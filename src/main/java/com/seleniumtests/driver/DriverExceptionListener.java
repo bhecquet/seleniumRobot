@@ -51,6 +51,10 @@ public class DriverExceptionListener implements WebDriverEventListener {
     public void beforeNavigateTo(final String arg0, final WebDriver arg1) { }
 
     public void beforeScript(final String arg0, final WebDriver arg1) { }
+    
+    public void afterNavigateRefresh(WebDriver arg0) {	}
+
+	public void beforeNavigateRefresh(WebDriver arg0) {	}
 
     public void onException(final Throwable ex, final WebDriver arg1) {
 
@@ -128,4 +132,7 @@ public class DriverExceptionListener implements WebDriverEventListener {
             }
         }
     }
+
+
+	
 }

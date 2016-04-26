@@ -4,7 +4,7 @@
 
 	<groupId>com.seleniumtests</groupId>
 	<artifactId>seleniumtestsframework</artifactId>
-	<version>4.0.5</version>
+	<version>4.1.0</version>
 	<packaging>jar</packaging>
 
 	<name>selenium tests framework</name>
@@ -55,6 +55,11 @@
             </snapshots>
         </repository>
     </repositories>
+    
+    <properties>
+    	<selenium.version>2.53.0</selenium.version>
+    	<htmlunitdriver.version>2.20</htmlunitdriver.version>
+    </properties>
 
 	<dependencies>
 		<dependency>
@@ -65,7 +70,7 @@
         <dependency>
             <groupId>io.appium</groupId>
             <artifactId>java-client</artifactId>
-            <version>2.1.0</version>
+            <version>3.4.1</version>
         </dependency>
 		<dependency>
 			<groupId>log4j</groupId>
@@ -100,7 +105,32 @@
 		<dependency>
 			<groupId>org.seleniumhq.selenium</groupId>
 			<artifactId>selenium-server</artifactId>
-			<version>2.48.2</version>
+			<version>${selenium.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.seleniumhq.selenium</groupId>
+			<artifactId>selenium-firefox-driver</artifactId>
+			<version>${selenium.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.seleniumhq.selenium</groupId>
+			<artifactId>selenium-chrome-driver</artifactId>
+			<version>${selenium.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.seleniumhq.selenium</groupId>
+			<artifactId>selenium-ie-driver</artifactId>
+			<version>${selenium.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.seleniumhq.selenium</groupId>
+			<artifactId>selenium-safari-driver</artifactId>
+			<version>${selenium.version}</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.seleniumhq.selenium</groupId>
+		    <artifactId>htmlunit-driver</artifactId>
+		    <version>${htmlunitdriver.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.opera</groupId>
@@ -138,6 +168,16 @@
 			<artifactId>commons-codec</artifactId>
 			<version>1.9</version>
 		</dependency>
+		<dependency>
+            <groupId>info.cukes</groupId>
+            <artifactId>cucumber-testng</artifactId>
+            <version>1.2.4</version>
+        </dependency>
+        <dependency>
+            <groupId>info.cukes</groupId>
+            <artifactId>cucumber-java8</artifactId>
+            <version>1.2.4</version>
+        </dependency>
     </dependencies>
 
 	<build>
