@@ -20,5 +20,5 @@ import com.seleniumtests.driver.DriverConfig;
 public interface ICapabilitiesFactory {
 
     DesiredCapabilities createCapabilities(DriverConfig cfg);
-
+    
 }

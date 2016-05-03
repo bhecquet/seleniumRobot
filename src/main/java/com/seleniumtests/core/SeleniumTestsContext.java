@@ -1,5 +1,6 @@
 /*
- * Copyright 2015 www.seleniumtests.com
+ * Orignal work: Copyright 2015 www.seleniumtests.com
+ * Modified work: Copyright 2016 www.infotel.com
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,8 +15,11 @@
 package com.seleniumtests.core;
 
 import java.io.File;
-
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -25,7 +29,9 @@ import java.util.Map.Entry;
 
 import org.testng.ITestContext;
 import org.testng.ITestResult;
+import org.testng.xml.XmlSuite;
 
+import com.seleniumtests.customexception.CustomSeleniumTestsException;
 import com.seleniumtests.driver.ScreenShot;
 import com.seleniumtests.driver.TestType;
 
@@ -35,6 +41,13 @@ import com.seleniumtests.reporter.PluginsHelper;
  * Defines TestNG context used in STF.
  */
 public class SeleniumTestsContext {
+	
+	// folder config
+	public static String ROOT_PATH;
+	public static String DATA_PATH;
+	public static String FEATURES_PATH;
+	public static String APPLICATION_NAME;
+	public static final String DATA_FOLDER_NAME = "data";
 
     /* configuration defined in testng.xml */
     public static final String TEST_CONFIGURATION = "testConfig";
@@ -82,7 +95,7 @@ public class SeleniumTestsContext {
     public static final String SSH_COMMAND_WAIT = "sshCommandWait";
     public static final String SOFT_ASSERT_ENABLED = "softAssertEnabled";
 
-    public static final String OUTPUT_DIRECTORY = "outputDirectory";
+    public static final String OUTPUT_DIRECTORY = "outputDirectory";     // folder where HTML report will be written
     public static final String WEB_DRIVER_LISTENER = "webDriverListener";
 
     public static final String TEST_METHOD_SIGNATURE = "testMethodSignature";
@@ -91,24 +104,35 @@ public class SeleniumTestsContext {
     public static final String TEST_DATA_FILE = "testDataFile";
 
     public static final String TEST_TYPE = "testType";
-
+    
+    public static final String CUCUMBER_TESTS = "cucumberTests";
+    public static final String CUCUMBER_TAGS = "cucumberTags";
+    public static final String VARIABLES = "variables";
+    public static final String TEST_ENV = "env";
+    public static final String CUCUMBER_IMPLEMENTATION_PKG = "cucumberPackage";
+    
     // Appium specific properties
+    public static final String APP = "app";
     public static final String APPIUM_SERVER_URL = "appiumServerURL";
     public static final String AUTOMATION_NAME = "automationName";
     public static final String MOBILE_PLATFORM_NAME = "platformName";
     public static final String MOBILE_PLATFORM_VERSION = "mobilePlatformVersion";
     public static final String DEVICE_NAME = "deviceName";
-    public static final String APP = "app";
 
     public static final String BROWSER_NAME = "browserName";
     public static final String APP_PACKAGE = "appPackage";
     public static final String APP_ACTIVITY = "appActivity";
+    public static final String APP_WAIT_ACTIVITY = "appWaitActivity";
     public static final String NEW_COMMAND_TIMEOUT = "newCommandTimeout";
 
-    // SauceLabs specific properties
+    // Cloud specific properties
     public static final String VERSION = "version";
     public static final String PLATFORM = "platform";
-    public static final String SAUCELABS_URL = "sauceLabsURL";
+    public static final String CLOUD_URL = "cloudURL";
+    public static final String CLOUD_API_KEY = "cloudApiKey";
+    
+    // Testdroid specific properties
+    public static final String PROJECT_NAME = "projectName";
 
     private LinkedList<TearDownService> tearDownServices = new LinkedList<TearDownService>();
     private Map<ITestResult, List<Throwable>> verificationFailuresMap = new HashMap<ITestResult, List<Throwable>>();
@@ -153,9 +177,55 @@ public class SeleniumTestsContext {
             return null;
         }
     }
+    
+    /**
+     * Build the root path of STF 
+     * method for guessing it is different if we are inside a jar (built mode) or in development
+     * @param clazz
+     * @param path
+     * @return
+     */
+    private static Boolean getPathFromClass(Class clazz, StringBuilder path) {
+		Boolean jar = false;
+		
+		try {
+			String url = URLDecoder.decode(clazz.getProtectionDomain().getCodeSource().getLocation().getFile(), "UTF-8" );
+			if (url.endsWith(".jar")) {
+				path.append((new File(url).getParentFile().getAbsoluteFile().toString() + "/").replace(File.separator, "/"));
+				jar = true;
+			} else {				
+				path.append((new File(url).getParentFile().getParentFile().getAbsoluteFile().toString() + "/").replace(File.separator, "/"));
+				jar = false;
+			}
+		} catch (UnsupportedEncodingException e) {}
+		
+		return jar;
+	}
+	
+    
+	private static void generateApplicationPath(XmlSuite xmlSuite) {
+
+		StringBuilder path = new StringBuilder();
+		getPathFromClass(SeleniumTestsContext.class, path);
+		
+		ROOT_PATH = path.toString();
+		APPLICATION_NAME = xmlSuite.getFileName().replace(File.separator, "/").split("/"+ DATA_FOLDER_NAME + "/")[1].split("/")[0];
+		DATA_PATH = xmlSuite.getFileName().replace(File.separator, "/").split("/"+ DATA_FOLDER_NAME + "/")[0] + "/" + DATA_FOLDER_NAME + "/";
+		FEATURES_PATH = Paths.get(DATA_PATH, APPLICATION_NAME, "features").toString();
+		
+		// create data folde if it does not exist (it should already exist)
+		if (!new File(DATA_PATH).isDirectory()) {
+			new File(DATA_PATH).mkdirs();
+		}
+	}
 
     public SeleniumTestsContext(final ITestContext context) {
         this.testNGContext = context;
+        
+        // initialize folders
+        if (context != null && context.getCurrentXmlTest() != null) {
+        	generateApplicationPath(context.getCurrentXmlTest().getSuite());
+        }
 
         setContextAttribute(context, TEST_DATA_FILE, System.getProperty(TEST_DATA_FILE), "testCase");
         setContextAttribute(context, TEST_TYPE, System.getProperty(TEST_TYPE), TestType.WEB.toString());
@@ -219,16 +289,25 @@ public class SeleniumTestsContext {
         setContextAttribute(context, DEVICE_NAME, System.getProperty(DEVICE_NAME), null);
 
         setContextAttribute(context, APP, System.getProperty(APP), "");
+       
+        setContextAttribute(context, CUCUMBER_TAGS, System.getProperty(CUCUMBER_TAGS), "");
+        setContextAttribute(context, CUCUMBER_TESTS, System.getProperty(CUCUMBER_TESTS), "");
+        setContextAttribute(context, CUCUMBER_IMPLEMENTATION_PKG, System.getProperty(CUCUMBER_IMPLEMENTATION_PKG), null);
+        setContextAttribute(context, VARIABLES, System.getProperty(VARIABLES), "{}");
+        setContextAttribute(context, TEST_ENV, System.getProperty(TEST_ENV), "DEV");
 
         // By default test is assumed to be executed on default browser on android emulator
         setContextAttribute(context, BROWSER_NAME, System.getProperty(BROWSER_NAME), "Browser");
         setContextAttribute(context, APP_PACKAGE, System.getProperty(APP_PACKAGE), null);
         setContextAttribute(context, APP_ACTIVITY, System.getProperty(APP_ACTIVITY), null);
+        setContextAttribute(context, APP_WAIT_ACTIVITY, System.getProperty(APP_WAIT_ACTIVITY), null);
         setContextAttribute(context, NEW_COMMAND_TIMEOUT, System.getProperty(NEW_COMMAND_TIMEOUT), "120");
 
         setContextAttribute(context, VERSION, System.getProperty(VERSION), null);
         setContextAttribute(context, PLATFORM, System.getProperty(PLATFORM), null);
-        setContextAttribute(context, SAUCELABS_URL, System.getProperty(SAUCELABS_URL), null);
+        setContextAttribute(context, CLOUD_URL, System.getProperty(CLOUD_URL), null);
+        setContextAttribute(context, CLOUD_API_KEY, System.getProperty(CLOUD_API_KEY), null);
+        setContextAttribute(context, PROJECT_NAME, System.getProperty(PROJECT_NAME), null);
 
         if (context != null) {
             setContextAttribute(OUTPUT_DIRECTORY, null, context.getOutputDirectory(), null);
@@ -441,6 +520,26 @@ public class SeleniumTestsContext {
         return (String) getAttribute(TEST_TYPE);
     }
 
+    public String getCucumberTags() {
+    	return (String) getAttribute(CUCUMBER_TAGS);
+    }
+    
+    public String[] getCucmberTests() {
+    	return ((String) getAttribute(CUCUMBER_TESTS)).split(",");
+    }
+    
+    public String getCucmberPkg() {
+    	return (String) getAttribute(CUCUMBER_IMPLEMENTATION_PKG);
+    }
+    
+    public String getTestEnvironment() {
+    	return (String) getAttribute(TEST_ENV);
+    }
+    
+    public String getVariables() {
+    	return (String) getAttribute(VARIABLES);
+    }
+    
     public String getTestMethodSignature() {
         return (String) getAttribute(TEST_METHOD_SIGNATURE);
     }
@@ -534,6 +633,10 @@ public class SeleniumTestsContext {
     public String getAppActivity() {
         return (String) getAttribute(APP_ACTIVITY);
     }
+    
+    public String getAppWaitActivity() {
+    	return (String) getAttribute(APP_WAIT_ACTIVITY);
+    }
 
     public String getNewCommandTimeout() {
         return (String) getAttribute(NEW_COMMAND_TIMEOUT);
@@ -547,8 +650,16 @@ public class SeleniumTestsContext {
         return (String) getAttribute(PLATFORM);
     }
 
-    public String getSaucelabsURL() {
-        return (String) getAttribute(SAUCELABS_URL);
+    public String getCloudURL() {
+        return (String) getAttribute(CLOUD_URL);
+    }
+    
+    public String getCloudApiKey() {
+    	return (String) getAttribute(CLOUD_API_KEY);
+    }
+    
+    public String getProjectName() {
+    	return (String) getAttribute(PROJECT_NAME);
     }
 
     public boolean isUseFirefoxDefaultProfile() {

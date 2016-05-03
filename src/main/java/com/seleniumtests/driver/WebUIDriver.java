@@ -1,5 +1,6 @@
 /*
- * Copyright 2015 www.seleniumtests.com
+ * Orignal work: Copyright 2015 www.seleniumtests.com
+ * Modified work: Copyright 2016 www.infotel.com
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -167,6 +168,8 @@ public class WebUIDriver {
                 webDriverBuilder = new SafariDriverFactory(this.config);
             } else if (config.getBrowser() == BrowserType.SauceLabs) {
                 webDriverBuilder = new SauceLabsDriverFactory(this.config);
+            } else if (config.getBrowser() == BrowserType.TestDroid) {
+            	webDriverBuilder = new TestDroidDriverFactory(this.config);
             } else if (config.getBrowser() == BrowserType.Android) {
                 webDriverBuilder = new AndroidDriverFactory(this.config);
             } else if (config.getBrowser() == BrowserType.IPhone) {
@@ -472,13 +475,18 @@ public class WebUIDriver {
 
         String appActivity = SeleniumTestsContextManager.getThreadContext().getAppActivity();
         config.setAppActivity(appActivity);
+        
+        String appWaitActivity = SeleniumTestsContextManager.getThreadContext().getAppWaitActivity();
+        config.setAppWaitActivity(appWaitActivity);
 
         String newCommandTimeOut = SeleniumTestsContextManager.getThreadContext().getNewCommandTimeout();
         config.setNewCommandTimeout(newCommandTimeOut);
 
         config.setVersion(SeleniumTestsContextManager.getThreadContext().getVersion());
         config.setPlatform(SeleniumTestsContextManager.getThreadContext().getPlatform());
-        config.setSauceLabsURL(SeleniumTestsContextManager.getThreadContext().getSaucelabsURL());
+        config.setCloudURL(SeleniumTestsContextManager.getThreadContext().getCloudURL());
+        config.setCloudApiKey(SeleniumTestsContextManager.getThreadContext().getCloudApiKey());
+        config.setProjectName(SeleniumTestsContextManager.getThreadContext().getProjectName());
         config.setTestType(SeleniumTestsContextManager.getThreadContext().getTestType());
     }
 
