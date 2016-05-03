@@ -1,5 +1,6 @@
 /*
- * Copyright 2015 www.seleniumtests.com
+ * Orignal work: Copyright 2015 www.seleniumtests.com
+ * Modified work: Copyright 2016 www.infotel.com
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -57,7 +58,7 @@ public class DriverExceptionListener implements WebDriverEventListener {
 	public void beforeNavigateRefresh(WebDriver arg0) {	}
 
     public void onException(final Throwable ex, final WebDriver arg1) {
-
+    	
         if (ex.getMessage() == null) {
             return;
         } else if (ex.getMessage().contains("Element must be user-editable in order to clear it")) {
@@ -119,12 +120,7 @@ public class DriverExceptionListener implements WebDriverEventListener {
 
             try {
                 System.out.println("Got customexception" + ex.getMessage());
-                if (SeleniumTestsContextManager.getThreadContext().getTestType().equalsIgnoreCase(
-                            TestType.WEB.toString())) {
-                    new ScreenshotUtil(arg1).capturePageSnapshotOnException();
-                } else {
-                    System.out.println("Capture screenshot is not available for appium");
-                }
+                new ScreenshotUtil(arg1).capturePageSnapshotOnException();
             } catch (Exception e) {
 
                 // Ignore all exceptions

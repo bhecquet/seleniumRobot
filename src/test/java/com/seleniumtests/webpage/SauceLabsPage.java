@@ -15,7 +15,7 @@ public class SauceLabsPage extends PageObject {
         super(null,
             openAPP
                 ? SeleniumTestsContextManager.getThreadContext()
-                    .getSaucelabsURL() : null);
+                    .getCloudURL() : null);
     }
 
     public void getMeToTheSauceLabs() {
