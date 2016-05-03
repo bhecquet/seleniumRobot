@@ -1,5 +1,6 @@
 /*
- * Copyright 2015 www.seleniumtests.com
+ * Orignal work: Copyright 2015 www.seleniumtests.com
+ * Modified work: Copyright 2016 www.infotel.com
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -78,11 +79,14 @@ public class DriverConfig {
 
     private String appPackage;
     private String appActivity;
+    private String appWaitActivity;
     private String newCommandTimeout;
 
     private String platform;
     private String version;
-    private String sauceLabsURL;
+    private String cloudURL;
+    private String cloudApiKey;
+    private String projectName;
 
     public ArrayList<WebDriverEventListener> getWebDriverListeners() {
         return webDriverListeners;
@@ -482,11 +486,35 @@ public class DriverConfig {
         this.version = version;
     }
 
-    public String getSauceLabsURL() {
-        return sauceLabsURL;
+    public String getCloudURL() {
+        return cloudURL;
     }
 
-    public void setSauceLabsURL(final String sauceLabsURL) {
-        this.sauceLabsURL = sauceLabsURL;
+    public void setCloudURL(final String cloudURL) {
+        this.cloudURL = cloudURL;
     }
+
+	public String getCloudApiKey() {
+		return cloudApiKey;
+	}
+
+	public void setCloudApiKey(final String cloudApiKey) {
+		this.cloudApiKey = cloudApiKey;
+	}
+
+	public String getProjectName() {
+		return projectName;
+	}
+
+	public void setProjectName(String projectName) {
+		this.projectName = projectName;
+	}
+
+	public String getAppWaitActivity() {
+		return appWaitActivity;
+	}
+
+	public void setAppWaitActivity(String appWaitActivity) {
+		this.appWaitActivity = appWaitActivity;
+	}
 }

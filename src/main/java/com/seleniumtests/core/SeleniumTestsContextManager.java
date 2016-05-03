@@ -1,5 +1,6 @@
 /*
- * Copyright 2015 www.seleniumtests.com
+ * Orignal work: Copyright 2015 www.seleniumtests.com
+ * Modified work: Copyright 2016 www.infotel.com
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -154,8 +155,7 @@ public class SeleniumTestsContextManager {
     }
 
     public static void initThreadContext(final ITestContext testNGCtx, final XmlTest xmlTest) {
-        SeleniumTestsContext seleniumTestsCtx = new SeleniumTestsContext(testNGCtx);
-
+    	SeleniumTestsContext seleniumTestsCtx = new SeleniumTestsContext(testNGCtx);
         loadCustomizedContextAttribute(testNGCtx, seleniumTestsCtx);
 
         if (xmlTest != null) {

@@ -1,5 +1,6 @@
 /*
- * Copyright 2015 www.seleniumtests.com
+ * Orignal work: Copyright 2015 www.seleniumtests.com
+ * Modified work: Copyright 2016 www.infotel.com
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -22,6 +23,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.openqa.selenium.UnsupportedCommandException;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebDriverException;
 
 import com.seleniumtests.driver.DriverConfig;
 
@@ -60,7 +62,7 @@ public class AndroidDriverFactory extends AbstractWebDriverFactory implements IW
     protected void setPageLoadTimeout(final long timeout) {
         try {
             driver.manage().timeouts().pageLoadTimeout(timeout, TimeUnit.SECONDS);
-        } catch (UnsupportedCommandException e) {
+        } catch (WebDriverException e) {
             // chromedriver does not support pageLoadTimeout
         }
     }

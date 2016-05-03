@@ -78,11 +78,6 @@
 			<version>1.2.5</version>
 		</dependency>
 		<dependency>
-			<groupId>commons-httpclient</groupId>
-			<artifactId>commons-httpclient</artifactId>
-			<version>3.1</version>
-		</dependency>
-		<dependency>
 			<groupId>org.json</groupId>
 			<artifactId>json</artifactId>
 			<version>20070829</version> 
@@ -102,6 +97,7 @@
 			<artifactId>guice</artifactId>
 			<version>3.0</version>
 		</dependency>
+		
 		<dependency>
 			<groupId>org.seleniumhq.selenium</groupId>
 			<artifactId>selenium-server</artifactId>
@@ -178,6 +174,19 @@
             <artifactId>cucumber-java8</artifactId>
             <version>1.2.4</version>
         </dependency>
+        
+        <!-- Specific Testdroid -->
+        <dependency>
+            <groupId>com.google.http-client</groupId>
+            <artifactId>google-http-client-jackson2</artifactId>
+            <version>1.15.0-rc</version>
+        </dependency>
+        <dependency>
+            <groupId>com.testdroid</groupId>
+            <artifactId>testdroid-api</artifactId>
+            <version>1.4.8</version>
+        </dependency>
+        
     </dependencies>
 
 	<build>
