@@ -1,5 +1,6 @@
 /*
- * Copyright 2015 www.seleniumtests.com
+ * Orignal work: Copyright 2015 www.seleniumtests.com
+ * Modified work: Copyright 2016 www.infotel.com
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -45,9 +46,9 @@ public class ScreenshotUtil {
                 return null;
             }
 
-            if (WebUIDriver.getWebUIDriver().getBrowser().equalsIgnoreCase(BrowserType.Android.getBrowserType())) {
-                return null;
-            }
+//            if (WebUIDriver.getWebUIDriver().getBrowser().equalsIgnoreCase(BrowserType.Android.getBrowserType())) {
+//                return null;
+//            }
 
             TakesScreenshot screenShot = (TakesScreenshot) driver;
             return screenShot.getScreenshotAs(OutputType.BASE64);
@@ -151,18 +152,23 @@ public class ScreenshotUtil {
         screenShot.setSuiteName(this.suiteName);
 
         try {
-            String url = null;
-            try {
-                url = driver.getCurrentUrl();
-            } catch (org.openqa.selenium.UnhandledAlertException ex) {
+            String url = "app";
+            String title = "app";
+            String pageSource = "";
+            if (SeleniumTestsContextManager.getThreadContext().getTestType().equalsIgnoreCase(TestType.WEB.toString())) {
+            	try {
+                    url = driver.getCurrentUrl();
+                } catch (org.openqa.selenium.UnhandledAlertException ex) {
 
-                // ignore alert customexception
-                ex.printStackTrace();
-                url = driver.getCurrentUrl();
-            }
+                    // ignore alert customexception
+                    ex.printStackTrace();
+                    url = driver.getCurrentUrl();
+                }
 
-            String title = driver.getTitle();
-            String pageSource = driver.getPageSource();
+                title = driver.getTitle();
+                pageSource = driver.getPageSource();
+            } 
+            
 
             String filename = HashCodeGenerator.getRandomHashCode("web");
             this.filename = filename;

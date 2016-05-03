@@ -1,3 +1,17 @@
+/*
+ * Copyright 2016 www.infotel.com
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+
 package com.seleniumtests.core.runner;
 
 import java.io.IOException;
@@ -10,6 +24,7 @@ import org.testng.ITestContext;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.AfterSuite;
+import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.BeforeSuite;
@@ -28,18 +43,11 @@ import com.seleniumtests.driver.WebUIDriver;
 import cucumber.api.CucumberOptions;
 import cucumber.api.testng.CucumberFeatureWrapper;
 
-@CucumberOptions(features = {"src/test/resources/features/Google2.feature"},
-        		glue = "com.seleniumtests.tests")
 public class CucumberRunner {
 	
 	private static final Logger logger = TestLogging.getLogger(SeleniumTestPlan.class);
     private Date start;
 	private CustomTestNGCucumberRunner testNGCucumberRunner;
-
-    @BeforeClass(alwaysRun = true)
-    public void setUpClass() throws Exception {
-        testNGCucumberRunner = new CustomTestNGCucumberRunner(this.getClass());
-    }
     
     @BeforeSuite(alwaysRun = true)
     public void beforeTestSuite(final ITestContext testContext) throws IOException {
@@ -59,6 +67,7 @@ public class CucumberRunner {
     @BeforeTest(alwaysRun = true)
     public void beforeTest(final ITestContext testContext, final XmlTest xmlTest) {
         SeleniumTestsContextManager.initTestLevelContext(testContext, xmlTest);
+        testNGCucumberRunner = new CustomTestNGCucumberRunner(this.getClass(), xmlTest.getName());
     }
 
     @BeforeMethod(alwaysRun = true)
@@ -86,10 +95,14 @@ public class CucumberRunner {
         return testNGCucumberRunner.provideScenarios();
     }
 
-    @AfterClass
-    public void tearDownClass() throws Exception {
+    @AfterTest
+    public void tearDown() throws Exception {
         testNGCucumberRunner.finish();
     }
+//    @AfterClass
+//    public void tearDownClass() throws Exception {
+//    	testNGCucumberRunner.finish();
+//    }
 
     @AfterSuite(alwaysRun = true)
     public void afterTestSuite() {

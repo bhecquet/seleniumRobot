@@ -1,5 +1,6 @@
 /*
- * Copyright 2015 www.seleniumtests.com
+ * Orignal work: Copyright 2015 www.seleniumtests.com
+ * Modified work: Copyright 2016 www.infotel.com
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,7 +14,7 @@
 
 package com.seleniumtests.customexception;
 
-public class CustomSeleniumTestsException extends Exception {
+public class CustomSeleniumTestsException extends RuntimeException {
 
     private static final long serialVersionUID = -5567383832452234582L;
 
