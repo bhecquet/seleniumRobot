@@ -1,5 +1,6 @@
 /*
- * Copyright 2015 www.seleniumtests.com
+ * Orignal work: Copyright 2015 www.seleniumtests.com
+ * Modified work: Copyright 2016 www.infotel.com
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,10 +16,10 @@ package com.seleniumtests.webelements;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-
 import org.openqa.selenium.By;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.UnhandledAlertException;
@@ -27,28 +28,23 @@ import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.remote.UnreachableBrowserException;
-
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.Assert;
 
 import com.gargoylesoftware.htmlunit.ElementNotFoundException;
-
 import com.seleniumtests.core.CustomAssertion;
+import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.SeleniumTestsPageListener;
 import com.seleniumtests.core.TestLogging;
-
+import com.seleniumtests.core.config.ConfigReader;
 import com.seleniumtests.customexception.CustomSeleniumTestsException;
 import com.seleniumtests.customexception.NotCurrentPageException;
-
 import com.seleniumtests.driver.ScreenShot;
 import com.seleniumtests.driver.ScreenshotUtil;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.driver.WebUtility;
-
-import com.seleniumtests.helper.WaitHelper;
-
-import com.thoughtworks.selenium.Wait;
-import com.thoughtworks.selenium.Wait.WaitTimedOutException;
 
 import net.jsourcerer.webdriver.jserrorcollector.JavaScriptError;
 
@@ -98,6 +94,7 @@ public class PageObject extends BasePage implements IPage {
      * @throws  Exception
      */
     public PageObject(final HtmlElement pageIdentifierElement, final String url) throws Exception {
+    	
         Calendar start = Calendar.getInstance();
         start.setTime(new Date());
 
@@ -171,6 +168,18 @@ public class PageObject extends BasePage implements IPage {
                         ? " (assert PageIdentifierElement " + pageIdentifierElement.toHTML() + " is present)." : "."),
                 false);
         }
+    }
+    
+    /**
+     * Get parameter from configuration
+     */
+    public String param(String key) {
+    	String value = SeleniumTestsContextManager.getTestLevelContext(SeleniumTestsContextManager.getThreadContext().getTestName()).getConfiguration().get(key);
+    	if (value == null) {
+    		TestLogging.errorLogger(String.format("Variable %s is not defined", key));
+    		return "";
+    	}
+    	return value;
     }
 
     public void assertHtmlSource(final String text) {
@@ -511,22 +520,7 @@ public class PageObject extends BasePage implements IPage {
     }
 
     private void waitForPageToLoad() throws Exception {
-        try {
-            new Wait() {
-                @Override
-                public boolean until() {
-                    try {
-                        driver.switchTo().defaultContent();
-                        return true;
-                    } catch (UnhandledAlertException ex) {
-                        WaitHelper.waitForSeconds(2);
-                    } catch (WebDriverException e) { }
-
-                    return false;
-                }
-            }.wait(String.format("Timed out waiting for page to load"),
-                WebUIDriver.getWebUIDriver().getWebSessionTimeout());
-        } catch (WaitTimedOutException ex) { }
+        new WebDriverWait(driver, 2).until(ExpectedConditions.jsReturnsValue("if (document.readyState === \"complete\") { return \"ok\"; }"));
 
         // populate page info
         try {

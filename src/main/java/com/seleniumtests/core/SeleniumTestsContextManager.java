@@ -105,7 +105,7 @@ public class SeleniumTestsContextManager {
     private static ITestContext getContextFromConfigFile(final ITestContext iTestContext) {
         if (iTestContext != null) {
 
-            // "testConfig" parameter can be define in testng.xml file
+            // "testConfig" parameter can be defined in testng.xml file
             // This parameter points to a config xml file which defines test configuration parameters
             // Hence testng.xml file can focus on test
             if (iTestContext.getSuite().getParameter(SeleniumTestsContext.TEST_CONFIGURATION) != null) {
@@ -138,6 +138,9 @@ public class SeleniumTestsContextManager {
             }
 
         }
+        
+        // merge configurations from ini file and xml file
+        seleniumTestsCtx.setTestConfiguration();
 
         testLevelContext.put(xmlTest.getName(), seleniumTestsCtx);
     }

@@ -15,26 +15,29 @@
 package com.seleniumtests.core;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
+import org.apache.commons.io.FileUtils;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.testng.ITestContext;
 import org.testng.ITestResult;
 import org.testng.xml.XmlSuite;
 
-import com.seleniumtests.customexception.CustomSeleniumTestsException;
+import com.seleniumtests.core.config.ConfigReader;
 import com.seleniumtests.driver.ScreenShot;
 import com.seleniumtests.driver.TestType;
-
 import com.seleniumtests.reporter.PluginsHelper;
 
 /**
@@ -46,6 +49,7 @@ public class SeleniumTestsContext {
 	public static String ROOT_PATH;
 	public static String DATA_PATH;
 	public static String FEATURES_PATH;
+	public static String CONFIG_PATH;
 	public static String APPLICATION_NAME;
 	public static final String DATA_FOLDER_NAME = "data";
 
@@ -104,10 +108,12 @@ public class SeleniumTestsContext {
     public static final String TEST_DATA_FILE = "testDataFile";
 
     public static final String TEST_TYPE = "testType";
+    public static final String TEST_NAME = "testName";
     
     public static final String CUCUMBER_TESTS = "cucumberTests";
     public static final String CUCUMBER_TAGS = "cucumberTags";
     public static final String VARIABLES = "variables";
+    public static final String TEST_CONFIG = "currentTestConfig"; // configuration used for the current test. It is not updated via XML file
     public static final String TEST_ENV = "env";
     public static final String CUCUMBER_IMPLEMENTATION_PKG = "cucumberPackage";
     
@@ -143,6 +149,7 @@ public class SeleniumTestsContext {
     private ITestContext testNGContext = null;
 
     private LinkedList<ScreenShot> screenshots = new LinkedList<ScreenShot>();
+    
 
     public LinkedList<ScreenShot> getScreenshots() {
         return screenshots;
@@ -212,8 +219,9 @@ public class SeleniumTestsContext {
 		APPLICATION_NAME = xmlSuite.getFileName().replace(File.separator, "/").split("/"+ DATA_FOLDER_NAME + "/")[1].split("/")[0];
 		DATA_PATH = xmlSuite.getFileName().replace(File.separator, "/").split("/"+ DATA_FOLDER_NAME + "/")[0] + "/" + DATA_FOLDER_NAME + "/";
 		FEATURES_PATH = Paths.get(DATA_PATH, APPLICATION_NAME, "features").toString();
+		CONFIG_PATH = Paths.get(DATA_PATH, APPLICATION_NAME, "config").toString();
 		
-		// create data folde if it does not exist (it should already exist)
+		// create data folder if it does not exist (it should already exist)
 		if (!new File(DATA_PATH).isDirectory()) {
 			new File(DATA_PATH).mkdirs();
 		}
@@ -225,6 +233,7 @@ public class SeleniumTestsContext {
         // initialize folders
         if (context != null && context.getCurrentXmlTest() != null) {
         	generateApplicationPath(context.getCurrentXmlTest().getSuite());
+        	setAttribute(TEST_NAME, context.getCurrentXmlTest().getName());
         }
 
         setContextAttribute(context, TEST_DATA_FILE, System.getProperty(TEST_DATA_FILE), "testCase");
@@ -519,6 +528,10 @@ public class SeleniumTestsContext {
     public String getTestType() {
         return (String) getAttribute(TEST_TYPE);
     }
+    
+    public String getTestName() {
+    	return (String) getAttribute(TEST_NAME);
+    }
 
     public String getCucumberTags() {
     	return (String) getAttribute(CUCUMBER_TAGS);
@@ -661,6 +674,10 @@ public class SeleniumTestsContext {
     public String getProjectName() {
     	return (String) getAttribute(PROJECT_NAME);
     }
+    
+    public HashMap<String, String> getConfiguration() {
+    	return (HashMap<String, String>) getAttribute(TEST_CONFIG);
+    }
 
     public boolean isUseFirefoxDefaultProfile() {
         try {
@@ -755,6 +772,28 @@ public class SeleniumTestsContext {
 
     public void setTestType(final String testType) {
         setAttribute(TEST_TYPE, testType);
+    }
+    
+    @SuppressWarnings("unchecked")
+	public void setTestConfiguration() {
+    	Map<String, String> testConfig;
+		try {
+			testConfig = new ConfigReader().readConfig(FileUtils.openInputStream(new File(CONFIG_PATH + File.separator + "config.ini")));
+		} catch (IOException e1) {
+			TestLogging.warning("no valid config.ini file for this application");
+			testConfig = new HashMap<String, String>();
+		}
+    	if (getVariables() != null) {
+			try {
+				JSONObject json = new JSONObject(getVariables());
+				for (String key: (Set<String>)json.keySet()) {
+					testConfig.put(key, json.getString(key));
+				}
+			} catch (JSONException e) {
+				TestLogging.warning("le format des variables n'est pas une chaine JSON valide");
+			}
+		}	
+    	setAttribute(TEST_CONFIG, testConfig);
     }
 
 }
