@@ -1,0 +1,22 @@
+<!DOCTYPE suite SYSTEM "http://beust.com/testng/testng-1.0.dtd" >
+<suite name="Unit test suite" parallel="methods" verbose="1" thread-count="5">
+   
+
+    
+
+    <test name="Unit tests" parallel="false">
+    
+    	<parameter name="variables" value="{'key6':'value6', 'key2': 'value20'}" />
+        
+        <groups>
+            <run>
+                <include name="ut"/>
+            </run>
+        </groups>
+
+        <packages>
+            <package name="com.seleniumtests.ut.*" />
+        </packages>
+    </test>
+
+</suite> 

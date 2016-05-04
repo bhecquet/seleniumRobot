@@ -80,7 +80,7 @@
 		<dependency>
 			<groupId>org.json</groupId>
 			<artifactId>json</artifactId>
-			<version>20070829</version> 
+			<version>20131018</version> 
 		</dependency>
 		<dependency>
 			<groupId>org.apache.commons</groupId>
@@ -186,8 +186,13 @@
             <artifactId>testdroid-api</artifactId>
             <version>1.4.8</version>
         </dependency>
-        
-    </dependencies>
+
+        <dependency>
+        	<groupId>org.ini4j</groupId>
+        	<artifactId>ini4j</artifactId>
+        	<version>0.5.4</version>
+        </dependency>
+	</dependencies>
 
 	<build>
 		<plugins>
