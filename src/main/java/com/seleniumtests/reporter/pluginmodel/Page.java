@@ -27,13 +27,13 @@ import javax.xml.bind.annotation.XmlType;
  *
  * <p/>
  * <pre>
-   &lt;complexType>
-     &lt;complexContent>
-       &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
-         &lt;attribute name="class-name" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
-       &lt;/restriction>
-     &lt;/complexContent>
-   &lt;/complexType>
+   &lt;complexType&gt;
+     &lt;complexContent&gt;
+       &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
+         &lt;attribute name="class-name" use="required" type="{http://www.w3.org/2001/XMLSchema}string" /&gt;
+       &lt;/restriction&gt;
+     &lt;/complexContent&gt;
+   &lt;/complexType&gt;
  * </pre>
  */
 @XmlAccessorType(XmlAccessType.FIELD)

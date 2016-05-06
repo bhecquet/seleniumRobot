@@ -41,11 +41,6 @@ public abstract class SeleniumTestPlan {
     private static final Logger logger = TestLogging.getLogger(SeleniumTestPlan.class);
     private Date start;
 
-    /**
-     * @param   testContext
-     *
-     * @throws  IOException
-     */
     @BeforeSuite(alwaysRun = true)
     public void beforeTestSuite(final ITestContext testContext) throws IOException {
         System.out.println("####################################################");
@@ -65,7 +60,6 @@ public abstract class SeleniumTestPlan {
     /**
      * Configure Test Params setting.
      *
-     * @param  xmlTest
      */
     @BeforeTest(alwaysRun = true)
     public void beforeTest(final ITestContext testContext, final XmlTest xmlTest) {
@@ -90,11 +84,6 @@ public abstract class SeleniumTestPlan {
 
     /**
      * clean up.
-     *
-     * @param  parameters
-     * @param  method
-     * @param  testContex
-     * @param  xmlTest
      */
     @AfterMethod(alwaysRun = true)
     public void afterTestMethod(final Object[] parameters, final Method method, final ITestContext testContex,
@@ -120,7 +109,7 @@ public abstract class SeleniumTestPlan {
      *
      * @param   parameters
      *
-     * @return
+     * @return	parameters as string
      */
     private String buildParameterString(final Object[] parameters) {
         StringBuffer parameter = new StringBuffer();

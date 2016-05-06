@@ -34,7 +34,7 @@ public class FirefoxDriverFactory extends AbstractWebDriverFactory implements IW
     /**
      * create native driver instance, designed for unit testing.
      *
-     * @return
+     * @return	the driver
      */
     protected WebDriver createNativeDriver() {
         return new FirefoxDriver(new FirefoxCapabilitiesFactory().createCapabilities(webDriverConfig));

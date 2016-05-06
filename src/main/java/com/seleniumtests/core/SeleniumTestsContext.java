@@ -502,9 +502,9 @@ public class SeleniumTestsContext {
     /**
      * Get TestNG suite parameter from testng.xml. Return System value for CI job.
      *
-     * @param   key
+     * @param   key		name of the parameter
      *
-     * @return
+     * @return value of the parameter
      */
     public String getSuiteParameter(final String key) {
         if (System.getProperty(key) != null) {
@@ -516,6 +516,8 @@ public class SeleniumTestsContext {
 
     /**
      * Returns the tear down list.
+     * 
+     * @return list of teardown services
      */
     public LinkedList<TearDownService> getTearDownServices() {
         return tearDownServices;

@@ -15,7 +15,7 @@
 package com.seleniumtests.driver;
 
 /**
- * @author  tbhadauria <tarun.kumar.bhadauria@zalando.de>
+ * @author  tbhadauria: tarun.kumar.bhadauria@zalando.de
  */
 public enum TestType {
 

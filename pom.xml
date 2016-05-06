@@ -28,9 +28,9 @@
     </developers>
 
     <scm>
-        <connection>scm:git:git@github.com:TestingForum/seleniumtestsframework.git</connection>
-        <developerConnection>scm:git:git@github.com:TestingForum/seleniumtestsframework.git</developerConnection>
-        <url>git@github.com:TestingForum/seleniumtestsframework.git</url>
+        <connection>scm:git:git@github.com:bhecquet/seleniumtestsframework.git</connection>
+        <developerConnection>scm:git:git@github.com:bhecquet/seleniumtestsframework.git</developerConnection>
+        <url>git@github.com:bhecquet/seleniumtestsframework.git</url>
     </scm>
 
 	<distributionManagement>
@@ -59,6 +59,7 @@
     <properties>
     	<selenium.version>2.53.0</selenium.version>
     	<htmlunitdriver.version>2.20</htmlunitdriver.version>
+    	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
 	<dependencies>
@@ -210,11 +211,14 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.5.1</version>
 				<configuration>
 					<encoding>utf-8</encoding>
-					<source>1.6</source>
-					<target>1.6</target>
+					<source>1.8</source>
+					<target>1.8</target>
+					
 				</configuration>
+				
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -222,7 +226,7 @@
 				<version>2.9</version>
 				<configuration>
 					<suiteXmlFiles>
-						<suiteXmlFile>testng.xml</suiteXmlFile>
+						<suiteXmlFile>data/core/testng/tu.xml</suiteXmlFile>
 					</suiteXmlFiles>
 					<properties>
 						<property>
@@ -242,10 +246,119 @@
                         </goals>
                         <configuration>
                             <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                            <overWriteReleases>true</overWriteReleases>
+							<overWriteSnapshots>false</overWriteSnapshots>
+							<overWriteIfNewer>true</overWriteIfNewer>
                         </configuration>
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<version>2.6</version>
+				<dependencies>
+					<dependency>
+						<groupId>${project.groupId}</groupId>
+						<artifactId>${project.artifactId}</artifactId>
+						<version>${project.version}</version>
+					</dependency>
+	        	</dependencies>
+				<executions>
+				    <execution>
+				    	<id>archive</id> 
+				    	<phase>package</phase>
+				    	<goals>
+							<goal>single</goal> 
+				      	</goals>
+				      	<configuration>
+				      		<finalName>${project.artifactId}</finalName>
+				      		<appendAssemblyId>false</appendAssemblyId>
+				     		<archiveBaseDirectory>${project.build.directory}</archiveBaseDirectory>
+				     		<outputDirectory>${project.basedir}</outputDirectory>
+				     		<descriptorRefs>
+		                		<descriptorRef>archiveArtifact</descriptorRef>
+		              		</descriptorRefs>
+				      	</configuration>
+				  	</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<artifactId>maven-resources-plugin</artifactId>
+				<version>2.7</version>
+				<executions>
+					<execution>
+						<id>default-resources</id>
+						<phase>process-test-resources</phase>
+						<configuration>
+							<overwrite>true</overwrite>
+						</configuration>
+						<goals>
+							<goal>resources</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>default-testResources</id>
+						<phase>process-test-resources</phase>
+						<goals>
+							<goal>testResources</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>copy-plugins</id>
+						<phase>process-resources</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${project.build.directory}/plugins</outputDirectory>
+							<resources>
+								<resource>
+									<directory>${project.basedir}/plugins</directory>
+								</resource>
+							</resources>
+						</configuration>            
+					</execution>
+					<execution>
+						<id>copy-data</id>
+						<phase>process-resources</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${project.build.directory}/data/${project.artifactId}</outputDirectory>
+							<resources>
+							
+								<resource>
+									<directory>src/main/resources/data/core</directory>
+								</resource>
+								<resource>
+									<directory>${project.basedir}/data/${project.artifactId}</directory>
+								</resource>
+							</resources>
+						</configuration>            
+					</execution>
+					<execution>
+						<id>copy-launcher</id>
+						<phase>process-resources</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${project.build.directory}</outputDirectory>
+							<resources>
+								<resource>
+									<directory>${project.basedir}/launchers</directory>
+									<include>launch.bat</include>
+								</resource>
+							</resources>
+						</configuration>            
+					</execution>
+				</executions>
+				<configuration>
+					<includeEmptyDirs>true</includeEmptyDirs>
+					
+				</configuration>
+			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-source-plugin</artifactId>
@@ -261,6 +374,34 @@
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>2.6</version>
+				<configuration>
+					<finalName>${project.artifactId}</finalName>
+					<archive>
+						<manifest>
+							<addClasspath>true</addClasspath>
+							<classpathPrefix>lib/</classpathPrefix>
+						</manifest>
+					</archive>
+				</configuration>
+				<executions>
+					<execution>
+						<id>test-jar</id>
+						<goals>
+							<goal>test-jar</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>jar</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
 				<version>2.9.1</version>
 				<executions>
@@ -269,9 +410,9 @@
 						<goals>
 							<goal>jar</goal>
 						</goals>
-						<!--<configuration> &lt;!&ndash; disable checking for java 8&ndash;&gt;
+						<configuration> <!-- disable checking for java 8 -->
 							<additionalparam>-Xdoclint:none</additionalparam>
-						</configuration>-->
+						</configuration>
 					</execution>
 				</executions>
 			</plugin>
