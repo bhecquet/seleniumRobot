@@ -133,7 +133,7 @@ public class FirefoxCapabilitiesFactory implements ICapabilitiesFactory {
      *
      * @param   profilePath  The folder to store the profile
      *
-     * @throws  IOException
+     * @throws  IOException	 when profile file is not found
      */
     protected void extractDefaultProfile(final String profilePath) throws IOException {
         synchronized (lockProfile) {

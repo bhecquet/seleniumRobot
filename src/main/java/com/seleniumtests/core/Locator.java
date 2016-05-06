@@ -3,7 +3,7 @@ package com.seleniumtests.core;
 import org.openqa.selenium.By;
 
 /**
- * @author  tbhadauria <tarun.kumar.bhadauria@zalando.de>
+ * @author  tbhadauria: tarun.kumar.bhadauria@zalando.de
  */
 public class Locator {
 
