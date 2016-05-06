@@ -708,6 +708,12 @@ public class SeleniumTestsContext {
         contextDataMap.put(name, value);
     }
 
+    /**
+     * Add to contextMap parameters defined in testng file which are not known as technical parameters
+     * For example, it's possible to add <parameter name="aNewParam" value="aValue" /> in context because it's unknown from 
+     * constructor. Whereas <parameter name=browser value="*opera" /> will not be overriden as it's already known
+     * @param context
+     */
     private void setContextAttribute(final ITestContext context) {
         if (context != null) {
             Map<String, String> testParameters = context.getSuite().getXmlSuite().getParameters();
@@ -715,7 +721,8 @@ public class SeleniumTestsContext {
             for (Entry<String, String> entry : testParameters.entrySet()) {
                 String attributeName = entry.getKey();
 
-                if (contextDataMap.get(entry.getKey()) == null) {
+                
+                if (!contextDataMap.containsKey(entry.getKey())) {
                     String sysPropertyValue = System.getProperty(entry.getKey());
                     String suiteValue = entry.getValue();
                     setContextAttribute(attributeName, sysPropertyValue, suiteValue, null);
@@ -738,8 +745,8 @@ public class SeleniumTestsContext {
     private void setContextAttribute(final ITestContext context, final String attributeName,
             final String sysPropertyValue, final String defaultValue) {
         String suiteValue = null;
-        if (context != null) {
-            suiteValue = context.getSuite().getParameter(attributeName);
+        if (context != null && context.getCurrentXmlTest() != null) {
+            suiteValue = context.getCurrentXmlTest().getSuite().getParameter(attributeName);
         }
 
         contextDataMap.put(attributeName,
