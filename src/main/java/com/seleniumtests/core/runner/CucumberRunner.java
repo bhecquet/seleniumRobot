@@ -71,8 +71,7 @@ public class CucumberRunner {
     }
 
     @BeforeMethod(alwaysRun = true)
-    public void beforeTestMethod(final Object[] parameters, final Method method, final ITestContext testContex,
-            final XmlTest xmlTest) {
+    public void beforeTestMethod(final Object[] parameters, final Method method, final ITestContext testContex, final XmlTest xmlTest) {
         logger.info(Thread.currentThread() + " Start method " + method.getName());
         SeleniumTestsContextManager.initThreadContext(testContex, xmlTest);
         if (method != null) {
