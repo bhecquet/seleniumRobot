@@ -15,12 +15,15 @@ package com.seleniumtests.browserfactory;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
 
+import org.openqa.selenium.Platform;
 import org.openqa.selenium.Proxy;
 import org.openqa.selenium.ie.InternetExplorerDriver;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
+import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.driver.DriverConfig;
 import com.seleniumtests.driver.DriverMode;
 
@@ -30,14 +33,11 @@ import com.seleniumtests.helper.OSUtility;
 import com.seleniumtests.resources.WebDriverExternalResources;
 
 public class IECapabilitiesFactory implements ICapabilitiesFactory {
-
-    private void handleExtractResources() throws IOException {
-        String dir = this.getClass().getResource("/").getPath();
+    
+    public void handleExtractResources() throws IOException {
+        String dir = Paths.get(SeleniumTestsContext.ROOT_PATH, "tools", "drivers", Platform.getCurrent().family().toString().toLowerCase()).toString();
         dir = FileUtility.decodePath(dir);
-        if (!new File(dir).exists()) {
-            FileUtility.extractJar(dir, WebDriverExternalResources.class);
-        }
-
+        
         if (!new File(dir + "\\IEDriverServer.exe").exists()) {
             if (OSUtility.getIEVersion() < 10) {
                 FileUtility.copyFile(dir + "\\IEDriverServer_x64.exe", dir + "\\IEDriverServer.exe");
@@ -45,7 +45,7 @@ public class IECapabilitiesFactory implements ICapabilitiesFactory {
                 FileUtility.copyFile(dir + "\\IEDriverServer_Win32.exe", dir + "\\IEDriverServer.exe"); // Win32
             }
         }
-
+        
         System.setProperty("webdriver.ie.driver", dir + "\\IEDriverServer.exe");
         System.out.println(dir + "\\IEDriverServer.exe");
     }
