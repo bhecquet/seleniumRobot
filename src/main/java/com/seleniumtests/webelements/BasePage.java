@@ -13,6 +13,8 @@
 
 package com.seleniumtests.webelements;
 
+import java.util.Set;
+
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.InvalidSelectorException;
@@ -22,19 +24,15 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
-
 import org.testng.Assert;
 
 import com.seleniumtests.core.CustomAssertion;
 import com.seleniumtests.core.TestLogging;
-
 import com.seleniumtests.customexception.NotCurrentPageException;
-
 import com.seleniumtests.driver.BrowserType;
+import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import com.seleniumtests.driver.WebUIDriver;
-
 import com.seleniumtests.helper.WaitHelper;
-
 import com.thoughtworks.selenium.SeleniumException;
 import com.thoughtworks.selenium.Wait;
 import com.thoughtworks.selenium.webdriven.JavascriptLibrary;
@@ -49,8 +47,10 @@ public abstract class BasePage {
     protected final WebUIDriver webUXDriver = WebUIDriver.getWebUIDriver();
     private int explictWaitTimeout = WebUIDriver.getWebUIDriver().getExplicitWait();
     private int sessionTimeout = WebUIDriver.getWebUIDriver().getWebSessionTimeout();
+    
 
-    public BasePage() { }
+    public BasePage() { 
+    }
 
     public void acceptAlert() throws NotCurrentPageException {
         Alert alert = driver.switchTo().alert();
@@ -341,6 +341,7 @@ public abstract class BasePage {
         TestLogging.logWebStep(null, "select frame, locator={\"" + by.toString() + "\"}", false);
         driver.switchTo().frame(driver.findElement(by));
     }
+    
 
     /**
      * If current window is closed then use driver.switchTo.window(handle).
@@ -350,8 +351,16 @@ public abstract class BasePage {
      * @throws  com.seleniumtests.customexception.NotCurrentPageException
      */
     public final void selectWindow(final String windowName) throws NotCurrentPageException {
+    	
+    	Windows windows = null;
+    	try {
+    		windows = new Windows(driver);
+    	} catch (NoSuchWindowException e) {
+    		driver.switchTo().window(windowName);
+    		return;
+    	}
+    	
         if (windowName == null) {
-            Windows windows = new Windows(driver);
             try {
                 windows.selectBlankWindow(driver);
             } catch (SeleniumException e) {
@@ -359,7 +368,6 @@ public abstract class BasePage {
             }
 
         } else {
-            Windows windows = new Windows(driver);
             windows.selectWindow(driver, "name=" + windowName);
         }
     }
@@ -461,6 +469,10 @@ public abstract class BasePage {
     protected void waitForSeconds(final int seconds) {
         WaitHelper.waitForSeconds(seconds);
     }
+    
+    protected void waitForMs(final int ms) {
+    	WaitHelper.waitForSeconds(ms);
+    }
 
     public void waitForTextPresent(final HtmlElement element, final String text) {
         Assert.assertNotNull(text, "Text can't be null");
@@ -515,5 +527,9 @@ public abstract class BasePage {
 
         assertHTML(!textPresent, "Timed out waiting for text \"" + text + "\" to be gone.");
     }
+
+	public Set<String> getCurrentHandles() {
+		return ((CustomEventFiringWebDriver)driver).getCurrentHandles();
+	}
 
 }
