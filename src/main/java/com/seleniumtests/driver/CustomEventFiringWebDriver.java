@@ -13,11 +13,16 @@
 
 package com.seleniumtests.driver;
 
+import java.util.Set;
+import java.util.TreeSet;
+
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.remote.FileDetector;
 import org.openqa.selenium.remote.UselessFileDetector;
 import org.openqa.selenium.support.events.EventFiringWebDriver;
+
+import com.seleniumtests.core.SeleniumTestsContextManager;
 
 /**
  * Supports file upload in remote webdriver.
@@ -25,6 +30,7 @@ import org.openqa.selenium.support.events.EventFiringWebDriver;
 public class CustomEventFiringWebDriver extends EventFiringWebDriver {
     private FileDetector fileDetector = new UselessFileDetector();
     private WebDriver driver = null;
+    private Set<String> currentHandles;
 
     public CustomEventFiringWebDriver(final WebDriver driver) {
         super(driver);
@@ -38,6 +44,14 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver {
 
         fileDetector = detector;
     }
+    
+    public final void updateWindowsHandles() {
+    	if (SeleniumTestsContextManager.isWebTest()) {
+    		currentHandles = driver.getWindowHandles();
+    	} else {
+    		currentHandles = new TreeSet<String>();
+    	}
+    }
 
     public FileDetector getFileDetector() {
         return fileDetector;
@@ -46,4 +60,8 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver {
     public WebDriver getWebDriver() {
         return driver;
     }
+    
+    public Set<String> getCurrentHandles() {
+		return currentHandles;
+	}
 }
