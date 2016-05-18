@@ -7,10 +7,10 @@ import org.testng.ITestContext;
 import org.testng.annotations.Test;
 import org.testng.xml.XmlTest;
 
+import com.seleniumtests.GenericTest;
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.config.ConfigReader;
-import com.seleniumtests.ut.GenericTest;
 
 public class TestConfigReader extends GenericTest {
 
