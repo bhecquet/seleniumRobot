@@ -36,22 +36,14 @@ public class TextFieldElement extends HtmlElement {
 
     public void sendKeys(final String keysToSend) {
         TestLogging.logWebStep(null, "Enter data: \"" + keysToSend + "\" on " + toHTML(), false);
-        findElement();
-        element.sendKeys(keysToSend);
+        super.sendKeys(keysToSend);
     }
     
-    public void simulateSendKeys(CharSequence... keysToSend) {
-    	findElement();
-    		
-    	// click on element before sending keys through keyboard
-    	element.click();
-    	JavascriptExecutor js = (JavascriptExecutor) driver;
-        js.executeScript("arguments[0].focus();", element);
-
-		// use keyboard to type
-		((CustomEventFiringWebDriver)driver).getKeyboard().sendKeys(keysToSend);
+    public void simulateSendKeys(final String keysToSend) {
+    	TestLogging.logWebStep(null, "Enter data: \"" + keysToSend + "\" on " + toHTML(), false);
+    	super.simulateSendKeys(keysToSend);
     }
-
+    
     public void type(final String keysToSend) {
         sendKeys(keysToSend);
     }
