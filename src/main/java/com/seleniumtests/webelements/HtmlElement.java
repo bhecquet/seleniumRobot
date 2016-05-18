@@ -13,27 +13,19 @@
 
 package com.seleniumtests.webelements;
 
-import com.seleniumtests.core.TestLogging;
-
-import com.seleniumtests.driver.BrowserType;
-import com.seleniumtests.driver.ScreenshotUtil;
-import com.seleniumtests.driver.WebUIDriver;
-
-import com.seleniumtests.helper.ContextHelper;
-import com.seleniumtests.helper.WaitHelper;
-
-import com.thoughtworks.selenium.webdriven.JavascriptLibrary;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
-
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
+import org.openqa.selenium.ElementNotVisibleException;
 import org.openqa.selenium.InvalidElementStateException;
 import org.openqa.selenium.InvalidSelectorException;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.NoAlertPresentException;
 import org.openqa.selenium.Point;
-import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
@@ -41,10 +33,18 @@ import org.openqa.selenium.interactions.HasInputDevices;
 import org.openqa.selenium.interactions.Mouse;
 import org.openqa.selenium.internal.Locatable;
 import org.openqa.selenium.support.ui.ExpectedCondition;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Wait;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-import java.util.List;
+import com.seleniumtests.core.TestLogging;
+import com.seleniumtests.driver.BrowserType;
+import com.seleniumtests.driver.CustomEventFiringWebDriver;
+import com.seleniumtests.driver.ScreenshotUtil;
+import com.seleniumtests.driver.WebUIDriver;
+import com.seleniumtests.helper.ContextHelper;
+import com.seleniumtests.helper.WaitHelper;
+import com.thoughtworks.selenium.webdriven.JavascriptLibrary;
 
 
 /**
@@ -115,6 +115,7 @@ public class HtmlElement {
     public void click() {
         findElement();
         element.click();
+        
     }
 
     /**
@@ -180,6 +181,18 @@ public class HtmlElement {
         js.executeScript(clickScript, element);
         WaitHelper.waitForSeconds(2);
     }
+    
+    public void simulateSendKeys(CharSequence... keysToSend) {
+    	findElement();
+    		
+    	// click on element before sending keys through keyboard
+    	element.click();
+    	JavascriptExecutor js = (JavascriptExecutor) driver;
+        js.executeScript("arguments[0].focus();", element);
+
+		// use keyboard to type
+		((CustomEventFiringWebDriver)driver).getKeyboard().sendKeys(keysToSend);
+    }
 
     public void simulateMoveToElement(final int x, final int y) {
         findElement();
@@ -198,7 +211,35 @@ public class HtmlElement {
     protected void findElement() {
         driver = WebUIDriver.getWebDriver();
         element = driver.findElement(by);
+        makeWebElementVisible(element);
     }
+    
+    private void changeCssAttribute(WebElement element, String cssProperty, String cssPropertyValue) {
+		String javascript = "arguments[0].style." + cssProperty + "='" + cssPropertyValue + "';";
+		((JavascriptExecutor) driver).executeScript(javascript, element); 
+	}
+    
+    /**
+	 * Make element visible. Sometimes useful when real elements are backed by an image element
+	 */
+	private void makeWebElementVisible(WebElement element) {
+		try {
+			if (element.getLocation().x < 0) {
+				changeCssAttribute(element, "left", "20px");
+				changeCssAttribute(element, "position", "fixed");
+			}
+			if (element.getAttribute("style").toLowerCase().replace(" ", "").contains("display:none")) {
+				changeCssAttribute(element, "display", "block");
+			}
+			
+			// wait for element to be displayed
+			try {
+				new WebDriverWait(driver, 1).until(ExpectedConditions.visibilityOf(element));
+			} catch (ElementNotVisibleException e) {
+				TestLogging.logInfo(String.format("element %s not visible", element));
+			}
+		} catch (Exception e) {}
+	}
 
     /**
      * Fires a Javascript event on the underlying element.
@@ -583,6 +624,9 @@ public class HtmlElement {
      */
     public void sendKeys(final CharSequence arg0) {
         findElement();
+        if (!element.getAttribute("type").equalsIgnoreCase("file")) {
+        	element.clear();
+        }
         element.sendKeys(arg0);
     }
 
@@ -592,6 +636,53 @@ public class HtmlElement {
     protected void sleep(final int waitTime) throws InterruptedException {
         Thread.sleep(waitTime);
     }
+    
+    /**
+	 * Returns string matching the pattern
+	 * 
+	 * @param pattern			pattern to find in element text or one of its attribute
+	 * @param attributeName		name of the attribute to look for
+	 * @return found string
+	 */
+	public String findPattern(Pattern pattern, String attributeName) {
+		findElement();
+		String attributeValue = "";
+		if (attributeName.equals("text")) {
+			attributeValue = element.getText();
+		} else {
+			attributeValue = element.getAttribute(attributeName);
+		}
+
+		Matcher matcher = pattern.matcher(attributeValue);
+		if (matcher.matches() && matcher.groupCount() > 0) {
+			return matcher.group(1);
+		}
+
+		return "";
+	}
+    
+    /**
+	 * Returns URL present in one of the element attributes
+	 * @param attributeName		attribute name in which we should look at. Give "text" to search in value
+	 * @return 					the found link
+	 */
+	public String findLink(String attributeName) {
+		
+		// link <a href="#" id="linkPopup2" onclick="window.open('http://www.infotel.com/', '_blank');">
+		String link = findPattern(Pattern.compile(".*(http://.*?)'\"?.*"), attributeName);
+		if (!link.equals("")) {
+			return link;
+		}
+		
+		// link with simple quotes  <a href="#" id="linkPopup" onclick='window.open("http://www.infotel.com/", "_blank");'>
+		link = findPattern(Pattern.compile(".*(http://.*?)\"'?.*"), attributeName);
+		if (!link.equals("")) {
+			return link;
+		}
+		
+		// no quotes
+		return findPattern(Pattern.compile(".*(http://.*)"), attributeName);
+	}
 
     /**
      * Converts the Type, Locator and LabelElement attributes of the HtmlElement into a readable and report-friendly

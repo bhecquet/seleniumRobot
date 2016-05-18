@@ -18,9 +18,12 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
+import org.openqa.selenium.Point;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.UnsupportedCommandException;
@@ -29,7 +32,11 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.remote.UnreachableBrowserException;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.SystemClock;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.sikuli.api.DesktopScreenRegion;
+import org.sikuli.api.robot.Mouse;
+import org.sikuli.api.robot.desktop.DesktopMouse;
 import org.testng.Assert;
 
 import com.gargoylesoftware.htmlunit.ElementNotFoundException;
@@ -41,6 +48,7 @@ import com.seleniumtests.core.TestLogging;
 import com.seleniumtests.core.config.ConfigReader;
 import com.seleniumtests.customexception.CustomSeleniumTestsException;
 import com.seleniumtests.customexception.NotCurrentPageException;
+import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import com.seleniumtests.driver.ScreenShot;
 import com.seleniumtests.driver.ScreenshotUtil;
 import com.seleniumtests.driver.WebUIDriver;
@@ -65,6 +73,7 @@ public class PageObject extends BasePage implements IPage {
     private String outputDirectory = null;
     private String htmlFilePath = null;
     private String imageFilePath = null;
+    private SystemClock systemClock;
 
     /**
      * Constructor for non-entry point page. The control is supposed to have reached the page from other API call.
@@ -94,7 +103,8 @@ public class PageObject extends BasePage implements IPage {
      * @throws  Exception
      */
     public PageObject(final HtmlElement pageIdentifierElement, final String url) throws Exception {
-    	
+
+    	systemClock = new SystemClock();
         Calendar start = Calendar.getInstance();
         start.setTime(new Date());
 
@@ -109,6 +119,7 @@ public class PageObject extends BasePage implements IPage {
 
         if (url != null) {
             open(url);
+            ((CustomEventFiringWebDriver)driver).updateWindowsHandles();
         }
 
         // Wait for page load is applicable only for web test
@@ -250,7 +261,7 @@ public class PageObject extends BasePage implements IPage {
 
         try {
             if (isMultipleWindow) {
-                this.selectWindow();
+                this.selectMainWindow();
             } else {
                 WebUIDriver.setWebDriver(null);
             }
@@ -479,7 +490,7 @@ public class PageObject extends BasePage implements IPage {
         frameFlag = true;
     }
 
-    public final void selectWindow() throws NotCurrentPageException {
+    public final void selectMainWindow() throws NotCurrentPageException {
         TestLogging.logWebStep(null, "select window, locator={\"" + getPopupWindowName() + "\"}", false);
 
         // selectWindow(getPopupWindowName());
@@ -494,11 +505,69 @@ public class PageObject extends BasePage implements IPage {
         TestLogging.logWebStep(null, "select window, locator={\"" + index + "\"}", false);
         driver.switchTo().window((String) driver.getWindowHandles().toArray()[index]);
     }
-
-    public final void selectNewWindow() throws NotCurrentPageException {
+    
+    public final String selectNewWindow() throws NotCurrentPageException {
+    	return selectNewWindow(6000);
+    }
+    
+    public final String selectNewWindow(int waitMs) throws NotCurrentPageException {
         TestLogging.logWebStep(null, "select new window", false);
-        driver.switchTo().window((String) driver.getWindowHandles().toArray()[1]);
-        waitForSeconds(1);
+//        driver.switchTo().window((String) driver.getWindowHandles().toArray()[1]);
+//        waitForSeconds(1);
+        
+        // Keep the name of the current window handle before switching
+        // sometimes, our action made window disappear
+ 		String mainWindowHandle;
+ 		try {
+ 			mainWindowHandle = driver.getWindowHandle();
+ 		} catch (Exception e) {
+ 			mainWindowHandle = "";
+ 		}
+
+ 		// wait for window to be displayed
+ 		long end = systemClock.laterBy(waitMs + 250);
+ 		Set<String> handles = new TreeSet<String>();
+ 		
+ 		while (systemClock.isNowBefore(end)) {
+ 			
+ 			handles = driver.getWindowHandles();
+
+ 			for (String handle: handles) {
+ 				
+ 				// we already know this handle
+ 				if (getCurrentHandles().contains(handle)) {
+ 					continue;
+ 				} else {
+ 					selectWindow(handle);
+ 					
+ 					// wait for a valid address
+ 					String address = "";
+ 					long endLoad = systemClock.laterBy(5000);
+ 					while (address.equals("") && systemClock.isNowBefore(endLoad)) {
+ 						address = driver.getCurrentUrl();
+ 						continue;
+ 					}
+ 					
+ 					// make window display in foreground
+ 					try {
+ 						Point windowPosition  = driver.manage().window().getPosition();
+ 						Mouse mouse = new DesktopMouse();
+ 						mouse.click(new DesktopScreenRegion(windowPosition.x + driver.manage().window().getSize().width / 2, windowPosition.y + 5, 2, 2).getCenter());
+ 					} catch (Exception e) {}
+ 					
+ 					// new window has been found, stop
+ 					return mainWindowHandle;
+ 				}
+ 			}
+ 			waitForMs(300);
+ 		}
+ 		
+ 		// on vérifie qu'on a bien changé de fenêtre
+ 		if (waitMs > 0 && mainWindowHandle.equals(driver.getWindowHandle())) {
+ 			throw new CustomSeleniumTestsException("new window has not been found. Handles: " + handles);
+ 		}
+ 		return mainWindowHandle;
+        
     }
 
     protected void setHtmlSavedToPath(final String htmlSavedToPath) {

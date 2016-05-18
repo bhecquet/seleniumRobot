@@ -14,7 +14,10 @@
 
 package com.seleniumtests.driver;
 
+import java.util.TreeSet;
+
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.UnsupportedCommandException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -25,9 +28,15 @@ import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.WebSessionEndedException;
 
 public class DriverExceptionListener implements WebDriverEventListener {
-    public void afterChangeValueOf(final WebElement arg0, final WebDriver arg1) { }
+    public void afterChangeValueOf(final WebElement element, final WebDriver driver) {
+    	if (SeleniumTestsContextManager.isWebTest() && element.getTagName().equalsIgnoreCase("input")) {
+    		try {
+    			((JavascriptExecutor) driver).executeScript("arguments[0].blur();", element);
+    		} catch (Exception e) {	}
+    	}
+    }
 
-    public void afterClickOn(final WebElement arg0, final WebDriver arg1) { }
+    public void afterClickOn(final WebElement arg0, final WebDriver driver) {  }
 
     public void afterFindBy(final By arg0, final WebElement arg1, final WebDriver arg2) { }
 
@@ -41,7 +50,11 @@ public class DriverExceptionListener implements WebDriverEventListener {
 
     public void beforeChangeValueOf(final WebElement arg0, final WebDriver arg1) { }
 
-    public void beforeClickOn(final WebElement arg0, final WebDriver arg1) { }
+    public void beforeClickOn(final WebElement arg0, final WebDriver driver) {
+    	if (SeleniumTestsContextManager.isWebTest()) {
+    		((CustomEventFiringWebDriver)WebUIDriver.getWebDriver()).updateWindowsHandles();
+    	}
+    }
 
     public void beforeFindBy(final By arg0, final WebElement arg1, final WebDriver arg2) { }
 
@@ -119,12 +132,11 @@ public class DriverExceptionListener implements WebDriverEventListener {
         if (arg1 != null) {
 
             try {
-                System.out.println("Got customexception" + ex.getMessage());
                 new ScreenshotUtil(arg1).capturePageSnapshotOnException();
             } catch (Exception e) {
 
                 // Ignore all exceptions
-                e.printStackTrace();
+//                e.printStackTrace();
             }
         }
     }

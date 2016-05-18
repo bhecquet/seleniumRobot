@@ -1,5 +1,6 @@
 /*
- * Copyright 2015 www.seleniumtests.com
+ * Orignal work: Copyright 2015 www.seleniumtests.com
+ * Modified work: Copyright 2016 www.infotel.com
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,8 +15,11 @@
 package com.seleniumtests.webelements;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.remote.RemoteWebDriver;
 
 import com.seleniumtests.core.TestLogging;
+import com.seleniumtests.driver.CustomEventFiringWebDriver;
 
 public class TextFieldElement extends HtmlElement {
     public TextFieldElement(final String label, final By by) {
@@ -32,10 +36,14 @@ public class TextFieldElement extends HtmlElement {
 
     public void sendKeys(final String keysToSend) {
         TestLogging.logWebStep(null, "Enter data: \"" + keysToSend + "\" on " + toHTML(), false);
-        findElement();
-        element.sendKeys(keysToSend);
+        super.sendKeys(keysToSend);
     }
-
+    
+    public void simulateSendKeys(final String keysToSend) {
+    	TestLogging.logWebStep(null, "Enter data: \"" + keysToSend + "\" on " + toHTML(), false);
+    	super.simulateSendKeys(keysToSend);
+    }
+    
     public void type(final String keysToSend) {
         sendKeys(keysToSend);
     }

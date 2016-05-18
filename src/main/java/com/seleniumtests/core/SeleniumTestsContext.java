@@ -216,8 +216,17 @@ public class SeleniumTestsContext {
 		getPathFromClass(SeleniumTestsContext.class, path);
 		
 		ROOT_PATH = path.toString();
-		APPLICATION_NAME = xmlSuite.getFileName().replace(File.separator, "/").split("/"+ DATA_FOLDER_NAME + "/")[1].split("/")[0];
-		DATA_PATH = xmlSuite.getFileName().replace(File.separator, "/").split("/"+ DATA_FOLDER_NAME + "/")[0] + "/" + DATA_FOLDER_NAME + "/";
+		
+		// in case launching unit test from eclipse, a temp file is generated outside the standard folder structure
+		// APPLICATION_NAME and DATA_PATH must be rewritten
+		try {
+			APPLICATION_NAME = xmlSuite.getFileName().replace(File.separator, "/").split("/"+ DATA_FOLDER_NAME + "/")[1].split("/")[0];
+			DATA_PATH = xmlSuite.getFileName().replace(File.separator, "/").split("/"+ DATA_FOLDER_NAME + "/")[0] + "/" + DATA_FOLDER_NAME + "/";
+		} catch (IndexOutOfBoundsException e) {
+			APPLICATION_NAME = "core";
+			DATA_PATH = Paths.get(ROOT_PATH, "data").toString();
+		}
+		
 		FEATURES_PATH = Paths.get(DATA_PATH, APPLICATION_NAME, "features").toString();
 		CONFIG_PATH = Paths.get(DATA_PATH, APPLICATION_NAME, "config").toString();
 		
