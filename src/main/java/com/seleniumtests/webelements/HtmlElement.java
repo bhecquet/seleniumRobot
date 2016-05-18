@@ -13,19 +13,11 @@
 
 package com.seleniumtests.webelements;
 
-import com.seleniumtests.core.TestLogging;
-
-import com.seleniumtests.driver.BrowserType;
-import com.seleniumtests.driver.ScreenshotUtil;
-import com.seleniumtests.driver.WebUIDriver;
-
-import com.seleniumtests.helper.ContextHelper;
-import com.seleniumtests.helper.WaitHelper;
-
-import com.thoughtworks.selenium.webdriven.JavascriptLibrary;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
-
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.ElementNotVisibleException;
@@ -34,7 +26,6 @@ import org.openqa.selenium.InvalidSelectorException;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.NoAlertPresentException;
 import org.openqa.selenium.Point;
-import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
@@ -46,9 +37,14 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Wait;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import com.seleniumtests.core.TestLogging;
+import com.seleniumtests.driver.BrowserType;
+import com.seleniumtests.driver.CustomEventFiringWebDriver;
+import com.seleniumtests.driver.ScreenshotUtil;
+import com.seleniumtests.driver.WebUIDriver;
+import com.seleniumtests.helper.ContextHelper;
+import com.seleniumtests.helper.WaitHelper;
+import com.thoughtworks.selenium.webdriven.JavascriptLibrary;
 
 
 /**
@@ -184,6 +180,18 @@ public class HtmlElement {
             "if(document.createEvent){var evObj = document.createEvent('MouseEvents');evObj.initEvent('click', true, false); arguments[0].dispatchEvent(evObj);} else if(document.createEventObject) { arguments[0].fireEvent('onclick');}";
         js.executeScript(clickScript, element);
         WaitHelper.waitForSeconds(2);
+    }
+    
+    public void simulateSendKeys(CharSequence... keysToSend) {
+    	findElement();
+    		
+    	// click on element before sending keys through keyboard
+    	element.click();
+    	JavascriptExecutor js = (JavascriptExecutor) driver;
+        js.executeScript("arguments[0].focus();", element);
+
+		// use keyboard to type
+		((CustomEventFiringWebDriver)driver).getKeyboard().sendKeys(keysToSend);
     }
 
     public void simulateMoveToElement(final int x, final int y) {
@@ -616,6 +624,9 @@ public class HtmlElement {
      */
     public void sendKeys(final CharSequence arg0) {
         findElement();
+        if (!element.getAttribute("type").equalsIgnoreCase("file")) {
+        	element.clear();
+        }
         element.sendKeys(arg0);
     }
 
