@@ -17,6 +17,7 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.remote.UnreachableBrowserException;
 import org.openqa.selenium.support.ui.SystemClock;
@@ -58,6 +59,8 @@ public class ReplayAction {
 	    	try {
 	    		reply = joinPoint.proceed(joinPoint.getArgs());
 	    		break;
+	    	} catch (UnhandledAlertException e) {
+	    		throw e;
 	    	} catch (WebDriverException e) {
 	    		if (systemClock.isNowBefore(end)) {
 	    			WaitHelper.waitForMilliSeconds(100);

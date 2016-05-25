@@ -8,6 +8,7 @@ import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.testng.Assert;
+import org.testng.ITestContext;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
@@ -27,8 +28,9 @@ public class TestDriver {
 	private WebDriver driver;
 	private static DriverTestPage testPage;
 	
-	@BeforeClass(dependsOnGroups={"it"})
-	public void initDriver() throws Exception {
+	@BeforeClass(groups={"it"})
+	public void initDriver(final ITestContext testNGCtx) throws Exception {
+		SeleniumTestsContextManager.initThreadContext(testNGCtx);
 		testPage = new DriverTestPage(true);
 		driver = WebUIDriver.getWebDriver(true);
 		
@@ -37,7 +39,7 @@ public class TestDriver {
 		} catch (Exception e) {}
 	}
 	
-	@AfterMethod
+	@AfterMethod(alwaysRun=true)
 	public void cleanAlert() {
 		try {
 			driver.switchTo().alert().accept();

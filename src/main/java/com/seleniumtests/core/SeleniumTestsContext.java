@@ -54,52 +54,52 @@ public class SeleniumTestsContext {
 	public static final String DATA_FOLDER_NAME = "data";
 
     /* configuration defined in testng.xml */
-    public static final String TEST_CONFIGURATION = "testConfig";
-    public static final String APP_URL = "appURL";
-    public static final String WEB_SESSION_TIME_OUT = "webSessionTimeOut";
-    public static final String IMPLICIT_WAIT_TIME_OUT = "implicitWaitTimeOut";
-    public static final String EXPLICIT_WAIT_TIME_OUT = "explicitWaitTimeOut";
-    public static final String PAGE_LOAD_TIME_OUT = "pageLoadTimeout";
-    public static final String WEB_DRIVER_GRID = "webDriverGrid";
-    public static final String RUN_MODE = "runMode";
-    public static final String BROWSER = "browser";
-    public static final String BROWSER_VERSION = "browserVersion";
-    public static final String WEB_PLATFORM = "webPlatform";
-    public static final String FIREFOX_USER_PROFILE_PATH = "firefoxUserProfilePath";
-    public static final String USE_DEFAULT_FIREFOX_PROFILE = "useFirefoxDefaultProfile";
-    public static final String OPERA_USER_PROFILE_PATH = "operaUserProfilePath";
-    public static final String FIREFOX_BINARY_PATH = "firefoxBinaryPath";
-    public static final String CHROME_DRIVER_PATH = "chromeDriverPath";
-    public static final String CHROME_BINARY_PATH = "chromeBinaryPath";
-    public static final String IE_DRIVER_PATH = "ieDriverPath";
-    public static final String USER_AGENT = "userAgent";
+    public static final String TEST_CONFIGURATION = "testConfig"; 			// configuration annexe
+    public static final String APP_URL = "appURL";					// url pour se connecter au site web
+    public static final String WEB_SESSION_TIME_OUT = "webSessionTimeOut";		// timeout de la session du navigateur
+    public static final String IMPLICIT_WAIT_TIME_OUT = "implicitWaitTimeOut";		// attente implicite du navigateur
+    public static final String EXPLICIT_WAIT_TIME_OUT = "explicitWaitTimeOut";		// attente explicite du navigateur
+    public static final String PAGE_LOAD_TIME_OUT = "pageLoadTimeout";			// temps d'attente de chargement d'une page
+    public static final String WEB_DRIVER_GRID = "webDriverGrid";			// adresse du serveur seleniumGrid
+    public static final String RUN_MODE = "runMode";					// local ou grid. Pourrait également contenir sauceLabs / testDroid
+    public static final String BROWSER = "browser";					// navigateur utilisé
+    public static final String BROWSER_VERSION = "browserVersion";			// version de navigateur utilisé
+    public static final String WEB_PLATFORM = "webPlatform";				// objet Platform de selenium => Windows / Linux / ... TODO: a supprimer ?
+    public static final String FIREFOX_USER_PROFILE_PATH = "firefoxUserProfilePath";	// profile utilisateur firefox
+    public static final String USE_DEFAULT_FIREFOX_PROFILE = "useFirefoxDefaultProfile";// utilisation du profile firefox par défaut
+    public static final String OPERA_USER_PROFILE_PATH = "operaUserProfilePath";	// profile utilisateur opéra
+    public static final String FIREFOX_BINARY_PATH = "firefoxBinaryPath";		// chemin vers le binaire firefox (firefox portable ou pour utiliser une version spécifique
+    public static final String CHROME_DRIVER_PATH = "chromeDriverPath";			// chemin vers chromeDriver si on souhaite utiliser une version différente
+    public static final String CHROME_BINARY_PATH = "chromeBinaryPath";			// chemin vers le binaire chrome lorsque celui-ci n'est pas installé de manière normale
+    public static final String IE_DRIVER_PATH = "ieDriverPath";				// chemin vers le driver Internet Explorer
+    public static final String USER_AGENT = "userAgent";				// user agent utilisé pour les tests. Permet d'écraser le user-agent par défaut du navigateur, sur firefox et chrome uniquement
 
-    public static final String Set_Assume_Untrusted_Certificate_Issuer = "setAssumeUntrustedCertificateIssuer";
-    public static final String Set_Accept_Untrusted_Certificates = "setAcceptUntrustedCertificates";
-    public static final String ENABLE_JAVASCRIPT = "enableJavascript";
-    public static final String NTLM_AUTH_TRUSTED_URIS = "ntlmAuthTrustedUris";
-    public static final String BROWSER_DOWNLOAD_DIR = "browserDownloadDir";
-    public static final String BROWSER_WINDOW_SIZE = "browserWindowSize";
-    public static final String ADD_JS_ERROR_COLLECTOR_EXTENSION = "addJSErrorCollectorExtension";
+    public static final String Set_Assume_Untrusted_Certificate_Issuer = "setAssumeUntrustedCertificateIssuer"; // Firefox uniquement pour qu'il ne prenne pas en compte les certificats invalides TODO: mettre à true par défaut
+    public static final String Set_Accept_Untrusted_Certificates = "setAcceptUntrustedCertificates"; // Firefox uniquement pour qu'il ne prenne pas en compte les certificats invalides TODO: mettre à true par défaut
+    public static final String ENABLE_JAVASCRIPT = "enableJavascript";			// activation du javascrit dans le navigateur. TODO: true par défaut. TODO: voir si ce n'est pas uniquement pour HtmlUnit
+    public static final String NTLM_AUTH_TRUSTED_URIS = "ntlmAuthTrustedUris";		// Firefox uniquement
+    public static final String BROWSER_DOWNLOAD_DIR = "browserDownloadDir";		// répertoire où seront enregistrés les fichiers
+    public static final String BROWSER_WINDOW_SIZE = "browserWindowSize";		// TODO: passer en plein écran par défaut
+    public static final String ADD_JS_ERROR_COLLECTOR_EXTENSION = "addJSErrorCollectorExtension"; // Firefox uniquement
 
-    public static final String WEB_PROXY_ENABLED = "webProxyEnabled";
-    public static final String WEB_PROXY_TYPE = "webProxyType";
-    public static final String WEB_PROXY_ADDRESS = "webProxyAddress";
+    public static final String WEB_PROXY_ENABLED = "webProxyEnabled";			// activation du serveur proxy pour le navigateur
+    public static final String WEB_PROXY_TYPE = "webProxyType";				// type de proxy. TODO: à compléter pour prendre en charge les proxy auto et manuels
+    public static final String WEB_PROXY_ADDRESS = "webProxyAddress";			// adresse du proxy. TODO: quel est le format
 
-    public static final String TEST_ENTITY = "testEntity";
+    public static final String TEST_ENTITY = "testEntity";				// Jamais utilisé
 
     public static final String REPORT_GENERATION_CONFIG = "reportGenerationConfig";
     public static final String OPEN_REPORT_IN_BROWSER = "openReportInBrowser";
     public static final String CAPTURE_SNAPSHOT = "captureSnapshot";
-    public static final String ENABLE_EXCEPTION_LISTENER = "enableExceptionListener";
+    public static final String ENABLE_EXCEPTION_LISTENER = "enableExceptionListener";	// TODO: voir son effet, activé par défaut
 
-    public static final String DP_TAGS_INCLUDE = "dpTagsInclude";
-    public static final String DP_TAGS_EXCLUDE = "dpTagsExclude";
+    public static final String DP_TAGS_INCLUDE = "dpTagsInclude";			// 
+    public static final String DP_TAGS_EXCLUDE = "dpTagsExclude";			// Utilisé pour la lecture de fichiers CSV/XLS des DataProvider TODO: a étudier comment cela fonctionne
 
     public static final String SSH_COMMAND_WAIT = "sshCommandWait";
-    public static final String SOFT_ASSERT_ENABLED = "softAssertEnabled";
+    public static final String SOFT_ASSERT_ENABLED = "softAssertEnabled";		// le test ne s'arrête pas lorsqu'une assertion est rencontrée
 
-    public static final String OUTPUT_DIRECTORY = "outputDirectory";     // folder where HTML report will be written
+    public static final String OUTPUT_DIRECTORY = "outputDirectory";     		// folder where HTML report will be written
     public static final String WEB_DRIVER_LISTENER = "webDriverListener";
 
     public static final String TEST_METHOD_SIGNATURE = "testMethodSignature";
@@ -110,35 +110,35 @@ public class SeleniumTestsContext {
     public static final String TEST_TYPE = "testType";
     public static final String TEST_NAME = "testName";
     
-    public static final String CUCUMBER_TESTS = "cucumberTests";
-    public static final String CUCUMBER_TAGS = "cucumberTags";
-    public static final String VARIABLES = "variables";
-    public static final String TEST_CONFIG = "currentTestConfig"; // configuration used for the current test. It is not updated via XML file
-    public static final String TEST_ENV = "env";
-    public static final String CUCUMBER_IMPLEMENTATION_PKG = "cucumberPackage";
+    public static final String CUCUMBER_TESTS = "cucumberTests";			// liste des tests en mode cucumber
+    public static final String CUCUMBER_TAGS = "cucumberTags";				// liste des tags cucumber
+    public static final String VARIABLES = "variables";					// TODO: à supprimer
+    public static final String TEST_CONFIG = "currentTestConfig"; 			// configuration used for the current test. It is not updated via XML file
+    public static final String TEST_ENV = "env";					// environnement de test pour le SUT. Permet d'accéder aux configurations spécifiques du fichier config.ini
+    public static final String CUCUMBER_IMPLEMENTATION_PKG = "cucumberPackage";		// nom du package java pour les classes cucumber, car celui-ci n'est pas accessible par testNG
     
     // Appium specific properties
-    public static final String APP = "app";
-    public static final String APPIUM_SERVER_URL = "appiumServerURL";
+    public static final String APP = "app";						// Nom de l'application utilisée en mobile
+    public static final String APPIUM_SERVER_URL = "appiumServerURL";			// URL du serveur appium en local. TODO: voir s'il n'est pas possible de mutualiser avec une autre variable pour l'accès distant
     public static final String AUTOMATION_NAME = "automationName";
-    public static final String MOBILE_PLATFORM_NAME = "platformName";
-    public static final String MOBILE_PLATFORM_VERSION = "mobilePlatformVersion";
-    public static final String DEVICE_NAME = "deviceName";
+    public static final String MOBILE_PLATFORM_NAME = "platformName";			// Android ou iOS
+    public static final String MOBILE_PLATFORM_VERSION = "mobilePlatformVersion";	// Version de l'OS mobile
+    public static final String DEVICE_NAME = "deviceName";				// Nom du terminal utilisé pour le test
 
-    public static final String BROWSER_NAME = "browserName";
-    public static final String APP_PACKAGE = "appPackage";
-    public static final String APP_ACTIVITY = "appActivity";
-    public static final String APP_WAIT_ACTIVITY = "appWaitActivity";
-    public static final String NEW_COMMAND_TIMEOUT = "newCommandTimeout";
+    public static final String BROWSER_NAME = "browserName";				// non du navigateur pour l'automatisation de tests mobiles. TODO: mutualiser avec la variable browser
+    public static final String APP_PACKAGE = "appPackage";				// package de l'application
+    public static final String APP_ACTIVITY = "appActivity";				// activité à démarrer (Android)
+    public static final String APP_WAIT_ACTIVITY = "appWaitActivity";			// dans certains cas, l'activité qui démarre l'application n'est pas l'activité principale. C'est celle-ci qu'on attend
+    public static final String NEW_COMMAND_TIMEOUT = "newCommandTimeout";		// Attente pour les commandes appium. TODO: à mutualiser avec le newSessionTiemout ?
 
     // Cloud specific properties
-    public static final String VERSION = "version";
-    public static final String PLATFORM = "platform";
-    public static final String CLOUD_URL = "cloudURL";
-    public static final String CLOUD_API_KEY = "cloudApiKey";
+    public static final String VERSION = "version";					// TODO: différence par rapport à la version du navigateur ?
+    public static final String PLATFORM = "platform";					// Platform sur laquelle se déroule un test Desktop en cloud. TODO: à mutualiser avec platformName	
+    public static final String CLOUD_URL = "cloudURL";					// URL d'accès au service Cloud
+    public static final String CLOUD_API_KEY = "cloudApiKey";				// clé d'accès (dépend des services)
     
     // Testdroid specific properties
-    public static final String PROJECT_NAME = "projectName";
+    public static final String PROJECT_NAME = "projectName";				// TestDroid nécessite un nom de projet dans lequel l'automatisation aura lieu	
 
     private LinkedList<TearDownService> tearDownServices = new LinkedList<TearDownService>();
     private Map<ITestResult, List<Throwable>> verificationFailuresMap = new HashMap<ITestResult, List<Throwable>>();
@@ -548,8 +548,12 @@ public class SeleniumTestsContext {
     	return (String) getAttribute(CUCUMBER_TAGS);
     }
     
-    public String[] getCucmberTests() {
-    	return ((String) getAttribute(CUCUMBER_TESTS)).split(",");
+    public List<String> getCucmberTests() {
+    	List<String> tests = new ArrayList<String>();
+    	for (String test: ((String)getAttribute(CUCUMBER_TESTS)).replace("\"", "").replace("&nbsp;", " ").split(",")) {
+    		tests.add(test.trim());
+    	}
+    	return tests;
     }
     
     public String getCucmberPkg() {
@@ -757,7 +761,12 @@ public class SeleniumTestsContext {
             final String sysPropertyValue, final String defaultValue) {
         String suiteValue = null;
         if (context != null && context.getCurrentXmlTest() != null) {
-            suiteValue = context.getCurrentXmlTest().getSuite().getParameter(attributeName);
+        	String testValue = context.getCurrentXmlTest().getParameter(attributeName);
+        	if (testValue == null) {
+        		suiteValue = context.getCurrentXmlTest().getSuite().getParameter(attributeName);
+        	} else {
+        		suiteValue = testValue;
+        	}
         }
 
         contextDataMap.put(attributeName,

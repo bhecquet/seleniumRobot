@@ -83,7 +83,7 @@ public class CustomTestNGCucumberRunner {
     	// get all features, filtered by test name
     	System.setProperty("cucumber.options", SeleniumTestsContext.FEATURES_PATH);
         List<CucumberFeature> testSelectedFeatures = getFeaturesFromRequestedTests(clazz, classLoader, resourceLoader);
-    	
+
     	// build cucumber option list
         // take into account tag options
         String cucumberOptions = "";
@@ -104,7 +104,6 @@ public class CustomTestNGCucumberRunner {
         cucumberOptions += " " + SeleniumTestsContext.FEATURES_PATH;
 
         // get filtered features, based on tags
-        RuntimeOptionsFactory runtimeOptionsFactory = new RuntimeOptionsFactory(clazz);
         runtimeOptions = new RuntimeOptions(cucumberOptions);
         ClassFinder classFinder = new ResourceLoaderClassFinder(resourceLoader, classLoader);
         runtime = new Runtime(resourceLoader, classFinder, classLoader, runtimeOptions);
@@ -132,7 +131,7 @@ public class CustomTestNGCucumberRunner {
         List<CucumberFeature> selectedFeatures = new ArrayList<CucumberFeature>();
         
         // filter features requested for execution
-        String[] testList = SeleniumTestsContextManager.getTestLevelContext(testName).getCucmberTests();
+        List<String> testList = SeleniumTestsContextManager.getThreadContext().getCucmberTests();
         
         for (CucumberFeature feature: allFeatures) {
         	String featureName = feature.getGherkinFeature().getName();
@@ -144,6 +143,27 @@ public class CustomTestNGCucumberRunner {
     				break;
     			}
     		}  
+        }
+        
+        // select scenarios in features if feature list is empty
+        // remove scenarios whose name is not in test list
+        if (selectedFeatures.isEmpty()) {
+        	for (CucumberFeature feature: allFeatures) {
+        		List<CucumberTagStatement> selectedScenarios = new ArrayList<CucumberTagStatement>();
+        		for (CucumberTagStatement stmt: feature.getFeatureElements()) {
+        			for (String test: testList) {
+            			if (stmt.getGherkinModel().getName().equals(test)) {
+            				selectedScenarios.add(stmt);
+            			}
+        			}
+        		}
+        		feature.getFeatureElements().removeAll(feature.getFeatureElements());
+        		feature.getFeatureElements().addAll(selectedScenarios);
+        		
+        		if (!selectedScenarios.isEmpty()) {
+        			selectedFeatures.add(feature);
+        		}
+        	}
         }
         
         return selectedFeatures;

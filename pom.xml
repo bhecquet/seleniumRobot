@@ -364,6 +364,21 @@
 						</configuration>            
 					</execution>
 					<execution>
+						<id>copy-tools</id>
+						<phase>process-resources</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${project.build.directory}/tools</outputDirectory>
+							<resources>
+								<resource>
+									<directory>${project.basedir}/tools</directory>
+								</resource>
+							</resources>
+						</configuration>            
+					</execution>
+					<execution>
 						<id>copy-launcher</id>
 						<phase>process-resources</phase>
 						<goals>
@@ -373,7 +388,7 @@
 							<outputDirectory>${project.build.directory}</outputDirectory>
 							<resources>
 								<resource>
-									<directory>${project.basedir}/launchers</directory>
+									<directory>${project.basedir}/tools</directory>
 									<include>launch.bat</include>
 								</resource>
 							</resources>
