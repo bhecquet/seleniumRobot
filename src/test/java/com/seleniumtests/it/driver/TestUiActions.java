@@ -15,7 +15,7 @@ public class TestUiActions {
 	
 	private WebDriver driver;
 	
-	@BeforeClass(dependsOnGroups={"it"})
+	@BeforeClass(groups={"it"})
 	public void initDriver() throws Exception {
 		driver = WebUIDriver.getWebDriver(true);
 		

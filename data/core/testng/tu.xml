@@ -20,8 +20,7 @@
     </test>
     
     <test name="Integration tests" parallel="false">
-    
-        
+ 
         <groups>
             <run>
                 <include name="it"/>
