@@ -1,5 +1,6 @@
 /*
- * Copyright 2015 www.seleniumtests.com
+ * Orignal work: Copyright 2015 www.seleniumtests.com
+ * Modified work: Copyright 2016 www.infotel.com
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -19,6 +20,9 @@ import org.openqa.selenium.Point;
 import org.openqa.selenium.WebDriver;
 
 import com.seleniumtests.core.TestLogging;
+
+import io.appium.java_client.android.AndroidDriver;
+import io.appium.java_client.ios.IOSDriver;
 
 public class WebUtility {
     private WebDriver driver;
@@ -45,8 +49,7 @@ public class WebUtility {
 
     public void maximizeWindow() {
         try {
-            BrowserType browser = BrowserType.getBrowserType(WebUIDriver.getWebUIDriver().getBrowser());
-            if (browser == BrowserType.Android || browser == BrowserType.IPad || browser == BrowserType.IPhone) {
+        	if (driver instanceof AndroidDriver || driver instanceof IOSDriver) {
                 return;
             }
 

@@ -155,7 +155,7 @@ public class ScreenshotUtil {
             String url = "app";
             String title = "app";
             String pageSource = "";
-            if (SeleniumTestsContextManager.getThreadContext().getTestType().equalsIgnoreCase(TestType.WEB.toString())) {
+            if (SeleniumTestsContextManager.getThreadContext().getTestType().family().equals(TestType.WEB)) {
             	try {
                     url = driver.getCurrentUrl();
                 } catch (org.openqa.selenium.UnhandledAlertException ex) {

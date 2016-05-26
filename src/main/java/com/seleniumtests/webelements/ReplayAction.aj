@@ -67,9 +67,9 @@ public class ReplayAction {
 					continue;
 				} else {
 					if (e instanceof NoSuchElementException) {
-						throw new NoSuchElementException("l'élément recherché n'a pas été trouvé");
+						throw new NoSuchElementException("Searched element could not be found");
 					} else if (e instanceof UnreachableBrowserException) {
-						throw new WebDriverException("Le navigateur n'a pas répondu. Le site met peut-être trop de temps à répondre");
+						throw new WebDriverException("Browser did not reply, it may have frozen");
 					}
 					throw e;
 				}

@@ -37,9 +37,14 @@ public class AndroidCapabilitiesFactory implements ICapabilitiesFactory {
     public DesiredCapabilities createCapabilities(final DriverConfig cfg) {
 
     	DesiredCapabilities caps = new DesiredCapabilities(this.capabilities);
-    	caps.setCapability("automationName", cfg.getAutomationName());
+    	if (Integer.parseInt(cfg.getMobilePlatformVersion().substring(0, 1)) < 4) {
+    		caps.setCapability("automationName", "Selendroid");
+    	} else {
+    		caps.setCapability("automationName", "Appium");
+    	}
+    	
     	caps.setCapability("fullReset", "true");
-    	caps.setCapability("platformName", cfg.getMobilePlatformName());
+    	caps.setCapability("platformName", cfg.getPlatform());
 
         // Set up version and device name else appium server would pick the only available emulator/device
         // Both of these are ignored for android for now
@@ -47,7 +52,9 @@ public class AndroidCapabilitiesFactory implements ICapabilitiesFactory {
     	caps.setCapability("deviceName", cfg.getDeviceName());
 
         String app = cfg.getApp();
-        caps.setCapability("app", app);
+        if (caps.getCapability("app") == null) {
+        	caps.setCapability("app", app);
+        }
         caps.setCapability("appPackage", cfg.getAppPackage());
         caps.setCapability("appActivity", cfg.getAppActivity());
         
@@ -57,7 +64,7 @@ public class AndroidCapabilitiesFactory implements ICapabilitiesFactory {
 
         // do not configure application and browser as they are mutualy exclusive
         if (app != null && app.trim().equals("")) {
-        	caps.setCapability(CapabilityType.BROWSER_NAME, cfg.getBrowserName());
+        	caps.setCapability(CapabilityType.BROWSER_NAME, cfg.getBrowser());
         }
         caps.setCapability("newCommandTimeout", cfg.getNewCommandTimeout());
 
