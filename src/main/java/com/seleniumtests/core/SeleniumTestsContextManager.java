@@ -136,7 +136,6 @@ public class SeleniumTestsContextManager {
             for (Entry<String, String> entry : testParameters.entrySet()) {
                 seleniumTestsCtx.setAttribute(entry.getKey(), entry.getValue());
             }
-
         }
         
         // merge configurations from ini file and xml file
@@ -174,8 +173,12 @@ public class SeleniumTestsContextManager {
             }
 
         }
-
+        
         threadLocalContext.set(seleniumTestsCtx);
+        
+        // merge configurations from ini file and xml file
+        seleniumTestsCtx.setTestConfiguration();
+
     }
 
     public static void initThreadContext(final XmlTest xmlTest) {
@@ -198,6 +201,6 @@ public class SeleniumTestsContextManager {
     }
 
     public static boolean isWebTest() {
-        return (getThreadContext().getTestType().equalsIgnoreCase(TestType.WEB.toString()));
+        return (getThreadContext().getTestType().equals(TestType.WEB));
     }
 }

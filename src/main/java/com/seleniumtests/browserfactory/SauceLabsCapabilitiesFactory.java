@@ -11,7 +11,7 @@ public class SauceLabsCapabilitiesFactory implements ICapabilitiesFactory {
 
         final DesiredCapabilities capabilities = new DesiredCapabilities();
 
-        capabilities.setCapability("browserName", cfg.getBrowserName());
+        capabilities.setCapability("browserName", cfg.getBrowser());
         capabilities.setCapability("platform", cfg.getPlatform());
         capabilities.setCapability("version", cfg.getVersion());
         capabilities.setCapability("name",

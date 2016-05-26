@@ -16,7 +16,6 @@ package com.seleniumtests.webelements;
 
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -41,11 +40,9 @@ import org.testng.Assert;
 
 import com.gargoylesoftware.htmlunit.ElementNotFoundException;
 import com.seleniumtests.core.CustomAssertion;
-import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.SeleniumTestsPageListener;
 import com.seleniumtests.core.TestLogging;
-import com.seleniumtests.core.config.ConfigReader;
 import com.seleniumtests.customexception.CustomSeleniumTestsException;
 import com.seleniumtests.customexception.NotCurrentPageException;
 import com.seleniumtests.driver.CustomEventFiringWebDriver;
@@ -184,8 +181,8 @@ public class PageObject extends BasePage implements IPage {
     /**
      * Get parameter from configuration
      */
-    public String param(String key) {
-    	String value = SeleniumTestsContextManager.getTestLevelContext(SeleniumTestsContextManager.getThreadContext().getTestName()).getConfiguration().get(key);
+    public static String param(String key) {
+    	String value = SeleniumTestsContextManager.getThreadContext().getConfiguration().get(key);
     	if (value == null) {
     		TestLogging.errorLogger(String.format("Variable %s is not defined", key));
     		return "";

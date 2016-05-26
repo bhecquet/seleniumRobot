@@ -87,7 +87,7 @@ public class CustomTestNGCucumberRunner {
     	// build cucumber option list
         // take into account tag options
         String cucumberOptions = "";
-        String tagList = SeleniumTestsContextManager.getTestLevelContext(testName).getCucumberTags();
+        String tagList = SeleniumTestsContextManager.getThreadContext().getCucumberTags();
         if (tagList != null && !tagList.equals("")) {
         	String tagsOptions = " ";
         	for (String tags: tagList.split("AND")) {

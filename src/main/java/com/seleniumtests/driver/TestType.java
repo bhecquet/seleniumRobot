@@ -19,13 +19,62 @@ package com.seleniumtests.driver;
  */
 public enum TestType {
 
-    WEB("web"),
-    APP("app"),
-    NON_GUI("NonGUI"),
-    APPIUM_WEB_ANDROID("appium_web_android"),
-    APPIUM_WEB_IOS("appium_web_ios"),
-	APPIUM_APP_ANDROID("appium_app_android"),
-	APPIUM_APP_IOS("appium_app_ios");
+    WEB("web") {
+    	public boolean isMobile() {
+    		return false;
+    	}
+    	public TestType family() {
+        	return WEB;
+        }
+    },
+    APP("app") {
+    	public boolean isMobile() {
+    		return true;
+    	}
+    	public TestType family() {
+        	return APP;
+        }
+    },
+    NON_GUI("NonGUI") {
+    	public boolean isMobile() {
+    		return false;
+    	}
+    	public TestType family() {
+        	return NON_GUI;
+        }
+    },
+    APPIUM_WEB_ANDROID("appium_web_android") {
+    	public boolean isMobile() {
+    		return true;
+    	}
+    	public TestType family() {
+        	return WEB;
+        }
+    },
+    APPIUM_WEB_IOS("appium_web_ios") {
+    	public boolean isMobile() {
+    		return true;
+    	}
+    	public TestType family() {
+        	return WEB;
+        }
+    },
+	APPIUM_APP_ANDROID("appium_app_android") {
+    	public boolean isMobile() {
+    		return true;
+    	}
+    	public TestType family() {
+        	return APP;
+        }
+    },
+	APPIUM_APP_IOS("appium_app_ios") {
+    	public boolean isMobile() {
+    		return true;
+    	}
+    	public TestType family() {
+        	return APP;
+        }
+    };
 
     String testType;
 
@@ -33,7 +82,14 @@ public enum TestType {
         this.testType = testType;
     }
 
-    public String getTestType() {
+    public boolean isMobile() {
+		return false;
+	}
+    public TestType family() {
+    	return WEB;
+    }
+
+	public String getTestType() {
         return testType;
     }
 
