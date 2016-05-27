@@ -71,7 +71,7 @@ public class SauceLabsDriverFactory extends AbstractWebDriverFactory implements 
      * @throws IOException
      * @throws AuthenticationException 
      */
-    protected static String uploadFile(String targetAppPath, String serverURL, String testdroid_apikey) throws IOException, AuthenticationException {
+    protected static String uploadFile(String targetAppPath) throws IOException, AuthenticationException {
 
     	// extract user name and password from appiumServerURL
     	Matcher matcher = REG_USER_PASSWORD.matcher(SeleniumTestsContextManager.getThreadContext().getAppiumServerURL());
@@ -109,7 +109,7 @@ public class SauceLabsDriverFactory extends AbstractWebDriverFactory implements 
     	if (webDriverConfig.getTestType().family().equals(TestType.APP)) {
     		capabilities = cloudSpecificCapabilities();
     		try {
-				uploadFile(webDriverConfig.getApp(), "", "");
+				uploadFile(webDriverConfig.getApp());
 			} catch (IOException | AuthenticationException e) {
 				throw new ConfigurationException("Error while uploading mobile application: " + e.getMessage());
 			}

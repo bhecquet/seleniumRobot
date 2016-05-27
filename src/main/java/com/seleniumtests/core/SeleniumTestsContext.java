@@ -32,11 +32,13 @@ import org.apache.commons.io.FileUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.openqa.selenium.Platform;
+import org.openqa.selenium.WebDriverException;
 import org.testng.ITestContext;
 import org.testng.ITestResult;
 import org.testng.xml.XmlSuite;
 
 import com.seleniumtests.core.config.ConfigReader;
+import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.driver.ScreenShot;
 import com.seleniumtests.driver.TestType;
 import com.seleniumtests.reporter.PluginsHelper;
@@ -56,6 +58,7 @@ public class SeleniumTestsContext {
 
     /* configuration defined in testng.xml */
     public static final String TEST_CONFIGURATION = "testConfig"; 				// configuration annexe
+    public static final String DEVICE_LIST = "deviceList"; 						// List of known devices in json format (internal use only)
     public static final String WEB_SESSION_TIME_OUT = "webSessionTimeOut";		// timeout de la session du navigateur
     public static final String IMPLICIT_WAIT_TIME_OUT = "implicitWaitTimeOut";	// attente implicite du navigateur
     public static final String EXPLICIT_WAIT_TIME_OUT = "explicitWaitTimeOut";	// attente explicite du navigateur
@@ -116,7 +119,7 @@ public class SeleniumTestsContext {
     // Appium specific properties
     public static final String APP = "app";										// Chemin de l'application mobile (local ou distant)
     public static final String APPIUM_SERVER_URL = "appiumServerURL";			// URL du serveur appium en local ou à distance
-    public static final String MOBILE_PLATFORM_VERSION = "mobilePlatformVersion";// Version de l'OS mobile
+    public static final String MOBILE_PLATFORM_VERSION = "mobilePlatformVersion";// Mobile OS version. It's deduced from platform name and not read directly from parameters
     public static final String DEVICE_NAME = "deviceName";						// Nom du terminal utilisé pour le test
 
     public static final String APP_PACKAGE = "appPackage";						// package de l'application
@@ -289,7 +292,6 @@ public class SeleniumTestsContext {
         setContextAttribute(context, WEB_DRIVER_LISTENER, System.getProperty(WEB_DRIVER_LISTENER), null);
 
         setContextAttribute(context, APPIUM_SERVER_URL, System.getProperty(APPIUM_SERVER_URL), null);
-        setContextAttribute(context, MOBILE_PLATFORM_VERSION, System.getProperty(MOBILE_PLATFORM_VERSION), null);
         setContextAttribute(context, DEVICE_NAME, System.getProperty(DEVICE_NAME), null);
 
         setContextAttribute(context, APP, System.getProperty(APP), "");
@@ -313,6 +315,9 @@ public class SeleniumTestsContext {
         // determines test_type according to input configuration
         configureTestType();
         
+        // get mobile platform version
+        updatePlatformVersion();
+        
 
         if (context != null) {
             setContextAttribute(OUTPUT_DIRECTORY, null, context.getOutputDirectory(), null);
@@ -335,6 +340,36 @@ public class SeleniumTestsContext {
                 }
             }
         }
+    }
+    
+    /**
+     * From platform name, in case of Desktop platform, do nothing and in cas of mobile, extract OS version from name
+     *
+     * @throws ConfigurationException 	in mobile, if version is not present
+     */
+    private void updatePlatformVersion() {
+    	try {
+	    	Platform currentPlatform = Platform.fromString(getPlatform()).family();
+	    	if (currentPlatform.equals(Platform.WINDOWS) 
+	    		|| currentPlatform.equals(Platform.MAC) 
+	    		|| currentPlatform.equals(Platform.UNIX) ) {
+	    		return;
+	    	} else {
+	    		throw new WebDriverException("");
+	    	}
+	    } catch (WebDriverException e) {
+    		if (getPlatform().toLowerCase().startsWith("android") || getPlatform().toLowerCase().startsWith("ios")) {
+	    		String[] pfVersion = getPlatform().split(" ", 2);
+	    		try {
+		    		setPlatform(pfVersion[0]);
+		    		setMobilePlatformVersion(pfVersion[1]);
+	    		} catch (IndexOutOfBoundsException x) {
+	    			throw new ConfigurationException("For mobile platform, platform name should contain version. Ex: 'Android 5.0' or 'iOS 9.1'");
+	    		}
+    		} else {
+    			throw new ConfigurationException(String.format("Platform %s has not been recognized as a valide platform", getPlatform()));
+    		}
+    	}
     }
     
     /**
@@ -707,7 +742,8 @@ public class SeleniumTestsContext {
      */
     private void setContextAttribute(final ITestContext context) {
         if (context != null) {
-            Map<String, String> testParameters = context.getSuite().getXmlSuite().getParameters();
+//            Map<String, String> testParameters = context.getSuite().getXmlSuite().getParameters();
+            Map<String, String> testParameters = context.getCurrentXmlTest().getAllParameters();
 
             for (Entry<String, String> entry : testParameters.entrySet()) {
                 String attributeName = entry.getKey();
@@ -776,6 +812,14 @@ public class SeleniumTestsContext {
 
     public void setTestType(final TestType testType) {
         setAttribute(TEST_TYPE, testType);
+    }
+    
+    public void setPlatform(final String platform) {
+        setAttribute(PLATFORM, platform);
+    }
+    
+    public void setMobilePlatformVersion(final String version) {
+    	setAttribute(MOBILE_PLATFORM_VERSION, version);
     }
     
     /**
