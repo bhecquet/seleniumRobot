@@ -7,7 +7,7 @@
 	<parameter name="aParam" value="value1" />
 	<parameter name="anOtherParam" value="value2" />
 	<parameter name="variable1" value="value4" />
-    
+    <parameter name="testConfig" value="exampleConfigGenericParams.xml" />
 
     <test name="Unit tests" parallel="false">
     	<parameter name="variable1" value="value2" />
@@ -29,6 +29,7 @@
     	<parameter name="app" value="https://www.google.fr" />
     	<parameter name="dpTagsInclude" value="aTag" />
 		<parameter name="anOtherParam" value="value3" />
+		
         
         <groups>
             <run>

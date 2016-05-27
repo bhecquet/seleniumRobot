@@ -1,5 +1,6 @@
 /*
- * Copyright 2015 www.seleniumtests.com
+ * Orignal work: Copyright 2015 www.seleniumtests.com
+ * Modified work: Copyright 2016 www.infotel.com
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -30,6 +31,8 @@ import org.testng.SuiteRunState;
 import org.testng.internal.annotations.IAnnotationFinder;
 
 import org.testng.xml.XmlSuite;
+
+import com.google.inject.Injector;
 
 public class SeleniumTestsDefaultSuite implements ISuite {
 
@@ -121,5 +124,20 @@ public class SeleniumTestsDefaultSuite implements ISuite {
     public List<ITestNGMethod> getAllMethods() {
         return null;
     }
+
+	public String getParentModule() {
+		return null;
+	}
+
+	public String getGuiceStage() {
+		return null;
+	}
+
+	public Injector getParentInjector() {
+		return null;
+	}
+
+	public void setParentInjector(Injector injector) {		
+	}
 
 }
