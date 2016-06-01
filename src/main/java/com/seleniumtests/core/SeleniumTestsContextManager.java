@@ -110,7 +110,7 @@ public class SeleniumTestsContextManager {
                 
                 TestConfigurationParser configParser = new TestConfigurationParser(configFile);
                 Map<String, String> parameters = iTestContext.getSuite().getXmlSuite().getParameters();
-                
+
                 // insert parameters
 	            for (Node node: configParser.getParameterNodes()) {
 		            parameters.put(node.getAttributes().getNamedItem("name").getNodeValue(),
