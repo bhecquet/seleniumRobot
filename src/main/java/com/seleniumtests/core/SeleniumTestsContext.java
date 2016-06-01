@@ -293,6 +293,7 @@ public class SeleniumTestsContext {
 
         setContextAttribute(context, APPIUM_SERVER_URL, System.getProperty(APPIUM_SERVER_URL), null);
         setContextAttribute(context, DEVICE_NAME, System.getProperty(DEVICE_NAME), null);
+        setContextAttribute(context, DEVICE_LIST, null, "{}");
 
         setContextAttribute(context, APP, System.getProperty(APP), "");
        
@@ -314,10 +315,12 @@ public class SeleniumTestsContext {
         
         // determines test_type according to input configuration
         configureTestType();
+
+        // get mobile platform version if one is defined in device list
+        updateDeviceMobileVersion();
         
         // get mobile platform version
         updatePlatformVersion();
-        
 
         if (context != null) {
             setContextAttribute(OUTPUT_DIRECTORY, null, context.getOutputDirectory(), null);
@@ -395,6 +398,16 @@ public class SeleniumTestsContext {
         		setAttribute(TEST_TYPE, TestType.WEB);
         	}
         }
+    }
+    
+    /**
+     * Search mobile platform version according to device name if one has been defined in testConfig file
+     */
+    private void updateDeviceMobileVersion() {
+    	HashMap<String, String> deviceList = getDeviceList();
+    	if (getDeviceName() != null && !deviceList.isEmpty()) {
+    		setAttribute(MOBILE_PLATFORM_VERSION, deviceList.get(getDeviceName()));
+    	}
     }
 
     /**
@@ -644,6 +657,20 @@ public class SeleniumTestsContext {
     public String getRunMode() {
         return (String) getAttribute(RUN_MODE);
     }
+    
+    @SuppressWarnings("unchecked")
+	public HashMap<String, String> getDeviceList() {
+    	HashMap<String, String> deviceList = new HashMap<String, String>();
+    	if (getAttribute(DEVICE_LIST) == null || getAttribute(DEVICE_LIST).equals("{}")) {
+    		return deviceList;
+    	}
+    	
+    	JSONObject devList = new JSONObject((String)getAttribute(DEVICE_LIST));
+    	for (String key: ((Set<String>)devList.keySet())) {
+    		deviceList.put(key, devList.getString(key));
+    	}
+    	return deviceList;
+    }
 
     public int getWebSessionTimeout() {
         try {
@@ -774,9 +801,19 @@ public class SeleniumTestsContext {
             final String sysPropertyValue, final String defaultValue) {
         String suiteValue = null;
         if (context != null && context.getCurrentXmlTest() != null) {
+        	
+        	// priority given to test parameter
         	String testValue = context.getCurrentXmlTest().getParameter(attributeName);
+        	
         	if (testValue == null) {
+        		
+        		// if test parameter does not exist, loot at suite parameter
         		suiteValue = context.getCurrentXmlTest().getSuite().getParameter(attributeName);
+        		
+        		// sometimes, suite parameter are defined at global level, not for current test
+        		if (suiteValue == null) {
+        			suiteValue = context.getSuite().getParameter(attributeName);
+        		}
         	} else {
         		suiteValue = testValue;
         	}

@@ -47,12 +47,15 @@ public class TestConfigurationParser {
 			doc = dBuilder.parse(xmlFile);
 			doc.getDocumentElement().normalize();
 		} catch (ParserConfigurationException | SAXException | IOException e) {
-			e.printStackTrace();
+			doc = null;
 		}
 	}
 
     public List<Node> getParameterNodes() {
         List<Node> nList = new ArrayList<Node>();
+        if (doc == null) {
+        	return nList;
+        }
         NodeList tmpnList = doc.getFirstChild().getChildNodes();
         
         for (int i = 0; i < tmpnList.getLength(); i++) {
@@ -67,6 +70,9 @@ public class TestConfigurationParser {
     
     public List<Node> getDeviceNodes() {
     	List<Node> nList = new ArrayList<Node>();
+    	if (doc == null) {
+        	return nList;
+        }
     	NodeList tmpnList = doc.getElementsByTagName("device");
         
         for (int i = 0; i < tmpnList.getLength(); i++) {
@@ -90,6 +96,9 @@ public class TestConfigurationParser {
     
     public List<Node> getServiceNodes() {
     	List<Node> nList = new ArrayList<Node>();
+    	if (doc == null) {
+        	return nList;
+        }
     	NodeList tmpnList = doc.getElementsByTagName("service");
         
         for (int i = 0; i < tmpnList.getLength(); i++) {
