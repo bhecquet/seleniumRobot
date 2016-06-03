@@ -37,6 +37,11 @@ public class DriverTestPage extends PageObject {
         super(textElement, openPageURL ? getPageUrl() : null);
     }
     
+    //for TestInterceptPage (the loader page of By has to be a PageObject)
+    public By findById(String id) {
+    	return By.id(id);
+    }
+    
     private static String getPageUrl() {
     	if (SeleniumTestsContextManager.getThreadContext().getWebRunBrowser().contains("firefox")) {
 			return "file://" + Thread.currentThread().getContextClassLoader().getResource("tu/test.html").getFile();

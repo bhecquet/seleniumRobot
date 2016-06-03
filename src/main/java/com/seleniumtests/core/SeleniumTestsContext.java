@@ -51,6 +51,7 @@ public class SeleniumTestsContext {
 	public static String FEATURES_PATH;
 	public static String CONFIG_PATH;
 	public static String APPLICATION_NAME;
+	public static HashMap<String, HashMap<String,String>> ID_MAPPING;
 	public static final String DATA_FOLDER_NAME = "data";
 
     /* configuration defined in testng.xml */
@@ -689,7 +690,20 @@ public class SeleniumTestsContext {
     public HashMap<String, String> getConfiguration() {
     	return (HashMap<String, String>) getAttribute(TEST_CONFIG);
     }
-
+    
+    
+    //Methods for ID_Mapping
+    //get
+    public HashMap<String, HashMap<String, String>> getIdMapping() {
+    	return (HashMap<String, HashMap<String,String>>) ID_MAPPING;
+    }
+    
+    //set
+    public void setIdMapping(HashMap<String, HashMap<String,String>> conf){
+    	ID_MAPPING = conf;
+    }
+    
+    
     public boolean isUseFirefoxDefaultProfile() {
         try {
             return Boolean.parseBoolean((String) getAttribute(USE_DEFAULT_FIREFOX_PROFILE));
