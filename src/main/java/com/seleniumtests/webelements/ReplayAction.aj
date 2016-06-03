@@ -17,6 +17,7 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.remote.UnreachableBrowserException;
 import org.openqa.selenium.support.ui.SystemClock;
@@ -58,15 +59,17 @@ public class ReplayAction {
 	    	try {
 	    		reply = joinPoint.proceed(joinPoint.getArgs());
 	    		break;
+	    	} catch (UnhandledAlertException e) {
+	    		throw e;
 	    	} catch (WebDriverException e) {
 	    		if (systemClock.isNowBefore(end)) {
 	    			WaitHelper.waitForMilliSeconds(100);
 					continue;
 				} else {
 					if (e instanceof NoSuchElementException) {
-						throw new NoSuchElementException("l'élément recherché n'a pas été trouvé");
+						throw new NoSuchElementException("Searched element could not be found");
 					} else if (e instanceof UnreachableBrowserException) {
-						throw new WebDriverException("Le navigateur n'a pas répondu. Le site met peut-être trop de temps à répondre");
+						throw new WebDriverException("Browser did not reply, it may have frozen");
 					}
 					throw e;
 				}

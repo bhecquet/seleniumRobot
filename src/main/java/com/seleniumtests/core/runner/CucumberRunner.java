@@ -66,8 +66,15 @@ public class CucumberRunner {
      */
     @BeforeTest(alwaysRun = true)
     public void beforeTest(final ITestContext testContext, final XmlTest xmlTest) {
-        SeleniumTestsContextManager.initTestLevelContext(testContext, xmlTest);
-        testNGCucumberRunner = new CustomTestNGCucumberRunner(this.getClass(), xmlTest.getName());
+    	try {
+	        SeleniumTestsContextManager.initTestLevelContext(testContext, xmlTest);
+	        testNGCucumberRunner = new CustomTestNGCucumberRunner(this.getClass(), xmlTest.getName());
+    	} catch (Exception e) {
+    		logger.error(Thread.currentThread() + " Error on init: " + e.getMessage());
+    		for (StackTraceElement s : e.getStackTrace()) {
+    			logger.error(Thread.currentThread() + " " + s.toString());
+    		}
+    	}
     }
 
     @BeforeMethod(alwaysRun = true)
@@ -82,7 +89,6 @@ public class CucumberRunner {
 
     @Test(groups = "cucumber", description = "Cucumber scenario", dataProvider = "scenarios")
     public void feature(CucumberScenarioWrapper cucumberScenarioWrapper) throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
-    	
     	testNGCucumberRunner.runScenario(cucumberScenarioWrapper);
     }
 

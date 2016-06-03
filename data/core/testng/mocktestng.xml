@@ -39,16 +39,13 @@
 
 
     <test name="WebTest - Test Link Login Test in Chrome">
-        <!--testType parameter is optional for web test, since testType defaults to web-->
-        <parameter name="testType" value="Web" />
+
         <classes>
             <class name="com.seleniumtests.tests.RegistrationTest" />
         </classes>
     </test>
 
     <test name="WebTest - Test Link Login Test in Firefox                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               ">
-        <!--testType parameter is optional for web test, since testType defaults to web-->
-        <parameter name="testType" value="Web" />
         <parameter name="browser" value="*firefox" />
         <classes>
             <class name="com.seleniumtests.tests.RegistrationTest" />
@@ -56,21 +53,18 @@
     </test>
 
     <test name="NonGUITest - Multiple assertion failures">
-        <parameter name="testType" value="NonGUI" />
         <classes>
             <class name="com.seleniumtests.tests.RetryTest" />
         </classes>
     </test>
 
     <test name="NonGUITest - Soft CustomAssertion Test">
-        <parameter name="testType" value="NonGUI" />
         <classes>
             <class name="com.seleniumtests.tests.SoftAssertionTest" />
         </classes>
     </test>
 
     <test name="Android m-site Test" parallel="false">
-        <parameter name="testType" value="Web" />
         <parameter name="browser" value="*android" />
         <parameter name="appiumServerURL" value="http://localhost:4723/wd/hub"/>
         <parameter name="automationName" value="Appium"/>
@@ -94,8 +88,7 @@
 
 
     <test name="Android App test" parallel="false">
-        <parameter name="browser" value="*android" />
-        <parameter name="testType" value="app" />        
+        <parameter name="browser" value="*android" />     
         <parameter name="appiumServerURL" value="http://localhost:4723/wd/hub"/>
         <parameter name="automationName" value="Appium"/>
         <parameter name="platform" value="Android"/>
@@ -128,7 +121,6 @@
 
     <test name="SauceLabs test" parallel="false">
         <parameter name="browser" value="*saucelabs" />
-        <!--<parameter name="testType" value="appium_web_ios" />-->
         <parameter name="sauceLabsURL" value="add saucelabs credentials"/>
         <parameter name="browserName" value="chrome"/>
         <parameter name="platform" value="Windows 7"/>

@@ -15,7 +15,6 @@
 package com.seleniumtests.core;
 
 import java.io.File;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -24,15 +23,12 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.testng.ITestContext;
-
 import org.testng.xml.XmlTest;
-
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import com.seleniumtests.driver.TestType;
-
-import com.seleniumtests.helper.XMLUtility;
+import com.seleniumtests.helper.TestConfigurationParser;
 
 /**
  * SeleniumTestsContextManager provides ways to manage global context, thread context and test level context.
@@ -102,7 +98,7 @@ public class SeleniumTestsContextManager {
      *
      * @return  iTestContext having parameters set from external config file
      */
-    private static ITestContext getContextFromConfigFile(final ITestContext iTestContext) {
+    public static ITestContext getContextFromConfigFile(final ITestContext iTestContext) {
         if (iTestContext != null) {
 
             // "testConfig" parameter can be defined in testng.xml file
@@ -110,17 +106,48 @@ public class SeleniumTestsContextManager {
             // Hence testng.xml file can focus on test
             if (iTestContext.getSuite().getParameter(SeleniumTestsContext.TEST_CONFIGURATION) != null) {
                 File suiteFile = new File(iTestContext.getSuite().getXmlSuite().getFileName());
-                String configFile = suiteFile.getPath().replace(suiteFile.getName(), "")
-                        + iTestContext.getSuite().getParameter("testConfig");
-                NodeList nList = XMLUtility.getXMLNodes(configFile, "parameter");
-                Map<String, String> parameters = iTestContext.getSuite().getXmlSuite().getParameters();
-                for (int i = 0; i < nList.getLength(); i++) {
-                    Node nNode = nList.item(i);
-                    parameters.put(nNode.getAttributes().getNamedItem("name").getNodeValue(),
-                        nNode.getAttributes().getNamedItem("value").getNodeValue());
+                String configFile = suiteFile.getPath().replace(suiteFile.getName(), "") + iTestContext.getSuite().getParameter("testConfig");
+                
+                TestConfigurationParser configParser = new TestConfigurationParser(configFile);
+                Map<String, String> parameters;
+                
+                if (iTestContext.getCurrentXmlTest() != null) {
+                	parameters = iTestContext.getCurrentXmlTest().getSuite().getParameters();
+                } else {
+                	parameters = iTestContext.getSuite().getXmlSuite().getParameters();
                 }
 
-                iTestContext.getSuite().getXmlSuite().setParameters(parameters);
+                // insert parameters
+	            for (Node node: configParser.getParameterNodes()) {
+		            parameters.put(node.getAttributes().getNamedItem("name").getNodeValue(),
+		            		       node.getAttributes().getNamedItem("value").getNodeValue());
+		        }
+                
+                // get configuration for services. Only insert paramters corresponding to the right service defined in runMode
+                String runMode = System.getProperty(SeleniumTestsContext.RUN_MODE) != null ?
+                		System.getProperty(SeleniumTestsContext.RUN_MODE): iTestContext.getSuite().getParameter(SeleniumTestsContext.RUN_MODE) != null ?
+                				iTestContext.getSuite().getParameter(SeleniumTestsContext.TEST_CONFIGURATION) : "LOCAL";
+                for (Node node: configParser.getServiceNodes()) {
+                	if (node.getAttributes().getNamedItem("name").getNodeValue().equalsIgnoreCase(runMode)) {
+                		NodeList nList = node.getChildNodes();
+                		for (int i = 0; i < nList.getLength(); i++ ) {
+                			Node paramNode = nList.item(i);
+                			if (paramNode.getNodeName().equals("parameter")) {
+	                			parameters.put(paramNode.getAttributes().getNamedItem("name").getNodeValue(),
+	                						   paramNode.getAttributes().getNamedItem("value").getNodeValue());
+                			}
+                		}
+                	}
+                }
+                
+                // 
+                parameters.put(SeleniumTestsContext.DEVICE_LIST, configParser.getDeviceNodesAsJson());
+                    
+                if (iTestContext.getCurrentXmlTest() != null) {
+                	iTestContext.getCurrentXmlTest().getSuite().setParameters(parameters);
+                } else {
+                	iTestContext.getSuite().getXmlSuite().setParameters(parameters);
+                }
             }
         }
 
@@ -136,7 +163,6 @@ public class SeleniumTestsContextManager {
             for (Entry<String, String> entry : testParameters.entrySet()) {
                 seleniumTestsCtx.setAttribute(entry.getKey(), entry.getValue());
             }
-
         }
         
         // merge configurations from ini file and xml file
@@ -157,25 +183,31 @@ public class SeleniumTestsContextManager {
         initThreadContext(testNGCtx, null);
     }
 
-    public static void initThreadContext(final ITestContext testNGCtx, final XmlTest xmlTest) {
+    public static void initThreadContext(ITestContext testNGCtx, final XmlTest xmlTest) {
+    	testNGCtx = getContextFromConfigFile(testNGCtx);
     	SeleniumTestsContext seleniumTestsCtx = new SeleniumTestsContext(testNGCtx);
         loadCustomizedContextAttribute(testNGCtx, seleniumTestsCtx);
 
-        if (xmlTest != null) {
-            Map<String, String> testParameters = xmlTest.getTestParameters();
-
-            // parse the test level parameters
-            for (Entry<String, String> entry : testParameters.entrySet()) {
-
-                if (System.getProperty(entry.getKey()) == null) {
-                    seleniumTestsCtx.setAttribute(entry.getKey(), entry.getValue());
-                }
-
-            }
-
-        }
-
+// COMMENTED as SeleniumTestContext now look for parameter value in currentXmlTest for every param
+//        if (xmlTest != null) {
+//            Map<String, String> testParameters = xmlTest.getTestParameters();
+//
+//            // parse the test level parameters
+//            for (Entry<String, String> entry : testParameters.entrySet()) {
+//
+//                if (System.getProperty(entry.getKey()) == null) {
+//                    seleniumTestsCtx.setAttribute(entry.getKey(), entry.getValue());
+//                }
+//
+//            }
+//
+//        }
+        
         threadLocalContext.set(seleniumTestsCtx);
+        
+        // merge configurations from ini file and xml file
+        seleniumTestsCtx.setTestConfiguration();
+
     }
 
     public static void initThreadContext(final XmlTest xmlTest) {
@@ -198,6 +230,6 @@ public class SeleniumTestsContextManager {
     }
 
     public static boolean isWebTest() {
-        return (getThreadContext().getTestType().equalsIgnoreCase(TestType.WEB.toString()));
+        return (getThreadContext().getTestType().equals(TestType.WEB));
     }
 }

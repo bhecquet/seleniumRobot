@@ -1,5 +1,6 @@
 /*
- * Copyright 2015 www.seleniumtests.com
+ * Orignal work: Copyright 2015 www.seleniumtests.com
+ * Modified work: Copyright 2016 www.infotel.com
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -552,13 +553,12 @@ public class SeleniumTestsReporter implements IReporter, ITestListener, IInvoked
 
                     SeleniumTestsContext testLevelContext = SeleniumTestsContextManager.getTestLevelContext(testName);
                     if (testLevelContext != null) {
-                        String appURL = testLevelContext.getAppURL();
-                        String browser = testLevelContext.getWebRunBrowser();
+                        String browser = testLevelContext.getBrowser();
 
                         String app = testLevelContext.getApp();
                         String appPackage = testLevelContext.getAppPackage();
                         String appActivity = testLevelContext.getAppActivity();
-                        String testType = testLevelContext.getTestType();
+                        TestType testType = testLevelContext.getTestType();
 
                         if (browser != null) {
                             browser = browser.replace("*", "");
@@ -570,10 +570,10 @@ public class SeleniumTestsReporter implements IReporter, ITestListener, IInvoked
                         }
 
                         // Log URL for web test and app info for app test
-                        if (testType.equalsIgnoreCase(TestType.WEB.getTestType())) {
-                            contentBuffer.append("<div><i>App URL:  <b>" + appURL + "</b>, Browser: <b>" + browser
+                        if (testType.family().equals(TestType.WEB)) {
+                            contentBuffer.append("<div><i>Browser: <b>" + browser
                                     + "</b></i></div>");
-                        } else if (testType.equalsIgnoreCase(TestType.APP.getTestType())) {
+                        } else if (testType.family().equals(TestType.APP)) {
 
                             // Either app Or app package and app activity is specified to run test on app
                             if (StringUtils.isNotBlank(app)) {
@@ -582,7 +582,7 @@ public class SeleniumTestsReporter implements IReporter, ITestListener, IInvoked
                                 contentBuffer.append("<div><i>App Package: <b>" + appPackage
                                         + "</b>, App Activity:  <b>" + appActivity + "</b></i></div>");
                             }
-                        } else if (testType.equalsIgnoreCase(TestType.NON_GUI.getTestType())) {
+                        } else if (testType.family().equals(TestType.NON_GUI)) {
                             contentBuffer.append("<div><i></i></div>");
 
                         } else {
@@ -1250,7 +1250,7 @@ public class SeleniumTestsReporter implements IReporter, ITestListener, IInvoked
             context.put("userName", userName);
             context.put("currentDate", new Date().toString());
 
-            String mode = SeleniumTestsContextManager.getGlobalContext().getWebRunMode();
+            String mode = SeleniumTestsContextManager.getGlobalContext().getRunMode();
             String hubUrl = SeleniumTestsContextManager.getGlobalContext().getWebDriverGrid();
             context.put("gridHub", "<a href='" + hubUrl + "' target=hub>" + hubUrl + "</a>");
 

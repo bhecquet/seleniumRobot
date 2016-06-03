@@ -33,20 +33,26 @@ public class IOsCapabilitiesFactory implements ICapabilitiesFactory {
     public DesiredCapabilities createCapabilities(final DriverConfig cfg) {
     	
     	DesiredCapabilities caps = new DesiredCapabilities(this.capabilities);
-    	caps.setCapability("automationName", cfg.getAutomationName());
+    	caps.setCapability("automationName", "Appium");
     	caps.setCapability("fullReset", "true");
-    	caps.setCapability("platformName", cfg.getMobilePlatformName());
+    	caps.setCapability("platformName", cfg.getPlatform());
 
         // Set up version and device name else appium server would pick the only available emulator/device
         // Both of these are ignored for android for now
     	caps.setCapability("platformVersion", cfg.getMobilePlatformVersion());
     	caps.setCapability("deviceName", cfg.getDeviceName());
 
-    	caps.setCapability("app", cfg.getApp());
+    	String app = cfg.getApp();
+    	if (caps.getCapability("app") == null) {
+        	caps.setCapability("app", app);
+        }
     	caps.setCapability("appPackage", cfg.getAppPackage());
     	caps.setCapability("appActivity", cfg.getAppActivity());
 
-    	caps.setCapability(CapabilityType.BROWSER_NAME, cfg.getBrowserName());
+    	// do not configure application and browser as they are mutualy exclusive
+        if (app != null && app.trim().equals("")) {
+        	caps.setCapability(CapabilityType.BROWSER_NAME, cfg.getBrowser());
+        }
     	caps.setCapability("newCommandTimeout", cfg.getNewCommandTimeout());
 
         return caps;
