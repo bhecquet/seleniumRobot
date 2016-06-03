@@ -1,5 +1,6 @@
 /*
- * Copyright 2015 www.seleniumtests.com
+ * Orignal work: Copyright 2015 www.seleniumtests.com
+ * Modified work: Copyright 2016 www.infotel.com
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,6 +15,29 @@
 package com.seleniumtests.driver;
 
 public enum DriverMode {
-    LOCAL,
-    ExistingGrid,
+    LOCAL ("local"),
+    ExistingGrid ("existinggrid"),
+    SauceLabs ("saucelabs"),
+    TestDroid ("testdroid");
+	
+	String[] driverMode;
+	
+	DriverMode(final String... driverMode) {
+        this.driverMode = driverMode;
+    }
+	
+	public static DriverMode fromString(String mode) {
+		try {
+			return DriverMode.valueOf(mode);
+		} catch (IllegalArgumentException ex) {
+			for (DriverMode drvMode : DriverMode.values()) {
+		        for (String matcher : drvMode.driverMode) {
+		          if (mode.toLowerCase().equals(matcher.toLowerCase())) {
+		            return drvMode;
+		          }
+		        }
+		      }
+		      throw new IllegalArgumentException("Unrecognized platform: " + mode);
+		}
+	}	
 }

@@ -55,27 +55,17 @@ public class DriverConfig {
     private boolean addJSErrorCollectorExtension = false;
     private ArrayList<WebDriverEventListener> webDriverListeners;
     private boolean useFirefoxDefaultProfile = true;
-    private int browserWindowWidth = -1;
-    private int browserWindowHeight = -1;
 
     private String proxyHost;
 
-    private String testType;
-
-    // appium properties
-    private String automationName;
+    private TestType testType;
 
     // Use same platform property as the one used for browser
     // private String platformName;
     private String appiumServerURL;
-    private String mobilePlatformName;
     private String mobilePlatformVersion;
     private String deviceName;
     private String app;
-
-    // Name of mobile web browser to automate.
-    // This is irrelevant when automating an app
-    private String browserName;
 
     private String appPackage;
     private String appActivity;
@@ -84,7 +74,6 @@ public class DriverConfig {
 
     private String platform;
     private String version;
-    private String cloudURL;
     private String cloudApiKey;
     private String projectName;
 
@@ -365,30 +354,6 @@ public class DriverConfig {
         this.webSessionTimeout = webSessionTimeout;
     }
 
-    public int getBrowserWindowWidth() {
-        return browserWindowWidth;
-    }
-
-    public void setBrowserWindowWidth(final int browserWindowWidth) {
-        this.browserWindowWidth = browserWindowWidth;
-    }
-
-    public int getBrowserWindowHeight() {
-        return browserWindowHeight;
-    }
-
-    public void setBrowserWindowHeight(final int browserWindowHeight) {
-        this.browserWindowHeight = browserWindowHeight;
-    }
-
-    public String getAutomationName() {
-        return automationName;
-    }
-
-    public void setAutomationName(final String automationName) {
-        this.automationName = automationName;
-    }
-
     public String getMobilePlatformVersion() {
         return mobilePlatformVersion;
     }
@@ -411,14 +376,6 @@ public class DriverConfig {
 
     public void setApp(final String app) {
         this.app = app;
-    }
-
-    public String getBrowserName() {
-        return browserName;
-    }
-
-    public void setBrowserName(final String browserName) {
-        this.browserName = browserName;
     }
 
     public String getAppPackage() {
@@ -453,24 +410,15 @@ public class DriverConfig {
         this.appiumServerURL = appiumServerURL;
     }
 
-    public String getMobilePlatformName() {
-        return mobilePlatformName;
-    }
-
-    public void setMobilePlatformName(final String mobilePlatformName) {
-        this.mobilePlatformName = mobilePlatformName;
-    }
-
-    public String getTestType() {
+    public TestType getTestType() {
         return testType;
     }
 
-    public void setTestType(final String testType) {
+    public void setTestType(final TestType testType) {
         this.testType = testType;
     }
 
     public String getPlatform() {
-
         return platform;
     }
 
@@ -484,14 +432,6 @@ public class DriverConfig {
 
     public void setVersion(final String version) {
         this.version = version;
-    }
-
-    public String getCloudURL() {
-        return cloudURL;
-    }
-
-    public void setCloudURL(final String cloudURL) {
-        this.cloudURL = cloudURL;
     }
 
 	public String getCloudApiKey() {

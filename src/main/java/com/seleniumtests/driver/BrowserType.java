@@ -20,12 +20,8 @@ public enum BrowserType {
     Chrome("*chrome"),
     HtmlUnit("*htmlunit"),
     Safari("*safari"),
-    Android("*android"),
-    IPhone("*iphone"),
-    IPad("*ipad"),
+    Browser("*browser"), // default Android browser
     PhantomJS("*phantomjs"),
-    SauceLabs("*saucelabs"),
-    TestDroid("*testdroid"),
     ;
 
     public static BrowserType getBrowserType(final String browserType) {
@@ -39,18 +35,10 @@ public enum BrowserType {
             return BrowserType.HtmlUnit;
         } else if (browserType.equalsIgnoreCase("*safari") || browserType.equalsIgnoreCase("safari")) {
             return BrowserType.Safari;
-        } else if (browserType.equalsIgnoreCase("*android") || browserType.equalsIgnoreCase("android")) {
-            return BrowserType.Android;
-        } else if (browserType.equalsIgnoreCase("*iphone") || browserType.equalsIgnoreCase("iphone")) {
-            return BrowserType.IPhone;
-        } else if (browserType.equalsIgnoreCase("*ipad") || browserType.equalsIgnoreCase("ipad")) {
-            return BrowserType.IPad;
+        } else if (browserType.equalsIgnoreCase("*browser") || browserType.equalsIgnoreCase("browser")) {
+        	return BrowserType.Browser;
         } else if (browserType.equalsIgnoreCase("*phantomjs") || browserType.equalsIgnoreCase("phantomjs")) {
             return BrowserType.PhantomJS;
-        } else if (browserType.equalsIgnoreCase("*saucelabs") || browserType.equalsIgnoreCase("saucelabs")) {
-            return BrowserType.SauceLabs;
-        } else if (browserType.equalsIgnoreCase("*testdroid") || browserType.equalsIgnoreCase("testdroid")) {
-        	return BrowserType.TestDroid;
         } else {
             return BrowserType.FireFox;
         }

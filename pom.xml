@@ -2,14 +2,14 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>com.seleniumtests</groupId>
-	<artifactId>seleniumtestsframework</artifactId>
-	<version>4.1.0</version>
+	<groupId>com.infotel</groupId>
+	<artifactId>seleniumRobot</artifactId>
+	<version>1.0.0</version>
 	<packaging>jar</packaging>
 
-	<name>selenium tests framework</name>
-    <description>Step by step test reporting framework based on webdriver and testng</description>
-	<url>http://www.seleniumtests.com</url>
+	<name>selenium robot</name>
+    <description>Step by step test reporting framework based on webdriver, cucumber and testng, based on project seleniumtestsframework</description>
+
 
     <licenses>
         <license>
@@ -20,20 +20,20 @@
 
     <developers>
         <developer>
-            <name>Tarun Kumar</name>
-            <email>tkumarb@gmail.com</email>
-            <organization>seleniumtests</organization>
-            <organizationUrl>http://www.seleniumtests.com</organizationUrl>
+            <name>Bertrand Hecquet</name>
+            <email>bertrand.hecquet@infotel.com</email>
+            <organization>infotel</organization>
+            <organizationUrl>http://www.infotel.com</organizationUrl>
         </developer>
     </developers>
 
     <scm>
-        <connection>scm:git:git@github.com:bhecquet/seleniumtestsframework.git</connection>
-        <developerConnection>scm:git:git@github.com:bhecquet/seleniumtestsframework.git</developerConnection>
-        <url>git@github.com:bhecquet/seleniumtestsframework.git</url>
+        <connection>scm:git:git@github.com:bhecquet/seleniumRobot.git</connection>
+        <developerConnection>scm:git:git@github.com:bhecquet/seleniumRobot.git</developerConnection>
+        <url>git@github.com:bhecquet/seleniumRobot.git</url>
     </scm>
 
-	<distributionManagement>
+	<!-- <distributionManagement>
 		<snapshotRepository>
 			<id>ossrh</id>
 			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
@@ -54,7 +54,8 @@
                 <enabled>false</enabled> 
             </snapshots>
         </repository>
-    </repositories>
+        nexus.ouest.sesame.infotel.com
+    </repositories>-->
     
     <properties>
     	<selenium.version>2.53.0</selenium.version>
@@ -66,7 +67,7 @@
 		<dependency>
 			<groupId>org.testng</groupId>
 			<artifactId>testng</artifactId>
-			<version>6.8</version>
+			<version>6.9.10</version>
 		</dependency>
         <dependency>
             <groupId>io.appium</groupId>
@@ -364,6 +365,21 @@
 						</configuration>            
 					</execution>
 					<execution>
+						<id>copy-tools</id>
+						<phase>process-resources</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${project.build.directory}/tools</outputDirectory>
+							<resources>
+								<resource>
+									<directory>${project.basedir}/tools</directory>
+								</resource>
+							</resources>
+						</configuration>            
+					</execution>
+					<execution>
 						<id>copy-launcher</id>
 						<phase>process-resources</phase>
 						<goals>
@@ -373,7 +389,7 @@
 							<outputDirectory>${project.build.directory}</outputDirectory>
 							<resources>
 								<resource>
-									<directory>${project.basedir}/launchers</directory>
+									<directory>${project.basedir}/tools</directory>
 									<include>launch.bat</include>
 								</resource>
 							</resources>

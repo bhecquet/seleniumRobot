@@ -78,22 +78,6 @@ public class RemoteDriverFactory extends AbstractWebDriverFactory implements IWe
                 capability = new SafariCapabilitiesFactory().createCapabilities(webDriverConfig);
                 break;
 
-            case Android :
-                capability = new AndroidCapabilitiesFactory().createCapabilities(webDriverConfig);
-                break;
-
-            case IPhone :
-                capability =
-                    ((ICapabilitiesFactory) Class.forName("com.seleniumtests.browserfactory.IPhoneCapabilitiesFactory")
-                            .getConstructor().newInstance()).createCapabilities(webDriverConfig);
-                break;
-
-            case IPad :
-                capability =
-                    ((ICapabilitiesFactory) Class.forName("com.seleniumtests.browserfactory.IPadCapabilitiesFactory")
-                            .getConstructor().newInstance()).createCapabilities(webDriverConfig);
-                break;
-
             case PhantomJS :
                 capability = new PhantomJSCapabilitiesFactory().createCapabilities(webDriverConfig);
                 break;
@@ -103,13 +87,6 @@ public class RemoteDriverFactory extends AbstractWebDriverFactory implements IWe
         }
 
         switch (webDriverConfig.getBrowser()) {
-
-            case IPhone :
-            case IPad :
-                driver = (WebDriver) Class.forName("com.seleniumtests.browserfactory.RemoteIOSBaseDriver")
-                                          .getConstructor(URL.class, DesiredCapabilities.class).newInstance(url,
-                                              capability);
-                break;
 
             case FireFox :
                 try {

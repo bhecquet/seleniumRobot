@@ -31,11 +31,14 @@ import java.util.Set;
 import org.apache.commons.io.FileUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.openqa.selenium.Platform;
+import org.openqa.selenium.WebDriverException;
 import org.testng.ITestContext;
 import org.testng.ITestResult;
 import org.testng.xml.XmlSuite;
 
 import com.seleniumtests.core.config.ConfigReader;
+import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.driver.ScreenShot;
 import com.seleniumtests.driver.TestType;
 import com.seleniumtests.reporter.PluginsHelper;
@@ -55,52 +58,50 @@ public class SeleniumTestsContext {
 	public static final String DATA_FOLDER_NAME = "data";
 
     /* configuration defined in testng.xml */
-    public static final String TEST_CONFIGURATION = "testConfig";
-    public static final String APP_URL = "appURL";
-    public static final String WEB_SESSION_TIME_OUT = "webSessionTimeOut";
-    public static final String IMPLICIT_WAIT_TIME_OUT = "implicitWaitTimeOut";
-    public static final String EXPLICIT_WAIT_TIME_OUT = "explicitWaitTimeOut";
-    public static final String PAGE_LOAD_TIME_OUT = "pageLoadTimeout";
-    public static final String WEB_DRIVER_GRID = "webDriverGrid";
-    public static final String RUN_MODE = "runMode";
-    public static final String BROWSER = "browser";
-    public static final String BROWSER_VERSION = "browserVersion";
-    public static final String WEB_PLATFORM = "webPlatform";
-    public static final String FIREFOX_USER_PROFILE_PATH = "firefoxUserProfilePath";
-    public static final String USE_DEFAULT_FIREFOX_PROFILE = "useFirefoxDefaultProfile";
-    public static final String OPERA_USER_PROFILE_PATH = "operaUserProfilePath";
-    public static final String FIREFOX_BINARY_PATH = "firefoxBinaryPath";
-    public static final String CHROME_DRIVER_PATH = "chromeDriverPath";
-    public static final String CHROME_BINARY_PATH = "chromeBinaryPath";
-    public static final String IE_DRIVER_PATH = "ieDriverPath";
-    public static final String USER_AGENT = "userAgent";
+    public static final String TEST_CONFIGURATION = "testConfig"; 				// configuration annexe
+    public static final String DEVICE_LIST = "deviceList"; 						// List of known devices in json format (internal use only)
+    public static final String WEB_SESSION_TIME_OUT = "webSessionTimeOut";		// timeout de la session du navigateur
+    public static final String IMPLICIT_WAIT_TIME_OUT = "implicitWaitTimeOut";	// attente implicite du navigateur
+    public static final String EXPLICIT_WAIT_TIME_OUT = "explicitWaitTimeOut";	// attente explicite du navigateur
+    public static final String PAGE_LOAD_TIME_OUT = "pageLoadTimeout";			// temps d'attente de chargement d'une page
+    public static final String WEB_DRIVER_GRID = "webDriverGrid";				// adresse du serveur seleniumGrid
+    public static final String RUN_MODE = "runMode";							// local ou grid. Pourrait également contenir sauceLabs / testDroid
+    public static final String BROWSER = "browser";								// navigateur utilisé. Sur Android, le navigateur par défaut est "Browser"
+    public static final String BROWSER_VERSION = "browserVersion";				// version de navigateur utilisé
+    public static final String FIREFOX_USER_PROFILE_PATH = "firefoxUserProfilePath";	// profile utilisateur firefox
+    public static final String USE_DEFAULT_FIREFOX_PROFILE = "useFirefoxDefaultProfile";// utilisation du profile firefox par défaut
+    public static final String OPERA_USER_PROFILE_PATH = "operaUserProfilePath";	// profile utilisateur opéra
+    public static final String FIREFOX_BINARY_PATH = "firefoxBinaryPath";		// chemin vers le binaire firefox (firefox portable ou pour utiliser une version spécifique
+    public static final String CHROME_DRIVER_PATH = "chromeDriverPath";			// chemin vers chromeDriver si on souhaite utiliser une version différente
+    public static final String CHROME_BINARY_PATH = "chromeBinaryPath";			// chemin vers le binaire chrome lorsque celui-ci n'est pas installé de manière normale
+    public static final String IE_DRIVER_PATH = "ieDriverPath";					// chemin vers le driver Internet Explorer
+    public static final String USER_AGENT = "userAgent";						// user agent utilisé pour les tests. Permet d'écraser le user-agent par défaut du navigateur, sur firefox et chrome uniquement
 
-    public static final String Set_Assume_Untrusted_Certificate_Issuer = "setAssumeUntrustedCertificateIssuer";
-    public static final String Set_Accept_Untrusted_Certificates = "setAcceptUntrustedCertificates";
-    public static final String ENABLE_JAVASCRIPT = "enableJavascript";
-    public static final String NTLM_AUTH_TRUSTED_URIS = "ntlmAuthTrustedUris";
-    public static final String BROWSER_DOWNLOAD_DIR = "browserDownloadDir";
-    public static final String BROWSER_WINDOW_SIZE = "browserWindowSize";
-    public static final String ADD_JS_ERROR_COLLECTOR_EXTENSION = "addJSErrorCollectorExtension";
+    public static final String Set_Assume_Untrusted_Certificate_Issuer = "setAssumeUntrustedCertificateIssuer"; // Firefox uniquement pour qu'il ne prenne pas en compte les certificats invalides 
+    public static final String Set_Accept_Untrusted_Certificates = "setAcceptUntrustedCertificates"; // Firefox uniquement pour qu'il ne prenne pas en compte les certificats invalides
+    public static final String ENABLE_JAVASCRIPT = "enableJavascript";			// activation du javascrit dans le navigateur.
+    public static final String NTLM_AUTH_TRUSTED_URIS = "ntlmAuthTrustedUris";	// Firefox uniquement
+    public static final String BROWSER_DOWNLOAD_DIR = "browserDownloadDir";		// répertoire où seront enregistrés les fichiers
+    public static final String ADD_JS_ERROR_COLLECTOR_EXTENSION = "addJSErrorCollectorExtension"; // Firefox uniquement
 
-    public static final String WEB_PROXY_ENABLED = "webProxyEnabled";
-    public static final String WEB_PROXY_TYPE = "webProxyType";
-    public static final String WEB_PROXY_ADDRESS = "webProxyAddress";
+    public static final String WEB_PROXY_ENABLED = "webProxyEnabled";			// activation du serveur proxy pour le navigateur
+    public static final String WEB_PROXY_TYPE = "webProxyType";					// type de proxy. TODO: à compléter pour prendre en charge les proxy auto et manuels
+    public static final String WEB_PROXY_ADDRESS = "webProxyAddress";			// adresse du proxy. TODO: quel est le format
 
-    public static final String TEST_ENTITY = "testEntity";
+    public static final String TEST_ENTITY = "testEntity";						// Jamais utilisé
 
     public static final String REPORT_GENERATION_CONFIG = "reportGenerationConfig";
     public static final String OPEN_REPORT_IN_BROWSER = "openReportInBrowser";
     public static final String CAPTURE_SNAPSHOT = "captureSnapshot";
-    public static final String ENABLE_EXCEPTION_LISTENER = "enableExceptionListener";
+    public static final String ENABLE_EXCEPTION_LISTENER = "enableExceptionListener";	// TODO: voir son effet, activé par défaut
 
-    public static final String DP_TAGS_INCLUDE = "dpTagsInclude";
-    public static final String DP_TAGS_EXCLUDE = "dpTagsExclude";
+    public static final String DP_TAGS_INCLUDE = "dpTagsInclude";				// 
+    public static final String DP_TAGS_EXCLUDE = "dpTagsExclude";				// Utilisé pour la lecture de fichiers CSV/XLS des DataProvider TODO: a étudier comment cela fonctionne
 
     public static final String SSH_COMMAND_WAIT = "sshCommandWait";
-    public static final String SOFT_ASSERT_ENABLED = "softAssertEnabled";
+    public static final String SOFT_ASSERT_ENABLED = "softAssertEnabled";		// le test ne s'arrête pas lorsqu'une assertion est rencontrée
 
-    public static final String OUTPUT_DIRECTORY = "outputDirectory";     // folder where HTML report will be written
+    public static final String OUTPUT_DIRECTORY = "outputDirectory";     		// folder where HTML report will be written
     public static final String WEB_DRIVER_LISTENER = "webDriverListener";
 
     public static final String TEST_METHOD_SIGNATURE = "testMethodSignature";
@@ -108,44 +109,39 @@ public class SeleniumTestsContext {
 
     public static final String TEST_DATA_FILE = "testDataFile";
 
-    public static final String TEST_TYPE = "testType";
-    public static final String TEST_NAME = "testName";
+    public static final String TEST_TYPE = "testType";							// configured automatically
     
-    public static final String CUCUMBER_TESTS = "cucumberTests";
-    public static final String CUCUMBER_TAGS = "cucumberTags";
-    public static final String VARIABLES = "variables";
-    public static final String TEST_CONFIG = "currentTestConfig"; // configuration used for the current test. It is not updated via XML file
-    public static final String TEST_ENV = "env";
-    public static final String CUCUMBER_IMPLEMENTATION_PKG = "cucumberPackage";
+    public static final String CUCUMBER_TESTS = "cucumberTests";				// liste des tests en mode cucumber
+    public static final String CUCUMBER_TAGS = "cucumberTags";					// liste des tags cucumber
+    public static final String TEST_CONFIG = "currentTestConfig"; 				// configuration used for the current test. It is not updated via XML file
+    public static final String TEST_ENV = "env";								// environnement de test pour le SUT. Permet d'accéder aux configurations spécifiques du fichier config.ini
+    public static final String CUCUMBER_IMPLEMENTATION_PKG = "cucumberPackage";	// nom du package java pour les classes cucumber, car celui-ci n'est pas accessible par testNG
     
     // Appium specific properties
-    public static final String APP = "app";
-    public static final String APPIUM_SERVER_URL = "appiumServerURL";
-    public static final String AUTOMATION_NAME = "automationName";
-    public static final String MOBILE_PLATFORM_NAME = "platformName";
-    public static final String MOBILE_PLATFORM_VERSION = "mobilePlatformVersion";
-    public static final String DEVICE_NAME = "deviceName";
+    public static final String APP = "app";										// Chemin de l'application mobile (local ou distant)
+    public static final String APPIUM_SERVER_URL = "appiumServerURL";			// URL du serveur appium en local ou à distance
+    public static final String MOBILE_PLATFORM_VERSION = "mobilePlatformVersion";// Mobile OS version. It's deduced from platform name and not read directly from parameters
+    public static final String DEVICE_NAME = "deviceName";						// Nom du terminal utilisé pour le test
 
-    public static final String BROWSER_NAME = "browserName";
-    public static final String APP_PACKAGE = "appPackage";
-    public static final String APP_ACTIVITY = "appActivity";
-    public static final String APP_WAIT_ACTIVITY = "appWaitActivity";
-    public static final String NEW_COMMAND_TIMEOUT = "newCommandTimeout";
+    public static final String APP_PACKAGE = "appPackage";						// package de l'application
+    public static final String APP_ACTIVITY = "appActivity";					// activité à démarrer (Android)
+    public static final String APP_WAIT_ACTIVITY = "appWaitActivity";			// dans certains cas, l'activité qui démarre l'application n'est pas l'activité principale. C'est celle-ci qu'on attend
+    public static final String NEW_COMMAND_TIMEOUT = "newCommandTimeout";		// Attente maximale entre 2 commandes envoyées à appium
 
     // Cloud specific properties
-    public static final String VERSION = "version";
-    public static final String PLATFORM = "platform";
-    public static final String CLOUD_URL = "cloudURL";
-    public static final String CLOUD_API_KEY = "cloudApiKey";
+    public static final String VERSION = "version";								// TODO: différence par rapport à la version du navigateur ?
+    public static final String PLATFORM = "platform";							// platform on which test should execute. Ex: Windows 7, Android, iOS, Linux, OS X 10.10. TODO: parse platform to add version for mobile	
+    public static final String CLOUD_API_KEY = "cloudApiKey";					// clé d'accès (dépend des services)
     
     // Testdroid specific properties
-    public static final String PROJECT_NAME = "projectName";
+    public static final String PROJECT_NAME = "projectName";					// TestDroid nécessite un nom de projet dans lequel l'automatisation aura lieu	
 
     private LinkedList<TearDownService> tearDownServices = new LinkedList<TearDownService>();
     private Map<ITestResult, List<Throwable>> verificationFailuresMap = new HashMap<ITestResult, List<Throwable>>();
 
     /* Data object to store all context data */
     private Map<String, Object> contextDataMap = Collections.synchronizedMap(new HashMap<String, Object>());
+    private Map<String, String> testVariables = Collections.synchronizedMap(new HashMap<String, String>());
 
     private ITestContext testNGContext = null;
 
@@ -243,12 +239,9 @@ public class SeleniumTestsContext {
         // initialize folders
         if (context != null && context.getCurrentXmlTest() != null) {
         	generateApplicationPath(context.getCurrentXmlTest().getSuite());
-        	setAttribute(TEST_NAME, context.getCurrentXmlTest().getName());
         }
 
         setContextAttribute(context, TEST_DATA_FILE, System.getProperty(TEST_DATA_FILE), "testCase");
-        setContextAttribute(context, TEST_TYPE, System.getProperty(TEST_TYPE), TestType.WEB.toString());
-
         setContextAttribute(context, WEB_SESSION_TIME_OUT, System.getProperty(WEB_SESSION_TIME_OUT), "90000");
         setContextAttribute(context, IMPLICIT_WAIT_TIME_OUT, System.getProperty(IMPLICIT_WAIT_TIME_OUT), "5");
         setContextAttribute(context, EXPLICIT_WAIT_TIME_OUT, System.getProperty(EXPLICIT_WAIT_TIME_OUT), "15");
@@ -258,7 +251,6 @@ public class SeleniumTestsContext {
         setContextAttribute(context, RUN_MODE, System.getProperty(RUN_MODE), "LOCAL");
         setContextAttribute(context, BROWSER, System.getProperty(BROWSER), "*firefox");
         setContextAttribute(context, BROWSER_VERSION, System.getProperty(BROWSER_VERSION), null);
-        setContextAttribute(context, WEB_PLATFORM, System.getProperty(WEB_PLATFORM), null);
 
         setContextAttribute(context, FIREFOX_USER_PROFILE_PATH, System.getProperty(FIREFOX_USER_PROFILE_PATH), null);
         setContextAttribute(context, USE_DEFAULT_FIREFOX_PROFILE, System.getProperty(USE_DEFAULT_FIREFOX_PROFILE),
@@ -270,13 +262,12 @@ public class SeleniumTestsContext {
         setContextAttribute(context, IE_DRIVER_PATH, System.getProperty(IE_DRIVER_PATH), null);
         setContextAttribute(context, USER_AGENT, System.getProperty(USER_AGENT), null);
         setContextAttribute(context, Set_Assume_Untrusted_Certificate_Issuer,
-            System.getProperty(Set_Assume_Untrusted_Certificate_Issuer), null);
+            System.getProperty(Set_Assume_Untrusted_Certificate_Issuer), "true");
         setContextAttribute(context, Set_Accept_Untrusted_Certificates,
-            System.getProperty(Set_Accept_Untrusted_Certificates), null);
-        setContextAttribute(context, ENABLE_JAVASCRIPT, System.getProperty(ENABLE_JAVASCRIPT), null);
+            System.getProperty(Set_Accept_Untrusted_Certificates), "true");
+        setContextAttribute(context, ENABLE_JAVASCRIPT, System.getProperty(ENABLE_JAVASCRIPT), "true");
         setContextAttribute(context, NTLM_AUTH_TRUSTED_URIS, System.getProperty(NTLM_AUTH_TRUSTED_URIS), null);
         setContextAttribute(context, BROWSER_DOWNLOAD_DIR, System.getProperty(BROWSER_DOWNLOAD_DIR), null);
-        setContextAttribute(context, BROWSER_WINDOW_SIZE, System.getProperty(BROWSER_WINDOW_SIZE), null);
         setContextAttribute(context, ADD_JS_ERROR_COLLECTOR_EXTENSION,
             System.getProperty(ADD_JS_ERROR_COLLECTOR_EXTENSION), "false");
 
@@ -302,32 +293,36 @@ public class SeleniumTestsContext {
         setContextAttribute(context, WEB_DRIVER_LISTENER, System.getProperty(WEB_DRIVER_LISTENER), null);
 
         setContextAttribute(context, APPIUM_SERVER_URL, System.getProperty(APPIUM_SERVER_URL), null);
-        setContextAttribute(context, AUTOMATION_NAME, System.getProperty(AUTOMATION_NAME), "Appium");
-        setContextAttribute(context, MOBILE_PLATFORM_NAME, System.getProperty(MOBILE_PLATFORM_NAME), "Android");
-        setContextAttribute(context, MOBILE_PLATFORM_VERSION, System.getProperty(MOBILE_PLATFORM_VERSION), null);
         setContextAttribute(context, DEVICE_NAME, System.getProperty(DEVICE_NAME), null);
+        setContextAttribute(context, DEVICE_LIST, null, "{}");
 
         setContextAttribute(context, APP, System.getProperty(APP), "");
        
         setContextAttribute(context, CUCUMBER_TAGS, System.getProperty(CUCUMBER_TAGS), "");
         setContextAttribute(context, CUCUMBER_TESTS, System.getProperty(CUCUMBER_TESTS), "");
         setContextAttribute(context, CUCUMBER_IMPLEMENTATION_PKG, System.getProperty(CUCUMBER_IMPLEMENTATION_PKG), null);
-        setContextAttribute(context, VARIABLES, System.getProperty(VARIABLES), "{}");
         setContextAttribute(context, TEST_ENV, System.getProperty(TEST_ENV), "DEV");
 
         // By default test is assumed to be executed on default browser on android emulator
-        setContextAttribute(context, BROWSER_NAME, System.getProperty(BROWSER_NAME), "Browser");
         setContextAttribute(context, APP_PACKAGE, System.getProperty(APP_PACKAGE), null);
         setContextAttribute(context, APP_ACTIVITY, System.getProperty(APP_ACTIVITY), null);
         setContextAttribute(context, APP_WAIT_ACTIVITY, System.getProperty(APP_WAIT_ACTIVITY), null);
         setContextAttribute(context, NEW_COMMAND_TIMEOUT, System.getProperty(NEW_COMMAND_TIMEOUT), "120");
 
         setContextAttribute(context, VERSION, System.getProperty(VERSION), null);
-        setContextAttribute(context, PLATFORM, System.getProperty(PLATFORM), null);
-        setContextAttribute(context, CLOUD_URL, System.getProperty(CLOUD_URL), null);
+        setContextAttribute(context, PLATFORM, System.getProperty(PLATFORM), Platform.getCurrent().toString());
         setContextAttribute(context, CLOUD_API_KEY, System.getProperty(CLOUD_API_KEY), null);
         setContextAttribute(context, PROJECT_NAME, System.getProperty(PROJECT_NAME), null);
+        
+        // determines test_type according to input configuration
+        configureTestType();
 
+        // get mobile platform version if one is defined in device list
+        updateDeviceMobileVersion();
+        
+        // get mobile platform version
+        updatePlatformVersion();
+        
         if (context != null) {
             setContextAttribute(OUTPUT_DIRECTORY, null, context.getOutputDirectory(), null);
 
@@ -349,6 +344,71 @@ public class SeleniumTestsContext {
                 }
             }
         }
+    }
+    
+    /**
+     * From platform name, in case of Desktop platform, do nothing and in case of mobile, extract OS version from name
+     *
+     * @throws ConfigurationException 	in mobile, if version is not present
+     */
+    private void updatePlatformVersion() {
+    	try {
+	    	Platform currentPlatform = Platform.fromString(getPlatform()).family();
+	    	if (currentPlatform.equals(Platform.WINDOWS) 
+	    		|| currentPlatform.equals(Platform.MAC) 
+	    		|| currentPlatform.equals(Platform.UNIX) ) {
+	    		return;
+	    	} else {
+	    		throw new WebDriverException("");
+	    	}
+	    } catch (WebDriverException e) {
+    		if (getPlatform().toLowerCase().startsWith("android") || getPlatform().toLowerCase().startsWith("ios")) {
+	    		String[] pfVersion = getPlatform().split(" ", 2);
+	    		try {
+		    		setPlatform(pfVersion[0]);
+		    		setMobilePlatformVersion(pfVersion[1]);
+	    		} catch (IndexOutOfBoundsException x) {
+	    			throw new ConfigurationException("For mobile platform, platform name should contain version. Ex: 'Android 5.0' or 'iOS 9.1'");
+	    		}
+    		} else {
+    			throw new ConfigurationException(String.format("Platform %s has not been recognized as a valide platform", getPlatform()));
+    		}
+    	}
+    }
+    
+    /**
+     * Configure test type according to platform, browser and app parameters
+     */
+    private void configureTestType() {
+    	if (getPlatform().toLowerCase().startsWith("android")) {
+        	if (getApp().isEmpty()) { // a browser name should be defined
+        		setAttribute(TEST_TYPE, TestType.APPIUM_WEB_ANDROID);
+        	} else {
+        		setAttribute(TEST_TYPE, TestType.APPIUM_APP_ANDROID);
+        	}
+        } else if (getPlatform().toLowerCase().startsWith("ios")) {
+        	if (getApp().isEmpty()) { // a browser name should be defined
+        		setAttribute(TEST_TYPE, TestType.APPIUM_WEB_IOS);
+        	} else {
+        		setAttribute(TEST_TYPE, TestType.APPIUM_APP_IOS);
+        	}
+        } else {
+        	if (getBrowser().isEmpty()) {
+        		setAttribute(TEST_TYPE, TestType.NON_GUI);
+        	} else {
+        		setAttribute(TEST_TYPE, TestType.WEB);
+        	}
+        }
+    }
+    
+    /**
+     * Search mobile platform version according to device name if one has been defined in testConfig file
+     */
+    private void updateDeviceMobileVersion() {
+    	HashMap<String, String> deviceList = getDeviceList();
+    	if (getDeviceName() != null && !getDeviceName().isEmpty() && !deviceList.isEmpty()) {
+    		setAttribute(PLATFORM, deviceList.get(getDeviceName()));
+    	}
     }
 
     /**
@@ -391,16 +451,12 @@ public class SeleniumTestsContext {
         }
     }
 
-    public String getBrowserWindowSize() {
-        return (String) getAttribute(BROWSER_WINDOW_SIZE);
-    }
-
     public boolean getCaptureSnapshot() {
         if (getAttribute(CAPTURE_SNAPSHOT) == null) {
 
             // IE grid default value set to false
-            if (this.getWebRunMode().equalsIgnoreCase("ExistingGrid")
-                    && (this.getWebRunBrowser().contains("iexplore") || this.getWebRunBrowser().contains("safari"))) {
+            if (this.getRunMode().equalsIgnoreCase("ExistingGrid")
+                    && (this.getBrowser().contains("iexplore") || this.getBrowser().contains("safari"))) {
                 this.setAttribute(CAPTURE_SNAPSHOT, "false");
             } else {
                 this.setAttribute(CAPTURE_SNAPSHOT, "true");
@@ -493,14 +549,6 @@ public class SeleniumTestsContext {
         }
     }
 
-    public String getWebPlatform() {
-        return (String) getAttribute(WEB_PLATFORM);
-    }
-
-    public String getAppURL() {
-        return (String) getAttribute(APP_URL);
-    }
-
     public int getSshCommandWait() {
         try {
             return Integer.parseInt((String) getAttribute(SSH_COMMAND_WAIT));
@@ -537,20 +585,20 @@ public class SeleniumTestsContext {
         return (String) getAttribute(TEST_DATA_FILE);
     }
 
-    public String getTestType() {
-        return (String) getAttribute(TEST_TYPE);
-    }
-    
-    public String getTestName() {
-    	return (String) getAttribute(TEST_NAME);
+    public TestType getTestType() {
+        return (TestType) getAttribute(TEST_TYPE);
     }
 
     public String getCucumberTags() {
     	return (String) getAttribute(CUCUMBER_TAGS);
     }
     
-    public String[] getCucmberTests() {
-    	return ((String) getAttribute(CUCUMBER_TESTS)).split(",");
+    public List<String> getCucmberTests() {
+    	List<String> tests = new ArrayList<String>();
+    	for (String test: ((String)getAttribute(CUCUMBER_TESTS)).replace("\"", "").replace("&nbsp;", " ").split(",")) {
+    		tests.add(test.trim());
+    	}
+    	return tests;
     }
     
     public String getCucmberPkg() {
@@ -559,10 +607,6 @@ public class SeleniumTestsContext {
     
     public String getTestEnvironment() {
     	return (String) getAttribute(TEST_ENV);
-    }
-    
-    public String getVariables() {
-    	return (String) getAttribute(VARIABLES);
     }
     
     public String getTestMethodSignature() {
@@ -607,12 +651,26 @@ public class SeleniumTestsContext {
         return (String) getAttribute(WEB_PROXY_TYPE);
     }
 
-    public String getWebRunBrowser() {
+    public String getBrowser() {
         return (String) getAttribute(BROWSER);
     }
 
-    public String getWebRunMode() {
+    public String getRunMode() {
         return (String) getAttribute(RUN_MODE);
+    }
+    
+    @SuppressWarnings("unchecked")
+	public HashMap<String, String> getDeviceList() {
+    	HashMap<String, String> deviceList = new HashMap<String, String>();
+    	if (getAttribute(DEVICE_LIST) == null || getAttribute(DEVICE_LIST).equals("{}")) {
+    		return deviceList;
+    	}
+    	
+    	JSONObject devList = new JSONObject((String)getAttribute(DEVICE_LIST));
+    	for (String key: ((Set<String>)devList.keySet())) {
+    		deviceList.put(key, devList.getString(key));
+    	}
+    	return deviceList;
     }
 
     public int getWebSessionTimeout() {
@@ -627,14 +685,6 @@ public class SeleniumTestsContext {
         return (String) getAttribute(APPIUM_SERVER_URL);
     }
 
-    public String getAutomationName() {
-        return (String) getAttribute(AUTOMATION_NAME);
-    }
-
-    public String getMobilePlatformName() {
-        return (String) getAttribute(MOBILE_PLATFORM_NAME);
-    }
-
     public String getMobilePlatformVersion() {
         return (String) getAttribute(MOBILE_PLATFORM_VERSION);
     }
@@ -645,10 +695,6 @@ public class SeleniumTestsContext {
 
     public String getApp() {
         return (String) getAttribute(APP);
-    }
-
-    public String getBrowserName() {
-        return (String) getAttribute(BROWSER_NAME);
     }
 
     public String getAppPackage() {
@@ -673,10 +719,6 @@ public class SeleniumTestsContext {
 
     public String getPlatform() {
         return (String) getAttribute(PLATFORM);
-    }
-
-    public String getCloudURL() {
-        return (String) getAttribute(CLOUD_URL);
     }
     
     public String getCloudApiKey() {
@@ -741,7 +783,8 @@ public class SeleniumTestsContext {
      */
     private void setContextAttribute(final ITestContext context) {
         if (context != null) {
-            Map<String, String> testParameters = context.getSuite().getXmlSuite().getParameters();
+//            Map<String, String> testParameters = context.getSuite().getXmlSuite().getParameters();
+            Map<String, String> testParameters = context.getCurrentXmlTest().getAllParameters();
 
             for (Entry<String, String> entry : testParameters.entrySet()) {
                 String attributeName = entry.getKey();
@@ -751,6 +794,7 @@ public class SeleniumTestsContext {
                     String sysPropertyValue = System.getProperty(entry.getKey());
                     String suiteValue = entry.getValue();
                     setContextAttribute(attributeName, sysPropertyValue, suiteValue, null);
+                    testVariables.put(attributeName, getAttribute(attributeName).toString());
                 }
 
             }
@@ -771,7 +815,18 @@ public class SeleniumTestsContext {
             final String sysPropertyValue, final String defaultValue) {
         String suiteValue = null;
         if (context != null && context.getCurrentXmlTest() != null) {
-            suiteValue = context.getCurrentXmlTest().getSuite().getParameter(attributeName);
+        	
+        	// priority given to test parameter
+        	String testValue = context.getCurrentXmlTest().getParameter(attributeName);
+        	
+        	if (testValue == null) {
+        		
+        		// if test parameter does not exist, loot at suite parameter
+        		suiteValue = context.getCurrentXmlTest().getSuite().getParameter(attributeName);
+        		
+        	} else {
+        		suiteValue = testValue;
+        	}
         }
 
         contextDataMap.put(attributeName,
@@ -802,11 +857,21 @@ public class SeleniumTestsContext {
         setAttribute(TEST_DATA_FILE, testDataFile);
     }
 
-    public void setTestType(final String testType) {
+    public void setTestType(final TestType testType) {
         setAttribute(TEST_TYPE, testType);
     }
     
-    @SuppressWarnings("unchecked")
+    public void setPlatform(final String platform) {
+        setAttribute(PLATFORM, platform);
+    }
+    
+    public void setMobilePlatformVersion(final String version) {
+    	setAttribute(MOBILE_PLATFORM_VERSION, version);
+    }
+    
+    /**
+     * Read configuration from environment specific data and undefined parameters present un testng xml file
+     */
 	public void setTestConfiguration() {
     	Map<String, String> testConfig;
 		try {
@@ -815,16 +880,8 @@ public class SeleniumTestsContext {
 			TestLogging.warning("no valid config.ini file for this application");
 			testConfig = new HashMap<String, String>();
 		}
-    	if (getVariables() != null) {
-			try {
-				JSONObject json = new JSONObject(getVariables());
-				for (String key: (Set<String>)json.keySet()) {
-					testConfig.put(key, json.getString(key));
-				}
-			} catch (JSONException e) {
-				TestLogging.warning("le format des variables n'est pas une chaine JSON valide");
-			}
-		}	
+		
+		testConfig.putAll(testVariables);
     	setAttribute(TEST_CONFIG, testConfig);
     }
 

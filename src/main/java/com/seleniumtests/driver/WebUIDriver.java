@@ -153,42 +153,33 @@ public class WebUIDriver {
         config.setBrowser(BrowserType.getBrowserType(browser));
         config.setMode(DriverMode.valueOf(mode));
 
+        // TODO: use grid with appium ?
         if (config.getMode() == DriverMode.ExistingGrid) {
             webDriverBuilder = new RemoteDriverFactory(this.config);
+        } else if (config.getMode() == DriverMode.SauceLabs) {
+        	webDriverBuilder = new SauceLabsDriverFactory(this.config);
+        } else if (config.getMode() == DriverMode.TestDroid) {
+        	webDriverBuilder = new TestDroidDriverFactory(this.config);
+        	
+        // local mode
         } else {
-            if (config.getBrowser() == BrowserType.FireFox) {
-                webDriverBuilder = new FirefoxDriverFactory(this.config);
-            } else if (config.getBrowser() == BrowserType.InternetExplore) {
-                webDriverBuilder = new IEDriverFactory(this.config);
-            } else if (config.getBrowser() == BrowserType.Chrome) {
-                webDriverBuilder = new ChromeDriverFactory(this.config);
-            } else if (config.getBrowser() == BrowserType.HtmlUnit) {
-                webDriverBuilder = new HtmlUnitDriverFactory(this.config);
-            } else if (config.getBrowser() == BrowserType.Safari) {
-                webDriverBuilder = new SafariDriverFactory(this.config);
-            } else if (config.getBrowser() == BrowserType.SauceLabs) {
-                webDriverBuilder = new SauceLabsDriverFactory(this.config);
-            } else if (config.getBrowser() == BrowserType.TestDroid) {
-            	webDriverBuilder = new TestDroidDriverFactory(this.config);
-            } else if (config.getBrowser() == BrowserType.Android) {
-                webDriverBuilder = new AndroidDriverFactory(this.config);
-            } else if (config.getBrowser() == BrowserType.IPhone) {
-
-                // webDriverBuilder = new IPhoneDriverFactory(this.config);
-                webDriverBuilder = (IWebDriverFactory) Class.forName(
-                                                                "com.seleniumtests.browserfactory.IPhoneDriverFactory")
-                                                            .getConstructor(DriverConfig.class).newInstance(
-                                                                this.config);
-            } else if (config.getBrowser() == BrowserType.IPad) {
-
-                // webDriverBuilder = new IPadDriverFactory(this.config);
-                webDriverBuilder = (IWebDriverFactory) Class.forName(
-                                                                "com.seleniumtests.browserfactory.IPadDriverFactory")
-                                                            .getConstructor(DriverConfig.class).newInstance(
-                                                                this.config);
-            } else {
-                throw new RuntimeException("Unsupported browser" + browser);
-            }
+        	if (config.getTestType().isMobile()) {
+        		webDriverBuilder = new AppiumDriverFactory(this.config);
+        	} else {
+	            if (config.getBrowser() == BrowserType.FireFox) {
+	                webDriverBuilder = new FirefoxDriverFactory(this.config);
+	            } else if (config.getBrowser() == BrowserType.InternetExplore) {
+	                webDriverBuilder = new IEDriverFactory(this.config);
+	            } else if (config.getBrowser() == BrowserType.Chrome) {
+	                webDriverBuilder = new ChromeDriverFactory(this.config);
+	            } else if (config.getBrowser() == BrowserType.HtmlUnit) {
+	                webDriverBuilder = new HtmlUnitDriverFactory(this.config);
+	            } else if (config.getBrowser() == BrowserType.Safari) {
+	                webDriverBuilder = new SafariDriverFactory(this.config);
+	            } else {
+	                throw new RuntimeException("Unsupported browser" + browser);
+	            }
+        	}
         }
 
         synchronized (this.getClass()) {
@@ -324,11 +315,11 @@ public class WebUIDriver {
             return;
         }
 
-        String browser = SeleniumTestsContextManager.getThreadContext().getWebRunBrowser();
+        String browser = SeleniumTestsContextManager.getThreadContext().getBrowser();
         config.setBrowser(BrowserType.getBrowserType(browser));
 
-        String mode = SeleniumTestsContextManager.getThreadContext().getWebRunMode();
-        config.setMode(DriverMode.valueOf(mode));
+        String mode = SeleniumTestsContextManager.getThreadContext().getRunMode();
+        config.setMode(DriverMode.fromString(mode));
 
         String hubUrl = SeleniumTestsContextManager.getThreadContext().getWebDriverGrid();
         config.setHubUrl(hubUrl);
@@ -372,9 +363,9 @@ public class WebUIDriver {
         String browserVersion = SeleniumTestsContextManager.getThreadContext().getWebBrowserVersion();
         config.setBrowserVersion(browserVersion);
 
-        String webPlatform = SeleniumTestsContextManager.getThreadContext().getWebPlatform();
+        String webPlatform = SeleniumTestsContextManager.getThreadContext().getPlatform();
         if (webPlatform != null) {
-            config.setWebPlatform(Platform.valueOf(webPlatform));
+            config.setWebPlatform(Platform.fromString(webPlatform));
         }
 
         if ("false".equalsIgnoreCase(
@@ -436,28 +427,9 @@ public class WebUIDriver {
 
         config.setUseFirefoxDefaultProfile(SeleniumTestsContextManager.getThreadContext().isUseFirefoxDefaultProfile());
 
-        String size = SeleniumTestsContextManager.getThreadContext().getBrowserWindowSize();
-        if (size != null) {
-            int width = -1;
-            int height = -1;
-            try {
-                width = Integer.parseInt(size.split(",")[0].trim());
-                height = Integer.parseInt(size.split(",")[1].trim());
-            } catch (Exception ex) { }
-
-            config.setBrowserWindowWidth(width);
-            config.setBrowserWindowHeight(height);
-        }
-
         String appiumServerURL = SeleniumTestsContextManager.getThreadContext().getAppiumServerURL();
         config.setAppiumServerURL(appiumServerURL);
-
-        String automationName = SeleniumTestsContextManager.getThreadContext().getAutomationName();
-        config.setAutomationName(automationName);
-
-        String mobilePlatformName = SeleniumTestsContextManager.getThreadContext().getMobilePlatformName();
-        config.setMobilePlatformName(mobilePlatformName);
-
+        
         String mobilePlatformVersion = SeleniumTestsContextManager.getThreadContext().getMobilePlatformVersion();
         config.setMobilePlatformVersion(mobilePlatformVersion);
 
@@ -466,9 +438,6 @@ public class WebUIDriver {
 
         String app = SeleniumTestsContextManager.getThreadContext().getApp();
         config.setApp(app);
-
-        String browserName = SeleniumTestsContextManager.getThreadContext().getBrowserName();
-        config.setBrowserName(browserName);
 
         String appPackage = SeleniumTestsContextManager.getThreadContext().getAppPackage();
         config.setAppPackage(appPackage);
@@ -484,7 +453,6 @@ public class WebUIDriver {
 
         config.setVersion(SeleniumTestsContextManager.getThreadContext().getVersion());
         config.setPlatform(SeleniumTestsContextManager.getThreadContext().getPlatform());
-        config.setCloudURL(SeleniumTestsContextManager.getThreadContext().getCloudURL());
         config.setCloudApiKey(SeleniumTestsContextManager.getThreadContext().getCloudApiKey());
         config.setProjectName(SeleniumTestsContextManager.getThreadContext().getProjectName());
         config.setTestType(SeleniumTestsContextManager.getThreadContext().getTestType());

@@ -1,5 +1,6 @@
 /*
- * Copyright 2015 www.seleniumtests.com
+ * Orignal work: Copyright 2015 www.seleniumtests.com
+ * Modified work: Copyright 2016 www.infotel.com
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -18,6 +19,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
+import org.testng.IClass;
 import org.testng.IResultMap;
 import org.testng.ISuite;
 import org.testng.ITestContext;
@@ -134,5 +136,9 @@ public class DefaultTestNGContext implements ITestContext {
     }
 
     public void addInjector(final List<Module> moduleInstances, final Injector injector) { }
+
+	public Injector getInjector(IClass iClass) {
+		return null;
+	}
 
 }

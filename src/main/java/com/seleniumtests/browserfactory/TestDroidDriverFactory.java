@@ -78,8 +78,8 @@ public class TestDroidDriverFactory extends AbstractWebDriverFactory implements 
 
         HttpRequest request = requestFactory.buildPostRequest(new GenericUrl(serverURL+"/upload"), multipartContent);
 
-        HttpResponse response = request.execute();
-        System.out.println("response:" + response.parseAsString());
+//        HttpResponse response = request.execute();
+//        System.out.println("response:" + response.parseAsString());
 
         AppiumResponse appiumResponse = request.execute().parseAs(AppiumResponse.class);
         System.out.println("File id:" + appiumResponse.uploadStatus.fileInfo.file);
@@ -134,30 +134,24 @@ public class TestDroidDriverFactory extends AbstractWebDriverFactory implements 
     	
     	// updload application on TestDroid cloud
     	String fileUUID;
-    	if (webDriverConfig.getTestType().equals(TestType.APPIUM_APP_ANDROID.getTestType()) 
-    			|| webDriverConfig.getTestType().equals(TestType.APPIUM_APP_IOS.getTestType())) {
-    		fileUUID = uploadFile(SeleniumTestsContextManager.getThreadContext().getAppURL(), 
-    								webDriverConfig.getCloudURL().split("/wd/hub")[0], 
+    	if (webDriverConfig.getTestType().family().equals(TestType.APP)) {
+    		fileUUID = uploadFile(SeleniumTestsContextManager.getThreadContext().getApp(), 
+    								webDriverConfig.getAppiumServerURL().split("/wd/hub")[0], 
     								webDriverConfig.getCloudApiKey());
     		capabilities = cloudSpecificCapabilities(fileUUID);
     	} else {
     		capabilities = new DesiredCapabilities();
     	}
 
-        if(webDriverConfig.getTestType().equals(TestType.APPIUM_WEB_ANDROID.getTestType())
-        		|| webDriverConfig.getTestType().equals(TestType.APPIUM_APP_ANDROID.getTestType())){
+        if(webDriverConfig.getPlatform().equalsIgnoreCase("android")){
         	capabilities.setCapability("testdroid_target", "android");
-            return new AndroidDriver(new URL(webDriverConfig.getCloudURL()), new AndroidCapabilitiesFactory(capabilities)
-                    .createCapabilities(webDriverConfig));
-        } else if (webDriverConfig.getTestType().equals(TestType.APPIUM_WEB_IOS.getTestType())
-        		|| webDriverConfig.getTestType().equals(TestType.APPIUM_APP_IOS.getTestType())){
+            return new AndroidDriver(new URL(webDriverConfig.getAppiumServerURL()), new AndroidCapabilitiesFactory(capabilities).createCapabilities(webDriverConfig));
+        } else if (webDriverConfig.getPlatform().equalsIgnoreCase("ios")){
         	capabilities.setCapability("testdroid_target", "ios");
-            return new IOSDriver(new URL(webDriverConfig.getCloudURL()), new IOsCapabilitiesFactory(capabilities)
-                    .createCapabilities(webDriverConfig));
+            return new IOSDriver(new URL(webDriverConfig.getAppiumServerURL()), new IOsCapabilitiesFactory(capabilities).createCapabilities(webDriverConfig));
         }
 
-        return new RemoteWebDriver(new URL(webDriverConfig.getCloudURL()), new SauceLabsCapabilitiesFactory()
-                    .createCapabilities(webDriverConfig));
+        return new RemoteWebDriver(new URL(webDriverConfig.getAppiumServerURL()), new SauceLabsCapabilitiesFactory().createCapabilities(webDriverConfig));
 
     }
 

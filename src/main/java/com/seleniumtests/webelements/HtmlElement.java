@@ -27,6 +27,7 @@ import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.NoAlertPresentException;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.interactions.HasInputDevices;
@@ -37,6 +38,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Wait;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.TestLogging;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.CustomEventFiringWebDriver;
@@ -223,22 +225,24 @@ public class HtmlElement {
 	 * Make element visible. Sometimes useful when real elements are backed by an image element
 	 */
 	private void makeWebElementVisible(WebElement element) {
-		try {
-			if (element.getLocation().x < 0) {
-				changeCssAttribute(element, "left", "20px");
-				changeCssAttribute(element, "position", "fixed");
-			}
-			if (element.getAttribute("style").toLowerCase().replace(" ", "").contains("display:none")) {
-				changeCssAttribute(element, "display", "block");
-			}
-			
-			// wait for element to be displayed
+		if (SeleniumTestsContextManager.isWebTest()) {
 			try {
-				new WebDriverWait(driver, 1).until(ExpectedConditions.visibilityOf(element));
-			} catch (ElementNotVisibleException e) {
-				TestLogging.logInfo(String.format("element %s not visible", element));
-			}
-		} catch (Exception e) {}
+				if (element.getLocation().x < 0) {
+					changeCssAttribute(element, "left", "20px");
+					changeCssAttribute(element, "position", "fixed");
+				}
+				if (element.getAttribute("style").toLowerCase().replace(" ", "").contains("display:none")) {
+					changeCssAttribute(element, "display", "block");
+				}
+				
+				// wait for element to be displayed
+				try {
+					new WebDriverWait(driver, 1).until(ExpectedConditions.visibilityOf(element));
+				} catch (ElementNotVisibleException e) {
+					TestLogging.logInfo(String.format("element %s not visible", element));
+				}
+			} catch (Exception e) {}
+		}
 	}
 
     /**
@@ -624,7 +628,13 @@ public class HtmlElement {
      */
     public void sendKeys(final CharSequence arg0) {
         findElement();
-        if (!element.getAttribute("type").equalsIgnoreCase("file")) {
+        
+        // on mobile and some fields, this throws an exception which prevents going on
+        try {
+	        if (!element.getAttribute("type").equalsIgnoreCase("file")) {
+	        	element.clear();
+	        }
+        } catch (WebDriverException e) {
         	element.clear();
         }
         element.sendKeys(arg0);
