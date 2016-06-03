@@ -54,6 +54,7 @@ public class SeleniumTestsContext {
 	public static String FEATURES_PATH;
 	public static String CONFIG_PATH;
 	public static String APPLICATION_NAME;
+	public static HashMap<String, HashMap<String,String>> ID_MAPPING;
 	public static final String DATA_FOLDER_NAME = "data";
 
     /* configuration defined in testng.xml */
@@ -321,7 +322,7 @@ public class SeleniumTestsContext {
         
         // get mobile platform version
         updatePlatformVersion();
-
+        
         if (context != null) {
             setContextAttribute(OUTPUT_DIRECTORY, null, context.getOutputDirectory(), null);
 
@@ -346,7 +347,7 @@ public class SeleniumTestsContext {
     }
     
     /**
-     * From platform name, in case of Desktop platform, do nothing and in cas of mobile, extract OS version from name
+     * From platform name, in case of Desktop platform, do nothing and in case of mobile, extract OS version from name
      *
      * @throws ConfigurationException 	in mobile, if version is not present
      */
@@ -405,8 +406,8 @@ public class SeleniumTestsContext {
      */
     private void updateDeviceMobileVersion() {
     	HashMap<String, String> deviceList = getDeviceList();
-    	if (getDeviceName() != null && !deviceList.isEmpty()) {
-    		setAttribute(MOBILE_PLATFORM_VERSION, deviceList.get(getDeviceName()));
+    	if (getDeviceName() != null && !getDeviceName().isEmpty() && !deviceList.isEmpty()) {
+    		setAttribute(PLATFORM, deviceList.get(getDeviceName()));
     	}
     }
 
@@ -731,7 +732,20 @@ public class SeleniumTestsContext {
     public HashMap<String, String> getConfiguration() {
     	return (HashMap<String, String>) getAttribute(TEST_CONFIG);
     }
-
+    
+    
+    //Methods for ID_Mapping
+    //get
+    public HashMap<String, HashMap<String, String>> getIdMapping() {
+    	return (HashMap<String, HashMap<String,String>>) ID_MAPPING;
+    }
+    
+    //set
+    public void setIdMapping(HashMap<String, HashMap<String,String>> conf){
+    	ID_MAPPING = conf;
+    }
+    
+    
     public boolean isUseFirefoxDefaultProfile() {
         try {
             return Boolean.parseBoolean((String) getAttribute(USE_DEFAULT_FIREFOX_PROFILE));
@@ -810,10 +824,6 @@ public class SeleniumTestsContext {
         		// if test parameter does not exist, loot at suite parameter
         		suiteValue = context.getCurrentXmlTest().getSuite().getParameter(attributeName);
         		
-        		// sometimes, suite parameter are defined at global level, not for current test
-        		if (suiteValue == null) {
-        			suiteValue = context.getSuite().getParameter(attributeName);
-        		}
         	} else {
         		suiteValue = testValue;
         	}

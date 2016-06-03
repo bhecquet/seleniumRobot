@@ -4,7 +4,7 @@
 
 	<groupId>com.infotel</groupId>
 	<artifactId>seleniumRobot</artifactId>
-	<version>1.0.0</version>
+	<version>1.1.0</version>
 	<packaging>jar</packaging>
 
 	<name>selenium robot</name>
@@ -33,7 +33,7 @@
         <url>git@github.com:bhecquet/seleniumRobot.git</url>
     </scm>
 
-	<distributionManagement>
+	<!-- <distributionManagement>
 		<snapshotRepository>
 			<id>ossrh</id>
 			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
@@ -54,7 +54,8 @@
                 <enabled>false</enabled> 
             </snapshots>
         </repository>
-    </repositories>
+        nexus.ouest.sesame.infotel.com
+    </repositories>-->
     
     <properties>
     	<selenium.version>2.53.0</selenium.version>
@@ -470,6 +471,25 @@
 						</goals>
 					</execution>
 				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-project-info-reports-plugin</artifactId>
+				<version>2.7</version>
+				<configuration>
+					<dependencyLocationsEnabled>false</dependencyLocationsEnabled>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>cobertura-maven-plugin</artifactId>
+				<version>2.6</version>
+				<configuration>
+					<formats>
+						<format>html</format>
+						<format>xml</format>
+					</formats>
+				</configuration>
 			</plugin>
         </plugins>
 		<resources>
