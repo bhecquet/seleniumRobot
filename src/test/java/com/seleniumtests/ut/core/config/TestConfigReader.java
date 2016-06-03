@@ -33,6 +33,5 @@ public class TestConfigReader extends GenericTest {
 		
 		Assert.assertEquals(seleniumTestsCtx.getConfiguration().get("key6"), "value6", "Value has not been get from xml file");
 		Assert.assertEquals(seleniumTestsCtx.getConfiguration().get("key2"), "value20", "Value has not been get from xml file");
-	}
-	
+	}	
 }

@@ -10,6 +10,7 @@ public class GenericTest {
 	
 	public WebDriver driver = null;
 
+	
 	/**
 	 * destroys the driver if one has been created
 	 */
