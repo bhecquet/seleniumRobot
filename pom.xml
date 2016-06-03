@@ -33,7 +33,7 @@
         <url>git@github.com:bhecquet/seleniumRobot.git</url>
     </scm>
 
-	<distributionManagement>
+	<!-- <distributionManagement>
 		<snapshotRepository>
 			<id>ossrh</id>
 			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
@@ -54,7 +54,8 @@
                 <enabled>false</enabled> 
             </snapshots>
         </repository>
-    </repositories>
+        nexus.ouest.sesame.infotel.com
+    </repositories>-->
     
     <properties>
     	<selenium.version>2.53.0</selenium.version>

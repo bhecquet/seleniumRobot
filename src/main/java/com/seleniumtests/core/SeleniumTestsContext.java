@@ -321,7 +321,7 @@ public class SeleniumTestsContext {
         
         // get mobile platform version
         updatePlatformVersion();
-
+        
         if (context != null) {
             setContextAttribute(OUTPUT_DIRECTORY, null, context.getOutputDirectory(), null);
 
@@ -346,7 +346,7 @@ public class SeleniumTestsContext {
     }
     
     /**
-     * From platform name, in case of Desktop platform, do nothing and in cas of mobile, extract OS version from name
+     * From platform name, in case of Desktop platform, do nothing and in case of mobile, extract OS version from name
      *
      * @throws ConfigurationException 	in mobile, if version is not present
      */
@@ -405,8 +405,8 @@ public class SeleniumTestsContext {
      */
     private void updateDeviceMobileVersion() {
     	HashMap<String, String> deviceList = getDeviceList();
-    	if (getDeviceName() != null && !deviceList.isEmpty()) {
-    		setAttribute(MOBILE_PLATFORM_VERSION, deviceList.get(getDeviceName()));
+    	if (getDeviceName() != null && !getDeviceName().isEmpty() && !deviceList.isEmpty()) {
+    		setAttribute(PLATFORM, deviceList.get(getDeviceName()));
     	}
     }
 
@@ -810,10 +810,6 @@ public class SeleniumTestsContext {
         		// if test parameter does not exist, loot at suite parameter
         		suiteValue = context.getCurrentXmlTest().getSuite().getParameter(attributeName);
         		
-        		// sometimes, suite parameter are defined at global level, not for current test
-        		if (suiteValue == null) {
-        			suiteValue = context.getSuite().getParameter(attributeName);
-        		}
         	} else {
         		suiteValue = testValue;
         	}

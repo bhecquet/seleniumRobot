@@ -134,8 +134,7 @@ public class TestDroidDriverFactory extends AbstractWebDriverFactory implements 
     	
     	// updload application on TestDroid cloud
     	String fileUUID;
-    	if (webDriverConfig.getTestType().equals(TestType.APPIUM_APP_ANDROID.getTestType()) 
-    			|| webDriverConfig.getTestType().equals(TestType.APPIUM_APP_IOS.getTestType())) {
+    	if (webDriverConfig.getTestType().family().equals(TestType.APP)) {
     		fileUUID = uploadFile(SeleniumTestsContextManager.getThreadContext().getApp(), 
     								webDriverConfig.getAppiumServerURL().split("/wd/hub")[0], 
     								webDriverConfig.getCloudApiKey());
@@ -144,20 +143,15 @@ public class TestDroidDriverFactory extends AbstractWebDriverFactory implements 
     		capabilities = new DesiredCapabilities();
     	}
 
-        if(webDriverConfig.getTestType().equals(TestType.APPIUM_WEB_ANDROID.getTestType())
-        		|| webDriverConfig.getTestType().equals(TestType.APPIUM_APP_ANDROID.getTestType())){
+        if(webDriverConfig.getPlatform().equalsIgnoreCase("android")){
         	capabilities.setCapability("testdroid_target", "android");
-            return new AndroidDriver(new URL(webDriverConfig.getAppiumServerURL()), new AndroidCapabilitiesFactory(capabilities)
-                    .createCapabilities(webDriverConfig));
-        } else if (webDriverConfig.getTestType().equals(TestType.APPIUM_WEB_IOS.getTestType())
-        		|| webDriverConfig.getTestType().equals(TestType.APPIUM_APP_IOS.getTestType())){
+            return new AndroidDriver(new URL(webDriverConfig.getAppiumServerURL()), new AndroidCapabilitiesFactory(capabilities).createCapabilities(webDriverConfig));
+        } else if (webDriverConfig.getPlatform().equalsIgnoreCase("ios")){
         	capabilities.setCapability("testdroid_target", "ios");
-            return new IOSDriver(new URL(webDriverConfig.getAppiumServerURL()), new IOsCapabilitiesFactory(capabilities)
-                    .createCapabilities(webDriverConfig));
+            return new IOSDriver(new URL(webDriverConfig.getAppiumServerURL()), new IOsCapabilitiesFactory(capabilities).createCapabilities(webDriverConfig));
         }
 
-        return new RemoteWebDriver(new URL(webDriverConfig.getAppiumServerURL()), new SauceLabsCapabilitiesFactory()
-                    .createCapabilities(webDriverConfig));
+        return new RemoteWebDriver(new URL(webDriverConfig.getAppiumServerURL()), new SauceLabsCapabilitiesFactory().createCapabilities(webDriverConfig));
 
     }
 
