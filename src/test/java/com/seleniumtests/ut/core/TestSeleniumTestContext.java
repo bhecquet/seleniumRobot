@@ -13,6 +13,9 @@
 
 package com.seleniumtests.ut.core;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.annotations.Test;
@@ -38,6 +41,17 @@ public class TestSeleniumTestContext {
 		SeleniumTestsContextManager.initThreadContext(testNGCtx, xmlTest);
 		SeleniumTestsContext seleniumTestsCtx = SeleniumTestsContextManager.getThreadContext();
 		Assert.assertEquals(seleniumTestsCtx.getImplicitWaitTimeout(), 2.0);
+		
+	}
+	
+	/**
+	 * If parameter is defined is suite and several tests, check it's the right param value which is picked up
+	 */
+	@Test(groups={"ut context"})
+	public void testMultipleTestShareSameParam(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		SeleniumTestsContextManager.initThreadContext(testNGCtx, xmlTest);
+		SeleniumTestsContext seleniumTestsCtx = SeleniumTestsContextManager.getThreadContext();
+		Assert.assertEquals(seleniumTestsCtx.getAttribute("variable1"), "value1");
 		
 	}
 	
@@ -107,59 +121,89 @@ public class TestSeleniumTestContext {
 	public void testPlatformParsingForWindows(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		try {
 			System.setProperty("platform", "Windows 7");
+			System.setProperty("deviceName", "");
 			SeleniumTestsContextManager.initThreadContext(testNGCtx, xmlTest);
 			SeleniumTestsContext seleniumTestsCtx = SeleniumTestsContextManager.getThreadContext();
 			Assert.assertEquals(seleniumTestsCtx.getPlatform(), "Windows 7");
 			Assert.assertEquals(seleniumTestsCtx.getMobilePlatformVersion(), null);
 		} finally {
 			System.clearProperty("platform");
+			System.clearProperty("deviceName");
 		}
 	}
 	@Test(groups={"ut context"})
 	public void testPlatformParsingForOSX(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		try {
 			System.setProperty("platform", "os x 10.10");
+			System.setProperty("deviceName", "");
 			SeleniumTestsContextManager.initThreadContext(testNGCtx, xmlTest);
 			SeleniumTestsContext seleniumTestsCtx = SeleniumTestsContextManager.getThreadContext();
 			Assert.assertEquals(seleniumTestsCtx.getPlatform(), "os x 10.10");
 			Assert.assertEquals(seleniumTestsCtx.getMobilePlatformVersion(), null);
 		} finally {
 			System.clearProperty("platform");
+			System.clearProperty("deviceName");
 		}
 	}
 	@Test(groups={"ut context"})
 	public void testPlatformParsingForAndroid(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		try {
 			System.setProperty("platform", "Android 5.0");
+			System.setProperty("deviceName", "");
 			SeleniumTestsContextManager.initThreadContext(testNGCtx, xmlTest);
 			SeleniumTestsContext seleniumTestsCtx = SeleniumTestsContextManager.getThreadContext();
 			Assert.assertEquals(seleniumTestsCtx.getPlatform(), "Android");
 			Assert.assertEquals(seleniumTestsCtx.getMobilePlatformVersion(), "5.0");
 		} finally {
 			System.clearProperty("platform");
+			System.clearProperty("deviceName");
+		}
+	}
+	
+	/**
+	 * Same test as above except that platform is set on test level, not in system property
+	 * @param testNGCtx
+	 * @param xmlTest
+	 */
+	@Test(groups={"ut context"})
+	public void testPlatformParsingForAndroidFromTest(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		try {
+			xmlTest.addParameter("platform", "Android 5.0");
+			System.setProperty("deviceName", "");
+			SeleniumTestsContextManager.initThreadContext(testNGCtx, xmlTest);
+			SeleniumTestsContext seleniumTestsCtx = SeleniumTestsContextManager.getThreadContext();
+			Assert.assertEquals(seleniumTestsCtx.getPlatform(), "Android");
+			Assert.assertEquals(seleniumTestsCtx.getMobilePlatformVersion(), "5.0");
+		} finally {
+			xmlTest.getLocalParameters().remove("platform");
+			System.clearProperty("deviceName");
 		}
 	}
 	@Test(groups={"ut context"})
 	public void testPlatformParsingForIOS(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		try {
 			System.setProperty("platform", "iOS 9.01");
+			System.setProperty("deviceName", "");
 			SeleniumTestsContextManager.initThreadContext(testNGCtx, xmlTest);
 			SeleniumTestsContext seleniumTestsCtx = SeleniumTestsContextManager.getThreadContext();
 			Assert.assertEquals(seleniumTestsCtx.getPlatform(), "iOS");
 			Assert.assertEquals(seleniumTestsCtx.getMobilePlatformVersion(), "9.01");
 		} finally {
 			System.clearProperty("platform");
+			System.clearProperty("deviceName");
 		}
 	}
 	@Test(groups={"ut context"}, expectedExceptions=ConfigurationException.class)
 	public void testPlatformParsingForIOSWithoutVersion(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		try {
 			System.setProperty("platform", "iOS");
+			System.setProperty("deviceName", "");
 			SeleniumTestsContextManager.initThreadContext(testNGCtx, xmlTest);
 			SeleniumTestsContext seleniumTestsCtx = SeleniumTestsContextManager.getThreadContext();
 			Assert.assertEquals(seleniumTestsCtx.getPlatform(), "iOS");
 		} finally {
 			System.clearProperty("platform");
+			System.clearProperty("deviceName");
 		}
 	}
 }

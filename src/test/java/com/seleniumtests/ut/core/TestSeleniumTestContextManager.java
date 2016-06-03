@@ -46,6 +46,30 @@ public class TestSeleniumTestContextManager {
 		Assert.assertEquals(iTestContext.getSuite().getXmlSuite().getParameter(SeleniumTestsContext.BROWSER), "chrome");
 	}
 	
+	/**
+	 * By default, runMode is LOCAL, we check it's possible to define runMode from command line and it's taken into account when reading
+	 * testConfig file
+	 * @param iTestContext
+	 */
+	@Test(groups={"ut"})
+	public void runModeDefinedAsProperty(ITestContext iTestContext) {
+		try {
+			System.setProperty("runMode", "saucelabs");
+			iTestContext = SeleniumTestsContextManager.getContextFromConfigFile(iTestContext);
+			
+			Assert.assertEquals(iTestContext.getSuite().getXmlSuite().getParameter(SeleniumTestsContext.APPIUM_SERVER_URL), "http://bhecquet:9be4e3b3-26d7-44fa-87b0-b2c75cdccafd@ondemand.saucelabs.com:80/wd/hub");
+		} finally {
+			System.clearProperty("runMode");
+		}
+	}
+	
+	@Test(groups={"ut"})
+	public void extendedConfigurationIsWrittentIntoCurrentTest(ITestContext iTestContext) {
+		SeleniumTestsContextManager.initThreadContext(iTestContext);
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getPlatform(), "Android");
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getMobilePlatformVersion(), "4.3");
+	}
+	
 	
 	
 }
