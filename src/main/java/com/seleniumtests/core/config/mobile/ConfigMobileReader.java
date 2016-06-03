@@ -19,7 +19,7 @@ public class ConfigMobileReader {
 	public HashMap<String, String> readConfig(String page) {
 		
 		//Recup values in context, lowerCase because of the name of directories but can be to change...
-		String mobile = SeleniumTestsContextManager.getThreadContext().getMobilePlatformName().toLowerCase();
+		String mobile = SeleniumTestsContextManager.getThreadContext().getPlatform().toLowerCase();
 		String version = SeleniumTestsContextManager.getThreadContext().getMobilePlatformVersion();
 		
 		return readConfig(mobile, version, page);
@@ -32,10 +32,10 @@ public class ConfigMobileReader {
 	public HashMap<String, HashMap<String, String>> readConfig() {
 		
 		//Recup values in context, lowerCase because of the name of directories but can be to change...
-		String mobile = SeleniumTestsContextManager.getThreadContext().getMobilePlatformName().toLowerCase();
+		String mobile = SeleniumTestsContextManager.getThreadContext().getPlatform().toLowerCase();
 		String version = SeleniumTestsContextManager.getThreadContext().getMobilePlatformVersion();
 		
-		return readConfig(mobile, version);
+		return readConfig(mobile, version); 
 	}
 	
 	/**
