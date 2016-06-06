@@ -64,16 +64,37 @@ public class TestConfigMobileReader extends GenericTest {
 	}
 	
 	@Test(groups={"ut"})
-	public void readHeritageInAndroid4_3() {
-		HashMap<String, String> config = new ConfigMobileReader().readConfig( "android", "4.3", "dev");
+	public void readHeritageInAndroid4_3WithOtherMethod() {
+		HashMap<String, String> config = new ConfigMobileReader().readConfig( "android", "4.3").get("dev");
 		Assert.assertEquals(config.get("phoneType"), "android", "read mobile phoneType android, heritage 4.3, does not work");
 		Assert.assertEquals(config.get("configuration"), "mobile", "read mobile configuration android 4.3 does not work");
 	}
 	
 	@Test(groups={"ut"})
-	public void readConfigMobileWithoutParams() {
+	public void readConfigAndroidWithoutParams() {
+		//test mode mobile
+		SeleniumTestsContextManager.getThreadContext().setPlatform("android");
+		SeleniumTestsContextManager.getThreadContext().setMobilePlatformVersion("");
 		HashMap<String, String> config = new ConfigMobileReader().readConfig( "dev");
 		Assert.assertEquals(config.get("id_search"), "androidSearchWord", "read android config does not work");
+	}
+	
+	@Test(groups={"ut"})
+	public void readConfigChromeWithoutParams() {
+		//test mode web
+		SeleniumTestsContextManager.getThreadContext().setPlatform("web");
+		SeleniumTestsContextManager.getThreadContext().setMobilePlatformVersion("");
+		HashMap<String, String> config = new ConfigMobileReader().readConfig( "dev");
+		Assert.assertEquals(config.get("id_search"), "webSearchWord", "read chrome config does not work");
+	}
+	
+	@Test(groups={"ut"})
+	public void readConfigAndroidWithoutPage() {
+		//test mode mobile
+		SeleniumTestsContextManager.getThreadContext().setPlatform("android");
+		SeleniumTestsContextManager.getThreadContext().setMobilePlatformVersion("");
+		HashMap<String, String> config = new ConfigMobileReader().readConfig().get("dev");
+		Assert.assertEquals(config.get("id_search"), "androidSearchWord", "read android config without any param does not work");
 	}
 	
 	@Test(groups={"ut"})
