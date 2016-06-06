@@ -49,7 +49,7 @@ public class IniHelper {
 		} catch (InvalidFileFormatException e) {
 			throw new ConfigurationException("Invalid file: " + fileToRead);
 		} catch (IOException e) {
-			throw new ConfigurationException(String.format("File does not exist %s: %s", fileToRead , e.getMessage()));
+			throw new ConfigurationException(String.format("File does not exist %s: %s", fileToRead, e.getMessage()));
 		}
 		return hashMapToComplete;
 	}
