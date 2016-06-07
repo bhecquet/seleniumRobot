@@ -57,7 +57,7 @@ public class TestInterceptePage {
 	
 	@Test(groups={"it"})
 	public void interceptBy() {
-		Assert.assertEquals(testPage.findById("prop:Text"), testPage.findById("text2"), "intercept by with prop doesn't work");
+		Assert.assertEquals(testPage.findById("map:Text"), testPage.findById("text2"), "intercept by with map doesn't work");
 	}
 
 }

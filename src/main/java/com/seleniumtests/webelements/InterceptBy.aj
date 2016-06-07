@@ -24,7 +24,7 @@ import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.config.mobile.ConfigMobileReader;
 /**
  * Aspect to intercept calls to methods from By. It change the argument of
- * methods when it use the keyWord : prop
+ * methods when it use the keyWord : map
  * 
  * @author Sophie
  *
@@ -46,7 +46,7 @@ public class InterceptBy {
 				Object argument = args[i];
 				if (argument != null && argument instanceof String) {
 						String[] input = ((String) argument).split(":");
-						if (input[0].equals("prop")) {
+						if (input[0].equals("map")) {
 							String page = getCallerName(Thread.currentThread().getStackTrace());
 							HashMap<String, HashMap<String, String>> config = SeleniumTestsContextManager.getThreadContext().getIdMapping();
 							if (config == null) {
