@@ -5,7 +5,7 @@
 
 	<groupId>com.infotel.seleniumRobot</groupId>
 	<artifactId>core</artifactId>
-	<version>1.1.1</version>
+	<version>1.2.0</version>
 	<packaging>jar</packaging>
 
 	<name>selenium robot</name>
@@ -33,6 +33,14 @@
         <developerConnection>scm:git:git@github.com:bhecquet/seleniumRobot.git</developerConnection>
         <url>git@github.com:bhecquet/seleniumRobot.git</url>
     </scm>
+    
+    <distributionManagement>
+		<repository>
+			<id>nexus</id>
+			<name>Nexus Infotel</name>
+			<url>http://nexus.ouest.sesame.infotel.com:8080/nexus/content/repositories/infotel/</url>
+		</repository>
+	</distributionManagement>
 
 	<!-- <distributionManagement>
 		<snapshotRepository>
@@ -220,17 +228,24 @@
 	<build>
 		<finalName>seleniumRobot</finalName>
 		<plugins>
-			<plugin>
+			<!-- <plugin>
 				<groupId>org.sonatype.plugins</groupId>
 				<artifactId>nexus-staging-maven-plugin</artifactId>
 				<version>1.6.3</version>
 				<extensions>true</extensions>
 				<configuration>
+					<serverId>nexus-infotel</serverId>
+					<nexusUrl>http://nexus.ouest.sesame.infotel.com:8080/nexus/</nexusUrl>
+					<autoReleaseAfterClose>true</autoReleaseAfterClose>
+					
+				</configuration>
+				<configuration>
 					<serverId>ossrh</serverId>
 					<nexusUrl>https://oss.sonatype.org/</nexusUrl>
 					<autoReleaseAfterClose>true</autoReleaseAfterClose>
 				</configuration>
-			</plugin>
+			</plugin> -->
+			
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
@@ -504,7 +519,7 @@
 					</execution>
 				</executions>
 			</plugin>
-			<plugin>
+			<!-- <plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-gpg-plugin</artifactId>
 				<version>1.5</version>
@@ -517,7 +532,7 @@
 						</goals>
 					</execution>
 				</executions>
-			</plugin>
+			</plugin> -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-project-info-reports-plugin</artifactId>
