@@ -636,27 +636,27 @@ public class XMLUtil
 
 
     /**
-     * � * Return the text that a node contains. This routine:<ul>
+     * * Return the text that a node contains. This routine:<ul>
      * <p/>
-     * � * <li>Ignores comments and processing instructions.
+     *  * <li>Ignores comments and processing instructions.
      * <p/>
-     * � * <li>Concatenates TEXT nodes, CDATA nodes, and the results of
+     *  * <li>Concatenates TEXT nodes, CDATA nodes, and the results of
      * <p/>
-     * � *     recursively processing EntityRef nodes.
+     *  *     recursively processing EntityRef nodes.
      * <p/>
-     * � * <li>Ignores any element nodes in the sublist.
+     *  * <li>Ignores any element nodes in the sublist.
      * <p/>
-     * � *     (Other possible options are to recurse into element sublists
+     *  *     (Other possible options are to recurse into element sublists
      * <p/>
-     * � *      or throw an exception.)
+     *  *      or throw an exception.)
      * <p/>
-     * � * </ul>
+     *  * </ul>
      * <p/>
-     * � * @param    node  a  DOM node
+     *  * @param    node  a  DOM node
      * <p/>
-     * � * @return   a String representing its contents
+     *  * @return   a String representing its contents
      * <p/>
-     * �
+     * 
      */
 
     public static String getText(Node node)
