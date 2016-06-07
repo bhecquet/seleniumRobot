@@ -420,7 +420,7 @@
 				<artifactId>maven-jar-plugin</artifactId>
 				<version>2.6</version>
 				<configuration>
-					<finalName>${project.artifactId}</finalName>
+					<finalName>seleniumRobot</finalName>
 					<archive>
 						<manifest>
 							<addClasspath>true</addClasspath>
