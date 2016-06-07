@@ -783,8 +783,12 @@ public class SeleniumTestsContext {
      */
     private void setContextAttribute(final ITestContext context) {
         if (context != null) {
-//            Map<String, String> testParameters = context.getSuite().getXmlSuite().getParameters();
-            Map<String, String> testParameters = context.getCurrentXmlTest().getAllParameters();
+        	Map<String, String> testParameters;
+        	if (context.getCurrentXmlTest() == null) {
+        		testParameters = context.getSuite().getXmlSuite().getParameters();
+        	} else {
+        		testParameters = context.getCurrentXmlTest().getAllParameters();
+        	}
 
             for (Entry<String, String> entry : testParameters.entrySet()) {
                 String attributeName = entry.getKey();

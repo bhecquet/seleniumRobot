@@ -30,9 +30,9 @@ public class TestSeleniumTestContextManager {
 	public void readExtendedConfiguration(ITestContext iTestContext) {
 		iTestContext = SeleniumTestsContextManager.getContextFromConfigFile(iTestContext);
 		
-		Assert.assertEquals(iTestContext.getSuite().getXmlSuite().getParameter(SeleniumTestsContext.DEVICE_LIST), "{\"Samsung Galaxy Nexus SPH-L700 4.3\":\"Android 4.3\",\"Android Emulator\":\"Android 5.1\"}");
-		Assert.assertEquals(iTestContext.getSuite().getXmlSuite().getParameter(SeleniumTestsContext.APPIUM_SERVER_URL), "http://localhost:4723/wd/hub");
-		Assert.assertEquals(iTestContext.getSuite().getXmlSuite().getParameter(SeleniumTestsContext.APP_PACKAGE), "com.infotel.mobile");
+		Assert.assertEquals(iTestContext.getCurrentXmlTest().getSuite().getParameter(SeleniumTestsContext.DEVICE_LIST), "{\"Samsung Galaxy Nexus SPH-L700 4.3\":\"Android 4.3\",\"Android Emulator\":\"Android 5.1\"}");
+		Assert.assertEquals(iTestContext.getCurrentXmlTest().getSuite().getParameter(SeleniumTestsContext.APPIUM_SERVER_URL), "http://localhost:4723/wd/hub");
+		Assert.assertEquals(iTestContext.getCurrentXmlTest().getSuite().getParameter(SeleniumTestsContext.APP_PACKAGE), "com.infotel.mobile");
 	}
 	
 	/**
@@ -43,7 +43,7 @@ public class TestSeleniumTestContextManager {
 	public void extendedConfigurationOverridesSuiveValue(ITestContext iTestContext) {
 		iTestContext = SeleniumTestsContextManager.getContextFromConfigFile(iTestContext);
 		
-		Assert.assertEquals(iTestContext.getSuite().getXmlSuite().getParameter(SeleniumTestsContext.BROWSER), "chrome");
+		Assert.assertEquals(iTestContext.getCurrentXmlTest().getSuite().getParameter(SeleniumTestsContext.BROWSER), "chrome");
 	}
 	
 	/**
@@ -57,7 +57,7 @@ public class TestSeleniumTestContextManager {
 			System.setProperty("runMode", "saucelabs");
 			iTestContext = SeleniumTestsContextManager.getContextFromConfigFile(iTestContext);
 			
-			Assert.assertEquals(iTestContext.getSuite().getXmlSuite().getParameter(SeleniumTestsContext.APPIUM_SERVER_URL), "http://bhecquet:9be4e3b3-26d7-44fa-87b0-b2c75cdccafd@ondemand.saucelabs.com:80/wd/hub");
+			Assert.assertEquals(iTestContext.getCurrentXmlTest().getSuite().getParameter(SeleniumTestsContext.APPIUM_SERVER_URL), "http://bhecquet:9be4e3b3-26d7-44fa-87b0-b2c75cdccafd@ondemand.saucelabs.com:80/wd/hub");
 		} finally {
 			System.clearProperty("runMode");
 		}

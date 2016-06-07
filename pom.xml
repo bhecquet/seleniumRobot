@@ -2,9 +2,10 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
+
 	<groupId>com.infotel.seleniumRobot</groupId>
 	<artifactId>core</artifactId>
-	<version>1.1.0</version>
+	<version>1.1.1</version>
 	<packaging>jar</packaging>
 
 	<name>selenium robot</name>
@@ -484,7 +485,7 @@
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>cobertura-maven-plugin</artifactId>
-				<version>2.6</version>
+				<version>2.7</version>
 				<configuration>
 					<formats>
 						<format>html</format>
