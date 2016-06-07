@@ -6,6 +6,7 @@ import java.util.HashMap;
 
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.util.IniHelper;
 
 
@@ -40,39 +41,39 @@ public class ConfigMobileReader {
 	
 	/**
 	 * @author  Sophie
-	 * @param mobileType name of the directory representing the mobile type (android, ios, etc), can be empty
+	 * @param type name of the directory representing the mobile type (android, ios, etc), can be empty
 	 * @param version name of the directory representing the version (4.4, ios_6, etc), can be empty
 	 * @param page name of the caller page : will read the part [page] in the .ini
 	 * @return the HashMap with all properties corresponding with the mobile using and the page caller
 	 */
-	public HashMap<String, String> readConfig(String mobileType, String version, String page){
+	public HashMap<String, String> readConfig(String type, String version, String page){
 		HashMap<String, String> res = new HashMap<String, String>();
-		res = readConfig(mobileType, version).get(page);
+		res = readConfig(type, version).get(page);
 		return res;
 	}
 	
 	/**
 	 * @author  Sophie
-	 * @param mobileType name of the directory representing the mobile type (android, ios, etc), can be empty
+	 * @param type name of the directory representing the mobile type (android, ios, etc), can be empty
 	 * @param version name of the directory representing the version (4.4, ios_6, etc), can be empty
 	 * @return the HashMap with all properties corresponding with the mobile using 
 	 */
-	public HashMap<String, HashMap<String,String>> readConfig(String mobileType, String version){
+	public HashMap<String, HashMap<String,String>> readConfig(String type, String version){
 		//create HashMap for result
 		HashMap<String, HashMap<String,String>> testConfig = new HashMap<String, HashMap<String,String>>();
 		
 		//create String for Paths
-		String pathToLoad = Paths.get("mobile").toString();
+		String pathToLoad = "";
 		String pathToHerite =  "";
 		String secondPathToHerite = "";
 	
 		//modify path of Files with the arguments 
-		if(mobileType != null && !mobileType.equals("")){
-			pathToHerite =  Paths.get(SeleniumTestsContext.CONFIG_PATH, "mobile", "objectMapping.ini").toString();
-			pathToLoad = Paths.get(pathToLoad, mobileType).toString();
+		if(type != null && !type.equals("")){
+			pathToHerite =  Paths.get(SeleniumTestsContext.CONFIG_PATH, "objectMapping.ini").toString();
+			pathToLoad = Paths.get(pathToLoad, type).toString();
 			
 			if(version != null && !version.equals("")){
-				secondPathToHerite =  Paths.get(SeleniumTestsContext.CONFIG_PATH, "mobile", mobileType, "objectMapping.ini").toString();
+				secondPathToHerite =  Paths.get(SeleniumTestsContext.CONFIG_PATH, type, "objectMapping.ini").toString();
 				pathToLoad = Paths.get(pathToLoad, version).toString();
 			}
 		}
@@ -87,19 +88,35 @@ public class ConfigMobileReader {
 	
 			
 		//load parents data
-		if(mobileType != null &&  !mobileType.equals("")){
+		if(type != null &&  !type.equals("")){
 			//extract values from the common file for all types of mobile
-			testConfig = IniHelper.readIniFile(fileForIniToHerite, testConfig);
+			try{
+				testConfig = IniHelper.readIniFile(fileForIniToHerite, testConfig);	
+			}
+			catch (ConfigurationException e){
+				System.out.println("No such file : " + fileForIniToHerite);
+			}
+
 			if(version != null && !version.equals("")){
 				//extract values from the common file for this type of mobile (android or ios)
-				 testConfig = IniHelper.readIniFile(secondFileForIniToHerite, testConfig);
+				try{
+					testConfig = IniHelper.readIniFile(secondFileForIniToHerite, testConfig);
+				}
+				catch (ConfigurationException e){
+					System.out.println("No such file : " + secondFileForIniToHerite);
+				}
 			}
 		}
 			
 		//extract values of past file
-		testConfig = IniHelper.readIniFile(fileForIni, testConfig);
-		return testConfig;
+		try{
+			testConfig = IniHelper.readIniFile(fileForIni, testConfig);
+		}
+		catch (ConfigurationException e){
+			System.out.println("No such file : " + fileForIni);
+		}
 		
+		return testConfig;
 		}
 	
 		

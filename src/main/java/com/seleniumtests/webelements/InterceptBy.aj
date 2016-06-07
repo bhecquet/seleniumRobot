@@ -45,7 +45,6 @@ public class InterceptBy {
 			for (int i = 0; i < args.length; i++) {
 				Object argument = args[i];
 				if (argument != null && argument instanceof String) {
-					try {
 						String[] input = ((String) argument).split(":");
 						if (input[0].equals("prop")) {
 							String page = getCallerName(Thread.currentThread().getStackTrace());
@@ -61,9 +60,6 @@ public class InterceptBy {
 								}
 							}
 						}
-					} catch (MissingFormatArgumentException e) {
-						throw e;
-					}
 				}
 
 			}
