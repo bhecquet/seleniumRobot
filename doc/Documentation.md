@@ -11,6 +11,7 @@ XML configurations are done statically and must be duplicated through all the te
 *Example:* the server URL depends on testing phase. They are not the same in production and in integration phase.
 
 That’s why the “config.ini” file is made for. Each tested application can embed a config.ini file whose format is: 
+
 ![](images/config_ini_example.png)
  
 “General“ section is for common configuration (e.g: a database user name which does not depends on environment) and other sections are specific to named test environments. Here, we define a “Dev” environment. Then, when launching test, user MUST define the environment on which test will be run with the option `-Denv=Dev`
@@ -20,6 +21,7 @@ This file must be located in <application root>/data/<application name>/config f
 
 #### Using configurations in test scripts ####
 Each webpage can use the configurations defined above using (getting variable “text” from configuration):
+
 ![](images/get_param_example.png)
  
 ### Cucumber tests ###
@@ -65,6 +67,18 @@ deviceName reflects the local device used to automate the test
 Below is the list of all parameters accepted in testing xml file.
 **TBD**
 
+# Deployment #
+Create build (for core and test apps):
+
+	mvn clean package
+
+Build creates a file named seleniumBot-core.zip. Unzip this file to any folder.
+
+Also unzip the test app and you should get this folder structure:
+
+![](images/folder_structure.png)
+
+
 # Interfacing with tests managers #
 ## Squash TM/TA ##
 STF can work with Squash TA by using an intermediate .java file. This file handles:
@@ -75,8 +89,9 @@ STF can work with Squash TA by using an intermediate .java file. This file handl
 
 ### Execution of test framework ###
 This needs some environment variable configuration:
-- Add a STF_HOME environment variable pointing to the folder where STF is deployed
-- Add a JAVA_HOME_STF environment variable pointing to a Java 8 installation. This is mandatory as for now (Squash TA 1.9), Squash only supports Java 7 whereas STF is built using Java 8.
+
+- Add a `STF_HOME` environment variable pointing to the folder where STF is deployed
+- Add a `JAVA_HOME_STF` environment variable pointing to a Java 8 installation. This is mandatory as for now (Squash TA 1.9), Squash only supports Java 7 whereas STF is built using Java 8.
 
 **Execution platform must be installed with Java 8**
 
@@ -90,12 +105,14 @@ Launching of STF expects some variables passed to the script. These MUST be decl
 
 - browser
 - testEnvironment
+
 ![](images/squash_tm_cuf.png)
 
 **Make sure your .ta script reflects this choice**
  
 ### TA files generation ###
 Before each run, test script updates the list of .ta files so that they reflect the list of available Cucumber Scenario and/or TestNG tests. The generation can also be done launching the Jenkins job with the following parameters:
+
 ![](images/squash_ta_run.png)
  
 Generation is done using a root test file names src/Squash ta/tests/<application>_generic.ta where some fields will be replaced to reflect the cucumberTest, TestNG xml file name and TestNG test name.
@@ -119,11 +136,13 @@ Below is an example of what has been generated for cucumber scenarios.
 If some of the tests should not be available in Squash TA, precede them with the comment: 
 
     <!-- EXCLUDE_FROM_SQUASH_TA -->
+
 ![](images/exclude_testng.png)
  
 ### Squash TA job configuration ###
 By default, Squash TM receives the Squash TA test report. But, it’s useless when executing tests with STF as it does not contain any details. So we have to configure the STF report to be sent to Squash TM
 Add the following line below « Publish HTML reports »
+
 ![](images/squash_ta_config.png)
  
 In maven command line (goals & options), replace
