@@ -19,6 +19,7 @@ public enum BrowserType {
     InternetExplore("*iexplore"),
     Chrome("*chrome"),
     HtmlUnit("*htmlunit"),
+    Opera("*opera"),
     Safari("*safari"),
     Browser("*browser"), // default Android browser
     PhantomJS("*phantomjs"),
@@ -31,6 +32,8 @@ public enum BrowserType {
             return BrowserType.InternetExplore;
         } else if (browserType.equalsIgnoreCase("*chrome") || browserType.equalsIgnoreCase("chrome")) {
             return BrowserType.Chrome;
+        } else if (browserType.equalsIgnoreCase("*opera") || browserType.equalsIgnoreCase("opera")) {
+        	return BrowserType.Opera;
         } else if (browserType.equalsIgnoreCase("*htmlunit") || browserType.equalsIgnoreCase("htmlunit")) {
             return BrowserType.HtmlUnit;
         } else if (browserType.equalsIgnoreCase("*safari") || browserType.equalsIgnoreCase("safari")) {

@@ -2,7 +2,7 @@
 <suite name="Integration test suite" parallel="methods" verbose="1" thread-count="1">
    
 	<parameter name="implicitWaitTimeOut" value="2"></parameter>
-	<parameter name="browser" value="opera" />
+	<parameter name="browser" value="*firefox" />
 	<parameter name="app" value="https://www.test.google.fr" />
 	<parameter name="aParam" value="value1" />
 	<parameter name="anOtherParam" value="value2" />
