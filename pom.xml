@@ -10,7 +10,7 @@
 
 	<name>selenium robot</name>
     <description>Step by step test reporting framework based on webdriver, cucumber and testng, based on project seleniumtestsframework</description>
-
+	<url>https://github.com/bhecquet/seleniumRobot</url>
 
     <licenses>
         <license>
@@ -33,16 +33,8 @@
         <developerConnection>scm:git:git@github.com:bhecquet/seleniumRobot.git</developerConnection>
         <url>git@github.com:bhecquet/seleniumRobot.git</url>
     </scm>
-    
-    <distributionManagement>
-		<repository>
-			<id>nexus</id>
-			<name>Nexus Infotel</name>
-			<url>http://nexus.ouest.sesame.infotel.com:8080/nexus/content/repositories/infotel/</url>
-		</repository>
-	</distributionManagement>
 
-	<!-- <distributionManagement>
+	<distributionManagement>
 		<snapshotRepository>
 			<id>ossrh</id>
 			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
@@ -63,8 +55,7 @@
                 <enabled>false</enabled> 
             </snapshots>
         </repository>
-        nexus.ouest.sesame.infotel.com
-    </repositories>-->
+    </repositories>
     
     <properties>
     	<selenium.version>2.53.0</selenium.version>
@@ -228,22 +219,32 @@
 	<build>
 		<finalName>seleniumRobot</finalName>
 		<plugins>
-			<!-- <plugin>
+			<plugin>
 				<groupId>org.sonatype.plugins</groupId>
 				<artifactId>nexus-staging-maven-plugin</artifactId>
 				<version>1.6.3</version>
 				<extensions>true</extensions>
 				<configuration>
-					<serverId>nexus-infotel</serverId>
-					<nexusUrl>http://nexus.ouest.sesame.infotel.com:8080/nexus/</nexusUrl>
-					<autoReleaseAfterClose>true</autoReleaseAfterClose>
-					
-				</configuration>
-				<configuration>
 					<serverId>ossrh</serverId>
 					<nexusUrl>https://oss.sonatype.org/</nexusUrl>
 					<autoReleaseAfterClose>true</autoReleaseAfterClose>
+					
 				</configuration>
+			</plugin>
+			<!-- <plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-deploy-plugin</artifactId>
+				<version>2.8.2</version>
+				<executions>
+					<execution>
+						<id>deploy-file</id>
+						<phase>deploy-file</phase>
+						<configuration>
+							<file>${project.build.directory}/${project.artifactId}</file>
+							<repositoryId>ossrh</repositoryId>
+						</configuration>
+					</execution>
+				</executions>
 			</plugin> -->
 			
 			<plugin>
@@ -368,10 +369,10 @@
 							<goal>single</goal> 
 				      	</goals>
 				      	<configuration>
-				      		<finalName>${project.artifactId}</finalName>
+				      		<finalName>seleniumRobot-${project.artifactId}</finalName>
 				      		<appendAssemblyId>false</appendAssemblyId>
 				     		<archiveBaseDirectory>${project.build.directory}</archiveBaseDirectory>
-				     		<outputDirectory>${project.basedir}</outputDirectory>
+				     		<outputDirectory>${project.build.directory}</outputDirectory>
 				     		<descriptorRefs>
 		                		<descriptorRef>archiveArtifact</descriptorRef>
 		              		</descriptorRefs>
@@ -528,7 +529,7 @@
 					</execution>
 				</executions>
 			</plugin>
-			<!-- <plugin>
+			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-gpg-plugin</artifactId>
 				<version>1.5</version>
@@ -539,9 +540,14 @@
 						<goals>
 							<goal>sign</goal>
 						</goals>
+						<configuration>
+			              <keyname>${gpg.keyname}</keyname>
+			              <passphraseServerId>${gpg.keyname}</passphraseServerId>
+			              
+			            </configuration>
 					</execution>
 				</executions>
-			</plugin> -->
+			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-project-info-reports-plugin</artifactId>
