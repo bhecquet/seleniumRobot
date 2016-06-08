@@ -21,12 +21,12 @@ public class TestConfigMobileIntercepter {
 	
 	@Test(groups={"ut"})
 	public void interceptBy() {
-		Assert.assertEquals(By.id("prop:id").toString(), "By.id: login", "intercept by with prop doesn't work");
+		Assert.assertEquals(By.id("map:id").toString(), "By.id: login", "intercept by with map doesn't work");
 	}
 
 	@Test(groups={"ut"})
 	public void interceptByLocator() {
-		Assert.assertEquals(Locator.locateById("prop:id").toString(), "By.id: login", "intercept by Locator doesn't work");
+		Assert.assertEquals(Locator.locateById("map:id").toString(), "By.id: login", "intercept by Locator doesn't work");
 	}
 	
 	@Test(groups={"ut"})
@@ -36,7 +36,7 @@ public class TestConfigMobileIntercepter {
 	
 	@Test(groups={"ut"})
 	public void noModifWhenNoPresence() {
-		Assert.assertEquals(By.id("prop:name").toString(), "By.id: prop:name", "no change when not present doesn't work");
+		Assert.assertEquals(By.id("map:name").toString(), "By.id: map:name", "no change when not present doesn't work");
 	}
 
 }
