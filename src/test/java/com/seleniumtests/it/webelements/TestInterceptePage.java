@@ -25,28 +25,11 @@ public class TestInterceptePage {
 	private WebDriver driver;
 	private static DriverTestPage testPage;
 	
-	@BeforeMethod(enabled=true, alwaysRun = true)
-	public void initContext(final ITestContext testNGCtx, final XmlTest xmlTest) {
-		SeleniumTestsContextManager.initThreadContext(testNGCtx, xmlTest);
-	}
-	
 	@BeforeClass(groups={"it"})
-	public void initDriver() throws Exception {
+	public void initDriver(final ITestContext testNGCtx, final XmlTest xmlTest) throws Exception {
+		SeleniumTestsContextManager.initThreadContext(testNGCtx, xmlTest);
 		testPage = new DriverTestPage(true);
 		driver = WebUIDriver.getWebDriver(true);
-		
-		try {
-			driver.manage().window().maximize();
-		} catch (Exception e) {}
-	}
-	
-	@AfterMethod
-	public void cleanAlert() {
-		try {
-			driver.switchTo().alert().accept();
-		} catch (WebDriverException e) {
-			
-		}
 	}
 	
 	@AfterClass(alwaysRun = true)

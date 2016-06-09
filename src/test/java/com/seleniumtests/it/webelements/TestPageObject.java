@@ -26,14 +26,8 @@ public class TestPageObject{
 	@BeforeClass()
 	public void initDriver(final ITestContext testNGCtx) throws Exception {
 		SeleniumTestsContextManager.initThreadContext(testNGCtx);
-		SeleniumTestsContextManager.getThreadContext().setAttribute("browser", "*firefox");
-		WaitHelper.waitForSeconds(1);
 		testPage = new DriverTestPage(true);
 		driver = WebUIDriver.getWebDriver(true);
-		
-		try {
-			driver.manage().window().maximize();
-		} catch (Exception e) {}
 	}
 	
 	@Test()
