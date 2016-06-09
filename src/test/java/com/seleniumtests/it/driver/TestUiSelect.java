@@ -24,10 +24,7 @@ public class TestUiSelect extends GenericTest {
 //		driver = Launcher.getInstance().getDriver();
 //		driver.setTestAttachment(new TestAttachment());
 //		driver.getTestAttachment().resetTestAttachments("unknown");
-//		
-//		try {
-//			driver.manage().window().maximize();
-//		} catch (Exception e) {}
+
 //		driver.get("file:///" + Thread.currentThread().getContextClassLoader().getResource("test.html").getFile());
 //	}
 //	

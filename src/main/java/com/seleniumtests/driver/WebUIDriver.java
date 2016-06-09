@@ -27,6 +27,7 @@ import org.openqa.selenium.support.events.WebDriverEventListener;
 
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.helper.WaitHelper;
 
 /**
  * This class provides factory to create webDriver session.
@@ -184,6 +185,7 @@ public class WebUIDriver {
 
         synchronized (this.getClass()) {
             driver = webDriverBuilder.createWebDriver();
+            WaitHelper.waitForSeconds(1);
         }
 
         driver = handleListeners(driver);

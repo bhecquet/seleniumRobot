@@ -61,6 +61,7 @@
     	<selenium.version>2.53.0</selenium.version>
     	<htmlunitdriver.version>2.20</htmlunitdriver.version>
     	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    	<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     	<sonar.jacoco.reportPath>${project.build.directory}/coverage-reports/jacoco-ut.exec</sonar.jacoco.reportPath>
     	<sonar.jacoco.itReportPath>${project.build.directory}/coverage-reports/jacoco-it.exec</sonar.jacoco.itReportPath>
     </properties>
@@ -263,19 +264,43 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
 				<version>2.19.1</version>
-					<configuration>
-						<suiteXmlFiles>
-							<suiteXmlFile>data/core/testng/tu.xml</suiteXmlFile>
-						</suiteXmlFiles>
-						<properties>
-							<property>
-								<name>usedefaultlisteners</name>
-								<value>false</value>
-							</property>
-						</properties>
-						<testFailureIgnore>true</testFailureIgnore>
-					</configuration>
+				<configuration>
+					<suiteXmlFiles>
+						<suiteXmlFile>data/core/testng/tu.xml</suiteXmlFile>
+					</suiteXmlFiles>
+					<properties>
+						<property>
+							<name>usedefaultlisteners</name>
+							<value>false</value>
+						</property>
+					</properties>
+					<testFailureIgnore>true</testFailureIgnore>
+				</configuration>
 			</plugin>
+			<plugin>
+		        <groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-failsafe-plugin</artifactId>
+				<version>2.19.1</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>integration-test</goal>
+							<goal>verify</goal>
+						</goals>
+						<configuration>
+							<suiteXmlFiles>
+								<suiteXmlFile>data/core/testng/ti.xml</suiteXmlFile>
+							</suiteXmlFiles>
+							<properties>
+								<property>
+									<name>usedefaultlisteners</name>
+									<value>false</value>
+								</property>
+							</properties>
+						</configuration>
+					</execution>
+				</executions>
+    		</plugin>
 			<plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
@@ -307,6 +332,32 @@
 			                <outputDirectory>${project.reporting.outputDirectory}/jacoco-ut</outputDirectory>
 		                </configuration>
                     </execution>
+                    <execution>
+			            <id>pre-integration-test</id>
+			            <phase>pre-integration-test</phase>
+			            <goals>
+			                <goal>prepare-agent</goal>
+			            </goals>
+			            <configuration>
+			                <!-- Sets the path to the file which contains the execution data. -->
+			                <destFile>${project.build.directory}/coverage-reports/jacoco-it.exec</destFile>
+			                <!-- Sets the name of the property containing the settings for JaCoCo runtime agent. -->
+			                <!-- <propertyName>failsafeArgLine</propertyName> -->
+			            </configuration>
+			        </execution>
+			        <execution>
+			            <id>post-integration-test</id>
+			            <phase>post-integration-test</phase>
+			            <goals>
+			                <goal>report</goal>
+			            </goals>
+			            <configuration>
+			                <!-- Sets the path to the file which contains the execution data. -->
+			                <dataFile>${project.build.directory}/coverage-reports/jacoco-it.exec</dataFile>
+			                <!-- Sets the output directory for the code coverage report. -->
+			                <outputDirectory>${project.reporting.outputDirectory}/jacoco-it</outputDirectory>
+			            </configuration>
+			        </execution>
                 </executions>
             </plugin>
             <plugin> 
@@ -578,22 +629,29 @@
 			<build>
 				<plugins>
 					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-surefire-plugin</artifactId>
+				        <groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-failsafe-plugin</artifactId>
 						<version>2.19.1</version>
-						<configuration>
-							<suiteXmlFiles>
-								<suiteXmlFile>data/core/testng/ti.xml</suiteXmlFile>
-							</suiteXmlFiles>
-							<properties>
-								<property>
-									<name>usedefaultlisteners</name>
-									<value>false</value>
-								</property>
-							</properties>
-							<testFailureIgnore>true</testFailureIgnore>
-						</configuration>
-					</plugin>
+						<executions>
+							<execution>
+								<goals>
+									<goal>integration-test</goal>
+									<goal>verify</goal>
+								</goals>
+								<configuration>
+									<suiteXmlFiles>
+										<suiteXmlFile>data/core/testng/ti.xml</suiteXmlFile>
+									</suiteXmlFiles>
+									<properties>
+										<property>
+											<name>usedefaultlisteners</name>
+											<value>false</value>
+										</property>
+									</properties>
+								</configuration>
+							</execution>
+						</executions>
+		    		</plugin>
 					<plugin>
 		                <groupId>org.jacoco</groupId>
 		                <artifactId>jacoco-maven-plugin</artifactId>

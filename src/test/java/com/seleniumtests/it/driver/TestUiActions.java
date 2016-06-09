@@ -31,10 +31,6 @@ public class TestUiActions {
 	@BeforeClass(groups={"it"})
 	public void initDriver() throws Exception {
 		driver = WebUIDriver.getWebDriver(true);
-		
-		try {
-			driver.manage().window().maximize();
-		} catch (Exception e) {}
 		if (SeleniumTestsContextManager.getThreadContext().getBrowser().contains("firefox")) {
 			driver.get("file://" + Thread.currentThread().getContextClassLoader().getResource("tu/test.html").getFile());
 		} else {

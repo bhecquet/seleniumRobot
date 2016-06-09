@@ -50,6 +50,7 @@ import com.seleniumtests.driver.ScreenShot;
 import com.seleniumtests.driver.ScreenshotUtil;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.driver.WebUtility;
+import com.seleniumtests.helper.WaitHelper;
 
 import net.jsourcerer.webdriver.jserrorcollector.JavaScriptError;
 
@@ -407,6 +408,7 @@ public class PageObject extends BasePage implements IPage {
 
             // Navigate to app URL for browser test
             if (SeleniumTestsContextManager.isWebTest()) {
+            	maximizeWindow();
                 driver.navigate().to(url);
             }
         } catch (UnreachableBrowserException e) {
