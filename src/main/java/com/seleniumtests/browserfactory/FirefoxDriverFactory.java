@@ -18,6 +18,7 @@ import java.util.concurrent.TimeUnit;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.firefox.MarionetteDriver;
 
 import com.seleniumtests.driver.DriverConfig;
 
@@ -37,7 +38,9 @@ public class FirefoxDriverFactory extends AbstractWebDriverFactory implements IW
      * @return	the driver
      */
     protected WebDriver createNativeDriver() {
-        return new FirefoxDriver(new FirefoxCapabilitiesFactory().createCapabilities(webDriverConfig));
+    	
+    	return new MarionetteDriver(new MarionetteCapabilitiesFactory().createCapabilities(webDriverConfig));
+//        return new FirefoxDriver(new FirefoxCapabilitiesFactory().createCapabilities(webDriverConfig));
     }
 
     @Override
