@@ -66,6 +66,8 @@
 		<sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
     	<sonar.jacoco.reportPath>${project.build.directory}/coverage-reports/jacoco-ut.exec</sonar.jacoco.reportPath>
     	<sonar.jacoco.itReportPath>${project.build.directory}/coverage-reports/jacoco-it.exec</sonar.jacoco.itReportPath>
+    	<surefireArgLine></surefireArgLine> <!-- stub values to allow launching unit test from eclipse -->
+    	<failsafeArgLine></failsafeArgLine> <!-- stub values to allow launching unit test from eclipse -->
     </properties>
 
 	<dependencies>
@@ -626,71 +628,4 @@
 			</resource>
 		</resources>
 	</build>
-	<profiles>
-		<profile>
-			<id>integration-test</id>
-			<build>
-				<plugins>
-					<plugin>
-				        <groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-failsafe-plugin</artifactId>
-						<version>2.19.1</version>
-						<executions>
-							<execution>
-								<goals>
-									<goal>integration-test</goal>
-									<goal>verify</goal>
-								</goals>
-								<configuration>
-									<suiteXmlFiles>
-										<suiteXmlFile>data/core/testng/ti.xml</suiteXmlFile>
-									</suiteXmlFiles>
-									<properties>
-										<property>
-											<name>usedefaultlisteners</name>
-											<value>false</value>
-										</property>
-									</properties>
-								</configuration>
-							</execution>
-						</executions>
-		    		</plugin>
-					<plugin>
-		                <groupId>org.jacoco</groupId>
-		                <artifactId>jacoco-maven-plugin</artifactId>
-		                <version>0.7.7.201606060606</version>
-		                                  
-		                <executions>
-		                    <execution>
-					            <id>pre-integration-test</id>
-					            <phase>pre-integration-test</phase>
-					            <goals>
-					                <goal>prepare-agent</goal>
-					            </goals>
-					            <configuration>
-					                <!-- Sets the path to the file which contains the execution data. -->
-					                <destFile>${project.build.directory}/coverage-reports/jacoco-it.exec</destFile>
-					                <!-- Sets the name of the property containing the settings for JaCoCo runtime agent. -->
-					                <!-- <propertyName>failsafeArgLine</propertyName> -->
-					            </configuration>
-					        </execution>
-					        <execution>
-					            <id>post-integration-test</id>
-					            <phase>post-integration-test</phase>
-					            <goals>
-					                <goal>report</goal>
-					            </goals>
-					            <configuration>
-					                <!-- Sets the path to the file which contains the execution data. -->
-					                <dataFile>${project.build.directory}/coverage-reports/jacoco-it.exec</dataFile>
-					                <!-- Sets the output directory for the code coverage report. -->
-					                <outputDirectory>${project.reporting.outputDirectory}/jacoco-it</outputDirectory>
-					            </configuration>
-					        </execution>
-		                </executions>
-		            </plugin>
-				</plugins>
-			</build>
-		</profile>
-	</profiles>
 </project>
