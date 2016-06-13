@@ -60,7 +60,7 @@ public class TestDriver {
 	
 	@AfterClass(alwaysRun = true)
 	public void closeBrowser() {
-		driver.close();
+		WebUIDriver.cleanUp();
 	}
 	
 	/**

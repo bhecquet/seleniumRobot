@@ -62,7 +62,6 @@ public class TestUiActions {
 	@AfterClass(alwaysRun = true)
 	public void destroyDriver() {
 		if (driver != null) {
-			driver.close();
 			WebUIDriver.cleanUp();
 		}
 	}
