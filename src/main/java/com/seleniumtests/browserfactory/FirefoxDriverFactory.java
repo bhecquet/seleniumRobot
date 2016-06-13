@@ -13,7 +13,12 @@
 
 package com.seleniumtests.browserfactory;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
@@ -31,6 +36,54 @@ public class FirefoxDriverFactory extends AbstractWebDriverFactory implements IW
     public FirefoxDriverFactory(final DriverConfig cfg) {
         super(cfg);
     }
+    
+    /**
+     * below firefox 47, we use FirefoxDriver
+     * above, we use Marionette, get version of firefox
+     * By default, use Marionette
+     * @return
+     */
+    public boolean useFirefoxDriver() {
+    	
+    	
+    	try {
+	    	Process p = Runtime.getRuntime().exec("firefox -v | more");
+			BufferedReader bri = new BufferedReader(new InputStreamReader(p.getInputStream()));
+			String line;
+			StringBuilder output = new StringBuilder();
+			while ((line = bri.readLine()) != null) {
+			    System.out.println(line);
+			    output.append(line);
+			}
+			bri.close();
+			p.waitFor();
+			
+			return useFirefoxVersion(output);
+			
+    	} catch (IOException | InterruptedException e) {
+    		return false;
+    	}
+    }
+    
+    /**
+     * use firefox if version is below 47
+     * @param versionString
+     * @return
+     */
+    public boolean useFirefoxVersion(StringBuilder versionString) {
+    	Pattern regMozilla = Pattern.compile("^Mozilla .* (\\d+)\\..*");
+    	Matcher versionMatcher = regMozilla.matcher(versionString);
+		if (versionMatcher.matches()) {
+			String version = versionMatcher.group(1);
+			if (Integer.parseInt(version) >= 47) {
+				return false;
+			} else {
+				return true;
+			}
+		} else {
+			return false;
+		}
+    }
 
     /**
      * create native driver instance, designed for unit testing.
@@ -39,8 +92,11 @@ public class FirefoxDriverFactory extends AbstractWebDriverFactory implements IW
      */
     protected WebDriver createNativeDriver() {
     	
-    	return new MarionetteDriver(new MarionetteCapabilitiesFactory().createCapabilities(webDriverConfig));
-//        return new FirefoxDriver(new FirefoxCapabilitiesFactory().createCapabilities(webDriverConfig));
+    	if (useFirefoxDriver()) {
+    		return new FirefoxDriver(new FirefoxCapabilitiesFactory().createCapabilities(webDriverConfig));
+    	} else {
+    		return new MarionetteDriver(new MarionetteCapabilitiesFactory().createCapabilities(webDriverConfig));
+    	}  
     }
 
     @Override
