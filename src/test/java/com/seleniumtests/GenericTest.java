@@ -30,7 +30,6 @@ public class GenericTest {
 	@AfterMethod(alwaysRun = true)
 	public void destroyDriver() {
 		if (driver != null) {
-			driver.close();
 			WebUIDriver.cleanUp();
 		}
 	}
