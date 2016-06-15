@@ -57,7 +57,7 @@ public class TestSeleniumTestContextManager {
 			System.setProperty("runMode", "saucelabs");
 			iTestContext = SeleniumTestsContextManager.getContextFromConfigFile(iTestContext);
 			
-			Assert.assertEquals(iTestContext.getCurrentXmlTest().getSuite().getParameter(SeleniumTestsContext.APPIUM_SERVER_URL), "http://bhecquet:9be4e3b3-26d7-44fa-87b0-b2c75cdccafd@ondemand.saucelabs.com:80/wd/hub");
+			Assert.assertEquals(iTestContext.getCurrentXmlTest().getSuite().getParameter(SeleniumTestsContext.APPIUM_SERVER_URL), "http://xxx:aaaaa-26d7-44fa-bbbb-b2c75cdccafd@ondemand.saucelabs.com:80/wd/hub");
 		} finally {
 			System.clearProperty("runMode");
 		}

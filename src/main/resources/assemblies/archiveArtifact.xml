@@ -12,6 +12,10 @@
 			<directory>.</directory>
 			<excludes>
 				<exclude>**/classes/**</exclude>
+				<exclude>**/apidocs/**</exclude>
+				<exclude>**/site/**</exclude>
+				<exclude>**/coverage-reports/**</exclude>
+				<exclude>**/javadoc-bundle-options/**</exclude>
 				<exclude>**/surefire/**</exclude>
 				<exclude>**/surefire-reports/**</exclude>
 				<exclude>**/test-classes/**</exclude>
