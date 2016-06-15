@@ -90,6 +90,7 @@ public class CucumberRunner {
     @Test(groups = "cucumber", description = "Cucumber scenario", dataProvider = "scenarios")
     public void feature(CucumberScenarioWrapper cucumberScenarioWrapper) throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
     	testNGCucumberRunner.runScenario(cucumberScenarioWrapper);
+    	logger.info(Thread.currentThread() + "Start scenario: " + cucumberScenarioWrapper);
     }
 
     /**
