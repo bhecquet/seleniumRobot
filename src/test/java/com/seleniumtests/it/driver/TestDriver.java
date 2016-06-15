@@ -47,10 +47,6 @@ public class TestDriver {
 		SeleniumTestsContextManager.initThreadContext(testNGCtx);
 		testPage = new DriverTestPage(true);
 		driver = WebUIDriver.getWebDriver(true);
-		
-		try {
-			driver.manage().window().maximize();
-		} catch (Exception e) {}
 	}
 	
 	@AfterMethod(alwaysRun=true)
@@ -64,7 +60,7 @@ public class TestDriver {
 	
 	@AfterClass(alwaysRun = true)
 	public void closeBrowser() {
-		driver.close();
+		WebUIDriver.cleanUp();
 	}
 	
 	/**
@@ -193,9 +189,11 @@ public class TestDriver {
 			Assert.assertEquals("input", driver.findElement(By.name("q")).getTagName());
 		} finally {
 			// retour sur l'onglet principal
-			driver.close();
-			if (mainHandle != null) {
-				testPage.selectWindow(mainHandle);
+			if (driver.getWindowHandles().size() > 1) {
+				driver.close();
+				if (mainHandle != null) {
+					testPage.selectWindow(mainHandle);
+				}
 			}
 		}
 		Assert.assertEquals(testPage.link.getUrl(), "http://www.google.fr/");

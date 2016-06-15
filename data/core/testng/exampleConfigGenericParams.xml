@@ -43,12 +43,12 @@
 	</service>
 	
 	<service name="saucelabs">
-		<parameter name="appiumServerURL" value="http://bhecquet:9be4e3b3-26d7-44fa-87b0-b2c75cdccafd@ondemand.saucelabs.com:80/wd/hub" />
+		<parameter name="appiumServerURL" value="http://xxx:aaaaa-26d7-44fa-bbbb-b2c75cdccafd@ondemand.saucelabs.com:80/wd/hub" />
 	</service>
 	
 	<service name="testdroid">
 		<parameter name="appiumServerURL" value="http://appium.testdroid.com/wd/hub" />
-	    <parameter name="cloudApiKey" value="b3dwlnppdipqHw93Ua0uQNPxBktPSfZv"/>
+	    <parameter name="cloudApiKey" value="aaaaaaaaaa93Ua0uQNPxBktPSfZv"/>
 		<parameter name="projectName" value="Test_testdroid" />
 	</service>
 </parameters>

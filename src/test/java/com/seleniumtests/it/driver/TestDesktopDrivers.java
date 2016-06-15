@@ -13,10 +13,8 @@
 
 package com.seleniumtests.it.driver;
 
-import org.openqa.selenium.WebDriver;
 import org.testng.Assert;
 import org.testng.ITestContext;
-import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 import org.testng.xml.XmlTest;
 
@@ -32,7 +30,7 @@ public class TestDesktopDrivers extends GenericTest {
 		SeleniumTestsContextManager.initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setAttribute("browser", "*firefox");
 		driver = WebUIDriver.getWebDriver(true);
-		Assert.assertEquals("about:blank", driver.getCurrentUrl());
+		Assert.assertEquals(driver.getCurrentUrl(), "about:blank");
 	}
 	
 	@Test(groups={"it"})
@@ -40,7 +38,7 @@ public class TestDesktopDrivers extends GenericTest {
 		SeleniumTestsContextManager.initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setAttribute("browser", "*chrome");
 		driver = WebUIDriver.getWebDriver(true);
-		Assert.assertEquals("data:,", driver.getCurrentUrl());
+		Assert.assertEquals(driver.getCurrentUrl(), "data:,");
 	}
 	
 	@Test(groups={"it"})

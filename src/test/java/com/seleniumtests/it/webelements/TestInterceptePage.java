@@ -1,14 +1,23 @@
+/*
+ * Copyright 2016 www.infotel.com
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.seleniumtests.it.webelements;
 
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebDriverException;
 import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.annotations.AfterClass;
-import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
-import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import org.testng.xml.XmlTest;
 
@@ -25,33 +34,16 @@ public class TestInterceptePage {
 	private WebDriver driver;
 	private static DriverTestPage testPage;
 	
-	@BeforeMethod(enabled=true, alwaysRun = true)
-	public void initContext(final ITestContext testNGCtx, final XmlTest xmlTest) {
-		SeleniumTestsContextManager.initThreadContext(testNGCtx, xmlTest);
-	}
-	
 	@BeforeClass(groups={"it"})
-	public void initDriver() throws Exception {
+	public void initDriver(final ITestContext testNGCtx, final XmlTest xmlTest) throws Exception {
+		SeleniumTestsContextManager.initThreadContext(testNGCtx, xmlTest);
 		testPage = new DriverTestPage(true);
 		driver = WebUIDriver.getWebDriver(true);
-		
-		try {
-			driver.manage().window().maximize();
-		} catch (Exception e) {}
-	}
-	
-	@AfterMethod
-	public void cleanAlert() {
-		try {
-			driver.switchTo().alert().accept();
-		} catch (WebDriverException e) {
-			
-		}
 	}
 	
 	@AfterClass(alwaysRun = true)
 	public void closeBrowser() {
-		driver.close();
+		WebUIDriver.cleanUp();
 	}
 	
 	
