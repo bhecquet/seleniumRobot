@@ -13,6 +13,7 @@
 
 package com.seleniumtests.webelements;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -60,16 +61,13 @@ public class HtmlElement {
     protected static final Logger logger = TestLogging.getLogger(
             HtmlElement.class);
 
-    private static enum LocatorType {
-        ID, NAME, CLASS_NAME, LINK_TEXT, PARTIAL_LINK_TEXT, CSS_SELECTOR,
-        TAG_NAME, XPATH,
-    }
 
     protected WebDriver driver = WebUIDriver.getWebDriver();
     protected WebUIDriver webUXDriver = WebUIDriver.getWebUIDriver();
     protected WebElement element = null;
     private String label = null;
-    private String locator = null;
+    private HtmlElement parent = null;
+    private int elementIndex = -1;
     private By by = null;
 
     /**
@@ -80,22 +78,26 @@ public class HtmlElement {
      *
      * @sample  {@code new HtmlElement("UserId", By.id(userid))}
      */
+    
     public HtmlElement(final String label, final By by) {
+    	this(label, by, -1);
+    }
+    
+    public HtmlElement(final String label, final By by, final int index) {
         this.label = label;
         this.by = by;
+        this.elementIndex = index;
     }
-
-    /**
-     * This constructor locates the element using locator and locator type.
-     *
-     * @param  label
-     * @param  locator  - locator
-     */
-    public HtmlElement(final String label, final String locator,
-        final LocatorType locatorType) {
-        this.label = label;
-        this.locator = locator;
-        this.by = getLocatorBy(locator, locatorType);
+    
+    public HtmlElement(final String label, final By by, final HtmlElement parent) {
+    	this(label, by, parent, -1);
+    }
+    
+    public HtmlElement(final String label, final By by, final HtmlElement parent, final int index) {
+    	this.label = label;
+    	this.by = by;
+    	this.parent = parent;
+    	this.elementIndex = index;
     }
 
     /**
@@ -204,6 +206,38 @@ public class HtmlElement {
             element, x, y);
 
     }
+    
+    /**
+     * Find elements inside this element
+     * @param by
+     */
+    public List<WebElement> findElements(By by) {
+    	
+    	// find the root element
+    	findElement();
+        return element.findElements(by);
+    }
+    
+    /**
+     * Find an element inside an other one
+     * @param by
+     * @return
+     */
+    public HtmlElement findElement(By by) {
+    	return new HtmlElement(label, by, this);
+    }
+    
+    /**
+     * Find the Nth element inside an other one
+     * Equivalent to HtmlElement("", By.id("0").findElements(By.id("1")).get(0); 
+     * except that any action on the found element will be retried if it fails
+     * @param by 	locator of the element list
+     * @param index	index in the list to get
+     * @return
+     */
+    public HtmlElement findElement(By by, int index) {
+    	return new HtmlElement(label, by, this, index);
+    }
 
     /**
      * Finds the element using By type. Implicit Waits is built in createWebDriver() in WebUIDriver to handle dynamic
@@ -211,8 +245,24 @@ public class HtmlElement {
      * waitForPresent to use Explicit Waits to deal with special element which needs long time to present.
      */
     protected void findElement() {
-        driver = WebUIDriver.getWebDriver();
-        element = driver.findElement(by);
+        
+        // if a parent is defined, search for it before getting the sub element
+        if (parent != null) {
+        	parent.findElement();
+        	if (elementIndex < 0) {
+        		element = parent.element.findElement(by);
+        	} else {
+        		element = parent.element.findElements(by).get(elementIndex);
+        	}
+        } else {
+	        driver = WebUIDriver.getWebDriver();
+	        if (elementIndex < 0) {
+	        	element = driver.findElement(by);
+	        } else {
+	        	element = driver.findElements(by).get(elementIndex);
+	        }
+	        
+        }
         makeWebElementVisible(element);
     }
     
@@ -267,7 +317,7 @@ public class HtmlElement {
      *
      * @return
      */
-    public List<WebElement> getAllElements() {
+    public List<WebElement> findElements() {
         findElement();
 
         return driver.findElements(by);
@@ -371,46 +421,6 @@ public class HtmlElement {
         findElement();
 
         return element.getLocation();
-    }
-
-    /**
-     * Returns the locator used to find the underlying WebElement.
-     *
-     * @return
-     */
-    public String getLocator() {
-        return locator;
-    }
-
-    private By getLocatorBy(final String locator,
-        final LocatorType locatorType) {
-
-        switch (locatorType) {
-
-        case ID:
-            return By.id(locator);
-
-        case NAME:
-            return By.name(locator);
-
-        case CLASS_NAME:
-            return By.className(locator);
-
-        case LINK_TEXT:
-            return By.linkText(locator);
-
-        case PARTIAL_LINK_TEXT:
-            return By.partialLinkText(locator);
-
-        case CSS_SELECTOR:
-            return By.cssSelector(locator);
-
-        case TAG_NAME:
-            return By.tagName(locator);
-
-        default:
-            return By.xpath(locator);
-        }
     }
 
     /**
