@@ -23,7 +23,29 @@ This file must be located in <application root>/data/<application name>/config f
 Each webpage can use the configurations defined above using (getting variable “text” from configuration):
 
 ![](images/get_param_example.png)
- 
+
+### Test script configuration mapping ###
+#### Mapping files utility ####
+
+Mapping file give possibility to call an element in a web page with a more accessible and understandable word. This way your code gain clarity for a non technical user.
+Every element can be redefined for any platform and version, you just have to create a hierarchical architecture of files :
+example :
+
+![](images/mapping_architecture.png)
+
+#### objectMapping.ini configuration ####
+
+Each file can define new elements, and it inherits parents files.
+The structure of an objectMapping.ini file looks like that :
+
+![](images/objectMapping_example.png)
+
+between [ ] you define the web page where to use the following definitions. Next, there is the word definitions : caller_word:technical_word
+
+#### Mapping data use ####
+
+In the corresponding pageObject you can use mapping words to search elements using : locateBy(map:caller_word) or by.(map:caller_word). It will search the element in the page which is defined by the technical word. 
+
 ### Cucumber tests ###
 TBC
 
