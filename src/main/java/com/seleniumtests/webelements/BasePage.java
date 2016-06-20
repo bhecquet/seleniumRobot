@@ -20,6 +20,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.InvalidSelectorException;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.NoSuchWindowException;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -284,29 +285,26 @@ public abstract class BasePage {
         return seenText;
     }
 
-    public boolean isElementPresent(final By by) {
-        int count = 0;
-        try {
-            count = WebUIDriver.getWebDriver().findElements(by).size();
-        } catch (RuntimeException e) {
-            if ((e instanceof InvalidSelectorException)
-                    || (e.getMessage() != null
-                        && e.getMessage().contains("TransformedEntriesMap cannot be cast to java.util.List"))) {
-                TestLogging.log("InvalidSelectorException or CastException got, retry");
-                WaitHelper.waitForSeconds(2);
-                count = WebUIDriver.getWebDriver().findElements(by).size();
-            } else {
-                throw e;
-            }
-        }
-
-        if (count == 0) {
-            return false;
-        }
-
-        return true;
-
+    /**
+     * Return true if element is present
+     * @param by
+     * @param timeout timeout in seconds
+     * @return
+     */
+    public boolean isElementPresent(final By by, final int timeout) {
+    	
+    	try {
+    		waitForElementPresent(by, timeout);
+    		return true;
+    	} catch (TimeoutException e) {
+    		return false;
+    	}
     }
+    public boolean isElementPresent(final By by) {
+    	return isElementPresent(by, 10);
+    }
+    
+    
 
     public boolean isFrame() {
         return false;
@@ -395,6 +393,11 @@ public abstract class BasePage {
         wait.until(ExpectedConditions.presenceOfElementLocated(by));
     }
 
+    /**
+     * 
+     * @param by
+     * @param timeout	timeout in seconds
+     */
     public void waitForElementPresent(final By by, final int timeout) {
         TestLogging.logWebStep(null, "wait for " + by.toString() + " to be present.", false);
 
