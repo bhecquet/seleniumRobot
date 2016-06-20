@@ -26,7 +26,6 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
-import org.testng.xml.XmlTest;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.driver.WebUIDriver;
@@ -35,12 +34,18 @@ import com.seleniumtests.webelements.HtmlElement;
 
 public class TestDriver {
 	
-	public TestDriver() throws Exception {
-		super();
-	}
+	
 
-	private WebDriver driver;
+	private static WebDriver driver;
 	private static DriverTestPage testPage;
+	
+	public TestDriver() throws Exception {
+	}
+	
+	public TestDriver(WebDriver driver, DriverTestPage testPage) throws Exception {
+		TestDriver.driver = driver;
+		TestDriver.testPage = testPage;
+	}
 	
 	@BeforeClass(groups={"it"})
 	public void initDriver(final ITestContext testNGCtx) throws Exception {
@@ -157,7 +162,7 @@ public class TestDriver {
 	public void testSendKeys() {
 		try {
 			testPage.textElement.sendKeys("youpi");
-			Assert.assertEquals("youpi", testPage.textElement.getValue());
+			Assert.assertEquals(testPage.textElement.getValue(), "youpi");
 		} finally {
 			testPage.resetButton.click();
 		}
@@ -167,7 +172,7 @@ public class TestDriver {
 	public void testSendKeysJs() {
 		try {
 			testPage.textElement.simulateSendKeys("youpi");
-			Assert.assertEquals("youpi", testPage.textElement.getValue());
+			Assert.assertEquals(testPage.textElement.getValue(), "youpi");
 		} finally {
 			driver.findElement(By.id("button2")).click();
 		}
@@ -205,40 +210,59 @@ public class TestDriver {
 	@Test(groups={"it"})
 	public void testOnBlur() {
 		testPage.onBlurField.sendKeys("onBlur done");
-		Assert.assertEquals("onBlur done", testPage.onBlurFieldDest.getValue());
+		Assert.assertEquals(testPage.onBlurFieldDest.getValue(), "onBlur done");
 	}
 	
 	@Test(groups={"it"})
 	public void testFindElements() {
 		// 2 éléments à trouver
-		Assert.assertEquals(2, new HtmlElement("", By.name("divFindName")).getAllElements().size());
+		Assert.assertEquals(new HtmlElement("", By.name("divFindName")).findElements().size(), 2);
 		
 		// 3 éléments dont l'un dans une branche
-		Assert.assertEquals(3, new HtmlElement("", By.className("myClass")).getAllElements().size());
+		Assert.assertEquals(new HtmlElement("", By.className("myClass")).findElements().size(), 4);
 	}
 
-//	@Test(groups={"it"})
-//	public void testFindElement() {
-//		TODO: vérifier si elle sert encore avec le rejeu
-//		Assert.assertEquals("first child", driver.findElement(By.id("parent")).findElement(By.id("child1")).getText());
-//	}
+	/**
+	 * Search an element inside an other one
+	 */
+	@Test(groups={"it"})
+	public void testFindSubElement() {
+		Assert.assertEquals(testPage.parent.findElement(By.className("myClass")).getText(), "first child");
+	}
+	
+	/**
+	 * Search the n th element inside an other one
+	 */
+	@Test(groups={"it"})
+	public void testFindNthSubElement() {
+		Assert.assertEquals(testPage.parent.findElement(By.className("myClass"), 1).getText(), "fourth child");
+		Assert.assertEquals(testPage.child.getText(), "fourth child");
+	}
+	
+	/**
+	 * Search the n th element corresponding to locator
+	 */
+	@Test(groups={"it"})
+	public void testFindNthElement() {
+		Assert.assertEquals(testPage.divFindName.getText(), "an other text");
+	}
 
 	/**
 	 * test specific HtmlElements actions
 	 */
 	@Test(groups={"it"})
 	public void testFindPattern1() {
-		Assert.assertEquals("http://www.google.fr/", testPage.link.findLink("href"));
+		Assert.assertEquals(testPage.link.findLink("href"), "http://www.google.fr");
 	}
 	
 	@Test(groups={"it"})
 	public void testFindPattern2() {
-		Assert.assertEquals("http://www.google.fr", testPage.linkPopup.findLink("onclick"));
+		Assert.assertEquals(testPage.linkPopup.findLink("onclick"), "http://www.google.fr");
 	}
 	
 	@Test(groups={"it"}) 
 	public void testFindPattern3() {
-		Assert.assertEquals("http://www.google.fr", testPage.linkPopup2.findLink("onclick"));
+		Assert.assertEquals(testPage.linkPopup2.findLink("onclick"), "http://www.google.fr");
 	}
 	
 	/**
@@ -246,7 +270,7 @@ public class TestDriver {
 	 */
 	@Test(groups={"it"})
 	public void testFindPattern4() {
-		Assert.assertEquals("other", new HtmlElement("", By.id("divFind2")).findPattern(Pattern.compile("an (\\w+) text"), "text"));
+		Assert.assertEquals(new HtmlElement("", By.id("divFind2")).findPattern(Pattern.compile("an (\\w+) text"), "text"), "other");
 	}
 	
 	/**
@@ -256,7 +280,7 @@ public class TestDriver {
 	public void testDelay() {
 		try {
 			testPage.delayButton.click();
-			Assert.assertEquals("my value", new HtmlElement("", By.id("newEl")).getValue());
+			Assert.assertEquals(new HtmlElement("", By.id("newEl")).getValue(), "my value");
 		} finally {
 			testPage.delayButtonReset.click();
 		}

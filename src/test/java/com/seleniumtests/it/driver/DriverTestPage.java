@@ -34,6 +34,9 @@ public class DriverTestPage extends PageObject {
 	public static final ButtonElement delayButtonReset = new ButtonElement("Reset", By.id("buttonDelayReset"));
 	public static final HtmlElement greenSquare = new HtmlElement("Green square", By.id("carre"));
 	public static final HtmlElement redSquare = new HtmlElement("Red Square", By.id("carre2"));
+	public static final HtmlElement parent  = new HtmlElement("parent", By.id("parent"));
+	public static final HtmlElement child  = new HtmlElement("parent", By.id("parent")).findElement(By.className("myClass"), 1);
+	public static final HtmlElement divFindName  = new HtmlElement("parent", By.name("divFindName"), 1);
 	public static final LinkElement link = new LinkElement("My link", By.id("link"));
 	public static final LinkElement linkPopup = new LinkElement("My link", By.id("linkPopup"));
 	public static final LinkElement linkPopup2 = new LinkElement("My link", By.id("linkPopup2"));
