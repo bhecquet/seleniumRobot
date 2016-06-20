@@ -15,6 +15,7 @@ package com.seleniumtests.browserfactory;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
 
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxProfile;
@@ -181,7 +182,7 @@ public class FirefoxCapabilitiesFactory implements ICapabilitiesFactory {
                 profilePath = FileUtility.decodePath(profilePath);
 
                 extractDefaultProfile(profilePath);
-                realPath = profilePath + OSUtility.getSlash() + "customFFprofile";
+                realPath = profilePath +  "/profiles/customProfileDirCUSTFF";
 
             } catch (Exception e) {
                 e.printStackTrace();

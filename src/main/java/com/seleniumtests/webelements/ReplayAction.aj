@@ -58,6 +58,7 @@ public class ReplayAction {
 	    	
 	    	try {
 	    		reply = joinPoint.proceed(joinPoint.getArgs());
+	    		WaitHelper.waitForMilliSeconds(200);
 	    		break;
 	    	} catch (UnhandledAlertException e) {
 	    		throw e;
