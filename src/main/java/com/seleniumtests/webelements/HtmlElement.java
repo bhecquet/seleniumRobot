@@ -27,6 +27,7 @@ import org.openqa.selenium.InvalidSelectorException;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.NoAlertPresentException;
 import org.openqa.selenium.Point;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
@@ -509,42 +510,16 @@ public class HtmlElement {
      *
      * @return
      */
-    public boolean isElementPresent() {
-
-        if (WebUIDriver.getWebDriver() == null) {
-            TestLogging.log(
-                "Web Driver is terminated! Exception might caught in last action.");
-            throw new RuntimeException(
-                "Web Driver is terminated! Exception might caught in last action.");
-        }
-
-        int count = 0;
-
+    public boolean isElementPresent(int timeout) {        
         try {
-
-            count = WebUIDriver.getWebDriver().findElements(by).size();
-        } catch (RuntimeException e) {
-
-            if (e instanceof InvalidSelectorException) {
-                TestLogging.log("Got InvalidSelectorException, retry");
-                WaitHelper.waitForSeconds(2);
-                count = WebUIDriver.getWebDriver().findElements(by).size();
-            } else if ((e.getMessage() != null) &&
-                    e.getMessage().contains(
-                        "TransformedEntriesMap cannot be cast to java.util.List")) {
-                TestLogging.log("Got CastException, retry");
-                WaitHelper.waitForSeconds(2);
-                count = WebUIDriver.getWebDriver().findElements(by).size();
-            } else {
-                throw e;
-            }
-        }
-
-        if (count == 0) {
-            return false;
-        }
-
-        return true;
+    		waitForPresent(timeout);
+    		return true;
+    	} catch (TimeoutException e) {
+    		return false;
+    	}
+    }
+    public boolean isElementPresent() {       
+    	return isElementPresent(EXPLICIT_WAIT_TIME_OUT);
     }
 
     /**
@@ -644,7 +619,7 @@ public class HtmlElement {
 	        if (!element.getAttribute("type").equalsIgnoreCase("file")) {
 	        	element.clear();
 	        }
-        } catch (WebDriverException e) {
+        } catch (WebDriverException | NullPointerException e) {
         	element.clear();
         }
         element.sendKeys(arg0);
@@ -736,14 +711,9 @@ public class HtmlElement {
      * which needs long time to present.
      */
     public void waitForPresent(final int timeout) {
-        TestLogging.logWebStep(null,
-            "wait for " + this.toString() + " to present.", false);
+        TestLogging.logWebStep(null, "wait for " + this.toString() + " to present.", false);
 
-        Wait<WebDriver> wait = new WebDriverWait(driver, timeout);
-        wait.until(new ExpectedCondition<WebElement>() {
-                public WebElement apply(final WebDriver driver) {
-                    return driver.findElement(by);
-                }
-            });
+        WebDriverWait wait = new WebDriverWait(driver, timeout);
+        wait.until(ExpectedConditions.presenceOfElementLocated(by));
     }
 }

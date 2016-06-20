@@ -9,7 +9,7 @@
 	<parameter name="variable1" value="value4" />
    
     
-    <test name="Integration tests" parallel="false">
+    <!-- <test name="Integration tests" parallel="false">
  		<parameter name="variable1" value="value1" />
  
         <groups>
@@ -21,7 +21,7 @@
         <packages>
             <package name="com.seleniumtests.it.*" />
         </packages>
-    </test>
+    </test> -->
     
     <test name="Page Object" parallel="false">
  		<parameter name="variable1" value="value3" />

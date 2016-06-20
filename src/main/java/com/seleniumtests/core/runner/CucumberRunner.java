@@ -45,7 +45,7 @@ import cucumber.api.testng.CucumberFeatureWrapper;
 
 public class CucumberRunner {
 	
-	private static final Logger logger = TestLogging.getLogger(SeleniumTestPlan.class);
+	private static final Logger logger = TestLogging.getLogger(CucumberRunner.class);
     private Date start;
 	private CustomTestNGCucumberRunner testNGCucumberRunner;
     

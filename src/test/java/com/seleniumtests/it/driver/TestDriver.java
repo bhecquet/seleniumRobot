@@ -34,12 +34,18 @@ import com.seleniumtests.webelements.HtmlElement;
 
 public class TestDriver {
 	
-	public TestDriver() throws Exception {
-		super();
-	}
+	
 
-	private WebDriver driver;
+	private static WebDriver driver;
 	private static DriverTestPage testPage;
+	
+	public TestDriver() throws Exception {
+	}
+	
+	public TestDriver(WebDriver driver, DriverTestPage testPage) throws Exception {
+		TestDriver.driver = driver;
+		TestDriver.testPage = testPage;
+	}
 	
 	@BeforeClass(groups={"it"})
 	public void initDriver(final ITestContext testNGCtx) throws Exception {
@@ -246,7 +252,7 @@ public class TestDriver {
 	 */
 	@Test(groups={"it"})
 	public void testFindPattern1() {
-		Assert.assertEquals(testPage.link.findLink("href"), "http://www.google.fr/");
+		Assert.assertEquals(testPage.link.findLink("href"), "http://www.google.fr");
 	}
 	
 	@Test(groups={"it"})
