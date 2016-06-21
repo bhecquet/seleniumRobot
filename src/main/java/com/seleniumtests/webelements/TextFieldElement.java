@@ -26,6 +26,10 @@ public class TextFieldElement extends HtmlElement {
         super(label, by);
     }
 
+    public TextFieldElement(final String label, final By by, final int index) {
+    	super(label, by, index);
+    }
+
     public void clear() {
         TestLogging.logWebStep(null, "Remove data From " + toHTML(), false);
         findElement();
