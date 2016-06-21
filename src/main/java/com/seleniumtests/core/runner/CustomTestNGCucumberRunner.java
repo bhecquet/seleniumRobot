@@ -191,10 +191,13 @@ public class CustomTestNGCucumberRunner {
 
     public void finish() {
         Formatter formatter = runtimeOptions.formatter(classLoader);
-
+        System.out.println(System.getProperty("file.encoding"));
         formatter.done();
         formatter.close();
         runtime.printSummary();
+        if (runtime.getSnippets().size() > 0) {
+        	throw new CucumberException("Some steps could not be found");
+        }
     }
 
     /**
