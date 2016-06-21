@@ -46,6 +46,7 @@ public class ReplayAction {
     		+ "&& !execution(* com.seleniumtests.webelements.HtmlElement.getBy (..))"
     		+ "&& !execution(* com.seleniumtests.webelements.HtmlElement.getLabel (..))"
     		+ "&& !execution(* com.seleniumtests.webelements.HtmlElement.getLocator (..))"
+    		+ "&& !execution(* com.seleniumtests.webelements.HtmlElement.waitForPresent (..))"
     		+ "&& !execution(* com.seleniumtests.webelements.HtmlElement.toHTML (..))"
     		+ "|| execution(public * com.seleniumtests.webelements.SelectList..* (..)) "
     		)

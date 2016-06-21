@@ -20,6 +20,8 @@ import java.util.ArrayList;
 import java.util.Date;
 
 import com.seleniumtests.browserfactory.*;
+
+import org.apache.log4j.Logger;
 import org.openqa.selenium.Platform;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
@@ -27,6 +29,8 @@ import org.openqa.selenium.support.events.WebDriverEventListener;
 
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.core.TestLogging;
+import com.seleniumtests.core.runner.CucumberRunner;
 import com.seleniumtests.helper.WaitHelper;
 
 /**
@@ -34,6 +38,7 @@ import com.seleniumtests.helper.WaitHelper;
  */
 public class WebUIDriver {
 
+	private static final Logger logger = TestLogging.getLogger(WebUIDriver.class);
     private static ThreadLocal<WebDriver> driverSession = new ThreadLocal<WebDriver>();
     private static ThreadLocal<WebUIDriver> uxDriverSession = new ThreadLocal<WebUIDriver>();
     private String node;
@@ -76,7 +81,7 @@ public class WebUIDriver {
      * @return  webDriver
      */
     public static WebDriver getNativeWebDriver() {
-        return ((CustomEventFiringWebDriver) getWebDriver(false)).getWebDriver();
+        return ((CustomEventFiringWebDriver) getWebDriver(true)).getWebDriver();
     }
 
     /**
@@ -85,7 +90,7 @@ public class WebUIDriver {
      * @return  webDriver
      */
     public static WebDriver getWebDriver() {
-        return getWebDriver(false);
+        return getWebDriver(true);
     }
 
     /**
@@ -205,12 +210,19 @@ public class WebUIDriver {
     }
 
     public WebDriver createWebDriver() throws Exception {
-        System.out.println(Thread.currentThread() + ":" + new Date() + ":::Start creating web driver instance: "
-                + this.getBrowser());
+    	if (config.getTestType().isMobile()) {
+    		logger.info("Start creating appium driver");
+    	} else {
+    		logger.info(String.format("Start creating %s driver", this.getBrowser()));
+    	}
+        
         driver = createRemoteWebDriver(config.getBrowser().getBrowserType(), config.getMode().name());
 
-        System.out.println(Thread.currentThread() + ":" + new Date() + ":::Finish creating web driver instance: "
-                + this.getBrowser());
+        if (config.getTestType().isMobile()) {
+    		logger.info("Finished creating appium driver");
+    	} else {
+    		logger.info(String.format("Finished creating %s driver", this.getBrowser()));
+    	}
 
         driverSession.set(driver);
         return driver;
