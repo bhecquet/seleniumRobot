@@ -13,7 +13,6 @@
 
 package com.seleniumtests.webelements;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -23,7 +22,6 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.ElementNotVisibleException;
 import org.openqa.selenium.InvalidElementStateException;
-import org.openqa.selenium.InvalidSelectorException;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.NoAlertPresentException;
 import org.openqa.selenium.Point;
@@ -35,9 +33,7 @@ import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.interactions.HasInputDevices;
 import org.openqa.selenium.interactions.Mouse;
 import org.openqa.selenium.internal.Locatable;
-import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.Wait;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
@@ -84,6 +80,16 @@ public class HtmlElement {
     	this(label, by, -1);
     }
     
+    /**
+     * Find element using BY locator. 
+     *
+     * @param   label  - element name for logging
+     * @param   by     - By type
+     * @param	index  - index of the element to find. In this case, robot will search the Nth element corresponding to
+     * 					 the By parameter. Equivalent to new HtmlElement(label, by).findElements().get(N)
+     *
+     * @sample  {@code new HtmlElement("UserId", By.id(userid), 2)}
+     */
     public HtmlElement(final String label, final By by, final int index) {
         this.label = label;
         this.by = by;
@@ -616,7 +622,8 @@ public class HtmlElement {
         
         // on mobile and some fields, this throws an exception which prevents going on
         try {
-	        if (!element.getAttribute("type").equalsIgnoreCase("file")) {
+        	String elType = element.getAttribute("type");
+	        if (elType != null && !elType.equalsIgnoreCase("file")) {
 	        	element.clear();
 	        }
         } catch (WebDriverException | NullPointerException e) {
