@@ -133,9 +133,9 @@ Below is an example of what has been generated for cucumber scenarios.
 
 ![](images/squashtm_select_test.png)
  
-If some of the tests should not be available in Squash TA, precede them with the comment: 
+If some of the tests should not be available in Squash TA, add parameter inside test: 
 
-    <!-- EXCLUDE_FROM_SQUASH_TA -->
+    <parameter name="EXCLUDE_FROM_SQUASH_TA" value="" />
 
 ![](images/exclude_testng.png)
  
