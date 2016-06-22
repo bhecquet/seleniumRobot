@@ -873,6 +873,10 @@ public class SeleniumTestsContext {
     	setAttribute(MOBILE_PLATFORM_VERSION, version);
     }
     
+    public void setSolftAssertEnabled(final Boolean enabled) {
+    	setAttribute(SOFT_ASSERT_ENABLED, enabled.toString());
+    }
+    
     /**
      * Read configuration from environment specific data and undefined parameters present un testng xml file
      */

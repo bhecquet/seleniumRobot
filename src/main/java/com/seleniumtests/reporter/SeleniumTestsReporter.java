@@ -183,49 +183,66 @@ public class SeleniumTestsReporter implements IReporter, ITestListener, IInvoked
             testResults.addAll(resultMap.getAllResults());
         }
     }
+    
+    /**
+     * In case test result is SUCCESS but some softAssertions were raised, change test result to 
+     * FAILED
+     * 
+     * @param result
+     */
+    public void changeTestResult(final ITestResult result) {
+    	List<Throwable> verificationFailures = CustomAssertion.getVerificationFailures();
+        
+        int size = verificationFailures.size();
+        if (size == 0) {
+            return;
+        } else if (result.getStatus() == TestResult.FAILURE) {
+            return;
+        }
 
+        result.setStatus(TestResult.FAILURE);
+
+        if (size == 1) {
+            result.setThrowable(verificationFailures.get(0));
+        } else {
+
+            // create failure message with all failures and stack traces barring last failure)
+            StringBuilder failureMessage = new StringBuilder("!!! Many Test Failures (").append(size).append(
+                    "):nn");
+            for (int i = 0; i < size - 1; i++) {
+                failureMessage.append("Failure ").append(i + 1).append(" of ").append(size).append(":n");
+
+                Throwable t = verificationFailures.get(i);
+                String fullStackTrace = Utils.stackTrace(t, false)[1];
+                failureMessage.append(fullStackTrace).append("nn");
+            }
+
+            // final failure
+            Throwable last = verificationFailures.get(size - 1);
+            failureMessage.append("Failure ").append(size).append(" of ").append(size).append(":n");
+            failureMessage.append(last.toString());
+
+            // set merged throwable
+            Throwable merged = new Throwable(failureMessage.toString());
+            merged.setStackTrace(last.getStackTrace());
+
+            result.setThrowable(merged);
+        }
+        
+        // move test for passedTests to failedTests if test is not already in failed tests
+        if (result.getTestContext().getPassedTests().getAllMethods().contains(result.getMethod())) {
+        	result.getTestContext().getPassedTests().removeResult(result);
+        	result.getTestContext().getFailedTests().addResult(result, result.getMethod());
+        }
+
+    }
+   
     public void afterInvocation(final IInvokedMethod method, final ITestResult result) {
         Reporter.setCurrentTestResult(result);
 
         // Handle Soft CustomAssertion
         if (method.isTestMethod()) {
-            List<Throwable> verificationFailures = CustomAssertion.getVerificationFailures();
-
-            int size = verificationFailures.size();
-            if (size == 0) {
-                return;
-            } else if (result.getStatus() == TestResult.FAILURE) {
-                return;
-            }
-
-            result.setStatus(TestResult.FAILURE);
-
-            if (size == 1) {
-                result.setThrowable(verificationFailures.get(0));
-            } else {
-
-                // create failure message with all failures and stack traces barring last failure)
-                StringBuilder failureMessage = new StringBuilder("!!! Many Test Failures (").append(size).append(
-                        "):nn");
-                for (int i = 0; i < size - 1; i++) {
-                    failureMessage.append("Failure ").append(i + 1).append(" of ").append(size).append(":n");
-
-                    Throwable t = verificationFailures.get(i);
-                    String fullStackTrace = Utils.stackTrace(t, false)[1];
-                    failureMessage.append(fullStackTrace).append("nn");
-                }
-
-                // final failure
-                Throwable last = verificationFailures.get(size - 1);
-                failureMessage.append("Failure ").append(size).append(" of ").append(size).append(":n");
-                failureMessage.append(last.toString());
-
-                // set merged throwable
-                Throwable merged = new Throwable(failureMessage.toString());
-                merged.setStackTrace(last.getStackTrace());
-
-                result.setThrowable(merged);
-            }
+            changeTestResult(result);
         }
     }
 

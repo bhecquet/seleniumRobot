@@ -191,7 +191,6 @@ public class CustomTestNGCucumberRunner {
 
     public void finish() {
         Formatter formatter = runtimeOptions.formatter(classLoader);
-        System.out.println(System.getProperty("file.encoding"));
         formatter.done();
         formatter.close();
         runtime.printSummary();
