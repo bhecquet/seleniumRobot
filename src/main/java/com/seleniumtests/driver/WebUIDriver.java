@@ -378,7 +378,9 @@ public class WebUIDriver {
         config.setBrowserVersion(browserVersion);
 
         String webPlatform = SeleniumTestsContextManager.getThreadContext().getPlatform();
-        if (webPlatform != null) {
+        
+        // this configuration is only used for web tests
+        if (webPlatform != null && !webPlatform.toLowerCase().contains("ios")) {
             config.setWebPlatform(Platform.fromString(webPlatform));
         }
 

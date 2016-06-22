@@ -19,6 +19,9 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 
 import com.seleniumtests.driver.DriverConfig;
 
+import io.appium.java_client.remote.AndroidMobileCapabilityType;
+import io.appium.java_client.remote.MobileCapabilityType;
+
 /**
  * Sets Android capabilities.
  */
@@ -38,35 +41,36 @@ public class AndroidCapabilitiesFactory implements ICapabilitiesFactory {
 
     	DesiredCapabilities caps = new DesiredCapabilities(this.capabilities);
     	if (Integer.parseInt(cfg.getMobilePlatformVersion().substring(0, 1)) < 4) {
-    		caps.setCapability("automationName", "Selendroid");
+    		caps.setCapability(MobileCapabilityType.AUTOMATION_NAME, "Selendroid");
     	} else {
-    		caps.setCapability("automationName", "Appium");
+    		caps.setCapability(MobileCapabilityType.AUTOMATION_NAME, "Appium");
     	}
     	
-    	caps.setCapability("fullReset", "true");
-    	caps.setCapability("platformName", cfg.getPlatform());
+    	caps.setCapability(MobileCapabilityType.FULL_RESET, "true");
+    	caps.setCapability(MobileCapabilityType.PLATFORM_NAME, cfg.getPlatform());
 
         // Set up version and device name else appium server would pick the only available emulator/device
         // Both of these are ignored for android for now
-    	caps.setCapability("platformVersion", cfg.getMobilePlatformVersion());
-    	caps.setCapability("deviceName", cfg.getDeviceName());
+    	caps.setCapability(MobileCapabilityType.PLATFORM_VERSION, cfg.getMobilePlatformVersion());
+    	caps.setCapability(MobileCapabilityType.DEVICE_NAME, cfg.getDeviceName());
 
+    	// in case app has not been specified for cloud provider
         String app = cfg.getApp();
         if (caps.getCapability("app") == null) {
         	caps.setCapability("app", app);
         }
-        caps.setCapability("appPackage", cfg.getAppPackage());
-        caps.setCapability("appActivity", cfg.getAppActivity());
+        caps.setCapability(AndroidMobileCapabilityType.APP_PACKAGE, cfg.getAppPackage());
+        caps.setCapability(AndroidMobileCapabilityType.APP_ACTIVITY, cfg.getAppActivity());
         
         if (cfg.getAppWaitActivity() != null) {
-        	caps.setCapability("appWaitActivity", cfg.getAppWaitActivity());
+        	caps.setCapability(AndroidMobileCapabilityType.APP_WAIT_ACTIVITY, cfg.getAppWaitActivity());
         }
 
         // do not configure application and browser as they are mutualy exclusive
         if (app != null && app.trim().equals("")) {
         	caps.setCapability(CapabilityType.BROWSER_NAME, cfg.getBrowser());
         }
-        caps.setCapability("newCommandTimeout", cfg.getNewCommandTimeout());
+        caps.setCapability(MobileCapabilityType.NEW_COMMAND_TIMEOUT, cfg.getNewCommandTimeout());
 
         return caps;
 
