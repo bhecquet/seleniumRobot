@@ -55,9 +55,14 @@ public class SauceLabsDriverFactory extends AbstractWebDriverFactory implements 
     
     private DesiredCapabilities cloudSpecificCapabilities() {
     	DesiredCapabilities capabilities = new DesiredCapabilities();
-    	capabilities.setCapability("app-package", webDriverConfig.getAppPackage());
-        capabilities.setCapability("app-activity", webDriverConfig.getAppActivity());
-        capabilities.setCapability("app-wait-activity", webDriverConfig.getAppWaitActivity());
+    	
+    	if (webDriverConfig.getPlatform().equalsIgnoreCase("android")) {
+	    	capabilities.setCapability("app-package", webDriverConfig.getAppPackage());
+	        capabilities.setCapability("app-activity", webDriverConfig.getAppActivity());
+	        capabilities.setCapability("app-wait-activity", webDriverConfig.getAppWaitActivity());
+    	} else if (webDriverConfig.getPlatform().equalsIgnoreCase("ios")) {
+    		capabilities = DesiredCapabilities.iphone();
+    	}
         capabilities.setCapability("app", "sauce-storage:" + new File(webDriverConfig.getApp()).getName()); //  saucelabs waits for app capability a special file: sauce-storage:<filename>
         return capabilities;
     }
