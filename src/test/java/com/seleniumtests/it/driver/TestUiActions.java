@@ -17,6 +17,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.interactions.Actions;
 import org.testng.Assert;
+import org.testng.ITestContext;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -29,7 +30,9 @@ public class TestUiActions {
 	private WebDriver driver;
 	
 	@BeforeClass(groups={"it"})
-	public void initDriver() throws Exception {
+	public void initDriver(final ITestContext testNGCtx) throws Exception {
+		SeleniumTestsContextManager.initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setAttribute("browser", "chrome");
 		driver = WebUIDriver.getWebDriver(true);
 		if (SeleniumTestsContextManager.getThreadContext().getBrowser().contains("firefox")) {
 			driver.get("file://" + Thread.currentThread().getContextClassLoader().getResource("tu/test.html").getFile());

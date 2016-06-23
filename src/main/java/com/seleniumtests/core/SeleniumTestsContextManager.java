@@ -232,4 +232,8 @@ public class SeleniumTestsContextManager {
     public static boolean isWebTest() {
         return (getThreadContext().getTestType().equals(TestType.WEB));
     }
+    
+    public static boolean isMobileAppTest() {
+    	return (getThreadContext().getTestType().family().equals(TestType.APP));
+    }
 }

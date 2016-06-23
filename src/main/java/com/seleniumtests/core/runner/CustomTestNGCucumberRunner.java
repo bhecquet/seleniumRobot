@@ -191,10 +191,12 @@ public class CustomTestNGCucumberRunner {
 
     public void finish() {
         Formatter formatter = runtimeOptions.formatter(classLoader);
-
         formatter.done();
         formatter.close();
         runtime.printSummary();
+        if (runtime.getSnippets().size() > 0) {
+        	throw new CucumberException("Some steps could not be found");
+        }
     }
 
     /**

@@ -845,11 +845,11 @@ public class SeleniumTestsContext {
 
     }
 
-    public void setExplicitWaitTimeout(final double timeout) {
-        setAttribute(EXPLICIT_WAIT_TIME_OUT, timeout);
+    public void setExplicitWaitTimeout(final Integer timeout) {
+        setAttribute(EXPLICIT_WAIT_TIME_OUT, timeout.toString());
     }
 
-    public void setImplicitWaitTimeout(final double timeout) {
+    public void setImplicitWaitTimeout(final int timeout) {
         setAttribute(IMPLICIT_WAIT_TIME_OUT, timeout);
     }
 
@@ -871,6 +871,10 @@ public class SeleniumTestsContext {
     
     public void setMobilePlatformVersion(final String version) {
     	setAttribute(MOBILE_PLATFORM_VERSION, version);
+    }
+    
+    public void setSolftAssertEnabled(final Boolean enabled) {
+    	setAttribute(SOFT_ASSERT_ENABLED, enabled.toString());
     }
     
     /**

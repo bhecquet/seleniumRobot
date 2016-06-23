@@ -29,16 +29,15 @@ import org.openqa.selenium.support.events.WebDriverEventListener;
 
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
-import com.seleniumtests.core.SeleniumTestsPageListener;
 import com.seleniumtests.core.TestLogging;
 import com.seleniumtests.helper.WaitHelper;
-import com.seleniumtests.webelements.PageObject;
 
 /**
  * This class provides factory to create webDriver session.
  */
 public class WebUIDriver {
 
+	private static final Logger logger = TestLogging.getLogger(WebUIDriver.class);
     private static ThreadLocal<WebDriver> driverSession = new ThreadLocal<WebDriver>();
     private static ThreadLocal<WebUIDriver> uxDriverSession = new ThreadLocal<WebUIDriver>();
     private String node;
@@ -81,7 +80,7 @@ public class WebUIDriver {
      * @return  webDriver
      */
     public static WebDriver getNativeWebDriver() {
-        return ((CustomEventFiringWebDriver) getWebDriver(false)).getWebDriver();
+        return ((CustomEventFiringWebDriver) getWebDriver(true)).getWebDriver();
     }
 
     /**
@@ -90,7 +89,7 @@ public class WebUIDriver {
      * @return  webDriver
      */
     public static WebDriver getWebDriver() {
-        return getWebDriver(false);
+        return getWebDriver(true);
     }
 
     /**
@@ -210,12 +209,19 @@ public class WebUIDriver {
     }
 
     public WebDriver createWebDriver() throws Exception {
-        System.out.println(Thread.currentThread() + ":" + new Date() + ":::Start creating web driver instance: "
-                + this.getBrowser());
+    	if (config.getTestType().isMobile()) {
+    		logger.info("Start creating appium driver");
+    	} else {
+    		logger.info(String.format("Start creating %s driver", this.getBrowser()));
+    	}
+        
         driver = createRemoteWebDriver(config.getBrowser().getBrowserType(), config.getMode().name());
 
-        System.out.println(Thread.currentThread() + ":" + new Date() + ":::Finish creating web driver instance: "
-                + this.getBrowser());
+        if (config.getTestType().isMobile()) {
+    		logger.info("Finished creating appium driver");
+    	} else {
+    		logger.info(String.format("Finished creating %s driver", this.getBrowser()));
+    	}
 
         driverSession.set(driver);
         return driver;
@@ -371,7 +377,9 @@ public class WebUIDriver {
         config.setBrowserVersion(browserVersion);
 
         String webPlatform = SeleniumTestsContextManager.getThreadContext().getPlatform();
-        if (webPlatform != null) {
+        
+        // this configuration is only used for web tests
+        if (webPlatform != null && !webPlatform.toLowerCase().contains("ios")) {
             config.setWebPlatform(Platform.fromString(webPlatform));
         }
 

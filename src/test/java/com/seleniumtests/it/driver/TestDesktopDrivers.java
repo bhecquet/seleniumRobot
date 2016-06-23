@@ -30,7 +30,7 @@ public class TestDesktopDrivers extends GenericTest {
 		SeleniumTestsContextManager.initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setAttribute("browser", "*firefox");
 		driver = WebUIDriver.getWebDriver(true);
-		Assert.assertEquals(driver.getCurrentUrl(), "about:blank");
+		Assert.assertTrue(driver.getCurrentUrl().equals("about:blank") || driver.getCurrentUrl().contains("http"));
 	}
 	
 	@Test(groups={"it"})

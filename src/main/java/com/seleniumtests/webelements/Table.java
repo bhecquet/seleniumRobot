@@ -113,6 +113,9 @@ public class Table extends HtmlElement {
     }
 
     public List<WebElement> getRows() {
+    	if (rows == null) {
+            findElement();
+        }
         return rows;
     }
 
