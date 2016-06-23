@@ -30,7 +30,6 @@ import org.openqa.selenium.support.events.WebDriverEventListener;
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.TestLogging;
-import com.seleniumtests.core.runner.CucumberRunner;
 import com.seleniumtests.helper.WaitHelper;
 
 /**
@@ -75,7 +74,7 @@ public class WebUIDriver {
         uxDriverSession.remove();
     }
 
-    /**
+	/**
      * Returns native WebDriver which can be converted to RemoteWebDriver.
      *
      * @return  webDriver
