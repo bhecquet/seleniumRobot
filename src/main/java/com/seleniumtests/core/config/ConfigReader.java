@@ -19,16 +19,19 @@ import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.ini4j.Config;
 import org.ini4j.Ini;
 import org.ini4j.InvalidFileFormatException;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.ConfigurationException;
+import com.seleniumtests.webelements.PageObject;
 
 public class ConfigReader {
 	
 	private static final String GLOBAL_SECTION_NAME = "General";
+	private static final Logger logger = Logger.getLogger(ConfigReader.class);
 
 	public HashMap<String, String> readConfig(InputStream iniFileStream) {
 		return readConfig(iniFileStream, SeleniumTestsContextManager.getThreadContext().getTestEnv());
@@ -59,14 +62,20 @@ public class ConfigReader {
 			}
 			
 			// then overwrite global options with local ones
+			boolean envFound = false;
 			for (Ini.Entry<String, Ini.Section> section: sections) {
 				
 				if (section.getKey().equals(environment)) {
+					envFound = true;
 					for (Ini.Entry<String, String> sectionOption: section.getValue().entrySet()) {
 						testConfig.put(sectionOption.getKey(), sectionOption.getValue());
 					}
 				}
 			}
+			if (!envFound) {
+				logger.warn(String.format("No section in config.ini file matches the environment '%s'", environment));
+			}
+			
 			return testConfig;
 		} catch (InvalidFileFormatException e) {
 			throw new ConfigurationException("Invalid file: " + iniFileStream);
