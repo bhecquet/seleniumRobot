@@ -58,6 +58,7 @@
     </repositories>
     
     <properties>
+    	<jacoco.version>0.7.7.201606060606</jacoco.version>
     	<selenium.version>2.53.0</selenium.version>
     	<htmlunitdriver.version>2.20</htmlunitdriver.version>
     	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -66,8 +67,10 @@
 		<sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
     	<sonar.jacoco.reportPath>${project.build.directory}/coverage-reports/jacoco-ut.exec</sonar.jacoco.reportPath>
     	<sonar.jacoco.itReportPath>${project.build.directory}/coverage-reports/jacoco-it.exec</sonar.jacoco.itReportPath>
-    	<surefireArgLine></surefireArgLine> <!-- stub values to allow launching unit test from eclipse -->
-    	<failsafeArgLine></failsafeArgLine> <!-- stub values to allow launching unit test from eclipse -->
+    	<!-- <surefireArgLine>-javaagent:${settings.localRepository}/org/jacoco/org.jacoco.agent/${jacoco.version}\\org.jacoco.agent-${jacoco.version}-runtime.jar=destfile=${project.build.directory}/coverage-reports/jacoco-ut.exec</surefireArgLine> 
+    	<failsafeArgLine>-javaagent:${settings.localRepository}/org/jacoco/org.jacoco.agent/${jacoco.version}\\org.jacoco.agent-${jacoco.version}-runtime.jar=destfile=${project.build.directory}/coverage-reports/jacoco-it.exec</failsafeArgLine> --> 
+    	<surefireArgLine></surefireArgLine> 
+    	<failsafeArgLine></failsafeArgLine> 
     </properties>
 
 	<dependencies>
@@ -263,7 +266,7 @@
 							<value>false</value>
 						</property>
 					</properties>
-					<argLine>${surefireArgLine}</argLine>
+					<argLine>@{surefireArgLine}</argLine>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -286,7 +289,7 @@
 									<value>false</value>
 								</property>
 							</properties>
-							<argLine>${failsafeArgLine}</argLine>
+							<argLine>@{failsafeArgLine}</argLine>
 						</configuration>
 					</execution>
 				</executions>
@@ -294,7 +297,7 @@
 			<plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.7.7.201606060606</version>
+                <version>${jacoco.version}</version>
                                   
                 <executions>
                     <execution>
