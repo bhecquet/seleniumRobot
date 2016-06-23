@@ -13,6 +13,8 @@
 
 package com.seleniumtests.webelements;
 
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -29,11 +31,14 @@ import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.firefox.MarionetteDriver;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.interactions.HasInputDevices;
 import org.openqa.selenium.interactions.Mouse;
 import org.openqa.selenium.internal.Locatable;
+import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.SystemClock;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
@@ -53,17 +58,15 @@ import com.thoughtworks.selenium.webdriven.JavascriptLibrary;
  */
 public class HtmlElement {
 
-    private static final int EXPLICIT_WAIT_TIME_OUT = WebUIDriver
-        .getWebUIDriver().getExplicitWait();
     protected static final Logger logger = TestLogging.getLogger(
             HtmlElement.class);
 
 
     protected WebDriver driver = WebUIDriver.getWebDriver();
-    protected WebUIDriver webUXDriver = WebUIDriver.getWebUIDriver();
     protected WebElement element = null;
     private String label = null;
     private HtmlElement parent = null;
+    private static SystemClock clock = new SystemClock();
     private int elementIndex = -1;
     private By by = null;
 
@@ -169,9 +172,9 @@ public class HtmlElement {
 
             if (((type == BrowserType.Chrome) ||
                         (type == BrowserType.InternetExplore)) &&
-                    this.getDriver().switchTo().alert().getText().contains(
+                    driver.switchTo().alert().getText().contains(
                         "leave")) {
-                this.getDriver().switchTo().alert().accept();
+                driver.switchTo().alert().accept();
             }
         } catch (NoAlertPresentException e) {
             e.printStackTrace();
@@ -200,9 +203,14 @@ public class HtmlElement {
     	element.click();
     	JavascriptExecutor js = (JavascriptExecutor) driver;
         js.executeScript("arguments[0].focus();", element);
-
-		// use keyboard to type
-		((CustomEventFiringWebDriver)driver).getKeyboard().sendKeys(keysToSend);
+        
+        if (((CustomEventFiringWebDriver)driver).getWebDriver() instanceof MarionetteDriver) {
+        	logger.warn("using specific Marionette method");
+        	js.executeScript(String.format("arguments[0].value='%s';", keysToSend[0].toString()), element);
+        } else {
+			// use keyboard to type
+			((CustomEventFiringWebDriver)driver).getKeyboard().sendKeys(keysToSend);
+        }
     }
 
     public void simulateMoveToElement(final int x, final int y) {
@@ -372,7 +380,11 @@ public class HtmlElement {
         return WebUIDriver.getWebDriver();
     }
 
-    /**
+    public void setDriver(WebDriver driver) {
+		this.driver = driver;
+	}
+
+	/**
      * Returns the underlying WebDriver WebElement.
      *
      * @return
@@ -524,8 +536,8 @@ public class HtmlElement {
     		return false;
     	}
     }
-    public boolean isElementPresent() {       
-    	return isElementPresent(EXPLICIT_WAIT_TIME_OUT);
+    public boolean isElementPresent() { 
+    	return isElementPresent(WebUIDriver.getWebUIDriver().getExplicitWait());
     }
 
     /**
@@ -710,7 +722,7 @@ public class HtmlElement {
      * Wait element to present using Explicit Waits with default EXPLICIT_WAIT_TIME_OUT = 15 seconds.
      */
     public void waitForPresent() {
-        waitForPresent(EXPLICIT_WAIT_TIME_OUT);
+        waitForPresent(WebUIDriver.getWebUIDriver().getExplicitWait());
     }
 
     /**
@@ -722,5 +734,6 @@ public class HtmlElement {
 
         WebDriverWait wait = new WebDriverWait(driver, timeout);
         wait.until(ExpectedConditions.presenceOfElementLocated(by));
+        
     }
 }
