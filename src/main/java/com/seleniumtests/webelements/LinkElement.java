@@ -1,5 +1,6 @@
 /*
- * Copyright 2015 www.seleniumtests.com
+ * Orignal work: Copyright 2015 www.seleniumtests.com
+ * Modified work: Copyright 2016 www.infotel.com
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -21,6 +22,10 @@ public class LinkElement extends HtmlElement {
 
     public LinkElement(final String label, final By by) {
         super(label, by);
+    }
+
+    public LinkElement(final String label, final By by, final int index) {
+    	super(label, by, index);
     }
 
     @Override

@@ -93,9 +93,9 @@ public class FirefoxCapabilitiesFactory implements ICapabilitiesFactory {
         capability = new DesiredCapabilities();
         capability.setBrowserName(DesiredCapabilities.firefox().getBrowserName());
 
-        FirefoxProfile profile = getFirefoxProfile(webDriverConfig);
-        configProfile(profile, webDriverConfig);
-        capability.setCapability(FirefoxDriver.PROFILE, profile);
+//        FirefoxProfile profile = getFirefoxProfile(webDriverConfig);
+//        configProfile(profile, webDriverConfig);
+//        capability.setCapability(FirefoxDriver.PROFILE, profile);
 
         if (webDriverConfig.isEnableJavascript()) {
             capability.setJavascriptEnabled(true);

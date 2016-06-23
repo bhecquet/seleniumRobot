@@ -17,11 +17,15 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.NoSuchSessionException;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.WebDriverException;
+import org.openqa.selenium.remote.SessionNotFoundException;
 import org.openqa.selenium.remote.UnreachableBrowserException;
 import org.openqa.selenium.support.ui.SystemClock;
 
+import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.helper.WaitHelper;
 
 /**
@@ -44,8 +48,11 @@ public class ReplayAction {
     @Around("execution(public * com.seleniumtests.webelements.HtmlElement..* (..)) "
     		+ "&& !execution(* com.seleniumtests.webelements.HtmlElement.toString (..))"
     		+ "&& !execution(* com.seleniumtests.webelements.HtmlElement.getBy (..))"
+    		+ "&& !execution(* com.seleniumtests.webelements.HtmlElement.setDriver (..))"
+    		+ "&& !execution(* com.seleniumtests.webelements.HtmlElement.getDriver (..))"
     		+ "&& !execution(* com.seleniumtests.webelements.HtmlElement.getLabel (..))"
     		+ "&& !execution(* com.seleniumtests.webelements.HtmlElement.getLocator (..))"
+    		+ "&& !execution(* com.seleniumtests.webelements.HtmlElement.waitForPresent ())"
     		+ "&& !execution(* com.seleniumtests.webelements.HtmlElement.toHTML (..))"
     		+ "|| execution(public * com.seleniumtests.webelements.SelectList..* (..)) "
     		)
@@ -53,6 +60,11 @@ public class ReplayAction {
     	
     	long end = systemClock.laterBy(30000);
     	Object reply = null;
+    	
+    	// update driver reference of the element
+    	// corrects bug of waitElementPresent which threw a SessionNotFoundError because driver reference were not
+    	// updated before searching element (it used the driver reference of an old test session)
+    	((HtmlElement)joinPoint.getTarget()).setDriver(WebUIDriver.getWebDriver());
     	
     	while (systemClock.isNowBefore(end)) {
 	    	
@@ -62,7 +74,16 @@ public class ReplayAction {
 	    		break;
 	    	} catch (UnhandledAlertException e) {
 	    		throw e;
-	    	} catch (WebDriverException e) {
+	    	} catch (WebDriverException e) { 
+	    		
+	    		// don't prevent TimeoutException to be thrown when coming from waitForPresent
+	    		// only check that cause is the not found element and not an other error (NoSucheSessionError for example)
+	    		if (e instanceof TimeoutException && joinPoint.getSignature().getName().equals("waitForPresent")) {
+	    			if (e.getCause() instanceof NoSuchElementException) {
+	    				throw e;
+	    			}
+	    		}
+
 	    		if (systemClock.isNowBefore(end)) {
 	    			WaitHelper.waitForMilliSeconds(100);
 					continue;
