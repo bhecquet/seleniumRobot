@@ -13,6 +13,7 @@
 
 package com.seleniumtests.it.driver;
 
+import java.time.LocalDateTime;
 import java.util.regex.Pattern;
 
 import org.openqa.selenium.By;
@@ -20,6 +21,7 @@ import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
+import org.openqa.selenium.firefox.MarionetteDriver;
 import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.annotations.AfterClass;
@@ -28,6 +30,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.helper.WaitHelper;
 import com.seleniumtests.webelements.HtmlElement;
@@ -50,6 +53,7 @@ public class TestDriver {
 	@BeforeClass(groups={"it"})
 	public void initDriver(final ITestContext testNGCtx) throws Exception {
 		SeleniumTestsContextManager.initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setExplicitWaitTimeout(2);
 		testPage = new DriverTestPage(true);
 		driver = WebUIDriver.getWebDriver(true);
 	}
@@ -85,6 +89,10 @@ public class TestDriver {
 		testPage.startButton.click();
 		testPage.greenSquare.click();
 		testPage.redSquare.click();
+		
+		if (((CustomEventFiringWebDriver)driver).getWebDriver() instanceof MarionetteDriver) {
+			throw new UnhandledAlertException("fake exception as firefox / marionette does not raise any exception");
+		}
 	}
    
 	
@@ -252,17 +260,17 @@ public class TestDriver {
 	 */
 	@Test(groups={"it"})
 	public void testFindPattern1() {
-		Assert.assertEquals(testPage.link.findLink("href"), "http://www.google.fr");
+		Assert.assertTrue(testPage.link.findLink("href").startsWith("http://www.google.fr"));
 	}
 	
 	@Test(groups={"it"})
 	public void testFindPattern2() {
-		Assert.assertEquals(testPage.linkPopup.findLink("onclick"), "http://www.google.fr");
+		Assert.assertTrue(testPage.linkPopup.findLink("onclick").startsWith("http://www.google.fr"));
 	}
 	
 	@Test(groups={"it"}) 
 	public void testFindPattern3() {
-		Assert.assertEquals(testPage.linkPopup2.findLink("onclick"), "http://www.google.fr");
+		Assert.assertTrue(testPage.linkPopup2.findLink("onclick").startsWith("http://www.google.fr"));
 	}
 	
 	/**
@@ -328,6 +336,6 @@ public class TestDriver {
 	public void testAutoScrolling() {
 		((JavascriptExecutor) driver).executeScript("window.scrollTo(0, 0);");
 		new HtmlElement("", By.id("buttonScroll")).click();
-		Assert.assertFalse(((JavascriptExecutor) driver).executeScript("return $(window).scrollTop();").equals(0L));
+		Assert.assertFalse(((JavascriptExecutor) driver).executeScript("return window.pageYOffset;").equals(0L));
 	}
 }

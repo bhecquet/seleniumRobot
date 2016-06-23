@@ -53,7 +53,7 @@ public class IOsCapabilitiesFactory implements ICapabilitiesFactory {
         }
 
     	// do not configure application and browser as they are mutualy exclusive
-        if (app == null || (app != null && app.trim().equals(""))) {
+        if (app == null || app.trim().equals("")) {
         	caps.setCapability(CapabilityType.BROWSER_NAME, cfg.getBrowser());
         } else {
         	caps.setCapability(CapabilityType.BROWSER_NAME, "");
