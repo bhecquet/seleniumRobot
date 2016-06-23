@@ -70,7 +70,7 @@ public class DriverConfig {
     private String appPackage;
     private String appActivity;
     private String appWaitActivity;
-    private String newCommandTimeout;
+    private Integer newCommandTimeout;
 
     private String platform;
     private String version;
@@ -394,11 +394,11 @@ public class DriverConfig {
         this.appActivity = appActivity;
     }
 
-    public String getNewCommandTimeout() {
+    public Integer getNewCommandTimeout() {
         return newCommandTimeout;
     }
 
-    public void setNewCommandTimeout(final String newCommandTimeout) {
+    public void setNewCommandTimeout(final Integer newCommandTimeout) {
         this.newCommandTimeout = newCommandTimeout;
     }
 

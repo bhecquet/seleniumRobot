@@ -43,7 +43,7 @@ public enum BrowserType {
         } else if (browserType.equalsIgnoreCase("*phantomjs") || browserType.equalsIgnoreCase("phantomjs")) {
             return BrowserType.PhantomJS;
         } else {
-            return BrowserType.FireFox;
+            throw new IllegalArgumentException(String.format("browser %s is unknown", browserType));
         }
     }
 

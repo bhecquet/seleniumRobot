@@ -31,7 +31,7 @@ public class ConfigReader {
 	private static final String GLOBAL_SECTION_NAME = "General";
 
 	public HashMap<String, String> readConfig(InputStream iniFileStream) {
-		return readConfig(iniFileStream, SeleniumTestsContextManager.getThreadContext().getTestEnvironment());
+		return readConfig(iniFileStream, SeleniumTestsContextManager.getThreadContext().getTestEnv());
 	}
 	
 	public HashMap<String, String> readConfig(InputStream iniFileStream, String environment) {
