@@ -4,6 +4,8 @@ import java.io.File;
 import java.nio.file.Paths;
 import java.util.HashMap;
 
+import org.ini4j.InvalidFileFormatException;
+
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.ConfigurationException;
@@ -59,6 +61,7 @@ public class ConfigMobileReader {
 	 * @return the HashMap with all properties corresponding with the mobile using 
 	 */
 	public HashMap<String, HashMap<String,String>> readConfig(String type, String version){
+		
 		//create HashMap for result
 		HashMap<String, HashMap<String,String>> testConfig = new HashMap<String, HashMap<String,String>>();
 		
@@ -116,8 +119,13 @@ public class ConfigMobileReader {
 			System.out.println("No such file : " + fileForIni);
 		}
 		
-		return testConfig;
+		try{
+			return testConfig;
 		}
+		catch(NullPointerException e){
+			throw new ConfigurationException("There is no mapping file (neither corresponding nor inheriting) for : "+ type + " " + version);
+		}
+	}
 	
 		
 }

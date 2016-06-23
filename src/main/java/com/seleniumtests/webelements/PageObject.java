@@ -234,19 +234,20 @@ public class PageObject extends BasePage implements IPage {
 
     }
 
-    public final void close() throws NotCurrentPageException {
+    public final void close() throws NotCurrentPageException { 
+    	
         if (WebUIDriver.getWebDriver() == null) {
             return;
         }
 
         SeleniumTestsPageListener.informPageUnload(this);
-        TestLogging.log("close web page");
+        TestLogging.logWebOutput(url, title +" close web page", false);
 
         boolean isMultipleWindow = false;
         if (driver.getWindowHandles().size() > 1) {
             isMultipleWindow = true;
         }
-
+        
         try {
             driver.close();
         } catch (WebDriverException ignore) { }
@@ -267,6 +268,8 @@ public class PageObject extends BasePage implements IPage {
             WebUIDriver.setWebDriver(null);
 
         }
+        
+
     }
 
     /**
