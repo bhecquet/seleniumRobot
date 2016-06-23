@@ -20,6 +20,8 @@ import java.util.ArrayList;
 import java.util.Date;
 
 import com.seleniumtests.browserfactory.*;
+
+import org.apache.log4j.Logger;
 import org.openqa.selenium.Platform;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
@@ -27,7 +29,10 @@ import org.openqa.selenium.support.events.WebDriverEventListener;
 
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.core.SeleniumTestsPageListener;
+import com.seleniumtests.core.TestLogging;
 import com.seleniumtests.helper.WaitHelper;
+import com.seleniumtests.webelements.PageObject;
 
 /**
  * This class provides factory to create webDriver session.
@@ -70,7 +75,7 @@ public class WebUIDriver {
         uxDriverSession.remove();
     }
 
-    /**
+	/**
      * Returns native WebDriver which can be converted to RemoteWebDriver.
      *
      * @return  webDriver
