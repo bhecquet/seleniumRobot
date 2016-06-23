@@ -1156,7 +1156,13 @@ public class SeleniumTestsReporter implements IReporter, ITestListener, IInvoked
 
     public void onTestStart(final ITestResult arg0) { }
 
-    public void onTestSuccess(final ITestResult arg0) { }
+    public void onTestSuccess(final ITestResult arg0) {
+    	 // capture snap shot at the end of the test
+        if (WebUIDriver.getWebDriver() != null) {
+            ScreenShot screenShot = new ScreenshotUtil().captureWebPageSnapshot();
+            TestLogging.logWebOutput(screenShot.getTitle(), screenShot.getTitle()+" ("+ TestLogging.buildScreenshotLog(screenShot)+")", false);
+        }
+    }
 
     /**
      * Remote failed test cases in TestNG.
@@ -1167,7 +1173,6 @@ public class SeleniumTestsReporter implements IReporter, ITestListener, IInvoked
      */
     private void removeFailedTestsInTestNG(final ITestContext tc) {
         IResultMap returnValue = tc.getFailedTests();
-
         ResultMap removeMap = new ResultMap();
         for (ITestResult result : returnValue.getAllResults()) {
             boolean isFailed = false;
