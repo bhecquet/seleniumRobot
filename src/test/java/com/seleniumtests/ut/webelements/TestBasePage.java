@@ -22,7 +22,7 @@ public class TestBasePage {
 	@BeforeClass(groups={"ut"})
 	public static void initDriver(final ITestContext testNGCtx) throws Exception {
 		SeleniumTestsContextManager.initThreadContext(testNGCtx);
-		SeleniumTestsContextManager.getThreadContext().setAttribute("browser", "htmlunit");
+		SeleniumTestsContextManager.getThreadContext().setBrowser("htmlunit");
 		testPage = new DriverTestPage(true);
 		driver = WebUIDriver.getWebDriver(true);
 		testDriverIt = new TestDriver(driver, testPage);

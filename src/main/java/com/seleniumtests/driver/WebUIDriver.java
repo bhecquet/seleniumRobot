@@ -384,23 +384,11 @@ public class WebUIDriver {
             config.setWebPlatform(Platform.fromString(webPlatform));
         }
 
-        if ("false".equalsIgnoreCase(
-                    (String) SeleniumTestsContextManager.getThreadContext().getAttribute(
-                        SeleniumTestsContext.Set_Assume_Untrusted_Certificate_Issuer))) {
-            config.setSetAssumeUntrustedCertificateIssuer(false);
-        }
+        config.setSetAssumeUntrustedCertificateIssuer(SeleniumTestsContextManager.getThreadContext().getAssumeUntrustedCertificateIssuer());
 
-        if ("false".equalsIgnoreCase(
-                    (String) SeleniumTestsContextManager.getThreadContext().getAttribute(
-                        SeleniumTestsContext.Set_Accept_Untrusted_Certificates))) {
-            config.setSetAcceptUntrustedCertificates(false);
-        }
+        config.setSetAcceptUntrustedCertificates(SeleniumTestsContextManager.getThreadContext().getAcceptUntrustedCertificates());
 
-        if ("false".equalsIgnoreCase(
-                    (String) SeleniumTestsContextManager.getThreadContext().getAttribute(
-                        SeleniumTestsContext.ENABLE_JAVASCRIPT))) {
-            config.setEnableJavascript(false);
-        }
+        config.setEnableJavascript(SeleniumTestsContextManager.getThreadContext().getJavascriptEnabled());
 
         if (SeleniumTestsContextManager.getThreadContext().getNtlmAuthTrustedUris() != null) {
             config.setNtlmAuthTrustedUris(SeleniumTestsContextManager.getThreadContext().getNtlmAuthTrustedUris());
@@ -410,10 +398,7 @@ public class WebUIDriver {
             config.setBrowserDownloadDir(SeleniumTestsContextManager.getThreadContext().getBrowserDownloadDir());
         }
 
-        if (SeleniumTestsContextManager.getThreadContext().getAddJSErrorCollectorExtension() != null) {
-            config.setAddJSErrorCollectorExtension(Boolean.parseBoolean(
-                    SeleniumTestsContextManager.getThreadContext().getAddJSErrorCollectorExtension()));
-        }
+        config.setAddJSErrorCollectorExtension(SeleniumTestsContextManager.getThreadContext().getAddJSErrorCollectorExtension());
 
         String ua = null;
         if (SeleniumTestsContextManager.getThreadContext().getUserAgent() != null) {
@@ -464,7 +449,7 @@ public class WebUIDriver {
         String appWaitActivity = SeleniumTestsContextManager.getThreadContext().getAppWaitActivity();
         config.setAppWaitActivity(appWaitActivity);
 
-        String newCommandTimeOut = SeleniumTestsContextManager.getThreadContext().getNewCommandTimeout();
+        Integer newCommandTimeOut = SeleniumTestsContextManager.getThreadContext().getNewCommandTimeout();
         config.setNewCommandTimeout(newCommandTimeOut);
 
         config.setVersion(SeleniumTestsContextManager.getThreadContext().getVersion());

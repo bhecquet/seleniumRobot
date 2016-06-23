@@ -37,7 +37,7 @@ public enum DriverMode {
 		          }
 		        }
 		      }
-		      throw new IllegalArgumentException("Unrecognized platform: " + mode);
+		      throw new IllegalArgumentException("Unrecognized driver mode: " + mode);
 		}
 	}	
 }

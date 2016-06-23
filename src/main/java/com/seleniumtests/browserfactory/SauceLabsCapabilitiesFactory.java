@@ -14,8 +14,7 @@ public class SauceLabsCapabilitiesFactory implements ICapabilitiesFactory {
         capabilities.setCapability("browserName", cfg.getBrowser());
         capabilities.setCapability("platform", cfg.getPlatform());
         capabilities.setCapability("version", cfg.getVersion());
-        capabilities.setCapability("name",
-            SeleniumTestsContextManager.getThreadContext().getAttribute(SeleniumTestsContext.TEST_METHOD_SIGNATURE));
+        capabilities.setCapability("name", SeleniumTestsContextManager.getThreadContext().getTestMethodSignature());
 
         return capabilities;
     }

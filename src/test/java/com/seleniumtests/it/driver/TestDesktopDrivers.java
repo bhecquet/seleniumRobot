@@ -28,7 +28,7 @@ public class TestDesktopDrivers extends GenericTest {
 	@Test(groups={"it"})
 	public void testFirefoxStartup(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		SeleniumTestsContextManager.initThreadContext(testNGCtx);
-		SeleniumTestsContextManager.getThreadContext().setAttribute("browser", "*firefox");
+		SeleniumTestsContextManager.getThreadContext().setBrowser("*firefox");
 		driver = WebUIDriver.getWebDriver(true);
 		Assert.assertTrue(driver.getCurrentUrl().equals("about:blank") || driver.getCurrentUrl().contains("http"));
 	}
@@ -36,7 +36,7 @@ public class TestDesktopDrivers extends GenericTest {
 	@Test(groups={"it"})
 	public void testChromeStartup(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		SeleniumTestsContextManager.initThreadContext(testNGCtx);
-		SeleniumTestsContextManager.getThreadContext().setAttribute("browser", "*chrome");
+		SeleniumTestsContextManager.getThreadContext().setBrowser("*chrome");
 		driver = WebUIDriver.getWebDriver(true);
 		Assert.assertEquals(driver.getCurrentUrl(), "data:,");
 	}
@@ -44,7 +44,7 @@ public class TestDesktopDrivers extends GenericTest {
 	@Test(groups={"it"})
 	public void testIEStartup(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		SeleniumTestsContextManager.initThreadContext(testNGCtx);
-		SeleniumTestsContextManager.getThreadContext().setAttribute("browser", "*iexplore");
+		SeleniumTestsContextManager.getThreadContext().setBrowser("*iexplore");
 		driver = WebUIDriver.getWebDriver(true);
 		Assert.assertTrue(driver.getCurrentUrl().contains("http://localhost:"));
 	}

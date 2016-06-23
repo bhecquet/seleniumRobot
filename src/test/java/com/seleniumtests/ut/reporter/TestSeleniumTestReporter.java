@@ -21,7 +21,7 @@ public class TestSeleniumTestReporter {
 	 */
 	@Test(groups={"ut"})
 	public void testSoftAssertionEnabled() {
-		SeleniumTestsContextManager.getThreadContext().setSolftAssertEnabled(true);
+		SeleniumTestsContextManager.getThreadContext().setSoftAssertEnabled(true);
 		CustomAssertion.assertTrue(false, "error should not be raised");
 	}
 	
@@ -30,13 +30,13 @@ public class TestSeleniumTestReporter {
 	 */
 	@Test(groups={"ut"}, expectedExceptions=AssertionError.class)
 	public void testSoftAssertionNotEnabled() {
-		SeleniumTestsContextManager.getThreadContext().setSolftAssertEnabled(false);
+		SeleniumTestsContextManager.getThreadContext().setSoftAssertEnabled(false);
 		CustomAssertion.assertTrue(false, "error should be raised");
 	}
 	
 	@Test(groups={"ut"})
 	public void testSoftAssertionEnabledWithChangedResult() {
-		SeleniumTestsContextManager.getThreadContext().setSolftAssertEnabled(true);
+		SeleniumTestsContextManager.getThreadContext().setSoftAssertEnabled(true);
 		CustomAssertion.assertTrue(false, "error should not be raised");
 	}
 	
@@ -62,6 +62,6 @@ public class TestSeleniumTestReporter {
 	
 	@AfterClass(alwaysRun = true)
 	public void clean() {
-		SeleniumTestsContextManager.getThreadContext().setSolftAssertEnabled(false);
+		SeleniumTestsContextManager.getThreadContext().setSoftAssertEnabled(false);
 	}
 }
