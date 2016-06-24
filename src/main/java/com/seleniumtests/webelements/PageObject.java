@@ -184,6 +184,10 @@ public class PageObject extends BasePage implements IPage {
     
     /**
      * Get parameter from configuration
+     * 
+     * @param key
+     * 
+     * @return String
      */
     public static String param(String key) {
     	String value = SeleniumTestsContextManager.getThreadContext().getConfiguration().get(key);
@@ -220,6 +224,7 @@ public class PageObject extends BasePage implements IPage {
 
     }
 
+    
     public void capturePageSnapshot() {
         ScreenShot screenShot = new ScreenshotUtil(driver).captureWebPageSnapshot();
         this.title = screenShot.getTitle();
@@ -237,6 +242,11 @@ public class PageObject extends BasePage implements IPage {
 
     }
 
+    /**
+     * Close a PageObject
+     * 
+     * @throws NotCurrentPageException
+     */
     public final void close() throws NotCurrentPageException { 
     	
         if (WebUIDriver.getWebDriver() == null) {
