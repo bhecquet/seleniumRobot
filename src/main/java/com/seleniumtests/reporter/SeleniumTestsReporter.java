@@ -1128,6 +1128,13 @@ public class SeleniumTestsReporter implements IReporter, ITestListener, IInvoked
 
     public void onTestFailedButWithinSuccessPercentage(final ITestResult arg0) { }
 
+    /**
+     * At the end of a failed test. 
+     * Log a screenshot and retry the test.
+     * 
+     * @param argO
+     * 
+     **/
     public synchronized void onTestFailure(final ITestResult arg0) {
         if (arg0.getMethod().getRetryAnalyzer() != null) {
             ITestRetryAnalyzer testRetryAnalyzer = (ITestRetryAnalyzer) arg0.getMethod().getRetryAnalyzer();
@@ -1156,6 +1163,13 @@ public class SeleniumTestsReporter implements IReporter, ITestListener, IInvoked
 
     public void onTestStart(final ITestResult arg0) { }
 
+    /**
+     * At the end of a successful test. 
+     * Log a screenshot.
+     * 
+     * @param argO
+     * 
+     **/
     public void onTestSuccess(final ITestResult arg0) {
     	 // capture snap shot at the end of the test
         if (WebUIDriver.getWebDriver() != null) {

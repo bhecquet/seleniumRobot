@@ -22,6 +22,7 @@ import org.aspectj.lang.annotation.Aspect;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.config.mobile.ConfigMobileReader;
+import com.seleniumtests.customexception.ConfigurationException;
 /**
  * Aspect to intercept calls to methods from By. It change the argument of
  * methods when it use the keyWord : map
@@ -44,22 +45,32 @@ public class InterceptBy {
 		if (args != null) {
 			for (int i = 0; i < args.length; i++) {
 				Object argument = args[i];
-				if (argument != null && argument instanceof String) {
-						String[] input = ((String) argument).split(":");
-						if (input[0].equals("map")) {
-							String page = getCallerName(Thread.currentThread().getStackTrace());
-							HashMap<String, HashMap<String, String>> config = SeleniumTestsContextManager.getThreadContext().getIdMapping();
-							if (config == null) {
-								config = new ConfigMobileReader().readConfig();
+				if (argument != null && argument instanceof String && argument.toString().contains("map:")) {
+					String[] input = ((String) argument).split(":");
+					if (input[0].equals("map")) {
+						String page = getCallerName(Thread.currentThread().getStackTrace());
+						HashMap<String, HashMap<String, String>> config = SeleniumTestsContextManager.getThreadContext().getIdMapping();
+						if (config == null) {
+							config = new ConfigMobileReader().readConfig();
+							if (config != null && !config.isEmpty()) {
 								SeleniumTestsContextManager.getThreadContext().setIdMapping(config);
+							} else {
+								throw new ConfigurationException("There is no mapping file correspondant to this type and version");
 							}
-							if (input[1] != null) {
+						}
+						if (input[1] != null && !input[1].equals("")) {
+							if (config.get(page) != null && !config.get(page).isEmpty()) {
 								String toPass = config.get(page).get(input[1]);
 								if (toPass != null && !toPass.equals("")) {
 									args[i] = toPass;
+								} else {
+									throw new ConfigurationException("This id is not in the mapping files for this page");
 								}
+							} else {
+								throw new ConfigurationException("This page doesn't have mapping configuration");
 							}
 						}
+					}
 				}
 
 			}

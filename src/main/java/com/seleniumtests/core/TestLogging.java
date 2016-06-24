@@ -53,7 +53,7 @@ public class TestLogging {
         message = "<li><b><font color='#6600CC'>" + message + "</font></b></li>";
         log(message, false, false);
     }
-
+    
     public static Logger getLogger(final Class<?> cls) {
         boolean rootIsConfigured = Logger.getRootLogger().getAllAppenders().hasMoreElements();
         if (!rootIsConfigured) {
@@ -119,6 +119,13 @@ public class TestLogging {
         log(message, false, logToStandardOutput);
     }
 
+    /**
+     * Log principal method (all others log methods use this one at the end)
+     *
+     * @param  message
+     * @param  failed
+     * @param  logToStandardOutput
+     */
     public static void log(String message, final boolean failed, final boolean logToStandardOutput) {
 
         if (message == null) {
@@ -145,14 +152,36 @@ public class TestLogging {
         return message;
     }
 
+    /**
+     * Log Web Output (add "Output:" to the message)
+     *
+     * @param  url
+     * @param  message
+     * @param  failed
+     */
     public static void logWebOutput(final String url, final String message, final boolean failed) {
         log("Output: " + message + "<br/>", failed, false);
     }
 
+    /**
+     * Log Web Step (add the message in the list of steps (with a number))
+     *
+     * @param  url
+     * @param  message
+     * @param  failed
+     */
     public static void logWebStep(final String url, final String message, final boolean failed) {
         log("<li>" + (failed ? "<b>FailedStep</b>: " : " ") + message + "</li>", failed, false);
     }
 
+    /**
+     * Log Screenshot method
+     * Return: screenshot message with links
+     *
+     * @param  screenShot
+     * 
+     * @return String
+     */
     public static String buildScreenshotLog(final ScreenShot screenShot) {
         StringBuffer sbMessage = new StringBuffer("");
         if (screenShot.getLocation() != null) {
