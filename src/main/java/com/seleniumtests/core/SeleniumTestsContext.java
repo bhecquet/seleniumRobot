@@ -39,6 +39,8 @@ import org.testng.xml.XmlSuite;
 
 import com.seleniumtests.core.config.ConfigReader;
 import com.seleniumtests.customexception.ConfigurationException;
+import com.seleniumtests.driver.BrowserType;
+import com.seleniumtests.driver.DriverMode;
 import com.seleniumtests.driver.ScreenShot;
 import com.seleniumtests.driver.TestType;
 import com.seleniumtests.reporter.PluginsHelper;
@@ -241,78 +243,72 @@ public class SeleniumTestsContext {
         	generateApplicationPath(context.getCurrentXmlTest().getSuite());
         }
 
-        setContextAttribute(context, TEST_DATA_FILE, System.getProperty(TEST_DATA_FILE), "testCase");
-        setContextAttribute(context, WEB_SESSION_TIME_OUT, System.getProperty(WEB_SESSION_TIME_OUT), "90000");
-        setContextAttribute(context, IMPLICIT_WAIT_TIME_OUT, System.getProperty(IMPLICIT_WAIT_TIME_OUT), "5");
-        setContextAttribute(context, EXPLICIT_WAIT_TIME_OUT, System.getProperty(EXPLICIT_WAIT_TIME_OUT), "15");
-        setContextAttribute(context, PAGE_LOAD_TIME_OUT, System.getProperty(PAGE_LOAD_TIME_OUT), "90");
+        setTestDataFile(getValueForTest(TEST_DATA_FILE, System.getProperty(TEST_DATA_FILE)));
+        setWebSessionTimeout(getIntValueForTest(WEB_SESSION_TIME_OUT, System.getProperty(WEB_SESSION_TIME_OUT)));
+        setImplicitWaitTimeout(getIntValueForTest(IMPLICIT_WAIT_TIME_OUT, System.getProperty(IMPLICIT_WAIT_TIME_OUT)));
+        setExplicitWaitTimeout(getIntValueForTest(EXPLICIT_WAIT_TIME_OUT, System.getProperty(EXPLICIT_WAIT_TIME_OUT)));
+        setPageLoadTimeout(getIntValueForTest(PAGE_LOAD_TIME_OUT, System.getProperty(PAGE_LOAD_TIME_OUT)));
+        setWebDriverGrid(getValueForTest(WEB_DRIVER_GRID, System.getProperty(WEB_DRIVER_GRID)));
+        setRunMode(getValueForTest(RUN_MODE, System.getProperty(RUN_MODE)));
+        setBrowser(getValueForTest(BROWSER, System.getProperty(BROWSER)));
+        setBrowserVersion(getValueForTest(BROWSER_VERSION, System.getProperty(BROWSER_VERSION)));
+        setFirefoxUserProfilePath(getValueForTest(FIREFOX_USER_PROFILE_PATH, System.getProperty(FIREFOX_USER_PROFILE_PATH)));
+        setUseDefaultFirefoxProfile(getBoolValueForTest(USE_DEFAULT_FIREFOX_PROFILE, System.getProperty(USE_DEFAULT_FIREFOX_PROFILE)));
+        setOperaUserProfilePath(getValueForTest(OPERA_USER_PROFILE_PATH, System.getProperty(OPERA_USER_PROFILE_PATH)));
+        setFirefoxBinary(getValueForTest(FIREFOX_BINARY_PATH, System.getProperty(FIREFOX_BINARY_PATH)));
+        setChromeDriverPath(getValueForTest(CHROME_DRIVER_PATH, System.getProperty(CHROME_DRIVER_PATH)));
+        setIEDriverPath(getValueForTest(IE_DRIVER_PATH, System.getProperty(IE_DRIVER_PATH)));
+        setUserAgent(getValueForTest(USER_AGENT, System.getProperty(USER_AGENT)));
+        setAssumeUntrustedCertificateIssuer(getBoolValueForTest(Set_Assume_Untrusted_Certificate_Issuer, System.getProperty(Set_Assume_Untrusted_Certificate_Issuer)));
+        setAcceptUntrustedCertificates(getBoolValueForTest(Set_Accept_Untrusted_Certificates, System.getProperty(Set_Accept_Untrusted_Certificates)));
+        setJavascriptEnabled(getBoolValueForTest(ENABLE_JAVASCRIPT, System.getProperty(ENABLE_JAVASCRIPT)));
+        setNtlmAuthTrustedUris(getValueForTest(NTLM_AUTH_TRUSTED_URIS, System.getProperty(NTLM_AUTH_TRUSTED_URIS)));
+        setBrowserDownloadDir(getValueForTest(BROWSER_DOWNLOAD_DIR, System.getProperty(BROWSER_DOWNLOAD_DIR)));
+   
+        setJsErrorCollectorExtension(getBoolValueForTest(ADD_JS_ERROR_COLLECTOR_EXTENSION, System.getProperty(ADD_JS_ERROR_COLLECTOR_EXTENSION)));
 
-        setContextAttribute(context, WEB_DRIVER_GRID, System.getProperty(WEB_DRIVER_GRID), null);
-        setContextAttribute(context, RUN_MODE, System.getProperty(RUN_MODE), "LOCAL");
-        setContextAttribute(context, BROWSER, System.getProperty(BROWSER), "*firefox");
-        setContextAttribute(context, BROWSER_VERSION, System.getProperty(BROWSER_VERSION), null);
-
-        setContextAttribute(context, FIREFOX_USER_PROFILE_PATH, System.getProperty(FIREFOX_USER_PROFILE_PATH), null);
-        setContextAttribute(context, USE_DEFAULT_FIREFOX_PROFILE, System.getProperty(USE_DEFAULT_FIREFOX_PROFILE),
-            "true");
-
-        setContextAttribute(context, OPERA_USER_PROFILE_PATH, System.getProperty(OPERA_USER_PROFILE_PATH), null);
-        setContextAttribute(context, FIREFOX_BINARY_PATH, System.getProperty(FIREFOX_BINARY_PATH), null);
-        setContextAttribute(context, CHROME_DRIVER_PATH, System.getProperty(CHROME_DRIVER_PATH), null);
-        setContextAttribute(context, IE_DRIVER_PATH, System.getProperty(IE_DRIVER_PATH), null);
-        setContextAttribute(context, USER_AGENT, System.getProperty(USER_AGENT), null);
-        setContextAttribute(context, Set_Assume_Untrusted_Certificate_Issuer,
-            System.getProperty(Set_Assume_Untrusted_Certificate_Issuer), "true");
-        setContextAttribute(context, Set_Accept_Untrusted_Certificates,
-            System.getProperty(Set_Accept_Untrusted_Certificates), "true");
-        setContextAttribute(context, ENABLE_JAVASCRIPT, System.getProperty(ENABLE_JAVASCRIPT), "true");
-        setContextAttribute(context, NTLM_AUTH_TRUSTED_URIS, System.getProperty(NTLM_AUTH_TRUSTED_URIS), null);
-        setContextAttribute(context, BROWSER_DOWNLOAD_DIR, System.getProperty(BROWSER_DOWNLOAD_DIR), null);
-        setContextAttribute(context, ADD_JS_ERROR_COLLECTOR_EXTENSION,
-            System.getProperty(ADD_JS_ERROR_COLLECTOR_EXTENSION), "false");
-
-        setContextAttribute(context, WEB_PROXY_ENABLED, System.getProperty(WEB_PROXY_ENABLED), "false");
-        setContextAttribute(context, WEB_PROXY_TYPE, System.getProperty(WEB_PROXY_TYPE), null);
-        setContextAttribute(context, WEB_PROXY_ADDRESS, System.getProperty(WEB_PROXY_ADDRESS), null);
+        setWebProxyEnabled(getBoolValueForTest(WEB_PROXY_ENABLED, System.getProperty(WEB_PROXY_ENABLED)));
+        setProxyType(getValueForTest(WEB_PROXY_TYPE, System.getProperty(WEB_PROXY_TYPE)));
+        setProxyAddress(getValueForTest(WEB_PROXY_ADDRESS, System.getProperty(WEB_PROXY_ADDRESS)));
 
         // Set default to summaryPerSuite, by default it would generate a summary report per suite for tests in SeleniumTestReport.html
         // if set to summaryAllSuites, only one summary report section would be generated.
-        setContextAttribute(context, REPORT_GENERATION_CONFIG, System.getProperty(REPORT_GENERATION_CONFIG), "summaryPerSuite");
+        setReportGenerationConfig(getValueForTest(REPORT_GENERATION_CONFIG, System.getProperty(REPORT_GENERATION_CONFIG)));
 
-        setContextAttribute(context, OPEN_REPORT_IN_BROWSER, System.getProperty(OPEN_REPORT_IN_BROWSER), null);
+        setOpenReportInBrowser(getValueForTest(OPEN_REPORT_IN_BROWSER, System.getProperty(OPEN_REPORT_IN_BROWSER)));
 
-        setContextAttribute(context, CAPTURE_SNAPSHOT, System.getProperty(CAPTURE_SNAPSHOT), null);
-        setContextAttribute(context, ENABLE_EXCEPTION_LISTENER, System.getProperty(ENABLE_EXCEPTION_LISTENER), "true");
+        setCaptureSnapshot(getBoolValueForTest(CAPTURE_SNAPSHOT, System.getProperty(CAPTURE_SNAPSHOT)));
+        setEnableExceptionListener(getBoolValueForTest(ENABLE_EXCEPTION_LISTENER, System.getProperty(ENABLE_EXCEPTION_LISTENER)));
 
-        setContextAttribute(context, DP_TAGS_INCLUDE, System.getProperty(DP_TAGS_INCLUDE), null);
-        setContextAttribute(context, DP_TAGS_EXCLUDE, System.getProperty(DP_TAGS_EXCLUDE), null);
+        setDpTagsInclude(getValueForTest(DP_TAGS_INCLUDE, System.getProperty(DP_TAGS_INCLUDE)));
+        setDpTagsExclude(getValueForTest(DP_TAGS_EXCLUDE, System.getProperty(DP_TAGS_EXCLUDE)));
 
-        setContextAttribute(context, SSH_COMMAND_WAIT, System.getProperty(SSH_COMMAND_WAIT), "5000");
-        setContextAttribute(context, SOFT_ASSERT_ENABLED, System.getProperty(SOFT_ASSERT_ENABLED), "false");
+        setSshCommandWait(getIntValueForTest(SSH_COMMAND_WAIT, System.getProperty(SSH_COMMAND_WAIT)));
+        setSoftAssertEnabled(getBoolValueForTest(SOFT_ASSERT_ENABLED, System.getProperty(SOFT_ASSERT_ENABLED)));
 
-        setContextAttribute(context, WEB_DRIVER_LISTENER, System.getProperty(WEB_DRIVER_LISTENER), null);
+        setWebDriverListener(getValueForTest(WEB_DRIVER_LISTENER, System.getProperty(WEB_DRIVER_LISTENER)));
 
-        setContextAttribute(context, APPIUM_SERVER_URL, System.getProperty(APPIUM_SERVER_URL), null);
-        setContextAttribute(context, DEVICE_NAME, System.getProperty(DEVICE_NAME), null);
-        setContextAttribute(context, DEVICE_LIST, null, "{}");
+        setAppiumServerUrl(getValueForTest(APPIUM_SERVER_URL, System.getProperty(APPIUM_SERVER_URL)));
+        setDeviceName(getValueForTest(DEVICE_NAME, System.getProperty(DEVICE_NAME)));
+        setDeviceList(getValueForTest(DEVICE_LIST, null));
 
-        setContextAttribute(context, APP, System.getProperty(APP), "");
+        setApp(getValueForTest(APP, System.getProperty(APP)));
        
-        setContextAttribute(context, CUCUMBER_TAGS, System.getProperty(CUCUMBER_TAGS), "");
-        setContextAttribute(context, CUCUMBER_TESTS, System.getProperty(CUCUMBER_TESTS), "");
-        setContextAttribute(context, CUCUMBER_IMPLEMENTATION_PKG, System.getProperty(CUCUMBER_IMPLEMENTATION_PKG), null);
-        setContextAttribute(context, TEST_ENV, System.getProperty(TEST_ENV), "DEV");
+        setCucumberTags(getValueForTest(CUCUMBER_TAGS, System.getProperty(CUCUMBER_TAGS)));
+        setCucumberTests(getValueForTest(CUCUMBER_TESTS, System.getProperty(CUCUMBER_TESTS)));
+        setCucumberImplementationPackage(getValueForTest(CUCUMBER_IMPLEMENTATION_PKG, System.getProperty(CUCUMBER_IMPLEMENTATION_PKG)));
+        setTestEnv(getValueForTest(TEST_ENV, System.getProperty(TEST_ENV)));
 
         // By default test is assumed to be executed on default browser on android emulator
-        setContextAttribute(context, APP_PACKAGE, System.getProperty(APP_PACKAGE), null);
-        setContextAttribute(context, APP_ACTIVITY, System.getProperty(APP_ACTIVITY), null);
-        setContextAttribute(context, APP_WAIT_ACTIVITY, System.getProperty(APP_WAIT_ACTIVITY), null);
-        setContextAttribute(context, NEW_COMMAND_TIMEOUT, System.getProperty(NEW_COMMAND_TIMEOUT), "120");
+        setAppPackage(getValueForTest(APP_PACKAGE, System.getProperty(APP_PACKAGE)));
+        setAppActivity(getValueForTest(APP_ACTIVITY, System.getProperty(APP_ACTIVITY)));
+        setAppWaitActivity(getValueForTest(APP_WAIT_ACTIVITY, System.getProperty(APP_WAIT_ACTIVITY)));
+        setNewCommandTimeout(getIntValueForTest(NEW_COMMAND_TIMEOUT, System.getProperty(NEW_COMMAND_TIMEOUT)));
 
-        setContextAttribute(context, VERSION, System.getProperty(VERSION), null);
-        setContextAttribute(context, PLATFORM, System.getProperty(PLATFORM), Platform.getCurrent().toString());
-        setContextAttribute(context, CLOUD_API_KEY, System.getProperty(CLOUD_API_KEY), null);
-        setContextAttribute(context, PROJECT_NAME, System.getProperty(PROJECT_NAME), null);
+        setVersion(getValueForTest(VERSION, System.getProperty(VERSION)));
+        setPlatform(getValueForTest(PLATFORM, System.getProperty(PLATFORM)));
+        setCloudApiKey(getValueForTest(CLOUD_API_KEY, System.getProperty(CLOUD_API_KEY)));
+        setProjectName(getValueForTest(PROJECT_NAME, System.getProperty(PROJECT_NAME)));
         
         // determines test_type according to input configuration
         configureTestType();
@@ -434,8 +430,8 @@ public class SeleniumTestsContext {
         }
     }
 
-    public String getAddJSErrorCollectorExtension() {
-        return (String) getAttribute(ADD_JS_ERROR_COLLECTOR_EXTENSION);
+    public Boolean getAddJSErrorCollectorExtension() {
+        return (Boolean) getAttribute(ADD_JS_ERROR_COLLECTOR_EXTENSION);
     }
 
     public Object getAttribute(final String name) {
@@ -457,17 +453,21 @@ public class SeleniumTestsContext {
             // IE grid default value set to false
             if (this.getRunMode().equalsIgnoreCase("ExistingGrid")
                     && (this.getBrowser().contains("iexplore") || this.getBrowser().contains("safari"))) {
-                this.setAttribute(CAPTURE_SNAPSHOT, "false");
+                this.setAttribute(CAPTURE_SNAPSHOT, false);
             } else {
-                this.setAttribute(CAPTURE_SNAPSHOT, "true");
+                this.setAttribute(CAPTURE_SNAPSHOT, true);
             }
         }
 
-        return Boolean.parseBoolean((String) getAttribute(CAPTURE_SNAPSHOT));
+        return (Boolean) getAttribute(CAPTURE_SNAPSHOT);
     }
 
     public boolean getEnableExceptionListener() {
-        return Boolean.parseBoolean((String) getAttribute(ENABLE_EXCEPTION_LISTENER));
+        return (Boolean) getAttribute(ENABLE_EXCEPTION_LISTENER);
+    }
+    
+    public boolean getJsErrorCollectorExtension() {
+    	return (Boolean) getAttribute(ADD_JS_ERROR_COLLECTOR_EXTENSION);
     }
 
     public String getChromeBinPath() {
@@ -489,13 +489,13 @@ public class SeleniumTestsContext {
     public int getExplicitWaitTimeout() {
         Integer timeout;
         try {
-            timeout = Integer.parseInt((String) getAttribute(EXPLICIT_WAIT_TIME_OUT));
+            timeout = (Integer) getAttribute(EXPLICIT_WAIT_TIME_OUT);
         } catch (Exception e) {
             timeout = 15;
         }
 
         if (timeout < getImplicitWaitTimeout()) {
-            return (int) getImplicitWaitTimeout();
+            return getImplicitWaitTimeout();
         } else {
             return timeout;
         }
@@ -513,9 +513,9 @@ public class SeleniumTestsContext {
         return (String) getAttribute(IE_DRIVER_PATH);
     }
 
-    public double getImplicitWaitTimeout() {
+    public int getImplicitWaitTimeout() {
         try {
-            return Double.parseDouble((String) getAttribute(IMPLICIT_WAIT_TIME_OUT));
+            return (Integer) getAttribute(IMPLICIT_WAIT_TIME_OUT);
         } catch (Exception e) {
             return 5;
         }
@@ -532,6 +532,19 @@ public class SeleniumTestsContext {
     public String getOpenReportInBrowser() {
         return (String) getAttribute(OPEN_REPORT_IN_BROWSER);
     }
+	
+	public Boolean getAssumeUntrustedCertificateIssuer() {
+        return (Boolean) getAttribute(Set_Assume_Untrusted_Certificate_Issuer);
+    }
+	
+	public Boolean getJavascriptEnabled() {
+		return (Boolean) getAttribute(ENABLE_JAVASCRIPT);
+	}
+
+	public Boolean getAcceptUntrustedCertificates() {
+        return (Boolean) getAttribute(Set_Accept_Untrusted_Certificates);
+    }
+
 
     public String getOperaUserProfilePath() {
         return (String) getAttribute(OPERA_USER_PROFILE_PATH);
@@ -543,7 +556,7 @@ public class SeleniumTestsContext {
 
     public int getPageLoadTimeout() {
         try {
-            return Integer.parseInt((String) getAttribute(PAGE_LOAD_TIME_OUT));
+            return (Integer) getAttribute(PAGE_LOAD_TIME_OUT);
         } catch (Exception e) {
             return 90;
         }
@@ -551,7 +564,7 @@ public class SeleniumTestsContext {
 
     public int getSshCommandWait() {
         try {
-            return Integer.parseInt((String) getAttribute(SSH_COMMAND_WAIT));
+            return (Integer) getAttribute(SSH_COMMAND_WAIT);
         } catch (Exception e) {
             return 5000; // Default
         }
@@ -593,8 +606,11 @@ public class SeleniumTestsContext {
     	return (String) getAttribute(CUCUMBER_TAGS);
     }
     
-    public List<String> getCucmberTests() {
+    public List<String> getCucumberTests() {
     	List<String> tests = new ArrayList<String>();
+    	if (((String)getAttribute(CUCUMBER_TESTS)).isEmpty()) {
+    		return tests;
+    	}
     	for (String test: ((String)getAttribute(CUCUMBER_TESTS)).replace("\"", "").replace("&nbsp;", " ").split(",")) {
     		tests.add(test.trim());
     	}
@@ -605,7 +621,7 @@ public class SeleniumTestsContext {
     	return (String) getAttribute(CUCUMBER_IMPLEMENTATION_PKG);
     }
     
-    public String getTestEnvironment() {
+    public String getTestEnv() {
     	return (String) getAttribute(TEST_ENV);
     }
     
@@ -674,11 +690,7 @@ public class SeleniumTestsContext {
     }
 
     public int getWebSessionTimeout() {
-        try {
-            return Integer.parseInt((String) getAttribute(WEB_SESSION_TIME_OUT));
-        } catch (Exception e) {
-            return 90000; // Default
-        }
+        return (Integer) getAttribute(WEB_SESSION_TIME_OUT);
     }
 
     public String getAppiumServerURL() {
@@ -709,8 +721,8 @@ public class SeleniumTestsContext {
     	return (String) getAttribute(APP_WAIT_ACTIVITY);
     }
 
-    public String getNewCommandTimeout() {
-        return (String) getAttribute(NEW_COMMAND_TIMEOUT);
+    public int getNewCommandTimeout() {
+        return (Integer) getAttribute(NEW_COMMAND_TIMEOUT);
     }
 
     public String getVersion() {
@@ -748,7 +760,7 @@ public class SeleniumTestsContext {
     
     public boolean isUseFirefoxDefaultProfile() {
         try {
-            return Boolean.parseBoolean((String) getAttribute(USE_DEFAULT_FIREFOX_PROFILE));
+            return (Boolean) getAttribute(USE_DEFAULT_FIREFOX_PROFILE);
         } catch (Exception e) {
             return true; // Default
         }
@@ -757,7 +769,7 @@ public class SeleniumTestsContext {
 
     public boolean isSoftAssertEnabled() {
         try {
-            return Boolean.parseBoolean((String) getAttribute(SOFT_ASSERT_ENABLED));
+            return (Boolean) getAttribute(SOFT_ASSERT_ENABLED);
         } catch (Exception e) {
             return false; // Default
         }
@@ -765,7 +777,7 @@ public class SeleniumTestsContext {
 
     public boolean isWebProxyEnabled() {
         try {
-            return Boolean.parseBoolean((String) getAttribute(WEB_PROXY_ENABLED));
+            return (Boolean) getAttribute(WEB_PROXY_ENABLED);
         } catch (Exception e) {
             return false; // Default
         }
@@ -807,34 +819,53 @@ public class SeleniumTestsContext {
     }
 
     /**
-     * Set Suite SeleniumTestsContext Attributes.
+     * Get (in order of importance) user value (if exist), test value (if exist), suite value (if exist) or null
      *
      * @param  context
      * @param  attributeName
      * @param  sysPropertyValue
      * @param  defaultValue
      */
-
-    private void setContextAttribute(final ITestContext context, final String attributeName,
-            final String sysPropertyValue, final String defaultValue) {
-        String suiteValue = null;
-        if (context != null && context.getCurrentXmlTest() != null) {
+    private String getValueForTest(final String attributeName, final String sysPropertyValue) {
+    	String suiteValue = null;
+        if (testNGContext != null && testNGContext.getCurrentXmlTest() != null) {
         	
         	// priority given to test parameter
-        	String testValue = context.getCurrentXmlTest().getParameter(attributeName);
+        	String testValue = testNGContext.getCurrentXmlTest().getParameter(attributeName);
         	
         	if (testValue == null) {
         		
         		// if test parameter does not exist, loot at suite parameter
-        		suiteValue = context.getCurrentXmlTest().getSuite().getParameter(attributeName);
+        		suiteValue = testNGContext.getCurrentXmlTest().getSuite().getParameter(attributeName);
         		
         	} else {
         		suiteValue = testValue;
         	}
         }
-
-        contextDataMap.put(attributeName,
-            (sysPropertyValue != null ? sysPropertyValue : (suiteValue != null ? suiteValue : defaultValue)));
+        
+        return sysPropertyValue != null ? sysPropertyValue : suiteValue;
+    }
+    
+    /**
+     * Return an int value from test parameters
+     * @param attributeName
+     * @param sysPropertyValue
+     * @return
+     */
+    private Integer getIntValueForTest(final String attributeName, final String sysPropertyValue) {
+    	String value = getValueForTest(attributeName, sysPropertyValue);
+    	return value == null ? null: Integer.parseInt(value);
+    }
+    
+    /**
+     * Return a boolean value from test parameters
+     * @param attributeName
+     * @param sysPropertyValue
+     * @return
+     */
+    private Boolean getBoolValueForTest(final String attributeName, final String sysPropertyValue) {
+    	String value = getValueForTest(attributeName, sysPropertyValue);
+    	return value == null ? null: Boolean.parseBoolean(value);
     }
 
     private void setContextAttribute(final String attributeName, final String sysPropertyValue, final String suiteValue,
@@ -845,36 +876,301 @@ public class SeleniumTestsContext {
 
     }
 
-    public void setExplicitWaitTimeout(final Integer timeout) {
-        setAttribute(EXPLICIT_WAIT_TIME_OUT, timeout.toString());
-    }
-
-    public void setImplicitWaitTimeout(final int timeout) {
-        setAttribute(IMPLICIT_WAIT_TIME_OUT, timeout);
-    }
-
-    public void setPageLoadTimeout(final int timeout) {
-        setAttribute(PAGE_LOAD_TIME_OUT, timeout);
-    }
-
-    public void setTestDataFile(final String testDataFile) {
+    public void setTestDataFile(String testDataFile) {
+    	if (testDataFile == null) {
+    		testDataFile = "testCase";
+    	}
         setAttribute(TEST_DATA_FILE, testDataFile);
     }
+    
+    public void setWebSessionTimeout(Integer timeout) {
+    	if (timeout == null) {
+    		timeout = 90000;
+    	}
+    	setAttribute(WEB_SESSION_TIME_OUT, timeout);
+    }
 
+    public void setImplicitWaitTimeout(Integer timeout) {
+    	if (timeout == null) {
+    		timeout = 5;
+    	}
+        setAttribute(IMPLICIT_WAIT_TIME_OUT, timeout);
+    }
+    
+    public void setExplicitWaitTimeout(Integer timeout) {
+    	if (timeout == null) {
+    		timeout = 15;
+    	}
+        setAttribute(EXPLICIT_WAIT_TIME_OUT, timeout);
+    }
+
+    public void setPageLoadTimeout(Integer timeout) {
+    	if (timeout == null) {
+    		timeout = 90;
+    	}
+        setAttribute(PAGE_LOAD_TIME_OUT, timeout);
+    }
+    
+    public void setWebDriverGrid(final String driverGrid) {
+        setAttribute(WEB_DRIVER_GRID, driverGrid);
+    }
+    
+    public void setRunMode(String runMode) {
+    	if (runMode == null) {
+    		runMode = "LOCAL";
+    	} 
+    	DriverMode.fromString(runMode);
+
+        setAttribute(RUN_MODE, runMode);
+    }
+
+    public void setBrowser(String browser) {
+    	if (browser == null) {
+    		browser = "*firefox";
+    	} 
+    	BrowserType.getBrowserType(browser);
+    	setAttribute(BROWSER, browser);
+    }
+    
+    public void setBrowserVersion(String browserVersion) {
+    	setAttribute(BROWSER_VERSION, browserVersion);
+    }
+    
+    public void setFirefoxUserProfilePath(String ffPath) {
+    	setAttribute(FIREFOX_USER_PROFILE_PATH, ffPath);
+    }
+    
+    public void setUseDefaultFirefoxProfile(Boolean useDefaultffProfile) {
+		if (useDefaultffProfile == null) {
+			useDefaultffProfile = true;
+    	}
+    	setAttribute(USE_DEFAULT_FIREFOX_PROFILE, useDefaultffProfile);
+    }
+    
+    public void setOperaUserProfilePath(String path) {
+    	setAttribute(OPERA_USER_PROFILE_PATH, path);
+    }
+    
+    public void setFirefoxBinary(String path) {
+    	setAttribute(FIREFOX_BINARY_PATH, path);
+    }
+    
+    public void setChromeDriverPath(String path) {
+    	setAttribute(CHROME_DRIVER_PATH, path);
+    }
+    
+    public void setIEDriverPath(String path) {
+    	setAttribute(IE_DRIVER_PATH, path);
+    }
+    
+    public void setUserAgent(String path) {
+    	setAttribute(USER_AGENT, path);
+    }
+    
+    public void setAssumeUntrustedCertificateIssuer(Boolean assume) {
+    	if (assume == null) {
+    		assume = true;
+    	}
+    	setAttribute(Set_Assume_Untrusted_Certificate_Issuer, assume);
+    }
+    
+    public void setAcceptUntrustedCertificates(Boolean accept) {
+    	if (accept == null) {
+    		accept = true;
+    	}
+    	setAttribute(Set_Accept_Untrusted_Certificates, accept);
+    }
+    
+    public void setJavascriptEnabled(Boolean enabled) {
+    	if (enabled == null) {
+    		enabled = true;
+    	}
+    	setAttribute(ENABLE_JAVASCRIPT, enabled);
+    }
+   
+    public void setNtlmAuthTrustedUris(String uris) {
+    	setAttribute(NTLM_AUTH_TRUSTED_URIS, uris);
+    }
+    
+    public void setBrowserDownloadDir(String downloadDir) {
+    	setAttribute(BROWSER_DOWNLOAD_DIR, downloadDir);
+    }
+    
+    public void setJsErrorCollectorExtension(Boolean enabled) {
+    	if (enabled == null) {
+    		enabled = false;
+    	}
+    	setAttribute(ADD_JS_ERROR_COLLECTOR_EXTENSION, enabled);
+    }
+   
+    public void setWebProxyEnabled(Boolean enabled) {
+    	if (enabled == null) {
+    		enabled = false;
+    	}
+    	setAttribute(WEB_PROXY_ENABLED, enabled);
+    }
+    
+    public void setProxyType(String proxyType) {
+    	setAttribute(WEB_PROXY_TYPE, proxyType);
+    }
+    
+    public void setProxyAddress(String proxyAddress) {
+    	setAttribute(WEB_PROXY_ADDRESS, proxyAddress);
+    }
+    
+    public void setReportGenerationConfig(String config) {
+    	if (config == null) {
+    		config = "summaryPerSuite";
+    	}
+    	setAttribute(REPORT_GENERATION_CONFIG, config);
+    }
+    
+    public void setOpenReportInBrowser(String browserName) {
+    	setAttribute(OPEN_REPORT_IN_BROWSER, browserName);
+    }
+    
+    public void setCaptureSnapshot(Boolean capture) {
+    	if (capture == null) {
+    		capture = true;
+    	}
+    	setAttribute(CAPTURE_SNAPSHOT, capture);
+    }
+    
+    public void setEnableExceptionListener(Boolean enable) {
+    	if (enable == null) {
+    		enable = true;
+    	}
+    	setAttribute(ENABLE_EXCEPTION_LISTENER, enable);
+    }
+    
+    public void setDpTagsInclude(String tags) {
+    	setAttribute(DP_TAGS_INCLUDE, tags);
+    }
+    
+    public void setDpTagsExclude(String tags) {
+    	setAttribute(DP_TAGS_EXCLUDE, tags);
+    }
+    
+    public void setSshCommandWait(Integer waitInMs) {
+    	if (waitInMs == null) {
+    		waitInMs = 5000;
+    	}
+    	setAttribute(SSH_COMMAND_WAIT, waitInMs);
+    }
+    
+    public void setSoftAssertEnabled(Boolean enable) {
+    	if (enable == null) {
+    		enable = true;
+    	}
+    	setAttribute(SOFT_ASSERT_ENABLED, enable);
+    }
+    
+    public void setWebDriverListener(String listener) {
+    	setAttribute(WEB_DRIVER_LISTENER, listener);
+    }
+    
+    public void setAppiumServerUrl(String url) {
+    	setAttribute(APPIUM_SERVER_URL, url);
+    }
+    
+    public void setDeviceName(String name) {
+    	setAttribute(DEVICE_NAME, name);
+    }
+
+    public void setDeviceList(String list) {
+    	if (list == null) {
+    		list = "{}";
+    	}
+    	setAttribute(DEVICE_LIST, list);
+    }
+    
+    public void setApp(String app) {
+    	if (app == null) {
+    		app = "";
+    	}
+    	setAttribute(APP, app);
+    }
+    
+    public void setCucumberTags(String tags) {
+    	if (tags == null) {
+    		tags = "";
+    	}
+    	setAttribute(CUCUMBER_TAGS, tags);
+    }
+    
+    public void setCucumberTests(String tests) {
+    	if (tests == null) {
+    		tests = "";
+    	}
+    	setAttribute(CUCUMBER_TESTS, tests);
+    }
+    
+    public void setCucumberImplementationPackage(String pkg) {
+    	if (pkg == null && (!getCucumberTests().isEmpty() || !getCucumberTags().isEmpty())) {
+    		throw new ConfigurationException("cucumberPackage parameter not defined whereas cucumberTests or cucumberTags are defined");
+    	}
+    	setAttribute(CUCUMBER_IMPLEMENTATION_PKG, pkg);
+    }
+    
+    public void setTestEnv(String tests) {
+    	if (tests == null) {
+    		tests = "DEV";
+    	}
+    	setAttribute(TEST_ENV, tests);
+    }
+
+    public void setAppPackage(String pkg) {
+    	setAttribute(APP_PACKAGE, pkg);
+    }
+    
+    public void setTestMethodSignature(String signature) {
+    	setAttribute(TEST_METHOD_SIGNATURE, signature);
+    }
+
+    public void setAppActivity(String name) {
+    	setAttribute(APP_ACTIVITY, name);
+    }
+
+    public void setAppWaitActivity(String name) {
+    	setAttribute(APP_WAIT_ACTIVITY, name);
+    }
+    
+    public void setNewCommandTimeout(Integer timeout) {
+    	if (timeout == null) {
+    		timeout = 120;
+    	}
+        setAttribute(NEW_COMMAND_TIMEOUT, timeout);
+    }
+    
+    public void setVersion(String version) {
+    	setAttribute(VERSION, version);
+    }
+    
+    public void setPlatform(String platform) {
+    	if (platform == null) {
+    		platform = Platform.getCurrent().toString();
+    	}
+        setAttribute(PLATFORM, platform);
+    }
+    
+    public void setCloudApiKey(String key) {
+    	setAttribute(CLOUD_API_KEY, key);
+    }
+    
     public void setTestType(final TestType testType) {
         setAttribute(TEST_TYPE, testType);
     }
     
-    public void setPlatform(final String platform) {
-        setAttribute(PLATFORM, platform);
+    /**
+     * For testdroid tests only
+     * @param name
+     */
+    public void setProjectName(String name) {
+    	setAttribute(PROJECT_NAME, name);
     }
     
     public void setMobilePlatformVersion(final String version) {
     	setAttribute(MOBILE_PLATFORM_VERSION, version);
-    }
-    
-    public void setSolftAssertEnabled(final Boolean enabled) {
-    	setAttribute(SOFT_ASSERT_ENABLED, enabled.toString());
     }
     
     /**

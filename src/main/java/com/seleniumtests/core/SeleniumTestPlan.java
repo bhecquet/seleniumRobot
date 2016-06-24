@@ -72,8 +72,7 @@ public abstract class SeleniumTestPlan {
         logger.info(Thread.currentThread() + " Start method " + method.getName());
         SeleniumTestsContextManager.initThreadContext(testContex, xmlTest);
         if (method != null) {
-            SeleniumTestsContextManager.getThreadContext().setAttribute(SeleniumTestsContext.TEST_METHOD_SIGNATURE,
-                buildMethodSignature(method, parameters));
+            SeleniumTestsContextManager.getThreadContext().setTestMethodSignature(buildMethodSignature(method, parameters));
         }
     }
 

@@ -32,7 +32,7 @@ public class TestUiActions {
 	@BeforeClass(groups={"it"})
 	public void initDriver(final ITestContext testNGCtx) throws Exception {
 		SeleniumTestsContextManager.initThreadContext(testNGCtx);
-		SeleniumTestsContextManager.getThreadContext().setAttribute("browser", "chrome");
+		SeleniumTestsContextManager.getThreadContext().setBrowser("chrome");
 		driver = WebUIDriver.getWebDriver(true);
 		if (SeleniumTestsContextManager.getThreadContext().getBrowser().contains("firefox")) {
 			driver.get("file://" + Thread.currentThread().getContextClassLoader().getResource("tu/test.html").getFile());

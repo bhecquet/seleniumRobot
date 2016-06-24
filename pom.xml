@@ -67,10 +67,10 @@
 		<sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
     	<sonar.jacoco.reportPath>${project.build.directory}/coverage-reports/jacoco-ut.exec</sonar.jacoco.reportPath>
     	<sonar.jacoco.itReportPath>${project.build.directory}/coverage-reports/jacoco-it.exec</sonar.jacoco.itReportPath>
-    	<!-- <surefireArgLine>-javaagent:${settings.localRepository}/org/jacoco/org.jacoco.agent/${jacoco.version}\\org.jacoco.agent-${jacoco.version}-runtime.jar=destfile=${project.build.directory}/coverage-reports/jacoco-ut.exec</surefireArgLine> 
-    	<failsafeArgLine>-javaagent:${settings.localRepository}/org/jacoco/org.jacoco.agent/${jacoco.version}\\org.jacoco.agent-${jacoco.version}-runtime.jar=destfile=${project.build.directory}/coverage-reports/jacoco-it.exec</failsafeArgLine> --> 
-    	<surefireArgLine></surefireArgLine> 
-    	<failsafeArgLine></failsafeArgLine> 
+    	<surefireArgLine>-javaagent:${settings.localRepository}/org/jacoco/org.jacoco.agent/${jacoco.version}/org.jacoco.agent-${jacoco.version}-runtime.jar=destfile=${project.build.directory}/coverage-reports/jacoco-ut.exec</surefireArgLine> 
+    	<failsafeArgLine>-javaagent:${settings.localRepository}/org/jacoco/org.jacoco.agent/${jacoco.version}/org.jacoco.agent-${jacoco.version}-runtime.jar=destfile=${project.build.directory}/coverage-reports/jacoco-it.exec</failsafeArgLine> 
+    	<!-- <surefireArgLine></surefireArgLine> 
+    	<failsafeArgLine></failsafeArgLine>  -->
     </properties>
 
 	<dependencies>
@@ -266,7 +266,8 @@
 							<value>false</value>
 						</property>
 					</properties>
-					<argLine>@{surefireArgLine}</argLine>
+<!-- 					<argLine>@{surefireArgLine}</argLine> -->
+						<argLine>${surefireArgLine}</argLine>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -289,7 +290,8 @@
 									<value>false</value>
 								</property>
 							</properties>
-							<argLine>@{failsafeArgLine}</argLine>
+<!-- 							<argLine>@{failsafeArgLine}</argLine> -->
+								<argLine>${failsafeArgLine}</argLine>
 						</configuration>
 					</execution>
 				</executions>
