@@ -581,7 +581,7 @@ public class SeleniumTestsReporter implements IReporter, ITestListener, IInvoked
                             browser = browser.replace("*", "");
                         }
 
-                        String browserVersion = (String) testLevelContext.getAttribute("browserVersion");
+                        String browserVersion = (String) testLevelContext.getWebBrowserVersion();
                         if (browserVersion != null) {
                             browser = browser + browserVersion;
                         }
@@ -741,8 +741,7 @@ public class SeleniumTestsReporter implements IReporter, ITestListener, IInvoked
             copyResources();
             logger.info("Completed Report Generation.");
 
-            String browserPath = (String) SeleniumTestsContextManager.getGlobalContext().getAttribute(
-                    SeleniumTestsContext.OPEN_REPORT_IN_BROWSER);
+            String browserPath = (String) SeleniumTestsContextManager.getGlobalContext().getOpenReportInBrowser();
             if (browserPath != null && browserPath.trim().length() > 0) {
                 executeCmd(browserPath, getReportLocation().getAbsolutePath());
             }

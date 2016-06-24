@@ -197,10 +197,9 @@ public class ScreenshotUtil {
      */
     public void capturePageSnapshotOnException() {
         Boolean capture = SeleniumTestsContextManager.getThreadContext().getCaptureSnapshot();
-        SeleniumTestsContextManager.getThreadContext().setAttribute(SeleniumTestsContext.CAPTURE_SNAPSHOT, "true");
+        SeleniumTestsContextManager.getThreadContext().setCaptureSnapshot(true);
         captureWebPageSnapshot();
-        SeleniumTestsContextManager.getThreadContext().setAttribute(SeleniumTestsContext.CAPTURE_SNAPSHOT,
-            Boolean.toString(capture));
+        SeleniumTestsContextManager.getThreadContext().setCaptureSnapshot(capture);
 
         // SeleniumTestsContextManager.getThreadContext().setScreenshotName(filename);
         // SeleniumTestsContextManager.getThreadContext().setWebExceptionURL(location);

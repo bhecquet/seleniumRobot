@@ -131,7 +131,7 @@ public class CustomTestNGCucumberRunner {
         List<CucumberFeature> selectedFeatures = new ArrayList<CucumberFeature>();
         
         // filter features requested for execution
-        List<String> testList = SeleniumTestsContextManager.getThreadContext().getCucmberTests();
+        List<String> testList = SeleniumTestsContextManager.getThreadContext().getCucumberTests();
         
         for (CucumberFeature feature: allFeatures) {
         	String featureName = feature.getGherkinFeature().getName();
