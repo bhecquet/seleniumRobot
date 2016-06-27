@@ -26,9 +26,7 @@ import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.TestLogging;
 import com.seleniumtests.customexception.CustomSeleniumTestsException;
 
-import cucumber.api.testng.CucumberFeatureWrapper;
 import cucumber.api.testng.FeatureResultListener;
-import cucumber.api.testng.TestNGCucumberRunner;
 import cucumber.api.testng.TestNgReporter;
 import cucumber.runtime.ClassFinder;
 import cucumber.runtime.CucumberException;
@@ -81,7 +79,7 @@ public class CustomTestNGCucumberRunner {
     	}
     	
     	// get all features, filtered by test name
-    	System.setProperty("cucumber.options", SeleniumTestsContext.FEATURES_PATH);
+    	System.setProperty("cucumber.options", SeleniumTestsContext.getFeaturePath());
         List<CucumberFeature> testSelectedFeatures = getFeaturesFromRequestedTests(clazz, classLoader, resourceLoader);
 
     	// build cucumber option list
@@ -101,7 +99,7 @@ public class CustomTestNGCucumberRunner {
         cucumberOptions += " --glue classpath:" + cucumberPkg;
         
         // add feature path
-        cucumberOptions += " " + SeleniumTestsContext.FEATURES_PATH;
+        cucumberOptions += " " + SeleniumTestsContext.getFeaturePath();
 
         // get filtered features, based on tags
         runtimeOptions = new RuntimeOptions(cucumberOptions);

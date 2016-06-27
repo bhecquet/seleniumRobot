@@ -14,11 +14,9 @@
 package com.seleniumtests.browserfactory;
 
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.safari.SafariDriver;
 
 import com.seleniumtests.core.TestLogging;
-
 import com.seleniumtests.driver.DriverConfig;
 
 public class SafariDriverFactory extends AbstractWebDriverFactory implements IWebDriverFactory {
@@ -26,16 +24,16 @@ public class SafariDriverFactory extends AbstractWebDriverFactory implements IWe
     public SafariDriverFactory(final DriverConfig cfg) {
         super(cfg);
     }
+    
+    protected WebDriver createNativeDriver() {
+    	synchronized (this.getClass()) {
+    		return new SafariDriver(new SafariCapabilitiesFactory().createCapabilities(webDriverConfig));
+    	}
+    }
 
     @Override
     public WebDriver createWebDriver() {
-        DesiredCapabilities cap = new SafariCapabilitiesFactory().createCapabilities(webDriverConfig);
-        System.out.println("Begin Safari");
-        synchronized (this.getClass()) {
-            driver = new SafariDriver(cap);
-        }
-
-        System.out.println("safari started");
+    	driver = createNativeDriver();
 
         this.setWebDriver(driver);
 

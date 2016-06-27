@@ -52,36 +52,38 @@ public class FileUtil {
         }
 
         BufferedWriter bw = null;
+        FileWriter fw = null;
 
         try {
-
-            bw = new BufferedWriter(new FileWriter(file));
+        	fw = new FileWriter(file);
+            bw = new BufferedWriter(fw);
 
             for (int i = 0; i < list.size(); i++) {
 
                 bw.write(list.get(i).toString());
-
                 bw.write(StringUtil.getNewlineStr());
 
             }
-
-        } catch (IOException ex) {
-
-            throw ex;
-
+            bw.close();
+            fw.close();
+           
         } finally {
 
             try {
 
-                bw.close();
-
+            	if (bw != null) {
+            		bw.close();
+            	}
                 bw = null;
 
-            } catch (Exception ex) {
-
-                // do nothing
-
-            }
+            } catch (Exception ex) {}
+            try {
+            	if (fw != null) {
+            		fw.close();
+            	}
+            	fw = null;
+            	
+            } catch (Exception ex) {}
 
         }
 

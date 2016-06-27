@@ -25,19 +25,20 @@ import org.ini4j.Ini;
 import org.ini4j.InvalidFileFormatException;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.core.TestLogging;
 import com.seleniumtests.customexception.ConfigurationException;
-import com.seleniumtests.webelements.PageObject;
 
 public class ConfigReader {
 	
 	private static final String GLOBAL_SECTION_NAME = "General";
-	private static final Logger logger = Logger.getLogger(ConfigReader.class);
+	private static final Logger logger = TestLogging.getLogger(ConfigReader.class);
 
 	public HashMap<String, String> readConfig(InputStream iniFileStream) {
 		return readConfig(iniFileStream, SeleniumTestsContextManager.getThreadContext().getTestEnv());
 	}
 	
 	public HashMap<String, String> readConfig(InputStream iniFileStream, String environment) {
+		
 		HashMap<String, String> testConfig = new HashMap<String, String>();
 	
 		try {
@@ -80,7 +81,7 @@ public class ConfigReader {
 		} catch (InvalidFileFormatException e) {
 			throw new ConfigurationException("Invalid file: " + iniFileStream);
 		} catch (IOException e) {
-			throw new ConfigurationException(String.format("File does not exist %s: %s", iniFileStream + e.getMessage()));
+			throw new ConfigurationException(String.format("File does not exist %s: %s", iniFileStream, e.getMessage()));
 		}
 	}
 }

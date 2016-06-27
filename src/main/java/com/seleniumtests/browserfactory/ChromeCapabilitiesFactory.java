@@ -1,5 +1,6 @@
 /*
- * Copyright 2015 www.seleniumtests.com
+ * Orignal work: Copyright 2015 www.seleniumtests.com
+ * Modified work: Copyright 2016 www.infotel.com
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -32,7 +33,7 @@ import com.seleniumtests.helper.OSUtility;
 
 import com.seleniumtests.resources.WebDriverExternalResources;
 
-public class ChromeCapabilitiesFactory implements ICapabilitiesFactory {
+public class ChromeCapabilitiesFactory extends ICapabilitiesFactory {
 
     public DesiredCapabilities createCapabilities(final DriverConfig webDriverConfig) {
 
@@ -86,7 +87,7 @@ public class ChromeCapabilitiesFactory implements ICapabilitiesFactory {
                         handleExtractResources();
                     }
                 } catch (IOException ex) {
-                    ex.printStackTrace();
+                	logger.error(ex);
                 }
             } else {
                 System.setProperty("webdriver.chrome.driver", chromeDriverPath);
@@ -97,7 +98,7 @@ public class ChromeCapabilitiesFactory implements ICapabilitiesFactory {
     }
 
     public void handleExtractResources() throws IOException {
-        String dir = Paths.get(SeleniumTestsContext.ROOT_PATH, "tools", "drivers", Platform.getCurrent().family().toString().toLowerCase()).toString();
+        String dir = Paths.get(SeleniumTestsContext.getRootPath(), "tools", "drivers", Platform.getCurrent().family().toString().toLowerCase()).toString();
         dir = FileUtility.decodePath(dir);
 
         if (OSUtility.isWindows()) {

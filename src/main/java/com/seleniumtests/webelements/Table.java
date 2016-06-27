@@ -88,7 +88,9 @@ public class Table extends HtmlElement {
             if (columns == null || columns.size() == 0) {
                 try {
                     columns = rows.get(row - 1).findElements(By.tagName("th"));
-                } catch (NotFoundException e) { }
+                } catch (NotFoundException e) {
+                	return null;
+                }
             }
 
             return columns.get(column - 1).getText();

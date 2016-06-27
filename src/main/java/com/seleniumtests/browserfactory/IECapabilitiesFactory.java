@@ -1,5 +1,6 @@
 /*
- * Copyright 2015 www.seleniumtests.com
+ * Orignal work: Copyright 2015 www.seleniumtests.com
+ * Modified work: Copyright 2016 www.infotel.com
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -32,10 +33,10 @@ import com.seleniumtests.helper.OSUtility;
 
 import com.seleniumtests.resources.WebDriverExternalResources;
 
-public class IECapabilitiesFactory implements ICapabilitiesFactory {
+public class IECapabilitiesFactory extends ICapabilitiesFactory {
     
     public void handleExtractResources() throws IOException {
-        String dir = Paths.get(SeleniumTestsContext.ROOT_PATH, "tools", "drivers", Platform.getCurrent().family().toString().toLowerCase()).toString();
+        String dir = Paths.get(SeleniumTestsContext.getRootPath(), "tools", "drivers", Platform.getCurrent().family().toString().toLowerCase()).toString();
         dir = FileUtility.decodePath(dir);
         
         if (!new File(dir + "\\IEDriverServer.exe").exists()) {
@@ -47,7 +48,7 @@ public class IECapabilitiesFactory implements ICapabilitiesFactory {
         }
         
         System.setProperty("webdriver.ie.driver", dir + "\\IEDriverServer.exe");
-        System.out.println(dir + "\\IEDriverServer.exe");
+        logger.debug(dir + "\\IEDriverServer.exe");
     }
 
     public DesiredCapabilities createCapabilities(final DriverConfig cfg) {
@@ -58,13 +59,13 @@ public class IECapabilitiesFactory implements ICapabilitiesFactory {
                 System.setProperty("webdriver.ie.driver", cfg.getIeDriverPath());
             } else {
                 if (System.getenv("webdriver.ie.driver") != null) {
-                    System.out.println("Get IE Driver from property:" + System.getenv("webdriver.ie.driver"));
+                    logger.info("Get IE Driver from property:" + System.getenv("webdriver.ie.driver"));
                     System.setProperty("webdriver.ie.driver", System.getenv("webdriver.ie.driver"));
                 } else {
                     try {
                         handleExtractResources();
                     } catch (IOException e) {
-                        e.printStackTrace();
+                        logger.error(e);
                     }
                 }
             }

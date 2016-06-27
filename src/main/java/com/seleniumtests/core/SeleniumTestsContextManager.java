@@ -163,12 +163,12 @@ public class SeleniumTestsContextManager {
             for (Entry<String, String> entry : testParameters.entrySet()) {
                 seleniumTestsCtx.setAttribute(entry.getKey(), entry.getValue());
             }
-        }
-        
-        // merge configurations from ini file and xml file
-        seleniumTestsCtx.setTestConfiguration();
+            
+            // merge configurations from ini file and xml file
+            seleniumTestsCtx.setTestConfiguration();
 
-        testLevelContext.put(xmlTest.getName(), seleniumTestsCtx);
+            testLevelContext.put(xmlTest.getName(), seleniumTestsCtx);
+        }
     }
 
     public static void initTestLevelContext(final XmlTest xmlTest) {

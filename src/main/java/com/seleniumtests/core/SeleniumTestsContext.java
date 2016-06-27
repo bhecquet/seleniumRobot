@@ -29,6 +29,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.log4j.Logger;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.openqa.selenium.Platform;
@@ -51,13 +52,15 @@ import com.seleniumtests.reporter.PluginsHelper;
 public class SeleniumTestsContext {
 	
 	// folder config
-	public static String ROOT_PATH;
-	public static String DATA_PATH;
-	public static String FEATURES_PATH;
-	public static String CONFIG_PATH;
-	public static String APPLICATION_NAME;
-	public static HashMap<String, HashMap<String,String>> ID_MAPPING;
+	private static String ROOT_PATH;
+	private static String DATA_PATH;
+	private static String FEATURES_PATH;
+	private static String CONFIG_PATH;
+	private static String APPLICATION_NAME;
+	public HashMap<String, HashMap<String,String>> idMapping;
 	public static final String DATA_FOLDER_NAME = "data";
+	
+	private static final Logger logger = TestLogging.getLogger(SeleniumTestsContext.class);
 
     /* configuration defined in testng.xml */
     public static final String TEST_CONFIGURATION = "testConfig"; 				// configuration annexe
@@ -172,7 +175,7 @@ public class SeleniumTestsContext {
                 screenshots.remove(size - 1);
             }
         } catch (Exception ex) {
-            ex.printStackTrace();
+            logger.error(ex.getMessage());
         }
     }
 
@@ -748,12 +751,36 @@ public class SeleniumTestsContext {
     //Methods for ID_Mapping
     //get
     public HashMap<String, HashMap<String, String>> getIdMapping() {
-    	return (HashMap<String, HashMap<String,String>>) ID_MAPPING;
+    	return (HashMap<String, HashMap<String,String>>) idMapping;
     }
     
-    //set
+    /**
+     * Returns application root path
+     * @return
+     */
+    public static String getRootPath() {
+		return ROOT_PATH;
+	}
+
+    /**
+     * Returns location of feature files
+     * @return
+     */
+	public static String getFeaturePath() {
+		return FEATURES_PATH;
+	}
+
+	/**
+	 * Returns location of config files
+	 * @return
+	 */
+	public static String getConfigPath() {
+		return CONFIG_PATH;
+	}
+
+	//set
     public void setIdMapping(HashMap<String, HashMap<String,String>> conf){
-    	ID_MAPPING = conf;
+    	idMapping = conf;
     }
     
     
