@@ -547,7 +547,7 @@ public class SeleniumTestsReporter implements IReporter, ITestListener, IInvoked
                     } else {
                         try {
                             testName = ans.getTestContext().getCurrentXmlTest().getName();
-                        } catch (Exception | Error ex) {
+                        } catch (Exception ex) {
                             logger.error(ex.getMessage());
                             continue;
                         }

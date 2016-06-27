@@ -14,6 +14,7 @@
 
 package com.seleniumtests.driver;
 
+import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 
@@ -157,7 +158,7 @@ public class WebUIDriver {
         uxDriverSession.set(this);
     }
 
-    public WebDriver createRemoteWebDriver(final String browser, final String mode) throws Exception {
+    public WebDriver createRemoteWebDriver(final String browser, final String mode) throws IOException  {
         WebDriver driver = null;
         config.setBrowser(BrowserType.getBrowserType(browser));
         config.setMode(DriverMode.valueOf(mode));

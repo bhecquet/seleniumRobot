@@ -18,16 +18,21 @@ import java.io.IOException;
 
 import java.util.concurrent.TimeUnit;
 
+import org.apache.log4j.Logger;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.ie.InternetExplorerDriver;
 
+import com.seleniumtests.core.TestLogging;
+import com.seleniumtests.core.runner.CucumberRunner;
 import com.seleniumtests.customexception.DriverExceptions;
 import com.seleniumtests.driver.DriverConfig;
 
 import com.seleniumtests.helper.OSUtility;
 
 public class IEDriverFactory extends AbstractWebDriverFactory implements IWebDriverFactory {
+	
+	private static final Logger logger = TestLogging.getLogger(IEDriverFactory.class);
 
     public IEDriverFactory(final DriverConfig webDriverConfig1) {
         super(webDriverConfig1);
@@ -40,7 +45,7 @@ public class IEDriverFactory extends AbstractWebDriverFactory implements IWebDri
                 try {
                     driver.quit();
                 } catch (WebDriverException ex) {
-                    ex.printStackTrace();
+                	logger.error(ex.getMessage());
                 }
 
                 driver = null;

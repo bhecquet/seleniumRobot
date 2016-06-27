@@ -320,7 +320,7 @@ public class FileUtility {
                 try {
                     bw.close();
                 } catch (Exception e) {
-                    e.printStackTrace();
+                	logger.warn(e.getMessage());
                 }
             }
 
