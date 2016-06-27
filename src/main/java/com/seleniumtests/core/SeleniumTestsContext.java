@@ -745,7 +745,6 @@ public class SeleniumTestsContext {
     	return (HashMap<String, String>) getAttribute(TEST_CONFIG);
     }
     
-    
     //Methods for ID_Mapping
     //get
     public HashMap<String, HashMap<String, String>> getIdMapping() {
