@@ -14,8 +14,7 @@
 
 package com.seleniumtests.driver;
 
-import java.util.TreeSet;
-
+import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.UnsupportedCommandException;
@@ -24,10 +23,13 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.events.WebDriverEventListener;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
-
+import com.seleniumtests.core.TestLogging;
 import com.seleniumtests.customexception.WebSessionEndedException;
 
 public class DriverExceptionListener implements WebDriverEventListener {
+	
+	private static final Logger logger = TestLogging.getLogger(DriverExceptionListener.class);
+	
     public void afterChangeValueOf(final WebElement element, final WebDriver driver) {
     	if (SeleniumTestsContextManager.isWebTest() && element.getTagName().equalsIgnoreCase("input")) {
     		try {
@@ -93,7 +95,7 @@ public class DriverExceptionListener implements WebDriverEventListener {
                 }
             }
 
-            ex.printStackTrace();
+            logger.error(ex);
             // return;
         } else if (ex.getMessage().contains("Error communicating with the remote browser. It may have died.")) {
 
@@ -110,7 +112,7 @@ public class DriverExceptionListener implements WebDriverEventListener {
             return;
         } else {
             String message = ex.getMessage().split("\\n")[0];
-            System.out.println("Got customexception:" + message);
+            logger.warn("Got exception:" + message);
             if (message.matches("Session (/S*) was terminated due to(.|\\n)*")
                     || message.matches("cannot forward the request Connection to(.|\\n)*")) {
                 WebUIDriver.setWebDriver(null); // can't quit anymore, save time.

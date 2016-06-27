@@ -58,8 +58,7 @@ import com.thoughtworks.selenium.webdriven.JavascriptLibrary;
  */
 public class HtmlElement {
 
-    protected static final Logger logger = TestLogging.getLogger(
-            HtmlElement.class);
+    protected static final Logger logger = TestLogging.getLogger(HtmlElement.class);
 
 
     protected WebDriver driver = WebUIDriver.getWebDriver();
@@ -162,22 +161,20 @@ public class HtmlElement {
             new Actions(driver).moveToElement(element, xOffset, yOffset).click()
                 .perform();
         } catch (InvalidElementStateException e) {
-            e.printStackTrace();
+            logger.error(e);
             element.click();
         }
 
         try {
-            BrowserType type = WebUIDriver.getWebUIDriver().getConfig()
-                .getBrowser();
+            BrowserType type = WebUIDriver.getWebUIDriver().getConfig().getBrowser();
 
             if (((type == BrowserType.Chrome) ||
                         (type == BrowserType.InternetExplore)) &&
-                    driver.switchTo().alert().getText().contains(
-                        "leave")) {
+                    driver.switchTo().alert().getText().contains("leave")) {
                 driver.switchTo().alert().accept();
             }
         } catch (NoAlertPresentException e) {
-            e.printStackTrace();
+        	logger.info(e);
         }
     }
 

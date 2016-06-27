@@ -1,5 +1,6 @@
 /*
- * Copyright 2015 www.seleniumtests.com
+ * Orignal work: Copyright 2015 www.seleniumtests.com
+ * Modified work: Copyright 2016 www.infotel.com
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -23,6 +24,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+
+import com.seleniumtests.customexception.DatasetException;
 
 /**
  * Provides mechanism to retrieve records from spreadsheets.
@@ -119,7 +122,7 @@ public class Filter {
 
             return found;
         } else if (values == null || values[0] == null) {
-            throw new RuntimeException("Filter Operation does not support Null values: " + operator);
+            throw new DatasetException("Filter Operation does not support Null values: " + operator);
         } else {
             if (values[0] instanceof String) {
                 switch (operator) {
@@ -196,7 +199,7 @@ public class Filter {
             }
         }
 
-        throw new RuntimeException("NOT Implemented Yet" + "\n" + filter + "\n" + parameters);
+        throw new DatasetException("NOT Implemented Yet" + "\n" + filter + "\n" + parameters);
     }
 
     public static Filter not(final Filter exp) {

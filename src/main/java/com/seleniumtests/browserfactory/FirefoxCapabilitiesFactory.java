@@ -1,5 +1,6 @@
 /*
- * Copyright 2015 www.seleniumtests.com
+ * Orignal work: Copyright 2015 www.seleniumtests.com
+ * Modified work: Copyright 2016 www.infotel.com
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -33,7 +34,7 @@ import com.seleniumtests.helper.OSUtility;
 
 import net.jsourcerer.webdriver.jserrorcollector.JavaScriptError;
 
-public class FirefoxCapabilitiesFactory implements ICapabilitiesFactory {
+public class FirefoxCapabilitiesFactory extends ICapabilitiesFactory {
     private static boolean isProfileCreated = false;
     private static Object lockProfile = new Object();
 
@@ -70,7 +71,7 @@ public class FirefoxCapabilitiesFactory implements ICapabilitiesFactory {
                 try {
                     JavaScriptError.addExtension(profile);
                 } catch (IOException e) {
-                    e.printStackTrace();
+                	logger.error(e);
                 }
             }
         }
@@ -93,9 +94,9 @@ public class FirefoxCapabilitiesFactory implements ICapabilitiesFactory {
         capability = new DesiredCapabilities();
         capability.setBrowserName(DesiredCapabilities.firefox().getBrowserName());
 
-//        FirefoxProfile profile = getFirefoxProfile(webDriverConfig);
-//        configProfile(profile, webDriverConfig);
-//        capability.setCapability(FirefoxDriver.PROFILE, profile);
+        FirefoxProfile profile = getFirefoxProfile(webDriverConfig);
+        configProfile(profile, webDriverConfig);
+        capability.setCapability(FirefoxDriver.PROFILE, profile);
 
         if (webDriverConfig.isEnableJavascript()) {
             capability.setJavascriptEnabled(true);
@@ -145,11 +146,12 @@ public class FirefoxCapabilitiesFactory implements ICapabilitiesFactory {
                     FileUtility.extractJar(profilePath, FireFoxProfileMarker.class);
                 }
             } catch (Exception ex) {
-                ex.printStackTrace();
+            	logger.error(ex);
             }
+            isProfileCreated = true;
         }
 
-        isProfileCreated = true;
+        
     }
 
     protected synchronized FirefoxProfile getFirefoxProfile(final DriverConfig webDriverConfig) {
@@ -185,12 +187,12 @@ public class FirefoxCapabilitiesFactory implements ICapabilitiesFactory {
                 realPath = profilePath +  "/profiles/customProfileDirCUSTFF";
 
             } catch (Exception e) {
-                e.printStackTrace();
+            	logger.error(e);
                 realPath = null;
             }
         }
 
-        System.out.println("Firefox Profile: " + realPath);
+        logger.info("Firefox Profile: " + realPath);
         return realPath;
     }
 }

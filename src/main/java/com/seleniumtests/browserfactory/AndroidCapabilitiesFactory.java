@@ -25,7 +25,7 @@ import io.appium.java_client.remote.MobileCapabilityType;
 /**
  * Sets Android capabilities.
  */
-public class AndroidCapabilitiesFactory implements ICapabilitiesFactory {
+public class AndroidCapabilitiesFactory extends ICapabilitiesFactory {
 	
 	private DesiredCapabilities capabilities;
 	

@@ -1,5 +1,6 @@
 /*
- * Copyright 2015 www.seleniumtests.com
+ * Orignal work: Copyright 2015 www.seleniumtests.com
+ * Modified work: Copyright 2016 www.infotel.com
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,31 +14,25 @@
 
 package com.seleniumtests.browserfactory;
 
-import java.lang.reflect.InvocationTargetException;
-
 import java.net.MalformedURLException;
 import java.net.URL;
-
 import java.util.concurrent.TimeUnit;
 
 import org.apache.http.HttpHost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicHttpEntityEnclosingRequest;
 import org.apache.http.util.EntityUtils;
-
 import org.json.JSONObject;
-
 import org.openqa.selenium.UnsupportedCommandException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
 import com.seleniumtests.core.TestLogging;
-
+import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.DriverConfig;
 import com.seleniumtests.driver.ScreenShotRemoteWebDriver;
-
 import com.seleniumtests.helper.WaitHelper;
 
 public class RemoteDriverFactory extends AbstractWebDriverFactory implements IWebDriverFactory {
@@ -47,14 +42,16 @@ public class RemoteDriverFactory extends AbstractWebDriverFactory implements IWe
     }
 
     @Override
-    public WebDriver createWebDriver() throws MalformedURLException, IllegalArgumentException, SecurityException,
-        InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException,
-        ClassNotFoundException {
+    public WebDriver createWebDriver() {
         DriverConfig webDriverConfig = this.getWebDriverConfig();
         DesiredCapabilities capability = null;
         URL url;
 
-        url = new URL(webDriverConfig.getHubUrl());
+        try {
+			url = new URL(webDriverConfig.getHubUrl());
+		} catch (MalformedURLException e1) {
+			throw new ConfigurationException(String.format("Hub url '%s' is invalid: %s", webDriverConfig.getHubUrl(), e1.getMessage()));
+		}
 
         switch (webDriverConfig.getBrowser()) {
 
@@ -93,7 +90,7 @@ public class RemoteDriverFactory extends AbstractWebDriverFactory implements IWe
                     driver = new ScreenShotRemoteWebDriver(url, capability);
                 } catch (RuntimeException e) {
                     if (e.getMessage().contains(
-                                "Unable to connect to host 127.0.0.1 on port 7062 after 45000 ms. Firefox console output")) {
+                                "Unable to connect to host localhost on port 7062 after 45000 ms. Firefox console output")) {
                         TestLogging.log("Firefox Driver creation got port customexception, retry after 5 seconds");
                         WaitHelper.waitForSeconds(5);
                         driver = new ScreenShotRemoteWebDriver(url, capability);
@@ -119,9 +116,10 @@ public class RemoteDriverFactory extends AbstractWebDriverFactory implements IWe
         int port = url.getPort();
 
         // logging node ip address:
+        DefaultHttpClient client = new DefaultHttpClient();
         try {
             HttpHost host = new HttpHost(hub, port);
-            DefaultHttpClient client = new DefaultHttpClient();
+            
             String sessionUrl = "http://" + hub + ":" + port + "/grid/api/testsession?session=";
             URL session = new URL(sessionUrl + ((RemoteWebDriver) driver).getSessionId());
             BasicHttpEntityEnclosingRequest req;
@@ -140,7 +138,11 @@ public class RemoteDriverFactory extends AbstractWebDriverFactory implements IWe
                 TestLogging.log("WebDriver is running on node " + node + ", " + browserName + version + ", session "
                         + ((RemoteWebDriver) driver).getSessionId());
             } catch (org.json.JSONException e) { }
-        } catch (Exception ex) { }
+        } catch (Exception ex) {
+        	
+        } finally {
+        	client.close();
+        }
 
         return driver;
     }
@@ -152,7 +154,7 @@ public class RemoteDriverFactory extends AbstractWebDriverFactory implements IWe
                 try {
                     driver.manage().timeouts().pageLoadTimeout(timeout, TimeUnit.SECONDS);
                 } catch (UnsupportedCommandException e) {
-                    e.printStackTrace();
+                	logger.error(e);
                 }
 
                 break;
@@ -165,4 +167,9 @@ public class RemoteDriverFactory extends AbstractWebDriverFactory implements IWe
             default :
         }
     }
+
+	@Override
+	protected WebDriver createNativeDriver() {
+		return null;
+	}
 }

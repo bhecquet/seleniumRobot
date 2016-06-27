@@ -1,5 +1,6 @@
 /*
- * Copyright 2015 www.seleniumtests.com
+ * Orignal work: Copyright 2015 www.seleniumtests.com
+ * Modified work: Copyright 2016 www.infotel.com
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,7 +15,6 @@
 package com.seleniumtests.helper;
 
 import java.awt.image.BufferedImage;
-
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
@@ -29,14 +29,8 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
-
 import java.net.URLDecoder;
-
-import java.nio.channels.FileLock;
-
 import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.jar.JarFile;
 import java.util.zip.ZipEntry;
 
@@ -44,14 +38,14 @@ import javax.imageio.ImageIO;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FileUtils;
-
 import org.apache.log4j.Logger;
 
-public class FileUtility {
-    static Logger logger = Logger.getLogger(FileUtility.class);
-    static final int BUFFER = 2048;
+import com.seleniumtests.core.TestLogging;
+import com.seleniumtests.driver.WebUIDriver;
 
-    private static Map<Integer, FileLock> fileLockMap = new HashMap<Integer, FileLock>();
+public class FileUtility {
+	private static final Logger logger = TestLogging.getLogger(WebUIDriver.class);
+    static final int BUFFER = 2048;
 
     public static void extractJar(final String storeLocation, final Class<?> clz) throws IOException {
         File firefoxProfile = new File(storeLocation);
@@ -91,6 +85,7 @@ public class FileUtility {
                 is.close();
             }
         }
+        jar.close();
 
         FileUtils.deleteDirectory(new File(storeLocation + "\\META-INF"));
         if (OSUtility.isWindows()) {
@@ -137,7 +132,7 @@ public class FileUtility {
                         try {
                             in.close();
                         } catch (Exception e) {
-                            e.printStackTrace();
+                            logger.warn(e);
                         }
                     }
 
@@ -145,7 +140,7 @@ public class FileUtility {
                         try {
                             out.close();
                         } catch (Exception e) {
-                            e.printStackTrace();
+                        	logger.warn(e);
                         }
                     }
                 }
@@ -231,7 +226,7 @@ public class FileUtility {
                 try {
                     br.close();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                	logger.warn(e);
                 }
             }
 
@@ -239,7 +234,7 @@ public class FileUtility {
                 try {
                     fr.close();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                	logger.warn(e);
                 }
             }
         }
@@ -275,13 +270,13 @@ public class FileUtility {
             ImageIO.write(img, "png", fos);
             img = null;
         } catch (Exception e) {
-            logger.warn(e.getMessage());
+            logger.warn(e);
         } finally {
             if (in != null) {
                 try {
                     in.close();
                 } catch (Exception e) {
-                    e.printStackTrace();
+                	logger.warn(e);
                 }
             }
 
@@ -289,7 +284,7 @@ public class FileUtility {
                 try {
                     fos.close();
                 } catch (Exception e) {
-                    e.printStackTrace();
+                	logger.warn(e);
                 }
             }
         }
@@ -325,7 +320,7 @@ public class FileUtility {
                 try {
                     bw.close();
                 } catch (Exception e) {
-                    e.printStackTrace();
+                	logger.warn(e);
                 }
             }
 
@@ -333,7 +328,7 @@ public class FileUtility {
                 try {
                     outputStreamWriter.close();
                 } catch (Exception e) {
-                    e.printStackTrace();
+                	logger.warn(e);
                 }
             }
 
@@ -341,7 +336,7 @@ public class FileUtility {
                 try {
                     fileOutputStream.close();
                 } catch (Exception e) {
-                    e.printStackTrace();
+                	logger.warn(e);
                 }
             }
         }

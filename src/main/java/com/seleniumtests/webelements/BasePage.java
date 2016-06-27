@@ -429,7 +429,7 @@ public abstract class BasePage {
         wait.until(ExpectedConditions.invisibilityOfElementLocated(element.getBy()));
     }
 
-    public void waitForPopup(final String locator) throws Exception {
+    public void waitForPopup(final String locator) {
         waitForPopUp(locator, sessionTimeout + "");
     }
 
@@ -498,11 +498,7 @@ public abstract class BasePage {
                 }
             } catch (Exception ignore) { }
 
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e.getMessage());
-            }
+            WaitHelper.waitForSeconds(1);
         }
 
         assertHTML(b, "Timed out waiting for text \"" + text + "\" to be there.");
@@ -521,11 +517,7 @@ public abstract class BasePage {
                 }
             } catch (Exception ignore) { }
 
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e.getMessage());
-            }
+            WaitHelper.waitForSeconds(1);
         }
 
         assertHTML(!textPresent, "Timed out waiting for text \"" + text + "\" to be gone.");

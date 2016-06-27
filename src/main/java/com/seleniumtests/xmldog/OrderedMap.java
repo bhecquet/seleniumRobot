@@ -14,13 +14,11 @@
 package com.seleniumtests.xmldog;
 
 import java.io.Serializable;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Class representing Ordered List ADT.
@@ -30,7 +28,12 @@ import java.util.Map;
  */
 public class OrderedMap implements Serializable {
 
-    // Thread safe OrderedMap
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 14563568984654L;
+
+	// Thread safe OrderedMap
     public static final int TYPE_SYNCHRONIZED = 1;
 
     // Unsynchronized OrderedMap
@@ -39,8 +42,8 @@ public class OrderedMap implements Serializable {
     // Unsychronized and allows Mutiple Object Values
     public static final int TYPE_UNSYNCHRONIZED_MOV = 3;
 
-    private List _elementOrder = null;
-    private Map _elements = null;
+    private ArrayList<Object> _elementOrder = null;
+    private HashMap<Object, Object> _elements = null;
     private int _type = -1;
 
     /**
@@ -51,13 +54,13 @@ public class OrderedMap implements Serializable {
      */
     public OrderedMap(final int type) {
         if (type == TYPE_SYNCHRONIZED) {
-            _elementOrder = Collections.synchronizedList(new ArrayList());
-            _elements = Collections.synchronizedMap(new HashMap());
+            _elementOrder = (ArrayList<Object>)Collections.synchronizedList(new ArrayList<Object>());
+            _elements = (HashMap<Object, Object>)Collections.synchronizedMap(new HashMap<Object, Object>());
         } else if (type == TYPE_UNSYNCHRONIZED) {
-            _elementOrder = new ArrayList();
-            _elements = new HashMap();
+            _elementOrder = new ArrayList<Object>();
+            _elements = new HashMap<Object, Object>();
         } else if (type == TYPE_UNSYNCHRONIZED_MOV) {
-            _elementOrder = new ArrayList();
+            _elementOrder = new ArrayList<Object>();
             _elements = new MOVMap();
         } else {
             throw new IllegalArgumentException("Unrecongnized OrderedMap type");
@@ -129,7 +132,7 @@ public class OrderedMap implements Serializable {
      *
      * @see     OrderdedList() Contructor
      */
-    public List getElementOrder() {
+    public List<Object> getElementOrder() {
         return _elementOrder;
     }
 
@@ -187,7 +190,7 @@ public class OrderedMap implements Serializable {
      *
      * @return  Enumeration of the element keys
      */
-    public Iterator elementKeys() {
+    public Iterator<Object> elementKeys() {
         return _elementOrder.iterator();
     }
 

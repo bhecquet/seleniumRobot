@@ -14,6 +14,7 @@
 
 package com.seleniumtests.webelements;
 
+import java.io.IOException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -56,7 +57,7 @@ import net.jsourcerer.webdriver.jserrorcollector.JavaScriptError;
 
 public class PageObject extends BasePage implements IPage {
 
-    private static final Logger logger = Logger.getLogger(PageObject.class);
+	private static final Logger logger = TestLogging.getLogger(PageObject.class);
     private static final int MAX_WAIT_TIME_FOR_REDIRECTION = 3;
     private boolean frameFlag = false;
     private HtmlElement pageIdentifierElement = null;
@@ -78,7 +79,7 @@ public class PageObject extends BasePage implements IPage {
      *
      * @throws  Exception
      */
-    public PageObject() throws Exception {
+    public PageObject() throws IOException {
         this(null, null);
     }
 
@@ -86,10 +87,11 @@ public class PageObject extends BasePage implements IPage {
      * Constructor for non-entry point page. The control is supposed to have reached the page from other API call.
      *
      * @param   pageIdentifierElement
+     * @throws IOException 
      *
      * @throws  Exception
      */
-    public PageObject(final HtmlElement pageIdentifierElement) throws Exception {
+    public PageObject(final HtmlElement pageIdentifierElement) throws IOException  {
         this(pageIdentifierElement, null);
     }
 
@@ -97,10 +99,11 @@ public class PageObject extends BasePage implements IPage {
      * Base Constructor.
      *
      * @param   url
+     * @throws IOException 
      *
      * @throws  Exception
      */
-    public PageObject(final HtmlElement pageIdentifierElement, final String url) throws Exception {
+    public PageObject(final HtmlElement pageIdentifierElement, final String url) throws IOException {
 
     	systemClock = new SystemClock();
         Calendar start = Calendar.getInstance();
@@ -165,7 +168,7 @@ public class PageObject extends BasePage implements IPage {
                     new ScreenshotUtil(driver).capturePageSnapshotOnException();
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+            	logger.error(e);
             }
 
             throw new NotCurrentPageException(getClass().getCanonicalName()
@@ -266,9 +269,7 @@ public class PageObject extends BasePage implements IPage {
         } catch (WebDriverException ignore) { }
 
         if (WebUIDriver.getWebUIDriver().getMode().equalsIgnoreCase("LOCAL")) {
-            try {
-                Thread.sleep(1000 * 2);
-            } catch (InterruptedException e) { }
+        	WaitHelper.waitForSeconds(2);
         }
 
         try {
@@ -412,7 +413,7 @@ public class PageObject extends BasePage implements IPage {
         new WebUtility(driver).maximizeWindow();
     }
 
-    private void open(final String url) throws Exception {
+    private void open(final String url) throws IOException {
 
         if (this.getDriver() == null) {
             TestLogging.logWebStep(url, "Launch application", false);
@@ -444,8 +445,8 @@ public class PageObject extends BasePage implements IPage {
         } catch (org.openqa.selenium.UnhandledAlertException ex) {
             TestLogging.log("got UnhandledAlertException, retry");
             driver.navigate().to(url);
-        } catch (Throwable e) {
-            e.printStackTrace();
+        } catch (WebDriverException e) {
+        	logger.error(e);
             throw new CustomSeleniumTestsException(e);
         }
 
@@ -540,7 +541,7 @@ public class PageObject extends BasePage implements IPage {
  		}
 
  		// wait for window to be displayed
- 		long end = systemClock.laterBy(waitMs + 250);
+ 		long end = systemClock.laterBy(waitMs + 250L);
  		Set<String> handles = new TreeSet<String>();
  		
  		while (systemClock.isNowBefore(end)) {
@@ -603,14 +604,14 @@ public class PageObject extends BasePage implements IPage {
         } catch (UnhandledAlertException e) { }
     }
 
-    private void waitForPageToLoad() throws Exception {
+    private void waitForPageToLoad() {
         new WebDriverWait(driver, 2).until(ExpectedConditions.jsReturnsValue("if (document.readyState === \"complete\") { return \"ok\"; }"));
 
         // populate page info
         try {
             populateAndCapturePageSnapshot();
         } catch (Exception ex) {
-
+        	logger.error(ex);
             // ex.printStackTrace();
             throw ex;
         }

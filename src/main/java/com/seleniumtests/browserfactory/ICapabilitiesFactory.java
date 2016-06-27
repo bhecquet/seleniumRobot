@@ -1,5 +1,6 @@
 /*
- * Copyright 2015 www.seleniumtests.com
+ * Orignal work: Copyright 2015 www.seleniumtests.com
+ * Modified work: Copyright 2016 www.infotel.com
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,12 +14,16 @@
 
 package com.seleniumtests.browserfactory;
 
+import org.apache.log4j.Logger;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
+import com.seleniumtests.core.TestLogging;
 import com.seleniumtests.driver.DriverConfig;
 
-public interface ICapabilitiesFactory {
+public abstract class ICapabilitiesFactory {
+	
+	protected static final Logger logger = TestLogging.getLogger(AbstractWebDriverFactory.class);
 
-    DesiredCapabilities createCapabilities(DriverConfig cfg);
+    abstract DesiredCapabilities createCapabilities(DriverConfig cfg);
     
 }

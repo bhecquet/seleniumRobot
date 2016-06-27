@@ -1,3 +1,16 @@
+/*
+ * Copyright 2016 www.infotel.com
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.seleniumtests.util;
 
 import java.io.File;
@@ -22,8 +35,9 @@ public class IniHelper {
 	 *            hashMap we want to fill
 	 * @return the HashMap completed with data from the file
 	 */
-	public static HashMap<String, HashMap<String,String>> readIniFile(File fileToRead, HashMap<String, HashMap<String, String>> hashMapToComplete) {
-		
+	public static HashMap<String, HashMap<String, String>> readIniFile(File fileToRead,
+			HashMap<String, HashMap<String, String>> hashMapToComplete) {
+
 		try {
 			Ini ini = new Ini();
 			Config conf = ini.getConfig();
@@ -32,19 +46,19 @@ public class IniHelper {
 			ini.setConfig(conf);
 			ini.load(fileToRead);
 			Set<Ini.Entry<String, Ini.Section>> sections = ini.entrySet();
-			HashMap<String, String> inter=new HashMap<String, String>();
+			HashMap<String, String> inter = new HashMap<String, String>();
 			String actualSection = "";
-			
+
 			for (Ini.Entry<String, Ini.Section> section : sections) {
-				    inter = new HashMap<String,String>(); //recreate inter
-				    actualSection = section.getKey();
-				    if(hashMapToComplete.containsKey(actualSection)){
-				    	inter.putAll(hashMapToComplete.get(actualSection)); //recup datas already read
-				    }
-					for (Ini.Entry<String, String> sectionOption : section.getValue().entrySet()) {
-						inter.put(sectionOption.getKey(), sectionOption.getValue());
-					}
-					hashMapToComplete.put(actualSection, inter);
+				inter = new HashMap<String, String>(); // recreate inter
+				actualSection = section.getKey();
+				if (hashMapToComplete.containsKey(actualSection)) {
+					inter.putAll(hashMapToComplete.get(actualSection)); // recup datas already read
+				}
+				for (Ini.Entry<String, String> sectionOption : section.getValue().entrySet()) {
+					inter.put(sectionOption.getKey(), sectionOption.getValue());
+				}
+				hashMapToComplete.put(actualSection, inter);
 			}
 		} catch (InvalidFileFormatException e) {
 			throw new ConfigurationException("Invalid file: " + fileToRead);

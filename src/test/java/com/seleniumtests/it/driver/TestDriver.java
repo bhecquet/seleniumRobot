@@ -13,7 +13,6 @@
 
 package com.seleniumtests.it.driver;
 
-import java.time.LocalDateTime;
 import java.util.regex.Pattern;
 
 import org.openqa.selenium.By;

@@ -1,5 +1,6 @@
 /*
- * Copyright 2015 www.seleniumtests.com
+ * Orignal work: Copyright 2015 www.seleniumtests.com
+ * Modified work: Copyright 2016 www.infotel.com
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -35,6 +36,7 @@ import com.seleniumtests.core.Filter;
 import com.seleniumtests.core.TestLogging;
 
 import com.seleniumtests.customexception.CustomSeleniumTestsException;
+import com.seleniumtests.customexception.DatasetException;
 
 public class CSVHelper {
     private static Logger logger = TestLogging.getLogger(CSVHelper.class);
@@ -149,14 +151,14 @@ public class CSVHelper {
             }
 
             return sheetData.iterator();
-        } catch (Throwable e) {
-            throw new RuntimeException(e.getMessage());
+        } catch (Exception e) {
+            throw new DatasetException(e.getMessage());
         } finally {
             if (is != null) {
                 try {
                     is.close();
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    logger.warn(e);
                 }
             }
         }
@@ -199,14 +201,14 @@ public class CSVHelper {
             }
 
             return rowData;
-        } catch (Throwable e) {
-            throw new RuntimeException(e.getMessage());
+        } catch (Exception e) {
+            throw new DatasetException(e.getMessage());
         } finally {
             if (is != null) {
                 try {
                     is.close();
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    logger.warn(e);
                 }
             }
         }

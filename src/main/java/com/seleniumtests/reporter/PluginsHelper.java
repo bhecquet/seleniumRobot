@@ -1,5 +1,6 @@
 /*
- * Copyright 2015 www.seleniumtests.com
+ * Orignal work: Copyright 2015 www.seleniumtests.com
+ * Modified work: Copyright 2016 www.infotel.com
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,7 +18,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -28,19 +28,20 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
 
 import org.apache.log4j.Logger;
+import org.openqa.selenium.WebDriverException;
 
 import com.seleniumtests.core.SeleniumTestsPageListener;
-
+import com.seleniumtests.core.TestLogging;
+import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.reporter.pluginmodel.Method;
 import com.seleniumtests.reporter.pluginmodel.Page;
 import com.seleniumtests.reporter.pluginmodel.Plugin;
 import com.seleniumtests.reporter.pluginmodel.SeleniumTestsPlugins;
 import com.seleniumtests.reporter.pluginmodel.Test;
-
 import com.seleniumtests.webelements.IPage;
 
 public class PluginsHelper {
-    private static final Logger logger = Logger.getLogger(PluginsHelper.class);
+	private static final Logger logger = TestLogging.getLogger(PluginsHelper.class);
     private static Map<String, SeleniumTestsPageListener> pageListenerMap = Collections.synchronizedMap(
             new HashMap<String, SeleniumTestsPageListener>());
 
@@ -81,7 +82,7 @@ public class PluginsHelper {
                 } else {
                     listener.onPageUnload(page);
                 }
-            } catch (Throwable e) {
+            } catch (WebDriverException e) {
                 logger.error(e);
             }
         }
@@ -154,13 +155,13 @@ public class PluginsHelper {
             }
 
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new ConfigurationException(e.getMessage());
         } finally {
             if (is != null) {
                 try {
                     is.close();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    logger.error(e.getMessage());
                 }
             }
         }

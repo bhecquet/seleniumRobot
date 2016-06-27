@@ -1,5 +1,6 @@
 /*
- * Copyright 2015 www.seleniumtests.com
+ * Orignal work: Copyright 2015 www.seleniumtests.com
+ * Modified work: Copyright 2016 www.infotel.com
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,15 +18,22 @@ import java.io.IOException;
 
 import java.util.concurrent.TimeUnit;
 
+import org.apache.log4j.Logger;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
+import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.ie.InternetExplorerDriver;
 
+import com.seleniumtests.core.TestLogging;
+import com.seleniumtests.core.runner.CucumberRunner;
+import com.seleniumtests.customexception.DriverExceptions;
 import com.seleniumtests.driver.DriverConfig;
 
 import com.seleniumtests.helper.OSUtility;
 
 public class IEDriverFactory extends AbstractWebDriverFactory implements IWebDriverFactory {
+	
+	private static final Logger logger = TestLogging.getLogger(IEDriverFactory.class);
 
     public IEDriverFactory(final DriverConfig webDriverConfig1) {
         super(webDriverConfig1);
@@ -38,14 +46,18 @@ public class IEDriverFactory extends AbstractWebDriverFactory implements IWebDri
                 try {
                     driver.quit();
                 } catch (WebDriverException ex) {
-                    ex.printStackTrace();
+                	logger.error(ex);
                 }
 
                 driver = null;
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e);
         }
+    }
+    
+    protected WebDriver createNativeDriver() {
+        return new InternetExplorerDriver(new IECapabilitiesFactory().createCapabilities(webDriverConfig));
     }
 
     @Override
@@ -53,22 +65,10 @@ public class IEDriverFactory extends AbstractWebDriverFactory implements IWebDri
 
         // killProcess();
         if (!OSUtility.isWindows()) {
-            throw new RuntimeException("With gods grace IE browser is only supported on windows, Imagine a "
-                    + "situation when you have to fix IE bugs on Unix and Mac as well");
+            throw new DriverExceptions("IE is only supported on windows");
         }
 
-        DriverConfig cfg = this.getWebDriverConfig();
-
-        driver = new InternetExplorerDriver(new IECapabilitiesFactory().createCapabilities(cfg));
-
-        // Implicit Waits to handle dynamic element. The default value is 5 seconds.
-        setImplicitWaitTimeout(cfg.getImplicitWaitTimeout());
-        if (cfg.getPageLoadTimeout() >= 0) {
-            driver.manage().timeouts().pageLoadTimeout(cfg.getPageLoadTimeout(), TimeUnit.SECONDS);
-        }
-
-        this.setWebDriver(driver);
-        return driver;
+        return super.createWebDriver();
     }
 
     private void killProcess() {
@@ -77,7 +77,7 @@ public class IEDriverFactory extends AbstractWebDriverFactory implements IWebDri
                 Runtime.getRuntime().exec("taskkill /F /IM IEDriverServer.exe");
                 Runtime.getRuntime().exec("taskkill /F /IM Iexplore.exe");
             } catch (IOException e) {
-                e.printStackTrace();
+            	logger.error(e);
             }
         }
     }

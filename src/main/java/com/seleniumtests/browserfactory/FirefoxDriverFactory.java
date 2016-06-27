@@ -1,5 +1,6 @@
 /*
- * Copyright 2015 www.seleniumtests.com
+ * Orignal work: Copyright 2015 www.seleniumtests.com
+ * Modified work: Copyright 2016 www.infotel.com
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -25,7 +26,9 @@ import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.MarionetteDriver;
 
+import com.seleniumtests.customexception.DriverExceptions;
 import com.seleniumtests.driver.DriverConfig;
+import com.seleniumtests.helper.WaitHelper;
 
 public class FirefoxDriverFactory extends AbstractWebDriverFactory implements IWebDriverFactory {
     private long timeout = 60;
@@ -102,11 +105,7 @@ public class FirefoxDriverFactory extends AbstractWebDriverFactory implements IW
     @Override
     public WebDriver createWebDriver() {
         DriverConfig cfg = this.getWebDriverConfig();
-
-        System.out.println("start create firefox");
         driver = createWebDriverWithTimeout();
-
-        System.out.println("end create firefox");
 
         // Implicit Waits to handle dynamic element. The default value is 5
         // seconds.
@@ -134,18 +133,16 @@ public class FirefoxDriverFactory extends AbstractWebDriverFactory implements IW
                 if (ex.getMessage().contains("SocketException")
                         || ex.getMessage().contains("Failed to connect to binary FirefoxBinary")
                         || ex.getMessage().contains("Unable to bind to locking port 7054 within 45000 ms")) {
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException e) { }
+                    WaitHelper.waitForSeconds(1);
 
                     time++;
                 } else {
-                    throw new RuntimeException(ex);
+                    throw new DriverExceptions(ex.getMessage());
                 }
             }
         }
 
-        throw new RuntimeException("Got customexception when creating webDriver with socket timeout 1 minute");
+        throw new DriverExceptions("Got customexception when creating webDriver with socket timeout 1 minute");
     }
 
     /**

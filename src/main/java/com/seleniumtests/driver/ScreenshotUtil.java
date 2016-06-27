@@ -17,22 +17,18 @@ package com.seleniumtests.driver;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
-
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 
-import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.TestLogging;
-
 import com.seleniumtests.customexception.WebSessionEndedException;
-
 import com.seleniumtests.helper.FileUtility;
 import com.seleniumtests.helper.HashCodeGenerator;
 
 public class ScreenshotUtil {
-    private static final Logger logger = Logger.getLogger(ScreenshotUtil.class);
+	private static final Logger logger = TestLogging.getLogger(ScreenshotUtil.class);
 
     public static String captureEntirePageScreenshotToString(final WebDriver driver, final String arg0) {
         if (driver == null) {
@@ -55,7 +51,7 @@ public class ScreenshotUtil {
         } catch (Exception ex) {
 
             // Ignore all exceptions
-            ex.printStackTrace();
+            logger.error(ex);
         }
 
         return "";
@@ -121,9 +117,8 @@ public class ScreenshotUtil {
                 screenShot.setImagePath(suiteName + "/screenshots/" + filename + ".png");
 
             }
-        } catch (Throwable e) {
-            logger.warn("Ex", e);
-            e.printStackTrace();
+        } catch (Exception e) {
+            logger.warn(e);
         }
     }
 
@@ -161,7 +156,7 @@ public class ScreenshotUtil {
                 } catch (org.openqa.selenium.UnhandledAlertException ex) {
 
                     // ignore alert customexception
-                    ex.printStackTrace();
+                    logger.error(ex);
                     url = driver.getCurrentUrl();
                 }
 
@@ -182,7 +177,7 @@ public class ScreenshotUtil {
         } catch (WebSessionEndedException e) {
             throw e;
         } catch (Exception ex) {
-            ex.printStackTrace();
+        	logger.error(ex);
         }
 
         if (SeleniumTestsContextManager.getThreadContext().getCaptureSnapshot()) {
@@ -239,8 +234,8 @@ public class ScreenshotUtil {
                 }
             } catch (WebSessionEndedException ex) {
                 throw ex;
-            } catch (Throwable e) {
-                e.printStackTrace();
+            } catch (Exception e) {
+                logger.error(e);
             }
 
         }
