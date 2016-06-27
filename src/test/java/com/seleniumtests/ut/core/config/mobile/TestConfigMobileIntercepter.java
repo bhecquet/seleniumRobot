@@ -9,6 +9,7 @@ import org.testng.xml.XmlTest;
 
 import com.seleniumtests.core.Locator;
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.webelements.InterceptBy;
 
 
@@ -34,9 +35,9 @@ public class TestConfigMobileIntercepter {
 		Assert.assertEquals(By.id("id").toString(), "By.id: id", "no change when no key word doesn't work");
 	}
 	
-	@Test(groups={"ut"})
-	public void noModifWhenNoPresence() {
-		Assert.assertEquals(By.id("map:name").toString(), "By.id: map:name", "no change when not present doesn't work");
+	@Test(groups={"ut"}, expectedExceptions = ConfigurationException.class)
+	public void exceptionWhenNoPresence() {
+		By.id("map:name");
 	}
 
 }
