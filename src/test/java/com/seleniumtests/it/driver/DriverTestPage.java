@@ -21,6 +21,7 @@ import com.seleniumtests.webelements.HtmlElement;
 import com.seleniumtests.webelements.LinkElement;
 import com.seleniumtests.webelements.PageObject;
 import com.seleniumtests.webelements.RadioButtonElement;
+import com.seleniumtests.webelements.SelectList;
 import com.seleniumtests.webelements.TextFieldElement;
 
 public class DriverTestPage extends PageObject {
@@ -43,6 +44,8 @@ public class DriverTestPage extends PageObject {
 	public static final TextFieldElement onBlurField = new TextFieldElement("On Blur", By.id("textOnBlur"));
 	public static final TextFieldElement onBlurFieldDest = new TextFieldElement("On Blur", By.id("textOnBlurDest"));
 	public static final CheckBoxElement hiddenCheckBox = new CheckBoxElement("check", By.id("hiddenCheckbox"));
+	public static final SelectList selectList = new SelectList("list", By.id("select"));
+	public static final SelectList selectMultipleList = new SelectList("listMultiple", By.id("selectMultiple"));
 
 	public DriverTestPage() throws Exception {
         super(textElement);
