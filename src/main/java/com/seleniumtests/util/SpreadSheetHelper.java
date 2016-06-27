@@ -139,7 +139,7 @@ public class SpreadSheetHelper {
                     int value = Integer.parseInt(ss[0]);
                     count = (value > count ? value : count);
                 } catch (NumberFormatException e) {
-                    logger.error(e.getMessage());
+                    logger.error(e);
                 }
             }
         }

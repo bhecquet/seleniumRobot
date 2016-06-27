@@ -82,7 +82,7 @@ public class XMLUtil
 
         {
 
-        	logger.error(ex.getMessage());
+        	logger.error(ex);
 
         }
 
@@ -536,7 +536,7 @@ public class XMLUtil
 
         {
 
-            logger.error(ex.getMessage());
+            logger.error(ex);
 
             throw new DOMException(DOMException.INVALID_MODIFICATION_ERR, "Error replacing Element text " + ex.toString());
 
@@ -2189,9 +2189,6 @@ public class XMLUtil
         {
 
             log(msg);
-
-            t.printStackTrace(System.out);
-
         }
 
     }
@@ -2361,7 +2358,7 @@ public class XMLUtil
 
         {
 
-            ex.printStackTrace();
+            logger.error(ex);
 
         }
 

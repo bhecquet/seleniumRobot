@@ -36,45 +36,21 @@ public class AppiumDriverFactory extends AbstractWebDriverFactory implements IWe
         super(cfg);
     }
     
-    protected WebDriver createNativeDriver() throws MalformedURLException {
+    protected WebDriver createNativeDriver() {
     	
     	DesiredCapabilities capabilities = new DesiredCapabilities();
 
-        if(webDriverConfig.getPlatform().equalsIgnoreCase("android")) {
-            return new AndroidDriver(new URL(webDriverConfig.getAppiumServerURL()), new AndroidCapabilitiesFactory(capabilities).createCapabilities(webDriverConfig));
-        } else if (webDriverConfig.getPlatform().equalsIgnoreCase("ios")){
-            return new IOSDriver(new URL(webDriverConfig.getAppiumServerURL()), new IOsCapabilitiesFactory(capabilities).createCapabilities(webDriverConfig));
-        }
-
-        return new RemoteWebDriver(new URL(webDriverConfig.getAppiumServerURL()), new SauceLabsCapabilitiesFactory().createCapabilities(webDriverConfig));
-
-    }
-
-    @Override
-    public WebDriver createWebDriver() {
-        final DriverConfig cfg = this.getWebDriverConfig();
-
-        try {
-            driver = createNativeDriver();
-        } catch (final MalformedURLException me){
-            throw new DriverExceptions("Problem with creating driver", me);
-        }
-
-        setImplicitWaitTimeout(cfg.getImplicitWaitTimeout());
-        if (cfg.getPageLoadTimeout() >= 0) {
-            setPageLoadTimeout(cfg.getPageLoadTimeout());
-        }
-
-        this.setWebDriver(driver);
-        return driver;
-    }
-
-    protected void setPageLoadTimeout(final long timeout) {
-        try {
-            driver.manage().timeouts().pageLoadTimeout(timeout, TimeUnit.SECONDS);
-        } catch (WebDriverException e) {
-            // chromedriver does not support pageLoadTimeout
-        }
+    	try {
+	        if(webDriverConfig.getPlatform().equalsIgnoreCase("android")) {
+	            return new AndroidDriver(new URL(webDriverConfig.getAppiumServerURL()), new AndroidCapabilitiesFactory(capabilities).createCapabilities(webDriverConfig));
+	        } else if (webDriverConfig.getPlatform().equalsIgnoreCase("ios")){
+	            return new IOSDriver(new URL(webDriverConfig.getAppiumServerURL()), new IOsCapabilitiesFactory(capabilities).createCapabilities(webDriverConfig));
+	        }
+	
+	        return new RemoteWebDriver(new URL(webDriverConfig.getAppiumServerURL()), new SauceLabsCapabilitiesFactory().createCapabilities(webDriverConfig));
+    	} catch (MalformedURLException e) {
+    		throw new DriverExceptions("Error creating driver: " + e.getMessage());
+    	}
     }
 
 }

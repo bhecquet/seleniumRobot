@@ -70,7 +70,7 @@ public class WebUIDriver {
                 try {
                     driver.quit();
                 } catch (WebDriverException ex) {
-                    logger.error(ex.getMessage());
+                    logger.error(ex);
                 }
 
                 driver = null;
@@ -111,7 +111,7 @@ public class WebUIDriver {
             try {
                 getWebUIDriver().createWebDriver();
             } catch (Exception e) {
-                logger.error(e.getMessage());
+                logger.error(e);
             }
         }
 
@@ -213,7 +213,7 @@ public class WebUIDriver {
         return driver;
     }
 
-    public WebDriver createWebDriver() throws Exception {
+    public WebDriver createWebDriver() throws IOException  {
     	if (config.getTestType().isMobile()) {
     		logger.info("Start creating appium driver");
     	} else {

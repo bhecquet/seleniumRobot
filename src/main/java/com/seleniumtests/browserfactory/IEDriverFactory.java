@@ -21,6 +21,7 @@ import java.util.concurrent.TimeUnit;
 import org.apache.log4j.Logger;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
+import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.ie.InternetExplorerDriver;
 
 import com.seleniumtests.core.TestLogging;
@@ -45,14 +46,18 @@ public class IEDriverFactory extends AbstractWebDriverFactory implements IWebDri
                 try {
                     driver.quit();
                 } catch (WebDriverException ex) {
-                	logger.error(ex.getMessage());
+                	logger.error(ex);
                 }
 
                 driver = null;
             }
         } catch (Exception e) {
-            logger.error(e.getMessage());
+            logger.error(e);
         }
+    }
+    
+    protected WebDriver createNativeDriver() {
+        return new InternetExplorerDriver(new IECapabilitiesFactory().createCapabilities(webDriverConfig));
     }
 
     @Override
@@ -60,22 +65,10 @@ public class IEDriverFactory extends AbstractWebDriverFactory implements IWebDri
 
         // killProcess();
         if (!OSUtility.isWindows()) {
-            throw new DriverExceptions("With gods grace IE browser is only supported on windows, Imagine a "
-                    + "situation when you have to fix IE bugs on Unix and Mac as well");
+            throw new DriverExceptions("IE is only supported on windows");
         }
 
-        DriverConfig cfg = this.getWebDriverConfig();
-
-        driver = new InternetExplorerDriver(new IECapabilitiesFactory().createCapabilities(cfg));
-
-        // Implicit Waits to handle dynamic element. The default value is 5 seconds.
-        setImplicitWaitTimeout(cfg.getImplicitWaitTimeout());
-        if (cfg.getPageLoadTimeout() >= 0) {
-            driver.manage().timeouts().pageLoadTimeout(cfg.getPageLoadTimeout(), TimeUnit.SECONDS);
-        }
-
-        this.setWebDriver(driver);
-        return driver;
+        return super.createWebDriver();
     }
 
     private void killProcess() {
@@ -84,7 +77,7 @@ public class IEDriverFactory extends AbstractWebDriverFactory implements IWebDri
                 Runtime.getRuntime().exec("taskkill /F /IM IEDriverServer.exe");
                 Runtime.getRuntime().exec("taskkill /F /IM Iexplore.exe");
             } catch (IOException e) {
-            	logger.error(e.getMessage());
+            	logger.error(e);
             }
         }
     }

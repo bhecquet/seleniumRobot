@@ -413,7 +413,7 @@ public class SeleniumTestsReporter implements IReporter, ITestListener, IInvoked
                 errorCountTabs.append("</font> )</span></a></li>");
             }
         } catch (Exception e) {
-            logger.error(e.getMessage());
+            logger.error(e);
         }
     }
 
@@ -475,7 +475,7 @@ public class SeleniumTestsReporter implements IReporter, ITestListener, IInvoked
                         t.merge(context, writer);
                         res.append(writer.toString());
                     } catch (Exception e) {
-                        logger.error("errorLogger creating a singlePageError." + e.getMessage());
+                        logger.error("errorLogger creating a singlePageError.", e);
                     }
 
                     pageCount++;
@@ -515,7 +515,7 @@ public class SeleniumTestsReporter implements IReporter, ITestListener, IInvoked
                 generatePanel(ve, tc.getPassedTests(), res, "passed", suite, ctx, envt);
             }
         } catch (Exception e) {
-            logger.error(e.getMessage());
+            logger.error(e);
         }
 
         return res.toString();
@@ -548,7 +548,7 @@ public class SeleniumTestsReporter implements IReporter, ITestListener, IInvoked
                         try {
                             testName = ans.getTestContext().getCurrentXmlTest().getName();
                         } catch (Exception ex) {
-                            logger.error(ex.getMessage());
+                            logger.error(ex);
                             continue;
                         }
                     }
@@ -679,7 +679,7 @@ public class SeleniumTestsReporter implements IReporter, ITestListener, IInvoked
                         t.merge(context, writer);
                         res.append(writer.toString());
                     } catch (Exception e) {
-                        logger.error("Exception creating a singleTest." + e.getMessage());
+                        logger.error("Exception creating a singleTest.", e);
                     }
                 }
             }
@@ -765,7 +765,7 @@ public class SeleniumTestsReporter implements IReporter, ITestListener, IInvoked
             m_out.write(writer.toString());
 
         } catch (Exception e) {
-            logger.error(e.getMessage());
+            logger.error(e);
         }
 
     }
@@ -879,7 +879,7 @@ public class SeleniumTestsReporter implements IReporter, ITestListener, IInvoked
             m_out.write(writer.toString());
 
         } catch (Exception e) {
-            logger.error(e.getMessage());
+            logger.error(e);
         }
 
     }
@@ -1278,7 +1278,7 @@ public class SeleniumTestsReporter implements IReporter, ITestListener, IInvoked
             out.write(writer.toString());
 
         } catch (Exception e) {
-            logger.error(e.getMessage());
+            logger.error(e);
         }
 
     }

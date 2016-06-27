@@ -21,11 +21,9 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.testng.ITestContext;
-import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.AfterSuite;
 import org.testng.annotations.AfterTest;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.BeforeTest;
@@ -33,14 +31,11 @@ import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 import org.testng.xml.XmlTest;
 
-import com.seleniumtests.core.SeleniumTestPlan;
-import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.TearDownService;
 import com.seleniumtests.core.TestLogging;
 import com.seleniumtests.driver.WebUIDriver;
 
-import cucumber.api.CucumberOptions;
 import cucumber.api.testng.CucumberFeatureWrapper;
 
 public class CucumberRunner {
@@ -70,7 +65,7 @@ public class CucumberRunner {
 	        SeleniumTestsContextManager.initTestLevelContext(testContext, xmlTest);
 	        testNGCucumberRunner = new CustomTestNGCucumberRunner(this.getClass(), xmlTest.getName());
     	} catch (Exception e) {
-    		logger.error(Thread.currentThread() + " Error on init: " + e.getMessage());
+    		logger.error(Thread.currentThread() + " Error on init: ", e);
     		for (StackTraceElement s : e.getStackTrace()) {
     			logger.error(Thread.currentThread() + " " + s.toString());
     		}

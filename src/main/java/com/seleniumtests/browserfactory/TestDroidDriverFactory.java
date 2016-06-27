@@ -19,11 +19,8 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Calendar;
-import java.util.concurrent.TimeUnit;
 
-import org.openqa.selenium.UnsupportedCommandException;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
@@ -33,7 +30,6 @@ import com.google.api.client.http.HttpHeaders;
 import com.google.api.client.http.HttpRequest;
 import com.google.api.client.http.HttpRequestFactory;
 import com.google.api.client.http.HttpRequestInitializer;
-import com.google.api.client.http.HttpResponse;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.JsonFactory;
@@ -128,58 +124,39 @@ public class TestDroidDriverFactory extends AbstractWebDriverFactory implements 
     }
 
 
-    protected WebDriver createNativeDriver() throws IOException {
+    protected WebDriver createNativeDriver() {
 
-    	DesiredCapabilities capabilities;
+    	DesiredCapabilities capabilities = new DesiredCapabilities();
     	
     	// updload application on TestDroid cloud
     	String fileUUID;
     	if (webDriverConfig.getTestType().family().equals(TestType.APP)) {
-    		fileUUID = uploadFile(SeleniumTestsContextManager.getThreadContext().getApp(), 
-    								webDriverConfig.getAppiumServerURL().split("/wd/hub")[0], 
-    								webDriverConfig.getCloudApiKey());
-    		capabilities = cloudSpecificCapabilities(fileUUID);
+    		try {
+				fileUUID = uploadFile(SeleniumTestsContextManager.getThreadContext().getApp(), 
+										webDriverConfig.getAppiumServerURL().split("/wd/hub")[0], 
+										webDriverConfig.getCloudApiKey());
+				capabilities = cloudSpecificCapabilities(fileUUID);
+			} catch (IOException e) {
+				logger.warn("application may not have been uploaded", e);
+			}
+    		
     	} else {
     		capabilities = new DesiredCapabilities();
     	}
 
-        if(webDriverConfig.getPlatform().equalsIgnoreCase("android")){
-        	capabilities.setCapability("testdroid_target", "android");
-            return new AndroidDriver(new URL(webDriverConfig.getAppiumServerURL()), new AndroidCapabilitiesFactory(capabilities).createCapabilities(webDriverConfig));
-        } else if (webDriverConfig.getPlatform().equalsIgnoreCase("ios")){
-        	capabilities.setCapability("testdroid_target", "ios");
-            return new IOSDriver(new URL(webDriverConfig.getAppiumServerURL()), new IOsCapabilitiesFactory(capabilities).createCapabilities(webDriverConfig));
-        }
+    	try {
+	        if(webDriverConfig.getPlatform().equalsIgnoreCase("android")){
+	        	capabilities.setCapability("testdroid_target", "android");
+	            return new AndroidDriver(new URL(webDriverConfig.getAppiumServerURL()), new AndroidCapabilitiesFactory(capabilities).createCapabilities(webDriverConfig));
+	        } else if (webDriverConfig.getPlatform().equalsIgnoreCase("ios")){
+	        	capabilities.setCapability("testdroid_target", "ios");
+	            return new IOSDriver(new URL(webDriverConfig.getAppiumServerURL()), new IOsCapabilitiesFactory(capabilities).createCapabilities(webDriverConfig));
+	        }
+	
+	        return new RemoteWebDriver(new URL(webDriverConfig.getAppiumServerURL()), new SauceLabsCapabilitiesFactory().createCapabilities(webDriverConfig));
 
-        return new RemoteWebDriver(new URL(webDriverConfig.getAppiumServerURL()), new SauceLabsCapabilitiesFactory().createCapabilities(webDriverConfig));
-
+    	} catch (MalformedURLException e) {
+    		throw new DriverExceptions("Error creating driver: " + e.getMessage());
+    	}
     }
-
-    @Override
-    public WebDriver createWebDriver() {
-        final DriverConfig cfg = this.getWebDriverConfig();
-
-        try {
-            driver = createNativeDriver();
-        } catch (final IOException me){
-            throw new DriverExceptions("Problem with creating driver", me);
-        }
-
-        setImplicitWaitTimeout(cfg.getImplicitWaitTimeout());
-        if (cfg.getPageLoadTimeout() >= 0) {
-            setPageLoadTimeout(cfg.getPageLoadTimeout());
-        }
-
-        this.setWebDriver(driver);
-        return driver;
-    }
-
-    protected void setPageLoadTimeout(final long timeout) {
-        try {
-            driver.manage().timeouts().pageLoadTimeout(timeout, TimeUnit.SECONDS);
-        } catch (WebDriverException e) {
-            // chromedriver does not support pageLoadTimeout
-        }
-    }
-
 }

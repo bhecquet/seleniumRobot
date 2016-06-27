@@ -158,7 +158,7 @@ public class CSVHelper {
                 try {
                     is.close();
                 } catch (Exception e) {
-                    logger.warn(e.getMessage());
+                    logger.warn(e);
                 }
             }
         }
@@ -208,7 +208,7 @@ public class CSVHelper {
                 try {
                     is.close();
                 } catch (Exception e) {
-                    logger.warn(e.getMessage());
+                    logger.warn(e);
                 }
             }
         }

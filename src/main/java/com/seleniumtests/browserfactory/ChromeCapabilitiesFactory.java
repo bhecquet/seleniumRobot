@@ -87,7 +87,7 @@ public class ChromeCapabilitiesFactory extends ICapabilitiesFactory {
                         handleExtractResources();
                     }
                 } catch (IOException ex) {
-                	logger.error(ex.getMessage());
+                	logger.error(ex);
                 }
             } else {
                 System.setProperty("webdriver.chrome.driver", chromeDriverPath);

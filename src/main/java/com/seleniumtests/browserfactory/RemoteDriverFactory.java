@@ -154,7 +154,7 @@ public class RemoteDriverFactory extends AbstractWebDriverFactory implements IWe
                 try {
                     driver.manage().timeouts().pageLoadTimeout(timeout, TimeUnit.SECONDS);
                 } catch (UnsupportedCommandException e) {
-                	logger.error(e.getMessage());
+                	logger.error(e);
                 }
 
                 break;
@@ -167,4 +167,9 @@ public class RemoteDriverFactory extends AbstractWebDriverFactory implements IWe
             default :
         }
     }
+
+	@Override
+	protected WebDriver createNativeDriver() {
+		return null;
+	}
 }

@@ -161,7 +161,7 @@ public class HtmlElement {
             new Actions(driver).moveToElement(element, xOffset, yOffset).click()
                 .perform();
         } catch (InvalidElementStateException e) {
-            logger.error(e.getMessage());
+            logger.error(e);
             element.click();
         }
 
@@ -174,7 +174,7 @@ public class HtmlElement {
                 driver.switchTo().alert().accept();
             }
         } catch (NoAlertPresentException e) {
-        	logger.info(e.getMessage());
+        	logger.info(e);
         }
     }
 

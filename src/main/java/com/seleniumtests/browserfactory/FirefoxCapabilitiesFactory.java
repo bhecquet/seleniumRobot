@@ -71,7 +71,7 @@ public class FirefoxCapabilitiesFactory extends ICapabilitiesFactory {
                 try {
                     JavaScriptError.addExtension(profile);
                 } catch (IOException e) {
-                	logger.error(e.getMessage());
+                	logger.error(e);
                 }
             }
         }
@@ -146,7 +146,7 @@ public class FirefoxCapabilitiesFactory extends ICapabilitiesFactory {
                     FileUtility.extractJar(profilePath, FireFoxProfileMarker.class);
                 }
             } catch (Exception ex) {
-            	logger.error(ex.getMessage());
+            	logger.error(ex);
             }
             isProfileCreated = true;
         }
@@ -187,7 +187,7 @@ public class FirefoxCapabilitiesFactory extends ICapabilitiesFactory {
                 realPath = profilePath +  "/profiles/customProfileDirCUSTFF";
 
             } catch (Exception e) {
-            	logger.error(e.getMessage());
+            	logger.error(e);
                 realPath = null;
             }
         }

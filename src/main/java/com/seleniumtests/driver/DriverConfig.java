@@ -102,7 +102,7 @@ public class DriverConfig {
                     listenerList.add(listener);
                 }
             } catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
-                logger.error(e.getMessage());
+                logger.error(e);
             }
         }
 

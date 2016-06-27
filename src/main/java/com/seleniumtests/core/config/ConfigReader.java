@@ -38,6 +38,7 @@ public class ConfigReader {
 	}
 	
 	public HashMap<String, String> readConfig(InputStream iniFileStream, String environment) {
+		
 		HashMap<String, String> testConfig = new HashMap<String, String>();
 	
 		try {

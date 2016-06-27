@@ -51,7 +51,7 @@ public class ScreenshotUtil {
         } catch (Exception ex) {
 
             // Ignore all exceptions
-            logger.error(ex.getMessage());
+            logger.error(ex);
         }
 
         return "";
@@ -118,7 +118,7 @@ public class ScreenshotUtil {
 
             }
         } catch (Exception e) {
-            logger.warn(e.getMessage(), e);
+            logger.warn(e);
         }
     }
 
@@ -156,7 +156,7 @@ public class ScreenshotUtil {
                 } catch (org.openqa.selenium.UnhandledAlertException ex) {
 
                     // ignore alert customexception
-                    logger.error(ex.getMessage());
+                    logger.error(ex);
                     url = driver.getCurrentUrl();
                 }
 
@@ -177,7 +177,7 @@ public class ScreenshotUtil {
         } catch (WebSessionEndedException e) {
             throw e;
         } catch (Exception ex) {
-        	logger.error(ex.getMessage());
+        	logger.error(ex);
         }
 
         if (SeleniumTestsContextManager.getThreadContext().getCaptureSnapshot()) {
@@ -235,7 +235,7 @@ public class ScreenshotUtil {
             } catch (WebSessionEndedException ex) {
                 throw ex;
             } catch (Exception e) {
-                logger.error(e.getMessage());
+                logger.error(e);
             }
 
         }

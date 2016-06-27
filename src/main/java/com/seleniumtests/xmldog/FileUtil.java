@@ -64,7 +64,9 @@ public class FileUtil {
                 bw.write(StringUtil.getNewlineStr());
 
             }
-
+            bw.close();
+            fw.close();
+           
         } finally {
 
             try {

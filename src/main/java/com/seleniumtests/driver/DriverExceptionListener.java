@@ -95,7 +95,7 @@ public class DriverExceptionListener implements WebDriverEventListener {
                 }
             }
 
-            logger.error(ex.getMessage());
+            logger.error(ex);
             // return;
         } else if (ex.getMessage().contains("Error communicating with the remote browser. It may have died.")) {
 
