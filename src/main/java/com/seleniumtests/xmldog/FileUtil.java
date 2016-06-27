@@ -52,10 +52,11 @@ public class FileUtil {
         }
 
         BufferedWriter bw = null;
+        FileWriter fw = null;
 
         try {
-
-            bw = new BufferedWriter(new FileWriter(file));
+        	fw = new FileWriter(file);
+            bw = new BufferedWriter(fw);
 
             for (int i = 0; i < list.size(); i++) {
 
@@ -73,15 +74,19 @@ public class FileUtil {
 
             try {
 
-                bw.close();
-
+            	if (bw != null) {
+            		bw.close();
+            	}
                 bw = null;
 
-            } catch (Exception ex) {
-
-                // do nothing
-
-            }
+            } catch (Exception ex) {}
+            try {
+            	if (fw != null) {
+            		fw.close();
+            	}
+            	fw = null;
+            	
+            } catch (Exception ex) {}
 
         }
 

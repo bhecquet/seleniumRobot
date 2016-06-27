@@ -81,9 +81,7 @@ public class CucumberRunner {
     public void beforeTestMethod(final Object[] parameters, final Method method, final ITestContext testContex, final XmlTest xmlTest) {
         logger.info(Thread.currentThread() + " Start method " + method.getName());
         SeleniumTestsContextManager.initThreadContext(testContex, xmlTest);
-        if (method != null) {
-            SeleniumTestsContextManager.getThreadContext().setTestMethodSignature(buildMethodSignature(method, parameters));
-        }
+        SeleniumTestsContextManager.getThreadContext().setTestMethodSignature(buildMethodSignature(method, parameters));
     }
 
     @Test(groups = "cucumber", description = "Cucumber scenario", dataProvider = "scenarios")
@@ -101,13 +99,9 @@ public class CucumberRunner {
     }
 
     @AfterTest
-    public void tearDown() throws Exception {
+    public void tearDown() {
         testNGCucumberRunner.finish();
     }
-//    @AfterClass
-//    public void tearDownClass() throws Exception {
-//    	testNGCucumberRunner.finish();
-//    }
 
     @AfterSuite(alwaysRun = true)
     public void afterTestSuite() {

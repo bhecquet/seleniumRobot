@@ -15,16 +15,21 @@
 package com.seleniumtests.driver;
 
 import java.net.URISyntaxException;
-
 import java.util.ArrayList;
 
+import org.apache.log4j.Logger;
 import org.openqa.selenium.Platform;
 import org.openqa.selenium.Proxy;
 import org.openqa.selenium.Proxy.ProxyType;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.events.WebDriverEventListener;
 
+import com.seleniumtests.core.TestLogging;
+import com.seleniumtests.customexception.DriverExceptions;
+
 public class DriverConfig {
+	
+	private static final Logger logger = TestLogging.getLogger(DriverConfig.class);
 
     private boolean setAssumeUntrustedCertificateIssuer = true;
     private boolean setAcceptUntrustedCertificates = true;
@@ -96,14 +101,8 @@ public class DriverConfig {
                     listener = (WebDriverEventListener) (Class.forName(aList)).newInstance();
                     listenerList.add(listener);
                 }
-            } catch (InstantiationException e) {
-                e.printStackTrace();
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
-            } catch (ClassCastException e) {
-                e.printStackTrace();
+            } catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
+                logger.error(e.getMessage());
             }
         }
 
@@ -152,7 +151,7 @@ public class DriverConfig {
             try {
                 return getClass().getResource("/profiles/customProfileDirCUSTFF").toURI().getPath();
             } catch (URISyntaxException e) {
-                throw new RuntimeException(e);
+                throw new DriverExceptions(e.getMessage());
             }
         } else {
             return ffProfilePath;
@@ -185,7 +184,7 @@ public class DriverConfig {
             try {
                 return getClass().getResource("/profiles/operaProfile").toURI().getPath();
             } catch (URISyntaxException e) {
-                throw new RuntimeException(e);
+            	throw new DriverExceptions(e.getMessage());
             }
         }
 

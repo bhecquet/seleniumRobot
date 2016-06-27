@@ -1,5 +1,6 @@
 /*
- * Copyright 2015 www.seleniumtests.com
+ * Orignal work: Copyright 2015 www.seleniumtests.com
+ * Modified work: Copyright 2016 www.infotel.com
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -18,7 +19,13 @@ import java.lang.reflect.Method;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+import org.apache.log4j.Logger;
+
+import com.seleniumtests.core.TestLogging;
+
 public class StringUtility {
+	
+	private static final Logger logger = TestLogging.getLogger(StringUtility.class);
 
     public static String constructMethodSignature(final Method method, final Object[] parameters) {
         return method.getDeclaringClass().getCanonicalName() + "." + method.getName() + "("
@@ -60,10 +67,10 @@ public class StringUtility {
             messageDigest.reset();
             messageDigest.update(str.getBytes("UTF-8"));
         } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
             return str;
         } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
+        	logger.error(e.getMessage());
             return str;
         }
 

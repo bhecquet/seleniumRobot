@@ -1,5 +1,6 @@
 /*
- * Copyright 2015 www.seleniumtests.com
+ * Orignal work: Copyright 2015 www.seleniumtests.com
+ * Modified work: Copyright 2016 www.infotel.com
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,18 +14,20 @@
 
 package com.seleniumtests.browserfactory;
 
+import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.log4j.Logger;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 
 import com.seleniumtests.core.TestLogging;
-
 import com.seleniumtests.driver.DriverConfig;
 import com.seleniumtests.driver.WebUIDriver;
 
 public abstract class AbstractWebDriverFactory {
 
+	protected static final Logger logger = TestLogging.getLogger(AbstractWebDriverFactory.class);
     protected DriverConfig webDriverConfig;
 
     protected WebDriver driver;
@@ -47,11 +50,11 @@ public abstract class AbstractWebDriverFactory {
                 driver = null;
             }
         } catch (Exception e) {
-            e.printStackTrace();
+        	logger.error(e.getMessage());
         }
     }
 
-    public WebDriver createWebDriver() throws Exception {
+    public WebDriver createWebDriver() throws IOException {
         return null;
     }
 
@@ -75,7 +78,7 @@ public abstract class AbstractWebDriverFactory {
             try {
                 driver.manage().timeouts().implicitlyWait(new Double(timeout).intValue(), TimeUnit.SECONDS);
             } catch (Exception ex) {
-                ex.printStackTrace();
+            	logger.error(ex.getMessage());
             }
         }
     }

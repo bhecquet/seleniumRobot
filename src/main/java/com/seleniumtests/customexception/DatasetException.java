@@ -1,6 +1,5 @@
 /*
- * Orignal work: Copyright 2015 www.seleniumtests.com
- * Modified work: Copyright 2016 www.infotel.com
+ * Copyright 2016 www.infotel.com
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,21 +11,19 @@
  * limitations under the License.
  */
 
-package com.seleniumtests.browserfactory;
+package com.seleniumtests.customexception;
 
-import java.io.IOException;
+public class DatasetException extends RuntimeException {
 
-import org.openqa.selenium.WebDriver;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 165465321654L;
+	public DatasetException(final String message, final Throwable throwable) {
+        super(message, throwable);
+    }
+    public DatasetException(final String message) {
+    	super(message);
+    }
 
-import com.seleniumtests.driver.DriverConfig;
-
-public interface IWebDriverFactory {
-
-    void cleanUp();
-
-    WebDriver createWebDriver() throws IOException;
-
-    WebDriver getWebDriver();
-
-    DriverConfig getWebDriverConfig();
 }

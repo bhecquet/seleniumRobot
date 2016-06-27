@@ -661,18 +661,12 @@ public class Comparator implements XMLDogConstants {
         DocumentType control = (DocumentType) xControl.getNode();
 
         DocumentType test = (DocumentType) xTest.getNode();
-
-        if ((diffName = XMLUtil.areNullorEqual(control.getPublicId(), test.getPublicId(), _ignoringWhitespace,
-                            _includeNodeValueInXPath))
-                &&
-
-                (diffSysId = XMLUtil.areNullorEqual(control.getSystemId(), test.getSystemId(), _ignoringWhitespace,
-                            _includeNodeValueInXPath))
-                &&
-
-                (diffPublicId = XMLUtil.areNullorEqual(control.getName(), test.getName(), _ignoringWhitespace,
-                            _includeNodeValueInXPath))) {
-
+        diffName = XMLUtil.areNullorEqual(control.getPublicId(), test.getPublicId(), _ignoringWhitespace, _includeNodeValueInXPath);
+        diffSysId = XMLUtil.areNullorEqual(control.getSystemId(), test.getSystemId(), _ignoringWhitespace, _includeNodeValueInXPath);
+        diffPublicId = XMLUtil.areNullorEqual(control.getName(), test.getName(), _ignoringWhitespace, _includeNodeValueInXPath);
+        
+        if (diffName && diffSysId && diffPublicId) {
+ 
             // do nothing
 
         } else {

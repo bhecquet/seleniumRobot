@@ -1,3 +1,16 @@
+/*
+ * Copyright 2016 www.infotel.com
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.seleniumtests.core.config.mobile;
 
 import java.io.File;
@@ -72,17 +85,17 @@ public class ConfigMobileReader {
 	
 		//modify path of Files with the arguments 
 		if(type != null && !type.equals("")){
-			pathToHerite =  Paths.get(SeleniumTestsContext.CONFIG_PATH, "objectMapping.ini").toString();
+			pathToHerite =  Paths.get(SeleniumTestsContext.getConfigPath(), "objectMapping.ini").toString();
 			pathToLoad = Paths.get(pathToLoad, type).toString();
 			
 			if(version != null && !version.equals("")){
-				secondPathToHerite =  Paths.get(SeleniumTestsContext.CONFIG_PATH, type, "objectMapping.ini").toString();
+				secondPathToHerite =  Paths.get(SeleniumTestsContext.getConfigPath(), type, "objectMapping.ini").toString();
 				pathToLoad = Paths.get(pathToLoad, version).toString();
 			}
 		}
 		
 			//Path of the target file
-		pathToLoad = Paths.get(SeleniumTestsContext.CONFIG_PATH , pathToLoad , "objectMapping.ini").toString();
+		pathToLoad = Paths.get(SeleniumTestsContext.getConfigPath() , pathToLoad , "objectMapping.ini").toString();
 		
 		//load targeted files from son to older parent
 		File fileForIni = new File(pathToLoad);

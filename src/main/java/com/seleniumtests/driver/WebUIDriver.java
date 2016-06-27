@@ -15,11 +15,7 @@
 package com.seleniumtests.driver;
 
 import java.net.URISyntaxException;
-
 import java.util.ArrayList;
-import java.util.Date;
-
-import com.seleniumtests.browserfactory.*;
 
 import org.apache.log4j.Logger;
 import org.openqa.selenium.Platform;
@@ -27,9 +23,19 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.support.events.WebDriverEventListener;
 
-import com.seleniumtests.core.SeleniumTestsContext;
+import com.seleniumtests.browserfactory.AppiumDriverFactory;
+import com.seleniumtests.browserfactory.ChromeDriverFactory;
+import com.seleniumtests.browserfactory.FirefoxDriverFactory;
+import com.seleniumtests.browserfactory.HtmlUnitDriverFactory;
+import com.seleniumtests.browserfactory.IEDriverFactory;
+import com.seleniumtests.browserfactory.IWebDriverFactory;
+import com.seleniumtests.browserfactory.RemoteDriverFactory;
+import com.seleniumtests.browserfactory.SafariDriverFactory;
+import com.seleniumtests.browserfactory.SauceLabsDriverFactory;
+import com.seleniumtests.browserfactory.TestDroidDriverFactory;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.TestLogging;
+import com.seleniumtests.customexception.DriverExceptions;
 import com.seleniumtests.helper.WaitHelper;
 
 /**
@@ -63,7 +69,7 @@ public class WebUIDriver {
                 try {
                     driver.quit();
                 } catch (WebDriverException ex) {
-                    ex.printStackTrace();
+                    logger.error(ex.getMessage());
                 }
 
                 driver = null;
@@ -104,7 +110,7 @@ public class WebUIDriver {
             try {
                 getWebUIDriver().createWebDriver();
             } catch (Exception e) {
-                e.printStackTrace();
+                logger.error(e.getMessage());
             }
         }
 
@@ -133,10 +139,8 @@ public class WebUIDriver {
         if (driver == null) {
             driverSession.remove();
         } else {
-            if (getWebUIDriver() == null) {
-                new WebUIDriver();
-            }
-
+        	// create WebUiDriver if it does not exist
+            getWebUIDriver();
             driverSession.set(driver);
         }
     }
@@ -182,7 +186,7 @@ public class WebUIDriver {
 	            } else if (config.getBrowser() == BrowserType.Safari) {
 	                webDriverBuilder = new SafariDriverFactory(this.config);
 	            } else {
-	                throw new RuntimeException("Unsupported browser" + browser);
+	                throw new DriverExceptions("Unsupported browser: " + browser);
 	            }
         	}
         }

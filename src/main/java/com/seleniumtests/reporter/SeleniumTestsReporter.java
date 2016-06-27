@@ -25,16 +25,12 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.Writer;
-
 import java.lang.reflect.Method;
-
 import java.net.URISyntaxException;
 import java.net.URL;
-
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -52,13 +48,10 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.apache.commons.lang.StringUtils;
-
 import org.apache.log4j.Logger;
-
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
-
 import org.testng.IInvokedMethod;
 import org.testng.IInvokedMethodListener;
 import org.testng.IReporter;
@@ -70,27 +63,23 @@ import org.testng.ITestListener;
 import org.testng.ITestNGMethod;
 import org.testng.ITestResult;
 import org.testng.Reporter;
-
 import org.testng.internal.ResultMap;
 import org.testng.internal.TestResult;
 import org.testng.internal.Utils;
-
 import org.testng.xml.XmlSuite;
 
 import com.seleniumtests.core.CustomAssertion;
+import com.seleniumtests.core.ITestRetryAnalyzer;
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.SeleniumTestsPageListener;
 import com.seleniumtests.core.TestLogging;
-import com.seleniumtests.core.ITestRetryAnalyzer;
-
+import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.driver.ScreenShot;
 import com.seleniumtests.driver.ScreenshotUtil;
 import com.seleniumtests.driver.TestType;
 import com.seleniumtests.driver.WebUIDriver;
-
 import com.seleniumtests.helper.StringUtility;
-
 import com.thoughtworks.qdox.JavaDocBuilder;
 import com.thoughtworks.qdox.model.JavaClass;
 import com.thoughtworks.qdox.model.JavaMethod;
@@ -121,8 +110,8 @@ public class SeleniumTestsReporter implements IReporter, ITestListener, IInvoked
          * Arrange methods by class and method name.
          */
         public int compare(final T o1, final T o2) {
-            String sig1 = StringUtility.constructMethodSignature(o1.getMethod().getMethod(), o1.getParameters());
-            String sig2 = StringUtility.constructMethodSignature(o2.getMethod().getMethod(), o2.getParameters());
+            String sig1 = StringUtility.constructMethodSignature(o1.getMethod().getConstructorOrMethod().getMethod(), o1.getParameters());
+            String sig2 = StringUtility.constructMethodSignature(o2.getMethod().getConstructorOrMethod().getMethod(), o2.getParameters());
             return sig1.compareTo(sig2);
         }
     }
@@ -248,7 +237,7 @@ public class SeleniumTestsReporter implements IReporter, ITestListener, IInvoked
 
     public void beforeInvocation(final IInvokedMethod arg0, final ITestResult arg1) { }
 
-    protected void copyResources() throws Exception {
+    protected void copyResources() throws IOException {
 
         new File(outputDirectory + File.separator + "resources").mkdir();
         new File(outputDirectory + File.separator + "resources" + File.separator + "css").mkdir();
@@ -382,7 +371,7 @@ public class SeleniumTestsReporter implements IReporter, ITestListener, IInvoked
         if (title == null) {
             try {
                 title = fortile.getCause().getMessage();
-            } catch (Throwable e) {
+            } catch (Exception e) {
                 title = e.getMessage();
             }
         }
@@ -458,7 +447,7 @@ public class SeleniumTestsReporter implements IReporter, ITestListener, IInvoked
 
                 boolean found = false;
                 for (ITestResult testResult : testResults) {
-                    Method method = testResult.getMethod().getMethod();
+                    Method method = testResult.getMethod().getConstructorOrMethod().getMethod();
                     String methodInstance = StringUtility.constructMethodSignature(method, testResult.getParameters());
                     if (errorMap.containsKey(methodInstance)) {
                         found = true;
@@ -527,7 +516,6 @@ public class SeleniumTestsReporter implements IReporter, ITestListener, IInvoked
             }
         } catch (Exception e) {
             logger.error(e.getMessage());
-            e.printStackTrace();
         }
 
         return res.toString();
@@ -559,11 +547,8 @@ public class SeleniumTestsReporter implements IReporter, ITestListener, IInvoked
                     } else {
                         try {
                             testName = ans.getTestContext().getCurrentXmlTest().getName();
-                        } catch (Exception ex) {
-                            ex.printStackTrace();
-                            continue;
-                        } catch (Error e) {
-                            e.printStackTrace();
+                        } catch (Exception | Error ex) {
+                            logger.error(ex.getMessage());
                             continue;
                         }
                     }
@@ -679,7 +664,7 @@ public class SeleniumTestsReporter implements IReporter, ITestListener, IInvoked
                             toDisplay = desc;
                         }
 
-                        String methodSignature = StringUtility.constructMethodSignature(method.getMethod(), parameters);
+                        String methodSignature = StringUtility.constructMethodSignature(method.getConstructorOrMethod().getMethod(), parameters);
                         if (methodSignature.length() > 500) {
                             context.put("methodName", methodSignature.substring(0, 500) + "...");
                         } else {
@@ -695,7 +680,6 @@ public class SeleniumTestsReporter implements IReporter, ITestListener, IInvoked
                         res.append(writer.toString());
                     } catch (Exception e) {
                         logger.error("Exception creating a singleTest." + e.getMessage());
-                        e.printStackTrace();
                     }
                 }
             }
@@ -988,11 +972,11 @@ public class SeleniumTestsReporter implements IReporter, ITestListener, IInvoked
     protected String getJavadocComments(final ITestNGMethod method) {
 
         try {
-            Method m = method.getMethod();
+            Method m = method.getConstructorOrMethod().getMethod();
             String javaClass = m.getDeclaringClass().getName();
             String javaMethod = m.getName();
             JavaClass jc = getJavaDocBuilder(m.getDeclaringClass()).getClassByName(javaClass);
-            Class<?>[] types = method.getMethod().getParameterTypes();
+            Class<?>[] types = method.getConstructorOrMethod().getMethod().getParameterTypes();
             Type[] qdoxTypes = new Type[types.length];
             for (int i = 0; i < types.length; i++) {
                 String type = getType(types[i]);
@@ -1002,7 +986,7 @@ public class SeleniumTestsReporter implements IReporter, ITestListener, IInvoked
 
             JavaMethod jm = jc.getMethodBySignature(javaMethod, qdoxTypes);
             return jm.getComment();
-        } catch (Throwable e) {
+        } catch (Exception e) {
             logger.error("Exception loading the javadoc comments for : " + method.getMethodName() + e);
             return null;
         }
@@ -1087,7 +1071,7 @@ public class SeleniumTestsReporter implements IReporter, ITestListener, IInvoked
             }
         }
 
-        throw new RuntimeException("method " + method + " not found. " + "Should not happen. Suite " + ctx.getName());
+        throw new ScenarioException("method " + method + " not found. Should not happen. Suite " + ctx.getName());
     }
 
     protected String getType(Class<?> cls) {

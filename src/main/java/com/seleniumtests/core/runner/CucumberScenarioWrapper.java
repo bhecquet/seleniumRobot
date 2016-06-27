@@ -41,7 +41,12 @@ public class CucumberScenarioWrapper {
     
     @Override
     public boolean equals(Object obj) {
-        if (obj == null) return false;
+        if (obj == null) {
+        	return false;
+        }
+        if (this.getClass() != obj.getClass()) {
+            return false;
+        }
         CucumberScenarioWrapper other;
         try {
         	other = (CucumberScenarioWrapper) obj;

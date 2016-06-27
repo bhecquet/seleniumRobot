@@ -103,6 +103,7 @@ public class SauceLabsDriverFactory extends AbstractWebDriverFactory implements 
         if (response.getStatusLine().getStatusCode() != 200) {
         	throw new ConfigurationException("Application file upload failed: " + response.getStatusLine().getReasonPhrase());
         }
+        client.close();
 
         return "";
 
