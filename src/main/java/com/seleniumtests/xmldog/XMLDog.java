@@ -191,7 +191,6 @@ public class XMLDog implements XMLDogConstants {
     public static void log(final String msg, final Throwable t) {
         if (DEBUG) {
             log(msg);
-            t.printStackTrace(System.out);
         }
     }
 
@@ -238,7 +237,7 @@ public class XMLDog implements XMLDogConstants {
             long t2 = System.currentTimeMillis();
             System.out.println("Time to compare the docs " + (t2 - t1) + " millisecs");
         } catch (Exception ex) {
-            logger.error(ex.getMessage());
+            logger.error(ex);
         }
     }
 }

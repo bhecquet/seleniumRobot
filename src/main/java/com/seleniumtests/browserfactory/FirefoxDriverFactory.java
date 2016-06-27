@@ -105,11 +105,7 @@ public class FirefoxDriverFactory extends AbstractWebDriverFactory implements IW
     @Override
     public WebDriver createWebDriver() {
         DriverConfig cfg = this.getWebDriverConfig();
-
-        System.out.println("start create firefox");
         driver = createWebDriverWithTimeout();
-
-        System.out.println("end create firefox");
 
         // Implicit Waits to handle dynamic element. The default value is 5
         // seconds.

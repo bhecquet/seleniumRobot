@@ -15,6 +15,7 @@
 package com.seleniumtests.browserfactory;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
@@ -22,6 +23,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 
 import com.seleniumtests.core.TestLogging;
+import com.seleniumtests.customexception.DriverExceptions;
 import com.seleniumtests.driver.DriverConfig;
 import com.seleniumtests.driver.WebUIDriver;
 
@@ -50,12 +52,32 @@ public abstract class AbstractWebDriverFactory {
                 driver = null;
             }
         } catch (Exception e) {
-        	logger.error(e.getMessage());
+        	logger.error(e);
         }
     }
-
+    
+    protected abstract WebDriver createNativeDriver();
+    
     public WebDriver createWebDriver() throws IOException {
-        return null;
+        final DriverConfig cfg = this.getWebDriverConfig();
+
+        driver = createNativeDriver();
+
+        setImplicitWaitTimeout(cfg.getImplicitWaitTimeout());
+        if (cfg.getPageLoadTimeout() >= 0) {
+            setPageLoadTimeout(cfg.getPageLoadTimeout());
+        }
+
+        this.setWebDriver(driver);
+        return driver;
+    }
+
+    protected void setPageLoadTimeout(final long timeout) {
+        try {
+            driver.manage().timeouts().pageLoadTimeout(timeout, TimeUnit.SECONDS);
+        } catch (WebDriverException e) {
+            // chromedriver does not support pageLoadTimeout
+        }
     }
 
     /**
@@ -78,7 +100,7 @@ public abstract class AbstractWebDriverFactory {
             try {
                 driver.manage().timeouts().implicitlyWait(new Double(timeout).intValue(), TimeUnit.SECONDS);
             } catch (Exception ex) {
-            	logger.error(ex.getMessage());
+            	logger.error(ex);
             }
         }
     }

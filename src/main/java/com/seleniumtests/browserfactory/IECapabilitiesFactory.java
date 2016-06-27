@@ -65,7 +65,7 @@ public class IECapabilitiesFactory extends ICapabilitiesFactory {
                     try {
                         handleExtractResources();
                     } catch (IOException e) {
-                        logger.error(e.getMessage());
+                        logger.error(e);
                     }
                 }
             }

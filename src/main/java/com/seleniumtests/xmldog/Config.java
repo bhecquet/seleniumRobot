@@ -610,7 +610,7 @@ public class Config implements XMLDogConstants {
 
         } catch (IOException ex) {
 
-            logger.error(ex.getMessage());
+            logger.error(ex);
 
         } finally {
 

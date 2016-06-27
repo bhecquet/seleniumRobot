@@ -132,7 +132,7 @@ public class FileUtility {
                         try {
                             in.close();
                         } catch (Exception e) {
-                            logger.warn(e.getMessage());
+                            logger.warn(e);
                         }
                     }
 
@@ -140,7 +140,7 @@ public class FileUtility {
                         try {
                             out.close();
                         } catch (Exception e) {
-                        	logger.warn(e.getMessage());
+                        	logger.warn(e);
                         }
                     }
                 }
@@ -226,7 +226,7 @@ public class FileUtility {
                 try {
                     br.close();
                 } catch (IOException e) {
-                	logger.warn(e.getMessage());
+                	logger.warn(e);
                 }
             }
 
@@ -234,7 +234,7 @@ public class FileUtility {
                 try {
                     fr.close();
                 } catch (IOException e) {
-                	logger.warn(e.getMessage());
+                	logger.warn(e);
                 }
             }
         }
@@ -270,13 +270,13 @@ public class FileUtility {
             ImageIO.write(img, "png", fos);
             img = null;
         } catch (Exception e) {
-            logger.warn(e.getMessage());
+            logger.warn(e);
         } finally {
             if (in != null) {
                 try {
                     in.close();
                 } catch (Exception e) {
-                	logger.warn(e.getMessage());
+                	logger.warn(e);
                 }
             }
 
@@ -284,7 +284,7 @@ public class FileUtility {
                 try {
                     fos.close();
                 } catch (Exception e) {
-                	logger.warn(e.getMessage());
+                	logger.warn(e);
                 }
             }
         }
@@ -320,7 +320,7 @@ public class FileUtility {
                 try {
                     bw.close();
                 } catch (Exception e) {
-                	logger.warn(e.getMessage());
+                	logger.warn(e);
                 }
             }
 
@@ -328,7 +328,7 @@ public class FileUtility {
                 try {
                     outputStreamWriter.close();
                 } catch (Exception e) {
-                	logger.warn(e.getMessage());
+                	logger.warn(e);
                 }
             }
 
@@ -336,7 +336,7 @@ public class FileUtility {
                 try {
                     fileOutputStream.close();
                 } catch (Exception e) {
-                	logger.warn(e.getMessage());
+                	logger.warn(e);
                 }
             }
         }

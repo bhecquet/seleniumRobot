@@ -67,10 +67,10 @@ public class StringUtility {
             messageDigest.reset();
             messageDigest.update(str.getBytes("UTF-8"));
         } catch (NoSuchAlgorithmException e) {
-            logger.error(e.getMessage());
+            logger.error(e);
             return str;
         } catch (UnsupportedEncodingException e) {
-        	logger.error(e.getMessage());
+        	logger.error(e);
             return str;
         }
 

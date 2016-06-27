@@ -25,6 +25,7 @@ import org.openqa.selenium.UnsupportedCommandException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 
+import com.seleniumtests.customexception.DriverExceptions;
 import com.seleniumtests.driver.DriverConfig;
 
 import io.appium.java_client.android.AndroidDriver;
@@ -38,33 +39,12 @@ public class AndroidDriverFactory extends AbstractWebDriverFactory implements IW
         super(webDriverConfig);
     }
 
-    protected WebDriver createNativeDriver() throws MalformedURLException {
+    protected WebDriver createNativeDriver() {
 
-        return new AndroidDriver(new URL(webDriverConfig.getAppiumServerURL()), new AndroidCapabilitiesFactory()
-                    .createCapabilities(webDriverConfig));
-    }
-
-    @Override
-    public WebDriver createWebDriver() throws IOException {
-        DriverConfig cfg = this.getWebDriverConfig();
-
-        driver = createNativeDriver();
-
-        setImplicitWaitTimeout(cfg.getImplicitWaitTimeout());
-        if (cfg.getPageLoadTimeout() >= 0) {
-            setPageLoadTimeout(cfg.getPageLoadTimeout());
-        }
-
-        this.setWebDriver(driver);
-        return driver;
-    }
-
-    protected void setPageLoadTimeout(final long timeout) {
         try {
-            driver.manage().timeouts().pageLoadTimeout(timeout, TimeUnit.SECONDS);
-        } catch (WebDriverException e) {
-            // chromedriver does not support pageLoadTimeout
-        }
+			return new AndroidDriver(new URL(webDriverConfig.getAppiumServerURL()), new AndroidCapabilitiesFactory().createCapabilities(webDriverConfig));
+		} catch (MalformedURLException e) {
+			throw new DriverExceptions("Error creating driver: " + e.getMessage());
+		}
     }
-
 }

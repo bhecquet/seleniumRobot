@@ -14,6 +14,7 @@
 
 package com.seleniumtests.webelements;
 
+import java.io.IOException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -78,7 +79,7 @@ public class PageObject extends BasePage implements IPage {
      *
      * @throws  Exception
      */
-    public PageObject() throws Exception {
+    public PageObject() throws IOException {
         this(null, null);
     }
 
@@ -86,10 +87,11 @@ public class PageObject extends BasePage implements IPage {
      * Constructor for non-entry point page. The control is supposed to have reached the page from other API call.
      *
      * @param   pageIdentifierElement
+     * @throws IOException 
      *
      * @throws  Exception
      */
-    public PageObject(final HtmlElement pageIdentifierElement) throws Exception {
+    public PageObject(final HtmlElement pageIdentifierElement) throws IOException  {
         this(pageIdentifierElement, null);
     }
 
@@ -97,10 +99,11 @@ public class PageObject extends BasePage implements IPage {
      * Base Constructor.
      *
      * @param   url
+     * @throws IOException 
      *
      * @throws  Exception
      */
-    public PageObject(final HtmlElement pageIdentifierElement, final String url) throws Exception {
+    public PageObject(final HtmlElement pageIdentifierElement, final String url) throws IOException {
 
     	systemClock = new SystemClock();
         Calendar start = Calendar.getInstance();
@@ -165,7 +168,7 @@ public class PageObject extends BasePage implements IPage {
                     new ScreenshotUtil(driver).capturePageSnapshotOnException();
                 }
             } catch (Exception e) {
-            	logger.error(e.getMessage());
+            	logger.error(e);
             }
 
             throw new NotCurrentPageException(getClass().getCanonicalName()
@@ -400,7 +403,7 @@ public class PageObject extends BasePage implements IPage {
         new WebUtility(driver).maximizeWindow();
     }
 
-    private void open(final String url) throws Exception {
+    private void open(final String url) throws IOException {
 
         if (this.getDriver() == null) {
             TestLogging.logWebStep(url, "Launch application", false);
@@ -433,7 +436,7 @@ public class PageObject extends BasePage implements IPage {
             TestLogging.log("got UnhandledAlertException, retry");
             driver.navigate().to(url);
         } catch (WebDriverException e) {
-        	logger.error(e.getMessage());
+        	logger.error(e);
             throw new CustomSeleniumTestsException(e);
         }
 
@@ -598,7 +601,7 @@ public class PageObject extends BasePage implements IPage {
         try {
             populateAndCapturePageSnapshot();
         } catch (Exception ex) {
-        	logger.error(ex.getMessage());
+        	logger.error(ex);
             // ex.printStackTrace();
             throw ex;
         }
