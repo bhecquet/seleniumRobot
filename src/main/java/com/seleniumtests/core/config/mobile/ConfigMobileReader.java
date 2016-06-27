@@ -14,6 +14,7 @@
 package com.seleniumtests.core.config.mobile;
 
 import java.io.File;
+import org.apache.log4j.Logger;
 import java.nio.file.Paths;
 import java.util.HashMap;
 
@@ -21,11 +22,15 @@ import org.ini4j.InvalidFileFormatException;
 
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.core.TestLogging;
+import com.seleniumtests.core.runner.CucumberRunner;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.util.IniHelper;
 
 
 public class ConfigMobileReader {
+	
+	private static final Logger logger = TestLogging.getLogger(ConfigMobileReader.class);
 	
 	/**
 	 * @author  Sophie
@@ -110,7 +115,7 @@ public class ConfigMobileReader {
 				testConfig = IniHelper.readIniFile(fileForIniToHerite, testConfig);	
 			}
 			catch (ConfigurationException e){
-				System.out.println("No such file : " + fileForIniToHerite);
+				logger.debug("No such file : " + fileForIniToHerite);
 			}
 
 			if(version != null && !version.equals("")){
@@ -119,7 +124,7 @@ public class ConfigMobileReader {
 					testConfig = IniHelper.readIniFile(secondFileForIniToHerite, testConfig);
 				}
 				catch (ConfigurationException e){
-					System.out.println("No such file : " + secondFileForIniToHerite);
+					logger.debug("No such file : " + secondFileForIniToHerite);
 				}
 			}
 		}
@@ -129,15 +134,10 @@ public class ConfigMobileReader {
 			testConfig = IniHelper.readIniFile(fileForIni, testConfig);
 		}
 		catch (ConfigurationException e){
-			System.out.println("No such file : " + fileForIni);
+			logger.debug("No such file : " + fileForIni);
 		}
 		
-		try{
-			return testConfig;
-		}
-		catch(NullPointerException e){
-			throw new ConfigurationException("There is no mapping file (neither corresponding nor inheriting) for : "+ type + " " + version);
-		}
+		return testConfig;
 	}
 	
 		
