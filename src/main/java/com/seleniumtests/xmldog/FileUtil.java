@@ -61,14 +61,9 @@ public class FileUtil {
             for (int i = 0; i < list.size(); i++) {
 
                 bw.write(list.get(i).toString());
-
                 bw.write(StringUtil.getNewlineStr());
 
             }
-
-        } catch (IOException ex) {
-
-            throw ex;
 
         } finally {
 

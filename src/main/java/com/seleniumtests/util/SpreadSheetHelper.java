@@ -152,7 +152,7 @@ public class SpreadSheetHelper {
      * the excel sheet in the same folder as the test case and specify clazz as <code>this.getClass()</code> .
      */
     public static synchronized Iterator<Object[]> getDataFromSpreadsheet(final Class<?> clazz, final String filename,
-            final Filter filter, final boolean readHeaders) throws Exception {
+            final Filter filter, final boolean readHeaders) {
         return getDataFromSpreadsheet(clazz, filename, filter, readHeaders, true);
     }
 
