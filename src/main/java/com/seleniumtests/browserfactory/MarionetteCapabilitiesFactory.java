@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 www.seleniumtests.com
+ * Copyright 2016 www.infotel.com
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -40,7 +40,7 @@ public class MarionetteCapabilitiesFactory extends FirefoxCapabilitiesFactory {
 	}
 	
 	private void configureGeckoDriver() throws UnsupportedEncodingException {
-		String dir = Paths.get(SeleniumTestsContext.ROOT_PATH, "tools", "drivers", Platform.getCurrent().family().toString().toLowerCase()).toString();
+		String dir = Paths.get(SeleniumTestsContext.getRootPath(), "tools", "drivers", Platform.getCurrent().family().toString().toLowerCase()).toString();
         dir = FileUtility.decodePath(dir);
 
         if (OSUtility.isWindows()) {

@@ -27,6 +27,7 @@ import java.util.StringTokenizer;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import org.apache.log4j.Logger;
 import org.w3c.dom.Attr;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
@@ -46,7 +47,7 @@ public class XMLUtil
         implements XMLDogConstants
 
 {
-
+	private static final Logger logger = Logger.getLogger(XMLUtil.class);
     private static DocumentBuilder _docBuilder = null;
 
 
@@ -81,7 +82,7 @@ public class XMLUtil
 
         {
 
-            ex.printStackTrace();
+        	logger.error(ex.getMessage());
 
         }
 
@@ -348,6 +349,7 @@ public class XMLUtil
                     fw.write(newXMLStr);
 
                     fw.flush();
+                    fw.close();
 
                 }
 
@@ -523,7 +525,7 @@ public class XMLUtil
                 fw.write(newXMLStr);
 
                 fw.flush();
-
+                fw.close();
             }
 
 
@@ -534,7 +536,7 @@ public class XMLUtil
 
         {
 
-            ex.printStackTrace();
+            logger.error(ex.getMessage());
 
             throw new DOMException(DOMException.INVALID_MODIFICATION_ERR, "Error replacing Element text " + ex.toString());
 

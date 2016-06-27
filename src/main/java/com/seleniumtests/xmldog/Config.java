@@ -25,6 +25,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
+
+import com.seleniumtests.webelements.PageObject;
+
 /*import org.apache.oro.text.perl.MalformedPerl5PatternException;
  *
  * import org.apache.oro.text.regex.Pattern;
@@ -71,6 +75,7 @@ import java.util.Set;
 
 public class Config implements XMLDogConstants {
 
+	private static final Logger logger = Logger.getLogger(Config.class);
     private boolean _isValidating = false;
 
     private boolean _isIgnoringWS = true;
@@ -97,21 +102,19 @@ public class Config implements XMLDogConstants {
 
     // as Objects
 
-    private HashMap _includedElementAttrsMap = new HashMap();
+    private HashMap<String, List<String>> _includedElementAttrsMap = new HashMap<String, List<String>>();
 
-    private HashMap _excludedElementAttrsMap = new HashMap();
+    private HashMap<String, List<String>> _excludedElementAttrsMap = new HashMap<String, List<String>>();
 
-    private HashSet _excludedElementsSet = new HashSet();
+    private HashSet<String> _excludedElementsSet = new HashSet<String>();
 
-    private HashMap _xpathEList = new HashMap();
-
-    private HashMap _xpathRList = new HashMap();
+    private HashMap<String, String> _xpathEList = new HashMap<String, String>();
 
     // HashMap containing Element names as Keys and unique attribute
 
     // names as objects
 
-    private HashMap _uniqueElementAttrMap = new HashMap();
+    private HashMap<String, String> _uniqueElementAttrMap = new HashMap<String, String>();
 
     /**
      * Default Constructor.
@@ -367,11 +370,11 @@ public class Config implements XMLDogConstants {
             return;
         }
 
-        List attrNames = null;
+        List<String> attrNames = null;
 
-        if ((attrNames = (List) _includedElementAttrsMap.get(elementName)) == null) {
+        if ((attrNames = (List<String>) _includedElementAttrsMap.get(elementName)) == null) {
 
-            attrNames = new ArrayList();
+            attrNames = new ArrayList<String>();
         }
 
         attrNames.add(attrName);
@@ -384,13 +387,13 @@ public class Config implements XMLDogConstants {
      * Adds Attributes to be included in the Element comparison.
      */
 
-    public void addIncludedAttributes(final String elementName, final List attrNames) {
+    public void addIncludedAttributes(final String elementName, final List<String> attrNames) {
 
-        List attrNamesList = null;
+        List<String> attrNamesList = null;
 
-        if ((attrNamesList = (List) _includedElementAttrsMap.get(elementName)) == null) {
+        if ((attrNamesList = (List<String>) _includedElementAttrsMap.get(elementName)) == null) {
 
-            attrNamesList = new ArrayList();
+            attrNamesList = new ArrayList<String>();
         }
 
         attrNamesList.addAll(attrNames);
@@ -415,11 +418,11 @@ public class Config implements XMLDogConstants {
             return;
         }
 
-        List attrNames = null;
+        List<String> attrNames = null;
 
-        if ((attrNames = (List) _excludedElementAttrsMap.get(elementName)) == null) {
+        if ((attrNames = (List<String>) _excludedElementAttrsMap.get(elementName)) == null) {
 
-            attrNames = new ArrayList();
+            attrNames = new ArrayList<String>();
         }
 
         attrNames.add(attrName);
@@ -432,18 +435,18 @@ public class Config implements XMLDogConstants {
      * Adds Attributes to be excluded in the Element comparison.
      */
 
-    public void addExcludedAttributes(final String elementName, final List attrNames) {
+    public void addExcludedAttributes(final String elementName, final List<String> attrNames) {
 
         if ((elementName == null) || (elementName.trim().equals(""))) {
 
             return;
         }
 
-        List attrNamesList = null;
+        List<String> attrNamesList = null;
 
-        if ((attrNamesList = (List) _excludedElementAttrsMap.get(elementName)) == null) {
+        if ((attrNamesList = (List<String>) _excludedElementAttrsMap.get(elementName)) == null) {
 
-            attrNamesList = new ArrayList();
+            attrNamesList = new ArrayList<String>();
         }
 
         attrNamesList.addAll(attrNames);
@@ -484,7 +487,7 @@ public class Config implements XMLDogConstants {
      * Gets excluded Attributes Map.
      */
 
-    public Map getExcludedAttributesMap() {
+    public Map<String, List<String>> getExcludedAttributesMap() {
 
         return _excludedElementAttrsMap;
 
@@ -494,7 +497,7 @@ public class Config implements XMLDogConstants {
      * Gets included Attributes Map.
      */
 
-    public Map getIncludedAttributesMap() {
+    public Map<String, List<String>> getIncludedAttributesMap() {
 
         return _includedElementAttrsMap;
 
@@ -504,7 +507,7 @@ public class Config implements XMLDogConstants {
      * Gets unique Attributes Map.
      */
 
-    public Map getUniqueAttributeMap() {
+    public Map<String, String> getUniqueAttributeMap() {
 
         return _uniqueElementAttrMap;
 
@@ -514,7 +517,7 @@ public class Config implements XMLDogConstants {
      * Gets excluded Elements Map.
      */
 
-    public Set getExcludedElementsSet() {
+    public Set<String> getExcludedElementsSet() {
 
         return _excludedElementsSet;
 
@@ -556,9 +559,10 @@ public class Config implements XMLDogConstants {
      * @return  the Map containing all the XPath exclusion entries
      */
 
-    public Map loadXPathEList(final String filename) {
+    public Map<String, String> loadXPathEList(final String filename) {
 
         BufferedReader br = null;
+        FileReader fr = null;
 
         try {
 
@@ -567,12 +571,10 @@ public class Config implements XMLDogConstants {
                 System.out.println("Elist (" + filename + ") doesn't exist -- exclude list turned off");
 
             }
-
-            br = new BufferedReader(new FileReader(filename));
+            fr = new FileReader(filename);
+            br = new BufferedReader(fr);
 
             String line;
-
-            String regEx = null;
 
             while ((line = br.readLine()) != null) {
 
@@ -608,7 +610,7 @@ public class Config implements XMLDogConstants {
 
         } catch (IOException ex) {
 
-            ex.printStackTrace();
+            logger.error(ex.getMessage());
 
         } finally {
 
@@ -621,6 +623,17 @@ public class Config implements XMLDogConstants {
                 } catch (Exception ex) { }
 
                 br = null;
+
+            }
+            if (fr != null) {
+
+                try {
+
+                    fr.close();
+
+                } catch (Exception ex) { }
+
+                fr = null;
 
             }
 
@@ -830,7 +843,7 @@ public class Config implements XMLDogConstants {
      * @return  the Set containing XPath Elist
      */
 
-    public Map getXPathEList() {
+    public Map<String, String> getXPathEList() {
 
         return _xpathEList;
 
@@ -844,7 +857,7 @@ public class Config implements XMLDogConstants {
 
         if (DEBUG) {
 
-            System.out.println("Config:" + msg);
+            logger.debug("Config:" + msg);
         }
 
     }

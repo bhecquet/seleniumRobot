@@ -1,5 +1,6 @@
 /*
- * Copyright 2015 www.seleniumtests.com
+ * Orignal work: Copyright 2015 www.seleniumtests.com
+ * Modified work: Copyright 2016 www.infotel.com
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -21,6 +22,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.ie.InternetExplorerDriver;
 
+import com.seleniumtests.customexception.DriverExceptions;
 import com.seleniumtests.driver.DriverConfig;
 
 import com.seleniumtests.helper.OSUtility;
@@ -44,7 +46,7 @@ public class IEDriverFactory extends AbstractWebDriverFactory implements IWebDri
                 driver = null;
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
         }
     }
 
@@ -53,7 +55,7 @@ public class IEDriverFactory extends AbstractWebDriverFactory implements IWebDri
 
         // killProcess();
         if (!OSUtility.isWindows()) {
-            throw new RuntimeException("With gods grace IE browser is only supported on windows, Imagine a "
+            throw new DriverExceptions("With gods grace IE browser is only supported on windows, Imagine a "
                     + "situation when you have to fix IE bugs on Unix and Mac as well");
         }
 
@@ -77,7 +79,7 @@ public class IEDriverFactory extends AbstractWebDriverFactory implements IWebDri
                 Runtime.getRuntime().exec("taskkill /F /IM IEDriverServer.exe");
                 Runtime.getRuntime().exec("taskkill /F /IM Iexplore.exe");
             } catch (IOException e) {
-                e.printStackTrace();
+            	logger.error(e.getMessage());
             }
         }
     }

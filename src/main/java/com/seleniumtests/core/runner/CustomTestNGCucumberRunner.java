@@ -81,7 +81,7 @@ public class CustomTestNGCucumberRunner {
     	}
     	
     	// get all features, filtered by test name
-    	System.setProperty("cucumber.options", SeleniumTestsContext.FEATURES_PATH);
+    	System.setProperty("cucumber.options", SeleniumTestsContext.getFeaturePath());
         List<CucumberFeature> testSelectedFeatures = getFeaturesFromRequestedTests(clazz, classLoader, resourceLoader);
 
     	// build cucumber option list
@@ -101,7 +101,7 @@ public class CustomTestNGCucumberRunner {
         cucumberOptions += " --glue classpath:" + cucumberPkg;
         
         // add feature path
-        cucumberOptions += " " + SeleniumTestsContext.FEATURES_PATH;
+        cucumberOptions += " " + SeleniumTestsContext.getFeaturePath();
 
         // get filtered features, based on tags
         runtimeOptions = new RuntimeOptions(cucumberOptions);

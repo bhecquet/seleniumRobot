@@ -1,5 +1,6 @@
 /*
- * Copyright 2015 www.seleniumtests.com
+ * Orignal work: Copyright 2015 www.seleniumtests.com
+ * Modified work: Copyright 2016 www.infotel.com
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -19,12 +20,9 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-
 import java.math.BigDecimal;
-
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -38,12 +36,13 @@ import org.apache.log4j.Logger;
 
 import com.seleniumtests.core.Filter;
 import com.seleniumtests.core.SeleniumTestsContextManager;
-
+import com.seleniumtests.core.TestLogging;
+import com.seleniumtests.customexception.DatasetException;
 import com.seleniumtests.util.internal.entity.TestEntity;
 
 public class SpreadSheetHelper {
 
-    private static Logger logger = Logger.getLogger(SpreadSheetHelper.class);
+	private static final Logger logger = TestLogging.getLogger(SpreadSheetHelper.class);
 
     private static final Map<Class<?>, Class<?>> PRIMITIVE_TYPE_MAP = new HashMap<Class<?>, Class<?>>();
 
@@ -139,8 +138,8 @@ public class SpreadSheetHelper {
                 try {
                     int value = Integer.parseInt(ss[0]);
                     count = (value > count ? value : count);
-                } catch (Exception e) {
-                    e.printStackTrace();
+                } catch (NumberFormatException e) {
+                    logger.error(e.getMessage());
                 }
             }
         }
@@ -171,7 +170,7 @@ public class SpreadSheetHelper {
      * @throws  Exception
      */
     public static synchronized Iterator<Object[]> getDataFromSpreadsheet(final Class<?> clazz, final String filename,
-            final Filter filter, final boolean readHeaders, final boolean supportDPFilter) throws Exception {
+            final Filter filter, final boolean readHeaders, final boolean supportDPFilter) {
 
         System.gc();
 
@@ -179,7 +178,7 @@ public class SpreadSheetHelper {
         if (filename.toLowerCase().endsWith(".csv")) {
             return CSVHelper.getDataFromCSVFile(clazz, filename, filter, readHeaders, supportDPFilter);
         } else {
-            throw new Exception("illegal file format, only csv files are supported for now");
+            throw new DatasetException("illegal file format, only csv files are supported for now");
         }
     }
 

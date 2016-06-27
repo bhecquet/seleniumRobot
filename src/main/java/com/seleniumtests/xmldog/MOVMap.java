@@ -19,6 +19,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
+
 /**
  * Multiple Object Values Map<br>
  * Class is useful when multiple Objects are put in to the Map with the same Key value. This implementation will save
@@ -30,9 +32,16 @@ import java.util.Map;
  * @author   Ritesht
  * @version  1.0
  */
-public final class MOVMap extends HashMap implements XMLDogConstants {
+public final class MOVMap extends HashMap<Object, Object> implements XMLDogConstants {
 
-    /**
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 11654651657465465L;
+	private static final Logger logger = Logger.getLogger(MOVMap.class);
+
+	/**
      * Default Constructor.
      */
     public MOVMap() {
@@ -76,7 +85,7 @@ public final class MOVMap extends HashMap implements XMLDogConstants {
      * @throws  IllegalArgumentException  If Null or List type Objects are passed
      */
     public Object put(final Object key, final Object value) {
-        if ((value instanceof List) && (value == null)) {
+        if ((value == null) || (value instanceof List) ) {
             throw new IllegalArgumentException("Null and List type Objects cannot be added to MOVMap");
         }
 
@@ -123,7 +132,7 @@ public final class MOVMap extends HashMap implements XMLDogConstants {
      */
     public static void log(final String msg) {
         if (DEBUG) {
-            System.out.println("MOVMap:" + msg);
+            logger.debug("MOVMap:" + msg);
         }
     }
 

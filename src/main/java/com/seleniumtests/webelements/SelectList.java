@@ -15,6 +15,7 @@
 package com.seleniumtests.webelements;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.openqa.selenium.By;
@@ -23,7 +24,6 @@ import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.UnexpectedTagNameException;
 
 import com.seleniumtests.core.TestLogging;
-
 import com.seleniumtests.driver.WebUIDriver;
 
 /**
@@ -203,7 +203,7 @@ public class SelectList extends HtmlElement {
     }
 
     public void selectByIndex(final int[] indexs) {
-        TestLogging.logWebStep(null, "make selection using indexs\"" + indexs.toString() + "\" on " + toHTML(), false);
+        TestLogging.logWebStep(null, "make selection using indexs\"" + Arrays.toString(indexs) + "\" on " + toHTML(), false);
         findElement();
         for (int i = 0; i < indexs.length; i++) {
             WebElement option = options.get(indexs[i]);

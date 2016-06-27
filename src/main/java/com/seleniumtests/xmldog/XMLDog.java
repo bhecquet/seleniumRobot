@@ -21,6 +21,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
 
 import org.xml.sax.SAXException;
@@ -34,6 +35,8 @@ public class XMLDog implements XMLDogConstants {
     private DocumentBuilderFactory _factory = null;
 
     private DocumentBuilder _parser = null;
+    
+    private static final Logger logger = Logger.getLogger(XMLDog.class);
 
     /**
      * Default Constructor.
@@ -235,7 +238,7 @@ public class XMLDog implements XMLDogConstants {
             long t2 = System.currentTimeMillis();
             System.out.println("Time to compare the docs " + (t2 - t1) + " millisecs");
         } catch (Exception ex) {
-            ex.printStackTrace();
+            logger.error(ex.getMessage());
         }
     }
 }
