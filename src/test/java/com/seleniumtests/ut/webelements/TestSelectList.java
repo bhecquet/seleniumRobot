@@ -31,6 +31,26 @@ public class TestSelectList {
 	}
 	
 	@Test(groups={"ut"})
+	public void testSelect() {
+		testDriverIt.testIsTextSelect();
+	}
+	
+	@Test(groups={"ut"})
+	public void testSelectMultiple() {
+		testDriverIt.testIsMultipleTextSelect();
+	}
+	
+	@Test(groups={"ut"})
+	public void testSelectValue() {
+		testDriverIt.testIsValueSelect();
+	}
+	
+	@Test(groups={"ut"})
+	public void testSelectMultipleValue() {
+		testDriverIt.testIsMultipleValueSelect();
+	}
+	
+	@Test(groups={"ut"})
 	public void testSelectCorresponding() {
 		testDriverIt.testIsCorrespondingTextSelect();
 	}
@@ -39,4 +59,36 @@ public class TestSelectList {
 	public void testSelectMultipleCorresponding() {
 		testDriverIt.testIsMultipleCorrespondingTextSelect();
 	}
+	
+	@Test(groups={"ut"})
+	public void testSelectIndex() {
+		testDriverIt.testIsIndexSelect();
+	}
+	
+	@Test(groups={"ut"})
+	public void testSelectMultipleIndex() {
+		testDriverIt.testIsMultipleIndexSelect();
+	}
+	
+	@Test(groups={"ut"})
+	public void testDeselectAll() {
+		testDriverIt.testIsAllDeselected();
+	}
+
+	
+	@Test(groups={"ut"})
+	public void testDeselectIndex() {
+		testDriverIt.testIsIndexDeselect();
+	}
+	
+	@Test(groups={"ut"})
+	public void testDeselectText() {
+		testDriverIt.testIsTextDeselect();
+	}
+	
+	@Test(groups={"ut"})
+	public void testDeselectValue() {
+		testDriverIt.testIsValueDeselect();
+	}
+	
 }
