@@ -273,7 +273,6 @@
 							<value>false</value>
 						</property>
 					</properties>
-<!-- 					<argLine>@{surefireArgLine}</argLine> -->
 						<argLine>${surefireArgLine}</argLine>
 				</configuration>
 			</plugin>
@@ -297,7 +296,6 @@
 									<value>false</value>
 								</property>
 							</properties>
-<!-- 							<argLine>@{failsafeArgLine}</argLine> -->
 								<argLine>${failsafeArgLine}</argLine>
 						</configuration>
 					</execution>
