@@ -26,6 +26,11 @@ import org.openqa.selenium.support.ui.UnexpectedTagNameException;
 import com.seleniumtests.core.TestLogging;
 import com.seleniumtests.driver.WebUIDriver;
 
+import net.ricecode.similarity.JaroWinklerStrategy;
+import net.ricecode.similarity.SimilarityStrategy;
+import net.ricecode.similarity.StringSimilarityService;
+import net.ricecode.similarity.StringSimilarityServiceImpl;
+
 /**
  * Support both standard select tag and fake select consists of tag ul and li.
  */
@@ -250,6 +255,37 @@ public class SelectList extends HtmlElement {
                 }
             }
         }
+    }
+    
+    /**
+     * Select Corresponding select by attribute text, select the most similar text
+     *
+     * @param  text
+     */
+    public void selectByCorrespondingText(String text) {
+    	 SimilarityStrategy strategy = new JaroWinklerStrategy();
+    	 double score = 0;
+    	 WebElement optionToSelect = null;
+    	 for (WebElement option : options) {
+    		String source = option.getText();
+    		StringSimilarityService service = new StringSimilarityServiceImpl(strategy);
+    		if(service.score(source, text)>score){
+    			score = service.score(source, text);
+    			optionToSelect = option;
+    		}
+    	 }
+    	 setSelected(optionToSelect);
+    }
+    
+    /**
+     * Multiple select by attribute text, similar select
+     * 
+     * @param text
+     */
+    public void selectByCorrespondingText(String[] text) {
+    	 for (int i = 0; i < text.length; i++) {
+    		 selectByCorrespondingText(text[i]);
+    	 }
     }
 
     public void selectByValue(final String value) {
