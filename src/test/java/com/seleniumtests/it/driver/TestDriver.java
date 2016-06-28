@@ -315,6 +315,23 @@ public class TestDriver {
 			testPage.delayButtonReset.click();
 		}
 	}
+	
+	@Test(groups={"it"})
+	public void testIsCorrespondingTextSelect() {
+			testPage.selectList.init();
+			testPage.selectList.selectByCorrespondingText("option 2");
+			Assert.assertTrue(testPage.selectList.getSelectedValue().equals("opt2"));
+	}
+	
+	@Test(groups={"it"})
+	public void testIsMultipleCorrespondingTextSelect() {
+			testPage.selectMultipleList.init();
+			String[] toSelect = {"option 2", "opti4"};
+			testPage.selectMultipleList.selectByCorrespondingText(toSelect);
+			String[] toFind = {"opt2", "opt4"};
+			Assert.assertTrue(toFind[0].equals(testPage.selectMultipleList.getSelectedValues()[0]));
+			Assert.assertTrue(toFind[1].equals(testPage.selectMultipleList.getSelectedValues()[1]));
+	}
 
 //	@Test(groups={"it"})
 //	public void testFindImageElement() {
@@ -337,4 +354,6 @@ public class TestDriver {
 		new HtmlElement("", By.id("buttonScroll")).click();
 		Assert.assertFalse(((JavascriptExecutor) driver).executeScript("return window.pageYOffset;").equals(0L));
 	}
+	
+	
 }
