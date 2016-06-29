@@ -28,7 +28,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import com.seleniumtests.driver.TestType;
-import com.seleniumtests.helper.TestConfigurationParser;
+import com.seleniumtests.util.TestConfigurationParser;
 
 /**
  * SeleniumTestsContextManager provides ways to manage global context, thread context and test level context.

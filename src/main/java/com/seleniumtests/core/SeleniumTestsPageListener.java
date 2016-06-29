@@ -16,7 +16,6 @@ package com.seleniumtests.core;
 import org.apache.log4j.Logger;
 
 import com.seleniumtests.reporter.PluginsHelper;
-
 import com.seleniumtests.webelements.IPage;
 
 /**

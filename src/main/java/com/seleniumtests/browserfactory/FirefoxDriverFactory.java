@@ -28,7 +28,7 @@ import org.openqa.selenium.firefox.MarionetteDriver;
 
 import com.seleniumtests.customexception.DriverExceptions;
 import com.seleniumtests.driver.DriverConfig;
-import com.seleniumtests.helper.WaitHelper;
+import com.seleniumtests.util.helper.WaitHelper;
 
 public class FirefoxDriverFactory extends AbstractWebDriverFactory implements IWebDriverFactory {
     private long timeout = 60;

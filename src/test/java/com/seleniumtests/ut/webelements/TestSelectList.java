@@ -10,19 +10,20 @@ import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.it.driver.DriverTestPage;
 import com.seleniumtests.it.driver.TestDriver;
+import com.seleniumtests.it.driver.TestUiSelect;
 
 public class TestSelectList {
 
 	private static WebDriver driver;
 	private static DriverTestPage testPage;
-	private static TestDriver testDriverIt;
+	private static TestDriver testSelectIt;
 	
 	@BeforeClass(groups={"ut"})
 	public static void initDriver(final ITestContext testNGCtx) throws Exception {
 		SeleniumTestsContextManager.initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setBrowser("htmlunit");
 		testPage = new DriverTestPage(true);
 		driver = WebUIDriver.getWebDriver(true);
-		testDriverIt = new TestDriver(driver, testPage);
 	}
 	
 	@AfterClass(alwaysRun = true)
@@ -32,63 +33,63 @@ public class TestSelectList {
 	
 	@Test(groups={"ut"})
 	public void testSelect() {
-		testDriverIt.testIsTextSelect();
+		TestUiSelect.testIsTextSelect();
 	}
 	
 	@Test(groups={"ut"})
 	public void testSelectMultiple() {
-		testDriverIt.testIsMultipleTextSelect();
+		TestUiSelect.testIsMultipleTextSelect();
 	}
 	
 	@Test(groups={"ut"})
 	public void testSelectValue() {
-		testDriverIt.testIsValueSelect();
+		TestUiSelect.testIsValueSelect();
 	}
 	
 	@Test(groups={"ut"})
 	public void testSelectMultipleValue() {
-		testDriverIt.testIsMultipleValueSelect();
+		TestUiSelect.testIsMultipleValueSelect();
 	}
 	
 	@Test(groups={"ut"})
 	public void testSelectCorresponding() {
-		testDriverIt.testIsCorrespondingTextSelect();
+		TestUiSelect.testIsCorrespondingTextSelect();
 	}
 	
 	@Test(groups={"ut"})
 	public void testSelectMultipleCorresponding() {
-		testDriverIt.testIsMultipleCorrespondingTextSelect();
+		TestUiSelect.testIsMultipleCorrespondingTextSelect();
 	}
 	
 	@Test(groups={"ut"})
 	public void testSelectIndex() {
-		testDriverIt.testIsIndexSelect();
+		TestUiSelect.testIsIndexSelect();
 	}
 	
 	@Test(groups={"ut"})
 	public void testSelectMultipleIndex() {
-		testDriverIt.testIsMultipleIndexSelect();
+		TestUiSelect.testIsMultipleIndexSelect();
 	}
 	
 	@Test(groups={"ut"})
 	public void testDeselectAll() {
-		testDriverIt.testIsAllDeselected();
+		TestUiSelect.testIsAllDeselected();
 	}
 
 	
 	@Test(groups={"ut"})
 	public void testDeselectIndex() {
-		testDriverIt.testIsIndexDeselect();
+		TestUiSelect.testIsIndexDeselect();
 	}
 	
 	@Test(groups={"ut"})
 	public void testDeselectText() {
-		testDriverIt.testIsTextDeselect();
+		TestUiSelect.testIsTextDeselect();
 	}
 	
 	@Test(groups={"ut"})
 	public void testDeselectValue() {
-		testDriverIt.testIsValueDeselect();
+		TestUiSelect.testIsValueDeselect();
 	}
 	
 }

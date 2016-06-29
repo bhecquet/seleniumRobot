@@ -28,8 +28,7 @@ import com.seleniumtests.core.TestLogging;
 import com.seleniumtests.core.runner.CucumberRunner;
 import com.seleniumtests.customexception.DriverExceptions;
 import com.seleniumtests.driver.DriverConfig;
-
-import com.seleniumtests.helper.OSUtility;
+import com.seleniumtests.util.OSUtility;
 
 public class IEDriverFactory extends AbstractWebDriverFactory implements IWebDriverFactory {
 	

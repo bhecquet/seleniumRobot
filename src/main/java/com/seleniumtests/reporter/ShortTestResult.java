@@ -13,7 +13,7 @@
 
 package com.seleniumtests.reporter;
 
-import com.seleniumtests.helper.StringUtility;
+import com.seleniumtests.util.StringUtility;
 
 public class ShortTestResult {
 

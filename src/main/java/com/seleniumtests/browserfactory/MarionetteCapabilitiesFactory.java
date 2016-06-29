@@ -22,8 +22,8 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.driver.DriverConfig;
-import com.seleniumtests.helper.FileUtility;
-import com.seleniumtests.helper.OSUtility;
+import com.seleniumtests.util.FileUtility;
+import com.seleniumtests.util.OSUtility;
 
 public class MarionetteCapabilitiesFactory extends FirefoxCapabilitiesFactory {
 

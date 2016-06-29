@@ -15,14 +15,14 @@ package com.seleniumtests.it.driver;
 import org.openqa.selenium.By;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
-import com.seleniumtests.webelements.ButtonElement;
-import com.seleniumtests.webelements.CheckBoxElement;
-import com.seleniumtests.webelements.HtmlElement;
-import com.seleniumtests.webelements.LinkElement;
 import com.seleniumtests.webelements.PageObject;
-import com.seleniumtests.webelements.RadioButtonElement;
-import com.seleniumtests.webelements.SelectList;
-import com.seleniumtests.webelements.TextFieldElement;
+import com.seleniumtests.webelements.htmlelements.ButtonElement;
+import com.seleniumtests.webelements.htmlelements.CheckBoxElement;
+import com.seleniumtests.webelements.htmlelements.HtmlElement;
+import com.seleniumtests.webelements.htmlelements.LinkElement;
+import com.seleniumtests.webelements.htmlelements.RadioButtonElement;
+import com.seleniumtests.webelements.htmlelements.SelectList;
+import com.seleniumtests.webelements.htmlelements.TextFieldElement;
 
 public class DriverTestPage extends PageObject {
 	

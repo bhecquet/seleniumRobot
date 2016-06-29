@@ -13,82 +13,140 @@
 
 package com.seleniumtests.it.driver;
 
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebDriverException;
+import org.testng.Assert;
+import org.testng.ITestContext;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
+
 import com.seleniumtests.GenericTest;
+import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.driver.WebUIDriver;
 
 public class TestUiSelect extends GenericTest {
 	
-//	private static ICustomWebDriver driver;
-//	
-//	@BeforeClass
-//	public static void initDriver() throws Exception {
-//		driver = Launcher.getInstance().getDriver();
-//		driver.setTestAttachment(new TestAttachment());
-//		driver.getTestAttachment().resetTestAttachments("unknown");
+	private static WebDriver driver;
+	private static DriverTestPage testPage;
 
-//		driver.get("file:///" + Thread.currentThread().getContextClassLoader().getResource("test.html").getFile());
-//	}
-//	
-//	@AfterClass
-//	public static void closeBrowser() {
-//		driver.close();
-//		DriverDesktopLocator.getHostInstance().cleanBrowsers();
-//		
-//		// attente pour ne pas impacter le lancement d'un autre test unitaire
-//		Tools.waitMs(2000);
-//	}
-//	
-//	/**
-//	 * Test le Select
-//	 * - teste les multiples méthodes
-//	 * TODO on ne teste pas le cas où le contenu du select est mis à jour suite à une communication réseau
-//	 */
-//	@Test  
-//	public void testSelectByIndex() {
-//		Select select = new Select(driver.findElement(By.id("select")));
-//		select.selectByIndex(1);
-//		Assert.assertTrue(select.getFirstSelectedOption().getText().equals("option2"));
-//		Assert.assertTrue(driver.findElement(By.id("textSelectedId")).getAttribute("value").equals("1"));
-//		Assert.assertTrue(driver.findElement(By.id("textSelectedValue")).getAttribute("value").equals("opt2"));
-//		Assert.assertTrue(driver.findElement(By.id("textSelectedText")).getAttribute("value").equals("option2"));
-//	}
-//	
-//	@Test  
-//	public void testSelectByMatchingVisibleText() {
-//		Select select = new Select(driver.findElement(By.id("select")));
-//		select.selectByMatchingVisibleText("numero");
-//		Assert.assertTrue(select.getFirstSelectedOption().getText().equals("option numero 3"));
-//	}
-//	
-//	@Test  
-//	public void testSelectByVisibleText() {
-//		Select select = new Select(driver.findElement(By.id("select")));
-//		select.selectByVisibleText("option2");
-//		Assert.assertTrue(select.getFirstSelectedOption().getText().equals("option2"));
-//	}
-//	
-//	@Test  
-//	public void testSelectByValue() {
-//		Select select = new Select(driver.findElement(By.id("select")));
-//		select.selectByValue("opt3");
-//		Assert.assertTrue(select.getFirstSelectedOption().getText().equals("option numero 3"));
-//	}
-//	
-//	@Test  
-//	public void testOptions() {
-//		Select select = new Select(driver.findElement(By.id("select")));
-//		Assert.assertTrue(select.getOptions().size() == 3);
-//		Assert.assertTrue(select.getAllSelectedOptions().size() == 1);
-//		Assert.assertFalse(select.isMultiple());
-//	}
-//	
-//	/**
-//	 * Le select disparait après sélection, on ne doit pas planter
-//	 */
-//	@Test  
-//	public void testSelectHiddenAfterChoice() {
-//		Select select = new Select(driver.findElement(By.id("select")));
-//		select.selectByIndex(1);
-//	}
-//	
+	@BeforeClass(groups={"it"})
+	public void initDriver(final ITestContext testNGCtx) throws Exception {
+		SeleniumTestsContextManager.initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setExplicitWaitTimeout(2);
+		testPage = new DriverTestPage(true);
+		driver = WebUIDriver.getWebDriver(true);
+	}
+	
+	@AfterMethod(alwaysRun=true)
+	public void cleanAlert() {
+		try {
+			driver.switchTo().alert().accept();
+		} catch (WebDriverException e) {
+			
+		}
+	}
+	
+	@AfterClass(alwaysRun = true)
+	public void closeBrowser() {
+		WebUIDriver.cleanUp();
+	}
+	
+	/*
+	 * Test SelectList and MultipleSelectList
+	 */
+	@Test(groups={"it"})
+	public static void testIsTextSelect() {
+			testPage.selectList.selectByText("option2");
+			Assert.assertTrue(testPage.selectList.getSelectedValue().equals("opt2"));
+	}
+	
+	@Test(groups={"it"})
+	public static void testIsMultipleTextSelect() {
+			testPage.selectMultipleList.deselectAll();
+			String[] toSelect = {"option2", "option4"};
+			testPage.selectMultipleList.selectByText(toSelect);
+			Assert.assertTrue("opt2".equals(testPage.selectMultipleList.getSelectedValues()[0]));
+			Assert.assertTrue("opt4".equals(testPage.selectMultipleList.getSelectedValues()[1]));
+	}
+	
+	@Test(groups={"it"})
+	public static void testIsValueSelect() {
+		testPage.selectList.selectByValue("opt2");
+		Assert.assertTrue(testPage.selectList.getSelectedValue().equals("opt2"));
+	}
+	
+	@Test(groups={"it"})
+	public static void testIsMultipleValueSelect() {
+			testPage.selectMultipleList.deselectAll();
+			String[] toSelect = {"opt2", "opt4"};
+			testPage.selectMultipleList.selectByValue(toSelect);
+			Assert.assertTrue(toSelect[0].equals(testPage.selectMultipleList.getSelectedValues()[0]));
+			Assert.assertTrue(toSelect[1].equals(testPage.selectMultipleList.getSelectedValues()[1]));
+	}
+	
+	@Test(groups={"it"})
+	public static void testIsCorrespondingTextSelect() {
+			testPage.selectList.selectByCorrespondingText("option 2");
+			Assert.assertTrue(testPage.selectList.getSelectedValue().equals("opt2"));
+	}
+	
+	@Test(groups={"it"})
+	public static void testIsMultipleCorrespondingTextSelect() {
+			testPage.selectMultipleList.deselectAll();
+			String[] toSelect = {"option 2", "opti4"};
+			testPage.selectMultipleList.selectByCorrespondingText(toSelect);
+			String[] toFind = {"opt2", "opt4"};
+			Assert.assertTrue(toFind[0].equals(testPage.selectMultipleList.getSelectedValues()[0]));
+			Assert.assertTrue(toFind[1].equals(testPage.selectMultipleList.getSelectedValues()[1]));
+	}
+	
+	@Test(groups={"it"})
+	public static void testIsAllDeselected() {
+		String[] toSelect = {"opt1", "opt2", "opt3", "opt4"};
+		testPage.selectMultipleList.selectByCorrespondingText(toSelect);
+		testPage.selectMultipleList.deselectAll();
+		Assert.assertTrue(testPage.selectMultipleList.getSelectedValues().length == 0);
+	}
+	
+	@Test(groups={"it"})
+	public static void testIsIndexSelect() {
+		testPage.selectList.selectByIndex(1);
+		Assert.assertTrue(testPage.selectList.getSelectedValue().equals("opt2"));
+	}
+	
+	@Test(groups={"it"})
+	public static void testIsMultipleIndexSelect() {
+		testPage.selectMultipleList.deselectAll();
+		int[] toSelect = {1, 2};
+		testPage.selectMultipleList.selectByIndex(toSelect);
+		Assert.assertTrue(testPage.selectMultipleList.getSelectedValues()[0].equals("opt2"));
+		Assert.assertTrue(testPage.selectMultipleList.getSelectedValues()[1].equals("opt3"));
+	}
+	
+	@Test(groups={"it"})
+	public static void testIsIndexDeselect() {
+		testPage.selectMultipleList.deselectAll();
+		testPage.selectMultipleList.selectByIndex(1);
+		testPage.selectMultipleList.deselectByIndex(1);
+		Assert.assertTrue(testPage.selectMultipleList.getSelectedValues().length == 0);
+	}
+	
+	@Test(groups={"it"})
+	public static void testIsTextDeselect() {
+		testPage.selectMultipleList.deselectAll();
+		testPage.selectMultipleList.selectByText("option1");
+		testPage.selectMultipleList.deselectByText("option1");
+		Assert.assertTrue(testPage.selectMultipleList.getSelectedValues().length == 0);
+	}
+	
+	@Test(groups={"it"})
+	public static void testIsValueDeselect() {
+		testPage.selectMultipleList.deselectAll();
+		testPage.selectMultipleList.selectByValue("opt1");
+		testPage.selectMultipleList.deselectByValue("opt1");
+		Assert.assertTrue(testPage.selectMultipleList.getSelectedValues().length == 0);
+	}	
 
 }

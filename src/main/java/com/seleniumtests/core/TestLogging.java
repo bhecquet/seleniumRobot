@@ -29,12 +29,9 @@ import org.testng.ITestResult;
 import org.testng.Reporter;
 
 import com.google.gdata.util.common.html.HtmlToText;
-
-import com.seleniumtests.driver.ScreenShot;
-
-import com.seleniumtests.helper.StringUtility;
-
+import com.seleniumtests.driver.screenshots.ScreenShot;
 import com.seleniumtests.reporter.PluginsHelper;
+import com.seleniumtests.util.StringUtility;
 
 /**
  * Log methods for test operations.

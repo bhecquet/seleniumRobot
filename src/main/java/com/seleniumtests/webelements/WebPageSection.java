@@ -17,9 +17,8 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
 import com.seleniumtests.core.TestLogging;
-
-import com.seleniumtests.driver.ScreenShot;
-import com.seleniumtests.driver.ScreenshotUtil;
+import com.seleniumtests.driver.screenshots.ScreenShot;
+import com.seleniumtests.driver.screenshots.ScreenshotUtil;
 
 public abstract class WebPageSection extends BasePage {
 
