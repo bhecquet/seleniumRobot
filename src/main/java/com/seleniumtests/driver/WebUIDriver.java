@@ -35,8 +35,8 @@ import com.seleniumtests.browserfactory.SafariDriverFactory;
 import com.seleniumtests.browserfactory.SauceLabsDriverFactory;
 import com.seleniumtests.browserfactory.TestDroidDriverFactory;
 import com.seleniumtests.core.SeleniumTestsContextManager;
-import com.seleniumtests.core.TestLogging;
 import com.seleniumtests.customexception.DriverExceptions;
+import com.seleniumtests.reporter.TestLogging;
 import com.seleniumtests.util.helper.WaitHelper;
 
 /**

@@ -25,8 +25,8 @@ import org.ini4j.Ini;
 import org.ini4j.InvalidFileFormatException;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
-import com.seleniumtests.core.TestLogging;
 import com.seleniumtests.customexception.ConfigurationException;
+import com.seleniumtests.reporter.TestLogging;
 
 public class ConfigReader {
 	

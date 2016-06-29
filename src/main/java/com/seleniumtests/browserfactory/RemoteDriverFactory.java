@@ -28,11 +28,11 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
-import com.seleniumtests.core.TestLogging;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.DriverConfig;
 import com.seleniumtests.driver.screenshots.ScreenShotRemoteWebDriver;
+import com.seleniumtests.reporter.TestLogging;
 import com.seleniumtests.util.helper.WaitHelper;
 
 public class RemoteDriverFactory extends AbstractWebDriverFactory implements IWebDriverFactory {

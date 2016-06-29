@@ -23,8 +23,8 @@ import org.apache.log4j.Logger;
 import com.seleniumtests.core.SeleniumTestPlan;
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
-import com.seleniumtests.core.TestLogging;
 import com.seleniumtests.customexception.CustomSeleniumTestsException;
+import com.seleniumtests.reporter.TestLogging;
 
 import cucumber.api.testng.FeatureResultListener;
 import cucumber.api.testng.TestNgReporter;

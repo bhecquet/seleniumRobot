@@ -33,8 +33,8 @@ import org.testng.xml.XmlTest;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.TearDownService;
-import com.seleniumtests.core.TestLogging;
 import com.seleniumtests.driver.WebUIDriver;
+import com.seleniumtests.reporter.TestLogging;
 
 import cucumber.api.testng.CucumberFeatureWrapper;
 

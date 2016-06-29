@@ -11,7 +11,7 @@
  * limitations under the License.
  */
 
-package com.seleniumtests.core;
+package com.seleniumtests.reporter;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -30,7 +30,6 @@ import org.testng.Reporter;
 
 import com.google.gdata.util.common.html.HtmlToText;
 import com.seleniumtests.driver.screenshots.ScreenShot;
-import com.seleniumtests.reporter.PluginsHelper;
 import com.seleniumtests.util.StringUtility;
 
 /**

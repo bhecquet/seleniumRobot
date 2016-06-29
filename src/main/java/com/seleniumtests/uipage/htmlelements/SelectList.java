@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-package com.seleniumtests.webelements.htmlelements;
+package com.seleniumtests.uipage.htmlelements;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -23,8 +23,8 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.UnexpectedTagNameException;
 
-import com.seleniumtests.core.TestLogging;
 import com.seleniumtests.driver.WebUIDriver;
+import com.seleniumtests.reporter.TestLogging;
 
 import net.ricecode.similarity.JaroWinklerStrategy;
 import net.ricecode.similarity.SimilarityStrategy;

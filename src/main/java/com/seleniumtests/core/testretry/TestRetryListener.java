@@ -11,22 +11,23 @@
  * limitations under the License.
  */
 
-package com.seleniumtests.core;
-
-import org.testng.IAnnotationTransformer;
-import org.testng.IRetryAnalyzer;
-import org.testng.annotations.ITestAnnotation;
+package com.seleniumtests.core.testretry;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 
-public class FairTestRetryListener implements IAnnotationTransformer {
+import org.testng.IAnnotationTransformer;
+import org.testng.IRetryAnalyzer;
+
+import org.testng.annotations.ITestAnnotation;
+
+public class TestRetryListener implements IAnnotationTransformer {
 
     public void transform(final ITestAnnotation annotation, final Class testClass, final Constructor testConstructor,
             final Method testMethod) {
         IRetryAnalyzer retryAnalyzer = annotation.getRetryAnalyzer();
         if (retryAnalyzer == null) {
-            annotation.setRetryAnalyzer(FairTestRetryAnalyzer.class);
+            annotation.setRetryAnalyzer(TestRetryAnalyzer.class);
         }
     }
 

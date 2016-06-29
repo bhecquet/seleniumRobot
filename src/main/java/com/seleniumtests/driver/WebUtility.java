@@ -19,7 +19,7 @@ import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.WebDriver;
 
-import com.seleniumtests.core.TestLogging;
+import com.seleniumtests.reporter.TestLogging;
 
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.ios.IOSDriver;

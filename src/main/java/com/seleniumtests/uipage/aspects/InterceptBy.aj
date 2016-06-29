@@ -11,7 +11,7 @@
  * limitations under the License.
  */
 
-package com.seleniumtests.webelements.aspects;
+package com.seleniumtests.uipage.aspects;
 
 import java.util.HashMap;
 import java.util.MissingFormatArgumentException;
@@ -23,7 +23,7 @@ import org.aspectj.lang.annotation.Aspect;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.config.ConfigMappingReader;
 import com.seleniumtests.customexception.ConfigurationException;
-import com.seleniumtests.webelements.PageObject;
+import com.seleniumtests.uipage.PageObject;
 /**
  * Aspect to intercept calls to methods from By. It change the argument of
  * methods when it use the keyWord : map

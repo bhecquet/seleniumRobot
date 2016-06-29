@@ -22,10 +22,10 @@ import org.apache.log4j.Logger;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 
-import com.seleniumtests.core.TestLogging;
 import com.seleniumtests.customexception.DriverExceptions;
 import com.seleniumtests.driver.DriverConfig;
 import com.seleniumtests.driver.WebUIDriver;
+import com.seleniumtests.reporter.TestLogging;
 
 public abstract class AbstractWebDriverFactory {
 

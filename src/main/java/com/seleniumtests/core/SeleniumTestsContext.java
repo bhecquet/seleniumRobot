@@ -45,6 +45,7 @@ import com.seleniumtests.driver.DriverMode;
 import com.seleniumtests.driver.TestType;
 import com.seleniumtests.driver.screenshots.ScreenShot;
 import com.seleniumtests.reporter.PluginsHelper;
+import com.seleniumtests.reporter.TestLogging;
 
 /**
  * Defines TestNG context used in STF.

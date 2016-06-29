@@ -27,7 +27,7 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 
-import com.seleniumtests.webelements.PageObject;
+import com.seleniumtests.uipage.PageObject;
 
 /*import org.apache.oro.text.perl.MalformedPerl5PatternException;
  *

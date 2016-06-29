@@ -11,7 +11,7 @@
  * limitations under the License.
  */
 
-package com.seleniumtests.webelements.aspects;
+package com.seleniumtests.uipage.aspects;
 
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -26,8 +26,8 @@ import org.openqa.selenium.remote.UnreachableBrowserException;
 import org.openqa.selenium.support.ui.SystemClock;
 
 import com.seleniumtests.driver.WebUIDriver;
+import com.seleniumtests.uipage.htmlelements.HtmlElement;
 import com.seleniumtests.util.helper.WaitHelper;
-import com.seleniumtests.webelements.htmlelements.HtmlElement;
 
 /**
  * Aspect to intercept calls to methods of HtmlElement. It allows to retry discovery and action 

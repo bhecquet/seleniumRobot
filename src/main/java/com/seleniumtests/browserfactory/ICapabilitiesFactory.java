@@ -17,8 +17,8 @@ package com.seleniumtests.browserfactory;
 import org.apache.log4j.Logger;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
-import com.seleniumtests.core.TestLogging;
 import com.seleniumtests.driver.DriverConfig;
+import com.seleniumtests.reporter.TestLogging;
 
 public abstract class ICapabilitiesFactory {
 	

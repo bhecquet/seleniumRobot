@@ -11,7 +11,7 @@
  * limitations under the License.
  */
 
-package com.seleniumtests.webelements.htmlelements;
+package com.seleniumtests.uipage.htmlelements;
 
 import java.util.List;
 

@@ -12,11 +12,11 @@
  * limitations under the License.
  */
 
-package com.seleniumtests.webelements.htmlelements;
+package com.seleniumtests.uipage.htmlelements;
 
 import org.openqa.selenium.By;
 
-import com.seleniumtests.core.TestLogging;
+import com.seleniumtests.reporter.TestLogging;
 
 public class LinkElement extends HtmlElement {
 

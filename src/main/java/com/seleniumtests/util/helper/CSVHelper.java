@@ -33,10 +33,9 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 
 import com.seleniumtests.core.Filter;
-import com.seleniumtests.core.TestLogging;
-
 import com.seleniumtests.customexception.CustomSeleniumTestsException;
 import com.seleniumtests.customexception.DatasetException;
+import com.seleniumtests.reporter.TestLogging;
 
 public class CSVHelper {
     private static Logger logger = TestLogging.getLogger(CSVHelper.class);

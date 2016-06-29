@@ -11,7 +11,7 @@
  * limitations under the License.
  */
 
-package com.seleniumtests.webelements.htmlelements;
+package com.seleniumtests.uipage.htmlelements;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
@@ -42,11 +42,11 @@ import org.openqa.selenium.support.ui.SystemClock;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
-import com.seleniumtests.core.TestLogging;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.driver.screenshots.ScreenshotUtil;
+import com.seleniumtests.reporter.TestLogging;
 import com.seleniumtests.util.helper.ContextHelper;
 import com.seleniumtests.util.helper.WaitHelper;
 import com.thoughtworks.selenium.webdriven.JavascriptLibrary;

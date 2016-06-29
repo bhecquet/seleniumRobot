@@ -31,8 +31,8 @@ import org.testng.annotations.Test;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import com.seleniumtests.driver.WebUIDriver;
+import com.seleniumtests.uipage.htmlelements.HtmlElement;
 import com.seleniumtests.util.helper.WaitHelper;
-import com.seleniumtests.webelements.htmlelements.HtmlElement;
 
 public class TestDriver {
 	

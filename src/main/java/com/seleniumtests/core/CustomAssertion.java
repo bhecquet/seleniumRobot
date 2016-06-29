@@ -23,6 +23,8 @@ import org.hamcrest.MatcherAssert;
 import org.testng.Assert;
 import org.testng.Reporter;
 
+import com.seleniumtests.reporter.TestLogging;
+
 /**
  * soft assert - test case continues when validation fails. soft assert is enabled only if context softAssertEnabled is
  * set to true.

@@ -34,6 +34,7 @@ import org.testng.annotations.BeforeTest;
 import org.testng.xml.XmlTest;
 
 import com.seleniumtests.driver.WebUIDriver;
+import com.seleniumtests.reporter.TestLogging;
 
 /**
  * This class initializes context, sets up and tears down and clean up drivers An STF test should extend this class.

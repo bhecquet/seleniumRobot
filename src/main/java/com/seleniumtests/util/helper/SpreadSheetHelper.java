@@ -36,8 +36,8 @@ import org.apache.log4j.Logger;
 
 import com.seleniumtests.core.Filter;
 import com.seleniumtests.core.SeleniumTestsContextManager;
-import com.seleniumtests.core.TestLogging;
 import com.seleniumtests.customexception.DatasetException;
+import com.seleniumtests.reporter.TestLogging;
 import com.seleniumtests.util.internal.entity.TestEntity;
 
 public class SpreadSheetHelper {

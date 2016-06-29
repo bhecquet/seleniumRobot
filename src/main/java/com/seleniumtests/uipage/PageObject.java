@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-package com.seleniumtests.webelements;
+package com.seleniumtests.uipage;
 
 import java.io.IOException;
 import java.util.Calendar;
@@ -43,7 +43,6 @@ import com.gargoylesoftware.htmlunit.ElementNotFoundException;
 import com.seleniumtests.core.CustomAssertion;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.SeleniumTestsPageListener;
-import com.seleniumtests.core.TestLogging;
 import com.seleniumtests.customexception.CustomSeleniumTestsException;
 import com.seleniumtests.customexception.NotCurrentPageException;
 import com.seleniumtests.driver.CustomEventFiringWebDriver;
@@ -51,10 +50,11 @@ import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.driver.WebUtility;
 import com.seleniumtests.driver.screenshots.ScreenShot;
 import com.seleniumtests.driver.screenshots.ScreenshotUtil;
+import com.seleniumtests.reporter.TestLogging;
+import com.seleniumtests.uipage.htmlelements.HtmlElement;
+import com.seleniumtests.uipage.htmlelements.LinkElement;
 import com.seleniumtests.util.helper.ContextHelper;
 import com.seleniumtests.util.helper.WaitHelper;
-import com.seleniumtests.webelements.htmlelements.HtmlElement;
-import com.seleniumtests.webelements.htmlelements.LinkElement;
 
 import net.jsourcerer.webdriver.jserrorcollector.JavaScriptError;
 
