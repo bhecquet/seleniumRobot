@@ -32,8 +32,8 @@ import com.seleniumtests.core.TestLogging;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.DriverConfig;
-import com.seleniumtests.driver.ScreenShotRemoteWebDriver;
-import com.seleniumtests.helper.WaitHelper;
+import com.seleniumtests.driver.screenshots.ScreenShotRemoteWebDriver;
+import com.seleniumtests.util.helper.WaitHelper;
 
 public class RemoteDriverFactory extends AbstractWebDriverFactory implements IWebDriverFactory {
 

@@ -47,11 +47,14 @@ import com.seleniumtests.core.TestLogging;
 import com.seleniumtests.customexception.CustomSeleniumTestsException;
 import com.seleniumtests.customexception.NotCurrentPageException;
 import com.seleniumtests.driver.CustomEventFiringWebDriver;
-import com.seleniumtests.driver.ScreenShot;
-import com.seleniumtests.driver.ScreenshotUtil;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.driver.WebUtility;
-import com.seleniumtests.helper.WaitHelper;
+import com.seleniumtests.driver.screenshots.ScreenShot;
+import com.seleniumtests.driver.screenshots.ScreenshotUtil;
+import com.seleniumtests.util.helper.ContextHelper;
+import com.seleniumtests.util.helper.WaitHelper;
+import com.seleniumtests.webelements.htmlelements.HtmlElement;
+import com.seleniumtests.webelements.htmlelements.LinkElement;
 
 import net.jsourcerer.webdriver.jserrorcollector.JavaScriptError;
 
@@ -296,10 +299,10 @@ public class PageObject extends BasePage implements IPage {
     public void dragAndDrop(final HtmlElement element, final int offsetX, final int offsetY) {
         TestLogging.logWebStep(null,
             "dragAndDrop " + element.toHTML() + " to offset(x,y): (" + offsetX + "," + offsetY + ")", false);
-        element.captureSnapshot("before draging");
+        captureSnapshot("before draging");
 
         new Actions(driver).dragAndDropBy((WebElement) element.getElement(), offsetX, offsetY).perform();
-        element.captureSnapshot("after dropping");
+        captureSnapshot("after dropping");
     }
 
     public String getBodyText() {
@@ -615,6 +618,22 @@ public class PageObject extends BasePage implements IPage {
             // ex.printStackTrace();
             throw ex;
         }
+    }
+    
+    /**
+     * Captures snapshot of the current browser window.
+     */
+    public void captureSnapshot() {
+        captureSnapshot(ContextHelper.getCallerMethod() + " on ");
+    }
+
+    /**
+     * Captures snapshot of the current browser window, and prefix the file name with the assigned string.
+     *
+     * @param  messagePrefix
+     */
+    protected void captureSnapshot(final String messagePrefix) {
+        ScreenshotUtil.captureSnapshot(messagePrefix);
     }
 
     public WebElement getElement(final By by, final String elementName) {

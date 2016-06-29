@@ -20,7 +20,7 @@ import org.testng.ITestContext;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import com.seleniumtests.helper.TestConfigurationParser;
+import com.seleniumtests.util.TestConfigurationParser;
 
 public class TestTestConfigurationParser {
 	

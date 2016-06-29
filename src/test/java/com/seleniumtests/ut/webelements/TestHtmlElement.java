@@ -14,8 +14,8 @@ import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.it.driver.DriverTestPage;
 import com.seleniumtests.it.driver.TestDriver;
-import com.seleniumtests.webelements.HtmlElement;
-import com.seleniumtests.webelements.LabelElement;
+import com.seleniumtests.webelements.htmlelements.HtmlElement;
+import com.seleniumtests.webelements.htmlelements.LabelElement;
 
 public class TestHtmlElement {
 

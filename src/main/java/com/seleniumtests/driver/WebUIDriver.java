@@ -37,7 +37,7 @@ import com.seleniumtests.browserfactory.TestDroidDriverFactory;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.TestLogging;
 import com.seleniumtests.customexception.DriverExceptions;
-import com.seleniumtests.helper.WaitHelper;
+import com.seleniumtests.util.helper.WaitHelper;
 
 /**
  * This class provides factory to create webDriver session.

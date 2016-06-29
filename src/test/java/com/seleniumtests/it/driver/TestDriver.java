@@ -31,8 +31,8 @@ import org.testng.annotations.Test;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import com.seleniumtests.driver.WebUIDriver;
-import com.seleniumtests.helper.WaitHelper;
-import com.seleniumtests.webelements.HtmlElement;
+import com.seleniumtests.util.helper.WaitHelper;
+import com.seleniumtests.webelements.htmlelements.HtmlElement;
 
 public class TestDriver {
 	
@@ -314,117 +314,6 @@ public class TestDriver {
 		} finally {
 			testPage.delayButtonReset.click();
 		}
-	}
-	
-	/**
-	 * Test SelectList and MultipleSelectList
-	 */
-	@Test(groups={"it"})
-	public void testIsTextSelect() {
-			testPage.selectList.init();
-			testPage.selectList.selectByText("option2");
-			Assert.assertTrue(testPage.selectList.getSelectedText().equals("option2"));
-	}
-	
-	@Test(groups={"it"})
-	public void testIsMultipleTextSelect() {
-			testPage.selectMultipleList.init();
-			testPage.selectMultipleList.deselectAll();
-			String[] toSelect = {"option2", "option4"};
-			testPage.selectMultipleList.selectByText(toSelect);
-			Assert.assertTrue(toSelect[0].equals(testPage.selectMultipleList.getSelectedTexts()[0]));
-			Assert.assertTrue(toSelect[1].equals(testPage.selectMultipleList.getSelectedTexts()[1]));
-	}
-	
-	@Test(groups={"it"})
-	public void testIsValueSelect() {
-		testPage.selectList.init();
-		testPage.selectList.selectByValue("opt2");
-		Assert.assertTrue(testPage.selectList.getSelectedValue().equals("opt2"));
-	}
-	
-	@Test(groups={"it"})
-	public void testIsMultipleValueSelect() {
-			testPage.selectMultipleList.init();
-			testPage.selectMultipleList.deselectAll();
-			String[] toSelect = {"opt2", "opt4"};
-			testPage.selectMultipleList.selectByValue(toSelect);
-			Assert.assertTrue(toSelect[0].equals(testPage.selectMultipleList.getSelectedValues()[0]));
-			Assert.assertTrue(toSelect[1].equals(testPage.selectMultipleList.getSelectedValues()[1]));
-	}
-	
-	@Test(groups={"it"})
-	public void testIsCorrespondingTextSelect() {
-			testPage.selectList.init();
-			testPage.selectList.selectByCorrespondingText("option 2");
-			Assert.assertTrue(testPage.selectList.getSelectedValue().equals("opt2"));
-	}
-	
-	@Test(groups={"it"})
-	public void testIsMultipleCorrespondingTextSelect() {
-			testPage.selectMultipleList.init();
-			testPage.selectMultipleList.deselectAll();
-			String[] toSelect = {"option 2", "opti4"};
-			testPage.selectMultipleList.selectByCorrespondingText(toSelect);
-			String[] toFind = {"opt2", "opt4"};
-			Assert.assertTrue(toFind[0].equals(testPage.selectMultipleList.getSelectedValues()[0]));
-			Assert.assertTrue(toFind[1].equals(testPage.selectMultipleList.getSelectedValues()[1]));
-	}
-	
-	@Test(groups={"it"})
-	public void testIsAllDeselected() {
-		testPage.selectMultipleList.init();
-		String[] toSelect = {"opt1", "opt2", "opt3", "opt4"};
-		testPage.selectMultipleList.selectByCorrespondingText(toSelect);
-		testPage.selectMultipleList.deselectAll();
-		Assert.assertTrue(testPage.selectMultipleList.getSelectedValues().length == 0);
-	}
-	
-	@Test(groups={"it"})
-	public void testIsIndexSelect() {
-		testPage.selectList.init();
-		testPage.selectList.selectByIndex(1);
-		Assert.assertTrue(testPage.selectList.getSelectedValue().equals("opt2"));
-	}
-	
-	@Test(groups={"it"})
-	public void testIsMultipleIndexSelect() {
-		testPage.selectMultipleList.init();
-		testPage.selectMultipleList.deselectAll();
-		int[] toSelect = {1, 2};
-		testPage.selectMultipleList.selectByIndex(toSelect);
-		Assert.assertTrue(testPage.selectMultipleList.getSelectedValues()[0].equals("opt2"));
-		Assert.assertTrue(testPage.selectMultipleList.getSelectedValues()[1].equals("opt3"));
-	}
-	
-	@Test(groups={"it"})
-	public void testIsIndexDeselect() {
-		testPage.selectMultipleList.init();
-		testPage.selectMultipleList.deselectAll();
-		testPage.selectMultipleList.selectByIndex(1);
-		testPage.selectMultipleList.deselectByIndex(1);
-		System.out.println(testPage.selectMultipleList.getSelectedValues().length);
-		Assert.assertTrue(testPage.selectMultipleList.getSelectedValues().length == 0);
-	}
-	
-	@Test(groups={"it"})
-	public void testIsTextDeselect() {
-		testPage.selectMultipleList.init();
-		testPage.selectMultipleList.deselectAll();
-		testPage.selectMultipleList.selectByText("option1");
-		testPage.selectMultipleList.deselectByText("option1");
-		System.out.println(testPage.selectMultipleList.getSelectedValues().length);
-		Assert.assertTrue(testPage.selectMultipleList.getSelectedValues().length == 0);
-	}
-	
-	@Test(groups={"it"})
-	public void testIsValueDeselect() {
-		testPage.selectMultipleList.init();
-		testPage.selectMultipleList.deselectAll();
-		testPage.selectMultipleList.selectByValue("opt1");
-		testPage.selectMultipleList.deselectByValue("opt1");
-		System.out.println(testPage.selectMultipleList.getSelectedValues().length);
-		Assert.assertTrue(testPage.selectMultipleList.getSelectedValues().length == 0);
 	}
 
 //	@Test(groups={"it"})
