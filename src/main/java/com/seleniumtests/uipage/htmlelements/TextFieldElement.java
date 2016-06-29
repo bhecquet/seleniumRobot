@@ -12,14 +12,14 @@
  * limitations under the License.
  */
 
-package com.seleniumtests.webelements.htmlelements;
+package com.seleniumtests.uipage.htmlelements;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
-import com.seleniumtests.core.TestLogging;
 import com.seleniumtests.driver.CustomEventFiringWebDriver;
+import com.seleniumtests.reporter.TestLogging;
 
 public class TextFieldElement extends HtmlElement {
     public TextFieldElement(final String label, final By by) {

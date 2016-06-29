@@ -11,10 +11,12 @@
  * limitations under the License.
  */
 
-package com.seleniumtests.core;
+package com.seleniumtests.core.testretry;
 
 import org.testng.IRetryAnalyzer;
 import org.testng.ITestResult;
+
+import com.seleniumtests.reporter.TestLogging;
 
 public class TestRetryAnalyzer implements IRetryAnalyzer, ITestRetryAnalyzer {
 

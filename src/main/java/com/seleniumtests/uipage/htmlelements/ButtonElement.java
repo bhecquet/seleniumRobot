@@ -12,15 +12,14 @@
  * limitations under the License.
  */
 
-package com.seleniumtests.webelements.htmlelements;
+package com.seleniumtests.uipage.htmlelements;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 
-import com.seleniumtests.core.TestLogging;
-
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.WebUIDriver;
+import com.seleniumtests.reporter.TestLogging;
 
 public class ButtonElement extends HtmlElement {
 

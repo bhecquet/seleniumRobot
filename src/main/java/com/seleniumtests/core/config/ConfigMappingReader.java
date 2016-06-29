@@ -22,9 +22,9 @@ import org.ini4j.InvalidFileFormatException;
 
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
-import com.seleniumtests.core.TestLogging;
 import com.seleniumtests.core.runner.CucumberRunner;
 import com.seleniumtests.customexception.ConfigurationException;
+import com.seleniumtests.reporter.TestLogging;
 import com.seleniumtests.util.helper.IniHelper;
 
 

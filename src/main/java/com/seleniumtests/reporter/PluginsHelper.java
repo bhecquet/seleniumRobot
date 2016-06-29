@@ -31,14 +31,13 @@ import org.apache.log4j.Logger;
 import org.openqa.selenium.WebDriverException;
 
 import com.seleniumtests.core.SeleniumTestsPageListener;
-import com.seleniumtests.core.TestLogging;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.reporter.pluginmodel.Method;
 import com.seleniumtests.reporter.pluginmodel.Page;
 import com.seleniumtests.reporter.pluginmodel.Plugin;
 import com.seleniumtests.reporter.pluginmodel.SeleniumTestsPlugins;
 import com.seleniumtests.reporter.pluginmodel.Test;
-import com.seleniumtests.webelements.IPage;
+import com.seleniumtests.uipage.IPage;
 
 public class PluginsHelper {
 	private static final Logger logger = TestLogging.getLogger(PluginsHelper.class);

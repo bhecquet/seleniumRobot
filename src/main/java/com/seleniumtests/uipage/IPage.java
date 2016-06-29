@@ -11,7 +11,7 @@
  * limitations under the License.
  */
 
-package com.seleniumtests.webelements;
+package com.seleniumtests.uipage;
 
 public interface IPage {
 

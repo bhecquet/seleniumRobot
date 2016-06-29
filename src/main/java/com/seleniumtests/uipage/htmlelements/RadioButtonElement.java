@@ -12,36 +12,35 @@
  * limitations under the License.
  */
 
-package com.seleniumtests.webelements.htmlelements;
+package com.seleniumtests.uipage.htmlelements;
 
 import org.openqa.selenium.By;
 
-import com.seleniumtests.core.CustomAssertion;
-import com.seleniumtests.core.TestLogging;
+import com.seleniumtests.reporter.TestLogging;
 
-public class LabelElement extends HtmlElement {
-    public LabelElement(final String label, final By by) {
+public class RadioButtonElement extends HtmlElement {
+
+    public RadioButtonElement(final String label, final By by) {
         super(label, by);
     }
-    
-    public LabelElement(final String label, final By by, final int index) {
+
+    public RadioButtonElement(final String label, final By by, final int index) {
     	super(label, by, index);
     }
 
+    public void check() {
+        TestLogging.logWebStep(null, "check " + toHTML(), false);
+        super.click();
+    }
+
     @Override
-    public String getText() {
-        TestLogging.logWebStep(null, "get text from " + toHTML(), false);
-        return super.getText();
+    public void click() {
+        TestLogging.logWebStep(null, "click on " + toHTML(), false);
+        super.click();
     }
 
-    public boolean isTextPresent(final String pattern) {
-        String text = getText();
-        return (text != null && (text.contains(pattern) || text.matches(pattern)));
-    }
-
-    @Deprecated
-    public String getExpectedText() {
-        CustomAssertion.assertTrue(false, "NOT supported!");
-        return null;
+    public boolean isSelected() {
+        findElement();
+        return element.isSelected();
     }
 }

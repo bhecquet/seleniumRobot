@@ -10,7 +10,7 @@ import org.testng.xml.XmlTest;
 import com.seleniumtests.core.Locator;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.ConfigurationException;
-import com.seleniumtests.webelements.aspects.InterceptBy;
+import com.seleniumtests.uipage.aspects.InterceptBy;
 
 
 public class TestConfigMobileIntercepter {

@@ -21,7 +21,7 @@ import java.security.NoSuchAlgorithmException;
 
 import org.apache.log4j.Logger;
 
-import com.seleniumtests.core.TestLogging;
+import com.seleniumtests.reporter.TestLogging;
 
 public class StringUtility {
 	

@@ -12,29 +12,36 @@
  * limitations under the License.
  */
 
-package com.seleniumtests.webelements.htmlelements;
+package com.seleniumtests.uipage.htmlelements;
 
 import org.openqa.selenium.By;
 
-public class ImageElement extends HtmlElement {
+import com.seleniumtests.core.CustomAssertion;
+import com.seleniumtests.reporter.TestLogging;
 
-    public ImageElement(final String label, final By by) {
+public class LabelElement extends HtmlElement {
+    public LabelElement(final String label, final By by) {
         super(label, by);
     }
     
-    public ImageElement(final String label, final By by, final int index) {
+    public LabelElement(final String label, final By by, final int index) {
     	super(label, by, index);
     }
 
-    public int getHeight() {
-        return super.getSize().getHeight();
+    @Override
+    public String getText() {
+        TestLogging.logWebStep(null, "get text from " + toHTML(), false);
+        return super.getText();
     }
 
-    public int getWidth() {
-        return super.getSize().getWidth();
+    public boolean isTextPresent(final String pattern) {
+        String text = getText();
+        return (text != null && (text.contains(pattern) || text.matches(pattern)));
     }
 
-    public String getUrl() {
-        return super.getAttribute("src");
+    @Deprecated
+    public String getExpectedText() {
+        CustomAssertion.assertTrue(false, "NOT supported!");
+        return null;
     }
 }

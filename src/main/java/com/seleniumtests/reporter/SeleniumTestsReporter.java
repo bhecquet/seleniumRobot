@@ -69,11 +69,10 @@ import org.testng.internal.Utils;
 import org.testng.xml.XmlSuite;
 
 import com.seleniumtests.core.CustomAssertion;
-import com.seleniumtests.core.ITestRetryAnalyzer;
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.SeleniumTestsPageListener;
-import com.seleniumtests.core.TestLogging;
+import com.seleniumtests.core.testretry.ITestRetryAnalyzer;
 import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.driver.TestType;
 import com.seleniumtests.driver.WebUIDriver;

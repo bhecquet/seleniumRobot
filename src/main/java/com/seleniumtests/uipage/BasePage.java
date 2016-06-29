@@ -11,7 +11,7 @@
  * limitations under the License.
  */
 
-package com.seleniumtests.webelements;
+package com.seleniumtests.uipage;
 
 import java.util.Set;
 
@@ -28,14 +28,14 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.Assert;
 
 import com.seleniumtests.core.CustomAssertion;
-import com.seleniumtests.core.TestLogging;
 import com.seleniumtests.customexception.NotCurrentPageException;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import com.seleniumtests.driver.WebUIDriver;
+import com.seleniumtests.reporter.TestLogging;
+import com.seleniumtests.uipage.htmlelements.HtmlElement;
+import com.seleniumtests.uipage.htmlelements.Table;
 import com.seleniumtests.util.helper.WaitHelper;
-import com.seleniumtests.webelements.htmlelements.HtmlElement;
-import com.seleniumtests.webelements.htmlelements.Table;
 import com.thoughtworks.selenium.SeleniumException;
 import com.thoughtworks.selenium.Wait;
 import com.thoughtworks.selenium.webdriven.JavascriptLibrary;

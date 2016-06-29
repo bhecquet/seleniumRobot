@@ -24,8 +24,8 @@ import org.openqa.selenium.Proxy.ProxyType;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.events.WebDriverEventListener;
 
-import com.seleniumtests.core.TestLogging;
 import com.seleniumtests.customexception.DriverExceptions;
+import com.seleniumtests.reporter.TestLogging;
 
 public class DriverConfig {
 	

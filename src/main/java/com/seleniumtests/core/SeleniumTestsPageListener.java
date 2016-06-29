@@ -16,7 +16,8 @@ package com.seleniumtests.core;
 import org.apache.log4j.Logger;
 
 import com.seleniumtests.reporter.PluginsHelper;
-import com.seleniumtests.webelements.IPage;
+import com.seleniumtests.reporter.TestLogging;
+import com.seleniumtests.uipage.IPage;
 
 /**
  * Plugin architecture for SEO, Java Script, Accessibility etc functional tests.

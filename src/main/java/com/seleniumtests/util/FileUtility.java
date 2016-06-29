@@ -40,8 +40,8 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 
-import com.seleniumtests.core.TestLogging;
 import com.seleniumtests.driver.WebUIDriver;
+import com.seleniumtests.reporter.TestLogging;
 
 public class FileUtility {
 	private static final Logger logger = TestLogging.getLogger(WebUIDriver.class);

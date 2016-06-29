@@ -12,35 +12,29 @@
  * limitations under the License.
  */
 
-package com.seleniumtests.webelements.htmlelements;
+package com.seleniumtests.uipage.htmlelements;
 
 import org.openqa.selenium.By;
 
-import com.seleniumtests.core.TestLogging;
+public class ImageElement extends HtmlElement {
 
-public class RadioButtonElement extends HtmlElement {
-
-    public RadioButtonElement(final String label, final By by) {
+    public ImageElement(final String label, final By by) {
         super(label, by);
     }
-
-    public RadioButtonElement(final String label, final By by, final int index) {
+    
+    public ImageElement(final String label, final By by, final int index) {
     	super(label, by, index);
     }
 
-    public void check() {
-        TestLogging.logWebStep(null, "check " + toHTML(), false);
-        super.click();
+    public int getHeight() {
+        return super.getSize().getHeight();
     }
 
-    @Override
-    public void click() {
-        TestLogging.logWebStep(null, "click on " + toHTML(), false);
-        super.click();
+    public int getWidth() {
+        return super.getSize().getWidth();
     }
 
-    public boolean isSelected() {
-        findElement();
-        return element.isSelected();
+    public String getUrl() {
+        return super.getAttribute("src");
     }
 }

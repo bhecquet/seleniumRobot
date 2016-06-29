@@ -24,8 +24,8 @@ import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
 import com.seleniumtests.browserfactory.customprofile.FireFoxProfileMarker;
-import com.seleniumtests.core.TestLogging;
 import com.seleniumtests.driver.DriverConfig;
+import com.seleniumtests.reporter.TestLogging;
 import com.seleniumtests.util.FileUtility;
 import com.seleniumtests.util.OSUtility;
 

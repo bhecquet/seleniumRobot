@@ -1,4 +1,4 @@
-package com.seleniumtests.core;
+package com.seleniumtests.core.testretry;
 
 import org.testng.ITestResult;
 
