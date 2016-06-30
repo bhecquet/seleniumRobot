@@ -46,16 +46,16 @@ public class ReplayAction {
 	 * @param joinPoint
 	 * @throws Throwable
 	 */
-    @Around("execution(public * com.seleniumtests.webelements.HtmlElement..* (..)) "
-    		+ "&& !execution(* com.seleniumtests.webelements.HtmlElement.toString (..))"
-    		+ "&& !execution(* com.seleniumtests.webelements.HtmlElement.getBy (..))"
-    		+ "&& !execution(* com.seleniumtests.webelements.HtmlElement.setDriver (..))"
-    		+ "&& !execution(* com.seleniumtests.webelements.HtmlElement.getDriver (..))"
-    		+ "&& !execution(* com.seleniumtests.webelements.HtmlElement.getLabel (..))"
-    		+ "&& !execution(* com.seleniumtests.webelements.HtmlElement.getLocator (..))"
-    		+ "&& !execution(* com.seleniumtests.webelements.HtmlElement.waitForPresent ())"
-    		+ "&& !execution(* com.seleniumtests.webelements.HtmlElement.toHTML (..))"
-    		+ "|| execution(public * com.seleniumtests.webelements.SelectList..* (..)) "
+    @Around("execution(public * com.seleniumtests.uipage.htmlelements.HtmlElement..* (..)) "
+    		+ "&& !execution(* com.seleniumtests.uipage.htmlelements.HtmlElement.toString (..))"
+    		+ "&& !execution(* com.seleniumtests.uipage.htmlelements.HtmlElement.getBy (..))"
+    		+ "&& !execution(* com.seleniumtests.uipage.htmlelements.HtmlElement.setDriver (..))"
+    		+ "&& !execution(* com.seleniumtests.uipage.htmlelements.HtmlElement.getDriver (..))"
+    		+ "&& !execution(* com.seleniumtests.uipage.htmlelements.HtmlElement.getLabel (..))"
+    		+ "&& !execution(* com.seleniumtests.uipage.htmlelements.HtmlElement.getLocator (..))"
+    		+ "&& !execution(* com.seleniumtests.uipage.htmlelements.HtmlElement.waitForPresent ())"
+    		+ "&& !execution(* com.seleniumtests.uipage.htmlelements.HtmlElement.toHTML (..))"
+    		+ "|| execution(public * com.seleniumtests.htmlelements.uipage.SelectList..* (..)) "
     		)
     public Object replay(ProceedingJoinPoint joinPoint) throws Throwable {
     	

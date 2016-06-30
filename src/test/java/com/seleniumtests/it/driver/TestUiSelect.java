@@ -42,6 +42,7 @@ public class TestUiSelect extends GenericTest {
 	@BeforeClass(groups={"it"})
 	public void initDriver(final ITestContext testNGCtx) throws Exception {
 		SeleniumTestsContextManager.initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setBrowser("chrome");
 		SeleniumTestsContextManager.getThreadContext().setExplicitWaitTimeout(2);
 		testPage = new DriverTestPage(true);
 		driver = WebUIDriver.getWebDriver(true);
