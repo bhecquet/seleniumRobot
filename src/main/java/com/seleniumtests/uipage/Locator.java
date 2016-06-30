@@ -1,4 +1,4 @@
-package com.seleniumtests.core;
+package com.seleniumtests.uipage;
 
 import org.openqa.selenium.By;
 

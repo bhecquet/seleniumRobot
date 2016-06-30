@@ -60,9 +60,7 @@ public class SelectList extends HtmlElement {
         }
 
         for (WebElement option : options) {
-            if (option.isSelected()) {
-                option.click();
-            }
+        	setDeselected(option);
         }
     }
 
@@ -71,9 +69,7 @@ public class SelectList extends HtmlElement {
         findElement();
 
         WebElement option = options.get(index);
-        if (option.isSelected()) {
-            option.click();
-        }
+        setDeselected(option);
     }
 
     public void deselectByText(final String text) {
@@ -81,10 +77,7 @@ public class SelectList extends HtmlElement {
         findElement();
         for (WebElement option : options) {
             if (option.getText().equals(text)) {
-                if (option.isSelected()) {
-                    option.click();
-                }
-
+            	setDeselected(option);
                 break;
             }
         }
@@ -95,10 +88,7 @@ public class SelectList extends HtmlElement {
         findElement();
         for (WebElement option : options) {
             if (option.getAttribute("value").equals(value)) {
-                if (option.isSelected()) {
-                    option.click();
-                }
-
+            	setDeselected(option);
                 break;
             }
         }
@@ -136,10 +126,9 @@ public class SelectList extends HtmlElement {
         findElement();
         for (WebElement option : options) {
             if (option.isSelected()) {
-                return option.getAttribute("text");
+                return option.getText();
             }
         }
-
         return null;
     }
 
@@ -149,7 +138,7 @@ public class SelectList extends HtmlElement {
         List<String> textList = new ArrayList<String>();
         for (WebElement option : options) {
             if (option.isSelected()) {
-                textList.add(option.getAttribute("text"));
+                textList.add(option.getText());
             }
         }
 
@@ -164,7 +153,6 @@ public class SelectList extends HtmlElement {
                 return option.getAttribute("value");
             }
         }
-
         return null;
     }
 
@@ -326,8 +314,26 @@ public class SelectList extends HtmlElement {
     }
 
     private void setSelected(final WebElement option) {
-        if (!option.isSelected()) {
-            option.click();
-        }
+    	if(select != null){
+    		if(!select.getAllSelectedOptions().contains(option)){
+    			select.selectByVisibleText(option.getText());
+    		}
+    	}else{
+	        if (!option.isSelected()) {
+	            option.click();
+	        }
+    	}
+    }
+    
+    private void setDeselected(final WebElement option) {
+    	if(select != null){
+    		if(select.getAllSelectedOptions().contains(option)){
+    			select.deselectByVisibleText(option.getText());
+    		}
+    	}else{
+	        if (option.isSelected()) {
+	            option.click();
+	        }
+    	}
     }
 }

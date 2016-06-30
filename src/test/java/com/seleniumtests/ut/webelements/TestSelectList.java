@@ -16,7 +16,7 @@ public class TestSelectList {
 
 	private static WebDriver driver;
 	private static DriverTestPage testPage;
-	private static TestDriver testSelectIt;
+	private static TestUiSelect testSelectIt;
 	
 	@BeforeClass(groups={"ut"})
 	public static void initDriver(final ITestContext testNGCtx) throws Exception {
@@ -24,6 +24,7 @@ public class TestSelectList {
 		SeleniumTestsContextManager.getThreadContext().setBrowser("htmlunit");
 		testPage = new DriverTestPage(true);
 		driver = WebUIDriver.getWebDriver(true);
+		testSelectIt = new TestUiSelect(driver, testPage);
 	}
 	
 	@AfterClass(alwaysRun = true)
@@ -33,63 +34,63 @@ public class TestSelectList {
 	
 	@Test(groups={"ut"})
 	public void testSelect() {
-		TestUiSelect.testIsTextSelect();
+		testSelectIt.testIsTextSelect();
 	}
 	
 	@Test(groups={"ut"})
 	public void testSelectMultiple() {
-		TestUiSelect.testIsMultipleTextSelect();
+		testSelectIt.testIsMultipleTextSelect();
 	}
 	
 	@Test(groups={"ut"})
 	public void testSelectValue() {
-		TestUiSelect.testIsValueSelect();
+		testSelectIt.testIsValueSelect();
 	}
 	
 	@Test(groups={"ut"})
 	public void testSelectMultipleValue() {
-		TestUiSelect.testIsMultipleValueSelect();
+		testSelectIt.testIsMultipleValueSelect();
 	}
 	
 	@Test(groups={"ut"})
 	public void testSelectCorresponding() {
-		TestUiSelect.testIsCorrespondingTextSelect();
+		testSelectIt.testIsCorrespondingTextSelect();
 	}
 	
 	@Test(groups={"ut"})
 	public void testSelectMultipleCorresponding() {
-		TestUiSelect.testIsMultipleCorrespondingTextSelect();
+		testSelectIt.testIsMultipleCorrespondingTextSelect();
 	}
 	
 	@Test(groups={"ut"})
 	public void testSelectIndex() {
-		TestUiSelect.testIsIndexSelect();
+		testSelectIt.testIsIndexSelect();
 	}
 	
 	@Test(groups={"ut"})
 	public void testSelectMultipleIndex() {
-		TestUiSelect.testIsMultipleIndexSelect();
+		testSelectIt.testIsMultipleIndexSelect();
 	}
 	
 	@Test(groups={"ut"})
 	public void testDeselectAll() {
-		TestUiSelect.testIsAllDeselected();
+		testSelectIt.testIsAllDeselected();
 	}
 
 	
 	@Test(groups={"ut"})
 	public void testDeselectIndex() {
-		TestUiSelect.testIsIndexDeselect();
+		testSelectIt.testIsIndexDeselect();
 	}
 	
 	@Test(groups={"ut"})
 	public void testDeselectText() {
-		TestUiSelect.testIsTextDeselect();
+		testSelectIt.testIsTextDeselect();
 	}
 	
 	@Test(groups={"ut"})
 	public void testDeselectValue() {
-		TestUiSelect.testIsValueDeselect();
+		testSelectIt.testIsValueDeselect();
 	}
 	
 }
