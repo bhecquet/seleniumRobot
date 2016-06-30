@@ -11,7 +11,7 @@
  * limitations under the License.
  */
 
-package com.seleniumtests.ut.helper;
+package com.seleniumtests.ut.util;
 
 import java.io.File;
 

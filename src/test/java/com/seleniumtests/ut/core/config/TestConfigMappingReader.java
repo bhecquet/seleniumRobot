@@ -1,4 +1,4 @@
-package com.seleniumtests.ut.core.config.mobile;
+package com.seleniumtests.ut.core.config;
 
 import java.util.HashMap;
 
@@ -12,7 +12,7 @@ import com.seleniumtests.GenericTest;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.config.ConfigMappingReader;
 
-public class TestConfigMobileReader extends GenericTest {
+public class TestConfigMappingReader extends GenericTest {
 
 	@BeforeMethod(enabled=true, alwaysRun = true)
 	public void initContext(final ITestContext testNGCtx, final XmlTest xmlTest) {
