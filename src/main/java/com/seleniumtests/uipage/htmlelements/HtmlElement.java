@@ -13,8 +13,6 @@
 
 package com.seleniumtests.uipage.htmlelements;
 
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
-
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -36,7 +34,6 @@ import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.interactions.HasInputDevices;
 import org.openqa.selenium.interactions.Mouse;
 import org.openqa.selenium.internal.Locatable;
-import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.SystemClock;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -45,9 +42,7 @@ import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import com.seleniumtests.driver.WebUIDriver;
-import com.seleniumtests.driver.screenshots.ScreenshotUtil;
 import com.seleniumtests.reporter.TestLogging;
-import com.seleniumtests.util.helper.ContextHelper;
 import com.seleniumtests.util.helper.WaitHelper;
 import com.thoughtworks.selenium.webdriven.JavascriptLibrary;
 
