@@ -1,4 +1,4 @@
-package com.seleniumtests.ut.webelements;
+package com.seleniumtests.ut.uipage;
 
 import org.openqa.selenium.WebDriver;
 import org.testng.ITestContext;

@@ -1,4 +1,4 @@
-package com.seleniumtests.ut.core.config.mobile;
+package com.seleniumtests.ut.core.config;
 
 import org.openqa.selenium.By;
 import org.testng.Assert;
@@ -13,7 +13,7 @@ import com.seleniumtests.uipage.Locator;
 import com.seleniumtests.uipage.aspects.InterceptBy;
 
 
-public class TestConfigMobileIntercepter {
+public class TestConfigMappingIntercepter {
 	@BeforeMethod(enabled=true, alwaysRun = true)
 	public void initContext(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		InterceptBy.setPage("TestConfigMobileIntercepter");

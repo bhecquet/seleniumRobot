@@ -1,4 +1,4 @@
-package com.seleniumtests.ut.webelements;
+package com.seleniumtests.ut.uipage;
 
 import java.util.regex.Pattern;
 
