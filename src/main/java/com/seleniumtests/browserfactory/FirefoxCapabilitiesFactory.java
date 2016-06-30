@@ -25,11 +25,10 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 
 import com.seleniumtests.browserfactory.customprofile.FireFoxProfileMarker;
 import com.seleniumtests.driver.DriverConfig;
+import com.seleniumtests.driver.JavaScriptError;
 import com.seleniumtests.reporter.TestLogging;
 import com.seleniumtests.util.FileUtility;
 import com.seleniumtests.util.OSUtility;
-
-import net.jsourcerer.webdriver.jserrorcollector.JavaScriptError;
 
 public class FirefoxCapabilitiesFactory extends ICapabilitiesFactory {
     private static boolean isProfileCreated = false;

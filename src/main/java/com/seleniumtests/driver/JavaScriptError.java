@@ -11,7 +11,7 @@
  * limitations under the License.
  */
 
-package net.jsourcerer.webdriver.jserrorcollector;
+package com.seleniumtests.driver;
 
 import java.io.IOException;
 

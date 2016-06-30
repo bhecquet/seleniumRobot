@@ -46,6 +46,7 @@ import com.seleniumtests.core.SeleniumTestsPageListener;
 import com.seleniumtests.customexception.CustomSeleniumTestsException;
 import com.seleniumtests.customexception.NotCurrentPageException;
 import com.seleniumtests.driver.CustomEventFiringWebDriver;
+import com.seleniumtests.driver.JavaScriptError;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.driver.WebUtility;
 import com.seleniumtests.driver.screenshots.ScreenShot;
@@ -55,8 +56,6 @@ import com.seleniumtests.uipage.htmlelements.HtmlElement;
 import com.seleniumtests.uipage.htmlelements.LinkElement;
 import com.seleniumtests.util.helper.ContextHelper;
 import com.seleniumtests.util.helper.WaitHelper;
-
-import net.jsourcerer.webdriver.jserrorcollector.JavaScriptError;
 
 public class PageObject extends BasePage implements IPage {
 
