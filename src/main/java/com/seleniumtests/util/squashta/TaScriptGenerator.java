@@ -26,17 +26,25 @@ import com.seleniumtests.reporter.TestLogging;
 
 public class TaScriptGenerator {
 	
-	protected static final Logger logger = TestLogging.getLogger(TaScriptGenerator.class);
+	private static final Logger logger = TestLogging.getLogger(TaScriptGenerator.class);
 	
-	private String path;
+	private String srcPath;
+	private String dstPath;
 	private String application;
 	
 	// patterns for exclusion from .ta script generation
 	private static final String XML_EXCLUDE = "EXCLUDE_FROM_SQUASH_TA";
 	private static final String FEATURE_EXCLUDE = "@EXCLUDE_FROM_SQUASH_TA";	
 
-	public TaScriptGenerator(String path, String application) {
-		this.path = path;
+	/**
+	 * 
+	 * @param srcPath		Path to root of the test application. it's the location of the "data" folder
+	 * @param dstPath		Path to root where files will be written
+	 * @param application	name of the application
+	 */
+	public TaScriptGenerator(String application, String srcPath, String dstPath) {
+		this.srcPath = srcPath.replace("\\", "/");
+		this.dstPath = dstPath.replace("\\", "/");
 		this.application = application;
 	}
 	
@@ -52,7 +60,7 @@ public class TaScriptGenerator {
 		Pattern scenarioOutlinePattern = Pattern.compile("^\\s*Scenario Outline:(.*)");
 		
 		// look for feature file into data folder
-		File dir = Paths.get(path, "data", application, "features").toFile();
+		File dir = Paths.get(srcPath, "data", application, "features").toFile();
 		if (!dir.exists()) {
 			return new ArrayList<String>();
 		}
@@ -105,7 +113,7 @@ public class TaScriptGenerator {
 	public List<SquashTaTestDef> parseTestNgXml() {
 		
 		// look for feature file into data folder
-		File dir = Paths.get(path, "data", application, "testng").toFile();
+		File dir = Paths.get(srcPath, "data", application, "testng").toFile();
 		if (!dir.exists()) {
 			return new ArrayList<SquashTaTestDef>();
 		}
@@ -233,11 +241,29 @@ public class TaScriptGenerator {
 		}
 	}
 	
+	/**
+	 * Generate .ta scripts based on the generic one
+	 * $cucumberTest$ pattern replaced by -DcucumberTest=<cucumberTestName>
+	 * $testngFile$ pattern replaced by the test ng file path. It's a path beginning with %STF_HOME% so that 
+	 * 			it uses env variables
+	 * $testngName$ pattern replaced by name of the testng test
+	 * @throws IOException
+	 */
 	public void generateTaScripts() throws IOException {
-		String taScriptDir = Paths.get("data", application, "squash-ta", "src", "squashTA", "tests").toString();
+		String taScriptDir = Paths.get(dstPath, "src", "squashTA", "tests").toString();
+		
+		File srcTaFile = Paths.get(srcPath, "data", application, "squash-ta", "src", "squashTA", "tests", application + "_generic.ta").toFile();
+		File genericFile = new File(taScriptDir + File.separator + application + "_generic.ta");
+		
+		if (srcTaFile.exists()) {
+			try {
+				FileUtils.copyFile(srcTaFile, genericFile);
+			} catch (IOException e) {
+				logger.warn("Cannot copy file: " + e.getMessage());
+			}
+		}
 		
 		// if base script does not exist, skip script generation
-		File genericFile = new File(taScriptDir + File.separator + application + "_generic.ta");
 		if (!genericFile.exists()) {
 			return;
 		}
@@ -254,25 +280,31 @@ public class TaScriptGenerator {
 				for (String cucumberScenario: cucumberScenarios) {
 					String newContent = content
 							.replace("$cucumberTest$", String.format("-DcucumberTests\"=%s\"", cucumberScenario.replace(" ", "&nbsp;")))
-							.replace("$testngFile$", testDef.file.getAbsolutePath().replace("\\", "/"))
-							.replace("$testngName$", testDef.name);
+							.replace("$testngFile$", testDef.file.getAbsolutePath()
+									.replace("\\", "/")
+									.replace(srcPath, "%STF_HOME%/"))
+							.replace("$testngName$", testDef.name)
+							.replace("$app$", application);;
 					String fileName = String.format("g__%s_%s_%s.ta", testDef.file.getName(), testDef.name, cucumberScenario
 																			.replace(" ", "_")
 																			.replace("<", "")
 																			.replace(">",  ""));
 					FileUtils.writeStringToFile(new File(taScriptDir + File.separator + fileName), newContent, "UTF-8");
 					taFileList.add(fileName);
-					logger.info("generating " + fileName);
+					logger.info("generating " + taScriptDir + File.separator + fileName);
 				}
 			} else {
 				String newContent = content
 						.replace("$cucumberTest$", "")
-						.replace("$testngFile$", testDef.file.getAbsolutePath().replace("\\", "/"))
-						.replace("$testngName$", testDef.name);
+						.replace("$testngFile$", testDef.file.getAbsolutePath()
+								.replace("\\", "/")
+								.replace(srcPath, "%STF_HOME%/"))
+						.replace("$testngName$", testDef.name)
+						.replace("$app$", application);;
 				String fileName = String.format("g__%s_%s.ta", testDef.file.getName(), testDef.name);
 				FileUtils.writeStringToFile(new File(taScriptDir + File.separator + fileName), newContent, "UTF-8");
 				taFileList.add(fileName);
-				logger.info("generating " + fileName);
+				logger.info("generating " + taScriptDir + File.separator + fileName);
 			}
 		}
 		
