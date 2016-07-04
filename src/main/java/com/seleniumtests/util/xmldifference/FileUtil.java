@@ -173,10 +173,10 @@ public class FileUtil {
 
             if ((filename == null) || (filename.trim().equals(""))) {
 
-                tempFile = f.createTempFile("file1", ".tmp");
+                tempFile = File.createTempFile("file1", ".tmp");
             } else {
 
-                tempFile = f.createTempFile(filename, "");
+                tempFile = File.createTempFile(filename, "");
             }
 
             fos = new FileOutputStream(tempFile);
@@ -203,54 +203,6 @@ public class FileUtil {
         }
 
         return tempFile.getCanonicalPath();
-
-    }
-
-    /**
-     * Main method for debugging purpose only.
-     */
-
-    public static void main(final String[] args) {
-
-        /*
-         *
-         * Tests writing list of String to the File
-         *
-         * List list = new ArrayList();
-         *
-         *
-         *
-         * list.add("Ritesh");
-         *
-         * list.add("Trivedi");
-         *
-         * list.add("EOF");
-         *
-         *
-         *
-         * try
-         *
-         * {
-         *
-         *      FileUtil.writeListAsStr("tempfile.txt", list);
-         *
-         * } catch (Exception ex)
-         *
-         * {
-         *
-         *      ex.printStackTrace();
-         *
-         * }
-         *
-         */
-
-        /*
-         *
-         * Tests the Prefix
-         *
-         */
-
-        System.out.println(FileUtil.getPrefix("test3.txt.out"));
 
     }
 
