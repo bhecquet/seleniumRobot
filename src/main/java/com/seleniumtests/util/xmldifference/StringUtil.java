@@ -61,32 +61,4 @@ public class StringUtil {
 
     }
 
-    /**
-     * Main method for debugging purpose only.
-     */
-
-    public static void main(final String[] args) {
-
-        /*
-         *
-         * NULL value checking for instanceof operator
-         *
-         */
-
-        /*
-         *
-         * StringUtil su = null;
-         *
-         * if (su instanceof StringUtil)
-         *
-         *  System.out.println(" null can be instance of anything");
-         *
-         * else
-         *
-         *  System.out.println(" null cannot be instance of anything");
-         *
-         */
-
-    }
-
 }

@@ -106,11 +106,9 @@ public class XMLDog implements XMLDogConstants {
      *
      * @param  controlDirPath  the directory containing control docs
      * @param  testDirPath     the directory containing test docs
-     * @param  suffix          the suffix string to be appended to each file in controlDirPath, if null nothing will be
-     *                         appended
+     * @param  resultDirPath   the directory containing result docs
      */
-    public void compareDir(final String controlDirPath, final String testDirPath, final String resultDirPath,
-            final String suffix) throws SAXException, IOException {
+    public void compareDir(final String controlDirPath, final String testDirPath, final String resultDirPath) throws SAXException, IOException {
         File[] controlFiles = null;
         File controlDir = null;
         File testDir = null;
@@ -140,19 +138,18 @@ public class XMLDog implements XMLDogConstants {
                 };
                 controlFiles = controlDir.listFiles(filter);
 
-                File testFile = null;
-                File controlFile = null;
                 String controlFilename = null;
                 String testFilename = null;
                 String diffFilename = null;
                 for (int i = 0; i < controlFiles.length; i++) {
                     controlFilename = controlFiles[i].getName();
                     diffFilename = resultDirPath + File.separator + FileUtil.getPrefix(controlFilename) + "_diff.txt";
-                    testFilename = testDirPath + File.separator + controlFilename + (suffix == null ? "" : suffix);
+                    testFilename = testDirPath + File.separator + controlFilename;
                     log("Diff file name: " + diffFilename);
                     log("Control XML filename: " + controlFilename);
                     log("Test XML filename: " + testFilename);
-                    FileUtil.writeListAsStr(diffFilename, compare(controlFiles[i].getAbsolutePath(), testFilename));
+                    Differences diff = compare(controlFiles[i].getAbsolutePath(), testFilename);
+                    FileUtil.writeListAsStr(diffFilename, diff);
                 }
             } else {
                 throw new IOException("One of the input paths is not a directory");
@@ -194,50 +191,4 @@ public class XMLDog implements XMLDogConstants {
         }
     }
 
-    /**
-     * Main method for debugging purpose only.
-     *
-     * @param  args  array of program arguments
-     */
-    public static void main(final String[] args) {
-        try {
-
-            /*
-             * Compare 2 files with excluded elements
-             */
-            Config config = new Config();
-            config.addExcludedElement("StartTime");
-            config.addExcludedElement("EndTime");
-            config.addExcludedElement("URL");
-            config.addExcludedElement("DateLong");
-            config.addExcludedElement("TimeLong");
-            config.addExcludedElement("TimeShort");
-            config.addExcludedElement("TimeMedium");
-            config.addExcludedElement("DateMedium");
-            config.addExcludedElement("DateShort");
-            config.addExcludedElement("Hours");
-            config.addExcludedElement("Seconds");
-            config.addExcludedElement("Minutes");
-            config.addExcludedElement("Days");
-
-            // config.addExcludedElement("Timestamp");
-            config.setCustomDifference(false);
-            config.setApplyEListToSiblings(true);
-            config.setIgnoringOrder(false);
-
-            XMLDog dog = new XMLDog(config);
-            long t1 = System.currentTimeMillis();
-
-            // System.out.println(dog.compare("d:\\try\\xml\\file1.xml", "d:\\try\\xml\\file2.xml"));
-            // System.out.println(dog.compare("d:\\try\\xml\\0058_a.xml", "d:\\try\\xml\\0058_b.xml"));
-            // System.out.println(dog.compare("d:\\try\\xml\\0052_a.xml", "d:\\try\\xml\\0052_b.xml"));
-            Differences diff = dog.compare("c:\\test\\1.xml", "c:\\test\\2.xml");
-            System.out.println(diff.toString());
-
-            long t2 = System.currentTimeMillis();
-            System.out.println("Time to compare the docs " + (t2 - t1) + " millisecs");
-        } catch (Exception ex) {
-            logger.error(ex);
-        }
-    }
 }
