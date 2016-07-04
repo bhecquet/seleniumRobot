@@ -59,7 +59,7 @@
     
     <properties>
     	<jacoco.version>0.7.7.201606060606</jacoco.version>
-    	<selenium.version>2.53.0</selenium.version>
+    	<selenium.version>2.53.1</selenium.version>
     	<htmlunitdriver.version>2.20</htmlunitdriver.version>
     	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     	<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>

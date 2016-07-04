@@ -268,8 +268,12 @@ public class HtmlElement {
 	private void makeWebElementVisible(WebElement element) {
 		if (SeleniumTestsContextManager.isWebTest()) {
 			try {
+				
 				if (element.getLocation().x < 0) {
+					Long viewportHeight = (Long)((JavascriptExecutor) driver).executeScript("return document.documentElement.clientHeight");
+					Integer heightPosition = element.getLocation().y > viewportHeight ? element.getLocation().y - viewportHeight.intValue(): element.getLocation().y;
 					changeCssAttribute(element, "left", "20px");
+					changeCssAttribute(element, "top", heightPosition + "px"); 
 					changeCssAttribute(element, "position", "fixed");
 				}
 				if (element.getAttribute("style").toLowerCase().replace(" ", "").contains("display:none")) {
