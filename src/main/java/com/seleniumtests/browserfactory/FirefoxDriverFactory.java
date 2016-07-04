@@ -47,25 +47,25 @@ public class FirefoxDriverFactory extends AbstractWebDriverFactory implements IW
      * @return
      */
     public boolean useFirefoxDriver() {
-    	
-    	
-    	try {
-	    	Process p = Runtime.getRuntime().exec("firefox -v | more");
-			BufferedReader bri = new BufferedReader(new InputStreamReader(p.getInputStream()));
-			String line;
-			StringBuilder output = new StringBuilder();
-			while ((line = bri.readLine()) != null) {
-			    System.out.println(line);
-			    output.append(line);
-			}
-			bri.close();
-			p.waitFor();
-			
-			return useFirefoxVersion(output);
-			
-    	} catch (IOException | InterruptedException e) {
-    		return false;
-    	}
+    	return true;
+//    	
+//    	try {
+//	    	Process p = Runtime.getRuntime().exec("firefox -v | more");
+//			BufferedReader bri = new BufferedReader(new InputStreamReader(p.getInputStream()));
+//			String line;
+//			StringBuilder output = new StringBuilder();
+//			while ((line = bri.readLine()) != null) {
+//			    System.out.println(line);
+//			    output.append(line);
+//			}
+//			bri.close();
+//			p.waitFor();
+//			
+//			return useFirefoxVersion(output);
+//			
+//    	} catch (IOException | InterruptedException e) {
+//    		return false;
+//    	}
     }
     
     /**
