@@ -778,6 +778,14 @@ public class SeleniumTestsContext {
 	public static String getConfigPath() {
 		return CONFIG_PATH;
 	}
+	
+	/**
+	 * Returns location of data folder
+	 * @return
+	 */
+	public static String getDataPath() {
+		return DATA_PATH;
+	}
 
 	//set
     public void setIdMapping(HashMap<String, HashMap<String,String>> conf){
