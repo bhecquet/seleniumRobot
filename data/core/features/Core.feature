@@ -18,6 +18,7 @@ Feature: Core
 	Scenario: core_4
 		When write tuta
 		
+	@EXCLUDE_FROM_SQUASH_TA
 	@new4
 	Scenario: core_5
 		When write tatu
