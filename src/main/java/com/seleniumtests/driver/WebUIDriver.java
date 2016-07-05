@@ -17,6 +17,7 @@ package com.seleniumtests.driver;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.openqa.selenium.Platform;
@@ -45,13 +46,69 @@ import com.seleniumtests.util.helper.WaitHelper;
 public class WebUIDriver {
 
 	private static final Logger logger = TestLogging.getLogger(WebUIDriver.class);
-    private static ThreadLocal<WebDriver> driverSession = new ThreadLocal<WebDriver>();
-    private static ThreadLocal<WebUIDriver> uxDriverSession = new ThreadLocal<WebUIDriver>();
+    private static ThreadLocal<WebDriver> driverSession = new ThreadLocal<>();
+    private static ThreadLocal<WebUIDriver> uxDriverSession = new ThreadLocal<>();
     private String node;
     private DriverConfig config = new DriverConfig();
     private WebDriver driver;
     private IWebDriverFactory webDriverBuilder;
 
+    public WebUIDriver() {
+        init();
+        uxDriverSession.set(this);
+    }
+
+    public WebUIDriver(final String browser, final String mode) {
+        init();
+        this.setBrowser(browser);
+        this.setMode(mode);
+        uxDriverSession.set(this);
+    }
+
+    public WebDriver createRemoteWebDriver(final String browser, final String mode) throws IOException  {
+        WebDriver driver = null;
+        config.setBrowser(BrowserType.getBrowserType(browser));
+        config.setMode(DriverMode.valueOf(mode));
+
+        // TODO: use grid with appium ?
+        if (config.getMode() == DriverMode.ExistingGrid) {
+            webDriverBuilder = new RemoteDriverFactory(this.config);
+        } else if (config.getMode() == DriverMode.SauceLabs) {
+        	webDriverBuilder = new SauceLabsDriverFactory(this.config);
+        } else if (config.getMode() == DriverMode.TestDroid) {
+        	webDriverBuilder = new TestDroidDriverFactory(this.config);
+        	
+        // local mode
+        } else {
+        	if (config.getTestType().isMobile()) {
+        		webDriverBuilder = new AppiumDriverFactory(this.config);
+        	} else {
+	            if (config.getBrowser() == BrowserType.FireFox) {
+	                webDriverBuilder = new FirefoxDriverFactory(this.config);
+	            } else if (config.getBrowser() == BrowserType.InternetExplore) {
+	                webDriverBuilder = new IEDriverFactory(this.config);
+	            } else if (config.getBrowser() == BrowserType.Chrome) {
+	                webDriverBuilder = new ChromeDriverFactory(this.config);
+	            } else if (config.getBrowser() == BrowserType.HtmlUnit) {
+	                webDriverBuilder = new HtmlUnitDriverFactory(this.config);
+	            } else if (config.getBrowser() == BrowserType.Safari) {
+	                webDriverBuilder = new SafariDriverFactory(this.config);
+	            } else {
+	                throw new DriverExceptions("Unsupported browser: " + browser);
+	            }
+        	}
+        }
+
+        synchronized (this.getClass()) {
+            driver = webDriverBuilder.createWebDriver();
+            WaitHelper.waitForSeconds(1);
+        }
+
+        driver = handleListeners(driver);
+
+        return driver;
+    }
+    
     public String getNode() {
         return node;
     }
@@ -146,65 +203,9 @@ public class WebUIDriver {
         }
     }
 
-    public WebUIDriver() {
-        init();
-        uxDriverSession.set(this);
-    }
-
-    public WebUIDriver(final String browser, final String mode) {
-        init();
-        this.setBrowser(browser);
-        this.setMode(mode);
-        uxDriverSession.set(this);
-    }
-
-    public WebDriver createRemoteWebDriver(final String browser, final String mode) throws IOException  {
-        WebDriver driver = null;
-        config.setBrowser(BrowserType.getBrowserType(browser));
-        config.setMode(DriverMode.valueOf(mode));
-
-        // TODO: use grid with appium ?
-        if (config.getMode() == DriverMode.ExistingGrid) {
-            webDriverBuilder = new RemoteDriverFactory(this.config);
-        } else if (config.getMode() == DriverMode.SauceLabs) {
-        	webDriverBuilder = new SauceLabsDriverFactory(this.config);
-        } else if (config.getMode() == DriverMode.TestDroid) {
-        	webDriverBuilder = new TestDroidDriverFactory(this.config);
-        	
-        // local mode
-        } else {
-        	if (config.getTestType().isMobile()) {
-        		webDriverBuilder = new AppiumDriverFactory(this.config);
-        	} else {
-	            if (config.getBrowser() == BrowserType.FireFox) {
-	                webDriverBuilder = new FirefoxDriverFactory(this.config);
-	            } else if (config.getBrowser() == BrowserType.InternetExplore) {
-	                webDriverBuilder = new IEDriverFactory(this.config);
-	            } else if (config.getBrowser() == BrowserType.Chrome) {
-	                webDriverBuilder = new ChromeDriverFactory(this.config);
-	            } else if (config.getBrowser() == BrowserType.HtmlUnit) {
-	                webDriverBuilder = new HtmlUnitDriverFactory(this.config);
-	            } else if (config.getBrowser() == BrowserType.Safari) {
-	                webDriverBuilder = new SafariDriverFactory(this.config);
-	            } else {
-	                throw new DriverExceptions("Unsupported browser: " + browser);
-	            }
-        	}
-        }
-
-        synchronized (this.getClass()) {
-            driver = webDriverBuilder.createWebDriver();
-            WaitHelper.waitForSeconds(1);
-        }
-
-        driver = handleListeners(driver);
-
-        return driver;
-    }
-
     protected WebDriver handleListeners(WebDriver driver) {
-        ArrayList<WebDriverEventListener> listeners = config.getWebDriverListeners();
-        if (listeners != null && listeners.size() > 0) {
+        List<WebDriverEventListener> listeners = config.getWebDriverListeners();
+        if (listeners != null && !listeners.isEmpty()) {
             for (int i = 0; i < config.getWebDriverListeners().size(); i++) {
                 driver = new CustomEventFiringWebDriver(driver).register(listeners.get(i));
             }
@@ -404,7 +405,7 @@ public class WebUIDriver {
 
         config.setAddJSErrorCollectorExtension(SeleniumTestsContextManager.getThreadContext().getAddJSErrorCollectorExtension());
 
-        String ua = null;
+        String ua;
         if (SeleniumTestsContextManager.getThreadContext().getUserAgent() != null) {
             ua = SeleniumTestsContextManager.getThreadContext().getUserAgent();
         } else {
@@ -424,7 +425,7 @@ public class WebUIDriver {
             listeners = listeners + DriverExceptionListener.class.getName();
         }
 
-        if (listeners != null && !listeners.equals("")) {
+        if (listeners != null && !"".equals(listeners)) {
             config.setWebDriverListeners(listeners);
         } else {
             config.setWebDriverListeners("");

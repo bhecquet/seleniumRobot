@@ -16,10 +16,8 @@ package com.seleniumtests.browserfactory;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.concurrent.TimeUnit;
 
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
@@ -36,14 +34,15 @@ public class AppiumDriverFactory extends AbstractWebDriverFactory implements IWe
         super(cfg);
     }
     
+    @Override
     protected WebDriver createNativeDriver() {
     	
     	DesiredCapabilities capabilities = new DesiredCapabilities();
 
     	try {
-	        if(webDriverConfig.getPlatform().equalsIgnoreCase("android")) {
+	        if("android".equalsIgnoreCase(webDriverConfig.getPlatform())) {
 	            return new AndroidDriver(new URL(webDriverConfig.getAppiumServerURL()), new AndroidCapabilitiesFactory(capabilities).createCapabilities(webDriverConfig));
-	        } else if (webDriverConfig.getPlatform().equalsIgnoreCase("ios")){
+	        } else if ("ios".equalsIgnoreCase(webDriverConfig.getPlatform())){
 	            return new IOSDriver(new URL(webDriverConfig.getAppiumServerURL()), new IOsCapabilitiesFactory(capabilities).createCapabilities(webDriverConfig));
 	        }
 	

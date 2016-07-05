@@ -32,8 +32,6 @@ import com.seleniumtests.util.OSUtility;
 
 public class IEDriverFactory extends AbstractWebDriverFactory implements IWebDriverFactory {
 	
-	private static final Logger logger = TestLogging.getLogger(IEDriverFactory.class);
-
     public IEDriverFactory(final DriverConfig webDriverConfig1) {
         super(webDriverConfig1);
     }
@@ -55,6 +53,7 @@ public class IEDriverFactory extends AbstractWebDriverFactory implements IWebDri
         }
     }
     
+    @Override
     protected WebDriver createNativeDriver() {
         return new InternetExplorerDriver(new IECapabilitiesFactory().createCapabilities(webDriverConfig));
     }

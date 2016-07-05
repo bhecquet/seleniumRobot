@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -33,13 +34,13 @@ public class ConfigReader {
 	private static final String GLOBAL_SECTION_NAME = "General";
 	private static final Logger logger = TestLogging.getLogger(ConfigReader.class);
 
-	public HashMap<String, String> readConfig(InputStream iniFileStream) {
+	public Map<String, String> readConfig(InputStream iniFileStream) {
 		return readConfig(iniFileStream, SeleniumTestsContextManager.getThreadContext().getTestEnv());
 	}
 	
-	public HashMap<String, String> readConfig(InputStream iniFileStream, String environment) {
+	public Map<String, String> readConfig(InputStream iniFileStream, String environment) {
 		
-		HashMap<String, String> testConfig = new HashMap<String, String>();
+		HashMap<String, String> testConfig = new HashMap<>();
 	
 		try {
 			Ini ini = new Ini();

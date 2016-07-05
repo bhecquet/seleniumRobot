@@ -14,6 +14,7 @@
 
 package com.seleniumtests.driver;
 
+import org.apache.log4j.Logger;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Point;
@@ -25,6 +26,9 @@ import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.ios.IOSDriver;
 
 public class WebUtility {
+	
+	protected static final Logger logger = TestLogging.getLogger(WebUtility.class);
+	
     private WebDriver driver;
 
     public WebUtility(final WebDriver driver) {
@@ -44,7 +48,9 @@ public class WebUtility {
             Dimension size = new Dimension(width, height);
             driver.manage().window().setPosition(new Point(0, 0));
             driver.manage().window().setSize(size);
-        } catch (Exception ex) { }
+        } catch (Exception ex) {
+        	logger.error(ex);
+        }
     }
 
     public void maximizeWindow() {
@@ -70,7 +76,7 @@ public class WebUtility {
         WebUIDriver.getWebUIDriver().setHubUrl(" ");
 
         WebDriver driver = WebUIDriver.getWebDriver(true);
-        System.out.print(driver.manage().window().getSize().width + ":" + driver.manage().window().getSize().height);
+        logger.info(driver.manage().window().getSize().width + ":" + driver.manage().window().getSize().height);
     }
 
 }

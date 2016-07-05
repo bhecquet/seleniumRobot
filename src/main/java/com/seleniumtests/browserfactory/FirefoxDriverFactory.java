@@ -93,6 +93,7 @@ public class FirefoxDriverFactory extends AbstractWebDriverFactory implements IW
      *
      * @return	the driver
      */
+    @Override
     protected WebDriver createNativeDriver() {
     	
     	if (useFirefoxDriver()) {
@@ -146,7 +147,7 @@ public class FirefoxDriverFactory extends AbstractWebDriverFactory implements IW
     }
 
     /**
-     * It's designed for shorten tiemout in unit testing.
+     * Method designed for shorten timeout in unit testing.
      *
      * @return  timeout
      */
@@ -154,6 +155,7 @@ public class FirefoxDriverFactory extends AbstractWebDriverFactory implements IW
         return timeout;
     }
 
+    @Override
     protected void setPageLoadTimeout(final long timeout) {
         driver.manage().timeouts().pageLoadTimeout(timeout, TimeUnit.SECONDS);
     }

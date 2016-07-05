@@ -49,7 +49,7 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver {
     	if (SeleniumTestsContextManager.isWebTest()) {
     		currentHandles = driver.getWindowHandles();
     	} else {
-    		currentHandles = new TreeSet<String>();
+    		currentHandles = new TreeSet<>();
     	}
     }
 

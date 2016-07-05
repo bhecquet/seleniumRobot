@@ -43,12 +43,17 @@ public class SeleniumTestsDefaultSuite implements ISuite {
         this.xmlSuite = new DefaultXmlSuite();
     }
 
+    @Override
     public Object getAttribute(final String name) {
         return null;
     }
 
-    public void setAttribute(final String name, final Object value) { }
+    @Override
+    public void setAttribute(final String name, final Object value) { 
+    	//TODO
+    }
 
+    @Override
     public Set<String> getAttributeNames() {
         return null;
     }
@@ -57,42 +62,52 @@ public class SeleniumTestsDefaultSuite implements ISuite {
         return null;
     }
 
+    @Override
     public String getName() {
         return "Default suite";
     }
 
+    @Override
     public Map<String, ISuiteResult> getResults() {
         return null;
     }
 
+    @Override
     public IObjectFactory getObjectFactory() {
         return null;
     }
 
+    @Override
     public IObjectFactory2 getObjectFactory2() {
         return null;
     }
 
+    @Override
     public String getOutputDirectory() {
         return null;
     }
 
+    @Override
     public String getParallel() {
         return null;
     }
 
+    @Override
     public String getParameter(final String parameterName) {
         return null;
     }
 
+    @Override
     public Map<String, Collection<ITestNGMethod>> getMethodsByGroups() {
         return null;
     }
 
+    @Override
     public Collection<ITestNGMethod> getInvokedMethods() {
         return null;
     }
 
+    @Override
     public List<IInvokedMethod> getAllInvokedMethods() {
         return null;
     }
@@ -101,12 +116,17 @@ public class SeleniumTestsDefaultSuite implements ISuite {
         return null;
     }
 
-    public void run() { }
+    @Override
+    public void run() { 
+    	//TODO
+    }
 
+    @Override
     public String getHost() {
         return null;
     }
 
+    @Override
     public SuiteRunState getSuiteState() {
         return null;
     }
@@ -115,29 +135,39 @@ public class SeleniumTestsDefaultSuite implements ISuite {
         return null;
     }
 
+    @Override
     public XmlSuite getXmlSuite() {
         return xmlSuite;
     }
 
-    public void addListener(final ITestNGListener listener) { }
+    @Override
+    public void addListener(final ITestNGListener listener) {
+    	//TODO
+    }
 
+    @Override
     public List<ITestNGMethod> getAllMethods() {
         return null;
     }
 
+    @Override
 	public String getParentModule() {
 		return null;
 	}
 
+    @Override
 	public String getGuiceStage() {
 		return null;
 	}
 
+    @Override
 	public Injector getParentInjector() {
 		return null;
 	}
 
-	public void setParentInjector(Injector injector) {		
+    @Override
+	public void setParentInjector(Injector injector) {
+    	//TODO
 	}
 
 }

@@ -47,7 +47,6 @@ import gherkin.formatter.Formatter;
 public class CustomTestNGCucumberRunner {
 
 	private Runtime runtime;
-	private String testName;
 	private List<CucumberFeature> cucumberFeatures;
     private RuntimeOptions runtimeOptions;
     private ResourceLoader resourceLoader;
@@ -60,15 +59,17 @@ public class CustomTestNGCucumberRunner {
      *
      * @param clazz Which has the cucumber.api.CucumberOptions and org.testng.annotations.Test annotations
      */
-    public CustomTestNGCucumberRunner(Class clazz, String testName) {
+    public CustomTestNGCucumberRunner(Class clazz) {
         classLoader = clazz.getClassLoader();
-        this.testName = testName; 
         resourceLoader = new MultiLoader(classLoader);
         
         cucumberFeatures = initCucumberOptions(clazz);
 
-        TestNgReporter reporter = new TestNgReporter(System.out);
         resultListener = new FeatureResultListener(runtimeOptions.reporter(classLoader), runtimeOptions.isStrict());
+    }
+    
+    public CustomTestNGCucumberRunner(Class clazz, String xmlFile) {
+    	this(clazz);
     }
     
     private List<CucumberFeature> initCucumberOptions(Class clazz) {
@@ -86,7 +87,7 @@ public class CustomTestNGCucumberRunner {
         // take into account tag options
         String cucumberOptions = "";
         String tagList = SeleniumTestsContextManager.getThreadContext().getCucumberTags();
-        if (tagList != null && !tagList.equals("")) {
+        if (tagList != null && !"".equals(tagList)) {
         	String tagsOptions = " ";
         	for (String tags: tagList.split("AND")) {
         		tagsOptions += String.format("--tags %s ", tags.trim());
@@ -107,11 +108,11 @@ public class CustomTestNGCucumberRunner {
         runtime = new Runtime(resourceLoader, classFinder, classLoader, runtimeOptions);
 
         // add list of tag filtered features to features selected by tests 
-        if (tagList != null && !tagList.equals("")) {
+        if (tagList != null && !"".equals(tagList)) {
         	testSelectedFeatures.addAll(runtimeOptions.cucumberFeatures(resourceLoader));
         }
          
-        if (testSelectedFeatures.size() == 0) {
+        if (testSelectedFeatures.isEmpty()) {
         	throw new CustomSeleniumTestsException("No test has been selected");
         }
         
@@ -126,7 +127,7 @@ public class CustomTestNGCucumberRunner {
         RuntimeOptions runtimeOptions = new RuntimeOptionsFactory(clazz).create();
         
         final List<CucumberFeature> allFeatures = runtimeOptions.cucumberFeatures(resourceLoader);
-        List<CucumberFeature> selectedFeatures = new ArrayList<CucumberFeature>();
+        List<CucumberFeature> selectedFeatures = new ArrayList<>();
         
         // filter features requested for execution
         List<String> testList = SeleniumTestsContextManager.getThreadContext().getCucumberTests();
@@ -147,7 +148,7 @@ public class CustomTestNGCucumberRunner {
         // remove scenarios whose name is not in test list
         if (selectedFeatures.isEmpty()) {
         	for (CucumberFeature feature: allFeatures) {
-        		List<CucumberTagStatement> selectedScenarios = new ArrayList<CucumberTagStatement>();
+        		List<CucumberTagStatement> selectedScenarios = new ArrayList<>();
         		for (CucumberTagStatement stmt: feature.getFeatureElements()) {
         			for (String test: testList) {
             			if (stmt.getGherkinModel().getName().equals(test)) {
@@ -167,7 +168,7 @@ public class CustomTestNGCucumberRunner {
         return selectedFeatures;
     }
 
-    public void runScenario(CucumberScenarioWrapper cucumberScenarioWrapper) throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
+    public void runScenario(CucumberScenarioWrapper cucumberScenarioWrapper) throws NoSuchFieldException, RuntimeException, IllegalAccessException {
     	resultListener.startFeature();
     	
     	Formatter formatter = runtimeOptions.formatter(classLoader);
@@ -192,7 +193,7 @@ public class CustomTestNGCucumberRunner {
         formatter.done();
         formatter.close();
         runtime.printSummary();
-        if (runtime.getSnippets().size() > 0) {
+        if (!runtime.getSnippets().isEmpty()) {
         	throw new CucumberException("Some steps could not be found");
         }
     }

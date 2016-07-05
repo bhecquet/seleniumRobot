@@ -85,6 +85,7 @@ public class FirefoxCapabilitiesFactory extends ICapabilitiesFactory {
     /**
      * Create firefox capabilities.
      */
+    @Override
     public DesiredCapabilities createCapabilities(final DriverConfig webDriverConfig) {
         DesiredCapabilities capability;
         capability = new DesiredCapabilities();
@@ -137,7 +138,7 @@ public class FirefoxCapabilitiesFactory extends ICapabilitiesFactory {
         synchronized (lockProfile) {
             try {
                 if (!isProfileCreated) {
-                    System.out.println("start create profile");
+                    logger.info("start create profile");
                     FileUtility.deleteDirectory(profilePath);
                     FileUtility.extractJar(profilePath, FireFoxProfileMarker.class);
                 }
@@ -165,7 +166,7 @@ public class FirefoxCapabilitiesFactory extends ICapabilitiesFactory {
     }
 
     protected String getFirefoxProfilePath(String path) {
-        String realPath = null;
+        String realPath;
         if (path != null && !new File(path).exists()) {
             TestLogging.log("Firefox profile path:" + path + " not found, use default");
             path = null;

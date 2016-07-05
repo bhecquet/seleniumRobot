@@ -32,7 +32,17 @@ import com.seleniumtests.customexception.DatasetException;
  */
 public class Filter {
 
-    static enum Operator {
+	private String name;
+
+    private Object[] values;
+
+    private Operator operator;
+
+    private Filter left;
+
+    private Filter right;
+	
+    enum Operator {
         EQUALS,
         EQUALS_IGNORE_CASE,
         LESS_THAN,
@@ -50,6 +60,23 @@ public class Filter {
         OR,
         AND;
     }
+    
+    private Filter(final Filter left, final Filter right, final Operator condition) {
+        this.left = left;
+        this.right = right;
+        this.operator = condition;
+    }
+
+    public Filter(final String name, final Object value, final Operator condition) {
+        this(name, new Object[] {value}, condition);
+    }
+
+    public Filter(final String name, final Object[] values, final Operator condition) {
+        super();
+        this.name = name;
+        this.values = values;
+        this.operator = condition;
+    }
 
     public static Filter and(final Filter left, final Filter right) {
         return new Filter(left, right, Operator.AND);
@@ -63,11 +90,11 @@ public class Filter {
         return new Filter(name, value, Operator.CONTAINS_IGNORE_CASE);
     }
 
-    public static Filter equals(final String name, final Object value) {
+    public static Filter isEqual(final String name, final Object value) {
         return new Filter(name, value, Operator.EQUALS);
     }
 
-    public static Filter equalsIgnoreCase(final String name, final String value) {
+    public static Filter isEqualIgnoreCase(final String name, final String value) {
         return new Filter(name, value, Operator.EQUALS_IGNORE_CASE);
     }
 
@@ -86,122 +113,7 @@ public class Filter {
     public static Filter lt(final String name, final Number value) {
         return new Filter(name, value, Operator.LESS_THAN);
     }
-
-    private static boolean match(final Filter filter, final Map<String, Object> parameters) {
-        String name = (filter.name != null ? filter.name.toUpperCase() : null);
-        Object[] values = filter.values;
-        Operator operator = filter.operator;
-        Filter left = filter.left;
-        Filter right = filter.right;
-
-        if (Operator.AND.equals(operator)) {
-            return left.match(parameters) && right.match(parameters);
-        } else if (Operator.OR.equals(operator)) {
-            return left.match(parameters) || right.match(parameters);
-        } else if (Operator.NOT.equals(operator)) {
-            return !right.match(parameters);
-        } else if (!parameters.containsKey(name)) {
-            return false;
-        } else if (Operator.IS_NULL.equals(operator)) {
-            return (parameters.get(name) == null);
-        } else if ((Operator.EQUALS.equals(operator) || Operator.EQUALS_IGNORE_CASE.equals(operator))
-                && (values == null || (values.length == 1 && values[0] == null))) {
-            return (parameters.get(name) == null);
-        } else if (Operator.EQUALS.equals(operator)) {
-            return parameters.get(name).equals(values[0]);
-        } else if (Operator.EQUALS_IGNORE_CASE.equals(operator)) {
-            return parameters.get(name).toString().toLowerCase().equals(values[0].toString().toLowerCase());
-        } else if (Operator.IN.equals(operator)) {
-            boolean found = false;
-            for (Object value : values) {
-                if (parameters.get(name).equals(value)) {
-                    found = true;
-                    break;
-                }
-            }
-
-            return found;
-        } else if (values == null || values[0] == null) {
-            throw new DatasetException("Filter Operation does not support Null values: " + operator);
-        } else {
-            if (values[0] instanceof String) {
-                switch (operator) {
-
-                    case CONTAINS :
-                        return parameters.get(name).toString().contains(values[0].toString());
-
-                    case CONTAINS_IGNORE_CASE :
-                        return parameters.get(name).toString().toLowerCase().contains(values[0].toString()
-                                    .toLowerCase());
-
-                    case STARTS_WITH :
-                        return parameters.get(name).toString().startsWith(values[0].toString());
-
-                    case STARTS_WITH_IGNORE_CASE :
-                        return parameters.get(name).toString().toLowerCase().startsWith(values[0].toString()
-                                    .toLowerCase());
-
-                    case ENDS_WITH :
-                        return parameters.get(name).toString().endsWith(values[0].toString());
-
-                    case ENDS_WITH_IGNORE_CASE :
-                        return parameters.get(name).toString().toLowerCase().endsWith(values[0].toString()
-                                    .toLowerCase());
-                }
-
-            } else if (values[0] instanceof Number) {
-                BigDecimal val = new BigDecimal(parameters.get(name).toString());
-                BigDecimal leftValue = new BigDecimal(values[0].toString());
-                BigDecimal rightValue;
-
-                switch (operator) {
-
-                    case BETWEEN :
-                        rightValue = new BigDecimal(values[1].toString());
-                        return leftValue.compareTo(val) < 1 && rightValue.compareTo(val) > -1;
-
-                    case LESS_THAN :
-                        return val.compareTo(leftValue) == -1;
-
-                    case GREATER_THAN :
-                        return val.compareTo(leftValue) == 1;
-
-                    default :
-                        break;
-                }
-            } else if (values[0] instanceof Date) {
-                Date date;
-                try {
-                    date = DateFormat.getDateInstance().parse(parameters.get(name).toString());
-                } catch (ParseException e) {
-                    date = (Date) parameters.get(name);
-                }
-
-                Date dateLeft = (Date) values[0];
-                Date dateRight;
-
-                switch (operator) {
-
-                    case BETWEEN :
-                        dateRight = (Date) values[1];
-                        return (dateLeft.before(date) || dateLeft.equals(date))
-                                && (date.before(dateRight) || date.equals(dateRight));
-
-                    case LESS_THAN :
-                        return date.before(dateLeft);
-
-                    case GREATER_THAN :
-                        return date.after(dateLeft);
-
-                    default :
-                        break;
-                }
-            }
-        }
-
-        throw new DatasetException("NOT Implemented Yet" + "\n" + filter + "\n" + parameters);
-    }
-
+    
     public static Filter not(final Filter exp) {
         return new Filter((Filter) null, exp, Operator.NOT);
     }
@@ -209,40 +121,9 @@ public class Filter {
     public static Filter or(final Filter left, final Filter right) {
         return new Filter(left, right, Operator.OR);
     }
-
-    private String name;
-
-    private Object[] values;
-
-    private Operator operator;
-
-    private Filter left;
-
-    private Filter right;
-
-    private Filter(final Filter left, final Filter right, final Operator condition) {
-        this.left = left;
-        this.right = right;
-        this.operator = condition;
-    }
-
-    public Filter(final String name, final Object value, final Operator condition) {
-        this(name, new Object[] {value}, condition);
-    }
-
-    public Filter(final String name, final Object[] values, final Operator condition) {
-        super();
-        this.name = name;
-        this.values = values;
-        this.operator = condition;
-    }
-
-    public String getName() {
-        return name;
-    }
-
+    
     public boolean match(final Map<String, Object> parameters) {
-        Map<String, Object> parameters2 = new HashMap<String, Object>();
+        Map<String, Object> parameters2 = new HashMap<>();
         for (Entry<String, Object> entry : parameters.entrySet()) {
             parameters2.put(entry.getKey().toUpperCase(), entry.getValue());
         }
@@ -250,14 +131,171 @@ public class Filter {
         return match(this, parameters2);
     }
 
+    /**
+     * Test if the given filter's value matches the given parameters'. 
+     * @param filter
+     * @param parameters
+     * @return boolean
+     */
+    private static boolean match(final Filter filter, final Map<String, Object> parameters) {
+        String name = filter.name != null ? filter.name.toUpperCase() : null;
+        Object[] values = filter.values;
+        Operator operator = filter.operator;
+        Filter left = filter.left;
+        Filter right = filter.right;
+
+        switch (operator) {
+
+        	case AND :
+        		return left.match(parameters) && right.match(parameters);
+        		
+        	case OR : 
+        		return left.match(parameters) || right.match(parameters);
+        		
+        	case NOT :
+        		return !right.match(parameters);
+        		
+        	default :
+                break;
+        }
+        
+        if (!parameters.containsKey(name)) {
+            return false;
+        } 	
+        
+        switch (operator) {
+        
+        	case IS_NULL :
+        		return parameters.get(name) == null;
+        		
+        	case EQUALS :
+        		if (values == null || (values.length == 1 && values[0] == null)) {
+        			return parameters.get(name) == null;
+        		} else {
+        			return parameters.get(name).equals(values[0]);
+        		}
+        		
+        	case EQUALS_IGNORE_CASE :
+        		if (values == null || (values.length == 1 && values[0] == null)) {
+        			return parameters.get(name) == null;
+        		} else {
+        			return parameters.get(name).toString().equalsIgnoreCase(values[0].toString());
+        		}
+        
+        	case IN :
+        		boolean found = false;
+                for (Object value : values) {
+                    if (parameters.get(name).equals(value)) {
+                        found = true;
+                        break;
+                    }
+                }
+                return found;
+        		
+        	default :
+                break;
+        }
+        
+        if (values == null || values[0] == null) {
+            throw new DatasetException("Filter Operation does not support Null values: " + operator);
+        } 
+        
+        if (values[0] instanceof String) {
+
+        	switch (operator) {
+        	
+		        case CONTAINS :
+		            return parameters.get(name).toString().contains(values[0].toString());
+		
+		        case CONTAINS_IGNORE_CASE :
+		            return parameters.get(name).toString().toLowerCase().contains(values[0].toString()
+		                        .toLowerCase());
+		
+		        case STARTS_WITH :
+		            return parameters.get(name).toString().startsWith(values[0].toString());
+		
+		        case STARTS_WITH_IGNORE_CASE :
+		            return parameters.get(name).toString().toLowerCase().startsWith(values[0].toString()
+		                        .toLowerCase());
+		
+		        case ENDS_WITH :
+		            return parameters.get(name).toString().endsWith(values[0].toString());
+		
+		        case ENDS_WITH_IGNORE_CASE :
+		            return parameters.get(name).toString().toLowerCase().endsWith(values[0].toString()
+		                        .toLowerCase());
+		            
+		        default :
+	                break;
+	        }
+        }
+        	
+        if (values[0] instanceof Number) {
+            BigDecimal val = new BigDecimal(parameters.get(name).toString());
+            BigDecimal leftValue = new BigDecimal(values[0].toString());
+            BigDecimal rightValue;
+            
+            switch (operator) {
+
+	            case BETWEEN :
+	                rightValue = new BigDecimal(values[1].toString());
+	                return leftValue.compareTo(val) < 1 && rightValue.compareTo(val) > -1;
+	
+	            case LESS_THAN :
+	                return val.compareTo(leftValue) < 0;
+	
+	            case GREATER_THAN :
+	                return val.compareTo(leftValue) > 0;
+            
+	            default :
+	                break;
+	        }
+        }
+                
+        if (values[0] instanceof Date) {
+            Date date;
+            try {
+                date = DateFormat.getDateInstance().parse(parameters.get(name).toString());
+            } catch (ParseException e) {
+                date = (Date) parameters.get(name);
+            }
+            Date dateLeft = (Date) values[0];
+            Date dateRight;
+
+            switch (operator) {
+            
+	            case BETWEEN :
+	                dateRight = (Date) values[1];
+	                return (dateLeft.before(date) || dateLeft.equals(date))
+	                        && (date.before(dateRight) || date.equals(dateRight));
+	
+	            case LESS_THAN :
+	                return date.before(dateLeft);
+	
+	            case GREATER_THAN :
+	                return date.after(dateLeft);
+	
+	            default :
+	                break;
+            }
+        }
+
+        throw new DatasetException("NOT Implemented Yet" + "\n" + filter + "\n" + parameters);
+    }
+    
+    public String getName() {
+        return name;
+    }
+
+    @Override
     public String toString() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         if (name != null) {
             sb.append(name + " " + operator.toString() + " " + Arrays.toString(values));
         } else {
             sb.append((left != null ? left.toString() : "") + " " + operator.toString() + " " + right.toString());
         }
-
         return "(" + sb.toString() + ")";
     }
+
 }
