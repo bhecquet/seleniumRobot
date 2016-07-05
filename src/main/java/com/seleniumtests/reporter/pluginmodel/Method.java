@@ -79,7 +79,7 @@ public class Method {
      */
     public List<Page> getPage() {
         if (page == null) {
-            page = new ArrayList<Page>();
+            page = new ArrayList<>();
         }
 
         return this.page;

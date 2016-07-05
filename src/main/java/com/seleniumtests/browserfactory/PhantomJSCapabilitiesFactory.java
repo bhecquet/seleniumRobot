@@ -22,6 +22,7 @@ import com.seleniumtests.driver.DriverConfig;
 
 public class PhantomJSCapabilitiesFactory extends ICapabilitiesFactory {
 
+	@Override
     public DesiredCapabilities createCapabilities(final DriverConfig cfg) {
         DesiredCapabilities capability = new DesiredCapabilities();
         capability.setBrowserName(DesiredCapabilities.phantomjs().getBrowserName());

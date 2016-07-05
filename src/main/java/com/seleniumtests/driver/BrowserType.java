@@ -25,32 +25,39 @@ public enum BrowserType {
     PhantomJS("*phantomjs"),
     ;
 
-    public static BrowserType getBrowserType(final String browserType) {
-        if (browserType.equalsIgnoreCase("*firefox") || browserType.equalsIgnoreCase("firefox")) {
-            return BrowserType.FireFox;
-        } else if (browserType.equalsIgnoreCase("*iexplore") || browserType.equalsIgnoreCase("iexplore")) {
-            return BrowserType.InternetExplore;
-        } else if (browserType.equalsIgnoreCase("*chrome") || browserType.equalsIgnoreCase("chrome")) {
-            return BrowserType.Chrome;
-        } else if (browserType.equalsIgnoreCase("*opera") || browserType.equalsIgnoreCase("opera")) {
-        	return BrowserType.Opera;
-        } else if (browserType.equalsIgnoreCase("*htmlunit") || browserType.equalsIgnoreCase("htmlunit")) {
-            return BrowserType.HtmlUnit;
-        } else if (browserType.equalsIgnoreCase("*safari") || browserType.equalsIgnoreCase("safari")) {
-            return BrowserType.Safari;
-        } else if (browserType.equalsIgnoreCase("*browser") || browserType.equalsIgnoreCase("browser")) {
-        	return BrowserType.Browser;
-        } else if (browserType.equalsIgnoreCase("*phantomjs") || browserType.equalsIgnoreCase("phantomjs")) {
-            return BrowserType.PhantomJS;
-        } else {
-            throw new IllegalArgumentException(String.format("browser %s is unknown", browserType));
-        }
-    }
-
-    private String browserType;
+	private String browserType;
 
     BrowserType(final String type) {
         this.browserType = type;
+    }
+	
+    public static BrowserType getBrowserType(final String browserType) {
+        if (browserType.toLowerCase().contains("firefox")) {
+            return BrowserType.FireFox;
+        } 
+        if (browserType.toLowerCase().contains("iexplore")) {
+            return BrowserType.InternetExplore;
+        } 
+        if (browserType.toLowerCase().contains("chrome")) {
+            return BrowserType.Chrome;
+        } 	
+        if (browserType.toLowerCase().contains("opera")) {
+        	return BrowserType.Opera;
+        } 
+        if (browserType.toLowerCase().contains("htmlunit")) {
+            return BrowserType.HtmlUnit;
+        } 
+        if (browserType.toLowerCase().contains("safari")) {
+            return BrowserType.Safari;
+        } 
+        if (browserType.toLowerCase().contains("browser")) {
+        	return BrowserType.Browser;
+        } 
+        if (browserType.toLowerCase().contains("phantomjs")) {
+            return BrowserType.PhantomJS;
+        } 
+        throw new IllegalArgumentException(String.format("browser %s is unknown", browserType));
+        
     }
 
     public String getBrowserType() {

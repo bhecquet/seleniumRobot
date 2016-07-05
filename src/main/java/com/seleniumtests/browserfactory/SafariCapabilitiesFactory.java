@@ -22,9 +22,9 @@ import com.seleniumtests.driver.DriverConfig;
 
 public class SafariCapabilitiesFactory extends ICapabilitiesFactory {
 
+	@Override
     public DesiredCapabilities createCapabilities(final DriverConfig cfg) {
-        DesiredCapabilities capability = null;
-        capability = DesiredCapabilities.safari();
+        DesiredCapabilities capability = DesiredCapabilities.safari();
 
         if (cfg.isEnableJavascript()) {
             capability.setJavascriptEnabled(true);

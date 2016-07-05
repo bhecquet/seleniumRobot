@@ -14,16 +14,10 @@
 
 package com.seleniumtests.browserfactory;
 
-import java.io.IOException;
-
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import java.util.concurrent.TimeUnit;
-
-import org.openqa.selenium.UnsupportedCommandException;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebDriverException;
 
 import com.seleniumtests.customexception.DriverExceptions;
 import com.seleniumtests.driver.DriverConfig;
@@ -39,6 +33,7 @@ public class AndroidDriverFactory extends AbstractWebDriverFactory implements IW
         super(webDriverConfig);
     }
 
+    @Override
     protected WebDriver createNativeDriver() {
 
         try {

@@ -13,11 +13,6 @@
 
 package com.seleniumtests.browserfactory;
 
-import java.io.IOException;
-
-import java.util.concurrent.TimeUnit;
-
-import org.openqa.selenium.UnsupportedCommandException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 
@@ -29,6 +24,7 @@ public class ChromeDriverFactory extends AbstractWebDriverFactory implements IWe
         super(cfg);
     }
 
+    @Override
     protected WebDriver createNativeDriver() {
         return new ChromeDriver(new ChromeCapabilitiesFactory().createCapabilities(webDriverConfig));
     }

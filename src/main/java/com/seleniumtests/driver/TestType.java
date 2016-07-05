@@ -20,57 +20,71 @@ package com.seleniumtests.driver;
 public enum TestType {
 
     WEB("web") {
+    	@Override
     	public boolean isMobile() {
     		return false;
     	}
+    	@Override
     	public TestType family() {
         	return WEB;
         }
     },
     APP("app") {
+    	@Override
     	public boolean isMobile() {
     		return true;
     	}
+    	@Override
     	public TestType family() {
         	return APP;
         }
     },
     NON_GUI("NonGUI") {
+    	@Override
     	public boolean isMobile() {
     		return false;
     	}
+    	@Override
     	public TestType family() {
         	return NON_GUI;
         }
     },
     APPIUM_WEB_ANDROID("appium_web_android") {
+    	@Override
     	public boolean isMobile() {
     		return true;
     	}
+    	@Override
     	public TestType family() {
         	return WEB;
         }
     },
     APPIUM_WEB_IOS("appium_web_ios") {
+    	@Override
     	public boolean isMobile() {
     		return true;
     	}
+    	@Override
     	public TestType family() {
         	return WEB;
         }
     },
 	APPIUM_APP_ANDROID("appium_app_android") {
+    	@Override
     	public boolean isMobile() {
     		return true;
     	}
+    	@Override
     	public TestType family() {
         	return APP;
         }
     },
 	APPIUM_APP_IOS("appium_app_ios") {
+    	@Override
     	public boolean isMobile() {
     		return true;
     	}
+    	@Override
     	public TestType family() {
         	return APP;
         }
