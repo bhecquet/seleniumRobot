@@ -618,11 +618,18 @@
 		        <artifactId>maven-release-plugin</artifactId>
 		        <version>2.5.3</version>
 		        <executions>
-		        
 		        	<execution>
+		        		<id>prepare</id>
+		        		<phase>release:prepare</phase>
+		        		<configuration>
+		        			<arguments>${proxyString} -DskipTests</arguments>
+		        		</configuration>
+		        	</execution>
+		        	<execution>
+		        		<id>perform</id>
 		        		<phase>release:perform</phase>
 		        		<configuration>
-		        			<arguments>-DskipTests</arguments>
+		        			<arguments>${proxyString} -DskipTests</arguments>
 		        		</configuration>
 		        	</execution>	
 		        </executions>
