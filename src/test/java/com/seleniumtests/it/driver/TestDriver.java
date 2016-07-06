@@ -198,8 +198,7 @@ public class TestDriver {
 		
 			// passage sur le nouvel onglet et recherche d'un élément
 			mainHandle = testPage.selectNewWindow();
-			WaitHelper.waitForSeconds(2);
-			Assert.assertEquals("input", driver.findElement(By.name("q")).getTagName());
+			Assert.assertEquals("a value", driver.findElement(By.id("textInIFrameWithValue")).getAttribute("value"));
 		} finally {
 			// retour sur l'onglet principal
 			if (driver.getWindowHandles().size() > 1) {
@@ -209,7 +208,7 @@ public class TestDriver {
 				}
 			}
 		}
-		Assert.assertEquals(testPage.link.getUrl(), "http://www.google.fr/");
+		Assert.assertTrue(testPage.link.getUrl().contains("testIFrame.html"));
 	}
 	
 	/**
@@ -260,7 +259,7 @@ public class TestDriver {
 	 */
 	@Test(groups={"it"})
 	public void testFindPattern1() {
-		Assert.assertTrue(testPage.link.findLink("href").startsWith("http://www.google.fr"));
+		Assert.assertTrue(testPage.link2.findLink("href").startsWith("http://www.google.fr"));
 	}
 	
 	@Test(groups={"it"})
