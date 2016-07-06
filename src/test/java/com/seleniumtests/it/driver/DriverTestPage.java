@@ -39,6 +39,7 @@ public class DriverTestPage extends PageObject {
 	public static final HtmlElement child  = new HtmlElement("parent", By.id("parent")).findElement(By.className("myClass"), 1);
 	public static final HtmlElement divFindName  = new HtmlElement("parent", By.name("divFindName"), 1);
 	public static final LinkElement link = new LinkElement("My link", By.id("link"));
+	public static final LinkElement link2 = new LinkElement("My link", By.id("link2"));
 	public static final LinkElement linkPopup = new LinkElement("My link", By.id("linkPopup"));
 	public static final LinkElement linkPopup2 = new LinkElement("My link", By.id("linkPopup2"));
 	public static final TextFieldElement onBlurField = new TextFieldElement("On Blur", By.id("textOnBlur"));
