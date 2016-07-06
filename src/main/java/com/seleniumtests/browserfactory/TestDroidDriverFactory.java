@@ -54,8 +54,8 @@ public class TestDroidDriverFactory extends AbstractWebDriverFactory implements 
         super(cfg);
     }
     
-    protected static String uploadFile(String targetAppPath, String serverURL, String testdroid_apikey) throws IOException {
-        final HttpHeaders headers = new HttpHeaders().setBasicAuthentication(testdroid_apikey, "");
+    protected static String uploadFile(String targetAppPath, String serverURL, String testDroidApiKey) throws IOException {
+        final HttpHeaders headers = new HttpHeaders().setBasicAuthentication(testDroidApiKey, "");
 
         HttpRequestFactory requestFactory =
                 HTTP_TRANSPORT.createRequestFactory(new HttpRequestInitializer() {
@@ -78,7 +78,7 @@ public class TestDroidDriverFactory extends AbstractWebDriverFactory implements 
 //        System.out.println("response:" + response.parseAsString());
 
         AppiumResponse appiumResponse = request.execute().parseAs(AppiumResponse.class);
-        System.out.println("File id:" + appiumResponse.uploadStatus.fileInfo.file);
+        logger.info("File id:" + appiumResponse.uploadStatus.fileInfo.file);
 
         return appiumResponse.uploadStatus.fileInfo.file;
 
@@ -123,7 +123,7 @@ public class TestDroidDriverFactory extends AbstractWebDriverFactory implements 
         return capabilities;
     }
 
-
+    @Override
     protected WebDriver createNativeDriver() {
 
     	DesiredCapabilities capabilities = new DesiredCapabilities();
@@ -145,10 +145,10 @@ public class TestDroidDriverFactory extends AbstractWebDriverFactory implements 
     	}
 
     	try {
-	        if(webDriverConfig.getPlatform().equalsIgnoreCase("android")){
+	        if("android".equalsIgnoreCase(webDriverConfig.getPlatform())){
 	        	capabilities.setCapability("testdroid_target", "android");
 	            return new AndroidDriver(new URL(webDriverConfig.getAppiumServerURL()), new AndroidCapabilitiesFactory(capabilities).createCapabilities(webDriverConfig));
-	        } else if (webDriverConfig.getPlatform().equalsIgnoreCase("ios")){
+	        } else if ("ios".equalsIgnoreCase(webDriverConfig.getPlatform())){
 	        	capabilities.setCapability("testdroid_target", "ios");
 	            return new IOSDriver(new URL(webDriverConfig.getAppiumServerURL()), new IOsCapabilitiesFactory(capabilities).createCapabilities(webDriverConfig));
 	        }

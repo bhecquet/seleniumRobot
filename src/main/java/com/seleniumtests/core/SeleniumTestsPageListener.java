@@ -23,7 +23,21 @@ import com.seleniumtests.uipage.IPage;
  * Plugin architecture for SEO, Java Script, Accessibility etc functional tests.
  */
 public abstract class SeleniumTestsPageListener {
-    protected static final Logger logger = TestLogging.getLogger(SeleniumTestsPageListener.class);
+    
+	private String title;
+
+    private boolean testResultEffected;
+	
+    
+    public SeleniumTestsPageListener() { }
+    
+    public SeleniumTestsPageListener(final String title, final boolean testResultEffected) {
+        this.title = title;
+        this.testResultEffected = testResultEffected;
+    }
+
+    
+	protected static final Logger logger = TestLogging.getLogger(SeleniumTestsPageListener.class);
 
     /**
      * Informs all the page listeners on page Load.
@@ -44,17 +58,6 @@ public abstract class SeleniumTestsPageListener {
         PluginsHelper.getInstance().invokePageListeners(SeleniumTestsContextManager.getThreadContext()
                 .getTestMethodSignature(), page, false);
     }
-
-    private String title;
-
-    private boolean testResultEffected;
-
-    public SeleniumTestsPageListener(final String title, final boolean testResultEffected) {
-        this.title = title;
-        this.testResultEffected = testResultEffected;
-    }
-
-    public SeleniumTestsPageListener() { }
 
     public String getTitle() {
         return title;

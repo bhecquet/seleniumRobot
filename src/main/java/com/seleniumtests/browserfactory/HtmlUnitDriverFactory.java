@@ -24,6 +24,7 @@ public class HtmlUnitDriverFactory extends AbstractWebDriverFactory implements I
         super(cfg);
     }
     
+    @Override
     protected WebDriver createNativeDriver() {
         return new HtmlUnitDriver(new HtmlUnitCapabilitiesFactory().createCapabilities(webDriverConfig));
     }

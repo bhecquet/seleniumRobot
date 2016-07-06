@@ -67,12 +67,16 @@ public class DriverExceptionListener implements WebDriverEventListener {
 
     public void beforeNavigateTo(final String arg0, final WebDriver arg1) { }
 
+    @Override
     public void beforeScript(final String arg0, final WebDriver arg1) { }
     
+    @Override
     public void afterNavigateRefresh(WebDriver arg0) {	}
 
+    @Override
 	public void beforeNavigateRefresh(WebDriver arg0) {	}
 
+    @Override
     public void onException(final Throwable ex, final WebDriver arg1) {
     	
         if (ex.getMessage() == null) {

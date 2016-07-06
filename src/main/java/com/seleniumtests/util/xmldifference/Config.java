@@ -27,7 +27,6 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 
-import com.seleniumtests.uipage.PageObject;
 
 /*import org.apache.oro.text.perl.MalformedPerl5PatternException;
  *
@@ -833,7 +832,8 @@ public class Config implements XMLDogConstants {
             return null;
         }
 
-        return line.substring(regExBegin + 2, regExEnd - 1);
+        regExBegin = regExBegin + 1;
+        return line.substring(regExBegin, regExEnd);
 
     }
 
@@ -875,16 +875,6 @@ public class Config implements XMLDogConstants {
             t.printStackTrace(System.out);
 
         }
-
-    }
-
-    public static void main(final String[] args) {
-
-        String str = "test";
-
-        System.out.println("index of e " + str.indexOf("e"));
-
-        System.out.println(Config.parseRegEx("/emp/[@name='whatever']"));
 
     }
 

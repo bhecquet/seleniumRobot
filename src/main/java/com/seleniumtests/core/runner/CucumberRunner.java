@@ -46,9 +46,6 @@ public class CucumberRunner {
     
     @BeforeSuite(alwaysRun = true)
     public void beforeTestSuite(final ITestContext testContext) throws IOException {
-        System.out.println("####################################################");
-        System.out.println("WWW.SELENIUMTESTS.COM");
-        System.out.println("####################################################");
         start = new Date();
         SeleniumTestsContextManager.initGlobalContext(testContext);
         SeleniumTestsContextManager.initThreadContext(testContext, null);
@@ -80,7 +77,7 @@ public class CucumberRunner {
     }
 
     @Test(groups = "cucumber", description = "Cucumber scenario", dataProvider = "scenarios")
-    public void feature(CucumberScenarioWrapper cucumberScenarioWrapper) throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
+    public void feature(CucumberScenarioWrapper cucumberScenarioWrapper) throws NoSuchFieldException, RuntimeException, IllegalAccessException {
     	testNGCucumberRunner.runScenario(cucumberScenarioWrapper);
     	logger.info(Thread.currentThread() + "Start scenario: " + cucumberScenarioWrapper);
     }
@@ -138,7 +135,7 @@ public class CucumberRunner {
      * @return
      */
     private String buildParameterString(final Object[] parameters) {
-        StringBuffer parameter = new StringBuffer();
+        StringBuilder parameter = new StringBuilder();
 
         if (parameters != null) {
             for (int i = 0; i < parameters.length; i++) {

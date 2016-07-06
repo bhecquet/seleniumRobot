@@ -54,11 +54,11 @@ public class SauceLabsDriverFactory extends AbstractWebDriverFactory implements 
     private DesiredCapabilities cloudSpecificCapabilities() {
     	DesiredCapabilities capabilities = new DesiredCapabilities();
     	
-    	if (webDriverConfig.getPlatform().equalsIgnoreCase("android")) {
+    	if ("android".equalsIgnoreCase(webDriverConfig.getPlatform())) {
 	    	capabilities.setCapability("app-package", webDriverConfig.getAppPackage());
 	        capabilities.setCapability("app-activity", webDriverConfig.getAppActivity());
 	        capabilities.setCapability("app-wait-activity", webDriverConfig.getAppWaitActivity());
-    	} else if (webDriverConfig.getPlatform().equalsIgnoreCase("ios")) {
+    	} else if ("ios".equalsIgnoreCase(webDriverConfig.getPlatform())) {
     		capabilities = DesiredCapabilities.iphone();
     	}
         capabilities.setCapability("app", "sauce-storage:" + new File(webDriverConfig.getApp()).getName()); //  saucelabs waits for app capability a special file: sauce-storage:<filename>
@@ -108,6 +108,7 @@ public class SauceLabsDriverFactory extends AbstractWebDriverFactory implements 
 
     }
 
+    @Override
     protected WebDriver createNativeDriver() {
     	
     	DesiredCapabilities capabilities;
@@ -123,9 +124,9 @@ public class SauceLabsDriverFactory extends AbstractWebDriverFactory implements 
     	}
 
     	try {
-	        if(webDriverConfig.getPlatform().equalsIgnoreCase("android")){
+	        if("android".equalsIgnoreCase(webDriverConfig.getPlatform())){
 	            return new AndroidDriver(new URL(webDriverConfig.getAppiumServerURL()), new AndroidCapabilitiesFactory(capabilities).createCapabilities(webDriverConfig));
-	        } else if (webDriverConfig.getPlatform().equalsIgnoreCase("ios")){
+	        } else if ("ios".equalsIgnoreCase(webDriverConfig.getPlatform())){
 	            return new IOSDriver(new URL(webDriverConfig.getAppiumServerURL()), new IOsCapabilitiesFactory(capabilities).createCapabilities(webDriverConfig));
 	        }
 	

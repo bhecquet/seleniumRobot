@@ -34,6 +34,7 @@ public class IOsCapabilitiesFactory extends ICapabilitiesFactory {
 		capabilities = new DesiredCapabilities();
 	}
 
+	@Override
     public DesiredCapabilities createCapabilities(final DriverConfig cfg) {
     	
     	DesiredCapabilities caps = new DesiredCapabilities(this.capabilities);
@@ -53,7 +54,7 @@ public class IOsCapabilitiesFactory extends ICapabilitiesFactory {
         }
 
     	// do not configure application and browser as they are mutualy exclusive
-        if (app == null || app.trim().equals("")) {
+        if (app == null || "".equals(app.trim())) {
         	caps.setCapability(CapabilityType.BROWSER_NAME, cfg.getBrowser());
         } else {
         	caps.setCapability(CapabilityType.BROWSER_NAME, "");

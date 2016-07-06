@@ -32,32 +32,37 @@ import com.seleniumtests.util.OSUtility;
 
 public class IECapabilitiesFactory extends ICapabilitiesFactory {
     
+	private static final String WEBDRIVER_PROPERTY = "webdriver.ie.driver";
+	
     public void handleExtractResources() throws IOException {
-        String dir = Paths.get(SeleniumTestsContext.getRootPath(), "tools", "drivers", Platform.getCurrent().family().toString().toLowerCase()).toString();
+        String dir = Paths.get(SeleniumTestsContext.getRootPath(), "tools", "drivers", 
+        						Platform.getCurrent().family().toString().toLowerCase()).toString();
         dir = FileUtility.decodePath(dir);
+        String iEDriverServerFile = "\\IEDriverServer.exe";
         
-        if (!new File(dir + "\\IEDriverServer.exe").exists()) {
+        if (!new File(dir + iEDriverServerFile).exists()) {
             if (OSUtility.getIEVersion() < 10) {
-                FileUtility.copyFile(dir + "\\IEDriverServer_x64.exe", dir + "\\IEDriverServer.exe");
+                FileUtility.copyFile(dir + "\\IEDriverServer_x64.exe", dir + iEDriverServerFile);
             } else {
-                FileUtility.copyFile(dir + "\\IEDriverServer_Win32.exe", dir + "\\IEDriverServer.exe"); // Win32
+                FileUtility.copyFile(dir + "\\IEDriverServer_Win32.exe", dir + iEDriverServerFile); // Win32
             }
         }
         
-        System.setProperty("webdriver.ie.driver", dir + "\\IEDriverServer.exe");
-        logger.debug(dir + "\\IEDriverServer.exe");
+        System.setProperty(WEBDRIVER_PROPERTY, dir + iEDriverServerFile);
+        logger.debug(dir + iEDriverServerFile);
     }
 
+    @Override
     public DesiredCapabilities createCapabilities(final DriverConfig cfg) {
 
         // Set IEDriver for Local Mode
         if (cfg.getMode() == DriverMode.LOCAL) {
             if (cfg.getIeDriverPath() != null) {
-                System.setProperty("webdriver.ie.driver", cfg.getIeDriverPath());
+                System.setProperty(WEBDRIVER_PROPERTY, cfg.getIeDriverPath());
             } else {
-                if (System.getenv("webdriver.ie.driver") != null) {
-                    logger.info("Get IE Driver from property:" + System.getenv("webdriver.ie.driver"));
-                    System.setProperty("webdriver.ie.driver", System.getenv("webdriver.ie.driver"));
+                if (System.getenv(WEBDRIVER_PROPERTY) != null) {
+                    logger.info("Get IE Driver from property:" + System.getenv(WEBDRIVER_PROPERTY));
+                    System.setProperty(WEBDRIVER_PROPERTY, System.getenv(WEBDRIVER_PROPERTY));
                 } else {
                     try {
                         handleExtractResources();
