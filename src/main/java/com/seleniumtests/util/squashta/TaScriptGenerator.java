@@ -124,7 +124,6 @@ public class TaScriptGenerator {
     		}
     	});
     	
-    	DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
     	List<SquashTaTestDef> tests = new ArrayList<SquashTaTestDef>();
     	
     	for (File testngFile: testngFiles) {
@@ -136,7 +135,7 @@ public class TaScriptGenerator {
     	        doc = sxb.build(testngFile);
     	    }
     	    catch(Exception e){
-    	    	logger.error(String.format("Fichier %s illisible", e.getMessage()));
+    	    	logger.error(String.format("Fichier %s illisible: %s", testngFile, e.getMessage()));
     	    	return tests;
     	    }
     	    
