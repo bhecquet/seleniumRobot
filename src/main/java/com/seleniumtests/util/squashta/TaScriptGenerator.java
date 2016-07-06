@@ -130,6 +130,7 @@ public class TaScriptGenerator {
     		
     		Document doc;
     		SAXBuilder sxb = new SAXBuilder();
+    		sxb.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
     	    try {
     	        
     	        doc = sxb.build(testngFile);
