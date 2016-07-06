@@ -513,7 +513,7 @@ public class PageObject extends BasePage implements IPage {
 
         // selectWindow(getPopupWindowName());
         driver.switchTo().window((String) driver.getWindowHandles().toArray()[0]);
-        waitForSeconds(1);
+        WaitHelper.waitForSeconds(1);
 
         // Check whether it's the expected page.
         assertCurrentPage(true);
@@ -530,8 +530,6 @@ public class PageObject extends BasePage implements IPage {
     
     public final String selectNewWindow(int waitMs) throws NotCurrentPageException {
         TestLogging.logWebStep(null, "select new window", false);
-//        driver.switchTo().window((String) driver.getWindowHandles().toArray()[1]);
-//        waitForSeconds(1);
         
         // Keep the name of the current window handle before switching
         // sometimes, our action made window disappear
@@ -545,8 +543,9 @@ public class PageObject extends BasePage implements IPage {
  		// wait for window to be displayed
  		long end = systemClock.laterBy(waitMs + 250L);
  		Set<String> handles = new TreeSet<String>();
+ 		boolean found = false;
  		
- 		while (systemClock.isNowBefore(end)) {
+ 		while (systemClock.isNowBefore(end) && !found) {
  			
  			handles = driver.getWindowHandles();
 
@@ -570,17 +569,17 @@ public class PageObject extends BasePage implements IPage {
  					try {
  						Point windowPosition  = driver.manage().window().getPosition();
  						Mouse mouse = new DesktopMouse();
- 						mouse.click(new DesktopScreenRegion(windowPosition.x + driver.manage().window().getSize().width / 2, windowPosition.y + 5, 2, 2).getCenter());
+ 						mouse.click(new DesktopScreenRegion(Math.max(0, windowPosition.x) + driver.manage().window().getSize().width / 2, Math.max(0, windowPosition.y) + 5, 2, 2).getCenter());
  					} catch (Exception e) {}
  					
- 					// new window has been found, stop
- 					return mainWindowHandle;
+ 					found = true;
+ 					break;
  				}
  			}
- 			waitForMs(300);
+ 			WaitHelper.waitForMilliSeconds(300);
  		}
  		
- 		// on vérifie qu'on a bien changé de fenêtre
+ 		// check window has changed
  		if (waitMs > 0 && mainWindowHandle.equals(driver.getWindowHandle())) {
  			throw new CustomSeleniumTestsException("new window has not been found. Handles: " + handles);
  		}

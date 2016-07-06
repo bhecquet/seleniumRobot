@@ -428,7 +428,7 @@ public abstract class BasePage {
         TestLogging.logWebStep(null, "wait for " + element.toString() + " to disappear.", false);
 
         WebDriverWait wait = new WebDriverWait(driver, explictWaitTimeout);
-        wait.until(ExpectedConditions.invisibilityOfElementLocated(element.getBy()));
+        wait.until(ExpectedConditions.invisibilityOfElementLocated(element.getBy())); 
     }
 
     public void waitForPopup(final String locator) {
@@ -441,7 +441,7 @@ public abstract class BasePage {
         final Windows windows = new Windows(driver);
 
         if (webUXDriver.getConfig().getBrowser() == BrowserType.InternetExplore) {
-            waitForSeconds(3);
+            WaitHelper.waitForSeconds(3);
         }
 
         new Wait() {
@@ -471,13 +471,6 @@ public abstract class BasePage {
      *
      * @param  seconds
      */
-    protected void waitForSeconds(final int seconds) {
-        WaitHelper.waitForSeconds(seconds);
-    }
-    
-    protected void waitForMs(final int ms) {
-    	WaitHelper.waitForSeconds(ms);
-    }
 
     public void waitForTextPresent(final HtmlElement element, final String text) {
         Assert.assertNotNull(text, "Text can't be null");
