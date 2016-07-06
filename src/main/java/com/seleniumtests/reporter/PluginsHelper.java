@@ -31,6 +31,7 @@ import org.apache.log4j.Logger;
 import org.openqa.selenium.WebDriverException;
 
 import com.seleniumtests.core.SeleniumTestsPageListener;
+import com.seleniumtests.reporter.TestLogging;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.reporter.pluginmodel.Method;
 import com.seleniumtests.reporter.pluginmodel.Page;
@@ -41,7 +42,10 @@ import com.seleniumtests.uipage.IPage;
 
 public class PluginsHelper {
 	private static final Logger logger = TestLogging.getLogger(PluginsHelper.class);
-    private static Map<String, SeleniumTestsPageListener> pageListenerMap = Collections.synchronizedMap(
+    
+	private SeleniumTestsPlugins seleniumTestsPlugins;
+	
+	private static Map<String, SeleniumTestsPageListener> pageListenerMap = Collections.synchronizedMap(
             new HashMap<String, SeleniumTestsPageListener>());
 
     private static final PluginsHelper instance = new PluginsHelper();
@@ -49,8 +53,6 @@ public class PluginsHelper {
     public static synchronized PluginsHelper getInstance() {
         return instance;
     }
-
-    private SeleniumTestsPlugins _seleniumTestsPlugins = null;
 
     public List<SeleniumTestsPageListener> getPageListeners() {
         List<SeleniumTestsPageListener> tempPageListenerList = Collections.synchronizedList(
@@ -62,13 +64,13 @@ public class PluginsHelper {
 
     public void invokePageListeners(final String testMethodSignature, final IPage page, final boolean isPageLoad) {
 
-        if (_seleniumTestsPlugins == null) {
+        if (seleniumTestsPlugins == null) {
             return;
         }
 
-        List<SeleniumTestsPageListener> pageListenerList = new ArrayList<SeleniumTestsPageListener>();
+        List<SeleniumTestsPageListener> pageListenerList = new ArrayList<>();
 
-        for (Plugin plugin : _seleniumTestsPlugins.getPlugin()) {
+        for (Plugin plugin : seleniumTestsPlugins.getPlugin()) {
             if (isPageListenerApplicable(plugin, testMethodSignature, page.getClass().getCanonicalName())) {
                 pageListenerList.add(pageListenerMap.get(plugin.getClassName().trim()));
             }
@@ -142,9 +144,9 @@ public class PluginsHelper {
 
             JAXBContext jc = JAXBContext.newInstance("com.seleniumtests.reporter.pluginmodel");
             Unmarshaller u = jc.createUnmarshaller();
-            _seleniumTestsPlugins = (SeleniumTestsPlugins) u.unmarshal(is);
+            seleniumTestsPlugins = (SeleniumTestsPlugins) u.unmarshal(is);
 
-            for (Plugin plugin : _seleniumTestsPlugins.getPlugin()) {
+            for (Plugin plugin : seleniumTestsPlugins.getPlugin()) {
                 try {
                     pageListenerMap.put(plugin.getClassName().trim(),
                         (SeleniumTestsPageListener) Class.forName(plugin.getClassName().trim()).newInstance());

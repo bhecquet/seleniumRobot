@@ -16,6 +16,7 @@ package com.seleniumtests.driver;
 
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.openqa.selenium.Platform;
@@ -82,16 +83,16 @@ public class DriverConfig {
     private String cloudApiKey;
     private String projectName;
 
-    public ArrayList<WebDriverEventListener> getWebDriverListeners() {
+    public List<WebDriverEventListener> getWebDriverListeners() {
         return webDriverListeners;
     }
 
-    public void setWebDriverListeners(final ArrayList<WebDriverEventListener> webDriverListeners) {
-        this.webDriverListeners = webDriverListeners;
+    public void setWebDriverListeners(final List<WebDriverEventListener> webDriverListeners) {
+        this.webDriverListeners = (ArrayList<WebDriverEventListener>) webDriverListeners;
     }
 
     public void setWebDriverListeners(final String listeners) {
-        ArrayList<WebDriverEventListener> listenerList = new ArrayList<WebDriverEventListener>();
+        ArrayList<WebDriverEventListener> listenerList = new ArrayList<>();
         String[] list = listeners.split(",");
         for (String aList : list) {
 

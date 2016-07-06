@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testng-results skipped="1" failed="3" total="5" passed="1">
+  <reporter-output>
+    <line pepe="youp">
+      <![CDATA[@@lt@@li^^greaterThan^^@@lt@@b^^greaterThan^^@@lt@@font color='#6600CC'^^greaterThan^^Variable appURL is not defined@@lt@@/font^^greaterThan^^@@lt@@/b^^greaterThan^^@@lt@@/li^^greaterThan^^]]>
+    </line>
+    <youpi>
+    </youpi>
+  </reporter-output>
+</testng-results>

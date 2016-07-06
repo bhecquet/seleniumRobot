@@ -15,14 +15,12 @@
 package com.seleniumtests.browserfactory;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 
-import com.seleniumtests.customexception.DriverExceptions;
 import com.seleniumtests.driver.DriverConfig;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.reporter.TestLogging;
@@ -98,7 +96,7 @@ public abstract class AbstractWebDriverFactory {
             driver.manage().timeouts().implicitlyWait((long) (timeout * 1000), TimeUnit.MILLISECONDS);
         } else {
             try {
-                driver.manage().timeouts().implicitlyWait(new Double(timeout).intValue(), TimeUnit.SECONDS);
+                driver.manage().timeouts().implicitlyWait((int)timeout, TimeUnit.SECONDS);
             } catch (Exception ex) {
             	logger.error(ex);
             }

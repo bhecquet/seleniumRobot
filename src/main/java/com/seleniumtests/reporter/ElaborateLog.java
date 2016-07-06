@@ -67,6 +67,7 @@ public class ElaborateLog {
 
     }
 
+    @Override
     public String toString() {
         StringBuilder buff = new StringBuilder();
         buff.append("TYPE=");

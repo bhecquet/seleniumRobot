@@ -30,7 +30,6 @@ import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
-import org.json.JSONException;
 import org.json.JSONObject;
 import org.openqa.selenium.Platform;
 import org.openqa.selenium.WebDriverException;
@@ -58,7 +57,7 @@ public class SeleniumTestsContext {
 	private static String FEATURES_PATH;
 	private static String CONFIG_PATH;
 	private static String APPLICATION_NAME;
-	public HashMap<String, HashMap<String,String>> idMapping;
+	public Map<String, HashMap<String,String>> idMapping;
 	public static final String DATA_FOLDER_NAME = "data";
 	
 	private static final Logger logger = TestLogging.getLogger(SeleniumTestsContext.class);
@@ -142,8 +141,8 @@ public class SeleniumTestsContext {
     // Testdroid specific properties
     public static final String PROJECT_NAME = "projectName";					// TestDroid nécessite un nom de projet dans lequel l'automatisation aura lieu	
 
-    private LinkedList<TearDownService> tearDownServices = new LinkedList<TearDownService>();
-    private Map<ITestResult, List<Throwable>> verificationFailuresMap = new HashMap<ITestResult, List<Throwable>>();
+    private LinkedList<TearDownService> tearDownServices = new LinkedList<>();
+    private Map<ITestResult, List<Throwable>> verificationFailuresMap = new HashMap<>();
 
     /* Data object to store all context data */
     private Map<String, Object> contextDataMap = Collections.synchronizedMap(new HashMap<String, Object>());
@@ -151,94 +150,8 @@ public class SeleniumTestsContext {
 
     private ITestContext testNGContext = null;
 
-    private LinkedList<ScreenShot> screenshots = new LinkedList<ScreenShot>();
+    private LinkedList<ScreenShot> screenshots = new LinkedList<>();
     
-
-    public LinkedList<ScreenShot> getScreenshots() {
-        return screenshots;
-    }
-
-    public void addScreenShot(final ScreenShot screenShot) {
-        deleteExceptionSnapshots();
-        screenshots.addLast(screenShot);
-    }
-
-    private void deleteExceptionSnapshots() {
-        try {
-            int size = screenshots.size();
-            if (size == 0) {
-                return;
-            }
-
-            ScreenShot screenShot = screenshots.get(size - 1);
-            if (screenShot.isException() && screenShot.getFullImagePath() != null) {
-                new File(screenShot.getFullImagePath()).delete();
-                screenshots.remove(size - 1);
-            }
-        } catch (Exception ex) {
-            logger.error(ex.getMessage());
-        }
-    }
-
-    public ScreenShot getExceptionScreenShot() {
-        if (screenshots.size() > 0 && screenshots.getLast().isException()) {
-            return screenshots.getLast();
-        } else {
-            return null;
-        }
-    }
-    
-    /**
-     * Build the root path of STF 
-     * method for guessing it is different if we are inside a jar (built mode) or in development
-     * @param clazz
-     * @param path
-     * @return
-     */
-    private static Boolean getPathFromClass(Class clazz, StringBuilder path) {
-		Boolean jar = false;
-		
-		try {
-			String url = URLDecoder.decode(clazz.getProtectionDomain().getCodeSource().getLocation().getFile(), "UTF-8" );
-			if (url.endsWith(".jar")) {
-				path.append((new File(url).getParentFile().getAbsoluteFile().toString() + "/").replace(File.separator, "/"));
-				jar = true;
-			} else {				
-				path.append((new File(url).getParentFile().getParentFile().getAbsoluteFile().toString() + "/").replace(File.separator, "/"));
-				jar = false;
-			}
-		} catch (UnsupportedEncodingException e) {}
-		
-		return jar;
-	}
-	
-    
-	private static void generateApplicationPath(XmlSuite xmlSuite) {
-
-		StringBuilder path = new StringBuilder();
-		getPathFromClass(SeleniumTestsContext.class, path);
-		
-		ROOT_PATH = path.toString();
-		
-		// in case launching unit test from eclipse, a temp file is generated outside the standard folder structure
-		// APPLICATION_NAME and DATA_PATH must be rewritten
-		try {
-			APPLICATION_NAME = xmlSuite.getFileName().replace(File.separator, "/").split("/"+ DATA_FOLDER_NAME + "/")[1].split("/")[0];
-			DATA_PATH = xmlSuite.getFileName().replace(File.separator, "/").split("/"+ DATA_FOLDER_NAME + "/")[0] + "/" + DATA_FOLDER_NAME + "/";
-		} catch (IndexOutOfBoundsException e) {
-			APPLICATION_NAME = "core";
-			DATA_PATH = Paths.get(ROOT_PATH, "data").toString();
-		}
-		
-		FEATURES_PATH = Paths.get(DATA_PATH, APPLICATION_NAME, "features").toString();
-		CONFIG_PATH = Paths.get(DATA_PATH, APPLICATION_NAME, "config").toString();
-		
-		// create data folder if it does not exist (it should already exist)
-		if (!new File(DATA_PATH).isDirectory()) {
-			new File(DATA_PATH).mkdirs();
-		}
-	}
-
     public SeleniumTestsContext(final ITestContext context) {
         this.testNGContext = context;
         
@@ -346,6 +259,93 @@ public class SeleniumTestsContext {
         }
     }
     
+    public LinkedList<ScreenShot> getScreenshots() {
+        return screenshots;
+    }
+
+    public void addScreenShot(final ScreenShot screenShot) {
+        deleteExceptionSnapshots();
+        screenshots.addLast(screenShot);
+    }
+
+    private void deleteExceptionSnapshots() {
+        try {
+            int size = screenshots.size();
+            if (size == 0) {
+                return;
+            }
+
+            ScreenShot screenShot = screenshots.get(size - 1);
+            if (screenShot.isException() && screenShot.getFullImagePath() != null) {
+                new File(screenShot.getFullImagePath()).delete();
+                screenshots.remove(size - 1);
+            }
+        } catch (Exception ex) {
+            logger.error(ex.getMessage());
+        }
+    }
+
+    public ScreenShot getExceptionScreenShot() {
+        if (screenshots.isEmpty() && screenshots.getLast().isException()) {
+            return screenshots.getLast();
+        } else {
+            return null;
+        }
+    }
+    
+    /**
+     * Build the root path of STF 
+     * method for guessing it is different if we are inside a jar (built mode) or in development
+     * @param clazz
+     * @param path
+     * @return
+     */
+    private static Boolean getPathFromClass(Class clazz, StringBuilder path) {
+		Boolean jar = false;
+		
+		try {
+			String url = URLDecoder.decode(clazz.getProtectionDomain().getCodeSource().getLocation().getFile(), "UTF-8" );
+			if (url.endsWith(".jar")) {
+				path.append((new File(url).getParentFile().getAbsoluteFile().toString() + "/").replace(File.separator, "/"));
+				jar = true;
+			} else {				
+				path.append((new File(url).getParentFile().getParentFile().getAbsoluteFile().toString() + "/").replace(File.separator, "/"));
+				jar = false;
+			}
+		} catch (UnsupportedEncodingException e) {}
+		
+		return jar;
+	}
+	
+    
+	private static void generateApplicationPath(XmlSuite xmlSuite) {
+
+		StringBuilder path = new StringBuilder();
+		getPathFromClass(SeleniumTestsContext.class, path);
+		
+		ROOT_PATH = path.toString();
+		
+		// in case launching unit test from eclipse, a temp file is generated outside the standard folder structure
+		// APPLICATION_NAME and DATA_PATH must be rewritten
+		try {
+			APPLICATION_NAME = xmlSuite.getFileName().replace(File.separator, "/").split("/"+ DATA_FOLDER_NAME + "/")[1].split("/")[0];
+			DATA_PATH = xmlSuite.getFileName().replace(File.separator, "/").split("/"+ DATA_FOLDER_NAME + "/")[0] + "/" + DATA_FOLDER_NAME + "/";
+		} catch (IndexOutOfBoundsException e) {
+			APPLICATION_NAME = "core";
+			DATA_PATH = Paths.get(ROOT_PATH, "data").toString();
+		}
+		
+		FEATURES_PATH = Paths.get(DATA_PATH, APPLICATION_NAME, "features").toString();
+		CONFIG_PATH = Paths.get(DATA_PATH, APPLICATION_NAME, "config").toString();
+		
+		// create data folder if it does not exist (it should already exist)
+		if (!new File(DATA_PATH).isDirectory()) {
+			new File(DATA_PATH).mkdirs();
+		}
+	}
+
+    
+    
     /**
      * From platform name, in case of Desktop platform, do nothing and in case of mobile, extract OS version from name
      *
@@ -405,7 +405,7 @@ public class SeleniumTestsContext {
      * Search mobile platform version according to device name if one has been defined in testConfig file
      */
     private void updateDeviceMobileVersion() {
-    	HashMap<String, String> deviceList = getDeviceList();
+    	Map<String, String> deviceList = getDeviceList();
     	if (getDeviceName() != null && !getDeviceName().isEmpty() && !deviceList.isEmpty()) {
     		setAttribute(PLATFORM, deviceList.get(getDeviceName()));
     	}
@@ -428,7 +428,7 @@ public class SeleniumTestsContext {
         if (verificationFailuresMap.get(result) != null) {
             this.verificationFailuresMap.get(result).add(failure);
         } else {
-            ArrayList<Throwable> failures = new ArrayList<Throwable>();
+            ArrayList<Throwable> failures = new ArrayList<>();
             failures.add(failure);
             this.addVerificationFailures(result, failures);
         }
@@ -455,8 +455,9 @@ public class SeleniumTestsContext {
         if (getAttribute(CAPTURE_SNAPSHOT) == null) {
 
             // IE grid default value set to false
-            if (this.getRunMode().equalsIgnoreCase("ExistingGrid")
-                    && (this.getBrowser().contains("iexplore") || this.getBrowser().contains("safari"))) {
+            if ("ExistingGrid".equalsIgnoreCase(this.getRunMode())
+                    && ("iexplore".contains(this.getBrowser()) 
+                    || "safari".contains(this.getBrowser()))) {
                 this.setAttribute(CAPTURE_SNAPSHOT, false);
             } else {
                 this.setAttribute(CAPTURE_SNAPSHOT, true);
@@ -594,10 +595,10 @@ public class SeleniumTestsContext {
      * 
      * @return list of teardown services
      */
-    public LinkedList<TearDownService> getTearDownServices() {
+    public List<TearDownService> getTearDownServices() {
         return tearDownServices;
     }
-
+    
     public String getTestDataFile() {
         return (String) getAttribute(TEST_DATA_FILE);
     }
@@ -611,7 +612,7 @@ public class SeleniumTestsContext {
     }
     
     public List<String> getCucumberTests() {
-    	List<String> tests = new ArrayList<String>();
+    	List<String> tests = new ArrayList<>();
     	if (((String)getAttribute(CUCUMBER_TESTS)).isEmpty()) {
     		return tests;
     	}
@@ -651,7 +652,7 @@ public class SeleniumTestsContext {
 
     public List<Throwable> getVerificationFailures(final ITestResult result) {
         List<Throwable> verificationFailures = verificationFailuresMap.get(result);
-        return verificationFailures == null ? new ArrayList<Throwable>() : verificationFailures;
+        return verificationFailures == null ? new ArrayList<>() : verificationFailures;
 
     }
 
@@ -680,9 +681,9 @@ public class SeleniumTestsContext {
     }
     
     @SuppressWarnings("unchecked")
-	public HashMap<String, String> getDeviceList() {
-    	HashMap<String, String> deviceList = new HashMap<String, String>();
-    	if (getAttribute(DEVICE_LIST) == null || getAttribute(DEVICE_LIST).equals("{}")) {
+	public Map<String, String> getDeviceList() {
+    	HashMap<String, String> deviceList = new HashMap<>();
+    	if (getAttribute(DEVICE_LIST) == null || "{}".equals(getAttribute(DEVICE_LIST))) {
     		return deviceList;
     	}
     	
@@ -745,14 +746,14 @@ public class SeleniumTestsContext {
     	return (String) getAttribute(PROJECT_NAME);
     }
     
-    public HashMap<String, String> getConfiguration() {
+    public Map<String, String> getConfiguration() {
     	return (HashMap<String, String>) getAttribute(TEST_CONFIG);
     }
     
     //Methods for ID_Mapping
     //get
-    public HashMap<String, HashMap<String, String>> getIdMapping() {
-    	return (HashMap<String, HashMap<String,String>>) idMapping;
+    public Map<String, HashMap<String, String>> getIdMapping() {
+    	return idMapping;
     }
     
     /**
@@ -788,7 +789,7 @@ public class SeleniumTestsContext {
 	}
 
 	//set
-    public void setIdMapping(HashMap<String, HashMap<String,String>> conf){
+    public void setIdMapping(Map<String, HashMap<String,String>> conf){
     	idMapping = conf;
     }
     
@@ -907,7 +908,7 @@ public class SeleniumTestsContext {
             final String defaultValue) {
 
         contextDataMap.put(attributeName,
-            (sysPropertyValue != null ? sysPropertyValue : (suiteValue != null ? suiteValue : defaultValue)));
+            sysPropertyValue != null ? sysPropertyValue : (suiteValue != null ? suiteValue : defaultValue));
 
     }
 

@@ -39,12 +39,17 @@ public class DefaultTestNGContext implements ITestContext {
         this.suite = new SeleniumTestsDefaultSuite();
     }
 
+    @Override
     public Object getAttribute(final String name) {
         return null;
     }
 
-    public void setAttribute(final String name, final Object value) { }
+    @Override
+    public void setAttribute(final String name, final Object value) { 
+    	//TODO
+    }
 
+    @Override
     public Set<String> getAttributeNames() {
         return null;
     }
@@ -53,90 +58,114 @@ public class DefaultTestNGContext implements ITestContext {
         return null;
     }
 
+    @Override
     public String getName() {
         return null;
     }
 
+    @Override
     public Date getStartDate() {
         return null;
     }
 
+    @Override
     public Date getEndDate() {
         return null;
     }
 
+    @Override
     public IResultMap getPassedTests() {
         return null;
     }
 
+    @Override
     public IResultMap getSkippedTests() {
         return null;
     }
 
+    @Override
     public IResultMap getFailedButWithinSuccessPercentageTests() {
         return null;
     }
 
+    @Override
     public IResultMap getFailedTests() {
         return null;
     }
 
+    @Override
     public String[] getIncludedGroups() {
         return null;
     }
 
+    @Override
     public String[] getExcludedGroups() {
         return null;
     }
 
+    @Override
     public String getOutputDirectory() {
         return this.getClass().getResource("/").getPath() + "../../test-output/defaultSuite";
     }
 
+    @Override
     public ISuite getSuite() {
         return suite;
     }
 
+    @Override
     public ITestNGMethod[] getAllTestMethods() {
         return null;
     }
 
+    @Override
     public String getHost() {
         return null;
     }
 
+    @Override
     public Collection<ITestNGMethod> getExcludedMethods() {
         return null;
     }
 
+    @Override
     public IResultMap getPassedConfigurations() {
         return null;
     }
 
+    @Override
     public IResultMap getSkippedConfigurations() {
         return null;
     }
 
+    @Override
     public IResultMap getFailedConfigurations() {
         return null;
     }
 
+    @Override
     public XmlTest getCurrentXmlTest() {
         return null;
     }
 
+    @Override
     public List<Module> getGuiceModules(final Class<? extends Module> cls) {
         return null;
     }
 
-    public void addGuiceModule(final Class<? extends Module> cls, final Module module) { }
+    public void addGuiceModule(final Class<? extends Module> cls, final Module module) { 
+    	//TODO
+    }
 
+    @Override
     public Injector getInjector(final List<Module> moduleInstances) {
         return null;
     }
 
+    @Override
     public void addInjector(final List<Module> moduleInstances, final Injector injector) { }
 
+    @Override
 	public Injector getInjector(IClass iClass) {
 		return null;
 	}

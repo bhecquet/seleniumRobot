@@ -84,7 +84,7 @@ public class Test {
      */
     public List<Method> getMethod() {
         if (method == null) {
-            method = new ArrayList<Method>();
+            method = new ArrayList<>();
         }
 
         return this.method;
@@ -112,7 +112,7 @@ public class Test {
      */
     public List<Page> getPage() {
         if (page == null) {
-            page = new ArrayList<Page>();
+            page = new ArrayList<>();
         }
 
         return this.page;

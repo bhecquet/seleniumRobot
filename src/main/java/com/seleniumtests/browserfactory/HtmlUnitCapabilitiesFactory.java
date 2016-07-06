@@ -22,9 +22,9 @@ import com.seleniumtests.driver.DriverConfig;
 
 public class HtmlUnitCapabilitiesFactory extends ICapabilitiesFactory {
 
+	@Override
     public DesiredCapabilities createCapabilities(final DriverConfig webDriverConfig) {
-        DesiredCapabilities capability = null;
-        capability = DesiredCapabilities.htmlUnit();
+        DesiredCapabilities capability = DesiredCapabilities.htmlUnit();
 
         if (webDriverConfig.isEnableJavascript()) {
             capability.setJavascriptEnabled(true);

@@ -32,10 +32,11 @@ import com.seleniumtests.util.OSUtility;
 
 public class ChromeCapabilitiesFactory extends ICapabilitiesFactory {
 
+	private static final String CHROME_DRIVER_PROPERTY = "webdriver.chrome.driver";
+	
     public DesiredCapabilities createCapabilities(final DriverConfig webDriverConfig) {
 
-        DesiredCapabilities capability = null;
-        capability = DesiredCapabilities.chrome();
+        DesiredCapabilities capability = DesiredCapabilities.chrome();
         capability.setBrowserName(DesiredCapabilities.chrome().getBrowserName());
 
         ChromeOptions options = new ChromeOptions();
@@ -76,10 +77,10 @@ public class ChromeCapabilitiesFactory extends ICapabilitiesFactory {
             String chromeDriverPath = webDriverConfig.getChromeDriverPath();
             if (chromeDriverPath == null) {
                 try {
-                    if (System.getenv("webdriver.chrome.driver") != null) {
-                        System.out.println("get Chrome driver from property:"
-                                + System.getenv("webdriver.chrome.driver"));
-                        System.setProperty("webdriver.chrome.driver", System.getenv("webdriver.chrome.driver"));
+                    if (System.getenv(CHROME_DRIVER_PROPERTY) != null) {
+                        logger.info("get Chrome driver from property:" 
+                        			+ System.getenv(CHROME_DRIVER_PROPERTY));
+                        System.setProperty(CHROME_DRIVER_PROPERTY, System.getenv(CHROME_DRIVER_PROPERTY));
                     } else {
                         handleExtractResources();
                     }
@@ -87,7 +88,7 @@ public class ChromeCapabilitiesFactory extends ICapabilitiesFactory {
                 	logger.error(ex);
                 }
             } else {
-                System.setProperty("webdriver.chrome.driver", chromeDriverPath);
+                System.setProperty(CHROME_DRIVER_PROPERTY, chromeDriverPath);
             }
         }
 
@@ -99,9 +100,9 @@ public class ChromeCapabilitiesFactory extends ICapabilitiesFactory {
         dir = FileUtility.decodePath(dir);
 
         if (OSUtility.isWindows()) {
-            System.setProperty("webdriver.chrome.driver", dir + "\\chromedriver.exe");
+            System.setProperty(CHROME_DRIVER_PROPERTY, dir + "\\chromedriver.exe");
         } else {
-            System.setProperty("webdriver.chrome.driver", dir + "/chromedriver");
+            System.setProperty(CHROME_DRIVER_PROPERTY, dir + "/chromedriver");
             new File(dir + "/chromedriver").setExecutable(true);
         }
     }

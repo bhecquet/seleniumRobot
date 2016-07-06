@@ -14,6 +14,7 @@
 package com.seleniumtests.uipage.aspects;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -49,7 +50,7 @@ public class InterceptBy {
 					String[] input = ((String) argument).split(":");
 					if (input[0].equals("map")) {
 						String page = getCallerName(Thread.currentThread().getStackTrace());
-						HashMap<String, HashMap<String, String>> config = SeleniumTestsContextManager.getThreadContext().getIdMapping();
+						Map<String, HashMap<String, String>> config = SeleniumTestsContextManager.getThreadContext().getIdMapping();
 						if (config == null) {
 							config = new ConfigMappingReader().readConfig();
 							if (config != null && !config.isEmpty()) {

@@ -29,12 +29,20 @@ import org.w3c.dom.NodeList;
 
 import com.seleniumtests.driver.TestType;
 import com.seleniumtests.util.TestConfigurationParser;
+import org.apache.log4j.Logger;
+import com.seleniumtests.reporter.TestLogging;
 
 /**
  * SeleniumTestsContextManager provides ways to manage global context, thread context and test level context.
  */
 public class SeleniumTestsContextManager {
 
+	private static final Logger logger = TestLogging.getLogger(SeleniumTestsContext.class);
+	
+	private SeleniumTestsContextManager() {
+		// As a utility class, it is not meant to be instantiated.
+	}
+	
     // context listener
     private static List<IContextAttributeListener> contextAttributeListeners = Collections.synchronizedList(
             new ArrayList<IContextAttributeListener>());
@@ -43,11 +51,11 @@ public class SeleniumTestsContextManager {
     private static SeleniumTestsContext globalContext;
 
     // test level context
-    private static Map<String, SeleniumTestsContext> testLevelContext = Collections.synchronizedMap(
-            new HashMap<String, SeleniumTestsContext>());
+    private static Map<String, SeleniumTestsContext> testLevelContext 
+    					= Collections.synchronizedMap(new HashMap<>());
 
     // thread level SeleniumTestsContext
-    private static ThreadLocal<SeleniumTestsContext> threadLocalContext = new ThreadLocal<SeleniumTestsContext>();
+    private static ThreadLocal<SeleniumTestsContext> threadLocalContext = new ThreadLocal<>();
 
     public static void addContextAttributeListener(final IContextAttributeListener listener) {
         contextAttributeListeners.add(listener);
@@ -55,7 +63,7 @@ public class SeleniumTestsContextManager {
 
     public static SeleniumTestsContext getGlobalContext() {
         if (globalContext == null) {
-            System.out.println("Initialize default GlobalContext");
+            logger.info("Initialize default GlobalContext");
             initGlobalContext(new DefaultTestNGContext());
         }
 
@@ -80,7 +88,7 @@ public class SeleniumTestsContextManager {
 
     public static SeleniumTestsContext getThreadContext() {
         if (threadLocalContext.get() == null) {
-            System.out.println("Initialize default ThreadContext");
+            logger.info("Initialize default ThreadContext");
             initThreadContext(null, null);
         }
 
@@ -222,7 +230,7 @@ public class SeleniumTestsContextManager {
     }
 
     public static void setGlobalContext(final SeleniumTestsContext ctx) {
-        globalContext = (ctx);
+        globalContext = ctx;
     }
 
     public static void setThreadContext(final SeleniumTestsContext ctx) {
@@ -230,10 +238,10 @@ public class SeleniumTestsContextManager {
     }
 
     public static boolean isWebTest() {
-        return (getThreadContext().getTestType().equals(TestType.WEB));
+        return getThreadContext().getTestType().equals(TestType.WEB);
     }
     
     public static boolean isMobileAppTest() {
-    	return (getThreadContext().getTestType().family().equals(TestType.APP));
+    	return getThreadContext().getTestType().family().equals(TestType.APP);
     }
 }

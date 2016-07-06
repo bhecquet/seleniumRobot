@@ -27,12 +27,14 @@ import com.seleniumtests.util.OSUtility;
 
 public class MarionetteCapabilitiesFactory extends FirefoxCapabilitiesFactory {
 
+	@Override
 	public DesiredCapabilities createCapabilities(final DriverConfig webDriverConfig) {
 		DesiredCapabilities capabilities = super.createCapabilities(webDriverConfig);
 		capabilities.setCapability("marionette", true);
 		try {
 			configureGeckoDriver();
 		} catch (UnsupportedEncodingException e) {
+			logger.error(e);
 		}
 		
 		return capabilities;

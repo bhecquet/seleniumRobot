@@ -83,26 +83,10 @@ public class RemoteDriverFactory extends AbstractWebDriverFactory implements IWe
                 break;
         }
 
-        switch (webDriverConfig.getBrowser()) {
-
-            case FireFox :
-                try {
-                    driver = new ScreenShotRemoteWebDriver(url, capability);
-                } catch (RuntimeException e) {
-                    if (e.getMessage().contains(
-                                "Unable to connect to host localhost on port 7062 after 45000 ms. Firefox console output")) {
-                        TestLogging.log("Firefox Driver creation got port customexception, retry after 5 seconds");
-                        WaitHelper.waitForSeconds(5);
-                        driver = new ScreenShotRemoteWebDriver(url, capability);
-                    } else {
-                        throw e;
-                    }
-                }
-
-                break;
-
-            default :
-                driver = new ScreenShotRemoteWebDriver(url, capability);
+        if ("FireFox".equals(webDriverConfig.getBrowser())) {
+            driver = getDriverFirefox(url, capability);
+        } else {
+            driver = new ScreenShotRemoteWebDriver(url, capability);
         }
 
         setImplicitWaitTimeout(webDriverConfig.getImplicitWaitTimeout());
@@ -112,7 +96,30 @@ public class RemoteDriverFactory extends AbstractWebDriverFactory implements IWe
 
         this.setWebDriver(driver);
 
-        String hub = url.getHost();
+        runWebDriver(url);
+
+        return driver;
+    }
+    
+    private WebDriver getDriverFirefox(URL url, DesiredCapabilities capability){
+    	driver = null;
+    	try {
+            driver = new ScreenShotRemoteWebDriver(url, capability);
+        } catch (RuntimeException e) {
+            if (e.getMessage().contains(
+                        "Unable to connect to host localhost on port 7062 after 45000 ms. Firefox console output")) {
+                TestLogging.log("Firefox Driver creation got port customexception, retry after 5 seconds");
+                WaitHelper.waitForSeconds(5);
+                driver = new ScreenShotRemoteWebDriver(url, capability);
+            } else {
+                throw e;
+            }
+        }
+    	return driver;
+    }
+    
+    private void runWebDriver(URL url){
+    	String hub = url.getHost();
         int port = url.getPort();
 
         // logging node ip address:
@@ -127,24 +134,22 @@ public class RemoteDriverFactory extends AbstractWebDriverFactory implements IWe
 
             org.apache.http.HttpResponse response = client.execute(host, req);
             String responseContent = EntityUtils.toString(response.getEntity());
-            try {
-                JSONObject object = new JSONObject(responseContent);
-                String proxyId = (String) object.get("proxyId");
-                String node = (proxyId.split("//")[1].split(":")[0]);
-                String browserName = ((RemoteWebDriver) driver).getCapabilities().getBrowserName();
-                String version = ((RemoteWebDriver) driver).getCapabilities().getVersion();
-                System.out.println("WebDriver is running on node " + node + ", " + browserName + version + ", session "
-                        + ((RemoteWebDriver) driver).getSessionId());
-                TestLogging.log("WebDriver is running on node " + node + ", " + browserName + version + ", session "
-                        + ((RemoteWebDriver) driver).getSessionId());
-            } catch (org.json.JSONException e) { }
+            
+            JSONObject object = new JSONObject(responseContent);
+            String proxyId = (String) object.get("proxyId");
+            String node = proxyId.split("//")[1].split(":")[0];
+            String browserName = ((RemoteWebDriver) driver).getCapabilities().getBrowserName();
+            String version = ((RemoteWebDriver) driver).getCapabilities().getVersion();
+            logger.info("WebDriver is running on node " + node + ", " + browserName + version 
+            			+ ", session " + ((RemoteWebDriver) driver).getSessionId());
+            TestLogging.log("WebDriver is running on node " + node + ", " + browserName + version + ", session "
+                    + ((RemoteWebDriver) driver).getSessionId());
+            
         } catch (Exception ex) {
-        	
+        	logger.error(ex);
         } finally {
         	client.close();
         }
-
-        return driver;
     }
 
     protected void setPageLoadTimeout(final long timeout, final BrowserType type) {
