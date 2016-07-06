@@ -198,6 +198,7 @@ public class TestDriver {
 		
 			// passage sur le nouvel onglet et recherche d'un élément
 			mainHandle = testPage.selectNewWindow();
+			WaitHelper.waitForSeconds(2);
 			Assert.assertEquals("input", driver.findElement(By.name("q")).getTagName());
 		} finally {
 			// retour sur l'onglet principal
