@@ -15,10 +15,7 @@
 package com.seleniumtests.uipage.htmlelements;
 
 import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.remote.RemoteWebDriver;
 
-import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import com.seleniumtests.reporter.TestLogging;
 
 public class TextFieldElement extends HtmlElement {
@@ -33,7 +30,7 @@ public class TextFieldElement extends HtmlElement {
     public void clear() {
         TestLogging.logWebStep(null, "Remove data From " + toHTML(), false);
         findElement();
-        if (!element.getAttribute("type").equalsIgnoreCase("file")) {
+        if (!"file".equalsIgnoreCase(element.getAttribute("type"))) {
             element.clear();
         }
     }

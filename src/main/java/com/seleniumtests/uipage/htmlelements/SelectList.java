@@ -95,6 +95,7 @@ public class SelectList extends HtmlElement {
 
     }
 
+    @Override
     protected void findElement() {
         driver = WebUIDriver.getWebDriver();
         element = driver.findElement(this.getBy());
@@ -102,7 +103,7 @@ public class SelectList extends HtmlElement {
             select = getNewSelectElement(element);
             options = select.getOptions();
         } catch (UnexpectedTagNameException e) {
-            if (element.getTagName().equalsIgnoreCase("ul")) {
+            if ("ul".equalsIgnoreCase(element.getTagName())) {
                 options = element.findElements(By.tagName("li"));
             }
         }
@@ -135,7 +136,7 @@ public class SelectList extends HtmlElement {
     public String[] getSelectedTexts() {
         findElement();
 
-        List<String> textList = new ArrayList<String>();
+        List<String> textList = new ArrayList<>();
         for (WebElement option : options) {
             if (option.isSelected()) {
                 textList.add(option.getText());
@@ -159,7 +160,7 @@ public class SelectList extends HtmlElement {
     public String[] getSelectedValues() {
         findElement();
 
-        List<String> valueList = new ArrayList<String>();
+        List<String> valueList = new ArrayList<>();
         for (WebElement option : options) {
             if (option.isSelected()) {
                 valueList.add(option.getAttribute("value"));
@@ -170,13 +171,14 @@ public class SelectList extends HtmlElement {
         return valueList.toArray(values);
     }
 
+    @Override
     public void init() {
         super.init();
         try {
             select = getNewSelectElement(element);
             options = select.getOptions();
         } catch (UnexpectedTagNameException e) {
-            if (element.getTagName().equalsIgnoreCase("ul")) {
+            if ("ul".equalsIgnoreCase(element.getTagName())) {
                 options = element.findElements(By.tagName("li"));
             }
         }
@@ -220,8 +222,8 @@ public class SelectList extends HtmlElement {
         }
 
         for (WebElement option : options) {
-            String selectedText = null;
-            if (option.getTagName().equalsIgnoreCase("li")) {
+            String selectedText;
+            if ("li".equalsIgnoreCase(option.getTagName())) {
                 selectedText = option.getAttribute("title");
             } else {
                 selectedText = option.getText();

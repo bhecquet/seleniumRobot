@@ -18,6 +18,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.w3c.dom.Attr;
 import org.w3c.dom.CDATASection;
 import org.w3c.dom.Comment;
@@ -30,6 +31,9 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
 
+import com.seleniumtests.driver.WebUIDriver;
+import com.seleniumtests.reporter.TestLogging;
+
 /**
  * Comparator class containing the Core of XML Comparison Engine.
  *
@@ -40,21 +44,21 @@ import org.w3c.dom.Text;
 
 public class Comparator implements XMLDogConstants {
 
-    private Node _controlNode = null;
+	private static final Logger logger = TestLogging.getLogger(WebUIDriver.class);
+	
+    private Node controlNode;
 
-    private Node _testNode = null;
+    private Node testNode;
 
-    private Config _config = null;
+    private Config config;
 
     // List of listeners
 
-    private List _listeners = new ArrayList();
+    private List listeners = new ArrayList();
 
-    private Set _elist = new HashSet();
+    private boolean ignoringWhitespace = true;
 
-    private boolean _ignoringWhitespace = true;
-
-    private boolean _includeNodeValueInXPath = true;
+    private boolean includeNodeValueInXPath = true;
 
     /**
      * Default Contructor.
@@ -83,19 +87,19 @@ public class Comparator implements XMLDogConstants {
          *
          */
 
-        _config = config;
+        this.config = config;
 
-        _controlNode = controlNode;
+        this.controlNode = controlNode;
 
-        _testNode = testNode;
+        this.testNode = testNode;
 
-        _ignoringWhitespace = config.isIgnoringWhitespace();
+        this.ignoringWhitespace = config.isIgnoringWhitespace();
 
-        _includeNodeValueInXPath = config.includesNodeValuesInXPath();
+        this.includeNodeValueInXPath = config.includesNodeValuesInXPath();
 
-        _listeners.clear();
+        this.listeners.clear();
 
-        _listeners.add(new Differences());
+        this.listeners.add(new Differences());
 
     }
 
@@ -107,7 +111,7 @@ public class Comparator implements XMLDogConstants {
 
         if (listener != null) {
 
-            _listeners.add(listener);
+            listeners.add(listener);
         }
 
     }
@@ -124,9 +128,9 @@ public class Comparator implements XMLDogConstants {
 
         if (listener != null) {
 
-            _listeners.clear();
+            listeners.clear();
 
-            _listeners.add(listener);
+            listeners.add(listener);
 
         }
 
@@ -141,23 +145,23 @@ public class Comparator implements XMLDogConstants {
 
         if (type == XMLDogConstants.EVENT_NODE_IDENTICAL) {
 
-            for (int i = 0; i < _listeners.size(); i++) {
+            for (int i = 0; i < listeners.size(); i++) {
 
-                ((DifferenceListener) _listeners.get(i)).identicalNodeFound(controlNode, testNode, msg);
+                ((DifferenceListener) listeners.get(i)).identicalNodeFound(controlNode, testNode, msg);
             }
 
         } else if (type == XMLDogConstants.EVENT_NODE_SIMILAR) {
 
-            for (int i = 0; i < _listeners.size(); i++) {
+            for (int i = 0; i < listeners.size(); i++) {
 
-                ((DifferenceListener) _listeners.get(i)).similarNodeFound(controlNode, testNode, msg);
+                ((DifferenceListener) listeners.get(i)).similarNodeFound(controlNode, testNode, msg);
             }
 
         } else if (type == XMLDogConstants.EVENT_NODE_MISMATCH) {
 
-            for (int i = 0; i < _listeners.size(); i++) {
+            for (int i = 0; i < listeners.size(); i++) {
 
-                ((DifferenceListener) _listeners.get(i)).nodeNotFound(controlNode, testNode, msg);
+                ((DifferenceListener) listeners.get(i)).nodeNotFound(controlNode, testNode, msg);
             }
 
         } else {
@@ -179,7 +183,7 @@ public class Comparator implements XMLDogConstants {
             throw new IllegalArgumentException("Cannot compare null node");
         }
 
-        _controlNode = controlNode;
+        this.controlNode = controlNode;
 
     }
 
@@ -189,7 +193,7 @@ public class Comparator implements XMLDogConstants {
 
     public Node getControlNode() {
 
-        return _controlNode;
+        return controlNode;
 
     }
 
@@ -204,7 +208,7 @@ public class Comparator implements XMLDogConstants {
             throw new IllegalArgumentException("Cannot compare null node");
         }
 
-        _testNode = testNode;
+        this.testNode = testNode;
 
     }
 
@@ -214,7 +218,7 @@ public class Comparator implements XMLDogConstants {
 
     public Node getTestNode() {
 
-        return _testNode;
+        return testNode;
 
     }
 
@@ -224,7 +228,7 @@ public class Comparator implements XMLDogConstants {
 
     protected boolean isIgnoringWhitespace() {
 
-        return _config.isIgnoringWhitespace();
+        return config.isIgnoringWhitespace();
 
     }
 
@@ -234,7 +238,7 @@ public class Comparator implements XMLDogConstants {
 
     public Differences compare() {
 
-        log("IN comparator compare method");
+        logger.info("IN comparator compare method");
 
         return compare(getControlNode(), getTestNode());
 
@@ -255,24 +259,17 @@ public class Comparator implements XMLDogConstants {
 
         Differences differences = new Differences();
 
-        log("IN the compare(node, node) method");
+        logger.info("IN the compare(node, node) method");
 
-        Node parent = null;
+        XNode xControlNode = new XNode(controlNode, XMLUtil.generateXPath(controlNode, 
+        								ignoringWhitespace, includeNodeValueInXPath, false));
 
-        XNode xControlNode =
-
-            new XNode(controlNode,
-                XMLUtil.generateXPath(controlNode, _ignoringWhitespace, _includeNodeValueInXPath, false));
-
-        XNode xTestNode =
-
-            new XNode(testNode, XMLUtil.generateXPath(testNode, _ignoringWhitespace, _includeNodeValueInXPath, false));
+        XNode xTestNode = new XNode(testNode, XMLUtil.generateXPath(testNode, ignoringWhitespace, 
+        															includeNodeValueInXPath, false));
 
         xControlNode.setDepth(0);
 
         xTestNode.setDepth(0);
-
-        NodeResult nodeResult = new NodeResult(xControlNode, xTestNode, differences);
 
         // For Document type Node
 
@@ -288,7 +285,7 @@ public class Comparator implements XMLDogConstants {
 
                 if (!controlNode.hasChildNodes()) {
 
-                    if (!_config.isCustomDifference()) {
+                    if (!config.isCustomDifference()) {
 
                         differences.add("/" + testNode.getNodeName() + " is entirely new document");
                     } else {
@@ -311,7 +308,7 @@ public class Comparator implements XMLDogConstants {
 
             } else {
 
-                if (!_config.isCustomDifference()) {
+                if (!config.isCustomDifference()) {
 
                     differences.add("/" + testNode.getNodeName() + " is an empty document");
                 } else {
@@ -328,7 +325,7 @@ public class Comparator implements XMLDogConstants {
 
         } else {
 
-            nodeResult = compareSimilarNodes(xControlNode, xTestNode,
+        	NodeResult nodeResult = compareSimilarNodes(xControlNode, xTestNode,
                     new OrderedMap(OrderedMap.TYPE_UNSYNCHRONIZED_MOV));
 
             differences.add(nodeResult);
@@ -381,9 +378,9 @@ public class Comparator implements XMLDogConstants {
 
         Node test = xTest.getNode();
 
-        XNode xSimilarNode = null;
+        XNode xSimilarNode;
 
-        String similarNodeXPath = null;
+        String similarNodeXPath;
 
         NodeResult bestfitNodeResult = new NodeResult(xControl, xTest, differences);
 
@@ -399,7 +396,7 @@ public class Comparator implements XMLDogConstants {
 
             NodeResult nr = null;
 
-            if (similarNodes.size() > 0) {
+            if (!similarNodes.isEmpty()) {
 
                 noSimilarNodes = false;
             }
@@ -420,10 +417,10 @@ public class Comparator implements XMLDogConstants {
                         XMLUtil.generateXPath(xControl.getXPath()),
 
 
-                        _ignoringWhitespace,
+                        ignoringWhitespace,
 
 
-                        _includeNodeValueInXPath,
+                        includeNodeValueInXPath,
 
 
                         false);
@@ -506,7 +503,7 @@ public class Comparator implements XMLDogConstants {
 
                         // been taken already
 
-                        Object ntObject = null;
+                        Object ntObject;
 
                         boolean shouldBreak = false;
 
@@ -610,7 +607,7 @@ public class Comparator implements XMLDogConstants {
 
                 bestfitNodeResult.setControlNode(new XNode(null, null));
 
-                if (!_config.isCustomDifference()) {
+                if (!config.isCustomDifference()) {
 
                     differences.add("Added Node: Test Node " + xTest.getXPath());
                 } else {
@@ -652,18 +649,18 @@ public class Comparator implements XMLDogConstants {
 
         NodeResult nodeResult = new NodeResult(xControl, xTest, differences);
 
-        boolean diffName = false;
+        boolean diffName;
 
-        boolean diffPublicId = false;
+        boolean diffPublicId;
 
-        boolean diffSysId = false;
+        boolean diffSysId;
 
         DocumentType control = (DocumentType) xControl.getNode();
 
         DocumentType test = (DocumentType) xTest.getNode();
-        diffName = XMLUtil.areNullorEqual(control.getPublicId(), test.getPublicId(), _ignoringWhitespace, _includeNodeValueInXPath);
-        diffSysId = XMLUtil.areNullorEqual(control.getSystemId(), test.getSystemId(), _ignoringWhitespace, _includeNodeValueInXPath);
-        diffPublicId = XMLUtil.areNullorEqual(control.getName(), test.getName(), _ignoringWhitespace, _includeNodeValueInXPath);
+        diffName = XMLUtil.areNullorEqual(control.getPublicId(), test.getPublicId(), ignoringWhitespace, includeNodeValueInXPath);
+        diffSysId = XMLUtil.areNullorEqual(control.getSystemId(), test.getSystemId(), ignoringWhitespace, includeNodeValueInXPath);
+        diffPublicId = XMLUtil.areNullorEqual(control.getName(), test.getName(), ignoringWhitespace, includeNodeValueInXPath);
         
         if (diffName && diffSysId && diffPublicId) {
  
@@ -671,7 +668,7 @@ public class Comparator implements XMLDogConstants {
 
         } else {
 
-            if (!_config.isCustomDifference()) {
+            if (!config.isCustomDifference()) {
 
                 differences.add("Different DocumentType Node: Current Node " + xTest.getXPath() + " --> Golden Node "
                         + xControl.getXPath());
@@ -723,7 +720,7 @@ public class Comparator implements XMLDogConstants {
 
         if (!XMLUtil.nodesEqual(control, test, isIgnoringWhitespace())) {
 
-            if (!_config.isCustomDifference()) {
+            if (!config.isCustomDifference()) {
 
                 differences.add("Different Comment Node: Current Node" + xTest.getXPath()
                         +
@@ -769,7 +766,7 @@ public class Comparator implements XMLDogConstants {
 
         if (!XMLUtil.nodesEqual(control, test, isIgnoringWhitespace())) {
 
-            if (!_config.isCustomDifference()) {
+            if (!config.isCustomDifference()) {
 
                 differences.add("Different CDATA Node : Current Node " + xTest.getXPath()
                         +
@@ -853,9 +850,9 @@ public class Comparator implements XMLDogConstants {
 
             if (DEBUG) {
 
-                System.out.println("===> Compare Text is ignoring whitespace " + isIgnoringWhitespace());
+                logger.info("===> Compare Text is ignoring whitespace " + isIgnoringWhitespace());
 
-                System.out.println("=====> Text nodes Control and test ");
+                logger.info("=====> Text nodes Control and test ");
 
                 XMLUtil.printNodeBasics(control);
 
@@ -863,7 +860,7 @@ public class Comparator implements XMLDogConstants {
 
             }
 
-            if (!_config.isCustomDifference()) {
+            if (!config.isCustomDifference()) {
 
                 differences.add("Different Text Node: Current Node " + xTest.getXPath()
                         +
@@ -913,7 +910,7 @@ public class Comparator implements XMLDogConstants {
 
         NodeResult nodeResult = new NodeResult(xControl, xTest, differences);
 
-        log("Comparing Elements at Test " + xTest.getXPath() + " Control " + xControl.getXPath());
+        logger.info("Comparing Elements at Test " + xTest.getXPath() + " Control " + xControl.getXPath());
 
         /*
          *
@@ -923,11 +920,11 @@ public class Comparator implements XMLDogConstants {
          *
          *
          *
-         * String uniqueAttrName = (String)_config.getUniqueAttributeMap().get(testNode.getTagName());
+         * String uniqueAttrName = (String)config.getUniqueAttributeMap().get(testNode.getTagName());
          *
          */
 
-        String uniqueAttrName = (String) _config.getUniqueAttributeMap().get(test.getTagName());
+        String uniqueAttrName = config.getUniqueAttributeMap().get(test.getTagName());
 
         // Special case if the nodes are same in the first shot itself
 
@@ -969,7 +966,7 @@ public class Comparator implements XMLDogConstants {
 
                 String controlAttrValue = control.getAttribute(uniqueAttrName);
 
-                if ((!testAttrValue.trim().equals("")) && (controlAttrValue.equals(testAttrValue))) {
+                if ((!"".equals(testAttrValue.trim())) && (controlAttrValue.equals(testAttrValue))) {
 
                     nodeResult.setUniqueAttrMatch(true);
 
@@ -989,7 +986,7 @@ public class Comparator implements XMLDogConstants {
 
         // if no differences, its an exact match
 
-        if (differences.size() == 0) {
+        if (differences.isEmpty()) {
 
             log(" Exact match for Test ELEMENT node " + XMLUtil.getNodeBasics(test)
                     +
@@ -1010,10 +1007,6 @@ public class Comparator implements XMLDogConstants {
 
         boolean excludedEmpty = false;
 
-        List excludedAttrs = null;
-
-        List includedAttrs = null;
-
         Element control = (Element) xControl.getNode();
 
         Element test = (Element) xTest.getNode();
@@ -1032,16 +1025,16 @@ public class Comparator implements XMLDogConstants {
 
         // need to get this once
 
-        excludedAttrs = (List) _config.getExcludedAttributesMap().get(testNode.getTagName());
+        List<String> excludedAttrs = config.getExcludedAttributesMap().get(testNode.getTagName());
 
-        includedAttrs = (List) _config.getIncludedAttributesMap().get(testNode.getTagName());
+        List<String> includedAttrs = config.getIncludedAttributesMap().get(testNode.getTagName());
 
-        if ((includedAttrs == null) || (includedAttrs.size() == 0)) {
+        if ((includedAttrs == null) || (includedAttrs.isEmpty())) {
 
             includedEmpty = true;
         }
 
-        if ((excludedAttrs == null) || (excludedAttrs.size() == 0)) {
+        if ((excludedAttrs == null) || (excludedAttrs.isEmpty())) {
 
             excludedEmpty = true;
         }
@@ -1056,11 +1049,11 @@ public class Comparator implements XMLDogConstants {
 
         if (DEBUG) {
 
-            System.out.println(" ********** " + test.getNodeName() + " test node has " + testAttrs.getLength()
-                    + " attrs ");
+            logger.info(" ********** " + test.getNodeName() + " test node has " 
+            							+ testAttrs.getLength() + " attrs ");
 
-            System.out.println(" ********** " + control.getNodeName() + " control node has " + controlAttrs.getLength()
-                    + " attrs ");
+            logger.info(" ********** " + control.getNodeName() + " control node has " 
+            							+ controlAttrs.getLength() + " attrs ");
 
         }
 
@@ -1084,17 +1077,17 @@ public class Comparator implements XMLDogConstants {
 
         }
 
-        String testAttrName = null;
+        String testAttrName;
 
-        Attr testAttrNode = null;
+        Attr testAttrNode;
 
-        Attr testAttrNodeXPath = null;
+        Attr testAttrNodeXPath;
 
         Attr controlAttrNode = null;
 
         Attr controlAttrNodeXPath = null;
 
-        String controlAttrNodeXPathStr = null;
+        String controlAttrNodeXPathStr;
 
         if (testAttrs != null) {
 
@@ -1115,19 +1108,19 @@ public class Comparator implements XMLDogConstants {
 
                 String nodeXPath =
 
-                    XMLUtil.generateXPath(testAttrNode, testNodeXPath, _ignoringWhitespace, _includeNodeValueInXPath,
+                    XMLUtil.generateXPath(testAttrNode, testNodeXPath, ignoringWhitespace, includeNodeValueInXPath,
                         false);
 
                 // Skip this attribute if its in the EList
 
-                if (_config.isXPathEListEnabled()) {
+                if (config.isXPathEListEnabled()) {
 
-                    if (_config.applyEListToSiblings()) {
+                    if (config.applyEListToSiblings()) {
 
                         nodeXPath = XMLUtil.getNoIndexXPath(nodeXPath);
                     }
 
-                    if (_config.getXPathEList().containsKey(nodeXPath)) {
+                    if (config.getXPathEList().containsKey(nodeXPath)) {
 
                         continue;
 
@@ -1153,7 +1146,7 @@ public class Comparator implements XMLDogConstants {
 
                     log("Added Attribute: Test node " + nodeXPath);
 
-                    if (!_config.isCustomDifference()) {
+                    if (!config.isCustomDifference()) {
 
                         differences.add("New Attribute added: Test Node " + nodeXPath);
                     } else {
@@ -1163,8 +1156,8 @@ public class Comparator implements XMLDogConstants {
                             xTestNode = new XNode(testAttrNodeXPath,
 
 
-                                    XMLUtil.generateXPath(testAttrNode, testNodeXPath, _ignoringWhitespace,
-                                        _includeNodeValueInXPath, false));
+                                    XMLUtil.generateXPath(testAttrNode, testNodeXPath, ignoringWhitespace,
+                                        includeNodeValueInXPath, false));
                         }
 
                         if (controlAttrNode != null) {
@@ -1172,8 +1165,8 @@ public class Comparator implements XMLDogConstants {
                             xControlNode = new XNode(controlAttrNodeXPath,
 
 
-                                    XMLUtil.generateXPath(controlAttrNode, controlNodeXPath, _ignoringWhitespace,
-                                        _includeNodeValueInXPath, false));
+                                    XMLUtil.generateXPath(controlAttrNode, controlNodeXPath, ignoringWhitespace,
+                                        includeNodeValueInXPath, false));
                         }
 
                         Difference diff = new Difference(DifferenceConstants.ATTR_NAME_NOT_FOUND, xControlNode,
@@ -1188,14 +1181,14 @@ public class Comparator implements XMLDogConstants {
                     if (!controlAttrNode.getValue().equals(testAttrNode.getValue())) {
 
                         controlAttrNodeXPathStr = XMLUtil.generateXPath(controlAttrNode, controlNodeXPath,
-                                _ignoringWhitespace, _includeNodeValueInXPath, false);
+                                ignoringWhitespace, includeNodeValueInXPath, false);
 
                         log("Different Attributes: Test document Node " + nodeXPath
                                 +
 
                                 " --> Control document Node " + controlAttrNodeXPathStr);
 
-                        if (!_config.isCustomDifference()) {
+                        if (!config.isCustomDifference()) {
 
                             differences.add("Different Attributes: Current Node " + nodeXPath
                                     +
@@ -1208,8 +1201,8 @@ public class Comparator implements XMLDogConstants {
                                 xTestNode = new XNode(testAttrNode,
 
 
-                                        XMLUtil.generateXPath(testAttrNode, testNodeXPath, _ignoringWhitespace,
-                                            _includeNodeValueInXPath, false));
+                                        XMLUtil.generateXPath(testAttrNode, testNodeXPath, ignoringWhitespace,
+                                            includeNodeValueInXPath, false));
                             }
 
                             if (controlAttrNode != null) {
@@ -1257,18 +1250,18 @@ public class Comparator implements XMLDogConstants {
                 testAttrNodeXPath = (Attr) testAttrsForXPath.getNamedItem(controlAttrNode.getName());
 
                 controlAttrNodeXPathStr = XMLUtil.generateXPath(controlAttrNodeXPath, controlNodeXPath,
-                        _ignoringWhitespace, _includeNodeValueInXPath, false);
+                        ignoringWhitespace, includeNodeValueInXPath, false);
 
                 // Skip this attribute if its in the EList
 
-                if (_config.isXPathEListEnabled()) {
+                if (config.isXPathEListEnabled()) {
 
-                    if (_config.applyEListToSiblings()) {
+                    if (config.applyEListToSiblings()) {
 
                         controlAttrNodeXPathStr = XMLUtil.getNoIndexXPath(controlAttrNodeXPathStr);
                     }
 
-                    if (_config.getXPathEList().containsKey(controlAttrNodeXPathStr)) {
+                    if (config.getXPathEList().containsKey(controlAttrNodeXPathStr)) {
 
                         continue;
                     }
@@ -1278,7 +1271,7 @@ public class Comparator implements XMLDogConstants {
                 log("Missing Attribute: Test document is missing attribute "
                         + XMLUtil.generateXPath(controlAttrNodeXPath, isIgnoringWhitespace()));
 
-                if (!_config.isCustomDifference()) {
+                if (!config.isCustomDifference()) {
 
                     differences.add("Missing Attribute: Test Node " + controlAttrNodeXPathStr);
                 } else {
@@ -1288,8 +1281,8 @@ public class Comparator implements XMLDogConstants {
                         xTestNode = new XNode(testAttrNodeXPath,
 
 
-                                XMLUtil.generateXPath(testAttrNodeXPath, testNodeXPath, _ignoringWhitespace,
-                                    _includeNodeValueInXPath, false));
+                                XMLUtil.generateXPath(testAttrNodeXPath, testNodeXPath, ignoringWhitespace,
+                                    includeNodeValueInXPath, false));
                     }
 
                     if (controlAttrNodeXPath != null) {
@@ -1323,9 +1316,7 @@ public class Comparator implements XMLDogConstants {
 
         Differences differences = new Differences();
 
-        NodeResult nodeResult = new NodeResult(xControl, xTest, differences);
-
-        return nodeResult;
+        return new NodeResult(xControl, xTest, differences);
 
     }
 
@@ -1363,13 +1354,13 @@ public class Comparator implements XMLDogConstants {
 
         Node test = xTest.getNode();
 
-        NodeList testChildNodes = null;
+        NodeList testChildNodes;
 
-        NodeList controlChildNodes = null;
+        NodeList controlChildNodes;
 
-        Node testChildNode = null;
+        Node testChildNode;
 
-        Node controlChildNode = null;
+        Node controlChildNode;
 
         // Check to see if the Control Node or Test Node has been added
 
@@ -1377,7 +1368,7 @@ public class Comparator implements XMLDogConstants {
 
             if (test != null) {
 
-                if (!_config.isCustomDifference()) {
+                if (!config.isCustomDifference()) {
 
                     differences.add("Test Node added at " + xTest.getXPath());
                 } else {
@@ -1399,7 +1390,7 @@ public class Comparator implements XMLDogConstants {
 
             if (test == null) {
 
-                if (!_config.isCustomDifference()) {
+                if (!config.isCustomDifference()) {
 
                     differences.add("Golden Node added at " + xControl.getXPath());
                 } else {
@@ -1426,17 +1417,17 @@ public class Comparator implements XMLDogConstants {
 
                 controlChildNodes = control.getChildNodes();
 
-                NodeResult matchedNodeResult = null;
+                NodeResult matchedNodeResult;
 
                 String testNodeXPath = null;
 
-                XNode xControlChildNode = null;
+                XNode xControlChildNode;
 
-                XNode xTestChildNode = null;
+                XNode xTestChildNode;
 
-                String testChildXPath = null;
+                String testChildXPath;
 
-                String controlChildXPath = null;
+                String controlChildXPath;
 
                 // For Test Node Child and find a matching Control Node
 
@@ -1444,8 +1435,8 @@ public class Comparator implements XMLDogConstants {
 
                     testChildNode = testChildNodes.item(i);
 
-                    testChildXPath = XMLUtil.generateXPath(testChildNode, xTest.getXPath(), _ignoringWhitespace,
-                            _includeNodeValueInXPath, false);
+                    testChildXPath = XMLUtil.generateXPath(testChildNode, xTest.getXPath(), ignoringWhitespace,
+                            includeNodeValueInXPath, false);
 
                     xTestChildNode = new XNode(testChildNode, testChildXPath);
 
@@ -1464,15 +1455,15 @@ public class Comparator implements XMLDogConstants {
                             + controlChildNode.getNodeType());
 
                     controlChildXPath = XMLUtil.generateXPath(controlChildNode, xControl.getXPath(),
-                            _ignoringWhitespace, _includeNodeValueInXPath, false);
+                            ignoringWhitespace, includeNodeValueInXPath, false);
 
                     log("compareChildNodes()......controlChildXPath " + controlChildXPath);
 
                     xControlChildNode = new XNode(controlChildNode, controlChildXPath);
 
-                    if (_config.isXPathEListEnabled()) {
+                    if (config.isXPathEListEnabled()) {
 
-                        testNodeXPath = _config.applyEListToSiblings() ? xTestChildNode.getNoIndexXPath()
+                        testNodeXPath = config.applyEListToSiblings() ? xTestChildNode.getNoIndexXPath()
                                                                        : xTestChildNode.getXPath();
 
                     }
@@ -1485,7 +1476,7 @@ public class Comparator implements XMLDogConstants {
 
                         log("Ignoring Whitespace Node");
 
-                    } else if (XMLUtil.isCommentNode(testChildNode) && (_config.isIgnoringComments())) {
+                    } else if (XMLUtil.isCommentNode(testChildNode) && (config.isIgnoringComments())) {
 
                         // skip
 
@@ -1493,7 +1484,7 @@ public class Comparator implements XMLDogConstants {
 
                         log("Ignoring Comment Node");
 
-                    } else if ((testNodeXPath != null) && (_config.getXPathEList().containsKey(testNodeXPath))) {
+                    } else if ((testNodeXPath != null) && (config.getXPathEList().containsKey(testNodeXPath))) {
 
                         // exclude this if its Xpath is in the EList
 
@@ -1510,7 +1501,7 @@ public class Comparator implements XMLDogConstants {
                         if ((testChildNode.getNodeType() == Node.ELEMENT_NODE)
                                 &&
 
-                                (_config.getExcludedElementsSet().contains(testChildNode.getNodeName()))) {
+                                (config.getExcludedElementsSet().contains(testChildNode.getNodeName()))) {
 
                             // Skip
 
@@ -1568,9 +1559,7 @@ public class Comparator implements XMLDogConstants {
 
                     Object nodeResult = nodeResults[i];
 
-                    // System.out.println(" i = " + i);
-
-                    NodeResult minDiffNR = null;
+                    NodeResult minDiffNR;
 
                     // if its a List its MOV
 
@@ -1591,7 +1580,7 @@ public class Comparator implements XMLDogConstants {
 
                             if ((currentNR.getNumDifferences()) < (minDiffNR.getNumDifferences())) {
 
-                                if (!_config.isCustomDifference()) {
+                                if (!config.isCustomDifference()) {
 
                                     // If currentNR is an exact match
 
@@ -1624,7 +1613,7 @@ public class Comparator implements XMLDogConstants {
 
                                             minDiffNR.getControlNode().getXPath());
 
-                                    Difference diff = null;
+                                    Difference diff;
 
                                     if (currentNR.getNumDifferences() == 0) {
 
@@ -1650,7 +1639,7 @@ public class Comparator implements XMLDogConstants {
 
                             } else {
 
-                                if (!_config.isCustomDifference()) {
+                                if (!config.isCustomDifference()) {
 
                                     // If minNR is an exact match
 
@@ -1683,7 +1672,7 @@ public class Comparator implements XMLDogConstants {
 
                                             currentNR.getControlNode().getXPath());
 
-                                    Difference diff = null;
+                                    Difference diff;
 
                                     if (minDiffNR.getNumDifferences() == 0) {
 
@@ -1713,12 +1702,12 @@ public class Comparator implements XMLDogConstants {
 
                         // to the list of differences
 
-                        if ((!_config.isIgnoringOrder())
+                        if ((!config.isIgnoringOrder())
                                 &&
 
                                 (minDiffNR.getControlNode().getPosition() != minDiffNR.getTestNode().getPosition())) {
 
-                            if (!_config.isCustomDifference()) {
+                            if (!config.isCustomDifference()) {
 
                                 differences.add("Position Mismatch: Current Node " + minDiffNR.getTestNode().getXPath()
                                         + " at position " + Integer.toString(minDiffNR.getTestNode().getPosition())
@@ -1752,12 +1741,12 @@ public class Comparator implements XMLDogConstants {
                         log("compareChildNodes: ++++++ Adding child differences from INDIVIDUAL NodeResult "
                                 + nodeResult.toString());
 
-                        if ((!_config.isIgnoringOrder())
+                        if ((!config.isIgnoringOrder())
                                 &&
 
                                 (nr.getControlNode().getPosition() != nr.getTestNode().getPosition())) {
 
-                            if (!_config.isCustomDifference()) {
+                            if (!config.isCustomDifference()) {
 
                                 differences.add("Position Mismatch: Current Node " + nr.getTestNode().getXPath()
                                         + " at position " + Integer.toString(nr.getTestNode().getPosition())
@@ -1788,7 +1777,7 @@ public class Comparator implements XMLDogConstants {
 
                 }
 
-                String controlChildNodeXPathStr = null;
+                String controlChildNodeXPathStr;
 
                 // Go thru the Control Nodes to see if there are unmatched Control nodes
 
@@ -1797,22 +1786,22 @@ public class Comparator implements XMLDogConstants {
                     controlChildNode = controlChildNodes.item(i);
 
                     controlChildNodeXPathStr = XMLUtil.generateXPath(controlChildNode, xControl.getXPath(),
-                            _ignoringWhitespace, _includeNodeValueInXPath, false);
+                            ignoringWhitespace, includeNodeValueInXPath, false);
 
                     if (!nodeTracker.containsElementKey(controlChildNode)) {
 
-                        if (_config.applyEListToSiblings()) {
+                        if (config.applyEListToSiblings()) {
 
                             controlChildNodeXPathStr = XMLUtil.getNoIndexXPath(controlChildNodeXPathStr);
                         }
 
-                        if (!_config.getXPathEList().containsKey(controlChildNodeXPathStr)) {
+                        if (!config.getXPathEList().containsKey(controlChildNodeXPathStr)) {
 
                             reportNodeDifference(new XNode(controlChildNode,
 
 
-                                    XMLUtil.generateXPath(controlChildNode, xControl.getXPath(), _ignoringWhitespace,
-                                        _includeNodeValueInXPath, false)),
+                                    XMLUtil.generateXPath(controlChildNode, xControl.getXPath(), ignoringWhitespace,
+                                        includeNodeValueInXPath, false)),
 
 
                                 xTest, differences, "Missing Node: Current Node ");
@@ -1830,14 +1819,14 @@ public class Comparator implements XMLDogConstants {
 
                 testChildNodes = test.getChildNodes();
 
-                String testChildNodeXPathStr = null;
+                String testChildNodeXPathStr;
 
                 for (int i = 0; i < testChildNodes.getLength(); i++) {
 
                     testChildNode = testChildNodes.item(i);
 
-                    testChildNodeXPathStr = XMLUtil.generateXPath(testChildNode, xTest.getXPath(), _ignoringWhitespace,
-                            _includeNodeValueInXPath, false);
+                    testChildNodeXPathStr = XMLUtil.generateXPath(testChildNode, xTest.getXPath(), ignoringWhitespace,
+                            includeNodeValueInXPath, false);
 
                     reportNodeDifference(xControl, new XNode(testChildNode, testChildNodeXPathStr),
 
@@ -1856,7 +1845,7 @@ public class Comparator implements XMLDogConstants {
 
             if (control.hasChildNodes()) {
 
-                String controlChildNodeXPathStr = null;
+                String controlChildNodeXPathStr;
 
                 controlChildNodes = control.getChildNodes();
 
@@ -1865,7 +1854,7 @@ public class Comparator implements XMLDogConstants {
                     controlChildNode = controlChildNodes.item(i);
 
                     controlChildNodeXPathStr = XMLUtil.generateXPath(controlChildNode, xControl.getXPath(),
-                            _ignoringWhitespace, _includeNodeValueInXPath, false);
+                            ignoringWhitespace, includeNodeValueInXPath, false);
 
                     reportNodeDifference(new XNode(controlChildNode, controlChildNodeXPathStr), xTest,
 
@@ -1908,7 +1897,7 @@ public class Comparator implements XMLDogConstants {
 
             // skip
 
-        } else if (XMLUtil.isCommentNode(node.getNode()) && (_config.isIgnoringComments())) {
+        } else if (XMLUtil.isCommentNode(node.getNode()) && (config.isIgnoringComments())) {
 
             // skip
 
@@ -1921,7 +1910,7 @@ public class Comparator implements XMLDogConstants {
             if ((node.getNode().getNodeType() == Node.ELEMENT_NODE)
                     &&
 
-                    (_config.getExcludedElementsSet().contains(node.getNode().getNodeName()))) {
+                    (config.getExcludedElementsSet().contains(node.getNode().getNodeName()))) {
 
                 // Skip
 
@@ -1932,20 +1921,13 @@ public class Comparator implements XMLDogConstants {
 
             } else {
 
-                if (!_config.isCustomDifference()) {
+                if (!config.isCustomDifference()) {
 
                     differences.add(msg + node.getXPath());
 
                 } else {
-
-                    NodeDetail testNodeDetail = null;
-
-                    NodeDetail controlNodeDetail = null;
-
-                    Difference diff = new Difference(DifferenceConstants.NODE_NOT_FOUND,
-
-
-                            xControl, xTest);
+                	
+                    Difference diff = new Difference(DifferenceConstants.NODE_NOT_FOUND, xControl, xTest);
 
                     differences.add(diff);
 
@@ -1965,7 +1947,7 @@ public class Comparator implements XMLDogConstants {
 
         if (DEBUG) {
 
-            System.out.println("Comparator:" + msg);
+            logger.info("Comparator:" + msg);
         }
 
     }
@@ -1980,7 +1962,7 @@ public class Comparator implements XMLDogConstants {
 
             log(msg);
 
-            t.printStackTrace(System.out);
+            logger.error(t);
 
         }
 

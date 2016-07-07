@@ -27,13 +27,17 @@ public class StringUtility {
 	
 	private static final Logger logger = TestLogging.getLogger(StringUtility.class);
 
+	private StringUtility() {
+		// As a utility class, it is not meant to be instantiated.
+	}
+	
     public static String constructMethodSignature(final Method method, final Object[] parameters) {
         return method.getDeclaringClass().getCanonicalName() + "." + method.getName() + "("
                 + constructParameterString(parameters) + ")";
     }
 
     public static String constructParameterString(final Object[] parameters) {
-        StringBuffer sbParam = new StringBuffer();
+        StringBuilder sbParam = new StringBuilder();
 
         if (parameters != null) {
             for (int i = 0; i < parameters.length; i++) {
@@ -66,10 +70,7 @@ public class StringUtility {
             messageDigest = MessageDigest.getInstance("MD5");
             messageDigest.reset();
             messageDigest.update(str.getBytes("UTF-8"));
-        } catch (NoSuchAlgorithmException e) {
-            logger.error(e);
-            return str;
-        } catch (UnsupportedEncodingException e) {
+        } catch (UnsupportedEncodingException|NoSuchAlgorithmException e) {
         	logger.error(e);
             return str;
         }

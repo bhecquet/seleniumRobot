@@ -40,6 +40,10 @@ public class TestLogging {
     private static Map<String, Map<String, Map<String, List<String>>>> logMap = Collections.synchronizedMap(
             new HashMap<String, Map<String, Map<String, List<String>>>>());
 
+    private TestLogging() {
+		// As a utility class, it is not meant to be instantiated.
+	}
+    
     /**
      * error Logger.
      *
@@ -179,7 +183,7 @@ public class TestLogging {
      * @return String
      */
     public static String buildScreenshotLog(final ScreenShot screenShot) {
-        StringBuffer sbMessage = new StringBuffer("");
+        StringBuilder sbMessage = new StringBuilder("");
         if (screenShot.getLocation() != null) {
             sbMessage.append("<a href='" + screenShot.getLocation() + "' target=url>Application URL</a>");
         }

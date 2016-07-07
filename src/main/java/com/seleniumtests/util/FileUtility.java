@@ -47,12 +47,16 @@ public class FileUtility {
 	private static final Logger logger = TestLogging.getLogger(WebUIDriver.class);
     static final int BUFFER = 2048;
 
+    private FileUtility() {
+		// As a utility method, it is not made to be instantiated.
+	}
+    
     public static void extractJar(final String storeLocation, final Class<?> clz) throws IOException {
         File firefoxProfile = new File(storeLocation);
         String location = clz.getProtectionDomain().getCodeSource().getLocation().getFile();
 
         JarFile jar = new JarFile(location);
-        System.out.println("Extracting jar file::: " + location);
+        logger.info("Extracting jar file::: " + location);
         firefoxProfile.mkdir();
 
         Enumeration<?> jarFiles = jar.entries();
@@ -252,8 +256,6 @@ public class FileUtility {
             return;
         }
 
-        System.gc();
-
         InputStream in = null;
         FileOutputStream fos = null;
         try {
@@ -299,8 +301,6 @@ public class FileUtility {
      */
 
     public static void writeToFile(final String path, final String content) throws IOException {
-
-        System.gc();
 
         FileOutputStream fileOutputStream = null;
         OutputStreamWriter outputStreamWriter = null;

@@ -255,7 +255,7 @@ public class CSVHelper {
             count++;
         }
 
-        if (tokenList.size() > 0) {
+        if (!tokenList.isEmpty()) {
             result = new String[tokenList.size()];
             tokenList.toArray(result);
         }
