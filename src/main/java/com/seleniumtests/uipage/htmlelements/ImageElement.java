@@ -26,10 +26,12 @@ public class ImageElement extends HtmlElement {
     	super(label, by, index);
     }
 
+    @Override
     public int getHeight() {
         return super.getSize().getHeight();
     }
 
+    @Override
     public int getWidth() {
         return super.getSize().getWidth();
     }

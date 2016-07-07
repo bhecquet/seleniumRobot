@@ -41,6 +41,7 @@ public class FairTestRetryAnalyzer implements IRetryAnalyzer, ITestRetryAnalyzer
         }
     }
 
+    @Override
     public int getCount() {
         return this.count;
     }
@@ -49,6 +50,7 @@ public class FairTestRetryAnalyzer implements IRetryAnalyzer, ITestRetryAnalyzer
         return this.maxCount;
     }
 
+    @Override
     public synchronized boolean retry(final ITestResult result) {
         String testClassName = String.format("%s.%s", result.getMethod().getRealClass().toString(),
                 result.getMethod().getMethodName());
@@ -73,7 +75,7 @@ public class FairTestRetryAnalyzer implements IRetryAnalyzer, ITestRetryAnalyzer
         return false;
     }
 
-
+    @Override
     public boolean retryPeek(final ITestResult result) {
         Integer retryCount = Integer.class.cast(result.getTestContext().getAttribute("fairTestRetryCount"));
         if (retryCount == null) {

@@ -75,45 +75,45 @@ import org.apache.log4j.Logger;
 public class Config implements XMLDogConstants {
 
 	private static final Logger logger = Logger.getLogger(Config.class);
-    private boolean _isValidating = false;
+    private boolean isValidating = false;
 
-    private boolean _isIgnoringWS = true;
+    private boolean isIgnoringWS = true;
 
-    private boolean _isNamespaceAware = false;
+    private boolean isNamespaceAware = false;
 
-    private boolean _isIgnoringComments = true;
+    private boolean isIgnoringComments = true;
 
-    private boolean _isExpandingEntityRefs = true;
+    private boolean isExpandingEntityRefs = true;
 
-    private boolean _isDetailedMode = true;
+    private boolean isDetailedMode = true;
 
-    private boolean _isCustomDifference = false;
+    private boolean isCustomDifference = false;
 
-    private boolean _elistEnabled = false;
+    private boolean elistEnabled = false;
 
-    private boolean _elistToSiblings = false;
+    private boolean elistToSiblings = false;
 
-    private boolean _isIgnoringOrder = true;
+    private boolean isIgnoringOrder = true;
 
-    private boolean _includeNodeValuesInXPath = true;
+    private boolean includeNodeValuesInXPath = true;
 
     // HashMap containing Element names as Keys and List of Attributes
 
     // as Objects
 
-    private HashMap<String, List<String>> _includedElementAttrsMap = new HashMap<String, List<String>>();
+    private HashMap<String, List<String>> includedElementAttrsMap = new HashMap<>();
 
-    private HashMap<String, List<String>> _excludedElementAttrsMap = new HashMap<String, List<String>>();
+    private HashMap<String, List<String>> excludedElementAttrsMap = new HashMap<>();
 
-    private HashSet<String> _excludedElementsSet = new HashSet<String>();
+    private HashSet<String> excludedElementsSet = new HashSet<>();
 
-    private HashMap<String, String> _xpathEList = new HashMap<String, String>();
+    private HashMap<String, String> xpathEList = new HashMap<>();
 
     // HashMap containing Element names as Keys and unique attribute
 
     // names as objects
 
-    private HashMap<String, String> _uniqueElementAttrMap = new HashMap<String, String>();
+    private HashMap<String, String> uniqueElementAttrMap = new HashMap<>();
 
     /**
      * Default Constructor.
@@ -127,7 +127,7 @@ public class Config implements XMLDogConstants {
 
     public void setValidating(final boolean flag) {
 
-        _isValidating = flag;
+        isValidating = flag;
 
     }
 
@@ -137,7 +137,7 @@ public class Config implements XMLDogConstants {
 
     public boolean isValidating() {
 
-        return _isValidating;
+        return isValidating;
 
     }
 
@@ -147,7 +147,7 @@ public class Config implements XMLDogConstants {
 
     public void setIgnoringWhitespace(final boolean flag) {
 
-        _isIgnoringWS = flag;
+        isIgnoringWS = flag;
 
     }
 
@@ -157,7 +157,7 @@ public class Config implements XMLDogConstants {
 
     public boolean isIgnoringWhitespace() {
 
-        return _isIgnoringWS;
+        return isIgnoringWS;
 
     }
 
@@ -173,7 +173,7 @@ public class Config implements XMLDogConstants {
 
     public void setIgnoringOrder(final boolean flag) {
 
-        _isIgnoringOrder = flag;
+        isIgnoringOrder = flag;
 
     }
 
@@ -189,7 +189,7 @@ public class Config implements XMLDogConstants {
 
     public boolean isIgnoringOrder() {
 
-        return _isIgnoringOrder;
+        return isIgnoringOrder;
 
     }
 
@@ -199,7 +199,7 @@ public class Config implements XMLDogConstants {
 
     public void setNamespaceAware(final boolean flag) {
 
-        _isNamespaceAware = flag;
+        isNamespaceAware = flag;
 
     }
 
@@ -209,7 +209,7 @@ public class Config implements XMLDogConstants {
 
     public boolean isNamespaceAware() {
 
-        return _isNamespaceAware;
+        return isNamespaceAware;
 
     }
 
@@ -219,7 +219,7 @@ public class Config implements XMLDogConstants {
 
     public void setIgnoringComments(final boolean flag) {
 
-        _isIgnoringComments = flag;
+        isIgnoringComments = flag;
 
     }
 
@@ -229,7 +229,7 @@ public class Config implements XMLDogConstants {
 
     public boolean isIgnoringComments() {
 
-        return _isIgnoringComments;
+        return isIgnoringComments;
 
     }
 
@@ -239,7 +239,7 @@ public class Config implements XMLDogConstants {
 
     public void setExpandingEntityRefs(final boolean flag) {
 
-        _isExpandingEntityRefs = flag;
+        isExpandingEntityRefs = flag;
 
     }
 
@@ -249,7 +249,7 @@ public class Config implements XMLDogConstants {
 
     public boolean isExpandingEntityRefs() {
 
-        return _isExpandingEntityRefs;
+        return isExpandingEntityRefs;
 
     }
 
@@ -271,7 +271,7 @@ public class Config implements XMLDogConstants {
 
     public void setDetailedMode(final boolean flag) {
 
-        _isDetailedMode = flag;
+        isDetailedMode = flag;
 
     }
 
@@ -281,19 +281,19 @@ public class Config implements XMLDogConstants {
 
     public boolean isDetailedMode() {
 
-        return _isDetailedMode;
+        return isDetailedMode;
 
     }
 
     public void setIncludeNodeValuesInXPath(final boolean flag) {
 
-        _includeNodeValuesInXPath = flag;
+        includeNodeValuesInXPath = flag;
 
     }
 
     public boolean includesNodeValuesInXPath() {
 
-        return _includeNodeValuesInXPath;
+        return includeNodeValuesInXPath;
 
     }
 
@@ -309,7 +309,7 @@ public class Config implements XMLDogConstants {
 
     public void setCustomDifference(final boolean flag) {
 
-        _isCustomDifference = flag;
+        isCustomDifference = flag;
 
     }
 
@@ -325,7 +325,7 @@ public class Config implements XMLDogConstants {
 
     public boolean isCustomDifference() {
 
-        return _isCustomDifference;
+        return isCustomDifference;
 
     }
 
@@ -337,7 +337,7 @@ public class Config implements XMLDogConstants {
 
     public void setApplyEListToSiblings(final boolean flag) {
 
-        _elistToSiblings = flag;
+        elistToSiblings = flag;
 
     }
 
@@ -349,7 +349,7 @@ public class Config implements XMLDogConstants {
 
     public boolean applyEListToSiblings() {
 
-        return _elistToSiblings;
+        return elistToSiblings;
 
     }
 
@@ -359,26 +359,23 @@ public class Config implements XMLDogConstants {
 
     public void addIncludedAttribute(final String elementName, final String attrName) {
 
-        if ((elementName == null) || (elementName.trim().equals(""))) {
-
+        if ((elementName == null) || ("".equals(elementName.trim()))) {
             return;
         }
 
-        if ((attrName == null) || (attrName.trim().equals(""))) {
-
+        if ((attrName == null) || ("".equals(attrName.trim()))) {
             return;
         }
 
-        List<String> attrNames = null;
+        List<String> attrNames = includedElementAttrsMap.get(elementName);
 
-        if ((attrNames = (List<String>) _includedElementAttrsMap.get(elementName)) == null) {
-
-            attrNames = new ArrayList<String>();
+        if (attrNames == null) {
+            attrNames = new ArrayList<>();
         }
 
         attrNames.add(attrName);
 
-        _includedElementAttrsMap.put(elementName, attrNames);
+        includedElementAttrsMap.put(elementName, attrNames);
 
     }
 
@@ -388,16 +385,15 @@ public class Config implements XMLDogConstants {
 
     public void addIncludedAttributes(final String elementName, final List<String> attrNames) {
 
-        List<String> attrNamesList = null;
+        List<String> attrNamesList = includedElementAttrsMap.get(elementName);
 
-        if ((attrNamesList = (List<String>) _includedElementAttrsMap.get(elementName)) == null) {
-
-            attrNamesList = new ArrayList<String>();
+        if (attrNamesList == null) {
+            attrNamesList = new ArrayList<>();
         }
 
         attrNamesList.addAll(attrNames);
 
-        _includedElementAttrsMap.put(elementName, attrNamesList);
+        includedElementAttrsMap.put(elementName, attrNamesList);
 
     }
 
@@ -407,26 +403,23 @@ public class Config implements XMLDogConstants {
 
     public void addExcludedAttribute(final String elementName, final String attrName) {
 
-        if ((elementName == null) || (elementName.trim().equals(""))) {
-
+        if ((elementName == null) || ("".equals(elementName.trim()))) {
             return;
         }
 
-        if ((attrName == null) || (attrName.trim().equals(""))) {
-
+        if ((attrName == null) || ("".equals(attrName.trim()))) {
             return;
         }
 
-        List<String> attrNames = null;
+        List<String> attrNames = excludedElementAttrsMap.get(elementName);
 
-        if ((attrNames = (List<String>) _excludedElementAttrsMap.get(elementName)) == null) {
-
-            attrNames = new ArrayList<String>();
+        if (attrNames == null) {
+            attrNames = new ArrayList<>();
         }
 
         attrNames.add(attrName);
 
-        _excludedElementAttrsMap.put(elementName, attrNames);
+        excludedElementAttrsMap.put(elementName, attrNames);
 
     }
 
@@ -436,21 +429,19 @@ public class Config implements XMLDogConstants {
 
     public void addExcludedAttributes(final String elementName, final List<String> attrNames) {
 
-        if ((elementName == null) || (elementName.trim().equals(""))) {
-
+        if ((elementName == null) || ("".equals(elementName.trim()))) {
             return;
         }
 
-        List<String> attrNamesList = null;
+        List<String> attrNamesList = excludedElementAttrsMap.get(elementName);
 
-        if ((attrNamesList = (List<String>) _excludedElementAttrsMap.get(elementName)) == null) {
-
+        if (attrNamesList == null) {
             attrNamesList = new ArrayList<String>();
         }
 
         attrNamesList.addAll(attrNames);
 
-        _excludedElementAttrsMap.put(elementName, attrNamesList);
+        excludedElementAttrsMap.put(elementName, attrNamesList);
 
     }
 
@@ -462,7 +453,7 @@ public class Config implements XMLDogConstants {
 
         if ((elementName != null) && (attrName != null)) {
 
-            _uniqueElementAttrMap.put(elementName, attrName);
+            uniqueElementAttrMap.put(elementName, attrName);
         }
 
     }
@@ -478,7 +469,7 @@ public class Config implements XMLDogConstants {
             return;
         }
 
-        _excludedElementsSet.add(elementName);
+        excludedElementsSet.add(elementName);
 
     }
 
@@ -488,7 +479,7 @@ public class Config implements XMLDogConstants {
 
     public Map<String, List<String>> getExcludedAttributesMap() {
 
-        return _excludedElementAttrsMap;
+        return excludedElementAttrsMap;
 
     }
 
@@ -498,7 +489,7 @@ public class Config implements XMLDogConstants {
 
     public Map<String, List<String>> getIncludedAttributesMap() {
 
-        return _includedElementAttrsMap;
+        return includedElementAttrsMap;
 
     }
 
@@ -508,7 +499,7 @@ public class Config implements XMLDogConstants {
 
     public Map<String, String> getUniqueAttributeMap() {
 
-        return _uniqueElementAttrMap;
+        return uniqueElementAttrMap;
 
     }
 
@@ -518,7 +509,7 @@ public class Config implements XMLDogConstants {
 
     public Set<String> getExcludedElementsSet() {
 
-        return _excludedElementsSet;
+        return excludedElementsSet;
 
     }
 
@@ -530,7 +521,7 @@ public class Config implements XMLDogConstants {
 
     public void setXPathEListEnabled(final boolean flag) {
 
-        _elistEnabled = flag;
+        elistEnabled = flag;
 
     }
 
@@ -542,7 +533,7 @@ public class Config implements XMLDogConstants {
 
     public boolean isXPathEListEnabled() {
 
-        return _elistEnabled;
+        return elistEnabled;
 
     }
 
@@ -595,7 +586,7 @@ public class Config implements XMLDogConstants {
                  *
                  *              if ((regEx != null) && (isValidRegEx(regEx)))
                  *
-                 *                      _xpathEList.put(line, regEx);
+                 *                      xpathEList.put(line, regEx);
                  *
                  *      }
                  *
@@ -603,7 +594,7 @@ public class Config implements XMLDogConstants {
                  *
                  */
 
-                _xpathEList.put(line.trim(), null);
+                xpathEList.put(line.trim(), null);
 
             }
 
@@ -638,7 +629,7 @@ public class Config implements XMLDogConstants {
 
         }
 
-        return _xpathEList;
+        return xpathEList;
 
     }
 
@@ -845,7 +836,7 @@ public class Config implements XMLDogConstants {
 
     public Map<String, String> getXPathEList() {
 
-        return _xpathEList;
+        return xpathEList;
 
     }
 

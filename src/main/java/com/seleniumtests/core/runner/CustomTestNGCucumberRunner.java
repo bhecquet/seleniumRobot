@@ -168,7 +168,9 @@ public class CustomTestNGCucumberRunner {
         return selectedFeatures;
     }
 
-    public void runScenario(CucumberScenarioWrapper cucumberScenarioWrapper) throws NoSuchFieldException, RuntimeException, IllegalAccessException {
+    public void runScenario(CucumberScenarioWrapper cucumberScenarioWrapper) 
+    		throws NoSuchFieldException, RuntimeException, IllegalAccessException {
+    	
     	resultListener.startFeature();
     	
     	Formatter formatter = runtimeOptions.formatter(classLoader);
@@ -183,9 +185,9 @@ public class CustomTestNGCucumberRunner {
     	cucumberScenario.run(runtimeOptions.formatter(classLoader), resultListener, runtime);
     	formatter.eof();
     	
-    	if (!resultListener.isPassed()) {
-            throw new CucumberException(resultListener.getFirstError());
-        }
+//    	if (!resultListener.isPassed()) {
+//            throw new CucumberException(resultListener.getFirstError());
+//        }
     }
 
     public void finish() {

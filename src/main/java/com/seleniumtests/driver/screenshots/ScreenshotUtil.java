@@ -15,6 +15,7 @@
 package com.seleniumtests.driver.screenshots;
 
 import java.io.IOException;
+import java.util.LinkedList;
 
 import org.apache.log4j.Logger;
 import org.openqa.selenium.OutputType;
@@ -33,6 +34,23 @@ import com.seleniumtests.util.HashCodeGenerator;
 public class ScreenshotUtil {
 	private static final Logger logger = TestLogging.getLogger(ScreenshotUtil.class);
 
+	private String suiteName;
+    private String outputDirectory;
+    private WebDriver driver;
+    private String filename;
+	
+	public ScreenshotUtil() {
+        suiteName = getSuiteName();
+        outputDirectory = getOutputDirectory();
+        this.driver = WebUIDriver.getWebDriver();
+    }
+
+    public ScreenshotUtil(final WebDriver driver) {
+        suiteName = getSuiteName();
+        outputDirectory = getOutputDirectory();
+        this.driver = driver;
+    }
+	
     public static String captureEntirePageScreenshotToString(final WebDriver driver, final String arg0) {
         if (driver == null) {
             return "";
@@ -58,23 +76,6 @@ public class ScreenshotUtil {
         }
 
         return "";
-    }
-
-    private String suiteName;
-    private String outputDirectory;
-    private WebDriver driver;
-    private String filename;
-
-    public ScreenshotUtil() {
-        suiteName = getSuiteName();
-        outputDirectory = getOutputDirectory();
-        this.driver = WebUIDriver.getWebDriver();
-    }
-
-    public ScreenshotUtil(final WebDriver driver) {
-        suiteName = getSuiteName();
-        outputDirectory = getOutputDirectory();
-        this.driver = driver;
     }
 
     private static String getSuiteName() {
@@ -204,8 +205,8 @@ public class ScreenshotUtil {
         // SeleniumTestsContextManager.getThreadContext().setWebExceptionMessage(title + " ("
         // + sbMessage.toString() + ")");
         // screenShot.setException(true);
-        if (SeleniumTestsContextManager.getThreadContext().getScreenshots().size() > 0) {
-            SeleniumTestsContextManager.getThreadContext().getScreenshots().getLast().setException(true);
+        if (!SeleniumTestsContextManager.getThreadContext().getScreenshots().isEmpty()) {
+            ((LinkedList<ScreenShot>) SeleniumTestsContextManager.getThreadContext().getScreenshots()).getLast().setException(true);
         }
     }
 
@@ -214,7 +215,7 @@ public class ScreenshotUtil {
                 && SeleniumTestsContextManager.getThreadContext().getCaptureSnapshot()
                 && getOutputDirectory() != null) {
             String filename = HashCodeGenerator.getRandomHashCode("HtmlElement");
-            StringBuffer sbMessage = new StringBuffer();
+            StringBuilder sbMessage = new StringBuilder();
             try {
                 String img = ScreenshotUtil.captureEntirePageScreenshotToString(WebUIDriver.getWebDriver(), "");
                 if (img == null) {

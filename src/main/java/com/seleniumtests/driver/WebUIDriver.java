@@ -66,7 +66,6 @@ public class WebUIDriver {
     }
 
     public WebDriver createRemoteWebDriver(final String browser, final String mode) throws IOException  {
-        WebDriver driver = null;
         config.setBrowser(BrowserType.getBrowserType(browser));
         config.setMode(DriverMode.valueOf(mode));
 
@@ -465,7 +464,7 @@ public class WebUIDriver {
     }
 
     public static void main(final String[] args) {
-        System.out.println(DriverExceptionListener.class.getName());
+        logger.info(DriverExceptionListener.class.getName());
     }
 
     public boolean isSetAcceptUntrustedCertificates() {

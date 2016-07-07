@@ -17,6 +17,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 import org.ini4j.Config;
@@ -35,8 +36,8 @@ public class IniHelper {
 	 *            hashMap we want to fill
 	 * @return the HashMap completed with data from the file
 	 */
-	public static HashMap<String, HashMap<String, String>> readIniFile(File fileToRead,
-			HashMap<String, HashMap<String, String>> hashMapToComplete) {
+	public static Map<String, HashMap<String, String>> readIniFile(File fileToRead,
+			Map<String, HashMap<String, String>> hashMapToComplete) {
 
 		try {
 			Ini ini = new Ini();
