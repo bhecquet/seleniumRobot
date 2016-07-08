@@ -16,18 +16,12 @@ package com.seleniumtests.browserfactory;
 
 import java.io.IOException;
 
-import java.util.concurrent.TimeUnit;
-
-import org.apache.log4j.Logger;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
-import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.ie.InternetExplorerDriver;
 
-import com.seleniumtests.core.runner.CucumberRunner;
 import com.seleniumtests.customexception.DriverExceptions;
 import com.seleniumtests.driver.DriverConfig;
-import com.seleniumtests.reporter.TestLogging;
 import com.seleniumtests.util.OSUtility;
 
 public class IEDriverFactory extends AbstractWebDriverFactory implements IWebDriverFactory {
@@ -40,15 +34,10 @@ public class IEDriverFactory extends AbstractWebDriverFactory implements IWebDri
     public void cleanUp() {
         try {
             if (driver != null) {
-                try {
-                    driver.quit();
-                } catch (WebDriverException ex) {
-                	logger.error(ex);
-                }
-
+                driver.quit();
                 driver = null;
             }
-        } catch (Exception e) {
+        } catch (WebDriverException e) {
             logger.error(e);
         }
     }

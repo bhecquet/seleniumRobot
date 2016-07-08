@@ -15,6 +15,7 @@
 package com.seleniumtests.core;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -55,9 +56,10 @@ public class SeleniumTestsDefaultSuite implements ISuite {
 
     @Override
     public Set<String> getAttributeNames() {
-        return null;
+        return Collections.emptySet();
     }
 
+    @Override
     public Object removeAttribute(final String name) {
         return null;
     }
@@ -69,7 +71,7 @@ public class SeleniumTestsDefaultSuite implements ISuite {
 
     @Override
     public Map<String, ISuiteResult> getResults() {
-        return null;
+        return Collections.emptyMap();
     }
 
     @Override
@@ -99,21 +101,22 @@ public class SeleniumTestsDefaultSuite implements ISuite {
 
     @Override
     public Map<String, Collection<ITestNGMethod>> getMethodsByGroups() {
-        return null;
+        return Collections.emptyMap();
     }
 
     @Override
     public Collection<ITestNGMethod> getInvokedMethods() {
-        return null;
+        return Collections.emptyList();
     }
 
     @Override
     public List<IInvokedMethod> getAllInvokedMethods() {
-        return null;
+        return Collections.emptyList();
     }
 
+    @Override
     public Collection<ITestNGMethod> getExcludedMethods() {
-        return null;
+        return Collections.emptyList();
     }
 
     @Override
@@ -131,6 +134,7 @@ public class SeleniumTestsDefaultSuite implements ISuite {
         return null;
     }
 
+    @Override
     public IAnnotationFinder getAnnotationFinder() {
         return null;
     }
@@ -147,7 +151,7 @@ public class SeleniumTestsDefaultSuite implements ISuite {
 
     @Override
     public List<ITestNGMethod> getAllMethods() {
-        return null;
+        return Collections.emptyList();
     }
 
     @Override

@@ -78,14 +78,11 @@ public class FirefoxDriverFactory extends AbstractWebDriverFactory implements IW
     	Matcher versionMatcher = regMozilla.matcher(versionString);
 		if (versionMatcher.matches()) {
 			String version = versionMatcher.group(1);
-			if (Integer.parseInt(version) >= 47) {
-				return false;
-			} else {
+			if (Integer.parseInt(version) < 47) {
 				return true;
 			}
-		} else {
-			return false;
-		}
+		} 
+		return false;
     }
 
     /**

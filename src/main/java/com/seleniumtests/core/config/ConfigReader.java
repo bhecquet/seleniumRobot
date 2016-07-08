@@ -40,7 +40,7 @@ public class ConfigReader {
 	
 	public Map<String, String> readConfig(InputStream iniFileStream, String environment) {
 		
-		HashMap<String, String> testConfig = new HashMap<>();
+		Map<String, String> testConfig = new HashMap<>();
 	
 		try {
 			Ini ini = new Ini();
@@ -54,35 +54,62 @@ public class ConfigReader {
 			Set<Ini.Entry<String, Ini.Section>> sections = ini.entrySet();
 			
 			// first get global options
-			for (Ini.Entry<String, Ini.Section> section: sections) {
-				
-				if (section.getKey().equals(GLOBAL_SECTION_NAME)) {
-					for (Ini.Entry<String, String> sectionOption: section.getValue().entrySet()) {
-						testConfig.put(sectionOption.getKey(), sectionOption.getValue());
-					}
-				}
-			}
+			testConfig = getGlobalOptions(testConfig, sections);
 			
 			// then overwrite global options with local ones
-			boolean envFound = false;
-			for (Ini.Entry<String, Ini.Section> section: sections) {
-				
-				if (section.getKey().equals(environment)) {
-					envFound = true;
-					for (Ini.Entry<String, String> sectionOption: section.getValue().entrySet()) {
-						testConfig.put(sectionOption.getKey(), sectionOption.getValue());
-					}
-				}
-			}
-			if (!envFound) {
-				logger.warn(String.format("No section in config.ini file matches the environment '%s'", environment));
-			}
+			testConfig = getLocalOptions(testConfig, sections, environment);
 			
 			return testConfig;
+			
 		} catch (InvalidFileFormatException e) {
 			throw new ConfigurationException("Invalid file: " + iniFileStream);
 		} catch (IOException e) {
 			throw new ConfigurationException(String.format("File does not exist %s: %s", iniFileStream, e.getMessage()));
 		}
+	}
+	
+	/**
+	 * 
+	 * @param testConfig
+	 * @param sections
+	 * @return configuration with global options
+	 */
+	private Map<String, String> getGlobalOptions(Map<String, String> testConfig, 
+													Set<Ini.Entry<String, Ini.Section>> sections){
+		
+		for (Ini.Entry<String, Ini.Section> section: sections) {
+			
+			if (section.getKey().equals(GLOBAL_SECTION_NAME)) {
+				for (Ini.Entry<String, String> sectionOption: section.getValue().entrySet()) {
+					testConfig.put(sectionOption.getKey(), sectionOption.getValue());
+				}
+			}
+		}
+		return testConfig;
+	}
+	
+	/**
+	 * 
+	 * @param testConfig
+	 * @param sections
+	 * @param environment
+	 * @return configuration with local options overriding previous options
+	 */
+	private Map<String, String> getLocalOptions(Map<String, String> testConfig, 
+												Set<Ini.Entry<String, Ini.Section>> sections, String environment) {
+		boolean envFound = false;
+		for (Ini.Entry<String, Ini.Section> section: sections) {
+			
+			if (section.getKey().equals(environment)) {
+				envFound = true;
+				for (Ini.Entry<String, String> sectionOption: section.getValue().entrySet()) {
+					testConfig.put(sectionOption.getKey(), sectionOption.getValue());
+				}
+			}
+		}
+		if (!envFound) {
+			logger.warn(String.format("No section in config.ini file matches the environment '%s'", environment));
+		}
+		return testConfig;
 	}
 }
