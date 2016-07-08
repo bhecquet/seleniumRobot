@@ -83,7 +83,7 @@ public class RemoteDriverFactory extends AbstractWebDriverFactory implements IWe
                 break;
         }
 
-        if ("FireFox".equals(webDriverConfig.getBrowser())) {
+        if ((BrowserType.FireFox).equals(webDriverConfig.getBrowser())) {
             driver = getDriverFirefox(url, capability);
         } else {
             driver = new ScreenShotRemoteWebDriver(url, capability);

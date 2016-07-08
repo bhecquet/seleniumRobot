@@ -450,7 +450,7 @@ public class SpreadSheetHelper {
             } catch (Exception e) {
                 logger.warn("Ex", e);
             }
-        } else if (fieldClz.getName().equals("java.util.Calendar")) {
+        } else if ("java.util.Calendar".equals(fieldClz.getName())) {
             Calendar calendar = Calendar.getInstance();
             try {
                 calendar.setTime(new SimpleDateFormat("MM/dd/yyyy").parse(tempValue));
@@ -516,7 +516,7 @@ public class SpreadSheetHelper {
         Map<String, Object> datamap = getFieldsDataNeedToBeSet(dataMap, objectName);
 
         for (String fieldName : fieldMap.keySet()) {
-            String first = "" + fieldName.charAt(0);
+            String first = "" + Character.toString(fieldName.charAt(0));
             String realfieldName = fieldName.replaceFirst(first, first.toLowerCase());
             Object fieldValue = null;
             Class<?> type = null;

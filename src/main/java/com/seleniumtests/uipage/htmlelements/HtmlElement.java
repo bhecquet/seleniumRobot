@@ -384,11 +384,8 @@ public class HtmlElement {
      */
     public String getEval(final String script) {
         findElement();
-
-        String name = (String) ((JavascriptExecutor) driver).executeScript(
-                script, element);
-
-        return name;
+        
+        return (String) ((JavascriptExecutor) driver).executeScript(script, element);
     }
 
     /**
@@ -615,7 +612,7 @@ public class HtmlElement {
         // on mobile and some fields, this throws an exception which prevents going on
         try {
         	String elType = element.getAttribute("type");
-	        if (elType != null && !elType.equalsIgnoreCase("file")) {
+	        if (elType != null && !"file".equalsIgnoreCase(elType)) {
 	        	element.clear();
 	        }
         } catch (WebDriverException | NullPointerException e) {
@@ -640,8 +637,8 @@ public class HtmlElement {
 	 */
 	public String findPattern(Pattern pattern, String attributeName) {
 		findElement();
-		String attributeValue = "";
-		if (attributeName.equals("text")) {
+		String attributeValue;
+		if ("text".equals(attributeName)) {
 			attributeValue = element.getText();
 		} else {
 			attributeValue = element.getAttribute(attributeName);
@@ -664,13 +661,13 @@ public class HtmlElement {
 		
 		// link <a href="#" id="linkPopup2" onclick="window.open('http://www.infotel.com/', '_blank');">
 		String link = findPattern(Pattern.compile(".*(http://.*?)'\"?.*"), attributeName);
-		if (!link.equals("")) {
+		if (!"".equals(link)) {
 			return link;
 		}
 		
 		// link with simple quotes  <a href="#" id="linkPopup" onclick='window.open("http://www.infotel.com/", "_blank");'>
 		link = findPattern(Pattern.compile(".*(http://.*?)\"'?.*"), attributeName);
-		if (!link.equals("")) {
+		if (!"".equals(link)) {
 			return link;
 		}
 		
@@ -693,6 +690,7 @@ public class HtmlElement {
     /**
      * Returns a friendly string, representing the HtmlElement's Type, LabelElement and Locator.
      */
+    @Override
     public String toString() {
         return getClass().getSimpleName().toLowerCase() + " " + getLabel() +
             ", by={" + getBy().toString() + "}";

@@ -16,6 +16,7 @@
         <groups>
             <run>
                 <include name="ut"/>
+                <include name="squash"/>
             </run>
         </groups>
 

@@ -17,7 +17,6 @@ import java.util.Set;
 
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
-import org.openqa.selenium.InvalidSelectorException;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.NoSuchWindowException;
 import org.openqa.selenium.TimeoutException;
@@ -55,7 +54,7 @@ public abstract class BasePage {
     public BasePage() { 
     }
 
-    public void acceptAlert() throws NotCurrentPageException {
+    public void acceptAlert() throws RuntimeException {
         Alert alert = driver.switchTo().alert();
         alert.accept();
         driver.switchTo().defaultContent();
@@ -127,7 +126,7 @@ public abstract class BasePage {
         assertAlertHTML(seenText.contains(text), "assert confirmation text.");
     }
 
-    protected void assertCurrentPage(final boolean log) throws NotCurrentPageException { }
+    protected void assertCurrentPage(final boolean log) throws RuntimeException { }
 
     public void assertElementNotPresent(final HtmlElement element) {
         TestLogging.logWebStep(null, "assert " + element.toHTML() + " is not present.", false);
@@ -240,7 +239,7 @@ public abstract class BasePage {
         assertHTML(getBodyText().toLowerCase().contains(text.toLowerCase()), "Text= {" + text + "} not found.");
     }
 
-    public String cancelConfirmation() throws NotCurrentPageException {
+    public String cancelConfirmation() throws RuntimeException {
         Alert alert = driver.switchTo().alert();
         String seenText = alert.getText();
         alert.dismiss();
@@ -251,8 +250,7 @@ public abstract class BasePage {
     protected abstract void capturePageSnapshot();
 
     public Alert getAlert() {
-        Alert alert = driver.switchTo().alert();
-        return alert;
+        return driver.switchTo().alert();
     }
 
     public String getAlertText() {
@@ -428,11 +426,11 @@ public abstract class BasePage {
         TestLogging.logWebStep(null, "wait for " + element.toString() + " to disappear.", false);
 
         WebDriverWait wait = new WebDriverWait(driver, explictWaitTimeout);
-        wait.until(ExpectedConditions.invisibilityOfElementLocated(element.getBy()));
+        wait.until(ExpectedConditions.invisibilityOfElementLocated(element.getBy())); 
     }
 
     public void waitForPopup(final String locator) {
-        waitForPopUp(locator, sessionTimeout + "");
+        waitForPopUp(locator, Integer.toString(sessionTimeout) + "");
     }
 
     public void waitForPopUp(final String windowID, final String timeout) {
@@ -441,7 +439,7 @@ public abstract class BasePage {
         final Windows windows = new Windows(driver);
 
         if (webUXDriver.getConfig().getBrowser() == BrowserType.InternetExplore) {
-            waitForSeconds(3);
+            WaitHelper.waitForSeconds(3);
         }
 
         new Wait() {
@@ -455,8 +453,7 @@ public abstract class BasePage {
                     }
 
                     return !"about:blank".equals(driver.getCurrentUrl());
-                } catch (SeleniumException e) { }
-                catch (NoSuchWindowException e) { }
+                } catch (SeleniumException|NoSuchWindowException e) { }
 
                 return false;
             }
@@ -471,13 +468,6 @@ public abstract class BasePage {
      *
      * @param  seconds
      */
-    protected void waitForSeconds(final int seconds) {
-        WaitHelper.waitForSeconds(seconds);
-    }
-    
-    protected void waitForMs(final int ms) {
-    	WaitHelper.waitForSeconds(ms);
-    }
 
     public void waitForTextPresent(final HtmlElement element, final String text) {
         Assert.assertNotNull(text, "Text can't be null");
@@ -494,7 +484,7 @@ public abstract class BasePage {
         boolean b = false;
         for (int millisec = 0; millisec < explictWaitTimeout * 1000; millisec += 1000) {
             try {
-                if ((isTextPresent(text))) {
+                if (isTextPresent(text)) {
                     b = true;
                     break;
                 }

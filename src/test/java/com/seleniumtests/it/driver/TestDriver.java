@@ -185,31 +185,6 @@ public class TestDriver {
 		}
 	}
 
-	/**
-	 * Click on link that opens a new window
-	 * Then search an element into this window, close it and search an element into main window
-	 */  
-	@Test(groups={"it"})
-	public void clickLink() {
-
-		String mainHandle = null;
-		try {
-			testPage.link.click();
-		
-			// passage sur le nouvel onglet et recherche d'un élément
-			mainHandle = testPage.selectNewWindow();
-			Assert.assertEquals("a value", driver.findElement(By.id("textInIFrameWithValue")).getAttribute("value"));
-		} finally {
-			// retour sur l'onglet principal
-			if (driver.getWindowHandles().size() > 1) {
-				driver.close();
-				if (mainHandle != null) {
-					testPage.selectWindow(mainHandle);
-				}
-			}
-		}
-		Assert.assertTrue(testPage.link.getUrl().contains("testIFrame.html"));
-	}
 	
 	/**
 	 * Changing data in an input field should throw onBlur event

@@ -32,6 +32,10 @@ import java.util.StringTokenizer;
 
 public class FileUtil {
 
+	private FileUtil() {
+		// As a utility class; it is not meant to be intantiated.
+	}
+	
     /**
      * Writes String representation of the elements in the list in to the file.
      *
@@ -43,7 +47,7 @@ public class FileUtil {
 
     public static void writeListAsStr(final String file, final List list) throws IOException {
 
-        if ((list == null) || (list.size() == 0)
+        if ((list == null) || (list.isEmpty())
                 ||
 
                 (file == null) || (file.trim().length() == 0)) {
@@ -105,7 +109,7 @@ public class FileUtil {
 
         StringTokenizer st = new StringTokenizer(filename, ".");
 
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
 
         // System.out.println("# of tokens " + st.countTokens());
 
@@ -118,11 +122,9 @@ public class FileUtil {
             return st.nextToken();
         }
 
-        String token = null;
+        String token;
 
         while (st.hasMoreTokens()) {
-
-            // System.out.println("token # " + index);
 
             token = st.nextToken();
 
@@ -171,7 +173,7 @@ public class FileUtil {
 
             f.mkdirs();
 
-            if ((filename == null) || (filename.trim().equals(""))) {
+            if ((filename == null) || ("".equals(filename.trim()))) {
 
                 tempFile = File.createTempFile("file1", ".tmp");
             } else {

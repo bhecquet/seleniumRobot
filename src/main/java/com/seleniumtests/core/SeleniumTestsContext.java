@@ -259,7 +259,7 @@ public class SeleniumTestsContext {
         }
     }
     
-    public LinkedList<ScreenShot> getScreenshots() {
+    public List<ScreenShot> getScreenshots() {
         return screenshots;
     }
 
@@ -286,7 +286,7 @@ public class SeleniumTestsContext {
     }
 
     public ScreenShot getExceptionScreenShot() {
-        if (screenshots.isEmpty() && screenshots.getLast().isException()) {
+        if ((!screenshots.isEmpty()) && screenshots.getLast().isException()) {
             return screenshots.getLast();
         } else {
             return null;
@@ -312,7 +312,9 @@ public class SeleniumTestsContext {
 				path.append((new File(url).getParentFile().getParentFile().getAbsoluteFile().toString() + "/").replace(File.separator, "/"));
 				jar = false;
 			}
-		} catch (UnsupportedEncodingException e) {}
+		} catch (UnsupportedEncodingException e) {
+			logger.error(e);
+		}
 		
 		return jar;
 	}
@@ -688,7 +690,7 @@ public class SeleniumTestsContext {
     	}
     	
     	JSONObject devList = new JSONObject((String)getAttribute(DEVICE_LIST));
-    	for (String key: ((Set<String>)devList.keySet())) {
+    	for (String key: (Set<String>)devList.keySet()) {
     		deviceList.put(key, devList.getString(key));
     	}
     	return deviceList;
@@ -1218,7 +1220,7 @@ public class SeleniumTestsContext {
 			testConfig = new ConfigReader().readConfig(FileUtils.openInputStream(new File(CONFIG_PATH + File.separator + "config.ini")));
 		} catch (IOException e1) {
 			TestLogging.warning("no valid config.ini file for this application");
-			testConfig = new HashMap<String, String>();
+			testConfig = new HashMap<>();
 		}
 		
 		testConfig.putAll(testVariables);

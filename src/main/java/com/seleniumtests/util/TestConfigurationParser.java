@@ -52,7 +52,7 @@ public class TestConfigurationParser {
 	}
 
     public List<Node> getParameterNodes() {
-        List<Node> nList = new ArrayList<Node>();
+        List<Node> nList = new ArrayList<>();
         if (doc == null) {
         	return nList;
         }
@@ -60,7 +60,7 @@ public class TestConfigurationParser {
         
         for (int i = 0; i < tmpnList.getLength(); i++) {
             Node nNode = tmpnList.item(i);
-            if (nNode.getNodeName().equals("parameter")) {
+            if ("parameter".equals(nNode.getNodeName())) {
             	nList.add(nNode);
             }
         }
@@ -69,7 +69,7 @@ public class TestConfigurationParser {
     }
     
     public List<Node> getDeviceNodes() {
-    	List<Node> nList = new ArrayList<Node>();
+    	List<Node> nList = new ArrayList<>();
     	if (doc == null) {
         	return nList;
         }
@@ -95,7 +95,7 @@ public class TestConfigurationParser {
     }
     
     public List<Node> getServiceNodes() {
-    	List<Node> nList = new ArrayList<Node>();
+    	List<Node> nList = new ArrayList<>();
     	if (doc == null) {
         	return nList;
         }

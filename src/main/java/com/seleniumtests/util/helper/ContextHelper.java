@@ -15,6 +15,10 @@ package com.seleniumtests.util.helper;
 
 public class ContextHelper {
 
+	private ContextHelper() {
+		// As a utility class, it is not meant to be instantiated.
+	}
+	
     private static class Helper extends SecurityManager {
 
         Class[] getContext() {

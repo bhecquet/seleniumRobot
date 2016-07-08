@@ -17,12 +17,10 @@ import java.io.File;
 import org.apache.log4j.Logger;
 import java.nio.file.Paths;
 import java.util.HashMap;
-
-import org.ini4j.InvalidFileFormatException;
+import java.util.Map;
 
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
-import com.seleniumtests.core.runner.CucumberRunner;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.reporter.TestLogging;
 import com.seleniumtests.util.helper.IniHelper;
@@ -37,7 +35,7 @@ public class ConfigMappingReader {
 	 * @param page name of the caller page : will read the part [page] in the .ini
 	 * @return the HashMap with all properties corresponding with the mobile using and the page
 	 */
-	public HashMap<String, String> readConfig(String page) {
+	public Map<String, String> readConfig(String page) {
 		
 		//Recup values in context, lowerCase because of the name of directories but can be to change...
 		String mobile = SeleniumTestsContextManager.getThreadContext().getPlatform().toLowerCase();
@@ -50,7 +48,7 @@ public class ConfigMappingReader {
 	 * @author  Sophie
 	 * @return the HashMap with all properties corresponding with the mobile using 
 	 */
-	public HashMap<String, HashMap<String, String>> readConfig() {
+	public Map<String, HashMap<String, String>> readConfig() {
 		
 		//Recup values in context, lowerCase because of the name of directories but can be to change...
 		String mobile = SeleniumTestsContextManager.getThreadContext().getPlatform().toLowerCase();
@@ -66,10 +64,8 @@ public class ConfigMappingReader {
 	 * @param page name of the caller page : will read the part [page] in the .ini
 	 * @return the HashMap with all properties corresponding with the mobile using and the page caller
 	 */
-	public HashMap<String, String> readConfig(String type, String version, String page){
-		HashMap<String, String> res = new HashMap<String, String>();
-		res = readConfig(type, version).get(page);
-		return res;
+	public Map<String, String> readConfig(String type, String version, String page){
+		return readConfig(type, version).get(page);
 	}
 	
 	/**
@@ -78,10 +74,10 @@ public class ConfigMappingReader {
 	 * @param version name of the directory representing the version (4.4, ios_6, etc), can be empty
 	 * @return the HashMap with all properties corresponding with the mobile using 
 	 */
-	public HashMap<String, HashMap<String,String>> readConfig(String type, String version){
+	public Map<String, HashMap<String,String>> readConfig(String type, String version){
 		
 		//create HashMap for result
-		HashMap<String, HashMap<String,String>> testConfig = new HashMap<String, HashMap<String,String>>();
+		Map<String, HashMap<String,String>> testConfig = new HashMap<>();
 		
 		//create String for Paths
 		String pathToLoad = "";
@@ -89,11 +85,11 @@ public class ConfigMappingReader {
 		String secondPathToHerite = "";
 	
 		//modify path of Files with the arguments 
-		if(type != null && !type.equals("")){
+		if(type != null && !"".equals(type)){
 			pathToHerite =  Paths.get(SeleniumTestsContext.getConfigPath(), "objectMapping.ini").toString();
 			pathToLoad = Paths.get(pathToLoad, type).toString();
 			
-			if(version != null && !version.equals("")){
+			if(version != null && !"".equals(version)){
 				secondPathToHerite =  Paths.get(SeleniumTestsContext.getConfigPath(), type, "objectMapping.ini").toString();
 				pathToLoad = Paths.get(pathToLoad, version).toString();
 			}
@@ -109,7 +105,7 @@ public class ConfigMappingReader {
 	
 			
 		//load parents data
-		if(type != null &&  !type.equals("")){
+		if(type != null &&  !"".equals(type)){
 			//extract values from the common file for all types of mobile
 			try{
 				testConfig = IniHelper.readIniFile(fileForIniToHerite, testConfig);	
@@ -118,7 +114,7 @@ public class ConfigMappingReader {
 				logger.debug("No such file : " + fileForIniToHerite);
 			}
 
-			if(version != null && !version.equals("")){
+			if(version != null && !"".equals(version)){
 				//extract values from the common file for this type of mobile (android or ios)
 				try{
 					testConfig = IniHelper.readIniFile(secondFileForIniToHerite, testConfig);
