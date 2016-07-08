@@ -96,9 +96,9 @@ public class SeleniumTestsContextManager {
     }
 
     public static void initGlobalContext(ITestContext testNGCtx) {
-        testNGCtx = getContextFromConfigFile(testNGCtx);
-        globalContext = new SeleniumTestsContext(testNGCtx);
-        loadCustomizedContextAttribute(testNGCtx, globalContext);
+    	ITestContext newTestNGCtx = getContextFromConfigFile(testNGCtx);
+        globalContext = new SeleniumTestsContext(newTestNGCtx);
+        loadCustomizedContextAttribute(newTestNGCtx, globalContext);
     }
 
     /**
@@ -107,55 +107,53 @@ public class SeleniumTestsContextManager {
      * @return  iTestContext having parameters set from external config file
      */
     public static ITestContext getContextFromConfigFile(final ITestContext iTestContext) {
-        if (iTestContext != null) {
+        if (iTestContext != null && iTestContext.getSuite().getParameter(SeleniumTestsContext.TEST_CONFIGURATION) != null) {
 
             // "testConfig" parameter can be defined in testng.xml file
             // This parameter points to a config xml file which defines test configuration parameters
             // Hence testng.xml file can focus on test
-            if (iTestContext.getSuite().getParameter(SeleniumTestsContext.TEST_CONFIGURATION) != null) {
-                File suiteFile = new File(iTestContext.getSuite().getXmlSuite().getFileName());
-                String configFile = suiteFile.getPath().replace(suiteFile.getName(), "") + iTestContext.getSuite().getParameter("testConfig");
-                
-                TestConfigurationParser configParser = new TestConfigurationParser(configFile);
-                Map<String, String> parameters;
-                
-                if (iTestContext.getCurrentXmlTest() != null) {
-                	parameters = iTestContext.getCurrentXmlTest().getSuite().getParameters();
-                } else {
-                	parameters = iTestContext.getSuite().getXmlSuite().getParameters();
-                }
+            File suiteFile = new File(iTestContext.getSuite().getXmlSuite().getFileName());
+            String configFile = suiteFile.getPath().replace(suiteFile.getName(), "") + iTestContext.getSuite().getParameter("testConfig");
+            
+            TestConfigurationParser configParser = new TestConfigurationParser(configFile);
+            Map<String, String> parameters;
+            
+            if (iTestContext.getCurrentXmlTest() != null) {
+            	parameters = iTestContext.getCurrentXmlTest().getSuite().getParameters();
+            } else {
+            	parameters = iTestContext.getSuite().getXmlSuite().getParameters();
+            }
 
-                // insert parameters
-	            for (Node node: configParser.getParameterNodes()) {
-		            parameters.put(node.getAttributes().getNamedItem("name").getNodeValue(),
-		            		       node.getAttributes().getNamedItem("value").getNodeValue());
-		        }
+            // insert parameters
+            for (Node node: configParser.getParameterNodes()) {
+	            parameters.put(node.getAttributes().getNamedItem("name").getNodeValue(),
+	            		       node.getAttributes().getNamedItem("value").getNodeValue());
+	        }
+            
+            // get configuration for services. Only insert paramters corresponding to the right service defined in runMode
+            String runMode = System.getProperty(SeleniumTestsContext.RUN_MODE) != null ?
+            		System.getProperty(SeleniumTestsContext.RUN_MODE): iTestContext.getSuite().getParameter(SeleniumTestsContext.RUN_MODE) != null ?
+            				iTestContext.getSuite().getParameter(SeleniumTestsContext.TEST_CONFIGURATION) : "LOCAL";
+            for (Node node: configParser.getServiceNodes()) {
+            	if (node.getAttributes().getNamedItem("name").getNodeValue().equalsIgnoreCase(runMode)) {
+            		NodeList nList = node.getChildNodes();
+            		for (int i = 0; i < nList.getLength(); i++ ) {
+            			Node paramNode = nList.item(i);
+            			if (paramNode.getNodeName().equals("parameter")) {
+                			parameters.put(paramNode.getAttributes().getNamedItem("name").getNodeValue(),
+                						   paramNode.getAttributes().getNamedItem("value").getNodeValue());
+            			}
+            		}
+            	}
+            }
+            
+            // 
+            parameters.put(SeleniumTestsContext.DEVICE_LIST, configParser.getDeviceNodesAsJson());
                 
-                // get configuration for services. Only insert paramters corresponding to the right service defined in runMode
-                String runMode = System.getProperty(SeleniumTestsContext.RUN_MODE) != null ?
-                		System.getProperty(SeleniumTestsContext.RUN_MODE): iTestContext.getSuite().getParameter(SeleniumTestsContext.RUN_MODE) != null ?
-                				iTestContext.getSuite().getParameter(SeleniumTestsContext.TEST_CONFIGURATION) : "LOCAL";
-                for (Node node: configParser.getServiceNodes()) {
-                	if (node.getAttributes().getNamedItem("name").getNodeValue().equalsIgnoreCase(runMode)) {
-                		NodeList nList = node.getChildNodes();
-                		for (int i = 0; i < nList.getLength(); i++ ) {
-                			Node paramNode = nList.item(i);
-                			if (paramNode.getNodeName().equals("parameter")) {
-	                			parameters.put(paramNode.getAttributes().getNamedItem("name").getNodeValue(),
-	                						   paramNode.getAttributes().getNamedItem("value").getNodeValue());
-                			}
-                		}
-                	}
-                }
-                
-                // 
-                parameters.put(SeleniumTestsContext.DEVICE_LIST, configParser.getDeviceNodesAsJson());
-                    
-                if (iTestContext.getCurrentXmlTest() != null) {
-                	iTestContext.getCurrentXmlTest().getSuite().setParameters(parameters);
-                } else {
-                	iTestContext.getSuite().getXmlSuite().setParameters(parameters);
-                }
+            if (iTestContext.getCurrentXmlTest() != null) {
+            	iTestContext.getCurrentXmlTest().getSuite().setParameters(parameters);
+            } else {
+            	iTestContext.getSuite().getXmlSuite().setParameters(parameters);
             }
         }
 

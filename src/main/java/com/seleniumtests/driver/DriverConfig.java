@@ -67,7 +67,6 @@ public class DriverConfig {
     private TestType testType;
 
     // Use same platform property as the one used for browser
-    // private String platformName;
     private String appiumServerURL;
     private String mobilePlatformVersion;
     private String deviceName;

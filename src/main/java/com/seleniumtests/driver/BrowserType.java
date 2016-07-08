@@ -25,35 +25,28 @@ public enum BrowserType {
     PhantomJS("*phantomjs"),
     ;
 
-	private String browserType;
+	private String bType;
 
     BrowserType(final String type) {
-        this.browserType = type;
+        this.bType = type;
     }
 	
     public static BrowserType getBrowserType(final String browserType) {
         if (browserType.toLowerCase().contains("firefox")) {
             return BrowserType.FireFox;
-        } 
-        if (browserType.toLowerCase().contains("iexplore")) {
+        } else if (browserType.toLowerCase().contains("iexplore")) {
             return BrowserType.InternetExplore;
-        } 
-        if (browserType.toLowerCase().contains("chrome")) {
+        } else if (browserType.toLowerCase().contains("chrome")) {
             return BrowserType.Chrome;
-        } 	
-        if (browserType.toLowerCase().contains("opera")) {
+        } else if (browserType.toLowerCase().contains("opera")) {
         	return BrowserType.Opera;
-        } 
-        if (browserType.toLowerCase().contains("htmlunit")) {
+        } else if (browserType.toLowerCase().contains("htmlunit")) {
             return BrowserType.HtmlUnit;
-        } 
-        if (browserType.toLowerCase().contains("safari")) {
+        }  else if (browserType.toLowerCase().contains("safari")) {
             return BrowserType.Safari;
-        } 
-        if (browserType.toLowerCase().contains("browser")) {
+        } else if (browserType.toLowerCase().contains("browser")) {
         	return BrowserType.Browser;
-        } 
-        if (browserType.toLowerCase().contains("phantomjs")) {
+        } else if (browserType.toLowerCase().contains("phantomjs")) {
             return BrowserType.PhantomJS;
         } 
         throw new IllegalArgumentException(String.format("browser %s is unknown", browserType));
@@ -61,7 +54,7 @@ public enum BrowserType {
     }
 
     public String getBrowserType() {
-        return this.browserType;
+        return this.bType;
     }
 
 }

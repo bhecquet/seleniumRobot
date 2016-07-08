@@ -35,7 +35,6 @@ import org.openqa.selenium.interactions.HasInputDevices;
 import org.openqa.selenium.interactions.Mouse;
 import org.openqa.selenium.internal.Locatable;
 import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.SystemClock;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
@@ -60,7 +59,6 @@ public class HtmlElement {
     protected WebElement element = null;
     private String label = null;
     private HtmlElement parent = null;
-    private static SystemClock clock = new SystemClock();
     private int elementIndex = -1;
     private By by = null;
 
@@ -279,14 +277,19 @@ public class HtmlElement {
 				if (element.getAttribute("style").toLowerCase().replace(" ", "").contains("display:none")) {
 					changeCssAttribute(element, "display", "block");
 				}
+			} catch (Exception e) {
+				return;
+			}
 				
-				// wait for element to be displayed
-				try {
-					new WebDriverWait(driver, 1).until(ExpectedConditions.visibilityOf(element));
-				} catch (ElementNotVisibleException e) {
-					TestLogging.logInfo(String.format("element %s not visible", element));
-				}
-			} catch (Exception e) {}
+			// wait for element to be displayed
+			try {
+				new WebDriverWait(driver, 1).until(ExpectedConditions.visibilityOf(element));
+			} catch (ElementNotVisibleException e) {
+				TestLogging.logInfo(String.format("element %s not visible", element));
+			} catch (Exception e) {
+				logger.warn("Could not make element visible");
+			}
+			
 		}
 	}
 
@@ -570,9 +573,6 @@ public class HtmlElement {
         TestLogging.log("MouseOver " + this.toString());
         findElement();
 
-        // build and perform the mouseOver with Advanced User Interactions API
-        // Actions builder = new Actions(driver);
-        // builder.moveToElement(element).build().perform();
         Locatable hoverItem = (Locatable) element;
         Mouse mouse = ((HasInputDevices) driver).getMouse();
         mouse.mouseMove(hoverItem.getCoordinates());

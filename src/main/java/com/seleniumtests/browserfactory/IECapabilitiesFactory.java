@@ -18,6 +18,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
 
+import org.apache.commons.io.FileUtils;
 import org.openqa.selenium.Platform;
 import org.openqa.selenium.Proxy;
 import org.openqa.selenium.ie.InternetExplorerDriver;
@@ -42,9 +43,9 @@ public class IECapabilitiesFactory extends ICapabilitiesFactory {
         
         if (!new File(dir + iEDriverServerFile).exists()) {
             if (OSUtility.getIEVersion() < 10) {
-                FileUtility.copyFile(dir + "\\IEDriverServer_x64.exe", dir + iEDriverServerFile);
+                FileUtils.copyFile(new File(dir + "\\IEDriverServer_x64.exe"), new File(dir + iEDriverServerFile));
             } else {
-                FileUtility.copyFile(dir + "\\IEDriverServer_Win32.exe", dir + iEDriverServerFile); // Win32
+            	FileUtils.copyFile(new File(dir + "\\IEDriverServer_Win32.exe"), new File(dir + iEDriverServerFile)); // Win32
             }
         }
         

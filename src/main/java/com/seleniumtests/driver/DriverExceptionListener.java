@@ -43,25 +43,39 @@ public class DriverExceptionListener implements WebDriverEventListener {
     }
 
 	@Override
-    public void afterClickOn(final WebElement arg0, final WebDriver driver) {  }
+    public void afterClickOn(final WebElement arg0, final WebDriver driver) {
+		// do nothing
+	}
 
 	@Override
-    public void afterFindBy(final By arg0, final WebElement arg1, final WebDriver arg2) { }
+    public void afterFindBy(final By arg0, final WebElement arg1, final WebDriver arg2) {
+		// do nothing
+	}
 
 	@Override
-    public void afterNavigateBack(final WebDriver arg0) { }
+    public void afterNavigateBack(final WebDriver arg0) {
+		// do nothing
+	}
 
 	@Override
-    public void afterNavigateForward(final WebDriver arg0) { }
+    public void afterNavigateForward(final WebDriver arg0) {
+		// do nothing
+	}
 
 	@Override
-    public void afterNavigateTo(final String arg0, final WebDriver arg1) { }
+    public void afterNavigateTo(final String arg0, final WebDriver arg1) {
+		// do nothing
+	}
 
     @Override
-    public void afterScript(final String arg0, final WebDriver arg1) { }
+    public void afterScript(final String arg0, final WebDriver arg1) {
+    	// do nothing
+    }
 
     @Override
-    public void beforeChangeValueOf(final WebElement arg0, final WebDriver arg1) { }
+    public void beforeChangeValueOf(final WebElement arg0, final WebDriver arg1) {
+    	// do nothing
+    }
 
     @Override
     public void beforeClickOn(final WebElement arg0, final WebDriver driver) {
@@ -71,25 +85,39 @@ public class DriverExceptionListener implements WebDriverEventListener {
     }
 
     @Override
-    public void beforeFindBy(final By arg0, final WebElement arg1, final WebDriver arg2) { }
+    public void beforeFindBy(final By arg0, final WebElement arg1, final WebDriver arg2) {
+    	// do nothing
+    }
 
     @Override
-    public void beforeNavigateBack(final WebDriver arg0) { }
+    public void beforeNavigateBack(final WebDriver arg0) {
+    	// do nothing
+    }
 
     @Override
-    public void beforeNavigateForward(final WebDriver arg0) { }
+    public void beforeNavigateForward(final WebDriver arg0) {
+    	// do nothing
+    }
 
     @Override
-    public void beforeNavigateTo(final String arg0, final WebDriver arg1) { }
+    public void beforeNavigateTo(final String arg0, final WebDriver arg1) {
+    	// do nothing
+    }
 
     @Override
-    public void beforeScript(final String arg0, final WebDriver arg1) { }
+    public void beforeScript(final String arg0, final WebDriver arg1) {
+    	// do nothing
+    }
     
     @Override
-    public void afterNavigateRefresh(WebDriver arg0) {	}
+    public void afterNavigateRefresh(WebDriver arg0) {
+    	// do nothing
+    }
 
     @Override
-	public void beforeNavigateRefresh(WebDriver arg0) {	}
+	public void beforeNavigateRefresh(WebDriver arg0) {
+    	// do nothing
+    }
 
     @Override
     public void onException(final Throwable ex, final WebDriver arg1) {
@@ -116,7 +144,7 @@ public class DriverExceptionListener implements WebDriverEventListener {
             }
 
             logger.error(ex);
-            // return;
+
         } else if (ex.getMessage().contains("Error communicating with the remote browser. It may have died.")) {
 
             // Session has lost connection, remove it then ignore quit() method.
@@ -156,9 +184,6 @@ public class DriverExceptionListener implements WebDriverEventListener {
             try {
                 new ScreenshotUtil(arg1).capturePageSnapshotOnException();
             } catch (Exception e) {
-
-                // Ignore all exceptions
-//                e.printStackTrace();
             }
         }
     }
