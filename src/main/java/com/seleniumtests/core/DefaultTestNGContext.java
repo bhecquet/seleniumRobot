@@ -14,17 +14,19 @@
 
 package com.seleniumtests.core;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 
 import org.testng.IClass;
 import org.testng.IResultMap;
 import org.testng.ISuite;
 import org.testng.ITestContext;
 import org.testng.ITestNGMethod;
-
+import org.testng.internal.TestNGMethod;
 import org.testng.xml.XmlTest;
 
 import com.google.inject.Injector;
@@ -51,9 +53,10 @@ public class DefaultTestNGContext implements ITestContext {
 
     @Override
     public Set<String> getAttributeNames() {
-        return null;
+        return new TreeSet<>();
     }
 
+    @Override
     public Object removeAttribute(final String name) {
         return null;
     }
@@ -95,12 +98,12 @@ public class DefaultTestNGContext implements ITestContext {
 
     @Override
     public String[] getIncludedGroups() {
-        return null;
+        return new String[] {};
     }
 
     @Override
     public String[] getExcludedGroups() {
-        return null;
+        return new String[] {};
     }
 
     @Override
@@ -115,7 +118,7 @@ public class DefaultTestNGContext implements ITestContext {
 
     @Override
     public ITestNGMethod[] getAllTestMethods() {
-        return null;
+        return new TestNGMethod[] {};
     }
 
     @Override
@@ -125,7 +128,7 @@ public class DefaultTestNGContext implements ITestContext {
 
     @Override
     public Collection<ITestNGMethod> getExcludedMethods() {
-        return null;
+        return new ArrayList<>();
     }
 
     @Override
@@ -150,7 +153,7 @@ public class DefaultTestNGContext implements ITestContext {
 
     @Override
     public List<Module> getGuiceModules(final Class<? extends Module> cls) {
-        return null;
+        return new ArrayList<>();
     }
 
     public void addGuiceModule(final Class<? extends Module> cls, final Module module) { 
@@ -163,7 +166,9 @@ public class DefaultTestNGContext implements ITestContext {
     }
 
     @Override
-    public void addInjector(final List<Module> moduleInstances, final Injector injector) { }
+    public void addInjector(final List<Module> moduleInstances, final Injector injector) { 
+    	// do nothing
+    }
 
     @Override
 	public Injector getInjector(IClass iClass) {

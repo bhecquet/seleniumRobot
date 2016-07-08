@@ -15,6 +15,7 @@ package com.seleniumtests.core;
 
 import org.testng.ITestContext;
 
+@FunctionalInterface
 public interface IContextAttributeListener {
     void load(ITestContext testNGCtx, SeleniumTestsContext seleniumTestsCtx);
 }

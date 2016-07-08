@@ -16,8 +16,8 @@ package com.seleniumtests.browserfactory;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Paths;
 
+import org.apache.commons.io.FileUtils;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxProfile;
 import org.openqa.selenium.remote.CapabilityType;
@@ -28,7 +28,6 @@ import com.seleniumtests.driver.DriverConfig;
 import com.seleniumtests.driver.JavaScriptError;
 import com.seleniumtests.reporter.TestLogging;
 import com.seleniumtests.util.FileUtility;
-import com.seleniumtests.util.OSUtility;
 
 public class FirefoxCapabilitiesFactory extends ICapabilitiesFactory {
     private static boolean isProfileCreated = false;
@@ -139,7 +138,7 @@ public class FirefoxCapabilitiesFactory extends ICapabilitiesFactory {
             try {
                 if (!isProfileCreated) {
                     logger.info("start create profile");
-                    FileUtility.deleteDirectory(profilePath);
+                    FileUtils.deleteDirectory(new File(profilePath));
                     FileUtility.extractJar(profilePath, FireFoxProfileMarker.class);
                 }
             } catch (Exception ex) {

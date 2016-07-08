@@ -30,9 +30,7 @@ public class Table extends HtmlElement {
     @Override
     public void findElement() {
         super.findElement();
-        try {
-            rows = element.findElements(By.tagName("tr"));
-        } catch (NotFoundException e) { }
+        rows = element.findElements(By.tagName("tr"));
 
     }
 
@@ -49,13 +47,11 @@ public class Table extends HtmlElement {
 
             if (columns == null || columns.isEmpty()) {
 
-                try {
-                    if (rows.size() > 1) {
-                        columns = rows.get(1).findElements(By.tagName("td"));
-                    } else {
-                        columns = rows.get(0).findElements(By.tagName("th"));
-                    }
-                } catch (NotFoundException e) { }
+                if (rows.size() > 1) {
+                    columns = rows.get(1).findElements(By.tagName("td"));
+                } else {
+                    columns = rows.get(0).findElements(By.tagName("th"));
+                }
             }
         }
 
@@ -87,11 +83,11 @@ public class Table extends HtmlElement {
             } catch (NotFoundException e) { }
 
             if (columns == null || columns.isEmpty()) {
-                try {
-                    columns = rows.get(row - 1).findElements(By.tagName("th"));
-                } catch (NotFoundException e) {
-                	return null;
-                }
+                columns = rows.get(row - 1).findElements(By.tagName("th"));
+            }
+            
+            if (columns.size() == 0) {
+            	return null;
             }
 
             return columns.get(column - 1).getText();

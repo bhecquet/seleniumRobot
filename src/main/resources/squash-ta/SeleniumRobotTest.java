@@ -11,7 +11,7 @@ public class SeleniumRobotTest {
 
 	@Test
 	public void test() throws Exception {
-		String command = "\"%JAVA_HOME_STF%/bin/java\" -cp %STF_HOME%/seleniumRobot.jar:%STF_HOME%/plugins/${application}-tests.jar -Dbrowser=${IT_CUF_browser} ${TC_CUF_cucumberTest} -Denv=${IT_CUF_testEnvironment} ${TC_CUF_parametres} org.testng.TestNG ${testngFile} -testnames ${testngName}";
+		String command = "\"%JAVA_HOME_STF%/bin/java\" -cp %STF_HOME%/seleniumRobot.jar:%STF_HOME%/plugins/${application}-tests.jar -Dbrowser=${IT_CUF_browser} ${TC_CUF_cucumberTest} -Denv=${IT_CUF_testEnvironment} org.testng.TestNG ${testngFile} -testnames ${testngName}";
 		
 		if (System.getProperty("os.name").toLowerCase().contains("windows")) {
 			command = command.replace("seleniumRobot.jar:", "seleniumRobot.jar;");
@@ -22,7 +22,6 @@ public class SeleniumRobotTest {
 		
 		String line;
 		StringBuilder output = new StringBuilder();
-		String[] results = result.split("\\,");
 		
 		System.out.println("Starting STF with: " + command);
 	    Process p = Runtime.getRuntime().exec(command);

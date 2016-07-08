@@ -16,7 +16,6 @@ package com.seleniumtests.driver;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -128,8 +127,6 @@ public class WebUIDriver {
                 } catch (WebDriverException ex) {
                     logger.error(ex);
                 }
-
-                driver = null;
             }
         }
 
@@ -203,14 +200,15 @@ public class WebUIDriver {
     }
 
     protected WebDriver handleListeners(WebDriver driver) {
+    	WebDriver listeningDriver = driver;
         List<WebDriverEventListener> listeners = config.getWebDriverListeners();
         if (listeners != null && !listeners.isEmpty()) {
             for (int i = 0; i < config.getWebDriverListeners().size(); i++) {
-                driver = new CustomEventFiringWebDriver(driver).register(listeners.get(i));
+            	listeningDriver = new CustomEventFiringWebDriver(listeningDriver).register(listeners.get(i));
             }
         }
 
-        return driver;
+        return listeningDriver;
     }
 
     public WebDriver createWebDriver() throws IOException  {

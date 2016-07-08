@@ -57,7 +57,7 @@ public class SeleniumTestsContext {
 	private static String FEATURES_PATH;
 	private static String CONFIG_PATH;
 	private static String APPLICATION_NAME;
-	public Map<String, HashMap<String,String>> idMapping;
+	private Map<String, HashMap<String,String>> idMapping;
 	public static final String DATA_FOLDER_NAME = "data";
 	
 	private static final Logger logger = TestLogging.getLogger(SeleniumTestsContext.class);

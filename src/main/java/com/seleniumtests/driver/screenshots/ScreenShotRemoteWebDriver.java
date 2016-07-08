@@ -32,8 +32,7 @@ public class ScreenShotRemoteWebDriver extends RemoteWebDriver implements TakesS
         super(url, capabilities);
     }
 
-    public ScreenShotRemoteWebDriver() { }
-
+    @Override
     public <X> X getScreenshotAs(final OutputType<X> target) throws WebDriverException {
         if ((Boolean) getCapabilities().getCapability(CapabilityType.TAKES_SCREENSHOT)) {
             String output = execute(DriverCommand.SCREENSHOT).getValue().toString();
