@@ -88,6 +88,8 @@ public class SeleniumTestsReporter implements IReporter, ITestListener, IInvoked
 
     private static Logger logger = TestLogging.getLogger(SeleniumTestsReporter.class);
 
+    private static final String RESOURCE_LOADER_PATH = "org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader";
+    
     private Map<String, Boolean> isRetryHandleNeeded = new HashMap<>();
 
     private Map<String, IResultMap> failedTests = new HashMap<>();
@@ -393,8 +395,7 @@ public class SeleniumTestsReporter implements IReporter, ITestListener, IInvoked
         try {
             VelocityEngine ve = new VelocityEngine();
             ve.setProperty("resource.loader", "class");
-            ve.setProperty("class.resource.loader.class",
-                "org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader");
+            ve.setProperty("class.resource.loader.class", RESOURCE_LOADER_PATH);
             ve.init();
 
             List<SeleniumTestsPageListener> pageListenersList = PluginsHelper.getInstance().getPageListeners();
@@ -431,7 +432,7 @@ public class SeleniumTestsReporter implements IReporter, ITestListener, IInvoked
             final StringBuilder sbCalcount) {
         int pageCount = 0;
 
-        Set<ITestResult> testResults = new HashSet<ITestResult>();
+        Set<ITestResult> testResults = new HashSet<>();
 
         addAllTestResults(testResults, tc.getPassedTests());
         addAllTestResults(testResults, failedTests.get(tc.getName()));
@@ -502,8 +503,7 @@ public class SeleniumTestsReporter implements IReporter, ITestListener, IInvoked
         try {
             VelocityEngine ve = new VelocityEngine();
             ve.setProperty("resource.loader", "class");
-            ve.setProperty("class.resource.loader.class",
-                "org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader");
+            ve.setProperty("class.resource.loader.class", RESOURCE_LOADER_PATH);
             ve.init();
 
             if (envt) {
@@ -751,8 +751,7 @@ public class SeleniumTestsReporter implements IReporter, ITestListener, IInvoked
         try {
             VelocityEngine ve = new VelocityEngine();
             ve.setProperty("resource.loader", "class");
-            ve.setProperty("class.resource.loader.class",
-                "org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader");
+            ve.setProperty("class.resource.loader.class", RESOURCE_LOADER_PATH);
             ve.init();
 
             Template t = ve.getTemplate("/templates/report.part.testDetail.html");
@@ -870,8 +869,7 @@ public class SeleniumTestsReporter implements IReporter, ITestListener, IInvoked
         try {
             VelocityEngine ve = new VelocityEngine();
             ve.setProperty("resource.loader", "class");
-            ve.setProperty("class.resource.loader.class",
-                "org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader");
+            ve.setProperty("class.resource.loader.class", RESOURCE_LOADER_PATH);
             ve.init();
 
             Template t = ve.getTemplate("/templates/report.part.summary.html");
@@ -1103,6 +1101,7 @@ public class SeleniumTestsReporter implements IReporter, ITestListener, IInvoked
         return null;
     }
 
+    @Override
     public void onFinish(final ITestContext arg0) {
         if (isRetryHandleNeeded.get(arg0.getName())) {
             removeIncorrectlySkippedTests(arg0, failedTests.get(arg0.getName()));
@@ -1113,12 +1112,14 @@ public class SeleniumTestsReporter implements IReporter, ITestListener, IInvoked
         }
     }
 
+    @Override
     public void onStart(final ITestContext arg0) {
         isRetryHandleNeeded.put(arg0.getName(), false);
         failedTests.put(arg0.getName(), new ResultMap());
         skippedTests.put(arg0.getName(), new ResultMap());
     }
 
+    @Override
     public void onTestFailedButWithinSuccessPercentage(final ITestResult arg0) { }
 
     /**
@@ -1128,6 +1129,7 @@ public class SeleniumTestsReporter implements IReporter, ITestListener, IInvoked
      * @param argO
      * 
      **/
+    @Override
     public synchronized void onTestFailure(final ITestResult arg0) {
         if (arg0.getMethod().getRetryAnalyzer() != null) {
             ITestRetryAnalyzer testRetryAnalyzer = (ITestRetryAnalyzer) arg0.getMethod().getRetryAnalyzer();
@@ -1141,7 +1143,7 @@ public class SeleniumTestsReporter implements IReporter, ITestListener, IInvoked
                 failedTests.put(arg0.getTestContext().getName(), rMap);
             }
 
-            System.out.println(arg0.getMethod() + " Failed in " + testRetryAnalyzer.getCount() + " times");
+            logger.info(arg0.getMethod() + " Failed in " + testRetryAnalyzer.getCount() + " times");
             isRetryHandleNeeded.put(arg0.getTestContext().getName(), true);
         }
 
@@ -1152,8 +1154,10 @@ public class SeleniumTestsReporter implements IReporter, ITestListener, IInvoked
         }
     }
 
+    @Override
     public void onTestSkipped(final ITestResult arg0) { }
 
+    @Override
     public void onTestStart(final ITestResult arg0) { }
 
     /**
@@ -1163,6 +1167,7 @@ public class SeleniumTestsReporter implements IReporter, ITestListener, IInvoked
      * @param argO
      * 
      **/
+    @Override
     public void onTestSuccess(final ITestResult arg0) {
     	 // capture snap shot at the end of the test
         if (WebUIDriver.getWebDriver() != null) {
@@ -1192,7 +1197,7 @@ public class SeleniumTestsReporter implements IReporter, ITestListener, IInvoked
             }
 
             if (!isFailed) {
-                System.out.println("Removed failed cases:" + result.getMethod().getMethodName());
+                logger.info("Removed failed cases:" + result.getMethod().getMethodName());
                 removeMap.addResult(result, result.getMethod());
             }
         }
@@ -1222,7 +1227,7 @@ public class SeleniumTestsReporter implements IReporter, ITestListener, IInvoked
      * @return
      */
     private void removeIncorrectlySkippedTests(final ITestContext tc, final IResultMap map) {
-        List<ITestNGMethod> failsToRemove = new ArrayList<ITestNGMethod>();
+        List<ITestNGMethod> failsToRemove = new ArrayList<>();
         IResultMap returnValue = tc.getSkippedTests();
 
         for (ITestResult result : returnValue.getAllResults()) {
@@ -1268,8 +1273,7 @@ public class SeleniumTestsReporter implements IReporter, ITestListener, IInvoked
         try {
             VelocityEngine ve = new VelocityEngine();
             ve.setProperty("resource.loader", "class");
-            ve.setProperty("class.resource.loader.class",
-                "org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader");
+            ve.setProperty("class.resource.loader.class", RESOURCE_LOADER_PATH);
             ve.init();
 
             Template t = ve.getTemplate("/templates/report.part.header.html");
@@ -1326,8 +1330,8 @@ public class SeleniumTestsReporter implements IReporter, ITestListener, IInvoked
                 }
 
                 String img = "<img src=\"";
-                String m_root = "resources/images/mktree/";
-                img += m_root + "/test" + getFailedOrSkippedResult(ctx, m).getStatus() + ".gif";
+                String mRoot = "resources/images/mktree/";
+                img += mRoot + "/test" + getFailedOrSkippedResult(ctx, m).getStatus() + ".gif";
                 img += "\"/>";
 
                 res.append(intendstr + "<li>" + img + m);
@@ -1350,7 +1354,7 @@ public class SeleniumTestsReporter implements IReporter, ITestListener, IInvoked
 
             String dependentGroup = method.getGroupsDependedUpon()[i];
 
-            Set<ITestNGMethod> methods = new LinkedHashSet<ITestNGMethod>();
+            Set<ITestNGMethod> methods = new LinkedHashSet<>();
             Collection<ITestNGMethod> c = suite.getMethodsByGroups().get(dependentGroup);
 
             if (c != null) {
@@ -1367,8 +1371,8 @@ public class SeleniumTestsReporter implements IReporter, ITestListener, IInvoked
                 }
 
                 String img = "<img src=\"";
-                String m_root = "resources/images/mktree/";
-                img += m_root + "/test" + getFailedOrSkippedResult(ctx, m).getStatus() + ".gif";
+                String mRoot = "resources/images/mktree/";
+                img += mRoot + "/test" + getFailedOrSkippedResult(ctx, m).getStatus() + ".gif";
                 img += "\"/>";
                 res.append(intendstr + "<li>" + img + m);
                 if (hasDependencies(m)) {

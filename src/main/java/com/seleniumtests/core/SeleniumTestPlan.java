@@ -45,15 +45,6 @@ public abstract class SeleniumTestPlan {
 
     @BeforeSuite(alwaysRun = true)
     public void beforeTestSuite(final ITestContext testContext) throws IOException {
-        System.out.println("####################################################");
-        System.out.println("####################################################");
-        System.out.println("####################################################");
-        System.out.println("WWW.SELENIUMTESTS.COM");
-        System.out.println("WWW.SELENIUMTESTS.COM");
-        System.out.println("WWW.SELENIUMTESTS.COM");
-        System.out.println("####################################################");
-        System.out.println("####################################################");
-        System.out.println("####################################################");
         start = new Date();
         SeleniumTestsContextManager.initGlobalContext(testContext);
         SeleniumTestsContextManager.initThreadContext(testContext, null);
@@ -111,7 +102,7 @@ public abstract class SeleniumTestPlan {
      * @return	parameters as string
      */
     private String buildParameterString(final Object[] parameters) {
-        StringBuffer parameter = new StringBuffer();
+        StringBuilder parameter = new StringBuilder();
 
         if (parameters != null) {
             for (int i = 0; i < parameters.length; i++) {

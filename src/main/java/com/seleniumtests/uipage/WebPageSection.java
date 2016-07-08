@@ -41,6 +41,7 @@ public abstract class WebPageSection extends BasePage {
     /**
      * Captures page snapshot.
      */
+    @Override
     public void capturePageSnapshot() {
 
         ScreenShot screenShot = new ScreenshotUtil(driver).captureWebPageSnapshot();

@@ -31,40 +31,55 @@ public class DriverExceptionListener implements WebDriverEventListener {
 	
 	private static final Logger logger = TestLogging.getLogger(DriverExceptionListener.class);
 	
+	@Override
     public void afterChangeValueOf(final WebElement element, final WebDriver driver) {
-    	if (SeleniumTestsContextManager.isWebTest() && element.getTagName().equalsIgnoreCase("input")) {
+    	if (SeleniumTestsContextManager.isWebTest() && "input".equalsIgnoreCase(element.getTagName())) {
     		try {
     			((JavascriptExecutor) driver).executeScript("arguments[0].blur();", element);
-    		} catch (Exception e) {	}
+    		} catch (Exception e) {	
+    			logger.error(e);
+    		}
     	}
     }
 
+	@Override
     public void afterClickOn(final WebElement arg0, final WebDriver driver) {  }
 
+	@Override
     public void afterFindBy(final By arg0, final WebElement arg1, final WebDriver arg2) { }
 
+	@Override
     public void afterNavigateBack(final WebDriver arg0) { }
 
+	@Override
     public void afterNavigateForward(final WebDriver arg0) { }
 
+	@Override
     public void afterNavigateTo(final String arg0, final WebDriver arg1) { }
 
+    @Override
     public void afterScript(final String arg0, final WebDriver arg1) { }
 
+    @Override
     public void beforeChangeValueOf(final WebElement arg0, final WebDriver arg1) { }
 
+    @Override
     public void beforeClickOn(final WebElement arg0, final WebDriver driver) {
     	if (SeleniumTestsContextManager.isWebTest()) {
     		((CustomEventFiringWebDriver)WebUIDriver.getWebDriver()).updateWindowsHandles();
     	}
     }
 
+    @Override
     public void beforeFindBy(final By arg0, final WebElement arg1, final WebDriver arg2) { }
 
+    @Override
     public void beforeNavigateBack(final WebDriver arg0) { }
 
+    @Override
     public void beforeNavigateForward(final WebDriver arg0) { }
 
+    @Override
     public void beforeNavigateTo(final String arg0, final WebDriver arg1) { }
 
     @Override

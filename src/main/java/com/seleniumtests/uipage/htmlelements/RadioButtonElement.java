@@ -39,6 +39,7 @@ public class RadioButtonElement extends HtmlElement {
         super.click();
     }
 
+    @Override
     public boolean isSelected() {
         findElement();
         return element.isSelected();

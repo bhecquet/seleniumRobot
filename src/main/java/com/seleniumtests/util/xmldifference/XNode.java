@@ -28,23 +28,21 @@ import org.w3c.dom.Node;
  *
  * <p/>needs to be computed, saves time not traversing to the ROOT multiple times.
  */
-
 public class XNode implements Serializable {
 
-    private Node _node = null;
+    private Node node = null;
 
-    private String _xPath = null;
+    private String xPath = null;
 
-    private String _noIndexXPath = null;
+    private String noIndexXPath = null;
 
-    private int _position = 0; // Position of the Node under a parent
+    private int position = 0; // Position of the Node under a parent
 
-    private int _depth = 0; // Depth of the Node in the Document
+    private int depth = 0; // Depth of the Node in the Document
 
     /**
      * Default Constructor.
      */
-
     public XNode() { }
 
     /**
@@ -53,13 +51,10 @@ public class XNode implements Serializable {
      * @param  node   the Node
      * @param  xPath  the XPath expression for the Node
      */
-
     public XNode(final Node node, final String xPath) {
 
-        _node = node;
-
-        _xPath = xPath;
-
+        this.node = node;
+        this.xPath = xPath;
     }
 
     /**
@@ -69,157 +64,126 @@ public class XNode implements Serializable {
      * @param  xPath         the XPath expression for the Node
      * @param  noIndexXPath  the XPath expression without the indexes
      */
-
     public XNode(final Node node, final String xPath, final String noIndexXPath) {
 
-        _node = node;
-
-        _xPath = xPath;
-
-        _noIndexXPath = noIndexXPath;
-
+        this.node = node;
+        this.xPath = xPath;
+        this.noIndexXPath = noIndexXPath;
     }
 
     /**
      * Gets Node.
      */
-
     public Node getNode() {
 
-        return _node;
-
+        return node;
     }
 
     /**
      * Sets Node.
      */
-
     public void setNode(final Node node) {
 
-        _node = node;
-
+        this.node = node;
     }
 
     /**
      * Gets the position of the Node under the parent.
      */
-
     public int getPosition() {
 
-        return _position;
-
+        return position;
     }
 
     /**
      * Sets the position of the Node under the parent.
      */
-
     public void setPosition(final int position) {
 
-        _position = position;
-
+        this.position = position;
     }
 
     /**
      * Gets the depth of the Node in the Document.
      */
-
     public int getDepth() {
 
-        return _depth;
-
+        return depth;
     }
 
     /**
      * Sets the depth of the Node in the Document.
      */
-
     public void setDepth(final int depth) {
 
-        _depth = depth;
-
+        this.depth = depth;
     }
 
     /**
      * Gets the XPath expression.
      */
-
     public String getXPath() {
 
-        return _xPath;
-
+        return xPath;
     }
 
     /**
      * Sets XPath expression.
      */
-
     public void setXPath(final String xPath) {
 
-        _xPath = xPath;
-
+        this.xPath = xPath;
     }
 
     /**
      * Gets XPath expression without the indexes.
      */
-
     public String getNoIndexXPath() {
 
         String xPath = getXPath();
-
         xPath = XMLUtil.getNoIndexXPath(xPath);
-
         setNoIndexXPath(xPath);
 
         return xPath;
-
     }
 
     /**
      * Sets XPath expression without the indexes.
      */
-
     public void setNoIndexXPath(final String noIndexXPath) {
 
-        _noIndexXPath = noIndexXPath;
-
+        this.noIndexXPath = noIndexXPath;
     }
 
     /**
      * Gets Node Value.
      */
-
     public String getValue() {
 
-        if (_node == null) {
+        if (node == null) {
 
             return null;
         }
 
-        return _node.getNodeValue();
-
+        return node.getNodeValue();
     }
 
     /**
      * Gets Node Name.
      */
-
     public String getName() {
 
-        if (_node == null) {
+        if (node == null) {
 
             return null;
         }
 
-        return _node.getNodeName();
-
+        return node.getNodeName();
     }
 
     /**
      * Gets String representation of the XNode.
      */
-
     public String toString() {
 
         String eol = System.getProperty("line.separator");
@@ -245,7 +209,6 @@ public class XNode implements Serializable {
         sb.append("]");
 
         return sb.toString();
-
     }
 
 }

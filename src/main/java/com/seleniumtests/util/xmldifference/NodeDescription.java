@@ -119,7 +119,7 @@ public class NodeDescription implements XMLConstants {
      * @param  aNode
      */
 
-    public static void appendNodeDetail(final StringBuffer buf, final XNode xNode) {
+    public static void appendNodeDetail(final StringBuilder buf, final XNode xNode) {
 
         appendNodeDetail(buf, xNode.getNode(), true);
 
@@ -127,7 +127,7 @@ public class NodeDescription implements XMLConstants {
 
     }
 
-    private static void appendNodeDetail(final StringBuffer buf, final Node aNode, final boolean notRecursing) {
+    private static void appendNodeDetail(final StringBuilder buf, final Node aNode, final boolean notRecursing) {
 
         if (aNode == null) {
 
@@ -206,14 +206,14 @@ public class NodeDescription implements XMLConstants {
 
     }
 
-    protected static void appendDocumentDetail(final StringBuffer buf) {
+    protected static void appendDocumentDetail(final StringBuilder buf) {
 
         buf.append(DOCUMENT_NODE_DESCRIPTION).append(XMLConstants.OPEN_START_NODE).append("...").append(
             XMLConstants.CLOSE_NODE);
 
     }
 
-    protected static void appendDocumentTypeDetail(final StringBuffer buf, final Node aNode) {
+    protected static void appendDocumentTypeDetail(final StringBuilder buf, final Node aNode) {
 
         DocumentType type = (DocumentType) aNode;
 
@@ -247,7 +247,7 @@ public class NodeDescription implements XMLConstants {
 
     }
 
-    protected static void appendProcessingInstructionDetail(final StringBuffer buf, final Node aNode) {
+    protected static void appendProcessingInstructionDetail(final StringBuilder buf, final Node aNode) {
 
         ProcessingInstruction instr = (ProcessingInstruction) aNode;
 
@@ -256,19 +256,19 @@ public class NodeDescription implements XMLConstants {
 
     }
 
-    protected static void appendCommentDetail(final StringBuffer buf, final Node aNode) {
+    protected static void appendCommentDetail(final StringBuilder buf, final Node aNode) {
 
         buf.append(XMLConstants.START_COMMENT).append(aNode.getNodeValue()).append(XMLConstants.END_COMMENT);
 
     }
 
-    protected static void appendCdataSectionDetail(final StringBuffer buf, final Node aNode) {
+    protected static void appendCdataSectionDetail(final StringBuilder buf, final Node aNode) {
 
         buf.append(XMLConstants.START_CDATA).append(aNode.getNodeValue()).append(XMLConstants.END_CDATA);
 
     }
 
-    protected static void appendTextDetail(final StringBuffer buf, final Node aNode) {
+    protected static void appendTextDetail(final StringBuilder buf, final Node aNode) {
 
         appendNodeDetail(buf, aNode.getParentNode(), false);
 
@@ -279,7 +279,7 @@ public class NodeDescription implements XMLConstants {
 
     }
 
-    protected static void appendElementDetail(final StringBuffer buf, final Node aNode, final boolean notRecursing) {
+    protected static void appendElementDetail(final StringBuilder buf, final Node aNode, final boolean notRecursing) {
 
         buf.append(aNode.getNodeName());
 
@@ -291,7 +291,7 @@ public class NodeDescription implements XMLConstants {
 
     }
 
-    protected static void appendAttributeDetail(final StringBuffer buf, final Node aNode) {
+    protected static void appendAttributeDetail(final StringBuilder buf, final Node aNode) {
 
         appendNodeDetail(buf,
 

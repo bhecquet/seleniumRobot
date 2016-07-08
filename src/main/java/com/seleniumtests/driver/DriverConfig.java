@@ -98,7 +98,7 @@ public class DriverConfig {
 
             WebDriverEventListener listener = null;
             try {
-                if (!aList.equals("")) {
+                if (!"".equals(aList)) {
                     listener = (WebDriverEventListener) (Class.forName(aList)).newInstance();
                     listenerList.add(listener);
                 }

@@ -31,23 +31,23 @@ public class Difference {
      * Simple unique identifier.
      */
 
-    private int _id;
+    private int id;
 
     /**
      * Description of the difference.
      */
 
-    private final String _description;
+    private final String description;
 
     /**
      * TRUE if the difference represents a similarity, FALSE otherwise.
      */
 
-    private boolean _recoverable;
+    private boolean recoverable;
 
-    private XNode _xControlNode = null;
+    private XNode xControlNode = null;
 
-    private XNode _xTestNode = null;
+    private XNode xTestNode = null;
 
     /**
      * Constructor for non-similar Difference instances.
@@ -71,11 +71,11 @@ public class Difference {
 
     protected Difference(final int id, final String description, final boolean recoverable) {
 
-        _id = id;
+        this.id = id;
 
-        _description = description;
+        this.description = description;
 
-        _recoverable = recoverable;
+        this.recoverable = recoverable;
 
     }
 
@@ -89,9 +89,9 @@ public class Difference {
 
         this(prototype.getId(), prototype.getDescription(), prototype.isRecoverable());
 
-        _xControlNode = xControlNode;
+        this.xControlNode = xControlNode;
 
-        _xTestNode = xTestNode;
+        this.xTestNode = xTestNode;
 
     }
 
@@ -101,13 +101,13 @@ public class Difference {
 
     public int getId() {
 
-        return _id;
+        return id;
 
     }
 
     public void setId(final int id) {
 
-        _id = id;
+        this.id = id;
 
     }
 
@@ -117,7 +117,7 @@ public class Difference {
 
     public String getDescription() {
 
-        return _description;
+        return description;
 
     }
 
@@ -127,7 +127,7 @@ public class Difference {
 
     public boolean isRecoverable() {
 
-        return _recoverable;
+        return recoverable;
 
     }
 
@@ -141,7 +141,7 @@ public class Difference {
 
     protected void setRecoverable(final boolean overrideValue) {
 
-        _recoverable = overrideValue;
+        recoverable = overrideValue;
 
     }
 
@@ -153,7 +153,7 @@ public class Difference {
 
     public XNode getControlNodeDetail() {
 
-        return _xControlNode;
+        return xControlNode;
 
     }
 
@@ -163,7 +163,7 @@ public class Difference {
 
     public void setControlNodeDetail(final XNode XNode) {
 
-        _xControlNode = XNode;
+        xControlNode = XNode;
 
     }
 
@@ -175,7 +175,7 @@ public class Difference {
 
     public XNode getTestNodeDetail() {
 
-        return _xTestNode;
+        return xTestNode;
 
     }
 
@@ -185,7 +185,7 @@ public class Difference {
 
     public void setTestNodeDetail(final XNode XNode) {
 
-        _xTestNode = XNode;
+        xTestNode = XNode;
 
     }
 
@@ -199,9 +199,9 @@ public class Difference {
 
     public String toString() {
 
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
 
-        if (_xControlNode == null || _xTestNode == null) {
+        if (xControlNode == null || xTestNode == null) {
 
             appendBasicRepresentation(buf);
 
@@ -215,22 +215,22 @@ public class Difference {
 
     }
 
-    private void appendBasicRepresentation(final StringBuffer buf) {
+    private void appendBasicRepresentation(final StringBuilder buf) {
 
-        buf.append("Difference (#").append(_id).append(") ").append(_description);
+        buf.append("Difference (#").append(id).append(") ").append(description);
 
     }
 
-    private void appendDetailedRepresentation(final StringBuffer buf) {
+    private void appendDetailedRepresentation(final StringBuilder buf) {
 
-        buf.append("Expected ").append(getDescription()).append(" '").append(_xControlNode.getValue())
-           .append("' but was '").append(_xTestNode.getValue()).append("' - comparing ");
+        buf.append("Expected ").append(getDescription()).append(" '").append(xControlNode.getValue())
+           .append("' but was '").append(xTestNode.getValue()).append("' - comparing ");
 
-        NodeDescription.appendNodeDetail(buf, _xControlNode);
+        NodeDescription.appendNodeDetail(buf, xControlNode);
 
         buf.append(" to ");
 
-        NodeDescription.appendNodeDetail(buf, _xTestNode);
+        NodeDescription.appendNodeDetail(buf, xTestNode);
 
     }
 

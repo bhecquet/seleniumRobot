@@ -27,6 +27,7 @@ public class Table extends HtmlElement {
         super(label, by);
     }
 
+    @Override
     public void findElement() {
         super.findElement();
         try {
@@ -46,7 +47,7 @@ public class Table extends HtmlElement {
                 columns = rows.get(0).findElements(By.tagName("td"));
             } catch (NotFoundException e) { }
 
-            if (columns == null || columns.size() == 0) {
+            if (columns == null || columns.isEmpty()) {
 
                 try {
                     if (rows.size() > 1) {
@@ -85,7 +86,7 @@ public class Table extends HtmlElement {
                 columns = rows.get(row - 1).findElements(By.tagName("td"));
             } catch (NotFoundException e) { }
 
-            if (columns == null || columns.size() == 0) {
+            if (columns == null || columns.isEmpty()) {
                 try {
                     columns = rows.get(row - 1).findElements(By.tagName("th"));
                 } catch (NotFoundException e) {
@@ -122,6 +123,6 @@ public class Table extends HtmlElement {
     }
 
     public boolean isHasBody() {
-        return getRows().size() > 0;
+        return !getRows().isEmpty();
     }
 }

@@ -27,6 +27,10 @@ public class HashCodeGenerator {
 
     private static Logger logger = Logger.getLogger(HashCodeGenerator.class);
 
+    private HashCodeGenerator() {
+		// As a utility method, it is not meant to be instantiated.
+	}
+    
     public static String getRandomHashCode(final String seed) {
         String signature;
         if (SeleniumTestsContextManager.getThreadContext() != null) {
@@ -39,7 +43,9 @@ public class HashCodeGenerator {
         try {
             MessageDigest digest = MessageDigest.getInstance("MD5");
             return new BigInteger(1, digest.digest(data)).toString(16);
-        } catch (Exception e2) { }
+        } catch (Exception e2) {
+        	logger.error(e2);
+        }
 
         return new String(data);
     }
