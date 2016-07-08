@@ -62,6 +62,19 @@ public class CSVHelper {
         return getDataFromCSVFile(clazz, filename, filter, readHeaders, null, supportDPFilter);
     }
 
+    /**
+     * Reads data from csv file.
+     * class : null => filename : entire path of file
+     * class : this.getClass(), filename : the filename will be search in the same directory of the class
+     * 
+     * @param clazz
+     * @param filename
+     * @param filter
+     * @param readHeaders
+     * @param delimiter
+     * @param supportDPFilter
+     * @return
+     */
     public static Iterator<Object[]> getDataFromCSVFile(final Class<?> clazz, final String filename, Filter filter,
             final boolean readHeaders, final String delimiter, final boolean supportDPFilter) {
 

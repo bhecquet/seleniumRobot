@@ -58,6 +58,18 @@ public class SpreadSheetHelper {
         PRIMITIVE_TYPE_MAP.put(Double.TYPE, Double.class);
     }
 
+    /**
+     * Read field value of an Object : 
+     * if fieldClz is an Array : readFieldValue with the class of Array data
+     * if fieldClz is a parametric class : readFieldValue with the class of the actual argument 
+     * 
+     * @param fieldClz
+     * @param type
+     * @param dataMap
+     * @param combinedFieldName
+     * @return
+     * @throws Exception
+     */
     private static Object _readFieldValueObject(final Class<?> fieldClz, final Type type,
             final Map<String, Object> dataMap, final String combinedFieldName) throws Exception {
         Object fieldValue = null;
@@ -100,6 +112,11 @@ public class SpreadSheetHelper {
         return fieldValue;
     }
 
+    /**
+     * Rewrite DPTags to assert they will be correctly used by getDPFilter
+     * 
+     * @param rowDataMap
+     */
     protected static void formatDPTags(final Map<String, Object> rowDataMap) {
         if (rowDataMap.get(TestEntity.TEST_DP_TAGS) != null) {
             String dpTags = rowDataMap.get(TestEntity.TEST_DP_TAGS).toString();
@@ -118,6 +135,14 @@ public class SpreadSheetHelper {
         }
     }
 
+    /**
+     * The map key has to be written like this : key.digits (digits : String in hexadecimal or octa)
+     * Return the integer corresponding to digits.
+     * 
+     * @param map
+     * @param key
+     * @return
+     */
     public static int getArraySize(final Map<String, Object> map, String key) {
         int count = 0;
         boolean valueFound = false;
@@ -182,6 +207,14 @@ public class SpreadSheetHelper {
         }
     }
 
+    /**
+     * Return the filter defined in Context. 
+     * TestEntity.TEST_DP_TAGS the line of headers (define in TestEntity.java)
+     * getDPTagsInclude : the tags that have to be in the entities lines to select (at least one of them)
+     * getDPTagsExclude : the tags have to be absent in the entities lines to select (if one of them : not selected)
+     * 
+     * @return
+     */
     protected static Filter getDPFilter() {
         String includedTags = SeleniumTestsContextManager.getGlobalContext().getDPTagsInclude();
         String excludedTags = SeleniumTestsContextManager.getGlobalContext().getDPTagsExclude();
@@ -245,6 +278,14 @@ public class SpreadSheetHelper {
         return list.iterator();
     }
 
+    /**
+     * Return the list of lines in the spreadsheet without the headers.
+     * 
+     * @param dataIterator
+     * @param entityClazzMap
+     * @return
+     * @throws Exception
+     */
     private static List<Object[]> getEntityData(final Iterator<Object[]> dataIterator,
             final LinkedHashMap<String, Class<?>> entityClazzMap) throws Exception {
         List<Object[]> list = new ArrayList<Object[]>();
@@ -289,6 +330,13 @@ public class SpreadSheetHelper {
         return list;
     }
 
+    /**
+     * Return map Objects with the key key or starting with key separated by . (exemple key.loo.bip.anything) in a Map.
+     * 
+     * @param map
+     * @param key
+     * @return
+     */
     public static Map<String, Object> getFieldsDataNeedToBeSet(final Map<String, Object> map, final String key) {
         Map<String, Object> result = new LinkedHashMap<String, Object>();
 
@@ -309,6 +357,14 @@ public class SpreadSheetHelper {
         return result;
     }
 
+    /**
+     * Return map Objects with the key key or starting with key separated by . (example: Object with key key.la will be return with key la). 
+     * If the map key contain more than one . it will return a the key cut before the . (example: Object with key key.louli.la will be return with key louli).
+     * 
+     * @param map
+     * @param key
+     * @return
+     */
     public static Map<String, Object> getFieldsNeedToBeSet(final Map<String, Object> map, final String key) {
         Map<String, Object> result = new LinkedHashMap<String, Object>();
         String lastKey = "";
@@ -332,6 +388,13 @@ public class SpreadSheetHelper {
         return result;
     }
 
+    /**
+     * Return the type of actual argument from a parameterized type (null if type is not a parameterized type)
+     * 
+     * @param type
+     * @return
+     * @throws ClassNotFoundException
+     */
     private static Class<?> getListItemType(final Type type) throws ClassNotFoundException {
 
         Class<?> itemClz = null;
@@ -344,6 +407,12 @@ public class SpreadSheetHelper {
         return itemClz;
     }
 
+    /**
+     * Return the value (any kind of Object) corresponding to the key
+     * @param map
+     * @param key
+     * @return
+     */
     public static Object getValue(final Map<String, Object> map, final String key) {
         for (Entry<String, Object> entry : map.entrySet()) {
             if ((entry.getKey() == null && key == null)
@@ -351,10 +420,14 @@ public class SpreadSheetHelper {
                 return entry.getValue();
             }
         }
-
         return null;
     }
 
+    /**
+     * Return true if clz is a primitive class
+     * @param clz
+     * @return
+     */
     private static boolean isPrimitive(final Class<?> clz) {
         return clz.isPrimitive() || clz.getCanonicalName().equals("java.lang." + clz.getSimpleName());
     }
@@ -418,6 +491,16 @@ public class SpreadSheetHelper {
         return fieldValue;
     }
 
+    /**
+     * Search in Class clz a Field with the name : objectName, dataMap provide the names of fields eligible.
+     * Return an instance of the class, with the constructor corresponding to the field or with class.newInstance() if no constructor with the field.
+     * 
+     * @param clz
+     * @param objectName
+     * @param dataMap
+     * @return
+     * @throws Exception
+     */
     public static Object readObject(final Class<?> clz, String objectName, final Map<String, Object> dataMap)
         throws Exception {
         Object object = null;
