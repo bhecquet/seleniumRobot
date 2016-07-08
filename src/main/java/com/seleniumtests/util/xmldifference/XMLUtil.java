@@ -279,7 +279,6 @@ public class XMLUtil implements XMLDogConstants
      * @return the String representation of the new XML document with all the Elements replaced
      */
     public static String replaceElementText(String xmlFile, String elementTag, List values, boolean overwrite)
-            throws RuntimeException
     {
         File file = null;
         FileWriter fw = null;

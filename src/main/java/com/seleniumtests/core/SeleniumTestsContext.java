@@ -364,18 +364,22 @@ public class SeleniumTestsContext {
 	    		throw new WebDriverException("");
 	    	}
 	    } catch (WebDriverException e) {
-    		if (getPlatform().toLowerCase().startsWith("android") || getPlatform().toLowerCase().startsWith("ios")) {
-	    		String[] pfVersion = getPlatform().split(" ", 2);
-	    		try {
-		    		setPlatform(pfVersion[0]);
-		    		setMobilePlatformVersion(pfVersion[1]);
-	    		} catch (IndexOutOfBoundsException x) {
-	    			throw new ConfigurationException("For mobile platform, platform name should contain version. Ex: 'Android 5.0' or 'iOS 9.1'");
-	    		}
-    		} else {
-    			throw new ConfigurationException(String.format("Platform %s has not been recognized as a valide platform", getPlatform()));
-    		}
+	    	dealWithWebDriverException(e);
     	}
+    }
+    
+    private void dealWithWebDriverException (WebDriverException e) throws ConfigurationException {
+    	if (getPlatform().toLowerCase().startsWith("android") || getPlatform().toLowerCase().startsWith("ios")) {
+    		String[] pfVersion = getPlatform().split(" ", 2);
+    		try {
+	    		setPlatform(pfVersion[0]);
+	    		setMobilePlatformVersion(pfVersion[1]);
+    		} catch (IndexOutOfBoundsException x) {
+    			throw new ConfigurationException("For mobile platform, platform name should contain version. Ex: 'Android 5.0' or 'iOS 9.1'");
+    		}
+		} else {
+			throw new ConfigurationException(String.format("Platform %s has not been recognized as a valide platform", getPlatform()));
+		}
     }
     
     /**
@@ -906,8 +910,8 @@ public class SeleniumTestsContext {
     	return value == null ? null: Boolean.parseBoolean(value);
     }
 
-    private void setContextAttribute(final String attributeName, final String sysPropertyValue, final String suiteValue,
-            final String defaultValue) {
+    private void setContextAttribute(final String attributeName, final String sysPropertyValue, 
+    									final String suiteValue, final String defaultValue) {
 
         contextDataMap.put(attributeName,
             sysPropertyValue != null ? sysPropertyValue : (suiteValue != null ? suiteValue : defaultValue));
@@ -915,38 +919,43 @@ public class SeleniumTestsContext {
     }
 
     public void setTestDataFile(String testDataFile) {
-    	if (testDataFile == null) {
-    		testDataFile = "testCase";
+    	if (testDataFile != null) {
+    		setAttribute(TEST_DATA_FILE, testDataFile);
+    	} else {
+    		setAttribute(TEST_DATA_FILE, "testCase");
     	}
-        setAttribute(TEST_DATA_FILE, testDataFile);
     }
     
     public void setWebSessionTimeout(Integer timeout) {
-    	if (timeout == null) {
-    		timeout = 90000;
+    	if (timeout != null) {
+    		setAttribute(WEB_SESSION_TIME_OUT, timeout);
+    	} else {
+    		setAttribute(WEB_SESSION_TIME_OUT, 90000);
     	}
-    	setAttribute(WEB_SESSION_TIME_OUT, timeout);
     }
 
     public void setImplicitWaitTimeout(Integer timeout) {
-    	if (timeout == null) {
-    		timeout = 5;
+    	if (timeout != null) {
+    		setAttribute(IMPLICIT_WAIT_TIME_OUT, timeout);
+    	} else {
+    		setAttribute(IMPLICIT_WAIT_TIME_OUT, 5);
     	}
-        setAttribute(IMPLICIT_WAIT_TIME_OUT, timeout);
     }
     
     public void setExplicitWaitTimeout(Integer timeout) {
-    	if (timeout == null) {
-    		timeout = 15;
+    	if (timeout != null) {
+    		setAttribute(EXPLICIT_WAIT_TIME_OUT, timeout);
+    	} else {
+    		setAttribute(EXPLICIT_WAIT_TIME_OUT, 15);
     	}
-        setAttribute(EXPLICIT_WAIT_TIME_OUT, timeout);
     }
 
     public void setPageLoadTimeout(Integer timeout) {
-    	if (timeout == null) {
-    		timeout = 90;
+    	if (timeout != null) {
+    		setAttribute(PAGE_LOAD_TIME_OUT, timeout);
+    	} else {
+    		setAttribute(PAGE_LOAD_TIME_OUT, 90);
     	}
-        setAttribute(PAGE_LOAD_TIME_OUT, timeout);
     }
     
     public void setWebDriverGrid(final String driverGrid) {
@@ -958,7 +967,6 @@ public class SeleniumTestsContext {
     		runMode = "LOCAL";
     	} 
     	DriverMode.fromString(runMode);
-
         setAttribute(RUN_MODE, runMode);
     }
 
@@ -979,10 +987,11 @@ public class SeleniumTestsContext {
     }
     
     public void setUseDefaultFirefoxProfile(Boolean useDefaultffProfile) {
-		if (useDefaultffProfile == null) {
-			useDefaultffProfile = true;
+		if (useDefaultffProfile != null) {
+			setAttribute(USE_DEFAULT_FIREFOX_PROFILE, useDefaultffProfile);
+		} else {
+			setAttribute(USE_DEFAULT_FIREFOX_PROFILE, true);
     	}
-    	setAttribute(USE_DEFAULT_FIREFOX_PROFILE, useDefaultffProfile);
     }
     
     public void setOperaUserProfilePath(String path) {
@@ -1006,24 +1015,27 @@ public class SeleniumTestsContext {
     }
     
     public void setAssumeUntrustedCertificateIssuer(Boolean assume) {
-    	if (assume == null) {
-    		assume = true;
+    	if (assume != null) {
+    		setAttribute(Set_Assume_Untrusted_Certificate_Issuer, assume);
+    	} else {
+    		setAttribute(Set_Assume_Untrusted_Certificate_Issuer, true);
     	}
-    	setAttribute(Set_Assume_Untrusted_Certificate_Issuer, assume);
     }
     
     public void setAcceptUntrustedCertificates(Boolean accept) {
-    	if (accept == null) {
-    		accept = true;
+    	if (accept != null) {
+    		setAttribute(Set_Accept_Untrusted_Certificates, accept);
+    	} else {
+    		setAttribute(Set_Accept_Untrusted_Certificates, true);
     	}
-    	setAttribute(Set_Accept_Untrusted_Certificates, accept);
     }
     
     public void setJavascriptEnabled(Boolean enabled) {
-    	if (enabled == null) {
-    		enabled = true;
+    	if (enabled != null) {
+    		setAttribute(ENABLE_JAVASCRIPT, enabled);
+    	} else {
+    		setAttribute(ENABLE_JAVASCRIPT, true);
     	}
-    	setAttribute(ENABLE_JAVASCRIPT, enabled);
     }
    
     public void setNtlmAuthTrustedUris(String uris) {
@@ -1035,17 +1047,19 @@ public class SeleniumTestsContext {
     }
     
     public void setJsErrorCollectorExtension(Boolean enabled) {
-    	if (enabled == null) {
-    		enabled = false;
+    	if (enabled != null) {
+    		setAttribute(ADD_JS_ERROR_COLLECTOR_EXTENSION, enabled);
+    	} else {
+    		setAttribute(ADD_JS_ERROR_COLLECTOR_EXTENSION, false);
     	}
-    	setAttribute(ADD_JS_ERROR_COLLECTOR_EXTENSION, enabled);
     }
    
     public void setWebProxyEnabled(Boolean enabled) {
-    	if (enabled == null) {
-    		enabled = false;
+    	if (enabled != null) {
+    		setAttribute(WEB_PROXY_ENABLED, enabled);
+    	} else {
+    		setAttribute(WEB_PROXY_ENABLED, false);
     	}
-    	setAttribute(WEB_PROXY_ENABLED, enabled);
     }
     
     public void setProxyType(String proxyType) {
@@ -1057,10 +1071,12 @@ public class SeleniumTestsContext {
     }
     
     public void setReportGenerationConfig(String config) {
-    	if (config == null) {
-    		config = "summaryPerSuite";
+    	if (config != null) {
+    		setAttribute(REPORT_GENERATION_CONFIG, config);
+    	} else {
+    		setAttribute(REPORT_GENERATION_CONFIG, "summaryPerSuite");
     	}
-    	setAttribute(REPORT_GENERATION_CONFIG, config);
+    	
     }
     
     public void setOpenReportInBrowser(String browserName) {
@@ -1068,17 +1084,19 @@ public class SeleniumTestsContext {
     }
     
     public void setCaptureSnapshot(Boolean capture) {
-    	if (capture == null) {
-    		capture = true;
+    	if (capture != null) {
+    		setAttribute(CAPTURE_SNAPSHOT, capture);
+    	} else {
+    		setAttribute(CAPTURE_SNAPSHOT, true);
     	}
-    	setAttribute(CAPTURE_SNAPSHOT, capture);
     }
     
     public void setEnableExceptionListener(Boolean enable) {
-    	if (enable == null) {
-    		enable = true;
+    	if (enable != null) {
+    		setAttribute(ENABLE_EXCEPTION_LISTENER, enable);
+    	} else {
+    		setAttribute(ENABLE_EXCEPTION_LISTENER, true);
     	}
-    	setAttribute(ENABLE_EXCEPTION_LISTENER, enable);
     }
     
     public void setDpTagsInclude(String tags) {
@@ -1090,17 +1108,19 @@ public class SeleniumTestsContext {
     }
     
     public void setSshCommandWait(Integer waitInMs) {
-    	if (waitInMs == null) {
-    		waitInMs = 5000;
+    	if (waitInMs != null) {
+    		setAttribute(SSH_COMMAND_WAIT, waitInMs);
+    	} else {
+    		setAttribute(SSH_COMMAND_WAIT, 5000);
     	}
-    	setAttribute(SSH_COMMAND_WAIT, waitInMs);
     }
     
     public void setSoftAssertEnabled(Boolean enable) {
-    	if (enable == null) {
-    		enable = true;
+    	if (enable != null) {
+    		setAttribute(SOFT_ASSERT_ENABLED, enable);
+    	} else {
+    		setAttribute(SOFT_ASSERT_ENABLED, true);
     	}
-    	setAttribute(SOFT_ASSERT_ENABLED, enable);
     }
     
     public void setWebDriverListener(String listener) {
@@ -1116,31 +1136,35 @@ public class SeleniumTestsContext {
     }
 
     public void setDeviceList(String list) {
-    	if (list == null) {
-    		list = "{}";
+    	if (list != null) {
+    		setAttribute(DEVICE_LIST, list);
+    	} else {
+    		setAttribute(DEVICE_LIST, "{}");
     	}
-    	setAttribute(DEVICE_LIST, list);
     }
     
     public void setApp(String app) {
-    	if (app == null) {
-    		app = "";
+    	if (app != null) {
+    		setAttribute(APP, app);
+    	} else {
+    		setAttribute(APP, "");
     	}
-    	setAttribute(APP, app);
     }
     
     public void setCucumberTags(String tags) {
-    	if (tags == null) {
-    		tags = "";
+    	if (tags != null) {
+    		setAttribute(CUCUMBER_TAGS, tags);
+    	} else {
+    		setAttribute(CUCUMBER_TAGS, "");
     	}
-    	setAttribute(CUCUMBER_TAGS, tags);
     }
     
     public void setCucumberTests(String tests) {
-    	if (tests == null) {
-    		tests = "";
+    	if (tests != null) {
+    		setAttribute(CUCUMBER_TESTS, tests);
+    	} else {
+    		setAttribute(CUCUMBER_TESTS, "");
     	}
-    	setAttribute(CUCUMBER_TESTS, tests);
     }
     
     public void setCucumberImplementationPackage(String pkg) {
@@ -1151,10 +1175,12 @@ public class SeleniumTestsContext {
     }
     
     public void setTestEnv(String tests) {
-    	if (tests == null) {
-    		tests = "DEV";
+    	if (tests != null) {
+    		setAttribute(TEST_ENV, tests);
+    	} else {
+    		setAttribute(TEST_ENV, "DEV");
     	}
-    	setAttribute(TEST_ENV, tests);
+    	
     }
 
     public void setAppPackage(String pkg) {
@@ -1174,10 +1200,11 @@ public class SeleniumTestsContext {
     }
     
     public void setNewCommandTimeout(Integer timeout) {
-    	if (timeout == null) {
-    		timeout = 120;
+    	if (timeout != null) {
+    		setAttribute(NEW_COMMAND_TIMEOUT, timeout);
+    	} else {
+    		setAttribute(NEW_COMMAND_TIMEOUT, 120);
     	}
-        setAttribute(NEW_COMMAND_TIMEOUT, timeout);
     }
     
     public void setVersion(String version) {
@@ -1185,10 +1212,11 @@ public class SeleniumTestsContext {
     }
     
     public void setPlatform(String platform) {
-    	if (platform == null) {
-    		platform = Platform.getCurrent().toString();
+    	if (platform != null) {
+    		setAttribute(PLATFORM, platform);
+    	} else {
+    		setAttribute(PLATFORM, Platform.getCurrent().toString());
     	}
-        setAttribute(PLATFORM, platform);
     }
     
     public void setCloudApiKey(String key) {
