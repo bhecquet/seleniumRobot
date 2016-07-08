@@ -28,24 +28,6 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 
 
-/*import org.apache.oro.text.perl.MalformedPerl5PatternException;
- *
- * import org.apache.oro.text.regex.Pattern;
- *
- * import org.apache.oro.text.regex.PatternCompiler;
- *
- * import org.apache.oro.text.regex.Perl5Compiler;
- *
- * import org.apache.oro.text.regex.Perl5Pattern;
- *
- * import org.apache.oro.text.regex.PatternMatcher;
- *
- * import org.apache.oro.text.regex.PatternMatcherInput;
- *
- * import org.apache.oro.text.regex.MalformedPatternException;
- *
- */
-
 /**
  * Config class containing configuration information about the XMLDog Application including the XML parser.
  *
@@ -114,12 +96,6 @@ public class Config implements XMLDogConstants {
     // names as objects
 
     private HashMap<String, String> uniqueElementAttrMap = new HashMap<>();
-
-    /**
-     * Default Constructor.
-     */
-
-    public Config() { }
 
     /**
      * Sets Validating flag.
@@ -436,7 +412,7 @@ public class Config implements XMLDogConstants {
         List<String> attrNamesList = excludedElementAttrsMap.get(elementName);
 
         if (attrNamesList == null) {
-            attrNamesList = new ArrayList<String>();
+            attrNamesList = new ArrayList<>();
         }
 
         attrNamesList.addAll(attrNames);
@@ -464,7 +440,7 @@ public class Config implements XMLDogConstants {
 
     public void addExcludedElement(final String elementName) {
 
-        if ((elementName == null) || (elementName.trim().equals(""))) {
+        if ((elementName == null) || ("".equals(elementName.trim()))) {
 
             return;
         }

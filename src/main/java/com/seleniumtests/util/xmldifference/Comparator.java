@@ -401,7 +401,6 @@ public class Comparator implements XMLDogConstants {
                 noSimilarNodes = false;
             }
 
-            // FIXME FIXME FIXME!!
 
             // Later control can be transferred to the App User code, to give them
 
@@ -1568,13 +1567,11 @@ public class Comparator implements XMLDogConstants {
                         log("CompareChildNodes: ++++++ Adding child differences from LIST NodeResult "
                                 + nodeResult.toString());
 
-                        NodeResult currentNR = null;
-
                         minDiffNR = (NodeResult) ((List) nodeResult).get(0);
 
                         for (int j = 1; j < ((List) nodeResult).size(); j++) {
 
-                            currentNR = (NodeResult) ((List) nodeResult).get(j);
+                        	NodeResult currentNR = (NodeResult) ((List) nodeResult).get(j);
 
                             // Gather all the Nodes with more Differences
 

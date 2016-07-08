@@ -15,10 +15,6 @@
 package com.seleniumtests.util.helper;
 
 public class WaitHelper {
-
-	public WaitHelper() {
-		// As a utility class, it is not meant to be instantiated.
-	}
 	
     /**
      * Wait For seconds.

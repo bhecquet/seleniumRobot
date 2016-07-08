@@ -41,10 +41,14 @@ import com.seleniumtests.reporter.TestLogging;
 import com.seleniumtests.util.internal.entity.TestEntity;
 
 public class SpreadSheetHelper {
+	
+	private SpreadSheetHelper() {
+		
+	}
 
 	private static final Logger logger = TestLogging.getLogger(SpreadSheetHelper.class);
 
-    private static final Map<Class<?>, Class<?>> PRIMITIVE_TYPE_MAP = new HashMap<Class<?>, Class<?>>();
+    private static final Map<Class<?>, Class<?>> PRIMITIVE_TYPE_MAP = new HashMap<>();
 
     // Setup primitives map
     static {
@@ -146,7 +150,7 @@ public class SpreadSheetHelper {
     public static int getArraySize(final Map<String, Object> map, String key) {
         int count = 0;
         boolean valueFound = false;
-        key = key.toLowerCase();
+        String newKey = key.toLowerCase();
         for (Entry<String, Object> entry : map.entrySet()) {
             String key2 = entry.getKey();
             String value2 = (String) entry.getValue();
@@ -155,21 +159,21 @@ public class SpreadSheetHelper {
             }
 
             key2 = key2.toLowerCase();
-            if (key2.startsWith(key + ".")) {
+            if (key2.startsWith(newKey + ".")) {
                 valueFound = true;
 
-                String subst = key2.substring((key + ".").length());
+                String subst = key2.substring((newKey + ".").length());
                 String[] ss = subst.split("\\.");
                 try {
                     int value = Integer.parseInt(ss[0]);
-                    count = (value > count ? value : count);
+                    count = value > count ? value : count;
                 } catch (NumberFormatException e) {
                     logger.error(e);
                 }
             }
         }
 
-        return (valueFound ? count + 1 : count);
+        return valueFound ? count + 1 : count;
     }
 
     /**
@@ -196,8 +200,6 @@ public class SpreadSheetHelper {
      */
     public static synchronized Iterator<Object[]> getDataFromSpreadsheet(final Class<?> clazz, final String filename,
             final Filter filter, final boolean readHeaders, final boolean supportDPFilter) {
-
-        System.gc();
 
         // CSVHelper handle CSV Files
         if (filename.toLowerCase().endsWith(".csv")) {
@@ -268,7 +270,7 @@ public class SpreadSheetHelper {
      * @throws  Exception
      */
     public static Iterator<Object[]> getEntitiesFromSpreadsheet(final Class<?> clazz,
-            final LinkedHashMap<String, Class<?>> entityClazzMap, final String filename, final Filter filter)
+            final Map<String, Class<?>> entityClazzMap, final String filename, final Filter filter)
         throws Exception {
 
         Iterator<Object[]> dataIterator = getDataFromSpreadsheet(clazz, filename, filter, true);
@@ -287,8 +289,8 @@ public class SpreadSheetHelper {
      * @throws Exception
      */
     private static List<Object[]> getEntityData(final Iterator<Object[]> dataIterator,
-            final LinkedHashMap<String, Class<?>> entityClazzMap) throws Exception {
-        List<Object[]> list = new ArrayList<Object[]>();
+            final Map<String, Class<?>> entityClazzMap) throws Exception {
+        List<Object[]> list = new ArrayList<>();
 
         // Get the headers
         Object[] headerArray = null;
@@ -299,15 +301,15 @@ public class SpreadSheetHelper {
         while (dataIterator.hasNext()) {
 
             Object[] rowDataArray = dataIterator.next();
-            Map<String, Object> map = new LinkedHashMap<String, Object>();
+            Map<String, Object> map = new LinkedHashMap<>();
 
-            List<Object> rowData = new ArrayList<Object>();
+            List<Object> rowData = new ArrayList<>();
             for (int j = 0; j < headerArray.length; j++) {
                 String header = (String) headerArray[j];
                 map.put(header, rowDataArray[j]);
             }
 
-            Map<String, Boolean> temp = new HashMap<String, Boolean>();
+            Map<String, Boolean> temp = new HashMap<>();
             if (entityClazzMap != null) {
                 for (Entry<String, Class<?>> entry : entityClazzMap.entrySet()) {
                     temp.put(entry.getKey(), Boolean.TRUE);
@@ -338,19 +340,15 @@ public class SpreadSheetHelper {
      * @return
      */
     public static Map<String, Object> getFieldsDataNeedToBeSet(final Map<String, Object> map, final String key) {
-        Map<String, Object> result = new LinkedHashMap<String, Object>();
+        Map<String, Object> result = new LinkedHashMap<>();
 
-        for (String key2 : map.keySet()) {
-            if (key2.equalsIgnoreCase(key)) {
-                if (map.get(key2) != null) {
-                    result.put(key2, map.get(key2).toString());
-                }
+        for (Map.Entry<String, Object> entry : map.entrySet()) {
+            if (entry.getKey().equalsIgnoreCase(key) && entry.getValue() != null) {
+                result.put(entry.getKey(), entry.getValue().toString());
             }
 
-            if (key2.toLowerCase().startsWith(key.toLowerCase() + ".")) {
-                if (map.get(key2) != null) {
-                    result.put(key2.substring(key.length() + 1), map.get(key2).toString());
-                }
+            if (entry.getKey().toLowerCase().startsWith(key.toLowerCase() + ".") && entry.getValue() != null) {
+                result.put(entry.getKey().substring(key.length() + 1), entry.getValue().toString());
             }
         }
 
@@ -366,21 +364,21 @@ public class SpreadSheetHelper {
      * @return
      */
     public static Map<String, Object> getFieldsNeedToBeSet(final Map<String, Object> map, final String key) {
-        Map<String, Object> result = new LinkedHashMap<String, Object>();
+        Map<String, Object> result = new LinkedHashMap<>();
         String lastKey = "";
-        for (String key2 : map.keySet()) {
-            if (key2.equalsIgnoreCase(key)) {
-                result.put(key2, map.get(key2));
+        for (Map.Entry<String, Object> entry : map.entrySet()) {
+            if (entry.getKey().equalsIgnoreCase(key)) {
+                result.put(entry.getKey(), entry.getValue());
             }
 
-            if (key2.toLowerCase().startsWith(key.toLowerCase() + ".")) {
-                String newkey = key2.substring(key.length() + 1);
+            if (entry.getKey().toLowerCase().startsWith(key.toLowerCase() + ".")) {
+                String newkey = entry.getKey().substring(key.length() + 1);
                 if (newkey.contains(".")) {
                     newkey = newkey.substring(0, newkey.indexOf("."));
                 }
 
                 if (!newkey.equalsIgnoreCase(lastKey)) {
-                    result.put(newkey, map.get(key2));
+                    result.put(newkey, entry.getValue());
                 }
             }
         }
@@ -439,8 +437,10 @@ public class SpreadSheetHelper {
 
         // Return null when field is atomic and value is null or blank
         if ((tempValue == null || tempValue.length() == 0)
-                && (fieldClz.isEnum() || fieldClz.getName().equals("java.util.Calendar")
-                    || fieldClz.getName().equals("java.math.BigDecimal") || isPrimitive(fieldClz))) {
+                && (fieldClz.isEnum() 
+                		|| "java.util.Calendar".equals(fieldClz.getName())
+                		|| "java.math.BigDecimal".equals(fieldClz.getName()) 
+                		|| isPrimitive(fieldClz))) {
             return null;
         }
 
@@ -465,12 +465,12 @@ public class SpreadSheetHelper {
             }
 
             fieldValue = calendar;
-        } else if (fieldClz.getName().equals("java.math.BigDecimal")) {
+        } else if ("java.math.BigDecimal".equals(fieldClz.getName())) {
             fieldValue = new BigDecimal(tempValue);
         } else if (isPrimitive(fieldClz)) {
             Constructor<?> constructor;
             try {
-                if (fieldClz.getName().equals("java.lang.String")) {
+                if ("java.lang.String".equals(fieldClz.getName())) {
                     fieldValue = tempValue;
                 } else {
                     if (PRIMITIVE_TYPE_MAP.containsKey(fieldClz)) {
@@ -548,23 +548,21 @@ public class SpreadSheetHelper {
 
             // execute the Setter Method
             try {
-                if (fieldValue != null) {
+                if (fieldValue != null && object == null) {
+                    try {
+                        object = clz.newInstance();
+                    } catch (InstantiationException e) {
 
-                    if (object == null) {
-                        try {
-                            object = clz.newInstance();
-                        } catch (InstantiationException e) {
+                        // handle no null parameter constructor
+                        Class<?>[] parameterTypes = new Class<?>[1];
+                        parameterTypes[0] = fieldValue.getClass();
 
-                            // handle no null parameter constructor
-                            Class<?>[] parameterTypes = new Class<?>[1];
-                            parameterTypes[0] = fieldValue.getClass();
-
-                            Constructor<?> constructor = clz.getDeclaredConstructor(parameterTypes);
-                            constructor.setAccessible(true);
-                            object = constructor.newInstance(fieldValue);
-                            return object;
-                        }
+                        Constructor<?> constructor = clz.getDeclaredConstructor(parameterTypes);
+                        constructor.setAccessible(true);
+                        object = constructor.newInstance(fieldValue);
+                        return object;
                     }
+
                 }
 
                 if (fieldValue != null) {

@@ -62,14 +62,10 @@ public class TaScriptGenerator {
 		// look for feature file into data folder
 		File dir = Paths.get(srcPath, "data", application, "features").toFile();
 		if (!dir.exists()) {
-			return new ArrayList<String>();
+			return new ArrayList<>();
 		}
-
-    	File[] featureFiles = dir.listFiles(new FilenameFilter() {
-    		public boolean accept(File dir, String filename) { 
-    			return filename.endsWith(".feature"); 
-    		}
-    	});
+		
+		File[] featureFiles = dir.listFiles((d, filename) -> filename.endsWith(".feature"));
     	
     	List<String> scenarios = new ArrayList<String>();
     	for (File featureFile: featureFiles) {
