@@ -364,22 +364,18 @@ public class SeleniumTestsContext {
 	    		throw new WebDriverException("");
 	    	}
 	    } catch (WebDriverException e) {
-	    	dealWithWebDriverException(e);
+	    	if (getPlatform().toLowerCase().startsWith("android") || getPlatform().toLowerCase().startsWith("ios")) {
+	    		String[] pfVersion = getPlatform().split(" ", 2);
+	    		try {
+		    		setPlatform(pfVersion[0]);
+		    		setMobilePlatformVersion(pfVersion[1]);
+	    		} catch (IndexOutOfBoundsException x) {
+	    			throw new ConfigurationException("For mobile platform, platform name should contain version. Ex: 'Android 5.0' or 'iOS 9.1'");
+	    		}
+			} else {
+				throw new ConfigurationException(String.format("Platform %s has not been recognized as a valide platform", getPlatform()));
+			}
     	}
-    }
-    
-    private void dealWithWebDriverException (WebDriverException e) throws ConfigurationException {
-    	if (getPlatform().toLowerCase().startsWith("android") || getPlatform().toLowerCase().startsWith("ios")) {
-    		String[] pfVersion = getPlatform().split(" ", 2);
-    		try {
-	    		setPlatform(pfVersion[0]);
-	    		setMobilePlatformVersion(pfVersion[1]);
-    		} catch (IndexOutOfBoundsException x) {
-    			throw new ConfigurationException("For mobile platform, platform name should contain version. Ex: 'Android 5.0' or 'iOS 9.1'");
-    		}
-		} else {
-			throw new ConfigurationException(String.format("Platform %s has not been recognized as a valide platform", getPlatform()));
-		}
     }
     
     /**

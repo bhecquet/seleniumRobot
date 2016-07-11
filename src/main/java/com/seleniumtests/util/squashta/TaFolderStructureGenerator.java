@@ -19,6 +19,7 @@ public class TaFolderStructureGenerator {
 	private String application;
 	private String sourceDir;
 	private String path;
+	private static final String TA_FOLDER_NAME = "squashTA";
 	protected static final Logger logger = TestLogging.getLogger(TaFolderStructureGenerator.class);
 	
 	/**
@@ -42,10 +43,10 @@ public class TaFolderStructureGenerator {
 	 */
 	public void generateDefaultStructure() throws IOException {
 		File pomFile = Paths.get(path, "pom.xml").toFile();
-		File javaFile = Paths.get(path, "src", "squashTA", "resources", "junit", "java", "SeleniumRobotTest.java").toFile();
-		File srcJavaFile = Paths.get(sourceDir, "src", "squashTA", "resources", "junit", "java", "SeleniumRobotTest.java").toFile();
-		File taFile = Paths.get(path, "src", "squashTA", "tests", application + "_generic.ta").toFile();
-		File srcTaFile = Paths.get(sourceDir, "src", "squashTA", "tests", application + "_generic.ta").toFile();
+		File javaFile = Paths.get(path, "src", TA_FOLDER_NAME, "resources", "junit", "java", "SeleniumRobotTest.java").toFile();
+		File srcJavaFile = Paths.get(sourceDir, "src", TA_FOLDER_NAME, "resources", "junit", "java", "SeleniumRobotTest.java").toFile();
+		File taFile = Paths.get(path, "src", TA_FOLDER_NAME, "tests", application + "_generic.ta").toFile();
+		File srcTaFile = Paths.get(sourceDir, "src", TA_FOLDER_NAME, "tests", application + "_generic.ta").toFile();
 		
 		// add pom.xml
 		logger.info("copying pom.xml to " + pomFile.toString());
