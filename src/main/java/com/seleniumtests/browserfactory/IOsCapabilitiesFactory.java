@@ -16,7 +16,6 @@ package com.seleniumtests.browserfactory;
 
 import com.seleniumtests.driver.DriverConfig;
 
-import io.appium.java_client.remote.IOSMobileCapabilityType;
 import io.appium.java_client.remote.MobileCapabilityType;
 
 import org.openqa.selenium.remote.CapabilityType;

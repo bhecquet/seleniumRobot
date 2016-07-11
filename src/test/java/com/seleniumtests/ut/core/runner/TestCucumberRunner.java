@@ -20,7 +20,7 @@ public class TestCucumberRunner {
 		try {
 			System.setProperty("cucumberTags", "@new");
 			SeleniumTestsContextManager.initThreadContext(testNGCtx);
-			CustomTestNGCucumberRunner runner = new CustomTestNGCucumberRunner(this.getClass(), "");
+			CustomTestNGCucumberRunner runner = new CustomTestNGCucumberRunner(this.getClass());
 			Assert.assertEquals(runner.provideScenarios().length, 1);
 		} finally {
 			System.clearProperty("cucumberTags");
@@ -32,7 +32,7 @@ public class TestCucumberRunner {
 		try {
 			System.setProperty("cucumberTags", "@new4 AND @new5");
 			SeleniumTestsContextManager.initThreadContext(testNGCtx);
-			CustomTestNGCucumberRunner runner = new CustomTestNGCucumberRunner(this.getClass(), "");
+			CustomTestNGCucumberRunner runner = new CustomTestNGCucumberRunner(this.getClass());
 			Assert.assertEquals(runner.provideScenarios().length, 1);
 		} finally {
 			System.clearProperty("cucumberTags");
@@ -44,7 +44,7 @@ public class TestCucumberRunner {
 		try {
 			System.setProperty("cucumberTags", "@new,@new2");
 			SeleniumTestsContextManager.initThreadContext(testNGCtx);
-			CustomTestNGCucumberRunner runner = new CustomTestNGCucumberRunner(this.getClass(), "");
+			CustomTestNGCucumberRunner runner = new CustomTestNGCucumberRunner(this.getClass());
 			Assert.assertEquals(runner.provideScenarios().length, 2);
 		} finally {
 			System.clearProperty("cucumberTags");
@@ -56,7 +56,7 @@ public class TestCucumberRunner {
 		try {
 			System.setProperty("cucumberTags", "@core AND @new2,@new");
 			SeleniumTestsContextManager.initThreadContext(testNGCtx);
-			CustomTestNGCucumberRunner runner = new CustomTestNGCucumberRunner(this.getClass(), "");
+			CustomTestNGCucumberRunner runner = new CustomTestNGCucumberRunner(this.getClass());
 			Assert.assertEquals(runner.provideScenarios().length, 2);
 		} finally {
 			System.clearProperty("cucumberTags");

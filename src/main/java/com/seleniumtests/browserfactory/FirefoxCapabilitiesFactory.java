@@ -166,16 +166,9 @@ public class FirefoxCapabilitiesFactory extends ICapabilitiesFactory {
 
     protected String getFirefoxProfilePath(String path) {
         String realPath;
-        if (path != null && !new File(path).exists()) {
-            TestLogging.log("Firefox profile path:" + path + " not found, use default");
-            path = null;
-        }
-
-        if (path != null) {
-
-            realPath = path;
-        } else {
-            try {
+        
+        if (path == null) {
+        	try {
                 String profilePath = this.getClass().getResource("/").getPath() + "ffprofile";
                 profilePath = FileUtility.decodePath(profilePath);
 
@@ -186,6 +179,11 @@ public class FirefoxCapabilitiesFactory extends ICapabilitiesFactory {
             	logger.error(e);
                 realPath = null;
             }
+        } else {
+        	realPath = path;
+        	if (!new File(path).exists()) {
+        		TestLogging.log("Firefox profile path:" + path + " not found, use default");
+        	}
         }
 
         logger.info("Firefox Profile: " + realPath);

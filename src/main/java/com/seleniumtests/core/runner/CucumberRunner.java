@@ -48,7 +48,7 @@ public class CucumberRunner {
     public void beforeTestSuite(final ITestContext testContext) throws IOException {
         start = new Date();
         SeleniumTestsContextManager.initGlobalContext(testContext);
-        SeleniumTestsContextManager.initThreadContext(testContext, null);
+        SeleniumTestsContextManager.initThreadContext(testContext);
     }
     
     /**
@@ -60,7 +60,7 @@ public class CucumberRunner {
     public void beforeTest(final ITestContext testContext, final XmlTest xmlTest) {
     	try {
 	        SeleniumTestsContextManager.initTestLevelContext(testContext, xmlTest);
-	        testNGCucumberRunner = new CustomTestNGCucumberRunner(this.getClass(), xmlTest.getName());
+	        testNGCucumberRunner = new CustomTestNGCucumberRunner(this.getClass());
     	} catch (Exception e) {
     		logger.error(Thread.currentThread() + " Error on init: ", e);
     		for (StackTraceElement s : e.getStackTrace()) {
@@ -72,12 +72,13 @@ public class CucumberRunner {
     @BeforeMethod(alwaysRun = true)
     public void beforeTestMethod(final Object[] parameters, final Method method, final ITestContext testContex, final XmlTest xmlTest) {
         logger.info(Thread.currentThread() + " Start method " + method.getName());
-        SeleniumTestsContextManager.initThreadContext(testContex, xmlTest);
+        SeleniumTestsContextManager.initThreadContext(testContex);
         SeleniumTestsContextManager.getThreadContext().setTestMethodSignature(buildMethodSignature(method, parameters));
     }
 
     @Test(groups = "cucumber", description = "Cucumber scenario", dataProvider = "scenarios")
-    public void feature(CucumberScenarioWrapper cucumberScenarioWrapper) throws NoSuchFieldException, RuntimeException, IllegalAccessException {
+    public void feature(CucumberScenarioWrapper cucumberScenarioWrapper) 
+    		throws NoSuchFieldException, RuntimeException, IllegalAccessException {
     	testNGCucumberRunner.runScenario(cucumberScenarioWrapper);
     	logger.info(Thread.currentThread() + "Start scenario: " + cucumberScenarioWrapper);
     }

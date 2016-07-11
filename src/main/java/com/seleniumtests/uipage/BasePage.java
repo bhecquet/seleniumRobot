@@ -54,7 +54,7 @@ public abstract class BasePage {
     public BasePage() { 
     }
 
-    public void acceptAlert() throws RuntimeException {
+    public void acceptAlert() {
         Alert alert = driver.switchTo().alert();
         alert.accept();
         driver.switchTo().defaultContent();
@@ -126,7 +126,7 @@ public abstract class BasePage {
         assertAlertHTML(seenText.contains(text), "assert confirmation text.");
     }
 
-    protected void assertCurrentPage(final boolean log) throws RuntimeException { }
+    protected void assertCurrentPage(final boolean log) { }
 
     public void assertElementNotPresent(final HtmlElement element) {
         TestLogging.logWebStep(null, "assert " + element.toHTML() + " is not present.", false);
@@ -239,7 +239,7 @@ public abstract class BasePage {
         assertHTML(getBodyText().toLowerCase().contains(text.toLowerCase()), "Text= {" + text + "} not found.");
     }
 
-    public String cancelConfirmation() throws RuntimeException {
+    public String cancelConfirmation() {
         Alert alert = driver.switchTo().alert();
         String seenText = alert.getText();
         alert.dismiss();

@@ -34,6 +34,7 @@ public class ChromeCapabilitiesFactory extends ICapabilitiesFactory {
 
 	private static final String CHROME_DRIVER_PROPERTY = "webdriver.chrome.driver";
 	
+	@Override
     public DesiredCapabilities createCapabilities(final DriverConfig webDriverConfig) {
 
         DesiredCapabilities capability = DesiredCapabilities.chrome();
@@ -74,22 +75,7 @@ public class ChromeCapabilitiesFactory extends ICapabilitiesFactory {
 
         // Set ChromeDriver for local mode
         if (webDriverConfig.getMode() == DriverMode.LOCAL) {
-            String chromeDriverPath = webDriverConfig.getChromeDriverPath();
-            if (chromeDriverPath == null) {
-                try {
-                    if (System.getenv(CHROME_DRIVER_PROPERTY) != null) {
-                        logger.info("get Chrome driver from property:" 
-                        			+ System.getenv(CHROME_DRIVER_PROPERTY));
-                        System.setProperty(CHROME_DRIVER_PROPERTY, System.getenv(CHROME_DRIVER_PROPERTY));
-                    } else {
-                        handleExtractResources();
-                    }
-                } catch (IOException ex) {
-                	logger.error(ex);
-                }
-            } else {
-                System.setProperty(CHROME_DRIVER_PROPERTY, chromeDriverPath);
-            }
+        	setChromeDriverLocal(webDriverConfig);
         }
 
         return capability;
@@ -104,6 +90,29 @@ public class ChromeCapabilitiesFactory extends ICapabilitiesFactory {
         } else {
             System.setProperty(CHROME_DRIVER_PROPERTY, dir + "/chromedriver");
             new File(dir + "/chromedriver").setExecutable(true);
+        }
+    }
+    
+    /**
+     * Set ChromeDriver for local mode
+     * @param webDriverConfig
+     */
+    public void setChromeDriverLocal(final DriverConfig webDriverConfig){
+        String chromeDriverPath = webDriverConfig.getChromeDriverPath();
+        if (chromeDriverPath == null) {
+            try {
+                if (System.getenv(CHROME_DRIVER_PROPERTY) != null) {
+                    logger.info("get Chrome driver from property:" 
+                    			+ System.getenv(CHROME_DRIVER_PROPERTY));
+                    System.setProperty(CHROME_DRIVER_PROPERTY, System.getenv(CHROME_DRIVER_PROPERTY));
+                } else {
+                    handleExtractResources();
+                }
+            } catch (IOException ex) {
+            	logger.error(ex);
+            }
+        } else {
+            System.setProperty(CHROME_DRIVER_PROPERTY, chromeDriverPath);
         }
     }
 
