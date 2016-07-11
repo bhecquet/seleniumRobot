@@ -41,10 +41,7 @@ import com.seleniumtests.reporter.TestLogging;
 import com.seleniumtests.util.internal.entity.TestEntity;
 
 public class SpreadSheetHelper {
-	
-	private SpreadSheetHelper() {
-		
-	}
+
 
 	private static final Logger logger = TestLogging.getLogger(SpreadSheetHelper.class);
 
@@ -61,6 +58,10 @@ public class SpreadSheetHelper {
         PRIMITIVE_TYPE_MAP.put(Float.TYPE, Float.class);
         PRIMITIVE_TYPE_MAP.put(Double.TYPE, Double.class);
     }
+    
+    private SpreadSheetHelper() {
+		
+	}
 
     /**
      * Read field value of an Object : 

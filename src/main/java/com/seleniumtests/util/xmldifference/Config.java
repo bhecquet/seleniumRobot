@@ -527,48 +527,19 @@ public class Config implements XMLDogConstants {
 
     public Map<String, String> loadXPathEList(final String filename) {
 
-        BufferedReader br = null;
-        FileReader fr = null;
+        if (!(new File(filename)).exists()) {
 
-        try {
+            logger.info("Elist (" + filename + ") doesn't exist -- exclude list turned off");
 
-            if (!(new File(filename)).exists()) {
+        }
 
-                System.out.println("Elist (" + filename + ") doesn't exist -- exclude list turned off");
-
-            }
-            fr = new FileReader(filename);
-            br = new BufferedReader(fr);
+        try (FileReader fr = new FileReader(filename);
+        	 BufferedReader br = new BufferedReader(fr);
+        		){
 
             String line;
 
             while ((line = br.readLine()) != null) {
-
-                /*
-                 *
-                 * line = line.trim();
-                 *
-                 * // Regular Expression for Attribute found
-                 *
-                 *
-                 *
-                 *      if (line.endsWith(XMLConstants.XPATH_REGEX_END))
-                 *
-                 *      {
-                 *
-                 *              regEx = parseRegEx(line);
-                 *
-                 *
-                 *
-                 *              if ((regEx != null) && (isValidRegEx(regEx)))
-                 *
-                 *                      xpathEList.put(line, regEx);
-                 *
-                 *      }
-                 *
-                 *      else
-                 *
-                 */
 
                 xpathEList.put(line.trim(), null);
 
@@ -578,183 +549,11 @@ public class Config implements XMLDogConstants {
 
             logger.error(ex);
 
-        } finally {
-
-            if (br != null) {
-
-                try {
-
-                    br.close();
-
-                } catch (Exception ex) { }
-
-                br = null;
-
-            }
-            if (fr != null) {
-
-                try {
-
-                    fr.close();
-
-                } catch (Exception ex) { }
-
-                fr = null;
-
-            }
-
-        }
+        } 
 
         return xpathEList;
 
     }
-
-    /**
-     * Loads XPath RList<br>
-     * Elist is a list of XPath expressions containing Regular Expressions to compare the Nodes with a given Regular
-     * Expression.
-     *
-     * @return  the Map containing all the XPath Node Regular Expression entries
-     */
-
-    /*
-     *
-     * public Map loadXPathRList(String filename)
-     *
-     * {
-     *
-     *      BufferedReader br = null;
-     *
-     *
-     *
-     *      try
-     *
-     *      {
-     *
-     *           if (!(new File(filename)).exists())
-     *
-     *           {
-     *
-     *                      System.out.println("Rlist ("+filename+") doesn't exist -- regular expression list turned
-     * off");
-     *
-     *           }
-     *
-     *
-     *
-     *           br = new BufferedReader(new FileReader(filename));
-     *
-     *           String line;
-     *
-     *           String regEx = null;
-     *
-     *
-     *
-     *           while ((line = br.readLine()) != null)
-     *
-     *           {
-     *
-     *              line = line.trim();
-     *
-     *              // Regular Expression for Attribute found
-     *
-     *                      if (line.endsWith(XMLConstants.XPATH_REGEX_END))
-     *
-     *                      {
-     *
-     *                              regEx = parseRegEx(line);
-     *
-     *
-     *
-     *                              if ((regEx != null) && (isValidRegEx(regEx)))
-     *
-     *                                      _xpathRList.put(line, regEx);
-     *
-     *                      }
-     *
-     *           }
-     *
-     *       }
-     *
-     *       catch (IOException ex)
-     *
-     *       {
-     *
-     *           ex.printStackTrace();
-     *
-     *       }
-     *
-     *       finally
-     *
-     *       {
-     *
-     *              if (br != null)
-     *
-     *              {
-     *
-     *                      try
-     *
-     *                      {
-     *
-     *                              br.close();
-     *
-     *                      } catch (Exception ex) {}
-     *
-     *                      br = null;
-     *
-     *              }
-     *
-     *       }
-     *
-     *
-     *
-     *      return _xpathRList;
-     *
-     * }
-     *
-     */
-
-    /**
-     * Checks to see if the Input line has a valid regualr expression<br>
-     * Currently Perl 5 Regular Expressions are supported<br>
-     * see Apache ORO documentation.
-     */
-
-    /*
-     *
-     * public static boolean isValidRegEx(String regEx)
-     *
-     * {
-     *
-     *      PatternCompiler compiler = new Perl5Compiler();
-     *
-     *
-     *
-     *      try
-     *
-     *      {
-     *
-     *              compiler.compile(regEx);
-     *
-     *      }
-     *
-     *      catch (MalformedPatternException mex)
-     *
-     *      {
-     *
-     *              mex.printStackTrace();
-     *
-     *              return false;
-     *
-     *      }
-     *
-     *
-     *
-     *      return true;
-     *
-     * }
-     *
-     */
 
     /**
      * Parses input string for the Regular Expression.
@@ -768,6 +567,7 @@ public class Config implements XMLDogConstants {
 
     public static String parseRegEx(String line) {
 
+    	
         if ((line == null) || (line.trim().length() == 0)) {
 
             return null;
@@ -782,11 +582,11 @@ public class Config implements XMLDogConstants {
 
         line = line.trim();
 
-        int regExBegin, regExEnd = 0;
+        int regExBegin, regExEnd;
 
         // Incorrect format if multiple ] occurs
 
-        if (((line.indexOf(']')) != (regExEnd = line.lastIndexOf(']')))
+        if ((line.indexOf(']') != (regExEnd = line.lastIndexOf(']')))
                 ||
 
                 (regExEnd <= 0)) {
@@ -838,8 +638,6 @@ public class Config implements XMLDogConstants {
         if (DEBUG) {
 
             log(msg);
-
-            t.printStackTrace(System.out);
 
         }
 

@@ -27,6 +27,7 @@ import java.util.StringTokenizer;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.w3c.dom.Attr;
 import org.w3c.dom.DOMException;
@@ -52,19 +53,9 @@ public class XMLUtil implements XMLDogConstants
         try {
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 
-            /*
-
-            factory.setExpandEntityReferences(false);
-
-            factory.setValidating(false);
-
-             */
-
             factory.setNamespaceAware(true);
 
             docBuilder = factory.newDocumentBuilder();
-            
-            //docBuilder.setEntityResolver(new MyEntityResolver());
 
         } catch (Exception ex) {
         	logger.error(ex);
@@ -74,7 +65,9 @@ public class XMLUtil implements XMLDogConstants
     /**
      * Default Constructor
      */
-    public XMLUtil() {}
+    private XMLUtil() {
+    	// do nothing
+    }
 
     /**
      * Gets Nodes identical to a given test Node for a given parent Node
@@ -112,7 +105,7 @@ public class XMLUtil implements XMLDogConstants
 
         NodeList childNodes = parent.getChildNodes();
 
-        XNode xNode = null;
+        XNode xNode;
 
         for (int i = 0; i < childNodes.getLength(); i++) 
         {
@@ -212,10 +205,6 @@ public class XMLUtil implements XMLDogConstants
                                 break;
 
                             Node element = nodes.item(i);
-                            String eText = getText(element);
-
-                            //System.out.println("Element : " + ((Element)element).getTagName() + ":Value:" + eText);
-
                             element = removeChildren(element);
                             Text textNode = doc.createTextNode(value);
                             element.appendChild(textNode);
@@ -280,8 +269,6 @@ public class XMLUtil implements XMLDogConstants
      */
     public static String replaceElementText(String xmlFile, String elementTag, List values, boolean overwrite)
     {
-        File file = null;
-        FileWriter fw = null;
         Document doc = null;
 
         if ((xmlFile == null) ||
@@ -316,8 +303,6 @@ public class XMLUtil implements XMLDogConstants
                 {
                     if ((values.get(i) != null) && (! "".equals( ((String) values.get(i)).trim()) )) 
                     {
-                        //System.out.println("********** XML value to be put is NOT null");
-
                         Element newElement = doc.createElement(elementTag);
                         Text textNode = doc.createTextNode((String) values.get(i));
                         newElement.appendChild(textNode);
@@ -330,13 +315,7 @@ public class XMLUtil implements XMLDogConstants
 
             if (overwrite) 
             {
-                file = new File(xmlFile);
-                file.renameTo(new File(xmlFile + ".bak"));
-
-                fw = new FileWriter(file);
-                fw.write(newXMLStr);
-                fw.flush();
-                fw.close();
+            	FileUtils.writeStringToFile(new File(xmlFile), newXMLStr);
             }
 
             return newXMLStr;
@@ -347,21 +326,7 @@ public class XMLUtil implements XMLDogConstants
 
             throw new DOMException(DOMException.INVALID_MODIFICATION_ERR, "Error replacing Element text " + ex.toString());
 
-        } finally {
-
-            try {
-
-                if (fw != null)
-                    fw.close();
-
-            } catch (IOException ex) {
-                // do nothing
-            }
-
-            file = null;
-            fw = null;
-            doc = null;
-        }
+        } 
     }
 
 
@@ -373,33 +338,17 @@ public class XMLUtil implements XMLDogConstants
      */
     public static Node removeChildren(Node node)
     {
-        /*
-        System.out.println(" Node whose children are to be removed:" + node.getNodeName() + 
-                               ":Type:" + node.getNodeType() + ":value:" + node.getNodeValue());
-         */
 
         // Currently remove children of only Element Nodes
         if (node.getNodeType() == Node.ELEMENT_NODE) 
         {
             NodeList children = node.getChildNodes();
 
-            //System.out.println("***** XMLUTIL....removeChildren....# of children are " + children.getLength());
-
             for (int i = 0; i < children.getLength(); i++) 
             {
                 Node child = children.item(i);
 
-                /*
-                System.out.println("Child Name:" + child.getNodeName() + 
-                                      ":Type:" + child.getNodeType() + " value:" + child.getNodeValue() + ":i= " + i);
-                 */
-
                 node.removeChild(child);
-
-                /*
-                System.out.println("Removed Name:" + temp.getNodeName() + 
-                                    ":Type:" + temp.getNodeType() + " value:" + temp.getNodeValue() + ":i= " + i);
-                 */
 
                 i--;
             }
@@ -491,46 +440,33 @@ public class XMLUtil implements XMLDogConstants
         switch (type)
         {
             case Node.DOCUMENT_NODE: 
-            {
             	sb.append(printDocumentNode(node, canonical, normalize));
             	break;
-            }
 
             case Node.ELEMENT_NODE: 
-            {
             	sb.append(printElementNode(node, canonical, normalize));
             	break;
-            }
 
             case Node.ENTITY_REFERENCE_NODE:
-            {
             	sb.append(printEntityReferenceNode(node, canonical, normalize));
-            }
+            	break;
             
             case Node.CDATA_SECTION_NODE:
-            {
             	sb.append(printCDataSectionNode(node, canonical, normalize));
             	break;
-            }
             
             // print text
             case Node.TEXT_NODE:
-            {                  
             	sb.append(normalize(node.getNodeValue(), canonical));
             	break;
-            }
             
             case Node.PROCESSING_INSTRUCTION_NODE:
-            {
-            	sb.append(printProcessingInstructionNode(node, canonical, normalize));
+            	sb.append(printProcessingInstructionNode(node, normalize));
             	break;
-            }
                 
             case Node.DOCUMENT_TYPE_NODE:
-            {
-            	sb.append(printDocumentTypeNode(node, canonical, normalize));
+            	sb.append(printDocumentTypeNode(node, normalize));
             	break;
-            }
             
             default:
             	break;
@@ -690,7 +626,7 @@ public class XMLUtil implements XMLDogConstants
      * @param normalize
      * @return the String representation of a processing instruction Node
      */
-    protected static String printProcessingInstructionNode(Node node, boolean canonical, boolean normalize){
+    protected static String printProcessingInstructionNode(Node node, boolean normalize){
     	
     	StringBuilder sb = new StringBuilder();
     	
@@ -717,7 +653,7 @@ public class XMLUtil implements XMLDogConstants
      * @param normalize
      * @return the String representation of a document type Node
      */
-    protected static String printDocumentTypeNode(Node node, boolean canonical, boolean normalize){
+    protected static String printDocumentTypeNode(Node node, boolean normalize){
     	
     	StringBuilder sb = new StringBuilder();
     	
@@ -752,47 +688,35 @@ public class XMLUtil implements XMLDogConstants
 	            switch (ch) {
 	
 	                case '<':
-	                {
 	                    str.append("&lt;");
 	                    break;
-	                }
 	
 	                case '>':
-	                {
 	                    str.append("&gt;");
 	                    break;
-	                }
 	
 	                case '&':
-	                {
 	                    str.append("&amp;");
 	                    break;
-	                }
 	
 	                case '"':
-	                {
 	                    str.append("&quot;");
 	                    break;
-	                }
 	
 	                case '\'':
-	                {
 	                    str.append("&apos;");
 	                    break;
-	                }
 	
-	                // case '\r': {}
 	
 	                case '\n':
-	                {
 	                    if (canonical) {
 	
 	                        str.append("&#");
 	                        str.append(Integer.toString(ch));
 	                        str.append(';');
+	                        break;
 	                    }
 	                    // else, default append char
-	                }
 	
 	                default:
 	                {
@@ -986,8 +910,6 @@ public class XMLUtil implements XMLDogConstants
         if (node == null)
             return "";
 
-        Node parent = node.getParentNode();
-
         int index = noIndex ? 0 : getXPathNodeIndex(node, ignoreWhitespace);
 
         String indexStr = "";
@@ -1094,7 +1016,6 @@ public class XMLUtil implements XMLDogConstants
         if (node == null)
         {
             return -1;
-            //throw new IllegalArgumentException("Node argument for getXPathNodeIndex cannot be null");
         }
 
         Node prevNode = node;
@@ -1143,22 +1064,6 @@ public class XMLUtil implements XMLDogConstants
             return false;
 
 
-    	/*	
-
-    	if (node1.getNodeType() == node2.getNodeType() &&
-
-           	(areNullorEqual(node1.getNodeValue(), node2.getNodeValue(), ignoreWhitespace, false)) &&
-
-           	(areNullorEqual(node1.getLocalName(), node2.getLocalName(), ignoreWhitespace, false)) &&
-
-           	(areNullorEqual(node1.getNamespaceURI(), node2.getNamespaceURI(), ignoreWhitespace, false)) &&
-
-           	(areNullorEqual(node1.getNodeName(), node2.getNodeName(), ignoreWhitespace, false)))
-
-            	return true;
-
-         */
-
         if (areNonNullAndEqual(node1.getNamespaceURI(), node2.getNamespaceURI()))
         {
             if (node1.getNodeType() == node2.getNodeType() &&
@@ -1193,20 +1098,7 @@ public class XMLUtil implements XMLDogConstants
         if ((node1 == null) || (node2 == null))
             return false;
 
-    	/*	
-
-    	if (node1.getNodeType() == node2.getNodeType() &&           	
-
-           	(areNullorEqual(node1.getLocalName(), node2.getLocalName(), ignoreWhitespace, false)) &&
-
-           	(areNullorEqual(node1.getNamespaceURI(), node2.getNamespaceURI(), ignoreWhitespace, false)) &&
-
-           	(areNullorEqual(node1.getNodeName(), node2.getNodeName(), ignoreWhitespace, false)))
-
-            	return true;
-
-        */
-
+    	
         if (areNonNullAndEqual(node1.getNamespaceURI(), node2.getNamespaceURI()))
         {
             if (node1.getNodeType() == node2.getNodeType() &&
@@ -1234,11 +1126,10 @@ public class XMLUtil implements XMLDogConstants
     {
         if (node == null)
         {
-            System.out.println("Null node");
             return;
         }
 
-        System.out.println(" Node[Namespace URI=" + node.getNamespaceURI() + " localname=" +
+        logger.info(" Node[Namespace URI=" + node.getNamespaceURI() + " localname=" +
                 node.getLocalName() + " name=" +
                 node.getNodeName() + " type=" +
                 getNodeTypeStr(node.getNodeType()) + " Value=" + node.getNodeValue() +
@@ -1352,7 +1243,7 @@ public class XMLUtil implements XMLDogConstants
         if (node == null)
             return false;
 
-        return (node.getNodeType() == Node.COMMENT_NODE);
+        return node.getNodeType() == Node.COMMENT_NODE;
     }
 
     /**
@@ -1361,7 +1252,7 @@ public class XMLUtil implements XMLDogConstants
     public static boolean isStrElementNode(String elementName, Node elementNode, boolean ignoreCase)
     {
         if ((elementNode == null) || (elementName == null) ||
-                (elementName.trim().equals("")) || (elementNode.getNodeType() != Node.ELEMENT_NODE))
+                (elementName.trim().isEmpty()) || (elementNode.getNodeType() != Node.ELEMENT_NODE))
             return false;
 
         StringTokenizer tokenizer = new StringTokenizer(":");
@@ -1370,7 +1261,6 @@ public class XMLUtil implements XMLDogConstants
 
         if (numTokens == 1)
         {
-            String name = (String) tokenizer.nextElement();
 
             Element element = (Element) elementNode;
 
@@ -1395,11 +1285,11 @@ public class XMLUtil implements XMLDogConstants
 
             if (ignoreCase)
 
-                return ((element.getLocalName().trim().equalsIgnoreCase(localName)) &&
-                        (element.getNamespaceURI().equalsIgnoreCase(namespace.trim())));
+                return (element.getLocalName().trim().equalsIgnoreCase(localName)) &&
+                        (element.getNamespaceURI().equalsIgnoreCase(namespace.trim()));
 
-            return ((element.getLocalName().trim().equals(localName)) &&
-                    (element.getNamespaceURI().equals(namespace.trim())));
+            return (element.getLocalName().trim().equals(localName)) &&
+                    (element.getNamespaceURI().equals(namespace.trim()));
             
         } else
 
@@ -1439,7 +1329,7 @@ public class XMLUtil implements XMLDogConstants
             }
         }
 
-        return (obj1.equals(obj2));
+        return obj1.equals(obj2);
     }
 
 
@@ -1460,44 +1350,7 @@ public class XMLUtil implements XMLDogConstants
     public static void log(String msg)
     {
         if (DEBUG)
-            System.out.println("XMLUtil:" + msg);
-    }
-
-    /**
-     * Prints msg and Exception to System.out
-     */
-    public static void log(String msg, Throwable t)
-    {
-        if (DEBUG)
-        {
-            log(msg);
-        }
-    }
-
-    /**
-     * EntityResolver class
-     */
-    private static class MyEntityResolver
-            implements EntityResolver
-    {
-        public org.xml.sax.InputSource resolveEntity(String publicID, String systemID)
-                throws org.xml.sax.SAXException, java.io.IOException
-        {
-            System.out.println("System id is " + systemID);
-
-            if (systemID.equals("http://java.sun.com/j2ee/dtds/web-app_2_2.dtd"))
-                return (new InputSource("web-app_2_2.dtd"));
-
-            else if (systemID.equals("http://java.sun.com/dtd/web-app_2_3.dtd"))
-                return (new InputSource("web-app_2_3.dtd"));
-            
-            else
-                //By returning null, the parser will use its default behaviour. 
-
-                return null;
-
-        }
-
+            logger.info("XMLUtil:" + msg);
     }
 
 }

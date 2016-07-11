@@ -451,7 +451,9 @@ public abstract class BasePage {
                     }
 
                     return !"about:blank".equals(driver.getCurrentUrl());
-                } catch (SeleniumException|NoSuchWindowException e) { }
+                } catch (SeleniumException|NoSuchWindowException e) {
+                	// ignore
+                }
 
                 return false;
             }
@@ -486,7 +488,9 @@ public abstract class BasePage {
                     b = true;
                     break;
                 }
-            } catch (Exception ignore) { }
+            } catch (Exception ignore) {
+            	// ignore
+            }
 
             WaitHelper.waitForSeconds(1);
         }
@@ -505,7 +509,9 @@ public abstract class BasePage {
                     textPresent = false;
                     break;
                 }
-            } catch (Exception ignore) { }
+            } catch (Exception ignore) { 
+            	// ignore
+            }
 
             WaitHelper.waitForSeconds(1);
         }

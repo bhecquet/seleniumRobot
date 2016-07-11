@@ -28,6 +28,8 @@ public class StringUtil {
     /**
      * Checks if the input String is Whitespace only.
      */
+	
+	private StringUtil() {}
 
     public static boolean isWhitespaceStr(String str) {
 

@@ -37,7 +37,7 @@ public class ConfigMappingReader {
 	 */
 	public Map<String, String> readConfig(String page) {
 		
-		//Recup values in context, lowerCase because of the name of directories but can be to change...
+		//Recup values in context, lowerCase because of the name of directories but can be changed...
 		String mobile = SeleniumTestsContextManager.getThreadContext().getPlatform().toLowerCase();
 		String version = SeleniumTestsContextManager.getThreadContext().getMobilePlatformVersion();
 		
@@ -50,7 +50,7 @@ public class ConfigMappingReader {
 	 */
 	public Map<String, HashMap<String, String>> readConfig() {
 		
-		//Recup values in context, lowerCase because of the name of directories but can be to change...
+		//Recup values in context, lowerCase because of the name of directories but can be changed...
 		String mobile = SeleniumTestsContextManager.getThreadContext().getPlatform().toLowerCase();
 		String version = SeleniumTestsContextManager.getThreadContext().getMobilePlatformVersion();
 		
@@ -80,43 +80,28 @@ public class ConfigMappingReader {
 		Map<String, HashMap<String,String>> testConfig = new HashMap<>();
 		
 		//create String for Paths
-		String iniFilePath = "";		
-		String typeFilePath;
-		String versionFilePath;
+		String iniFilePath = "";
+
+		// load generic configuration
+		File globalConfigFile =  Paths.get(SeleniumTestsContext.getConfigPath(), "objectMapping.ini").toFile();
+		testConfig = extractConfigValues(testConfig, globalConfigFile);
 		
-		if(typeDir != null && !"".equals(typeDir)){
+		// load system specific configuration if any (web / ios / android)
+		if(typeDir != null && !typeDir.isEmpty()) {
 			
-			typeFilePath =  Paths.get(SeleniumTestsContext.getConfigPath(), "objectMapping.ini").toString();
-			iniFilePath = Paths.get(iniFilePath, typeDir).toString();
-			
-			//load targeted files from parent
-			File fileForIniToHerite = new File(typeFilePath);
-			
-			//load values from the common file for all types of mobile
-			testConfig = extractConfigValues(testConfig, fileForIniToHerite);
+			if (!"ios".equalsIgnoreCase(typeDir) && !"android".equalsIgnoreCase(typeDir)) {
+				typeDir = "web";
+			}
+			File systemConfigFile =  Paths.get(SeleniumTestsContext.getConfigPath(), typeDir, "objectMapping.ini").toFile();
+			testConfig = extractConfigValues(testConfig, systemConfigFile);
 			
 			
-			if(versionDir != null && !"".equals(versionDir)){
+			if(versionDir != null && !versionDir.isEmpty()){
 				
-				versionFilePath =  Paths.get(SeleniumTestsContext.getConfigPath(), typeDir, "objectMapping.ini").toString();
-				iniFilePath = Paths.get(iniFilePath, versionDir).toString();
-				
-				//load targeted files from son
-				File secondFileForIniToHerite = new File(versionFilePath);
-				
-				//load values from the common file for this type of mobile (android or ios)
-				testConfig = extractConfigValues(testConfig, secondFileForIniToHerite);
+				File versionConfigFile =  Paths.get(SeleniumTestsContext.getConfigPath(), typeDir, versionDir, "objectMapping.ini").toFile();
+				testConfig = extractConfigValues(testConfig, versionConfigFile);
 			}
 		}
-		
-		//Path of the target file
-		iniFilePath = Paths.get(SeleniumTestsContext.getConfigPath() , iniFilePath , "objectMapping.ini").toString();
-		
-		//load targeted files from older parent
-		File fileForIni = new File(iniFilePath);
-		
-		//extract values of past file
-		testConfig = extractConfigValues(testConfig, fileForIni);
 		
 		return testConfig;
 	}
@@ -134,6 +119,7 @@ public class ConfigMappingReader {
 		}
 		catch (ConfigurationException e){
 			logger.debug("No such file : " + file);
+			return testConfig;
 		}
 		return newTestConfig;
 	}

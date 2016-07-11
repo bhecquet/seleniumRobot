@@ -39,10 +39,7 @@ public class SeleniumTestsContextManager {
 
 	private static final Logger logger = TestLogging.getLogger(SeleniumTestsContext.class);
 	
-	private SeleniumTestsContextManager() {
-		// As a utility class, it is not meant to be instantiated.
-	}
-	
+
     // context listener
     private static List<IContextAttributeListener> contextAttributeListeners = Collections.synchronizedList(
             new ArrayList<IContextAttributeListener>());
@@ -57,6 +54,10 @@ public class SeleniumTestsContextManager {
     // thread level SeleniumTestsContext
     private static ThreadLocal<SeleniumTestsContext> threadLocalContext = new ThreadLocal<>();
 
+    private SeleniumTestsContextManager() {
+		// As a utility class, it is not meant to be instantiated.
+	}
+    
     public static void addContextAttributeListener(final IContextAttributeListener listener) {
         contextAttributeListeners.add(listener);
     }

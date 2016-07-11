@@ -16,7 +16,6 @@ package com.seleniumtests.uipage.htmlelements;
 import java.util.List;
 
 import org.openqa.selenium.By;
-import org.openqa.selenium.NotFoundException;
 import org.openqa.selenium.WebElement;
 
 public class Table extends HtmlElement {
