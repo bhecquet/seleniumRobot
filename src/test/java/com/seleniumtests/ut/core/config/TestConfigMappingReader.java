@@ -17,7 +17,7 @@ public class TestConfigMappingReader extends GenericTest {
 
 	@BeforeMethod(enabled=true, alwaysRun = true)
 	public void initContext(final ITestContext testNGCtx, final XmlTest xmlTest) {
-		SeleniumTestsContextManager.initThreadContext(testNGCtx, xmlTest);
+		SeleniumTestsContextManager.initThreadContext(testNGCtx);
 	}
 	
 	@Test(groups={"ut"})

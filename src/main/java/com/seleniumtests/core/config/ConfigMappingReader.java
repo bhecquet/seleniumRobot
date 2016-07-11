@@ -70,69 +70,71 @@ public class ConfigMappingReader {
 	
 	/**
 	 * @author  Sophie
-	 * @param type name of the directory representing the mobile type (android, ios, etc), can be empty
-	 * @param version name of the directory representing the version (4.4, ios_6, etc), can be empty
-	 * @return the HashMap with all properties corresponding with the mobile using 
+	 * @param typeDir : name of the directory representing the mobile type (android, ios, etc), can be empty
+	 * @param versionDir : name of the directory representing the version (4.4, ios_6, etc), can be empty
+	 * @return the Map with all properties corresponding with the mobile using 
 	 */
-	public Map<String, HashMap<String,String>> readConfig(String type, String version){
+	public Map<String, HashMap<String,String>> readConfig(String typeDir, String versionDir){
 		
 		//create HashMap for result
 		Map<String, HashMap<String,String>> testConfig = new HashMap<>();
 		
 		//create String for Paths
-		String pathToLoad = "";
-		String pathToHerite =  "";
-		String secondPathToHerite = "";
-	
-		//modify path of Files with the arguments 
-		if(type != null && !"".equals(type)){
-			pathToHerite =  Paths.get(SeleniumTestsContext.getConfigPath(), "objectMapping.ini").toString();
-			pathToLoad = Paths.get(pathToLoad, type).toString();
+		String iniFilePath = "";		
+		String typeFilePath =  "";
+		String versionFilePath = "";
+		
+		if(typeDir != null && !"".equals(typeDir)){
 			
-			if(version != null && !"".equals(version)){
-				secondPathToHerite =  Paths.get(SeleniumTestsContext.getConfigPath(), type, "objectMapping.ini").toString();
-				pathToLoad = Paths.get(pathToLoad, version).toString();
+			typeFilePath =  Paths.get(SeleniumTestsContext.getConfigPath(), "objectMapping.ini").toString();
+			iniFilePath = Paths.get(iniFilePath, typeDir).toString();
+			
+			//load targeted files from parent
+			File fileForIniToHerite = new File(typeFilePath);
+			
+			//load values from the common file for all types of mobile
+			testConfig = extractConfigValues(testConfig, fileForIniToHerite);
+			
+			
+			if(versionDir != null && !"".equals(versionDir)){
+				
+				versionFilePath =  Paths.get(SeleniumTestsContext.getConfigPath(), typeDir, "objectMapping.ini").toString();
+				iniFilePath = Paths.get(iniFilePath, versionDir).toString();
+				
+				//load targeted files from son
+				File secondFileForIniToHerite = new File(versionFilePath);
+				
+				//load values from the common file for this type of mobile (android or ios)
+				testConfig = extractConfigValues(testConfig, secondFileForIniToHerite);
 			}
 		}
 		
-			//Path of the target file
-		pathToLoad = Paths.get(SeleniumTestsContext.getConfigPath() , pathToLoad , "objectMapping.ini").toString();
+		//Path of the target file
+		iniFilePath = Paths.get(SeleniumTestsContext.getConfigPath() , iniFilePath , "objectMapping.ini").toString();
 		
-		//load targeted files from son to older parent
-		File fileForIni = new File(pathToLoad);
-		File fileForIniToHerite = new File(pathToHerite);
-		File secondFileForIniToHerite = new File(secondPathToHerite);
-	
-			
-		//load parents data
-		if(type != null &&  !"".equals(type)){
-			//extract values from the common file for all types of mobile
-			try{
-				testConfig = IniHelper.readIniFile(fileForIniToHerite, testConfig);	
-			}
-			catch (ConfigurationException e){
-				logger.debug("No such file : " + fileForIniToHerite);
-			}
-
-			if(version != null && !"".equals(version)){
-				//extract values from the common file for this type of mobile (android or ios)
-				try{
-					testConfig = IniHelper.readIniFile(secondFileForIniToHerite, testConfig);
-				}
-				catch (ConfigurationException e){
-					logger.debug("No such file : " + secondFileForIniToHerite);
-				}
-			}
-		}
-			
+		//load targeted files from older parent
+		File fileForIni = new File(iniFilePath);
+		
 		//extract values of past file
+		testConfig = extractConfigValues(testConfig, fileForIni);
+		
+		return testConfig;
+	}
+	
+	/**
+	 * 
+	 * @param testConfig
+	 * @param file
+	 * @return
+	 */
+	private Map<String, HashMap<String,String>> extractConfigValues(
+									Map<String, HashMap<String,String>> testConfig, File file){
 		try{
-			testConfig = IniHelper.readIniFile(fileForIni, testConfig);
+			testConfig = IniHelper.readIniFile(file, testConfig);
 		}
 		catch (ConfigurationException e){
-			logger.debug("No such file : " + fileForIni);
+			logger.debug("No such file : " + file);
 		}
-		
 		return testConfig;
 	}
 	
