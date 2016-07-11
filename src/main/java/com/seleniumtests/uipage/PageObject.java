@@ -59,7 +59,6 @@ import com.seleniumtests.util.helper.WaitHelper;
 public class PageObject extends BasePage implements IPage {
 
 	private static final Logger logger = TestLogging.getLogger(PageObject.class);
-    private static final int MAX_WAIT_TIME_FOR_REDIRECTION = 3;
     private boolean frameFlag = false;
     private HtmlElement pageIdentifierElement = null;
     private String popupWindowName = null;
@@ -161,9 +160,7 @@ public class PageObject extends BasePage implements IPage {
     @Override
     protected void assertCurrentPage(final boolean log) throws NotCurrentPageException {
 
-        if (pageIdentifierElement == null) { }
-        else if (this.isElementPresent(pageIdentifierElement.getBy())) { }
-        else {
+        if (pageIdentifierElement != null && !isElementPresent(pageIdentifierElement.getBy())) {
             try {
                 if (!SeleniumTestsContextManager.getThreadContext().getCaptureSnapshot()) {
                     new ScreenshotUtil(driver).capturePageSnapshotOnException();
@@ -228,7 +225,7 @@ public class PageObject extends BasePage implements IPage {
 
     }
 
-    
+    @Override
     public void capturePageSnapshot() {
         ScreenShot screenShot = new ScreenshotUtil(driver).captureWebPageSnapshot();
         this.title = screenShot.getTitle();
@@ -267,7 +264,9 @@ public class PageObject extends BasePage implements IPage {
         
         try {
             driver.close();
-        } catch (WebDriverException ignore) { }
+        } catch (WebDriverException ignore) { 
+        	logger.info("Error closing driver: " + ignore.getMessage());
+        }
 
         if ("LOCAL".equalsIgnoreCase(WebUIDriver.getWebUIDriver().getMode())) {
         	WaitHelper.waitForSeconds(2);

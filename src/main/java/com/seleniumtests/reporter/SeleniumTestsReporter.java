@@ -1120,7 +1120,9 @@ public class SeleniumTestsReporter implements IReporter, ITestListener, IInvoked
     }
 
     @Override
-    public void onTestFailedButWithinSuccessPercentage(final ITestResult arg0) { }
+    public void onTestFailedButWithinSuccessPercentage(final ITestResult arg0) { 
+    	// overriden
+    }
 
     /**
      * At the end of a failed test. 
@@ -1155,10 +1157,14 @@ public class SeleniumTestsReporter implements IReporter, ITestListener, IInvoked
     }
 
     @Override
-    public void onTestSkipped(final ITestResult arg0) { }
+    public void onTestSkipped(final ITestResult arg0) {
+    	// overriden
+    }
 
     @Override
-    public void onTestStart(final ITestResult arg0) { }
+    public void onTestStart(final ITestResult arg0) {
+    	// overriden
+    }
 
     /**
      * At the end of a successful test. 

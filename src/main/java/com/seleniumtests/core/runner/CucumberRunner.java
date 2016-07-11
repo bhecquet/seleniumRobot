@@ -37,6 +37,7 @@ import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.reporter.TestLogging;
 
 import cucumber.api.testng.CucumberFeatureWrapper;
+import cucumber.runtime.CucumberException;
 
 public class CucumberRunner {
 	
@@ -70,15 +71,14 @@ public class CucumberRunner {
     }
 
     @BeforeMethod(alwaysRun = true)
-    public void beforeTestMethod(final Object[] parameters, final Method method, final ITestContext testContex, final XmlTest xmlTest) {
+    public void beforeTestMethod(final Object[] parameters, final Method method, final ITestContext testContex) {
         logger.info(Thread.currentThread() + " Start method " + method.getName());
         SeleniumTestsContextManager.initThreadContext(testContex);
         SeleniumTestsContextManager.getThreadContext().setTestMethodSignature(buildMethodSignature(method, parameters));
     }
 
     @Test(groups = "cucumber", description = "Cucumber scenario", dataProvider = "scenarios")
-    public void feature(CucumberScenarioWrapper cucumberScenarioWrapper) 
-    		throws NoSuchFieldException, RuntimeException, IllegalAccessException {
+    public void feature(CucumberScenarioWrapper cucumberScenarioWrapper) throws CucumberException {
     	testNGCucumberRunner.runScenario(cucumberScenarioWrapper);
     	logger.info(Thread.currentThread() + "Start scenario: " + cucumberScenarioWrapper);
     }
@@ -110,7 +110,7 @@ public class CucumberRunner {
      * @param  xmlTest
      */
     @AfterMethod(alwaysRun = true)
-    public void afterTestMethod(final Object[] parameters, final Method method, final ITestContext testContex,
+    public void afterTestMethod(final Method method, final ITestContext testContex,
             final XmlTest xmlTest) {
         List<TearDownService> serviceList = SeleniumTestsContextManager.getThreadContext().getTearDownServices();
         if (serviceList != null && !serviceList.isEmpty()) {

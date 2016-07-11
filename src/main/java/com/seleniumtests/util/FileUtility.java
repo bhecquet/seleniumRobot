@@ -116,7 +116,6 @@ public class FileUtility {
 
             BufferedImage img = ImageIO.read(in);
             ImageIO.write(img, "png", fos);
-            img = null;
         } catch (Exception e) {
             logger.warn(e);
         } 
