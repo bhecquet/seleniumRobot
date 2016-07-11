@@ -18,13 +18,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.io.FilenameUtils;
-import org.apache.log4j.Logger;
 
-import com.seleniumtests.core.SeleniumTestPlan;
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.CustomSeleniumTestsException;
-import com.seleniumtests.reporter.TestLogging;
 
 import cucumber.api.testng.FeatureResultListener;
 import cucumber.runtime.ClassFinder;
@@ -51,7 +48,6 @@ public class CustomTestNGCucumberRunner {
     private ResourceLoader resourceLoader;
     private FeatureResultListener resultListener;
     private ClassLoader classLoader;
-    private static final Logger logger = TestLogging.getLogger(SeleniumTestPlan.class);
 
     /**
      * Bootstrap the cucumber runtime
@@ -196,21 +192,25 @@ public class CustomTestNGCucumberRunner {
     }
 
     public void runScenario(CucumberScenarioWrapper cucumberScenarioWrapper) 
-    		throws NoSuchFieldException, CucumberException, IllegalAccessException {
+    		throws CucumberException  {
     	
     	resultListener.startFeature();
     	
     	Formatter formatter = runtimeOptions.formatter(classLoader);
     	CucumberScenario cucumberScenario = cucumberScenarioWrapper.getCucumberScenario();
     	
-    	Field field = StepContainer.class.getDeclaredField("cucumberFeature");
-		field.setAccessible(true);
-		CucumberFeature cucumberFeature = (CucumberFeature)field.get(cucumberScenario);
-    	formatter.uri(cucumberFeature.getPath());
-        formatter.feature(cucumberFeature.getGherkinFeature());
-    	
-    	cucumberScenario.run(runtimeOptions.formatter(classLoader), resultListener, runtime);
-    	formatter.eof();
+    	try {
+	    	Field field = StepContainer.class.getDeclaredField("cucumberFeature");
+			field.setAccessible(true);
+			CucumberFeature cucumberFeature = (CucumberFeature)field.get(cucumberScenario);
+	    	formatter.uri(cucumberFeature.getPath());
+	        formatter.feature(cucumberFeature.getGherkinFeature());
+	    	
+	    	cucumberScenario.run(runtimeOptions.formatter(classLoader), resultListener, runtime);
+	    	formatter.eof();
+    	} catch (NoSuchFieldException | IllegalAccessException e) {
+    		throw new CucumberException("Could not run scenario: " + e.getMessage());
+    	}
     	
     	if (!resultListener.isPassed()) {
             throw new CucumberException(resultListener.getFirstError());

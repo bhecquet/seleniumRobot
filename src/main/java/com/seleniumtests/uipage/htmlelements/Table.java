@@ -41,9 +41,7 @@ public class Table extends HtmlElement {
 
         // Need to check whether rows is null AND whether or not the list of rows is empty
         if (rows != null && !rows.isEmpty()) {
-            try {
-                columns = rows.get(0).findElements(By.tagName("td"));
-            } catch (NotFoundException e) { }
+            columns = rows.get(0).findElements(By.tagName("td"));
 
             if (columns == null || columns.isEmpty()) {
 
@@ -78,15 +76,13 @@ public class Table extends HtmlElement {
         }
 
         if (rows != null && !rows.isEmpty()) {
-            try {
-                columns = rows.get(row - 1).findElements(By.tagName("td"));
-            } catch (NotFoundException e) { }
+            columns = rows.get(row - 1).findElements(By.tagName("td"));
 
             if (columns == null || columns.isEmpty()) {
                 columns = rows.get(row - 1).findElements(By.tagName("th"));
             }
             
-            if (columns.size() == 0) {
+            if (columns.isEmpty()) {
             	return null;
             }
 

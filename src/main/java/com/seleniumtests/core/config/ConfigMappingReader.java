@@ -81,8 +81,8 @@ public class ConfigMappingReader {
 		
 		//create String for Paths
 		String iniFilePath = "";		
-		String typeFilePath =  "";
-		String versionFilePath = "";
+		String typeFilePath;
+		String versionFilePath;
 		
 		if(typeDir != null && !"".equals(typeDir)){
 			
@@ -127,15 +127,15 @@ public class ConfigMappingReader {
 	 * @param file
 	 * @return
 	 */
-	private Map<String, HashMap<String,String>> extractConfigValues(
-									Map<String, HashMap<String,String>> testConfig, File file){
+	private Map<String, HashMap<String,String>> extractConfigValues(Map<String, HashMap<String,String>> testConfig, File file){
+		Map<String, HashMap<String,String>> newTestConfig = new HashMap<>();
 		try{
-			testConfig = IniHelper.readIniFile(file, testConfig);
+			newTestConfig = IniHelper.readIniFile(file, testConfig);
 		}
 		catch (ConfigurationException e){
 			logger.debug("No such file : " + file);
 		}
-		return testConfig;
+		return newTestConfig;
 	}
 	
 		

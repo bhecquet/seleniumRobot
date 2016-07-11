@@ -320,8 +320,6 @@ public abstract class BasePage {
             return body.getText().contains(text);
         }
 
-        Boolean result = false;
-
         if (body.getText().contains(text)) {
             return true;
         }
@@ -329,7 +327,7 @@ public abstract class BasePage {
         JavascriptLibrary js = new JavascriptLibrary();
         String script = js.getSeleniumScript("isTextPresent.js");
 
-        result = (Boolean) ((JavascriptExecutor) driver).executeScript("return (" + script + ")(arguments[0]);", text);
+        Boolean result = (Boolean) ((JavascriptExecutor) driver).executeScript("return (" + script + ")(arguments[0]);", text);
 
         // Handle the null case
         return Boolean.TRUE == result;
@@ -430,10 +428,10 @@ public abstract class BasePage {
     }
 
     public void waitForPopup(final String locator) {
-        waitForPopUp(locator, Integer.toString(sessionTimeout) + "");
+        waitForPopup(locator, Integer.toString(sessionTimeout) + "");
     }
 
-    public void waitForPopUp(final String windowID, final String timeout) {
+    public void waitForPopup(final String windowID, final String timeout) {
         final long millis = Long.parseLong(timeout);
         final String current = driver.getWindowHandle();
         final Windows windows = new Windows(driver);

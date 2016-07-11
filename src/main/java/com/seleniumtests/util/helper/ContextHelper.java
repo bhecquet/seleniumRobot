@@ -37,8 +37,4 @@ public class ContextHelper {
         StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
         return stackTrace[3].getMethodName();
     }
-
-    public static void main(final String[] st) {
-        System.out.println(getCallerMethod());
-    }
 }

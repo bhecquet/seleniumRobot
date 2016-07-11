@@ -233,24 +233,6 @@ public class SeleniumTestsContextManager {
     	testNGCtx = getContextFromConfigFile(testNGCtx);
     	SeleniumTestsContext seleniumTestsCtx = new SeleniumTestsContext(testNGCtx);
         loadCustomizedContextAttribute(testNGCtx, seleniumTestsCtx);
-
-        /* COMMENTED 
-         * because SeleniumTestContext now look for parameter value in currentXmlTest for every param.
-         * final XmlTest xmlTest
-         */
-//        if (xmlTest != null) {
-//            Map<String, String> testParameters = xmlTest.getTestParameters();
-//
-//            // parse the test level parameters
-//            for (Entry<String, String> entry : testParameters.entrySet()) {
-//
-//                if (System.getProperty(entry.getKey()) == null) {
-//                    seleniumTestsCtx.setAttribute(entry.getKey(), entry.getValue());
-//                }
-//
-//            }
-//
-//        }
         
         threadLocalContext.set(seleniumTestsCtx);
         
