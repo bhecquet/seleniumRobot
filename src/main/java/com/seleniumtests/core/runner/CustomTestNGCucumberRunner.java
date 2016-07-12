@@ -191,8 +191,7 @@ public class CustomTestNGCucumberRunner {
     	return selectedScenarios;
     }
 
-    public void runScenario(CucumberScenarioWrapper cucumberScenarioWrapper) 
-    		throws CucumberException  {
+    public void runScenario(CucumberScenarioWrapper cucumberScenarioWrapper)   {
     	
     	resultListener.startFeature();
     	

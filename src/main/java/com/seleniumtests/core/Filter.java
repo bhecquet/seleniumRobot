@@ -212,7 +212,6 @@ public class Filter {
     
     private static boolean stringFilterCase(String name, Object[] values, Operator operator, 
 											final Map<String, Object> parameters)
-		throws DatasetException
     {
     	switch (operator) {
     	
@@ -244,7 +243,6 @@ public class Filter {
     
     private static boolean numberFilterCase(String name, Object[] values, Operator operator, 
 												final Map<String, Object> parameters)
-		throws DatasetException
     {
     	BigDecimal val = new BigDecimal(parameters.get(name).toString());
         BigDecimal leftValue = new BigDecimal(values[0].toString());
@@ -269,7 +267,6 @@ public class Filter {
 
     private static boolean dateFilterCase(String name, Object[] values, Operator operator, 
     										final Map<String, Object> parameters)
-    	throws DatasetException
     {
     	Date date;
         try {

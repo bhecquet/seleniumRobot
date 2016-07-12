@@ -148,7 +148,7 @@ public class DriverExceptionListener implements WebDriverEventListener {
         } else if (ex.getMessage().contains("Error communicating with the remote browser. It may have died.")) {
 
             // Session has lost connection, remove it then ignore quit() method.
-            if (WebUIDriver.getWebUIDriver().getConfig().getMode() == DriverMode.ExistingGrid) {
+            if (WebUIDriver.getWebUIDriver().getConfig().getMode() == DriverMode.EXISTING_GRID) {
                 WebUIDriver.setWebDriver(null);
                 throw new WebSessionEndedException(ex);
             }

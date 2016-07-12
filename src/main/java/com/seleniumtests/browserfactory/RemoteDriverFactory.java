@@ -51,27 +51,27 @@ public class RemoteDriverFactory extends AbstractWebDriverFactory implements IWe
     	
     	switch (webDriverConfig.getBrowser()) {
 
-	        case FireFox :
+	        case FIREFOX :
 	            capability = new FirefoxCapabilitiesFactory().createCapabilities(webDriverConfig);
 	            break;
 	
-	        case InternetExplore :
+	        case INTERNETEXPLORER :
 	            capability = new IECapabilitiesFactory().createCapabilities(webDriverConfig);
 	            break;
 	
-	        case Chrome :
+	        case CHROME :
 	            capability = new ChromeCapabilitiesFactory().createCapabilities(webDriverConfig);
 	            break;
 	
-	        case HtmlUnit :
+	        case HTMLUNIT :
 	            capability = new HtmlUnitCapabilitiesFactory().createCapabilities(webDriverConfig);
 	            break;
 	
-	        case Safari :
+	        case SAFARI :
 	            capability = new SafariCapabilitiesFactory().createCapabilities(webDriverConfig);
 	            break;
 	
-	        case PhantomJS :
+	        case PHANTOMJS :
 	            capability = new PhantomJSCapabilitiesFactory().createCapabilities(webDriverConfig);
 	            break;
 	
@@ -95,7 +95,7 @@ public class RemoteDriverFactory extends AbstractWebDriverFactory implements IWe
 
         DesiredCapabilities capability = createCapabilityByBrowser(webDriverConfig);
 
-        if ((BrowserType.FireFox).equals(webDriverConfig.getBrowser())) {
+        if ((BrowserType.FIREFOX).equals(webDriverConfig.getBrowser())) {
             driver = getDriverFirefox(url, capability);
         } else {
             driver = new ScreenShotRemoteWebDriver(url, capability);
@@ -167,9 +167,9 @@ public class RemoteDriverFactory extends AbstractWebDriverFactory implements IWe
     protected void setPageLoadTimeout(final long timeout, final BrowserType type) {
         switch (type) {
 
-            case Chrome :
-            case FireFox :
-            case InternetExplore :
+            case CHROME :
+            case FIREFOX :
+            case INTERNETEXPLORER :
             	setPageLoadTimeoutCommonBrowser(timeout);
                 break;
 

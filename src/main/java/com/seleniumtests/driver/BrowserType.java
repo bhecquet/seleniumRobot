@@ -15,14 +15,14 @@
 package com.seleniumtests.driver;
 
 public enum BrowserType {
-    FireFox("*firefox"),
-    InternetExplore("*iexplore"),
-    Chrome("*chrome"),
-    HtmlUnit("*htmlunit"),
-    Opera("*opera"),
-    Safari("*safari"),
-    Browser("*browser"), // default Android browser
-    PhantomJS("*phantomjs"),
+    FIREFOX("*firefox"),
+    INTERNETEXPLORER("*iexplore"),
+    CHROME("*chrome"),
+    HTMLUNIT("*htmlunit"),
+    OPERA("*opera"),
+    SAFARI("*safari"),
+    BROWSER("*browser"), // default Android browser
+    PHANTOMJS("*phantomjs"),
     ;
 
 	private String bType;
@@ -33,21 +33,21 @@ public enum BrowserType {
 	
     public static BrowserType getBrowserType(final String browserType) {
         if (browserType.toLowerCase().contains("firefox")) {
-            return BrowserType.FireFox;
+            return BrowserType.FIREFOX;
         } else if (browserType.toLowerCase().contains("iexplore")) {
-            return BrowserType.InternetExplore;
+            return BrowserType.INTERNETEXPLORER;
         } else if (browserType.toLowerCase().contains("chrome")) {
-            return BrowserType.Chrome;
+            return BrowserType.CHROME;
         } else if (browserType.toLowerCase().contains("opera")) {
-        	return BrowserType.Opera;
+        	return BrowserType.OPERA;
         } else if (browserType.toLowerCase().contains("htmlunit")) {
-            return BrowserType.HtmlUnit;
+            return BrowserType.HTMLUNIT;
         }  else if (browserType.toLowerCase().contains("safari")) {
-            return BrowserType.Safari;
+            return BrowserType.SAFARI;
         } else if (browserType.toLowerCase().contains("browser")) {
-        	return BrowserType.Browser;
+        	return BrowserType.BROWSER;
         } else if (browserType.toLowerCase().contains("phantomjs")) {
-            return BrowserType.PhantomJS;
+            return BrowserType.PHANTOMJS;
         } 
         throw new IllegalArgumentException(String.format("browser %s is unknown", browserType));
         

@@ -83,38 +83,59 @@ public abstract class BasePage {
      * @param  value
      */
     public void assertAttribute(final HtmlElement element, final String attributeName, final String value) {
-        TestLogging.logWebStep(null,
-            "assert " + element.toHTML() + " attribute = " + attributeName + ", expectedValue ={" + value + "}.",
+        TestLogging.logWebStep(null, String.format("assert %s attribute = %s, expectedValue ={%s}.",
+        		element.toHTML(),
+        		attributeName,
+        		value),
             false);
 
         String attributeValue = element.getAttribute(attributeName);
 
         assertHTML(value != null && value.equals(attributeValue),
-            element.toString() + " attribute = " + attributeName + ", expectedValue = {" + value + "}"
-                + ", attributeValue = {" + attributeValue + "}");
+        		String.format("%s attribute = %s, expectedValue = {%s}, attributeValue = {%s}",
+                        element.toString(),
+                        attributeName,
+                        attributeValue,
+                        value
+                        )
+            );
     }
 
     public void assertAttributeContains(final HtmlElement element, final String attributeName, final String keyword) {
-        TestLogging.logWebStep(null,
-            "assert " + element.toHTML() + " attribute=" + attributeName + ", contains keyword = {" + keyword + "}.",
+        TestLogging.logWebStep(null, String.format("assert %s attribute = %s, contains keyword ={%s}.",
+        		element.toHTML(),
+        		attributeName,
+        		keyword),  
             false);
 
         String attributeValue = element.getAttribute(attributeName);
 
         assertHTML(attributeValue != null && keyword != null && attributeValue.contains(keyword),
-            element.toString() + " attribute=" + attributeName + ", expected to contains keyword {" + keyword + "}"
-                + ", attributeValue = {" + attributeValue + "}");
+        		String.format("%s attribute = %s, expected to contains keyword = {%s}, attributeValue = {%s}",
+                        element.toString(),
+                        attributeName,
+                        keyword,
+                        attributeValue
+                        ));
     }
 
     public void assertAttributeMatches(final HtmlElement element, final String attributeName, final String regex) {
-        TestLogging.logWebStep(null,
-            "assert " + element.toHTML() + " attribute=" + attributeName + ", matches regex = {" + regex + "}.", false);
+        TestLogging.logWebStep(null, String.format("assert %s attribute = %s, matches regex ={%s}.",
+        		element.toHTML(),
+        		attributeName,
+        		regex),  
+            false);
 
         String attributeValue = element.getAttribute(attributeName);
 
         assertHTML(attributeValue != null && regex != null && attributeValue.matches(regex),
-            element.toString() + " attribute=" + attributeName + " expected to match regex {" + regex + "}"
-                + ", attributeValue = {" + attributeValue + "}");
+        		String.format("%s attribute = %s, expected to match regex = {%s}, attributeValue = {%s}",
+                        element.toString(),
+                        attributeName,
+                        regex,
+                        attributeValue
+                        )
+        		);
     }
 
     public void assertConfirmationText(final String text) {
@@ -129,38 +150,38 @@ public abstract class BasePage {
     protected void assertCurrentPage(final boolean log) { }
 
     public void assertElementNotPresent(final HtmlElement element) {
-        TestLogging.logWebStep(null, "assert " + element.toHTML() + " is not present.", false);
-        assertHTML(!element.isElementPresent(), element.toString() + " found.");
+        TestLogging.logWebStep(null, String.format("assert %s is not present.", element.toHTML()), false);
+        assertHTML(!element.isElementPresent(), String.format("%s found.", element.toString()));
     }
 
     public void assertElementPresent(final HtmlElement element) {
-        TestLogging.logWebStep(null, "assert " + element.toHTML() + " is present.", false);
-        assertHTML(element.isElementPresent(), element.toString() + " not found.");
+        TestLogging.logWebStep(null, String.format("assert %s is present.", element.toHTML()), false);
+        assertHTML(element.isElementPresent(), String.format("%s not found.", element.toString()));
     }
 
     public void assertElementEnabled(final HtmlElement element) {
-        TestLogging.logWebStep(null, "assert " + element.toHTML() + " is enabled.", false);
-        assertHTML(element.isEnabled(), element.toString() + " not found.");
+        TestLogging.logWebStep(null, String.format("assert %s is enabled.", element.toHTML()), false);
+        assertHTML(element.isEnabled(), String.format("%s not found.", element.toString()));
     }
 
     public void assertElementNotEnabled(final HtmlElement element) {
-        TestLogging.logWebStep(null, "assert " + element.toHTML() + " is not enabled.", false);
-        assertHTML(!element.isEnabled(), element.toString() + " not found.");
+        TestLogging.logWebStep(null, String.format("assert %s is not enabled.", element.toHTML()), false);
+        assertHTML(!element.isEnabled(), String.format("%s not found.", element.toString()));
     }
 
     public void assertElementDisplayed(final HtmlElement element) {
-        TestLogging.logWebStep(null, "assert " + element.toHTML() + " is displayed.", false);
-        assertHTML(element.isDisplayed(), element.toString() + " not found.");
+        TestLogging.logWebStep(null, String.format("assert %s is displayed.", element.toHTML()), false);
+        assertHTML(element.isDisplayed(), String.format("%s not found.", element.toString()));
     }
 
     public void assertElementSelected(final HtmlElement element) {
-        TestLogging.logWebStep(null, "assert " + element.toHTML() + " is selected.", false);
-        assertHTML(element.isSelected(), element.toString() + " not found.");
+        TestLogging.logWebStep(null, String.format("assert %s is selected.", element.toHTML()), false);
+        assertHTML(element.isSelected(), String.format("%s not found.", element.toString()));
     }
 
     public void assertElementNotSelected(final HtmlElement element) {
-        TestLogging.logWebStep(null, "assert " + element.toHTML() + " is NOT selected.", false);
-        assertHTML(!element.isSelected(), element.toString() + " not found.");
+        TestLogging.logWebStep(null, String.format("assert %s is NOT selected.", element.toHTML()), false);
+        assertHTML(!element.isSelected(), String.format("%s not found.", element.toString()));
     }
 
     public void assertCondition(final boolean condition, final String message) {
@@ -191,7 +212,11 @@ public abstract class BasePage {
 
     public void assertTable(final Table table, final int row, final int col, final String text) {
         TestLogging.logWebStep(null,
-            "assert text \"" + text + "\" equals " + table.toHTML() + " at (row, col) = (" + row + ", " + col + ").",
+        		String.format("assert text %s equals %s at (row, col) = (%d, %d).",
+                		text,
+                		table.toHTML(),
+                		row, 
+                		col), 
             false);
 
         String content = table.getContent(row, col);
@@ -201,17 +226,29 @@ public abstract class BasePage {
 
     public void assertTableContains(final Table table, final int row, final int col, final String text) {
         TestLogging.logWebStep(null,
-            "assert text \"" + text + "\" contains " + table.toHTML() + " at (row, col) = (" + row + ", " + col + ").",
+        		String.format("assert text %s contains %s at (row, col) = (%d, %d).",
+                		text,
+                		table.toHTML(),
+                		row, 
+                		col), 
             false);
 
         String content = table.getContent(row, col);
         assertHTML(content != null && content.contains(text),
-            "Text= {" + text + "} not found on " + table.toString() + " at cell(row, col) = {" + row + "," + col + "}");
+        		String.format("Text= {%s} not found on %s at cell(row, col) = {%d,%d}",
+        				text,
+        				table.toString(),
+        				row,
+        				col));
     }
 
     public void assertTableMatches(final Table table, final int row, final int col, final String text) {
         TestLogging.logWebStep(null,
-            "assert text \"" + text + "\" matches " + table.toHTML() + " at (row, col) = (" + row + ", " + col + ").",
+        		String.format("assert text %s matches %s at (row, col) = (%d, %d).",
+                		text,
+                		table.toHTML(),
+                		row, 
+                		col), 
             false);
 
         String content = table.getContent(row, col);
@@ -316,7 +353,7 @@ public abstract class BasePage {
 
         WebElement body = driver.findElement(By.tagName("body"));
 
-        if (WebUIDriver.getWebUIDriver().getBrowser().equalsIgnoreCase(BrowserType.HtmlUnit.getBrowserType())) {
+        if (WebUIDriver.getWebUIDriver().getBrowser().equalsIgnoreCase(BrowserType.HTMLUNIT.getBrowserType())) {
             return body.getText().contains(text);
         }
 
@@ -343,10 +380,8 @@ public abstract class BasePage {
      * If current window is closed then use driver.switchTo.window(handle).
      *
      * @param   windowName
-     *
-     * @throws  com.seleniumtests.customexception.NotCurrentPageException
      */
-    public final void selectWindow(final String windowName) throws NotCurrentPageException {
+    public final void selectWindow(final String windowName) {
     	
     	Windows windows = null;
     	try {
@@ -436,7 +471,7 @@ public abstract class BasePage {
         final String current = driver.getWindowHandle();
         final Windows windows = new Windows(driver);
 
-        if (webUXDriver.getConfig().getBrowser() == BrowserType.InternetExplore) {
+        if (webUXDriver.getConfig().getBrowser() == BrowserType.INTERNETEXPLORER) {
             WaitHelper.waitForSeconds(3);
         }
 

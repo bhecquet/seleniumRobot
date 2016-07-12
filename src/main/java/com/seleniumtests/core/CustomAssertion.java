@@ -29,6 +29,8 @@ import com.seleniumtests.reporter.TestLogging;
  * set to true.
  */
 public class CustomAssertion {
+	
+	private CustomAssertion() {}
 
     private static void addVerificationFailure(final Throwable e) {
         SeleniumTestsContextManager.getThreadContext().addVerificationFailures(Reporter.getCurrentTestResult(), e);

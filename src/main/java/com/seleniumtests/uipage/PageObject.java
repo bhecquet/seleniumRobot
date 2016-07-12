@@ -158,7 +158,7 @@ public class PageObject extends BasePage implements IPage {
     }
 
     @Override
-    protected void assertCurrentPage(final boolean log) throws NotCurrentPageException {
+    protected void assertCurrentPage(final boolean log) {
 
         if (pageIdentifierElement != null && !isElementPresent(pageIdentifierElement.getBy())) {
             try {
@@ -248,7 +248,7 @@ public class PageObject extends BasePage implements IPage {
      * 
      * @throws NotCurrentPageException
      */
-    public final void close() throws NotCurrentPageException { 
+    public final void close() { 
     	
         if (WebUIDriver.getWebDriver() == null) {
             return;
@@ -315,7 +315,7 @@ public class PageObject extends BasePage implements IPage {
         return driver.manage().getCookieNamed(name).getValue();
     }
 
-    public final int getElementCount(final HtmlElement element) throws CustomSeleniumTestsException {
+    public final int getElementCount(final HtmlElement element) {
         return driver.findElements(element.getBy()).size();
     }
 
@@ -472,7 +472,7 @@ public class PageObject extends BasePage implements IPage {
         capturePageSnapshot();
     }
 
-    public final void refresh() throws NotCurrentPageException {
+    public final void refresh()  {
         TestLogging.logWebStep(null, "refresh", false);
         try {
             driver.navigate().refresh();
@@ -504,7 +504,7 @@ public class PageObject extends BasePage implements IPage {
         frameFlag = true;
     }
 
-    public final void selectMainWindow() throws NotCurrentPageException {
+    public final void selectMainWindow() {
         TestLogging.logWebStep(null, "select window, locator={\"" + getPopupWindowName() + "\"}", false);
 
         driver.switchTo().window((String) driver.getWindowHandles().toArray()[0]);
@@ -514,16 +514,16 @@ public class PageObject extends BasePage implements IPage {
         assertCurrentPage(true);
     }
 
-    public final void selectWindow(final int index) throws NotCurrentPageException {
+    public final void selectWindow(final int index) {
         TestLogging.logWebStep(null, "select window, locator={\"" + index + "\"}", false);
         driver.switchTo().window((String) driver.getWindowHandles().toArray()[index]);
     }
     
-    public final String selectNewWindow() throws NotCurrentPageException {
+    public final String selectNewWindow() {
     	return selectNewWindow(6000);
     }
     
-    public final String selectNewWindow(int waitMs) throws NotCurrentPageException {
+    public final String selectNewWindow(int waitMs) {
         TestLogging.logWebStep(null, "select new window", false);
         
         // Keep the name of the current window handle before switching

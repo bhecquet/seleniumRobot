@@ -27,7 +27,8 @@ public abstract class SeleniumTestsPageListener {
 	private String title;
 
     private boolean testResultEffected;
-	
+ 	protected static final Logger logger = TestLogging.getLogger(SeleniumTestsPageListener.class);
+
     
     public SeleniumTestsPageListener() { }
     
@@ -35,9 +36,6 @@ public abstract class SeleniumTestsPageListener {
         this.title = title;
         this.testResultEffected = testResultEffected;
     }
-
-    
-	protected static final Logger logger = TestLogging.getLogger(SeleniumTestsPageListener.class);
 
     /**
      * Informs all the page listeners on page Load.
