@@ -36,7 +36,7 @@ public class ButtonElement extends HtmlElement {
         TestLogging.logWebStep(null, "click on " + toHTML(), false);
 
         BrowserType browser = WebUIDriver.getWebUIDriver().getConfig().getBrowser();
-        if (browser == BrowserType.InternetExplore) {
+        if (browser == BrowserType.INTERNETEXPLORER) {
             super.sendKeys(Keys.ENTER);
         } else {
             super.click();

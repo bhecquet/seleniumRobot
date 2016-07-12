@@ -78,7 +78,7 @@ public class CucumberRunner {
     }
 
     @Test(groups = "cucumber", description = "Cucumber scenario", dataProvider = "scenarios")
-    public void feature(CucumberScenarioWrapper cucumberScenarioWrapper) throws CucumberException {
+    public void feature(CucumberScenarioWrapper cucumberScenarioWrapper) {
     	testNGCucumberRunner.runScenario(cucumberScenarioWrapper);
     	logger.info(Thread.currentThread() + "Start scenario: " + cucumberScenarioWrapper);
     }

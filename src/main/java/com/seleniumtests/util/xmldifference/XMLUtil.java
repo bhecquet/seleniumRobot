@@ -136,9 +136,7 @@ public class XMLUtil implements XMLDogConstants
      * <p/>
      * if successful, null otherwise
      */
-    public static String replaceElementText(String xmlFile, String tagName, String value, boolean all, boolean overwrite)
-            throws DOMException
-    {
+    public static String replaceElementText(String xmlFile, String tagName, String value, boolean all, boolean overwrite)    {
         Map elements = new HashMap();
         elements.put(tagName, value);
         
@@ -172,9 +170,7 @@ public class XMLUtil implements XMLDogConstants
      * @param overwrite true if File needs to be overwritten with the changes, false otherwise
      * @return the String representation of the new XML document with all the Elements replaced
      */
-    public static String replaceElementText(String xmlFile, Map elements, boolean all, boolean overwrite)
-            throws DOMException
-    {
+    public static String replaceElementText(String xmlFile, Map elements, boolean all, boolean overwrite)    {
         if ((xmlFile == null) || (elements == null))
             return null;
 

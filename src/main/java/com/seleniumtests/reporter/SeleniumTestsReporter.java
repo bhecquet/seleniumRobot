@@ -89,6 +89,15 @@ public class SeleniumTestsReporter implements IReporter, ITestListener, IInvoked
     private static Logger logger = TestLogging.getLogger(SeleniumTestsReporter.class);
 
     private static final String RESOURCE_LOADER_PATH = "org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader";
+    private static final String FAILED_TEST = "failed";
+    private static final String SKIPPED_TEST = "skipped";
+    private static final String PASSED_TEST = "passed";
+    private static final String RESOURCES_DIR = "resources";
+    private static final String IMAGES_DIR = "images";
+    private static final String LIGHTBOX_DIR = "lightbox";
+    private static final String MKTREE_DIR = "mktree";
+    private static final String YUKONTOOLBOX_DIR = "yukontoolbox";
+    private static final String REPORTER_DIR = "reporter";
     
     private Map<String, Boolean> isRetryHandleNeeded = new HashMap<>();
 
@@ -242,13 +251,6 @@ public class SeleniumTestsReporter implements IReporter, ITestListener, IInvoked
     }
 
     protected void copyResources() throws IOException {
-
-    	String RESOURCES_DIR = "resources";
-    	String IMAGES_DIR = "images";
-    	String LIGHTBOX_DIR = "lightbox";
-    	String MKTREE_DIR = "mktree";
-    	String YUKONTOOLBOX_DIR = "yukontoolbox";
-    	String REPORTER_DIR = "reporter";
     	
         new File(outputDirectory + File.separator + RESOURCES_DIR).mkdir();
         new File(outputDirectory + File.separator + RESOURCES_DIR + File.separator + "css").mkdir();
@@ -417,7 +419,7 @@ public class SeleniumTestsReporter implements IReporter, ITestListener, IInvoked
                                   " ( <font color='red'>");
                 errorCountHtmls.append("<div class='" + abstractPageListener.getClass().getSimpleName()
                         + "' style='width: 98%;margin-left:15px;'>");
-                generateGlobalErrorsPanel(abstractPageListener, ve, errorCountHtmls, "failed", testContext,
+                generateGlobalErrorsPanel(abstractPageListener, ve, errorCountHtmls, FAILED_TEST, testContext,
                     errorCountTabs);
                 errorCountHtmls.append("</div>");
                 errorCountTabs.append("</font> )</span></a></li>");
@@ -508,20 +510,20 @@ public class SeleniumTestsReporter implements IReporter, ITestListener, IInvoked
 
             if (envt) {
                 if (!tc.getFailedConfigurations().getAllResults().isEmpty()) {
-                    generatePanel(ve, tc.getFailedConfigurations(), res, "failed", suite, ctx, envt);
+                    generatePanel(ve, tc.getFailedConfigurations(), res, FAILED_TEST, suite, ctx, envt);
                 }
 
-                generatePanel(ve, failedTests.get(tc.getName()), res, "failed", suite, ctx, envt);
+                generatePanel(ve, failedTests.get(tc.getName()), res, FAILED_TEST, suite, ctx, envt);
                 if (!tc.getFailedConfigurations().getAllResults().isEmpty()) {
-                    generatePanel(ve, tc.getSkippedConfigurations(), res, "skipped", suite, ctx, envt);
+                    generatePanel(ve, tc.getSkippedConfigurations(), res, SKIPPED_TEST, suite, ctx, envt);
                 }
 
-                generatePanel(ve, skippedTests.get(tc.getName()), res, "skipped", suite, ctx, envt);
-                generatePanel(ve, tc.getPassedTests(), res, "passed", suite, ctx, envt);
+                generatePanel(ve, skippedTests.get(tc.getName()), res, SKIPPED_TEST, suite, ctx, envt);
+                generatePanel(ve, tc.getPassedTests(), res, PASSED_TEST, suite, ctx, envt);
             } else {
-                generatePanel(ve, failedTests.get(tc.getName()), res, "failed", suite, ctx, envt);
-                generatePanel(ve, skippedTests.get(tc.getName()), res, "skipped", suite, ctx, envt);
-                generatePanel(ve, tc.getPassedTests(), res, "passed", suite, ctx, envt);
+                generatePanel(ve, failedTests.get(tc.getName()), res, FAILED_TEST, suite, ctx, envt);
+                generatePanel(ve, skippedTests.get(tc.getName()), res, SKIPPED_TEST, suite, ctx, envt);
+                generatePanel(ve, tc.getPassedTests(), res, PASSED_TEST, suite, ctx, envt);
             }
         } catch (Exception e) {
             logger.error(e);
@@ -610,9 +612,9 @@ public class SeleniumTestsReporter implements IReporter, ITestListener, IInvoked
                     if (hasReporterOutput || hasThrowable) {
                         contentBuffer.append("<div class='leftContent' style='float: left; width: 100%;'>");
                         contentBuffer.append("<h4><a href='javascript:void(0);' class='testloglnk'>Test Steps "
-                                + ("passed".equals(style) ? "[+]" : "[ - ]") + "</a></h4>");
+                                + (PASSED_TEST.equals(style) ? "[+]" : "[ - ]") + "</a></h4>");
                         contentBuffer.append("<div class='testlog' "
-                                + ("passed".equals(style) ? "style='display:none'" : "") + ">");
+                                + (PASSED_TEST.equals(style) ? "style='display:none'" : "") + ">");
                         contentBuffer.append("<ol>");
                         for (String line : msgs) {
                             ElaborateLog logLine = new ElaborateLog(line, outputDirectory);

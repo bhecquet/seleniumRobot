@@ -145,8 +145,8 @@ public class HtmlElement {
         try {
             BrowserType type = WebUIDriver.getWebUIDriver().getConfig().getBrowser();
 
-            if (((type == BrowserType.Chrome) ||
-                        (type == BrowserType.InternetExplore)) &&
+            if (((type == BrowserType.CHROME) ||
+                        (type == BrowserType.INTERNETEXPLORER)) &&
                     driver.switchTo().alert().getText().contains("leave")) {
                 driver.switchTo().alert().accept();
             }

@@ -36,7 +36,7 @@ public class DriverConfig {
     private boolean setAcceptUntrustedCertificates = true;
     private boolean enableJavascript = true;
     private WebDriver driver;
-    private BrowserType browser = BrowserType.FireFox;
+    private BrowserType browser = BrowserType.FIREFOX;
     private DriverMode mode = DriverMode.LOCAL;
     private String hubUrl;
     private String ffProfilePath;

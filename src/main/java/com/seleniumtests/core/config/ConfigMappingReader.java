@@ -29,6 +29,8 @@ import com.seleniumtests.util.helper.IniHelper;
 public class ConfigMappingReader {
 	
 	private static final Logger logger = TestLogging.getLogger(ConfigMappingReader.class);
+
+	private static final String OBJECT_MAPPING_FILE_NAME = "objectMapping.ini";
 	
 	/**
 	 * @author  Sophie
@@ -83,7 +85,7 @@ public class ConfigMappingReader {
 		String iniFilePath = "";
 
 		// load generic configuration
-		File globalConfigFile =  Paths.get(SeleniumTestsContext.getConfigPath(), "objectMapping.ini").toFile();
+		File globalConfigFile =  Paths.get(SeleniumTestsContext.getConfigPath(), OBJECT_MAPPING_FILE_NAME).toFile();
 		testConfig = extractConfigValues(testConfig, globalConfigFile);
 		
 		// load system specific configuration if any (web / ios / android)
@@ -92,13 +94,13 @@ public class ConfigMappingReader {
 			if (!"ios".equalsIgnoreCase(typeDir) && !"android".equalsIgnoreCase(typeDir)) {
 				typeDir = "web";
 			}
-			File systemConfigFile =  Paths.get(SeleniumTestsContext.getConfigPath(), typeDir, "objectMapping.ini").toFile();
+			File systemConfigFile =  Paths.get(SeleniumTestsContext.getConfigPath(), typeDir, OBJECT_MAPPING_FILE_NAME).toFile();
 			testConfig = extractConfigValues(testConfig, systemConfigFile);
 			
 			
 			if(versionDir != null && !versionDir.isEmpty()){
 				
-				File versionConfigFile =  Paths.get(SeleniumTestsContext.getConfigPath(), typeDir, versionDir, "objectMapping.ini").toFile();
+				File versionConfigFile =  Paths.get(SeleniumTestsContext.getConfigPath(), typeDir, versionDir, OBJECT_MAPPING_FILE_NAME).toFile();
 				testConfig = extractConfigValues(testConfig, versionConfigFile);
 			}
 		}

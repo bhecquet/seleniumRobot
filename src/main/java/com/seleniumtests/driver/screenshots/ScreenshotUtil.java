@@ -40,6 +40,7 @@ public class ScreenshotUtil {
     private String outputDirectory;
     private WebDriver driver;
     private String filename;
+    private static final String SCREENSHOT_DIR = "/screenshots/";
 	
 	public ScreenshotUtil() {
         suiteName = getSuiteName();
@@ -61,7 +62,7 @@ public class ScreenshotUtil {
         try {
 
             // Don't capture snapshot for htmlunit
-            if (WebUIDriver.getWebUIDriver().getBrowser().equalsIgnoreCase(BrowserType.HtmlUnit.getBrowserType())) {
+            if (WebUIDriver.getWebUIDriver().getBrowser().equalsIgnoreCase(BrowserType.HTMLUNIT.getBrowserType())) {
                 return null;
             }
 
@@ -105,8 +106,8 @@ public class ScreenshotUtil {
 
             if (screenshotString != null && !screenshotString.isEmpty()) {
                 byte[] byteArray = screenshotString.getBytes();
-                FileUtility.writeImage(outputDirectory + "/screenshots/" + filename + ".png", byteArray);
-                screenShot.setImagePath(suiteName + "/screenshots/" + filename + ".png");
+                FileUtility.writeImage(outputDirectory + SCREENSHOT_DIR + filename + ".png", byteArray);
+                screenShot.setImagePath(suiteName + SCREENSHOT_DIR + filename + ".png");
 
             }
         } catch (Exception e) {
@@ -203,7 +204,7 @@ public class ScreenshotUtil {
 
                 byte[] byteArray = img.getBytes();
                 if (byteArray != null && byteArray.length > 0) {
-                    String imgFile = "/screenshots/" + filename + ".png";
+                    String imgFile = SCREENSHOT_DIR + filename + ".png";
                     FileUtility.writeImage(getOutputDirectory() + imgFile, byteArray);
 
                     ScreenShot screenShot = new ScreenShot();

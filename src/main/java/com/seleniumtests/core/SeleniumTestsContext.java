@@ -52,11 +52,11 @@ import com.seleniumtests.reporter.TestLogging;
 public class SeleniumTestsContext {
 	
 	// folder config
-	private static String ROOT_PATH;
-	private static String DATA_PATH;
-	private static String FEATURES_PATH;
-	private static String CONFIG_PATH;
-	private static String APPLICATION_NAME;
+	private static String rootPath;
+	private static String dataPath;
+	private static String featuresPath;
+	private static String configPath;
+	private static String applicationName;
 	private Map<String, HashMap<String,String>> idMapping;
 	public static final String DATA_FOLDER_NAME = "data";
 	
@@ -82,8 +82,8 @@ public class SeleniumTestsContext {
     public static final String IE_DRIVER_PATH = "ieDriverPath";					// chemin vers le driver Internet Explorer
     public static final String USER_AGENT = "userAgent";						// user agent utilisé pour les tests. Permet d'écraser le user-agent par défaut du navigateur, sur firefox et chrome uniquement
 
-    public static final String Set_Assume_Untrusted_Certificate_Issuer = "setAssumeUntrustedCertificateIssuer"; // Firefox uniquement pour qu'il ne prenne pas en compte les certificats invalides 
-    public static final String Set_Accept_Untrusted_Certificates = "setAcceptUntrustedCertificates"; // Firefox uniquement pour qu'il ne prenne pas en compte les certificats invalides
+    public static final String SET_ASSUME_UNTRUSTED_CERTIFICATE_ISSUER = "setAssumeUntrustedCertificateIssuer"; // Firefox uniquement pour qu'il ne prenne pas en compte les certificats invalides 
+    public static final String SET_ACCEPT_UNTRUSTED_CERTIFICATES = "setAcceptUntrustedCertificates"; // Firefox uniquement pour qu'il ne prenne pas en compte les certificats invalides
     public static final String ENABLE_JAVASCRIPT = "enableJavascript";			// activation du javascrit dans le navigateur.
     public static final String NTLM_AUTH_TRUSTED_URIS = "ntlmAuthTrustedUris";	// Firefox uniquement
     public static final String BROWSER_DOWNLOAD_DIR = "browserDownloadDir";		// répertoire où seront enregistrés les fichiers
@@ -176,8 +176,8 @@ public class SeleniumTestsContext {
         setChromeDriverPath(getValueForTest(CHROME_DRIVER_PATH, System.getProperty(CHROME_DRIVER_PATH)));
         setIEDriverPath(getValueForTest(IE_DRIVER_PATH, System.getProperty(IE_DRIVER_PATH)));
         setUserAgent(getValueForTest(USER_AGENT, System.getProperty(USER_AGENT)));
-        setAssumeUntrustedCertificateIssuer(getBoolValueForTest(Set_Assume_Untrusted_Certificate_Issuer, System.getProperty(Set_Assume_Untrusted_Certificate_Issuer)));
-        setAcceptUntrustedCertificates(getBoolValueForTest(Set_Accept_Untrusted_Certificates, System.getProperty(Set_Accept_Untrusted_Certificates)));
+        setAssumeUntrustedCertificateIssuer(getBoolValueForTest(SET_ASSUME_UNTRUSTED_CERTIFICATE_ISSUER, System.getProperty(SET_ASSUME_UNTRUSTED_CERTIFICATE_ISSUER)));
+        setAcceptUntrustedCertificates(getBoolValueForTest(SET_ACCEPT_UNTRUSTED_CERTIFICATES, System.getProperty(SET_ACCEPT_UNTRUSTED_CERTIFICATES)));
         setJavascriptEnabled(getBoolValueForTest(ENABLE_JAVASCRIPT, System.getProperty(ENABLE_JAVASCRIPT)));
         setNtlmAuthTrustedUris(getValueForTest(NTLM_AUTH_TRUSTED_URIS, System.getProperty(NTLM_AUTH_TRUSTED_URIS)));
         setBrowserDownloadDir(getValueForTest(BROWSER_DOWNLOAD_DIR, System.getProperty(BROWSER_DOWNLOAD_DIR)));
@@ -325,24 +325,24 @@ public class SeleniumTestsContext {
 		StringBuilder path = new StringBuilder();
 		getPathFromClass(SeleniumTestsContext.class, path);
 		
-		ROOT_PATH = path.toString();
+		rootPath = path.toString();
 		
 		// in case launching unit test from eclipse, a temp file is generated outside the standard folder structure
 		// APPLICATION_NAME and DATA_PATH must be rewritten
 		try {
-			APPLICATION_NAME = xmlSuite.getFileName().replace(File.separator, "/").split("/"+ DATA_FOLDER_NAME + "/")[1].split("/")[0];
-			DATA_PATH = xmlSuite.getFileName().replace(File.separator, "/").split("/"+ DATA_FOLDER_NAME + "/")[0] + "/" + DATA_FOLDER_NAME + "/";
+			applicationName = xmlSuite.getFileName().replace(File.separator, "/").split("/"+ DATA_FOLDER_NAME + "/")[1].split("/")[0];
+			dataPath = xmlSuite.getFileName().replace(File.separator, "/").split("/"+ DATA_FOLDER_NAME + "/")[0] + "/" + DATA_FOLDER_NAME + "/";
 		} catch (IndexOutOfBoundsException e) {
-			APPLICATION_NAME = "core";
-			DATA_PATH = Paths.get(ROOT_PATH, "data").toString();
+			applicationName = "core";
+			dataPath = Paths.get(rootPath, "data").toString();
 		}
 		
-		FEATURES_PATH = Paths.get(DATA_PATH, APPLICATION_NAME, "features").toString();
-		CONFIG_PATH = Paths.get(DATA_PATH, APPLICATION_NAME, "config").toString();
+		featuresPath = Paths.get(dataPath, applicationName, "features").toString();
+		configPath = Paths.get(dataPath, applicationName, "config").toString();
 		
 		// create data folder if it does not exist (it should already exist)
-		if (!new File(DATA_PATH).isDirectory()) {
-			new File(DATA_PATH).mkdirs();
+		if (!new File(dataPath).isDirectory()) {
+			new File(dataPath).mkdirs();
 		}
 	}
 
@@ -541,7 +541,7 @@ public class SeleniumTestsContext {
     }
 	
 	public Boolean getAssumeUntrustedCertificateIssuer() {
-        return (Boolean) getAttribute(Set_Assume_Untrusted_Certificate_Issuer);
+        return (Boolean) getAttribute(SET_ASSUME_UNTRUSTED_CERTIFICATE_ISSUER);
     }
 	
 	public Boolean getJavascriptEnabled() {
@@ -549,7 +549,7 @@ public class SeleniumTestsContext {
 	}
 
 	public Boolean getAcceptUntrustedCertificates() {
-        return (Boolean) getAttribute(Set_Accept_Untrusted_Certificates);
+        return (Boolean) getAttribute(SET_ACCEPT_UNTRUSTED_CERTIFICATES);
     }
 
 
@@ -763,7 +763,7 @@ public class SeleniumTestsContext {
      * @return
      */
     public static String getRootPath() {
-		return ROOT_PATH;
+		return rootPath;
 	}
 
     /**
@@ -771,7 +771,7 @@ public class SeleniumTestsContext {
      * @return
      */
 	public static String getFeaturePath() {
-		return FEATURES_PATH;
+		return featuresPath;
 	}
 
 	/**
@@ -779,7 +779,7 @@ public class SeleniumTestsContext {
 	 * @return
 	 */
 	public static String getConfigPath() {
-		return CONFIG_PATH;
+		return configPath;
 	}
 	
 	/**
@@ -787,7 +787,7 @@ public class SeleniumTestsContext {
 	 * @return
 	 */
 	public static String getDataPath() {
-		return DATA_PATH;
+		return dataPath;
 	}
 
 	//set
@@ -1012,17 +1012,17 @@ public class SeleniumTestsContext {
     
     public void setAssumeUntrustedCertificateIssuer(Boolean assume) {
     	if (assume != null) {
-    		setAttribute(Set_Assume_Untrusted_Certificate_Issuer, assume);
+    		setAttribute(SET_ASSUME_UNTRUSTED_CERTIFICATE_ISSUER, assume);
     	} else {
-    		setAttribute(Set_Assume_Untrusted_Certificate_Issuer, true);
+    		setAttribute(SET_ASSUME_UNTRUSTED_CERTIFICATE_ISSUER, true);
     	}
     }
     
     public void setAcceptUntrustedCertificates(Boolean accept) {
     	if (accept != null) {
-    		setAttribute(Set_Accept_Untrusted_Certificates, accept);
+    		setAttribute(SET_ACCEPT_UNTRUSTED_CERTIFICATES, accept);
     	} else {
-    		setAttribute(Set_Accept_Untrusted_Certificates, true);
+    		setAttribute(SET_ACCEPT_UNTRUSTED_CERTIFICATES, true);
     	}
     }
     
@@ -1241,7 +1241,7 @@ public class SeleniumTestsContext {
 	public void setTestConfiguration() {
     	Map<String, String> testConfig;
 		try {
-			testConfig = new ConfigReader().readConfig(FileUtils.openInputStream(new File(CONFIG_PATH + File.separator + "config.ini")));
+			testConfig = new ConfigReader().readConfig(FileUtils.openInputStream(new File(configPath + File.separator + "config.ini")));
 		} catch (IOException e1) {
 			TestLogging.warning("no valid config.ini file for this application");
 			testConfig = new HashMap<>();

@@ -55,7 +55,7 @@ public class FairTestRetryAnalyzer implements IRetryAnalyzer, ITestRetryAnalyzer
         String testClassName = String.format("%s.%s", result.getMethod().getRealClass().toString(),
                 result.getMethod().getMethodName());
 
-        Integer retryCount = Integer.class.cast(result.getTestContext().getAttribute("fairTestRetryCount"));
+        Integer retryCount = Integer.class.cast(result.getTestContext().getAttribute(TEST_RETRY_COUNT));
         if (retryCount == null) {
             count = 1;
         } else {
@@ -66,7 +66,7 @@ public class FairTestRetryAnalyzer implements IRetryAnalyzer, ITestRetryAnalyzer
 
             result.setAttribute("RETRY", new Integer(count));
             TestLogging.log("[RETRYING] " + testClassName + " FAILED, " + "Retrying " + count + " time", true);
-            result.getTestContext().setAttribute("fairTestRetryCount", ++count);
+            result.getTestContext().setAttribute(TEST_RETRY_COUNT, ++count);
 
             maxCount++;
             return true;
@@ -77,7 +77,7 @@ public class FairTestRetryAnalyzer implements IRetryAnalyzer, ITestRetryAnalyzer
 
     @Override
     public boolean retryPeek(final ITestResult result) {
-        Integer retryCount = Integer.class.cast(result.getTestContext().getAttribute("fairTestRetryCount"));
+        Integer retryCount = Integer.class.cast(result.getTestContext().getAttribute(TEST_RETRY_COUNT));
         if (retryCount == null) {
             count = 1;
         } else {
