@@ -96,6 +96,8 @@ public class WebUIDriver {
 	            }
         	}
         }
+        
+        logger.info("driver mode: "+config.getMode());
 
         synchronized (this.getClass()) {
             driver = webDriverBuilder.createWebDriver();
