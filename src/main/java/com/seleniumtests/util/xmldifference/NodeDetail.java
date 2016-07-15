@@ -40,7 +40,7 @@ public class NodeDetail {
      *
      * @param  node  the Document Node
      *
-     * @paran  xpath the XPath location of the Node
+     * @param  xpath the XPath location of the Node
      */
 
     public NodeDetail(final Node node, final String xpath) {
@@ -57,7 +57,7 @@ public class NodeDetail {
      * @param  value  the value of the Node
      * @param  node   the Document Node
      *
-     * @paran  xpath the XPath location of the Node
+     * @param  xpath the XPath location of the Node
      */
 
     public NodeDetail(final String value, final Node node, final String xpath) {

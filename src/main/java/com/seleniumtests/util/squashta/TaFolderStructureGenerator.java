@@ -51,7 +51,7 @@ public class TaFolderStructureGenerator {
 		logger.info("copying pom.xml to " + pomFile.toString());
 		FileUtils.copyFile(new File(Thread.currentThread().getContextClassLoader().getResource("squash-ta/pom.xml").getFile()), 
 							pomFile);
-		
+
 		// add .java file
 		if (!srcJavaFile.exists()) {
 			logger.info("copying SeleniumRobotTest.java to " + javaFile.toString());
@@ -78,7 +78,6 @@ public class TaFolderStructureGenerator {
 	 */
 	public static void main(String [] args) throws IOException {
 		new TaFolderStructureGenerator(args[0], Paths.get(args[1], "data", args[0], "squash-ta").toString(), args[2]).generateDefaultStructure();
-		
 		// generate new .ta files
 		new TaScriptGenerator(args[0], args[1], args[2]).generateTaScripts();
 	}
