@@ -16,7 +16,6 @@ package com.seleniumtests.uipage.htmlelements;
 import java.util.List;
 
 import org.openqa.selenium.By;
-import org.openqa.selenium.NotFoundException;
 import org.openqa.selenium.WebElement;
 
 public class Table extends HtmlElement {
@@ -30,9 +29,7 @@ public class Table extends HtmlElement {
     @Override
     public void findElement() {
         super.findElement();
-        try {
-            rows = element.findElements(By.tagName("tr"));
-        } catch (NotFoundException e) { }
+        rows = element.findElements(By.tagName("tr"));
 
     }
 
@@ -43,19 +40,15 @@ public class Table extends HtmlElement {
 
         // Need to check whether rows is null AND whether or not the list of rows is empty
         if (rows != null && !rows.isEmpty()) {
-            try {
-                columns = rows.get(0).findElements(By.tagName("td"));
-            } catch (NotFoundException e) { }
+            columns = rows.get(0).findElements(By.tagName("td"));
 
             if (columns == null || columns.isEmpty()) {
 
-                try {
-                    if (rows.size() > 1) {
-                        columns = rows.get(1).findElements(By.tagName("td"));
-                    } else {
-                        columns = rows.get(0).findElements(By.tagName("th"));
-                    }
-                } catch (NotFoundException e) { }
+                if (rows.size() > 1) {
+                    columns = rows.get(1).findElements(By.tagName("td"));
+                } else {
+                    columns = rows.get(0).findElements(By.tagName("th"));
+                }
             }
         }
 
@@ -82,16 +75,14 @@ public class Table extends HtmlElement {
         }
 
         if (rows != null && !rows.isEmpty()) {
-            try {
-                columns = rows.get(row - 1).findElements(By.tagName("td"));
-            } catch (NotFoundException e) { }
+            columns = rows.get(row - 1).findElements(By.tagName("td"));
 
             if (columns == null || columns.isEmpty()) {
-                try {
-                    columns = rows.get(row - 1).findElements(By.tagName("th"));
-                } catch (NotFoundException e) {
-                	return null;
-                }
+                columns = rows.get(row - 1).findElements(By.tagName("th"));
+            }
+            
+            if (columns.isEmpty()) {
+            	return null;
             }
 
             return columns.get(column - 1).getText();

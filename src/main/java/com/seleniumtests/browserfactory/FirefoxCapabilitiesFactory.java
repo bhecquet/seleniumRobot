@@ -16,8 +16,8 @@ package com.seleniumtests.browserfactory;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Paths;
 
+import org.apache.commons.io.FileUtils;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxProfile;
 import org.openqa.selenium.remote.CapabilityType;
@@ -28,7 +28,6 @@ import com.seleniumtests.driver.DriverConfig;
 import com.seleniumtests.driver.JavaScriptError;
 import com.seleniumtests.reporter.TestLogging;
 import com.seleniumtests.util.FileUtility;
-import com.seleniumtests.util.OSUtility;
 
 public class FirefoxCapabilitiesFactory extends ICapabilitiesFactory {
     private static boolean isProfileCreated = false;
@@ -139,7 +138,7 @@ public class FirefoxCapabilitiesFactory extends ICapabilitiesFactory {
             try {
                 if (!isProfileCreated) {
                     logger.info("start create profile");
-                    FileUtility.deleteDirectory(profilePath);
+                    FileUtils.deleteDirectory(new File(profilePath));
                     FileUtility.extractJar(profilePath, FireFoxProfileMarker.class);
                 }
             } catch (Exception ex) {
@@ -167,16 +166,9 @@ public class FirefoxCapabilitiesFactory extends ICapabilitiesFactory {
 
     protected String getFirefoxProfilePath(String path) {
         String realPath;
-        if (path != null && !new File(path).exists()) {
-            TestLogging.log("Firefox profile path:" + path + " not found, use default");
-            path = null;
-        }
-
-        if (path != null) {
-
-            realPath = path;
-        } else {
-            try {
+        
+        if (path == null) {
+        	try {
                 String profilePath = this.getClass().getResource("/").getPath() + "ffprofile";
                 profilePath = FileUtility.decodePath(profilePath);
 
@@ -187,6 +179,11 @@ public class FirefoxCapabilitiesFactory extends ICapabilitiesFactory {
             	logger.error(e);
                 realPath = null;
             }
+        } else {
+        	realPath = path;
+        	if (!new File(path).exists()) {
+        		TestLogging.log("Firefox profile path:" + path + " not found, use default");
+        	}
         }
 
         logger.info("Firefox Profile: " + realPath);

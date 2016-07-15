@@ -22,6 +22,7 @@ import java.util.List;
 
 public class OSUtility {
 	
+	private OSUtility() {}
 
     public static String getOSName() {
         return System.getProperty("os.name");
@@ -40,19 +41,19 @@ public class OSUtility {
     }
 
     public static boolean is32() {
-        return getOSBits().equals("x86");
+        return "x86".equals(getOSBits());
     }
 
     public static boolean is64() {
         if (isWindows()) {
-            return (System.getenv("ProgramW6432") != null);
+            return System.getenv("ProgramW6432") != null;
         } else {
-            return !getOSBits().equals("x86");
+            return !"x86".equals(getOSBits());
         }
     }
 
     private static List<String> executeCommand(final String cmd) {
-        List<String> output = new ArrayList<String>();
+        List<String> output = new ArrayList<>();
         Process p;
         try {
             p = Runtime.getRuntime().exec(cmd);
@@ -80,7 +81,7 @@ public class OSUtility {
             output = executeCommand("reg query \"HKLM\\Software\\Microsoft\\Internet Explorer\" /v Version");
         }
 
-        String internet_explorer_value = (output.get(2));
+        String internet_explorer_value = output.get(2);
         String version = internet_explorer_value.trim().split("   ")[2];
         version = version.trim().split("\\.")[0];
         return Integer.parseInt(version);
@@ -93,11 +94,4 @@ public class OSUtility {
             return "/";
         }
     }
-
-    public static void main(final String[] args) {
-
-        System.out.println(getIEVersion());
-
-    }
-
 }

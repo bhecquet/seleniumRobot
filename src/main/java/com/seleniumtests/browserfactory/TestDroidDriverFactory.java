@@ -59,6 +59,7 @@ public class TestDroidDriverFactory extends AbstractWebDriverFactory implements 
 
         HttpRequestFactory requestFactory =
                 HTTP_TRANSPORT.createRequestFactory(new HttpRequestInitializer() {
+                	@Override
                     public void initialize(HttpRequest request) {
                         request.setParser(new JsonObjectParser(JSON_FACTORY));
                         request.setHeaders(headers);

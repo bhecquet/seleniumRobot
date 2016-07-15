@@ -31,12 +31,6 @@ public class NodeDetail {
 
     /**
      * Constructor.
-     */
-
-    public NodeDetail() { }
-
-    /**
-     * Constructor.
      *
      * @param  node  the Document Node
      *

@@ -46,7 +46,7 @@ public class testSpreadSheetHelper {
 	 */
 	@Test(groups={"ut"})
 	public void testgetHeadersFromCSV(){
-		ArrayList<String> data = CSVHelper.getHeaderFromCSVFile(null, "src/test/resources/ti/excel/test.csv", null);
+		List<String> data = CSVHelper.getHeaderFromCSVFile(null, "src/test/resources/ti/excel/test.csv", null);
 		Assert.assertTrue(data.get(0).equals("test;test2"));
 		Assert.assertEquals(data.size(), 1);
 	}

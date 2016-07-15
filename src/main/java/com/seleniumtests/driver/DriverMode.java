@@ -16,14 +16,14 @@ package com.seleniumtests.driver;
 
 public enum DriverMode {
     LOCAL ("local"),
-    ExistingGrid ("existinggrid"),
-    SauceLabs ("saucelabs"),
-    TestDroid ("testdroid");
+    EXISTING_GRID ("existinggrid"),
+    SAUCELABS ("saucelabs"),
+    TESTDROID ("testdroid");
 	
-	String[] driverMode;
+	String[] dMode;
 	
 	DriverMode(final String... driverMode) {
-        this.driverMode = driverMode;
+        this.dMode = driverMode;
     }
 	
 	public static DriverMode fromString(String mode) {
@@ -31,8 +31,8 @@ public enum DriverMode {
 			return DriverMode.valueOf(mode);
 		} catch (IllegalArgumentException ex) {
 			for (DriverMode drvMode : DriverMode.values()) {
-		        for (String matcher : drvMode.driverMode) {
-		          if (mode.toLowerCase().equals(matcher.toLowerCase())) {
+		        for (String matcher : drvMode.dMode) {
+		          if (mode.equalsIgnoreCase(matcher)) {
 		            return drvMode;
 		          }
 		        }

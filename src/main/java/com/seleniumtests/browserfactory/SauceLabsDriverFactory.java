@@ -74,7 +74,7 @@ public class SauceLabsDriverFactory extends AbstractWebDriverFactory implements 
      * @throws IOException
      * @throws AuthenticationException 
      */
-    protected static String uploadFile(String targetAppPath) throws IOException, AuthenticationException {
+    protected static boolean uploadFile(String targetAppPath) throws IOException, AuthenticationException {
 
     	// extract user name and password from appiumServerURL
     	Matcher matcher = REG_USER_PASSWORD.matcher(SeleniumTestsContextManager.getThreadContext().getAppiumServerURL());
@@ -103,13 +103,11 @@ public class SauceLabsDriverFactory extends AbstractWebDriverFactory implements 
         	throw new ConfigurationException("Application file upload failed: " + response.getStatusLine().getReasonPhrase());
         }
         client.close();
-
-        return "";
-
+        
+        return true;
     }
 
-    @Override
-    protected WebDriver createNativeDriver() {
+    private DesiredCapabilities createCapabilities(){
     	
     	DesiredCapabilities capabilities;
     	if (webDriverConfig.getTestType().family().equals(TestType.APP)) {
@@ -122,6 +120,13 @@ public class SauceLabsDriverFactory extends AbstractWebDriverFactory implements 
     	} else {
     		capabilities = new DesiredCapabilities();
     	}
+    	return capabilities;
+    }
+    
+    @Override
+    protected WebDriver createNativeDriver() {
+    	
+    	DesiredCapabilities capabilities = createCapabilities();
 
     	try {
 	        if("android".equalsIgnoreCase(webDriverConfig.getPlatform())){

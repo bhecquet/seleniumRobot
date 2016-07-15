@@ -16,7 +16,6 @@ package com.seleniumtests.uipage.htmlelements;
 
 import org.openqa.selenium.By;
 
-import com.seleniumtests.core.CustomAssertion;
 import com.seleniumtests.reporter.TestLogging;
 
 public class LabelElement extends HtmlElement {
@@ -34,14 +33,9 @@ public class LabelElement extends HtmlElement {
         return super.getText();
     }
 
+    @Override
     public boolean isTextPresent(final String pattern) {
         String text = getText();
-        return (text != null && (text.contains(pattern) || text.matches(pattern)));
-    }
-
-    @Deprecated
-    public String getExpectedText() {
-        CustomAssertion.assertTrue(false, "NOT supported!");
-        return null;
+        return text != null && (text.contains(pattern) || text.matches(pattern));
     }
 }

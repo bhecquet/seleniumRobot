@@ -55,12 +55,11 @@ public class FileUtil {
             return;
         }
 
-        BufferedWriter bw = null;
-        FileWriter fw = null;
 
-        try {
-        	fw = new FileWriter(file);
-            bw = new BufferedWriter(fw);
+        try (FileWriter fw = new FileWriter(file);
+        	BufferedWriter bw = new BufferedWriter(fw);
+        		){
+        	
 
             for (int i = 0; i < list.size(); i++) {
 
@@ -71,26 +70,7 @@ public class FileUtil {
             bw.close();
             fw.close();
            
-        } finally {
-
-            try {
-
-            	if (bw != null) {
-            		bw.close();
-            	}
-                bw = null;
-
-            } catch (Exception ex) {}
-            try {
-            	if (fw != null) {
-            		fw.close();
-            	}
-            	fw = null;
-            	
-            } catch (Exception ex) {}
-
-        }
-
+        } 
     }
 
     /**
@@ -110,8 +90,6 @@ public class FileUtil {
         StringTokenizer st = new StringTokenizer(filename, ".");
 
         StringBuilder sb = new StringBuilder();
-
-        // System.out.println("# of tokens " + st.countTokens());
 
         int index = 0;
 
@@ -161,27 +139,24 @@ public class FileUtil {
             throw new IOException("InputStream is null");
         }
 
-        FileOutputStream fos = null;
-
         File tempFile = null;
+        
+        String userHome = System.getProperty("user.home");
 
-        try {
+        File f = new File(userHome + File.separator + "temp");
 
-            String userHome = System.getProperty("user.home");
+        f.mkdirs();
 
-            File f = new File(userHome + File.separator + "temp");
+        if ((filename == null) || ("".equals(filename.trim()))) {
 
-            f.mkdirs();
+            tempFile = File.createTempFile("file1", ".tmp");
+        } else {
 
-            if ((filename == null) || ("".equals(filename.trim()))) {
+            tempFile = File.createTempFile(filename, "");
+        }
 
-                tempFile = File.createTempFile("file1", ".tmp");
-            } else {
-
-                tempFile = File.createTempFile(filename, "");
-            }
-
-            fos = new FileOutputStream(tempFile);
+        try (FileOutputStream fos = new FileOutputStream(tempFile);
+        		) {
 
             byte[] buffer = new byte[8192];
 
@@ -190,16 +165,6 @@ public class FileUtil {
             while ((bytesRead = is.read(buffer, 0, 8192)) != -1) {
 
                 fos.write(buffer, 0, bytesRead);
-            }
-
-        } finally {
-
-            if (fos != null) {
-
-                fos.close();
-
-                fos = null;
-
             }
 
         }

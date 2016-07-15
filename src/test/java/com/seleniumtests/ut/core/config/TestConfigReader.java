@@ -41,7 +41,7 @@ public class TestConfigReader extends GenericTest {
 	
 	@Test(groups={"ut context"})
 	public void mergeIniAndXmlConfiguration(final ITestContext testNGCtx, final XmlTest xmlTest) {
-		SeleniumTestsContextManager.initThreadContext(testNGCtx, xmlTest);
+		SeleniumTestsContextManager.initThreadContext(testNGCtx);
 		SeleniumTestsContext seleniumTestsCtx = SeleniumTestsContextManager.getThreadContext();
 
 		Assert.assertEquals(seleniumTestsCtx.getConfiguration().get("variable1"), "value1", "Value has not been get from xml file");

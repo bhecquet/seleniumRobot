@@ -17,17 +17,11 @@ package com.seleniumtests.util;
 import java.awt.image.BufferedImage;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.Enumeration;
@@ -99,153 +93,6 @@ public class FileUtility {
         }
     }
 
-    public static void copyFile(final File srcPath, final File dstPath) throws IOException {
-
-        if (srcPath.isDirectory()) {
-            if (!dstPath.exists()) {
-                dstPath.mkdir();
-            }
-
-            String[] files = srcPath.list();
-            for (String file : files) {
-                copyFile(new File(srcPath, file), new File(dstPath, file));
-            }
-        } else {
-            if (!srcPath.exists()) {
-                throw new IOException("Directory Not Found ::: " + srcPath);
-            } else {
-                InputStream in = null;
-                OutputStream out = null;
-                try {
-                    if (!dstPath.getParentFile().exists()) {
-                        dstPath.getParentFile().mkdirs();
-                    }
-
-                    in = new FileInputStream(srcPath);
-                    out = new FileOutputStream(dstPath);
-
-                    // Transfer bytes
-                    byte[] buf = new byte[1024];
-                    int len;
-
-                    while ((len = in.read(buf)) > 0) {
-                        out.write(buf, 0, len);
-                    }
-                } finally {
-                    if (in != null) {
-                        try {
-                            in.close();
-                        } catch (Exception e) {
-                            logger.warn(e);
-                        }
-                    }
-
-                    if (out != null) {
-                        try {
-                            out.close();
-                        } catch (Exception e) {
-                        	logger.warn(e);
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    public static void copyFile(final String srcPath, final String dstPath) throws IOException {
-        copyFile(new File(srcPath), new File(dstPath));
-    }
-
-    /**
-     * Deletes Directory with Files.
-     *
-     * @param   path
-     *
-     * @return
-     */
-    public static boolean deleteDirectory(final File path) {
-        if (path.exists()) {
-            File[] files = path.listFiles();
-            for (File file : files) {
-                if (file.isDirectory()) {
-                    deleteDirectory(file);
-                } else {
-                    file.delete();
-                }
-            }
-        }
-
-        return path.delete();
-    }
-
-    public static boolean deleteDirectory(final String dir) {
-        return deleteDirectory(new File(dir));
-    }
-
-    /**
-     * Read contents of a file.
-     *
-     * @param   path
-     *
-     * @return  content
-     *
-     * @throws  IOException
-     */
-    public static String readFromFile(final File path) throws IOException {
-        FileInputStream fis = null;
-        try {
-            fis = new FileInputStream(path);
-            return readFromFile(fis);
-        } finally {
-            if (fis != null) {
-                fis.close();
-            }
-        }
-    }
-
-    /**
-     * Read contents From Stream.
-     *
-     * @param   path
-     *
-     * @return  content
-     *
-     * @throws  IOException
-     */
-    public static String readFromFile(final InputStream path) throws IOException {
-        InputStreamReader fr = null;
-        BufferedReader br = null;
-        StringBuilder stringBuilder = new StringBuilder();
-
-        try {
-            fr = new InputStreamReader(path);
-            br = new BufferedReader(fr);
-
-            String line;
-            while ((line = br.readLine()) != null) {
-                stringBuilder.append(line).append("\n");
-            }
-        } finally {
-            if (br != null) {
-                try {
-                    br.close();
-                } catch (IOException e) {
-                	logger.warn(e);
-                }
-            }
-
-            if (fr != null) {
-                try {
-                    fr.close();
-                } catch (IOException e) {
-                	logger.warn(e);
-                }
-            }
-        }
-
-        return stringBuilder.toString();
-    }
-
     /**
      * Constructs ImageElement from bytes and stores it.
      *
@@ -255,91 +102,23 @@ public class FileUtility {
         if (byteArray.length == 0) {
             return;
         }
+        
+        File parentDir = new File(path).getParentFile();
+        if (!parentDir.exists()) {
+            parentDir.mkdirs();
+        }
 
-        InputStream in = null;
-        FileOutputStream fos = null;
-        try {
-            File parentDir = new File(path).getParentFile();
-            if (!parentDir.exists()) {
-                parentDir.mkdirs();
-            }
+        byte[] decodeBuffer = Base64.decodeBase64(byteArray);
 
-            byte[] decodeBuffer = Base64.decodeBase64(byteArray);
-            in = new ByteArrayInputStream(decodeBuffer);
+        try (InputStream in = new ByteArrayInputStream(decodeBuffer);
+             FileOutputStream fos = new FileOutputStream(path);
+        		) {
 
             BufferedImage img = ImageIO.read(in);
-            fos = new FileOutputStream(path);
             ImageIO.write(img, "png", fos);
-            img = null;
         } catch (Exception e) {
             logger.warn(e);
-        } finally {
-            if (in != null) {
-                try {
-                    in.close();
-                } catch (Exception e) {
-                	logger.warn(e);
-                }
-            }
-
-            if (fos != null) {
-                try {
-                    fos.close();
-                } catch (Exception e) {
-                	logger.warn(e);
-                }
-            }
-        }
-    }
-
-    /**
-     * Saves HTML Source.
-     *
-     * @param   path
-     *
-     * @throws  Exception
-     */
-
-    public static void writeToFile(final String path, final String content) throws IOException {
-
-        FileOutputStream fileOutputStream = null;
-        OutputStreamWriter outputStreamWriter = null;
-        BufferedWriter bw = null;
-        try {
-            File parentDir = new File(path).getParentFile();
-            if (!parentDir.exists()) {
-                parentDir.mkdirs();
-            }
-
-            fileOutputStream = new FileOutputStream(path);
-            outputStreamWriter = new OutputStreamWriter(fileOutputStream, "UTF8");
-            bw = new BufferedWriter(outputStreamWriter);
-            bw.write(content);
-        } finally {
-            if (bw != null) {
-                try {
-                    bw.close();
-                } catch (Exception e) {
-                	logger.warn(e);
-                }
-            }
-
-            if (outputStreamWriter != null) {
-                try {
-                    outputStreamWriter.close();
-                } catch (Exception e) {
-                	logger.warn(e);
-                }
-            }
-
-            if (fileOutputStream != null) {
-                try {
-                    fileOutputStream.close();
-                } catch (Exception e) {
-                	logger.warn(e);
-                }
-            }
-        }
+        } 
     }
 
     public static String getLatestFile(final String folder) {

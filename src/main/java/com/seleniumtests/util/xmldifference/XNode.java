@@ -34,8 +34,6 @@ public class XNode implements Serializable {
 
     private String xPath = null;
 
-    private String noIndexXPath = null;
-
     private int position = 0; // Position of the Node under a parent
 
     private int depth = 0; // Depth of the Node in the Document
@@ -68,7 +66,6 @@ public class XNode implements Serializable {
 
         this.node = node;
         this.xPath = xPath;
-        this.noIndexXPath = noIndexXPath;
     }
 
     /**
@@ -140,19 +137,10 @@ public class XNode implements Serializable {
      */
     public String getNoIndexXPath() {
 
-        String xPath = getXPath();
-        xPath = XMLUtil.getNoIndexXPath(xPath);
-        setNoIndexXPath(xPath);
+        String _xPath = getXPath();
+        _xPath = XMLUtil.getNoIndexXPath(_xPath);
 
-        return xPath;
-    }
-
-    /**
-     * Sets XPath expression without the indexes.
-     */
-    public void setNoIndexXPath(final String noIndexXPath) {
-
-        this.noIndexXPath = noIndexXPath;
+        return _xPath;
     }
 
     /**
@@ -184,11 +172,12 @@ public class XNode implements Serializable {
     /**
      * Gets String representation of the XNode.
      */
+    @Override
     public String toString() {
 
         String eol = System.getProperty("line.separator");
 
-        StringBuffer sb = new StringBuffer("XNode:[");
+        StringBuilder sb = new StringBuilder("XNode:[");
 
         sb.append("Node Name:" + getNode().getNodeName());
 

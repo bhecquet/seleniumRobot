@@ -169,28 +169,23 @@ public class Filter {
         		return parameters.get(name) == null;
         		
         	case EQUALS :
-        		if (values == null || (values.length == 1 && values[0] == null)) {
+        		if (values == null || (values.length == 1 && values[0] == null))
         			return parameters.get(name) == null;
-        		} else {
+        		else 
         			return parameters.get(name).equals(values[0]);
-        		}
         		
         	case EQUALS_IGNORE_CASE :
-        		if (values == null || (values.length == 1 && values[0] == null)) {
+        		if (values == null || (values.length == 1 && values[0] == null))
         			return parameters.get(name) == null;
-        		} else {
+        		else
         			return parameters.get(name).toString().equalsIgnoreCase(values[0].toString());
-        		}
         
         	case IN :
-        		boolean found = false;
                 for (Object value : values) {
-                    if (parameters.get(name).equals(value)) {
-                        found = true;
-                        break;
-                    }
+                    if (parameters.get(name).equals(value))
+                        return true;
                 }
-                return found;
+                return false;
         		
         	default :
                 break;
@@ -201,86 +196,103 @@ public class Filter {
         } 
         
         if (values[0] instanceof String) {
-
-        	switch (operator) {
-        	
-		        case CONTAINS :
-		            return parameters.get(name).toString().contains(values[0].toString());
-		
-		        case CONTAINS_IGNORE_CASE :
-		            return parameters.get(name).toString().toLowerCase().contains(values[0].toString()
-		                        .toLowerCase());
-		
-		        case STARTS_WITH :
-		            return parameters.get(name).toString().startsWith(values[0].toString());
-		
-		        case STARTS_WITH_IGNORE_CASE :
-		            return parameters.get(name).toString().toLowerCase().startsWith(values[0].toString()
-		                        .toLowerCase());
-		
-		        case ENDS_WITH :
-		            return parameters.get(name).toString().endsWith(values[0].toString());
-		
-		        case ENDS_WITH_IGNORE_CASE :
-		            return parameters.get(name).toString().toLowerCase().endsWith(values[0].toString()
-		                        .toLowerCase());
-		            
-		        default :
-	                break;
-	        }
+        	return stringFilterCase(name, values, operator, parameters);
         }
         	
         if (values[0] instanceof Number) {
-            BigDecimal val = new BigDecimal(parameters.get(name).toString());
-            BigDecimal leftValue = new BigDecimal(values[0].toString());
-            BigDecimal rightValue;
-            
-            switch (operator) {
-
-	            case BETWEEN :
-	                rightValue = new BigDecimal(values[1].toString());
-	                return leftValue.compareTo(val) < 1 && rightValue.compareTo(val) > -1;
-	
-	            case LESS_THAN :
-	                return val.compareTo(leftValue) < 0;
-	
-	            case GREATER_THAN :
-	                return val.compareTo(leftValue) > 0;
-            
-	            default :
-	                break;
-	        }
+        	return numberFilterCase(name, values, operator, parameters);
         }
                 
         if (values[0] instanceof Date) {
-            Date date;
-            try {
-                date = DateFormat.getDateInstance().parse(parameters.get(name).toString());
-            } catch (ParseException e) {
-                date = (Date) parameters.get(name);
-            }
-            Date dateLeft = (Date) values[0];
-            Date dateRight;
-
-            switch (operator) {
-            
-	            case BETWEEN :
-	                dateRight = (Date) values[1];
-	                return (dateLeft.before(date) || dateLeft.equals(date))
-	                        && (date.before(dateRight) || date.equals(dateRight));
-	
-	            case LESS_THAN :
-	                return date.before(dateLeft);
-	
-	            case GREATER_THAN :
-	                return date.after(dateLeft);
-	
-	            default :
-	                break;
-            }
+        	return dateFilterCase(name, values, operator, parameters);
         }
 
-        throw new DatasetException("NOT Implemented Yet" + "\n" + filter + "\n" + parameters);
+        throw new DatasetException("Filter NOT Implemented Yet" + "\n" + filter + "\n" + parameters);
+    }
+    
+    private static boolean stringFilterCase(String name, Object[] values, Operator operator, 
+											final Map<String, Object> parameters)
+    {
+    	switch (operator) {
+    	
+        case CONTAINS :
+            return parameters.get(name).toString().contains(values[0].toString());
+
+        case CONTAINS_IGNORE_CASE :
+            return parameters.get(name).toString().toLowerCase().contains(values[0].toString()
+                        .toLowerCase());
+
+        case STARTS_WITH :
+            return parameters.get(name).toString().startsWith(values[0].toString());
+
+        case STARTS_WITH_IGNORE_CASE :
+            return parameters.get(name).toString().toLowerCase().startsWith(values[0].toString()
+                        .toLowerCase());
+
+        case ENDS_WITH :
+            return parameters.get(name).toString().endsWith(values[0].toString());
+
+        case ENDS_WITH_IGNORE_CASE :
+            return parameters.get(name).toString().toLowerCase().endsWith(values[0].toString()
+                        .toLowerCase());
+            
+        default :
+        	throw new DatasetException(name + "filter NOT implemented yet for strings.");
+    }
+    }
+    
+    private static boolean numberFilterCase(String name, Object[] values, Operator operator, 
+												final Map<String, Object> parameters)
+    {
+    	BigDecimal val = new BigDecimal(parameters.get(name).toString());
+        BigDecimal leftValue = new BigDecimal(values[0].toString());
+        BigDecimal rightValue;
+        
+        switch (operator) {
+
+            case BETWEEN :
+                rightValue = new BigDecimal(values[1].toString());
+                return leftValue.compareTo(val) < 1 && rightValue.compareTo(val) > -1;
+
+            case LESS_THAN :
+                return val.compareTo(leftValue) < 0;
+
+            case GREATER_THAN :
+                return val.compareTo(leftValue) > 0;
+        
+            default :
+            	throw new DatasetException(name + "filter NOT implemented yet for numbers.");
+        }
+    }
+
+    private static boolean dateFilterCase(String name, Object[] values, Operator operator, 
+    										final Map<String, Object> parameters)
+    {
+    	Date date;
+        try {
+            date = DateFormat.getDateInstance().parse(parameters.get(name).toString());
+        } catch (ParseException e) {
+            date = (Date) parameters.get(name);
+        }
+        Date dateLeft = (Date) values[0];
+        Date dateRight;
+
+        switch (operator) {
+        
+            case BETWEEN :
+                dateRight = (Date) values[1];
+                return (dateLeft.before(date) || dateLeft.equals(date))
+                        && (date.before(dateRight) || date.equals(dateRight));
+
+            case LESS_THAN :
+                return date.before(dateLeft);
+
+            case GREATER_THAN :
+                return date.after(dateLeft);
+
+            default :
+            	throw new DatasetException(name + "filter NOT implemented yet for dates.");
+        }
     }
     
     public String getName() {

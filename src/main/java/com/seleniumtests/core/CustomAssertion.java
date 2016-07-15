@@ -19,7 +19,6 @@ import java.util.List;
 
 import org.hamcrest.Matcher;
 import org.hamcrest.MatcherAssert;
-
 import org.testng.Assert;
 import org.testng.Reporter;
 
@@ -30,6 +29,8 @@ import com.seleniumtests.reporter.TestLogging;
  * set to true.
  */
 public class CustomAssertion {
+	
+	private CustomAssertion() {}
 
     private static void addVerificationFailure(final Throwable e) {
         SeleniumTestsContextManager.getThreadContext().addVerificationFailures(Reporter.getCurrentTestResult(), e);

@@ -79,7 +79,7 @@ package com.seleniumtests.util.xmldifference;
  *
  * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
  *
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES
  *
  * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
  *
@@ -118,6 +118,10 @@ public class NodeDescription implements XMLConstants {
      * @param  buf
      * @param  aNode
      */
+    
+    private NodeDescription() {
+    	
+    }
 
     public static void appendNodeDetail(final StringBuilder buf, final XNode xNode) {
 

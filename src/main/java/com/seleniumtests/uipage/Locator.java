@@ -7,7 +7,8 @@ import org.openqa.selenium.By;
  */
 public class Locator {
 
-    // To Do - should not return By object but hide it. https://sourcemaking.com/design_patterns/facade/java/1
+
+	private Locator() {}
 
     public static By locateByName(final String name) {
         return By.name(name);

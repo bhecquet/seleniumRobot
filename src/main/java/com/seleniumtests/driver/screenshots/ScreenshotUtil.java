@@ -14,9 +14,11 @@
 
 package com.seleniumtests.driver.screenshots;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.LinkedList;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
@@ -38,6 +40,7 @@ public class ScreenshotUtil {
     private String outputDirectory;
     private WebDriver driver;
     private String filename;
+    private static final String SCREENSHOT_DIR = "/screenshots/";
 	
 	public ScreenshotUtil() {
         suiteName = getSuiteName();
@@ -51,7 +54,7 @@ public class ScreenshotUtil {
         this.driver = driver;
     }
 	
-    public static String captureEntirePageScreenshotToString(final WebDriver driver, final String arg0) {
+    public static String captureEntirePageScreenshotToString(final WebDriver driver) {
         if (driver == null) {
             return "";
         }
@@ -59,13 +62,9 @@ public class ScreenshotUtil {
         try {
 
             // Don't capture snapshot for htmlunit
-            if (WebUIDriver.getWebUIDriver().getBrowser().equalsIgnoreCase(BrowserType.HtmlUnit.getBrowserType())) {
+            if (WebUIDriver.getWebUIDriver().getBrowser().equalsIgnoreCase(BrowserType.HTMLUNIT.getBrowserType())) {
                 return null;
             }
-
-//            if (WebUIDriver.getWebUIDriver().getBrowser().equalsIgnoreCase(BrowserType.Android.getBrowserType())) {
-//                return null;
-//            }
 
             TakesScreenshot screenShot = (TakesScreenshot) driver;
             return screenShot.getScreenshotAs(OutputType.BASE64);
@@ -79,46 +78,36 @@ public class ScreenshotUtil {
     }
 
     private static String getSuiteName() {
-        String suiteName = null;
-
-        suiteName = SeleniumTestsContextManager.getGlobalContext().getTestNGContext().getSuite().getName();
-
-        return suiteName;
+    	return SeleniumTestsContextManager.getGlobalContext().getTestNGContext().getSuite().getName();
     }
 
     private static String getOutputDirectory() {
-        String outputDirectory = null;
-        outputDirectory = SeleniumTestsContextManager.getGlobalContext().getTestNGContext().getOutputDirectory();
-
-        return outputDirectory;
+        return SeleniumTestsContextManager.getGlobalContext().getTestNGContext().getOutputDirectory();
     }
 
     private void handleSource(String htmlSource, final ScreenShot screenShot) {
         if (htmlSource == null) {
-
-            // driver.switchTo().defaultContent();
             htmlSource = driver.getPageSource();
         }
 
         if (htmlSource != null) {
             try {
-                FileUtility.writeToFile(outputDirectory + "/htmls/" + filename + ".html", htmlSource);
+                FileUtils.writeStringToFile(new File(outputDirectory + "/htmls/" + filename + ".html"), htmlSource);
                 screenShot.setHtmlSourcePath(suiteName + "/htmls/" + filename + ".html");
             } catch (IOException e) {
                 logger.warn("Ex", e);
             }
-
         }
     }
 
     private void handleImage(final ScreenShot screenShot) {
         try {
-            String screenshotString = captureEntirePageScreenshotToString(WebUIDriver.getWebDriver(), "");
+            String screenshotString = captureEntirePageScreenshotToString(WebUIDriver.getWebDriver());
 
-            if (screenshotString != null && !screenshotString.equalsIgnoreCase("")) {
+            if (screenshotString != null && !screenshotString.isEmpty()) {
                 byte[] byteArray = screenshotString.getBytes();
-                FileUtility.writeImage(outputDirectory + "/screenshots/" + filename + ".png", byteArray);
-                screenShot.setImagePath(suiteName + "/screenshots/" + filename + ".png");
+                FileUtility.writeImage(outputDirectory + SCREENSHOT_DIR + filename + ".png", byteArray);
+                screenShot.setImagePath(suiteName + SCREENSHOT_DIR + filename + ".png");
 
             }
         } catch (Exception e) {
@@ -128,8 +117,6 @@ public class ScreenshotUtil {
 
     private void handleTitle(String title, final ScreenShot screenShot) {
         if (title == null) {
-
-            // driver.switchTo().defaultContent();
             title = driver.getTitle();
         }
 
@@ -168,9 +155,7 @@ public class ScreenshotUtil {
                 pageSource = driver.getPageSource();
             } 
             
-
-            String filename = HashCodeGenerator.getRandomHashCode("web");
-            this.filename = filename;
+            this.filename = HashCodeGenerator.getRandomHashCode("web");
             screenShot.setLocation(url);
 
             handleTitle(title, screenShot);
@@ -200,11 +185,6 @@ public class ScreenshotUtil {
         captureWebPageSnapshot();
         SeleniumTestsContextManager.getThreadContext().setCaptureSnapshot(capture);
 
-        // SeleniumTestsContextManager.getThreadContext().setScreenshotName(filename);
-        // SeleniumTestsContextManager.getThreadContext().setWebExceptionURL(location);
-        // SeleniumTestsContextManager.getThreadContext().setWebExceptionMessage(title + " ("
-        // + sbMessage.toString() + ")");
-        // screenShot.setException(true);
         if (!SeleniumTestsContextManager.getThreadContext().getScreenshots().isEmpty()) {
             ((LinkedList<ScreenShot>) SeleniumTestsContextManager.getThreadContext().getScreenshots()).getLast().setException(true);
         }
@@ -217,14 +197,14 @@ public class ScreenshotUtil {
             String filename = HashCodeGenerator.getRandomHashCode("HtmlElement");
             StringBuilder sbMessage = new StringBuilder();
             try {
-                String img = ScreenshotUtil.captureEntirePageScreenshotToString(WebUIDriver.getWebDriver(), "");
+                String img = ScreenshotUtil.captureEntirePageScreenshotToString(WebUIDriver.getWebDriver());
                 if (img == null) {
                     return;
                 }
 
                 byte[] byteArray = img.getBytes();
                 if (byteArray != null && byteArray.length > 0) {
-                    String imgFile = "/screenshots/" + filename + ".png";
+                    String imgFile = SCREENSHOT_DIR + filename + ".png";
                     FileUtility.writeImage(getOutputDirectory() + imgFile, byteArray);
 
                     ScreenShot screenShot = new ScreenShot();
@@ -234,7 +214,6 @@ public class ScreenshotUtil {
                     sbMessage.append(messagePrefix + ": <a href='" + imagePath
                             + "' class='lightbox'>Application Snapshot</a>");
                     TestLogging.logWebOutput(null, sbMessage.toString(), false);
-                    sbMessage = null;
                 }
             } catch (WebSessionEndedException ex) {
                 throw ex;

@@ -71,7 +71,7 @@ public class SeleniumTestsPlugins {
      */
     public List<Plugin> getPlugin() {
         if (plugin == null) {
-            plugin = new ArrayList<Plugin>();
+            plugin = new ArrayList<>();
         }
 
         return this.plugin;

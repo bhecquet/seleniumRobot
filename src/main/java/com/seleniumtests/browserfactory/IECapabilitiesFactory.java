@@ -18,6 +18,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
 
+import org.apache.commons.io.FileUtils;
 import org.openqa.selenium.Platform;
 import org.openqa.selenium.Proxy;
 import org.openqa.selenium.ie.InternetExplorerDriver;
@@ -42,36 +43,43 @@ public class IECapabilitiesFactory extends ICapabilitiesFactory {
         
         if (!new File(dir + iEDriverServerFile).exists()) {
             if (OSUtility.getIEVersion() < 10) {
-                FileUtility.copyFile(dir + "\\IEDriverServer_x64.exe", dir + iEDriverServerFile);
+                FileUtils.copyFile(new File(dir + "\\IEDriverServer_x64.exe"), new File(dir + iEDriverServerFile));
             } else {
-                FileUtility.copyFile(dir + "\\IEDriverServer_Win32.exe", dir + iEDriverServerFile); // Win32
+            	FileUtils.copyFile(new File(dir + "\\IEDriverServer_Win32.exe"), new File(dir + iEDriverServerFile)); // Win32
             }
         }
         
         System.setProperty(WEBDRIVER_PROPERTY, dir + iEDriverServerFile);
         logger.debug(dir + iEDriverServerFile);
     }
+    
+    /**
+     * Set IEDriver for Local Mode for local mode
+     * @param webDriverConfig
+     */
+    public void setIEDriverLocal(final DriverConfig webDriverConfig){
+    	
+    	if (webDriverConfig.getIeDriverPath() != null) {
+            System.setProperty(WEBDRIVER_PROPERTY, webDriverConfig.getIeDriverPath());
+        } else {
+            if (System.getenv(WEBDRIVER_PROPERTY) != null) {
+                logger.info("Get IE Driver from property:" + System.getenv(WEBDRIVER_PROPERTY));
+                System.setProperty(WEBDRIVER_PROPERTY, System.getenv(WEBDRIVER_PROPERTY));
+            } else {
+                try {
+                    handleExtractResources();
+                } catch (IOException e) {
+                    logger.error(e);
+                }
+            }
+        }
+    }
 
     @Override
     public DesiredCapabilities createCapabilities(final DriverConfig cfg) {
 
-        // Set IEDriver for Local Mode
         if (cfg.getMode() == DriverMode.LOCAL) {
-            if (cfg.getIeDriverPath() != null) {
-                System.setProperty(WEBDRIVER_PROPERTY, cfg.getIeDriverPath());
-            } else {
-                if (System.getenv(WEBDRIVER_PROPERTY) != null) {
-                    logger.info("Get IE Driver from property:" + System.getenv(WEBDRIVER_PROPERTY));
-                    System.setProperty(WEBDRIVER_PROPERTY, System.getenv(WEBDRIVER_PROPERTY));
-                } else {
-                    try {
-                        handleExtractResources();
-                    } catch (IOException e) {
-                        logger.error(e);
-                    }
-                }
-            }
-
+        	setIEDriverLocal(cfg);
         }
 
         DesiredCapabilities capability = DesiredCapabilities.internetExplorer();

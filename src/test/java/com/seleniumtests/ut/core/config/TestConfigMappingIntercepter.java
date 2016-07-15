@@ -17,7 +17,7 @@ public class TestConfigMappingIntercepter {
 	@BeforeMethod(enabled=true, alwaysRun = true)
 	public void initContext(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		InterceptBy.setPage("TestConfigMobileIntercepter");
-		SeleniumTestsContextManager.initThreadContext(testNGCtx, xmlTest);
+		SeleniumTestsContextManager.initThreadContext(testNGCtx);
 	}
 	
 	@Test(groups={"ut"})

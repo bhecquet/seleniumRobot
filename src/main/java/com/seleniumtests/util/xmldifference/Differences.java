@@ -75,6 +75,7 @@ public class Differences extends ArrayList implements DifferenceListener {
 
     }
 
+    @Override
     public boolean add(final Object obj) {
 
         if (obj instanceof NodeResult) {
@@ -98,6 +99,7 @@ public class Differences extends ArrayList implements DifferenceListener {
      * <p/>Implementation method from DifferenceListener interface
      */
 
+    @Override
     public void similarNodeFound(final Node controlNode, final Node testNode, final String msg) {
 
         add(msg);
@@ -111,7 +113,7 @@ public class Differences extends ArrayList implements DifferenceListener {
      *
      * <p/>Implementation method from DifferenceListener interface
      */
-
+    @Override
     public void identicalNodeFound(final Node controlNode, final Node testNode, final String msg) {
 
         add(msg);
@@ -125,7 +127,7 @@ public class Differences extends ArrayList implements DifferenceListener {
      *
      * <p/>Implementation method from DifferenceListener interface
      */
-
+    @Override
     public void nodeNotFound(final Node controlNode, final Node testNode, final String msg) {
 
         add(msg);
@@ -146,9 +148,10 @@ public class Differences extends ArrayList implements DifferenceListener {
      * Gets the String representation of the object.
      */
 
+    @Override
     public String toString() {
 
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
 
         sb.append("Differences:[ size: " + size());
 
@@ -157,8 +160,6 @@ public class Differences extends ArrayList implements DifferenceListener {
         if (size() > 0) {
 
             for (int i = 0; i < size(); i++) {
-
-                // System.out.println(" Element in the differences list is of type " + get(i).getClass());
 
                 sb.append(get(i).toString());
 
@@ -188,15 +189,13 @@ public class Differences extends ArrayList implements DifferenceListener {
 
     public String getHTML() {
 
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
 
         sb.append("<UL>");
 
         if (size() > 0) {
 
             for (int i = 0; i < size(); i++) {
-
-                // System.out.println(" Element in the differences list is of type " + get(i).getClass());
 
                 sb.append("<LI>");
 

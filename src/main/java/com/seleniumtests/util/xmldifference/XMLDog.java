@@ -23,20 +23,22 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
-
 import org.xml.sax.SAXException;
+
+import com.seleniumtests.reporter.TestLogging;
 
 /**
  * XMLDog class for comparing XML documents.
  */
 public class XMLDog implements XMLDogConstants {
     private Config _config = null;
+    
+	private static final Logger logger = TestLogging.getLogger(Comparator.class);
 
     private DocumentBuilderFactory _factory = null;
 
     private DocumentBuilder _parser = null;
-    
-    private static final Logger logger = Logger.getLogger(XMLDog.class);
+
 
     /**
      * Default Constructor.
@@ -113,52 +115,32 @@ public class XMLDog implements XMLDogConstants {
         File controlDir = null;
         File testDir = null;
         File resultDir = null;
-        try {
-            controlDir = new File(controlDirPath);
-            testDir = new File(testDirPath);
-            resultDir = new File(resultDirPath);
-            if (controlDir.isDirectory() && testDir.isDirectory() && resultDir.isDirectory()) {
-                if ((!resultDir.exists()) || (!resultDir.isDirectory())) {
-                    resultDir.mkdirs();
-                }
 
-                // Take only the files ending in .xml
-                FilenameFilter filter = new FilenameFilter() {
-
-                    /**
-                     * @see  java.io.FilenameFilter#accept(File, String)
-                     */
-                    public boolean accept(final File dir, final String name) {
-                        if (name.endsWith(".xml")) {
-                            return true;
-                        } else {
-                            return false;
-                        }
-                    }
-                };
-                controlFiles = controlDir.listFiles(filter);
-
-                String controlFilename = null;
-                String testFilename = null;
-                String diffFilename = null;
-                for (int i = 0; i < controlFiles.length; i++) {
-                    controlFilename = controlFiles[i].getName();
-                    diffFilename = resultDirPath + File.separator + FileUtil.getPrefix(controlFilename) + "_diff.txt";
-                    testFilename = testDirPath + File.separator + controlFilename;
-                    log("Diff file name: " + diffFilename);
-                    log("Control XML filename: " + controlFilename);
-                    log("Test XML filename: " + testFilename);
-                    Differences diff = compare(controlFiles[i].getAbsolutePath(), testFilename);
-                    FileUtil.writeListAsStr(diffFilename, diff);
-                }
-            } else {
-                throw new IOException("One of the input paths is not a directory");
+        controlDir = new File(controlDirPath);
+        testDir = new File(testDirPath);
+        resultDir = new File(resultDirPath);
+        if (controlDir.isDirectory() && testDir.isDirectory() && resultDir.isDirectory()) {
+            if ((!resultDir.exists()) || (!resultDir.isDirectory())) {
+                resultDir.mkdirs();
             }
-        } finally {
-            controlFiles = null;
-            controlDir = null;
-            testDir = null;
-            resultDir = null;
+
+            controlFiles = controlDir.listFiles((dir, name) -> name.endsWith(".xml") ? true: false);
+
+            String controlFilename;
+            String testFilename;
+            String diffFilename;
+            for (int i = 0; i < controlFiles.length; i++) {
+                controlFilename = controlFiles[i].getName();
+                diffFilename = resultDirPath + File.separator + FileUtil.getPrefix(controlFilename) + "_diff.txt";
+                testFilename = testDirPath + File.separator + controlFilename;
+                log("Diff file name: " + diffFilename);
+                log("Control XML filename: " + controlFilename);
+                log("Test XML filename: " + testFilename);
+                Differences diff = compare(controlFiles[i].getAbsolutePath(), testFilename);
+                FileUtil.writeListAsStr(diffFilename, diff);
+            }
+        } else {
+            throw new IOException("One of the input paths is not a directory");
         }
     }
 
@@ -178,16 +160,7 @@ public class XMLDog implements XMLDogConstants {
      */
     public static void log(final String msg) {
         if (DEBUG) {
-            System.out.println("XMLDog:" + msg);
-        }
-    }
-
-    /**
-     * Prints msg and Exception to System.out.
-     */
-    public static void log(final String msg, final Throwable t) {
-        if (DEBUG) {
-            log(msg);
+            logger.info("XMLDog:" + msg);
         }
     }
 

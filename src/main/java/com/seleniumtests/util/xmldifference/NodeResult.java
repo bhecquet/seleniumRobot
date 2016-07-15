@@ -35,11 +35,6 @@ public class NodeResult implements Serializable {
 
     private boolean _isExactMatch = false;
 
-    /**
-     * Default Constructor.
-     */
-
-    public NodeResult() { }
 
     /**
      * Constructor.
@@ -179,7 +174,7 @@ public class NodeResult implements Serializable {
 
     public boolean isMatch() {
 
-        return (isExactMatch() || isUniqueAttrMatch());
+        return isExactMatch() || isUniqueAttrMatch();
 
     }
 
@@ -202,9 +197,10 @@ public class NodeResult implements Serializable {
      * Gets String representation of the Instance.
      */
 
+    @Override
     public String toString() {
 
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
 
         sb.append("NodeResult[");
 
@@ -224,8 +220,6 @@ public class NodeResult implements Serializable {
 
         sb.append(StringUtil.getNewlineStr());
 
-        // sb.append("Differences");
-
         sb.append(getDifferences());
 
         sb.append(StringUtil.getNewlineStr() + "]");
@@ -233,11 +227,5 @@ public class NodeResult implements Serializable {
         return sb.toString();
 
     }
-
-    /**
-     * Main method for debugging purpose only.
-     */
-
-    public static void main(final String[] args) { }
 
 }
