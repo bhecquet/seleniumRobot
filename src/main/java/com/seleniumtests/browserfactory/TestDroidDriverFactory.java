@@ -29,7 +29,6 @@ import com.google.api.client.http.GenericUrl;
 import com.google.api.client.http.HttpHeaders;
 import com.google.api.client.http.HttpRequest;
 import com.google.api.client.http.HttpRequestFactory;
-import com.google.api.client.http.HttpRequestInitializer;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.JsonFactory;
@@ -56,17 +55,12 @@ public class TestDroidDriverFactory extends AbstractWebDriverFactory implements 
     
     protected static String uploadFile(String targetAppPath, String serverURL, String testDroidApiKey) throws IOException {
         final HttpHeaders headers = new HttpHeaders().setBasicAuthentication(testDroidApiKey, "");
-
-        HttpRequestFactory requestFactory =
-                HTTP_TRANSPORT.createRequestFactory(new HttpRequestInitializer() {
-                	@Override
-                    public void initialize(HttpRequest request) {
-                        request.setParser(new JsonObjectParser(JSON_FACTORY));
-                        request.setHeaders(headers);
-                    }
-
-
-                });
+        
+        HttpRequestFactory requestFactory = HTTP_TRANSPORT.createRequestFactory(request -> {
+        		request.setParser(new JsonObjectParser(JSON_FACTORY));
+        		request.setHeaders(headers);
+        		});
+        
         MultipartFormDataContent multipartContent = new MultipartFormDataContent();
         FileContent fileContent = new FileContent("application/octet-stream", new File(targetAppPath));
 
@@ -74,9 +68,6 @@ public class TestDroidDriverFactory extends AbstractWebDriverFactory implements 
         multipartContent.addPart(filePart);
 
         HttpRequest request = requestFactory.buildPostRequest(new GenericUrl(serverURL+"/upload"), multipartContent);
-
-//        HttpResponse response = request.execute();
-//        System.out.println("response:" + response.parseAsString());
 
         AppiumResponse appiumResponse = request.execute().parseAs(AppiumResponse.class);
         logger.info("File id:" + appiumResponse.uploadStatus.fileInfo.file);

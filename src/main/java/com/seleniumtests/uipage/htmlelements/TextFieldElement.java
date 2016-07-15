@@ -16,8 +16,6 @@ package com.seleniumtests.uipage.htmlelements;
 
 import org.openqa.selenium.By;
 
-import com.seleniumtests.reporter.TestLogging;
-
 public class TextFieldElement extends HtmlElement {
     public TextFieldElement(final String label, final By by) {
         super(label, by);
@@ -28,7 +26,6 @@ public class TextFieldElement extends HtmlElement {
     }
 
     public void clear() {
-        TestLogging.logWebStep(null, "Remove data From " + toHTML(), false);
         findElement();
         if (!"file".equalsIgnoreCase(element.getAttribute("type"))) {
             element.clear();
@@ -36,12 +33,10 @@ public class TextFieldElement extends HtmlElement {
     }
 
     public void sendKeys(final String keysToSend) {
-        TestLogging.logWebStep(null, "Enter data: \"" + keysToSend + "\" on " + toHTML(), false);
         super.sendKeys(keysToSend);
     }
     
     public void simulateSendKeys(final String keysToSend) {
-    	TestLogging.logWebStep(null, "Enter data: \"" + keysToSend + "\" on " + toHTML(), false);
     	super.simulateSendKeys(keysToSend);
     }
     

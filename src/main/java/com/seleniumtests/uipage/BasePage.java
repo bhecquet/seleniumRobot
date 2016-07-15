@@ -27,7 +27,6 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.Assert;
 
 import com.seleniumtests.core.CustomAssertion;
-import com.seleniumtests.customexception.NotCurrentPageException;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import com.seleniumtests.driver.WebUIDriver;
@@ -221,7 +220,12 @@ public abstract class BasePage {
 
         String content = table.getContent(row, col);
         assertHTML(content != null && content.equals(text),
-            "Text= {" + text + "} not found on " + table.toString() + " at cell(row, col) = {" + row + "," + col + "}");
+        		String.format("Text= {%s} not found on %s at cell(row, col) = {%d,%d}",
+        				text,
+        				table.toString(),
+        				row,
+        				col)
+           );
     }
 
     public void assertTableContains(final Table table, final int row, final int col, final String text) {
@@ -253,7 +257,12 @@ public abstract class BasePage {
 
         String content = table.getContent(row, col);
         assertHTML(content != null && content.matches(text),
-            "Text= {" + text + "} not found on " + table.toString() + " at cell(row, col) = {" + row + "," + col + "}");
+        		String.format("Text= {%s} not found on %s at cell(row, col) = {%d,%d}",
+        				text,
+        				table.toString(),
+        				row,
+        				col)
+           );
     }
 
     public void assertTextNotPresent(final String text) {
@@ -292,9 +301,7 @@ public abstract class BasePage {
 
     public String getAlertText() {
         Alert alert = driver.switchTo().alert();
-        String seenText = alert.getText();
-
-        return seenText;
+        return alert.getText();
     }
 
     private String getBodyText() {
@@ -304,9 +311,7 @@ public abstract class BasePage {
 
     public String getConfirmation() {
         Alert alert = driver.switchTo().alert();
-        String seenText = alert.getText();
-
-        return seenText;
+        return alert.getText();
     }
 
     public WebDriver getDriver() {
@@ -317,9 +322,7 @@ public abstract class BasePage {
 
     public String getPrompt() {
         Alert alert = driver.switchTo().alert();
-        String seenText = alert.getText();
-
-        return seenText;
+        return alert.getText();
     }
 
     /**
@@ -402,25 +405,26 @@ public abstract class BasePage {
             windows.selectWindow(driver, "name=" + windowName);
         }
     }
+    
+    private void checkNullElement(final HtmlElement element) {
+    	Assert.assertNotNull(element, "Element can't be null");
+    }
 
     public void waitForElementChecked(final HtmlElement element) {
-        Assert.assertNotNull(element, "Element can't be null");
-        TestLogging.logWebStep(null, "wait for " + element.toString() + " to be checked.", false);
+        checkNullElement(element);
 
         WebDriverWait wait = new WebDriverWait(driver, explictWaitTimeout);
         wait.until(ExpectedConditions.elementToBeSelected(element.getBy()));
     }
 
     public void waitForElementEditable(final HtmlElement element) {
-        Assert.assertNotNull(element, "Element can't be null");
-        TestLogging.logWebStep(null, "wait for " + element.toString() + " to be editable.", false);
+        checkNullElement(element);
 
         WebDriverWait wait = new WebDriverWait(driver, explictWaitTimeout);
         wait.until(ExpectedConditions.elementToBeClickable(element.getBy()));
     }
 
     public void waitForElementPresent(final By by) {
-        TestLogging.logWebStep(null, "wait for " + by.toString() + " to be present.", false);
 
         WebDriverWait wait = new WebDriverWait(driver, explictWaitTimeout);
         wait.until(ExpectedConditions.presenceOfElementLocated(by));
@@ -432,31 +436,27 @@ public abstract class BasePage {
      * @param timeout	timeout in seconds
      */
     public void waitForElementPresent(final By by, final int timeout) {
-        TestLogging.logWebStep(null, "wait for " + by.toString() + " to be present.", false);
 
         WebDriverWait wait = new WebDriverWait(driver, timeout);
         wait.until(ExpectedConditions.presenceOfElementLocated(by));
     }
 
     public void waitForElementPresent(final HtmlElement element) {
-        Assert.assertNotNull(element, "Element can't be null");
-        TestLogging.logWebStep(null, "wait for " + element.toString() + " to be present.", false);
+        checkNullElement(element);
 
         WebDriverWait wait = new WebDriverWait(driver, explictWaitTimeout);
         wait.until(ExpectedConditions.presenceOfElementLocated(element.getBy()));
     }
 
     public void waitForElementToBeVisible(final HtmlElement element) {
-        Assert.assertNotNull(element, "Element can't be null");
-        TestLogging.logWebStep(null, "wait for " + element.toString() + " to be visible.", false);
+        checkNullElement(element);
 
         WebDriverWait wait = new WebDriverWait(driver, explictWaitTimeout);
         wait.until(ExpectedConditions.visibilityOfElementLocated(element.getBy()));
     }
 
     public void waitForElementToDisappear(final HtmlElement element) {
-        Assert.assertNotNull(element, "Element can't be null");
-        TestLogging.logWebStep(null, "wait for " + element.toString() + " to disappear.", false);
+        checkNullElement(element);
 
         WebDriverWait wait = new WebDriverWait(driver, explictWaitTimeout);
         wait.until(ExpectedConditions.invisibilityOfElementLocated(element.getBy())); 
@@ -497,24 +497,20 @@ public abstract class BasePage {
         driver.switchTo().window(current);
 
     }
-
-    /**
-     * Wait For seconds. Provide a value less than WebSessionTimeout i.e. 180 Seconds
-     *
-     * @param  seconds
-     */
+    
+    private void checkTextNull(String text) {
+    	Assert.assertNotNull(text, "Text can't be null");
+    }
 
     public void waitForTextPresent(final HtmlElement element, final String text) {
-        Assert.assertNotNull(text, "Text can't be null");
-        TestLogging.logWebStep(null, "wait for text \"" + text + "\" to be present.", false);
+        checkTextNull(text);
 
         WebDriverWait wait = new WebDriverWait(driver, explictWaitTimeout);
-        wait.until(ExpectedConditions.textToBePresentInElement(element.getBy(), text));
+        wait.until(ExpectedConditions.textToBePresentInElementLocated(element.getBy(), text));
     }
 
     public void waitForTextPresent(final String text) {
-        Assert.assertNotNull(text, "Text can't be null");
-        TestLogging.logWebStep(null, "wait for text \"" + text + "\" to be present.", false);
+        checkTextNull(text);
 
         boolean b = false;
         for (int millisec = 0; millisec < explictWaitTimeout * 1000; millisec += 1000) {
@@ -534,8 +530,7 @@ public abstract class BasePage {
     }
 
     public void waitForTextToDisappear(final String text) {
-        Assert.assertNotNull(text, "Text can't be null");
-        TestLogging.logWebStep(null, "wait for text \"" + text + "\" to disappear.", false);
+        checkTextNull(text);
 
         boolean textPresent = true;
         for (int millisec = 0; millisec < explictWaitTimeout * 1000; millisec += 1000) {

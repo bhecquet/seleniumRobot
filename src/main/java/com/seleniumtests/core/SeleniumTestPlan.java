@@ -75,7 +75,7 @@ public abstract class SeleniumTestPlan {
      * clean up.
      */
     @AfterMethod(alwaysRun = true)
-    public void afterTestMethod(final Method method, final XmlTest xmlTest) {
+    public void afterTestMethod(final Method method) {
         List<TearDownService> serviceList = SeleniumTestsContextManager.getThreadContext().getTearDownServices();
         if (serviceList != null && !serviceList.isEmpty()) {
             for (TearDownService service : serviceList) {

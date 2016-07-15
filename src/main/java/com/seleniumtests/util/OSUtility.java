@@ -81,8 +81,8 @@ public class OSUtility {
             output = executeCommand("reg query \"HKLM\\Software\\Microsoft\\Internet Explorer\" /v Version");
         }
 
-        String internet_explorer_value = output.get(2);
-        String version = internet_explorer_value.trim().split("   ")[2];
+        String internetExplorerVersion = output.get(2);
+        String version = internetExplorerVersion.trim().split("   ")[2];
         version = version.trim().split("\\.")[0];
         return Integer.parseInt(version);
     }

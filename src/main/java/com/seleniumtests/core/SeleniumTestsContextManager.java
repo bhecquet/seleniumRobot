@@ -152,8 +152,7 @@ public class SeleniumTestsContextManager {
      * @param configParser
      * @return Map with service parameters from the given file.
      */
-    private static Map<String, String> getServiceParameters(Map<String, String> parameters, String runMode, 
-    							final ITestContext iTestContext, TestConfigurationParser configParser) {
+    private static Map<String, String> getServiceParameters(Map<String, String> parameters, String runMode, TestConfigurationParser configParser) {
     	
     	for (Node node: configParser.getServiceNodes()) {
     		
@@ -190,7 +189,7 @@ public class SeleniumTestsContextManager {
                 
                 // get configuration for services.
 	            String runMode = setRunMode(iTestContext);
-	            parameters = getServiceParameters(parameters, runMode, iTestContext, configParser);
+	            parameters = getServiceParameters(parameters, runMode, configParser);
                 
                 // 
                 parameters.put(SeleniumTestsContext.DEVICE_LIST, configParser.getDeviceNodesAsJson());
@@ -231,9 +230,9 @@ public class SeleniumTestsContextManager {
     }
 
     public static void initThreadContext(ITestContext testNGCtx) {
-    	testNGCtx = getContextFromConfigFile(testNGCtx);
-    	SeleniumTestsContext seleniumTestsCtx = new SeleniumTestsContext(testNGCtx);
-        loadCustomizedContextAttribute(testNGCtx, seleniumTestsCtx);
+    	ITestContext _testNGCtx = getContextFromConfigFile(testNGCtx);
+    	SeleniumTestsContext seleniumTestsCtx = new SeleniumTestsContext(_testNGCtx);
+        loadCustomizedContextAttribute(_testNGCtx, seleniumTestsCtx);
         
         threadLocalContext.set(seleniumTestsCtx);
         

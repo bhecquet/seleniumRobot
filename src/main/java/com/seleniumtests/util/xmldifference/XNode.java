@@ -39,30 +39,12 @@ public class XNode implements Serializable {
     private int depth = 0; // Depth of the Node in the Document
 
     /**
-     * Default Constructor.
-     */
-    public XNode() { }
-
-    /**
      * Constructor.
      *
      * @param  node   the Node
      * @param  xPath  the XPath expression for the Node
      */
     public XNode(final Node node, final String xPath) {
-
-        this.node = node;
-        this.xPath = xPath;
-    }
-
-    /**
-     * Constructor.
-     *
-     * @param  node          the Node
-     * @param  xPath         the XPath expression for the Node
-     * @param  noIndexXPath  the XPath expression without the indexes
-     */
-    public XNode(final Node node, final String xPath, final String noIndexXPath) {
 
         this.node = node;
         this.xPath = xPath;

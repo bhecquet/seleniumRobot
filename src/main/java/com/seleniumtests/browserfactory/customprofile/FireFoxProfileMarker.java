@@ -16,4 +16,4 @@ package com.seleniumtests.browserfactory.customprofile;
 /**
  * FireFoxProfileMarker.
  */
-public class FireFoxProfileMarker { }
+public interface FireFoxProfileMarker { }

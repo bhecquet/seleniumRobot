@@ -19,7 +19,6 @@ import org.openqa.selenium.Keys;
 
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.WebUIDriver;
-import com.seleniumtests.reporter.TestLogging;
 
 public class ButtonElement extends HtmlElement {
 
@@ -33,7 +32,6 @@ public class ButtonElement extends HtmlElement {
 
     @Override
     public void click() {
-        TestLogging.logWebStep(null, "click on " + toHTML(), false);
 
         BrowserType browser = WebUIDriver.getWebUIDriver().getConfig().getBrowser();
         if (browser == BrowserType.INTERNETEXPLORER) {
@@ -44,7 +42,6 @@ public class ButtonElement extends HtmlElement {
     }
 
     public void submit() {
-        TestLogging.logWebStep(null, "Submit form by clicking on " + toHTML(), false);
         findElement();
         element.submit();
     }

@@ -15,6 +15,10 @@ package com.seleniumtests.util.xmldifference;
 
 import java.io.Serializable;
 
+import com.google.api.client.util.StringUtils;
+
+
+
 /**
  * NodeResult class used to store the Control Node, Test Node and Differences between them.
  *
@@ -25,15 +29,15 @@ import java.io.Serializable;
 
 public class NodeResult implements Serializable {
 
-    private XNode _testNode = null;
+    private XNode nrTestNode = null;
 
-    private XNode _controlNode = null;
+    private XNode nrControlNode = null;
 
-    private Differences _differences = null;
+    private Differences nrDifferences = null;
 
-    private boolean _uniqueAttrMatch = false;
+    private boolean nrUniqueAttrMatch = false;
 
-    private boolean _isExactMatch = false;
+    private boolean nrIsExactMatch = false;
 
 
     /**
@@ -48,11 +52,11 @@ public class NodeResult implements Serializable {
 
     public NodeResult(final XNode controlNode, final XNode testNode, final Differences diff) {
 
-        _controlNode = controlNode;
+        nrControlNode = controlNode;
 
-        _testNode = testNode;
+        nrTestNode = testNode;
 
-        _differences = diff;
+        nrDifferences = diff;
 
     }
 
@@ -62,7 +66,7 @@ public class NodeResult implements Serializable {
 
     public XNode getTestNode() {
 
-        return _testNode;
+        return nrTestNode;
 
     }
 
@@ -72,7 +76,7 @@ public class NodeResult implements Serializable {
 
     public void setTestNode(final XNode node) {
 
-        _testNode = node;
+        nrTestNode = node;
 
     }
 
@@ -82,7 +86,7 @@ public class NodeResult implements Serializable {
 
     public XNode getControlNode() {
 
-        return _controlNode;
+        return nrControlNode;
 
     }
 
@@ -92,7 +96,7 @@ public class NodeResult implements Serializable {
 
     public void setControlNode(final XNode node) {
 
-        _controlNode = node;
+        nrControlNode = node;
 
     }
 
@@ -104,7 +108,7 @@ public class NodeResult implements Serializable {
 
     public Differences getDifferences() {
 
-        return _differences;
+        return nrDifferences;
 
     }
 
@@ -116,7 +120,7 @@ public class NodeResult implements Serializable {
 
     public void setDifferences(final Differences diff) {
 
-        _differences = diff;
+        nrDifferences = diff;
 
     }
 
@@ -126,7 +130,7 @@ public class NodeResult implements Serializable {
 
     public boolean isUniqueAttrMatch() {
 
-        return _uniqueAttrMatch;
+        return nrUniqueAttrMatch;
 
     }
 
@@ -136,7 +140,7 @@ public class NodeResult implements Serializable {
 
     public void setUniqueAttrMatch(final boolean flag) {
 
-        _uniqueAttrMatch = flag;
+        nrUniqueAttrMatch = flag;
 
     }
 
@@ -146,7 +150,7 @@ public class NodeResult implements Serializable {
 
     public boolean isExactMatch() {
 
-        return _isExactMatch;
+        return nrIsExactMatch;
 
     }
 
@@ -156,7 +160,7 @@ public class NodeResult implements Serializable {
 
     public void setIfExactMatch(final boolean flag) {
 
-        _isExactMatch = flag;
+        nrIsExactMatch = flag;
 
     }
 
@@ -184,12 +188,12 @@ public class NodeResult implements Serializable {
 
     public int getNumDifferences() {
 
-        if (_differences == null) {
+        if (nrDifferences == null) {
 
             return 0;
         }
 
-        return _differences.size();
+        return nrDifferences.size();
 
     }
 
@@ -204,25 +208,25 @@ public class NodeResult implements Serializable {
 
         sb.append("NodeResult[");
 
-        sb.append(StringUtil.getNewlineStr());
+        sb.append(StringUtils.LINE_SEPARATOR);
 
         sb.append("Golden");
 
         sb.append(XMLUtil.getNodeBasics(getControlNode().getNode()));
 
-        sb.append(StringUtil.getNewlineStr());
+        sb.append(StringUtils.LINE_SEPARATOR);
 
         sb.append("Current");
 
-        sb.append(StringUtil.getNewlineStr());
+        sb.append(StringUtils.LINE_SEPARATOR);
 
         sb.append(XMLUtil.getNodeBasics(getTestNode().getNode()));
 
-        sb.append(StringUtil.getNewlineStr());
+        sb.append(StringUtils.LINE_SEPARATOR);
 
         sb.append(getDifferences());
 
-        sb.append(StringUtil.getNewlineStr() + "]");
+        sb.append(StringUtils.LINE_SEPARATOR + "]");
 
         return sb.toString();
 

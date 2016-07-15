@@ -80,6 +80,7 @@ public class CSVHelper {
     public static Iterator<Object[]> getDataFromCSVFile(final Class<?> clazz, final String filename, Filter filter,
             final boolean readHeaders, final String delimiter, final boolean supportDPFilter) {
 
+    	Filter _filter = filter;
         InputStream is = null;
         try {
             if (clazz != null) {
@@ -119,10 +120,10 @@ public class CSVHelper {
                 Filter dpFilter = SpreadSheetHelper.getDPFilter();
 
                 if (dpFilter != null) {
-                    if (filter == null) {
-                        filter = dpFilter;
+                    if (_filter == null) {
+                    	_filter = dpFilter;
                     } else {
-                        filter = Filter.and(filter, dpFilter);
+                    	_filter = Filter.and(_filter, dpFilter);
                     }
                 }
             }
@@ -154,14 +155,14 @@ public class CSVHelper {
                     SpreadSheetHelper.formatDPTags(rowDataMap);
                 }
 
-                if (filter == null || filter.match(rowDataMap)) {
+                if (_filter == null || _filter.match(rowDataMap)) {
                     sheetData.add(rowData.toArray(new Object[rowData.size()]));
                 }
             }
 
             if ((!readHeaders && sheetData.isEmpty()) || (readHeaders && sheetData.size() <= 1)) {
                 logger.warn("No matching data found on csv file: " + filename + " with filter criteria: "
-                        + filter.toString());
+                        + _filter.toString());
             }
 
             return sheetData.iterator();
@@ -188,10 +189,8 @@ public class CSVHelper {
      * @return
      */
     public static List<String> getHeaderFromCSVFile(final Class<?> clazz, final String filename, String delimiter) {
-        if (delimiter == null) {
-            delimiter = ",";
-        }
-
+        String _delimiter = delimiter == null ? ",": delimiter;
+    	
         InputStream is = null;
         try {
             if (clazz != null) {
@@ -205,7 +204,7 @@ public class CSVHelper {
             }
 
             // Get the sheet
-            String[][] csvData = read(is, delimiter);
+            String[][] csvData = read(is, _delimiter);
 
             ArrayList<String> rowData = new ArrayList<>();
 

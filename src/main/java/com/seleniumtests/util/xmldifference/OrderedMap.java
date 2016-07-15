@@ -42,9 +42,9 @@ public class OrderedMap implements Serializable {
     // Unsychronized and allows Mutiple Object Values
     public static final int TYPE_UNSYNCHRONIZED_MOV = 3;
 
-    private ArrayList<Object> _elementOrder = null;
-    private HashMap<Object, Object> _elements = null;
-    private int _type = -1;
+    private ArrayList<Object> omElementOrder = null;
+    private HashMap<Object, Object> omElements = null;
+    private int omType = -1;
 
     /**
      * Constructor.
@@ -54,14 +54,14 @@ public class OrderedMap implements Serializable {
      */
     public OrderedMap(final int type) {
         if (type == TYPE_SYNCHRONIZED) {
-            _elementOrder = (ArrayList<Object>)Collections.synchronizedList(new ArrayList<Object>());
-            _elements = (HashMap<Object, Object>)Collections.synchronizedMap(new HashMap<Object, Object>());
+            omElementOrder = (ArrayList<Object>)Collections.synchronizedList(new ArrayList<Object>());
+            omElements = (HashMap<Object, Object>)Collections.synchronizedMap(new HashMap<Object, Object>());
         } else if (type == TYPE_UNSYNCHRONIZED) {
-            _elementOrder = new ArrayList<>();
-            _elements = new HashMap<>();
+            omElementOrder = new ArrayList<>();
+            omElements = new HashMap<>();
         } else if (type == TYPE_UNSYNCHRONIZED_MOV) {
-            _elementOrder = new ArrayList<>();
-            _elements = new MOVMap();
+            omElementOrder = new ArrayList<>();
+            omElements = new MOVMap();
         } else {
             throw new IllegalArgumentException("Unrecongnized OrderedMap type");
         }
@@ -73,22 +73,22 @@ public class OrderedMap implements Serializable {
      * @return  size of this list
      */
     public int size() {
-        return _elementOrder.size();
+        return omElementOrder.size();
     }
 
     /**
      * Clears the Ordered List.
      */
     public void clear() {
-        _elementOrder.clear();
-        _elements.clear();
+        omElementOrder.clear();
+        omElements.clear();
     }
 
     /**
      * Gets the type of the OrderedList.
      */
     public int getType() {
-        return _type;
+        return omType;
     }
 
     /**
@@ -99,7 +99,7 @@ public class OrderedMap implements Serializable {
      * @return  true if element exists in the list, false otherwise
      */
     public boolean contains(final Object element) {
-        return _elements.containsValue(element);
+        return omElements.containsValue(element);
     }
 
     /**
@@ -110,7 +110,7 @@ public class OrderedMap implements Serializable {
      * @return  true if element key exists, false otherwise
      */
     public boolean containsKey(final Object eKey) {
-        return _elementOrder.contains(eKey);
+        return omElementOrder.contains(eKey);
     }
 
     /**
@@ -121,7 +121,7 @@ public class OrderedMap implements Serializable {
      * @return  true if element key exists, false otherwise
      */
     public boolean containsElementKey(final Object eKey) {
-        return _elementOrder.contains(eKey);
+        return omElementOrder.contains(eKey);
     }
 
     /**
@@ -133,7 +133,7 @@ public class OrderedMap implements Serializable {
      * @see     OrderdedList() Contructor
      */
     public List<Object> getElementOrder() {
-        return _elementOrder;
+        return omElementOrder;
     }
 
     /**
@@ -145,7 +145,7 @@ public class OrderedMap implements Serializable {
      */
     public Object getElement(final Object elementKey) {
         if (elementKey != null) {
-            return _elements.get(elementKey);
+            return omElements.get(elementKey);
         } else {
             return null;
         }
@@ -159,11 +159,11 @@ public class OrderedMap implements Serializable {
      * @return  Element at a given position
      */
     public Object getElement(final int position) {
-        if ((position > _elementOrder.size()) || (position < 0)) {
+        if ((position > omElementOrder.size()) || (position < 0)) {
             return null;
         }
 
-        Object elementKey = _elementOrder.get(position);
+        Object elementKey = omElementOrder.get(position);
 
         return getElement(elementKey);
     }
@@ -174,10 +174,10 @@ public class OrderedMap implements Serializable {
      * @return  Array of elements
      */
     public Object[] elements() {
-        Object[] objects = new Object[_elementOrder.size()];
+        Object[] objects = new Object[omElementOrder.size()];
 
-        for (int i = 0; i < _elementOrder.size(); i++) {
-            objects[i] = _elements.get(_elementOrder.get(i));
+        for (int i = 0; i < omElementOrder.size(); i++) {
+            objects[i] = omElements.get(omElementOrder.get(i));
         }
 
         return objects;
@@ -189,18 +189,18 @@ public class OrderedMap implements Serializable {
      * @return  Enumeration of the element keys
      */
     public Iterator<Object> elementKeys() {
-        return _elementOrder.iterator();
+        return omElementOrder.iterator();
     }
 
     /**
      * Adds element with the key into the Ordered List.
      */
     public void add(final Object eKey, final Object element) {
-        if ((!_elements.containsKey(eKey)) && (getType() != TYPE_UNSYNCHRONIZED_MOV)) {
-            _elementOrder.add(eKey);
+        if ((!omElements.containsKey(eKey)) && (getType() != TYPE_UNSYNCHRONIZED_MOV)) {
+            omElementOrder.add(eKey);
         }
 
-        _elements.put(eKey, element);
+        omElements.put(eKey, element);
     }
 
     /**
@@ -211,8 +211,8 @@ public class OrderedMap implements Serializable {
      * @param  position  position at which element is to be inserted
      */
     public void insert(final Object eKey, final Object element, final int position) {
-        _elementOrder.add(position, eKey);
-        _elements.put(eKey, element);
+        omElementOrder.add(position, eKey);
+        omElements.put(eKey, element);
     }
 
     /**
@@ -223,6 +223,6 @@ public class OrderedMap implements Serializable {
      * @return  position of the element key in this ordered list
      */
     public int indexOf(final Object eKey) {
-        return _elementOrder.indexOf(eKey);
+        return omElementOrder.indexOf(eKey);
     }
 }

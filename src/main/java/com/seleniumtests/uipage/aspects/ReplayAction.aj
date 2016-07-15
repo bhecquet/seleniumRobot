@@ -55,7 +55,7 @@ public class ReplayAction {
     		+ "&& !execution(* com.seleniumtests.uipage.htmlelements.HtmlElement.getLocator (..))"
     		+ "&& !execution(* com.seleniumtests.uipage.htmlelements.HtmlElement.waitForPresent ())"
     		+ "&& !execution(* com.seleniumtests.uipage.htmlelements.HtmlElement.toHTML (..))"
-    		+ "|| execution(public * com.seleniumtests.htmlelements.uipage.SelectList..* (..)) "
+    		+ "|| execution(public * com.seleniumtests.uipage.htmlelements.SelectList..* (..)) "
     		)
     public Object replay(ProceedingJoinPoint joinPoint) throws Throwable {
     	

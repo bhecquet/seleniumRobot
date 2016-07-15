@@ -23,6 +23,8 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.StringTokenizer;
 
+import com.google.api.client.util.StringUtils;
+
 /**
  * FileUtil class containing utility functions related to Files.
  *
@@ -64,7 +66,7 @@ public class FileUtil {
             for (int i = 0; i < list.size(); i++) {
 
                 bw.write(list.get(i).toString());
-                bw.write(StringUtil.getNewlineStr());
+                bw.write(StringUtils.LINE_SEPARATOR);
 
             }
             bw.close();
@@ -139,7 +141,7 @@ public class FileUtil {
             throw new IOException("InputStream is null");
         }
 
-        File tempFile = null;
+        File tempFile;
         
         String userHome = System.getProperty("user.home");
 
@@ -160,7 +162,7 @@ public class FileUtil {
 
             byte[] buffer = new byte[8192];
 
-            int bytesRead = 0;
+            int bytesRead;
 
             while ((bytesRead = is.read(buffer, 0, 8192)) != -1) {
 

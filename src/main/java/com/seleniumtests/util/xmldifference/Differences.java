@@ -17,6 +17,8 @@ import java.util.ArrayList;
 
 import org.w3c.dom.Node;
 
+import com.google.api.client.util.StringUtils;
+
 /**
  * Differences class used to store all the Differences between the Nodes.
  *
@@ -155,7 +157,7 @@ public class Differences extends ArrayList implements DifferenceListener {
 
         sb.append("Differences:[ size: " + size());
 
-        sb.append(StringUtil.getNewlineStr());
+        sb.append(StringUtils.LINE_SEPARATOR);
 
         if (size() > 0) {
 
@@ -163,7 +165,7 @@ public class Differences extends ArrayList implements DifferenceListener {
 
                 sb.append(get(i).toString());
 
-                sb.append(StringUtil.getNewlineStr());
+                sb.append(StringUtils.LINE_SEPARATOR);
 
             }
 
@@ -172,7 +174,7 @@ public class Differences extends ArrayList implements DifferenceListener {
             sb.append("XML Nodes are identical, No differences found");
         }
 
-        sb.append(StringUtil.getNewlineStr());
+        sb.append(StringUtils.LINE_SEPARATOR);
 
         sb.append("]");
 

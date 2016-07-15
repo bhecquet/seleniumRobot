@@ -32,7 +32,7 @@ import org.apache.log4j.Logger;
  * @author   Ritesht
  * @version  1.0
  */
-public final class MOVMap extends HashMap<Object, Object> implements XMLDogConstants {
+public final class MOVMap extends HashMap<Object, Object> {
 
 
 	/**
@@ -132,17 +132,8 @@ public final class MOVMap extends HashMap<Object, Object> implements XMLDogConst
      * Prints msg to System.out.
      */
     public static void log(final String msg) {
-        if (DEBUG) {
+        if (XMLDogConstants.DEBUG) {
             logger.debug("MOVMap:" + msg);
-        }
-    }
-
-    /**
-     * Prints msg and Exception to System.out.
-     */
-    public static void log(final String msg, final Throwable t) {
-        if (DEBUG) {
-            log(msg);
         }
     }
 

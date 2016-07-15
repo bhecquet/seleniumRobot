@@ -54,7 +54,7 @@ import org.apache.log4j.Logger;
  * <p/>Element Nodes
  */
 
-public class Config implements XMLDogConstants {
+public class Config {
 
 	private static final Logger logger = Logger.getLogger(Config.class);
     private boolean isValidating = false;
@@ -582,7 +582,8 @@ public class Config implements XMLDogConstants {
 
         line = line.trim();
 
-        int regExBegin, regExEnd;
+        int regExBegin;
+        int regExEnd;
 
         // Incorrect format if multiple ] occurs
 
@@ -622,23 +623,9 @@ public class Config implements XMLDogConstants {
 
     public static void log(final String msg) {
 
-        if (DEBUG) {
+        if (XMLDogConstants.DEBUG) {
 
             logger.debug("Config:" + msg);
-        }
-
-    }
-
-    /**
-     * Prints msg and Exception to System.out.
-     */
-
-    public static void log(final String msg, final Throwable t) {
-
-        if (DEBUG) {
-
-            log(msg);
-
         }
 
     }

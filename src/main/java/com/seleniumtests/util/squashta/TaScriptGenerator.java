@@ -96,6 +96,60 @@ public class TaScriptGenerator {
 	}
 	
 	/**
+	 * Read a test element in an XML testNG file
+	 * @param test			the test element to read
+	 * @param testDefs		list of test definitions to update
+	 * @param testngFile	testNgFile read
+	 */
+	private void readTestTag(Element test, List<SquashTaTestDef> testDefs, File testngFile) {
+		boolean cucumberTest = false;
+    	String cucumberNamedTest = "";
+    	boolean exclude = false;
+    	
+    	// search cucumber parameters among test parameters
+    	// does test specifies precise cucumber properties (cucumberTests / cucumberTags)
+    	for (Element param: test.getChildren("parameter")) {
+    		if ("cucumberTests".equals(param.getAttributeValue("name"))) {
+    			cucumberTest = true;
+    			cucumberNamedTest = param.getAttributeValue("value");
+    			
+    			if (!cucumberNamedTest.isEmpty()) {
+    				break;
+    			}
+    		} 
+    		else if ("cucumberTags".equals(param.getAttributeValue("name"))) {
+    			cucumberTest = true;
+    			cucumberNamedTest = param.getAttributeValue("value");
+    			
+    			if (!cucumberNamedTest.isEmpty()) {
+    				break;
+    			}
+    		}
+    	}
+    	
+    	for (Element param: test.getChildren("parameter")) {
+    		if (XML_EXCLUDE.equals(param.getAttributeValue("name"))) {
+    			exclude = true;
+    		}
+    	}
+    	
+    	// is this test a cucumber test ? (calling specific runner)
+    	for (Element pack: test.getDescendants(new ElementFilter("package"))) {
+    		if (pack.getAttributeValue("name").contains("com.seleniumtests.core.runner")) {
+    			cucumberTest = true;
+    		}
+    	}
+    	
+    	if (!exclude) {
+	    	if (cucumberTest) {
+	    		testDefs.add(new SquashTaTestDef(testngFile, test.getAttributeValue("name"), true, cucumberNamedTest));
+	    	} else {
+	    		testDefs.add(new SquashTaTestDef(testngFile, test.getAttributeValue("name"), false, ""));
+	    	}
+    	}
+	}
+	
+	/**
 	 * Search for tests in TestNG files
 	 * @param path
 	 * @param application
@@ -111,7 +165,7 @@ public class TaScriptGenerator {
 
 		File[] testngFiles = dir.listFiles((d, filename) -> filename.endsWith(".xml"));
     	
-    	List<SquashTaTestDef> tests = new ArrayList<>();
+    	List<SquashTaTestDef> testDefs = new ArrayList<>();
     	
     	for (File testngFile: testngFiles) {
     		
@@ -124,7 +178,7 @@ public class TaScriptGenerator {
     	    }
     	    catch(Exception e){
     	    	logger.error(String.format("Fichier %s illisible: %s", testngFile, e.getMessage()));
-    	    	return tests;
+    	    	return testDefs;
     	    }
     	    
     	    Element suite = doc.getRootElement();
@@ -133,56 +187,12 @@ public class TaScriptGenerator {
     	    }
     	    
     	    for (Element test: suite.getChildren("test")) {
+    	    	readTestTag(test, testDefs, testngFile);
     	    	
-    	    	boolean cucumberTest = false;
-    	    	String cucumberNamedTest = "";
-    	    	boolean exclude = false;
-    	    	
-    	    	// search cucumber parameters among test parameters
-    	    	// does test specifies precise cucumber properties (cucumberTests / cucumberTags)
-    	    	for (Element param: test.getChildren("parameter")) {
-    	    		if ("cucumberTests".equals(param.getAttributeValue("name"))) {
-    	    			cucumberTest = true;
-    	    			cucumberNamedTest = param.getAttributeValue("value");
-    	    			
-    	    			if (!cucumberNamedTest.isEmpty()) {
-    	    				break;
-    	    			}
-    	    		} 
-    	    		else if ("cucumberTags".equals(param.getAttributeValue("name"))) {
-    	    			cucumberTest = true;
-    	    			cucumberNamedTest = param.getAttributeValue("value");
-    	    			
-    	    			if (!cucumberNamedTest.isEmpty()) {
-    	    				break;
-    	    			}
-    	    		}
-    	    	}
-    	    	
-    	    	for (Element param: test.getChildren("parameter")) {
-    	    		if (XML_EXCLUDE.equals(param.getAttributeValue("name"))) {
-    	    			exclude = true;
-    	    		}
-    	    	}
-    	    	
-    	    	// is this test a cucumber test ? (calling specific runner)
-    	    	for (Element pack: test.getDescendants(new ElementFilter("package"))) {
-    	    		if (pack.getAttributeValue("name").contains("com.seleniumtests.core.runner")) {
-    	    			cucumberTest = true;
-    	    		}
-    	    	}
-    	    	
-    	    	if (!exclude) {
-	    	    	if (cucumberTest) {
-	    	    		tests.add(new SquashTaTestDef(testngFile, test.getAttributeValue("name"), true, cucumberNamedTest));
-	    	    	} else {
-	    	    		tests.add(new SquashTaTestDef(testngFile, test.getAttributeValue("name"), false, ""));
-	    	    	}
-    	    	}
     	    }
     	}	
     	
-    	return tests;
+    	return testDefs;
 	}
 	
 	/**

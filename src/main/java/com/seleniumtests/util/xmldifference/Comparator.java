@@ -16,6 +16,7 @@ package com.seleniumtests.util.xmldifference;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.w3c.dom.Attr;
 import org.w3c.dom.CDATASection;
@@ -28,7 +29,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
 
-import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.reporter.TestLogging;
 
 /**
@@ -39,7 +39,7 @@ import com.seleniumtests.reporter.TestLogging;
  * <p/>Document Node which is a Best fit
  */
 
-public class Comparator implements XMLDogConstants {
+public class Comparator {
 
 	private static final Logger logger = TestLogging.getLogger(Comparator.class);
 	
@@ -399,7 +399,7 @@ public class Comparator implements XMLDogConstants {
 
                     log("compareSimilarNodes: Test node is TEXT type");
 
-                    if ((StringUtil.isWhitespaceStr(test.getNodeValue())) && (isIgnoringWhitespace())) {
+                    if ((StringUtils.isBlank(test.getNodeValue())) && (isIgnoringWhitespace())) {
 
                         log("compareSimilarNodes: Ignoring WHITE space node");
                     } else {
@@ -788,7 +788,7 @@ public class Comparator implements XMLDogConstants {
 
         if (!XMLUtil.nodesEqual(control, test, isIgnoringWhitespace())) {
 
-            if (DEBUG) {
+            if (XMLDogConstants.DEBUG) {
 
                 logger.info("===> Compare Text is ignoring whitespace " + isIgnoringWhitespace());
 
@@ -948,7 +948,7 @@ public class Comparator implements XMLDogConstants {
 
         NamedNodeMap controlAttrsForXPath = control.getAttributes();
 
-        if (DEBUG) {
+        if (XMLDogConstants.DEBUG) {
 
             logger.info(" ********** " + test.getNodeName() + " test node has " 
             							+ testAttrs.getLength() + " attrs ");
@@ -1843,7 +1843,7 @@ public class Comparator implements XMLDogConstants {
 
     public static void log(final String msg) {
 
-        if (DEBUG) {
+        if (XMLDogConstants.DEBUG) {
 
             logger.info("Comparator:" + msg);
         }
@@ -1856,7 +1856,7 @@ public class Comparator implements XMLDogConstants {
 
     public static void log(final String msg, final Throwable t) {
 
-        if (DEBUG) {
+        if (XMLDogConstants.DEBUG) {
 
             log(msg);
 
