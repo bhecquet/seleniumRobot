@@ -161,9 +161,9 @@ public class Difference {
      * Sets control Node detail.
      */
 
-    public void setControlNodeDetail(final XNode XNode) {
+    public void setControlNodeDetail(final XNode xNode) {
 
-        xControlNode = XNode;
+        xControlNode = xNode;
 
     }
 
@@ -183,9 +183,9 @@ public class Difference {
      * Sets test Node detail.
      */
 
-    public void setTestNodeDetail(final XNode XNode) {
+    public void setTestNodeDetail(final XNode xNode) {
 
-        xTestNode = XNode;
+        xTestNode = xNode;
 
     }
 

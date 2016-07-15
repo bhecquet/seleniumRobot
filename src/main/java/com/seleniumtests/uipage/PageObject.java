@@ -153,7 +153,6 @@ public class PageObject extends BasePage implements IPage {
     }
 
     public void assertCookiePresent(final String name) {
-        TestLogging.logWebStep(null, "assert cookie " + name + " is present.", false);
         assertHTML(getCookieByName(name) != null, "Cookie: {" + name + "} not found.");
     }
 
@@ -200,27 +199,22 @@ public class PageObject extends BasePage implements IPage {
     }
 
     public void assertHtmlSource(final String text) {
-        TestLogging.logWebStep(null, "assert text \"" + text + "\" is present in page source.", false);
         assertHTML(getHtmlSource().contains(text), "Text: {" + text + "} not found on page source.");
     }
 
     public void assertKeywordNotPresent(final String text) {
-        TestLogging.logWebStep(null, "assert text \"" + text + "\" is present in page source.", false);
         Assert.assertFalse(getHtmlSource().contains(text), "Text: {" + text + "} not found on page source.");
     }
 
     public void assertLocation(final String urlPattern) {
-        TestLogging.logWebStep(null, "assert location \"" + urlPattern + "\".", false);
         assertHTML(getLocation().contains(urlPattern), "Pattern: {" + urlPattern + "} not found on page location.");
     }
 
     public void assertPageSectionPresent(final WebPageSection pageSection) {
-        TestLogging.logWebStep(null, "assert pagesection \"" + pageSection.getName() + "\"  is present.", false);
         assertElementPresent(new HtmlElement(pageSection.getName(), pageSection.getBy()));
     }
 
     public void assertTitle(final String text) {
-        TestLogging.logWebStep(null, "assert text \"" + text + "\"  is present on title.", false);
         assertHTML(getTitle().contains(text), "Text: {" + text + "} not found on page title.");
 
     }
@@ -396,13 +390,11 @@ public class PageObject extends BasePage implements IPage {
     }
 
     public final void goBack() {
-        TestLogging.logWebStep(null, "goBack", false);
         driver.navigate().back();
         frameFlag = false;
     }
 
     public final void goForward() {
-        TestLogging.logWebStep(null, "goForward", false);
         driver.navigate().forward();
         frameFlag = false;
     }
@@ -473,7 +465,6 @@ public class PageObject extends BasePage implements IPage {
     }
 
     public final void refresh()  {
-        TestLogging.logWebStep(null, "refresh", false);
         try {
             driver.navigate().refresh();
         } catch (org.openqa.selenium.TimeoutException ex) {
@@ -486,26 +477,22 @@ public class PageObject extends BasePage implements IPage {
     }
 
     public final void selectFrame(final int index) {
-        TestLogging.logWebStep(null, "select frame using index" + index, false);
         driver.switchTo().frame(index);
         frameFlag = true;
     }
 
     @Override
     public final void selectFrame(final By by) {
-        TestLogging.logWebStep(null, "select frame, locator={\"" + by.toString() + "\"}", false);
         driver.switchTo().frame(driver.findElement(by));
         frameFlag = true;
     }
 
     public final void selectFrame(final String locator) {
-        TestLogging.logWebStep(null, "select frame, locator={\"" + locator + "\"}", false);
         driver.switchTo().frame(locator);
         frameFlag = true;
     }
 
     public final void selectMainWindow() {
-        TestLogging.logWebStep(null, "select window, locator={\"" + getPopupWindowName() + "\"}", false);
 
         driver.switchTo().window((String) driver.getWindowHandles().toArray()[0]);
         WaitHelper.waitForSeconds(1);
@@ -515,7 +502,6 @@ public class PageObject extends BasePage implements IPage {
     }
 
     public final void selectWindow(final int index) {
-        TestLogging.logWebStep(null, "select window, locator={\"" + index + "\"}", false);
         driver.switchTo().window((String) driver.getWindowHandles().toArray()[index]);
     }
     
@@ -524,7 +510,6 @@ public class PageObject extends BasePage implements IPage {
     }
     
     public final String selectNewWindow(int waitMs) {
-        TestLogging.logWebStep(null, "select new window", false);
         
         // Keep the name of the current window handle before switching
         // sometimes, our action made window disappear

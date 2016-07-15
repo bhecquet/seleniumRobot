@@ -959,19 +959,15 @@ public class SeleniumTestsContext {
     }
     
     public void setRunMode(String runMode) {
-    	if (runMode == null) {
-    		runMode = "LOCAL";
-    	} 
-    	DriverMode.fromString(runMode);
-        setAttribute(RUN_MODE, runMode);
+    	String _runMode = runMode == null ? "LOCAL": runMode;
+    	DriverMode.fromString(_runMode);
+        setAttribute(RUN_MODE, _runMode);
     }
 
     public void setBrowser(String browser) {
-    	if (browser == null) {
-    		browser = "*firefox";
-    	} 
-    	BrowserType.getBrowserType(browser);
-    	setAttribute(BROWSER, browser);
+    	String _browser = browser == null ? "*firefox": browser;
+    	BrowserType.getBrowserType(_browser);
+    	setAttribute(BROWSER, _browser);
     }
     
     public void setBrowserVersion(String browserVersion) {

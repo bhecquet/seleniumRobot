@@ -14,7 +14,6 @@
 package com.seleniumtests.util.xmldifference;
 
 import java.io.File;
-import java.io.FilenameFilter;
 import java.io.IOException;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -30,14 +29,14 @@ import com.seleniumtests.reporter.TestLogging;
 /**
  * XMLDog class for comparing XML documents.
  */
-public class XMLDog implements XMLDogConstants {
-    private Config _config = null;
+public class XMLDog {
+    private Config xConfig = null;
     
 	private static final Logger logger = TestLogging.getLogger(Comparator.class);
 
-    private DocumentBuilderFactory _factory = null;
+    private DocumentBuilderFactory xFactory = null;
 
-    private DocumentBuilder _parser = null;
+    private DocumentBuilder xParser = null;
 
 
     /**
@@ -79,14 +78,14 @@ public class XMLDog implements XMLDogConstants {
      * Sets config.
      */
     public void setConfig(final Config config) throws ParserConfigurationException {
-        _config = config;
-        _factory = DocumentBuilderFactory.newInstance();
-        _factory.setExpandEntityReferences(_config.isExpandingEntityRefs());
-        _factory.setIgnoringComments(_config.isIgnoringComments());
-        _factory.setIgnoringElementContentWhitespace(_config.isIgnoringWhitespace());
-        _factory.setCoalescing(true);
-        _factory.setNamespaceAware(_config.isNamespaceAware());
-        _parser = _factory.newDocumentBuilder();
+        xConfig = config;
+        xFactory = DocumentBuilderFactory.newInstance();
+        xFactory.setExpandEntityReferences(xConfig.isExpandingEntityRefs());
+        xFactory.setIgnoringComments(xConfig.isIgnoringComments());
+        xFactory.setIgnoringElementContentWhitespace(xConfig.isIgnoringWhitespace());
+        xFactory.setCoalescing(true);
+        xFactory.setNamespaceAware(xConfig.isNamespaceAware());
+        xParser = xFactory.newDocumentBuilder();
     }
 
     /**
@@ -97,9 +96,9 @@ public class XMLDog implements XMLDogConstants {
      * @see     Differences, FileUtil.writeListAsStr()
      */
     public Differences compare(final File controlFile, final File testFile) throws SAXException, IOException {
-        Document control = _parser.parse(controlFile);
-        Document test = _parser.parse(testFile);
-        Comparator comparator = new Comparator(control, test, _config);
+        Document control = xParser.parse(controlFile);
+        Document test = xParser.parse(testFile);
+        Comparator comparator = new Comparator(control, test, xConfig);
         return comparator.compare();
     }
 
@@ -111,10 +110,10 @@ public class XMLDog implements XMLDogConstants {
      * @param  resultDirPath   the directory containing result docs
      */
     public void compareDir(final String controlDirPath, final String testDirPath, final String resultDirPath) throws SAXException, IOException {
-        File[] controlFiles = null;
-        File controlDir = null;
-        File testDir = null;
-        File resultDir = null;
+        File[] controlFiles;
+        File controlDir;
+        File testDir;
+        File resultDir;
 
         controlDir = new File(controlDirPath);
         testDir = new File(testDirPath);
@@ -152,14 +151,14 @@ public class XMLDog implements XMLDogConstants {
      * @return  the DOM Document
      */
     public Document getDocument(final String xmlFilePath) throws SAXException, IOException {
-        return _parser.parse(new File(xmlFilePath));
+        return xParser.parse(new File(xmlFilePath));
     }
 
     /**
      * Prints msg to System.out.
      */
     public static void log(final String msg) {
-        if (DEBUG) {
+        if (XMLDogConstants.DEBUG) {
             logger.info("XMLDog:" + msg);
         }
     }

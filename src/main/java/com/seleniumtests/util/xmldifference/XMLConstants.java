@@ -22,13 +22,13 @@ package com.seleniumtests.util.xmldifference;
  * A convenient place to hang constants relating to general XML usage.
  */
 
-public interface XMLConstants {
+public final class XMLConstants {
 
     /**
      * &lt;?xml&greaterThan; declaration.
      */
 
-    String XML_DECLARATION =
+    public static final String XML_DECLARATION =
 
         "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>";
 
@@ -36,120 +36,120 @@ public interface XMLConstants {
      * xmlns attribute prefix.
      */
 
-    String XMLNS_PREFIX = "xmlns";
+    public static final String XMLNS_PREFIX = "xmlns";
 
     /**
      * "&lt;"
      */
 
-    String OPEN_START_NODE = "<";
+    public static final String OPEN_START_NODE = "<";
 
     /**
      * "&lt;/"
      */
 
-    String OPEN_END_NODE = "</";
+    public static final String OPEN_END_NODE = "</";
 
     /**
      * "&greaterThan;"
      */
 
-    String CLOSE_NODE = ">";
+    public static final String CLOSE_NODE = ">";
 
     /**
      * "![CDATA["
      */
 
-    String START_CDATA = "![CDATA[";
+    public static final String START_CDATA = "![CDATA[";
 
     /**
      * "]]"
      */
 
-    String END_CDATA = "]]";
+    public static final String END_CDATA = "]]";
 
     /**
      * "!--"
      */
 
-    String START_COMMENT = "!--";
+    public static final String START_COMMENT = "!--";
 
     /**
      * "--""
      */
 
-    String END_COMMENT = "--";
+    public static final String END_COMMENT = "--";
 
     /**
      * "?"
      */
 
-    String START_PROCESSING_INSTRUCTION = "?";
+    public static final String START_PROCESSING_INSTRUCTION = "?";
 
     /**
      * "?"
      */
 
-    String END_PROCESSING_INSTRUCTION = "?";
+    public static final String END_PROCESSING_INSTRUCTION = "?";
 
     /**
      * "!DOCTYPE"
      */
 
-    String START_DOCTYPE = "!DOCTYPE ";
+    public static final String START_DOCTYPE = "!DOCTYPE ";
 
     /**
      * "/"
      */
 
-    String XPATH_SEPARATOR = "/";
+    public static final String XPATH_SEPARATOR = "/";
 
     /**
      * "["
      */
 
-    String XPATH_NODE_INDEX_START = "[";
+    public static final String XPATH_NODE_INDEX_START = "[";
 
     /**
      * "]"
      */
 
-    String XPATH_NODE_INDEX_END = "]";
+    public static final String XPATH_NODE_INDEX_END = "]";
 
     /**
      * "comment()"
      */
 
-    String XPATH_COMMENT_IDENTIFIER = "comment()";
+    public static final String XPATH_COMMENT_IDENTIFIER = "comment()";
 
     /**
      * "processing-instruction()"
      */
 
-    String XPATH_PROCESSING_INSTRUCTION_IDENTIFIER = "processing-instruction()";
+    public static final String XPATH_PROCESSING_INSTRUCTION_IDENTIFIER = "processing-instruction()";
 
     /**
      * "text()"
      */
 
-    String XPATH_CHARACTER_NODE_IDENTIFIER = "text()";
+    public static final String XPATH_CHARACTER_NODE_IDENTIFIER = "text()";
 
     /**
      * "&at;"
      */
 
-    String XPATH_ATTRIBUTE_IDENTIFIER = "@";
+    public static final String XPATH_ATTRIBUTE_IDENTIFIER = "@";
 
     /**
      * Regular Expression startor for Exclusion List.
      */
 
-    String XPATH_REGEX_BEGIN = "[";
+    public static final String XPATH_REGEX_BEGIN = "[";
 
     /**
      * Regular Expression terminator for Exclusion List.
      */
 
-    String XPATH_REGEX_END = "]";
+    public static final String XPATH_REGEX_END = "]";
 
 }

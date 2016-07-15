@@ -106,9 +106,9 @@ import org.w3c.dom.ProcessingInstruction;
  * Class for describing Nodes.
  */
 
-public class NodeDescription implements XMLConstants {
+public class NodeDescription {
 
-    protected static String DOCUMENT_NODE_DESCRIPTION = "Document Node ";
+    protected static final String DOCUMENT_NODE_DESCRIPTION = "Document Node ";
 
     /**
      * Convert a Node into a simple String representation.

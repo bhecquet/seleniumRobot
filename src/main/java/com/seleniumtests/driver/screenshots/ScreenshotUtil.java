@@ -86,13 +86,14 @@ public class ScreenshotUtil {
     }
 
     private void handleSource(String htmlSource, final ScreenShot screenShot) {
-        if (htmlSource == null) {
-            htmlSource = driver.getPageSource();
+    	String _htmlSource = htmlSource;
+        if (_htmlSource == null) {
+        	_htmlSource = driver.getPageSource();
         }
 
-        if (htmlSource != null) {
+        if (_htmlSource != null) {
             try {
-                FileUtils.writeStringToFile(new File(outputDirectory + "/htmls/" + filename + ".html"), htmlSource);
+                FileUtils.writeStringToFile(new File(outputDirectory + "/htmls/" + filename + ".html"), _htmlSource);
                 screenShot.setHtmlSourcePath(suiteName + "/htmls/" + filename + ".html");
             } catch (IOException e) {
                 logger.warn("Ex", e);
@@ -116,15 +117,16 @@ public class ScreenshotUtil {
     }
 
     private void handleTitle(String title, final ScreenShot screenShot) {
-        if (title == null) {
-            title = driver.getTitle();
+    	String _title = title;
+        if (_title == null) {
+            _title = driver.getTitle();
         }
 
-        if (title == null) {
-            title = "";
+        if (_title == null) {
+            _title = "";
         }
 
-        screenShot.setTitle(title);
+        screenShot.setTitle(_title);
     }
 
     public ScreenShot captureWebPageSnapshot() {

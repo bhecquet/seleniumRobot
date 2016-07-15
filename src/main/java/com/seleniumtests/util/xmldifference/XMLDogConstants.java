@@ -23,22 +23,22 @@ package com.seleniumtests.util.xmldifference;
  * XMLDogConstants Interface containing all the XMLDog Application constants.
  */
 
-public interface XMLDogConstants {
+public final class XMLDogConstants {
 
     // Application name
 
-    String APP_NAME = "XMLDog";
+    public static final String APP_NAME = "XMLDog";
 
     // DEBUG flag
 
-    boolean DEBUG = false;
+    public static final boolean DEBUG = false;
 
     // Event types sent to the DifferenceListeners
 
-    int EVENT_NODE_IDENTICAL = 0;
+    public static final int EVENT_NODE_IDENTICAL = 0;
 
-    int EVENT_NODE_SIMILAR = 1;
+    public static final int EVENT_NODE_SIMILAR = 1;
 
-    int EVENT_NODE_MISMATCH = 2;
+    public static final int EVENT_NODE_MISMATCH = 2;
 
 }

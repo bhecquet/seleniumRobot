@@ -28,6 +28,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.w3c.dom.Attr;
 import org.w3c.dom.DOMException;
@@ -38,11 +39,9 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
-import org.xml.sax.EntityResolver;
-import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-public class XMLUtil implements XMLDogConstants 
+public class XMLUtil 
 {
 	private static final Logger logger = Logger.getLogger(XMLUtil.class);
 	
@@ -265,7 +264,7 @@ public class XMLUtil implements XMLDogConstants
      */
     public static String replaceElementText(String xmlFile, String elementTag, List values, boolean overwrite)
     {
-        Document doc = null;
+        Document doc;
 
         if ((xmlFile == null) ||
         		(elementTag == null) || ("".equals(elementTag.trim())) ||
@@ -457,11 +456,11 @@ public class XMLUtil implements XMLDogConstants
             	break;
             
             case Node.PROCESSING_INSTRUCTION_NODE:
-            	sb.append(printProcessingInstructionNode(node, normalize));
+            	sb.append(printProcessingInstructionNode(node));
             	break;
                 
             case Node.DOCUMENT_TYPE_NODE:
-            	sb.append(printDocumentTypeNode(node, normalize));
+            	sb.append(printDocumentTypeNode(node));
             	break;
             
             default:
@@ -486,7 +485,7 @@ public class XMLUtil implements XMLDogConstants
         {
             String encoding = "UTF-8";
             sb.append("<?xml version=\"1.0\" encoding=\"" + encoding + "\"?>");
-            sb.append(StringUtil.getNewlineStr());
+            sb.append(com.google.api.client.util.StringUtils.LINE_SEPARATOR);
         }
 
         print(((Document) node).getDocumentElement(), canonical, normalize);
@@ -619,10 +618,9 @@ public class XMLUtil implements XMLDogConstants
      * Print processing instruction
      * @param node
      * @param canonical
-     * @param normalize
      * @return the String representation of a processing instruction Node
      */
-    protected static String printProcessingInstructionNode(Node node, boolean normalize){
+    protected static String printProcessingInstructionNode(Node node){
     	
     	StringBuilder sb = new StringBuilder();
     	
@@ -645,11 +643,9 @@ public class XMLUtil implements XMLDogConstants
     /**
      * 
      * @param node
-     * @param canonical
-     * @param normalize
      * @return the String representation of a document type Node
      */
-    protected static String printDocumentTypeNode(Node node, boolean normalize){
+    protected static String printDocumentTypeNode(Node node){
     	
     	StringBuilder sb = new StringBuilder();
     	
@@ -659,7 +655,7 @@ public class XMLUtil implements XMLDogConstants
         sb.append("\"" + ((DocumentType) node).getPublicId() + "\" ");
         sb.append(" \"" + ((DocumentType) node).getSystemId() + "\"");
         sb.append(">");
-        sb.append(StringUtil.getNewlineStr());
+        sb.append(com.google.api.client.util.StringUtils.LINE_SEPARATOR);
         
         return sb.toString();
     }
@@ -715,10 +711,8 @@ public class XMLUtil implements XMLDogConstants
 	                    // else, default append char
 	
 	                default:
-	                {
 	                    str.append(ch);
 	                    break;
-	                }
 	                
 	            }
         	}
@@ -1225,7 +1219,7 @@ public class XMLUtil implements XMLDogConstants
             return false;
 
         if (node.getNodeType() == Node.TEXT_NODE)
-            return StringUtil.isWhitespaceStr(node.getNodeValue());
+            return StringUtils.isBlank(node.getNodeValue());
 
         return false;
     }
@@ -1345,7 +1339,7 @@ public class XMLUtil implements XMLDogConstants
      */
     public static void log(String msg)
     {
-        if (DEBUG)
+        if (XMLDogConstants.DEBUG)
             logger.info("XMLUtil:" + msg);
     }
 

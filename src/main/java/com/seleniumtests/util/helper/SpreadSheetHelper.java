@@ -75,7 +75,7 @@ public class SpreadSheetHelper {
      * @return
      * @throws Exception
      */
-    private static Object _readFieldValueObject(final Class<?> fieldClz, final Type type,
+    private static Object readFieldValueObject(final Class<?> fieldClz, final Type type,
             final Map<String, Object> dataMap, final String combinedFieldName) throws Exception {
         Object fieldValue = null;
 
@@ -319,7 +319,7 @@ public class SpreadSheetHelper {
             }
 
             for (int i = rowDataArray.length - 1; i >= 0; i--) {
-                int docIdx = ((String) headerArray[i]).indexOf(".");
+                int docIdx = ((String) headerArray[i]).indexOf('.');
                 if (docIdx < 0) {
                     rowData.add(0, rowDataArray[i]);
                 } else if (temp.get(((String) headerArray[i]).substring(0, docIdx)) == null) {
@@ -375,7 +375,7 @@ public class SpreadSheetHelper {
             if (entry.getKey().toLowerCase().startsWith(key.toLowerCase() + ".")) {
                 String newkey = entry.getKey().substring(key.length() + 1);
                 if (newkey.contains(".")) {
-                    newkey = newkey.substring(0, newkey.indexOf("."));
+                    newkey = newkey.substring(0, newkey.indexOf('.'));
                 }
 
                 if (!newkey.equalsIgnoreCase(lastKey)) {
@@ -525,20 +525,20 @@ public class SpreadSheetHelper {
                 Class<?>[] parameterTypes = new Class<?>[] {};
                 Method method = clz.getMethod("get" + fieldName, parameterTypes);
                 type = method.getReturnType();
-                fieldValue = _readFieldValueObject(type, method.getGenericReturnType(), datamap, fieldName);
+                fieldValue = readFieldValueObject(type, method.getGenericReturnType(), datamap, fieldName);
             } catch (NoSuchMethodException ex) {
                 try {
                     Class<?>[] parameterTypes = new Class<?>[] {};
                     Method method = clz.getMethod("is" + fieldName, parameterTypes);
                     type = method.getReturnType();
-                    fieldValue = _readFieldValueObject(type, method.getGenericReturnType(), datamap, fieldName);
+                    fieldValue = readFieldValueObject(type, method.getGenericReturnType(), datamap, fieldName);
                 } catch (NoSuchMethodException ex2) {
                     try {
                         Field field = clz.getDeclaredField(realfieldName);
-                        fieldValue = _readFieldValueObject(field.getType(), field.getGenericType(), datamap, fieldName);
+                        fieldValue = readFieldValueObject(field.getType(), field.getGenericType(), datamap, fieldName);
                     } catch (NoSuchFieldException ex3) {
                         try {
-                            fieldValue = _readFieldValueObject(String.class, String.class, datamap, fieldName);
+                            fieldValue = readFieldValueObject(String.class, String.class, datamap, fieldName);
                             type = String.class;
                         } catch (Exception e) {
                             logger.warn("Ex:" + clz.getName(), e);

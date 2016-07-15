@@ -37,7 +37,6 @@ import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.reporter.TestLogging;
 
 import cucumber.api.testng.CucumberFeatureWrapper;
-import cucumber.runtime.CucumberException;
 
 public class CucumberRunner {
 	
@@ -110,8 +109,7 @@ public class CucumberRunner {
      * @param  xmlTest
      */
     @AfterMethod(alwaysRun = true)
-    public void afterTestMethod(final Method method, final ITestContext testContex,
-            final XmlTest xmlTest) {
+    public void afterTestMethod(final Method method, final XmlTest xmlTest) {
         List<TearDownService> serviceList = SeleniumTestsContextManager.getThreadContext().getTearDownServices();
         if (serviceList != null && !serviceList.isEmpty()) {
             for (TearDownService service : serviceList) {

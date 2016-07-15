@@ -76,27 +76,26 @@ public class ConfigMappingReader {
 	 * @param versionDir : name of the directory representing the version (4.4, ios_6, etc), can be empty
 	 * @return the Map with all properties corresponding with the mobile using 
 	 */
-	public Map<String, HashMap<String,String>> readConfig(String typeDir, String versionDir){
+	public Map<String, HashMap<String,String>> readConfig(String systemType, String versionDir){
 		
 		//create HashMap for result
 		Map<String, HashMap<String,String>> testConfig = new HashMap<>();
-		
-		//create String for Paths
-		String iniFilePath = "";
 
 		// load generic configuration
 		File globalConfigFile =  Paths.get(SeleniumTestsContext.getConfigPath(), OBJECT_MAPPING_FILE_NAME).toFile();
 		testConfig = extractConfigValues(testConfig, globalConfigFile);
 		
 		// load system specific configuration if any (web / ios / android)
-		if(typeDir != null && !typeDir.isEmpty()) {
+		if(systemType != null && !systemType.isEmpty()) {
 			
-			if (!"ios".equalsIgnoreCase(typeDir) && !"android".equalsIgnoreCase(typeDir)) {
+			String typeDir;
+			if (!"ios".equalsIgnoreCase(systemType) && !"android".equalsIgnoreCase(systemType)) {
 				typeDir = "web";
+			} else {
+				typeDir = systemType.toLowerCase();
 			}
 			File systemConfigFile =  Paths.get(SeleniumTestsContext.getConfigPath(), typeDir, OBJECT_MAPPING_FILE_NAME).toFile();
 			testConfig = extractConfigValues(testConfig, systemConfigFile);
-			
 			
 			if(versionDir != null && !versionDir.isEmpty()){
 				

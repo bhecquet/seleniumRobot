@@ -16,8 +16,6 @@ package com.seleniumtests.uipage.htmlelements;
 
 import org.openqa.selenium.By;
 
-import com.seleniumtests.reporter.TestLogging;
-
 public class LinkElement extends HtmlElement {
 
     public LinkElement(final String label, final By by) {
@@ -30,7 +28,6 @@ public class LinkElement extends HtmlElement {
 
     @Override
     public void click() {
-        TestLogging.logWebStep(null, "click on " + toHTML(), false);
         super.click();
     }
 

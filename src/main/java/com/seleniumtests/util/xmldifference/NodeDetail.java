@@ -23,11 +23,11 @@ import org.w3c.dom.Node;
 
 public class NodeDetail {
 
-    private Node _node = null;
+    private Node ndNode = null;
 
-    private String _xpath = null;
+    private String ndXpath = null;
 
-    private String _value = null;
+    private String ndValue = null;
 
     /**
      * Constructor.
@@ -39,9 +39,9 @@ public class NodeDetail {
 
     public NodeDetail(final Node node, final String xpath) {
 
-        _node = node;
+        ndNode = node;
 
-        _xpath = xpath;
+        ndXpath = xpath;
 
     }
 
@@ -56,11 +56,11 @@ public class NodeDetail {
 
     public NodeDetail(final String value, final Node node, final String xpath) {
 
-        _value = value;
+        ndValue = value;
 
-        _node = node;
+        ndNode = node;
 
-        _xpath = xpath;
+        ndXpath = xpath;
 
     }
 
@@ -72,7 +72,7 @@ public class NodeDetail {
 
     public Node getNode() {
 
-        return _node;
+        return ndNode;
 
     }
 
@@ -84,7 +84,7 @@ public class NodeDetail {
 
     public void setNode(final Node node) {
 
-        _node = node;
+        ndNode = node;
 
     }
 
@@ -96,7 +96,7 @@ public class NodeDetail {
 
     public String getXPathLocation() {
 
-        return _xpath;
+        return ndXpath;
 
     }
 
@@ -108,7 +108,7 @@ public class NodeDetail {
 
     public void setXPathLocation(final String xpath) {
 
-        _xpath = xpath;
+        ndXpath = xpath;
 
     }
 
@@ -120,12 +120,12 @@ public class NodeDetail {
 
     public String getValue() {
 
-        if (_value == null) {
+        if (ndValue == null) {
 
             return getNode().getNodeValue();
         }
 
-        return _value;
+        return ndValue;
 
     }
 

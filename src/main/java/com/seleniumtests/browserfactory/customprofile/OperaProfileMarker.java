@@ -13,4 +13,4 @@
 
 package com.seleniumtests.browserfactory.customprofile;
 
-public class OperaProfileMarker { }
+public interface OperaProfileMarker { }

@@ -16,8 +16,6 @@ package com.seleniumtests.uipage.htmlelements;
 
 import org.openqa.selenium.By;
 
-import com.seleniumtests.reporter.TestLogging;
-
 public class LabelElement extends HtmlElement {
     public LabelElement(final String label, final By by) {
         super(label, by);
@@ -29,7 +27,6 @@ public class LabelElement extends HtmlElement {
 
     @Override
     public String getText() {
-        TestLogging.logWebStep(null, "get text from " + toHTML(), false);
         return super.getText();
     }
 

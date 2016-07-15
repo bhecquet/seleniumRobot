@@ -373,12 +373,12 @@ public class SeleniumTestsReporter implements IReporter, ITestListener, IInvoked
     }
 
     protected void generateExceptionReport(final Throwable exception, final ITestNGMethod method, final String title,
-            final StringBuilder contentBuffer, final String lastLine) {
-        generateTheStackTrace(exception, method, title, contentBuffer, lastLine);
+            final StringBuilder contentBuffer) {
+        generateTheStackTrace(exception, method, title, contentBuffer);
     }
 
     protected void generateExceptionReport(final Throwable exception, final ITestNGMethod method,
-            final StringBuilder contentBuffer, final String lastline) {
+            final StringBuilder contentBuffer) {
         Throwable fortile = exception;
         String title = fortile.getMessage();
         if (title == null) {
@@ -389,7 +389,7 @@ public class SeleniumTestsReporter implements IReporter, ITestListener, IInvoked
             }
         }
 
-        generateExceptionReport(exception, method, title, contentBuffer, lastline);
+        generateExceptionReport(exception, method, title, contentBuffer);
     }
 
     protected void generateGlobalErrorHTML(final ITestContext testContext, final StringBuilder errorCountTabs,
@@ -644,7 +644,7 @@ public class SeleniumTestsReporter implements IReporter, ITestListener, IInvoked
                         }
 
                         if (hasThrowable) {
-                            generateExceptionReport(exception, method, contentBuffer, lastLine);
+                            generateExceptionReport(exception, method, contentBuffer);
                         }
 
                         contentBuffer.append("</div></div>");
@@ -895,7 +895,7 @@ public class SeleniumTestsReporter implements IReporter, ITestListener, IInvoked
     }
 
     protected void generateTheStackTrace(final Throwable exception, final ITestNGMethod method, final String title,
-            final StringBuilder contentBuffer, final String lastline) {
+            final StringBuilder contentBuffer) {
         contentBuffer.append(" <div class='stContainer' >" + exception.getClass() + ":" + escape(title)
                 + "(<a  href='javascript:void(0);'  class='exceptionlnk'>stacktrace</a>)");
 
@@ -912,7 +912,7 @@ public class SeleniumTestsReporter implements IReporter, ITestListener, IInvoked
         }
 
         if (t2 != null) {
-            generateExceptionReport(t2, method, "Caused by " + t2.getLocalizedMessage(), contentBuffer, ""); // jerry
+            generateExceptionReport(t2, method, "Caused by " + t2.getLocalizedMessage(), contentBuffer); // jerry
         }
 
         contentBuffer.append("</div></div>");
