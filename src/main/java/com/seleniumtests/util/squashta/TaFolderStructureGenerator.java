@@ -6,6 +6,7 @@ import java.nio.file.Paths;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
+import org.openqa.selenium.io.IOUtils;
 
 import com.seleniumtests.reporter.TestLogging;
 
@@ -50,20 +51,20 @@ public class TaFolderStructureGenerator {
 		
 		// add pom.xml
 		logger.info("copying pom.xml to " + pomFile.toString());
-		FileUtils.copyFile(new File(Thread.currentThread().getContextClassLoader().getResource("squash-ta/pom.xml").getFile()), 
+		FileUtils.copyInputStreamToFile(Thread.currentThread().getContextClassLoader().getResourceAsStream("squash-ta/pom.xml"), 
 							pomFile);
-		
+
 		// add .java file
 		if (!srcJavaFile.exists()) {
 			logger.info("copying SeleniumRobotTest.java to " + javaFile.toString());
-			FileUtils.copyFile(new File(Thread.currentThread().getContextClassLoader().getResource("squash-ta/SeleniumRobotTest.java").getFile()), 
+			FileUtils.copyInputStreamToFile(Thread.currentThread().getContextClassLoader().getResourceAsStream("squash-ta/SeleniumRobotTest.java"), 
 					javaFile);
 		}
 		
 		// add .ta file
 		if (!srcTaFile.exists()) {
 			logger.info("copying generic.ta to " + taFile.toString());
-			String content = FileUtils.readFileToString(new File(Thread.currentThread().getContextClassLoader().getResource("squash-ta/squash_generic.ta").getFile()));
+			String content = IOUtils.readFully(Thread.currentThread().getContextClassLoader().getResourceAsStream("squash-ta/squash_generic.ta"));
 			content = content.replace("%app%", application);
 			FileUtils.writeStringToFile(taFile, content);
 		}
@@ -79,7 +80,6 @@ public class TaFolderStructureGenerator {
 	 */
 	public static void main(String [] args) throws IOException {
 		new TaFolderStructureGenerator(args[0], Paths.get(args[1], "data", args[0], "squash-ta").toString(), args[2]).generateDefaultStructure();
-		
 		// generate new .ta files
 		new TaScriptGenerator(args[0], args[1], args[2]).generateTaScripts();
 	}
