@@ -18,16 +18,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.io.FilenameUtils;
-import org.apache.log4j.Logger;
 
-import com.seleniumtests.core.SeleniumTestPlan;
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.CustomSeleniumTestsException;
-import com.seleniumtests.reporter.TestLogging;
 
 import cucumber.api.testng.FeatureResultListener;
-import cucumber.api.testng.TestNgReporter;
 import cucumber.runtime.ClassFinder;
 import cucumber.runtime.CucumberException;
 import cucumber.runtime.Runtime;
@@ -52,7 +48,6 @@ public class CustomTestNGCucumberRunner {
     private ResourceLoader resourceLoader;
     private FeatureResultListener resultListener;
     private ClassLoader classLoader;
-    private static final Logger logger = TestLogging.getLogger(SeleniumTestPlan.class);
 
     /**
      * Bootstrap the cucumber runtime
@@ -68,10 +63,6 @@ public class CustomTestNGCucumberRunner {
         resultListener = new FeatureResultListener(runtimeOptions.reporter(classLoader), runtimeOptions.isStrict());
     }
     
-    public CustomTestNGCucumberRunner(Class clazz, String xmlFile) {
-    	this(clazz);
-    }
-    
     private List<CucumberFeature> initCucumberOptions(Class clazz) {
     	String cucumberPkg = SeleniumTestsContextManager.getThreadContext().getCucmberPkg();
     	if (cucumberPkg == null) {
@@ -81,7 +72,7 @@ public class CustomTestNGCucumberRunner {
     	
     	// get all features, filtered by test name
     	System.setProperty("cucumber.options", SeleniumTestsContext.getFeaturePath());
-        List<CucumberFeature> testSelectedFeatures = getFeaturesFromRequestedTests(clazz, classLoader, resourceLoader);
+        List<CucumberFeature> testSelectedFeatures = getFeaturesFromRequestedTests(clazz, resourceLoader);
 
     	// build cucumber option list
         // take into account tag options
@@ -122,40 +113,29 @@ public class CustomTestNGCucumberRunner {
     /**
      * Get list of features given their name or their file name
      */
-    private List<CucumberFeature> getFeaturesFromRequestedTests(Class clazz, ClassLoader classLoader, ResourceLoader resourceLoader) {
+    private List<CucumberFeature> getFeaturesFromRequestedTests(Class clazz, ResourceLoader resourceLoader) {
 
-        RuntimeOptions runtimeOptions = new RuntimeOptionsFactory(clazz).create();
+        RuntimeOptions runtimeOptionsB = new RuntimeOptionsFactory(clazz).create();
         
-        final List<CucumberFeature> allFeatures = runtimeOptions.cucumberFeatures(resourceLoader);
+        final List<CucumberFeature> allFeatures = runtimeOptionsB.cucumberFeatures(resourceLoader);
         List<CucumberFeature> selectedFeatures = new ArrayList<>();
         
         // filter features requested for execution
         List<String> testList = SeleniumTestsContextManager.getThreadContext().getCucumberTests();
         
-        for (CucumberFeature feature: allFeatures) {
-        	String featureName = feature.getGherkinFeature().getName();
-        	String featureFileName = FilenameUtils.getBaseName(feature.getPath());
-        	
-        	for (String test: testList) {
-    			if (featureName.matches(test) || test.equals(featureFileName)) {
-    				selectedFeatures.add(feature);
-    				break;
-    			}
-    		}  
-        }
+        selectedFeatures = selectFeatures(allFeatures, selectedFeatures, testList);
         
-        // select scenarios in features if feature list is empty
-        // remove scenarios whose name is not in test list
+        
         if (selectedFeatures.isEmpty()) {
+        	// select scenarios in features
+        	
+            // get only scenarios whose name is in the list of tests
         	for (CucumberFeature feature: allFeatures) {
+        		
         		List<CucumberTagStatement> selectedScenarios = new ArrayList<>();
-        		for (CucumberTagStatement stmt: feature.getFeatureElements()) {
-        			for (String test: testList) {
-            			if (stmt.getGherkinModel().getName().equals(test)) {
-            				selectedScenarios.add(stmt);
-            			}
-        			}
-        		}
+        		
+        		selectedScenarios = selectSenario(feature, testList, selectedScenarios);
+            				
         		feature.getFeatureElements().removeAll(feature.getFeatureElements());
         		feature.getFeatureElements().addAll(selectedScenarios);
         		
@@ -167,27 +147,73 @@ public class CustomTestNGCucumberRunner {
         
         return selectedFeatures;
     }
+    
+    /**
+     * 
+     * @param allFeatures
+     * @param selectedFeatures
+     * @param testList
+     * @return Cucumber feature list of selected tests
+     */
+    private List<CucumberFeature> selectFeatures(final List<CucumberFeature> allFeatures, List<CucumberFeature> selectedFeatures, 
+    									List<String> testList){
+    	for (CucumberFeature feature: allFeatures) {
+        	String featureName = feature.getGherkinFeature().getName();
+        	String featureFileName = FilenameUtils.getBaseName(feature.getPath());
+        	
+        	for (String test: testList) {
+    			if (featureName.matches(test) || test.equals(featureFileName)) {
+    				selectedFeatures.add(feature);
+    				break;
+    			}
+    		}  
+        }
+    	return selectedFeatures;
+    }
+    
+    /**
+     * 
+     * @param feature
+     * @param testList
+     * @param selectedScenarios
+     * @return Cucumber statement list of selected tests
+     */
+    private List<CucumberTagStatement> selectSenario(CucumberFeature feature, List<String> testList, 
+    													List<CucumberTagStatement> selectedScenarios){
+    	for (CucumberTagStatement stmt: feature.getFeatureElements()) {
+			
+			for (String test: testList) {
+    			if (stmt.getGherkinModel().getName().equals(test)) {
+    				selectedScenarios.add(stmt);
+    			}
+			}
+		}
+    	return selectedScenarios;
+    }
 
-    public void runScenario(CucumberScenarioWrapper cucumberScenarioWrapper) 
-    		throws NoSuchFieldException, RuntimeException, IllegalAccessException {
+    public void runScenario(CucumberScenarioWrapper cucumberScenarioWrapper)   {
     	
     	resultListener.startFeature();
     	
     	Formatter formatter = runtimeOptions.formatter(classLoader);
     	CucumberScenario cucumberScenario = cucumberScenarioWrapper.getCucumberScenario();
     	
-    	Field field = StepContainer.class.getDeclaredField("cucumberFeature");
-		field.setAccessible(true);
-		CucumberFeature cucumberFeature = (CucumberFeature)field.get(cucumberScenario);
-    	formatter.uri(cucumberFeature.getPath());
-        formatter.feature(cucumberFeature.getGherkinFeature());
+    	try {
+	    	Field field = StepContainer.class.getDeclaredField("cucumberFeature");
+			field.setAccessible(true);
+			CucumberFeature cucumberFeature = (CucumberFeature)field.get(cucumberScenario);
+	    	formatter.uri(cucumberFeature.getPath());
+	        formatter.feature(cucumberFeature.getGherkinFeature());
+	    	
+	    	cucumberScenario.run(runtimeOptions.formatter(classLoader), resultListener, runtime);
+	    	formatter.eof();
+    	} catch (NoSuchFieldException | IllegalAccessException e) {
+    		throw new CucumberException("Could not run scenario: " + e.getMessage());
+    	}
     	
-    	cucumberScenario.run(runtimeOptions.formatter(classLoader), resultListener, runtime);
-    	formatter.eof();
-    	
-//    	if (!resultListener.isPassed()) {
-//            throw new CucumberException(resultListener.getFirstError());
-//        }
+    	if (!resultListener.isPassed()) {
+            throw new CucumberException(resultListener.getFirstError());
+        }
     }
 
     public void finish() {
@@ -208,34 +234,46 @@ public class CustomTestNGCucumberRunner {
     }
 	
 	public Object[][] provideScenarios() {
-		List<CucumberScenarioWrapper> scenarioList = new ArrayList<CucumberScenarioWrapper>();
+		List<CucumberScenarioWrapper> scenarioList = new ArrayList<>();
         for (CucumberFeature feature : getFeatures()) {
         	
         	// get scenario / scenario outline
         	for (CucumberTagStatement cucumberTagStatement : feature.getFeatureElements()) {
                 
-        		if (cucumberTagStatement instanceof CucumberScenarioOutline) {
-        			for (CucumberExamples cucumberExamples : ((CucumberScenarioOutline)cucumberTagStatement).getCucumberExamplesList()) {
-        	            for (CucumberScenario exampleScenario : cucumberExamples.createExampleScenarios()) {
-                			CucumberScenarioWrapper scenarioWrapper = new CucumberScenarioWrapper(exampleScenario);
-        	            	scenarioList.add(scenarioWrapper);
-        	            }
-        	        }
-        		} else {
-        			CucumberScenarioWrapper scenarioWrapper = new CucumberScenarioWrapper((CucumberScenario)cucumberTagStatement);
-        			if (!scenarioList.contains(scenarioWrapper)) {
-        				scenarioList.add(scenarioWrapper);
-        			}
-        		}
+        		scenarioList = getScenarioWrapper(cucumberTagStatement, scenarioList);
             }
        }
         
-       List<Object[]> newScenarioList = new ArrayList<Object[]>();
+       List<Object[]> newScenarioList = new ArrayList<>();
        for (CucumberScenarioWrapper scenarioWrapper: scenarioList) {
     	   newScenarioList.add(new Object[]{scenarioWrapper});
        }
         
        return newScenarioList.toArray(new Object[][]{});
     }
+	
+	/**
+	 * 
+	 * @param cucumberTagStatement
+	 * @param scenarioList
+	 * @return list of cucumber scenario wrapper
+	 */
+	private List<CucumberScenarioWrapper> getScenarioWrapper(CucumberTagStatement cucumberTagStatement, 
+															List<CucumberScenarioWrapper> scenarioList){
+		if (cucumberTagStatement instanceof CucumberScenarioOutline) {
+			for (CucumberExamples cucumberExamples : ((CucumberScenarioOutline)cucumberTagStatement).getCucumberExamplesList()) {
+	            for (CucumberScenario exampleScenario : cucumberExamples.createExampleScenarios()) {
+        			CucumberScenarioWrapper scenarioWrapper = new CucumberScenarioWrapper(exampleScenario);
+	            	scenarioList.add(scenarioWrapper);
+	            }
+	        }
+		} else {
+			CucumberScenarioWrapper scenarioWrapper = new CucumberScenarioWrapper((CucumberScenario)cucumberTagStatement);
+			if (!scenarioList.contains(scenarioWrapper)) {
+				scenarioList.add(scenarioWrapper);
+			}
+		}
+		return scenarioList;
+	}
 
 }

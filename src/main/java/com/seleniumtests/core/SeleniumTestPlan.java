@@ -47,7 +47,7 @@ public abstract class SeleniumTestPlan {
     public void beforeTestSuite(final ITestContext testContext) throws IOException {
         start = new Date();
         SeleniumTestsContextManager.initGlobalContext(testContext);
-        SeleniumTestsContextManager.initThreadContext(testContext, null);
+        SeleniumTestsContextManager.initThreadContext(testContext);
     }
 
     /**
@@ -60,10 +60,9 @@ public abstract class SeleniumTestPlan {
     }
 
     @BeforeMethod(alwaysRun = true)
-    public void beforeTestMethod(final Object[] parameters, final Method method, final ITestContext testContex,
-            final XmlTest xmlTest) {
+    public void beforeTestMethod(final Object[] parameters, final Method method, final ITestContext testContex) {
         logger.info(Thread.currentThread() + " Start method " + method.getName());
-        SeleniumTestsContextManager.initThreadContext(testContex, xmlTest);
+        SeleniumTestsContextManager.initThreadContext(testContex);
         SeleniumTestsContextManager.getThreadContext().setTestMethodSignature(buildMethodSignature(method, parameters));
     }
 
@@ -76,8 +75,7 @@ public abstract class SeleniumTestPlan {
      * clean up.
      */
     @AfterMethod(alwaysRun = true)
-    public void afterTestMethod(final Object[] parameters, final Method method, final ITestContext testContex,
-            final XmlTest xmlTest) {
+    public void afterTestMethod(final Method method, final XmlTest xmlTest) {
         List<TearDownService> serviceList = SeleniumTestsContextManager.getThreadContext().getTearDownServices();
         if (serviceList != null && !serviceList.isEmpty()) {
             for (TearDownService service : serviceList) {

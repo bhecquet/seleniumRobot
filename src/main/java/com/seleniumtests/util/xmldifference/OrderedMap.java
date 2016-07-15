@@ -57,10 +57,10 @@ public class OrderedMap implements Serializable {
             _elementOrder = (ArrayList<Object>)Collections.synchronizedList(new ArrayList<Object>());
             _elements = (HashMap<Object, Object>)Collections.synchronizedMap(new HashMap<Object, Object>());
         } else if (type == TYPE_UNSYNCHRONIZED) {
-            _elementOrder = new ArrayList<Object>();
-            _elements = new HashMap<Object, Object>();
+            _elementOrder = new ArrayList<>();
+            _elements = new HashMap<>();
         } else if (type == TYPE_UNSYNCHRONIZED_MOV) {
-            _elementOrder = new ArrayList<Object>();
+            _elementOrder = new ArrayList<>();
             _elements = new MOVMap();
         } else {
             throw new IllegalArgumentException("Unrecongnized OrderedMap type");
@@ -177,8 +177,6 @@ public class OrderedMap implements Serializable {
         Object[] objects = new Object[_elementOrder.size()];
 
         for (int i = 0; i < _elementOrder.size(); i++) {
-
-            // System.out.println(" ----> Getting Elements at " + i);
             objects[i] = _elements.get(_elementOrder.get(i));
         }
 

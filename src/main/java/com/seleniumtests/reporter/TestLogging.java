@@ -13,6 +13,7 @@
 
 package com.seleniumtests.reporter;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -50,8 +51,8 @@ public class TestLogging {
      * @param  message
      */
     public static void errorLogger(String message) {
-        message = "<li><b><font color='#6600CC'>" + message + "</font></b></li>";
-        log(message, false, false);
+        String formattedMessage = "<li><b><font color='#6600CC'>" + message + "</font></b></li>";
+        log(formattedMessage, false, false);
     }
     
     public static Logger getLogger(final Class<?> cls) {
@@ -87,7 +88,7 @@ public class TestLogging {
             }
         }
 
-        return null;
+        return new ArrayList<>();
     }
 
     /**
@@ -96,8 +97,8 @@ public class TestLogging {
      * @param  message
      */
     public static void logInfo(String message) {
-        message = "<li><font color='#00cd00'>" + message + "</font></li>";
-        log(message, false, false);
+        String formattedMessage = "<li><font color='#00cd00'>" + message + "</font></li>";
+        log(formattedMessage, false, false);
     }
 
     /**
@@ -128,17 +129,18 @@ public class TestLogging {
      */
     public static void log(String message, final boolean failed, final boolean logToStandardOutput) {
 
-        if (message == null) {
-            message = "";
+    	String formattedMessage = message;
+        if (formattedMessage == null) {
+        	formattedMessage = "";
         }
 
-        message = message.replaceAll("\\n", "<br/>");
+        formattedMessage = formattedMessage.replaceAll("\\n", "<br/>");
 
         if (failed) {
-            message = "<span style=\"font-weight:bold;color:#cc0052;\">" + message + "</span>";
+        	formattedMessage = "<span style=\"font-weight:bold;color:#cc0052;\">" + formattedMessage + "</span>";
         }
 
-        Reporter.log(escape(message), logToStandardOutput);
+        Reporter.log(escape(formattedMessage), logToStandardOutput);
     }
 
     public static String escape(final String message) {
@@ -146,10 +148,10 @@ public class TestLogging {
     }
 
     public static String unEscape(String message) {
-        message = message.replaceAll("<br/>", "\\n").replaceAll("@@lt@@", "<").replaceAll("\\^\\^gt\\^\\^", ">");
+        String formattedMessage = message.replaceAll("<br/>", "\\n").replaceAll("@@lt@@", "<").replaceAll("\\^\\^gt\\^\\^", ">");
 
-        message = HtmlToText.htmlToPlainText(message);
-        return message;
+        formattedMessage = HtmlToText.htmlToPlainText(formattedMessage);
+        return formattedMessage;
     }
 
     /**
@@ -207,7 +209,7 @@ public class TestLogging {
      * @param  message
      */
     public static void warning(String message) {
-        message = "<li><font color='#FFFF00'>" + message + "</font></li>";
-        log(message, false, false);
+        String formattedMessage = "<li><font color='#FFFF00'>" + message + "</font></li>";
+        log(formattedMessage, false, false);
     }
 }

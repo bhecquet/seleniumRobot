@@ -14,15 +14,12 @@
 package com.seleniumtests.util.xmldifference;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.w3c.dom.Attr;
 import org.w3c.dom.CDATASection;
 import org.w3c.dom.Comment;
-import org.w3c.dom.Document;
 import org.w3c.dom.DocumentType;
 import org.w3c.dom.Element;
 import org.w3c.dom.EntityReference;
@@ -44,7 +41,7 @@ import com.seleniumtests.reporter.TestLogging;
 
 public class Comparator implements XMLDogConstants {
 
-	private static final Logger logger = TestLogging.getLogger(WebUIDriver.class);
+	private static final Logger logger = TestLogging.getLogger(Comparator.class);
 	
     private Node controlNode;
 
@@ -78,14 +75,6 @@ public class Comparator implements XMLDogConstants {
      */
 
     public Comparator(final Node controlNode, final Node testNode, final Config config) {
-
-        /*
-         *
-         * if ((controlNode == null) || (testNode == null))
-         *
-         *      throw new IllegalArgumentException("Cannot compare null node");
-         *
-         */
 
         this.config = config;
 
@@ -131,42 +120,6 @@ public class Comparator implements XMLDogConstants {
             listeners.clear();
 
             listeners.add(listener);
-
-        }
-
-    }
-
-    /**
-     * Notifies all the DifferenceListeners of the events.
-     */
-
-    private void notifyDifferenceListeners(final int type, final Node controlNode, final Node testNode,
-            final String msg) {
-
-        if (type == XMLDogConstants.EVENT_NODE_IDENTICAL) {
-
-            for (int i = 0; i < listeners.size(); i++) {
-
-                ((DifferenceListener) listeners.get(i)).identicalNodeFound(controlNode, testNode, msg);
-            }
-
-        } else if (type == XMLDogConstants.EVENT_NODE_SIMILAR) {
-
-            for (int i = 0; i < listeners.size(); i++) {
-
-                ((DifferenceListener) listeners.get(i)).similarNodeFound(controlNode, testNode, msg);
-            }
-
-        } else if (type == XMLDogConstants.EVENT_NODE_MISMATCH) {
-
-            for (int i = 0; i < listeners.size(); i++) {
-
-                ((DifferenceListener) listeners.get(i)).nodeNotFound(controlNode, testNode, msg);
-            }
-
-        } else {
-
-            // do nothing
 
         }
 
@@ -276,10 +229,6 @@ public class Comparator implements XMLDogConstants {
         if (testNode.getNodeType() == Node.DOCUMENT_NODE) {
 
             log("Test Node is Document Node");
-
-            Element controlRoot = ((Document) controlNode).getDocumentElement();
-
-            // Element testRoot = ((Document)testNode).getDocumentElement();
 
             if (testNode.hasChildNodes()) {
 
@@ -401,7 +350,6 @@ public class Comparator implements XMLDogConstants {
                 noSimilarNodes = false;
             }
 
-            // FIXME FIXME FIXME!!
 
             // Later control can be transferred to the App User code, to give them
 
@@ -506,14 +454,6 @@ public class Comparator implements XMLDogConstants {
                         Object ntObject;
 
                         boolean shouldBreak = false;
-
-                        /*
-                         *
-                         * if(((ntObject = nodeTracker.getElement(similarNode)) instanceof NodeResult) &&
-                         *
-                         * (!((NodeResult)ntObject).isMatch()))
-                         *
-                         */
 
                         if ((ntObject = nodeTracker.getElement(similarNode)) == null) {
 
@@ -912,17 +852,6 @@ public class Comparator implements XMLDogConstants {
 
         logger.info("Comparing Elements at Test " + xTest.getXPath() + " Control " + xControl.getXPath());
 
-        /*
-         *
-         * Element controlNode = (Element)control.cloneNode(true);
-         *
-         * Element testNode = (Element)test.cloneNode(true);
-         *
-         *
-         *
-         * String uniqueAttrName = (String)config.getUniqueAttributeMap().get(testNode.getTagName());
-         *
-         */
 
         String uniqueAttrName = config.getUniqueAttributeMap().get(test.getTagName());
 
@@ -930,49 +859,21 @@ public class Comparator implements XMLDogConstants {
 
         // based on the unique attribute
 
-        // if((uniqueAttrName != null) && (XMLUtil.nodesEqual(controlNode, testNode, isIgnoringWhitespace())))
+        if (uniqueAttrName != null 
+        		&& (XMLUtil.nodesEqual(control, test, isIgnoringWhitespace()))
+        		&& control.hasAttributes()
+        		&& test.hasAttributes()
+        		) {
 
-        if ((uniqueAttrName != null) && (XMLUtil.nodesEqual(control, test, isIgnoringWhitespace()))) {
+            String testAttrValue = test.getAttribute(uniqueAttrName);
 
-            /* Next block is identical except I am NOT USING CLONED NODE
-             *
-             * if((controlNode.hasAttributes()) && (testNode.hasAttributes()))
-             *
-             * {
-             *
-             *      String testAttrValue = testNode.getAttribute(uniqueAttrName);
-             *
-             *      String controlAttrValue = controlNode.getAttribute(uniqueAttrName);
-             *
-             *
-             *
-             *      if ((!testAttrValue.trim().equals("")) && (controlAttrValue.equals(testAttrValue)))
-             *
-             *      {
-             *
-             *              nodeResult.setUniqueAttrMatch(true);
-             *
-             *              return nodeResult;
-             *
-             *      }
-             *
-             * }
-             *
-             */
+            String controlAttrValue = control.getAttribute(uniqueAttrName);
 
-            if ((control.hasAttributes()) && (test.hasAttributes())) {
+            if ((!"".equals(testAttrValue.trim())) && (controlAttrValue.equals(testAttrValue))) {
 
-                String testAttrValue = test.getAttribute(uniqueAttrName);
+                nodeResult.setUniqueAttrMatch(true);
 
-                String controlAttrValue = control.getAttribute(uniqueAttrName);
-
-                if ((!"".equals(testAttrValue.trim())) && (controlAttrValue.equals(testAttrValue))) {
-
-                    nodeResult.setUniqueAttrMatch(true);
-
-                    return nodeResult;
-
-                }
+                return nodeResult;
 
             }
 
@@ -1017,17 +918,17 @@ public class Comparator implements XMLDogConstants {
 
         log("Comparing Attributes for test " + testNodeXPath + " control " + controlNodeXPath);
 
-        Element controlNode = (Element) control.cloneNode(true);
+        Element ctrlNode = (Element) control.cloneNode(true);
 
-        Element testNode = (Element) test.cloneNode(true);
+        Element tstNode = (Element) test.cloneNode(true);
 
         // Since the elementList contains elements with the same name, we only
 
         // need to get this once
 
-        List<String> excludedAttrs = config.getExcludedAttributesMap().get(testNode.getTagName());
+        List<String> excludedAttrs = config.getExcludedAttributesMap().get(tstNode.getTagName());
 
-        List<String> includedAttrs = config.getIncludedAttributesMap().get(testNode.getTagName());
+        List<String> includedAttrs = config.getIncludedAttributesMap().get(tstNode.getTagName());
 
         if ((includedAttrs == null) || (includedAttrs.isEmpty())) {
 
@@ -1039,9 +940,9 @@ public class Comparator implements XMLDogConstants {
             excludedEmpty = true;
         }
 
-        NamedNodeMap testAttrs = testNode.getAttributes();
+        NamedNodeMap testAttrs = tstNode.getAttributes();
 
-        NamedNodeMap controlAttrs = controlNode.getAttributes();
+        NamedNodeMap controlAttrs = ctrlNode.getAttributes();
 
         NamedNodeMap testAttrsForXPath = test.getAttributes();
 
@@ -1305,7 +1206,6 @@ public class Comparator implements XMLDogConstants {
     }
 
     /**
-     * FIXME FIXME FIXME!!
      *
      * <p/>Refactor above function to reduce the complexity and put compare attributes here
      *
@@ -1568,13 +1468,11 @@ public class Comparator implements XMLDogConstants {
                         log("CompareChildNodes: ++++++ Adding child differences from LIST NodeResult "
                                 + nodeResult.toString());
 
-                        NodeResult currentNR = null;
-
                         minDiffNR = (NodeResult) ((List) nodeResult).get(0);
 
                         for (int j = 1; j < ((List) nodeResult).size(); j++) {
 
-                            currentNR = (NodeResult) ((List) nodeResult).get(j);
+                        	NodeResult currentNR = (NodeResult) ((List) nodeResult).get(j);
 
                             // Gather all the Nodes with more Differences
 

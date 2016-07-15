@@ -190,7 +190,7 @@ public class TestXmlComparator {
 	
 	@Test(groups={"it"})
 	public void testXMLUtilreplaceElementText() throws SAXException, IOException{
-		List list = new ArrayList();
+		List<String> list = new ArrayList<>();
 		list.add("bleu");
 		XMLUtil.replaceElementText(comparePath, "correct", list, true);
 		Document doc = XMLUtil.getDocument(comparePath);

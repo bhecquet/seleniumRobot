@@ -36,7 +36,7 @@ public class DriverConfig {
     private boolean setAcceptUntrustedCertificates = true;
     private boolean enableJavascript = true;
     private WebDriver driver;
-    private BrowserType browser = BrowserType.FireFox;
+    private BrowserType browser = BrowserType.FIREFOX;
     private DriverMode mode = DriverMode.LOCAL;
     private String hubUrl;
     private String ffProfilePath;
@@ -67,7 +67,6 @@ public class DriverConfig {
     private TestType testType;
 
     // Use same platform property as the one used for browser
-    // private String platformName;
     private String appiumServerURL;
     private String mobilePlatformVersion;
     private String deviceName;

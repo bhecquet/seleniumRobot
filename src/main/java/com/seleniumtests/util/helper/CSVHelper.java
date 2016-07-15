@@ -44,6 +44,8 @@ public class CSVHelper {
     public static final String DELIM_CHAR = ",";
     public static final String TAB_CHAR = "	";
 
+    private CSVHelper() {}
+    
     /**
      * Reads data from csv formatted file. Keep csv file in the same folder as the test case class and specify class as
      * <code>this.getClass()</code>.
@@ -93,9 +95,9 @@ public class CSVHelper {
             // Get the sheet
             String[][] csvData = read(is, delimiter);
 
-            List<Object[]> sheetData = new ArrayList<Object[]>();
+            List<Object[]> sheetData = new ArrayList<>();
             if (readHeaders) {
-                List<Object> rowData = new ArrayList<Object>();
+                List<Object> rowData = new ArrayList<>();
                 for (int j = 0; j < csvData[0].length; j++) {
                     rowData.add(csvData[0][j]);
                 }
@@ -128,8 +130,8 @@ public class CSVHelper {
             // The first row is the header data
             for (int i = 1; i < csvData.length; i++) {
 
-                Map<String, Object> rowDataMap = new HashMap<String, Object>();
-                List<Object> rowData = new ArrayList<Object>();
+                Map<String, Object> rowDataMap = new HashMap<>();
+                List<Object> rowData = new ArrayList<>();
 
                 // Create the mapping between headers and column data
                 for (int j = 0; j < csvData[i].length; j++) {
@@ -185,8 +187,7 @@ public class CSVHelper {
      *
      * @return
      */
-    public static ArrayList<String> getHeaderFromCSVFile(final Class<?> clazz, final String filename,
-            String delimiter) {
+    public static List<String> getHeaderFromCSVFile(final Class<?> clazz, final String filename, String delimiter) {
         if (delimiter == null) {
             delimiter = ",";
         }
@@ -200,13 +201,13 @@ public class CSVHelper {
             }
 
             if (is == null) {
-                return null;
+                return new ArrayList<>();
             }
 
             // Get the sheet
             String[][] csvData = read(is, delimiter);
 
-            ArrayList<String> rowData = new ArrayList<String>();
+            ArrayList<String> rowData = new ArrayList<>();
 
             for (int j = 0; j < csvData[0].length; j++) {
                 rowData.add(csvData[0][j]);
@@ -237,10 +238,10 @@ public class CSVHelper {
      */
     public static String[] parseLine(final String line, final String delim) {
         if (line == null || line.trim().length() == 0) {
-            return null;
+            return new String[] {};
         }
 
-        List<String> tokenList = new ArrayList<String>();
+        List<String> tokenList = new ArrayList<>();
         String[] result = null;
 
         String[] tokens = line.split(delim);
@@ -307,7 +308,7 @@ public class CSVHelper {
     public static String[][] read(final InputStream is, final String delim) throws IOException {
 
         String[][] result = null;
-        List<String[]> list = new ArrayList<String[]>();
+        List<String[]> list = new ArrayList<>();
         String inputLine;
 
         BufferedReader reader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
@@ -323,12 +324,14 @@ public class CSVHelper {
                 if (item != null) {
                     list.add(item);
                 }
-            } catch (Exception e) { }
+            } catch (Exception e) {
+            	// ignore
+            }
         }
 
         reader.close();
 
-        if (list.size() > 0) {
+        if (!list.isEmpty()) {
             result = new String[list.size()][];
             list.toArray(result);
         }

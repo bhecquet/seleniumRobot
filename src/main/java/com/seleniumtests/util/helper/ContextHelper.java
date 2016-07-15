@@ -15,6 +15,8 @@ package com.seleniumtests.util.helper;
 
 public class ContextHelper {
 
+	private static final Helper HELPER = new Helper();
+	
 	private ContextHelper() {
 		// As a utility class, it is not meant to be instantiated.
 	}
@@ -26,8 +28,6 @@ public class ContextHelper {
         }
     }
 
-    private static final Helper HELPER = new Helper();
-
     public static Class getCaller() {
         Class[] classContext = HELPER.getContext();
         return classContext[3];
@@ -36,9 +36,5 @@ public class ContextHelper {
     public static String getCallerMethod() {
         StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
         return stackTrace[3].getMethodName();
-    }
-
-    public static void main(final String[] st) {
-        System.out.println(getCallerMethod());
     }
 }

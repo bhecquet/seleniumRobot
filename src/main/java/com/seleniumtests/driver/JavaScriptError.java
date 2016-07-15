@@ -158,7 +158,7 @@ public class JavaScriptError {
     public static List<JavaScriptError> readErrors(final WebDriver driver) {
         final String script = "return window.JSErrorCollector_errors ? window.JSErrorCollector_errors.pump() : []";
         final List<Object> errors = (List<Object>) ((JavascriptExecutor) driver).executeScript(script);
-        final List<JavaScriptError> response = new ArrayList<JavaScriptError>();
+        final List<JavaScriptError> response = new ArrayList<>();
         for (final Object rawError : errors) {
             response.add(new JavaScriptError((Map<String, ? extends Object>) rawError));
         }

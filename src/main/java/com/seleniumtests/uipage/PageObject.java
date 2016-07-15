@@ -24,7 +24,6 @@ import java.util.TreeSet;
 import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Point;
-import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.UnsupportedCommandException;
 import org.openqa.selenium.WebDriverException;
@@ -60,7 +59,6 @@ import com.seleniumtests.util.helper.WaitHelper;
 public class PageObject extends BasePage implements IPage {
 
 	private static final Logger logger = TestLogging.getLogger(PageObject.class);
-    private static final int MAX_WAIT_TIME_FOR_REDIRECTION = 3;
     private boolean frameFlag = false;
     private HtmlElement pageIdentifierElement = null;
     private String popupWindowName = null;
@@ -160,11 +158,9 @@ public class PageObject extends BasePage implements IPage {
     }
 
     @Override
-    protected void assertCurrentPage(final boolean log) throws NotCurrentPageException {
+    protected void assertCurrentPage(final boolean log) {
 
-        if (pageIdentifierElement == null) { }
-        else if (this.isElementPresent(pageIdentifierElement.getBy())) { }
-        else {
+        if (pageIdentifierElement != null && !isElementPresent(pageIdentifierElement.getBy())) {
             try {
                 if (!SeleniumTestsContextManager.getThreadContext().getCaptureSnapshot()) {
                     new ScreenshotUtil(driver).capturePageSnapshotOnException();
@@ -229,7 +225,7 @@ public class PageObject extends BasePage implements IPage {
 
     }
 
-    
+    @Override
     public void capturePageSnapshot() {
         ScreenShot screenShot = new ScreenshotUtil(driver).captureWebPageSnapshot();
         this.title = screenShot.getTitle();
@@ -252,7 +248,7 @@ public class PageObject extends BasePage implements IPage {
      * 
      * @throws NotCurrentPageException
      */
-    public final void close() throws NotCurrentPageException { 
+    public final void close() { 
     	
         if (WebUIDriver.getWebDriver() == null) {
             return;
@@ -268,9 +264,11 @@ public class PageObject extends BasePage implements IPage {
         
         try {
             driver.close();
-        } catch (WebDriverException ignore) { }
+        } catch (WebDriverException ignore) { 
+        	logger.info("Error closing driver: " + ignore.getMessage());
+        }
 
-        if (WebUIDriver.getWebUIDriver().getMode().equalsIgnoreCase("LOCAL")) {
+        if ("LOCAL".equalsIgnoreCase(WebUIDriver.getWebUIDriver().getMode())) {
         	WaitHelper.waitForSeconds(2);
         }
 
@@ -304,6 +302,7 @@ public class PageObject extends BasePage implements IPage {
         captureSnapshot("after dropping");
     }
 
+    @Override
     public String getBodyText() {
         return bodyText;
     }
@@ -316,12 +315,12 @@ public class PageObject extends BasePage implements IPage {
         return driver.manage().getCookieNamed(name).getValue();
     }
 
-    public final int getElementCount(final HtmlElement element) throws CustomSeleniumTestsException {
+    public final int getElementCount(final HtmlElement element) {
         return driver.findElements(element.getBy()).size();
     }
 
     public String getEval(final String expression) {
-        CustomAssertion.assertTrue(false, "focus not implemented yet");
+        CustomAssertion.assertTrue(false, "focus not implemented yet for " + expression);
         return null;
     }
 
@@ -329,10 +328,12 @@ public class PageObject extends BasePage implements IPage {
         return htmlFilePath;
     }
 
+    @Override
     public String getHtmlSavedToPath() {
         return htmlSavedToPath;
     }
 
+    @Override
     public String getHtmlSource() {
         return htmlSource;
     }
@@ -346,6 +347,7 @@ public class PageObject extends BasePage implements IPage {
      *
      * @return  jsErrors in format "line number, errorLogger message, source name; "
      */
+    @Override
     public String getJSErrors() {
         if (WebUIDriver.getWebUIDriver().isAddJSErrorCollectorExtension()) {
             List<JavaScriptError> jsErrorList = JavaScriptError.readErrors(driver);
@@ -363,6 +365,7 @@ public class PageObject extends BasePage implements IPage {
         return null;
     }
 
+    @Override
     public String getLocation() {
         return driver.getCurrentUrl();
     }
@@ -375,6 +378,7 @@ public class PageObject extends BasePage implements IPage {
         return SeleniumTestsContextManager.getThreadContext().getWebSessionTimeout();
     }
 
+    @Override
     public String getTitle() {
         return driver.getTitle();
     }
@@ -407,6 +411,7 @@ public class PageObject extends BasePage implements IPage {
         return getCookieByName(name) != null;
     }
 
+    @Override
     public boolean isFrame() {
         return frameFlag;
     }
@@ -451,24 +456,14 @@ public class PageObject extends BasePage implements IPage {
         	logger.error(e);
             throw new CustomSeleniumTestsException(e);
         }
-
-        // switchToDefaultContent();
     }
 
     private void populateAndCapturePageSnapshot() {
         try {
             setTitle(driver.getTitle());
             htmlSource = driver.getPageSource();
-            try {
-                bodyText = driver.findElement(By.tagName("body")).getText();
-            } catch (StaleElementReferenceException ignore) {
-                logger.warn("StaleElementReferenceException got in populateAndCapturePageSnapshot");
-                bodyText = driver.findElement(By.tagName("body")).getText();
-            }
-
-        } catch (UnreachableBrowserException e) { // throw
-
-            // UnreachableBrowserException
+            bodyText = new HtmlElement("Body", By.tagName("body")).getText();
+        } catch (UnreachableBrowserException e) { 
             throw new WebDriverException(e);
         } catch (WebDriverException e) {
             throw e;
@@ -477,7 +472,7 @@ public class PageObject extends BasePage implements IPage {
         capturePageSnapshot();
     }
 
-    public final void refresh() throws NotCurrentPageException {
+    public final void refresh()  {
         TestLogging.logWebStep(null, "refresh", false);
         try {
             driver.navigate().refresh();
@@ -496,6 +491,7 @@ public class PageObject extends BasePage implements IPage {
         frameFlag = true;
     }
 
+    @Override
     public final void selectFrame(final By by) {
         TestLogging.logWebStep(null, "select frame, locator={\"" + by.toString() + "\"}", false);
         driver.switchTo().frame(driver.findElement(by));
@@ -508,10 +504,9 @@ public class PageObject extends BasePage implements IPage {
         frameFlag = true;
     }
 
-    public final void selectMainWindow() throws NotCurrentPageException {
+    public final void selectMainWindow() {
         TestLogging.logWebStep(null, "select window, locator={\"" + getPopupWindowName() + "\"}", false);
 
-        // selectWindow(getPopupWindowName());
         driver.switchTo().window((String) driver.getWindowHandles().toArray()[0]);
         WaitHelper.waitForSeconds(1);
 
@@ -519,16 +514,16 @@ public class PageObject extends BasePage implements IPage {
         assertCurrentPage(true);
     }
 
-    public final void selectWindow(final int index) throws NotCurrentPageException {
+    public final void selectWindow(final int index) {
         TestLogging.logWebStep(null, "select window, locator={\"" + index + "\"}", false);
         driver.switchTo().window((String) driver.getWindowHandles().toArray()[index]);
     }
     
-    public final String selectNewWindow() throws NotCurrentPageException {
+    public final String selectNewWindow() {
     	return selectNewWindow(6000);
     }
     
-    public final String selectNewWindow(int waitMs) throws NotCurrentPageException {
+    public final String selectNewWindow(int waitMs) {
         TestLogging.logWebStep(null, "select new window", false);
         
         // Keep the name of the current window handle before switching
@@ -542,7 +537,7 @@ public class PageObject extends BasePage implements IPage {
 
  		// wait for window to be displayed
  		long end = systemClock.laterBy(waitMs + 250L);
- 		Set<String> handles = new TreeSet<String>();
+ 		Set<String> handles = new TreeSet<>();
  		boolean found = false;
  		
  		while (systemClock.isNowBefore(end) && !found) {
@@ -554,27 +549,28 @@ public class PageObject extends BasePage implements IPage {
  				// we already know this handle
  				if (getCurrentHandles().contains(handle)) {
  					continue;
- 				} else {
- 					selectWindow(handle);
- 					
- 					// wait for a valid address
- 					String address = "";
- 					long endLoad = systemClock.laterBy(5000);
- 					while (address.equals("") && systemClock.isNowBefore(endLoad)) {
- 						address = driver.getCurrentUrl();
- 						continue;
- 					}
- 					
- 					// make window display in foreground
- 					try {
- 						Point windowPosition  = driver.manage().window().getPosition();
- 						Mouse mouse = new DesktopMouse();
- 						mouse.click(new DesktopScreenRegion(Math.max(0, windowPosition.x) + driver.manage().window().getSize().width / 2, Math.max(0, windowPosition.y) + 5, 2, 2).getCenter());
- 					} catch (Exception e) {}
- 					
- 					found = true;
- 					break;
- 				}
+ 				} 
+ 				
+				selectWindow(handle);
+				
+				// wait for a valid address
+				String address = "";
+				long endLoad = systemClock.laterBy(5000);
+				while (address.isEmpty() && systemClock.isNowBefore(endLoad)) {
+					address = driver.getCurrentUrl();
+				}
+				
+				// make window display in foreground
+				try {
+					Point windowPosition  = driver.manage().window().getPosition();
+					Mouse mouse = new DesktopMouse();
+					mouse.click(new DesktopScreenRegion(Math.max(0, windowPosition.x) + driver.manage().window().getSize().width / 2, Math.max(0, windowPosition.y) + 5, 2, 2).getCenter());
+				} catch (Exception e) {
+					logger.warn("error while giving focus to window");
+				}
+				
+				found = true;
+				break;
  			}
  			WaitHelper.waitForMilliSeconds(300);
  		}
@@ -602,7 +598,9 @@ public class PageObject extends BasePage implements IPage {
     public void switchToDefaultContent() {
         try {
             driver.switchTo().defaultContent();
-        } catch (UnhandledAlertException e) { }
+        } catch (UnhandledAlertException e) {
+        	logger.warn("Alert found, you should handle it");
+        }
     }
 
     private void waitForPageToLoad() {
@@ -613,7 +611,6 @@ public class PageObject extends BasePage implements IPage {
             populateAndCapturePageSnapshot();
         } catch (Exception ex) {
         	logger.error(ex);
-            // ex.printStackTrace();
             throw ex;
         }
     }

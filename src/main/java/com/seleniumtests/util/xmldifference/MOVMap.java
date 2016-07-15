@@ -26,7 +26,7 @@ import org.apache.log4j.Logger;
  * Class is useful when multiple Objects are put in to the Map with the same Key value. This implementation will save
  * Mutiple Object Values for the Key as a List, instead of overwriting the value (default behaviour of the Map).<br>
  * IMPORTANT!! Current implementation has a limitation where List type objects shouldnot be put in the MOVMap<br>
- * FIXME FIXME FIXME<br>
+ * <br>
  * Support for List type Object addition
  *
  * @author   Ritesht
@@ -84,13 +84,14 @@ public final class MOVMap extends HashMap<Object, Object> implements XMLDogConst
      *
      * @throws  IllegalArgumentException  If Null or List type Objects are passed
      */
+    @Override
     public Object put(final Object key, final Object value) {
         if ((value == null) || (value instanceof List) ) {
             throw new IllegalArgumentException("Null and List type Objects cannot be added to MOVMap");
         }
 
-        Object oldValue = null;
-        List valueList = null;
+        Object oldValue;
+        List valueList;
 
         if ((oldValue = get(key)) != null) {
             if (oldValue instanceof List) {
@@ -117,12 +118,12 @@ public final class MOVMap extends HashMap<Object, Object> implements XMLDogConst
      *
      * @param  t  the Map whose elements are to be copied
      */
+    @Override
     public void putAll(final Map t) {
         Iterator iterator = t.keySet().iterator();
-        Object key = null;
 
         while (iterator.hasNext()) {
-            key = iterator.next();
+        	Object key = iterator.next();
             put(key, t.get(key));
         }
     }
@@ -142,7 +143,6 @@ public final class MOVMap extends HashMap<Object, Object> implements XMLDogConst
     public static void log(final String msg, final Throwable t) {
         if (DEBUG) {
             log(msg);
-            t.printStackTrace(System.out);
         }
     }
 

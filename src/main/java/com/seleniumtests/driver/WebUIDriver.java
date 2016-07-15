@@ -16,7 +16,6 @@ package com.seleniumtests.driver;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -70,11 +69,11 @@ public class WebUIDriver {
         config.setMode(DriverMode.valueOf(mode));
 
         // TODO: use grid with appium ?
-        if (config.getMode() == DriverMode.ExistingGrid) {
+        if (config.getMode() == DriverMode.EXISTING_GRID) {
             webDriverBuilder = new RemoteDriverFactory(this.config);
-        } else if (config.getMode() == DriverMode.SauceLabs) {
+        } else if (config.getMode() == DriverMode.SAUCELABS) {
         	webDriverBuilder = new SauceLabsDriverFactory(this.config);
-        } else if (config.getMode() == DriverMode.TestDroid) {
+        } else if (config.getMode() == DriverMode.TESTDROID) {
         	webDriverBuilder = new TestDroidDriverFactory(this.config);
         	
         // local mode
@@ -82,15 +81,15 @@ public class WebUIDriver {
         	if (config.getTestType().isMobile()) {
         		webDriverBuilder = new AppiumDriverFactory(this.config);
         	} else {
-	            if (config.getBrowser() == BrowserType.FireFox) {
+	            if (config.getBrowser() == BrowserType.FIREFOX) {
 	                webDriverBuilder = new FirefoxDriverFactory(this.config);
-	            } else if (config.getBrowser() == BrowserType.InternetExplore) {
+	            } else if (config.getBrowser() == BrowserType.INTERNETEXPLORER) {
 	                webDriverBuilder = new IEDriverFactory(this.config);
-	            } else if (config.getBrowser() == BrowserType.Chrome) {
+	            } else if (config.getBrowser() == BrowserType.CHROME) {
 	                webDriverBuilder = new ChromeDriverFactory(this.config);
-	            } else if (config.getBrowser() == BrowserType.HtmlUnit) {
+	            } else if (config.getBrowser() == BrowserType.HTMLUNIT) {
 	                webDriverBuilder = new HtmlUnitDriverFactory(this.config);
-	            } else if (config.getBrowser() == BrowserType.Safari) {
+	            } else if (config.getBrowser() == BrowserType.SAFARI) {
 	                webDriverBuilder = new SafariDriverFactory(this.config);
 	            } else {
 	                throw new DriverExceptions("Unsupported browser: " + browser);
@@ -130,8 +129,6 @@ public class WebUIDriver {
                 } catch (WebDriverException ex) {
                     logger.error(ex);
                 }
-
-                driver = null;
             }
         }
 
@@ -205,14 +202,15 @@ public class WebUIDriver {
     }
 
     protected WebDriver handleListeners(WebDriver driver) {
+    	WebDriver listeningDriver = driver;
         List<WebDriverEventListener> listeners = config.getWebDriverListeners();
         if (listeners != null && !listeners.isEmpty()) {
             for (int i = 0; i < config.getWebDriverListeners().size(); i++) {
-                driver = new CustomEventFiringWebDriver(driver).register(listeners.get(i));
+            	listeningDriver = new CustomEventFiringWebDriver(listeningDriver).register(listeners.get(i));
             }
         }
 
-        return driver;
+        return listeningDriver;
     }
 
     public WebDriver createWebDriver() throws IOException  {

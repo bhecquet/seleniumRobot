@@ -16,7 +16,6 @@ package com.seleniumtests.reporter;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -31,7 +30,6 @@ import org.apache.log4j.Logger;
 import org.openqa.selenium.WebDriverException;
 
 import com.seleniumtests.core.SeleniumTestsPageListener;
-import com.seleniumtests.reporter.TestLogging;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.reporter.pluginmodel.Method;
 import com.seleniumtests.reporter.pluginmodel.Page;
@@ -138,10 +136,8 @@ public class PluginsHelper {
     public void loadPlugins(final File path) {
         logger.info("Loading Selenium Tests Plugins from path: " + path + " ...");
 
-        InputStream is = null;
-        try {
-            is = new FileInputStream(path);
-
+        try (InputStream is = new FileInputStream(path)){
+    
             JAXBContext jc = JAXBContext.newInstance("com.seleniumtests.reporter.pluginmodel");
             Unmarshaller u = jc.createUnmarshaller();
             seleniumTestsPlugins = (SeleniumTestsPlugins) u.unmarshal(is);
@@ -157,14 +153,6 @@ public class PluginsHelper {
 
         } catch (Exception e) {
             throw new ConfigurationException(e.getMessage());
-        } finally {
-            if (is != null) {
-                try {
-                    is.close();
-                } catch (IOException e) {
-                    logger.error(e.getMessage());
-                }
-            }
         }
     }
 }

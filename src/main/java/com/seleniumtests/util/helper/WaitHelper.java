@@ -15,10 +15,8 @@
 package com.seleniumtests.util.helper;
 
 public class WaitHelper {
-
-	public WaitHelper() {
-		// As a utility class, it is not meant to be instantiated.
-	}
+	
+	private WaitHelper() {}
 	
     /**
      * Wait For seconds.
@@ -28,12 +26,16 @@ public class WaitHelper {
     public static void waitForSeconds(final int seconds) {
         try {
             Thread.sleep(seconds * 1000L);
-        } catch (InterruptedException ignore) { }
+        } catch (InterruptedException ignore) {
+        	// ignore
+        }
     }
     
     public static void waitForMilliSeconds(final int ms) {
     	try {
     		Thread.sleep(ms);
-    	} catch (InterruptedException ignore) { }
+    	} catch (InterruptedException ignore) {
+    		// ignore
+    	}
     }
 }

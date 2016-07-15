@@ -41,10 +41,50 @@ public class RemoteDriverFactory extends AbstractWebDriverFactory implements IWe
         super(cfg);
     }
 
+    /**
+     * Create a capability depending on the browser type.
+     * @param webDriverConfig
+     * @return the capability for a given browser
+     */
+    public DesiredCapabilities createCapabilityByBrowser(DriverConfig webDriverConfig){
+    	DesiredCapabilities capability = null;
+    	
+    	switch (webDriverConfig.getBrowser()) {
+
+	        case FIREFOX :
+	            capability = new FirefoxCapabilitiesFactory().createCapabilities(webDriverConfig);
+	            break;
+	
+	        case INTERNETEXPLORER :
+	            capability = new IECapabilitiesFactory().createCapabilities(webDriverConfig);
+	            break;
+	
+	        case CHROME :
+	            capability = new ChromeCapabilitiesFactory().createCapabilities(webDriverConfig);
+	            break;
+	
+	        case HTMLUNIT :
+	            capability = new HtmlUnitCapabilitiesFactory().createCapabilities(webDriverConfig);
+	            break;
+	
+	        case SAFARI :
+	            capability = new SafariCapabilitiesFactory().createCapabilities(webDriverConfig);
+	            break;
+	
+	        case PHANTOMJS :
+	            capability = new PhantomJSCapabilitiesFactory().createCapabilities(webDriverConfig);
+	            break;
+	
+	        default :
+	            break;
+	    }
+    	
+    	return capability;
+    }
+    
     @Override
     public WebDriver createWebDriver() {
         DriverConfig webDriverConfig = this.getWebDriverConfig();
-        DesiredCapabilities capability = null;
         URL url;
 
         try {
@@ -53,37 +93,9 @@ public class RemoteDriverFactory extends AbstractWebDriverFactory implements IWe
 			throw new ConfigurationException(String.format("Hub url '%s' is invalid: %s", webDriverConfig.getHubUrl(), e1.getMessage()));
 		}
 
-        switch (webDriverConfig.getBrowser()) {
+        DesiredCapabilities capability = createCapabilityByBrowser(webDriverConfig);
 
-            case FireFox :
-                capability = new FirefoxCapabilitiesFactory().createCapabilities(webDriverConfig);
-                break;
-
-            case InternetExplore :
-                capability = new IECapabilitiesFactory().createCapabilities(webDriverConfig);
-                break;
-
-            case Chrome :
-                capability = new ChromeCapabilitiesFactory().createCapabilities(webDriverConfig);
-                break;
-
-            case HtmlUnit :
-                capability = new HtmlUnitCapabilitiesFactory().createCapabilities(webDriverConfig);
-                break;
-
-            case Safari :
-                capability = new SafariCapabilitiesFactory().createCapabilities(webDriverConfig);
-                break;
-
-            case PhantomJS :
-                capability = new PhantomJSCapabilitiesFactory().createCapabilities(webDriverConfig);
-                break;
-
-            default :
-                break;
-        }
-
-        if ((BrowserType.FireFox).equals(webDriverConfig.getBrowser())) {
+        if ((BrowserType.FIREFOX).equals(webDriverConfig.getBrowser())) {
             driver = getDriverFirefox(url, capability);
         } else {
             driver = new ScreenShotRemoteWebDriver(url, capability);
@@ -155,21 +167,21 @@ public class RemoteDriverFactory extends AbstractWebDriverFactory implements IWe
     protected void setPageLoadTimeout(final long timeout, final BrowserType type) {
         switch (type) {
 
-            case Chrome :
-                try {
-                    driver.manage().timeouts().pageLoadTimeout(timeout, TimeUnit.SECONDS);
-                } catch (UnsupportedCommandException e) {
-                	logger.error(e);
-                }
-
-                break;
-
-            case FireFox :
-            case InternetExplore :
-                driver.manage().timeouts().pageLoadTimeout(timeout, TimeUnit.SECONDS);
+            case CHROME :
+            case FIREFOX :
+            case INTERNETEXPLORER :
+            	setPageLoadTimeoutCommonBrowser(timeout);
                 break;
 
             default :
+        }
+    }
+    
+    protected void setPageLoadTimeoutCommonBrowser(final long timeout) {
+        try {
+            driver.manage().timeouts().pageLoadTimeout(timeout, TimeUnit.SECONDS);
+        } catch (UnsupportedCommandException e) {
+        	logger.error(e);
         }
     }
 

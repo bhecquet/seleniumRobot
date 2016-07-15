@@ -28,6 +28,8 @@ import com.seleniumtests.customexception.ConfigurationException;
 
 public class IniHelper {
 
+	private IniHelper() {
+	}
 	/**
 	 * @author Sophie
 	 * @param fileToRead
@@ -47,12 +49,10 @@ public class IniHelper {
 			ini.setConfig(conf);
 			ini.load(fileToRead);
 			Set<Ini.Entry<String, Ini.Section>> sections = ini.entrySet();
-			HashMap<String, String> inter = new HashMap<String, String>();
-			String actualSection = "";
 
 			for (Ini.Entry<String, Ini.Section> section : sections) {
-				inter = new HashMap<String, String>(); // recreate inter
-				actualSection = section.getKey();
+				HashMap<String, String> inter = new HashMap<>(); 
+				String actualSection = section.getKey();
 				if (hashMapToComplete.containsKey(actualSection)) {
 					inter.putAll(hashMapToComplete.get(actualSection)); // recup datas already read
 				}

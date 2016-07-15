@@ -36,7 +36,7 @@ public class TestInterceptePage {
 	
 	@BeforeClass(groups={"it"})
 	public void initDriver(final ITestContext testNGCtx, final XmlTest xmlTest) throws Exception {
-		SeleniumTestsContextManager.initThreadContext(testNGCtx, xmlTest);
+		SeleniumTestsContextManager.initThreadContext(testNGCtx);
 		testPage = new DriverTestPage(true);
 		driver = WebUIDriver.getWebDriver(true);
 	}
