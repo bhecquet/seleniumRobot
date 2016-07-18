@@ -37,6 +37,7 @@ import com.seleniumtests.browserfactory.TestDroidDriverFactory;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.DriverExceptions;
 import com.seleniumtests.reporter.TestLogging;
+import com.seleniumtests.util.OSUtility;
 import com.seleniumtests.util.helper.WaitHelper;
 
 /**
@@ -180,6 +181,9 @@ public class WebUIDriver {
      */
     public static WebUIDriver getWebUIDriver() {
         if (uxDriverSession.get() == null) {
+        	if (!SeleniumTestsContextManager.getThreadContext().getDevMode()){
+        		cleanWebDrivers();
+        	}
             uxDriverSession.set(new WebUIDriver());
         }
 
@@ -187,6 +191,15 @@ public class WebUIDriver {
     }
 
     /**
+     * Close all the opened web browser processes. Not called in development mode.
+     */
+    private static void cleanWebDrivers() {
+    	logger.info("Dev. mode : " + SeleniumTestsContextManager.getThreadContext().getDevMode()
+    					+" , web browser running processes will terminate ! ");
+		OSUtility.killWebBrowserProcesses(false); //true to force the kill
+	}
+
+	/**
      * Lets user set their own driver This can be retrieved as WebUIDriver.getWebDriver().
      *
      * @param  driver

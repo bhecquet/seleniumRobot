@@ -23,6 +23,7 @@ import org.openqa.selenium.ie.InternetExplorerDriver;
 import com.seleniumtests.customexception.DriverExceptions;
 import com.seleniumtests.driver.DriverConfig;
 import com.seleniumtests.util.OSUtility;
+import com.seleniumtests.util.OSUtilityWindows;
 
 public class IEDriverFactory extends AbstractWebDriverFactory implements IWebDriverFactory {
 	
@@ -50,23 +51,12 @@ public class IEDriverFactory extends AbstractWebDriverFactory implements IWebDri
     @Override
     public WebDriver createWebDriver() throws IOException {
 
-        // killProcess();
+    	//OSUtilityWindows.killIEProcess(true);
         if (!OSUtility.isWindows()) {
             throw new DriverExceptions("IE is only supported on windows");
         }
 
         return super.createWebDriver();
-    }
-
-    private void killProcess() {
-        if (OSUtility.isWindows()) {
-            try {
-                Runtime.getRuntime().exec("taskkill /F /IM IEDriverServer.exe");
-                Runtime.getRuntime().exec("taskkill /F /IM Iexplore.exe");
-            } catch (IOException e) {
-            	logger.error(e);
-            }
-        }
     }
 
 }

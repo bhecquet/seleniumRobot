@@ -71,6 +71,7 @@ public class SeleniumTestsContext {
     public static final String PAGE_LOAD_TIME_OUT = "pageLoadTimeout";			// temps d'attente de chargement d'une page
     public static final String WEB_DRIVER_GRID = "webDriverGrid";				// adresse du serveur seleniumGrid
     public static final String RUN_MODE = "runMode";							// local ou grid. Pourrait également contenir sauceLabs / testDroid
+    public static final String DEV_MODE = "devMode";							// The development mode allow all existing browsers to remain. It is set to "false" by default, which means it closes all existing browsers.
     public static final String BROWSER = "browser";								// navigateur utilisé. Sur Android, le navigateur par défaut est "Browser"
     public static final String BROWSER_VERSION = "browserVersion";				// version de navigateur utilisé
     public static final String FIREFOX_USER_PROFILE_PATH = "firefoxUserProfilePath";	// profile utilisateur firefox
@@ -167,6 +168,7 @@ public class SeleniumTestsContext {
         setPageLoadTimeout(getIntValueForTest(PAGE_LOAD_TIME_OUT, System.getProperty(PAGE_LOAD_TIME_OUT)));
         setWebDriverGrid(getValueForTest(WEB_DRIVER_GRID, System.getProperty(WEB_DRIVER_GRID)));
         setRunMode(getValueForTest(RUN_MODE, System.getProperty(RUN_MODE)));
+        setDevMode(getBoolValueForTest(DEV_MODE, System.getProperty(DEV_MODE)));
         setBrowser(getValueForTest(BROWSER, System.getProperty(BROWSER)));
         setBrowserVersion(getValueForTest(BROWSER_VERSION, System.getProperty(BROWSER_VERSION)));
         setFirefoxUserProfilePath(getValueForTest(FIREFOX_USER_PROFILE_PATH, System.getProperty(FIREFOX_USER_PROFILE_PATH)));
@@ -682,6 +684,10 @@ public class SeleniumTestsContext {
         return (String) getAttribute(RUN_MODE);
     }
     
+    public Boolean getDevMode() {
+        return (Boolean) getAttribute(DEV_MODE);
+    }
+    
     @SuppressWarnings("unchecked")
 	public Map<String, String> getDeviceList() {
     	HashMap<String, String> deviceList = new HashMap<>();
@@ -962,6 +968,14 @@ public class SeleniumTestsContext {
     	String _runMode = runMode == null ? "LOCAL": runMode;
     	DriverMode.fromString(_runMode);
         setAttribute(RUN_MODE, _runMode);
+	}
+    
+    public void setDevMode(Boolean devMode) {
+    	if (devMode != null) {
+    		setAttribute(DEV_MODE, devMode);
+    	} else {
+    		setAttribute(DEV_MODE, false);
+    	}
     }
 
     public void setBrowser(String browser) {
