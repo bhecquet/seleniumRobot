@@ -20,78 +20,201 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+
+import com.seleniumtests.reporter.TestLogging;
+
 public class OSUtility {
 	
-	private OSUtility() {}
-
+	private static final Logger logger = TestLogging.getLogger(OSUtility.class);
+	
+	/**
+	 * 
+	 */
+	static String[] webBrowserProcessList = 
+		{ 
+		 //Android browser, 
+		 "chrome", "chromedriver", 
+		 "firefox", 
+		 //htmlunit, 
+		 "iexplore", //"IEDriverServer",
+		 //marionette,
+		 //opera, 
+		 //phntomjs, 
+		 //safari, 
+		 };
+	
+	/**
+	 * @return the name of the Operating System
+	 */
     public static String getOSName() {
         return System.getProperty("os.name");
     }
 
+    /**
+     * @return true if the OS is Windows
+     */
+    public static boolean isWindows() {
+        return getOSName().startsWith("Win");
+    }
+    
+    /**
+     * @return true if the Operating System is MAC OS X
+     */
     public static boolean isMac() {
         return getOSName().startsWith("Mac");
     }
 
-    public static boolean isWindows() {
-        return getOSName().startsWith("Win");
-    }
-
-    public static String getOSBits() {
+    /**
+     * @return operating system JVM architecture
+     */
+    public static String getArchitecture() {
         return System.getProperty("os.arch");
     }
-
-    public static boolean is32() {
-        return "x86".equals(getOSBits());
+    
+    /**
+     * 
+     * @return the quantity of bits of the processor
+     */
+    public static String getOSBits() {
+        return System.getProperty("sun.arch.data.model");
     }
-
-    public static boolean is64() {
-        if (isWindows()) {
-            return System.getenv("ProgramW6432") != null;
-        } else {
-            return !"x86".equals(getOSBits());
-        }
-    }
-
-    private static List<String> executeCommand(final String cmd) {
-        List<String> output = new ArrayList<>();
-        Process p;
+    
+    /**
+     * Execute a command in command line terminal
+     * @param cmd
+     * @param wait for the end of the command execution
+     * @return 
+     */
+    protected static List<String> executeCommand(final String cmd) {
+        List<String> output = new ArrayList<String>();
+        Process proc;
         try {
-            p = Runtime.getRuntime().exec(cmd);
-        } catch (IOException e1) {
-            return output;
-        }
-
-        BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()), 8 * 1024);
-        String s = null;
-        try {
+			proc = Runtime.getRuntime().exec(cmd);
+			
+	        BufferedReader stdInput = new BufferedReader(new 
+	    	     InputStreamReader(proc.getInputStream()));
+	
+	    	BufferedReader stdError = new BufferedReader(new 
+	    	     InputStreamReader(proc.getErrorStream()));
+	        
+	        String s = null;
+	        
+        	// read result output from command
             while ((s = stdInput.readLine()) != null) {
                 output.add(s);
             }
-        } catch (IOException e) {
-            return output;
+            // read error output from command
+            while ((s = stdError.readLine()) != null) {
+                output.add(s);
+            }
+        } catch (IOException e1) {
+        	logger.error(e1);
         }
-
+        
         return output;
     }
 
-    public static int getIEVersion() {
-        List<String> output;
-        output = executeCommand("reg query \"HKLM\\Software\\Microsoft\\Internet Explorer\" /v svcVersion");
-        if (output.size() < 3) {
-            output = executeCommand("reg query \"HKLM\\Software\\Microsoft\\Internet Explorer\" /v Version");
-        }
-
-        String internetExplorerVersion = output.get(2);
-        String version = internetExplorerVersion.trim().split("   ")[2];
-        version = version.trim().split("\\.")[0];
-        return Integer.parseInt(version);
+    /**
+     * Ask system to terminate all the known web browser processes.
+     * @param force
+     */
+    public static void killWebBrowserProcesses(boolean force){
+    	
+    	int stopWhile=0;
+    	int maxCount=15;
+    	//TODO: set this to false after test phase
+    	while (isWebBrowserRunning(true) && stopWhile<maxCount) {
+    		stopWhile++;
+    		for (String process : webBrowserProcessList) {
+    			if (isProcessRunning(process)){
+			    	try {
+			    		if (isWindows()) {
+			    			OSUtilityWindows.killProcess(process, force);
+			    		} else {
+			    			OSUtilityUnix.killProcess(process, false);
+			    		}
+		    			logger.info("demanded " + process + " process to terminate");
+					} catch (IOException e) {
+						logger.error(e);
+					}
+    			}
+    		}
+    	} // end while
+    	if (stopWhile >= maxCount) {
+    		logger.info("could not stop every running process.");
+    	}
     }
-
-    public static String getSlash() {
-        if (isWindows()) {
-            return "\\";
-        } else {
-            return "/";
-        }
+    
+    /**
+     * @param showAll running process found
+     * @return true if one of the running process is a known web browser.
+     */
+    public static boolean isWebBrowserRunning(boolean showAll) {
+    	
+    	List<String> processList;
+    	if (isWindows()) {
+    		processList = OSUtilityWindows.getRunningProcessList();
+    	} else {
+    		processList = OSUtilityUnix.getRunningProcessList();
+    	}	
+    	boolean isRunning = false;
+    	for (String line : processList) {
+    		for (String process : webBrowserProcessList){
+	    		if (line.toLowerCase().startsWith(process)){
+					isRunning = true;
+					if (!showAll) break;
+					logger.info("process is still running : " + line);
+	    		}
+    		}
+    	}
+    	return isRunning;
     }
+    
+    /**
+     * @return the list of the running known web browser processes.
+     */
+    public static List<String> whichWebBrowserRunning() {
+    	
+    	List<String> processList;
+    	if (isWindows()) {
+    		processList = OSUtilityWindows.getRunningProcessList();
+    	} else {
+    		processList = OSUtilityUnix.getRunningProcessList();
+    	}
+    	
+    	List<String> webBrowserRunningList = new ArrayList<>();
+    	for (String line : processList) {
+    		for (String process : webBrowserProcessList){
+	    		if (line.toLowerCase().contains(process)){
+	    			webBrowserRunningList.add(line);
+	    		}
+    		}
+    	}
+    	return webBrowserRunningList;
+    }
+    
+    /**
+     * @param key : process name
+     * @return true if the key is found in the running process list.
+     */
+    public static boolean isProcessRunning(String key) {
+    	
+    	List<String> processList;
+    	if (isWindows()) {
+    		processList = OSUtilityWindows.getRunningProcessList();
+    	} else {
+    		processList = OSUtilityUnix.getRunningProcessList();
+    	}
+    	
+    	boolean isRunning = false;
+    	for (String line : processList) {
+    		if (StringUtility.existsAlone(key, line)){
+				isRunning = true;
+				break;
+    		}
+    	}
+    	return isRunning;
+    }
+    
 }

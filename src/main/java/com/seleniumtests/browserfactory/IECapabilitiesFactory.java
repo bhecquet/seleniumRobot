@@ -29,7 +29,7 @@ import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.driver.DriverConfig;
 import com.seleniumtests.driver.DriverMode;
 import com.seleniumtests.util.FileUtility;
-import com.seleniumtests.util.OSUtility;
+import com.seleniumtests.util.OSUtilityWindows;
 
 public class IECapabilitiesFactory extends ICapabilitiesFactory {
     
@@ -42,7 +42,7 @@ public class IECapabilitiesFactory extends ICapabilitiesFactory {
         String iEDriverServerFile = "\\IEDriverServer.exe";
         
         if (!new File(dir + iEDriverServerFile).exists()) {
-            if (OSUtility.getIEVersion() < 10) {
+            if (OSUtilityWindows.getIEVersion() < 10) {
                 FileUtils.copyFile(new File(dir + "\\IEDriverServer_x64.exe"), new File(dir + iEDriverServerFile));
             } else {
             	FileUtils.copyFile(new File(dir + "\\IEDriverServer_Win32.exe"), new File(dir + iEDriverServerFile)); // Win32

@@ -18,6 +18,7 @@ import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Method;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 
@@ -91,5 +92,181 @@ public class StringUtility {
         }
 
         return builder.toString();
+    }
+    
+    /**
+     * Checks if the input String is Whitespace only.
+     */
+    public static boolean isWhitespaceStr(String str) {
+
+        if (str == null) {
+            return false;
+        }
+
+        str = str.trim();
+
+        for (int i = 0; i < str.length(); i++) {
+
+            if (!Character.isWhitespace(str.charAt(i))) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Gets Platform independent line separator (new line character(s).
+     */
+    public static String getNewlineStr() {
+
+        return System.getProperty("line.separator");
+    }
+    
+    /**
+     * Gather String of a list, and separate them with a backspace
+     * @param stringList
+     * @return String
+     */
+    public static String fromListToString(List<String> stringList) {
+    	StringBuilder sb = new StringBuilder();
+    	for (String line : stringList) {
+    		sb.append(line + "\n");
+    	}
+    	return sb.toString();
+    }
+    
+    /**
+	 * @param key
+	 * @param line
+	 * @return true if the key is found with no prefix and no suffix in the given line.
+	 */
+	public static boolean existsAlone(String key, String line){
+		
+		int startIndex = findStart(key, line); 
+		
+		if (line.contains(key)) {
+			// word exists
+			if (startIndex == 0 || !isLetter(line.charAt(startIndex-1))) {
+				// no prefix
+				if (startIndex + key.length() == line.length()
+					|| !isLetter(line.charAt(startIndex+key.length()))) {
+					// no suffix
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+	
+	/**
+	 * @param line : String
+	 * @param key : String to find in the given "line".
+	 * @return the index where the key starts in the given line. 0 if not.
+	 */
+	public static int findStart(String key, String line) {
+		
+		if (line==null || key==null) 
+    		return 0;
+		if (!line.contains(key)) 
+    		return 0;
+		    	
+    	int j=0;
+    	char cLine;
+		char cKey;
+		int l;
+		
+		for (int i=0; i<line.length(); i++) {
+			cLine = line.charAt(i);
+			cKey = key.charAt(j);
+    		if (cLine == cKey){
+    			l = 0;
+    			while (cLine == cKey && key.length()-1>j) {
+    				i++;
+    				j++;
+    				l++;
+    				cLine = line.charAt(i);
+    				cKey = key.charAt(j);
+    			}
+    			if (l == key.length()-1) {
+    				// the key has been found in the line.
+    				return i-(key.length()-1);
+    			}
+    			j = 0;
+    		} // end of if key is maybe found.
+		}
+		return 0;
+	}
+	
+	/**
+	 * @param ch
+	 * @return true if the given character is a letter
+	 */
+	public static boolean isLetter(char ch) {
+		int ascii = (int) ch;
+		/*
+		 * A=65 ; Z=90
+		 * a=97 ; z=122
+		 */
+		if ((ascii >= 65 && ascii <= 90)
+			|| (ascii >= 97 && ascii <= 122)) {
+			return true;
+		}
+		return false;
+	}
+	
+	/**
+     * Shows where two strings are different
+     * @param a
+     * @param b
+     * @return true if strings are almost* the same
+     * *almost, because the back line character can differ from ascii 10 to 13. 
+     */
+    public static boolean compareStrings(String a, String b, boolean shows){
+    	if (a==null || b==null) 
+    		return false;
+    	int lengthA = a.length();
+    	int lengthB = b.length();
+    	if (lengthA != lengthB) {
+    		if (shows)
+    			System.out.println("String A has " + lengthA + " characters, whereas String B has " + lengthB);
+    	}
+    	
+    	int j=0;
+    	char chA;
+		char chB;
+		int asciiA;
+		int asciiB;
+		
+    	for (int i=0; i<lengthA; i++) {
+    		chA = a.charAt(i);
+    		chB = b.charAt(j);
+    		if (chA == chB){
+    			if (shows) {System.out.println("i:"+i+";j:"+j+" ; a:" + chA + " = b:" + chB);}
+    		}
+    		else {
+    			asciiA = (int) chA;
+    			asciiB = (int) chB;
+    			if (shows) {
+    				System.out.println("i:"+i+";j:"+j+" ; a:" + chA + " (ascii " + asciiA + ") "
+    										+ "!= b:" + chB + " (ascii " + asciiB + ")");
+    			}
+    			if ((asciiA == 10 || asciiA == 13) && (asciiB == 10 || asciiB == 13)) {
+    				if (shows) {System.out.println("i:"+i+";j:"+j+" (different back to line char) ");}
+    				
+    	    		asciiA = (int) a.charAt(i+1);
+    				if (asciiA == 10 || asciiA == 13) i++;
+    				
+    				asciiB = (int) b.charAt(j+1);
+    				if (asciiB == 10 || asciiB == 13) j++;
+    				
+    			} else {
+    				return false;
+    			}
+    		}
+    		j++;
+    	}
+    	if (shows)
+			System.out.println("=> the strings are the same.");
+    	return true;
     }
 }
