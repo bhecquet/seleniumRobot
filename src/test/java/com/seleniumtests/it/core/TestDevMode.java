@@ -11,25 +11,22 @@
  * limitations under the License.
  */
 
-package com.seleniumtests.it.driver;
+package com.seleniumtests.it.core;
 
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.interactions.Actions;
 import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.annotations.BeforeClass;
-import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.driver.WebUIDriver;
+import com.seleniumtests.it.driver.DriverTestPage;
 import com.seleniumtests.reporter.TestLogging;
 import com.seleniumtests.util.OSUtility;
-import com.seleniumtests.util.StringUtility;
 
 public class TestDevMode {
 
@@ -41,28 +38,12 @@ public class TestDevMode {
 	@BeforeClass(groups={"it"})
 	public void initContext(final ITestContext testNGCtx) throws Exception {
 		SeleniumTestsContextManager.initThreadContext(testNGCtx);
-		SeleniumTestsContextManager.getThreadContext().setBrowser("chrome");
-		SeleniumTestsContextManager.getThreadContext().setExplicitWaitTimeout(2);
-	}
-
-	/**
-	 * Test if the dev mode answers to the given JVM option.
-	 */
-	@Test(groups={"it"})
-	public void testDevMode() {
-		
-		boolean devMode = SeleniumTestsContextManager.getThreadContext().getDevMode();
-		logger.info("Test, dev mode = " + devMode);
-		
-		launchPageTest();
-		
-		if (OSUtility.isWebBrowserRunning(true) && !devMode) {
-			Assert.fail("Except in development mode, all web browser processes should be over.");
-		}
+		SeleniumTestsContextManager.getThreadContext().setBrowser("firefox");
 	}
 	
 	/**
 	 * Forces devMode to false, and check if it closes all the browsers.
+	 * test disabled to avoid annoying developper
 	 */
 	@Test(groups={"it"}, enabled = false)
 	public void testDevModeFalse() {
@@ -82,27 +63,21 @@ public class TestDevMode {
 	 * NOTE : if those got closed in previous tests, this one becomes useless...
 	 */
 	@Test(groups={"it"})
-	public void testDevModeTrue() {
-		
-		logger.info("Test, dev mode = " + true);
+	public void testDevModeTrue() {	
 		SeleniumTestsContextManager.getThreadContext().setDevMode(true);
-		
 		List<String> webBrowserRunningListBefore = OSUtility.whichWebBrowserRunning();
 		
 		launchPageTest();
 		
 		List<String> webBrowserRunningListAfter = OSUtility.whichWebBrowserRunning();
-		
-		logger.info("webBrowserRunningListBefore : \n" + StringUtility.fromListToString(webBrowserRunningListBefore) );
-		logger.info("webBrowserRunningListAfter : \n" + StringUtility.fromListToString(webBrowserRunningListAfter));
-		
+
 		Assert.assertEquals(webBrowserRunningListBefore.size(), webBrowserRunningListAfter.size());
 	}
 	
 	/**
 	 * launch one basic Selenium test
 	 */
-	public void launchPageTest(){
+	private void launchPageTest(){
 		try {
 			driver = WebUIDriver.getWebDriver(true);
 			testHomePage = new DriverTestPage(true);
