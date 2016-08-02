@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 www.seleniumtests.com
+ * Copyright 2016 www.infotel.com
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,7 +14,7 @@
 package com.seleniumtests.util;
 
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class OSUtilityUnix extends OSUtility {
@@ -23,12 +23,9 @@ public class OSUtilityUnix extends OSUtility {
      * Ask console for every running process.
      * @return list of output command lines
      */
-    public static List<String> getRunningProcessList(){
-    	List<String> processList = new ArrayList<>();
-    	String command;
-    	command = "ps -e";
-	    processList = executeCommand(command);
-    	return processList;
+    public static List<String> getURunningProcessList(){
+    	String command = "ps -e";
+	    return Arrays.asList(executeCommand(command).split("\n"));
     }
     
     /**
@@ -38,17 +35,14 @@ public class OSUtilityUnix extends OSUtility {
      * @return
      * @throws IOException
      */
-    protected static String killProcess(String process, boolean force) throws IOException {
-    	List<String> outputLines;
+    protected static String ukillProcess(String process, boolean force) throws IOException {
+    
+		String pId = executeCommand("pidof " + process).split("\n")[0];
     	
-    		String pId = executeCommand("pidof "+process).get(0);
-        	
-        	if (force) {
-        		outputLines = executeCommand("kill -SIGKILL " + pId);
-        	} else {
-        		outputLines = executeCommand("kill -SIGTERM " + pId);
-        	}
-    	
-        return StringUtility.fromListToString(outputLines);
+    	if (force) {
+    		return executeCommand("kill -SIGKILL " + pId);
+    	} else {
+    		return executeCommand("kill -SIGTERM " + pId);
+    	}
     }
 }

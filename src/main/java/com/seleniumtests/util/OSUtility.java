@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 www.seleniumtests.com
+ * Copyright 2016 www.infotel.com
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -86,33 +86,45 @@ public class OSUtility {
      * @param wait for the end of the command execution
      * @return 
      */
-    protected static List<String> executeCommand(final String cmd) {
-        List<String> output = new ArrayList<String>();
+    protected static String executeCommand(final String cmd) {
+        String output = "";
         Process proc;
         try {
 			proc = Runtime.getRuntime().exec(cmd);
 			
-	        BufferedReader stdInput = new BufferedReader(new 
-	    	     InputStreamReader(proc.getInputStream()));
+	        BufferedReader stdInput = new BufferedReader(new InputStreamReader(proc.getInputStream()));
 	
-	    	BufferedReader stdError = new BufferedReader(new 
-	    	     InputStreamReader(proc.getErrorStream()));
+	    	BufferedReader stdError = new BufferedReader(new InputStreamReader(proc.getErrorStream()));
 	        
 	        String s = null;
 	        
         	// read result output from command
             while ((s = stdInput.readLine()) != null) {
-                output.add(s);
+                output += s + "\n";
             }
             // read error output from command
             while ((s = stdError.readLine()) != null) {
-                output.add(s);
+                output += s + "\n";
             }
         } catch (IOException e1) {
         	logger.error(e1);
         }
         
         return output;
+    }
+    
+    /**
+     * Kill named process
+     * @param process
+     * @param force
+     * @throws IOException
+     */
+    public static void killProcess(String process, boolean force) throws IOException {
+    	if (isWindows()) {
+			OSUtilityWindows.wkillProcess(process, force);
+		} else {
+			OSUtilityUnix.ukillProcess(process, false);
+		}
     }
 
     /**
@@ -129,12 +141,7 @@ public class OSUtility {
     		for (String process : webBrowserProcessList) {
     			if (isProcessRunning(process)){
 			    	try {
-			    		if (isWindows()) {
-			    			OSUtilityWindows.killProcess(process, force);
-			    		} else {
-			    			OSUtilityUnix.killProcess(process, false);
-			    		}
-		    			logger.info("demanded " + process + " process to terminate");
+			    		killProcess(process, force);
 					} catch (IOException e) {
 						logger.error(e);
 					}
@@ -147,21 +154,27 @@ public class OSUtility {
     }
     
     /**
+     * Returns list of all running processes
+     * @return
+     */
+    public static List<String> getRunningProcessList() {
+    	if (isWindows()) {
+    		return OSUtilityWindows.getWRunningProcessList();
+    	} else {
+    		return OSUtilityUnix.getURunningProcessList();
+    	}	
+    }
+    
+    /**
      * @param showAll running process found
      * @return true if one of the running process is a known web browser.
      */
     public static boolean isWebBrowserRunning(boolean showAll) {
     	
-    	List<String> processList;
-    	if (isWindows()) {
-    		processList = OSUtilityWindows.getRunningProcessList();
-    	} else {
-    		processList = OSUtilityUnix.getRunningProcessList();
-    	}	
     	boolean isRunning = false;
-    	for (String line : processList) {
+    	for (String line : getRunningProcessList()) {
     		for (String process : webBrowserProcessList){
-	    		if (line.toLowerCase().startsWith(process)){
+	    		if (line.toLowerCase().contains(process)){
 					isRunning = true;
 					if (!showAll) break;
 					logger.info("process is still running : " + line);
@@ -176,15 +189,8 @@ public class OSUtility {
      */
     public static List<String> whichWebBrowserRunning() {
     	
-    	List<String> processList;
-    	if (isWindows()) {
-    		processList = OSUtilityWindows.getRunningProcessList();
-    	} else {
-    		processList = OSUtilityUnix.getRunningProcessList();
-    	}
-    	
     	List<String> webBrowserRunningList = new ArrayList<>();
-    	for (String line : processList) {
+    	for (String line : getRunningProcessList()) {
     		for (String process : webBrowserProcessList){
 	    		if (line.toLowerCase().contains(process)){
 	    			webBrowserRunningList.add(line);
@@ -200,21 +206,12 @@ public class OSUtility {
      */
     public static boolean isProcessRunning(String key) {
     	
-    	List<String> processList;
-    	if (isWindows()) {
-    		processList = OSUtilityWindows.getRunningProcessList();
-    	} else {
-    		processList = OSUtilityUnix.getRunningProcessList();
-    	}
-    	
-    	boolean isRunning = false;
-    	for (String line : processList) {
-    		if (StringUtility.existsAlone(key, line)){
-				isRunning = true;
-				break;
+    	for (String line : getRunningProcessList()) {
+    		if (line.contains(key)){
+				return true;
     		}
     	}
-    	return isRunning;
+    	return false;
     }
     
 }

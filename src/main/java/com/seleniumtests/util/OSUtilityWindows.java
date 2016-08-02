@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 www.seleniumtests.com
+ * Copyright 2016 www.infotel.com
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,38 +14,31 @@
 package com.seleniumtests.util;
 
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class OSUtilityWindows extends OSUtility {
 	
 	public static int getIEVersion() {
-        List<String> output;
-        output = executeCommand("reg query \"HKLM\\Software\\Microsoft\\Internet Explorer\" /v svcVersion");
-        if (output.size() < 3) {
+
+        String output = executeCommand("reg query \"HKLM\\Software\\Microsoft\\Internet Explorer\" /v svcVersion");
+        if (output.split("\n").length < 3) {
             output = executeCommand("reg query \"HKLM\\Software\\Microsoft\\Internet Explorer\" /v Version");
         }
 
-        String internet_explorer_value = (output.get(2));
+        String internet_explorer_value = output.split("\n")[2];
         String version = internet_explorer_value.trim().split("   ")[2];
         version = version.trim().split("\\.")[0];
         return Integer.parseInt(version);
-    }
-
-    public static String getSlash() {
-        return "\\";
     }
 
     /**
      * Ask console for every running process.
      * @return list of output command lines
      */
-    protected static List<String> getRunningProcessList(){
-    	List<String> processList = new ArrayList<>();
-    	String command;
-    	command = System.getenv("windir") +"\\system32\\"+"tasklist.exe"; // Windows 7, windir = C:\Windows\ 
-	    processList = executeCommand(command);
-    	return processList;
+    protected static List<String> getWRunningProcessList(){
+    	String command = System.getenv("windir") + "\\system32\\" + "tasklist.exe /NH"; // Windows 7, windir = C:\Windows\ 
+	    return Arrays.asList(executeCommand(command).split("\n"));
     }
     
     /**
@@ -55,16 +48,14 @@ public class OSUtilityWindows extends OSUtility {
      * @return
      * @throws IOException
      */
-    protected static String killProcess(String process, boolean force) throws IOException {
-    	List<String> outputLines;
-    	
+    protected static String wkillProcess(String process, boolean force) throws IOException {
+
     	if (force) {
-    		outputLines = executeCommand("taskkill /F /IM "+process+".exe");
+    		return executeCommand("taskkill /F /IM " + process + ".exe");
     	} else {
-    		outputLines = executeCommand("taskkill /IM "+process+".exe");
+    		return executeCommand("taskkill /IM " + process + ".exe");
     	}
     	
-        return StringUtility.fromListToString(outputLines);
     }
     
     /**
@@ -74,10 +65,6 @@ public class OSUtilityWindows extends OSUtility {
      * @throws IOException
      */
     public static String killIEProcess(boolean force) throws IOException {
-    	String output;
-    	
-		output = killProcess("iexplore", true);
-    	
-        return output;
+		return wkillProcess("iexplore", true);	
     }
 }
