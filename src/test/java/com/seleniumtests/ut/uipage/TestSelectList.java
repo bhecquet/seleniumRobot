@@ -32,65 +32,65 @@ public class TestSelectList {
 		WebUIDriver.cleanUp();
 	}
 	
-	@Test(groups={"ut"})
-	public void testSelect() {
-		testSelectIt.testIsTextSelect();
-	}
-	
-	@Test(groups={"ut"})
-	public void testSelectMultiple() {
-		testSelectIt.testIsMultipleTextSelect();
-	}
-	
-	@Test(groups={"ut"})
-	public void testSelectValue() {
-		testSelectIt.testIsValueSelect();
-	}
-	
-	@Test(groups={"ut"})
-	public void testSelectMultipleValue() {
-		testSelectIt.testIsMultipleValueSelect();
-	}
-	
-	@Test(groups={"ut"})
-	public void testSelectCorresponding() {
-		testSelectIt.testIsCorrespondingTextSelect();
-	}
-	
-	@Test(groups={"ut"})
-	public void testSelectMultipleCorresponding() {
-		testSelectIt.testIsMultipleCorrespondingTextSelect();
-	}
-	
-	@Test(groups={"ut"})
-	public void testSelectIndex() {
-		testSelectIt.testIsIndexSelect();
-	}
-	
-	@Test(groups={"ut"})
-	public void testSelectMultipleIndex() {
-		testSelectIt.testIsMultipleIndexSelect();
-	}
-	
-	@Test(groups={"ut"})
-	public void testDeselectAll() {
-		testSelectIt.testIsAllDeselected();
-	}
-
-	
-	@Test(groups={"ut"})
-	public void testDeselectIndex() {
-		testSelectIt.testIsIndexDeselect();
-	}
-	
-	@Test(groups={"ut"})
-	public void testDeselectText() {
-		testSelectIt.testIsTextDeselect();
-	}
-	
-	@Test(groups={"ut"})
-	public void testDeselectValue() {
-		testSelectIt.testIsValueDeselect();
-	}
+//	@Test(groups={"ut"})
+//	public void testSelect() {
+//		testSelectIt.testIsTextSelect();
+//	}
+//	
+//	@Test(groups={"ut"})
+//	public void testSelectMultiple() {
+//		testSelectIt.testIsMultipleTextSelect();
+//	}
+//	
+//	@Test(groups={"ut"})
+//	public void testSelectValue() {
+//		testSelectIt.testIsValueSelect();
+//	}
+//	
+//	@Test(groups={"ut"})
+//	public void testSelectMultipleValue() {
+//		testSelectIt.testIsMultipleValueSelect();
+//	}
+//	
+//	@Test(groups={"ut"})
+//	public void testSelectCorresponding() {
+//		testSelectIt.testIsCorrespondingTextSelect();
+//	}
+//	
+//	@Test(groups={"ut"})
+//	public void testSelectMultipleCorresponding() {
+//		testSelectIt.testIsMultipleCorrespondingTextSelect();
+//	}
+//	
+//	@Test(groups={"ut"})
+//	public void testSelectIndex() {
+//		testSelectIt.testIsIndexSelect();
+//	}
+//	
+//	@Test(groups={"ut"})
+//	public void testSelectMultipleIndex() {
+//		testSelectIt.testIsMultipleIndexSelect();
+//	}
+//	
+//	@Test(groups={"ut"})
+//	public void testDeselectAll() {
+//		testSelectIt.testIsAllDeselected();
+//	}
+//
+//	
+//	@Test(groups={"ut"})
+//	public void testDeselectIndex() {
+//		testSelectIt.testIsIndexDeselect();
+//	}
+//	
+//	@Test(groups={"ut"})
+//	public void testDeselectText() {
+//		testSelectIt.testIsTextDeselect();
+//	}
+//	
+//	@Test(groups={"ut"})
+//	public void testDeselectValue() {
+//		testSelectIt.testIsValueDeselect();
+//	}
 	
 }

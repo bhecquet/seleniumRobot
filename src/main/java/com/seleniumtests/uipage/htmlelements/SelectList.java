@@ -235,7 +235,7 @@ public class SelectList extends HtmlElement {
         } else {
 	        for (WebElement option : options) {
 	            String selectedText;
-	            if ("li".equalsIgnoreCase(option.getTagName())) {
+	            if ("li".equalsIgnoreCase(option.getTagName()) && !option.getAttribute("title").isEmpty()) {
 	                selectedText = option.getAttribute("title");
 	            } else {
 	                selectedText = option.getText();

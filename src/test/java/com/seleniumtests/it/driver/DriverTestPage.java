@@ -48,6 +48,8 @@ public class DriverTestPage extends PageObject {
 	public static final CheckBoxElement hiddenCheckBox = new CheckBoxElement("check", By.id("hiddenCheckbox"));
 	public static final SelectList selectList = new SelectList("list", By.id("select"));
 	public static final SelectList selectMultipleList = new SelectList("listMultiple", By.id("selectMultiple"));
+	public static final SelectList selectUlLiList = new SelectList("ulLiList", By.id("languages"));
+	public static final TextFieldElement ulliListTrigger = new TextFieldElement("listTrigger", By.id("language"));
 
 	public DriverTestPage() throws Exception {
         super(textElement);
