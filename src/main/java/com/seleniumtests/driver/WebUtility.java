@@ -71,12 +71,4 @@ public class WebUtility {
         }
     }
 
-    public static void main(final String[] args) {
-        WebUIDriver.getWebUIDriver().setMode("ExistingGrid");
-        WebUIDriver.getWebUIDriver().setHubUrl(" ");
-
-        WebDriver driver = WebUIDriver.getWebDriver(true);
-        logger.info(driver.manage().window().getSize().width + ":" + driver.manage().window().getSize().height);
-    }
-
 }

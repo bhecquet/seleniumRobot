@@ -16,6 +16,7 @@ package com.seleniumtests.ut.core;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.openqa.selenium.Proxy.ProxyType;
 import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.annotations.Test;
@@ -24,6 +25,8 @@ import org.testng.xml.XmlTest;
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.ConfigurationException;
+import com.seleniumtests.driver.BrowserType;
+import com.seleniumtests.driver.DriverMode;
 
 /**
  * Test parsing of test options into SeleniumTestContext
@@ -277,13 +280,13 @@ public class TestSeleniumTestContext {
 	public void testRunMode(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		SeleniumTestsContextManager.initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setRunMode("saucelabs");
-		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getRunMode(), "saucelabs");
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getRunMode(), DriverMode.SAUCELABS);
 	}
 	@Test(groups="ut context")
 	public void testRunModeNull(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		SeleniumTestsContextManager.initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setRunMode(null);
-		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getRunMode(), "LOCAL");
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getRunMode(), DriverMode.LOCAL);
 	}
 	@Test(groups="ut context", expectedExceptions=IllegalArgumentException.class)
 	public void testRunModeKo(final ITestContext testNGCtx, final XmlTest xmlTest) {
@@ -295,13 +298,13 @@ public class TestSeleniumTestContext {
 	public void testBrowser(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		SeleniumTestsContextManager.initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setBrowser("chrome");
-		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getBrowser(), "chrome");
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getBrowser(), BrowserType.CHROME);
 	}
 	@Test(groups="ut context")
 	public void testBrowserNull(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		SeleniumTestsContextManager.initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setBrowser(null);
-		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getBrowser(), "*firefox");
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getBrowser(), BrowserType.FIREFOX);
 	}
 	@Test(groups="ut context", expectedExceptions=IllegalArgumentException.class)
 	public void testBrowserKo(final ITestContext testNGCtx, final XmlTest xmlTest) {
@@ -359,19 +362,6 @@ public class TestSeleniumTestContext {
 		SeleniumTestsContextManager.initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setJsErrorCollectorExtension(null);
 		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getJsErrorCollectorExtension(), false);
-	}
-	
-	@Test(groups="ut context")
-	public void testWebProxyEnabled(final ITestContext testNGCtx, final XmlTest xmlTest) {
-		SeleniumTestsContextManager.initThreadContext(testNGCtx);
-		SeleniumTestsContextManager.getThreadContext().setWebProxyEnabled(true);
-		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().isWebProxyEnabled(), true);
-	}
-	@Test(groups="ut context")
-	public void testWebProxyEnabledNull(final ITestContext testNGCtx, final XmlTest xmlTest) {
-		SeleniumTestsContextManager.initThreadContext(testNGCtx);
-		SeleniumTestsContextManager.getThreadContext().setWebProxyEnabled(null);
-		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().isWebProxyEnabled(), false);
 	}
 	
 	@Test(groups="ut context")
@@ -537,4 +527,103 @@ public class TestSeleniumTestContext {
 		SeleniumTestsContextManager.getThreadContext().setNewCommandTimeout(null);
 		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getNewCommandTimeout(), 120);
 	}
+	
+	/**
+	 * Proxy type is set to "pac" in config.ini. check that this value is taken
+	 */
+	@Test(groups="ut context")
+	public void testProxyFromEnvIniFile(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		SeleniumTestsContextManager.initThreadContext(testNGCtx);
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getWebProxyType(), ProxyType.DIRECT);
+	}
+	@Test(groups="ut context")
+	public void testProxyPreset(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		SeleniumTestsContextManager.generateApplicationPath(testNGCtx.getCurrentXmlTest().getSuite());
+		SeleniumTestsContext seleniumContext = new SeleniumTestsContext();
+		seleniumContext.postsetProxyConfig();
+		Assert.assertEquals(seleniumContext.getWebProxyType(), ProxyType.DIRECT);
+	}
+	@Test(groups="ut context")
+	public void testProxyOverride(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		try {
+			System.setProperty("proxyType", "system");
+			SeleniumTestsContextManager.initThreadContext(testNGCtx);
+			Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getWebProxyType(), ProxyType.SYSTEM);
+		} finally {
+			System.clearProperty("proxyType");
+		}
+	}
+	@Test(groups="ut context")
+	public void testProxyType(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		SeleniumTestsContextManager.initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setWebProxyType("PAC");
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getWebProxyType(), ProxyType.PAC);
+	}
+	/**
+	 * Proxy type default value is set in postInit method, so setting null / unknown value will result in null
+	 */
+	@Test(groups="ut context")
+	public void testProxyTypeNull(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		SeleniumTestsContextManager.initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setWebProxyType(null);
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getWebProxyType(), null);
+	}
+	
+	@Test(groups="ut context")
+	public void testProxyAddress(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		SeleniumTestsContextManager.initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setWebProxyAddress("address");
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getWebProxyAddress(), "address");
+	}
+	
+	@Test(groups="ut context")
+	public void testProxyPort(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		SeleniumTestsContextManager.initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setWebProxyPort(8080);
+		Assert.assertEquals((int)SeleniumTestsContextManager.getThreadContext().getWebProxyPort(), (int)8080);
+	}
+	
+	@Test(groups="ut context")
+	public void testProxyLogin(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		SeleniumTestsContextManager.initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setWebProxyLogin("login");
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getWebProxyLogin(), "login");
+	}
+	
+	@Test(groups="ut context")
+	public void testProxyPassword(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		SeleniumTestsContextManager.initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setWebProxyPassword("password");
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getWebProxyPassword(), "password");
+	}
+	
+	@Test(groups="ut context")
+	public void testProxyExclude(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		SeleniumTestsContextManager.initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setWebProxyExclude("127.0.0.1");
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getWebProxyExclude(), "127.0.0.1");
+	}
+	
+	@Test(groups="ut context")
+	public void testProxyPac(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		SeleniumTestsContextManager.initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setWebProxyPac("http://pac");
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getWebProxyPac(), "http://pac");
+	}
+	
+	@Test(groups="ut context")
+	public void testProxyFilledInDefaultContext(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		SeleniumTestsContextManager.initThreadContext(testNGCtx);
+		
+		// default proxy type value get from config.ini file
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getWebProxyType(), ProxyType.DIRECT);
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getWebProxyAddress(), null);
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getWebProxyPort(), null);
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getWebProxyLogin(), null);
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getWebProxyPassword(), null);
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getWebProxyExclude(), null);
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getWebProxyPac(), null);
+	}
+	
+	
 }

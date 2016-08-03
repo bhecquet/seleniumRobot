@@ -45,6 +45,7 @@ import com.seleniumtests.core.SeleniumTestsPageListener;
 import com.seleniumtests.customexception.CustomSeleniumTestsException;
 import com.seleniumtests.customexception.NotCurrentPageException;
 import com.seleniumtests.driver.CustomEventFiringWebDriver;
+import com.seleniumtests.driver.DriverMode;
 import com.seleniumtests.driver.JavaScriptError;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.driver.WebUtility;
@@ -262,7 +263,7 @@ public class PageObject extends BasePage implements IPage {
         	logger.info("Error closing driver: " + ignore.getMessage());
         }
 
-        if ("LOCAL".equalsIgnoreCase(WebUIDriver.getWebUIDriver().getMode())) {
+        if (SeleniumTestsContextManager.getThreadContext().getRunMode() == DriverMode.LOCAL) {
         	WaitHelper.waitForSeconds(2);
         }
 

@@ -24,7 +24,7 @@ import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
-import com.seleniumtests.core.SeleniumTestsContext;
+import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.driver.DriverConfig;
 import com.seleniumtests.driver.DriverMode;
 import com.seleniumtests.util.FileUtility;
@@ -63,11 +63,9 @@ public class ChromeCapabilitiesFactory extends ICapabilitiesFactory {
         if (webDriverConfig.getWebPlatform() != null) {
             capability.setPlatform(webDriverConfig.getWebPlatform());
         }
-
-        if (webDriverConfig.getProxyHost() != null) {
-            Proxy proxy = webDriverConfig.getProxy();
-            capability.setCapability(CapabilityType.PROXY, proxy);
-        }
+        
+        Proxy proxy = webDriverConfig.getProxy();
+        capability.setCapability(CapabilityType.PROXY, proxy);
 
         if (webDriverConfig.getChromeBinPath() != null) {
             capability.setCapability("chrome.binary", webDriverConfig.getChromeBinPath());
@@ -82,7 +80,7 @@ public class ChromeCapabilitiesFactory extends ICapabilitiesFactory {
     }
 
     public void handleExtractResources() throws IOException {
-        String dir = Paths.get(SeleniumTestsContext.getRootPath(), "tools", "drivers", Platform.getCurrent().family().toString().toLowerCase()).toString();
+        String dir = Paths.get(SeleniumTestsContextManager.getRootPath(), "tools", "drivers", Platform.getCurrent().family().toString().toLowerCase()).toString();
         dir = FileUtility.decodePath(dir);
 
         if (OSUtility.isWindows()) {

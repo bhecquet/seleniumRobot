@@ -20,7 +20,7 @@ import java.nio.file.Paths;
 import org.openqa.selenium.Platform;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
-import com.seleniumtests.core.SeleniumTestsContext;
+import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.driver.DriverConfig;
 import com.seleniumtests.util.FileUtility;
 import com.seleniumtests.util.OSUtility;
@@ -42,7 +42,7 @@ public class MarionetteCapabilitiesFactory extends FirefoxCapabilitiesFactory {
 	}
 	
 	private void configureGeckoDriver() throws UnsupportedEncodingException {
-		String dir = Paths.get(SeleniumTestsContext.getRootPath(), "tools", "drivers", Platform.getCurrent().family().toString().toLowerCase()).toString();
+		String dir = Paths.get(SeleniumTestsContextManager.getRootPath(), "tools", "drivers", Platform.getCurrent().family().toString().toLowerCase()).toString();
         dir = FileUtility.decodePath(dir);
 
         if (OSUtility.isWindows()) {

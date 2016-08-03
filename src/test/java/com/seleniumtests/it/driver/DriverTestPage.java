@@ -15,6 +15,7 @@ package com.seleniumtests.it.driver;
 import org.openqa.selenium.By;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.uipage.PageObject;
 import com.seleniumtests.uipage.htmlelements.ButtonElement;
 import com.seleniumtests.uipage.htmlelements.CheckBoxElement;
@@ -62,7 +63,7 @@ public class DriverTestPage extends PageObject {
     }
     
     private static String getPageUrl() {
-    	if (SeleniumTestsContextManager.getThreadContext().getBrowser().contains("firefox")) {
+    	if (SeleniumTestsContextManager.getThreadContext().getBrowser() == BrowserType.FIREFOX) {
 			return "file://" + Thread.currentThread().getContextClassLoader().getResource("tu/test.html").getFile();
 		} else {
 			return "file:///" + Thread.currentThread().getContextClassLoader().getResource("tu/test.html").getFile();

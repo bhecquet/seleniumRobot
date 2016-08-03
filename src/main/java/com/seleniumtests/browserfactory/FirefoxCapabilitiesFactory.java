@@ -111,9 +111,7 @@ public class FirefoxCapabilitiesFactory extends ICapabilitiesFactory {
             capability.setPlatform(webDriverConfig.getWebPlatform());
         }
 
-        if (webDriverConfig.getProxyHost() != null) {
-            capability.setCapability(CapabilityType.PROXY, webDriverConfig.getProxy());
-        }
+        capability.setCapability(CapabilityType.PROXY, webDriverConfig.getProxy());
 
         return capability;
     }

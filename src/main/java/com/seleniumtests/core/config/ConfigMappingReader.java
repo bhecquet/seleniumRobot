@@ -14,12 +14,12 @@
 package com.seleniumtests.core.config;
 
 import java.io.File;
-import org.apache.log4j.Logger;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.seleniumtests.core.SeleniumTestsContext;
+import org.apache.log4j.Logger;
+
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.reporter.TestLogging;
@@ -82,7 +82,7 @@ public class ConfigMappingReader {
 		Map<String, HashMap<String,String>> testConfig = new HashMap<>();
 
 		// load generic configuration
-		File globalConfigFile =  Paths.get(SeleniumTestsContext.getConfigPath(), OBJECT_MAPPING_FILE_NAME).toFile();
+		File globalConfigFile =  Paths.get(SeleniumTestsContextManager.getConfigPath(), OBJECT_MAPPING_FILE_NAME).toFile();
 		testConfig = extractConfigValues(testConfig, globalConfigFile);
 		
 		// load system specific configuration if any (web / ios / android)
@@ -94,12 +94,12 @@ public class ConfigMappingReader {
 			} else {
 				typeDir = systemType.toLowerCase();
 			}
-			File systemConfigFile =  Paths.get(SeleniumTestsContext.getConfigPath(), typeDir, OBJECT_MAPPING_FILE_NAME).toFile();
+			File systemConfigFile =  Paths.get(SeleniumTestsContextManager.getConfigPath(), typeDir, OBJECT_MAPPING_FILE_NAME).toFile();
 			testConfig = extractConfigValues(testConfig, systemConfigFile);
 			
 			if(versionDir != null && !versionDir.isEmpty()){
 				
-				File versionConfigFile =  Paths.get(SeleniumTestsContext.getConfigPath(), typeDir, versionDir, OBJECT_MAPPING_FILE_NAME).toFile();
+				File versionConfigFile =  Paths.get(SeleniumTestsContextManager.getConfigPath(), typeDir, versionDir, OBJECT_MAPPING_FILE_NAME).toFile();
 				testConfig = extractConfigValues(testConfig, versionConfigFile);
 			}
 		}

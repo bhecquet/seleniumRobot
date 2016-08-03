@@ -47,52 +47,11 @@ public class SelectList extends HtmlElement {
     	super(label, by, index);
     }
 
-    /**
-     * De-selects all options in a multi-select list element.
-     */
-    public void deselectAll() {
-        findElement();
-        if (!isMultiple()) {
-            throw new UnsupportedOperationException("You may only deselect all options of a multi-select");
-        }
-
-        for (WebElement option : options) {
-        	setDeselected(option);
-        }
-    }
-
-    public void deselectByIndex(final int index) {
-        findElement();
-
-        WebElement option = options.get(index);
-        setDeselected(option);
-    }
-
-    public void deselectByText(final String text) {
-        findElement();
-        for (WebElement option : options) {
-            if (option.getText().equals(text)) {
-            	setDeselected(option);
-                break;
-            }
-        }
-    }
-
-    public void deselectByValue(final String value) {
-        findElement();
-        for (WebElement option : options) {
-            if (option.getAttribute("value").equals(value)) {
-            	setDeselected(option);
-                break;
-            }
-        }
-
-    }
-
     @Override
     protected void findElement() {
         driver = WebUIDriver.getWebDriver();
         element = driver.findElement(this.getBy());
+        makeWebElementVisible(element);
         try {
             select = getNewSelectElement(element);
             options = select.getOptions();
@@ -184,16 +143,75 @@ public class SelectList extends HtmlElement {
         String value = element.getAttribute("multiple");
         return value != null && !"false".equals(value);
     }
+    
+    /**
+     * De-selects all options in a multi-select list element.
+     */
+    public void deselectAll() {
+        findElement();
+        if (!isMultiple()) {
+            throw new UnsupportedOperationException("You may only deselect all options of a multi-select");
+        }
+
+        for (WebElement option : options) {
+        	setDeselected(option);
+        }
+    }
+
+    public void deselectByIndex(final int index) {
+        findElement();
+        if (select != null) {
+        	select.deselectByIndex(index);
+        } else {
+	        WebElement option = options.get(index);
+	        setDeselected(option);
+        }
+    }
+
+    public void deselectByText(final String text) {
+        findElement();
+        
+        if (select != null) {
+        	select.deselectByVisibleText(text);
+        } else {
+	        for (WebElement option : options) {
+	            if (option.getText().equals(text)) {
+	            	setDeselected(option);
+	                break;
+	            }
+	        }
+        }
+    }
+
+    public void deselectByValue(final String value) {
+        findElement();
+        
+        if (select != null) {
+        	select.deselectByValue(value);
+        } else {
+	        for (WebElement option : options) {
+	            if (option.getAttribute("value").equals(value)) {
+	            	setDeselected(option);
+	                break;
+	            }
+	        }
+        }
+    }
 
     public void selectByIndex(final int index) {
         findElement();
 
-        WebElement option = options.get(index);
-        setSelected(option);
+        if (select != null) {
+        	select.selectByIndex(index);
+        } else {
+	        WebElement option = options.get(index);
+	        setSelected(option);
+        }
     }
 
     public void selectByIndex(final int[] indexs) {
         findElement();
+        
         for (int i = 0; i < indexs.length; i++) {
             WebElement option = options.get(indexs[i]);
             setSelected(option);
@@ -211,19 +229,23 @@ public class SelectList extends HtmlElement {
             driver.findElement(By.xpath("//li[text()='" + text + "']")).click();
             return;
         }
-
-        for (WebElement option : options) {
-            String selectedText;
-            if ("li".equalsIgnoreCase(option.getTagName())) {
-                selectedText = option.getAttribute("title");
-            } else {
-                selectedText = option.getText();
-            }
-
-            if (selectedText.equals(text)) {
-                setSelected(option);
-                break;
-            }
+        
+        if (select != null) {
+        	select.selectByVisibleText(text);
+        } else {
+	        for (WebElement option : options) {
+	            String selectedText;
+	            if ("li".equalsIgnoreCase(option.getTagName())) {
+	                selectedText = option.getAttribute("title");
+	            } else {
+	                selectedText = option.getText();
+	            }
+	
+	            if (selectedText.equals(text)) {
+	                setSelected(option);
+	                break;
+	            }
+	        }
         }
     }
 
@@ -246,16 +268,16 @@ public class SelectList extends HtmlElement {
      */
     public void selectByCorrespondingText(String text) {
     	findElement();
-    	 double score = 0;
-    	 WebElement optionToSelect = null;
-    	 for (WebElement option : options) {
+    	double score = 0;
+    	WebElement optionToSelect = null;
+    	for (WebElement option : options) {
     		String source = option.getText();
-    		if(service.score(source, text)>score){
+    		if (service.score(source, text) > score) {
     			score = service.score(source, text);
     			optionToSelect = option;
     		}
-    	 }
-    	 setSelected(optionToSelect);
+    	}
+    	setSelected(optionToSelect);
     }
     
     /**
@@ -264,28 +286,33 @@ public class SelectList extends HtmlElement {
      * @param text
      */
     public void selectByCorrespondingText(String[] text) {
-    	 findElement();
-    	 for (int i = 0; i < text.length; i++) {
-    		 double score = 0;
-        	 WebElement optionToSelect = null;
-        	 for (WebElement option : options) {
+    	findElement();
+    	for (int i = 0; i < text.length; i++) {
+    		double score = 0;
+        	WebElement optionToSelect = null;
+        	for (WebElement option : options) {
         		String source = option.getText();
-        		if(service.score(source, text[i])>score){
+        		if (service.score(source, text[i]) > score) {
         			score = service.score(source, text[i]);
         			optionToSelect = option;
         		}
-        	 }
-        	 setSelected(optionToSelect);
-    	 }
+        	}
+        	setSelected(optionToSelect);
+    	}
     }
 
     public void selectByValue(final String value) {
         findElement();
-        for (WebElement option : options) {
-            if (option.getAttribute("value").equals(value)) {
-                setSelected(option);
-                break;
-            }
+        
+        if (select != null) {
+        	select.selectByValue(value);
+        } else {
+	        for (WebElement option : options) {
+	            if (option.getAttribute("value").equals(value)) {
+	                setSelected(option);
+	                break;
+	            }
+	        }
         }
     }
 

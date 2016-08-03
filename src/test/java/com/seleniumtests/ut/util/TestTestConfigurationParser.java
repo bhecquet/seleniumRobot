@@ -35,7 +35,7 @@ public class TestTestConfigurationParser {
 
 	@Test(groups={"ut"})
 	public void testParameterNodes() {
-		Assert.assertEquals(configParser.getParameterNodes().size(), 10);
+		Assert.assertEquals(configParser.getParameterNodes().size(), 7);
 	}
 	
 	@Test(groups={"ut"})

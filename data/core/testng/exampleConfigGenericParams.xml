@@ -20,9 +20,6 @@
 	-->
 
 	<parameter name="browser" value="chrome" />
-	<parameter name="webProxyEnabled" value="" />
-	<parameter name="webProxyType" value="" />
-	<parameter name="webProxyAddress" value="" />
 	
 	<parameter name="app" value="myMobileApp.apk" />
 	<parameter name="deviceName" value="Samsung Galaxy Nexus SPH-L700 4.3" />

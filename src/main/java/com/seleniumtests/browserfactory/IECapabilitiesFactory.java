@@ -25,7 +25,7 @@ import org.openqa.selenium.ie.InternetExplorerDriver;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
-import com.seleniumtests.core.SeleniumTestsContext;
+import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.driver.DriverConfig;
 import com.seleniumtests.driver.DriverMode;
 import com.seleniumtests.util.FileUtility;
@@ -36,7 +36,7 @@ public class IECapabilitiesFactory extends ICapabilitiesFactory {
 	private static final String WEBDRIVER_PROPERTY = "webdriver.ie.driver";
 	
     public void handleExtractResources() throws IOException {
-        String dir = Paths.get(SeleniumTestsContext.getRootPath(), "tools", "drivers", 
+        String dir = Paths.get(SeleniumTestsContextManager.getRootPath(), "tools", "drivers", 
         						Platform.getCurrent().family().toString().toLowerCase()).toString();
         dir = FileUtility.decodePath(dir);
         String iEDriverServerFile = "\\IEDriverServer.exe";
@@ -104,10 +104,8 @@ public class IECapabilitiesFactory extends ICapabilitiesFactory {
             capability.setPlatform(cfg.getWebPlatform());
         }
 
-        if (cfg.getProxyHost() != null) {
-            Proxy proxy = cfg.getProxy();
-            capability.setCapability(CapabilityType.PROXY, proxy);
-        }
+        Proxy proxy = cfg.getProxy();
+        capability.setCapability(CapabilityType.PROXY, proxy);
 
         capability.setCapability(InternetExplorerDriver.INTRODUCE_FLAKINESS_BY_IGNORING_SECURITY_DOMAINS, true);
         return capability;

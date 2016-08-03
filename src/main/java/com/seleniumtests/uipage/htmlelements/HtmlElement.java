@@ -254,7 +254,7 @@ public class HtmlElement {
         makeWebElementVisible(element);
     }
     
-    private void changeCssAttribute(WebElement element, String cssProperty, String cssPropertyValue) {
+    protected void changeCssAttribute(WebElement element, String cssProperty, String cssPropertyValue) {
 		String javascript = "arguments[0].style." + cssProperty + "='" + cssPropertyValue + "';";
 		((JavascriptExecutor) driver).executeScript(javascript, element); 
 	}
@@ -262,7 +262,7 @@ public class HtmlElement {
     /**
 	 * Make element visible. Sometimes useful when real elements are backed by an image element
 	 */
-	private void makeWebElementVisible(WebElement element) {
+	protected void makeWebElementVisible(WebElement element) {
 		if (SeleniumTestsContextManager.isWebTest()) {
 			try {
 				
@@ -516,7 +516,7 @@ public class HtmlElement {
     	}
     }
     public boolean isElementPresent() { 
-    	return isElementPresent(WebUIDriver.getWebUIDriver().getExplicitWait());
+    	return isElementPresent(SeleniumTestsContextManager.getThreadContext().getExplicitWaitTimeout());
     }
 
     /**
@@ -699,7 +699,7 @@ public class HtmlElement {
      * Wait element to present using Explicit Waits with default EXPLICIT_WAIT_TIME_OUT = 15 seconds.
      */
     public void waitForPresent() {
-        waitForPresent(WebUIDriver.getWebUIDriver().getExplicitWait());
+        waitForPresent(SeleniumTestsContextManager.getThreadContext().getExplicitWaitTimeout());
     }
 
     /**
