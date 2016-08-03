@@ -43,10 +43,8 @@ public class HtmlUnitCapabilitiesFactory extends ICapabilitiesFactory {
             capability.setPlatform(webDriverConfig.getWebPlatform());
         }
 
-        if (webDriverConfig.getProxyHost() != null) {
-            Proxy proxy = webDriverConfig.getProxy();
-            capability.setCapability(CapabilityType.PROXY, proxy);
-        }
+        Proxy proxy = webDriverConfig.getProxy();
+        capability.setCapability(CapabilityType.PROXY, proxy);
 
         return capability;
     }

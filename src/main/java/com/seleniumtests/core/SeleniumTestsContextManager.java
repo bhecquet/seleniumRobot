@@ -15,6 +15,9 @@
 package com.seleniumtests.core;
 
 import java.io.File;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -23,6 +26,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.testng.ITestContext;
+import org.testng.xml.XmlSuite;
 import org.testng.xml.XmlTest;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -39,17 +43,22 @@ public class SeleniumTestsContextManager {
 
 	private static final Logger logger = TestLogging.getLogger(SeleniumTestsContext.class);
 	
+	private static String rootPath;
+	private static String dataPath;
+	private static String featuresPath;
+	private static String configPath;
+	private static String applicationName;
+
+	public static final String DATA_FOLDER_NAME = "data";
 
     // context listener
-    private static List<IContextAttributeListener> contextAttributeListeners = Collections.synchronizedList(
-            new ArrayList<IContextAttributeListener>());
+    private static List<IContextAttributeListener> contextAttributeListeners = Collections.synchronizedList(new ArrayList<IContextAttributeListener>());
 
     // global level context
     private static SeleniumTestsContext globalContext;
 
     // test level context
-    private static Map<String, SeleniumTestsContext> testLevelContext 
-    					= Collections.synchronizedMap(new HashMap<>());
+    private static Map<String, SeleniumTestsContext> testLevelContext = Collections.synchronizedMap(new HashMap<>());
 
     // thread level SeleniumTestsContext
     private static ThreadLocal<SeleniumTestsContext> threadLocalContext = new ThreadLocal<>();
@@ -213,11 +222,11 @@ public class SeleniumTestsContextManager {
             for (Entry<String, String> entry : testParameters.entrySet()) {
                 seleniumTestsCtx.setAttribute(entry.getKey(), entry.getValue());
             }
-            
-            // merge configurations from ini file and xml file
-            seleniumTestsCtx.setTestConfiguration();
 
             testLevelContext.put(xmlTest.getName(), seleniumTestsCtx);
+            
+            // update some values after init
+            seleniumTestsCtx.postInit();
         }
     }
 
@@ -230,19 +239,24 @@ public class SeleniumTestsContextManager {
     }
 
     public static void initThreadContext(ITestContext testNGCtx) {
+    	
+    	// generate all paths used by test application
+    	if (testNGCtx != null && testNGCtx.getCurrentXmlTest() != null) {
+        	generateApplicationPath(testNGCtx.getCurrentXmlTest().getSuite());
+        }
+    	
     	ITestContext _testNGCtx = getContextFromConfigFile(testNGCtx);
     	SeleniumTestsContext seleniumTestsCtx = new SeleniumTestsContext(_testNGCtx);
         loadCustomizedContextAttribute(_testNGCtx, seleniumTestsCtx);
         
         threadLocalContext.set(seleniumTestsCtx);
         
-        // merge configurations from ini file and xml file
-        seleniumTestsCtx.setTestConfiguration();
+        // update some values after init
+        seleniumTestsCtx.postInit();
 
     }
 
-    private static void loadCustomizedContextAttribute(final ITestContext testNGCtx,
-            final SeleniumTestsContext seleniumTestsCtx) {
+    private static void loadCustomizedContextAttribute(final ITestContext testNGCtx, final SeleniumTestsContext seleniumTestsCtx) {
         for (int i = 0; i < contextAttributeListeners.size(); i++) {
             contextAttributeListeners.get(i).load(testNGCtx, seleniumTestsCtx);
         }
@@ -255,6 +269,97 @@ public class SeleniumTestsContextManager {
     public static void setThreadContext(final SeleniumTestsContext ctx) {
         threadLocalContext.set(ctx);
     }
+    
+    /**
+     * Build the root path of STF 
+     * method for guessing it is different if we are inside a jar (built mode) or in development
+     * @param clazz
+     * @param path
+     * @return
+     */
+    private static Boolean getPathFromClass(Class clazz, StringBuilder path) {
+		Boolean jar = false;
+		
+		try {
+			String url = URLDecoder.decode(clazz.getProtectionDomain().getCodeSource().getLocation().getFile(), "UTF-8" );
+			if (url.endsWith(".jar")) {
+				path.append((new File(url).getParentFile().getAbsoluteFile().toString() + "/").replace(File.separator, "/"));
+				jar = true;
+			} else {				
+				path.append((new File(url).getParentFile().getParentFile().getAbsoluteFile().toString() + "/").replace(File.separator, "/"));
+				jar = false;
+			}
+		} catch (UnsupportedEncodingException e) {
+			logger.error(e);
+		}
+		
+		return jar;
+	}
+    
+    /**
+     * Generate all applications path
+     * - root
+     * - data
+     * - config
+     * @param xmlSuite
+     */
+    public static void generateApplicationPath(XmlSuite xmlSuite) {
+
+		StringBuilder path = new StringBuilder();
+		getPathFromClass(SeleniumTestsContext.class, path);
+		
+		rootPath = path.toString();
+		
+		// in case launching unit test from eclipse, a temp file is generated outside the standard folder structure
+		// APPLICATION_NAME and DATA_PATH must be rewritten
+		try {
+			applicationName = xmlSuite.getFileName().replace(File.separator, "/").split("/"+ DATA_FOLDER_NAME + "/")[1].split("/")[0];
+			dataPath = xmlSuite.getFileName().replace(File.separator, "/").split("/"+ DATA_FOLDER_NAME + "/")[0] + "/" + DATA_FOLDER_NAME + "/";
+		} catch (IndexOutOfBoundsException e) {
+			applicationName = "core";
+			dataPath = Paths.get(rootPath, "data").toString();
+		}
+		
+		featuresPath = Paths.get(dataPath, applicationName, "features").toString();
+		configPath = Paths.get(dataPath, applicationName, "config").toString();
+		
+		// create data folder if it does not exist (it should already exist)
+		if (!new File(dataPath).isDirectory()) {
+			new File(dataPath).mkdirs();
+		}
+	}
+    
+    /**
+     * Returns application root path
+     * @return
+     */
+    public static String getRootPath() {
+		return rootPath;
+	}
+
+    /**
+     * Returns location of feature files
+     * @return
+     */
+	public static String getFeaturePath() {
+		return featuresPath;
+	}
+
+	/**
+	 * Returns location of config files
+	 * @return
+	 */
+	public static String getConfigPath() {
+		return configPath;
+	}
+	
+	/**
+	 * Returns location of data folder
+	 * @return
+	 */
+	public static String getDataPath() {
+		return dataPath;
+	}
 
     public static boolean isWebTest() {
         return getThreadContext().getTestType().equals(TestType.WEB);

@@ -44,10 +44,8 @@ public class PhantomJSCapabilitiesFactory extends ICapabilitiesFactory {
             capability.setPlatform(cfg.getWebPlatform());
         }
 
-        if (cfg.getProxyHost() != null) {
-            Proxy proxy = cfg.getProxy();
-            capability.setCapability(CapabilityType.PROXY, proxy);
-        }
+        Proxy proxy = cfg.getProxy();
+        capability.setCapability(CapabilityType.PROXY, proxy);
 
         return capability;
     }

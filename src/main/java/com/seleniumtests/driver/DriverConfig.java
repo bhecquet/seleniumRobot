@@ -25,6 +25,7 @@ import org.openqa.selenium.Proxy.ProxyType;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.events.WebDriverEventListener;
 
+import com.seleniumtests.core.proxy.ProxyConfig;
 import com.seleniumtests.customexception.DriverExceptions;
 import com.seleniumtests.reporter.TestLogging;
 
@@ -62,7 +63,7 @@ public class DriverConfig {
     private ArrayList<WebDriverEventListener> webDriverListeners;
     private boolean useFirefoxDefaultProfile = true;
 
-    private String proxyHost;
+    private ProxyConfig proxyConfig;
 
     private TestType testType;
 
@@ -204,21 +205,26 @@ public class DriverConfig {
     }
 
     public Proxy getProxy() {
-        Proxy proxy = null;
-        if (proxyHost != null) {
-            proxy = new Proxy();
-            proxy.setProxyType(ProxyType.MANUAL);
-            proxy.setHttpProxy(proxyHost);
-            proxy.setFtpProxy(proxyHost);
-            proxy.setSslProxy(proxyHost);
-        }
-
-        return proxy;
-
+    	Proxy proxy = new Proxy();
+    	proxy.setProxyType(proxyConfig.getType());
+    	
+		if (proxyConfig.getType() == ProxyType.PAC) {
+			proxy.setProxyAutoconfigUrl(proxyConfig.getPac());
+			
+		// manual proxy configuration
+		} else if (proxyConfig.getType() == ProxyType.MANUAL) {
+			proxy.setHttpProxy(proxyConfig.getAddressAndPort());
+			proxy.setSslProxy(proxyConfig.getAddressAndPort());
+			proxy.setFtpProxy(proxyConfig.getAddressAndPort());
+			proxy.setSocksUsername(proxyConfig.getLogin());
+			proxy.setSocksPassword(proxyConfig.getPassword());
+			proxy.setNoProxy(proxyConfig.getExclude().replace(";", ","));
+		} 
+		return proxy;
     }
 
-    public String getProxyHost() {
-        return proxyHost;
+    public ProxyConfig getProxyConfig() {
+        return proxyConfig;
     }
 
     public String getUserAgentOverride() {
@@ -333,8 +339,8 @@ public class DriverConfig {
         this.webPlatform = webPlatform;
     }
 
-    public void setProxyHost(final String proxyHost) {
-        this.proxyHost = proxyHost;
+    public void setProxyConfig(final ProxyConfig proxy) {
+        this.proxyConfig = proxy;
     }
 
     public void setSetAcceptUntrustedCertificates(final boolean setAcceptUntrustedCertificates) {

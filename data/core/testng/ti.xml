@@ -7,6 +7,7 @@
 	<parameter name="aParam" value="value1" />
 	<parameter name="anOtherParam" value="value2" />
 	<parameter name="variable1" value="value4" />
+	<parameter name="devMode" value="true" />
    
     
     <test name="Integration tests" parallel="false">

@@ -27,6 +27,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.Assert;
 
 import com.seleniumtests.core.CustomAssertion;
+import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import com.seleniumtests.driver.WebUIDriver;
@@ -46,8 +47,8 @@ public abstract class BasePage {
 
     protected WebDriver driver = WebUIDriver.getWebDriver();
     protected final WebUIDriver webUXDriver = WebUIDriver.getWebUIDriver();
-    private int explictWaitTimeout = WebUIDriver.getWebUIDriver().getExplicitWait();
-    private int sessionTimeout = WebUIDriver.getWebUIDriver().getWebSessionTimeout();
+    private int explictWaitTimeout = SeleniumTestsContextManager.getThreadContext().getExplicitWaitTimeout();
+    private int sessionTimeout = SeleniumTestsContextManager.getThreadContext().getWebSessionTimeout();
     
 
     public BasePage() { 
@@ -356,7 +357,7 @@ public abstract class BasePage {
 
         WebElement body = driver.findElement(By.tagName("body"));
 
-        if (WebUIDriver.getWebUIDriver().getBrowser().equalsIgnoreCase(BrowserType.HTMLUNIT.getBrowserType())) {
+        if (SeleniumTestsContextManager.getThreadContext().getBrowser() == BrowserType.HTMLUNIT) {
             return body.getText().contains(text);
         }
 

@@ -83,7 +83,10 @@ public class TestDriver {
 		
 	}
 	
-	@Test(groups={"it"}, expectedExceptions=UnhandledAlertException.class)
+	/**
+	 * deactivated as it depends on browser
+	 */
+	@Test(groups={"it"}, expectedExceptions=UnhandledAlertException.class, enabled=false)
 	public void testFindWithAlert() {
 		testPage.startButton.click();
 		testPage.greenSquare.click();

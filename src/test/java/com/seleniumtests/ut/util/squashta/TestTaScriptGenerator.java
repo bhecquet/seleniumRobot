@@ -12,7 +12,6 @@ import org.testng.ITestContext;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.util.squashta.SquashTaTestDef;
 import com.seleniumtests.util.squashta.TaScriptGenerator;
@@ -31,7 +30,7 @@ public class TestTaScriptGenerator {
 	@Test(groups={"squash"})
 	public void testParseFeatures() {
 		
-		TaScriptGenerator scriptGenerator = new TaScriptGenerator("core", SeleniumTestsContext.getRootPath(), SeleniumTestsContext.getRootPath());
+		TaScriptGenerator scriptGenerator = new TaScriptGenerator("core", SeleniumTestsContextManager.getRootPath(), SeleniumTestsContextManager.getRootPath());
 		List<String> scenarios = scriptGenerator.parseFeatures();
 		Assert.assertTrue(scenarios.contains("core_ <text>"));
 		Assert.assertTrue(scenarios.contains("core_3"));
@@ -44,7 +43,7 @@ public class TestTaScriptGenerator {
 	
 	@Test(groups={"squash"})
 	public void testParseTestNg() {
-		TaScriptGenerator scriptGenerator = new TaScriptGenerator("core", SeleniumTestsContext.getRootPath(), SeleniumTestsContext.getRootPath());
+		TaScriptGenerator scriptGenerator = new TaScriptGenerator("core", SeleniumTestsContextManager.getRootPath(), SeleniumTestsContextManager.getRootPath());
 		List<SquashTaTestDef> testList = scriptGenerator.parseTestNgXml();
 		Assert.assertTrue(testList.contains(new SquashTaTestDef(null, "SquashTa_cucumber_test", true, "Conge")));
 		Assert.assertTrue(testList.contains(new SquashTaTestDef(null, "SquashTa_cucumber_tags", true, "@new")));
@@ -60,12 +59,12 @@ public class TestTaScriptGenerator {
 	 */
 	@Test(groups={"squash"})
 	public void testCleanGeneratedFiles() throws IOException {
-		File tmpFolder = Paths.get(SeleniumTestsContext.getDataPath(), "tmp").toFile();
+		File tmpFolder = Paths.get(SeleniumTestsContextManager.getDataPath(), "tmp").toFile();
 		tmpFolder.mkdirs();
 		FileUtils.write(Paths.get(tmpFolder.getPath(), "a_file.ta").toFile(), "");
 		FileUtils.write(Paths.get(tmpFolder.getPath(), "g__a_file.ta").toFile(), "");
 		FileUtils.write(Paths.get(tmpFolder.getPath(), "g__an_other_file.ta").toFile(), "");
-		TaScriptGenerator scriptGenerator = new TaScriptGenerator("core", SeleniumTestsContext.getRootPath(), SeleniumTestsContext.getRootPath());
+		TaScriptGenerator scriptGenerator = new TaScriptGenerator("core", SeleniumTestsContextManager.getRootPath(), SeleniumTestsContextManager.getRootPath());
 		
 		try {
 			scriptGenerator.cleanGeneratedFile(tmpFolder.toString(), Arrays.asList("g__a_file.ta", "g__a_file2.ta"));
@@ -84,8 +83,8 @@ public class TestTaScriptGenerator {
 	 */
 	@Test(groups={"squash"})
 	public void testGenerateTaScripts() throws IOException {
-		File generationFolder = Paths.get(SeleniumTestsContext.getRootPath(), "data", "core", "squash-ta").toFile();
-		TaScriptGenerator scriptGenerator = new TaScriptGenerator("core", SeleniumTestsContext.getRootPath(), generationFolder.getPath());
+		File generationFolder = Paths.get(SeleniumTestsContextManager.getRootPath(), "data", "core", "squash-ta").toFile();
+		TaScriptGenerator scriptGenerator = new TaScriptGenerator("core", SeleniumTestsContextManager.getRootPath(), generationFolder.getPath());
 		
 		try {
 			scriptGenerator.generateTaScripts();
@@ -111,8 +110,8 @@ public class TestTaScriptGenerator {
 	 */
 	@Test(groups={"squash"})
 	public void testGenerateTaScriptContent() throws IOException {
-		File generationFolder = Paths.get(SeleniumTestsContext.getRootPath(), "data", "core", "squash-ta").toFile();
-		TaScriptGenerator scriptGenerator = new TaScriptGenerator("core", SeleniumTestsContext.getRootPath(), generationFolder.getPath());
+		File generationFolder = Paths.get(SeleniumTestsContextManager.getRootPath(), "data", "core", "squash-ta").toFile();
+		TaScriptGenerator scriptGenerator = new TaScriptGenerator("core", SeleniumTestsContextManager.getRootPath(), generationFolder.getPath());
 		
 		try {
 			// compare non generic cucumber

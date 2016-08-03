@@ -32,6 +32,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.json.JSONObject;
 import org.openqa.selenium.Platform;
+import org.openqa.selenium.Proxy.ProxyType;
 import org.openqa.selenium.WebDriverException;
 import org.testng.ITestContext;
 import org.testng.ITestResult;
@@ -52,13 +53,7 @@ import com.seleniumtests.reporter.TestLogging;
 public class SeleniumTestsContext {
 	
 	// folder config
-	private static String rootPath;
-	private static String dataPath;
-	private static String featuresPath;
-	private static String configPath;
-	private static String applicationName;
 	private Map<String, HashMap<String,String>> idMapping;
-	public static final String DATA_FOLDER_NAME = "data";
 	
 	private static final Logger logger = TestLogging.getLogger(SeleniumTestsContext.class);
 
@@ -90,9 +85,13 @@ public class SeleniumTestsContext {
     public static final String BROWSER_DOWNLOAD_DIR = "browserDownloadDir";		// répertoire où seront enregistrés les fichiers
     public static final String ADD_JS_ERROR_COLLECTOR_EXTENSION = "addJSErrorCollectorExtension"; // Firefox uniquement
 
-    public static final String WEB_PROXY_ENABLED = "webProxyEnabled";			// activation du serveur proxy pour le navigateur
-    public static final String WEB_PROXY_TYPE = "webProxyType";					// type de proxy. TODO: à compléter pour prendre en charge les proxy auto et manuels
-    public static final String WEB_PROXY_ADDRESS = "webProxyAddress";			// adresse du proxy. TODO: quel est le format
+    public static final String WEB_PROXY_TYPE = "proxyType";					// type de proxy. AUTO, MANUAL, NO
+    public static final String WEB_PROXY_ADDRESS = "proxyAddress";				// adresse du proxy. 
+    public static final String WEB_PROXY_PORT = "proxyPort";					// port du proxy
+    public static final String WEB_PROXY_LOGIN = "proxyLogin";					// login du proxy (si nécessaire)
+    public static final String WEB_PROXY_PASSWORD = "proxyPassword";			// mot de passe du proxy (si nécessaire)
+    public static final String WEB_PROXY_EXCLUDE = "proxyExclude";				// exclusion des adresse de proxy
+    public static final String WEB_PROXY_PAC = "proxyPac";						// adresse de configuration automatique du proxy
 
     public static final String TEST_ENTITY = "testEntity";						// Jamais utilisé
 
@@ -120,7 +119,7 @@ public class SeleniumTestsContext {
     public static final String CUCUMBER_TESTS = "cucumberTests";				// liste des tests en mode cucumber
     public static final String CUCUMBER_TAGS = "cucumberTags";					// liste des tags cucumber
     public static final String TEST_CONFIG = "currentTestConfig"; 				// configuration used for the current test. It is not updated via XML file
-    public static final String TEST_ENV = "env";								// environnement de test pour le SUT. Permet d'accéder aux configurations spécifiques du fichier config.ini
+    public static final String TEST_ENV = "env";								// environnement de test pour le SUT. Permet d'accéder aux configurations spécifiques du fichier env.ini
     public static final String CUCUMBER_IMPLEMENTATION_PKG = "cucumberPackage";	// nom du package java pour les classes cucumber, car celui-ci n'est pas accessible par testNG
     
     // Appium specific properties
@@ -153,13 +152,10 @@ public class SeleniumTestsContext {
 
     private LinkedList<ScreenShot> screenshots = new LinkedList<>();
     
+    public SeleniumTestsContext() {}
+    
     public SeleniumTestsContext(final ITestContext context) {
         this.testNGContext = context;
-        
-        // initialize folders
-        if (context != null && context.getCurrentXmlTest() != null) {
-        	generateApplicationPath(context.getCurrentXmlTest().getSuite());
-        }
 
         setTestDataFile(getValueForTest(TEST_DATA_FILE, System.getProperty(TEST_DATA_FILE)));
         setWebSessionTimeout(getIntValueForTest(WEB_SESSION_TIME_OUT, System.getProperty(WEB_SESSION_TIME_OUT)));
@@ -186,9 +182,13 @@ public class SeleniumTestsContext {
    
         setJsErrorCollectorExtension(getBoolValueForTest(ADD_JS_ERROR_COLLECTOR_EXTENSION, System.getProperty(ADD_JS_ERROR_COLLECTOR_EXTENSION)));
 
-        setWebProxyEnabled(getBoolValueForTest(WEB_PROXY_ENABLED, System.getProperty(WEB_PROXY_ENABLED)));
-        setProxyType(getValueForTest(WEB_PROXY_TYPE, System.getProperty(WEB_PROXY_TYPE)));
-        setProxyAddress(getValueForTest(WEB_PROXY_ADDRESS, System.getProperty(WEB_PROXY_ADDRESS)));
+        setWebProxyType(getValueForTest(WEB_PROXY_TYPE, System.getProperty(WEB_PROXY_TYPE)));
+        setWebProxyAddress(getValueForTest(WEB_PROXY_ADDRESS, System.getProperty(WEB_PROXY_ADDRESS)));
+        setWebProxyLogin(getValueForTest(WEB_PROXY_LOGIN, System.getProperty(WEB_PROXY_LOGIN)));
+        setWebProxyPassword(getValueForTest(WEB_PROXY_PASSWORD, System.getProperty(WEB_PROXY_PASSWORD)));
+        setWebProxyPort(getIntValueForTest(WEB_PROXY_PORT, System.getProperty(WEB_PROXY_PORT)));
+        setWebProxyExclude(getValueForTest(WEB_PROXY_EXCLUDE, System.getProperty(WEB_PROXY_EXCLUDE)));
+        setWebProxyPac(getValueForTest(WEB_PROXY_PAC, System.getProperty(WEB_PROXY_PAC)));
 
         // Set default to summaryPerSuite, by default it would generate a summary report per suite for tests in SeleniumTestReport.html
         // if set to summaryAllSuites, only one summary report section would be generated.
@@ -293,62 +293,7 @@ public class SeleniumTestsContext {
         } else {
             return null;
         }
-    }
-    
-    /**
-     * Build the root path of STF 
-     * method for guessing it is different if we are inside a jar (built mode) or in development
-     * @param clazz
-     * @param path
-     * @return
-     */
-    private static Boolean getPathFromClass(Class clazz, StringBuilder path) {
-		Boolean jar = false;
-		
-		try {
-			String url = URLDecoder.decode(clazz.getProtectionDomain().getCodeSource().getLocation().getFile(), "UTF-8" );
-			if (url.endsWith(".jar")) {
-				path.append((new File(url).getParentFile().getAbsoluteFile().toString() + "/").replace(File.separator, "/"));
-				jar = true;
-			} else {				
-				path.append((new File(url).getParentFile().getParentFile().getAbsoluteFile().toString() + "/").replace(File.separator, "/"));
-				jar = false;
-			}
-		} catch (UnsupportedEncodingException e) {
-			logger.error(e);
-		}
-		
-		return jar;
-	}
-	
-    
-	private static void generateApplicationPath(XmlSuite xmlSuite) {
-
-		StringBuilder path = new StringBuilder();
-		getPathFromClass(SeleniumTestsContext.class, path);
-		
-		rootPath = path.toString();
-		
-		// in case launching unit test from eclipse, a temp file is generated outside the standard folder structure
-		// APPLICATION_NAME and DATA_PATH must be rewritten
-		try {
-			applicationName = xmlSuite.getFileName().replace(File.separator, "/").split("/"+ DATA_FOLDER_NAME + "/")[1].split("/")[0];
-			dataPath = xmlSuite.getFileName().replace(File.separator, "/").split("/"+ DATA_FOLDER_NAME + "/")[0] + "/" + DATA_FOLDER_NAME + "/";
-		} catch (IndexOutOfBoundsException e) {
-			applicationName = "core";
-			dataPath = Paths.get(rootPath, "data").toString();
-		}
-		
-		featuresPath = Paths.get(dataPath, applicationName, "features").toString();
-		configPath = Paths.get(dataPath, applicationName, "config").toString();
-		
-		// create data folder if it does not exist (it should already exist)
-		if (!new File(dataPath).isDirectory()) {
-			new File(dataPath).mkdirs();
-		}
-	}
-
-    
+    }    
     
     /**
      * From platform name, in case of Desktop platform, do nothing and in case of mobile, extract OS version from name
@@ -397,7 +342,7 @@ public class SeleniumTestsContext {
         		setAttribute(TEST_TYPE, TestType.APPIUM_APP_IOS);
         	}
         } else {
-        	if (getBrowser().isEmpty()) {
+        	if (getBrowser() == BrowserType.NONE) {
         		setAttribute(TEST_TYPE, TestType.NON_GUI);
         	} else {
         		setAttribute(TEST_TYPE, TestType.WEB);
@@ -459,9 +404,9 @@ public class SeleniumTestsContext {
         if (getAttribute(CAPTURE_SNAPSHOT) == null) {
 
             // IE grid default value set to false
-            if ("ExistingGrid".equalsIgnoreCase(this.getRunMode())
-                    && ("iexplore".contains(this.getBrowser()) 
-                    || "safari".contains(this.getBrowser()))) {
+            if (this.getRunMode() == DriverMode.EXISTING_GRID
+                    && (this.getBrowser() == BrowserType.INTERNETEXPLORER 
+                    || this.getBrowser() == BrowserType.SAFARI)) {
                 this.setAttribute(CAPTURE_SNAPSHOT, false);
             } else {
                 this.setAttribute(CAPTURE_SNAPSHOT, true);
@@ -672,16 +617,36 @@ public class SeleniumTestsContext {
         return (String) getAttribute(WEB_PROXY_ADDRESS);
     }
 
-    public String getWebProxyType() {
-        return (String) getAttribute(WEB_PROXY_TYPE);
+    public ProxyType getWebProxyType() {
+        return (ProxyType) getAttribute(WEB_PROXY_TYPE);
     }
 
-    public String getBrowser() {
-        return (String) getAttribute(BROWSER);
+    public Integer getWebProxyPort() {
+		return (Integer) getAttribute(WEB_PROXY_PORT);
+	}
+
+	public String getWebProxyLogin() {
+		return (String) getAttribute(WEB_PROXY_LOGIN);
+	}
+
+	public String getWebProxyPassword() {
+		return (String) getAttribute(WEB_PROXY_PASSWORD);
+	}
+
+	public String getWebProxyExclude() {
+		return (String) getAttribute(WEB_PROXY_EXCLUDE);
+	}
+
+	public String getWebProxyPac() {
+		return (String) getAttribute(WEB_PROXY_PAC);
+	}
+
+	public BrowserType getBrowser() {
+        return (BrowserType) getAttribute(BROWSER);
     }
 
-    public String getRunMode() {
-        return (String) getAttribute(RUN_MODE);
+    public DriverMode getRunMode() {
+        return (DriverMode) getAttribute(RUN_MODE);
     }
     
     public Boolean getDevMode() {
@@ -763,38 +728,6 @@ public class SeleniumTestsContext {
     public Map<String, HashMap<String, String>> getIdMapping() {
     	return idMapping;
     }
-    
-    /**
-     * Returns application root path
-     * @return
-     */
-    public static String getRootPath() {
-		return rootPath;
-	}
-
-    /**
-     * Returns location of feature files
-     * @return
-     */
-	public static String getFeaturePath() {
-		return featuresPath;
-	}
-
-	/**
-	 * Returns location of config files
-	 * @return
-	 */
-	public static String getConfigPath() {
-		return configPath;
-	}
-	
-	/**
-	 * Returns location of data folder
-	 * @return
-	 */
-	public static String getDataPath() {
-		return dataPath;
-	}
 
 	//set
     public void setIdMapping(Map<String, HashMap<String,String>> conf){
@@ -814,14 +747,6 @@ public class SeleniumTestsContext {
     public boolean isSoftAssertEnabled() {
         try {
             return (Boolean) getAttribute(SOFT_ASSERT_ENABLED);
-        } catch (Exception e) {
-            return false; // Default
-        }
-    }
-
-    public boolean isWebProxyEnabled() {
-        try {
-            return (Boolean) getAttribute(WEB_PROXY_ENABLED);
         } catch (Exception e) {
             return false; // Default
         }
@@ -879,7 +804,7 @@ public class SeleniumTestsContext {
         	
         	if (testValue == null) {
         		
-        		// if test parameter does not exist, loot at suite parameter
+        		// if test parameter does not exist, look at suite parameter
         		suiteValue = testNGContext.getCurrentXmlTest().getSuite().getParameter(attributeName);
         		
         	} else {
@@ -966,8 +891,7 @@ public class SeleniumTestsContext {
     
     public void setRunMode(String runMode) {
     	String _runMode = runMode == null ? "LOCAL": runMode;
-    	DriverMode.fromString(_runMode);
-        setAttribute(RUN_MODE, _runMode);
+        setAttribute(RUN_MODE, DriverMode.fromString(_runMode));
 	}
     
     public void setDevMode(Boolean devMode) {
@@ -980,8 +904,7 @@ public class SeleniumTestsContext {
 
     public void setBrowser(String browser) {
     	String _browser = browser == null ? "*firefox": browser;
-    	BrowserType.getBrowserType(_browser);
-    	setAttribute(BROWSER, _browser);
+    	setAttribute(BROWSER, BrowserType.getBrowserType(_browser));
     }
     
     public void setBrowserVersion(String browserVersion) {
@@ -1059,21 +982,38 @@ public class SeleniumTestsContext {
     		setAttribute(ADD_JS_ERROR_COLLECTOR_EXTENSION, false);
     	}
     }
-   
-    public void setWebProxyEnabled(Boolean enabled) {
-    	if (enabled != null) {
-    		setAttribute(WEB_PROXY_ENABLED, enabled);
-    	} else {
-    		setAttribute(WEB_PROXY_ENABLED, false);
+    
+    public void setWebProxyType(String proxyType) {
+    	try {
+    		setAttribute(WEB_PROXY_TYPE, ProxyType.valueOf(proxyType.toUpperCase()));
+    	} catch (NullPointerException | IllegalArgumentException e) {
+    		setAttribute(WEB_PROXY_TYPE, null);
     	}
+    	
     }
     
-    public void setProxyType(String proxyType) {
-    	setAttribute(WEB_PROXY_TYPE, proxyType);
-    }
-    
-    public void setProxyAddress(String proxyAddress) {
+    public void setWebProxyAddress(String proxyAddress) {
     	setAttribute(WEB_PROXY_ADDRESS, proxyAddress);
+    }
+    
+    public void setWebProxyPort(Integer port) {
+    	setAttribute(WEB_PROXY_PORT, port);    	
+    }
+    
+    public void setWebProxyLogin(String login) {
+    	setAttribute(WEB_PROXY_LOGIN, login);
+    }
+    
+    public void setWebProxyPassword(String password) {
+    	setAttribute(WEB_PROXY_PASSWORD, password);
+    }
+    
+    public void setWebProxyPac(String pacAddress) {
+    	setAttribute(WEB_PROXY_PAC, pacAddress);
+    }
+    
+    public void setWebProxyExclude(String proxyExclude) {
+    	setAttribute(WEB_PROXY_EXCLUDE, proxyExclude);
     }
     
     public void setReportGenerationConfig(String config) {
@@ -1246,19 +1186,59 @@ public class SeleniumTestsContext {
     }
     
     /**
+     * post configuration of the context
+     */
+    public void postInit() {
+    	postsetProxyConfig();
+    	setTestConfiguration();
+    }
+    
+    /**
+     * Extract proxy settings from environment configuration and write them to context if 
+     */
+    public void postsetProxyConfig() {
+    	Map<String, String> envConfig = new ConfigReader().readConfig();
+    	for (String key: envConfig.keySet()) {
+    		switch (key) {
+    			case WEB_PROXY_TYPE:
+    				setWebProxyType(getWebProxyType() == null ? envConfig.get(key): (getWebProxyType() == null ? null: getWebProxyType().name()));
+    				break;
+    			case WEB_PROXY_ADDRESS:
+    				setWebProxyAddress(getWebProxyAddress() == null ? envConfig.get(key): getWebProxyAddress());
+    				break;
+    			case WEB_PROXY_PORT:
+    				setWebProxyPort(getWebProxyPort() == null ? Integer.valueOf(envConfig.get(key)): getWebProxyPort());
+    				break;
+    			case WEB_PROXY_LOGIN:
+    				setWebProxyLogin(getWebProxyLogin() == null ? envConfig.get(key): getWebProxyLogin());
+    				break;
+    			case WEB_PROXY_PASSWORD:
+    				setWebProxyPassword(getWebProxyPassword() == null ? envConfig.get(key): getWebProxyPassword());
+    				break;
+    			case WEB_PROXY_PAC:
+    				setWebProxyPac(getWebProxyPac() == null ? envConfig.get(key): getWebProxyPac());
+    				break;
+    			case WEB_PROXY_EXCLUDE:
+    				setWebProxyExclude(getWebProxyExclude() == null ? envConfig.get(key): getWebProxyExclude());
+    				break;
+    			default:
+    				continue;
+    		}
+    	}
+    	
+    	// set default value for proxy type if none as been set before
+    	if (getWebProxyType() == null) {
+    		setWebProxyType("AUTODETECT");
+    	}
+    }
+    
+    /**
      * Read configuration from environment specific data and undefined parameters present un testng xml file
      */
 	public void setTestConfiguration() {
-    	Map<String, String> testConfig;
-		try {
-			testConfig = new ConfigReader().readConfig(FileUtils.openInputStream(new File(configPath + File.separator + "config.ini")));
-		} catch (IOException e1) {
-			TestLogging.warning("no valid config.ini file for this application");
-			testConfig = new HashMap<>();
-		}
-		
-		testConfig.putAll(testVariables);
-    	setAttribute(TEST_CONFIG, testConfig);
+    	Map<String, String> envConfig = new ConfigReader().readConfig();
+    	envConfig.putAll(testVariables);
+    	setAttribute(TEST_CONFIG, envConfig);
     }
 
 }

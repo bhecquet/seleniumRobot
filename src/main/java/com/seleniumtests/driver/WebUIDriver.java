@@ -15,7 +15,6 @@
 package com.seleniumtests.driver;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -35,6 +34,7 @@ import com.seleniumtests.browserfactory.SafariDriverFactory;
 import com.seleniumtests.browserfactory.SauceLabsDriverFactory;
 import com.seleniumtests.browserfactory.TestDroidDriverFactory;
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.core.proxy.ProxyConfig;
 import com.seleniumtests.customexception.DriverExceptions;
 import com.seleniumtests.reporter.TestLogging;
 import com.seleniumtests.util.OSUtility;
@@ -58,17 +58,8 @@ public class WebUIDriver {
         uxDriverSession.set(this);
     }
 
-    public WebUIDriver(final String browser, final String mode) {
-        init();
-        this.setBrowser(browser);
-        this.setMode(mode);
-        uxDriverSession.set(this);
-    }
-
-    public WebDriver createRemoteWebDriver(final String browser, final String mode) throws IOException  {
-        config.setBrowser(BrowserType.getBrowserType(browser));
-        config.setMode(DriverMode.valueOf(mode));
-
+    public WebDriver createRemoteWebDriver() throws IOException  {
+        
         // TODO: use grid with appium ?
         if (config.getMode() == DriverMode.EXISTING_GRID) {
             webDriverBuilder = new RemoteDriverFactory(this.config);
@@ -93,7 +84,7 @@ public class WebUIDriver {
 	            } else if (config.getBrowser() == BrowserType.SAFARI) {
 	                webDriverBuilder = new SafariDriverFactory(this.config);
 	            } else {
-	                throw new DriverExceptions("Unsupported browser: " + browser);
+	                throw new DriverExceptions("Unsupported browser: " + config.getBrowser().toString());
 	            }
         	}
         }
@@ -230,115 +221,19 @@ public class WebUIDriver {
     	if (config.getTestType().isMobile()) {
     		logger.info("Start creating appium driver");
     	} else {
-    		logger.info(String.format("Start creating %s driver", this.getBrowser()));
+    		logger.info(String.format("Start creating %s driver", config.getBrowser().getBrowserType()));
     	}
         
-        driver = createRemoteWebDriver(config.getBrowser().getBrowserType(), config.getMode().name());
+        driver = createRemoteWebDriver();
 
         if (config.getTestType().isMobile()) {
     		logger.info("Finished creating appium driver");
     	} else {
-    		logger.info(String.format("Finished creating %s driver", this.getBrowser()));
+    		logger.info(String.format("Finished creating %s driver", config.getBrowser().getBrowserType()));
     	}
 
         driverSession.set(driver);
         return driver;
-    }
-
-    public String getBrowser() {
-        return config.getBrowser().getBrowserType();
-    }
-
-    public String getPlatform() {
-        return config.getWebPlatform().name();
-    }
-
-    public String getBrowserVersion() {
-        return config.getBrowserVersion();
-    }
-
-    public String getChromeBinPath() {
-        return config.getChromeBinPath();
-    }
-
-    public String getChromeDriverPath() {
-        return config.getChromeDriverPath();
-    }
-
-    public DriverConfig getConfig() {
-        return config;
-    }
-
-    public int getExplicitWait() {
-        return config.getExplicitWaitTimeout();
-    }
-
-    public String getFfBinPath() {
-        return config.getFirefoxBinPath();
-    }
-
-    public String getFfProfilePath() throws URISyntaxException {
-        return config.getFirefoxProfilePath();
-    }
-
-    public String getOperaProfilePath() throws URISyntaxException {
-        return config.getOperaProfilePath();
-    }
-
-    public void setOperaProfilePath(final String operaProfilePath) {
-        config.setOperaProfilePath(operaProfilePath);
-    }
-
-    public String getHubUrl() {
-        return config.getHubUrl();
-    }
-
-    public String getIEDriverPath() {
-        return config.getIeDriverPath();
-    }
-
-    public double getImplicitWait() {
-        return config.getImplicitWaitTimeout();
-    }
-
-    public String getMode() {
-        return config.getMode().name();
-    }
-
-    public String getOutputDirectory() {
-        return config.getOutputDirectory();
-    }
-
-    public String getNtlmAuthTrustedUris() {
-        return config.getNtlmAuthTrustedUris();
-    }
-
-    public void setNtlmAuthTrustedUris(final String url) {
-        config.setNtlmAuthTrustedUris(url);
-    }
-
-    public int getPageLoadTimeout() {
-        return config.getPageLoadTimeout();
-    }
-
-    public String getProxyHost() {
-        return config.getProxyHost();
-    }
-
-    public void setUserAgentOverride(final String userAgentOverride) {
-        config.setUserAgentOverride(userAgentOverride);
-    }
-
-    public String getUserAgentOverride() {
-        return config.getUserAgentOverride();
-    }
-
-    public IWebDriverFactory getWebDriverBuilder() {
-        return webDriverBuilder;
-    }
-
-    public int getWebSessionTimeout() {
-        return config.getWebSessionTimeout();
     }
 
     private void init() {
@@ -346,11 +241,11 @@ public class WebUIDriver {
             return;
         }
 
-        String browser = SeleniumTestsContextManager.getThreadContext().getBrowser();
-        config.setBrowser(BrowserType.getBrowserType(browser));
+        BrowserType browser = SeleniumTestsContextManager.getThreadContext().getBrowser();
+        config.setBrowser(browser);
 
-        String mode = SeleniumTestsContextManager.getThreadContext().getRunMode();
-        config.setMode(DriverMode.fromString(mode));
+        DriverMode mode = SeleniumTestsContextManager.getThreadContext().getRunMode();
+        config.setMode(mode);
 
         String hubUrl = SeleniumTestsContextManager.getThreadContext().getWebDriverGrid();
         config.setHubUrl(hubUrl);
@@ -385,11 +280,18 @@ public class WebUIDriver {
 
         String outputDirectory = SeleniumTestsContextManager.getGlobalContext().getOutputDirectory();
         config.setOutputDirectory(outputDirectory);
+        
+        // set proxy config
+        ProxyConfig proxyConfig = new ProxyConfig();
+        proxyConfig.setType(SeleniumTestsContextManager.getThreadContext().getWebProxyType());
+        proxyConfig.setAddress(SeleniumTestsContextManager.getThreadContext().getWebProxyAddress());
+        proxyConfig.setPort(SeleniumTestsContextManager.getThreadContext().getWebProxyPort());
+        proxyConfig.setLogin(SeleniumTestsContextManager.getThreadContext().getWebProxyLogin());
+        proxyConfig.setPassword(SeleniumTestsContextManager.getThreadContext().getWebProxyPassword());
+        proxyConfig.setExclude(SeleniumTestsContextManager.getThreadContext().getWebProxyExclude());
+        proxyConfig.setPac(SeleniumTestsContextManager.getThreadContext().getWebProxyPac());
+        config.setProxyConfig(proxyConfig);
 
-        if (SeleniumTestsContextManager.getThreadContext().isWebProxyEnabled()) {
-            String proxyHost = SeleniumTestsContextManager.getThreadContext().getWebProxyAddress();
-            config.setProxyHost(proxyHost);
-        }
 
         String browserVersion = SeleniumTestsContextManager.getThreadContext().getWebBrowserVersion();
         config.setBrowserVersion(browserVersion);
@@ -500,96 +402,7 @@ public class WebUIDriver {
         return config.isEnableJavascript();
     }
 
-    public void setEnableJavascript(final Boolean enableJavascript) {
-        config.setEnableJavascript(enableJavascript);
-    }
-
-    public void setBrowser(final String browser) {
-        config.setBrowser(BrowserType.getBrowserType(browser));
-
-    }
-
-    public void setBrowserVersion(final String browserVersion) {
-        config.setBrowserVersion(browserVersion);
-    }
-
-    public void setPlatform(final String platform) {
-        config.setWebPlatform(Platform.valueOf(platform));
-    }
-
-    public void setChromeBinPath(final String chromeBinPath) {
-        config.setChromeBinPath(chromeBinPath);
-    }
-
-    public void setBrowserDownloadDir(final String browserDownloadDir) {
-        config.setBrowserDownloadDir(browserDownloadDir);
-    }
-
-    public String getBrowserDownloadDir() {
-        return config.getBrowserDownloadDir();
-    }
-
-    public void setChromeDriverPath(final String chromeDriverPath) {
-        config.setChromeDriverPath(chromeDriverPath);
-    }
-
-    public void setConfig(final DriverConfig config) {
-        this.config = config;
-    }
-
-    public void setExplicitTimeout(final int explicitWaitTimeout) {
-        config.setExplicitWaitTimeout(explicitWaitTimeout);
-    }
-
-    public void setFfBinPath(final String ffBinPath) {
-        config.setFfBinPath(ffBinPath);
-    }
-
-    public void setFfProfilePath(final String ffProfilePath) {
-        config.setFfProfilePath(ffProfilePath);
-    }
-
-    public void setHubUrl(final String hubUrl) {
-        config.setHubUrl(hubUrl);
-    }
-
-    public void setIEDriverPath(final String ieDriverPath) {
-        config.setIeDriverPath(ieDriverPath);
-    }
-
-    public void setImplicitlyWaitTimeout(final double implicitTimeout) {
-        config.setImplicitWaitTimeout(implicitTimeout);
-    }
-
-    public void setMode(final String mode) {
-        config.setMode(DriverMode.valueOf(mode));
-    }
-
-    public void setOutputDirectory(final String outputDirectory) {
-        config.setOutputDirectory(outputDirectory);
-    }
-
-    public void setPageLoadTimeout(final int pageLoadTimeout) {
-        config.setPageLoadTimeout(pageLoadTimeout);
-    }
-
-    public void setProxyHost(final String proxyHost) {
-        config.setProxyHost(proxyHost);
-    }
-
-    public void setSetAcceptUntrustedCertificates(final boolean setAcceptUntrustedCertificates) {
-        config.setSetAcceptUntrustedCertificates(setAcceptUntrustedCertificates);
-    }
-
-    public void setSetAssumeUntrustedCertificateIssuer(final boolean setAssumeUntrustedCertificateIssuer) {
-        config.setSetAssumeUntrustedCertificateIssuer(setAssumeUntrustedCertificateIssuer);
-    }
-
-    public void setWebDriverBuilder(final IWebDriverFactory builder) {
-        this.webDriverBuilder = builder;
-    }
-
-    public void setWebSessionTimeout(final int webSessionTimeout) {
-        config.setWebSessionTimeout(webSessionTimeout);
-    }
+	public DriverConfig getConfig() {
+		return config;
+	}
 }

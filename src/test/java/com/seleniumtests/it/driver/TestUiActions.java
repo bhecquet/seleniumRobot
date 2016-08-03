@@ -23,6 +23,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.WebUIDriver;
 
 public class TestUiActions {
@@ -34,7 +35,7 @@ public class TestUiActions {
 		SeleniumTestsContextManager.initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setBrowser("chrome");
 		driver = WebUIDriver.getWebDriver(true);
-		if (SeleniumTestsContextManager.getThreadContext().getBrowser().contains("firefox")) {
+		if (SeleniumTestsContextManager.getThreadContext().getBrowser() == BrowserType.FIREFOX) {
 			driver.get("file://" + Thread.currentThread().getContextClassLoader().getResource("tu/test.html").getFile());
 		} else {
 			driver.get("file:///" + Thread.currentThread().getContextClassLoader().getResource("tu/test.html").getFile());

@@ -10,7 +10,6 @@ import org.testng.ITestContext;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.util.squashta.TaFolderStructureGenerator;
 
@@ -28,7 +27,7 @@ public class TestTaFolderStructureGenerator {
 	 */
 	@Test(groups={"squash"})
 	public void testGenerateDefaultStructure() throws IOException {
-		File tmpFolder = Paths.get(SeleniumTestsContext.getDataPath(), "tmp").toFile();
+		File tmpFolder = Paths.get(SeleniumTestsContextManager.getDataPath(), "tmp").toFile();
 		TaFolderStructureGenerator structGen = new TaFolderStructureGenerator("core", null, tmpFolder.getAbsolutePath());
 		try {
 			structGen.generateDefaultStructure();
@@ -47,7 +46,7 @@ public class TestTaFolderStructureGenerator {
 	 */
 	@Test(groups={"squash"})
 	public void testGenerateStructureWithExistingTa() throws IOException {
-		File tmpFolder = Paths.get(SeleniumTestsContext.getDataPath(), "tmp").toFile();
+		File tmpFolder = Paths.get(SeleniumTestsContextManager.getDataPath(), "tmp").toFile();
 		File taFile = Paths.get(tmpFolder.getPath(), "src", "squashTA", "tests", "core_generic.ta").toFile();
 		FileUtils.writeStringToFile(taFile, "exists");
 		
@@ -68,7 +67,7 @@ public class TestTaFolderStructureGenerator {
 	 */
 	@Test(groups={"squash"})
 	public void testGenerateStructureWithExistingJava() throws IOException {
-		File tmpFolder = Paths.get(SeleniumTestsContext.getDataPath(), "tmp").toFile();
+		File tmpFolder = Paths.get(SeleniumTestsContextManager.getDataPath(), "tmp").toFile();
 		File javaFile = Paths.get(tmpFolder.getPath(), "src", "squashTA", "resources", "junit", "java", "SeleniumRobotTest.java").toFile();
 		FileUtils.writeStringToFile(javaFile, "javaExist");
 		
@@ -89,7 +88,7 @@ public class TestTaFolderStructureGenerator {
 	 */
 	@Test(groups={"squash"})
 	public void testGenerateStructureWithExistingJavaInOutput() throws IOException {
-		File tmpFolder = Paths.get(SeleniumTestsContext.getDataPath(), "tmp").toFile();
+		File tmpFolder = Paths.get(SeleniumTestsContextManager.getDataPath(), "tmp").toFile();
 		File javaFile = Paths.get(tmpFolder.getPath(), "src", "squashTA", "resources", "junit", "java", "SeleniumRobotTest.java").toFile();
 		FileUtils.writeStringToFile(javaFile, "javaExist");
 		

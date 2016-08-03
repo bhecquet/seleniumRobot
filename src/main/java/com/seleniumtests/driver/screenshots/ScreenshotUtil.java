@@ -62,7 +62,7 @@ public class ScreenshotUtil {
         try {
 
             // Don't capture snapshot for htmlunit
-            if (WebUIDriver.getWebUIDriver().getBrowser().equalsIgnoreCase(BrowserType.HTMLUNIT.getBrowserType())) {
+            if (SeleniumTestsContextManager.getThreadContext().getBrowser() == BrowserType.HTMLUNIT) {
                 return null;
             }
 

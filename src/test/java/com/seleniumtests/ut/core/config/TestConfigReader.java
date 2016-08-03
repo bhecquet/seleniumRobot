@@ -13,6 +13,7 @@
 
 package com.seleniumtests.ut.core.config;
 
+import java.io.File;
 import java.util.Map;
 
 import org.testng.Assert;
@@ -29,14 +30,22 @@ public class TestConfigReader extends GenericTest {
 
 	@Test(groups={"ut"})
 	public void readConfigurationWithValueOverride() {
-		Map<String, String> config = new ConfigReader().readConfig(Thread.currentThread().getContextClassLoader().getResourceAsStream("tu/config.ini"), "Dev");
+		Map<String, String> config = new ConfigReader().readConfig(Thread.currentThread().getContextClassLoader().getResourceAsStream("tu/env.ini"), "Dev");
 		Assert.assertEquals(config.get("key1"), "value4", "Key override does not work");
 	}
 	
 	@Test(groups={"ut"})
 	public void readConfigurationWithoutValueOverride() {
-		Map<String, String> config = new ConfigReader().readConfig(Thread.currentThread().getContextClassLoader().getResourceAsStream("tu/config.ini"), "VNR");
+		Map<String, String> config = new ConfigReader().readConfig(Thread.currentThread().getContextClassLoader().getResourceAsStream("tu/env.ini"), "VNR");
 		Assert.assertEquals(config.get("key1"), "value1", "Key should not be overriden");
+	}
+	
+	@Test(groups={"ut context"})
+	public void getConfigFile(final ITestContext testNGCtx) {
+		SeleniumTestsContextManager.initThreadContext(testNGCtx);
+		File config = ConfigReader.getConfigFile();
+		Assert.assertEquals(config.getName(), "config.ini", "Key should not be overriden");
+		Assert.assertTrue(config.getAbsolutePath().contains("core"));
 	}
 	
 	@Test(groups={"ut context"})

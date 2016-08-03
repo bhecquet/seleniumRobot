@@ -13,6 +13,7 @@
 
 package com.seleniumtests.core.config;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
@@ -20,6 +21,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.ini4j.Config;
 import org.ini4j.Ini;
@@ -33,9 +35,40 @@ public class ConfigReader {
 	
 	private static final String GLOBAL_SECTION_NAME = "General";
 	private static final Logger logger = TestLogging.getLogger(ConfigReader.class);
+	private static File configFile = getCurrentConfigFile();
+	
+	/**
+	 * 
+	 * @return
+	 */
+	private static File getCurrentConfigFile() {
+		if (new File(SeleniumTestsContextManager.getConfigPath() + File.separator + "env.ini").isFile()) {
+			return new File(SeleniumTestsContextManager.getConfigPath() + File.separator + "env.ini");
+		} else {
+			return new File(SeleniumTestsContextManager.getConfigPath() + File.separator + "config.ini");
+		}
+	}
+
+	public static File getConfigFile() {
+		return configFile;
+	}
 
 	public Map<String, String> readConfig(InputStream iniFileStream) {
 		return readConfig(iniFileStream, SeleniumTestsContextManager.getThreadContext().getTestEnv());
+	}
+	
+	/**
+	 * read configuration from default config file
+	 * @return
+	 */
+	public Map<String, String> readConfig() {
+		try {
+			InputStream iniFileStream = FileUtils.openInputStream(configFile);
+			return readConfig(iniFileStream, SeleniumTestsContextManager.getThreadContext().getTestEnv());
+		} catch (IOException e1) {
+			TestLogging.warning("no valid config.ini file for this application");
+			return new HashMap<>();
+		}
 	}
 	
 	public Map<String, String> readConfig(InputStream iniFileStream, String environment) {
@@ -108,7 +141,7 @@ public class ConfigReader {
 			}
 		}
 		if (!envFound) {
-			logger.warn(String.format("No section in config.ini file matches the environment '%s'", environment));
+			logger.warn(String.format("No section in env.ini/config.ini file matches the environment '%s'", environment));
 		}
 		return testConfig;
 	}

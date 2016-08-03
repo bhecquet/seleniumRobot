@@ -23,6 +23,7 @@ public enum BrowserType {
     SAFARI("*safari"),
     BROWSER("*browser"), // default Android browser
     PHANTOMJS("*phantomjs"),
+    NONE("*none")
     ;
 
 	private String bType;
@@ -48,6 +49,8 @@ public enum BrowserType {
         	return BrowserType.BROWSER;
         } else if (browserType.toLowerCase().contains("phantomjs")) {
             return BrowserType.PHANTOMJS;
+        } else if (browserType.toLowerCase().contains("none")) {
+        	return BrowserType.NONE;
         } 
         throw new IllegalArgumentException(String.format("browser %s is unknown", browserType));
         

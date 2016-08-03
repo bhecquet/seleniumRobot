@@ -73,7 +73,7 @@ import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.SeleniumTestsPageListener;
 import com.seleniumtests.core.testretry.ITestRetryAnalyzer;
 import com.seleniumtests.customexception.ScenarioException;
-import com.seleniumtests.reporter.TestLogging;
+import com.seleniumtests.driver.DriverMode;
 import com.seleniumtests.driver.TestType;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.driver.screenshots.ScreenShot;
@@ -566,7 +566,7 @@ public class SeleniumTestsReporter implements IReporter, ITestListener, IInvoked
 
                     SeleniumTestsContext testLevelContext = SeleniumTestsContextManager.getTestLevelContext(testName);
                     if (testLevelContext != null) {
-                        String browser = testLevelContext.getBrowser();
+                        String browser = testLevelContext.getBrowser().getBrowserType();
 
                         String app = testLevelContext.getApp();
                         String appPackage = testLevelContext.getAppPackage();
@@ -1291,11 +1291,11 @@ public class SeleniumTestsReporter implements IReporter, ITestListener, IInvoked
             context.put("userName", userName);
             context.put("currentDate", new Date().toString());
 
-            String mode = SeleniumTestsContextManager.getGlobalContext().getRunMode();
+            DriverMode mode = SeleniumTestsContextManager.getGlobalContext().getRunMode();
             String hubUrl = SeleniumTestsContextManager.getGlobalContext().getWebDriverGrid();
             context.put("gridHub", "<a href='" + hubUrl + "' target=hub>" + hubUrl + "</a>");
 
-            context.put("mode", mode);
+            context.put("mode", mode.toString());
 
             StringBuilder sbGroups = new StringBuilder();
             sbGroups.append("envt,test");

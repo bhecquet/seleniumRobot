@@ -19,7 +19,6 @@ import java.util.List;
 
 import org.apache.commons.io.FilenameUtils;
 
-import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.CustomSeleniumTestsException;
 
@@ -71,7 +70,7 @@ public class CustomTestNGCucumberRunner {
     	}
     	
     	// get all features, filtered by test name
-    	System.setProperty("cucumber.options", SeleniumTestsContext.getFeaturePath());
+    	System.setProperty("cucumber.options", SeleniumTestsContextManager.getFeaturePath());
         List<CucumberFeature> testSelectedFeatures = getFeaturesFromRequestedTests(clazz, resourceLoader);
 
     	// build cucumber option list
@@ -91,7 +90,7 @@ public class CustomTestNGCucumberRunner {
         cucumberOptions += " --glue classpath:" + cucumberPkg;
         
         // add feature path
-        cucumberOptions += " " + SeleniumTestsContext.getFeaturePath();
+        cucumberOptions += " " + SeleniumTestsContextManager.getFeaturePath();
 
         // get filtered features, based on tags
         runtimeOptions = new RuntimeOptions(cucumberOptions);
