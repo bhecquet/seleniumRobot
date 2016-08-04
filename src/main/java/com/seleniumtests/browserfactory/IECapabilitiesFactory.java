@@ -29,11 +29,13 @@ import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.driver.DriverConfig;
 import com.seleniumtests.driver.DriverMode;
 import com.seleniumtests.util.FileUtility;
-import com.seleniumtests.util.OSUtilityWindows;
+import com.seleniumtests.util.osutility.OSUtility;
 
 public class IECapabilitiesFactory extends ICapabilitiesFactory {
     
 	private static final String WEBDRIVER_PROPERTY = "webdriver.ie.driver";
+	
+	private OSUtility osUtil = new OSUtility();
 	
     public void handleExtractResources() throws IOException {
         String dir = Paths.get(SeleniumTestsContextManager.getRootPath(), "tools", "drivers", 
@@ -42,7 +44,7 @@ public class IECapabilitiesFactory extends ICapabilitiesFactory {
         String iEDriverServerFile = "\\IEDriverServer.exe";
         
         if (!new File(dir + iEDriverServerFile).exists()) {
-            if (OSUtilityWindows.getIEVersion() < 10) {
+            if (osUtil.getIEVersion() < 10) {
                 FileUtils.copyFile(new File(dir + "\\IEDriverServer_x64.exe"), new File(dir + iEDriverServerFile));
             } else {
             	FileUtils.copyFile(new File(dir + "\\IEDriverServer_Win32.exe"), new File(dir + iEDriverServerFile)); // Win32

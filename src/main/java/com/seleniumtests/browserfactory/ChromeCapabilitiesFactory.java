@@ -28,11 +28,13 @@ import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.driver.DriverConfig;
 import com.seleniumtests.driver.DriverMode;
 import com.seleniumtests.util.FileUtility;
-import com.seleniumtests.util.OSUtility;
+import com.seleniumtests.util.osutility.OSUtility;
 
 public class ChromeCapabilitiesFactory extends ICapabilitiesFactory {
 
 	private static final String CHROME_DRIVER_PROPERTY = "webdriver.chrome.driver";
+	
+	private OSUtility osUtil = new OSUtility();
 	
 	@Override
     public DesiredCapabilities createCapabilities(final DriverConfig webDriverConfig) {
