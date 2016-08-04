@@ -649,7 +649,7 @@ public class SeleniumTestsContext {
         return (DriverMode) getAttribute(RUN_MODE);
     }
     
-    public Boolean getDevMode() {
+    public boolean isDevMode() {
         return (Boolean) getAttribute(DEV_MODE);
     }
     

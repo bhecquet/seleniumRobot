@@ -295,6 +295,19 @@ public class TestSeleniumTestContext {
 	}
 	
 	@Test(groups="ut context")
+	public void testDevMode(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		SeleniumTestsContextManager.initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setDevMode(true);
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().isDevMode(), true);
+	}
+	@Test(groups="ut context")
+	public void testDevModeNull(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		SeleniumTestsContextManager.initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setDevMode(null);
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().isDevMode(), false);
+	}
+	
+	@Test(groups="ut context")
 	public void testBrowser(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		SeleniumTestsContextManager.initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setBrowser("chrome");

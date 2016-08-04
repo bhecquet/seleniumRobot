@@ -36,11 +36,14 @@ import org.apache.log4j.Logger;
 
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.reporter.TestLogging;
+import com.seleniumtests.util.osutility.OSUtility;
 
 public class FileUtility {
 	private static final Logger logger = TestLogging.getLogger(WebUIDriver.class);
     static final int BUFFER = 2048;
 
+    private static OSUtility osUtil = new OSUtility();
+    
     private FileUtility() {
 		// As a utility method, it is not made to be instantiated.
 	}
@@ -86,7 +89,7 @@ public class FileUtility {
         jar.close();
 
         FileUtils.deleteDirectory(new File(storeLocation + "\\META-INF"));
-        if (OSUtility.isWindows()) {
+        if (osUtil.isWindows()) {
             new File(storeLocation + "\\" + clz.getCanonicalName().replaceAll("\\.", "\\\\") + ".class").delete();
         } else {
             new File(storeLocation + "/" + clz.getCanonicalName().replaceAll("\\.", "/") + ".class").delete();

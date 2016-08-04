@@ -37,8 +37,8 @@ import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.proxy.ProxyConfig;
 import com.seleniumtests.customexception.DriverExceptions;
 import com.seleniumtests.reporter.TestLogging;
-import com.seleniumtests.util.OSUtility;
 import com.seleniumtests.util.helper.WaitHelper;
+import com.seleniumtests.util.osutility.OSUtility;
 
 /**
  * This class provides factory to create webDriver session.
@@ -46,6 +46,8 @@ import com.seleniumtests.util.helper.WaitHelper;
 public class WebUIDriver {
 
 	private static final Logger logger = TestLogging.getLogger(WebUIDriver.class);
+	private static OSUtility osUtil = new OSUtility();
+	
     private static ThreadLocal<WebDriver> driverSession = new ThreadLocal<>();
     private static ThreadLocal<WebUIDriver> uxDriverSession = new ThreadLocal<>();
     private String node;
@@ -172,7 +174,7 @@ public class WebUIDriver {
      */
     public static WebUIDriver getWebUIDriver() {
         if (uxDriverSession.get() == null) {
-        	if (!SeleniumTestsContextManager.getThreadContext().getDevMode()){
+        	if (!SeleniumTestsContextManager.getThreadContext().isDevMode()){
         		cleanWebDrivers();
         	}
             uxDriverSession.set(new WebUIDriver());
@@ -185,9 +187,9 @@ public class WebUIDriver {
      * Close all the opened web browser processes. Not called in development mode.
      */
     private static void cleanWebDrivers() {
-    	logger.info("Dev. mode : " + SeleniumTestsContextManager.getThreadContext().getDevMode()
+    	logger.info("Dev. mode : " + SeleniumTestsContextManager.getThreadContext().isDevMode()
     					+" , web browser running processes will terminate ! ");
-		OSUtility.killWebBrowserProcesses(false); //true to force the kill
+		osUtil.killAllWebBrowserProcess(false); //true to force the kill
 	}
 
 	/**

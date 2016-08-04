@@ -26,24 +26,28 @@ import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.it.driver.DriverTestPage;
 import com.seleniumtests.reporter.TestLogging;
-import com.seleniumtests.util.OSUtility;
+import com.seleniumtests.util.osutility.OSUtility;
+import com.seleniumtests.util.osutility.ProcessInfo;
 
 public class TestDevMode {
 
 	private static final Logger logger = TestLogging.getLogger(TestDevMode.class);
+	
+	private OSUtility osUtil;
 	
 	private static WebDriver driver;
 	private static DriverTestPage testHomePage;
 	
 	@BeforeClass(groups={"it"})
 	public void initContext(final ITestContext testNGCtx) throws Exception {
+		osUtil = new OSUtility();
 		SeleniumTestsContextManager.initThreadContext(testNGCtx);
-		SeleniumTestsContextManager.getThreadContext().setBrowser("firefox");
+		SeleniumTestsContextManager.getThreadContext().setBrowser("chrome");
 	}
 	
 	/**
 	 * Forces devMode to false, and check if it closes all the browsers.
-	 * test disabled to avoid annoying developper
+	 * test disabled to avoid annoying developer
 	 */
 	@Test(groups={"it"}, enabled = false)
 	public void testDevModeFalse() {
@@ -53,7 +57,7 @@ public class TestDevMode {
 		
 		launchPageTest();
 		
-		if (OSUtility.isWebBrowserRunning(true)) {
+		if (osUtil.isWebBrowserRunning(true)) {
 			Assert.fail("All web browser processes should be over.");
 		}
 	}
@@ -64,12 +68,13 @@ public class TestDevMode {
 	 */
 	@Test(groups={"it"})
 	public void testDevModeTrue() {	
+		logger.info("Test, dev mode = " + true);
 		SeleniumTestsContextManager.getThreadContext().setDevMode(true);
-		List<String> webBrowserRunningListBefore = OSUtility.whichWebBrowserRunning();
+		List<ProcessInfo> webBrowserRunningListBefore = osUtil.whichWebBrowserRunning();
 		
 		launchPageTest();
 		
-		List<String> webBrowserRunningListAfter = OSUtility.whichWebBrowserRunning();
+		List<ProcessInfo> webBrowserRunningListAfter = osUtil.whichWebBrowserRunning();
 
 		Assert.assertEquals(webBrowserRunningListBefore.size(), webBrowserRunningListAfter.size());
 	}
