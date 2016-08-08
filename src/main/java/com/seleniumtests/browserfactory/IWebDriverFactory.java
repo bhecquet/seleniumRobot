@@ -14,8 +14,6 @@
 
 package com.seleniumtests.browserfactory;
 
-import java.io.IOException;
-
 import org.openqa.selenium.WebDriver;
 
 import com.seleniumtests.driver.DriverConfig;
@@ -24,7 +22,7 @@ public interface IWebDriverFactory {
 
     void cleanUp();
 
-    WebDriver createWebDriver() throws IOException;
+    WebDriver createWebDriver();
 
     WebDriver getWebDriver();
 

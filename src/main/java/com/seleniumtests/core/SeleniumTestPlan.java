@@ -33,6 +33,7 @@ import org.testng.annotations.BeforeTest;
 
 import org.testng.xml.XmlTest;
 
+import com.seleniumtests.core.runner.SeleniumRobotRunner;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.reporter.TestLogging;
 
@@ -57,6 +58,7 @@ public abstract class SeleniumTestPlan {
     @BeforeTest(alwaysRun = true)
     public void beforeTest(final ITestContext testContext, final XmlTest xmlTest) {
         SeleniumTestsContextManager.initTestLevelContext(testContext, xmlTest);
+    	SeleniumRobotRunner.setCucumberTest(false);
     }
 
     @BeforeMethod(alwaysRun = true)

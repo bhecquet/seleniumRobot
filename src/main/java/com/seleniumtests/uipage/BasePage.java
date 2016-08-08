@@ -61,7 +61,7 @@ public abstract class BasePage {
     }
 
     public void assertAlertPresent() {
-        TestLogging.logWebStep(null, "assert alert present.", false);
+        TestLogging.logWebStep("assert alert present.", false);
         try {
             driver.switchTo().alert();
         } catch (Exception ex) {
@@ -70,7 +70,7 @@ public abstract class BasePage {
     }
 
     public void assertAlertText(final String text) {
-        TestLogging.logWebStep(null, "assert alert text.", false);
+        TestLogging.logWebStep("assert alert text.", false);
 
         Alert alert = driver.switchTo().alert();
         String alertText = alert.getText();
@@ -83,7 +83,7 @@ public abstract class BasePage {
      * @param  value
      */
     public void assertAttribute(final HtmlElement element, final String attributeName, final String value) {
-        TestLogging.logWebStep(null, String.format("assert %s attribute = %s, expectedValue ={%s}.",
+        TestLogging.logWebStep(String.format("assert %s attribute = %s, expectedValue ={%s}.",
         		element.toHTML(),
         		attributeName,
         		value),
@@ -102,7 +102,7 @@ public abstract class BasePage {
     }
 
     public void assertAttributeContains(final HtmlElement element, final String attributeName, final String keyword) {
-        TestLogging.logWebStep(null, String.format("assert %s attribute = %s, contains keyword ={%s}.",
+        TestLogging.logWebStep(String.format("assert %s attribute = %s, contains keyword ={%s}.",
         		element.toHTML(),
         		attributeName,
         		keyword),  
@@ -120,7 +120,7 @@ public abstract class BasePage {
     }
 
     public void assertAttributeMatches(final HtmlElement element, final String attributeName, final String regex) {
-        TestLogging.logWebStep(null, String.format("assert %s attribute = %s, matches regex ={%s}.",
+        TestLogging.logWebStep(String.format("assert %s attribute = %s, matches regex ={%s}.",
         		element.toHTML(),
         		attributeName,
         		regex),  
@@ -139,7 +139,7 @@ public abstract class BasePage {
     }
 
     public void assertConfirmationText(final String text) {
-        TestLogging.logWebStep(null, "assert confirmation text.", false);
+        TestLogging.logWebStep("assert confirmation text.", false);
 
         Alert alert = driver.switchTo().alert();
         String seenText = alert.getText();
@@ -150,42 +150,42 @@ public abstract class BasePage {
     protected void assertCurrentPage(final boolean log) { }
 
     public void assertElementNotPresent(final HtmlElement element) {
-        TestLogging.logWebStep(null, String.format("assert %s is not present.", element.toHTML()), false);
+        TestLogging.logWebStep(String.format("assert %s is not present.", element.toHTML()), false);
         assertHTML(!element.isElementPresent(), String.format("%s found.", element.toString()));
     }
 
     public void assertElementPresent(final HtmlElement element) {
-        TestLogging.logWebStep(null, String.format("assert %s is present.", element.toHTML()), false);
+        TestLogging.logWebStep(String.format("assert %s is present.", element.toHTML()), false);
         assertHTML(element.isElementPresent(), String.format("%s not found.", element.toString()));
     }
 
     public void assertElementEnabled(final HtmlElement element) {
-        TestLogging.logWebStep(null, String.format("assert %s is enabled.", element.toHTML()), false);
+        TestLogging.logWebStep(String.format("assert %s is enabled.", element.toHTML()), false);
         assertHTML(element.isEnabled(), String.format("%s not found.", element.toString()));
     }
 
     public void assertElementNotEnabled(final HtmlElement element) {
-        TestLogging.logWebStep(null, String.format("assert %s is not enabled.", element.toHTML()), false);
+        TestLogging.logWebStep(String.format("assert %s is not enabled.", element.toHTML()), false);
         assertHTML(!element.isEnabled(), String.format("%s not found.", element.toString()));
     }
 
     public void assertElementDisplayed(final HtmlElement element) {
-        TestLogging.logWebStep(null, String.format("assert %s is displayed.", element.toHTML()), false);
+        TestLogging.logWebStep(String.format("assert %s is displayed.", element.toHTML()), false);
         assertHTML(element.isDisplayed(), String.format("%s not found.", element.toString()));
     }
 
     public void assertElementSelected(final HtmlElement element) {
-        TestLogging.logWebStep(null, String.format("assert %s is selected.", element.toHTML()), false);
+        TestLogging.logWebStep(String.format("assert %s is selected.", element.toHTML()), false);
         assertHTML(element.isSelected(), String.format("%s not found.", element.toString()));
     }
 
     public void assertElementNotSelected(final HtmlElement element) {
-        TestLogging.logWebStep(null, String.format("assert %s is NOT selected.", element.toHTML()), false);
+        TestLogging.logWebStep(String.format("assert %s is NOT selected.", element.toHTML()), false);
         assertHTML(!element.isSelected(), String.format("%s not found.", element.toString()));
     }
 
     public void assertCondition(final boolean condition, final String message) {
-        TestLogging.logWebStep(null, "assert that " + message, false);
+        TestLogging.logWebStep("assert that " + message, false);
         assert condition;
     }
 
@@ -203,7 +203,7 @@ public abstract class BasePage {
     }
 
     public void assertPromptText(final String text) {
-        TestLogging.logWebStep(null, "assert prompt text.", false);
+        TestLogging.logWebStep("assert prompt text.", false);
 
         Alert alert = driver.switchTo().alert();
         String seenText = alert.getText();
@@ -211,7 +211,7 @@ public abstract class BasePage {
     }
 
     public void assertTable(final Table table, final int row, final int col, final String text) {
-        TestLogging.logWebStep(null,
+        TestLogging.logWebStep(
         		String.format("assert text %s equals %s at (row, col) = (%d, %d).",
                 		text,
                 		table.toHTML(),
@@ -230,7 +230,7 @@ public abstract class BasePage {
     }
 
     public void assertTableContains(final Table table, final int row, final int col, final String text) {
-        TestLogging.logWebStep(null,
+        TestLogging.logWebStep(
         		String.format("assert text %s contains %s at (row, col) = (%d, %d).",
                 		text,
                 		table.toHTML(),
@@ -248,7 +248,7 @@ public abstract class BasePage {
     }
 
     public void assertTableMatches(final Table table, final int row, final int col, final String text) {
-        TestLogging.logWebStep(null,
+        TestLogging.logWebStep(
         		String.format("assert text %s matches %s at (row, col) = (%d, %d).",
                 		text,
                 		table.toHTML(),
@@ -267,22 +267,22 @@ public abstract class BasePage {
     }
 
     public void assertTextNotPresent(final String text) {
-        TestLogging.logWebStep(null, "assert text \"" + text + "\" is not present.", false);
+        TestLogging.logWebStep("assert text \"" + text + "\" is not present.", false);
         assertHTML(!isTextPresent(text), "Text= {" + text + "} found.");
     }
 
     public void assertTextNotPresentIgnoreCase(final String text) {
-        TestLogging.logWebStep(null, "assert text \"" + text + "\" is not present.(ignore case)", false);
+        TestLogging.logWebStep("assert text \"" + text + "\" is not present.(ignore case)", false);
         assertHTML(!getBodyText().toLowerCase().contains(text.toLowerCase()), "Text= {" + text + "} found.");
     }
 
     public void assertTextPresent(final String text) {
-        TestLogging.logWebStep(null, "assert text \"" + text + "\" is present.", false);
+        TestLogging.logWebStep("assert text \"" + text + "\" is present.", false);
         assertHTML(isTextPresent(text), "Text= {" + text + "} not found.");
     }
 
     public void assertTextPresentIgnoreCase(final String text) {
-        TestLogging.logWebStep(null, "assert text \"" + text + "\" is present.(ignore case)", false);
+        TestLogging.logWebStep("assert text \"" + text + "\" is present.(ignore case)", false);
         assertHTML(getBodyText().toLowerCase().contains(text.toLowerCase()), "Text= {" + text + "} not found.");
     }
 
@@ -375,7 +375,7 @@ public abstract class BasePage {
     }
 
     public void selectFrame(final By by) {
-        TestLogging.logWebStep(null, "select frame, locator={\"" + by.toString() + "\"}", false);
+        TestLogging.logWebStep("select frame, locator={\"" + by.toString() + "\"}", false);
         driver.switchTo().frame(driver.findElement(by));
     }
     

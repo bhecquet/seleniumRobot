@@ -66,7 +66,7 @@ public class ConfigReader {
 			InputStream iniFileStream = FileUtils.openInputStream(configFile);
 			return readConfig(iniFileStream, SeleniumTestsContextManager.getThreadContext().getTestEnv());
 		} catch (IOException e1) {
-			TestLogging.warning("no valid config.ini file for this application");
+			logger.warn("no valid config.ini file for this application");
 			return new HashMap<>();
 		}
 	}

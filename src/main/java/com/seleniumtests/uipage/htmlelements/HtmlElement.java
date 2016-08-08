@@ -694,6 +694,13 @@ public class HtmlElement {
         return getClass().getSimpleName() + " " + getLabel() +
             ", by={" + getBy().toString() + "}";
     }
+    
+    /**
+     * Method created for test purpose only
+     */
+    public void doNothing() {
+    	// do nothing
+    }
 
     /**
      * Wait element to present using Explicit Waits with default EXPLICIT_WAIT_TIME_OUT = 15 seconds.

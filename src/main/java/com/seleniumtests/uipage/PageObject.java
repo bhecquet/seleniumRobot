@@ -119,19 +119,8 @@ public class PageObject extends BasePage implements IPage {
         this.pageIdentifierElement = pageIdentifierElement;
         driver = WebUIDriver.getWebDriver();
 
-        if (url != null) {
-            open(url);
-            ((CustomEventFiringWebDriver)driver).updateWindowsHandles();
-        }
-
-        // Wait for page load is applicable only for web test
-        // When running tests on an iframe embedded site then test will fail if this command is not used
-        // in case of mobile application, only capture screenshot
-        if (SeleniumTestsContextManager.isWebTest()) {
-            waitForPageToLoad();
-        } else if (SeleniumTestsContextManager.isMobileAppTest()) {
-        	capturePageSnapshot();
-        }
+        // open page
+        openPage(url);
 
         assertCurrentPage(false);
 
@@ -150,6 +139,28 @@ public class PageObject extends BasePage implements IPage {
         long endTime = end.getTimeInMillis();
         if ((endTime - startTime) / 1000 > 0) {
             TestLogging.log("Open web page in :" + (endTime - startTime) / 1000 + "seconds");
+        }
+    }
+    
+    /**
+     * Open page 
+     * Wait for page loading
+     * @param url
+     * @throws IOException
+     */
+    private void openPage(String url) throws IOException {
+    	if (url != null) {
+            open(url);
+            ((CustomEventFiringWebDriver)driver).updateWindowsHandles();
+        }
+
+        // Wait for page load is applicable only for web test
+        // When running tests on an iframe embedded site then test will fail if this command is not used
+        // in case of mobile application, only capture screenshot
+        if (SeleniumTestsContextManager.isWebTest()) {
+            waitForPageToLoad();
+        } else if (SeleniumTestsContextManager.isMobileAppTest()) {
+        	capturePageSnapshot();
         }
     }
 
@@ -175,7 +186,7 @@ public class PageObject extends BasePage implements IPage {
         }
 
         if (log) {
-            TestLogging.logWebStep(null,
+            TestLogging.logWebStep(
                 "assert \"" + getClass().getSimpleName() + "\" is the current page"
                     + (pageIdentifierElement != null
                         ? " (assert PageIdentifierElement " + pageIdentifierElement.toHTML() + " is present)." : "."),
@@ -234,7 +245,7 @@ public class PageObject extends BasePage implements IPage {
             imageFilePath = screenShot.getImagePath().replace(suiteName, outputDirectory);
         }
 
-        TestLogging.logWebOutput(url, title + " (" + TestLogging.buildScreenshotLog(screenShot) + ")", false);
+        TestLogging.logWebOutput(title + " (" + TestLogging.buildScreenshotLog(screenShot) + ")", false);
 
     }
 
@@ -250,7 +261,7 @@ public class PageObject extends BasePage implements IPage {
         }
 
         SeleniumTestsPageListener.informPageUnload(this);
-        TestLogging.logWebOutput(url, title +" close web page", false);
+        TestLogging.logWebOutput(title +" close web page", false);
 
         boolean isMultipleWindow = false;
         if (driver.getWindowHandles().size() > 1) {
@@ -289,7 +300,7 @@ public class PageObject extends BasePage implements IPage {
      * @param  offsetY  in pixels from the current location to which the element should be moved, e.g., -300
      */
     public void dragAndDrop(final HtmlElement element, final int offsetX, final int offsetY) {
-        TestLogging.logWebStep(null,
+        TestLogging.logWebStep(
             "dragAndDrop " + element.toHTML() + " to offset(x,y): (" + offsetX + "," + offsetY + ")", false);
         captureSnapshot("before draging");
 
@@ -416,7 +427,7 @@ public class PageObject extends BasePage implements IPage {
     private void open(final String url) throws IOException {
 
         if (this.getDriver() == null) {
-            TestLogging.logWebStep(url, "Launch application", false);
+            TestLogging.logWebStep("Launch application", false);
             driver = webUXDriver.createWebDriver();
         }
 
@@ -431,7 +442,7 @@ public class PageObject extends BasePage implements IPage {
         } catch (UnreachableBrowserException e) {
 
             // handle if the last window is closed
-            TestLogging.logWebStep(url, "Launch application", false);
+            TestLogging.logWebStep("Launch application", false);
             driver = webUXDriver.createWebDriver();
             maximizeWindow();
             driver.navigate().to(url);

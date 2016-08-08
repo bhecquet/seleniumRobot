@@ -14,8 +14,6 @@
 
 package com.seleniumtests.browserfactory;
 
-import java.io.IOException;
-
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.ie.InternetExplorerDriver;
@@ -48,7 +46,7 @@ public class IEDriverFactory extends AbstractWebDriverFactory implements IWebDri
     }
 
     @Override
-    public WebDriver createWebDriver() throws IOException {
+    public WebDriver createWebDriver() {
 
     	//osUtil.killIEProcess(true);
         if (!OSUtility.isWindows()) {

@@ -215,7 +215,7 @@ public class ScreenshotUtil {
                     SeleniumTestsContextManager.getThreadContext().addScreenShot(screenShot);
                     sbMessage.append(messagePrefix + ": <a href='" + imagePath
                             + "' class='lightbox'>Application Snapshot</a>");
-                    TestLogging.logWebOutput(null, sbMessage.toString(), false);
+                    TestLogging.logWebOutput(sbMessage.toString(), false);
                 }
             } catch (WebSessionEndedException ex) {
                 throw ex;

@@ -628,9 +628,10 @@ public class SeleniumTestsReporter implements IReporter, ITestListener, IInvoked
 
                             htmllog = htmllog.replaceAll("@@lt@@", "<").replace("^^greaterThan^^", ">");
                             contentBuffer.append(htmllog);
-                            if (!htmllog.contains("<br>")) {
-                                contentBuffer.append("<br/>");
-                            }
+//                            if (!htmllog.contains("<br>")) {
+//                                contentBuffer.append("<br/>");
+//                            }
+                            contentBuffer.append("\n");
                         }
 
                         contentBuffer.append("</ol>");
@@ -1152,9 +1153,10 @@ public class SeleniumTestsReporter implements IReporter, ITestListener, IInvoked
         }
 
         // capture snap shot only for the failed web tests
-        if (WebUIDriver.getWebDriver() != null) {
+        // don't recreate driver if it does not exist
+        if (WebUIDriver.getWebDriver(false) != null) {
             ScreenShot screenShot = new ScreenshotUtil().captureWebPageSnapshot();
-            TestLogging.logWebOutput(screenShot.getTitle(), TestLogging.buildScreenshotLog(screenShot), true);
+            TestLogging.logWebOutput(TestLogging.buildScreenshotLog(screenShot), true);
         }
     }
 
@@ -1178,9 +1180,9 @@ public class SeleniumTestsReporter implements IReporter, ITestListener, IInvoked
     @Override
     public void onTestSuccess(final ITestResult arg0) {
     	 // capture snap shot at the end of the test
-        if (WebUIDriver.getWebDriver() != null) {
+        if (WebUIDriver.getWebDriver(false) != null) {
             ScreenShot screenShot = new ScreenshotUtil().captureWebPageSnapshot();
-            TestLogging.logWebOutput(screenShot.getTitle(), screenShot.getTitle()+" ("+ TestLogging.buildScreenshotLog(screenShot)+")", false);
+            TestLogging.logWebOutput(screenShot.getTitle()+" ("+ TestLogging.buildScreenshotLog(screenShot)+")", false);
         }
     }
 

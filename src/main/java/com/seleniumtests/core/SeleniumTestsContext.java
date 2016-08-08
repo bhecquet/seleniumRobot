@@ -331,21 +331,21 @@ public class SeleniumTestsContext {
     private void configureTestType() {
     	if (getPlatform().toLowerCase().startsWith("android")) {
         	if (getApp().isEmpty()) { // a browser name should be defined
-        		setAttribute(TEST_TYPE, TestType.APPIUM_WEB_ANDROID);
+        		setTestType(TestType.APPIUM_WEB_ANDROID);
         	} else {
-        		setAttribute(TEST_TYPE, TestType.APPIUM_APP_ANDROID);
+        		setTestType(TestType.APPIUM_APP_ANDROID);
         	}
         } else if (getPlatform().toLowerCase().startsWith("ios")) {
         	if (getApp().isEmpty()) { // a browser name should be defined
-        		setAttribute(TEST_TYPE, TestType.APPIUM_WEB_IOS);
+        		setTestType(TestType.APPIUM_WEB_IOS);
         	} else {
-        		setAttribute(TEST_TYPE, TestType.APPIUM_APP_IOS);
+        		setTestType(TestType.APPIUM_APP_IOS);
         	}
         } else {
         	if (getBrowser() == BrowserType.NONE) {
-        		setAttribute(TEST_TYPE, TestType.NON_GUI);
+        		setTestType(TestType.NON_GUI);
         	} else {
-        		setAttribute(TEST_TYPE, TestType.WEB);
+        		setTestType(TestType.WEB);
         	}
         }
     }
@@ -898,7 +898,8 @@ public class SeleniumTestsContext {
     	if (devMode != null) {
     		setAttribute(DEV_MODE, devMode);
     	} else {
-    		setAttribute(DEV_MODE, false);
+    		// default value depends on who starts test. If start is done through jar execution, deployed mode will be true (devMode set to false)
+    		setAttribute(DEV_MODE, !SeleniumTestsContextManager.getDeployedMode());
     	}
     }
 
