@@ -67,6 +67,7 @@ public class CucumberRunner {
     			logger.error(Thread.currentThread() + " " + s.toString());
     		}
     	}
+    	SeleniumRobotRunner.setCucumberTest(true);
     }
 
     @BeforeMethod(alwaysRun = true)

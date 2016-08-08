@@ -14,9 +14,6 @@
 
 package com.seleniumtests.browserfactory;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -31,7 +28,7 @@ import com.seleniumtests.driver.DriverConfig;
 import com.seleniumtests.util.helper.WaitHelper;
 
 public class FirefoxDriverFactory extends AbstractWebDriverFactory implements IWebDriverFactory {
-    private long timeout = 60;
+    private long timeout = 1;
 
     /**
      * @param  cfg  the configuration of the firefoxDriver

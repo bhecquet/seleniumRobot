@@ -161,7 +161,7 @@ public class TestLogging {
      * @param  message
      * @param  failed
      */
-    public static void logWebOutput(final String url, final String message, final boolean failed) {
+    public static void logWebOutput(final String message, final boolean failed) {
         log("Output: " + message + "<br/>", failed, false);
     }
 
@@ -172,8 +172,27 @@ public class TestLogging {
      * @param  message
      * @param  failed
      */
-    public static void logWebStep(final String url, final String message, final boolean failed) {
+    public static void logWebStep(final String message, final boolean failed) {
         log("<li>" + (failed ? "<b>FailedStep</b>: " : " ") + message + "</li>", failed, false);
+    }
+    
+    public static void logTestStep(TestStep testStep) {
+    	log("<li>" + (testStep.getFailed() ? "<b>FailedStep</b>: " : " ") + "<b>" + testStep.getName() + "</b>", testStep.getFailed(), false);
+    	List<TestAction> actionList = testStep.getStepActions();
+    	
+    	if (!actionList.isEmpty()) {
+    		log("<ul>");
+	    	for (TestAction action: actionList) {
+	    		if (action instanceof TestStep) {	
+					logTestStep((TestStep)action);	
+				} else if (action instanceof TestAction) {
+					log("<li>" + (action.getFailed() ? "<b>FailedAction</b>: " : " ") + action.getName() + "</li>", action.getFailed(), false);
+				}
+			}
+    		log("</ul>");
+    	}
+    	log("</li>");
+    	
     }
 
     /**

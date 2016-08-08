@@ -14,7 +14,6 @@
 
 package com.seleniumtests.browserfactory;
 
-import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
@@ -56,7 +55,7 @@ public abstract class AbstractWebDriverFactory {
     
     protected abstract WebDriver createNativeDriver();
     
-    public WebDriver createWebDriver() throws IOException {
+    public WebDriver createWebDriver() {
         final DriverConfig cfg = this.getWebDriverConfig();
 
         driver = createNativeDriver();

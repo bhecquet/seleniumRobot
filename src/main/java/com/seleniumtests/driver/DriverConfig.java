@@ -216,9 +216,15 @@ public class DriverConfig {
 			proxy.setHttpProxy(proxyConfig.getAddressAndPort());
 			proxy.setSslProxy(proxyConfig.getAddressAndPort());
 			proxy.setFtpProxy(proxyConfig.getAddressAndPort());
-			proxy.setSocksUsername(proxyConfig.getLogin());
-			proxy.setSocksPassword(proxyConfig.getPassword());
-			proxy.setNoProxy(proxyConfig.getExclude().replace(";", ","));
+			
+			if (proxyConfig.getLogin() != null && proxyConfig.getPassword() != null) {
+				proxy.setSocksUsername(proxyConfig.getLogin());
+				proxy.setSocksPassword(proxyConfig.getPassword());
+			}
+			
+			if (proxyConfig.getExclude() != null) {
+				proxy.setNoProxy(proxyConfig.getExclude().replace(";", ","));
+			}
 		} 
 		return proxy;
     }

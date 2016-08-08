@@ -48,6 +48,7 @@ public class SeleniumTestsContextManager {
 	private static String featuresPath;
 	private static String configPath;
 	private static String applicationName;
+	private static Boolean deployedMode;
 
 	public static final String DATA_FOLDER_NAME = "data";
 
@@ -106,6 +107,12 @@ public class SeleniumTestsContextManager {
     }
 
     public static void initGlobalContext(ITestContext testNGCtx) {
+    	
+    	// generate all paths used by test application
+    	if (testNGCtx != null && testNGCtx.getCurrentXmlTest() != null) {
+        	generateApplicationPath(testNGCtx.getCurrentXmlTest().getSuite());
+        }
+    	
     	ITestContext newTestNGCtx = getContextFromConfigFile(testNGCtx);
         globalContext = new SeleniumTestsContext(newTestNGCtx);
         loadCustomizedContextAttribute(newTestNGCtx, globalContext);
@@ -277,23 +284,20 @@ public class SeleniumTestsContextManager {
      * @param path
      * @return
      */
-    private static Boolean getPathFromClass(Class clazz, StringBuilder path) {
-		Boolean jar = false;
+    private static void getPathFromClass(Class clazz, StringBuilder path) {
 		
 		try {
 			String url = URLDecoder.decode(clazz.getProtectionDomain().getCodeSource().getLocation().getFile(), "UTF-8" );
 			if (url.endsWith(".jar")) {
 				path.append((new File(url).getParentFile().getAbsoluteFile().toString() + "/").replace(File.separator, "/"));
-				jar = true;
+				deployedMode = true;
 			} else {				
 				path.append((new File(url).getParentFile().getParentFile().getAbsoluteFile().toString() + "/").replace(File.separator, "/"));
-				jar = false;
+				deployedMode = false;
 			}
 		} catch (UnsupportedEncodingException e) {
 			logger.error(e);
 		}
-		
-		return jar;
 	}
     
     /**
@@ -361,10 +365,21 @@ public class SeleniumTestsContextManager {
 		return dataPath;
 	}
 
-    public static boolean isWebTest() {
+    public static Boolean getDeployedMode() {
+    	if (deployedMode == null) {
+    		getPathFromClass(SeleniumTestsContext.class, new StringBuilder());
+    	}
+		return deployedMode;
+	}
+
+	public static boolean isWebTest() {
         return getThreadContext().getTestType().equals(TestType.WEB);
     }
     
+	public static boolean isNonGuiTest() {
+		return getThreadContext().getTestType().equals(TestType.NON_GUI);
+	}
+	
     public static boolean isMobileAppTest() {
     	return getThreadContext().getTestType().family().equals(TestType.APP);
     }

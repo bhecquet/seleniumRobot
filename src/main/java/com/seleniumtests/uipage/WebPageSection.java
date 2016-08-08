@@ -48,7 +48,7 @@ public abstract class WebPageSection extends BasePage {
         String title = screenShot.getTitle();
         String url = screenShot.getLocation();
 
-        TestLogging.logWebOutput(url, title + " (" + TestLogging.buildScreenshotLog(screenShot) + ")", false);
+        TestLogging.logWebOutput(title + " (" + TestLogging.buildScreenshotLog(screenShot) + ")", false);
     }
 
     public String getLocator() {

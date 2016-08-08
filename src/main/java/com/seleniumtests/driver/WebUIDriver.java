@@ -14,7 +14,6 @@
 
 package com.seleniumtests.driver;
 
-import java.io.IOException;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -60,7 +59,7 @@ public class WebUIDriver {
         uxDriverSession.set(this);
     }
 
-    public WebDriver createRemoteWebDriver() throws IOException  {
+    public WebDriver createRemoteWebDriver()  {
         
         // TODO: use grid with appium ?
         if (config.getMode() == DriverMode.EXISTING_GRID) {
@@ -156,12 +155,8 @@ public class WebUIDriver {
      * @return
      */
     public static WebDriver getWebDriver(final Boolean isCreate) {
-        if (driverSession.get() == null && isCreate) {
-            try {
-                getWebUIDriver().createWebDriver();
-            } catch (Exception e) {
-                logger.error(e);
-            }
+        if (driverSession.get() == null && isCreate && !SeleniumTestsContextManager.isNonGuiTest()) {
+        	getWebUIDriver().createWebDriver();
         }
 
         return driverSession.get();
@@ -219,7 +214,7 @@ public class WebUIDriver {
         return listeningDriver;
     }
 
-    public WebDriver createWebDriver() throws IOException  {
+    public WebDriver createWebDriver() {
     	if (config.getTestType().isMobile()) {
     		logger.info("Start creating appium driver");
     	} else {
