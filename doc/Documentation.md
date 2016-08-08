@@ -112,7 +112,7 @@ A "test application" is the code specific to the Web or Mobile application under
 Use seleniumRobot-example project as a base to develop your own test application
 [https://github.com/bhecquet/seleniumRobot-example](https://github.com/bhecquet/seleniumRobot-example)
 
-#### Requirements are #### 
+#### Requirements are ####
 
 - Test data are in `data/<app_name>/`
 	- `features` contains feature files (mandatory if cucumber mode is used)
@@ -177,16 +177,101 @@ Example of a shopping cart class:
 		} 
 	}
 	
-
+**WARN:** If you write your class combined with cucumber feature (methods annotated with @Given, @When, ...), only write methods returning `void`. Else, report will contain new page create step twice.
 
 
 ### Write a test ###
-TBD
+A test is a suite of steps defined in several page objects. By convention, they are located in the `tests` folder
+Assuming that the right objects are created, a test looks like:
+    
+    public class VmoeTests extends SeleniumTestPlan {
+	
+		@Test(
+		        groups = { "vmoe" },
+		        description = "check Angel Fish"
+		    )
+		public void consultProductDetails() throws Exception {
+			ProductItem productItem = new JPetStoreHome(true)
+				.goToFish()
+				.accessAngelFish()
+				.showItem("EST-1");
+			Assert.assertEquals(productItem.getProductDetails().name, "Large Angelfish");
+		}
+	}
+
+A typical method whould be
+
+	public FishList goToFish() throws Exception {
+    	fishMenu.click();
+    	return new FishList();
+    }
+
 #### TestNG file ####
+For tests extending SeleniumTestPlan, the testNg XML looks like (minimal requirements):
+	<suite name="Integration tests" parallel="false" verbose="1" thread-count="1">
+	    <listeners>
+	        <listener class-name="com.seleniumtests.reporter.SeleniumTestsReporter" />
+	        <listener class-name="com.seleniumtests.core.testretry.TestRetryListener" />
+	    </listeners>
+
+	    <test name="order">	    	
+	        <classes>
+	            <class name="com.infotel.seleniumRobot.jpetstore.tests.VmoeTests">
+	            	<methods>
+	            		<include name="orderFish" />
+	            	</methods>
+	            </class>
+	        </classes>
+	    </test>
+	</suite>
 
 ### Write a cucumber test ###
-TBD
+Cucumber styled tests rely on a `.feature` file where each test step is defined. Look at [https://cucumber.io/docs/reference](https://cucumber.io/docs/reference) for more information about writing a feature file.
+
+Each line in the feature file must correspond to an implementation inside java code through annotation
+
+	@When("Cliquer sur le lien 'FISH'")
+    public void goToFish() throws Exception {
+    	fishMenu.click();
+    }
+
+**WARN:**You should write only void methods to avoid getting twice the page creation in report
+
+
+#### Feature file example ####
+	Feature: Catalogue
+	
+		Scenario: Consulter la fiche Angel Fish
+			
+			Given Ouvrir le jPetStore
+			When Cliquer sur le lien 'FISH'
+			And Cliquer sur le produit 'Angel Fish'
+			And Cliquer sur le type 'EST-1'
+			Then Le nom du produit est 'Large Angelfish'
+
 #### TestNG file ####
+XML testNg file looks like:
+	<!DOCTYPE suite SYSTEM "http://beust.com/testng/testng-1.0.dtd" >
+	<suite name="Integration tests" parallel="false" verbose="1" thread-count="1">
+	    <listeners>
+	        <listener class-name="com.seleniumtests.reporter.SeleniumTestsReporter" />
+	        <listener class-name="com.seleniumtests.core.testretry.TestRetryListener" />
+	    </listeners>
+	
+		<parameter name="cucumberPackage" value="com.infotel.seleniumRobot.jpetstore" />
+	    
+	    <test name="consult_catalog">
+	    	<parameter name="cucumberTests" value="Consulter la fiche Angel Fish" />
+		    <parameter name="cucumberTags" value="" />
+	    	
+	        <packages>
+	            <package name="com.seleniumtests.core.runner.*"/>
+	        </packages>
+	    </test>
+	   
+	</suite>
+
+`cucumberPackage` parameter is mandatory so that framework knows where implementation code resides
 
 ### Configure test scripts ###
 There are several ways to make values in test script change according to test environment, executed test, ...
@@ -201,7 +286,7 @@ XML configurations are done statically and must be duplicated through all the te
 
 *Example:* the server URL depends on testing phase. They are not the same in production and in integration phase.
 
-That’s why the “config.ini” file is made for. Each tested application can embed a config.ini file whose format is: 
+That’s why the “env.ini” file is made for. Each tested application can embed a env.ini file whose format is: 
 
 ![](images/config_ini_example.png)
  
@@ -243,7 +328,62 @@ In the corresponding pageObject you can use mapping words to search elements usi
 
 ### Configurations ###
 Below is the list of all parameters accepted in testing xml file.
-**TBD**
+
+| Param name       			| Default 	| Description  |
+| -------------------------	| ------- 	| ------------ |
+| testConfig 				|  			| Additional configuration. This should contain common configuration through all TestNG files.<br/>See `exampleConfigGenericParams.xml` file for format | 
+
+| webSessionTimeOut 		| 90000 	| browser session timeout in milliseconds | 
+| implicitWaitTimeOut 		| 5			| implicit wait of the browser, in seconds (selenium definition) | 
+| explicitWaitTimeOut 		| 15		| explicit wait of the browser, in seconds. Used when checking is an element is present and no wait value is defined (`waitElementPresent` & `isElementPresent` | 
+| pageLoadTimeout 			| 90		| Value defined in selenium driver. Wait delay for page loading | 
+
+| webDriverGrid 			| 			| Address of seleniumGrid server | 
+| runMode 					| LOCAL		| `local`: current computer<br/>`grid`: seleniumGrid<br/>`sauceLabs`: run on sauceLabs device<br/>`testDroid`: run on testdroid device | 
+| devMode 					| false		| The development mode allow all existing browsers to remain. In case test is run from any IDE, devMode will be defaulted to true | 
+| browser 					| firefox	| Browser used to start test. Valid values are:<br/>`firefox`, `chrome`, `safari`, `iexplore`, `htmlunit`, `opera`, `phantomjs`, `none` for no driver, `browser` for android default browser | 
+| browserVersion 			|  			| Browser version to use. By default, it's the last one, or the installed one in local mode. This option has sense when using sauceLabs where browser version can be choosen | 
+| firefoxUserProfilePath 	|  			| Firefox user profile if a specific one is defined | 
+| useFirefoxDefaultProfile	| true		| Use default firefox profile | 
+| operaUserProfilePath 		| 			| Opera user profile if a specific one is defined | 
+| firefoxBinaryPath 		| 			| Path to firefox binary if a specific one should be used (for example when using portable versions. Else, the default firefox installation is choosen | 
+| chromeDriverPath 			| 			| Path to a different installation of chromedriver executable | 
+| chromeBinaryPath 			| 			| Path to chrome binary if using a portable installation (not detected by system | 
+| ieDriverPath 				| 			| Path to a different ieDriverServer executable | 
+| userAgent 				| 			| Allow defining a specific user-agent in chrome and firefox only | 
+| enableJavascript 			| true		| Javascript activation |
+| browserDownloadDir 		| 			| Path where files are downloaded. Firefox only | 
+| proxyType 				| AUTO		| Proxy type. Valid values are `AUTODETECT`, `MANUAL`, `DIRECT`, `PAC`, `SYSTEM` | 
+| proxyAddress 				| 			| Proxy address, if MANUAL type is choosen | 
+| proxyPort 				| 			| Proxy port, if MANUAL type is choosen | 
+| proxyLogin 				| 			| Proxy login, if MANUAL type is choosen |  
+| proxyPassword 			| 			| Proxy password, if MANUAL type is choosen | 
+| proxyExclude 				|			| Proxy address exclusion, if MANUAL type is choosen | 
+| proxyPac 					| 			| Automatic configuration address, if PAC type is choosen | 
+| reportGenerationConfig 	| summaryPerSuite | Type of report generation.
+| captureSnapshot 			| true 		| Capture page snapshots
+| softAssertEnabled 		| true		| Test does not stop is an assertion fails. Only valid when using assertions defined in `CustomAssertion` class or assert methods in `BasePage` class | 
+| outputDirectory 			| <exec folder>	| folder where HTML report will be written | 
+| webDriverListener 		| 			| additional driver listener class |
+| testMethodSignature 		|  			| define a specific method signature for hashcodes |
+| pluginConfigPath 			|  			| plugins to add |
+| testDataFile 				|  			| Datafile to read and inject inside tests | 
+| cucumberTests 			|  			| List of tests to execute when using cucumber mode. Test name can be the feature name, the feature file name or the scenario name | 
+| cucumberTags 				|  			| List of cucumber tags that will allow determining tests to execute. Format can be:<br/>`@new4 AND @new5` for filtering scenario containing tag new4 AND new5<br/>`@new,@new2` for filtering scenarios containing new OR new2<br/>`@new` for filtering scenario containing new tag | 
+| env 						| DEV		| Test environment for the SUT. Allow accessing param values defined in env.ini file  
+| cucumberPackage 			| 			| **Mandatory for cucumberTests:** name of the package where cucumber implementation class reside | 
+| app 						| 			| Path to the application file (local or remote) | 
+| appiumServerURL 			| 			| Appium server url. May be local or remote | 
+| deviceName 				| 			| Name of the device to use for mobils tests | 
+| appPackage 				| 			| Package name of application (android only) | 
+| appActivity 				| 			| Activity started by mobile application (Android) | 
+| appWaitActivity 			| 			| In some cases, the first started activity is not the main app activity | 
+| newCommandTimeout 		| 120		| Max wait between 2 appium commands in seconds | 
+| version 					| 			| Platform version | 
+| platform 					| 			| platform on which test should execute. Ex: Windows 7, Android 5.0, iOS 9.1, Linux, OS X 10.10. Defaults to the current platform | 
+| cloudApiKey 				| 			| Access key for service | 
+| projectName 				| 			| Project name for Testdroid tests only | 
+
 
 ### Test with Appium locally ###
 #### Application test on android ####
