@@ -20,6 +20,7 @@ import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.WebDriver;
 
+import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.reporter.TestLogging;
 
 import io.appium.java_client.android.AndroidDriver;
@@ -55,7 +56,7 @@ public class WebUtility {
 
     public void maximizeWindow() {
         try {
-        	if (driver instanceof AndroidDriver || driver instanceof IOSDriver) {
+        	if (SeleniumTestsContextManager.getThreadContext().getTestType().isMobile()) {
                 return;
             }
 

@@ -103,7 +103,6 @@ public class SeleniumTestsContext {
     public static final String DP_TAGS_INCLUDE = "dpTagsInclude";				// 
     public static final String DP_TAGS_EXCLUDE = "dpTagsExclude";				// Utilisé pour la lecture de fichiers CSV/XLS des DataProvider TODO: a étudier comment cela fonctionne
 
-    public static final String SSH_COMMAND_WAIT = "sshCommandWait";
     public static final String SOFT_ASSERT_ENABLED = "softAssertEnabled";		// le test ne s'arrête pas lorsqu'une assertion est rencontrée
 
     public static final String OUTPUT_DIRECTORY = "outputDirectory";     		// folder where HTML report will be written
@@ -202,7 +201,6 @@ public class SeleniumTestsContext {
         setDpTagsInclude(getValueForTest(DP_TAGS_INCLUDE, System.getProperty(DP_TAGS_INCLUDE)));
         setDpTagsExclude(getValueForTest(DP_TAGS_EXCLUDE, System.getProperty(DP_TAGS_EXCLUDE)));
 
-        setSshCommandWait(getIntValueForTest(SSH_COMMAND_WAIT, System.getProperty(SSH_COMMAND_WAIT)));
         setSoftAssertEnabled(getBoolValueForTest(SOFT_ASSERT_ENABLED, System.getProperty(SOFT_ASSERT_ENABLED)));
 
         setWebDriverListener(getValueForTest(WEB_DRIVER_LISTENER, System.getProperty(WEB_DRIVER_LISTENER)));
@@ -513,14 +511,6 @@ public class SeleniumTestsContext {
             return (Integer) getAttribute(PAGE_LOAD_TIME_OUT);
         } catch (Exception e) {
             return 90;
-        }
-    }
-
-    public int getSshCommandWait() {
-        try {
-            return (Integer) getAttribute(SSH_COMMAND_WAIT);
-        } catch (Exception e) {
-            return 5000; // Default
         }
     }
 
@@ -1052,14 +1042,6 @@ public class SeleniumTestsContext {
     
     public void setDpTagsExclude(String tags) {
     	setAttribute(DP_TAGS_EXCLUDE, tags);
-    }
-    
-    public void setSshCommandWait(Integer waitInMs) {
-    	if (waitInMs != null) {
-    		setAttribute(SSH_COMMAND_WAIT, waitInMs);
-    	} else {
-    		setAttribute(SSH_COMMAND_WAIT, 5000);
-    	}
     }
     
     public void setSoftAssertEnabled(Boolean enable) {
