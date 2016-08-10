@@ -236,6 +236,7 @@ Each line in the feature file must correspond to an implementation inside java c
     }
 
 **WARN:**You should write only void methods to avoid getting twice the page creation in report
+**WARN:**Java8 style (lambda expressions) is currently not supported by framework. Use only @Annotation style
 
 
 #### Feature file example ####
@@ -324,6 +325,17 @@ between [ ] you define the web page where to use the following definitions. Next
 
 In the corresponding pageObject you can use mapping words to search elements using : locateBy(map:caller_word) or by.(map:caller_word). It will search the element in the page which is defined by the technical word. 
 
+### Optional features ###
+Here will be described features that may be used to improve test
+
+#### Soft assertions ####
+By default, inside a test, checks will be done using TestNG `Assert` class
+On first failure, test will stop.
+To avoid this, instead of using `Assert`, use either:
+
+- the assertXXX methods defined in `BasePage` class when checking element values, attribute, ...
+- `CustomAssertion` class that redefine every assertXXX method of `Assert` class
+
 ## Run tests ##
 
 ### Configurations ###
@@ -398,7 +410,7 @@ Below is the list of all parameters accepted in testing xml file.
     	<parameter name="platform" value="Android 6.0"/>
     	<parameter name="deviceName" value="192.168.56.101:5555"/>
     
-    	<parameter name="app" value="C:\Users\behe\Documents\Tests\Tests mobiles\infolidays-1.0.0-release.apk"/>
+    	<parameter name="app" value="<local_path_to_apk>"/>
     	<parameter name="appPackage" value="com.infotel.mobile.infolidays"/>
     	<parameter name="appActivity" value="com.infotel.mobile.mesconges.view.activity.StartActivity"/>
     	<parameter name="newCommandTimeout" value="120"/>
@@ -412,10 +424,47 @@ Below is the list of all parameters accepted in testing xml file.
 deviceName reflects the local device used to automate the test
 
 ### Test with SauceLabs ###
-TBD
+
+	<test name="tnr_sauce_mobile_app" parallel="false">
+    	<parameter name="cucumberTests" value="Configuration" />
+	    <parameter name="cucumberTags" value="" />
+	    <parameter name="runMode" value="saucelabs" />
+	    
+        <parameter name="appiumServerURL" value="http://<user>:<key>@ondemand.saucelabs.com:80/wd/hub"/>
+        <parameter name="deviceName" value="Android Emulator"/>
+        <parameter name="platform" value="Android 5.1"/>
+        
+        <parameter name="app" value="<local_path_to_apk>"/>
+    	<parameter name="appPackage" value="com.infotel.mobile.infolidays"/>
+    	<parameter name="appActivity" value="com.infotel.mobile.mesconges.view.activity.StartActivity"/>
+
+        <packages>
+            <package name="com.seleniumtests.core.runner.*"/>
+        </packages>
+    </test>
 
 ### Test with Testdroid ###
-TBD
+
+	<test name="tnr_testdroid_mobile_app" parallel="false">
+    	<parameter name="cucumberTests" value="Configuration" />
+	    <parameter name="cucumberTags" value="" />
+	    <parameter name="runMode" value="testdroid" />
+	    
+        <parameter name="appiumServerURL" value="http://appium.testdroid.com/wd/hub"/>
+        <parameter name="cloudApiKey" value="<key>"/>
+        <parameter name="deviceName" value="Samsung Galaxy Nexus SPH-L700 4.3"/>
+        <parameter name="platform" value="Android 4.3"/>
+        
+        <parameter name="app" value="<local_path_to_apk>"/>
+    	<parameter name="appPackage" value="com.infotel.mobile.infolidays"/>
+    	<parameter name="appActivity" value="com.infotel.mobile.mesconges.view.activity.StartActivity"/>
+        
+        <parameter name="projectName" value="Test_testdroid"/>
+        
+        <packages>
+            <package name="com.seleniumtests.core.runner.*"/>
+        </packages>
+    </test>
 
 ## Development ##
 

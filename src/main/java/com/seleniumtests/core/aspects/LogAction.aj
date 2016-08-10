@@ -72,7 +72,7 @@ public class LogAction {
 			actionFailed = true;
 			throw e;
 		} finally {
-			if (isHtmlElementDirectlyCalled(Thread.currentThread().getStackTrace())) {
+			if (isHtmlElementDirectlyCalled(Thread.currentThread().getStackTrace()) && parentTestStep != null) {
 				String actionName = String.format("%s on %s %s", joinPoint.getSignature().getName(), element, buildArgString(joinPoint));
 				parentTestStep.addAction(new TestAction(actionName, actionFailed));
 			}		
@@ -105,7 +105,9 @@ public class LogAction {
 			actionFailed = true;
 			throw e;
 		} finally {
-			parentTestStep.addAction(new TestAction(actionName, actionFailed));
+			if (parentTestStep != null) {
+				parentTestStep.addAction(new TestAction(actionName, actionFailed));
+			}
 		}
 		return reply;
 	}
@@ -205,6 +207,7 @@ public class LogAction {
 			if (rootStep) {
 				TestLogging.logTestStep(currentRootTestStep);	
 				currentRootTestStep = null;
+				parentTestStep = null;
 			} else {
 				parentTestStep = previousParent;
 			}

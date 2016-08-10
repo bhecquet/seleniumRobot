@@ -601,7 +601,7 @@ public class PageObject extends BasePage implements IPage {
     }
 
     private void waitForPageToLoad() {
-        new WebDriverWait(driver, 2).until(ExpectedConditions.jsReturnsValue("if (document.readyState === \"complete\") { return \"ok\"; }"));
+    	new WebDriverWait(driver, 10).until(ExpectedConditions.jsReturnsValue("if (document.readyState === \"complete\") { return \"ok\"; }"));
 
         // populate page info
         try {

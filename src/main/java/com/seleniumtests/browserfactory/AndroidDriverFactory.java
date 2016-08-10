@@ -37,7 +37,8 @@ public class AndroidDriverFactory extends AbstractWebDriverFactory implements IW
     protected WebDriver createNativeDriver() {
 
         try {
-			return new AndroidDriver(new URL(webDriverConfig.getAppiumServerURL()), new AndroidCapabilitiesFactory().createCapabilities(webDriverConfig));
+        	WebDriver driver = new AndroidDriver(new URL(webDriverConfig.getAppiumServerURL()), new AndroidCapabilitiesFactory().createCapabilities(webDriverConfig));
+        	return driver;
 		} catch (MalformedURLException e) {
 			throw new DriverExceptions("Error creating driver: " + e.getMessage());
 		}

@@ -373,11 +373,11 @@ public class SeleniumTestsContextManager {
 	}
 
 	public static boolean isWebTest() {
-        return getThreadContext().getTestType().equals(TestType.WEB);
+        return getThreadContext().getTestType().family().equals(TestType.WEB);
     }
     
 	public static boolean isNonGuiTest() {
-		return getThreadContext().getTestType().equals(TestType.NON_GUI);
+		return getThreadContext().getTestType().family().equals(TestType.NON_GUI);
 	}
 	
     public static boolean isMobileAppTest() {

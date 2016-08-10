@@ -276,6 +276,7 @@ public class HtmlElement {
 				if (element.getAttribute("style").toLowerCase().replace(" ", "").contains("display:none")) {
 					changeCssAttribute(element, "display", "block");
 				}
+				changeCssAttribute(element, "zIndex", "1000");
 			} catch (Exception e) {
 				return;
 			}

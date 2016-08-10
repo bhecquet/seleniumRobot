@@ -428,20 +428,7 @@ public class TestSeleniumTestContext {
 		SeleniumTestsContextManager.getThreadContext().setEnableExceptionListener(null);
 		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getEnableExceptionListener(), true);
 	}
-	
-	@Test(groups="ut context")
-	public void testSshCommandWait(final ITestContext testNGCtx, final XmlTest xmlTest) {
-		SeleniumTestsContextManager.initThreadContext(testNGCtx);
-		SeleniumTestsContextManager.getThreadContext().setSshCommandWait(15);
-		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getSshCommandWait(), 15);
-	}
-	@Test(groups="ut context")
-	public void testSshCommandWaitNull(final ITestContext testNGCtx, final XmlTest xmlTest) {
-		SeleniumTestsContextManager.initThreadContext(testNGCtx);
-		SeleniumTestsContextManager.getThreadContext().setSshCommandWait(null);
-		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getSshCommandWait(), 5000);
-	}
-	
+
 	@Test(groups="ut context")
 	public void testSoftAssertEnabled(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		SeleniumTestsContextManager.initThreadContext(testNGCtx);
