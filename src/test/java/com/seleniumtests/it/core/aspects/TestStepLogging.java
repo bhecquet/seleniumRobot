@@ -13,6 +13,7 @@ import org.testng.annotations.Test;
 
 import com.seleniumtests.core.runner.SeleniumRobotRunner;
 import com.seleniumtests.customexception.DriverExceptions;
+import com.seleniumtests.driver.WebUIDriver;
 
 public class TestStepLogging {
 	
@@ -24,6 +25,7 @@ public class TestStepLogging {
 	@AfterClass(groups={"it"})
 	public void teardown() {
 		System.clearProperty("browser");
+		WebUIDriver.cleanUp();
 	}
 	
 	@BeforeMethod(groups={"it"})
