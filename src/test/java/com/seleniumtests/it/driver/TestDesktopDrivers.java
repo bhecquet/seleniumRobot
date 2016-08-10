@@ -25,7 +25,7 @@ import com.seleniumtests.driver.WebUIDriver;
 public class TestDesktopDrivers extends GenericTest {
 	
 	
-	@Test(groups={"it"})
+	@Test(groups={"it"}, enabled=false)
 	public void testFirefoxStartup(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		SeleniumTestsContextManager.initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setBrowser("*firefox");
