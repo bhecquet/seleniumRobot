@@ -300,11 +300,12 @@ public class TestSeleniumTestContext {
 		SeleniumTestsContextManager.getThreadContext().setDevMode(true);
 		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().isDevMode(), true);
 	}
+	// by default, devMode is true if tests are launched from IDE
 	@Test(groups="ut context")
 	public void testDevModeNull(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		SeleniumTestsContextManager.initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setDevMode(null);
-		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().isDevMode(), false);
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().isDevMode(), true);
 	}
 	
 	@Test(groups="ut context")
