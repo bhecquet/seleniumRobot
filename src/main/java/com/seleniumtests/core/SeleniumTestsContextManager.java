@@ -58,9 +58,6 @@ public class SeleniumTestsContextManager {
     // global level context
     private static SeleniumTestsContext globalContext;
 
-    // test level context
-    private static Map<String, SeleniumTestsContext> testLevelContext = Collections.synchronizedMap(new HashMap<>());
-
     // thread level SeleniumTestsContext
     private static ThreadLocal<SeleniumTestsContext> threadLocalContext = new ThreadLocal<>();
 
@@ -79,22 +76,6 @@ public class SeleniumTestsContextManager {
         }
 
         return globalContext;
-    }
-
-    public static SeleniumTestsContext getTestLevelContext(final ITestContext testContext) {
-        if (testContext != null && testContext.getCurrentXmlTest() != null) {
-            if (testLevelContext.get(testContext.getCurrentXmlTest().getName()) == null) {
-                initTestLevelContext(testContext, testContext.getCurrentXmlTest());
-            }
-
-            return testLevelContext.get(testContext.getCurrentXmlTest().getName());
-        } else {
-            return null;
-        }
-    }
-
-    public static SeleniumTestsContext getTestLevelContext(final String testName) {
-        return testLevelContext.get(testName);
     }
 
     public static SeleniumTestsContext getThreadContext() {
@@ -218,27 +199,6 @@ public class SeleniumTestsContextManager {
         }
 
         return iTestContext;
-    }
-
-    public static void initTestLevelContext(final ITestContext testNGCtx, final XmlTest xmlTest) {
-        SeleniumTestsContext seleniumTestsCtx = new SeleniumTestsContext(testNGCtx);
-        if (xmlTest != null) {
-            Map<String, String> testParameters = xmlTest.getTestParameters();
-
-            // parse the test level parameters
-            for (Entry<String, String> entry : testParameters.entrySet()) {
-                seleniumTestsCtx.setAttribute(entry.getKey(), entry.getValue());
-            }
-
-            testLevelContext.put(xmlTest.getName(), seleniumTestsCtx);
-            
-            // update some values after init
-            seleniumTestsCtx.postInit();
-        }
-    }
-
-    public static void initTestLevelContext(final XmlTest xmlTest) {
-        initTestLevelContext(globalContext.getTestNGContext(), xmlTest);
     }
 
     public static void initThreadContext() {

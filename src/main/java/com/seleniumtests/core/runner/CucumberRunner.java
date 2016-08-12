@@ -59,7 +59,6 @@ public class CucumberRunner {
     @BeforeTest(alwaysRun = true)
     public void beforeTest(final ITestContext testContext, final XmlTest xmlTest) {
     	try {
-	        SeleniumTestsContextManager.initTestLevelContext(testContext, xmlTest);
 	        testNGCucumberRunner = new CustomTestNGCucumberRunner(this.getClass());
     	} catch (Exception e) {
     		logger.error(Thread.currentThread() + " Error on init: ", e);

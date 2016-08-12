@@ -564,20 +564,20 @@ public class SeleniumTestsReporter implements IReporter, ITestListener, IInvoked
                         }
                     }
 
-                    SeleniumTestsContext testLevelContext = SeleniumTestsContextManager.getTestLevelContext(testName);
-                    if (testLevelContext != null) {
-                        String browser = testLevelContext.getBrowser().getBrowserType();
+                    SeleniumTestsContext testContext = SeleniumTestsContextManager.getThreadContext();
+                    if (testContext != null) {
+                        String browser = testContext.getBrowser().getBrowserType();
 
-                        String app = testLevelContext.getApp();
-                        String appPackage = testLevelContext.getAppPackage();
-                        String appActivity = testLevelContext.getAppActivity();
-                        TestType testType = testLevelContext.getTestType();
+                        String app = testContext.getApp();
+                        String appPackage = testContext.getAppPackage();
+                        String appActivity = testContext.getAppActivity();
+                        TestType testType = testContext.getTestType();
 
                         if (browser != null) {
                             browser = browser.replace("*", "");
                         }
 
-                        String browserVersion = testLevelContext.getWebBrowserVersion();
+                        String browserVersion = testContext.getWebBrowserVersion();
                         if (browserVersion != null) {
                             browser = browser + browserVersion;
                         }
