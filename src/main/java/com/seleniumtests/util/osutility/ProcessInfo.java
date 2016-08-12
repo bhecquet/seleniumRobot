@@ -19,13 +19,11 @@ public class ProcessInfo {
 	private String name;
 	private String sessionName; //Console, Services
 	private int sessionNumber;
-	private double memUsage; // Ko
+	private int memUsage; // Ko
 	private String status; // Running, Unknown, Not Responding
 	private String username; 
 	private String cpuTime; // HH:mm:ss
 	private String title; // N/A, MINGW64:/d/workspace, ...
-	
-	public ProcessInfo() {}
 
 	public String getPid() {
 		return pid;
@@ -59,11 +57,11 @@ public class ProcessInfo {
 		this.sessionNumber = sessionNumber;
 	}
 
-	public double getMemUsage() {
+	public int getMemUsage() {
 		return memUsage;
 	}
 
-	public void setMemUsage(double memUsage) {
+	public void setMemUsage(int memUsage) {
 		this.memUsage = memUsage;
 	}
 

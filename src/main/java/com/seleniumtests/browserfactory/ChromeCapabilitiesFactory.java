@@ -34,8 +34,6 @@ public class ChromeCapabilitiesFactory extends ICapabilitiesFactory {
 
 	private static final String CHROME_DRIVER_PROPERTY = "webdriver.chrome.driver";
 	
-	private OSUtility osUtil = new OSUtility();
-	
 	@Override
     public DesiredCapabilities createCapabilities(final DriverConfig webDriverConfig) {
 

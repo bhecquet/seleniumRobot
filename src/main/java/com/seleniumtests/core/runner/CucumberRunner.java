@@ -57,7 +57,7 @@ public class CucumberRunner {
      * @param  xmlTest
      */
     @BeforeTest(alwaysRun = true)
-    public void beforeTest(final ITestContext testContext, final XmlTest xmlTest) {
+    public void beforeTest() {
     	try {
 	        testNGCucumberRunner = new CustomTestNGCucumberRunner(this.getClass());
     	} catch (Exception e) {
@@ -109,7 +109,7 @@ public class CucumberRunner {
      * @param  xmlTest
      */
     @AfterMethod(alwaysRun = true)
-    public void afterTestMethod(final Method method, final XmlTest xmlTest) {
+    public void afterTestMethod(final Method method) {
         List<TearDownService> serviceList = SeleniumTestsContextManager.getThreadContext().getTearDownServices();
         if (serviceList != null && !serviceList.isEmpty()) {
             for (TearDownService service : serviceList) {

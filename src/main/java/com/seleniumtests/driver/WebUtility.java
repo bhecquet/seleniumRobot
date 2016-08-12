@@ -23,9 +23,6 @@ import org.openqa.selenium.WebDriver;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.reporter.TestLogging;
 
-import io.appium.java_client.android.AndroidDriver;
-import io.appium.java_client.ios.IOSDriver;
-
 public class WebUtility {
 	
 	protected static final Logger logger = TestLogging.getLogger(WebUtility.class);

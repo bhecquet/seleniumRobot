@@ -31,14 +31,6 @@ public class TextFieldElement extends HtmlElement {
             element.clear();
         }
     }
-
-    public void sendKeys(final String keysToSend) {
-        super.sendKeys(keysToSend);
-    }
-    
-    public void simulateSendKeys(final String keysToSend) {
-    	super.simulateSendKeys(keysToSend);
-    }
     
     public void type(final String keysToSend) {
         sendKeys(keysToSend);

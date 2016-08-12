@@ -116,7 +116,7 @@ public class OSUtility {
     	
     	ProcessInfo output = new ProcessInfo();
     	for (ProcessInfo processInfo : getRunningProcessList()) {
-    		if (processInfo.getName().toLowerCase().equals(processName)){
+    		if (processInfo.getName().equalsIgnoreCase(processName)){
     			output = processInfo;
 				break;
     		}
@@ -160,7 +160,7 @@ public class OSUtility {
     	boolean isRunning = false;
     	for (ProcessInfo processInfo : getRunningProcessList()) {
     		for (String processName : webBrowserProcessList){
-	    		if (processInfo.getName().toLowerCase().equals(processName)){
+	    		if (processInfo.getName().equalsIgnoreCase(processName)){
 					isRunning = true;
 					if (!showAll) break;
 					logger.info("Web browser process is still running : " + processInfo.getName());
@@ -178,7 +178,7 @@ public class OSUtility {
     	List<ProcessInfo> webBrowserRunningList = new ArrayList<>();
     	for (ProcessInfo processInfo : getRunningProcessList()) {
     		for (String processName : webBrowserProcessList){
-	    		if (processInfo.getName().toLowerCase().equals(processName)){
+	    		if (processInfo.getName().equalsIgnoreCase(processName)){
 	    			logger.info("Web browser process still running : " + processInfo.getName());
 	    			webBrowserRunningList.add(processInfo);
 	    		}
@@ -213,7 +213,7 @@ public class OSUtility {
     	
     	for (ProcessInfo processInfo : getRunningProcessList()) {
     		for (String processName : webBrowserProcessList) {
-    			if (processInfo.getName().toLowerCase().equals(processName)){
+    			if (processInfo.getName().equalsIgnoreCase(processName)){
     				try {
     					logger.info("Asked system to terminate : " + processInfo.getName());
 			    		killProcess(processInfo.getPid(), force);
@@ -231,7 +231,7 @@ public class OSUtility {
      * @return output command lines
      * @throws IOException
      */
-    public String killIEProcess(boolean force) throws IOException {
+    public String killIEProcess() throws IOException {
     	ProcessInfo processInfo = getRunningProcess("iexplore");
 		if (processInfo.getName() != null){
 			logger.info("Asked system to terminate : " + processInfo.getName());

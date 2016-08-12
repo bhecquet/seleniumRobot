@@ -185,7 +185,7 @@ public class TestLogging {
 	    	for (TestAction action: actionList) {
 	    		if (action instanceof TestStep) {	
 					logTestStep((TestStep)action);	
-				} else if (action instanceof TestAction) {
+				} else {
 					log("<li>" + (action.getFailed() ? "<b>FailedAction</b>: " : " ") + action.getName() + "</li>", action.getFailed(), false);
 				}
 			}

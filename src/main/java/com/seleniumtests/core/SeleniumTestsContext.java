@@ -15,10 +15,6 @@
 package com.seleniumtests.core;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -28,7 +24,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.json.JSONObject;
 import org.openqa.selenium.Platform;
@@ -36,7 +31,6 @@ import org.openqa.selenium.Proxy.ProxyType;
 import org.openqa.selenium.WebDriverException;
 import org.testng.ITestContext;
 import org.testng.ITestResult;
-import org.testng.xml.XmlSuite;
 
 import com.seleniumtests.core.config.ConfigReader;
 import com.seleniumtests.customexception.ConfigurationException;
@@ -151,7 +145,9 @@ public class SeleniumTestsContext {
 
     private LinkedList<ScreenShot> screenshots = new LinkedList<>();
     
-    public SeleniumTestsContext() {}
+    public SeleniumTestsContext() {
+    	// for test purpose only
+    }
     
     public SeleniumTestsContext(final ITestContext context) {
         this.testNGContext = context;

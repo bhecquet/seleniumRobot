@@ -56,7 +56,7 @@ public abstract class SeleniumTestPlan {
      *
      */
     @BeforeTest(alwaysRun = true)
-    public void beforeTest(final ITestContext testContext, final XmlTest xmlTest) {
+    public void beforeTest() {
     	SeleniumRobotRunner.setCucumberTest(false);
     }
 
