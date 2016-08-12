@@ -26,8 +26,6 @@ import com.seleniumtests.util.FileUtility;
 import com.seleniumtests.util.osutility.OSUtility;
 
 public class MarionetteCapabilitiesFactory extends FirefoxCapabilitiesFactory {
-
-	private OSUtility osUtil = new OSUtility();
 	
 	@Override
 	public DesiredCapabilities createCapabilities(final DriverConfig webDriverConfig) {
@@ -47,7 +45,7 @@ public class MarionetteCapabilitiesFactory extends FirefoxCapabilitiesFactory {
 		String dir = Paths.get(SeleniumTestsContextManager.getRootPath(), "tools", "drivers", Platform.getCurrent().family().toString().toLowerCase()).toString();
         dir = FileUtility.decodePath(dir);
 
-        if (osUtil.isWindows()) {
+        if (OSUtility.isWindows()) {
             System.setProperty("webdriver.gecko.driver", dir + "\\geckodriver.exe");
         } else {
             System.setProperty("webdriver.gecko.driver", dir + "/geckodriver");

@@ -70,6 +70,10 @@ public class SelectList extends HtmlElement {
     protected Select getNewSelectElement(final WebElement element) {
         return new Select(element);
     }
+    
+    private String getOptionValue(WebElement option) {
+    	return option.getAttribute("value");
+    }
 
     public List<WebElement> getOptions() {
         findElement();
@@ -104,7 +108,7 @@ public class SelectList extends HtmlElement {
         findElement();
         for (WebElement option : options) {
             if (option.isSelected()) {
-                return option.getAttribute("value");
+                return getOptionValue(option);
             }
         }
         return null;
@@ -116,7 +120,7 @@ public class SelectList extends HtmlElement {
         List<String> valueList = new ArrayList<>();
         for (WebElement option : options) {
             if (option.isSelected()) {
-                valueList.add(option.getAttribute("value"));
+                valueList.add(getOptionValue(option));
             }
         }
 
@@ -190,7 +194,7 @@ public class SelectList extends HtmlElement {
         	select.deselectByValue(value);
         } else {
 	        for (WebElement option : options) {
-	            if (option.getAttribute("value").equals(value)) {
+	            if (getOptionValue(option).equals(value)) {
 	            	setDeselected(option);
 	                break;
 	            }
@@ -308,7 +312,7 @@ public class SelectList extends HtmlElement {
         	select.selectByValue(value);
         } else {
 	        for (WebElement option : options) {
-	            if (option.getAttribute("value").equals(value)) {
+	            if (getOptionValue(option).equals(value)) {
 	                setSelected(option);
 	                break;
 	            }
@@ -320,7 +324,7 @@ public class SelectList extends HtmlElement {
         findElement();
         for (int i = 0; i < values.length; i++) {
             for (WebElement option : options) {
-                if (option.getAttribute("value").equals(values[i])) {
+                if (getOptionValue(option).equals(values[i])) {
                     setSelected(option);
                     break;
                 }

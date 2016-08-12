@@ -44,7 +44,7 @@ public abstract class OSCommand {
 	
 	    	BufferedReader stdError = new BufferedReader(new InputStreamReader(proc.getErrorStream()));
 	        
-	        String s = null;
+	        String s;
 	        
         	// read result output from command
             while ((s = stdInput.readLine()) != null) {

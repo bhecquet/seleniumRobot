@@ -33,11 +33,6 @@ public class CheckBoxElement extends HtmlElement {
     }
 
     @Override
-    public void click() {
-        super.click();
-    }
-
-    @Override
     public boolean isSelected() {
         findElement();
         return element.isSelected();

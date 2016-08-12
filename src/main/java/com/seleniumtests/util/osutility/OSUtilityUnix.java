@@ -18,8 +18,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import com.seleniumtests.util.StringUtility;
-
 public class OSUtilityUnix extends OSCommand {
 
 	/**
@@ -54,7 +52,6 @@ public class OSUtilityUnix extends OSCommand {
     			
     			// CMD
     			processInfo.setName(words[i]);
-    			i++;
     		}
     	}
     	return processInfoList;
@@ -68,8 +65,6 @@ public class OSUtilityUnix extends OSCommand {
      * @throws IOException
      */
     protected String killProcess(String pid, boolean force) throws IOException {
-    
-		//String pId = executeCommand("pidof " + process).split("\n")[0];
     	
     	if (force) {
     		return executeCommand("kill -SIGKILL " + pid);

@@ -46,7 +46,6 @@ public abstract class WebPageSection extends BasePage {
 
         ScreenShot screenShot = new ScreenshotUtil(driver).captureWebPageSnapshot();
         String title = screenShot.getTitle();
-        String url = screenShot.getLocation();
 
         TestLogging.logWebOutput(title + " (" + TestLogging.buildScreenshotLog(screenShot) + ")", false);
     }

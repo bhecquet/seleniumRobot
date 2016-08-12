@@ -26,11 +26,6 @@ public class LabelElement extends HtmlElement {
     }
 
     @Override
-    public String getText() {
-        return super.getText();
-    }
-
-    @Override
     public boolean isTextPresent(final String pattern) {
         String text = getText();
         return text != null && (text.contains(pattern) || text.matches(pattern));

@@ -48,7 +48,6 @@ public class IEDriverFactory extends AbstractWebDriverFactory implements IWebDri
     @Override
     public WebDriver createWebDriver() {
 
-    	//osUtil.killIEProcess(true);
         if (!OSUtility.isWindows()) {
             throw new DriverExceptions("IE is only supported on windows");
         }

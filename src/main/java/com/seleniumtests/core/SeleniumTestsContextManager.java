@@ -20,21 +20,18 @@ import java.net.URLDecoder;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
+import org.apache.log4j.Logger;
 import org.testng.ITestContext;
 import org.testng.xml.XmlSuite;
-import org.testng.xml.XmlTest;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import com.seleniumtests.driver.TestType;
-import com.seleniumtests.util.TestConfigurationParser;
-import org.apache.log4j.Logger;
 import com.seleniumtests.reporter.TestLogging;
+import com.seleniumtests.util.TestConfigurationParser;
 
 /**
  * SeleniumTestsContextManager provides ways to manage global context, thread context and test level context.

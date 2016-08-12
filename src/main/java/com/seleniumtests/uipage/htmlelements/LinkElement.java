@@ -26,11 +26,6 @@ public class LinkElement extends HtmlElement {
     	super(label, by, index);
     }
 
-    @Override
-    public void click() {
-        super.click();
-    }
-
     public String getUrl() {
         return super.getAttribute("href");
     }

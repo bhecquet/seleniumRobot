@@ -20,11 +20,8 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.seleniumtests.util.StringUtility;
-
 public class OSUtilityWindows extends OSCommand {
 		
-	public OSUtilityWindows() {}
 	
 	public int getIEVersion() {
 
@@ -33,8 +30,8 @@ public class OSUtilityWindows extends OSCommand {
             output = executeCommand("reg query \"HKLM\\Software\\Microsoft\\Internet Explorer\" /v Version");
         }
 
-        String internet_explorer_value = output.split("\n")[2];
-        String version = internet_explorer_value.trim().split("   ")[2];
+        String internetExplorerValue = output.split("\n")[2];
+        String version = internetExplorerValue.trim().split("   ")[2];
         version = version.trim().split("\\.")[0];
         return Integer.parseInt(version);
     }

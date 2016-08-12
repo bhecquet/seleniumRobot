@@ -24,6 +24,7 @@ public class TestStep extends TestAction {
 	/**
 	 * Return true if this step or one of its actions / sub-step is failed
 	 */
+	@Override
 	public Boolean getFailed() {
 		if (super.getFailed()) {
 			return true;

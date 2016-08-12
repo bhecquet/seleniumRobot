@@ -552,17 +552,6 @@ public class SeleniumTestsReporter implements IReporter, ITestListener, IInvoked
                 String content;
                 for (ITestResult ans : resultSet) {
                     StringBuilder contentBuffer = new StringBuilder();
-                    String testName;
-                    if (ans.getMethod().getXmlTest() != null) {
-                        testName = ans.getMethod().getXmlTest().getName();
-                    } else {
-                        try {
-                            testName = ans.getTestContext().getCurrentXmlTest().getName();
-                        } catch (Exception ex) {
-                            logger.error(ex);
-                            continue;
-                        }
-                    }
 
                     SeleniumTestsContext testContext = SeleniumTestsContextManager.getThreadContext();
                     if (testContext != null) {
@@ -628,21 +617,11 @@ public class SeleniumTestsReporter implements IReporter, ITestListener, IInvoked
 
                             htmllog = htmllog.replaceAll("@@lt@@", "<").replace("^^greaterThan^^", ">");
                             contentBuffer.append(htmllog);
-//                            if (!htmllog.contains("<br>")) {
-//                                contentBuffer.append("<br/>");
-//                            }
+
                             contentBuffer.append("\n");
                         }
 
                         contentBuffer.append("</ol>");
-
-                        String lastLine = "";
-                        for (int lastIdx = msgs.size() - 1; lastIdx >= 0; lastIdx--) {
-                            lastLine = msgs.get(lastIdx).replaceAll("@@lt@@", "<").replace("^^greaterThan^^", ">");
-                            if (lastLine.indexOf(">screenshot</a>") != -1) {
-                                break;
-                            }
-                        }
 
                         if (hasThrowable) {
                             generateExceptionReport(exception, method, contentBuffer);
