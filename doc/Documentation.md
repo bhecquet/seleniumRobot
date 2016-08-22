@@ -127,7 +127,7 @@ If pure TestNG mode is used, this package should not exist.
 	- `tests` subpackage contains code for pure TestNG tests (not cucumber). If cucumber mode is used, this package should not exist
 	- `webpage` subpackage is mandatory as it contains PageObject implementation
 
-![](/images/package_structure.png)
+![](images/package_structure.png)
 
 ### PageObject ###
 PageObject is a design pattern that helps writing maintainable selenium applications. Each screen of the website or mobile application is a class.
