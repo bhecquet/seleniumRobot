@@ -564,12 +564,12 @@ Generation is done by copying a test file `resources/squash-ta/squash_generic.ta
 pom.xml and java files used by Squash TA to launch the test are also copied to the destination directory.
 You get the following structure which is directly used by Squash TA
 
-![](/images/ta_generation.png)
+![](images/ta_generation.png)
 
 It's possible to customize SeleniumRobotTest.java file or squash_generic.ta file. If so, create squash-ta specific folder structure inside `data` folder of the test application and put the files you modified. 
 They will be used on next generation, instead of default ones
 
-![](/images/squash_ta_structure.png)
+![](images/squash_ta_structure.png)
 
 ##### Cucumber mode #####
 A .ta test script will be generated for each test (in testNG file) where `cucumberTests` or `cucumberTags` parameters are used. 
