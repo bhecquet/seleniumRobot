@@ -503,11 +503,9 @@ Check installation requirements to perform a release
 
 ## Interfacing with tests managers ##
 ### Squash TM/TA ###
-STF can work with Squash TA by using an intermediate .java file. This file handles:
-
-- Execution of test framework using a command line
-- Generation of .ta files
-- Update of test list
+SeleniumRobot can work with Squash TA by using an intermediate .java file. This file handles execution of test framework using a command line.
+Moreover, SeleniumRobot can generate .ta, pom.xml and .java files automatically. See "TA files generation" part.
+**Following instruction expect the use of generated files**
 
 #### Execution of test framework ####
 This needs some environment variable configuration:
@@ -517,16 +515,19 @@ This needs some environment variable configuration:
 
 **Execution platform must be installed with Java 8**
 
-A typical command line would be:
+A typical command line would be (included in generated .java file):
 
 
-    %JAVA_HOME_STF%/bin/java -cp %STF_HOME%/seleniumtestsframework.jar;%STF_HOME%/plugins/${application}-tests.jar -Dbrowser=${TC_CUF_browser} -DcucumberTests=\"${TC_CUF_cucumberTest}\" -DcucumberTags=${TC_CUF_cucumberTags} -Dvariables=${TC_CUF_testVariables} -Denv=${TC_CUF_testEnvironment} org.testng.TestNG ${testngFile} -testnames ${testngName}
+    "%JAVA_HOME_STF%/bin/java\" -cp %STF_HOME%/seleniumRobot.jar:%STF_HOME%/plugins/${application}-tests.jar -Dbrowser=${IT_CUF_browser} ${TC_CUF_cucumberTest} -Denv=${IT_CUF_testEnvironment} org.testng.TestNG ${testngFile} -testnames ${testngName}
+
 Each ${} is a variable passed by the .ta script when replacing variables by their actual value.
-#### Squash TM configuration ####
-Launching of STF expects some variables passed to the script. These MUST be declared on Squash TM side (as Test Case custom fields or Test Execution custom field):
 
-- browser
-- testEnvironment
+#### Squash TM configuration ####
+Launching of SeleniumRobot with pre-configured test applications expects some variables passed to the script. These MUST be declared on Squash TM side:
+
+- browser (iteration custom field)
+- testEnvironment (iteration custom field)
+
 
 ![](images/squash_tm_cuf.png)
 
@@ -563,6 +564,10 @@ Generation is done by copying a test file `resources/squash-ta/squash_generic.ta
 pom.xml and java files used by Squash TA to launch the test are also copied to the destination directory.
 You get the following structure which is directly used by Squash TA
 ![](/images/ta_generation.png)
+
+It's possible to customize SeleniumRobotTest.java file or squash_generic.ta file. If so, create squash-ta specific folder structure inside `data` folder of the test application and put the files you modified. 
+They will be used on next generation, instead of default ones
+![](/images/squash_ta_structure.png)
 
 ##### Cucumber mode #####
 A .ta test script will be generated for each test (in testNG file) where `cucumberTests` or `cucumberTags` parameters are used. 
