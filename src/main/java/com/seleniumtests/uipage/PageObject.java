@@ -17,7 +17,6 @@ package com.seleniumtests.uipage;
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -46,7 +45,6 @@ import com.seleniumtests.customexception.CustomSeleniumTestsException;
 import com.seleniumtests.customexception.NotCurrentPageException;
 import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import com.seleniumtests.driver.DriverMode;
-import com.seleniumtests.driver.JavaScriptError;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.driver.WebUtility;
 import com.seleniumtests.driver.screenshots.ScreenShot;
@@ -54,7 +52,6 @@ import com.seleniumtests.driver.screenshots.ScreenshotUtil;
 import com.seleniumtests.reporter.TestLogging;
 import com.seleniumtests.uipage.htmlelements.HtmlElement;
 import com.seleniumtests.uipage.htmlelements.LinkElement;
-import com.seleniumtests.util.helper.ContextHelper;
 import com.seleniumtests.util.helper.WaitHelper;
 
 public class PageObject extends BasePage implements IPage {
@@ -348,29 +345,6 @@ public class PageObject extends BasePage implements IPage {
         return imageFilePath;
     }
 
-    /**
-     * Get JS Error by JSErrorCollector which only supports Firefox browser.
-     *
-     * @return  jsErrors in format "line number, errorLogger message, source name; "
-     */
-    @Override
-    public String getJSErrors() {
-        if (WebUIDriver.getWebUIDriver().isAddJSErrorCollectorExtension()) {
-            List<JavaScriptError> jsErrorList = JavaScriptError.readErrors(driver);
-            if (!jsErrorList.isEmpty()) {
-                String jsErrors = "";
-                for (JavaScriptError aJsErrorList : jsErrorList) {
-                    jsErrors += aJsErrorList.getLineNumber() + ", " + aJsErrorList.getErrorMessage() + ", "
-                            + aJsErrorList.getSourceName() + "; ";
-                }
-
-                return jsErrors;
-            }
-        }
-
-        return null;
-    }
-
     @Override
     public String getLocation() {
         return driver.getCurrentUrl();
@@ -610,13 +584,6 @@ public class PageObject extends BasePage implements IPage {
         	logger.error(ex);
             throw ex;
         }
-    }
-    
-    /**
-     * Captures snapshot of the current browser window.
-     */
-    public void captureSnapshot() {
-        captureSnapshot(ContextHelper.getCallerMethod() + " on ");
     }
 
     /**
