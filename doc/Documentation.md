@@ -607,3 +607,23 @@ by
 
     -Dta.tmcallback.reportname=SeleniumRobot_Report
 
+## How To ##
+In this section, we will describe how to add some useful features to test applications (file comparison, log reading, ...)
+
+### Compare 2 XML files ###
+Use the XMLUnit api: https://github.com/xmlunit/user-guide/wiki
+
+Add dependency to pom.xml
+	
+	<dependency>
+		<groupId>org.xmlunit</groupId>
+		<artifactId>xmlunit-core</artifactId>
+		<version>2.2.1</version>
+	</dependency>
+	
+Use the following java code
+	
+	Source source = Input.fromStream(getClass().getResourceAsStream("/tu/xmlFileToTest.xml")).build();
+    Source source2 = Input.fromStream(getClass().getResourceAsStream("/tu/xmlFileToTest2.xml")).build();
+    Diff diff = DiffBuilder.compare(source).withTest(source2).build();
+    System.out.println(diff);
