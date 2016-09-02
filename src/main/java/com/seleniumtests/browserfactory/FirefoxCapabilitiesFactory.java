@@ -25,7 +25,6 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 
 import com.seleniumtests.browserfactory.customprofile.FireFoxProfileMarker;
 import com.seleniumtests.driver.DriverConfig;
-import com.seleniumtests.driver.JavaScriptError;
 import com.seleniumtests.reporter.TestLogging;
 import com.seleniumtests.util.FileUtility;
 
@@ -59,17 +58,8 @@ public class FirefoxCapabilitiesFactory extends ICapabilitiesFactory {
 
         if (!webDriverConfig.isEnableJavascript()) {
             profile.setPreference("javascript.enabled", false);
-        } else {
-
-            // Add Firefox extension to collect JS Error
-            if (webDriverConfig.isAddJSErrorCollectorExtension()) {
-                try {
-                    JavaScriptError.addExtension(profile);
-                } catch (IOException e) {
-                	logger.error(e);
-                }
-            }
         }
+        
 
         // fix permission denied issues
         profile.setPreference("capability.policy.default.Window.QueryInterface", "allAccess");
