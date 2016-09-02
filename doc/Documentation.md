@@ -208,6 +208,8 @@ A typical method whould be
 
 #### TestNG file ####
 For tests extending SeleniumTestPlan, the testNg XML looks like (minimal requirements):
+**WARN**: listeners are mandatory for a full featured seleniumRobot
+
 	<suite name="Integration tests" parallel="false" verbose="1" thread-count="1">
 	    <listeners>
 	        <listener class-name="com.seleniumtests.reporter.SeleniumTestsReporter" />
@@ -252,6 +254,8 @@ Each line in the feature file must correspond to an implementation inside java c
 
 #### TestNG file ####
 XML testNg file looks like:
+**WARN**: listeners are mandatory for a full featured seleniumRobot
+
 	<!DOCTYPE suite SYSTEM "http://beust.com/testng/testng-1.0.dtd" >
 	<suite name="Integration tests" parallel="false" verbose="1" thread-count="1">
 	    <listeners>
@@ -339,7 +343,7 @@ To avoid this, instead of using `Assert`, use either:
 ## Run tests ##
 
 ### Configurations ###
-Below is the list of all parameters accepted in testing xml file.
+Below is the list of all parameters accepted in testing xml file. These parameters may also be passed java properties (-D<paramName>=<value>)
 
 | Param name       			| Default 	| Description  |
 | -------------------------	| ------- 	| ------------ |
@@ -394,6 +398,12 @@ Below is the list of all parameters accepted in testing xml file.
 | cloudApiKey 				| 			| Access key for service | 
 | projectName 				| 			| Project name for Testdroid tests only | 
 
+
+Other parameters, not accepted in XML file but allowed on command line
+
+| Param name       			| Default 	| Description  |
+| -------------------------	| ------- 	| ------------ |
+| testRetryCount			| 2			| Number of times a failed test is retried. Set to 0 for no retry
 
 ### Test with Appium locally ###
 #### Application test on android ####
