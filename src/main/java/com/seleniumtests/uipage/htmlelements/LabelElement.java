@@ -24,10 +24,4 @@ public class LabelElement extends HtmlElement {
     public LabelElement(final String label, final By by, final int index) {
     	super(label, by, index);
     }
-
-    @Override
-    public boolean isTextPresent(final String pattern) {
-        String text = getText();
-        return text != null && (text.contains(pattern) || text.matches(pattern));
-    }
 }

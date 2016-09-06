@@ -56,11 +56,6 @@ public class FirefoxCapabilitiesFactory extends ICapabilitiesFactory {
                 "application/octet-stream,text/plain,application/pdf,application/zip,text/csv,text/html");
         }
 
-        if (!webDriverConfig.isEnableJavascript()) {
-            profile.setPreference("javascript.enabled", false);
-        }
-        
-
         // fix permission denied issues
         profile.setPreference("capability.policy.default.Window.QueryInterface", "allAccess");
         profile.setPreference("capability.policy.default.Window.frameElement.get", "allAccess");

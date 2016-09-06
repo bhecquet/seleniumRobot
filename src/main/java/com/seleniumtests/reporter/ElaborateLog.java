@@ -22,7 +22,7 @@ public class ElaborateLog {
     private String location;
     private String href;
 
-    public ElaborateLog(final String s, final String root) {
+    public ElaborateLog(final String s) {
         if (s == null) {
             return;
         }

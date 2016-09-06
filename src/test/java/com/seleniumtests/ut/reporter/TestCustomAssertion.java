@@ -14,7 +14,7 @@ import com.seleniumtests.core.CustomAssertion;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.reporter.SeleniumTestsReporter;
 
-public class TestSeleniumTestReporter {
+public class TestCustomAssertion {
 
 	/**
 	 * Test soft assertion enabled

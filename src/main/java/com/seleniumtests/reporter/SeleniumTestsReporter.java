@@ -606,7 +606,7 @@ public class SeleniumTestsReporter implements IReporter, ITestListener, IInvoked
                                 + (PASSED_TEST.equals(style) ? "style='display:none'" : "") + ">");
                         contentBuffer.append("<ol>");
                         for (String line : msgs) {
-                            ElaborateLog logLine = new ElaborateLog(line, outputDirectory);
+                            ElaborateLog logLine = new ElaborateLog(line);
                             String htmllog;
                             if (logLine.getHref() != null) {
                                 htmllog = "<a href='" + logLine.getHref() + "' title='" + logLine.getLocation() + "' >"

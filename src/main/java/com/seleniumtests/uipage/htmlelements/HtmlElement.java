@@ -23,7 +23,6 @@ import org.openqa.selenium.Dimension;
 import org.openqa.selenium.ElementNotVisibleException;
 import org.openqa.selenium.InvalidElementStateException;
 import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.NoAlertPresentException;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
@@ -38,7 +37,6 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
-import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.reporter.TestLogging;
@@ -55,13 +53,17 @@ public class HtmlElement {
     protected static final Logger logger = TestLogging.getLogger(HtmlElement.class);
 
 
-    protected WebDriver driver = WebUIDriver.getWebDriver();
+    protected WebDriver driver;
     protected WebElement element = null;
     private String label = null;
     private HtmlElement parent = null;
     private int elementIndex = -1;
     private By by = null;
 
+    public HtmlElement() {
+    	this("", By.id(""));
+    }
+    
     /**
      * Find element using BY locator. Make sure to initialize the driver before calling findElement()
      *
@@ -89,6 +91,7 @@ public class HtmlElement {
         this.label = label;
         this.by = by;
         this.elementIndex = index;
+//        driver = getDriver();
     }
     
     public HtmlElement(final String label, final By by, final HtmlElement parent) {
@@ -100,6 +103,7 @@ public class HtmlElement {
     	this.by = by;
     	this.parent = parent;
     	this.elementIndex = index;
+//    	driver = getDriver();
     }
 
     public void click() {
@@ -107,31 +111,19 @@ public class HtmlElement {
         element.click();
         
     }
-
-    /**
-     * Click element in native way by Actions.
-     */
-    public void clickAt() {
-        clickAt("1,1");
-
-    }
-
+    
     /**
      * Click element in native way by Actions.
      *
      * <p/>
      * <pre class="code">
-       clickAt(&quot;1, 1&quot;);
+       clickAt(1, 1);
      * </pre>
      *
      * @param  value
      */
-    public void clickAt(final String value) {
+    public void clickAt(int xOffset, int yOffset) {
         findElement();
-
-        String[] parts = value.split(",");
-        int xOffset = Integer.parseInt(parts[0]);
-        int yOffset = Integer.parseInt(parts[1]);
 
         try {
             new Actions(driver).moveToElement(element, xOffset, yOffset).click()
@@ -139,18 +131,6 @@ public class HtmlElement {
         } catch (InvalidElementStateException e) {
             logger.error(e);
             element.click();
-        }
-
-        try {
-            BrowserType type = WebUIDriver.getWebUIDriver().getConfig().getBrowser();
-
-            if (((type == BrowserType.CHROME) ||
-                        (type == BrowserType.INTERNETEXPLORER)) &&
-                    driver.switchTo().alert().getText().contains("leave")) {
-                driver.switchTo().alert().accept();
-            }
-        } catch (NoAlertPresentException e) {
-        	logger.info(e);
         }
     }
 
@@ -243,7 +223,7 @@ public class HtmlElement {
         		element = parent.element.findElements(by).get(elementIndex);
         	}
         } else {
-	        driver = WebUIDriver.getWebDriver();
+	        driver = getDriver();
 	        if (elementIndex < 0) {
 	        	element = driver.findElement(by);
 	        } else {
@@ -292,23 +272,6 @@ public class HtmlElement {
 			
 		}
 	}
-
-    /**
-     * Fires a Javascript event on the underlying element.
-     *
-     * @param  eventName
-     */
-    public void fireEvent(final String eventName) {
-        findElement();
-
-        try {
-            JavascriptLibrary jsLib = new JavascriptLibrary();
-            jsLib.callEmbeddedSelenium(driver, "doFireEvent", element,
-                eventName);
-        } catch (Exception ex) {
-            // Handle OperaDriver
-        }
-    }
 
     /**
      * Get all elements in the current page with same locator.
@@ -373,8 +336,7 @@ public class HtmlElement {
      * @return
      */
     public WebElement getElement() {
-        element = driver.findElement(by);
-
+    	findElement();
         return element;
     }
 
@@ -478,15 +440,6 @@ public class HtmlElement {
     }
 
     /**
-     * Refreshes the WebUIDriver before locating the element, to ensure we have the current version (useful for when the
-     * state of an element has changed via an AJAX or non-page-turn action).
-     */
-    public void init() {
-        driver = WebUIDriver.getWebDriver();
-        element = driver.findElement(by);
-    }
-
-    /**
      * Indicates whether or not the web element is currently displayed in the browser.
      *
      * @return
@@ -549,28 +502,26 @@ public class HtmlElement {
      *
      * @return
      */
-    public boolean isTextPresent(final String text) {
-        findElement();
-
-        return element.getText().contains(text);
+    public boolean isTextPresent(final String pattern) {
+        String text = getText();
+        return text != null && (text.contains(pattern) || text.matches(pattern));
     }
 
     /**
      * Forces a mouseDown event on the WebElement.
      */
     public void mouseDown() {
-        TestLogging.log("MouseDown " + this.toString());
         findElement();
 
+        Locatable item = (Locatable) element;
         Mouse mouse = ((HasInputDevices) driver).getMouse();
-        mouse.mouseDown(null);
+        mouse.mouseDown(item.getCoordinates());
     }
 
     /**
      * Forces a mouseOver event on the WebElement.
      */
     public void mouseOver() {
-        TestLogging.log("MouseOver " + this.toString());
         findElement();
 
         Locatable hoverItem = (Locatable) element;
@@ -594,11 +545,11 @@ public class HtmlElement {
      * Forces a mouseUp event on the WebElement.
      */
     public void mouseUp() {
-        TestLogging.log("MouseUp " + this.toString());
         findElement();
 
+        Locatable item = (Locatable) element;
         Mouse mouse = ((HasInputDevices) driver).getMouse();
-        mouse.mouseUp(null);
+        mouse.mouseUp(item.getCoordinates());
     }
 
     /**
@@ -715,7 +666,9 @@ public class HtmlElement {
      * which needs long time to present.
      */
     public void waitForPresent(final int timeout) {
-
+    	
+    	// refresh driver
+    	driver = getDriver();
         WebDriverWait wait = new WebDriverWait(driver, timeout);
         wait.until(ExpectedConditions.presenceOfElementLocated(by));
         
