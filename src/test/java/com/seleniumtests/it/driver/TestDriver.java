@@ -72,17 +72,17 @@ public class TestDriver {
 		WebUIDriver.cleanUp();
 	}
 	
-	/**
-	 * Is browser able to clic on moving elements
-	 * @throws Exception
-	 */
-	@Test(groups={"it"})
-	public void testMovingElement() throws Exception {
-		testPage.startButton.click();
-		testPage.greenSquare.click();
-		driver.switchTo().alert().accept();
-		
-	}
+//	/**
+//	 * Is browser able to clic on moving elements
+//	 * @throws Exception
+//	 */
+//	@Test(groups={"it"})
+//	public void testMovingElement() throws Exception {
+//		testPage.startButton.click();
+//		testPage.greenSquare.click();
+//		driver.switchTo().alert().accept();
+//		
+//	}
 	
 	/**
 	 * deactivated as it depends on browser

@@ -1,7 +1,5 @@
 package com.seleniumtests.ut.uipage;
 
-import java.util.regex.Pattern;
-
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.testng.Assert;
@@ -15,7 +13,6 @@ import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.it.driver.DriverTestPage;
 import com.seleniumtests.it.driver.TestDriver;
 import com.seleniumtests.uipage.htmlelements.HtmlElement;
-import com.seleniumtests.uipage.htmlelements.LabelElement;
 
 public class TestHtmlElement {
 

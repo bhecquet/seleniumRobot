@@ -49,7 +49,7 @@ public class SelectList extends HtmlElement {
 
     @Override
     protected void findElement() {
-        driver = WebUIDriver.getWebDriver();
+        driver = getDriver();
         element = driver.findElement(this.getBy());
         makeWebElementVisible(element);
         try {
@@ -126,19 +126,6 @@ public class SelectList extends HtmlElement {
 
         String[] values = new String[valueList.size()];
         return valueList.toArray(values);
-    }
-
-    @Override
-    public void init() {
-        super.init();
-        try {
-            select = getNewSelectElement(element);
-            options = select.getOptions();
-        } catch (UnexpectedTagNameException e) {
-            if ("ul".equalsIgnoreCase(element.getTagName())) {
-                options = element.findElements(By.tagName("li"));
-            }
-        }
     }
 
     public boolean isMultiple() {
