@@ -12,11 +12,12 @@ import org.testng.ITestContext;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import com.seleniumtests.GenericTest;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.util.squashta.SquashTaTestDef;
 import com.seleniumtests.util.squashta.TaScriptGenerator;
 
-public class TestTaScriptGenerator {
+public class TestTaScriptGenerator extends GenericTest {
 
 	@BeforeClass(groups={"ut"})
 	public void init(ITestContext testNGCtx) {

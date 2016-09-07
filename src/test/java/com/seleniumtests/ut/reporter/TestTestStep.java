@@ -3,10 +3,11 @@ package com.seleniumtests.ut.reporter;
 import org.junit.Assert;
 import org.testng.annotations.Test;
 
+import com.seleniumtests.GenericTest;
 import com.seleniumtests.reporter.TestAction;
 import com.seleniumtests.reporter.TestStep;
 
-public class TestTestStep {
+public class TestTestStep extends GenericTest {
 
 	/**
 	 * Checks getFailed correctly compute test step status if action is failed

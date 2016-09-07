@@ -5,10 +5,11 @@ import org.testng.ITestContext;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import com.seleniumtests.GenericTest;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.runner.CustomTestNGCucumberRunner;
 
-public class TestCucumberRunner {
+public class TestCucumberRunner extends GenericTest {
 	
 	@BeforeMethod(alwaysRun=true)
 	public void init() {

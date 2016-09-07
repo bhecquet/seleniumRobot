@@ -22,11 +22,12 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import com.seleniumtests.GenericTest;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.WebUIDriver;
 
-public class TestUiActions {
+public class TestUiActions extends GenericTest {
 	
 	private WebDriver driver;
 	

@@ -21,15 +21,16 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import org.testng.xml.XmlTest;
 
+import com.seleniumtests.GenericTest;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.it.driver.DriverTestPage;
 
 
-public class TestInterceptePage {
+public class TestInterceptePage extends GenericTest {
 	public TestInterceptePage() throws Exception {
 		super();
-	}
+	} 
 
 	private WebDriver driver;
 	private static DriverTestPage testPage;

@@ -13,15 +13,13 @@
 
 package com.seleniumtests.ut.core;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.openqa.selenium.Proxy.ProxyType;
 import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.annotations.Test;
 import org.testng.xml.XmlTest;
 
+import com.seleniumtests.GenericTest;
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.ConfigurationException;
@@ -34,7 +32,7 @@ import com.seleniumtests.driver.DriverMode;
  * @author behe
  *
  */
-public class TestSeleniumTestContext {
+public class TestSeleniumTestContext extends GenericTest {
 
 	/**
 	 * If parameter is only defined in test suite, it's correctly read
@@ -530,7 +528,7 @@ public class TestSeleniumTestContext {
 	}
 	
 	/**
-	 * Proxy type is set to "pac" in config.ini. check that this value is taken
+	 * Proxy type is set to "direct" in config.ini. check that this value is taken
 	 */
 	@Test(groups="ut context")
 	public void testProxyFromEnvIniFile(final ITestContext testNGCtx, final XmlTest xmlTest) {

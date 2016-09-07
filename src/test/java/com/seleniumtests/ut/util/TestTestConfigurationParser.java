@@ -20,9 +20,10 @@ import org.testng.ITestContext;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import com.seleniumtests.GenericTest;
 import com.seleniumtests.util.TestConfigurationParser;
 
-public class TestTestConfigurationParser {
+public class TestTestConfigurationParser extends GenericTest {
 	
 	private static TestConfigurationParser configParser;
 	

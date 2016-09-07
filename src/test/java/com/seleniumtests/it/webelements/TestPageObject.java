@@ -20,6 +20,7 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import com.seleniumtests.GenericTest;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.it.driver.DriverTestPage;
@@ -29,7 +30,7 @@ import com.seleniumtests.it.driver.DriverTestPage;
  * @author behe
  *
  */
-public class TestPageObject{
+public class TestPageObject extends GenericTest {
 	
 	private static DriverTestPage testPage;
 	private WebDriver driver;

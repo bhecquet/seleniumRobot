@@ -1,6 +1,5 @@
 package com.seleniumtests.ut.core.config;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import org.testng.Assert;

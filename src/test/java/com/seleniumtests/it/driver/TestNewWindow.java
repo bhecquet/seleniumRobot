@@ -10,10 +10,11 @@ import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import com.seleniumtests.GenericTest;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.driver.WebUIDriver;
 
-public class TestNewWindow {
+public class TestNewWindow extends GenericTest {
 
 	private static WebDriver driver;
 	private static DriverTestPage testPage;

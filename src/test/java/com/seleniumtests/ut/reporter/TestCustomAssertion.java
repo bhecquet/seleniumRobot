@@ -10,34 +10,34 @@ import org.testng.annotations.AfterMethod;
 import org.testng.annotations.Test;
 import org.testng.internal.TestResult;
 
-import com.seleniumtests.core.CustomAssertion;
+import com.seleniumtests.GenericTest;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.reporter.SeleniumTestsReporter;
 
-public class TestCustomAssertion {
+public class TestCustomAssertion extends GenericTest {
 
 	/**
-	 * Test soft assertion enabled
+	 * Test soft assertion enabled, raise an assertion and check it's intercept by aspect
 	 */
 	@Test(groups={"ut"})
 	public void testSoftAssertionEnabled() {
 		SeleniumTestsContextManager.getThreadContext().setSoftAssertEnabled(true);
-		CustomAssertion.assertTrue(false, "error should not be raised");
+		Assert.assertTrue(false, "error should not be raised");
 	}
 	
 	/**
-	 * Test soft assertion disabled
+	 * Test soft assertion disabled, check AssertionError is not intercept by aspect
 	 */
 	@Test(groups={"ut"}, expectedExceptions=AssertionError.class)
 	public void testSoftAssertionNotEnabled() {
 		SeleniumTestsContextManager.getThreadContext().setSoftAssertEnabled(false);
-		CustomAssertion.assertTrue(false, "error should be raised");
+		Assert.assertTrue(false, "error should be raised");
 	}
 	
 	@Test(groups={"ut"})
 	public void testSoftAssertionEnabledWithChangedResult() {
 		SeleniumTestsContextManager.getThreadContext().setSoftAssertEnabled(true);
-		CustomAssertion.assertTrue(false, "error should not be raised");
+		Assert.assertTrue(false, "error should not be raised");
 	}
 	
 	@AfterMethod(alwaysRun = true)

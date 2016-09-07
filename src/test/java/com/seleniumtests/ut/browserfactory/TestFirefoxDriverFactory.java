@@ -16,10 +16,11 @@ package com.seleniumtests.ut.browserfactory;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import com.seleniumtests.GenericTest;
 import com.seleniumtests.browserfactory.FirefoxDriverFactory;
 import com.seleniumtests.driver.DriverConfig;
 
-public class TestFirefoxDriverFactory {
+public class TestFirefoxDriverFactory extends GenericTest {
 
 	@Test(groups={"ut"})
 	public void testVersionChoice_v47() {
