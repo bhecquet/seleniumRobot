@@ -8,13 +8,14 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import com.seleniumtests.GenericTest;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.it.driver.DriverTestPage;
 import com.seleniumtests.it.driver.TestDriver;
 import com.seleniumtests.uipage.htmlelements.HtmlElement;
 
-public class TestHtmlElement {
+public class TestHtmlElement extends GenericTest {
 
 	private static WebDriver driver;
 	private static DriverTestPage testPage;

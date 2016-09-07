@@ -10,10 +10,11 @@ import org.testng.ITestContext;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import com.seleniumtests.GenericTest;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.util.squashta.TaFolderStructureGenerator;
 
-public class TestTaFolderStructureGenerator {
+public class TestTaFolderStructureGenerator extends GenericTest {
 
 	@BeforeClass(groups={"ut"})
 	public void init(ITestContext testNGCtx) {

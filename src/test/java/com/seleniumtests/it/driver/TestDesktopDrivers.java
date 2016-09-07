@@ -18,11 +18,11 @@ import org.testng.ITestContext;
 import org.testng.annotations.Test;
 import org.testng.xml.XmlTest;
 
-import com.seleniumtests.GenericTest;
+import com.seleniumtests.GenericDriverTest;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.driver.WebUIDriver;
 
-public class TestDesktopDrivers extends GenericTest {
+public class TestDesktopDrivers extends GenericDriverTest {
 	
 	
 	@Test(groups={"it"}, enabled=false)

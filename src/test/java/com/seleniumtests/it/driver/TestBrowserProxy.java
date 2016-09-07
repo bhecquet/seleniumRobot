@@ -6,12 +6,12 @@ import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.annotations.Test;
 
-import com.seleniumtests.GenericTest;
+import com.seleniumtests.GenericDriverTest;
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.driver.WebUIDriver;
 
-public class TestBrowserProxy extends GenericTest {
+public class TestBrowserProxy extends GenericDriverTest {
 	
 	private static final String BROWSER = "chrome";
 

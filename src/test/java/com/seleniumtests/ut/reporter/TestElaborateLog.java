@@ -3,9 +3,10 @@ package com.seleniumtests.ut.reporter;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import com.seleniumtests.GenericTest;
 import com.seleniumtests.reporter.ElaborateLog;
 
-public class TestElaborateLog {
+public class TestElaborateLog extends GenericTest {
 
 	@Test(groups={"ut"})
 	public void testToString() {

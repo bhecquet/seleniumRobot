@@ -5,13 +5,14 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import com.seleniumtests.GenericTest;
 import com.seleniumtests.browserfactory.AndroidCapabilitiesFactory;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.DriverConfig;
 
 import io.appium.java_client.remote.MobileCapabilityType;
 
-public class TestAndroidCapabilitiesFactory {
+public class TestAndroidCapabilitiesFactory extends GenericTest {
 
 	/**
 	 * Check default behaviour

@@ -1,5 +1,6 @@
 package com.seleniumtests.ut.core;
 
+import com.seleniumtests.GenericTest;
 import com.seleniumtests.core.Filter;
 
 import org.testng.Assert;
@@ -13,7 +14,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-public class TestFilter {
+public class TestFilter extends GenericTest {
 
 	// parameters with Filter'name (key) and its value(s)
 	final Map<String, Object> parameters1 = new HashMap<>();

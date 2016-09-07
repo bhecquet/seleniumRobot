@@ -6,10 +6,11 @@ import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import com.seleniumtests.GenericTest;
 import com.seleniumtests.util.osutility.OSUtility;
 import com.seleniumtests.util.osutility.ProcessInfo;
 
-public class TestOsUtility {
+public class TestOsUtility extends GenericTest {
 
 	private OSUtility osUtil;
 	

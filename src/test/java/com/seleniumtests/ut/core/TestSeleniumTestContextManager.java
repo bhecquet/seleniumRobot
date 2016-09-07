@@ -17,10 +17,11 @@ import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.annotations.Test;
 
+import com.seleniumtests.GenericTest;
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 
-public class TestSeleniumTestContextManager {
+public class TestSeleniumTestContextManager extends GenericTest {
 
 	/**
 	 * Test reading of extended configuration (referenced by testConfig parameter in suite file)

@@ -12,23 +12,22 @@
  */
 package com.seleniumtests.ut.util.helper;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import com.seleniumtests.GenericTest;
 import com.seleniumtests.core.Filter;
 import com.seleniumtests.customexception.DatasetException;
 import com.seleniumtests.util.helper.CSVHelper;
 import com.seleniumtests.util.helper.SpreadSheetHelper;
 import com.seleniumtests.util.internal.entity.TestEntity;
 
-import org.testng.Assert;
-
-public class testSpreadSheetHelper {
+public class testSpreadSheetHelper extends GenericTest {
 	Map<String, Object> classMap = new LinkedHashMap<String, Object>();
 	String test = "violet";
 

@@ -22,6 +22,7 @@ import org.testng.ITestContext;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import com.seleniumtests.GenericTest;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.it.driver.DriverTestPage;
@@ -29,7 +30,7 @@ import com.seleniumtests.reporter.TestLogging;
 import com.seleniumtests.util.osutility.OSUtility;
 import com.seleniumtests.util.osutility.ProcessInfo;
 
-public class TestDevMode {
+public class TestDevMode extends GenericTest {
 
 	private static final Logger logger = TestLogging.getLogger(TestDevMode.class);
 	

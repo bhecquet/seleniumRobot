@@ -11,11 +11,12 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import com.seleniumtests.GenericTest;
 import com.seleniumtests.core.runner.SeleniumRobotRunner;
 import com.seleniumtests.customexception.DriverExceptions;
 import com.seleniumtests.driver.WebUIDriver;
 
-public class TestStepLogging {
+public class TestStepLogging extends GenericTest {
 	
 	@BeforeClass(groups={"it"})
 	public void init() {

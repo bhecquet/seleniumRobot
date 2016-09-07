@@ -7,13 +7,14 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import org.testng.xml.XmlTest;
 
+import com.seleniumtests.GenericTest;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.uipage.Locator;
 import com.seleniumtests.uipage.aspects.InterceptBy;
 
 
-public class TestConfigMappingIntercepter {
+public class TestConfigMappingIntercepter extends GenericTest {
 	@BeforeMethod(enabled=true, alwaysRun = true)
 	public void initContext(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		InterceptBy.setPage("TestConfigMobileIntercepter");
