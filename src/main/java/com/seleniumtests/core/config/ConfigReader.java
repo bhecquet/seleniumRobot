@@ -35,21 +35,31 @@ public class ConfigReader {
 	
 	private static final String GLOBAL_SECTION_NAME = "General";
 	private static final Logger logger = TestLogging.getLogger(ConfigReader.class);
-	private static File configFile = getCurrentConfigFile();
+	private static File configFile;
 	
 	/**
+	 * Get config file path
+	 * In case SeleniumTestsContextManager.generateApplicationPath has not already been called, return null as configFile won't be 
+	 * valid
 	 * 
 	 * @return
 	 */
 	private static File getCurrentConfigFile() {
-		if (new File(SeleniumTestsContextManager.getConfigPath() + File.separator + "env.ini").isFile()) {
-			return new File(SeleniumTestsContextManager.getConfigPath() + File.separator + "env.ini");
+		String configPath = SeleniumTestsContextManager.getConfigPath();
+		if (configPath == null) {
+			return null;
+		}
+		if (new File(configPath + File.separator + "env.ini").isFile()) {
+			return new File(configPath + File.separator + "env.ini");
 		} else {
-			return new File(SeleniumTestsContextManager.getConfigPath() + File.separator + "config.ini");
+			return new File(configPath + File.separator + "config.ini");
 		}
 	}
 
 	public static File getConfigFile() {
+		if (configFile == null) {
+			configFile = getCurrentConfigFile();
+		}
 		return configFile;
 	}
 
@@ -63,8 +73,11 @@ public class ConfigReader {
 	 */
 	public Map<String, String> readConfig() {
 		try {
-			InputStream iniFileStream = FileUtils.openInputStream(configFile);
+			InputStream iniFileStream = FileUtils.openInputStream(getConfigFile());
 			return readConfig(iniFileStream, SeleniumTestsContextManager.getThreadContext().getTestEnv());
+		} catch (NullPointerException e) {
+			logger.warn("config file is null, check config path has been set using 'SeleniumTestsContextManager.generateApplicationPath()'");
+			return new HashMap<>();
 		} catch (IOException e1) {
 			logger.warn("no valid config.ini file for this application");
 			return new HashMap<>();

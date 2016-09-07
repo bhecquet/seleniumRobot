@@ -38,7 +38,6 @@ import org.sikuli.api.robot.desktop.DesktopMouse;
 import org.testng.Assert;
 
 import com.gargoylesoftware.htmlunit.ElementNotFoundException;
-import com.seleniumtests.core.CustomAssertion;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.SeleniumTestsPageListener;
 import com.seleniumtests.customexception.CustomSeleniumTestsException;
@@ -139,6 +138,46 @@ public class PageObject extends BasePage implements IPage {
         }
     }
     
+    protected void setHtmlSavedToPath(final String htmlSavedToPath) {
+        this.htmlSavedToPath = htmlSavedToPath;
+    }
+
+    protected void setTitle(final String title) {
+        this.title = title;
+    }
+
+    protected void setUrl(final String openUrl) {
+        this.url = openUrl;
+    }
+    
+    public String getHtmlFilePath() {
+        return htmlFilePath;
+    }
+
+    @Override
+    public String getHtmlSavedToPath() {
+        return htmlSavedToPath;
+    }
+
+    @Override
+    public String getHtmlSource() {
+        return htmlSource;
+    }
+
+    public String getImageFilePath() {
+        return imageFilePath;
+    }
+
+    @Override
+    public String getLocation() {
+        return driver.getCurrentUrl();
+    }
+
+    public String getPopupWindowName() {
+        return popupWindowName;
+    }
+
+
     /**
      * Open page 
      * Wait for page loading
@@ -168,7 +207,7 @@ public class PageObject extends BasePage implements IPage {
     @Override
     protected void assertCurrentPage(final boolean log) {
 
-        if (pageIdentifierElement != null && !isElementPresent(pageIdentifierElement.getBy())) {
+        if (pageIdentifierElement != null && !pageIdentifierElement.isElementPresent()) {
             try {
                 if (!SeleniumTestsContextManager.getThreadContext().getCaptureSnapshot()) {
                     new ScreenshotUtil(driver).capturePageSnapshotOnException();
@@ -217,10 +256,6 @@ public class PageObject extends BasePage implements IPage {
 
     public void assertLocation(final String urlPattern) {
         assertHTML(getLocation().contains(urlPattern), "Pattern: {" + urlPattern + "} not found on page location.");
-    }
-
-    public void assertPageSectionPresent(final WebPageSection pageSection) {
-        assertElementPresent(new HtmlElement(pageSection.getName(), pageSection.getBy()));
     }
 
     public void assertTitle(final String text) {
@@ -323,35 +358,8 @@ public class PageObject extends BasePage implements IPage {
     }
 
     public String getEval(final String expression) {
-        CustomAssertion.assertTrue(false, "focus not implemented yet for " + expression);
+        Assert.assertTrue(false, "focus not implemented yet for " + expression);
         return null;
-    }
-
-    public String getHtmlFilePath() {
-        return htmlFilePath;
-    }
-
-    @Override
-    public String getHtmlSavedToPath() {
-        return htmlSavedToPath;
-    }
-
-    @Override
-    public String getHtmlSource() {
-        return htmlSource;
-    }
-
-    public String getImageFilePath() {
-        return imageFilePath;
-    }
-
-    @Override
-    public String getLocation() {
-        return driver.getCurrentUrl();
-    }
-
-    public String getPopupWindowName() {
-        return popupWindowName;
     }
 
     public int getTimeout() {
@@ -554,18 +562,6 @@ public class PageObject extends BasePage implements IPage {
         
     }
 
-    protected void setHtmlSavedToPath(final String htmlSavedToPath) {
-        this.htmlSavedToPath = htmlSavedToPath;
-    }
-
-    protected void setTitle(final String title) {
-        this.title = title;
-    }
-
-    protected void setUrl(final String openUrl) {
-        this.url = openUrl;
-    }
-
     public void switchToDefaultContent() {
         try {
             driver.switchTo().defaultContent();
@@ -593,29 +589,5 @@ public class PageObject extends BasePage implements IPage {
      */
     protected void captureSnapshot(final String messagePrefix) {
         ScreenshotUtil.captureSnapshot(messagePrefix);
-    }
-
-    public WebElement getElement(final By by, final String elementName) {
-        WebElement element = null;
-        try {
-            element = driver.findElement(by);
-        } catch (ElementNotFoundException e) {
-            TestLogging.errorLogger(elementName + " is not found with locator - " + by.toString());
-            throw e;
-        }
-
-        return element;
-    }
-
-    public String getElementUrl(final By by, final String name) {
-        return getElement(by, name).getAttribute("href");
-    }
-
-    public String getElementText(final By by, final String name) {
-        return getElement(by, name).getText();
-    }
-
-    public String getElementSrc(final By by, final String name) {
-        return getElement(by, name).getAttribute("src");
     }
 }

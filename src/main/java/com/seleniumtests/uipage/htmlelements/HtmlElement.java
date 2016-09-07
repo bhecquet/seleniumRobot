@@ -41,7 +41,6 @@ import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.reporter.TestLogging;
 import com.seleniumtests.util.helper.WaitHelper;
-import com.thoughtworks.selenium.webdriven.JavascriptLibrary;
 
 
 /**
