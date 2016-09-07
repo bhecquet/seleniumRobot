@@ -67,7 +67,6 @@ import org.testng.internal.TestResult;
 import org.testng.internal.Utils;
 import org.testng.xml.XmlSuite;
 
-import com.seleniumtests.core.CustomAssertion;
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.SeleniumTestsPageListener;
@@ -189,7 +188,7 @@ public class SeleniumTestsReporter implements IReporter, ITestListener, IInvoked
      * @param result
      */
     public void changeTestResult(final ITestResult result) {
-    	List<Throwable> verificationFailures = CustomAssertion.getVerificationFailures();
+    	List<Throwable> verificationFailures = SeleniumTestsContextManager.getThreadContext().getVerificationFailures(Reporter.getCurrentTestResult());
         
         int size = verificationFailures.size();
         if (size == 0) {
