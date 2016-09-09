@@ -428,7 +428,9 @@ Other parameters, not accepted in XML file but allowed on command line
     </test>
 
 
-deviceName reflects the local device used to automate the test
+`deviceName` reflects the local device used to automate the test
+`app` is the path of the application file. It can be an URL. If access to URL is restricted, use the pattern "http://<user>:<password>@<host>:<port>/path"
+
 
 ### Test with SauceLabs ###
 
