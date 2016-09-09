@@ -23,6 +23,7 @@
 
         <packages>
             <package name="com.seleniumtests.ut.*" />
+            <package name="com.seleniumtests.it.reporter.*" />
         </packages>
     </test>
     

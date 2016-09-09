@@ -103,6 +103,8 @@ public class SeleniumTestsReporter implements IReporter, ITestListener, IInvoked
     private Map<String, IResultMap> failedTests = new HashMap<>();
 
     private Map<String, IResultMap> skippedTests = new HashMap<>();
+    
+    private Map<String, IResultMap> passedTests = new HashMap<>();
     protected PrintWriter mOut;
 
     private String uuid = new GregorianCalendar().getTime().toString();
@@ -112,6 +114,7 @@ public class SeleniumTestsReporter implements IReporter, ITestListener, IInvoked
     private String outputDirectory;
     private String resources;
     private JavaDocBuilder builder = null;
+    private String generationErrorMessage = null;
 
     private File report;
 
@@ -146,7 +149,7 @@ public class SeleniumTestsReporter implements IReporter, ITestListener, IInvoked
         }
     }
 
-    protected static String escape(final String string) {
+    public static String escape(final String string) {
         if (null == string) {
             return string;
         }
@@ -249,7 +252,7 @@ public class SeleniumTestsReporter implements IReporter, ITestListener, IInvoked
     	//TODO
     }
 
-    protected void copyResources() throws IOException {
+    public void copyResources() throws IOException {
     	
         new File(outputDirectory + File.separator + RESOURCES_DIR).mkdir();
         new File(outputDirectory + File.separator + RESOURCES_DIR + File.separator + "css").mkdir();
@@ -376,7 +379,7 @@ public class SeleniumTestsReporter implements IReporter, ITestListener, IInvoked
         generateTheStackTrace(exception, method, title, contentBuffer);
     }
 
-    protected void generateExceptionReport(final Throwable exception, final ITestNGMethod method,
+    public void generateExceptionReport(final Throwable exception, final ITestNGMethod method,
             final StringBuilder contentBuffer) {
         Throwable fortile = exception;
         String title = fortile.getMessage();
@@ -424,7 +427,8 @@ public class SeleniumTestsReporter implements IReporter, ITestListener, IInvoked
                 errorCountTabs.append("</font> )</span></a></li>");
             }
         } catch (Exception e) {
-            logger.error(e);
+        	generationErrorMessage = "generateGlobalErrorHTML error:" + e.getMessage();
+            logger.error("generateGlobalErrorHTML error:", e);
         }
     }
 
@@ -497,7 +501,7 @@ public class SeleniumTestsReporter implements IReporter, ITestListener, IInvoked
         sbCalcount.append(pageCount);
     }
 
-    protected String generateHTML(final ITestContext tc, final boolean envt, final ISuite suite,
+    public String generateHTML(final ITestContext tc, final boolean envt, final ISuite suite,
             final ITestContext ctx) {
 
         StringBuilder res = new StringBuilder();
@@ -525,13 +529,14 @@ public class SeleniumTestsReporter implements IReporter, ITestListener, IInvoked
                 generatePanel(ve, tc.getPassedTests(), res, PASSED_TEST, suite, ctx, envt);
             }
         } catch (Exception e) {
-            logger.error(e);
+        	generationErrorMessage = "generateHTML error:" + e.getMessage();
+            logger.error("generateHTML error: ", e);
         }
 
         return res.toString();
     }
 
-    protected void generatePanel(final VelocityEngine ve, final IResultMap map, final StringBuilder res,
+    public void generatePanel(final VelocityEngine ve, final IResultMap map, final StringBuilder res,
             final String style, final ISuite suite, final ITestContext ctx, final boolean envt) {
 
         Collection<ITestNGMethod> methodSet = getMethodSet(map);
@@ -669,6 +674,7 @@ public class SeleniumTestsReporter implements IReporter, ITestListener, IInvoked
                         t.merge(context, writer);
                         res.append(writer.toString());
                     } catch (Exception e) {
+                    	generationErrorMessage = "generatePanel, Exception creating a singleTest:" + e.getMessage();
                         logger.error("Exception creating a singleTest.", e);
                     }
                 }
@@ -755,12 +761,13 @@ public class SeleniumTestsReporter implements IReporter, ITestListener, IInvoked
             mOut.write(writer.toString());
 
         } catch (Exception e) {
-            logger.error(e);
+        	generationErrorMessage = "generateReportDetailsContainer error:" + e.getMessage();
+            logger.error("generateReportDetailsContainer error: ", e);
         }
 
     }
 
-    protected void generateReportsSection(final List<ISuite> suites) {
+    public void generateReportsSection(final List<ISuite> suites) {
 
         mOut.println("<div id='reports'>");
 
@@ -868,12 +875,13 @@ public class SeleniumTestsReporter implements IReporter, ITestListener, IInvoked
             mOut.write(writer.toString());
 
         } catch (Exception e) {
-            logger.error(e);
+        	generationErrorMessage = "generateSuiteSummaryReport error:" + e.getMessage();
+            logger.error("generateSuiteSummaryReport error: ", e);
         }
 
     }
 
-    protected void generateTheStackTrace(final Throwable exception, final ITestNGMethod method, final String title,
+    public void generateTheStackTrace(final Throwable exception, final ITestNGMethod method, final String title,
             final StringBuilder contentBuffer) {
         contentBuffer.append(" <div class='stContainer' >" + exception.getClass() + ":" + escape(title)
                 + "(<a  href='javascript:void(0);'  class='exceptionlnk'>stacktrace</a>)");
@@ -926,12 +934,12 @@ public class SeleniumTestsReporter implements IReporter, ITestListener, IInvoked
         }
 
         res.addAll(ctx.getPassedTests().getResults(method));
-        if (res.isEmpty()) {
+        if (!res.isEmpty()) {
             return res.get(0);
         }
 
         res.addAll(skippedTests.get(ctx.getName()).getResults(method));
-        if (res.isEmpty()) {
+        if (!res.isEmpty()) {
             return res.get(0);
         }
 
@@ -1045,7 +1053,7 @@ public class SeleniumTestsReporter implements IReporter, ITestListener, IInvoked
     protected ITestNGMethod getTestNGMethod(final ITestContext ctx, final String method) {
         Collection<ITestNGMethod> methods = new HashSet<>();
 
-        int index = ".".lastIndexOf(method.substring(0, ".".lastIndexOf(method)));
+        int index = method.substring(0, method.lastIndexOf(".")).lastIndexOf(".");
         String localMethod = method.substring(index + 1);
 
         ITestNGMethod[] all = ctx.getAllTestMethods();
@@ -1090,6 +1098,7 @@ public class SeleniumTestsReporter implements IReporter, ITestListener, IInvoked
         } else {
             failedTests.put(arg0.getName(), arg0.getFailedTests());
             skippedTests.put(arg0.getName(), arg0.getSkippedTests());
+            passedTests.put(arg0.getName(), arg0.getPassedTests());
         }
     }
 
@@ -1098,6 +1107,7 @@ public class SeleniumTestsReporter implements IReporter, ITestListener, IInvoked
         isRetryHandleNeeded.put(arg0.getName(), false);
         failedTests.put(arg0.getName(), new ResultMap());
         skippedTests.put(arg0.getName(), new ResultMap());
+        passedTests.put(arg0.getName(), new ResultMap());
     }
 
     @Override
@@ -1294,7 +1304,8 @@ public class SeleniumTestsReporter implements IReporter, ITestListener, IInvoked
             out.write(writer.toString());
 
         } catch (Exception e) {
-            logger.error(e);
+        	generationErrorMessage = "startHtml error:" + e.getMessage();
+            logger.error("startHtml error:", e);
         }
 
     }
@@ -1319,7 +1330,7 @@ public class SeleniumTestsReporter implements IReporter, ITestListener, IInvoked
 
                 String img = "<img src=\"";
                 String mRoot = "resources/images/mktree/";
-                img += mRoot + "/test" + getFailedOrSkippedResult(ctx, m).getStatus() + ".gif";
+                img += mRoot + "/seleniumtests_test" + getFailedOrSkippedResult(ctx, m).getStatus() + ".gif";
                 img += "\"/>";
 
                 res.append(intendstr + "<li>" + img + m);
@@ -1360,7 +1371,7 @@ public class SeleniumTestsReporter implements IReporter, ITestListener, IInvoked
 
                 String img = "<img src=\"";
                 String mRoot = "resources/images/mktree/";
-                img += mRoot + "/test" + getFailedOrSkippedResult(ctx, m).getStatus() + ".gif";
+                img += mRoot + "/seleniumtests_test" + getFailedOrSkippedResult(ctx, m).getStatus() + ".gif";
                 img += "\"/>";
                 res.append(intendstr + "<li>" + img + m);
                 if (hasDependencies(m)) {
@@ -1381,4 +1392,20 @@ public class SeleniumTestsReporter implements IReporter, ITestListener, IInvoked
         }
 
     }
+
+	public Map<String, IResultMap> getFailedTests() {
+		return failedTests;
+	}
+
+	public Map<String, IResultMap> getSkippedTests() {
+		return skippedTests;
+	}
+	
+	public Map<String, IResultMap> getPassedTests() {
+		return passedTests;
+	}
+
+	public String getGenerationErrorMessage() {
+		return generationErrorMessage;
+	}
 }

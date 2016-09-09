@@ -1,24 +1,11 @@
 package com.seleniumtests;
 
 import org.mockito.MockitoAnnotations;
-import org.powermock.core.MockRepository;
-import org.powermock.core.classloader.MockClassLoader;
-import org.powermock.core.reporter.MockingFrameworkReporter;
-import org.powermock.core.reporter.MockingFrameworkReporterFactory;
 import org.powermock.modules.testng.PowerMockTestCase;
-import org.powermock.reflect.Whitebox;
-import org.testng.IObjectFactory;
-import org.testng.ITestContext;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.ObjectFactory;
-
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.util.Set;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
 
