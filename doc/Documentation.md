@@ -334,11 +334,8 @@ Here will be described features that may be used to improve test
 
 #### Soft assertions ####
 By default, inside a test, checks will be done using TestNG `Assert` class
-On first failure, test will stop.
-To avoid this, instead of using `Assert`, use either:
-
-- the assertXXX methods defined in `BasePage` class when checking element values, attribute, ...
-- `CustomAssertion` class that redefine every assertXXX method of `Assert` class
+On assert failure, test will continue but error will be reported
+If this behaviour is not expected, then use the parameter `softAssertEnabled` and set it to false
 
 ## Run tests ##
 
@@ -637,3 +634,12 @@ Use the following java code
     Source source2 = Input.fromStream(getClass().getResourceAsStream("/tu/xmlFileToTest2.xml")).build();
     Diff diff = DiffBuilder.compare(source).withTest(source2).build();
     System.out.println(diff);
+    
+### Write working unit tests ###
+By default, SeleniumTestsContext enables SoftAssertions, so any unit test with assertion failure will not really fail. To prevent this behaviour, subclass all Unit-Test class from 
+
+- `GenericTest` : parent class for all unit tests
+- `GenericDriverTest`: parent class for real driver tests. It cleans driver after each test
+- `MockitoTest`: parent of all tests using Mockito / PowerMock
+
+depending on test type
