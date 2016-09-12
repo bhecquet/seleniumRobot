@@ -16,6 +16,7 @@
  */
 package com.seleniumtests.uipage.htmlelements;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.openqa.selenium.By;
@@ -33,14 +34,11 @@ public class Table extends HtmlElement {
     public void findElement() {
         super.findElement();
         rows = element.findElements(By.tagName("tr"));
-
+        columns = getColumnsInternal();
     }
 
-    public int getColumnCount() {
-        if (rows == null) {
-            findElement();
-        }
-
+    private List<WebElement> getColumnsInternal() {
+        
         // Need to check whether rows is null AND whether or not the list of rows is empty
         if (rows != null && !rows.isEmpty()) {
             columns = rows.get(0).findElements(By.tagName("td"));
@@ -53,17 +51,20 @@ public class Table extends HtmlElement {
                     columns = rows.get(0).findElements(By.tagName("th"));
                 }
             }
+            return columns;
+        } else {
+        	return new ArrayList<WebElement>();
         }
-
-        if (columns != null) {
-            return columns.size();
-        }
-
-        return 0;
+    }
+    
+    public List<WebElement> getColumns() {
+    	findElement();
+    	return columns;
     }
 
-    public List<WebElement> getColumns() {
-        return columns;
+    public int getColumnCount() {
+    	findElement();
+        return columns.size();
     }
 
     /**
@@ -73,9 +74,7 @@ public class Table extends HtmlElement {
      * @param  column  Starts from 1
      */
     public String getContent(final int row, final int column) {
-        if (rows == null) {
-            findElement();
-        }
+        findElement();
 
         if (rows != null && !rows.isEmpty()) {
             columns = rows.get(row - 1).findElements(By.tagName("td"));
@@ -95,24 +94,12 @@ public class Table extends HtmlElement {
     }
 
     public int getRowCount() {
-        if (rows == null) {
-            findElement();
-        } else {
-            return rows.size();
-        }
-
-        int count = element.findElements(By.xpath("tbody/tr")).size();
-        if (count == 0) {
-            count = element.findElements(By.xpath("tr")).size();
-        }
-
-        return count;
+        getRows();
+        return rows.size();
     }
 
     public List<WebElement> getRows() {
-    	if (rows == null) {
-            findElement();
-        }
+        findElement();
         return rows;
     }
 

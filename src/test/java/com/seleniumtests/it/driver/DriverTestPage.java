@@ -27,6 +27,7 @@ import com.seleniumtests.uipage.htmlelements.HtmlElement;
 import com.seleniumtests.uipage.htmlelements.LinkElement;
 import com.seleniumtests.uipage.htmlelements.RadioButtonElement;
 import com.seleniumtests.uipage.htmlelements.SelectList;
+import com.seleniumtests.uipage.htmlelements.Table;
 import com.seleniumtests.uipage.htmlelements.TextFieldElement;
 
 public class DriverTestPage extends PageObject {
@@ -54,6 +55,7 @@ public class DriverTestPage extends PageObject {
 	public static final SelectList selectMultipleList = new SelectList("listMultiple", By.id("selectMultiple"));
 	public static final SelectList selectUlLiList = new SelectList("ulLiList", By.id("languages"));
 	public static final TextFieldElement ulliListTrigger = new TextFieldElement("listTrigger", By.id("language"));
+	public static final Table table = new Table("table", By.id("table"));
 
 	public DriverTestPage() throws Exception {
         super(textElement);

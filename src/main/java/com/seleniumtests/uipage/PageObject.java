@@ -39,7 +39,6 @@ import org.sikuli.api.robot.Mouse;
 import org.sikuli.api.robot.desktop.DesktopMouse;
 import org.testng.Assert;
 
-import com.gargoylesoftware.htmlunit.ElementNotFoundException;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.SeleniumTestsPageListener;
 import com.seleniumtests.customexception.CustomSeleniumTestsException;
