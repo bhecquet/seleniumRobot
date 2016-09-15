@@ -16,6 +16,8 @@
  */
 package com.seleniumtests.uipage.htmlelements;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -36,14 +38,21 @@ import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.interactions.HasInputDevices;
 import org.openqa.selenium.interactions.Mouse;
 import org.openqa.selenium.internal.Locatable;
+import org.openqa.selenium.support.events.EventFiringWebDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.customexception.DriverExceptions;
+import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.reporter.TestLogging;
 import com.seleniumtests.util.helper.WaitHelper;
+
+import io.appium.java_client.AppiumDriver;
+import io.appium.java_client.MobileElement;
+import io.appium.java_client.SwipeElementDirection;
 
 
 /**
@@ -93,7 +102,6 @@ public class HtmlElement {
         this.label = label;
         this.by = by;
         this.elementIndex = index;
-//        driver = getDriver();
     }
     
     public HtmlElement(final String label, final By by, final HtmlElement parent) {
@@ -105,7 +113,6 @@ public class HtmlElement {
     	this.by = by;
     	this.parent = parent;
     	this.elementIndex = index;
-//    	driver = getDriver();
     }
 
     public void click() {
@@ -655,7 +662,87 @@ public class HtmlElement {
     public void doNothing() {
     	// do nothing
     }
-
+    
+    /*
+     * Methods for mobile actions only
+     */
+    /**
+     * Check if the current platform is a mobile platform
+     * if it's the case, search for the element, else, raise a ScenarioException
+     */
+    private void checkForMobile() {
+    	if (!(((CustomEventFiringWebDriver)driver).getWebDriver() instanceof AppiumDriver<?>)) {
+    		throw new ScenarioException("action is available only for mobile platforms");
+    	}
+    	findElement();
+    }
+    
+    /**
+     * findElement returns a EventFiringWebElement which is not compatible with MobileElement
+     * Get the unerlying element and return it
+     */
+    private WebElement getUnderlyingElement(WebElement element) {
+    	
+    	if (element.getClass().getName().contains("EventFiringWebElement")) {
+    		try {
+				Method getWrappedElementMethod = element.getClass().getDeclaredMethod("getWrappedElement");
+				getWrappedElementMethod.setAccessible(true);
+				return (WebElement) getWrappedElementMethod.invoke(element);
+			} catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+				throw new DriverExceptions("cannot get wrapped Element", e);
+			}
+    	} else {
+    		return element;
+    	}
+    	
+    }
+    
+    public Point getCenter() {
+    	checkForMobile();
+    	return ((MobileElement)getUnderlyingElement(element)).getCenter();
+    }
+    
+    public void pinch() {
+    	checkForMobile();
+    	((MobileElement)getUnderlyingElement(element)).pinch();
+    }
+    
+    /**
+     * Convenience method for swiping on the given element to the given direction
+     * @param direction		UP, DOWN, LEFT, RIGHT
+     * @param duration		amount of time in milliseconds for the entire swipe action to take
+     */
+    public void swipe(SwipeElementDirection direction, int duration) {
+    	checkForMobile();
+    	((MobileElement)getUnderlyingElement(element)).swipe(direction, duration);
+    }
+    
+    /**
+     * Convenience method for swiping on the given element to the given direction
+     * @param direction				UP, DOWN, LEFT, RIGHT
+     * @param offsetFromStartBorder
+     * @param offsetFromEndBorder 	offsetFromEndBorder is the offset from the border of the element where the swiping 
+     * 								should be started. If direction is UP then this is offset from the bottom of the element. 
+     * 								If direction is DOWN then this is offset from the top of the element. If direction is RIGHT 
+     * 								then this is offset from the left border of the element. If direction is LEFT then this is 
+     * 								offset from the right border of the element.
+     * @param duration				amount of time in milliseconds for the entire swipe action to take
+     */
+    public void swipe(SwipeElementDirection direction, int offsetFromStartBorder, int offsetFromEndBorder, int duration) {
+    	checkForMobile();
+    	((MobileElement)getUnderlyingElement(element)).swipe(direction, offsetFromStartBorder, offsetFromEndBorder, duration);
+    }
+    
+    public void tap(int fingers, int duration) {
+    	checkForMobile();
+    	((MobileElement)getUnderlyingElement(element)).tap(fingers, duration);
+    }
+    
+    public void zoom() {
+    	checkForMobile();
+    	((MobileElement)getUnderlyingElement(element)).zoom();
+    }
+    
     /**
      * Wait element to present using Explicit Waits with default EXPLICIT_WAIT_TIME_OUT = 15 seconds.
      */

@@ -16,13 +16,15 @@
  */
 package com.seleniumtests.ut.uipage.htmlelements;
 
-import java.lang.reflect.Method;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.verify;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
@@ -31,18 +33,23 @@ import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Keyboard;
 import org.openqa.selenium.interactions.Mouse;
+import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.RemoteWebElement;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
-import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import com.seleniumtests.MockitoTest;
+import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.uipage.htmlelements.HtmlElement;
+
+import io.appium.java_client.AppiumDriver;
+import io.appium.java_client.MobileElement;
+import io.appium.java_client.SwipeElementDirection;
 
 /**
  * Test class for checking calls to a standard HTMLElement without using any driver
@@ -54,8 +61,13 @@ import com.seleniumtests.uipage.htmlelements.HtmlElement;
 public class TestHtmlElement extends MockitoTest {
 	
 	@Mock
-	private CustomEventFiringWebDriver driver;
+	private RemoteWebDriver driver;
 	
+	@Mock
+	private AppiumDriver<WebElement> mobileDriver;
+	
+	@Mock
+	private MobileElement mobileElement;
 	@Mock
 	private RemoteWebElement element;
 	@Mock
@@ -84,191 +96,287 @@ public class TestHtmlElement extends MockitoTest {
 		elList.add(element);
 		
 		PowerMockito.mockStatic(WebUIDriver.class);
-		Mockito.when(WebUIDriver.getWebDriver()).thenReturn(driver);
-		Mockito.when(driver.findElement(By.id("el"))).thenReturn(element);
-		Mockito.when(driver.findElements(By.name("subEl"))).thenReturn(subElList);
-		Mockito.when(driver.findElement(By.name("subEl"))).thenReturn(subElement1);
-		Mockito.when(driver.findElements(By.id("el"))).thenReturn(elList);
-		Mockito.when(driver.getKeyboard()).thenReturn(keyboard);
-		Mockito.when(driver.getMouse()).thenReturn(mouse);
+		when(WebUIDriver.getWebDriver()).thenReturn(new CustomEventFiringWebDriver(driver));
+		when(driver.findElement(By.id("el"))).thenReturn(element);
+		when(driver.findElements(By.name("subEl"))).thenReturn(subElList);
+		when(driver.findElement(By.name("subEl"))).thenReturn(subElement1);
+		when(driver.findElements(By.id("el"))).thenReturn(elList);
+		when(driver.getKeyboard()).thenReturn(keyboard);
+		when(driver.getMouse()).thenReturn(mouse);
 		
-		Mockito.when(element.findElement(By.name("subEl"))).thenReturn(subElement1);
-		Mockito.when(element.findElements(By.name("subEl"))).thenReturn(subElList);
-		Mockito.when(element.getAttribute(Mockito.anyString())).thenReturn("attribute");
-		Mockito.when(element.getSize()).thenReturn(new Dimension(10, 10));
-		Mockito.when(element.getLocation()).thenReturn(new Point(5, 5));
-		Mockito.when(element.getTagName()).thenReturn("h1");
-		Mockito.when(element.getText()).thenReturn("text");
-		Mockito.when(element.isDisplayed()).thenReturn(true);
-		Mockito.when(element.isEnabled()).thenReturn(true);
+		when(mobileDriver.findElement(By.id("el"))).thenReturn(mobileElement);
+		
+		when(element.findElement(By.name("subEl"))).thenReturn(subElement1);
+		when(element.findElements(By.name("subEl"))).thenReturn(subElList);
+		when(element.getAttribute(anyString())).thenReturn("attribute");
+		when(element.getSize()).thenReturn(new Dimension(10, 10));
+		when(element.getLocation()).thenReturn(new Point(5, 5));
+		when(element.getTagName()).thenReturn("h1");
+		when(element.getText()).thenReturn("text");
+		when(element.isDisplayed()).thenReturn(true);
+		when(element.isEnabled()).thenReturn(true);
+		
+		when(mobileElement.getCenter()).thenReturn(new Point(2, 2));
 	}
 	
-	@AfterMethod(alwaysRun=true) 
-	private void finish(Method method) throws Exception {
+	private void finalCheck(boolean findElement) throws Exception {
 		// check we called getDriver before using it
 		PowerMockito.verifyPrivate(el).invoke("getDriver");
 		
 		// isElementPresent does not call findElement as we use WebDriverWait
-		if (!method.getName().contains("ElementPresent")) {
+		if (findElement) {
 			PowerMockito.verifyPrivate(el).invoke("findElement");
 		}
 	}
 
 	@Test(groups={"ut"})
-	public void testClick() {
+	public void testClick() throws Exception {
 		el.click();
+		finalCheck(true);
 	}
 	
 	@Test(groups={"ut"})
-	public void testSimulateClick() {
+	public void testSimulateClick() throws Exception {
 		el.simulateClick();
+		finalCheck(true);
 	}
 	
 	@Test(groups={"ut"})
-	public void testSimulateSendKeys() {
+	public void testSimulateSendKeys() throws Exception {
 		el.simulateSendKeys();
+		finalCheck(true);
 	}
 
 	@Test(groups={"ut"})
-	public void testSimulateMoveToElement() {
+	public void testSimulateMoveToElement() throws Exception {
 		el.simulateMoveToElement(1, 1);
+		finalCheck(true);
 	}
 	
 	@Test(groups={"ut"})
-	public void testFindElementsBy() {
+	public void testFindElementsBy() throws Exception {
 		Assert.assertEquals(el.findElements(By.name("subEl")).size(), 2);
+		finalCheck(true);
 	}
 	
+	/**
+	 * Check we get the first sub-element of our root element "el"
+	 */
 	@Test(groups={"ut"})
-	public void testFindSubElement() {
+	public void testFindSubElement() throws Exception {
 		HtmlElement subEl = el.findElement(By.name("subEl"));
-		Assert.assertEquals(subEl.getElement(), subElement1);
+		Assert.assertEquals(subEl.getElement().toString(), "subElement1");
+		finalCheck(true);
 	}
 	
+	/**
+	 * Check we get the Nth sub-element of our root element "el"
+	 */
 	@Test(groups={"ut"})
-	public void testFindNthSubElement() {
+	public void testFindNthSubElement() throws Exception {
 		HtmlElement subEl = el.findElement(By.name("subEl"), 1);
-		Assert.assertEquals(subEl.getElement(), subElement2);
+		Assert.assertEquals(subEl.getElement().toString(), "subElement2");
+		finalCheck(true);
 	}
 	
 	@Test(groups={"ut"})
-	public void testFindElements() {
+	public void testFindElements() throws Exception {
 		Assert.assertEquals(el.findElements().size(), 1);
+		finalCheck(true);
 	}
 	
 	@Test(groups={"ut"})
-	public void testGetAttribute() {
+	public void testGetAttribute() throws Exception {
 		Assert.assertEquals(el.getAttribute("attr"), "attribute");
+		finalCheck(true);
 	}
 	
 	@Test(groups={"ut"})
-	public void testGetHeight() {
+	public void testGetHeight() throws Exception {
 		Assert.assertEquals(el.getHeight(), 10);
+		finalCheck(true);
 	}
 	
 	@Test(groups={"ut"})
-	public void testGetWidth() {
+	public void testGetWidth() throws Exception {
 		Assert.assertEquals(el.getWidth(), 10);
+		finalCheck(true);
 	}
 	
 	@Test(groups={"ut"})
-	public void testLocation() {
+	public void testLocation() throws Exception {
 		Assert.assertEquals(el.getLocation().getX(), 5);
+		finalCheck(true);
 	}
 	
 	@Test(groups={"ut"})
-	public void testTagName() {
+	public void testTagName() throws Exception {
 		Assert.assertEquals(el.getTagName(), "h1");
+		finalCheck(true);
 	}
 	
 	@Test(groups={"ut"})
-	public void testText() {
+	public void testText() throws Exception {
 		Assert.assertEquals(el.getText(), "text");
+		finalCheck(true);
 	}
 	
 	@Test(groups={"ut"})
-	public void testValue() {
+	public void testValue() throws Exception {
 		Assert.assertEquals(el.getValue(), "attribute");
+		finalCheck(true);
 	}
 	
 	@Test(groups={"ut"})
-	public void testIsDisplayed() {
+	public void testIsDisplayed() throws Exception {
 		Assert.assertEquals(el.isDisplayed(), true);
+		finalCheck(true);
 	}
 	
 	@Test(groups={"ut"})
-	public void testIsDisplayedException() {
-		Mockito.when(element.isDisplayed()).thenThrow(WebDriverException.class);
+	public void testIsDisplayedException() throws Exception {
+		when(element.isDisplayed()).thenThrow(WebDriverException.class);
 		Assert.assertEquals(el.isDisplayed(), false);
+		finalCheck(true);
 	}
 	
 	@Test(groups={"ut"})
-	public void testIsElementPresent() {
+	public void testIsElementPresent() throws Exception {
 		Assert.assertEquals(el.isElementPresent(1), true);
+		finalCheck(false);
 	}
 	
 	@Test(groups={"ut"})
-	public void testIsEnabled() {
+	public void testIsEnabled() throws Exception {
 		Assert.assertEquals(el.isEnabled(), true);
+		finalCheck(true);
 	}
 	
 	@Test(groups={"ut"})
-	public void testIsTextPresentPattern() {
+	public void testIsTextPresentPattern() throws Exception {
 		Assert.assertEquals(el.isTextPresent("\\w+xt"), true);
+		finalCheck(true);
 	}
 	
 	@Test(groups={"ut"})
-	public void testIsTextPresentText() {
+	public void testIsTextPresentText() throws Exception {
 		Assert.assertEquals(el.isTextPresent("text"), true);
+		finalCheck(true);
 	}
 	
 	@Test(groups={"ut"})
-	public void testMouseDown() {
+	public void testMouseDown() throws Exception {
 		el.mouseDown();
+		finalCheck(true);
 	}
 	
 	@Test(groups={"ut"})
-	public void testMouseOver() {
+	public void testMouseOver() throws Exception {
 		el.mouseOver();
+		finalCheck(true);
 	}
 	
 	@Test(groups={"ut"})
-	public void testMouseUp() {
+	public void testMouseUp() throws Exception {
 		el.mouseUp();
+		finalCheck(true);
 	}
 	
 	@Test(groups={"ut"})
-	public void testSimulateMouseOver() {
+	public void testSimulateMouseOver() throws Exception {
 		el.simulateMouseOver();
+		finalCheck(true);
 	}
 	
 	@Test(groups={"ut"})
-	public void testSendKeys() {
+	public void testSendKeys() throws Exception {
 		el.sendKeys("someText");
+		finalCheck(true);
 	}
 	
 	@Test(groups={"ut"})
-	public void testSendKeysWithException() {
-		Mockito.when(element.getAttribute("type")).thenThrow(WebDriverException.class);
+	public void testSendKeysWithException() throws Exception {
+		when(element.getAttribute("type")).thenThrow(WebDriverException.class);
 		el.sendKeys("someText");
-		Mockito.verify(element).clear();
+		verify(element).clear();
+		finalCheck(true);
 	}
 	
 	@Test(groups={"ut"})
-	public void testFindPatternInText() {
+	public void testFindPatternInText() throws Exception {
 		Assert.assertEquals(el.findPattern(Pattern.compile("\\w(\\w+)\\w"), "text"), "ex");
+		finalCheck(true);
 	}
 	
 	@Test(groups={"ut"})
-	public void testFindPatternInAttr() {
+	public void testFindPatternInAttr() throws Exception {
 		Assert.assertEquals(el.findPattern(Pattern.compile("\\w(\\w+)\\w"), "attr"), "ttribut");
+		finalCheck(true);
 	}
 	
 	@Test(groups={"ut"})
-	public void testFindPatternInAttrNoMatch() {
+	public void testFindPatternInAttrNoMatch() throws Exception {
 		Assert.assertEquals(el.findPattern(Pattern.compile("\\w(\\d+)\\w"), "attr"), "");
+		finalCheck(true);
 	}
 	
+	/**
+	 * A desktop driver makes exception raise
+	 * @throws Exception
+	 */
+	@Test(groups={"ut"}, expectedExceptions=ScenarioException.class)
+	public void testPinchWithDesktopDriver() throws Exception {
+		el.pinch();
+		finalCheck(true);
+	}
 	
+	@Test(groups={"ut"})
+	public void testPinch() throws Exception {
+		when(WebUIDriver.getWebDriver()).thenReturn(new CustomEventFiringWebDriver(mobileDriver));
+		el.pinch();
+		finalCheck(true);
+		PowerMockito.verifyPrivate(el).invoke("checkForMobile");
+	}
+	
+	@Test(groups={"ut"})
+	public void testGetCenter() throws Exception {
+		when(WebUIDriver.getWebDriver()).thenReturn(new CustomEventFiringWebDriver(mobileDriver));
+		el.getCenter();
+		finalCheck(true);
+		PowerMockito.verifyPrivate(el).invoke("checkForMobile");
+	}
+	
+	@Test(groups={"ut"})
+	public void testSwipe1() throws Exception {
+		when(WebUIDriver.getWebDriver()).thenReturn(new CustomEventFiringWebDriver(mobileDriver));
+		el.swipe(SwipeElementDirection.DOWN, 1);
+		finalCheck(true);
+		PowerMockito.verifyPrivate(el).invoke("checkForMobile");
+	}
+	
+	@Test(groups={"ut"})
+	public void testSwipe2() throws Exception {
+		when(WebUIDriver.getWebDriver()).thenReturn(new CustomEventFiringWebDriver(mobileDriver));
+		el.swipe(SwipeElementDirection.DOWN, 2, 2, 1);
+		finalCheck(true);
+		PowerMockito.verifyPrivate(el).invoke("checkForMobile");
+	}
+	
+	@Test(groups={"ut"})
+	public void testTap() throws Exception {
+		when(WebUIDriver.getWebDriver()).thenReturn(new CustomEventFiringWebDriver(mobileDriver));
+		el.tap(2, 2);
+		finalCheck(true);
+		PowerMockito.verifyPrivate(el).invoke("checkForMobile");
+	}
+	
+	@Test(groups={"ut"})
+	public void testZoom() throws Exception {
+		when(WebUIDriver.getWebDriver()).thenReturn(new CustomEventFiringWebDriver(mobileDriver));
+		el.zoom();
+		finalCheck(true);
+		PowerMockito.verifyPrivate(el).invoke("checkForMobile");
+	}
+
 	
 }
