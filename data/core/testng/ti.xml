@@ -1,5 +1,5 @@
 <!DOCTYPE suite SYSTEM "http://beust.com/testng/testng-1.0.dtd" >
-<suite name="Integration test suite" parallel="methods" verbose="1" thread-count="1">
+<suite name="Integration test suite" parallel="methods" verbose="1" thread-count="1" configfailurepolicy="continue">
    
 	<parameter name="implicitWaitTimeOut" value="2"></parameter>
 	<parameter name="browser" value="*firefox" />
