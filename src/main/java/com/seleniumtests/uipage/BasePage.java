@@ -29,8 +29,10 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.Assert;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.CustomEventFiringWebDriver;
+import com.seleniumtests.driver.TestType;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.reporter.TestLogging;
 import com.thoughtworks.selenium.SeleniumException;
@@ -134,6 +136,11 @@ public abstract class BasePage {
      * @param   windowName
      */
     public final void selectWindow(final String windowName) {
+    	
+    	// app test are not compatible with window
+    	if (SeleniumTestsContextManager.getThreadContext().getTestType().family() == TestType.APP) {
+            throw new ScenarioException("Application are not compatible with Windows");
+        }
     	
     	Windows windows = null;
     	try {

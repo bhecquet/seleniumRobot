@@ -46,6 +46,7 @@ import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.DriverExceptions;
 import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.driver.CustomEventFiringWebDriver;
+import com.seleniumtests.driver.TestType;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.reporter.TestLogging;
 import com.seleniumtests.util.helper.WaitHelper;
@@ -560,24 +561,28 @@ public class HtmlElement {
         Mouse mouse = ((HasInputDevices) driver).getMouse();
         mouse.mouseUp(item.getCoordinates());
     }
+    
+    public void sendKeys(final CharSequence text) {
+    	// Appium seems to clear field before writing
+    	if (SeleniumTestsContextManager.getThreadContext().getTestType().family() == TestType.APP) {
+            sendKeys(text, false);
+        } else {
+        	sendKeys(text, true);
+        }
+    }
 
     /**
      * Sends the indicated CharSequence to the WebElement.
      *
      * @param  arg0
+     * @param 	clear	if true, clear field before writing
      */
-    public void sendKeys(final CharSequence arg0) {
+    public void sendKeys(final CharSequence arg0, final boolean clear) {
         findElement();
         
-        // on mobile and some fields, this throws an exception which prevents going on
-        try {
-        	String elType = element.getAttribute("type");
-	        if (elType != null && !"file".equalsIgnoreCase(elType)) {
-	        	element.clear();
-	        }
-        } catch (WebDriverException | NullPointerException e) {
+        if (clear) {
         	element.clear();
-        }
+        } 
         element.sendKeys(arg0);
     }
 

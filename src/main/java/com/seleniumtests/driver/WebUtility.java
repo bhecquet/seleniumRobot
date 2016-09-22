@@ -42,6 +42,11 @@ public class WebUtility {
      * @param  height
      */
     public void resizeWindow(final int width, final int height) {
+    	// app test are not compatible with window
+    	if (SeleniumTestsContextManager.getThreadContext().getTestType().family() == TestType.APP) {
+            return;
+        }
+    	
         try {
             TestLogging.logWebStep("Resize browser window to width " + width + " height " + height, false);
 
@@ -55,7 +60,8 @@ public class WebUtility {
 
     public void maximizeWindow() {
         try {
-        	if (SeleniumTestsContextManager.getThreadContext().getTestType().isMobile()) {
+        	// app test are not compatible with window
+        	if (SeleniumTestsContextManager.getThreadContext().getTestType().family() == TestType.APP) {
                 return;
             }
 
