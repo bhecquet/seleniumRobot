@@ -16,9 +16,11 @@
  */
 package com.seleniumtests.browserfactory;
 
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
+import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.DriverConfig;
 
 import io.appium.java_client.remote.AndroidMobileCapabilityType;
@@ -72,6 +74,12 @@ public class AndroidCapabilitiesFactory extends ICapabilitiesFactory {
         // do not configure application and browser as they are mutualy exclusive
         if (app != null && "".equals(app.trim())) {
         	caps.setCapability(CapabilityType.BROWSER_NAME, cfg.getBrowser());
+        	
+        	
+        	// set specific configuration for chrome
+        	if (cfg.getBrowser() == BrowserType.CHROME) {
+        		caps.merge(new ChromeCapabilitiesFactory().createMobileCapabilities(cfg));
+        	}
         }
         caps.setCapability(MobileCapabilityType.NEW_COMMAND_TIMEOUT, cfg.getNewCommandTimeout());
 

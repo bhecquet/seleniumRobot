@@ -46,6 +46,7 @@ public class ChromeCapabilitiesFactory extends ICapabilitiesFactory {
         if (webDriverConfig.getUserAgentOverride() != null) {
             options.addArguments("--user-agent=" + webDriverConfig.getUserAgentOverride());
         }
+        options.addArguments("--disable-translate");
 
         capability.setCapability(ChromeOptions.CAPABILITY, options);
 
@@ -80,6 +81,21 @@ public class ChromeCapabilitiesFactory extends ICapabilitiesFactory {
 
         return capability;
     }
+	
+	/**
+	 * Create capabilities for mobile chrome
+	 */
+	public DesiredCapabilities createMobileCapabilities(final DriverConfig webDriverConfig) {
+		DesiredCapabilities capabilities = new DesiredCapabilities();
+		ChromeOptions options = new ChromeOptions();
+        if (webDriverConfig.getUserAgentOverride() != null) {
+            options.addArguments("--user-agent=" + webDriverConfig.getUserAgentOverride());
+        }
+        options.addArguments("--disable-translate");
+
+        capabilities.setCapability(ChromeOptions.CAPABILITY, options);
+        return capabilities;
+	}
 
     public void handleExtractResources() throws IOException {
         String dir = Paths.get(SeleniumTestsContextManager.getRootPath(), "tools", "drivers", Platform.getCurrent().family().toString().toLowerCase()).toString();
