@@ -43,8 +43,10 @@ import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.SeleniumTestsPageListener;
 import com.seleniumtests.customexception.CustomSeleniumTestsException;
 import com.seleniumtests.customexception.NotCurrentPageException;
+import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import com.seleniumtests.driver.DriverMode;
+import com.seleniumtests.driver.TestType;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.driver.WebUtility;
 import com.seleniumtests.driver.screenshots.ScreenShot;
@@ -60,7 +62,6 @@ public class PageObject extends BasePage implements IPage {
     private boolean frameFlag = false;
     private HtmlElement pageIdentifierElement = null;
     private String popupWindowName = null;
-    private String windowHandle = null;
     private String title = null;
     private String url = null;
     private String bodyText = null;
@@ -120,12 +121,6 @@ public class PageObject extends BasePage implements IPage {
         openPage(url);
 
         assertCurrentPage(false);
-
-        try {
-            this.windowHandle = driver.getWindowHandle();
-        } catch (Exception ex) {
-            // Ignore for OperaDriver
-        }
 
         SeleniumTestsPageListener.informPageLoad(this);
 
@@ -380,10 +375,6 @@ public class PageObject extends BasePage implements IPage {
         return new LinkElement("Canonical URL", By.cssSelector("link[rel=canonical]")).getAttribute("href");
     }
 
-    public String getWindowHandle() {
-        return windowHandle;
-    }
-
     public final void goBack() {
         driver.navigate().back();
         frameFlag = false;
@@ -488,16 +479,20 @@ public class PageObject extends BasePage implements IPage {
     }
 
     public final void selectMainWindow() {
-
-        driver.switchTo().window((String) driver.getWindowHandles().toArray()[0]);
-        WaitHelper.waitForSeconds(1);
+    	selectWindow(0);
 
         // Check whether it's the expected page.
         assertCurrentPage(true);
     }
 
     public final void selectWindow(final int index) {
+    	// app test are not compatible with window
+    	if (SeleniumTestsContextManager.getThreadContext().getTestType().family() == TestType.APP) {
+            throw new ScenarioException("Application are not compatible with Windows");
+        }
+    	    
         driver.switchTo().window((String) driver.getWindowHandles().toArray()[index]);
+        WaitHelper.waitForSeconds(1);
     }
     
     public final String selectNewWindow() {
@@ -505,7 +500,11 @@ public class PageObject extends BasePage implements IPage {
     }
     
     public final String selectNewWindow(int waitMs) {
-        
+    	// app test are not compatible with window
+    	if (SeleniumTestsContextManager.getThreadContext().getTestType().family() == TestType.APP) {
+            throw new ScenarioException("Application are not compatible with Windows");
+        }
+    	        
         // Keep the name of the current window handle before switching
         // sometimes, our action made window disappear
  		String mainWindowHandle;
