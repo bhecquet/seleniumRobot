@@ -4,7 +4,7 @@
 
 	<groupId>com.infotel.seleniumRobot</groupId>
 	<artifactId>core</artifactId>
-	<version>2.2.2-SNAPSHOT</version>
+	<version>2.2.2</version>
 	<packaging>jar</packaging>
 
 	<name>selenium robot</name>
@@ -31,7 +31,7 @@
         <connection>scm:git:git@github.com:bhecquet/seleniumRobot.git</connection>
         <developerConnection>scm:git:git@github.com:bhecquet/seleniumRobot.git</developerConnection>
         <url>git@github.com:bhecquet/seleniumRobot.git</url>
-      <tag>HEAD</tag>
+      <tag>core-2.2.2</tag>
   </scm>
 
 	<distributionManagement>
