@@ -27,6 +27,14 @@ public class LinkElement extends HtmlElement {
     public LinkElement(final String label, final By by, final int index) {
     	super(label, by, index);
     }
+    
+    public LinkElement(final String label, final By by, final FrameElement frame) {
+    	super(label, by, frame);
+    }
+    
+    public LinkElement(final String label, final By by, final FrameElement frame, final int index) {
+    	super(label, by, frame, index);
+    }
 
     public String getUrl() {
         return super.getAttribute("href");

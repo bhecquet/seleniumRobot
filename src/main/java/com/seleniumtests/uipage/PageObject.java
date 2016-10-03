@@ -462,7 +462,7 @@ public class PageObject extends BasePage implements IPage {
         new WebUtility(driver).resizeWindow(width, height);
     }
 
-    public final void selectFrame(final int index) {
+    public final void selectFrame(final Integer index) {
         driver.switchTo().frame(index);
         frameFlag = true;
     }
@@ -476,6 +476,11 @@ public class PageObject extends BasePage implements IPage {
     public final void selectFrame(final String locator) {
         driver.switchTo().frame(locator);
         frameFlag = true;
+    }
+    
+    public final void exitFrame() {
+    	driver.switchTo().defaultContent();
+    	frameFlag = false;
     }
 
     public final void selectMainWindow() {

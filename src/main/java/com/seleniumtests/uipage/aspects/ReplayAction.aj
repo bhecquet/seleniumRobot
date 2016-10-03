@@ -20,15 +20,15 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.NoSuchSessionException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.WebDriverException;
-import org.openqa.selenium.remote.SessionNotFoundException;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.UnreachableBrowserException;
 import org.openqa.selenium.support.ui.SystemClock;
 
 import com.seleniumtests.driver.WebUIDriver;
+import com.seleniumtests.uipage.htmlelements.FrameElement;
 import com.seleniumtests.uipage.htmlelements.HtmlElement;
 import com.seleniumtests.util.helper.WaitHelper;
 
@@ -54,11 +54,16 @@ public class ReplayAction {
     		+ "&& !execution(* com.seleniumtests.uipage.htmlelements.HtmlElement.getBy (..))"
     		+ "&& !execution(* com.seleniumtests.uipage.htmlelements.HtmlElement.setDriver (..))"
     		+ "&& !execution(* com.seleniumtests.uipage.htmlelements.HtmlElement.getDriver (..))"
+    		+ "&& !execution(* com.seleniumtests.uipage.htmlelements.HtmlElement.getFrameElement (..))"
     		+ "&& !execution(* com.seleniumtests.uipage.htmlelements.HtmlElement.getLabel (..))"
     		+ "&& !execution(* com.seleniumtests.uipage.htmlelements.HtmlElement.getLocator (..))"
     		+ "&& !execution(* com.seleniumtests.uipage.htmlelements.HtmlElement.waitForPresent ())"
     		+ "&& !execution(* com.seleniumtests.uipage.htmlelements.HtmlElement.toHTML (..))"
+    		+ "&& !execution(* com.seleniumtests.uipage.htmlelements.HtmlElement.sendKeys (CharSequence))"
     		+ "|| execution(public * com.seleniumtests.uipage.htmlelements.SelectList..* (..)) "
+    		+ "|| execution(public * com.seleniumtests.uipage.htmlelements.ButtonElement..* (..)) "
+    		+ "|| execution(public * com.seleniumtests.uipage.htmlelements.Table.get* (..))"
+    		+ "|| execution(public * com.seleniumtests.uipage.htmlelements.TextFieldElement.clear (..)) "
     		)
     public Object replay(ProceedingJoinPoint joinPoint) throws Throwable {
     	
@@ -68,9 +73,18 @@ public class ReplayAction {
     	// update driver reference of the element
     	// corrects bug of waitElementPresent which threw a SessionNotFoundError because driver reference were not
     	// updated before searching element (it used the driver reference of an old test session)
-    	((HtmlElement)joinPoint.getTarget()).setDriver(WebUIDriver.getWebDriver());
-    	
+    	HtmlElement element = (HtmlElement)joinPoint.getTarget();
+    	element.setDriver(WebUIDriver.getWebDriver());
+
     	while (systemClock.isNowBefore(end)) {
+    		
+    		// handle frame case
+    		FrameElement frame = element.getFrameElement();
+    		while (frame != null) {
+    			WebElement frameElement = element.getDriver().findElement(frame.getBy());
+    			element.getDriver().switchTo().frame(frameElement);
+    			frame = frame.getFrameElement();
+    		}
 	    	
 	    	try {
 	    		reply = joinPoint.proceed(joinPoint.getArgs());
@@ -99,7 +113,11 @@ public class ReplayAction {
 					}
 					throw e;
 				}
-	    	} 
+	    	} finally {
+	    		if (element.getFrameElement() != null) {
+	    			element.getDriver().switchTo().defaultContent();
+	    		}
+	    	}
 			
     	}
     	return reply;

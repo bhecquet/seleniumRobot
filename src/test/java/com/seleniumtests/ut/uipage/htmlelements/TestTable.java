@@ -79,13 +79,12 @@ public class TestTable extends MockitoTest {
 	 */
 	@AfterMethod(alwaysRun=true) 
 	public void checkTableRefresh() {
-		verify(table).findElement();
+		verify(table).findTableElement();
 	}
 
 	@Test(groups={"ut"})
 	public void testGetRows() throws Exception {
 		Assert.assertEquals(table.getRows().size(), 2);
-		verify(table).findElement();
 	}
 	
 	@Test(groups={"ut"})
