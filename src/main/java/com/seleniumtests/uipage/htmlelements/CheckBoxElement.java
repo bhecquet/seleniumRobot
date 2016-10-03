@@ -27,17 +27,19 @@ public class CheckBoxElement extends HtmlElement {
     public CheckBoxElement(final String label, final By by, final int index) {
     	super(label, by, index);
     }
+    
+    public CheckBoxElement(final String label, final By by, final FrameElement frame) {
+    	super(label, by, frame);
+    }
+    
+    public CheckBoxElement(final String label, final By by, final FrameElement frame, final int index) {
+    	super(label, by, frame, index);
+    }
 
     public void check() {
         if (!isSelected()) {
             super.click();
         }
-    }
-
-    @Override
-    public boolean isSelected() {
-        findElement();
-        return element.isSelected();
     }
 
     public void uncheck() {

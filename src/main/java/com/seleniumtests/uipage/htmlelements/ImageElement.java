@@ -27,15 +27,13 @@ public class ImageElement extends HtmlElement {
     public ImageElement(final String label, final By by, final int index) {
     	super(label, by, index);
     }
-
-    @Override
-    public int getHeight() {
-        return super.getSize().getHeight();
+    
+    public ImageElement(final String label, final By by, final FrameElement frame) {
+    	super(label, by, frame);
     }
-
-    @Override
-    public int getWidth() {
-        return super.getSize().getWidth();
+    
+    public ImageElement(final String label, final By by, final FrameElement frame, final int index) {
+    	super(label, by, frame, index);
     }
 
     public String getUrl() {

@@ -26,6 +26,14 @@ public class TextFieldElement extends HtmlElement {
     public TextFieldElement(final String label, final By by, final int index) {
     	super(label, by, index);
     }
+    
+    public TextFieldElement(final String label, final By by, final FrameElement frame) {
+    	super(label, by, frame);
+    }
+    
+    public TextFieldElement(final String label, final By by, final FrameElement frame, final int index) {
+    	super(label, by, frame, index);
+    }
 
     public void clear() {
         findElement();

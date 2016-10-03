@@ -29,9 +29,12 @@ public class Table extends HtmlElement {
     public Table(final String label, final By by) {
         super(label, by);
     }
+    
+    public Table(final String label, final By by, final FrameElement frame) {
+    	super(label, by, frame);
+    }
 
-    @Override
-    public void findElement() {
+    public void findTableElement() {
         super.findElement();
         rows = element.findElements(By.tagName("tr"));
         columns = getColumnsInternal();
@@ -53,17 +56,17 @@ public class Table extends HtmlElement {
             }
             return columns;
         } else {
-        	return new ArrayList<WebElement>();
+        	return new ArrayList<>();
         }
     }
     
     public List<WebElement> getColumns() {
-    	findElement();
+    	findTableElement();
     	return columns;
     }
 
     public int getColumnCount() {
-    	findElement();
+    	findTableElement();
         return columns.size();
     }
 
@@ -74,7 +77,7 @@ public class Table extends HtmlElement {
      * @param  column  Starts from 1
      */
     public String getContent(final int row, final int column) {
-        findElement();
+    	findTableElement();
 
         if (rows != null && !rows.isEmpty()) {
             columns = rows.get(row - 1).findElements(By.tagName("td"));
@@ -99,7 +102,7 @@ public class Table extends HtmlElement {
     }
 
     public List<WebElement> getRows() {
-        findElement();
+    	findTableElement();
         return rows;
     }
 

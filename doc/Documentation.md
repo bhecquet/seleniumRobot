@@ -278,6 +278,38 @@ XML testNg file looks like:
 
 `cucumberPackage` parameter is mandatory so that framework knows where implementation code resides
 
+### Working with frames ###
+In case an HTML element has to be searched inside an iFrame there are 2 ways to handle this
+
+#### Selenium way ####
+Selenium offers the way to switch focus to an iframe using
+
+	driver.switchTo().frame(<frameElement>)  // => switch to the iframe previously searched. Each search after this call will be done inside frame
+	driver.switchTo().defautlContent()		 // => go back to the main page
+	
+The drawback of this approach is that if iframe reloads after switching, each element search will fail
+Moreover, no retry is done when searching frame
+
+#### SeleniumRobot way ####
+SeleniumRobot adds a way to retry a search when an error occurs even using iframes
+
+	// declare your frame as any other element inside page.
+	FrameElement frame = new FrameElement("my frame", By.id("frameId"));
+	
+	// declare your element as being present inside this frame (the frame parameter)
+	HtmlElement el = new HtmlElement("my element", By.id("el"), frame);
+	
+	// use the element
+	el.click();
+	
+This way, each time an action is performed on the element, SeleniumRobot will:
+
+- search the frame and switch to it
+- act on element
+- switch to default content
+
+If an error occurs during one of these actions, SeleniumRobot will retry
+
 ### Configure test scripts ###
 There are several ways to make values in test script change according to test environment, executed test, ...
 

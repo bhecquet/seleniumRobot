@@ -27,14 +27,16 @@ public class RadioButtonElement extends HtmlElement {
     public RadioButtonElement(final String label, final By by, final int index) {
     	super(label, by, index);
     }
+    
+    public RadioButtonElement(final String label, final By by, final FrameElement frame) {
+    	super(label, by, frame);
+    }
+    
+    public RadioButtonElement(final String label, final By by, final FrameElement frame, final int index) {
+    	super(label, by, frame, index);
+    }
 
     public void check() {
         super.click();
-    }
-
-    @Override
-    public boolean isSelected() {
-        findElement();
-        return element.isSelected();
     }
 }

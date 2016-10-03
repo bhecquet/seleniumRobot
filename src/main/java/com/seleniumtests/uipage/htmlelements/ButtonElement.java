@@ -31,6 +31,14 @@ public class ButtonElement extends HtmlElement {
     public ButtonElement(final String label, final By by, final int index) {
     	super(label, by, index);
     }
+    
+    public ButtonElement(final String label, final By by, final FrameElement frame) {
+    	super(label, by, frame);
+    }
+    
+    public ButtonElement(final String label, final By by, final FrameElement frame, final int index) {
+    	super(label, by, frame, index);
+    }
 
     @Override
     public void click() {

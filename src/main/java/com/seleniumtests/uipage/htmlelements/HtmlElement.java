@@ -31,14 +31,12 @@ import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.firefox.MarionetteDriver;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.interactions.HasInputDevices;
 import org.openqa.selenium.interactions.Mouse;
 import org.openqa.selenium.internal.Locatable;
-import org.openqa.selenium.support.events.EventFiringWebDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
@@ -69,6 +67,7 @@ public class HtmlElement {
     protected WebElement element = null;
     private String label = null;
     private HtmlElement parent = null;
+    private FrameElement frameElement = null;
     private int elementIndex = -1;
     private By by = null;
 
@@ -103,23 +102,35 @@ public class HtmlElement {
         this.label = label;
         this.by = by;
         this.elementIndex = index;
+        this.frameElement = null;
     }
     
-    public HtmlElement(final String label, final By by, final HtmlElement parent) {
+    public HtmlElement(final String label, final By by, final FrameElement frame) {
+    	this(label, by, frame, -1);
+    }
+    
+    public HtmlElement(final String label, final By by, final FrameElement frame, final int index) {
+    	this.label = label;
+    	this.by = by;
+    	this.elementIndex = index;
+    	this.frameElement = frame;
+    }
+    
+    private HtmlElement(final String label, final By by, final HtmlElement parent) {
     	this(label, by, parent, -1);
     }
     
-    public HtmlElement(final String label, final By by, final HtmlElement parent, final int index) {
+    private HtmlElement(final String label, final By by, final HtmlElement parent, final int index) {
     	this.label = label;
     	this.by = by;
     	this.parent = parent;
     	this.elementIndex = index;
+    	this.frameElement = null;
     }
 
     public void click() {
         findElement();
-        element.click();
-        
+        element.click();   
     }
     
     /**
@@ -233,7 +244,7 @@ public class HtmlElement {
         		element = parent.element.findElements(by).get(elementIndex);
         	}
         } else {
-	        driver = getDriver();
+	        driver = updateDriver();
 	        if (elementIndex < 0) {
 	        	element = driver.findElement(by);
 	        } else {
@@ -332,8 +343,12 @@ public class HtmlElement {
     /**
      * Get and refresh underlying WebDriver.
      */
-    protected WebDriver getDriver() {
+    protected WebDriver updateDriver() {
         return WebUIDriver.getWebDriver();
+    }
+    
+    public WebDriver getDriver() {
+    	return driver;
     }
 
     public void setDriver(WebDriver driver) {
@@ -762,9 +777,13 @@ public class HtmlElement {
     public void waitForPresent(final int timeout) {
     	
     	// refresh driver
-    	driver = getDriver();
+    	driver = updateDriver();
         WebDriverWait wait = new WebDriverWait(driver, timeout);
         wait.until(ExpectedConditions.presenceOfElementLocated(by));
         
     }
+
+	public FrameElement getFrameElement() {
+		return frameElement;
+	}
 }
