@@ -21,8 +21,10 @@ import java.util.List;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.UnexpectedTagNameException;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 import com.seleniumtests.driver.WebUIDriver;
 
@@ -62,6 +64,8 @@ public class SelectList extends HtmlElement {
         driver = updateDriver();
         element = driver.findElement(this.getBy());
         makeWebElementVisible(element);
+        new WebDriverWait(driver, 1).until(ExpectedConditions.visibilityOf(element));
+        
         try {
             select = getNewSelectElement(element);
             options = select.getOptions();

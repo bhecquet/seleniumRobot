@@ -52,7 +52,7 @@ public class ButtonElement extends HtmlElement {
     }
 
     public void submit() {
-        findElement();
+        findElement(true);
         element.submit();
     }
 }
