@@ -129,7 +129,7 @@ public class HtmlElement {
     }
 
     public void click() {
-        findElement();
+        findElement(true);
         element.click();   
     }
     
@@ -144,7 +144,7 @@ public class HtmlElement {
      * @param  value
      */
     public void clickAt(int xOffset, int yOffset) {
-        findElement();
+        findElement(true);
 
         try {
             new Actions(driver).moveToElement(element, xOffset, yOffset).click()
@@ -156,7 +156,7 @@ public class HtmlElement {
     }
 
     public void simulateClick() {
-        findElement();
+        findElement(true);
 
         String mouseOverScript =
             "if(document.createEvent){var evObj = document.createEvent('MouseEvents');evObj.initEvent('mouseover', true, false); arguments[0].dispatchEvent(evObj);} else if(document.createEventObject) { arguments[0].fireEvent('onmouseover');}";
@@ -171,7 +171,7 @@ public class HtmlElement {
     }
     
     public void simulateSendKeys(CharSequence... keysToSend) {
-    	findElement();
+    	findElement(true);
     		
     	// click on element before sending keys through keyboard
     	element.click();
@@ -188,7 +188,7 @@ public class HtmlElement {
     }
 
     public void simulateMoveToElement(final int x, final int y) {
-        findElement();
+        findElement(true);
         ((JavascriptExecutor) driver).executeScript(
             "function simulate(f,c,d,e){var b,a=null;for(b in eventMatchers)if(eventMatchers[b].test(c)){a=b;break}if(!a)return!1;document.createEvent?(b=document.createEvent(a),a==\"HTMLEvents\"?b.initEvent(c,!0,!0):b.initMouseEvent(c,!0,!0,document.defaultView,0,d,e,d,e,!1,!1,!1,!1,0,null),f.dispatchEvent(b)):(a=document.createEventObject(),a.detail=0,a.screenX=d,a.screenY=e,a.clientX=d,a.clientY=e,a.ctrlKey=!1,a.altKey=!1,a.shiftKey=!1,a.metaKey=!1,a.button=1,f.fireEvent(\"on\"+c,a));return!0} var eventMatchers={HTMLEvents:/^(?:load|unload|abort|errorLogger|select|change|submit|reset|focus|blur|resize|scroll)$/,MouseEvents:/^(?:click|dblclick|mouse(?:down|up|over|move|out))$/}; " +
             "simulate(arguments[0],\"mousemove\",arguments[1],arguments[2]);",
@@ -227,13 +227,18 @@ public class HtmlElement {
     public HtmlElement findElement(By by, int index) {
     	return new HtmlElement(label, by, this, index);
     }
+    
+    protected void findElement() {
+    	findElement(false);
+    }
+    
 
     /**
      * Finds the element using By type. Implicit Waits is built in createWebDriver() in WebUIDriver to handle dynamic
      * element problem. This method is invoked before all the basic operations like click, sendKeys, getText, etc. Use
      * waitForPresent to use Explicit Waits to deal with special element which needs long time to present.
      */
-    protected void findElement() {
+    protected void findElement(boolean waitForVisibility) {
         
         // if a parent is defined, search for it before getting the sub element
         if (parent != null) {
@@ -253,6 +258,11 @@ public class HtmlElement {
 	        
         }
         makeWebElementVisible(element);
+        
+        // wait for element to be really visible. should be done only for actions on element
+        if (waitForVisibility) {
+        	new WebDriverWait(driver, 1).until(ExpectedConditions.visibilityOf(element));
+        }
     }
     
     protected void changeCssAttribute(WebElement element, String cssProperty, String cssPropertyValue) {
@@ -361,7 +371,7 @@ public class HtmlElement {
      * @return
      */
     public WebElement getElement() {
-    	findElement();
+    	findElement(true);
         return element;
     }
 
@@ -536,7 +546,7 @@ public class HtmlElement {
      * Forces a mouseDown event on the WebElement.
      */
     public void mouseDown() {
-        findElement();
+        findElement(true);
 
         Locatable item = (Locatable) element;
         Mouse mouse = ((HasInputDevices) driver).getMouse();
@@ -547,7 +557,7 @@ public class HtmlElement {
      * Forces a mouseOver event on the WebElement.
      */
     public void mouseOver() {
-        findElement();
+        findElement(true);
 
         Locatable hoverItem = (Locatable) element;
         Mouse mouse = ((HasInputDevices) driver).getMouse();
@@ -558,7 +568,7 @@ public class HtmlElement {
      * Forces a mouseOver event on the WebElement using simulate by JavaScript way for some dynamic menu.
      */
     public void simulateMouseOver() {
-        findElement();
+        findElement(true);
 
         String mouseOverScript =
             "if(document.createEvent){var evObj = document.createEvent('MouseEvents');evObj.initEvent('mouseover', true, false); arguments[0].dispatchEvent(evObj);} else if(document.createEventObject) { arguments[0].fireEvent('onmouseover');}";
@@ -570,7 +580,7 @@ public class HtmlElement {
      * Forces a mouseUp event on the WebElement.
      */
     public void mouseUp() {
-        findElement();
+        findElement(true);
 
         Locatable item = (Locatable) element;
         Mouse mouse = ((HasInputDevices) driver).getMouse();
@@ -593,7 +603,7 @@ public class HtmlElement {
      * @param 	clear	if true, clear field before writing
      */
     public void sendKeys(final CharSequence arg0, final boolean clear) {
-        findElement();
+        findElement(true);
         
         if (clear) {
         	element.clear();
@@ -694,7 +704,7 @@ public class HtmlElement {
     	if (!(((CustomEventFiringWebDriver)driver).getWebDriver() instanceof AppiumDriver<?>)) {
     		throw new ScenarioException("action is available only for mobile platforms");
     	}
-    	findElement();
+    	findElement(true);
     }
     
     /**
