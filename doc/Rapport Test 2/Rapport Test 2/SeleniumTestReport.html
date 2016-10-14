@@ -1,0 +1,166 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html"
+    ; charset="utf-8" />
+
+    <title>SeleniumRobot</title>
+
+	<link rel="stylesheet" type="text/css" href="AdminLTE.min.css">
+	<link rel="stylesheet" type="text/css" href="bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="seleniumRobot.css">
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lobster+Two"> 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.5.0/css/font-awesome.min.css">
+
+</head>
+
+<body>
+
+	<div class="wrapper">
+		<header class='main-header'>
+		    <a href='http://www.seleniumtests.com/2013/10/announcing-selenium-tests-automation.html'>SeleniumRobot</a><br/>
+		</header>
+	</div>
+
+	<div class="container">
+
+		<div class="pieChart">
+        	<canvas id="pieChart" style="height:250px"></canvas>
+        	<!--<div id="pieChartLegend" class="chart-legend"></div>-->
+    	</div>
+    	
+		<section class="content-header">
+      		<h1> Integration tests</h1>
+    	</section>
+
+    	<section class="content">
+	      	<div class="row">
+	        	<div class="col-xs-12">
+	          		<div class="box box-black">
+	            		<div class="box-body">
+	              			<table class="table">
+	                			<thead>
+	                				<tr>
+	                					<th class="alignleft"> Tests </th>
+					                  	<th class="alignleft"> Steps </th>
+					                  	<th> Passed Tests Count </th>
+					                 	<th> Failed Tests Count </th>
+					                 	<th> Skipped Tests Count </th>
+					                 	<th> Method Count </th>
+					                 	<th> Duration </th>
+					                </tr>
+				                </thead>
+				                <tbody>
+				                	<tr class="testSkipped">
+				                		<td rowspan="2" class="alignleft bgwhite"> MRH </td>
+				                  		<td class="alignleft"><i class="fa fa-circle circleSkipped"></i> MRH_mobile</td>
+				                  		<td>0</td>
+				                  		<td>0</td>
+				                  		<td>1</td>
+				                  		<td>1</td>
+				                  		<td>1000ms</td>
+				                	</tr>
+				                	<tr class="testFailed">
+				                  		<td class="alignleft"><i class="fa fa-circle circleFailed"></i> MRH_mobile2</td>
+				                  		<td>0</td>
+				                  		<td>1</td>
+				                  		<td>0</td>
+				                  		<td>1</td>
+				                  		<td>500ms</td>
+				                	</tr>
+				                	<tr class="testSuccess">
+				                		<td rowspan="3" class="alignleft bgwhite"> DRH </td>
+				                  		<td class="alignleft"><i class="fa fa-circle circleSuccess"></i> DRH_mobile</td>
+				                  		<td>1</td>
+				                  		<td>0</td>
+				                  		<td>0</td>
+				                  		<td>1</td>
+				                  		<td>2000ms</td>
+				                	</tr>
+				                	<tr class="testSuccess">
+				                  		<td class="alignleft"><i class="fa fa-circle circleSuccess"></i> DRH_mobile2</td>
+				                  		<td>1</td>
+				                  		<td>0</td>
+				                  		<td>0</td>
+				                  		<td>1</td>
+				                  		<td>250ms</td>
+				                	</tr>
+				                	<tr class="testSkipped">
+				                  		<td class="alignleft"><i class="fa fa-circle circleSkipped"></i> DRH_mobile3</td>
+				                  		<td>0</td>
+				                  		<td>0</td>
+				                  		<td>1</td>
+				                  		<td>1</td>
+				                  		<td>250ms</td>
+				                	</tr>
+				           		</tbody>
+				           		<tfoot>
+	                				<tr>
+					                  	<th> </th>
+					                  	<th class="alignleft"> Total </th>
+					                  	<th> 2 </th>
+					                 	<th> 1 </th>
+					                 	<th> 2 </th>
+					                 	<th> 5 </th>
+					                 	<th>4000ms</th>
+					                </tr>
+				                </tfoot>
+				           	</table>
+				        </div>
+				    </div>
+				</div>
+			</div>
+		</section>
+
+	</div>
+
+	<script src="jQuery-2.2.0.min.js"></script>
+	<script src="bootstrap.min.js"></script>
+	<script src="Chart.min.js"></script>
+
+	<script>
+		$(function () {
+
+			var data = [
+	   		{
+			    value: 2,
+			    color: "#2BC400",
+			    label: "Success"
+			}, {
+			    value: 1,
+			    color: "#FF6666",
+			    label: "Failed"
+			}, {
+			    value: 2,
+			    color: "#00CCFF",
+			    label: "Skipped"
+			}];
+
+			var options = {
+	    		segmentShowStroke: true,
+			    animateRotate: true,
+			    animateScale: false,
+			    percentageInnerCutout: 0,
+			    segmentShowStroke: true,
+			    segmentStrokeColor: "#fff",
+			    segmentStrokeWidth: 2,
+			    animationSteps: 100,
+			    animationEasing: "easeOutBounce",
+			    tooltipTemplate: "<%if (label){%><%=label %>: <%}%><%= value %>",
+			    onAnimationComplete: function()
+        			{this.showTooltip(this.segments, true);},
+        		tooltipEvents: [],
+			    showTooltips: true,
+			}
+
+			var ctx = document.getElementById("pieChart").getContext("2d");
+			var myChart = new Chart(ctx).Doughnut(data, options);
+			//document.getElementById('pieChartLegend').innerHTML = myChart.generateLegend();
+
+		});
+
+</script>
+
+</body>
+</html>
