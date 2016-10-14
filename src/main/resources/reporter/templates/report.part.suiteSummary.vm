@@ -1,0 +1,78 @@
+<div class="pieChart">
+	<canvas id="pieChart" style="height:250px"></canvas>
+	<!--<div id="pieChartLegend" class="chart-legend"></div>-->
+</div>
+
+<section class="content-header">
+	<h1> Integration tests</h1>
+</section>
+
+<section class="content">
+	      	<div class="row">
+	        	<div class="col-xs-12">
+	          		<div class="box box-black">
+	            		<div class="box-body">
+	              			<table class="table">
+	                			<thead>
+	                				<tr>
+	                					<th class="alignleft"> Tests </th>
+					                  	<th class="alignleft"> Steps </th>
+					                  	<th> Passed Tests Count </th>
+					                 	<th> Failed Tests Count </th>
+					                 	<th> Skipped Tests Count </th>
+					                 	<th> Method Count </th>
+					                 	<th> Duration </th>
+					                </tr>
+				                </thead>
+				                <tbody>
+				                #**
+				                Check if there is failed or skipped step to determine the status of the test.
+				                *#
+			                	#foreach ($miniTestResult in $tests.entrySet())
+				                	#if ($miniTestResult.getKey().getInstancesFailed() >= 1 )
+				                	<tr class="testFailed">
+				                	#elseif ($miniTestResult.getKey().getInstancesSkipped() >= 1 )
+				                	<tr class="testSkipped">
+				                	#else 
+				                  	<tr class="testSuccess">
+				                	#end
+				                	
+				                	
+				                	
+				                	#**
+  									Check the suite name to add or not the first cell of the row. 
+  									It also count the number of occurence of suite name to parametrize the rowspan.
+									*#	
+				                	#if ($miniTestResult.getValue() != $suiteName)
+				                		#set ($nb = 0)
+				                		#foreach ($count in $tests.entrySet())
+				                			#if ($count.getValue() == $suiteName)
+				                			#set ($nb = $nb +1)
+				                			#end
+				                		#end
+				                		#set ($suiteName = $miniTestResult.getValue())
+				                		<td rowspan="$nb" class="alignleft bgwhite">$miniTestResult.getValue()</td>
+				                	#end
+			                  			<td class="alignleft"><i class="fa fa-circle circleFailed"></i><a href='./$files.get($miniTestResult.getKey().getName())'>$miniTestResult.getKey().getName()</a></td>
+				                		<td>$miniTestResult.getKey().getInstancesPassed()</td>
+				                  		<td>$miniTestResult.getKey().getInstancesFailed()</td>
+				                  		<td>$miniTestResult.getKey().getInstancesSkipped()</td>
+				                  		<td>$miniTestResult.getKey().getTotalMethod()</td>
+				                  		<td>$miniTestResult.getKey().getTimeExecution() sec.</td>
+				                	</tr>
+				                #end
+				           		</tbody>
+				           		<tfoot>
+	                				<tr>
+					                  	<th class="alignleft"> Total </th>
+					                  	<th> </th>
+					                  	<th> $total.getInstancesPassed() </th>
+					                 	<th> $total.getInstancesFailed() </th>
+					                 	<th> $total.getInstancesSkipped() </th>
+					                 	<th> $total.getTotalMethod() </th>
+					                 	<th>$totalRunTime</th>
+					                </tr>
+				                </tfoot>
+				           	</table>
+				        </div>
+				    </div>
