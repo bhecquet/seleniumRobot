@@ -1,0 +1,100 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html"
+    ; charset="utf-8" />
+
+    <title>SeleniumRobot</title>
+
+	<link rel="stylesheet" type="text/css" href="resources/templates/AdminLTE.min.css">
+	<link rel="stylesheet" type="text/css" href="resources/templates/bootstrap.min.css">
+    #if ($report.equals("complete"))
+    <link rel="stylesheet" type="text/css" href="resources/templates/seleniumRobot.css">
+    #else
+	<link rel="stylesheet" type="text/css" href="resources/templates/seleniumRobot_solo.css">
+    #end
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lobster+Two"> 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.5.0/css/font-awesome.min.css">
+    
+    <script src="resources/templates/jQuery-2.2.0.min.js"></script>
+	<script src="resources/templates/bootstrap.min.js"></script>
+	#if ($report.equals("complete"))
+	<script src="resources/templates/Chart.min.js"></script>
+	#else
+	<script src="resources/templates/app.min.js"></script>
+	#end
+	<script>
+		$(function () {
+
+			var data = [
+	   		{
+			    value: $('.testSuccess').length,
+			    color: "#2BC400",
+			    label: "Success"
+			}, {
+			    value: $('.testFailed').length,
+			    color: "#FF6666",
+			    label: "Failed"
+			}, {
+			    value: $('.testSkipped').length,
+			    color: "#00CCFF",
+			    label: "Skipped"
+			}];
+
+			var options = {
+	    		segmentShowStroke: true,
+			    animateRotate: true,
+			    animateScale: false,
+			    percentageInnerCutout: 0,
+			    segmentShowStroke: true,
+			    segmentStrokeColor: "#fff",
+			    segmentStrokeWidth: 2,
+			    animationSteps: 100,
+			    animationEasing: "easeOutBounce",
+			    tooltipTemplate: "<%if (label){%><%=label %>: <%}%><%= value %>",
+			    onAnimationComplete: function()
+        			{this.showTooltip(this.segments, true);},
+        		tooltipEvents: [],
+			    showTooltips: true,
+			}
+
+			var ctx = document.getElementById("pieChart").getContext("2d");
+			var myChart = new Chart(ctx).Doughnut(data, options);
+			//document.getElementById('pieChartLegend').innerHTML = myChart.generateLegend();
+
+		});
+
+</script>
+
+</head>
+
+<body>
+	#if ($report.equals("complete"))
+	<div class="wrapper">
+		<header class='main-header'>
+		    <a href='http://www.seleniumtests.com/2013/10/announcing-selenium-tests-automation.html'>SeleniumRobot</a><br/>
+		</header>
+	</div>
+	#else
+		#if ($header == "passed")
+	<div class="wrapper">
+		<header class='main-header header-success'>
+		    <a href='http://www.seleniumtests.com/2013/10/announcing-selenium-tests-automation.html'>SeleniumRobot</a><br/>
+		</header>
+	</div>
+	#elseif ($header == "failed")
+	<div class="wrapper">
+		<header class='main-header header-failed'>
+		    <a href='http://www.seleniumtests.com/2013/10/announcing-selenium-tests-automation.html'>SeleniumRobot</a><br/>
+		</header>
+	</div>
+	#else
+	<div class="wrapper">
+		<header class='main-header header-skipped'>
+		    <a href='http://www.seleniumtests.com/2013/10/announcing-selenium-tests-automation.html'>SeleniumRobot</a><br/>
+		</header>
+	</div>
+	#end
+	#end
+	<div class="container">
+		
