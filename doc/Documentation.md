@@ -1,6 +1,6 @@
 # SeleniumRobot documentation #
 
-## Introduction ##
+## 1. Introduction ##
 SeleniumRobot is a test framework based on Selenium & Appium API to ease Web and Mobile testing. It's based on the seleniumtestsframework open-source project [https://github.com/tarun3kumar/seleniumtestsframework](https://github.com/tarun3kumar/seleniumtestsframework)
 
 Main features are:
@@ -26,9 +26,9 @@ Main features are:
 - Replay on failure
 - Selenium error recovery
 
-## Installation ##
+## 2. Installation ##
 
-### Development environment ###
+### 2.1 Development environment ###
 SeleniumRobot is developped using eclipse IDE. Following plugins are mandatory:
 
 - aspectj plugin (AJDT): use the dev version are older versions are not compatible with recent eclipse versions
@@ -95,7 +95,7 @@ For publishing artifacts to OSS Sonatype server
       <password><your_password></password>
     </server>
 
-### Execution environment ###
+### 2.2 Execution environment ###
 Execution environment needs at least Java 8. SeleniumRobot is compatible with Windows, Mac OS and Linux.
 Depending on your tests, you should consider install:
 
@@ -104,9 +104,9 @@ Depending on your tests, you should consider install:
 - Android SDK / Genymotion to test on android simulator / emulator
 - XCode (Mac OS X) to test on iPhone Simulator 
 
-## Test writting ##
+## 3. Test writting ##
 
-### Create a new test application ###
+### 3.1 Create a new test application ###
 A "test application" is the code specific to the Web or Mobile application under test. It consists of testNG files, Cucumber feature files, configurations and Java implementation files.
 
 Use seleniumRobot-example project as a base to develop your own test application
@@ -129,7 +129,7 @@ If pure TestNG mode is used, this package should not exist.
 
 ![](images/package_structure.png)
 
-### PageObject ###
+### 3.2 PageObject ###
 PageObject is a design pattern that helps writing maintainable selenium applications. Each screen of the website or mobile application is a class.
 This class contains:
 
@@ -180,7 +180,7 @@ Example of a shopping cart class:
 **WARN:** If you write your class combined with cucumber feature (methods annotated with @Given, @When, ...), only write methods returning `void`. Else, report will contain new page create step twice.
 
 
-### Write a test ###
+### 3.3 Write a test ###
 A test is a suite of steps defined in several page objects. By convention, they are located in the `tests` folder
 Assuming that the right objects are created, a test looks like:
     
@@ -208,13 +208,8 @@ A typical method whould be
 
 #### TestNG file ####
 For tests extending SeleniumTestPlan, the testNg XML looks like (minimal requirements):
-**WARN**: listeners are mandatory for a full featured seleniumRobot
 
 	<suite name="Integration tests" parallel="false" verbose="1" thread-count="1">
-	    <listeners>
-	        <listener class-name="com.seleniumtests.reporter.SeleniumTestsReporter" />
-	        <listener class-name="com.seleniumtests.core.testretry.TestRetryListener" />
-	    </listeners>
 
 	    <test name="order">	    	
 	        <classes>
@@ -227,7 +222,7 @@ For tests extending SeleniumTestPlan, the testNg XML looks like (minimal require
 	    </test>
 	</suite>
 
-### Write a cucumber test ###
+### 3.4 Write a cucumber test ###
 Cucumber styled tests rely on a `.feature` file where each test step is defined. Look at [https://cucumber.io/docs/reference](https://cucumber.io/docs/reference) for more information about writing a feature file.
 
 Each line in the feature file must correspond to an implementation inside java code through annotation
@@ -254,14 +249,9 @@ Each line in the feature file must correspond to an implementation inside java c
 
 #### TestNG file ####
 XML testNg file looks like:
-**WARN**: listeners are mandatory for a full featured seleniumRobot
 
 	<!DOCTYPE suite SYSTEM "http://beust.com/testng/testng-1.0.dtd" >
 	<suite name="Integration tests" parallel="false" verbose="1" thread-count="1">
-	    <listeners>
-	        <listener class-name="com.seleniumtests.reporter.SeleniumTestsReporter" />
-	        <listener class-name="com.seleniumtests.core.testretry.TestRetryListener" />
-	    </listeners>
 	
 		<parameter name="cucumberPackage" value="com.infotel.seleniumRobot.jpetstore" />
 	    
@@ -278,7 +268,7 @@ XML testNg file looks like:
 
 `cucumberPackage` parameter is mandatory so that framework knows where implementation code resides
 
-### Working with frames ###
+### 3.5 Working with frames ###
 In case an HTML element has to be searched inside an iFrame there are 2 ways to handle this
 
 #### Selenium way ####
@@ -310,7 +300,7 @@ This way, each time an action is performed on the element, SeleniumRobot will:
 
 If an error occurs during one of these actions, SeleniumRobot will retry
 
-### Configure test scripts ###
+### 3.6 Configure test scripts ###
 There are several ways to make values in test script change according to test environment, executed test, ...
 
 #### XML configuration ####
@@ -339,7 +329,7 @@ Each webpage can use the configurations defined above using (getting variable â€
 
 ![](images/get_param_example.png)
 
-### Test script configuration mapping ###
+### 3.7 Test script configuration mapping ###
 #### Mapping files utility ####
 
 Mapping file give possibility to call an element in a web page with a more accessible and understandable word. This way your code gain clarity for a non technical user.
@@ -361,7 +351,7 @@ between [ ] you define the web page where to use the following definitions. Next
 
 In the corresponding pageObject you can use mapping words to search elements using : locateBy(map:caller_word) or by.(map:caller_word). It will search the element in the page which is defined by the technical word. 
 
-### Optional features ###
+### 3.8 Optional features ###
 Here will be described features that may be used to improve test
 
 #### Soft assertions ####
@@ -369,9 +359,9 @@ By default, inside a test, checks will be done using TestNG `Assert` class
 On assert failure, test will continue but error will be reported
 If this behaviour is not expected, then use the parameter `softAssertEnabled` and set it to false
 
-## Run tests ##
+## 4. Run tests ##
 
-### Configurations ###
+### 4.1 Configurations ###
 Below is the list of all parameters accepted in testing xml file. These parameters may also be passed java properties (-D<paramName>=<value>)
 
 | Param name       			| Default 	| Description  |
@@ -434,7 +424,7 @@ Other parameters, not accepted in XML file but allowed on command line
 | -------------------------	| ------- 	| ------------ |
 | testRetryCount			| 2			| Number of times a failed test is retried. Set to 0 for no retry
 
-### Test with Appium locally ###
+### 4.2 Test with Appium locally ###
 #### Application test on android ####
 
     <test name="tnr_appium_mobile_app" parallel="false">
@@ -464,7 +454,7 @@ Other parameters, not accepted in XML file but allowed on command line
 `app` is the path of the application file. It can be an URL. If access to URL is restricted, use the pattern "http://<user>:<password>@<host>:<port>/path"
 
 
-### Test with SauceLabs ###
+### 4.3 Test with SauceLabs ###
 
 	<test name="tnr_sauce_mobile_app" parallel="false">
     	<parameter name="cucumberTests" value="Configuration" />
@@ -484,7 +474,7 @@ Other parameters, not accepted in XML file but allowed on command line
         </packages>
     </test>
 
-### Test with Testdroid ###
+### 4.4 Test with Testdroid ###
 
 	<test name="tnr_testdroid_mobile_app" parallel="false">
     	<parameter name="cucumberTests" value="Configuration" />
@@ -507,34 +497,34 @@ Other parameters, not accepted in XML file but allowed on command line
         </packages>
     </test>
 
-## Development ##
+## 5. Development ##
 
-### Import project ###
+### 5.1 Import project ###
 eclipse project file is provided to avoid eclipse project configuration
 Import this project into eclipse.
 
 In case eclipse does not weave aspects (.aj files do not have the 'A' icon), check in build path parameters that **/*.aj files are included to "sources on build path)
 
-### Build ###
+### 5.2 Build ###
 Create build (for core and test apps):
 
 	mvn clean package
 
 Build creates a file named seleniumBot-core.zip. 
 
-### Test ###
+### 5.3 Test ###
 SeleniumRobot contains Unit tests, executed through the maven "test" phase. They tend to be quick and do not use any browser. They are configured using the `data/core/testng/tu.xml` file.
 
 Integration tests are executed in the maven "verify" phase. They are configured using the `data/core/testng/ti.xml` file. These tests can start browser to check specific features.
 
-### Deploy ###
+### 5.4 Deploy ###
 Unzip this file to any folder.
 
 Also unzip the test app and you should get this folder structure:
 
 ![](images/folder_structure.png)
 
-### Release code ###
+### 5.5 Release code ###
 When a SNAPSHOT version is ready to be released, use
 
     mvn release:prepare release:perform
@@ -542,8 +532,8 @@ When a SNAPSHOT version is ready to be released, use
 Check installation requirements to perform a release
 
 
-## Interfacing with tests managers ##
-### Squash TM/TA ###
+## 6. Interfacing with tests managers ##
+### 6.1 Squash TM/TA ###
 SeleniumRobot can work with Squash TA by using an intermediate .java file. This file handles execution of test framework using a command line.
 Moreover, SeleniumRobot can generate .ta, pom.xml and .java files automatically. See "TA files generation" part.
 **Following instruction expect the use of generated files**
@@ -648,10 +638,10 @@ by
 
     -Dta.tmcallback.reportname=SeleniumRobot_Report
 
-## How To ##
+## 7. How To ##
 In this section, we will describe how to add some useful features to test applications (file comparison, log reading, ...)
 
-### Compare 2 XML files ###
+### 7.1 Compare 2 XML files ###
 Use the XMLUnit api: https://github.com/xmlunit/user-guide/wiki
 
 Add dependency to pom.xml
@@ -669,7 +659,7 @@ Use the following java code
     Diff diff = DiffBuilder.compare(source).withTest(source2).build();
     System.out.println(diff);
     
-### Write working unit tests ###
+### 7.2 Write working unit tests ###
 By default, SeleniumTestsContext enables SoftAssertions, so any unit test with assertion failure will not really fail. To prevent this behaviour, subclass all Unit-Test class from 
 
 - `GenericTest` : parent class for all unit tests

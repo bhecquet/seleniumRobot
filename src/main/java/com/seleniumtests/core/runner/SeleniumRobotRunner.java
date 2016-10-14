@@ -27,12 +27,16 @@ import org.testng.annotations.AfterMethod;
 import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.BeforeSuite;
+import org.testng.annotations.Listeners;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.TearDownService;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.reporter.TestLogging;
 
+@Listeners({com.seleniumtests.reporter.SeleniumTestsReporter.class, 
+			com.seleniumtests.core.testretry.TestRetryListener.class, 
+			com.seleniumtests.reporter.JMeterReporter.class})
 public class SeleniumRobotRunner {
 	
 	protected static final Logger logger = TestLogging.getLogger(SeleniumRobotRunner.class);
