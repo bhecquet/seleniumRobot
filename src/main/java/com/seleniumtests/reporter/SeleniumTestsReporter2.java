@@ -553,7 +553,9 @@ public class SeleniumTestsReporter2 implements IReporter, ITestListener, IInvoke
 				}
 				quantityFail += q;
 				mini.setInstancesFailed(q);
-				mini.setTimeExecution((overview.getEndDate().getTime() - overview.getStartDate().getTime())/1000);
+				
+				// TODO: do not compile
+				//mini.setTimeExecution((overview.getEndDate().getTime() - overview.getStartDate().getTime())/1000);
 				timeStart = Math.min(overview.getStartDate().getTime(), timeStart);
 				timeEnd = Math.max(overview.getEndDate().getTime(), timeEnd);
 				tests2.put(mini, suite.getName());

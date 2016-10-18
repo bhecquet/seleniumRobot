@@ -98,7 +98,7 @@ public class SeleniumRobotRunner {
         }
 
         WebUIDriver.cleanUp();
-        logger.info(Thread.currentThread() + " Finish method " + method.getName());
+        logger.info(TestLogging.END_TEST_PATTERN + method.getName());
     }
     
     @BeforeSuite(alwaysRun = true)
@@ -106,16 +106,22 @@ public class SeleniumRobotRunner {
         start = new Date();
         SeleniumTestsContextManager.initGlobalContext(testContext);
         SeleniumTestsContextManager.initThreadContext(testContext);
+        TestLogging.updateLogger();
     }
     
     @AfterSuite(alwaysRun = true)
     public void afterTestSuite() {
         logger.info("Test Suite Execution Time: " + (new Date().getTime() - start.getTime()) / 1000 / 60 + " minutes.");
+        try {
+			TestLogging.parseLogFile();
+		} catch (IOException e) {
+			logger.error("cannot read log file");
+		}
     }
     
     @BeforeMethod(alwaysRun = true)
     public void beforeTestMethod(final Object[] parameters, final Method method, final ITestContext testContex) {
-        logger.info(Thread.currentThread() + " Start method " + method.getName());
+        logger.info(TestLogging.START_TEST_PATTERN + method.getName());
         SeleniumTestsContextManager.initThreadContext(testContex);
         SeleniumTestsContextManager.getThreadContext().setTestMethodSignature(buildMethodSignature(method, parameters));
     }   

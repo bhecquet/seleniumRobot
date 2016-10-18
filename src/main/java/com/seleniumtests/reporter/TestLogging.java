@@ -16,33 +16,43 @@
  */
 package com.seleniumtests.reporter;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Appender;
 import org.apache.log4j.BasicConfigurator;
+import org.apache.log4j.FileAppender;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
-
 import org.testng.ITestResult;
 import org.testng.Reporter;
 
 import com.google.gdata.util.common.html.HtmlToText;
+import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.driver.screenshots.ScreenShot;
-import com.seleniumtests.util.StringUtility;
 
 /**
  * Log methods for test operations.
  */
 public class TestLogging {
 
-    private static Map<String, Map<String, Map<String, List<String>>>> logMap = Collections.synchronizedMap(
-            new HashMap<String, Map<String, Map<String, List<String>>>>());
+	private static Map<ITestResult, List<TestStep>> testsSteps = Collections.synchronizedMap(new HashMap<>());
+	private static Map<String, String> testLogs = Collections.synchronizedMap(new HashMap<>());
+	private static final String LOG_PATTERN = " %-5p %d [%t] %C{1}: %m%n";
+	private static final String LOG_FILE_NAME = "seleniumRobot.log";
+	private static final Pattern LOG_FILE_PATTERN = Pattern.compile(".*?\\d \\[(.*?)\\](.*)");
+	
+	public static final String START_TEST_PATTERN = "Start method ";
+	public static final String END_TEST_PATTERN = "Finish method ";
 
     private TestLogging() {
 		// As a utility class, it is not meant to be instantiated.
@@ -58,39 +68,86 @@ public class TestLogging {
         log(formattedMessage, false, false);
     }
     
+    /**
+     * Update root logger so that logs are made available in a log file
+     * This code is delayed so that SeleniumTestsContext is initialized
+     * This is also not called for unit and integration tests
+     */
+    public static void updateLogger() {
+    	Appender fileLoggerAppender = Logger.getRootLogger().getAppender("FileLogger");
+    	if (fileLoggerAppender == null) {
+    		Logger rootLogger = Logger.getRootLogger();
+    		
+    		// clean output dir
+            String outputDir = SeleniumTestsContextManager.getGlobalContext().getOutputDirectory();
+        	try {
+				FileUtils.deleteDirectory(new File(outputDir));
+				new File(outputDir).mkdirs();
+			} catch (IOException e) {
+				// do nothing
+			}
+            
+            FileAppender fileAppender = new FileAppender();
+            fileAppender.setName("FileLogger");
+            fileAppender.setFile(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory() + "/" + LOG_FILE_NAME);
+            fileAppender.setLayout(new PatternLayout(LOG_PATTERN));
+            fileAppender.setThreshold(Level.INFO);
+            fileAppender.activateOptions();
+            rootLogger.addAppender(fileAppender);
+    	}
+    }
+    
     public static Logger getLogger(final Class<?> cls) {
         boolean rootIsConfigured = Logger.getRootLogger().getAllAppenders().hasMoreElements();
         if (!rootIsConfigured) {
+        	
             BasicConfigurator.configure();
-            Logger.getRootLogger().setLevel(Level.INFO);
+            Logger rootLogger = Logger.getRootLogger();
+            rootLogger.setLevel(Level.INFO);
 
-            Appender appender = (Appender) Logger.getRootLogger().getAllAppenders().nextElement();
-            appender.setLayout(new PatternLayout(" %-5p %d [%t] %C{1}: %m%n"));
+            Appender appender = (Appender) rootLogger.getAllAppenders().nextElement();
+            appender.setLayout(new PatternLayout(LOG_PATTERN));
         }
 
         return Logger.getLogger(cls);
     }
+    
+    /**
+     * Parses log file and returns only lines of the current thread
+     * @return
+     * @throws IOException 
+     */
+    public static void parseLogFile() throws IOException {
+    	List<String> logLines = FileUtils.readLines(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory() + "/" + LOG_FILE_NAME));
+    	Map<String, String> testPerThread = new HashMap<>();
+    	
+    	for (String line: logLines) {
+    		Matcher matcher = LOG_FILE_PATTERN.matcher(line);
+    		if (matcher.matches()) {
+    			String thread = matcher.group(1);
+    			String content = matcher.group(2);
+    			
+    			if (content.contains("SeleniumRobotRunner: " + START_TEST_PATTERN)) {
+    				String testName = content.replace("SeleniumRobotRunner: " + START_TEST_PATTERN, "").trim();
+    				testPerThread.put(thread, testName);
+    				testLogs.put(testName, "");
+    			}
+    			if (testPerThread.get(thread) != null) {
+    				String testName = testPerThread.get(thread);
+    				testLogs.put(testName, testLogs.get(testName).concat(content + "\n"));
+    			}
+    		}
+    	}
+    }
+    
 
+    // TODO: remove this method
     public static Map<String, Map<String, List<String>>> getPageListenerLog(final String pageListenerClassName) {
-        return logMap.get(pageListenerClassName);
+        return null;
     }
 
+    // TODO: remove this method
     public static List<String> getPageListenerLogByMethodInstance(final ITestResult testResult) {
-
-        for (Entry<String, Map<String, Map<String, List<String>>>> listenerEntry : logMap.entrySet()) {
-            if (!PluginsHelper.getInstance().isTestResultEffected(listenerEntry.getKey())) {
-                continue;
-            }
-
-            Map<String, Map<String, List<String>>> pageMap = listenerEntry.getValue();
-            for (Entry<String, Map<String, List<String>>> pageEntry : pageMap.entrySet()) {
-                Map<String, List<String>> errorMap = pageEntry.getValue();
-                String methodInstance = StringUtility.constructMethodSignature(testResult.getMethod()
-                            .getConstructorOrMethod().getMethod(), testResult.getParameters());
-                return errorMap.get(methodInstance);
-            }
-        }
-
         return new ArrayList<>();
     }
 
@@ -234,4 +291,8 @@ public class TestLogging {
         String formattedMessage = "<li><font color='#FFFF00'>" + message + "</font></li>";
         log(formattedMessage, false, false);
     }
+
+	public static Map<String, String> getTestLogs() {
+		return testLogs;
+	}
 }

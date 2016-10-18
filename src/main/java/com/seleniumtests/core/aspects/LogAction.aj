@@ -19,6 +19,7 @@ package com.seleniumtests.core.aspects;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.aspectj.lang.JoinPoint;
@@ -46,6 +47,7 @@ public class LogAction {
 	
 	private TestStep currentRootTestStep = null;
 	private TestStep parentTestStep = null;
+	private Date testStepStart = null;
 
 	/**
 	 * Intercept actions done through browser
@@ -114,11 +116,11 @@ public class LogAction {
 	}
 	
 	/**
-	 * Log any call to test steps (page object calls inside a SeleniumTestPlan subclass)
+	 * Log any call to test steps (page object calls inside a PageObject subclass)
 	 * @param joinPoint
 	 * @throws Throwable 
 	 */
-	@Around("this(com.seleniumtests.uipage.PageObject) && " +
+	@Around("this(com.seleniumtests.uipage.PageObject) && " +					// caller is a PageObject
 			"(call(public * com.seleniumtests.uipage.PageObject+.* (..))"
 			+ "&& !call(public * com.seleniumtests.uipage.PageObject.* (..)))"			
 			)
@@ -154,7 +156,7 @@ public class LogAction {
 	 * @return
 	 * @throws Throwable
 	 */
-	@Pointcut("execution(@cucumber.api.java.en..* public * * (..)) && if()")
+	@Pointcut("(execution(@cucumber.api.java.en.When public * * (..)) || execution(@cucumber.api.java.en.Given public * * (..))) && if()")
 	public static boolean isCucumberTest(ProceedingJoinPoint joinPoint) {
 		return SeleniumRobotRunner.isCucumberTest();
 	}
@@ -170,9 +172,9 @@ public class LogAction {
 	 * @throws Throwable 
 	 */
 	@Around(
-			"(!this(com.seleniumtests.uipage.PageObject) && " +
-			"(call(public * com.seleniumtests.uipage.PageObject+.* (..))"
-			+ "&& !call(public * com.seleniumtests.uipage.PageObject.* (..)))"
+			"(!this(com.seleniumtests.uipage.PageObject) && " +							// caller is not a PageObject
+			"(call(public * com.seleniumtests.uipage.PageObject+.* (..))"				// calls to methods in subclasses of PageObject class
+			+ "&& !call(public * com.seleniumtests.uipage.PageObject.* (..)))"			// not calls to methods inside PageObject class
 			+ "|| call(private * com.seleniumtests.uipage.PageObject.openPage (..)))"
 			)
 	public Object logNonCucumberTestStep(ProceedingJoinPoint joinPoint) throws Throwable {
@@ -192,6 +194,7 @@ public class LogAction {
 		if (currentRootTestStep == null) {
 			currentRootTestStep = currentStep;
 			parentTestStep = currentRootTestStep;
+			testStepStart = new Date();
 			rootStep = true;
 		} else {
 			parentTestStep.addStep(currentStep);
@@ -206,6 +209,7 @@ public class LogAction {
 			throw e;
 		} finally {
 			if (rootStep) {
+				currentRootTestStep.setDuration(testStepStart.getTime() - new Date().getTime());
 				TestLogging.logTestStep(currentRootTestStep);	
 				currentRootTestStep = null;
 				parentTestStep = null;
