@@ -70,7 +70,6 @@ public class SeleniumTestsContextManager {
 
     public static SeleniumTestsContext getGlobalContext() {
         if (globalContext == null) {
-            logger.info("Initialize default GlobalContext");
             initGlobalContext(new DefaultTestNGContext());
         }
 
@@ -79,7 +78,6 @@ public class SeleniumTestsContextManager {
 
     public static SeleniumTestsContext getThreadContext() {
         if (threadLocalContext.get() == null) {
-            logger.info("Initialize default ThreadContext");
             initThreadContext(null);
         }
 

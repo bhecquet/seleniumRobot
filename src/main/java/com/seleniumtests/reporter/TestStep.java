@@ -27,12 +27,22 @@ import java.util.List;
  */
 public class TestStep extends TestAction {
 	private List<TestAction> stepActions;
+	private Long duration;
 	
 	public TestStep(String name) {
 		super(name, false);
 		stepActions = new ArrayList<>();
+		duration = null;
 	}
 	
+	public Long getDuration() {
+		return duration;
+	}
+
+	public void setDuration(Long duration) {
+		this.duration = duration;
+	}
+
 	public List<TestAction> getStepActions() {
 		return stepActions;
 	}

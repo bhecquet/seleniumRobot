@@ -33,6 +33,7 @@ import org.openqa.selenium.Proxy.ProxyType;
 import org.openqa.selenium.WebDriverException;
 import org.testng.ITestContext;
 import org.testng.ITestResult;
+import org.testng.TestRunner;
 
 import com.seleniumtests.core.config.ConfigReader;
 import com.seleniumtests.customexception.ConfigurationException;
@@ -235,7 +236,7 @@ public class SeleniumTestsContext {
         updatePlatformVersion();
         
         if (context != null) {
-            setContextAttribute(OUTPUT_DIRECTORY, null, context.getOutputDirectory(), null);
+        	setOutputDirectory(getValueForTest(OUTPUT_DIRECTORY, System.getProperty(OUTPUT_DIRECTORY)), context);
 
             // parse other parameters that are defined in testng xml but not defined
             // in this context
@@ -1131,6 +1132,15 @@ public class SeleniumTestsContext {
     		setAttribute(NEW_COMMAND_TIMEOUT, timeout);
     	} else {
     		setAttribute(NEW_COMMAND_TIMEOUT, 120);
+    	}
+    }
+    
+    public void setOutputDirectory(String outputDir, ITestContext context) {
+    	if (outputDir == null) {
+    		setAttribute(OUTPUT_DIRECTORY, context.getOutputDirectory());
+    	} else {
+    		((TestRunner)context).setOutputDirectory(outputDir);
+    		setAttribute(OUTPUT_DIRECTORY, outputDir);
     	}
     }
     

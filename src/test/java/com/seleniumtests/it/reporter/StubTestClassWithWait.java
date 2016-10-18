@@ -16,26 +16,32 @@
  */
 package com.seleniumtests.it.reporter;
 
-import org.testng.Assert;
+import org.apache.log4j.Logger;
 import org.testng.annotations.Test;
 
+import com.seleniumtests.core.runner.SeleniumTestPlan;
 import com.seleniumtests.reporter.TestLogging;
-import com.seleniumtests.reporter.TestStep;
+import com.seleniumtests.util.helper.WaitHelper;
 
-public class StubTestClass {
+public class StubTestClassWithWait extends SeleniumTestPlan {
+
+	private static Logger logger = TestLogging.getLogger(StubTestClass.class);
 
 	@Test(groups="stub")
 	public void test1() {
-		TestStep step1 = new TestStep("etape 1");
-		step1.setDuration(1230L);
-		TestStep step2 = new TestStep("etape 2");
-		step2.setDuration(14030L);
-		TestLogging.logTestStep(step1);
-		TestLogging.logTestStep(step2);
+		logger.info("test1 starting");
+		logger.info("test1 finished");
 	}
 	
 	@Test(groups="stub")
-	public void testInError() {
-		Assert.fail("error");
+	public void test2() {
+		logger.info("test2 starting");
+		logger.info("test2 finished");
+	}
+	
+	@Test(groups="stub")
+	public void test3() {
+		logger.info("test3 starting");
+		logger.info("test3 finished");
 	}
 }
