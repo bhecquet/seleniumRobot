@@ -24,6 +24,7 @@ import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.UnsupportedCommandException;
