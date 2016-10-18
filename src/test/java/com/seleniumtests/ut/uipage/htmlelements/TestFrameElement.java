@@ -83,6 +83,7 @@ public class TestFrameElement extends MockitoTest {
 		when(driver.switchTo()).thenReturn(locator);
 		
 		when(element.getSize()).thenReturn(new Dimension(1, 1));
+		when(element.isDisplayed()).thenReturn(true);
 	}
 
 	@Test(groups={"ut"})

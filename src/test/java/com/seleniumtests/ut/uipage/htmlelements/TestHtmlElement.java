@@ -17,6 +17,7 @@
 package com.seleniumtests.ut.uipage.htmlelements;
 
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.verify;
 
@@ -115,17 +116,22 @@ public class TestHtmlElement extends MockitoTest {
 		when(element.getText()).thenReturn("text");
 		when(element.isDisplayed()).thenReturn(true);
 		when(element.isEnabled()).thenReturn(true);
+
+		when(subElement1.isDisplayed()).thenReturn(true);
+		when(subElement2.isDisplayed()).thenReturn(true);
 		
 		when(mobileElement.getCenter()).thenReturn(new Point(2, 2));
+
+		when(mobileElement.isDisplayed()).thenReturn(true);
 	}
 	
 	private void finalCheck(boolean findElement) throws Exception {
 		// check we called getDriver before using it
-		PowerMockito.verifyPrivate(el).invoke("getDriver");
+		PowerMockito.verifyPrivate(el).invoke("updateDriver");
 		
 		// isElementPresent does not call findElement as we use WebDriverWait
 		if (findElement) {
-			PowerMockito.verifyPrivate(el).invoke("findElement");
+			PowerMockito.verifyPrivate(el).invoke("findElement", anyBoolean());
 		}
 	}
 

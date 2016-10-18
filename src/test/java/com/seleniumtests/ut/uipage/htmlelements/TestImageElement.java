@@ -56,6 +56,6 @@ public class TestImageElement extends MockitoTest {
 		Assert.assertEquals(el.getUrl(), "http://nowhere.com/jpg");
 		
 		// check we called getDriver before using it
-		PowerMockito.verifyPrivate(el, Mockito.times(3)).invoke("getDriver");
+		PowerMockito.verifyPrivate(el, Mockito.times(3)).invoke("updateDriver");
 	}
 }

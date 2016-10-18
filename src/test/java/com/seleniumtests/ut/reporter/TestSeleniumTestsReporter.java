@@ -17,12 +17,10 @@
 package com.seleniumtests.ut.reporter;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.Spy;
 import org.openqa.selenium.WebDriverException;
 import org.testng.IResultMap;
 import org.testng.ITestContext;

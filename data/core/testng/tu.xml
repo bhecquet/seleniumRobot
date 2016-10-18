@@ -23,6 +23,20 @@
 
         <packages>
             <package name="com.seleniumtests.ut.*" />
+        </packages>
+    </test>
+    
+    <test name="Reporting Unit tests" parallel="false">
+    	<parameter name="EXCLUDE_FROM_SQUASH_TA" value="" />
+    	<parameter name="variable1" value="value2" />
+        
+        <groups>
+            <run>
+                <include name="ut"/>
+            </run>
+        </groups>
+
+        <packages>
             <package name="com.seleniumtests.it.reporter.*" />
         </packages>
     </test>

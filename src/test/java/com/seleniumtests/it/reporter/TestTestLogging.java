@@ -13,7 +13,6 @@ import org.testng.xml.XmlTest;
 
 import com.seleniumtests.GenericTest;
 import com.seleniumtests.core.SeleniumTestsContextManager;
-import com.seleniumtests.core.runner.SeleniumTestPlan;
 import com.seleniumtests.reporter.TestLogging;
 
 public class TestTestLogging extends GenericTest {
