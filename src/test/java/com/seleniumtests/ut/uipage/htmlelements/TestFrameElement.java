@@ -248,7 +248,6 @@ public class TestFrameElement extends MockitoTest {
 		
 		SelectList el = new SelectList("", By.id("el"));
 		el.getSelectedText();
-		
 		verify(locator, times(0)).frame(frameEl);
 	}
 	

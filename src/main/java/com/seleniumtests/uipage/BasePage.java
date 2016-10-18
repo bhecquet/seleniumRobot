@@ -25,6 +25,7 @@ import org.openqa.selenium.NoSuchWindowException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedCondition;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.Assert;
 
@@ -73,6 +74,7 @@ public abstract class BasePage {
     }
     
     public Alert getAlert() {
+    	new WebDriverWait(driver, 2).until(ExpectedConditions.alertIsPresent());
         return driver.switchTo().alert();
     }
 
