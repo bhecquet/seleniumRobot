@@ -127,8 +127,8 @@ public class TestLogging {
     			String thread = matcher.group(1);
     			String content = matcher.group(2);
     			
-    			if (content.contains("SeleniumRobotRunner: " + START_TEST_PATTERN)) {
-    				String testName = content.replace("SeleniumRobotRunner: " + START_TEST_PATTERN, "").trim();
+    			if (content.contains(START_TEST_PATTERN)) {
+    				String testName = content.split(START_TEST_PATTERN)[1].trim();
     				testPerThread.put(thread, testName);
     				testLogs.put(testName, "");
     			}

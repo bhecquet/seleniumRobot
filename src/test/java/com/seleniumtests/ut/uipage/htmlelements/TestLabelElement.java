@@ -52,6 +52,6 @@ public class TestLabelElement extends MockitoTest {
 		Assert.assertEquals(el.getText(), "textual label");
 		
 		// check we called getDriver before using it
-		PowerMockito.verifyPrivate(el, Mockito.times(1)).invoke("getDriver");
+		PowerMockito.verifyPrivate(el, Mockito.times(1)).invoke("updateDriver");
 	}
 }
