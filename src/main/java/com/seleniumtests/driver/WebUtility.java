@@ -48,8 +48,6 @@ public class WebUtility {
         }
     	
         try {
-            TestLogging.logWebStep("Resize browser window to width " + width + " height " + height, false);
-
             Dimension size = new Dimension(width, height);
             driver.manage().window().setPosition(new Point(0, 0));
             driver.manage().window().setSize(size);

@@ -16,61 +16,71 @@
 	                			<thead>
 	                				<tr>
 	                					<th class="alignleft"> Tests </th>
-					                  	<th class="alignleft"> Steps </th>
-					                  	<th> Passed Tests Count </th>
-					                 	<th> Failed Tests Count </th>
-					                 	<th> Skipped Tests Count </th>
-					                 	<th> Method Count </th>
+					                  	<th class="alignleft"> Methods </th>
+					                  	<th> Passed Steps Count </th>
+					                 	<th> Failed Steps Count </th>
+					                 	<th> Steps Count </th>
 					                 	<th> Duration </th>
 					                </tr>
 				                </thead>
 				                <tbody>
-				                #**
-				                Check if there is failed or skipped step to determine the status of the test.
-				                *#
-			                	#foreach ($miniTestResult in $tests.entrySet())
-				                	#if ($miniTestResult.getKey().getInstancesFailed() >= 1 )
-				                	<tr class="testFailed">
-				                	#elseif ($miniTestResult.getKey().getInstancesSkipped() >= 1 )
-				                	<tr class="testSkipped">
-				                	#else 
-				                  	<tr class="testSuccess">
-				                	#end
-				                	
-				                	
-				                	
-				                	#**
-  									Check the suite name to add or not the first cell of the row. 
-  									It also count the number of occurence of suite name to parametrize the rowspan.
-									*#	
-				                	#if ($miniTestResult.getValue() != $suiteName)
-				                		#set ($nb = 0)
-				                		#foreach ($count in $tests.entrySet())
-				                			#if ($count.getValue() == $suiteName)
-				                			#set ($nb = $nb +1)
-				                			#end
-				                		#end
-				                		#set ($suiteName = $miniTestResult.getValue())
-				                		<td rowspan="$nb" class="alignleft bgwhite">$miniTestResult.getValue()</td>
-				                	#end
-			                  			<td class="alignleft"><i class="fa fa-circle circleFailed"></i><a href='./$files.get($miniTestResult.getKey().getName())'>$miniTestResult.getKey().getName()</a></td>
-				                		<td>$miniTestResult.getKey().getInstancesPassed()</td>
-				                  		<td>$miniTestResult.getKey().getInstancesFailed()</td>
-				                  		<td>$miniTestResult.getKey().getInstancesSkipped()</td>
-				                  		<td>$miniTestResult.getKey().getTotalMethod()</td>
-				                  		<td>$miniTestResult.getKey().getTimeExecution() sec.</td>
-				                	</tr>
+				                #set ($totalPassed = 0)
+	                			#set ($totalFailed = 0)
+	                			#set ($totalSteps = 0)
+	                			#set ($testIdx = 0)
+				                
+			                	#foreach ($testContext in $tests.entrySet())
+			                		#foreach ($testResult in $testContext.value)
+			                			#set ($testIdx = $testIdx + 1)
+			                			#**
+			                			Compute step state for each test
+			                			*#
+			                			#set ($passedSteps = 0)
+			                			#set ($failedSteps = 0)
+			                			#set ($totalTestSteps = 0)
+			                			#set ($testDuration = ($testResult.getEndMillis() - $testResult.getStartMillis()) / 1000)
+			                			#foreach ($testStep in $steps.get($testResult))
+			                				#if ($testStep.getFailed())
+			                					#set ($failedSteps = $failedSteps + 1)
+			                				#else
+			                					#set ($passedSteps = $passedSteps + 1)
+			                				#end
+			                				#set ($totalTestSteps = $totalTestSteps + 1)
+			                			#end
+			                			#set ($totalPassed = $totalPassed + $passedSteps)
+			                			#set ($totalFailed = $totalFailed + $failedSteps)
+			                			#set ($totalSteps = $totalSteps + $totalTestSteps)
+			                		
+			                			#if ($testResult.getStatus() == 1)
+			                				<tr class="testSuccess">
+			                				#set ($circleClass = "circleSuccess")
+			                			#elseif ($testResult.getStatus() == 2)
+			                				<tr class="testFailed">
+			                				#set ($circleClass = "circleFailed")
+			                			#else 
+			                				<tr class="testSkipped">
+			                				#set ($circleClass = "circleSkipped")
+			                			#end 
+			                			<td>$testContext.key.getName()</td>
+			                			<td class="alignleft"><i class="fa fa-circle $circleClass"></i><a href='$testResult.getAttribute("methodResultFileName")'>$testResult.getName()</a></td>
+				                		
+				                		<td name="passed-$testIdx">$passedSteps</td>
+				                  		<td name="failed-$testIdx">$failedSteps</td>
+				                  		<td name="stepsTotal-$testIdx">$totalTestSteps</td>
+				                  		<td>$testDuration sec.</td>
+				                  		</tr>
+			                		
+			                		#end	
 				                #end
 				           		</tbody>
 				           		<tfoot>
 	                				<tr>
 					                  	<th class="alignleft"> Total </th>
 					                  	<th> </th>
-					                  	<th> $total.getInstancesPassed() </th>
-					                 	<th> $total.getInstancesFailed() </th>
-					                 	<th> $total.getInstancesSkipped() </th>
-					                 	<th> $total.getTotalMethod() </th>
-					                 	<th>$totalRunTime</th>
+					                  	<th name="totalPassed"> $totalPassed </th>
+					                 	<th name="totalFailed"> $totalFailed </th>
+					                 	<th name="totalSteps"> $totalSteps </th>
+					                 	<th></th>
 					                </tr>
 				                </tfoot>
 				           	</table>

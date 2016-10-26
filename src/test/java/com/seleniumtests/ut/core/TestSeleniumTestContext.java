@@ -400,19 +400,6 @@ public class TestSeleniumTestContext extends GenericTest {
 	}
 	
 	@Test(groups="ut context")
-	public void testReportGenerationConfig(final ITestContext testNGCtx, final XmlTest xmlTest) {
-		initThreadContext(testNGCtx);
-		SeleniumTestsContextManager.getThreadContext().setReportGenerationConfig("test");
-		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getReportGenerationConfig(), "test");
-	}
-	@Test(groups="ut context")
-	public void testReportGenerationConfigNull(final ITestContext testNGCtx, final XmlTest xmlTest) {
-		initThreadContext(testNGCtx);
-		SeleniumTestsContextManager.getThreadContext().setReportGenerationConfig(null);
-		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getReportGenerationConfig(), "summaryPerSuite");
-	}
-	
-	@Test(groups="ut context")
 	public void testCaptureSnapshot(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setCaptureSnapshot(false);

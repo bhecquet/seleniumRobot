@@ -37,7 +37,7 @@ public class SoftAssert {
 		} catch (AssertionError e) {
 			if (SeleniumTestsContextManager.getThreadContext().isSoftAssertEnabled()) {
 				SeleniumTestsContextManager.getThreadContext().addVerificationFailures(Reporter.getCurrentTestResult(), e);
-		        TestLogging.log("!!!FAILURE ALERT!!! - Assertion Failure: " + e.getMessage(), true, true);
+		        TestLogging.error("!!!FAILURE ALERT!!! - Assertion Failure: " + e.getMessage());
 		        return null;
 			} else {
 				throw e;

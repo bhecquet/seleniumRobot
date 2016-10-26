@@ -1,0 +1,31 @@
+
+	#if ($status.toString().equals("passed"))
+		<div class="box collapsed-box success">
+	#elseif ($status.toString().equals("failed"))
+		<div class="box collapsed-box failed">
+	#else
+		<div class="box collapsed-box skipped">
+	#end
+		<div class="box-header with-border">
+			<button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-plus"></i></button> Execution logs
+		</div>
+		<div class="box-body logs">
+			#if ($stacktrace)
+				<div class="message-error">
+				#set ($lineIdx = 0)
+				#foreach($line in $stacktrace)
+					#if ($lineIdx == 0)
+						<div>$line</div>
+					#else
+						<div class="stack-element">$line</div>
+					#end
+					#set ($lineIdx = $lineIdx + 1)
+				#end
+				</div>
+			#end
+			<br/>
+			#foreach($line in $logs)
+				<div>$line</div>
+			#end	
+		</div>
+	</div>

@@ -24,7 +24,6 @@ import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.UnsupportedCommandException;
@@ -205,25 +204,11 @@ public class PageObject extends BasePage implements IPage {
     protected void assertCurrentPage(final boolean log) {
 
         if (pageIdentifierElement != null && !pageIdentifierElement.isElementPresent()) {
-            try {
-                if (!SeleniumTestsContextManager.getThreadContext().getCaptureSnapshot()) {
-                    new ScreenshotUtil(driver).capturePageSnapshotOnException();
-                }
-            } catch (Exception e) {
-            	logger.error(e);
-            }
+            new ScreenshotUtil(driver).captureWebPageSnapshot();
 
             throw new NotCurrentPageException(getClass().getCanonicalName()
                     + " is not the current page.\nPageIdentifierElement " + pageIdentifierElement.toString()
                     + " is not found.");
-        }
-
-        if (log) {
-            TestLogging.logWebStep(
-                "assert \"" + getClass().getSimpleName() + "\" is the current page"
-                    + (pageIdentifierElement != null
-                        ? " (assert PageIdentifierElement " + pageIdentifierElement.toHTML() + " is present)." : "."),
-                false);
         }
     }
     
@@ -237,7 +222,7 @@ public class PageObject extends BasePage implements IPage {
     public static String param(String key) {
     	String value = SeleniumTestsContextManager.getThreadContext().getConfiguration().get(key);
     	if (value == null) {
-    		TestLogging.errorLogger(String.format("Variable %s is not defined", key));
+    		TestLogging.error(String.format("Variable %s is not defined", key));
     		return "";
     	}
     	return value;
@@ -274,7 +259,7 @@ public class PageObject extends BasePage implements IPage {
             imageFilePath = screenShot.getImagePath().replace(suiteName, outputDirectory);
         }
 
-        TestLogging.logWebOutput(title + " (" + TestLogging.buildScreenshotLog(screenShot) + ")", false);
+        TestLogging.logScreenshot(screenShot, false);
 
     }
 
@@ -290,7 +275,7 @@ public class PageObject extends BasePage implements IPage {
         }
 
         SeleniumTestsPageListener.informPageUnload(this);
-        TestLogging.logWebOutput(title +" close web page", false);
+        TestLogging.info(title +" close web page");
 
         boolean isMultipleWindow = false;
         if (driver.getWindowHandles().size() > 1) {
@@ -329,12 +314,7 @@ public class PageObject extends BasePage implements IPage {
      * @param  offsetY  in pixels from the current location to which the element should be moved, e.g., -300
      */
     public void dragAndDrop(final HtmlElement element, final int offsetX, final int offsetY) {
-        TestLogging.logWebStep(
-            "dragAndDrop " + element.toHTML() + " to offset(x,y): (" + offsetX + "," + offsetY + ")", false);
-        captureSnapshot("before draging");
-
         new Actions(driver).dragAndDropBy((WebElement) element.getElement(), offsetX, offsetY).perform();
-        captureSnapshot("after dropping");
     }
 
     @Override
@@ -390,7 +370,6 @@ public class PageObject extends BasePage implements IPage {
         return getCookieByName(name) != null;
     }
 
-    @Override
     public boolean isFrame() {
         return frameFlag;
     }
@@ -402,7 +381,6 @@ public class PageObject extends BasePage implements IPage {
     private void open(final String url) throws IOException {
 
         if (this.getDriver() == null) {
-            TestLogging.logWebStep("Launch application", false);
             driver = webUXDriver.createWebDriver();
         }
 
@@ -416,8 +394,6 @@ public class PageObject extends BasePage implements IPage {
             }
         } catch (UnreachableBrowserException e) {
 
-            // handle if the last window is closed
-            TestLogging.logWebStep("Launch application", false);
             driver = webUXDriver.createWebDriver();
             maximizeWindow();
             driver.navigate().to(url);
@@ -468,7 +444,6 @@ public class PageObject extends BasePage implements IPage {
         frameFlag = true;
     }
 
-    @Override
     public final void selectFrame(final By by) {
         driver.switchTo().frame(driver.findElement(by));
         frameFlag = true;
@@ -586,14 +561,5 @@ public class PageObject extends BasePage implements IPage {
         	logger.error(ex);
             throw ex;
         }
-    }
-
-    /**
-     * Captures snapshot of the current browser window, and prefix the file name with the assigned string.
-     *
-     * @param  messagePrefix
-     */
-    protected void captureSnapshot(final String messagePrefix) {
-        ScreenshotUtil.captureSnapshot(messagePrefix);
     }
 }

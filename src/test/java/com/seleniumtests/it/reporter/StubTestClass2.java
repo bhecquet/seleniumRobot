@@ -19,7 +19,7 @@ package com.seleniumtests.it.reporter;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-public class StubTestClass2 {
+public class StubTestClass2 extends StubParentClass {
 
 	@Test(groups="stub")
 	public void test1() {
@@ -43,7 +43,7 @@ public class StubTestClass2 {
 		Assert.fail("fail");
 	}
 	
-	@Test(groups="stub", dependsOnMethods={"test3"})
+	@Test(groups="stub", dependsOnMethods={"test1"})
 	public void test6() {
 	}
 }

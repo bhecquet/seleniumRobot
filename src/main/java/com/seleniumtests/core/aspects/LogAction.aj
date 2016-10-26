@@ -44,9 +44,7 @@ import com.seleniumtests.uipage.htmlelements.HtmlElement;
  */
 @Aspect
 public class LogAction {
-	
-	private TestStep currentRootTestStep = null;
-	private TestStep parentTestStep = null;
+
 	private Date testStepStart = null;
 
 	/**
@@ -75,9 +73,9 @@ public class LogAction {
 			actionFailed = true;
 			throw e;
 		} finally {
-			if (isHtmlElementDirectlyCalled(Thread.currentThread().getStackTrace()) && parentTestStep != null) {
+			if (isHtmlElementDirectlyCalled(Thread.currentThread().getStackTrace()) && TestLogging.getParentTestStep() != null) {
 				String actionName = String.format("%s on %s %s", joinPoint.getSignature().getName(), element, buildArgString(joinPoint));
-				parentTestStep.addAction(new TestAction(actionName, actionFailed));
+				TestLogging.getParentTestStep().addAction(new TestAction(actionName, actionFailed));
 			}		
 		}
 		return reply;
@@ -108,8 +106,8 @@ public class LogAction {
 			actionFailed = true;
 			throw e;
 		} finally {
-			if (parentTestStep != null) {
-				parentTestStep.addAction(new TestAction(actionName, actionFailed));
+			if (TestLogging.getParentTestStep() != null) {
+				TestLogging.getParentTestStep().addAction(new TestAction(actionName, actionFailed));
 			}
 		}
 		return reply;
@@ -129,10 +127,10 @@ public class LogAction {
 		
 		String stepName = String.format("%s %s", joinPoint.getSignature().getName(), buildArgString(joinPoint));
 		TestStep currentStep = new TestStep(stepName);
-		TestStep previousParent = parentTestStep;
-		if (parentTestStep != null) {
-			parentTestStep.addStep(currentStep);
-			parentTestStep = currentStep;
+		TestStep previousParent = TestLogging.getParentTestStep();
+		if (TestLogging.getParentTestStep() != null) {
+			TestLogging.getParentTestStep().addStep(currentStep);
+			TestLogging.setParentTestStep(currentStep);
 		}
 		
 		try {
@@ -141,8 +139,8 @@ public class LogAction {
 			currentStep.setFailed(true);
 			throw e;
 		} finally {
-			if (parentTestStep != null && previousParent != null) {
-				parentTestStep = previousParent;
+			if (TestLogging.getParentTestStep() != null && previousParent != null) {
+				TestLogging.setParentTestStep(previousParent);
 			}				
 		}
 		return reply;
@@ -191,15 +189,14 @@ public class LogAction {
 		// happens when using cucumber where a cucumber method can call an other method intercepted by this pointcut
 		// ex: Given (url "www.somesite.com") calls "open(url)"
 		// In this case, open becomes a child of Given
-		if (currentRootTestStep == null) {
-			currentRootTestStep = currentStep;
-			parentTestStep = currentRootTestStep;
+		if (TestLogging.getCurrentRootTestStep() == null) {
+			TestLogging.setCurrentRootTestStep(currentStep); // will also set parent step
 			testStepStart = new Date();
 			rootStep = true;
 		} else {
-			parentTestStep.addStep(currentStep);
-			parentTestStep = currentStep;
-			previousParent = parentTestStep;
+			TestLogging.getParentTestStep().addStep(currentStep);
+			TestLogging.setParentTestStep(currentStep);
+			previousParent = TestLogging.getParentTestStep();
 		}
 		
 		try {
@@ -209,12 +206,12 @@ public class LogAction {
 			throw e;
 		} finally {
 			if (rootStep) {
-				currentRootTestStep.setDuration(testStepStart.getTime() - new Date().getTime());
-				TestLogging.logTestStep(currentRootTestStep);	
-				currentRootTestStep = null;
-				parentTestStep = null;
+				TestLogging.getCurrentRootTestStep().setDuration(new Date().getTime() - testStepStart.getTime());
+				TestLogging.logTestStep(TestLogging.getCurrentRootTestStep());	
+				TestLogging.setCurrentRootTestStep(null);
+				TestLogging.setParentTestStep(null);
 			} else {
-				parentTestStep = previousParent;
+				TestLogging.setParentTestStep(previousParent);
 			}
 		}
 		return reply;
@@ -223,14 +220,14 @@ public class LogAction {
 	@Around("execution(public * com.seleniumtests.reporter.TestLogging.logWebOutput (..))"
 			+ " || execution(public * com.seleniumtests.reporter.TestLogging.logWebStep (..))")
 	public Object interceptLogging(ProceedingJoinPoint joinPoint) throws Throwable {
-		if (parentTestStep != null) {
+		if (TestLogging.getParentTestStep() != null) {
 			Boolean actionFailed;
 			try {
 				actionFailed = (Boolean)joinPoint.getArgs()[1];
 			} catch (ClassCastException | IndexOutOfBoundsException e) {
 				actionFailed = false;
 			}
-			parentTestStep.addAction(new TestAction(joinPoint.getArgs()[0].toString(), actionFailed));
+			TestLogging.getParentTestStep().addAction(new TestAction(joinPoint.getArgs()[0].toString(), actionFailed));
 			return null;
 		} else {
 			return joinPoint.proceed(joinPoint.getArgs());

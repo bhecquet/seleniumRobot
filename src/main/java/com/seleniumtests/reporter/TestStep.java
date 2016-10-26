@@ -22,6 +22,18 @@ import java.util.List;
 /**
  * Group of test actions
  * Represent each method call inside a PageObject during the test
+ * TestStep allows to log any action done during the test. See {@link com.seleniumtests.core.aspects.LogAction#logTestStep }
+ * We get a tree like this:
+ * root (TestStep)
+ * +--- action1 (TestAction)
+ * +--+ sub-step1 (TestStep)
+ *    +--- sub-action1
+ *    +--- message (TestMessage)
+ *    +--- sub-action2
+ * +--- action2
+ * 
+ * Each TestStep is then logged in {@link TestLogging TestLogging class} with TestLogging.logTestStep() method
+ * 
  * @author behe
  *
  */
@@ -32,13 +44,17 @@ public class TestStep extends TestAction {
 	public TestStep(String name) {
 		super(name, false);
 		stepActions = new ArrayList<>();
-		duration = null;
+		duration = 0L;
 	}
 	
 	public Long getDuration() {
 		return duration;
 	}
 
+	/**
+	 * set duration in milliseconds
+	 * @param duration
+	 */
 	public void setDuration(Long duration) {
 		this.duration = duration;
 	}
@@ -64,6 +80,9 @@ public class TestStep extends TestAction {
 	}
 
 	public void addAction(TestAction action) {
+		stepActions.add(action);
+	}
+	public void addMessage(TestMessage action) {
 		stepActions.add(action);
 	}
 	public void addStep(TestStep step) {

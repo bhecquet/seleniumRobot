@@ -25,5 +25,6 @@ public class GenericTest {
 	@BeforeMethod(alwaysRun=true)  
 	public void initTest() {
 		SeleniumTestsContextManager.getThreadContext().setSoftAssertEnabled(false);
+		SeleniumTestsContextManager.getGlobalContext().setSoftAssertEnabled(false);
 	}
 }

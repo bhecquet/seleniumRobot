@@ -36,6 +36,21 @@ body{
 	background-color: #F9727B;
 }
 
+.message-error {
+	background-color: #FFC9C9;
+	color: red;
+	font-weight: bold;
+}
+
+.message-info {
+	background-color: #B5EEAE;
+}
+
+.message-warning {
+	background-color: #FFBF80;
+}
+
+
 .success{
 	border-top: 3px solid #97D086;
 }
@@ -66,4 +81,12 @@ body{
 
 .bold{
 	font-weight: bold;
+}
+
+.logs {
+	font-family: "Courier New", Courier, monospace;
+}
+
+.stack-element {
+	padding-left: 30px;
 }
