@@ -57,6 +57,7 @@ public class TestSeleniumTestsReporter extends MockitoTest {
 	private XmlSuite executeSubTest() {
 		XmlSuite suite = new XmlSuite();
 		suite.setName("TmpSuite");
+		suite.setFileName("/home/test/seleniumRobot/data/core/testng/testLoggging.xml");
 		 
 		XmlTest test = new XmlTest(suite);
 		test.setName("FirstTest");
@@ -91,12 +92,12 @@ public class TestSeleniumTestsReporter extends MockitoTest {
 		XmlSuite suite = executeSubTest();
 		
 		// check data stored in reporter
-		Assert.assertEquals(reporter.getFailedTests().get("FirstTest").size(), 1);
+		Assert.assertEquals(reporter.getFailedTests().get("FirstTest").size(), 2);
 		Assert.assertEquals(reporter.getFailedTests().get("SecondTest").size(), 2);
 		Assert.assertEquals(reporter.getSkippedTests().get("FirstTest").size(), 0);
-		Assert.assertEquals(reporter.getSkippedTests().get("SecondTest").size(), 3);
+		Assert.assertEquals(reporter.getSkippedTests().get("SecondTest").size(), 2);
 		Assert.assertEquals(reporter.getPassedTests().get("FirstTest").size(), 1);
-		Assert.assertEquals(reporter.getPassedTests().get("SecondTest").size(), 1);
+		Assert.assertEquals(reporter.getPassedTests().get("SecondTest").size(), 2);
 		
 		int testClassNb = suite.getTests().size();
 		int errorNb = reporter.getFailedTests().get("FirstTest").size() 

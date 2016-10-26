@@ -533,9 +533,9 @@ public class TestSeleniumTestContext extends GenericTest {
 	@Test(groups="ut context")
 	public void testOutputDirectoryNull(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		initThreadContext(testNGCtx);
-		((TestRunner)testNGCtx).setOutputDirectory("/home/other/test-output");
+		((TestRunner)testNGCtx).setOutputDirectory("/home/other/test-output/testsuite");
 		SeleniumTestsContextManager.getThreadContext().setOutputDirectory(null, testNGCtx);
-		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), "/home/other/test-output");
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), "\\home\\other\\test-output");
 	}
 	
 	/**

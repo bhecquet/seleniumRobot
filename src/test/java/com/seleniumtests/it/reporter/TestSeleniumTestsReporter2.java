@@ -129,7 +129,7 @@ public class TestSeleniumTestsReporter2 extends MockitoTest {
 		executeSubTest(new String[] {"com.seleniumtests.it.reporter.StubTestClass"});
 		
 		// check content of summary report file
-		String mainReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getParentFile().getAbsolutePath() + File.separator + "SeleniumTestReport.html"));
+		String mainReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport.html"));
 		
 		Assert.assertTrue(mainReportContent.contains("<a href='SeleniumTestReport-1.html'>test1</a>"));
 		Assert.assertTrue(mainReportContent.contains("<a href='SeleniumTestReport-2.html'>testInError</a>"));
@@ -159,7 +159,7 @@ public class TestSeleniumTestsReporter2 extends MockitoTest {
 		executeSubTest(new String[] {"com.seleniumtests.it.reporter.StubTestClass2"});
 		
 		// check content of summary report file
-		String mainReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getParentFile().getAbsolutePath() + File.separator + "SeleniumTestReport.html"));
+		String mainReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport.html"));
 		mainReportContent = mainReportContent.replace("\n", "").replace("\r",  "");
 		
 		Assert.assertTrue(mainReportContent.matches(".*class=\"fa fa-circle circleSuccess\"></i><a href='SeleniumTestReport-\\d.html'>test1</a>.*"));
@@ -183,7 +183,7 @@ public class TestSeleniumTestsReporter2 extends MockitoTest {
 		executeSubTest(new String[] {"com.seleniumtests.it.reporter.StubTestClass"});
 		
 		// check content of summary report file
-		String detailedReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getParentFile().getAbsolutePath() + File.separator + "SeleniumTestReport-2.html"));
+		String detailedReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport-2.html"));
 		
 		Assert.assertTrue(detailedReportContent.contains("<div class=\"message-info\">click ok</div>"));
 		Assert.assertTrue(detailedReportContent.contains("<div class=\"message-warning\">Warning: Some warning message</div>"));
@@ -207,7 +207,7 @@ public class TestSeleniumTestsReporter2 extends MockitoTest {
 		executeSubTest(new String[] {"com.seleniumtests.it.reporter.StubTestClass"});
 		
 		// check content of summary report file
-		String detailedReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getParentFile().getAbsolutePath() + File.separator + "SeleniumTestReport-1.html"));
+		String detailedReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport-1.html"));
 		detailedReportContent = detailedReportContent.replace("\n", "").replace("\r",  "").replaceAll(">\\s+<", "><");
 		
 		Assert.assertTrue(detailedReportContent.contains(
@@ -236,7 +236,7 @@ public class TestSeleniumTestsReporter2 extends MockitoTest {
 		executeSubTest(new String[] {"com.seleniumtests.it.reporter.StubTestClass"});
 		
 		// check content of summary report file
-		String detailedReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getParentFile().getAbsolutePath() + File.separator + "SeleniumTestReport-1.html"));
+		String detailedReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport-1.html"));
 		detailedReportContent = detailedReportContent.replace("\n", "").replace("\r",  "").replaceAll(">\\s+<", "><");
 		
 		// check log presence
