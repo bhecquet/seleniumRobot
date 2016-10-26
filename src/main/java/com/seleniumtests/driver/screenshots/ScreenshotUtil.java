@@ -62,7 +62,6 @@ public class ScreenshotUtil {
         }
 
         try {
-
             // Don't capture snapshot for htmlunit
             if (SeleniumTestsContextManager.getThreadContext().getBrowser() == BrowserType.HTMLUNIT) {
                 return null;
@@ -71,7 +70,6 @@ public class ScreenshotUtil {
             TakesScreenshot screenShot = (TakesScreenshot) driver;
             return screenShot.getScreenshotAs(OutputType.BASE64);
         } catch (Exception ex) {
-
             // Ignore all exceptions
             logger.error(ex);
         }
@@ -131,11 +129,17 @@ public class ScreenshotUtil {
         screenShot.setTitle(_title);
     }
 
+    /**
+     * Capture snapshot if seleniumContext is configured to do so
+     * @return
+     */
     public ScreenShot captureWebPageSnapshot() {
 
         ScreenShot screenShot = new ScreenShot();
 
-        if (SeleniumTestsContextManager.getThreadContext() == null || outputDirectory == null) {
+        if (SeleniumTestsContextManager.getThreadContext() == null 
+        		|| outputDirectory == null 
+        		|| !SeleniumTestsContextManager.getThreadContext().getCaptureSnapshot()) {
             return screenShot;
         }
 
@@ -164,67 +168,13 @@ public class ScreenshotUtil {
 
             handleTitle(title, screenShot);
             handleSource(pageSource, screenShot);
-            if (SeleniumTestsContextManager.getThreadContext().getCaptureSnapshot()) {
-                handleImage(screenShot);
-            }
+            handleImage(screenShot);
         } catch (WebSessionEndedException e) {
             throw e;
         } catch (Exception ex) {
         	logger.error(ex);
         }
 
-        if (SeleniumTestsContextManager.getThreadContext().getCaptureSnapshot()) {
-            SeleniumTestsContextManager.getThreadContext().addScreenShot(screenShot);
-        }
-
         return screenShot;
-    }
-
-    /**
-     * Used by DriverExceptionListener, don't log the customexception but put it into context.
-     */
-    public void capturePageSnapshotOnException() {
-        Boolean capture = SeleniumTestsContextManager.getThreadContext().getCaptureSnapshot();
-        SeleniumTestsContextManager.getThreadContext().setCaptureSnapshot(true);
-        captureWebPageSnapshot();
-        SeleniumTestsContextManager.getThreadContext().setCaptureSnapshot(capture);
-
-        if (!SeleniumTestsContextManager.getThreadContext().getScreenshots().isEmpty()) {
-            ((LinkedList<ScreenShot>) SeleniumTestsContextManager.getThreadContext().getScreenshots()).getLast().setException(true);
-        }
-    }
-
-    public static void captureSnapshot(final String messagePrefix) {
-        if (SeleniumTestsContextManager.getThreadContext() != null
-                && SeleniumTestsContextManager.getThreadContext().getCaptureSnapshot()
-                && getOutputDirectory() != null) {
-            String filename = HashCodeGenerator.getRandomHashCode("HtmlElement");
-            StringBuilder sbMessage = new StringBuilder();
-            try {
-                String img = ScreenshotUtil.captureEntirePageScreenshotToString(WebUIDriver.getWebDriver());
-                if (img == null) {
-                    return;
-                }
-
-                byte[] byteArray = img.getBytes();
-                if (byteArray != null && byteArray.length > 0) {
-                    String imgFile = SCREENSHOT_DIR + filename + ".png";
-                    FileUtility.writeImage(getOutputDirectory() + imgFile, byteArray);
-
-                    ScreenShot screenShot = new ScreenShot();
-                    String imagePath = getSuiteName() + imgFile;
-                    screenShot.setImagePath(imagePath);
-                    SeleniumTestsContextManager.getThreadContext().addScreenShot(screenShot);
-                    sbMessage.append(messagePrefix + ": <a href='" + imagePath
-                            + "' class='lightbox'>Application Snapshot</a>");
-                    TestLogging.logWebOutput(sbMessage.toString(), false);
-                }
-            } catch (WebSessionEndedException ex) {
-                throw ex;
-            } catch (Exception e) {
-                logger.error(e);
-            }
-
-        }
     }
 }

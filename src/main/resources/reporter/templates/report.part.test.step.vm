@@ -1,3 +1,24 @@
+#macro( stepActions $localStep $directCall)
+
+#if (!$directCall)
+	<li>$localStep.getName()</li>
+#end
+<ul>
+#foreach( $action in $localStep.getStepActions() )
+	#if (${action.class.name.equals("com.seleniumtests.reporter.TestStep")})
+		#stepActions($action false)
+	#elseif (${action.class.name.equals("com.seleniumtests.reporter.TestMessage")})
+		#set ($messageType = $action.getMessageType().toString().toLowerCase())
+		#set ($messageType = "message-" + $messageType)
+		<div class="$messageType">$action.getName()</div>
+		#set ($messageType = "")
+	#else
+		<li>$action.getName()</li>
+    #end
+#end
+</ul>
+#end
+
 	#if ($status.toString().equals("passed"))
 		<div class="box collapsed-box success">
 	#elseif ($status.toString().equals("failed"))
@@ -6,17 +27,10 @@
 		<div class="box collapsed-box skipped">
 	#end
 		<div class="box-header with-border">
-			<button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-plus"></i></button> $methodName - $time
+			<button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-plus"></i></button> $stepName - $stepDuration secs
 		</div>
 		<div class="box-body">
-			<ul>
-				<li><b>$desc</b></li>
-				
-				<ul>
-					$content
-				</ul>
-			</ul>
-			$dependencies_desc
+			#stepActions($step true)
 	
 		</div>
 	</div>

@@ -37,6 +37,7 @@ public class MockitoTest  extends PowerMockTestCase {
 	public void beforeMethod() throws Exception {
 		beforePowerMockTestMethod();
 		SeleniumTestsContextManager.getThreadContext().setSoftAssertEnabled(false);
+		SeleniumTestsContextManager.getGlobalContext().setSoftAssertEnabled(false);
 		MockitoAnnotations.initMocks(this); 
 	}
 	

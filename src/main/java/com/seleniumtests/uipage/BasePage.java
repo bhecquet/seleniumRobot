@@ -35,7 +35,6 @@ import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import com.seleniumtests.driver.TestType;
 import com.seleniumtests.driver.WebUIDriver;
-import com.seleniumtests.reporter.TestLogging;
 import com.thoughtworks.selenium.SeleniumException;
 import com.thoughtworks.selenium.webdriven.JavascriptLibrary;
 import com.thoughtworks.selenium.webdriven.Windows;
@@ -45,8 +44,8 @@ import com.thoughtworks.selenium.webdriven.Windows;
  */
 public abstract class BasePage {
 
-    protected WebDriver driver;// = WebUIDriver.getWebDriver();
-    protected WebUIDriver webUXDriver; // = WebUIDriver.getWebUIDriver();
+    protected WebDriver driver;
+    protected WebUIDriver webUXDriver;
     private int explictWaitTimeout = SeleniumTestsContextManager.getThreadContext().getExplicitWaitTimeout();
     
 
@@ -120,17 +119,7 @@ public abstract class BasePage {
 
         // Handle the null case
         return Boolean.TRUE == result;
-    }
-
-    public void selectFrame(final By by) {
-        TestLogging.logWebStep("select frame, locator={\"" + by.toString() + "\"}", false);
-        driver.switchTo().frame(driver.findElement(by));
-    }
-    
-    public boolean isFrame() {
-        return false;
-    }
-    
+    }    
 
     /**
      * If current window is closed then use driver.switchTo.window(handle).

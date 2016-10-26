@@ -92,8 +92,6 @@ public class SeleniumTestsContext {
 
     public static final String TEST_ENTITY = "testEntity";						// Jamais utilisé
 
-    public static final String REPORT_GENERATION_CONFIG = "reportGenerationConfig";
-    public static final String OPEN_REPORT_IN_BROWSER = "openReportInBrowser";
     public static final String CAPTURE_SNAPSHOT = "captureSnapshot";
     public static final String ENABLE_EXCEPTION_LISTENER = "enableExceptionListener";	// TODO: voir son effet, activé par défaut
 
@@ -188,12 +186,6 @@ public class SeleniumTestsContext {
         setWebProxyExclude(getValueForTest(WEB_PROXY_EXCLUDE, System.getProperty(WEB_PROXY_EXCLUDE)));
         setWebProxyPac(getValueForTest(WEB_PROXY_PAC, System.getProperty(WEB_PROXY_PAC)));
 
-        // Set default to summaryPerSuite, by default it would generate a summary report per suite for tests in SeleniumTestReport.html
-        // if set to summaryAllSuites, only one summary report section would be generated.
-        setReportGenerationConfig(getValueForTest(REPORT_GENERATION_CONFIG, System.getProperty(REPORT_GENERATION_CONFIG)));
-
-        setOpenReportInBrowser(getValueForTest(OPEN_REPORT_IN_BROWSER, System.getProperty(OPEN_REPORT_IN_BROWSER)));
-
         setCaptureSnapshot(getBoolValueForTest(CAPTURE_SNAPSHOT, System.getProperty(CAPTURE_SNAPSHOT)));
         setEnableExceptionListener(getBoolValueForTest(ENABLE_EXCEPTION_LISTENER, System.getProperty(ENABLE_EXCEPTION_LISTENER)));
 
@@ -257,40 +249,6 @@ public class SeleniumTestsContext {
             }
         }
     }
-    
-    public List<ScreenShot> getScreenshots() {
-        return screenshots;
-    }
-
-    public void addScreenShot(final ScreenShot screenShot) {
-        deleteExceptionSnapshots();
-        screenshots.addLast(screenShot);
-    }
-
-    private void deleteExceptionSnapshots() {
-        try {
-            int size = screenshots.size();
-            if (size == 0) {
-                return;
-            }
-
-            ScreenShot screenShot = screenshots.get(size - 1);
-            if (screenShot.isException() && screenShot.getFullImagePath() != null) {
-                new File(screenShot.getFullImagePath()).delete();
-                screenshots.remove(size - 1);
-            }
-        } catch (Exception ex) {
-            logger.error(ex.getMessage());
-        }
-    }
-
-    public ScreenShot getExceptionScreenShot() {
-        if ((!screenshots.isEmpty()) && screenshots.getLast().isException()) {
-            return screenshots.getLast();
-        } else {
-            return null;
-        }
-    }    
     
     /**
      * From platform name, in case of Desktop platform, do nothing and in case of mobile, extract OS version from name
@@ -474,14 +432,6 @@ public class SeleniumTestsContext {
 
     public String getNtlmAuthTrustedUris() {
         return (String) getAttribute(NTLM_AUTH_TRUSTED_URIS);
-    }
-
-    public String getReportGenerationConfig() {
-        return (String) getAttribute(REPORT_GENERATION_CONFIG);
-    }
-
-    public String getOpenReportInBrowser() {
-        return (String) getAttribute(OPEN_REPORT_IN_BROWSER);
     }
 	
 	public Boolean getAssumeUntrustedCertificateIssuer() {
@@ -1006,19 +956,6 @@ public class SeleniumTestsContext {
     	setAttribute(WEB_PROXY_EXCLUDE, proxyExclude);
     }
     
-    public void setReportGenerationConfig(String config) {
-    	if (config != null) {
-    		setAttribute(REPORT_GENERATION_CONFIG, config);
-    	} else {
-    		setAttribute(REPORT_GENERATION_CONFIG, "summaryPerSuite");
-    	}
-    	
-    }
-    
-    public void setOpenReportInBrowser(String browserName) {
-    	setAttribute(OPEN_REPORT_IN_BROWSER, browserName);
-    }
-    
     public void setCaptureSnapshot(Boolean capture) {
     	if (capture != null) {
     		setAttribute(CAPTURE_SNAPSHOT, capture);
@@ -1137,7 +1074,7 @@ public class SeleniumTestsContext {
     
     public void setOutputDirectory(String outputDir, ITestContext context) {
     	if (outputDir == null) {
-    		setAttribute(OUTPUT_DIRECTORY, context.getOutputDirectory());
+    		setAttribute(OUTPUT_DIRECTORY, new File(context.getOutputDirectory()).getParent());
     	} else {
     		((TestRunner)context).setOutputDirectory(outputDir);
     		setAttribute(OUTPUT_DIRECTORY, outputDir);

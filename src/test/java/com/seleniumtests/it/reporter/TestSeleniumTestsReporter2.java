@@ -17,27 +17,25 @@
 package com.seleniumtests.it.reporter;
 
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.velocity.app.VelocityEngine;
 import org.testng.Assert;
 import org.testng.IInvokedMethodListener;
 import org.testng.IReporter;
-import org.testng.IResultMap;
-import org.testng.ISuite;
 import org.testng.ITestContext;
 import org.testng.ITestListener;
-import org.testng.ITestNGMethod;
+import org.testng.ITestResult;
 import org.testng.TestNG;
 import org.testng.annotations.Test;
 import org.testng.xml.XmlClass;
@@ -46,8 +44,8 @@ import org.testng.xml.XmlTest;
 
 import com.seleniumtests.MockitoTest;
 import com.seleniumtests.core.SeleniumTestsContextManager;
-import com.seleniumtests.reporter.SeleniumTestsReporter;
 import com.seleniumtests.reporter.SeleniumTestsReporter2;
+import com.seleniumtests.reporter.TestLogging;
 
 public class TestSeleniumTestsReporter2 extends MockitoTest {
 	
@@ -56,25 +54,23 @@ public class TestSeleniumTestsReporter2 extends MockitoTest {
 	/**
 	 * Execute stub tests using TestNG runner and make SeleniumTestsReporter a listener so that 
 	 * a report is generated
+	 * @throws IOException 
 	 */
-	private XmlSuite executeSubTest() {
+	private XmlSuite executeSubTest(String[] testClasses) throws IOException {
 		XmlSuite suite = new XmlSuite();
 		suite.setName("TmpSuite");
-		 
-		XmlTest test = new XmlTest(suite);
-		test.setName("FirstTest");
-		List<XmlClass> classes = new ArrayList<XmlClass>();
-		classes.add(new XmlClass("com.seleniumtests.it.reporter.StubTestClass"));
-		test.setXmlClasses(classes) ;
-		
-		XmlTest test2 = new XmlTest(suite);
-		test2.setName("SecondTest");
-		List<XmlClass> classes2 = new ArrayList<XmlClass>();
-		classes2.add(new XmlClass("com.seleniumtests.it.reporter.StubTestClass2"));
-		test2.setXmlClasses(classes2) ;
-		
+		suite.setFileName("/home/test/seleniumRobot/data/core/testng/testLoggging.xml");
 		List<XmlSuite> suites = new ArrayList<XmlSuite>();
 		suites.add(suite);
+		
+		for (String testClass: testClasses) {
+			XmlTest test = new XmlTest(suite);
+			test.setName(testClass.substring(testClass.lastIndexOf(".") + 1));
+			List<XmlClass> classes = new ArrayList<XmlClass>();
+			classes.add(new XmlClass(testClass));
+			test.setXmlClasses(classes) ;
+		}		
+		
 		TestNG tng = new TestNG(false);
 		tng.setXmlSuites(suites);
 		tng.addListener((IReporter)reporter);
@@ -82,50 +78,168 @@ public class TestSeleniumTestsReporter2 extends MockitoTest {
 		tng.addListener((IInvokedMethodListener)reporter);
 		tng.setOutputDirectory(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory());
 		tng.run(); 
+		TestLogging.parseLogFile();
 		
 		return suite;
 	}
 	
 	@Test(groups={"it"})
-	public void testReportGeneration(ITestContext testContext) throws Exception {
+	public void testReportGeneration() throws Exception {
 		
 		reporter = spy(new SeleniumTestsReporter2());
 
-		XmlSuite suite = executeSubTest();
+		executeSubTest(new String[] {"com.seleniumtests.it.reporter.StubTestClass", "com.seleniumtests.it.reporter.StubTestClass2"});
 		
 		// check data stored in reporter
-		Assert.assertEquals(reporter.getFailedTests().get("FirstTest").size(), 1);
-		Assert.assertEquals(reporter.getFailedTests().get("SecondTest").size(), 2);
-		Assert.assertEquals(reporter.getSkippedTests().get("FirstTest").size(), 0);
-		Assert.assertEquals(reporter.getSkippedTests().get("SecondTest").size(), 3);
-		Assert.assertEquals(reporter.getPassedTests().get("FirstTest").size(), 1);
-		Assert.assertEquals(reporter.getPassedTests().get("SecondTest").size(), 1);
+		Assert.assertEquals(reporter.getFailedTests().get("StubTestClass").size(), 2);
+		Assert.assertEquals(reporter.getFailedTests().get("StubTestClass2").size(), 2);
+		Assert.assertEquals(reporter.getSkippedTests().get("StubTestClass").size(), 0);
+		Assert.assertEquals(reporter.getSkippedTests().get("StubTestClass2").size(), 2);
+		Assert.assertEquals(reporter.getPassedTests().get("StubTestClass").size(), 1);
+		Assert.assertEquals(reporter.getPassedTests().get("StubTestClass2").size(), 2);
 		
-		int testClassNb = suite.getTests().size();
-		int errorNb = reporter.getFailedTests().get("FirstTest").size() 
-					+ reporter.getFailedTests().get("SecondTest").size()
-					+ reporter.getSkippedTests().get("FirstTest").size()
-					+ reporter.getSkippedTests().get("SecondTest").size();
+		int errorNb = reporter.getFailedTests().get("StubTestClass").size() 
+					+ reporter.getFailedTests().get("StubTestClass2").size()
+					+ reporter.getSkippedTests().get("StubTestClass").size()
+					+ reporter.getSkippedTests().get("StubTestClass2").size();
+		int successNb = reporter.getPassedTests().get("StubTestClass").size()
+				    + reporter.getPassedTests().get("StubTestClass2").size();
+		
 		// check at least one generation occured for each part of the report
 		verify(reporter).generateReport(anyList(), anyList(), anyString()); // 1 time only
-		verify(reporter).generateSuiteSummaryReport(anyList(), anyString(), any(HashMap.class));		// 1 suite => 1 call
-		verify(reporter, times(3 * testClassNb)).generatePanel(any(VelocityEngine.class), 	// 3 calls (skipped/passed/failed) 2 tests => 6 calls
-																							any(IResultMap.class), 
-																							anyString(), 
-																							any(ISuite.class), 
-																							any(ITestContext.class));
-		verify(reporter, times(errorNb)).generateExceptionReport(any(Throwable.class), 		// number of tests in error
-																							any(ITestNGMethod.class), 
-																							any(StringBuilder.class));
-		verify(reporter, times(errorNb)).generateTheStackTrace(any(Throwable.class), 		// number of tests in error
-																							any(ITestNGMethod.class), 
-																							anyString(), 
-																							any(StringBuilder.class));
-		verify(reporter, times(testClassNb)).generateExecutionReport(any(ISuite.class), any(ITestContext.class));
+		verify(reporter).generateSuiteSummaryReport(anyList());				// 1 call
+		verify(reporter, times(successNb + errorNb)).generatePanel(any(VelocityEngine.class),any(ITestResult.class)); 	// 1 call per test method => 8 calls
+		verify(reporter, times(successNb + errorNb)).generateExecutionReport(any(ITestResult.class));
 		verify(reporter).copyResources();
-		//verify(reporter).generateExecutionReport(anyList());
+
 		// check report is complete without error
-		Assert.assertEquals(reporter.getGenerationErrorMessage(), null, "error during generation: " + reporter.getGenerationErrorMessage());
+		Assert.assertEquals(reporter.getGenerationErrorMessage(), null, "error during generation: " + reporter.getGenerationErrorMessage());		
+	}
+	
+	/**
+	 * Check summary format when tests have steps
+	 * @param testContext
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testReportSummaryContentWithSteps(ITestContext testContext) throws Exception {
 		
+		reporter = spy(new SeleniumTestsReporter2());
+
+		executeSubTest(new String[] {"com.seleniumtests.it.reporter.StubTestClass"});
+		
+		// check content of summary report file
+		String mainReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getParentFile().getAbsolutePath() + File.separator + "SeleniumTestReport.html"));
+		
+		Assert.assertTrue(mainReportContent.contains("<a href='SeleniumTestReport-1.html'>test1</a>"));
+		Assert.assertTrue(mainReportContent.contains("<a href='SeleniumTestReport-2.html'>testInError</a>"));
+		
+		// check number of steps is correctly computed. "test1" has 2 main steps, "testInError" has 1 step
+		Assert.assertTrue(mainReportContent.contains("<td name=\"passed-1\">1</td>"));
+		Assert.assertTrue(mainReportContent.contains("<td name=\"failed-1\">1</td>"));
+		Assert.assertTrue(mainReportContent.contains("<td name=\"stepsTotal-1\">2</td>"));
+		
+		// for second test, test is reported KO whereas all steps are OK because we do not use LogAction.aj
+		// which handles assertion errors and report them in test steps
+		Assert.assertTrue(mainReportContent.contains("<td name=\"passed-2\">1</td>"));
+		Assert.assertTrue(mainReportContent.contains("<td name=\"failed-2\">0</td>"));
+		Assert.assertTrue(mainReportContent.contains("<td name=\"stepsTotal-2\">1</td>"));
+	}
+	
+	/**
+	 * Check state and style of all tests
+	 * @param testContext
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testReportSummaryContentWithDependantTests(ITestContext testContext) throws Exception {
+		
+		reporter = spy(new SeleniumTestsReporter2());
+		
+		executeSubTest(new String[] {"com.seleniumtests.it.reporter.StubTestClass2"});
+		
+		// check content of summary report file
+		String mainReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getParentFile().getAbsolutePath() + File.separator + "SeleniumTestReport.html"));
+		mainReportContent = mainReportContent.replace("\n", "").replace("\r",  "");
+		
+		Assert.assertTrue(mainReportContent.matches(".*class=\"fa fa-circle circleSuccess\"></i><a href='SeleniumTestReport-\\d.html'>test1</a>.*"));
+		Assert.assertTrue(mainReportContent.matches(".*class=\"fa fa-circle circleFailed\"></i><a href='SeleniumTestReport-\\d.html'>test4</a>.*"));
+		Assert.assertTrue(mainReportContent.matches(".*class=\"fa fa-circle circleSkipped\"></i><a href='SeleniumTestReport-\\d.html'>test3</a>.*"));
+		Assert.assertTrue(mainReportContent.matches(".*class=\"fa fa-circle circleFailed\"></i><a href='SeleniumTestReport-\\d.html'>test5</a>.*"));
+		Assert.assertTrue(mainReportContent.matches(".*class=\"fa fa-circle circleSkipped\"></i><a href='SeleniumTestReport-\\d.html'>test2</a>.*"));
+		Assert.assertTrue(mainReportContent.matches(".*class=\"fa fa-circle circleSuccess\"></i><a href='SeleniumTestReport-\\d.html'>test1</a>.*"));
+	}
+	
+	/**
+	 * Check format of messages in detailed report
+	 * @param testContext
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testReportDetailsMessageStyles(ITestContext testContext) throws Exception {
+		
+		reporter = spy(new SeleniumTestsReporter2());
+
+		executeSubTest(new String[] {"com.seleniumtests.it.reporter.StubTestClass"});
+		
+		// check content of summary report file
+		String detailedReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getParentFile().getAbsolutePath() + File.separator + "SeleniumTestReport-2.html"));
+		
+		Assert.assertTrue(detailedReportContent.contains("<div class=\"message-info\">click ok</div>"));
+		Assert.assertTrue(detailedReportContent.contains("<div class=\"message-warning\">Warning: Some warning message</div>"));
+		Assert.assertTrue(detailedReportContent.contains("<div class=\"message-info\">Some Info message</div>"));
+		Assert.assertTrue(detailedReportContent.contains("<div class=\"message-error\">Some Error message</div>"));
+		Assert.assertTrue(detailedReportContent.contains("<div class=\"message-log\">Some log message</div>"));
+		Assert.assertTrue(detailedReportContent.contains("<li>send keyboard action</li>"));
+	}
+	
+	/**
+	 * Check format of steps inside steps
+	 * test1 in com.seleniumtests.it.reporter.StubTestClass defines steps inside other steps
+	 * @param testContext
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testReportDetailsWithSubSteps(ITestContext testContext) throws Exception {
+		
+		reporter = spy(new SeleniumTestsReporter2());
+		
+		executeSubTest(new String[] {"com.seleniumtests.it.reporter.StubTestClass"});
+		
+		// check content of summary report file
+		String detailedReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getParentFile().getAbsolutePath() + File.separator + "SeleniumTestReport-1.html"));
+		detailedReportContent = detailedReportContent.replace("\n", "").replace("\r",  "").replaceAll(">\\s+<", "><");
+		
+		Assert.assertTrue(detailedReportContent.contains(
+				"<ul>"													// root step
+					+ "<li>click button</li>"
+					+ "<li>sendKeys to text field</li>"
+					+ "<li>step 1.3: open page</li>"					// sub-step
+					+ "<ul>"
+						+ "<li>click link</li>"							// action in sub step
+						+ "<div class=\"message-log\">a message</div>"	// message in sub step
+						+ "<li>sendKeys to password field</li>"			// action in sub step
+					+ "</ul>"
+				+ "</ul>"));
+	}
+	
+	/**
+	 * Check logs are written in file
+	 * @param testContext
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testReportDetailsWithLogs(ITestContext testContext) throws Exception {
+		
+		reporter = spy(new SeleniumTestsReporter2());
+		
+		executeSubTest(new String[] {"com.seleniumtests.it.reporter.StubTestClass"});
+		
+		// check content of summary report file
+		String detailedReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getParentFile().getAbsolutePath() + File.separator + "SeleniumTestReport-1.html"));
+		detailedReportContent = detailedReportContent.replace("\n", "").replace("\r",  "").replaceAll(">\\s+<", "><");
+		
+		// check log presence
+		Assert.assertTrue(detailedReportContent.contains("<div> StubParentClass: Start method test1</div>"));
 	}
 }

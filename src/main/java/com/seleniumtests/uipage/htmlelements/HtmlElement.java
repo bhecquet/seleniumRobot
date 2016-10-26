@@ -296,7 +296,7 @@ public class HtmlElement {
 			try {
 				new WebDriverWait(driver, 1).until(ExpectedConditions.visibilityOf(element));
 			} catch (ElementNotVisibleException e) {
-				TestLogging.logInfo(String.format("element %s not visible", element));
+				TestLogging.info(String.format("element %s not visible", element));
 			} catch (Exception e) {
 				logger.warn("Could not make element visible");
 			}

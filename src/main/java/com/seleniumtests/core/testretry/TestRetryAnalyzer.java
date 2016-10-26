@@ -55,7 +55,7 @@ public class TestRetryAnalyzer implements IRetryAnalyzer, ITestRetryAnalyzer {
         if (count <= maxCount) {
             result.setAttribute("RETRY", new Integer(count));
 
-            TestLogging.log("[RETRYING] " + testClassName + " FAILED, " + "Retrying " + count + " time", true);
+            TestLogging.log("[RETRYING] " + testClassName + " FAILED, " + "Retrying " + count + " time");
 
             count += 1;
             return true;

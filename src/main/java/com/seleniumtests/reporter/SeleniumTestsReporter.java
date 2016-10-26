@@ -251,7 +251,7 @@ public class SeleniumTestsReporter implements IReporter, ITestListener, IInvoked
 
     @Override
     public void beforeInvocation(final IInvokedMethod arg0, final ITestResult arg1) { 
-    	//TODO
+    	TestLogging.setCurrentTestResult(arg1);
     }
 
     public void copyResources() throws IOException {
@@ -445,60 +445,12 @@ public class SeleniumTestsReporter implements IReporter, ITestListener, IInvoked
         addAllTestResults(testResults, failedTests.get(tc.getName()));
         addAllTestResults(testResults, tc.getFailedButWithinSuccessPercentageTests());
 
-        Map<String, Map<String, List<String>>> pageListenerLogMap = TestLogging.getPageListenerLog(
-                abstractPageListener.getClass().getCanonicalName());
-        if (pageListenerLogMap == null || pageListenerLogMap.isEmpty()) {
-            res.append("<div class='method passed'><div class='yuk_goldgrad_tl'><div class='yuk_goldgrad_tr'>"
-                    + "<div class='yuk_goldgrad_m'></div></div></div>"
-                    + "<h3 class='yuk_grad_ltitle_passed'>No Errors found.</h3>"
-                    + "<div class='yuk_pnl_footerbar'></div>"
-                    + "<div class='yuk_grey_bm_footer'><div class='yuk_grey_br'>"
-                    + "<div class='yuk_grey_bl'></div></div></div></div>");
-        } else {
-            for (Entry<String, Map<String, List<String>>> pageEntry : pageListenerLogMap.entrySet()) {
-                StringBuilder contentBuffer = new StringBuilder();
-                contentBuffer.append(
-                    "<table  class='ex' width='90%'><thead><tr><th>TestMethod</th><th>Errors</th></thead><tbody>");
-
-                Map<String, List<String>> errorMap = pageEntry.getValue();
-
-                boolean found = false;
-                for (ITestResult testResult : testResults) {
-                    Method method = testResult.getMethod().getConstructorOrMethod().getMethod();
-                    String methodInstance = StringUtility.constructMethodSignature(method, testResult.getParameters());
-                    if (errorMap.containsKey(methodInstance)) {
-                        found = true;
-                        contentBuffer.append("<tr><td>" + methodInstance + "</td><td>");
-                        for (String message : errorMap.get(methodInstance)) {
-                            contentBuffer.append(message);
-                            contentBuffer.append("<br>");
-                        }
-
-                        contentBuffer.append("</td><tr>");
-                    }
-                }
-
-                if (found) {
-                    contentBuffer.append("</tbody></table>");
-
-                    try {
-                        Template t = ve.getTemplate("/templates/report.part.singlePageError.html");
-                        VelocityContext context = new VelocityContext();
-                        context.put("status", style);
-                        context.put("pageName", pageEntry.getKey());
-                        context.put("content", contentBuffer.toString());
-
-                        StringWriter writer = new StringWriter();
-                        t.merge(context, writer);
-                        res.append(writer.toString());
-                    } catch (Exception e) {
-                        logger.error("errorLogger creating a singlePageError.", e);
-                    }
-
-                    pageCount++;
-                }
-            }
-        }
+        res.append("<div class='method passed'><div class='yuk_goldgrad_tl'><div class='yuk_goldgrad_tr'>"
+                + "<div class='yuk_goldgrad_m'></div></div></div>"
+                + "<h3 class='yuk_grad_ltitle_passed'>No Errors found.</h3>"
+                + "<div class='yuk_pnl_footerbar'></div>"
+                + "<div class='yuk_grey_bm_footer'><div class='yuk_grey_br'>"
+                + "<div class='yuk_grey_bl'></div></div></div></div>");
 
         sbCalcount.append(pageCount);
     }
@@ -700,23 +652,8 @@ public class SeleniumTestsReporter implements IReporter, ITestListener, IInvoked
 
             mOut = createWriter(getOutputDirectory());
             startHtml(testCtx, mOut);
-
-            // hard coded "summaryPerSuite", consider refactoring if more report configurations.
-            if ("summaryPerSuite".equalsIgnoreCase(SeleniumTestsContextManager.getGlobalContext().getReportGenerationConfig())) {
-                for (ISuite suite : suites) {
-                    List<ISuite> singleSuiteList = new ArrayList<>();
-                    singleSuiteList.add(suite);
-                    generateSuiteSummaryReport(singleSuiteList, suite.getName());
-                }
-                for (ISuite suite : suites) {
-                    List<ISuite> singleSuiteList = new ArrayList<>();
-                    singleSuiteList.add(suite);
-                    generateReportsSection(singleSuiteList);
-                }
-            } else {
-                generateSuiteSummaryReport(suites, xml.get(0).getName());
-                generateReportsSection(suites);
-            }
+            generateSuiteSummaryReport(suites, xml.get(0).getName());
+            generateReportsSection(suites);
 
             endHtml(mOut);
             mOut.flush();
@@ -724,10 +661,6 @@ public class SeleniumTestsReporter implements IReporter, ITestListener, IInvoked
             copyResources();
             logger.info("Completed Report Generation.");
 
-            String browserPath = SeleniumTestsContextManager.getGlobalContext().getOpenReportInBrowser();
-            if (browserPath != null && browserPath.trim().length() > 0) {
-                executeCmd(browserPath, getReportLocation().getAbsolutePath());
-            }
         } catch (Exception e) {
             logger.error("output file", e);
         }
@@ -1146,7 +1079,7 @@ public class SeleniumTestsReporter implements IReporter, ITestListener, IInvoked
         // don't recreate driver if it does not exist
         if (WebUIDriver.getWebDriver(false) != null) {
             ScreenShot screenShot = new ScreenshotUtil().captureWebPageSnapshot();
-            TestLogging.logWebOutput(TestLogging.buildScreenshotLog(screenShot), true);
+            TestLogging.logScreenshot(screenShot, true);
         }
     }
 
@@ -1172,7 +1105,7 @@ public class SeleniumTestsReporter implements IReporter, ITestListener, IInvoked
     	 // capture snap shot at the end of the test
         if (WebUIDriver.getWebDriver(false) != null) {
             ScreenShot screenShot = new ScreenshotUtil().captureWebPageSnapshot();
-            TestLogging.logWebOutput(screenShot.getTitle()+" ("+ TestLogging.buildScreenshotLog(screenShot)+")", false);
+            TestLogging.logScreenshot(screenShot, false);
         }
     }
 

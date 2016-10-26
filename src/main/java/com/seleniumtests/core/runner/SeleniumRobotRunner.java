@@ -34,7 +34,7 @@ import com.seleniumtests.core.TearDownService;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.reporter.TestLogging;
 
-@Listeners({com.seleniumtests.reporter.SeleniumTestsReporter.class, 
+@Listeners({com.seleniumtests.reporter.SeleniumTestsReporter2.class, 
 			com.seleniumtests.core.testretry.TestRetryListener.class, 
 			com.seleniumtests.reporter.JMeterReporter.class})
 public class SeleniumRobotRunner {
