@@ -175,7 +175,7 @@ public class SeleniumTestsContextManager {
         	&& iTestContext.getSuite().getParameter(SeleniumTestsContext.TEST_CONFIGURATION) != null) {
             	
             	File suiteFile = new File(iTestContext.getSuite().getXmlSuite().getFileName());
-                String configFile = suiteFile.getPath().replace(suiteFile.getName(), "") + iTestContext.getSuite().getParameter("testConfig");
+                String configFile = suiteFile.getPath().replace(suiteFile.getName(), "") + iTestContext.getSuite().getParameter(SeleniumTestsContext.TEST_CONFIGURATION);
                 
                 TestConfigurationParser configParser = new TestConfigurationParser(configFile);
             	

@@ -64,7 +64,7 @@ public class WebUIDriver {
     public WebDriver createRemoteWebDriver()  {
         
         // TODO: use grid with appium ?
-        if (config.getMode() == DriverMode.EXISTING_GRID) {
+        if (config.getMode() == DriverMode.GRID) {
             webDriverBuilder = new RemoteDriverFactory(this.config);
         } else if (config.getMode() == DriverMode.SAUCELABS) {
         	webDriverBuilder = new SauceLabsDriverFactory(this.config);

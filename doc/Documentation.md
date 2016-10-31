@@ -424,6 +424,60 @@ Other parameters, not accepted in XML file but allowed on command line
 | -------------------------	| ------- 	| ------------ |
 | testRetryCount			| 2			| Number of times a failed test is retried. Set to 0 for no retry
 
+#### Centralized XML configuration ####
+
+A test application may have several TestNG XML files but some of the parameters may be common.
+To avoid maintaining several files with the same values, SeleniumRobot allows to centralize these parameters into one specific file.
+This file is referenced in XML configuration with:
+
+`<parameter name="testConfig" value="<filePath>.xml" />`
+
+Below is an example of this file extending TestNG configuration
+
+	<parameters>
+	
+		<!-- common parameters -->
+		<parameter name="app" value="myMobileApp.apk" />
+		
+		<!-- mobile device definition -->
+		<device name="Samsung Galaxy Nexus SPH-L700 4.3" platform="Android 4.3" />
+		
+		<!-- service definitions for run mode -->
+		<service name="grid">
+			<parameter name="webDriverGrid" value="http://localhost:4444/wd/hub" />
+		</service>
+		
+		<service name="local">
+			<parameter name="appiumServerURL" value="http://localhost:4723/wd/hub" />
+		</service>
+		
+		<service name="saucelabs">
+			<parameter name="appiumServerURL" value="http://xxx:aaaaa-26d7-44fa-bbbb-b2c75cdccafd@ondemand.saucelabs.com:80/wd/hub" />
+		</service>
+		
+		<service name="testdroid">
+			<parameter name="appiumServerURL" value="http://appium.testdroid.com/wd/hub" />
+		    <parameter name="cloudApiKey" value="aaaaaaaaaa93Ua0uQNPxBktPSfZv"/>
+			<parameter name="projectName" value="Test_testdroid" />
+		</service>
+	<parameters>
+	
+You can define:
+ 
+- *parameters* like in main XML configuration.
+- *device definition*: Allows to only specify the device name in parameter. Platform will then be get from device definition
+_e.g_: in testNG.xml, you have <parameter name="deviceName" value="Samsung Galaxy Nexus SPH-L700 4.3" /><br/>
+SeleniumRobot will translate that in:
+`<parameter name="deviceName" value="Samsung Galaxy Nexus SPH-L700 4.3" />`
+and
+`<parameter name="platform" value="Android 4.3" />`
+
+- *service definition* used for runMode option<br/>
+You can define one service for each runMode, with the same name: local, grid, saucelabs, testdroid<br/>
+Under each service, you can then add any parameter needed to address this runMode as in the above example.
+_e.g_: if user select "testdroid" runMode, then the 3 parameters (appiumServerURL, cloudApiKey, projectName) will be added to configuration
+
+
 ### 4.2 Test with Appium locally ###
 #### Application test on android ####
 
@@ -496,6 +550,58 @@ Other parameters, not accepted in XML file but allowed on command line
             <package name="com.seleniumtests.core.runner.*"/>
         </packages>
     </test>
+    
+### 4.5 Test with SeleniumGrid ###
+
+SeleniumGrid allows to address multiple selenium nodes from one central point
+![](/images/seleniumGrid.png) 
+In this mode, SeleniumRobot addresses the Hub and then, the hub dispatches browser creation on available nodes, for mobile or desktop tests.
+
+#### Configure SeleniumRobot ####
+
+Test must be configured like the example below (or use `-DrunMode=grid`)
+ 
+ 	<test name="MRH">
+    	<parameter name="runMode" value="grid" />
+    	
+        <packages>
+            <package name="com.seleniumtests.core.runner.*"/>
+        </packages>
+    </test>
+
+#### Configure Grid hub ####
+Hub configuration from command line or JSON is provided here: 
+[https://github.com/SeleniumHQ/selenium/wiki/Grid2](https://github.com/SeleniumHQ/selenium/wiki/Grid2)
+
+Hub configuration should use a browserTimeout of 60 seconds
+
+#### Configure Grid node ####
+Node configuration from command line or JSON is provided here: 
+[https://github.com/SeleniumHQ/selenium/wiki/Grid2](https://github.com/SeleniumHQ/selenium/wiki/Grid2)
+
+You should use JSON configuration for nodes, to make it simpler to start
+
+To add a browser / browser version, add following code (change info if necessary)
+
+	{
+      "browserName": "firefox",
+      "maxInstances": 5,
+      "seleniumProtocol": "WebDriver",
+	  "version": "last",
+	  "firefox_binary": "C:/Program Files (x86)/Mozilla Firefox/firefox.exe"
+    },
+
+`version` may be any text string as soon as SeleniumRobot asks for it with the `browserVersion` parameter
+`firefox_binary` is only necessary if you need to specify a version different from the default one
+
+To configure IEDriverServer and ChromeDriver executables, add the following to JSON `configuration` dictionnary
+
+	"Dwebdriver.chrome.driver=<path_to_driver>/chromedriver.exe": "",
+    "Dwebdriver.ie.driver=<path_to_driver>/IEDriverServer.exe": ""
+
+or as command line switches
+
+Node configuration should use a timeout of 45 seconds
 
 ## 5. Development ##
 
