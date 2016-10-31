@@ -16,9 +16,11 @@
  */
 package com.seleniumtests;
 
+import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeMethod;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.driver.WebUIDriver;
 
 public class GenericTest {
 
@@ -26,5 +28,10 @@ public class GenericTest {
 	public void initTest() {
 		SeleniumTestsContextManager.getThreadContext().setSoftAssertEnabled(false);
 		SeleniumTestsContextManager.getGlobalContext().setSoftAssertEnabled(false);
+	}
+	
+	@AfterClass(alwaysRun = true)
+	public void closeBrowser() {
+		WebUIDriver.cleanUp();
 	}
 }
