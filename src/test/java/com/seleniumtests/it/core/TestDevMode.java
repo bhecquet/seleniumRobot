@@ -80,7 +80,11 @@ public class TestDevMode extends GenericTest {
 		
 		List<ProcessInfo> webBrowserRunningListAfter = osUtil.whichWebBrowserRunning();
 
-		Assert.assertEquals(webBrowserRunningListBefore.size(), webBrowserRunningListAfter.size());
+		for (ProcessInfo info: webBrowserRunningListBefore) {
+			if (!webBrowserRunningListAfter.contains(info)) {
+				Assert.fail("a browser has been closed");
+			}
+		}
 	}
 	
 	/**
