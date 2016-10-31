@@ -41,6 +41,7 @@ public class TestPageObject extends GenericTest {
 	@BeforeClass()
 	public void initDriver(final ITestContext testNGCtx) throws Exception {
 		SeleniumTestsContextManager.initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setBrowser("htmlunit");
 		testPage = new DriverTestPage(true);
 		driver = WebUIDriver.getWebDriver(true);
 	}
@@ -49,10 +50,6 @@ public class TestPageObject extends GenericTest {
 	public void testPageParam() {
 		Assert.assertEquals(testPage.param("variable1"), "value3");
 	}
-	
-	@AfterClass(alwaysRun = true)
-	public void closeBrowser() {
-		WebUIDriver.cleanUp();
-	}
+
 	
 }

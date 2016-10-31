@@ -33,18 +33,6 @@
             <class name="com.seleniumtests.it.webelements.TestPageObject" />
         </classes>
     </test>
-    
-     <test name="XmlComparator" parallel="false">
- 
-        <groups>
-            <run>
-                <include name="it"/>
-            </run>
-        </groups>
 
-        <packages>
-            <package name="com.seleniumtests.it.util.xmldifference.*" />
-        </packages>
-    </test>
 
 </suite> 

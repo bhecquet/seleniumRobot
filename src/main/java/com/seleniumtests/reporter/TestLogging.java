@@ -301,9 +301,7 @@ public class TestLogging {
 	
 	public static void setCurrentRootTestStep(TestStep testStep) {
 		TestLogging.currentRootTestStep.put(Thread.currentThread(), testStep);
-		if (getParentTestStep() == null) {
-			TestLogging.setParentTestStep(TestLogging.getCurrentRootTestStep());
-		}
+		TestLogging.setParentTestStep(TestLogging.getCurrentRootTestStep());
 	}
 	
 	public static TestStep getCurrentRootTestStep() {
