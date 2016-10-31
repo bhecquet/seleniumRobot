@@ -16,6 +16,8 @@
  */
 package com.seleniumtests.util.osutility;
 
+import com.seleniumtests.core.runner.CucumberScenarioWrapper;
+
 public class ProcessInfo {
 
 	private String pid;
@@ -114,6 +116,29 @@ public class ProcessInfo {
 		}
 		return sb.toString();
 	}
+	
+	@Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+        	return false;
+        }
+        if (this.getClass() != obj.getClass()) {
+            return false;
+        }
+        ProcessInfo info;
+        try {
+        	info = (ProcessInfo) obj;
+        } catch (Exception e) {
+        	return false;
+        }
+
+        return this.toString() !=null ? this.toString().equals(info.toString()) : this.toString() == info.toString();
+    }
+
+    @Override
+    public int hashCode() {
+        return this.toString().hashCode();
+    }
 	
 	
 }
