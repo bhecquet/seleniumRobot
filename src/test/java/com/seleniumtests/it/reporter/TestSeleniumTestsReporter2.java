@@ -184,14 +184,7 @@ public class TestSeleniumTestsReporter2 extends MockitoTest {
 		
 		// check content of summary report file
 		String detailedReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport-2.html"));
-		System.out.println(detailedReportContent);
-		System.out.println("##################################################################################################################################");
-		String detailedReportContent2 = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport-1.html"));
-		System.out.println(detailedReportContent2);
-		System.out.println("##################################################################################################################################");
-		String detailedReportContent3 = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport-3.html"));
-		System.out.println(detailedReportContent3);
-		System.out.println("##################################################################################################################################");
+		
 		Assert.assertTrue(detailedReportContent.contains("<div class=\"message-info\">click ok</div>"));
 		Assert.assertTrue(detailedReportContent.contains("<div class=\"message-warning\">Warning: Some warning message</div>"));
 		Assert.assertTrue(detailedReportContent.contains("<div class=\"message-info\">Some Info message</div>"));
