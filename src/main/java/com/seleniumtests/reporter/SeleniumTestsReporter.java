@@ -335,7 +335,7 @@ public class SeleniumTestsReporter implements IReporter, ITestListener, IInvoked
         System.setProperty("file.encoding", "UTF8");
         uuid = uuid.replaceAll(" ", "-").replaceAll(":", "-");
 
-        File f = new File(outDir, "SeleniumTestReport.html");
+        File f = new File(outDir, "SeleniumTestReportOld.html");
         logger.info("generating report " + f.getAbsolutePath());
         report = f;
 
@@ -646,7 +646,7 @@ public class SeleniumTestsReporter implements IReporter, ITestListener, IInvoked
         }
 
         File f = new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory());
-        setOutputDirectory(f.getParentFile().getAbsolutePath());
+        setOutputDirectory(f.getAbsolutePath());
         setResources(getOutputDirectory() + "\\resources");
         try {
 
