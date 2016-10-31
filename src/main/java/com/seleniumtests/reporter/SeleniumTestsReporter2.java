@@ -569,10 +569,7 @@ public class SeleniumTestsReporter2 implements IReporter, ITestListener, IInvoke
 
 		// capture snap shot only for the failed web tests
 		// don't recreate driver if it does not exist
-		if (WebUIDriver.getWebDriver(false) != null) {
-			ScreenShot screenShot = new ScreenshotUtil().captureWebPageSnapshot();
-			TestLogging.logScreenshot(screenShot, true);
-		}
+		logLastSnapshot();
 	}
 
 	@Override
@@ -595,9 +592,19 @@ public class SeleniumTestsReporter2 implements IReporter, ITestListener, IInvoke
 	@Override
 	public void onTestSuccess(final ITestResult arg0) {
 		// capture snap shot at the end of the test
+		logLastSnapshot();
+	}
+	
+	/**
+	 * On test end, will take a snap shot and store it
+	 */
+	private void logLastSnapshot() {
 		if (WebUIDriver.getWebDriver(false) != null) {
 			ScreenShot screenShot = new ScreenshotUtil().captureWebPageSnapshot();
+			TestStep tearDownStep = new TestStep("Test end");
+			TestLogging.setCurrentRootTestStep(tearDownStep);
 			TestLogging.logScreenshot(screenShot, false);
+			TestLogging.logTestStep(tearDownStep);
 		}
 	}
 
