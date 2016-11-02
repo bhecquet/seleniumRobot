@@ -30,7 +30,7 @@ import com.seleniumtests.browserfactory.FirefoxDriverFactory;
 import com.seleniumtests.browserfactory.HtmlUnitDriverFactory;
 import com.seleniumtests.browserfactory.IEDriverFactory;
 import com.seleniumtests.browserfactory.IWebDriverFactory;
-import com.seleniumtests.browserfactory.RemoteDriverFactory;
+import com.seleniumtests.browserfactory.SeleniumGridDriverFactory;
 import com.seleniumtests.browserfactory.SafariDriverFactory;
 import com.seleniumtests.browserfactory.SauceLabsDriverFactory;
 import com.seleniumtests.browserfactory.TestDroidDriverFactory;
@@ -65,7 +65,7 @@ public class WebUIDriver {
         
         // TODO: use grid with appium ?
         if (config.getMode() == DriverMode.GRID) {
-            webDriverBuilder = new RemoteDriverFactory(this.config);
+            webDriverBuilder = new SeleniumGridDriverFactory(this.config);
         } else if (config.getMode() == DriverMode.SAUCELABS) {
         	webDriverBuilder = new SauceLabsDriverFactory(this.config);
         } else if (config.getMode() == DriverMode.TESTDROID) {

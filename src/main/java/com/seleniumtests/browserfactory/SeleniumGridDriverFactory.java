@@ -27,9 +27,11 @@ import org.apache.http.util.EntityUtils;
 import org.json.JSONObject;
 import org.openqa.selenium.UnsupportedCommandException;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
+import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.DriverConfig;
@@ -37,9 +39,9 @@ import com.seleniumtests.driver.screenshots.ScreenShotRemoteWebDriver;
 import com.seleniumtests.reporter.TestLogging;
 import com.seleniumtests.util.helper.WaitHelper;
 
-public class RemoteDriverFactory extends AbstractWebDriverFactory implements IWebDriverFactory {
+public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implements IWebDriverFactory {
 
-    public RemoteDriverFactory(final DriverConfig cfg) {
+    public SeleniumGridDriverFactory(final DriverConfig cfg) {
         super(cfg);
     }
 
@@ -48,40 +50,57 @@ public class RemoteDriverFactory extends AbstractWebDriverFactory implements IWe
      * @param webDriverConfig
      * @return the capability for a given browser
      */
-    public DesiredCapabilities createCapabilityByBrowser(DriverConfig webDriverConfig){
-    	DesiredCapabilities capability = null;
-    	
+    public DesiredCapabilities createCapabilityByBrowser(DriverConfig webDriverConfig, DesiredCapabilities capabilities){
+
     	switch (webDriverConfig.getBrowser()) {
 
 	        case FIREFOX :
-	            capability = new FirefoxCapabilitiesFactory().createCapabilities(webDriverConfig);
+	            capabilities.merge(new FirefoxCapabilitiesFactory().createCapabilities(webDriverConfig));
 	            break;
 	
 	        case INTERNETEXPLORER :
-	            capability = new IECapabilitiesFactory().createCapabilities(webDriverConfig);
+	        	capabilities.merge(new IECapabilitiesFactory().createCapabilities(webDriverConfig));
 	            break;
 	
 	        case CHROME :
-	            capability = new ChromeCapabilitiesFactory().createCapabilities(webDriverConfig);
+	        	capabilities.merge(new ChromeCapabilitiesFactory().createCapabilities(webDriverConfig));
 	            break;
 	
 	        case HTMLUNIT :
-	            capability = new HtmlUnitCapabilitiesFactory().createCapabilities(webDriverConfig);
+	        	capabilities.merge(new HtmlUnitCapabilitiesFactory().createCapabilities(webDriverConfig));
 	            break;
 	
 	        case SAFARI :
-	            capability = new SafariCapabilitiesFactory().createCapabilities(webDriverConfig);
+	        	capabilities.merge(new SafariCapabilitiesFactory().createCapabilities(webDriverConfig));
 	            break;
 	
 	        case PHANTOMJS :
-	            capability = new PhantomJSCapabilitiesFactory().createCapabilities(webDriverConfig);
+	        	capabilities.merge(new PhantomJSCapabilitiesFactory().createCapabilities(webDriverConfig));
 	            break;
 	
 	        default :
 	            break;
 	    }
     	
-    	return capability;
+    	return capabilities;
+    }
+    
+    /**
+     * Creates capabilities specific to seleniumGrid
+     * For example, Appium needs PLATFORM_NAME and PLATFORM_VERSION capabilities, but seleniumGrid matcher
+     * looks at PLATFORM and VERSION capabilities. This method adds them
+     * OS version is only updated for mobile. It has no real sense on desktop
+     * @return
+     */
+    private DesiredCapabilities createSpecificGridCapabilities(DriverConfig webDriverConfig) {
+    	DesiredCapabilities capabilities = new DesiredCapabilities();
+    	capabilities.setCapability(CapabilityType.PLATFORM, webDriverConfig.getPlatform().toLowerCase());
+    	
+    	if (SeleniumTestsContextManager.isMobileTest()) {
+    		capabilities.setCapability(CapabilityType.VERSION, webDriverConfig.getMobilePlatformVersion());
+    	}
+    	
+    	return capabilities;
     }
     
     @Override
@@ -95,12 +114,26 @@ public class RemoteDriverFactory extends AbstractWebDriverFactory implements IWe
 			throw new ConfigurationException(String.format("Hub url '%s' is invalid: %s", webDriverConfig.getHubUrl(), e1.getMessage()));
 		}
 
-        DesiredCapabilities capability = createCapabilityByBrowser(webDriverConfig);
+        DesiredCapabilities capabilities = createSpecificGridCapabilities(webDriverConfig);
+        if (SeleniumTestsContextManager.isDesktopWebTest()) {
+        	capabilities = createCapabilityByBrowser(webDriverConfig, capabilities);
+        } else if (SeleniumTestsContextManager.isMobileTest()) {
+        	if("android".equalsIgnoreCase(webDriverConfig.getPlatform())) {
+        		capabilities = new AndroidCapabilitiesFactory(capabilities).createCapabilities(webDriverConfig);
+	        } else if ("ios".equalsIgnoreCase(webDriverConfig.getPlatform())){
+	        	capabilities = new IOsCapabilitiesFactory(capabilities).createCapabilities(webDriverConfig);
+	        } else {
+	        	throw new ConfigurationException(String.format("Platform %s is unknown for mobile tests", webDriverConfig.getPlatform()));
+	        }
+        } else {
+        	throw new ConfigurationException("Remote driver is supported for mobile and desktop web tests");
+        }
+        
 
         if ((BrowserType.FIREFOX).equals(webDriverConfig.getBrowser())) {
-            driver = getDriverFirefox(url, capability);
+            driver = getDriverFirefox(url, capabilities);
         } else {
-            driver = new ScreenShotRemoteWebDriver(url, capability);
+            driver = new ScreenShotRemoteWebDriver(url, capabilities);
         }
 
         setImplicitWaitTimeout(webDriverConfig.getImplicitWaitTimeout());
@@ -154,9 +187,7 @@ public class RemoteDriverFactory extends AbstractWebDriverFactory implements IWe
             String node = proxyId.split("//")[1].split(":")[0];
             String browserName = ((RemoteWebDriver) driver).getCapabilities().getBrowserName();
             String version = ((RemoteWebDriver) driver).getCapabilities().getVersion();
-            logger.info("WebDriver is running on node " + node + ", " + browserName + version 
-            			+ ", session " + ((RemoteWebDriver) driver).getSessionId());
-            TestLogging.log("WebDriver is running on node " + node + ", " + browserName + version + ", session "
+            TestLogging.info("WebDriver is running on node " + node + ", " + browserName + version + ", session "
                     + ((RemoteWebDriver) driver).getSessionId());
             
         } catch (Exception ex) {

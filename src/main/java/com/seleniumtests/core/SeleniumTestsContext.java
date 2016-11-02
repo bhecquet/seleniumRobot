@@ -143,8 +143,6 @@ public class SeleniumTestsContext {
     private Map<String, String> testVariables = Collections.synchronizedMap(new HashMap<String, String>());
 
     private ITestContext testNGContext = null;
-
-    private LinkedList<ScreenShot> screenshots = new LinkedList<>();
     
     public SeleniumTestsContext() {
     	// for test purpose only
@@ -221,7 +219,7 @@ public class SeleniumTestsContext {
         // determines test_type according to input configuration
         configureTestType();
 
-        // get mobile platform version if one is defined in device list
+        // get mobile platform version if one is defined in device list and a deviceName is set in parameters
         updateDeviceMobileVersion();
         
         // get mobile platform version
@@ -275,7 +273,7 @@ public class SeleniumTestsContext {
 	    			throw new ConfigurationException("For mobile platform, platform name should contain version. Ex: 'Android 5.0' or 'iOS 9.1'");
 	    		}
 			} else {
-				throw new ConfigurationException(String.format("Platform %s has not been recognized as a valide platform", getPlatform()));
+				throw new ConfigurationException(String.format("Platform %s has not been recognized as a valid platform", getPlatform()));
 			}
     	}
     }

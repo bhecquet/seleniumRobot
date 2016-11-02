@@ -581,6 +581,8 @@ Node configuration from command line or JSON is provided here:
 
 You should use JSON configuration for nodes, to make it simpler to start
 
+##### Desktop node #####
+
 To add a browser / browser version, add following code (change info if necessary)
 
 	{
@@ -602,6 +604,45 @@ To configure IEDriverServer and ChromeDriver executables, add the following to J
 or as command line switches
 
 Node configuration should use a timeout of 45 seconds
+
+##### Appium nodes #####
+
+To use mobile tests and SeleniumGrid, we use appium directly.<br/>
+Create a node.json configuration file for this node. (In the example below, We have 1 mobile device in Android 6.0 version, supporting either chrome or default android browser)
+
+	{
+  	"capabilities":
+      [
+        {
+			"browserName": "browser",
+			"deviceName": "192.168.228.101:5555",
+			 "version":"6.0",
+			 "maxInstances": 1,
+			 "platform":"android"
+        },
+		{
+			"browserName": "chrome",
+			"deviceName": "192.168.228.101:5555",
+			 "version":"6.0",
+			 "maxInstances": 1,
+			 "platform":"android"
+        }
+      ],
+  "configuration":
+  {
+    "proxy": "org.openqa.grid.selenium.proxy.DefaultRemoteProxy",
+    "maxSession": 1,
+    "register": true,
+    "registerCycle": 5000,
+    "hubPort": 4444,
+    "hubHost": "172.22.2.2"
+  }
+}
+
+From command line, use
+`appium --nodeconfig /path/to/nodeconfig.json`
+
+From GUI, node config file can be specified in appium options
 
 ## 5. Development ##
 
