@@ -332,12 +332,32 @@ public class SeleniumTestsContextManager {
 	public static boolean isWebTest() {
         return getThreadContext().getTestType().family().equals(TestType.WEB);
     }
+	
+	public static boolean isMobileTest() {
+		return getThreadContext().getTestType().isMobile();
+	}
     
 	public static boolean isNonGuiTest() {
 		return getThreadContext().getTestType().family().equals(TestType.NON_GUI);
 	}
 	
-    public static boolean isMobileAppTest() {
+    public static boolean isAppTest() {
     	return getThreadContext().getTestType().family().equals(TestType.APP);
+    }
+    
+    public static boolean isMobileAppTest() {
+    	return getThreadContext().getTestType().family().equals(TestType.APP) && getThreadContext().getTestType().isMobile();
+    }
+    
+    public static boolean isMobileWebTest() {
+    	return getThreadContext().getTestType().family().equals(TestType.WEB) && getThreadContext().getTestType().isMobile();
+    }
+    
+    public static boolean isDesktopAppTest() {
+    	return getThreadContext().getTestType().family().equals(TestType.APP) && !getThreadContext().getTestType().isMobile();
+    }
+    
+    public static boolean isDesktopWebTest() {
+    	return getThreadContext().getTestType().family().equals(TestType.WEB) && !getThreadContext().getTestType().isMobile();
     }
 }

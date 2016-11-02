@@ -73,7 +73,7 @@ public class AndroidCapabilitiesFactory extends ICapabilitiesFactory {
 
         // do not configure application and browser as they are mutualy exclusive
         if (app != null && "".equals(app.trim())) {
-        	caps.setCapability(CapabilityType.BROWSER_NAME, cfg.getBrowser());
+        	caps.setCapability(CapabilityType.BROWSER_NAME, cfg.getBrowser().toString().toLowerCase());
         	
         	
         	// set specific configuration for chrome

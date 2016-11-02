@@ -191,7 +191,7 @@ public class PageObject extends BasePage implements IPage {
         // in case of mobile application, only capture screenshot
         if (SeleniumTestsContextManager.isWebTest()) {
             waitForPageToLoad();
-        } else if (SeleniumTestsContextManager.isMobileAppTest()) {
+        } else if (SeleniumTestsContextManager.isAppTest()) {
         	capturePageSnapshot();
         }
     }

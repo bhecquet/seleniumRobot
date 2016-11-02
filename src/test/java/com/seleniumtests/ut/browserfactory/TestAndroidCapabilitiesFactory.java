@@ -43,7 +43,7 @@ public class TestAndroidCapabilitiesFactory extends GenericTest {
 		AndroidCapabilitiesFactory capaFactory = new AndroidCapabilitiesFactory();
 		DesiredCapabilities capa = capaFactory.createCapabilities(config);
 		
-		Assert.assertEquals(capa.getCapability(CapabilityType.BROWSER_NAME), BrowserType.FIREFOX);
+		Assert.assertEquals(capa.getCapability(CapabilityType.BROWSER_NAME), BrowserType.FIREFOX.toString().toLowerCase());
 		Assert.assertEquals(capa.getCapability(MobileCapabilityType.AUTOMATION_NAME), "Appium");
 	}
 	
