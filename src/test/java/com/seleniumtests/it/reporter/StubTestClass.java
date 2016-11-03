@@ -16,6 +16,7 @@
  */
 package com.seleniumtests.it.reporter;
 
+import org.openqa.selenium.WebDriverException;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -29,10 +30,11 @@ import com.seleniumtests.reporter.TestStep;
 public class StubTestClass extends StubParentClass {
 
 	@Test(groups="stub", description="a test with steps")
-	public void test1() {
+	public void testAndSubActions() {
 		TestStep step1 = new TestStep("step 1");
 		step1.addAction(new TestAction("click button", false));
 		step1.addAction(new TestAction("sendKeys to text field", true));
+		step1.setActionException(new WebDriverException("driver exception"));
 		TestStep subStep1 = new TestStep("step 1.3: open page");
 		subStep1.addAction(new TestAction("click link", false));
 		subStep1.addMessage(new TestMessage("a message", MessageType.LOG));

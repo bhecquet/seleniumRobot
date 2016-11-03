@@ -16,20 +16,14 @@
  */
 package com.seleniumtests.reporter;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.io.Writer;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -39,12 +33,10 @@ import java.util.TreeSet;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
 import org.testng.IInvokedMethod;
-import org.testng.IInvokedMethodListener;
 import org.testng.IReporter;
 import org.testng.IResultMap;
 import org.testng.ISuite;
@@ -69,11 +61,8 @@ import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.driver.screenshots.ScreenShot;
 import com.seleniumtests.driver.screenshots.ScreenshotUtil;
 
-public class SeleniumTestsReporter2 implements IReporter, ITestListener, IInvokedMethodListener {
+public class SeleniumTestsReporter2 extends CommonReporter implements IReporter, ITestListener {
 
-	private static Logger logger = TestLogging.getLogger(SeleniumTestsReporter.class);
-
-	private static final String RESOURCE_LOADER_PATH = "org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader";
 	private static final String HEADER = "header";
 	private static final String APPLICATION = "application";
 	private static final String APPLICATION_TYPE = "applicationType";
@@ -92,13 +81,9 @@ public class SeleniumTestsReporter2 implements IReporter, ITestListener, IInvoke
 	private Map<String, IResultMap> passedTests = new HashMap<>();
 	protected PrintWriter mOut;
 
-	private String uuid = new GregorianCalendar().getTime().toString();
-
 	private String outputDirectory;
 	private String resources;
 	private String generationErrorMessage = null;
-
-	private File report;
 	
 	/**
 	 * In case test result is SUCCESS but some softAssertions were raised, change test result to 
@@ -163,18 +148,6 @@ public class SeleniumTestsReporter2 implements IReporter, ITestListener, IInvoke
 		}
 	}
 
-	@Override
-	public void beforeInvocation(final IInvokedMethod arg0, final ITestResult arg1) { 
-		TestLogging.setCurrentTestResult(arg1);
-	}
-
-	private VelocityEngine initVelocityEngine() throws Exception {
-		VelocityEngine ve = new VelocityEngine();
-		ve.setProperty("resource.loader", "class");
-		ve.setProperty("class.resource.loader.class", RESOURCE_LOADER_PATH);
-		ve.init();
-		return ve;
-	}
 	
 	/**
 	 * Copy resources necessary for result file
@@ -184,25 +157,12 @@ public class SeleniumTestsReporter2 implements IReporter, ITestListener, IInvoke
 		
 		String[] styleFiles = new String[] {"bootstrap.min.css", "bootstrap.min.js", "Chart.min.js", "jQuery-2.2.0.min.js",
 											"seleniumRobot.css", "app.min.js", "seleniumRobot_solo.css", "seleniumtests_test1.gif",
-											"seleniumtests_test2.gif", "seleniumtests_test3.gif", "AdminLTE.min.css"};
+											"seleniumtests_test2.gif", "seleniumtests_test3.gif", "AdminLTE.min.css",
+											"seleniumRobot.js"};
 		for (String fileName: styleFiles) {
 			FileUtils.copyInputStreamToFile(Thread.currentThread().getContextClassLoader().getResourceAsStream("reporter/templates/" + fileName), 
 											Paths.get(outputDirectory, RESOURCES_DIR, "templates", fileName).toFile());
 		}
-	}
-
-	protected PrintWriter createWriter(final String outDir, final String fileName) throws IOException {
-		System.setProperty("file.encoding", "UTF8");
-		uuid = uuid.replaceAll(" ", "-").replaceAll(":", "-");
-
-		File f = new File(outDir, fileName);
-		logger.info("generating report " + f.getAbsolutePath());
-		report = f;
-
-		OutputStream out = new FileOutputStream(f);
-		Writer writer = new BufferedWriter(new OutputStreamWriter(out, "utf-8"));
-		return new PrintWriter(writer);
-
 	}
 
 	/**
@@ -226,54 +186,6 @@ public class SeleniumTestsReporter2 implements IReporter, ITestListener, IInvoke
 			mOut.close();
 		} catch (Exception e) {
 			logger.error("error writing result file end: " + e.getMessage());
-		}
-	}
-
-	protected void generateExceptionReport(final Throwable exception, final String title, final StringBuilder contentBuffer) {
-		generateTheStackTrace(exception, title, contentBuffer);
-	}
-	
-	/**
-	 * Remove useless stacktrace elements (e.g: sun.reflect)
-	 * @param message
-	 * @return
-	 */
-	private String filterStackTrace(String message) {
-		if (message.startsWith("sun.reflect.")
-			|| message.startsWith("java.lang.reflect")
-			|| message.startsWith("org.testng.")
-			|| message.startsWith("java.lang.Thread")
-			|| message.startsWith("java.util.concurrent.")
-			|| message.startsWith("org.aspectj.runtime.reflect")
-				) {
-			return null;
-		}
-		return message;
-	}
-	
-	/**
-	 * Method to generate the formated stacktrace
-	 * @param exception
-	 * @param title
-	 * @param contentBuffer
-	 */
-	public void generateTheStackTrace(final Throwable exception, final String title, final StringBuilder contentBuffer) {
-		contentBuffer.append(exception.getClass() + ": " + title + "\n");
-
-		StackTraceElement[] s1 = exception.getStackTrace();
-		Throwable t2 = exception.getCause();
-		if (t2 == exception) {
-			t2 = null;
-		}
-		for (int x = 0; x < s1.length; x++) {
-			String message = filterStackTrace(s1[x].toString());
-			if (message != null) {
-				contentBuffer.append("\nat " + message);
-			}
-		}
-
-		if (t2 != null) {
-			generateTheStackTrace(t2, "Caused by " + t2.getLocalizedMessage(), contentBuffer);
 		}
 	}
 

@@ -78,6 +78,15 @@ public class TestStep extends TestAction {
 		}
 		return false;
 	}
+	
+	public String getExceptionMessage() {
+		if (actionException == null) {
+			return "";
+		}
+		StringBuilder stackString = new StringBuilder();
+		CommonReporter.generateTheStackTrace(actionException, actionException.getMessage(), stackString);
+		return stackString.toString();
+	}
 
 	public void addAction(TestAction action) {
 		stepActions.add(action);

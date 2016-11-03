@@ -137,6 +137,7 @@ public class LogAction {
 			reply = joinPoint.proceed(joinPoint.getArgs());
 		} catch (Exception e) {
 			currentStep.setFailed(true);
+			currentStep.setActionException(e);
 			throw e;
 		} finally {
 			if (TestLogging.getParentTestStep() != null && previousParent != null) {
@@ -203,6 +204,7 @@ public class LogAction {
 			reply = joinPoint.proceed(joinPoint.getArgs());
 		} catch (Exception e) {
 			currentStep.setFailed(true);
+			currentStep.setActionException(e);
 			throw e;
 		} finally {
 			if (rootStep) {

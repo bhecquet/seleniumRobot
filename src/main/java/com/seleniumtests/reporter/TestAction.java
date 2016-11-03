@@ -24,6 +24,7 @@ package com.seleniumtests.reporter;
 public class TestAction {
 	private String name;
 	private Boolean failed;
+	protected Throwable actionException;
 	
 	public TestAction(String name, Boolean failed) {
 		this.name = name;
@@ -41,4 +42,13 @@ public class TestAction {
 	public void setFailed(Boolean failed) {
 		this.failed = failed;
 	}
+	
+	public Throwable getActionException() {
+		return actionException;
+	}
+
+	public void setActionException(Throwable actionException) {
+		this.actionException = actionException;
+	}
+
 }
