@@ -131,7 +131,7 @@ public class TestSeleniumTestsReporter2 extends MockitoTest {
 		// check content of summary report file
 		String mainReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport.html"));
 		
-		Assert.assertTrue(mainReportContent.contains("<a href='SeleniumTestReport-1.html'>test1</a>"));
+		Assert.assertTrue(mainReportContent.contains("<a href='SeleniumTestReport-1.html'>testAndSubActions</a>"));
 		Assert.assertTrue(mainReportContent.contains("<a href='SeleniumTestReport-2.html'>testInError</a>"));
 		
 		// check number of steps is correctly computed. "test1" has 2 main steps, "testInError" has 1 step
@@ -240,6 +240,6 @@ public class TestSeleniumTestsReporter2 extends MockitoTest {
 		detailedReportContent = detailedReportContent.replace("\n", "").replace("\r",  "").replaceAll(">\\s+<", "><");
 		
 		// check log presence
-		Assert.assertTrue(detailedReportContent.contains("<div> StubParentClass: Start method test1</div>"));
+		Assert.assertTrue(detailedReportContent.contains("<div> StubParentClass: Start method testAndSubActions</div>"));
 	}
 }

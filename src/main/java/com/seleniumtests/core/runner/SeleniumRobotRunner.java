@@ -36,7 +36,7 @@ import com.seleniumtests.reporter.TestLogging;
 
 @Listeners({com.seleniumtests.reporter.SeleniumTestsReporter2.class, 
 			com.seleniumtests.core.testretry.TestRetryListener.class, 
-			com.seleniumtests.reporter.JMeterReporter.class})
+			com.seleniumtests.reporter.PerformanceReporter.class})
 public class SeleniumRobotRunner {
 	
 	protected static final Logger logger = TestLogging.getLogger(SeleniumRobotRunner.class);

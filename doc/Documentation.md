@@ -784,6 +784,24 @@ In maven command line (goals & options), replace
 by
 
     -Dta.tmcallback.reportname=SeleniumRobot_Report
+    
+### Jenkins ###
+
+To execute SeleniumRobot using Jenkins, create a free-style job.
+
+- In "Build" section, add a shell command: `java -cp <sr_home>/seleniumRobot.jar;<sr_home>/plugins/<app_name>-tests.jar -DtestRetryCount=0 -Dbrowser=chrome -Denv=Integration org.testng.TestNG %STF_HOME%/data/<app_name>/testng/<testng.xml> -testnames <testnames>`</br>
+  - Replace `<sr_home>` by the folder where seleniumRobot is deployed
+  - Replace `<app_name>` by the name of the test application. e.g 'jpetstore'
+  - Replace `<testng.xml>` by the XML file to execute
+  - Replace `<testnames>` by the names of tests to execute (they must be present in XML file)
+  ![](images/jenkins_job_command.png)
+
+- In "Post build actions", configure like this<br/>
+  ![](images/jenkins_job_publish_html.png)
+
+  ![](images/jenkins_job_publish_perf.png)
+
+  ![](images/jenkins_job_publish_testng.png)
 
 ## 7. How To ##
 In this section, we will describe how to add some useful features to test applications (file comparison, log reading, ...)
