@@ -135,15 +135,15 @@ public class TestSeleniumTestsReporter2 extends MockitoTest {
 		Assert.assertTrue(mainReportContent.contains("<a href='SeleniumTestReport-2.html'>testInError</a>"));
 		
 		// check number of steps is correctly computed. "test1" has 2 main steps, "testInError" has 1 step
-		Assert.assertTrue(mainReportContent.contains("<td name=\"passed-1\">1</td>"));
+		Assert.assertTrue(mainReportContent.contains("<td name=\"passed-1\">2</td>"));
 		Assert.assertTrue(mainReportContent.contains("<td name=\"failed-1\">1</td>"));
-		Assert.assertTrue(mainReportContent.contains("<td name=\"stepsTotal-1\">2</td>"));
+		Assert.assertTrue(mainReportContent.contains("<td name=\"stepsTotal-1\">3</td>"));
 		
 		// for second test, test is reported KO whereas all steps are OK because we do not use LogAction.aj
 		// which handles assertion errors and report them in test steps
-		Assert.assertTrue(mainReportContent.contains("<td name=\"passed-2\">0</td>"));
+		Assert.assertTrue(mainReportContent.contains("<td name=\"passed-2\">1</td>"));
 		Assert.assertTrue(mainReportContent.contains("<td name=\"failed-2\">1</td>"));
-		Assert.assertTrue(mainReportContent.contains("<td name=\"stepsTotal-2\">1</td>"));
+		Assert.assertTrue(mainReportContent.contains("<td name=\"stepsTotal-2\">2</td>"));
 	}
 	
 	/**
@@ -182,7 +182,7 @@ public class TestSeleniumTestsReporter2 extends MockitoTest {
 
 		executeSubTest(new String[] {"com.seleniumtests.it.reporter.StubTestClass"});
 		
-		// check content of summary report file
+		// check style of messages
 		String detailedReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport-2.html"));
 		
 		Assert.assertTrue(detailedReportContent.contains("<div class=\"message-info\">click ok</div>"));
@@ -231,15 +231,68 @@ public class TestSeleniumTestsReporter2 extends MockitoTest {
 	@Test(groups={"it"})
 	public void testReportDetailsWithLogs(ITestContext testContext) throws Exception {
 		
-		reporter = spy(new SeleniumTestsReporter2());
+		reporter = new SeleniumTestsReporter2();
 		
 		executeSubTest(new String[] {"com.seleniumtests.it.reporter.StubTestClass"});
 		
-		// check content of summary report file
+		// check content of detailed report file
 		String detailedReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport-1.html"));
 		detailedReportContent = detailedReportContent.replace("\n", "").replace("\r",  "").replaceAll(">\\s+<", "><");
 		
 		// check log presence
 		Assert.assertTrue(detailedReportContent.contains("<div> StubParentClass: Start method testAndSubActions</div>"));
+	}
+	
+	/**
+	 * Check all steps are present in detailed report file
+	 * Test OK
+	 * @param testContext
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testReportDetailsSteps(ITestContext testContext) throws Exception {
+		
+		reporter = new SeleniumTestsReporter2();
+		
+		executeSubTest(new String[] {"com.seleniumtests.it.reporter.StubTestClass"});
+		
+		String detailedReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport-1.html"));
+		detailedReportContent = detailedReportContent.replace("\n", "").replace("\r",  "").replaceAll(">\\s+<", "><");
+		
+		// Check each step is recorded in file: 2 test steps + test end + logs
+		Assert.assertTrue(detailedReportContent.contains("<div class=\"box collapsed-box failed\"><div class=\"box-header with-border\"><button type=\"button\" class=\"btn btn-box-tool\" data-widget=\"collapse\"><i class=\"fa fa-plus\"></i></button> step 1 - 1.23 secs"));
+		Assert.assertTrue(detailedReportContent.contains("<div class=\"box collapsed-box success\"><div class=\"box-header with-border\"><button type=\"button\" class=\"btn btn-box-tool\" data-widget=\"collapse\"><i class=\"fa fa-plus\"></i></button> step 2 - 14.03 secs"));
+		Assert.assertTrue(detailedReportContent.contains("<div class=\"box collapsed-box success\"><div class=\"box-header with-border\"><button type=\"button\" class=\"btn btn-box-tool\" data-widget=\"collapse\"><i class=\"fa fa-plus\"></i></button> Test end - 0.0 secs"));
+		Assert.assertTrue(detailedReportContent.contains("<div class=\"box collapsed-box success\"><div class=\"box-header with-border\"><button type=\"button\" class=\"btn btn-box-tool\" data-widget=\"collapse\"><i class=\"fa fa-plus\"></i></button> Execution logs"));
+		Assert.assertTrue(detailedReportContent.contains("<div class=\"message-log\">Test is OK</div>"));
+	}
+	
+	/**
+	 * Check all errors are recorded in detailed file
+	 * - in execution logs
+	 * - in Test end step
+	 * @param testContext
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testReportDetailsWithErrors(ITestContext testContext) throws Exception {
+		
+		reporter = new SeleniumTestsReporter2();
+		
+		executeSubTest(new String[] {"com.seleniumtests.it.reporter.StubTestClass"});
+		
+		String detailedReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport-2.html"));
+		detailedReportContent = detailedReportContent.replace("\n", "").replace("\r",  "").replaceAll(">\\s+<", "><");
+		
+		// Check error is present is Last test step
+		Assert.assertTrue(detailedReportContent.contains("<div class=\"box-body\"><ul><div class=\"message-log\">Test is KO with error: error</div>"));
+		
+		// Check exception is logged and filtered
+		Assert.assertTrue(detailedReportContent.contains("<div class=\"message-error\"><div>class java.lang.AssertionError: error</div>"
+								+ "<div class=\"stack-element\"></div>"
+								+ "<div class=\"stack-element\">at com.seleniumtests.it.reporter.StubTestClass.testInError(StubTestClass.java:63)</div>"
+								+ "<div class=\"stack-element\">at com.seleniumtests.it.reporter.TestSeleniumTestsReporter2.executeSubTest(TestSeleniumTestsReporter2.java:80)</div>"
+								+ "<div class=\"stack-element\">at com.seleniumtests.it.reporter.TestSeleniumTestsReporter2.testReportDetailsWithErrors(TestSeleniumTestsReporter2.java:282)</div>"));
+		
 	}
 }

@@ -38,20 +38,18 @@ import com.seleniumtests.util.HashCodeGenerator;
 public class ScreenshotUtil {
 	private static final Logger logger = TestLogging.getLogger(ScreenshotUtil.class);
 
-	private String suiteName;
     private String outputDirectory;
     private WebDriver driver;
     private String filename;
-    private static final String SCREENSHOT_DIR = "/screenshots/";
+    private static final String SCREENSHOT_DIR = "screenshots/";
+    private static final String HTML_DIR = "htmls/";
 	
 	public ScreenshotUtil() {
-        suiteName = getSuiteName();
         outputDirectory = getOutputDirectory();
         this.driver = WebUIDriver.getWebDriver();
     }
 
     public ScreenshotUtil(final WebDriver driver) {
-        suiteName = getSuiteName();
         outputDirectory = getOutputDirectory();
         this.driver = driver;
     }
@@ -82,7 +80,8 @@ public class ScreenshotUtil {
     }
 
     private static String getOutputDirectory() {
-        return SeleniumTestsContextManager.getGlobalContext().getTestNGContext().getOutputDirectory();
+//        return SeleniumTestsContextManager.getGlobalContext().getTestNGContext().getOutputDirectory();
+        return SeleniumTestsContextManager.getThreadContext().getOutputDirectory();
     }
 
     private void handleSource(String htmlSource, final ScreenShot screenShot) {
@@ -93,8 +92,8 @@ public class ScreenshotUtil {
 
         if (_htmlSource != null) {
             try {
-                FileUtils.writeStringToFile(new File(outputDirectory + "/htmls/" + filename + ".html"), _htmlSource);
-                screenShot.setHtmlSourcePath(suiteName + "/htmls/" + filename + ".html");
+                FileUtils.writeStringToFile(new File(outputDirectory + "/" + HTML_DIR + filename + ".html"), _htmlSource);
+                screenShot.setHtmlSourcePath(HTML_DIR + filename + ".html");
             } catch (IOException e) {
                 logger.warn("Ex", e);
             }
@@ -107,8 +106,8 @@ public class ScreenshotUtil {
 
             if (screenshotString != null && !screenshotString.isEmpty()) {
                 byte[] byteArray = screenshotString.getBytes();
-                FileUtility.writeImage(outputDirectory + SCREENSHOT_DIR + filename + ".png", byteArray);
-                screenShot.setImagePath(suiteName + SCREENSHOT_DIR + filename + ".png");
+                FileUtility.writeImage(outputDirectory + "/" + SCREENSHOT_DIR + filename + ".png", byteArray);
+                screenShot.setImagePath(SCREENSHOT_DIR + filename + ".png");
 
             }
         } catch (Exception e) {
@@ -143,7 +142,7 @@ public class ScreenshotUtil {
             return screenShot;
         }
 
-        screenShot.setSuiteName(this.suiteName);
+        screenShot.setSuiteName(getSuiteName());
 
         try {
             String url = "app";

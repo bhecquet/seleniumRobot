@@ -210,8 +210,6 @@ public class LogAction {
 			if (rootStep) {
 				TestLogging.getCurrentRootTestStep().setDuration(new Date().getTime() - testStepStart.getTime());
 				TestLogging.logTestStep(TestLogging.getCurrentRootTestStep());	
-				TestLogging.setCurrentRootTestStep(null);
-				TestLogging.setParentTestStep(null);
 			} else {
 				TestLogging.setParentTestStep(previousParent);
 			}
