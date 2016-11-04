@@ -462,35 +462,34 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter,
 	 * 
 	 **/
 	@Override
-	public synchronized void onTestFailure(final ITestResult arg0) {
-		if (arg0.getMethod().getRetryAnalyzer() != null) {
-			ITestRetryAnalyzer testRetryAnalyzer = (ITestRetryAnalyzer) arg0.getMethod().getRetryAnalyzer();
+	public synchronized void onTestFailure(final ITestResult testResult) {
+		if (testResult.getMethod().getRetryAnalyzer() != null) {
+			ITestRetryAnalyzer testRetryAnalyzer = (ITestRetryAnalyzer) testResult.getMethod().getRetryAnalyzer();
 
-			if (testRetryAnalyzer.retryPeek(arg0)) {
-				arg0.setStatus(ITestResult.SKIP);
+			if (testRetryAnalyzer.retryPeek(testResult)) {
+				testResult.setStatus(ITestResult.SKIP);
 				Reporter.setCurrentTestResult(null);
 			} else {
-				IResultMap rMap = failedTests.get(arg0.getTestContext().getName());
-				rMap.addResult(arg0, arg0.getMethod());
-				failedTests.put(arg0.getTestContext().getName(), rMap);
+				IResultMap rMap = failedTests.get(testResult.getTestContext().getName());
+				rMap.addResult(testResult, testResult.getMethod());
+				failedTests.put(testResult.getTestContext().getName(), rMap);
 			}
 
-			logger.info(arg0.getMethod() + " Failed in " + testRetryAnalyzer.getCount() + " times");
-			isRetryHandleNeeded.put(arg0.getTestContext().getName(), true);
+			logger.info(testResult.getMethod() + " Failed in " + testRetryAnalyzer.getCount() + " times");
+			isRetryHandleNeeded.put(testResult.getTestContext().getName(), true);
 		}
 
-		// capture snap shot only for the failed web tests
-		// don't recreate driver if it does not exist
-		logLastSnapshot();
+		// capture snap shot
+		logLastStep(testResult);
 	}
 
 	@Override
-	public void onTestSkipped(final ITestResult arg0) {
+	public void onTestSkipped(final ITestResult testResult) {
 		// overriden
 	}
 
 	@Override
-	public void onTestStart(final ITestResult arg0) {
+	public void onTestStart(final ITestResult testResult) {
 		// overriden
 	}
 
@@ -502,22 +501,24 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter,
 	 * 
 	 **/
 	@Override
-	public void onTestSuccess(final ITestResult arg0) {
+	public void onTestSuccess(final ITestResult testResult) {
 		// capture snap shot at the end of the test
-		logLastSnapshot();
+		logLastStep(testResult);
 	}
 	
 	/**
 	 * On test end, will take a snap shot and store it
 	 */
-	private void logLastSnapshot() {
+	private void logLastStep(ITestResult testResult) {
+		TestStep tearDownStep = new TestStep("Test end");
+		TestLogging.setCurrentRootTestStep(tearDownStep);
+		TestLogging.log(String.format("Test is %s", testResult.isSuccess() ? "OK": "KO with error: " + testResult.getThrowable().getMessage()));
+		
 		if (WebUIDriver.getWebDriver(false) != null) {
 			ScreenShot screenShot = new ScreenshotUtil().captureWebPageSnapshot();
-			TestStep tearDownStep = new TestStep("Test end");
-			TestLogging.setCurrentRootTestStep(tearDownStep);
 			TestLogging.logScreenshot(screenShot, false);
-			TestLogging.logTestStep(tearDownStep);
 		}
+		TestLogging.logTestStep(tearDownStep);
 	}
 
 	/**

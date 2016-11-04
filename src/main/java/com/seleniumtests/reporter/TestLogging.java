@@ -246,6 +246,13 @@ public class TestLogging {
     public static void logTestStep(TestStep testStep) {
     	logTestStep(testStep, true);
     }
+    
+    /**
+     * Logs the testStep for this test
+     * Once logging is done, parentTestStep and currentRootTestStep are reset to avoid storing new data in them
+     * @param testStep
+     * @param storeStep
+     */
     public static void logTestStep(TestStep testStep, boolean storeStep) {
     	log("<li>" + (testStep.getFailed() ? "<b>FailedStep</b>: " : " ") + "<b>" + testStep.getName() + "</b>", testStep.getFailed(), false);
     	List<TestAction> actionList = testStep.getStepActions();
@@ -265,6 +272,8 @@ public class TestLogging {
     	
     	if (storeStep) {
     		TestLogging.testsSteps.get(getCurrentTestResult()).add(testStep);
+    		TestLogging.setCurrentRootTestStep(null);
+			TestLogging.setParentTestStep(null);
     	}
     }
 
@@ -321,7 +330,18 @@ public class TestLogging {
 		TestLogging.testsSteps.put(testResult, new ArrayList<>());
 	}
 	
+	/**
+	 * For Integration tests only
+	 */
+	public static void resetCurrentTestResult() {
+		TestLogging.currentTestResult.remove(Thread.currentThread());
+	}
+	
 	public static ITestResult getCurrentTestResult() {
+		if (TestLogging.currentTestResult.get(Thread.currentThread()) == null) {
+			logger.warn("Reporter did not inform about the current test result, creating one");
+			setCurrentTestResult(Reporter.getCurrentTestResult());
+		} 
 		return TestLogging.currentTestResult.get(Thread.currentThread());
 	}
 	
