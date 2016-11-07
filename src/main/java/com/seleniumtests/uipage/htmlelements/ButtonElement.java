@@ -21,6 +21,7 @@ import org.openqa.selenium.Keys;
 
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.WebUIDriver;
+import com.seleniumtests.uipage.ReplayOnError;
 
 public class ButtonElement extends HtmlElement {
 
@@ -51,6 +52,7 @@ public class ButtonElement extends HtmlElement {
         }
     }
 
+    @ReplayOnError
     public void submit() {
         findElement(true);
         element.submit();

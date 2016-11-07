@@ -47,6 +47,7 @@ import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import com.seleniumtests.driver.TestType;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.reporter.TestLogging;
+import com.seleniumtests.uipage.ReplayOnError;
 import com.seleniumtests.util.helper.WaitHelper;
 
 import io.appium.java_client.AppiumDriver;
@@ -128,6 +129,7 @@ public class HtmlElement {
     	this.frameElement = null;
     }
 
+    @ReplayOnError
     public void click() {
         findElement(true);
         element.click();   
@@ -143,6 +145,7 @@ public class HtmlElement {
      *
      * @param  value
      */
+    @ReplayOnError
     public void clickAt(int xOffset, int yOffset) {
         findElement(true);
 
@@ -155,6 +158,7 @@ public class HtmlElement {
         }
     }
 
+    @ReplayOnError
     public void simulateClick() {
         findElement(true);
 
@@ -170,6 +174,7 @@ public class HtmlElement {
         WaitHelper.waitForSeconds(2);
     }
     
+    @ReplayOnError
     public void simulateSendKeys(CharSequence... keysToSend) {
     	findElement(true);
     		
@@ -187,6 +192,7 @@ public class HtmlElement {
         }
     }
 
+    @ReplayOnError
     public void simulateMoveToElement(final int x, final int y) {
         findElement(true);
         ((JavascriptExecutor) driver).executeScript(
@@ -200,6 +206,7 @@ public class HtmlElement {
      * Find elements inside this element
      * @param by
      */
+    @ReplayOnError
     public List<WebElement> findElements(By by) {
     	
     	// find the root element
@@ -309,6 +316,7 @@ public class HtmlElement {
      *
      * @return
      */
+	@ReplayOnError
     public List<WebElement> findElements() {
         findElement();
 
@@ -322,6 +330,7 @@ public class HtmlElement {
      *
      * @return
      */
+	@ReplayOnError
     public String getAttribute(final String name) {
         findElement();
 
@@ -344,6 +353,7 @@ public class HtmlElement {
      *
      * @return
      */
+    @ReplayOnError
     public String getCssValue(final String propertyName) {
         findElement();
 
@@ -370,6 +380,7 @@ public class HtmlElement {
      *
      * @return
      */
+    @ReplayOnError
     public WebElement getElement() {
     	findElement(true);
         return element;
@@ -382,6 +393,7 @@ public class HtmlElement {
      *
      * @return
      */
+    @ReplayOnError
     public String getEval(final String script) {
         findElement();
         
@@ -393,6 +405,7 @@ public class HtmlElement {
      *
      * @return
      */
+    @ReplayOnError
     public int getHeight() {
         findElement();
 
@@ -413,6 +426,7 @@ public class HtmlElement {
      *
      * @return
      */
+    @ReplayOnError
     public Point getLocation() {
         findElement();
 
@@ -424,6 +438,7 @@ public class HtmlElement {
      *
      * @return
      */
+    @ReplayOnError
     public Dimension getSize() {
         findElement();
 
@@ -435,6 +450,7 @@ public class HtmlElement {
      *
      * @return
      */
+    @ReplayOnError
     public String getTagName() {
         findElement();
 
@@ -446,6 +462,7 @@ public class HtmlElement {
      *
      * @return
      */
+    @ReplayOnError
     public String getText() {
         findElement();
 
@@ -457,6 +474,7 @@ public class HtmlElement {
      *
      * @return
      */
+    @ReplayOnError
     public String getValue() {
         findElement();
 
@@ -468,6 +486,7 @@ public class HtmlElement {
      *
      * @return
      */
+    @ReplayOnError
     public int getWidth() {
         findElement();
 
@@ -479,6 +498,7 @@ public class HtmlElement {
      *
      * @return
      */
+    @ReplayOnError
     public boolean isDisplayed() {
 
         try {
@@ -513,6 +533,7 @@ public class HtmlElement {
      *
      * @return
      */
+    @ReplayOnError
     public boolean isEnabled() {
         findElement();
 
@@ -524,6 +545,7 @@ public class HtmlElement {
      *
      * @return
      */
+    @ReplayOnError
     public boolean isSelected() {
         findElement();
 
@@ -545,6 +567,7 @@ public class HtmlElement {
     /**
      * Forces a mouseDown event on the WebElement.
      */
+    @ReplayOnError
     public void mouseDown() {
         findElement(true);
 
@@ -556,6 +579,7 @@ public class HtmlElement {
     /**
      * Forces a mouseOver event on the WebElement.
      */
+    @ReplayOnError
     public void mouseOver() {
         findElement(true);
 
@@ -567,6 +591,7 @@ public class HtmlElement {
     /**
      * Forces a mouseOver event on the WebElement using simulate by JavaScript way for some dynamic menu.
      */
+    @ReplayOnError
     public void simulateMouseOver() {
         findElement(true);
 
@@ -579,6 +604,7 @@ public class HtmlElement {
     /**
      * Forces a mouseUp event on the WebElement.
      */
+    @ReplayOnError
     public void mouseUp() {
         findElement(true);
 
@@ -602,6 +628,7 @@ public class HtmlElement {
      * @param  arg0
      * @param 	clear	if true, clear field before writing
      */
+    @ReplayOnError
     public void sendKeys(final CharSequence arg0, final boolean clear) {
         findElement(true);
         
@@ -625,6 +652,7 @@ public class HtmlElement {
 	 * @param attributeName		name of the attribute to look for
 	 * @return found string
 	 */
+    @ReplayOnError
 	public String findPattern(Pattern pattern, String attributeName) {
 		findElement();
 		String attributeValue;
@@ -689,6 +717,7 @@ public class HtmlElement {
     /**
      * Method created for test purpose only
      */
+    @ReplayOnError
     public void doNothing() {
     	// do nothing
     }
@@ -727,11 +756,13 @@ public class HtmlElement {
     	
     }
     
+    @ReplayOnError
     public Point getCenter() {
     	checkForMobile();
     	return ((MobileElement)getUnderlyingElement(element)).getCenter();
     }
     
+    @ReplayOnError
     public void pinch() {
     	checkForMobile();
     	((MobileElement)getUnderlyingElement(element)).pinch();
@@ -742,6 +773,7 @@ public class HtmlElement {
      * @param direction		UP, DOWN, LEFT, RIGHT
      * @param duration		amount of time in milliseconds for the entire swipe action to take
      */
+    @ReplayOnError
     public void swipe(SwipeElementDirection direction, int duration) {
     	checkForMobile();
     	((MobileElement)getUnderlyingElement(element)).swipe(direction, duration);
@@ -758,16 +790,19 @@ public class HtmlElement {
      * 								offset from the right border of the element.
      * @param duration				amount of time in milliseconds for the entire swipe action to take
      */
+    @ReplayOnError
     public void swipe(SwipeElementDirection direction, int offsetFromStartBorder, int offsetFromEndBorder, int duration) {
     	checkForMobile();
     	((MobileElement)getUnderlyingElement(element)).swipe(direction, offsetFromStartBorder, offsetFromEndBorder, duration);
     }
     
+    @ReplayOnError
     public void tap(int fingers, int duration) {
     	checkForMobile();
     	((MobileElement)getUnderlyingElement(element)).tap(fingers, duration);
     }
     
+    @ReplayOnError
     public void zoom() {
     	checkForMobile();
     	((MobileElement)getUnderlyingElement(element)).zoom();
@@ -784,6 +819,7 @@ public class HtmlElement {
      * Wait element to present using Explicit Waits with timeout in seconds. This method is used for special element
      * which needs long time to present.
      */
+    @ReplayOnError
     public void waitForPresent(final int timeout) {
     	
     	// refresh driver
