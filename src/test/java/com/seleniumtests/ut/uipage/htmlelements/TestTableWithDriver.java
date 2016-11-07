@@ -24,6 +24,8 @@ public class TestTableWithDriver extends GenericDriverTest {
 		
 	@BeforeMethod(alwaysRun = true)
 	public void initDriver() throws Exception {
+		System.out.println("#######################" + SeleniumTestsContextManager.getThreadContext().getBrowser());
+		System.out.println("#######################" + SeleniumTestsContextManager.getThreadContext().getPlatform());
 		driver = WebUIDriver.getWebDriver(true);
 		testPage = new DriverTestPage(true);
 	}

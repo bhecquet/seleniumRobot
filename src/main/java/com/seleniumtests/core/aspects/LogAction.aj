@@ -63,6 +63,7 @@ public class LogAction {
     		+ "&& !execution(* com.seleniumtests.uipage.htmlelements.HtmlElement.toHTML (..))"
     		)
 	public Object logAction(ProceedingJoinPoint joinPoint) throws Throwable {
+		System.out.println(joinPoint.getSignature().toLongString());
 		HtmlElement element = (HtmlElement)joinPoint.getTarget();
 		Object reply = null;
 		boolean actionFailed = false;
@@ -312,13 +313,15 @@ public class LogAction {
 		boolean specificElementFound = false;
 		boolean htmlElementFound = false;
 		
-		for(int i=0; i < stack.length; i++){
-			 stackClass = stack[i].getClassName();
-			 if (stackClass.equals("com.seleniumtests.uipage.htmlelements.HtmlElement")) {
-				 htmlElementFound = true;
-			 } else if (stackClass.startsWith("com.seleniumtests.uipage.htmlelements.")) {
-				 specificElementFound = true;
-			 }
+		for(int i=0; i < stack.length; i++) {
+			
+			// when using aspects, class name may contain a "$", remove everything after that symbol
+			stackClass = stack[i].getClassName().split("\\$")[0];
+			if (stackClass.equals("com.seleniumtests.uipage.htmlelements.HtmlElement")) {
+				htmlElementFound = true;
+			} else if (stackClass.startsWith("com.seleniumtests.uipage.htmlelements.")) {
+				specificElementFound = true;
+			}
 		}
 		if (htmlElementFound && specificElementFound) {
 			return false;

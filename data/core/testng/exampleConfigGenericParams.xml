@@ -22,7 +22,7 @@
 	<parameter name="browser" value="chrome" />
 	
 	<parameter name="app" value="myMobileApp.apk" />
-	<parameter name="deviceName" value="Samsung Galaxy Nexus SPH-L700 4.3" />
+	<!-- <parameter name="deviceName" value="Samsung Galaxy Nexus SPH-L700 4.3" /> -->
 	<parameter name="appPackage" value="com.infotel.mobile" />
 	<parameter name="appActivity" value="com.infotel.mobile.StartActivity" />
 	<parameter name="appWaitActivity" value="com.infotel.mobile.ConfigurationActivity" />
