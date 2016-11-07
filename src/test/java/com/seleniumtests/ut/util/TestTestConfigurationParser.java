@@ -39,7 +39,7 @@ public class TestTestConfigurationParser extends GenericTest {
 
 	@Test(groups={"ut"})
 	public void testParameterNodes() {
-		Assert.assertEquals(configParser.getParameterNodes().size(), 7);
+		Assert.assertEquals(configParser.getParameterNodes().size(), 6);
 	}
 	
 	@Test(groups={"ut"})

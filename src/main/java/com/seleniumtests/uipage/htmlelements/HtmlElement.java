@@ -719,6 +719,7 @@ public class HtmlElement {
      */
     @ReplayOnError
     public void doNothing() {
+    	System.out.println("toto");
     	// do nothing
     }
     
