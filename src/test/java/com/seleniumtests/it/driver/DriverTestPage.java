@@ -23,7 +23,9 @@ import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.uipage.PageObject;
 import com.seleniumtests.uipage.htmlelements.ButtonElement;
 import com.seleniumtests.uipage.htmlelements.CheckBoxElement;
+import com.seleniumtests.uipage.htmlelements.FrameElement;
 import com.seleniumtests.uipage.htmlelements.HtmlElement;
+import com.seleniumtests.uipage.htmlelements.LabelElement;
 import com.seleniumtests.uipage.htmlelements.LinkElement;
 import com.seleniumtests.uipage.htmlelements.RadioButtonElement;
 import com.seleniumtests.uipage.htmlelements.SelectList;
@@ -56,7 +58,21 @@ public class DriverTestPage extends PageObject {
 	public static final SelectList selectUlLiList = new SelectList("ulLiList", By.id("languages"));
 	public static final TextFieldElement ulliListTrigger = new TextFieldElement("listTrigger", By.id("language"));
 	public static final Table table = new Table("table", By.id("table"));
-
+	
+	// Elements for IFrame
+	public static final FrameElement iframe = new FrameElement("IFrame", By.id("myIFrame"));
+	public static final FrameElement subIframe = new FrameElement("IFrame", By.name("mySecondIFrame"), iframe);
+	public static final TextFieldElement textElementIFrame = new TextFieldElement("Text", By.id("textInIFrameWithValue"), iframe);
+	public static final RadioButtonElement radioElementIFrame = new RadioButtonElement("Radio", By.id("radioClickIFrame"), iframe);
+	public static final CheckBoxElement checkElementIFrame = new CheckBoxElement("Check", By.id("checkboxClickIFrame"), iframe);
+	public static final ButtonElement buttonIFrame = new ButtonElement("Button", By.id("buttonIFrame"), iframe);
+	public static final LinkElement linkIFrame = new LinkElement("My link", By.id("linkIFrame"), iframe);
+	public static final SelectList selectListIFrame = new SelectList("list", By.id("selectIFrame"), iframe);
+	public static final Table tableIFrame = new Table("table", By.id("tableIframe"), iframe);
+	public static final LabelElement labelIFrame = new LabelElement("label", By.id("labelIFrame"), iframe);
+	
+	public static final TextFieldElement textElementSubIFrame = new TextFieldElement("Text", By.id("textInIFrameWithValue2"), subIframe);
+	
 	public DriverTestPage() throws Exception {
         super(textElement);
     }
