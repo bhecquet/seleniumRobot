@@ -109,13 +109,13 @@ public class TestLogActions extends GenericTest {
 	/**
 	 * Only test presence of root steps. there should be:
 	 * - page opening
-	 * - add
+	 * - failAction
 	 * Checks that root steps are correctly intercepted with an action in error
 	 * Also check this action is marked as failed and exception is present in step
 	 * @throws IOException
 	 */
 	@Test(groups={"it"})
-	public void testFailedStep() throws IOException {
+	public void testFailedStepOnException() throws IOException {
 		try {
 			new CalcPage()
 				.failAction();
@@ -131,6 +131,33 @@ public class TestLogActions extends GenericTest {
 		Assert.assertTrue(steps.get(1).getFailed());
 		Assert.assertNotNull(steps.get(1).getActionException());
 		Assert.assertEquals(steps.get(1).getActionException().getMessage(), "fail");
+	}
+	
+	/**
+	 * Only test presence of root steps. there should be:
+	 * - page opening
+	 * - failAction
+	 * Checks that root steps are correctly intercepted with an action in error (AssertionError)
+	 * Also check this action is marked as failed and exception is present in step
+	 * @throws IOException
+	 */
+	@Test(groups={"it"})
+	public void testFailedStepOnAssertion() throws IOException {
+		try {
+			new CalcPage()
+			.assertAction();
+		} catch (AssertionError e) {
+			// continue;
+		}
+		
+		List<TestStep> steps = TestLogging.getTestsSteps().get(Reporter.getCurrentTestResult());
+		Assert.assertEquals(steps.size(), 2);
+		Assert.assertEquals(steps.get(0).getName(), "openPage with args: (null, )");
+		Assert.assertEquals(steps.get(1).getName(), "assertAction ");
+		Assert.assertFalse(steps.get(0).getFailed());
+		Assert.assertTrue(steps.get(1).getFailed());
+		Assert.assertNotNull(steps.get(1).getActionException());
+		Assert.assertEquals(steps.get(1).getActionException().getMessage(), "false error expected [true] but found [false]");
 	}
 	
 	/**

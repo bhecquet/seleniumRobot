@@ -45,6 +45,7 @@ import org.testng.xml.XmlTest;
 import com.seleniumtests.MockitoTest;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.reporter.SeleniumTestsReporter2;
+import com.seleniumtests.reporter.TestListener;
 import com.seleniumtests.reporter.TestLogging;
 
 public class TestSeleniumTestsReporter2 extends MockitoTest {
@@ -57,6 +58,8 @@ public class TestSeleniumTestsReporter2 extends MockitoTest {
 	 * @throws IOException 
 	 */
 	private XmlSuite executeSubTest(String[] testClasses) throws IOException {
+		TestListener testListener = new TestListener();
+		
 		XmlSuite suite = new XmlSuite();
 		suite.setName("TmpSuite");
 		suite.setFileName("/home/test/seleniumRobot/data/core/testng/testLoggging.xml");
@@ -74,8 +77,8 @@ public class TestSeleniumTestsReporter2 extends MockitoTest {
 		TestNG tng = new TestNG(false);
 		tng.setXmlSuites(suites);
 		tng.addListener((IReporter)reporter);
-		tng.addListener((ITestListener)reporter);
-		tng.addListener((IInvokedMethodListener)reporter);
+		tng.addListener((ITestListener)testListener);
+		tng.addListener((IInvokedMethodListener)testListener);
 		tng.setOutputDirectory(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory());
 		tng.run(); 
 		TestLogging.parseLogFile();
@@ -91,19 +94,19 @@ public class TestSeleniumTestsReporter2 extends MockitoTest {
 		executeSubTest(new String[] {"com.seleniumtests.it.reporter.StubTestClass", "com.seleniumtests.it.reporter.StubTestClass2"});
 		
 		// check data stored in reporter
-		Assert.assertEquals(reporter.getFailedTests().get("StubTestClass").size(), 2);
-		Assert.assertEquals(reporter.getFailedTests().get("StubTestClass2").size(), 2);
-		Assert.assertEquals(reporter.getSkippedTests().get("StubTestClass").size(), 0);
-		Assert.assertEquals(reporter.getSkippedTests().get("StubTestClass2").size(), 2);
-		Assert.assertEquals(reporter.getPassedTests().get("StubTestClass").size(), 1);
-		Assert.assertEquals(reporter.getPassedTests().get("StubTestClass2").size(), 2);
+		Assert.assertEquals(TestListener.getCurrentListener().getFailedTests().get("StubTestClass").size(), 2);
+		Assert.assertEquals(TestListener.getCurrentListener().getFailedTests().get("StubTestClass2").size(), 2);
+		Assert.assertEquals(TestListener.getCurrentListener().getSkippedTests().get("StubTestClass").size(), 0);
+		Assert.assertEquals(TestListener.getCurrentListener().getSkippedTests().get("StubTestClass2").size(), 2);
+		Assert.assertEquals(TestListener.getCurrentListener().getPassedTests().get("StubTestClass").size(), 1);
+		Assert.assertEquals(TestListener.getCurrentListener().getPassedTests().get("StubTestClass2").size(), 2);
 		
-		int errorNb = reporter.getFailedTests().get("StubTestClass").size() 
-					+ reporter.getFailedTests().get("StubTestClass2").size()
-					+ reporter.getSkippedTests().get("StubTestClass").size()
-					+ reporter.getSkippedTests().get("StubTestClass2").size();
-		int successNb = reporter.getPassedTests().get("StubTestClass").size()
-				    + reporter.getPassedTests().get("StubTestClass2").size();
+		int errorNb = TestListener.getCurrentListener().getFailedTests().get("StubTestClass").size() 
+					+ TestListener.getCurrentListener().getFailedTests().get("StubTestClass2").size()
+					+ TestListener.getCurrentListener().getSkippedTests().get("StubTestClass").size()
+					+ TestListener.getCurrentListener().getSkippedTests().get("StubTestClass2").size();
+		int successNb = TestListener.getCurrentListener().getPassedTests().get("StubTestClass").size()
+				    + TestListener.getCurrentListener().getPassedTests().get("StubTestClass2").size();
 		
 		// check at least one generation occured for each part of the report
 		verify(reporter).generateReport(anyList(), anyList(), anyString()); // 1 time only
@@ -291,8 +294,8 @@ public class TestSeleniumTestsReporter2 extends MockitoTest {
 		Assert.assertTrue(detailedReportContent.contains("<div class=\"message-error\"><div>class java.lang.AssertionError: error</div>"
 								+ "<div class=\"stack-element\"></div>"
 								+ "<div class=\"stack-element\">at com.seleniumtests.it.reporter.StubTestClass.testInError(StubTestClass.java:63)</div>"
-								+ "<div class=\"stack-element\">at com.seleniumtests.it.reporter.TestSeleniumTestsReporter2.executeSubTest(TestSeleniumTestsReporter2.java:80)</div>"
-								+ "<div class=\"stack-element\">at com.seleniumtests.it.reporter.TestSeleniumTestsReporter2.testReportDetailsWithErrors(TestSeleniumTestsReporter2.java:282)</div>"));
+								+ "<div class=\"stack-element\">at com.seleniumtests.it.reporter.TestSeleniumTestsReporter2.executeSubTest(TestSeleniumTestsReporter2.java:83)</div>"
+								+ "<div class=\"stack-element\">at com.seleniumtests.it.reporter.TestSeleniumTestsReporter2.testReportDetailsWithErrors(TestSeleniumTestsReporter2.java:285)</div>"));
 		
 	}
 }

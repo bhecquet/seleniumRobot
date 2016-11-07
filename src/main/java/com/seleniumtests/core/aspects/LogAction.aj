@@ -69,7 +69,7 @@ public class LogAction {
 		
 		try {
 			reply = joinPoint.proceed(joinPoint.getArgs());
-		} catch (Exception e) {
+		} catch (Throwable e) {
 			actionFailed = true;
 			throw e;
 		} finally {
@@ -102,7 +102,7 @@ public class LogAction {
 		
 		try {
 			reply = joinPoint.proceed(joinPoint.getArgs());
-		} catch (Exception e) {
+		} catch (Throwable e) {
 			actionFailed = true;
 			throw e;
 		} finally {
@@ -135,7 +135,7 @@ public class LogAction {
 		
 		try {
 			reply = joinPoint.proceed(joinPoint.getArgs());
-		} catch (Exception e) {
+		} catch (Throwable e) {
 			currentStep.setFailed(true);
 			currentStep.setActionException(e);
 			throw e;
@@ -202,7 +202,7 @@ public class LogAction {
 		
 		try {
 			reply = joinPoint.proceed(joinPoint.getArgs());
-		} catch (Exception e) {
+		} catch (Throwable e) {
 			currentStep.setFailed(true);
 			currentStep.setActionException(e);
 			throw e;

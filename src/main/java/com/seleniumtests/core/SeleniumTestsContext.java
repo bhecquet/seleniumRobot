@@ -843,6 +843,11 @@ public class SeleniumTestsContext {
     public void setBrowser(String browser) {
     	String _browser = browser == null ? "*firefox": browser;
     	setAttribute(BROWSER, BrowserType.getBrowserType(_browser));
+    	
+    	// when reconfiguring browser, mostly from integration tests, change test type accordingly
+    	if (getPlatform() != null) {
+        	configureTestType();
+    	}
     }
     
     public void setBrowserVersion(String browserVersion) {

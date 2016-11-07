@@ -40,7 +40,7 @@ public class StubTestClass2 extends StubParentClass {
 	
 	@Test(groups="stub2")
 	public void test5() {
-		Assert.fail("fail");
+		Assert.assertTrue(false);
 	}
 	
 	@Test(groups="stub", dependsOnMethods={"test1"})

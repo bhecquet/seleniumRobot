@@ -45,6 +45,7 @@ import org.testng.xml.XmlTest;
 import com.seleniumtests.MockitoTest;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.reporter.SeleniumTestsReporter;
+import com.seleniumtests.reporter.TestListener;
 
 public class TestSeleniumTestsReporter extends MockitoTest {
 	
@@ -55,6 +56,8 @@ public class TestSeleniumTestsReporter extends MockitoTest {
 	 * a report is generated
 	 */
 	private XmlSuite executeSubTest() {
+		TestListener testListener = new TestListener();
+		
 		XmlSuite suite = new XmlSuite();
 		suite.setName("TmpSuite");
 		suite.setFileName("/home/test/seleniumRobot/data/core/testng/testLoggging.xml");
@@ -76,8 +79,8 @@ public class TestSeleniumTestsReporter extends MockitoTest {
 		TestNG tng = new TestNG(false);
 		tng.setXmlSuites(suites);
 		tng.addListener((IReporter)reporter);
-		tng.addListener((ITestListener)reporter);
-		tng.addListener((IInvokedMethodListener)reporter);
+		tng.addListener((ITestListener)testListener);
+		tng.addListener((IInvokedMethodListener)testListener);
 		tng.setOutputDirectory(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory());
 		tng.run(); 
 		
@@ -92,18 +95,18 @@ public class TestSeleniumTestsReporter extends MockitoTest {
 		XmlSuite suite = executeSubTest();
 		
 		// check data stored in reporter
-		Assert.assertEquals(reporter.getFailedTests().get("FirstTest").size(), 2);
-		Assert.assertEquals(reporter.getFailedTests().get("SecondTest").size(), 2);
-		Assert.assertEquals(reporter.getSkippedTests().get("FirstTest").size(), 0);
-		Assert.assertEquals(reporter.getSkippedTests().get("SecondTest").size(), 2);
-		Assert.assertEquals(reporter.getPassedTests().get("FirstTest").size(), 1);
-		Assert.assertEquals(reporter.getPassedTests().get("SecondTest").size(), 2);
+		Assert.assertEquals(TestListener.getCurrentListener().getFailedTests().get("FirstTest").size(), 2);
+		Assert.assertEquals(TestListener.getCurrentListener().getFailedTests().get("SecondTest").size(), 2);
+		Assert.assertEquals(TestListener.getCurrentListener().getSkippedTests().get("FirstTest").size(), 0);
+		Assert.assertEquals(TestListener.getCurrentListener().getSkippedTests().get("SecondTest").size(), 2);
+		Assert.assertEquals(TestListener.getCurrentListener().getPassedTests().get("FirstTest").size(), 1);
+		Assert.assertEquals(TestListener.getCurrentListener().getPassedTests().get("SecondTest").size(), 2);
 		
 		int testClassNb = suite.getTests().size();
-		int errorNb = reporter.getFailedTests().get("FirstTest").size() 
-					+ reporter.getFailedTests().get("SecondTest").size()
-					+ reporter.getSkippedTests().get("FirstTest").size()
-					+ reporter.getSkippedTests().get("SecondTest").size();
+		int errorNb = TestListener.getCurrentListener().getFailedTests().get("FirstTest").size() 
+					+ TestListener.getCurrentListener().getFailedTests().get("SecondTest").size()
+					+ TestListener.getCurrentListener().getSkippedTests().get("FirstTest").size()
+					+ TestListener.getCurrentListener().getSkippedTests().get("SecondTest").size();
 		
 		// check at least one generation occured for each part of the report
 		verify(reporter).generateReport(anyList(), anyList(), anyString()); // 1 time only

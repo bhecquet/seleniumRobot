@@ -21,7 +21,7 @@ import org.testng.ITestResult;
 
 import com.seleniumtests.reporter.TestLogging;
 
-public class TestRetryAnalyzer implements IRetryAnalyzer, ITestRetryAnalyzer {
+public class TestRetryAnalyzer implements IRetryAnalyzer {
 
     private static final String TEST_RETRY_COUNT = "testRetryCount";
     private int count = 1;
@@ -38,7 +38,6 @@ public class TestRetryAnalyzer implements IRetryAnalyzer, ITestRetryAnalyzer {
         this.maxCount = count;
     }
 
-    @Override
     public int getCount() {
         return this.count;
     }
@@ -49,23 +48,39 @@ public class TestRetryAnalyzer implements IRetryAnalyzer, ITestRetryAnalyzer {
 
     @Override
     public synchronized boolean retry(final ITestResult result) {
-        String testClassName = String.format("%s.%s", result.getMethod().getRealClass().toString(),
+        return retry(result, true);
+    }
+
+    /**
+     * Retry logic. We retry a test if
+     * - it has not reached the maximum retry number
+     * - the error of the test is not an AssertionError. These are functional errors and so should not be retried
+     * @param result
+     * @param logRetry
+     * @return
+     */
+    private boolean retry(final ITestResult result, boolean logRetry) {
+    	String testClassName = String.format("%s.%s", result.getMethod().getRealClass().toString(),
                 result.getMethod().getMethodName());
 
         if (count <= maxCount) {
-            result.setAttribute("RETRY", new Integer(count));
-
-            TestLogging.log("[RETRYING] " + testClassName + " FAILED, " + "Retrying " + count + " time");
-
-            count += 1;
+        	
+        	if (result.getThrowable() instanceof AssertionError) {
+        		return false;
+        	}
+        	
+        	if (logRetry) {
+	            result.setAttribute("RETRY", new Integer(count));
+	            TestLogging.log("[RETRYING] " + testClassName + " FAILED, " + "Retrying " + count + " time");
+	            count += 1;
+        	}
             return true;
         }
 
         return false;
     }
-
-    @Override
+    
     public boolean retryPeek(final ITestResult result) {
-        return count <= maxCount;
+    	return retry(result, false);
     }
 }

@@ -35,6 +35,7 @@ import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.reporter.TestLogging;
 
 @Listeners({com.seleniumtests.reporter.SeleniumTestsReporter2.class, 
+			com.seleniumtests.reporter.TestListener.class, 
 			com.seleniumtests.core.testretry.TestRetryListener.class, 
 			com.seleniumtests.reporter.PerformanceReporter.class})
 public class SeleniumRobotRunner {
