@@ -9,20 +9,28 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.Writer;
 import java.util.GregorianCalendar;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.apache.velocity.app.VelocityEngine;
-import org.testng.IInvokedMethod;
-import org.testng.IInvokedMethodListener;
 import org.testng.ITestResult;
+import org.testng.Reporter;
+import org.testng.internal.TestResult;
+import org.testng.internal.Utils;
 
-public abstract class CommonReporter implements IInvokedMethodListener {
+import com.seleniumtests.core.SeleniumTestsContextManager;
+
+public abstract class CommonReporter {
 	
 	private static final String RESOURCE_LOADER_PATH = "org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader";
 	private String uuid = new GregorianCalendar().getTime().toString();
 	protected static Logger logger = TestLogging.getLogger(CommonReporter.class);
-	protected File report;
 	
+	protected static final String FAILED_TEST = "failed";
+	protected static final String SKIPPED_TEST = "skipped";
+	protected static final String PASSED_TEST = "passed";
+	protected static final String RESOURCES_DIR = "resources";
+
 	/**
 	 * Initializes the VelocityEngine
 	 * @return
@@ -50,7 +58,6 @@ public abstract class CommonReporter implements IInvokedMethodListener {
 
 		File f = new File(outDir, fileName);
 		logger.info("generating report " + f.getAbsolutePath());
-		report = f;
 
 		OutputStream out = new FileOutputStream(f);
 		Writer writer = new BufferedWriter(new OutputStreamWriter(out, "utf-8"));
@@ -99,15 +106,5 @@ public abstract class CommonReporter implements IInvokedMethodListener {
 		if (t2 != null) {
 			generateTheStackTrace(t2, "Caused by " + t2.getLocalizedMessage(), contentBuffer);
 		}
-	}
-	
-	@Override
-	public void beforeInvocation(final IInvokedMethod arg0, final ITestResult arg1) { 
-		TestLogging.setCurrentTestResult(arg1);
-	}
-	
-	@Override
-	public void afterInvocation(final IInvokedMethod method, final ITestResult result) {
-		
 	}
 }

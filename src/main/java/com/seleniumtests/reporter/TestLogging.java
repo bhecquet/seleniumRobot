@@ -125,7 +125,11 @@ public class TestLogging {
     			if (content.contains(START_TEST_PATTERN)) {
     				String testName = content.split(START_TEST_PATTERN)[1].trim();
     				testPerThread.put(thread, testName);
-    				testLogs.put(testName, "");
+    				
+    				// do not refresh content of logs in case test is retried
+    				if (!testLogs.containsKey(testName)) {
+    					testLogs.put(testName, "");
+    				}
     			}
     			if (testPerThread.get(thread) != null) {
     				String testName = testPerThread.get(thread);
@@ -350,6 +354,14 @@ public class TestLogging {
 		TestLogging.testsSteps.clear();
 		TestLogging.parentTestStep.clear();
 		TestLogging.testLogs.clear();
+		
+		// clear log file
+		Appender fileAppender = Logger.getRootLogger().getAppender("FileLogger");
+		if (fileAppender != null) {
+			fileAppender.close();
+			Logger.getRootLogger().removeAppender("FileLogger");
+			new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory() + "/" + LOG_FILE_NAME).delete();
+		}
 	}
 	
 }

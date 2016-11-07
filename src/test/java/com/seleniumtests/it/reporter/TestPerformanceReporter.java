@@ -40,6 +40,7 @@ import com.seleniumtests.MockitoTest;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.reporter.PerformanceReporter;
 import com.seleniumtests.reporter.SeleniumTestsReporter2;
+import com.seleniumtests.reporter.TestListener;
 
 public class TestPerformanceReporter extends MockitoTest {
 	
@@ -50,6 +51,7 @@ public class TestPerformanceReporter extends MockitoTest {
 	 * a report is generated
 	 */
 	private XmlSuite executeSubTest(String[] testClasses) {
+		TestListener testListener = new TestListener();
 		XmlSuite suite = new XmlSuite();
 		suite.setName("TmpSuite");
 		suite.setFileName("/home/test/seleniumRobot/data/core/testng/testLoggging.xml");
@@ -67,7 +69,7 @@ public class TestPerformanceReporter extends MockitoTest {
 		TestNG tng = new TestNG(false);
 		tng.setXmlSuites(suites);
 		tng.addListener((IReporter)reporter);
-		tng.addListener((IInvokedMethodListener)reporter);
+		tng.addListener((IInvokedMethodListener)testListener);
 		tng.setOutputDirectory(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory());
 		tng.run(); 
 		

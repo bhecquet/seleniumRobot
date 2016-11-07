@@ -19,6 +19,7 @@ package com.seleniumtests.it.core.aspects;
 import java.io.IOException;
 
 import org.openqa.selenium.By;
+import org.testng.Assert;
 
 import com.seleniumtests.customexception.DriverExceptions;
 import com.seleniumtests.uipage.PageObject;
@@ -50,6 +51,16 @@ public class CalcPage extends PageObject {
 	
 	public CalcPage failAction() {
 		throw new DriverExceptions("fail");
+	}
+	
+	public CalcPage assertAction() {
+		Assert.assertTrue(false, "false error");
+		return this;
+	}
+	
+	public CalcPage assertAction2() {
+		Assert.assertTrue(false, "false error2");
+		return this;
 	}
 	
 	public CalcPage add(int a) {

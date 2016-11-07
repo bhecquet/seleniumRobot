@@ -38,4 +38,13 @@ public class StubTestClassWithWait extends StubParentClass {
 		logger.info("test3 finished");
 	}
 	
+	@Test(groups="stub")
+	public void testSimulatingRetry() {
+		logger.info("testSimulatingRetry starting");
+		logger.info("Start method testSimulatingRetry");
+		logger.info("TestLogging: [RETRYING] class com.seleniumtests.it.reporter.StubTestClassWithWait FAILED, Retrying 1 time");
+		logger.info("Finish method testSimulatingRetry");
+		logger.info("testSimulatingRetry finished");
+	}
+	
 }

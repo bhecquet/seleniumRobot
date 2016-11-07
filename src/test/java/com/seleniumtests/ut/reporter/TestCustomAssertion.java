@@ -29,7 +29,7 @@ import org.testng.internal.TestResult;
 
 import com.seleniumtests.GenericTest;
 import com.seleniumtests.core.SeleniumTestsContextManager;
-import com.seleniumtests.reporter.SeleniumTestsReporter;
+import com.seleniumtests.reporter.TestListener;
 
 public class TestCustomAssertion extends GenericTest {
 
@@ -67,7 +67,7 @@ public class TestCustomAssertion extends GenericTest {
 			ITestResult previousResult = Reporter.getCurrentTestResult();
 			Reporter.setCurrentTestResult(result);
 			try {
-				new SeleniumTestsReporter().changeTestResult(result);
+				new TestListener().changeTestResult(result);
 			
 				// test result should be changed in failure because of soft assertion
 				Assert.assertEquals(result.getStatus(), TestResult.FAILURE);
