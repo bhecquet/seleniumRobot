@@ -16,9 +16,13 @@
  */
 package com.seleniumtests.uipage.aspects;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Pointcut;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.UnhandledAlertException;
@@ -27,6 +31,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.UnreachableBrowserException;
 import org.openqa.selenium.support.ui.SystemClock;
 
+import com.seleniumtests.core.runner.SeleniumRobotRunner;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.uipage.htmlelements.FrameElement;
 import com.seleniumtests.uipage.htmlelements.HtmlElement;
@@ -45,26 +50,12 @@ public class ReplayAction {
 	private static SystemClock systemClock = new SystemClock();
 	
 	/**
-	 * 
+	 * Replay all actions annotated by ReplayOnError. See javadoc of the annotation for details
 	 * @param joinPoint
 	 * @throws Throwable
 	 */
-    @Around("execution(public * com.seleniumtests.uipage.htmlelements.HtmlElement..* (..)) "
-    		+ "&& !execution(* com.seleniumtests.uipage.htmlelements.HtmlElement.toString (..))"
-    		+ "&& !execution(* com.seleniumtests.uipage.htmlelements.HtmlElement.getBy (..))"
-    		+ "&& !execution(* com.seleniumtests.uipage.htmlelements.HtmlElement.setDriver (..))"
-    		+ "&& !execution(* com.seleniumtests.uipage.htmlelements.HtmlElement.getDriver (..))"
-    		+ "&& !execution(* com.seleniumtests.uipage.htmlelements.HtmlElement.getFrameElement (..))"
-    		+ "&& !execution(* com.seleniumtests.uipage.htmlelements.HtmlElement.getLabel (..))"
-    		+ "&& !execution(* com.seleniumtests.uipage.htmlelements.HtmlElement.getLocator (..))"
-    		+ "&& !execution(* com.seleniumtests.uipage.htmlelements.HtmlElement.waitForPresent ())"
-    		+ "&& !execution(* com.seleniumtests.uipage.htmlelements.HtmlElement.toHTML (..))"
-    		+ "&& !execution(* com.seleniumtests.uipage.htmlelements.HtmlElement.sendKeys (CharSequence))"
-    		+ "|| execution(public * com.seleniumtests.uipage.htmlelements.SelectList..* (..)) "
-    		+ "|| execution(public * com.seleniumtests.uipage.htmlelements.ButtonElement..* (..)) "
-    		+ "|| execution(public * com.seleniumtests.uipage.htmlelements.Table.get* (..))"
-    		+ "|| execution(public * com.seleniumtests.uipage.htmlelements.TextFieldElement.clear (..)) "
-    		)
+	@Around("execution(public * com.seleniumtests.uipage.htmlelements.HtmlElement+.* (..))"
+			+ "&& execution(@com.seleniumtests.uipage.ReplayOnError public * * (..))")
     public Object replay(ProceedingJoinPoint joinPoint) throws Throwable {
     	
     	long end = systemClock.laterBy(30000);
@@ -79,11 +70,17 @@ public class ReplayAction {
     	while (systemClock.isNowBefore(end)) {
     		
     		// handle frame case
+    		List<FrameElement> frameTree = new ArrayList<FrameElement>();
     		FrameElement frame = element.getFrameElement();
+    		
     		while (frame != null) {
-    			WebElement frameElement = element.getDriver().findElement(frame.getBy());
-    			element.getDriver().switchTo().frame(frameElement);
+    			frameTree.add(0, frame);
     			frame = frame.getFrameElement();
+    		}
+
+    		for (FrameElement frameEl: frameTree) {
+    			WebElement frameElement = element.getDriver().findElement(frameEl.getBy());
+    			element.getDriver().switchTo().frame(frameElement);
     		}
 	    	
 	    	try {

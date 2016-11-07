@@ -832,3 +832,16 @@ By default, SeleniumTestsContext enables SoftAssertions, so any unit test with a
 - `MockitoTest`: parent of all tests using Mockito / PowerMock
 
 depending on test type
+
+### 7.3 Core: making an action on an HTMLElement replay on error ###
+
+By default, actions in HtmlElements are done only once.<br/>
+For better reliability, all actions currently implemented in SeleniumRobot are made to retry on error
+
+    @ReplayOnError
+    public void click() {
+        findElement(true);
+        element.click();   
+    }
+    
+/!\ *annotate only direct actions (where no other HtmlElement method, except `findElement` is called)

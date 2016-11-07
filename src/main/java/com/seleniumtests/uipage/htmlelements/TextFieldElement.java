@@ -18,6 +18,8 @@ package com.seleniumtests.uipage.htmlelements;
 
 import org.openqa.selenium.By;
 
+import com.seleniumtests.uipage.ReplayOnError;
+
 public class TextFieldElement extends HtmlElement {
     public TextFieldElement(final String label, final By by) {
         super(label, by);
@@ -35,6 +37,7 @@ public class TextFieldElement extends HtmlElement {
     	super(label, by, frame, index);
     }
 
+    @ReplayOnError
     public void clear() {
         findElement();
         if (!"file".equalsIgnoreCase(element.getAttribute("type"))) {

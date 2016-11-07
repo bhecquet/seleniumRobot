@@ -27,6 +27,7 @@ import org.openqa.selenium.support.ui.UnexpectedTagNameException;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import com.seleniumtests.driver.WebUIDriver;
+import com.seleniumtests.uipage.ReplayOnError;
 
 import net.ricecode.similarity.JaroWinklerStrategy;
 import net.ricecode.similarity.SimilarityStrategy;
@@ -89,11 +90,13 @@ public class SelectList extends HtmlElement {
     	return option.getAttribute("value");
     }
 
+    @ReplayOnError
     public List<WebElement> getOptions() {
         findElement();
         return options;
     }
 
+    @ReplayOnError
     public String getSelectedText() {
         findElement();
         for (WebElement option : options) {
@@ -104,6 +107,7 @@ public class SelectList extends HtmlElement {
         return null;
     }
 
+    @ReplayOnError
     public String[] getSelectedTexts() {
         findElement();
 
@@ -118,6 +122,7 @@ public class SelectList extends HtmlElement {
         return textList.toArray(texts);
     }
 
+    @ReplayOnError
     public String getSelectedValue() {
         findElement();
         for (WebElement option : options) {
@@ -128,6 +133,7 @@ public class SelectList extends HtmlElement {
         return null;
     }
 
+    @ReplayOnError
     public String[] getSelectedValues() {
         findElement();
 
@@ -142,6 +148,7 @@ public class SelectList extends HtmlElement {
         return valueList.toArray(values);
     }
 
+    @ReplayOnError
     public boolean isMultiple() {
         findElement();
 
@@ -152,6 +159,7 @@ public class SelectList extends HtmlElement {
     /**
      * De-selects all options in a multi-select list element.
      */
+    @ReplayOnError
     public void deselectAll() {
         findElement();
         if (!isMultiple()) {
@@ -163,6 +171,7 @@ public class SelectList extends HtmlElement {
         }
     }
 
+    @ReplayOnError
     public void deselectByIndex(final int index) {
         findElement();
         if (select != null) {
@@ -173,6 +182,7 @@ public class SelectList extends HtmlElement {
         }
     }
 
+    @ReplayOnError
     public void deselectByText(final String text) {
         findElement();
         
@@ -188,6 +198,7 @@ public class SelectList extends HtmlElement {
         }
     }
 
+    @ReplayOnError
     public void deselectByValue(final String value) {
         findElement();
         
@@ -203,6 +214,7 @@ public class SelectList extends HtmlElement {
         }
     }
 
+    @ReplayOnError
     public void selectByIndex(final int index) {
         findElement();
 
@@ -214,6 +226,7 @@ public class SelectList extends HtmlElement {
         }
     }
 
+    @ReplayOnError
     public void selectByIndex(final int[] indexs) {
         findElement();
         
@@ -228,6 +241,7 @@ public class SelectList extends HtmlElement {
      *
      * @param  text
      */
+    @ReplayOnError
     public void selectByText(final String text) {
         findElement();
         if (options == null) {
@@ -254,6 +268,7 @@ public class SelectList extends HtmlElement {
         }
     }
 
+    @ReplayOnError
     public void selectByText(final String[] texts) {
         findElement();
         for (int i = 0; i < texts.length; i++) {
@@ -271,6 +286,7 @@ public class SelectList extends HtmlElement {
      *
      * @param  text
      */
+    @ReplayOnError
     public void selectByCorrespondingText(String text) {
     	findElement();
     	double score = 0;
@@ -290,6 +306,7 @@ public class SelectList extends HtmlElement {
      * 
      * @param text
      */
+    @ReplayOnError
     public void selectByCorrespondingText(String[] text) {
     	findElement();
     	for (int i = 0; i < text.length; i++) {
@@ -306,6 +323,7 @@ public class SelectList extends HtmlElement {
     	}
     }
 
+    @ReplayOnError
     public void selectByValue(final String value) {
         findElement();
         
@@ -321,6 +339,7 @@ public class SelectList extends HtmlElement {
         }
     }
 
+    @ReplayOnError
     public void selectByValue(final String[] values) {
         findElement();
         for (int i = 0; i < values.length; i++) {

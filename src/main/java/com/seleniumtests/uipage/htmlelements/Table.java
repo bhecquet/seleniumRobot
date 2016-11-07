@@ -22,6 +22,8 @@ import java.util.List;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
+import com.seleniumtests.uipage.ReplayOnError;
+
 public class Table extends HtmlElement {
     private List<WebElement> rows = null;
     private List<WebElement> columns = null;
@@ -60,11 +62,13 @@ public class Table extends HtmlElement {
         }
     }
     
+    @ReplayOnError
     public List<WebElement> getColumns() {
     	findTableElement();
     	return columns;
     }
 
+    @ReplayOnError
     public int getColumnCount() {
     	findTableElement();
         return columns.size();
@@ -76,6 +80,7 @@ public class Table extends HtmlElement {
      * @param  row     Starts from 1
      * @param  column  Starts from 1
      */
+    @ReplayOnError
     public String getContent(final int row, final int column) {
     	findTableElement();
 
@@ -101,6 +106,7 @@ public class Table extends HtmlElement {
         return rows.size();
     }
 
+    @ReplayOnError
     public List<WebElement> getRows() {
     	findTableElement();
         return rows;
