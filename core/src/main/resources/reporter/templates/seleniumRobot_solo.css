@@ -1,0 +1,92 @@
+body{
+	background-color: #ecf0f5;
+}
+
+@media (min-width:1600px) {
+	.container {
+		width:1400px
+	}
+} 
+
+.main-header{
+	min-height: 50px;
+	text-align: center;
+	font-family: 'Lobster Two', cursive;
+	font-size: 30px;
+	line-height: 50px;
+}
+
+.box{
+	margin-bottom: 7px;
+}
+
+.box-header{
+	padding: 0px;
+}
+
+.header-success{
+	background-color: #97D086;
+}
+
+.header-skipped{
+	background-color: #A7D7F3;
+}
+
+.header-failed{
+	background-color: #F9727B;
+}
+
+.message-error {
+	background-color: #FFC9C9;
+	color: red;
+	font-weight: bold;
+}
+
+.message-info {
+	background-color: #B5EEAE;
+}
+
+.message-warning {
+	background-color: #FFBF80;
+}
+
+
+.success{
+	border-top: 3px solid #97D086;
+}
+
+.skipped{
+	border-top: 3px solid #A7D7F3;
+}
+
+.failed{
+	border-top: 3px solid #F9727B;
+}
+
+.success .fa-plus, .success .fa-minus, .success a, .success a:hover{
+	color: #97D086;
+}
+
+.skipped .fa-plus, .skipped .fa-minus, .skipped a, .skipped a:hover{
+	color: #A7D7F3;
+}
+
+.failed .fa-plus, .failed .fa-minus, .failed a, .failed a:hover{
+	color: #F9727B;
+}
+
+.main-header a, .main-header a:hover{
+	color: #ffffff;
+}
+
+.bold{
+	font-weight: bold;
+}
+
+.logs {
+	font-family: "Courier New", Courier, monospace;
+}
+
+.stack-element {
+	padding-left: 30px;
+}

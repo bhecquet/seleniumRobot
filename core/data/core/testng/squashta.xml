@@ -1,0 +1,54 @@
+<!DOCTYPE suite SYSTEM "http://beust.com/testng/testng-1.0.dtd" >
+<suite name="Unit test suite" parallel="methods" verbose="1" thread-count="1">
+   
+	<parameter name="implicitWaitTimeOut" value="2"></parameter>
+	<parameter name="browser" value="opera" />
+	<parameter name="app" value="https://www.test.google.fr" />
+	<parameter name="aParam" value="value1" />
+	<parameter name="anOtherParam" value="value2" />
+	<parameter name="variable1" value="value4" />
+    <parameter name="testConfig" value="exampleConfigGenericParams.xml" />
+	<parameter name="devMode" value="true" />
+
+    <test name="SquashTa_cucumber_test" parallel="false">
+    	<!-- cucumber part -->
+    	<parameter name="cucumberTests" value="Conge" />
+	    <parameter name="cucumberTags" value="" />
+
+        <packages>
+            <package name="com.seleniumtests.core.runner.*"/>
+        </packages>
+    </test>
+    
+    <test name="SquashTa_cucumber_tags" parallel="false">
+    	<!-- cucumber part -->
+    	<parameter name="cucumberTests" value="" />
+	    <parameter name="cucumberTags" value="@new" />
+
+        <packages>
+            <package name="com.seleniumtests.core.runner.*"/>
+        </packages>
+    </test>
+    
+    <test name="SquashTa_cucumber_generic" parallel="false">
+
+        <packages>
+            <package name="com.seleniumtests.core.runner.*"/>
+        </packages>
+    </test>
+    
+    <test name="SquashTa_testPlan" parallel="false">
+    	
+        <packages>
+            <package name="com.seleniumtests.ut.*" />
+        </packages>
+    </test>
+    
+    <test name="SquashTa_excluded" parallel="false">
+    	<parameter name="EXCLUDE_FROM_SQUASH_TA" value="" />
+        <packages>
+            <package name="com.seleniumtests.ut.*" />
+        </packages>
+    </test>
+
+</suite> 

@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style type="text/css">
+  	#languages {
+	    display: none;
+	    position: absolute;
+	    margin: 0;
+	    background: #dddddd;
+	}
+	
+	#languages > li {
+	    width: 200px;
+	    background: #eee;
+	    line-height: 25px;
+	    font-size: 14px;
+	    padding: 0 10px;
+	    cursor: pointer;
+	}
+	
+	#languages > li:hover {
+	    background: #aaa;
+	}
+</style>
+</head>
+ 
+<body>
+	<h3>Test clicking a moving element</h3>
+	<button id="button">Start Animation</button>
+	<div style="background:#98bf21;height:20px;width:10px;position:absolute;" onclick="javascript:alert('coucou');" id="carre"></div>
+
+	<h3>Test clicking an element</h3>
+	<button id="button2" onclick="javascript:addText('text2', '');javascript:resetState();">reset</button>
+	<div style="background:red;height:20px;width:10px;display: inline-block;" onclick="javascript:addText('text2', 'coucou');" id="carre2"></div>
+	<div style="display: inline-block;"><input id="text2"/></div>
+	<input type="radio" id="radioClick">
+	<input type="checkbox" id="checkboxClick">
+	<input type="image" id="image" src="googleSearch.png" onclick="javascript:addText('text2', 'image');">
+	
+	<h3>Test select</h3>
+	<select id="select" onChange="javascript:addText('textSelectedId', this.selectedIndex);javascript:addText('textSelectedValue', this.options[selectedIndex].value);javascript:addText('textSelectedText', this.options[selectedIndex].text);">
+		<option value="opt1">option1</option>
+		<option value="opt2">option2</option>
+		<option value="opt3">option numero 3</option>
+	</select>
+	<input id="textSelectedId"/>
+	<input id="textSelectedValue"/>
+	<input id="textSelectedText"/>
+	
+	<div id="selectHidable">
+		<select onChange="javascript:hideSelect();">
+			<option value="opt1">option1</option>
+			<option value="opt2">option2</option>
+			<option value="opt3">option numero 3</option>
+		</select>
+	</div>
+	
+	<h3>Test select Multiple</h3>
+	<select id="selectMultiple" multiple>
+		<option value="opt1">option1</option>
+		<option value="opt2">option2</option>
+		<option value="opt3">option3</option>
+		<option value="opt4">option4</option>
+	</select>
+	
+	<h3>Test select as list</h3>
+	<input class="language_selector" type="text" id="language" value="Choose Language" />
+	<ul id="languages">
+	    <li id="eng">English</li>
+	    <li id="deu">Deutsch</li>
+	</ul>
+	
+	<h3>Test IFrame</h3>
+	<iframe src="testIFrame.html" id="myIFrame" width="600px" height="180px"></iframe>
+	
+	<h3>Test link</h3>
+	<a href="testIFrame.html" id="link" target="_blank">My link</a>
+	<a href="http://www.google.fr" id="link2" target="_blank">My link</a>
+	<a href="#" id="linkPopup" onclick='window.open("http://www.google.fr", "_blank", "toolbar=yes, scrollbars=yes, resizable=yes, top=500, left=500, width=400, height=400");'>My link popup</a>
+	<a href="#" id="linkPopup2" onclick="window.open('http://www.google.fr', '_blank', 'toolbar=yes, scrollbars=yes, resizable=yes, top=500, left=500, width=400, height=400');">My link popup 2</a>
+	
+	<h3>Test onblur</h3>
+	<input id="textOnBlur" onBlur="javascript:addText('textOnBlurDest', this.value);">
+	<input id="textOnBlurDest"/>
+	
+	<h3>Test findElement</h3>
+	<div id="divFind" name="divFindName" attr="attrValue" class="myClass">a text</div>
+	<div id="divFind2" name="divFindName" attr="attrValue" class="myClass">an other text</div>
+	<div id="parent">
+		<div id="child1" class="myClass">first child</div>
+		<div id="child2">second child</div>
+		<div id="child4" class="myClass">fourth child</div>
+	</div>
+	<div id="child3" name="child">first child</div>
+	<input type="checkbox" style="position:absolute; left: -1000px" id="hiddenCheckbox"/>
+	
+	<h3>Test delay</h3>
+	<button id="buttonDelay" onclick="javascript:display();">Display field!</button>
+	<button id="buttonDelayReset" onclick="javascript:hide();">Hide field!</button>
+	<div id="displayContent"></div>
+	
+	<h3>Test server delay</h3>
+	delay: <input id="delay" value="500"/> ms
+	<button id="buttonServerDelay" onclick="javascript:displayServer();">Display field!</button>
+	<button id="buttonServerDelayReset" onclick="javascript:hideServer();">Hide field!</button>
+	<div id="displayContent2"></div>
+	
+	<h3>Test label</h3>
+	<label>Mon label</label>
+	<span><input type="text" value="mon texte"></input></span>
+	
+	<h3>Test scrolling</h3>
+	<div style="background:blue;height:400px;width:10px;display: block;"></div>
+	<button id="buttonScroll" onclick="javascript:addText('text5', 'a text');">set</button>
+	<input id="text5"/>
+	
+	<h3>Test table</h3>
+	<table id="table" border="1">
+		<tr>
+			<th>Id</th>
+			<th>Name</th>
+		</tr>
+		<tr>
+			<td>1</td>
+			<td>Java</td>
+		</tr>
+		<tr>
+			<td>2</td>
+			<td>C#</td>
+		</tr>
+	</table>
+	
+<script src="jquery.min.js">
+</script>
+<script> 
+$(document).ready(function(){
+  $("#button").click(function(){
+    $("div").animate({left:'1450px'}, 600);
+  });
+});
+
+function addText(id, text) {
+	$("#" + id).val(text);
+}
+
+function resetState() {
+	$('#checkboxClick').prop("checked", false);
+	$('#radioClick').prop("checked", false);
+}
+
+function display() {
+	setTimeout(function() {
+      $("#displayContent").html('<input id="newEl" value="my value"/>');
+     }, 7000);
+	
+}
+function hide() {
+      $("#displayContent").html('');
+}
+
+function displayServer() {
+	var delay = $('#delay').val();
+	$("#displayContent2").html("new content" + delay);
+}
+function hideServer() {
+      $("#displayContent2").html('');
+}
+
+function hideSelect() {
+      $("#selectHidable").html('');
+}
+
+var trigger = $('.language_selector');
+var list = $('#languages');
+var engLang = $('#eng');
+var deuLang = $('#deu');
+
+engLang.click(function() {
+	$('#language').val(engLang.text());
+});
+deuLang.click(function() {
+	$('#language').val(deuLang.text());
+});
+
+trigger.click(function() {
+    trigger.toggleClass('active');
+    list.slideToggle(200);
+});
+
+list.click(function() {
+    trigger.click();
+}); 
+
+
+</script> 
+</body>
+</html>
