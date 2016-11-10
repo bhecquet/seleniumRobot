@@ -1,0 +1,62 @@
+<!DOCTYPE suite SYSTEM "http://beust.com/testng/testng-1.0.dtd" >
+<suite name="Unit test suite" parallel="methods" verbose="1" thread-count="1" configfailurepolicy="continue">
+   
+	<parameter name="implicitWaitTimeOut" value="2"></parameter>
+	<parameter name="browser" value="opera" />
+	<parameter name="app" value="https://www.test.google.fr" />
+	<parameter name="aParam" value="value1" />
+	<parameter name="anOtherParam" value="value2" />
+	<parameter name="variable1" value="value4" />
+    <parameter name="testConfig" value="exampleConfigGenericParams.xml" />
+	<parameter name="devMode" value="true" />
+
+    <test name="Unit tests" parallel="false">
+    	<parameter name="EXCLUDE_FROM_SQUASH_TA" value="" />
+    	<parameter name="variable1" value="value2" />
+        
+        <groups>
+            <run>
+                <include name="ut"/>
+                <include name="squash"/>
+            </run>
+        </groups>
+
+        <packages>
+            <package name="com.seleniumtests.ut.*" />
+        </packages>
+    </test>
+    
+    <test name="Reporting Unit tests" parallel="false">
+    	<parameter name="EXCLUDE_FROM_SQUASH_TA" value="" />
+    	<parameter name="variable1" value="value2" />
+        
+        <groups>
+            <run>
+                <include name="ut"/>
+            </run>
+        </groups>
+
+        <packages>
+            <package name="com.seleniumtests.it.reporter.*" />
+        </packages>
+    </test>
+    
+    <test name="Unit tests with context" parallel="false">
+    	<parameter name="variable1" value="value1" />
+    	<parameter name="app" value="https://www.google.fr" />
+    	<parameter name="dpTagsInclude" value="aTag" />
+		<parameter name="anOtherParam" value="value3" />
+		
+        
+        <groups>
+            <run>
+                <include name="ut context"/>
+            </run>
+        </groups>
+
+        <packages>
+            <package name="com.seleniumtests.ut.*" />
+        </packages>
+    </test>
+
+</suite> 

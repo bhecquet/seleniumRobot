@@ -1,0 +1,38 @@
+<!DOCTYPE suite SYSTEM "http://beust.com/testng/testng-1.0.dtd" >
+<suite name="Integration test suite" parallel="false" verbose="1" thread-count="1" configfailurepolicy="continue">
+   
+	<parameter name="implicitWaitTimeOut" value="2"></parameter>
+	<parameter name="browser" value="*firefox" />
+	<parameter name="app" value="https://www.test.google.fr" />
+	<parameter name="aParam" value="value1" />
+	<parameter name="anOtherParam" value="value2" />
+	<parameter name="variable1" value="value4" />
+	<parameter name="devMode" value="true" />
+   
+    
+    <test name="Integration tests" parallel="false">
+    	<parameter name="EXCLUDE_FROM_SQUASH_TA" value="" />
+ 		<parameter name="variable1" value="value1" />
+ 
+        <groups>
+            <run>
+                <include name="it"/>
+            </run>
+        </groups>
+
+        <packages>
+            <package name="com.seleniumtests.it.*" />
+        </packages>
+    </test>
+    
+    <test name="Page Object" parallel="false">
+    	<parameter name="EXCLUDE_FROM_SQUASH_TA" value="" />
+ 		<parameter name="variable1" value="value3" />
+
+        <classes>
+            <class name="com.seleniumtests.it.webelements.TestPageObject" />
+        </classes>
+    </test>
+
+
+</suite> 
