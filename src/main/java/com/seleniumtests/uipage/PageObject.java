@@ -445,7 +445,8 @@ public class PageObject extends BasePage implements IPage {
     }
 
     public final void selectFrame(final By by) {
-        driver.switchTo().frame(driver.findElement(by));
+    	WebElement element = driver.findElement(by);
+        driver.switchTo().frame(element);
         frameFlag = true;
     }
 

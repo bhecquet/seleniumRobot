@@ -29,7 +29,7 @@ public class OSUtilityUnix extends OSCommand {
      */
     public List<ProcessInfo> getRunningProcessList(){
     	String command = "ps";
-    	List<String> strProcessList = Arrays.asList(executeCommand(command).split("\n"));
+    	List<String> strProcessList = Arrays.asList(executeCommandAndWait(command).split("\n"));
     	
     	List<ProcessInfo> processInfoList = new ArrayList<>();
     	for (String sentence : strProcessList) {
@@ -70,9 +70,9 @@ public class OSUtilityUnix extends OSCommand {
     protected String killProcess(String pid, boolean force) throws IOException {
     	
     	if (force) {
-    		return executeCommand("kill -SIGKILL " + pid);
+    		return executeCommandAndWait("kill -SIGKILL " + pid);
     	} else {
-    		return executeCommand("kill -SIGTERM " + pid);
+    		return executeCommandAndWait("kill -SIGTERM " + pid);
     	}
     }
 }

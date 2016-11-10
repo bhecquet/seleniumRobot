@@ -22,6 +22,7 @@ import java.io.InputStreamReader;
 
 import org.apache.log4j.Logger;
 
+import com.seleniumtests.customexception.CustomSeleniumTestsException;
 import com.seleniumtests.reporter.TestLogging;
 
 /**
@@ -31,13 +32,23 @@ public abstract class OSCommand {
 	
 	private static final Logger logger = TestLogging.getLogger(OSCommand.class);
 	
+	public static Process executeCommand(final String cmd) {
+		Process proc;
+        try {
+			proc = Runtime.getRuntime().exec(cmd);
+			return proc;
+        } catch (IOException e1) {
+        	throw new CustomSeleniumTestsException("cannot start process: " + cmd, e1);
+        }
+	}
+	
     /**
      * Execute a command in command line terminal
      * @param cmd
      * @param wait for the end of the command execution
      * @return 
      */
-    protected String executeCommand(final String cmd) {
+    public static String executeCommandAndWait(final String cmd) {
         String output = "";
         Process proc;
         try {

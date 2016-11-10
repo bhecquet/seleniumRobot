@@ -28,9 +28,9 @@ public class OSUtilityWindows extends OSCommand {
 	
 	public int getIEVersion() {
 
-        String output = executeCommand("reg query \"HKLM\\Software\\Microsoft\\Internet Explorer\" /v svcVersion");
+        String output = executeCommandAndWait("reg query \"HKLM\\Software\\Microsoft\\Internet Explorer\" /v svcVersion");
         if (output.split("\n").length < 3) {
-            output = executeCommand("reg query \"HKLM\\Software\\Microsoft\\Internet Explorer\" /v Version");
+            output = executeCommandAndWait("reg query \"HKLM\\Software\\Microsoft\\Internet Explorer\" /v Version");
         }
 
         String internetExplorerValue = output.split("\n")[2];
@@ -52,7 +52,7 @@ public class OSUtilityWindows extends OSCommand {
     	 * or /SVC displays only : Image name ;  PID ;  Services .
     	 */
     	String command = System.getenv("windir") + "\\system32\\" + "tasklist.exe /NH /SVC";
-    	List<String> strProcessList = Arrays.asList(executeCommand(command).split("\n"));
+    	List<String> strProcessList = Arrays.asList(executeCommandAndWait(command).split("\n"));
     	
     	List<ProcessInfo> processInfoList = new ArrayList<>();
     	for (String sentence : strProcessList) {
@@ -83,9 +83,9 @@ public class OSUtilityWindows extends OSCommand {
     protected String killProcess(String pid, boolean force) throws IOException {
 
     	if (force) {
-    		return executeCommand("taskkill /F /PID " + pid);
+    		return executeCommandAndWait("taskkill /F /PID " + pid);
     	} else {
-    		return executeCommand("taskkill /PID " + pid);
+    		return executeCommandAndWait("taskkill /PID " + pid);
     	}
     	
     }
