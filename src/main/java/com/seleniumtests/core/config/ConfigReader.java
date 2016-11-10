@@ -49,6 +49,7 @@ public class ConfigReader {
 	 */
 	private static File getCurrentConfigFile() {
 		String configPath = SeleniumTestsContextManager.getConfigPath();
+		logger.warn("config path: " + configPath);
 		if (configPath == null) {
 			return null;
 		}

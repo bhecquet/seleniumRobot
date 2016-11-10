@@ -34,7 +34,7 @@ public class DriverExceptionListener implements WebDriverEventListener {
 	private static final Logger logger = TestLogging.getLogger(DriverExceptionListener.class);
 	
 	@Override
-    public void afterChangeValueOf(final WebElement element, final WebDriver driver) {
+    public void afterChangeValueOf(final WebElement element, final WebDriver driver, CharSequence[] arg2) {
     	if (SeleniumTestsContextManager.isWebTest() && "input".equalsIgnoreCase(element.getTagName())) {
     		try {
     			((JavascriptExecutor) driver).executeScript("arguments[0].blur();", element);
@@ -74,10 +74,11 @@ public class DriverExceptionListener implements WebDriverEventListener {
     	// do nothing
     }
 
-    @Override
-    public void beforeChangeValueOf(final WebElement arg0, final WebDriver arg1) {
-    	// do nothing
-    }
+	@Override
+	public void beforeChangeValueOf(WebElement arg0, WebDriver arg1, CharSequence[] arg2) {
+		// do nothing
+		
+	}
 
     @Override
     public void beforeClickOn(final WebElement arg0, final WebDriver driver) {
@@ -190,7 +191,6 @@ public class DriverExceptionListener implements WebDriverEventListener {
             }
         }
     }
-
 
 	
 }
