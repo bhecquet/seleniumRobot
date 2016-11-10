@@ -60,8 +60,8 @@
     <properties>
     	<jacoco.version>0.7.7.201606060606</jacoco.version>
     	<selenium.version>2.53.1</selenium.version>
-    	<appium.version>4.1.2</appium.version>
-    	<htmlunitdriver.version>2.23.2</htmlunitdriver.version>
+    	<appium.version>3.4.1</appium.version>
+    	<htmlunitdriver.version>2.20</htmlunitdriver.version>
     	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     	<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     	<sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
