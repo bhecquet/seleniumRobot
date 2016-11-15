@@ -7,9 +7,9 @@ import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.driver.DriverMode;
 
-public interface AppiumLauncherFactory {
+public class AppiumLauncherFactory {
 
-	public default AppiumLauncher getInstance() {
+	public static AppiumLauncher getInstance() {
 		if (!SeleniumTestsContextManager.isMobileTest()) {
 			throw new ConfigurationException("AppiumLauncher can only be used in mobile testing");
 		}
