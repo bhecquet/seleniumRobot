@@ -126,6 +126,11 @@ public class WebUIDriver {
                 }
             }
         }
+        
+        // in case of mobile test with appium, stop appium server
+        if (iWebDriverFactory instanceof AppiumDriverFactory) {
+        	((AppiumDriverFactory) iWebDriverFactory).getAppiumLauncher().stopAppium();
+        }
 
         driverSession.remove();
         uxDriverSession.remove();
@@ -149,7 +154,11 @@ public class WebUIDriver {
         return getWebDriver(true);
     }
 
-    /**
+    public IWebDriverFactory getWebDriverBuilder() {
+		return webDriverBuilder;
+	}
+
+	/**
      * Returns WebDriver instance Creates a new WebDriver Instance if it is null and isCreate is true.
      *
      * @param   isCreate  create webdriver or not

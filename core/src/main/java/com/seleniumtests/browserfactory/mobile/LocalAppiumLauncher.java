@@ -101,7 +101,7 @@ public class LocalAppiumLauncher implements AppiumLauncher {
 		
 		for (int i=0; i< 10; i++) {
 			try {
-				HttpGet request = new HttpGet(String.format("http://localhost:%d/wd/hub/sessions", appiumPort));
+				HttpGet request = new HttpGet(getAppiumServerUrl() + "sessions");
 		        CloseableHttpClient client = HttpClients.createDefault();
 		        CloseableHttpResponse response = client.execute(request);
 		        client.close();
@@ -113,6 +113,14 @@ public class LocalAppiumLauncher implements AppiumLauncher {
 			}
 			WaitHelper.waitForSeconds(1);
 		}
+	}
+	
+	/**
+	 * Returns the local appium URL
+	 * @return
+	 */
+	public String getAppiumServerUrl() {
+		return String.format("http://localhost:%d/wd/hub/", appiumPort);
 	}
 	
 	public void startAppiumWithWait() {

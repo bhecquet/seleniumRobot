@@ -21,8 +21,10 @@ import java.net.URL;
 
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
-import org.openqa.selenium.remote.RemoteWebDriver;
 
+import com.seleniumtests.browserfactory.mobile.AppiumLauncher;
+import com.seleniumtests.browserfactory.mobile.LocalAppiumLauncher;
+import com.seleniumtests.browserfactory.mobile.MobileDeviceSelector;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.DriverExceptions;
 import com.seleniumtests.driver.DriverConfig;
@@ -32,6 +34,7 @@ import io.appium.java_client.ios.IOSDriver;
 
 public class AppiumDriverFactory extends AbstractWebDriverFactory implements IWebDriverFactory {
 
+	private AppiumLauncher appiumLauncher;
 
     public AppiumDriverFactory(final DriverConfig cfg) {
         super(cfg);
@@ -40,13 +43,23 @@ public class AppiumDriverFactory extends AbstractWebDriverFactory implements IWe
     @Override
     protected WebDriver createNativeDriver() {
     	
+    	// start appium
+    	// TODO: may be useful to connect to an existing appium server
+    	appiumLauncher = AppiumLauncherFactory.getInstance();
+    	appiumLauncher.startAppium();
+    	
     	DesiredCapabilities capabilities = new DesiredCapabilities();
-
     	try {
 	        if("android".equalsIgnoreCase(webDriverConfig.getPlatform())) {
-	            return new AndroidDriver(new URL(webDriverConfig.getAppiumServerURL()), new AndroidCapabilitiesFactory(capabilities).createCapabilities(webDriverConfig));
+	        	DesiredCapabilities androidCaps = new AndroidCapabilitiesFactory(capabilities).createCapabilities(webDriverConfig);
+	        	androidCaps = new MobileDeviceSelector().initialize().updateCapabilitiesWithSelectedDevice(androidCaps);
+	            return new AndroidDriver(new URL(((LocalAppiumLauncher)appiumLauncher).getAppiumServerUrl()), androidCaps);
+	            
 	        } else if ("ios".equalsIgnoreCase(webDriverConfig.getPlatform())){
-	            return new IOSDriver(new URL(webDriverConfig.getAppiumServerURL()), new IOsCapabilitiesFactory(capabilities).createCapabilities(webDriverConfig));
+	        	DesiredCapabilities iosCaps = new IOsCapabilitiesFactory(capabilities).createCapabilities(webDriverConfig);
+	        	iosCaps = new MobileDeviceSelector().initialize().updateCapabilitiesWithSelectedDevice(iosCaps);
+	            return new IOSDriver(new URL(((LocalAppiumLauncher)appiumLauncher).getAppiumServerUrl()), iosCaps);
+	            
 	        } else {
 	        	throw new ConfigurationException(String.format("Platform %s is unknown for Appium tests", webDriverConfig.getPlatform()));
 	        }
@@ -54,5 +67,9 @@ public class AppiumDriverFactory extends AbstractWebDriverFactory implements IWe
     		throw new DriverExceptions("Error creating driver: " + e.getMessage());
     	}
     }
+
+	public AppiumLauncher getAppiumLauncher() {
+		return appiumLauncher;
+	}
 
 }
