@@ -1,0 +1,291 @@
+package com.seleniumtests.ut.util.imaging;
+
+import java.io.File;
+import java.io.IOException;
+
+import org.apache.commons.io.FileUtils;
+import org.opencv.core.Point;
+import org.openqa.selenium.Rectangle;
+import org.testng.Assert;
+import org.testng.annotations.Test;
+
+import com.seleniumtests.GenericTest;
+import com.seleniumtests.customexception.ImageSearchException;
+import com.seleniumtests.util.imaging.ImageDetector;
+
+public class TestImageDetector extends GenericTest {
+
+	private File createFileFromResource(String resource) throws IOException {
+		File tempFile = File.createTempFile("img", null);
+		tempFile.deleteOnExit();
+		FileUtils.copyInputStreamToFile(Thread.currentThread().getContextClassLoader().getResourceAsStream(resource), tempFile);
+		
+		return tempFile;
+	}
+	
+	/**
+	 * For debug purpose only
+	 * @throws IOException 
+	 */
+	private void showResultingPicture(ImageDetector detector) throws IOException {
+		String tempFile = File.createTempFile("img", ".png").getAbsolutePath();
+		detector.writeComparisonPictureToFile(tempFile);
+		detector.showResultingImage(tempFile);
+	}
+	
+	/**
+	 * Search an image inside an other one but no corresponding zone should be found
+	 * @throws IOException 
+	 */
+	@Test(groups={"ut"}, expectedExceptions=ImageSearchException.class)
+	public void searchNonCorrespondingPicture() throws IOException {
+		ImageDetector detector = new ImageDetector(createFileFromResource("tu/images/p9.png"), 
+													createFileFromResource("tu/images/creditMutuelLogo.png"));
+		detector.detectCorrespondingZone();
+	}
+	
+	/**
+	 * Initialize detector with non existing file
+	 */
+	@Test(groups={"ut"}, expectedExceptions=ImageSearchException.class)
+	public void searchNonExistingPicture() {
+		new ImageDetector(new File("not_existing_file.png"), 
+							new File("not_existing_file2.png"));
+	}
+	
+	/**
+	 * Search an image inside an other one, no rotation, no resizing
+	 * @throws IOException 
+	 */
+	@Test(groups={"ut"})
+	public void searchPictureWithoutRotation() throws IOException {
+		ImageDetector detector = new ImageDetector(createFileFromResource("tu/images/RIB.png"), 
+						createFileFromResource("tu/images/creditMutuelLogo.png"));
+		detector.detectCorrespondingZone();
+		Assert.assertEquals(detector.getRotationAngle(), 0);
+		Assert.assertEquals(detector.getDetectedRectangle(), new Rectangle(604, 147, 76, 492));
+	}
+	
+	/**
+	 * Search an image inside an other one, 90° rotation, no resizing
+	 * @throws IOException 
+	 */
+	@Test(groups={"ut"})
+	public void searchPictureWith90degRotation() throws IOException {
+		ImageDetector detector = new ImageDetector(createFileFromResource("tu/images/p9.png"), 
+				createFileFromResource("tu/images/vosAlertesRotate90.png"));
+		detector.detectCorrespondingZone();
+		Assert.assertEquals(detector.getRotationAngle(), 90);
+		Assert.assertEquals(detector.getDetectedRectangle(), new Rectangle(573, 136, 29, 108));
+	}
+	
+	/**
+	 * Search an image inside an other one, 180° rotation, no resizing
+	 * @throws IOException 
+	 */
+	@Test(groups={"ut"})
+	public void searchPictureWith180degRotation() throws IOException {
+		ImageDetector detector = new ImageDetector(createFileFromResource("tu/images/p9.png"), 
+				createFileFromResource("tu/images/vosAlertesRotate180.png"));
+		detector.detectCorrespondingZone();
+		Assert.assertEquals(detector.getRotationAngle(), 180);
+		Assert.assertEquals(detector.getDetectedRectangle(), new Rectangle(573, 135, 29, 108));
+	}
+	
+	/**
+	 * Search an image inside an other one, 180° rotation, no resizing
+	 * @throws IOException 
+	 */
+	@Test(groups={"ut"})
+	public void searchPictureWith270degRotation() throws IOException {
+		ImageDetector detector = new ImageDetector(createFileFromResource("tu/images/p9.png"), 
+				createFileFromResource("tu/images/vosAlertesRotate270.png"));
+		detector.detectCorrespondingZone();
+		Assert.assertEquals(detector.getRotationAngle(), 270);
+		Assert.assertEquals(detector.getDetectedRectangle(), new Rectangle(574, 135, 29, 108));
+	}
+	
+	/**
+	 * Search an image inside an other one, 0° rotation, 80% resizing
+	 * @throws IOException 
+	 */
+	@Test(groups={"ut"})
+	public void searchPictureWithResizing() throws IOException {
+		ImageDetector detector = new ImageDetector(createFileFromResource("tu/images/RIB.png"), 
+				createFileFromResource("tu/images/creditMutuelLogo0.8.png"));
+		detector.detectCorrespondingZone();
+		Assert.assertEquals(detector.getRotationAngle(), 0);
+		Assert.assertEquals(detector.getDetectedRectangle(), new Rectangle(604, 147, 77, 493));
+	}
+	
+	/**
+	 * Search an image inside an other one, 0° rotation, 80% resizing in width and 100% in height
+	 * Error should be raised
+	 * @throws IOException 
+	 */
+	@Test(groups={"ut"}, expectedExceptions=ImageSearchException.class)
+	public void searchPictureWithNonProportianalResizing() throws IOException {
+		ImageDetector detector = new ImageDetector(createFileFromResource("tu/images/RIB.png"), 
+				createFileFromResource("tu/images/creditMutuelLogo0.8-1.png"));
+		detector.detectCorrespondingZone();
+	}
+	
+	/**
+	 * Search an image inside an other one, 45° rotation, 
+	 * Error should be raised
+	 * @throws IOException 
+	 */
+	@Test(groups={"ut"}, expectedExceptions=ImageSearchException.class)
+	public void searchPictureWithWrongRotating() throws IOException {
+		ImageDetector detector = new ImageDetector(createFileFromResource("tu/images/RIB_rotated.png"), 
+				createFileFromResource("tu/images/creditMutuelLogo.png"), 0.07);
+		try {
+			detector.detectCorrespondingZone();
+		} finally {
+			Assert.assertEquals(detector.getRotationAngle(), 44);
+		}
+	}
+	
+	
+	private class SubImageDetector extends ImageDetector {
+		
+		public long testAngle(Point vec1p1, Point vec1p2, Point vec2p1, Point vec2p2) {
+			return getAngleBetweenVectors(vec1p1, vec1p2, vec2p1, vec2p2);
+		}
+		public void testRotationAngle(Point p1, Point p2, Point p3, Point p4, Point po1, Point po2, Point po3, Point po4) {
+			checkRotationAngle(p1, p2, p3, p4, po1, po2, po3, po4);
+		}
+		public void testDetectionZoneAspectRatio(Point p1, Point p2, Point p4, Point po1, Point po2, Point po4) {
+			checkDetectionZoneAspectRatio(p1, p2, p4, po1, po2, po4);
+		}
+	}
+	
+	@Test(groups={"ut"})
+	public void testGetAngleBetweenVectors90() {
+		SubImageDetector detector = new SubImageDetector();
+		Assert.assertEquals(detector.testAngle(new Point(0, 10), new Point(10, 10), new Point(0, 10), new Point(0, 0)), 90);
+	}
+	
+	@Test(groups={"ut"})
+	public void testGetAngleBetweenVectors89() {
+		SubImageDetector detector = new SubImageDetector();
+		Assert.assertEquals(detector.testAngle(new Point(0, 10), new Point(10, 10), new Point(0, 10), new Point(0.174, 0)), 90);
+	}
+	
+	@Test(groups={"ut"})
+	public void testGetAngleBetweenVectors88() {
+		SubImageDetector detector = new SubImageDetector();
+		Assert.assertEquals(detector.testAngle(new Point(0, 10), new Point(10, 10), new Point(0, 10), new Point(0.349, 0)), 88);
+	}
+	
+	@Test(groups={"ut"})
+	public void testGetAngleBetweenVectors91() {
+		SubImageDetector detector = new SubImageDetector();
+		Assert.assertEquals(detector.testAngle(new Point(0, 10), new Point(10, 10), new Point(0, 10), new Point(-0.174, 0)), 90);
+	}
+	
+	@Test(groups={"ut"})
+	public void testGetAngleBetweenVectors92() {
+		SubImageDetector detector = new SubImageDetector();
+		Assert.assertEquals(detector.testAngle(new Point(0, 10), new Point(10, 10), new Point(0, 10), new Point(-0.349, 0)), 92);
+	}
+	
+	@Test(groups={"ut"})
+	public void testCheckRotationAngle0() {
+		Point po1 = new Point(0, 0);
+		Point po2 = new Point(2, 0);
+		Point po3 = new Point(2, 1);
+		Point po4 = new Point(0, 1);
+		Point p1 = new Point(0, 0);
+		Point p2 = new Point(2, 0);
+		Point p3 = new Point(2, 1);
+		Point p4 = new Point(0, 1);
+		SubImageDetector detector = new SubImageDetector();
+		detector.testRotationAngle(p1, p2, p3, p4, po1, po2, po3, po4);
+		Assert.assertEquals(detector.getRotationAngle(), 0);
+	}
+	
+	/**
+	 * Error is raised when detected zone is not a rectangle
+	 */
+	@Test(groups={"ut"}, expectedExceptions=ImageSearchException.class)
+	public void testCheckNonRectangleDetectedZone() {
+		Point po1 = new Point(0, 0);
+		Point po2 = new Point(2, 0);
+		Point po3 = new Point(2, 1);
+		Point po4 = new Point(0, 1);
+		Point p1 = new Point(0, 0);
+		Point p2 = new Point(2, 0);
+		Point p3 = new Point(2.1, 1);
+		Point p4 = new Point(0, 1);
+		SubImageDetector detector = new SubImageDetector();
+		detector.testRotationAngle(p1, p2, p3, p4, po1, po2, po3, po4);
+	}
+	
+	/**
+	 * Error should be raised as rotation angle is 45°
+	 */
+	@Test(groups={"ut"}, expectedExceptions=ImageSearchException.class)
+	public void testCheckRotationAngle45() {
+		Point po1 = new Point(0, 0);
+		Point po2 = new Point(2, 0);
+		Point po3 = new Point(2, 1);
+		Point po4 = new Point(0, 1);
+		Point p1 = new Point(0, 0);
+		Point p2 = new Point(2, 2);
+		Point p3 = new Point(1, 3);
+		Point p4 = new Point(-1, 1);
+		SubImageDetector detector = new SubImageDetector();
+		detector.testRotationAngle(p1, p2, p3, p4, po1, po2, po3, po4);
+	}
+	
+	/**
+	 * Rotation 0°, aspect ratio of found image: 1
+	 */
+	@Test(groups={"ut"})
+	public void testDetectionZoneAspectRatio1() {
+		Point po1 = new Point(0, 0);
+		Point po2 = new Point(2, 0);
+		Point po4 = new Point(0, 1);
+		Point p1 = new Point(0, 0);
+		Point p2 = new Point(2, 0);
+		Point p4 = new Point(0, 1);
+		SubImageDetector detector = new SubImageDetector();
+		detector.setRotationAngle(0);
+		detector.testDetectionZoneAspectRatio(p1, p2, p4, po1, po2, po4);
+		Assert.assertEquals(detector.getAspectRatio(), 1.0, 0.01);
+	}
+	
+	/**
+	 * Rotation 90°, aspect ratio of found image: 2
+	 */
+	@Test(groups={"ut"})
+	public void testDetectionZoneAspectRatio2() {
+		Point po1 = new Point(0, 0);
+		Point po2 = new Point(2, 0);
+		Point po4 = new Point(0, 1);
+		Point p1 = new Point(0, 4);
+		Point p2 = new Point(0, 0);
+		Point p4 = new Point(2, 4);
+		SubImageDetector detector = new SubImageDetector();
+		detector.setRotationAngle(90);
+		detector.testDetectionZoneAspectRatio(p1, p2, p4, po1, po2, po4);
+		Assert.assertEquals(detector.getAspectRatio(), 2.0, 0.01);
+	}
+	
+	/**
+	 * Rotation 0°, aspect ratio of found image: 1
+	 */
+	@Test(groups={"ut"}, expectedExceptions=ImageSearchException.class)
+	public void testDetectionZoneDifferentAspectRatio() {
+		Point po1 = new Point(0, 0);
+		Point po2 = new Point(2, 0);
+		Point po4 = new Point(0, 1);
+		Point p1 = new Point(0, 0);
+		Point p2 = new Point(3, 0);
+		Point p4 = new Point(0, 1);
+		SubImageDetector detector = new SubImageDetector();
+		detector.setRotationAngle(0);
+		detector.testDetectionZoneAspectRatio(p1, p2, p4, po1, po2, po4);
+	}
+}

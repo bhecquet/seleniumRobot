@@ -34,9 +34,6 @@ import org.openqa.selenium.remote.UnreachableBrowserException;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.SystemClock;
 import org.openqa.selenium.support.ui.WebDriverWait;
-import org.sikuli.api.DesktopScreenRegion;
-import org.sikuli.api.robot.Mouse;
-import org.sikuli.api.robot.desktop.DesktopMouse;
 import org.testng.Assert;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
@@ -525,8 +522,10 @@ public class PageObject extends BasePage implements IPage {
 				// make window display in foreground
 				try {
 					Point windowPosition  = driver.manage().window().getPosition();
-					Mouse mouse = new DesktopMouse();
-					mouse.click(new DesktopScreenRegion(Math.max(0, windowPosition.x) + driver.manage().window().getSize().width / 2, Math.max(0, windowPosition.y) + 5, 2, 2).getCenter());
+//					org.openqa.selenium.interactions.Mouse mouse = ((HasInputDevices) driver).getMouse();
+//					mouse.click();
+//					Mouse mouse = new DesktopMouse();
+//					mouse.click(new DesktopScreenRegion(Math.max(0, windowPosition.x) + driver.manage().window().getSize().width / 2, Math.max(0, windowPosition.y) + 5, 2, 2).getCenter());
 				} catch (Exception e) {
 					logger.warn("error while giving focus to window");
 				}
