@@ -96,6 +96,11 @@
             <artifactId>cucumber-java8</artifactId>
             <version>1.2.4</version>
         </dependency>
+        <dependency>
+			<groupId>org.openpnp</groupId>
+			<artifactId>opencv</artifactId>
+			<version>2.4.13-0</version>
+		</dependency>
         
         <!-- Specific Testdroid -->
         <dependency>
@@ -114,11 +119,11 @@
         	<artifactId>ini4j</artifactId>
         	<version>0.5.4</version>
         </dependency>
-        <dependency>
+        <!-- <dependency>
         	<groupId>org.sikuli</groupId>
         	<artifactId>sikuli-api</artifactId>
         	<version>1.2.0</version>
-        </dependency>
+        </dependency> -->
         <dependency>
         	<groupId>org.aspectj</groupId>
         	<artifactId>aspectjrt</artifactId>

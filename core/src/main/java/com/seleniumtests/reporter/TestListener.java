@@ -277,9 +277,7 @@ public class TestListener implements IInvokedMethodListener, ITestListener {
 		List<Throwable> verificationFailures = SeleniumTestsContextManager.getThreadContext().getVerificationFailures(Reporter.getCurrentTestResult());
 
 		int size = verificationFailures.size();
-		if (size == 0) {
-			return;
-		} else if (result.getStatus() == TestResult.FAILURE) {
+		if (size == 0 || result.getStatus() == TestResult.FAILURE) {
 			return;
 		}
 
@@ -288,31 +286,15 @@ public class TestListener implements IInvokedMethodListener, ITestListener {
 		if (size == 1) {
 			result.setThrowable(verificationFailures.get(0));
 		} else {
-
-//			// create failure message with all failures and stack traces barring last failure)
-//			StringBuilder failureMessage = new StringBuilder("!!! Many Test Failures (").append(size).append(
-//					"):nn");
-//			for (int i = 0; i < size - 1; i++) {
-//				failureMessage.append("Failure ").append(i + 1).append(" of ").append(size).append("\n");
-//
-//				Throwable t = verificationFailures.get(i);
-//				String fullStackTrace = Utils.stackTrace(t, false)[1];
-//				failureMessage.append(fullStackTrace).append("\n\n");
-//			}
-//
-//			// final failure
-//			Throwable last = verificationFailures.get(size - 1);
-//			failureMessage.append("Failure ").append(size).append(" of ").append(size).append("\n");
-//			failureMessage.append(last.toString());
 			
 			StringBuilder stackString = new StringBuilder("!!! Many Test Failures (").append(size).append(")\n\n");
 			
 			for (int i = 0; i < size - 1; i++) {
-				CommonReporter.generateTheStackTrace(verificationFailures.get(i), String.format("Failure %d of %d\n", i + 1, size), stackString);
+				CommonReporter.generateTheStackTrace(verificationFailures.get(i), String.format("Failure %d of %d%n", i + 1, size), stackString);
 			}
 			
 			Throwable last = verificationFailures.get(size - 1);
-			stackString.append(String.format("\n.\nFailure %d of %d\n", size, size));
+			stackString.append(String.format("\n.\nFailure %d of %d%n", size, size));
 			stackString.append(last.toString());
 
 			// set merged throwable
@@ -329,65 +311,6 @@ public class TestListener implements IInvokedMethodListener, ITestListener {
 		}
 
 	}
-	
-//	public void changeTestResult(final ITestResult result) {
-//		List<Throwable> verificationFailures = SeleniumTestsContextManager.getThreadContext().getVerificationFailures(Reporter.getCurrentTestResult());
-//
-//		int size = verificationFailures.size();
-//		if (size == 0) {
-//			return;
-//		} else if (result.getStatus() == TestResult.FAILURE) {
-//			return;
-//		}
-//
-//		result.setStatus(TestResult.FAILURE);
-//
-//		if (size == 1) {
-//			result.setThrowable(verificationFailures.get(0));
-//		} else {
-//			
-//			StringBuilder stackString = new StringBuilder("!!! Many Test Failures (").append(size).append(")\n\n");
-//			
-//			
-//			for (int i = 0; i < size - 1; i++) {
-//				CommonReporter.generateTheStackTrace(verificationFailures.get(i), String.format("Failure %d of %d\n", i + 1, size), stackString);
-//			}
-//			
-//			Throwable last = verificationFailures.get(size - 1);
-//			stackString.append(String.format("Failure %d of %d\n", size, size));
-//			stackString.append(last.toString());
-//
-////			// create failure message with all failures and stack traces barring last failure)
-////			StringBuilder failureMessage = new StringBuilder("!!! Many Test Failures (").append(size).append(
-////					")\n\n");
-////			for (int i = 0; i < size - 1; i++) {
-////				failureMessage.append("Failure ").append(i + 1).append(" of ").append(size).append("\n");
-////
-////				Throwable t = verificationFailures.get(i);
-////				String fullStackTrace = Utils.stackTrace(t, false)[1];
-////				failureMessage.append(fullStackTrace).append("nn");
-////			}
-////
-////			// final failure
-////			Throwable last = verificationFailures.get(size - 1);
-////			failureMessage.append("Failure ").append(size).append(" of ").append(size).append("\n");
-////			failureMessage.append(last.toString());
-//
-//			// set merged throwable
-//			Throwable merged = new Throwable(stackString.toString());
-//			merged.setStackTrace(last.getStackTrace());
-//
-//			result.setThrowable(merged);
-//		}
-//
-//		// move test for passedTests to failedTests if test is not already in failed tests
-//		if (result.getTestContext().getPassedTests().getAllMethods().contains(result.getMethod())) {
-//			result.getTestContext().getPassedTests().removeResult(result);
-//			result.getTestContext().getFailedTests().addResult(result, result.getMethod());
-//		}
-//
-//	}
-	
 
 	/**
 	 * At the end of a successful test. 
