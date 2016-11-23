@@ -27,6 +27,7 @@ import com.seleniumtests.uipage.htmlelements.FrameElement;
 import com.seleniumtests.uipage.htmlelements.HtmlElement;
 import com.seleniumtests.uipage.htmlelements.LabelElement;
 import com.seleniumtests.uipage.htmlelements.LinkElement;
+import com.seleniumtests.uipage.htmlelements.PictureElement;
 import com.seleniumtests.uipage.htmlelements.RadioButtonElement;
 import com.seleniumtests.uipage.htmlelements.SelectList;
 import com.seleniumtests.uipage.htmlelements.Table;
@@ -58,6 +59,8 @@ public class DriverTestPage extends PageObject {
 	public static final SelectList selectUlLiList = new SelectList("ulLiList", By.id("languages"));
 	public static final TextFieldElement ulliListTrigger = new TextFieldElement("listTrigger", By.id("language"));
 	public static final Table table = new Table("table", By.id("table"));
+	public static final PictureElement picture = new PictureElement("picture", "tu/images/logo_text_field.png", table);
+	
 	
 	// Elements for IFrame
 	public static final FrameElement iframe = new FrameElement("IFrame", By.id("myIFrame"));

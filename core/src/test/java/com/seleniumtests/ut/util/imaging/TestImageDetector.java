@@ -24,16 +24,6 @@ public class TestImageDetector extends GenericTest {
 	}
 	
 	/**
-	 * For debug purpose only
-	 * @throws IOException 
-	 */
-	private void showResultingPicture(ImageDetector detector) throws IOException {
-		String tempFile = File.createTempFile("img", ".png").getAbsolutePath();
-		detector.writeComparisonPictureToFile(tempFile);
-		detector.showResultingImage(tempFile);
-	}
-	
-	/**
 	 * Search an image inside an other one but no corresponding zone should be found
 	 * @throws IOException 
 	 */
@@ -67,6 +57,19 @@ public class TestImageDetector extends GenericTest {
 	}
 	
 	/**
+	 * Search an image inside an other one, no rotation, no resizing
+	 * @throws IOException 
+	 */
+	@Test(groups={"ut"})
+	public void searchPictureWithoutRotationDriverPage() throws IOException {
+		ImageDetector detector = new ImageDetector(createFileFromResource("tu/images/driverTestPage.png"), 
+				createFileFromResource("tu/images/logo_text_field.png"));
+		detector.detectCorrespondingZone();
+		Assert.assertEquals(detector.getRotationAngle(), 0);
+		Assert.assertEquals(detector.getDetectedRectangle(), new Rectangle(3, 714, 94, 138));
+	}
+	
+	/**
 	 * Search an image inside an other one, 90° rotation, no resizing
 	 * @throws IOException 
 	 */
@@ -76,7 +79,7 @@ public class TestImageDetector extends GenericTest {
 				createFileFromResource("tu/images/vosAlertesRotate90.png"));
 		detector.detectCorrespondingZone();
 		Assert.assertEquals(detector.getRotationAngle(), 90);
-		Assert.assertEquals(detector.getDetectedRectangle(), new Rectangle(573, 136, 29, 108));
+		Assert.assertEquals(detector.getDetectedRectangle(), new Rectangle(574, 136, 29, 107));
 	}
 	
 	/**
@@ -89,7 +92,7 @@ public class TestImageDetector extends GenericTest {
 				createFileFromResource("tu/images/vosAlertesRotate180.png"));
 		detector.detectCorrespondingZone();
 		Assert.assertEquals(detector.getRotationAngle(), 180);
-		Assert.assertEquals(detector.getDetectedRectangle(), new Rectangle(573, 135, 29, 108));
+		Assert.assertEquals(detector.getDetectedRectangle(), new Rectangle(574, 135, 29, 107));
 	}
 	
 	/**
@@ -102,7 +105,7 @@ public class TestImageDetector extends GenericTest {
 				createFileFromResource("tu/images/vosAlertesRotate270.png"));
 		detector.detectCorrespondingZone();
 		Assert.assertEquals(detector.getRotationAngle(), 270);
-		Assert.assertEquals(detector.getDetectedRectangle(), new Rectangle(574, 135, 29, 108));
+		Assert.assertEquals(detector.getDetectedRectangle(), new Rectangle(575, 135, 29, 107));
 	}
 	
 	/**
@@ -115,7 +118,7 @@ public class TestImageDetector extends GenericTest {
 				createFileFromResource("tu/images/creditMutuelLogo0.8.png"));
 		detector.detectCorrespondingZone();
 		Assert.assertEquals(detector.getRotationAngle(), 0);
-		Assert.assertEquals(detector.getDetectedRectangle(), new Rectangle(604, 147, 77, 493));
+		Assert.assertEquals(detector.getDetectedRectangle(), new Rectangle(603, 147, 77, 493));
 	}
 	
 	/**
@@ -253,7 +256,7 @@ public class TestImageDetector extends GenericTest {
 		SubImageDetector detector = new SubImageDetector();
 		detector.setRotationAngle(0);
 		detector.testDetectionZoneAspectRatio(p1, p2, p4, po1, po2, po4);
-		Assert.assertEquals(detector.getAspectRatio(), 1.0, 0.01);
+		Assert.assertEquals(detector.getSizeRatio(), 1.0, 0.01);
 	}
 	
 	/**
@@ -270,7 +273,7 @@ public class TestImageDetector extends GenericTest {
 		SubImageDetector detector = new SubImageDetector();
 		detector.setRotationAngle(90);
 		detector.testDetectionZoneAspectRatio(p1, p2, p4, po1, po2, po4);
-		Assert.assertEquals(detector.getAspectRatio(), 2.0, 0.01);
+		Assert.assertEquals(detector.getSizeRatio(), 2.0, 0.01);
 	}
 	
 	/**
