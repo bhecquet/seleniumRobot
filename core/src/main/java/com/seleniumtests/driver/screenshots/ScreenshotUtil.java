@@ -16,9 +16,16 @@
  */
 package com.seleniumtests.driver.screenshots;
 
+import java.awt.AWTException;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
+import java.awt.Rectangle;
+import java.awt.Robot;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.LinkedList;
+
+import javax.imageio.ImageIO;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
@@ -27,6 +34,7 @@ import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.customexception.WebSessionEndedException;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.TestType;
@@ -80,7 +88,6 @@ public class ScreenshotUtil {
     }
 
     private static String getOutputDirectory() {
-//        return SeleniumTestsContextManager.getGlobalContext().getTestNGContext().getOutputDirectory();
         return SeleniumTestsContextManager.getThreadContext().getOutputDirectory();
     }
 
@@ -127,6 +134,48 @@ public class ScreenshotUtil {
 
         screenShot.setTitle(_title);
     }
+    
+    /**
+     * Capture driver snapshot to file
+     */
+    public File captureWebPageToFile() {
+    	ScreenShot screenShot = new ScreenShot();
+    	filename = HashCodeGenerator.getRandomHashCode("web");
+    	handleImage(screenShot);
+    	if (screenShot.getImagePath() == null) {
+    		return null;
+    	}
+    	return new File(outputDirectory + "/" + screenShot.getFullImagePath());
+    }
+    
+    /**
+	 * prend une capture d'écran
+	 */
+	public File captureDesktopToFile() {
+		
+		if (SeleniumTestsContextManager.isMobileTest()) {
+			throw new ScenarioException("Desktop capture can only be done on Desktop tests");
+		}
+		
+		GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+		GraphicsDevice defaultGraphicDevice = ge.getDefaultScreenDevice();
+		Integer screenWidth = defaultGraphicDevice.getDisplayMode().getWidth();
+		Integer screenHeight = defaultGraphicDevice.getDisplayMode().getHeight();
+		
+		// Capture the screen shot of the area of the screen defined by the rectangle
+        BufferedImage bi;
+		try {
+			bi = new Robot().createScreenCapture(new Rectangle(screenWidth, screenHeight));
+			filename = HashCodeGenerator.getRandomHashCode("web");
+			File outputFile = new File(outputDirectory + "/" + SCREENSHOT_DIR + filename + ".png");
+			ImageIO.write(bi, "png" , outputFile);
+			return outputFile;
+		} catch (AWTException e) {
+			throw new ScenarioException("Cannot capture image", e);
+		} catch (IOException e1) {
+			throw new ScenarioException("Erreur while creating screenshot:  " + e1.getMessage(), e1);
+		}
+	}
 
     /**
      * Capture snapshot if seleniumContext is configured to do so

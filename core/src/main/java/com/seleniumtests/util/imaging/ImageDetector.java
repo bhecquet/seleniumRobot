@@ -1,6 +1,7 @@
 package com.seleniumtests.util.imaging;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -46,9 +47,10 @@ public class ImageDetector {
 	private long rotationAngle;
 	private File sceneImage;
 	private File objectImage;
+	private boolean debug;
 	private double detectionThreshold;
 	private Mat imgMatch;
-	private double aspectRatio;
+	private double sizeRatio;
 	private static Logger logger = SeleniumRobotLogger.getLogger(ImageDetector.class);
 	
 	// load openCV
@@ -76,6 +78,7 @@ public class ImageDetector {
 		this.objectImage = objectImage;
 		this.detectionThreshold = detectionThreshold;
 		imgMatch = new Mat();
+		debug = false;
 	}
 	
 	/**
@@ -155,7 +158,8 @@ public class ImageDetector {
 		MatOfPoint2f scene = new MatOfPoint2f();
 		scene.fromList(sceneList);
 		
-		Mat hg = Calib3d.findHomography(obj, scene, 8, 10);
+		// Calib3d.RANSAC could be used instead of 0
+		Mat hg = Calib3d.findHomography(obj, scene, 0, 5);
 
 		Mat objectCorners = new Mat(4,1,CvType.CV_32FC2);
 		Mat sceneCorners = new Mat(4,1,CvType.CV_32FC2);
@@ -167,44 +171,63 @@ public class ImageDetector {
 		
 		Core.perspectiveTransform(objectCorners, sceneCorners, hg);
 		
+		// points of object
 		Point po1 = new Point(objectCorners.get(0,0));
 		Point po2 = new Point(objectCorners.get(1,0));
 		Point po3 = new Point(objectCorners.get(2,0));
 		Point po4 = new Point(objectCorners.get(3,0));
-		logger.debug(po1);
-		logger.debug(po2);
-		logger.debug(po3);
-		logger.debug(po4);
-
+		
+		// point of object in scene
 		Point p1 = new Point(sceneCorners.get(0,0)); // top left
 		Point p2 = new Point(sceneCorners.get(1,0)); // top right
 		Point p3 = new Point(sceneCorners.get(2,0)); // bottom right
 		Point p4 = new Point(sceneCorners.get(3,0)); // bottom left
 		
+		logger.debug(po1);
+		logger.debug(po2);
+		logger.debug(po3);
+		logger.debug(po4);
 		logger.debug(p1); // top left
 		logger.debug(p2); // top right
 		logger.debug(p3); // bottom right
 		logger.debug(p4); // bottom left
 		
+		if (debug) {
+			try {
+				// translate corners
+				p1.set(new double[] {p1.x + objectImageMat.cols(), p1.y});
+				p2.set(new double[] {p2.x + objectImageMat.cols(), p2.y});
+				p3.set(new double[] {p3.x + objectImageMat.cols(), p3.y});
+				p4.set(new double[] {p4.x + objectImageMat.cols(), p4.y});
+				
+				Core.line(imgMatch, p1, p2, new Scalar(0, 255, 0),1);
+				Core.line(imgMatch, p2, p3, new Scalar(0, 255, 0),1);
+				Core.line(imgMatch, p3, p4, new Scalar(0, 255, 0),1);
+				Core.line(imgMatch, p4, p1, new Scalar(0, 255, 0),1);
+				
+				showResultingPicture();
+			} catch (IOException e) {
+			}
+		}
 		
 		// check rotation angles
 		checkRotationAngle(p1, p2, p3, p4, po1, po2, po3, po4);
+		
+		// rework on scene points as new, we are sure the object rotation is 0, 90, 180 or 270°
+		System.out.println(p1);
+		System.out.println(p2);
+		System.out.println(p3);
+		System.out.println(p4);
+		reworkOnScenePoints(p1, p2, p3, p4);
+		System.out.println(p1);
+		System.out.println(p2);
+		System.out.println(p3);
+		System.out.println(p4);
 		
 		// check that aspect ratio of the detected height and width are the same
 		checkDetectionZoneAspectRatio(p1, p2, p4, po1, po2, po4);
 		
 		recordDetectedRectangle(p1, p2, p3, p4);
-	
-		// translate corners
-		p1.set(new double[] {p1.x + objectImageMat.cols(), p1.y});
-		p2.set(new double[] {p2.x + objectImageMat.cols(), p2.y});
-		p3.set(new double[] {p3.x + objectImageMat.cols(), p3.y});
-		p4.set(new double[] {p4.x + objectImageMat.cols(), p4.y});
-		
-		Core.line(imgMatch, p1, p2, new Scalar(0, 255, 0),1);
-		Core.line(imgMatch, p2, p3, new Scalar(0, 255, 0),1);
-		Core.line(imgMatch, p3, p4, new Scalar(0, 255, 0),1);
-		Core.line(imgMatch, p4, p1, new Scalar(0, 255, 0),1);
 	}
 	
 	/**
@@ -256,6 +279,28 @@ public class ImageDetector {
 	}
 	
 	/**
+	 * In case angles are not strictly multiples of 90°, move points so that we have a real rectangle
+	 * 
+	 * @param p1
+	 * @param p2
+	 * @param p3
+	 * @param p4
+	 */
+	protected void reworkOnScenePoints(Point p1, Point p2, Point p3, Point p4) {
+		if (rotationAngle == 0 || rotationAngle == 180) {
+			p1.y = p2.y = (p1.y + p2.y) / 2;
+			p3.y = p4.y = (p3.y + p4.y) / 2;
+			p1.x = p4.x = (p1.x + p4.x) / 2;
+			p2.x = p3.x = (p2.x + p3.x) / 2;
+		} else {
+			p1.y = p4.y = (p1.y + p4.y) / 2;
+			p2.y = p3.y = (p3.y + p2.y) / 2;
+			p1.x = p2.x = (p1.x + p2.x) / 2;
+			p4.x = p3.x = (p4.x + p3.x) / 2;
+		}
+	}
+	
+	/**
 	 * Check aspect ratio between the searched picture (object) and the detected zone in the scene picture
 	 * Width and Height ratios must be the same
 	 * @param p1	corner corresponding to top left corner of origin possibly rotated
@@ -277,11 +322,11 @@ public class ImageDetector {
 			heightRatio = Math.abs(p1.y - p4.y) / Math.abs(po1.y - po4.y);
 			
 		}
-		if (Math.abs(widthRatio - heightRatio) > 0.01) {
+		if (Math.abs(widthRatio - heightRatio) > 0.1) {
 			throw new ImageSearchException("Aspect ratio between source and detected image is not the same");
 		} else {
 			logger.debug("Transform ratio is " + Math.round(widthRatio * 100) / 100.0);
-			aspectRatio = widthRatio;
+			sizeRatio = widthRatio;
 		}
 	}
 	
@@ -310,6 +355,12 @@ public class ImageDetector {
 		default:
 			break;
 		}
+	}
+	
+	private void showResultingPicture() throws IOException {
+		String tempFile = File.createTempFile("img", ".png").getAbsolutePath();
+		writeComparisonPictureToFile(tempFile);
+		showResultingImage(tempFile);
 	}
 	
 	/**
@@ -364,7 +415,11 @@ public class ImageDetector {
 		this.rotationAngle = rotationAngle;
 	}
 
-	public double getAspectRatio() {
-		return aspectRatio;
+	public double getSizeRatio() {
+		return sizeRatio;
+	}
+
+	public void setDebug(boolean debug) {
+		this.debug = debug;
 	}
 }

@@ -306,10 +306,26 @@ public class HtmlElement {
 			} catch (ElementNotVisibleException e) {
 				TestLogging.info(String.format("element %s not visible", element));
 			} catch (Exception e) {
-				logger.warn("Could not make element visible");
+				logger.warn("Could not make element visible", e);
 			}
 			
 		}
+	}
+	
+	/**
+	 * Move to element
+	 * @param element
+	 */
+	public void scrollToElement(int yOffset) {
+		findElement();
+		new Actions(driver).moveToElement(element).build().perform();
+		
+		if (SeleniumTestsContextManager.isWebTest()) {
+			((JavascriptExecutor) driver).executeScript("window.top.scroll(" + Math.max(element.getLocation().x - 200, 0) + "," + Math.max(element.getLocation().y + yOffset, 0) + ")");
+		} else {
+			logger.warn("scrollToElement is only available for Web tests");
+		}
+		
 	}
 
     /**
