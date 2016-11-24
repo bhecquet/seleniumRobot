@@ -259,6 +259,19 @@ public class TestSeleniumTestContext extends GenericTest {
 	}
 	
 	@Test(groups="ut context")
+	public void testReplayWaitTimeout(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setReplayTimeout(15);
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getReplayTimeout(), 15);
+	}
+	@Test(groups="ut context")
+	public void testReplayWaitTimeoutNull(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setReplayTimeout(null);
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getReplayTimeout(), 30);
+	}
+	
+	@Test(groups="ut context")
 	public void testExplicitWaitTimeout(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setExplicitWaitTimeout(5);

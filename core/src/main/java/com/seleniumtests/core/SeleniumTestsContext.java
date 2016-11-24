@@ -60,6 +60,7 @@ public class SeleniumTestsContext {
     public static final String WEB_SESSION_TIME_OUT = "webSessionTimeOut";		// timeout de la session du navigateur
     public static final String IMPLICIT_WAIT_TIME_OUT = "implicitWaitTimeOut";	// attente implicite du navigateur
     public static final String EXPLICIT_WAIT_TIME_OUT = "explicitWaitTimeOut";	// attente explicite du navigateur
+    public static final String REPLAY_TIME_OUT = "replayTimeOut";				// time during which an action is replayed. By default 30 secs
     public static final String PAGE_LOAD_TIME_OUT = "pageLoadTimeout";			// temps d'attente de chargement d'une page
     public static final String WEB_DRIVER_GRID = "webDriverGrid";				// adresse du serveur seleniumGrid
     public static final String RUN_MODE = "runMode";							// local ou grid. Pourrait également contenir sauceLabs / testDroid
@@ -128,13 +129,15 @@ public class SeleniumTestsContext {
     public static final String NEW_COMMAND_TIMEOUT = "newCommandTimeout";		// Attente maximale entre 2 commandes envoyées à appium
 
     // Cloud specific properties
-    public static final String VERSION = "version";								// TODO: différence par rapport à la version du navigateur ?
-    public static final String PLATFORM = "platform";							// platform on which test should execute. Ex: Windows 7, Android, iOS, Linux, OS X 10.10. TODO: parse platform to add version for mobile	
+    public static final String VERSION = "version";								// 
+    public static final String PLATFORM = "platform";							// platform on which test should execute. Ex: Windows 7, Android, iOS, Linux, OS X 10.10. 	
     public static final String CLOUD_API_KEY = "cloudApiKey";					// clé d'accès (dépend des services)
     
     // Testdroid specific properties
     public static final String PROJECT_NAME = "projectName";					// TestDroid nécessite un nom de projet dans lequel l'automatisation aura lieu	
 
+    private static final int REPLAY_TIME_OUT_VALUE = 30;
+    
     private LinkedList<TearDownService> tearDownServices = new LinkedList<>();
     private Map<ITestResult, List<Throwable>> verificationFailuresMap = new HashMap<>();
 
@@ -155,6 +158,7 @@ public class SeleniumTestsContext {
         setWebSessionTimeout(getIntValueForTest(WEB_SESSION_TIME_OUT, System.getProperty(WEB_SESSION_TIME_OUT)));
         setImplicitWaitTimeout(getIntValueForTest(IMPLICIT_WAIT_TIME_OUT, System.getProperty(IMPLICIT_WAIT_TIME_OUT)));
         setExplicitWaitTimeout(getIntValueForTest(EXPLICIT_WAIT_TIME_OUT, System.getProperty(EXPLICIT_WAIT_TIME_OUT)));
+        setReplayTimeout(getIntValueForTest(REPLAY_TIME_OUT, System.getProperty(REPLAY_TIME_OUT)));
         setPageLoadTimeout(getIntValueForTest(PAGE_LOAD_TIME_OUT, System.getProperty(PAGE_LOAD_TIME_OUT)));
         setWebDriverGrid(getValueForTest(WEB_DRIVER_GRID, System.getProperty(WEB_DRIVER_GRID)));
         setRunMode(getValueForTest(RUN_MODE, System.getProperty(RUN_MODE)));
@@ -426,6 +430,14 @@ public class SeleniumTestsContext {
         } catch (Exception e) {
             return 5;
         }
+    }
+    
+    public int getReplayTimeout() {
+    	try {
+    		return (Integer) getAttribute(REPLAY_TIME_OUT);
+    	} catch (Exception e) {
+    		return REPLAY_TIME_OUT_VALUE;
+    	}
     }
 
     public String getNtlmAuthTrustedUris() {
@@ -819,6 +831,14 @@ public class SeleniumTestsContext {
     		setAttribute(PAGE_LOAD_TIME_OUT, timeout);
     	} else {
     		setAttribute(PAGE_LOAD_TIME_OUT, 90);
+    	}
+    }
+    
+    public void setReplayTimeout(Integer timeout) {
+    	if (timeout != null) {
+    		setAttribute(REPLAY_TIME_OUT, timeout);
+    	} else {
+    		setAttribute(REPLAY_TIME_OUT, REPLAY_TIME_OUT_VALUE);
     	}
     }
     

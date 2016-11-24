@@ -60,6 +60,8 @@ public class DriverTestPage extends PageObject {
 	public static final TextFieldElement ulliListTrigger = new TextFieldElement("listTrigger", By.id("language"));
 	public static final Table table = new Table("table", By.id("table"));
 	public static final PictureElement picture = new PictureElement("picture", "tu/images/logo_text_field.png", table);
+	public static final PictureElement pictureNotPresent = new PictureElement("picture", "tu/images/vosAlertes.png", table);
+	public static final TextFieldElement logoText = new TextFieldElement("logoText", By.id("logoText"));
 	
 	
 	// Elements for IFrame

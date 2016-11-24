@@ -3,49 +3,55 @@ package com.seleniumtests.uipage.htmlelements;
 import java.awt.AWTException;
 import java.awt.Robot;
 import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Field;
 
 import javax.swing.ImageIcon;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.log4j.Logger;
 import org.openqa.selenium.Rectangle;
 import org.openqa.selenium.WebDriverException;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.ConfigurationException;
+import com.seleniumtests.customexception.ImageSearchException;
 import com.seleniumtests.customexception.ScenarioException;
+import com.seleniumtests.driver.DriverMode;
 import com.seleniumtests.driver.screenshots.ScreenshotUtil;
 import com.seleniumtests.uipage.ReplayOnError;
 import com.seleniumtests.util.imaging.ImageDetector;
+import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
 /**
  * Element which is found inside driver snapshot
  * @author behe
  *
  */
-public class PictureElement extends HtmlElement {
+public class PictureElement {
 	
 	private File objectPictureFile;
+	private String resourcePath;
 	private HtmlElement intoElement;
 	private Rectangle detectedObjectRectangle;
 	private double pictureSizeRatio;
 	private Robot robot;
+	private ImageDetector detector;
+	private ScreenshotUtil screenshotUtil;
+	
+
+	private static Logger logger = SeleniumRobotLogger.getLogger(PictureElement.class);
+	
+	public PictureElement() {
+		// for mocks
+	}
 
 	public PictureElement(String label, String resourcePath, HtmlElement intoElement) {
-		try {
-			objectPictureFile = createFileFromResource(resourcePath);
-		} catch (IOException e) {
-			throw new ConfigurationException("Resource cannot be found", e);
-		}
-		this.intoElement = intoElement;
-		if (!SeleniumTestsContextManager.isMobileTest()) {
-			try {
-				robot = new Robot();
-			} catch (AWTException e) {
-				throw new ScenarioException("Cannot create robot", e);
-			}
-		}
+		this(label, createFileFromResource(resourcePath), intoElement);
+		this.resourcePath = resourcePath;
+		
 	}
 	
 	/**
@@ -56,26 +62,53 @@ public class PictureElement extends HtmlElement {
 	 * 						picture is searched before doing capture
 	 */
 	public PictureElement(String label, File pictureFile, HtmlElement intoElement) {
-		objectPictureFile = pictureFile;
 		this.intoElement = intoElement;
-		if (!SeleniumTestsContextManager.isMobileTest()) {
+		if (isRobotUsable()) {
 			try {
 				robot = new Robot();
 			} catch (AWTException e) {
 				throw new ScenarioException("Cannot create robot", e);
 			}
 		}
+		detector = new ImageDetector();
+		setObjectPictureFile(pictureFile);
+		screenshotUtil = new ScreenshotUtil();
 	}
 	
-	private File createFileFromResource(String resource) throws IOException {
-		File tempFile = File.createTempFile("img", null);
-		tempFile.deleteOnExit();
-		FileUtils.copyInputStreamToFile(Thread.currentThread().getContextClassLoader().getResourceAsStream(resource), tempFile);
-		
-		return tempFile;
+	private static File createFileFromResource(String resource)  {
+		try {
+			File tempFile = File.createTempFile("img", null);
+			tempFile.deleteOnExit();
+			FileUtils.copyInputStreamToFile(Thread.currentThread().getContextClassLoader().getResourceAsStream(resource), tempFile);
+			
+			return tempFile;
+		} catch (IOException e) {
+			throw new ConfigurationException("Resource cannot be found", e);
+		}
 	}
 	
-	protected void findElement() {
+	/**
+	 * Check whether Robot is usable
+	 * It's only available in local mode (for now)
+	 * @return
+	 */
+	public boolean isRobotUsable() {
+		if (SeleniumTestsContextManager.getThreadContext().getRunMode() == DriverMode.LOCAL
+				&& !SeleniumTestsContextManager.isMobileTest()) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	/**
+	 * Search the picture in the screenshot taken by Robot or WebDriver
+	 * Robot is used in Desktop mode
+	 * WebDriver is used in mobile, because Robot is not available for mobile platforms
+	 * 
+	 * @param searchOnly
+	 */
+	protected void findElement(boolean searchOnly) {
 		
 		// scroll to element where our picture is
 		if (intoElement != null) {
@@ -84,20 +117,21 @@ public class PictureElement extends HtmlElement {
 		}
 		
 		File screenshotFile;
-		if (SeleniumTestsContextManager.isMobileTest()) {
-			screenshotFile = new ScreenshotUtil().captureWebPageToFile();
+		if (robot == null || searchOnly) {
+			screenshotFile = screenshotUtil.captureWebPageToFile();
 		} else {
-			screenshotFile = new ScreenshotUtil().captureDesktopToFile();
+			screenshotFile = screenshotUtil.captureDesktopToFile();
 		}
 		if (screenshotFile == null) {
 			throw new WebDriverException("Screenshot does not exist");
 		}
-		ImageDetector detector = new ImageDetector(screenshotFile, objectPictureFile);
+		detector.setSceneImage(screenshotFile);
 		detector.detectCorrespondingZone();
 		detectedObjectRectangle = detector.getDetectedRectangle();
 		pictureSizeRatio = detector.getSizeRatio();
 	}
-	
+
+
 	/**
 	 * Click in the center of the found picture
 	 */
@@ -111,22 +145,79 @@ public class PictureElement extends HtmlElement {
 	 * In case the size ratio between searched picture and found picture is not 1, then, offset is
 	 * the source offset so that it's compatible with any screen size and resolution
 	 */
-	@Override
 	@ReplayOnError
 	public void clickAt(int xOffset, int yOffset) {
-		if (SeleniumTestsContextManager.isMobileTest()) {
-			throw new ScenarioException("click on picture is not supported on mobile devices");
+		if (robot == null) {
+			throw new ScenarioException("click on picture is not supported on mobile devices and remote mode");
 		}
-		findElement();
-	    robot.mouseMove(detectedObjectRectangle.x + detectedObjectRectangle.width / 2 + xOffset, detectedObjectRectangle.y + detectedObjectRectangle.height / 2 + yOffset);    
+		findElement(false);
+	    robot.mouseMove(detectedObjectRectangle.x + detectedObjectRectangle.width / 2 + (int)(xOffset * pictureSizeRatio), 
+	    			    detectedObjectRectangle.y + detectedObjectRectangle.height / 2 +(int)(yOffset * pictureSizeRatio));    
 	    robot.mousePress(InputEvent.BUTTON1_MASK);
 	    robot.mouseRelease(InputEvent.BUTTON1_MASK);
 	}
 	
-	@Override 
-	@ReplayOnError
-	public void sendKeys(final CharSequence text) {
+	public void sendKeys(final CharSequence text, int xOffset, int yOffset) {
+		clickAt(xOffset, yOffset);
 		
+		for (int i=0; i < text.length(); i++) {
+			char ch = text.charAt(i);
+			int keyCode = KeyEvent.getExtendedKeyCodeForChar((int)ch);
+			boolean shift = false;
+			if ((Character.isUpperCase(ch) && Character.isLetter(ch))
+					|| Character.isDigit(ch)) {
+				shift = true;
+			}
+			
+			try {
+				if (shift) {
+					robot.keyPress(KeyEvent.VK_SHIFT);
+				}
+				robot.keyPress(keyCode);
+				robot.keyRelease(keyCode);
+				if (shift) {
+					robot.keyRelease(KeyEvent.VK_SHIFT);
+				}
+			} catch (IllegalArgumentException e) {
+				logger.warn(String.format("Character %s could not be written", text.charAt(i)), e);
+			}
+		}
+	}
+
+	public void sendKeys(final CharSequence text) {
+		sendKeys(text, 0, 0);
+	}
+	
+	/**
+	 * Returns true in cas the searched picture is found
+	 * @return
+	 */
+	public boolean isVisible() {
+		try {
+			findElement(true);
+			return true;
+		} catch (ImageSearchException e) {
+			return false;
+		}
+	}
+	
+	@Override
+	public String toString() {
+		if (resourcePath != null) {
+			return "Picture from resource " + resourcePath;
+		} else {
+			return "Picture from file " + objectPictureFile.getAbsolutePath();
+		}
+	}
+	
+	
+	public void setRobot(Robot robot) {
+		this.robot = robot;
+	}
+
+	public void setObjectPictureFile(File objectPictureFile) {
+		this.objectPictureFile = objectPictureFile;
+		detector.setObjectImage(objectPictureFile);
 	}
 	
 	// TODO: actions for mobile
