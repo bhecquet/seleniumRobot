@@ -56,14 +56,25 @@ public class LogAction {
     		+ "|| execution(public * com.seleniumtests.uipage.htmlelements.SelectList..* (..)) "
     		+ "|| execution(public * com.seleniumtests.uipage.htmlelements.Table..* (..))) "
     		+ "&& !execution(* com.seleniumtests.uipage.htmlelements.HtmlElement.toString (..))"
+    		+ "&& !execution(* com.seleniumtests.uipage.htmlelements.PictureElement.toString (..))"
     		+ "&& !execution(* com.seleniumtests.uipage.htmlelements.HtmlElement.get* (..))"
+    		+ "&& !execution(* com.seleniumtests.uipage.htmlelements.PictureElement.get* (..))"
     		+ "&& !execution(* com.seleniumtests.uipage.htmlelements.HtmlElement.set* (..))"
+    		+ "&& !execution(* com.seleniumtests.uipage.htmlelements.PictureElement.set* (..))"
     		+ "&& !execution(* com.seleniumtests.uipage.htmlelements.HtmlElement.find* (..))"
     		+ "&& !execution(* com.seleniumtests.uipage.htmlelements.HtmlElement.wait* (..))"
     		+ "&& !execution(* com.seleniumtests.uipage.htmlelements.HtmlElement.toHTML (..))"
     		)
 	public Object logAction(ProceedingJoinPoint joinPoint) throws Throwable {
-		HtmlElement element = (HtmlElement)joinPoint.getTarget();
+		String targetName;
+		
+		try {
+			HtmlElement element = (HtmlElement)joinPoint.getTarget();
+			targetName = element.toString();
+		} catch (ClassCastException e) {
+			targetName = joinPoint.getTarget().toString();
+		}
+		
 		Object reply = null;
 		boolean actionFailed = false;
 		
@@ -74,7 +85,7 @@ public class LogAction {
 			throw e;
 		} finally {
 			if (isHtmlElementDirectlyCalled(Thread.currentThread().getStackTrace()) && TestLogging.getParentTestStep() != null) {
-				String actionName = String.format("%s on %s %s", joinPoint.getSignature().getName(), element, buildArgString(joinPoint));
+				String actionName = String.format("%s on %s %s", joinPoint.getSignature().getName(), targetName, buildArgString(joinPoint));
 				TestLogging.getParentTestStep().addAction(new TestAction(actionName, actionFailed));
 			}		
 		}

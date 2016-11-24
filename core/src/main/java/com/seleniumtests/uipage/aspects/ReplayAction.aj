@@ -22,7 +22,6 @@ import java.util.List;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
-import org.aspectj.lang.annotation.Pointcut;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.UnhandledAlertException;
@@ -31,7 +30,10 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.UnreachableBrowserException;
 import org.openqa.selenium.support.ui.SystemClock;
 
-import com.seleniumtests.core.runner.SeleniumRobotRunner;
+import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.customexception.ConfigurationException;
+import com.seleniumtests.customexception.DatasetException;
+import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.uipage.htmlelements.FrameElement;
 import com.seleniumtests.uipage.htmlelements.HtmlElement;
@@ -50,15 +52,17 @@ public class ReplayAction {
 	private static SystemClock systemClock = new SystemClock();
 	
 	/**
-	 * Replay all actions annotated by ReplayOnError. See javadoc of the annotation for details
+	 * Replay all HtmlElement actions annotated by ReplayOnError.
+	 * Classes which are not subclass of HtmlElement won't go there 
+	 * See javadoc of the annotation for details
 	 * @param joinPoint
 	 * @throws Throwable
 	 */
 	@Around("execution(public * com.seleniumtests.uipage.htmlelements.HtmlElement+.* (..))"
 			+ "&& execution(@com.seleniumtests.uipage.ReplayOnError public * * (..))")
-    public Object replay(ProceedingJoinPoint joinPoint) throws Throwable {
-    	
-    	long end = systemClock.laterBy(30000);
+    public Object htmlElementReplay(ProceedingJoinPoint joinPoint) throws Throwable {
+
+    	long end = systemClock.laterBy(SeleniumTestsContextManager.getThreadContext().getReplayTimeout());
     	Object reply = null;
     	
     	// update driver reference of the element
@@ -99,7 +103,7 @@ public class ReplayAction {
 	    			}
 	    		}
 
-	    		if (systemClock.isNowBefore(end)) {
+	    		if (systemClock.isNowBefore(end - 200)) {
 	    			WaitHelper.waitForMilliSeconds(100);
 					continue;
 				} else {
@@ -120,5 +124,45 @@ public class ReplayAction {
     	return reply;
    }
     
+	/**
+	 * Replay all actions annotated by ReplayOnError if the class is not a subclass of 
+	 * HtmlElement
+	 * @param joinPoint
+	 * @throws Throwable
+	 */
+	@Around("!execution(public * com.seleniumtests.uipage.htmlelements.HtmlElement+.* (..))"
+			+ "&& execution(@com.seleniumtests.uipage.ReplayOnError public * * (..))")
+	public Object replay(ProceedingJoinPoint joinPoint) throws Throwable {
+		
+		long end = systemClock.laterBy(SeleniumTestsContextManager.getThreadContext().getReplayTimeout() * 1000);
+		Object reply = null;
+		
+		while (systemClock.isNowBefore(end)) {
+			
+			try {
+				reply = joinPoint.proceed(joinPoint.getArgs());
+				WaitHelper.waitForMilliSeconds(200);
+				break;
+			} catch (Throwable e) {
+				
+				// do not replay when error comes from test writing or configuration
+				if (e instanceof ScenarioException 
+						|| e instanceof ConfigurationException
+						|| e instanceof DatasetException
+						) {
+					throw e;
+				}
+
+				if (systemClock.isNowBefore(end - 200)) {
+					WaitHelper.waitForMilliSeconds(100);
+					continue;
+				} else {
+					throw e;
+				}
+			}
+		}
+		return reply;
+	}
+	
     
 }

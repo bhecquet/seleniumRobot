@@ -48,7 +48,7 @@ public class ImageDetector {
 	private File sceneImage;
 	private File objectImage;
 	private boolean debug;
-	private double detectionThreshold;
+	private double detectionThreshold = 0.05;
 	private Mat imgMatch;
 	private double sizeRatio;
 	private static Logger logger = SeleniumRobotLogger.getLogger(ImageDetector.class);
@@ -68,14 +68,8 @@ public class ImageDetector {
 	}
 	
 	public ImageDetector(File sceneImage, File objectImage, double detectionThreshold) {
-		if (!sceneImage.exists()) {
-			throw new ImageSearchException(String.format("File for object to detect %s does not exist", sceneImage));
-		}
-		if (!objectImage.exists()) {
-			throw new ImageSearchException(String.format("File for scene to detect object in %s does not exist", objectImage));
-		}
-		this.sceneImage = sceneImage;
-		this.objectImage = objectImage;
+		setSceneImage(sceneImage);
+		setObjectImage(objectImage);
 		this.detectionThreshold = detectionThreshold;
 		imgMatch = new Mat();
 		debug = false;
@@ -214,15 +208,7 @@ public class ImageDetector {
 		checkRotationAngle(p1, p2, p3, p4, po1, po2, po3, po4);
 		
 		// rework on scene points as new, we are sure the object rotation is 0, 90, 180 or 270°
-		System.out.println(p1);
-		System.out.println(p2);
-		System.out.println(p3);
-		System.out.println(p4);
 		reworkOnScenePoints(p1, p2, p3, p4);
-		System.out.println(p1);
-		System.out.println(p2);
-		System.out.println(p3);
-		System.out.println(p4);
 		
 		// check that aspect ratio of the detected height and width are the same
 		checkDetectionZoneAspectRatio(p1, p2, p4, po1, po2, po4);
@@ -415,11 +401,29 @@ public class ImageDetector {
 		this.rotationAngle = rotationAngle;
 	}
 
+	/**
+	 * Returns the ratio between the detected image (in scene) and the source image (to find)
+	 * @return
+	 */
 	public double getSizeRatio() {
 		return sizeRatio;
 	}
 
 	public void setDebug(boolean debug) {
 		this.debug = debug;
+	}
+
+	public void setSceneImage(File sceneImage) {
+		if (!sceneImage.exists()) {
+			throw new ImageSearchException(String.format("File for object to detect %s does not exist", sceneImage));
+		}
+		this.sceneImage = sceneImage;
+	}
+
+	public void setObjectImage(File objectImage) {
+		if (!objectImage.exists()) {
+			throw new ImageSearchException(String.format("File for scene to detect object in %s does not exist", objectImage));
+		}
+		this.objectImage = objectImage;
 	}
 }

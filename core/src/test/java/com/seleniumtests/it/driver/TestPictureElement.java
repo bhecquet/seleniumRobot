@@ -17,6 +17,7 @@
 package com.seleniumtests.it.driver;
 
 import org.openqa.selenium.WebDriver;
+import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
@@ -55,7 +56,26 @@ public class TestPictureElement extends GenericDriverTest {
 	
 	@Test(groups={"it"})
 	public void testClickOnPicture() {
-		testPage.picture.click();
+		testPage.picture.clickAt(0, -30);
+		Assert.assertEquals(testPage.logoText.getValue(), "ff logo");
 	}
+	
+	@Test(groups={"it"})
+	public void testSendKeysOnPicture() {
+		testPage.logoText.clear();
+		testPage.picture.sendKeys("hello", 0, 5);
+		Assert.assertEquals(testPage.logoText.getValue(), "hello");
+	}
+
+	@Test(groups={"it"})
+	public void testIsVisible() {
+		Assert.assertTrue(testPage.picture.isVisible());
+	}
+	
+	@Test(groups={"it"})
+	public void testIsNotVisible() {
+		Assert.assertFalse(testPage.pictureNotPresent.isVisible());
+	}
+	
 	
 }
