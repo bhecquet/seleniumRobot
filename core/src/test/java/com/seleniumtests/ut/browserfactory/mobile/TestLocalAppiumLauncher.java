@@ -145,7 +145,7 @@ public class TestLocalAppiumLauncher extends MockitoTest {
 		
 		LocalAppiumLauncher appium = new LocalAppiumLauncher();
 		appium.setAppiumPort(4723);
-		appium.startAppium();
+		appium.startAppiumWithoutWait();
 		
 		Assert.assertEquals(appium.getAppiumProcess(), nodeProcess);
 	}
@@ -169,7 +169,7 @@ public class TestLocalAppiumLauncher extends MockitoTest {
 		
 		LocalAppiumLauncher appium = new LocalAppiumLauncher();
 		appium.setAppiumPort(4723);
-		appium.startAppium();
+		appium.startAppiumWithoutWait();
 		appium.stopAppium();
 		Mockito.verify(nodeProcess).destroy();
 	}

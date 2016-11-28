@@ -41,7 +41,6 @@ public class TestCustomAssertion extends GenericTest {
 		SeleniumTestsContextManager.initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setSoftAssertEnabled(true);
 		Assert.assertTrue(false, "error should not be raised");
-		System.out.println("sldkflsdfhslqkjfhlkjh");
 	}
 	
 	/**

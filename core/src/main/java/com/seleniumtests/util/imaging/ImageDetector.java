@@ -47,16 +47,17 @@ public class ImageDetector {
 	private long rotationAngle;
 	private File sceneImage;
 	private File objectImage;
-	private boolean debug;
+	private boolean debug = false;
 	private double detectionThreshold = 0.05;
-	private Mat imgMatch;
+	private Mat imgMatch = new Mat();
 	private double sizeRatio;
 	private static Logger logger = SeleniumRobotLogger.getLogger(ImageDetector.class);
 	
 	// load openCV
+	// In case of "UnsatisfiedLinkError, library already loaded in another class loader", during unit tests, check that 
+	// this class or a calling one is not "prepared" through PowerMockito (which reloads the class in another class loader)
 	static {
 		nu.pattern.OpenCV.loadShared();
-    	System.loadLibrary( Core.NATIVE_LIBRARY_NAME );
 	}
 	
 	public ImageDetector() {
@@ -71,8 +72,6 @@ public class ImageDetector {
 		setSceneImage(sceneImage);
 		setObjectImage(objectImage);
 		this.detectionThreshold = detectionThreshold;
-		imgMatch = new Mat();
-		debug = false;
 	}
 	
 	/**

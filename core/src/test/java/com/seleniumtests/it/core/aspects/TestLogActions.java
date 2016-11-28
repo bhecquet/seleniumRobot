@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.util.List;
 
 import org.testng.Assert;
+import org.testng.ITestContext;
 import org.testng.Reporter;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
@@ -28,6 +29,7 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import com.seleniumtests.GenericTest;
+import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.runner.SeleniumRobotRunner;
 import com.seleniumtests.customexception.DriverExceptions;
 import com.seleniumtests.driver.WebUIDriver;
@@ -38,8 +40,10 @@ import com.seleniumtests.reporter.TestStep;
 public class TestLogActions extends GenericTest {
 	
 	@BeforeClass(groups={"it"})
-	public void init() {
+	public void init(ITestContext testContext) {
 		System.setProperty("browser", "none");
+		SeleniumTestsContextManager.initGlobalContext(testContext);
+		SeleniumTestsContextManager.initThreadContext(testContext);
 	}
 	
 	@AfterClass(groups={"it"})

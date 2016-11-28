@@ -62,7 +62,7 @@ public class ReplayAction {
 			+ "&& execution(@com.seleniumtests.uipage.ReplayOnError public * * (..))")
     public Object htmlElementReplay(ProceedingJoinPoint joinPoint) throws Throwable {
 
-    	long end = systemClock.laterBy(SeleniumTestsContextManager.getThreadContext().getReplayTimeout());
+    	long end = systemClock.laterBy(SeleniumTestsContextManager.getThreadContext().getReplayTimeout() * 1000);
     	Object reply = null;
     	
     	// update driver reference of the element
