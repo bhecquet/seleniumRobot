@@ -236,7 +236,7 @@ public class TestSeleniumBothTestsReporters extends MockitoTest {
 		
 		// check exception display
 		Assert.assertTrue(detailsReportContent.contains("<div>class java.lang.AssertionError: !!! Many Test Failures (2)</div>"));
-		Assert.assertTrue(detailsReportContent.contains("<div class=\"stack-element\">class java.lang.AssertionError: Failure 1 of 2</div>"));
+		Assert.assertTrue(detailsReportContent.contains("<div class=\"stack-element\">class java.lang.AssertionError: Failure 1 of 2"));
 		Assert.assertFalse(detailsReportContent.contains("at org.aspectj.runtime"));
 		Assert.assertFalse(detailsReportContent.contains("at sun.reflect."));
 		Assert.assertFalse(detailsReportContent.contains("at org.testng.TestNG"));

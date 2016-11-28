@@ -61,6 +61,7 @@ public class LogAction {
     		+ "&& !execution(* com.seleniumtests.uipage.htmlelements.PictureElement.get* (..))"
     		+ "&& !execution(* com.seleniumtests.uipage.htmlelements.HtmlElement.set* (..))"
     		+ "&& !execution(* com.seleniumtests.uipage.htmlelements.PictureElement.set* (..))"
+    		+ "&& !execution(* com.seleniumtests.uipage.htmlelements.PictureElement.is* (..))"
     		+ "&& !execution(* com.seleniumtests.uipage.htmlelements.HtmlElement.find* (..))"
     		+ "&& !execution(* com.seleniumtests.uipage.htmlelements.HtmlElement.wait* (..))"
     		+ "&& !execution(* com.seleniumtests.uipage.htmlelements.HtmlElement.toHTML (..))"

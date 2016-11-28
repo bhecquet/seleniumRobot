@@ -31,7 +31,6 @@ import com.seleniumtests.driver.screenshots.ScreenshotUtil;
 import com.seleniumtests.uipage.htmlelements.PictureElement;
 import com.seleniumtests.util.imaging.ImageDetector;
 
-@PrepareForTest({Robot.class, PictureElement.class})
 public class TestPictureElement extends MockitoTest {
 	
 	@Mock
