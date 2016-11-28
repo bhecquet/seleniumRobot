@@ -28,14 +28,18 @@ import org.openqa.selenium.Dimension;
 import org.openqa.selenium.ElementNotVisibleException;
 import org.openqa.selenium.InvalidElementStateException;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.OutputType;
 import org.openqa.selenium.Point;
+import org.openqa.selenium.Rectangle;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.firefox.MarionetteDriver;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.interactions.HasInputDevices;
 import org.openqa.selenium.interactions.Mouse;
+import org.openqa.selenium.interactions.internal.Coordinates;
 import org.openqa.selenium.internal.Locatable;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -60,7 +64,7 @@ import io.appium.java_client.SwipeElementDirection;
  * Provides methods to interact with a web page. All HTML element (ButtonElement, LinkElement, TextFieldElement, etc.)
  * extends from this class.
  */
-public class HtmlElement {
+public class HtmlElement implements WebElement, Locatable {
 
     protected static final Logger logger = SeleniumRobotLogger.getLogger(HtmlElement.class);
 
@@ -220,6 +224,7 @@ public class HtmlElement {
      * @param by
      * @return
      */
+    @Override
     public HtmlElement findElement(By by) {
     	return new HtmlElement(label, by, this);
     }
@@ -370,6 +375,7 @@ public class HtmlElement {
      *
      * @return
      */
+    @Override
     @ReplayOnError
     public String getCssValue(final String propertyName) {
         findElement();
@@ -443,18 +449,28 @@ public class HtmlElement {
      *
      * @return
      */
+    @Override
     @ReplayOnError
     public Point getLocation() {
         findElement();
 
         return element.getLocation();
     }
+    
+
+	@Override
+	@ReplayOnError
+	public Rectangle getRect() {
+		findElement();
+		return new Rectangle(element.getLocation(), element.getSize());
+	}
 
     /**
      * Returns the Dimension property of the underlying WebElement.
      *
      * @return
      */
+    @Override
     @ReplayOnError
     public Dimension getSize() {
         findElement();
@@ -467,6 +483,7 @@ public class HtmlElement {
      *
      * @return
      */
+    @Override
     @ReplayOnError
     public String getTagName() {
         findElement();
@@ -479,6 +496,7 @@ public class HtmlElement {
      *
      * @return
      */
+    @Override
     @ReplayOnError
     public String getText() {
         findElement();
@@ -515,6 +533,7 @@ public class HtmlElement {
      *
      * @return
      */
+    @Override
     @ReplayOnError
     public boolean isDisplayed() {
 
@@ -550,6 +569,7 @@ public class HtmlElement {
      *
      * @return
      */
+    @Override
     @ReplayOnError
     public boolean isEnabled() {
         findElement();
@@ -562,6 +582,7 @@ public class HtmlElement {
      *
      * @return
      */
+    @Override
     @ReplayOnError
     public boolean isSelected() {
         findElement();
@@ -630,29 +651,37 @@ public class HtmlElement {
         mouse.mouseUp(item.getCoordinates());
     }
     
-    public void sendKeys(final CharSequence text) {
+    @Override
+    public void sendKeys(CharSequence... keysToSend) {
     	// Appium seems to clear field before writing
     	if (SeleniumTestsContextManager.getThreadContext().getTestType().family() == TestType.APP) {
-            sendKeys(text, false);
+            sendKeys(false, keysToSend);
         } else {
-        	sendKeys(text, true);
+        	sendKeys(true, keysToSend);
         }
     }
 
     /**
      * Sends the indicated CharSequence to the WebElement.
      *
-     * @param  arg0
-     * @param 	clear	if true, clear field before writing
+     * @param 	clear		if true, clear field before writing
+     * @param   keysToSend	write this text
      */
     @ReplayOnError
-    public void sendKeys(final CharSequence arg0, final boolean clear) {
+    public void sendKeys(final boolean clear, CharSequence... keysToSend) {
         findElement(true);
         
         if (clear) {
         	element.clear();
         } 
-        element.sendKeys(arg0);
+        element.sendKeys(keysToSend);
+    }
+    
+    @Override
+    @ReplayOnError
+    public void clear() {
+    	findElement(true);
+    	element.clear();
     }
 
     /**
@@ -848,5 +877,25 @@ public class HtmlElement {
 
 	public FrameElement getFrameElement() {
 		return frameElement;
+	}
+
+	@Override
+	public <X> X getScreenshotAs(OutputType<X> target) {
+		findElement();
+		return element.getScreenshotAs(target);
+	}
+
+	@Override
+	@ReplayOnError
+	public void submit() {
+		findElement(true);
+		element.submit();
+	}
+
+	@Override
+	@ReplayOnError
+	public Coordinates getCoordinates() {
+		findElement();
+		return ((Locatable)element).getCoordinates();
 	}
 }
