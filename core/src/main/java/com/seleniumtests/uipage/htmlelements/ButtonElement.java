@@ -51,10 +51,4 @@ public class ButtonElement extends HtmlElement {
             super.click();
         }
     }
-
-    @ReplayOnError
-    public void submit() {
-        findElement(true);
-        element.submit();
-    }
 }

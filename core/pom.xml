@@ -329,6 +329,12 @@
 				<configuration>
 					<complianceLevel>1.8</complianceLevel>
 					<source>1.8</source>
+					<weaveDependencies>
+			            <weaveDependency>
+			              <groupId>org.seleniumhq.selenium</groupId>
+			              <artifactId>selenium-api</artifactId>
+			            </weaveDependency>
+		            </weaveDependencies>
 				</configuration>
 				<executions>
 					<execution>
