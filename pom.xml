@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 
@@ -8,31 +9,31 @@
 	<packaging>pom</packaging>
 
 	<name>selenium robot</name>
-    <description>Step by step test reporting framework based on webdriver, cucumber and testng, based on project seleniumtestsframework</description>
+	<description>Step by step test reporting framework based on webdriver, cucumber and testng, based on project seleniumtestsframework</description>
 	<url>https://github.com/bhecquet/seleniumRobot</url>
 
-    <licenses>
-        <license>
-            <name>The Apache License, Version 2.0</name>
-            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-        </license>
-    </licenses>
+	<licenses>
+		<license>
+			<name>The Apache License, Version 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+		</license>
+	</licenses>
 
-    <developers>
-        <developer>
-            <name>Bertrand Hecquet</name>
-            <email>bertrand.hecquet@infotel.com</email>
-            <organization>infotel</organization>
-            <organizationUrl>http://www.infotel.com</organizationUrl>
-        </developer>
-    </developers>
+	<developers>
+		<developer>
+			<name>Bertrand Hecquet</name>
+			<email>bertrand.hecquet@infotel.com</email>
+			<organization>infotel</organization>
+			<organizationUrl>http://www.infotel.com</organizationUrl>
+		</developer>
+	</developers>
 
-    <scm>
-        <connection>scm:git:git@github.com:bhecquet/seleniumRobot.git</connection>
-        <developerConnection>scm:git:git@github.com:bhecquet/seleniumRobot.git</developerConnection>
-        <url>git@github.com:bhecquet/seleniumRobot.git</url>
-      <tag>HEAD</tag>
-  </scm>
+	<scm>
+		<connection>scm:git:git@github.com:bhecquet/seleniumRobot.git</connection>
+		<developerConnection>scm:git:git@github.com:bhecquet/seleniumRobot.git</developerConnection>
+		<url>git@github.com:bhecquet/seleniumRobot.git</url>
+		<tag>HEAD</tag>
+	</scm>
 
 	<distributionManagement>
 		<snapshotRepository>
@@ -45,39 +46,40 @@
 		</repository>
 	</distributionManagement>
 
-    <repositories>
-        <repository>
-            <id>central</id>
-            <name>Maven Repository Switchboard</name>
-            <layout>default</layout>
-            <url>http://repo1.maven.org/maven2</url>
-            <snapshots>
-                <enabled>false</enabled> 
-            </snapshots>
-        </repository>
-    </repositories>
-    
-    <properties>
-    	<jacoco.version>0.7.7.201606060606</jacoco.version>
-    	
-    	<!--  when changing selenium version, do not forget to change selenium-api version in project file (for aspectj build path) -->
-    	<selenium.version>2.53.1</selenium.version>
-    	<appium.version>3.4.1</appium.version>
-    	<htmlunitdriver.version>2.20</htmlunitdriver.version>
-    	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    	<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-    	<sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
+	<repositories>
+		<repository>
+			<id>central</id>
+			<name>Maven Repository Switchboard</name>
+			<layout>default</layout>
+			<url>http://repo1.maven.org/maven2</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+	</repositories>
+
+	<properties>
+		<jacoco.version>0.7.7.201606060606</jacoco.version>
+
+		<!-- when changing selenium version, do not forget to change selenium-api 
+			version in project file (for aspectj build path) -->
+		<selenium.version>2.53.1</selenium.version>
+		<appium.version>3.4.1</appium.version>
+		<htmlunitdriver.version>2.20</htmlunitdriver.version>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		<sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
 		<sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
-    	<sonar.jacoco.reportPath>${project.build.directory}/coverage-reports/jacoco-ut.exec</sonar.jacoco.reportPath>
-    	<sonar.jacoco.itReportPath>${project.build.directory}/coverage-reports/jacoco-it.exec</sonar.jacoco.itReportPath>
-    	<surefireArgLine>-javaagent:${settings.localRepository}/org/jacoco/org.jacoco.agent/${jacoco.version}/org.jacoco.agent-${jacoco.version}-runtime.jar=destfile=${project.build.directory}/coverage-reports/jacoco-ut.exec</surefireArgLine> 
-    	<failsafeArgLine>-javaagent:${settings.localRepository}/org/jacoco/org.jacoco.agent/${jacoco.version}/org.jacoco.agent-${jacoco.version}-runtime.jar=destfile=${project.build.directory}/coverage-reports/jacoco-it.exec</failsafeArgLine> 
-    	<powermock.version>1.6.5</powermock.version>
-    </properties>
-    
-    <dependencyManagement>
-	    <dependencies>
-	    	<dependency>
+		<sonar.jacoco.reportPath>${project.build.directory}/coverage-reports/jacoco-ut.exec</sonar.jacoco.reportPath>
+		<sonar.jacoco.itReportPath>${project.build.directory}/coverage-reports/jacoco-it.exec</sonar.jacoco.itReportPath>
+		<surefireArgLine>-javaagent:${settings.localRepository}/org/jacoco/org.jacoco.agent/${jacoco.version}/org.jacoco.agent-${jacoco.version}-runtime.jar=destfile=${project.build.directory}/coverage-reports/jacoco-ut.exec</surefireArgLine>
+		<failsafeArgLine>-javaagent:${settings.localRepository}/org/jacoco/org.jacoco.agent/${jacoco.version}/org.jacoco.agent-${jacoco.version}-runtime.jar=destfile=${project.build.directory}/coverage-reports/jacoco-it.exec</failsafeArgLine>
+		<powermock.version>1.6.5</powermock.version>
+	</properties>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
 				<groupId>log4j</groupId>
 				<artifactId>log4j</artifactId>
 				<version>1.2.5</version>
@@ -88,15 +90,33 @@
 				<version>2.4</version>
 			</dependency>
 			<dependency>
-	            <groupId>io.appium</groupId>
-	            <artifactId>java-client</artifactId>
-	            <version>${appium.version}</version>
-	        </dependency>
-	    </dependencies>
-    </dependencyManagement>
+				<groupId>io.appium</groupId>
+				<artifactId>java-client</artifactId>
+				<version>${appium.version}</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 
 	<modules>
-    	<module>core</module>
-    	<module>grid-extensions</module>
-  	</modules>
+		<module>core</module>
+		<module>grid-extensions</module>
+	</modules>
+
+	<build>
+		<finalName>seleniumRobot</finalName>
+		<plugins>
+			<plugin>
+				<groupId>org.sonatype.plugins</groupId>
+				<artifactId>nexus-staging-maven-plugin</artifactId>
+				<version>1.6.3</version>
+				<extensions>true</extensions>
+				<configuration>
+					<serverId>ossrh</serverId>
+					<nexusUrl>https://oss.sonatype.org/</nexusUrl>
+					<autoReleaseAfterClose>true</autoReleaseAfterClose>
+
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
 </project>
