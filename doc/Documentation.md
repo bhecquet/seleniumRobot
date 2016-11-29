@@ -845,3 +845,10 @@ For better reliability, all actions currently implemented in SeleniumRobot are m
     }
     
 /!\ *annotate only direct actions (where no other HtmlElement method, except `findElement` is called)
+
+### 7.4 Working with images ###
+
+SeleniumRobot exposes 2 elements to work with images
+
+- `ImageElement` is used to handle HTML images `<img src=" ... `
+- `PictureElement` is used to find arbitrary images in web page or application and interact with it (click, sendKeys). The later point is only available locally on web browsers
