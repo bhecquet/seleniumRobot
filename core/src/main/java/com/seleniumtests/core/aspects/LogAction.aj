@@ -65,6 +65,7 @@ public class LogAction {
     		+ "&& !execution(* com.seleniumtests.uipage.htmlelements.HtmlElement.find* (..))"
     		+ "&& !execution(* com.seleniumtests.uipage.htmlelements.HtmlElement.wait* (..))"
     		+ "&& !execution(* com.seleniumtests.uipage.htmlelements.HtmlElement.toHTML (..))"
+    		+ "&& !execution(* com.seleniumtests.uipage.htmlelements.Table.find* (..))"
     		)
 	public Object logAction(ProceedingJoinPoint joinPoint) throws Throwable {
 		String targetName;

@@ -23,6 +23,7 @@ import java.util.regex.Pattern;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.remote.RemoteWebDriver;
 
 import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.uipage.ReplayOnError;
@@ -66,8 +67,10 @@ public class Table extends HtmlElement {
     
     @ReplayOnError
     public List<WebElement> getColumns() {
+    	((RemoteWebDriver)driver).getMouse().mouseMove(getCoordinates());
     	findTableElement();
     	return columns;
+ 
     }
 
     @ReplayOnError

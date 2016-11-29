@@ -6,7 +6,6 @@ import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Field;
 
 import javax.swing.ImageIcon;
 
@@ -14,12 +13,14 @@ import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.openqa.selenium.Rectangle;
 import org.openqa.selenium.WebDriverException;
+import org.openqa.selenium.support.events.EventFiringWebDriver;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.ImageSearchException;
 import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.driver.DriverMode;
+import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.driver.screenshots.ScreenshotUtil;
 import com.seleniumtests.uipage.ReplayOnError;
 import com.seleniumtests.util.imaging.ImageDetector;
@@ -38,6 +39,7 @@ public class PictureElement {
 	private Rectangle detectedObjectRectangle;
 	private double pictureSizeRatio;
 	private Robot robot;
+	private EventFiringWebDriver driver;
 	private ImageDetector detector;
 	private ScreenshotUtil screenshotUtil;
 	
@@ -51,6 +53,7 @@ public class PictureElement {
 	public PictureElement(String label, String resourcePath, HtmlElement intoElement) {
 		this(label, createFileFromResource(resourcePath), intoElement);
 		this.resourcePath = resourcePath;
+		driver = (EventFiringWebDriver)WebUIDriver.getWebDriver();
 		
 	}
 	
