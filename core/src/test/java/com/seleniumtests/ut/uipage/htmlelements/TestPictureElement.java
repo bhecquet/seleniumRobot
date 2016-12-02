@@ -1,9 +1,10 @@
 package com.seleniumtests.ut.uipage.htmlelements;
 
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.times;
 
 import java.awt.AWTException;
 import java.awt.Robot;
@@ -16,7 +17,6 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.openqa.selenium.Rectangle;
 import org.openqa.selenium.WebDriverException;
-import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.annotations.AfterMethod;
@@ -38,10 +38,7 @@ public class TestPictureElement extends MockitoTest {
 	
 	@Mock
 	ScreenshotUtil screenshotUtil;
-	
-//	@Mock
-//	Robot robot;
-	
+
 	@InjectMocks
 	PictureElement pictureElement = new PictureElement();
 
@@ -133,26 +130,46 @@ public class TestPictureElement extends MockitoTest {
 	
 	@Test(groups={"ut"})
 	public void testPictureNotVisible() throws AWTException {
-		pictureElement.setObjectPictureFile(new File(""));
+		PictureElement picElement = spy(pictureElement);
+		picElement.setObjectPictureFile(new File(""));
 		Robot robot = Mockito.mock(Robot.class);
-		pictureElement.setRobot(robot);
+		picElement.setRobot(robot);
 		when(screenshotUtil.captureWebPageToFile()).thenReturn(new File(""));
 		doThrow(ImageSearchException.class).when(imageDetector).detectCorrespondingZone();
 		
-		Assert.assertFalse(pictureElement.isVisible());
+		Assert.assertFalse(picElement.isElementPresent());
+		
+		verify(picElement).findElement(true);
+		
+	}
+	
+	@Test(groups={"ut"})
+	public void testPictureNotVisibleWithReplay() throws AWTException {
+		PictureElement picElement = spy(pictureElement);
+		picElement.setObjectPictureFile(new File(""));
+		Robot robot = Mockito.mock(Robot.class);
+		picElement.setRobot(robot);
+		when(screenshotUtil.captureWebPageToFile()).thenReturn(new File(""));
+		doThrow(ImageSearchException.class).when(imageDetector).detectCorrespondingZone();
+		
+		Assert.assertFalse(picElement.isElementPresent(350));
+		
+		verify(picElement, times(2)).findElement(true);
 		
 	}
 	
 	@Test(groups={"ut"})
 	public void testPictureVisible() throws AWTException {
-		pictureElement.setObjectPictureFile(new File(""));
+		PictureElement picElement = spy(pictureElement);
+		picElement.setObjectPictureFile(new File(""));
 		Robot robot = Mockito.mock(Robot.class);
-		pictureElement.setRobot(robot);
+		picElement.setRobot(robot);
 		when(screenshotUtil.captureWebPageToFile()).thenReturn(new File(""));
 		when(imageDetector.getDetectedRectangle()).thenReturn(new Rectangle(10, 10, 100, 50));
 		when(imageDetector.getSizeRatio()).thenReturn(1.0);
 		
-		Assert.assertTrue(pictureElement.isVisible());
+		Assert.assertTrue(picElement.isElementPresent(2000));
+		verify(picElement).findElement(true);
 		
 	}
 	

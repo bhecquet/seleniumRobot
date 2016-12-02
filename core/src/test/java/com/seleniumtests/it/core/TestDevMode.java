@@ -31,6 +31,7 @@ import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.it.driver.DriverTestPage;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 import com.seleniumtests.util.osutility.OSUtility;
+import com.seleniumtests.util.osutility.OSUtilityFactory;
 import com.seleniumtests.util.osutility.ProcessInfo;
 
 public class TestDevMode extends GenericTest {
@@ -44,7 +45,7 @@ public class TestDevMode extends GenericTest {
 	
 	@BeforeClass(groups={"it"})
 	public void initContext(final ITestContext testNGCtx) throws Exception {
-		osUtil = new OSUtility();
+		osUtil = OSUtilityFactory.getInstance();
 		SeleniumTestsContextManager.initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setBrowser("chrome");
 	}

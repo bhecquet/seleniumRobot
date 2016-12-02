@@ -29,32 +29,33 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.driver.DriverConfig;
+import com.seleniumtests.driver.DriverExtractor;
 import com.seleniumtests.driver.DriverMode;
 import com.seleniumtests.util.FileUtility;
 import com.seleniumtests.util.osutility.OSUtility;
+import com.seleniumtests.util.osutility.OSUtilityFactory;
 
 public class IECapabilitiesFactory extends ICapabilitiesFactory {
     
 	private static final String WEBDRIVER_PROPERTY = "webdriver.ie.driver";
 	
-	private OSUtility osUtil = new OSUtility();
+	private OSUtility osUtil = OSUtilityFactory.getInstance();
 	
     public void handleExtractResources() throws IOException {
-        String dir = Paths.get(SeleniumTestsContextManager.getRootPath(), "tools", "drivers", 
-        						Platform.getCurrent().family().toString().toLowerCase()).toString();
-        dir = FileUtility.decodePath(dir);
-        String iEDriverServerFile = "\\IEDriverServer.exe";
+    	String driverPath;
+    	if (osUtil.getIEVersion() < 10) {
+    		driverPath = new DriverExtractor().extractDriver("IEDriverServer_x64");
+    	} else {
+    		driverPath = new DriverExtractor().extractDriver("IEDriverServer_Win32");
+    	}
+    	
+        File iEDriverServerFile = Paths.get(new File(driverPath).getParent(), "IEDriverServer.exe").toFile();
+
+        FileUtils.copyFile(new File(driverPath), iEDriverServerFile);
+
         
-        if (!new File(dir + iEDriverServerFile).exists()) {
-            if (osUtil.getIEVersion() < 10) {
-                FileUtils.copyFile(new File(dir + "\\IEDriverServer_x64.exe"), new File(dir + iEDriverServerFile));
-            } else {
-            	FileUtils.copyFile(new File(dir + "\\IEDriverServer_Win32.exe"), new File(dir + iEDriverServerFile)); // Win32
-            }
-        }
-        
-        System.setProperty(WEBDRIVER_PROPERTY, dir + iEDriverServerFile);
-        logger.debug(dir + iEDriverServerFile);
+        System.setProperty(WEBDRIVER_PROPERTY, iEDriverServerFile.toString());
+        logger.debug(iEDriverServerFile);
     }
     
     /**
@@ -63,9 +64,11 @@ public class IECapabilitiesFactory extends ICapabilitiesFactory {
      */
     public void setIEDriverLocal(final DriverConfig webDriverConfig){
     	
+    	// an other driver has been configured through command line
     	if (webDriverConfig.getIeDriverPath() != null) {
             System.setProperty(WEBDRIVER_PROPERTY, webDriverConfig.getIeDriverPath());
         } else {
+        	// an other driver has been configured in environment
             if (System.getenv(WEBDRIVER_PROPERTY) != null) {
                 logger.info("Get IE Driver from property:" + System.getenv(WEBDRIVER_PROPERTY));
                 System.setProperty(WEBDRIVER_PROPERTY, System.getenv(WEBDRIVER_PROPERTY));

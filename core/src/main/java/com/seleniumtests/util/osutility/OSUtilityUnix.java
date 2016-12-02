@@ -21,15 +21,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class OSUtilityUnix extends OSCommand {
-
+public class OSUtilityUnix extends OSUtility {
+	
 	/**
      * Ask console for every running process.
      * @return list of output command lines
      */
     public List<ProcessInfo> getRunningProcessList(){
     	String command = "ps";
-    	List<String> strProcessList = Arrays.asList(executeCommandAndWait(command).split("\n"));
+    	List<String> strProcessList = Arrays.asList(OSCommand.executeCommandAndWait(command).split("\n"));
     	
     	List<ProcessInfo> processInfoList = new ArrayList<>();
     	for (String sentence : strProcessList) {
@@ -67,12 +67,23 @@ public class OSUtilityUnix extends OSCommand {
      * @return
      * @throws IOException
      */
-    protected String killProcess(String pid, boolean force) throws IOException {
+    @Override
+    public String killProcess(String pid, boolean force) {
     	
     	if (force) {
-    		return executeCommandAndWait("kill -SIGKILL " + pid);
+    		return OSCommand.executeCommandAndWait("kill -SIGKILL " + pid);
     	} else {
-    		return executeCommandAndWait("kill -SIGTERM " + pid);
+    		return OSCommand.executeCommandAndWait("kill -SIGTERM " + pid);
     	}
     }
+
+	@Override
+	public String getProgramExtension() {
+		return "";
+	}
+
+	@Override
+	public int getIEVersion() {
+		return 0;
+	}
 }

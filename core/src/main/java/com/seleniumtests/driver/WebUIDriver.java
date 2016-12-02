@@ -30,9 +30,9 @@ import com.seleniumtests.browserfactory.FirefoxDriverFactory;
 import com.seleniumtests.browserfactory.HtmlUnitDriverFactory;
 import com.seleniumtests.browserfactory.IEDriverFactory;
 import com.seleniumtests.browserfactory.IWebDriverFactory;
-import com.seleniumtests.browserfactory.SeleniumGridDriverFactory;
 import com.seleniumtests.browserfactory.SafariDriverFactory;
 import com.seleniumtests.browserfactory.SauceLabsDriverFactory;
+import com.seleniumtests.browserfactory.SeleniumGridDriverFactory;
 import com.seleniumtests.browserfactory.TestDroidDriverFactory;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.proxy.ProxyConfig;
@@ -40,6 +40,7 @@ import com.seleniumtests.customexception.DriverExceptions;
 import com.seleniumtests.util.helper.WaitHelper;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 import com.seleniumtests.util.osutility.OSUtility;
+import com.seleniumtests.util.osutility.OSUtilityFactory;
 
 /**
  * This class provides factory to create webDriver session.
@@ -47,7 +48,7 @@ import com.seleniumtests.util.osutility.OSUtility;
 public class WebUIDriver {
 
 	private static final Logger logger = SeleniumRobotLogger.getLogger(WebUIDriver.class);
-	private static OSUtility osUtil = new OSUtility();
+	private static OSUtility osUtil = OSUtilityFactory.getInstance();
 	
     private static ThreadLocal<WebDriver> driverSession = new ThreadLocal<>();
     private static ThreadLocal<WebUIDriver> uxDriverSession = new ThreadLocal<>();

@@ -17,6 +17,7 @@
 package com.seleniumtests.browserfactory;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.file.Paths;
 
@@ -25,6 +26,7 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.driver.DriverConfig;
+import com.seleniumtests.driver.DriverExtractor;
 import com.seleniumtests.util.FileUtility;
 import com.seleniumtests.util.osutility.OSUtility;
 
@@ -36,7 +38,7 @@ public class MarionetteCapabilitiesFactory extends FirefoxCapabilitiesFactory {
 		capabilities.setCapability("marionette", true);
 		try {
 			configureGeckoDriver();
-		} catch (UnsupportedEncodingException e) {
+		} catch (IOException e) {
 			logger.error(e);
 		}
 		
@@ -44,15 +46,13 @@ public class MarionetteCapabilitiesFactory extends FirefoxCapabilitiesFactory {
 		
 	}
 	
-	private void configureGeckoDriver() throws UnsupportedEncodingException {
-		String dir = Paths.get(SeleniumTestsContextManager.getRootPath(), "tools", "drivers", Platform.getCurrent().family().toString().toLowerCase()).toString();
-        dir = FileUtility.decodePath(dir);
-
-        if (OSUtility.isWindows()) {
-            System.setProperty("webdriver.gecko.driver", dir + "\\geckodriver.exe");
-        } else {
-            System.setProperty("webdriver.gecko.driver", dir + "/geckodriver");
-            new File(dir + "/geckodriver").setExecutable(true);
+	private void configureGeckoDriver() throws IOException {
+		String driverPath = new DriverExtractor().extractDriver("geckodriver");
+		driverPath = FileUtility.decodePath(driverPath);
+		
+		System.setProperty("webdriver.gecko.driver", driverPath);
+		if (!OSUtility.isWindows()) {
+            new File(driverPath).setExecutable(true);
         }
 	}
     

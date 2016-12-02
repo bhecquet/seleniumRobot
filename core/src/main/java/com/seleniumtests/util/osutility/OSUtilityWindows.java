@@ -23,14 +23,14 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class OSUtilityWindows extends OSCommand {
+public class OSUtilityWindows extends OSUtility {
 		
-	
+	@Override
 	public int getIEVersion() {
 
-        String output = executeCommandAndWait("reg query \"HKLM\\Software\\Microsoft\\Internet Explorer\" /v svcVersion");
+        String output = OSCommand.executeCommandAndWait("reg query \"HKLM\\Software\\Microsoft\\Internet Explorer\" /v svcVersion");
         if (output.split("\n").length < 3) {
-            output = executeCommandAndWait("reg query \"HKLM\\Software\\Microsoft\\Internet Explorer\" /v Version");
+            output = OSCommand.executeCommandAndWait("reg query \"HKLM\\Software\\Microsoft\\Internet Explorer\" /v Version");
         }
 
         String internetExplorerValue = output.split("\n")[2];
@@ -43,7 +43,8 @@ public class OSUtilityWindows extends OSCommand {
      * @param fast : true gets only Image Name and pId of the process
      * @return list of ProcessInfo
      */
-    protected List<ProcessInfo> getRunningProcessList(){
+	@Override
+    public List<ProcessInfo> getRunningProcessList(){
     	/*
     	 * Output command : Image name ;  PID ;  Session name ;  Session# ;  Mem Usage .
     	 * In Windows 7, windir = C:\Windows\ 
@@ -52,7 +53,7 @@ public class OSUtilityWindows extends OSCommand {
     	 * or /SVC displays only : Image name ;  PID ;  Services .
     	 */
     	String command = System.getenv("windir") + "\\system32\\" + "tasklist.exe /NH /SVC";
-    	List<String> strProcessList = Arrays.asList(executeCommandAndWait(command).split("\n"));
+    	List<String> strProcessList = Arrays.asList(OSCommand.executeCommandAndWait(command).split("\n"));
     	
     	List<ProcessInfo> processInfoList = new ArrayList<>();
     	for (String sentence : strProcessList) {
@@ -80,13 +81,19 @@ public class OSUtilityWindows extends OSCommand {
      * @return
      * @throws IOException
      */
-    protected String killProcess(String pid, boolean force) throws IOException {
+    @Override
+    public String killProcess(String pid, boolean force) {
 
     	if (force) {
-    		return executeCommandAndWait("taskkill /F /PID " + pid);
+    		return OSCommand.executeCommandAndWait("taskkill /F /PID " + pid);
     	} else {
-    		return executeCommandAndWait("taskkill /PID " + pid);
+    		return OSCommand.executeCommandAndWait("taskkill /PID " + pid);
     	}
     	
     }
+
+	@Override
+	public String getProgramExtension() {
+		return ".exe";
+	}
 }
