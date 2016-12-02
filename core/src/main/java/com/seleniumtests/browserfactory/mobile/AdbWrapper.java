@@ -64,7 +64,7 @@ public class AdbWrapper {
 			String deviceName = "";
 			String osVersion = "";
 			
-			String reply = OSCommand.executeCommandAndWait(String.format("%s -s %s shell getprop", adbCommand, deviceId));
+			String reply = OSCommand.executeCommandAndWait(String.format("%s -s %s shell getprop", adbCommand, deviceId)).replace("\n", "").replace("\r", "");
 			Matcher matcherName = namePattern.matcher(reply);
 			if (matcherName.matches()) {
 				deviceName = matcherName.group(1);

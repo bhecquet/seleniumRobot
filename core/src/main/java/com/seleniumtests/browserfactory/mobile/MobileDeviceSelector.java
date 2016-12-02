@@ -38,13 +38,13 @@ public class MobileDeviceSelector {
 		
 		for (MobileDevice device: deviceList) {
 			boolean keep = true;
-			if (deviceName != null && device.getName() != null && !device.getName().equals(deviceName.toString())) {
+			if (deviceName != null && device.getName() != null && !device.getName().equalsIgnoreCase(deviceName.toString())) {
 				keep = false;
 			}
-			if (platformName != null && device.getPlatform() != null && !device.getPlatform().equals(platformName.toString())) {
+			if (platformName != null && device.getPlatform() != null && !device.getPlatform().equalsIgnoreCase(platformName.toString())) {
 				keep = false;
 			}
-			if (platformVersion != null && device.getVersion() != null && !device.getVersion().equals(platformVersion.toString())) {
+			if (platformVersion != null && device.getVersion() != null && !device.getVersion().equalsIgnoreCase(platformVersion.toString())) {
 				keep = false;
 			}
 			if (keep) {
