@@ -26,7 +26,7 @@ import org.testng.ITestContext;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.BeforeSuite;
+import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Listeners;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
@@ -102,7 +102,13 @@ public class SeleniumRobotRunner {
         logger.info(SeleniumRobotLogger.END_TEST_PATTERN + method.getName());
     }
     
-    @BeforeSuite(alwaysRun = true)
+    /**
+     * Reinitialize SeleniumTestContext before each test so that we have a context 
+     * corresponding to parameters owned by this test and not an other one
+     * @param testContext
+     * @throws IOException
+     */
+    @BeforeTest(alwaysRun = true)
     public void beforeTestSuite(final ITestContext testContext) throws IOException {
         start = new Date();
         SeleniumTestsContextManager.initGlobalContext(testContext);
@@ -116,7 +122,7 @@ public class SeleniumRobotRunner {
         try {
 			SeleniumRobotLogger.parseLogFile();
 		} catch (IOException e) {
-			logger.error("cannot read log file");
+			logger.error("cannot read log file", e);
 		}
     }
     

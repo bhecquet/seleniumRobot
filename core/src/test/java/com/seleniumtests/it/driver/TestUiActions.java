@@ -67,6 +67,17 @@ public class TestUiActions extends GenericTest {
 		}
 	}
 	
+	@Test(groups={"it"}) 
+	public void testSendKeysWithHtmlElement() throws Exception {
+		DriverTestPage testPage = new DriverTestPage(false);
+		try {
+			new Actions(driver).moveToElement(testPage.textElement).click().sendKeys("youpi2").build().perform();
+			Assert.assertEquals("youpi2", testPage.textElement.getAttribute("value"));
+		} finally {
+			driver.findElement(By.id("button2")).click();
+		}
+	}
+	
 	@AfterClass(alwaysRun = true)
 	public void destroyDriver() {
 		if (driver != null) {

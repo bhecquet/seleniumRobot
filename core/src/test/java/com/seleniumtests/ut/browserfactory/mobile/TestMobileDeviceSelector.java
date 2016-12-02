@@ -104,14 +104,15 @@ public class TestMobileDeviceSelector extends MockitoTest {
 	
 	/**
 	 * Test that when several devices exists with the same capabilities, the first one is selected
+	 * Test platform name with different cases
 	 */
 	@Test(groups={"ut"})
 	public void testSelectFirstMatchingAndroidDevice() {
 		// available devices
 		List<MobileDevice> deviceList = new ArrayList<>();
 		deviceList.add(new MobileDevice("IPhone 6", "0000", "ios", "10.2"));
-		deviceList.add(new MobileDevice("Nexus 5", "1234", "android", "5.0"));
-		deviceList.add(new MobileDevice("Nexus 7", "1235", "android", "6.0"));
+		deviceList.add(new MobileDevice("Nexus 5", "1234", "Android", "5.0"));
+		deviceList.add(new MobileDevice("Nexus 7", "1235", "Android", "6.0"));
 		when(adbWrapper.getDeviceList()).thenReturn(deviceList);
 		
 		// requested caps
@@ -132,7 +133,7 @@ public class TestMobileDeviceSelector extends MockitoTest {
 		// available devices
 		List<MobileDevice> deviceList = new ArrayList<>();
 		deviceList.add(new MobileDevice("IPhone 6", "0000", "ios", "10.2"));
-		deviceList.add(new MobileDevice("Nexus 5", "1234", "android", "5.0"));
+		deviceList.add(new MobileDevice("Nexus 5", "1234", "Android", "5.0"));
 		deviceList.add(new MobileDevice("Nexus 7", "1235", "android", "6.0"));
 		when(adbWrapper.getDeviceList()).thenReturn(deviceList);
 		
@@ -157,7 +158,7 @@ public class TestMobileDeviceSelector extends MockitoTest {
 	public void testCapabilitiesUpdate() {
 		// available devices
 		List<MobileDevice> deviceList = new ArrayList<>();
-		deviceList.add(new MobileDevice("Nexus 5", "1234", "android", "5.0"));
+		deviceList.add(new MobileDevice("nexus 5", "1234", "android", "5.0"));
 		when(adbWrapper.getDeviceList()).thenReturn(deviceList);
 		
 		DesiredCapabilities requestedCaps = new DesiredCapabilities();
