@@ -53,8 +53,6 @@
 					<target>1.8</target>
 					<includes>
 						<include>**/browserfactory/mobile/**</include>
-						<!--<include>**/util/osutility/**</include>
-						<include>**/util/logging/**</include>-->
 					</includes>
 				</configuration>
 			</plugin>
@@ -110,16 +108,16 @@
 				<version>2.7</version>
 				<executions>
 					<execution>
-						<id>copy-tools</id>
+						<id>copy-drivers</id>
 						<phase>process-resources</phase>
 						<goals>
 							<goal>copy-resources</goal>
 						</goals>
 						<configuration>
-							<outputDirectory>${project.build.directory}/tools</outputDirectory>
+							<outputDirectory>${project.build.directory}/drivers</outputDirectory>
 							<resources>
 								<resource>
-									<directory>${project.basedir}/../core/tools</directory>
+									<directory>${project.basedir}/../core/src/main/resources/drivers</directory>
 								</resource>
 							</resources>
 						</configuration>            
@@ -183,6 +181,9 @@
 						</goals>
 						<configuration> <!-- disable checking for java 8 -->
 							<additionalparam>-Xdoclint:none</additionalparam>
+							<sourceFileIncludes>
+								<sourceFileInclude>**/browserfactory/mobile/**</sourceFileInclude>
+							</sourceFileIncludes>
 						</configuration>
 					</execution>
 				</executions>
@@ -226,6 +227,10 @@
 		<resources>
 			<resource>
 				<directory>../core/src/main/resources</directory>
+				
+				<includes>
+					<include>**/*.xml</include>
+				</includes>
 			</resource>
 		</resources>
 	</build>

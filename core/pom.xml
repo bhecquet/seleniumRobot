@@ -384,7 +384,7 @@
 			</plugin>
 			<plugin>
 				<artifactId>maven-resources-plugin</artifactId>
-				<version>2.7</version>
+				<version>2.7</version> 
 				<executions>
 					<execution>
 						<id>default-resources</id>
@@ -438,21 +438,6 @@
 						</configuration>            
 					</execution>
 					<execution>
-						<id>copy-tools</id>
-						<phase>process-resources</phase>
-						<goals>
-							<goal>copy-resources</goal>
-						</goals>
-						<configuration>
-							<outputDirectory>${project.build.directory}/tools</outputDirectory>
-							<resources>
-								<resource>
-									<directory>${project.basedir}/tools</directory>
-								</resource>
-							</resources>
-						</configuration>            
-					</execution>
-					<execution>
 						<id>copy-launcher</id>
 						<phase>process-resources</phase>
 						<goals>
@@ -497,6 +482,8 @@
 						<manifest>
 							<addClasspath>true</addClasspath>
 							<classpathPrefix>lib/</classpathPrefix>
+							<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                			<addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
 						</manifest>
 					</archive>
 				</configuration>
@@ -578,27 +565,14 @@
 		      			<include>**/*.aj</include>
 		      		</includes>
 		      	</configuration>
-		      	<!-- <dependencies>
-		      		<dependency>
-		      			<groupId>com.mycila</groupId>
-		      			<artifactId>license-maven-plugin-git</artifactId>
-		      			<version>2.11</version>
-		      		</dependency>
-		      	</dependencies> -->
 		      </plugin>
         </plugins>
 		<resources>
 			<resource>
-				<directory>src/main/resources</directory>
-			</resource>
+		    	<directory>src/main/resources</directory>
+		    </resource>
 			<resource>
 				<directory>src/test/resources</directory>
-			</resource>
-			<resource>
-				<directory>src/main/java</directory>
-				<excludes>
-					<exclude>**/*.java</exclude>
-				</excludes>
 			</resource>
 		</resources>
 	</build>

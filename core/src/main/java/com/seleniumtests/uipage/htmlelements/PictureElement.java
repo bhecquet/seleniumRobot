@@ -14,6 +14,7 @@ import org.apache.log4j.Logger;
 import org.openqa.selenium.Rectangle;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.support.events.EventFiringWebDriver;
+import org.openqa.selenium.support.ui.SystemClock;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.ConfigurationException;
@@ -23,6 +24,7 @@ import com.seleniumtests.driver.DriverMode;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.driver.screenshots.ScreenshotUtil;
 import com.seleniumtests.uipage.ReplayOnError;
+import com.seleniumtests.util.helper.WaitHelper;
 import com.seleniumtests.util.imaging.ImageDetector;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
@@ -42,7 +44,7 @@ public class PictureElement {
 	private EventFiringWebDriver driver;
 	private ImageDetector detector;
 	private ScreenshotUtil screenshotUtil;
-	
+	private SystemClock clock = new SystemClock();
 
 	private static Logger logger = SeleniumRobotLogger.getLogger(PictureElement.class);
 	
@@ -111,7 +113,7 @@ public class PictureElement {
 	 * 
 	 * @param searchOnly
 	 */
-	protected void findElement(boolean searchOnly) {
+	public void findElement(boolean searchOnly) {
 		
 		// scroll to element where our picture is
 		if (intoElement != null) {
@@ -150,10 +152,19 @@ public class PictureElement {
 	 */
 	@ReplayOnError
 	public void clickAt(int xOffset, int yOffset) {
+//		findElement(true);
+//		
+//		Point intoElementPos = intoElement.getCoordinates().inViewPort();
+//		int relativeX = detectedObjectRectangle.x - intoElementPos.x;
+//		int relativeY = detectedObjectRectangle.y - intoElementPos.y;
+//		
+//		new Actions(driver).moveToElement(intoElement, relativeX + xOffset, relativeY + yOffset).click().build().perform();
+		
 		if (robot == null) {
 			throw new ScenarioException("click on picture is not supported on mobile devices and remote mode");
 		}
 		findElement(false);
+		
 	    robot.mouseMove(detectedObjectRectangle.x + detectedObjectRectangle.width / 2 + (int)(xOffset * pictureSizeRatio), 
 	    			    detectedObjectRectangle.y + detectedObjectRectangle.height / 2 +(int)(yOffset * pictureSizeRatio));    
 	    robot.mousePress(InputEvent.BUTTON1_MASK);
@@ -193,8 +204,10 @@ public class PictureElement {
 	
 	/**
 	 * Returns true in cas the searched picture is found
+	 * @deprecated use isElementPresentInstead
 	 * @return
 	 */
+	@Deprecated
 	public boolean isVisible() {
 		try {
 			findElement(true);
@@ -202,6 +215,33 @@ public class PictureElement {
 		} catch (ImageSearchException e) {
 			return false;
 		}
+	}
+	
+	public boolean isElementPresent() {
+		return isElementPresent(0);
+	}
+	
+	/**
+	 * check whether picture is present or not
+	 * @param waitMs
+	 * @return
+	 */
+	public boolean isElementPresent(int waitMs) {
+		long end = clock.laterBy(waitMs);
+		while (clock.isNowBefore(end) || waitMs == 0) {
+			try {
+				findElement(true);
+				return true;
+			} catch (ImageSearchException e) {
+				if (waitMs == 0) {
+					return false;
+				}
+				WaitHelper.waitForMilliSeconds(200);
+				continue;
+			}
+		}
+		return false;
+		
 	}
 	
 	@Override

@@ -24,6 +24,7 @@ import org.testng.annotations.Test;
 
 import com.seleniumtests.GenericTest;
 import com.seleniumtests.util.osutility.OSUtility;
+import com.seleniumtests.util.osutility.OSUtilityFactory;
 import com.seleniumtests.util.osutility.ProcessInfo;
 
 public class TestOsUtility extends GenericTest {
@@ -32,7 +33,7 @@ public class TestOsUtility extends GenericTest {
 	
 	@BeforeClass(groups={"it"})
 	public void testInitialization() {
-		osUtil = new OSUtility();
+		osUtil = OSUtilityFactory.getInstance();
 	}
 	
 	@Test(groups={"it"})

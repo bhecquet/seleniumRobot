@@ -28,7 +28,7 @@ import com.seleniumtests.util.logging.SeleniumRobotLogger;
 /**
  * Common methods for Windows and Unix systems.
  */
-public abstract class OSCommand {
+public class OSCommand {
 	
 	private static final Logger logger = SeleniumRobotLogger.getLogger(OSCommand.class);
 	
@@ -41,7 +41,7 @@ public abstract class OSCommand {
         	throw new CustomSeleniumTestsException("cannot start process: " + cmd, e1);
         }
 	}
-	
+
     /**
      * Execute a command in command line terminal
      * @param cmd

@@ -27,7 +27,7 @@ import com.seleniumtests.util.logging.SeleniumRobotLogger;
 /**
  * Facade of the OS Utility Windows or Unix
  */
-public class OSUtility {
+public abstract class OSUtility {
 
 	private static final Logger logger = SeleniumRobotLogger.getLogger(OSUtility.class);
 	
@@ -43,17 +43,7 @@ public class OSUtility {
 		 //phntomjs, 
 		 //safari, 
 		 };
-	
-	private OSUtilityWindows osw;
-	private OSUtilityUnix osu;
-	
-	public OSUtility() {
-		if (isWindows()){
-			osw = new OSUtilityWindows();
-		} else {
-			osu = new OSUtilityUnix();
-		}
-	}
+
 	
 	/******************************************
 	 *********** OS information ***************
@@ -103,13 +93,7 @@ public class OSUtility {
      * Returns list of all running processes
      * @return
      */
-    public List<ProcessInfo> getRunningProcessList() {
-    	if (isWindows()) {
-    		return osw.getRunningProcessList();
-    	} else {
-    		return osu.getRunningProcessList();
-    	}	
-    }
+    public abstract List<ProcessInfo> getRunningProcessList();
     
     /**
      * @param name of the process
@@ -165,7 +149,9 @@ public class OSUtility {
     		for (String processName : webBrowserProcessList){
 	    		if (processInfo.getName().equalsIgnoreCase(processName)){
 					isRunning = true;
-					if (!showAll) break;
+					if (!showAll) {
+						break;
+					}
 					logger.info("Web browser process is still running : " + processInfo.getName());
 	    		}
     		}
@@ -200,13 +186,15 @@ public class OSUtility {
      * @param force
      * @throws IOException
      */
-    public String killProcess(String pid, boolean force) throws IOException {
-    	if (isWindows()) {
-			return osw.killProcess(pid, force);
-		} else {
-			return osu.killProcess(pid, false);
-		}
-    }
+    public abstract String killProcess(String pid, boolean force);
+    
+	
+    /**
+     * Get extension of the program
+     * @return
+     */
+	public abstract String getProgramExtension();
+	
 
     /**
      * Ask system to terminate all the known web browser processes.
@@ -217,12 +205,8 @@ public class OSUtility {
     	for (ProcessInfo processInfo : getRunningProcessList()) {
     		for (String processName : webBrowserProcessList) {
     			if (processInfo.getName().equalsIgnoreCase(processName)){
-    				try {
-    					logger.info("Asked system to terminate : " + processInfo.getName());
-			    		killProcess(processInfo.getPid(), force);
-					} catch (IOException e) {
-						logger.error(e);
-					}
+					logger.info("Asked system to terminate : " + processInfo.getName());
+		    		killProcess(processInfo.getPid(), force);
     			}
     		}
     	}
@@ -243,12 +227,6 @@ public class OSUtility {
 		return "Internet Explorer has not been found.";
     }
     
-    public int getIEVersion() {
-    	if (isWindows()) {
-			return osw.getIEVersion();
-		}
-    	logger.error("Internet Explorer is supported by Windows only.");
-    	return 0;
-    }
+    public abstract int getIEVersion();
     
 }
