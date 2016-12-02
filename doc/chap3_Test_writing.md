@@ -4,6 +4,14 @@ A "test application" is the code specific to the Web or Mobile application under
 Use seleniumRobot-example project as a base to develop your own test application
 [https://github.com/bhecquet/seleniumRobot-example](https://github.com/bhecquet/seleniumRobot-example)
 
+- for the remainder, we use a unique name for that new application `appName`
+- in pom.xml
+	- remove all unnecessary plugins & configurations (see file comments)
+	- change artifactId, groupId and version according to your organization
+- change test package according to your organization. Last part of the package MUST BE `appName`
+- change folder name under `data` to `appName`
+- in `data/appName/testng/test_qwant.xml`, change value for `cucumberPackage` parameter according to the updated package name
+
 #### Requirements are ####
 
 - Test data are in `data/<app_name>/`
@@ -20,6 +28,11 @@ If pure TestNG mode is used, this package should not exist.
 	- `webpage` subpackage is mandatory as it contains PageObject implementation
 
 ![](images/package_structure.png)
+
+*If something goes wrong when launching test, check:*
+- project name, folder name under `data`, sub-package name, containing `webpages` *MUST BE THE SAME*
+- There is no space in folder structure
+- In cucumber mode, the `@Given` creating the first PageObject must not be in the PageObject class. It should be in `cucumber`subpackage instead
 
 ### 2 PageObject ###
 PageObject is a design pattern that helps writing maintainable selenium applications. Each screen of the website or mobile application is a class.
@@ -198,26 +211,26 @@ There are several ways to make values in test script change according to test en
 #### XML configuration ####
 XML testing file handles many technical configurations: server address, used tools and related configuration.
  
-Business configuration can be done through the “unknown” parameters. These are parameters which are not known from the framework. They are added to a list of business parameters.
+Business configuration can be done through the ï¿½unknownï¿½ parameters. These are parameters which are not known from the framework. They are added to a list of business parameters.
 
 #### Confg.ini configuration ####
-XML configurations are done statically and must be duplicated through all the test suites (or using “testConfiguration” parameter). It’s not possible to have a centralized configuration which depends on test environment.
+XML configurations are done statically and must be duplicated through all the test suites (or using ï¿½testConfigurationï¿½ parameter). Itï¿½s not possible to have a centralized configuration which depends on test environment.
 
 *Example:* the server URL depends on testing phase. They are not the same in production and in integration phase.
 
-That’s why the “env.ini” file is made for. Each tested application can embed a env.ini file whose format is: 
+Thatï¿½s why the ï¿½env.iniï¿½ file is made for. Each tested application can embed a env.ini file whose format is: 
 
 ![](images/config_ini_example.png)
  
-“General“ section is for common configuration (e.g: a database user name which does not depends on environment) and other sections are specific to named test environments. Here, we define a “Dev” environment. Then, when launching test, user MUST define the environment on which test will be run with the option `-Denv=Dev`
+ï¿½Generalï¿½ section is for common configuration (e.g: a database user name which does not depends on environment) and other sections are specific to named test environments. Here, we define a ï¿½Devï¿½ environment. Then, when launching test, user MUST define the environment on which test will be run with the option `-Denv=Dev`
 
-Keys defined in environment sections override the ones in “General” section.
+Keys defined in environment sections override the ones in ï¿½Generalï¿½ section.
 This file must be located in "<<t>application root>/data/<<t>application name>/config" folder.
 
 These configurations are also stored in the business configuration.
 
 #### Using configurations (aka business configuration) in test scripts ####
-Each webpage can use the configurations defined above using (getting variable “text” from configuration):
+Each webpage can use the configurations defined above using (getting variable ï¿½textï¿½ from configuration):
 
 ![](images/get_param_example.png)
 
