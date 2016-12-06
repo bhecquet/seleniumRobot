@@ -36,6 +36,14 @@ public class Table extends HtmlElement {
         super(label, by);
     }
     
+    public Table(final String label, final By by, final HtmlElement parent) {
+    	super(label, by, parent);
+    }
+
+    public Table(final String label, final By by, final HtmlElement parent, final int index) {
+    	super(label, by, parent, index);
+    }
+    
     public Table(final String label, final By by, final FrameElement frame) {
     	super(label, by, frame);
     }

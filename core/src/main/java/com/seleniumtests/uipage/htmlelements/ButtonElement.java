@@ -21,12 +21,19 @@ import org.openqa.selenium.Keys;
 
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.WebUIDriver;
-import com.seleniumtests.uipage.ReplayOnError;
 
 public class ButtonElement extends HtmlElement {
 
     public ButtonElement(final String label, final By by) {
         super(label, by);
+    }
+    
+    public ButtonElement(final String label, final By by, final HtmlElement parent) {
+    	super(label, by, parent);
+    }
+    
+    public ButtonElement(final String label, final By by, final HtmlElement parent, final int index) {
+    	super(label, by, parent, index);
     }
     
     public ButtonElement(final String label, final By by, final int index) {

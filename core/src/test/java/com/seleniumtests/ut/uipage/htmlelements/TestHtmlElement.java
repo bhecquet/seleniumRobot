@@ -84,6 +84,7 @@ public class TestHtmlElement extends MockitoTest {
 	
 	@Spy
 	private HtmlElement el = new HtmlElement("element", By.id("el"));
+	private HtmlElement el1 = new HtmlElement("element", By.id("el1"), el);
 	
 	@BeforeMethod(alwaysRun=true)
 	private void init() {
@@ -133,6 +134,11 @@ public class TestHtmlElement extends MockitoTest {
 		if (findElement) {
 			PowerMockito.verifyPrivate(el).invoke("findElement", anyBoolean());
 		}
+	}
+	
+	@Test(groups={"ut"})
+	public void testToString() throws Exception {
+		Assert.assertEquals(el1.toString(), "HtmlElement element, by={By.id: el1}, sub-element of HtmlElement element, by={By.id: el}");
 	}
 
 	@Test(groups={"ut"})
