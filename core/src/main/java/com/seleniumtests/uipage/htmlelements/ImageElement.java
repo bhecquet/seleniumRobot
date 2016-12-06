@@ -24,6 +24,14 @@ public class ImageElement extends HtmlElement {
         super(label, by);
     }
     
+    public ImageElement(final String label, final By by, final HtmlElement parent) {
+    	super(label, by, parent);
+    }
+
+    public ImageElement(final String label, final By by, final HtmlElement parent, final int index) {
+    	super(label, by, parent, index);
+    }
+    
     public ImageElement(final String label, final By by, final int index) {
     	super(label, by, index);
     }

@@ -23,6 +23,14 @@ public class LabelElement extends HtmlElement {
         super(label, by);
     }
     
+    public LabelElement(final String label, final By by, final HtmlElement parent) {
+    	super(label, by, parent);
+    }
+
+    public LabelElement(final String label, final By by, final HtmlElement parent, final int index) {
+    	super(label, by, parent, index);
+    }
+    
     public LabelElement(final String label, final By by, final int index) {
     	super(label, by, index);
     }

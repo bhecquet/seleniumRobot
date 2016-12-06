@@ -122,11 +122,11 @@ public class HtmlElement implements WebElement, Locatable {
     	this.frameElement = frame;
     }
     
-    private HtmlElement(final String label, final By by, final HtmlElement parent) {
+    public HtmlElement(final String label, final By by, final HtmlElement parent) {
     	this(label, by, parent, -1);
     }
     
-    private HtmlElement(final String label, final By by, final HtmlElement parent, final int index) {
+    public HtmlElement(final String label, final By by, final HtmlElement parent, final int index) {
     	this.label = label;
     	this.by = by;
     	this.parent = parent;
@@ -211,6 +211,7 @@ public class HtmlElement implements WebElement, Locatable {
      * Find elements inside this element
      * @param by
      */
+    @Override
     @ReplayOnError
     public List<WebElement> findElements(By by) {
     	
@@ -229,6 +230,34 @@ public class HtmlElement implements WebElement, Locatable {
     	return new HtmlElement(label, by, this);
     }
     
+    public ButtonElement findButtonElement(By by) {
+    	return new ButtonElement(label, by, this);
+    }
+    public CheckBoxElement findCheckBoxElement(By by) {
+    	return new CheckBoxElement(label, by, this);
+    }
+    public ImageElement findImageElement(By by) {
+    	return new ImageElement(label, by, this);
+    }
+    public LabelElement findLabelElement(By by) {
+    	return new LabelElement(label, by, this);
+    }
+    public LinkElement findLinkElement(By by) {
+    	return new LinkElement(label, by, this);
+    }
+    public RadioButtonElement findRadioButtonElement(By by) {
+    	return new RadioButtonElement(label, by, this);
+    }
+    public SelectList findSelectList(By by) {
+    	return new SelectList(label, by, this);
+    }
+    public Table findTable(By by) {
+    	return new Table(label, by, this);
+    }
+    public TextFieldElement findTextFieldElement(By by) {
+    	return new TextFieldElement(label, by, this);
+    }
+    
     /**
      * Find the Nth element inside an other one
      * Equivalent to HtmlElement("", By.id("0").findElements(By.id("1")).get(0); 
@@ -239,6 +268,34 @@ public class HtmlElement implements WebElement, Locatable {
      */
     public HtmlElement findElement(By by, int index) {
     	return new HtmlElement(label, by, this, index);
+    }
+    
+    public ButtonElement findButtonElement(By by, int index) {
+    	return new ButtonElement(label, by, this, index);
+    }
+    public CheckBoxElement findCheckBoxElement(By by, int index) {
+    	return new CheckBoxElement(label, by, this, index);
+    }
+    public ImageElement findImageElement(By by, int index) {
+    	return new ImageElement(label, by, this, index);
+    }
+    public LabelElement findLabelElement(By by, int index) {
+    	return new LabelElement(label, by, this, index);
+    }
+    public LinkElement findLinkElement(By by, int index) {
+    	return new LinkElement(label, by, this, index);
+    }
+    public RadioButtonElement findRadioButtonElement(By by, int index) {
+    	return new RadioButtonElement(label, by, this, index);
+    }
+    public SelectList findSelectList(By by, int index) {
+    	return new SelectList(label, by, this, index);
+    }
+    public Table findTable(By by, int index) {
+    	return new Table(label, by, this, index);
+    }
+    public TextFieldElement findTextFieldElement(By by, int index) {
+    	return new TextFieldElement(label, by, this, index);
     }
     
     protected void findElement() {
@@ -756,8 +813,11 @@ public class HtmlElement implements WebElement, Locatable {
      */
     @Override
     public String toString() {
-        return getClass().getSimpleName() + " " + getLabel() +
-            ", by={" + getBy().toString() + "}";
+        String elDescr = getClass().getSimpleName() + " " + getLabel() + ", by={" + getBy().toString() + "}";
+        if (parent != null) {
+        	elDescr += ", sub-element of " + parent.toString();
+        }
+        return elDescr;
     }
     
     /**

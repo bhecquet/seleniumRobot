@@ -23,7 +23,15 @@ public class LinkElement extends HtmlElement {
     public LinkElement(final String label, final By by) {
         super(label, by);
     }
+    
+    public LinkElement(final String label, final By by, final HtmlElement parent) {
+    	super(label, by, parent);
+    }
 
+    public LinkElement(final String label, final By by, final HtmlElement parent, final int index) {
+    	super(label, by, parent, index);
+    }
+    
     public LinkElement(final String label, final By by, final int index) {
     	super(label, by, index);
     }

@@ -26,7 +26,6 @@ import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.UnexpectedTagNameException;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.uipage.ReplayOnError;
 
 import net.ricecode.similarity.JaroWinklerStrategy;
@@ -48,6 +47,14 @@ public class SelectList extends HtmlElement {
         super(text, by);
     }
     
+    public SelectList(final String label, final By by, final HtmlElement parent) {
+    	super(label, by, parent);
+    }
+
+    public SelectList(final String label, final By by, final HtmlElement parent, final int index) {
+    	super(label, by, parent, index);
+    }
+     
     public SelectList(final String label, final By by, final int index) {
     	super(label, by, index);
     }

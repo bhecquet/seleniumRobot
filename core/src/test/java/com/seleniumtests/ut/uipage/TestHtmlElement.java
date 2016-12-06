@@ -166,4 +166,100 @@ public class TestHtmlElement extends GenericTest {
 		Assert.assertFalse(new HtmlElement("", By.id("divNotFound")).isElementPresent(2));
 	}
 	
+	@Test(groups={"ut"})
+	public void testFindTextElementInsideHtmlElement() {
+		testPage.textElement2.sendKeys("hello");
+		Assert.assertEquals(testPage.textElement2.getValue(), "hello");
+	}
+	
+	@Test(groups={"ut"})
+	public void testFindRadioElementInsideHtmlElement() {
+		try {
+			testPage.radioElement2.click();
+			Assert.assertTrue(testPage.radioElement2.isSelected());
+		} finally {
+			testPage.resetButton.click();
+		}
+	}
+	
+	@Test(groups={"ut"})
+	public void testFindCheckElementInsideHtmlElement() {
+		try {
+			testPage.checkElement2.click();
+			Assert.assertTrue(testPage.checkElement2.isSelected());
+		} finally {
+			testPage.resetButton.click();
+		}
+	}
+	
+	@Test(groups={"ut"})
+	public void testFindButtonElementInsideHtmlElement() {
+		Assert.assertEquals(testPage.startButton2.getText(), "Start Animation");
+	}
+	
+	@Test(groups={"ut"})
+	public void testFindLinkElementInsideHtmlElement() {
+		Assert.assertTrue(testPage.link2.getUrl().contains("http://www.google.fr"));
+	}
+	
+	@Test(groups={"ut"})
+	public void testFindSelectElementInsideHtmlElement() {
+		Assert.assertEquals(testPage.selectList2.getOptions().size(), 3);
+	}
+	
+	@Test(groups={"ut"})
+	public void testFindTableInsideHtmlElement() {
+		Assert.assertEquals(testPage.table2.getRowCount(), 3);
+	}
+	
+	/*
+	 * Use elements searched by index inside other elements 
+	 */
+	
+	@Test(groups={"ut"})
+	public void testFindTextElementsInsideHtmlElement() {
+		testPage.textElement2.sendKeys("hello");
+		Assert.assertEquals(testPage.textElement2.getValue(), "hello");
+	}
+	
+	@Test(groups={"ut"})
+	public void testFindRadioElementsInsideHtmlElement() {
+		try {
+			testPage.radioElement2.click();
+			Assert.assertTrue(testPage.radioElement2.isSelected());
+		} finally {
+			testPage.resetButton.click();
+		}
+	}
+	
+	@Test(groups={"ut"})
+	public void testFindCheckElementsInsideHtmlElement() {
+		try {
+			testPage.checkElement2.click();
+			Assert.assertTrue(testPage.checkElement2.isSelected());
+		} finally {
+			testPage.resetButton.click();
+		}
+	}
+	
+	@Test(groups={"ut"})
+	public void testFindButtonElementsInsideHtmlElement() {
+		Assert.assertEquals(testPage.startButton2.getText(), "Start Animation");
+	}
+	
+	@Test(groups={"ut"})
+	public void testFindLinkElementsInsideHtmlElement() {
+		Assert.assertTrue(testPage.link2.getUrl().contains("http://www.google.fr"));
+	}
+	
+	@Test(groups={"ut"})
+	public void testFindSelectElementsInsideHtmlElement() {
+		Assert.assertEquals(testPage.selectList2.getOptions().size(), 3);
+	}
+	
+	@Test(groups={"ut"})
+	public void testFindTablesInsideHtmlElement() {
+		Assert.assertEquals(testPage.table2.getRowCount(), 3);
+	}
+	
 }

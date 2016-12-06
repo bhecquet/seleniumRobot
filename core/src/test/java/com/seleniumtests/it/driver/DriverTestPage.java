@@ -64,6 +64,23 @@ public class DriverTestPage extends PageObject {
 	public static final PictureElement pictureNotPresent = new PictureElement("picture", "tu/images/vosAlertes.png", table);
 	public static final TextFieldElement logoText = new TextFieldElement("logoText", By.id("logoText"));
 	
+	// Elements inside others
+	public static final TextFieldElement textElement2 = new HtmlElement("", By.tagName("body")).findTextFieldElement(By.id("text2"));
+	public static final RadioButtonElement radioElement2 = new HtmlElement("", By.tagName("body")).findRadioButtonElement(By.id("radioClick"));
+	public static final CheckBoxElement checkElement2 = new HtmlElement("", By.tagName("body")).findCheckBoxElement(By.id("checkboxClick"));
+	public static final ButtonElement startButton2 = new HtmlElement("", By.tagName("body")).findButtonElement(By.id("button"));
+	public static final LinkElement linkElement2 = new HtmlElement("", By.tagName("body")).findLinkElement(By.id("link"));
+	public static final SelectList selectList2 = new HtmlElement("", By.tagName("body")).findSelectList(By.id("select"));
+	public static final Table table2 = new HtmlElement("", By.tagName("body")).findTable(By.id("table"));
+	
+	// Elements inside others with findElements()
+	public static final TextFieldElement textElement3 = new HtmlElement("", By.tagName("body")).findTextFieldElement(By.id("text2"), 0);
+	public static final RadioButtonElement radioElement3 = new HtmlElement("", By.tagName("body")).findRadioButtonElement(By.id("radioClick"), 0);
+	public static final CheckBoxElement checkElement3 = new HtmlElement("", By.tagName("body")).findCheckBoxElement(By.id("checkboxClick"), 0);
+	public static final ButtonElement startButton3 = new HtmlElement("", By.tagName("body")).findButtonElement(By.id("button"), 0);
+	public static final LinkElement linkElement3 = new HtmlElement("", By.tagName("body")).findLinkElement(By.id("link"), 0);
+	public static final SelectList selectList3 = new HtmlElement("", By.tagName("body")).findSelectList(By.id("select"), 0);
+	public static final Table table3 = new HtmlElement("", By.tagName("body")).findTable(By.id("table"), 0);
 	
 	// Elements for IFrame
 	public static final FrameElement iframe = new FrameElement("IFrame", By.id("myIFrame"));

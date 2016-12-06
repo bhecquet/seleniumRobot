@@ -24,6 +24,14 @@ public class RadioButtonElement extends HtmlElement {
         super(label, by);
     }
 
+    public RadioButtonElement(final String label, final By by, final HtmlElement parent) {
+    	super(label, by, parent);
+    }
+
+    public RadioButtonElement(final String label, final By by, final HtmlElement parent, final int index) {
+    	super(label, by, parent, index);
+    }
+    
     public RadioButtonElement(final String label, final By by, final int index) {
     	super(label, by, index);
     }

@@ -23,6 +23,14 @@ public class CheckBoxElement extends HtmlElement {
     public CheckBoxElement(final String label, final By by) {
         super(label, by);
     }
+    
+    public CheckBoxElement(final String label, final By by, final HtmlElement parent) {
+    	super(label, by, parent);
+    }
+
+    public CheckBoxElement(final String label, final By by, final HtmlElement parent, final int index) {
+    	super(label, by, parent, index);
+    }
 
     public CheckBoxElement(final String label, final By by, final int index) {
     	super(label, by, index);
