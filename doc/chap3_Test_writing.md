@@ -254,7 +254,7 @@ between [ ] you define the web page where to use the following definitions. Next
 
 #### Mapping data use ####
 
-In the corresponding pageObject you can use mapping words to search elements using : locateBy(map:caller_word) or by.(map:caller_word). It will search the element in the page which is defined by the technical word. 
+In the corresponding pageObject you can use mapping words to search elements using : locateBy(map:caller_word) or by.id(map:caller_word). It will search the element in the page which is defined by the technical word. 
 
 ### 8 Optional features ###
 Here will be described features that may be used to improve test

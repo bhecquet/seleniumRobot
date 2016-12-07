@@ -75,7 +75,6 @@ public class Table extends HtmlElement {
     
     @ReplayOnError
     public List<WebElement> getColumns() {
-    	((RemoteWebDriver)driver).getMouse().mouseMove(getCoordinates());
     	findTableElement();
     	return columns;
  

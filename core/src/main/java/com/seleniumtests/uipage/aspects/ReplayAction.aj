@@ -27,6 +27,7 @@ import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.CompositeAction;
 import org.openqa.selenium.remote.UnreachableBrowserException;
 import org.openqa.selenium.support.ui.SystemClock;
 
@@ -162,6 +163,21 @@ public class ReplayAction {
 			}
 		}
 		return reply;
+	}
+	
+	/**
+	 * Replays the composite action in case any error occurs
+	 * @param joinPoint
+	 */
+	@Around("call(public void org.openqa.selenium.interactions.Action+.perform ())")
+	public Object replayCompositeAction(ProceedingJoinPoint joinPoint) throws Throwable {
+		
+		// do replay only global perform
+		if (!(joinPoint.getTarget() instanceof CompositeAction)) {
+			return joinPoint.proceed(joinPoint.getArgs());
+		}
+		
+		return replay(joinPoint);
 	}
 	
     

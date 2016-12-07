@@ -48,7 +48,7 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver {
         fileDetector = detector;
     }
     
-    public final void updateWindowsHandles() {
+    public void updateWindowsHandles() {
     	if (SeleniumTestsContextManager.isWebTest()) {
     		currentHandles = driver.getWindowHandles();
     	} else {
