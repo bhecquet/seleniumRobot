@@ -20,6 +20,9 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.atLeast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,6 +39,7 @@ import org.openqa.selenium.interactions.Keyboard;
 import org.openqa.selenium.interactions.Mouse;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.RemoteWebElement;
+import org.openqa.selenium.support.events.EventFiringWebDriver;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
@@ -43,8 +47,10 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import com.seleniumtests.MockitoTest;
+import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.driver.CustomEventFiringWebDriver;
+import com.seleniumtests.driver.DriverExceptionListener;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.uipage.htmlelements.HtmlElement;
 
@@ -86,6 +92,8 @@ public class TestHtmlElement extends MockitoTest {
 	private HtmlElement el = new HtmlElement("element", By.id("el"));
 	private HtmlElement el1 = new HtmlElement("element", By.id("el1"), el);
 	
+	private EventFiringWebDriver eventDriver;
+	
 	@BeforeMethod(alwaysRun=true)
 	private void init() {
 		// mimic sub elements of the HtmlElement
@@ -97,8 +105,11 @@ public class TestHtmlElement extends MockitoTest {
 		List<WebElement> elList = new ArrayList<WebElement>();
 		elList.add(element);
 		
+		// add DriverExceptionListener to reproduce driver behavior
+		eventDriver = spy(new CustomEventFiringWebDriver(driver).register(new DriverExceptionListener()));
+		
 		PowerMockito.mockStatic(WebUIDriver.class);
-		when(WebUIDriver.getWebDriver()).thenReturn(new CustomEventFiringWebDriver(driver));
+		when(WebUIDriver.getWebDriver()).thenReturn(eventDriver);
 		when(driver.findElement(By.id("el"))).thenReturn(element);
 		when(driver.findElements(By.name("subEl"))).thenReturn(subElList);
 		when(driver.findElement(By.name("subEl"))).thenReturn(subElement1);
@@ -145,12 +156,19 @@ public class TestHtmlElement extends MockitoTest {
 	public void testClick() throws Exception {
 		el.click();
 		finalCheck(true);
+		
+		// check handled are updated on click
+		verify((CustomEventFiringWebDriver)eventDriver).updateWindowsHandles();
 	}
 	
 	@Test(groups={"ut"})
 	public void testSimulateClick() throws Exception {
 		el.simulateClick();
 		finalCheck(true);
+		
+		// check handled are updated on click
+		verify((CustomEventFiringWebDriver)eventDriver).updateWindowsHandles();
+		
 	}
 	
 	@Test(groups={"ut"})
@@ -245,11 +263,20 @@ public class TestHtmlElement extends MockitoTest {
 		finalCheck(true);
 	}
 	
+	/**
+	 * Check exception handling and action replay
+	 * @throws Exception
+	 */
 	@Test(groups={"ut"})
 	public void testIsDisplayedException() throws Exception {
-		when(element.isDisplayed()).thenThrow(WebDriverException.class);
+		SeleniumTestsContextManager.getThreadContext().setReplayTimeout(1);
+		when(element.isDisplayed()).thenThrow(new WebDriverException("error"));
 		Assert.assertEquals(el.isDisplayed(), false);
-		finalCheck(true);
+		
+		// updateDriver is called on every replay, so if we have 2 invocations, it means that replay has been done
+		PowerMockito.verifyPrivate(el, atLeast(2)).invoke("updateDriver");
+		
+		verify(el, times(1)).isDisplayedRetry();
 	}
 	
 	@Test(groups={"ut"})

@@ -165,6 +165,10 @@ public class HtmlElement implements WebElement, Locatable {
 
     @ReplayOnError
     public void simulateClick() {
+    	if (SeleniumTestsContextManager.isWebTest()) {
+    		((CustomEventFiringWebDriver)WebUIDriver.getWebDriver()).updateWindowsHandles();
+    	}
+    	
         findElement(true);
 
         String mouseOverScript =
@@ -591,16 +595,18 @@ public class HtmlElement implements WebElement, Locatable {
      * @return
      */
     @Override
-    @ReplayOnError
     public boolean isDisplayed() {
-
         try {
-            findElement();
-
-            return element.isDisplayed();
+            return isDisplayedRetry();
         } catch (Exception e) {
             return false;
         }
+    }
+    
+    @ReplayOnError
+    public boolean isDisplayedRetry() {
+    	findElement();
+        return element.isDisplayed();
     }
 
     /**

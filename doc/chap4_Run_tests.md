@@ -6,7 +6,7 @@ Below is the list of all parameters accepted in testing xml file. These paramete
 | testConfig 				|  			| Additional configuration. This should contain common configuration through all TestNG files.<br/>See `exampleConfigGenericParams.xml` file for format | 
 | webSessionTimeOut 		| 90000 	| browser session timeout in milliseconds | 
 | implicitWaitTimeOut 		| 5			| implicit wait of the browser, in seconds (selenium definition) | 
-| explicitWaitTimeOut 		| 15		| explicit wait of the browser, in seconds. Used when checking is an element is present and no wait value is defined (`waitElementPresent` & `isElementPresent` | 
+| explicitWaitTimeOut 		| 15		| explicit wait of the browser, in seconds. Used when checking is an element is present and no wait value is defined (`waitElementPresent` & `isElementPresent`). This value is also used when checking that browser is on the right page (PageObject constructor) | 
 | pageLoadTimeout 			| 90		| Value defined in selenium driver. Wait delay for page loading | 
 | webDriverGrid 			| 			| Address of seleniumGrid server | 
 | runMode 					| LOCAL		| `local`: current computer<br/>`grid`: seleniumGrid<br/>`sauceLabs`: run on sauceLabs device<br/>`testDroid`: run on testdroid device | 
