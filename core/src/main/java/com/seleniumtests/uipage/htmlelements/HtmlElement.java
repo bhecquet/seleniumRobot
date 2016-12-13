@@ -33,7 +33,6 @@ import org.openqa.selenium.Point;
 import org.openqa.selenium.Rectangle;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.firefox.MarionetteDriver;
 import org.openqa.selenium.interactions.Actions;
@@ -303,7 +302,11 @@ public class HtmlElement implements WebElement, Locatable {
     }
     
     protected void findElement() {
-    	findElement(false);
+    	findElement(false, true);
+    }
+    
+    protected void findElement(boolean waitForVisibility) {
+    	findElement(waitForVisibility, true);
     }
     
 
@@ -311,10 +314,13 @@ public class HtmlElement implements WebElement, Locatable {
      * Finds the element using By type. Implicit Waits is built in createWebDriver() in WebUIDriver to handle dynamic
      * element problem. This method is invoked before all the basic operations like click, sendKeys, getText, etc. Use
      * waitForPresent to use Explicit Waits to deal with special element which needs long time to present.
+     * @param waitForVisibility		wait for element to be visible
+     * @param makeVisible			whether we try to make the element visible. Should be true except when trying to know if element is displayed
      */
-    protected void findElement(boolean waitForVisibility) {
+    protected void findElement(boolean waitForVisibility, boolean makeVisible) {
         
         // if a parent is defined, search for it before getting the sub element
+    	driver = updateDriver();
         if (parent != null) {
         	parent.findElement();
         	if (elementIndex < 0) {
@@ -323,7 +329,6 @@ public class HtmlElement implements WebElement, Locatable {
         		element = parent.element.findElements(by).get(elementIndex);
         	}
         } else {
-	        driver = updateDriver();
 	        if (elementIndex < 0) {
 	        	element = driver.findElement(by);
 	        } else {
@@ -331,10 +336,13 @@ public class HtmlElement implements WebElement, Locatable {
 	        }
 	        
         }
-        makeWebElementVisible(element);
+        
+        if (makeVisible) {
+        	makeWebElementVisible(element);
+        }
         
         // wait for element to be really visible. should be done only for actions on element
-        if (waitForVisibility) {
+        if (waitForVisibility && makeVisible) {
         	new WebDriverWait(driver, 1).until(ExpectedConditions.visibilityOf(element));
         }
     }
@@ -361,7 +369,7 @@ public class HtmlElement implements WebElement, Locatable {
 				if (element.getAttribute("style").toLowerCase().replace(" ", "").contains("display:none")) {
 					changeCssAttribute(element, "display", "block");
 				}
-				changeCssAttribute(element, "zIndex", "1000");
+				changeCssAttribute(element, "zIndex", "100000");
 			} catch (Exception e) {
 				return;
 			}
@@ -605,14 +613,14 @@ public class HtmlElement implements WebElement, Locatable {
     
     @ReplayOnError
     public boolean isDisplayedRetry() {
-    	findElement();
+    	findElement(false, false);
         return element.isDisplayed();
     }
 
     /**
      * Searches for the element using the BY locator, and indicates whether or not it exists in the page. This can be
      * used to look for hidden objects, whereas isDisplayed() only looks for things that are visible to the user
-     *
+     * @param timeout timeout in seconds
      * @return
      */
     public boolean isElementPresent(int timeout) {        
@@ -737,6 +745,7 @@ public class HtmlElement implements WebElement, Locatable {
         if (clear) {
         	element.clear();
         } 
+        element.click();
         element.sendKeys(keysToSend);
     }
     
