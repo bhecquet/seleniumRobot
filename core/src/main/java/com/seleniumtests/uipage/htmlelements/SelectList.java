@@ -69,10 +69,7 @@ public class SelectList extends HtmlElement {
 
     @Override
     protected void findElement() {
-        driver = updateDriver();
-        element = driver.findElement(this.getBy());
-        makeWebElementVisible(element);
-        new WebDriverWait(driver, 1).until(ExpectedConditions.visibilityOf(element));
+        super.findElement(true);
         
         try {
             select = getNewSelectElement(element);

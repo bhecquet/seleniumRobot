@@ -45,7 +45,7 @@ public class DriverTestPage extends PageObject {
 	public static final HtmlElement greenSquare = new HtmlElement("Green square", By.id("carre"));
 	public static final HtmlElement redSquare = new HtmlElement("Red Square", By.id("carre2"));
 	public static final HtmlElement parent  = new HtmlElement("parent", By.id("parent"));
-	public static final HtmlElement child  = new HtmlElement("parent", By.id("parent")).findElement(By.className("myClass"), 1);
+	public static final HtmlElement child  = parent.findElement(By.className("myClass"), 1);
 	public static final HtmlElement divFindName  = new HtmlElement("parent", By.name("divFindName"), 1);
 	public static final LinkElement link = new LinkElement("My link", By.id("link"));
 	public static final LinkElement link2 = new LinkElement("My link", By.id("link2"));
@@ -65,22 +65,27 @@ public class DriverTestPage extends PageObject {
 	public static final TextFieldElement logoText = new TextFieldElement("logoText", By.id("logoText"));
 	
 	// Elements inside others
-	public static final TextFieldElement textElement2 = new HtmlElement("", By.tagName("body")).findTextFieldElement(By.id("text2"));
-	public static final RadioButtonElement radioElement2 = new HtmlElement("", By.tagName("body")).findRadioButtonElement(By.id("radioClick"));
-	public static final CheckBoxElement checkElement2 = new HtmlElement("", By.tagName("body")).findCheckBoxElement(By.id("checkboxClick"));
-	public static final ButtonElement startButton2 = new HtmlElement("", By.tagName("body")).findButtonElement(By.id("button"));
-	public static final LinkElement linkElement2 = new HtmlElement("", By.tagName("body")).findLinkElement(By.id("link"));
-	public static final SelectList selectList2 = new HtmlElement("", By.tagName("body")).findSelectList(By.id("select"));
-	public static final Table table2 = new HtmlElement("", By.tagName("body")).findTable(By.id("table"));
+	public static final TextFieldElement textElement2 = new HtmlElement("", By.id("parentDiv")).findTextFieldElement(By.name("textField"));
+	public static final RadioButtonElement radioElement2 = new HtmlElement("", By.id("parentDiv")).findRadioButtonElement(By.name("radioClick"));
+	public static final CheckBoxElement checkElement2 = new HtmlElement("", By.id("parentDiv")).findCheckBoxElement(By.name("checkboxClick"));
+	public static final ButtonElement resetButton2 = new HtmlElement("", By.id("parentDiv")).findButtonElement(By.name("resetButton"));
+	public static final LinkElement linkElement2 = new HtmlElement("", By.id("parentDiv")).findLinkElement(By.name("googleLink"));
+	public static final SelectList selectList2 = new HtmlElement("", By.id("parentDiv")).findSelectList(By.name("select"));
+	public static final Table table2 = new HtmlElement("", By.id("parentDiv")).findTable(By.tagName("table"));
+	
+	// bug check when we search element in select, and this select is in an other element
+	public static final TextFieldElement textInselectUlLiList = new HtmlElement("", By.tagName("body")).findSelectList(By.id("languages")).findTextFieldElement(By.id("inputInSelect"));
+	
 	
 	// Elements inside others with findElements()
-	public static final TextFieldElement textElement3 = new HtmlElement("", By.tagName("body")).findTextFieldElement(By.id("text2"), 0);
-	public static final RadioButtonElement radioElement3 = new HtmlElement("", By.tagName("body")).findRadioButtonElement(By.id("radioClick"), 0);
-	public static final CheckBoxElement checkElement3 = new HtmlElement("", By.tagName("body")).findCheckBoxElement(By.id("checkboxClick"), 0);
-	public static final ButtonElement startButton3 = new HtmlElement("", By.tagName("body")).findButtonElement(By.id("button"), 0);
-	public static final LinkElement linkElement3 = new HtmlElement("", By.tagName("body")).findLinkElement(By.id("link"), 0);
-	public static final SelectList selectList3 = new HtmlElement("", By.tagName("body")).findSelectList(By.id("select"), 0);
-	public static final Table table3 = new HtmlElement("", By.tagName("body")).findTable(By.id("table"), 0);
+	public static final TextFieldElement textElement3 = new HtmlElement("", By.id("parentDiv")).findTextFieldElement(By.name("textField"), 0);
+	public static final RadioButtonElement radioElement3 = new HtmlElement("", By.id("parentDiv")).findRadioButtonElement(By.name("radioClick"), 0);
+	public static final CheckBoxElement checkElement3 = new HtmlElement("", By.id("parentDiv")).findCheckBoxElement(By.name("checkboxClick"), 0);
+	public static final ButtonElement resetButton3 = new HtmlElement("", By.id("parentDiv")).findButtonElement(By.name("resetButton"), 0);
+	public static final LinkElement linkElement3 = new HtmlElement("", By.id("parentDiv")).findLinkElement(By.name("googleLink"), 0);
+	public static final SelectList selectList3 = new HtmlElement("", By.id("parentDiv")).findSelectList(By.name("select"), 0);
+	public static final Table table3 = new HtmlElement("", By.id("parentDiv")).findTable(By.tagName("table"), 0);
+	
 	
 	// Elements for IFrame
 	public static final FrameElement iframe = new FrameElement("IFrame", By.id("myIFrame"));

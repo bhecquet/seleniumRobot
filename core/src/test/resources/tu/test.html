@@ -30,15 +30,15 @@
 	<div style="background:#98bf21;height:20px;width:10px;position:absolute;" onclick="javascript:alert('coucou');" id="carre"></div>
 
 	<h3>Test clicking an element</h3>
-	<button id="button2" onclick="javascript:addText('text2', '');javascript:resetState();">reset</button>
+	<button id="button2" name="resetButton" onclick="javascript:addText('text2', '');javascript:resetState();">reset</button>
 	<div style="background:red;height:20px;width:10px;display: inline-block;" onclick="javascript:addText('text2', 'coucou');" id="carre2"></div>
-	<div style="display: inline-block;"><input id="text2"/></div>
-	<input type="radio" id="radioClick">
-	<input type="checkbox" id="checkboxClick">
-	<input type="image" id="image" src="googleSearch.png" onclick="javascript:addText('text2', 'image');">
+	<div style="display: inline-block;"><input id="text2" name="textField"/></div>
+	<input type="radio" id="radioClick" name="radioClick">
+	<input type="checkbox" id="checkboxClick" name="checkboxClick">
+	<input type="image" id="image" name="image" src="googleSearch.png" onclick="javascript:addText('text2', 'image');">
 	
 	<h3>Test select</h3>
-	<select id="select" onChange="javascript:addText('textSelectedId', this.selectedIndex);javascript:addText('textSelectedValue', this.options[selectedIndex].value);javascript:addText('textSelectedText', this.options[selectedIndex].text);">
+	<select id="select" name="select" onChange="javascript:addText('textSelectedId', this.selectedIndex);javascript:addText('textSelectedValue', this.options[selectedIndex].value);javascript:addText('textSelectedText', this.options[selectedIndex].text);">
 		<option value="opt1">option1</option>
 		<option value="opt2">option2</option>
 		<option value="opt3">option numero 3</option>
@@ -68,6 +68,7 @@
 	<ul id="languages">
 	    <li id="eng">English</li>
 	    <li id="deu">Deutsch</li>
+	    <li id="other"><input id="inputInSelect" /></li>
 	</ul>
 	
 	<h3>Test IFrame</h3>
@@ -75,7 +76,7 @@
 	
 	<h3>Test link</h3>
 	<a href="testIFrame.html" id="link" target="_blank">My link</a>
-	<a href="http://www.google.fr" id="link2" target="_blank">My link</a>
+	<a href="http://www.google.fr" id="link2" name="googleLink" target="_blank">My link</a>
 	<a href="#" id="linkPopup" onclick='window.open("http://www.google.fr", "_blank", "toolbar=yes, scrollbars=yes, resizable=yes, top=500, left=500, width=400, height=400");'>My link popup</a>
 	<a href="#" id="linkPopup2" onclick="window.open('http://www.google.fr', '_blank', 'toolbar=yes, scrollbars=yes, resizable=yes, top=500, left=500, width=400, height=400');">My link popup 2</a>
 	
@@ -137,6 +138,35 @@
 	<input id="logoText" /><br/>
 	<img src="ffLogo2.png" />
 	
+	<h3>Test Element inside other Element</h3>
+	<div id="parentDiv">
+		<button name="resetButton" onclick="javascript:addText('textInParent', '');javascript:resetState();">reset button</button>
+		<div style="background:red;height:20px;width:10px;display: inline-block;" onclick="javascript:addText('textInParent', 'coucouParent');" name="carre2"></div>
+		<div style="display: inline-block;"><input id="textInParent" name="textField" value="default"/></div>
+		<input type="radio" name="radioClick" id="radioClickParent">
+		<input type="checkbox" name="checkboxClick" id="checkboxClickParent">
+		<input type="image" name="image" src="googleSearch.png" onclick="javascript:addText('textInParent', 'imageParent');">
+		<br/>
+		<select name="select" onChange="javascript:addText('textSelectedTextParent', this.options[selectedIndex].text);">
+			<option value="opt1">option1Parent</option>
+			<option value="opt2">option2Parent</option>
+		</select>
+		<input id="textSelectedTextParent" name="textSelectedText"/>
+		<br/>
+		<a href="http://www.googleFrance.fr" name="googleLink" target="_blank">My link Parent</a>
+		<br/>
+		<table id="table" border="1">
+			<tr>
+				<th>Id</th>
+				<th>Name</th>
+			</tr>
+			<tr>
+				<td>1</td>
+				<td>Python</td>
+			</tr>
+		</table>
+	</div>
+	
 	
 <script src="jquery.min.js">
 </script>
@@ -154,6 +184,8 @@ function addText(id, text) {
 function resetState() {
 	$('#checkboxClick').prop("checked", false);
 	$('#radioClick').prop("checked", false);
+	$('#radioClickParent').prop("checked", false);
+	$('#checkboxClickParent').prop("checked", false);
 }
 
 function display() {

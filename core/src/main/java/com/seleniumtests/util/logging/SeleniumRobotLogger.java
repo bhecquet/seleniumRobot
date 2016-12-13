@@ -17,6 +17,8 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
 
+import com.seleniumtests.util.helper.WaitHelper;
+
 public class SeleniumRobotLogger {
 	
 	private static final String LOG_PATTERN = " %-5p %d [%t] %C{1}: %m%n";
@@ -65,6 +67,7 @@ public class SeleniumRobotLogger {
 	    	try {
 				FileUtils.deleteDirectory(new File(outputDir));
 				new File(outputDir).mkdirs();
+				WaitHelper.waitForSeconds(1);
 			} catch (IOException e) {
 				// do nothing
 			}

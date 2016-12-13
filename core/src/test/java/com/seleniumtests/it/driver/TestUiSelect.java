@@ -168,4 +168,12 @@ public class TestUiSelect extends GenericDriverTest {
 		testPage.selectUlLiList.selectByText("English");
 		Assert.assertEquals(testPage.ulliListTrigger.getValue(), "English");
 	}
+	
+	@Test(groups={"it"})
+	public void testInputInSelectUlList() {
+		testPage.ulliListTrigger.click();
+		
+		// should not raise any exception
+		testPage.textInselectUlLiList.sendKeys("text");
+	}
 }
