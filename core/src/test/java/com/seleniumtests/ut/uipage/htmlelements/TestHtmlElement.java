@@ -143,7 +143,7 @@ public class TestHtmlElement extends MockitoTest {
 		
 		// isElementPresent does not call findElement as we use WebDriverWait
 		if (findElement) {
-			PowerMockito.verifyPrivate(el).invoke("findElement", anyBoolean());
+			PowerMockito.verifyPrivate(el).invoke("findElement", anyBoolean(), anyBoolean());
 		}
 	}
 	

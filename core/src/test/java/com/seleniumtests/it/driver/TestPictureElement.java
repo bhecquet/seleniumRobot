@@ -56,32 +56,26 @@ public class TestPictureElement extends GenericDriverTest {
 	
 	@Test(groups={"it"})
 	public void testClickOnPicture() {
-		testPage.picture.clickAt(10, 10);
+		testPage.picture.clickAt(0, -30);
 		Assert.assertEquals(testPage.logoText.getValue(), "ff logo");
 	}
 	
-//	@Test(groups={"it"})
-//	public void testClickOnPicture() {
-//		testPage.picture.clickAt(0, -30);
-//		Assert.assertEquals(testPage.logoText.getValue(), "ff logo");
-//	}
-//	
-//	@Test(groups={"it"})
-//	public void testSendKeysOnPicture() {
-//		testPage.logoText.clear();
-//		testPage.picture.sendKeys("hello", 0, 5);
-//		Assert.assertEquals(testPage.logoText.getValue(), "hello");
-//	}
-//
-//	@Test(groups={"it"})
-//	public void testIsVisible() {
-//		Assert.assertTrue(testPage.picture.isVisible());
-//	}
-//	
-//	@Test(groups={"it"})
-//	public void testIsNotVisible() {
-//		Assert.assertFalse(testPage.pictureNotPresent.isVisible());
-//	}
+	@Test(groups={"it"})
+	public void testSendKeysOnPicture() {
+		testPage.logoText.clear();
+		testPage.picture.sendKeys("hello", 0, 5);
+		Assert.assertEquals(testPage.logoText.getValue(), "hello");
+	}
+
+	@Test(groups={"it"})
+	public void testIsVisible() {
+		Assert.assertTrue(testPage.picture.isElementPresent());
+	}
+	
+	@Test(groups={"it"})
+	public void testIsNotVisible() {
+		Assert.assertFalse(testPage.pictureNotPresent.isElementPresent());
+	}
 	
 	
 }
