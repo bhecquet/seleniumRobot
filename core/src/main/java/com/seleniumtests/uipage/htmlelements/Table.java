@@ -85,6 +85,18 @@ public class Table extends HtmlElement {
     	findTableElement();
         return columns.size();
     }
+    
+    public List<WebElement> getRowCells(WebElement row) {
+    	List<WebElement> cells;
+    	if (row == null) {
+    		return new ArrayList<>();
+    	}
+    	cells = row.findElements(By.tagName("td"));
+    	if (cells.isEmpty()) {
+    		cells = row.findElements(By.tagName("th"));
+    	}
+    	return cells;
+    }
 
     /**
      * Get table cell content.
@@ -95,9 +107,9 @@ public class Table extends HtmlElement {
     }
     
     /**
-     * 
-     * @param content
-     * @param column
+     * Returns the cell from table, searching for its content by pattern
+     * @param content	pattern to search for
+     * @param column	column where pattern should be searched
      * @return
      */
     public WebElement getCellFromContent(final Pattern content, final int column) {

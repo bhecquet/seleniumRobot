@@ -40,6 +40,7 @@ public class TestHtmlElement extends GenericTest {
 	@BeforeClass(groups={"ut"})
 	public static void initDriver(final ITestContext testNGCtx) throws Exception {
 		SeleniumTestsContextManager.initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setReplayTimeout(1);
 		SeleniumTestsContextManager.getThreadContext().setBrowser("htmlunit");
 		testPage = new DriverTestPage(true);
 		driver = WebUIDriver.getWebDriver(true);
@@ -51,132 +52,131 @@ public class TestHtmlElement extends GenericTest {
 		WebUIDriver.cleanUp();
 	}
 	
-	@Test(groups={"ut"})
-	public void testClickDiv() {
-		testDriverIt.testClickDiv();
-	}
-	
-	
-	
-	@Test(groups={"ut"})
-	public void testClickRadio() {
-		testDriverIt.testClickRadio();
-	}
-   
-	@Test(groups={"ut"})
-	public void testClickCheckBox() {
-		testDriverIt.testClickCheckBox();
-	}
-	
-	/**
-	 * Test javascript actions
-	 */
-	@Test(groups={"ut"})
-	public void testClickJsDiv() {
-		testDriverIt.testClickJsDiv();
-	}
-   
-	@Test(groups={"ut"})
-	public void testClickJsRadio() {
-		testDriverIt.testClickJsRadio();
-	}
-   
-	@Test(groups={"ut"})
-	public void testClickJsCheckbox() {
-		testDriverIt.testClickJsCheckbox();
-	}
-   
-	@Test(groups={"ut"})
-	public void testSendKeys() {
-		testDriverIt.testSendKeys();
-	}
-   
-	@Test(groups={"ut"})
-	public void testSendKeysJs() {
-		testDriverIt.testSendKeysJs();
-	}
-	
-	@Test(groups={"ut"})
-	public void testOnBlur() {
-		testDriverIt.testOnBlur();
-	}
-	
-	@Test(groups={"ut"})
-	public void testFindElements() {
-		testDriverIt.testFindElements();
-	}
-
-	/**
-	 * Search an element inside an other one
-	 */
-	@Test(groups={"ut"})
-	public void testFindSubElement() {
-		testDriverIt.testFindSubElement();
-	}
-	
-	/**
-	 * Search the n th element inside an other one
-	 */
-	@Test(groups={"ut"})
-	public void testFindNthSubElement() {
-		testDriverIt.testFindNthSubElement();
-	}
-	
-	/**
-	 * Search the n th element corresponding to locator
-	 */
-	@Test(groups={"ut"})
-	public void testFindNthElement() {
-		testDriverIt.testFindNthElement();
-	}
-
-	/**
-	 * test specific HtmlElements actions
-	 */
-	@Test(groups={"ut"})
-	public void testFindPattern1() {
-		testDriverIt.testFindPattern1();
-	}
-	
-	@Test(groups={"ut"})
-	public void testFindPattern2() {
-		testDriverIt.testFindPattern2();
-	}
-	
-	@Test(groups={"ut"}) 
-	public void testFindPattern3() {
-		testDriverIt.testFindPattern3();
-	}
-	
-	/**
-	 * text search
-	 */
-	@Test(groups={"ut"})
-	public void testFindPattern4() {
-		testDriverIt.testFindPattern4();
-	}
-	
-	@Test(groups={"ut"})
-	public void testIsElementPresent() {
-		Assert.assertTrue(testPage.textElement.isElementPresent(2));
-	}
-	
-	@Test(groups={"ut"})
-	public void testIsElementNotPresent() {
-		Assert.assertFalse(new HtmlElement("", By.id("divNotFound")).isElementPresent(2));
-	}
-	
+//	@Test(groups={"ut"})
+//	public void testClickDiv() {
+//		testDriverIt.testClickDiv();
+//	}
+//	
+//	
+//	
+//	@Test(groups={"ut"})
+//	public void testClickRadio() {
+//		testDriverIt.testClickRadio();
+//	}
+//   
+//	@Test(groups={"ut"})
+//	public void testClickCheckBox() {
+//		testDriverIt.testClickCheckBox();
+//	}
+//	
+//	/**
+//	 * Test javascript actions
+//	 */
+//	@Test(groups={"ut"})
+//	public void testClickJsDiv() {
+//		testDriverIt.testClickJsDiv();
+//	}
+//   
+//	@Test(groups={"ut"})
+//	public void testClickJsRadio() {
+//		testDriverIt.testClickJsRadio();
+//	}
+//   
+//	@Test(groups={"ut"})
+//	public void testClickJsCheckbox() {
+//		testDriverIt.testClickJsCheckbox();
+//	}
+//   
+//	@Test(groups={"ut"})
+//	public void testSendKeys() {
+//		testDriverIt.testSendKeys();
+//	}
+//   
+//	@Test(groups={"ut"})
+//	public void testSendKeysJs() {
+//		testDriverIt.testSendKeysJs();
+//	}
+//	
+//	@Test(groups={"ut"})
+//	public void testOnBlur() {
+//		testDriverIt.testOnBlur();
+//	}
+//	
+//	@Test(groups={"ut"})
+//	public void testFindElements() {
+//		testDriverIt.testFindElements();
+//	}
+//
+//	/**
+//	 * Search an element inside an other one
+//	 */
+//	@Test(groups={"ut"})
+//	public void testFindSubElement() {
+//		testDriverIt.testFindSubElement();
+//	}
+//	
+//	/**
+//	 * Search the n th element inside an other one
+//	 */
+//	@Test(groups={"ut"})
+//	public void testFindNthSubElement() {
+//		testDriverIt.testFindNthSubElement();
+//	}
+//	
+//	/**
+//	 * Search the n th element corresponding to locator
+//	 */
+//	@Test(groups={"ut"})
+//	public void testFindNthElement() {
+//		testDriverIt.testFindNthElement();
+//	}
+//
+//	/**
+//	 * test specific HtmlElements actions
+//	 */
+//	@Test(groups={"ut"})
+//	public void testFindPattern1() {
+//		testDriverIt.testFindPattern1();
+//	}
+//	
+//	@Test(groups={"ut"})
+//	public void testFindPattern2() {
+//		testDriverIt.testFindPattern2();
+//	}
+//	
+//	@Test(groups={"ut"}) 
+//	public void testFindPattern3() {
+//		testDriverIt.testFindPattern3();
+//	}
+//	
+//	/**
+//	 * text search
+//	 */
+//	@Test(groups={"ut"})
+//	public void testFindPattern4() {
+//		testDriverIt.testFindPattern4();
+//	}
+//	
+//	@Test(groups={"ut"})
+//	public void testIsElementPresent() {
+//		Assert.assertTrue(testPage.textElement.isElementPresent(2));
+//	}
+//	
+//	@Test(groups={"ut"})
+//	public void testIsElementNotPresent() {
+//		Assert.assertFalse(new HtmlElement("", By.id("divNotFound")).isElementPresent(2));
+//	}
+//	
 	@Test(groups={"ut"})
 	public void testFindTextElementInsideHtmlElement() {
-		testPage.textElement2.sendKeys("hello");
-		Assert.assertEquals(testPage.textElement2.getValue(), "hello");
+		Assert.assertEquals(testPage.textElement2.getValue(), "default");
 	}
 	
 	@Test(groups={"ut"})
 	public void testFindRadioElementInsideHtmlElement() {
 		try {
 			testPage.radioElement2.click();
-			Assert.assertTrue(testPage.radioElement2.isSelected());
+			Assert.assertTrue(new HtmlElement("", By.id("radioClickParent")).isSelected());
 		} finally {
 			testPage.resetButton.click();
 		}
@@ -186,7 +186,7 @@ public class TestHtmlElement extends GenericTest {
 	public void testFindCheckElementInsideHtmlElement() {
 		try {
 			testPage.checkElement2.click();
-			Assert.assertTrue(testPage.checkElement2.isSelected());
+			Assert.assertTrue(new HtmlElement("", By.id("checkboxClickParent")).isSelected());
 		} finally {
 			testPage.resetButton.click();
 		}
@@ -194,22 +194,22 @@ public class TestHtmlElement extends GenericTest {
 	
 	@Test(groups={"ut"})
 	public void testFindButtonElementInsideHtmlElement() {
-		Assert.assertEquals(testPage.startButton2.getText(), "Start Animation");
+		Assert.assertEquals(testPage.resetButton2.getText(), "reset button");
 	}
 	
 	@Test(groups={"ut"})
 	public void testFindLinkElementInsideHtmlElement() {
-		Assert.assertTrue(testPage.link2.getUrl().contains("http://www.google.fr"));
+		Assert.assertTrue(testPage.linkElement2.getUrl().contains("http://www.googleFrance.fr"));
 	}
 	
 	@Test(groups={"ut"})
 	public void testFindSelectElementInsideHtmlElement() {
-		Assert.assertEquals(testPage.selectList2.getOptions().size(), 3);
+		Assert.assertEquals(testPage.selectList2.getOptions().size(), 2);
 	}
 	
 	@Test(groups={"ut"})
 	public void testFindTableInsideHtmlElement() {
-		Assert.assertEquals(testPage.table2.getRowCount(), 3);
+		Assert.assertEquals(testPage.table2.getRowCount(), 2);
 	}
 	
 	/*
@@ -218,15 +218,14 @@ public class TestHtmlElement extends GenericTest {
 	
 	@Test(groups={"ut"})
 	public void testFindTextElementsInsideHtmlElement() {
-		testPage.textElement2.sendKeys("hello");
-		Assert.assertEquals(testPage.textElement2.getValue(), "hello");
+		Assert.assertEquals(testPage.textElement3.getValue(), "default");
 	}
 	
 	@Test(groups={"ut"})
 	public void testFindRadioElementsInsideHtmlElement() {
 		try {
-			testPage.radioElement2.click();
-			Assert.assertTrue(testPage.radioElement2.isSelected());
+			testPage.radioElement3.click();
+			Assert.assertTrue(new HtmlElement("", By.id("radioClickParent")).isSelected());
 		} finally {
 			testPage.resetButton.click();
 		}
@@ -235,8 +234,8 @@ public class TestHtmlElement extends GenericTest {
 	@Test(groups={"ut"})
 	public void testFindCheckElementsInsideHtmlElement() {
 		try {
-			testPage.checkElement2.click();
-			Assert.assertTrue(testPage.checkElement2.isSelected());
+			testPage.checkElement3.click();
+			Assert.assertTrue(new HtmlElement("", By.id("checkboxClickParent")).isSelected());
 		} finally {
 			testPage.resetButton.click();
 		}
@@ -244,22 +243,22 @@ public class TestHtmlElement extends GenericTest {
 	
 	@Test(groups={"ut"})
 	public void testFindButtonElementsInsideHtmlElement() {
-		Assert.assertEquals(testPage.startButton2.getText(), "Start Animation");
+		Assert.assertEquals(testPage.resetButton3.getText(), "reset button");
 	}
 	
 	@Test(groups={"ut"})
 	public void testFindLinkElementsInsideHtmlElement() {
-		Assert.assertTrue(testPage.link2.getUrl().contains("http://www.google.fr"));
+		Assert.assertTrue(testPage.linkElement3.getUrl().contains("http://www.googleFrance.fr"));
 	}
 	
 	@Test(groups={"ut"})
 	public void testFindSelectElementsInsideHtmlElement() {
-		Assert.assertEquals(testPage.selectList2.getOptions().size(), 3);
+		Assert.assertEquals(testPage.selectList3.getOptions().size(), 2);
 	}
 	
 	@Test(groups={"ut"})
 	public void testFindTablesInsideHtmlElement() {
-		Assert.assertEquals(testPage.table2.getRowCount(), 3);
+		Assert.assertEquals(testPage.table3.getRowCount(), 2);
 	}
 	
 }
