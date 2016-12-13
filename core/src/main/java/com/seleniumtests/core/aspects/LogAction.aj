@@ -257,7 +257,15 @@ public class LogAction {
 		if (joinPoint.getArgs().length > 0) {
 			argString = "with args: (";
 			for (Object arg: joinPoint.getArgs()) {
-				argString += (arg == null ? "null": arg.toString()) + ", ";
+				if (arg instanceof CharSequence[]) {
+					argString += "[";
+					for (Object obj: (CharSequence[])arg) {
+						argString += obj.toString() + ",";
+					}
+					argString += "]";
+				} else {
+					argString += (arg == null ? "null": arg.toString()) + ", ";
+				}
 			}
 			argString += ")";
 		}
