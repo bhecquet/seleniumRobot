@@ -20,6 +20,7 @@ Below is the list of all parameters accepted in testing xml file. These paramete
 | chromeDriverPath 			| 			| Path to a different installation of chromedriver executable | 
 | chromeBinaryPath 			| 			| Path to chrome binary if using a portable installation (not detected by system | 
 | ieDriverPath 				| 			| Path to a different ieDriverServer executable | 
+| edgeDriverPath			| 			| Path to a different edge driver executable |
 | userAgent 				| 			| Allow defining a specific user-agent in chrome and firefox only | 
 | enableJavascript 			| true		| Javascript activation |
 | browserDownloadDir 		| 			| Path where files are downloaded. Firefox only | 

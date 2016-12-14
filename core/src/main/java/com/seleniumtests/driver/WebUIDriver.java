@@ -26,6 +26,7 @@ import org.openqa.selenium.support.events.WebDriverEventListener;
 
 import com.seleniumtests.browserfactory.AppiumDriverFactory;
 import com.seleniumtests.browserfactory.ChromeDriverFactory;
+import com.seleniumtests.browserfactory.EdgeDriverFactory;
 import com.seleniumtests.browserfactory.FirefoxDriverFactory;
 import com.seleniumtests.browserfactory.HtmlUnitDriverFactory;
 import com.seleniumtests.browserfactory.IEDriverFactory;
@@ -81,6 +82,8 @@ public class WebUIDriver {
 	                webDriverBuilder = new FirefoxDriverFactory(this.config);
 	            } else if (config.getBrowser() == BrowserType.INTERNETEXPLORER) {
 	                webDriverBuilder = new IEDriverFactory(this.config);
+	            } else if (config.getBrowser() == BrowserType.EDGE) {
+	            	webDriverBuilder = new EdgeDriverFactory(this.config);
 	            } else if (config.getBrowser() == BrowserType.CHROME) {
 	                webDriverBuilder = new ChromeDriverFactory(this.config);
 	            } else if (config.getBrowser() == BrowserType.HTMLUNIT) {
@@ -273,6 +276,9 @@ public class WebUIDriver {
 
         String chromeDriverPath = SeleniumTestsContextManager.getThreadContext().getChromeDriverPath();
         config.setChromeDriverPath(chromeDriverPath);
+        
+        String edgeDriverPath = SeleniumTestsContextManager.getThreadContext().getEdgeDriverPath();
+        config.setEdgeDriverPath(edgeDriverPath);
 
         String ieDriverPath = SeleniumTestsContextManager.getThreadContext().getIEDriverPath();
         config.setIeDriverPath(ieDriverPath);

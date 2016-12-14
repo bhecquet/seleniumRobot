@@ -47,6 +47,7 @@ public class DriverConfig {
     private String ffBinPath;
     private String ieDriverPath;
     private String chromeDriverPath;
+    private String edgeDriverPath;
     private String chromeBinPath;
     private int webSessionTimeout = 90 * 1000;
     public static final int DEFAULT_IMPLICIT_WAIT_TIMEOUT = 5;
@@ -407,7 +408,15 @@ public class DriverConfig {
         this.appActivity = appActivity;
     }
 
-    public Integer getNewCommandTimeout() {
+    public String getEdgeDriverPath() {
+		return edgeDriverPath;
+	}
+
+	public void setEdgeDriverPath(String edgeDriverPath) {
+		this.edgeDriverPath = edgeDriverPath;
+	}
+
+	public Integer getNewCommandTimeout() {
         return newCommandTimeout;
     }
 
