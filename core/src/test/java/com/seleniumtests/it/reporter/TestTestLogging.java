@@ -122,7 +122,10 @@ public class TestTestLogging extends GenericTest {
 	public void checkTestStepHandling() throws Exception {
 		executeSubTest(1, "StubTestClassForTestSteps");
 		Assert.assertTrue(SeleniumRobotLogger.getTestLogs().get("testPage").contains("Start method testPage"));	
-		Assert.assertTrue(SeleniumRobotLogger.getTestLogs().get("testPage").contains("TestLogging: tell me why"));	
+		Assert.assertTrue(SeleniumRobotLogger.getTestLogs().get("testPage").contains("TestLogging: tell me why"));
+		
+		// check log level is present
+		Assert.assertTrue(SeleniumRobotLogger.getTestLogs().get("testPage").contains("INFO "));	
 	}
 	
 }
