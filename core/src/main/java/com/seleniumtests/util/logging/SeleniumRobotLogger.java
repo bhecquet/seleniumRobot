@@ -109,7 +109,7 @@ public class SeleniumRobotLogger {
 				}
 				if (testPerThread.get(thread) != null) {
 					String testName = testPerThread.get(thread);
-					SeleniumRobotLogger.testLogs.put(testName, SeleniumRobotLogger.testLogs.get(testName).concat(content + "\n"));
+					SeleniumRobotLogger.testLogs.put(testName, SeleniumRobotLogger.testLogs.get(testName).concat(line + "\n"));
 				}
 			}
 		}
