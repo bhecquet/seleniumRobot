@@ -62,9 +62,7 @@ public class PageObject extends BasePage implements IPage {
     private String popupWindowName = null;
     private String title = null;
     private String url = null;
-    private String bodyText = null;
     private String htmlSource = null;
-    private String htmlSavedToPath = null;
     private String suiteName = null;
     private String outputDirectory = null;
     private String htmlFilePath = null;
@@ -131,10 +129,6 @@ public class PageObject extends BasePage implements IPage {
             TestLogging.log("Open web page in :" + (endTime - startTime) / 1000 + "seconds");
         }
     }
-    
-    protected void setHtmlSavedToPath(final String htmlSavedToPath) {
-        this.htmlSavedToPath = htmlSavedToPath;
-    }
 
     protected void setTitle(final String title) {
         this.title = title;
@@ -146,11 +140,6 @@ public class PageObject extends BasePage implements IPage {
     
     public String getHtmlFilePath() {
         return htmlFilePath;
-    }
-
-    @Override
-    public String getHtmlSavedToPath() {
-        return htmlSavedToPath;
     }
 
     @Override
@@ -250,7 +239,7 @@ public class PageObject extends BasePage implements IPage {
 
         if (screenShot.getHtmlSourcePath() != null) {
             htmlFilePath = screenShot.getHtmlSourcePath().replace(suiteName, outputDirectory);
-            htmlSavedToPath = screenShot.getHtmlSourcePath();
+            htmlSource = screenShot.getHtmlSource();
         }
 
         if (screenShot.getImagePath() != null) {
@@ -313,11 +302,6 @@ public class PageObject extends BasePage implements IPage {
      */
     public void dragAndDrop(final HtmlElement element, final int offsetX, final int offsetY) {
         new Actions(driver).dragAndDropBy((WebElement) element.getElement(), offsetX, offsetY).perform();
-    }
-
-    @Override
-    public String getBodyText() {
-        return bodyText;
     }
 
     public final String getCookieByName(final String name) {
@@ -409,20 +393,6 @@ public class PageObject extends BasePage implements IPage {
         	logger.error(e);
             throw new CustomSeleniumTestsException(e);
         }
-    }
-
-    private void populateAndCapturePageSnapshot() {
-        try {
-            setTitle(driver.getTitle());
-            htmlSource = driver.getPageSource();
-            bodyText = new HtmlElement("Body", By.tagName("body")).getText();
-        } catch (UnreachableBrowserException e) { 
-            throw new WebDriverException(e);
-        } catch (WebDriverException e) {
-            throw e;
-        }
-
-        capturePageSnapshot();
     }
 
     public final void refresh()  {
@@ -557,7 +527,7 @@ public class PageObject extends BasePage implements IPage {
 
         // populate page info
         try {
-            populateAndCapturePageSnapshot();
+        	capturePageSnapshot();
         } catch (Exception ex) {
         	logger.error(ex);
             throw ex;

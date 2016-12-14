@@ -1,21 +1,22 @@
 package com.seleniumtests.ut.driver;
 
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
+
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import org.apache.commons.io.FileUtils;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.never;
 import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import com.seleniumtests.GenericTest;
 import com.seleniumtests.MockitoTest;
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.customexception.DriverExceptions;
 import com.seleniumtests.driver.DriverExtractor;
 import com.seleniumtests.util.osutility.OSUtility;
 
@@ -41,10 +42,13 @@ public class TestDriverExtractor extends MockitoTest {
 		} else {
 			Assert.assertTrue(Paths.get(driverPath.toString(), "chromedriver").toFile().exists());
 		}
-		Assert.assertTrue(Paths.get(driverPath.toString(), "version.txt").toFile().exists());
+		Assert.assertTrue(Paths.get(driverPath.toString(), "version_chromedriver.txt").toFile().exists());
 	}
 	
-
+	/**
+	 * Driver file already exists with version file up to date
+	 * @throws IOException
+	 */
 	@Test(groups={"ut"})
 	public void testDriverNotExtractedAlreadyExists() throws IOException {
 		
@@ -61,6 +65,19 @@ public class TestDriverExtractor extends MockitoTest {
 		verify(driverExtractor, never()).copyDriver("chromedriver");
 	}
 	
+	/**
+	 * Error handling when the specified driver does not exist
+	 * @throws IOException
+	 */
+	@Test(groups={"ut"}, expectedExceptions=DriverExceptions.class)
+	public void testCopyDriverNull() throws IOException {
+		new DriverExtractor().extractDriver("toto");
+	}
+	
+	/**
+	 * driver extracted as version file does not exist
+	 * @throws IOException
+	 */
 	@Test(groups={"ut"})
 	public void testDriverNotExtractedAlreadyExistsNoVersion() throws IOException {
 		
@@ -71,7 +88,7 @@ public class TestDriverExtractor extends MockitoTest {
 		new DriverExtractor().extractDriver("chromedriver");
 		
 		// remove version to force copy
-		Paths.get(driverPath.toString(), "version.txt").toFile().delete();
+		Paths.get(driverPath.toString(), "version_chromedriver.txt").toFile().delete();
 		
 		DriverExtractor driverExtractor = spy(new DriverExtractor());
 		driverExtractor.extractDriver("chromedriver");

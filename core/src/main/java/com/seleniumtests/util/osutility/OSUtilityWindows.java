@@ -24,6 +24,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class OSUtilityWindows extends OSUtility {
+	
+	Pattern versionPattern = Pattern.compile(".*?(\\d+\\.\\d+\\.\\d+).*?");
 		
 	@Override
 	public int getIEVersion() {
@@ -95,5 +97,17 @@ public class OSUtilityWindows extends OSUtility {
 	@Override
 	public String getProgramExtension() {
 		return ".exe";
+	}
+
+	@Override
+	public String getOSBuild() {
+		String version = OSCommand.executeCommandAndWait("cmd /C ver").replace("\r", "").replace("\n", "").trim();
+		Matcher versionMatcher = versionPattern.matcher(version);
+		if (versionMatcher.matches()) {
+			return versionMatcher.group(1);
+		} else {
+			logger.error("could not get Windows version");
+			return "5000";
+		}
 	}
 }

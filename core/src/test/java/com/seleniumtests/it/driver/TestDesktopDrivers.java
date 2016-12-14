@@ -16,8 +16,10 @@
  */
 package com.seleniumtests.it.driver;
 
+import org.apache.commons.lang3.SystemUtils;
 import org.testng.Assert;
 import org.testng.ITestContext;
+import org.testng.SkipException;
 import org.testng.annotations.Test;
 import org.testng.xml.XmlTest;
 
@@ -46,8 +48,22 @@ public class TestDesktopDrivers extends GenericDriverTest {
 	
 	@Test(groups={"it"})
 	public void testIEStartup(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		if (!SystemUtils.IS_OS_WINDOWS) {
+			throw new SkipException("This test can only be done on Windows");
+		}
 		SeleniumTestsContextManager.initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setBrowser("*iexplore");
+		driver = WebUIDriver.getWebDriver(true);
+		Assert.assertTrue(driver.getCurrentUrl().contains("http://localhost:"));
+	}
+	
+	@Test(groups={"it"})
+	public void testEdgeStartup(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		if (!SystemUtils.IS_OS_WINDOWS_10) {
+			throw new SkipException("This test can only be done on Windows 10");
+		}
+		SeleniumTestsContextManager.initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setBrowser("*edge");
 		driver = WebUIDriver.getWebDriver(true);
 		Assert.assertTrue(driver.getCurrentUrl().contains("http://localhost:"));
 	}

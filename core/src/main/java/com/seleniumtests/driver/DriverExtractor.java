@@ -1,10 +1,8 @@
 package com.seleniumtests.driver;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.nio.file.CopyOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -21,6 +19,7 @@ import org.openqa.selenium.Platform;
 import org.w3c.dom.Document;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.customexception.DriverExceptions;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 import com.seleniumtests.util.osutility.OSUtilityFactory;
 
@@ -33,7 +32,7 @@ import com.seleniumtests.util.osutility.OSUtilityFactory;
  */
 public class DriverExtractor {
 	
-	private static final String DRIVER_VERSION_FILE = "version.txt";
+	private static final String DRIVER_VERSION_FILE = "version_%s.txt";
 	private static final String DRIVER_FOLDER = "drivers";
 	private static final Logger logger = SeleniumRobotLogger.getLogger(DriverExtractor.class);
 
@@ -121,12 +120,16 @@ public class DriverExtractor {
 		return version.isEmpty() ? "unknown" : version;
 	}
 	
-	private String getDriverVersion() {
+	private String getDriverVersion(String driverName) {
 		try {
-			return FileUtils.readFileToString(Paths.get(getDriverPath().toFile().getAbsolutePath(), DRIVER_VERSION_FILE).toFile());
+			return FileUtils.readFileToString(Paths.get(getDriverPath().toFile().getAbsolutePath(), getDriverVersionFileName(driverName)).toFile());
 		} catch (IOException e) {
 			return null;
 		}
+	}
+	
+	private String getDriverVersionFileName(String driverName) {
+		return String.format(DRIVER_VERSION_FILE, driverName);
 	}
 	
 	/**
@@ -139,7 +142,7 @@ public class DriverExtractor {
 	 */
 	public String extractDriver(String driverName) throws IOException {
 		
-		String driverVersion = getDriverVersion();
+		String driverVersion = getDriverVersion(driverName);
 		String robotVersion = getVersion();
 		Path driverPath = getDriverPath(driverName);
 		
@@ -149,22 +152,31 @@ public class DriverExtractor {
 		} 
 		
 		// write version file
-		FileUtils.writeStringToFile(Paths.get(getDriverPath().toFile().getAbsolutePath(), DRIVER_VERSION_FILE).toFile(), robotVersion);
+		FileUtils.writeStringToFile(Paths.get(getDriverPath().toFile().getAbsolutePath(), getDriverVersionFileName(driverName)).toFile(), robotVersion);
 		
 		return driverPath.toString();
 	}
 	
-	public void copyDriver(String driverName) throws IOException {
+	public void copyDriver(String driverName) {
 		InputStream driver = Thread.currentThread().getContextClassLoader().getResourceAsStream(String.format("drivers/%s/%s%s", 
 						Platform.getCurrent().family().toString().toLowerCase(), 
 						driverName,
 						OSUtilityFactory.getInstance().getProgramExtension()));
 		
+		if (driver == null) {
+			throw new DriverExceptions(String.format("Driver %s does not exist in resources", driverName));
+		}
 		Path driverPath = getDriverPath(driverName);
 		
 		driverPath.toFile().getParentFile().mkdirs();
-		Files.copy(driver, driverPath, StandardCopyOption.REPLACE_EXISTING);
-		logger.info(String.format("Driver %s copied to %s", driverName, driverPath));
+		
+		try {
+			Files.copy(driver, driverPath, StandardCopyOption.REPLACE_EXISTING);
+			logger.info(String.format("Driver %s copied to %s", driverName, driverPath));
+		} catch (IOException e) {
+			logger.info(String.format("Driver not copied: %s - it may be in use"));
+		}
+		
 	}
 	
 	public static Path getDriverPath() {

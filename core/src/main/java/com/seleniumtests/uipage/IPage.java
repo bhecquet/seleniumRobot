@@ -18,10 +18,6 @@ package com.seleniumtests.uipage;
 
 public interface IPage {
 
-    String getBodyText();
-
-    String getHtmlSavedToPath();
-
     String getHtmlSource();
 
     String getLocation();

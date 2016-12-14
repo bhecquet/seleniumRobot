@@ -135,6 +135,10 @@ public class DriverExceptionListener implements WebDriverEventListener {
             return;
         } else if (ex.getMessage().contains(" read-only")) {
             return;
+            
+        // Edge driver does return a WebDriverException when doing getPageSource
+        } else if (ex.getMessage().contains("not implemented")) {
+        	return;
         } else if (ex.getMessage().contains("No response on ECMAScript evaluation command")) { // Opera
 
             // customexception
