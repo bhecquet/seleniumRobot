@@ -72,6 +72,7 @@ public class SeleniumTestsContext {
     public static final String OPERA_USER_PROFILE_PATH = "operaUserProfilePath";	// profile utilisateur opéra
     public static final String FIREFOX_BINARY_PATH = "firefoxBinaryPath";		// chemin vers le binaire firefox (firefox portable ou pour utiliser une version spécifique
     public static final String CHROME_DRIVER_PATH = "chromeDriverPath";			// chemin vers chromeDriver si on souhaite utiliser une version différente
+    public static final String EDGE_DRIVER_PATH = "edgeDriverPath";				// path to Edge driver binary if we want to use an other version than the provided one
     public static final String CHROME_BINARY_PATH = "chromeBinaryPath";			// chemin vers le binaire chrome lorsque celui-ci n'est pas installé de manière normale
     public static final String IE_DRIVER_PATH = "ieDriverPath";					// chemin vers le driver Internet Explorer
     public static final String USER_AGENT = "userAgent";						// user agent utilisé pour les tests. Permet d'écraser le user-agent par défaut du navigateur, sur firefox et chrome uniquement
@@ -170,6 +171,7 @@ public class SeleniumTestsContext {
         setOperaUserProfilePath(getValueForTest(OPERA_USER_PROFILE_PATH, System.getProperty(OPERA_USER_PROFILE_PATH)));
         setFirefoxBinary(getValueForTest(FIREFOX_BINARY_PATH, System.getProperty(FIREFOX_BINARY_PATH)));
         setChromeDriverPath(getValueForTest(CHROME_DRIVER_PATH, System.getProperty(CHROME_DRIVER_PATH)));
+        setEdgeDriverPath(getValueForTest(EDGE_DRIVER_PATH, System.getProperty(EDGE_DRIVER_PATH)));
         setIEDriverPath(getValueForTest(IE_DRIVER_PATH, System.getProperty(IE_DRIVER_PATH)));
         setUserAgent(getValueForTest(USER_AGENT, System.getProperty(USER_AGENT)));
         setAssumeUntrustedCertificateIssuer(getBoolValueForTest(SET_ASSUME_UNTRUSTED_CERTIFICATE_ISSUER, System.getProperty(SET_ASSUME_UNTRUSTED_CERTIFICATE_ISSUER)));
@@ -387,6 +389,10 @@ public class SeleniumTestsContext {
 
     public String getChromeDriverPath() {
         return (String) getAttribute(CHROME_DRIVER_PATH);
+    }
+    
+    public String getEdgeDriverPath() {
+    	return (String) getAttribute(EDGE_DRIVER_PATH);
     }
 
     public String getDPTagsExclude() {
@@ -896,6 +902,10 @@ public class SeleniumTestsContext {
     
     public void setChromeDriverPath(String path) {
     	setAttribute(CHROME_DRIVER_PATH, path);
+    }
+    
+    public void setEdgeDriverPath(String path) {
+    	setAttribute(EDGE_DRIVER_PATH, path);
     }
     
     public void setIEDriverPath(String path) {
