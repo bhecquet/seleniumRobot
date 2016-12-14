@@ -19,6 +19,7 @@ package com.seleniumtests.driver;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.apache.log4j.Logger;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.remote.FileDetector;
@@ -26,11 +27,14 @@ import org.openqa.selenium.remote.UselessFileDetector;
 import org.openqa.selenium.support.events.EventFiringWebDriver;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
 /**
  * Supports file upload in remote webdriver.
  */
 public class CustomEventFiringWebDriver extends EventFiringWebDriver {
+	
+	private static final Logger logger = SeleniumRobotLogger.getLogger(CustomEventFiringWebDriver.class);
     private FileDetector fileDetector = new UselessFileDetector();
     private WebDriver driver = null;
     private Set<String> currentHandles;
@@ -62,6 +66,19 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver {
 
     public WebDriver getWebDriver() {
         return driver;
+    }
+    
+    /**
+     * Handle WebDriver exception when this method is not implemented
+     */
+    @Override
+    public String getPageSource() {
+    	try {
+    		return super.getPageSource();
+    	} catch (WebDriverException e) {
+    		logger.info("page source not get: " + e.getMessage());
+    		return null;
+    	}
     }
     
     public Set<String> getCurrentHandles() {

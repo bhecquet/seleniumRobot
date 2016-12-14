@@ -16,9 +16,18 @@
  */
 package com.seleniumtests.driver.screenshots;
 
+import java.io.File;
+import java.io.IOException;
+
+import org.apache.commons.io.FileUtils;
+import org.apache.log4j.Logger;
+
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
 public class ScreenShot {
+	
+	private static final Logger logger = SeleniumRobotLogger.getLogger(ScreenShot.class);
 
     private String location;
     private String htmlSourcePath;
@@ -77,6 +86,19 @@ public class ScreenShot {
 
     public String getHtmlSourcePath() {
         return htmlSourcePath;
+    }
+    
+    public String getHtmlSource() {
+    	if (htmlSourcePath != null) {
+    		try {
+				return FileUtils.readFileToString(new File(outputDirectory + "/" + htmlSourcePath));
+			} catch (IOException e) {
+				logger.error("cannot read source file", e);
+				return "";
+			}
+    	} else {
+    		return "";
+    	}
     }
 
     public String getImagePath() {

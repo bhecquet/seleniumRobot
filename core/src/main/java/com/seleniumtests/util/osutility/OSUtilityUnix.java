@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Matcher;
 
 public class OSUtilityUnix extends OSUtility {
 	
@@ -85,5 +86,11 @@ public class OSUtilityUnix extends OSUtility {
 	@Override
 	public int getIEVersion() {
 		return 0;
+	}
+	
+
+	@Override
+	public String getOSBuild() {
+		return OSCommand.executeCommandAndWait("uname -a");
 	}
 }

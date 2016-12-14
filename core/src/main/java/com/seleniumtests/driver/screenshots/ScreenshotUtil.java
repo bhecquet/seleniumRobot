@@ -32,6 +32,7 @@ import org.apache.log4j.Logger;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebDriverException;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.ScenarioException;
@@ -208,7 +209,12 @@ public class ScreenshotUtil {
                 }
 
                 title = driver.getTitle();
-                pageSource = driver.getPageSource();
+                
+                try {
+                	pageSource = driver.getPageSource();
+                } catch (WebDriverException e) {
+                	pageSource = "";
+                }
             } 
             
             this.filename = HashCodeGenerator.getRandomHashCode("web");

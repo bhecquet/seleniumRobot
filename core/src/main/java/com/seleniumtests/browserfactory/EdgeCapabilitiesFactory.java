@@ -18,13 +18,16 @@ package com.seleniumtests.browserfactory;
 
 import java.io.IOException;
 
+import org.apache.commons.lang3.SystemUtils;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
+import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.driver.DriverConfig;
 import com.seleniumtests.driver.DriverExtractor;
 import com.seleniumtests.driver.DriverMode;
 import com.seleniumtests.util.FileUtility;
+import com.seleniumtests.util.osutility.OSUtilityFactory;
 
 public class EdgeCapabilitiesFactory extends ICapabilitiesFactory {
 
@@ -35,9 +38,11 @@ public class EdgeCapabilitiesFactory extends ICapabilitiesFactory {
      */
     @Override
     public DesiredCapabilities createCapabilities(final DriverConfig webDriverConfig) {
-        DesiredCapabilities capability;
-        capability = DesiredCapabilities.edge();
+        DesiredCapabilities capability = DesiredCapabilities.edge();
         
+        if (!SystemUtils.IS_OS_WINDOWS_10) {
+        	throw new ConfigurationException("Edge browser is only available on Windows 10");
+        }
 
         if (webDriverConfig.isEnableJavascript()) {
             capability.setJavascriptEnabled(true);
@@ -66,9 +71,15 @@ public class EdgeCapabilitiesFactory extends ICapabilitiesFactory {
         return capability;
     }
     
-
+    
+    
+    /**
+     * Get Windows version as Edge driver is tied to it
+     * @throws IOException
+     */
     public void handleExtractResources() throws IOException {
-    	String driverPath = new DriverExtractor().extractDriver("MicrosoftWebDriver");
+    	String driverVersion = OSUtilityFactory.getInstance().getOSBuild().split("\\.")[2];
+    	String driverPath = new DriverExtractor().extractDriver("MicrosoftWebDriver_" + driverVersion);
     
     	driverPath = FileUtility.decodePath(driverPath);
 

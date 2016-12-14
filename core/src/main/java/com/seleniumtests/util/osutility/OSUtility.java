@@ -29,7 +29,7 @@ import com.seleniumtests.util.logging.SeleniumRobotLogger;
  */
 public abstract class OSUtility {
 
-	private static final Logger logger = SeleniumRobotLogger.getLogger(OSUtility.class);
+	protected static final Logger logger = SeleniumRobotLogger.getLogger(OSUtility.class);
 	
 	private String[] webBrowserProcessList= 
 		{ 
@@ -228,5 +228,7 @@ public abstract class OSUtility {
     }
     
     public abstract int getIEVersion();
+    
+    public abstract String getOSBuild();
     
 }
