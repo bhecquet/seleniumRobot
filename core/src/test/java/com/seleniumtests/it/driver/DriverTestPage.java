@@ -96,6 +96,7 @@ public class DriverTestPage extends PageObject {
 	public static final ButtonElement buttonIFrame = new ButtonElement("Button", By.id("buttonIFrame"), iframe);
 	public static final LinkElement linkIFrame = new LinkElement("My link", By.id("linkIFrame"), iframe);
 	public static final SelectList selectListIFrame = new SelectList("list", By.id("selectIFrame"), iframe);
+	public static final HtmlElement optionOfSelectListIFrame = selectListIFrame.findElement(By.tagName("option"));
 	public static final Table tableIFrame = new Table("table", By.id("tableIframe"), iframe);
 	public static final LabelElement labelIFrame = new LabelElement("label", By.id("labelIFrame"), iframe);
 	

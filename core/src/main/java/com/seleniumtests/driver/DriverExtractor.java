@@ -174,7 +174,7 @@ public class DriverExtractor {
 			Files.copy(driver, driverPath, StandardCopyOption.REPLACE_EXISTING);
 			logger.info(String.format("Driver %s copied to %s", driverName, driverPath));
 		} catch (IOException e) {
-			logger.info(String.format("Driver not copied: %s - it may be in use"));
+			logger.info(String.format("Driver not copied: %s - it may be in use", driverName));
 		}
 		
 	}
