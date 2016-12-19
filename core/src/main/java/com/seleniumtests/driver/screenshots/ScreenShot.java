@@ -40,7 +40,7 @@ public class ScreenShot {
     public ScreenShot() {
         if (SeleniumTestsContextManager.getGlobalContext().getTestNGContext() != null) {
             suiteName = SeleniumTestsContextManager.getGlobalContext().getTestNGContext().getSuite().getName();
-            outputDirectory = SeleniumTestsContextManager.getGlobalContext().getTestNGContext().getOutputDirectory();
+            outputDirectory = SeleniumTestsContextManager.getThreadContext().getOutputDirectory();
         }
     }
 

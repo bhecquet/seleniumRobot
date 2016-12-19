@@ -109,8 +109,18 @@ public class TestFrame extends GenericTest {
 	}
 	
 	@Test(groups={"it"})
+	public void testElementInsideOtherElementWithFrame() {
+		Assert.assertEquals(testPage.optionOfSelectListIFrame.getText(), "option1 frame");
+	}
+	
+	@Test(groups={"it"})
 	public void testFrameTable() {
 		Assert.assertEquals(testPage.tableIFrame.getRowCount(), 2);
+	}
+	
+	@Test(groups={"it"})
+	public void testIsElementPresentInFrame() {
+		Assert.assertTrue(testPage.tableIFrame.isElementPresent());
 	}
 	
 	@Test(groups={"it"})

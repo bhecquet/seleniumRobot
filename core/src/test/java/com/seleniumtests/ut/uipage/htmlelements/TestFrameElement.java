@@ -63,6 +63,8 @@ public class TestFrameElement extends MockitoTest {
 	@Mock
 	private RemoteWebElement element;
 	@Mock
+	private RemoteWebElement link;
+	@Mock
 	private RemoteWebElement frameEl;
 	@Mock
 	private RemoteWebElement frameEl2;
@@ -78,12 +80,14 @@ public class TestFrameElement extends MockitoTest {
 		PowerMockito.mockStatic(WebUIDriver.class);
 		when(WebUIDriver.getWebDriver()).thenReturn(driver);
 		when(driver.findElement(By.id("el"))).thenReturn(element);
+		when(element.findElement(By.id("link"))).thenReturn(link);
 		when(driver.findElement(By.id("frameId"))).thenReturn(frameEl);
 		when(driver.findElement(By.id("frameId2"))).thenReturn(frameEl2);
 		when(driver.switchTo()).thenReturn(locator);
 		
 		when(element.getSize()).thenReturn(new Dimension(1, 1));
 		when(element.isDisplayed()).thenReturn(true);
+		when(link.isDisplayed()).thenReturn(true);
 	}
 
 	@Test(groups={"ut"})
@@ -284,6 +288,21 @@ public class TestFrameElement extends MockitoTest {
 		el.sendKeys("toto");
 		
 		verify(locator, times(0)).frame(frameEl);
+	}
+	
+	/**
+	 * Test that we enter the iframe of the parent element when searching looking a sub-element
+	 * @throws Exception
+	 */
+	@Test(groups={"ut"})
+	public void testUseElementInsideElementInsideFrame() throws Exception {
+		FrameElement frame = new FrameElement("", By.id("frameId"));
+		HtmlElement el = new HtmlElement("", By.id("el"), frame);
+		LinkElement link = el.findLinkElement(By.id("link"));
+		link.click();
+		
+		verify(locator).frame(frameEl);
+		verify(locator).defaultContent();
 	}
 	
 }

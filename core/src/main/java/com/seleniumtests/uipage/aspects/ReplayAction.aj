@@ -16,9 +16,6 @@
  */
 package com.seleniumtests.uipage.aspects;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -26,7 +23,6 @@ import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.WebDriverException;
-import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.CompositeAction;
 import org.openqa.selenium.remote.UnreachableBrowserException;
 import org.openqa.selenium.support.ui.SystemClock;
@@ -36,7 +32,6 @@ import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.DatasetException;
 import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.driver.WebUIDriver;
-import com.seleniumtests.uipage.htmlelements.FrameElement;
 import com.seleniumtests.uipage.htmlelements.HtmlElement;
 import com.seleniumtests.util.helper.WaitHelper;
 
@@ -73,20 +68,6 @@ public class ReplayAction {
     	element.setDriver(WebUIDriver.getWebDriver());
 
     	while (systemClock.isNowBefore(end)) {
-    		
-    		// handle frame case
-    		List<FrameElement> frameTree = new ArrayList<FrameElement>();
-    		FrameElement frame = element.getFrameElement();
-    		
-    		while (frame != null) {
-    			frameTree.add(0, frame);
-    			frame = frame.getFrameElement();
-    		}
-
-    		for (FrameElement frameEl: frameTree) {
-    			WebElement frameElement = element.getDriver().findElement(frameEl.getBy());
-    			element.getDriver().switchTo().frame(frameElement);
-    		}
 	    	
 	    	try {
 	    		reply = joinPoint.proceed(joinPoint.getArgs());
@@ -116,9 +97,8 @@ public class ReplayAction {
 					throw e;
 				}
 	    	} finally {
-	    		if (element.getFrameElement() != null) {
-	    			element.getDriver().switchTo().defaultContent();
-	    		}
+	    		// in case we have switched to an iframe for using webElement, go to default content
+	    		element.getDriver().switchTo().defaultContent();
 	    	}
 			
     	}

@@ -18,6 +18,7 @@ package com.seleniumtests.uipage.htmlelements;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -323,12 +324,14 @@ public class HtmlElement implements WebElement, Locatable {
     	driver = updateDriver();
         if (parent != null) {
         	parent.findElement();
+        	enterFrame();
         	if (elementIndex < 0) {
         		element = parent.element.findElement(by);
         	} else {
         		element = parent.element.findElements(by).get(elementIndex);
         	}
         } else {
+        	enterFrame();
 	        if (elementIndex < 0) {
 	        	element = driver.findElement(by);
 	        } else {
@@ -345,6 +348,21 @@ public class HtmlElement implements WebElement, Locatable {
         if (waitForVisibility && makeVisible) {
         	new WebDriverWait(driver, 1).until(ExpectedConditions.visibilityOf(element));
         }
+    }
+    
+    private void enterFrame() {
+    	List<FrameElement> frameTree = new ArrayList<>();
+    	FrameElement frame = getFrameElement();
+		
+		while (frame != null) {
+			frameTree.add(0, frame);
+			frame = frame.getFrameElement();
+		}
+
+		for (FrameElement frameEl: frameTree) {
+			WebElement frameWebElement = driver.findElement(frameEl.getBy());
+			driver.switchTo().frame(frameWebElement);
+		}
     }
     
     protected void changeCssAttribute(WebElement element, String cssProperty, String cssPropertyValue) {
@@ -945,6 +963,7 @@ public class HtmlElement implements WebElement, Locatable {
     	
     	// refresh driver
     	driver = updateDriver();
+    	enterFrame();
         WebDriverWait wait = new WebDriverWait(driver, timeout);
         wait.until(ExpectedConditions.presenceOfElementLocated(by));
         
