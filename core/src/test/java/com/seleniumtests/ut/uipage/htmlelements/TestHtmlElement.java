@@ -16,13 +16,13 @@
  */
 package com.seleniumtests.ut.uipage.htmlelements;
 
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.atLeast;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,6 +33,7 @@ import org.mockito.Spy;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Point;
+import org.openqa.selenium.WebDriver.TargetLocator;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Keyboard;
@@ -88,6 +89,9 @@ public class TestHtmlElement extends MockitoTest {
 	@Mock
 	private Keyboard keyboard;
 	
+	@Mock
+	private TargetLocator locator;
+	
 	@Spy
 	private HtmlElement el = new HtmlElement("element", By.id("el"));
 	private HtmlElement el1 = new HtmlElement("element", By.id("el1"), el);
@@ -116,8 +120,10 @@ public class TestHtmlElement extends MockitoTest {
 		when(driver.findElements(By.id("el"))).thenReturn(elList);
 		when(driver.getKeyboard()).thenReturn(keyboard);
 		when(driver.getMouse()).thenReturn(mouse);
+		when(driver.switchTo()).thenReturn(locator);
 		
 		when(mobileDriver.findElement(By.id("el"))).thenReturn(mobileElement);
+		when(mobileDriver.switchTo()).thenReturn(locator);
 		
 		when(element.findElement(By.name("subEl"))).thenReturn(subElement1);
 		when(element.findElements(By.name("subEl"))).thenReturn(subElList);

@@ -27,6 +27,7 @@ import org.mockito.Spy;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.WebDriver.TargetLocator;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
@@ -56,6 +57,9 @@ public class TestTable extends MockitoTest {
 	@Mock
 	private WebElement col2;
 	
+	@Mock
+	private TargetLocator locator;
+	
 	@Spy
 	private Table table = new Table("", By.id("table"));
 	
@@ -66,6 +70,7 @@ public class TestTable extends MockitoTest {
 		PowerMockito.mockStatic(WebUIDriver.class);
 		when(WebUIDriver.getWebDriver()).thenReturn(driver);
 		when(driver.findElement(By.id("table"))).thenReturn(tableEl);
+		when(driver.switchTo()).thenReturn(locator);
 		
 		rowEl = new ArrayList<>();
 		rowEl.add(row1);

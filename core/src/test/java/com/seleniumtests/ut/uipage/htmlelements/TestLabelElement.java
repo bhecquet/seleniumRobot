@@ -16,11 +16,14 @@
  */
 package com.seleniumtests.ut.uipage.htmlelements;
 
+import static org.mockito.Mockito.when;
+
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.WebDriver.TargetLocator;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
@@ -39,6 +42,9 @@ public class TestLabelElement extends MockitoTest {
 	
 	@Mock
 	private WebElement element;
+	
+	@Mock
+	private TargetLocator locator;
 
 	@Test(groups={"ut"})
 	public void testLabelElement() throws Exception {
@@ -46,6 +52,7 @@ public class TestLabelElement extends MockitoTest {
 		Mockito.when(WebUIDriver.getWebDriver()).thenReturn(driver);
 		Mockito.when(driver.findElement(By.id("label"))).thenReturn(element);
 		Mockito.when(element.getText()).thenReturn("textual label");
+		Mockito.when(driver.switchTo()).thenReturn(locator);
 		
 		LabelElement el = Mockito.spy(new LabelElement("label", By.id("label")));
 	
