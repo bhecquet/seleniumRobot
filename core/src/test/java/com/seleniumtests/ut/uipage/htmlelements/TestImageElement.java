@@ -21,6 +21,7 @@ import org.mockito.Mockito;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebDriver.TargetLocator;
 import org.openqa.selenium.WebElement;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -41,11 +42,15 @@ public class TestImageElement extends MockitoTest {
 	@Mock
 	private WebElement element;
 
+	@Mock
+	private TargetLocator locator;
+
 	@Test(groups={"ut"})
 	public void testImageElement() throws Exception {
 		PowerMockito.mockStatic(WebUIDriver.class);
 		Mockito.when(WebUIDriver.getWebDriver()).thenReturn(driver);
 		Mockito.when(driver.findElement(By.id("img"))).thenReturn(element);
+		Mockito.when(driver.switchTo()).thenReturn(locator);
 		Mockito.when(element.getSize()).thenReturn(new Dimension(10,10));
 		Mockito.when(element.getAttribute("src")).thenReturn("http://nowhere.com/jpg");
 		
