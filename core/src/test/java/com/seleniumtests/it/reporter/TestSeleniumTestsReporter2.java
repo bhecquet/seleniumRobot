@@ -243,7 +243,7 @@ public class TestSeleniumTestsReporter2 extends MockitoTest {
 		detailedReportContent = detailedReportContent.replace("\n", "").replace("\r",  "").replaceAll(">\\s+<", "><");
 		
 		// check log presence
-		Assert.assertTrue(detailedReportContent.contains("<div> StubParentClass: Start method testAndSubActions</div>"));
+		Assert.assertTrue(detailedReportContent.contains("[main] StubParentClass: Start method testAndSubActions</div>"));
 	}
 	
 	/**

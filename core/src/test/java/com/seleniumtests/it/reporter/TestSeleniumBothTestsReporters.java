@@ -207,7 +207,7 @@ public class TestSeleniumBothTestsReporters extends MockitoTest {
 		Assert.assertTrue(detailsReportContent.contains("<div>class java.lang.AssertionError: false error expected [true] but found [false]</div>"));
 		
 		// check log display
-		Assert.assertTrue(detailsReportContent.contains("<div> TestLogging: !!!FAILURE ALERT!!! - Assertion Failure: false error expected [true] but found [false]</div>"));
+		Assert.assertTrue(detailsReportContent.contains("[main] TestLogging: !!!FAILURE ALERT!!! - Assertion Failure: false error expected [true] but found [false]</div>"));
 	}
 	
 	/**
@@ -242,8 +242,8 @@ public class TestSeleniumBothTestsReporters extends MockitoTest {
 		Assert.assertFalse(detailsReportContent.contains("at org.testng.TestNG"));
 		
 		// check log display
-		Assert.assertTrue(detailsReportContent.contains("<div> TestLogging: !!!FAILURE ALERT!!! - Assertion Failure: false error expected [true] but found [false]</div>"));
-		Assert.assertTrue(detailsReportContent.contains("<div> TestLogging: !!!FAILURE ALERT!!! - Assertion Failure: false error2 expected [true] but found [false]</div>"));
+		Assert.assertTrue(detailsReportContent.contains("[main] TestLogging: !!!FAILURE ALERT!!! - Assertion Failure: false error expected [true] but found [false]</div>"));
+		Assert.assertTrue(detailsReportContent.contains("[main] TestLogging: !!!FAILURE ALERT!!! - Assertion Failure: false error2 expected [true] but found [false]</div>"));
 	}
 	
 }
