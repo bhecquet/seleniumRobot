@@ -98,7 +98,9 @@ public class ReplayAction {
 				}
 	    	} finally {
 	    		// in case we have switched to an iframe for using webElement, go to default content
-	    		element.getDriver().switchTo().defaultContent();
+	    		if (element.getDriver() != null) {
+	    			element.getDriver().switchTo().defaultContent();
+	    		}
 	    	}
 			
     	}
