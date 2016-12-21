@@ -31,6 +31,7 @@ import org.testng.IInvokedMethodListener;
 import org.testng.IReporter;
 import org.testng.ITestContext;
 import org.testng.TestNG;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.Test;
 import org.testng.xml.XmlClass;
 import org.testng.xml.XmlSuite;
@@ -76,6 +77,18 @@ public class TestPerformanceReporter extends MockitoTest {
 		return suite;
 	}
 	
+	@AfterMethod(alwaysRun=true)
+	private void deleteGeneratedFiles() {
+		if (reporter == null) {
+			return;
+		}
+		String outDir = new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath();
+		for (String filePath: reporter.getGeneratedFiles()) {
+			new File(outDir + File.separator + filePath).delete();
+		}
+		
+	}
+	
 	@Test(groups={"it"})
 	public void testReportGeneration(ITestContext testContext) throws Exception {
 		
@@ -84,9 +97,9 @@ public class TestPerformanceReporter extends MockitoTest {
 		executeSubTest(new String[] {"com.seleniumtests.it.reporter.StubTestClass"});
 		
 		// check all files are generated with the right name
-		Assert.assertTrue(reporter.getGeneratedFiles().contains("TEST-com.seleniumtests.it.reporter.StubTestClass.testAndSubActions.xml"));
-		Assert.assertTrue(reporter.getGeneratedFiles().contains("TEST-com.seleniumtests.it.reporter.StubTestClass.testInError.xml"));
-		Assert.assertTrue(reporter.getGeneratedFiles().contains("TEST-com.seleniumtests.it.reporter.StubTestClass.testWithException.xml"));
+		Assert.assertTrue(reporter.getGeneratedFiles().contains("PERF-com.seleniumtests.it.reporter.StubTestClass.testAndSubActions.xml"));
+		Assert.assertTrue(reporter.getGeneratedFiles().contains("PERF-com.seleniumtests.it.reporter.StubTestClass.testInError.xml"));
+		Assert.assertTrue(reporter.getGeneratedFiles().contains("PERF-com.seleniumtests.it.reporter.StubTestClass.testWithException.xml"));
 		
 		// check at least one generation occured for each part of the report
 		verify(reporter).generateReport(anyList(), anyList(), anyString()); // 1 time only
@@ -105,7 +118,7 @@ public class TestPerformanceReporter extends MockitoTest {
 		executeSubTest(new String[] {"com.seleniumtests.it.reporter.StubTestClass"});
 		
 		// check content of summary report file
-		String jmeterReport = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "TEST-com.seleniumtests.it.reporter.StubTestClass.testAndSubActions.xml"));
+		String jmeterReport = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "PERF-com.seleniumtests.it.reporter.StubTestClass.testAndSubActions.xml"));
 		
 		Assert.assertTrue(jmeterReport.contains("<testsuite errors=\"0\" failures=\"1\" hostname=\"\" name=\"testAndSubActions\" tests=\"2\" time=\"15.26\" timestamp="));
 		Assert.assertTrue(jmeterReport.contains("<testcase classname=\"com.seleniumtests.it.reporter.StubTestClass\" name=\"step 1\" time=\"1.23\">"));
@@ -125,7 +138,7 @@ public class TestPerformanceReporter extends MockitoTest {
 		executeSubTest(new String[] {"com.seleniumtests.it.reporter.StubTestClass"});
 		
 		// check content of summary report file
-		String jmeterReport = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "TEST-com.seleniumtests.it.reporter.StubTestClass.testAndSubActions.xml"));
+		String jmeterReport = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "PERF-com.seleniumtests.it.reporter.StubTestClass.testAndSubActions.xml"));
 		
 		Assert.assertTrue(jmeterReport.contains("<error message=\"driver exception"));
 		Assert.assertTrue(jmeterReport.contains("<![CDATA[class org.openqa.selenium.WebDriverException: driver exception"));
@@ -145,7 +158,7 @@ public class TestPerformanceReporter extends MockitoTest {
 		executeSubTest(new String[] {"com.seleniumtests.it.reporter.StubTestClass"});
 		
 		// check content of summary report file
-		String jmeterReport = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "TEST-com.seleniumtests.it.reporter.StubTestClass.testInError.xml"));
+		String jmeterReport = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "PERF-com.seleniumtests.it.reporter.StubTestClass.testInError.xml"));
 		
 		Assert.assertTrue(jmeterReport.contains("<error message=\"Step in error\" type=\"\">"));
 		Assert.assertTrue(jmeterReport.contains("<![CDATA[Error message not available]]>"));

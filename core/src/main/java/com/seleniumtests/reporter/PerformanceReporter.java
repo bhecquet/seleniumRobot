@@ -89,7 +89,7 @@ public class PerformanceReporter extends CommonReporter implements IReporter {
 			StringWriter writer = new StringWriter();
 			t.merge( context, writer );
 			
-			String fileName = "TEST-" + testResult.getTestClass().getName() + "." + testResult.getName()
+			String fileName = "PERF-" + testResult.getTestClass().getName() + "." + testResult.getName()
 											.replace(" ",  "_")
 											.replace("'", "")
 											.replace("\"", "")

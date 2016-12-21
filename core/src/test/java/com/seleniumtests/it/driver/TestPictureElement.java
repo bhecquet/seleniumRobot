@@ -19,12 +19,14 @@ package com.seleniumtests.it.driver;
 import org.openqa.selenium.WebDriver;
 import org.testng.Assert;
 import org.testng.ITestContext;
+import org.testng.SkipException;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.seleniumtests.GenericDriverTest;
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.customexception.ImageSearchException;
 import com.seleniumtests.driver.WebUIDriver;
 
 public class TestPictureElement extends GenericDriverTest {
@@ -56,14 +58,22 @@ public class TestPictureElement extends GenericDriverTest {
 	
 	@Test(groups={"it"})
 	public void testClickOnPicture() {
-		testPage.picture.clickAt(0, -30);
+		try {
+			testPage.picture.clickAt(0, -30);
+		} catch (ImageSearchException e) {
+			throw new SkipException("Image not found, we may be on screenless slave", e);
+		}
 		Assert.assertEquals(testPage.logoText.getValue(), "ff logo");
 	}
 	
 	@Test(groups={"it"})
 	public void testSendKeysOnPicture() {
-		testPage.logoText.clear();
-		testPage.picture.sendKeys("hello", 0, 5);
+		try {
+			testPage.logoText.clear();
+			testPage.picture.sendKeys("hello", 0, 5);
+		} catch (ImageSearchException e) {
+			throw new SkipException("Image not found, we may be on screenless slave", e);
+		}
 		Assert.assertEquals(testPage.logoText.getValue(), "hello");
 	}
 

@@ -35,6 +35,17 @@ public class TestImageDetector extends GenericTest {
 	}
 	
 	/**
+	 * Search an image inside an other one but no corresponding zone should be found
+	 * @throws IOException 
+	 */
+	@Test(groups={"ut"}, expectedExceptions=ImageSearchException.class)
+	public void searchWithBlackPicture() throws IOException {
+		ImageDetector detector = new ImageDetector(createFileFromResource("tu/images/blackScreen.png"), 
+													createFileFromResource("tu/images/creditMutuelLogo.png"));
+		detector.detectCorrespondingZone();
+	}
+	
+	/**
 	 * Initialize detector with non existing file
 	 */
 	@Test(groups={"ut"}, expectedExceptions=ImageSearchException.class)

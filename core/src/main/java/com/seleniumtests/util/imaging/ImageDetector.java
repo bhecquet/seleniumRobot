@@ -99,6 +99,14 @@ public class ImageDetector {
 		// http://stackoverflow.com/questions/29828849/flann-for-opencv-java
 		DescriptorMatcher matcher = DescriptorMatcher.create(DescriptorMatcher.FLANNBASED);
 		MatOfDMatch matches = new MatOfDMatch();
+		
+		if (objectKeyPoints.toList().size() == 0) {
+			throw new ImageSearchException("No keypoints in object to search, check it's not uniformly coloured: " + objectImage.getAbsolutePath());
+		}
+		if (sceneKeyPoints.toList().size() == 0) {
+			throw new ImageSearchException("No keypoints in scene, check it's not uniformly coloured: " + sceneImage.getAbsolutePath());
+		}
+		
 		matcher.match( objectDescriptor, sceneDescriptor, matches );
 		
 		double maxDist = 0; 
