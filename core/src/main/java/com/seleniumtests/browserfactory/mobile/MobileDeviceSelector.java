@@ -38,13 +38,13 @@ public class MobileDeviceSelector {
 		
 		for (MobileDevice device: deviceList) {
 			boolean keep = true;
-			if (deviceName != null && device.getName() != null && !device.getName().equalsIgnoreCase(deviceName.toString())) {
+			if (deviceName != null && device.getName() != null && !device.getName().equalsIgnoreCase(deviceName)) {
 				keep = false;
 			}
-			if (platformName != null && device.getPlatform() != null && !device.getPlatform().equalsIgnoreCase(platformName.toString())) {
+			if (platformName != null && device.getPlatform() != null && !device.getPlatform().equalsIgnoreCase(platformName)) {
 				keep = false;
 			}
-			if (platformVersion != null && device.getVersion() != null && !device.getVersion().equalsIgnoreCase(platformVersion.toString())) {
+			if (platformVersion != null && device.getVersion() != null && !device.getVersion().equalsIgnoreCase(platformVersion)) {
 				keep = false;
 			}
 			if (keep) {
@@ -105,7 +105,7 @@ public class MobileDeviceSelector {
 	public DesiredCapabilities updateCapabilitiesWithSelectedDevice(DesiredCapabilities capabilities) {
 		MobileDevice selectedDevice = getRelevantMobileDevice(capabilities);
 		
-		if (selectedDevice.getPlatform().equals("android")) {
+		if ("android".equals(selectedDevice.getPlatform())) {
 			capabilities.setCapability(MobileCapabilityType.DEVICE_NAME, selectedDevice.getId());
 		}
 		capabilities.setCapability(MobileCapabilityType.PLATFORM_NAME, selectedDevice.getPlatform());

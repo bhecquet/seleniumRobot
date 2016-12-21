@@ -10,7 +10,6 @@ import org.aspectj.lang.annotation.Before;
 import org.openqa.selenium.interactions.Action;
 import org.openqa.selenium.interactions.ClickAction;
 import org.openqa.selenium.interactions.CompositeAction;
-import org.openqa.selenium.support.ui.SystemClock;
 
 import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import com.seleniumtests.driver.WebUIDriver;
@@ -18,8 +17,6 @@ import com.seleniumtests.util.helper.WaitHelper;
 
 @Aspect
 public class CompositeActions {
-
-	private static SystemClock systemClock = new SystemClock();
 	
 	/**
 	 * Slows down any action performed through CompositeActions by 200 ms

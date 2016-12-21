@@ -26,7 +26,6 @@ import org.testng.ITestResult;
 import org.testng.Reporter;
 import org.testng.internal.ResultMap;
 import org.testng.internal.TestResult;
-import org.testng.internal.Utils;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.testretry.TestRetryAnalyzer;
@@ -294,7 +293,7 @@ public class TestListener implements IInvokedMethodListener, ITestListener {
 			}
 			
 			Throwable last = verificationFailures.get(size - 1);
-			stackString.append(String.format("\n.\nFailure %d of %d%n", size, size));
+			stackString.append(String.format("%n.%nFailure %d of %d%n", size, size));
 			stackString.append(last.toString());
 
 			// set merged throwable

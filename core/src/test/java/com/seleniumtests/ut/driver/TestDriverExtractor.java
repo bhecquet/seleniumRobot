@@ -33,11 +33,8 @@ public class TestDriverExtractor extends MockitoTest {
 		Path driverPath = DriverExtractor.getDriverPath();
 		
 		// clean output directory
-		try {
-			FileUtils.deleteDirectory(driverPath.toFile());
-		} catch (IOException e) {
-			// do nothing
-		}
+		FileUtils.deleteDirectory(driverPath.toFile());
+
 		DriverExtractor extractor = new DriverExtractor();
 		extractor.extractDriver("chromedriver");
 		
@@ -59,11 +56,8 @@ public class TestDriverExtractor extends MockitoTest {
 		Path driverPath = DriverExtractor.getDriverPath();
 		
 		// clean output directory
-		try {
-			FileUtils.deleteDirectory(driverPath.toFile());
-		} catch (IOException e) {
-			// do nothing
-		}
+		FileUtils.deleteDirectory(driverPath.toFile());
+
 		new DriverExtractor().extractDriver("chromedriver");
 		
 		DriverExtractor driverExtractor = spy(new DriverExtractor());
@@ -92,11 +86,8 @@ public class TestDriverExtractor extends MockitoTest {
 		Path driverPath = DriverExtractor.getDriverPath();
 		
 		// clean output directory
-		try {
-			FileUtils.deleteDirectory(driverPath.toFile());
-		} catch (IOException e) {
-			// do nothing
-		}
+		FileUtils.deleteDirectory(driverPath.toFile());
+
 		new DriverExtractor().extractDriver("chromedriver");
 		
 		// remove version to force copy

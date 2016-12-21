@@ -45,6 +45,7 @@ public class TextFieldElement extends HtmlElement {
     	super(label, by, frame, index);
     }
 
+    @Override
     @ReplayOnError
     public void clear() {
         findElement();

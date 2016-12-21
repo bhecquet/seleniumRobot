@@ -32,6 +32,10 @@ public class OSCommand {
 	
 	private static final Logger logger = SeleniumRobotLogger.getLogger(OSCommand.class);
 	
+	private OSCommand() {
+		// class with static methods
+	}
+	
 	public static Process executeCommand(final String cmd) {
 		Process proc;
         try {
