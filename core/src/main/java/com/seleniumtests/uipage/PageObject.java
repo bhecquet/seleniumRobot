@@ -446,7 +446,7 @@ public class PageObject extends BasePage implements IPage {
     }
     
     public final String selectNewWindow() {
-    	return selectNewWindow(6000);
+    	return selectNewWindow(SeleniumTestsContextManager.getThreadContext().getExplicitWaitTimeout() * 1000);
     }
     
     public final String selectNewWindow(int waitMs) {
