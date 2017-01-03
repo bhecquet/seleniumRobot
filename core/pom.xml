@@ -569,7 +569,7 @@
 		      	<artifactId>license-maven-plugin</artifactId>
 		      	<version>2.11</version>
 		      	<configuration>
-		      		<header>${project.basedir}/doc/license_header.txt</header>
+		      		<header>${project.basedir}/../doc/license_header.txt</header>
 		      		
 		      		<includes>
 		      			<include>**/*.java</include>
