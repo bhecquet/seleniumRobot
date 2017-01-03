@@ -83,6 +83,7 @@ public class AndroidCapabilitiesFactory extends ICapabilitiesFactory {
         }
         caps.setCapability(MobileCapabilityType.NEW_COMMAND_TIMEOUT, cfg.getNewCommandTimeout());
 
+
         return caps;
 
     }
