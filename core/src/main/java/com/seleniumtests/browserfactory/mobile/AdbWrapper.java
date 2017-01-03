@@ -18,7 +18,7 @@ public class AdbWrapper {
 	private String adbCommand;
 	private static Pattern devicePattern = Pattern.compile("^(.*?)\\s+device$");
 	private static Pattern versionPattern = Pattern.compile(".*\\[ro\\.build\\.version\\.release\\]: \\[(.*?)\\].*");
-	private static Pattern namePattern = Pattern.compile(".*\\[ro\\.product\\.name\\]: \\[(.*?)\\].*");
+	private static Pattern namePattern = Pattern.compile(".*\\[ro\\.product\\.model\\]: \\[(.*?)\\].*");
 	
 	private static Logger logger = SeleniumRobotLogger.getLogger(AdbWrapper.class);
 	
