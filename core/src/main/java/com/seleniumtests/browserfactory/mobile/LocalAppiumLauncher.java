@@ -131,6 +131,8 @@ public class LocalAppiumLauncher implements AppiumLauncher {
 	}
 	
 	public void startAppiumWithoutWait() {
+		
+		
 		appiumProcess = OSCommand.executeCommand(String.format("%s %s/node_modules/appium/bin/appium.js --port %d", nodeCommand, appiumHome, appiumPort));
 	}
 	
