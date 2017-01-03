@@ -31,18 +31,10 @@ public abstract class OSUtility {
 
 	protected static final Logger logger = SeleniumRobotLogger.getLogger(OSUtility.class);
 	
-	private String[] webBrowserProcessList= 
-		{ 
-		 //Android browser, 
-		 "chrome", "chromedriver", 
-		 "firefox", 
-		 //htmlunit, 
-		 "iexplore", //"IEDriverServer",
-		 //marionette,
-		 //opera, 
-		 //phntomjs, 
-		 //safari, 
-		 };
+	private String[] webBrowserProcessList = {"chrome", "firefox",  "iexplore"};
+
+	private String[] webDriverProcessList = {"chromedriver", "geckodriver", "IEDriverServer", "MicrosoftWebDriver"};
+		
 
 	
 	/******************************************
@@ -205,8 +197,23 @@ public abstract class OSUtility {
     	for (ProcessInfo processInfo : getRunningProcessList()) {
     		for (String processName : webBrowserProcessList) {
     			if (processInfo.getName().equalsIgnoreCase(processName)){
-					logger.info("Asked system to terminate : " + processInfo.getName());
+					logger.info("Asked system to terminate browser: " + processInfo.getName());
 		    		killProcess(processInfo.getPid(), force);
+    			}
+    		}
+    	}
+    }
+    
+    /**
+     * Ask system to terminate all the drivers processes
+     * @param force
+     */
+    public void killAllWebDriverProcess(){
+    	for (ProcessInfo processInfo : getRunningProcessList()) {
+    		for (String processName : webDriverProcessList) {
+    			if (processInfo.getName().equalsIgnoreCase(processName)){
+    				logger.info("Asked system to terminate webdriver: " + processInfo.getName());
+    				killProcess(processInfo.getPid(), true);
     			}
     		}
     	}
