@@ -92,6 +92,12 @@ public class ChromeCapabilitiesFactory extends ICapabilitiesFactory {
         options.addArguments("--disable-translate");
 
         capabilities.setCapability(ChromeOptions.CAPABILITY, options);
+        
+        if (webDriverConfig.getMode() == DriverMode.LOCAL) {
+        	setChromeDriverLocal(webDriverConfig);
+        	capabilities.setCapability("chromedriverExecutable", System.getProperty(CHROME_DRIVER_PROPERTY));
+        }
+        
         return capabilities;
 	}
 
