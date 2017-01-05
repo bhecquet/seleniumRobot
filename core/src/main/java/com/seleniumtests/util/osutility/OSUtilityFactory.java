@@ -25,6 +25,8 @@ public class OSUtilityFactory {
 	public static OSUtility getInstance() {
 		if (OSUtility.isWindows()){
 			return new OSUtilityWindows();
+		} else if (OSUtility.isMac()) {
+			return new OSUtilityMac();
 		} else {
 			return new OSUtilityUnix();
 		}

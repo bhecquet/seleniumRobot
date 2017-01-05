@@ -93,10 +93,25 @@ public class AdbWrapper {
 			if (deviceName.isEmpty() || osVersion.isEmpty()) {
 				logger.warn(String.format("device with id %s could not be parsed, device or version not found", deviceId));
 			} else {
-				devices.add(new MobileDevice(deviceName, deviceId, "android", osVersion));
+				devices.add(new MobileDevice(deviceName, deviceId, "android", osVersion, getInstalledBrowsers(deviceId)));
 			}					
 		}
 		return devices;
+	}
+	
+	private List<String> getInstalledBrowsers(String deviceId) {
+		List<String> browsers = new ArrayList<>();
+		String reply = OSCommand.executeCommandAndWait(String.format("%s -s %s shell \"pm list packages\"", adbCommand, deviceId));
+		
+		for (String line: reply.split("\n")) {
+			if (line.contains("package:com.android.chrome")) {
+				browsers.add("chrome");
+			}
+			if (line.contains("package:com.android.browser")) {
+				browsers.add("browser");
+			}
+		}
+		return browsers;
 	}
 	
 	/**

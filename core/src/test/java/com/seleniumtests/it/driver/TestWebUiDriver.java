@@ -76,9 +76,9 @@ public class TestWebUiDriver extends MockitoTest {
 		whenNew(AdbWrapper.class).withNoArguments().thenReturn(adbWrapper);
 		
 		List<MobileDevice> deviceList = new ArrayList<>();
-		deviceList.add(new MobileDevice("IPhone 6", "0000", "ios", "10.2"));
-		deviceList.add(new MobileDevice("Nexus 5", "1234", "android", "5.0"));
-		deviceList.add(new MobileDevice("Nexus 7", "1235", "android", "6.0"));
+		deviceList.add(new MobileDevice("IPhone 6", "0000", "ios", "10.2", new ArrayList<>()));
+		deviceList.add(new MobileDevice("Nexus 5", "1234", "android", "5.0", new ArrayList<>()));
+		deviceList.add(new MobileDevice("Nexus 7", "1235", "android", "6.0", new ArrayList<>()));
 		when(adbWrapper.getDeviceList()).thenReturn(deviceList);
 		
 		whenNew(AndroidDriver.class).withAnyArguments().thenReturn(androidDriver);

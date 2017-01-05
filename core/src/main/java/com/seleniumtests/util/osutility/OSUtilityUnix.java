@@ -21,6 +21,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import com.seleniumtests.driver.BrowserType;
+
 public class OSUtilityUnix extends OSUtility {
 	
 	/**
@@ -92,5 +94,20 @@ public class OSUtilityUnix extends OSUtility {
 	@Override
 	public String getOSBuild() {
 		return OSCommand.executeCommandAndWait("uname -a");
+	}
+
+	@Override
+	public List<BrowserType> getInstalledBrowsers() {
+		List<BrowserType> browserList = new ArrayList<>();
+		
+		if (!OSCommand.executeCommandAndWait("which firefox").trim().isEmpty() 
+			|| !OSCommand.executeCommandAndWait("which iceweasel").trim().isEmpty()) {
+			browserList.add(BrowserType.FIREFOX);
+		}
+		if (!OSCommand.executeCommandAndWait("which google-chrome").trim().isEmpty()) {
+			browserList.add(BrowserType.CHROME);
+		}
+		
+		return browserList;
 	}
 }

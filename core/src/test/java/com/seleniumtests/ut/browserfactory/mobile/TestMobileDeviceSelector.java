@@ -88,7 +88,7 @@ public class TestMobileDeviceSelector extends MockitoTest {
 	public void testSelectAndroidNotReady() {
 		// available devices
 		List<MobileDevice> deviceList = new ArrayList<>();
-		deviceList.add(new MobileDevice("Nexus 5", "1234", "android", "5.0"));
+		deviceList.add(new MobileDevice("Nexus 5", "1234", "android", "5.0", new ArrayList<>()));
 		when(adbWrapper.getDeviceList()).thenReturn(deviceList);
 		
 		// requested caps
@@ -126,9 +126,9 @@ public class TestMobileDeviceSelector extends MockitoTest {
 	public void testSelectFirstMatchingAndroidDevice() {
 		// available devices
 		List<MobileDevice> deviceList = new ArrayList<>();
-		deviceList.add(new MobileDevice("IPhone 6", "0000", "ios", "10.2"));
-		deviceList.add(new MobileDevice("Nexus 5", "1234", "Android", "5.0"));
-		deviceList.add(new MobileDevice("Nexus 7", "1235", "Android", "6.0"));
+		deviceList.add(new MobileDevice("IPhone 6", "0000", "ios", "10.2", new ArrayList<>()));
+		deviceList.add(new MobileDevice("Nexus 5", "1234", "Android", "5.0", new ArrayList<>()));
+		deviceList.add(new MobileDevice("Nexus 7", "1235", "Android", "6.0", new ArrayList<>()));
 		when(adbWrapper.getDeviceList()).thenReturn(deviceList);
 		
 		// requested caps
@@ -148,9 +148,9 @@ public class TestMobileDeviceSelector extends MockitoTest {
 	public void testSelectMostMatchingAndroidDevice() {
 		// available devices
 		List<MobileDevice> deviceList = new ArrayList<>();
-		deviceList.add(new MobileDevice("IPhone 6", "0000", "ios", "10.2"));
-		deviceList.add(new MobileDevice("Nexus 5", "1234", "Android", "5.0"));
-		deviceList.add(new MobileDevice("Nexus 7", "1235", "android", "6.0"));
+		deviceList.add(new MobileDevice("IPhone 6", "0000", "ios", "10.2", new ArrayList<>()));
+		deviceList.add(new MobileDevice("Nexus 5", "1234", "Android", "5.0", new ArrayList<>()));
+		deviceList.add(new MobileDevice("Nexus 7", "1235", "android", "6.0", new ArrayList<>()));
 		when(adbWrapper.getDeviceList()).thenReturn(deviceList);
 		
 		// requested caps
@@ -174,7 +174,7 @@ public class TestMobileDeviceSelector extends MockitoTest {
 	public void testCapabilitiesUpdate() {
 		// available devices
 		List<MobileDevice> deviceList = new ArrayList<>();
-		deviceList.add(new MobileDevice("nexus 5", "1234", "android", "5.0"));
+		deviceList.add(new MobileDevice("nexus 5", "1234", "android", "5.0", new ArrayList<>()));
 		when(adbWrapper.getDeviceList()).thenReturn(deviceList);
 		
 		DesiredCapabilities requestedCaps = new DesiredCapabilities();
