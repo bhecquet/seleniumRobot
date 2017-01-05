@@ -38,20 +38,24 @@ import com.seleniumtests.util.osutility.OSUtility;
 
 public class TestDriverExtractor extends MockitoTest {
 	
+	private String rootPath;
+	
 	@BeforeClass(groups={"it"})
 	public void initContext(final ITestContext testNGCtx) throws Exception {
 		SeleniumTestsContextManager.initThreadContext(testNGCtx);
+		rootPath = SeleniumTestsContextManager.getRootPath() + "/tmp";
 	}
 	
 	@Test(groups={"ut"})
 	public void testDriverExtraction() throws IOException {
 		
-		Path driverPath = DriverExtractor.getDriverPath();
+		DriverExtractor extractor = new DriverExtractor(rootPath);
+		Path driverPath = extractor.getDriverPath();
 		
 		// clean output directory
 		FileUtils.deleteDirectory(driverPath.toFile());
 
-		DriverExtractor extractor = new DriverExtractor();
+		
 		extractor.extractDriver("chromedriver");
 		
 		if (OSUtility.isWindows()) {
@@ -69,14 +73,15 @@ public class TestDriverExtractor extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testDriverNotExtractedAlreadyExists() throws IOException {
 		
-		Path driverPath = DriverExtractor.getDriverPath();
+		DriverExtractor extractor = new DriverExtractor(rootPath);
+		Path driverPath = extractor.getDriverPath();
 		
 		// clean output directory
 		FileUtils.deleteDirectory(driverPath.toFile());
 
-		new DriverExtractor().extractDriver("chromedriver");
+		extractor.extractDriver("chromedriver");
 		
-		DriverExtractor driverExtractor = spy(new DriverExtractor());
+		DriverExtractor driverExtractor = spy(new DriverExtractor(rootPath));
 		driverExtractor.extractDriver("chromedriver");
 		
 		// check driver has not been copied as it already exists in the right version
@@ -89,7 +94,7 @@ public class TestDriverExtractor extends MockitoTest {
 	 */
 	@Test(groups={"ut"}, expectedExceptions=DriverExceptions.class)
 	public void testCopyDriverNull() throws IOException {
-		new DriverExtractor().extractDriver("toto");
+		new DriverExtractor(rootPath).extractDriver("toto");
 	}
 	
 	/**
@@ -99,17 +104,18 @@ public class TestDriverExtractor extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testDriverNotExtractedAlreadyExistsNoVersion() throws IOException {
 		
-		Path driverPath = DriverExtractor.getDriverPath();
+		DriverExtractor extractor = new DriverExtractor(rootPath);
+		Path driverPath = extractor.getDriverPath();
 		
 		// clean output directory
 		FileUtils.deleteDirectory(driverPath.toFile());
 
-		new DriverExtractor().extractDriver("chromedriver");
+		extractor.extractDriver("chromedriver");
 		
 		// remove version to force copy
 		Paths.get(driverPath.toString(), "version_chromedriver.txt").toFile().delete();
 		
-		DriverExtractor driverExtractor = spy(new DriverExtractor());
+		DriverExtractor driverExtractor = spy(new DriverExtractor(rootPath));
 		driverExtractor.extractDriver("chromedriver");
 		
 		// check driver has been copied as it already exists but no version has been specified

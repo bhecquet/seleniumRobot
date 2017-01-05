@@ -51,6 +51,15 @@ public class DriverExtractor {
 	private static final String DRIVER_VERSION_FILE = "version_%s.txt";
 	private static final String DRIVER_FOLDER = "drivers";
 	private static final Logger logger = SeleniumRobotLogger.getLogger(DriverExtractor.class);
+	private String rootPath;
+	
+	public DriverExtractor() {
+		rootPath = SeleniumTestsContextManager.getRootPath();
+	}
+	
+	public DriverExtractor(String rootPath) {
+		this.rootPath = rootPath;
+	}
 
 	private String getVersionFromPom() {
 		// Try to get version number from pom.xml (available in Eclipse)
@@ -195,11 +204,11 @@ public class DriverExtractor {
 		
 	}
 	
-	public static Path getDriverPath() {
-		return Paths.get(SeleniumTestsContextManager.getRootPath(), DRIVER_FOLDER);
+	public Path getDriverPath() {
+		return Paths.get(rootPath, DRIVER_FOLDER);
 	}
 	
-	public static Path getDriverPath(String driverName) {
-		return Paths.get(SeleniumTestsContextManager.getRootPath(), DRIVER_FOLDER, driverName + OSUtilityFactory.getInstance().getProgramExtension());
+	public Path getDriverPath(String driverName) {
+		return Paths.get(rootPath, DRIVER_FOLDER, driverName + OSUtilityFactory.getInstance().getProgramExtension());
 	}
 }
