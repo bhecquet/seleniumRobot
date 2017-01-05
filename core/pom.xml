@@ -576,7 +576,7 @@
 		      			<include>**/*.aj</include>
 		      		</includes>
 		      	</configuration>
-		      </plugin>
+		   	</plugin>
         </plugins>
 		<resources>
 			<resource>

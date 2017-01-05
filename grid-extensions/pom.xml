@@ -10,7 +10,6 @@
   	<artifactId>grid-extensions</artifactId>
   	<packaging>jar</packaging>
 
-	
 	<dependencies>
 		<dependency>
 			<groupId>log4j</groupId>
@@ -75,35 +74,6 @@
                     </execution>
                 </executions>
             </plugin>
-           <!--  <plugin>
-				<artifactId>maven-assembly-plugin</artifactId>
-				<version>2.6</version>
-				<dependencies>
-					<dependency>
-						<groupId>${project.groupId}</groupId>
-						<artifactId>${project.artifactId}</artifactId>
-						<version>${project.version}</version>
-					</dependency>
-	        	</dependencies>
-				<executions>
-				    <execution>
-				    	<id>archive</id> 
-				    	<phase>package</phase>
-				    	<goals>
-							<goal>single</goal> 
-				      	</goals>
-				      	<configuration>
-				      		<finalName>seleniumRobot-${project.artifactId}</finalName>
-				      		<appendAssemblyId>false</appendAssemblyId>
-				     		<archiveBaseDirectory>${project.build.directory}</archiveBaseDirectory>
-				     		<outputDirectory>${project.build.directory}</outputDirectory>
-				     		<descriptorRefs>
-		                		<descriptorRef>archiveArtifact</descriptorRef>
-		              		</descriptorRefs>
-				      	</configuration>
-				  	</execution>
-				</executions>
-			</plugin> -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-source-plugin</artifactId>
@@ -199,16 +169,47 @@
 		        	<arguments>${proxyString}</arguments>
 		        </configuration>
 			</plugin>
+			<plugin>
+		      <groupId>org.commonjava.maven.plugins</groupId>
+		      <artifactId>directory-maven-plugin</artifactId>
+		      <version>0.1</version>
+		      <executions>
+		        <execution>
+		          <id>directories</id>
+		          <goals>
+		            <goal>highest-basedir</goal>
+		          </goals>
+		          <phase>initialize</phase>
+		          <configuration>
+		            <property>rootDirectory</property>
+		          </configuration>
+		        </execution>
+		      </executions>
+		    </plugin>
+			<plugin>
+			    <artifactId>maven-antrun-plugin</artifactId>
+			    <version>1.7</version>
+			    <executions>
+			        <execution>
+			            <phase>generate-sources</phase>
+			            <configuration>
+			                <target>
+			                    <fileset id="driver-fileset" dir="../core/src/main/resources/drivers" />
+			                    <pathconvert targetos="unix" pathsep=","
+			                        property="driver-file-list" refid="driver-fileset">
+			                        <map from="${rootDirectory}/core/src/main/resources/drivers/" to="" />
+			                    </pathconvert>
+			                    <echo file="${project.basedir}/target/classes/driver-list.txt">${driver-file-list}</echo>
+			                </target>
+			            </configuration>
+			            <goals>
+			                <goal>run</goal>
+			            </goals>
+			        </execution>
+			    </executions>
+			</plugin>
         </plugins>
-		<!-- <resources>
-			<resource>
-				<directory>../core/src/main/resources</directory>
-				
-				<includes>
-					<include>**/*.xml</include>
-				</includes>
-			</resource>
-		</resources> -->
+        
 		<resources>
 			<resource>
 				<directory>../core/src/main/resources</directory>
