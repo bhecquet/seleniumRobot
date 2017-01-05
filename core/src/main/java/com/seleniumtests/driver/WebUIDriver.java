@@ -80,7 +80,7 @@ public class WebUIDriver {
         	} else {
 	            if (config.getBrowser() == BrowserType.FIREFOX) {
 	                webDriverBuilder = new FirefoxDriverFactory(this.config);
-	            } else if (config.getBrowser() == BrowserType.INTERNETEXPLORER) {
+	            } else if (config.getBrowser() == BrowserType.INTERNET_EXPLORER) {
 	                webDriverBuilder = new IEDriverFactory(this.config);
 	            } else if (config.getBrowser() == BrowserType.EDGE) {
 	            	webDriverBuilder = new EdgeDriverFactory(this.config);

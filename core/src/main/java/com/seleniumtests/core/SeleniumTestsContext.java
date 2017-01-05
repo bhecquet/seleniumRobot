@@ -364,7 +364,7 @@ public class SeleniumTestsContext {
 
             // IE grid default value set to false
             if (this.getRunMode() == DriverMode.GRID
-                    && (this.getBrowser() == BrowserType.INTERNETEXPLORER 
+                    && (this.getBrowser() == BrowserType.INTERNET_EXPLORER 
                     || this.getBrowser() == BrowserType.SAFARI)) {
                 this.setAttribute(CAPTURE_SNAPSHOT, false);
             } else {

@@ -23,6 +23,11 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.seleniumtests.driver.BrowserType;
+import com.sun.jna.platform.win32.Advapi32Util;
+import com.sun.jna.platform.win32.Win32Exception;
+import com.sun.jna.platform.win32.WinReg;
+
 public class OSUtilityWindows extends OSUtility {
 	
 	Pattern versionPattern = Pattern.compile(".*?(\\d+\\.\\d+\\.\\d+).*?");
@@ -109,5 +114,44 @@ public class OSUtilityWindows extends OSUtility {
 			logger.error("could not get Windows version");
 			return "5000";
 		}
+	}
+
+	@Override
+	public List<BrowserType> getInstalledBrowsers() {
+			
+		List<BrowserType> browserList = new ArrayList<>();
+		
+		// look for Firefox
+		try {
+			Advapi32Util.registryGetStringValue(WinReg.HKEY_CLASSES_ROOT, "FirefoxHTML\\shell\\open\\command", "");
+			browserList.add(BrowserType.FIREFOX);
+		} catch (Win32Exception e) {}
+		
+		
+		// look for chrome
+		try {
+			Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Classes\\ChromeHTML\\shell\\open\\command", "");
+			browserList.add(BrowserType.CHROME);
+		} catch (Win32Exception e) {}
+		
+		// look for safari
+		try {
+			Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Classes\\SafariHTML\\shell\\open\\command", "");
+			browserList.add(BrowserType.SAFARI);
+		} catch (Win32Exception e) {}
+		
+		// look for ie
+		try {
+			Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Microsoft\\Windows\\CurrentVersion\\App Paths\\IEXPLORE.EXE", "");
+			browserList.add(BrowserType.INTERNET_EXPLORER);
+		} catch (Win32Exception e) {}
+		
+		// look for edge
+		try {
+			Advapi32Util.registryGetStringValue(WinReg.HKEY_CURRENT_USER, "Software\\Microsoft\\MicrosoftEdge\\Main\\EdgeSwitchingOSBuildNumber", "");
+			browserList.add(BrowserType.EDGE);
+		} catch (Win32Exception e) {}
+		
+		return browserList;
 	}
 }

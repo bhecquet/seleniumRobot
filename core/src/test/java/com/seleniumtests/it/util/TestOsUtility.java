@@ -39,7 +39,6 @@ public class TestOsUtility extends GenericTest {
 	@Test(groups={"it"})
 	public void testProcessList() {
 		List<ProcessInfo> plist= osUtil.getRunningProcessList();
-		System.out.println("=== process found : ");
 		for (ProcessInfo p : plist) {
 			System.out.println(p);
 		}

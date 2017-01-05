@@ -22,6 +22,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
+import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
 /**
@@ -237,5 +238,7 @@ public abstract class OSUtility {
     public abstract int getIEVersion();
     
     public abstract String getOSBuild();
+    
+    public abstract List<BrowserType> getInstalledBrowsers();
     
 }

@@ -58,7 +58,7 @@ public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implemen
 	            capabilities.merge(new FirefoxCapabilitiesFactory().createCapabilities(webDriverConfig));
 	            break;
 	
-	        case INTERNETEXPLORER :
+	        case INTERNET_EXPLORER :
 	        	capabilities.merge(new IECapabilitiesFactory().createCapabilities(webDriverConfig));
 	            break;
 	
@@ -202,7 +202,7 @@ public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implemen
 
             case CHROME :
             case FIREFOX :
-            case INTERNETEXPLORER :
+            case INTERNET_EXPLORER :
             	setPageLoadTimeoutCommonBrowser(timeout);
                 break;
 

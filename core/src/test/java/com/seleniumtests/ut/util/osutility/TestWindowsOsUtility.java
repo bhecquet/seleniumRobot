@@ -16,12 +16,16 @@
  */
 package com.seleniumtests.ut.util.osutility;
 
+import java.util.List;
+
+import org.apache.commons.lang3.SystemUtils;
 import org.testng.Assert;
 import org.testng.SkipException;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.seleniumtests.GenericTest;
+import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.util.osutility.OSUtility;
 import com.seleniumtests.util.osutility.OSUtilityFactory;
 
@@ -37,5 +41,15 @@ public class TestWindowsOsUtility extends GenericTest {
 	@Test(groups={"ut"})
 	public void testGetBuild() {
 		Assert.assertNotEquals(OSUtilityFactory.getInstance().getOSBuild(), 5000);
+	}
+	
+	@Test(groups={"ut"})
+	public void testBrowserList() {
+		List<BrowserType> browsers = OSUtilityFactory.getInstance().getInstalledBrowsers();
+		Assert.assertTrue(browsers.contains(BrowserType.INTERNET_EXPLORER));
+		
+		if (SystemUtils.IS_OS_WINDOWS_10) {
+			Assert.assertTrue(browsers.contains(BrowserType.EDGE));
+		}
 	}
 }

@@ -18,7 +18,7 @@ package com.seleniumtests.driver;
 
 public enum BrowserType {
     FIREFOX("*firefox"),
-    INTERNETEXPLORER("*iexplore"),
+    INTERNET_EXPLORER("*iexplore"),
     EDGE("*edge"),
     CHROME("*chrome"),
     HTMLUNIT("*htmlunit"),
@@ -39,7 +39,7 @@ public enum BrowserType {
         if (browserType.toLowerCase().contains("firefox")) {
             return BrowserType.FIREFOX;
         } else if (browserType.toLowerCase().contains("iexplore")) {
-            return BrowserType.INTERNETEXPLORER;
+            return BrowserType.INTERNET_EXPLORER;
         } else if (browserType.toLowerCase().contains("edge")) {
         	return BrowserType.EDGE;
         } else if (browserType.toLowerCase().contains("chrome")) {

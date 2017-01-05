@@ -16,20 +16,28 @@
  */
 package com.seleniumtests.browserfactory.mobile;
 
+import java.util.List;
+
 public class MobileDevice {
 
 	private String name;
 	private String id;
 	private String platform;
 	private String version;
+	private List<String> browsers;
 	
-	public MobileDevice(String name, String id, String platform, String version) {
+	public MobileDevice(String name, String id, String platform, String version, List<String> browsers) {
 		this.name = name;
 		this.id = id;
 		this.platform = platform;
 		this.version = version;
+		this.browsers = browsers;
 	}
 	
+	public List<String> getBrowsers() {
+		return browsers;
+	}
+
 	public String getName() {
 		return name;
 	}

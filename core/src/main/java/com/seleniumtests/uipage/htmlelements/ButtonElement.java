@@ -52,7 +52,7 @@ public class ButtonElement extends HtmlElement {
     public void click() {
 
         BrowserType browser = WebUIDriver.getWebUIDriver().getConfig().getBrowser();
-        if (browser == BrowserType.INTERNETEXPLORER) {
+        if (browser == BrowserType.INTERNET_EXPLORER) {
             super.sendKeys(Keys.ENTER);
         } else {
             super.click();
