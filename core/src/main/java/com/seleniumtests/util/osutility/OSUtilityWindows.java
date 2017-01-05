@@ -148,7 +148,7 @@ public class OSUtilityWindows extends OSUtility {
 		
 		// look for edge
 		try {
-			Advapi32Util.registryGetStringValue(WinReg.HKEY_CURRENT_USER, "Software\\Microsoft\\MicrosoftEdge\\Main\\EdgeSwitchingOSBuildNumber", "");
+			Advapi32Util.registryGetStringValue(WinReg.HKEY_CURRENT_USER, "Software\\Microsoft\\MicrosoftEdge\\Main", "EdgeSwitchingOSBuildNumber");
 			browserList.add(BrowserType.EDGE);
 		} catch (Win32Exception e) {}
 		
