@@ -261,10 +261,10 @@ public class SeleniumTestsContext {
      */
     private void updatePlatformVersion() {
     	try {
-	    	Platform currentPlatform = Platform.fromString(getPlatform()).family();
-	    	if (currentPlatform.equals(Platform.WINDOWS) 
-	    		|| currentPlatform.equals(Platform.MAC) 
-	    		|| currentPlatform.equals(Platform.UNIX) ) {
+	    	Platform currentPlatform = Platform.fromString(getPlatform());
+	    	if (currentPlatform.is(Platform.WINDOWS) 
+	    		|| currentPlatform.is(Platform.MAC) 
+	    		|| currentPlatform.is(Platform.UNIX) ) {
 	    		return;
 	    	} else {
 	    		throw new WebDriverException("");
@@ -1122,7 +1122,7 @@ public class SeleniumTestsContext {
     	if (platform != null) {
     		setAttribute(PLATFORM, platform);
     	} else {
-    		setAttribute(PLATFORM, Platform.getCurrent().toString());
+    		setAttribute(PLATFORM, Platform.getCurrent().family().toString());
     	}
     }
     
