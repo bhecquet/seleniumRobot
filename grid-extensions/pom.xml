@@ -4,7 +4,7 @@
 	<parent>
 	    <groupId>com.infotel.seleniumRobot</groupId>
 	    <artifactId>core-parent</artifactId>
-	    <version>2.5.4-SNAPSHOT</version>
+	    <version>2.5.4</version>
 	</parent>
 
   	<artifactId>grid-extensions</artifactId>
@@ -195,8 +195,7 @@
 			            <configuration>
 			                <target>
 			                    <fileset id="driver-fileset" dir="../core/src/main/resources/drivers" />
-			                    <pathconvert targetos="unix" pathsep=","
-			                        property="driver-file-list" refid="driver-fileset">
+			                    <pathconvert targetos="unix" pathsep="," property="driver-file-list" refid="driver-fileset">
 			                        <map from="${rootDirectory}/core/src/main/resources/drivers/" to="" />
 			                    </pathconvert>
 			                    <echo file="${project.basedir}/target/classes/driver-list.txt">${driver-file-list}</echo>
