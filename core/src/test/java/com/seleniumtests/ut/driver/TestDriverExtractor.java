@@ -40,7 +40,7 @@ public class TestDriverExtractor extends MockitoTest {
 	
 	private String rootPath;
 	
-	@BeforeClass(groups={"it"})
+	@BeforeClass(groups={"ut"})
 	public void initContext(final ITestContext testNGCtx) throws Exception {
 		SeleniumTestsContextManager.initThreadContext(testNGCtx);
 		rootPath = SeleniumTestsContextManager.getRootPath() + "/tmp";
