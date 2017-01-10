@@ -350,6 +350,11 @@ public class HtmlElement implements WebElement, Locatable {
         }
     }
     
+    /**
+     * Method for going into the right frame before doing anything else
+     * this method should be called each time we need to get an element
+     * Therefore, it's used inside findElement() method
+     */
     private void enterFrame() {
     	List<FrameElement> frameTree = new ArrayList<>();
     	FrameElement frame = getFrameElement();
