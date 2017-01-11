@@ -48,9 +48,12 @@ public class IECapabilitiesFactory extends ICapabilitiesFactory {
     	
         File iEDriverServerFile = Paths.get(new File(driverPath).getParent(), "IEDriverServer.exe").toFile();
 
-        FileUtils.copyFile(new File(driverPath), iEDriverServerFile);
+        try {
+        	FileUtils.copyFile(new File(driverPath), iEDriverServerFile);
+        } catch (IOException e) {
+        	// do nothing, the file may already be in use
+        }
 
-        
         System.setProperty(WEBDRIVER_PROPERTY, iEDriverServerFile.toString());
         logger.debug(iEDriverServerFile);
     }
@@ -99,6 +102,10 @@ public class IECapabilitiesFactory extends ICapabilitiesFactory {
         capability.setCapability(CapabilityType.TAKES_SCREENSHOT, true);
         capability.setCapability(CapabilityType.ACCEPT_SSL_CERTS, true);
         capability.setCapability("ignoreZoomSetting", true);
+        
+        capability.setCapability(InternetExplorerDriver.INTRODUCE_FLAKINESS_BY_IGNORING_SECURITY_DOMAINS,true);
+        capability.setCapability(InternetExplorerDriver.IE_ENSURE_CLEAN_SESSION, true);
+        capability.setCapability(InternetExplorerDriver.INITIAL_BROWSER_URL, "about:blank");
 
         if (cfg.getBrowserVersion() != null) {
             capability.setVersion(cfg.getBrowserVersion());
