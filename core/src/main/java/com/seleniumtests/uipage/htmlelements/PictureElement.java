@@ -17,6 +17,7 @@
 package com.seleniumtests.uipage.htmlelements;
 
 import java.awt.AWTException;
+import java.awt.GraphicsEnvironment;
 import java.awt.Robot;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
@@ -115,7 +116,9 @@ public class PictureElement {
 	 */
 	public boolean isRobotUsable() {
 		if (SeleniumTestsContextManager.getThreadContext().getRunMode() == DriverMode.LOCAL
-				&& !SeleniumTestsContextManager.isMobileTest()) {
+				&& !SeleniumTestsContextManager.isMobileTest()
+				&& !GraphicsEnvironment.isHeadless()
+) {
 			return true;
 		} else {
 			return false;

@@ -37,7 +37,9 @@ import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.Test;
+import org.testng.SkipException;
 
+import java.awt.GraphicsEnvironment;
 import com.seleniumtests.MockitoTest;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.ImageSearchException;
@@ -60,6 +62,10 @@ public class TestPictureElement extends MockitoTest {
 
 	@Test(groups={"ut"})
 	public void testRobotUsable() {
+		if (GraphicsEnvironment.isHeadless()) {
+			throw new SkipException("headless environment");
+		}
+
 		SeleniumTestsContextManager.getThreadContext().setTestType(TestType.WEB);
 		SeleniumTestsContextManager.getThreadContext().setRunMode("local");
 		pictureElement.setObjectPictureFile(new File("tu/images/logo_text_field.png"));
@@ -98,6 +104,10 @@ public class TestPictureElement extends MockitoTest {
 	 */
 	@Test(groups={"ut"}, expectedExceptions=WebDriverException.class)
 	public void testClickWithRobot() throws AWTException {
+		if (GraphicsEnvironment.isHeadless()) {
+                        throw new SkipException("headless environment");
+                }
+
 		pictureElement.setObjectPictureFile(new File(""));
 		pictureElement.setRobot(new Robot());
 		SeleniumTestsContextManager.getThreadContext().setReplayTimeout(1);

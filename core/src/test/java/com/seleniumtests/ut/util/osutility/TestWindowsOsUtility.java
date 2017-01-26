@@ -31,7 +31,7 @@ import com.seleniumtests.util.osutility.OSUtilityFactory;
 
 public class TestWindowsOsUtility extends GenericTest {
 	
-	@BeforeClass
+	@BeforeClass(groups={"ut"})
 	public void isWindows() {
 		if (!OSUtility.isWindows()) {
 			throw new SkipException("Test only available on Windows platform");
