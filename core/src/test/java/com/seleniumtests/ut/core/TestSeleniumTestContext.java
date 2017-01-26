@@ -22,6 +22,7 @@ import org.testng.ITestContext;
 import org.testng.TestRunner;
 import org.testng.annotations.Test;
 import org.testng.xml.XmlTest;
+import java.io.File;
 
 import com.seleniumtests.GenericTest;
 import com.seleniumtests.core.SeleniumTestsContext;
@@ -548,7 +549,7 @@ public class TestSeleniumTestContext extends GenericTest {
 		initThreadContext(testNGCtx);
 		((TestRunner)testNGCtx).setOutputDirectory("/home/other/test-output/testsuite");
 		SeleniumTestsContextManager.getThreadContext().setOutputDirectory(null, testNGCtx);
-		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), "\\home\\other\\test-output");
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), "/home/other/test-output".replace("/", File.separator));
 	}
 	
 	/**
