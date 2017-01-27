@@ -28,33 +28,47 @@ import org.apache.commons.io.FileUtils;
 import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import com.seleniumtests.MockitoTest;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.DriverExceptions;
 import com.seleniumtests.driver.DriverExtractor;
+import com.seleniumtests.util.helper.WaitHelper;
 import com.seleniumtests.util.osutility.OSUtility;
 
 public class TestDriverExtractor extends MockitoTest {
 	
 	private String rootPath;
+	private DriverExtractor extractor;
+	private Path driverPath;
 	
 	@BeforeClass(groups={"ut"})
 	public void initContext(final ITestContext testNGCtx) throws Exception {
 		SeleniumTestsContextManager.initThreadContext(testNGCtx);
 		rootPath = SeleniumTestsContextManager.getRootPath() + "/tmp";
+		extractor = new DriverExtractor(rootPath);
+		driverPath = extractor.getDriverPath();
+	}
+	
+	@BeforeMethod(groups={"ut"})
+	public void deleteTmpDir() throws IOException {
+		
+		
+		// clean output directory
+		for (int i = 0; i < 5; i++) {
+			try {
+				FileUtils.deleteDirectory(driverPath.toFile());
+				break;
+			} catch (IOException e) {
+				WaitHelper.waitForSeconds(2);
+			}
+		}
 	}
 	
 	@Test(groups={"ut"})
 	public void testDriverExtraction() throws IOException {
-		
-		DriverExtractor extractor = new DriverExtractor(rootPath);
-		Path driverPath = extractor.getDriverPath();
-		
-		// clean output directory
-		FileUtils.deleteDirectory(driverPath.toFile());
-
 		
 		extractor.extractDriver("chromedriver");
 		
@@ -72,12 +86,6 @@ public class TestDriverExtractor extends MockitoTest {
 	 */
 	@Test(groups={"ut"})
 	public void testDriverNotExtractedAlreadyExists() throws IOException {
-		
-		DriverExtractor extractor = new DriverExtractor(rootPath);
-		Path driverPath = extractor.getDriverPath();
-		
-		// clean output directory
-		FileUtils.deleteDirectory(driverPath.toFile());
 
 		extractor.extractDriver("chromedriver");
 		
@@ -103,12 +111,6 @@ public class TestDriverExtractor extends MockitoTest {
 	 */
 	@Test(groups={"ut"})
 	public void testDriverNotExtractedAlreadyExistsNoVersion() throws IOException {
-		
-		DriverExtractor extractor = new DriverExtractor(rootPath);
-		Path driverPath = extractor.getDriverPath();
-		
-		// clean output directory
-		FileUtils.deleteDirectory(driverPath.toFile());
 
 		extractor.extractDriver("chromedriver");
 		
