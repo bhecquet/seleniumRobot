@@ -263,3 +263,15 @@ Here will be described features that may be used to improve test
 By default, inside a test, checks will be done using TestNG `Assert` class
 On assert failure, test will continue but error will be reported
 If this behaviour is not expected, then use the parameter `softAssertEnabled` and set it to false
+
+### 9 Write good tests and Page Objects ###
+
+According to `http://www.slideshare.net/saucelabs/how-to-grade-your-selenium-tests-by-dave-haeffner-sauce-labs-webinar?mkt_tok=eyJpIjoiTlRFeVpUTXdNbVpoTlRNMiIsInQiOiI2UzdLYnBraTczaHU0cUM0Z1FcL2pxOWZEVFhPdWxRa2h0QjJXZFwvK1B2NXRXRnhpWVk4MlFmcGE5eE5Ub3lkUG40UXNES1JENzhHMmExREg4aG9wRTFMZHBSTGdFaWIyeWEzcXpXb1BvTHRVPSJ9`
+you should follow these rules:
+- each test is independant
+- common parts are centralized (eased with PageObject)
+- No explicit waits and sleeps: handled by this framework. At most configure proper timeouts
+- Assertions are in tests, not in Page Object
+- A Page Object contains locators (see example) and actions (the methods). They are seperated to simplify readability
+- the locator use order is: id, name, className, cssPath, xPath, linkText because the first are most of time unique and do not change each time the DOM changes
+
