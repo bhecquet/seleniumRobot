@@ -158,14 +158,16 @@ public class ScreenshotUtil {
     			
     			// do not scroll to much so that we can crop fixed header without loosing content
     			scrollY = currentImageHeight - cropTop;
-				((JavascriptExecutor) driver).executeScript(String.format("window.top.scroll(%d, %d)", scrollX, scrollY));
-    			
+//				((JavascriptExecutor) driver).executeScript(String.format("window.top.scroll(%d, %d)", scrollX, scrollY));
+				((CustomEventFiringWebDriver)driver).scrollTo(scrollX, scrollY);
+				
     			capturePageScreenshotToFile(driver, tmpCap, cropTop, cropBottom);
 				BufferedImage image = ImageIO.read(new File(tmpCap));
 				
 				if (currentImage == null) {
 					currentImage = new BufferedImage(contentDimension.getWidth(), contentDimension.getHeight(), BufferedImage.TYPE_INT_RGB);
 					currentImage.createGraphics().drawImage(image, 0, 0, null);
+					currentImageHeight = image.getHeight();
 				} else {
 					
 					// crop top of the picture in case of the last vertical snapshot. It prevents duplication of content
@@ -236,7 +238,7 @@ public class ScreenshotUtil {
         } catch (Exception e) {
             logger.warn(e);
         }
-        ((CustomEventFiringWebDriver)driver).scrollTop();
+        ((CustomEventFiringWebDriver)WebUIDriver.getWebDriver()).scrollTop();
     }
 
     private void handleTitle(String title, final ScreenShot screenShot) {
