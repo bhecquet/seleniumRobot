@@ -23,32 +23,33 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.awt.AWTException;
-import java.awt.Robot;
-import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
 import java.io.File;
 
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
+import org.openqa.selenium.Point;
 import org.openqa.selenium.Rectangle;
-import org.openqa.selenium.WebDriverException;
+import org.openqa.selenium.interactions.Keyboard;
+import org.openqa.selenium.interactions.Mouse;
+import org.openqa.selenium.interactions.internal.Coordinates;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.Test;
-import org.testng.SkipException;
 
-import java.awt.GraphicsEnvironment;
 import com.seleniumtests.MockitoTest;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.ImageSearchException;
-import com.seleniumtests.customexception.ScenarioException;
-import com.seleniumtests.driver.TestType;
+import com.seleniumtests.driver.CustomEventFiringWebDriver;
+import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.driver.screenshots.ScreenshotUtil;
+import com.seleniumtests.uipage.htmlelements.HtmlElement;
 import com.seleniumtests.uipage.htmlelements.PictureElement;
 import com.seleniumtests.util.imaging.ImageDetector;
 
+//@PrepareForTest(WebUIDriver.class)
 public class TestPictureElement extends MockitoTest {
 	
 	@Mock
@@ -56,110 +57,56 @@ public class TestPictureElement extends MockitoTest {
 	
 	@Mock
 	ScreenshotUtil screenshotUtil;
+	
+	@Mock
+	HtmlElement intoElement;
+	
+	@Mock
+	Coordinates coordinates;
+	
+	@Mock
+	CustomEventFiringWebDriver driver;
+	
+	@Mock
+	Mouse mouse;
+	@Mock
+	Keyboard keyboard;
 
 	@InjectMocks
 	PictureElement pictureElement = new PictureElement();
-
-	@Test(groups={"ut"})
-	public void testRobotUsable() {
-		if (GraphicsEnvironment.isHeadless()) {
-			throw new SkipException("headless environment");
-		}
-
-		SeleniumTestsContextManager.getThreadContext().setTestType(TestType.WEB);
-		SeleniumTestsContextManager.getThreadContext().setRunMode("local");
-		pictureElement.setObjectPictureFile(new File("tu/images/logo_text_field.png"));
-		Assert.assertTrue(pictureElement.isRobotUsable());
-	}
 	
-	@Test(groups={"ut"})
-	public void testRobotNotUsableInMobile() {
-		SeleniumTestsContextManager.getThreadContext().setTestType(TestType.APPIUM_APP_ANDROID);
-		SeleniumTestsContextManager.getThreadContext().setRunMode("local");
-		pictureElement.setObjectPictureFile(new File("tu/images/logo_text_field.png"));
-		Assert.assertFalse(pictureElement.isRobotUsable());
-	}
-	
-	@Test(groups={"ut"})
-	public void testRobotNotUsableInRemote() {
-		SeleniumTestsContextManager.getThreadContext().setTestType(TestType.WEB);
-		SeleniumTestsContextManager.getThreadContext().setRunMode("grid");
-		pictureElement.setObjectPictureFile(new File("tu/images/logo_text_field.png"));
-		Assert.assertFalse(pictureElement.isRobotUsable());
-	}
 	
 	/**
-	 * Without configured robot, click is forbidden
+	 * test click
+	 * This test is disabled as it cannot be executed with all other unit tests. It results in 
+	 * "UnsatisfiedLinkError, library already loaded in another class loader" because ImageDetector has already loaded openCV
+	 * To enable it, uncomment "@PrepareForTest" line and set "enabled" to true
+	 * 
 	 */
-	@Test(groups={"ut"}, expectedExceptions=ScenarioException.class)
-	public void testClickWithoutRobot() {
-		pictureElement.setObjectPictureFile(new File(""));
-		pictureElement.setRobot(null);
-		pictureElement.click();
-	}
-	
-	/**
-	 * With configured robot, but without screenshot retrieved, error is raised
-	 * @throws AWTException 
-	 */
-	@Test(groups={"ut"}, expectedExceptions=WebDriverException.class)
-	public void testClickWithRobot() throws AWTException {
-		if (GraphicsEnvironment.isHeadless()) {
-                        throw new SkipException("headless environment");
-                }
+	@Test(groups={"ut"}, enabled=false)
+	public void testClick() {
+		PictureElement picElement = spy(pictureElement);
+		picElement.setObjectPictureFile(new File(""));
 
-		pictureElement.setObjectPictureFile(new File(""));
-		pictureElement.setRobot(new Robot());
-		SeleniumTestsContextManager.getThreadContext().setReplayTimeout(1);
-		pictureElement.click();
-	}
-	
-	/**
-	 * With configured robot, but without screenshot retrieved, error is raised
-	 * @throws AWTException 
-	 */
-	@Test(groups={"ut"})
-	public void testClick() throws AWTException {
-		pictureElement.setObjectPictureFile(new File(""));
-		Robot robot = Mockito.mock(Robot.class);
-		pictureElement.setRobot(robot);
-		when(screenshotUtil.captureDesktopToFile()).thenReturn(new File(""));
+		PowerMockito.mockStatic(WebUIDriver.class);
+		when(WebUIDriver.getWebDriver()).thenReturn(driver);
+		when(driver.getMouse()).thenReturn(mouse);
+		when(driver.getKeyboard()).thenReturn(keyboard);
+		when(screenshotUtil.captureWebPageToFile()).thenReturn(new File(""));
 		when(imageDetector.getDetectedRectangle()).thenReturn(new Rectangle(10, 10, 100, 50));
 		when(imageDetector.getSizeRatio()).thenReturn(1.0);
-		pictureElement.click();
+		when(coordinates.inViewPort()).thenReturn(new Point(100, 120));
+		when(intoElement.getCoordinates()).thenReturn(coordinates);
 		
-		verify(robot).mouseMove(35, 60);
-		verify(robot).mousePress(InputEvent.BUTTON1_MASK);
-		verify(robot).mouseRelease(InputEvent.BUTTON1_MASK);
+		picElement.click();
+		verify(picElement).moveAndClick(intoElement, -65, -60);
 	}
 	
-	/**
-	 * Click at 10, 10 from the center of the detected image, with different Aspect ratio
-	 * Here, A/R is 2.0, so offset is multiplied by 2 so that the relative position between
-	 * picture center in object and in scene is the same
-	 * @throws AWTException 
-	 */
-	@Test(groups={"ut"})
-	public void testClickAt() throws AWTException {
-		pictureElement.setObjectPictureFile(new File(""));
-		Robot robot = Mockito.mock(Robot.class);
-		pictureElement.setRobot(robot);
-		when(screenshotUtil.captureDesktopToFile()).thenReturn(new File(""));
-		when(imageDetector.getDetectedRectangle()).thenReturn(new Rectangle(10, 10, 100, 50));
-		when(imageDetector.getSizeRatio()).thenReturn(2.0);
-		pictureElement.clickAt(10, 10);
-		
-		verify(robot).mouseMove(55, 80);
-		verify(robot).mousePress(InputEvent.BUTTON1_MASK);
-		verify(robot).mouseRelease(InputEvent.BUTTON1_MASK);
-	}
 	
 	@Test(groups={"ut"})
 	public void testPictureNotVisible() throws AWTException {
 		PictureElement picElement = spy(pictureElement);
 		picElement.setObjectPictureFile(new File(""));
-		Robot robot = Mockito.mock(Robot.class);
-		picElement.setRobot(robot);
 		when(screenshotUtil.captureWebPageToFile()).thenReturn(new File(""));
 		doThrow(ImageSearchException.class).when(imageDetector).detectCorrespondingZone();
 		
@@ -173,8 +120,6 @@ public class TestPictureElement extends MockitoTest {
 	public void testPictureNotVisibleWithReplay() throws AWTException {
 		PictureElement picElement = spy(pictureElement);
 		picElement.setObjectPictureFile(new File(""));
-		Robot robot = Mockito.mock(Robot.class);
-		picElement.setRobot(robot);
 		when(screenshotUtil.captureWebPageToFile()).thenReturn(new File(""));
 		doThrow(ImageSearchException.class).when(imageDetector).detectCorrespondingZone();
 		
@@ -188,8 +133,6 @@ public class TestPictureElement extends MockitoTest {
 	public void testPictureVisible() throws AWTException {
 		PictureElement picElement = spy(pictureElement);
 		picElement.setObjectPictureFile(new File(""));
-		Robot robot = Mockito.mock(Robot.class);
-		picElement.setRobot(robot);
 		when(screenshotUtil.captureWebPageToFile()).thenReturn(new File(""));
 		when(imageDetector.getDetectedRectangle()).thenReturn(new Rectangle(10, 10, 100, 50));
 		when(imageDetector.getSizeRatio()).thenReturn(1.0);
@@ -198,28 +141,7 @@ public class TestPictureElement extends MockitoTest {
 		verify(picElement).findElement(true);
 		
 	}
-	
-	@Test(groups={"ut"})
-	public void testSendKeys() throws AWTException {
-		pictureElement.setObjectPictureFile(new File(""));
-		Robot robot = Mockito.mock(Robot.class);
-		pictureElement.setRobot(robot);
-		when(screenshotUtil.captureDesktopToFile()).thenReturn(new File(""));
-		when(imageDetector.getDetectedRectangle()).thenReturn(new Rectangle(600, 300, 100, 50));
-		when(imageDetector.getSizeRatio()).thenReturn(1.0);
-		
-		pictureElement.sendKeys("Hello _3 £ !");	
-		
-		verify(robot).keyPress(KeyEvent.VK_H);
-		verify(robot).keyPress(KeyEvent.VK_E);
-		verify(robot, times(2)).keyPress(KeyEvent.VK_L);
-		verify(robot).keyPress(KeyEvent.VK_O);
-		verify(robot).keyPress(KeyEvent.VK_3);
-		verify(robot).keyPress(KeyEvent.VK_EXCLAMATION_MARK);
-		verify(robot).keyPress(KeyEvent.VK_UNDERSCORE);
-		verify(robot, times(3)).keyPress(KeyEvent.VK_SPACE);
-		verify(robot, times(2)).keyPress(KeyEvent.VK_SHIFT); // 1 for 'H' and 1 for '3'
-	}
+
 	
 	@AfterMethod(alwaysRun=true)
 	public void reset(ITestContext testNGCtx) {

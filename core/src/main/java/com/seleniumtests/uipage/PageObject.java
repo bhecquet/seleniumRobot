@@ -24,7 +24,9 @@ import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Point;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.UnsupportedCommandException;
 import org.openqa.selenium.WebDriverException;
@@ -523,7 +525,12 @@ public class PageObject extends BasePage implements IPage {
     }
 
     private void waitForPageToLoad() {
-    	new WebDriverWait(driver, 10).until(ExpectedConditions.jsReturnsValue("if (document.readyState === \"complete\") { return \"ok\"; }"));
+    	try {
+    		new WebDriverWait(driver, 5).until(ExpectedConditions.jsReturnsValue("if (document.readyState === \"complete\") { return \"ok\"; }"));
+    	} catch (TimeoutException e) {
+    		// nothing
+    	}
+    	
 
         // populate page info
         try {

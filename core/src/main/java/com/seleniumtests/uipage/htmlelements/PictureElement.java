@@ -16,11 +16,6 @@
  */
 package com.seleniumtests.uipage.htmlelements;
 
-import java.awt.AWTException;
-import java.awt.GraphicsEnvironment;
-import java.awt.Robot;
-import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
 
@@ -28,22 +23,24 @@ import javax.swing.ImageIcon;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
+import org.openqa.selenium.Point;
 import org.openqa.selenium.Rectangle;
 import org.openqa.selenium.WebDriverException;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.events.EventFiringWebDriver;
 import org.openqa.selenium.support.ui.SystemClock;
 
-import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.ImageSearchException;
-import com.seleniumtests.customexception.ScenarioException;
-import com.seleniumtests.driver.DriverMode;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.driver.screenshots.ScreenshotUtil;
 import com.seleniumtests.uipage.ReplayOnError;
 import com.seleniumtests.util.helper.WaitHelper;
 import com.seleniumtests.util.imaging.ImageDetector;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
+
+import io.appium.java_client.TouchAction;
 
 /**
  * Element which is found inside driver snapshot
@@ -57,7 +54,6 @@ public class PictureElement {
 	private HtmlElement intoElement;
 	private Rectangle detectedObjectRectangle;
 	private double pictureSizeRatio;
-	private Robot robot;
 	private EventFiringWebDriver driver;
 	private ImageDetector detector;
 	private ScreenshotUtil screenshotUtil;
@@ -85,13 +81,6 @@ public class PictureElement {
 	 */
 	public PictureElement(String label, File pictureFile, HtmlElement intoElement) {
 		this.intoElement = intoElement;
-		if (isRobotUsable()) {
-			try {
-				robot = new Robot();
-			} catch (AWTException e) {
-				throw new ScenarioException("Cannot create robot", e);
-			}
-		}
 		detector = new ImageDetector();
 		setObjectPictureFile(pictureFile);
 		screenshotUtil = new ScreenshotUtil();
@@ -106,22 +95,6 @@ public class PictureElement {
 			return tempFile;
 		} catch (IOException e) {
 			throw new ConfigurationException("Resource cannot be found", e);
-		}
-	}
-	
-	/**
-	 * Check whether Robot is usable
-	 * It's only available in local mode (for now)
-	 * @return
-	 */
-	public boolean isRobotUsable() {
-		if (SeleniumTestsContextManager.getThreadContext().getRunMode() == DriverMode.LOCAL
-				&& !SeleniumTestsContextManager.isMobileTest()
-				&& !GraphicsEnvironment.isHeadless()
-) {
-			return true;
-		} else {
-			return false;
 		}
 	}
 	
@@ -141,7 +114,7 @@ public class PictureElement {
 		}
 		
 		File screenshotFile;
-		if (robot == null || searchOnly) {
+		if (searchOnly) {
 			screenshotFile = screenshotUtil.captureWebPageToFile();
 		} else {
 			screenshotFile = screenshotUtil.captureDesktopToFile();
@@ -171,50 +144,23 @@ public class PictureElement {
 	 */
 	@ReplayOnError
 	public void clickAt(int xOffset, int yOffset) {
-//		findElement(true);
-//		
-//		Point intoElementPos = intoElement.getCoordinates().inViewPort();
-//		int relativeX = detectedObjectRectangle.x - intoElementPos.x;
-//		int relativeY = detectedObjectRectangle.y - intoElementPos.y;
-//		
-//		new Actions(driver).moveToElement(intoElement, relativeX + xOffset, relativeY + yOffset).click().build().perform();
+		findElement(true);
 		
-		if (robot == null) {
-			throw new ScenarioException("click on picture is not supported on mobile devices and remote mode");
-		}
-		findElement(false);
+		Point intoElementPos = intoElement.getCoordinates().inViewPort();
+		int relativeX = detectedObjectRectangle.x + detectedObjectRectangle.width / 2 - intoElementPos.x;
+		int relativeY = detectedObjectRectangle.y + detectedObjectRectangle.height / 2 - intoElementPos.y;
 		
-	    robot.mouseMove(detectedObjectRectangle.x + detectedObjectRectangle.width / 2 + (int)(xOffset * pictureSizeRatio), 
-	    			    detectedObjectRectangle.y + detectedObjectRectangle.height / 2 +(int)(yOffset * pictureSizeRatio));    
-	    robot.mousePress(InputEvent.BUTTON1_MASK);
-	    robot.mouseRelease(InputEvent.BUTTON1_MASK);
+		moveAndClick(intoElement, relativeX + (int)(xOffset * pictureSizeRatio), relativeY + (int)(yOffset * pictureSizeRatio));
+	}
+	
+	public void moveAndClick(WebElement element, int coordX, int coordY) {
+		new Actions(driver).moveToElement(intoElement, coordX, coordY).click().build().perform();
 	}
 	
 	public void sendKeys(final CharSequence text, int xOffset, int yOffset) {
 		clickAt(xOffset, yOffset);
 		
-		for (int i=0; i < text.length(); i++) {
-			char ch = text.charAt(i);
-			int keyCode = KeyEvent.getExtendedKeyCodeForChar((int)ch);
-			boolean shift = false;
-			if ((Character.isUpperCase(ch) && Character.isLetter(ch))
-					|| Character.isDigit(ch)) {
-				shift = true;
-			}
-			
-			try {
-				if (shift) {
-					robot.keyPress(KeyEvent.VK_SHIFT);
-				}
-				robot.keyPress(keyCode);
-				robot.keyRelease(keyCode);
-				if (shift) {
-					robot.keyRelease(KeyEvent.VK_SHIFT);
-				}
-			} catch (IllegalArgumentException e) {
-				logger.warn(String.format("Character %s could not be written", text.charAt(i)), e);
-			}
-		}
+		new Actions(driver).sendKeys(text).build().perform();
 	}
 
 	public void sendKeys(final CharSequence text) {
@@ -270,11 +216,6 @@ public class PictureElement {
 		} else {
 			return "Picture from file " + objectPictureFile.getAbsolutePath();
 		}
-	}
-	
-	
-	public void setRobot(Robot robot) {
-		this.robot = robot;
 	}
 
 	public void setObjectPictureFile(File objectPictureFile) {

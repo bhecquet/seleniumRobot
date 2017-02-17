@@ -105,23 +105,38 @@ public class FileUtility {
         if (byteArray.length == 0) {
             return;
         }
-        
-        File parentDir = new File(path).getParentFile();
-        if (!parentDir.exists()) {
-            parentDir.mkdirs();
-        }
 
         byte[] decodeBuffer = Base64.decodeBase64(byteArray);
 
-        try (InputStream in = new ByteArrayInputStream(decodeBuffer);
-             FileOutputStream fos = new FileOutputStream(path);
-        		) {
-
+        try (InputStream in = new ByteArrayInputStream(decodeBuffer)) {
             BufferedImage img = ImageIO.read(in);
-            ImageIO.write(img, "png", fos);
+            writeImage(path, img);
         } catch (Exception e) {
             logger.warn(e);
         } 
+        
+    }
+    /**
+     * Constructs ImageElement from bytes and stores it.
+     *
+     * @param  path
+     */
+    public static synchronized void writeImage(final String path, BufferedImage bufImage) {
+    	if (bufImage == null) {
+    		return;
+    	}
+    	
+    	File parentDir = new File(path).getParentFile();
+    	if (!parentDir.exists()) {
+    		parentDir.mkdirs();
+    	}
+
+    	try (FileOutputStream fos = new FileOutputStream(path)) {
+    		
+    		ImageIO.write(bufImage, "png", fos);
+    	} catch (Exception e) {
+    		logger.warn(e);
+    	} 
     }
 
     public static String getLatestFile(final String folder) {
