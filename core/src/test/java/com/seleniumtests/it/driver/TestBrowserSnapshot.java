@@ -4,11 +4,9 @@ import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 
 import javax.imageio.ImageIO;
 
-import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.WebDriver;
@@ -120,6 +118,7 @@ public class TestBrowserSnapshot {
 	@Test(groups={"it"})
 	public void testRemoveScrollbarCapture() throws IOException {
 		driver.manage().window().setSize(new Dimension(400, 300));
+		WaitHelper.waitForSeconds(1);
 		
 		// get real capture
 		String origFilePath = generateCaptureFilePath();
@@ -167,6 +166,7 @@ public class TestBrowserSnapshot {
 	@Test(groups={"it"})
 	public void testRemoveHeader() throws IOException {
 		driver.manage().window().setSize(new Dimension(400, 300));
+		WaitHelper.waitForSeconds(1);
 
 		// get cropped picture
 		String filePath = generateCaptureFilePath();
@@ -187,6 +187,7 @@ public class TestBrowserSnapshot {
 	@Test(groups={"it"})
 	public void testRemoveFooter() throws IOException {
 		driver.manage().window().setSize(new Dimension(400, 300));
+		WaitHelper.waitForSeconds(1);
 		
 		// get cropped picture
 		String filePath = generateCaptureFilePath();
@@ -207,6 +208,7 @@ public class TestBrowserSnapshot {
 	@Test(groups={"it"})
 	public void testRemoveHeaderAndFooter() throws IOException {
 		driver.manage().window().setSize(new Dimension(400, 300));
+		WaitHelper.waitForSeconds(1);
 		
 		// get cropped picture
 		String filePath = generateCaptureFilePath();

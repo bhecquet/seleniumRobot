@@ -31,10 +31,8 @@ import org.openqa.selenium.remote.UselessFileDetector;
 import org.openqa.selenium.support.events.EventFiringWebDriver;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.util.helper.WaitHelper;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
-
-import io.appium.java_client.AppiumDriver;
-import io.appium.java_client.ios.IOSDriver;
 
 /**
  * Supports file upload in remote webdriver.
@@ -182,4 +180,41 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver {
 		} 
 	}
 	
+	public void scrollTo(int x, int y) {
+		if (SeleniumTestsContextManager.isWebTest()) {
+			((JavascriptExecutor) driver).executeScript(String.format("window.top.scroll(%d, %d)", x, y));
+			
+			// wait for scrolling end
+			Point previousScrollPosition = getScrollPosition();
+			int i = 0;
+			boolean fixed = false;
+			do {
+				Point scrollPosition = getScrollPosition();
+				if (scrollPosition.x == x && scrollPosition.y == y) {
+					break;
+				} else if (scrollPosition.x == previousScrollPosition.x && scrollPosition.y == previousScrollPosition.y) {
+					if (!fixed) {
+						fixed = true;
+					} else {
+						break;
+					}
+				}
+				previousScrollPosition = scrollPosition;
+				WaitHelper.waitForMilliSeconds(100);
+				i++;
+			} while (i < 10);
+		} 
+	}
+	
+	/**
+	 * TODO: handle mobile app case
+	 */
+	public Point getScrollPosition() {
+		if (SeleniumTestsContextManager.isWebTest()) {
+			List<Long> dims = (List<Long>)((JavascriptExecutor) driver).executeScript(JS_GET_CURRENT_SCROLL_POSITION);
+			return new Point(dims.get(0).intValue(), dims.get(1).intValue());
+		} else {
+			throw new WebDriverException("scroll position can only be get for web");
+		}
+	}
 }
