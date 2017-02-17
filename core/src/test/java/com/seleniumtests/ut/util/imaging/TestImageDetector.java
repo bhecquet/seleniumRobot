@@ -176,6 +176,28 @@ public class TestImageDetector extends GenericTest {
 		}
 	}
 	
+	/**
+	 * Search an image with template matching. Here, image should not be found
+	 * @throws IOException 
+	 */
+	@Test(groups={"ut"}, expectedExceptions=ImageSearchException.class)
+	public void searchExactPictureNoDetection() throws IOException {
+		ImageDetector detector = new ImageDetector(createFileFromResource("tu/images/RIB.png"), 
+						createFileFromResource("tu/images/vosAlertes.png"));
+		detector.detectExactZone();
+	}
+	
+	/**
+	 * Search an image with template matching
+	 * @throws IOException 
+	 */
+	@Test(groups={"ut"})
+	public void searchExactPicture() throws IOException {
+		ImageDetector detector = new ImageDetector(createFileFromResource("tu/images/p9.png"), 
+				createFileFromResource("tu/images/vosAlertes.png"));
+		detector.detectExactZone();
+	}
+	
 	
 	private class SubImageDetector extends ImageDetector {
 		

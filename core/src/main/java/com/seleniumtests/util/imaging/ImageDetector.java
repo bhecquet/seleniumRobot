@@ -29,6 +29,7 @@ import javax.swing.WindowConstants;
 import org.apache.log4j.Logger;
 import org.opencv.calib3d.Calib3d;
 import org.opencv.core.Core;
+import org.opencv.core.Core.MinMaxLocResult;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfByte;
@@ -44,6 +45,7 @@ import org.opencv.features2d.FeatureDetector;
 import org.opencv.features2d.Features2d;
 import org.opencv.features2d.KeyPoint;
 import org.opencv.highgui.Highgui;
+import org.opencv.imgproc.Imgproc;
 import org.openqa.selenium.Rectangle;
 
 import com.seleniumtests.customexception.ImageSearchException;
@@ -222,7 +224,7 @@ public class ImageDetector {
 				Core.line(imgMatch, p3, p4, new Scalar(0, 255, 0),1);
 				Core.line(imgMatch, p4, p1, new Scalar(0, 255, 0),1);
 				
-				showResultingPicture();
+				showResultingPicture(imgMatch);
 			} catch (IOException e) {
 			}
 		}
@@ -237,6 +239,56 @@ public class ImageDetector {
 		checkDetectionZoneAspectRatio(p1, p2, p4, po1, po2, po4);
 		
 		recordDetectedRectangle(p1, p2, p3, p4);
+	}
+	
+	/**
+	 * This method uses template matching for exact comparison
+	 * It means that no resizing or rotation can be detected
+	 * @throws IOException
+	 */
+	public void detectExactZone() {
+		int matchMethod = Imgproc.TM_CCOEFF_NORMED;
+		Mat sceneImageMat = Highgui.imread(sceneImage.getAbsolutePath(), Highgui.CV_LOAD_IMAGE_COLOR);
+        Mat objectImageMat = Highgui.imread(objectImage.getAbsolutePath(), Highgui.CV_LOAD_IMAGE_COLOR);
+
+        // / Create the result matrix
+        int resultCols = sceneImageMat.cols() - objectImageMat.cols() + 1;
+        int resultRows = sceneImageMat.rows() - objectImageMat.rows() + 1;
+        Mat result = new Mat(resultRows, resultCols, CvType.CV_32FC1);
+
+        // / Do the Matching and Normalize
+        Imgproc.matchTemplate(sceneImageMat, objectImageMat, result, matchMethod);
+
+        // / Localizing the best match with minMaxLoc
+        MinMaxLocResult mmr = Core.minMaxLoc(result);
+
+        Point matchLoc;
+        if (matchMethod == Imgproc.TM_SQDIFF || matchMethod == Imgproc.TM_SQDIFF_NORMED) {
+            matchLoc = mmr.minLoc;
+            if (mmr.minVal > detectionThreshold) {
+            	throw new ImageSearchException("match not found");
+            }
+        } else {
+            matchLoc = mmr.maxLoc;
+            if (mmr.maxVal < 1 - detectionThreshold) {
+            	throw new ImageSearchException("match not found");
+            }
+        }
+
+        // / Show me what you got
+        Core.rectangle(sceneImageMat, matchLoc, new Point(matchLoc.x + objectImageMat.cols(),
+                matchLoc.y + objectImageMat.rows()), new Scalar(0, 255, 0));
+        
+        detectedRectangle = new Rectangle((int)matchLoc.x, (int)matchLoc.y, (int)objectImageMat.rows(), (int)objectImageMat.cols());
+        rotationAngle = 0;
+        
+        // Save the visualized detection.
+        if (debug) {
+        	try {
+				showResultingPicture(sceneImageMat);
+			} catch (IOException e) {
+			}
+        }
 	}
 	
 	/**
@@ -366,9 +418,9 @@ public class ImageDetector {
 		}
 	}
 	
-	private void showResultingPicture() throws IOException {
+	private void showResultingPicture(Mat img) throws IOException {
 		String tempFile = File.createTempFile("img", ".png").getAbsolutePath();
-		writeComparisonPictureToFile(tempFile);
+		writeComparisonPictureToFile(tempFile, img);
 		showResultingImage(tempFile);
 	}
 	
@@ -376,9 +428,9 @@ public class ImageDetector {
 	 * File path should end with an image extension (jpg, png)
 	 * @param filePath
 	 */
-	public void writeComparisonPictureToFile(String filePath) {
+	public void writeComparisonPictureToFile(String filePath, Mat img) {
 		if (filePath.toLowerCase().endsWith(".jpg") || filePath.toLowerCase().endsWith(".png")) {
-			Highgui.imwrite(filePath, imgMatch);
+			Highgui.imwrite(filePath, img);
 		} else {
 			throw new ImageSearchException("only .JPG and .PNG files are supported");
 		}

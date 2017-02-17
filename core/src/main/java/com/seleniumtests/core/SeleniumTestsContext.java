@@ -40,7 +40,6 @@ import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.DriverMode;
 import com.seleniumtests.driver.TestType;
-import com.seleniumtests.driver.screenshots.ScreenShot;
 import com.seleniumtests.reporter.PluginsHelper;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
@@ -84,6 +83,9 @@ public class SeleniumTestsContext {
     public static final String BROWSER_DOWNLOAD_DIR = "browserDownloadDir";		// répertoire où seront enregistrés les fichiers
     public static final String ADD_JS_ERROR_COLLECTOR_EXTENSION = "addJSErrorCollectorExtension"; // Firefox uniquement
 
+    public static final String SNAPSHOT_TOP_CROPPING = "snapshotTopCropping";
+    public static final String SNAPSHOT_BOTTOM_CROPPING = "snapshotBottomCropping";
+    
     public static final String WEB_PROXY_TYPE = "proxyType";					// type de proxy. AUTO, MANUAL, NO
     public static final String WEB_PROXY_ADDRESS = "proxyAddress";				// adresse du proxy. 
     public static final String WEB_PROXY_PORT = "proxyPort";					// port du proxy
@@ -190,6 +192,8 @@ public class SeleniumTestsContext {
         setWebProxyExclude(getValueForTest(WEB_PROXY_EXCLUDE, System.getProperty(WEB_PROXY_EXCLUDE)));
         setWebProxyPac(getValueForTest(WEB_PROXY_PAC, System.getProperty(WEB_PROXY_PAC)));
 
+        setSnapshotBottomCropping(getIntValueForTest(SNAPSHOT_BOTTOM_CROPPING, System.getProperty(SNAPSHOT_BOTTOM_CROPPING)));
+        setSnapshotTopCropping(getIntValueForTest(SNAPSHOT_TOP_CROPPING, System.getProperty(SNAPSHOT_TOP_CROPPING)));
         setCaptureSnapshot(getBoolValueForTest(CAPTURE_SNAPSHOT, System.getProperty(CAPTURE_SNAPSHOT)));
         setEnableExceptionListener(getBoolValueForTest(ENABLE_EXCEPTION_LISTENER, System.getProperty(ENABLE_EXCEPTION_LISTENER)));
 
@@ -357,6 +361,14 @@ public class SeleniumTestsContext {
         } else {
             return this.getOutputDirectory() + "\\downloads\\";
         }
+    }
+    
+    public int getSnapshotBottomCropping() {
+    	return (Integer) getAttribute(SNAPSHOT_BOTTOM_CROPPING);
+    }
+    
+    public int getSnapshotTopCropping() {
+    	return (Integer) getAttribute(SNAPSHOT_TOP_CROPPING);
     }
 
     public boolean getCaptureSnapshot() {
@@ -987,6 +999,24 @@ public class SeleniumTestsContext {
     
     public void setWebProxyExclude(String proxyExclude) {
     	setAttribute(WEB_PROXY_EXCLUDE, proxyExclude);
+    }
+    
+    
+    
+    public void setSnapshotBottomCropping(Integer crop) {
+    	if (crop != null) {
+    		setAttribute(SNAPSHOT_BOTTOM_CROPPING, crop);
+    	} else {
+    		setAttribute(SNAPSHOT_BOTTOM_CROPPING, 0);
+    	}
+    }
+    
+    public void setSnapshotTopCropping(Integer crop) {
+    	if (crop != null) {
+    		setAttribute(SNAPSHOT_TOP_CROPPING, crop);
+    	} else {
+    		setAttribute(SNAPSHOT_TOP_CROPPING, 0);
+    	}
     }
     
     public void setCaptureSnapshot(Boolean capture) {
