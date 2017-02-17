@@ -427,6 +427,32 @@ public class TestSeleniumTestContext extends GenericTest {
 	}
 	
 	@Test(groups="ut context")
+	public void testSnapshotTopCropping(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setSnapshotTopCropping(5);
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getSnapshotTopCropping(), 5);
+	}
+	@Test(groups="ut context")
+	public void testSnapshotTopCroppingNull(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setSnapshotTopCropping(null);
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getSnapshotTopCropping(), 0);
+	}
+	
+	@Test(groups="ut context")
+	public void testSnapshotBottomCropping(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setSnapshotBottomCropping(5);
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getSnapshotBottomCropping(), 5);
+	}
+	@Test(groups="ut context")
+	public void testSnapshotBottomCroppingNull(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setSnapshotBottomCropping(null);
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getSnapshotBottomCropping(), 0);
+	}
+	
+	@Test(groups="ut context")
 	public void testEnableExceptionListener(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setEnableExceptionListener(false);
