@@ -107,12 +107,6 @@ public class PictureElement {
 	 */
 	public void findElement(boolean searchOnly) {
 		
-		// scroll to element where our picture is
-		if (intoElement != null) {
-			ImageIcon image = new ImageIcon(objectPictureFile.getAbsolutePath());
-			intoElement.scrollToElement(200 + image.getIconHeight());
-		}
-		
 		File screenshotFile;
 		if (searchOnly) {
 			screenshotFile = screenshotUtil.captureWebPageToFile();
@@ -126,6 +120,12 @@ public class PictureElement {
 		detector.detectCorrespondingZone();
 		detectedObjectRectangle = detector.getDetectedRectangle();
 		pictureSizeRatio = detector.getSizeRatio();
+		
+		// scroll to element where our picture is so that we will be able to act on it
+		if (intoElement != null) {
+			ImageIcon image = new ImageIcon(objectPictureFile.getAbsolutePath());
+			intoElement.scrollToElement(200 + image.getIconHeight());
+		}
 	}
 
 
@@ -146,7 +146,8 @@ public class PictureElement {
 	public void clickAt(int xOffset, int yOffset) {
 		findElement(true);
 		
-		Point intoElementPos = intoElement.getCoordinates().inViewPort();
+//		Point intoElementPos = intoElement.getCoordinates().inViewPort();
+		Point intoElementPos = intoElement.getCoordinates().onPage();
 		int relativeX = detectedObjectRectangle.x + detectedObjectRectangle.width / 2 - intoElementPos.x;
 		int relativeY = detectedObjectRectangle.y + detectedObjectRectangle.height / 2 - intoElementPos.y;
 		

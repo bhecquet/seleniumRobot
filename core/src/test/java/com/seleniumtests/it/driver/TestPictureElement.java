@@ -32,12 +32,12 @@ import com.seleniumtests.driver.WebUIDriver;
 public class TestPictureElement extends GenericDriverTest {
 	
 	private static WebDriver driver;
-	private static DriverTestPage testPage;
+	private static DriverTestPageWithoutFixedPattern testPage;
 	
 	public TestPictureElement() throws Exception {
 	}
 	
-	public TestPictureElement(WebDriver driver, DriverTestPage testPage) throws Exception {
+	public TestPictureElement(WebDriver driver, DriverTestPageWithoutFixedPattern testPage) throws Exception {
 		TestPictureElement.driver = driver;
 		TestPictureElement.testPage = testPage;
 	}
@@ -47,7 +47,7 @@ public class TestPictureElement extends GenericDriverTest {
 		SeleniumTestsContextManager.initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setBrowser("chrome");
 		SeleniumTestsContextManager.getThreadContext().setExplicitWaitTimeout(2);
-		testPage = new DriverTestPage(true);
+		testPage = new DriverTestPageWithoutFixedPattern(true);
 		driver = WebUIDriver.getWebDriver(true);
 	}
 	
