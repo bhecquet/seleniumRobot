@@ -115,7 +115,7 @@ public class DriverTestPage extends PageObject {
     	return By.id(id);
     }
     
-    private static String getPageUrl() {
+    public static String getPageUrl() {
     	if (SeleniumTestsContextManager.getThreadContext().getBrowser() == BrowserType.FIREFOX) {
 			return "file://" + Thread.currentThread().getContextClassLoader().getResource("tu/test.html").getFile();
 		} else {
