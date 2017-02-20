@@ -32,7 +32,9 @@ Below is the list of all parameters accepted in testing xml file. These paramete
 | proxyExclude 				|			| Proxy address exclusion, if MANUAL type is choosen | 
 | proxyPac 					| 			| Automatic configuration address, if PAC type is choosen | 
 | reportGenerationConfig 	| summaryPerSuite | Type of report generation.
-| captureSnapshot 			| true 		| Capture page snapshots
+| captureSnapshot 			| true 		| Capture page snapshots |
+| snapshotTopCropping		| 0			| number of pixel that will be cropped from the top when capturing snapshot. This only applies to snapshots done with several captures (like from chrome) when a portion of the GUI is fixed when scrolling |
+| snapshotBottomCropping	| 0			| same as snapshotTopCropping for bottom cropping |
 | softAssertEnabled 		| true		| Test does not stop is an assertion fails. Only valid when using assertions defined in `CustomAssertion` class or assert methods in `BasePage` class | 
 | outputDirectory 			| <exec folder>	| folder where HTML report will be written | 
 | webDriverListener 		| 			| additional driver listener class |
@@ -195,6 +197,8 @@ SeleniumGrid allows to address multiple selenium nodes from one central point
 ![](/images/seleniumGrid.png) 
 In this mode, SeleniumRobot addresses the Hub and then, the hub dispatches browser creation on available nodes, for mobile or desktop tests.
 
+For better features, prefer using seleniumRobot-grid which is based on standard grid
+
 #### Configure SeleniumRobot ####
 
 Test must be configured like the example below (or use `-DrunMode=grid`)
@@ -281,3 +285,42 @@ From command line, use
 `appium --nodeconfig /path/to/nodeconfig.json`
 
 From GUI, node config file can be specified in appium options
+
+### 6 Running tests in parallel ###
+When testing among several browsers or devices is requested, it's easier to run these tests in parallel
+
+#### Test NG way ####
+Test NG is able to run tests in parallel using the XML configuration
+To do so, configure several tests, one for each browser / mobile device
+	
+	<test name="tnr_chrome">
+	     <parameter name="browser" value="*chrome" />
+	     <classes>
+	         <class name="com.infotel.seleniumTests.googleTest.tests.NextTest"/>
+	     </classes>
+	</test>
+    
+	<test name="tnr_firefox">
+	     <parameter name="browser" value="*firefox" />
+	     <classes>
+	         <class name="com.infotel.seleniumTests.googleTest.tests.NextTest"/>
+	     </classes>
+	</test>
+    
+Then, in suite definition, in the XML, set parallel mode
+
+	<suite name="My suite" parallel="tests" thread-count="5">
+    
+
+#### Jenkins way ####
+
+##### Matrix Job #####
+
+Create a Matrix job with an axis called "browser"
+Then, add all browser you want to use to this axis
+Finally, configure a shell / batch script to use the created variable "%BROWSER%"
+
+##### Selenium Capability Axis #####
+
+Jenkins offers Selenium Capability Axis to create a matrix configured through Selenium Grid
+
