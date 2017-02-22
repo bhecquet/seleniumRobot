@@ -98,7 +98,7 @@ public class ReplayAction {
 				}
 	    	} finally {
 	    		// in case we have switched to an iframe for using webElement, go to default content
-	    		if (element.getDriver() != null) {
+	    		if (element.getDriver() != null && SeleniumTestsContextManager.isWebTest()) {
 	    			element.getDriver().switchTo().defaultContent();
 	    		}
 	    	}
