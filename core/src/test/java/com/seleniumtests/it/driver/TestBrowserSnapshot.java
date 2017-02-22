@@ -245,7 +245,7 @@ public class TestBrowserSnapshot {
 
 		// exception thrown if nothing found
 		ImageDetector detectorTop = new ImageDetector(new File(filePath), new File(topFilePath), 0.001);
-		detectorTop.detectExactZone();
+		detectorTop.detectExactZoneWithScale();
 	}
 	
 	/**

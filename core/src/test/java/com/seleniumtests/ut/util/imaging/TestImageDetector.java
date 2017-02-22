@@ -25,6 +25,7 @@ import org.openqa.selenium.Rectangle;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import com.google.api.client.util.DateTime;
 import com.seleniumtests.GenericTest;
 import com.seleniumtests.customexception.ImageSearchException;
 import com.seleniumtests.util.imaging.ImageDetector;
@@ -37,6 +38,55 @@ public class TestImageDetector extends GenericTest {
 		FileUtils.copyInputStreamToFile(Thread.currentThread().getContextClassLoader().getResourceAsStream(resource), tempFile);
 		
 		return tempFile;
+	}
+	
+	/**
+	 * Search an image inside an other with templace matching
+	 * @throws IOException 
+	 */
+	// low resolution
+	@Test(groups={"ut"})
+	public void searchPicturesByTemplate() throws IOException {
+		ImageDetector detector = new ImageDetector(createFileFromResource("tu/images/infolidays.png"), 
+				createFileFromResource("tu/images/bouton_enregistrer.png"), 0.06);
+
+		detector.detectExactZoneWithScale();
+		Assert.assertEquals(detector.getDetectedRectangle(), new Rectangle(457, 1582, 232, 487));
+		Assert.assertEquals(detector.getSizeRatio(), 2.5, 0.05);
+	}
+	@Test(groups={"ut"})
+	public void searchPicturesByTemplate2() throws IOException {
+		ImageDetector detector = new ImageDetector(createFileFromResource("tu/images/infolidays.png"), 
+				createFileFromResource("tu/images/bouton_enregistrer2.png"), 0.06);
+		detector.detectExactZoneWithScale();
+		Assert.assertEquals(detector.getDetectedRectangle(), new Rectangle(69, 1609, 185, 1299));
+		Assert.assertEquals(detector.getSizeRatio(), 1.2, 0.05);
+	}
+	// small object
+	@Test(groups={"ut"})
+	public void searchPicturesByTemplate3() throws IOException {
+		ImageDetector detector = new ImageDetector(createFileFromResource("tu/images/infolidays.png"), 
+				createFileFromResource("tu/images/bouton_enregistrer3.png"), 0.06);
+		detector.detectExactZoneWithScale();
+		Assert.assertEquals(detector.getDetectedRectangle(), new Rectangle(677, 1595, 220, 155));
+		Assert.assertEquals(detector.getSizeRatio(), 1.2, 0.05);
+	}
+	// highly detailed
+	@Test(groups={"ut"})
+	public void searchPicturesByTemplate4() throws IOException {
+		ImageDetector detector = new ImageDetector(createFileFromResource("tu/images/RIB.png"), 
+				createFileFromResource("tu/images/creditMutuelLogo.png"), 0.06);
+		detector.detectExactZoneWithScale();
+		Assert.assertEquals(detector.getDetectedRectangle(), new Rectangle(604, 147, 77, 493));
+		Assert.assertEquals(detector.getSizeRatio(), 1.0, 0.05);
+	}
+	
+	@Test(groups={"ut"}, expectedExceptions=ImageSearchException.class)
+	public void searchPicturesByTemplateNoMatching() throws IOException {
+		ImageDetector detector = new ImageDetector(createFileFromResource("tu/images/p9.png"), 
+				createFileFromResource("tu/images/creditMutuelLogo.png"), 0.06);
+		detector.detectExactZoneWithScale();
+		Assert.assertEquals(detector.getSizeRatio(), 1.0, 0.05);
 	}
 	
 	/**
@@ -184,7 +234,7 @@ public class TestImageDetector extends GenericTest {
 	public void searchExactPictureNoDetection() throws IOException {
 		ImageDetector detector = new ImageDetector(createFileFromResource("tu/images/RIB.png"), 
 						createFileFromResource("tu/images/vosAlertes.png"));
-		detector.detectExactZone();
+		detector.detectExactZoneWithScale();
 	}
 	
 	/**
@@ -195,7 +245,7 @@ public class TestImageDetector extends GenericTest {
 	public void searchExactPicture() throws IOException {
 		ImageDetector detector = new ImageDetector(createFileFromResource("tu/images/p9.png"), 
 				createFileFromResource("tu/images/vosAlertes.png"));
-		detector.detectExactZone();
+		detector.detectExactZoneWithScale();
 	}
 	
 	

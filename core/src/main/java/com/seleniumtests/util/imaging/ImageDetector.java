@@ -18,8 +18,17 @@ package com.seleniumtests.util.imaging;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
@@ -38,6 +47,7 @@ import org.opencv.core.MatOfKeyPoint;
 import org.opencv.core.MatOfPoint2f;
 import org.opencv.core.Point;
 import org.opencv.core.Scalar;
+import org.opencv.core.Size;
 import org.opencv.features2d.DMatch;
 import org.opencv.features2d.DescriptorExtractor;
 import org.opencv.features2d.DescriptorMatcher;
@@ -78,6 +88,36 @@ public class ImageDetector {
 		nu.pattern.OpenCV.loadShared();
 	}
 	
+	class TemplateMatchProperties {
+		public Point matchLoc;
+		public Integer matchScale;
+		public Double matchValue;
+		public boolean active;
+		
+		public TemplateMatchProperties() {
+			matchLoc = null;
+			matchScale = null;
+			matchValue = null;
+			active = false;
+		}
+		
+		public TemplateMatchProperties(Point loc, Double value, Integer scale) {
+			matchLoc = loc;
+			matchScale = scale;
+			matchValue = value;
+			active = true;
+		}
+		
+		@Override
+		public String toString() {
+			return String.format("%s - %s: %.2f", matchLoc, matchScale, matchValue);
+		}
+		
+		public Double getDoubleScale() {
+			return matchScale != null ? matchScale / 1000.0: null;
+		}
+	}
+	
 	public ImageDetector() {
 		// do nothing, only for test
 	}
@@ -114,6 +154,15 @@ public class ImageDetector {
 		surfExtractor.compute(objectImageMat, objectKeyPoints, objectDescriptor);
 		surfExtractor.compute(sceneImageMat, sceneKeyPoints, sceneDescriptor);
 		
+		try {
+			Mat outImage = new Mat();
+			Features2d.drawKeypoints(objectImageMat, objectKeyPoints, outImage);
+			String tempFile = File.createTempFile("img", ".png").getAbsolutePath();
+			writeComparisonPictureToFile(tempFile, outImage);
+		} catch (IOException e) {
+			
+		}
+		
 		// http://stackoverflow.com/questions/29828849/flann-for-opencv-java
 		DescriptorMatcher matcher = DescriptorMatcher.create(DescriptorMatcher.FLANNBASED);
 		MatOfDMatch matches = new MatOfDMatch();
@@ -124,11 +173,17 @@ public class ImageDetector {
 		if (sceneKeyPoints.toList().size() == 0) {
 			throw new ImageSearchException("No keypoints in scene, check it's not uniformly coloured: " + sceneImage.getAbsolutePath());
 		}
-		
+		if (objectDescriptor.type() != CvType.CV_32F) {
+			objectDescriptor.convertTo(objectDescriptor, CvType.CV_32F);
+		}
+		if (sceneDescriptor.type() != CvType.CV_32F) {
+			sceneDescriptor.convertTo(sceneDescriptor, CvType.CV_32F);
+		}
+			
 		matcher.match( objectDescriptor, sceneDescriptor, matches );
 		
 		double maxDist = 0; 
-		double minDist = 100;
+		double minDist = 10000;
 		
 		for( int i = 0; i < objectDescriptor.rows(); i++ ) { 
 			double dist = matches.toList().get(i).distance;
@@ -240,17 +295,133 @@ public class ImageDetector {
 		
 		recordDetectedRectangle(p1, p2, p3, p4);
 	}
-	
-	/**
-	 * This method uses template matching for exact comparison
-	 * It means that no resizing or rotation can be detected
-	 * @throws IOException
-	 */
-	public void detectExactZone() {
-		int matchMethod = Imgproc.TM_CCOEFF_NORMED;
-		Mat sceneImageMat = Highgui.imread(sceneImage.getAbsolutePath(), Highgui.CV_LOAD_IMAGE_COLOR);
-        Mat objectImageMat = Highgui.imread(objectImage.getAbsolutePath(), Highgui.CV_LOAD_IMAGE_COLOR);
 
+	public void detectExactZoneWithScale() {
+		
+		Mat sceneImageMat = Highgui.imread(sceneImage.getAbsolutePath(), Highgui.CV_LOAD_IMAGE_GRAYSCALE);
+        Mat objectImageMat = Highgui.imread(objectImage.getAbsolutePath(), Highgui.CV_LOAD_IMAGE_GRAYSCALE);
+        
+        List<TemplateMatchProperties> matches = Collections.synchronizedList(new ArrayList<>());
+        
+        Map<Integer, Double> scaleSteps = new LinkedHashMap<>();
+        scaleSteps.put(100, 0.6);
+        scaleSteps.put(50, 0.7);
+        scaleSteps.put(25, 0.8);
+        
+        int currentStep = 100;
+        
+        Set<Integer> computedScales = new HashSet<>();
+        
+        while (currentStep >= 25) {
+        	final double currentThreshold = scaleSteps.get(currentStep);
+        	
+        	// first loop
+        	Set<Integer> localScales = Collections.synchronizedSet(new HashSet<>());
+        	if (currentStep == 100) {
+        		for (int scale=200; scale < 1200; scale += currentStep) {
+        			localScales.add(scale);
+                }
+        	} else {
+        		if (matches.isEmpty()) {
+        			throw new ImageSearchException("no matches");
+        		}
+	        	for (TemplateMatchProperties tmpM: matches) {
+	        		if (tmpM.active) {
+	        			localScales.add(tmpM.matchScale - currentStep);
+	        			localScales.add(tmpM.matchScale + currentStep);
+	        		}
+	        	}
+        	}
+        	
+        	ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+        	for (int scale: localScales) {
+        		if (computedScales.contains(scale)) {
+        			continue;
+        		}
+        		computedScales.add(scale);
+
+    			// resize to scale factor
+        		final int localScale = scale;
+    			Size sz = new Size(sceneImageMat.cols() * scale / 1000.0, sceneImageMat.rows() * localScale / 1000.0);
+    			
+    			// skip if resized image is smaller than object
+    			if (sz.width < objectImageMat.cols() || sz.height < objectImageMat.rows()) {
+    				continue;
+    			}
+
+    			executorService.submit(() -> {
+    				
+    				Mat resizeSceneImageMat = new Mat();
+    				Imgproc.resize( sceneImageMat, resizeSceneImageMat, sz );
+    				
+    		        try {
+    		        	TemplateMatchProperties match = detectExactZone2(resizeSceneImageMat, objectImageMat, localScale, currentThreshold);
+    		        	matches.add(match);
+    		      	} catch (ImageSearchException e) {
+    				}
+    		        
+    		      });
+    		}
+        
+    		executorService.shutdown();
+    		try {
+    			executorService.awaitTermination(10, TimeUnit.SECONDS);
+    		} catch (InterruptedException e) {
+    		}
+    		
+    		
+        	// shortcut if we find a very good match
+    		double cleanThreshold = currentThreshold;
+    		matches.sort((TemplateMatchProperties t1, TemplateMatchProperties t2) -> -(t1.matchValue.compareTo(t2.matchValue)));
+    		if (!matches.isEmpty() && matches.get(0).matchValue > 0.9) {
+    			cleanThreshold = 0.9;
+    			currentStep = Math.min(currentStep, 50);
+    		} 
+    		currentStep = currentStep / 2;
+
+    		
+    		// clean matches from too low matching values
+    		for (TemplateMatchProperties t: matches) {
+    			if (t.matchValue < cleanThreshold) {
+        			t.active = false;
+        		}
+    		}
+        }
+		
+		// get the best match
+		matches.sort((TemplateMatchProperties t1, TemplateMatchProperties t2) -> -(t1.matchValue.compareTo(t2.matchValue)));
+		
+		if (!matches.isEmpty()) {
+			TemplateMatchProperties bestMatch = matches.get(0);
+			if (bestMatch.matchValue < 1 - detectionThreshold) {
+				throw new ImageSearchException(String.format("No match found for threshold %.2f, match found with value %.2f", 1 - detectionThreshold, bestMatch.matchValue));
+			}
+	
+			detectedRectangle = new Rectangle((int)(bestMatch.matchLoc.x / bestMatch.getDoubleScale()), 
+												(int)(bestMatch.matchLoc.y / bestMatch.getDoubleScale()), 
+												(int)(objectImageMat.rows() / bestMatch.getDoubleScale()), 
+												(int)(objectImageMat.cols() / bestMatch.getDoubleScale()));
+			
+			if (debug) {
+				try {
+					Core.rectangle(sceneImageMat, new Point(detectedRectangle.x, detectedRectangle.y), new Point(detectedRectangle.x + detectedRectangle.width,
+						detectedRectangle.y + detectedRectangle.height), new Scalar(0, 255, 0));
+				
+					showResultingPicture(sceneImageMat);
+				} catch (IOException e) {
+				}
+			}
+	        rotationAngle = 0;
+	        sizeRatio = detectedRectangle.width / (double)objectImageMat.cols();
+	        
+		} else {
+			throw new ImageSearchException("no matching has been found");
+		}
+      
+	}
+	
+	private MinMaxLocResult getBestTemplateMatching(int matchMethod, Mat sceneImageMat, Mat objectImageMat) {
+		
         // / Create the result matrix
         int resultCols = sceneImageMat.cols() - objectImageMat.cols() + 1;
         int resultRows = sceneImageMat.rows() - objectImageMat.rows() + 1;
@@ -259,36 +430,26 @@ public class ImageDetector {
         // / Do the Matching and Normalize
         Imgproc.matchTemplate(sceneImageMat, objectImageMat, result, matchMethod);
 
-        // / Localizing the best match with minMaxLoc
-        MinMaxLocResult mmr = Core.minMaxLoc(result);
-
-        Point matchLoc;
-        if (matchMethod == Imgproc.TM_SQDIFF || matchMethod == Imgproc.TM_SQDIFF_NORMED) {
-            matchLoc = mmr.minLoc;
-            if (mmr.minVal > detectionThreshold) {
-            	throw new ImageSearchException("match not found");
-            }
-        } else {
-            matchLoc = mmr.maxLoc;
-            if (mmr.maxVal < 1 - detectionThreshold) {
-            	throw new ImageSearchException("match not found");
-            }
-        }
-
-        // / Show me what you got
-        Core.rectangle(sceneImageMat, matchLoc, new Point(matchLoc.x + objectImageMat.cols(),
-                matchLoc.y + objectImageMat.rows()), new Scalar(0, 255, 0));
-        
-        detectedRectangle = new Rectangle((int)matchLoc.x, (int)matchLoc.y, (int)objectImageMat.rows(), (int)objectImageMat.cols());
-        rotationAngle = 0;
-        
-        // Save the visualized detection.
-        if (debug) {
-        	try {
-				showResultingPicture(sceneImageMat);
-			} catch (IOException e) {
-			}
-        }
+        // / Localizing the best match with minMaxLoc        
+        return Core.minMaxLoc(result);
+	}
+	
+	/**
+	 * This method uses template matching for exact comparison
+	 * It means that no resizing or rotation can be detected
+	 * @throws IOException
+	 */
+	private TemplateMatchProperties detectExactZone2(Mat sceneImageMat, Mat objectImageMat, int scale, double threshold) {
+		
+		// with this match method, higher value is better. TM_SQDIFF would imply lower as better
+		int matchMethod = Imgproc.TM_CCOEFF_NORMED;
+		 
+		MinMaxLocResult mmr = getBestTemplateMatching(matchMethod, sceneImageMat, objectImageMat);
+		System.out.println(scale + " - " + mmr.maxVal);
+		if (mmr.maxVal < threshold) {
+			throw new ImageSearchException("match not found");
+		}
+		return new TemplateMatchProperties(mmr.maxLoc, mmr.maxVal, scale);
 	}
 	
 	/**
@@ -500,5 +661,9 @@ public class ImageDetector {
 			throw new ImageSearchException(String.format("File for scene to detect object in %s does not exist", objectImage));
 		}
 		this.objectImage = objectImage;
+	}
+
+	public void setDetectionThreshold(double detectionThreshold) {
+		this.detectionThreshold = detectionThreshold;
 	}
 }

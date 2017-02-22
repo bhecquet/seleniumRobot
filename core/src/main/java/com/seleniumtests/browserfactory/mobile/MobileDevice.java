@@ -53,4 +53,9 @@ public class MobileDevice {
 	public String getVersion() {
 		return version;
 	}
+	
+	@Override
+	public String toString() {
+		return String.format("name: %s, id: %s, platform: %s, version: %s, browsers: %s", name, id, platform, version, browsers.toString());
+	}
 }
