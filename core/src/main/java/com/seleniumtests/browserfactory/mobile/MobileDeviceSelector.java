@@ -105,7 +105,7 @@ public class MobileDeviceSelector {
 		);
 		
 		if (filteredDeviceList.isEmpty()) {
-			throw new ConfigurationException("no matching device found");
+			throw new ConfigurationException("no matching device found among: " + deviceList);
 		}
 		
 		// returns the first matching device

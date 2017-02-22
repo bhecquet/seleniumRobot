@@ -33,6 +33,8 @@ import org.openqa.selenium.support.ui.SystemClock;
 
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.ImageSearchException;
+import com.seleniumtests.customexception.ScenarioException;
+import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.driver.screenshots.ScreenshotUtil;
 import com.seleniumtests.uipage.ReplayOnError;
@@ -40,6 +42,8 @@ import com.seleniumtests.util.helper.WaitHelper;
 import com.seleniumtests.util.imaging.ImageDetector;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
+import io.appium.java_client.AppiumDriver;
+import io.appium.java_client.SwipeElementDirection;
 import io.appium.java_client.TouchAction;
 
 /**
@@ -64,12 +68,19 @@ public class PictureElement {
 	public PictureElement() {
 		// for mocks
 	}
-
+	
 	public PictureElement(String label, String resourcePath, HtmlElement intoElement) {
-		this(label, createFileFromResource(resourcePath), intoElement);
+		this(label, resourcePath, intoElement, 0.1);
+	}
+
+	public PictureElement(String label, String resourcePath, HtmlElement intoElement, double detectionThreshold) {
+		this(label, createFileFromResource(resourcePath), intoElement, detectionThreshold);
 		this.resourcePath = resourcePath;
 		driver = (EventFiringWebDriver)WebUIDriver.getWebDriver();
-		
+	}
+	
+	public PictureElement(String label, File pictureFile, HtmlElement intoElement) {
+		this(label, pictureFile, intoElement, 0.1);
 	}
 	
 	/**
@@ -79,9 +90,10 @@ public class PictureElement {
 	 * @param intoElement	HtmlElement inside of which our picture is. It allows scrolling to the zone where 
 	 * 						picture is searched before doing capture
 	 */
-	public PictureElement(String label, File pictureFile, HtmlElement intoElement) {
+	public PictureElement(String label, File pictureFile, HtmlElement intoElement, double detectionThreshold) {
 		this.intoElement = intoElement;
 		detector = new ImageDetector();
+		detector.setDetectionThreshold(detectionThreshold);
 		setObjectPictureFile(pictureFile);
 		screenshotUtil = new ScreenshotUtil();
 	}
@@ -117,7 +129,7 @@ public class PictureElement {
 			throw new WebDriverException("Screenshot does not exist");
 		}
 		detector.setSceneImage(screenshotFile);
-		detector.detectCorrespondingZone();
+		detector.detectExactZoneWithScale();
 		detectedObjectRectangle = detector.getDetectedRectangle();
 		pictureSizeRatio = detector.getSizeRatio();
 		
@@ -146,12 +158,31 @@ public class PictureElement {
 	public void clickAt(int xOffset, int yOffset) {
 		findElement(true);
 		
-//		Point intoElementPos = intoElement.getCoordinates().inViewPort();
 		Point intoElementPos = intoElement.getCoordinates().onPage();
 		int relativeX = detectedObjectRectangle.x + detectedObjectRectangle.width / 2 - intoElementPos.x;
 		int relativeY = detectedObjectRectangle.y + detectedObjectRectangle.height / 2 - intoElementPos.y;
 		
 		moveAndClick(intoElement, relativeX + (int)(xOffset * pictureSizeRatio), relativeY + (int)(yOffset * pictureSizeRatio));
+	}
+	
+	@ReplayOnError
+    public void swipe(int xMove, int yMove) {
+		findElement(true);
+		
+		int xInit = detectedObjectRectangle.x + detectedObjectRectangle.width / 2;
+		int yInit = detectedObjectRectangle.y + detectedObjectRectangle.height / 2;
+		
+		new TouchAction(getMobileDriver()).press(xInit, yInit)
+			.waitAction(500)
+			.moveTo(xInit + xMove, yInit + yMove)
+			.release();
+	}
+	
+	@ReplayOnError
+    public void tap() {
+		findElement(true);
+		
+		new TouchAction(getMobileDriver()).tap(detectedObjectRectangle.x + detectedObjectRectangle.width / 2, detectedObjectRectangle.y + detectedObjectRectangle.height / 2);
 	}
 	
 	public void moveAndClick(WebElement element, int coordX, int coordY) {
@@ -222,6 +253,13 @@ public class PictureElement {
 	public void setObjectPictureFile(File objectPictureFile) {
 		this.objectPictureFile = objectPictureFile;
 		detector.setObjectImage(objectPictureFile);
+	}
+	
+	private AppiumDriver getMobileDriver() {
+		if (!(((CustomEventFiringWebDriver)driver).getWebDriver() instanceof AppiumDriver<?>)) {
+    		throw new ScenarioException("action is available only for mobile platforms");
+    	}
+		return (AppiumDriver)((CustomEventFiringWebDriver)driver).getWebDriver();
 	}
 	
 	// TODO: actions for mobile
