@@ -175,18 +175,18 @@ public class PictureElement {
 		new TouchAction(getMobileDriver()).press(xInit, yInit)
 			.waitAction(500)
 			.moveTo(xInit + xMove, yInit + yMove)
-			.release();
+			.release()
+			.perform();
 	}
 	
 	@ReplayOnError
     public void tap() {
 		findElement(true);
-		
-		new TouchAction(getMobileDriver()).tap(detectedObjectRectangle.x + detectedObjectRectangle.width / 2, detectedObjectRectangle.y + detectedObjectRectangle.height / 2);
+		new TouchAction(getMobileDriver()).tap(detectedObjectRectangle.x + detectedObjectRectangle.width / 2, detectedObjectRectangle.y + detectedObjectRectangle.height / 2).perform();
 	}
 	
 	public void moveAndClick(WebElement element, int coordX, int coordY) {
-		new Actions(driver).moveToElement(intoElement, coordX, coordY).click().build().perform();
+		new Actions(driver).moveToElement(element, coordX, coordY).click().build().perform();
 	}
 	
 	public void sendKeys(final CharSequence text, int xOffset, int yOffset) {
