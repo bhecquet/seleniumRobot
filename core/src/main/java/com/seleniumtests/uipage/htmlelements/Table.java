@@ -22,9 +22,12 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.Point;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
 
 import com.seleniumtests.customexception.ScenarioException;
+import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import com.seleniumtests.uipage.ReplayOnError;
 
 public class Table extends HtmlElement {
@@ -139,6 +142,15 @@ public class Table extends HtmlElement {
     	}
     }
     
+    public WebElement getCell(final int row, final int column, boolean focus) {
+    	WebElement cell = getCell(row, column);
+    	if (focus) {
+    		Point loc = cell.getLocation();
+    		((CustomEventFiringWebDriver)driver).scrollTo(loc.x - 50, loc.y - 50);
+    	}
+    	return cell;
+    }
+    
     /**
      * Get table cell.
      */
@@ -156,6 +168,8 @@ public class Table extends HtmlElement {
     		if (columns.isEmpty()) {
     			throw new ScenarioException(String.format("Cell at (%d, %d) could not be found", row, column));
     		}
+    		
+    		
     		
     		return columns.get(column);
     	}
