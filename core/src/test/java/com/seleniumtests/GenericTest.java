@@ -16,6 +16,10 @@
  */
 package com.seleniumtests;
 
+import java.io.File;
+import java.io.IOException;
+
+import org.apache.commons.io.FileUtils;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeMethod;
 
@@ -33,5 +37,13 @@ public class GenericTest {
 	@AfterClass(alwaysRun = true)
 	public void closeBrowser() {
 		WebUIDriver.cleanUp();
+	}
+	
+	protected File createFileFromResource(String resource) throws IOException {
+		File tempFile = File.createTempFile("img", null);
+		tempFile.deleteOnExit();
+		FileUtils.copyInputStreamToFile(Thread.currentThread().getContextClassLoader().getResourceAsStream(resource), tempFile);
+		
+		return tempFile;
 	}
 }

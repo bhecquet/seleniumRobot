@@ -1,0 +1,81 @@
+package com.seleniumtests.ut.util.logging;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
+
+import org.testng.Assert;
+import org.testng.annotations.Test;
+
+import com.seleniumtests.GenericTest;
+import com.seleniumtests.customexception.ConfigurationException;
+import com.seleniumtests.util.logging.AppStepsGenerator;
+
+public class TestAppStepGenerator extends GenericTest {
+
+	@Test(groups={"ut"})
+	public void testFileAnalysisStepMethods() throws IOException {
+		List<AppStepsGenerator.TestStep> steps = new AppStepsGenerator().analyzeFile(createFileFromResource("tu/JPetStoreHome.java"));
+		
+		Assert.assertEquals(steps.size(), 4);
+		Assert.assertEquals(steps.get(0).stepMethod, "goToFish");
+		Assert.assertEquals(steps.get(1).stepMethod, "goToSonarLanguageList");
+		Assert.assertEquals(steps.get(2).stepMethod, "goToMockedSonarLanguageList");
+		Assert.assertEquals(steps.get(3).stepMethod, "goToFishFromHeader");
+	}
+	
+	/**
+	 * Test with cucumber annotation and without
+	 * @throws IOException
+	 */
+	@Test(groups={"ut"})
+	public void testFileAnalysisStepNames() throws IOException {
+		List<AppStepsGenerator.TestStep> steps = new AppStepsGenerator().analyzeFile(createFileFromResource("tu/JPetStoreHome.java"));
+		
+		Assert.assertEquals(steps.get(0).stepName, "When Cliquer sur le lien 'FISH'");
+		Assert.assertEquals(steps.get(1).stepName, "public LanguageList goToSonarLanguageList()");
+		Assert.assertEquals(steps.get(3).stepName, "public FishList goToFishFromHeader(String param)");
+		
+		Assert.assertEquals(steps.get(0).stepDetails, "Go to fish page\n" +
+				"@return\n" +
+				"@throws Exception");
+	}
+	
+	/**
+	 * Test with and without comment for method
+	 * @throws IOException
+	 */
+	@Test(groups={"ut"})
+	public void testFileAnalysisStepDetails() throws IOException {
+		List<AppStepsGenerator.TestStep> steps = new AppStepsGenerator().analyzeFile(createFileFromResource("tu/JPetStoreHome.java"));
+		
+		Assert.assertEquals(steps.get(0).stepDetails, "Go to fish page\n" +
+				"@return\n" +
+				"@throws Exception");
+		Assert.assertEquals(steps.get(3).stepDetails, "");
+	}
+	
+	@Test(groups={"ut"})
+	public void testGetSourceFiles() {
+		File resourceDir = new File(TestAppStepGenerator.class.getClassLoader().getResource("tu/JPetStoreHome.java").getFile()).getParentFile();
+		File[] javaFiles = new AppStepsGenerator().getSourceFiles(resourceDir);
+		Assert.assertEquals(javaFiles.length, 2);
+		Assert.assertEquals(javaFiles[0].getName(), "Catalog.java");
+	}
+	
+	@Test(groups={"ut"}, expectedExceptions=ConfigurationException.class)
+	public void testGetSourceFilesWrongPath() {
+		new AppStepsGenerator().getSourceFiles(new File("/home/test/src"));
+	}
+	
+	@Test(groups={"ut"})
+	public void testTxtFormat() throws IOException {
+		File resourceDir = new File(TestAppStepGenerator.class.getClassLoader().getResource("tu/JPetStoreHome.java").getFile()).getParentFile();
+		String output = new AppStepsGenerator().generate(resourceDir);
+
+		System.out.println(output);
+		Assert.assertTrue(output.contains("\tWhen Cliquer sur le lien 'FISH'"));
+		Assert.assertTrue(output.contains("\"Go to fish page"));
+	}
+
+}
