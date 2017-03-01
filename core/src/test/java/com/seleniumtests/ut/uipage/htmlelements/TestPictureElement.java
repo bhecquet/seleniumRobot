@@ -108,7 +108,7 @@ public class TestPictureElement extends MockitoTest {
 		PictureElement picElement = spy(pictureElement);
 		picElement.setObjectPictureFile(new File(""));
 		when(screenshotUtil.captureWebPageToFile()).thenReturn(new File(""));
-		doThrow(ImageSearchException.class).when(imageDetector).detectCorrespondingZone();
+		doThrow(ImageSearchException.class).when(imageDetector).detectExactZoneWithScale();
 		
 		Assert.assertFalse(picElement.isElementPresent());
 		
@@ -121,7 +121,7 @@ public class TestPictureElement extends MockitoTest {
 		PictureElement picElement = spy(pictureElement);
 		picElement.setObjectPictureFile(new File(""));
 		when(screenshotUtil.captureWebPageToFile()).thenReturn(new File(""));
-		doThrow(ImageSearchException.class).when(imageDetector).detectCorrespondingZone();
+		doThrow(ImageSearchException.class).when(imageDetector).detectExactZoneWithScale();
 		
 		Assert.assertFalse(picElement.isElementPresent(350));
 		
