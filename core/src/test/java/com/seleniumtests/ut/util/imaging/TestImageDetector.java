@@ -19,27 +19,17 @@ package com.seleniumtests.ut.util.imaging;
 import java.io.File;
 import java.io.IOException;
 
-import org.apache.commons.io.FileUtils;
 import org.opencv.core.Point;
 import org.openqa.selenium.Rectangle;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import com.google.api.client.util.DateTime;
 import com.seleniumtests.GenericTest;
 import com.seleniumtests.customexception.ImageSearchException;
 import com.seleniumtests.util.imaging.ImageDetector;
 
 public class TestImageDetector extends GenericTest {
 
-	private File createFileFromResource(String resource) throws IOException {
-		File tempFile = File.createTempFile("img", null);
-		tempFile.deleteOnExit();
-		FileUtils.copyInputStreamToFile(Thread.currentThread().getContextClassLoader().getResourceAsStream(resource), tempFile);
-		
-		return tempFile;
-	}
-	
 	/**
 	 * Search an image inside an other with templace matching
 	 * @throws IOException 

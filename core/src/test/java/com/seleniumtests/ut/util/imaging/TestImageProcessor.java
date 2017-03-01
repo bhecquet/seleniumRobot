@@ -4,7 +4,6 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
-import org.apache.commons.io.FileUtils;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -13,13 +12,7 @@ import com.seleniumtests.util.imaging.ImageProcessor;
 
 public class TestImageProcessor extends GenericTest {
 
-	private File createFileFromResource(String resource) throws IOException {
-		File tempFile = File.createTempFile("img", null);
-		tempFile.deleteOnExit();
-		FileUtils.copyInputStreamToFile(Thread.currentThread().getContextClassLoader().getResourceAsStream(resource), tempFile);
-		
-		return tempFile;
-	}
+	
 	
 	/**
 	 * Crop a picture
