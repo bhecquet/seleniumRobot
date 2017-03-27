@@ -17,26 +17,27 @@
 package com.seleniumtests.util.osutility;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.EnumMap;
+import java.util.Map;
 
 import com.seleniumtests.driver.BrowserType;
 
 public class OSUtilityMac extends OSUtilityUnix {
 	
-
 	@Override
-	public List<BrowserType> getInstalledBrowsers() {
-		List<BrowserType> browserList = new ArrayList<>();
+	public Map<BrowserType, String> getInstalledBrowsersWithVersion() {
+		Map<BrowserType, String> browserList = new EnumMap<>(BrowserType.class);
 		
 		// safari is always installed on mac os
-		browserList.add(BrowserType.SAFARI);
+		browserList.put(BrowserType.SAFARI, "latest");
 		
 		if (new File("/Applications/Google Chrome.app").isDirectory()) {
-			browserList.add(BrowserType.CHROME);
+			String version = OSCommand.executeCommandAndWait("\"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome\" --version");
+			browserList.put(BrowserType.CHROME, extractChromeVersion(version));
 		}
 		if (new File("/Applications/Firefox.app").isDirectory()) {
-			browserList.add(BrowserType.FIREFOX);
+			String version = OSCommand.executeCommandAndWait("/Applications/Firefox.app/Contents/MacOS/firefox --version | more");
+			browserList.put(BrowserType.FIREFOX, extractFirefoxVersion(version));
 		}
 		
 		return browserList;

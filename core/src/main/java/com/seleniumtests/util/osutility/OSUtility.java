@@ -19,6 +19,9 @@ package com.seleniumtests.util.osutility;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 
@@ -239,6 +242,73 @@ public abstract class OSUtility {
     
     public abstract String getOSBuild();
     
-    public abstract List<BrowserType> getInstalledBrowsers();
+    public List<BrowserType> getInstalledBrowsers() {
+    	return new ArrayList<>(getInstalledBrowsersWithVersion().keySet());
+    }
+    
+    public abstract Map<BrowserType, String> getInstalledBrowsersWithVersion();
+    
+    /**
+     * example: Mozilla Firefox 52.0
+     * @param versionString
+     * @return
+     */
+    protected String extractFirefoxVersion(String versionString) {
+    	Pattern regMozilla = Pattern.compile("^Mozilla .* (\\d+\\.\\d+).*");
+    	Matcher versionMatcher = regMozilla.matcher(versionString.trim());
+		if (versionMatcher.matches()) {
+			return versionMatcher.group(1);
+		} else {
+			return "";
+		}
+    }
+    
+    /**
+     * example: Google Chrome 57.0.2987.110
+     * @param versionString
+     * @return
+     */
+    protected String extractChromeVersion(String versionString) {
+    	Pattern regChrome = Pattern.compile("^Google Chrome (\\d+\\.\\d+).*");
+    	Matcher versionMatcher = regChrome.matcher(versionString.trim());
+    	if (versionMatcher.matches()) {
+    		return versionMatcher.group(1);
+    	} else {
+    		return "";
+    	}
+    }
+    
+    /**
+     * example: Chromium 56.0.2924.76 Built on Ubuntu , running on Ubuntu 16.04 
+     * @param versionString
+     * @return
+     */
+    protected String extractChromiumVersion(String versionString) {
+    	Pattern regChrome = Pattern.compile("^Chromium (\\d+\\.\\d+).*");
+    	Matcher versionMatcher = regChrome.matcher(versionString.trim());
+    	if (versionMatcher.matches()) {
+    		return versionMatcher.group(1);
+    	} else {
+    		return "";
+    	}
+    }
+    
+    /**
+     * example: 11.0.9600.18499
+     * @param versionString
+     * @return
+     */
+    protected String extractIEVersion(String versionString) {
+    	return versionString.split("\\.")[0];
+    }
+    
+    /**
+     * example: 10240.th1.160802-1852
+     * @param versionString
+     * @return
+     */
+    protected String extractEdgeVersion(String versionString) {
+    	return versionString.split("\\.")[0];
+    }
     
 }

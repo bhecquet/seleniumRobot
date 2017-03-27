@@ -16,10 +16,13 @@
  */
 package com.seleniumtests.util.osutility;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.EnumMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -117,39 +120,46 @@ public class OSUtilityWindows extends OSUtility {
 	}
 
 	@Override
-	public List<BrowserType> getInstalledBrowsers() {
+	public Map<BrowserType, String> getInstalledBrowsersWithVersion() {
 			
-		List<BrowserType> browserList = new ArrayList<>();
+		Map<BrowserType, String> browserList = new EnumMap<>(BrowserType.class);
 		
 		// look for Firefox
 		try {
-			Advapi32Util.registryGetStringValue(WinReg.HKEY_CLASSES_ROOT, "FirefoxHTML\\shell\\open\\command", "");
-			browserList.add(BrowserType.FIREFOX);
+			String firefoxPath = Advapi32Util.registryGetStringValue(WinReg.HKEY_CLASSES_ROOT, "FirefoxHTML\\shell\\open\\command", "");
+			String version = OSCommand.executeCommandAndWait(firefoxPath + File.separator + "firefox --version | more");
+			browserList.put(BrowserType.FIREFOX, extractFirefoxVersion(version));
 		} catch (Win32Exception e) {}
 		
 		
 		// look for chrome
 		try {
 			Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Classes\\ChromeHTML\\shell\\open\\command", "");
-			browserList.add(BrowserType.CHROME);
-		} catch (Win32Exception e) {}
-		
-		// look for safari
-		try {
-			Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Classes\\SafariHTML\\shell\\open\\command", "");
-			browserList.add(BrowserType.SAFARI);
+			String version;
+			try {
+				version = Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Wow6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Google Chrome", "version");
+			} catch (Win32Exception e) {
+				version = Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Google\\Chrome\\BLBeacon", "version");
+			}
+			browserList.put(BrowserType.CHROME, extractChromeVersion("Google Chrome " + version));
 		} catch (Win32Exception e) {}
 		
 		// look for ie
 		try {
 			Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Microsoft\\Windows\\CurrentVersion\\App Paths\\IEXPLORE.EXE", "");
-			browserList.add(BrowserType.INTERNET_EXPLORER);
+			String version;
+			try {
+				version = Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Microsoft\\Internet Explorer", "svcVersion");
+			} catch (Win32Exception e) {
+				version = Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Microsoft\\Internet Explorer", "version");
+			}
+			browserList.put(BrowserType.INTERNET_EXPLORER, extractIEVersion(version));
 		} catch (Win32Exception e) {}
 		
 		// look for edge
 		try {
-			Advapi32Util.registryGetStringValue(WinReg.HKEY_CURRENT_USER, "Software\\Microsoft\\MicrosoftEdge\\Main", "EdgeSwitchingOSBuildNumber");
-			browserList.add(BrowserType.EDGE);
+			String version = Advapi32Util.registryGetStringValue(WinReg.HKEY_CURRENT_USER, "Software\\Microsoft\\MicrosoftEdge\\Main", "EdgeSwitchingOSBuildNumber");
+			browserList.put(BrowserType.EDGE, extractEdgeVersion(version));
 		} catch (Win32Exception e) {}
 		
 		return browserList;
