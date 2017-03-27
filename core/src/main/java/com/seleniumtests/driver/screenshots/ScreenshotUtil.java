@@ -268,7 +268,7 @@ public class ScreenshotUtil {
     }
     
     /**
-	 * prend une capture d'écran
+	 * Take screenshot
 	 */
 	public File captureDesktopToFile() {
 		

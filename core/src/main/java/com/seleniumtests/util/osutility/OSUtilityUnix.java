@@ -19,7 +19,9 @@ package com.seleniumtests.util.osutility;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.EnumMap;
 import java.util.List;
+import java.util.Map;
 
 import com.seleniumtests.driver.BrowserType;
 
@@ -95,17 +97,24 @@ public class OSUtilityUnix extends OSUtility {
 	public String getOSBuild() {
 		return OSCommand.executeCommandAndWait("uname -a");
 	}
-
+	
 	@Override
-	public List<BrowserType> getInstalledBrowsers() {
-		List<BrowserType> browserList = new ArrayList<>();
+	public Map<BrowserType, String> getInstalledBrowsersWithVersion() {
+		Map<BrowserType, String> browserList = new EnumMap<>(BrowserType.class);
 		
-		if (!OSCommand.executeCommandAndWait("which firefox").trim().isEmpty() 
-			|| !OSCommand.executeCommandAndWait("which iceweasel").trim().isEmpty()) {
-			browserList.add(BrowserType.FIREFOX);
+		if (!OSCommand.executeCommandAndWait("which firefox").trim().isEmpty()) {
+			String version = OSCommand.executeCommandAndWait("firefox --version | more");
+			browserList.put(BrowserType.FIREFOX, extractFirefoxVersion(version));
+		} else if (!OSCommand.executeCommandAndWait("which iceweasel").trim().isEmpty()) {
+			String version = OSCommand.executeCommandAndWait("iceweasel --version | more");
+			browserList.put(BrowserType.FIREFOX, extractFirefoxVersion(version));
 		}
 		if (!OSCommand.executeCommandAndWait("which google-chrome").trim().isEmpty()) {
-			browserList.add(BrowserType.CHROME);
+			String version = OSCommand.executeCommandAndWait("google-chrome --version");
+			browserList.put(BrowserType.CHROME, extractChromeVersion(version));
+		} else if (!OSCommand.executeCommandAndWait("which chromium-browser").trim().isEmpty()) {
+			String version = OSCommand.executeCommandAndWait("chromium-browser --version");
+			browserList.put(BrowserType.CHROME, extractChromiumVersion(version));
 		}
 		
 		return browserList;
