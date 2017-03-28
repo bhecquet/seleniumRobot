@@ -253,7 +253,7 @@ public abstract class OSUtility {
      * @param versionString
      * @return
      */
-    protected String extractFirefoxVersion(String versionString) {
+    public static String extractFirefoxVersion(String versionString) {
     	Pattern regMozilla = Pattern.compile("^Mozilla .* (\\d+\\.\\d+).*");
     	Matcher versionMatcher = regMozilla.matcher(versionString.trim());
 		if (versionMatcher.matches()) {
@@ -268,7 +268,7 @@ public abstract class OSUtility {
      * @param versionString
      * @return
      */
-    protected String extractChromeVersion(String versionString) {
+    public static String extractChromeVersion(String versionString) {
     	Pattern regChrome = Pattern.compile("^Google Chrome (\\d+\\.\\d+).*");
     	Matcher versionMatcher = regChrome.matcher(versionString.trim());
     	if (versionMatcher.matches()) {
@@ -283,7 +283,7 @@ public abstract class OSUtility {
      * @param versionString
      * @return
      */
-    protected String extractChromiumVersion(String versionString) {
+    public static String extractChromiumVersion(String versionString) {
     	Pattern regChrome = Pattern.compile("^Chromium (\\d+\\.\\d+).*");
     	Matcher versionMatcher = regChrome.matcher(versionString.trim());
     	if (versionMatcher.matches()) {
@@ -298,7 +298,7 @@ public abstract class OSUtility {
      * @param versionString
      * @return
      */
-    protected String extractIEVersion(String versionString) {
+    public static String extractIEVersion(String versionString) {
     	return versionString.split("\\.")[0];
     }
     
@@ -307,7 +307,7 @@ public abstract class OSUtility {
      * @param versionString
      * @return
      */
-    protected String extractEdgeVersion(String versionString) {
+    public static String extractEdgeVersion(String versionString) {
     	return versionString.split("\\.")[0];
     }
     

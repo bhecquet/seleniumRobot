@@ -17,6 +17,7 @@
 package com.seleniumtests.driver;
 
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.openqa.selenium.Platform;
@@ -37,6 +38,7 @@ import com.seleniumtests.browserfactory.SeleniumGridDriverFactory;
 import com.seleniumtests.browserfactory.TestDroidDriverFactory;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.proxy.ProxyConfig;
+import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.DriverExceptions;
 import com.seleniumtests.util.helper.WaitHelper;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
@@ -228,14 +230,36 @@ public class WebUIDriver {
 
         return listeningDriver;
     }
+    
+    /**
+     * In local mode only, display the browser version
+     * For remote, will use either the default one, or version specified in test context
+     */
+    private void displayBrowserVersion() {
+    	String version = null;
+    	if (config.getMode() == DriverMode.LOCAL && !config.getTestType().isMobile()) {
+    		Map<BrowserType, String> browsers = OSUtilityFactory.getInstance().getInstalledBrowsersWithVersion();
+    		if (!browsers.containsKey(config.getBrowser())) {
+    			throw new ConfigurationException(String.format("Browser %s is not available. Available browsers are %s", 
+    					config.getBrowser(), browsers));
+    		}
+    		version = browsers.get(config.getBrowser());
+    	} else if (!config.getTestType().isMobile()) {
+    		version = SeleniumTestsContextManager.getThreadContext().getWebBrowserVersion();
+    	}
+    	
+    	logger.info("Browser version is: " + version);
+    }
 
     public WebDriver createWebDriver() {
+    	
     	if (config.getTestType().isMobile()) {
     		logger.info("Start creating appium driver");
     	} else {
     		logger.info(String.format("Start creating %s driver", config.getBrowser().getBrowserType()));
     	}
         
+    	displayBrowserVersion();
         driver = createRemoteWebDriver();
 
         if (config.getTestType().isMobile()) {
