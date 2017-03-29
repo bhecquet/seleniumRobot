@@ -124,6 +124,9 @@ public class OSUtilityWindows extends OSUtility {
 			
 		Map<BrowserType, String> browserList = new EnumMap<>(BrowserType.class);
 		
+		browserList.put(BrowserType.HTMLUNIT, "latest");
+		browserList.put(BrowserType.PHANTOMJS, "latest");
+		
 		// look for Firefox
 		try {
 			String firefoxPath = Advapi32Util.registryGetStringValue(WinReg.HKEY_CLASSES_ROOT, "FirefoxHTML\\shell\\open\\command", "");

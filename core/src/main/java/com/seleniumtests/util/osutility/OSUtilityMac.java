@@ -28,6 +28,9 @@ public class OSUtilityMac extends OSUtilityUnix {
 	public Map<BrowserType, String> getInstalledBrowsersWithVersion() {
 		Map<BrowserType, String> browserList = new EnumMap<>(BrowserType.class);
 		
+		browserList.put(BrowserType.HTMLUNIT, "latest");
+		browserList.put(BrowserType.PHANTOMJS, "latest");
+		
 		// safari is always installed on mac os
 		browserList.put(BrowserType.SAFARI, "latest");
 		
