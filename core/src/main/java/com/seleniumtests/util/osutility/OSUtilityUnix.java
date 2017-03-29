@@ -102,6 +102,9 @@ public class OSUtilityUnix extends OSUtility {
 	public Map<BrowserType, String> getInstalledBrowsersWithVersion() {
 		Map<BrowserType, String> browserList = new EnumMap<>(BrowserType.class);
 		
+		browserList.put(BrowserType.HTMLUNIT, "latest");
+		browserList.put(BrowserType.PHANTOMJS, "latest");
+		
 		if (!OSCommand.executeCommandAndWait("which firefox").trim().isEmpty()) {
 			String version = OSCommand.executeCommandAndWait("firefox --version | more");
 			browserList.put(BrowserType.FIREFOX, extractFirefoxVersion(version));
