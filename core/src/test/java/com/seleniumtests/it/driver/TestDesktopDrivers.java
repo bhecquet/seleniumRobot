@@ -54,7 +54,7 @@ public class TestDesktopDrivers extends GenericDriverTest {
 		SeleniumTestsContextManager.initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setBrowser("*iexplore");
 		driver = WebUIDriver.getWebDriver(true);
-		Assert.assertTrue(driver.getCurrentUrl().contains("http://localhost:"));
+		Assert.assertTrue(driver.getCurrentUrl().contains("http://localhost:") || driver.getCurrentUrl().contains("about:blank"));
 	}
 	
 	@Test(groups={"it"})
