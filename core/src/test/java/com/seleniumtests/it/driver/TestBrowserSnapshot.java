@@ -271,10 +271,10 @@ public class TestBrowserSnapshot {
 		int[] headerFooter = getHeaderAndFooterPixels(new File(filePath));
 		int[] headerFooterFull = getHeaderAndFooterPixels(new File(filePathFull));
 		
-		// header should have been removed, not footer
+		// header and footer should have been removed
 		Assert.assertEquals(6, headerFooter[0]);
 		Assert.assertEquals(5, headerFooter[1]);
-		Assert.assertEquals(headerFooter[2], headerFooterFull[2] + 2); 
+		Assert.assertTrue(headerFooter[2] >= headerFooterFull[2]); // depending on browser window size (depends on OS) image is split in more or less sections
 		Assert.assertEquals(ImageIO.read(new File(filePath)).getHeight(), ImageIO.read(new File(filePathFull)).getHeight());
 	}
 }
