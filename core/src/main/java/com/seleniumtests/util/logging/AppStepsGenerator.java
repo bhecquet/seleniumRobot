@@ -1,9 +1,10 @@
 package com.seleniumtests.util.logging;
 
 import java.io.File;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InvalidClassException;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -11,15 +12,18 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.tools.ant.util.SourceFileScanner;
+import org.apache.log4j.Logger;
 
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.expr.AnnotationExpr;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 import com.google.common.io.Files;
 import com.seleniumtests.customexception.ConfigurationException;
+import com.seleniumtests.customexception.DoNotVisitException;
+import com.seleniumtests.util.osutility.OSUtility;
 
 /**
  * This class aims at generating a documentation of the steps defined
@@ -31,6 +35,8 @@ import com.seleniumtests.customexception.ConfigurationException;
  */
 public class AppStepsGenerator {
 	
+	private static final Logger logger = SeleniumRobotLogger.getLogger(AppStepsGenerator.class);
+	
 	public class TestStep {
 		
 		public String stepName;
@@ -41,6 +47,21 @@ public class AppStepsGenerator {
 		public String toString() {
 			return stepName;
 		}
+	}
+	
+	/**
+	 * prevent SeleniumTestPlan sub-classes to be analyzed as they should not contain any steps
+	 * @author behe
+	 *
+	 */
+	private class ClassVisitor extends VoidVisitorAdapter<Void> {
+	
+		@Override
+		public void visit(ClassOrInterfaceDeclaration n, Void arg) {
+			if (!n.getExtendedTypes().isEmpty() && "SeleniumTestPlan".equals(n.getExtendedTypes().get(0).getName().toString())) {
+				throw new DoNotVisitException("do not analyse SeleniumTestPlan sub classes");
+			}	
+		}	
 	}
 	
 	private class MethodVisitor extends VoidVisitorAdapter<Void> {
@@ -71,7 +92,7 @@ public class AppStepsGenerator {
             
             steps.add(step);
         }
-        
+           
         private String getAnnotationString(AnnotationExpr annotation) {
         	String stepName = annotation.getChildNodes().get(1).toString();
         	return String.format("%s %s", annotation.getChildNodes().get(0), stepName.substring(1, stepName.lastIndexOf("\"")));
@@ -84,17 +105,24 @@ public class AppStepsGenerator {
 	
     }
 
-	public void main(String[] args) {
+	public static void main(String[] args) throws IOException {
+		if (!new File(args[0]).isDirectory()) {
+			throw new ConfigurationException(String.format("Folder %s does not exist", args[0]));
+		}
+		String stepsText = new AppStepsGenerator().generate(new File(args[0]));
+		File stepsFile = Paths.get(args[0], "steps.txt").toFile();
 		
+		logger.info("writing steps to " + stepsFile);
+		FileUtils.write(stepsFile, stepsText);
 	}
 	
 	/**
 	 * Returns list of java source files to analyze
 	 * @return
 	 */
-	public File[] getSourceFiles(File sourceDirectory) {
+	public List<File> getSourceFiles(File sourceDirectory) {
 		if (sourceDirectory.exists() && sourceDirectory.isDirectory()) {
-			return sourceDirectory.listFiles((File dir, String name) -> name.toLowerCase().endsWith(".java"));
+			return (List<File>) FileUtils.listFiles(sourceDirectory, new String[] {"java"}, true);
 			    
 		} else {
 			throw new ConfigurationException(String.format("%s does not exist or is not a directory", sourceDirectory.getAbsolutePath()));
@@ -113,6 +141,8 @@ public class AppStepsGenerator {
 	}
 	public List<TestStep> analyzeFile(InputStream inputStream) {
 		CompilationUnit cu = JavaParser.parse(inputStream);
+		ClassVisitor clsVisitor = new ClassVisitor();
+		clsVisitor.visit(cu, null);
 		MethodVisitor visitor = new MethodVisitor();
 		visitor.visit(cu, null);
 		return visitor.getSteps();
@@ -121,7 +151,11 @@ public class AppStepsGenerator {
 	public String generate(File sourceDirectory) throws IOException {
 		Map<File, List<TestStep>> allSteps = new HashMap<>();
 		for (File javaFile: getSourceFiles(sourceDirectory)) {
-			allSteps.put(javaFile, analyzeFile(javaFile));
+			try {
+				allSteps.put(javaFile, analyzeFile(javaFile));
+			} catch (DoNotVisitException e) {
+				
+			}
 		}
 		
 		return formatToTxt(allSteps);
