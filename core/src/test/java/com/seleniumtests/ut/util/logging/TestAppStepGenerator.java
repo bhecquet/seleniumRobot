@@ -60,10 +60,10 @@ public class TestAppStepGenerator extends GenericTest {
 	@Test(groups={"ut"})
 	public void testGetSourceFiles() {
 		File resourceDir = new File(TestAppStepGenerator.class.getClassLoader().getResource("tu/JPetStoreHome.java").getFile()).getParentFile();
-		File[] javaFiles = new AppStepsGenerator().getSourceFiles(resourceDir);
-		Arrays.sort(javaFiles);
-		Assert.assertEquals(javaFiles.length, 2);
-		Assert.assertEquals(javaFiles[0].getName(), "Catalog.java");
+		List<File> javaFiles = new AppStepsGenerator().getSourceFiles(resourceDir);
+		Collections.sort(javaFiles);
+		Assert.assertEquals(javaFiles.size(), 3);
+		Assert.assertEquals(javaFiles.get(0).getName(), "Catalog.java");
 	}
 	
 	@Test(groups={"ut"}, expectedExceptions=ConfigurationException.class)
@@ -75,10 +75,12 @@ public class TestAppStepGenerator extends GenericTest {
 	public void testTxtFormat() throws IOException {
 		File resourceDir = new File(TestAppStepGenerator.class.getClassLoader().getResource("tu/JPetStoreHome.java").getFile()).getParentFile();
 		String output = new AppStepsGenerator().generate(resourceDir);
-
 		System.out.println(output);
 		Assert.assertTrue(output.contains("\tWhen Cliquer sur le lien 'FISH'"));
 		Assert.assertTrue(output.contains("\"Go to fish page"));
+		
+		// check IntegrationTestsClass has not been taken into account
+		Assert.assertFalse(output.contains("addAnimalToCart"));
 	}
 
 }
