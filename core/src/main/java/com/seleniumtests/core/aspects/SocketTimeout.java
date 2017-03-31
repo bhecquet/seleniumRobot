@@ -35,7 +35,9 @@ public class SocketTimeout {
 	private static HttpClient.Factory httpClientFactory = new ApacheHttpClient.Factory(new HttpClientFactory(TIMEOUT_TWO_MINUTES, TIMEOUT_TWO_MINUTES));
 	
 	/**
-	 * 
+	 * HttpCommandExecutor is responsible for sending commands to browser
+	 * Sometimes, browser is stuck. Default behaviour is a 3 hours wait
+	 * Change this to avoid test to be stuck during this time
 	 * @param joinPoint
 	 */
 	@Around("execution(private * org.openqa.selenium.remote.HttpCommandExecutor.getDefaultClientFactory (..))")
