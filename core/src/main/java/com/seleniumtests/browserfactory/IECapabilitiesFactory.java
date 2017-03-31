@@ -118,7 +118,6 @@ public class IECapabilitiesFactory extends ICapabilitiesFactory {
         Proxy proxy = cfg.getProxy();
         capability.setCapability(CapabilityType.PROXY, proxy);
 
-        capability.setCapability(InternetExplorerDriver.INTRODUCE_FLAKINESS_BY_IGNORING_SECURITY_DOMAINS, true);
         return capability;
     }
 }

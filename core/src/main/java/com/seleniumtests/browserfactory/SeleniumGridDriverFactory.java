@@ -77,6 +77,10 @@ public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implemen
 	        case PHANTOMJS :
 	        	capabilities.merge(new PhantomJSCapabilitiesFactory().createCapabilities(webDriverConfig));
 	            break;
+	            
+	        case EDGE :
+	        	capabilities.merge(new EdgeCapabilitiesFactory().createCapabilities(webDriverConfig));
+	        	break;
 	
 	        default :
 	            break;
