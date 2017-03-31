@@ -40,7 +40,7 @@ public class EdgeCapabilitiesFactory extends ICapabilitiesFactory {
     public DesiredCapabilities createCapabilities(final DriverConfig webDriverConfig) {
         DesiredCapabilities capability = DesiredCapabilities.edge();
         
-        if (!SystemUtils.IS_OS_WINDOWS_10) {
+        if (!SystemUtils.IS_OS_WINDOWS_10 && webDriverConfig.getMode() == DriverMode.LOCAL) {
         	throw new ConfigurationException("Edge browser is only available on Windows 10");
         }
 

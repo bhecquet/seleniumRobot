@@ -65,6 +65,6 @@ public class TestDesktopDrivers extends GenericDriverTest {
 		SeleniumTestsContextManager.initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setBrowser("*edge");
 		driver = WebUIDriver.getWebDriver(true);
-		Assert.assertTrue(driver.getCurrentUrl().contains("http://localhost:"));
+		Assert.assertTrue(driver.getCurrentUrl().contains("http://localhost:") || driver.getCurrentUrl().contains("about:start"));
 	}
 }
