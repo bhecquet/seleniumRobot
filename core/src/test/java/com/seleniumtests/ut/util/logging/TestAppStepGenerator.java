@@ -2,6 +2,8 @@ package com.seleniumtests.ut.util.logging;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.testng.Assert;
@@ -59,6 +61,7 @@ public class TestAppStepGenerator extends GenericTest {
 	public void testGetSourceFiles() {
 		File resourceDir = new File(TestAppStepGenerator.class.getClassLoader().getResource("tu/JPetStoreHome.java").getFile()).getParentFile();
 		File[] javaFiles = new AppStepsGenerator().getSourceFiles(resourceDir);
+		Arrays.sort(javaFiles);
 		Assert.assertEquals(javaFiles.length, 2);
 		Assert.assertEquals(javaFiles[0].getName(), "Catalog.java");
 	}
