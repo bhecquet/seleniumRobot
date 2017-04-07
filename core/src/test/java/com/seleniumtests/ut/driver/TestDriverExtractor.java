@@ -21,6 +21,7 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -123,6 +124,20 @@ public class TestDriverExtractor extends MockitoTest {
 		// check driver has been copied as it already exists but no version has been specified
 		verify(driverExtractor).copyDriver("chromedriver");
 		
+	}
+	
+	@Test(groups={"ut"})
+	public void testPomVersionReadingWithParent() throws Exception {
+		InputStream stream = Thread.currentThread().getContextClassLoader().getResourceAsStream("tu/pomWithParent.xml");
+		String version = new DriverExtractor().getVersionFromPom(stream);
+		Assert.assertEquals(version, "2.7.0-SNAPSHOT");
+	}
+	
+	@Test(groups={"ut"})
+	public void testPomVersionReadingWithoutParent() throws Exception {
+		InputStream stream = Thread.currentThread().getContextClassLoader().getResourceAsStream("tu/pomWithoutParent.xml");
+		String version = new DriverExtractor().getVersionFromPom(stream);
+		Assert.assertEquals(version, "2.7.0-SNAPSHOT");
 	}
 
 }

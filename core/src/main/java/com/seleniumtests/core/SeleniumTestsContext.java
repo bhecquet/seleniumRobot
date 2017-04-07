@@ -76,6 +76,9 @@ public class SeleniumTestsContext {
     public static final String IE_DRIVER_PATH = "ieDriverPath";					// chemin vers le driver Internet Explorer
     public static final String USER_AGENT = "userAgent";						// user agent utilisé pour les tests. Permet d'écraser le user-agent par défaut du navigateur, sur firefox et chrome uniquement
 
+    public static final String VIEWPORT_WIDTH = "viewPortWidth";					// width of viewport	
+    public static final String VIEWPORT_HEIGHT = "viewPortHeight";					// height of viewport	
+    
     public static final String SET_ASSUME_UNTRUSTED_CERTIFICATE_ISSUER = "setAssumeUntrustedCertificateIssuer"; // Firefox uniquement pour qu'il ne prenne pas en compte les certificats invalides 
     public static final String SET_ACCEPT_UNTRUSTED_CERTIFICATES = "setAcceptUntrustedCertificates"; // Firefox uniquement pour qu'il ne prenne pas en compte les certificats invalides
     public static final String ENABLE_JAVASCRIPT = "enableJavascript";			// activation du javascrit dans le navigateur.
@@ -225,6 +228,9 @@ public class SeleniumTestsContext {
         setPlatform(getValueForTest(PLATFORM, System.getProperty(PLATFORM)));
         setCloudApiKey(getValueForTest(CLOUD_API_KEY, System.getProperty(CLOUD_API_KEY)));
         setProjectName(getValueForTest(PROJECT_NAME, System.getProperty(PROJECT_NAME)));
+        
+        setViewPortWidth(getIntValueForTest(VIEWPORT_WIDTH, System.getProperty(VIEWPORT_WIDTH)));
+        setViewPortHeight(getIntValueForTest(VIEWPORT_HEIGHT, System.getProperty(VIEWPORT_HEIGHT)));
         
         // determines test_type according to input configuration
         configureTestType();
@@ -684,6 +690,14 @@ public class SeleniumTestsContext {
     
     public String getProjectName() {
     	return (String) getAttribute(PROJECT_NAME);
+    }
+    
+    public Integer getViewPortWidth() {
+		return (Integer) getAttribute(VIEWPORT_WIDTH);
+	}
+    
+    public Integer getViewPortHeight() {
+    	return (Integer) getAttribute(VIEWPORT_HEIGHT);
     }
     
     public Map<String, String> getConfiguration() {
@@ -1175,6 +1189,15 @@ public class SeleniumTestsContext {
     public void setMobilePlatformVersion(final String version) {
     	setAttribute(MOBILE_PLATFORM_VERSION, version);
     }
+    
+    public void setViewPortWidth(Integer width) {
+    	setAttribute(VIEWPORT_WIDTH, width);    	
+    }
+    
+    public void setViewPortHeight(Integer height) {
+    	setAttribute(VIEWPORT_HEIGHT, height);    	
+    }
+    
     
     /**
      * post configuration of the context

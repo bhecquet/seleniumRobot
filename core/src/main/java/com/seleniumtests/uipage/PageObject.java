@@ -361,6 +361,24 @@ public class PageObject extends BasePage implements IPage {
     public final void maximizeWindow() {
         new WebUtility(driver).maximizeWindow();
     }
+    
+    /**
+     * On init set window to size requested by user. Window is maximized if no size is set
+     */
+    public final void setWindowToRequestedSize() {
+    	if (!SeleniumTestsContextManager.isWebTest()) {
+    		return;
+    	}
+    	
+    	Integer width = SeleniumTestsContextManager.getThreadContext().getViewPortWidth();
+    	Integer height = SeleniumTestsContextManager.getThreadContext().getViewPortHeight();
+    	
+    	if (width == null || height == null) {
+    		maximizeWindow();
+    	} else {
+    		resizeTo(width, height);
+    	}
+    }
 
     private void open(final String url) throws IOException {
 
@@ -373,19 +391,23 @@ public class PageObject extends BasePage implements IPage {
 
             // Navigate to app URL for browser test
             if (SeleniumTestsContextManager.isWebTest()) {
-            	maximizeWindow();
+            	setWindowToRequestedSize();
                 driver.navigate().to(url);
             }
         } catch (UnreachableBrowserException e) {
 
             driver = webUXDriver.createWebDriver();
-            maximizeWindow();
-            driver.navigate().to(url);
+            if (SeleniumTestsContextManager.isWebTest()) {
+	            setWindowToRequestedSize();
+	            driver.navigate().to(url);
+            }
         } catch (UnsupportedCommandException e) {
             TestLogging.log("get UnsupportedCommandException, retry");
             driver = webUXDriver.createWebDriver();
-            maximizeWindow();
-            driver.navigate().to(url);
+            if (SeleniumTestsContextManager.isWebTest()) {
+            	setWindowToRequestedSize();
+	            driver.navigate().to(url);
+            }
         } catch (org.openqa.selenium.TimeoutException ex) {
             TestLogging.log("got time out when loading " + url + ", ignored");
         } catch (org.openqa.selenium.UnhandledAlertException ex) {

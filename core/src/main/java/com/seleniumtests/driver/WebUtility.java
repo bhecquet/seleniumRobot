@@ -42,16 +42,32 @@ public class WebUtility {
      * @param  width
      * @param  height
      */
-    public void resizeWindow(final int width, final int height) {
+    public void resizeWindow(final Integer width, final Integer height) {
     	// app test are not compatible with window
     	if (SeleniumTestsContextManager.getThreadContext().getTestType().family() == TestType.APP) {
             return;
         }
     	
+    	if (width == null || height == null) {
+    		return;
+    	} 
+    	
         try {
-            Dimension size = new Dimension(width, height);
+            Dimension setSize = new Dimension(width, height);
             driver.manage().window().setPosition(new Point(0, 0));
-            driver.manage().window().setSize(size);
+            int retries = 5;
+            
+            for (int i=0; i < retries; i++) {
+            	driver.manage().window().setSize(setSize);
+            	Dimension viewPortSize = ((CustomEventFiringWebDriver)driver).getViewPortDimensionWithoutScrollbar();
+            	
+            	if (viewPortSize.height == height && viewPortSize.width == width) {
+            		break;
+            	} else {
+            		setSize = new Dimension(2 * width - viewPortSize.width, 2 * height - viewPortSize.height);
+            	}
+            }
+            
         } catch (Exception ex) {
         	logger.error(ex);
         }

@@ -56,6 +56,8 @@ Below is the list of all parameters accepted in testing xml file. These paramete
 | platform 					| 			| platform on which test should execute. Ex: Windows 7, Android 5.0, iOS 9.1, Linux, OS X 10.10. Defaults to the current platform | 
 | cloudApiKey 				| 			| Access key for service | 
 | projectName 				| 			| Project name for Testdroid tests only | 
+| viewPortWidth				|			| Width of the viewPort when doing web tests. No effect for mobile apps. If not set, window will be maximized |
+| viewPortHeight			|			| Height of the viewPort when doing web tests. No effect for mobile apps. If not set, window will be maximized |
 
 
 Other parameters, not accepted in XML file but allowed on command line
