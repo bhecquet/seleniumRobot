@@ -52,121 +52,121 @@ public class TestHtmlElement extends GenericTest {
 		WebUIDriver.cleanUp();
 	}
 	
-//	@Test(groups={"ut"})
-//	public void testClickDiv() {
-//		testDriverIt.testClickDiv();
-//	}
-//	
-//	
-//	
-//	@Test(groups={"ut"})
-//	public void testClickRadio() {
-//		testDriverIt.testClickRadio();
-//	}
-//   
-//	@Test(groups={"ut"})
-//	public void testClickCheckBox() {
-//		testDriverIt.testClickCheckBox();
-//	}
-//	
-//	/**
-//	 * Test javascript actions
-//	 */
-//	@Test(groups={"ut"})
-//	public void testClickJsDiv() {
-//		testDriverIt.testClickJsDiv();
-//	}
-//   
-//	@Test(groups={"ut"})
-//	public void testClickJsRadio() {
-//		testDriverIt.testClickJsRadio();
-//	}
-//   
-//	@Test(groups={"ut"})
-//	public void testClickJsCheckbox() {
-//		testDriverIt.testClickJsCheckbox();
-//	}
-//   
-//	@Test(groups={"ut"})
-//	public void testSendKeys() {
-//		testDriverIt.testSendKeys();
-//	}
-//   
-//	@Test(groups={"ut"})
-//	public void testSendKeysJs() {
-//		testDriverIt.testSendKeysJs();
-//	}
-//	
-//	@Test(groups={"ut"})
-//	public void testOnBlur() {
-//		testDriverIt.testOnBlur();
-//	}
-//	
-//	@Test(groups={"ut"})
-//	public void testFindElements() {
-//		testDriverIt.testFindElements();
-//	}
-//
-//	/**
-//	 * Search an element inside an other one
-//	 */
-//	@Test(groups={"ut"})
-//	public void testFindSubElement() {
-//		testDriverIt.testFindSubElement();
-//	}
-//	
-//	/**
-//	 * Search the n th element inside an other one
-//	 */
-//	@Test(groups={"ut"})
-//	public void testFindNthSubElement() {
-//		testDriverIt.testFindNthSubElement();
-//	}
-//	
-//	/**
-//	 * Search the n th element corresponding to locator
-//	 */
-//	@Test(groups={"ut"})
-//	public void testFindNthElement() {
-//		testDriverIt.testFindNthElement();
-//	}
-//
-//	/**
-//	 * test specific HtmlElements actions
-//	 */
-//	@Test(groups={"ut"})
-//	public void testFindPattern1() {
-//		testDriverIt.testFindPattern1();
-//	}
-//	
-//	@Test(groups={"ut"})
-//	public void testFindPattern2() {
-//		testDriverIt.testFindPattern2();
-//	}
-//	
-//	@Test(groups={"ut"}) 
-//	public void testFindPattern3() {
-//		testDriverIt.testFindPattern3();
-//	}
-//	
-//	/**
-//	 * text search
-//	 */
-//	@Test(groups={"ut"})
-//	public void testFindPattern4() {
-//		testDriverIt.testFindPattern4();
-//	}
-//	
-//	@Test(groups={"ut"})
-//	public void testIsElementPresent() {
-//		Assert.assertTrue(testPage.textElement.isElementPresent(2));
-//	}
-//	
-//	@Test(groups={"ut"})
-//	public void testIsElementNotPresent() {
-//		Assert.assertFalse(new HtmlElement("", By.id("divNotFound")).isElementPresent(2));
-//	}
-//	
+	@Test(groups={"ut"})
+	public void testClickDiv() {
+		testDriverIt.testClickDiv();
+	}
+	
+	
+	
+	@Test(groups={"ut"})
+	public void testClickRadio() {
+		testDriverIt.testClickRadio();
+	}
+   
+	@Test(groups={"ut"})
+	public void testClickCheckBox() {
+		testDriverIt.testClickCheckBox();
+	}
+	
+	/**
+	 * Test javascript actions
+	 */
+	@Test(groups={"ut"})
+	public void testClickJsDiv() {
+		testDriverIt.testClickJsDiv();
+	}
+   
+	@Test(groups={"ut"})
+	public void testClickJsRadio() {
+		testDriverIt.testClickJsRadio();
+	}
+   
+	@Test(groups={"ut"})
+	public void testClickJsCheckbox() {
+		testDriverIt.testClickJsCheckbox();
+	}
+   
+	@Test(groups={"ut"})
+	public void testSendKeys() {
+		testDriverIt.testSendKeys();
+	}
+   
+	@Test(groups={"ut"})
+	public void testSendKeysJs() {
+		testDriverIt.testSendKeysJs();
+	}
+	
+	@Test(groups={"ut"})
+	public void testOnBlur() {
+		testDriverIt.testOnBlur();
+	}
+	
+	@Test(groups={"ut"})
+	public void testFindElements() {
+		testDriverIt.testFindElements();
+	}
+
+	/**
+	 * Search an element inside an other one
+	 */
+	@Test(groups={"ut"})
+	public void testFindSubElement() {
+		testDriverIt.testFindSubElement();
+	}
+	
+	/**
+	 * Search the n th element inside an other one
+	 */
+	@Test(groups={"ut"})
+	public void testFindNthSubElement() {
+		testDriverIt.testFindNthSubElement();
+	}
+	
+	/**
+	 * Search the n th element corresponding to locator
+	 */
+	@Test(groups={"ut"})
+	public void testFindNthElement() {
+		testDriverIt.testFindNthElement();
+	}
+
+	/**
+	 * test specific HtmlElements actions
+	 */
+	@Test(groups={"ut"})
+	public void testFindPattern1() {
+		testDriverIt.testFindPattern1();
+	}
+	
+	@Test(groups={"ut"})
+	public void testFindPattern2() {
+		testDriverIt.testFindPattern2();
+	}
+	
+	@Test(groups={"ut"}) 
+	public void testFindPattern3() {
+		testDriverIt.testFindPattern3();
+	}
+	
+	/**
+	 * text search
+	 */
+	@Test(groups={"ut"})
+	public void testFindPattern4() {
+		testDriverIt.testFindPattern4();
+	}
+	
+	@Test(groups={"ut"})
+	public void testIsElementPresent() {
+		Assert.assertTrue(testPage.textElement.isElementPresent(2));
+	}
+	
+	@Test(groups={"ut"})
+	public void testIsElementNotPresent() {
+		Assert.assertFalse(new HtmlElement("", By.id("divNotFound")).isElementPresent(2));
+	}
+	
 	@Test(groups={"ut"})
 	public void testFindTextElementInsideHtmlElement() {
 		Assert.assertEquals(testPage.textElement2.getValue(), "default");

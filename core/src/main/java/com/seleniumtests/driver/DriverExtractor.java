@@ -26,13 +26,16 @@ import java.nio.file.StandardCopyOption;
 import java.util.Properties;
 
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.openqa.selenium.Platform;
 import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.DriverExceptions;
@@ -60,6 +63,45 @@ public class DriverExtractor {
 	public DriverExtractor(String rootPath) {
 		this.rootPath = rootPath;
 	}
+	
+	/**
+	 * Read pom file to extract version
+	 * If version is not available, in pom, look for parent version
+	 * @param pomFile
+	 * @return
+	 * @throws IOException
+	 * @throws SAXException
+	 * @throws ParserConfigurationException
+	 * @throws XPathExpressionException
+	 */
+	public String getVersionFromPom(InputStream pomStream) throws IOException, SAXException, ParserConfigurationException, XPathExpressionException {
+		
+		Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(pomStream);
+		doc.getDocumentElement().normalize();
+		String version = (String) XPathFactory.newInstance()
+											.newXPath()
+											.compile("/project/version")
+											.evaluate(doc, XPathConstants.STRING);
+		if (version != null) {
+			version = version.trim();
+			if (!version.isEmpty()) {
+				return version;
+			}
+		}
+		
+		// version not found, look for parent version
+		version = (String) XPathFactory.newInstance()
+				.newXPath()
+				.compile("/project/parent/version")
+				.evaluate(doc, XPathConstants.STRING);
+		if (version != null) {
+			version = version.trim();
+			if (!version.isEmpty()) {
+				return version;
+			}
+		}
+		return null;
+	}
 
 	private String getVersionFromPom() {
 		// Try to get version number from pom.xml (available in Eclipse)
@@ -79,18 +121,7 @@ public class DriverExtractor {
 				}
 				Path pom = path.resolve("pom.xml");
 				try (InputStream is = Files.newInputStream(pom)) {
-					Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(is);
-					doc.getDocumentElement().normalize();
-					String version = (String) XPathFactory.newInstance()
-														.newXPath()
-														.compile("/project/version")
-														.evaluate(doc, XPathConstants.STRING);
-					if (version != null) {
-						version = version.trim();
-						if (!version.isEmpty()) {
-							return version;
-						}
-					}
+					return getVersionFromPom(is);
 				}
 			} 
 			return null;
