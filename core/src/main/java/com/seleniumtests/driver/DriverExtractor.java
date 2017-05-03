@@ -106,7 +106,7 @@ public class DriverExtractor {
 	private String getVersionFromPom() {
 		// Try to get version number from pom.xml (available in Eclipse)
 		try {
-			String className = getClass().getName();
+			String className = DriverExceptions.class.getName();
 			String classfileName = "/" + className.replace('.', '/') + ".class";
 			URL classfileResource = getClass().getResource(classfileName);
 			if (classfileResource != null) {
