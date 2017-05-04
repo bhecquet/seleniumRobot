@@ -167,19 +167,19 @@ public class AppStepsGenerator {
 	 * @param outputFile
 	 */
 	public String formatToTxt(Map<File, List<TestStep>> stepsInFiles) {
-		String out = "";
+		StringBuilder out = new StringBuilder();
 		for (Entry<File, List<TestStep>> entry: stepsInFiles.entrySet()) {
-			out += entry.getKey().getName().replace(".java", "") + "\n";
+			out.append(entry.getKey().getName().replace(".java", "") + "\n");
 			
 			for (TestStep step: entry.getValue()) {
-				out += String.format("\t%s\n", step.stepName);
+				out.append(String.format("\t%s%n", step.stepName));
 				if (!step.stepDetails.isEmpty()) {
-					out += String.format("\t\t\"%s\"\n", step.stepDetails.replace("\n", "\n\t\t"));
+					out.append(String.format("\t\t\"%s\"%n", step.stepDetails.replace("\n", "%n\t\t")));
 				}
 			}
 			
-			out += "------------------------------------------------------------------------------\n";
+			out.append("------------------------------------------------------------------------------\n");
 		}
-		return out;
+		return out.toString();
 	}
 }
