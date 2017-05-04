@@ -366,7 +366,8 @@ public class ImageDetector {
     		executorService.shutdown();
     		try {
     			executorService.awaitTermination(10, TimeUnit.SECONDS);
-    		} catch (InterruptedException e) {
+    		} catch (Exception e) {
+    			logger.info("Could not compute scale within 10 seconds", e);
     		}
     		
     		
