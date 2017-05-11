@@ -91,8 +91,8 @@ If some of the tests should not be available in Squash TA, add parameter inside 
 ![](images/exclude_testng.png)
  
 #### Squash TA job configuration ####
-By default, Squash TM receives the Squash TA test report. But, it’s useless when executing tests with SeleniumRobot as it does not contain any details. So we have to configure the SeleniumRobot report to be sent to Squash TM
-Add the following line below « Publish HTML reports »
+By default, Squash TM receives the Squash TA test report. But, itâ€™s useless when executing tests with SeleniumRobot as it does not contain any details. So we have to configure the SeleniumRobot report to be sent to Squash TM
+Add the following line below Â« Publish HTML reports Â»
 
 ![](images/squash_ta_config.png)
  
@@ -107,7 +107,14 @@ by
 
 To execute SeleniumRobot using Jenkins, create a free-style job.
 
-- In "Build" section, add a shell command: `java -cp <sr_home>/seleniumRobot.jar;<sr_home>/plugins/<app_name>-tests.jar -DtestRetryCount=0 -Dbrowser=chrome -Denv=Integration org.testng.TestNG %STF_HOME%/data/<app_name>/testng/<testng.xml> -testnames <testnames>`</br>
+- In "Build" section, add a shell command: `${JENKINS_HOME}/tools/hudson.tasks.Maven_MavenInstallation/Maven_3/bin/mvn -U org.apache.maven.plugins:maven-dependency-plugin:2.8:unpack -Dartifact=com.infotel.seleniumRobot:core:RELEASE:zip -DoutputDirectory=${WORKSPACE}/tmp/seleniumRobot  -Dmdep.overWriteReleases=true`<br/>
+This command will update core artifact to the latest version on maven
+- In "Build" section, add a shell command: `${JENKINS_HOME}/tools/hudson.tasks.Maven_MavenInstallation/Maven_3/bin/mvn -gs ${MVN_SETTINGS} -U org.apache.maven.plugins:maven-dependency-plugin:2.8:unpack -Dartifact=<groupId>:<artifactId>:RELEASE:zip -DoutputDirectory=${WORKSPACE}/tmp/seleniumRobot  -Dmdep.overWriteReleases=true`<br/>
+This command will update the test application to its latest release from maven repo
+	- Replace `<groupId>` by the groupId of your test application artifact
+	- Replace `<artifactId>` by the artifactId of your test application
+
+- In "Build" section, add a shell command: `java -cp <sr_home>/seleniumRobot.jar;<sr_home>/plugins/<app_name>-tests.jar -DtestRetryCount=0 -Dbrowser=chrome -Denv=Integration org.testng.TestNG %STF_HOME%/data/<app_name>/testng/<testng.xml> -testnames <testnames>`<br/>
   - Replace `<sr_home>` by the folder where seleniumRobot is deployed
   - Replace `<app_name>` by the name of the test application. e.g 'jpetstore'
   - Replace `<testng.xml>` by the XML file to execute
