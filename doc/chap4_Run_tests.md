@@ -121,6 +121,16 @@ _e.g_: if user select "testdroid" runMode, then the 3 parameters (appiumServerUR
 
 
 ### 2 Test with Appium locally ###
+
+For mobile tests, set the following environment variables on your local computer:
+- APPIUM_HOME: path to Appium installation path (e.g: where Appium.exe/node.exe resides on Windows)
+- ANDROID_HOME: path to Android SDK (e.g: where SDK Manager resides)
+
+Also check that there is only one version of ADB on computer. Otherwise, there may be conflicts and ADB client you provide may not get relevant information from devices
+
+When using seleniumRobot-grid, these environment variables will be set on grid node
+For cloud test, these variables are not needed
+
 #### Application test on android ####
 
     <test name="tnr_appium_mobile_app" parallel="false">
