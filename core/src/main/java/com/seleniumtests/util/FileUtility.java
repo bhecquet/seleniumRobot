@@ -24,24 +24,29 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.nio.file.Files;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.jar.JarFile;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
+import java.util.zip.ZipOutputStream;
 
 import javax.imageio.ImageIO;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 
-import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 import com.seleniumtests.util.osutility.OSUtility;
 
 public class FileUtility {
-	private static final Logger logger = SeleniumRobotLogger.getLogger(WebUIDriver.class);
+	private static final Logger logger = SeleniumRobotLogger.getLogger(FileUtility.class);
     static final int BUFFER = 2048;
     
     private FileUtility() {
@@ -159,5 +164,59 @@ public class FileUtility {
 
     public static String decodePath(final String path) throws UnsupportedEncodingException {
         return URLDecoder.decode(path, "UTF-8");
+    }
+    
+    /**
+     * Create a zip file from list of files to a temp directory. They will be added at the root of zip file
+     * @param files
+     * @return the zipped file
+     * @throws IOException
+     */
+    public static File createZipArchiveFromFiles(List<File> files) throws IOException {
+        final File zipArchive = File.createTempFile("temp_zip_", ".zip");
+        try (
+                final ZipOutputStream out = new ZipOutputStream(new FileOutputStream(zipArchive))) {
+        	for (File f: files) {
+        		if (!f.exists()) {
+        			logger.warn(String.format("File %s does not exist", f.getName()));
+        			continue;
+        		}
+        		ZipEntry e = new ZipEntry(f.getName());
+        		out.putNextEntry(e);
+                IOUtils.write(FileUtils.readFileToString(f), out);
+                out.closeEntry();
+        	}   
+        }
+        return zipArchive;
+    }
+    
+    /**
+     * Unzip file to a temp directory
+     * @param zippedFile
+     * @return the output folder
+     * @throws IOException
+     */
+    public static File unzipFile(final File zippedFile) throws IOException {
+        File outputFolder = Files.createTempDirectory("tmp").toFile();
+        try (ZipFile zipFile = new ZipFile(zippedFile)) {
+            final Enumeration<? extends ZipEntry> entries = zipFile.entries();
+            while (entries.hasMoreElements()) {
+                final ZipEntry entry = entries.nextElement();
+                final File entryDestination = new File(outputFolder, entry.getName());
+                if (entry.isDirectory()) {
+                    //noinspection ResultOfMethodCallIgnored
+                    entryDestination.mkdirs();
+                } else {
+                    //noinspection ResultOfMethodCallIgnored
+                    entryDestination.getParentFile().mkdirs();
+                    final InputStream in = zipFile.getInputStream(entry);
+                    final OutputStream out = new FileOutputStream(entryDestination);
+                    IOUtils.copy(in, out);
+                    IOUtils.closeQuietly(in);
+                    out.close();
+                }
+            }
+        }
+        return outputFolder;
     }
 }

@@ -16,21 +16,17 @@
  */
 package com.seleniumtests.browserfactory;
 
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.http.HttpHost;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.message.BasicHttpEntityEnclosingRequest;
-import org.apache.http.util.EntityUtils;
-import org.json.JSONObject;
 import org.openqa.selenium.UnsupportedCommandException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
+import com.seleniumtests.connectors.selenium.SeleniumGridConnector;
+import com.seleniumtests.connectors.selenium.SeleniumGridConnectorFactory;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.driver.BrowserType;
@@ -40,9 +36,12 @@ import com.seleniumtests.reporter.TestLogging;
 import com.seleniumtests.util.helper.WaitHelper;
 
 public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implements IWebDriverFactory {
+	
+	private SeleniumGridConnector gridConnector;
 
     public SeleniumGridDriverFactory(final DriverConfig cfg) {
         super(cfg);
+        gridConnector = SeleniumGridConnectorFactory.getInstance(cfg.getHubUrl());
     }
 
     /**
@@ -91,7 +90,7 @@ public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implemen
     
     /**
      * Creates capabilities specific to seleniumGrid
-     * For example, Appium needs PLATFORM_NAME and PLATFORM_VERSION capabilities, but seleniumGrid matcher
+     * For example, Appium needs PLATFORM_NAME and PLATFORM_VERSION capabilities, but seleniumGrid matcher (default seleniumGrid)
      * looks at PLATFORM and VERSION capabilities. This method adds them
      * OS version is only updated for mobile. It has no real sense on desktop
      * @return
@@ -109,15 +108,8 @@ public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implemen
     
     @Override
     public WebDriver createWebDriver() {
-        DriverConfig webDriverConfig = this.getWebDriverConfig();
-        URL url;
 
-        try {
-			url = new URL(webDriverConfig.getHubUrl());
-		} catch (MalformedURLException e1) {
-			throw new ConfigurationException(String.format("Hub url '%s' is invalid: %s", webDriverConfig.getHubUrl(), e1.getMessage()));
-		}
-
+        // create capabilities, specific to OS
         DesiredCapabilities capabilities = createSpecificGridCapabilities(webDriverConfig);
         if (SeleniumTestsContextManager.isDesktopWebTest()) {
         	capabilities = createCapabilityByBrowser(webDriverConfig, capabilities);
@@ -132,12 +124,11 @@ public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implemen
         } else {
         	throw new ConfigurationException("Remote driver is supported for mobile and desktop web tests");
         }
-        
 
         if ((BrowserType.FIREFOX).equals(webDriverConfig.getBrowser())) {
-            driver = getDriverFirefox(url, capabilities);
+            driver = getDriverFirefox(gridConnector.getHubUrl(), capabilities);
         } else {
-            driver = new ScreenShotRemoteWebDriver(url, capabilities);
+            driver = new ScreenShotRemoteWebDriver(gridConnector.getHubUrl(), capabilities);
         }
 
         setImplicitWaitTimeout(webDriverConfig.getImplicitWaitTimeout());
@@ -147,7 +138,7 @@ public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implemen
 
         this.setWebDriver(driver);
 
-        runWebDriver(url);
+        runWebDriver(gridConnector.getHubUrl());
 
         return driver;
     }
@@ -170,35 +161,7 @@ public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implemen
     }
     
     private void runWebDriver(URL url){
-    	String hub = url.getHost();
-        int port = url.getPort();
-
-        // logging node ip address:
-        DefaultHttpClient client = new DefaultHttpClient();
-        try {
-            HttpHost host = new HttpHost(hub, port);
-            
-            String sessionUrl = "http://" + hub + ":" + port + "/grid/api/testsession?session=";
-            URL session = new URL(sessionUrl + ((RemoteWebDriver) driver).getSessionId());
-            BasicHttpEntityEnclosingRequest req;
-            req = new BasicHttpEntityEnclosingRequest("POST", session.toExternalForm());
-
-            org.apache.http.HttpResponse response = client.execute(host, req);
-            String responseContent = EntityUtils.toString(response.getEntity());
-            
-            JSONObject object = new JSONObject(responseContent);
-            String proxyId = (String) object.get("proxyId");
-            String node = proxyId.split("//")[1].split(":")[0];
-            String browserName = ((RemoteWebDriver) driver).getCapabilities().getBrowserName();
-            String version = ((RemoteWebDriver) driver).getCapabilities().getVersion();
-            TestLogging.info("WebDriver is running on node " + node + ", " + browserName + version + ", session "
-                    + ((RemoteWebDriver) driver).getSessionId());
-            
-        } catch (Exception ex) {
-        	logger.error(ex);
-        } finally {
-        	client.close();
-        }
+    	gridConnector.runTest((RemoteWebDriver) driver);
     }
 
     protected void setPageLoadTimeout(final long timeout, final BrowserType type) {

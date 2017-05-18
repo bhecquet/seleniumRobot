@@ -61,8 +61,8 @@ public class AndroidCapabilitiesFactory extends ICapabilitiesFactory {
 
     	// in case app has not been specified for cloud provider
         String app = cfg.getApp();
-        if (caps.getCapability("app") == null) {
-        	caps.setCapability("app", app);
+        if (caps.getCapability(MobileCapabilityType.APP) == null) {
+        	caps.setCapability(MobileCapabilityType.APP, app.replace("\\", "/"));
         }
         caps.setCapability(AndroidMobileCapabilityType.APP_PACKAGE, cfg.getAppPackage());
         caps.setCapability(AndroidMobileCapabilityType.APP_ACTIVITY, cfg.getAppActivity());
