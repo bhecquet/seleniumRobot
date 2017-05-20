@@ -183,7 +183,7 @@ public class FileUtility {
         		}
         		ZipEntry e = new ZipEntry(f.getName());
         		out.putNextEntry(e);
-                IOUtils.write(FileUtils.readFileToString(f), out);
+                IOUtils.write(FileUtils.readFileToByteArray(f), out);
                 out.closeEntry();
         	}   
         }

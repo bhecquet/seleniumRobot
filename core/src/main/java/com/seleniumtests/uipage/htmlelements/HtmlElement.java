@@ -319,8 +319,13 @@ public class HtmlElement implements WebElement, Locatable {
      * @param makeVisible			whether we try to make the element visible. Should be true except when trying to know if element is displayed
      */
     protected void findElement(boolean waitForVisibility, boolean makeVisible) {
+        // TODO: https://discuss.appium.io/t/how-can-i-scroll-to-an-element-in-appium-im-using-android-native-app/10618/14
+    	// String DESTINATION_ELEMENT_TEXT= "KUBO";
+    	//((AndroidDriver) driver).findElementByAndroidUIAutomator("new UiScrollable(new UiSelector())
+    	//		.scrollIntoView(new UiSelector().text(DESTINATION_ELEMENT_TEXT))");
         
-        // if a parent is defined, search for it before getting the sub element
+    	
+    	// if a parent is defined, search for it before getting the sub element
     	driver = updateDriver();
         if (parent != null) {
         	parent.findElement();
