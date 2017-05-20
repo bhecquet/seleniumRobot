@@ -35,9 +35,8 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 	/**
 	 * In case an app is required on the node running the test, upload it to the grid
 	 */
-	public void uploadMobileApp(RemoteWebDriver driver) {
+	public void uploadMobileApp(Capabilities caps) {
 		
-		Capabilities caps = driver.getCapabilities();
 		String appPath = (String)caps.getCapability(MobileCapabilityType.APP);
 		
 		// check whether app is given and app path is a local file
@@ -53,7 +52,8 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 				
 				HttpHost serverHost = new HttpHost(hubUrl.getHost(), hubUrl.getPort());
 				URIBuilder builder = new URIBuilder();
-	        	builder.setPath("/extra/FileServlet/output=app");
+	        	builder.setPath("/grid/admin/FileServlet/");
+	        	builder.addParameter("output", "app");
 	        	HttpPost httpPost = new HttpPost(builder.build());
 		        httpPost.setHeader(HttpHeaders.CONTENT_TYPE, MediaType.OCTET_STREAM.toString());
 		        FileInputStream fileInputStream = new FileInputStream(zipFile);
@@ -64,7 +64,7 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 		        if (response.getStatusLine().getStatusCode() != 200) {
 		        	throw new SeleniumGridException("could not upload application file: " + response.getStatusLine().getReasonPhrase());
 		        } else {
-		        	((DesiredCapabilities)caps).setCapability(MobileCapabilityType.APP, IOUtils.toString(response.getEntity().getContent()));
+		        	((DesiredCapabilities)caps).setCapability(MobileCapabilityType.APP, IOUtils.toString(response.getEntity().getContent()) + "/" + appFiles.get(0).getName());
 		        }
 		        
 			} catch (IOException | URISyntaxException e) {

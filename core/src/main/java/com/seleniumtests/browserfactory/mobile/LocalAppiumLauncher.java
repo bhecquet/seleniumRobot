@@ -16,6 +16,7 @@
  */
 package com.seleniumtests.browserfactory.mobile;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.regex.Matcher;
@@ -42,13 +43,27 @@ public class LocalAppiumLauncher implements AppiumLauncher {
 	private String nodeCommand;
 	private Process appiumProcess;
 	private long appiumPort;
+	private String logFile = null;
+	private String optionString = "";
 
 	private static Logger logger = SeleniumRobotLogger.getLogger(LocalAppiumLauncher.class);
 	private Pattern appiumVersionPattern = Pattern.compile(".*android\":\\{\"version\":\"(\\d+\\.\\d+\\.\\d+)\"\\}.*");
 	
-
 	public LocalAppiumLauncher() {
+		this(null);
+	}
+
+	public LocalAppiumLauncher(String logDirectory) {
+
+		if (logDirectory != null) {
+			new File(logDirectory).mkdirs();
+			if (new File(logDirectory).isDirectory()) {
+				logFile = Paths.get(logDirectory, "appium.log").toString();
+			}
+		}
+		
 		checkInstallation();
+		generateOptions();
 		appiumPort = 4723 + Math.round(Math.random() * 1000);
 	}
 	
@@ -66,6 +81,15 @@ public class LocalAppiumLauncher implements AppiumLauncher {
 	
 	public void setAppiumPort(long appiumPort) {
 		this.appiumPort = appiumPort;
+	}
+	
+	/**
+	 * Method for generating options passed to appium (e.g: logging)
+	 */
+	private void generateOptions() {
+		if (logFile != null) {
+			optionString += String.format(" --log %s", logFile);
+		}
 	}
 
 	private void checkAppiumVersion() {
@@ -147,9 +171,11 @@ public class LocalAppiumLauncher implements AppiumLauncher {
 	}
 	
 	public void startAppiumWithoutWait() {
-		
-		
-		appiumProcess = OSCommand.executeCommand(String.format("%s %s/node_modules/appium/bin/appium.js --port %d", nodeCommand, appiumHome, appiumPort));
+		appiumProcess = OSCommand.executeCommand(String.format("%s %s/node_modules/appium/bin/appium.js --port %d %s", 
+									nodeCommand, 
+									appiumHome, 
+									appiumPort,
+									optionString));
 	}
 	
 	/**

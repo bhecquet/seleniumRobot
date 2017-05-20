@@ -53,6 +53,10 @@ public class AndroidCapabilitiesFactory extends ICapabilitiesFactory {
     	
     	caps.setCapability(MobileCapabilityType.FULL_RESET, "true");
     	caps.setCapability(MobileCapabilityType.PLATFORM_NAME, cfg.getPlatform());
+    	
+    	// automatically hide keyboard
+//    	caps.setCapability(AndroidMobileCapabilityType.RESET_KEYBOARD, true);
+//    	caps.setCapability(AndroidMobileCapabilityType.UNICODE_KEYBOARD, true);
 
         // Set up version and device name else appium server would pick the only available emulator/device
         // Both of these are ignored for android for now

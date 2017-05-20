@@ -124,15 +124,19 @@ public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implemen
         } else {
         	throw new ConfigurationException("Remote driver is supported for mobile and desktop web tests");
         }
+        
+        // 
+        gridConnector.uploadMobileApp(capabilities);
 
-        if ((BrowserType.FIREFOX).equals(webDriverConfig.getBrowser())) {
+        // connection to grid is made here
+        if (SeleniumTestsContextManager.isWebTest() && (BrowserType.FIREFOX).equals(webDriverConfig.getBrowser())) {
             driver = getDriverFirefox(gridConnector.getHubUrl(), capabilities);
         } else {
             driver = new ScreenShotRemoteWebDriver(gridConnector.getHubUrl(), capabilities);
         }
 
         setImplicitWaitTimeout(webDriverConfig.getImplicitWaitTimeout());
-        if (webDriverConfig.getPageLoadTimeout() >= 0) {
+        if (webDriverConfig.getPageLoadTimeout() >= 0 && SeleniumTestsContextManager.isWebTest()) {
             setPageLoadTimeout(webDriverConfig.getPageLoadTimeout(), webDriverConfig.getBrowser());
         }
 

@@ -86,7 +86,6 @@ public class TestSeleniumGridConnector extends MockitoTest {
 		TestLogging.info("WebDriver is running on node node, firefox 50.0, session null");
 	}
 	
-	
 	/**
 	 * With simple selenium grid, upload is not available
 	 * @throws ClientProtocolException 
@@ -97,7 +96,7 @@ public class TestSeleniumGridConnector extends MockitoTest {
 	public void testDoNothing() throws ClientProtocolException, IOException {
 		
 		SeleniumGridConnector connector = new SeleniumGridConnector("http://localhost:6666");
-		connector.uploadMobileApp(driver);
+		connector.uploadMobileApp(new DesiredCapabilities());
 		
 		verify(client, never()).execute((HttpHost)anyObject(), anyObject());
 	}

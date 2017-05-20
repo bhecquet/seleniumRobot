@@ -1,9 +1,9 @@
 package com.seleniumtests.ut.connectors.selenium;
 
 import static org.mockito.Matchers.anyObject;
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.io.File;
 import java.io.IOException;
@@ -18,9 +18,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.tools.ant.filters.StringInputStream;
 import org.mockito.Mock;
-import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.remote.DesiredCapabilities;
-import org.openqa.selenium.remote.RemoteWebDriver;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
@@ -49,10 +47,7 @@ public class TestSeleniumRobotGridConnector extends MockitoTest {
 	@Mock
 	private StatusLine statusLine;
 	
-	@Mock
-	private RemoteWebDriver driver;
-	
-	private Capabilities capabilities = new DesiredCapabilities();
+	private DesiredCapabilities capabilities = new DesiredCapabilities();
 	
 	@BeforeMethod(alwaysRun=true)
 	private void init() throws ClientProtocolException, IOException {
@@ -61,7 +56,6 @@ public class TestSeleniumRobotGridConnector extends MockitoTest {
 		when(response.getEntity()).thenReturn(entity);
 		when(response.getStatusLine()).thenReturn(statusLine);
 		when(client.execute((HttpHost)anyObject(), anyObject())).thenReturn(response);
-		when(driver.getCapabilities()).thenReturn(capabilities);
 	}
 	
 	@Test(groups={"ut"})
@@ -69,7 +63,7 @@ public class TestSeleniumRobotGridConnector extends MockitoTest {
 		
 		// prepare app file
 		File appFile = File.createTempFile("app", ".apk");
-		((DesiredCapabilities)capabilities).setCapability(MobileCapabilityType.APP, appFile.getAbsolutePath());
+		capabilities.setCapability(MobileCapabilityType.APP, appFile.getAbsolutePath());
 		
 		// prepare response
 		InputStream is = new StringInputStream("file:app/zip");
@@ -77,8 +71,8 @@ public class TestSeleniumRobotGridConnector extends MockitoTest {
 		when(entity.getContent()).thenReturn(is);
 		
 		SeleniumGridConnector connector = new SeleniumRobotGridConnector("http://localhost:6666");
-		connector.uploadMobileApp(driver);
-		Assert.assertEquals(capabilities.getCapability(MobileCapabilityType.APP), "file:app/zip");
+		connector.uploadMobileApp(capabilities);
+		Assert.assertEquals(capabilities.getCapability(MobileCapabilityType.APP), "file:app/zip/" + appFile.getName());
 	}
 	
 	/**
@@ -91,10 +85,10 @@ public class TestSeleniumRobotGridConnector extends MockitoTest {
 	public void testDontSendAppWhenHttp() throws ClientProtocolException, IOException {
 		
 		// prepare app key
-		((DesiredCapabilities)capabilities).setCapability(MobileCapabilityType.APP, "http://server:port/data/application.apk");
+		capabilities.setCapability(MobileCapabilityType.APP, "http://server:port/data/application.apk");
 		
 		SeleniumGridConnector connector = new SeleniumRobotGridConnector("http://localhost:6666");
-		connector.uploadMobileApp(driver);
+		connector.uploadMobileApp(capabilities);
 		
 		verify(client, never()).execute((HttpHost)anyObject(), anyObject());
 		Assert.assertEquals(capabilities.getCapability(MobileCapabilityType.APP), "http://server:port/data/application.apk");
@@ -110,7 +104,7 @@ public class TestSeleniumRobotGridConnector extends MockitoTest {
 	public void testDontSendAppWhenAppIsNull() throws ClientProtocolException, IOException {
 		
 		SeleniumGridConnector connector = new SeleniumRobotGridConnector("http://localhost:6666");
-		connector.uploadMobileApp(driver);
+		connector.uploadMobileApp(new DesiredCapabilities());
 		
 		verify(client, never()).execute((HttpHost)anyObject(), anyObject());
 		Assert.assertEquals(capabilities.getCapability(MobileCapabilityType.APP), null);

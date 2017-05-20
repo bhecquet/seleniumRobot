@@ -13,6 +13,7 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
 import org.json.JSONObject;
+import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
 import com.seleniumtests.customexception.ConfigurationException;
@@ -40,7 +41,7 @@ public class SeleniumGridConnector {
 	 * Do nothing as we are not a SeleniumRobotGrid
 	 * @param driver
 	 */
-	public void uploadMobileApp(RemoteWebDriver driver) {
+	public void uploadMobileApp(Capabilities caps) {
 		return;
 	}
 	
