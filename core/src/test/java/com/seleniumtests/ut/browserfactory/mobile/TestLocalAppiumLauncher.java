@@ -157,7 +157,7 @@ public class TestLocalAppiumLauncher extends MockitoTest {
 		initValidAppiumInstallation();
 		initValidNodeInstallation();
 		
-		when(OSCommand.executeCommand("node /opt/appium//node_modules/appium/bin/appium.js --port 4723")).thenReturn(nodeProcess);
+		when(OSCommand.executeCommand("node /opt/appium//node_modules/appium/bin/appium.js --port 4723 ")).thenReturn(nodeProcess);
 		
 		LocalAppiumLauncher appium = new LocalAppiumLauncher();
 		appium.setAppiumPort(4723);
@@ -181,7 +181,7 @@ public class TestLocalAppiumLauncher extends MockitoTest {
 		initValidAppiumInstallation();
 		initValidNodeInstallation();
 		
-		when(OSCommand.executeCommand("node /opt/appium//node_modules/appium/bin/appium.js --port 4723")).thenReturn(nodeProcess);
+		when(OSCommand.executeCommand("node /opt/appium//node_modules/appium/bin/appium.js --port 4723 ")).thenReturn(nodeProcess);
 		
 		LocalAppiumLauncher appium = new LocalAppiumLauncher();
 		appium.setAppiumPort(4723);
