@@ -215,7 +215,7 @@ public class DriverExtractor {
 	
 	public void copyDriver(String driverName) {
 		InputStream driver = Thread.currentThread().getContextClassLoader().getResourceAsStream(String.format("drivers/%s/%s%s", 
-						Platform.getCurrent().family().toString().toLowerCase(), 
+						SeleniumTestsContextManager.getThreadContext().getPlatform().toLowerCase(), 
 						driverName,
 						OSUtilityFactory.getInstance().getProgramExtension()));
 		

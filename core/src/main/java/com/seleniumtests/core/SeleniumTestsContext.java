@@ -1166,7 +1166,12 @@ public class SeleniumTestsContext {
     	if (platform != null) {
     		setAttribute(PLATFORM, platform);
     	} else {
-    		setAttribute(PLATFORM, Platform.getCurrent().family().toString());
+    		Platform pf = Platform.getCurrent();
+    		if (pf == Platform.MAC && pf.family() == Platform.ANY) {
+    			setAttribute(PLATFORM, Platform.MAC.toString());
+    		} else {
+    			setAttribute(PLATFORM, pf.family().toString());
+    		}
     	}
     }
     
