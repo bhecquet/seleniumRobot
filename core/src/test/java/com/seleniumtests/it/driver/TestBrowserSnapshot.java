@@ -64,7 +64,7 @@ public class TestBrowserSnapshot {
 			}
 		}
 		for (height=0; height < image.getHeight(); height++) {
-			Color color = new Color(image.getRGB(0, height));
+			Color color = new Color(image.getRGB(5, height));
 			if (!(color.equals(Color.WHITE) || color.equals(Color.YELLOW) || color.equals(Color.ORANGE) || color.equals(Color.GREEN) || color.equals(Color.RED))) {
 				break;
 			}
@@ -136,7 +136,7 @@ public class TestBrowserSnapshot {
 	}
 	
 	/**
-	 * Test if we succeed in removing scrollbars from capture (horizontal and vertical)
+	 * Test when no scrollbar is present in capture
 	 * @throws Exception 
 	 */
 	@Test(groups={"it"})
