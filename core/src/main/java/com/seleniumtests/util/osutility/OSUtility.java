@@ -59,6 +59,14 @@ public abstract class OSUtility {
         return getOSName().startsWith("Win");
     }
     
+
+    /**
+     * @return true if the OS is Windows
+     */
+    public static boolean isLinux() {
+        return getOSName().startsWith("Linux");
+    }
+    
     /**
      * @return true if the Operating System is MAC OS X
      */

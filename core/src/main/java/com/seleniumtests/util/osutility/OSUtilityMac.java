@@ -35,7 +35,7 @@ public class OSUtilityMac extends OSUtilityUnix {
 		browserList.put(BrowserType.SAFARI, "latest");
 		
 		if (new File("/Applications/Google Chrome.app").isDirectory()) {
-			String version = OSCommand.executeCommandAndWait("\"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome\" --version");
+			String version = OSCommand.executeCommandAndWait(new String[] {"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome", "--version"});
 			browserList.put(BrowserType.CHROME, extractChromeVersion(version));
 		}
 		if (new File("/Applications/Firefox.app").isDirectory()) {
