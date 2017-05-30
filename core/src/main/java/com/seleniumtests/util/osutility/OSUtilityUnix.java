@@ -33,12 +33,12 @@ public class OSUtilityUnix extends OSUtility {
      */
 	@Override
     public List<ProcessInfo> getRunningProcessList(){
-    	String command = "ps";
+    	String command = "ps ax";
     	List<String> strProcessList = Arrays.asList(OSCommand.executeCommandAndWait(command).split("\n"));
     	
     	List<ProcessInfo> processInfoList = new ArrayList<>();
     	for (String sentence : strProcessList) {
-    		String[] words = sentence.split("\\s+");
+    		String[] words = sentence.trim().split("\\s+");
     		
     		ProcessInfo processInfo = new ProcessInfo();
     		
@@ -52,7 +52,7 @@ public class OSUtilityUnix extends OSUtility {
     			
     			// TTY
     			processInfo.setSessionName(words[i]);
-    			i++;
+    			i += 2;
     			
     			// TIME
     			processInfo.setCpuTime(words[i]);
@@ -61,6 +61,7 @@ public class OSUtilityUnix extends OSUtility {
     			// CMD
     			processInfo.setName(words[i]);
     		}
+    		processInfoList.add(processInfo);
     	}
     	return processInfoList;
     }
