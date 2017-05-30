@@ -1166,6 +1166,8 @@ public class SeleniumTestsContext {
     	if (platform != null) {
     		setAttribute(PLATFORM, platform);
     	} else {
+    		
+    		// Workaround to make Selenium 2.53.1 compatible with any MAC OS version
     		Platform pf = Platform.getCurrent();
     		if (pf == Platform.MAC && pf.family() == Platform.ANY) {
     			setAttribute(PLATFORM, Platform.MAC.toString());
