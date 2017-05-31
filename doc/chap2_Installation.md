@@ -1,4 +1,6 @@
 ### 1 Development environment ###
+
+#### eclipse ####
 SeleniumRobot is developped using eclipse IDE. Following plugins are mandatory:
 
 - aspectj plugin (AJDT): use the dev version are older versions are not compatible with recent eclipse versions
@@ -7,6 +9,10 @@ SeleniumRobot is developped using eclipse IDE. Following plugins are mandatory:
 - TestNG (execute testNG tests)
 
 SeleniumRobot needs Java 8 to be compiled.
+
+It has also been tested with IntelliJ, however this requires the AspectJ compiler plugin which is not available in community version. A solution may be to compile seleniumRobot using maven.
+
+Sometimes, eclipse does not get the same environment variables than the system. This can block mobile testing when it search for `node` installed on system. Simply add the path to node installation to `PATH` environment variable (e.g: `$PATH:/usr/local/bin`)
 
 #### Sign artifact for deploy phase ####
 OSS needs artifacts to be signed before being deployed
@@ -21,7 +27,7 @@ Copy key to a public key server
 #### Git key for release ####
 In order for maven to push tags on release, a key must be generated for SSH connection
 
-    ssh-keygen -t rsa -C '<key name>’
+    ssh-keygen -t rsa -C '<key name>ï¿½
 Copy the generated public key to Github
 Check connection (it should reply: You've successfuly authenticated)
 
@@ -73,3 +79,26 @@ Depending on your tests, you should consider install:
 - Appium
 - Android SDK / Genymotion to test on android simulator / emulator
 - XCode (Mac OS X) to test on iPhone Simulator 
+
+#### Installing Appium ####
+Either install it with .dmg on Mac or .exe on Windows or through npm `npm install -g appium`
+Set `APPIUM_HOME` environment variable to point to path where appium has been installed:
+- On Windows, using .exe, it's the root path where Appium.exe is located
+- On Mac, using .dmg, it will be `/Applications/Appium.app/Contents/Resources/app`
+- On any platform using npm installation, it will be the path where root `node_modules` folder has been created. This folder should contain an `appium` subfolder
+
+On Linux/Mac systems, you can add `export APPIUM_HOME=<path to appium>` to the `.bash_profile` file in home directory
+
+#### Configuring Android for tests ####
+- Install android SDK (the zip/command line tools version is enough) : [https://developer.android.com/studio/index.html#downloads](https://developer.android.com/studio/index.html#downloads)
+- Install Intel HAXM driver to allow Virtual machine speedup. This can also be installed through Android SDK Manager
+- Open SDK Manager and select the android images corresponding to the versions you wish to use (select only x86 Atom 64 bits). Install the components
+- In AVD Manager, create a virtual machine (activate graphic acceleration) and start it. You should be able to use your Android virtual device.
+- Add `ANDROID_HOME` environment variable pointing to root of android tools. This is the directory where AVDManager is copied
+
+#### Configuring iOS for tests ####
+Follow appium instruction here [http://appium.io/slate/en/master/?ruby#running-appium-on-mac-os-x] (http://appium.io/slate/en/master/?ruby#running-appium-on-mac-os-x)
+Check installation with appium-doctor:
+- `npm install appium-doctor`
+- in node_modules/appium-doctor, `node . --ios`
+ 
