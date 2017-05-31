@@ -1,3 +1,14 @@
+
+### 0 preparation ###
+
+Unzip seleniumRobot-core.zip file (can be found on maven central or build it with maven) to any folder
+Unzip your test application .zip file to the same folder. It will create the correct folder structure
+
+Tests are run using command line: `java -cp seleniumRobot.jar;<app>-tests.jar -D<option1>=<value1> -D<option2>=<value2> org.testng.TestNG <path_to_TestNG_xml_file>"`
+Specify options from the table bellow
+Classpath must define the seleniumRobot.jar file and the test application jar file. Separator is `;` on Linux and `:` on Windows
+
+
 ### 1 Configurations ###
 Below is the list of all parameters accepted in testing xml file. These parameters may also be passed java properties (-D<paramName>=<value>)
 
@@ -47,7 +58,7 @@ Below is the list of all parameters accepted in testing xml file. These paramete
 | cucumberPackage 			| 			| **Mandatory for cucumberTests:** name of the package where cucumber implementation class reside | 
 | app 						| 			| Path to the application file (local or remote) | 
 | appiumServerURL 			| 			| Appium server url. May be local or remote | 
-| deviceName 				| 			| Name of the device to use for mobils tests | 
+| deviceName 				| 			| Name of the device to use for mobile tests | 
 | appPackage 				| 			| Package name of application (android only) | 
 | appActivity 				| 			| Activity started by mobile application (Android) | 
 | appWaitActivity 			| 			| In some cases, the first started activity is not the main app activity | 
