@@ -45,6 +45,46 @@ public class OSCommand {
         	throw new CustomSeleniumTestsException("cannot start process: " + cmd, e1);
         }
 	}
+	
+	/**
+     * Execute a command in command line terminal
+     * @param cmd
+     * @param wait for the end of the command execution
+     * @return 
+     */
+    public static String executeCommandAndWait(final String[] cmd) {
+        
+        Process proc;
+        try {
+			proc = Runtime.getRuntime().exec(cmd);
+			return readOutput(proc);
+	        
+        } catch (IOException e1) {
+        	logger.error(e1);
+        }
+        
+        return "";
+    }
+    
+    private static String readOutput(Process proc) throws IOException {
+    	String output = "";
+    	BufferedReader stdInput = new BufferedReader(new InputStreamReader(proc.getInputStream()));
+    	
+    	BufferedReader stdError = new BufferedReader(new InputStreamReader(proc.getErrorStream()));
+        
+        String s;
+        
+    	// read result output from command
+        while ((s = stdInput.readLine()) != null) {
+            output += s + "\n";
+        }
+        // read error output from command
+        while ((s = stdError.readLine()) != null) {
+            output += s + "\n";
+        }
+        
+        return output;
+    }
 
     /**
      * Execute a command in command line terminal
