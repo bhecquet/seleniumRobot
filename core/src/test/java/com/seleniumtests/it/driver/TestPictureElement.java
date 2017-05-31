@@ -21,6 +21,7 @@ import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.SkipException;
 import org.testng.annotations.AfterClass;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -51,7 +52,12 @@ public class TestPictureElement extends GenericDriverTest {
 		driver = WebUIDriver.getWebDriver(true);
 	}
 	
-	@AfterClass(alwaysRun = true)
+	@AfterMethod(groups={"it"})
+	public void reset() {
+		testPage.logoText.clear();
+	}
+	
+	@AfterClass(alwaysRun = true, groups={"it"})
 	public void closeBrowser() {
 		WebUIDriver.cleanUp();
 	}

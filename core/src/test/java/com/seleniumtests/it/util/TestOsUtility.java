@@ -46,7 +46,7 @@ public class TestOsUtility extends GenericTest {
 	
 	@Test(groups={"it"})
 	public void testWindowsProcessList() {
-		if (osUtil.isWindows()) {
+		if (OSUtility.isWindows()) {
 			if (osUtil.isProcessRunning("svchost")) {
 				return;
 			}
@@ -55,15 +55,24 @@ public class TestOsUtility extends GenericTest {
 	}
 
 	@Test(groups={"it"})
-	public void testUnixProcessList() {
-		if (!osUtil.isWindows()) {
+	public void testLinuxProcessList() {
+		if (OSUtility.isLinux()) {
 			if (osUtil.isProcessRunning("dbus-daemon")) {
 				return;
 			}
 			Assert.fail("no dbus process found");
 		}
 	}
-	
+
+	@Test(groups={"it"})
+	public void testMacProcessList() {
+		if (OSUtility.isMac()) {
+			if (osUtil.isProcessRunning("sysmond")) {
+				return;
+			}
+			Assert.fail("no sysmond process found");
+		}
+	}
 	@Test(groups={"it"})
 	public void testIsProcessNotRunning() {		
 		Assert.assertFalse(osUtil.isProcessRunning("anUnknownProcess"), String.format("process anUnknownProcess should not be found"));
