@@ -25,7 +25,14 @@
             <groupId>io.appium</groupId>
             <artifactId>java-client</artifactId>
         </dependency>
-        
+        <dependency>
+		  <groupId>com.vdurmont</groupId>
+		  <artifactId>semver4j</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.json</groupId>
+			<artifactId>json</artifactId>
+		</dependency>
         
 		<dependency>
 			<groupId>org.apache.commons</groupId>
@@ -36,11 +43,6 @@
 			<groupId>org.testng</groupId>
 			<artifactId>testng</artifactId>
 			<version>6.9.10</version>
-		</dependency>
-		<dependency>
-			<groupId>org.json</groupId>
-			<artifactId>json</artifactId>
-			<version>20131018</version> 
 		</dependency>
 		<dependency>
 			<groupId>com.google.inject</groupId>
