@@ -23,6 +23,14 @@
             <groupId>io.appium</groupId>
             <artifactId>java-client</artifactId>
         </dependency>
+        <dependency>
+		  <groupId>com.vdurmont</groupId>
+		  <artifactId>semver4j</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.json</groupId>
+			<artifactId>json</artifactId>
+		</dependency>
 	</dependencies>
 
 	<build>

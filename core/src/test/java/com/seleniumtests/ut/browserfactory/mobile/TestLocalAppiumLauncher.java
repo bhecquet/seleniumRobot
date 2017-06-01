@@ -53,8 +53,8 @@ public class TestLocalAppiumLauncher extends MockitoTest {
 		PowerMockito.mockStatic(FileUtils.class);
 		PowerMockito.mockStatic(System.class);
 		when(System.getenv("APPIUM_HOME")).thenReturn("/opt/appium/");
-		when(FileUtils.readFileToString(new File("/opt/appium/node_modules/appium/.appiumconfig.json")))
-					  .thenReturn("{\"git-sha\":\"c75d8adcb66a75818a542fe1891a34260c21f76a\",\"ios\":{\"version\":\"1.4.13\"},\"android\":{\"version\":\"1.4.13\"},\"selendroid\":{\"version\":\"1.4.13\"},\"firefoxos\":{\"version\":\"1.4.13\"},\"built\":\"2015-09-30T01:56:51.644Z\"}");
+		when(FileUtils.readFileToString(new File("/opt/appium/node_modules/appium/package.json")))
+					  .thenReturn("{\"name\":\"appium\",\"version\":\"1.4.13\"}");
 		
 	}
 	
@@ -96,8 +96,8 @@ public class TestLocalAppiumLauncher extends MockitoTest {
 		PowerMockito.mockStatic(System.class);
 		PowerMockito.mockStatic(OSCommand.class);
 		when(System.getenv("APPIUM_HOME")).thenReturn("/opt/appium/");
-		when(FileUtils.readFileToString(new File("/opt/appium/node_modules/appium/.appiumconfig.json")))
-					  .thenReturn("{\"git-sha\":\"c75d8adcb66a75818a542fe1891a34260c21f76a\"}");
+		when(FileUtils.readFileToString(new File("/opt/appium/node_modules/appium/package.json")))
+					  .thenReturn("{\"name\":\"application\"}");
 		new LocalAppiumLauncher();
 	}
 	
