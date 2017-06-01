@@ -47,6 +47,16 @@ public class TestDesktopDrivers extends GenericDriverTest {
 	}
 	
 	@Test(groups={"it"})
+	public void testSafariStartup(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		if (SystemUtils.IS_OS_MAC_OSX) {
+			SeleniumTestsContextManager.initThreadContext(testNGCtx);
+			SeleniumTestsContextManager.getThreadContext().setBrowser("*safari");
+			driver = WebUIDriver.getWebDriver(true);
+			Assert.assertEquals(driver.getCurrentUrl(), "data:,");
+		}
+	}
+	
+	@Test(groups={"it"})
 	public void testIEStartup(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		if (!SystemUtils.IS_OS_WINDOWS) {
 			throw new SkipException("This test can only be done on Windows");

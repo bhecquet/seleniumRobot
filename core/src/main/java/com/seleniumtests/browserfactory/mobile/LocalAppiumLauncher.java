@@ -19,8 +19,6 @@ package com.seleniumtests.browserfactory.mobile;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -28,12 +26,14 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.log4j.Logger;
+import org.json.JSONObject;
 
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.util.helper.WaitHelper;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 import com.seleniumtests.util.osutility.OSCommand;
+import com.vdurmont.semver4j.Semver;
 
 public class LocalAppiumLauncher implements AppiumLauncher {
 
@@ -47,7 +47,6 @@ public class LocalAppiumLauncher implements AppiumLauncher {
 	private String optionString = "";
 
 	private static Logger logger = SeleniumRobotLogger.getLogger(LocalAppiumLauncher.class);
-	private Pattern appiumVersionPattern = Pattern.compile(".*android\":\\{\"version\":\"(\\d+\\.\\d+\\.\\d+)\"\\}.*");
 	
 	public LocalAppiumLauncher() {
 		this(null);
@@ -94,15 +93,17 @@ public class LocalAppiumLauncher implements AppiumLauncher {
 
 	private void checkAppiumVersion() {
 		try {
-			String appiumConfig = FileUtils.readFileToString(Paths.get(appiumHome, "node_modules", "appium", ".appiumconfig.json").toFile());
-			Matcher appiumVersionMatcher = appiumVersionPattern.matcher(appiumConfig);
-			if (appiumVersionMatcher.matches()) {
-				appiumVersion = appiumVersionMatcher.group(1);
-			} else {
-				throw new ConfigurationException("File .appiumconfig.json is invalid (version not found) in " + appiumHome);
+			File packageFile = Paths.get(appiumHome, "node_modules", "appium", "package.json").toFile();
+			String appiumConfig = FileUtils.readFileToString(packageFile);
+			JSONObject packages = new JSONObject(appiumConfig);
+			if (!packages.getString("name").equals("appium")) {
+				throw new ConfigurationException(String.format("package.json file found in %s is not for appium, check path", packageFile.getAbsolutePath()));
 			}
+			
+			appiumVersion = packages.getString("version");
+
 		} catch (IOException e) {
-			throw new ConfigurationException("File .appiumconfig.json not found, appium does not seem to be installed in " + appiumHome, e);
+			throw new ConfigurationException("File package.json not found, appium does not seem to be installed in " + appiumHome, e);
 		}
 	}
 
@@ -149,7 +150,7 @@ public class LocalAppiumLauncher implements AppiumLauncher {
 		        	break;
 		        }
 			} catch (IOException e) {
-				logger.info("appium not started", e);
+				logger.info("appium not started");
 			}
 			WaitHelper.waitForSeconds(1);
 		}
@@ -171,11 +172,20 @@ public class LocalAppiumLauncher implements AppiumLauncher {
 	}
 	
 	public void startAppiumWithoutWait() {
-		appiumProcess = OSCommand.executeCommand(String.format("%s %s/node_modules/appium/bin/appium.js --port %d %s", 
-									nodeCommand, 
-									appiumHome, 
-									appiumPort,
-									optionString));
+		Semver appiumVers = new Semver(appiumVersion);
+		if (appiumVers.isGreaterThan("1.6.0") || appiumVers.isEqualTo("1.6.0")) {
+			appiumProcess = OSCommand.executeCommand(String.format("%s %s/node_modules/appium/ --port %d %s", 
+					nodeCommand, 
+					appiumHome, 
+					appiumPort,
+					optionString));
+		} else {
+			appiumProcess = OSCommand.executeCommand(String.format("%s %s/node_modules/appium/bin/appium.js --port %d %s", 
+										nodeCommand, 
+										appiumHome, 
+										appiumPort,
+										optionString));
+		}
 	}
 	
 	/**
