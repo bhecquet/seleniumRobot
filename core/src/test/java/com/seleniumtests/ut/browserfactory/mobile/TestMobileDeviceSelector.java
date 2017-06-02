@@ -205,7 +205,7 @@ public class TestMobileDeviceSelector extends MockitoTest {
  + "iPhone 6 Plus (10.3) [FEB56FF6-5705-45F6-8D0F-4958ACA91FF5] (Simulator)\n"
  + "iPhone 7 (10.3) [D11D74FE-A620-403C-BAAA-1E0FF4486238] (Simulator)\n"
  + "iPhone 7 (10.3) + Apple Watch Series 2 - 38mm (3.2) [84DA8FFA-F743-4EA6-8E98-DC38165B9ACB] (Simulator)\n"
- + "iPhone SE (10.3) [2FD40F1E-45A2-4580-95D4-5B850E438953] (Simulator)");
+ + "iPhone SE (10.3.1) [2FD40F1E-45A2-4580-95D4-5B850E438953] (Simulator)");
 		
 		deviceSelector.setAndroidReady(false);
 		deviceSelector.setIosReady(true);
@@ -218,5 +218,6 @@ public class TestMobileDeviceSelector extends MockitoTest {
 		Assert.assertEquals(devs.get(8).getId(), "84DA8FFA-F743-4EA6-8E98-DC38165B9ACB");
 		Assert.assertEquals(devs.get(8).getPlatform(), "iOS");
 		Assert.assertEquals(devs.get(8).getBrowsers().get(0), "safari");
+		Assert.assertEquals(devs.get(9).getVersion(), "10.3.1");
 	}
 }

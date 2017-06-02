@@ -140,13 +140,14 @@ public class LocalAppiumLauncher implements AppiumLauncher {
 	 */
 	private void waitAppiumAlive() {
 		
-		for (int i=0; i< 10; i++) {
+		for (int i=0; i< 60; i++) {
 			try {
 				HttpGet request = new HttpGet(getAppiumServerUrl() + "sessions");
 		        CloseableHttpClient client = HttpClients.createDefault();
 		        CloseableHttpResponse response = client.execute(request);
 		        client.close();
 		        if (response.getStatusLine().getStatusCode() == 200) {
+		        	logger.info("appium has started");
 		        	break;
 		        }
 			} catch (IOException e) {

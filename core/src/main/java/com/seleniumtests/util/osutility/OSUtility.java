@@ -24,7 +24,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
+import org.openqa.selenium.Platform;
 
+import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
@@ -44,6 +46,18 @@ public abstract class OSUtility {
 	/******************************************
 	 *********** OS information ***************
 	 ******************************************/
+	
+	public static Platform getCurrentPlatorm() {
+		if (isWindows()) {
+			return Platform.WINDOWS;
+		} else if (isLinux()) {
+			return Platform.LINUX;
+		} else if (isMac()) {
+			return Platform.MAC;
+		} else {
+			throw new ConfigurationException(getOSName() + " is not recognized as a valid platform");
+		}
+	}
 	
 	/**
 	 * @return the name of the Operating System
