@@ -25,6 +25,8 @@ import org.openqa.selenium.remote.http.HttpClient;
 import org.openqa.selenium.remote.internal.ApacheHttpClient;
 import org.openqa.selenium.remote.internal.HttpClientFactory;
 
+import com.seleniumtests.core.SeleniumTestsContextManager;
+
 @Aspect
 public class SocketTimeout {
 	
@@ -33,6 +35,7 @@ public class SocketTimeout {
 	private static final int TIMEOUT_TWO_MINUTES = (int) SECONDS.toMillis(60 * 2);
 	
 	private static HttpClient.Factory httpClientFactory = new ApacheHttpClient.Factory(new HttpClientFactory(TIMEOUT_TWO_MINUTES, TIMEOUT_TWO_MINUTES));
+	private static HttpClient.Factory httpClientFactoryLong = new ApacheHttpClient.Factory(new HttpClientFactory(TIMEOUT_TWO_MINUTES * 3, TIMEOUT_TWO_MINUTES * 3));
 	
 	/**
 	 * HttpCommandExecutor is responsible for sending commands to browser
@@ -42,7 +45,11 @@ public class SocketTimeout {
 	 */
 	@Around("execution(private * org.openqa.selenium.remote.HttpCommandExecutor.getDefaultClientFactory (..))")
     public HttpClient.Factory changetTimeout(ProceedingJoinPoint joinPoint) {
-		return httpClientFactory;
+		if (SeleniumTestsContextManager.isMobileTest()) {
+			return httpClientFactoryLong;
+		} else {
+			return httpClientFactory;
+		}
 	}
 	
 }

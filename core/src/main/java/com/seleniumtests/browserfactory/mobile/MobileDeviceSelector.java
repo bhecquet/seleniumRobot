@@ -38,7 +38,7 @@ public class MobileDeviceSelector {
 	// examples
 	// Apple TV 1080p (10.2) [6444F65D-DA15-4505-8307-4520FD346ACE] (Simulator)
 	// Mac mini [CBFA063D-2535-5FD8-BA05-CE8D3683D6BA]
-	private static final Pattern REG_DEVICE = Pattern.compile("([a-zA-Z0-9 ]+).*?\\((\\d+\\.\\d+)\\).*?\\[(.*?)\\].*");
+	private static final Pattern REG_DEVICE = Pattern.compile("([a-zA-Z0-9 ]+).*?\\((\\d+\\.\\d+\\.?\\d?)\\).*?\\[(.*?)\\].*");
 	
 	public MobileDeviceSelector initialize() {
 		try {

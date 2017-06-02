@@ -42,6 +42,7 @@ import com.seleniumtests.driver.DriverMode;
 import com.seleniumtests.driver.TestType;
 import com.seleniumtests.reporter.PluginsHelper;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
+import com.seleniumtests.util.osutility.OSUtility;
 
 /**
  * Defines TestNG context used in STF.
@@ -1166,14 +1167,7 @@ public class SeleniumTestsContext {
     	if (platform != null) {
     		setAttribute(PLATFORM, platform);
     	} else {
-    		
-    		// Workaround to make Selenium 2.53.1 compatible with any MAC OS version
-    		Platform pf = Platform.getCurrent();
-    		if (pf == Platform.MAC && pf.family() == Platform.ANY) {
-    			setAttribute(PLATFORM, Platform.MAC.toString());
-    		} else {
-    			setAttribute(PLATFORM, pf.family().toString());
-    		}
+    		setAttribute(PLATFORM, OSUtility.getCurrentPlatorm().toString());
     	}
     }
     
