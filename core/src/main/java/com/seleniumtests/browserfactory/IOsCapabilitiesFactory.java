@@ -40,6 +40,8 @@ public class IOsCapabilitiesFactory extends ICapabilitiesFactory {
     	
     	DesiredCapabilities caps = new DesiredCapabilities(this.capabilities);
     	caps.setCapability(MobileCapabilityType.AUTOMATION_NAME, "Appium");
+    	//caps.setCapability(MobileCapabilityType.AUTOMATION_NAME, "XCUITest");
+    	
     	caps.setCapability(MobileCapabilityType.FULL_RESET, "true");
     	caps.setCapability(MobileCapabilityType.PLATFORM_NAME, cfg.getPlatform());
 

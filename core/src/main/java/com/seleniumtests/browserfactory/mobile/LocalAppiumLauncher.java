@@ -33,6 +33,7 @@ import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.util.helper.WaitHelper;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 import com.seleniumtests.util.osutility.OSCommand;
+import com.seleniumtests.util.osutility.OSUtility;
 import com.vdurmont.semver4j.Semver;
 
 public class LocalAppiumLauncher implements AppiumLauncher {
@@ -173,6 +174,13 @@ public class LocalAppiumLauncher implements AppiumLauncher {
 	}
 	
 	public void startAppiumWithoutWait() {
+		
+		// correction for "socket hang up" error when starting test
+		// TODO: this fix does not handle multiple tests in parallel, but for now, only one mobile test can be done on mac on one session
+		if (OSUtility.isMac()) {
+			OSCommand.executeCommand("killall iproxy xcodebuild XCTRunner");
+		}
+		
 		Semver appiumVers = new Semver(appiumVersion);
 		if (appiumVers.isGreaterThan("1.6.0") || appiumVers.isEqualTo("1.6.0")) {
 			appiumProcess = OSCommand.executeCommand(String.format("%s %s/node_modules/appium/ --port %d %s", 
