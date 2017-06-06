@@ -97,10 +97,15 @@ public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implemen
      */
     private DesiredCapabilities createSpecificGridCapabilities(DriverConfig webDriverConfig) {
     	DesiredCapabilities capabilities = new DesiredCapabilities();
-    	capabilities.setCapability(CapabilityType.PLATFORM, webDriverConfig.getPlatform().toLowerCase());
+    	
     	
     	if (SeleniumTestsContextManager.isMobileTest()) {
     		capabilities.setCapability(CapabilityType.VERSION, webDriverConfig.getMobilePlatformVersion());
+    	} else {
+    		capabilities.setCapability(CapabilityType.PLATFORM, webDriverConfig.getPlatform().toLowerCase());
+    		if (webDriverConfig.getBrowserVersion() != null) {
+    			capabilities.setCapability(CapabilityType.VERSION, webDriverConfig.getBrowserVersion());
+    		}
     	}
     	
     	return capabilities;

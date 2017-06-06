@@ -275,8 +275,10 @@ public class SeleniumTestsContext {
 	    	Platform currentPlatform = Platform.fromString(getPlatform());
 	    	if (currentPlatform.is(Platform.WINDOWS) 
 	    		|| currentPlatform.is(Platform.MAC) 
-	    		|| currentPlatform.is(Platform.UNIX) ) {
+	    		|| currentPlatform.is(Platform.UNIX)
+	    		|| currentPlatform.is(Platform.ANY) && getRunMode() == DriverMode.GRID) {
 	    		return;
+	    	
 	    	} else {
 	    		throw new WebDriverException("");
 	    	}
@@ -1167,7 +1169,8 @@ public class SeleniumTestsContext {
     	if (platform != null) {
     		setAttribute(PLATFORM, platform);
     	} else {
-    		setAttribute(PLATFORM, OSUtility.getCurrentPlatorm().toString());
+//    		setAttribute(PLATFORM, OSUtility.getCurrentPlatorm().toString());
+    		setAttribute(PLATFORM, Platform.ANY.toString());
     	}
     }
     

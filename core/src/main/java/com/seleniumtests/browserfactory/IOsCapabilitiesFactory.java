@@ -16,12 +16,15 @@
  */
 package com.seleniumtests.browserfactory;
 
-import com.seleniumtests.driver.DriverConfig;
-
-import io.appium.java_client.remote.MobileCapabilityType;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
+
+import com.seleniumtests.driver.DriverConfig;
+
+import io.appium.java_client.remote.MobileCapabilityType;
 
 public class IOsCapabilitiesFactory extends ICapabilitiesFactory {
 	
@@ -37,8 +40,8 @@ public class IOsCapabilitiesFactory extends ICapabilitiesFactory {
 
 	@Override
     public DesiredCapabilities createCapabilities(final DriverConfig cfg) {
-    	
-    	DesiredCapabilities caps = new DesiredCapabilities(this.capabilities);
+		
+    	DesiredCapabilities caps = new DesiredCapabilities(capabilities);
     	caps.setCapability(MobileCapabilityType.AUTOMATION_NAME, "Appium");
     	caps.setCapability(MobileCapabilityType.FULL_RESET, "true");
     	caps.setCapability(MobileCapabilityType.PLATFORM_NAME, cfg.getPlatform());
@@ -61,6 +64,8 @@ public class IOsCapabilitiesFactory extends ICapabilitiesFactory {
         	caps.setCapability(CapabilityType.BROWSER_NAME, "");
         }
     	caps.setCapability(MobileCapabilityType.NEW_COMMAND_TIMEOUT, cfg.getNewCommandTimeout());
+    	
+    	
 
         return caps;
     }
