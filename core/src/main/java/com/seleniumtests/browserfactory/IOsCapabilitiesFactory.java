@@ -39,10 +39,14 @@ public class IOsCapabilitiesFactory extends ICapabilitiesFactory {
     public DesiredCapabilities createCapabilities(final DriverConfig cfg) {
     	
     	DesiredCapabilities caps = new DesiredCapabilities(this.capabilities);
-    	caps.setCapability(MobileCapabilityType.AUTOMATION_NAME, "Appium");
-    	//caps.setCapability(MobileCapabilityType.AUTOMATION_NAME, "XCUITest");
+    	//caps.setCapability(MobileCapabilityType.AUTOMATION_NAME, "Appium");
+    	caps.setCapability(MobileCapabilityType.AUTOMATION_NAME, "XCUITest");
     	
-    	caps.setCapability(MobileCapabilityType.FULL_RESET, "true");
+    	if (cfg.isFullReset()) {
+    		caps.setCapability(MobileCapabilityType.FULL_RESET, "true");
+    	} else {
+    		caps.setCapability(MobileCapabilityType.FULL_RESET, "false");
+    	}
     	caps.setCapability(MobileCapabilityType.PLATFORM_NAME, cfg.getPlatform());
 
         // Set up version and device name else appium server would pick the only available emulator/device
