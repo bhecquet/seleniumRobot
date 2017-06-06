@@ -92,6 +92,12 @@
 				<groupId>io.appium</groupId>
 				<artifactId>java-client</artifactId>
 				<version>${appium.version}</version>
+				<exclusions>
+					<exclusion>
+						<groupId>org.apache.commons</groupId>
+						<artifactId>commons-lang3</artifactId>
+					</exclusion>
+				</exclusions>
 			</dependency>
 			<dependency>
 			  <groupId>com.vdurmont</groupId>

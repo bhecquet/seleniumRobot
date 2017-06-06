@@ -32,13 +32,10 @@ import io.appium.java_client.remote.MobileCapabilityType;
 public class MobileDeviceSelector {
 	
 	private AdbWrapper adbWrapper;
+	private InstrumentsWrapper instrumentsWrapper;
 	private Boolean androidReady;
 	private Boolean iosReady;
 	
-	// examples
-	// Apple TV 1080p (10.2) [6444F65D-DA15-4505-8307-4520FD346ACE] (Simulator)
-	// Mac mini [CBFA063D-2535-5FD8-BA05-CE8D3683D6BA]
-	private static final Pattern REG_DEVICE = Pattern.compile("([a-zA-Z0-9 ]+).*?\\((\\d+\\.\\d+\\.?\\d?)\\).*?\\[(.*?)\\].*");
 	
 	public MobileDeviceSelector initialize() {
 		try {
@@ -48,7 +45,14 @@ public class MobileDeviceSelector {
 			adbWrapper = null;
 			androidReady = false;
 		}
-		iosReady = true;
+		
+		try {
+			instrumentsWrapper = new InstrumentsWrapper();
+			iosReady = true;
+		} catch (ConfigurationException e) {
+			instrumentsWrapper = null;
+			iosReady = false;
+		}
 		return this;
 	}
 	
@@ -104,7 +108,7 @@ public class MobileDeviceSelector {
 		}
 		
 		if (iosReady) {
-			deviceList.addAll(parseIosDevices());
+			deviceList.addAll(instrumentsWrapper.parseIosDevices());
 		}
 		
 		List<MobileDevice> filteredDeviceList = filterDevices(deviceList, 
@@ -132,6 +136,8 @@ public class MobileDeviceSelector {
 		
 		if ("android".equals(selectedDevice.getPlatform())) {
 			capabilities.setCapability(MobileCapabilityType.DEVICE_NAME, selectedDevice.getId());
+		} else if ("ios".equalsIgnoreCase(selectedDevice.getPlatform())) {
+			capabilities.setCapability(MobileCapabilityType.UDID, selectedDevice.getId());
 		}
 		capabilities.setCapability(MobileCapabilityType.PLATFORM_NAME, selectedDevice.getPlatform());
 		capabilities.setCapability(MobileCapabilityType.PLATFORM_VERSION, selectedDevice.getVersion());
@@ -139,24 +145,7 @@ public class MobileDeviceSelector {
 		return capabilities;
 	}
 	
-	/**
-	 * Use 'instruments -s devices' to know which devices are available for test
-	 */
-	public List<MobileDevice> parseIosDevices() {
-		String output = OSCommand.executeCommandAndWait("instruments -s devices");
-		List<MobileDevice> devList = new ArrayList<>();
-		
-		for (String line: output.split("\n")) {
-			line = line.trim();
-			Matcher matcher = REG_DEVICE.matcher(line);
-
-			if (matcher.matches()) {
-				MobileDevice dev = new MobileDevice(matcher.group(1).trim(), matcher.group(3), "iOS", matcher.group(2), Arrays.asList(new String[] {"safari"}));
-				devList.add(dev);
-			}
-		}
-		return devList;
-	}
+	
 	
 	public boolean isAndroidReady() {
 		return androidReady;
