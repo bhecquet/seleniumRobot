@@ -75,7 +75,8 @@ public class DriverConfig {
     private String mobilePlatformVersion;
     private String deviceName;
     private String app;
-
+    private boolean fullReset;
+    
     private String appPackage;
     private String appActivity;
     private String appWaitActivity;
@@ -478,5 +479,13 @@ public class DriverConfig {
 
 	public void setAppWaitActivity(String appWaitActivity) {
 		this.appWaitActivity = appWaitActivity;
+	}
+
+	public boolean isFullReset() {
+		return fullReset;
+	}
+
+	public void setFullReset(boolean fullReset) {
+		this.fullReset = fullReset;
 	}
 }
