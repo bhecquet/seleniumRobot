@@ -32,6 +32,7 @@ import org.testng.annotations.Test;
 
 import com.seleniumtests.MockitoTest;
 import com.seleniumtests.browserfactory.mobile.AdbWrapper;
+import com.seleniumtests.browserfactory.mobile.InstrumentsWrapper;
 import com.seleniumtests.browserfactory.mobile.MobileDevice;
 import com.seleniumtests.browserfactory.mobile.MobileDeviceSelector;
 import com.seleniumtests.customexception.ConfigurationException;
@@ -44,6 +45,9 @@ public class TestMobileDeviceSelector extends MockitoTest {
 	
 	@Mock
 	private AdbWrapper adbWrapper;
+	
+	@Mock
+	private InstrumentsWrapper instrumentsWrapper;
 	
 	@InjectMocks
 	private MobileDeviceSelector deviceSelector;
@@ -62,7 +66,7 @@ public class TestMobileDeviceSelector extends MockitoTest {
 		requestedCaps.setCapability(MobileCapabilityType.PLATFORM_NAME, "android");
 
 		deviceSelector.setAndroidReady(true);
-		deviceSelector.setIosReady(true);
+		deviceSelector.setIosReady(false);
 		
 		deviceSelector.getRelevantMobileDevice(requestedCaps);
 	}
@@ -81,7 +85,7 @@ public class TestMobileDeviceSelector extends MockitoTest {
 		requestedCaps.setCapability(CapabilityType.BROWSER_NAME, "firefox");
 		
 		deviceSelector.setAndroidReady(true);
-		deviceSelector.setIosReady(true);
+		deviceSelector.setIosReady(false);
 		
 		deviceSelector.getRelevantMobileDevice(requestedCaps);
 	}
@@ -98,7 +102,7 @@ public class TestMobileDeviceSelector extends MockitoTest {
 		requestedCaps.setCapability(MobileCapabilityType.PLATFORM_NAME, "android");
 		
 		deviceSelector.setAndroidReady(false);
-		deviceSelector.setIosReady(true);
+		deviceSelector.setIosReady(false);
 		
 		deviceSelector.getRelevantMobileDevice(requestedCaps);
 	}
@@ -107,12 +111,12 @@ public class TestMobileDeviceSelector extends MockitoTest {
 	public void testSelectiOSNotReady() {
 		// available devices
 		List<MobileDevice> deviceList = new ArrayList<>();
-//		deviceList.add(new MobileDevice("IPhone 6", "0000", "ios", "10.2"));
-		when(adbWrapper.getDeviceList()).thenReturn(deviceList);
+		deviceList.add(new MobileDevice("IPhone 6", "0000", "iOS", "10.2", new ArrayList<>()));
+		when(instrumentsWrapper.parseIosDevices()).thenReturn(deviceList);
 		
 		// requested caps
 		DesiredCapabilities requestedCaps = new DesiredCapabilities();
-		requestedCaps.setCapability(MobileCapabilityType.PLATFORM_NAME, "ios");
+		requestedCaps.setCapability(MobileCapabilityType.PLATFORM_NAME, "iOS");
 		
 		deviceSelector.setAndroidReady(true);
 		deviceSelector.setIosReady(false);
@@ -127,11 +131,14 @@ public class TestMobileDeviceSelector extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testSelectFirstMatchingAndroidDevice() {
 		// available devices
-		List<MobileDevice> deviceList = new ArrayList<>();
-		deviceList.add(new MobileDevice("IPhone 6", "0000", "ios", "10.2", new ArrayList<>()));
-		deviceList.add(new MobileDevice("Nexus 5", "1234", "Android", "5.0", new ArrayList<>()));
-		deviceList.add(new MobileDevice("Nexus 7", "1235", "Android", "6.0", new ArrayList<>()));
-		when(adbWrapper.getDeviceList()).thenReturn(deviceList);
+		List<MobileDevice> deviceListAndroid = new ArrayList<>();
+		deviceListAndroid.add(new MobileDevice("Nexus 5", "1234", "Android", "5.0", new ArrayList<>()));
+		deviceListAndroid.add(new MobileDevice("Nexus 7", "1235", "Android", "6.0", new ArrayList<>()));
+		when(adbWrapper.getDeviceList()).thenReturn(deviceListAndroid);
+		
+		List<MobileDevice> deviceListIos = new ArrayList<>();
+		deviceListIos.add(new MobileDevice("IPhone 6", "0000", "iOS", "10.2", new ArrayList<>()));
+		when(instrumentsWrapper.parseIosDevices()).thenReturn(deviceListIos);
 		
 		// requested caps
 		DesiredCapabilities requestedCaps = new DesiredCapabilities();
@@ -140,7 +147,34 @@ public class TestMobileDeviceSelector extends MockitoTest {
 		deviceSelector.setAndroidReady(true);
 		deviceSelector.setIosReady(true);
 		
-		Assert.assertEquals(deviceSelector.getRelevantMobileDevice(requestedCaps), deviceList.get(1));
+		Assert.assertEquals(deviceSelector.getRelevantMobileDevice(requestedCaps), deviceListAndroid.get(0));
+	}
+	
+	/**
+	 * Test that when several devices exists with the same capabilities, the first one is selected
+	 * Test platform name with different cases
+	 */
+	@Test(groups={"ut"})
+	public void testSelectFirstMatchingiOSDevice() {
+		// available devices
+		List<MobileDevice> deviceListAndroid = new ArrayList<>();
+		deviceListAndroid.add(new MobileDevice("Nexus 5", "1234", "Android", "5.0", new ArrayList<>()));
+		deviceListAndroid.add(new MobileDevice("Nexus 7", "1235", "Android", "6.0", new ArrayList<>()));
+		when(adbWrapper.getDeviceList()).thenReturn(deviceListAndroid);
+		
+		List<MobileDevice> deviceListIos = new ArrayList<>();
+		deviceListIos.add(new MobileDevice("IPhone 6", "0000", "iOS", "10.2", new ArrayList<>()));
+		deviceListIos.add(new MobileDevice("IPhone 7", "0000", "iOS", "10.3", new ArrayList<>()));
+		when(instrumentsWrapper.parseIosDevices()).thenReturn(deviceListIos);
+		
+		// requested caps
+		DesiredCapabilities requestedCaps = new DesiredCapabilities();
+		requestedCaps.setCapability(MobileCapabilityType.PLATFORM_NAME, "iOS");
+		
+		deviceSelector.setAndroidReady(true);
+		deviceSelector.setIosReady(true);
+		
+		Assert.assertEquals(deviceSelector.getRelevantMobileDevice(requestedCaps), deviceListIos.get(0));
 	}
 	
 	/**
@@ -150,7 +184,7 @@ public class TestMobileDeviceSelector extends MockitoTest {
 	public void testSelectMostMatchingAndroidDevice() {
 		// available devices
 		List<MobileDevice> deviceList = new ArrayList<>();
-		deviceList.add(new MobileDevice("IPhone 6", "0000", "ios", "10.2", new ArrayList<>()));
+		deviceList.add(new MobileDevice("IPhone 6", "0000", "iOS", "10.2", new ArrayList<>()));
 		deviceList.add(new MobileDevice("Nexus 5", "1234", "Android", "5.0", new ArrayList<>()));
 		deviceList.add(new MobileDevice("Nexus 7", "1235", "android", "6.0", new ArrayList<>()));
 		when(adbWrapper.getDeviceList()).thenReturn(deviceList);
@@ -161,7 +195,7 @@ public class TestMobileDeviceSelector extends MockitoTest {
 		requestedCaps.setCapability(MobileCapabilityType.PLATFORM_VERSION, "6.0");
 		
 		deviceSelector.setAndroidReady(true);
-		deviceSelector.setIosReady(true);
+		deviceSelector.setIosReady(false);
 		
 		Assert.assertEquals(deviceSelector.getRelevantMobileDevice(requestedCaps), deviceList.get(2));
 	}
@@ -183,7 +217,7 @@ public class TestMobileDeviceSelector extends MockitoTest {
 		requestedCaps.setCapability(MobileCapabilityType.DEVICE_NAME, "Nexus 5");
 		
 		deviceSelector.setAndroidReady(true);
-		deviceSelector.setIosReady(true);
+		deviceSelector.setIosReady(false);
 		
 		DesiredCapabilities updatedCaps = deviceSelector.updateCapabilitiesWithSelectedDevice(requestedCaps);
 		Assert.assertEquals(updatedCaps.getCapability(MobileCapabilityType.PLATFORM_NAME), "android");

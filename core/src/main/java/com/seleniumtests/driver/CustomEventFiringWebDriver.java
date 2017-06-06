@@ -67,7 +67,7 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver {
                 + "	if (b.clientWidth) {"
                 + "		width = Math.min(b.clientWidth, width);"
                 + "	}"
-                + "	return [width, height];";
+                + "	return [width * devicePixelRatio, height * devicePixelRatio];";
 
     private static final String JS_GET_CURRENT_SCROLL_POSITION =
             "var doc = document.documentElement; "
@@ -92,7 +92,7 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver {
             "var maxDocElementHeight = Math.max(clientHeight, scrollHeight); " +
             "var maxBodyHeight = Math.max(bodyClientHeight, bodyScrollHeight); " +
             "var totalHeight = Math.max(maxDocElementHeight, maxBodyHeight); " +
-            "return [totalWidth, totalHeight];";
+            "return [totalWidth * devicePixelRatio, totalHeight * devicePixelRatio];";
 
     public CustomEventFiringWebDriver(final WebDriver driver) {
         super(driver);
@@ -109,7 +109,17 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver {
     
     public void updateWindowsHandles() {
     	if (SeleniumTestsContextManager.isWebTest()) {
-    		currentHandles = driver.getWindowHandles();
+    		// workaround for ios tests where getWindowHandles sometimes fails
+    		for (int i = 0; i < 10; i++) {
+    			try  {
+    				currentHandles = driver.getWindowHandles();
+    				break;
+    			} catch (Exception e) {
+    				logger.info("getting window handles");
+    				WaitHelper.waitForSeconds(2);
+    			}
+    		}
+    			
     	} else {
     		currentHandles = new TreeSet<>();
     	}
