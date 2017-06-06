@@ -40,6 +40,7 @@ import org.xml.sax.SAXException;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.DriverExceptions;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
+import com.seleniumtests.util.osutility.OSUtility;
 import com.seleniumtests.util.osutility.OSUtilityFactory;
 
 /**
@@ -215,7 +216,7 @@ public class DriverExtractor {
 	
 	public void copyDriver(String driverName) {
 		InputStream driver = Thread.currentThread().getContextClassLoader().getResourceAsStream(String.format("drivers/%s/%s%s", 
-						SeleniumTestsContextManager.getThreadContext().getPlatform().toLowerCase(), 
+						OSUtility.getCurrentPlatorm().toString().toLowerCase(), 
 						driverName,
 						OSUtilityFactory.getInstance().getProgramExtension()));
 		

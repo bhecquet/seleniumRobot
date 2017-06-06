@@ -89,6 +89,8 @@ Set `APPIUM_HOME` environment variable to point to path where appium has been in
 
 On Linux/Mac systems, you can add `export APPIUM_HOME=<path to appium>` to the `.bash_profile` file in home directory
 
+When running seleniumRobot from eclipse, it may not inherit the user environment variables, so set it in Run Configuration
+
 #### Configuring Android for tests ####
 - Install android SDK (the zip/command line tools version is enough) : [https://developer.android.com/studio/index.html#downloads](https://developer.android.com/studio/index.html#downloads)
 - Install Intel HAXM driver to allow Virtual machine speedup. This can also be installed through Android SDK Manager
@@ -98,7 +100,24 @@ On Linux/Mac systems, you can add `export APPIUM_HOME=<path to appium>` to the `
 
 #### Configuring iOS for tests ####
 Follow appium instruction here [http://appium.io/slate/en/master/?ruby#running-appium-on-mac-os-x] (http://appium.io/slate/en/master/?ruby#running-appium-on-mac-os-x)
+As of June 2017, it asks for (simulator and real device):
+- install xcode
+- install xcode-select
+- `npm install -g authorize-ios`
+- `sudo authorize-ios`
+- install homebrew (see homebrew website)
+- `brew install carthage`
+
 Check installation with appium-doctor:
 - `npm install appium-doctor`
 - in node_modules/appium-doctor, `node . --ios`
+
+For use with a real iOS device, follow instructions here: [http://appium.io/slate/en/master/?ruby#appium-on-real-ios-devices] (http://appium.io/slate/en/master/?ruby#appium-on-real-ios-devices)
+For real device only:
+- `brew install libimobiledevice`
+- `npm install -g ios-deploy`
+
+TODO: 
+https://discuss.appium.io/t/xcodebuild-failed-with-code-65-warning-the-server-did-not-provide-any-stacktrace-information-command-duration-or-timeout-32-63-seconds/12756/4
+https://github.com/appium/appium/issues/7747
  
