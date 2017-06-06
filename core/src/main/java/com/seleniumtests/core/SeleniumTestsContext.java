@@ -129,6 +129,7 @@ public class SeleniumTestsContext {
     public static final String APPIUM_SERVER_URL = "appiumServerURL";			// URL du serveur appium en local ou à distance
     public static final String MOBILE_PLATFORM_VERSION = "mobilePlatformVersion";// Mobile OS version. It's deduced from platform name and not read directly from parameters
     public static final String DEVICE_NAME = "deviceName";						// Nom du terminal utilisé pour le test
+    public static final String FULL_RESET = "fullReset";						// whether we should do a full reset (default is true)
 
     public static final String APP_PACKAGE = "appPackage";						// package de l'application
     public static final String APP_ACTIVITY = "appActivity";					// activité à démarrer (Android)
@@ -211,6 +212,7 @@ public class SeleniumTestsContext {
         setAppiumServerUrl(getValueForTest(APPIUM_SERVER_URL, System.getProperty(APPIUM_SERVER_URL)));
         setDeviceName(getValueForTest(DEVICE_NAME, System.getProperty(DEVICE_NAME)));
         setDeviceList(getValueForTest(DEVICE_LIST, null));
+        setFullReset(getBoolValueForTest(FULL_RESET, System.getProperty(FULL_RESET)));
 
         setApp(getValueForTest(APP, System.getProperty(APP)));
        
@@ -355,6 +357,10 @@ public class SeleniumTestsContext {
 
     public Boolean getAddJSErrorCollectorExtension() {
         return (Boolean) getAttribute(ADD_JS_ERROR_COLLECTOR_EXTENSION);
+    }
+    
+    public Boolean getFullReset() {
+        return (Boolean) getAttribute(FULL_RESET);
     }
 
     public Object getAttribute(final String name) {
@@ -983,6 +989,15 @@ public class SeleniumTestsContext {
     	}
     }
     
+    public void setFullReset(Boolean enabled) {
+    	if (enabled != null) {
+    		setAttribute(FULL_RESET, enabled);
+    	} else {
+    		setAttribute(FULL_RESET, true);
+    	}
+    }
+    
+
     public void setWebProxyType(String proxyType) {
     	try {
     		setAttribute(WEB_PROXY_TYPE, ProxyType.valueOf(proxyType.toUpperCase()));

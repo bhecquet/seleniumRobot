@@ -409,6 +409,8 @@ public class WebUIDriver {
 
         Integer newCommandTimeOut = SeleniumTestsContextManager.getThreadContext().getNewCommandTimeout();
         config.setNewCommandTimeout(newCommandTimeOut);
+        
+        config.setFullReset(SeleniumTestsContextManager.getThreadContext().getFullReset());
 
         config.setVersion(SeleniumTestsContextManager.getThreadContext().getVersion());
         config.setPlatform(SeleniumTestsContextManager.getThreadContext().getPlatform());
