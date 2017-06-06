@@ -277,8 +277,10 @@ public class SeleniumTestsContext {
 	    	Platform currentPlatform = Platform.fromString(getPlatform());
 	    	if (currentPlatform.is(Platform.WINDOWS) 
 	    		|| currentPlatform.is(Platform.MAC) 
-	    		|| currentPlatform.is(Platform.UNIX) ) {
+	    		|| currentPlatform.is(Platform.UNIX)
+	    		|| currentPlatform.is(Platform.ANY) && getRunMode() == DriverMode.GRID) {
 	    		return;
+	    	
 	    	} else {
 	    		throw new WebDriverException("");
 	    	}
@@ -1178,11 +1180,22 @@ public class SeleniumTestsContext {
     	setAttribute(VERSION, version);
     }
     
+    /**
+     * Set platform on which we request to execute the test
+     * In mobile, platform parameter will be given (iOS xx or Android yy)
+     * In desktop, if we run the test locally, we should get the current platform, else, let user decide on which platform
+     * test will be run. It may be any if underlying OS does not matter (for grid)
+     * @param platform
+     */
     public void setPlatform(String platform) {
     	if (platform != null) {
     		setAttribute(PLATFORM, platform);
     	} else {
-    		setAttribute(PLATFORM, OSUtility.getCurrentPlatorm().toString());
+    		if (getRunMode() == DriverMode.LOCAL) {
+    			setAttribute(PLATFORM, OSUtility.getCurrentPlatorm().toString());
+    		} else {
+    			setAttribute(PLATFORM, Platform.ANY.toString());
+    		}
     	}
     }
     
