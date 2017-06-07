@@ -24,7 +24,9 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import org.mockito.Matchers;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.interactions.Mouse;
@@ -59,7 +61,7 @@ public class TestCompositeActions extends MockitoTest {
 	private CustomEventFiringWebDriver eventDriver;
 	
 
-	@BeforeMethod(alwaysRun=true)
+	@BeforeMethod(groups={"ut"})
 	private void init() {
 		
 		eventDriver = spy(new CustomEventFiringWebDriver(driver));
@@ -67,6 +69,7 @@ public class TestCompositeActions extends MockitoTest {
 		PowerMockito.mockStatic(WebUIDriver.class);
 		when(WebUIDriver.getWebDriver()).thenReturn(eventDriver);
 		when(driver.getMouse()).thenReturn(mouse);
+		Mockito.doCallRealMethod().when(driver).perform(Matchers.anyCollection());
 
 	}
 	
@@ -87,9 +90,35 @@ public class TestCompositeActions extends MockitoTest {
 	public void testHandlesNotUpdated() throws Exception {
 		new Actions(eventDriver).clickAndHold().perform();
 		
+		// check handled are not updated when no click is done
+		verify(eventDriver, never()).updateWindowsHandles();
+	}
+	
+	/**
+	 * Checks that CompositeAction.updateHandles() aspect is called when 
+	 * a click is done in a composite action with a driver supporting new actions (the real driver)
+	 * @throws Exception
+	 */
+	@Test(groups={"ut"})
+	public void testUpdateHandlesNewActions() throws Exception {
+		new Actions(eventDriver.getWebDriver()).click().perform();
+		
+		// check handled are updated on click
+		verify(eventDriver).updateWindowsHandles();
+	}
+	
+	/**
+	 * No update when only down or up action is done
+	 * @throws Exception
+	 */
+	@Test(groups={"ut"})
+	public void testUpdateHandlesNotUpdatedNewActions() throws Exception {
+		new Actions(eventDriver.getWebDriver()).clickAndHold().perform();
+		
 		// check handled are updated on click
 		verify(eventDriver, never()).updateWindowsHandles();
 	}
+
 	
 	/**
 	 * Test replay of CompositeAction

@@ -18,6 +18,7 @@ package com.seleniumtests.uipage.htmlelements;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -40,6 +41,7 @@ import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.interactions.HasInputDevices;
 import org.openqa.selenium.interactions.Mouse;
 import org.openqa.selenium.interactions.internal.Coordinates;
+import org.openqa.selenium.internal.HasIdentity;
 import org.openqa.selenium.internal.Locatable;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -57,14 +59,16 @@ import com.seleniumtests.util.helper.WaitHelper;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
 import io.appium.java_client.MobileElement;
-import io.appium.java_client.SwipeElementDirection;
+import io.appium.java_client.MultiTouchAction;
+import io.appium.java_client.PerformsTouchActions;
+import io.appium.java_client.TouchAction;
 
 
 /**
  * Provides methods to interact with a web page. All HTML element (ButtonElement, LinkElement, TextFieldElement, etc.)
  * extends from this class.
  */
-public class HtmlElement implements WebElement, Locatable {
+public class HtmlElement implements WebElement, Locatable, HasIdentity {
 
     protected static final Logger logger = SeleniumRobotLogger.getLogger(HtmlElement.class);
 
@@ -879,11 +883,13 @@ public class HtmlElement implements WebElement, Locatable {
      * Check if the current platform is a mobile platform
      * if it's the case, search for the element, else, raise a ScenarioException
      */
-    private void checkForMobile() {
+    private PerformsTouchActions checkForMobile() {
     	if (!SeleniumTestsContextManager.isMobileTest()) {
     		throw new ScenarioException("action is available only for mobile platforms");
     	}
     	findElement(true);
+    	
+    	return (PerformsTouchActions) ((CustomEventFiringWebDriver)driver).getWebDriver();
     }
     
     /**
@@ -914,48 +920,84 @@ public class HtmlElement implements WebElement, Locatable {
     
     @ReplayOnError
     public void pinch() {
-    	checkForMobile();
-    	((MobileElement)getUnderlyingElement(element)).pinch();
+    	PerformsTouchActions performTouchActions = checkForMobile();
+    	MobileElement mobElement = (MobileElement) getUnderlyingElement(element);
+    	
+    	// code taken from appium
+		MultiTouchAction multiTouch = new MultiTouchAction(performTouchActions);
+		
+		Point upperLeft = mobElement.getLocation();
+		Point center = mobElement.getCenter();
+		int yOffset = center.getY() - upperLeft.getY();
+		
+		TouchAction action0 = new TouchAction(performTouchActions).press(mobElement, center.getX(), center.getY() - yOffset)
+																	.moveTo(mobElement)
+																	.release();
+		TouchAction action1 = new TouchAction(performTouchActions).press(mobElement, center.getX(), center.getY() + yOffset)
+																	.moveTo(mobElement)
+																	.release();
+		
+		multiTouch.add(action0).add(action1).perform();
+
     }
     
     /**
      * Convenience method for swiping on the given element to the given direction
-     * @param direction		UP, DOWN, LEFT, RIGHT
-     * @param duration		amount of time in milliseconds for the entire swipe action to take
+     * @param xOffset	X offset from the top-left corner of the element
+     * @param yOffset	Y offset from the top-left corner of the element
+     * @param xMove		Movement amplitude on x axis
+     * @param yMove		Movement amplitude on y axis
      */
     @ReplayOnError
-    public void swipe(SwipeElementDirection direction, int duration) {
-    	checkForMobile();
-    	((MobileElement)getUnderlyingElement(element)).swipe(direction, duration);
+    public void swipe(int xOffset, int yOffset, int xMove, int yMove) {
+    	PerformsTouchActions performTouchActions = checkForMobile();
+    	MobileElement mobElement = (MobileElement) getUnderlyingElement(element);
+        
+        new TouchAction(performTouchActions).press(mobElement, xOffset, yOffset)
+			.waitAction()
+			.moveTo(mobElement, xMove, yMove)
+			.release().perform();
     }
     
     /**
-     * Convenience method for swiping on the given element to the given direction
-     * @param direction				UP, DOWN, LEFT, RIGHT
-     * @param offsetFromStartBorder
-     * @param offsetFromEndBorder 	offsetFromEndBorder is the offset from the border of the element where the swiping 
-     * 								should be started. If direction is UP then this is offset from the bottom of the element. 
-     * 								If direction is DOWN then this is offset from the top of the element. If direction is RIGHT 
-     * 								then this is offset from the left border of the element. If direction is LEFT then this is 
-     * 								offset from the right border of the element.
-     * @param duration				amount of time in milliseconds for the entire swipe action to take
+     * Tap with X fingers on screen
+     * @param fingers	number of fingers to tap with
+     * @param duration	duration in ms to wait before releasing
      */
-    @ReplayOnError
-    public void swipe(SwipeElementDirection direction, int offsetFromStartBorder, int offsetFromEndBorder, int duration) {
-    	checkForMobile();
-    	((MobileElement)getUnderlyingElement(element)).swipe(direction, offsetFromStartBorder, offsetFromEndBorder, duration);
-    }
-    
     @ReplayOnError
     public void tap(int fingers, int duration) {
-    	checkForMobile();
-    	((MobileElement)getUnderlyingElement(element)).tap(fingers, duration);
+    	PerformsTouchActions performTouchActions = checkForMobile();
+    	MobileElement mobElement = (MobileElement) getUnderlyingElement(element);
+    
+    	// code from appium
+    	MultiTouchAction multiTouch = new MultiTouchAction(performTouchActions);
+
+        for (int i = 0; i < fingers; i++) {
+            TouchAction tap = new TouchAction(performTouchActions);
+            multiTouch.add(tap.press(mobElement).waitAction(Duration.ofMillis(duration)).release());
+        }
+
+        multiTouch.perform();
     }
     
     @ReplayOnError
     public void zoom() {
-    	checkForMobile();
-    	((MobileElement)getUnderlyingElement(element)).zoom();
+    	PerformsTouchActions performTouchActions = checkForMobile();
+    	MobileElement mobElement = (MobileElement) getUnderlyingElement(element);
+    	
+    	MultiTouchAction multiTouch = new MultiTouchAction(performTouchActions);
+
+        Point upperLeft = mobElement.getLocation();
+        Point center = mobElement.getCenter();
+        int yOffset = center.getY() - upperLeft.getY();
+
+        TouchAction action0 = new TouchAction(performTouchActions).press(center.getX(), center.getY())
+                												.moveTo(mobElement, center.getX(), center.getY() - yOffset)
+                												.release();
+        TouchAction action1 = new TouchAction(performTouchActions).press(center.getX(), center.getY())
+                												.moveTo(mobElement, center.getX(), center.getY() + yOffset)
+                												.release();
+        multiTouch.add(action0).add(action1).perform();
     }
     
     /**
@@ -1002,5 +1044,11 @@ public class HtmlElement implements WebElement, Locatable {
 	public Coordinates getCoordinates() {
 		findElement();
 		return ((Locatable)element).getCoordinates();
+	}
+	
+	@Override
+	public String getId() {
+		findElement();
+		return ((HasIdentity)getUnderlyingElement(element)).getId();
 	}
 }
