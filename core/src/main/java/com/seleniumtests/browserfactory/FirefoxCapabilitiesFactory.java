@@ -63,7 +63,6 @@ public class FirefoxCapabilitiesFactory extends ICapabilitiesFactory {
         profile.setPreference("capability.policy.default.Window.frameElement.get", "allAccess");
         profile.setPreference("capability.policy.default.HTMLDocument.compatMode.get", "allAccess");
         profile.setPreference("capability.policy.default.Document.compatMode.get", "allAccess");
-        profile.setEnableNativeEvents(false);
         profile.setPreference("dom.max_chrome_script_run_time", 0);
         profile.setPreference("dom.max_script_run_time", 0);
     }
@@ -80,6 +79,7 @@ public class FirefoxCapabilitiesFactory extends ICapabilitiesFactory {
         FirefoxProfile profile = getFirefoxProfile(webDriverConfig);
         configProfile(profile, webDriverConfig);
         capability.setCapability(FirefoxDriver.PROFILE, profile);
+        capability.setCapability("marionette", false);
 
         if (webDriverConfig.isEnableJavascript()) {
             capability.setJavascriptEnabled(true);

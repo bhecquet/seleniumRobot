@@ -106,7 +106,7 @@ public class TestTable extends MockitoTest {
 	
 	@Test(groups={"ut"})
 	public void testGetColumnsWithoutRows() throws Exception {
-		when(tableEl.findElements(By.tagName("tr"))).thenReturn(new ArrayList());
+		when(tableEl.findElements(By.tagName("tr"))).thenReturn(new ArrayList<>());
 		
 		Assert.assertEquals(table.getColumns().size(), 0);
 	}

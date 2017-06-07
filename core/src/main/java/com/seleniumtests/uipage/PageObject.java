@@ -24,8 +24,6 @@ import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.Point;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.UnsupportedCommandException;
@@ -514,8 +512,9 @@ public class PageObject extends BasePage implements IPage {
 				}
 				
 				// make window display in foreground
+				// TODO: reactivate feature
 				try {
-					Point windowPosition  = driver.manage().window().getPosition();
+//					Point windowPosition  = driver.manage().window().getPosition();
 //					org.openqa.selenium.interactions.Mouse mouse = ((HasInputDevices) driver).getMouse();
 //					mouse.click();
 //					Mouse mouse = new DesktopMouse();

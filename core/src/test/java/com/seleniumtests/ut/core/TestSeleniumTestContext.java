@@ -554,14 +554,14 @@ public class TestSeleniumTestContext extends GenericTest {
 	@Test(groups="ut context")
 	public void testFullReset(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		initThreadContext(testNGCtx);
-		SeleniumTestsContextManager.getThreadContext().setFullReset(true);
-		Assert.assertTrue(SeleniumTestsContextManager.getThreadContext().getFullReset());
+		SeleniumTestsContextManager.getThreadContext().setFullReset(false);
+		Assert.assertFalse(SeleniumTestsContextManager.getThreadContext().getFullReset());
 	}
 	@Test(groups="ut context")
 	public void testFullResetNull(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setFullReset(null);
-		Assert.assertFalse(SeleniumTestsContextManager.getThreadContext().getFullReset());
+		Assert.assertTrue(SeleniumTestsContextManager.getThreadContext().getFullReset());
 	}
 	
 	@Test(groups="ut context")

@@ -56,7 +56,7 @@ public class CustomTestNGCucumberRunner {
      *
      * @param clazz Which has the cucumber.api.CucumberOptions and org.testng.annotations.Test annotations
      */
-    public CustomTestNGCucumberRunner(Class clazz) {
+    public CustomTestNGCucumberRunner(Class<?> clazz) {
         classLoader = clazz.getClassLoader();
         resourceLoader = new MultiLoader(classLoader);
         
@@ -65,7 +65,7 @@ public class CustomTestNGCucumberRunner {
         resultListener = new FeatureResultListener(runtimeOptions.reporter(classLoader), runtimeOptions.isStrict());
     }
     
-    private List<CucumberFeature> initCucumberOptions(Class clazz) {
+    private List<CucumberFeature> initCucumberOptions(Class<?> clazz) {
     	String cucumberPkg = SeleniumTestsContextManager.getThreadContext().getCucmberPkg();
     	if (cucumberPkg == null) {
     		throw new CustomSeleniumTestsException("'cucumberPackage' parameter is not set in test NG XML file (inside <suite> tag), "
@@ -115,7 +115,7 @@ public class CustomTestNGCucumberRunner {
     /**
      * Get list of features given their name or their file name
      */
-    private List<CucumberFeature> getFeaturesFromRequestedTests(Class clazz, ResourceLoader resourceLoader) {
+    private List<CucumberFeature> getFeaturesFromRequestedTests(Class<?> clazz, ResourceLoader resourceLoader) {
 
         RuntimeOptions runtimeOptionsB = new RuntimeOptionsFactory(clazz).create();
         

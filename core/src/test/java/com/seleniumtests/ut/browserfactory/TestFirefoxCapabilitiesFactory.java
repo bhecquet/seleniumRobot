@@ -20,6 +20,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxProfile;
+import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -49,7 +50,7 @@ public class TestFirefoxCapabilitiesFactory extends MockitoTest {
 		
 		DesiredCapabilities capa = new FirefoxCapabilitiesFactory().createCapabilities(config);
 		
-		Assert.assertTrue(capa.isJavascriptEnabled());
+		Assert.assertTrue(capa.is(CapabilityType.SUPPORTS_JAVASCRIPT));
 		Assert.assertEquals(capa.getVersion(), "");
 	}
 	
@@ -66,7 +67,7 @@ public class TestFirefoxCapabilitiesFactory extends MockitoTest {
 		
 		DesiredCapabilities capa = new FirefoxCapabilitiesFactory().createCapabilities(config);
 		
-		Assert.assertFalse(capa.isJavascriptEnabled());
+		Assert.assertFalse(capa.is(CapabilityType.SUPPORTS_JAVASCRIPT));
 		Assert.assertEquals(((FirefoxProfile)capa.getCapability(FirefoxDriver.PROFILE)).getIntegerPreference("browser.download.folderList", 0), 2);
 		Assert.assertEquals(System.getProperty("webdriver.firefox.bin"), "/home/bin");
 		Assert.assertEquals(((FirefoxProfile)capa.getCapability(FirefoxDriver.PROFILE)).getStringPreference("general.useragent.override", "_"), "");

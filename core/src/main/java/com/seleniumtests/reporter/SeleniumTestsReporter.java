@@ -48,7 +48,6 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
-import org.testng.IInvokedMethod;
 import org.testng.IReporter;
 import org.testng.IResultMap;
 import org.testng.ISuite;
@@ -753,7 +752,7 @@ public class SeleniumTestsReporter extends CommonReporter implements IReporter {
         return null;
     }
 
-    protected JavaDocBuilder getJavaDocBuilder(final Class clz) throws URISyntaxException {
+    protected JavaDocBuilder getJavaDocBuilder(final Class<?> clz) throws URISyntaxException {
         String projectPath = new File("").getAbsolutePath();
         String packagePath = clz.getPackage().getName().replaceAll("\\.", "/");
         if (builder == null) {

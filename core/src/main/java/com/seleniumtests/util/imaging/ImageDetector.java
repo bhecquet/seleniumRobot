@@ -40,6 +40,8 @@ import org.opencv.calib3d.Calib3d;
 import org.opencv.core.Core;
 import org.opencv.core.Core.MinMaxLocResult;
 import org.opencv.core.CvType;
+import org.opencv.core.DMatch;
+import org.opencv.core.KeyPoint;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfByte;
 import org.opencv.core.MatOfDMatch;
@@ -48,13 +50,11 @@ import org.opencv.core.MatOfPoint2f;
 import org.opencv.core.Point;
 import org.opencv.core.Scalar;
 import org.opencv.core.Size;
-import org.opencv.features2d.DMatch;
 import org.opencv.features2d.DescriptorExtractor;
 import org.opencv.features2d.DescriptorMatcher;
 import org.opencv.features2d.FeatureDetector;
 import org.opencv.features2d.Features2d;
-import org.opencv.features2d.KeyPoint;
-import org.opencv.highgui.Highgui;
+import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 import org.openqa.selenium.Rectangle;
 
@@ -136,10 +136,11 @@ public class ImageDetector {
 	 * Compute the rectangle where the searched picture is and the rotation angle between both images
 	 * Throw {@link ImageSearchException} if picture is not found
 	 * @return
+	 * @deprecated Kept here for information, but open CV 3 does not include SURF anymore for java build
 	 */
 	public void detectCorrespondingZone() {
-		Mat objectImageMat = Highgui.imread(objectImage.getAbsolutePath(), Highgui.CV_LOAD_IMAGE_COLOR);
-		Mat sceneImageMat = Highgui.imread(sceneImage.getAbsolutePath(), Highgui.CV_LOAD_IMAGE_COLOR);
+		Mat objectImageMat = Imgcodecs.imread(objectImage.getAbsolutePath(), Imgcodecs.CV_LOAD_IMAGE_COLOR);
+		Mat sceneImageMat = Imgcodecs.imread(sceneImage.getAbsolutePath(), Imgcodecs.CV_LOAD_IMAGE_COLOR);
 		FeatureDetector surf = FeatureDetector.create(FeatureDetector.SURF);
 		
 		MatOfKeyPoint objectKeyPoints = new MatOfKeyPoint();
@@ -274,10 +275,10 @@ public class ImageDetector {
 				p3.set(new double[] {p3.x + objectImageMat.cols(), p3.y});
 				p4.set(new double[] {p4.x + objectImageMat.cols(), p4.y});
 				
-				Core.line(imgMatch, p1, p2, new Scalar(0, 255, 0),1);
-				Core.line(imgMatch, p2, p3, new Scalar(0, 255, 0),1);
-				Core.line(imgMatch, p3, p4, new Scalar(0, 255, 0),1);
-				Core.line(imgMatch, p4, p1, new Scalar(0, 255, 0),1);
+				Imgproc.line(imgMatch, p1, p2, new Scalar(0, 255, 0),1);
+				Imgproc.line(imgMatch, p2, p3, new Scalar(0, 255, 0),1);
+				Imgproc.line(imgMatch, p3, p4, new Scalar(0, 255, 0),1);
+				Imgproc.line(imgMatch, p4, p1, new Scalar(0, 255, 0),1);
 				
 				showResultingPicture(imgMatch);
 			} catch (IOException e) {
@@ -298,8 +299,8 @@ public class ImageDetector {
 
 	public void detectExactZoneWithScale() {
 		
-		Mat sceneImageMat = Highgui.imread(sceneImage.getAbsolutePath(), Highgui.CV_LOAD_IMAGE_GRAYSCALE);
-        Mat objectImageMat = Highgui.imread(objectImage.getAbsolutePath(), Highgui.CV_LOAD_IMAGE_GRAYSCALE);
+		Mat sceneImageMat = Imgcodecs.imread(sceneImage.getAbsolutePath(), Imgcodecs.CV_LOAD_IMAGE_GRAYSCALE);
+        Mat objectImageMat = Imgcodecs.imread(objectImage.getAbsolutePath(), Imgcodecs.CV_LOAD_IMAGE_GRAYSCALE);
         
         List<TemplateMatchProperties> matches = Collections.synchronizedList(new ArrayList<>());
         
@@ -405,7 +406,7 @@ public class ImageDetector {
 			
 			if (debug) {
 				try {
-					Core.rectangle(sceneImageMat, new Point(detectedRectangle.x, detectedRectangle.y), new Point(detectedRectangle.x + detectedRectangle.width,
+					Imgproc.rectangle(sceneImageMat, new Point(detectedRectangle.x, detectedRectangle.y), new Point(detectedRectangle.x + detectedRectangle.width,
 						detectedRectangle.y + detectedRectangle.height), new Scalar(0, 255, 0));
 				
 					showResultingPicture(sceneImageMat);
@@ -592,7 +593,7 @@ public class ImageDetector {
 	 */
 	public void writeComparisonPictureToFile(String filePath, Mat img) {
 		if (filePath.toLowerCase().endsWith(".jpg") || filePath.toLowerCase().endsWith(".png")) {
-			Highgui.imwrite(filePath, img);
+			Imgcodecs.imwrite(filePath, img);
 		} else {
 			throw new ImageSearchException("only .JPG and .PNG files are supported");
 		}

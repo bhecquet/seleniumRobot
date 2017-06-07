@@ -27,19 +27,13 @@ public class TestFirefoxDriverFactory extends GenericTest {
 
 	@Test(groups={"ut"})
 	public void testVersionChoice_v47() {
-		StringBuilder versionString = new StringBuilder("Mozilla Firefox 47.0");
+		String versionString = "47.0";
 		Assert.assertEquals(new FirefoxDriverFactory(new DriverConfig()).useFirefoxVersion(versionString), false);
 	}
 	
 	@Test(groups={"ut"})
 	public void testVersionChoice_v46() {
-		StringBuilder versionString = new StringBuilder("Mozilla Firefox 46.0");
-		Assert.assertEquals(new FirefoxDriverFactory(new DriverConfig()).useFirefoxVersion(versionString), true);
-	}
-	
-	@Test(groups={"ut"})
-	public void testVersionChoice_debian() {
-		StringBuilder versionString = new StringBuilder("Mozilla Iceweasel 38.8.0");
+		String versionString = "46.0";
 		Assert.assertEquals(new FirefoxDriverFactory(new DriverConfig()).useFirefoxVersion(versionString), true);
 	}
 	

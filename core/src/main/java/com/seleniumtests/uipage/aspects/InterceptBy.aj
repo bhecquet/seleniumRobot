@@ -90,7 +90,7 @@ public class InterceptBy {
 	 */
 	public String getCallerName(StackTraceElement[] stack) {
 		String page = getPage();
-		Class stackClass = null;
+		Class<?> stackClass = null;
 		
 		//find the PageObject Loader
 		for(int i=0; i<stack.length;i++){

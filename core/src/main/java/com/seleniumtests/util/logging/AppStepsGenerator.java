@@ -3,7 +3,6 @@ package com.seleniumtests.util.logging;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InvalidClassException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -23,7 +22,6 @@ import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 import com.google.common.io.Files;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.DoNotVisitException;
-import com.seleniumtests.util.osutility.OSUtility;
 
 /**
  * This class aims at generating a documentation of the steps defined

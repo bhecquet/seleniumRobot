@@ -30,9 +30,11 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 
@@ -91,7 +93,7 @@ public class SpreadSheetHelper {
                 }
             }
         } else if (fieldClz.isAssignableFrom(java.util.List.class)) {
-            java.util.ArrayList list = java.util.ArrayList.class.newInstance();
+            List<Object> list = new ArrayList<>();
             int size = getArraySize(dataMap, combinedFieldName);
             if (size > 0) {
                 fieldValue = list;
@@ -102,7 +104,7 @@ public class SpreadSheetHelper {
                 }
             }
         } else if (fieldClz.isAssignableFrom(java.util.Set.class)) {
-            java.util.Set list = java.util.LinkedHashSet.class.newInstance();
+            Set<Object> list = new LinkedHashSet<>();
             int size = getArraySize(dataMap, combinedFieldName);
             if (size > 0) {
                 fieldValue = list;

@@ -31,7 +31,6 @@ import com.seleniumtests.MockitoTest;
 import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.uipage.BasePage;
-import com.thoughtworks.selenium.webdriven.Windows;
 
 @PrepareForTest(WebUIDriver.class)
 public class TestBasePage extends MockitoTest {

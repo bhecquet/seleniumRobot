@@ -25,16 +25,10 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.Writer;
 import java.util.GregorianCalendar;
-import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.apache.velocity.app.VelocityEngine;
-import org.testng.ITestResult;
-import org.testng.Reporter;
-import org.testng.internal.TestResult;
-import org.testng.internal.Utils;
 
-import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
 public abstract class CommonReporter {

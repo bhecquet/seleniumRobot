@@ -16,7 +16,6 @@
  */
 package com.seleniumtests.browserfactory;
 
-import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 

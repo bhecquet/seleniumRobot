@@ -27,7 +27,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.mockito.Mock;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriver.Options;
 import org.openqa.selenium.WebDriver.Timeouts;
 import org.openqa.selenium.WebDriverException;
@@ -91,14 +90,13 @@ public class TestWebUiDriver extends MockitoTest {
 		SeleniumTestsContextManager.getThreadContext().setTestType(TestType.APPIUM_APP_ANDROID);
 		
 		PowerMockito.mockStatic(AppiumLauncherFactory.class);
-		WebDriver driver;
 		LocalAppiumLauncher appiumLauncher;
 		
 		try {
 			appiumLauncher = spy(new LocalAppiumLauncher());
 			when(AppiumLauncherFactory.getInstance()).thenReturn(appiumLauncher);	
 		
-			driver = WebUIDriver.getWebDriver();
+			WebUIDriver.getWebDriver();
 		} catch (ConfigurationException e) {
 			throw new SkipException("Test skipped, appium not correctly configured", e);
 		}

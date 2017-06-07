@@ -40,7 +40,6 @@ import org.testng.xml.XmlTest;
 import com.seleniumtests.MockitoTest;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.reporter.PerformanceReporter;
-import com.seleniumtests.reporter.SeleniumTestsReporter2;
 import com.seleniumtests.reporter.TestListener;
 
 public class TestPerformanceReporter extends MockitoTest {
@@ -89,6 +88,7 @@ public class TestPerformanceReporter extends MockitoTest {
 		
 	}
 	
+	@SuppressWarnings("unchecked")
 	@Test(groups={"it"})
 	public void testReportGeneration(ITestContext testContext) throws Exception {
 		

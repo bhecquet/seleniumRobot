@@ -87,6 +87,7 @@ public class TestSeleniumTestsReporter extends MockitoTest {
 		return suite;
 	}
 	
+	@SuppressWarnings("unchecked")
 	@Test(groups={"it"})
 	public void testReportGeneration(ITestContext testContext) throws Exception {
 		

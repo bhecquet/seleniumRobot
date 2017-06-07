@@ -219,6 +219,7 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver {
 	/**
 	 * TODO: handle mobile app case
 	 */
+	@SuppressWarnings("unchecked")
 	public Point getScrollPosition() {
 		if (SeleniumTestsContextManager.isWebTest()) {
 			List<Long> dims = (List<Long>)((JavascriptExecutor) driver).executeScript(JS_GET_CURRENT_SCROLL_POSITION);
