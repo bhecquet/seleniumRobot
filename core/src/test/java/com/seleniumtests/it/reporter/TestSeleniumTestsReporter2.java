@@ -86,6 +86,7 @@ public class TestSeleniumTestsReporter2 extends MockitoTest {
 		return suite;
 	}
 	
+	@SuppressWarnings("unchecked")
 	@Test(groups={"it"})
 	public void testReportGeneration() throws Exception {
 		
@@ -290,12 +291,13 @@ public class TestSeleniumTestsReporter2 extends MockitoTest {
 		// Check error is present is Last test step
 		Assert.assertTrue(detailedReportContent.contains("<div class=\"box-body\"><ul><div class=\"message-log\">Test is KO with error: error</div>"));
 		
+		// /!\: lines in error message may change
 		// Check exception is logged and filtered
 		Assert.assertTrue(detailedReportContent.contains("<div class=\"message-error\"><div>class java.lang.AssertionError: error</div>"
 								+ "<div class=\"stack-element\"></div>"
 								+ "<div class=\"stack-element\">at com.seleniumtests.it.reporter.StubTestClass.testInError(StubTestClass.java:63)</div>"
 								+ "<div class=\"stack-element\">at com.seleniumtests.it.reporter.TestSeleniumTestsReporter2.executeSubTest(TestSeleniumTestsReporter2.java:83)</div>"
-								+ "<div class=\"stack-element\">at com.seleniumtests.it.reporter.TestSeleniumTestsReporter2.testReportDetailsWithErrors(TestSeleniumTestsReporter2.java:285)</div>"));
+								+ "<div class=\"stack-element\">at com.seleniumtests.it.reporter.TestSeleniumTestsReporter2.testReportDetailsWithErrors(TestSeleniumTestsReporter2.java:286)</div>"));
 		
 	}
 }

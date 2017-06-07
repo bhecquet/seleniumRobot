@@ -20,8 +20,6 @@ import java.util.Set;
 
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.NoSuchWindowException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedCondition;
@@ -31,13 +29,9 @@ import org.testng.Assert;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.ScenarioException;
-import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import com.seleniumtests.driver.TestType;
 import com.seleniumtests.driver.WebUIDriver;
-import com.thoughtworks.selenium.SeleniumException;
-import com.thoughtworks.selenium.webdriven.JavascriptLibrary;
-import com.thoughtworks.selenium.webdriven.Windows;
 
 /**
  * Base html page abstraction. Used by PageObject and WebPageSection
@@ -99,26 +93,15 @@ public abstract class BasePage {
     }
 
     public boolean isTextPresent(final String text) {
-        Assert.assertNotNull(text, "isTextPresent: text should not be null!");
-        driver = getDriver();
-
-        WebElement body = driver.findElement(By.tagName("body"));
-
-        if (SeleniumTestsContextManager.getThreadContext().getBrowser() == BrowserType.HTMLUNIT) {
-            return body.getText().contains(text);
-        }
-
-        if (body.getText().contains(text)) {
-            return true;
-        }
-
-        JavascriptLibrary js = new JavascriptLibrary();
-        String script = js.getSeleniumScript("isTextPresent.js");
-
-        Boolean result = (Boolean) ((JavascriptExecutor) driver).executeScript("return (" + script + ")(arguments[0]);", text);
-
-        // Handle the null case
-        return Boolean.TRUE == result;
+    	if (SeleniumTestsContextManager.isWebTest()) {
+	        Assert.assertNotNull(text, "isTextPresent: text should not be null!");
+	        driver = getDriver();
+	
+	        WebElement body = driver.findElement(By.tagName("body"));
+	
+	        return body.getText().contains(text);
+    	}
+        return false;
     }    
 
     /**
@@ -133,23 +116,10 @@ public abstract class BasePage {
             throw new ScenarioException("Application are not compatible with Windows");
         }
     	
-    	Windows windows = null;
-    	try {
-    		windows = new Windows(driver);
-    	} catch (NoSuchWindowException e) {
-    		driver.switchTo().window(windowName);
-    		return;
-    	}
-    	
         if (windowName == null) {
-            try {
-                windows.selectBlankWindow(driver);
-            } catch (SeleniumException e) {
-                driver.switchTo().defaultContent();
-            }
-
+        	driver.switchTo().defaultContent();
         } else {
-            windows.selectWindow(driver, "name=" + windowName);
+        	driver.switchTo().window(windowName);
         }
     }
 

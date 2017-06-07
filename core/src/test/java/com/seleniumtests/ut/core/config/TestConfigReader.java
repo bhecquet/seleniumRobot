@@ -24,7 +24,6 @@ import org.testng.ITestContext;
 import org.testng.annotations.Test;
 import org.testng.xml.XmlTest;
 
-import com.seleniumtests.GenericDriverTest;
 import com.seleniumtests.GenericTest;
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;

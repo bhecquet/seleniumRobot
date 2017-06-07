@@ -35,7 +35,7 @@ import org.openqa.selenium.Rectangle;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.firefox.MarionetteDriver;
+import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.interactions.HasInputDevices;
 import org.openqa.selenium.interactions.Mouse;
@@ -44,6 +44,7 @@ import org.openqa.selenium.internal.Locatable;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import com.seleniumtests.browserfactory.FirefoxDriverFactory;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.DriverExceptions;
 import com.seleniumtests.customexception.ScenarioException;
@@ -55,7 +56,6 @@ import com.seleniumtests.uipage.ReplayOnError;
 import com.seleniumtests.util.helper.WaitHelper;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
-import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.MobileElement;
 import io.appium.java_client.SwipeElementDirection;
 
@@ -192,7 +192,7 @@ public class HtmlElement implements WebElement, Locatable {
     	JavascriptExecutor js = (JavascriptExecutor) driver;
         js.executeScript("arguments[0].focus();", element);
         
-        if (((CustomEventFiringWebDriver)driver).getWebDriver() instanceof MarionetteDriver) {
+        if (((CustomEventFiringWebDriver)driver).getWebDriver() instanceof FirefoxDriver && FirefoxDriverFactory.isMarionetteMode()) {
         	logger.warn("using specific Marionette method");
         	js.executeScript(String.format("arguments[0].value='%s';", keysToSend[0].toString()), element);
         } else {
@@ -229,7 +229,8 @@ public class HtmlElement implements WebElement, Locatable {
      * @param by
      * @return
      */
-    @Override
+    @SuppressWarnings("unchecked")
+	@Override
     public HtmlElement findElement(By by) {
     	return new HtmlElement(label, by, this);
     }
@@ -879,7 +880,7 @@ public class HtmlElement implements WebElement, Locatable {
      * if it's the case, search for the element, else, raise a ScenarioException
      */
     private void checkForMobile() {
-    	if (!(((CustomEventFiringWebDriver)driver).getWebDriver() instanceof AppiumDriver<?>)) {
+    	if (!SeleniumTestsContextManager.isMobileTest()) {
     		throw new ScenarioException("action is available only for mobile platforms");
     	}
     	findElement(true);

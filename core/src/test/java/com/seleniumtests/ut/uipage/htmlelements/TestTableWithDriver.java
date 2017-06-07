@@ -16,8 +16,6 @@
  */
 package com.seleniumtests.ut.uipage.htmlelements;
 
-import java.util.regex.Pattern;
-
 import org.openqa.selenium.By;
 import org.testng.Assert;
 import org.testng.ITestContext;
@@ -27,7 +25,6 @@ import org.testng.annotations.Test;
 
 import com.seleniumtests.GenericDriverTest;
 import com.seleniumtests.core.SeleniumTestsContextManager;
-import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.it.driver.DriverTestPage;
 

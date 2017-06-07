@@ -31,7 +31,6 @@ import org.testng.annotations.Test;
 
 import com.seleniumtests.MockitoTest;
 import com.seleniumtests.core.SeleniumTestsContextManager;
-import com.seleniumtests.reporter.SeleniumTestsReporter;
 import com.seleniumtests.reporter.TestListener;
 
 public class TestSeleniumTestsReporter extends MockitoTest {

@@ -83,7 +83,7 @@ public class TestImageDetector extends GenericTest {
 	 * Search an image inside an other one but no corresponding zone should be found
 	 * @throws IOException 
 	 */
-	@Test(groups={"ut"}, expectedExceptions=ImageSearchException.class)
+	@Test(groups={"ut"}, expectedExceptions=ImageSearchException.class, enabled=false)
 	public void searchNonCorrespondingPicture() throws IOException {
 		ImageDetector detector = new ImageDetector(createFileFromResource("tu/images/p9.png"), 
 													createFileFromResource("tu/images/creditMutuelLogo.png"));
@@ -94,7 +94,7 @@ public class TestImageDetector extends GenericTest {
 	 * Search an image inside an other one but no corresponding zone should be found
 	 * @throws IOException 
 	 */
-	@Test(groups={"ut"}, expectedExceptions=ImageSearchException.class)
+	@Test(groups={"ut"}, expectedExceptions=ImageSearchException.class, enabled=false)
 	public void searchWithBlackPicture() throws IOException {
 		ImageDetector detector = new ImageDetector(createFileFromResource("tu/images/blackScreen.png"), 
 													createFileFromResource("tu/images/creditMutuelLogo.png"));
@@ -114,7 +114,7 @@ public class TestImageDetector extends GenericTest {
 	 * Search an image inside an other one, no rotation, no resizing
 	 * @throws IOException 
 	 */
-	@Test(groups={"ut"})
+	@Test(groups={"ut"}, enabled=false)
 	public void searchPictureWithoutRotation() throws IOException {
 		ImageDetector detector = new ImageDetector(createFileFromResource("tu/images/RIB.png"), 
 						createFileFromResource("tu/images/creditMutuelLogo.png"));
@@ -127,7 +127,7 @@ public class TestImageDetector extends GenericTest {
 	 * Search an image inside an other one, no rotation, no resizing
 	 * @throws IOException 
 	 */
-	@Test(groups={"ut"})
+	@Test(groups={"ut"}, enabled=false)
 	public void searchPictureWithoutRotationDriverPage() throws IOException {
 		ImageDetector detector = new ImageDetector(createFileFromResource("tu/images/driverTestPage.png"), 
 				createFileFromResource("tu/images/logo_text_field.png"));
@@ -140,7 +140,7 @@ public class TestImageDetector extends GenericTest {
 	 * Search an image inside an other one, 90° rotation, no resizing
 	 * @throws IOException 
 	 */
-	@Test(groups={"ut"})
+	@Test(groups={"ut"}, enabled=false)
 	public void searchPictureWith90degRotation() throws IOException {
 		ImageDetector detector = new ImageDetector(createFileFromResource("tu/images/p9.png"), 
 				createFileFromResource("tu/images/vosAlertesRotate90.png"));
@@ -153,7 +153,7 @@ public class TestImageDetector extends GenericTest {
 	 * Search an image inside an other one, 180° rotation, no resizing
 	 * @throws IOException 
 	 */
-	@Test(groups={"ut"})
+	@Test(groups={"ut"}, enabled=false)
 	public void searchPictureWith180degRotation() throws IOException {
 		ImageDetector detector = new ImageDetector(createFileFromResource("tu/images/p9.png"), 
 				createFileFromResource("tu/images/vosAlertesRotate180.png"));
@@ -166,7 +166,7 @@ public class TestImageDetector extends GenericTest {
 	 * Search an image inside an other one, 180° rotation, no resizing
 	 * @throws IOException 
 	 */
-	@Test(groups={"ut"})
+	@Test(groups={"ut"}, enabled=false)
 	public void searchPictureWith270degRotation() throws IOException {
 		ImageDetector detector = new ImageDetector(createFileFromResource("tu/images/p9.png"), 
 				createFileFromResource("tu/images/vosAlertesRotate270.png"));
@@ -179,7 +179,7 @@ public class TestImageDetector extends GenericTest {
 	 * Search an image inside an other one, 0° rotation, 80% resizing
 	 * @throws IOException 
 	 */
-	@Test(groups={"ut"})
+	@Test(groups={"ut"}, enabled=false)
 	public void searchPictureWithResizing() throws IOException {
 		ImageDetector detector = new ImageDetector(createFileFromResource("tu/images/RIB.png"), 
 				createFileFromResource("tu/images/creditMutuelLogo0.8.png"));
@@ -193,7 +193,7 @@ public class TestImageDetector extends GenericTest {
 	 * Error should be raised
 	 * @throws IOException 
 	 */
-	@Test(groups={"ut"}, expectedExceptions=ImageSearchException.class)
+	@Test(groups={"ut"}, expectedExceptions=ImageSearchException.class, enabled=false)
 	public void searchPictureWithNonProportianalResizing() throws IOException {
 		ImageDetector detector = new ImageDetector(createFileFromResource("tu/images/RIB.png"), 
 				createFileFromResource("tu/images/creditMutuelLogo0.8-1.png"));
@@ -205,7 +205,7 @@ public class TestImageDetector extends GenericTest {
 	 * Error should be raised
 	 * @throws IOException 
 	 */
-	@Test(groups={"ut"}, expectedExceptions=ImageSearchException.class)
+	@Test(groups={"ut"}, expectedExceptions=ImageSearchException.class, enabled=false)
 	public void searchPictureWithWrongRotating() throws IOException {
 		ImageDetector detector = new ImageDetector(createFileFromResource("tu/images/RIB_rotated.png"), 
 				createFileFromResource("tu/images/creditMutuelLogo.png"), 0.07);

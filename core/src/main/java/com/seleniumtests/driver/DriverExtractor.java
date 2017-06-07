@@ -33,7 +33,6 @@ import javax.xml.xpath.XPathFactory;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
-import org.openqa.selenium.Platform;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 

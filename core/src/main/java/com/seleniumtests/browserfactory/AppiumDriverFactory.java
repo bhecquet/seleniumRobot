@@ -20,6 +20,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
 import com.seleniumtests.browserfactory.mobile.AppiumLauncher;
@@ -53,12 +54,12 @@ public class AppiumDriverFactory extends AbstractWebDriverFactory implements IWe
 	        if("android".equalsIgnoreCase(webDriverConfig.getPlatform())) {
 	        	DesiredCapabilities androidCaps = new AndroidCapabilitiesFactory(capabilities).createCapabilities(webDriverConfig);
 	        	androidCaps = new MobileDeviceSelector().initialize().updateCapabilitiesWithSelectedDevice(androidCaps);
-	            return new AndroidDriver(new URL(((LocalAppiumLauncher)appiumLauncher).getAppiumServerUrl()), androidCaps);
+	            return new AndroidDriver<WebElement>(new URL(((LocalAppiumLauncher)appiumLauncher).getAppiumServerUrl()), androidCaps);
 	            
 	        } else if ("ios".equalsIgnoreCase(webDriverConfig.getPlatform())){
 	        	DesiredCapabilities iosCaps = new IOsCapabilitiesFactory(capabilities).createCapabilities(webDriverConfig);
 	        	iosCaps = new MobileDeviceSelector().initialize().updateCapabilitiesWithSelectedDevice(iosCaps);
-	            return new IOSDriver(new URL(((LocalAppiumLauncher)appiumLauncher).getAppiumServerUrl()), iosCaps);
+	            return new IOSDriver<WebElement>(new URL(((LocalAppiumLauncher)appiumLauncher).getAppiumServerUrl()), iosCaps);
 	            
 	        } else {
 	        	throw new ConfigurationException(String.format("Platform %s is unknown for Appium tests", webDriverConfig.getPlatform()));

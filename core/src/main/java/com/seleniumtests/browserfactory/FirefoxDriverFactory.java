@@ -23,14 +23,16 @@ import java.util.regex.Pattern;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.firefox.FirefoxDriver;
-import org.openqa.selenium.firefox.MarionetteDriver;
 
 import com.seleniumtests.customexception.DriverExceptions;
+import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.DriverConfig;
 import com.seleniumtests.util.helper.WaitHelper;
+import com.seleniumtests.util.osutility.OSUtilityFactory;
 
 public class FirefoxDriverFactory extends AbstractWebDriverFactory implements IWebDriverFactory {
     private long timeout = 1;
+    private static boolean marionetteMode = false;
 
     /**
      * @param  cfg  the configuration of the firefoxDriver
@@ -46,25 +48,9 @@ public class FirefoxDriverFactory extends AbstractWebDriverFactory implements IW
      * @return
      */
     public boolean useFirefoxDriver() {
-    	return true;
-//    	
-//    	try {
-//	    	Process p = Runtime.getRuntime().exec("firefox -v | more");
-//			BufferedReader bri = new BufferedReader(new InputStreamReader(p.getInputStream()));
-//			String line;
-//			StringBuilder output = new StringBuilder();
-//			while ((line = bri.readLine()) != null) {
-//			    System.out.println(line);
-//			    output.append(line);
-//			}
-//			bri.close();
-//			p.waitFor();
-//			
-//			return useFirefoxVersion(output);
-//			
-//    	} catch (IOException | InterruptedException e) {
-//    		return false;
-//    	}
+    	
+		String output = OSUtilityFactory.getInstance().getInstalledBrowsersWithVersion().get(BrowserType.FIREFOX);
+		return useFirefoxVersion(output);
     }
     
     /**
@@ -72,8 +58,8 @@ public class FirefoxDriverFactory extends AbstractWebDriverFactory implements IW
      * @param versionString
      * @return
      */
-    public boolean useFirefoxVersion(StringBuilder versionString) {
-    	Pattern regMozilla = Pattern.compile("^Mozilla .* (\\d+)\\..*");
+    public boolean useFirefoxVersion(String versionString) {
+    	Pattern regMozilla = Pattern.compile(".*?(\\d+)\\..*");
     	Matcher versionMatcher = regMozilla.matcher(versionString);
 		if (versionMatcher.matches()) {
 			String version = versionMatcher.group(1);
@@ -95,7 +81,8 @@ public class FirefoxDriverFactory extends AbstractWebDriverFactory implements IW
     	if (useFirefoxDriver()) {
     		return new FirefoxDriver(new FirefoxCapabilitiesFactory().createCapabilities(webDriverConfig));
     	} else {
-    		return new MarionetteDriver(new MarionetteCapabilitiesFactory().createCapabilities(webDriverConfig));
+    		marionetteMode = true;
+    		return new FirefoxDriver(new MarionetteCapabilitiesFactory().createCapabilities(webDriverConfig));
     	}  
     }
 
@@ -155,4 +142,8 @@ public class FirefoxDriverFactory extends AbstractWebDriverFactory implements IW
     protected void setPageLoadTimeout(final long timeout) {
         driver.manage().timeouts().pageLoadTimeout(timeout, TimeUnit.SECONDS);
     }
+
+	public static boolean isMarionetteMode() {
+		return marionetteMode;
+	}
 }

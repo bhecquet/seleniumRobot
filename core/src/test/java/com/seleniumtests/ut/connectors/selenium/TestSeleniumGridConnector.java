@@ -1,11 +1,10 @@
 package com.seleniumtests.ut.connectors.selenium;
 
 import static org.mockito.Matchers.anyObject;
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -24,16 +23,12 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import com.seleniumtests.MockitoTest;
 import com.seleniumtests.connectors.selenium.SeleniumGridConnector;
-import com.seleniumtests.connectors.selenium.SeleniumRobotGridConnector;
 import com.seleniumtests.reporter.TestLogging;
-
-import io.appium.java_client.remote.MobileCapabilityType;
 
 
 @PrepareForTest({HttpClients.class, TestLogging.class})

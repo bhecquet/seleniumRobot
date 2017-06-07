@@ -18,6 +18,7 @@ package com.seleniumtests.uipage.htmlelements;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.Duration;
 
 import javax.swing.ImageIcon;
 
@@ -43,7 +44,6 @@ import com.seleniumtests.util.imaging.ImageDetector;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
 import io.appium.java_client.AppiumDriver;
-import io.appium.java_client.SwipeElementDirection;
 import io.appium.java_client.TouchAction;
 
 /**
@@ -173,7 +173,7 @@ public class PictureElement {
 		int yInit = detectedObjectRectangle.y + detectedObjectRectangle.height / 2;
 		
 		new TouchAction(getMobileDriver()).press(xInit, yInit)
-			.waitAction(500)
+			.waitAction(Duration.ofMillis(500))
 			.moveTo(xInit + xMove, yInit + yMove)
 			.release()
 			.perform();
@@ -255,11 +255,11 @@ public class PictureElement {
 		detector.setObjectImage(objectPictureFile);
 	}
 	
-	private AppiumDriver getMobileDriver() {
+	private AppiumDriver<?> getMobileDriver() {
 		if (!(((CustomEventFiringWebDriver)driver).getWebDriver() instanceof AppiumDriver<?>)) {
     		throw new ScenarioException("action is available only for mobile platforms");
     	}
-		return (AppiumDriver)((CustomEventFiringWebDriver)driver).getWebDriver();
+		return (AppiumDriver<?>)((CustomEventFiringWebDriver)driver).getWebDriver();
 	}
 	
 	// TODO: actions for mobile

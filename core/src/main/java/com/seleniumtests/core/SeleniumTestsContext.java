@@ -635,7 +635,6 @@ public class SeleniumTestsContext {
         return (Boolean) getAttribute(DEV_MODE);
     }
     
-    @SuppressWarnings("unchecked")
 	public Map<String, String> getDeviceList() {
     	HashMap<String, String> deviceList = new HashMap<>();
     	if (getAttribute(DEVICE_LIST) == null || "{}".equals(getAttribute(DEVICE_LIST))) {
@@ -709,7 +708,8 @@ public class SeleniumTestsContext {
     	return (Integer) getAttribute(VIEWPORT_HEIGHT);
     }
     
-    public Map<String, String> getConfiguration() {
+    @SuppressWarnings("unchecked")
+	public Map<String, String> getConfiguration() {
     	return (HashMap<String, String>) getAttribute(TEST_CONFIG);
     }
     

@@ -17,6 +17,7 @@
 package com.seleniumtests.ut.uipage.htmlelements;
 
 import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.anyObject;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.spy;
@@ -24,11 +25,16 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.io.IOException;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.regex.Pattern;
 
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
@@ -38,8 +44,10 @@ import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Keyboard;
 import org.openqa.selenium.interactions.Mouse;
+import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.RemoteWebElement;
+import org.openqa.selenium.remote.Response;
 import org.openqa.selenium.support.events.EventFiringWebDriver;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -52,12 +60,14 @@ import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import com.seleniumtests.driver.DriverExceptionListener;
+import com.seleniumtests.driver.TestType;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.uipage.htmlelements.HtmlElement;
 
 import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.MobileElement;
 import io.appium.java_client.SwipeElementDirection;
+import io.appium.java_client.remote.AppiumCommandExecutor;
 
 /**
  * Test class for checking calls to a standard HTMLElement without using any driver
@@ -65,14 +75,14 @@ import io.appium.java_client.SwipeElementDirection;
  * @author behe
  *
  */
-@PrepareForTest(WebUIDriver.class)
+@PrepareForTest({WebUIDriver.class, AppiumDriver.class, RemoteWebDriver.class})
 public class TestHtmlElement extends MockitoTest {
 	
 	@Mock
 	private RemoteWebDriver driver;
 	
 	@Mock
-	private AppiumDriver<WebElement> mobileDriver;
+	private RemoteWebDriver mobileDriver;
 	
 	@Mock
 	private MobileElement mobileElement;
@@ -98,8 +108,8 @@ public class TestHtmlElement extends MockitoTest {
 	
 	private EventFiringWebDriver eventDriver;
 	
-	@BeforeMethod(alwaysRun=true)
-	private void init() {
+	@BeforeMethod(groups={"ut"})
+	private void init() throws WebDriverException, IOException {
 		// mimic sub elements of the HtmlElement
 		List<WebElement> subElList = new ArrayList<WebElement>();
 		subElList.add(subElement1);
@@ -121,10 +131,10 @@ public class TestHtmlElement extends MockitoTest {
 		when(driver.getKeyboard()).thenReturn(keyboard);
 		when(driver.getMouse()).thenReturn(mouse);
 		when(driver.switchTo()).thenReturn(locator);
-		
+
 		when(mobileDriver.findElement(By.id("el"))).thenReturn(mobileElement);
 		when(mobileDriver.switchTo()).thenReturn(locator);
-		
+
 		when(element.findElement(By.name("subEl"))).thenReturn(subElement1);
 		when(element.findElements(By.name("subEl"))).thenReturn(subElList);
 		when(element.getAttribute(anyString())).thenReturn("attribute");
@@ -141,6 +151,8 @@ public class TestHtmlElement extends MockitoTest {
 		when(mobileElement.getCenter()).thenReturn(new Point(2, 2));
 
 		when(mobileElement.isDisplayed()).thenReturn(true);
+		
+		SeleniumTestsContextManager.getThreadContext().setTestType(TestType.WEB);
 	}
 	
 	private void finalCheck(boolean findElement) throws Exception {
@@ -377,6 +389,7 @@ public class TestHtmlElement extends MockitoTest {
 	
 	@Test(groups={"ut"})
 	public void testPinch() throws Exception {
+		SeleniumTestsContextManager.getThreadContext().setTestType(TestType.APPIUM_WEB_ANDROID);
 		when(WebUIDriver.getWebDriver()).thenReturn(new CustomEventFiringWebDriver(mobileDriver));
 		el.pinch();
 		finalCheck(true);
@@ -385,6 +398,7 @@ public class TestHtmlElement extends MockitoTest {
 	
 	@Test(groups={"ut"})
 	public void testGetCenter() throws Exception {
+		SeleniumTestsContextManager.getThreadContext().setTestType(TestType.APPIUM_WEB_ANDROID);
 		when(WebUIDriver.getWebDriver()).thenReturn(new CustomEventFiringWebDriver(mobileDriver));
 		el.getCenter();
 		finalCheck(true);
@@ -393,6 +407,7 @@ public class TestHtmlElement extends MockitoTest {
 	
 	@Test(groups={"ut"})
 	public void testSwipe1() throws Exception {
+		SeleniumTestsContextManager.getThreadContext().setTestType(TestType.APPIUM_WEB_ANDROID);
 		when(WebUIDriver.getWebDriver()).thenReturn(new CustomEventFiringWebDriver(mobileDriver));
 		el.swipe(SwipeElementDirection.DOWN, 1);
 		finalCheck(true);
@@ -401,6 +416,7 @@ public class TestHtmlElement extends MockitoTest {
 	
 	@Test(groups={"ut"})
 	public void testSwipe2() throws Exception {
+		SeleniumTestsContextManager.getThreadContext().setTestType(TestType.APPIUM_WEB_ANDROID);
 		when(WebUIDriver.getWebDriver()).thenReturn(new CustomEventFiringWebDriver(mobileDriver));
 		el.swipe(SwipeElementDirection.DOWN, 2, 2, 1);
 		finalCheck(true);
@@ -409,6 +425,7 @@ public class TestHtmlElement extends MockitoTest {
 	
 	@Test(groups={"ut"})
 	public void testTap() throws Exception {
+		SeleniumTestsContextManager.getThreadContext().setTestType(TestType.APPIUM_WEB_ANDROID);
 		when(WebUIDriver.getWebDriver()).thenReturn(new CustomEventFiringWebDriver(mobileDriver));
 		el.tap(2, 2);
 		finalCheck(true);
@@ -417,6 +434,7 @@ public class TestHtmlElement extends MockitoTest {
 	
 	@Test(groups={"ut"})
 	public void testZoom() throws Exception {
+		SeleniumTestsContextManager.getThreadContext().setTestType(TestType.APPIUM_WEB_ANDROID);
 		when(WebUIDriver.getWebDriver()).thenReturn(new CustomEventFiringWebDriver(mobileDriver));
 		el.zoom();
 		finalCheck(true);

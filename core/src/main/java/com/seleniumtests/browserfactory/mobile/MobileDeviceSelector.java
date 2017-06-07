@@ -17,15 +17,11 @@
 package com.seleniumtests.browserfactory.mobile;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.openqa.selenium.remote.DesiredCapabilities;
 
 import com.seleniumtests.customexception.ConfigurationException;
-import com.seleniumtests.util.osutility.OSCommand;
 
 import io.appium.java_client.remote.MobileCapabilityType;
 

@@ -21,8 +21,8 @@ import java.io.IOException;
 import java.nio.file.Paths;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
-import org.openqa.selenium.io.IOUtils;
 
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
@@ -80,7 +80,7 @@ public class TaFolderStructureGenerator {
 		// add .ta file
 		if (!srcTaFile.exists()) {
 			logger.info("copying generic.ta to " + taFile.toString());
-			String content = IOUtils.readFully(Thread.currentThread().getContextClassLoader().getResourceAsStream("squash-ta/squash_generic.ta"));
+			String content = IOUtils.toString(Thread.currentThread().getContextClassLoader().getResourceAsStream("squash-ta/squash_generic.ta"));
 			content = content.replace("%app%", application);
 			FileUtils.writeStringToFile(taFile, content);
 		}
