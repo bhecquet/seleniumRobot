@@ -16,9 +16,12 @@
  */
 package com.seleniumtests.it.driver;
 
+import java.util.ArrayList;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.remote.RemoteWebDriver;
 import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.annotations.AfterClass;
@@ -28,6 +31,7 @@ import org.testng.annotations.Test;
 import com.seleniumtests.GenericTest;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.driver.BrowserType;
+import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import com.seleniumtests.driver.WebUIDriver;
 
 public class TestUiActions extends GenericTest {
@@ -43,6 +47,20 @@ public class TestUiActions extends GenericTest {
 			driver.get("file://" + Thread.currentThread().getContextClassLoader().getResource("tu/test.html").getFile());
 		} else {
 			driver.get("file:///" + Thread.currentThread().getContextClassLoader().getResource("tu/test.html").getFile());
+		}
+	}
+	
+	/**
+	 * Test with the real driver, it should try to use new actions
+	 */
+	@Test(groups={"it"})
+	public void testNewAction() {
+		try {
+			new Actions(((CustomEventFiringWebDriver)driver).getWebDriver()).moveToElement(driver.findElement(By.id("carre2"))).click().build().perform();
+			Assert.assertEquals("coucou", driver.findElement(By.id("text2")).getAttribute("value"));
+		} finally {
+			new Actions(driver).moveToElement(driver.findElement(By.id("button2"))).click().build().perform();
+			Assert.assertEquals("", driver.findElement(By.id("text2")).getAttribute("value"));
 		}
 	}
 

@@ -17,7 +17,6 @@
 package com.seleniumtests.ut.uipage.htmlelements;
 
 import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Matchers.anyObject;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.spy;
@@ -26,15 +25,11 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.regex.Pattern;
 
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
@@ -44,10 +39,8 @@ import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Keyboard;
 import org.openqa.selenium.interactions.Mouse;
-import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.RemoteWebElement;
-import org.openqa.selenium.remote.Response;
 import org.openqa.selenium.support.events.EventFiringWebDriver;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -66,8 +59,6 @@ import com.seleniumtests.uipage.htmlelements.HtmlElement;
 
 import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.MobileElement;
-import io.appium.java_client.SwipeElementDirection;
-import io.appium.java_client.remote.AppiumCommandExecutor;
 
 /**
  * Test class for checking calls to a standard HTMLElement without using any driver
@@ -409,16 +400,7 @@ public class TestHtmlElement extends MockitoTest {
 	public void testSwipe1() throws Exception {
 		SeleniumTestsContextManager.getThreadContext().setTestType(TestType.APPIUM_WEB_ANDROID);
 		when(WebUIDriver.getWebDriver()).thenReturn(new CustomEventFiringWebDriver(mobileDriver));
-		el.swipe(SwipeElementDirection.DOWN, 1);
-		finalCheck(true);
-		PowerMockito.verifyPrivate(el).invoke("checkForMobile");
-	}
-	
-	@Test(groups={"ut"})
-	public void testSwipe2() throws Exception {
-		SeleniumTestsContextManager.getThreadContext().setTestType(TestType.APPIUM_WEB_ANDROID);
-		when(WebUIDriver.getWebDriver()).thenReturn(new CustomEventFiringWebDriver(mobileDriver));
-		el.swipe(SwipeElementDirection.DOWN, 2, 2, 1);
+		el.swipe(0, 0, 0, 10);
 		finalCheck(true);
 		PowerMockito.verifyPrivate(el).invoke("checkForMobile");
 	}

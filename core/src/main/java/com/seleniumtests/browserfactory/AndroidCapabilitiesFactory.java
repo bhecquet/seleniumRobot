@@ -50,7 +50,11 @@ public class AndroidCapabilitiesFactory extends ICapabilitiesFactory {
     		caps.setCapability(MobileCapabilityType.AUTOMATION_NAME, "Appium");
     	}
     	
-    	caps.setCapability(MobileCapabilityType.FULL_RESET, "true");
+    	if (cfg.isFullReset()) {
+    		caps.setCapability(MobileCapabilityType.FULL_RESET, "true");
+    	} else {
+    		caps.setCapability(MobileCapabilityType.FULL_RESET, "false");
+    	}
     	caps.setCapability(MobileCapabilityType.PLATFORM_NAME, cfg.getPlatform());
     	
     	// automatically hide keyboard
