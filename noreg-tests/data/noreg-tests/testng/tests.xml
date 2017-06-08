@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "http://beust.com/testng/testng-1.0.dtd" >
+<suite name="TNR Suite" parallel="methods" verbose="1" thread-count="5">
+    
+    <!-- mandatory parameter for cucumber based tests -->
+	<parameter name="cucumberPackage" value="com.seleniumtests.noreg" />
+    
+    <test name="browser">
+    	<classes>
+            <class name="com.seleniumtests.noreg.tests.TestWithAllBrowsers"/>
+        </classes>
+    </test>
+	
+</suite>
