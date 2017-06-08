@@ -26,9 +26,11 @@ import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
 import com.seleniumtests.browserfactory.customprofile.FireFoxProfileMarker;
+import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.DriverConfig;
 import com.seleniumtests.reporter.TestLogging;
 import com.seleniumtests.util.FileUtility;
+import com.seleniumtests.util.osutility.OSUtility;
 
 public class FirefoxCapabilitiesFactory extends ICapabilitiesFactory {
     private static boolean isProfileCreated = false;
@@ -40,6 +42,8 @@ public class FirefoxCapabilitiesFactory extends ICapabilitiesFactory {
 
         if (webDriverConfig.getFirefoxBinPath() != null) {
             System.setProperty("webdriver.firefox.bin", webDriverConfig.getFirefoxBinPath());
+        } else {
+        	System.setProperty("webdriver.firefox.bin", OSUtility.getInstalledBrowsersWithVersion().get(BrowserType.FIREFOX).getPath());
         }
 
         if (webDriverConfig.getUserAgentOverride() != null) {

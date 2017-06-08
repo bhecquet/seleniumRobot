@@ -26,6 +26,7 @@ import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.support.events.WebDriverEventListener;
 
 import com.seleniumtests.browserfactory.AppiumDriverFactory;
+import com.seleniumtests.browserfactory.BrowserInfo;
 import com.seleniumtests.browserfactory.ChromeDriverFactory;
 import com.seleniumtests.browserfactory.EdgeDriverFactory;
 import com.seleniumtests.browserfactory.FirefoxDriverFactory;
@@ -238,12 +239,12 @@ public class WebUIDriver {
     private void displayBrowserVersion() {
     	String version = null;
     	if (config.getMode() == DriverMode.LOCAL && !config.getTestType().isMobile()) {
-    		Map<BrowserType, String> browsers = OSUtilityFactory.getInstance().getInstalledBrowsersWithVersion();
+    		Map<BrowserType, BrowserInfo> browsers = OSUtility.getInstalledBrowsersWithVersion();
     		if (!browsers.containsKey(config.getBrowser())) {
     			throw new ConfigurationException(String.format("Browser %s is not available. Available browsers are %s", 
     					config.getBrowser(), browsers));
     		}
-    		version = browsers.get(config.getBrowser());
+    		version = browsers.get(config.getBrowser()).getVersion();
     	} else if (!config.getTestType().isMobile()) {
     		version = SeleniumTestsContextManager.getThreadContext().getWebBrowserVersion();
     	}

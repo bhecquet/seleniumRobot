@@ -35,6 +35,7 @@ import org.testng.ITestContext;
 import org.testng.ITestResult;
 import org.testng.TestRunner;
 
+import com.seleniumtests.browserfactory.BrowserInfo;
 import com.seleniumtests.core.config.ConfigReader;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.driver.BrowserType;
@@ -177,6 +178,7 @@ public class SeleniumTestsContext {
         setUseDefaultFirefoxProfile(getBoolValueForTest(USE_DEFAULT_FIREFOX_PROFILE, System.getProperty(USE_DEFAULT_FIREFOX_PROFILE)));
         setOperaUserProfilePath(getValueForTest(OPERA_USER_PROFILE_PATH, System.getProperty(OPERA_USER_PROFILE_PATH)));
         setFirefoxBinary(getValueForTest(FIREFOX_BINARY_PATH, System.getProperty(FIREFOX_BINARY_PATH)));
+        setChromeBinary(getValueForTest(CHROME_BINARY_PATH, System.getProperty(CHROME_BINARY_PATH)));
         setChromeDriverPath(getValueForTest(CHROME_DRIVER_PATH, System.getProperty(CHROME_DRIVER_PATH)));
         setEdgeDriverPath(getValueForTest(EDGE_DRIVER_PATH, System.getProperty(EDGE_DRIVER_PATH)));
         setIEDriverPath(getValueForTest(IE_DRIVER_PATH, System.getProperty(IE_DRIVER_PATH)));
@@ -244,6 +246,9 @@ public class SeleniumTestsContext {
         // get mobile platform version
         updatePlatformVersion();
         
+        // update browser version: replace installed one with those given in parameters
+        updateInstalledBrowsers();
+        
         if (context != null) {
         	setOutputDirectory(getValueForTest(OUTPUT_DIRECTORY, System.getProperty(OUTPUT_DIRECTORY)), context);
 
@@ -265,6 +270,24 @@ public class SeleniumTestsContext {
                 }
             }
         }
+    }
+    
+    /**
+     * If chrome or firefox binary is redefined in parameter, update list of installed browser so
+     * that it matches those really used
+     */
+    private void updateInstalledBrowsers() {
+    	Map<BrowserType, BrowserInfo> installedBrowsers = OSUtility.getInstalledBrowsersWithVersion();
+    	
+    	if (getFirefoxBinPath() != null) {
+    		String version = OSUtility.getFirefoxVersion(getFirefoxBinPath());
+    		installedBrowsers.put(BrowserType.FIREFOX, new BrowserInfo(BrowserType.FIREFOX, version, getFirefoxBinPath()));
+    	}
+    	
+    	if (getChromeBinPath() != null) {
+    		String version = OSUtility.getChromeVersion(getChromeBinPath());
+    		installedBrowsers.put(BrowserType.CHROME, new BrowserInfo(BrowserType.CHROME, version, getChromeBinPath()));
+    	}
     }
     
     /**
@@ -932,7 +955,17 @@ public class SeleniumTestsContext {
     }
     
     public void setFirefoxBinary(String path) {
+    	if (path != null && !new File(path).exists()) {
+    		throw new ConfigurationException("Firefox path does not exist: " + path);
+    	}
     	setAttribute(FIREFOX_BINARY_PATH, path);
+    }
+    
+    public void setChromeBinary(String path) {
+    	if (path != null && !new File(path).exists()) {
+    		throw new ConfigurationException("Chrome path does not exist: " + path);
+    	}
+    	setAttribute(CHROME_BINARY_PATH, path);
     }
     
     public void setChromeDriverPath(String path) {

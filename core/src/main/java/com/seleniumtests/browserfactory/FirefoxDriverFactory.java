@@ -28,6 +28,7 @@ import com.seleniumtests.customexception.DriverExceptions;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.DriverConfig;
 import com.seleniumtests.util.helper.WaitHelper;
+import com.seleniumtests.util.osutility.OSUtility;
 import com.seleniumtests.util.osutility.OSUtilityFactory;
 
 public class FirefoxDriverFactory extends AbstractWebDriverFactory implements IWebDriverFactory {
@@ -48,8 +49,7 @@ public class FirefoxDriverFactory extends AbstractWebDriverFactory implements IW
      * @return
      */
     public boolean useFirefoxDriver() {
-    	
-		String output = OSUtilityFactory.getInstance().getInstalledBrowsersWithVersion().get(BrowserType.FIREFOX);
+    	String output = OSUtility.getInstalledBrowsersWithVersion().get(BrowserType.FIREFOX).getVersion();
 		return useFirefoxVersion(output);
     }
     
@@ -63,7 +63,7 @@ public class FirefoxDriverFactory extends AbstractWebDriverFactory implements IW
     	Matcher versionMatcher = regMozilla.matcher(versionString);
 		if (versionMatcher.matches()) {
 			String version = versionMatcher.group(1);
-			if (Integer.parseInt(version) < 47) {
+			if (Integer.parseInt(version) < 48) {
 				return true;
 			}
 		} 
