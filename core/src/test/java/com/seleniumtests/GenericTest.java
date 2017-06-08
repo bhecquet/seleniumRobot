@@ -28,13 +28,13 @@ import com.seleniumtests.driver.WebUIDriver;
 
 public class GenericTest {
 
-	@BeforeMethod(alwaysRun=true)  
+	@BeforeMethod(groups={"ut", "it"})  
 	public void initTest() {
 		SeleniumTestsContextManager.getThreadContext().setSoftAssertEnabled(false);
 		SeleniumTestsContextManager.getGlobalContext().setSoftAssertEnabled(false);
 	}
 	
-	@AfterClass(alwaysRun = true)
+	@AfterClass(groups={"ut", "it"})
 	public void closeBrowser() {
 		WebUIDriver.cleanUp();
 	}

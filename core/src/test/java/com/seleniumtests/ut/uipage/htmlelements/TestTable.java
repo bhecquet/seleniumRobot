@@ -65,7 +65,7 @@ public class TestTable extends MockitoTest {
 	
 	private List<WebElement> rowEl;
 	
-	@BeforeMethod(alwaysRun=true)
+	@BeforeMethod(groups={"ut"})
 	private void init() {
 		PowerMockito.mockStatic(WebUIDriver.class);
 		when(WebUIDriver.getWebDriver()).thenReturn(driver);
@@ -82,7 +82,7 @@ public class TestTable extends MockitoTest {
 	/**
 	 * Always check that findElement is called when accessing table
 	 */
-	@AfterMethod(alwaysRun=true) 
+	@AfterMethod(groups={"ut"}) 
 	public void checkTableRefresh() {
 		verify(table).findTableElement();
 	}

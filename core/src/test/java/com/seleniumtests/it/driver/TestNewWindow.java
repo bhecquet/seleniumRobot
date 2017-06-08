@@ -44,7 +44,7 @@ public class TestNewWindow extends GenericTest {
 		driver = WebUIDriver.getWebDriver(true);
 	}
 
-	@AfterClass(alwaysRun = true)
+	@AfterClass(groups={"it"})
 	public void closeBrowser() {
 		WebUIDriver.cleanUp();
 	}

@@ -30,7 +30,7 @@ import com.seleniumtests.core.config.ConfigMappingReader;
 
 public class TestConfigMappingReader extends GenericTest {
 
-	@BeforeMethod(enabled=true, alwaysRun = true)
+	@BeforeMethod(groups={"ut"})
 	public void initContext(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		SeleniumTestsContextManager.initThreadContext(testNGCtx);
 	}

@@ -60,7 +60,7 @@ public class TestCustomAssertion extends GenericTest {
 		Assert.assertTrue(false, "error should not be raised");
 	}
 	
-	@AfterMethod(alwaysRun = true)
+	@AfterMethod(groups={"ut"})
 	public void changeTestResult(Method method, ITestResult result) {
 		if (method.getName().equals("testSoftAssertionEnabledWithChangedResult")) {
 			ITestResult previousResult = Reporter.getCurrentTestResult();
@@ -80,7 +80,7 @@ public class TestCustomAssertion extends GenericTest {
 		}
 	}
 	
-	@AfterClass(alwaysRun = true)
+	@AfterClass(groups={"ut"})
 	public void clean() {
 		SeleniumTestsContextManager.getThreadContext().setSoftAssertEnabled(false);
 	}

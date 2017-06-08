@@ -36,7 +36,7 @@ public class TestTable extends GenericTest {
 	private static DriverTestPage testPage;
 	private static WebDriver driver;
 
-	@BeforeClass(groups={"ut"})
+	@BeforeClass(groups={"it"})
 	public static void initPage(final ITestContext testNGCtx) throws Exception {
 		SeleniumTestsContextManager.initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setBrowser("chrome");
@@ -45,48 +45,48 @@ public class TestTable extends GenericTest {
 	}
 		
 
-	@AfterClass(alwaysRun = true)
+	@AfterClass(groups={"it"})
 	public void closeBrowser() {
 		WebUIDriver.cleanUp();
 	}
 	
 	
-	@Test(groups={"ut"})
+	@Test(groups={"it"})
 	public void testGetContent() {
 		Assert.assertEquals(testPage.table.getContent(0, 0), "Id");
 	}
 	
-	@Test(groups={"ut"}, expectedExceptions=ScenarioException.class)
+	@Test(groups={"it"}, expectedExceptions=ScenarioException.class)
 	public void testGetContentEmptyTable() {
 		testPage.emptyTable.getContent(0, 0);
 	}
 	
-	@Test(groups={"ut"}, expectedExceptions=IndexOutOfBoundsException.class)
+	@Test(groups={"it"}, expectedExceptions=IndexOutOfBoundsException.class)
 	public void testGetContentOutsideRange() {
 		Assert.assertEquals(testPage.table.getContent(10, 0), "Id");
 	}
 	
-	@Test(groups={"ut"})
+	@Test(groups={"it"})
 	public void testGetCellFromContent() {
 		Assert.assertEquals(testPage.table.getCellFromContent(Pattern.compile("Jav.*"), 1).getText(), "Java");
 	}
 	
-	@Test(groups={"ut"}, expectedExceptions=ScenarioException.class)
+	@Test(groups={"it"}, expectedExceptions=ScenarioException.class)
 	public void testGetCellFromWrongContent() {
 		testPage.table.getCellFromContent(Pattern.compile("Jai.*"), 1).getText();
 	}
 	
-	@Test(groups={"ut"})
+	@Test(groups={"it"})
 	public void testRowCount() {
 		Assert.assertEquals(testPage.table.getRowCount(), 3);
 	}
 	
-	@Test(groups={"ut"})
+	@Test(groups={"it"})
 	public void testRowCountEmptyTable() {
 		Assert.assertEquals(testPage.emptyTable.getRowCount(), 0);
 	}
 	
-	@Test(groups={"ut"})
+	@Test(groups={"it"})
 	public void testColCount() {
 		Assert.assertEquals(testPage.table.getColumnCount(), 2);
 	}

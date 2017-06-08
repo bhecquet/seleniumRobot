@@ -49,7 +49,7 @@ public class TestSeleniumRobotGridConnector extends MockitoTest {
 	
 	private DesiredCapabilities capabilities = new DesiredCapabilities();
 	
-	@BeforeMethod(alwaysRun=true)
+	@BeforeMethod(groups={"ut"})
 	private void init() throws ClientProtocolException, IOException {
 		PowerMockito.mockStatic(HttpClients.class);
 		when(HttpClients.createDefault()).thenReturn(client);

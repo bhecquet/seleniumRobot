@@ -52,7 +52,7 @@ public class TestBasePage extends MockitoTest {
 	
 	private BasePage page;
 	
-	@BeforeMethod(alwaysRun=true)
+	@BeforeMethod(groups={"ut"})
 	public void init() throws Exception{
 		
 		PowerMockito.mockStatic(WebUIDriver.class);
