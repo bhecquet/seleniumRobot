@@ -16,6 +16,7 @@
  */
 package com.seleniumtests.util.osutility;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +27,7 @@ import java.util.regex.Pattern;
 import org.apache.log4j.Logger;
 import org.openqa.selenium.Platform;
 
+import com.seleniumtests.browserfactory.BrowserInfo;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
@@ -41,7 +43,7 @@ public abstract class OSUtility {
 
 	private String[] webDriverProcessList = {"chromedriver", "geckodriver", "IEDriverServer", "MicrosoftWebDriver"};
 		
-
+	private static Map<BrowserType, BrowserInfo> installedBrowsersWithVersion = OSUtilityFactory.getInstance().discoverInstalledBrowsersWithVersion();
 	
 	/******************************************
 	 *********** OS information ***************
@@ -264,11 +266,19 @@ public abstract class OSUtility {
     
     public abstract String getOSBuild();
     
+    public static String getChromeVersion(String chromePath) {
+    	return OSCommand.executeCommandAndWait(new String[] {chromePath, "--version"});
+    }
+    
+    public static String getFirefoxVersion(String firefoxPath) {
+    	return OSCommand.executeCommandAndWait(firefoxPath + " --version | more");
+    }
+    
     public List<BrowserType> getInstalledBrowsers() {
     	return new ArrayList<>(getInstalledBrowsersWithVersion().keySet());
     }
     
-    public abstract Map<BrowserType, String> getInstalledBrowsersWithVersion();
+    public abstract Map<BrowserType, BrowserInfo> discoverInstalledBrowsersWithVersion();
     
     /**
      * example: Mozilla Firefox 52.0
@@ -332,5 +342,9 @@ public abstract class OSUtility {
     public static String extractEdgeVersion(String versionString) {
     	return versionString.split("\\.")[0];
     }
+
+	public static Map<BrowserType, BrowserInfo> getInstalledBrowsersWithVersion() {
+		return installedBrowsersWithVersion;
+	}
     
 }

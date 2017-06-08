@@ -18,17 +18,22 @@ package com.seleniumtests.util.osutility;
 
 public class OSUtilityFactory {
 	
+	private static OSUtility instance = null;
+	
 	private OSUtilityFactory() {
 		// nothing to do
 	}
 
 	public static OSUtility getInstance() {
-		if (OSUtility.isWindows()){
-			return new OSUtilityWindows();
-		} else if (OSUtility.isMac()) {
-			return new OSUtilityMac();
-		} else {
-			return new OSUtilityUnix();
+		if (instance == null) {
+			if (OSUtility.isWindows()){
+				instance = new OSUtilityWindows();
+			} else if (OSUtility.isMac()) {
+				instance = new OSUtilityMac();
+			} else {
+				instance = new OSUtilityUnix();
+			}
 		}
+		return instance;
 	}
 }
