@@ -107,7 +107,7 @@ public class TestWebUiDriver extends MockitoTest {
 		verify(appiumLauncher).stopAppium();
 	}
 	
-	@AfterMethod(alwaysRun=true)
+	@AfterMethod(groups={"it"})
 	public void closeBrowser() {
 		try {
 			WebUIDriver.cleanUp();

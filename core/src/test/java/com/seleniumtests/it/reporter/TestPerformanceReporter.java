@@ -76,7 +76,7 @@ public class TestPerformanceReporter extends MockitoTest {
 		return suite;
 	}
 	
-	@AfterMethod(alwaysRun=true)
+	@AfterMethod(groups={"it"})
 	private void deleteGeneratedFiles() {
 		if (reporter == null) {
 			return;

@@ -41,7 +41,7 @@ public class TestBrowserSnapshot {
 	}
 	
 
-	@AfterMethod(alwaysRun = true)
+	@AfterMethod(groups={"it"})
 	public void closeBrowser() {
 		WebUIDriver.cleanUp();
 	}

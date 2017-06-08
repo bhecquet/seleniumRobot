@@ -27,7 +27,7 @@ public class GenericDriverTest {
 	
 	public WebDriver driver = null;
 
-	@BeforeMethod(alwaysRun=true)  
+	@BeforeMethod(groups={"ut", "it"})  
 	public void initTest() {
 		SeleniumTestsContextManager.getThreadContext().setSoftAssertEnabled(false);
 		SeleniumTestsContextManager.getGlobalContext().setSoftAssertEnabled(false);
@@ -36,7 +36,7 @@ public class GenericDriverTest {
 	/**
 	 * destroys the driver if one has been created
 	 */
-	@AfterMethod(alwaysRun = true)
+	@AfterMethod(groups={"ut", "it"})
 	public void destroyDriver() {
 		if (driver != null) {
 			WebUIDriver.cleanUp();

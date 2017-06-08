@@ -96,7 +96,7 @@ public class TestUiActions extends GenericTest {
 		}
 	}
 	
-	@AfterClass(alwaysRun = true)
+	@AfterClass(groups={"it"})
 	public void destroyDriver() {
 		if (driver != null) {
 			WebUIDriver.cleanUp();

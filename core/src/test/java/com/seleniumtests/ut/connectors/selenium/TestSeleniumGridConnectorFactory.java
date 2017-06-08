@@ -43,7 +43,7 @@ public class TestSeleniumGridConnectorFactory extends MockitoTest {
 	@Mock
 	private StatusLine statusLine;
 	
-	@BeforeMethod(alwaysRun=true)
+	@BeforeMethod(groups={"ut"})
 	private void init() throws ClientProtocolException, IOException {
 		PowerMockito.mockStatic(HttpClients.class);
 		when(HttpClients.createDefault()).thenReturn(client);

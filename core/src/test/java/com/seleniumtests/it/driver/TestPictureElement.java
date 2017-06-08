@@ -57,7 +57,7 @@ public class TestPictureElement extends GenericDriverTest {
 		testPage.logoText.clear();
 	}
 	
-	@AfterClass(alwaysRun = true, groups={"it"})
+	@AfterClass(groups={"it"})
 	public void closeBrowser() {
 		WebUIDriver.cleanUp();
 	}

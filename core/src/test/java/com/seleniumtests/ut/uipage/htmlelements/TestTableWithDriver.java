@@ -38,7 +38,7 @@ public class TestTableWithDriver extends GenericDriverTest {
 		SeleniumTestsContextManager.getThreadContext().setBrowser("htmlunit");
 	}
 		
-	@BeforeMethod(alwaysRun = true)
+	@BeforeMethod(groups={"ut"})
 	public void initDriver() throws Exception {
 		driver = WebUIDriver.getWebDriver(true);
 		testPage = new DriverTestPage(true);

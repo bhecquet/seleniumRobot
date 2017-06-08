@@ -18,6 +18,7 @@ package com.seleniumtests.ut.uipage.htmlelements;
 
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.anyObject;
 import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
@@ -26,10 +27,13 @@ import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
@@ -39,8 +43,14 @@ import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Keyboard;
 import org.openqa.selenium.interactions.Mouse;
+import org.openqa.selenium.remote.Command;
+import org.openqa.selenium.remote.CommandExecutor;
+import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.remote.DriverCommand;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.RemoteWebElement;
+import org.openqa.selenium.remote.Response;
+import org.openqa.selenium.remote.SessionId;
 import org.openqa.selenium.support.events.EventFiringWebDriver;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -48,6 +58,7 @@ import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import com.google.common.collect.ImmutableMap;
 import com.seleniumtests.MockitoTest;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.ScenarioException;
@@ -59,6 +70,7 @@ import com.seleniumtests.uipage.htmlelements.HtmlElement;
 
 import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.MobileElement;
+import io.appium.java_client.remote.AppiumCommandExecutor;
 
 /**
  * Test class for checking calls to a standard HTMLElement without using any driver
@@ -72,8 +84,7 @@ public class TestHtmlElement extends MockitoTest {
 	@Mock
 	private RemoteWebDriver driver;
 	
-	@Mock
-	private RemoteWebDriver mobileDriver;
+	private AppiumDriver mobileDriver;
 	
 	@Mock
 	private MobileElement mobileElement;
@@ -123,9 +134,6 @@ public class TestHtmlElement extends MockitoTest {
 		when(driver.getMouse()).thenReturn(mouse);
 		when(driver.switchTo()).thenReturn(locator);
 
-		when(mobileDriver.findElement(By.id("el"))).thenReturn(mobileElement);
-		when(mobileDriver.switchTo()).thenReturn(locator);
-
 		when(element.findElement(By.name("subEl"))).thenReturn(subElement1);
 		when(element.findElements(By.name("subEl"))).thenReturn(subElList);
 		when(element.getAttribute(anyString())).thenReturn("attribute");
@@ -140,8 +148,20 @@ public class TestHtmlElement extends MockitoTest {
 		when(subElement2.isDisplayed()).thenReturn(true);
 		
 		when(mobileElement.getCenter()).thenReturn(new Point(2, 2));
-
+		when(mobileElement.getLocation()).thenReturn(new Point(1, 1));
 		when(mobileElement.isDisplayed()).thenReturn(true);
+		when(mobileElement.getId()).thenReturn("12");
+		
+		// init for mobile tests
+		AppiumCommandExecutor ce = Mockito.mock(AppiumCommandExecutor.class);
+		Response response = new Response(new SessionId("1"));
+		response.setValue(new HashMap<String, Object>());
+		Response findResponse = new Response(new SessionId("1"));
+		findResponse.setValue(mobileElement);
+
+		// newSession, getSession, getSession, findElement
+		when(ce.execute(anyObject())).thenReturn(response, response, response, findResponse);
+		mobileDriver = Mockito.spy(new AppiumDriver(ce, new DesiredCapabilities()));
 		
 		SeleniumTestsContextManager.getThreadContext().setTestType(TestType.WEB);
 	}
@@ -389,6 +409,7 @@ public class TestHtmlElement extends MockitoTest {
 	
 	@Test(groups={"ut"})
 	public void testGetCenter() throws Exception {
+		
 		SeleniumTestsContextManager.getThreadContext().setTestType(TestType.APPIUM_WEB_ANDROID);
 		when(WebUIDriver.getWebDriver()).thenReturn(new CustomEventFiringWebDriver(mobileDriver));
 		el.getCenter();

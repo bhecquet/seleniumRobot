@@ -73,7 +73,7 @@ public class TestFrameElement extends MockitoTest {
 	private TargetLocator locator;
 
 	
-	@BeforeMethod(alwaysRun=true)
+	@BeforeMethod(groups={"ut"})
 	private void init() {
 
 		

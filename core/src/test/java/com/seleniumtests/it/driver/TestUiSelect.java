@@ -51,7 +51,7 @@ public class TestUiSelect extends GenericDriverTest {
 		driver = WebUIDriver.getWebDriver(true);
 	}
 	
-	@AfterMethod(alwaysRun=true)
+	@AfterMethod(groups={"it"})
 	public void cleanAlert() {
 		try {
 			driver.switchTo().alert().accept();
@@ -60,7 +60,7 @@ public class TestUiSelect extends GenericDriverTest {
 		}
 	}
 	
-	@AfterClass(alwaysRun = true)
+	@AfterClass(groups={"it"})
 	public void closeBrowser() {
 		WebUIDriver.cleanUp();
 	}

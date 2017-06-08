@@ -57,6 +57,8 @@ public class TestInstrumentsWrapper extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testOnMac() {
 		PowerMockito.mockStatic(OSUtility.class);
+		PowerMockito.mockStatic(OSCommand.class);
+		when(OSCommand.executeCommandAndWait("instruments")).thenReturn("instruments, version 8.3.2 (62124)");
 		when(OSUtility.getCurrentPlatorm()).thenReturn(Platform.MAC);
 		
 		new InstrumentsWrapper();
@@ -66,7 +68,9 @@ public class TestInstrumentsWrapper extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testiOSDeviceRetrieving() {
 		PowerMockito.mockStatic(OSCommand.class);
+		PowerMockito.mockStatic(OSUtility.class);
 		when(OSCommand.executeCommandAndWait("instruments")).thenReturn("instruments, version 8.3.2 (62124)");
+		when(OSUtility.getCurrentPlatorm()).thenReturn(Platform.MAC);
 		
 		when(OSCommand.executeCommandAndWait("instruments -s devices")).thenReturn("Mac mini de Thoraval [CBFA063D-2535-5FD8-BA05-CE8D3683D6BA]\n" 
  + "Apple TV 1080p (10.2) [6444F65D-DA15-4505-8307-4520FD346ACE] (Simulator)\n" 
