@@ -27,7 +27,7 @@ Copy key to a public key server
 #### Git key for release ####
 In order for maven to push tags on release, a key must be generated for SSH connection
 
-    ssh-keygen -t rsa -C '<key name>�
+    ssh-keygen -t rsa -C '<key name>'
 Copy the generated public key to Github
 Check connection (it should reply: You've successfuly authenticated)
 
@@ -112,12 +112,20 @@ Check installation with appium-doctor:
 - `npm install appium-doctor`
 - in node_modules/appium-doctor, `node . --ios`
 
-For use with a real iOS device, follow instructions here: [http://appium.io/slate/en/master/?ruby#appium-on-real-ios-devices] (http://appium.io/slate/en/master/?ruby#appium-on-real-ios-devices)
+For use with a real iOS device, follow instructions here: 
+[http://appium.io/slate/en/master/?ruby#appium-on-real-ios-devices] (http://appium.io/slate/en/master/?ruby#appium-on-real-ios-devices)
+[https://github.com/appium/appium-xcuitest-driver#real-devices] (https://github.com/appium/appium-xcuitest-driver#real-devices)
+[https://github.com/appium/appium-xcuitest-driver/blob/master/docs/real-device-config.md] (https://github.com/appium/appium-xcuitest-driver/blob/master/docs/real-device-config.md)
 For real device only:
 - `brew install libimobiledevice`
 - `npm install -g ios-deploy`
 
+An Apple Developper account is also mandatory. Add your real devices to list of devices and assign it to a iOS development profile
+
+Automatic configuration should be enough, but give a try to manual configuration if something goes wrong
+
 TODO: 
 https://discuss.appium.io/t/xcodebuild-failed-with-code-65-warning-the-server-did-not-provide-any-stacktrace-information-command-duration-or-timeout-32-63-seconds/12756/4
 https://github.com/appium/appium/issues/7747
+
  
