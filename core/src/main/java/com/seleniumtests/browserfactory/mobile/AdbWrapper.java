@@ -105,9 +105,11 @@ public class AdbWrapper {
 		
 		for (String line: reply.split("\n")) {
 			if (line.contains("package:com.android.chrome")) {
+				// version: dumpsys package com.android.chrome | grep versionName
 				browsers.add("chrome");
 			}
 			if (line.contains("package:com.android.browser")) {
+				// versio: dumpsys package com.android.browser | grep versionName
 				browsers.add("browser");
 			}
 		}

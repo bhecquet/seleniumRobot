@@ -24,6 +24,7 @@ import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
+import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.DriverConfig;
 import com.seleniumtests.driver.DriverExtractor;
 import com.seleniumtests.driver.DriverMode;
@@ -102,10 +103,8 @@ public class ChromeCapabilitiesFactory extends ICapabilitiesFactory {
 	}
 
     public void handleExtractResources() throws IOException {
-    	String driverPath = new DriverExtractor().extractDriver("chromedriver");
-    
-    	driverPath = FileUtility.decodePath(driverPath);
-
+    	BrowserInfo browserInfo = OSUtility.getInstalledBrowsersWithVersion().get(BrowserType.CHROME);
+    	String driverPath = FileUtility.decodePath(new DriverExtractor().extractDriver(browserInfo.getDriverFileName()));
     	System.setProperty(CHROME_DRIVER_PROPERTY, driverPath);
         if (!OSUtility.isWindows()) {
             new File(driverPath).setExecutable(true);

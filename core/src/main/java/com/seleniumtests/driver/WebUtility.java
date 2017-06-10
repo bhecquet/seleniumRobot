@@ -76,7 +76,7 @@ public class WebUtility {
     public void maximizeWindow() {
         try {
         	// app test are not compatible with window
-        	if (SeleniumTestsContextManager.getThreadContext().getTestType().family() == TestType.APP) {
+        	if (SeleniumTestsContextManager.getThreadContext().getTestType().family() == TestType.APP || SeleniumTestsContextManager.getThreadContext().getBrowser() == BrowserType.BROWSER) {
                 return;
             }
 

@@ -48,6 +48,7 @@ public class DriverConfig {
     private String ieDriverPath;
     private String chromeDriverPath;
     private String edgeDriverPath;
+    private String geckoDriverPath;
     private String chromeBinPath;
     private int webSessionTimeout = 90 * 1000;
     public static final int DEFAULT_IMPLICIT_WAIT_TIMEOUT = 5;
@@ -487,5 +488,13 @@ public class DriverConfig {
 
 	public void setFullReset(boolean fullReset) {
 		this.fullReset = fullReset;
+	}
+
+	public String getGeckoDriverPath() {
+		return geckoDriverPath;
+	}
+
+	public void setGeckoDriverPath(String geckoDriverPath) {
+		this.geckoDriverPath = geckoDriverPath;
 	}
 }

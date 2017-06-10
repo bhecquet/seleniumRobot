@@ -16,7 +16,6 @@
  */
 package com.seleniumtests.util.osutility;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
