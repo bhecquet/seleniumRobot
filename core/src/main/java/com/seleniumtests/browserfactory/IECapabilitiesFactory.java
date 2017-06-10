@@ -16,46 +16,45 @@
  */
 package com.seleniumtests.browserfactory;
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Paths;
 
-import org.apache.commons.io.FileUtils;
 import org.openqa.selenium.Proxy;
 import org.openqa.selenium.ie.InternetExplorerDriver;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
+import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.DriverConfig;
 import com.seleniumtests.driver.DriverExtractor;
 import com.seleniumtests.driver.DriverMode;
+import com.seleniumtests.util.FileUtility;
 import com.seleniumtests.util.osutility.OSUtility;
-import com.seleniumtests.util.osutility.OSUtilityFactory;
 
 public class IECapabilitiesFactory extends ICapabilitiesFactory {
     
 	private static final String WEBDRIVER_PROPERTY = "webdriver.ie.driver";
-	
-	private OSUtility osUtil = OSUtilityFactory.getInstance();
-	
+
     public void handleExtractResources() throws IOException {
-    	String driverPath;
-    	if (osUtil.getIEVersion() < 10) {
-    		driverPath = new DriverExtractor().extractDriver("IEDriverServer_x64");
-    	} else {
-    		driverPath = new DriverExtractor().extractDriver("IEDriverServer_Win32");
-    	}
+    	BrowserInfo browserInfo = OSUtility.getInstalledBrowsersWithVersion().get(BrowserType.INTERNET_EXPLORER);
+    	String driverPath = FileUtility.decodePath(new DriverExtractor().extractDriver(browserInfo.getDriverFileName()));
+    	System.setProperty(WEBDRIVER_PROPERTY, driverPath);
     	
-        File iEDriverServerFile = Paths.get(new File(driverPath).getParent(), "IEDriverServer.exe").toFile();
+//    	String driverPath;
+//    	if (osUtil.getIEVersion() < 10) {
+//    		driverPath = new DriverExtractor().extractDriver("IEDriverServer_x64");
+//    	} else {
+//    		driverPath = new DriverExtractor().extractDriver("IEDriverServer_Win32");
+//    	}
+//    	
+//        File iEDriverServerFile = Paths.get(new File(driverPath).getParent(), "IEDriverServer.exe").toFile();
+//
+//        try {
+//        	FileUtils.copyFile(new File(driverPath), iEDriverServerFile);
+//        } catch (IOException e) {
+//        	// do nothing, the file may already be in use
+//        }
 
-        try {
-        	FileUtils.copyFile(new File(driverPath), iEDriverServerFile);
-        } catch (IOException e) {
-        	// do nothing, the file may already be in use
-        }
-
-        System.setProperty(WEBDRIVER_PROPERTY, iEDriverServerFile.toString());
-        logger.debug(iEDriverServerFile);
+        
     }
     
     /**

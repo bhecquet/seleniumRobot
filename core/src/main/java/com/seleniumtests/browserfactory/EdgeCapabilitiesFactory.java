@@ -23,10 +23,12 @@ import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
 import com.seleniumtests.customexception.ConfigurationException;
+import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.DriverConfig;
 import com.seleniumtests.driver.DriverExtractor;
 import com.seleniumtests.driver.DriverMode;
 import com.seleniumtests.util.FileUtility;
+import com.seleniumtests.util.osutility.OSUtility;
 import com.seleniumtests.util.osutility.OSUtilityFactory;
 
 public class EdgeCapabilitiesFactory extends ICapabilitiesFactory {
@@ -78,11 +80,8 @@ public class EdgeCapabilitiesFactory extends ICapabilitiesFactory {
      * @throws IOException
      */
     public void handleExtractResources() throws IOException {
-    	String driverVersion = OSUtilityFactory.getInstance().getOSBuild().split("\\.")[2];
-    	String driverPath = new DriverExtractor().extractDriver("MicrosoftWebDriver_" + driverVersion);
-    
-    	driverPath = FileUtility.decodePath(driverPath);
-
+    	BrowserInfo browserInfo = OSUtility.getInstalledBrowsersWithVersion().get(BrowserType.EDGE);
+    	String driverPath = FileUtility.decodePath(new DriverExtractor().extractDriver(browserInfo.getDriverFileName()));
     	System.setProperty(EDGE_DRIVER_PROPERTY, driverPath);
     }
     
@@ -95,7 +94,7 @@ public class EdgeCapabilitiesFactory extends ICapabilitiesFactory {
         if (edgeDriverPath == null) {
             try {
                 if (System.getenv(EDGE_DRIVER_PROPERTY) != null) {
-                    logger.info("get Chrome driver from property:" + System.getenv(EDGE_DRIVER_PROPERTY));
+                    logger.info("get edge driver from property:" + System.getenv(EDGE_DRIVER_PROPERTY));
                     System.setProperty(EDGE_DRIVER_PROPERTY, System.getenv(EDGE_DRIVER_PROPERTY));
                 } else {
                     handleExtractResources();

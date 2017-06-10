@@ -36,6 +36,7 @@ import org.testng.ITestResult;
 import org.testng.TestRunner;
 
 import com.seleniumtests.browserfactory.BrowserInfo;
+import com.seleniumtests.browserfactory.mobile.MobileDeviceSelector;
 import com.seleniumtests.core.config.ConfigReader;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.driver.BrowserType;
@@ -73,6 +74,7 @@ public class SeleniumTestsContext {
     public static final String OPERA_USER_PROFILE_PATH = "operaUserProfilePath";	// profile utilisateur opéra
     public static final String FIREFOX_BINARY_PATH = "firefoxBinaryPath";		// chemin vers le binaire firefox (firefox portable ou pour utiliser une version spécifique
     public static final String CHROME_DRIVER_PATH = "chromeDriverPath";			// chemin vers chromeDriver si on souhaite utiliser une version différente
+    public static final String GECKO_DRIVER_PATH = "geckoDriverPath";			// chemin vers chromeDriver si on souhaite utiliser une version différente
     public static final String EDGE_DRIVER_PATH = "edgeDriverPath";				// path to Edge driver binary if we want to use an other version than the provided one
     public static final String CHROME_BINARY_PATH = "chromeBinaryPath";			// chemin vers le binaire chrome lorsque celui-ci n'est pas installé de manière normale
     public static final String IE_DRIVER_PATH = "ieDriverPath";					// chemin vers le driver Internet Explorer
@@ -180,6 +182,7 @@ public class SeleniumTestsContext {
         setFirefoxBinary(getValueForTest(FIREFOX_BINARY_PATH, System.getProperty(FIREFOX_BINARY_PATH)));
         setChromeBinary(getValueForTest(CHROME_BINARY_PATH, System.getProperty(CHROME_BINARY_PATH)));
         setChromeDriverPath(getValueForTest(CHROME_DRIVER_PATH, System.getProperty(CHROME_DRIVER_PATH)));
+        setGeckoDriverPath(getValueForTest(GECKO_DRIVER_PATH, System.getProperty(GECKO_DRIVER_PATH)));
         setEdgeDriverPath(getValueForTest(EDGE_DRIVER_PATH, System.getProperty(EDGE_DRIVER_PATH)));
         setIEDriverPath(getValueForTest(IE_DRIVER_PATH, System.getProperty(IE_DRIVER_PATH)));
         setUserAgent(getValueForTest(USER_AGENT, System.getProperty(USER_AGENT)));
@@ -236,15 +239,8 @@ public class SeleniumTestsContext {
         
         setViewPortWidth(getIntValueForTest(VIEWPORT_WIDTH, System.getProperty(VIEWPORT_WIDTH)));
         setViewPortHeight(getIntValueForTest(VIEWPORT_HEIGHT, System.getProperty(VIEWPORT_HEIGHT)));
-        
-        // determines test_type according to input configuration
-        configureTestType();
-
-        // get mobile platform version if one is defined in device list and a deviceName is set in parameters
-        updateDeviceMobileVersion();
-        
-        // get mobile platform version
-        updatePlatformVersion();
+    
+        updateTestAndMobile(getPlatform());
         
         // update browser version: replace installed one with those given in parameters
         updateInstalledBrowsers();
@@ -291,6 +287,24 @@ public class SeleniumTestsContext {
     }
     
     /**
+     * update test data according to platform
+     * @param platform
+     */
+    public void updateTestAndMobile(String platform) {
+    	
+    	setPlatform(platform);
+    	
+    	 // determines test_type according to input configuration
+        configureTestType();
+
+        // get mobile platform version if one is defined in device list and a deviceName is set in parameters
+        updateDeviceMobileVersion();
+        
+        // get mobile platform version
+        updatePlatformVersion();
+    }
+    
+    /**
      * From platform name, in case of Desktop platform, do nothing and in case of mobile, extract OS version from name
      *
      * @throws ConfigurationException 	in mobile, if version is not present
@@ -313,9 +327,12 @@ public class SeleniumTestsContext {
 	    		try {
 		    		setPlatform(pfVersion[0]);
 		    		setMobilePlatformVersion(pfVersion[1]);
+		    		return;
 	    		} catch (IndexOutOfBoundsException x) {
-	    			throw new ConfigurationException("For mobile platform, platform name should contain version. Ex: 'Android 5.0' or 'iOS 9.1'");
+	    			setMobilePlatformVersion(null);
+	    			logger.warn("For mobile platform, platform name should contain version. Ex: 'Android 5.0' or 'iOS 9.1'. Else, first found device is used");
 	    		}
+	    		
 			} else {
 				throw new ConfigurationException(String.format("Platform %s has not been recognized as a valid platform", getPlatform()));
 			}
@@ -439,6 +456,10 @@ public class SeleniumTestsContext {
 
     public String getChromeDriverPath() {
         return (String) getAttribute(CHROME_DRIVER_PATH);
+    }
+    
+    public String getGeckoDriverPath() {
+    	return (String) getAttribute(GECKO_DRIVER_PATH);
     }
     
     public String getEdgeDriverPath() {
@@ -970,6 +991,10 @@ public class SeleniumTestsContext {
     
     public void setChromeDriverPath(String path) {
     	setAttribute(CHROME_DRIVER_PATH, path);
+    }
+    
+    public void setGeckoDriverPath(String path) {
+    	setAttribute(GECKO_DRIVER_PATH, path);
     }
     
     public void setEdgeDriverPath(String path) {

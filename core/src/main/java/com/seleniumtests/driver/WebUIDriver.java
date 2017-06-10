@@ -302,6 +302,10 @@ public class WebUIDriver {
         String chromeDriverPath = SeleniumTestsContextManager.getThreadContext().getChromeDriverPath();
         config.setChromeDriverPath(chromeDriverPath);
         
+        
+        String geckoDriverPath = SeleniumTestsContextManager.getThreadContext().getGeckoDriverPath();
+        config.setGeckoDriverPath(geckoDriverPath);
+        
         String edgeDriverPath = SeleniumTestsContextManager.getThreadContext().getEdgeDriverPath();
         config.setEdgeDriverPath(edgeDriverPath);
 

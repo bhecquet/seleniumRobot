@@ -19,6 +19,7 @@ package com.seleniumtests.browserfactory;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
+import com.seleniumtests.browserfactory.mobile.MobileDeviceSelector;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.DriverConfig;
 
@@ -44,7 +45,7 @@ public class AndroidCapabilitiesFactory extends ICapabilitiesFactory {
     public DesiredCapabilities createCapabilities(final DriverConfig cfg) {
 
     	DesiredCapabilities caps = new DesiredCapabilities(this.capabilities);
-    	if (Integer.parseInt(cfg.getMobilePlatformVersion().substring(0, 1)) < 4) {
+    	if (!(cfg.getMobilePlatformVersion() == null) && Integer.parseInt(cfg.getMobilePlatformVersion().substring(0, 1)) < 4) {
     		caps.setCapability(MobileCapabilityType.AUTOMATION_NAME, "Selendroid");
     	} else {
     		caps.setCapability(MobileCapabilityType.AUTOMATION_NAME, "Appium");
@@ -87,6 +88,9 @@ public class AndroidCapabilitiesFactory extends ICapabilitiesFactory {
         	if (cfg.getBrowser() == BrowserType.CHROME) {
         		caps.merge(new ChromeCapabilitiesFactory().createMobileCapabilities(cfg));
         	}
+        	
+        	// set the right chromedriver executable according to android browser / chromeversion
+        	//caps.setCapability(AndroidMobileCapabilityType.CHROMEDRIVER_EXECUTABLE, value);
         }
         caps.setCapability(MobileCapabilityType.NEW_COMMAND_TIMEOUT, cfg.getNewCommandTimeout());
 

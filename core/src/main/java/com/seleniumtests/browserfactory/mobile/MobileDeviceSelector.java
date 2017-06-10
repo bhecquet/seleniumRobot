@@ -32,7 +32,6 @@ public class MobileDeviceSelector {
 	private Boolean androidReady;
 	private Boolean iosReady;
 	
-	
 	public MobileDeviceSelector initialize() {
 		try {
 			adbWrapper = new AdbWrapper();
@@ -105,6 +104,10 @@ public class MobileDeviceSelector {
 		
 		if (iosReady) {
 			deviceList.addAll(instrumentsWrapper.parseIosDevices());
+		}
+		
+		if (deviceList.isEmpty()) {
+			throw new ConfigurationException("No device found, check at least one is connected");
 		}
 		
 		List<MobileDevice> filteredDeviceList = filterDevices(deviceList, 
