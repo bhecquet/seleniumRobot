@@ -46,7 +46,7 @@ public class TestWithAllBrowsers extends SeleniumTestPlan {
 			}
 			browsers.add(new Object[] {browser.getBrowserType()});
 		}
-		//browsers.add(new Object[] {"phantomjs"});
+//		browsers.add(new Object[] {"chrome"});
         return browsers.toArray(new Object[][]{});
     }
 	

@@ -28,6 +28,7 @@ Below is the list of all parameters accepted in testing xml file. These paramete
 | useFirefoxDefaultProfile	| true		| Use default firefox profile | 
 | operaUserProfilePath 		| 			| Opera user profile if a specific one is defined | 
 | firefoxBinaryPath 		| 			| Path to firefox binary if a specific one should be used (for example when using portable versions. Else, the default firefox installation is choosen | 
+| geckoDriverPath 			| 			| Path to a different installation of geckodriver executable | 
 | chromeDriverPath 			| 			| Path to a different installation of chromedriver executable | 
 | chromeBinaryPath 			| 			| Path to chrome binary if using a portable installation (not detected by system | 
 | ieDriverPath 				| 			| Path to a different ieDriverServer executable | 
@@ -59,6 +60,7 @@ Below is the list of all parameters accepted in testing xml file. These paramete
 | app 						| 			| Path to the application file (local or remote) | 
 | appiumServerURL 			| 			| Appium server url. May be local or remote | 
 | deviceName 				| 			| Name of the device to use for mobile tests | 
+| fullReset 				| true		| enable full reset capability for appium tests | 
 | appPackage 				| 			| Package name of application (android only) | 
 | appActivity 				| 			| Activity started by mobile application (Android) | 
 | appWaitActivity 			| 			| In some cases, the first started activity is not the main app activity | 
