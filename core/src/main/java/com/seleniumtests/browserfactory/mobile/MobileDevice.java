@@ -18,15 +18,18 @@ package com.seleniumtests.browserfactory.mobile;
 
 import java.util.List;
 
+import com.seleniumtests.browserfactory.BrowserInfo;
+import com.seleniumtests.driver.BrowserType;
+
 public class MobileDevice {
 
 	private String name;
 	private String id;
 	private String platform;
 	private String version;
-	private List<String> browsers;
+	private List<BrowserInfo> browsers;
 	
-	public MobileDevice(String name, String id, String platform, String version, List<String> browsers) {
+	public MobileDevice(String name, String id, String platform, String version, List<BrowserInfo> browsers) {
 		this.name = name;
 		this.id = id;
 		this.platform = platform;
@@ -34,7 +37,16 @@ public class MobileDevice {
 		this.browsers = browsers;
 	}
 	
-	public List<String> getBrowsers() {
+	public BrowserInfo getBrowserInfo(BrowserType browser) {
+		for (BrowserInfo info: browsers) {
+			if (info.getBrowser() == browser) {
+				return info;
+			}
+		}
+		return null;
+	}
+	
+	public List<BrowserInfo> getBrowsers() {
 		return browsers;
 	}
 

@@ -19,6 +19,7 @@ package com.seleniumtests.ut.browserfactory.mobile;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.mockito.InjectMocks;
@@ -30,13 +31,17 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import com.seleniumtests.MockitoTest;
+import com.seleniumtests.browserfactory.BrowserInfo;
 import com.seleniumtests.browserfactory.mobile.AdbWrapper;
 import com.seleniumtests.browserfactory.mobile.InstrumentsWrapper;
 import com.seleniumtests.browserfactory.mobile.MobileDevice;
 import com.seleniumtests.browserfactory.mobile.MobileDeviceSelector;
 import com.seleniumtests.customexception.ConfigurationException;
+import com.seleniumtests.driver.BrowserType;
+import com.seleniumtests.driver.DriverMode;
 import com.seleniumtests.util.osutility.OSCommand;
 
+import io.appium.java_client.remote.AndroidMobileCapabilityType;
 import io.appium.java_client.remote.MobileCapabilityType;
 
 @PrepareForTest({AdbWrapper.class, OSCommand.class})
@@ -218,10 +223,58 @@ public class TestMobileDeviceSelector extends MockitoTest {
 		deviceSelector.setAndroidReady(true);
 		deviceSelector.setIosReady(false);
 		
-		DesiredCapabilities updatedCaps = deviceSelector.updateCapabilitiesWithSelectedDevice(requestedCaps);
+		DesiredCapabilities updatedCaps = deviceSelector.updateCapabilitiesWithSelectedDevice(requestedCaps, DriverMode.LOCAL);
 		Assert.assertEquals(updatedCaps.getCapability(MobileCapabilityType.PLATFORM_NAME), "android");
 		Assert.assertEquals(updatedCaps.getCapability(MobileCapabilityType.DEVICE_NAME), "1234");
 		Assert.assertEquals(updatedCaps.getCapability(MobileCapabilityType.PLATFORM_VERSION), "5.0");
+		Assert.assertNull(updatedCaps.getCapability(AndroidMobileCapabilityType.CHROMEDRIVER_EXECUTABLE));		
+	}
+	
+	/**
+	 * Test the update of driver capabilities when using browsers in local mode
+	 */
+	@Test(groups={"ut"})
+	public void testCapabilitiesUpdateWithDriver() {
+		// available devices
+		List<MobileDevice> deviceList = new ArrayList<>();
+		BrowserInfo chromeInfo = new BrowserInfo(BrowserType.CHROME, "47.0", null);
+		chromeInfo.setDriverFileName("chromedriver.exe");
+		deviceList.add(new MobileDevice("nexus 5", "1234", "android", "5.0", Arrays.asList(new BrowserInfo[] {chromeInfo})));
+		when(adbWrapper.getDeviceList()).thenReturn(deviceList);
+		
+		DesiredCapabilities requestedCaps = new DesiredCapabilities();
+		requestedCaps.setCapability(MobileCapabilityType.DEVICE_NAME, "Nexus 5");
+		requestedCaps.setCapability(MobileCapabilityType.BROWSER_NAME, "chrome");
+		
+		deviceSelector.setAndroidReady(true);
+		deviceSelector.setIosReady(false);
+		
+		DesiredCapabilities updatedCaps = deviceSelector.updateCapabilitiesWithSelectedDevice(requestedCaps, DriverMode.LOCAL);
+		Assert.assertEquals(updatedCaps.getCapability(AndroidMobileCapabilityType.CHROMEDRIVER_EXECUTABLE), "chromedriver.exe");
+		
+	}
+	
+	/**
+	 * Test the driver capabilities are not updated with driver executable when using browsers in non-local mode
+	 */
+	@Test(groups={"ut"})
+	public void testCapabilitiesUpdateWithDriverNonLocal() {
+		// available devices
+		List<MobileDevice> deviceList = new ArrayList<>();
+		BrowserInfo chromeInfo = new BrowserInfo(BrowserType.BROWSER, "47.0", null);
+		chromeInfo.setDriverFileName("chromedriver2.exe");
+		deviceList.add(new MobileDevice("nexus 5", "1234", "android", "5.0", Arrays.asList(new BrowserInfo[] {chromeInfo})));
+		when(adbWrapper.getDeviceList()).thenReturn(deviceList);
+		
+		DesiredCapabilities requestedCaps = new DesiredCapabilities();
+		requestedCaps.setCapability(MobileCapabilityType.DEVICE_NAME, "Nexus 5");
+		requestedCaps.setCapability(MobileCapabilityType.BROWSER_NAME, "browser");
+		
+		deviceSelector.setAndroidReady(true);
+		deviceSelector.setIosReady(false);
+		
+		DesiredCapabilities updatedCaps = deviceSelector.updateCapabilitiesWithSelectedDevice(requestedCaps, DriverMode.SAUCELABS);
+		Assert.assertNull(updatedCaps.getCapability(AndroidMobileCapabilityType.CHROMEDRIVER_EXECUTABLE));
 		
 	}
 }

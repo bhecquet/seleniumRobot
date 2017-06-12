@@ -16,13 +16,19 @@
  */
 package com.seleniumtests.browserfactory.mobile;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.openqa.selenium.remote.DesiredCapabilities;
 
 import com.seleniumtests.customexception.ConfigurationException;
+import com.seleniumtests.driver.BrowserType;
+import com.seleniumtests.driver.DriverExtractor;
+import com.seleniumtests.driver.DriverMode;
+import com.seleniumtests.util.FileUtility;
 
+import io.appium.java_client.remote.AndroidMobileCapabilityType;
 import io.appium.java_client.remote.MobileCapabilityType;
 
 public class MobileDeviceSelector {
@@ -130,11 +136,30 @@ public class MobileDeviceSelector {
 	 * @param capabilities
 	 * @return
 	 */
-	public DesiredCapabilities updateCapabilitiesWithSelectedDevice(DesiredCapabilities capabilities) {
+	public DesiredCapabilities updateCapabilitiesWithSelectedDevice(DesiredCapabilities capabilities, DriverMode driverMode) {
 		MobileDevice selectedDevice = getRelevantMobileDevice(capabilities);
 		
 		if ("android".equals(selectedDevice.getPlatform())) {
 			capabilities.setCapability(MobileCapabilityType.DEVICE_NAME, selectedDevice.getId());
+			
+			// set the right chromedriver executable according to android browser / chromeversion
+			if (driverMode == DriverMode.LOCAL && !capabilities.getBrowserName().isEmpty()) {
+				String chromeDriverFile = null;
+				if (BrowserType.CHROME.toString().equalsIgnoreCase(capabilities.getBrowserName())) {
+					chromeDriverFile = selectedDevice.getBrowserInfo(BrowserType.CHROME).getDriverFileName();
+	        	} else if (BrowserType.BROWSER.toString().equalsIgnoreCase(capabilities.getBrowserName())) {
+	        		chromeDriverFile = selectedDevice.getBrowserInfo(BrowserType.BROWSER).getDriverFileName();
+	        	}
+				if (chromeDriverFile != null) {
+					try {
+						String driverPath = FileUtility.decodePath(new DriverExtractor().extractDriver(chromeDriverFile));
+						capabilities.setCapability(AndroidMobileCapabilityType.CHROMEDRIVER_EXECUTABLE, driverPath);
+					} catch (IOException e) {
+					}
+					
+				}
+			}
+			
 		} else if ("ios".equalsIgnoreCase(selectedDevice.getPlatform())) {
 			capabilities.setCapability(MobileCapabilityType.UDID, selectedDevice.getId());
 		}

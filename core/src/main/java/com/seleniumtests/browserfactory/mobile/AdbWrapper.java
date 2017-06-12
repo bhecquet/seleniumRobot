@@ -24,7 +24,9 @@ import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 
+import com.seleniumtests.browserfactory.BrowserInfo;
 import com.seleniumtests.customexception.ConfigurationException;
+import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 import com.seleniumtests.util.osutility.OSCommand;
 
@@ -37,6 +39,9 @@ public class AdbWrapper {
 	private static Pattern namePattern = Pattern.compile(".*\\[ro\\.product\\.model\\]: \\[(.*?)\\].*");
 	
 	private static Logger logger = SeleniumRobotLogger.getLogger(AdbWrapper.class);
+	
+	private static final Pattern REG_BROWSER_VERSION_NAME = Pattern.compile("versionName=(.*?)-.*");
+	private static final Pattern REG_ANDROID_VERSION_NAME = Pattern.compile("versionName=(.*?)-.*");
 	
 	public AdbWrapper() {
 		checkInstallation();
@@ -99,18 +104,24 @@ public class AdbWrapper {
 		return devices;
 	}
 	
-	private List<String> getInstalledBrowsers(String deviceId) {
-		List<String> browsers = new ArrayList<>();
+	private List<BrowserInfo> getInstalledBrowsers(String deviceId) {
+		List<BrowserInfo> browsers = new ArrayList<>();
 		String reply = OSCommand.executeCommandAndWait(String.format("%s -s %s shell \"pm list packages\"", adbCommand, deviceId));
 		
 		for (String line: reply.split("\n")) {
 			if (line.contains("package:com.android.chrome")) {
-				// version: dumpsys package com.android.chrome | grep versionName
-				browsers.add("chrome");
+				String chromeVersion = OSCommand.executeCommandAndWait(String.format("%s -s %s shell \"dumpsys package com.android.chrome | grep versionName\"", adbCommand, deviceId));
+				browsers.add(new BrowserInfo(BrowserType.CHROME, chromeVersion, null));
 			}
 			if (line.contains("package:com.android.browser")) {
-				// versio: dumpsys package com.android.browser | grep versionName
-				browsers.add("browser");
+				String androidVersion = OSCommand.executeCommandAndWait(String.format("%s -s %s shell \"dumpsys package com.android.browser | grep versionName\"", adbCommand, deviceId));
+				Matcher versionMatcher = REG_BROWSER_VERSION_NAME.matcher(androidVersion.trim());
+				if (versionMatcher.matches()) {
+					browsers.add(new BrowserInfo(BrowserType.BROWSER, versionMatcher.group(1), null));
+				} else {
+					logger.error(String.format("Cannot parse android version %s", androidVersion));
+					browsers.add(new BrowserInfo(BrowserType.BROWSER, androidVersion, null));
+				}
 			}
 		}
 		return browsers;

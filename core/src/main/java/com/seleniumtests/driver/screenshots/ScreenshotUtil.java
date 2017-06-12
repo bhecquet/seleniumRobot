@@ -35,6 +35,7 @@ import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
+import org.openqa.selenium.WebElement;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.ScenarioException;
@@ -47,6 +48,8 @@ import com.seleniumtests.util.FileUtility;
 import com.seleniumtests.util.HashCodeGenerator;
 import com.seleniumtests.util.imaging.ImageProcessor;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
+
+import io.appium.java_client.android.AndroidDriver;
 
 public class ScreenshotUtil {
 	private static final Logger logger = SeleniumRobotLogger.getLogger(ScreenshotUtil.class);
@@ -79,7 +82,18 @@ public class ScreenshotUtil {
             }
 
             TakesScreenshot screenShot = (TakesScreenshot) driver;
-            return screenShot.getScreenshotAs(OutputType.BASE64);
+            
+            // android does not support screenshot from webview context, switch temporarly to native_app context to take screenshot
+            if (SeleniumTestsContextManager.getThreadContext().getBrowser() == BrowserType.BROWSER) {
+            	((AndroidDriver<WebElement>)((CustomEventFiringWebDriver)driver).getWebDriver()).context("NATIVE_APP");
+            }
+
+            String screenshotB64 = screenShot.getScreenshotAs(OutputType.BASE64);
+            if (SeleniumTestsContextManager.getThreadContext().getBrowser() == BrowserType.BROWSER) {
+            	((AndroidDriver<WebElement>)((CustomEventFiringWebDriver)driver).getWebDriver()).context("WEBVIEW");
+            }
+            
+            return screenshotB64;
         } catch (Exception ex) {
             // Ignore all exceptions
             logger.error(ex);
@@ -157,7 +171,6 @@ public class ScreenshotUtil {
     			
     			// do not scroll to much so that we can crop fixed header without loosing content
     			scrollY = currentImageHeight - cropTop;
-//				((JavascriptExecutor) driver).executeScript(String.format("window.top.scroll(%d, %d)", scrollX, scrollY));
 				((CustomEventFiringWebDriver)driver).scrollTo(scrollX, scrollY);
 				
     			capturePageScreenshotToFile(driver, tmpCap, cropTop, cropBottom);
