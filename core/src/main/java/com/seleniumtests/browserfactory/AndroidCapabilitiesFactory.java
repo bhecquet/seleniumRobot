@@ -88,9 +88,6 @@ public class AndroidCapabilitiesFactory extends ICapabilitiesFactory {
         	if (cfg.getBrowser() == BrowserType.CHROME) {
         		caps.merge(new ChromeCapabilitiesFactory().createMobileCapabilities(cfg));
         	}
-        	
-        	// set the right chromedriver executable according to android browser / chromeversion
-        	//caps.setCapability(AndroidMobileCapabilityType.CHROMEDRIVER_EXECUTABLE, value);
         }
         caps.setCapability(MobileCapabilityType.NEW_COMMAND_TIMEOUT, cfg.getNewCommandTimeout());
 

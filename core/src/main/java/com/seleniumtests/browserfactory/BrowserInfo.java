@@ -39,7 +39,7 @@ public class BrowserInfo {
 	 * Create information about the 
 	 * @param browser
 	 * @param version
-	 * @param path
+	 * @param path				path to browser executable
 	 * @param driverFileName
 	 */
 	public BrowserInfo(BrowserType browser, String version, String path) {
@@ -48,7 +48,7 @@ public class BrowserInfo {
 		this.version = version;
 		os = OSUtility.getCurrentPlatorm().toString().toLowerCase();		
 	}
-	
+
 	private void addDriverFile() throws IOException {
 		switch (browser) {
 			case CHROME:
@@ -213,6 +213,15 @@ public class BrowserInfo {
 			}
 		}
 		return driverFileName;
+	}
+	
+	/**
+	 * For test only
+	 * @param driverFileName
+	 */
+	public void setDriverFileName(String driverFileName) {
+		this.driverFileName = driverFileName;
+		driverFileSearched = true;
 	}
 
 }

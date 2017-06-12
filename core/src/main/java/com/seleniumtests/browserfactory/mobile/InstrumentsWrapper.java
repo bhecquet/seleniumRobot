@@ -8,7 +8,9 @@ import java.util.regex.Pattern;
 
 import org.openqa.selenium.Platform;
 
+import com.seleniumtests.browserfactory.BrowserInfo;
 import com.seleniumtests.customexception.ConfigurationException;
+import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.util.osutility.OSCommand;
 import com.seleniumtests.util.osutility.OSUtility;
 
@@ -52,7 +54,11 @@ public class InstrumentsWrapper {
 			Matcher matcher = REG_DEVICE.matcher(line);
 
 			if (matcher.matches()) {
-				MobileDevice dev = new MobileDevice(matcher.group(1).trim(), matcher.group(3), "iOS", matcher.group(2), Arrays.asList(new String[] {"safari"}));
+				MobileDevice dev = new MobileDevice(matcher.group(1).trim(), 
+						matcher.group(3), 
+						"iOS", 
+						matcher.group(2), 
+						Arrays.asList(new BrowserInfo[] {new BrowserInfo(BrowserType.SAFARI, "latest", null)}));
 				devList.add(dev);
 			}
 		}
