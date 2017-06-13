@@ -86,6 +86,7 @@ public class TestAdbWrapper extends MockitoTest {
 		when(System.getenv("ANDROID_HOME")).thenReturn(null);
 		when(OSCommand.executeCommandAndWait("adb version")).thenReturn("Android Debug Bridge version 1.0.32\nRevision 09a0d98bebce-android");
 		when(OSCommand.executeCommandAndWait("adb -s emulator-5554 shell \"dumpsys package com.android.browser | grep versionName\"")).thenReturn("  versionName=6.0-123.4");
+		when(OSCommand.executeCommandAndWait("adb -s emulator-5554 shell \"dumpsys package com.android.chrome | grep versionName\"")).thenReturn("  versionName=56.0.123.4");
 		when(OSCommand.executeCommandAndWait("adb devices")).thenReturn("List of devices attached\n"
 																		+ "emulator-5554   device");
 		when(OSCommand.executeCommandAndWait("adb -s emulator-5554 shell getprop")).thenReturn("[dalvik.vm.dex2oat-Xms]: [64m]\n"
@@ -337,6 +338,7 @@ public class TestAdbWrapper extends MockitoTest {
 		Assert.assertEquals(mobiles.get(0).getBrowsers().get(0).getBrowser(), BrowserType.BROWSER);
 		Assert.assertEquals(mobiles.get(0).getBrowsers().get(0).getVersion(), "6.0");
 		Assert.assertEquals(mobiles.get(0).getBrowsers().get(1).getBrowser(), BrowserType.CHROME);
+		Assert.assertEquals(mobiles.get(0).getBrowsers().get(1).getVersion(), "56.0");
 	}
 
 }
