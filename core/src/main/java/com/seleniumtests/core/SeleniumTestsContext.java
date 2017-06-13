@@ -818,7 +818,6 @@ public class SeleniumTestsContext {
 
             }
         }
-
     }
 
     /**
