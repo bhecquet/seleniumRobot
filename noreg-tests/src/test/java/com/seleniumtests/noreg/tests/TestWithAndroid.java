@@ -12,6 +12,7 @@ import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.runner.SeleniumTestPlan;
 import com.seleniumtests.noreg.support.WebServer;
 import com.seleniumtests.noreg.webpage.DemoPage;
+import com.seleniumtests.noreg.webpage.TestRoomHome;
 
 public class TestWithAndroid extends SeleniumTestPlan {
 	
@@ -43,13 +44,13 @@ public class TestWithAndroid extends SeleniumTestPlan {
 	public void testMobileApp() throws Exception {
 		
 		File apk = File.createTempFile("application-", ".apk");
-		FileUtils.copyInputStreamToFile(getClass().getClassLoader().getResourceAsStream("apps/android/TestRoom.Android-Signed.apk"), apk);
+		FileUtils.copyInputStreamToFile(getClass().getClassLoader().getResourceAsStream("apps/android/TestRoom.Android-x86.apk"), apk);
 
-		SeleniumTestsContextManager.getThreadContext().setAppActivity("TestRoom");
+		SeleniumTestsContextManager.getThreadContext().setAppActivity("md5275aec19faed04d28d11ce353acee8a9.MainActivity");
 		SeleniumTestsContextManager.getThreadContext().setAppPackage("TestRoom.Android");
 		SeleniumTestsContextManager.getThreadContext().setApp(apk.getAbsolutePath());
 		SeleniumTestsContextManager.getThreadContext().updateTestAndMobile("android");
-		DemoPage demo = new DemoPage(String.format("http://10.0.2.2:%d/index.html", server.getServerHost().getPort())).fillForm();
+		TestRoomHome demo = new TestRoomHome(String.format("http://10.0.2.2:%d/index.html", server.getServerHost().getPort())).fillForm();
 		Assert.assertEquals(demo.getText(), "hello");
 	}
 	
