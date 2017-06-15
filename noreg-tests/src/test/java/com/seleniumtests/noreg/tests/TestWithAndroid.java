@@ -50,7 +50,7 @@ public class TestWithAndroid extends SeleniumTestPlan {
 		SeleniumTestsContextManager.getThreadContext().setAppPackage("TestRoom.Android");
 		SeleniumTestsContextManager.getThreadContext().setApp(apk.getAbsolutePath());
 		SeleniumTestsContextManager.getThreadContext().updateTestAndMobile("android");
-		TestRoomHome demo = new TestRoomHome(String.format("http://10.0.2.2:%d/index.html", server.getServerHost().getPort())).fillForm();
+		TestRoomHome demo = new TestRoomHome().fillForm();
 		Assert.assertEquals(demo.getText(), "hello");
 	}
 	

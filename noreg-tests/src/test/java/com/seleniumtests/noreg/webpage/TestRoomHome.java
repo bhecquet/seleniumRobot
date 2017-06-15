@@ -15,7 +15,7 @@ public class TestRoomHome extends PageObject {
 	private static final ButtonElement goButton = new ButtonElement("go Button", By.id("go"));
 	private static final ButtonElement resetButton = new ButtonElement("reset Button", By.id("reset"));
 	
-	public TestRoomHome(String url) throws IOException {
+	public TestRoomHome() throws IOException {
 		super(textBox, SeleniumTestsContextManager.getThreadContext().getApp());
 	}
 	
