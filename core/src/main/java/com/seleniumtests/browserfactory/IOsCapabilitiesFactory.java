@@ -20,7 +20,9 @@ import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
 import com.seleniumtests.driver.DriverConfig;
+import com.seleniumtests.driver.DriverMode;
 
+import io.appium.java_client.remote.IOSMobileCapabilityType;
 import io.appium.java_client.remote.MobileCapabilityType;
 
 public class IOsCapabilitiesFactory extends ICapabilitiesFactory {
@@ -42,6 +44,10 @@ public class IOsCapabilitiesFactory extends ICapabilitiesFactory {
     	//caps.setCapability(MobileCapabilityType.AUTOMATION_NAME, "Appium");
     	caps.setCapability(MobileCapabilityType.AUTOMATION_NAME, "XCUITest");
     	
+    	if (cfg.getMode() == DriverMode.LOCAL) {
+    		caps.setCapability(IOSMobileCapabilityType.XCODE_CONFIG_FILE, System.getenv("APPIUM_HOME") + "/node_modules/appium/node_modules/appium-xcuitest-driver/WebDriverAgent/xcodeConfigFile.xcconfig");
+    	}
+    		
     	if (cfg.isFullReset()) {
     		caps.setCapability(MobileCapabilityType.FULL_RESET, "true");
     	} else {
