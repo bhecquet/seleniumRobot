@@ -60,6 +60,7 @@
 					<target>1.8</target>
 					<includes>
 						<include>**/browserfactory/mobile/**</include>
+						<include>**/browserfactory/BrowserInfo.java</include>
 						<include>**/util/osutility/**</include>
 						<include>**/util/FileUtility.java</include>
 					</includes>

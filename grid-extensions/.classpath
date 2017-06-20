@@ -10,7 +10,7 @@
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry including="**/browserfactory/mobile/**|**/util/osutility/**" kind="src" output="target/classes" path="Dev/seleniumRobot/core/src/main/java">
+	<classpathentry including="**/browserfactory/mobile/**|**/util/osutility/**|**/util/FileUtility.java" kind="src" output="target/classes" path="Dev/seleniumRobot/core/src/main/java">
 		<attributes>
 			<attribute name="optional" value="true"/>
 			<attribute name="maven.pomderived" value="true"/>
