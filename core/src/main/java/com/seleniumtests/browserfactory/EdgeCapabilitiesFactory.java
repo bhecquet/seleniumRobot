@@ -19,6 +19,7 @@ package com.seleniumtests.browserfactory;
 import java.io.IOException;
 
 import org.apache.commons.lang3.SystemUtils;
+import org.openqa.selenium.edge.EdgeDriverService;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
@@ -29,12 +30,9 @@ import com.seleniumtests.driver.DriverExtractor;
 import com.seleniumtests.driver.DriverMode;
 import com.seleniumtests.util.FileUtility;
 import com.seleniumtests.util.osutility.OSUtility;
-import com.seleniumtests.util.osutility.OSUtilityFactory;
 
 public class EdgeCapabilitiesFactory extends ICapabilitiesFactory {
 
-	private static final String EDGE_DRIVER_PROPERTY = "webdriver.edge.driver";
-	
     /**
      * Create edge capabilities.
      */
@@ -82,7 +80,7 @@ public class EdgeCapabilitiesFactory extends ICapabilitiesFactory {
     public void handleExtractResources() throws IOException {
     	BrowserInfo browserInfo = OSUtility.getInstalledBrowsersWithVersion().get(BrowserType.EDGE);
     	String driverPath = FileUtility.decodePath(new DriverExtractor().extractDriver(browserInfo.getDriverFileName()));
-    	System.setProperty(EDGE_DRIVER_PROPERTY, driverPath);
+    	System.setProperty(EdgeDriverService.EDGE_DRIVER_EXE_PROPERTY, driverPath);
     }
     
     /**
@@ -93,9 +91,9 @@ public class EdgeCapabilitiesFactory extends ICapabilitiesFactory {
         String edgeDriverPath = webDriverConfig.getEdgeDriverPath();
         if (edgeDriverPath == null) {
             try {
-                if (System.getenv(EDGE_DRIVER_PROPERTY) != null) {
-                    logger.info("get edge driver from property:" + System.getenv(EDGE_DRIVER_PROPERTY));
-                    System.setProperty(EDGE_DRIVER_PROPERTY, System.getenv(EDGE_DRIVER_PROPERTY));
+                if (System.getenv(EdgeDriverService.EDGE_DRIVER_EXE_PROPERTY) != null) {
+                    logger.info("get edge driver from property:" + System.getenv(EdgeDriverService.EDGE_DRIVER_EXE_PROPERTY));
+                    System.setProperty(EdgeDriverService.EDGE_DRIVER_EXE_PROPERTY, System.getenv(EdgeDriverService.EDGE_DRIVER_EXE_PROPERTY));
                 } else {
                     handleExtractResources();
                 }
@@ -103,7 +101,7 @@ public class EdgeCapabilitiesFactory extends ICapabilitiesFactory {
             	logger.error(ex);
             }
         } else {
-            System.setProperty(EDGE_DRIVER_PROPERTY, edgeDriverPath);
+            System.setProperty(EdgeDriverService.EDGE_DRIVER_EXE_PROPERTY, edgeDriverPath);
         }
     }
 
