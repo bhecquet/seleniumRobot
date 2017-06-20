@@ -16,6 +16,7 @@
  */
 package com.seleniumtests.browserfactory;
 
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 
@@ -29,9 +30,12 @@ import com.seleniumtests.browserfactory.mobile.MobileDeviceSelector;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.DriverExceptions;
 import com.seleniumtests.driver.DriverConfig;
+import com.seleniumtests.driver.DriverExtractor;
+import com.seleniumtests.util.FileUtility;
 
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.ios.IOSDriver;
+import io.appium.java_client.remote.AndroidMobileCapabilityType;
 
 public class AppiumDriverFactory extends AbstractWebDriverFactory implements IWebDriverFactory {
 
@@ -39,6 +43,17 @@ public class AppiumDriverFactory extends AbstractWebDriverFactory implements IWe
 
     public AppiumDriverFactory(final DriverConfig cfg) {
         super(cfg);
+    }
+    
+    private void extractAndroidDriver(DesiredCapabilities capabilities) {
+    	String chromeDriverFile = (String)capabilities.getCapability(AndroidMobileCapabilityType.CHROMEDRIVER_EXECUTABLE);
+		if (chromeDriverFile != null) {
+			try {
+				String driverPath = FileUtility.decodePath(new DriverExtractor().extractDriver(chromeDriverFile));
+				capabilities.setCapability(AndroidMobileCapabilityType.CHROMEDRIVER_EXECUTABLE, driverPath);
+			} catch (IOException e) {
+			}
+		}
     }
     
     @Override
@@ -54,6 +69,7 @@ public class AppiumDriverFactory extends AbstractWebDriverFactory implements IWe
 	        if("android".equalsIgnoreCase(webDriverConfig.getPlatform())) {
 	        	DesiredCapabilities androidCaps = new AndroidCapabilitiesFactory(capabilities).createCapabilities(webDriverConfig);
 	        	androidCaps = new MobileDeviceSelector().initialize().updateCapabilitiesWithSelectedDevice(androidCaps, webDriverConfig.getMode());
+	        	extractAndroidDriver(androidCaps);
 	            return new AndroidDriver<WebElement>(new URL(((LocalAppiumLauncher)appiumLauncher).getAppiumServerUrl()), androidCaps);
 	            
 	        } else if ("ios".equalsIgnoreCase(webDriverConfig.getPlatform())){
