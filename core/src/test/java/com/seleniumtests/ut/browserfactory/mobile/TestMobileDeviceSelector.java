@@ -239,7 +239,7 @@ public class TestMobileDeviceSelector extends MockitoTest {
 		List<MobileDevice> deviceList = new ArrayList<>();
 		BrowserInfo chromeInfo = new BrowserInfo(BrowserType.CHROME, "47.0", null);
 		chromeInfo.setDriverFileName("chromedriver.exe");
-		deviceList.add(new MobileDevice("nexus 5", "1234", "android", "5.0", Arrays.asList(new BrowserInfo[] {chromeInfo})));
+		deviceList.add(new MobileDevice("nexus 5", "1234", "android", "5.0", Arrays.asList(chromeInfo)));
 		when(adbWrapper.getDeviceList()).thenReturn(deviceList);
 		
 		DesiredCapabilities requestedCaps = new DesiredCapabilities();
@@ -263,7 +263,7 @@ public class TestMobileDeviceSelector extends MockitoTest {
 		List<MobileDevice> deviceList = new ArrayList<>();
 		BrowserInfo chromeInfo = new BrowserInfo(BrowserType.BROWSER, "47.0", null);
 		chromeInfo.setDriverFileName("chromedriver2.exe");
-		deviceList.add(new MobileDevice("nexus 5", "1234", "android", "5.0", Arrays.asList(new BrowserInfo[] {chromeInfo})));
+		deviceList.add(new MobileDevice("nexus 5", "1234", "android", "5.0", Arrays.asList(chromeInfo)));
 		when(adbWrapper.getDeviceList()).thenReturn(deviceList);
 		
 		DesiredCapabilities requestedCaps = new DesiredCapabilities();
