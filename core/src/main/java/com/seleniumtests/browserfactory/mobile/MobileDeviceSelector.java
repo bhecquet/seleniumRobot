@@ -154,6 +154,7 @@ public class MobileDeviceSelector {
 			
 		} else if ("ios".equalsIgnoreCase(selectedDevice.getPlatform())) {
 			capabilities.setCapability(MobileCapabilityType.UDID, selectedDevice.getId());
+			capabilities.setCapability(MobileCapabilityType.DEVICE_NAME, selectedDevice.getName());
 		}
 		capabilities.setCapability(MobileCapabilityType.PLATFORM_NAME, selectedDevice.getPlatform());
 		capabilities.setCapability(MobileCapabilityType.PLATFORM_VERSION, selectedDevice.getVersion());

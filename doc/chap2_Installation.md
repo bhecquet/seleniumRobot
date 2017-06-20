@@ -124,8 +124,4 @@ An Apple Developper account is also mandatory. Add your real devices to list of 
 
 Automatic configuration should be enough, but give a try to manual configuration if something goes wrong
 
-TODO: 
-https://discuss.appium.io/t/xcodebuild-failed-with-code-65-warning-the-server-did-not-provide-any-stacktrace-information-command-duration-or-timeout-32-63-seconds/12756/4
-https://github.com/appium/appium/issues/7747
-
  
