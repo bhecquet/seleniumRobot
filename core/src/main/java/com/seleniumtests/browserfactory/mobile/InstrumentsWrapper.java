@@ -58,7 +58,7 @@ public class InstrumentsWrapper {
 						matcher.group(3), 
 						"iOS", 
 						matcher.group(2), 
-						Arrays.asList(new BrowserInfo[] {new BrowserInfo(BrowserType.SAFARI, "latest", null)}));
+						Arrays.asList(new BrowserInfo(BrowserType.SAFARI, "latest", null)));
 				devList.add(dev);
 			}
 		}

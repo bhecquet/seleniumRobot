@@ -16,7 +16,6 @@
  */
 package com.seleniumtests.browserfactory.mobile;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,9 +23,7 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.driver.BrowserType;
-import com.seleniumtests.driver.DriverExtractor;
 import com.seleniumtests.driver.DriverMode;
-import com.seleniumtests.util.FileUtility;
 
 import io.appium.java_client.remote.AndroidMobileCapabilityType;
 import io.appium.java_client.remote.MobileCapabilityType;
@@ -151,12 +148,7 @@ public class MobileDeviceSelector {
 	        		chromeDriverFile = selectedDevice.getBrowserInfo(BrowserType.BROWSER).getDriverFileName();
 	        	}
 				if (chromeDriverFile != null) {
-					try {
-						String driverPath = FileUtility.decodePath(new DriverExtractor().extractDriver(chromeDriverFile));
-						capabilities.setCapability(AndroidMobileCapabilityType.CHROMEDRIVER_EXECUTABLE, driverPath);
-					} catch (IOException e) {
-					}
-					
+					capabilities.setCapability(AndroidMobileCapabilityType.CHROMEDRIVER_EXECUTABLE, chromeDriverFile);
 				}
 			}
 			
