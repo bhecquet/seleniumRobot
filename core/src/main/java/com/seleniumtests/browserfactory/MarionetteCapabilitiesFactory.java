@@ -19,6 +19,7 @@ package com.seleniumtests.browserfactory;
 import java.io.File;
 import java.io.IOException;
 
+import org.openqa.selenium.firefox.GeckoDriverService;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
 import com.seleniumtests.driver.BrowserType;
@@ -29,8 +30,6 @@ import com.seleniumtests.util.FileUtility;
 import com.seleniumtests.util.osutility.OSUtility;
 
 public class MarionetteCapabilitiesFactory extends FirefoxCapabilitiesFactory {
-	
-	private static final String GECKO_DRIVER_PROPERTY = "webdriver.gecko.driver";
 	
 	@Override
 	public DesiredCapabilities createCapabilities(final DriverConfig webDriverConfig) {
@@ -48,7 +47,7 @@ public class MarionetteCapabilitiesFactory extends FirefoxCapabilitiesFactory {
 	private void handleExtractResources() throws IOException {
 		BrowserInfo browserInfo = OSUtility.getInstalledBrowsersWithVersion().get(BrowserType.FIREFOX);
     	String driverPath = FileUtility.decodePath(new DriverExtractor().extractDriver(browserInfo.getDriverFileName()));
-    	System.setProperty(GECKO_DRIVER_PROPERTY, driverPath);
+    	System.setProperty(GeckoDriverService.GECKO_DRIVER_EXE_PROPERTY, driverPath);
 		
 		if (!OSUtility.isWindows()) {
             new File(driverPath).setExecutable(true);
@@ -63,9 +62,9 @@ public class MarionetteCapabilitiesFactory extends FirefoxCapabilitiesFactory {
         String edgeDriverPath = webDriverConfig.getGeckoDriverPath();
         if (edgeDriverPath == null) {
             try {
-                if (System.getenv(GECKO_DRIVER_PROPERTY) != null) {
-                    logger.info("get gecko driver from property:" + System.getenv(GECKO_DRIVER_PROPERTY));
-                    System.setProperty(GECKO_DRIVER_PROPERTY, System.getenv(GECKO_DRIVER_PROPERTY));
+                if (System.getenv(GeckoDriverService.GECKO_DRIVER_EXE_PROPERTY) != null) {
+                    logger.info("get gecko driver from property:" + System.getenv(GeckoDriverService.GECKO_DRIVER_EXE_PROPERTY));
+                    System.setProperty(GeckoDriverService.GECKO_DRIVER_EXE_PROPERTY, System.getenv(GeckoDriverService.GECKO_DRIVER_EXE_PROPERTY));
                 } else {
                     handleExtractResources();
                 }
@@ -73,7 +72,7 @@ public class MarionetteCapabilitiesFactory extends FirefoxCapabilitiesFactory {
             	logger.error(ex);
             }
         } else {
-            System.setProperty(GECKO_DRIVER_PROPERTY, edgeDriverPath);
+            System.setProperty(GeckoDriverService.GECKO_DRIVER_EXE_PROPERTY, edgeDriverPath);
         }
     }
     

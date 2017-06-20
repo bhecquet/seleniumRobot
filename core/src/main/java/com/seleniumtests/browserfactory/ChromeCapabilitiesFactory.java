@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.IOException;
 
 import org.openqa.selenium.Proxy;
+import org.openqa.selenium.chrome.ChromeDriverService;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
@@ -33,8 +34,6 @@ import com.seleniumtests.util.osutility.OSUtility;
 
 public class ChromeCapabilitiesFactory extends ICapabilitiesFactory {
 
-	private static final String CHROME_DRIVER_PROPERTY = "webdriver.chrome.driver";
-	
 	@Override
     public DesiredCapabilities createCapabilities(final DriverConfig webDriverConfig) {
 
@@ -96,7 +95,7 @@ public class ChromeCapabilitiesFactory extends ICapabilitiesFactory {
         
         if (webDriverConfig.getMode() == DriverMode.LOCAL) {
         	setChromeDriverLocal(webDriverConfig);
-        	capabilities.setCapability("chromedriverExecutable", System.getProperty(CHROME_DRIVER_PROPERTY));
+        	capabilities.setCapability("chromedriverExecutable", System.getProperty(ChromeDriverService.CHROME_DRIVER_EXE_PROPERTY));
         }
         
         return capabilities;
@@ -105,7 +104,7 @@ public class ChromeCapabilitiesFactory extends ICapabilitiesFactory {
     public void handleExtractResources() throws IOException {
     	BrowserInfo browserInfo = OSUtility.getInstalledBrowsersWithVersion().get(BrowserType.CHROME);
     	String driverPath = FileUtility.decodePath(new DriverExtractor().extractDriver(browserInfo.getDriverFileName()));
-    	System.setProperty(CHROME_DRIVER_PROPERTY, driverPath);
+    	System.setProperty(ChromeDriverService.CHROME_DRIVER_EXE_PROPERTY, driverPath);
         if (!OSUtility.isWindows()) {
             new File(driverPath).setExecutable(true);
         }
@@ -119,10 +118,10 @@ public class ChromeCapabilitiesFactory extends ICapabilitiesFactory {
         String chromeDriverPath = webDriverConfig.getChromeDriverPath();
         if (chromeDriverPath == null) {
             try {
-                if (System.getenv(CHROME_DRIVER_PROPERTY) != null) {
+                if (System.getenv(ChromeDriverService.CHROME_DRIVER_EXE_PROPERTY) != null) {
                     logger.info("get Chrome driver from property:" 
-                    			+ System.getenv(CHROME_DRIVER_PROPERTY));
-                    System.setProperty(CHROME_DRIVER_PROPERTY, System.getenv(CHROME_DRIVER_PROPERTY));
+                    			+ System.getenv(ChromeDriverService.CHROME_DRIVER_EXE_PROPERTY));
+                    System.setProperty(ChromeDriverService.CHROME_DRIVER_EXE_PROPERTY, System.getenv(ChromeDriverService.CHROME_DRIVER_EXE_PROPERTY));
                 } else {
                     handleExtractResources();
                 }
@@ -130,7 +129,7 @@ public class ChromeCapabilitiesFactory extends ICapabilitiesFactory {
             	logger.error(ex);
             }
         } else {
-            System.setProperty(CHROME_DRIVER_PROPERTY, chromeDriverPath);
+            System.setProperty(ChromeDriverService.CHROME_DRIVER_EXE_PROPERTY, chromeDriverPath);
         }
     }
 
