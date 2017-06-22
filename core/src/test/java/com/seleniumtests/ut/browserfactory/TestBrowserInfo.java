@@ -56,6 +56,21 @@ public class TestBrowserInfo extends MockitoTest {
 	}
 	
 	/**
+	 * Check we take the highest driver version matching this chrome version
+	 * @throws Exception 
+	 */
+	@Test(groups={"ut"})
+	public void testGetFilesFromList() throws Exception {
+		
+		List<String> driverList = Arrays.asList("chromedriver_2.28_chrome-55-57_android_7.0.exe", "chromedriver_2.29_chrome-56-58_android_7.0.exe", "chromedriver_2.30_chrome-58-60.exe");
+		BrowserInfo bInfo = PowerMockito.spy(new BrowserInfo(BrowserType.CHROME, "58.0", null));
+		BrowserInfo.setDriverList(driverList);
+		PowerMockito.doNothing().when(bInfo, "checkResourceExists");
+		
+		Assert.assertEquals(bInfo.getDriverFileName(), "chromedriver_2.30_chrome-58-60");
+	}
+	
+	/**
 	 * Check we can discover version inside a range of versions
 	 * @throws Exception 
 	 */

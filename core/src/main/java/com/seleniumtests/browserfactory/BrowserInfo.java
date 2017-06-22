@@ -1,6 +1,7 @@
 package com.seleniumtests.browserfactory;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -9,8 +10,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import org.apache.commons.io.Charsets;
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 
@@ -26,6 +25,7 @@ public class BrowserInfo {
 
 	private static final Pattern REG_CHROME_VERSION = Pattern.compile(".*chrome-(\\d+)-(\\d+).*");
 	private static final Pattern REG_ANDROID_VERSION = Pattern.compile(".*android-(\\d+\\.\\d+).*");
+	private static List<String> driverList;
 	
 	private String version;
 	private String path;
@@ -79,7 +79,11 @@ public class BrowserInfo {
 	}
 	
 	private List<String> getDriverFiles() throws IOException {
-		return IOUtils.readLines(getClass().getClassLoader().getResourceAsStream(String.format("drivers/%s/", os)), Charsets.UTF_8);
+		if (driverList != null) {
+			return driverList;
+		} else {
+			return IOUtils.readLines(getClass().getClassLoader().getResourceAsStream(String.format("drivers/%s/", os)), Charset.forName("UTF-8"));
+		}
 	}
 	
 	/**
@@ -90,7 +94,7 @@ public class BrowserInfo {
 		List<String> driverFiles = getDriverFiles();
 		driverFiles = driverFiles.stream()
 				.filter(s -> s.contains("chrome-") && s.startsWith("chromedriver_"))
-				.map(FilenameUtils::removeExtension)
+				.map(s -> s.replace(".exe", ""))
 				.sorted()
 				.collect(Collectors.toList());
 
@@ -140,7 +144,7 @@ public class BrowserInfo {
 		List<String> driverFiles = getDriverFiles();
 		driverFiles = driverFiles.stream()
 								.filter(s -> s.contains("android-") && s.startsWith("chromedriver_"))
-								.map(FilenameUtils::removeExtension)
+								.map(s -> s.replace(".exe", ""))
 								.sorted()
 								.collect(Collectors.toList());
 		
@@ -221,6 +225,14 @@ public class BrowserInfo {
 	public void setDriverFileName(String driverFileName) {
 		this.driverFileName = driverFileName;
 		driverFileSearched = true;
+	}
+
+	public static List<String> getDriverList() {
+		return driverList;
+	}
+
+	public static void setDriverList(List<String> driverList) {
+		BrowserInfo.driverList = driverList;
 	}
 
 }

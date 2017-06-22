@@ -26,6 +26,7 @@ import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.DriverMode;
 
 import io.appium.java_client.remote.AndroidMobileCapabilityType;
+import io.appium.java_client.remote.IOSMobileCapabilityType;
 import io.appium.java_client.remote.MobileCapabilityType;
 
 public class MobileDeviceSelector {
@@ -155,6 +156,7 @@ public class MobileDeviceSelector {
 		} else if ("ios".equalsIgnoreCase(selectedDevice.getPlatform())) {
 			capabilities.setCapability(MobileCapabilityType.UDID, selectedDevice.getId());
 			capabilities.setCapability(MobileCapabilityType.DEVICE_NAME, selectedDevice.getName());
+			capabilities.setCapability(IOSMobileCapabilityType.XCODE_CONFIG_FILE, System.getenv("APPIUM_HOME") + "/node_modules/appium/node_modules/appium-xcuitest-driver/WebDriverAgent/xcodeConfigFile.xcconfig");
 		}
 		capabilities.setCapability(MobileCapabilityType.PLATFORM_NAME, selectedDevice.getPlatform());
 		capabilities.setCapability(MobileCapabilityType.PLATFORM_VERSION, selectedDevice.getVersion());

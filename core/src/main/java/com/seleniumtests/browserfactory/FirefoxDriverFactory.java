@@ -29,7 +29,6 @@ import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.DriverConfig;
 import com.seleniumtests.util.helper.WaitHelper;
 import com.seleniumtests.util.osutility.OSUtility;
-import com.seleniumtests.util.osutility.OSUtilityFactory;
 
 public class FirefoxDriverFactory extends AbstractWebDriverFactory implements IWebDriverFactory {
     private long timeout = 1;
