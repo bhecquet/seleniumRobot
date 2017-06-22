@@ -91,12 +91,12 @@ public class CompositeActions {
 	 * @throws IllegalArgumentException
 	 * @throws IllegalAccessException
 	 */
-	@Before("call(public void org.openqa.selenium.remote.RemoteWebDriver.perform (..))")
+	@Before("execution(public void org.openqa.selenium.remote.RemoteWebDriver.perform (..))")
 	public void updateHandlesNewActions(JoinPoint joinPoint) throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
 
 		Collection<Sequence> sequences = (Collection<Sequence>)joinPoint.getArgs()[0];
+
 		for (Sequence sequence: sequences) {
-		
 			Field actionsField = Sequence.class.getDeclaredField("actions");
 			actionsField.setAccessible(true);
 			LinkedList<Interaction> actionsList = (LinkedList<Interaction>)actionsField.get(sequence);

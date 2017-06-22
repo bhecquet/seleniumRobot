@@ -53,18 +53,11 @@ public class SeleniumGridConnector {
         try {
         	HttpHost serverHost = new HttpHost(hubUrl.getHost(), hubUrl.getPort());
         	URIBuilder builder = new URIBuilder();
-        	builder.setPath("/grid/api/testsession?session=" + driver.getSessionId());
+        	builder.setPath("/grid/api/testsession/");
+        	builder.addParameter("session", driver.getSessionId().toString());
         	HttpPost httpPost = new HttpPost(builder.build());
 	        CloseableHttpResponse response = client.execute(serverHost, httpPost);
 
-//            HttpHost host = new HttpHost(hubHost, hubPort);
-//            
-//            String sessionUrl = "http://" + hub + ":" + port + "/grid/api/testsession?session=";
-//            URL session = new URL(sessionUrl + driver.getSessionId());
-//            BasicHttpEntityEnclosingRequest req;
-//            req = new BasicHttpEntityEnclosingRequest("POST", session.toExternalForm());
-//
-//            org.apache.http.HttpResponse response = client.execute(host, req);
             String responseContent = EntityUtils.toString(response.getEntity());
             
             JSONObject object = new JSONObject(responseContent);

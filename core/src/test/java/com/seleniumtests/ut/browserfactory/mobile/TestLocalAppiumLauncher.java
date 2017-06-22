@@ -17,6 +17,7 @@
 package com.seleniumtests.ut.browserfactory.mobile;
 
 import static org.mockito.Mockito.when;
+import static org.mockito.Matchers.contains;
 
 import java.io.File;
 import java.io.IOException;
@@ -157,7 +158,7 @@ public class TestLocalAppiumLauncher extends MockitoTest {
 		initValidAppiumInstallation();
 		initValidNodeInstallation();
 		
-		when(OSCommand.executeCommand("node /opt/appium//node_modules/appium/bin/appium.js --port 4723 ")).thenReturn(nodeProcess);
+		when(OSCommand.executeCommand(contains("node_modules/appium/"))).thenReturn(nodeProcess);
 		
 		LocalAppiumLauncher appium = new LocalAppiumLauncher();
 		appium.setAppiumPort(4723);
@@ -181,7 +182,7 @@ public class TestLocalAppiumLauncher extends MockitoTest {
 		initValidAppiumInstallation();
 		initValidNodeInstallation();
 		
-		when(OSCommand.executeCommand("node /opt/appium//node_modules/appium/bin/appium.js --port 4723 ")).thenReturn(nodeProcess);
+		when(OSCommand.executeCommand(contains("node_modules/appium/"))).thenReturn(nodeProcess);
 		
 		LocalAppiumLauncher appium = new LocalAppiumLauncher();
 		appium.setAppiumPort(4723);

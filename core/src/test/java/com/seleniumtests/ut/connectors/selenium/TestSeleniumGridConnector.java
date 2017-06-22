@@ -21,6 +21,7 @@ import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.remote.SessionId;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.annotations.BeforeMethod;
@@ -61,6 +62,7 @@ public class TestSeleniumGridConnector extends MockitoTest {
 		when(response.getStatusLine()).thenReturn(statusLine);
 		when(client.execute((HttpHost)anyObject(), anyObject())).thenReturn(response);
 		when(driver.getCapabilities()).thenReturn(capabilities);
+		when(driver.getSessionId()).thenReturn(new SessionId("0"));
 	}
 	
 	@Test(groups={"ut"})
@@ -78,7 +80,7 @@ public class TestSeleniumGridConnector extends MockitoTest {
 		connector.runTest(driver);
 		
 		PowerMockito.verifyStatic();
-		TestLogging.info("WebDriver is running on node node, firefox 50.0, session null");
+		TestLogging.info("WebDriver is running on node node, firefox 50.0, session 0");
 	}
 	
 	/**

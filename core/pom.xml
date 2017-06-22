@@ -348,6 +348,7 @@
 				<configuration>
 					<complianceLevel>1.8</complianceLevel>
 					<source>1.8</source>
+					<!-- <showWeaveInfo>true</showWeaveInfo> -->
 					<weaveDependencies>
 			            <weaveDependency>
 			              <groupId>org.seleniumhq.selenium</groupId>
