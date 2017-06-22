@@ -26,14 +26,14 @@ import com.seleniumtests.driver.DriverConfig;
 public class TestFirefoxDriverFactory extends GenericTest {
 
 	@Test(groups={"ut"})
-	public void testVersionChoice_v47() {
-		String versionString = "47.0";
+	public void testVersionChoice_v48() {
+		String versionString = "48.0";
 		Assert.assertEquals(new FirefoxDriverFactory(new DriverConfig()).useFirefoxVersion(versionString), false);
 	}
 	
 	@Test(groups={"ut"})
-	public void testVersionChoice_v46() {
-		String versionString = "46.0";
+	public void testVersionChoice_v47() {
+		String versionString = "47.0";
 		Assert.assertEquals(new FirefoxDriverFactory(new DriverConfig()).useFirefoxVersion(versionString), true);
 	}
 	

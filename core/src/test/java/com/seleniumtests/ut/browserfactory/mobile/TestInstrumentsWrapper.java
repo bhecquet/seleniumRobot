@@ -30,6 +30,7 @@ import com.seleniumtests.MockitoTest;
 import com.seleniumtests.browserfactory.mobile.InstrumentsWrapper;
 import com.seleniumtests.browserfactory.mobile.MobileDevice;
 import com.seleniumtests.customexception.ConfigurationException;
+import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.util.osutility.OSCommand;
 import com.seleniumtests.util.osutility.OSUtility;
 
@@ -93,7 +94,7 @@ public class TestInstrumentsWrapper extends MockitoTest {
 		Assert.assertEquals(devs.get(8).getVersion(), "10.3");
 		Assert.assertEquals(devs.get(8).getId(), "84DA8FFA-F743-4EA6-8E98-DC38165B9ACB");
 		Assert.assertEquals(devs.get(8).getPlatform(), "iOS");
-		Assert.assertEquals(devs.get(8).getBrowsers().get(0), "safari");
+		Assert.assertEquals(devs.get(8).getBrowsers().get(0).getBrowser(), BrowserType.SAFARI);
 		Assert.assertEquals(devs.get(9).getVersion(), "10.3.1");
 	}
 	

@@ -205,7 +205,7 @@ public class TestSeleniumTestContext extends GenericTest {
 			System.clearProperty("deviceName");
 		}
 	}
-	@Test(groups={"ut context"}, expectedExceptions=ConfigurationException.class)
+	@Test(groups={"ut context"})
 	public void testPlatformParsingForIOSWithoutVersion(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		try {
 			System.setProperty("platform", "iOS");
@@ -213,6 +213,7 @@ public class TestSeleniumTestContext extends GenericTest {
 			initThreadContext(testNGCtx);
 			SeleniumTestsContext seleniumTestsCtx = SeleniumTestsContextManager.getThreadContext();
 			Assert.assertEquals(seleniumTestsCtx.getPlatform(), "iOS");
+			Assert.assertEquals(seleniumTestsCtx.getMobilePlatformVersion(), null);
 		} finally {
 			System.clearProperty("platform");
 			System.clearProperty("deviceName");
