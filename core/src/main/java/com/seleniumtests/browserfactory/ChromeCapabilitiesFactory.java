@@ -32,6 +32,8 @@ import com.seleniumtests.driver.DriverMode;
 import com.seleniumtests.util.FileUtility;
 import com.seleniumtests.util.osutility.OSUtility;
 
+import io.appium.java_client.remote.AndroidMobileCapabilityType;
+
 public class ChromeCapabilitiesFactory extends ICapabilitiesFactory {
 
 	@Override
@@ -95,7 +97,7 @@ public class ChromeCapabilitiesFactory extends ICapabilitiesFactory {
         
         if (webDriverConfig.getMode() == DriverMode.LOCAL) {
         	setChromeDriverLocal(webDriverConfig);
-        	capabilities.setCapability("chromedriverExecutable", System.getProperty(ChromeDriverService.CHROME_DRIVER_EXE_PROPERTY));
+        	capabilities.setCapability(AndroidMobileCapabilityType.CHROMEDRIVER_EXECUTABLE, System.getProperty(ChromeDriverService.CHROME_DRIVER_EXE_PROPERTY));
         }
         
         return capabilities;

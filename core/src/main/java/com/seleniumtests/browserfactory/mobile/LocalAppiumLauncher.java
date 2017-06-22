@@ -27,6 +27,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.log4j.Logger;
 import org.json.JSONObject;
+import org.openqa.selenium.Platform;
 
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.ScenarioException;
@@ -55,16 +56,17 @@ public class LocalAppiumLauncher implements AppiumLauncher {
 
 	public LocalAppiumLauncher(String logDirectory) {
 
+		appiumPort = 4723 + Math.round(Math.random() * 1000);
 		if (logDirectory != null) {
 			new File(logDirectory).mkdirs();
 			if (new File(logDirectory).isDirectory()) {
-				logFile = Paths.get(logDirectory, "appium.log").toString();
+				logFile = Paths.get(logDirectory, String.format("appium-%d.log", appiumPort)).toString();
 			}
 		}
 		
 		checkInstallation();
 		generateOptions();
-		appiumPort = 4723 + Math.round(Math.random() * 1000);
+		
 	}
 	
 	public Process getAppiumProcess() {
@@ -88,7 +90,7 @@ public class LocalAppiumLauncher implements AppiumLauncher {
 	 */
 	private void generateOptions() {
 		if (logFile != null) {
-			optionString += String.format(" --log %s", logFile);
+			optionString += String.format(" --log %s --log-level debug:debug", logFile);
 		}
 	}
 
@@ -133,6 +135,10 @@ public class LocalAppiumLauncher implements AppiumLauncher {
 			throw new ConfigurationException("Node does not seem to be installed, is environment variable APPIUM_HOME set ?");
 		} else {
 			nodeVersion = reply;
+		}
+		
+		if (OSUtility.getCurrentPlatorm() == Platform.WINDOWS) {
+			nodeCommand = "cmd /c start cmd /C " + nodeCommand;
 		}
 	}
 	

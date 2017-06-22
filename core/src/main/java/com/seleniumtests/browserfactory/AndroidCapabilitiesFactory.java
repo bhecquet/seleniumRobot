@@ -19,7 +19,6 @@ package com.seleniumtests.browserfactory;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
-import com.seleniumtests.browserfactory.mobile.MobileDeviceSelector;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.DriverConfig;
 
@@ -45,16 +44,20 @@ public class AndroidCapabilitiesFactory extends ICapabilitiesFactory {
     public DesiredCapabilities createCapabilities(final DriverConfig cfg) {
 
     	DesiredCapabilities caps = new DesiredCapabilities(this.capabilities);
+    	String app = cfg.getApp();
+    	
     	if (!(cfg.getMobilePlatformVersion() == null) && Integer.parseInt(cfg.getMobilePlatformVersion().substring(0, 1)) < 4) {
     		caps.setCapability(MobileCapabilityType.AUTOMATION_NAME, "Selendroid");
     	} else {
     		caps.setCapability(MobileCapabilityType.AUTOMATION_NAME, "Appium");
     	}
     	
-    	if (cfg.isFullReset()) {
-    		caps.setCapability(MobileCapabilityType.FULL_RESET, "true");
-    	} else {
-    		caps.setCapability(MobileCapabilityType.FULL_RESET, "false");
+    	if (app != null && !"".equals(app.trim())) {
+	    	if (cfg.isFullReset()) {
+	    		caps.setCapability(MobileCapabilityType.FULL_RESET, "true");
+	    	} else {
+	    		caps.setCapability(MobileCapabilityType.FULL_RESET, "false");
+	    	}
     	}
     	caps.setCapability(MobileCapabilityType.PLATFORM_NAME, cfg.getPlatform());
     	
@@ -68,7 +71,6 @@ public class AndroidCapabilitiesFactory extends ICapabilitiesFactory {
     	caps.setCapability(MobileCapabilityType.DEVICE_NAME, cfg.getDeviceName());
 
     	// in case app has not been specified for cloud provider
-        String app = cfg.getApp();
         if (caps.getCapability(MobileCapabilityType.APP) == null) {
         	caps.setCapability(MobileCapabilityType.APP, app.replace("\\", "/"));
         }
