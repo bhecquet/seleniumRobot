@@ -52,11 +52,29 @@ public class TestUiActions extends GenericTest {
 	
 	/**
 	 * Test with the real driver, it should try to use new actions
+	 * TODO: this test takes 30 secs because new actions are not currently (3.4.0) supported by chromedriver, so we fall back to old behaviour
+	 * @throws Exception 
 	 */
-	@Test(groups={"it"})
+	@Test(groups={"it"}, enabled=false)
 	public void testNewAction() {
 		try {
 			new Actions(((CustomEventFiringWebDriver)driver).getWebDriver()).moveToElement(driver.findElement(By.id("carre2"))).click().build().perform();
+			Assert.assertEquals("coucou", driver.findElement(By.id("text2")).getAttribute("value"));
+		} finally {
+			new Actions(driver).moveToElement(driver.findElement(By.id("button2"))).click().build().perform();
+			Assert.assertEquals("", driver.findElement(By.id("text2")).getAttribute("value"));
+		}
+	}
+	
+	/**
+	 * TODO: same as test above
+	 * @throws Exception
+	 */
+	@Test(groups={"it"}, enabled=false)
+	public void testNewActionWithHtmlElement() throws Exception {
+		try {
+			DriverTestPage testPage = new DriverTestPage(false);
+			new Actions(((CustomEventFiringWebDriver)driver).getWebDriver()).moveToElement(testPage.redSquare).click().build().perform();
 			Assert.assertEquals("coucou", driver.findElement(By.id("text2")).getAttribute("value"));
 		} finally {
 			new Actions(driver).moveToElement(driver.findElement(By.id("button2"))).click().build().perform();

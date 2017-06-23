@@ -22,6 +22,7 @@ import org.aspectj.lang.annotation.Aspect;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.UnhandledAlertException;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.interactions.CompositeAction;
 import org.openqa.selenium.remote.UnreachableBrowserException;
@@ -151,15 +152,10 @@ public class ReplayAction {
 	 * Replays the composite action in case any error occurs
 	 * @param joinPoint
 	 */
-	@Around("call(public void org.openqa.selenium.interactions.Action+.perform ())")
+	@Around("execution(public void org.openqa.selenium.interactions.Actions.BuiltAction.perform ())")
 	public Object replayCompositeAction(ProceedingJoinPoint joinPoint) throws Throwable {
-		
-		// do replay only global perform
-		if (!(joinPoint.getTarget() instanceof CompositeAction)) {
-			return joinPoint.proceed(joinPoint.getArgs());
-		}
-		
 		return replay(joinPoint);
+
 	}
 	
     
