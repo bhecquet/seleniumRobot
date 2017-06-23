@@ -17,7 +17,7 @@
 package com.seleniumtests.ut.browserfactory.mobile;
 
 import static org.mockito.Mockito.when;
-import static org.mockito.Matchers.contains;
+import static org.mockito.ArgumentMatchers.contains;
 
 import java.io.File;
 import java.io.IOException;

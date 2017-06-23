@@ -16,7 +16,6 @@
  */
 package com.seleniumtests.ut.uipage.htmlelements;
 
-import static org.mockito.Matchers.anyObject;
 import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
@@ -25,22 +24,16 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-
-import org.mockito.Matchers;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.interactions.Mouse;
 import org.openqa.selenium.interactions.internal.Coordinates;
-import org.openqa.selenium.remote.CommandExecutor;
-import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.remote.DriverCommand;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.RemoteWebElement;
-import org.openqa.selenium.remote.Response;
-import org.openqa.selenium.remote.SessionId;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.annotations.BeforeMethod;
@@ -51,12 +44,10 @@ import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.util.helper.WaitHelper;
 
-import io.appium.java_client.AppiumDriver;
-
-@PrepareForTest({WebUIDriver.class, WaitHelper.class})
+@PrepareForTest({WebUIDriver.class, WaitHelper.class, RemoteWebDriver.class})
 public class TestCompositeActions extends MockitoTest {
 
-	@Mock
+//	@Mock
 	private RemoteWebDriver driver;
 	
 	@Mock
@@ -72,14 +63,17 @@ public class TestCompositeActions extends MockitoTest {
 	
 
 	@BeforeMethod(groups={"ut"})
-	private void init() {
+	private void init() throws Exception {
+		
+		driver = PowerMockito.mock(RemoteWebDriver.class);
 		
 		eventDriver = spy(new CustomEventFiringWebDriver(driver));
 		
 		PowerMockito.mockStatic(WebUIDriver.class);
 		when(WebUIDriver.getWebDriver()).thenReturn(eventDriver);
 		when(driver.getMouse()).thenReturn(mouse);
-
+		Mockito.doCallRealMethod().when(driver).perform(ArgumentMatchers.anyCollection());
+		
 	}
 	
 	/**
@@ -109,23 +103,10 @@ public class TestCompositeActions extends MockitoTest {
 	 * @throws Exception
 	 */
 	@Test(groups={"ut"})
-	public void testUpdateHandlesNewActions() throws Exception {
-		CommandExecutor ce = Mockito.mock(CommandExecutor.class);
-		Response response = new Response(new SessionId("1"));
-		response.setValue(new HashMap<String, Object>());
-		Response findResponse = new Response(new SessionId("1"));
-		findResponse.setValue(element);
-
-		// newSession, getSession, getSession, findElement
-		when(ce.execute(anyObject())).thenReturn(response, response, response, findResponse);
-		driver = new RemoteWebDriver(ce, new DesiredCapabilities());
-
-		eventDriver = spy(new CustomEventFiringWebDriver(driver));
-		when(WebUIDriver.getWebDriver()).thenReturn(eventDriver);
-		
+	public void testUpdateHandlesNewActions() throws Exception {	
 		new Actions(eventDriver.getWebDriver()).click().perform();
 		
-		// check handled are updated on click
+		// check handles are updated on click
 		verify(eventDriver).updateWindowsHandles();
 	}
 	
@@ -160,6 +141,39 @@ public class TestCompositeActions extends MockitoTest {
 	 */
 	@Test(groups={"ut"})
 	public void testReplayOnPerform() {
+		when(element.getCoordinates()).thenReturn(coordinates);
+		doThrow(new WebDriverException("error clicking")).doNothing().when(mouse).click(coordinates);
+		
+		new Actions(eventDriver).click(element).perform();
+
+		verify(mouse, times(2)).click(coordinates);
+	}
+	
+	/**
+	 * Test replay of CompositeAction
+	 * TODO: to complete when real drivers will be able to handle new actions (e.g: chrome)
+	 * @throws Exception 
+	 */
+	@Test(groups={"ut"}, enabled=false)
+	public void testReplayOnSearchNewActions() throws Exception {
+//		PowerMockito.doCallRealMethod().when(driver, "execute", ArgumentMatchers.eq(DriverCommand.ACTIONS), ArgumentMatchers.anyMap());
+//		
+		when(element.getCoordinates()).thenThrow(WebDriverException.class).thenThrow(WebDriverException.class).thenReturn(coordinates);
+		new Actions(eventDriver.getWebDriver()).click(element).perform();
+		System.out.println(Mockito.mockingDetails(element).printInvocations());
+		
+		
+		// coordinates search is done 3 times, because of errors
+		verify(element, atLeast(3)).getCoordinates();
+
+	}
+	
+	/**
+	 * Test replay when error occurs in any part of the action (except search)
+	 * TODO: same as above
+	 */
+	@Test(groups={"ut"}, enabled=false)
+	public void testReplayOnPerformNewActions() {
 		when(element.getCoordinates()).thenReturn(coordinates);
 		doThrow(new WebDriverException("error clicking")).doNothing().when(mouse).click(coordinates);
 		

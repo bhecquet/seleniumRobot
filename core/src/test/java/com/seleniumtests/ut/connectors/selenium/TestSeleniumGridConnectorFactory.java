@@ -1,7 +1,7 @@
 package com.seleniumtests.ut.connectors.selenium;
 
 
-import static org.mockito.Matchers.anyObject;
+import static org.mockito.ArgumentMatchers.anyObject;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
