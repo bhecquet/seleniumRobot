@@ -19,6 +19,7 @@ package com.seleniumtests.browserfactory.mobile;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.util.List;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -35,6 +36,8 @@ import com.seleniumtests.util.helper.WaitHelper;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 import com.seleniumtests.util.osutility.OSCommand;
 import com.seleniumtests.util.osutility.OSUtility;
+import com.seleniumtests.util.osutility.OSUtilityFactory;
+import com.seleniumtests.util.osutility.ProcessInfo;
 import com.vdurmont.semver4j.Semver;
 
 public class LocalAppiumLauncher implements AppiumLauncher {
@@ -44,9 +47,11 @@ public class LocalAppiumLauncher implements AppiumLauncher {
 	private String nodeVersion;
 	private String nodeCommand;
 	private Process appiumProcess;
+	private ProcessInfo appiumNodeProcess;
 	private long appiumPort;
 	private String logFile = null;
 	private String optionString = "";
+	private static Object appiumLauncherLock = new Object();
 
 	private static Logger logger = SeleniumRobotLogger.getLogger(LocalAppiumLauncher.class);
 	
@@ -172,11 +177,29 @@ public class LocalAppiumLauncher implements AppiumLauncher {
 		return String.format("http://localhost:%d/wd/hub/", appiumPort);
 	}
 	
+	/**
+	 * Start appium and wait for availability
+	 * To work around windows launching, which spawns a new cmd (we cannot stop the underlying node process), 
+	 * get the node process PID associated to the newly created appium
+	 */
 	public void startAppiumWithWait() {
-		startAppiumWithoutWait();
 		
-		// wait for startup
-		waitAppiumAlive();
+		synchronized(appiumLauncherLock) {
+			
+			List<ProcessInfo> nodeProcessesInitial = OSUtilityFactory.getInstance().getRunningProcesses("node");
+		
+			startAppiumWithoutWait();
+			
+			// wait for startup
+			waitAppiumAlive();
+			
+			for (ProcessInfo nodeProcess: OSUtilityFactory.getInstance().getRunningProcesses("node")) {
+				if (!nodeProcessesInitial.contains(nodeProcess)) {
+					appiumNodeProcess = nodeProcess;
+					break;
+				}
+			}
+		}
 	}
 	
 	public void startAppiumWithoutWait() {
@@ -186,7 +209,7 @@ public class LocalAppiumLauncher implements AppiumLauncher {
 		if (OSUtility.isMac()) {
 			OSCommand.executeCommand("killall iproxy xcodebuild XCTRunner");
 		}
-		
+
 		Semver appiumVers = new Semver(appiumVersion);
 		if (appiumVers.isGreaterThan("1.6.0") || appiumVers.isEqualTo("1.6.0")) {
 			appiumProcess = OSCommand.executeCommand(String.format("%s %s/node_modules/appium/ --port %d %s", 
@@ -200,7 +223,7 @@ public class LocalAppiumLauncher implements AppiumLauncher {
 										appiumHome, 
 										appiumPort,
 										optionString));
-		}
+		}	
 	}
 	
 	/**
@@ -220,6 +243,10 @@ public class LocalAppiumLauncher implements AppiumLauncher {
 			throw new ScenarioException("Appium process has never been started");
 		}
 		appiumProcess.destroy();
+		
+		if (appiumNodeProcess != null) {
+			OSUtilityFactory.getInstance().killProcess(appiumNodeProcess.getPid(), true);
+		}
 		
 	}
 	

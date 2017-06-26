@@ -23,17 +23,25 @@ import cucumber.api.java.en_au.ButattheendofthedayIreckon;
 public class TestWithAllBrowsers extends SeleniumTestPlan {
 	
 	private static WebServer server;
+	private static String localAddress;
 	
 	@BeforeClass(groups={"tnr"})
 	public static void exposeTestPage() throws Exception {
         server = new WebServer("/index.html");
         server.expose();
+        
+        localAddress = System.getProperty("localAddress");
+        if (localAddress == null) {
+        	logger.warn("localAddress system property has not been defined, reverse to default value may cause test to fail");
+        	logger.warn("Define it with '-DlocalAddress=A.B.C.D' when launching test");
+        	localAddress = "127.0.0.1"; // default localhost for android emulator
+        }
 	}
 
 	@Test(groups={"tnr"}, dataProvider="browsers")
 	public void testSearch(String browser) throws Exception {
 		SeleniumTestsContextManager.getThreadContext().setBrowser(browser);
-		DemoPage demo = new DemoPage(String.format("%s/index.html", server.getServerHost().toURI())).fillForm();
+		DemoPage demo = new DemoPage(String.format("http://%s:%d/index.html", localAddress, server.getServerHost().getPort())).fillForm();
 		Assert.assertEquals(demo.getText(), "hello");
 	}
 	

@@ -119,15 +119,26 @@ public abstract class OSUtility {
      * @return ProcessInfo
      */
     public ProcessInfo getRunningProcess(String processName) {
+    	try {
+    		return getRunningProcesses(processName).get(0);	
+    	} catch (IndexOutOfBoundsException e) {
+    		return null;
+    	}
+    }
+    
+    /**
+     * @param name of the process
+     * @return ProcessInfo
+     */
+    public List<ProcessInfo> getRunningProcesses(String processName) {
     	
-    	ProcessInfo output = new ProcessInfo();
+    	List<ProcessInfo> processes = new ArrayList<>();
     	for (ProcessInfo processInfo : getRunningProcessList()) {
     		if (processInfo.getName().equalsIgnoreCase(processName)){
-    			output = processInfo;
-				break;
+    			processes.add(processInfo);
     		}
     	}
-    	return output;
+    	return processes;
     }
     
     /**

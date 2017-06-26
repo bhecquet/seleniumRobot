@@ -40,19 +40,19 @@ public class TestWithAndroid extends SeleniumTestPlan {
 		Assert.assertEquals(demo.getText(), "hello");
 	}
 	
-	@Test(groups={"tnr"})
-	public void testMobileApp() throws Exception {
-		
-		File apk = File.createTempFile("application-", ".apk");
-		FileUtils.copyInputStreamToFile(getClass().getClassLoader().getResourceAsStream("apps/android/TestRoom.Android-x86.apk"), apk);
-
-		SeleniumTestsContextManager.getThreadContext().setAppActivity("md5275aec19faed04d28d11ce353acee8a9.MainActivity");
-		SeleniumTestsContextManager.getThreadContext().setAppPackage("TestRoom.Android");
-		SeleniumTestsContextManager.getThreadContext().setApp(apk.getAbsolutePath());
-		SeleniumTestsContextManager.getThreadContext().updateTestAndMobile("android");
-		TestRoomHome demo = new TestRoomHome().fillForm();
-		Assert.assertEquals(demo.getText(), "hello");
-	}
+//	@Test(groups={"tnr"})
+//	public void testMobileApp() throws Exception {
+//		
+//		File apk = File.createTempFile("application-", ".apk");
+//		FileUtils.copyInputStreamToFile(getClass().getClassLoader().getResourceAsStream("apps/android/TestRoom.Android-x86.apk"), apk);
+//
+//		SeleniumTestsContextManager.getThreadContext().setAppActivity("md5275aec19faed04d28d11ce353acee8a9.MainActivity");
+//		SeleniumTestsContextManager.getThreadContext().setAppPackage("TestRoom.Android");
+//		SeleniumTestsContextManager.getThreadContext().setApp(apk.getAbsolutePath());
+//		SeleniumTestsContextManager.getThreadContext().updateTestAndMobile("android");
+//		TestRoomHome demo = new TestRoomHome().fillForm();
+//		Assert.assertEquals(demo.getText(), "hello");
+//	}
 	
 	@AfterClass(groups={"tnr"})
 	public static void stop() throws Exception {
