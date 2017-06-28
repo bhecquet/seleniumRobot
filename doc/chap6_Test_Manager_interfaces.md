@@ -133,7 +133,16 @@ This command will update the test application to its latest release from maven r
 From ALM v11 HP ALM can run seleniumRobot tests using VBScript connector
 
 *WARNING*: This connector is not currently fully fonctional as launch_SeleniumRobot.bat script does not exist anymore
-VBS script should be updated, for example, using a direct java call with JVM options and TestNG parameters lcearly identified 
+VBS script should be updated, for example, using a direct java call with JVM options and TestNG parameters lcearly identified
+
+#### 3.0 Configure environment to access HP ALM ####
+
+Put connection information into env.ini file:
+- hpAlmServerUrl: url to server. It should not contain the '/qcbin' part
+- hpAlmProject: project to connect to
+- hpAlmDomain: domain of the project
+- hpAlmUser: user
+- hpAlmPassword: password 
  
 #### 3.1 Configure test runner computer ####
  
