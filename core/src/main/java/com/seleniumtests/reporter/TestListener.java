@@ -50,6 +50,11 @@ import com.seleniumtests.driver.screenshots.ScreenShot;
 import com.seleniumtests.driver.screenshots.ScreenshotUtil;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
+/**
+ * Class for modifying test results when some events occur (assertion, test retry, ...)
+ * @author behe
+ *
+ */
 public class TestListener implements IInvokedMethodListener, ITestListener {
 	
 	private static final String RESOURCE_LOADER_PATH = "org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader";
@@ -86,39 +91,6 @@ public class TestListener implements IInvokedMethodListener, ITestListener {
 	
 	public Map<String, Boolean> getIsRetryHandleNeeded() {
 		return isRetryHandleNeeded;
-	}
-
-	/**
-	 * Initializes the VelocityEngine
-	 * @return
-	 * @throws Exception
-	 */
-	protected VelocityEngine initVelocityEngine() throws Exception {
-		VelocityEngine ve = new VelocityEngine();
-		ve.setProperty("resource.loader", "class");
-		ve.setProperty("class.resource.loader.class", RESOURCE_LOADER_PATH);
-		ve.init();
-		return ve;
-	}
-	
-
-	/**
-	 * create writer used for writing report file
-	 * @param outDir
-	 * @param fileName
-	 * @return
-	 * @throws IOException
-	 */
-	protected PrintWriter createWriter(final String outDir, final String fileName) throws IOException {
-		System.setProperty("file.encoding", "UTF8");
-		uuid = uuid.replaceAll(" ", "-").replaceAll(":", "-");
-
-		File f = new File(outDir, fileName);
-		logger.info("generating report " + f.getAbsolutePath());
-
-		OutputStream out = new FileOutputStream(f);
-		Writer writer = new BufferedWriter(new OutputStreamWriter(out, "utf-8"));
-		return new PrintWriter(writer);
 	}
 	
 	@Override

@@ -1,0 +1,307 @@
+package com.seleniumtests.connectors.mails;
+
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import javax.mail.MessagingException;
+
+import org.apache.log4j.Logger;
+
+import com.seleniumtests.util.helper.WaitHelper;
+import com.seleniumtests.util.logging.SeleniumRobotLogger;
+
+public abstract class EmailClientImpl implements EmailClient {
+
+	protected static final Logger logger = SeleniumRobotLogger.getLogger(EmailClientImpl.class);
+	
+	public enum SearchMode {
+		BY_DATE, BY_INDEX
+	}
+	
+	protected SearchMode searchMode;
+	protected LocalDateTime fromDate;
+	protected Integer lastMessageIndex;
+	protected String folder;
+	
+	public EmailClientImpl() {
+		searchMode = SearchMode.BY_INDEX;
+		lastMessageIndex = 0;
+		
+		// date from which messages should be searched
+		fromDate = LocalDateTime.now();
+	}
+	
+	/**
+	 * Return list of emails since last server request
+	 * 
+	 * @param folderName	folder to read on server
+	 * @return list of received emails
+	 * @throws Exception 
+	 */
+	@Override
+	public List<Email> getLastEmails(String folderName) throws Exception {
+	
+		if (searchMode == SearchMode.BY_INDEX) {
+			return getEmails(folderName, getLastMessageIndex());
+		} else {
+			return getEmails(folderName, fromDate);
+		}
+	}
+	
+	/**
+	 * Return list of email received from the date in parameter in given folder
+	 * @param folderName		name of folder to read
+	 * @param firstMessageTime	date from which we should get messages
+	 * @return	email list
+	 */
+	@Override
+	public List<Email> getEmails(String folderName, LocalDateTime firstMessageTime) throws Exception {
+		return getEmails(folderName, lastMessageIndex, firstMessageTime);
+	}
+	
+	/**
+	 * Return list of email in server folder
+	 * 
+	 * @param folderName	name of folder to read
+	 * @param firstMessageTime	date from which we should get messages
+	 * @throws MessagingException
+	 * @throws IOException
+	 */
+	@Override
+	public List<Email> getEmails(String folderName, Integer firstMessageIndex) throws Exception {
+		return getEmails(folderName, firstMessageIndex, fromDate);
+	}
+	
+	/**
+	 * Returns email list since last server request
+	 * @return	email list
+	 * @throws Exception 
+	 */
+	@Override
+	public List<Email> getLastEmails() throws Exception {
+		return getLastEmails(folder);
+	}
+	
+	/**
+	 * Return list of email in server folder
+	 * 
+	 * @param firstMessageTime	date from which we should get messages
+	 * @throws Exception 
+	 */
+	@Override
+	public List<Email> getEmails(Integer firstMessageIndex) throws Exception {
+		return getEmails(folder, firstMessageIndex, fromDate);
+	}
+
+	/**
+	 * Return list of email received from the date in parameter 
+	 * @param firstMessageTime	date from which we should get messages
+	 * @return	email list
+	 */
+	@Override
+	public List<Email> getEmails(LocalDateTime firstMessageTime) throws Exception {
+		return getEmails(folder, lastMessageIndex, firstMessageTime);
+	}
+	
+	/**
+	 * Check that email whose subject and attachements are specified have been received
+	 * @param subject			subject title. Regex are accepted
+	 * @param attachmentNames	list of attachment names. Regex are allowed
+	 * 
+	 * @return null if no email found or list of missing attachments if an email has been found
+	 */
+	@Override
+	public List<String> checkMessagePresenceInLastMessages(String subject, String[] attachmentNames) throws Exception {
+		return checkMessagePresenceInLastMessages(subject, Arrays.asList(attachmentNames));
+	}
+	
+	/**
+	 * Check that email whose subject and attachements are specified have been received
+	 * @param subject			subject title. Regex are accepted
+	 * @param attachmentNames	list of attachment names. Regex are allowed
+	 * 
+	 * @return null if no email found or list of missing attachments if an email has been found
+	 * @throws Exception 
+	 */
+	@Override
+	public List<String> checkMessagePresenceInLastMessages(String subject, List<String> attachmentNames) throws Exception {
+		return checkMessagePresenceInLastMessages(subject, attachmentNames, new Email());
+	}
+	
+	/**
+	 * Check that email whose subject and attachements are specified have been received
+	 * @param subject			subject title. Regex are accepted
+	 * @param attachmentNames	list of attachment names. Regex are allowed
+	 * @param email				an empty email which will store found email
+	 * 
+	 * @return null if no email found or list of missing attachments if an email has been found
+	 * @throws Exception 
+	 */
+	@Override
+	public List<String> checkMessagePresenceInLastMessages(String subject, String[] attachmentNames, Email email) throws Exception {
+		return checkMessagePresenceInLastMessages(subject, Arrays.asList(attachmentNames), email);
+	}
+
+	/**
+	 * Check that email whose subject and attachements are specified have been received
+	 * @param subject			subject title. Regex are accepted
+	 * @param attachmentNames	list of attachment names. Regex are allowed
+	 * @param emailOut			an empty email which will store found email
+	 * 
+	 * @return null if no email found or list of missing attachments if an email has been found
+	 * @throws Exception 
+	 */
+	@Override
+	public List<String> checkMessagePresenceInLastMessages(String subject, List<String> attachmentNames, Email emailOut) throws Exception {
+		
+		List<Email> emailList = getEmails(subject);
+		List<String> matchingMissingAttachments = null;
+		
+		// try several times
+		for (int i = 0; i < 10; i++) {
+			
+			for (Email email: emailList) {
+				List<String> missingAttachments = new ArrayList<String>();
+				missingAttachments.addAll(attachmentNames);
+
+				// do we have the requested attachments
+				for (String attachmentName: attachmentNames) {
+
+					for (String emailAttachment: email.getAttachment()) {
+						if (emailAttachment.matches(attachmentName)) {
+							missingAttachments.remove(attachmentName);
+							break;
+						}
+					}
+				}
+				emailOut.setSubject(email.getSubject());
+				emailOut.setSender(email.getSender());
+				emailOut.setContent(email.getContent());
+				emailOut.setDatetime(email.getDatetime());
+				emailOut.setAttachment(email.getAttachment());
+				
+				// title and attachments OK
+				if (missingAttachments.isEmpty()) {
+					return missingAttachments;
+				} else {
+					matchingMissingAttachments = missingAttachments.subList(0, missingAttachments.size());
+				}
+			}
+			
+			// non found retry with last received emails
+			emailList.addAll(getEmails(subject));
+			
+			WaitHelper.waitForSeconds(10);
+		}
+		
+		return matchingMissingAttachments;
+	}
+	
+	/**
+	 * Check that email whose subject and attachments are specified have been received
+	 * several retries are done in case it's not available
+	 * 
+	 * @param subject			subject title. Regex are accepted
+	 * @param attachmentNames	list of attachment names. Regex are allowed
+	 * 
+	 * @return 					found email
+	 * @throws Exception 
+	 */
+	@Override
+	public Email getEmail(String subject, String[] attachmentNames) throws Exception {
+		return getEmail(subject, Arrays.asList(attachmentNames));
+	}
+	
+	/**
+	 * Check that email whose subject and attachments are specified have been received
+	 * several retries are done in case it's not available
+	 * 
+	 * @param subject			subject title. Regex are accepted
+	 * @param attachmentNames	list of attachment names. Regex are allowed
+	 * 
+	 * @return 					found email
+	 * @throws Exception 
+	 */
+	@Override
+	public Email getEmail(String subject, List<String> attachmentNames) throws Exception {
+		
+		List<Email> emailList = getEmails(subject);
+		
+		// check several times
+		for (int i = 0; i < 10; i++) {
+			
+			for (Email email: emailList) {
+				// do we have the whole list of attachments
+				Boolean attachmentsFound = true;
+				for (String attachmentName: attachmentNames) {
+					Boolean attachmentFound = false;
+					for (String emailAttachment: email.getAttachment()) {
+						if (emailAttachment.matches(attachmentName)) {
+							attachmentFound = true;
+							break;
+						}
+					}
+					attachmentsFound = attachmentsFound && attachmentFound;
+				}
+				
+				// title and attachments OK
+				if (attachmentsFound) {
+					return email;
+				}
+			}
+			
+			// non found retry with last received emails
+			emailList.addAll(getEmails(subject));
+			
+			WaitHelper.waitForSeconds(5);
+		}
+		
+		return null;
+	}
+	
+	/**
+	 * Returns list of newly received email whose title matches subject
+	 * 
+	 * @param subject			subject title. Regex are accepted
+	 * @return 					email list
+	 * @throws Exception 
+	 */
+	public List<Email> getEmails(String subject) throws Exception {
+
+		List<Email> matchingEmails = new ArrayList<>();
+
+		List<Email> lastEmails = getLastEmails();
+		for (Email email: lastEmails) {
+			
+			// does title matches
+			if (email.getSubject().matches(subject)) {
+				matchingEmails.add(email);
+			}
+		}
+
+		return matchingEmails;
+	}
+
+	@Override
+	public SearchMode getSearchMode() {
+		return searchMode;
+	}
+
+	@Override
+	public void setSearchMode(SearchMode searchMode) {
+		this.searchMode = searchMode;
+	}
+
+	@Override
+	public LocalDateTime getFromDate() {
+		return fromDate;
+	}
+
+	@Override
+	public void setFromDate(LocalDateTime fromDate) {
+		this.fromDate = fromDate;
+	}
+}

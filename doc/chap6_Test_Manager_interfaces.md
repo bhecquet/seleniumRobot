@@ -127,3 +127,93 @@ This command will update the test application to its latest release from maven r
   ![](images/jenkins_job_publish_perf.png)
 
   ![](images/jenkins_job_publish_testng.png)
+  
+### 3 HP ALM ###
+ 
+From ALM v11 HP ALM can run seleniumRobot tests using VBScript connector
+
+*WARNING*: This connector is not currently fully fonctional as launch_SeleniumRobot.bat script does not exist anymore
+VBS script should be updated, for example, using a direct java call with JVM options and TestNG parameters lcearly identified 
+ 
+#### 3.1 Configure test runner computer ####
+ 
+Create `SELENIUMROBOT_HOME` environment variable, pointing to the path where robot is available (unzipped, presence of launch.bat file)
+ 
+#### 3.2 Create test on ALM ####
+ 
+In ALM, create a VAPI-XP test
+
+![](images/alm_vapi.png)
+
+Click 'OK'
+
+![](images/alm_vbscript.png)
+
+Keep 'VBSCript' and click 'Next'
+
+![](images/alm_console.png)
+
+Choose 'Console application' and click 'Finish'
+
+#### 3.3 Test script ####
+
+In Test plan, go to newly created test, "Test script" tab and paste the following content
+ 	
+
+	' ----------------------------------------------------
+	' Main Test Function
+	' Debug - Boolean. Equals to false if running in [Test Mode] : reporting to Quality Center
+	' CurrentTestSet - [OTA COM Library].TestSet.
+	' CurrentTSTest - [OTA COM Library].TSTest.
+	' CurrentRun - [OTA COM Library].Run.
+	' ----------------------------------------------------
+	Sub Test_Main(Debug, CurrentTestSet, CurrentTSTest, CurrentRun)
+	  ' *** VBScript Limitation ! ***
+	  ' "On Error Resume Next" statement suppresses run-time script errors.
+	  ' To handle run-time error in a right way, you need to put "If Err.Number <> 0 Then"
+	  ' after each line of code that can cause such a run-time error.
+	  On Error Resume Next
+	
+	  ' clear output window
+	  TDOutput.Clear
+	
+	  seleniumRobotHome = CreateObject( "WScript.Shell" ).Environment( "SYSTEM" )("SELENIUMROBOT_HOME") & "\launch_seleniumRobot.bat"
+	  
+	  options = ""
+	  With CurrentTSTest.Params
+	    For i = 0 To .Count - 1
+	      options = options & "-D" & Trim(.ParamName(i)) & "=" & .ParamValue(i) & " "
+	    Next
+	  End With
+	
+	
+	  ' Run seleniumBot application
+	  result = XTools.run(seleniumRobotHome , options & " -Dtms={'type':'hp','run':" & CurrentRun.ID & "}", -1)
+	
+	  If Err.Number <> 0 Or result <> 0 Then
+	    TDOutput.Print "Run-time error [" & Err.Number & "] : " & Err.Description
+	    ' update execution status in "Test" mode
+	    If Not Debug Then
+	      CurrentRun.Status = "Failed"
+	      CurrentTSTest.Status = "Failed"
+	    End If
+	  End If
+	End Sub
+	
+#### 3.4 test parameters ####
+	
+In 'parameters' tab, add specific test parameters 
+
+![](images/alm_parameters.png)
+
+#### 3.5 Run test ####
+
+In test lab, create a test set with this automated test. Double click test instance and configure "execution settings"
+
+![](images/alm_runtest.png)
+
+Test run is possible when actual values are configured. You can use "copy default values" if they are correct. When test finishes, robot records test details as a test attachment
+
+![](images/alm_result.png)
+
+

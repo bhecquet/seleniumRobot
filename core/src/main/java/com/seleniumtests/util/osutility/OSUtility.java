@@ -356,5 +356,7 @@ public abstract class OSUtility {
 	public static Map<BrowserType, BrowserInfo> getInstalledBrowsersWithVersion() {
 		return installedBrowsersWithVersion;
 	}
+	
+	
     
 }

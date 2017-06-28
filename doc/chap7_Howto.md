@@ -49,3 +49,73 @@ SeleniumRobot exposes 2 elements to work with images
 
 Behind the scene, PictureElement takes a screenshot, and then uses openCV to search the picture inside the screenshot. Rotation and resizing are supported.
 The `intoElement` parameters helps scrolling in page. It must be an element right above the picture to search, or the element enclosing this picture. If not specified, no scrolling will be done
+
+### 5 Working with PDF files ###
+
+Sometimes, it's useful to read PDF files and extract content. Formatting is lost but text remains using the following code
+
+	PDDocument document = PDDocument.load(fichierPdf);
+	if (document.isEncrypted()) {
+		document.decrypt("");
+	}
+	document.setAllSecurityToBeRemoved(true);
+	PDFTextStripper s = new PDFTextStripper();
+	s.getText(document);
+			
+PDDocument is available through maven dependencies
+
+	<dependency>
+        <groupId>org.apache.pdfbox</groupId>
+        <artifactId>pdfbox</artifactId> 
+        <version>1.8.9</version>
+    </dependency>
+    <dependency>
+        <groupId>org.bouncycastle</groupId>
+        <artifactId>bcmail-jdk15</artifactId> 
+        <version>1.44</version>
+    </dependency> 
+    <dependency>
+        <groupId>org.bouncycastle</groupId>
+        <artifactId>bcprov-jdk15</artifactId> 
+        <version>1.44</version>
+    </dependency>
+    
+### 6 Accessing remote computer through SSH or SCP ###
+
+To retrieve file from remote to local
+
+	Scp scp = new Scp(<sshHost>, <sshUser>, <sshPassword>, null, false);
+	scp.connect();  
+	scp.transfertFile(new File(<remote file>), new File(<local file>));
+	scp.disconnect();
+	
+To execute command on remte
+
+	Ssh ssh = new Ssh(<sshHost>, <sshUser>, <sshPassword>, null, false);
+	ssh.connect();  
+	ssh.executeCommand(<my command>);
+	ssh.disconnect();
+	
+### 7 execute requests via SOAP UI ###
+
+When someone already created SOAP UI request to test a service, reuse can be time saving
+Either use directly the project file, or change content to adapt it to your data set or environment and execute project string
+
+		SoapUi soapUi = new SoapUi();
+		String reply = soapUi.executeWithProjectString(<project_content>, "myProject");
+		
+### 8 Using database ###
+
+For now, only Oracle database is supported
+You must provide the ojdb6.jar file into src/lib folder so that it can be automatically installed in maven local repository when doing `mvn clean`
+connection and disconnection are done automatically
+
+	Oracle db = new Oracle(<dbName>, <dbHost>, <dbPort>, <dbUser>, <dbPassword>);
+	db.executeParamQuery("SELECT * FROM TAB1 WHERE id=?", id);
+	
+### 9 Using emails ###
+
+SeleniumRobot provides several email clients to allow reading email content and attachments
+
+	EmailAccount account = EmailAccount(<email_address>, <login>, <password>);
+	Email emailFound = account.checkEmailPresence(<email_title>, new String[] {"attachment1"});
