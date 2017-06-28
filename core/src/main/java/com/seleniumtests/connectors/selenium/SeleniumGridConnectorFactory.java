@@ -25,6 +25,10 @@ import com.seleniumtests.util.logging.SeleniumRobotLogger;
 public class SeleniumGridConnectorFactory {
 	
 	protected static final Logger logger = SeleniumRobotLogger.getLogger(SeleniumGridConnector.class);
+	
+	private SeleniumGridConnectorFactory() {
+		// othing to do
+	}
 
 	public static SeleniumGridConnector getInstance(String url) {
 		URL hubUrl;

@@ -27,6 +27,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.openqa.selenium.Platform;
 import org.openqa.selenium.Proxy.ProxyType;
@@ -36,7 +37,7 @@ import org.testng.ITestResult;
 import org.testng.TestRunner;
 
 import com.seleniumtests.browserfactory.BrowserInfo;
-import com.seleniumtests.browserfactory.mobile.MobileDeviceSelector;
+import com.seleniumtests.connectors.tms.TestManager;
 import com.seleniumtests.core.config.ConfigReader;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.driver.BrowserType;
@@ -120,6 +121,7 @@ public class SeleniumTestsContext {
     public static final String TEST_DATA_FILE = "testDataFile";
 
     public static final String TEST_TYPE = "testType";							// configured automatically
+    public static final String TMS = "tms";										// option for configuring test management system, like HP ALM or Squash TM
     
     public static final String CUCUMBER_TESTS = "cucumberTests";				// liste des tests en mode cucumber
     public static final String CUCUMBER_TAGS = "cucumberTags";					// liste des tags cucumber
@@ -213,6 +215,7 @@ public class SeleniumTestsContext {
         setSoftAssertEnabled(getBoolValueForTest(SOFT_ASSERT_ENABLED, System.getProperty(SOFT_ASSERT_ENABLED)));
 
         setWebDriverListener(getValueForTest(WEB_DRIVER_LISTENER, System.getProperty(WEB_DRIVER_LISTENER)));
+        setTms(getValueForTest(TMS, System.getProperty(TMS)));
 
         setAppiumServerUrl(getValueForTest(APPIUM_SERVER_URL, System.getProperty(APPIUM_SERVER_URL)));
         setDeviceName(getValueForTest(DEVICE_NAME, System.getProperty(DEVICE_NAME)));
@@ -628,11 +631,14 @@ public class SeleniumTestsContext {
     public List<Throwable> getVerificationFailures(final ITestResult result) {
         List<Throwable> verificationFailures = verificationFailuresMap.get(result);
         return verificationFailures == null ? new ArrayList<>() : verificationFailures;
-
     }
 
     public String getWebBrowserVersion() {
         return (String) getAttribute(BROWSER_VERSION);
+    }
+    
+    public TestManager getTms() {
+    	return (TestManager) getAttribute(TMS);
     }
 
     public String getWebDriverGrid() {
@@ -928,6 +934,19 @@ public class SeleniumTestsContext {
     
     public void setWebDriverGrid(final String driverGrid) {
         setAttribute(WEB_DRIVER_GRID, driverGrid);
+    }
+    
+    public void setTms(final String tms) {
+    	if (tms == null) {
+    		setAttribute(TMS, null);
+    	} else {
+	    	try {
+	    		JSONObject tmsJson = new JSONObject(tms);
+	    		setAttribute(TMS, TestManager.getInstance(tmsJson));
+	    	} catch (JSONException e) {
+	    		throw new ConfigurationException("tms option must have the JSON format like {'type': 'hp', 'run': '3'}");
+	    	}
+    	}
     }
     
     public void setRunMode(String runMode) {
@@ -1291,6 +1310,7 @@ public class SeleniumTestsContext {
     public void postInit() {
     	postsetProxyConfig();
     	setTestConfiguration();
+    	checkTmsConfiguration();
     }
     
     /**
@@ -1340,5 +1360,11 @@ public class SeleniumTestsContext {
     	envConfig.putAll(testVariables);
     	setAttribute(TEST_CONFIG, envConfig);
     }
+	
+	public void checkTmsConfiguration() {
+		if (getTms() != null) {
+			getTms().init();
+		}
+	}
 
 }

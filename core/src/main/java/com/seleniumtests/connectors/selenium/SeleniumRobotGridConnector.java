@@ -34,6 +34,7 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 	/**
 	 * In case an app is required on the node running the test, upload it to the grid
 	 */
+	@Override
 	public void uploadMobileApp(Capabilities caps) {
 		
 		String appPath = (String)caps.getCapability(MobileCapabilityType.APP);

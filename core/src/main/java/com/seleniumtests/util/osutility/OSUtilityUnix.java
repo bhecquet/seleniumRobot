@@ -108,24 +108,21 @@ public class OSUtilityUnix extends OSUtility {
 		browserList.put(BrowserType.PHANTOMJS, new BrowserInfo(BrowserType.PHANTOMJS, "latest", null));
 		
 		if (!OSCommand.executeCommandAndWait("which firefox").trim().isEmpty()) {
-//			String version = OSCommand.executeCommandAndWait("firefox --version | more");
 			String version = getFirefoxVersion("firefox");
 			browserList.put(BrowserType.FIREFOX, new BrowserInfo(BrowserType.FIREFOX, extractFirefoxVersion(version), OSCommand.executeCommandAndWait("which firefox").trim()));
 		} else if (!OSCommand.executeCommandAndWait("which iceweasel").trim().isEmpty()) {
-//			String version = OSCommand.executeCommandAndWait("iceweasel --version | more");
 			String version = getFirefoxVersion("iceweasel");
 			browserList.put(BrowserType.FIREFOX, new BrowserInfo(BrowserType.FIREFOX, extractFirefoxVersion(version), OSCommand.executeCommandAndWait("which iceweasel").trim()));
 		}
 		if (!OSCommand.executeCommandAndWait("which google-chrome").trim().isEmpty()) {
-//			String version = OSCommand.executeCommandAndWait("google-chrome --version");
 			String version = getChromeVersion("google-chrome");
 			browserList.put(BrowserType.CHROME, new BrowserInfo(BrowserType.CHROME, extractChromeVersion(version), OSCommand.executeCommandAndWait("which google-chrome").trim()));
 		} else if (!OSCommand.executeCommandAndWait("which chromium-browser").trim().isEmpty()) {
-//			String version = OSCommand.executeCommandAndWait("chromium-browser --version");
 			String version = getChromeVersion("chromium-browser");
 			browserList.put(BrowserType.CHROME, new BrowserInfo(BrowserType.CHROME, extractChromeVersion(version), OSCommand.executeCommandAndWait("which chromium-browser").trim()));
 		}
 		
 		return browserList;
 	}
+
 }

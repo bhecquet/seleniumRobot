@@ -51,6 +51,11 @@ import com.seleniumtests.driver.DriverMode;
 import com.seleniumtests.driver.TestType;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
+/**
+ * Class for generating test report
+ * @author behe
+ *
+ */
 public class SeleniumTestsReporter2 extends CommonReporter implements IReporter {
 
 	private static final String HEADER = "header";

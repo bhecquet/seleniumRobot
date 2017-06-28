@@ -25,6 +25,7 @@ import org.testng.xml.XmlTest;
 import java.io.File;
 
 import com.seleniumtests.GenericTest;
+import com.seleniumtests.connectors.tms.TestManager;
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.ConfigurationException;
@@ -563,6 +564,30 @@ public class TestSeleniumTestContext extends GenericTest {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setFullReset(null);
 		Assert.assertTrue(SeleniumTestsContextManager.getThreadContext().getFullReset());
+	}
+	
+	@Test(groups="ut context")
+	public void testTms(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setTms("{'type':'hp', 'run':1}");
+		Assert.assertNotNull(SeleniumTestsContextManager.getThreadContext().getTms());
+		Assert.assertTrue(SeleniumTestsContextManager.getThreadContext().getTms() instanceof TestManager);
+	}
+	@Test(groups="ut context", expectedExceptions=ConfigurationException.class)
+	public void testWrongType(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setTms("{'type':'sonar'}");
+	}
+	@Test(groups="ut context", expectedExceptions=ConfigurationException.class)
+	public void testWrongFormat(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setTms("hp");
+	}
+	@Test(groups="ut context")
+	public void testTmsNull(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setTms(null);
+		Assert.assertNull(SeleniumTestsContextManager.getThreadContext().getTms());
 	}
 	
 	@Test(groups="ut context")

@@ -26,6 +26,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.seleniumtests.browserfactory.BrowserInfo;
+import com.seleniumtests.customexception.DisabledConnector;
 import com.seleniumtests.driver.BrowserType;
 import com.sun.jna.platform.win32.Advapi32Util;
 import com.sun.jna.platform.win32.Win32Exception;
@@ -168,5 +169,19 @@ public class OSUtilityWindows extends OSUtility {
 		} catch (Win32Exception e) {}
 		
 		return browserList;
+	}
+	
+	public String getSoapUiPath() {
+		try {
+			String[] jvms = Advapi32Util.registryGetKeys(WinReg.HKEY_CURRENT_USER, "Software\\ej-technologies\\exe4j\\jvms");
+			
+			for (String jvm: jvms) {
+				if (jvm.toLowerCase().contains("soapui")) {
+					return jvm.split("/jre/bin")[0];
+				}
+			}
+		} catch (Exception e) {		}
+		throw new DisabledConnector("SOAP UI is not installed (not found in registry). Install it and run it once (MANDATORY)");
+	
 	}
 }
