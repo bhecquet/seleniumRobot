@@ -11,9 +11,15 @@
         </classes>
     </test>
 	
-    <test name="mobile">
+    <test name="mobileAndroid">
     	<classes>
             <class name="com.seleniumtests.noreg.tests.TestWithAndroid"/>
+        </classes>
+    </test>
+    
+    <test name="mobileIOS">
+    	<classes>
+            <class name="com.seleniumtests.noreg.tests.TestWithIOS"/>
         </classes>
     </test>
 	

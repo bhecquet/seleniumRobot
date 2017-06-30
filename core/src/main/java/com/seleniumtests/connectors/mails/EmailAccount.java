@@ -6,7 +6,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.junit.Assert;
+import org.testng.Assert;
 
 import com.seleniumtests.connectors.mails.EmailClientImpl.SearchMode;
 import com.seleniumtests.core.SeleniumTestsContextManager;
@@ -114,10 +114,10 @@ public class EmailAccount {
 			} 
 			
 			if (missingAttachments == null) {
-				Assert.assertNotNull("Email '" + emailTitle + "' not found", missingAttachments);
+				Assert.assertNotNull(missingAttachments, "Email '" + emailTitle + "' not found");
 				
 			} else if (!missingAttachments.isEmpty()) {
-				Assert.assertTrue("Email '" + emailTitle + "' found but attachments are missing: " + missingAttachments, missingAttachments.isEmpty());
+				Assert.assertTrue(missingAttachments.isEmpty(), "Email '" + emailTitle + "' found but attachments are missing: " + missingAttachments);
 			} 
 		} else {
 			throw new ConfigurationException("Mail server client has not been configured");
