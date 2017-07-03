@@ -1,8 +1,7 @@
 package com.seleniumtests.connectors.mails;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -13,17 +12,17 @@ public class Email {
 	private String content;
 	private List<String> attachment;
 	private String sender;
-	private Date datetime;
+	private LocalDateTime datetime;
 	
 	public Email() {
 		subject = "";
 		content = "";
 		sender = "";
-		datetime = Calendar.getInstance().getTime();
+		datetime = LocalDateTime.now();
 		attachment = null;
 	}
 
-	public Email(String subject, String content, String sender, Date datetime, List<String> attachment) {
+	public Email(String subject, String content, String sender, LocalDateTime datetime, List<String> attachment) {
 		this.subject = subject;
 		this.content = content;
 		this.attachment = attachment;
@@ -46,6 +45,18 @@ public class Email {
 		
 		return linksList;
 	}
+	
+	/**
+	 * Copy email into this one
+	 * @param email
+	 */
+	public void copy(Email email) {
+		setSubject(email.getSubject());
+		setSender(email.getSender());
+		setContent(email.getContent());
+		setDatetime(email.getDatetime());
+		setAttachment(email.getAttachment());
+	}
 
 	public String getSubject() {
 		return subject;
@@ -63,7 +74,7 @@ public class Email {
 		return sender;
 	}
 
-	public Date getDatetime() {
+	public LocalDateTime getDatetime() {
 		return datetime;
 	}
 
@@ -83,7 +94,7 @@ public class Email {
 		this.sender = sender;
 	}
 
-	public void setDatetime(Date datetime) {
+	public void setDatetime(LocalDateTime datetime) {
 		this.datetime = datetime;
 	}
 }

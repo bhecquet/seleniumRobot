@@ -49,6 +49,9 @@ public class Oracle {
     	String tnsNamePath = SeleniumTestsContextManager.getThreadContext().getConfiguration().get("tnsnamePath");
     	
     	// check tnsname.ora path
+    	if (tnsNamePath == null) {
+    		throw new ConfigurationException("'tnsnamePath' configuration does not exist in env.ini, it must be the path to folder where tnsnames.ora file is");
+    	}
     	if (!new File(tnsNamePath).isDirectory()) {
     		throw new ConfigurationException("Folder " + tnsNamePath +  " does not exist, check your configuration in env.ini");
     	}
