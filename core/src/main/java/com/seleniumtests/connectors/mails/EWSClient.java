@@ -157,7 +157,7 @@ public class EWSClient extends EmailClientImpl {
 	 * @throws IOException
 	 */
 	@Override
-	public List<Email> getEmails(String folderName, Integer firstMessageIndex, LocalDateTime firstMessageTime) throws Exception {
+	public List<Email> getEmails(String folderName, int firstMessageIndex, LocalDateTime firstMessageTime) throws Exception {
 
 		if (folderName == null) {
 			throw new ConfigurationException("folder should not be empty");
@@ -170,7 +170,7 @@ public class EWSClient extends EmailClientImpl {
 		List<Item> preFilteredItems;
 		
 		// filter messages
-		if (searchMode == SearchMode.BY_INDEX) {
+		if (searchMode == SearchMode.BY_INDEX || firstMessageTime == null) {
 			lastMessageIndex = folder.getTotalCount();
 			preFilteredItems = service.findItems(folderId, new ItemView(lastMessageIndex - firstMessageIndex + 1)).getItems();
 		} else {
@@ -187,7 +187,7 @@ public class EWSClient extends EmailClientImpl {
 				attachments.add(att.getName());
 			}
 
-			emails.add(new Email(item.getSubject(), item.getBody().toString(), "", item.getDateTimeReceived(), attachments));
+			emails.add(new Email(item.getSubject(), item.getBody().toString(), "", item.getDateTimeReceived().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime(), attachments));
 		}
 
 		return emails;
@@ -209,12 +209,12 @@ public class EWSClient extends EmailClientImpl {
 	 * @param messageIndex	index for the reference message
 	 */
 	@Override
-	public void setLastMessageIndex(Integer messageIndex) {
+	public void setLastMessageIndex(int messageIndex) {
 		lastMessageIndex = messageIndex;
 	}
 
 	@Override
-	public Integer getLastMessageIndex() {
+	public int getLastMessageIndex() {
 		return lastMessageIndex;
 	}
 }

@@ -13,6 +13,7 @@ import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.CustomSeleniumTestsException;
 import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
+import com.seleniumtests.util.osutility.OSCommand;
 import com.seleniumtests.util.osutility.OSUtility;
 
 public class SoapUi {
@@ -47,13 +48,7 @@ public class SoapUi {
 	 * @return				reply of service
 	 */
 	public String executeWithProjectFile(File projectFile) {
-		try {
-			Process child = Runtime.getRuntime().exec(new String[] {soapUiPath, projectFile.getAbsolutePath()});
-			return IOUtils.toString(child.getInputStream());
-		} catch (IOException e) {
-			throw new CustomSeleniumTestsException("SOAP UI failed: " + e.getMessage());
-		}
-		
+		return OSCommand.executeCommandAndWait(new String[] {soapUiPath, projectFile.getAbsolutePath()});
 	}
 	
 	/**

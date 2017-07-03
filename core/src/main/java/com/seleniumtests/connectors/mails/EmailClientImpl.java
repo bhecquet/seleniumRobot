@@ -4,7 +4,13 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import javax.mail.MessagingException;
 
@@ -23,8 +29,9 @@ public abstract class EmailClientImpl implements EmailClient {
 	
 	protected SearchMode searchMode;
 	protected LocalDateTime fromDate;
-	protected Integer lastMessageIndex;
+	protected int lastMessageIndex;
 	protected String folder;
+	protected boolean testMode = false;
 	
 	public EmailClientImpl() {
 		searchMode = SearchMode.BY_INDEX;
@@ -44,7 +51,7 @@ public abstract class EmailClientImpl implements EmailClient {
 	@Override
 	public List<Email> getLastEmails(String folderName) throws Exception {
 	
-		if (searchMode == SearchMode.BY_INDEX) {
+		if (searchMode == SearchMode.BY_INDEX || fromDate == null) {
 			return getEmails(folderName, getLastMessageIndex());
 		} else {
 			return getEmails(folderName, fromDate);
@@ -71,7 +78,7 @@ public abstract class EmailClientImpl implements EmailClient {
 	 * @throws IOException
 	 */
 	@Override
-	public List<Email> getEmails(String folderName, Integer firstMessageIndex) throws Exception {
+	public List<Email> getEmails(String folderName, int firstMessageIndex) throws Exception {
 		return getEmails(folderName, firstMessageIndex, fromDate);
 	}
 	
@@ -92,7 +99,7 @@ public abstract class EmailClientImpl implements EmailClient {
 	 * @throws Exception 
 	 */
 	@Override
-	public List<Email> getEmails(Integer firstMessageIndex) throws Exception {
+	public List<Email> getEmails(int firstMessageIndex) throws Exception {
 		return getEmails(folder, firstMessageIndex, fromDate);
 	}
 
@@ -158,13 +165,13 @@ public abstract class EmailClientImpl implements EmailClient {
 	public List<String> checkMessagePresenceInLastMessages(String subject, List<String> attachmentNames, Email emailOut) throws Exception {
 		
 		List<Email> emailList = getEmails(subject);
-		List<String> matchingMissingAttachments = null;
+		Map<Email, List<String>> missingAttachmentsPerEmail = new HashMap<>();
 		
 		// try several times
 		for (int i = 0; i < 10; i++) {
 			
 			for (Email email: emailList) {
-				List<String> missingAttachments = new ArrayList<String>();
+				List<String> missingAttachments = new ArrayList<>();
 				missingAttachments.addAll(attachmentNames);
 
 				// do we have the requested attachments
@@ -177,27 +184,36 @@ public abstract class EmailClientImpl implements EmailClient {
 						}
 					}
 				}
-				emailOut.setSubject(email.getSubject());
-				emailOut.setSender(email.getSender());
-				emailOut.setContent(email.getContent());
-				emailOut.setDatetime(email.getDatetime());
-				emailOut.setAttachment(email.getAttachment());
 				
 				// title and attachments OK
 				if (missingAttachments.isEmpty()) {
+					emailOut.copy(email);
 					return missingAttachments;
 				} else {
-					matchingMissingAttachments = missingAttachments.subList(0, missingAttachments.size());
+					missingAttachmentsPerEmail.put(email, missingAttachments.subList(0, missingAttachments.size()));
 				}
 			}
 			
-			// non found retry with last received emails
-			emailList.addAll(getEmails(subject));
+			if (isTestMode()) {
+				break;
+			}
 			
+			// non found retry with last received emails
+			emailList.addAll(getEmails(subject));			
 			WaitHelper.waitForSeconds(10);
 		}
+
+		SortedSet<Map.Entry<Email, List<String>>> sortedset = new TreeSet<>((e1, e2) -> ((Integer)e1.getValue().size()).compareTo((Integer)e2.getValue().size()));
+
+		sortedset.addAll(missingAttachmentsPerEmail.entrySet());
 		
-		return matchingMissingAttachments;
+		if (sortedset.isEmpty()) {
+			return null;
+		} else {
+			Entry<Email, List<String>> entry = sortedset.first();
+			emailOut.copy(entry.getKey());
+			return entry.getValue();
+		}
 	}
 	
 	/**
@@ -253,9 +269,12 @@ public abstract class EmailClientImpl implements EmailClient {
 				}
 			}
 			
+			if (isTestMode()) {
+				break;
+			}
+			
 			// non found retry with last received emails
 			emailList.addAll(getEmails(subject));
-			
 			WaitHelper.waitForSeconds(5);
 		}
 		
@@ -303,5 +322,13 @@ public abstract class EmailClientImpl implements EmailClient {
 	@Override
 	public void setFromDate(LocalDateTime fromDate) {
 		this.fromDate = fromDate;
+	}
+
+	public void setTestMode(boolean testMode) {
+		this.testMode = testMode;
+	}
+
+	public boolean isTestMode() {
+		return testMode;
 	}
 }

@@ -120,7 +120,7 @@ public class ImapClient extends EmailClientImpl {
 	 * @throws IOException
 	 */
 	@Override
-	public List<Email> getEmails(String folderName, Integer firstMessageIndex, LocalDateTime firstMessageTime) throws MessagingException, IOException {
+	public List<Email> getEmails(String folderName, int firstMessageIndex, LocalDateTime firstMessageTime) throws MessagingException, IOException {
 		
 		if (folderName == null) {
 			throw new MessagingException("folder ne doit pas être vide");
@@ -138,7 +138,7 @@ public class ImapClient extends EmailClientImpl {
 		final LocalDateTime firstTime = firstMessageTime;
 		
 		// on filtre les message en fonction du mode de recherche
-		if (searchMode == SearchMode.BY_INDEX) {
+		if (searchMode == SearchMode.BY_INDEX || firstTime == null) {
 			for (int i = firstMessageIndex, n = messages.length; i < n; i++) {
 				preFilteredMessages.add(messages[i]);
 			}
@@ -172,9 +172,9 @@ public class ImapClient extends EmailClientImpl {
 				contentType = message.getContentType();
 			}
 
-			// decode le contenu comme une liste de chaine de caractères
+			// decode content
 			String messageContent = "";
-			List<String> attachments = new ArrayList<String>();
+			List<String> attachments = new ArrayList<>();
 
 			if (contentType.toLowerCase().contains("text/html")) {
 				messageContent += StringEscapeUtils.unescapeHtml4(message.getContent().toString());
@@ -182,7 +182,7 @@ public class ImapClient extends EmailClientImpl {
 				List<BodyPart> partList = getMessageParts((Multipart) message
 						.getContent());
 
-				// stocke le contenu du mail dans une liste
+				// store content in list
 				for (BodyPart part : partList) {
 
 					String partContentType = part.getContentType().toLowerCase();
@@ -207,8 +207,8 @@ public class ImapClient extends EmailClientImpl {
 				}
 			}
 			
-			// créé un nouvel mail
-			filteredEmails.add(new Email(message.getSubject(), messageContent, "", message.getReceivedDate(), attachments));
+			// create a new email
+			filteredEmails.add(new Email(message.getSubject(), messageContent, "", message.getReceivedDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime(), attachments));
 		}
 		
 
@@ -232,12 +232,12 @@ public class ImapClient extends EmailClientImpl {
 	 * @param messageIndex	index for the reference message
 	 */
 	@Override
-	public void setLastMessageIndex(Integer messageIndex) {
+	public void setLastMessageIndex(int messageIndex) {
 		lastMessageIndex = messageIndex;
 	}
 	
 	@Override
-	public Integer getLastMessageIndex() {
+	public int getLastMessageIndex() {
 		return lastMessageIndex;
 	}
 
