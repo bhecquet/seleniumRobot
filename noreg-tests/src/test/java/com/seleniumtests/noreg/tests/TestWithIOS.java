@@ -40,6 +40,7 @@ public class TestWithIOS extends SeleniumTestPlan {
 		FileUtils.copyInputStreamToFile(getClass().getClassLoader().getResourceAsStream("apps/ios/TestRoom.iOS.app.zip"), app);
 
 		SeleniumTestsContextManager.getThreadContext().setApp(app.getAbsolutePath());
+		SeleniumTestsContextManager.getThreadContext().setDeviceName("iPhone SE");
 		SeleniumTestsContextManager.getThreadContext().updateTestAndMobile("iOS");
 		TestRoomHome demo = new TestRoomHome().fillForm();
 		Assert.assertEquals(demo.getText(), "hello");
