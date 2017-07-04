@@ -33,8 +33,7 @@ public abstract class TestManager {
 		try {
 			type = configString.getString("type");
 		} catch (JSONException e) {
-			logger.error("Test manager type must be provided. ex: {'type': 'hp', 'run': '3'}");
-			return null;
+			throw new ConfigurationException("Test manager type must be provided. ex: {'type': 'hp', 'run': '3'}");
 		}
 		
 		if (type.equals("hp")) {
@@ -42,6 +41,10 @@ public abstract class TestManager {
 		} else {
 			throw new ConfigurationException(String.format("TestManager type [%s] is unknown, valid values are: ['hp']", type));
 		}
+	}
+
+	public Boolean getInitialized() {
+		return initialized;
 	}
 
 }
