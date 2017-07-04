@@ -42,13 +42,11 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 		// check whether app is given and app path is a local file
 		if (appPath != null && new File(appPath).isFile()) {
 			
-			try {
+			try (CloseableHttpClient client = HttpClients.createDefault();) {
 				// zip file
 				List<File> appFiles = new ArrayList<>();
 				appFiles.add(new File(appPath));
 				File zipFile = FileUtility.createZipArchiveFromFiles(appFiles);
-				
-				CloseableHttpClient client = HttpClients.createDefault();
 				
 				HttpHost serverHost = new HttpHost(hubUrl.getHost(), hubUrl.getPort());
 				URIBuilder builder = new URIBuilder();

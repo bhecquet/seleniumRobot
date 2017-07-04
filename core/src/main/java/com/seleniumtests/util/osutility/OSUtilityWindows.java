@@ -119,20 +119,35 @@ public class OSUtilityWindows extends OSUtility {
 			return "5000";
 		}
 	}
+	
+	private String getChromeVersionFromRegistry() {
+		try {
+			return Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Wow6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Google Chrome", "version");
+		} catch (Win32Exception e) {
+			return Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Google\\Chrome\\BLBeacon", "version");
+		}
+	}
+	
+	private String getIeVersionFromRegistry() {
+		try {
+			return Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Microsoft\\Internet Explorer", "svcVersion");
+		} catch (Win32Exception e) {
+			return Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Microsoft\\Internet Explorer", "version");
+		}
+	}
 
 	@Override
 	public Map<BrowserType, BrowserInfo> discoverInstalledBrowsersWithVersion() {
 			
 		Map<BrowserType, BrowserInfo> browserList = new EnumMap<>(BrowserType.class);
 		
-		browserList.put(BrowserType.HTMLUNIT, new BrowserInfo(BrowserType.HTMLUNIT, "latest", null));
-		browserList.put(BrowserType.PHANTOMJS, new BrowserInfo(BrowserType.PHANTOMJS, "latest", null));
+		browserList.put(BrowserType.HTMLUNIT, new BrowserInfo(BrowserType.HTMLUNIT, LATEST_VERSION, null));
+		browserList.put(BrowserType.PHANTOMJS, new BrowserInfo(BrowserType.PHANTOMJS, LATEST_VERSION, null));
 		
 		// look for Firefox
 		try {
 			String firefoxPath = Advapi32Util.registryGetStringValue(WinReg.HKEY_CLASSES_ROOT, "FirefoxHTML\\shell\\open\\command", "");
 			firefoxPath = firefoxPath.split(".exe\"")[0].replace("\"", "") + ".exe";
-//			String version = OSCommand.executeCommandAndWait(firefoxPath + File.separator + "firefox --version | more");
 			String version = getFirefoxVersion(firefoxPath);
 			browserList.put(BrowserType.FIREFOX, new BrowserInfo(BrowserType.FIREFOX, extractFirefoxVersion(version), firefoxPath));
 		} catch (Win32Exception e) {}
@@ -141,24 +156,15 @@ public class OSUtilityWindows extends OSUtility {
 		// look for chrome
 		try {
 			String chromePath = Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Classes\\ChromeHTML\\shell\\open\\command", "");
-			String version;
-			try {
-				version = Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Wow6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Google Chrome", "version");
-			} catch (Win32Exception e) {
-				version = Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Google\\Chrome\\BLBeacon", "version");
-			}
+			String version = getChromeVersionFromRegistry();
 			browserList.put(BrowserType.CHROME, new BrowserInfo(BrowserType.CHROME, extractChromeVersion("Google Chrome " + version), chromePath));
 		} catch (Win32Exception e) {}
 		
 		// look for ie
 		try {
 			Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Microsoft\\Windows\\CurrentVersion\\App Paths\\IEXPLORE.EXE", "");
-			String version;
-			try {
-				version = Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Microsoft\\Internet Explorer", "svcVersion");
-			} catch (Win32Exception e) {
-				version = Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Microsoft\\Internet Explorer", "version");
-			}
+			String version = getIeVersionFromRegistry();
+			
 			browserList.put(BrowserType.INTERNET_EXPLORER, new BrowserInfo(BrowserType.INTERNET_EXPLORER, extractIEVersion(version), null));
 		} catch (Win32Exception e) {}
 		

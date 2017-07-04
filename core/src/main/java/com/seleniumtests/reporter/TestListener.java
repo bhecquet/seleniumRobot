@@ -16,22 +16,12 @@
  */
 package com.seleniumtests.reporter;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-import java.io.Writer;
 import java.util.ArrayList;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.apache.velocity.app.VelocityEngine;
 import org.testng.IInvokedMethod;
 import org.testng.IInvokedMethodListener;
 import org.testng.IResultMap;
@@ -57,8 +47,6 @@ import com.seleniumtests.util.logging.SeleniumRobotLogger;
  */
 public class TestListener implements IInvokedMethodListener, ITestListener {
 	
-	private static final String RESOURCE_LOADER_PATH = "org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader";
-	private String uuid = new GregorianCalendar().getTime().toString();
 	protected static Logger logger = SeleniumRobotLogger.getLogger(TestListener.class);
 	
 	private Map<String, Boolean> isRetryHandleNeeded = new HashMap<>();

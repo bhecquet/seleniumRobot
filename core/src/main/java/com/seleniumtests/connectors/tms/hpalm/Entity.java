@@ -58,6 +58,7 @@ public class Entity {
 	 *
 	 */
 	public Entity() {
+		// nothing
 	}
 
 	/**
@@ -133,13 +134,14 @@ public class Entity {
 		 * @param fields
 		 */
 		public Fields(Fields fields) {
-			field = new ArrayList<Field>(fields.getField());
+			field = new ArrayList<>(fields.getField());
 		}
 
 		/**
 	 *
 	 */
 		public Fields() {
+			// nothing
 		}
 
 		/**
@@ -166,7 +168,7 @@ public class Entity {
 		 */
 		public List<Entity.Fields.Field> getField() {
 			if (field == null) {
-				field = new ArrayList<Entity.Fields.Field>();
+				field = new ArrayList<>();
 			}
 			return this.field;
 		}
@@ -228,7 +230,7 @@ public class Entity {
 			 */
 			public List<String> getValue() {
 				if (value == null) {
-					value = new ArrayList<String>();
+					value = new ArrayList<>();
 				}
 				return this.value;
 			}

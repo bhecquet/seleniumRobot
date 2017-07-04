@@ -99,8 +99,10 @@ public class SpreadSheetHelper {
                 fieldValue = list;
 
                 Class<?> itemClz = getListItemType(type);
-                for (int j = 0; j < size; j++) {
-                    list.add(readFieldValue(itemClz, combinedFieldName + "." + j, dataMap));
+                if (itemClz != null) {
+	                for (int j = 0; j < size; j++) {
+	                    list.add(readFieldValue(itemClz, combinedFieldName + "." + j, dataMap));
+	                }
                 }
             }
         } else if (fieldClz.isAssignableFrom(java.util.Set.class)) {
@@ -110,8 +112,10 @@ public class SpreadSheetHelper {
                 fieldValue = list;
 
                 Class<?> itemClz = getListItemType(type);
-                for (int j = 0; j < size; j++) {
-                    list.add(readFieldValue(itemClz, combinedFieldName + "." + j, dataMap));
+                if (itemClz != null) {
+	                for (int j = 0; j < size; j++) {
+	                    list.add(readFieldValue(itemClz, combinedFieldName + "." + j, dataMap));
+	                }
                 }
             }
         } else {

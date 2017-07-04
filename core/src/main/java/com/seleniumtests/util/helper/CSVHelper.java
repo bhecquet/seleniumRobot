@@ -82,7 +82,7 @@ public class CSVHelper {
     public static Iterator<Object[]> getDataFromCSVFile(final Class<?> clazz, final String filename, Filter filter,
             final boolean readHeaders, final String delimiter, final boolean supportDPFilter) {
 
-    	Filter _filter = filter;
+    	Filter newFilter = filter;
         InputStream is = null;
         try {
             if (clazz != null) {
@@ -97,6 +97,9 @@ public class CSVHelper {
 
             // Get the sheet
             String[][] csvData = read(is, delimiter);
+            if (csvData == null) {
+            	return new ArrayList<Object[]>().iterator();
+            }
 
             List<Object[]> sheetData = new ArrayList<>();
             if (readHeaders) {
@@ -122,10 +125,10 @@ public class CSVHelper {
                 Filter dpFilter = SpreadSheetHelper.getDPFilter();
 
                 if (dpFilter != null) {
-                    if (_filter == null) {
-                    	_filter = dpFilter;
+                    if (newFilter == null) {
+                    	newFilter = dpFilter;
                     } else {
-                    	_filter = Filter.and(_filter, dpFilter);
+                    	newFilter = Filter.and(newFilter, dpFilter);
                     }
                 }
             }
@@ -157,14 +160,14 @@ public class CSVHelper {
                     SpreadSheetHelper.formatDPTags(rowDataMap);
                 }
 
-                if (_filter == null || _filter.match(rowDataMap)) {
+                if (newFilter == null || newFilter.match(rowDataMap)) {
                     sheetData.add(rowData.toArray(new Object[rowData.size()]));
                 }
             }
 
             if ((!readHeaders && sheetData.isEmpty()) || (readHeaders && sheetData.size() <= 1)) {
                 logger.warn("No matching data found on csv file: " + filename + " with filter criteria: "
-                        + _filter.toString());
+                        + newFilter.toString());
             }
 
             return sheetData.iterator();
@@ -191,7 +194,7 @@ public class CSVHelper {
      * @return
      */
     public static List<String> getHeaderFromCSVFile(final Class<?> clazz, final String filename, String delimiter) {
-        String _delimiter = delimiter == null ? ",": delimiter;
+        String newDelimiter = delimiter == null ? ",": delimiter;
     	
         InputStream is = null;
         try {
@@ -206,7 +209,10 @@ public class CSVHelper {
             }
 
             // Get the sheet
-            String[][] csvData = read(is, _delimiter);
+            String[][] csvData = read(is, newDelimiter);
+            if (csvData == null) {
+            	return new ArrayList<>();
+            }
 
             ArrayList<String> rowData = new ArrayList<>();
 

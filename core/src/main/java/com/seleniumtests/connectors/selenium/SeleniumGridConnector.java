@@ -1,6 +1,5 @@
 package com.seleniumtests.connectors.selenium;
 
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 
@@ -47,10 +46,8 @@ public class SeleniumGridConnector {
 	
 	public void runTest(RemoteWebDriver driver) {
 		
-
         // logging node ip address:
-        CloseableHttpClient client = HttpClients.createDefault();
-        try {
+        try (CloseableHttpClient client = HttpClients.createDefault()) {
         	HttpHost serverHost = new HttpHost(hubUrl.getHost(), hubUrl.getPort());
         	URIBuilder builder = new URIBuilder();
         	builder.setPath("/grid/api/testsession/");
@@ -69,12 +66,7 @@ public class SeleniumGridConnector {
             
         } catch (Exception ex) {
         	logger.error(ex);
-        } finally {
-        	try {
-				client.close();
-			} catch (IOException e) {
-			}
-        }
+        } 
 	}
 
 	public URL getHubUrl() {

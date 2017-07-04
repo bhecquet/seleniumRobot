@@ -38,7 +38,6 @@ import microsoft.exchange.webservices.data.search.filter.SearchFilter;
 
 public class EWSClient extends EmailClientImpl {
 	
-	private Integer lastMessageIndex;
 	private Mailbox mb;
 	
 	private ExchangeService service;
@@ -60,7 +59,7 @@ public class EWSClient extends EmailClientImpl {
 	public EWSClient(String host, String username, String password, String email, String domain, String folder, ExchangeVersion version, Integer timeOffset) throws Exception {
 		
 		super();
-		// connexion au serveur
+		// connection to server
 		
 		connect(host, username, password, email, domain, version);
 		

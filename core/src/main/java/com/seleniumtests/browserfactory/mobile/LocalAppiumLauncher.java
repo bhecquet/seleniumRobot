@@ -104,7 +104,7 @@ public class LocalAppiumLauncher implements AppiumLauncher {
 			File packageFile = Paths.get(appiumHome, "node_modules", "appium", "package.json").toFile();
 			String appiumConfig = FileUtils.readFileToString(packageFile);
 			JSONObject packages = new JSONObject(appiumConfig);
-			if (!packages.getString("name").equals("appium")) {
+			if (!"appium".equals(packages.getString("name"))) {
 				throw new ConfigurationException(String.format("package.json file found in %s is not for appium, check path", packageFile.getAbsolutePath()));
 			}
 			
@@ -153,11 +153,10 @@ public class LocalAppiumLauncher implements AppiumLauncher {
 	private void waitAppiumAlive() {
 		
 		for (int i=0; i< 60; i++) {
-			try {
-				HttpGet request = new HttpGet(getAppiumServerUrl() + "sessions");
-		        CloseableHttpClient client = HttpClients.createDefault();
+			try (CloseableHttpClient client = HttpClients.createDefault();) {
+				HttpGet request = new HttpGet(getAppiumServerUrl() + "sessions"); 
 		        CloseableHttpResponse response = client.execute(request);
-		        client.close();
+
 		        if (response.getStatusLine().getStatusCode() == 200) {
 		        	logger.info("appium has started");
 		        	break;

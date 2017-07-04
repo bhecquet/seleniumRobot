@@ -32,7 +32,7 @@ import com.seleniumtests.util.osutility.OSUtility;
 
 public class FirefoxDriverFactory extends AbstractWebDriverFactory implements IWebDriverFactory {
     private long timeout = 1;
-    private static boolean marionetteMode = false;
+    private static boolean marionetteMode = !useFirefoxDriver();
 
     /**
      * @param  cfg  the configuration of the firefoxDriver
@@ -47,7 +47,7 @@ public class FirefoxDriverFactory extends AbstractWebDriverFactory implements IW
      * By default, use Marionette
      * @return
      */
-    public boolean useFirefoxDriver() {
+    public static boolean useFirefoxDriver() {
     	String output = OSUtility.getInstalledBrowsersWithVersion().get(BrowserType.FIREFOX).getVersion();
 		return useFirefoxVersion(output);
     }
@@ -57,7 +57,7 @@ public class FirefoxDriverFactory extends AbstractWebDriverFactory implements IW
      * @param versionString
      * @return
      */
-    public boolean useFirefoxVersion(String versionString) {
+    public static boolean useFirefoxVersion(String versionString) {
     	Pattern regMozilla = Pattern.compile(".*?(\\d+)\\..*");
     	Matcher versionMatcher = regMozilla.matcher(versionString);
 		if (versionMatcher.matches()) {
@@ -77,11 +77,10 @@ public class FirefoxDriverFactory extends AbstractWebDriverFactory implements IW
     @Override
     protected WebDriver createNativeDriver() {
     	
-    	if (useFirefoxDriver()) {
-    		return new FirefoxDriver(new FirefoxCapabilitiesFactory().createCapabilities(webDriverConfig));
-    	} else {
-    		marionetteMode = true;
+    	if (isMarionetteMode()) {
     		return new FirefoxDriver(new MarionetteCapabilitiesFactory().createCapabilities(webDriverConfig));
+    	} else {
+    		return new FirefoxDriver(new FirefoxCapabilitiesFactory().createCapabilities(webDriverConfig));
     	}  
     }
 

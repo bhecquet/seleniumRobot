@@ -373,7 +373,7 @@ public class SeleniumTestsContext {
     private void updateDeviceMobileVersion() {
     	Map<String, String> deviceList = getDeviceList();
     	if (getDeviceName() != null && !getDeviceName().isEmpty() && !deviceList.isEmpty()) {
-    		setAttribute(PLATFORM, deviceList.get(getDeviceName()));
+    		setPlatform(deviceList.get(getDeviceName()));
     	}
     }
 
@@ -950,8 +950,8 @@ public class SeleniumTestsContext {
     }
     
     public void setRunMode(String runMode) {
-    	String _runMode = runMode == null ? "LOCAL": runMode;
-        setAttribute(RUN_MODE, DriverMode.fromString(_runMode));
+    	String newRunMode = runMode == null ? "LOCAL": runMode;
+        setAttribute(RUN_MODE, DriverMode.fromString(newRunMode));
 	}
     
     public void setDevMode(Boolean devMode) {
@@ -964,8 +964,8 @@ public class SeleniumTestsContext {
     }
 
     public void setBrowser(String browser) {
-    	String _browser = browser == null ? "*firefox": browser;
-    	setAttribute(BROWSER, BrowserType.getBrowserType(_browser));
+    	String newBrowser = browser == null ? "none": browser;
+    	setAttribute(BROWSER, BrowserType.getBrowserType(newBrowser));
     	
     	// when reconfiguring browser, mostly from integration tests, change test type accordingly
     	if (getPlatform() != null) {
@@ -1318,7 +1318,8 @@ public class SeleniumTestsContext {
      */
     public void postsetProxyConfig() {
     	Map<String, String> envConfig = new ConfigReader().readConfig();
-    	for (String key: envConfig.keySet()) {
+    	for (Entry<String, String> entry: envConfig.entrySet()) {
+    		String key = entry.getKey();
     		switch (key) {
     			case WEB_PROXY_TYPE:
     				setWebProxyType(getWebProxyType() == null ? envConfig.get(key): (getWebProxyType() == null ? null: getWebProxyType().name()));

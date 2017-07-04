@@ -28,7 +28,6 @@ import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.file.Files;
-import java.util.Collection;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.jar.JarFile;
@@ -41,8 +40,6 @@ import javax.imageio.ImageIO;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.io.filefilter.FileFilterUtils;
-import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.apache.log4j.Logger;
 
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
@@ -60,41 +57,42 @@ public class FileUtility {
         File firefoxProfile = new File(storeLocation);
         String location = clz.getProtectionDomain().getCodeSource().getLocation().getFile();
 
-        JarFile jar = new JarFile(location);
-        logger.info("Extracting jar file::: " + location);
-        firefoxProfile.mkdir();
-
-        Enumeration<?> jarFiles = jar.entries();
-        while (jarFiles.hasMoreElements()) {
-            ZipEntry entry = (ZipEntry) jarFiles.nextElement();
-            String currentEntry = entry.getName();
-            File destinationFile = new File(storeLocation, currentEntry);
-            File destinationParent = destinationFile.getParentFile();
-
-            // create the parent directory structure if required
-            destinationParent.mkdirs();
-            if (!entry.isDirectory()) {
-                BufferedInputStream is = new BufferedInputStream(jar.getInputStream(entry));
-                int currentByte;
-
-                // buffer for writing file
-                byte[] data = new byte[BUFFER];
-
-                // write the current file to disk
-                FileOutputStream fos = new FileOutputStream(destinationFile);
-                BufferedOutputStream destination = new BufferedOutputStream(fos, BUFFER);
-
-                // read and write till last byte
-                while ((currentByte = is.read(data, 0, BUFFER)) != -1) {
-                    destination.write(data, 0, currentByte);
-                }
-
-                destination.flush();
-                destination.close();
-                is.close();
-            }
+        try (JarFile jar = new JarFile(location);) {
+	        logger.info("Extracting jar file::: " + location);
+	        firefoxProfile.mkdir();
+	
+	        Enumeration<?> jarFiles = jar.entries();
+	        while (jarFiles.hasMoreElements()) {
+	            ZipEntry entry = (ZipEntry) jarFiles.nextElement();
+	            String currentEntry = entry.getName();
+	            File destinationFile = new File(storeLocation, currentEntry);
+	            File destinationParent = destinationFile.getParentFile();
+	
+	            // create the parent directory structure if required
+	            destinationParent.mkdirs();
+	            if (!entry.isDirectory()) {
+	                BufferedInputStream is = new BufferedInputStream(jar.getInputStream(entry));
+	                int currentByte;
+	
+	                // buffer for writing file
+	                byte[] data = new byte[BUFFER];
+	
+	                // write the current file to disk
+	                try (FileOutputStream fos = new FileOutputStream(destinationFile);) {
+		                BufferedOutputStream destination = new BufferedOutputStream(fos, BUFFER);
+		
+		                // read and write till last byte
+		                while ((currentByte = is.read(data, 0, BUFFER)) != -1) {
+		                    destination.write(data, 0, currentByte);
+		                }
+		
+		                destination.flush();
+		                destination.close();
+		                is.close();
+	                }
+	            }
+	        }
         }
-        jar.close();
 
         FileUtils.deleteDirectory(new File(storeLocation + "\\META-INF"));
         if (OSUtility.isWindows()) {

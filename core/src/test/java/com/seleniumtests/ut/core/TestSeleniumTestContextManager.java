@@ -69,9 +69,14 @@ public class TestSeleniumTestContextManager extends GenericTest {
 	
 	@Test(groups={"ut"})
 	public void extendedConfigurationIsWrittentIntoCurrentTest(ITestContext iTestContext) {
-		SeleniumTestsContextManager.initThreadContext(iTestContext);
-		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getPlatform(), "Android");
-		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getMobilePlatformVersion(), "4.3");
+		try {
+			System.setProperty(SeleniumTestsContext.DEVICE_NAME, "Samsung Galaxy Nexus SPH-L700 4.3");
+			SeleniumTestsContextManager.initThreadContext(iTestContext);
+			Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getPlatform(), "Android");
+			Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getMobilePlatformVersion(), "4.3");
+		} finally {
+			System.clearProperty(SeleniumTestsContext.DEVICE_NAME);
+		}
 	}
 	
 	

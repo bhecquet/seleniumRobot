@@ -37,13 +37,37 @@ public class AppStepsGenerator {
 	
 	public class TestStep {
 		
-		public String stepName;
-		public String stepDetails;
-		public String stepMethod;
+		private String stepName;
+		private String stepDetails;
+		private String stepMethod;
 		
 		@Override
 		public String toString() {
 			return stepName;
+		}
+
+		public String getStepName() {
+			return stepName;
+		}
+
+		public String getStepDetails() {
+			return stepDetails;
+		}
+
+		public String getStepMethod() {
+			return stepMethod;
+		}
+
+		public void setStepName(String stepName) {
+			this.stepName = stepName;
+		}
+
+		public void setStepDetails(String stepDetails) {
+			this.stepDetails = stepDetails;
+		}
+
+		public void setStepMethod(String stepMethod) {
+			this.stepMethod = stepMethod;
 		}
 	}
 	
@@ -93,7 +117,7 @@ public class AppStepsGenerator {
            
         private String getAnnotationString(AnnotationExpr annotation) {
         	String stepName = annotation.getChildNodes().get(1).toString();
-        	return String.format("%s %s", annotation.getChildNodes().get(0), stepName.substring(1, stepName.lastIndexOf("\"")));
+        	return String.format("%s %s", annotation.getChildNodes().get(0), stepName.substring(1, stepName.lastIndexOf('\"')));
         }
         
         

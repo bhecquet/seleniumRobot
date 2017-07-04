@@ -147,7 +147,7 @@ public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implemen
 
         this.setWebDriver(driver);
 
-        runWebDriver(gridConnector.getHubUrl());
+        runWebDriver();
 
         return driver;
     }
@@ -169,7 +169,7 @@ public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implemen
     	return driver;
     }
     
-    private void runWebDriver(URL url){
+    private void runWebDriver(){
     	gridConnector.runTest((RemoteWebDriver) driver);
     }
 

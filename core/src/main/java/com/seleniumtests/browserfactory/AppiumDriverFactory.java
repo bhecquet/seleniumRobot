@@ -17,6 +17,7 @@
 package com.seleniumtests.browserfactory;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 
@@ -48,11 +49,14 @@ public class AppiumDriverFactory extends AbstractWebDriverFactory implements IWe
     private void extractAndroidDriver(DesiredCapabilities capabilities) {
     	String chromeDriverFile = (String)capabilities.getCapability(AndroidMobileCapabilityType.CHROMEDRIVER_EXECUTABLE);
 		if (chromeDriverFile != null) {
+			String driverPath;
 			try {
-				String driverPath = FileUtility.decodePath(new DriverExtractor().extractDriver(chromeDriverFile));
+				driverPath = FileUtility.decodePath(new DriverExtractor().extractDriver(chromeDriverFile));
 				capabilities.setCapability(AndroidMobileCapabilityType.CHROMEDRIVER_EXECUTABLE, driverPath);
-			} catch (IOException e) {
+			} catch (UnsupportedEncodingException e) {
+				logger.error("cannot get driver path", e);
 			}
+			
 		}
     }
     

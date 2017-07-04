@@ -1,5 +1,6 @@
 package com.seleniumtests.ut.connectors.extools;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import java.io.File;
@@ -7,10 +8,7 @@ import java.io.IOException;
 import java.nio.file.Paths;
 
 import org.apache.commons.io.FileUtils;
-import org.mockito.Mockito;
 import org.openqa.selenium.Platform;
-
-import static org.mockito.ArgumentMatchers.any;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;

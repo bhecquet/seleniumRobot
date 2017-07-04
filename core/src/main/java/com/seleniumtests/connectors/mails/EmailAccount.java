@@ -52,11 +52,8 @@ public class EmailAccount {
 	/**
 	 * @return true if all account information are set
 	 */
-	public Boolean canConnect() {
-		if (email.equals(DEFAULT_EMAIL) || emailLogin == null || emailLogin.isEmpty()) {
-			return false;
-		}
-		return true;
+	public boolean canConnect() {
+		return !(email.equals(DEFAULT_EMAIL) || emailLogin == null || emailLogin.isEmpty());
 	}
 	
 	/**
@@ -107,10 +104,12 @@ public class EmailAccount {
 		
 		Email foundEmail = new Email();
 		if (emailClient != null) {
-			List<String> missingAttachments = null;
+			List<String> missingAttachments;
 			try {
 				missingAttachments = emailClient.checkMessagePresenceInLastMessages(emailTitle, attachments, foundEmail);
 			} catch (Exception e) {
+				logger.error("Could not get messages", e);
+				missingAttachments = null;
 			} 
 			
 			if (missingAttachments == null) {

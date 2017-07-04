@@ -17,7 +17,6 @@
 package com.seleniumtests.uipage.htmlelements;
 
 import org.openqa.selenium.By;
-import org.openqa.selenium.Keys;
 
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.WebUIDriver;
@@ -51,7 +50,7 @@ public class ButtonElement extends HtmlElement {
     @Override
     public void click() {
 
-        BrowserType browser = WebUIDriver.getWebUIDriver().getConfig().getBrowser();
+        //BrowserType browser = WebUIDriver.getWebUIDriver().getConfig().getBrowser();
         // TODO: check if for some web site, send keys solve clicking problems
 //        if (browser == BrowserType.INTERNET_EXPLORER) {
 //            super.sendKeys(Keys.ENTER);

@@ -300,7 +300,11 @@ public class SelectList extends HtmlElement {
     			optionToSelect = option;
     		}
     	}
-    	setSelected(optionToSelect);
+    	if (optionToSelect != null) {
+    		setSelected(optionToSelect);
+    	} else {
+    		logger.error("No option matches " + text);
+    	}
     }
     
     /**
@@ -321,7 +325,11 @@ public class SelectList extends HtmlElement {
         			optionToSelect = option;
         		}
         	}
-        	setSelected(optionToSelect);
+        	if (optionToSelect != null) {
+        		setSelected(optionToSelect);
+        	} else {
+        		logger.error("No option matches " + text);
+        	}
     	}
     }
 

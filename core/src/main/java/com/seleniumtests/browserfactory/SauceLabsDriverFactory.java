@@ -98,14 +98,15 @@ public class SauceLabsDriverFactory extends AbstractWebDriverFactory implements 
         request.addHeader(new BasicScheme().authenticate(creds, request, null));
         request.addHeader("Content-Type", "application/octet-stream");
 
-        CloseableHttpClient client = HttpClients.createDefault();
-        CloseableHttpResponse response = client.execute(request);
+        try (CloseableHttpClient client = HttpClients.createDefault();) {
+	        CloseableHttpResponse response = client.execute(request);
+	        
+	        if (response.getStatusLine().getStatusCode() != 200) {
+	        	client.close();
+	        	throw new ConfigurationException("Application file upload failed: " + response.getStatusLine().getReasonPhrase());
+	        }
+        } 
         
-        if (response.getStatusLine().getStatusCode() != 200) {
-        	client.close();
-        	throw new ConfigurationException("Application file upload failed: " + response.getStatusLine().getReasonPhrase());
-        }
-        client.close();
         
         return true;
     }

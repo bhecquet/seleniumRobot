@@ -342,7 +342,7 @@ public class TestSeleniumTestContext extends GenericTest {
 	public void testBrowserNull(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setBrowser(null);
-		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getBrowser(), BrowserType.FIREFOX);
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getBrowser(), BrowserType.NONE);
 	}
 	@Test(groups="ut context", expectedExceptions=IllegalArgumentException.class)
 	public void testBrowserKo(final ITestContext testNGCtx, final XmlTest xmlTest) {

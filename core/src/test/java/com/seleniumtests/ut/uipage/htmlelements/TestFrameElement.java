@@ -34,6 +34,7 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import com.seleniumtests.MockitoTest;
+import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.uipage.htmlelements.ButtonElement;
 import com.seleniumtests.uipage.htmlelements.CheckBoxElement;
@@ -75,7 +76,7 @@ public class TestFrameElement extends MockitoTest {
 	
 	@BeforeMethod(groups={"ut"})
 	private void init() {
-
+		SeleniumTestsContextManager.getThreadContext().setBrowser("firefox");
 		
 		PowerMockito.mockStatic(WebUIDriver.class);
 		when(WebUIDriver.getWebDriver()).thenReturn(driver);

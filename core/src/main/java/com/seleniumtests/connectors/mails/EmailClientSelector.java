@@ -9,8 +9,12 @@ import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
 public class EmailClientSelector {
 
+	private static final String INBOX = "INBOX";
 	private static final Logger logger = SeleniumRobotLogger.getLogger(EmailClientSelector.class);
 
+	private EmailClientSelector() {
+		// private constructor
+	}
 
 	/**
 	 * Returns a client depending on email address
@@ -28,7 +32,7 @@ public class EmailClientSelector {
 		
 		if (server.getType() == EmailServerTypes.EXCHANGE) {
 			try {
-				return new ExchangeClient(server.getUrl(), loginEmailAccount, passwordEmailAccount, "INBOX");
+				return new ExchangeClient(server.getUrl(), loginEmailAccount, passwordEmailAccount, INBOX);
 			} catch (Exception e) {
 				logger.error("Cannot connect exchange 2003 server: " + e.getMessage());
 			}
@@ -40,13 +44,13 @@ public class EmailClientSelector {
 			} 
 		} else if (server.getType() == EmailServerTypes.GMAIL) {
 				try {
-					return new GMailClient(server.getUrl(), loginEmailAccount, passwordEmailAccount, "INBOX");
+					return new GMailClient(server.getUrl(), loginEmailAccount, passwordEmailAccount, INBOX);
 				} catch (Exception e) {
 					logger.error("Cannot connect to gmail server: " + e.getMessage());
 				} 
 		} else {
 			try {
-				return new ImapClient(server.getUrl(), loginEmailAccount, passwordEmailAccount, "INBOX");
+				return new ImapClient(server.getUrl(), loginEmailAccount, passwordEmailAccount, INBOX);
 			} catch (Exception e) {
 				logger.error("Cannot connect to imap server: " + e.getMessage());
 			} 

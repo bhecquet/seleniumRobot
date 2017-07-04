@@ -71,7 +71,7 @@ public class AndroidCapabilitiesFactory extends ICapabilitiesFactory {
     	caps.setCapability(MobileCapabilityType.DEVICE_NAME, cfg.getDeviceName());
 
     	// in case app has not been specified for cloud provider
-        if (caps.getCapability(MobileCapabilityType.APP) == null) {
+        if (caps.getCapability(MobileCapabilityType.APP) == null && app != null) {
         	caps.setCapability(MobileCapabilityType.APP, app.replace("\\", "/"));
         }
         caps.setCapability(AndroidMobileCapabilityType.APP_PACKAGE, cfg.getAppPackage());
@@ -82,7 +82,7 @@ public class AndroidCapabilitiesFactory extends ICapabilitiesFactory {
         }
 
         // do not configure application and browser as they are mutualy exclusive
-        if (app != null && "".equals(app.trim())) {
+        if (app != null && "".equals(app.trim()) && cfg.getBrowser() != BrowserType.NONE) {
         	caps.setCapability(CapabilityType.BROWSER_NAME, cfg.getBrowser().toString().toLowerCase());
         	
         	

@@ -1,5 +1,6 @@
 package com.seleniumtests.ut.browserfactory;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -15,6 +16,12 @@ import com.seleniumtests.driver.BrowserType;
 
 @PrepareForTest(BrowserInfo.class)
 public class TestBrowserInfo extends MockitoTest {
+	
+
+	@Test(groups={"ut"})
+	public void getDriverFiles() throws IOException {
+		Assert.assertFalse(new BrowserInfo(BrowserType.CHROME, "58.0", null).getDriverFiles().isEmpty());
+	}
 
 	@Test(groups={"ut"})
 	public void testEdgeVersion() {

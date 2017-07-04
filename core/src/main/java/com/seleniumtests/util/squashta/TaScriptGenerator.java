@@ -125,7 +125,7 @@ public class TaScriptGenerator {
     	// search cucumber parameters among test parameters
     	// does test specifies precise cucumber properties (cucumberTests / cucumberTags)
     	for (Element param: test.getChildren("parameter")) {
-    		if ("cucumberTests".equals(param.getAttributeValue("name"))) {
+    		if ("cucumberTests".equals(param.getAttributeValue("name")) || "cucumberTags".equals(param.getAttributeValue("name"))) {
     			cucumberTest = true;
     			cucumberNamedTest = param.getAttributeValue("value");
     			
@@ -133,14 +133,6 @@ public class TaScriptGenerator {
     				break;
     			}
     		} 
-    		else if ("cucumberTags".equals(param.getAttributeValue("name"))) {
-    			cucumberTest = true;
-    			cucumberNamedTest = param.getAttributeValue("value");
-    			
-    			if (!cucumberNamedTest.isEmpty()) {
-    				break;
-    			}
-    		}
     	}
     	
     	for (Element param: test.getChildren("parameter")) {

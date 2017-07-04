@@ -34,5 +34,5 @@ public class TestLocalAppiumLauncher extends GenericTest {
 		} catch (ConfigurationException e) {
 			throw new SkipException("Test skipped, appium not correctly configured", e);
 		}
-	}
+	}	
 }

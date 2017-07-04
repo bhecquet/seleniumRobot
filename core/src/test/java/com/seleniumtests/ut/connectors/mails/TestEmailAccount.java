@@ -9,21 +9,27 @@ import com.seleniumtests.customexception.ConfigurationException;
 public class TestEmailAccount extends Object {
 
 	@Test(groups={"ut"})
-	public void testCanConnect() {
+	public void testCantConnectWithoutInfo() {
 		EmailAccount account = new EmailAccount();
 		Assert.assertFalse(account.canConnect(), "We should not be able to connect to default account");
 	}
 	
 	@Test(groups={"ut"})
-	public void testCanConnect2() {
-		EmailAccount account = new EmailAccount("no.email@free.fr", null, null);
+	public void testCantConnectWithOnlyAddress() {
+		EmailAccount account = new EmailAccount("email@free.fr", null, null);
 		Assert.assertFalse(account.canConnect(), "We should not be able to connect to default account");
 	}
 	
 	@Test(groups={"ut"})
-	public void testCanConnect3() {
+	public void testCantConnectWithDefaultAddress() {
 		EmailAccount account = new EmailAccount("no.email@free.fr", "no.email@free.fr", "aaa");
-		Assert.assertTrue(account.canConnect(), "We should not be able to connect to default account");
+		Assert.assertFalse(account.canConnect(), "We should not be able to connect to default account");
+	}
+	
+	@Test(groups={"ut"})
+	public void testCanConnect() {
+		EmailAccount account = new EmailAccount("email@free.fr", "email@free.fr", "aaa");
+		Assert.assertTrue(account.canConnect(), "We should be able to connect");
 	}
 	
 	@Test(groups={"ut"})
