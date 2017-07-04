@@ -27,10 +27,17 @@ import com.seleniumtests.customexception.ConfigurationException;
  */
 public class HpAlmConnector extends TestManager {
 	
+	public static final String HP_ALM_SERVER_URL = "hpAlmServerUrl";
+	public static final String HP_ALM_PASSWORD = "hpAlmPassword";
+	public static final String HP_ALM_USER = "hpAlmUser";
+	public static final String HP_ALM_DOMAIN = "hpAlmDomain";
+	public static final String HP_ALM_PROJECT = "hpAlmProject";
 	private static final String DOMAIN_NAME = "domain";
 	private static final String PROJECT_NAME = "project";
 	private static final String ENTITY_ID = "entityId";
 	private static final String ENTITY_TYPE = "entityType";
+	
+	
 	private String serverUrl;
 	private String project;
 	private String domain;
@@ -58,11 +65,11 @@ public class HpAlmConnector extends TestManager {
 
 	@Override
 	public void init() {
-		serverUrl = SeleniumTestsContextManager.getThreadContext().getConfiguration().get("hpAlmServerUrl");
-		project = SeleniumTestsContextManager.getThreadContext().getConfiguration().get("hpAlmProject");
-		domain = SeleniumTestsContextManager.getThreadContext().getConfiguration().get("hpAlmDomain");
-		user = SeleniumTestsContextManager.getThreadContext().getConfiguration().get("hpAlmUser");
-		password = SeleniumTestsContextManager.getThreadContext().getConfiguration().get("hpAlmPassword");
+		serverUrl = SeleniumTestsContextManager.getThreadContext().getConfiguration().get(HP_ALM_SERVER_URL);
+		project = SeleniumTestsContextManager.getThreadContext().getConfiguration().get(HP_ALM_PROJECT);
+		domain = SeleniumTestsContextManager.getThreadContext().getConfiguration().get(HP_ALM_DOMAIN);
+		user = SeleniumTestsContextManager.getThreadContext().getConfiguration().get(HP_ALM_USER);
+		password = SeleniumTestsContextManager.getThreadContext().getConfiguration().get(HP_ALM_PASSWORD);
 		
 		if (serverUrl == null || project == null || domain == null || user == null || password == null) {
 			throw new ConfigurationException("HP ALM access not correctly configured. Environment configuration must contain variables"
@@ -269,6 +276,10 @@ public class HpAlmConnector extends TestManager {
 		entity.setFields(fields);
 		entity.setType(entityType);
 		return entity;
+	}
+
+	public String getCurrentRunId() {
+		return currentRunId;
 	}
 
 	
