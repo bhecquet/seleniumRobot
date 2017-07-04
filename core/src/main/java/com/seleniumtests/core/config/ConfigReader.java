@@ -75,8 +75,7 @@ public class ConfigReader {
 	 * @return
 	 */
 	public Map<String, String> readConfig() {
-		try {
-			InputStream iniFileStream = FileUtils.openInputStream(getConfigFile());
+		try (InputStream iniFileStream = FileUtils.openInputStream(getConfigFile());){
 			return readConfig(iniFileStream, SeleniumTestsContextManager.getThreadContext().getTestEnv());
 		} catch (NullPointerException e) {
 			logger.warn("config file is null, check config path has been set using 'SeleniumTestsContextManager.generateApplicationPath()'");

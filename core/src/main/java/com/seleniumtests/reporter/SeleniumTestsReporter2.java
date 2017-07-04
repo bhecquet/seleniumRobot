@@ -58,6 +58,7 @@ import com.seleniumtests.util.logging.SeleniumRobotLogger;
  */
 public class SeleniumTestsReporter2 extends CommonReporter implements IReporter {
 
+	private static final String STATUS = "status";
 	private static final String HEADER = "header";
 	private static final String APPLICATION = "application";
 	private static final String APPLICATION_TYPE = "applicationType";
@@ -130,9 +131,9 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 				
 				// step status
 				if (testStep.getFailed()) {
-					context.put("status", FAILED_TEST);
+					context.put(STATUS, FAILED_TEST);
 				} else {
-					context.put("status", PASSED_TEST);
+					context.put(STATUS, PASSED_TEST);
 				}
 				
 				context.put("stepName", testStep.getName());
@@ -176,7 +177,7 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 			}
 			
 			String[] logLines = logs.split("\n");
-			context.put("status", getTestStatus(testResult));
+			context.put(STATUS, getTestStatus(testResult));
 			context.put("stacktrace", stack);
 			context.put("logs", logLines);
 			

@@ -18,7 +18,13 @@ package com.seleniumtests.reporter;
 
 public class ElaborateLog {
 
-    private String type;
+    private static final String HREF = "HREF=";
+	private static final String LOCATION = "LOCATION=";
+	private static final String SRC = "SRC=";
+	private static final String SCREEN = "SCREEN=";
+	private static final String MSG = "MSG=";
+	private static final String TYPE = "TYPE=";
+	private String type;
     private String msg;
     private String screen;
     private String src;
@@ -49,18 +55,18 @@ public class ElaborateLog {
     }
 
     private void parse(final String part) {
-        if (part.startsWith("TYPE=")) {
-            type = part.replace("TYPE=", "");
-        } else if (part.startsWith("MSG=")) {
-            msg = part.replace("MSG=", "");
-        } else if (part.startsWith("SCREEN=")) {
-            screen = part.replace("SCREEN=", "");
-        } else if (part.startsWith("SRC=")) {
-            src = part.replace("SRC=", "");
-        } else if (part.startsWith("LOCATION=")) {
-            location = part.replace("LOCATION=", "");
-        } else if (part.startsWith("HREF=")) {
-            href = part.replace("HREF=", "");
+        if (part.startsWith(TYPE)) {
+            type = part.replace(TYPE, "");
+        } else if (part.startsWith(MSG)) {
+            msg = part.replace(MSG, "");
+        } else if (part.startsWith(SCREEN)) {
+            screen = part.replace(SCREEN, "");
+        } else if (part.startsWith(SRC)) {
+            src = part.replace(SRC, "");
+        } else if (part.startsWith(LOCATION)) {
+            location = part.replace(LOCATION, "");
+        } else if (part.startsWith(HREF)) {
+            href = part.replace(HREF, "");
         } else {
             msg = part;
         }
@@ -70,7 +76,7 @@ public class ElaborateLog {
     @Override
     public String toString() {
         StringBuilder buff = new StringBuilder();
-        buff.append("TYPE=");
+        buff.append(TYPE);
         if (type != null) {
             buff.append(type);
         }

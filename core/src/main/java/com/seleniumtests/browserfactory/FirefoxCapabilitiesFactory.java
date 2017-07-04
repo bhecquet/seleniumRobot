@@ -22,7 +22,6 @@ import java.io.IOException;
 import org.apache.commons.io.FileUtils;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxProfile;
-import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
 import com.seleniumtests.browserfactory.customprofile.FireFoxProfileMarker;
@@ -33,7 +32,8 @@ import com.seleniumtests.util.FileUtility;
 import com.seleniumtests.util.osutility.OSUtility;
 
 public class FirefoxCapabilitiesFactory extends ICapabilitiesFactory {
-    private static boolean isProfileCreated = false;
+    private static final String ALL_ACCESS = "allAccess";
+	private static boolean isProfileCreated = false;
     private static Object lockProfile = new Object();
 
     protected void configProfile(final FirefoxProfile profile, final DriverConfig webDriverConfig) {
@@ -63,10 +63,10 @@ public class FirefoxCapabilitiesFactory extends ICapabilitiesFactory {
         }
 
         // fix permission denied issues
-        profile.setPreference("capability.policy.default.Window.QueryInterface", "allAccess");
-        profile.setPreference("capability.policy.default.Window.frameElement.get", "allAccess");
-        profile.setPreference("capability.policy.default.HTMLDocument.compatMode.get", "allAccess");
-        profile.setPreference("capability.policy.default.Document.compatMode.get", "allAccess");
+        profile.setPreference("capability.policy.default.Window.QueryInterface", ALL_ACCESS);
+        profile.setPreference("capability.policy.default.Window.frameElement.get", ALL_ACCESS);
+        profile.setPreference("capability.policy.default.HTMLDocument.compatMode.get", ALL_ACCESS);
+        profile.setPreference("capability.policy.default.Document.compatMode.get", ALL_ACCESS);
         profile.setPreference("dom.max_chrome_script_run_time", 0);
         profile.setPreference("dom.max_script_run_time", 0);
     }
@@ -79,30 +79,12 @@ public class FirefoxCapabilitiesFactory extends ICapabilitiesFactory {
         DesiredCapabilities capability;
         capability = new DesiredCapabilities();
         capability.setBrowserName(DesiredCapabilities.firefox().getBrowserName());
+        capability = updateDefaultCapabilities(capability, webDriverConfig);
 
         FirefoxProfile profile = getFirefoxProfile(webDriverConfig);
         configProfile(profile, webDriverConfig);
         capability.setCapability(FirefoxDriver.PROFILE, profile);
         capability.setCapability("marionette", false);
-
-        if (webDriverConfig.isEnableJavascript()) {
-            capability.setJavascriptEnabled(true);
-        } else {
-            capability.setJavascriptEnabled(false);
-        }
-
-        capability.setCapability(CapabilityType.TAKES_SCREENSHOT, true);
-        capability.setCapability(CapabilityType.ACCEPT_SSL_CERTS, true);
-
-        if (webDriverConfig.getBrowserVersion() != null) {
-            capability.setVersion(webDriverConfig.getBrowserVersion());
-        }
-
-        if (webDriverConfig.getWebPlatform() != null) {
-            capability.setPlatform(webDriverConfig.getWebPlatform());
-        }
-
-        capability.setCapability(CapabilityType.PROXY, webDriverConfig.getProxy());
 
         return capability;
     }

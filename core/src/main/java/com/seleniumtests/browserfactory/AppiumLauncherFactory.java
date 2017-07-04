@@ -26,6 +26,10 @@ import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.driver.DriverMode;
 
 public class AppiumLauncherFactory {
+	
+	private AppiumLauncherFactory() {
+		// private constructor
+	}
 
 	public static AppiumLauncher getInstance() {
 		if (!SeleniumTestsContextManager.isMobileTest()) {

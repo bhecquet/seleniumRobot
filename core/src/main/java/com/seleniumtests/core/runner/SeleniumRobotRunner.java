@@ -110,7 +110,7 @@ public class SeleniumRobotRunner {
      * @throws IOException
      */
     @BeforeTest(alwaysRun = true)
-    public void beforeTestSuite(final ITestContext testContext) throws IOException {
+    public void beforeTestSuite(final ITestContext testContext) {
         start = new Date();
         SeleniumTestsContextManager.initGlobalContext(testContext);
         SeleniumTestsContextManager.initThreadContext(testContext);

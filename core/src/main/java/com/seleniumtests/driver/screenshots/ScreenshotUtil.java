@@ -111,7 +111,7 @@ public class ScreenshotUtil {
     public static void capturePageScreenshotToFile(final WebDriver driver, String filePath, int cropTop, int cropBottom) throws IOException {
     	String screenshotString = capturePageScreenshotToString(driver);
 
-        if (screenshotString != null && !screenshotString.isEmpty()) {
+        if (screenshotString != null && !screenshotString.isEmpty() && driver != null) {
             byte[] byteArray = screenshotString.getBytes();
             byte[] decodeBuffer = Base64.decodeBase64(byteArray);
             BufferedImage img = ImageProcessor.loadFromFile(decodeBuffer);
@@ -224,14 +224,14 @@ public class ScreenshotUtil {
     }
 
     private void handleSource(String htmlSource, final ScreenShot screenShot) {
-    	String _htmlSource = htmlSource;
-        if (_htmlSource == null) {
-        	_htmlSource = driver.getPageSource();
+    	String newHtmlSource = htmlSource;
+        if (newHtmlSource == null) {
+        	newHtmlSource = driver.getPageSource();
         }
 
-        if (_htmlSource != null) {
+        if (newHtmlSource != null) {
             try {
-                FileUtils.writeStringToFile(new File(outputDirectory + "/" + HTML_DIR + filename + ".html"), _htmlSource);
+                FileUtils.writeStringToFile(new File(outputDirectory + "/" + HTML_DIR + filename + ".html"), newHtmlSource);
                 screenShot.setHtmlSourcePath(HTML_DIR + filename + ".html");
             } catch (IOException e) {
                 logger.warn("Ex", e);
@@ -254,16 +254,16 @@ public class ScreenshotUtil {
     }
 
     private void handleTitle(String title, final ScreenShot screenShot) {
-    	String _title = title;
-        if (_title == null) {
-            _title = driver.getTitle();
+    	String newTitle = title;
+        if (newTitle == null) {
+            newTitle = driver.getTitle();
         }
 
-        if (_title == null) {
-            _title = "";
+        if (newTitle == null) {
+            newTitle = "";
         }
 
-        screenShot.setTitle(_title);
+        screenShot.setTitle(newTitle);
     }
     
     /**

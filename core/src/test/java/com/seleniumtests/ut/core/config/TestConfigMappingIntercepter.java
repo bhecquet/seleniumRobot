@@ -29,7 +29,11 @@ import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.uipage.Locator;
 import com.seleniumtests.uipage.aspects.InterceptBy;
 
-
+/**
+ * Check that InterceptBy aspect is working and has been weaved
+ * @author behe
+ *
+ */
 public class TestConfigMappingIntercepter extends GenericTest {
 	@BeforeMethod(groups={"ut"})
 	public void initContext(final ITestContext testNGCtx, final XmlTest xmlTest) {

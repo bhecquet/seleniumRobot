@@ -23,7 +23,6 @@ import java.time.Duration;
 import javax.swing.ImageIcon;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.log4j.Logger;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.Rectangle;
 import org.openqa.selenium.WebDriverException;
@@ -41,7 +40,6 @@ import com.seleniumtests.driver.screenshots.ScreenshotUtil;
 import com.seleniumtests.uipage.ReplayOnError;
 import com.seleniumtests.util.helper.WaitHelper;
 import com.seleniumtests.util.imaging.ImageDetector;
-import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
 import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.TouchAction;
@@ -63,8 +61,6 @@ public class PictureElement {
 	private ScreenshotUtil screenshotUtil;
 	private SystemClock clock = new SystemClock();
 
-	private static Logger logger = SeleniumRobotLogger.getLogger(PictureElement.class);
-	
 	public PictureElement() {
 		// for mocks
 	}
@@ -197,21 +193,6 @@ public class PictureElement {
 
 	public void sendKeys(final CharSequence text) {
 		sendKeys(text, 0, 0);
-	}
-	
-	/**
-	 * Returns true in cas the searched picture is found
-	 * @deprecated use isElementPresentInstead
-	 * @return
-	 */
-	@Deprecated
-	public boolean isVisible() {
-		try {
-			findElement(true);
-			return true;
-		} catch (ImageSearchException e) {
-			return false;
-		}
 	}
 	
 	public boolean isElementPresent() {

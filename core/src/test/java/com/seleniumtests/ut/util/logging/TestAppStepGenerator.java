@@ -19,10 +19,10 @@ public class TestAppStepGenerator extends GenericTest {
 		List<AppStepsGenerator.TestStep> steps = new AppStepsGenerator().analyzeFile(createFileFromResource("tu/JPetStoreHome.java"));
 		
 		Assert.assertEquals(steps.size(), 4);
-		Assert.assertEquals(steps.get(0).stepMethod, "goToFish");
-		Assert.assertEquals(steps.get(1).stepMethod, "goToSonarLanguageList");
-		Assert.assertEquals(steps.get(2).stepMethod, "goToMockedSonarLanguageList");
-		Assert.assertEquals(steps.get(3).stepMethod, "goToFishFromHeader");
+		Assert.assertEquals(steps.get(0).getStepMethod(), "goToFish");
+		Assert.assertEquals(steps.get(1).getStepMethod(), "goToSonarLanguageList");
+		Assert.assertEquals(steps.get(2).getStepMethod(), "goToMockedSonarLanguageList");
+		Assert.assertEquals(steps.get(3).getStepMethod(), "goToFishFromHeader");
 	}
 	
 	/**
@@ -33,11 +33,11 @@ public class TestAppStepGenerator extends GenericTest {
 	public void testFileAnalysisStepNames() throws IOException {
 		List<AppStepsGenerator.TestStep> steps = new AppStepsGenerator().analyzeFile(createFileFromResource("tu/JPetStoreHome.java"));
 		
-		Assert.assertEquals(steps.get(0).stepName, "When Cliquer sur le lien 'FISH'");
-		Assert.assertEquals(steps.get(1).stepName, "public LanguageList goToSonarLanguageList()");
-		Assert.assertEquals(steps.get(3).stepName, "public FishList goToFishFromHeader(String param)");
+		Assert.assertEquals(steps.get(0).getStepName(), "When Cliquer sur le lien 'FISH'");
+		Assert.assertEquals(steps.get(1).getStepName(), "public LanguageList goToSonarLanguageList()");
+		Assert.assertEquals(steps.get(3).getStepName(), "public FishList goToFishFromHeader(String param)");
 		
-		Assert.assertEquals(steps.get(0).stepDetails, "Go to fish page\n" +
+		Assert.assertEquals(steps.get(0).getStepDetails(), "Go to fish page\n" +
 				"@return\n" +
 				"@throws Exception");
 	}
@@ -50,10 +50,10 @@ public class TestAppStepGenerator extends GenericTest {
 	public void testFileAnalysisStepDetails() throws IOException {
 		List<AppStepsGenerator.TestStep> steps = new AppStepsGenerator().analyzeFile(createFileFromResource("tu/JPetStoreHome.java"));
 		
-		Assert.assertEquals(steps.get(0).stepDetails, "Go to fish page\n" +
+		Assert.assertEquals(steps.get(0).getStepDetails(), "Go to fish page\n" +
 				"@return\n" +
 				"@throws Exception");
-		Assert.assertEquals(steps.get(3).stepDetails, "");
+		Assert.assertEquals(steps.get(3).getStepDetails(), "");
 	}
 	
 	@Test(groups={"ut"})

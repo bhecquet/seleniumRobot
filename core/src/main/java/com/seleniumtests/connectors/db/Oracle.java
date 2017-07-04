@@ -85,13 +85,11 @@ public class Oracle {
     		return oracleEnv;
     	}
     	
-    	if (OSUtility.getCurrentPlatorm() == Platform.WINDOWS) {
-    		if (new File("C:\\oracle").isDirectory()) {
-	    		for (File orCli: new File("C:\\oracle").listFiles()) {
-	    			if (new File(orCli.getAbsolutePath() + File.separator + "NETWORK\\ADMIN\\sqlnet.ora").isFile()) {
-	    				return orCli.getAbsolutePath();
-	    			}
-	    		}
+    	if (OSUtility.getCurrentPlatorm() == Platform.WINDOWS && new File("C:\\oracle").isDirectory()) {
+    		for (File orCli: new File("C:\\oracle").listFiles()) {
+    			if (new File(orCli.getAbsolutePath() + File.separator + "NETWORK\\ADMIN\\sqlnet.ora").isFile()) {
+    				return orCli.getAbsolutePath();
+    			}
     		}
     	}
     	return null;
@@ -127,12 +125,12 @@ public class Oracle {
     public List<List<String>> executeQuery(String query) throws SQLException {
     	
     	List<List<String>> result = new ArrayList<>();
-    	Statement stmt = null;
-    	ResultSet rs = null;
+
     	Connection connection = connect();
-    	try {
-	    	stmt = connection.createStatement();
-	        rs = stmt.executeQuery(query);
+    	try (Statement stmt = connection.createStatement();
+    		 ResultSet rs = stmt.executeQuery(query);
+    			) {
+	    	
 	        
 	        result = new ArrayList<>();
 	        
@@ -147,17 +145,21 @@ public class Oracle {
     		if (!e.getMessage().contains("next")) {
     			throw e;
     		}
-    	} finally {
-    		if (stmt != null) {
-    			stmt.close();
-    		}
-    		if (rs != null) {
-    			rs.close();
-    		}
-    		disconnect(connection);
-    	}
+    	} 
         
         return result;
+    }
+    
+    private List<HashMap<String, String>> readRows(ResultSet rs) throws SQLException {
+    	List<HashMap<String, String>> result = new ArrayList<>();
+    	while (rs.next()) {
+			HashMap<String, String> row = new HashMap<>();
+			for (int j=1; j < rs.getMetaData().getColumnCount() + 1; j++) {
+				row.put(rs.getMetaData().getColumnName(j), rs.getString(j));
+			}
+			result.add(row);
+		}
+    	return result;
     }
     
     /**
@@ -170,40 +172,28 @@ public class Oracle {
     public List<HashMap<String, String>> executeParamQuery(String query, Object...params) throws SQLException {
     	
 
-    	List<HashMap<String, String>> result = new ArrayList<HashMap<String, String>>();
-    	PreparedStatement pstmt = null;
+    	List<HashMap<String, String>> result = new ArrayList<>();
+
     	Connection connection = connect();
-    	try {
-    		pstmt = connection.prepareStatement(query);
+    	
+    	try (PreparedStatement pstmt = connection.prepareStatement(query);){
     		int i = 1;
     		for (Object param: params) {
     			pstmt.setObject(i, param);
     			i += 1;
     		}
-    		ResultSet rs = pstmt.executeQuery();
-
-    		if (!query.toLowerCase().startsWith("update") && !query.toLowerCase().startsWith("delete")) {
-    			
-        		while (rs.next()) {
-        			HashMap<String, String> row = new HashMap<>();
-        			for (int j=1; j < rs.getMetaData().getColumnCount() + 1; j++) {
-        				row.put(rs.getMetaData().getColumnName(j), rs.getString(j));
-        			}
-        			result.add(row);
-        		}
+    		
+    		try (ResultSet rs = pstmt.executeQuery();) {
+	    		if (!query.toLowerCase().startsWith("update") && !query.toLowerCase().startsWith("delete")) {
+	    			result = readRows(rs);
+	    		}
     		}
     		
     	} catch (SQLException e) {
     		if (!e.getMessage().contains("next")) {
     			throw e;
     		}
-    	} finally {
-    		if (pstmt != null) {
-    			pstmt.close();
-    		}
-    		disconnect(connection);
-    	}
-    	
+    	} 
     	return result;
     }
     

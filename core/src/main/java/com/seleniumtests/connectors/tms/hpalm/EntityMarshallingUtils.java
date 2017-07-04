@@ -54,8 +54,7 @@ public class EntityMarshallingUtils {
 		Marshaller marshaller = ctx.createMarshaller();
 		StringWriter entityXml = new StringWriter();
 		marshaller.marshal(o, entityXml);
-		String entityString = entityXml.toString();
-		return entityString;
+		return entityXml.toString();
 	}
 
 }

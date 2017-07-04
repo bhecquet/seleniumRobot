@@ -378,7 +378,7 @@ public class PageObject extends BasePage implements IPage {
     	}
     }
 
-    private void open(final String url) throws IOException {
+    private void open(final String url) {
 
         if (this.getDriver() == null) {
             driver = webUXDriver.createWebDriver();

@@ -19,6 +19,7 @@ package com.seleniumtests.browserfactory;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
+import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.DriverConfig;
 import com.seleniumtests.driver.DriverMode;
 
@@ -67,7 +68,7 @@ public class IOsCapabilitiesFactory extends ICapabilitiesFactory {
         }
 
     	// do not configure application and browser as they are mutualy exclusive
-        if (app == null || "".equals(app.trim())) {
+        if (app == null || "".equals(app.trim()) && cfg.getBrowser() != BrowserType.NONE) {
         	caps.setCapability(CapabilityType.BROWSER_NAME, cfg.getBrowser().toString().toLowerCase());
         } else {
         	caps.setCapability(CapabilityType.BROWSER_NAME, "");

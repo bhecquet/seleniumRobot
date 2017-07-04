@@ -855,7 +855,7 @@ public class SeleniumTestsReporter extends CommonReporter implements IReporter {
     protected ITestNGMethod getTestNGMethod(final ITestContext ctx, final String method) {
         Collection<ITestNGMethod> methods = new HashSet<>();
 
-        int index = method.substring(0, method.lastIndexOf(".")).lastIndexOf(".");
+        int index = method.substring(0, method.lastIndexOf('.')).lastIndexOf('.');
         String localMethod = method.substring(index + 1);
 
         ITestNGMethod[] all = ctx.getAllTestMethods();

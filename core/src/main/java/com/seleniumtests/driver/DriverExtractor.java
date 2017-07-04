@@ -196,7 +196,7 @@ public class DriverExtractor {
 	 * In case of difference, extract
 	 * @throws IOException 
 	 */
-	public String extractDriver(String driverName) throws IOException {
+	public String extractDriver(String driverName) {
 		
 		String driverVersion = getDriverVersion(driverName);
 		String robotVersion = getVersion();
@@ -208,7 +208,11 @@ public class DriverExtractor {
 		} 
 		
 		// write version file
-		FileUtils.writeStringToFile(Paths.get(getDriverPath().toFile().getAbsolutePath(), getDriverVersionFileName(driverName)).toFile(), robotVersion);
+		try {
+			FileUtils.writeStringToFile(Paths.get(getDriverPath().toFile().getAbsolutePath(), getDriverVersionFileName(driverName)).toFile(), robotVersion);
+		} catch (IOException e) {
+			logger.error("driver version not written", e);
+		}
 		
 		return driverPath.toString();
 	}

@@ -29,7 +29,7 @@ public class ImapClient extends EmailClientImpl {
 	
 	private Integer imapPort;
 	
-	public ImapClient(String host, String username, String password, String folder) throws MessagingException, IOException {
+	public ImapClient(String host, String username, String password, String folder) throws MessagingException {
 		this(host, username, password, folder, 143);
 	}
 	
@@ -43,7 +43,7 @@ public class ImapClient extends EmailClientImpl {
 	 * @param timeOffset		workaround when server does not report the same time
 	 * @throws Exception 
 	 */
-	public ImapClient(String host, String username, String password, String folder, Integer imapPort) throws MessagingException, IOException {
+	public ImapClient(String host, String username, String password, String folder, Integer imapPort) throws MessagingException {
 		
 		super();
 		
@@ -179,8 +179,7 @@ public class ImapClient extends EmailClientImpl {
 			if (contentType.toLowerCase().contains("text/html")) {
 				messageContent += StringEscapeUtils.unescapeHtml4(message.getContent().toString());
 			} else if (contentType.toLowerCase().contains("multipart/")) {
-				List<BodyPart> partList = getMessageParts((Multipart) message
-						.getContent());
+				List<BodyPart> partList = getMessageParts((Multipart) message.getContent());
 
 				// store content in list
 				for (BodyPart part : partList) {

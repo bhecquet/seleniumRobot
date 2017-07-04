@@ -36,7 +36,7 @@ public abstract class TestManager {
 			throw new ConfigurationException("Test manager type must be provided. ex: {'type': 'hp', 'run': '3'}");
 		}
 		
-		if (type.equals("hp")) {
+		if ("hp".equals(type)) {
 			return new HpAlmConnector(configString);
 		} else {
 			throw new ConfigurationException(String.format("TestManager type [%s] is unknown, valid values are: ['hp']", type));

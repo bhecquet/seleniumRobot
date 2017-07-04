@@ -89,10 +89,12 @@ public class ImageDetector {
 	}
 	
 	class TemplateMatchProperties {
-		public Point matchLoc;
-		public Integer matchScale;
-		public Double matchValue;
-		public boolean active;
+		
+
+		private Point matchLoc;
+		private Integer matchScale;
+		private Double matchValue;
+		private boolean active;
 		
 		public TemplateMatchProperties() {
 			matchLoc = null;
@@ -116,6 +118,26 @@ public class ImageDetector {
 		public Double getDoubleScale() {
 			return matchScale != null ? matchScale / 1000.0: null;
 		}
+
+		public Point getMatchLoc() {
+			return matchLoc;
+		}
+
+		public Integer getMatchScale() {
+			return matchScale;
+		}
+
+		public Double getMatchValue() {
+			return matchValue;
+		}
+
+		public boolean isActive() {
+			return active;
+		}
+		
+		public void setActive(boolean active) {
+			this.active = active;
+		}
 	}
 	
 	public ImageDetector() {
@@ -136,7 +158,7 @@ public class ImageDetector {
 	 * Compute the rectangle where the searched picture is and the rotation angle between both images
 	 * Throw {@link ImageSearchException} if picture is not found
 	 * @return
-	 * @deprecated Kept here for information, but open CV 3 does not include SURF anymore for java build
+	 * @Deprecated Kept here for information, but open CV 3 does not include SURF anymore for java build
 	 */
 	public void detectCorrespondingZone() {
 		Mat objectImageMat = Imgcodecs.imread(objectImage.getAbsolutePath(), Imgcodecs.CV_LOAD_IMAGE_COLOR);
@@ -168,10 +190,10 @@ public class ImageDetector {
 		DescriptorMatcher matcher = DescriptorMatcher.create(DescriptorMatcher.FLANNBASED);
 		MatOfDMatch matches = new MatOfDMatch();
 		
-		if (objectKeyPoints.toList().size() == 0) {
+		if (objectKeyPoints.toList().isEmpty()) {
 			throw new ImageSearchException("No keypoints in object to search, check it's not uniformly coloured: " + objectImage.getAbsolutePath());
 		}
-		if (sceneKeyPoints.toList().size() == 0) {
+		if (sceneKeyPoints.toList().isEmpty()) {
 			throw new ImageSearchException("No keypoints in scene, check it's not uniformly coloured: " + sceneImage.getAbsolutePath());
 		}
 		if (objectDescriptor.type() != CvType.CV_32F) {
@@ -327,9 +349,9 @@ public class ImageDetector {
         			throw new ImageSearchException("no matches");
         		}
 	        	for (TemplateMatchProperties tmpM: matches) {
-	        		if (tmpM.active) {
-	        			localScales.add(tmpM.matchScale - currentStep);
-	        			localScales.add(tmpM.matchScale + currentStep);
+	        		if (tmpM.isActive()) {
+	        			localScales.add(tmpM.getMatchScale() - currentStep);
+	        			localScales.add(tmpM.getMatchScale() + currentStep);
 	        		}
 	        	}
         	}
@@ -374,8 +396,8 @@ public class ImageDetector {
     		
         	// shortcut if we find a very good match
     		double cleanThreshold = currentThreshold;
-    		matches.sort((TemplateMatchProperties t1, TemplateMatchProperties t2) -> -(t1.matchValue.compareTo(t2.matchValue)));
-    		if (!matches.isEmpty() && matches.get(0).matchValue > 0.9) {
+    		matches.sort((TemplateMatchProperties t1, TemplateMatchProperties t2) -> -(t1.getMatchValue().compareTo(t2.getMatchValue())));
+    		if (!matches.isEmpty() && matches.get(0).getMatchValue() > 0.9) {
     			cleanThreshold = 0.9;
     			currentStep = Math.min(currentStep, 50);
     		} 
@@ -384,23 +406,23 @@ public class ImageDetector {
     		
     		// clean matches from too low matching values
     		for (TemplateMatchProperties t: matches) {
-    			if (t.matchValue < cleanThreshold) {
-        			t.active = false;
+    			if (t.getMatchValue() < cleanThreshold) {
+        			t.setActive(false);
         		}
     		}
         }
 		
 		// get the best match
-		matches.sort((TemplateMatchProperties t1, TemplateMatchProperties t2) -> -(t1.matchValue.compareTo(t2.matchValue)));
+		matches.sort((TemplateMatchProperties t1, TemplateMatchProperties t2) -> -(t1.getMatchValue().compareTo(t2.getMatchValue())));
 		
 		if (!matches.isEmpty()) {
 			TemplateMatchProperties bestMatch = matches.get(0);
-			if (bestMatch.matchValue < 1 - detectionThreshold) {
-				throw new ImageSearchException(String.format("No match found for threshold %.2f, match found with value %.2f", 1 - detectionThreshold, bestMatch.matchValue));
+			if (bestMatch.getMatchValue() < 1 - detectionThreshold) {
+				throw new ImageSearchException(String.format("No match found for threshold %.2f, match found with value %.2f", 1 - detectionThreshold, bestMatch.getMatchValue()));
 			}
 	
-			detectedRectangle = new Rectangle((int)(bestMatch.matchLoc.x / bestMatch.getDoubleScale()), 
-												(int)(bestMatch.matchLoc.y / bestMatch.getDoubleScale()), 
+			detectedRectangle = new Rectangle((int)(bestMatch.getMatchLoc().x / bestMatch.getDoubleScale()), 
+												(int)(bestMatch.getMatchLoc().y / bestMatch.getDoubleScale()), 
 												(int)(objectImageMat.rows() / bestMatch.getDoubleScale()), 
 												(int)(objectImageMat.cols() / bestMatch.getDoubleScale()));
 			
@@ -447,7 +469,7 @@ public class ImageDetector {
 		int matchMethod = Imgproc.TM_CCOEFF_NORMED;
 		 
 		MinMaxLocResult mmr = getBestTemplateMatching(matchMethod, sceneImageMat, objectImageMat);
-		System.out.println(scale + " - " + mmr.maxVal);
+	
 		if (mmr.maxVal < threshold) {
 			throw new ImageSearchException("match not found");
 		}

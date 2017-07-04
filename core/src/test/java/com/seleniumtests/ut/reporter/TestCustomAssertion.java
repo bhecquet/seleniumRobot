@@ -31,6 +31,11 @@ import com.seleniumtests.GenericTest;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.reporter.TestListener;
 
+/**
+ * Check that SoftAssert aspect is working and has been weaved
+ * @author behe
+ *
+ */
 public class TestCustomAssertion extends GenericTest {
 
 	/**

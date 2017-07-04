@@ -38,6 +38,8 @@ public abstract class OSUtility {
 
 	protected static final Logger logger = SeleniumRobotLogger.getLogger(OSUtility.class);
 	
+	protected static final String LATEST_VERSION = "latest";
+	
 	private String[] webBrowserProcessList = {"chrome", "firefox",  "iexplore"};
 
 	private String[] webDriverProcessList = {"chromedriver", "geckodriver", "IEDriverServer", "MicrosoftWebDriver"};
@@ -148,10 +150,7 @@ public abstract class OSUtility {
     public boolean isProcessRunning(String processName) {
     	
     	ProcessInfo processInfo = getRunningProcess(processName);
-		if (processInfo.getName() != null){
-			return true;
-		}
-    	return false;
+		return (processInfo != null && processInfo.getName() != null);
     }
     
     /**
@@ -263,7 +262,7 @@ public abstract class OSUtility {
      * @return output command lines
      * @throws IOException
      */
-    public String killIEProcess() throws IOException {
+    public String killIEProcess() {
     	ProcessInfo processInfo = getRunningProcess("iexplore");
 		if (processInfo.getName() != null){
 			logger.info("Asked system to terminate : " + processInfo.getName());

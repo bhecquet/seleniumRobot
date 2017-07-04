@@ -39,20 +39,15 @@ public abstract class AbstractWebDriverFactory {
     }
 
     public void cleanUp() {
-        try {
-            if (driver != null) {
-                try {
-                    TestLogging.log("quiting webdriver" + Thread.currentThread().getId());
-                    driver.quit();
-                } catch (WebDriverException ex) {
-                    TestLogging.log("Exception encountered when quiting driver: "
-                            + WebUIDriver.getWebUIDriver().getConfig().getBrowser().name() + ":" + ex.getMessage());
-                }
-
-                driver = null;
+        if (driver != null) {
+            try {
+                TestLogging.log("quiting webdriver" + Thread.currentThread().getId());
+                driver.quit();
+            } catch (Exception ex) {
+                TestLogging.log("Exception encountered when quiting driver:" + ex.getMessage());
             }
-        } catch (Exception e) {
-        	logger.error(e);
+
+            driver = null;
         }
     }
     

@@ -151,6 +151,23 @@ public abstract class EmailClientImpl implements EmailClient {
 		return checkMessagePresenceInLastMessages(subject, Arrays.asList(attachmentNames), email);
 	}
 
+	private List<String> getMissingAttachments(List<String> attachmentNames, Email email) {
+		List<String> missingAttachments = new ArrayList<>();
+		missingAttachments.addAll(attachmentNames);
+
+		// do we have the requested attachments
+		for (String attachmentName: attachmentNames) {
+
+			for (String emailAttachment: email.getAttachment()) {
+				if (emailAttachment.matches(attachmentName)) {
+					missingAttachments.remove(attachmentName);
+					break;
+				}
+			}
+		}
+		return missingAttachments;
+	}
+	
 	/**
 	 * Check that email whose subject and attachements are specified have been received
 	 * @param subject			subject title. Regex are accepted
@@ -170,19 +187,7 @@ public abstract class EmailClientImpl implements EmailClient {
 		for (int i = 0; i < 10; i++) {
 			
 			for (Email email: emailList) {
-				List<String> missingAttachments = new ArrayList<>();
-				missingAttachments.addAll(attachmentNames);
-
-				// do we have the requested attachments
-				for (String attachmentName: attachmentNames) {
-
-					for (String emailAttachment: email.getAttachment()) {
-						if (emailAttachment.matches(attachmentName)) {
-							missingAttachments.remove(attachmentName);
-							break;
-						}
-					}
-				}
+				List<String> missingAttachments = getMissingAttachments(attachmentNames, email);
 				
 				// title and attachments OK
 				if (missingAttachments.isEmpty()) {
@@ -231,6 +236,27 @@ public abstract class EmailClientImpl implements EmailClient {
 	}
 	
 	/**
+	 * Check if the email contains all requested attachment names
+	 * @param attachmentNames
+	 * @param email
+	 * @return
+	 */
+	private boolean areAllAttachmentsFound(List<String> attachmentNames, Email email) {
+		Boolean attachmentsFound = true;
+		for (String attachmentName: attachmentNames) {
+			Boolean attachmentFound = false;
+			for (String emailAttachment: email.getAttachment()) {
+				if (emailAttachment.matches(attachmentName)) {
+					attachmentFound = true;
+					break;
+				}
+			}
+			attachmentsFound = attachmentsFound && attachmentFound;
+		}
+		return attachmentsFound;
+	}
+	
+	/**
 	 * Check that email whose subject and attachments are specified have been received
 	 * several retries are done in case it's not available
 	 * 
@@ -249,21 +275,9 @@ public abstract class EmailClientImpl implements EmailClient {
 		for (int i = 0; i < 10; i++) {
 			
 			for (Email email: emailList) {
-				// do we have the whole list of attachments
-				Boolean attachmentsFound = true;
-				for (String attachmentName: attachmentNames) {
-					Boolean attachmentFound = false;
-					for (String emailAttachment: email.getAttachment()) {
-						if (emailAttachment.matches(attachmentName)) {
-							attachmentFound = true;
-							break;
-						}
-					}
-					attachmentsFound = attachmentsFound && attachmentFound;
-				}
-				
+
 				// title and attachments OK
-				if (attachmentsFound) {
+				if (areAllAttachmentsFound(attachmentNames, email)) {
 					return email;
 				}
 			}

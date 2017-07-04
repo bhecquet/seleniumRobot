@@ -95,7 +95,7 @@ public class HpAlmConnector extends TestManager {
 				throw new ConfigurationException("Cannot connect to HP server: " + response.getStatusText());
 			}
 		} catch (UnirestException e) {
-			throw new ConfigurationException("Cannot connect to HP server: " + e.getMessage());
+			throw new ConfigurationException("Cannot connect to HP server", e);
 		}
 		loggedIn = true;
 	}
@@ -109,6 +109,7 @@ public class HpAlmConnector extends TestManager {
 			try {
 				Unirest.get(serverUrl + "/authentication-point/logout").asString();
 			} catch (UnirestException e) {
+				logger.warn("Error while logout", e);
 			}
 		}
 	}
@@ -187,7 +188,7 @@ public class HpAlmConnector extends TestManager {
 					.asString();
 			
 		} catch (UnirestException | IOException e) {
-			logger.error("L'enregistrement du résultat a échoué: " + e.getMessage());
+			logger.error("Result record failed", e);
 		}
 	}
 	
@@ -262,12 +263,11 @@ public class HpAlmConnector extends TestManager {
 	private Entity buildTestRunResultEntity(Map<String, String> fieldMap, String entityType) {
 		Entity entity = new Entity();
 		Entity.Fields fields = new Entity.Fields();
-		Entity.Fields.Field field = new Entity.Fields.Field();
 
 		Iterator<Entry<String, String>> headersIterator = fieldMap.entrySet().iterator();
 		while (headersIterator.hasNext()) {
 			Entry<String, String> header = headersIterator.next();
-			field = new Entity.Fields.Field();
+			Entity.Fields.Field field = new Entity.Fields.Field();
 			field.setName(header.getKey());
 			field.addValue(header.getValue());
 			fields.addField(field);

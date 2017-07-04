@@ -209,9 +209,9 @@ public class SeleniumTestsContextManager {
         	generateApplicationPath(testNGCtx.getCurrentXmlTest().getSuite());
         }
     	
-    	ITestContext _testNGCtx = getContextFromConfigFile(testNGCtx);
-    	SeleniumTestsContext seleniumTestsCtx = new SeleniumTestsContext(_testNGCtx);
-        loadCustomizedContextAttribute(_testNGCtx, seleniumTestsCtx);
+    	ITestContext newTestNGCtx = getContextFromConfigFile(testNGCtx);
+    	SeleniumTestsContext seleniumTestsCtx = new SeleniumTestsContext(newTestNGCtx);
+        loadCustomizedContextAttribute(newTestNGCtx, seleniumTestsCtx);
         
         threadLocalContext.set(seleniumTestsCtx);
         

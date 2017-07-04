@@ -1,8 +1,8 @@
 package com.seleniumtests.ut.connectors.mails;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.nullable;
@@ -23,7 +23,6 @@ import org.testng.annotations.Test;
 import com.seleniumtests.MockitoTest;
 import com.seleniumtests.connectors.mails.Email;
 import com.seleniumtests.connectors.mails.EmailClient;
-import com.seleniumtests.connectors.mails.EmailClientImpl.SearchMode;
 import com.seleniumtests.connectors.mails.EmailClientSelector;
 import com.seleniumtests.connectors.mails.EmailServer;
 import com.seleniumtests.connectors.mails.EmailServer.EmailServerTypes;

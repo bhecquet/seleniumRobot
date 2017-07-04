@@ -29,19 +29,17 @@ public class OSUtilityMac extends OSUtilityUnix {
 	public Map<BrowserType, BrowserInfo> discoverInstalledBrowsersWithVersion() {
 		Map<BrowserType, BrowserInfo> browserList = new EnumMap<>(BrowserType.class);
 		
-		browserList.put(BrowserType.HTMLUNIT, new BrowserInfo(BrowserType.HTMLUNIT, "latest", null));
-		browserList.put(BrowserType.PHANTOMJS, new BrowserInfo(BrowserType.PHANTOMJS, "latest", null));
+		browserList.put(BrowserType.HTMLUNIT, new BrowserInfo(BrowserType.HTMLUNIT, LATEST_VERSION, null));
+		browserList.put(BrowserType.PHANTOMJS, new BrowserInfo(BrowserType.PHANTOMJS, LATEST_VERSION, null));
 		
 		// safari is always installed on mac os
-		browserList.put(BrowserType.SAFARI, new BrowserInfo(BrowserType.SAFARI, "latest", null));
+		browserList.put(BrowserType.SAFARI, new BrowserInfo(BrowserType.SAFARI, LATEST_VERSION, null));
 		
 		if (new File("/Applications/Google Chrome.app").isDirectory()) {
-//			String version = OSCommand.executeCommandAndWait(new String[] {"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome", "--version"});
 			String version = getChromeVersion("/Applications/Google Chrome.app/Contents/MacOS/Google Chrome");
 			browserList.put(BrowserType.CHROME, new BrowserInfo(BrowserType.CHROME, extractChromeVersion(version), "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"));
 		}
 		if (new File("/Applications/Firefox.app").isDirectory()) {
-//			String version = OSCommand.executeCommandAndWait("/Applications/Firefox.app/Contents/MacOS/firefox --version | more");
 			String version = getFirefoxVersion("/Applications/Firefox.app/Contents/MacOS/firefox");
 			browserList.put(BrowserType.FIREFOX, new BrowserInfo(BrowserType.FIREFOX, extractFirefoxVersion(version), "/Applications/Firefox.app/Contents/MacOS/firefox"));
 		}

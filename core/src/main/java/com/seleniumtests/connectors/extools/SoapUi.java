@@ -5,12 +5,10 @@ import java.io.IOException;
 import java.nio.file.Paths;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.openqa.selenium.Platform;
 
 import com.seleniumtests.customexception.ConfigurationException;
-import com.seleniumtests.customexception.CustomSeleniumTestsException;
 import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 import com.seleniumtests.util.osutility.OSCommand;
@@ -48,6 +46,7 @@ public class SoapUi {
 	 * @return				reply of service
 	 */
 	public String executeWithProjectFile(File projectFile) {
+		logger.info("Running Soap UI with project file: " + projectFile.getAbsolutePath());
 		return OSCommand.executeCommandAndWait(new String[] {soapUiPath, projectFile.getAbsolutePath()});
 	}
 	
