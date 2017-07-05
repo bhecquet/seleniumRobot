@@ -32,7 +32,7 @@ public class TestBrowserProxy extends GenericDriverTest {
 	private static final String BROWSER = "chrome";
 
 	public void initDriver(final ITestContext testNGCtx) {
-		SeleniumTestsContextManager.initThreadContext(testNGCtx);
+		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setExplicitWaitTimeout(2);
 		driver = WebUIDriver.getWebDriver(true);
 	}

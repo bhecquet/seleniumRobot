@@ -29,6 +29,7 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Listeners;
 
+import com.mashape.unirest.http.Unirest;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.TearDownService;
 import com.seleniumtests.driver.WebUIDriver;
@@ -124,6 +125,11 @@ public class SeleniumRobotRunner {
 			SeleniumRobotLogger.parseLogFile();
 		} catch (IOException e) {
 			logger.error("cannot read log file", e);
+		}
+        try {
+			Unirest.shutdown();
+		} catch (IOException e) {
+			logger.error("Cannot stop unirest", e);
 		}
     }
     

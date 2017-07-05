@@ -37,7 +37,7 @@ public class TestTaScriptGenerator extends GenericTest {
 
 	@BeforeClass(groups={"ut"})
 	public void init(ITestContext testNGCtx) {
-		SeleniumTestsContextManager.initThreadContext(testNGCtx);
+		initThreadContext(testNGCtx);
 	}
 	
 	

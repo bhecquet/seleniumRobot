@@ -23,7 +23,13 @@ import org.testng.annotations.Test;
 import com.seleniumtests.GenericTest;
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.util.PackageUtility;
 
+/**
+ * The first 4 tests will fail when executed directly because they use the tu.xml specific configurations
+ * @author behe
+ *
+ */
 public class TestSeleniumTestContextManager extends GenericTest {
 
 	/**
@@ -71,7 +77,7 @@ public class TestSeleniumTestContextManager extends GenericTest {
 	public void extendedConfigurationIsWrittentIntoCurrentTest(ITestContext iTestContext) {
 		try {
 			System.setProperty(SeleniumTestsContext.DEVICE_NAME, "Samsung Galaxy Nexus SPH-L700 4.3");
-			SeleniumTestsContextManager.initThreadContext(iTestContext);
+			initThreadContext(iTestContext);
 			Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getPlatform(), "Android");
 			Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getMobilePlatformVersion(), "4.3");
 		} finally {
@@ -79,6 +85,57 @@ public class TestSeleniumTestContextManager extends GenericTest {
 		}
 	}
 	
+	/**
+	 * Check that version is shorten: 3.0.0 => 3.0
+	 * @param iTestContext
+	 */
+	@Test(groups={"ut"})
+	public void testReadApplicationVersion(ITestContext iTestContext) {
+		initThreadContext(iTestContext);
+		String packageVersion = PackageUtility.getVersion();
+		Assert.assertTrue(packageVersion.contains(SeleniumTestsContextManager.getApplicationVersion()));
+		Assert.assertTrue(packageVersion.length() > SeleniumTestsContextManager.getApplicationVersion().length());
+	}
+	
+	/**
+	 * Empty version => 0.0
+	 * @param iTestContext
+	 */
+	@Test(groups={"ut"})
+	public void testReadEmptyApplicationVersion(ITestContext iTestContext) {
+		initThreadContext(iTestContext);
+		Assert.assertEquals(SeleniumTestsContextManager.readApplicationVersion("tu/core-version-empty.txt"), "0.0");
+	}
+	
+	/**
+	 * 1.2alpha-all.3 => 1.2alpha-all
+	 * @param iTestContext
+	 */
+	@Test(groups={"ut"})
+	public void testReadComplicatedApplicationVersion(ITestContext iTestContext) {
+		initThreadContext(iTestContext);
+		Assert.assertEquals(SeleniumTestsContextManager.readApplicationVersion("tu/core-version-complicated.txt"), "1.2alpha-all");
+	}
+	
+	/**
+	 * 1.2alpha-all.3 => 1.2alpha-all
+	 * @param iTestContext
+	 */
+	@Test(groups={"ut"})
+	public void testReadOneDigitApplicationVersion(ITestContext iTestContext) {
+		initThreadContext(iTestContext);
+		Assert.assertEquals(SeleniumTestsContextManager.readApplicationVersion("tu/core-version-one-digit.txt"), "1");
+	}
+	
+	/**
+	 * no version => 0.0
+	 * @param iTestContext
+	 */
+	@Test(groups={"ut"})
+	public void testReadUnexistingApplicationVersion(ITestContext iTestContext) {
+		initThreadContext(iTestContext);
+		Assert.assertEquals(SeleniumTestsContextManager.readApplicationVersion("tu/version.txt"), "0.0");
+	}
 	
 	
 }

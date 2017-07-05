@@ -144,6 +144,6 @@ public class TestPictureElement extends MockitoTest {
 	
 	@AfterMethod(groups={"ut"})
 	public void reset(ITestContext testNGCtx) {
-		SeleniumTestsContextManager.initThreadContext(testNGCtx);
+		initThreadContext(testNGCtx);
 	}
 }

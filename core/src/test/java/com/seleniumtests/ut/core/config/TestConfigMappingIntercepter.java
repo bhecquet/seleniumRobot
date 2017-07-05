@@ -38,7 +38,7 @@ public class TestConfigMappingIntercepter extends GenericTest {
 	@BeforeMethod(groups={"ut"})
 	public void initContext(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		InterceptBy.setPage("TestConfigMobileIntercepter");
-		SeleniumTestsContextManager.initThreadContext(testNGCtx);
+		initThreadContext(testNGCtx);
 	}
 	
 	@Test(groups={"ut"})

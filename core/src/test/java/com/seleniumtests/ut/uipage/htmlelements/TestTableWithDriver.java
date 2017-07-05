@@ -33,8 +33,8 @@ public class TestTableWithDriver extends GenericDriverTest {
 	private DriverTestPage testPage;
 
 	@BeforeClass(groups={"ut"})
-	public static void initPage(final ITestContext testNGCtx) throws Exception {
-		SeleniumTestsContextManager.initThreadContext(testNGCtx);
+	public void initPage(final ITestContext testNGCtx) throws Exception {
+		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setBrowser("htmlunit");
 	}
 		

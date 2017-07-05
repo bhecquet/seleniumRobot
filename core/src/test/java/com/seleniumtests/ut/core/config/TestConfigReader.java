@@ -45,7 +45,7 @@ public class TestConfigReader extends GenericTest {
 	
 	@Test(groups={"ut context"})
 	public void getConfigFile(final ITestContext testNGCtx) {
-		SeleniumTestsContextManager.initThreadContext(testNGCtx);
+		initThreadContext(testNGCtx);
 		File config = ConfigReader.getConfigFile();
 		Assert.assertEquals(config.getName(), "config.ini", "Key should not be overriden");
 		Assert.assertTrue(config.getAbsolutePath().contains("core"));
@@ -53,7 +53,7 @@ public class TestConfigReader extends GenericTest {
 	
 	@Test(groups={"ut context"})
 	public void mergeIniAndXmlConfiguration(final ITestContext testNGCtx, final XmlTest xmlTest) {
-		SeleniumTestsContextManager.initThreadContext(testNGCtx);
+		initThreadContext(testNGCtx);
 		SeleniumTestsContext seleniumTestsCtx = SeleniumTestsContextManager.getThreadContext();
 
 		Assert.assertEquals(seleniumTestsCtx.getConfiguration().get("variable1"), "value1", "Value has not been get from xml file");

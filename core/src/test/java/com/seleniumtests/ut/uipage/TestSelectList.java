@@ -35,8 +35,8 @@ public class TestSelectList extends GenericTest {
 	private static TestUiSelect testSelectIt;
 	
 	@BeforeClass(groups={"ut"})
-	public static void initDriver(final ITestContext testNGCtx) throws Exception {
-		SeleniumTestsContextManager.initThreadContext(testNGCtx);
+	public void initDriver(final ITestContext testNGCtx) throws Exception {
+		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setBrowser("htmlunit");
 		testPage = new DriverTestPage(true);
 		driver = WebUIDriver.getWebDriver(true);

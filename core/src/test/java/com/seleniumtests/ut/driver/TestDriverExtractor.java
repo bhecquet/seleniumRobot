@@ -47,7 +47,7 @@ public class TestDriverExtractor extends MockitoTest {
 	
 	@BeforeClass(groups={"ut"})
 	public void initContext(final ITestContext testNGCtx) throws Exception {
-		SeleniumTestsContextManager.initThreadContext(testNGCtx);
+		initThreadContext(testNGCtx);
 		rootPath = SeleniumTestsContextManager.getRootPath() + "/tmp";
 		extractor = new DriverExtractor(rootPath);
 		driverPath = extractor.getDriverPath();
@@ -125,19 +125,4 @@ public class TestDriverExtractor extends MockitoTest {
 		verify(driverExtractor).copyDriver("chromedriver_2.30_chrome-58-60");
 		
 	}
-	
-	@Test(groups={"ut"})
-	public void testPomVersionReadingWithParent() throws Exception {
-		InputStream stream = Thread.currentThread().getContextClassLoader().getResourceAsStream("tu/pomWithParent.xml");
-		String version = new DriverExtractor().getVersionFromPom(stream);
-		Assert.assertEquals(version, "2.7.0-SNAPSHOT");
-	}
-	
-	@Test(groups={"ut"})
-	public void testPomVersionReadingWithoutParent() throws Exception {
-		InputStream stream = Thread.currentThread().getContextClassLoader().getResourceAsStream("tu/pomWithoutParent.xml");
-		String version = new DriverExtractor().getVersionFromPom(stream);
-		Assert.assertEquals(version, "2.7.0-SNAPSHOT");
-	}
-
 }
