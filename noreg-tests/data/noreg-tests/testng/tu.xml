@@ -1,0 +1,18 @@
+<!DOCTYPE suite SYSTEM "http://beust.com/testng/testng-1.0.dtd" >
+<suite name="Unit test suite" parallel="methods" verbose="1" thread-count="1">
+
+	<!-- EXCLUDE_FROM_SQUASH_TA -->
+    <test name="Unit tests" parallel="false">
+    	<parameter name="EXCLUDE_FROM_SQUASH_TA" value="" />
+        <groups>
+            <run>
+                <include name="ut"/>
+            </run>
+        </groups>
+
+        <packages>
+            <package name="com.infotel.seleniumRobot.ut.*" />
+        </packages>
+    </test>
+
+</suite> 
