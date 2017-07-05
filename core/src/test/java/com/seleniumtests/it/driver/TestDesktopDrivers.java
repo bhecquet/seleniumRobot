@@ -32,7 +32,7 @@ public class TestDesktopDrivers extends GenericDriverTest {
 	
 	@Test(groups={"it"}, enabled=false)
 	public void testFirefoxStartup(final ITestContext testNGCtx, final XmlTest xmlTest) {
-		SeleniumTestsContextManager.initThreadContext(testNGCtx);
+		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setBrowser("*firefox");
 		driver = WebUIDriver.getWebDriver(true);
 		Assert.assertTrue(driver.getCurrentUrl().equals("about:blank") || driver.getCurrentUrl().contains("http"));
@@ -40,7 +40,7 @@ public class TestDesktopDrivers extends GenericDriverTest {
 	
 	@Test(groups={"it"})
 	public void testChromeStartup(final ITestContext testNGCtx, final XmlTest xmlTest) {
-		SeleniumTestsContextManager.initThreadContext(testNGCtx);
+		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setBrowser("*chrome");
 		driver = WebUIDriver.getWebDriver(true);
 		Assert.assertEquals(driver.getCurrentUrl(), "data:,");
@@ -49,7 +49,7 @@ public class TestDesktopDrivers extends GenericDriverTest {
 	@Test(groups={"it"})
 	public void testSafariStartup(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		if (SystemUtils.IS_OS_MAC_OSX) {
-			SeleniumTestsContextManager.initThreadContext(testNGCtx);
+			initThreadContext(testNGCtx);
 			SeleniumTestsContextManager.getThreadContext().setBrowser("*safari");
 			driver = WebUIDriver.getWebDriver(true);
 			Assert.assertEquals(driver.getCurrentUrl(), "data:,");
@@ -61,7 +61,7 @@ public class TestDesktopDrivers extends GenericDriverTest {
 		if (!SystemUtils.IS_OS_WINDOWS) {
 			throw new SkipException("This test can only be done on Windows");
 		}
-		SeleniumTestsContextManager.initThreadContext(testNGCtx);
+		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setBrowser("*iexplore");
 		driver = WebUIDriver.getWebDriver(true);
 		Assert.assertTrue(driver.getCurrentUrl().contains("http://localhost:") || driver.getCurrentUrl().contains("about:blank"));
@@ -72,7 +72,7 @@ public class TestDesktopDrivers extends GenericDriverTest {
 		if (!SystemUtils.IS_OS_WINDOWS_10) {
 			throw new SkipException("This test can only be done on Windows 10");
 		}
-		SeleniumTestsContextManager.initThreadContext(testNGCtx);
+		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setBrowser("*edge");
 		driver = WebUIDriver.getWebDriver(true);
 		Assert.assertTrue(driver.getCurrentUrl().contains("http://localhost:") || driver.getCurrentUrl().contains("about:start"));

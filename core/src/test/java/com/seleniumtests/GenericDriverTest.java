@@ -17,6 +17,7 @@
 package com.seleniumtests;
 
 import org.openqa.selenium.WebDriver;
+import org.testng.ITestContext;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 
@@ -29,6 +30,12 @@ public class GenericDriverTest {
 
 	@BeforeMethod(groups={"ut", "it"})  
 	public void initTest() {
+		SeleniumTestsContextManager.getThreadContext().setSoftAssertEnabled(false);
+		SeleniumTestsContextManager.getGlobalContext().setSoftAssertEnabled(false);
+	}
+
+	public void initThreadContext(final ITestContext testNGCtx) {
+		SeleniumTestsContextManager.initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setSoftAssertEnabled(false);
 		SeleniumTestsContextManager.getGlobalContext().setSoftAssertEnabled(false);
 	}

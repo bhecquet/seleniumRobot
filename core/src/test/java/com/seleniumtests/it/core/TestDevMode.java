@@ -46,7 +46,7 @@ public class TestDevMode extends GenericTest {
 	@BeforeClass(groups={"it"})
 	public void initContext(final ITestContext testNGCtx) throws Exception {
 		osUtil = OSUtilityFactory.getInstance();
-		SeleniumTestsContextManager.initThreadContext(testNGCtx);
+		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setBrowser("chrome");
 	}
 	

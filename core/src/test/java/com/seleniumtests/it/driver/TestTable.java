@@ -37,8 +37,8 @@ public class TestTable extends GenericTest {
 	private static WebDriver driver;
 
 	@BeforeClass(groups={"it"})
-	public static void initPage(final ITestContext testNGCtx) throws Exception {
-		SeleniumTestsContextManager.initThreadContext(testNGCtx);
+	public void initPage(final ITestContext testNGCtx) throws Exception {
+		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setBrowser("chrome");
 		driver = WebUIDriver.getWebDriver(true);
 		testPage = new DriverTestPage(true);

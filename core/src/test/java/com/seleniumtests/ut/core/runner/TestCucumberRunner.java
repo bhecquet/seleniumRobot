@@ -36,7 +36,7 @@ public class TestCucumberRunner extends GenericTest {
 	public void testSingle(ITestContext testNGCtx) {
 		try {
 			System.setProperty("cucumberTags", "@new");
-			SeleniumTestsContextManager.initThreadContext(testNGCtx);
+			initThreadContext(testNGCtx);
 			CustomTestNGCucumberRunner runner = new CustomTestNGCucumberRunner(this.getClass());
 			Assert.assertEquals(runner.provideScenarios().length, 1);
 		} finally {
@@ -48,7 +48,7 @@ public class TestCucumberRunner extends GenericTest {
 	public void testAnd(ITestContext testNGCtx) {
 		try {
 			System.setProperty("cucumberTags", "@new4 AND @new5");
-			SeleniumTestsContextManager.initThreadContext(testNGCtx);
+			initThreadContext(testNGCtx);
 			CustomTestNGCucumberRunner runner = new CustomTestNGCucumberRunner(this.getClass());
 			Assert.assertEquals(runner.provideScenarios().length, 1);
 		} finally {
@@ -60,7 +60,7 @@ public class TestCucumberRunner extends GenericTest {
 	public void testOr(ITestContext testNGCtx) {
 		try {
 			System.setProperty("cucumberTags", "@new,@new2");
-			SeleniumTestsContextManager.initThreadContext(testNGCtx);
+			initThreadContext(testNGCtx);
 			CustomTestNGCucumberRunner runner = new CustomTestNGCucumberRunner(this.getClass());
 			Assert.assertEquals(runner.provideScenarios().length, 2);
 		} finally {
@@ -72,7 +72,7 @@ public class TestCucumberRunner extends GenericTest {
 	public void testAndOr(ITestContext testNGCtx) {
 		try {
 			System.setProperty("cucumberTags", "@core AND @new2,@new");
-			SeleniumTestsContextManager.initThreadContext(testNGCtx);
+			initThreadContext(testNGCtx);
 			CustomTestNGCucumberRunner runner = new CustomTestNGCucumberRunner(this.getClass());
 			Assert.assertEquals(runner.provideScenarios().length, 2);
 		} finally {

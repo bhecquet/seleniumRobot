@@ -34,7 +34,7 @@ public class TestTaFolderStructureGenerator extends GenericTest {
 
 	@BeforeClass(groups={"ut"})
 	public void init(ITestContext testNGCtx) {
-		SeleniumTestsContextManager.initThreadContext(testNGCtx);
+		initThreadContext(testNGCtx);
 	}
 	
 	

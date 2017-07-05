@@ -38,8 +38,8 @@ public class TestHtmlElement extends GenericTest {
 	private static TestDriver testDriverIt;
 	
 	@BeforeClass(groups={"ut"})
-	public static void initDriver(final ITestContext testNGCtx) throws Exception {
-		SeleniumTestsContextManager.initThreadContext(testNGCtx);
+	public void initDriver(final ITestContext testNGCtx) throws Exception {
+		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setReplayTimeout(1);
 		SeleniumTestsContextManager.getThreadContext().setBrowser("htmlunit");
 		testPage = new DriverTestPage(true);

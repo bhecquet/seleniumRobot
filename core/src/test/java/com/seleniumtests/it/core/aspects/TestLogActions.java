@@ -43,7 +43,7 @@ public class TestLogActions extends GenericTest {
 	public void init(ITestContext testContext) {
 		System.setProperty("browser", "none");
 		SeleniumTestsContextManager.initGlobalContext(testContext);
-		SeleniumTestsContextManager.initThreadContext(testContext);
+		initThreadContext(testContext);
 	}
 	
 	@AfterClass(groups={"it"})

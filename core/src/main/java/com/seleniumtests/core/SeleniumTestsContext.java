@@ -142,7 +142,7 @@ public class SeleniumTestsContext {
     public static final String NEW_COMMAND_TIMEOUT = "newCommandTimeout";		// Attente maximale entre 2 commandes envoyées à appium
 
     // Cloud specific properties
-    public static final String VERSION = "version";								// 
+    public static final String VERSION = "version";								// browser version
     public static final String PLATFORM = "platform";							// platform on which test should execute. Ex: Windows 7, Android, iOS, Linux, OS X 10.10. 	
     public static final String CLOUD_API_KEY = "cloudApiKey";					// clé d'accès (dépend des services)
     

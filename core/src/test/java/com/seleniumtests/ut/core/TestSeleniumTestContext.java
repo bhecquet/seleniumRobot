@@ -40,11 +40,6 @@ import com.seleniumtests.driver.DriverMode;
  *
  */
 public class TestSeleniumTestContext extends GenericTest {
-
-	private void initThreadContext(final ITestContext testNGCtx) {
-		SeleniumTestsContextManager.initThreadContext(testNGCtx);
-		SeleniumTestsContextManager.getThreadContext().setSoftAssertEnabled(false);
-	}
 	
 	/**
 	 * If parameter is only defined in test suite, it's correctly read

@@ -15,6 +15,7 @@ import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import com.seleniumtests.GenericTest;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.driver.screenshots.ScreenshotUtil;
@@ -23,13 +24,13 @@ import com.seleniumtests.util.HashCodeGenerator;
 import com.seleniumtests.util.helper.WaitHelper;
 import com.seleniumtests.util.imaging.ImageDetector;
 
-public class TestBrowserSnapshot {
+public class TestBrowserSnapshot extends GenericTest {
 	
 	private static WebDriver driver;
 	
 	@BeforeMethod(groups={"it"})
 	public void initDriver(final ITestContext testNGCtx) throws Exception {
-		SeleniumTestsContextManager.initThreadContext(testNGCtx);
+		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setExplicitWaitTimeout(2);
 		SeleniumTestsContextManager.getThreadContext().setBrowser("chrome");
 		SeleniumTestsContextManager.getThreadContext().setSnapshotBottomCropping(0);

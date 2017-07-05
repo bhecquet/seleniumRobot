@@ -27,6 +27,8 @@ By default, SeleniumTestsContext enables SoftAssertions, so any unit test with a
 
 depending on test type
 
+If you need to reinit the SeleniumTestContext using `SeleniumTestsContextManager.initThreadContext(testNGCtx)`, call `initThreadContext(testNGCtx)` of one of these classes instead
+
 ### 3 Core: making an action on an HTMLElement replay on error ###
 
 By default, actions in HtmlElements are done only once.<br/>
