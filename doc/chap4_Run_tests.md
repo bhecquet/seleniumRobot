@@ -4,13 +4,23 @@
 Unzip seleniumRobot-core.zip file (can be found on maven central or build it with maven) to any folder
 Unzip your test application .zip file to the same folder. It will create the correct folder structure
 
-Tests are run using command line: `java -cp seleniumRobot.jar;plugins/<app>-tests.jar -D<option1>=<value1> -D<option2>=<value2> org.testng.TestNG <path_to_TestNG_xml_file>"`
+Tests are run using command line: `java -cp seleniumRobot.jar;plugins/<app>-tests.jar -D<option1>=<value1> -D<option2>=<value2> org.testng.TestNG <path_to_TestNG_xml_file>"`</br>
+
+In the above line, there are 2 option types:
+- seleniumRobot parameters (table below) which are passed as JVM options `-Dkey=value`
+- TestNG parameters ([http://testng.org/doc/documentation-main.html#running-testng]) which must contain at least the xml file to use. For example, if the XML `app-test.xml` file contains several test (testLogin, testCart), you can choose to start only one of them with the line `java -cp seleniumRobot.jar;plugins/<app>-tests.jar -D<option1>=<value1> -D<option2>=<value2> org.testng.TestNG app-test.xml -testnames testLogin`
+
 Specify options from the table bellow
 Classpath must define the seleniumRobot.jar file and the test application jar file. Separator is `:` on Linux and `;` on Windows
 
 
 ### 1 Configurations ###
-Below is the list of all parameters accepted in testing xml file. These parameters may also be passed java properties (-D<paramName>=<value>)
+Below is the list of all parameters accepted in testing xml file in `<suite>` or `<test>` tag. Format is: `<parameter name="myParam" value="myValue" />`<br/>
+Test parameter will overwrite suite parameters
+
+These parameters may also be passed java properties / JVM options (`-D<paramName>=<value>`).
+In this case, this user passed value will overwrite test or suite parameters
+
 
 | Param name       			| Default 	| Description  |
 | -------------------------	| ------- 	| ------------ |
@@ -59,7 +69,7 @@ Below is the list of all parameters accepted in testing xml file. These paramete
 | cucumberPackage 			| 			| **Mandatory for cucumberTests:** name of the package where cucumber implementation class reside | 
 | app 						| 			| Path to the application file (local or remote) | 
 | appiumServerURL 			| 			| Appium server url. May be local or remote | 
-| deviceName 				| 			| Name of the device to use for mobile tests | 
+| deviceName 				| 			| Name of the device to use for mobile tests. It's the Human readable name (e.g: Nexus 6 as given by `adb -s <id_device> shell getprop`, line [ro.product.model] property on Android or `instruments -s devices`), not it's id. SeleniumRobot will replace this name with id when communicating with Appium | 
 | fullReset 				| true		| enable full reset capability for appium tests | 
 | appPackage 				| 			| Package name of application (android only) | 
 | appActivity 				| 			| Activity started by mobile application (Android) | 
@@ -78,6 +88,10 @@ Other parameters, not accepted in XML file but allowed on command line
 | Param name       			| Default 	| Description  |
 | -------------------------	| ------- 	| ------------ |
 | testRetryCount			| 2			| Number of times a failed test is retried. Set to 0 for no retry
+
+#### Minimal Configuration ####
+
+See §3.3 for the minimal TestNG XML file
 
 #### Centralized XML configuration ####
 
@@ -132,8 +146,12 @@ You can define one service for each runMode, with the same name: local, grid, sa
 Under each service, you can then add any parameter needed to address this runMode as in the above example.
 _e.g_: if user select "testdroid" runMode, then the 3 parameters (appiumServerURL, cloudApiKey, projectName) will be added to configuration
 
+### 2 Test WebApp with desktop browser ###
 
-### 2 Test with Appium locally ###
+The minimal parameters to pass to SeleniumRobot are:
+`browser`: MUST be defined because default browser is None
+
+### 3 Test with Appium locally ###
 
 For mobile tests, set the following environment variables on your local computer:
 - APPIUM_HOME: path to Appium installation path (e.g: where Appium.exe/node.exe resides on Windows)
@@ -146,22 +164,18 @@ For cloud test, these variables are not needed
 
 #### Application test on android ####
 
+Define test as follows (minimal needed options)
+
     <test name="tnr_appium_mobile_app" parallel="false">
     
     	<!-- cucumber part -->
-    	<parameter name="cucumberTests" value="Infolidays" />
-    	<parameter name="cucumberTags" value="" />
-    	
     	<parameter name="browser" value="*android" />
-    	<parameter name="testType" value="appium_app_android" />
-    	<parameter name="appiumServerURL" value="http://localhost:4723/wd/hub"/>
     	<parameter name="platform" value="Android 6.0"/>
-    	<parameter name="deviceName" value="192.168.56.101:5555"/>
+    	<parameter name="deviceName" value="Nexus 6"/>
     
     	<parameter name="app" value="<local_path_to_apk>"/>
     	<parameter name="appPackage" value="com.infotel.mobile.infolidays"/>
     	<parameter name="appActivity" value="com.infotel.mobile.mesconges.view.activity.StartActivity"/>
-    	<parameter name="newCommandTimeout" value="120"/>
     
     	<packages>
     		<package name="com.seleniumtests.core.runner.*"/>
@@ -171,9 +185,28 @@ For cloud test, these variables are not needed
 
 `deviceName` reflects the local device used to automate the test
 `app` is the path of the application file. It can be an URL. If access to URL is restricted, use the pattern "http://<user>:<password>@<host>:<port>/path"
+`appPackage` and `appActivity` can be found in APK manifest file
+
+#### Application test on iOS ####
+
+Define test as follows (minimal needed options)
+
+    <test name="tnr_appium_mobile_app" parallel="false">
+    
+    	<parameter name="browser" value="*safari" />
+    	<parameter name="platform" value="iOS 10.3"/>
+    	<parameter name="deviceName" value="iPhone SE"/>
+    	<parameter name="app" value="<local_path_to_ipa_or_app.zip file>"/>
+    
+    	<packages>
+    		<package name="com.seleniumtests.core.runner.*"/>
+    	</packages>
+    </test>
 
 
 ### 3 Test with SauceLabs ###
+
+Define test as follows
 
 	<test name="tnr_sauce_mobile_app" parallel="false">
     	<parameter name="cucumberTests" value="Configuration" />
@@ -194,6 +227,8 @@ For cloud test, these variables are not needed
     </test>
 
 ### 4 Test with Testdroid ###
+
+Define test as follows
 
 	<test name="tnr_testdroid_mobile_app" parallel="false">
     	<parameter name="cucumberTests" value="Configuration" />
@@ -231,7 +266,7 @@ Test must be configured like the example below (or use `-DrunMode=grid`)
  	<test name="MRH">
     	<parameter name="runMode" value="grid" />
     	
-        <packages>
+        <packages> 
             <package name="com.seleniumtests.core.runner.*"/>
         </packages>
     </test>

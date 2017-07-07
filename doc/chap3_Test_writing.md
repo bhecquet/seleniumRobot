@@ -171,7 +171,7 @@ XML testNg file looks like:
 	   
 	</suite>
 
-`cucumberPackage` parameter is mandatory so that framework knows where implementation code resides
+`cucumberPackage` parameter is mandatory so that framework knows where implementation code resides. `cucumberTests` and `cucumberTags` help selecting the right scenario. See §4 for details
 
 ### 5 Working with frames ###
 In case an HTML element has to be searched inside an iFrame there are 2 ways to handle this
