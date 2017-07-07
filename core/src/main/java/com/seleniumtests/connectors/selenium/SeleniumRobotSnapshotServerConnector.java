@@ -120,13 +120,13 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 	/**
 	 * Create test case and add it to the current session
 	 */
-	public void createTestCase() {
+	public void createTestCase(String testName) {
 		if (versionId == null) {
 			createVersion();
 		}
 		try {
 			JSONObject envJson = Unirest.post(url + TESTCASE_API_URL)
-					.field("name", SeleniumTestsContextManager.getThreadContext().getTestEnv())
+					.field("name", testName)
 					.field("version", versionId)
 					.asJson()
 					.getBody()
