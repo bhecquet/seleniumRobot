@@ -18,10 +18,13 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 	private static final String APPLICATION_API_URL = "/api/application/";
 	private static final String ENVIRONMENT_API_URL = "/api/environment/";
 	private static final String SESSION_API_URL = "/api/session/";
+	private static final String TESTCASE_API_URL = "/api/testcase/";
+	private static final String TESTSTEP_API_URL = "/api/teststep/";
 	private Integer applicationId;
 	private Integer versionId;
 	private Integer environmentId;
 	private Integer sessionId;
+	private Integer testCaseId;
 
 	public SeleniumRobotSnapshotServerConnector() {
 		super();
@@ -65,7 +68,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 					.getObject();
 			versionId = versionJson.getInt("id");
 		} catch (UnirestException | JSONException e) {
-			logger.error("cannot create application", e);
+			logger.error("cannot create version", e);
 		}
 	}
 	
@@ -81,7 +84,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 					.getObject();
 			environmentId = envJson.getInt("id");
 		} catch (UnirestException | JSONException e) {
-			logger.error("cannot create application", e);
+			logger.error("cannot create environment", e);
 		}
 	}
 	
@@ -110,7 +113,27 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 					.getObject();
 			sessionId = sessionJson.getInt("id");
 		} catch (UnirestException | JSONException e) {
-			logger.error("cannot create application", e);
+			logger.error("cannot create session", e);
+		}
+	}
+	
+	/**
+	 * Create test case and add it to the current session
+	 */
+	public void createTestCase() {
+		if (versionId == null) {
+			createVersion();
+		}
+		try {
+			JSONObject envJson = Unirest.post(url + TESTCASE_API_URL)
+					.field("name", SeleniumTestsContextManager.getThreadContext().getTestEnv())
+					.field("version", versionId)
+					.asJson()
+					.getBody()
+					.getObject();
+			testCaseId = envJson.getInt("id");
+		} catch (UnirestException | JSONException e) {
+			logger.error("cannot create test case", e);
 		}
 	}
 
@@ -128,5 +151,9 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 
 	public Integer getSessionId() {
 		return sessionId;
+	}
+
+	public Integer getTestCaseId() {
+		return testCaseId;
 	}
 }
