@@ -70,6 +70,11 @@ For publishing artifacts to OSS Sonatype server
       <username><your_user></username>
       <password><your_password></password>
     </server>
+    
+#### Oracle library for core compile ####
+
+In order to compile core artifact, you must provide the ojdb6.jar file into src/lib folder so that it can be automatically installed in maven local repository when doing `mvn clean`
+This is not necessary when developping only test applications
 
 ### 2 Execution environment ###
 Execution environment needs at least Java 8. SeleniumRobot is compatible with Windows, Mac OS and Linux.
