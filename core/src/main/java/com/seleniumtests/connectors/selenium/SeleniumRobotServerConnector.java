@@ -43,4 +43,8 @@ public abstract class SeleniumRobotServerConnector {
 			return true;
 		}
 	}
+	
+	public boolean getActive() {
+		return active;
+	}
 }

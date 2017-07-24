@@ -7,6 +7,7 @@ import java.util.List;
 import org.apache.commons.io.FileUtils;
 import org.testng.Assert;
 import org.testng.ITestContext;
+import org.testng.SkipException;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -24,6 +25,9 @@ public class TestSeleniumRobotSnapshotServerConnector extends GenericTest {
 		initThreadContext(ctx);
 		SeleniumTestsContextManager.getThreadContext().getConfiguration().put(SeleniumRobotServerConnector.SELENIUM_SERVER_URL, "http://localhost:8002");
 		connector = new SeleniumRobotSnapshotServerConnector();
+		if (!connector.getActive()) {
+			throw new SkipException("no seleniumrobot server available");
+		}
 	}
 	
 	@Test(groups={"it"})
