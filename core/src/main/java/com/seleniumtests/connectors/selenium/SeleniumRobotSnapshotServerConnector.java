@@ -15,6 +15,7 @@ import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import com.mashape.unirest.request.BaseRequest;
+import com.mashape.unirest.request.HttpRequestWithBody;
 import com.mashape.unirest.request.body.MultipartBody;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.ConfigurationException;
@@ -22,13 +23,13 @@ import com.seleniumtests.driver.BrowserType;
 
 public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerConnector {
 	
-	private static final String VERSION_API_URL = "/api/version/";
-	private static final String APPLICATION_API_URL = "/api/application/";
-	private static final String ENVIRONMENT_API_URL = "/api/environment/";
-	private static final String SESSION_API_URL = "/api/session/";
-	private static final String TESTCASE_API_URL = "/api/testcase/";
-	private static final String TESTSTEP_API_URL = "/api/teststep/";
-	private static final String SNAPSHOT_API_URL = "/upload/image";
+	public static final String VERSION_API_URL = "/api/version/";
+	public static final String APPLICATION_API_URL = "/api/application/";
+	public static final String ENVIRONMENT_API_URL = "/api/environment/";
+	public static final String SESSION_API_URL = "/api/session/";
+	public static final String TESTCASE_API_URL = "/api/testcase/";
+	public static final String TESTSTEP_API_URL = "/api/teststep/";
+	public static final String SNAPSHOT_API_URL = "/upload/image";
 	private Integer applicationId;
 	private Integer versionId;
 	private Integer environmentId;
@@ -40,6 +41,9 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 
 	public SeleniumRobotSnapshotServerConnector() {
 		super();
+		if (!active) {
+			return;
+		}
 		active = isAlive();
 	}
 	
@@ -215,21 +219,26 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 		try {
 			// get list of tests associated to this session
 			List<String> testCases = getTestListFromSession();
-			
-			MultipartBody request = Unirest.patch(url + SESSION_API_URL + sessionId + "/")
-					.field("testCases", testCaseId);
-			
-			// add already linked test cases, except the current one
-			for (String tc: testCases) {
-				if (testCaseId.toString().equals(tc)) {
-					continue;
-				}
-				request = request.field("testCases", tc);
+			if (!testCases.contains(testCaseId.toString())) {
+				testCases.add(testCaseId.toString());
 			}
-			getJSonResponse(request);
+			addTestCasesToSession(testCases);
+			
 		} catch (UnirestException | JSONException e) {
-			logger.error("cannot create test case", e);
+			logger.error("cannot add test case to session", e);
 		}
+	}
+	
+	public JSONObject addTestCasesToSession(List<String> testCases) throws UnirestException {
+		if (testCases.isEmpty()) {
+			return new JSONObject();
+		}
+		
+		MultipartBody request = Unirest.patch(url + SESSION_API_URL + sessionId + "/").field("testCases", testCases.get(0));
+		for (String tc: testCases.subList(1, testCases.size())) {
+			request = request.field("testCases", tc);
+		}
+		return getJSonResponse(request);
 	}
 	
 	/**
@@ -267,21 +276,26 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 		try {
 			// get list of tests associated to this session
 			List<String> testSteps = getStepListFromTestCase();
-			
-			MultipartBody request = Unirest.patch(url + TESTCASE_API_URL + testCaseId + "/")
-					.field("testSteps", testStepId);
-			
-			// add already linked test steps, except the current one
-			for (String ts: testSteps) {
-				if (testStepId.toString().equals(ts)) {
-					continue;
-				}
-				request = request.field("testSteps", ts);
+			if (!testSteps.contains(testStepId.toString())) {
+				testSteps.add(testStepId.toString());
 			}
-			getJSonResponse(request);
+			addTestStepsToTestCases(testSteps);
+			
 		} catch (UnirestException | JSONException e) {
-			logger.error("cannot create test case", e);
+			logger.error("cannot add test step to test case", e);
 		}
+	}
+	
+	public JSONObject addTestStepsToTestCases(List<String> testSteps) throws UnirestException {
+		if (testSteps.isEmpty()) {
+			return new JSONObject();
+		}
+		
+		MultipartBody request = Unirest.patch(url + TESTCASE_API_URL + testCaseId + "/").field("testSteps", testSteps.get(0));
+		for (String tc: testSteps.subList(1, testSteps.size())) {
+			request = request.field("testSteps", tc);
+		}
+		return getJSonResponse(request);
 	}
 	
 	private JSONObject getJSonResponse(BaseRequest request) throws UnirestException {
@@ -299,7 +313,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 	}
 	
 
-	public int getApplicationId() {
+	public Integer getApplicationId() {
 		return applicationId;
 	}
 
@@ -325,5 +339,9 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 
 	public Integer getSnapshotId() {
 		return snapshotId;
+	}
+
+	public String getSessionUUID() {
+		return sessionUUID;
 	}
 }
