@@ -54,21 +54,30 @@ public class TestSeleniumRobotSnapshotServerConnector extends GenericTest {
 		connector.createSession();
 		Assert.assertNotNull(connector.getEnvironmentId());
 		Assert.assertNotNull(connector.getSessionId());
+		Assert.assertNotNull(connector.getVersionId());
+	}
+	
+	/**
+	 * create a test case
+	 */
+	@Test(groups={"it"})
+	public void testCreateTestCase() {
+		connector.createSession();
+		connector.createTestCase("Test 1");
+		Assert.assertNotNull(connector.getTestCaseId());
+		Assert.assertNotNull(connector.getApplicationId());
 	}
 	
 	/**
 	 * create a test case and check it's added to session
 	 */
 	@Test(groups={"it"})
-	public void testCreateTestCase() {
-		connector.createSession();
+	public void testCreateTestCaseInSession() {
 		connector.createTestCase("Test 1");
-		Assert.assertNotNull(connector.getVersionId());
-		Assert.assertNotNull(connector.getTestCaseId());
-		
-		List<String> testCases = connector.getTestListFromSession();
-		Assert.assertEquals(testCases.size(), 1);
-		Assert.assertEquals(testCases.get(0), connector.getTestCaseId().toString());
+		connector.createTestCaseInSession();
+		Assert.assertNotNull(connector.getSessionId());
+		Assert.assertNotNull(connector.getTestCaseInSessionId());
+		Assert.assertNotNull(connector.getApplicationId());
 	}
 	
 	/**
@@ -78,6 +87,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends GenericTest {
 	public void testCreateTestStep() {
 		connector.createSession();
 		connector.createTestCase("Test 1");
+		connector.createTestCaseInSession();
 		connector.createTestStep("Step 1");
 		Assert.assertNotNull(connector.getTestStepId());
 		
@@ -94,6 +104,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends GenericTest {
 	public void testCreateSnapshot() throws IOException {
 		connector.createSession();
 		connector.createTestCase("Test 1");
+		connector.createTestCaseInSession();
 		connector.createTestStep("Step 1");
 		File image = File.createTempFile("image-", ".png");
 		FileUtils.copyInputStreamToFile(getClass().getClassLoader().getResourceAsStream("tu/images/ffLogoConcat.png"), image);
