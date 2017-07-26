@@ -15,7 +15,6 @@ import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import com.mashape.unirest.request.BaseRequest;
-import com.mashape.unirest.request.HttpRequestWithBody;
 import com.mashape.unirest.request.body.MultipartBody;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.ConfigurationException;
@@ -23,19 +22,21 @@ import com.seleniumtests.driver.BrowserType;
 
 public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerConnector {
 	
-	public static final String VERSION_API_URL = "/api/version/";
-	public static final String APPLICATION_API_URL = "/api/application/";
-	public static final String ENVIRONMENT_API_URL = "/api/environment/";
-	public static final String SESSION_API_URL = "/api/session/";
-	public static final String TESTCASE_API_URL = "/api/testcase/";
-	public static final String TESTSTEP_API_URL = "/api/teststep/";
-	public static final String SNAPSHOT_API_URL = "/upload/image";
+	public static final String VERSION_API_URL = "/snapshot/api/version/";
+	public static final String APPLICATION_API_URL = "/snapshot/api/application/";
+	public static final String ENVIRONMENT_API_URL = "/snapshot/api/environment/";
+	public static final String SESSION_API_URL = "/snapshot/api/session/";
+	public static final String TESTCASE_API_URL = "/snapshot/api/testcase/";
+	public static final String TESTCASEINSESSION_API_URL = "/snapshot/api/testcaseinsession/";
+	public static final String TESTSTEP_API_URL = "/snapshot/api/teststep/";
+	public static final String SNAPSHOT_API_URL = "/snapshot/upload/image";
 	private Integer applicationId;
 	private Integer versionId;
 	private Integer environmentId;
 	private Integer sessionId;
 	private String sessionUUID;
 	private Integer testCaseId;
+	private Integer testCaseInSessionId;
 	private Integer testStepId;
 	private Integer snapshotId;
 
@@ -49,7 +50,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 	
 	@Override
 	protected boolean isAlive() {
-		return isAlive("/compare/");
+		return isAlive("/snapshot/compare/");
 	}
 
 	public void createApplication() {
@@ -129,15 +130,38 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 		if (!active) {
 			return;
 		}
-		if (versionId == null) {
-			createVersion();
+		if (applicationId == null) {
+			createApplication();
 		}
+
 		try {
 			JSONObject testJson = getJSonResponse(Unirest.post(url + TESTCASE_API_URL)
 					.field("name", testName)
-					.field("version", versionId));
+					.field("application", applicationId));
 			testCaseId = testJson.getInt("id");
-			addCurrentTestCaseToSession();
+		} catch (UnirestException | JSONException e) {
+			logger.error("cannot create test case", e);
+		}
+	}
+	
+	/**
+	 * Create test case and add it to the current session
+	 */
+	public void createTestCaseInSession() {
+		if (!active) {
+			return;
+		}
+		if (sessionId == null) {
+			createSession();
+		}
+		if (testCaseId == null) {
+			throw new ConfigurationException("Test case must be previously defined");
+		}
+		try {
+			JSONObject testInSessionJson = getJSonResponse(Unirest.post(url + TESTCASEINSESSION_API_URL)
+					.field("testCase", testCaseId)
+					.field("session", sessionId));
+			testCaseInSessionId = testInSessionJson.getInt("id");
 		} catch (UnirestException | JSONException e) {
 			logger.error("cannot create test case", e);
 		}
@@ -187,72 +211,19 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 			logger.error("cannot create test snapshot", e);
 		}
 	}
-	
-	public List<String> getTestListFromSession() {
-		if (sessionId == null) {
-			return new ArrayList<>();
-		}
-		
-		try {
-			
-			JSONObject sessionJson = getJSonResponse(Unirest.get(url + SESSION_API_URL + sessionId));
-			return sessionJson.getJSONArray("testCases")
-					.toList()
-					.stream()
-					.map(Object::toString)
-					.collect(Collectors.toList());
-			
-		} catch (UnirestException | JSONException e) {
-			logger.error("cannot get test case list", e);
-		}
-		return new ArrayList<>();
-	}
 
-	/**
-	 * Add the current test case (should have been previously created) to this test session
-	 */
-	public void addCurrentTestCaseToSession() {
-		if (sessionId == null || testCaseId == null) {
-			throw new ConfigurationException("Session and Test case must be previously created");
-		}
-		
-		try {
-			// get list of tests associated to this session
-			List<String> testCases = getTestListFromSession();
-			if (!testCases.contains(testCaseId.toString())) {
-				testCases.add(testCaseId.toString());
-			}
-			addTestCasesToSession(testCases);
-			
-		} catch (UnirestException | JSONException e) {
-			logger.error("cannot add test case to session", e);
-		}
-	}
-	
-	public JSONObject addTestCasesToSession(List<String> testCases) throws UnirestException {
-		if (testCases.isEmpty()) {
-			return new JSONObject();
-		}
-		
-		MultipartBody request = Unirest.patch(url + SESSION_API_URL + sessionId + "/").field("testCases", testCases.get(0));
-		for (String tc: testCases.subList(1, testCases.size())) {
-			request = request.field("testCases", tc);
-		}
-		return getJSonResponse(request);
-	}
-	
 	/**
 	 * Returns list of test steps in a test case
 	 * @return
 	 */
 	public List<String> getStepListFromTestCase() {
-		if (testCaseId == null) {
+		if (testCaseInSessionId == null) {
 			return new ArrayList<>();
 		}
 		
 		try {
 
-			JSONObject sessionJson = getJSonResponse(Unirest.get(url + TESTCASE_API_URL + testCaseId));
+			JSONObject sessionJson = getJSonResponse(Unirest.get(url + TESTCASEINSESSION_API_URL + testCaseInSessionId));
 			return sessionJson.getJSONArray("testSteps")
 					.toList()
 					.stream()
@@ -269,8 +240,8 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 	 * Add the current test case (should have been previously created) to this test session
 	 */
 	public void addCurrentTestStepToTestCase() {
-		if (testStepId == null || testCaseId == null) {
-			throw new ConfigurationException("Test step and Test case must be previously created");
+		if (testStepId == null || testCaseInSessionId == null) {
+			throw new ConfigurationException("Test step and Test case in session must be previously created");
 		}
 		
 		try {
@@ -291,7 +262,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 			return new JSONObject();
 		}
 		
-		MultipartBody request = Unirest.patch(url + TESTCASE_API_URL + testCaseId + "/").field("testSteps", testSteps.get(0));
+		MultipartBody request = Unirest.patch(url + TESTCASEINSESSION_API_URL + testCaseInSessionId + "/").field("testSteps", testSteps.get(0));
 		for (String tc: testSteps.subList(1, testSteps.size())) {
 			request = request.field("testSteps", tc);
 		}
@@ -343,5 +314,9 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 
 	public String getSessionUUID() {
 		return sessionUUID;
+	}
+
+	public Integer getTestCaseInSessionId() {
+		return testCaseInSessionId;
 	}
 }
