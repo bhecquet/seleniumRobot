@@ -103,7 +103,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends GenericTest {
 	@Test(groups={"it"})
 	public void testCreateSnapshot() throws IOException {
 		connector.createSession();
-		connector.createTestCase("Test 1");
+		connector.createTestCase("Test 2");
 		connector.createTestCaseInSession();
 		connector.createTestStep("Step 1");
 		File image = File.createTempFile("image-", ".png");

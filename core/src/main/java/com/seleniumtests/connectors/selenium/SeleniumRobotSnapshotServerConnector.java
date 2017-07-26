@@ -195,15 +195,18 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 		if (sessionId == null) {
 			createSession();
 		}
-		if (testStepId == null && testCaseId == null) {
-			throw new ConfigurationException("Test step and test case must be previously defined");
+		if (testCaseInSessionId == null) {
+			createTestCaseInSession();
+		}
+		if (testStepId == null) {
+			throw new ConfigurationException("Test step and test case in session must be previously defined");
 		}
 		try {
 			snapshotId = null;
 			getJSonResponse(Unirest.post(url + SNAPSHOT_API_URL)
 					.field("step", testStepId)
 					.field("sessionId", sessionUUID)
-					.field("testCase", testCaseId)
+					.field("testCase", testCaseInSessionId)
 					.field("image", pictureFile)
 					);
 			snapshotId = 0; // for test only
