@@ -10,7 +10,7 @@ import com.seleniumtests.util.logging.SeleniumRobotLogger;
 public abstract class SeleniumRobotServerConnector {
 	
 	protected static final Logger logger = SeleniumRobotLogger.getLogger(SeleniumRobotServerConnector.class);
-	public static final String SELENIUM_SERVER_URL = "seleniumServerUrl";
+	public static final String SELENIUM_SERVER_URL = "SELENIUM_SERVER_URL";
 	public static final String SELENIUM_SERVER_LOGIN = "seleniumServerLogin";
 	public static final String SELENIUM_SERVER_PASWORD = "seleniumServerPassword";
 
@@ -35,13 +35,16 @@ public abstract class SeleniumRobotServerConnector {
 	}
 	
 	protected boolean isActive() {
-		if (!SeleniumTestsContextManager.getThreadContext().getConfiguration().containsKey(SELENIUM_SERVER_URL)) {
-			logger.warn(String.format("selenium server won't be used, key %s is not available in configuration. It must be the root URL of server 'http://<host>:<port>'", SELENIUM_SERVER_URL));
-			return false;
-		} else {
+		if (SeleniumTestsContextManager.getThreadContext().getConfiguration().containsKey(SELENIUM_SERVER_URL)) {
 			url = SeleniumTestsContextManager.getThreadContext().getConfiguration().get(SELENIUM_SERVER_URL);
 			return true;
-		}
+		} else if (System.getenv(SELENIUM_SERVER_URL) != null) {
+			url = System.getenv(SELENIUM_SERVER_URL);
+			return true;
+		} else {
+			logger.warn(String.format("selenium server won't be used, key %s is not available in configuration or in environment variable. It must be the root URL of server 'http://<host>:<port>'", SELENIUM_SERVER_URL));
+			return false;
+		} 
 	}
 	
 	public boolean getActive() {

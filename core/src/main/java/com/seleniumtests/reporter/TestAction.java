@@ -50,5 +50,10 @@ public class TestAction {
 	public void setActionException(Throwable actionException) {
 		this.actionException = actionException;
 	}
+	
+	@Override
+	public String toString() {
+		return name;
+	}
 
 }

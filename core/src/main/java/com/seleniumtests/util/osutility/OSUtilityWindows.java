@@ -16,6 +16,7 @@
  */
 package com.seleniumtests.util.osutility;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -26,6 +27,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.seleniumtests.browserfactory.BrowserInfo;
+import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.DisabledConnector;
 import com.seleniumtests.driver.BrowserType;
 import com.sun.jna.platform.win32.Advapi32Util;
@@ -128,6 +130,20 @@ public class OSUtilityWindows extends OSUtility {
 		}
 	}
 	
+	/**
+	 * Search for a folder with version name where chrome.exe is located (e.g: 58.0.3029.81)
+	 * @param chromePath
+	 * @return
+	 */
+	private String getChromeVersionFromFolder(String chromePath) {
+		for (File file: new File(chromePath.replace("chrome.exe", "")).listFiles()) {
+			if (file.isDirectory() && file.getName().matches("^\\d+.*")) {
+				return file.getName();
+			}
+		}
+		throw new ConfigurationException("Chrome version could not be get from folder");
+	}
+	
 	private String getIeVersionFromRegistry() {
 		try {
 			return Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Microsoft\\Internet Explorer", "svcVersion");
@@ -156,7 +172,13 @@ public class OSUtilityWindows extends OSUtility {
 		// look for chrome
 		try {
 			String chromePath = Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Classes\\ChromeHTML\\shell\\open\\command", "");
-			String version = getChromeVersionFromRegistry();
+			String version;
+			try {
+				version = getChromeVersionFromRegistry();
+			} catch (Win32Exception e) {
+				chromePath = chromePath.split(".exe\"")[0].replace("\"", "") + ".exe";
+				version = getChromeVersionFromFolder(chromePath);
+			}
 			browserList.put(BrowserType.CHROME, new BrowserInfo(BrowserType.CHROME, extractChromeVersion("Google Chrome " + version), chromePath));
 		} catch (Win32Exception e) {}
 		
