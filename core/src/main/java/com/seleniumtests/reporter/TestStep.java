@@ -98,5 +98,15 @@ public class TestStep extends TestAction {
 		stepActions.add(step);
 	}
 	
+	@Override
+	public String toString() {
+		StringBuilder testStepRepr = new StringBuilder(String.format("Step %s\\n", getName()));
+		for (TestAction testAction: getStepActions()) {
+			testStepRepr.append(testAction.toString());
+		}
+		
+		return testStepRepr.toString();
+	}
+	
 	
 }

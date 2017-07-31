@@ -18,6 +18,7 @@ import com.mashape.unirest.request.BaseRequest;
 import com.mashape.unirest.request.body.MultipartBody;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.ConfigurationException;
+import com.seleniumtests.customexception.SeleniumRobotServerException;
 import com.seleniumtests.driver.BrowserType;
 
 public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerConnector {
@@ -29,6 +30,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 	public static final String TESTCASE_API_URL = "/snapshot/api/testcase/";
 	public static final String TESTCASEINSESSION_API_URL = "/snapshot/api/testcaseinsession/";
 	public static final String TESTSTEP_API_URL = "/snapshot/api/teststep/";
+	public static final String STEPRESULT_API_URL = "/snapshot/api/stepresult/";
 	public static final String SNAPSHOT_API_URL = "/snapshot/upload/image";
 	private Integer applicationId;
 	private Integer versionId;
@@ -38,6 +40,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 	private Integer testCaseId;
 	private Integer testCaseInSessionId;
 	private Integer testStepId;
+	private Integer stepResultId;
 	private Integer snapshotId;
 
 	public SeleniumRobotSnapshotServerConnector() {
@@ -62,7 +65,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 					.field("name", SeleniumTestsContextManager.getApplicationName()));
 			applicationId = applicationJson.getInt("id");
 		} catch (UnirestException | JSONException e) {
-			logger.error("cannot create application", e);
+			throw new SeleniumRobotServerException("cannot create application", e);
 		}
 	}
 	
@@ -79,7 +82,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 					.field("application", applicationId));
 			versionId = versionJson.getInt("id");
 		} catch (UnirestException | JSONException e) {
-			logger.error("cannot create version", e);
+			throw new SeleniumRobotServerException("cannot create version", e);
 		}
 	}
 	
@@ -92,7 +95,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 					.field("name", SeleniumTestsContextManager.getThreadContext().getTestEnv()));
 			environmentId = envJson.getInt("id");
 		} catch (UnirestException | JSONException e) {
-			logger.error("cannot create environment", e);
+			throw new SeleniumRobotServerException("cannot create environment", e);
 		}
 	}
 	
@@ -119,7 +122,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 					.field("version", versionId));
 			sessionId = sessionJson.getInt("id");
 		} catch (UnirestException | JSONException e) {
-			logger.error("cannot create session", e);
+			throw new SeleniumRobotServerException("cannot create session", e);
 		}
 	}
 	
@@ -140,7 +143,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 					.field("application", applicationId));
 			testCaseId = testJson.getInt("id");
 		} catch (UnirestException | JSONException e) {
-			logger.error("cannot create test case", e);
+			throw new SeleniumRobotServerException("cannot create test case", e);
 		}
 	}
 	
@@ -163,7 +166,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 					.field("session", sessionId));
 			testCaseInSessionId = testInSessionJson.getInt("id");
 		} catch (UnirestException | JSONException e) {
-			logger.error("cannot create test case", e);
+			throw new SeleniumRobotServerException("cannot create test case", e);
 		}
 	}
 	
@@ -181,7 +184,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 			testStepId = stepJson.getInt("id");
 			addCurrentTestStepToTestCase();
 		} catch (UnirestException | JSONException e) {
-			logger.error("cannot create test step", e);
+			throw new SeleniumRobotServerException("cannot create test step", e);
 		}
 	}
 	
@@ -211,7 +214,37 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 					);
 			snapshotId = 0; // for test only
 		} catch (UnirestException | JSONException e) {
-			logger.error("cannot create test snapshot", e);
+			throw new SeleniumRobotServerException("cannot create test snapshot", e);
+		}
+	}
+	
+	/**
+	 * Record step result
+	 */
+	public void recordStepResult(Boolean result, String logs) {
+		if (!active) {
+			return;
+		}
+		if (sessionId == null) {
+			createSession();
+		}
+		if (testCaseInSessionId == null) {
+			createTestCaseInSession();
+		}
+		if (testStepId == null) {
+			throw new ConfigurationException("Test step and test case in session must be previously defined");
+		}
+		try {
+			stepResultId = null;
+			JSONObject resultJson = getJSonResponse(Unirest.post(url + STEPRESULT_API_URL)
+					.field("step", testStepId)
+					.field("testCase", testCaseInSessionId)
+					.field("result", result)
+					.field("stacktrace", logs)
+					);
+			stepResultId = resultJson.getInt("id");
+		} catch (UnirestException | JSONException e) {
+			throw new SeleniumRobotServerException("cannot create test snapshot", e);
 		}
 	}
 
@@ -234,9 +267,8 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 					.collect(Collectors.toList());
 
 		} catch (UnirestException | JSONException e) {
-			logger.error("cannot get test step list", e);
+			throw new SeleniumRobotServerException("cannot get test step list", e);
 		}
-		return new ArrayList<>();
 	}
 	
 	/**
@@ -256,7 +288,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 			addTestStepsToTestCases(testSteps);
 			
 		} catch (UnirestException | JSONException e) {
-			logger.error("cannot add test step to test case", e);
+			throw new SeleniumRobotServerException("cannot add test step to test case", e);
 		}
 	}
 	
@@ -321,5 +353,9 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 
 	public Integer getTestCaseInSessionId() {
 		return testCaseInSessionId;
+	}
+
+	public Integer getStepResultId() {
+		return stepResultId;
 	}
 }

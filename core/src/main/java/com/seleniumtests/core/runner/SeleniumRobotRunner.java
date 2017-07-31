@@ -39,6 +39,7 @@ import com.seleniumtests.util.logging.SeleniumRobotLogger;
 			com.seleniumtests.reporter.TestListener.class, 
 			com.seleniumtests.core.testretry.TestRetryListener.class, 
 			com.seleniumtests.reporter.PerformanceReporter.class,
+			com.seleniumtests.reporter.SeleniumRobotServerTestRecorder.class,
 			com.seleniumtests.reporter.TestManagerReporter.class})
 public class SeleniumRobotRunner {
 	
