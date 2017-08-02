@@ -3,11 +3,15 @@ package com.seleniumtests.it.reporter;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.doThrow;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,6 +32,7 @@ import org.testng.xml.XmlTest;
 import com.seleniumtests.MockitoTest;
 import com.seleniumtests.connectors.selenium.SeleniumRobotSnapshotServerConnector;
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.customexception.SeleniumRobotServerException;
 import com.seleniumtests.reporter.SeleniumRobotServerTestRecorder;
 import com.seleniumtests.reporter.SeleniumTestsReporter2;
 import com.seleniumtests.reporter.TestListener;
@@ -79,7 +84,6 @@ public class TestSeleniumRobotServerTestRecorder extends MockitoTest {
 	 * In this test, everything is fine with seleniumrobot server
 	 * @throws Exception
 	 */
-	@SuppressWarnings("unchecked")
 	@Test(groups={"it"})
 	public void testReportGeneration() throws Exception {
 		
@@ -106,24 +110,94 @@ public class TestSeleniumRobotServerTestRecorder extends MockitoTest {
 		verify(serverConnector).createTestCase("test4");
 		verify(serverConnector).createTestCase("test5");
 		verify(serverConnector).createTestCase("test6");
+		verify(serverConnector, times(9)).addLogsToTestCaseInSession(anyString());
 		verify(serverConnector, times(9)).createTestCaseInSession(); 
 		verify(serverConnector, times(3)).createTestStep("step 1");
 		verify(serverConnector).createTestStep("step 2");
-		verify(serverConnector).recordStepResult(false, "Step step 1\\nclick button\\nsendKeys to text field\\nStep step 1.3: open page\\nclick link\\na message\\nsendKeys to password field");
+		verify(serverConnector).createSnapshot(any(File.class));
 		
+		// check that screenshot information are removed from logs (the pattern "Output: ...")
+		verify(serverConnector).recordStepResult(false, "Step step 1\nclick button\nsendKeys to text field\nStep step 1.3: open page\nclick link\na message\nsendKeys to password field");
 	}
 	
 	/**
 	 * Test when no seleniumrobot server is present
 	 */
+	@Test(groups={"it"})
+	public void testNoReportWhenServerIsOffline() throws Exception {
+		
+		reporter = spy(new SeleniumRobotServerTestRecorder());
+		when(reporter.getServerConnector()).thenReturn(serverConnector);
+		when(serverConnector.getActive()).thenReturn(false);
+
+		executeSubTest(new String[] {"com.seleniumtests.it.reporter.StubTestClass", "com.seleniumtests.it.reporter.StubTestClass2"});
+		
+
+		// check server has been called for all aspects of test (app, version, ...)
+		verify(serverConnector, never()).createApplication();
+		verify(serverConnector, never()).createVersion();
+		verify(serverConnector, never()).createEnvironment();
+		verify(serverConnector, never()).createSession();
+		
+		// check all test cases are created, in both test classes
+		verify(serverConnector, never()).createTestCase(anyString());
+		verify(serverConnector, never()).createTestCaseInSession(); 
+		verify(serverConnector, never()).createTestStep(anyString());
+	}
 	
 	
 	/**
 	 * Test when seleniumRobot server raises an error when registring app
 	 */
+	@Test(groups={"it"})
+	public void testErrorHandlingWhenRecordingApp() throws Exception {
+		
+		reporter = spy(new SeleniumRobotServerTestRecorder());
+		when(reporter.getServerConnector()).thenReturn(serverConnector);
+		when(serverConnector.getActive()).thenReturn(true);
+		doThrow(SeleniumRobotServerException.class).when(serverConnector).createApplication();
+
+		executeSubTest(new String[] {"com.seleniumtests.it.reporter.StubTestClass", "com.seleniumtests.it.reporter.StubTestClass2"});
+		
+
+		// check that process is interrupted
+		verify(serverConnector).createApplication();
+		verify(serverConnector, never()).createVersion();
+		verify(serverConnector, never()).createEnvironment();
+		verify(serverConnector, never()).createSession();
+		
+		// check no recording has been performed
+		verify(serverConnector, never()).createTestCase(anyString());
+		verify(serverConnector, never()).createTestCaseInSession(); 
+		verify(serverConnector, never()).createTestStep(anyString());
+	}
 	
 
 	/**
 	 * Test when seleniumRobot server raises an error when recording test result
+	 * Recording stops as soon as an error is raised to avoid inconsistencies in data
 	 */
+	@Test(groups={"it"})
+	public void testErrorHandlingWhenRecordingTestResult() throws Exception {
+		
+		reporter = spy(new SeleniumRobotServerTestRecorder());
+		when(reporter.getServerConnector()).thenReturn(serverConnector);
+		when(serverConnector.getActive()).thenReturn(true);
+		doThrow(SeleniumRobotServerException.class).when(serverConnector).recordStepResult(anyBoolean(), anyString());
+
+		executeSubTest(new String[] {"com.seleniumtests.it.reporter.StubTestClass", "com.seleniumtests.it.reporter.StubTestClass2"});
+		
+
+		// check server has been called for all aspects of test (app, version, ...)
+		verify(serverConnector).createApplication();
+		verify(serverConnector).createVersion();
+		verify(serverConnector).createEnvironment();
+		verify(serverConnector).createSession();
+		
+		// only one test should be created because process is interrupted
+		verify(serverConnector).createTestCase(anyString());
+		verify(serverConnector).createTestCaseInSession(); 
+		verify(serverConnector).createTestStep(anyString());
+		verify(serverConnector).recordStepResult(anyBoolean(), anyString());
+	}
 }

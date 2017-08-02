@@ -93,6 +93,7 @@ public class SeleniumTestsContext {
 
     public static final String SNAPSHOT_TOP_CROPPING = "snapshotTopCropping";
     public static final String SNAPSHOT_BOTTOM_CROPPING = "snapshotBottomCropping";
+    public static final String COMPARE_SNAPSHOT = "compareSnapshots";			// whether we should use the snapshots created by robot to compare them to a previous execution. This option only operates when SeleniumRobot server is connected
     
     public static final String WEB_PROXY_TYPE = "proxyType";					// type de proxy. AUTO, MANUAL, NO
     public static final String WEB_PROXY_ADDRESS = "proxyAddress";				// adresse du proxy. 
@@ -206,6 +207,7 @@ public class SeleniumTestsContext {
 
         setSnapshotBottomCropping(getIntValueForTest(SNAPSHOT_BOTTOM_CROPPING, System.getProperty(SNAPSHOT_BOTTOM_CROPPING)));
         setSnapshotTopCropping(getIntValueForTest(SNAPSHOT_TOP_CROPPING, System.getProperty(SNAPSHOT_TOP_CROPPING)));
+        setCompareSnapshot(getBoolValueForTest(COMPARE_SNAPSHOT, System.getProperty(COMPARE_SNAPSHOT)));
         setCaptureSnapshot(getBoolValueForTest(CAPTURE_SNAPSHOT, System.getProperty(CAPTURE_SNAPSHOT)));
         setEnableExceptionListener(getBoolValueForTest(ENABLE_EXCEPTION_LISTENER, System.getProperty(ENABLE_EXCEPTION_LISTENER)));
 
@@ -443,6 +445,10 @@ public class SeleniumTestsContext {
         }
 
         return (Boolean) getAttribute(CAPTURE_SNAPSHOT);
+    }
+    
+    public boolean getCompareSnapshot() {
+    	return (Boolean) getAttribute(COMPARE_SNAPSHOT);
     }
 
     public boolean getEnableExceptionListener() {
@@ -1132,6 +1138,14 @@ public class SeleniumTestsContext {
     		setAttribute(CAPTURE_SNAPSHOT, capture);
     	} else {
     		setAttribute(CAPTURE_SNAPSHOT, true);
+    	}
+    }
+    
+    public void setCompareSnapshot(Boolean capture) {
+    	if (capture != null) {
+    		setAttribute(COMPARE_SNAPSHOT, capture);
+    	} else {
+    		setAttribute(COMPARE_SNAPSHOT, false);
     	}
     }
     

@@ -1,3 +1,14 @@
+### 0 SeleniumRobot Server ###
+SeleniumRobot server [https://github.com/bhecquet/seleniumRobot-server](https://github.com/bhecquet/seleniumRobot-server) is a server which aims to be used with SeleniumRobot, giving the following features:
+- handle test variables: instead of setting test data into env.ini file, they can be set in server, which offers more features when sharing values among test projects
+- compare snapshots: as Seleniumrobot takes snapshots, it's able to send them to server which can compare with the same step of the same test executed previously
+- record test results: Even if test results are recorded in a test manager, the full result format with snapshots may not be available directly
+
+To use this server, 
+- first deploy it (see documentation of seleniumRobot-server project)
+- set an environment variable `SELENIUM_SERVER_URL` on the seleniumRobot executor, giving the root url of the server. E.g: `http://seleniumRobotServer:8000`
+- run your tests. SeleniumRobot will automatically connect to server and send data
+
 ### 1 Squash TM/TA ###
 SeleniumRobot can work with Squash TA by using an intermediate .java file. This file handles execution of test framework using a command line.
 Moreover, SeleniumRobot can generate .ta, pom.xml and .java files automatically. See "TA files generation" part.

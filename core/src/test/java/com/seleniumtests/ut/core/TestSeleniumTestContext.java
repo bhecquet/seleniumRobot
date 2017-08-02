@@ -424,6 +424,19 @@ public class TestSeleniumTestContext extends GenericTest {
 	}
 	
 	@Test(groups="ut context")
+	public void testCompareSnapshot(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setCompareSnapshot(true);
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getCompareSnapshot(), true);
+	}
+	@Test(groups="ut context")
+	public void testCompareSnapshotNull(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setCompareSnapshot(null);
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getCompareSnapshot(), false);
+	}
+	
+	@Test(groups="ut context")
 	public void testSnapshotTopCropping(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setSnapshotTopCropping(5);

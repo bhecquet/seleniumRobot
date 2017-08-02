@@ -39,7 +39,10 @@ public class TestLogging {
 	private static Map<Thread, TestStep> currentRootTestStep = Collections.synchronizedMap(new HashMap<>());
 	private static Map<Thread, TestStep> parentTestStep = Collections.synchronizedMap(new HashMap<>());
 	private static Map<Thread, ITestResult> currentTestResult = Collections.synchronizedMap(new HashMap<>());
-	private static Logger logger = SeleniumRobotLogger.getLogger(TestLogging.class);;
+	private static Logger logger = SeleniumRobotLogger.getLogger(TestLogging.class);
+	
+	public static final String OUTPUT_PATTERN = "Output: ";
+	public static final String SNAPSHOT_PATTERN = "Application Snapshot";
 	
 	private TestLogging() {
 		// As a utility class, it is not meant to be instantiated.
@@ -148,8 +151,13 @@ public class TestLogging {
     public static void logScreenshot(final ScreenShot screenshot, final boolean failed) {
     	String screenshotString = TestLogging.buildScreenshotLog(screenshot);
     	String message = screenshot.getTitle() + ": " + screenshotString;
-        log("Output: " + message + "<br/>", failed, false);
-        logMessage("Output: " + message, failed ? MessageType.ERROR: MessageType.LOG);
+        log(OUTPUT_PATTERN + message + "<br/>", failed, false);
+        logMessage(OUTPUT_PATTERN + message, failed ? MessageType.ERROR: MessageType.LOG);
+        
+        // store snapshot path to step
+        if (getParentTestStep() != null) {
+    		getParentTestStep().setSnapshot(screenshot.getImagePath());
+    	}
     }
     
     public static void logTestStep(TestStep testStep) {
@@ -207,7 +215,7 @@ public class TestLogging {
 
         if (screenShot.getImagePath() != null) {
             sbMessage.append(" | <a href='" + screenShot.getImagePath()
-                    + "' class='lightbox'>Application Snapshot</a>");
+                    + "' class='lightbox'>" + SNAPSHOT_PATTERN + "</a>");
         }
 
         return sbMessage.toString();

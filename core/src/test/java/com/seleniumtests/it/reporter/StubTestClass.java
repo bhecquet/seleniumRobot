@@ -21,6 +21,7 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import com.seleniumtests.customexception.DriverExceptions;
+import com.seleniumtests.driver.screenshots.ScreenShot;
 import com.seleniumtests.reporter.TestAction;
 import com.seleniumtests.reporter.TestLogging;
 import com.seleniumtests.reporter.TestMessage;
@@ -34,6 +35,11 @@ public class StubTestClass extends StubParentClass {
 		TestStep step1 = new TestStep("step 1");
 		step1.addAction(new TestAction("click button", false));
 		step1.addAction(new TestAction("sendKeys to text field", true));
+		
+		ScreenShot screenshot = new ScreenShot();
+		screenshot.setImagePath("screenshots/image.png");
+		step1.setSnapshot("screenshots/image.png");
+		step1.addMessage(new TestMessage(TestLogging.OUTPUT_PATTERN + TestLogging.buildScreenshotLog(screenshot), MessageType.INFO));
 		step1.setActionException(new WebDriverException("driver exception"));
 		TestStep subStep1 = new TestStep("step 1.3: open page");
 		subStep1.addAction(new TestAction("click link", false));
