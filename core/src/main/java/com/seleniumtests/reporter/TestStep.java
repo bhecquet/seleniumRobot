@@ -40,6 +40,7 @@ import java.util.List;
 public class TestStep extends TestAction {
 	private List<TestAction> stepActions;
 	private Long duration;
+	private String snapshot; // store at most 1 snapshot. It will be the last one if more than one are recorded
 	
 	public TestStep(String name) {
 		super(name, false);
@@ -100,12 +101,20 @@ public class TestStep extends TestAction {
 	
 	@Override
 	public String toString() {
-		StringBuilder testStepRepr = new StringBuilder(String.format("Step %s\\n", getName()));
+		StringBuilder testStepRepr = new StringBuilder(String.format("Step %s\n", getName()));
 		for (TestAction testAction: getStepActions()) {
-			testStepRepr.append(testAction.toString());
+			testStepRepr.append(testAction.toString() + "\n");
 		}
 		
-		return testStepRepr.toString();
+		return testStepRepr.toString().trim();
+	}
+
+	public String getSnapshot() {
+		return snapshot;
+	}
+
+	public void setSnapshot(String snapshot) {
+		this.snapshot = snapshot;
 	}
 	
 	

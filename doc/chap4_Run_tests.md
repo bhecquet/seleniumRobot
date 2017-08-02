@@ -54,9 +54,10 @@ In this case, this user passed value will overwrite test or suite parameters
 | proxyExclude 				|			| Proxy address exclusion, if MANUAL type is choosen | 
 | proxyPac 					| 			| Automatic configuration address, if PAC type is choosen | 
 | reportGenerationConfig 	| summaryPerSuite | Type of report generation.
-| captureSnapshot 			| true 		| Capture page snapshots |
+| captureSnapshot 			| true 		| Capture page snapshots. Captures are done only when a new page is opened |
 | snapshotTopCropping		| 0			| number of pixel that will be cropped from the top when capturing snapshot. This only applies to snapshots done with several captures (like from chrome) when a portion of the GUI is fixed when scrolling |
 | snapshotBottomCropping	| 0			| same as snapshotTopCropping for bottom cropping |
+| compareSnapshots			| false		| whether we should use the snapshots created by robot to compare them to a previous execution. This option only operates when SeleniumRobot server is connected. See chap6 documentation for details on connecting to server |
 | softAssertEnabled 		| true		| Test does not stop is an assertion fails. Only valid when using assertions defined in `CustomAssertion` class or assert methods in `BasePage` class | 
 | outputDirectory 			| <exec folder>	| folder where HTML report will be written | 
 | webDriverListener 		| 			| additional driver listener class |

@@ -1,5 +1,6 @@
 package com.seleniumtests.reporter;
 
+import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -57,6 +58,7 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 	@Override
 	public void generateReport(final List<XmlSuite> xml, final List<ISuite> suites, final String outdir) {
 		ITestContext testCtx = SeleniumTestsContextManager.getGlobalContext().getTestNGContext();
+		
 		if (testCtx == null) {
 			logger.error("Looks like your class does not extend from SeleniumTestPlan!");
 			return;
@@ -82,36 +84,8 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 		try {
 			for (ISuite suite : suites) {
 				Map<String, ISuiteResult> tests = suite.getResults();
-				for (ISuiteResult r : tests.values()) {
-					ITestContext context = r.getTestContext();
-					
-					// test case in seleniumRobot naming
-					for (ITestNGMethod method: context.getAllTestMethods()) {
-		
-						Collection<ITestResult> methodResults = getResultSet(context.getFailedTests(), method);
-						methodResults.addAll(getResultSet(context.getPassedTests(), method));
-						methodResults.addAll(getResultSet(context.getSkippedTests(), method));
-	
-						if (!methodResults.isEmpty()) {
-							
-							// record test case
-							serverConnector.createTestCase(method.getMethodName());
-							serverConnector.createTestCaseInSession();
-							
-							List<TestStep> testSteps = TestLogging.getTestsSteps().get(methodResults.toArray(new ITestResult[] {})[0]);
-							if (testSteps == null) {
-								continue;
-							}
-							
-							for (TestStep testStep: testSteps) {
-								
-								// record test step
-								serverConnector.createTestStep(testStep.getName());
-								serverConnector.recordStepResult(!testStep.getFailed(), testStep.toString());
-							}
-						}
-					}
-				}
+				
+				recordSuiteResults(serverConnector, tests);
 			}
 		} catch (SeleniumRobotServerException | ConfigurationException e) {
 			logger.error("Error contacting selenium robot serveur", e);
@@ -119,7 +93,61 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 		}
 	
 	}
+	
+	private void recordSuiteResults(SeleniumRobotSnapshotServerConnector serverConnector, Map<String, ISuiteResult> tests) {
+		
+		String outputDir = SeleniumTestsContextManager.getThreadContext().getOutputDirectory();
+		
+		for (ISuiteResult r : tests.values()) {
+			ITestContext context = r.getTestContext();
+			
+			// test case in seleniumRobot naming
+			for (ITestNGMethod method: context.getAllTestMethods()) {
 
+				Collection<ITestResult> methodResults = getResultSet(context.getFailedTests(), method);
+				methodResults.addAll(getResultSet(context.getPassedTests(), method));
+				methodResults.addAll(getResultSet(context.getSkippedTests(), method));
+
+				if (!methodResults.isEmpty()) {
+					ITestResult testResult = methodResults.toArray(new ITestResult[] {})[0];
+					
+					// record test case
+					serverConnector.createTestCase(method.getMethodName());
+					serverConnector.createTestCaseInSession();
+					serverConnector.addLogsToTestCaseInSession(generateExecutionLogs(testResult));
+					
+					List<TestStep> testSteps = TestLogging.getTestsSteps().get(testResult);
+					if (testSteps == null) {
+						continue;
+					}
+					
+					for (TestStep testStep: testSteps) {
+						
+						// record test step
+						serverConnector.createTestStep(testStep.getName());
+						String stepLogs = testStep.toString();
+						
+						serverConnector.recordStepResult(!testStep.getFailed(), filterStepLogs(stepLogs));
+						
+						if (testStep.getSnapshot() != null) {
+							serverConnector.createSnapshot(Paths.get(outputDir, testStep.getSnapshot()).toFile());
+						}
+					}
+				}
+			}
+		}
+	}
+	
+	private String filterStepLogs(String stepLogs) {
+		StringBuilder filteredLogs = new StringBuilder();
+		for (String line: stepLogs.split("\n")) {
+			if (line.startsWith(TestLogging.OUTPUT_PATTERN) && line.contains(TestLogging.SNAPSHOT_PATTERN)) {
+				continue;
+			}
+			filteredLogs.append(line + "\n");
+		}
+		return filteredLogs.toString().trim();
+	}
 
 	/**
 	 * @param   tests

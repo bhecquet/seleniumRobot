@@ -53,7 +53,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 	
 	@Override
 	protected boolean isAlive() {
-		return isAlive("/snapshot/compare/");
+		return isAlive("/snapshot/");
 	}
 
 	public void createApplication() {
@@ -119,7 +119,8 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 					.field("date", LocalDate.now().format(DateTimeFormatter.ISO_DATE))
 					.field("browser", browser.getBrowserType())
 					.field("environment", SeleniumTestsContextManager.getThreadContext().getTestEnv())
-					.field("version", versionId));
+					.field("version", versionId)
+					.field("compareSnapshot", SeleniumTestsContextManager.getThreadContext().getCompareSnapshot()));
 			sessionId = sessionJson.getInt("id");
 		} catch (UnirestException | JSONException e) {
 			throw new SeleniumRobotServerException("cannot create session", e);
@@ -148,7 +149,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 	}
 	
 	/**
-	 * Create test case and add it to the current session
+	 * Create link between test case and session
 	 */
 	public void createTestCaseInSession() {
 		if (!active) {
@@ -201,13 +202,13 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 		if (testCaseInSessionId == null) {
 			createTestCaseInSession();
 		}
-		if (testStepId == null) {
-			throw new ConfigurationException("Test step and test case in session must be previously defined");
+		if (stepResultId == null) {
+			throw new ConfigurationException("Step result must be previously recorded");
 		}
 		try {
 			snapshotId = null;
 			getJSonResponse(Unirest.post(url + SNAPSHOT_API_URL)
-					.field("step", testStepId)
+					.field("stepResult", stepResultId)
 					.field("sessionId", sessionUUID)
 					.field("testCase", testCaseInSessionId)
 					.field("image", pictureFile)
@@ -302,6 +303,18 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 			request = request.field("testSteps", tc);
 		}
 		return getJSonResponse(request);
+	}
+	
+	public void addLogsToTestCaseInSession(String logs) {
+		if (testCaseInSessionId == null) {
+			createTestCaseInSession();
+		}
+		
+		try {
+			getJSonResponse(Unirest.patch(url + TESTCASEINSESSION_API_URL + testCaseInSessionId + "/").field("stacktrace", logs));
+		} catch (UnirestException e) {
+			throw new SeleniumRobotServerException("cannot add logs to test case", e);
+		}
 	}
 	
 	private JSONObject getJSonResponse(BaseRequest request) throws UnirestException {

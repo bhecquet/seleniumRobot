@@ -503,7 +503,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends MockitoTest {
 	
 	// snapshot creation
 	@Test(groups= {"ut"}, expectedExceptions=ConfigurationException.class)
-	public void testCreateSnapshotNoStep() throws UnirestException {
+	public void testCreateSnapshotNoStepResult() throws UnirestException {
 		SeleniumRobotSnapshotServerConnector connector = spy(configureAliveConnection());
 		
 		connector.createSnapshot(new File(""));
@@ -518,6 +518,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends MockitoTest {
 		connector.createTestCase("Test 1");
 		connector.createTestCaseInSession();
 		connector.createTestStep("Step 1");
+		connector.recordStepResult(true, "");
 		connector.createSnapshot(new File(""));
 		
 		// check prerequisites has been created
@@ -535,6 +536,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends MockitoTest {
 		connector.createTestCase("Test 1");
 		connector.createTestCaseInSession();
 		connector.createTestStep("Step 1");
+		connector.recordStepResult(true, "");
 		connector.createSnapshot(new File(""));
 		Assert.assertNull(connector.getSnapshotId());
 	}
@@ -601,4 +603,36 @@ public class TestSeleniumRobotSnapshotServerConnector extends MockitoTest {
 		Unirest.post(ArgumentMatchers.contains(SeleniumRobotSnapshotServerConnector.STEPRESULT_API_URL));
 	}
 	
+	// add logs to test case in session
+	@Test(groups= {"ut"})
+	public void testRecordTestLogsNoTestCaseInSession() throws UnirestException {
+		SeleniumRobotSnapshotServerConnector connector = spy(configureAliveConnection());
+		connector.createTestCase("Test 1");
+		connector.addLogsToTestCaseInSession("some logs");
+
+		verify(connector).createTestCaseInSession();
+	}
+	
+	
+	@Test(groups= {"ut"})
+	public void testRecordTestLogs() throws UnirestException {
+		SeleniumRobotSnapshotServerConnector connector = spy(configureAliveConnection());
+		
+		connector.createTestCase("Test 1");
+		connector.createTestCaseInSession();
+		connector.addLogsToTestCaseInSession("some logs");
+	}
+	
+	
+	@Test(groups= {"ut"}, expectedExceptions=SeleniumRobotServerException.class)
+	public void testRecordTestLogsInError() throws UnirestException {
+		
+		SeleniumRobotSnapshotServerConnector connector = configureAliveConnection();
+		when(Unirest.patch(SERVER_URL + SeleniumRobotSnapshotServerConnector.TESTCASEINSESSION_API_URL + "15/")).thenThrow(UnirestException.class);
+		
+		connector.createTestCase("Test 1");
+		connector.createTestCaseInSession();
+		connector.addLogsToTestCaseInSession("some logs");
+	}
+
 }
