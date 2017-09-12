@@ -138,10 +138,39 @@ public class HtmlElement implements WebElement, Locatable, HasIdentity {
     	this.frameElement = null;
     }
 
+    /**
+     * Native click
+     */
     @ReplayOnError
     public void click() {
         findElement(true);
         element.click();   
+    }
+    
+    /**
+     * Click with CompositeActions
+     */
+    @ReplayOnError
+    public void clickAction() {
+    	findElement(true);
+    	try {
+            new Actions(driver).click(element).perform();
+        } catch (InvalidElementStateException e) {
+            logger.error(e);
+        }
+    }
+    
+    /**
+     * Double Click with CompositeActions
+     */
+    @ReplayOnError
+    public void doubleClickAction() {
+    	findElement(true);
+    	try {
+            new Actions(driver).doubleClick(element).perform();
+        } catch (InvalidElementStateException e) {
+            logger.error(e);
+        }
     }
     
     /**
@@ -167,6 +196,9 @@ public class HtmlElement implements WebElement, Locatable, HasIdentity {
         }
     }
 
+    /**
+     * Click with javascript
+     */
     @ReplayOnError
     public void simulateClick() {
     	if (SeleniumTestsContextManager.isWebTest()) {
@@ -1024,6 +1056,21 @@ public class HtmlElement implements WebElement, Locatable, HasIdentity {
 
 	public FrameElement getFrameElement() {
 		return frameElement;
+	}
+
+	public void setFrameElement(FrameElement frameElement) {
+		this.frameElement = frameElement;
+	}
+	
+	/**
+	 * Sometimes, the frame defined for the element may change
+	 * @param frameElement
+	 * @return
+	 */
+	public <T extends HtmlElement> T changeFrame(FrameElement frameElement, Class<T> type) {
+		setFrameElement(frameElement);
+	
+		return (T)this;
 	}
 
 	@Override
