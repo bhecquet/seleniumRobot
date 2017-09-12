@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.UnexpectedTagNameException;
@@ -96,6 +97,39 @@ public class SelectList extends HtmlElement {
     public List<WebElement> getOptions() {
         findElement();
         return options;
+    }
+    
+    /**
+     * @return The first selected option in this select tag (or the currently selected option in a
+     *         normal select)
+     * @throws NoSuchElementException If no option is selected
+     */
+    @ReplayOnError
+    public WebElement getFirstSelectedOption() {
+    	findElement();
+        for (WebElement option : options) {
+        	if (option.isSelected()) {
+        		return option;
+        	}
+        }
+
+        return null;
+    }
+    
+    /**
+     * @return All selected options belonging to this select tag
+     */
+    @ReplayOnError
+    public List<WebElement> getAllSelectedOptions() {
+      List<WebElement> toReturn = new ArrayList<>();
+
+      for (WebElement option : options) {
+          if (option.isSelected()) {
+        	  toReturn.add(option);
+          }
+      }
+
+      return toReturn;
     }
 
     @ReplayOnError
