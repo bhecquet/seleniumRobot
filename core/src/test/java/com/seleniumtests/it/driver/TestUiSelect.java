@@ -99,6 +99,31 @@ public class TestUiSelect extends GenericDriverTest {
 	}
 	
 	@Test(groups={"it"})
+	public void testGetFirstSelectedOption() {
+		testPage.selectMultipleList.deselectAll();
+		String[] toSelect = {"opt2", "opt4"};
+		testPage.selectMultipleList.selectByValue(toSelect);
+		Assert.assertTrue("option2".equals(testPage.selectMultipleList.getFirstSelectedOption().getText()));
+	}
+	
+	@Test(groups={"it"})
+	public void testGetFirstSelectedOptionNoSelection() {
+		testPage.selectMultipleList.deselectAll();
+		Assert.assertNull(testPage.selectMultipleList.getFirstSelectedOption());
+	}
+	
+
+	@Test(groups={"it"})
+	public void testGetAllSelectedOptions() {
+		testPage.selectMultipleList.deselectAll();
+		String[] toSelect = {"opt2", "opt4"};
+		testPage.selectMultipleList.selectByValue(toSelect);
+		Assert.assertTrue("option2".equals(testPage.selectMultipleList.getAllSelectedOptions().get(0).getText()));
+		Assert.assertTrue("option4".equals(testPage.selectMultipleList.getAllSelectedOptions().get(1).getText()));
+	}
+	
+	
+	@Test(groups={"it"})
 	public void testIsCorrespondingTextSelect() {
 			testPage.selectList.selectByCorrespondingText("option 2");
 			Assert.assertTrue(testPage.selectList.getSelectedValue().equals("opt2"));

@@ -17,6 +17,7 @@
 package com.seleniumtests.ut.uipage;
 
 import org.openqa.selenium.WebDriver;
+import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
@@ -108,5 +109,22 @@ public class TestSelectList extends GenericTest {
 	public void testDeselectValue() {
 		testSelectIt.testIsValueDeselect();
 	}
+	
+
+	@Test(groups={"ut"})
+	public void testIsMultipleValueSelect() {
+		testSelectIt.testIsMultipleValueSelect();
+	}
+	
+	@Test(groups={"ut"})
+	public void testGetFirstSelectedOption() {
+		testSelectIt.testGetFirstSelectedOption();
+	}
+	
+	@Test(groups={"ut"})
+	public void testGetFirstSelectedOptionNoSelection() {
+		testSelectIt.testGetFirstSelectedOptionNoSelection();
+	}
+	
 	
 }

@@ -173,6 +173,51 @@ public class TestDriver extends GenericTest {
 			testPage.resetButton.click();
 		}
 	}
+	
+	/**
+	 * Test composite actions
+	 */
+	@Test(groups={"it"})
+	public void testClickActionDiv() {
+		try {
+			testPage.redSquare.clickAction();
+			Assert.assertEquals("coucou", testPage.textElement.getValue());
+		} finally {
+			testPage.resetButton.click();
+			Assert.assertEquals("", testPage.textElement.getValue());
+		}
+	}
+	
+	@Test(groups={"it"})
+	public void testDoubleClickActionDiv() {
+		try {
+			testPage.redSquare.doubleClickAction();
+			Assert.assertEquals("double coucou", testPage.textElement.getValue());
+		} finally {
+			testPage.resetButton.click();
+			Assert.assertEquals("", testPage.textElement.getValue());
+		}
+	}
+	
+	@Test(groups={"it"})
+	public void testClickActionRadio() {
+		try {
+			testPage.radioElement.clickAction();
+			Assert.assertTrue(testPage.radioElement.isSelected());
+		} finally {
+			testPage.resetButton.click();
+		}
+	}
+	
+	@Test(groups={"it"})
+	public void testClickActionCheckbox() {
+		try {
+			testPage.checkElement.clickAction();
+			Assert.assertTrue(testPage.checkElement.isSelected());
+		} finally {
+			testPage.resetButton.click();
+		}
+	}
    
 	@Test(groups={"it"})
 	public void testSendKeys() {

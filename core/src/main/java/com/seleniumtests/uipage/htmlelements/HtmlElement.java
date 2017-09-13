@@ -153,6 +153,9 @@ public class HtmlElement implements WebElement, Locatable, HasIdentity {
     @ReplayOnError
     public void clickAction() {
     	findElement(true);
+    	
+    	// element must be fully visible (for example checkbox), to be actionned
+    	scrollToElement(-20);
     	try {
             new Actions(driver).click(element).perform();
         } catch (InvalidElementStateException e) {
@@ -166,6 +169,9 @@ public class HtmlElement implements WebElement, Locatable, HasIdentity {
     @ReplayOnError
     public void doubleClickAction() {
     	findElement(true);
+    	
+    	// element must be fully visible (for example checkbox), to be actionned
+    	scrollToElement(-20);
     	try {
             new Actions(driver).doubleClick(element).perform();
         } catch (InvalidElementStateException e) {
