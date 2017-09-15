@@ -18,7 +18,6 @@ package com.seleniumtests.driver;
 
 import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.UnsupportedCommandException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -35,13 +34,7 @@ public class DriverExceptionListener implements WebDriverEventListener {
 	
 	@Override
     public void afterChangeValueOf(final WebElement element, final WebDriver driver, CharSequence[] arg2) {
-    	if (SeleniumTestsContextManager.isWebTest() && "input".equalsIgnoreCase(element.getTagName())) {
-    		try {
-    			((JavascriptExecutor) driver).executeScript("arguments[0].blur();", element);
-    		} catch (Exception e) {	
-    			logger.error(e);
-    		}
-    	}
+    	// do nothing
     }
 	
 	@Override
