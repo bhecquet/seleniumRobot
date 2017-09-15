@@ -3,6 +3,7 @@ package com.seleniumtests.ut.connectors.selenium;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -63,7 +64,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends MockitoTest {
 	private SeleniumRobotSnapshotServerConnector configureAliveConnection() throws UnirestException {
 		when(getAliveRequest.asString()).thenReturn(responseAliveString);
 		when(responseAliveString.getStatus()).thenReturn(200);
-		when(Unirest.get(SERVER_URL + "/snapshot/compare/")).thenReturn(getAliveRequest);
+		when(Unirest.get(SERVER_URL + "/snapshot/")).thenReturn(getAliveRequest);
 		
 		SeleniumTestsContextManager.getThreadContext().getConfiguration().put(SeleniumRobotServerConnector.SELENIUM_SERVER_URL, SERVER_URL);
 		
@@ -90,7 +91,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends MockitoTest {
 	 */
 	private SeleniumRobotSnapshotServerConnector configureNotAliveConnection() throws UnirestException {
 		when(getAliveRequest.asString()).thenThrow(UnirestException.class);
-		when(Unirest.get(SERVER_URL + "/snapshot/compare/")).thenReturn(getAliveRequest);
+		when(Unirest.get(SERVER_URL + "/snapshot/")).thenReturn(getAliveRequest);
 		
 		SeleniumTestsContextManager.getThreadContext().getConfiguration().put(SeleniumRobotServerConnector.SELENIUM_SERVER_URL, SERVER_URL);
 		return new SeleniumRobotSnapshotServerConnector();
@@ -120,10 +121,12 @@ public class TestSeleniumRobotSnapshotServerConnector extends MockitoTest {
 				when(Unirest.patch(SERVER_URL + apiPath)).thenReturn(postRequest);
 				when(postRequest.field(anyString(), anyString())).thenReturn(requestMultipartBody);
 				when(postRequest.field(anyString(), anyInt())).thenReturn(requestMultipartBody);
+				when(postRequest.field(anyString(), anyLong())).thenReturn(requestMultipartBody);
 				when(postRequest.field(anyString(), any(File.class))).thenReturn(requestMultipartBody);
 				when(requestMultipartBody.field(anyString(), anyInt())).thenReturn(requestMultipartBody);
 				when(requestMultipartBody.field(anyString(), anyBoolean())).thenReturn(requestMultipartBody);
 				when(requestMultipartBody.field(anyString(), anyString())).thenReturn(requestMultipartBody);
+				when(requestMultipartBody.field(anyString(), anyLong())).thenReturn(requestMultipartBody);
 				when(requestMultipartBody.field(anyString(), any(File.class))).thenReturn(requestMultipartBody);
 				when(requestMultipartBody.asString()).thenReturn(response);
 				when(response.getStatus()).thenReturn(statusCode);
@@ -518,7 +521,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends MockitoTest {
 		connector.createTestCase("Test 1");
 		connector.createTestCaseInSession();
 		connector.createTestStep("Step 1");
-		connector.recordStepResult(true, "");
+		connector.recordStepResult(true, "", 1);
 		connector.createSnapshot(new File(""));
 		
 		// check prerequisites has been created
@@ -536,7 +539,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends MockitoTest {
 		connector.createTestCase("Test 1");
 		connector.createTestCaseInSession();
 		connector.createTestStep("Step 1");
-		connector.recordStepResult(true, "");
+		connector.recordStepResult(true, "", 1);
 		connector.createSnapshot(new File(""));
 		Assert.assertNull(connector.getSnapshotId());
 	}
@@ -558,7 +561,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends MockitoTest {
 	public void testCreateStepResultNoStep() throws UnirestException {
 		SeleniumRobotSnapshotServerConnector connector = spy(configureAliveConnection());
 		
-		connector.recordStepResult(true, "");
+		connector.recordStepResult(true, "", 1);
 	}
 	
 	
@@ -570,7 +573,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends MockitoTest {
 		connector.createTestCase("Test 1");
 		connector.createTestCaseInSession();
 		connector.createTestStep("Step 1");
-		connector.recordStepResult(true, "");
+		connector.recordStepResult(true, "", 1);
 		
 		// check prerequisites has been created
 		Assert.assertEquals((int)connector.getSessionId(), 13);
@@ -587,7 +590,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends MockitoTest {
 		connector.createTestCase("Test 1");
 		connector.createTestCaseInSession();
 		connector.createTestStep("Step 1");
-		connector.recordStepResult(true, "");
+		connector.recordStepResult(true, "", 1);
 		Assert.assertNull(connector.getStepResultId());
 	}
 	
@@ -598,7 +601,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends MockitoTest {
 		connector.createTestCase("Test 1");
 		connector.createTestCaseInSession();
 		connector.createTestStep("Step 1");
-		connector.recordStepResult(true, "");
+		connector.recordStepResult(true, "", 1);
 		PowerMockito.verifyStatic(never());
 		Unirest.post(ArgumentMatchers.contains(SeleniumRobotSnapshotServerConnector.STEPRESULT_API_URL));
 	}

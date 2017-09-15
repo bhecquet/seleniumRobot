@@ -69,15 +69,8 @@ public class TestTestLogging extends GenericTest {
 	@Test(groups={"ut"})
 	public void testLogScreenshotOk() {
 		TestLogging.setCurrentRootTestStep(new TestStep("step"));
-		TestLogging.logScreenshot(new ScreenShot(), false);
-		Assert.assertEquals(((TestMessage)(TestLogging.getParentTestStep().getStepActions().get(0))).getMessageType(), MessageType.LOG);
-	}
-	
-	@Test(groups={"ut"})
-	public void testLogScreenshotKo() {
-		TestLogging.setCurrentRootTestStep(new TestStep("step"));
-		TestLogging.logScreenshot(new ScreenShot(), true);
-		Assert.assertEquals(((TestMessage)(TestLogging.getParentTestStep().getStepActions().get(0))).getMessageType(), MessageType.ERROR);
+		TestLogging.logScreenshot(new ScreenShot());
+		Assert.assertEquals(((TestMessage)(TestLogging.getParentTestStep().getStepActions().get(0))).getMessageType(), MessageType.SNAPSHOT);
 	}
 	
 	@Test(groups={"ut"})

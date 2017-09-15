@@ -58,8 +58,6 @@ public class TestLogging {
      * @param  message
      */
     public static void info(String message) {
-        String formattedMessage = "<li><font color='#00cd00'>" + message + "</font></li>";
-        log(formattedMessage, false, false);
         logMessage(message, MessageType.INFO);
         logger.info(message);
     }
@@ -70,8 +68,6 @@ public class TestLogging {
      * @param  message
      */
     public static void warning(String message) {
-        String formattedMessage = "<li><font color='#FFFF00'>" + message + "</font></li>";
-        log(formattedMessage, false, false);
         logMessage("Warning: " + message, MessageType.WARNING);
         logger.warn(message);
     }
@@ -81,12 +77,10 @@ public class TestLogging {
      *
      * @param  message
      */
-    public static void error(String message) {
-        String formattedMessage = "<li><b><font color='#6600CC'>" + message + "</font></b></li>";
-        log(formattedMessage, false, false);
+    public static void error(String message) { 
         logMessage(message, MessageType.ERROR);
         logger.error(message);
-    }
+    } 
 
     /**
      * Write log message to logger and current test step
@@ -94,7 +88,6 @@ public class TestLogging {
      * @param  message
      */
     public static void log(final String message) {
-        log(message, false, false);
         logMessage(message, MessageType.LOG);
         logger.info(message);
     }
@@ -106,41 +99,7 @@ public class TestLogging {
     	}
     }
 
-    /**
-     * @deprecated will be deleted when SeleniumTestReported will be removed
-     * Log principal method (all others log methods use this one at the end)
-     *
-     * @param  message
-     * @param  failed
-     * @param  logToStandardOutput
-     */
-    @Deprecated
-    private static void log(String message, final boolean failed, final boolean logToStandardOutput) {
-
-    	String formattedMessage = message;
-        if (formattedMessage == null) {
-        	formattedMessage = "";
-        }
-
-        formattedMessage = formattedMessage.replaceAll("\\n", "<br/>");
-
-        if (failed) {
-        	formattedMessage = "<span style=\"font-weight:bold;color:#cc0052;\">" + formattedMessage + "</span>";
-        }
-
-        Reporter.log(escape(formattedMessage), logToStandardOutput);
-    }
-
-    /**
-     * @deprecated will be deleted when SeleniumTestReported will be removed
-     * @param message
-     * @return
-     */
-    @Deprecated
-    private static String escape(final String message) {
-        return message.replaceAll("\\n", "<br/>").replaceAll("<", "@@lt@@").replaceAll(">", "^^greaterThan^^");
-    }
-
+ 
     /**
      * Log Web Output (add "Output:" to the message)
      *
@@ -148,11 +107,10 @@ public class TestLogging {
      * @param  message
      * @param  failed
      */
-    public static void logScreenshot(final ScreenShot screenshot, final boolean failed) {
+    public static void logScreenshot(final ScreenShot screenshot) {
     	String screenshotString = TestLogging.buildScreenshotLog(screenshot);
     	String message = screenshot.getTitle() + ": " + screenshotString;
-        log(OUTPUT_PATTERN + message + "<br/>", failed, false);
-        logMessage(OUTPUT_PATTERN + message, failed ? MessageType.ERROR: MessageType.LOG);
+        logMessage(OUTPUT_PATTERN + message, MessageType.SNAPSHOT);
         
         // store snapshot path to step
         if (getParentTestStep() != null) {
@@ -171,21 +129,15 @@ public class TestLogging {
      * @param storeStep
      */
     public static void logTestStep(TestStep testStep, boolean storeStep) {
-    	log("<li>" + (testStep.getFailed() ? "<b>FailedStep</b>: " : " ") + "<b>" + testStep.getName() + "</b>", testStep.getFailed(), false);
     	List<TestAction> actionList = testStep.getStepActions();
     	
     	if (!actionList.isEmpty()) {
-    		log("<ul>", false, false);
-	    	for (TestAction action: actionList) {
+    		for (TestAction action: actionList) {
 	    		if (action instanceof TestStep) {	
 					logTestStep((TestStep)action, false);	
-				} else {
-					log("<li>" + (action.getFailed() ? "<b>FailedAction</b>: " : " ") + action.getName() + "</li>", action.getFailed(), false);
-				}
+				} 
 			}
-    		log("</ul>", false, false);
     	}
-    	log("</li>", false, false);
     	
     	if (storeStep) {
     		TestLogging.testsSteps.get(getCurrentTestResult()).add(testStep);

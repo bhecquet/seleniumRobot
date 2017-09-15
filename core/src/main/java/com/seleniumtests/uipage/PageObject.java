@@ -246,7 +246,7 @@ public class PageObject extends BasePage implements IPage {
             imageFilePath = screenShot.getImagePath().replace(suiteName, outputDirectory);
         }
 
-        TestLogging.logScreenshot(screenShot, false);
+        TestLogging.logScreenshot(screenShot);
 
     }
 

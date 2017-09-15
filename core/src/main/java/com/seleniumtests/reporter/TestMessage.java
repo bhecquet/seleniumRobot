@@ -16,6 +16,8 @@
  */
 package com.seleniumtests.reporter;
 
+import org.json.JSONObject;
+
 public class TestMessage extends TestAction {
 	
 	private MessageType messageType;
@@ -25,7 +27,8 @@ public class TestMessage extends TestAction {
 		ERROR,
 		WARNING,	// warning message
 		INFO,		// success message
-		LOG			// neutral message
+		LOG,		// neutral message
+		SNAPSHOT	// this is a snapshot message
 	}
 	
 	public TestMessage(String name, MessageType type) {
@@ -35,5 +38,16 @@ public class TestMessage extends TestAction {
 
 	public MessageType getMessageType() {
 		return messageType;
+	}
+	
+	@Override
+	public JSONObject toJson() {
+		JSONObject actionJson = new JSONObject();
+		
+		actionJson.put("type", "message");
+		actionJson.put("name", name);
+		actionJson.put("messageType", messageType.toString());
+		
+		return actionJson;
 	}
 }
