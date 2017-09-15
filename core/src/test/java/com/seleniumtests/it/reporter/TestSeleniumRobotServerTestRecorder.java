@@ -1,28 +1,26 @@
 package com.seleniumtests.it.reporter;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.doThrow;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.velocity.app.VelocityEngine;
 import org.mockito.Mock;
-import org.testng.Assert;
 import org.testng.IInvokedMethodListener;
 import org.testng.IReporter;
 import org.testng.ITestListener;
-import org.testng.ITestResult;
 import org.testng.TestNG;
 import org.testng.annotations.Test;
 import org.testng.xml.XmlClass;
@@ -34,7 +32,6 @@ import com.seleniumtests.connectors.selenium.SeleniumRobotSnapshotServerConnecto
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.SeleniumRobotServerException;
 import com.seleniumtests.reporter.SeleniumRobotServerTestRecorder;
-import com.seleniumtests.reporter.SeleniumTestsReporter2;
 import com.seleniumtests.reporter.TestListener;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
@@ -117,7 +114,7 @@ public class TestSeleniumRobotServerTestRecorder extends MockitoTest {
 		verify(serverConnector).createSnapshot(any(File.class));
 		
 		// check that screenshot information are removed from logs (the pattern "Output: ...")
-		verify(serverConnector).recordStepResult(false, "Step step 1\nclick button\nsendKeys to text field\nStep step 1.3: open page\nclick link\na message\nsendKeys to password field");
+		verify(serverConnector).recordStepResult(eq(false), eq("Step step 1\nclick button\nsendKeys to text field\nStep step 1.3: open page\nclick link\na message\nsendKeys to password field"), anyLong());
 	}
 	
 	/**
@@ -183,7 +180,7 @@ public class TestSeleniumRobotServerTestRecorder extends MockitoTest {
 		reporter = spy(new SeleniumRobotServerTestRecorder());
 		when(reporter.getServerConnector()).thenReturn(serverConnector);
 		when(serverConnector.getActive()).thenReturn(true);
-		doThrow(SeleniumRobotServerException.class).when(serverConnector).recordStepResult(anyBoolean(), anyString());
+		doThrow(SeleniumRobotServerException.class).when(serverConnector).recordStepResult(anyBoolean(), anyString(), anyLong());
 
 		executeSubTest(new String[] {"com.seleniumtests.it.reporter.StubTestClass", "com.seleniumtests.it.reporter.StubTestClass2"});
 		
@@ -198,6 +195,6 @@ public class TestSeleniumRobotServerTestRecorder extends MockitoTest {
 		verify(serverConnector).createTestCase(anyString());
 		verify(serverConnector).createTestCaseInSession(); 
 		verify(serverConnector).createTestStep(anyString());
-		verify(serverConnector).recordStepResult(anyBoolean(), anyString());
+		verify(serverConnector).recordStepResult(anyBoolean(), anyString(), anyLong());
 	}
 }

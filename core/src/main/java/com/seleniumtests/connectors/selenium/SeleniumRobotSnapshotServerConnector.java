@@ -221,8 +221,11 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 	
 	/**
 	 * Record step result
+	 * @param result	step result (true of false)
+	 * @param logs		step details
+	 * @param duration	step duration in milliseconds
 	 */
-	public void recordStepResult(Boolean result, String logs) {
+	public void recordStepResult(Boolean result, String logs, long duration) {
 		if (!active) {
 			return;
 		}
@@ -241,6 +244,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 					.field("step", testStepId)
 					.field("testCase", testCaseInSessionId)
 					.field("result", result)
+					.field("duration", duration)
 					.field("stacktrace", logs)
 					);
 			stepResultId = resultJson.getInt("id");

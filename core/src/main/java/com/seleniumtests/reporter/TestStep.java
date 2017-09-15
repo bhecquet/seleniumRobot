@@ -19,6 +19,9 @@ package com.seleniumtests.reporter;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 /**
  * Group of test actions
  * Represent each method call inside a PageObject during the test
@@ -107,6 +110,21 @@ public class TestStep extends TestAction {
 		}
 		
 		return testStepRepr.toString().trim();
+	}
+	
+	@Override
+	public JSONObject toJson() {
+		JSONObject stepJSon = new JSONObject();
+		
+		stepJSon.put("name", name);
+		stepJSon.put("type", "step");
+		
+		stepJSon.put("actions", new JSONArray());
+		for (TestAction testAction: getStepActions()) {
+			stepJSon.getJSONArray("actions").put(testAction.toJson());
+		}
+		
+		return stepJSon;
 	}
 
 	public String getSnapshot() {

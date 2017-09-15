@@ -16,12 +16,15 @@
  */
 package com.seleniumtests.ut.reporter;
 
-import org.junit.Assert;
+import org.json.JSONObject;
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import com.seleniumtests.GenericTest;
 import com.seleniumtests.reporter.TestAction;
+import com.seleniumtests.reporter.TestMessage;
 import com.seleniumtests.reporter.TestStep;
+import com.seleniumtests.reporter.TestMessage.MessageType;
 
 public class TestTestStep extends GenericTest {
 
@@ -82,5 +85,39 @@ public class TestTestStep extends GenericTest {
 		subStep.addAction(new TestAction("action1", false));
 		step.addAction(new TestAction("action2", false));
 		Assert.assertFalse(step.getFailed());
+	}
+	
+	/**
+	 * Checks getFailed correctly compute test step status if sub step is not failed
+	 */
+	@Test(groups={"ut"})
+	public void testToJson() {
+		TestStep step = new TestStep("step1");
+		step.addMessage(new TestMessage("everything OK", MessageType.INFO));
+		step.addAction(new TestAction("action2", false));
+		
+		TestStep subStep = new TestStep("subStep");
+		subStep.addMessage(new TestMessage("everything in subStep almost OK", MessageType.WARNING));
+		subStep.addAction(new TestAction("action1", false));
+		step.addAction(subStep);
+		
+		JSONObject stepJson = step.toJson();
+		
+		Assert.assertEquals(stepJson.getString("type"), "step");
+		Assert.assertEquals(stepJson.getString("name"), "step1");
+		Assert.assertEquals(stepJson.getJSONArray("actions").length(), 3);
+		
+		// check actions order
+		Assert.assertEquals(stepJson.getJSONArray("actions").getJSONObject(0).getString("type"), "message");
+		Assert.assertEquals(stepJson.getJSONArray("actions").getJSONObject(0).getString("messageType"), "INFO");
+		
+		Assert.assertEquals(stepJson.getJSONArray("actions").getJSONObject(1).getString("type"), "action");
+		Assert.assertEquals(stepJson.getJSONArray("actions").getJSONObject(1).getString("name"), "action2");
+		Assert.assertEquals(stepJson.getJSONArray("actions").getJSONObject(1).getBoolean("failed"), false);
+		
+		Assert.assertEquals(stepJson.getJSONArray("actions").getJSONObject(2).getString("type"), "step");
+		Assert.assertEquals(stepJson.getJSONArray("actions").getJSONObject(2).getString("name"), "subStep");
+		Assert.assertEquals(stepJson.getJSONArray("actions").getJSONObject(2).getJSONArray("actions").length(), 2);
+		
 	}
 }

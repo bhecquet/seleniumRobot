@@ -311,7 +311,7 @@ public class TestListener implements IInvokedMethodListener, ITestListener {
 		
 		if (WebUIDriver.getWebDriver(false) != null) {
 			ScreenShot screenShot = new ScreenshotUtil().captureWebPageSnapshot();
-			TestLogging.logScreenshot(screenShot, false);
+			TestLogging.logScreenshot(screenShot);
 		}
 		TestLogging.logTestStep(tearDownStep);
 	}

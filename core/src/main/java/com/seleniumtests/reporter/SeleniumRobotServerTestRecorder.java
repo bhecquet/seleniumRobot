@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.json.JSONObject;
 import org.testng.IReporter;
 import org.testng.IResultMap;
 import org.testng.ISuite;
@@ -33,13 +34,10 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 	 * @param ve			velocity engine used to generate file
 	 * @param testResult	result for this test method
 	 */
-	public String generateExecutionLogs(final ITestResult testResult) {
+	public JSONObject generateExecutionLogs(final ITestResult testResult) {
 		
-		// add logs
-		String logs = SeleniumRobotLogger.getTestLogs().get(testResult.getName());
-		if (logs == null) {
-			return "";
-		}
+		JSONObject executionLogs = new JSONObject();
+		executionLogs.put("logs", SeleniumRobotLogger.getTestLogs().get(testResult.getName()));
 		
 		// exception handling
 		StringBuilder stackString = new StringBuilder();
@@ -47,9 +45,9 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 			generateTheStackTrace(testResult.getThrowable(), testResult.getThrowable().getMessage(), stackString);
 		}
 		
-		logs += "\\nStacktrace\\n" + stackString.toString();
+		executionLogs.put("stacktrace", stackString.toString());
 
-		return logs;
+		return executionLogs;
 	}
 
 	/**
@@ -114,7 +112,7 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 					// record test case
 					serverConnector.createTestCase(method.getMethodName());
 					serverConnector.createTestCaseInSession();
-					serverConnector.addLogsToTestCaseInSession(generateExecutionLogs(testResult));
+					serverConnector.addLogsToTestCaseInSession(generateExecutionLogs(testResult).toString());
 					
 					List<TestStep> testSteps = TestLogging.getTestsSteps().get(testResult);
 					if (testSteps == null) {
@@ -125,9 +123,9 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 						
 						// record test step
 						serverConnector.createTestStep(testStep.getName());
-						String stepLogs = testStep.toString();
+						String stepLogs = testStep.toJson().toString();
 						
-						serverConnector.recordStepResult(!testStep.getFailed(), filterStepLogs(stepLogs));
+						serverConnector.recordStepResult(!testStep.getFailed(), stepLogs, testStep.getDuration());
 						
 						if (testStep.getSnapshot() != null) {
 							serverConnector.createSnapshot(Paths.get(outputDir, testStep.getSnapshot()).toFile());
@@ -136,17 +134,6 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 				}
 			}
 		}
-	}
-	
-	private String filterStepLogs(String stepLogs) {
-		StringBuilder filteredLogs = new StringBuilder();
-		for (String line: stepLogs.split("\n")) {
-			if (line.startsWith(TestLogging.OUTPUT_PATTERN) && line.contains(TestLogging.SNAPSHOT_PATTERN)) {
-				continue;
-			}
-			filteredLogs.append(line + "\n");
-		}
-		return filteredLogs.toString().trim();
 	}
 
 	/**

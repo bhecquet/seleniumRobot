@@ -106,7 +106,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends GenericTest {
 		connector.createTestCase("Test 2");
 		connector.createTestCaseInSession();
 		connector.createTestStep("Step 1");
-		connector.recordStepResult(true, "logs");
+		connector.recordStepResult(true, "logs", 1);
 		File image = File.createTempFile("image-", ".png");
 		FileUtils.copyInputStreamToFile(getClass().getClassLoader().getResourceAsStream("tu/images/ffLogoConcat.png"), image);
 		connector.createSnapshot(image);
@@ -124,7 +124,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends GenericTest {
 		connector.createTestCase("Test 2");
 		connector.createTestCaseInSession();
 		connector.createTestStep("Step 1");
-		connector.recordStepResult(true, "some logs");
+		connector.recordStepResult(true, "some logs", 1);
 		
 		Assert.assertNotNull(connector.getStepResultId());
 	}

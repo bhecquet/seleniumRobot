@@ -16,14 +16,17 @@
  */
 package com.seleniumtests.reporter;
 
+import org.json.JSONObject;
+
+
 /**
  * This is an action made inside the test: click on an element, ...
  * @author behe
  *
  */
 public class TestAction {
-	private String name;
-	private Boolean failed;
+	protected String name;
+	protected Boolean failed;
 	protected Throwable actionException;
 	
 	public TestAction(String name, Boolean failed) {
@@ -54,6 +57,17 @@ public class TestAction {
 	@Override
 	public String toString() {
 		return name;
+	}
+	
+	public JSONObject toJson() {
+		JSONObject actionJson = new JSONObject();
+		
+		actionJson.put("type", "action");
+		actionJson.put("name", name);
+		actionJson.put("exception", actionException == null ? null: actionException.toString());
+		actionJson.put("failed", failed);
+		
+		return actionJson;
 	}
 
 }
