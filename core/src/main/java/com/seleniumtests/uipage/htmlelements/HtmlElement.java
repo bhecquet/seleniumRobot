@@ -795,22 +795,49 @@ public class HtmlElement implements WebElement, Locatable, HasIdentity {
     
     @Override
     public void sendKeys(CharSequence... keysToSend) {
+    	sendKeys(true, keysToSend);
+    }
+    
+    public void sendKeys(final boolean blurAfter, CharSequence... keysToSend) {
     	// Appium seems to clear field before writing
     	if (SeleniumTestsContextManager.getThreadContext().getTestType().family() == TestType.APP) {
-            sendKeys(false, keysToSend);
-        } else {
-        	sendKeys(true, keysToSend);
-        }
+    		sendKeys(false, blurAfter, keysToSend);
+    	} else {
+    		sendKeys(true, blurAfter, keysToSend);
+    	}
+    }
+    
+    private void blur() {
+    	if (SeleniumTestsContextManager.isWebTest() && "input".equalsIgnoreCase(element.getTagName())) {
+    		try {
+    			((JavascriptExecutor) driver).executeScript("arguments[0].blur();", element);
+    		} catch (Exception e) {	
+    			logger.error(e);
+    		}
+    	}
+    }
+    
+    /**
+     * Send keys through composite actions
+     * /!\ does not clear text before and no blur after
+     * 
+     * @param keysToSend
+     */
+    @ReplayOnError
+    public void sendKeysAction(CharSequence... keysToSend) {
+    	findElement(true);
+    	new Actions(driver).sendKeys(element, keysToSend).build().perform();
     }
 
     /**
      * Sends the indicated CharSequence to the WebElement.
      *
      * @param 	clear		if true, clear field before writing
+     * @param	blurAfter	if true, do blur() after sendKeys has been done
      * @param   keysToSend	write this text
      */
     @ReplayOnError
-    public void sendKeys(final boolean clear, CharSequence... keysToSend) {
+    public void sendKeys(final boolean clear, final boolean blurAfter, CharSequence... keysToSend) {
         findElement(true);
         
         if (clear) {
@@ -818,6 +845,10 @@ public class HtmlElement implements WebElement, Locatable, HasIdentity {
         } 
         element.click();
         element.sendKeys(keysToSend);
+        
+        if (blurAfter) {
+        	blur();
+        }
     }
     
     @Override
