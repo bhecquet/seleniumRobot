@@ -320,21 +320,6 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 			throw new SeleniumRobotServerException("cannot add logs to test case", e);
 		}
 	}
-	
-	private JSONObject getJSonResponse(BaseRequest request) throws UnirestException {
-		HttpResponse<String> response = request.asString();
-		
-		if (response.getStatus() >= 400) {
-			throw new UnirestException(String.format("request to %s failed: %s", request.getHttpRequest().getUrl(), response.getStatusText()));
-		}
-		
-		if (response.getStatus() == 204) {
-			return new JSONObject();
-		}
-		
-		return new JSONObject(response.getBody());
-	}
-	
 
 	public Integer getApplicationId() {
 		return applicationId;
