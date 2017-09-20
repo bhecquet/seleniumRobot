@@ -23,21 +23,13 @@ import com.seleniumtests.driver.BrowserType;
 
 public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerConnector {
 	
-	public static final String VERSION_API_URL = "/snapshot/api/version/";
-	public static final String APPLICATION_API_URL = "/snapshot/api/application/";
-	public static final String ENVIRONMENT_API_URL = "/snapshot/api/environment/";
 	public static final String SESSION_API_URL = "/snapshot/api/session/";
-	public static final String TESTCASE_API_URL = "/snapshot/api/testcase/";
 	public static final String TESTCASEINSESSION_API_URL = "/snapshot/api/testcaseinsession/";
 	public static final String TESTSTEP_API_URL = "/snapshot/api/teststep/";
 	public static final String STEPRESULT_API_URL = "/snapshot/api/stepresult/";
 	public static final String SNAPSHOT_API_URL = "/snapshot/upload/image";
-	private Integer applicationId;
-	private Integer versionId;
-	private Integer environmentId;
 	private Integer sessionId;
 	private String sessionUUID;
-	private Integer testCaseId;
 	private Integer testCaseInSessionId;
 	private Integer testStepId;
 	private Integer stepResultId;
@@ -54,49 +46,6 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 	@Override
 	protected boolean isAlive() {
 		return isAlive("/snapshot/");
-	}
-
-	public void createApplication() {
-		if (!active) {
-			return;
-		}
-		try {
-			JSONObject applicationJson = getJSonResponse(Unirest.post(url + APPLICATION_API_URL)
-					.field("name", SeleniumTestsContextManager.getApplicationName()));
-			applicationId = applicationJson.getInt("id");
-		} catch (UnirestException | JSONException e) {
-			throw new SeleniumRobotServerException("cannot create application", e);
-		}
-	}
-	
-	public void createVersion() {
-		if (!active) {
-			return;
-		}
-		if (applicationId == null) {
-			createApplication();
-		}
-		try {
-			JSONObject versionJson = getJSonResponse(Unirest.post(url + VERSION_API_URL)
-					.field("name", SeleniumTestsContextManager.getApplicationVersion())
-					.field("application", applicationId));
-			versionId = versionJson.getInt("id");
-		} catch (UnirestException | JSONException e) {
-			throw new SeleniumRobotServerException("cannot create version", e);
-		}
-	}
-	
-	public void createEnvironment() {
-		if (!active) {
-			return;
-		}
-		try {
-			JSONObject envJson = getJSonResponse(Unirest.post(url + ENVIRONMENT_API_URL)
-					.field("name", SeleniumTestsContextManager.getThreadContext().getTestEnv()));
-			environmentId = envJson.getInt("id");
-		} catch (UnirestException | JSONException e) {
-			throw new SeleniumRobotServerException("cannot create environment", e);
-		}
 	}
 	
 	public void createSession() {
@@ -124,27 +73,6 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 			sessionId = sessionJson.getInt("id");
 		} catch (UnirestException | JSONException e) {
 			throw new SeleniumRobotServerException("cannot create session", e);
-		}
-	}
-	
-	/**
-	 * Create test case and add it to the current session
-	 */
-	public void createTestCase(String testName) {
-		if (!active) {
-			return;
-		}
-		if (applicationId == null) {
-			createApplication();
-		}
-
-		try {
-			JSONObject testJson = getJSonResponse(Unirest.post(url + TESTCASE_API_URL)
-					.field("name", testName)
-					.field("application", applicationId));
-			testCaseId = testJson.getInt("id");
-		} catch (UnirestException | JSONException e) {
-			throw new SeleniumRobotServerException("cannot create test case", e);
 		}
 	}
 	
@@ -320,25 +248,8 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 			throw new SeleniumRobotServerException("cannot add logs to test case", e);
 		}
 	}
-
-	public Integer getApplicationId() {
-		return applicationId;
-	}
-
-	public Integer getVersionId() {
-		return versionId;
-	}
-
-	public Integer getEnvironmentId() {
-		return environmentId;
-	}
-
 	public Integer getSessionId() {
 		return sessionId;
-	}
-
-	public Integer getTestCaseId() {
-		return testCaseId;
 	}
 
 	public Integer getTestStepId() {
