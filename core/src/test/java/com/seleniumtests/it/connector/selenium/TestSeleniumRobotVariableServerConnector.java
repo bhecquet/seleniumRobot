@@ -21,7 +21,7 @@ public class TestSeleniumRobotVariableServerConnector extends GenericTest {
 	public void init(ITestContext ctx) {
 		initThreadContext(ctx);
 		SeleniumTestsContextManager.getThreadContext().getConfiguration().put(SeleniumRobotServerConnector.SELENIUM_SERVER_URL, "http://localhost:8000");
-		connector = new SeleniumRobotVariableServerConnector();
+		connector = new SeleniumRobotVariableServerConnector("Test 1");
 		if (!connector.getActive()) {
 			throw new SkipException("no seleniumrobot server available");
 		}

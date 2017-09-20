@@ -16,25 +16,13 @@ public class SeleniumRobotVariableServerConnector extends SeleniumRobotServerCon
 	
 	public static final String VARIABLE_API_URL = "/variable/api/version/";
 
-	private Integer versionId;
-	private Integer environmentId;
-	private Integer testCaseId;
 		
-	public SeleniumRobotVariableServerConnector() {
-		super();
+	public SeleniumRobotVariableServerConnector(String testName) {
+		super(testName);
 		if (!active) {
 			return;
 		}
 		active = isAlive();
-		
-		getInfoFromServer();
-	}
-	
-	/**
-	 * Returns the versionId, environmentId and testCaseId from server
-	 */
-	private void getInfoFromServer() {
-		new NotImplementedException();
 	}
 	
 	@Override

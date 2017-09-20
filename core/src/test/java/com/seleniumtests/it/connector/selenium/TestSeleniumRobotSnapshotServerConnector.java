@@ -64,7 +64,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends GenericTest {
 	public void testCreateTestCase() {
 		connector.createSession();
 		connector.createTestCase("Test 1");
-		Assert.assertNotNull(connector.getTestCaseId());
+		Assert.assertNotNull(connector.getTestCaseId("Test 1"));
 		Assert.assertNotNull(connector.getApplicationId());
 	}
 	

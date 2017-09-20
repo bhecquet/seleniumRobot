@@ -311,7 +311,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends MockitoTest {
 		connector.createSession();
 		connector.createTestCase("Test 1");
 		
-		Assert.assertEquals((int)connector.getTestCaseId(), 12);
+		Assert.assertEquals((int)connector.getTestCaseId("Test 1"), 12);
 		
 		// check application has also been created
 		Assert.assertEquals((int)connector.getApplicationId(), 9);
@@ -325,7 +325,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends MockitoTest {
 		connector.createApplication();
 		connector.createTestCase("Test 1");
 		
-		Assert.assertEquals((int)connector.getTestCaseId(), 12);
+		Assert.assertEquals((int)connector.getTestCaseId("Test 1"), 12);
 	}
 	
 	@Test(groups= {"ut"}, expectedExceptions=SeleniumRobotServerException.class)
@@ -336,7 +336,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends MockitoTest {
 		
 		connector.createApplication();
 		connector.createTestCase("Test 1");
-		Assert.assertNull(connector.getTestCaseId());
+		Assert.assertNull(connector.getTestCaseId("Test 1"));
 	}
 	
 	@Test(groups= {"ut"})
