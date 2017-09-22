@@ -309,7 +309,7 @@ public class SeleniumTestsContextManager {
 			dataPath = xmlSuite.getFileName().replace(File.separator, "/").split("/"+ DATA_FOLDER_NAME + "/")[0] + "/" + DATA_FOLDER_NAME + "/";
 		} catch (IndexOutOfBoundsException e) {
 			applicationName = "core";
-			dataPath = Paths.get(rootPath, "data").toString();
+			dataPath = Paths.get(rootPath, DATA_FOLDER_NAME).toString();
 		}
 		
 		featuresPath = Paths.get(dataPath, applicationName, "features").toString();

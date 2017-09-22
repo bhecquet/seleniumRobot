@@ -17,6 +17,7 @@
 package com.seleniumtests.util.logging;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
@@ -46,6 +47,7 @@ public class SeleniumRobotLogger {
 	
 	public static final String START_TEST_PATTERN = "Start method ";
 	public static final String END_TEST_PATTERN = "Finish method ";
+	public static final String METHOD_NAME = "methodName";
 	public static final String LOG_FILE_NAME = "seleniumRobot.log";
 	
 	private SeleniumRobotLogger() {
@@ -78,6 +80,7 @@ public class SeleniumRobotLogger {
 		Appender fileLoggerAppender = Logger.getRootLogger().getAppender(FILE_APPENDER_NAME);
 		if (fileLoggerAppender == null) {
 			Logger rootLogger = Logger.getRootLogger();
+			FileAppender fileAppender = new FileAppender();
 			
 			// clean output dir
 	    	try {
@@ -87,13 +90,23 @@ public class SeleniumRobotLogger {
 			} catch (IOException e) {
 				// do nothing
 			}
-	        
-	        FileAppender fileAppender = new FileAppender();
-	        fileAppender.setName(FILE_APPENDER_NAME);
-	        fileAppender.setFile(outputDir + "/" + SeleniumRobotLogger.LOG_FILE_NAME);
-	        fileAppender.setLayout(new PatternLayout(LOG_PATTERN));
-	        fileAppender.setThreshold(Level.INFO);
-	        fileAppender.activateOptions();
+			
+			for (int i=0; i < 4; i++) {
+				try {
+					if (!new File(outputDir).exists()) {
+						new File(outputDir).mkdirs();
+					}
+			        
+			        
+			        fileAppender.setName(FILE_APPENDER_NAME);
+			        fileAppender.setFile(outputDir + "/" + SeleniumRobotLogger.LOG_FILE_NAME);
+			        fileAppender.setLayout(new PatternLayout(LOG_PATTERN));
+			        fileAppender.setThreshold(Level.INFO);
+			        fileAppender.activateOptions();
+			        break;
+				} catch (Exception e) {
+				}
+			}
 	        rootLogger.addAppender(fileAppender);
 		}
 	}

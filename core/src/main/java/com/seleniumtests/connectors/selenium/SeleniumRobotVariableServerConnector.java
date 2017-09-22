@@ -3,7 +3,6 @@ package com.seleniumtests.connectors.selenium;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.lang.NotImplementedException;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -18,15 +17,16 @@ public class SeleniumRobotVariableServerConnector extends SeleniumRobotServerCon
 
 		
 	public SeleniumRobotVariableServerConnector(String testName) {
-		super(testName);
+		super();
 		if (!active) {
 			return;
 		}
 		active = isAlive();
+		getInfoFromServer(testName);
 	}
 	
 	@Override
-	protected boolean isAlive() {
+	public boolean isAlive() {
 		return isAlive("/variable/api/");
 	}
 

@@ -16,10 +16,16 @@
  */
 package com.seleniumtests.core.runner;
 
+import org.testng.ITestContext;
+import org.testng.ITestResult;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
+
+import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
 import cucumber.api.testng.CucumberFeatureWrapper;
 
@@ -47,9 +53,16 @@ public class CucumberRunner extends SeleniumRobotRunner {
     }
 
     @Test(groups = "cucumber", description = "Cucumber scenario", dataProvider = "scenarios")
-    public void feature(CucumberScenarioWrapper cucumberScenarioWrapper) {
+    public void feature(CucumberScenarioWrapper cucumberScenarioWrapper, final ITestContext testContext) {
+    	logger.info(SeleniumRobotLogger.START_TEST_PATTERN + cucumberScenarioWrapper);
+        SeleniumTestsContextManager.initThreadContext(testContext);
+        SeleniumTestsContextManager.getThreadContext().setTestMethodSignature(cucumberScenarioWrapper.toString());
     	testNGCucumberRunner.runScenario(cucumberScenarioWrapper);
-    	logger.info(Thread.currentThread() + "Start scenario: " + cucumberScenarioWrapper);
+    }
+    
+    @AfterMethod(groups = "cucumber")
+    public void setName(ITestResult result) {
+    	result.setAttribute(SeleniumRobotLogger.METHOD_NAME, result.getParameters()[0].toString());
     }
 
     /**
