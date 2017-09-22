@@ -28,9 +28,11 @@ import org.testng.annotations.BeforeSuite;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.runner.SeleniumRobotRunner;
+import com.seleniumtests.core.runner.SeleniumTestPlan;
+import com.seleniumtests.util.helper.WaitHelper;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
-public class StubParentClass {
+public class StubParentClass extends SeleniumTestPlan {
 	
 	protected static final Logger logger = SeleniumRobotLogger.getLogger(SeleniumRobotRunner.class);
 
@@ -49,31 +51,36 @@ public class StubParentClass {
         SeleniumRobotLogger.updateLogger(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory());
 	}
 	
-	/**
-	 * Simulate SeleniumRobotRunner logs for log parsing feature
-	 * @param method
-	 */
-	@BeforeMethod(groups="stub")
-	public void beforeTestMethod(final Method method) {
-		logger.info(SeleniumRobotLogger.START_TEST_PATTERN + method.getName());
-	}
+//	/**
+//	 * Simulate SeleniumRobotRunner logs for log parsing feature
+//	 * @param method
+//	 */
+//	@BeforeMethod(groups="stub")
+//	public void beforeTestMethod(final Method method) {
+//		logger.info(SeleniumRobotLogger.START_TEST_PATTERN + method.getName());
+//	}
+//	
+//	/**
+//	 * Simulate SeleniumRobotRunner logs for log parsing feature
+//	 * @param method
+//	 */
+//	@AfterMethod(groups="stub")
+//	public void afterTestMethod(final Method method) {
+//		logger.info(SeleniumRobotLogger.END_TEST_PATTERN + method.getName());
+//	}
+//	
+//	@AfterSuite(groups="stub")
+//	public void finishSuite() {
+//		
+//		try {
+//			SeleniumRobotLogger.parseLogFile();
+//		} catch (IOException e) {
+//			logger.error("cannot read log file");
+//		}
+//	}
 	
-	/**
-	 * Simulate SeleniumRobotRunner logs for log parsing feature
-	 * @param method
-	 */
 	@AfterMethod(groups="stub")
-	public void afterTestMethod(final Method method) {
-		logger.info(SeleniumRobotLogger.END_TEST_PATTERN + method.getName());
-	}
-	
-	@AfterSuite(groups="stub")
-	public void finishSuite() {
-		
-		try {
-			SeleniumRobotLogger.parseLogFile();
-		} catch (IOException e) {
-			logger.error("cannot read log file");
-		}
+	public void waitAfterTestEnd() {
+		WaitHelper.waitForMilliSeconds(300);
 	}
 }

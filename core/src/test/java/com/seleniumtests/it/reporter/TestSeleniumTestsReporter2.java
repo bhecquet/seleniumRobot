@@ -26,7 +26,10 @@ import static org.mockito.Mockito.verify;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.velocity.app.VelocityEngine;
@@ -39,7 +42,9 @@ import org.testng.ITestResult;
 import org.testng.TestNG;
 import org.testng.annotations.Test;
 import org.testng.xml.XmlClass;
+import org.testng.xml.XmlPackage;
 import org.testng.xml.XmlSuite;
+import org.testng.xml.XmlSuite.ParallelMode;
 import org.testng.xml.XmlTest;
 
 import com.seleniumtests.MockitoTest;
@@ -62,6 +67,7 @@ public class TestSeleniumTestsReporter2 extends MockitoTest {
 		
 		XmlSuite suite = new XmlSuite();
 		suite.setName("TmpSuite");
+		suite.setParallel(ParallelMode.FALSE);
 		suite.setFileName("/home/test/seleniumRobot/data/core/testng/testLoggging.xml");
 		List<XmlSuite> suites = new ArrayList<XmlSuite>();
 		suites.add(suite);
@@ -76,9 +82,9 @@ public class TestSeleniumTestsReporter2 extends MockitoTest {
 		
 		TestNG tng = new TestNG(false);
 		tng.setXmlSuites(suites);
-		tng.addListener((IReporter)reporter);
-		tng.addListener((ITestListener)testListener);
-		tng.addListener((IInvokedMethodListener)testListener);
+//		tng.addListener((IReporter)reporter);
+//		tng.addListener((ITestListener)testListener);
+//		tng.addListener((IInvokedMethodListener)testListener);
 		tng.setOutputDirectory(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory());
 		tng.run(); 
 		SeleniumRobotLogger.parseLogFile();
@@ -86,7 +92,6 @@ public class TestSeleniumTestsReporter2 extends MockitoTest {
 		return suite;
 	}
 	
-	@SuppressWarnings("unchecked")
 	@Test(groups={"it"})
 	public void testReportGeneration() throws Exception {
 		
@@ -131,6 +136,7 @@ public class TestSeleniumTestsReporter2 extends MockitoTest {
 		reporter = spy(new SeleniumTestsReporter2());
 
 		executeSubTest(new String[] {"com.seleniumtests.it.reporter.StubTestClass"});
+		FileUtils.copyDirectory(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()), new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory() + "-testReportSummaryContentWithSteps"));
 		
 		// check content of summary report file
 		String mainReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport.html"));
@@ -161,6 +167,7 @@ public class TestSeleniumTestsReporter2 extends MockitoTest {
 		reporter = spy(new SeleniumTestsReporter2());
 		
 		executeSubTest(new String[] {"com.seleniumtests.it.reporter.StubTestClass2"});
+		FileUtils.copyDirectory(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()), new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory() + "-testReportSummaryContentWithDependantTests"));
 		
 		// check content of summary report file
 		String mainReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport.html"));
@@ -185,6 +192,7 @@ public class TestSeleniumTestsReporter2 extends MockitoTest {
 		reporter = spy(new SeleniumTestsReporter2());
 
 		executeSubTest(new String[] {"com.seleniumtests.it.reporter.StubTestClass"});
+		FileUtils.copyDirectory(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()), new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory() + "-testReportDetailsMessageStyles"));
 		
 		// check style of messages
 		String detailedReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport-2.html"));
@@ -195,6 +203,7 @@ public class TestSeleniumTestsReporter2 extends MockitoTest {
 		Assert.assertTrue(detailedReportContent.contains("<div class=\"message-error\">Some Error message</div>"));
 		Assert.assertTrue(detailedReportContent.contains("<div class=\"message-log\">Some log message</div>"));
 		Assert.assertTrue(detailedReportContent.contains("<li>send keyboard action</li>"));
+		
 	}
 	
 	/**
@@ -209,6 +218,7 @@ public class TestSeleniumTestsReporter2 extends MockitoTest {
 		reporter = spy(new SeleniumTestsReporter2());
 		
 		executeSubTest(new String[] {"com.seleniumtests.it.reporter.StubTestClass"});
+		FileUtils.copyDirectory(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()), new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory() + "-testReportDetailsWithSubSteps"));
 		
 		// check content of summary report file
 		String detailedReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport-1.html"));
@@ -218,6 +228,7 @@ public class TestSeleniumTestsReporter2 extends MockitoTest {
 				"<ul>"													// root step
 					+ "<li>click button</li>"
 					+ "<li>sendKeys to text field</li>"
+					+ "<div class=\"message-info\">Output:  | <a href='screenshots/image.png' class='lightbox'>Application Snapshot</a></div>"
 					+ "<li>step 1.3: open page</li>"					// sub-step
 					+ "<ul>"
 						+ "<li>click link</li>"							// action in sub step
@@ -225,6 +236,7 @@ public class TestSeleniumTestsReporter2 extends MockitoTest {
 						+ "<li>sendKeys to password field</li>"			// action in sub step
 					+ "</ul>"
 				+ "</ul>"));
+		
 	}
 	
 	/**
@@ -238,6 +250,7 @@ public class TestSeleniumTestsReporter2 extends MockitoTest {
 		reporter = new SeleniumTestsReporter2();
 		
 		executeSubTest(new String[] {"com.seleniumtests.it.reporter.StubTestClass"});
+		FileUtils.copyDirectory(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()), new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory() + "-testReportDetailsWithLogs"));
 		
 		// check content of detailed report file
 		String detailedReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport-1.html"));
@@ -245,6 +258,7 @@ public class TestSeleniumTestsReporter2 extends MockitoTest {
 		
 		// check log presence
 		Assert.assertTrue(detailedReportContent.contains("[main] StubParentClass: Start method testAndSubActions</div>"));
+		
 	}
 	
 	/**
@@ -259,16 +273,18 @@ public class TestSeleniumTestsReporter2 extends MockitoTest {
 		reporter = new SeleniumTestsReporter2();
 		
 		executeSubTest(new String[] {"com.seleniumtests.it.reporter.StubTestClass"});
+		FileUtils.copyDirectory(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()), new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory() + "-testReportDetailsSteps"));
 		
 		String detailedReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport-1.html"));
 		detailedReportContent = detailedReportContent.replace("\n", "").replace("\r",  "").replaceAll(">\\s+<", "><");
 		
 		// Check each step is recorded in file: 2 test steps + test end + logs
-		Assert.assertTrue(detailedReportContent.contains("<div class=\"box collapsed-box failed\"><div class=\"box-header with-border\"><button type=\"button\" class=\"btn btn-box-tool\" data-widget=\"collapse\"><i class=\"fa fa-plus\"></i></button> step 1 - 1.23 secs"));
-		Assert.assertTrue(detailedReportContent.contains("<div class=\"box collapsed-box success\"><div class=\"box-header with-border\"><button type=\"button\" class=\"btn btn-box-tool\" data-widget=\"collapse\"><i class=\"fa fa-plus\"></i></button> step 2 - 14.03 secs"));
-		Assert.assertTrue(detailedReportContent.contains("<div class=\"box collapsed-box success\"><div class=\"box-header with-border\"><button type=\"button\" class=\"btn btn-box-tool\" data-widget=\"collapse\"><i class=\"fa fa-plus\"></i></button> Test end - 0.0 secs"));
+		Assert.assertTrue(detailedReportContent.contains("<div class=\"box collapsed-box failed\"><div class=\"box-header with-border\"><button type=\"button\" class=\"btn btn-box-tool\" data-widget=\"collapse\"><i class=\"fa fa-plus\"></i></button> step 1 - "));
+		Assert.assertTrue(detailedReportContent.contains("<div class=\"box collapsed-box success\"><div class=\"box-header with-border\"><button type=\"button\" class=\"btn btn-box-tool\" data-widget=\"collapse\"><i class=\"fa fa-plus\"></i></button> step 2 - "));
+		Assert.assertTrue(detailedReportContent.contains("<div class=\"box collapsed-box success\"><div class=\"box-header with-border\"><button type=\"button\" class=\"btn btn-box-tool\" data-widget=\"collapse\"><i class=\"fa fa-plus\"></i></button> Test end - "));
 		Assert.assertTrue(detailedReportContent.contains("<div class=\"box collapsed-box success\"><div class=\"box-header with-border\"><button type=\"button\" class=\"btn btn-box-tool\" data-widget=\"collapse\"><i class=\"fa fa-plus\"></i></button> Execution logs"));
 		Assert.assertTrue(detailedReportContent.contains("<div class=\"message-log\">Test is OK</div>"));
+		
 	}
 	
 	/**
@@ -284,8 +300,10 @@ public class TestSeleniumTestsReporter2 extends MockitoTest {
 		reporter = new SeleniumTestsReporter2();
 		
 		executeSubTest(new String[] {"com.seleniumtests.it.reporter.StubTestClass"});
+		FileUtils.copyDirectory(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()), new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory() + "-testReportDetailsWithErrors"));
 		
 		String detailedReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport-2.html"));
+		
 		detailedReportContent = detailedReportContent.replace("\n", "").replace("\r",  "").replaceAll(">\\s+<", "><");
 		
 		// Check error is present is Last test step
@@ -295,9 +313,61 @@ public class TestSeleniumTestsReporter2 extends MockitoTest {
 		// Check exception is logged and filtered
 		Assert.assertTrue(detailedReportContent.contains("<div class=\"message-error\"><div>class java.lang.AssertionError: error</div>"
 								+ "<div class=\"stack-element\"></div>"
-								+ "<div class=\"stack-element\">at com.seleniumtests.it.reporter.StubTestClass.testInError(StubTestClass.java:63)</div>"
-								+ "<div class=\"stack-element\">at com.seleniumtests.it.reporter.TestSeleniumTestsReporter2.executeSubTest(TestSeleniumTestsReporter2.java:83)</div>"
-								+ "<div class=\"stack-element\">at com.seleniumtests.it.reporter.TestSeleniumTestsReporter2.testReportDetailsWithErrors(TestSeleniumTestsReporter2.java:286)</div>"));
+								+ "<div class=\"stack-element\">at com.seleniumtests.it.reporter.StubTestClass.testInError(StubTestClass.java:69)</div>"
+								+ "<div class=\"stack-element\">at com.seleniumtests.it.reporter.TestSeleniumTestsReporter2.executeSubTest(TestSeleniumTestsReporter2.java:87)</div>"
+								+ "<div class=\"stack-element\">at com.seleniumtests.it.reporter.TestSeleniumTestsReporter2.testReportDetailsWithErrors(TestSeleniumTestsReporter2.java:290)</div>"));
 		
+	}
+	
+	/**
+	 * Check all steps are present in detailed report file
+	 * Test OK
+	 * @param testContext
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testCucumberStart(ITestContext testContext) throws Exception {
+		
+		reporter = new SeleniumTestsReporter2();
+		
+		TestListener testListener = new TestListener();
+		
+		XmlSuite suite = new XmlSuite();
+		suite.setName("TmpSuite");
+		suite.setFileName("/home/test/seleniumRobot/testng/testLoggging.xml");
+		Map<String, String> suiteParameters = new HashMap<>();
+		suiteParameters.put("cucumberPackage", "com.seleniumtests");
+		suite.setParameters(suiteParameters);
+		List<XmlSuite> suites = new ArrayList<XmlSuite>();
+		suites.add(suite);
+		
+		XmlTest test = new XmlTest(suite);
+		test.setName("cucumberTest");
+		XmlPackage xmlPackage = new XmlPackage("com.seleniumtests.core.runner.*");
+		test.setXmlPackages(Arrays.asList(xmlPackage));
+		Map<String, String> parameters = new HashMap<>();
+		parameters.put("cucumberTests", "core_3");
+		parameters.put("cucumberTagss", "");
+		test.setParameters(parameters);
+		
+		TestNG tng = new TestNG(false);
+		tng.setXmlSuites(suites);
+		tng.addListener((IReporter)reporter);
+		tng.addListener((IInvokedMethodListener)testListener);
+		tng.setOutputDirectory(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory());
+		tng.run(); 
+		SeleniumRobotLogger.parseLogFile();
+
+		FileUtils.copyDirectory(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()), new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory() + "-testCucumberStart"));
+		
+		String mainReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport.html"));
+		Assert.assertTrue(mainReportContent.contains("<a href='SeleniumTestReport-1.html'>core_3</a>"));
+	
+		String detailedReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport-1.html"));
+		detailedReportContent = detailedReportContent.replace("\n", "").replace("\r",  "").replaceAll(">\\s+<", "><");
+		
+		// Check each step is recorded in file: 2 test steps + test end + logs
+		Assert.assertTrue(detailedReportContent.contains("<div class=\"box collapsed-box success\"><div class=\"box-header with-border\"><button type=\"button\" class=\"btn btn-box-tool\" data-widget=\"collapse\"><i class=\"fa fa-plus\"></i></button> write (\\w+) with args: (tutu, )"));
+		Assert.assertTrue(detailedReportContent.contains("<div class=\"message-log\">Test is OK</div>"));
 	}
 }

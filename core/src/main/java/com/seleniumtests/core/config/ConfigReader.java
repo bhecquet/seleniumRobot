@@ -30,6 +30,7 @@ import org.ini4j.Config;
 import org.ini4j.Ini;
 import org.ini4j.InvalidFileFormatException;
 
+import com.seleniumtests.connectors.selenium.SeleniumRobotVariableServerConnector;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
@@ -37,6 +38,7 @@ import com.seleniumtests.util.logging.SeleniumRobotLogger;
 public class ConfigReader {
 	
 	private static final String GLOBAL_SECTION_NAME = "General";
+
 	private static final Logger logger = SeleniumRobotLogger.getLogger(ConfigReader.class);
 	private static File configFile;
 	

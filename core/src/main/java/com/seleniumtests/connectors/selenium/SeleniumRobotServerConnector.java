@@ -1,6 +1,5 @@
 package com.seleniumtests.connectors.selenium;
 
-import org.apache.commons.lang.NotImplementedException;
 import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -18,9 +17,8 @@ import com.seleniumtests.util.logging.SeleniumRobotLogger;
 public abstract class SeleniumRobotServerConnector {
 	
 	protected static final Logger logger = SeleniumRobotLogger.getLogger(SeleniumRobotServerConnector.class);
-	public static final String SELENIUM_SERVER_URL = "SELENIUM_SERVER_URL";
-	public static final String SELENIUM_SERVER_LOGIN = "seleniumServerLogin";
-	public static final String SELENIUM_SERVER_PASWORD = "seleniumServerPassword";
+	public static final String SELENIUMROBOTSERVER_URL = "selenium.robot.server.url";
+	public static final String SELENIUMROBOTSERVER_ACTIVE = "selenium.robot.server.active";
 	
 	// api to get items from name
 	public static final String NAMED_VERSION_API_URL = "/commons/api/gversion/";
@@ -42,15 +40,9 @@ public abstract class SeleniumRobotServerConnector {
 	
 	public SeleniumRobotServerConnector() {
 		active = isActive();
-		getInfoFromServer(null);
 	}
 	
-	public SeleniumRobotServerConnector(String testName) {
-		active = isActive();
-		getInfoFromServer(testName);
-	}
-	
-	protected abstract boolean isAlive();
+	public abstract boolean isAlive();
 	
 	protected boolean isAlive(String testUrl) {
 		Unirest.setTimeouts(1500, 1500);
@@ -64,14 +56,14 @@ public abstract class SeleniumRobotServerConnector {
 	}
 	
 	protected boolean isActive() {
-		if (SeleniumTestsContextManager.getThreadContext().getConfiguration().containsKey(SELENIUM_SERVER_URL)) {
-			url = SeleniumTestsContextManager.getThreadContext().getConfiguration().get(SELENIUM_SERVER_URL);
+		if (SeleniumTestsContextManager.getThreadContext().getConfiguration().containsKey(SELENIUMROBOTSERVER_URL)) {
+			url = SeleniumTestsContextManager.getThreadContext().getConfiguration().get(SELENIUMROBOTSERVER_URL);
 			return true;
-		} else if (System.getenv(SELENIUM_SERVER_URL) != null) {
-			url = System.getenv(SELENIUM_SERVER_URL);
+		} else if (System.getenv(SELENIUMROBOTSERVER_URL) != null) {
+			url = System.getenv(SELENIUMROBOTSERVER_URL);
 			return true;
 		} else {
-			logger.warn(String.format("selenium server won't be used, key %s is not available in configuration or in environment variable. It must be the root URL of server 'http://<host>:<port>'", SELENIUM_SERVER_URL));
+			logger.warn(String.format("selenium server won't be used, key %s is not available in configuration or in environment variable. It must be the root URL of server 'http://<host>:<port>'", SELENIUMROBOTSERVER_URL));
 			return false;
 		} 
 	}
@@ -79,7 +71,7 @@ public abstract class SeleniumRobotServerConnector {
 	/**
 	 * Returns the versionId, environmentId and testCaseId from server
 	 */
-	private void getInfoFromServer(String testName) {
+	protected void getInfoFromServer(String testName) {
 		applicationId = getApplicationId();
 		versionId = getVersionId();
 		environmentId = getEnvironmentId();

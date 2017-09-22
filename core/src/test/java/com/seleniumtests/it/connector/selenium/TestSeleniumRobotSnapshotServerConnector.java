@@ -23,7 +23,8 @@ public class TestSeleniumRobotSnapshotServerConnector extends GenericTest {
 	@BeforeMethod(groups={"it"})
 	public void init(ITestContext ctx) {
 		initThreadContext(ctx);
-		SeleniumTestsContextManager.getThreadContext().getConfiguration().put(SeleniumRobotServerConnector.SELENIUM_SERVER_URL, "http://localhost:8002");
+		SeleniumTestsContextManager.getThreadContext().getConfiguration().put(SeleniumRobotServerConnector.SELENIUMROBOTSERVER_URL, "http://localhost:8002");
+		SeleniumTestsContextManager.getThreadContext().getConfiguration().put(SeleniumRobotServerConnector.SELENIUMROBOTSERVER_ACTIVE, "true");
 		connector = new SeleniumRobotSnapshotServerConnector();
 		if (!connector.getActive()) {
 			throw new SkipException("no seleniumrobot server available");

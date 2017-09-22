@@ -23,6 +23,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.testng.ITestContext;
+import org.testng.ITestResult;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeMethod;
@@ -93,12 +94,16 @@ public class SeleniumRobotRunner {
      * clean up.
      */
     @AfterMethod(alwaysRun = true)
-    public void afterTestMethod(final Method method) {
+    public void afterTestMethod(final Method method, final ITestResult result) {
         List<TearDownService> serviceList = SeleniumTestsContextManager.getThreadContext().getTearDownServices();
         if (serviceList != null && !serviceList.isEmpty()) {
             for (TearDownService service : serviceList) {
                 service.tearDown();
             }
+        }
+        	
+        if (!cucumberTest) {
+        	result.setAttribute(SeleniumRobotLogger.METHOD_NAME, method.getName());
         }
 
         WebUIDriver.cleanUp();
@@ -135,9 +140,11 @@ public class SeleniumRobotRunner {
     }
     
     @BeforeMethod(alwaysRun = true)
-    public void beforeTestMethod(final Object[] parameters, final Method method, final ITestContext testContex) {
-        logger.info(SeleniumRobotLogger.START_TEST_PATTERN + method.getName());
-        SeleniumTestsContextManager.initThreadContext(testContex);
-        SeleniumTestsContextManager.getThreadContext().setTestMethodSignature(buildMethodSignature(method, parameters));
+    public void beforeTestMethod(final Object[] parameters, final Method method, final ITestContext testContext) {
+    	if (!cucumberTest) {
+	        logger.info(SeleniumRobotLogger.START_TEST_PATTERN + method.getName());
+	        SeleniumTestsContextManager.initThreadContext(testContext);
+	        SeleniumTestsContextManager.getThreadContext().setTestMethodSignature(buildMethodSignature(method, parameters));
+    	}
     }   
 }

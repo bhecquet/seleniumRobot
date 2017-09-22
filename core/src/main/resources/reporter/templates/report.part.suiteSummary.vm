@@ -62,7 +62,8 @@
 			                				#set ($circleClass = "circleSkipped")
 			                			#end 
 			                			<td>$testContext.key.getName()</td>
-			                			<td class="alignleft"><i class="fa fa-circle $circleClass"></i><a href='$testResult.getAttribute("methodResultFileName")'>$testResult.getName()</a></td>
+			                			<!--<td class="alignleft"><i class="fa fa-circle $circleClass"></i><a href='$testResult.getAttribute("methodResultFileName")'>$testResult.getName()</a></td>-->
+				                		<td class="alignleft"><i class="fa fa-circle $circleClass"></i><a href='$testResult.getAttribute("methodResultFileName")'>$testResult.getAttribute("methodName")</a></td>
 				                		
 				                		<td name="passed-$testIdx">$passedSteps</td>
 				                  		<td name="failed-$testIdx">$failedSteps</td>

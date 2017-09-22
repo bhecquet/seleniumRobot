@@ -64,7 +64,7 @@ In this case, this user passed value will overwrite test or suite parameters
 | testMethodSignature 		|  			| define a specific method signature for hashcodes |
 | pluginConfigPath 			|  			| plugins to add |
 | testDataFile 				|  			| Datafile to read and inject inside tests | 
-| cucumberTests 			|  			| List of tests to execute when using cucumber mode. Test name can be the feature name, the feature file name or the scenario name | 
+| cucumberTests 			|  			| Comma seperated list of tests to execute when using cucumber mode. Test name can be the feature name, the feature file name or the scenario name | 
 | cucumberTags 				|  			| List of cucumber tags that will allow determining tests to execute. Format can be:<br/>`@new4 AND @new5` for filtering scenario containing tag new4 AND new5<br/>`@new,@new2` for filtering scenarios containing new OR new2<br/>`@new` for filtering scenario containing new tag | 
 | env 						| DEV		| Test environment for the SUT. Allow accessing param values defined in env.ini file  
 | cucumberPackage 			| 			| **Mandatory for cucumberTests:** name of the package where cucumber implementation class reside | 

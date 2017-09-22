@@ -37,6 +37,7 @@ import org.testng.ITestResult;
 import org.testng.TestRunner;
 
 import com.seleniumtests.browserfactory.BrowserInfo;
+import com.seleniumtests.connectors.selenium.SeleniumRobotVariableServerConnector;
 import com.seleniumtests.connectors.tms.TestManager;
 import com.seleniumtests.core.config.ConfigReader;
 import com.seleniumtests.customexception.ConfigurationException;
@@ -58,7 +59,7 @@ public class SeleniumTestsContext {
 	private static final Logger logger = SeleniumRobotLogger.getLogger(SeleniumTestsContext.class);
 
     /* configuration defined in testng.xml */
-    public static final String TEST_CONFIGURATION = "testConfig"; 				// configuration annexe
+    public static final String TEST_CONFIGURATION = "testConfig"; 				// parameter name for additional configuration to load 
     public static final String DEVICE_LIST = "deviceList"; 						// List of known devices in json format (internal use only)
     public static final String WEB_SESSION_TIME_OUT = "webSessionTimeOut";		// timeout de la session du navigateur
     public static final String IMPLICIT_WAIT_TIME_OUT = "implicitWaitTimeOut";	// attente implicite du navigateur
@@ -1322,16 +1323,16 @@ public class SeleniumTestsContext {
      * post configuration of the context
      */
     public void postInit() {
-    	postsetProxyConfig();
     	setTestConfiguration();
+    	postsetProxyConfig();
     	checkTmsConfiguration();
     }
     
     /**
-     * Extract proxy settings from environment configuration and write them to context if 
+     * Extract proxy settings from environment configuration and write them to context 
      */
     public void postsetProxyConfig() {
-    	Map<String, String> envConfig = new ConfigReader().readConfig();
+    	Map<String, String> envConfig = getConfiguration();
     	for (Entry<String, String> entry: envConfig.entrySet()) {
     		String key = entry.getKey();
     		switch (key) {
@@ -1367,6 +1368,26 @@ public class SeleniumTestsContext {
     	}
     }
     
+    private void updateTestConfigurationFromVariableServer() {
+    	// in case we find the url of variable server and it's marked as active, use it
+		if (getConfiguration().get(SeleniumRobotVariableServerConnector.SELENIUMROBOTSERVER_ACTIVE) == "true" && getConfiguration().containsKey(SeleniumRobotVariableServerConnector.SELENIUMROBOTSERVER_URL)) {
+			logger.info(String.format("%s key found, and set to true, trying to get variable from variable server %s", 
+						SeleniumRobotVariableServerConnector.SELENIUMROBOTSERVER_ACTIVE, 
+						SeleniumRobotVariableServerConnector.SELENIUMROBOTSERVER_URL));
+			SeleniumRobotVariableServerConnector variableServer = new SeleniumRobotVariableServerConnector("");
+			
+			if (!variableServer.isAlive()) {
+				throw new ConfigurationException(String.format("Variable server %s could not be contacted", 
+						SeleniumRobotVariableServerConnector.SELENIUMROBOTSERVER_ACTIVE, 
+						SeleniumRobotVariableServerConnector.SELENIUMROBOTSERVER_URL));
+			}
+		} else {
+			logger.info(String.format("%s key not found or set to false, or url key %s has not been set", 
+						SeleniumRobotVariableServerConnector.SELENIUMROBOTSERVER_ACTIVE, 
+						SeleniumRobotVariableServerConnector.SELENIUMROBOTSERVER_URL));
+		}
+    }
+    
     /**
      * Read configuration from environment specific data and undefined parameters present un testng xml file
      */
@@ -1374,6 +1395,8 @@ public class SeleniumTestsContext {
     	Map<String, String> envConfig = new ConfigReader().readConfig();
     	envConfig.putAll(testVariables);
     	setAttribute(TEST_CONFIG, envConfig);
+    	
+    	//updateTestConfigurationFromVariableServer();
     }
 	
 	public void checkTmsConfiguration() {

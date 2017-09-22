@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
@@ -163,7 +164,7 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 			VelocityContext context = new VelocityContext();
 			
 			// add logs
-			String logs = SeleniumRobotLogger.getTestLogs().get(testResult.getName());
+			String logs = SeleniumRobotLogger.getTestLogs().get(testResult.getAttribute(SeleniumRobotLogger.METHOD_NAME));
 			if (logs == null) {
 				return;
 			}
@@ -249,7 +250,7 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 					endHtml();
 					logger.info("Completed Report Generation.");
 				} catch (IOException e) {
-					logger.error("Error writing test report: " + testResult.getName(), e);
+					logger.error("Error writing test report: " + testResult.getAttribute(SeleniumRobotLogger.METHOD_NAME), e);
 				}  
 			}
 		}
@@ -275,19 +276,22 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 				ITestContext context = r.getTestContext();
 				List<ITestResult> resultList = new ArrayList<>();
 				
-				for (ITestNGMethod method: context.getAllTestMethods()) {
+				Collection<ITestResult> methodResults = new ArrayList<>();
+				methodResults.addAll(context.getFailedTests().getAllResults());
+				methodResults.addAll(context.getPassedTests().getAllResults());
+				methodResults.addAll(context.getSkippedTests().getAllResults());
+
+				methodResults = methodResults.stream()
+							.sorted((r1, r2) -> Long.compare(r1.getStartMillis(), r2.getStartMillis()))
+							.collect(Collectors.toList());
+				
+				for (ITestResult result: methodResults) {
 					fileIndex++;
 					String fileName = "SeleniumTestReport-" + fileIndex + ".html";
-					
-					Collection<ITestResult> methodResults = getResultSet(context.getFailedTests(), method);
-					methodResults.addAll(getResultSet(context.getPassedTests(), method));
-					methodResults.addAll(getResultSet(context.getSkippedTests(), method));
-
-					if (!methodResults.isEmpty()) {
-						methodResults.toArray(new ITestResult[] {})[0].setAttribute(METHOD_RESULT_FILE_NAME, fileName);
-						resultList.add(methodResults.toArray(new ITestResult[] {})[0]);
-					}
+					result.setAttribute(METHOD_RESULT_FILE_NAME, fileName);
 				}
+				resultList.addAll(methodResults);
+
 				methodResultsMap.put(context, resultList);
 			}
 		}
@@ -458,7 +462,7 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 			
 			// create a context and add data
 			VelocityContext velocityContext = new VelocityContext();
-			velocityContext.put("testName", testResult.getName());
+			velocityContext.put("testName", testResult.getAttribute(SeleniumRobotLogger.METHOD_NAME));
 			
 			// Application information
 			fillContextWithTestParams(velocityContext);       

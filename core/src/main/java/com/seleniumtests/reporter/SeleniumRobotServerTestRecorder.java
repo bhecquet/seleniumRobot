@@ -37,7 +37,7 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 	public JSONObject generateExecutionLogs(final ITestResult testResult) {
 		
 		JSONObject executionLogs = new JSONObject();
-		executionLogs.put("logs", SeleniumRobotLogger.getTestLogs().get(testResult.getName()));
+		executionLogs.put("logs", SeleniumRobotLogger.getTestLogs().get(testResult.getAttribute(SeleniumRobotLogger.METHOD_NAME)));
 		
 		// exception handling
 		StringBuilder stackString = new StringBuilder();

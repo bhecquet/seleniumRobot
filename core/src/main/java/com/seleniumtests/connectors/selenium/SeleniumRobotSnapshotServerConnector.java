@@ -41,10 +41,11 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 			return;
 		}
 		active = isAlive();
+		getInfoFromServer(null);
 	}
 	
 	@Override
-	protected boolean isAlive() {
+	public boolean isAlive() {
 		return isAlive("/snapshot/");
 	}
 	

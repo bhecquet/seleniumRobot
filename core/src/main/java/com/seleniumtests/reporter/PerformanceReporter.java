@@ -34,6 +34,7 @@ import org.testng.xml.XmlSuite;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.ScenarioException;
+import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
 public class PerformanceReporter extends CommonReporter implements IReporter {
 	
@@ -94,7 +95,7 @@ public class PerformanceReporter extends CommonReporter implements IReporter {
 			context.put("errors", 0);
 			context.put("failures", errors);
 			context.put("hostname", testResult.getHost() == null ? "": testResult.getHost());
-			context.put("suiteName", testResult.getName());
+			context.put("suiteName", testResult.getAttribute(SeleniumRobotLogger.METHOD_NAME));
 			context.put("className", testResult.getTestClass().getName());
 			context.put("tests", testSteps == null ? 0: testSteps.size());
 			context.put("duration", testDuration / 1000.0);
@@ -105,7 +106,7 @@ public class PerformanceReporter extends CommonReporter implements IReporter {
 			StringWriter writer = new StringWriter();
 			t.merge( context, writer );
 			
-			String fileName = "PERF-" + testResult.getTestClass().getName() + "." + testResult.getName()
+			String fileName = "PERF-" + testResult.getTestClass().getName() + "." + testResult.getAttribute(SeleniumRobotLogger.METHOD_NAME).toString()
 											.replace(" ",  "_")
 											.replace("'", "")
 											.replace("\"", "")
@@ -125,7 +126,7 @@ public class PerformanceReporter extends CommonReporter implements IReporter {
 			fileWriter.close();
 			generatedFiles.add(fileName);
 		} catch (Exception e) {
-			logger.error(String.format("Error generating test result %s: %s", testResult.getName(), e.getMessage()));
+			logger.error(String.format("Error generating test result %s: %s", testResult.getAttribute(SeleniumRobotLogger.METHOD_NAME), e.getMessage()));
 		}
 	}
 }
