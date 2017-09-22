@@ -22,7 +22,6 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import com.seleniumtests.GenericTest;
-import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.runner.CustomTestNGCucumberRunner;
 
 public class TestCucumberRunner extends GenericTest {
@@ -75,6 +74,53 @@ public class TestCucumberRunner extends GenericTest {
 			initThreadContext(testNGCtx);
 			CustomTestNGCucumberRunner runner = new CustomTestNGCucumberRunner(this.getClass());
 			Assert.assertEquals(runner.provideScenarios().length, 2);
+		} finally {
+			System.clearProperty("cucumberTags");
+		}
+	}
+	
+	/**
+	 * Check that we can get test from scenario outlines with matching text
+	 * @param testNGCtx
+	 */
+	@Test(groups={"ut"})
+	public void testScenarioOutlineMatching(ITestContext testNGCtx) {
+		try {
+			System.setProperty("cucumberTests", "core_ .*");
+			initThreadContext(testNGCtx);
+			CustomTestNGCucumberRunner runner = new CustomTestNGCucumberRunner(this.getClass());
+			Assert.assertEquals(runner.provideScenarios().length, 2);
+		} finally {
+			System.clearProperty("cucumberTags");
+		}
+	}
+	/**
+	 * Check that we can get test from scenario 
+	 * @param testNGCtx
+	 */
+	@Test(groups={"ut"})
+	public void testScenarioExactText(ITestContext testNGCtx) {
+		try {
+			System.setProperty("cucumberTests", "core_3,core_4");
+			initThreadContext(testNGCtx);
+			CustomTestNGCucumberRunner runner = new CustomTestNGCucumberRunner(this.getClass());
+			Assert.assertEquals(runner.provideScenarios().length, 2);
+		} finally {
+			System.clearProperty("cucumberTags");
+		}
+	}
+	
+	/**
+	 * Check that we can get tests from feature name matching
+	 * @param testNGCtx
+	 */
+	@Test(groups={"ut"})
+	public void testFeatureMatching(ITestContext testNGCtx) {
+		try {
+			System.setProperty("cucumberTests", "Co.*");
+			initThreadContext(testNGCtx);
+			CustomTestNGCucumberRunner runner = new CustomTestNGCucumberRunner(this.getClass());
+			Assert.assertEquals(runner.provideScenarios().length, 6);
 		} finally {
 			System.clearProperty("cucumberTags");
 		}
