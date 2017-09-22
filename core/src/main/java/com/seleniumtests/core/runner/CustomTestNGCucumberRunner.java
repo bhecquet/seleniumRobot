@@ -185,7 +185,7 @@ public class CustomTestNGCucumberRunner {
     	for (CucumberTagStatement stmt: feature.getFeatureElements()) {
 			
 			for (String test: testList) {
-    			if (stmt.getGherkinModel().getName().equals(test)) {
+    			if (stmt.getGherkinModel().getName().equals(test) || stmt.getGherkinModel().getName().matches(test)) {
     				selectedScenarios.add(stmt);
     			}
 			}
