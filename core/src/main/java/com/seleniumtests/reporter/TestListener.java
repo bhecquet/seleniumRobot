@@ -34,6 +34,7 @@ import org.testng.internal.ResultMap;
 import org.testng.internal.TestResult;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.core.runner.SeleniumRobotRunner;
 import com.seleniumtests.core.testretry.TestRetryAnalyzer;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.driver.screenshots.ScreenShot;
@@ -63,27 +64,24 @@ public class TestListener implements IInvokedMethodListener, ITestListener {
 	public static TestListener getCurrentListener() {
 		return currentListener;
 	}
-
-
-	public Map<String, IResultMap> getFailedTests() {
-		return failedTests;
-	}
-
-	public Map<String, IResultMap> getSkippedTests() {
-		return skippedTests;
-	}
-
-	public Map<String, IResultMap> getPassedTests() {
-		return passedTests;
-	}
 	
 	public Map<String, Boolean> getIsRetryHandleNeeded() {
 		return isRetryHandleNeeded;
 	}
 	
 	@Override
-	public void beforeInvocation(final IInvokedMethod arg0, final ITestResult arg1) { 
-		TestLogging.setCurrentTestResult(arg1);
+	public void beforeInvocation(final IInvokedMethod invokedMethod, final ITestResult result) { 
+		TestLogging.setCurrentTestResult(result);
+		
+		if (invokedMethod.isTestMethod()) {
+			if (SeleniumRobotRunner.isCucumberTest()) {
+				result.setAttribute(SeleniumRobotLogger.METHOD_NAME, result.getParameters()[0].toString());
+			} else {
+				result.setAttribute(SeleniumRobotLogger.METHOD_NAME, invokedMethod.getTestMethod().getMethodName());
+			}
+			
+		}
+		
 	}
 	
 	@Override
@@ -165,7 +163,7 @@ public class TestListener implements IInvokedMethodListener, ITestListener {
 	
 
 	/**
-	 * Remote failed test cases in TestNG.
+	 * Remove failed test cases in TestNG.
 	 *
 	 * @param   tc
 	 *

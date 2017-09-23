@@ -25,10 +25,16 @@ public class StubTestClass2 extends StubParentClass {
 	public void test1() {
 	}
 	
+	/**
+	 * Skipped as test5 failed
+	 */
 	@Test(groups="stub", dependsOnGroups={"stub2"})
 	public void test2() {
 	}
 	
+	/**
+	 * Skipped as test4 failed
+	 */
 	@Test(groups="stub", dependsOnMethods={"test4"})
 	public void test3() {
 	}

@@ -59,11 +59,11 @@ public class CucumberRunner extends SeleniumRobotRunner {
         SeleniumTestsContextManager.getThreadContext().setTestMethodSignature(cucumberScenarioWrapper.toString());
     	testNGCucumberRunner.runScenario(cucumberScenarioWrapper);
     }
-    
-    @AfterMethod(groups = "cucumber")
-    public void setName(ITestResult result) {
-    	result.setAttribute(SeleniumRobotLogger.METHOD_NAME, result.getParameters()[0].toString());
-    }
+//    
+//    @AfterMethod(groups = "cucumber")
+//    public void setName(ITestResult result) {
+//    	result.setAttribute(SeleniumRobotLogger.METHOD_NAME, result.getParameters()[0].toString());
+//    }
 
     /**
      * @return returns two dimensional array of {@link CucumberFeatureWrapper} objects.

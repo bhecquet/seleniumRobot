@@ -51,20 +51,21 @@
 			                			#set ($totalFailed = $totalFailed + $failedSteps)
 			                			#set ($totalSteps = $totalSteps + $totalTestSteps)
 			                		
+			                			
 			                			#if ($testResult.getStatus() == 1)
 			                				<tr class="testSuccess">
-			                				#set ($circleClass = "circleSuccess")
+			                				<td>$testContext.key.getName()</td>
+			                				<td class="alignleft"><i class="fa fa-circle circleSuccess"></i><a href='$testResult.getAttribute("methodResultFileName")'>$testResult.getAttribute("methodName")</a></td>
 			                			#elseif ($testResult.getStatus() == 2)
 			                				<tr class="testFailed">
-			                				#set ($circleClass = "circleFailed")
+			                				<td>$testContext.key.getName()</td>
+			                				<td class="alignleft"><i class="fa fa-circle circleFailed"></i><a href='$testResult.getAttribute("methodResultFileName")'>$testResult.getAttribute("methodName")</a></td>
 			                			#else 
 			                				<tr class="testSkipped">
-			                				#set ($circleClass = "circleSkipped")
+			                				<td>$testContext.key.getName()</td>
+			                				<td class="alignleft"><i class="fa fa-circle circleSkipped"></i>$testResult.getName()</td>
 			                			#end 
-			                			<td>$testContext.key.getName()</td>
-			                			<!--<td class="alignleft"><i class="fa fa-circle $circleClass"></i><a href='$testResult.getAttribute("methodResultFileName")'>$testResult.getName()</a></td>-->
-				                		<td class="alignleft"><i class="fa fa-circle $circleClass"></i><a href='$testResult.getAttribute("methodResultFileName")'>$testResult.getAttribute("methodName")</a></td>
-				                		
+
 				                		<td name="passed-$testIdx">$passedSteps</td>
 				                  		<td name="failed-$testIdx">$failedSteps</td>
 				                  		<td name="stepsTotal-$testIdx">$totalTestSteps</td>
