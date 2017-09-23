@@ -41,7 +41,9 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 			return;
 		}
 		active = isAlive();
-		getInfoFromServer(null);
+		if (active) {
+			getInfoFromServer(null);
+		}
 	}
 	
 	@Override

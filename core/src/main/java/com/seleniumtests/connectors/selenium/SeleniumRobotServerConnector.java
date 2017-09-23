@@ -127,6 +127,7 @@ public abstract class SeleniumRobotServerConnector {
 		if (versionId != null) {
 			return versionId;
 		}
+		
 		createVersion();
 		return versionId;
 	}
@@ -239,5 +240,24 @@ public abstract class SeleniumRobotServerConnector {
 	
 	public boolean getActive() {
 		return active;
+	}
+
+	/*
+	 * For Test purpose only
+	 */
+	public void setApplicationId(Integer applicationId) {
+		this.applicationId = applicationId;
+	}
+
+	public void setVersionId(Integer versionId) {
+		this.versionId = versionId;
+	}
+
+	public void setEnvironmentId(Integer environmentId) {
+		this.environmentId = environmentId;
+	}
+
+	public void setTestCaseId(Integer testCaseId) {
+		this.testCaseId = testCaseId;
 	}
 }

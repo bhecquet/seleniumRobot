@@ -91,7 +91,7 @@ public class TestCucumberRunner extends GenericTest {
 			CustomTestNGCucumberRunner runner = new CustomTestNGCucumberRunner(this.getClass());
 			Assert.assertEquals(runner.provideScenarios().length, 2);
 		} finally {
-			System.clearProperty("cucumberTags");
+			System.clearProperty("cucumberTests");
 		}
 	}
 	/**
@@ -106,7 +106,7 @@ public class TestCucumberRunner extends GenericTest {
 			CustomTestNGCucumberRunner runner = new CustomTestNGCucumberRunner(this.getClass());
 			Assert.assertEquals(runner.provideScenarios().length, 2);
 		} finally {
-			System.clearProperty("cucumberTags");
+			System.clearProperty("cucumberTests");
 		}
 	}
 	
@@ -122,7 +122,7 @@ public class TestCucumberRunner extends GenericTest {
 			CustomTestNGCucumberRunner runner = new CustomTestNGCucumberRunner(this.getClass());
 			Assert.assertEquals(runner.provideScenarios().length, 6);
 		} finally {
-			System.clearProperty("cucumberTags");
+			System.clearProperty("cucumberTests");
 		}
 	}
 }

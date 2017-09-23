@@ -1,11 +1,13 @@
 package com.seleniumtests.reporter;
 
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 import org.json.JSONObject;
 import org.testng.IReporter;
@@ -95,61 +97,55 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 	private void recordSuiteResults(SeleniumRobotSnapshotServerConnector serverConnector, Map<String, ISuiteResult> tests) {
 		
 		String outputDir = SeleniumTestsContextManager.getThreadContext().getOutputDirectory();
+
 		
 		for (ISuiteResult r : tests.values()) {
 			ITestContext context = r.getTestContext();
 			
+			Collection<ITestResult> methodResults = new ArrayList<>();
+			methodResults.addAll(context.getFailedTests().getAllResults());
+			methodResults.addAll(context.getPassedTests().getAllResults());
+			methodResults.addAll(context.getSkippedTests().getAllResults());
+			
+			methodResults = methodResults.stream()
+					.sorted((r1, r2) -> Long.compare(r1.getStartMillis(), r2.getStartMillis()))
+					.collect(Collectors.toList());
+			
 			// test case in seleniumRobot naming
-			for (ITestNGMethod method: context.getAllTestMethods()) {
-
-				Collection<ITestResult> methodResults = getResultSet(context.getFailedTests(), method);
-				methodResults.addAll(getResultSet(context.getPassedTests(), method));
-				methodResults.addAll(getResultSet(context.getSkippedTests(), method));
-
-				if (!methodResults.isEmpty()) {
-					ITestResult testResult = methodResults.toArray(new ITestResult[] {})[0];
+			for (ITestResult testResult: methodResults) {
+				
+				// skipped tests has never been executed and so attribute (set in TestListener) has not been applied
+				String testName;
+				if (testResult.getStatus() == ITestResult.SKIP) {
+					testName = testResult.getName();
+				} else {
+					testName = testResult.getAttribute(SeleniumRobotLogger.METHOD_NAME).toString();
+				}
+				
+				// record test case
+				serverConnector.createTestCase(testName);
+				serverConnector.createTestCaseInSession();
+				serverConnector.addLogsToTestCaseInSession(generateExecutionLogs(testResult).toString());
+				
+				List<TestStep> testSteps = TestLogging.getTestsSteps().get(testResult);
+				if (testSteps == null) {
+					continue;
+				}
+				
+				for (TestStep testStep: testSteps) {
 					
-					// record test case
-					serverConnector.createTestCase(method.getMethodName());
-					serverConnector.createTestCaseInSession();
-					serverConnector.addLogsToTestCaseInSession(generateExecutionLogs(testResult).toString());
+					// record test step
+					serverConnector.createTestStep(testStep.getName());
+					String stepLogs = testStep.toJson().toString();
 					
-					List<TestStep> testSteps = TestLogging.getTestsSteps().get(testResult);
-					if (testSteps == null) {
-						continue;
-					}
+					serverConnector.recordStepResult(!testStep.getFailed(), stepLogs, testStep.getDuration());
 					
-					for (TestStep testStep: testSteps) {
-						
-						// record test step
-						serverConnector.createTestStep(testStep.getName());
-						String stepLogs = testStep.toJson().toString();
-						
-						serverConnector.recordStepResult(!testStep.getFailed(), stepLogs, testStep.getDuration());
-						
-						if (testStep.getSnapshot() != null) {
-							serverConnector.createSnapshot(Paths.get(outputDir, testStep.getSnapshot()).toFile());
-						}
+					if (testStep.getSnapshot() != null) {
+						serverConnector.createSnapshot(Paths.get(outputDir, testStep.getSnapshot()).toFile());
 					}
 				}
 			}
 		}
-	}
-
-	/**
-	 * @param   tests
-	 *
-	 * @return
-	 */
-	protected Collection<ITestResult> getResultSet(final IResultMap tests, final ITestNGMethod method) {
-		Set<ITestResult> r = new TreeSet<>();
-		for (ITestResult result : tests.getAllResults()) {
-			if (result.getMethod().getMethodName().equals(method.getMethodName())) {
-				r.add(result);
-			}
-		}
-
-		return r;
 	}
 
 

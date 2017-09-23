@@ -20,7 +20,7 @@ import com.seleniumtests.core.SeleniumTestsContextManager;
 
 public class ReporterTest extends MockitoTest {
 
-	protected XmlSuite executeSubTest(String[] testClasses) throws IOException {
+	protected TestNG executeSubTest(String[] testClasses) throws IOException {
 		return executeSubTest(1, testClasses);
 	}
 	
@@ -29,7 +29,7 @@ public class ReporterTest extends MockitoTest {
 	 * a report is generated
 	 * @throws IOException 
 	 */
-	protected XmlSuite executeSubTest(int threadCount, String[] testClasses) throws IOException {
+	protected TestNG executeSubTest(int threadCount, String[] testClasses) throws IOException {
 //		TestListener testListener = new TestListener();
 		
 		XmlSuite suite = new XmlSuite();
@@ -65,7 +65,7 @@ public class ReporterTest extends MockitoTest {
 		tng.run(); 
 //		SeleniumRobotLogger.parseLogFile();
 		
-		return suite;
+		return tng;
 	}
 	
 	/**
