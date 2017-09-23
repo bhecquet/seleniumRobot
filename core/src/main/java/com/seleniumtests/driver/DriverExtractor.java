@@ -46,9 +46,14 @@ public class DriverExtractor {
 	private static final String DRIVER_FOLDER = "drivers";
 	private static final Logger logger = SeleniumRobotLogger.getLogger(DriverExtractor.class);
 	private String rootPath;
+	private String os;
 	
 	public DriverExtractor() {
 		rootPath = SeleniumTestsContextManager.getRootPath();
+		os = OSUtility.getCurrentPlatorm().toString().toLowerCase();
+		if (os.equals("linux")) {
+			os = "unix";
+		}
 	}
 	
 	public DriverExtractor(String rootPath) {
@@ -98,7 +103,7 @@ public class DriverExtractor {
 	
 	public void copyDriver(String driverName) {
 		InputStream driver = Thread.currentThread().getContextClassLoader().getResourceAsStream(String.format("drivers/%s/%s%s", 
-						OSUtility.getCurrentPlatorm().toString().toLowerCase(), 
+						os, 
 						driverName,
 						OSUtilityFactory.getInstance().getProgramExtension()));
 		
