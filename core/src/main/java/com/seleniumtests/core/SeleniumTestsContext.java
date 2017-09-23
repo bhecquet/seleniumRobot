@@ -767,7 +767,13 @@ public class SeleniumTestsContext {
     
     @SuppressWarnings("unchecked")
 	public Map<String, String> getConfiguration() {
-    	return (HashMap<String, String>) getAttribute(TEST_CONFIG);
+    	
+    	Map<String, String> config = (HashMap<String, String>) getAttribute(TEST_CONFIG);
+    	if (config == null) {
+    		return new HashMap<>();
+    	} else {
+    		return config;
+    	}
     }
     
     //Methods for ID_Mapping

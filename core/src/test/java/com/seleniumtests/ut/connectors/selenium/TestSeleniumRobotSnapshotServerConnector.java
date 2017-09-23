@@ -82,8 +82,19 @@ public class TestSeleniumRobotSnapshotServerConnector extends MockitoTest {
 		createSnapshotServerMock("GET", SeleniumRobotSnapshotServerConnector.TESTCASEINSESSION_API_URL + "15", 200, "{'testSteps': []}");		
 		createSnapshotServerMock("PATCH", SeleniumRobotSnapshotServerConnector.TESTCASEINSESSION_API_URL + "15/", 200, "{\"id\":12,\"name\":\"Test 1\",\"version\":11,\"testSteps\":[14]}");		
 		createSnapshotServerMock("POST", SeleniumRobotSnapshotServerConnector.TESTSTEP_API_URL, 200, "{'id': '14'}");
+		createSnapshotServerMock("GET", SeleniumRobotServerConnector.NAMED_APPLICATION_API_URL, 200, "{'id': 9}");		
+		createSnapshotServerMock("GET", SeleniumRobotServerConnector.NAMED_ENVIRONMENT_API_URL, 200, "{'id': 10}");		
+		createSnapshotServerMock("GET", SeleniumRobotServerConnector.NAMED_TESTCASE_API_URL, 200, "{'id': 12}");		
+		createSnapshotServerMock("GET", SeleniumRobotServerConnector.NAMED_VERSION_API_URL, 200, "{'id': 11}");		
 		
-		return new SeleniumRobotSnapshotServerConnector();
+		SeleniumRobotSnapshotServerConnector connector = new SeleniumRobotSnapshotServerConnector();
+		
+		// reset default value to force creation
+		connector.setApplicationId(null);
+		connector.setEnvironmentId(null);
+		connector.setVersionId(null);
+		connector.setTestCaseId(null);
+		return connector;
 	}
 	
 	/**
@@ -114,6 +125,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends MockitoTest {
 				GetRequest getRequest = mock(GetRequest.class); 
 				when(Unirest.get(SERVER_URL + apiPath)).thenReturn(getRequest);
 				when(getRequest.asString()).thenReturn(response);
+				when(getRequest.queryString(anyString(), anyString())).thenReturn(getRequest);
 				when(response.getStatus()).thenReturn(statusCode);
 				when(response.getBody()).thenReturn(replyData);
 				break;
@@ -210,13 +222,13 @@ public class TestSeleniumRobotSnapshotServerConnector extends MockitoTest {
 		verify(connector).createApplication();
 	}
 	
-	@Test(groups= {"ut"})
+	@Test(groups= {"ut"}, expectedExceptions=SeleniumRobotServerException.class)
 	public void testCreateVersionInError() throws UnirestException {
 		SeleniumRobotSnapshotServerConnector connector = configureAliveConnection();
 		when(Unirest.post(SERVER_URL + SeleniumRobotSnapshotServerConnector.VERSION_API_URL)).thenThrow(UnirestException.class);
 		
 		connector.createApplication();
-		Assert.assertNull(connector.getVersionId());
+		connector.createVersion();
 	}
 	
 	@Test(groups= {"ut"})
