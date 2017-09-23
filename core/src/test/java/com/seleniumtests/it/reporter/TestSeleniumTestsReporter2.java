@@ -24,7 +24,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -37,60 +36,23 @@ import org.testng.Assert;
 import org.testng.IInvokedMethodListener;
 import org.testng.IReporter;
 import org.testng.ITestContext;
-import org.testng.ITestListener;
 import org.testng.ITestResult;
 import org.testng.TestNG;
 import org.testng.annotations.Test;
-import org.testng.xml.XmlClass;
 import org.testng.xml.XmlPackage;
 import org.testng.xml.XmlSuite;
-import org.testng.xml.XmlSuite.ParallelMode;
 import org.testng.xml.XmlTest;
 
-import com.seleniumtests.MockitoTest;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.reporter.SeleniumTestsReporter2;
 import com.seleniumtests.reporter.TestListener;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
-public class TestSeleniumTestsReporter2 extends MockitoTest {
+public class TestSeleniumTestsReporter2 extends ReporterTest {
 	
 	private SeleniumTestsReporter2 reporter;
 
-	/**
-	 * Execute stub tests using TestNG runner and make SeleniumTestsReporter a listener so that 
-	 * a report is generated
-	 * @throws IOException 
-	 */
-	private XmlSuite executeSubTest(String[] testClasses) throws IOException {
-//		TestListener testListener = new TestListener();
-		
-		XmlSuite suite = new XmlSuite();
-		suite.setName("TmpSuite");
-		suite.setParallel(ParallelMode.FALSE);
-		suite.setFileName("/home/test/seleniumRobot/data/core/testng/testLoggging.xml");
-		List<XmlSuite> suites = new ArrayList<XmlSuite>();
-		suites.add(suite);
-		
-		for (String testClass: testClasses) {
-			XmlTest test = new XmlTest(suite);
-			test.setName(testClass.substring(testClass.lastIndexOf(".") + 1));
-			List<XmlClass> classes = new ArrayList<XmlClass>();
-			classes.add(new XmlClass(testClass));
-			test.setXmlClasses(classes) ;
-		}		
-		
-		TestNG tng = new TestNG(false);
-		tng.setXmlSuites(suites);
-//		tng.addListener((IReporter)reporter);
-//		tng.addListener((ITestListener)testListener);
-//		tng.addListener((IInvokedMethodListener)testListener);
-		tng.setOutputDirectory(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory());
-		tng.run(); 
-		SeleniumRobotLogger.parseLogFile();
-		
-		return suite;
-	}
+	
 	
 	/**
 	 * Disabled because now, it's not easy to get the SeleniumRobotReporterInstance created by testNg
@@ -152,9 +114,7 @@ public class TestSeleniumTestsReporter2 extends MockitoTest {
 	 */
 	@Test(groups={"it"})
 	public void testReportSummaryContentWithDependantTests(ITestContext testContext) throws Exception {
-		
-		reporter = spy(new SeleniumTestsReporter2());
-		
+	
 		executeSubTest(new String[] {"com.seleniumtests.it.reporter.StubTestClass2"});
 		FileUtils.copyDirectory(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()), new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory() + "-testReportSummaryContentWithDependantTests"));
 		
@@ -164,9 +124,9 @@ public class TestSeleniumTestsReporter2 extends MockitoTest {
 		
 		Assert.assertTrue(mainReportContent.matches(".*class=\"fa fa-circle circleSuccess\"></i><a href='SeleniumTestReport-\\d.html'>test1</a>.*"));
 		Assert.assertTrue(mainReportContent.matches(".*class=\"fa fa-circle circleFailed\"></i><a href='SeleniumTestReport-\\d.html'>test4</a>.*"));
-		Assert.assertTrue(mainReportContent.matches(".*class=\"fa fa-circle circleSkipped\"></i><a href='SeleniumTestReport-\\d.html'>test3</a>.*"));
+		Assert.assertTrue(mainReportContent.matches(".*class=\"fa fa-circle circleSkipped\"></i>test3.*"));
 		Assert.assertTrue(mainReportContent.matches(".*class=\"fa fa-circle circleFailed\"></i><a href='SeleniumTestReport-\\d.html'>test5</a>.*"));
-		Assert.assertTrue(mainReportContent.matches(".*class=\"fa fa-circle circleSkipped\"></i><a href='SeleniumTestReport-\\d.html'>test2</a>.*"));
+		Assert.assertTrue(mainReportContent.matches(".*class=\"fa fa-circle circleSkipped\"></i>test2.*"));
 		Assert.assertTrue(mainReportContent.matches(".*class=\"fa fa-circle circleSuccess\"></i><a href='SeleniumTestReport-\\d.html'>test1</a>.*"));
 		Assert.assertFalse(mainReportContent.contains("$testResult.getAttribute(\"methodName\")")); // check all test methods are filled
 	}
@@ -247,7 +207,7 @@ public class TestSeleniumTestsReporter2 extends MockitoTest {
 		detailedReportContent = detailedReportContent.replace("\n", "").replace("\r",  "").replaceAll(">\\s+<", "><");
 		
 		// check log presence
-		Assert.assertTrue(detailedReportContent.contains("[main] StubParentClass: Start method testAndSubActions</div>"));
+		Assert.assertTrue(detailedReportContent.contains("[main] SeleniumRobotRunner: Start method testAndSubActions</div>"));
 		
 	}
 	
@@ -301,11 +261,11 @@ public class TestSeleniumTestsReporter2 extends MockitoTest {
 		
 		// /!\: lines in error message may change
 		// Check exception is logged and filtered
-		Assert.assertTrue(detailedReportContent.contains("<div class=\"message-error\"><div>class java.lang.AssertionError: error</div>"
+		Assert.assertTrue(detailedReportContent.matches(".*<div class=\"message-error\"><div>class java.lang.AssertionError: error</div>"
 								+ "<div class=\"stack-element\"></div>"
-								+ "<div class=\"stack-element\">at com.seleniumtests.it.reporter.StubTestClass.testInError(StubTestClass.java:69)</div>"
-								+ "<div class=\"stack-element\">at com.seleniumtests.it.reporter.TestSeleniumTestsReporter2.executeSubTest(TestSeleniumTestsReporter2.java:87)</div>"
-								+ "<div class=\"stack-element\">at com.seleniumtests.it.reporter.TestSeleniumTestsReporter2.testReportDetailsWithErrors(TestSeleniumTestsReporter2.java:290)</div>"));
+								+ "<div class=\"stack-element\">at com.seleniumtests.it.reporter.StubTestClass.testInError\\(StubTestClass.java:\\d+\\)</div>"
+								+ "<div class=\"stack-element\">at com.seleniumtests.it.reporter.ReporterTest.executeSubTest\\(ReporterTest.java:\\d+\\)</div>"
+								+ "<div class=\"stack-element\">at com.seleniumtests.it.reporter.TestSeleniumTestsReporter2.testReportDetailsWithErrors\\(TestSeleniumTestsReporter2.java:\\d+\\)</div>.*"));
 		
 	}
 	
@@ -318,35 +278,7 @@ public class TestSeleniumTestsReporter2 extends MockitoTest {
 	@Test(groups={"it"})
 	public void testCucumberStart(ITestContext testContext) throws Exception {
 		
-		reporter = new SeleniumTestsReporter2();
-		
-		TestListener testListener = new TestListener();
-		
-		XmlSuite suite = new XmlSuite();
-		suite.setName("TmpSuite");
-		suite.setFileName("/home/test/seleniumRobot/testng/testLoggging.xml");
-		Map<String, String> suiteParameters = new HashMap<>();
-		suiteParameters.put("cucumberPackage", "com.seleniumtests");
-		suite.setParameters(suiteParameters);
-		List<XmlSuite> suites = new ArrayList<XmlSuite>();
-		suites.add(suite);
-		
-		XmlTest test = new XmlTest(suite);
-		test.setName("cucumberTest");
-		XmlPackage xmlPackage = new XmlPackage("com.seleniumtests.core.runner.*");
-		test.setXmlPackages(Arrays.asList(xmlPackage));
-		Map<String, String> parameters = new HashMap<>();
-		parameters.put("cucumberTests", "core_3");
-		parameters.put("cucumberTagss", "");
-		test.setParameters(parameters);
-		
-		TestNG tng = new TestNG(false);
-		tng.setXmlSuites(suites);
-		tng.addListener((IReporter)reporter);
-		tng.addListener((IInvokedMethodListener)testListener);
-		tng.setOutputDirectory(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory());
-		tng.run(); 
-		SeleniumRobotLogger.parseLogFile();
+		executeSubCucumberTests("core_3");
 
 		FileUtils.copyDirectory(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()), new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory() + "-testCucumberStart"));
 		

@@ -18,8 +18,11 @@ package com.seleniumtests.core.runner;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
+import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.testng.ITestContext;
@@ -34,6 +37,7 @@ import com.mashape.unirest.http.Unirest;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.TearDownService;
 import com.seleniumtests.driver.WebUIDriver;
+import com.seleniumtests.reporter.TestLogging;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
 @Listeners({com.seleniumtests.reporter.SeleniumTestsReporter2.class, 
@@ -45,15 +49,19 @@ import com.seleniumtests.util.logging.SeleniumRobotLogger;
 public class SeleniumRobotRunner {
 	
 	protected static final Logger logger = SeleniumRobotLogger.getLogger(SeleniumRobotRunner.class);
-	private static boolean cucumberTest = false;
+	private static Map<Thread, Boolean> cucumberTest = Collections.synchronizedMap(new HashMap<>());
 	private Date start;
 
 	public static boolean isCucumberTest() {
-		return cucumberTest;
+		Boolean isCucumberT = SeleniumRobotRunner.cucumberTest.get(Thread.currentThread());
+		if (isCucumberT == null) {
+			return false;
+		}
+		return isCucumberT;
 	}
 	
-	public static void setCucumberTest(boolean cucumberTest) {
-		SeleniumRobotRunner.cucumberTest = cucumberTest;
+	public static void setCucumberTest(boolean cucumberTestIn) {
+		SeleniumRobotRunner.cucumberTest.put(Thread.currentThread(), cucumberTestIn);
 	}
 	
 	protected String buildMethodSignature(final Method method, final Object[] parameters) {
@@ -101,10 +109,6 @@ public class SeleniumRobotRunner {
                 service.tearDown();
             }
         }
-        	
-        if (!cucumberTest) {
-        	result.setAttribute(SeleniumRobotLogger.METHOD_NAME, method.getName());
-        }
 
         WebUIDriver.cleanUp();
         logger.info(SeleniumRobotLogger.END_TEST_PATTERN + method.getName());
@@ -141,7 +145,7 @@ public class SeleniumRobotRunner {
     
     @BeforeMethod(alwaysRun = true)
     public void beforeTestMethod(final Object[] parameters, final Method method, final ITestContext testContext) {
-    	if (!cucumberTest) {
+    	if (!isCucumberTest()) {
 	        logger.info(SeleniumRobotLogger.START_TEST_PATTERN + method.getName());
 	        SeleniumTestsContextManager.initThreadContext(testContext);
 	        SeleniumTestsContextManager.getThreadContext().setTestMethodSignature(buildMethodSignature(method, parameters));
