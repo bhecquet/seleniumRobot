@@ -41,6 +41,8 @@ public class TestInterceptePage extends GenericTest {
 	@BeforeClass(groups={"it"})
 	public void initDriver(final ITestContext testNGCtx, final XmlTest xmlTest) throws Exception {
 		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setBrowser("chrome");
+		SeleniumTestsContextManager.getThreadContext().setExplicitWaitTimeout(2);
 		testPage = new DriverTestPage(true);
 		driver = WebUIDriver.getWebDriver(true);
 	}

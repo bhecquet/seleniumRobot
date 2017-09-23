@@ -265,6 +265,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 								+ "<div class=\"stack-element\"></div>"
 								+ "<div class=\"stack-element\">at com.seleniumtests.it.reporter.StubTestClass.testInError\\(StubTestClass.java:\\d+\\)</div>"
 								+ "<div class=\"stack-element\">at com.seleniumtests.it.reporter.ReporterTest.executeSubTest\\(ReporterTest.java:\\d+\\)</div>"
+								+ "<div class=\"stack-element\">at com.seleniumtests.it.reporter.ReporterTest.executeSubTest\\(ReporterTest.java:\\d+\\)</div>"
 								+ "<div class=\"stack-element\">at com.seleniumtests.it.reporter.TestSeleniumTestsReporter2.testReportDetailsWithErrors\\(TestSeleniumTestsReporter2.java:\\d+\\)</div>.*"));
 		
 	}

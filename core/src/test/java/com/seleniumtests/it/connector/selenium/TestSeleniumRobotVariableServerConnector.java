@@ -28,7 +28,7 @@ public class TestSeleniumRobotVariableServerConnector extends GenericTest {
 		}
 	}
 	
-	@Test(groups={"it"})
+	@Test(groups={"it"}, enabled=false)
 	public void testCreateApplication() {
 		Map<String, String> variables = connector.getVariables();
 		Assert.assertTrue(variables.size() > 0);
