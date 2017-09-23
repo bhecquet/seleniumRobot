@@ -1,6 +1,8 @@
 package com.seleniumtests.it.driver;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.Select;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.driver.BrowserType;
@@ -19,9 +21,20 @@ public class DriverTestPageNativeActions extends PageObject {
         super(textElement, openPageURL ? getPageUrl() : null);
     }
     
-    public void sendKeysAndReset() {
+    public void sendKeys() {
     	driver.findElement(By.id("text2")).sendKeys("some text");
+    }
+    
+    public void reset() {
     	driver.findElement(By.id("button2")).click();
+    }
+    
+    public void select() {
+    	new Select(driver.findElement(By.id("select"))).selectByVisibleText("option1");
+    }
+    
+    public WebElement getElement() {
+    	return driver.findElement(By.id("text2"));
     }
     
     public static String getPageUrl() {
