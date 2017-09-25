@@ -30,6 +30,7 @@ import org.testng.ITestResult;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Listeners;
 
@@ -141,6 +142,13 @@ public class SeleniumRobotRunner {
 		} catch (IOException e) {
 			logger.error("Cannot stop unirest", e);
 		}
+    }
+    
+    @BeforeSuite(alwaysRun = true)
+    public void showVersion(final ITestContext testContext) {
+    	SeleniumTestsContextManager.initGlobalContext(testContext);
+    	logger.info(String.format("Application %s version: %s", SeleniumTestsContextManager.getApplicationName(), SeleniumTestsContextManager.getApplicationVersion()));
+    	logger.info("Core version: " + SeleniumTestsContextManager.getCoreVersion());
     }
     
     @BeforeMethod(alwaysRun = true)
