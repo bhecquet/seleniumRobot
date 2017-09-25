@@ -50,6 +50,7 @@ public class SeleniumTestsContextManager {
 	private static String configPath;
 	private static String applicationName;
 	private static String applicationVersion;
+	private static String coreVersion;
 	private static Boolean deployedMode;
 
 	public static final String DATA_FOLDER_NAME = "data";
@@ -270,6 +271,9 @@ public class SeleniumTestsContextManager {
     private static String readApplicationVersion() {
     	return readApplicationVersion(String.format("%s-version.txt", applicationName));
     }
+    private static String readCoreVersion() {
+    	return readApplicationVersion("core-version.txt");
+    }
     public static String readApplicationVersion(String resourceName) {
     	try {
 			String version = IOUtils.toString(SeleniumTestsContextManager.class.getClassLoader().getResourceAsStream(resourceName));
@@ -315,6 +319,7 @@ public class SeleniumTestsContextManager {
 		featuresPath = Paths.get(dataPath, applicationName, "features").toString();
 		configPath = Paths.get(dataPath, applicationName, "config").toString();
 		applicationVersion = readApplicationVersion();
+		coreVersion = readCoreVersion();
 		
 		// create data folder if it does not exist (it should already exist)
 		if (!new File(dataPath).isDirectory()) {
@@ -344,6 +349,10 @@ public class SeleniumTestsContextManager {
 
 	public static String getApplicationVersion() {
 		return applicationVersion;
+	}
+
+	public static String getCoreVersion() {
+		return coreVersion;
 	}
 
 	/**
