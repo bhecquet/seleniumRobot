@@ -37,6 +37,19 @@ public class DriverTestPageNativeActions extends PageObject {
     	return driver.findElement(By.id("text2"));
     }
     
+    public void switchToFrameByElement() {
+    	WebElement el = driver.findElement(By.id("myIFrame"));
+    	driver.switchTo().frame(el);
+    }
+    
+    public void switchToFrameByIndex() {
+    	driver.switchTo().frame(0);
+    }
+    
+    public void switchToFrameByNameOrId() {
+    	driver.switchTo().frame("myIFrame");
+    }
+    
     public static String getPageUrl() {
     	if (SeleniumTestsContextManager.getThreadContext().getBrowser() == BrowserType.FIREFOX) {
 			return "file://" + Thread.currentThread().getContextClassLoader().getResource("tu/test.html").getFile();
