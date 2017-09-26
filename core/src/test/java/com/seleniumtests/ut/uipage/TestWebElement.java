@@ -199,6 +199,27 @@ public class TestWebElement extends MockitoTest {
 	}
 	
 	/**
+	 * Test switching to default context resets frame state
+	 */
+	@Test(groups= {"ut"})
+	public void testSwitchParentFrame() {
+		testPage.switchToFirstFrameByElement();
+		testPage.switchToSecondFrameByElement();
+		WebElement el = testPage.getElementInsideFrameOfFrame();
+		Assert.assertEquals(el.getAttribute("value"), "an other value in iframe");
+		testPage.switchParentFrame();
+		WebElement el1 = testPage.getElementInsideFrame();
+		Assert.assertEquals(el1.getAttribute("value"), "a value");
+	}
+	
+	@Test(groups={"ut"})
+	public void testSwitchParentWithoutParentFrame() {
+		testPage.switchParentFrame();
+		testPage.select();
+		Assert.assertEquals(new Select(realDriver.findElement(By.id("select"))).getFirstSelectedOption().getText(), "option1");
+	}
+	
+	/**
 	 * Test that findElements call is also intercepted
 	 */
 	@Test(groups= {"ut"})
