@@ -290,3 +290,12 @@ SeleniumRobot intercept selenium calls to create HtmlElement objects (the same a
 The constraint is that this code *MUST* be placed in a PageObject sub-class
 
 This should be seen as a way to migrate legacy selenium code to the new format without rewriting every old test 
+
+The handled methods are the most used in selenium writing:
+- findElement(By)
+- findElements(By)
+- switchTo().frame(int)
+- switchTo().frame(WebElement)
+- switchTo().frame(String)
+- switchTo().defaultContent()
+- switchTo().parentFrame()
