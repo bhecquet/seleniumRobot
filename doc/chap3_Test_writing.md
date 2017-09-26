@@ -280,3 +280,13 @@ you should follow these rules:
 - A Page Object contains locators (see example) and actions (the methods). They are seperated to simplify readability
 - the locator use order is: id, name, className, cssPath, xPath, linkText because the first are most of time unique and do not change each time the DOM changes
 
+### 10 Use Selenium code style inside SeleniumRobot ###
+
+As PageObject exposes the `driver` object, it's possible to write standard Selenium code
+	
+	driver.findElement(By.id("myId")).click();
+	
+SeleniumRobot intercept selenium calls to create HtmlElement objects (the same as in §2) and thus benefit all SelniumRobot behaviour
+The constraint is that this code *MUST* be placed in a PageObject sub-class
+
+This should be seen as a way to migrate legacy selenium code to the new format without rewriting every old test 
