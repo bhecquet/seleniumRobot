@@ -1,5 +1,7 @@
 package com.seleniumtests.it.driver;
 
+import java.util.List;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
@@ -37,17 +39,50 @@ public class DriverTestPageNativeActions extends PageObject {
     	return driver.findElement(By.id("text2"));
     }
     
-    public void switchToFrameByElement() {
+    public void switchToFirstFrameByElement() {
     	WebElement el = driver.findElement(By.id("myIFrame"));
     	driver.switchTo().frame(el);
     }
     
-    public void switchToFrameByIndex() {
+    public void switchToSecondFrameByElement() {
+    	WebElement el = driver.findElement(By.name("mySecondIFrame"));
+    	driver.switchTo().frame(el);
+    }
+    
+    public void switchToFirstFrameByIndex() {
     	driver.switchTo().frame(0);
     }
     
-    public void switchToFrameByNameOrId() {
+    public void switchToFirstFrameByNameOrId() {
     	driver.switchTo().frame("myIFrame");
+    }
+    
+    public void switchDefaultContent() {
+    	driver.switchTo().defaultContent();
+    }
+    
+    /** 
+     * must be called after switchToFrameByElement
+     * @return
+     */
+    public WebElement getElementInsideFrame() {
+    	return driver.findElement(By.id("textInIFrameWithValue"));
+    }
+    
+    /** 
+     * must be called after switchToFrameByElement
+     * @return
+     */
+    public List<WebElement> getElementsInsideFrame() {
+    	return driver.findElements(By.tagName("input"));
+    }
+    
+    /** 
+     * must be called after switchToFirstFrameByElement and switchToSecondFrameByElement
+     * @return
+     */
+    public WebElement getElementInsideFrameOfFrame() {
+    	return driver.findElement(By.id("textInIFrameWithValue2"));
     }
     
     public static String getPageUrl() {

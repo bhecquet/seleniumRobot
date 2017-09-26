@@ -16,68 +16,33 @@
  */
 package com.seleniumtests.ut.uipage;
 
-import static org.mockito.ArgumentMatchers.anyBoolean;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.anyObject;
-import static org.mockito.Mockito.atLeast;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.regex.Pattern;
-
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.openqa.selenium.By;
-import org.openqa.selenium.Dimension;
-import org.openqa.selenium.Point;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriver.TargetLocator;
-import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Keyboard;
 import org.openqa.selenium.interactions.Mouse;
-import org.openqa.selenium.remote.Command;
-import org.openqa.selenium.remote.CommandExecutor;
-import org.openqa.selenium.remote.DesiredCapabilities;
-import org.openqa.selenium.remote.DriverCommand;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.RemoteWebElement;
-import org.openqa.selenium.remote.Response;
-import org.openqa.selenium.remote.SessionId;
 import org.openqa.selenium.support.events.EventFiringWebDriver;
 import org.openqa.selenium.support.ui.Select;
-import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
 import org.testng.ITestContext;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
-import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import com.google.common.collect.ImmutableMap;
 import com.seleniumtests.MockitoTest;
 import com.seleniumtests.core.SeleniumTestsContextManager;
-import com.seleniumtests.customexception.ScenarioException;
-import com.seleniumtests.driver.CustomEventFiringWebDriver;
-import com.seleniumtests.driver.DriverExceptionListener;
-import com.seleniumtests.driver.TestType;
 import com.seleniumtests.driver.WebUIDriver;
-import com.seleniumtests.it.driver.DriverTestPage;
 import com.seleniumtests.it.driver.DriverTestPageNativeActions;
-import com.seleniumtests.it.driver.TestDriver;
 import com.seleniumtests.uipage.htmlelements.HtmlElement;
 
 import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.MobileElement;
-import io.appium.java_client.remote.AppiumCommandExecutor;
 
 /**
  * Test class for checking calls to a standard HTMLElement without using any driver
@@ -130,6 +95,13 @@ public class TestWebElement extends MockitoTest {
 		realDriver = WebUIDriver.getWebDriver(true);
 	}
 	
+	@AfterMethod(groups={"ut"})
+	public void reset() {
+		
+		// call testPage switchTo().defaultContent() so that it can be intercepted and seleniumRobot internal state can be reset
+		testPage.switchDefaultContent();
+	}
+	
 	@Test(groups={"ut"})
 	public void testFindElementOverride() {
 		Assert.assertTrue(testPage.getElement() instanceof HtmlElement);
@@ -145,15 +117,98 @@ public class TestWebElement extends MockitoTest {
 		}
 	}
 
+	/**
+	 * Check that select behaviour remains the same as native selenium
+	 */
 	@Test(groups={"ut"})
 	public void testSelect() {
 		testPage.select();
-		Assert.assertEquals(new Select(realDriver.findElement(By.id("select"))).getFirstSelectedOption().getText(), "options1");
+		Assert.assertEquals(new Select(realDriver.findElement(By.id("select"))).getFirstSelectedOption().getText(), "option1");
+	}
+	
+	/**
+	 * Test that we can find an element inside frame, using standard Selenium writing (switchTo().frame())
+	 */
+	@Test(groups= {"ut"})
+	public void testSingleFrame() {
+		testPage.switchToFirstFrameByElement();
+		WebElement el = testPage.getElementInsideFrame();
+		Assert.assertEquals(el.getAttribute("value"), "a value");
+	}
+	
+	/**
+	 * Test that we can find an element inside frame by index, using standard Selenium writing (switchTo().frame())
+	 */
+	@Test(groups= {"ut"})
+	public void testSingleFrameByIndex() {
+		testPage.switchToFirstFrameByIndex();
+		WebElement el = testPage.getElementInsideFrame();
+		Assert.assertEquals(el.getAttribute("value"), "a value");
+	}
+	
+	/**
+	 * Test that we can find an element inside frame by index, using standard Selenium writing (switchTo().frame())
+	 */
+	@Test(groups= {"ut"})
+	public void testSingleFrameByNameOrId() {
+		testPage.switchToFirstFrameByNameOrId();
+		WebElement el = testPage.getElementInsideFrame();
+		Assert.assertEquals(el.getAttribute("value"), "a value");
+	}
+	
+	/**
+	 * Test that we can find an element inside several frames
+	 */
+	@Test(groups= {"ut"})
+	public void testSeveralFrames() {
+		testPage.switchToFirstFrameByElement();
+		testPage.switchToSecondFrameByElement();
+		WebElement el = testPage.getElementInsideFrameOfFrame();
+		Assert.assertEquals(el.getAttribute("value"), "an other value in iframe");
+	}
+	
+	/**
+	 * Test that we can find several element inside several frames. We check frame state is not reset between findElement calls
+	 */
+	@Test(groups= {"ut"})
+	public void testFrameStateNotReset() {
+
+		testPage.switchToFirstFrameByIndex();
+		WebElement el = testPage.getElementInsideFrame();
+		Assert.assertEquals(el.getAttribute("value"), "a value");
+		WebElement el2 = testPage.getElementInsideFrame();
+		Assert.assertEquals(el2.getAttribute("value"), "a value");
+	}
+	
+	/**
+	 * Test switching to default context resets frame state
+	 */
+	@Test(groups= {"ut"})
+	public void testDefaultContent() {
+		testPage.switchToFirstFrameByIndex();
+		WebElement el = testPage.getElementInsideFrame();
+		Assert.assertEquals(el.getAttribute("value"), "a value");
+		testPage.switchDefaultContent();
 		
+		try {
+			testPage.sendKeys();
+			Assert.assertEquals(realDriver.findElement(By.id("text2")).getAttribute("value"), "some text");
+		} finally {
+			testPage.reset();
+		}
+	}
+	
+	/**
+	 * Test that findElements call is also intercepted
+	 */
+	@Test(groups= {"ut"})
+	public void testFindElements() {
+		testPage.switchToFirstFrameByIndex();
+		Assert.assertEquals(testPage.getElementsInsideFrame().size(), 4);
+
 	}
 	
 	// TODO: add replay check
-	// TODO: add Select test
 	
 	
 //	

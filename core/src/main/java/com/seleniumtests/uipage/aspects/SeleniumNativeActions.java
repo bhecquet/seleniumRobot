@@ -1,15 +1,12 @@
 package com.seleniumtests.uipage.aspects;
 
-import java.util.List;
-
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.openqa.selenium.By;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.WebDriver;
 
-import com.seleniumtests.customexception.ScenarioException;
+import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.uipage.htmlelements.FrameElement;
 import com.seleniumtests.uipage.htmlelements.HtmlElement;
 
@@ -30,7 +27,15 @@ public class SeleniumNativeActions {
 			+ ")"			
 			)
 	public Object interceptFindHtmlElement(ProceedingJoinPoint joinPoint) throws Throwable {
-		return new HtmlElement("", (By)(joinPoint.getArgs()[0]));
+		return new HtmlElement("", (By)(joinPoint.getArgs()[0]), currentFrame);
+	}
+	
+	@Around("this(com.seleniumtests.uipage.PageObject) && " +					// caller is a PageObject
+			"(call(public * org.openqa.selenium.WebDriver+.findElements (..))"
+			+ ")"			
+			)
+	public Object interceptFindsHtmlElement(ProceedingJoinPoint joinPoint) throws Throwable {
+		return new HtmlElement("", (By)(joinPoint.getArgs()[0]), currentFrame).findElements();
 	}
 	
 	/**
@@ -67,6 +72,16 @@ public class SeleniumNativeActions {
 		}
 		return null;
 
+	}
+	
+	@Around("this(com.seleniumtests.uipage.PageObject) && " +					// caller is a PageObject
+			"(call(public * org.openqa.selenium.WebDriver.TargetLocator+.defaultContent (..))"
+			+ ")"			
+			)
+	public Object recordSwitchDefaultContext(ProceedingJoinPoint joinPoint) throws Throwable {
+		WebDriver driver = WebUIDriver.getWebDriver();
+		currentFrame = null;
+		return joinPoint.proceed(joinPoint.getArgs());
 	}
 	
 	
