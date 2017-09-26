@@ -79,9 +79,23 @@ public class SeleniumNativeActions {
 			+ ")"			
 			)
 	public Object recordSwitchDefaultContext(ProceedingJoinPoint joinPoint) throws Throwable {
-		WebDriver driver = WebUIDriver.getWebDriver();
 		currentFrame = null;
 		return joinPoint.proceed(joinPoint.getArgs());
+	}
+	
+	
+	@Around("this(com.seleniumtests.uipage.PageObject) && " +					// caller is a PageObject
+			"(call(public * org.openqa.selenium.WebDriver.TargetLocator+.parentFrame (..))"
+			+ ")"			
+			)
+	public Object recordSwitchParentFrame(ProceedingJoinPoint joinPoint) throws Throwable {
+		if (currentFrame == null) {
+			return joinPoint.proceed(joinPoint.getArgs());
+		} else {
+			currentFrame = currentFrame.getFrameElement();
+		}
+		return null;
+		
 	}
 	
 	

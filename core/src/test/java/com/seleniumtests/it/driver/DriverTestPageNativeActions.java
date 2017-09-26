@@ -61,6 +61,10 @@ public class DriverTestPageNativeActions extends PageObject {
     	driver.switchTo().defaultContent();
     }
     
+    public void switchParentFrame() {
+    	driver.switchTo().parentFrame();
+    }
+    
     /** 
      * must be called after switchToFrameByElement
      * @return
