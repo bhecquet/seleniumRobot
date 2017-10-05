@@ -60,6 +60,12 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 			return;
 		}
 		
+		if (!SeleniumTestsContextManager.getThreadContext().getSeleniumRobotServerActive() 
+				|| !SeleniumTestsContextManager.getThreadContext().getSeleniumRobotServerRecordResults() 
+				&& !SeleniumTestsContextManager.getThreadContext().getSeleniumRobotServerCompareSnapshot()) {
+			return;
+		}
+		
 		// check that seleniumRobot server is alive
 		SeleniumRobotSnapshotServerConnector serverConnector = getServerConnector();
 		if (!serverConnector.getActive()) {

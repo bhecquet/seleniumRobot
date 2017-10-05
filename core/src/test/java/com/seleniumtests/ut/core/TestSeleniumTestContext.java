@@ -424,19 +424,6 @@ public class TestSeleniumTestContext extends GenericTest {
 	}
 	
 	@Test(groups="ut context")
-	public void testCompareSnapshot(final ITestContext testNGCtx, final XmlTest xmlTest) {
-		initThreadContext(testNGCtx);
-		SeleniumTestsContextManager.getThreadContext().setCompareSnapshot(true);
-		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getCompareSnapshot(), true);
-	}
-	@Test(groups="ut context")
-	public void testCompareSnapshotNull(final ITestContext testNGCtx, final XmlTest xmlTest) {
-		initThreadContext(testNGCtx);
-		SeleniumTestsContextManager.getThreadContext().setCompareSnapshot(null);
-		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getCompareSnapshot(), false);
-	}
-	
-	@Test(groups="ut context")
 	public void testSnapshotTopCropping(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setSnapshotTopCropping(5);
@@ -460,6 +447,65 @@ public class TestSeleniumTestContext extends GenericTest {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setSnapshotBottomCropping(null);
 		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getSnapshotBottomCropping(), 0);
+	}
+	
+	@Test(groups="ut context", expectedExceptions=ConfigurationException.class)
+	public void testSeleniumRobotServerActive(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setSeleniumRobotServerActive(true);
+		Assert.assertFalse(SeleniumTestsContextManager.getThreadContext().getSeleniumRobotServerActive());
+	}
+	@Test(groups="ut context")
+	public void testSeleniumRobotServerActiveWithoutUrl(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setSeleniumRobotServerUrl("http://localhost:8000");
+		SeleniumTestsContextManager.getThreadContext().setSeleniumRobotServerActive(true);
+		Assert.assertTrue(SeleniumTestsContextManager.getThreadContext().getSeleniumRobotServerActive());
+	}
+	@Test(groups="ut context")
+	public void testSeleniumRobotServerActiveNull(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setSeleniumRobotServerActive(null);
+		Assert.assertFalse(SeleniumTestsContextManager.getThreadContext().getSeleniumRobotServerActive());
+	}
+	
+	@Test(groups="ut context")
+	public void testSeleniumRobotServerUrl(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setSeleniumRobotServerUrl("http://localhost:8000");
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getSeleniumRobotServerUrl(), "http://localhost:8000");
+	}
+	@Test(groups="ut context")
+	public void testSeleniumRobotServerUrlNull(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setSeleniumRobotServerUrl(null);
+		Assert.assertNull(SeleniumTestsContextManager.getThreadContext().getSeleniumRobotServerUrl());
+	}
+	
+	@Test(groups="ut context")
+	public void testCompareSnapshot(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setSeleniumRobotServerCompareSnapshot(true);
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getSeleniumRobotServerCompareSnapshot(), true);
+	}
+	@Test(groups="ut context")
+	public void testCompareSnapshotNull(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setSeleniumRobotServerCompareSnapshot(null);
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getSeleniumRobotServerCompareSnapshot(), false);
+	}
+	
+	@Test(groups="ut context")
+	public void testRecordResults(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setSeleniumRobotServerRecordResults(true);
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getSeleniumRobotServerRecordResults(), true);
+	}
+	@Test(groups="ut context")
+	public void testRecordResultsNull(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setSeleniumRobotServerRecordResults(null);
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getSeleniumRobotServerRecordResults(), false);
 	}
 	
 	@Test(groups="ut context")

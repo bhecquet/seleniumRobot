@@ -17,9 +17,7 @@ import com.seleniumtests.util.logging.SeleniumRobotLogger;
 public abstract class SeleniumRobotServerConnector {
 	
 	protected static final Logger logger = SeleniumRobotLogger.getLogger(SeleniumRobotServerConnector.class);
-	public static final String SELENIUMROBOTSERVER_URL = "selenium.robot.server.url";
-	public static final String SELENIUMROBOTSERVER_ACTIVE = "selenium.robot.server.active";
-	
+
 	// api to get items from name
 	public static final String NAMED_VERSION_API_URL = "/commons/api/gversion/";
 	public static final String NAMED_APPLICATION_API_URL = "/commons/api/gapplication/";
@@ -56,14 +54,11 @@ public abstract class SeleniumRobotServerConnector {
 	}
 	
 	protected boolean isActive() {
-		if (SeleniumTestsContextManager.getThreadContext().getConfiguration().containsKey(SELENIUMROBOTSERVER_URL)) {
-			url = SeleniumTestsContextManager.getThreadContext().getConfiguration().get(SELENIUMROBOTSERVER_URL);
-			return true;
-		} else if (System.getenv(SELENIUMROBOTSERVER_URL) != null) {
-			url = System.getenv(SELENIUMROBOTSERVER_URL);
+		if (SeleniumTestsContextManager.getThreadContext().getSeleniumRobotServerActive()) {
+			url = SeleniumTestsContextManager.getThreadContext().getSeleniumRobotServerUrl();
 			return true;
 		} else {
-			logger.warn(String.format("selenium server won't be used, key %s is not available in configuration or in environment variable. It must be the root URL of server 'http://<host>:<port>'", SELENIUMROBOTSERVER_URL));
+			logger.warn("selenium server won't be used, key 'seleniumrobotServerActive' is not available in testng configuration or in environment variable.");
 			return false;
 		} 
 	}
@@ -167,6 +162,10 @@ public abstract class SeleniumRobotServerConnector {
 		}
 	}
 
+	/**
+	 * create version
+	 * If version name already exists on server, it's id will be returned. Else, a new one will be created
+	 */
 	public void createVersion() {
 		if (!active) {
 			return;

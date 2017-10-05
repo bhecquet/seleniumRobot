@@ -72,7 +72,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 					.field("browser", browser.getBrowserType())
 					.field("environment", SeleniumTestsContextManager.getThreadContext().getTestEnv())
 					.field("version", versionId)
-					.field("compareSnapshot", SeleniumTestsContextManager.getThreadContext().getCompareSnapshot()));
+					.field("compareSnapshot", SeleniumTestsContextManager.getThreadContext().getSeleniumRobotServerCompareSnapshot()));
 			sessionId = sessionJson.getInt("id");
 		} catch (UnirestException | JSONException e) {
 			throw new SeleniumRobotServerException("cannot create session", e);
