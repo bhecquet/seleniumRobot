@@ -13,7 +13,7 @@ import com.seleniumtests.customexception.SeleniumRobotServerException;
 
 public class SeleniumRobotVariableServerConnector extends SeleniumRobotServerConnector {
 	
-	public static final String VARIABLE_API_URL = "/variable/api/version/";
+	public static final String VARIABLE_API_URL = "/variable/api/variable/";
 
 		
 	public SeleniumRobotVariableServerConnector(String testName) {
