@@ -83,7 +83,13 @@ public class SeleniumTestsContext {
     public static final String USER_AGENT = "userAgent";						// user agent utilisé pour les tests. Permet d'écraser le user-agent par défaut du navigateur, sur firefox et chrome uniquement
 
     public static final String VIEWPORT_WIDTH = "viewPortWidth";					// width of viewport	
-    public static final String VIEWPORT_HEIGHT = "viewPortHeight";					// height of viewport	
+    public static final String VIEWPORT_HEIGHT = "viewPortHeight";					// height of viewport
+    
+    // selenium robot server parameters
+    public static final String SELENIUMROBOTSERVER_URL = "seleniumRobotServerUrl";
+    public static final String SELENIUMROBOTSERVER_ACTIVE = "seleniumRobotServerActive";
+    public static final String SELENIUMROBOTSERVER_COMPARE_SNAPSHOT = "seleniumRobotServerCompareSnapshots";			// whether we should use the snapshots created by robot to compare them to a previous execution. This option only operates when SeleniumRobot server is connected
+    public static final String SELENIUMROBOTSERVER_RECORD_RESULTS = "seleniumRobotServerRecordResults";			// whether we should record test results to server. This option only operates when SeleniumRobot server is connected
     
     public static final String SET_ASSUME_UNTRUSTED_CERTIFICATE_ISSUER = "setAssumeUntrustedCertificateIssuer"; // Firefox uniquement pour qu'il ne prenne pas en compte les certificats invalides 
     public static final String SET_ACCEPT_UNTRUSTED_CERTIFICATES = "setAcceptUntrustedCertificates"; // Firefox uniquement pour qu'il ne prenne pas en compte les certificats invalides
@@ -94,7 +100,6 @@ public class SeleniumTestsContext {
 
     public static final String SNAPSHOT_TOP_CROPPING = "snapshotTopCropping";
     public static final String SNAPSHOT_BOTTOM_CROPPING = "snapshotBottomCropping";
-    public static final String COMPARE_SNAPSHOT = "compareSnapshots";			// whether we should use the snapshots created by robot to compare them to a previous execution. This option only operates when SeleniumRobot server is connected
     
     public static final String WEB_PROXY_TYPE = "proxyType";					// type de proxy. AUTO, MANUAL, NO
     public static final String WEB_PROXY_ADDRESS = "proxyAddress";				// adresse du proxy. 
@@ -205,10 +210,14 @@ public class SeleniumTestsContext {
         setWebProxyPort(getIntValueForTest(WEB_PROXY_PORT, System.getProperty(WEB_PROXY_PORT)));
         setWebProxyExclude(getValueForTest(WEB_PROXY_EXCLUDE, System.getProperty(WEB_PROXY_EXCLUDE)));
         setWebProxyPac(getValueForTest(WEB_PROXY_PAC, System.getProperty(WEB_PROXY_PAC)));
+        
+        setSeleniumRobotServerUrl(getValueForTest(SELENIUMROBOTSERVER_URL, System.getProperty(SELENIUMROBOTSERVER_URL)));
+        setSeleniumRobotServerActive(getBoolValueForTest(SELENIUMROBOTSERVER_ACTIVE, System.getProperty(SELENIUMROBOTSERVER_ACTIVE)));
+        setSeleniumRobotServerCompareSnapshot(getBoolValueForTest(SELENIUMROBOTSERVER_COMPARE_SNAPSHOT, System.getProperty(SELENIUMROBOTSERVER_COMPARE_SNAPSHOT)));
+        setSeleniumRobotServerRecordResults(getBoolValueForTest(SELENIUMROBOTSERVER_RECORD_RESULTS, System.getProperty(SELENIUMROBOTSERVER_RECORD_RESULTS)));
 
         setSnapshotBottomCropping(getIntValueForTest(SNAPSHOT_BOTTOM_CROPPING, System.getProperty(SNAPSHOT_BOTTOM_CROPPING)));
         setSnapshotTopCropping(getIntValueForTest(SNAPSHOT_TOP_CROPPING, System.getProperty(SNAPSHOT_TOP_CROPPING)));
-        setCompareSnapshot(getBoolValueForTest(COMPARE_SNAPSHOT, System.getProperty(COMPARE_SNAPSHOT)));
         setCaptureSnapshot(getBoolValueForTest(CAPTURE_SNAPSHOT, System.getProperty(CAPTURE_SNAPSHOT)));
         setEnableExceptionListener(getBoolValueForTest(ENABLE_EXCEPTION_LISTENER, System.getProperty(ENABLE_EXCEPTION_LISTENER)));
 
@@ -447,10 +456,7 @@ public class SeleniumTestsContext {
 
         return (Boolean) getAttribute(CAPTURE_SNAPSHOT);
     }
-    
-    public boolean getCompareSnapshot() {
-    	return (Boolean) getAttribute(COMPARE_SNAPSHOT);
-    }
+ 
 
     public boolean getEnableExceptionListener() {
         return (Boolean) getAttribute(ENABLE_EXCEPTION_LISTENER);
@@ -509,6 +515,22 @@ public class SeleniumTestsContext {
 
     public String getIEDriverPath() {
         return (String) getAttribute(IE_DRIVER_PATH);
+    }
+    
+    public String getSeleniumRobotServerUrl() {
+    	return (String) getAttribute(SELENIUMROBOTSERVER_URL);
+    }
+    
+    public Boolean getSeleniumRobotServerActive() {
+    	return (Boolean) getAttribute(SELENIUMROBOTSERVER_ACTIVE);
+    }
+    
+    public boolean getSeleniumRobotServerCompareSnapshot() {
+    	return (Boolean) getAttribute(SELENIUMROBOTSERVER_COMPARE_SNAPSHOT);
+    }
+    
+    public boolean getSeleniumRobotServerRecordResults() {
+    	return (Boolean) getAttribute(SELENIUMROBOTSERVER_RECORD_RESULTS);
     }
 
     public int getImplicitWaitTimeout() {
@@ -827,7 +849,7 @@ public class SeleniumTestsContext {
             for (Entry<String, String> entry : testParameters.entrySet()) {
                 String attributeName = entry.getKey();
 
-                
+                // contextDataMap already contains all technical parameters
                 if (!contextDataMap.containsKey(entry.getKey())) {
                     String sysPropertyValue = System.getProperty(entry.getKey());
                     String suiteValue = entry.getValue();
@@ -942,6 +964,44 @@ public class SeleniumTestsContext {
     		setAttribute(REPLAY_TIME_OUT, timeout);
     	} else {
     		setAttribute(REPLAY_TIME_OUT, REPLAY_TIME_OUT_VALUE);
+    	}
+    }
+    
+    public void setSeleniumRobotServerUrl(String url) {
+    	if (url != null) {
+    		setAttribute(SELENIUMROBOTSERVER_URL, url);
+    	} else if (System.getenv(SELENIUMROBOTSERVER_URL) != null) {
+    		setAttribute(SELENIUMROBOTSERVER_URL, System.getenv(SELENIUMROBOTSERVER_URL));
+    	} else {
+    		setAttribute(SELENIUMROBOTSERVER_URL, null);
+    	}
+    }
+    
+    public void setSeleniumRobotServerActive(Boolean active) {
+    	if (active != null) {
+    		setAttribute(SELENIUMROBOTSERVER_ACTIVE, active);
+    	} else {
+    		setAttribute(SELENIUMROBOTSERVER_ACTIVE, false);
+    	}
+    	
+    	if (getSeleniumRobotServerUrl() == null && getSeleniumRobotServerActive()) {
+    		throw new ConfigurationException("SeleniumRobot server is requested but URL is not found, either in parameters, command line or through environment variable");
+    	}
+    }
+    
+    public void setSeleniumRobotServerCompareSnapshot(Boolean capture) {
+    	if (capture != null) {
+    		setAttribute(SELENIUMROBOTSERVER_COMPARE_SNAPSHOT, capture);
+    	} else {
+    		setAttribute(SELENIUMROBOTSERVER_COMPARE_SNAPSHOT, false);
+    	}
+    }
+    
+    public void setSeleniumRobotServerRecordResults(Boolean record) {
+    	if (record != null) {
+    		setAttribute(SELENIUMROBOTSERVER_RECORD_RESULTS, record);
+    	} else {
+    		setAttribute(SELENIUMROBOTSERVER_RECORD_RESULTS, false);
     	}
     }
     
@@ -1145,14 +1205,6 @@ public class SeleniumTestsContext {
     		setAttribute(CAPTURE_SNAPSHOT, capture);
     	} else {
     		setAttribute(CAPTURE_SNAPSHOT, true);
-    	}
-    }
-    
-    public void setCompareSnapshot(Boolean capture) {
-    	if (capture != null) {
-    		setAttribute(COMPARE_SNAPSHOT, capture);
-    	} else {
-    		setAttribute(COMPARE_SNAPSHOT, false);
     	}
     }
     
@@ -1376,21 +1428,17 @@ public class SeleniumTestsContext {
     
     private void updateTestConfigurationFromVariableServer() {
     	// in case we find the url of variable server and it's marked as active, use it
-		if (getConfiguration().get(SeleniumRobotVariableServerConnector.SELENIUMROBOTSERVER_ACTIVE) == "true" && getConfiguration().containsKey(SeleniumRobotVariableServerConnector.SELENIUMROBOTSERVER_URL)) {
+		if (getSeleniumRobotServerActive() && getSeleniumRobotServerUrl() != null) {
 			logger.info(String.format("%s key found, and set to true, trying to get variable from variable server %s", 
-						SeleniumRobotVariableServerConnector.SELENIUMROBOTSERVER_ACTIVE, 
-						SeleniumRobotVariableServerConnector.SELENIUMROBOTSERVER_URL));
+						SELENIUMROBOTSERVER_ACTIVE, 
+						SELENIUMROBOTSERVER_URL));
 			SeleniumRobotVariableServerConnector variableServer = new SeleniumRobotVariableServerConnector("");
 			
 			if (!variableServer.isAlive()) {
-				throw new ConfigurationException(String.format("Variable server %s could not be contacted", 
-						SeleniumRobotVariableServerConnector.SELENIUMROBOTSERVER_ACTIVE, 
-						SeleniumRobotVariableServerConnector.SELENIUMROBOTSERVER_URL));
+				throw new ConfigurationException(String.format("Variable server %s could not be contacted", SELENIUMROBOTSERVER_URL));
 			}
 		} else {
-			logger.info(String.format("%s key not found or set to false, or url key %s has not been set", 
-						SeleniumRobotVariableServerConnector.SELENIUMROBOTSERVER_ACTIVE, 
-						SeleniumRobotVariableServerConnector.SELENIUMROBOTSERVER_URL));
+			logger.info(String.format("%s key not found or set to false, or url key %s has not been set", SELENIUMROBOTSERVER_ACTIVE, SELENIUMROBOTSERVER_URL));
 		}
     }
     

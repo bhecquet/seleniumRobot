@@ -22,7 +22,10 @@ public class SeleniumRobotVariableServerConnector extends SeleniumRobotServerCon
 			return;
 		}
 		active = isAlive();
-		getInfoFromServer(testName);
+		
+		if (active) {
+			getInfoFromServer(testName);
+		}
 	}
 	
 	@Override
