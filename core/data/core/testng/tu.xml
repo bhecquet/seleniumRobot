@@ -26,20 +26,41 @@
         </packages>
     </test>
     
-    <test name="Reporting Unit tests" parallel="false">
+    <!-- <test name="Unit tests unique" parallel="false">
     	<parameter name="EXCLUDE_FROM_SQUASH_TA" value="" />
     	<parameter name="variable1" value="value2" />
         
         <groups>
             <run>
                 <include name="ut"/>
+                <include name="squash"/>
             </run>
         </groups>
+        
+        <classes>
+        	<class name="com.seleniumtests.ut.browserfactory.mobile.TestAdbWrapper"></class>
+        	<class name="com.seleniumtests.ut.core.TestSeleniumTestContextManager"></class>
+        	<class name="com.seleniumtests.ut.uipage.TestWebElement"></class>
+        	<class name="com.seleniumtests.ut.util.imaging.TestImageDetector"></class>
+        	<class name="com.seleniumtests.ut.browserfactory.mobile.TestInstrumentsWrapper"></class>
+        	<class name="com.seleniumtests.ut.driver.TestDriverExtractor"></class>
+        	<class name="com.seleniumtests.ut.util.helper.testSpreadSheetHelper"></class>
+        	<class name="com.seleniumtests.ut.util.imaging.TestImageProcessor"></class>
+        	<class name="com.seleniumtests.ut.browserfactory.mobile.TestLocalAppiumLauncher"></class>
+        	<class name="com.seleniumtests.ut.reporter.TestCustomAssertion"></class>
+        	
+        </classes>
 
         <packages>
-            <package name="com.seleniumtests.it.reporter.*" />
+            <package name="com.seleniumtests.ut.core.*" />
+            <package name="com.seleniumtests.ut.driver.*" />
+            <package name="com.seleniumtests.ut.util.*" />
+            <package name="com.seleniumtests.ut.reporter.*" />
+            <package name="com.seleniumtests.ut.browserfactory.*" />
+            <package name="com.seleniumtests.ut.connectors.*" />
+            <package name="com.seleniumtests.ut.uipage.*" />
         </packages>
-    </test>
+    </test>-->
     
     <test name="Unit tests with context" parallel="false">
     	<parameter name="variable1" value="value1" />
