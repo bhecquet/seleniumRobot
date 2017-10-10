@@ -49,15 +49,16 @@ public class DriverExtractor {
 	private String os;
 	
 	public DriverExtractor() {
-		rootPath = SeleniumTestsContextManager.getRootPath();
-		os = OSUtility.getCurrentPlatorm().toString().toLowerCase();
-		if (os.equals("linux")) {
-			os = "unix";
-		}
+		this(SeleniumTestsContextManager.getRootPath());
 	}
 	
 	public DriverExtractor(String rootPath) {
 		this.rootPath = rootPath;
+		
+		os = OSUtility.getCurrentPlatorm().toString().toLowerCase();
+		if (os.equals("linux")) {
+			os = "unix";
+		}
 	}
 	
 	private String getDriverVersion(String driverName) {

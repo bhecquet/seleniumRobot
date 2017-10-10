@@ -1428,7 +1428,7 @@ public class SeleniumTestsContext {
     
     private void updateTestConfigurationFromVariableServer() {
     	// in case we find the url of variable server and it's marked as active, use it
-		if (getSeleniumRobotServerActive() && getSeleniumRobotServerUrl() != null) {
+		if (getSeleniumRobotServerActive() != null && getSeleniumRobotServerActive() && getSeleniumRobotServerUrl() != null) {
 			logger.info(String.format("%s key found, and set to true, trying to get variable from variable server %s", 
 						SELENIUMROBOTSERVER_ACTIVE, 
 						SELENIUMROBOTSERVER_URL));
@@ -1450,7 +1450,7 @@ public class SeleniumTestsContext {
     	envConfig.putAll(testVariables);
     	setAttribute(TEST_CONFIG, envConfig);
     	
-    	//updateTestConfigurationFromVariableServer();
+    	updateTestConfigurationFromVariableServer();
     }
 	
 	public void checkTmsConfiguration() {
