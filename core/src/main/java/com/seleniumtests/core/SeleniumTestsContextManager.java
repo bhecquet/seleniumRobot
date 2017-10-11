@@ -134,7 +134,7 @@ public class SeleniumTestsContextManager {
 		if (System.getProperty(SeleniumTestsContext.RUN_MODE) != null) {
 			runMode = System.getProperty(SeleniumTestsContext.RUN_MODE);
 		} else if (iTestContext.getSuite().getParameter(SeleniumTestsContext.RUN_MODE) != null) {
-			runMode = iTestContext.getSuite().getParameter(SeleniumTestsContext.TEST_CONFIGURATION);
+			runMode = iTestContext.getSuite().getParameter(SeleniumTestsContext.RUN_MODE);
 		} else {
 			runMode = "LOCAL";
 		}

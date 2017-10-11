@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -73,19 +74,38 @@ public class ConfigReader {
 	}
 	
 	/**
-	 * read configuration from default config file
+	 * read configuration from default config file (env.ini or config.ini)
+	 * read any other provided configuration files (through loadIni parameter)
 	 * @return
 	 */
 	public Map<String, String> readConfig() {
+		Map<String, String> variables = new HashMap<>();
 		try (InputStream iniFileStream = FileUtils.openInputStream(getConfigFile());){
-			return readConfig(iniFileStream, SeleniumTestsContextManager.getThreadContext().getTestEnv());
+			variables.putAll(readConfig(iniFileStream, SeleniumTestsContextManager.getThreadContext().getTestEnv()));
 		} catch (NullPointerException e) {
 			logger.warn("config file is null, check config path has been set using 'SeleniumTestsContextManager.generateApplicationPath()'");
-			return new HashMap<>();
+			return variables;
 		} catch (IOException e1) {
 			logger.warn("no valid config.ini file for this application");
-			return new HashMap<>();
+			return variables;
 		}
+		
+		// read additional files
+		if (SeleniumTestsContextManager.getThreadContext().getLoadIni() != null) {
+			for (String fileName: SeleniumTestsContextManager.getThreadContext().getLoadIni().split(",")) {
+				fileName = fileName.trim();
+				File currentConfFile = Paths.get(SeleniumTestsContextManager.getConfigPath(), fileName).toFile();
+				logger.info("reading file " + currentConfFile.getAbsolutePath());
+				
+				try (InputStream iniFileStream = FileUtils.openInputStream(currentConfFile);) {
+					variables.putAll(readConfig(iniFileStream, SeleniumTestsContextManager.getThreadContext().getTestEnv()));
+				} catch (IOException e) {
+					throw new ConfigurationException(String.format("File %s does not exist in data/<app>/config folder", fileName));
+				}
+			}
+		}
+		
+		return variables;
 	}
 	
 	public Map<String, String> readConfig(InputStream iniFileStream, String environment) {
@@ -112,7 +132,7 @@ public class ConfigReader {
 			return testConfig;
 			
 		} catch (InvalidFileFormatException e) {
-			throw new ConfigurationException("Invalid file: " + iniFileStream);
+			throw new ConfigurationException("Invalid ini/properties file: " + iniFileStream);
 		} catch (IOException e) {
 			throw new ConfigurationException(String.format("File does not exist %s: %s", iniFileStream, e.getMessage()));
 		}
