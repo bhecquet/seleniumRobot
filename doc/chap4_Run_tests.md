@@ -62,7 +62,7 @@ In this case, this user passed value will overwrite test or suite parameters
 | seleniumRobotServerCompareSnapshots	| false		| whether we should use the snapshots created by robot to compare them to a previous execution. This option only operates when SeleniumRobot server is connected. See chap6 documentation for details on connecting to server |
 | seleniumRobotServerRecordResults		| false		| whether we should record test results to seleniumrobot server. This option only operates when SeleniumRobot server is connected. See chap6 documentation for details on connecting to server |
 | softAssertEnabled 		| true		| Test does not stop is an assertion fails. Only valid when using assertions defined in `CustomAssertion` class or assert methods in `BasePage` class | 
-| outputDirectory 			| <exec folder>	| folder where HTML report will be written | 
+| outputDirectory 			| <exec folder>	| folder where HTML report will be written. By default, it's 'test-output' subfolder. If you want to write test in an other directory, use `test-output/myResult` to write them relative to SeleniumRobot root. An absolute path may also be specified. This will allow to execute several tests in parallel without overwritting existing results | 
 | webDriverListener 		| 			| additional driver listener class |
 | testMethodSignature 		|  			| define a specific method signature for hashcodes |
 | pluginConfigPath 			|  			| plugins to add |

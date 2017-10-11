@@ -17,12 +17,20 @@
 package com.seleniumtests.util.logging;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -34,6 +42,7 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
 
+import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.util.helper.WaitHelper;
 
 public class SeleniumRobotLogger {
@@ -83,13 +92,7 @@ public class SeleniumRobotLogger {
 			FileAppender fileAppender = new FileAppender();
 			
 			// clean output dir
-	    	try {
-				FileUtils.deleteDirectory(new File(outputDir));
-				new File(outputDir).mkdirs();
-				WaitHelper.waitForSeconds(1);
-			} catch (IOException e) {
-				// do nothing
-			}
+			cleanResults(outputDir);
 			
 			for (int i=0; i < 4; i++) {
 				try {
@@ -109,6 +112,33 @@ public class SeleniumRobotLogger {
 			}
 	        rootLogger.addAppender(fileAppender);
 		}
+	}
+	
+	/**
+	 * Clean result directories
+	 * Delete the directory that will be used to write these test results
+	 * Delete also directories in "test-output" which are older than 300 minutes so that results written to the other directories are cleaned
+	 */
+	private static void cleanResults(String outputDir) {
+		// clean output dir
+    	try {
+			FileUtils.deleteDirectory(new File(outputDir));
+			new File(outputDir).mkdirs();
+			WaitHelper.waitForSeconds(1);
+		} catch (IOException e) {
+			// do nothing
+		}
+    	
+    	for (File directory: new File(SeleniumTestsContextManager.getThreadContext().getDefaultOutputDirectory()).listFiles(file -> file.isDirectory())) {
+    		try {
+				if (Files.readAttributes(directory.toPath(), BasicFileAttributes.class).lastAccessTime().toInstant().atZone(ZoneOffset.UTC).toLocalTime()
+						.isBefore(ZonedDateTime.now().minusMinutes(300).withZoneSameInstant(ZoneOffset.UTC).toLocalTime())) {
+					FileUtils.deleteDirectory(directory);
+				}
+			} catch (IOException e) {
+			}
+    	
+    	}
 	}
 
 

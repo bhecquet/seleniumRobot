@@ -120,6 +120,7 @@ public class SeleniumTestsContext {
     public static final String SOFT_ASSERT_ENABLED = "softAssertEnabled";		// le test ne s'arrête pas lorsqu'une assertion est rencontrée
 
     public static final String OUTPUT_DIRECTORY = "outputDirectory";     		// folder where HTML report will be written
+    public static final String DEFAULT_OUTPUT_DIRECTORY = "defaultOutputDirectory";    // folder where TestNG would write it's results if not overwritten
     public static final String WEB_DRIVER_LISTENER = "webDriverListener";
 
     public static final String TEST_METHOD_SIGNATURE = "testMethodSignature";
@@ -572,6 +573,10 @@ public class SeleniumTestsContext {
 
     public String getOutputDirectory() {
         return (String) getAttribute(OUTPUT_DIRECTORY);
+    }
+    
+    public String getDefaultOutputDirectory() {
+    	return (String) getAttribute(DEFAULT_OUTPUT_DIRECTORY);
     }
 
     public int getPageLoadTimeout() {
@@ -1317,6 +1322,7 @@ public class SeleniumTestsContext {
     }
     
     public void setOutputDirectory(String outputDir, ITestContext context) {
+    	setAttribute(DEFAULT_OUTPUT_DIRECTORY, new File(context.getOutputDirectory()).getParent());
     	if (outputDir == null) {
     		setAttribute(OUTPUT_DIRECTORY, new File(context.getOutputDirectory()).getParent());
     	} else {
