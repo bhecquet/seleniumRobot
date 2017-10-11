@@ -87,7 +87,6 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		reporter = spy(new SeleniumTestsReporter2());
 
 		executeSubTest(new String[] {"com.seleniumtests.it.reporter.StubTestClass"});
-		FileUtils.copyDirectory(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()), new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory() + "-testReportSummaryContentWithSteps"));
 		
 		// check content of summary report file
 		String mainReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport.html"));
@@ -116,7 +115,6 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	public void testReportSummaryContentWithDependantTests(ITestContext testContext) throws Exception {
 	
 		executeSubTest(new String[] {"com.seleniumtests.it.reporter.StubTestClass2"});
-		FileUtils.copyDirectory(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()), new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory() + "-testReportSummaryContentWithDependantTests"));
 		
 		// check content of summary report file
 		String mainReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport.html"));
@@ -142,7 +140,6 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		reporter = spy(new SeleniumTestsReporter2());
 
 		executeSubTest(new String[] {"com.seleniumtests.it.reporter.StubTestClass"});
-		FileUtils.copyDirectory(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()), new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory() + "-testReportDetailsMessageStyles"));
 		
 		// check style of messages
 		String detailedReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport-2.html"));
@@ -168,7 +165,6 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		reporter = spy(new SeleniumTestsReporter2());
 		
 		executeSubTest(new String[] {"com.seleniumtests.it.reporter.StubTestClass"});
-		FileUtils.copyDirectory(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()), new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory() + "-testReportDetailsWithSubSteps"));
 		
 		// check content of summary report file
 		String detailedReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport-1.html"));
@@ -200,7 +196,6 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		reporter = new SeleniumTestsReporter2();
 		
 		executeSubTest(new String[] {"com.seleniumtests.it.reporter.StubTestClass"});
-		FileUtils.copyDirectory(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()), new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory() + "-testReportDetailsWithLogs"));
 		
 		// check content of detailed report file
 		String detailedReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport-1.html"));
@@ -223,7 +218,6 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		reporter = new SeleniumTestsReporter2();
 		
 		executeSubTest(new String[] {"com.seleniumtests.it.reporter.StubTestClass"});
-		FileUtils.copyDirectory(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()), new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory() + "-testReportDetailsSteps"));
 		
 		String detailedReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport-1.html"));
 		detailedReportContent = detailedReportContent.replace("\n", "").replace("\r",  "").replaceAll(">\\s+<", "><");
@@ -250,7 +244,6 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		reporter = new SeleniumTestsReporter2();
 		
 		executeSubTest(new String[] {"com.seleniumtests.it.reporter.StubTestClass"});
-		FileUtils.copyDirectory(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()), new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory() + "-testReportDetailsWithErrors"));
 		
 		String detailedReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport-2.html"));
 		
@@ -281,8 +274,6 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		
 		executeSubCucumberTests("core_3");
 
-		FileUtils.copyDirectory(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()), new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory() + "-testCucumberStart"));
-		
 		String mainReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport.html"));
 		Assert.assertTrue(mainReportContent.contains("<a href='SeleniumTestReport-1.html'>core_3</a>"));
 	
