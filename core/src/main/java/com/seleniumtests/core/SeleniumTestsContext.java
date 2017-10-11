@@ -59,7 +59,9 @@ public class SeleniumTestsContext {
 	private static final Logger logger = SeleniumRobotLogger.getLogger(SeleniumTestsContext.class);
 
     /* configuration defined in testng.xml */
-    public static final String TEST_CONFIGURATION = "testConfig"; 				// parameter name for additional configuration to load 
+    public static final String TEST_CONFIGURATION = "testConfig"; 				// parameter name for additional configuration to load (should only be used in XML)
+    public static final String LOAD_INI = "loadIni";							// comma separated list of files to load. They are searched in data/<app>/config folder. They will append to env.ini file with variable overwriting. Last file will overwrite previous ones
+    
     public static final String DEVICE_LIST = "deviceList"; 						// List of known devices in json format (internal use only)
     public static final String WEB_SESSION_TIME_OUT = "webSessionTimeOut";		// timeout de la session du navigateur
     public static final String IMPLICIT_WAIT_TIME_OUT = "implicitWaitTimeOut";	// attente implicite du navigateur
@@ -176,6 +178,7 @@ public class SeleniumTestsContext {
         this.testNGContext = context;
 
         setTestDataFile(getValueForTest(TEST_DATA_FILE, System.getProperty(TEST_DATA_FILE)));
+        setLoadIni(getValueForTest(LOAD_INI, System.getProperty(LOAD_INI)));
         setWebSessionTimeout(getIntValueForTest(WEB_SESSION_TIME_OUT, System.getProperty(WEB_SESSION_TIME_OUT)));
         setImplicitWaitTimeout(getIntValueForTest(IMPLICIT_WAIT_TIME_OUT, System.getProperty(IMPLICIT_WAIT_TIME_OUT)));
         setExplicitWaitTimeout(getIntValueForTest(EXPLICIT_WAIT_TIME_OUT, System.getProperty(EXPLICIT_WAIT_TIME_OUT)));
@@ -577,6 +580,10 @@ public class SeleniumTestsContext {
     
     public String getDefaultOutputDirectory() {
     	return (String) getAttribute(DEFAULT_OUTPUT_DIRECTORY);
+    }
+    
+    public String getLoadIni() {
+        return (String) getAttribute(LOAD_INI);
     }
 
     public int getPageLoadTimeout() {
@@ -1294,7 +1301,10 @@ public class SeleniumTestsContext {
     	} else {
     		setAttribute(TEST_ENV, "DEV");
     	}
-    	
+    }
+    
+    public void setLoadIni(String iniFiles) {
+    	setAttribute(LOAD_INI, iniFiles);
     }
 
     public void setAppPackage(String pkg) {
