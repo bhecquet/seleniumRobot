@@ -12,6 +12,7 @@
 			<directory>.</directory>
 			<excludes>
 				<exclude>**/classes/**</exclude>
+				<exclude>**/antrun/**</exclude>
 				<exclude>**/apidocs/**</exclude>
 				<exclude>**/site/**</exclude>
 				<exclude>**/coverage-reports/**</exclude>
