@@ -27,6 +27,7 @@ import org.openqa.selenium.Proxy.ProxyType;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.events.WebDriverEventListener;
 
+import com.google.gson.JsonObject;
 import com.seleniumtests.core.proxy.ProxyConfig;
 import com.seleniumtests.customexception.DriverExceptions;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
@@ -208,6 +209,33 @@ public class DriverConfig {
     public Platform getWebPlatform() {
         return webPlatform;
     }
+    
+    public JsonObject getJsonProxy() {
+    	JsonObject json = new JsonObject();
+		json.addProperty("proxyType", proxyConfig.getType().toString());
+		
+		if (proxyConfig.getType() == ProxyType.PAC) {
+			json.addProperty("proxyAutoconfigUrl", proxyConfig.getPac());
+			
+		// manual proxy configuration
+		} else if (proxyConfig.getType() == ProxyType.MANUAL) {
+			json.addProperty("httpProxy", proxyConfig.getAddress());
+			json.addProperty("httpProxyPort", proxyConfig.getPort());
+			json.addProperty("sslProxy", proxyConfig.getAddress());
+			json.addProperty("sslProxyPort", proxyConfig.getPort());
+			
+			if (proxyConfig.getLogin() != null && proxyConfig.getPassword() != null) {
+				json.addProperty("socksUsername", proxyConfig.getLogin());
+				json.addProperty("socksPassword", proxyConfig.getPassword());
+			}
+			
+			if (proxyConfig.getExclude() != null) {
+				json.addProperty("noProxy", proxyConfig.getExclude().replace(";", ","));
+			}
+		}
+		
+		return json;
+    }
 
     public Proxy getProxy() {
     	Proxy proxy = new Proxy();
@@ -230,7 +258,8 @@ public class DriverConfig {
 			if (proxyConfig.getExclude() != null) {
 				proxy.setNoProxy(proxyConfig.getExclude().replace(";", ","));
 			}
-		} 
+		} 	
+		
 		return proxy;
     }
 
