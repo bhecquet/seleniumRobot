@@ -1,7 +1,7 @@
 ### 1 Development environment ###
 
 #### eclipse ####
-SeleniumRobot is developped using eclipse IDE. Following plugins are mandatory:
+SeleniumRobot is developed using eclipse IDE. Following plugins are mandatory:
 
 - aspectj plugin (AJDT): use the dev version are older versions are not compatible with recent eclipse versions
 - m2e plugin (maven)
@@ -13,6 +13,35 @@ SeleniumRobot needs Java 8 to be compiled.
 It has also been tested with IntelliJ, however this requires the AspectJ compiler plugin which is not available in community version. A solution may be to compile seleniumRobot using maven.
 
 Sometimes, eclipse does not get the same environment variables than the system. This can block mobile testing when it search for `node` installed on system. Simply add the path to node installation to `PATH` environment variable (e.g: `$PATH:/usr/local/bin`)
+
+#### intelliJ ####
+IntelliJ Ultimate can be used to develop test applications (or seleniumrobot project itself) but requires some configuration to activate AspectJ
+
+##### AspectJ activation #####
+This step must be done only once to make IntelliJ work with aspectJ
+- follow this guide to configure AspectJ for IntelliJ: [https://www.jetbrains.com/help/idea/aspectj.html] (https://www.jetbrains.com/help/idea/aspectj.html)
+- File -> Settings -> Plugins: add aspectJ plugins (search aspectJ in search box and tick all)
+
+##### Project configuration #####
+- Import the project
+- By default, project is not seen as a maven one, so, right click on project -> add framework -> select maven
+- File -> Settings -> Build -> Compiler -> Java Compiler: <br/>
+	- select Ajc compiler<br/>
+	- configure path to aspectj compiler (should be available if aspectJ activation has been done correctly)
+	- choose the correct project bytecode version<br/>
+	- choose the correct per module bytecode version<br/>
+	- select "delegate to javac"<br/>
+- File -> Settings -> Build -> Required plugins: add "AspectJ support"
+- File -> Project Structure -> Project: select the right SDK version and language level
+- File -> Project Structure -> Modules: for the existing module<br/>
+	- source tab: select the right language level<br/>
+	- dependencies tab: remove eclipse specific dependencies (if project was previously imported from eclipse)<br/>
+- File -> Project Structure -> Facects: 
+	- add aspectj for the current module <br/>
+	- tick "post-compile weave mode"<br/>
+	- add seleniumRobot:core dependency in aspect path (in case of a test application. If developing core, aspect path are selenium-api and remode-remote-driver)<br/>
+	
+
 
 #### Sign artifact for deploy phase ####
 OSS needs artifacts to be signed before being deployed
