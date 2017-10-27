@@ -23,13 +23,13 @@ This step must be done only once to make IntelliJ work with aspectJ
 - File -> Settings -> Plugins: add aspectJ plugins (search aspectJ in search box and tick all)
 
 ##### Project configuration #####
-- Import the project
-- By default, project is not seen as a maven one, so, right click on project -> add framework -> select maven
+- Import the project (from eclipse or from maven)
+- By default, project is not seen as a maven one if imported from eclipse, so, right click on project -> add framework -> select maven
 - File -> Settings -> Build -> Compiler -> Java Compiler: <br/>
 	- select Ajc compiler<br/>
-	- configure path to aspectj compiler (should be available if aspectJ activation has been done correctly)
+	- configure path to aspectj compiler (aspectjtools.jar should be available somewhere if aspectJ activation has been done correctly)
 	- choose the correct project bytecode version<br/>
-	- choose the correct per module bytecode version<br/>
+	- add module and choose the correct per module bytecode version<br/>
 	- select "delegate to javac"<br/>
 - File -> Settings -> Build -> Required plugins: add "AspectJ support"
 - File -> Project Structure -> Project: select the right SDK version and language level

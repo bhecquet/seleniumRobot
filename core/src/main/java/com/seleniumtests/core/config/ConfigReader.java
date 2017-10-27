@@ -132,7 +132,7 @@ public class ConfigReader {
 			return testConfig;
 			
 		} catch (InvalidFileFormatException e) {
-			throw new ConfigurationException("Invalid ini/properties file: " + iniFileStream);
+			throw new ConfigurationException("Invalid ini/properties file: " + iniFileStream + ", check there is no BOM for encoding");
 		} catch (IOException e) {
 			throw new ConfigurationException(String.format("File does not exist %s: %s", iniFileStream, e.getMessage()));
 		}
