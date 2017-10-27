@@ -126,7 +126,8 @@ public class SeleniumRobotRunner {
         start = new Date();
         SeleniumTestsContextManager.initGlobalContext(testContext);
         SeleniumTestsContextManager.initThreadContext(testContext);
-        SeleniumRobotLogger.updateLogger(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory());
+        SeleniumRobotLogger.updateLogger(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(),
+        								SeleniumTestsContextManager.getGlobalContext().getDefaultOutputDirectory());
     }
     
     @AfterSuite(alwaysRun = true)

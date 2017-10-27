@@ -30,9 +30,7 @@ import org.testng.ISuiteResult;
 import org.testng.ITestNGListener;
 import org.testng.ITestNGMethod;
 import org.testng.SuiteRunState;
-
 import org.testng.internal.annotations.IAnnotationFinder;
-
 import org.testng.xml.XmlSuite;
 
 import com.google.inject.Injector;

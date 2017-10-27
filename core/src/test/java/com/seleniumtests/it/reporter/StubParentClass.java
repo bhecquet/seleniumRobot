@@ -41,6 +41,6 @@ public class StubParentClass extends SeleniumTestPlan {
 
 		SeleniumTestsContextManager.getThreadContext().setSoftAssertEnabled(false);
 		SeleniumTestsContextManager.getGlobalContext().setSoftAssertEnabled(false);
-        SeleniumRobotLogger.updateLogger(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory());
+        SeleniumRobotLogger.updateLogger(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), SeleniumTestsContextManager.getGlobalContext().getDefaultOutputDirectory());
 	}
 }
