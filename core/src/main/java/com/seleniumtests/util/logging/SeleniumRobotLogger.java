@@ -123,11 +123,13 @@ public class SeleniumRobotLogger {
 		// clean output dir
     	try {
 			FileUtils.deleteDirectory(new File(outputDir));
-			new File(outputDir).mkdirs();
 			WaitHelper.waitForSeconds(1);
 		} catch (IOException e) {
 			// do nothing
 		}
+    	
+		new File(outputDir).mkdirs();
+		WaitHelper.waitForSeconds(1);
     	
     	for (File directory: new File(SeleniumTestsContextManager.getThreadContext().getDefaultOutputDirectory()).listFiles(file -> file.isDirectory())) {
     		try {
