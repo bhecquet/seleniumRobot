@@ -4,10 +4,8 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
-import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.uipage.htmlelements.FrameElement;
 import com.seleniumtests.uipage.htmlelements.HtmlElement;
 

@@ -24,7 +24,6 @@ import org.testng.annotations.Test;
 import org.testng.xml.XmlTest;
 
 import com.seleniumtests.GenericTest;
-import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.uipage.Locator;
 import com.seleniumtests.uipage.aspects.InterceptBy;
