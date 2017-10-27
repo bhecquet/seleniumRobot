@@ -45,6 +45,8 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver {
     private Set<String> currentHandles;
     
     private static final String JS_GET_VIEWPORT_SIZE =
+    		"var pixelRatio;" +
+    	    "try{pixelRatio = devicePixelRatio} catch(err){pixelRatio=1}" +
             "var height = 100000;"
                 + "var width = 100000;"
                 + " if (window.innerHeight) {"
@@ -67,7 +69,7 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver {
                 + "	if (b.clientWidth) {"
                 + "		width = Math.min(b.clientWidth, width);"
                 + "	}"
-                + "	return [width * devicePixelRatio, height * devicePixelRatio];";
+                + "	return [width * pixelRatio, height * pixelRatio];";
 
     private static final String JS_GET_CURRENT_SCROLL_POSITION =
             "var doc = document.documentElement; "
@@ -82,7 +84,9 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver {
     // smaller (!) than the clientHeight, which is why we take the
     // maximum between them.
     private static final String JS_GET_CONTENT_ENTIRE_SIZE =
-            "var scrollWidth = document.documentElement.scrollWidth; " +
+            "var pixelRatio;" +
+    		"try{pixelRatio = devicePixelRatio} catch(err){pixelRatio=1}" +
+    		"var scrollWidth = document.documentElement.scrollWidth; " +
             "var bodyScrollWidth = document.body.scrollWidth; " +
             "var totalWidth = Math.max(scrollWidth, bodyScrollWidth); " +
             "var clientHeight = document.documentElement.clientHeight; " +
@@ -92,7 +96,7 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver {
             "var maxDocElementHeight = Math.max(clientHeight, scrollHeight); " +
             "var maxBodyHeight = Math.max(bodyClientHeight, bodyScrollHeight); " +
             "var totalHeight = Math.max(maxDocElementHeight, maxBodyHeight); " +
-            "return [totalWidth * devicePixelRatio, totalHeight * devicePixelRatio];";
+            "return [totalWidth * pixelRatio, totalHeight * pixelRatio];";
 
     public CustomEventFiringWebDriver(final WebDriver driver) {
         super(driver);
