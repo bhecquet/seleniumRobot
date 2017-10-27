@@ -17,20 +17,15 @@
 package com.seleniumtests.util.logging;
 
 import java.io.File;
-import java.io.FileFilter;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -42,7 +37,6 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
 
-import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.util.helper.WaitHelper;
 
 public class SeleniumRobotLogger {
@@ -53,6 +47,7 @@ public class SeleniumRobotLogger {
 	private static final Pattern LOG_FILE_PATTERN = Pattern.compile(".*?\\d \\[(.*?)\\](.*)");
 	private static Map<String, String> testLogs = Collections.synchronizedMap(new HashMap<>());
 	private static String outputDirectory;
+	private static String defaultOutputDirectory;
 	
 	public static final String START_TEST_PATTERN = "Start method ";
 	public static final String END_TEST_PATTERN = "Finish method ";
@@ -84,15 +79,16 @@ public class SeleniumRobotLogger {
 	 * This code is delayed so that SeleniumTestsContext is initialized
 	 * This is also not called for unit and integration tests
 	 */
-	public static void updateLogger(String outputDir) {
+	public static void updateLogger(String outputDir, String defaultOutputDir) {
 		outputDirectory = outputDir;
+		defaultOutputDirectory = defaultOutputDir;
 		Appender fileLoggerAppender = Logger.getRootLogger().getAppender(FILE_APPENDER_NAME);
 		if (fileLoggerAppender == null) {
 			Logger rootLogger = Logger.getRootLogger();
 			FileAppender fileAppender = new FileAppender();
 			
 			// clean output dir
-			cleanResults(outputDir);
+			cleanResults();
 			
 			for (int i=0; i < 4; i++) {
 				try {
@@ -117,21 +113,22 @@ public class SeleniumRobotLogger {
 	/**
 	 * Clean result directories
 	 * Delete the directory that will be used to write these test results
-	 * Delete also directories in "test-output" which are older than 300 minutes so that results written to the other directories are cleaned
+	 * Delete also directories in "test-output" which are older than 300 minutes. Especially useful when test is requested to write result
+	 * to a sub-directory of test-output with timestamp (for example). Without this mechanism, results would never be cleaned
 	 */
-	private static void cleanResults(String outputDir) {
+	private static void cleanResults() {
 		// clean output dir
     	try {
-			FileUtils.deleteDirectory(new File(outputDir));
+			FileUtils.deleteDirectory(new File(outputDirectory));
 			WaitHelper.waitForSeconds(1);
 		} catch (IOException e) {
 			// do nothing
 		}
     	
-		new File(outputDir).mkdirs();
+		new File(outputDirectory).mkdirs();
 		WaitHelper.waitForSeconds(1);
     	
-    	for (File directory: new File(SeleniumTestsContextManager.getThreadContext().getDefaultOutputDirectory()).listFiles(file -> file.isDirectory())) {
+    	for (File directory: new File(defaultOutputDirectory).listFiles(file -> file.isDirectory())) {
     		try {
 				if (Files.readAttributes(directory.toPath(), BasicFileAttributes.class).lastAccessTime().toInstant().atZone(ZoneOffset.UTC).toLocalTime()
 						.isBefore(ZonedDateTime.now().minusMinutes(300).withZoneSameInstant(ZoneOffset.UTC).toLocalTime())) {
