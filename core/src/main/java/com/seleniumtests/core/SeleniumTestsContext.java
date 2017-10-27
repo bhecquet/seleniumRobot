@@ -121,6 +121,8 @@ public class SeleniumTestsContext {
 
     public static final String SOFT_ASSERT_ENABLED = "softAssertEnabled";		// le test ne s'arrête pas lorsqu'une assertion est rencontrée
 
+    public static final String OVERRIDE_SELENIUM_NATIVE_ACTION = "overrideSeleniumNativeAction";	// intercept driver.findElement and driver.frame operations to move to HtmlElement methods 
+    
     public static final String OUTPUT_DIRECTORY = "outputDirectory";     		// folder where HTML report will be written
     public static final String DEFAULT_OUTPUT_DIRECTORY = "defaultOutputDirectory";    // folder where TestNG would write it's results if not overwritten
     public static final String WEB_DRIVER_LISTENER = "webDriverListener";
@@ -205,6 +207,8 @@ public class SeleniumTestsContext {
         setNtlmAuthTrustedUris(getValueForTest(NTLM_AUTH_TRUSTED_URIS, System.getProperty(NTLM_AUTH_TRUSTED_URIS)));
         setBrowserDownloadDir(getValueForTest(BROWSER_DOWNLOAD_DIR, System.getProperty(BROWSER_DOWNLOAD_DIR)));
    
+        setOverrideSeleniumNativeAction(getBoolValueForTest(OVERRIDE_SELENIUM_NATIVE_ACTION, System.getProperty(OVERRIDE_SELENIUM_NATIVE_ACTION)));
+        
         setJsErrorCollectorExtension(getBoolValueForTest(ADD_JS_ERROR_COLLECTOR_EXTENSION, System.getProperty(ADD_JS_ERROR_COLLECTOR_EXTENSION)));
 
         setWebProxyType(getValueForTest(WEB_PROXY_TYPE, System.getProperty(WEB_PROXY_TYPE)));
@@ -535,6 +539,10 @@ public class SeleniumTestsContext {
     
     public boolean getSeleniumRobotServerRecordResults() {
     	return (Boolean) getAttribute(SELENIUMROBOTSERVER_RECORD_RESULTS);
+    }
+    
+    public boolean getOverrideSeleniumNativeAction() {
+    	return (Boolean) getAttribute(OVERRIDE_SELENIUM_NATIVE_ACTION);
     }
 
     public int getImplicitWaitTimeout() {
@@ -1014,6 +1022,14 @@ public class SeleniumTestsContext {
     		setAttribute(SELENIUMROBOTSERVER_RECORD_RESULTS, record);
     	} else {
     		setAttribute(SELENIUMROBOTSERVER_RECORD_RESULTS, false);
+    	}
+    }
+    
+    public void setOverrideSeleniumNativeAction(Boolean record) {
+    	if (record != null) {
+    		setAttribute(OVERRIDE_SELENIUM_NATIVE_ACTION, record);
+    	} else {
+    		setAttribute(OVERRIDE_SELENIUM_NATIVE_ACTION, false);
     	}
     }
     

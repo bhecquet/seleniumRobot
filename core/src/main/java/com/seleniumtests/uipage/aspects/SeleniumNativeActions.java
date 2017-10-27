@@ -6,6 +6,7 @@ import org.aspectj.lang.annotation.Aspect;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 
+import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.uipage.htmlelements.FrameElement;
 import com.seleniumtests.uipage.htmlelements.HtmlElement;
@@ -14,6 +15,7 @@ import com.seleniumtests.uipage.htmlelements.HtmlElement;
 public class SeleniumNativeActions {
 
 	private FrameElement currentFrame;
+	private static Boolean override = SeleniumTestsContextManager.getThreadContext().getOverrideSeleniumNativeAction();
 	
 	/**
 	 * Intercept any call to findElement made from a PageObject subclass and returns a HtmlElement instead of a RemoteWebElement
@@ -27,7 +29,11 @@ public class SeleniumNativeActions {
 			+ ")"			
 			)
 	public Object interceptFindHtmlElement(ProceedingJoinPoint joinPoint) throws Throwable {
-		return new HtmlElement("", (By)(joinPoint.getArgs()[0]), currentFrame);
+		if (override) {
+			return new HtmlElement("", (By)(joinPoint.getArgs()[0]), currentFrame);
+		} else {
+			return joinPoint.proceed(joinPoint.getArgs());
+		}
 	}
 	
 	@Around("this(com.seleniumtests.uipage.PageObject) && " +					// caller is a PageObject
@@ -35,7 +41,11 @@ public class SeleniumNativeActions {
 			+ ")"			
 			)
 	public Object interceptFindsHtmlElement(ProceedingJoinPoint joinPoint) throws Throwable {
-		return new HtmlElement("", (By)(joinPoint.getArgs()[0]), currentFrame).findElements();
+		if (override) {
+			return new HtmlElement("", (By)(joinPoint.getArgs()[0]), currentFrame).findElements();
+		} else {
+			return joinPoint.proceed(joinPoint.getArgs());
+		}
 	}
 	
 	/**
@@ -50,27 +60,31 @@ public class SeleniumNativeActions {
 			+ ")"			
 			)
 	public Object recordSwitchToFramCalls(ProceedingJoinPoint joinPoint) throws Throwable {
-		Object frameArg = joinPoint.getArgs()[0];
-		FrameElement frameEl;
-		
-		if (frameArg instanceof HtmlElement) {
-			frameEl = new FrameElement("", ((HtmlElement)frameArg).getBy());
-		} else if (frameArg instanceof Integer) {
-			frameEl = new FrameElement("", By.tagName("iframe"), 0);
-		} else if (frameArg instanceof String) {
-			String name = ((String)frameArg).replaceAll("(['\"\\\\#.:;,!?+<>=~*^$|%&@`{}\\-/\\[\\]\\(\\)])", "\\\\$1");
-			frameEl = new FrameElement("", By.cssSelector("frame[name='" + name + "'],iframe[name='" + name + "'],frame#" + name + ",iframe#" + name));
+		if (override) {
+			Object frameArg = joinPoint.getArgs()[0];
+			FrameElement frameEl;
+			
+			if (frameArg instanceof HtmlElement) {
+				frameEl = new FrameElement("", ((HtmlElement)frameArg).getBy());
+			} else if (frameArg instanceof Integer) {
+				frameEl = new FrameElement("", By.tagName("iframe"), 0);
+			} else if (frameArg instanceof String) {
+				String name = ((String)frameArg).replaceAll("(['\"\\\\#.:;,!?+<>=~*^$|%&@`{}\\-/\\[\\]\\(\\)])", "\\\\$1");
+				frameEl = new FrameElement("", By.cssSelector("frame[name='" + name + "'],iframe[name='" + name + "'],frame#" + name + ",iframe#" + name));
+			} else {
+				return joinPoint.proceed(joinPoint.getArgs());
+			}
+			System.out.println("entering frame " + frameArg.toString());
+			if (currentFrame == null) {
+				currentFrame = frameEl;
+			} else {
+				frameEl.setFrameElement(currentFrame);
+				currentFrame = frameEl;
+			}
+			return null;
 		} else {
 			return joinPoint.proceed(joinPoint.getArgs());
 		}
-		
-		if (currentFrame == null) {
-			currentFrame = frameEl;
-		} else {
-			frameEl.setFrameElement(currentFrame);
-			currentFrame = frameEl;
-		}
-		return null;
 
 	}
 	
@@ -89,7 +103,7 @@ public class SeleniumNativeActions {
 			+ ")"			
 			)
 	public Object recordSwitchParentFrame(ProceedingJoinPoint joinPoint) throws Throwable {
-		if (currentFrame == null) {
+		if (currentFrame == null || override) {
 			return joinPoint.proceed(joinPoint.getArgs());
 		} else {
 			currentFrame = currentFrame.getFrameElement();
