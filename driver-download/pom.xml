@@ -1,0 +1,286 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>fr.test</groupId>
+	<artifactId>driver-download</artifactId>
+	<packaging>pom</packaging>
+	
+	<parent>
+	    <groupId>com.infotel.seleniumRobot</groupId>
+	    <artifactId>core-parent</artifactId>
+	    <version>3.2.2-SNAPSHOT</version>
+	</parent>
+
+	<properties>
+		<os>linux</os>
+		<is.not.windows>true</is.not.windows>
+		<root.path>${project.basedir}</root.path>
+		<driver.path>${root.path}/../core/src/main/resources/drivers/</driver.path>
+		<chromedriver.url>https://chromedriver.storage.googleapis.com</chromedriver.url>
+		<geckodriver.url>https://github.com/mozilla/geckodriver/releases/download</geckodriver.url>
+		<iedriver.url>http://selenium-release.storage.googleapis.com</iedriver.url>
+		<edgedriver.url>https://download.microsoft.com/download</edgedriver.url>
+		<chromedriver.suffix></chromedriver.suffix>
+		<geckodriver.suffix></geckodriver.suffix>
+		<geckodriver.ext></geckodriver.ext>
+		<skip.clean.driver>false</skip.clean.driver>
+	</properties>
+
+	<modules>
+		<module>seleniumRobot-windows-driver</module>
+		<module>seleniumRobot-linux-driver</module>
+		<module>seleniumRobot-mac-driver</module>
+	</modules>
+
+	<dependencies>
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>2.4</version>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>com.googlecode.maven-download-plugin</groupId>
+					<artifactId>download-maven-plugin</artifactId>
+					<version>1.3.0</version>
+
+					<configuration>
+						<unpack>true</unpack>
+					</configuration>
+					<executions>
+
+						<!-- CHROMEDRIVER -->
+						<execution>
+							<id>chromedriver 2.33</id>
+							<phase>process-resources</phase>
+							<goals>
+								<goal>wget</goal>
+							</goals>
+							<configuration>
+								<url>${chromedriver.url}/2.33/chromedriver_${chromedriver.suffix}.zip</url>
+								<outputDirectory>${driver.path}${os}/dir_chromedriver_2.33_chrome_60-62</outputDirectory>
+							</configuration>
+						</execution>
+						<execution>
+							<id>chromedriver 2.31</id>
+							<phase>process-resources</phase>
+							<goals>
+								<goal>wget</goal>
+							</goals>
+							<configuration>
+								<url>${chromedriver.url}/2.31/chromedriver_${chromedriver.suffix}.zip</url>
+								<outputDirectory>${driver.path}${os}/dir_chromedriver_2.31_chrome-58-60</outputDirectory>
+							</configuration>
+						</execution>
+						<execution>
+							<id>chromedriver 2.29</id>
+							<phase>process-resources</phase>
+							<goals>
+								<goal>wget</goal>
+							</goals>
+							<configuration>
+								<url>${chromedriver.url}/2.29/chromedriver_${chromedriver.suffix}.zip</url>
+								<outputDirectory>${driver.path}${os}/dir_chromedriver_2.29_chrome-56-58_android-7.0</outputDirectory>
+							</configuration>
+						</execution>
+						<execution>
+							<id>chromedriver 2.20</id>
+							<phase>process-resources</phase>
+							<goals>
+								<goal>wget</goal>
+							</goals>
+							<configuration>
+								<url>${chromedriver.url}/2.20/chromedriver_${chromedriver.suffix}.zip</url>
+								<outputDirectory>${driver.path}${os}/dir_chromedriver_2.20_chrome-43-48_android-6.0</outputDirectory>
+							</configuration>
+						</execution>
+
+						<!-- GECKODRIVER -->
+						<execution>
+							<id>geckodriver 0.19</id>
+							<phase>process-resources</phase>
+							<goals>
+								<goal>wget</goal>
+							</goals>
+							<configuration>
+								<url>${geckodriver.url}/v0.19.0/geckodriver-v0.19.0-${geckodriver.suffix}${geckodriver.ext}</url>
+								<outputDirectory>${driver.path}${os}/dir_geckodriver</outputDirectory>
+							</configuration>
+						</execution>
+
+						<!-- IEDriverServer -->
+						<execution>
+							<id>IEDriverServer 64</id>
+							<phase>process-resources</phase>
+							<goals>
+								<goal>wget</goal>
+							</goals>
+							<configuration>
+								<skip>${is.not.windows}</skip>
+								<url>${iedriver.url}/${selenium.version.short}/IEDriverServer_x64_${selenium.version}.zip</url>
+								<outputDirectory>${driver.path}${os}/dir_IEDriverServer_x64</outputDirectory>
+							</configuration>
+						</execution>
+						<execution>
+							<id>IEDriverServer 32</id>
+							<phase>process-resources</phase>
+							<goals>
+								<goal>wget</goal>
+							</goals>
+							<configuration>
+								<skip>${is.not.windows}</skip>
+								<url>${iedriver.url}/${selenium.version.short}/IEDriverServer_Win32_${selenium.version}.zip</url>
+								<outputDirectory>${driver.path}${os}/dir_IEDriverServer_Win32</outputDirectory>
+							</configuration>
+						</execution>
+						
+						<!-- Edge driver -->
+						<execution>
+							<id>Edge driver 16299</id>
+							<phase>process-resources</phase>
+							<goals>
+								<goal>wget</goal>
+							</goals>
+							<configuration>
+								<skip>${is.not.windows}</skip>
+								<url>${edgedriver.url}/D/4/1/D417998A-58EE-4EFE-A7CC-39EF9E020768/MicrosoftWebDriver.exe</url>
+								<outputDirectory>${driver.path}${os}/dir_MicrosoftWebDriver_16299</outputDirectory>
+								<unpack>false</unpack>
+							</configuration>
+						</execution>
+						<execution>
+							<id>Edge driver 15063</id>
+							<phase>process-resources</phase>
+							<goals>
+								<goal>wget</goal>
+							</goals>
+							<configuration>
+								<skip>${is.not.windows}</skip>
+								<url>${edgedriver.url}/3/4/2/342316D7-EBE0-4F10-ABA2-AE8E0CDF36DD/MicrosoftWebDriver.exe</url>
+								<outputDirectory>${driver.path}${os}/dir_MicrosoftWebDriver_15063</outputDirectory>
+								<unpack>false</unpack>
+							</configuration>
+						</execution>
+						<execution>
+							<id>Edge driver 14393</id>
+							<phase>process-resources</phase>
+							<goals>
+								<goal>wget</goal>
+							</goals>
+							<configuration>
+								<skip>${is.not.windows}</skip>
+								<url>${edgedriver.url}/3/2/D/32D3E464-F2EF-490F-841B-05D53C848D15/MicrosoftWebDriver.exe</url>
+								<outputDirectory>${driver.path}${os}/dir_MicrosoftWebDriver_14393</outputDirectory>
+								<unpack>false</unpack>
+							</configuration>
+						</execution>						
+					</executions>
+				</plugin>
+				<!-- <plugin>
+					<artifactId>maven-assembly-plugin</artifactId>
+					<version>2.6</version>
+					<configuration>
+						<skipAssembly>true</skipAssembly>
+					</configuration>
+					<executions>
+						<execution>
+							<id>archive</id>
+							<phase>package</phase>
+							<goals>
+								<goal>single</goal>
+							</goals>
+							<configuration>
+								<finalName>seleniumRobot-${os}-driver</finalName>
+								<appendAssemblyId>false</appendAssemblyId>
+								<archiveBaseDirectory>${project.build.directory}</archiveBaseDirectory>
+								<outputDirectory>${project.build.directory}</outputDirectory>
+								<descriptor>${root.path}/zipDrivers.xml</descriptor>
+							</configuration>
+						</execution>
+					</executions>
+				</plugin> -->
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-compiler-plugin</artifactId>
+					<version>3.5.1</version>
+					<configuration>
+						<encoding>utf-8</encoding>
+						<source>1.8</source>
+						<target>1.8</target>
+					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.codehaus.mojo</groupId>
+					<artifactId>exec-maven-plugin</artifactId>
+					<version>1.6.0</version>
+					<executions>
+						<execution>
+							<phase>compile</phase>
+							<goals>
+								<goal>java</goal>
+							</goals>
+						</execution>
+					</executions>
+					<configuration>
+						<mainClass>fr.covea.seleniumRobot.driversdownload.MoveDrivers</mainClass>
+						<arguments>
+							<argument>${driver.path}</argument>
+							<argument>${os}</argument>
+						</arguments>
+					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.codehaus.mojo</groupId>
+					<artifactId>build-helper-maven-plugin</artifactId>
+					<version>3.0.0</version>
+					<executions>
+						<execution>
+							<id>regex-property</id>
+							<goals>
+								<goal>regex-property</goal>
+							</goals>
+							<configuration>
+	
+								<name>selenium.version.short</name>
+								<value>${selenium.version}</value>
+								<regex>^([0-9]+)\.([0-9]+)\.([0-9]+)(-SNAPSHOT)?$</regex>
+								<replacement>$1.$2</replacement>
+								<failIfNoMatch>true</failIfNoMatch>
+							</configuration>
+						</execution>
+					</executions>
+				</plugin>
+
+			</plugins>
+		</pluginManagement>
+		<plugins>
+			<!-- <plugin>
+				<artifactId>maven-clean-plugin</artifactId>
+				<version>3.0.0</version>
+				<executions>
+					<execution>
+						<phase>clean</phase>
+						<id>driver-clean</id>
+						<goals>
+							<goal>clean</goal>
+						</goals>
+						<configuration>
+							<skip>${skip.clean.driver}</skip>
+							<filesets>
+								<fileset>
+									<directory>${driver.path}</directory>
+									<followSymlinks>false</followSymlinks>
+								</fileset>
+							</filesets>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin> -->
+		</plugins>
+	</build>
+
+</project>

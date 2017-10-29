@@ -1,0 +1,38 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>fr.test</groupId>
+		<artifactId>driver-download</artifactId>
+		<version>0.0.1-SNAPSHOT</version>
+	</parent>
+	<artifactId>seleniumRobot-linux-driver</artifactId>
+
+	<properties>
+		<os>unix</os>
+		<is.not.windows>true</is.not.windows>
+		<chromedriver.suffix>linux64</chromedriver.suffix>
+		<geckodriver.suffix>linux64</geckodriver.suffix>
+		<geckodriver.ext>.tar.gz</geckodriver.ext>
+		<skip.clean.driver>true</skip.clean.driver>
+		<root.path>${project.basedir}/..</root.path>
+	</properties>
+	<build>
+		<sourceDirectory>../src/main/java</sourceDirectory>
+		<plugins>
+			<plugin>
+				<groupId>com.googlecode.maven-download-plugin</groupId>
+				<artifactId>download-maven-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>exec-maven-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>
