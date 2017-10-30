@@ -1,8 +1,5 @@
 package com.seleniumtests.noreg.tests;
 
-import java.io.File;
-
-import org.apache.commons.io.FileUtils;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
@@ -12,7 +9,6 @@ import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.runner.SeleniumTestPlan;
 import com.seleniumtests.noreg.support.WebServer;
 import com.seleniumtests.noreg.webpage.DemoPage;
-import com.seleniumtests.noreg.webpage.TestRoomHome;
 
 public class TestWithAndroid extends SeleniumTestPlan {
 	

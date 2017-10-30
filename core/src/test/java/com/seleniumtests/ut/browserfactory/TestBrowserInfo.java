@@ -25,8 +25,8 @@ public class TestBrowserInfo extends MockitoTest {
 
 	@Test(groups={"ut"})
 	public void testEdgeVersion() {
-		BrowserInfo bInfo = new BrowserInfo(BrowserType.EDGE, "10240", null);
-		Assert.assertEquals(bInfo.getDriverFileName(), "MicrosoftWebDriver_10240");
+		BrowserInfo bInfo = new BrowserInfo(BrowserType.EDGE, "14393", null);
+		Assert.assertEquals(bInfo.getDriverFileName(), "MicrosoftWebDriver_14393");
 	}
 	
 	@Test(groups={"ut"}, expectedExceptions=ConfigurationException.class)
@@ -54,12 +54,12 @@ public class TestBrowserInfo extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testChromeVersionHighestDriverVersion() throws Exception {
 
-		List<String> driverList = Arrays.asList("chromedriver_2.28_chrome-55-57_android_7.0.exe", "chromedriver_2.29_chrome-56-58_android_7.0.exe", "chromedriver_2.30_chrome-58-60.exe");
+		List<String> driverList = Arrays.asList("chromedriver_2.28_chrome-55-57_android_7.0.exe", "chromedriver_2.29_chrome-56-58_android_7.0.exe", "chromedriver_2.31_chrome-58-60.exe");
 		BrowserInfo bInfo = PowerMockito.spy(new BrowserInfo(BrowserType.CHROME, "58.0", null));
 		PowerMockito.when(bInfo, "getDriverFiles").thenReturn(driverList);
 		PowerMockito.doNothing().when(bInfo, "checkResourceExists");
 		
-		Assert.assertEquals(bInfo.getDriverFileName(), "chromedriver_2.30_chrome-58-60");
+		Assert.assertEquals(bInfo.getDriverFileName(), "chromedriver_2.31_chrome-58-60");
 	}
 	
 	/**
@@ -69,12 +69,12 @@ public class TestBrowserInfo extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testGetFilesFromList() throws Exception {
 		
-		List<String> driverList = Arrays.asList("chromedriver_2.28_chrome-55-57_android_7.0.exe", "chromedriver_2.29_chrome-56-58_android_7.0.exe", "chromedriver_2.30_chrome-58-60.exe");
+		List<String> driverList = Arrays.asList("chromedriver_2.28_chrome-55-57_android_7.0.exe", "chromedriver_2.29_chrome-56-58_android_7.0.exe", "chromedriver_2.31_chrome-58-60.exe");
 		BrowserInfo bInfo = PowerMockito.spy(new BrowserInfo(BrowserType.CHROME, "58.0", null));
 		BrowserInfo.setDriverList(driverList);
 		PowerMockito.doNothing().when(bInfo, "checkResourceExists");
 		
-		Assert.assertEquals(bInfo.getDriverFileName(), "chromedriver_2.30_chrome-58-60");
+		Assert.assertEquals(bInfo.getDriverFileName(), "chromedriver_2.31_chrome-58-60");
 	}
 	
 	/**
@@ -83,7 +83,7 @@ public class TestBrowserInfo extends MockitoTest {
 	 */
 	@Test(groups={"ut"})
 	public void testChromeVersionMiddleRange() throws Exception {
-		List<String> driverList = Arrays.asList("chromedriver_2.28_chrome-55-57_android_7.0", "chromedriver_2.29_chrome-56-58_android_7.0", "chromedriver_2.30_chrome-58-60");
+		List<String> driverList = Arrays.asList("chromedriver_2.28_chrome-55-57_android_7.0", "chromedriver_2.29_chrome-56-58_android_7.0", "chromedriver_2.31_chrome-58-60");
 		BrowserInfo bInfo = PowerMockito.spy(new BrowserInfo(BrowserType.CHROME, "57.1", null));
 		PowerMockito.when(bInfo, "getDriverFiles").thenReturn(driverList);
 		PowerMockito.doNothing().when(bInfo, "checkResourceExists");
@@ -97,7 +97,7 @@ public class TestBrowserInfo extends MockitoTest {
 	 */
 	@Test(groups={"ut"}, expectedExceptions=ConfigurationException.class)
 	public void testChromeVersionNotFound() throws Exception {
-		List<String> driverList = Arrays.asList("chromedriver_2.28_chrome-55-57_android_7.0", "chromedriver_2.29_chrome-56-58_android_7.0", "chromedriver_2.30_chrome-58-60");
+		List<String> driverList = Arrays.asList("chromedriver_2.28_chrome-55-57_android_7.0", "chromedriver_2.29_chrome-56-58_android_7.0", "chromedriver_2.31_chrome-58-60");
 		BrowserInfo bInfo = PowerMockito.spy(new BrowserInfo(BrowserType.CHROME, "1.0", null));
 		PowerMockito.when(bInfo, "getDriverFiles").thenReturn(driverList);
 		PowerMockito.doNothing().when(bInfo, "checkResourceExists");
@@ -112,12 +112,12 @@ public class TestBrowserInfo extends MockitoTest {
 	 */
 	@Test(groups={"ut"})
 	public void testChromeVersionHigherThanDriverVersion() throws Exception {
-		List<String> driverList = Arrays.asList("chromedriver_2.28_chrome-55-57_android_7.0", "chromedriver_2.29_chrome-56-58_android_7.0", "chromedriver_2.30_chrome-58-60");
+		List<String> driverList = Arrays.asList("chromedriver_2.28_chrome-55-57_android_7.0", "chromedriver_2.29_chrome-56-58_android_7.0", "chromedriver_2.31_chrome-58-60");
 		BrowserInfo bInfo = PowerMockito.spy(new BrowserInfo(BrowserType.CHROME, "70.0", null));
 		PowerMockito.when(bInfo, "getDriverFiles").thenReturn(driverList);
 		PowerMockito.doNothing().when(bInfo, "checkResourceExists");
 		
-		Assert.assertEquals(bInfo.getDriverFileName(), "chromedriver_2.30_chrome-58-60");
+		Assert.assertEquals(bInfo.getDriverFileName(), "chromedriver_2.31_chrome-58-60");
 	}
 	
 	/**
@@ -156,7 +156,7 @@ public class TestBrowserInfo extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testAndroidVersionExactMatch() throws Exception {
 
-		List<String> driverList = Arrays.asList("chromedriver_2.20_chrome-55-57_android-6.0.exe", "chromedriver_2.29_chrome-56-58_android-7.0", "chromedriver_2.30_chrome-58-60");
+		List<String> driverList = Arrays.asList("chromedriver_2.20_chrome-55-57_android-6.0.exe", "chromedriver_2.29_chrome-56-58_android-7.0", "chromedriver_2.31_chrome-58-60");
 		BrowserInfo bInfo = PowerMockito.spy(new BrowserInfo(BrowserType.BROWSER, "6.0", null));
 		PowerMockito.when(bInfo, "getDriverFiles").thenReturn(driverList);
 		PowerMockito.doNothing().when(bInfo, "checkResourceExists");
@@ -186,7 +186,7 @@ public class TestBrowserInfo extends MockitoTest {
 	@Test(groups={"ut"}, expectedExceptions=ConfigurationException.class)
 	public void testAndroidVersionNoMatch() throws Exception {
 		
-		List<String> driverList = Arrays.asList("chromedriver_2.20_chrome-55-57_android-6.0", "chromedriver_2.29_chrome-56-58_android-7.0", "chromedriver_2.30_chrome-58-60");
+		List<String> driverList = Arrays.asList("chromedriver_2.20_chrome-55-57_android-6.0", "chromedriver_2.29_chrome-56-58_android-7.0", "chromedriver_2.31_chrome-58-60");
 		BrowserInfo bInfo = PowerMockito.spy(new BrowserInfo(BrowserType.BROWSER, "5.0", null));
 		PowerMockito.when(bInfo, "getDriverFiles").thenReturn(driverList);
 		PowerMockito.doNothing().when(bInfo, "checkResourceExists");
@@ -201,7 +201,7 @@ public class TestBrowserInfo extends MockitoTest {
 	@Test(groups={"ut"}, expectedExceptions=ConfigurationException.class)
 	public void testAndroidVersionNoDriver() throws Exception {
 		
-		List<String> driverList = Arrays.asList("chromedriver_2.30_chrome-58-60");
+		List<String> driverList = Arrays.asList("chromedriver_2.31_chrome-58-60");
 		BrowserInfo bInfo = PowerMockito.spy(new BrowserInfo(BrowserType.BROWSER, "5.0", null));
 		PowerMockito.when(bInfo, "getDriverFiles").thenReturn(driverList);
 		PowerMockito.doNothing().when(bInfo, "checkResourceExists");
