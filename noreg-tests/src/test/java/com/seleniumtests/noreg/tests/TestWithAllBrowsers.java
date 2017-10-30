@@ -6,8 +6,6 @@ import java.util.List;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.BeforeTest;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -17,8 +15,6 @@ import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.noreg.support.WebServer;
 import com.seleniumtests.noreg.webpage.DemoPage;
 import com.seleniumtests.util.osutility.OSUtilityFactory;
-
-import cucumber.api.java.en_au.ButattheendofthedayIreckon;
 
 public class TestWithAllBrowsers extends SeleniumTestPlan {
 	
