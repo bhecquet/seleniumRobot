@@ -105,6 +105,13 @@ For publishing artifacts to OSS Sonatype server
 In order to compile core artifact, you must provide the ojdb6.jar file into src/lib folder so that it can be automatically installed in maven local repository when doing `mvn clean`
 This is not necessary when developping only test applications
 
+#### Download drivers ####
+From seleniumRobot 3.3.0, drivers are not provided anymore with source code, they are downloaded by a maven build (driver-download module)
+To setup environment, execute `mvn clean compile` on project `driver-download`
+If you are behind a corporate proxy, you should already have your settings.xml configured to use it.
+/!\ you *MUST* have a configuration for http *and* https proxy. Else, download won't be possible
+
+
 ### 2 Execution environment ###
 Execution environment needs at least Java 8. SeleniumRobot is compatible with Windows, Mac OS and Linux.
 Depending on your tests, you should consider install:
