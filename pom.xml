@@ -116,8 +116,8 @@
 	<modules>
 		<module>driver-download</module>
 		<module>core</module>
-		<module>grid-extensions</module>
 		<module>noreg-tests</module>
+		<module>grid-extensions</module>
 	</modules>
 
 	<build>
