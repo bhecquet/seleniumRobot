@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.commons.lang3.SystemUtils;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
@@ -25,8 +26,10 @@ public class TestBrowserInfo extends MockitoTest {
 
 	@Test(groups={"ut"})
 	public void testEdgeVersion() {
-		BrowserInfo bInfo = new BrowserInfo(BrowserType.EDGE, "14393", null);
-		Assert.assertEquals(bInfo.getDriverFileName(), "MicrosoftWebDriver_14393");
+		if (SystemUtils.IS_OS_WINDOWS) {
+			BrowserInfo bInfo = new BrowserInfo(BrowserType.EDGE, "14393", null);
+			Assert.assertEquals(bInfo.getDriverFileName(), "MicrosoftWebDriver_14393");
+		}
 	}
 	
 	@Test(groups={"ut"}, expectedExceptions=ConfigurationException.class)
@@ -37,14 +40,18 @@ public class TestBrowserInfo extends MockitoTest {
 	
 	@Test(groups={"ut"})
 	public void testIE9Version() {
-		BrowserInfo bInfo = new BrowserInfo(BrowserType.INTERNET_EXPLORER, "9", null);
-		Assert.assertEquals(bInfo.getDriverFileName(), "IEDriverServer_x64");
+		if (SystemUtils.IS_OS_WINDOWS) {
+			BrowserInfo bInfo = new BrowserInfo(BrowserType.INTERNET_EXPLORER, "9", null);
+			Assert.assertEquals(bInfo.getDriverFileName(), "IEDriverServer_x64");
+		}
 	}
 	
 	@Test(groups={"ut"})
 	public void testIE10Version() {
-		BrowserInfo bInfo = new BrowserInfo(BrowserType.INTERNET_EXPLORER, "10", null);
-		Assert.assertEquals(bInfo.getDriverFileName(), "IEDriverServer_Win32");
+		if (SystemUtils.IS_OS_WINDOWS) {
+			BrowserInfo bInfo = new BrowserInfo(BrowserType.INTERNET_EXPLORER, "10", null);
+			Assert.assertEquals(bInfo.getDriverFileName(), "IEDriverServer_Win32");
+		}
 	}
 	
 	/**
