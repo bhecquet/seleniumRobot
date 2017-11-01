@@ -101,7 +101,7 @@ public class SeleniumNativeActions {
 			+ ")"			
 			)
 	public Object recordSwitchParentFrame(ProceedingJoinPoint joinPoint) throws Throwable {
-		if (currentFrame == null || override) {
+		if (currentFrame == null || !override) {
 			return joinPoint.proceed(joinPoint.getArgs());
 		} else {
 			currentFrame = currentFrame.getFrameElement();
