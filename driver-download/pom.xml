@@ -1,5 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>fr.test</groupId>
 	<artifactId>driver-download</artifactId>
@@ -8,7 +7,7 @@
 	<parent>
 	    <groupId>com.infotel.seleniumRobot</groupId>
 	    <artifactId>core-parent</artifactId>
-	    <version>3.2.2-SNAPSHOT</version>
+	    <version>3.3.0</version>
 	</parent>
 
 	<properties>
@@ -20,9 +19,9 @@
 		<geckodriver.url>https://github.com/mozilla/geckodriver/releases/download</geckodriver.url>
 		<iedriver.url>http://selenium-release.storage.googleapis.com</iedriver.url>
 		<edgedriver.url>https://download.microsoft.com/download</edgedriver.url>
-		<chromedriver.suffix></chromedriver.suffix>
-		<geckodriver.suffix></geckodriver.suffix>
-		<geckodriver.ext></geckodriver.ext>
+		<chromedriver.suffix />
+		<geckodriver.suffix />
+		<geckodriver.ext />
 		<skip.clean.driver>false</skip.clean.driver>
 	</properties>
 
