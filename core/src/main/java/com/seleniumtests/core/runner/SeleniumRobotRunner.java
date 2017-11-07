@@ -61,6 +61,13 @@ public class SeleniumRobotRunner {
 		return isCucumberT;
 	}
 	
+	/**
+	 * Configure cucumberTest in case we use several threads. This should be called inside the thread running the test method
+	 */
+	public void configureCucumberTest() {
+		setCucumberTest(false);
+	}
+	
 	public static void setCucumberTest(boolean cucumberTestIn) {
 		SeleniumRobotRunner.cucumberTest.put(Thread.currentThread(), cucumberTestIn);
 	}
@@ -154,6 +161,7 @@ public class SeleniumRobotRunner {
     
     @BeforeMethod(alwaysRun = true)
     public void beforeTestMethod(final Object[] parameters, final Method method, final ITestContext testContext) {
+    	configureCucumberTest();
     	if (!isCucumberTest()) {
 	        logger.info(SeleniumRobotLogger.START_TEST_PATTERN + method.getName());
 	        SeleniumTestsContextManager.initThreadContext(testContext);

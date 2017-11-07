@@ -74,7 +74,7 @@ public class ReporterTest extends MockitoTest {
 	 * @return
 	 * @throws IOException 
 	 */
-	protected XmlSuite executeSubCucumberTests(String cucumberTests) throws IOException {
+	protected XmlSuite executeSubCucumberTests(String cucumberTests, int threadCount) throws IOException {
 
 		XmlSuite suite = new XmlSuite();
 		suite.setName("TmpSuite");
@@ -85,6 +85,12 @@ public class ReporterTest extends MockitoTest {
 		suite.setParameters(suiteParameters);
 		List<XmlSuite> suites = new ArrayList<XmlSuite>();
 		suites.add(suite);
+		
+
+		if (threadCount > 1) {
+			suite.setThreadCount(threadCount);
+			suite.setParallel(XmlSuite.ParallelMode.METHODS);
+		}
 		
 		XmlTest test = new XmlTest(suite);
 		test.setName("cucumberTest");

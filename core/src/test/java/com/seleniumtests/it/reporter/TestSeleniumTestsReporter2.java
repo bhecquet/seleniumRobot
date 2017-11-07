@@ -272,7 +272,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	@Test(groups={"it"})
 	public void testCucumberStart(ITestContext testContext) throws Exception {
 		
-		executeSubCucumberTests("core_3");
+		executeSubCucumberTests("core_3", 1);
 
 		String mainReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport.html"));
 		Assert.assertTrue(mainReportContent.contains("<a href='SeleniumTestReport-1.html'>core_3</a>"));
@@ -283,5 +283,19 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		// Check each step is recorded in file: 2 test steps + test end + logs
 		Assert.assertTrue(detailedReportContent.contains("<div class=\"box collapsed-box success\"><div class=\"box-header with-border\"><button type=\"button\" class=\"btn btn-box-tool\" data-widget=\"collapse\"><i class=\"fa fa-plus\"></i></button> write (\\w+) with args: (tutu, )"));
 		Assert.assertTrue(detailedReportContent.contains("<div class=\"message-log\">Test is OK</div>"));
+	}
+	/**
+	 * Check that test name is correctly reported in cucumber mode when threads are used
+	 * Test OK
+	 * @param testContext
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testCucumberMultiThread(ITestContext testContext) throws Exception {
+		
+		executeSubCucumberTests("core_3,core_4", 5);
+		
+		String mainReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport.html"));
+		Assert.assertTrue(mainReportContent.contains("<a href='SeleniumTestReport-1.html'>core_3</a>"));
 	}
 }
