@@ -115,6 +115,8 @@ A typical method whould be
     	fishMenu.click();
     	return new FishList();
     }
+    
+**WARN** DO NOT give the same test name in different test classes as it leads to wrong logging reporting
 
 #### TestNG file ####
 For tests extending SeleniumTestPlan, the testNg XML looks like (minimal requirements):
