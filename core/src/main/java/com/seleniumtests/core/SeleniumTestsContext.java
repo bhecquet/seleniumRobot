@@ -1348,13 +1348,17 @@ public class SeleniumTestsContext {
     }
     
     public void setOutputDirectory(String outputDir, ITestContext context) {
-    	setAttribute(DEFAULT_OUTPUT_DIRECTORY, new File(context.getOutputDirectory()).getParent());
+    	setDefaultOutputDirectory(context);
     	if (outputDir == null) {
     		setAttribute(OUTPUT_DIRECTORY, new File(context.getOutputDirectory()).getParent());
     	} else {
     		((TestRunner)context).setOutputDirectory(outputDir);
     		setAttribute(OUTPUT_DIRECTORY, outputDir);
     	}
+    }
+    
+    public void setDefaultOutputDirectory(ITestContext context) {
+    	setAttribute(DEFAULT_OUTPUT_DIRECTORY, new File(context.getOutputDirectory()).getParent());
     }
     
     public void setVersion(String version) {

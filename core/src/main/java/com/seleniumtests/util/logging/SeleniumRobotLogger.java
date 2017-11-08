@@ -78,6 +78,7 @@ public class SeleniumRobotLogger {
 	 * Update root logger so that logs are made available in a log file
 	 * This code is delayed so that SeleniumTestsContext is initialized
 	 * This is also not called for unit and integration tests
+	 * 
 	 */
 	public static void updateLogger(String outputDir, String defaultOutputDir) {
 		outputDirectory = outputDir;
@@ -147,7 +148,13 @@ public class SeleniumRobotLogger {
 	 * @throws IOException 
 	 */
 	public static void parseLogFile() throws IOException {
-		List<String> logLines = FileUtils.readLines(new File(outputDirectory + "/" + LOG_FILE_NAME));
+		Appender fileLoggerAppender = Logger.getRootLogger().getAppender(FILE_APPENDER_NAME);
+		if (fileLoggerAppender == null) {
+			return;
+		} 
+		
+		// read the file from appender directly
+		List<String> logLines = FileUtils.readLines(new File(((FileAppender)fileLoggerAppender).getFile())); 
 		Map<String, String> testPerThread = new HashMap<>();
 		
 		for (String line: logLines) {
