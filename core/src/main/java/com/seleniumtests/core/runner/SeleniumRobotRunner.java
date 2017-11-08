@@ -132,9 +132,7 @@ public class SeleniumRobotRunner {
     public void beforeTestSuite(final ITestContext testContext) {
         start = new Date();
         SeleniumTestsContextManager.initGlobalContext(testContext);
-        SeleniumTestsContextManager.initThreadContext(testContext);
-        SeleniumRobotLogger.updateLogger(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(),
-        								SeleniumTestsContextManager.getGlobalContext().getDefaultOutputDirectory());
+        SeleniumTestsContextManager.initThreadContext(testContext);  
     }
     
     @AfterSuite(alwaysRun = true)
@@ -157,6 +155,9 @@ public class SeleniumRobotRunner {
     	SeleniumTestsContextManager.initGlobalContext(testContext);
     	logger.info(String.format("Application %s version: %s", SeleniumTestsContextManager.getApplicationName(), SeleniumTestsContextManager.getApplicationVersion()));
     	logger.info("Core version: " + SeleniumTestsContextManager.getCoreVersion());
+    	
+    	SeleniumRobotLogger.updateLogger(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(),
+										SeleniumTestsContextManager.getGlobalContext().getDefaultOutputDirectory());
     }
     
     @BeforeMethod(alwaysRun = true)
