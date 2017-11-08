@@ -92,6 +92,10 @@ public class TestListener implements IInvokedMethodListener, ITestListener {
 		if (method.isTestMethod()) {
 			changeTestResult(result);
 		}
+		
+		if (result.getThrowable() != null) {
+			logger.error(result.getThrowable().getMessage());
+		}
 	}
 	
 	/* ----------------------- ITestListener ------------------------------ */
