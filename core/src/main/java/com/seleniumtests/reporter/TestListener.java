@@ -312,8 +312,9 @@ public class TestListener implements IInvokedMethodListener, ITestListener {
 		TestLogging.log(String.format("Test is %s", testResult.isSuccess() ? "OK": "KO with error: " + testResult.getThrowable().getMessage()));
 		
 		if (WebUIDriver.getWebDriver(false) != null) {
-			ScreenShot screenShot = new ScreenshotUtil().captureWebPageSnapshot();
-			TestLogging.logScreenshot(screenShot);
+			for (ScreenShot screenshot: new ScreenshotUtil().captureWebPageSnapshots(true)) {
+				TestLogging.logScreenshot(screenshot);
+			}
 		}
 		TestLogging.logTestStep(tearDownStep);
 	}
