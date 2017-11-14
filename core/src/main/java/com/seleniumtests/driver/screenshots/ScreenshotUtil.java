@@ -24,6 +24,9 @@ import java.awt.Robot;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 import javax.imageio.ImageIO;
 
@@ -44,6 +47,7 @@ import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import com.seleniumtests.driver.TestType;
 import com.seleniumtests.driver.WebUIDriver;
+import com.seleniumtests.reporter.TestLogging;
 import com.seleniumtests.util.FileUtility;
 import com.seleniumtests.util.HashCodeGenerator;
 import com.seleniumtests.util.imaging.ImageProcessor;
@@ -276,11 +280,11 @@ public class ScreenshotUtil {
     	if (screenShot.getImagePath() == null) {
     		return null;
     	}
-    	return new File(outputDirectory + "/" + screenShot.getFullImagePath());
+    	return new File(screenShot.getFullImagePath());
     }
     
     /**
-	 * Take screenshot
+	 * Take screenshot and put it in a file
 	 */
 	public File captureDesktopToFile() {
 		
@@ -307,26 +311,94 @@ public class ScreenshotUtil {
 			throw new ScenarioException("Erreur while creating screenshot:  " + e1.getMessage(), e1);
 		}
 	}
-
-    /**
+	
+	/**
+	 * Take screenshot and put it in a screenshot object
+	 */
+	public ScreenShot captureDeskotToScreenshot() {
+		ScreenShot screenShot = new ScreenShot();
+		screenShot.setTitle("Desktop");
+		File screenshotFile = captureDesktopToFile();
+		screenShot.setImagePath(SCREENSHOT_DIR + screenshotFile.getName());
+		return screenShot;
+	}
+	
+	/**
      * Capture snapshot if seleniumContext is configured to do so
      * @return
      */
-    public ScreenShot captureWebPageSnapshot() {
+	public ScreenShot captureWebPageSnapshot() {
+		try {
+			return captureWebPageSnapshots(false).get(0);
+		} catch (IndexOutOfBoundsException e) {
+			return new ScreenShot();
+		}
+	}
 
-        ScreenShot screenShot = new ScreenShot();
+    /**
+     * Capture browser windows to screenshot objects
+     * Current window will be the last captured one so that it can be recorded in the current step (see <code>TestLogging.logScreenshot</code>)
+     * @param allWindows 	if true, all windows created by this browsing session will be captured
+     * @return
+     */
+    public List<ScreenShot> captureWebPageSnapshots(boolean allWindows) {
 
         if (SeleniumTestsContextManager.getThreadContext() == null 
         		|| outputDirectory == null 
         		|| !SeleniumTestsContextManager.getThreadContext().getCaptureSnapshot()) {
-            return screenShot;
+            return new ArrayList<>();
+        }
+        
+        // check driver is accessible
+        List<ScreenShot> screenshots = new ArrayList<>();
+        Set<String> windowHandles;
+        String currentWindowHandle;
+        try {
+	        windowHandles = driver.getWindowHandles();
+	        currentWindowHandle = driver.getWindowHandle();
+        } catch (Exception e) {
+        	screenshots.add(captureDeskotToScreenshot());
+        	return screenshots;
         }
 
-        screenShot.setSuiteName(getSuiteName());
+        // capture all but the current window
+        try {
+	        if (allWindows) {
+	        	for (String windowHandle: windowHandles) {
+	        		if (windowHandle.equals(currentWindowHandle)) {
+	        			continue;
+	        		}
+	        		driver.switchTo().window(windowHandle);
+	        		screenshots.add(captureWebPageToScreenshot(""));
+	        	}
+	        }
+	        
+	    // be sure to go back to the window we left before capture 
+        } finally {
+        	try {
+        		driver.switchTo().window(currentWindowHandle);
+        		
+        		// capture current window
+                screenshots.add(captureWebPageToScreenshot("Current Window: "));
+        		
+        	} catch (Exception e) {
+            }
+        }
+
+        return screenshots;
+    }
+    
+    /**
+     * Capture current browser window to screenshot object 
+     * @return
+     */
+    private ScreenShot captureWebPageToScreenshot(String titlePrefix) {
+    	ScreenShot screenShot = new ScreenShot();
+    	screenShot.setSuiteName(getSuiteName());
 
         try {
             String url = "app";
-            String title = "app";
+            String title = titlePrefix + "app";
             String pageSource = "";
             if (SeleniumTestsContextManager.getThreadContext().getTestType().family().equals(TestType.WEB)) {
             	try {
@@ -338,7 +410,7 @@ public class ScreenshotUtil {
                     url = driver.getCurrentUrl();
                 }
 
-                title = driver.getTitle();
+                title = titlePrefix + driver.getTitle();
                 
                 try {
                 	pageSource = driver.getPageSource();

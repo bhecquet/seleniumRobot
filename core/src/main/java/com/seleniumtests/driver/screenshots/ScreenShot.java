@@ -115,7 +115,7 @@ public class ScreenShot {
 
     public String getFullImagePath() {
         if (this.imagePath != null) {
-            return this.imagePath.replace(suiteName, outputDirectory);
+            return outputDirectory + "/" + this.imagePath;
         } else {
             return null;
         }
@@ -123,7 +123,7 @@ public class ScreenShot {
 
     public String getFullHtmlPath() {
         if (this.htmlSourcePath != null) {
-            return this.htmlSourcePath.replace(suiteName, outputDirectory);
+            return outputDirectory + "/" + this.htmlSourcePath;
         } else {
             return null;
         }
