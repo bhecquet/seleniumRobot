@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -267,7 +268,7 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 	public Map<ITestContext, List<ITestResult>> generateSuiteSummaryReport(final List<ISuite> suites) {
 		
 		// build result list for each TestNG test
-		Map<ITestContext, List<ITestResult>> methodResultsMap = new HashMap<>();
+		Map<ITestContext, List<ITestResult>> methodResultsMap = new LinkedHashMap<>();
 		Integer fileIndex = 0;
 		
 		for (ISuite suite : suites) {
