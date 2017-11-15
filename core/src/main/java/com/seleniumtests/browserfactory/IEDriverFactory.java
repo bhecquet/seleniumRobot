@@ -17,7 +17,6 @@
 package com.seleniumtests.browserfactory;
 
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.ie.InternetExplorerDriver;
 
 import com.seleniumtests.customexception.DriverExceptions;
@@ -37,7 +36,7 @@ public class IEDriverFactory extends AbstractWebDriverFactory implements IWebDri
                 driver.quit();
                 driver = null;
             }
-        } catch (WebDriverException e) {
+        } catch (Exception e) {
             logger.error(e);
         }
     }

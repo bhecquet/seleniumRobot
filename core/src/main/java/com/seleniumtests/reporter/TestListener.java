@@ -290,7 +290,7 @@ public class TestListener implements IInvokedMethodListener, ITestListener {
 	}
 
 	/**
-	 * At the end of a successful test. 
+	 * At the end of a successful test. T
 	 * Log a screenshot.
 	 * 
 	 * @param argO
