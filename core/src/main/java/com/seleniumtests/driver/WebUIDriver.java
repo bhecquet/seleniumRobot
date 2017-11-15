@@ -63,7 +63,7 @@ public class WebUIDriver {
     private IWebDriverFactory webDriverBuilder;
     private BrowserInfo browserInfo;
     private List<Integer> driverPids;
-    private final Object createDriverLock = new Object();
+    private final static Object createDriverLock = new Object();
 
     public WebUIDriver() {
         init();
@@ -273,38 +273,42 @@ public class WebUIDriver {
     	logger.info("Browser version is: " + version);
     }
 
-    public synchronized WebDriver createWebDriver() {
+    public WebDriver createWebDriver() {
     	
-    	if (config.getTestType().isMobile()) {
-    		logger.info("Start creating appium driver");
-    	} else {
-    		logger.info(String.format("Start creating %s driver", config.getBrowser().getBrowserType()));
-    	}
+    	synchronized (createDriverLock) {
+	    	if (config.getTestType().isMobile()) {
+	    		logger.info("Start creating appium driver");
+	    	} else {
+	    		logger.info(String.format("Start creating %s driver", config.getBrowser().getBrowserType()));
+	    	}
     	
-    	// get browser info used to start this driver. It will be used then for 
-    	browserInfo = OSUtility.getInstalledBrowsersWithVersion().get(config.getBrowser());
-    	List<Integer> existingPids = new ArrayList<>();
+    	
+    		// get browser info used to start this driver. It will be used then for 
+        	browserInfo = OSUtility.getInstalledBrowsersWithVersion().get(config.getBrowser());
+        	List<Integer> existingPids = new ArrayList<>();
 
-		// get pid pre-existing the creation of this driver. This helps filtering drivers launched by other tests or users
-		if (browserInfo != null) {
-    		existingPids.addAll(browserInfo.getDriverAndBrowserPid(new ArrayList<>()));
+    		// get pid pre-existing the creation of this driver. This helps filtering drivers launched by other tests or users
+    		if (browserInfo != null) {
+        		existingPids.addAll(browserInfo.getDriverAndBrowserPid(new ArrayList<>()));
+        	}
+            
+        	displayBrowserVersion();
+            driver = createRemoteWebDriver();
+            
+            // get the created PIDs
+            if (browserInfo != null) {
+    			driverPids = browserInfo.getDriverAndBrowserPid(existingPids);
+    		}
+    	
+
+	        if (config.getTestType().isMobile()) {
+	    		logger.info("Finished creating appium driver");
+	    	} else {
+	    		logger.info(String.format("Finished creating %s driver", config.getBrowser().getBrowserType()));
+	    	}
+	
+	        driverSession.set(driver);
     	}
-        
-    	displayBrowserVersion();
-        driver = createRemoteWebDriver();
-        
-        // get the created PIDs
-        if (browserInfo != null) {
-			driverPids = browserInfo.getDriverAndBrowserPid(existingPids);
-		}
-
-        if (config.getTestType().isMobile()) {
-    		logger.info("Finished creating appium driver");
-    	} else {
-    		logger.info(String.format("Finished creating %s driver", config.getBrowser().getBrowserType()));
-    	}
-
-        driverSession.set(driver);
         return driver;
     }
 
