@@ -346,15 +346,15 @@ public class BrowserInfo {
      */
     public List<Integer> getAllBrowserSubprocessPids(List<Integer> driverPids) {
     	OSUtility osUtility = OSUtilityFactory.getInstance();
-    	List<Integer> allPids = new ArrayList<>();
+    	List<Integer> allPids = new ArrayList<>(driverPids);
     	
     	try {
     		for (Integer driverPid: driverPids) {
     			List<Integer> browserPids = osUtility.getChildProcessPid(driverPid, null, new ArrayList<>());
     			allPids.addAll(browserPids);
-    			for (Integer pid: browserPids) {
-    				List<Integer> subBrowserPids = osUtility.getChildProcessPid(driverPid, null, new ArrayList<>());
-    				allPids.addAll(browserPids);
+    			for (Integer browserPid: browserPids) {
+    				List<Integer> subBrowserPids = osUtility.getChildProcessPid(browserPid, null, new ArrayList<>());
+    				allPids.addAll(subBrowserPids);
     			}
     		}
     		return allPids;
