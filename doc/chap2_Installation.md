@@ -14,6 +14,14 @@ It has also been tested with IntelliJ, however this requires the AspectJ compile
 
 Sometimes, eclipse does not get the same environment variables than the system. This can block mobile testing when it search for `node` installed on system. Simply add the path to node installation to `PATH` environment variable (e.g: `$PATH:/usr/local/bin`)
 
+##### Test application project configuration #####
+When developping test application on eclipse, `core` aspects must be woven by IDE when tests are launched from it. 
+Convert project to aspectJ project:
+Right click on project -> Configure -> convert as AspectJ project
+
+Therefore, right click on test application project -> properties -> Build path -> AspectJ Build -> Aspect Path.
+Add either the `core` project if you have it in eclipse or add the `core-x.y.z.jar` file. 
+
 #### intelliJ ####
 IntelliJ Ultimate can be used to develop test applications (or seleniumrobot project itself) but requires some configuration to activate AspectJ
 
@@ -22,7 +30,7 @@ This step must be done only once to make IntelliJ work with aspectJ
 - follow this guide to configure AspectJ for IntelliJ: [https://www.jetbrains.com/help/idea/aspectj.html] (https://www.jetbrains.com/help/idea/aspectj.html)
 - File -> Settings -> Plugins: add aspectJ plugins (search aspectJ in search box and tick all)
 
-##### Project configuration #####
+##### Test Application Project configuration #####
 - Import the project (from eclipse or from maven)
 - By default, project is not seen as a maven one if imported from eclipse, so, right click on project -> add framework -> select maven
 - File -> Settings -> Build -> Compiler -> Java Compiler: <br/>
