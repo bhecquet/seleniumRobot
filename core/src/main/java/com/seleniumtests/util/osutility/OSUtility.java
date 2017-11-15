@@ -117,6 +117,16 @@ public abstract class OSUtility {
     public abstract List<ProcessInfo> getRunningProcessList();
     
     /**
+     * get sub process of parent one
+     * @param parentProcess		the parent process
+     * @param processName		the process name to search. May be null if any child should be matched
+     * @param existingPids		reply will not contain these PIDs
+     * @return
+     * @throws IOException
+     */
+    public abstract List<Integer> getChildProcessPid(Integer parentProcess, String processName, List<Integer> existingPids) throws IOException;
+    
+    /**
      * @param name of the process
      * @return ProcessInfo
      */
@@ -248,7 +258,7 @@ public abstract class OSUtility {
     public void killAllWebDriverProcess(){
     	for (ProcessInfo processInfo : getRunningProcessList()) {
     		for (String processName : webDriverProcessList) {
-    			if (processInfo.getName().equalsIgnoreCase(processName)){
+    			if (processInfo.getName().contains(processName)){
     				logger.info("Asked system to terminate webdriver: " + processInfo.getName());
     				killProcess(processInfo.getPid(), true);
     			}

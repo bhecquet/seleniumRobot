@@ -1,6 +1,7 @@
 package com.seleniumtests.browserfactory;
 
 import java.io.IOException;
+import java.lang.management.ManagementFactory;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -200,8 +201,27 @@ public class BrowserInfo {
 		}
 	}
 	
+	/**
+     * use firefox if version is below 47
+     * @param versionString
+     * @return
+     */
+    public static boolean useLegacyFirefoxVersion(String versionString) {
+    	Pattern regMozilla = Pattern.compile(".*?(\\d+)\\..*");
+    	Matcher versionMatcher = regMozilla.matcher(versionString);
+		if (versionMatcher.matches()) {
+			String version = versionMatcher.group(1);
+			if (Integer.parseInt(version) < 48) {
+				return true;
+			}
+		} 
+		return false;
+    }
+	
 	private void addFirefoxDriverFile() {
-		driverFileName = "geckodriver";
+		if (!useLegacyFirefoxVersion(version)) {
+			driverFileName = "geckodriver";
+		}
 	}
 	
 	/**
@@ -263,5 +283,86 @@ public class BrowserInfo {
 	public static void setDriverList(List<String> driverList) {
 		BrowserInfo.driverList = driverList;
 	}
+	
+	/**
+	 * get 
+	 * @return
+	 */
+    public List<Integer> getProgramPid(String programName, List<Integer> existingPids) {
+    	final String jvmName = ManagementFactory.getRuntimeMXBean().getName();
+        final int index = jvmName.indexOf('@');
+        
+        OSUtility osUtility = OSUtilityFactory.getInstance();
+        
+        if(index == 0) {
+        	return new ArrayList<>();
+        }
+        try {
+            String processId = Long.toString(Long.parseLong(jvmName.substring(0, index)));
+            List<Integer> driverProcesses = osUtility.getChildProcessPid(Integer.parseInt(processId), programName + osUtility.getProgramExtension(), existingPids);
+            return driverProcesses;
+        } catch (Exception e) {
+        	logger.warn("could not get driver pid", e);
+        	return new ArrayList<>();
+        }
+    }
+    
+    /**
+     * Returns the list of pids for existing drivers and browsers. These are direct programes launched by seleniumRobot
+     * @param existingPids
+     * @return
+     */
+    public List<Integer> getDriverAndBrowserPid(List<Integer> existingPids) {
+    	
+    	List<Integer> pids = new ArrayList<>();
+    	
+    	// no driver used to connect to browser
+    	if ((browser == BrowserType.FIREFOX && driverFileName == null) || browser == BrowserType.SAFARI) {
+    		pids.addAll(getBrowserPid(existingPids));
+    	} else {
+    		pids.addAll(getDriverPid(existingPids));
+    	}
+    	
+    	return pids;
+    }
+    
+    /**
+     * Get the driver process created by selenium. 
+     * @param existingPids
+     * @return
+     */
+    public List<Integer> getDriverPid(List<Integer> existingPids) {
+    	return getProgramPid(driverFileName, existingPids);
+    }
+    
+    public List<Integer> getBrowserPid(List<Integer> existingPids) {
+    	return getProgramPid(browser.getBrowserType().substring(1) + OSUtilityFactory.getInstance().getProgramExtension(), existingPids);
+    }
+    
+    /**
+     * Get the list of pids for the browser launched by driver and all subprocess created by browser
+     * @param driverPid
+     * @return
+     */
+    public List<Integer> getAllBrowserSubprocessPids(List<Integer> driverPids) {
+    	OSUtility osUtility = OSUtilityFactory.getInstance();
+    	List<Integer> allPids = new ArrayList<>();
+    	
+    	try {
+    		for (Integer driverPid: driverPids) {
+    			List<Integer> browserPids = osUtility.getChildProcessPid(driverPid, null, new ArrayList<>());
+    			allPids.addAll(browserPids);
+    			for (Integer pid: browserPids) {
+    				List<Integer> subBrowserPids = osUtility.getChildProcessPid(driverPid, null, new ArrayList<>());
+    				allPids.addAll(browserPids);
+    			}
+    		}
+    		return allPids;
+    		
+    		
+		} catch (IOException e) {
+			return new ArrayList<>();
+		}
+    }
 
 }

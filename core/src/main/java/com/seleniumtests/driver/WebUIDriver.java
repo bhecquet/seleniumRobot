@@ -16,6 +16,7 @@
  */
 package com.seleniumtests.driver;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -60,6 +61,9 @@ public class WebUIDriver {
     private DriverConfig config = new DriverConfig();
     private WebDriver driver;
     private IWebDriverFactory webDriverBuilder;
+    private BrowserInfo browserInfo;
+    private List<Integer> driverPids;
+    private final Object createDriverLock = new Object();
 
     public WebUIDriver() {
         init();
@@ -81,6 +85,7 @@ public class WebUIDriver {
         	if (config.getTestType().isMobile()) {
         		webDriverBuilder = new AppiumDriverFactory(this.config);
         	} else {
+        		
 	            if (config.getBrowser() == BrowserType.FIREFOX) {
 	                webDriverBuilder = new FirefoxDriverFactory(this.config);
 	            } else if (config.getBrowser() == BrowserType.INTERNET_EXPLORER) {
@@ -128,11 +133,13 @@ public class WebUIDriver {
             if (driver != null) {
                 try {
                     driver.quit();
-                } catch (WebDriverException ex) {
+                } catch (Exception ex) {
                     logger.error(ex);
                 }
             }
         }
+        
+        cleanDriverAndBrowserPid();
         
         // in case of mobile test with appium, stop appium server
         if (iWebDriverFactory instanceof AppiumDriverFactory) {
@@ -141,6 +148,20 @@ public class WebUIDriver {
 
         driverSession.remove();
         uxDriverSession.remove();
+    }
+    
+    /**
+     * This method will kill all drivers and browsers that could remain after driver has been closed by selenium
+     */
+    private static void cleanDriverAndBrowserPid() {
+    	WebUIDriver uiDriver = uxDriverSession.get();
+    	
+    	if (uiDriver.driverPids != null) {
+        	List<Integer> pidsToKill = uiDriver.browserInfo.getAllBrowserSubprocessPids(uiDriver.driverPids);
+        	for (Integer pid: pidsToKill) {
+        		OSUtilityFactory.getInstance().killProcess(pid.toString(), true);
+        	}
+    	}
     }
 
 	/**
@@ -252,16 +273,30 @@ public class WebUIDriver {
     	logger.info("Browser version is: " + version);
     }
 
-    public WebDriver createWebDriver() {
+    public synchronized WebDriver createWebDriver() {
     	
     	if (config.getTestType().isMobile()) {
     		logger.info("Start creating appium driver");
     	} else {
     		logger.info(String.format("Start creating %s driver", config.getBrowser().getBrowserType()));
     	}
+    	
+    	// get browser info used to start this driver. It will be used then for 
+    	browserInfo = OSUtility.getInstalledBrowsersWithVersion().get(config.getBrowser());
+    	List<Integer> existingPids = new ArrayList<>();
+
+		// get pid pre-existing the creation of this driver. This helps filtering drivers launched by other tests or users
+		if (browserInfo != null) {
+    		existingPids.addAll(browserInfo.getDriverAndBrowserPid(new ArrayList<>()));
+    	}
         
     	displayBrowserVersion();
         driver = createRemoteWebDriver();
+        
+        // get the created PIDs
+        if (browserInfo != null) {
+			driverPids = browserInfo.getDriverAndBrowserPid(existingPids);
+		}
 
         if (config.getTestType().isMobile()) {
     		logger.info("Finished creating appium driver");

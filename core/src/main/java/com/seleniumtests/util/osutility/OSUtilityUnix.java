@@ -22,6 +22,7 @@ import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Scanner;
 
 import com.seleniumtests.browserfactory.BrowserInfo;
 import com.seleniumtests.driver.BrowserType;
@@ -123,6 +124,26 @@ public class OSUtilityUnix extends OSUtility {
 		} 
 		
 		return browserList;
+	}
+	
+	@Override
+	public List<Integer> getChildProcessPid(Integer parentProcess, String processName, List<Integer> existingPids) throws IOException {
+		Scanner scan = new Scanner(Runtime.getRuntime().exec(String.format("pgrep -P %d", parentProcess)).getInputStream());
+        scan.useDelimiter("\\A");
+        String childProcessIds =  scan.hasNext() ? scan.next() : "";
+        List<Integer> namedSubprocesses = new ArrayList<>();
+        String[] splited = childProcessIds.split("\\s+");
+
+        for(int i =0 ; i<splited.length; i = i+2) {
+        	Integer pid = Integer.parseInt(splited[i+1]);
+            if((processName == null || processName.equalsIgnoreCase(splited[i])) && !existingPids.contains(pid)) {
+            	namedSubprocesses.add(pid);
+            }
+        }
+       
+        scan.close();
+        
+        return namedSubprocesses;
 	}
 
 }
