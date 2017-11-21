@@ -16,11 +16,6 @@
  */
 package com.seleniumtests.uipage;
 
-import java.awt.AWTException;
-import java.awt.Robot;
-import java.awt.Toolkit;
-import java.awt.datatransfer.StringSelection;
-import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.Date;
@@ -52,9 +47,9 @@ import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import com.seleniumtests.driver.DriverMode;
+import com.seleniumtests.driver.SeleniumHostUtility;
 import com.seleniumtests.driver.TestType;
 import com.seleniumtests.driver.WebUIDriver;
-import com.seleniumtests.driver.SeleniumHostUtility;
 import com.seleniumtests.driver.screenshots.ScreenShot;
 import com.seleniumtests.driver.screenshots.ScreenshotUtil;
 import com.seleniumtests.reporter.TestLogging;
@@ -629,7 +624,7 @@ public class PageObject extends BasePage implements IPage {
      */
 	public void uploadFile(String filePath) {
 
-		SeleniumHostUtility.uploadFile(filePath);
+		SeleniumHostUtility.getInstance(SeleniumTestsContextManager.getThreadContext().getRunMode()).uploadFile(filePath);
 		
 	}
 }
