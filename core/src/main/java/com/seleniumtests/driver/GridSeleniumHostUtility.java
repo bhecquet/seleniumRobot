@@ -2,19 +2,28 @@ package com.seleniumtests.driver;
 
 import java.awt.image.BufferedImage;
 
-import org.apache.commons.lang.NotImplementedException;
+import com.seleniumtests.connectors.selenium.SeleniumGridConnector;
 
+/*
+ * Use SeleniumRobotGridConnector
+ */
 public class GridSeleniumHostUtility extends SeleniumHostUtility {
+	
+	private SeleniumGridConnector gridConnector;
+
+	public GridSeleniumHostUtility(SeleniumGridConnector gridConnector) {
+		this.gridConnector = gridConnector;
+	}
 
 	@Override
 	public void uploadFile(String filePath) {
-		throw new NotImplementedException();
+		gridConnector.uploadFile(filePath);
 
 	}
 
 	@Override
 	public BufferedImage captureDesktopToBuffer() {
-		throw new NotImplementedException();
+		return gridConnector.captureDesktopToBuffer();
 	}
 
 }
