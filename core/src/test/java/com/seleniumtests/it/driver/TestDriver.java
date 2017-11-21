@@ -16,6 +16,12 @@
  */
 package com.seleniumtests.it.driver;
 
+import java.awt.AWTException;
+import java.awt.Robot;
+import java.awt.Toolkit;
+import java.awt.datatransfer.StringSelection;
+import java.awt.event.KeyEvent;
+import java.io.File;
 import java.util.regex.Pattern;
 
 import org.openqa.selenium.By;
@@ -58,7 +64,7 @@ public class TestDriver extends GenericTest {
 	public void initDriver(final ITestContext testNGCtx) throws Exception {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setExplicitWaitTimeout(2);
-		SeleniumTestsContextManager.getThreadContext().setBrowser("chrome");
+		SeleniumTestsContextManager.getThreadContext().setBrowser("iexplore");
 		testPage = new DriverTestPage(true);
 		driver = WebUIDriver.getWebDriver(true);
 	}
@@ -365,6 +371,17 @@ public class TestDriver extends GenericTest {
 		((JavascriptExecutor) driver).executeScript("window.scrollTo(0, 0);");
 		new HtmlElement("", By.id("buttonScroll")).click();
 		Assert.assertFalse(((JavascriptExecutor) driver).executeScript("return window.pageYOffset;").equals(0L));
+	}
+	
+	@Test(groups= {"it"})
+	public void testUploadFile() throws AWTException, InterruptedException {
+		String path = SeleniumTestsContextManager.getConfigPath() + File.separator + "config.ini";
+		testPage.upload.click();
+		
+		testPage.uploadFile(path);
+		
+		
+		Assert.assertEquals(testPage.uploadedFile.getAttribute("value"), "config.ini");
 	}
 	
 	
