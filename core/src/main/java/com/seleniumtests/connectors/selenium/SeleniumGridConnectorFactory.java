@@ -24,13 +24,23 @@ import com.seleniumtests.util.logging.SeleniumRobotLogger;
  */
 public class SeleniumGridConnectorFactory {
 	
+	private static ThreadLocal<SeleniumGridConnector> seleniumGridConnector = new ThreadLocal<>();
+	
 	protected static final Logger logger = SeleniumRobotLogger.getLogger(SeleniumGridConnector.class);
 	
 	private SeleniumGridConnectorFactory() {
-		// othing to do
+		// nothing to do
+	}
+	
+	public static SeleniumGridConnector getInstance() {
+		if (seleniumGridConnector.get() == null) {
+			throw new ConfigurationException("getInstance() should be called after getInstance(String url) has been called once");
+		}
+		return seleniumGridConnector.get();
 	}
 
-	public static SeleniumGridConnector getInstance(String url) {
+	public synchronized static SeleniumGridConnector getInstance(String url) {
+		
 		URL hubUrl;
 		try {
 			hubUrl = new URL(url);
@@ -49,10 +59,11 @@ public class SeleniumGridConnectorFactory {
         	
         	if (response.getStatusLine().getStatusCode() == 200) {
         		if (content.contains("default monitoring page")) {
-        			return new SeleniumGridConnector(url);
+        			seleniumGridConnector.set(new SeleniumGridConnector(url));
         		} else {
-        			return new SeleniumRobotGridConnector(url);
+        			seleniumGridConnector.set(new SeleniumRobotGridConnector(url));
         		}
+        		return seleniumGridConnector.get();
         	} else {
         		throw new ConfigurationException("Cannot connect to the grid hub at " + url);
         	}

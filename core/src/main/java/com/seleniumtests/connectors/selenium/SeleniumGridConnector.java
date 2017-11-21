@@ -1,5 +1,6 @@
 package com.seleniumtests.connectors.selenium;
 
+import java.awt.image.BufferedImage;
 import java.net.MalformedURLException;
 import java.net.URL;
 
@@ -42,6 +43,22 @@ public class SeleniumGridConnector {
 	 */
 	public void uploadMobileApp(Capabilities caps) {
 		return;
+	}
+	
+	/**
+	 * Upload a file given file path
+	 * @param filePath
+	 */
+	public void uploadFile(String filePath) {
+		return;
+	}
+	
+	/**
+	 * Take screenshot of the full desktop
+	 * @return
+	 */
+	public BufferedImage captureDesktopToBuffer() {
+		return null;
 	}
 	
 	public void runTest(RemoteWebDriver driver) {
