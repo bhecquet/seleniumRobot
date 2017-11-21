@@ -124,7 +124,7 @@ public abstract class OSUtility {
      * @return
      * @throws IOException
      */
-    public abstract List<Integer> getChildProcessPid(Integer parentProcess, String processName, List<Integer> existingPids) throws IOException;
+    public abstract List<Long> getChildProcessPid(Long parentProcess, String processName, List<Long> existingPids) throws IOException;
     
     /**
      * @param name of the process
@@ -284,6 +284,8 @@ public abstract class OSUtility {
     public abstract int getIEVersion();
     
     public abstract String getOSBuild();
+    
+    public abstract String getProgramNameFromPid(Long pid);
     
     public static String getChromeVersion(String chromePath) {
     	return OSCommand.executeCommandAndWait(new String[] {chromePath, "--version"});

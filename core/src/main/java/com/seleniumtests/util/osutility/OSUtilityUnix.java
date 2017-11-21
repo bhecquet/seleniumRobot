@@ -127,16 +127,16 @@ public class OSUtilityUnix extends OSUtility {
 	}
 	
 	@Override
-	public List<Integer> getChildProcessPid(Integer parentProcess, String processName, List<Integer> existingPids) throws IOException {
+	public List<Long> getChildProcessPid(Long parentProcess, String processName, List<Long> existingPids) throws IOException {
 		
-		List<Integer> searchedPids = new ArrayList<>();
+		List<Long> searchedPids = new ArrayList<>();
 		
 		String pids = OSCommand.executeCommandAndWait(String.format("pgrep -P %d -d , -l", parentProcess)).trim();
         for(String process: pids.split(",")) {
         	String[] processSplit = process.split(" ");
-        	Integer pid;
+        	Long pid;
         	try {
-        		pid = Integer.parseInt(processSplit[0]);
+        		pid = Long.parseLong(processSplit[0]);
         	} catch (NumberFormatException e) {
         		continue;
         	}
@@ -147,6 +147,11 @@ public class OSUtilityUnix extends OSUtility {
        
         
         return searchedPids;
+	}
+	
+	@Override
+	public String getProgramNameFromPid(Long pid) {
+		return OSCommand.executeCommandAndWait(String.format("ps -p %d -o comm=", pid));
 	}
 
 }
