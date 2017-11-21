@@ -45,6 +45,7 @@ import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.customexception.WebSessionEndedException;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.CustomEventFiringWebDriver;
+import com.seleniumtests.driver.SeleniumHostUtility;
 import com.seleniumtests.driver.TestType;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.reporter.TestLogging;
@@ -292,21 +293,13 @@ public class ScreenshotUtil {
 			throw new ScenarioException("Desktop capture can only be done on Desktop tests");
 		}
 		
-		GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
-		GraphicsDevice defaultGraphicDevice = ge.getDefaultScreenDevice();
-		Integer screenWidth = defaultGraphicDevice.getDisplayMode().getWidth();
-		Integer screenHeight = defaultGraphicDevice.getDisplayMode().getHeight();
-		
 		// Capture the screen shot of the area of the screen defined by the rectangle
-        BufferedImage bi;
 		try {
-			bi = new Robot().createScreenCapture(new Rectangle(screenWidth, screenHeight));
+			BufferedImage bi = SeleniumHostUtility.captureDesktopToBuffer();
 			filename = HashCodeGenerator.getRandomHashCode("web");
 			File outputFile = new File(outputDirectory + "/" + SCREENSHOT_DIR + filename + ".png");
 			ImageIO.write(bi, "png" , outputFile);
 			return outputFile;
-		} catch (AWTException e) {
-			throw new ScenarioException("Cannot capture image", e);
 		} catch (IOException e1) {
 			throw new ScenarioException("Erreur while creating screenshot:  " + e1.getMessage(), e1);
 		}
