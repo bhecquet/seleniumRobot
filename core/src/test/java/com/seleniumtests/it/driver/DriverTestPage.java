@@ -63,6 +63,8 @@ public class DriverTestPage extends PageObject {
 	public static final PictureElement picture = new PictureElement("picture", "tu/images/logo_text_field.png", table);
 	public static final PictureElement pictureNotPresent = new PictureElement("picture", "tu/images/vosAlertes.png", table);
 	public static final TextFieldElement logoText = new TextFieldElement("logoText", By.id("logoText"));
+	public static final ButtonElement upload = new ButtonElement("upload", By.id("upload"));
+	public static final TextFieldElement uploadedFile = new TextFieldElement("uploadedFile", By.id("uploadedFile"));
 	
 	// Elements inside others
 	public static final TextFieldElement textElement2 = new HtmlElement("", By.id("parentDiv")).findTextFieldElement(By.name("textField"));

@@ -172,6 +172,9 @@
 	<div style="background:#00FF00;height:1px;width:500px;position:fixed;bottom:5px;left:0px;"></div>
 	<div style="background:#FFC800;height:5px;width:500px;position:fixed;bottom:0px;left:0px;"></div>
 	
+	<h3>Test upload</h3>
+	<input type="text" id="uploadedFile"><input type="file" id="upload"/>
+	
 <script src="jquery.min.js">
 </script>
 <script> 
@@ -234,6 +237,11 @@ trigger.click(function() {
 list.click(function() {
     trigger.click();
 }); 
+
+document.getElementById('upload').addEventListener('change', function(){
+        var file =  this.files[0];
+        $('#uploadedFile').val(file.name);
+}, false);
 
 
 </script> 
