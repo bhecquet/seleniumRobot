@@ -288,7 +288,7 @@ public class BrowserInfo {
 	 * get 
 	 * @return
 	 */
-    public List<Integer> getProgramPid(String programName, List<Integer> existingPids) {
+    public List<Long> getProgramPid(String programName, List<Long> existingPids) {
     	final String jvmName = ManagementFactory.getRuntimeMXBean().getName();
         final int index = jvmName.indexOf('@');
         
@@ -299,7 +299,7 @@ public class BrowserInfo {
         }
         try {
             String processId = Long.toString(Long.parseLong(jvmName.substring(0, index)));
-            List<Integer> driverProcesses = osUtility.getChildProcessPid(Integer.parseInt(processId), programName + osUtility.getProgramExtension(), existingPids);
+            List<Long> driverProcesses = osUtility.getChildProcessPid(Long.parseLong(processId), programName + osUtility.getProgramExtension(), existingPids);
             return driverProcesses;
         } catch (Exception e) {
         	logger.warn("could not get driver pid", e);
@@ -312,9 +312,9 @@ public class BrowserInfo {
      * @param existingPids
      * @return
      */
-    public List<Integer> getDriverAndBrowserPid(List<Integer> existingPids) {
+    public List<Long> getDriverAndBrowserPid(List<Long> existingPids) {
     	
-    	List<Integer> pids = new ArrayList<>();
+    	List<Long> pids = new ArrayList<>();
     	
     	// no driver used to connect to browser
     	if ((browser == BrowserType.FIREFOX && driverFileName == null) || browser == BrowserType.SAFARI) {
@@ -331,11 +331,11 @@ public class BrowserInfo {
      * @param existingPids
      * @return
      */
-    public List<Integer> getDriverPid(List<Integer> existingPids) {
+    public List<Long> getDriverPid(List<Long> existingPids) {
     	return getProgramPid(driverFileName, existingPids);
     }
     
-    public List<Integer> getBrowserPid(List<Integer> existingPids) {
+    public List<Long> getBrowserPid(List<Long> existingPids) {
     	return getProgramPid(browser.getBrowserType().substring(1) + OSUtilityFactory.getInstance().getProgramExtension(), existingPids);
     }
     
@@ -344,16 +344,16 @@ public class BrowserInfo {
      * @param driverPid
      * @return
      */
-    public List<Integer> getAllBrowserSubprocessPids(List<Integer> driverPids) {
+    public List<Long> getAllBrowserSubprocessPids(List<Long> driverPids) {
     	OSUtility osUtility = OSUtilityFactory.getInstance();
-    	List<Integer> allPids = new ArrayList<>(driverPids);
+    	List<Long> allPids = new ArrayList<>(driverPids);
     	
     	try {
-    		for (Integer driverPid: driverPids) {
-    			List<Integer> browserPids = osUtility.getChildProcessPid(driverPid, null, new ArrayList<>());
+    		for (Long driverPid: driverPids) {
+    			List<Long> browserPids = osUtility.getChildProcessPid(driverPid, null, new ArrayList<>());
     			allPids.addAll(browserPids);
-    			for (Integer browserPid: browserPids) {
-    				List<Integer> subBrowserPids = osUtility.getChildProcessPid(browserPid, null, new ArrayList<>());
+    			for (Long browserPid: browserPids) {
+    				List<Long> subBrowserPids = osUtility.getChildProcessPid(browserPid, null, new ArrayList<>());
     				allPids.addAll(subBrowserPids);
     			}
     		}
@@ -364,5 +364,9 @@ public class BrowserInfo {
 			return new ArrayList<>();
 		}
     }
+
+	public boolean isDriverFileSearched() {
+		return driverFileSearched;
+	}
 
 }

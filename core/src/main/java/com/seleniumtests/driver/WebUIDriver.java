@@ -62,7 +62,7 @@ public class WebUIDriver {
     private WebDriver driver;
     private IWebDriverFactory webDriverBuilder;
     private BrowserInfo browserInfo;
-    private List<Integer> driverPids;
+    private List<Long> driverPids;
     private final static Object createDriverLock = new Object();
 
     public WebUIDriver() {
@@ -70,7 +70,7 @@ public class WebUIDriver {
         uxDriverSession.set(this);
     }
 
-    public WebDriver createRemoteWebDriver()  {
+	public WebDriver createRemoteWebDriver()  {
         
         // TODO: use grid with appium ?
         if (config.getMode() == DriverMode.GRID) {
@@ -157,8 +157,8 @@ public class WebUIDriver {
     	WebUIDriver uiDriver = uxDriverSession.get();
     	
     	if (uiDriver.driverPids != null) {
-        	List<Integer> pidsToKill = uiDriver.browserInfo.getAllBrowserSubprocessPids(uiDriver.driverPids);
-        	for (Integer pid: pidsToKill) {
+        	List<Long> pidsToKill = uiDriver.browserInfo.getAllBrowserSubprocessPids(uiDriver.driverPids);
+        	for (Long pid: pidsToKill) {
         		OSUtilityFactory.getInstance().killProcess(pid.toString(), true);
         	}
     	}
@@ -285,7 +285,7 @@ public class WebUIDriver {
     	
     		// get browser info used to start this driver. It will be used then for 
         	browserInfo = OSUtility.getInstalledBrowsersWithVersion().get(config.getBrowser());
-        	List<Integer> existingPids = new ArrayList<>();
+        	List<Long> existingPids = new ArrayList<>();
 
     		// get pid pre-existing the creation of this driver. This helps filtering drivers launched by other tests or users
     		if (browserInfo != null) {
@@ -489,5 +489,17 @@ public class WebUIDriver {
 
 	public DriverConfig getConfig() {
 		return config;
+	}
+	
+    public static ThreadLocal<WebUIDriver> getUxDriverSession() {
+		return uxDriverSession;
+	}
+
+	public BrowserInfo getBrowserInfo() {
+		return browserInfo;
+	}
+
+	public List<Long> getDriverPids() {
+		return driverPids;
 	}
 }

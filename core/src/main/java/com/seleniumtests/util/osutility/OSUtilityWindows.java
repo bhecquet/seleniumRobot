@@ -215,16 +215,16 @@ public class OSUtilityWindows extends OSUtility {
 	}
 
 	@Override
-	public List<Integer> getChildProcessPid(Integer parentProcess, String processName, List<Integer> existingPids) throws IOException {
+	public List<Long> getChildProcessPid(Long parentProcess, String processName, List<Long> existingPids) throws IOException {
 		Scanner scan = new Scanner(Runtime.getRuntime().exec(String.format("wmic process where (ParentProcessId=%d) get Caption,ProcessId", parentProcess)).getInputStream());
         scan.useDelimiter("\\A");
         String childProcessIds =  scan.hasNext() ? scan.next() : "";
-        List<Integer> namedSubprocesses = new ArrayList<>();
+        List<Long> namedSubprocesses = new ArrayList<>();
         String[] splited = childProcessIds.split("\\s+");
         for(int i =0 ; i<splited.length; i = i+2){
-        	Integer pid;
+        	Long pid;
         	try {
-        		pid = Integer.parseInt(splited[i+1]);
+        		pid = Long.parseLong(splited[i+1]);
         	} catch (NumberFormatException e) {
         		continue;
         	}
@@ -236,5 +236,12 @@ public class OSUtilityWindows extends OSUtility {
         scan.close();
         
         return namedSubprocesses;
+	}
+
+	@Override
+	public String getProgramNameFromPid(Long pid) {
+		String[] processNames = OSCommand.executeCommandAndWait(String.format("wmic process where processId=%d get name", pid)).trim().split("\n");
+		String processName = processNames[processNames.length - 1];
+		return processName.endsWith(".exe") ? processName: "";
 	}
 }

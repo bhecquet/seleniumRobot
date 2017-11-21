@@ -16,6 +16,8 @@
  */
 package com.seleniumtests.it.util;
 
+import java.lang.management.ManagementFactory;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.testng.Assert;
@@ -30,10 +32,15 @@ import com.seleniumtests.util.osutility.ProcessInfo;
 public class TestOsUtility extends GenericTest {
 
 	private OSUtility osUtil;
+	private Long processId;
 	
 	@BeforeClass(groups={"it"})
 	public void testInitialization() {
 		osUtil = OSUtilityFactory.getInstance();
+		
+		final String jvmName = ManagementFactory.getRuntimeMXBean().getName();
+        final int index = jvmName.indexOf('@');
+        processId = Long.parseLong(jvmName.substring(0, index));
 	}
 	
 	@Test(groups={"it"})
@@ -78,5 +85,22 @@ public class TestOsUtility extends GenericTest {
 		Assert.assertFalse(osUtil.isProcessRunning("anUnknownProcess"), String.format("process anUnknownProcess should not be found"));
 	}
 	
+	@Test(groups={"it"})
+	public void testGetProcessNameFromPid() {
+		if (OSUtility.isWindows()) {
+			Assert.assertEquals(osUtil.getProgramNameFromPid(processId), "javaw.exe");
+		}
+	}
 	
+	@Test(groups={"it"})
+	public void testGetProcessNameFromNonExistingPid() {
+		Assert.assertEquals(osUtil.getProgramNameFromPid(999999L), "");
+	}
+	
+	@Test(groups={"it"})
+	public void testGetProcessNameFromPidLinux() {
+		if (OSUtility.isLinux()) {
+			Assert.assertEquals(osUtil.getProgramNameFromPid(processId), "javaw");
+		}
+	}
 }
