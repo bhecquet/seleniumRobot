@@ -16,11 +16,6 @@
  */
 package com.seleniumtests.driver.screenshots;
 
-import java.awt.AWTException;
-import java.awt.GraphicsDevice;
-import java.awt.GraphicsEnvironment;
-import java.awt.Rectangle;
-import java.awt.Robot;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -48,7 +43,6 @@ import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import com.seleniumtests.driver.SeleniumHostUtility;
 import com.seleniumtests.driver.TestType;
 import com.seleniumtests.driver.WebUIDriver;
-import com.seleniumtests.reporter.TestLogging;
 import com.seleniumtests.util.FileUtility;
 import com.seleniumtests.util.HashCodeGenerator;
 import com.seleniumtests.util.imaging.ImageProcessor;
@@ -295,7 +289,7 @@ public class ScreenshotUtil {
 		
 		// Capture the screen shot of the area of the screen defined by the rectangle
 		try {
-			BufferedImage bi = SeleniumHostUtility.captureDesktopToBuffer();
+			BufferedImage bi = SeleniumHostUtility.getInstance(SeleniumTestsContextManager.getThreadContext().getRunMode()).captureDesktopToBuffer();
 			filename = HashCodeGenerator.getRandomHashCode("web");
 			File outputFile = new File(outputDirectory + "/" + SCREENSHOT_DIR + filename + ".png");
 			ImageIO.write(bi, "png" , outputFile);
