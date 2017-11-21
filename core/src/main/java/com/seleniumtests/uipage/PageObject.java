@@ -29,6 +29,9 @@ import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
+import org.openqa.selenium.Dimension;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.Point;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.UnsupportedCommandException;
@@ -46,11 +49,12 @@ import com.seleniumtests.core.SeleniumTestsPageListener;
 import com.seleniumtests.customexception.CustomSeleniumTestsException;
 import com.seleniumtests.customexception.NotCurrentPageException;
 import com.seleniumtests.customexception.ScenarioException;
+import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import com.seleniumtests.driver.DriverMode;
 import com.seleniumtests.driver.TestType;
 import com.seleniumtests.driver.WebUIDriver;
-import com.seleniumtests.driver.WebUtility;
+import com.seleniumtests.driver.SeleniumHostUtility;
 import com.seleniumtests.driver.screenshots.ScreenShot;
 import com.seleniumtests.driver.screenshots.ScreenshotUtil;
 import com.seleniumtests.reporter.TestLogging;
@@ -362,7 +366,22 @@ public class PageObject extends BasePage implements IPage {
     }
 
     public final void maximizeWindow() {
-        new WebUtility(driver).maximizeWindow();
+        try {
+        	// app test are not compatible with window
+        	if (SeleniumTestsContextManager.getThreadContext().getTestType().family() == TestType.APP || SeleniumTestsContextManager.getThreadContext().getBrowser() == BrowserType.BROWSER) {
+                return;
+            }
+
+            driver.manage().window().maximize();
+        } catch (Exception ex) {
+
+            try {
+                ((JavascriptExecutor) driver).executeScript(
+                    "if (window.screen){window.moveTo(0, 0);window.resizeTo(window.screen.availWidth,window.screen.availHeight);}");
+            } catch (Exception ignore) {
+                TestLogging.log("Unable to maximize browser window. Exception occured: " + ignore.getMessage());
+            }
+        }
     }
     
     /**
@@ -430,8 +449,37 @@ public class PageObject extends BasePage implements IPage {
         }
     }
 
+    /**
+     * Resize window to given dimensions.
+     *
+     * @param  width
+     * @param  height
+     */
     public final void resizeTo(final int width, final int height) {
-        new WebUtility(driver).resizeWindow(width, height);
+    	// app test are not compatible with window
+    	if (SeleniumTestsContextManager.getThreadContext().getTestType().family() == TestType.APP) {
+            return;
+        }
+    	
+        try {
+            Dimension setSize = new Dimension(width, height);
+            driver.manage().window().setPosition(new Point(0, 0));
+            int retries = 5;
+            
+            for (int i=0; i < retries; i++) {
+            	driver.manage().window().setSize(setSize);
+            	Dimension viewPortSize = ((CustomEventFiringWebDriver)driver).getViewPortDimensionWithoutScrollbar();
+            	
+            	if (viewPortSize.height == height && viewPortSize.width == width) {
+            		break;
+            	} else {
+            		setSize = new Dimension(2 * width - viewPortSize.width, 2 * height - viewPortSize.height);
+            	}
+            }
+            
+        } catch (Exception ex) {
+        	logger.error(ex);
+        }
     }
 
     public final void selectFrame(final Integer index) {
@@ -581,34 +629,7 @@ public class PageObject extends BasePage implements IPage {
      */
 	public void uploadFile(String filePath) {
 
-		// Copy to clipboard
-		Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(filePath), null);
-		Robot robot;
-		try {
-			robot = new Robot();
+		SeleniumHostUtility.uploadFile(filePath);
 		
-			WaitHelper.waitForSeconds(1);
-	
-			// Press Enter
-			robot.keyPress(KeyEvent.VK_ENTER);
-	
-			// Release Enter
-			robot.keyRelease(KeyEvent.VK_ENTER);
-	
-			// Press CTRL+V
-			robot.keyPress(KeyEvent.VK_CONTROL);
-			robot.keyPress(KeyEvent.VK_V);
-	
-			// Release CTRL+V
-			robot.keyRelease(KeyEvent.VK_CONTROL);
-			robot.keyRelease(KeyEvent.VK_V);
-			WaitHelper.waitForSeconds(1);
-	
-			// Press Enter
-			robot.keyPress(KeyEvent.VK_ENTER);
-			robot.keyRelease(KeyEvent.VK_ENTER);
-		} catch (AWTException e) {
-			logger.error("could not initialize robot" + e.getMessage());
-		}
 	}
 }
