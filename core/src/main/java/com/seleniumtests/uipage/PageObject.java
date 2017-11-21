@@ -16,6 +16,11 @@
  */
 package com.seleniumtests.uipage;
 
+import java.awt.AWTException;
+import java.awt.Robot;
+import java.awt.Toolkit;
+import java.awt.datatransfer.StringSelection;
+import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.Date;
@@ -561,4 +566,49 @@ public class PageObject extends BasePage implements IPage {
             throw ex;
         }
     }
+    
+    /**
+     * Method to handle file upload through robot class
+     * /!\ This should only be used as the last option when uploading file cannot be done an other way
+     * https://saucelabs.com/resources/articles/best-practices-tips-selenium-file-upload
+     * <code>
+     * driver.setFileDetector(new LocalFileDetector());
+     * driver.get("http://sso.dev.saucelabs.com/test/guinea-file-upload");
+     *   WebElement upload = driver.findElement(By.id("myfile"));
+     *   upload.sendKeys("/Users/sso/the/local/path/to/darkbulb.jpg");
+     *   </code> 
+     * @param filePath
+     */
+	public void uploadFile(String filePath) {
+
+		// Copy to clipboard
+		Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(filePath), null);
+		Robot robot;
+		try {
+			robot = new Robot();
+		
+			WaitHelper.waitForSeconds(1);
+	
+			// Press Enter
+			robot.keyPress(KeyEvent.VK_ENTER);
+	
+			// Release Enter
+			robot.keyRelease(KeyEvent.VK_ENTER);
+	
+			// Press CTRL+V
+			robot.keyPress(KeyEvent.VK_CONTROL);
+			robot.keyPress(KeyEvent.VK_V);
+	
+			// Release CTRL+V
+			robot.keyRelease(KeyEvent.VK_CONTROL);
+			robot.keyRelease(KeyEvent.VK_V);
+			WaitHelper.waitForSeconds(1);
+	
+			// Press Enter
+			robot.keyPress(KeyEvent.VK_ENTER);
+			robot.keyRelease(KeyEvent.VK_ENTER);
+		} catch (AWTException e) {
+			logger.error("could not initialize robot" + e.getMessage());
+		}
+	}
 }
