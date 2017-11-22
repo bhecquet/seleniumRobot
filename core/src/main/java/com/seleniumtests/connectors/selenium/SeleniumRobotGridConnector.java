@@ -34,7 +34,9 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 	}
 	
 	/**
-	 * In case an app is required on the node running the test, upload it to the grid
+	 * In case an app is required on the node running the test, upload it to the grid hub
+	 * This will then be made available through HTTP GET URL to the node (appium will receive an url instead of a file)
+	 * 
 	 */
 	@Override
 	public void uploadMobileApp(Capabilities caps) {
@@ -64,6 +66,7 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 		        if (response.getStatusLine().getStatusCode() != 200) {
 		        	throw new SeleniumGridException("could not upload application file: " + response.getStatusLine().getReasonPhrase());
 		        } else {
+		        	// set path to the mobile application as an URL on the grid hub
 		        	((DesiredCapabilities)caps).setCapability(MobileCapabilityType.APP, IOUtils.toString(response.getEntity().getContent()) + "/" + appFiles.get(0).getName());
 		        }
 		        

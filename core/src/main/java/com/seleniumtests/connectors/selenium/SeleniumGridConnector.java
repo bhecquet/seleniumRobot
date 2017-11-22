@@ -15,6 +15,7 @@ import org.apache.log4j.Logger;
 import org.json.JSONObject;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.remote.SessionId;
 
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.reporter.TestLogging;
@@ -25,6 +26,8 @@ public class SeleniumGridConnector {
 	protected URL hubUrl;
 	protected String hubHost;
 	protected int hubPort;
+	protected SessionId sessionId;
+	protected String nodeUrl;
 	protected static final Logger logger = SeleniumRobotLogger.getLogger(SeleniumGridConnector.class);
 	
 	public SeleniumGridConnector(String url) {
@@ -75,11 +78,12 @@ public class SeleniumGridConnector {
             String responseContent = EntityUtils.toString(response.getEntity());
             
             JSONObject object = new JSONObject(responseContent);
-            String proxyId = (String) object.get("proxyId");
-            String node = proxyId.split("//")[1].split(":")[0];
+            nodeUrl = (String) object.get("proxyId");
+            String node = nodeUrl.split("//")[1].split(":")[0];
             String browserName = driver.getCapabilities().getBrowserName();
             String version = driver.getCapabilities().getVersion();
-            TestLogging.info("WebDriver is running on node " + node + ", " + browserName + " " + version + ", session " + driver.getSessionId());
+            sessionId = driver.getSessionId();
+            TestLogging.info("WebDriver is running on node " + node + ", " + browserName + " " + version + ", session " + sessionId);
             
         } catch (Exception ex) {
         	logger.error(ex);
@@ -88,5 +92,13 @@ public class SeleniumGridConnector {
 
 	public URL getHubUrl() {
 		return hubUrl;
+	}
+
+	public SessionId getSessionId() {
+		return sessionId;
+	}
+
+	public String getNodeUrl() {
+		return nodeUrl;
 	}
 }
