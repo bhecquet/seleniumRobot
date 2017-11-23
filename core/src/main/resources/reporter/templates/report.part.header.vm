@@ -13,8 +13,8 @@
     #else
 	<link rel="stylesheet" type="text/css" href="resources/templates/seleniumRobot_solo.css">
     #end
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lobster+Two"> 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.5.0/css/font-awesome.min.css">
+    <link rel="stylesheet" type="text/css" href="resources/templates/lobsterTwo.css"> 
+    <link rel="stylesheet" type="text/css" href="resources/templates/css/font-awesome.min.css">
     
     <script src="resources/templates/jQuery-2.2.0.min.js"></script>
 	<script src="resources/templates/bootstrap.min.js"></script>
@@ -31,26 +31,26 @@
 	#if ($report.equals("complete"))
 	<div class="wrapper">
 		<header class='main-header'>
-		    <a href='http://www.seleniumtests.com/2013/10/announcing-selenium-tests-automation.html'>SeleniumRobot</a><br/>
+		    <a href='https://github.com/bhecquet/seleniumRobot'>SeleniumRobot</a><br/>
 		</header>
 	</div>
 	#else
 		#if ($header == "passed")
 	<div class="wrapper">
 		<header class='main-header header-success'>
-		    <a href='http://www.seleniumtests.com/2013/10/announcing-selenium-tests-automation.html'>SeleniumRobot</a><br/>
+		    <a href='https://github.com/bhecquet/seleniumRobot'>SeleniumRobot</a><br/>
 		</header>
 	</div>
 	#elseif ($header == "failed")
 	<div class="wrapper">
 		<header class='main-header header-failed'>
-		    <a href='http://www.seleniumtests.com/2013/10/announcing-selenium-tests-automation.html'>SeleniumRobot</a><br/>
+		    <a href='https://github.com/bhecquet/seleniumRobot'>SeleniumRobot</a><br/>
 		</header>
 	</div>
 	#else
 	<div class="wrapper">
 		<header class='main-header header-skipped'>
-		    <a href='http://www.seleniumtests.com/2013/10/announcing-selenium-tests-automation.html'>SeleniumRobot</a><br/>
+		    <a href='https://github.com/bhecquet/seleniumRobot'>SeleniumRobot</a><br/>
 		</header>
 	</div>
 	#end
