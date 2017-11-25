@@ -277,8 +277,8 @@ public class ScreenshotUtil {
     	}
     	return new File(screenShot.getFullImagePath());
     }
-    
-    /**
+	
+	/**
 	 * Take screenshot and put it in a file
 	 */
 	public File captureDesktopToFile() {
@@ -287,22 +287,32 @@ public class ScreenshotUtil {
 			throw new ScenarioException("Desktop capture can only be done on Desktop tests");
 		}
 		
-		// Capture the screen shot of the area of the screen defined by the rectangle
+		TakesScreenshot screenShot = (TakesScreenshot) driver;
+		String screenshotString = screenShot.getScreenshotAs(CustomOutputType.DESKTOP_BASE64);
+		
 		try {
-			BufferedImage bi = SeleniumHostUtility.getInstance(SeleniumTestsContextManager.getThreadContext().getRunMode()).captureDesktopToBuffer();
-			filename = HashCodeGenerator.getRandomHashCode("web");
-			File outputFile = new File(outputDirectory + "/" + SCREENSHOT_DIR + filename + ".png");
-			ImageIO.write(bi, "png" , outputFile);
-			return outputFile;
-		} catch (IOException e1) {
-			throw new ScenarioException("Erreur while creating screenshot:  " + e1.getMessage(), e1);
+			if (screenshotString != null && !screenshotString.isEmpty()) {
+	            byte[] byteArray = screenshotString.getBytes();
+	            filename = HashCodeGenerator.getRandomHashCode("web");
+	            String filePath = outputDirectory + "/" + SCREENSHOT_DIR + filename + ".png";
+	            byte[] decodeBuffer = Base64.decodeBase64(byteArray);
+	            BufferedImage img = ImageProcessor.loadFromFile(decodeBuffer);
+	            FileUtility.writeImage(filePath, img);
+	            return new File(filePath);
+			} else {
+				throw new ScenarioException("Erreur while creating screenshot");
+			}
+		} catch (IOException e) {
+			throw new ScenarioException("Erreur while creating screenshot:  " + e.getMessage(), e);
 		}
+		
+		
 	}
 	
 	/**
 	 * Take screenshot and put it in a screenshot object
 	 */
-	public ScreenShot captureDeskotToScreenshot() {
+	public ScreenShot captureDesktopToScreenshot() {
 		ScreenShot screenShot = new ScreenShot();
 		screenShot.setTitle("Desktop");
 		File screenshotFile = captureDesktopToFile();
@@ -325,6 +335,7 @@ public class ScreenshotUtil {
     /**
      * Capture browser windows to screenshot objects
      * Current window will be the last captured one so that it can be recorded in the current step (see <code>TestLogging.logScreenshot</code>)
+     * If an error occurs when getting driver, desktop snapshot is taken
      * @param allWindows 	if true, all windows created by this browsing session will be captured
      * @return
      */
@@ -344,7 +355,11 @@ public class ScreenshotUtil {
 	        windowHandles = driver.getWindowHandles();
 	        currentWindowHandle = driver.getWindowHandle();
         } catch (Exception e) {
-        	screenshots.add(captureDeskotToScreenshot());
+        	try {
+        		screenshots.add(captureDesktopToScreenshot());
+        	} catch (ScenarioException e1) {
+        		logger.warn("could not capture desktop: " + e1.getMessage());
+        	}
         	return screenshots;
         }
 

@@ -16,14 +16,23 @@
  */
 package com.seleniumtests.driver;
 
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
+import javax.imageio.ImageIO;
+
+import org.apache.commons.codec.binary.Base64OutputStream;
 import org.apache.log4j.Logger;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.OutputType;
 import org.openqa.selenium.Point;
+import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.remote.FileDetector;
@@ -231,5 +240,25 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver {
 		} else {
 			throw new WebDriverException("scroll position can only be get for web");
 		}
+	}
+	
+	@Override
+	public <X> X getScreenshotAs(OutputType<X> target) throws WebDriverException {
+		if (driver instanceof TakesScreenshot && !"OutputType.DESKTOP_BASE64".equals(target.toString())) {
+			return ((TakesScreenshot) driver).getScreenshotAs(target);
+		} else {
+			
+		}
+			BufferedImage bi = new LocalSeleniumHostUtility().captureDesktopToBuffer();
+			ByteArrayOutputStream os = new ByteArrayOutputStream();
+			OutputStream b64 = new Base64OutputStream(os);
+			try {
+				ImageIO.write(bi, "png", b64);
+				return target.convertFromBase64Png(os.toString("UTF-8"));
+			} catch (IOException e) {
+				throw new UnsupportedOperationException(
+				        "Underlying driver instance does not support taking screenshots");
+			}
+			
 	}
 }

@@ -43,7 +43,7 @@ public class TestBrowserSnapshot extends MockitoTest {
 	public void initDriver(final ITestContext testNGCtx) throws Exception {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setExplicitWaitTimeout(2);
-		SeleniumTestsContextManager.getThreadContext().setBrowser("chrome");
+		SeleniumTestsContextManager.getThreadContext().setBrowser("firefox");
 		SeleniumTestsContextManager.getThreadContext().setSnapshotBottomCropping(0);
 		SeleniumTestsContextManager.getThreadContext().setSnapshotTopCropping(0);
 //		SeleniumTestsContextManager.getThreadContext().setBrowser("firefox");
@@ -323,6 +323,15 @@ public class TestBrowserSnapshot extends MockitoTest {
 		Assert.assertEquals(screenshots.size(), 1);
 		verify(screenshotUtil).captureDesktopToFile();
 		
+	}
+	
+	/**
+	 * Check we can capture desktop snapshots
+	 */
+	@Test(groups= {"it"})
+	public void testDesktopSnapshot() {
+		File output = new ScreenshotUtil(driver).captureDesktopToFile();
+		Assert.assertTrue(FileUtils.sizeOf(output) > 0);
 	}
 	
 	/**
