@@ -82,7 +82,9 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 		String[] styleFiles = new String[] {"bootstrap.min.css", "bootstrap.min.js", "Chart.min.js", "jQuery-2.2.0.min.js",
 											"seleniumRobot.css", "app.min.js", "seleniumRobot_solo.css", "seleniumtests_test1.gif",
 											"seleniumtests_test2.gif", "seleniumtests_test3.gif", "AdminLTE.min.css",
-											"seleniumRobot.js"};
+											"seleniumRobot.js", "lobsterTwo.css", "css/font-awesome.min.css", 
+											"fonts/fontawesome-webfont.eot", "fonts/fontawesome-webfont.svg", "fonts/fontawesome-webfont.ttf", 
+											"fonts/fontawesome-webfont.woff", "fonts/fontawesome-webfont.woff2", "fonts/FontAwesome.otf"};
 		for (String fileName: styleFiles) {
 			FileUtils.copyInputStreamToFile(Thread.currentThread().getContextClassLoader().getResourceAsStream("reporter/templates/" + fileName), 
 											Paths.get(outputDirectory, RESOURCES_DIR, "templates", fileName).toFile());

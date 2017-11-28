@@ -1,19 +1,23 @@
 package com.seleniumtests.uipage.aspects;
 
+import org.apache.log4j.Logger;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.openqa.selenium.By;
 
+import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.uipage.htmlelements.FrameElement;
 import com.seleniumtests.uipage.htmlelements.HtmlElement;
+import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
 @Aspect
 public class SeleniumNativeActions {
 
 	private FrameElement currentFrame;
 	private static Boolean override = SeleniumTestsContextManager.getThreadContext().getOverrideSeleniumNativeAction();
+	private static final Logger logger = SeleniumRobotLogger.getLogger(SeleniumTestsContext.class);
 	
 	/**
 	 * Intercept any call to findElement made from a PageObject subclass and returns a HtmlElement instead of a RemoteWebElement
