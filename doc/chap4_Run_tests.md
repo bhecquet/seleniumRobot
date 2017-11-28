@@ -267,10 +267,11 @@ For better features, prefer using seleniumRobot-grid which is based on standard 
 
 #### Configure SeleniumRobot ####
 
-Test must be configured like the example below (or use `-DrunMode=grid`)
+Test must be configured like the example below (or use `-DrunMode=grid -DwebDriverGrid=http://127.0.0.1:4444/wd/hub`)
  
  	<test name="MRH">
     	<parameter name="runMode" value="grid" />
+    	<parameter name="webDriverGrid" value="http://127.0.0.1:4444/wd/hub" />
     	
         <packages> 
             <package name="com.seleniumtests.core.runner.*"/>
