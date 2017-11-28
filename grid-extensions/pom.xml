@@ -63,6 +63,7 @@
 						<include>**/browserfactory/BrowserInfo.java</include>
 						<include>**/util/osutility/**</include>
 						<include>**/util/FileUtility.java</include>
+						<include>**/driver/CustomEventFiringWebDriver.java</include>
 					</includes>
 				</configuration>
 			</plugin>
