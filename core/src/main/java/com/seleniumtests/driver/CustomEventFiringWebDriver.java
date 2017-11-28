@@ -49,7 +49,6 @@ import org.openqa.selenium.remote.UselessFileDetector;
 import org.openqa.selenium.support.events.EventFiringWebDriver;
 
 import com.seleniumtests.browserfactory.BrowserInfo;
-import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.DriverExceptions;
 import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.util.helper.WaitHelper;
@@ -66,6 +65,8 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver {
     private Set<String> currentHandles;
     private final List<Long> driverPids;
 	private final WebDriver driver;
+	private final boolean isWebTest;
+	private final DriverMode driverMode;
 	private final BrowserInfo browserInfo;
     
     private static final String JS_GET_VIEWPORT_SIZE =
@@ -126,14 +127,16 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver {
     		"var action = 'upload_file_through_popup';";
     
     public CustomEventFiringWebDriver(final WebDriver driver) {
-    	this(driver, null, null);
+    	this(driver, null, null, true, DriverMode.LOCAL);
     }
 
-	public CustomEventFiringWebDriver(final WebDriver driver, List<Long> driverPids, BrowserInfo browserInfo) {
+	public CustomEventFiringWebDriver(final WebDriver driver, List<Long> driverPids, BrowserInfo browserInfo, Boolean isWebTest, DriverMode localDriver) {
         super(driver);
         this.driverPids = driverPids == null ? new ArrayList<>(): driverPids;
 		this.driver = driver;
 		this.browserInfo = browserInfo;
+		this.isWebTest = isWebTest;
+		this.driverMode = localDriver;
     }
 
     public void setFileDetector(final FileDetector detector) {
@@ -145,7 +148,7 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver {
     }
     
     public void updateWindowsHandles() {
-    	if (SeleniumTestsContextManager.isWebTest()) {
+    	if (isWebTest) {
     		// workaround for ios tests where getWindowHandles sometimes fails
     		for (int i = 0; i < 10; i++) {
     			try  {
@@ -194,7 +197,7 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver {
      */
     @SuppressWarnings("unchecked")
 	public Dimension getViewPortDimensionWithoutScrollbar() {
-    	if (SeleniumTestsContextManager.isWebTest()) {
+    	if (isWebTest) {
     		List<Long> dims = (List<Long>)((JavascriptExecutor)driver).executeScript(JS_GET_VIEWPORT_SIZE);
     		return new Dimension(dims.get(0).intValue(), dims.get(1).intValue());
     	} else {
@@ -210,7 +213,7 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver {
 
 	@SuppressWarnings("unchecked")
     public Dimension getContentDimension() {
-    	if (SeleniumTestsContextManager.isWebTest()) {
+    	if (isWebTest) {
 			List<Long> dims = (List<Long>)((JavascriptExecutor)driver).executeScript(JS_GET_CONTENT_ENTIRE_SIZE);
 	    	return new Dimension(dims.get(0).intValue(), dims.get(1).intValue());
     	} else {
@@ -222,13 +225,13 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver {
 	 * TODO: handle mobile app case
 	 */
 	public void scrollTop() {
-		if (SeleniumTestsContextManager.isWebTest()) {
+		if (isWebTest) {
 			((JavascriptExecutor) driver).executeScript("window.top.scroll(0, 0)");
 		} 
 	}
 	
 	public void scrollTo(int x, int y) {
-		if (SeleniumTestsContextManager.isWebTest()) {
+		if (isWebTest) {
 			((JavascriptExecutor) driver).executeScript(String.format("window.top.scroll(%d, %d)", x, y));
 			
 			// wait for scrolling end
@@ -258,7 +261,7 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver {
 	 */
 	@SuppressWarnings("unchecked")
 	public Point getScrollPosition() {
-		if (SeleniumTestsContextManager.isWebTest()) {
+		if (isWebTest) {
 			List<Long> dims = (List<Long>)((JavascriptExecutor) driver).executeScript(JS_GET_CURRENT_SCROLL_POSITION);
 			return new Point(dims.get(0).intValue(), dims.get(1).intValue());
 		} else {
@@ -286,8 +289,10 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver {
 	}
 	
 	@Override
-	public <X> X getScreenshotAs(OutputType<X> target) throws WebDriverException {
-		if (driver instanceof TakesScreenshot && !"OutputType.DESKTOP_BASE64".equals(target.toString())) {
+	public <X> X getScreenshotAs(OutputType<X> target) throws WebDriverException {	
+		
+		// all standard screenshot are passed to driver. In grid driver, send command to grid
+		if (driver instanceof TakesScreenshot && (!"OutputType.DESKTOP_BASE64".equals(target.toString())) || driverMode == DriverMode.GRID) {
 			return ((TakesScreenshot) driver).getScreenshotAs(target);
 		} else {
 			BufferedImage bi = captureDesktopToBuffer();
@@ -312,7 +317,8 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver {
 		try {
 			driver.quit();
 		} finally {
-			if (browserInfo == null) {
+			// only kill processes in local mode
+			if (browserInfo == null || driverMode != DriverMode.LOCAL) {
 				return;
 			}
 			List<Long> pidsToKill = browserInfo.getAllBrowserSubprocessPids(driverPids);
@@ -362,7 +368,7 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver {
 	public Object executeScript(String script, Object... args) {
 		
 		// to we know this command ?
-		if (NON_JS_UPLOAD_FILE_THROUGH_POPUP.equals(script)) {
+		if (driverMode == DriverMode.LOCAL && NON_JS_UPLOAD_FILE_THROUGH_POPUP.equals(script)) {
 			if (args.length == 0) {
 				throw new DriverExceptions("Upload feature through executeScript needs a string argument (file path)");
 			}
