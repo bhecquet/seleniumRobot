@@ -30,6 +30,9 @@ import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.support.ui.ExpectedCondition;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.annotations.AfterClass;
@@ -64,7 +67,7 @@ public class TestDriver extends GenericTest {
 	public void initDriver(final ITestContext testNGCtx) throws Exception {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setExplicitWaitTimeout(2);
-		SeleniumTestsContextManager.getThreadContext().setBrowser("iexplore");
+		SeleniumTestsContextManager.getThreadContext().setBrowser("firefox");
 		testPage = new DriverTestPage(true);
 		driver = WebUIDriver.getWebDriver(true);
 	}
@@ -380,8 +383,7 @@ public class TestDriver extends GenericTest {
 		
 		testPage.uploadFile(path);
 		
-		
-		Assert.assertEquals(testPage.uploadedFile.getAttribute("value"), "config.ini");
+		new WebDriverWait(driver, 2).until(ExpectedConditions.attributeContains(testPage.uploadedFile.getBy(), "value", "config.ini"));
 	}
 	
 	
