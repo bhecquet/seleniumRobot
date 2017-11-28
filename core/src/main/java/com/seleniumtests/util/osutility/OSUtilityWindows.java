@@ -162,6 +162,7 @@ public class OSUtilityWindows extends OSUtility {
 		browserList.put(BrowserType.PHANTOMJS, new BrowserInfo(BrowserType.PHANTOMJS, LATEST_VERSION, null));
 		
 		// look for Firefox
+		// TODO: handle multiple firefox version (other directories FirefoxHTML-SOMEID)
 		try {
 			String firefoxPath = Advapi32Util.registryGetStringValue(WinReg.HKEY_CLASSES_ROOT, "FirefoxHTML\\shell\\open\\command", "");
 			firefoxPath = firefoxPath.split(".exe\"")[0].replace("\"", "") + ".exe";
@@ -173,11 +174,11 @@ public class OSUtilityWindows extends OSUtility {
 		// look for chrome
 		try {
 			String chromePath = Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Classes\\ChromeHTML\\shell\\open\\command", "");
+			chromePath = chromePath.split(".exe\"")[0].replace("\"", "") + ".exe";
 			String version;
 			try {
 				version = getChromeVersionFromRegistry();
 			} catch (Win32Exception e) {
-				chromePath = chromePath.split(".exe\"")[0].replace("\"", "") + ".exe";
 				version = getChromeVersionFromFolder(chromePath);
 			}
 			browserList.put(BrowserType.CHROME, new BrowserInfo(BrowserType.CHROME, extractChromeVersion("Google Chrome " + version), chromePath));
