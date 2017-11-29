@@ -47,7 +47,6 @@ import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import com.seleniumtests.driver.DriverMode;
-import com.seleniumtests.driver.SeleniumHostUtility;
 import com.seleniumtests.driver.TestType;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.driver.screenshots.ScreenShot;
@@ -623,8 +622,6 @@ public class PageObject extends BasePage implements IPage {
      * @param filePath
      */
 	public void uploadFile(String filePath) {
-
-		SeleniumHostUtility.getInstance(SeleniumTestsContextManager.getThreadContext().getRunMode()).uploadFile(filePath);
-		
+		((JavascriptExecutor) driver).executeScript(CustomEventFiringWebDriver.NON_JS_UPLOAD_FILE_THROUGH_POPUP, filePath); 
 	}
 }
