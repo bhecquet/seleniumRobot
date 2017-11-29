@@ -44,6 +44,7 @@ public class DriverSubTestPage extends PageObject {
 	public static final HtmlElement optionOfSelectList = selectList.findElement(By.tagName("option"));
 	public static final Table table = new Table("table", By.id("tableIframe"));
 	public static final LabelElement label = new LabelElement("label", By.id("labelIFrame"));
+	public static final ButtonElement closeButton = new ButtonElement("close Button", By.id("closeButton"));
 	
 	public static final TextFieldElement textElementSub = new TextFieldElement("Text", By.id("textInIFrameWithValue2"), subIframe);
 	

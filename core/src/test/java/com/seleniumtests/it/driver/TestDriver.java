@@ -64,7 +64,7 @@ public class TestDriver extends GenericTest {
 	public void initDriver(final ITestContext testNGCtx) throws Exception {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setExplicitWaitTimeout(2);
-		SeleniumTestsContextManager.getThreadContext().setBrowser("iexplore");
+		SeleniumTestsContextManager.getThreadContext().setBrowser("*chrome");
 		testPage = new DriverTestPage(true);
 		driver = WebUIDriver.getWebDriver(true);
 	}
@@ -94,6 +94,20 @@ public class TestDriver extends GenericTest {
 //		driver.switchTo().alert().accept();
 //		
 //	}
+	
+	/**
+	 * Check for issue #47 where ReplayAction aspect raised an error when switching to default context after click with alert present
+	 */
+	@Test(groups={"it"})
+	public void testAlertDisplay() {
+		try {
+			testPage.greenSquare.click();
+			driver.switchTo().alert().accept();
+		} finally {
+			testPage.resetButton.click();
+			Assert.assertEquals("", testPage.textElement.getValue());
+		}
+	}
 	
 	/**
 	 * deactivated as it depends on browser
