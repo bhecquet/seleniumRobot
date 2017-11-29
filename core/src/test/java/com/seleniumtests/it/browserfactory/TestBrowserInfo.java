@@ -12,6 +12,7 @@ import com.seleniumtests.GenericDriverTest;
 import com.seleniumtests.browserfactory.BrowserInfo;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.driver.BrowserType;
+import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.util.osutility.OSUtilityFactory;
 
@@ -96,11 +97,11 @@ public class TestBrowserInfo extends GenericDriverTest {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setBrowser("*iexplore");
 		driver = WebUIDriver.getWebDriver(true);
-		WebUIDriver uiDriver = WebUIDriver.getUxDriverSession().get();
+		CustomEventFiringWebDriver efDriver = (CustomEventFiringWebDriver)driver;
 		
 		// there should be one PID for the driver server
-		List<Long> pids = uiDriver.getDriverPids();
-		Assert.assertEquals(uiDriver.getDriverPids().size(), 1);
+		List<Long> pids = efDriver.getDriverPids();
+		Assert.assertEquals(efDriver.getDriverPids().size(), 1);
 		Assert.assertTrue(OSUtilityFactory.getInstance().getProgramNameFromPid((Long)pids.get(0)).contains("IEDriverServer"));
 	}
 	
@@ -109,11 +110,11 @@ public class TestBrowserInfo extends GenericDriverTest {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setBrowser("*chrome");
 		driver = WebUIDriver.getWebDriver(true);
-		WebUIDriver uiDriver = WebUIDriver.getUxDriverSession().get();
+		CustomEventFiringWebDriver efDriver = (CustomEventFiringWebDriver)driver;
 		
 		// there should be one PID for the driver server
-		List<Long> pids = uiDriver.getDriverPids();
-		Assert.assertEquals(uiDriver.getDriverPids().size(), 1);
+		List<Long> pids = efDriver.getDriverPids();
+		Assert.assertEquals(efDriver.getDriverPids().size(), 1);
 		Assert.assertTrue(OSUtilityFactory.getInstance().getProgramNameFromPid((Long)pids.get(0)).contains("chromedriver"));
 	}
 	
@@ -122,11 +123,11 @@ public class TestBrowserInfo extends GenericDriverTest {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setBrowser("*firefox");
 		driver = WebUIDriver.getWebDriver(true);
-		WebUIDriver uiDriver = WebUIDriver.getUxDriverSession().get();
+		CustomEventFiringWebDriver efDriver = (CustomEventFiringWebDriver)driver;
 		
 		// there should be one PID for the driver server
-		List<Long> pids = uiDriver.getDriverPids();
-		Assert.assertEquals(uiDriver.getDriverPids().size(), 1);
+		List<Long> pids = efDriver.getDriverPids();
+		Assert.assertEquals(efDriver.getDriverPids().size(), 1);
 		Assert.assertTrue(OSUtilityFactory.getInstance().getProgramNameFromPid((Long)pids.get(0)).contains("geckodriver"));
 	}
 	
@@ -136,10 +137,10 @@ public class TestBrowserInfo extends GenericDriverTest {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setBrowser("*chrome");
 		driver = WebUIDriver.getWebDriver(true);
-		WebUIDriver uiDriver = WebUIDriver.getUxDriverSession().get();
+		CustomEventFiringWebDriver efDriver = (CustomEventFiringWebDriver)driver;
 		
-		List<Long> pids = uiDriver.getDriverPids();
-		List<Long> allPids = uiDriver.getBrowserInfo().getAllBrowserSubprocessPids(pids);
+		List<Long> pids = efDriver.getDriverPids();
+		List<Long> allPids = efDriver.getBrowserInfo().getAllBrowserSubprocessPids(pids);
 		
 		// one pid for driver and at least one for browser (chrome starts several processes)
 		Assert.assertTrue(allPids.size() >= 2);

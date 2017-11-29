@@ -16,10 +16,19 @@
  */
 package com.seleniumtests.driver;
 
+import java.awt.AWTException;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
+import java.awt.Rectangle;
+import java.awt.Robot;
+import java.awt.Toolkit;
+import java.awt.datatransfer.StringSelection;
+import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -39,9 +48,12 @@ import org.openqa.selenium.remote.FileDetector;
 import org.openqa.selenium.remote.UselessFileDetector;
 import org.openqa.selenium.support.events.EventFiringWebDriver;
 
-import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.browserfactory.BrowserInfo;
+import com.seleniumtests.customexception.DriverExceptions;
+import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.util.helper.WaitHelper;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
+import com.seleniumtests.util.osutility.OSUtilityFactory;
 
 /**
  * Supports file upload in remote webdriver.
@@ -50,8 +62,12 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver {
 	
 	private static final Logger logger = SeleniumRobotLogger.getLogger(CustomEventFiringWebDriver.class);
     private FileDetector fileDetector = new UselessFileDetector();
-    private WebDriver driver = null;
     private Set<String> currentHandles;
+    private final List<Long> driverPids;
+	private final WebDriver driver;
+	private final boolean isWebTest;
+	private final DriverMode driverMode;
+	private final BrowserInfo browserInfo;
     
     private static final String JS_GET_VIEWPORT_SIZE =
     		"var pixelRatio;" +
@@ -106,10 +122,21 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver {
             "var maxBodyHeight = Math.max(bodyClientHeight, bodyScrollHeight); " +
             "var totalHeight = Math.max(maxDocElementHeight, maxBodyHeight); " +
             "return [totalWidth * pixelRatio, totalHeight * pixelRatio];";
-
+    
+    public static final String NON_JS_UPLOAD_FILE_THROUGH_POPUP = 
+    		"var action = 'upload_file_through_popup';";
+    
     public CustomEventFiringWebDriver(final WebDriver driver) {
+    	this(driver, null, null, true, DriverMode.LOCAL);
+    }
+
+	public CustomEventFiringWebDriver(final WebDriver driver, List<Long> driverPids, BrowserInfo browserInfo, Boolean isWebTest, DriverMode localDriver) {
         super(driver);
-        this.driver = driver;
+        this.driverPids = driverPids == null ? new ArrayList<>(): driverPids;
+		this.driver = driver;
+		this.browserInfo = browserInfo;
+		this.isWebTest = isWebTest;
+		this.driverMode = localDriver;
     }
 
     public void setFileDetector(final FileDetector detector) {
@@ -121,7 +148,7 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver {
     }
     
     public void updateWindowsHandles() {
-    	if (SeleniumTestsContextManager.isWebTest()) {
+    	if (isWebTest) {
     		// workaround for ios tests where getWindowHandles sometimes fails
     		for (int i = 0; i < 10; i++) {
     			try  {
@@ -170,7 +197,7 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver {
      */
     @SuppressWarnings("unchecked")
 	public Dimension getViewPortDimensionWithoutScrollbar() {
-    	if (SeleniumTestsContextManager.isWebTest()) {
+    	if (isWebTest) {
     		List<Long> dims = (List<Long>)((JavascriptExecutor)driver).executeScript(JS_GET_VIEWPORT_SIZE);
     		return new Dimension(dims.get(0).intValue(), dims.get(1).intValue());
     	} else {
@@ -186,7 +213,7 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver {
 
 	@SuppressWarnings("unchecked")
     public Dimension getContentDimension() {
-    	if (SeleniumTestsContextManager.isWebTest()) {
+    	if (isWebTest) {
 			List<Long> dims = (List<Long>)((JavascriptExecutor)driver).executeScript(JS_GET_CONTENT_ENTIRE_SIZE);
 	    	return new Dimension(dims.get(0).intValue(), dims.get(1).intValue());
     	} else {
@@ -198,13 +225,13 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver {
 	 * TODO: handle mobile app case
 	 */
 	public void scrollTop() {
-		if (SeleniumTestsContextManager.isWebTest()) {
+		if (isWebTest) {
 			((JavascriptExecutor) driver).executeScript("window.top.scroll(0, 0)");
 		} 
 	}
 	
 	public void scrollTo(int x, int y) {
-		if (SeleniumTestsContextManager.isWebTest()) {
+		if (isWebTest) {
 			((JavascriptExecutor) driver).executeScript(String.format("window.top.scroll(%d, %d)", x, y));
 			
 			// wait for scrolling end
@@ -234,7 +261,7 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver {
 	 */
 	@SuppressWarnings("unchecked")
 	public Point getScrollPosition() {
-		if (SeleniumTestsContextManager.isWebTest()) {
+		if (isWebTest) {
 			List<Long> dims = (List<Long>)((JavascriptExecutor) driver).executeScript(JS_GET_CURRENT_SCROLL_POSITION);
 			return new Point(dims.get(0).intValue(), dims.get(1).intValue());
 		} else {
@@ -242,14 +269,33 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver {
 		}
 	}
 	
+
+	/**
+	 * Take screenshot of the desktop and put it in a file
+	 */
+	private BufferedImage captureDesktopToBuffer() {
+		
+		GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+		GraphicsDevice defaultGraphicDevice = ge.getDefaultScreenDevice();
+		Integer screenWidth = defaultGraphicDevice.getDisplayMode().getWidth();
+		Integer screenHeight = defaultGraphicDevice.getDisplayMode().getHeight();
+		
+		// Capture the screen shot of the area of the screen defined by the rectangle
+		try {
+			return new Robot().createScreenCapture(new Rectangle(screenWidth, screenHeight));
+		} catch (AWTException e) {
+			throw new ScenarioException("Cannot capture image", e);
+		}
+	}
+	
 	@Override
-	public <X> X getScreenshotAs(OutputType<X> target) throws WebDriverException {
-		if (driver instanceof TakesScreenshot && !"OutputType.DESKTOP_BASE64".equals(target.toString())) {
+	public <X> X getScreenshotAs(OutputType<X> target) throws WebDriverException {	
+		
+		// all standard screenshot are passed to driver. In grid driver, send command to grid
+		if (driver instanceof TakesScreenshot && (!"OutputType.DESKTOP_BASE64".equals(target.toString())) || driverMode == DriverMode.GRID) {
 			return ((TakesScreenshot) driver).getScreenshotAs(target);
 		} else {
-			
-		}
-			BufferedImage bi = new LocalSeleniumHostUtility().captureDesktopToBuffer();
+			BufferedImage bi = captureDesktopToBuffer();
 			ByteArrayOutputStream os = new ByteArrayOutputStream();
 			OutputStream b64 = new Base64OutputStream(os);
 			try {
@@ -259,6 +305,86 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver {
 				throw new UnsupportedOperationException(
 				        "Underlying driver instance does not support taking screenshots");
 			}
-			
+		}	
+	}
+	
+
+	/**
+	 * After quitting driver, if it fails, some pids may remain. Kill them
+	 */
+	@Override
+	public void quit() {
+		try {
+			driver.quit();
+		} finally {
+			// only kill processes in local mode
+			if (browserInfo == null || driverMode != DriverMode.LOCAL) {
+				return;
+			}
+			List<Long> pidsToKill = browserInfo.getAllBrowserSubprocessPids(driverPids);
+	    	for (Long pid: pidsToKill) {
+	    		OSUtilityFactory.getInstance().killProcess(pid.toString(), true);
+	    	}
+		}
+	}
+	
+	private void uploadFile(String filePath) {
+
+		// Copy to clipboard
+		Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(filePath), null);
+		Robot robot;
+		try {
+			robot = new Robot();
+		
+			WaitHelper.waitForSeconds(1);
+	
+			// Press Enter
+			robot.keyPress(KeyEvent.VK_ENTER);
+	
+			// Release Enter
+			robot.keyRelease(KeyEvent.VK_ENTER);
+	
+			// Press CTRL+V
+			robot.keyPress(KeyEvent.VK_CONTROL);
+			robot.keyPress(KeyEvent.VK_V);
+	
+			// Release CTRL+V
+			robot.keyRelease(KeyEvent.VK_CONTROL);
+			robot.keyRelease(KeyEvent.VK_V);
+			WaitHelper.waitForSeconds(1);
+	
+			// Press Enter
+			robot.keyPress(KeyEvent.VK_ENTER);
+			robot.keyRelease(KeyEvent.VK_ENTER);
+		} catch (AWTException e) {
+			throw new ScenarioException("could not initialize robot to upload file: " + e.getMessage());
+		}
+	}
+	
+	/**
+	 * Intercept specific scripts to do some non selenium actions
+	 */
+	@Override
+	public Object executeScript(String script, Object... args) {
+		
+		// to we know this command ?
+		if (driverMode == DriverMode.LOCAL && NON_JS_UPLOAD_FILE_THROUGH_POPUP.equals(script)) {
+			if (args.length == 0) {
+				throw new DriverExceptions("Upload feature through executeScript needs a string argument (file path)");
+			}
+			uploadFile((String)args[0]);
+			return null;
+		} else {
+			return super.executeScript(script, args);
+		}
+	}
+	
+
+    public List<Long> getDriverPids() {
+		return driverPids;
+	}
+
+	public BrowserInfo getBrowserInfo() {
+		return browserInfo;
 	}
 }
