@@ -128,5 +128,20 @@ public class TestFrame extends GenericTest {
 		Assert.assertEquals(testPage.textElementSubIFrame.getValue(), "an other value in iframe");
 	}
 	
+	/**
+	 * test that when working with an element inside frame, we automatically go back to default content before next element action
+	 */
+	@Test(groups={"it"})
+	public void testBackToMainFrame() {
+		testPage.labelIFrame.getText();
+		try {
+			testPage.textElement.sendKeys("youpi");
+			Assert.assertEquals(testPage.textElement.getValue(), "youpi");
+		} finally {
+			testPage.resetButton.click();
+		}
+		
+	}
+	
  	
 }
