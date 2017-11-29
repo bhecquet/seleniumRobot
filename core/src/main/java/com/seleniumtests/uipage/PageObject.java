@@ -16,12 +16,15 @@
  */
 package com.seleniumtests.uipage;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
@@ -622,6 +625,11 @@ public class PageObject extends BasePage implements IPage {
      * @param filePath
      */
 	public void uploadFile(String filePath) {
-		((JavascriptExecutor) driver).executeScript(CustomEventFiringWebDriver.NON_JS_UPLOAD_FILE_THROUGH_POPUP, filePath); 
+		try {
+			byte[] encoded = Base64.encodeBase64(FileUtils.readFileToByteArray(new File(filePath)));
+			((JavascriptExecutor) driver).executeScript(CustomEventFiringWebDriver.NON_JS_UPLOAD_FILE_THROUGH_POPUP, new File(filePath).getName(), new String(encoded));
+		} catch (IOException e) {
+			throw new ScenarioException(String.format("could not read file to upload %s: %s", filePath, e.getMessage()));
+		}
 	}
 }

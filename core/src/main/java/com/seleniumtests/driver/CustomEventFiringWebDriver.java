@@ -26,6 +26,7 @@ import java.awt.datatransfer.StringSelection;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
@@ -35,13 +36,13 @@ import java.util.TreeSet;
 
 import javax.imageio.ImageIO;
 
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Base64OutputStream;
+import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.OutputType;
 import org.openqa.selenium.Point;
-import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.remote.FileDetector;
@@ -308,10 +309,15 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver {
 		}
 	}
 	
-	private void uploadFile(String filePath) {
+	private void uploadFile(String fileName, String base64Content) throws IOException {
+		
+		byte[] byteArray = base64Content.getBytes();
+        File tempFile = new File("tmp/" + fileName);
+        byte[] decodeBuffer = Base64.decodeBase64(byteArray);
+        FileUtils.writeByteArrayToFile(tempFile, decodeBuffer);
 
 		// Copy to clipboard
-		Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(filePath), null);
+		Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(tempFile.getAbsolutePath()), null);
 		Robot robot;
 		try {
 			robot = new Robot();
@@ -349,11 +355,16 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver {
 		
 		// to we know this command ?
 		if (driverMode == DriverMode.LOCAL && NON_JS_UPLOAD_FILE_THROUGH_POPUP.equals(script)) {
-			if (args.length == 0) {
-				throw new DriverExceptions("Upload feature through executeScript needs a string argument (file path)");
+			if (args.length != 2) {
+				throw new DriverExceptions("Upload feature through executeScript needs 2 string arguments (file name, base64 content)");
 			}
-			uploadFile((String)args[0]);
-			return null;
+			try {
+				uploadFile((String)args[0], (String)args[1]);
+				return null; 
+			} catch (IOException e) {
+				return null;
+			}
+			
 		} else if (driverMode == DriverMode.LOCAL && NON_JS_CAPTURE_DESKTOP.equals(script)) {
 			BufferedImage bi = captureDesktopToBuffer();
 			ByteArrayOutputStream os = new ByteArrayOutputStream();
