@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>fr.test</groupId>
 		<artifactId>driver-download</artifactId>
-		<version>3.3.4-SNAPSHOT</version>
+		<version>3.4.0</version>
 	</parent>
 	<artifactId>seleniumRobot-windows-driver</artifactId>
 
