@@ -125,6 +125,8 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver {
     
     public static final String NON_JS_UPLOAD_FILE_THROUGH_POPUP = 
     		"var action = 'upload_file_through_popup';";
+    public static final String NON_JS_CAPTURE_DESKTOP = 
+    		"var action = 'capture_desktop_snapshot_to_base64_string';return '';";
     
     public CustomEventFiringWebDriver(final WebDriver driver) {
     	this(driver, null, null, true, DriverMode.LOCAL);
@@ -269,7 +271,6 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver {
 		}
 	}
 	
-
 	/**
 	 * Take screenshot of the desktop and put it in a file
 	 */
@@ -287,27 +288,6 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver {
 			throw new ScenarioException("Cannot capture image", e);
 		}
 	}
-	
-	@Override
-	public <X> X getScreenshotAs(OutputType<X> target) throws WebDriverException {	
-		
-		// all standard screenshot are passed to driver. In grid driver, send command to grid
-		if (driver instanceof TakesScreenshot && (!"OutputType.DESKTOP_BASE64".equals(target.toString())) || driverMode == DriverMode.GRID) {
-			return ((TakesScreenshot) driver).getScreenshotAs(target);
-		} else {
-			BufferedImage bi = captureDesktopToBuffer();
-			ByteArrayOutputStream os = new ByteArrayOutputStream();
-			OutputStream b64 = new Base64OutputStream(os);
-			try {
-				ImageIO.write(bi, "png", b64);
-				return target.convertFromBase64Png(os.toString("UTF-8"));
-			} catch (IOException e) {
-				throw new UnsupportedOperationException(
-				        "Underlying driver instance does not support taking screenshots");
-			}
-		}	
-	}
-	
 
 	/**
 	 * After quitting driver, if it fails, some pids may remain. Kill them
@@ -374,6 +354,16 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver {
 			}
 			uploadFile((String)args[0]);
 			return null;
+		} else if (driverMode == DriverMode.LOCAL && NON_JS_CAPTURE_DESKTOP.equals(script)) {
+			BufferedImage bi = captureDesktopToBuffer();
+			ByteArrayOutputStream os = new ByteArrayOutputStream();
+			OutputStream b64 = new Base64OutputStream(os);
+			try {
+				ImageIO.write(bi, "png", b64);
+				return os.toString("UTF-8");
+			} catch (IOException e) {
+				return "";
+			}
 		} else {
 			return super.executeScript(script, args);
 		}
