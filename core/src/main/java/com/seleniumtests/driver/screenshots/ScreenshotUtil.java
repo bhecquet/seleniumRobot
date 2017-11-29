@@ -286,9 +286,8 @@ public class ScreenshotUtil {
 			throw new ScenarioException("Desktop capture can only be done on Desktop tests");
 		}
 		
-		TakesScreenshot screenShot = (TakesScreenshot) driver;
-		String screenshotString = screenShot.getScreenshotAs(CustomOutputType.DESKTOP_BASE64);
-		
+		String screenshotString = (String)((CustomEventFiringWebDriver)driver).executeScript(CustomEventFiringWebDriver.NON_JS_CAPTURE_DESKTOP);
+		 
 		try {
 			if (screenshotString != null && !screenshotString.isEmpty()) {
 	            byte[] byteArray = screenshotString.getBytes();

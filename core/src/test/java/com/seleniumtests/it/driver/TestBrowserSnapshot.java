@@ -46,6 +46,8 @@ public class TestBrowserSnapshot extends MockitoTest {
 		SeleniumTestsContextManager.getThreadContext().setBrowser("firefox");
 		SeleniumTestsContextManager.getThreadContext().setSnapshotBottomCropping(0);
 		SeleniumTestsContextManager.getThreadContext().setSnapshotTopCropping(0);
+//		SeleniumTestsContextManager.getThreadContext().setWebDriverGrid("http://127.0.0.1:4444/wd/hub");
+//		SeleniumTestsContextManager.getThreadContext().setRunMode("grid");
 //		SeleniumTestsContextManager.getThreadContext().setBrowser("firefox");
 //		SeleniumTestsContextManager.getThreadContext().setFirefoxBinary("path to firefox");
 		testPage = new DriverTestPage(true);
