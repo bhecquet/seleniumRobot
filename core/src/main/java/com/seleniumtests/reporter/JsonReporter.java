@@ -46,6 +46,7 @@ public class JsonReporter extends CommonReporter implements IReporter {
 		results.put("pass", 0);
 		results.put("fail", 0);
 		results.put("skip", 0);
+		results.put("total", 0);
 		
 		for (ISuite suite : suites) {
 			Map<String, ISuiteResult> tests = suite.getResults();
@@ -56,6 +57,9 @@ public class JsonReporter extends CommonReporter implements IReporter {
 				results.put("fail", results.get("fail") + context.getFailedTests().getAllResults().size());
 				results.put("pass", results.get("pass") + context.getPassedTests().getAllResults().size());
 				results.put("skip", results.get("skip") + context.getSkippedTests().getAllResults().size());
+				
+				Integer total = results.get("pass") + results.get("fail") + results.get("skip");
+				results.put("total", total);
 
 			}
 		}
