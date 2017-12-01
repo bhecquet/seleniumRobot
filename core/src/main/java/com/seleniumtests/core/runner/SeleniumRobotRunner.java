@@ -46,7 +46,8 @@ import com.seleniumtests.util.logging.SeleniumRobotLogger;
 			com.seleniumtests.core.testretry.TestRetryListener.class, 
 			com.seleniumtests.reporter.PerformanceReporter.class,
 			com.seleniumtests.reporter.SeleniumRobotServerTestRecorder.class,
-			com.seleniumtests.reporter.TestManagerReporter.class})
+			com.seleniumtests.reporter.TestManagerReporter.class,
+			com.seleniumtests.reporter.JsonReporter.class})
 public class SeleniumRobotRunner {
 	
 	protected static final Logger logger = SeleniumRobotLogger.getLogger(SeleniumRobotRunner.class);
