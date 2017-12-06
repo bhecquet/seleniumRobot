@@ -160,6 +160,8 @@ public class SeleniumTestsContext {
     
     // Testdroid specific properties
     public static final String PROJECT_NAME = "projectName";					// TestDroid nécessite un nom de projet dans lequel l'automatisation aura lieu	
+    
+    public static final String TEST_NAME = "testName";
 
     private static final int REPLAY_TIME_OUT_VALUE = 30;
     
@@ -176,7 +178,7 @@ public class SeleniumTestsContext {
     	// for test purpose only
     }
     
-    public SeleniumTestsContext(final ITestContext context) {
+    public SeleniumTestsContext(final ITestContext context, final String testName) {
         this.testNGContext = context;
 
         setTestDataFile(getValueForTest(TEST_DATA_FILE, System.getProperty(TEST_DATA_FILE)));
@@ -262,6 +264,8 @@ public class SeleniumTestsContext {
         
         setViewPortWidth(getIntValueForTest(VIEWPORT_WIDTH, System.getProperty(VIEWPORT_WIDTH)));
         setViewPortHeight(getIntValueForTest(VIEWPORT_HEIGHT, System.getProperty(VIEWPORT_HEIGHT)));
+        
+        setTestName(testName);
     
         updateTestAndMobile(getPlatform());
         
@@ -797,6 +801,10 @@ public class SeleniumTestsContext {
     
     public String getProjectName() {
     	return (String) getAttribute(PROJECT_NAME);
+    }
+    
+    public String getTestName() {
+    	return (String) getAttribute(TEST_NAME);
     }
     
     public Integer getViewPortWidth() {
@@ -1400,6 +1408,10 @@ public class SeleniumTestsContext {
     	setAttribute(PROJECT_NAME, name);
     }
     
+    public void setTestName(String name) {
+    	setAttribute(TEST_NAME, name);
+    }
+    
     public void setMobilePlatformVersion(final String version) {
     	setAttribute(MOBILE_PLATFORM_VERSION, version);
     }
@@ -1463,16 +1475,24 @@ public class SeleniumTestsContext {
     }
     
     private void updateTestConfigurationFromVariableServer() {
+    	
+    	if (getTestName() == null) {
+    		return;
+    	}
+    	
     	// in case we find the url of variable server and it's marked as active, use it
 		if (getSeleniumRobotServerActive() != null && getSeleniumRobotServerActive() && getSeleniumRobotServerUrl() != null) {
 			logger.info(String.format("%s key found, and set to true, trying to get variable from variable server %s", 
 						SELENIUMROBOTSERVER_ACTIVE, 
 						SELENIUMROBOTSERVER_URL));
-			SeleniumRobotVariableServerConnector variableServer = new SeleniumRobotVariableServerConnector("");
+			SeleniumRobotVariableServerConnector variableServer = new SeleniumRobotVariableServerConnector(getTestName());
 			
 			if (!variableServer.isAlive()) {
 				throw new ConfigurationException(String.format("Variable server %s could not be contacted", SELENIUMROBOTSERVER_URL));
 			}
+			
+			getConfiguration().putAll(variableServer.getVariables());
+			
 		} else {
 			logger.info(String.format("%s key not found or set to false, or url key %s has not been set", SELENIUMROBOTSERVER_ACTIVE, SELENIUMROBOTSERVER_URL));
 		}

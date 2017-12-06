@@ -148,6 +148,10 @@ public abstract class SeleniumRobotServerConnector {
 		if (!active) {
 			return;
 		}
+		if (testName == null || testName.isEmpty()) {
+			throw new ConfigurationException("testName must not be null or empty");
+		}
+		
 		if (applicationId == null) {
 			createApplication();
 		}

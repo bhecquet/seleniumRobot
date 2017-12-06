@@ -82,7 +82,7 @@ public class SeleniumTestsContextManager {
 
     public static SeleniumTestsContext getThreadContext() {
         if (threadLocalContext.get() == null) {
-            initThreadContext(null);
+            initThreadContext(null, null);
         }
 
         return threadLocalContext.get();
@@ -96,7 +96,7 @@ public class SeleniumTestsContextManager {
         }
     	
     	ITestContext newTestNGCtx = getContextFromConfigFile(testNGCtx);
-        globalContext = new SeleniumTestsContext(newTestNGCtx);
+        globalContext = new SeleniumTestsContext(newTestNGCtx, null);
         loadCustomizedContextAttribute(newTestNGCtx, globalContext);
     }
 
@@ -203,10 +203,10 @@ public class SeleniumTestsContextManager {
     }
 
     public static void initThreadContext() {
-        initThreadContext(globalContext.getTestNGContext());
+        initThreadContext(globalContext.getTestNGContext(), null);
     }
 
-    public static void initThreadContext(ITestContext testNGCtx) {
+    public static void initThreadContext(ITestContext testNGCtx, String testName) {
     	
     	// generate all paths used by test application
     	if (testNGCtx != null && testNGCtx.getCurrentXmlTest() != null) {
@@ -214,7 +214,7 @@ public class SeleniumTestsContextManager {
         }
     	
     	ITestContext newTestNGCtx = getContextFromConfigFile(testNGCtx);
-    	SeleniumTestsContext seleniumTestsCtx = new SeleniumTestsContext(newTestNGCtx);
+    	SeleniumTestsContext seleniumTestsCtx = new SeleniumTestsContext(newTestNGCtx, testName);
         loadCustomizedContextAttribute(newTestNGCtx, seleniumTestsCtx);
         
         threadLocalContext.set(seleniumTestsCtx);

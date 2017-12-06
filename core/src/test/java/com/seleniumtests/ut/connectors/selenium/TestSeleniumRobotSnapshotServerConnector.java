@@ -342,6 +342,22 @@ public class TestSeleniumRobotSnapshotServerConnector extends MockitoTest {
 		Assert.assertEquals((int)connector.getTestCaseId("Test 1"), 12);
 	}
 	
+	@Test(groups= {"ut"}, expectedExceptions=ConfigurationException.class)
+	public void testCreateTestCaseEmptyName() throws UnirestException {	
+		SeleniumRobotSnapshotServerConnector connector = spy(configureAliveConnection());
+		
+		connector.createApplication();
+		connector.createTestCase("");
+	}
+	
+	@Test(groups= {"ut"}, expectedExceptions=ConfigurationException.class)
+	public void testCreateTestCaseNullName() throws UnirestException {	
+		SeleniumRobotSnapshotServerConnector connector = spy(configureAliveConnection());
+		
+		connector.createApplication();
+		connector.createTestCase(null);
+	}
+	
 	@Test(groups= {"ut"}, expectedExceptions=SeleniumRobotServerException.class)
 	public void testCreateTestCaseInError() throws UnirestException {
 		
