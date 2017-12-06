@@ -6,7 +6,7 @@ SeleniumRobot server [https://github.com/bhecquet/seleniumRobot-server](https://
 
 To use this server, 
 - first deploy it (see documentation of seleniumRobot-server project)
-- set an environment variable `seleniumRobotServerUrl` on the seleniumRobot executor, giving the root url of the server. E.g: `http://seleniumRobotServer:8000`. This can be replaced by a parameter inside XML testNG file
+- set a JVM parameter `seleniumRobotServerUrl` when starting the test, giving the root url of the server. E.g: `http://seleniumRobotServer:8000`. This can be replaced by a parameter inside XML testNG file
 - parameter `seleniumRobotServerActive` must be set to true. By default, only variable fetching is done when server is active
 - parameter `seleniumRobotServerCompareSnapshots` can be set to true for tests where snapshot comparison is required (defaults to false)
 - parameter `seleniumRobotServerRecordResults` can be set to true when results should be recorded on server (defaults to false)
@@ -141,6 +141,11 @@ This command will update the test application to its latest release from maven r
   ![](images/jenkins_job_publish_perf.png)
 
   ![](images/jenkins_job_publish_testng.png)
+  
+SeleniumRobot uses external fonts and javascript so Jenkins must be configured to relax CSP (Content-Security-policy) if it's acceptable to you: [https://wiki.jenkins.io/display/JENKINS/Configuring+Content+Security+Policy] (https://wiki.jenkins.io/display/JENKINS/Configuring+Content+Security+Policy)
+
+e.g: `"default-src 'self' fonts.googleapis.com cdnjs.cloudflare.com fonts.gstatic.com 'unsafe-inline' 'unsafe-eval'"`
+
   
 ### 3 HP ALM ###
  
