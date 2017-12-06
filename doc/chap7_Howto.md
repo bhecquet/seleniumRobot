@@ -148,3 +148,9 @@ SeleniumRobot provides several email clients to allow reading email content and 
 
 	EmailAccount account = EmailAccount(<email_address>, <login>, <password>);
 	Email emailFound = account.checkEmailPresence(<email_title>, new String[] {"attachment1"});
+	
+### 10 upload file ###
+
+This should be avoided as much as possible, but some tests may require uploading a file to the tested application.
+With selenium, click on the button to upload the file, then you can call `uploadFile(<filePath>)` which will handle the modal opened by browser.
+The drawbak of this method is that browser MUST have the focus and thus no other test should be executed at the same time.

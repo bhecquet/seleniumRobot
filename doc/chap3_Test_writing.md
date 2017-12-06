@@ -220,26 +220,30 @@ There are several ways to make values in test script change according to test en
 #### XML configuration ####
 XML testing file handles many technical configurations: server address, used tools and related configuration.
  
-Business configuration can be done through the �unknown� parameters. These are parameters which are not known from the framework. They are added to a list of business parameters.
+Business configuration can be done through the `unknown` parameters. These are parameters which are not known from the framework. They are added to a list of business parameters.
 
-#### Confg.ini configuration ####
-XML configurations are done statically and must be duplicated through all the test suites (or using �testConfiguration� parameter). It�s not possible to have a centralized configuration which depends on test environment.
+#### env.ini configuration ####
+XML configurations are done statically and must be duplicated through all the test suites (or using `testConfiguration` parameter). It's not possible to have a centralized configuration which depends on test environment.
 
 *Example:* the server URL depends on testing phase. They are not the same in production and in integration phase.
 
-That�s why the �env.ini� file is made for. Each tested application can embed a env.ini file whose format is: 
+That's why the `env.ini` file is made for. Each tested application can embed a env.ini file whose format is: 
 
 ![](images/config_ini_example.png)
  
-�General� section is for common configuration (e.g: a database user name which does not depends on environment) and other sections are specific to named test environments. Here, we define a �Dev� environment. Then, when launching test, user MUST define the environment on which test will be run with the option `-Denv=Dev`
+`General` section is for common configuration (e.g: a database user name which does not depends on environment) and other sections are specific to named test environments. Here, we define a `Dev` environment. Then, when launching test, user MUST define the environment on which test will be run with the option `-Denv=Dev`
 
-Keys defined in environment sections override the ones in �General� section.
+Keys defined in environment sections override the ones in `General` section.
 This file must be located in "<<t>application root>/data/<<t>application name>/config" folder.
 
 These configurations are also stored in the business configuration.
 
+#### seleniumRobot server ####
+
+Selenium robot server allows to store variables of all your test applications in a centralized place. See details in [chap6_Test_Manager_interfaces.md](chap6_Test_Manager_interfaces.md)
+
 #### Using configurations (aka business configuration) in test scripts ####
-Each webpage can use the configurations defined above using (getting variable �text� from configuration):
+Each webpage can use the configurations defined above using (getting variable `text` from configuration):
 
 ![](images/get_param_example.png)
 
@@ -263,7 +267,7 @@ between [ ] you define the web page where to use the following definitions. Next
 
 #### Mapping data use ####
 
-In the corresponding pageObject you can use mapping words to search elements using : locateBy(map:caller_word) or by.id(map:caller_word). It will search the element in the page which is defined by the technical word. 
+In the corresponding pageObject you can use mapping words to search elements using : `locateBy(map:caller_word)` or `By.id(map:caller_word)`. It will search the element in the page which is defined by the technical word. 
 
 ### 8 Optional features ###
 Here will be described features that may be used to improve test
