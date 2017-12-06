@@ -60,7 +60,7 @@ public class CucumberRunner extends SeleniumRobotRunner {
     @Test(groups = "cucumber", description = "Cucumber scenario", dataProvider = "scenarios")
     public void feature(CucumberScenarioWrapper cucumberScenarioWrapper, final ITestContext testContext) {
     	logger.info(SeleniumRobotLogger.START_TEST_PATTERN + cucumberScenarioWrapper);
-        SeleniumTestsContextManager.initThreadContext(testContext);
+        SeleniumTestsContextManager.initThreadContext(testContext, cucumberScenarioWrapper.toString());
         SeleniumTestsContextManager.getThreadContext().setTestMethodSignature(cucumberScenarioWrapper.toString());
     	testNGCucumberRunner.runScenario(cucumberScenarioWrapper);
     }

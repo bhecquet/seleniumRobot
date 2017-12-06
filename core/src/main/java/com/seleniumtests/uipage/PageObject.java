@@ -26,6 +26,7 @@ import java.util.TreeSet;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
+import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.JavascriptExecutor;
@@ -33,6 +34,7 @@ import org.openqa.selenium.Point;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.UnsupportedCommandException;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
@@ -612,6 +614,15 @@ public class PageObject extends BasePage implements IPage {
         }
     }
     
+	public Alert waitForAlert(int waitInSeconds) {
+		long end = systemClock.laterBy(waitInSeconds * 1000);
+
+		while (systemClock.isNowBefore(end)) {
+			return driver.switchTo().alert();
+		}
+		return null;
+	}
+    
     /**
      * Method to handle file upload through robot class
      * /!\ This should only be used as the last option when uploading file cannot be done an other way
@@ -628,6 +639,14 @@ public class PageObject extends BasePage implements IPage {
 		try {
 			byte[] encoded = Base64.encodeBase64(FileUtils.readFileToByteArray(new File(filePath)));
 			((JavascriptExecutor) driver).executeScript(CustomEventFiringWebDriver.NON_JS_UPLOAD_FILE_THROUGH_POPUP, new File(filePath).getName(), new String(encoded));
+			
+			// Upload fichier de X ko
+			Alert alert = waitForAlert(5);
+			if (alert != null) {
+				driver.switchTo().alert().accept();
+			}
+			WaitHelper.waitForSeconds(2);
+			
 		} catch (IOException e) {
 			throw new ScenarioException(String.format("could not read file to upload %s: %s", filePath, e.getMessage()));
 		}

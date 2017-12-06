@@ -39,6 +39,7 @@ import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.TearDownService;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.reporter.TestLogging;
+import com.seleniumtests.uipage.PageObject;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
 @Listeners({com.seleniumtests.reporter.SeleniumTestsReporter2.class, 
@@ -129,10 +130,10 @@ public class SeleniumRobotRunner {
      * @throws IOException
      */
     @BeforeTest(alwaysRun = true)
-    public void beforeTestSuite(final ITestContext testContext) {
+    public void beforeTest(final ITestContext testContext) {
         start = new Date();
         SeleniumTestsContextManager.initGlobalContext(testContext);
-        SeleniumTestsContextManager.initThreadContext(testContext);  
+        SeleniumTestsContextManager.initThreadContext(testContext, null);  
     }
     
     @AfterSuite(alwaysRun = true)
@@ -165,7 +166,7 @@ public class SeleniumRobotRunner {
     	configureCucumberTest();
     	if (!isCucumberTest()) {
 	        logger.info(SeleniumRobotLogger.START_TEST_PATTERN + method.getName());
-	        SeleniumTestsContextManager.initThreadContext(testContext);
+	        SeleniumTestsContextManager.initThreadContext(testContext, method.getName());
 	        SeleniumTestsContextManager.getThreadContext().setTestMethodSignature(buildMethodSignature(method, parameters));
     	}
     }  
@@ -178,11 +179,6 @@ public class SeleniumRobotRunner {
      * @return String
      */
     public static String param(String key) {
-    	String value = SeleniumTestsContextManager.getThreadContext().getConfiguration().get(key);
-    	if (value == null) {
-    		TestLogging.error(String.format("Variable %s is not defined", key));
-    		return "";
-    	}
-    	return value;
+    	return PageObject.param(key);
     }
 }
