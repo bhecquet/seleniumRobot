@@ -167,7 +167,7 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 			VelocityContext context = new VelocityContext();
 			
 			// add logs
-			String logs = SeleniumRobotLogger.getTestLogs().get(testResult.getAttribute(SeleniumRobotLogger.METHOD_NAME));
+			String logs = SeleniumRobotLogger.getTestLogs().get(getTestName(testResult));
 			if (logs == null) {
 				return;
 			}
@@ -253,7 +253,7 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 					endHtml();
 					logger.info("Completed Report Generation.");
 				} catch (IOException e) {
-					logger.error("Error writing test report: " + testResult.getAttribute(SeleniumRobotLogger.METHOD_NAME), e);
+					logger.error("Error writing test report: " + getTestName(testResult), e);
 				}  
 			}
 		}
@@ -292,6 +292,8 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 					fileIndex++;
 					String fileName = "SeleniumTestReport-" + fileIndex + ".html";
 					result.setAttribute(METHOD_RESULT_FILE_NAME, fileName);
+					result.setAttribute(SeleniumRobotLogger.METHOD_NAME, getTestName(result));
+					
 				}
 				resultList.addAll(methodResults);
 
@@ -465,7 +467,8 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 			
 			// create a context and add data
 			VelocityContext velocityContext = new VelocityContext();
-			velocityContext.put("testName", testResult.getAttribute(SeleniumRobotLogger.METHOD_NAME));
+			
+			velocityContext.put("testName", getTestName(testResult));
 			
 			// Application information
 			fillContextWithTestParams(velocityContext);       

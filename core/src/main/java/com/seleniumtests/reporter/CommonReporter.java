@@ -28,6 +28,7 @@ import java.util.GregorianCalendar;
 
 import org.apache.log4j.Logger;
 import org.apache.velocity.app.VelocityEngine;
+import org.testng.ITestResult;
 
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
@@ -116,6 +117,24 @@ public abstract class CommonReporter {
 
 		if (t2 != null) {
 			generateTheStackTrace(t2, "Caused by " + t2.getLocalizedMessage(), contentBuffer);
+		}
+	}
+	
+	/**
+	 * Returns the visible test name. It depends if test has been skipped or not
+	 * skipped tests has never been executed and so attribute (set in TestListener) has not been applied
+	 * @param testResult
+	 * @return
+	 */
+	protected String getTestName(ITestResult testResult) {
+		if (testResult.getAttribute(SeleniumRobotLogger.METHOD_NAME) != null) {
+			return testResult.getAttribute(SeleniumRobotLogger.METHOD_NAME).toString();
+		}
+		
+		if (testResult.getStatus() == ITestResult.SKIP) {
+			return testResult.getName();
+		} else {
+			return testResult.getAttribute(SeleniumRobotLogger.METHOD_NAME).toString();
 		}
 	}
 }
