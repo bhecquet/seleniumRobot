@@ -117,12 +117,7 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 			for (ITestResult testResult: methodResults) {
 				
 				// skipped tests has never been executed and so attribute (set in TestListener) has not been applied
-				String testName;
-				if (testResult.getStatus() == ITestResult.SKIP) {
-					testName = testResult.getName();
-				} else {
-					testName = testResult.getAttribute(SeleniumRobotLogger.METHOD_NAME).toString();
-				}
+				String testName = getTestName(testResult);
 				
 				// record test case
 				serverConnector.createTestCase(testName);
