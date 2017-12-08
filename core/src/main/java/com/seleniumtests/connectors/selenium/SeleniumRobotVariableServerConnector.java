@@ -54,7 +54,7 @@ public class SeleniumRobotVariableServerConnector extends SeleniumRobotServerCon
 			
 		} catch (UnirestException | JSONException e) {
 			throw new SeleniumRobotServerException("cannot get variables", e);
-		}
+		} 
 	}
 
 }

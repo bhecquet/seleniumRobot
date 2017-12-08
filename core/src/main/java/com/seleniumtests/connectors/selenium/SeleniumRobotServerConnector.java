@@ -230,8 +230,20 @@ public abstract class SeleniumRobotServerConnector {
 	protected JSONArray getJSonArray(BaseRequest request) throws UnirestException {
 		HttpResponse<String> response = request.asString();
 		
+
+		if (response.getStatus() == 423) {
+			String error = new JSONObject(response.getBody()).getString("detail");
+			throw new SeleniumRobotServerException(error);
+		}
+		
 		if (response.getStatus() >= 400) {
-			throw new UnirestException(String.format("request to %s failed: %s", request.getHttpRequest().getUrl(), response.getStatusText()));
+			try {
+				String error = new JSONObject(response.getBody()).getString("detail");
+				throw new SeleniumRobotServerException(String.format("request to %s failed: %s", request.getHttpRequest().getUrl(), error));
+			} catch (Exception e) {
+				throw new UnirestException(String.format("request to %s failed: %s", request.getHttpRequest().getUrl(), response.getStatusText()));
+			}
+			
 		}
 		
 		if (response.getStatus() == 204) {
