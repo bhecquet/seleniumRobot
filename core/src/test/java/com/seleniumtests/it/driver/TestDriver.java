@@ -24,6 +24,7 @@ import java.awt.event.KeyEvent;
 import java.io.File;
 import java.util.regex.Pattern;
 
+import org.apache.xml.serialize.TextSerializer;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.UnhandledAlertException;
@@ -65,6 +66,7 @@ public class TestDriver extends GenericTest {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setExplicitWaitTimeout(2);
 		SeleniumTestsContextManager.getThreadContext().setBrowser("*chrome");
+		SeleniumTestsContextManager.getThreadContext().setCaptureSnapshot(false);
 //		SeleniumTestsContextManager.getThreadContext().setWebDriverGrid("http://127.0.0.1:4444/wd/hub");
 //		SeleniumTestsContextManager.getThreadContext().setRunMode("grid");
 		testPage = new DriverTestPage(true);
@@ -396,8 +398,41 @@ public class TestDriver extends GenericTest {
 		
 		testPage.uploadFile(path);
 		
-		
 		Assert.assertEquals(testPage.uploadedFile.getAttribute("value"), "config.ini");
+	}
+	
+	@Test(groups={"it"})
+	public void testFindElementByLabelForward() {
+		testPage.inputByLabel.sendKeys("element found by label");
+		Assert.assertEquals(testPage.textSelectedId.getValue(), "element found by label");
+	}
+	
+	@Test(groups={"it"})
+	public void testFindElementByLabelForwardWithoutTagName() {
+		testPage.inputByLabel2.sendKeys("element found by label without tagname");
+		Assert.assertEquals(testPage.textSelectedId.getValue(), "element found by label without tagname");
+	}
+	
+	@Test(groups={"it"})
+	public void testFindElementsByLabelForward() {
+		Assert.assertTrue(testPage.inputByLabel.findElements().size() > 3);
+	}
+	
+	@Test(groups={"it"})
+	public void testFindElementByLabelBackward() {
+		testPage.inputByLabelBackward.sendKeys("element found by label backward");
+		Assert.assertEquals(testPage.textSelectedText.getValue(), "element found by label backward");
+	}
+	
+	@Test(groups={"it"})
+	public void testFindElementByLabelBackwardWithoutTagName() {
+		testPage.inputByLabelBackward2.sendKeys("element found by label backward without tagname");
+		Assert.assertEquals(testPage.textSelectedText.getValue(), "element found by label backward without tagname");
+	}
+	
+	@Test(groups={"it"})
+	public void testFindElementsByLabelBackward() {
+		Assert.assertTrue(testPage.inputByLabelBackward.findElements().size() > 3);
 	}
 	
 	
