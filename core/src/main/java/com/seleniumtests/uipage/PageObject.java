@@ -30,6 +30,7 @@ import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.NoAlertPresentException;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.UnhandledAlertException;
@@ -618,7 +619,11 @@ public class PageObject extends BasePage implements IPage {
 		long end = systemClock.laterBy(waitInSeconds * 1000);
 
 		while (systemClock.isNowBefore(end)) {
-			return driver.switchTo().alert();
+			try {
+				return driver.switchTo().alert();
+			} catch (NoAlertPresentException e) {
+				WaitHelper.waitForSeconds(1);
+			}
 		}
 		return null;
 	}
@@ -640,12 +645,10 @@ public class PageObject extends BasePage implements IPage {
 			byte[] encoded = Base64.encodeBase64(FileUtils.readFileToByteArray(new File(filePath)));
 			((JavascriptExecutor) driver).executeScript(CustomEventFiringWebDriver.NON_JS_UPLOAD_FILE_THROUGH_POPUP, new File(filePath).getName(), new String(encoded));
 			
-			// Upload fichier de X ko
 			Alert alert = waitForAlert(5);
 			if (alert != null) {
-				driver.switchTo().alert().accept();
+				alert.accept();
 			}
-			WaitHelper.waitForSeconds(2);
 			
 		} catch (IOException e) {
 			throw new ScenarioException(String.format("could not read file to upload %s: %s", filePath, e.getMessage()));
