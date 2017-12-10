@@ -91,6 +91,17 @@ Example of a shopping cart class:
 	
 **WARN:** If you write your class combined with cucumber feature (methods annotated with @Given, @When, ...), only write methods returning `void`. Else, report will contain new page create step twice.
 
+#### Search elements ####
+
+SeleniumRobot supports standard search through `By` class
+
+	LinkElement proceed = new LinkElement("Checkout", By.linkText("Proceed to Checkout"));
+	
+Additional search using the `ByC` class are
+- search element by attribute: `new TextFieldElement("", ByC.attribute("attr", "attribute")).sendKeys("element found by attribute");`. See: [https://developer.mozilla.org/en-US/docs/Web/CSS/Attribute_selectors] (https://developer.mozilla.org/en-US/docs/Web/CSS/Attribute_selectors) for syntax
+- search element after a label: `new TextFieldElement("", ByC.labelForward("By id forward", "input")).sendKeys("element found by label");`
+- search element before a label: `new TextFieldElement("", ByC.labelBackward("By id backward", "input")).sendKeys("element found by label backward");`
+
 
 ### 3 Write a test ###
 A test is a suite of steps defined in several page objects. By convention, they are located in the `tests` folder
