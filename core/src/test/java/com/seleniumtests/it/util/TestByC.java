@@ -122,6 +122,22 @@ public class TestByC extends GenericTest {
 		new TextFieldElement("", ByC.partialLabelBackward("By id back", "input")).sendKeys("element found by partial label backward");
 		Assert.assertEquals(testPage.textSelectedText.getValue(), "element found by partial label backward");
 	}
+
+	@Test(groups={"it"})
+	public void testFindElementByAttribute() {
+		new TextFieldElement("", ByC.attribute("attr", "attribute")).sendKeys("element found by attribute");
+		Assert.assertEquals(testPage.textSelectedId.getValue(), "element found by attribute");
+	}
+	
+	@Test(groups={"it"}, expectedExceptions=IllegalArgumentException.class)
+	public void testFindElementByNullAttribute() {
+		new TextFieldElement("", ByC.attribute(null, "attribute")).sendKeys("element found by attribute");
+	}
+	
+	@Test(groups={"it"}, expectedExceptions=IllegalArgumentException.class)
+	public void testFindElementByNullAttributeValue() {
+		new TextFieldElement("", ByC.attribute("attr", null)).sendKeys("element found by attribute");
+	}
 	
 	
 }
