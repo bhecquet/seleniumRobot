@@ -20,48 +20,43 @@ public class ByC extends By {
 	}
 	
 	public static ByC labelForward(final String label) {
-		return labelForward(label, "input");
+		return labelForward(label, "input", false);
+	}
+	
+	public static ByC labelForward(final String label, final String tagName) {
+		return labelForward(label, tagName, false);
 	}
 
-	public static ByC labelForward(final String label, String tagName) {
-		if (label == null) {
-			throw new IllegalArgumentException("Cannot find elements with a null label attribute.");
-		}
-		if (tagName == null) {
-			tagName = "input";
-		}
-	
-		return new ByLabelForward(label, tagName);
-	}
-	
 	public static ByC partialLabelForward(final String label) {
-		return labelForward(label, "input");
+		return labelForward(label, "input", true);
 	}
 	
-	public static ByC partialLabelForward(final String label, String tagName) {
-		if (label == null) {
-			throw new IllegalArgumentException("Cannot find elements with a null label attribute.");
-		}
-		if (tagName == null) {
-			tagName = "input";
-		}
-		
-		return new ByLabelForward(label, tagName);
+	public static ByC partialLabelForward(final String label, final String tagName) {
+		return labelForward(label, tagName, true);
+	}
+
+	private static ByC labelForward(final String label, String tagName, boolean partial) {
+		return new ByLabelForward(label, tagName, partial);
 	}
 	
 	public static ByC labelBackward(final String label) {
-		return labelBackward(label, "input");
+		return labelBackward(label, "input", false);
 	}
 	
-	public static ByC labelBackward(final String label, String tagName) {
-		if (label == null) {
-			throw new IllegalArgumentException("Cannot find elements with a null label attribute.");
-		}
-		if (tagName == null) {
-			tagName = "input";
-		}
-		
-		return new ByLabelBackward(label, tagName);
+	public static ByC labelBackward(final String label, final String tagName) {
+		return labelBackward(label, tagName, false);
+	}
+
+	public static ByC partialLabelBackward(final String label) {
+		return labelBackward(label, "input", true);
+	}
+	
+	public static ByC partialLabelBackward(final String label, final String tagName) {
+		return labelBackward(label, tagName, true);
+	}
+	
+	private static ByC labelBackward(final String label, String tagName, boolean partial) {
+		return new ByLabelBackward(label, tagName, partial);
 	}
 
 	public static class ByLabelForward extends ByC implements Serializable {
@@ -73,21 +68,17 @@ public class ByC extends By {
 		private final boolean partial;
 
 		public ByLabelForward(String label, String tagName, boolean partial) {
+			
+			if (label == null) {
+				throw new IllegalArgumentException("Cannot find elements with a null label attribute.");
+			}
+			if (tagName == null) {
+				tagName = "input";
+			}
+			
 			this.label = label;
 			this.tagName = tagName;
 			this.partial = partial;
-		}
-		
-		public ByLabelForward(String label, boolean partial) {
-			this(label, "input", partial);
-		}
-		
-		public ByLabelForward(String label, String tagName) {
-			this(label, tagName, false);
-		}
-		
-		public ByLabelForward(String label) {
-			this(label, "input", false);
 		}
 
 		@Override
@@ -125,21 +116,17 @@ public class ByC extends By {
 		private final boolean partial;
 
 		public ByLabelBackward(String label, String tagName, boolean partial) {
+			
+			if (label == null) {
+				throw new IllegalArgumentException("Cannot find elements with a null label attribute.");
+			}
+			if (tagName == null) {
+				tagName = "input";
+			}
+			
 			this.label = label;
 			this.tagName = tagName;
 			this.partial = partial;
-		}
-		
-		public ByLabelBackward(String label, boolean partial) {
-			this(label, "input", partial);
-		}
-		
-		public ByLabelBackward(String label, String tagName) {
-			this(label, tagName, false);
-		}
-		
-		public ByLabelBackward(String label) {
-			this(label, "input", false);
 		}
 		
 		@Override

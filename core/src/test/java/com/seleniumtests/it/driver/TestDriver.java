@@ -401,39 +401,4 @@ public class TestDriver extends GenericTest {
 		Assert.assertEquals(testPage.uploadedFile.getAttribute("value"), "config.ini");
 	}
 	
-	@Test(groups={"it"})
-	public void testFindElementByLabelForward() {
-		testPage.inputByLabel.sendKeys("element found by label");
-		Assert.assertEquals(testPage.textSelectedId.getValue(), "element found by label");
-	}
-	
-	@Test(groups={"it"})
-	public void testFindElementByLabelForwardWithoutTagName() {
-		testPage.inputByLabel2.sendKeys("element found by label without tagname");
-		Assert.assertEquals(testPage.textSelectedId.getValue(), "element found by label without tagname");
-	}
-	
-	@Test(groups={"it"})
-	public void testFindElementsByLabelForward() {
-		Assert.assertTrue(testPage.inputByLabel.findElements().size() > 3);
-	}
-	
-	@Test(groups={"it"})
-	public void testFindElementByLabelBackward() {
-		testPage.inputByLabelBackward.sendKeys("element found by label backward");
-		Assert.assertEquals(testPage.textSelectedText.getValue(), "element found by label backward");
-	}
-	
-	@Test(groups={"it"})
-	public void testFindElementByLabelBackwardWithoutTagName() {
-		testPage.inputByLabelBackward2.sendKeys("element found by label backward without tagname");
-		Assert.assertEquals(testPage.textSelectedText.getValue(), "element found by label backward without tagname");
-	}
-	
-	@Test(groups={"it"})
-	public void testFindElementsByLabelBackward() {
-		Assert.assertTrue(testPage.inputByLabelBackward.findElements().size() > 3);
-	}
-	
-	
 }

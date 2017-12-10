@@ -66,11 +66,7 @@ public class DriverTestPage extends PageObject {
 	public static final TextFieldElement logoText = new TextFieldElement("logoText", By.id("logoText"));
 	public static final ButtonElement upload = new ButtonElement("upload", By.id("upload"));
 	public static final TextFieldElement uploadedFile = new TextFieldElement("uploadedFile", By.id("uploadedFile"));
-	public static final TextFieldElement inputByLabel = new TextFieldElement("", ByC.labelForward("By id", "input"));
-	public static final TextFieldElement inputByLabel2 = new TextFieldElement("", ByC.labelForward("By id"));
 	public static final TextFieldElement textSelectedId = new TextFieldElement("", By.id("textSelectedId"));
-	public static final TextFieldElement inputByLabelBackward = new TextFieldElement("", ByC.labelBackward("By id backward", "input"));
-	public static final TextFieldElement inputByLabelBackward2 = new TextFieldElement("", ByC.labelBackward("By id backward"));
 	public static final TextFieldElement textSelectedText = new TextFieldElement("", By.id("textSelectedText"));
 	
 	// Elements inside others
