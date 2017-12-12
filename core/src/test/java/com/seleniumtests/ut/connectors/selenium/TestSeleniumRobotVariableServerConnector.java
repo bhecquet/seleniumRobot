@@ -190,12 +190,4 @@ public class TestSeleniumRobotVariableServerConnector extends MockitoTest {
 		Assert.assertEquals(variables.get("key2"), "value2");
 	}
 
-	
-	
-	// get variables
-	// get information form server
-
-	
-
-
 }

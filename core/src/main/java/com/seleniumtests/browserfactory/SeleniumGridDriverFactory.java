@@ -134,6 +134,8 @@ public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implemen
         gridConnector.uploadMobileApp(capabilities);
 
         // connection to grid is made here
+        // TODO: remote ScreenShotRemoteWebDriver reference (seems useless)
+        // 			check TAKE_SCREENSHOT capability is always present
         if (SeleniumTestsContextManager.isWebTest() && (BrowserType.FIREFOX).equals(webDriverConfig.getBrowser())) {
             driver = getDriverFirefox(gridConnector.getHubUrl(), capabilities);
         } else {

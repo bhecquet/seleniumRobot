@@ -63,7 +63,7 @@
 			                			#else 
 			                				<tr class="testSkipped">
 			                				<td>$testContext.key.getName()</td>
-			                				<td class="alignleft"><i class="fa fa-circle circleSkipped"></i>$testResult.getName()</td>
+			                				<td class="alignleft"><i class="fa fa-circle circleSkipped"></i><a href='$testResult.getAttribute("methodResultFileName")'>$testResult.getAttribute("methodName")</a></td>
 			                			#end 
 
 				                		<td name="passed-$testIdx">$passedSteps</td>

@@ -16,8 +16,15 @@
  */
 package com.seleniumtests.it.driver;
 
+import java.awt.AWTException;
+import java.awt.Robot;
+import java.awt.Toolkit;
+import java.awt.datatransfer.StringSelection;
+import java.awt.event.KeyEvent;
+import java.io.File;
 import java.util.regex.Pattern;
 
+import org.apache.xml.serialize.TextSerializer;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.UnhandledAlertException;
@@ -58,7 +65,10 @@ public class TestDriver extends GenericTest {
 	public void initDriver(final ITestContext testNGCtx) throws Exception {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setExplicitWaitTimeout(2);
-		SeleniumTestsContextManager.getThreadContext().setBrowser("chrome");
+		SeleniumTestsContextManager.getThreadContext().setBrowser("*chrome");
+		SeleniumTestsContextManager.getThreadContext().setCaptureSnapshot(false);
+//		SeleniumTestsContextManager.getThreadContext().setWebDriverGrid("http://127.0.0.1:4444/wd/hub");
+//		SeleniumTestsContextManager.getThreadContext().setRunMode("grid");
 		testPage = new DriverTestPage(true);
 		driver = WebUIDriver.getWebDriver(true);
 	}
@@ -88,6 +98,20 @@ public class TestDriver extends GenericTest {
 //		driver.switchTo().alert().accept();
 //		
 //	}
+	
+	/**
+	 * Check for issue #47 where ReplayAction aspect raised an error when switching to default context after click with alert present
+	 */
+	@Test(groups={"it"})
+	public void testAlertDisplay() {
+		try {
+			testPage.greenSquare.click();
+			driver.switchTo().alert().accept();
+		} finally {
+			testPage.resetButton.click();
+			Assert.assertEquals("", testPage.textElement.getValue());
+		}
+	}
 	
 	/**
 	 * deactivated as it depends on browser
@@ -367,5 +391,14 @@ public class TestDriver extends GenericTest {
 		Assert.assertFalse(((JavascriptExecutor) driver).executeScript("return window.pageYOffset;").equals(0L));
 	}
 	
+	@Test(groups= {"it"})
+	public void testUploadFile() throws AWTException, InterruptedException {
+		String path = SeleniumTestsContextManager.getConfigPath() + File.separator + "config.ini";
+		testPage.upload.click();
+		
+		testPage.uploadFile(path);
+		
+		Assert.assertEquals(testPage.uploadedFile.getAttribute("value"), "config.ini");
+	}
 	
 }

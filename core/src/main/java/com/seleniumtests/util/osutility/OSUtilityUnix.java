@@ -22,6 +22,7 @@ import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Scanner;
 
 import com.seleniumtests.browserfactory.BrowserInfo;
 import com.seleniumtests.driver.BrowserType;
@@ -123,6 +124,34 @@ public class OSUtilityUnix extends OSUtility {
 		} 
 		
 		return browserList;
+	}
+	
+	@Override
+	public List<Long> getChildProcessPid(Long parentProcess, String processName, List<Long> existingPids) throws IOException {
+		
+		List<Long> searchedPids = new ArrayList<>();
+		
+		String pids = OSCommand.executeCommandAndWait(String.format("pgrep -P %d -d , -l", parentProcess)).trim();
+        for(String process: pids.split(",")) {
+        	String[] processSplit = process.split(" ");
+        	Long pid;
+        	try {
+        		pid = Long.parseLong(processSplit[0]);
+        	} catch (NumberFormatException e) {
+        		continue;
+        	}
+            if((processName == null || processName.equalsIgnoreCase(processSplit[1])) && !existingPids.contains(pid)) {
+            	searchedPids.add(pid);
+            }
+        }
+       
+        
+        return searchedPids;
+	}
+	
+	@Override
+	public String getProgramNameFromPid(Long pid) {
+		return OSCommand.executeCommandAndWait(String.format("ps -p %d -o comm=", pid));
 	}
 
 }

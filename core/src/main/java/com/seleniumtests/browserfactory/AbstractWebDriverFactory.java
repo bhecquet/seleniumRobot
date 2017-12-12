@@ -23,7 +23,6 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 
 import com.seleniumtests.driver.DriverConfig;
-import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.reporter.TestLogging;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 

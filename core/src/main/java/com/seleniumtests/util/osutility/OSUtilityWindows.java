@@ -23,6 +23,7 @@ import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -161,6 +162,7 @@ public class OSUtilityWindows extends OSUtility {
 		browserList.put(BrowserType.PHANTOMJS, new BrowserInfo(BrowserType.PHANTOMJS, LATEST_VERSION, null));
 		
 		// look for Firefox
+		// TODO: handle multiple firefox version (other directories FirefoxHTML-SOMEID)
 		try {
 			String firefoxPath = Advapi32Util.registryGetStringValue(WinReg.HKEY_CLASSES_ROOT, "FirefoxHTML\\shell\\open\\command", "");
 			firefoxPath = firefoxPath.split(".exe\"")[0].replace("\"", "") + ".exe";
@@ -172,11 +174,11 @@ public class OSUtilityWindows extends OSUtility {
 		// look for chrome
 		try {
 			String chromePath = Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Classes\\ChromeHTML\\shell\\open\\command", "");
+			chromePath = chromePath.split(".exe\"")[0].replace("\"", "") + ".exe";
 			String version;
 			try {
 				version = getChromeVersionFromRegistry();
 			} catch (Win32Exception e) {
-				chromePath = chromePath.split(".exe\"")[0].replace("\"", "") + ".exe";
 				version = getChromeVersionFromFolder(chromePath);
 			}
 			browserList.put(BrowserType.CHROME, new BrowserInfo(BrowserType.CHROME, extractChromeVersion("Google Chrome " + version), chromePath));
@@ -211,5 +213,36 @@ public class OSUtilityWindows extends OSUtility {
 		} catch (Exception e) {		}
 		throw new DisabledConnector("SOAP UI is not installed (not found in registry). Install it and run it once (MANDATORY)");
 	
+	}
+
+	@Override
+	public List<Long> getChildProcessPid(Long parentProcess, String processName, List<Long> existingPids) throws IOException {
+		Scanner scan = new Scanner(Runtime.getRuntime().exec(String.format("wmic process where (ParentProcessId=%d) get Caption,ProcessId", parentProcess)).getInputStream());
+        scan.useDelimiter("\\A");
+        String childProcessIds =  scan.hasNext() ? scan.next() : "";
+        List<Long> namedSubprocesses = new ArrayList<>();
+        String[] splited = childProcessIds.split("\\s+");
+        for(int i =0 ; i<splited.length; i = i+2){
+        	Long pid;
+        	try {
+        		pid = Long.parseLong(splited[i+1]);
+        	} catch (NumberFormatException e) {
+        		continue;
+        	}
+            if((processName == null || processName.equalsIgnoreCase(splited[i])) && !existingPids.contains(pid)) {
+            	namedSubprocesses.add(pid);
+            }
+        }
+       
+        scan.close();
+        
+        return namedSubprocesses;
+	}
+
+	@Override
+	public String getProgramNameFromPid(Long pid) {
+		String[] processNames = OSCommand.executeCommandAndWait(String.format("wmic process where processId=%d get name", pid)).trim().split("\n");
+		String processName = processNames[processNames.length - 1];
+		return processName.endsWith(".exe") ? processName: "";
 	}
 }

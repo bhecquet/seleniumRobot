@@ -16,13 +16,14 @@
  */
 package com.seleniumtests.driver;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.openqa.selenium.Platform;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebDriverException;
+import org.openqa.selenium.support.events.EventFiringWebDriver;
 import org.openqa.selenium.support.events.WebDriverEventListener;
 
 import com.seleniumtests.browserfactory.AppiumDriverFactory;
@@ -60,13 +61,14 @@ public class WebUIDriver {
     private DriverConfig config = new DriverConfig();
     private WebDriver driver;
     private IWebDriverFactory webDriverBuilder;
+    private final static Object createDriverLock = new Object();
 
     public WebUIDriver() {
         init();
         uxDriverSession.set(this);
     }
 
-    public WebDriver createRemoteWebDriver()  {
+	public WebDriver createRemoteWebDriver()  {
         
         // TODO: use grid with appium ?
         if (config.getMode() == DriverMode.GRID) {
@@ -81,6 +83,7 @@ public class WebUIDriver {
         	if (config.getTestType().isMobile()) {
         		webDriverBuilder = new AppiumDriverFactory(this.config);
         	} else {
+        		
 	            if (config.getBrowser() == BrowserType.FIREFOX) {
 	                webDriverBuilder = new FirefoxDriverFactory(this.config);
 	            } else if (config.getBrowser() == BrowserType.INTERNET_EXPLORER) {
@@ -101,12 +104,32 @@ public class WebUIDriver {
         
         logger.info("driver mode: "+config.getMode());
 
-        synchronized (this.getClass()) {
+        synchronized (createDriverLock) {
+        	
+    		// get browser info used to start this driver. It will be used then for 
+        	BrowserInfo browserInfo = OSUtility.getInstalledBrowsersWithVersion().get(config.getBrowser());
+        	List<Long> existingPids = new ArrayList<>();
+
+    		// get pid pre-existing the creation of this driver. This helps filtering drivers launched by other tests or users
+    		if (browserInfo != null) {
+        		existingPids.addAll(browserInfo.getDriverAndBrowserPid(new ArrayList<>()));
+        	}
+        	
             driver = webDriverBuilder.createWebDriver();
-            WaitHelper.waitForSeconds(1);
+            WaitHelper.waitForSeconds(2);
+            
+            List<Long> driverPids = new ArrayList<>();
+            
+            // get the created PIDs
+            if (browserInfo != null) {
+    			driverPids = browserInfo.getDriverAndBrowserPid(existingPids);
+    		}
+            
+            driver = handleListeners(driver, browserInfo, driverPids);
+    	
         }
 
-        driver = handleListeners(driver);
+        
 
         return driver;
     }
@@ -128,7 +151,7 @@ public class WebUIDriver {
             if (driver != null) {
                 try {
                     driver.quit();
-                } catch (WebDriverException ex) {
+                } catch (Exception ex) {
                     logger.error(ex);
                 }
             }
@@ -187,9 +210,9 @@ public class WebUIDriver {
      */
     public static WebUIDriver getWebUIDriver() {
         if (uxDriverSession.get() == null) {
-        	if (!SeleniumTestsContextManager.getThreadContext().isDevMode()){
-        		cleanWebDrivers();
-        	}
+//        	if (!SeleniumTestsContextManager.getThreadContext().isDevMode()){
+//        		cleanWebDrivers();
+//        	}
             uxDriverSession.set(new WebUIDriver());
         }
 
@@ -220,12 +243,12 @@ public class WebUIDriver {
         }
     }
 
-    protected WebDriver handleListeners(WebDriver driver) {
-    	WebDriver listeningDriver = driver;
+    protected WebDriver handleListeners(WebDriver driver, BrowserInfo browserInfo, List<Long> driverPids) {
+    	EventFiringWebDriver listeningDriver = new CustomEventFiringWebDriver(driver, driverPids, browserInfo, SeleniumTestsContextManager.isWebTest(), SeleniumTestsContextManager.getThreadContext().getRunMode());
         List<WebDriverEventListener> listeners = config.getWebDriverListeners();
         if (listeners != null && !listeners.isEmpty()) {
             for (int i = 0; i < config.getWebDriverListeners().size(); i++) {
-            	listeningDriver = new CustomEventFiringWebDriver(listeningDriver).register(listeners.get(i));
+            	listeningDriver = listeningDriver.register(listeners.get(i));
             }
         }
 
@@ -259,6 +282,8 @@ public class WebUIDriver {
     	} else {
     		logger.info(String.format("Start creating %s driver", config.getBrowser().getBrowserType()));
     	}
+	
+	
         
     	displayBrowserVersion();
         driver = createRemoteWebDriver();
@@ -450,5 +475,9 @@ public class WebUIDriver {
 
 	public DriverConfig getConfig() {
 		return config;
+	}
+	
+    public static ThreadLocal<WebUIDriver> getUxDriverSession() {
+		return uxDriverSession;
 	}
 }
