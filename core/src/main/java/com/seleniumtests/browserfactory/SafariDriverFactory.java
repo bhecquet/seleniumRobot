@@ -18,6 +18,7 @@ package com.seleniumtests.browserfactory;
 
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.safari.SafariDriver;
+import org.openqa.selenium.safari.SafariOptions;
 
 import com.seleniumtests.driver.DriverConfig;
 import com.seleniumtests.reporter.TestLogging;
@@ -31,7 +32,7 @@ public class SafariDriverFactory extends AbstractWebDriverFactory implements IWe
     @Override
     protected WebDriver createNativeDriver() {
     	synchronized (this.getClass()) {
-    		return new SafariDriver(new SafariCapabilitiesFactory().createCapabilities(webDriverConfig));
+    		return new SafariDriver(new SafariOptions(new SafariCapabilitiesFactory().createCapabilities(webDriverConfig)));
     	}
     }
 

@@ -84,7 +84,7 @@ public class FirefoxCapabilitiesFactory extends ICapabilitiesFactory {
         FirefoxProfile profile = getFirefoxProfile(webDriverConfig);
         configProfile(profile, webDriverConfig);
         capability.setCapability(FirefoxDriver.PROFILE, profile);
-        capability.setCapability("marionette", false);
+        capability.setCapability(FirefoxDriver.MARIONETTE, false);
 
         return capability;
     }

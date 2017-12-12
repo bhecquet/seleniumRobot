@@ -18,6 +18,7 @@ package com.seleniumtests.browserfactory;
 
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 
 import com.seleniumtests.driver.DriverConfig;
 
@@ -29,7 +30,9 @@ public class ChromeDriverFactory extends AbstractWebDriverFactory implements IWe
 
     @Override
     protected WebDriver createNativeDriver() {
-        return new ChromeDriver(new ChromeCapabilitiesFactory().createCapabilities(webDriverConfig));
+    	ChromeOptions options = new ChromeOptions();
+    	options.merge(new ChromeCapabilitiesFactory().createCapabilities(webDriverConfig));
+    	return new ChromeDriver(options);
     }
 
 }
