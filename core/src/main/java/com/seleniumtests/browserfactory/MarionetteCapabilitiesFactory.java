@@ -19,6 +19,7 @@ package com.seleniumtests.browserfactory;
 import java.io.File;
 import java.io.IOException;
 
+import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.GeckoDriverService;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
@@ -34,7 +35,7 @@ public class MarionetteCapabilitiesFactory extends FirefoxCapabilitiesFactory {
 	@Override
 	public DesiredCapabilities createCapabilities(final DriverConfig webDriverConfig) {
 		DesiredCapabilities capabilities = super.createCapabilities(webDriverConfig);
-		capabilities.setCapability("marionette", true);
+		capabilities.setCapability(FirefoxDriver.MARIONETTE, true);
 		
 		if (webDriverConfig.getMode() == DriverMode.LOCAL) {
         	setGeckoDriverLocal(webDriverConfig);

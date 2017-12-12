@@ -18,6 +18,7 @@ package com.seleniumtests.browserfactory;
 
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.edge.EdgeDriver;
+import org.openqa.selenium.edge.EdgeOptions;
 
 import com.seleniumtests.driver.DriverConfig;
 
@@ -37,6 +38,8 @@ public class EdgeDriverFactory extends AbstractWebDriverFactory implements IWebD
      */
     @Override
     protected WebDriver createNativeDriver() {
-    	return new EdgeDriver(new EdgeCapabilitiesFactory().createCapabilities(webDriverConfig));
+    	EdgeOptions options = new EdgeOptions();
+    	options.merge(new EdgeCapabilitiesFactory().createCapabilities(webDriverConfig));
+    	return new EdgeDriver(options);
     }
 }

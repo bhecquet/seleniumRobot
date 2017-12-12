@@ -17,12 +17,11 @@
 package com.seleniumtests.browserfactory;
 
 import java.util.concurrent.TimeUnit;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.firefox.FirefoxOptions;
 
 import com.seleniumtests.customexception.DriverExceptions;
 import com.seleniumtests.driver.BrowserType;
@@ -60,11 +59,10 @@ public class FirefoxDriverFactory extends AbstractWebDriverFactory implements IW
      */
     @Override
     protected WebDriver createNativeDriver() {
-    	
     	if (isMarionetteMode()) {
-    		return new FirefoxDriver(new MarionetteCapabilitiesFactory().createCapabilities(webDriverConfig));
+    		return new FirefoxDriver(new FirefoxOptions(new MarionetteCapabilitiesFactory().createCapabilities(webDriverConfig)));
     	} else {
-    		return new FirefoxDriver(new FirefoxCapabilitiesFactory().createCapabilities(webDriverConfig));
+    		return new FirefoxDriver(new FirefoxOptions(new FirefoxCapabilitiesFactory().createCapabilities(webDriverConfig)));
     	}  
     }
 

@@ -18,6 +18,7 @@ package com.seleniumtests.browserfactory;
 
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.ie.InternetExplorerDriver;
+import org.openqa.selenium.ie.InternetExplorerOptions;
 
 import com.seleniumtests.customexception.DriverExceptions;
 import com.seleniumtests.driver.DriverConfig;
@@ -43,7 +44,8 @@ public class IEDriverFactory extends AbstractWebDriverFactory implements IWebDri
     
     @Override
     protected WebDriver createNativeDriver() {
-        return new InternetExplorerDriver(new IECapabilitiesFactory().createCapabilities(webDriverConfig));
+    	InternetExplorerOptions options = new InternetExplorerOptions(new IECapabilitiesFactory().createCapabilities(webDriverConfig));
+        return new InternetExplorerDriver(options);
     }
 
     @Override

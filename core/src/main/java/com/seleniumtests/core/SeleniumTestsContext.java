@@ -333,6 +333,7 @@ public class SeleniumTestsContext {
     
     /**
      * From platform name, in case of Desktop platform, do nothing and in case of mobile, extract OS version from name
+     * as platformName will be 'Android 5.0' for example
      *
      * @throws ConfigurationException 	in mobile, if version is not present
      */
