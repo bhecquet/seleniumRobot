@@ -16,33 +16,19 @@
  */
 package com.seleniumtests.it.util;
 
-import java.awt.AWTException;
-import java.io.File;
-import java.util.regex.Pattern;
-
-import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebDriverException;
-import org.openqa.selenium.firefox.FirefoxDriver;
 import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.annotations.AfterClass;
-import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.seleniumtests.GenericTest;
-import com.seleniumtests.browserfactory.FirefoxDriverFactory;
 import com.seleniumtests.core.SeleniumTestsContextManager;
-import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.it.driver.DriverTestPage;
 import com.seleniumtests.uipage.ByC;
-import com.seleniumtests.uipage.htmlelements.HtmlElement;
 import com.seleniumtests.uipage.htmlelements.TextFieldElement;
-import com.seleniumtests.util.helper.WaitHelper;
 
 public class TestByC extends GenericTest {
 	
