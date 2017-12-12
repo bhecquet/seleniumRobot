@@ -4,7 +4,7 @@
 	<parent>
 	    <groupId>com.infotel.seleniumRobot</groupId>
 	    <artifactId>core-parent</artifactId>
-	    <version>3.4.0-SNAPSHOT</version>
+	    <version>3.4.3-SNAPSHOT</version>
 	</parent>
 
   	<artifactId>grid-extensions</artifactId>
@@ -63,6 +63,7 @@
 						<include>**/browserfactory/BrowserInfo.java</include>
 						<include>**/util/osutility/**</include>
 						<include>**/util/FileUtility.java</include>
+						<include>**/driver/CustomEventFiringWebDriver.java</include>
 					</includes>
 				</configuration>
 			</plugin>

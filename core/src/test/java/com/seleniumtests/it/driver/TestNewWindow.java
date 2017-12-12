@@ -58,11 +58,11 @@ public class TestNewWindow extends GenericTest {
 		try {
 			testPage.link.click();
 		
-			// passage sur le nouvel onglet et recherche d'un élément
+			// go to new opened window
 			mainHandle = testPage.selectNewWindow();
 			Assert.assertEquals("a value", driver.findElement(By.id("textInIFrameWithValue")).getAttribute("value"));
 		} finally {
-			// retour sur l'onglet principal
+			// go back to main window
 			if (driver.getWindowHandles().size() > 1) {
 				driver.close();
 				if (mainHandle != null) {
@@ -71,5 +71,34 @@ public class TestNewWindow extends GenericTest {
 			}
 		}
 		Assert.assertTrue(testPage.link.getUrl().contains("testIFrame.html"));
+	}
+	
+	/**
+	 * test correction of bug #47 where error is raised when closing window through a click
+	 * @throws Exception 
+	 */
+	@Test(groups={"it"})
+	public void testClosingWindow() throws Exception {
+		String mainHandle = null;
+		
+		
+		try {
+			testPage.link.click();
+			
+		
+			// go to new opened window
+			mainHandle = testPage.selectNewWindow();
+			DriverSubTestPage subTestPage = new DriverSubTestPage(false);
+			subTestPage.closeButton.click();
+			testPage.selectWindow(mainHandle);
+		} finally {
+			// go back to main window
+			if (driver.getWindowHandles().size() > 1) {
+				driver.close();
+				if (mainHandle != null) {
+					testPage.selectWindow(mainHandle);
+				}
+			}
+		}
 	}
 }

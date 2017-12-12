@@ -64,5 +64,49 @@ public enum BrowserType {
     public String getBrowserType() {
         return this.bType;
     }
+    
+    public static String getSeleniumBrowserType(BrowserType browserType) {
+    	if (browserType == BrowserType.FIREFOX) {
+    		return org.openqa.selenium.remote.BrowserType.FIREFOX;
+    	} else if (browserType == BrowserType.CHROME) {
+    		return org.openqa.selenium.remote.BrowserType.CHROME;
+    	} else if (browserType == BrowserType.EDGE) {
+    		return org.openqa.selenium.remote.BrowserType.EDGE;
+    	} else if (browserType == BrowserType.SAFARI) {
+    		return org.openqa.selenium.remote.BrowserType.SAFARI;
+    	} else if (browserType == BrowserType.INTERNET_EXPLORER) {
+    		return org.openqa.selenium.remote.BrowserType.IE;
+    	} else if (browserType == BrowserType.HTMLUNIT) {
+    		return org.openqa.selenium.remote.BrowserType.HTMLUNIT;
+    	} else if (browserType == BrowserType.PHANTOMJS) {
+    		return org.openqa.selenium.remote.BrowserType.PHANTOMJS;
+    	} else if (browserType == BrowserType.BROWSER) {
+    		return org.openqa.selenium.remote.BrowserType.ANDROID;
+    	} else {
+    		return null;
+    	}
+    }
+    
+    public static BrowserType getBrowserTypeFromSeleniumBrowserType(String browserType) {
+    	if (org.openqa.selenium.remote.BrowserType.FIREFOX.equals(browserType)) {
+    		return BrowserType.FIREFOX;
+    	} else if (org.openqa.selenium.remote.BrowserType.CHROME.equals(browserType)) {
+    		return BrowserType.CHROME;
+    	} else if (org.openqa.selenium.remote.BrowserType.EDGE.equals(browserType)) {
+    		return BrowserType.EDGE;
+    	} else if (org.openqa.selenium.remote.BrowserType.SAFARI.equals(browserType)) {
+    		return BrowserType.SAFARI;
+    	} else if (org.openqa.selenium.remote.BrowserType.IE.equals(browserType)) {
+    		return BrowserType.INTERNET_EXPLORER;
+    	} else if (org.openqa.selenium.remote.BrowserType.HTMLUNIT.equals(browserType)) {
+    		return BrowserType.HTMLUNIT;
+    	} else if (org.openqa.selenium.remote.BrowserType.PHANTOMJS.equals(browserType)) {
+    		return BrowserType.PHANTOMJS;
+    	} else if (org.openqa.selenium.remote.BrowserType.ANDROID.equals(browserType)) {
+    		return BrowserType.BROWSER;
+    	} else {
+    		return BrowserType.NONE;
+    	}
+    }
 
 }

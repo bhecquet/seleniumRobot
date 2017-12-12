@@ -86,7 +86,7 @@ In this case, this user passed value will overwrite test or suite parameters
 | projectName 				| 			| Project name for Testdroid tests only | 
 | viewPortWidth				|			| Width of the viewPort when doing web tests. No effect for mobile apps. If not set, window will be maximized |
 | viewPortHeight			|			| Height of the viewPort when doing web tests. No effect for mobile apps. If not set, window will be maximized |
-[ overrideSeleniumNativeAction      | false | intercept driver.findElement and driver.frame operations so that seleniumRobot element operations can be use (replay, error handling, ...) even when using standard selenium code. Only findElement(By) and findElements(By) are supported, not findElementByxxx(String) |
+| overrideSeleniumNativeAction      | false | intercept driver.findElement and driver.frame operations so that seleniumRobot element operations can be use (replay, error handling, ...) even when using standard selenium code. Only findElement(By) and findElements(By) are supported, not findElementByxxx(String) |
 
 
 Other parameters, not accepted in XML file but allowed on command line
@@ -267,10 +267,11 @@ For better features, prefer using seleniumRobot-grid which is based on standard 
 
 #### Configure SeleniumRobot ####
 
-Test must be configured like the example below (or use `-DrunMode=grid`)
+Test must be configured like the example below (or use `-DrunMode=grid -DwebDriverGrid=http://127.0.0.1:4444/wd/hub`)
  
  	<test name="MRH">
     	<parameter name="runMode" value="grid" />
+    	<parameter name="webDriverGrid" value="http://127.0.0.1:4444/wd/hub" />
     	
         <packages> 
             <package name="com.seleniumtests.core.runner.*"/>

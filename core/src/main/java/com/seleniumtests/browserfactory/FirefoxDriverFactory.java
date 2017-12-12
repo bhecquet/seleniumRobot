@@ -49,25 +49,9 @@ public class FirefoxDriverFactory extends AbstractWebDriverFactory implements IW
      */
     public static boolean useFirefoxDriver() {
     	String output = OSUtility.getInstalledBrowsersWithVersion().get(BrowserType.FIREFOX).getVersion();
-		return useFirefoxVersion(output);
+		return BrowserInfo.useLegacyFirefoxVersion(output);
     }
-    
-    /**
-     * use firefox if version is below 47
-     * @param versionString
-     * @return
-     */
-    public static boolean useFirefoxVersion(String versionString) {
-    	Pattern regMozilla = Pattern.compile(".*?(\\d+)\\..*");
-    	Matcher versionMatcher = regMozilla.matcher(versionString);
-		if (versionMatcher.matches()) {
-			String version = versionMatcher.group(1);
-			if (Integer.parseInt(version) < 48) {
-				return true;
-			}
-		} 
-		return false;
-    }
+   
 
     /**
      * create native driver instance, designed for unit testing.

@@ -1,5 +1,32 @@
 In this section, we will describe how to add some useful features to test applications (file comparison, log reading, ...)
 
+### 0 Troubleshooting ###
+
+#### Clicking on an element makes a new window display but browser returns to previous one ####
+
+This behaviour is caused by seleniumRobot when doing the following
+
+	testPage.link.click();
+	
+	// this is the PageObject corresponding to the new window
+	DriverSubTestPage subTestPage = new DriverSubTestPage(false);
+	
+	// go to new opened window
+	mainHandle = testPage.selectNewWindow();
+	
+The call to new PageObject is performing snapshot of the current window. But, driver did not already switched to this window so 
+snapshot is taken from the first one.
+
+To resolve, do instead
+
+	testPage.link.click();
+	
+	// go to new opened window
+	mainHandle = testPage.selectNewWindow();
+	
+	// this is the PageObject corresponding to the new window
+	DriverSubTestPage subTestPage = new DriverSubTestPage(false);
+
 ### 1 Compare 2 XML files ###
 Use the XMLUnit api: https://github.com/xmlunit/user-guide/wiki
 
@@ -121,3 +148,9 @@ SeleniumRobot provides several email clients to allow reading email content and 
 
 	EmailAccount account = EmailAccount(<email_address>, <login>, <password>);
 	Email emailFound = account.checkEmailPresence(<email_title>, new String[] {"attachment1"});
+	
+### 10 upload file ###
+
+This should be avoided as much as possible, but some tests may require uploading a file to the tested application.
+With selenium, click on the button to upload the file, then you can call `uploadFile(<filePath>)` which will handle the modal opened by browser.
+The drawbak of this method is that browser MUST have the focus and thus no other test should be executed at the same time.

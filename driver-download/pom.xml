@@ -7,7 +7,7 @@
 	<parent>
 	    <groupId>com.infotel.seleniumRobot</groupId>
 	    <artifactId>core-parent</artifactId>
-	    <version>3.4.0-SNAPSHOT</version>
+	    <version>3.4.3-SNAPSHOT</version>
 	</parent>
 
 	<properties>
@@ -51,7 +51,7 @@
 					</configuration>
 					<executions>
 
-						<!-- CHROMEDRIVER -->
+						<!-- CHROMEDRIVER: pattern for file MUST BE chromedriver_<version>_chrome-<minChromeVersion>-<maxChromeVersion> -->
 						<execution>
 							<id>chromedriver 2.33</id>
 							<phase>process-resources</phase>
@@ -60,7 +60,7 @@
 							</goals>
 							<configuration>
 								<url>${chromedriver.url}/2.33/chromedriver_${chromedriver.suffix}.zip</url>
-								<outputDirectory>${driver.path}${os}/dir_chromedriver_2.33_chrome_60-62</outputDirectory>
+								<outputDirectory>${driver.path}${os}/dir_chromedriver_2.33_chrome-60-62</outputDirectory>
 							</configuration>
 						</execution>
 						<execution>

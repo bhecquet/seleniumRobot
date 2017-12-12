@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -81,7 +82,9 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 		String[] styleFiles = new String[] {"bootstrap.min.css", "bootstrap.min.js", "Chart.min.js", "jQuery-2.2.0.min.js",
 											"seleniumRobot.css", "app.min.js", "seleniumRobot_solo.css", "seleniumtests_test1.gif",
 											"seleniumtests_test2.gif", "seleniumtests_test3.gif", "AdminLTE.min.css",
-											"seleniumRobot.js"};
+											"seleniumRobot.js", "lobsterTwo.css", "css/font-awesome.min.css", 
+											"fonts/fontawesome-webfont.eot", "fonts/fontawesome-webfont.svg", "fonts/fontawesome-webfont.ttf", 
+											"fonts/fontawesome-webfont.woff", "fonts/fontawesome-webfont.woff2", "fonts/FontAwesome.otf"};
 		for (String fileName: styleFiles) {
 			FileUtils.copyInputStreamToFile(Thread.currentThread().getContextClassLoader().getResourceAsStream("reporter/templates/" + fileName), 
 											Paths.get(outputDirectory, RESOURCES_DIR, "templates", fileName).toFile());
@@ -164,7 +167,7 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 			VelocityContext context = new VelocityContext();
 			
 			// add logs
-			String logs = SeleniumRobotLogger.getTestLogs().get(testResult.getAttribute(SeleniumRobotLogger.METHOD_NAME));
+			String logs = SeleniumRobotLogger.getTestLogs().get(getTestName(testResult));
 			if (logs == null) {
 				return;
 			}
@@ -250,7 +253,7 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 					endHtml();
 					logger.info("Completed Report Generation.");
 				} catch (IOException e) {
-					logger.error("Error writing test report: " + testResult.getAttribute(SeleniumRobotLogger.METHOD_NAME), e);
+					logger.error("Error writing test report: " + getTestName(testResult), e);
 				}  
 			}
 		}
@@ -267,7 +270,7 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 	public Map<ITestContext, List<ITestResult>> generateSuiteSummaryReport(final List<ISuite> suites) {
 		
 		// build result list for each TestNG test
-		Map<ITestContext, List<ITestResult>> methodResultsMap = new HashMap<>();
+		Map<ITestContext, List<ITestResult>> methodResultsMap = new LinkedHashMap<>();
 		Integer fileIndex = 0;
 		
 		for (ISuite suite : suites) {
@@ -289,6 +292,8 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 					fileIndex++;
 					String fileName = "SeleniumTestReport-" + fileIndex + ".html";
 					result.setAttribute(METHOD_RESULT_FILE_NAME, fileName);
+					result.setAttribute(SeleniumRobotLogger.METHOD_NAME, getTestName(result));
+					
 				}
 				resultList.addAll(methodResults);
 
@@ -462,7 +467,8 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 			
 			// create a context and add data
 			VelocityContext velocityContext = new VelocityContext();
-			velocityContext.put("testName", testResult.getAttribute(SeleniumRobotLogger.METHOD_NAME));
+			
+			velocityContext.put("testName", getTestName(testResult));
 			
 			// Application information
 			fillContextWithTestParams(velocityContext);       

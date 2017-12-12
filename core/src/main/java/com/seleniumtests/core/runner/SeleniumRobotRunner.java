@@ -39,6 +39,7 @@ import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.TearDownService;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.reporter.TestLogging;
+import com.seleniumtests.uipage.PageObject;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
 @Listeners({com.seleniumtests.reporter.SeleniumTestsReporter2.class, 
@@ -46,7 +47,8 @@ import com.seleniumtests.util.logging.SeleniumRobotLogger;
 			com.seleniumtests.core.testretry.TestRetryListener.class, 
 			com.seleniumtests.reporter.PerformanceReporter.class,
 			com.seleniumtests.reporter.SeleniumRobotServerTestRecorder.class,
-			com.seleniumtests.reporter.TestManagerReporter.class})
+			com.seleniumtests.reporter.TestManagerReporter.class,
+			com.seleniumtests.reporter.JsonReporter.class})
 public class SeleniumRobotRunner {
 	
 	protected static final Logger logger = SeleniumRobotLogger.getLogger(SeleniumRobotRunner.class);
@@ -129,12 +131,10 @@ public class SeleniumRobotRunner {
      * @throws IOException
      */
     @BeforeTest(alwaysRun = true)
-    public void beforeTestSuite(final ITestContext testContext) {
+    public void beforeTest(final ITestContext testContext) {
         start = new Date();
         SeleniumTestsContextManager.initGlobalContext(testContext);
-        SeleniumTestsContextManager.initThreadContext(testContext);
-        SeleniumRobotLogger.updateLogger(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(),
-        								SeleniumTestsContextManager.getGlobalContext().getDefaultOutputDirectory());
+        SeleniumTestsContextManager.initThreadContext(testContext, null);  
     }
     
     @AfterSuite(alwaysRun = true)
@@ -157,6 +157,9 @@ public class SeleniumRobotRunner {
     	SeleniumTestsContextManager.initGlobalContext(testContext);
     	logger.info(String.format("Application %s version: %s", SeleniumTestsContextManager.getApplicationName(), SeleniumTestsContextManager.getApplicationVersion()));
     	logger.info("Core version: " + SeleniumTestsContextManager.getCoreVersion());
+    	
+    	SeleniumRobotLogger.updateLogger(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(),
+										SeleniumTestsContextManager.getGlobalContext().getDefaultOutputDirectory());
     }
     
     @BeforeMethod(alwaysRun = true)
@@ -164,7 +167,7 @@ public class SeleniumRobotRunner {
     	configureCucumberTest();
     	if (!isCucumberTest()) {
 	        logger.info(SeleniumRobotLogger.START_TEST_PATTERN + method.getName());
-	        SeleniumTestsContextManager.initThreadContext(testContext);
+	        SeleniumTestsContextManager.initThreadContext(testContext, method.getName());
 	        SeleniumTestsContextManager.getThreadContext().setTestMethodSignature(buildMethodSignature(method, parameters));
     	}
     }  
@@ -177,11 +180,6 @@ public class SeleniumRobotRunner {
      * @return String
      */
     public static String param(String key) {
-    	String value = SeleniumTestsContextManager.getThreadContext().getConfiguration().get(key);
-    	if (value == null) {
-    		TestLogging.error(String.format("Variable %s is not defined", key));
-    		return "";
-    	}
-    	return value;
+    	return PageObject.param(key);
     }
 }

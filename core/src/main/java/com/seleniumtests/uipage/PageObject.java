@@ -16,17 +16,26 @@
  */
 package com.seleniumtests.uipage;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
+import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
+import org.openqa.selenium.Dimension;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.NoAlertPresentException;
+import org.openqa.selenium.Point;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.UnsupportedCommandException;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
@@ -41,11 +50,11 @@ import com.seleniumtests.core.SeleniumTestsPageListener;
 import com.seleniumtests.customexception.CustomSeleniumTestsException;
 import com.seleniumtests.customexception.NotCurrentPageException;
 import com.seleniumtests.customexception.ScenarioException;
+import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import com.seleniumtests.driver.DriverMode;
 import com.seleniumtests.driver.TestType;
 import com.seleniumtests.driver.WebUIDriver;
-import com.seleniumtests.driver.WebUtility;
 import com.seleniumtests.driver.screenshots.ScreenShot;
 import com.seleniumtests.driver.screenshots.ScreenshotUtil;
 import com.seleniumtests.reporter.TestLogging;
@@ -357,7 +366,22 @@ public class PageObject extends BasePage implements IPage {
     }
 
     public final void maximizeWindow() {
-        new WebUtility(driver).maximizeWindow();
+        try {
+        	// app test are not compatible with window
+        	if (SeleniumTestsContextManager.getThreadContext().getTestType().family() == TestType.APP || SeleniumTestsContextManager.getThreadContext().getBrowser() == BrowserType.BROWSER) {
+                return;
+            }
+
+            driver.manage().window().maximize();
+        } catch (Exception ex) {
+
+            try {
+                ((JavascriptExecutor) driver).executeScript(
+                    "if (window.screen){window.moveTo(0, 0);window.resizeTo(window.screen.availWidth,window.screen.availHeight);}");
+            } catch (Exception ignore) {
+                TestLogging.log("Unable to maximize browser window. Exception occured: " + ignore.getMessage());
+            }
+        }
     }
     
     /**
@@ -425,8 +449,37 @@ public class PageObject extends BasePage implements IPage {
         }
     }
 
+    /**
+     * Resize window to given dimensions.
+     *
+     * @param  width
+     * @param  height
+     */
     public final void resizeTo(final int width, final int height) {
-        new WebUtility(driver).resizeWindow(width, height);
+    	// app test are not compatible with window
+    	if (SeleniumTestsContextManager.getThreadContext().getTestType().family() == TestType.APP) {
+            return;
+        }
+    	
+        try {
+            Dimension setSize = new Dimension(width, height);
+            driver.manage().window().setPosition(new Point(0, 0));
+            int retries = 5;
+            
+            for (int i=0; i < retries; i++) {
+            	driver.manage().window().setSize(setSize);
+            	Dimension viewPortSize = ((CustomEventFiringWebDriver)driver).getViewPortDimensionWithoutScrollbar();
+            	
+            	if (viewPortSize.height == height && viewPortSize.width == width) {
+            		break;
+            	} else {
+            		setSize = new Dimension(2 * width - viewPortSize.width, 2 * height - viewPortSize.height);
+            	}
+            }
+            
+        } catch (Exception ex) {
+        	logger.error(ex);
+        }
     }
 
     public final void selectFrame(final Integer index) {
@@ -561,4 +614,44 @@ public class PageObject extends BasePage implements IPage {
             throw ex;
         }
     }
+    
+	public Alert waitForAlert(int waitInSeconds) {
+		long end = systemClock.laterBy(waitInSeconds * 1000);
+
+		while (systemClock.isNowBefore(end)) {
+			try {
+				return driver.switchTo().alert();
+			} catch (NoAlertPresentException e) {
+				WaitHelper.waitForSeconds(1);
+			}
+		}
+		return null;
+	}
+    
+    /**
+     * Method to handle file upload through robot class
+     * /!\ This should only be used as the last option when uploading file cannot be done an other way
+     * https://saucelabs.com/resources/articles/best-practices-tips-selenium-file-upload
+     * <code>
+     * driver.setFileDetector(new LocalFileDetector());
+     * driver.get("http://sso.dev.saucelabs.com/test/guinea-file-upload");
+     *   WebElement upload = driver.findElement(By.id("myfile"));
+     *   upload.sendKeys("/Users/sso/the/local/path/to/darkbulb.jpg");
+     *   </code> 
+     * @param filePath
+     */
+	public void uploadFile(String filePath) {
+		try {
+			byte[] encoded = Base64.encodeBase64(FileUtils.readFileToByteArray(new File(filePath)));
+			((JavascriptExecutor) driver).executeScript(CustomEventFiringWebDriver.NON_JS_UPLOAD_FILE_THROUGH_POPUP, new File(filePath).getName(), new String(encoded));
+			
+			Alert alert = waitForAlert(5);
+			if (alert != null) {
+				alert.accept();
+			}
+			
+		} catch (IOException e) {
+			throw new ScenarioException(String.format("could not read file to upload %s: %s", filePath, e.getMessage()));
+		}
+	}
 }

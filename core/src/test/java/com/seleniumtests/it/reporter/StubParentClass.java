@@ -37,7 +37,7 @@ public class StubParentClass extends SeleniumTestPlan {
 	public void initSuite(final ITestContext testContext) {
 
         SeleniumTestsContextManager.initGlobalContext(testContext);
-        SeleniumTestsContextManager.initThreadContext(testContext);
+        SeleniumTestsContextManager.initThreadContext(testContext, null);
 
 		SeleniumTestsContextManager.getThreadContext().setSoftAssertEnabled(false);
 		SeleniumTestsContextManager.getGlobalContext().setSoftAssertEnabled(false);

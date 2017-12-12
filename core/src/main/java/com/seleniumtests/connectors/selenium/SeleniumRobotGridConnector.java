@@ -1,5 +1,6 @@
 package com.seleniumtests.connectors.selenium;
 
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -8,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.NotImplementedException;
 import org.apache.http.HttpHost;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
@@ -32,7 +34,9 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 	}
 	
 	/**
-	 * In case an app is required on the node running the test, upload it to the grid
+	 * In case an app is required on the node running the test, upload it to the grid hub
+	 * This will then be made available through HTTP GET URL to the node (appium will receive an url instead of a file)
+	 * 
 	 */
 	@Override
 	public void uploadMobileApp(Capabilities caps) {
@@ -62,6 +66,7 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 		        if (response.getStatusLine().getStatusCode() != 200) {
 		        	throw new SeleniumGridException("could not upload application file: " + response.getStatusLine().getReasonPhrase());
 		        } else {
+		        	// set path to the mobile application as an URL on the grid hub
 		        	((DesiredCapabilities)caps).setCapability(MobileCapabilityType.APP, IOUtils.toString(response.getEntity().getContent()) + "/" + appFiles.get(0).getName());
 		        }
 		        
@@ -69,6 +74,49 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 				throw new SeleniumGridException("could not upload application file", e);
 			}
 		}
+	}
+	
+	/**
+	 * Upload a file given file path
+	 * @param filePath
+	 */
+	public void uploadFile(String filePath) {
+		try (CloseableHttpClient client = HttpClients.createDefault();) {
+			// zip file
+			List<File> appFiles = new ArrayList<>();
+			appFiles.add(new File(filePath));
+			File zipFile = FileUtility.createZipArchiveFromFiles(appFiles);
+			
+			HttpHost serverHost = new HttpHost(hubUrl.getHost(), hubUrl.getPort());
+			URIBuilder builder = new URIBuilder();
+        	builder.setPath("/grid/admin/FileServlet/");
+        	builder.addParameter("output", "app");
+        	HttpPost httpPost = new HttpPost(builder.build());
+	        httpPost.setHeader(HttpHeaders.CONTENT_TYPE, MediaType.OCTET_STREAM.toString());
+	        FileInputStream fileInputStream = new FileInputStream(zipFile);
+            InputStreamEntity entity = new InputStreamEntity(fileInputStream);
+            httpPost.setEntity(entity);
+	        
+	        CloseableHttpResponse response = client.execute(serverHost, httpPost);
+	        if (response.getStatusLine().getStatusCode() != 200) {
+	        	throw new SeleniumGridException("could not upload file: " + response.getStatusLine().getReasonPhrase());
+	        } else {
+	        	// TODO call remote API
+	        	throw new NotImplementedException("call remote Robot to really upload file");
+	        }
+	        
+		} catch (IOException | URISyntaxException e) {
+			throw new SeleniumGridException("could not upload file", e);
+		}
+	}
+	
+	/**
+	 * Take screenshot of the full desktop
+	 * @return
+	 */
+	public BufferedImage captureDesktopToBuffer() {
+		// TODO: call remote API to do capture and get content
+		throw new NotImplementedException("call remote Robot to really upload file");
 	}
 
 }
