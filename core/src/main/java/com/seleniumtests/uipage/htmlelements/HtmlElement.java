@@ -41,8 +41,8 @@ import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.interactions.HasInputDevices;
 import org.openqa.selenium.interactions.Mouse;
 import org.openqa.selenium.interactions.internal.Coordinates;
+import org.openqa.selenium.interactions.internal.Locatable;
 import org.openqa.selenium.internal.HasIdentity;
-import org.openqa.selenium.internal.Locatable;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
@@ -361,7 +361,7 @@ public class HtmlElement implements WebElement, Locatable, HasIdentity {
      * @param waitForVisibility		wait for element to be visible
      * @param makeVisible			whether we try to make the element visible. Should be true except when trying to know if element is displayed
      */
-    protected void findElement(boolean waitForVisibility, boolean makeVisible) {
+    public void findElement(boolean waitForVisibility, boolean makeVisible) {
         // TODO: https://discuss.appium.io/t/how-can-i-scroll-to-an-element-in-appium-im-using-android-native-app/10618/14
     	// String DESTINATION_ELEMENT_TEXT= "KUBO";
     	//((AndroidDriver) driver).findElementByAndroidUIAutomator("new UiScrollable(new UiSelector())
@@ -1134,5 +1134,13 @@ public class HtmlElement implements WebElement, Locatable, HasIdentity {
 	public String getId() {
 		findElement();
 		return ((HasIdentity)getUnderlyingElement(element)).getId();
+	}
+
+	/**
+	 * USE ONLY for testing
+	 * @param element
+	 */
+	public void setElement(WebElement element) {
+		this.element = element;
 	}
 }
