@@ -7,16 +7,13 @@ import java.util.List;
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.By.ById;
 import org.openqa.selenium.internal.FindsByCssSelector;
-import org.openqa.selenium.internal.FindsById;
 import org.openqa.selenium.internal.FindsByXPath;
 
 public class ByC extends By {
 
 	@Override
 	public List<WebElement> findElements(SearchContext context) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 	

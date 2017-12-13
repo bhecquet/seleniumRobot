@@ -17,8 +17,6 @@ public class SeleniumNativeActions {
 
 	private FrameElement currentFrame;
 	private static Boolean override = SeleniumTestsContextManager.getThreadContext().getOverrideSeleniumNativeAction();
-	private static final Logger logger = SeleniumRobotLogger.getLogger(SeleniumTestsContext.class);
-	
 	/**
 	 * Intercept any call to findElement made from a PageObject subclass and returns a HtmlElement instead of a RemoteWebElement
 	 * This way, every action done on this element will benefit from HtmlElement mechanism

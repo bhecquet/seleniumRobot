@@ -221,6 +221,8 @@ public class WebUIDriver {
 
     /**
      * Close all the opened web browser processes. Not called in development mode.
+     * 
+     * This may not be desirable
      */
     private static void cleanWebDrivers() {
     	logger.info("Dev. mode : " + SeleniumTestsContextManager.getThreadContext().isDevMode()
