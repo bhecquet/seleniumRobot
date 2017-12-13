@@ -122,20 +122,6 @@ public class TestCompositeActions extends MockitoTest {
 		// check handled are updated on click
 		verify(eventDriver, never()).updateWindowsHandles();
 	}
-
-	
-	/**
-	 * Test replay of CompositeAction
-	 */
-	@Test(groups={"ut"})
-	public void testReplayOnSearch() {
-		when(element.getCoordinates()).thenThrow(WebDriverException.class).thenThrow(WebDriverException.class).thenReturn(coordinates);
-		new Actions(eventDriver).click(element).perform();
-		
-		// coordinates search is done 3 times, because of errors
-		verify(element, atLeast(3)).getCoordinates();
-
-	}
 	
 	/**
 	 * Test replay when error occurs in any part of the action (except search)
@@ -148,38 +134,5 @@ public class TestCompositeActions extends MockitoTest {
 		new Actions(eventDriver).click(element).perform();
 
 		verify(eventDriver, times(2)).perform(anyCollection());
-	}
-	
-	/**
-	 * Test replay of CompositeAction
-	 * TODO: to complete when real drivers will be able to handle new actions (e.g: chrome)
-	 * @throws Exception 
-	 */
-	@Test(groups={"ut"}, enabled=false)
-	public void testReplayOnSearchNewActions() throws Exception {
-//		PowerMockito.doCallRealMethod().when(driver, "execute", ArgumentMatchers.eq(DriverCommand.ACTIONS), ArgumentMatchers.anyMap());
-//		
-		when(element.getCoordinates()).thenThrow(WebDriverException.class).thenThrow(WebDriverException.class).thenReturn(coordinates);
-		new Actions(eventDriver.getWebDriver()).click(element).perform();
-		System.out.println(Mockito.mockingDetails(element).printInvocations());
-		
-		
-		// coordinates search is done 3 times, because of errors
-		verify(element, atLeast(3)).getCoordinates();
-
-	}
-	
-	/**
-	 * Test replay when error occurs in any part of the action (except search)
-	 * TODO: same as above
-	 */
-	@Test(groups={"ut"}, enabled=false)
-	public void testReplayOnPerformNewActions() {
-		when(element.getCoordinates()).thenReturn(coordinates);
-		doThrow(new WebDriverException("error clicking")).doNothing().when(mouse).click(coordinates);
-		
-		new Actions(eventDriver).click(element).perform();
-
-		verify(mouse, times(2)).click(coordinates);
 	}
 }
