@@ -38,7 +38,6 @@ import com.mashape.unirest.http.Unirest;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.TearDownService;
 import com.seleniumtests.driver.WebUIDriver;
-import com.seleniumtests.reporter.TestLogging;
 import com.seleniumtests.uipage.PageObject;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 

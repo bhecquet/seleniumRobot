@@ -18,9 +18,6 @@ package com.seleniumtests.uipage.htmlelements;
 
 import org.openqa.selenium.By;
 
-import com.seleniumtests.driver.BrowserType;
-import com.seleniumtests.driver.WebUIDriver;
-
 public class ButtonElement extends HtmlElement {
 
     public ButtonElement(final String label, final By by) {
