@@ -31,25 +31,6 @@ public class CucumberRunner extends SeleniumRobotRunner {
 	
     
 	private CustomTestNGCucumberRunner testNGCucumberRunner;
-    
-    /**
-     * Configure Test Params setting.
-     *
-     * @param  xmlTest
-     */
-    @BeforeTest(alwaysRun = true)
-    public void beforeTest() {
-    	try {
-	        testNGCucumberRunner = new CustomTestNGCucumberRunner(this.getClass());
-    	} catch (Exception e) {
-    		logger.error(Thread.currentThread() + " Error on init: ", e);
-    		for (StackTraceElement s : e.getStackTrace()) {
-    			logger.error(Thread.currentThread() + " " + s.toString());
-    		}
-    	}
-    	SeleniumRobotRunner.setCucumberTest(true);
-    }
-    
 
 	public void configureCucumberTest() {
 		setCucumberTest(true);
@@ -67,7 +48,17 @@ public class CucumberRunner extends SeleniumRobotRunner {
      * @return returns two dimensional array of {@link CucumberFeatureWrapper} objects.
      */
     @DataProvider
-    public Object[][] scenarios() {
+    public Object[][] scenarios(ITestContext testContext) {
+    	SeleniumTestsContextManager.initGlobalContext(testContext);
+        SeleniumTestsContextManager.initThreadContext(testContext, null);  
+        try {
+	        testNGCucumberRunner = new CustomTestNGCucumberRunner(this.getClass());
+    	} catch (Exception e) {
+    		logger.error(Thread.currentThread() + " Error on init: ", e);
+    		for (StackTraceElement s : e.getStackTrace()) {
+    			logger.error(Thread.currentThread() + " " + s.toString());
+    		}
+    	}
         return testNGCucumberRunner.provideScenarios();
     }
 
