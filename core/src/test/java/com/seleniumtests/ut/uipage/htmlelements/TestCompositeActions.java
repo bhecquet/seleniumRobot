@@ -23,6 +23,7 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.anyCollection;
 
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
@@ -142,11 +143,11 @@ public class TestCompositeActions extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testReplayOnPerform() {
 		when(element.getCoordinates()).thenReturn(coordinates);
-		doThrow(new WebDriverException("error clicking")).doNothing().when(mouse).click(coordinates);
+		doThrow(new WebDriverException("error clicking")).doNothing().when(eventDriver).perform(anyCollection());
 		
 		new Actions(eventDriver).click(element).perform();
 
-		verify(mouse, times(2)).click(coordinates);
+		verify(eventDriver, times(2)).perform(anyCollection());
 	}
 	
 	/**
