@@ -98,7 +98,7 @@ public class ReporterTest extends MockitoTest {
 		test.setXmlPackages(Arrays.asList(xmlPackage));
 		Map<String, String> parameters = new HashMap<>();
 		parameters.put("cucumberTests", cucumberTests);
-		parameters.put("cucumberTagss", "");
+		parameters.put("cucumberTags", "");
 		test.setParameters(parameters);
 		
 		TestNG tng = new TestNG(false);

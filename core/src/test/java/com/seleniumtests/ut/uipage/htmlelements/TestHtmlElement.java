@@ -24,6 +24,7 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.doNothing;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -402,8 +403,9 @@ public class TestHtmlElement extends MockitoTest {
 	public void testPinch() throws Exception {
 		SeleniumTestsContextManager.getThreadContext().setTestType(TestType.APPIUM_WEB_ANDROID);
 		when(WebUIDriver.getWebDriver()).thenReturn(new CustomEventFiringWebDriver(mobileDriver));
+		doNothing().when(el).findElement(anyBoolean(), anyBoolean());
+		el.setElement(mobileElement);
 		el.pinch();
-		finalCheck(true);
 		PowerMockito.verifyPrivate(el).invoke("checkForMobile");
 	}
 	
@@ -412,8 +414,9 @@ public class TestHtmlElement extends MockitoTest {
 		
 		SeleniumTestsContextManager.getThreadContext().setTestType(TestType.APPIUM_WEB_ANDROID);
 		when(WebUIDriver.getWebDriver()).thenReturn(new CustomEventFiringWebDriver(mobileDriver));
+		doNothing().when(el).findElement(anyBoolean(), anyBoolean());
+		el.setElement(mobileElement);
 		el.getCenter();
-		finalCheck(true);
 		PowerMockito.verifyPrivate(el).invoke("checkForMobile");
 	}
 	
@@ -421,8 +424,9 @@ public class TestHtmlElement extends MockitoTest {
 	public void testSwipe1() throws Exception {
 		SeleniumTestsContextManager.getThreadContext().setTestType(TestType.APPIUM_WEB_ANDROID);
 		when(WebUIDriver.getWebDriver()).thenReturn(new CustomEventFiringWebDriver(mobileDriver));
+		doNothing().when(el).findElement(anyBoolean(), anyBoolean());
+		el.setElement(mobileElement);
 		el.swipe(0, 0, 0, 10);
-		finalCheck(true);
 		PowerMockito.verifyPrivate(el).invoke("checkForMobile");
 	}
 	
@@ -430,8 +434,9 @@ public class TestHtmlElement extends MockitoTest {
 	public void testTap() throws Exception {
 		SeleniumTestsContextManager.getThreadContext().setTestType(TestType.APPIUM_WEB_ANDROID);
 		when(WebUIDriver.getWebDriver()).thenReturn(new CustomEventFiringWebDriver(mobileDriver));
+		doNothing().when(el).findElement(anyBoolean(), anyBoolean());
+		el.setElement(mobileElement);
 		el.tap(2, 2);
-		finalCheck(true);
 		PowerMockito.verifyPrivate(el).invoke("checkForMobile");
 	}
 	
@@ -439,8 +444,9 @@ public class TestHtmlElement extends MockitoTest {
 	public void testZoom() throws Exception {
 		SeleniumTestsContextManager.getThreadContext().setTestType(TestType.APPIUM_WEB_ANDROID);
 		when(WebUIDriver.getWebDriver()).thenReturn(new CustomEventFiringWebDriver(mobileDriver));
+		doNothing().when(el).findElement(anyBoolean(), anyBoolean());
+		el.setElement(mobileElement);
 		el.zoom();
-		finalCheck(true);
 		PowerMockito.verifyPrivate(el).invoke("checkForMobile");
 	}
 
