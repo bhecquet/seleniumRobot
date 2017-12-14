@@ -33,6 +33,10 @@
 			<groupId>org.json</groupId>
 			<artifactId>json</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>org.seleniumhq.selenium</groupId>
+			<artifactId>selenium-java</artifactId>
+		</dependency>
 	    <dependency>
 	      <groupId>net.java.dev.jna</groupId>
 	      <artifactId>jna-platform</artifactId>
@@ -101,11 +105,6 @@
 		<dependency>
 			<groupId>org.seleniumhq.selenium</groupId>
 			<artifactId>selenium-safari-driver</artifactId>
-			<version>${selenium.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.seleniumhq.selenium</groupId>
-			<artifactId>selenium-java</artifactId>
 			<version>${selenium.version}</version>
 		</dependency>
 		<dependency>
