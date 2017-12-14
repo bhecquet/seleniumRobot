@@ -122,6 +122,11 @@
 				<artifactId>json</artifactId>
 				<version>20160810</version>
 			</dependency>
+			<dependency>
+				<groupId>org.seleniumhq.selenium</groupId>
+				<artifactId>selenium-java</artifactId>
+				<version>${selenium.version}</version>
+			</dependency>
 		    <dependency>
 		      <groupId>net.java.dev.jna</groupId>
 		      <artifactId>jna-platform</artifactId>
