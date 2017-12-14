@@ -74,6 +74,10 @@ public class TestListener implements IInvokedMethodListener, ITestListener {
 		TestLogging.setCurrentTestResult(result);
 		
 		if (invokedMethod.isTestMethod()) {
+			if (result.getMethod().getRetryAnalyzer() == null) {
+				result.getMethod().setRetryAnalyzer(new TestRetryAnalyzer());
+			}
+			
 			if (SeleniumRobotRunner.isCucumberTest()) {
 				result.setAttribute(SeleniumRobotLogger.METHOD_NAME, result.getParameters()[0].toString());
 			} else {

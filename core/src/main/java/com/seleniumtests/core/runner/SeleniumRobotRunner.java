@@ -33,6 +33,7 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Listeners;
+import org.testng.annotations.Test;
 
 import com.mashape.unirest.http.Unirest;
 import com.seleniumtests.core.SeleniumTestsContextManager;
@@ -43,7 +44,6 @@ import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
 @Listeners({com.seleniumtests.reporter.SeleniumTestsReporter2.class, 
 			com.seleniumtests.reporter.TestListener.class, 
-			com.seleniumtests.core.testretry.TestRetryListener.class, 
 			com.seleniumtests.reporter.PerformanceReporter.class,
 			com.seleniumtests.reporter.SeleniumRobotServerTestRecorder.class,
 			com.seleniumtests.reporter.TestManagerReporter.class,
