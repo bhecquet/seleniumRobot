@@ -29,6 +29,8 @@ import com.seleniumtests.reporter.TestMessage.MessageType;
 import com.seleniumtests.reporter.TestStep;
 
 public class StubTestClass extends StubParentClass {
+	
+	private static int count = 0;
 
 	@Test(groups="stub", description="a test with steps")
 	public void testAndSubActions() {
@@ -71,7 +73,9 @@ public class StubTestClass extends StubParentClass {
 	
 	@Test(groups="stub")
 	public void testWithException() {
+		count++;
 		TestStep step1 = new TestStep("step 1");
+		step1.addAction(new TestAction(String.format("played %d times", count), false));
 		step1.addAction(new TestAction("click button", false));
 		TestLogging.logTestStep(step1);
 		throw new DriverExceptions("some exception");

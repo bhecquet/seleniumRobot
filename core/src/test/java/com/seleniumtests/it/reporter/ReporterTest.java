@@ -58,12 +58,8 @@ public class ReporterTest extends MockitoTest {
 		
 		TestNG tng = new TestNG(false);
 		tng.setXmlSuites(suites);
-//		tng.addListener((IReporter)reporter);
-//		tng.addListener((ITestListener)testListener);
-//		tng.addListener((IInvokedMethodListener)testListener);
 		tng.setOutputDirectory(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory());
 		tng.run(); 
-//		SeleniumRobotLogger.parseLogFile();
 		
 		return tng;
 	}
