@@ -111,6 +111,23 @@ public class ByC extends By {
 	public static ByC attribute(final String attributeName, final String attributeValue) {
 		return new ByAttribute(attributeName, attributeValue);
 	}
+	
+	/**
+	 * Search first element of <code>tagName</code> with text
+	 * @param label
+	 * @param tagName
+	 * @return
+	 */
+	public static ByC partialText(final String textToSearch, final String tagName) {
+		return text(textToSearch, tagName, true);
+	}
+	public static ByC text(final String textToSearch, final String tagName) {
+		return text(textToSearch, tagName, false);
+	}
+
+	private static ByC text(final String textToSearch, String tagName, boolean partial) {
+		return new ByText(textToSearch, tagName, partial);
+	}
 
 	public static class ByLabelForward extends ByC implements Serializable {
 
@@ -248,6 +265,59 @@ public class ByC extends By {
 		@Override
 		public String toString() {
 			return "By.attribute: " + attributeName;
+		}
+	}
+	
+	/**
+	 * Find element with the text content given
+	 * @author s047432
+	 *
+	 */
+	public static class ByText extends ByC implements Serializable {
+
+		private static final long serialVersionUID = 5341968046120372161L;
+
+		private final String text;
+		private final String tagName;
+		private final boolean partial;
+
+		public ByText(String text, String tagName, boolean partial) {
+			
+			if (text == null) {
+				throw new IllegalArgumentException("Cannot find elements with a null text content.");
+			}
+			if (tagName == null) {
+				throw new IllegalArgumentException("Cannot find elements with a null tagName.");
+			}
+			
+			this.text = text;
+			this.tagName = tagName;
+			this.partial = partial;
+		}
+
+		@Override
+		public List<WebElement> findElements(SearchContext context) {
+			String escapedText = escapeQuotes(text);
+			if (partial) {
+				return ((FindsByXPath) context).findElementsByXPath(String.format("//%s[contains(text(),%s)]", tagName, escapedText));
+			} else {
+				return ((FindsByXPath) context).findElementsByXPath(String.format("//%s[text() = %s]", tagName, escapedText));
+			}
+		}
+
+		@Override
+		public WebElement findElement(SearchContext context) {
+			String escapedText = escapeQuotes(text);
+			if (partial) {
+				return ((FindsByXPath) context).findElementByXPath(String.format("//%s[contains(text(),%s)]", tagName, escapedText));
+			} else {
+				return ((FindsByXPath) context).findElementByXPath(String.format("//%s[text() = %s]", tagName, escapedText));
+			}
+		}
+
+		@Override
+		public String toString() {
+			return String.format("%s By.text: %s", tagName, text);
 		}
 	}
 	
