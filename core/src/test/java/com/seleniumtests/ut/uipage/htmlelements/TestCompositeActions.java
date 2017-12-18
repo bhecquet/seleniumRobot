@@ -16,6 +16,7 @@
  */
 package com.seleniumtests.ut.uipage.htmlelements;
 
+import static org.mockito.ArgumentMatchers.anyCollection;
 import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
@@ -23,16 +24,15 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mockito.ArgumentMatchers.anyCollection;
 
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.openqa.selenium.UnsupportedCommandException;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.interactions.Mouse;
 import org.openqa.selenium.interactions.internal.Coordinates;
-import org.openqa.selenium.remote.DriverCommand;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.RemoteWebElement;
 import org.powermock.api.mockito.PowerMockito;
@@ -124,11 +124,43 @@ public class TestCompositeActions extends MockitoTest {
 	}
 	
 	/**
-	 * Test replay when error occurs in any part of the action (except search)
+	 * Test replay of CompositeAction in fallback mode
+	 */
+	@Test(groups={"ut"})
+	public void testReplayOnSearch() {
+
+		// force fallback to old behaviour: used by chrome as of version 62
+		doThrow(new UnsupportedCommandException("not supported")).when(eventDriver).perform(anyCollection());
+		when(element.getCoordinates()).thenThrow(WebDriverException.class).thenThrow(WebDriverException.class).thenReturn(coordinates);
+		new Actions(eventDriver).click(element).perform();
+		
+		// coordinates search is done 3 times, because of errors
+		verify(element, atLeast(3)).getCoordinates();
+
+	}
+	
+	/**
+	 * Test replay in fallback mode when error occurs in any part of the action (except search)
 	 */
 	@Test(groups={"ut"})
 	public void testReplayOnPerform() {
 		when(element.getCoordinates()).thenReturn(coordinates);
+		
+		// force fallback to old behaviour: used by chrome as of version 62
+		doThrow(new UnsupportedCommandException("not supported")).when(eventDriver).perform(anyCollection());
+		doThrow(new WebDriverException("error clicking")).doNothing().when(mouse).click(coordinates);
+		
+		new Actions(eventDriver).click(element).perform();
+
+		verify(mouse, times(2)).click(coordinates);
+	}
+	
+	/**
+	 * Test replay when error occurs in any part of the action
+	 * This mode is used by firefox
+	 */
+	@Test(groups={"ut"})
+	public void testReplayOnPerformWithNewActions() {
 		doThrow(new WebDriverException("error clicking")).doNothing().when(eventDriver).perform(anyCollection());
 		
 		new Actions(eventDriver).click(element).perform();
