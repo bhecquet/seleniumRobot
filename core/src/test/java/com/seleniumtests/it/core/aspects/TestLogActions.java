@@ -30,7 +30,7 @@ import org.testng.annotations.Test;
 
 import com.seleniumtests.GenericTest;
 import com.seleniumtests.core.SeleniumTestsContextManager;
-import com.seleniumtests.core.runner.SeleniumRobotRunner;
+import com.seleniumtests.core.runner.SeleniumRobotTestPlan;
 import com.seleniumtests.customexception.DriverExceptions;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.reporter.TestAction;
@@ -54,7 +54,7 @@ public class TestLogActions extends GenericTest {
 	
 	@BeforeMethod(groups={"it"})
 	public void set() {
-		SeleniumRobotRunner.setCucumberTest(false);
+		SeleniumRobotTestPlan.setCucumberTest(false);
 	}
 	
 	@AfterMethod(groups={"it"})
@@ -95,7 +95,7 @@ public class TestLogActions extends GenericTest {
 	 */
 	@Test(groups={"it"})
 	public void testSimpleCucumberStepLogging() throws IOException {
-		SeleniumRobotRunner.setCucumberTest(true);
+		SeleniumRobotTestPlan.setCucumberTest(true);
 		new CalcPage()
 			.addC(1, 1);
 		
