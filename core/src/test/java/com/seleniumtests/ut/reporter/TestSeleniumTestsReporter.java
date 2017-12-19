@@ -31,7 +31,9 @@ import org.testng.annotations.Test;
 
 import com.seleniumtests.MockitoTest;
 import com.seleniumtests.core.SeleniumTestsContextManager;
-import com.seleniumtests.reporter.TestListener;
+import com.seleniumtests.core.runner.SeleniumRobotTestListener;
+
+import junit.framework.TestListener;
 
 public class TestSeleniumTestsReporter extends MockitoTest {
 	
@@ -65,7 +67,7 @@ public class TestSeleniumTestsReporter extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testChangeTestResultWithoutKo() {
 
-		TestListener listener = new TestListener();
+		SeleniumRobotTestListener listener = new SeleniumRobotTestListener();
 		listener.changeTestResult(testResult);
 		
 		// check setStatus has not been called as no verification failure has been provided
@@ -78,7 +80,7 @@ public class TestSeleniumTestsReporter extends MockitoTest {
 		Throwable ex = new WebDriverException("test exception");
 		SeleniumTestsContextManager.getThreadContext().addVerificationFailures(Reporter.getCurrentTestResult(), ex);
 		init();
-		TestListener listener = new TestListener();
+		SeleniumRobotTestListener listener = new SeleniumRobotTestListener();
 		listener.changeTestResult(testResult);
 		
 		// check setStatus has not been called as no verification failure has been provided
@@ -100,7 +102,7 @@ public class TestSeleniumTestsReporter extends MockitoTest {
 		
 		SeleniumTestsContextManager.getThreadContext().addVerificationFailures(Reporter.getCurrentTestResult(), throwables);
 		init();
-		TestListener listener = new TestListener();
+		SeleniumRobotTestListener listener = new SeleniumRobotTestListener();
 		listener.changeTestResult(testResult);
 		
 		// check that the throwable associated to result is not the first declared one
