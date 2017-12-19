@@ -28,12 +28,11 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 
-import com.seleniumtests.core.runner.SeleniumRobotRunner;
+import com.seleniumtests.core.runner.SeleniumRobotTestPlan;
 import com.seleniumtests.reporter.TestAction;
 import com.seleniumtests.reporter.TestLogging;
 import com.seleniumtests.reporter.TestStep;
 import com.seleniumtests.uipage.PageObject;
-import com.seleniumtests.uipage.htmlelements.HtmlElement;
 
 /**
  * Aspect to intercept calls to methods of HtmlElement. It allows to retry discovery and action 
@@ -128,7 +127,7 @@ public class LogAction {
 	 */
 	@Pointcut("(execution(@cucumber.api.java.en.When public * * (..)) || execution(@cucumber.api.java.en.Given public * * (..))) && if()")
 	public static boolean isCucumberTest(ProceedingJoinPoint joinPoint) {
-		return SeleniumRobotRunner.isCucumberTest();
+		return SeleniumRobotTestPlan.isCucumberTest();
 	}
 	
 	@Around("isCucumberTest(joinPoint)")

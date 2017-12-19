@@ -16,20 +16,13 @@
  */
 package com.seleniumtests.core.runner;
 
-import org.testng.annotations.BeforeTest;
+import org.testng.annotations.Listeners;
 
 /**
  * This class initializes context, sets up and tears down and clean up drivers An STF test should extend this class.
  */
 
-public abstract class SeleniumTestPlan extends SeleniumRobotRunner {
+@Listeners({com.seleniumtests.core.runner.SeleniumRobotTestListener.class})
+public abstract class SeleniumTestPlan extends SeleniumRobotTestPlan {
 
-    /**
-     * Configure Test Params setting.
-     *
-     */
-    @BeforeTest(alwaysRun = true)
-    public void beforeTest() {
-    	SeleniumRobotRunner.setCucumberTest(false);
-    }
 }

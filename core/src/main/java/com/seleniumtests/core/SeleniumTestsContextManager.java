@@ -55,9 +55,6 @@ public class SeleniumTestsContextManager {
 
 	public static final String DATA_FOLDER_NAME = "data";
 
-    // context listener
-    private static List<IContextAttributeListener> contextAttributeListeners = Collections.synchronizedList(new ArrayList<IContextAttributeListener>());
-
     // global level context
     private static SeleniumTestsContext globalContext;
 
@@ -67,11 +64,7 @@ public class SeleniumTestsContextManager {
     private SeleniumTestsContextManager() {
 		// As a utility class, it is not meant to be instantiated.
 	}
-    
-    public static void addContextAttributeListener(final IContextAttributeListener listener) {
-        contextAttributeListeners.add(listener);
-    }
-
+   
     public static SeleniumTestsContext getGlobalContext() {
         if (globalContext == null) {
             initGlobalContext(new DefaultTestNGContext());
@@ -87,6 +80,8 @@ public class SeleniumTestsContextManager {
 
         return threadLocalContext.get();
     }
+    
+    
 
     public static void initGlobalContext(ITestContext testNGCtx) {
     	
@@ -97,7 +92,6 @@ public class SeleniumTestsContextManager {
     	
     	ITestContext newTestNGCtx = getContextFromConfigFile(testNGCtx);
         globalContext = new SeleniumTestsContext(newTestNGCtx, null);
-        loadCustomizedContextAttribute(newTestNGCtx, globalContext);
     }
 
     /**
@@ -215,19 +209,12 @@ public class SeleniumTestsContextManager {
     	
     	ITestContext newTestNGCtx = getContextFromConfigFile(testNGCtx);
     	SeleniumTestsContext seleniumTestsCtx = new SeleniumTestsContext(newTestNGCtx, testName);
-        loadCustomizedContextAttribute(newTestNGCtx, seleniumTestsCtx);
         
         threadLocalContext.set(seleniumTestsCtx);
         
         // update some values after init
         seleniumTestsCtx.postInit();
 
-    }
-
-    private static void loadCustomizedContextAttribute(final ITestContext testNGCtx, final SeleniumTestsContext seleniumTestsCtx) {
-        for (int i = 0; i < contextAttributeListeners.size(); i++) {
-            contextAttributeListeners.get(i).load(testNGCtx, seleniumTestsCtx);
-        }
     }
 
     public static void setGlobalContext(final SeleniumTestsContext ctx) {

@@ -21,13 +21,12 @@ import org.testng.ITestContext;
 import org.testng.annotations.BeforeSuite;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
-import com.seleniumtests.core.runner.SeleniumRobotRunner;
 import com.seleniumtests.core.runner.SeleniumTestPlan;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
 public class StubParentClass extends SeleniumTestPlan {
 	
-	protected static final Logger logger = SeleniumRobotLogger.getLogger(SeleniumRobotRunner.class);
+	protected static final Logger logger = SeleniumRobotLogger.getLogger(StubParentClass.class);
 
 	/**
 	 * Generate context to have logger correctly initialized

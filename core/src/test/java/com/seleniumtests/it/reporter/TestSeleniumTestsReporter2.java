@@ -264,7 +264,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	}
 	
 	/**
-	 * Check all steps are present in detailed report file
+	 * Check all steps are present in detailed report file. For cucumber, check that method name is the Scenario name, not the "feature" generic method
 	 * Test OK
 	 * @param testContext
 	 * @throws Exception
