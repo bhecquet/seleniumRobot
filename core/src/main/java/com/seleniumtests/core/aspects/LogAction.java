@@ -46,61 +46,6 @@ import com.seleniumtests.uipage.htmlelements.HtmlElement;
 public class LogAction {
 
 	private Date testStepStart = null;
-
-//	/**
-//	 * Intercept actions done through browser
-//	 * @param joinPoint
-//	 * @throws Throwable 
-//	 */
-//	@Around("(execution(public * com.seleniumtests.uipage.htmlelements..*Element..* (..)) "
-//    		+ "|| execution(public * com.seleniumtests.uipage.htmlelements.SelectList..* (..)) "
-//    		+ "|| execution(public * com.seleniumtests.uipage.htmlelements.Table..* (..))) "
-//    		+ "&& !execution(* com.seleniumtests.uipage.htmlelements.HtmlElement.toString (..))"
-//    		+ "&& !execution(* com.seleniumtests.uipage.htmlelements.PictureElement.toString (..))"
-//    		+ "&& !execution(* com.seleniumtests.uipage.htmlelements.HtmlElement.get* (..))"
-//    		+ "&& !execution(* com.seleniumtests.uipage.htmlelements.PictureElement.get* (..))"
-//    		+ "&& !execution(* com.seleniumtests.uipage.htmlelements.HtmlElement.set* (..))"
-//    		+ "&& !execution(* com.seleniumtests.uipage.htmlelements.PictureElement.set* (..))"
-//    		+ "&& !execution(* com.seleniumtests.uipage.htmlelements.PictureElement.is* (..))"
-//    		+ "&& !execution(* com.seleniumtests.uipage.htmlelements.HtmlElement.find* (..))"
-//    		+ "&& !execution(* com.seleniumtests.uipage.htmlelements.HtmlElement.wait* (..))"
-//    		+ "&& !execution(* com.seleniumtests.uipage.htmlelements.HtmlElement.toHTML (..))"
-//    		+ "&& !execution(* com.seleniumtests.uipage.htmlelements.Table.find* (..))"
-//    		)
-//	public Object logAction(ProceedingJoinPoint joinPoint) throws Throwable {
-//		String targetName;
-//		try {
-//			HtmlElement element = (HtmlElement)joinPoint.getTarget();
-//			targetName = element.toString();
-//		} catch (ClassCastException e) {
-//			targetName = joinPoint.getTarget().toString();
-//		}
-//
-//		String actionName = String.format("%s on %s %s", joinPoint.getSignature().getName(), targetName, buildArgString(joinPoint));
-//		TestAction currentAction = new TestAction(actionName, false);
-//		System.out.println("log_ " + actionName);
-//		
-//		// log action before its started. By default, it's OK. Then result may be overwritten if step fails
-//		// order of steps is the right one (first called is first displayed)
-//		if (isHtmlElementDirectlyCalled(Thread.currentThread().getStackTrace()) && TestLogging.getParentTestStep() != null) {
-//			TestLogging.getParentTestStep().addAction(currentAction);
-//		}	
-//		
-//		Object reply = null;
-//		boolean actionFailed = false;
-//		
-//		try {
-//			reply = joinPoint.proceed(joinPoint.getArgs());
-//		} catch (Throwable e) {
-//			actionFailed = true;
-//			throw e;
-//		} finally {
-//			if (isHtmlElementDirectlyCalled(Thread.currentThread().getStackTrace()) && TestLogging.getParentTestStep() != null) {
-//				currentAction.setFailed(actionFailed);
-//			}		
-//		}
-//		return reply;
-//	}
 	
 	/**
 	 * Intercept actions
@@ -260,7 +205,7 @@ public class LogAction {
 	 * @param joinPoint
 	 * @return
 	 */
-	private String buildArgString(JoinPoint joinPoint) {
+	public static String buildArgString(JoinPoint joinPoint) {
 		String argString = "";
 		if (joinPoint.getArgs().length > 0) {
 			argString = "with args: (";
