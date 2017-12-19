@@ -29,7 +29,7 @@ import org.testng.internal.TestResult;
 
 import com.seleniumtests.GenericTest;
 import com.seleniumtests.core.SeleniumTestsContextManager;
-import com.seleniumtests.reporter.TestListener;
+import com.seleniumtests.core.runner.SeleniumRobotTestListener;
 
 /**
  * Check that SoftAssert aspect is working and has been weaved
@@ -71,7 +71,7 @@ public class TestCustomAssertion extends GenericTest {
 			ITestResult previousResult = Reporter.getCurrentTestResult();
 			Reporter.setCurrentTestResult(result);
 			try {
-				new TestListener().changeTestResult(result);
+				new SeleniumRobotTestListener().changeTestResult(result);
 			
 				// test result should be changed in failure because of soft assertion
 				Assert.assertEquals(result.getStatus(), TestResult.FAILURE);
