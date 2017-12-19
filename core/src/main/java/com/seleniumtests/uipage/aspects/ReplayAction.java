@@ -29,6 +29,7 @@ import org.openqa.selenium.remote.UnreachableBrowserException;
 import org.openqa.selenium.support.ui.SystemClock;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.core.aspects.LogAction;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.DatasetException;
 import com.seleniumtests.customexception.ScenarioException;
@@ -73,7 +74,7 @@ public class ReplayAction {
     	element.setDriver(WebUIDriver.getWebDriver());
 		String targetName = joinPoint.getTarget().toString();
     	
-    	String actionName = String.format("%s on %s %s", joinPoint.getSignature().getName(), targetName, buildArgString(joinPoint));
+    	String actionName = String.format("%s on %s %s", joinPoint.getSignature().getName(), targetName, LogAction.buildArgString(joinPoint));
 		TestAction currentAction = new TestAction(actionName, false);
 
 		// log action before its started. By default, it's OK. Then result may be overwritten if step fails
@@ -211,31 +212,6 @@ public class ReplayAction {
 		} else {
 			return true;
 		}
-	}
-	
-	/**
-	 * Build argument string of the join point
-	 * @param joinPoint
-	 * @return
-	 */
-	private String buildArgString(JoinPoint joinPoint) {
-		String argString = "";
-		if (joinPoint.getArgs().length > 0) {
-			argString = "with args: (";
-			for (Object arg: joinPoint.getArgs()) {
-				if (arg instanceof CharSequence[]) {
-					argString += "[";
-					for (Object obj: (CharSequence[])arg) {
-						argString += obj.toString() + ",";
-					}
-					argString += "]";
-				} else {
-					argString += (arg == null ? "null": arg.toString()) + ", ";
-				}
-			}
-			argString += ")";
-		}
-		return argString;
 	}
 	
     
