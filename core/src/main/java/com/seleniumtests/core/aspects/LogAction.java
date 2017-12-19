@@ -65,6 +65,11 @@ public class LogAction {
 		String actionName = String.format("%s %s %s", joinPoint.getSignature().getName(), pageName, buildArgString(joinPoint));
 		Object reply = null;
 		boolean actionFailed = false;
+		TestAction currentAction = new TestAction(actionName, false);
+		
+		if (TestLogging.getParentTestStep() != null) {
+			TestLogging.getParentTestStep().addAction(currentAction);
+		}
 		
 		try {
 			reply = joinPoint.proceed(joinPoint.getArgs());
@@ -73,7 +78,7 @@ public class LogAction {
 			throw e;
 		} finally {
 			if (TestLogging.getParentTestStep() != null) {
-				TestLogging.getParentTestStep().addAction(new TestAction(actionName, actionFailed));
+				currentAction.setFailed(actionFailed);
 			}
 		}
 		return reply;
