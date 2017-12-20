@@ -55,14 +55,6 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 	public Map<String, Boolean> getIsRetryHandleNeeded() {
 		return isRetryHandleNeeded;
 	}
-	
-
-	/**
-	 * Configure cucumberTest in case we use several threads. This should be called inside the thread running the test method
-	 */
-	public void configureCucumberTest() {
-		SeleniumRobotTestPlan.setCucumberTest(false);
-	}
 
 	protected String buildMethodSignature(final Method method) {
         return method.getDeclaringClass().getCanonicalName() + "." + method.getName() + "()";
@@ -157,9 +149,8 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 	@Override
 	public void beforeInvocation(IInvokedMethod method, ITestResult testResult, ITestContext context) {
 		TestLogging.setCurrentTestResult(testResult);
-		System.out.println("before: " + method.getTestMethod().getMethodName() + this.hashCode());
+		
 		if (method.isTestMethod()) {
-	    	configureCucumberTest();
 
 	    	if (SeleniumRobotTestPlan.isCucumberTest()) {
 	    		testResult.setAttribute(SeleniumRobotLogger.METHOD_NAME, testResult.getParameters()[0].toString());
@@ -183,7 +174,7 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 	public void afterInvocation(IInvokedMethod method, ITestResult testResult, ITestContext context) {
 		
 		Reporter.setCurrentTestResult(testResult);
-		System.out.println("after: " + method.getTestMethod().getMethodName() + this.hashCode());
+		
 		if (method.isTestMethod()) {
 	        List<TearDownService> serviceList = SeleniumTestsContextManager.getThreadContext().getTearDownServices();
 	        if (serviceList != null && !serviceList.isEmpty()) {
