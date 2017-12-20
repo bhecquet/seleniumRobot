@@ -21,6 +21,7 @@ Use seleniumRobot-example project as a base to develop your own test application
 	- `squash-ta` contains ta files that should override the default ones (optional). See Squash-TA section for details 
 
 - Test code must be in `src/test/java`
+- **WARN** When using IntelliJ, you must also create a `src/main/java` with subpackage inside and a main class. This does nothing but IntelliJ cannot weave aspects without that
 - package name is free but following structure should be used
 	- `cucumber` subpackage contains cucumber implementation files. As cucumber annotations can be written directly in test page object, it should at least contain code for `@Then` (checks) and `@Given` (initial state).
 If pure TestNG mode is used, this package should not exist.
@@ -30,7 +31,7 @@ If pure TestNG mode is used, this package should not exist.
 ![](images/package_structure.png)
 
 *If something goes wrong when launching test, check:*
-- project name, folder name under `data`, sub-package name, containing `webpages` *MUST BE THE SAME*
+- project name, folder name under `data`, sub-package name, containing `webpages` **MUST BE THE SAME**
 - There is no space in folder structure
 - In cucumber mode, the `@Given` creating the first PageObject must not be in the PageObject class. It should be in `cucumber`subpackage instead
 
