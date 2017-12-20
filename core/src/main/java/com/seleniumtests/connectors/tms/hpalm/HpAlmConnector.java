@@ -65,11 +65,11 @@ public class HpAlmConnector extends TestManager {
 
 	@Override
 	public void init() {
-		serverUrl = SeleniumTestsContextManager.getThreadContext().getConfiguration().get(HP_ALM_SERVER_URL);
-		project = SeleniumTestsContextManager.getThreadContext().getConfiguration().get(HP_ALM_PROJECT);
-		domain = SeleniumTestsContextManager.getThreadContext().getConfiguration().get(HP_ALM_DOMAIN);
-		user = SeleniumTestsContextManager.getThreadContext().getConfiguration().get(HP_ALM_USER);
-		password = SeleniumTestsContextManager.getThreadContext().getConfiguration().get(HP_ALM_PASSWORD);
+		serverUrl = SeleniumTestsContextManager.getThreadContext().getConfiguration().get(HP_ALM_SERVER_URL).getValue();
+		project = SeleniumTestsContextManager.getThreadContext().getConfiguration().get(HP_ALM_PROJECT).getValue();
+		domain = SeleniumTestsContextManager.getThreadContext().getConfiguration().get(HP_ALM_DOMAIN).getValue();
+		user = SeleniumTestsContextManager.getThreadContext().getConfiguration().get(HP_ALM_USER).getValue();
+		password = SeleniumTestsContextManager.getThreadContext().getConfiguration().get(HP_ALM_PASSWORD).getValue();
 		
 		if (serverUrl == null || project == null || domain == null || user == null || password == null) {
 			throw new ConfigurationException("HP ALM access not correctly configured. Environment configuration must contain variables"

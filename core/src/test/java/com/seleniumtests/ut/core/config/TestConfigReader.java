@@ -27,6 +27,7 @@ import org.testng.xml.XmlTest;
 import com.seleniumtests.GenericTest;
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.core.TestVariable;
 import com.seleniumtests.core.config.ConfigReader;
 import com.seleniumtests.customexception.ConfigurationException;
 
@@ -34,14 +35,14 @@ public class TestConfigReader extends GenericTest {
 
 	@Test(groups={"ut"})
 	public void readConfigurationWithValueOverride() {
-		Map<String, String> config = new ConfigReader().readConfig(Thread.currentThread().getContextClassLoader().getResourceAsStream("tu/env.ini"), "DEV");
-		Assert.assertEquals(config.get("key1"), "value4", "Key override does not work");
+		Map<String, TestVariable> config = new ConfigReader().readConfig(Thread.currentThread().getContextClassLoader().getResourceAsStream("tu/env.ini"), "DEV");
+		Assert.assertEquals(config.get("key1").getValue(), "value4", "Key override does not work");
 	}
 	
 	@Test(groups={"ut"})
 	public void readConfigurationWithoutValueOverride() {
-		Map<String, String> config = new ConfigReader().readConfig(Thread.currentThread().getContextClassLoader().getResourceAsStream("tu/env.ini"), "VNR");
-		Assert.assertEquals(config.get("key1"), "value1", "Key should not be overriden");
+		Map<String, TestVariable> config = new ConfigReader().readConfig(Thread.currentThread().getContextClassLoader().getResourceAsStream("tu/env.ini"), "VNR");
+		Assert.assertEquals(config.get("key1").getValue(), "value1", "Key should not be overriden");
 	}
 	
 	@Test(groups={"ut context"})

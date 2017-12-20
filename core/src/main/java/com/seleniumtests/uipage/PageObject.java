@@ -215,12 +215,22 @@ public class PageObject extends BasePage implements IPage {
      * @return String
      */
     public static String param(String key) {
-    	String value = SeleniumTestsContextManager.getThreadContext().getConfiguration().get(key);
+    	String value = SeleniumTestsContextManager.getThreadContext().getConfiguration().get(key).getValue();
     	if (value == null) {
     		TestLogging.error(String.format("Variable %s is not defined", key));
     		return "";
     	}
     	return value;
+    }
+    
+    /**
+     * Method for creating or updating a variable on the seleniumRobot server ONLY. This will raise a ScenarioException if variables are get from
+     * env.ini file 
+     * @param key
+     * @param value
+     */
+    public static void createOrUpdateParam(String key, String value) {
+    	
     }
 
     public void assertHtmlSource(final String text) {
@@ -259,7 +269,8 @@ public class PageObject extends BasePage implements IPage {
     }
 
     /**
-     * Close a PageObject
+     * Close a PageObject. This method can be called when a web session opens several pages and one of them is closed after some action
+     * In case there are multiple windows opened, swith back to the first window in the list
      * 
      * @throws NotCurrentPageException
      */
@@ -289,7 +300,7 @@ public class PageObject extends BasePage implements IPage {
 
         try {
             if (isMultipleWindow) {
-                this.selectMainWindow();
+                selectMainWindow();
             } else {
                 WebUIDriver.setWebDriver(null);
             }

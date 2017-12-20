@@ -137,7 +137,7 @@ public class EmailAccount {
 		
 		logger.info("email " + getEmail() + " will be used to access server");
 		
-		emailClient = EmailClientSelector.routeEmail(EmailServer.fromJson(SeleniumTestsContextManager.getThreadContext().getConfiguration().get("mailServer")),
+		emailClient = EmailClientSelector.routeEmail(EmailServer.fromJson(SeleniumTestsContextManager.getThreadContext().getConfiguration().get("mailServer").getValue()),
 				getEmail(),
 				getEmailLogin(),
 				getEmailPassword());

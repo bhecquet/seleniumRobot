@@ -46,7 +46,7 @@ public class Oracle {
     	this.password = password;
     	this.dbName = dbName;
     	
-    	String tnsNamePath = SeleniumTestsContextManager.getThreadContext().getConfiguration().get("tnsnamePath");
+    	String tnsNamePath = SeleniumTestsContextManager.getThreadContext().getConfiguration().get("tnsnamePath").getValue();
     	
     	// check tnsname.ora path
     	if (tnsNamePath == null) {

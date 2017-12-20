@@ -41,6 +41,7 @@ import com.seleniumtests.connectors.selenium.SeleniumRobotVariableServerConnecto
 import com.seleniumtests.connectors.tms.TestManager;
 import com.seleniumtests.core.config.ConfigReader;
 import com.seleniumtests.customexception.ConfigurationException;
+import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.DriverMode;
 import com.seleniumtests.driver.TestType;
@@ -137,7 +138,7 @@ public class SeleniumTestsContext {
     
     public static final String CUCUMBER_TESTS = "cucumberTests";				// liste des tests en mode cucumber
     public static final String CUCUMBER_TAGS = "cucumberTags";					// liste des tags cucumber
-    public static final String TEST_CONFIG = "currentTestConfig"; 				// configuration used for the current test. It is not updated via XML file
+    public static final String TEST_VARIABLES = "testVariables"; 				// configuration (aka variables, get via 'param()' method) used for the current test. It is not updated via XML file
     public static final String TEST_ENV = "env";								// environnement de test pour le SUT. Permet d'accéder aux configurations spécifiques du fichier env.ini
     public static final String CUCUMBER_IMPLEMENTATION_PKG = "cucumberPackage";	// nom du package java pour les classes cucumber, car celui-ci n'est pas accessible par testNG
     
@@ -170,16 +171,27 @@ public class SeleniumTestsContext {
 
     /* Data object to store all context data */
     private Map<String, Object> contextDataMap = Collections.synchronizedMap(new HashMap<String, Object>());
-    private Map<String, String> testVariables = Collections.synchronizedMap(new HashMap<String, String>());
+    private Map<String, TestVariable> testVariables = Collections.synchronizedMap(new HashMap<String, TestVariable>());
 
     private ITestContext testNGContext = null;
+    private final SeleniumRobotVariableServerConnector variableServer;
     
     public SeleniumTestsContext() {
     	// for test purpose only
+    	variableServer = null;
     }
     
     public SeleniumTestsContext(final ITestContext context, final String testName) {
         this.testNGContext = context;
+        
+        setSeleniumRobotServerUrl(getValueForTest(SELENIUMROBOTSERVER_URL, System.getProperty(SELENIUMROBOTSERVER_URL)));
+        setSeleniumRobotServerActive(getBoolValueForTest(SELENIUMROBOTSERVER_ACTIVE, System.getProperty(SELENIUMROBOTSERVER_ACTIVE)));
+        setSeleniumRobotServerCompareSnapshot(getBoolValueForTest(SELENIUMROBOTSERVER_COMPARE_SNAPSHOT, System.getProperty(SELENIUMROBOTSERVER_COMPARE_SNAPSHOT)));
+        setSeleniumRobotServerRecordResults(getBoolValueForTest(SELENIUMROBOTSERVER_RECORD_RESULTS, System.getProperty(SELENIUMROBOTSERVER_RECORD_RESULTS)));
+        setTestName(testName);
+
+        // create seleniumRobot server instance
+        variableServer = connectSeleniumRobotServer();
 
         setTestDataFile(getValueForTest(TEST_DATA_FILE, System.getProperty(TEST_DATA_FILE)));
         setLoadIni(getValueForTest(LOAD_INI, System.getProperty(LOAD_INI)));
@@ -221,11 +233,6 @@ public class SeleniumTestsContext {
         setWebProxyExclude(getValueForTest(WEB_PROXY_EXCLUDE, System.getProperty(WEB_PROXY_EXCLUDE)));
         setWebProxyPac(getValueForTest(WEB_PROXY_PAC, System.getProperty(WEB_PROXY_PAC)));
         
-        setSeleniumRobotServerUrl(getValueForTest(SELENIUMROBOTSERVER_URL, System.getProperty(SELENIUMROBOTSERVER_URL)));
-        setSeleniumRobotServerActive(getBoolValueForTest(SELENIUMROBOTSERVER_ACTIVE, System.getProperty(SELENIUMROBOTSERVER_ACTIVE)));
-        setSeleniumRobotServerCompareSnapshot(getBoolValueForTest(SELENIUMROBOTSERVER_COMPARE_SNAPSHOT, System.getProperty(SELENIUMROBOTSERVER_COMPARE_SNAPSHOT)));
-        setSeleniumRobotServerRecordResults(getBoolValueForTest(SELENIUMROBOTSERVER_RECORD_RESULTS, System.getProperty(SELENIUMROBOTSERVER_RECORD_RESULTS)));
-
         setSnapshotBottomCropping(getIntValueForTest(SNAPSHOT_BOTTOM_CROPPING, System.getProperty(SNAPSHOT_BOTTOM_CROPPING)));
         setSnapshotTopCropping(getIntValueForTest(SNAPSHOT_TOP_CROPPING, System.getProperty(SNAPSHOT_TOP_CROPPING)));
         setCaptureSnapshot(getBoolValueForTest(CAPTURE_SNAPSHOT, System.getProperty(CAPTURE_SNAPSHOT)));
@@ -264,8 +271,6 @@ public class SeleniumTestsContext {
         
         setViewPortWidth(getIntValueForTest(VIEWPORT_WIDTH, System.getProperty(VIEWPORT_WIDTH)));
         setViewPortHeight(getIntValueForTest(VIEWPORT_HEIGHT, System.getProperty(VIEWPORT_HEIGHT)));
-        
-        setTestName(testName);
     
         updateTestAndMobile(getPlatform());
         
@@ -400,6 +405,31 @@ public class SeleniumTestsContext {
     	if (getDeviceName() != null && !getDeviceName().isEmpty() && !deviceList.isEmpty()) {
     		setPlatform(deviceList.get(getDeviceName()));
     	}
+    }
+    
+    private SeleniumRobotVariableServerConnector connectSeleniumRobotServer() {
+    	
+    	if (getTestName() == null) {
+    		return null;
+    	}
+    	
+    	// in case we find the url of variable server and it's marked as active, use it
+		if (getSeleniumRobotServerActive() != null && getSeleniumRobotServerActive() && getSeleniumRobotServerUrl() != null) {
+			logger.info(String.format("%s key found, and set to true, trying to get variable from variable server %s", 
+						SELENIUMROBOTSERVER_ACTIVE, 
+						SELENIUMROBOTSERVER_URL));
+			SeleniumRobotVariableServerConnector vServer = new SeleniumRobotVariableServerConnector(getTestName());
+			
+			if (!vServer.isAlive()) {
+				throw new ConfigurationException(String.format("Variable server %s could not be contacted", SELENIUMROBOTSERVER_URL));
+			}
+			
+			return vServer;
+			
+		} else {
+			logger.info(String.format("%s key not found or set to false, or url key %s has not been set", SELENIUMROBOTSERVER_ACTIVE, SELENIUMROBOTSERVER_URL));
+			return null;
+		}
     }
 
     /**
@@ -817,9 +847,9 @@ public class SeleniumTestsContext {
     }
     
     @SuppressWarnings("unchecked")
-	public Map<String, String> getConfiguration() {
+	public Map<String, TestVariable> getConfiguration() {
     	
-    	Map<String, String> config = (HashMap<String, String>) getAttribute(TEST_CONFIG);
+    	Map<String, TestVariable> config = (HashMap<String, TestVariable>) getAttribute(TEST_VARIABLES);
     	if (config == null) {
     		return new HashMap<>();
     	} else {
@@ -836,8 +866,7 @@ public class SeleniumTestsContext {
 	//set
     public void setIdMapping(Map<String, HashMap<String,String>> conf){
     	idMapping = conf;
-    }
-    
+    }    
     
     public boolean isUseFirefoxDefaultProfile() {
         try {
@@ -883,7 +912,7 @@ public class SeleniumTestsContext {
                     String sysPropertyValue = System.getProperty(entry.getKey());
                     String suiteValue = entry.getValue();
                     setContextAttribute(attributeName, sysPropertyValue, suiteValue, null);
-                    testVariables.put(attributeName, getAttribute(attributeName).toString());
+                    testVariables.put(attributeName, new TestVariable(attributeName, getAttribute(attributeName).toString()));
                 }
 
             }
@@ -1044,6 +1073,11 @@ public class SeleniumTestsContext {
     
     public void setWebDriverGrid(final String driverGrid) {
         setAttribute(WEB_DRIVER_GRID, driverGrid);
+    }
+    
+
+    public void setConfiguration(Map<String, TestVariable> variables){
+    	setAttribute(TEST_VARIABLES, variables);
     }
     
     public void setTms(final String tms) {
@@ -1436,33 +1470,33 @@ public class SeleniumTestsContext {
     }
     
     /**
-     * Extract proxy settings from environment configuration and write them to context 
+     * Extract proxy settings from environment configuration and write them to context if they are not already present in XML file or on command line
      */
     public void postsetProxyConfig() {
-    	Map<String, String> envConfig = getConfiguration();
-    	for (Entry<String, String> entry: envConfig.entrySet()) {
+    	Map<String, TestVariable> envConfig = getConfiguration();
+    	for (Entry<String, TestVariable> entry: envConfig.entrySet()) {
     		String key = entry.getKey();
     		switch (key) {
     			case WEB_PROXY_TYPE:
-    				setWebProxyType(getWebProxyType() == null ? envConfig.get(key): (getWebProxyType() == null ? null: getWebProxyType().name()));
+    				setWebProxyType(getWebProxyType() == null ? envConfig.get(key).getValue(): (getWebProxyType() == null ? null: getWebProxyType().name()));
     				break;
     			case WEB_PROXY_ADDRESS:
-    				setWebProxyAddress(getWebProxyAddress() == null ? envConfig.get(key): getWebProxyAddress());
+    				setWebProxyAddress(getWebProxyAddress() == null ? envConfig.get(key).getValue(): getWebProxyAddress());
     				break;
     			case WEB_PROXY_PORT:
-    				setWebProxyPort(getWebProxyPort() == null ? Integer.valueOf(envConfig.get(key)): getWebProxyPort());
+    				setWebProxyPort(getWebProxyPort() == null ? Integer.valueOf(envConfig.get(key).getValue()): getWebProxyPort());
     				break;
     			case WEB_PROXY_LOGIN:
-    				setWebProxyLogin(getWebProxyLogin() == null ? envConfig.get(key): getWebProxyLogin());
+    				setWebProxyLogin(getWebProxyLogin() == null ? envConfig.get(key).getValue(): getWebProxyLogin());
     				break;
     			case WEB_PROXY_PASSWORD:
-    				setWebProxyPassword(getWebProxyPassword() == null ? envConfig.get(key): getWebProxyPassword());
+    				setWebProxyPassword(getWebProxyPassword() == null ? envConfig.get(key).getValue(): getWebProxyPassword());
     				break;
     			case WEB_PROXY_PAC:
-    				setWebProxyPac(getWebProxyPac() == null ? envConfig.get(key): getWebProxyPac());
+    				setWebProxyPac(getWebProxyPac() == null ? envConfig.get(key).getValue(): getWebProxyPac());
     				break;
     			case WEB_PROXY_EXCLUDE:
-    				setWebProxyExclude(getWebProxyExclude() == null ? envConfig.get(key): getWebProxyExclude());
+    				setWebProxyExclude(getWebProxyExclude() == null ? envConfig.get(key).getValue(): getWebProxyExclude());
     				break;
     			default:
     				continue;
@@ -1476,36 +1510,32 @@ public class SeleniumTestsContext {
     }
     
     private void updateTestConfigurationFromVariableServer() {
-    	
-    	if (getTestName() == null) {
-    		return;
+    	if (variableServer != null) {
+			getConfiguration().putAll(variableServer.getVariables());
+    	}
+    }
+    
+    /**
+     * Method for creating or updating a variable on the seleniumRobot server ONLY. This will raise a ScenarioException if variables are get from
+     * env.ini file 
+     * @param key
+     * @param value
+     */
+    public void createOrUpdateParam(String key, String value) {
+    	if (variableServer == null) {
+    		throw new ScenarioException("Cannot create or update variable if seleniumRobot server is not connected");
     	}
     	
-    	// in case we find the url of variable server and it's marked as active, use it
-		if (getSeleniumRobotServerActive() != null && getSeleniumRobotServerActive() && getSeleniumRobotServerUrl() != null) {
-			logger.info(String.format("%s key found, and set to true, trying to get variable from variable server %s", 
-						SELENIUMROBOTSERVER_ACTIVE, 
-						SELENIUMROBOTSERVER_URL));
-			SeleniumRobotVariableServerConnector variableServer = new SeleniumRobotVariableServerConnector(getTestName());
-			
-			if (!variableServer.isAlive()) {
-				throw new ConfigurationException(String.format("Variable server %s could not be contacted", SELENIUMROBOTSERVER_URL));
-			}
-			
-			getConfiguration().putAll(variableServer.getVariables());
-			
-		} else {
-			logger.info(String.format("%s key not found or set to false, or url key %s has not been set", SELENIUMROBOTSERVER_ACTIVE, SELENIUMROBOTSERVER_URL));
-		}
+    	
     }
     
     /**
      * Read configuration from environment specific data and undefined parameters present un testng xml file
      */
 	public void setTestConfiguration() {
-    	Map<String, String> envConfig = new ConfigReader().readConfig();
+    	Map<String, TestVariable> envConfig = new ConfigReader().readConfig();
     	envConfig.putAll(testVariables);
-    	setAttribute(TEST_CONFIG, envConfig);
+    	setConfiguration(envConfig);
     	
     	updateTestConfigurationFromVariableServer();
     }
