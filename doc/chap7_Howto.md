@@ -142,12 +142,16 @@ connection and disconnection are done automatically
 	Oracle db = new Oracle(<dbName>, <dbHost>, <dbPort>, <dbUser>, <dbPassword>);
 	db.executeParamQuery("SELECT * FROM TAB1 WHERE id=?", id);
 	
+Oracle DB needs `tnsnamePath` variable: path to folder where tnsnames.ora file
+	
 ### 9 Using emails ###
 
 SeleniumRobot provides several email clients to allow reading email content and attachments
 
 	EmailAccount account = EmailAccount(<email_address>, <login>, <password>);
 	Email emailFound = account.checkEmailPresence(<email_title>, new String[] {"attachment1"});
+	
+Email needs `mailServer` variable which is the URL to the server
 	
 ### 10 upload file ###
 
