@@ -11,6 +11,7 @@ import org.testng.annotations.Test;
 import com.seleniumtests.GenericTest;
 import com.seleniumtests.connectors.selenium.SeleniumRobotVariableServerConnector;
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.core.TestVariable;
 
 public class TestSeleniumRobotVariableServerConnector extends GenericTest {
 
@@ -29,13 +30,13 @@ public class TestSeleniumRobotVariableServerConnector extends GenericTest {
 	
 	@Test(groups={"it"}, enabled=false)
 	public void testCreateApplication() {
-		Map<String, String> variables = connector.getVariables();
+		Map<String, TestVariable> variables = connector.getVariables();
 		Assert.assertTrue(variables.size() > 0);
 	}
 	
 	@Test(groups={"it"}, enabled=true)
 	public void testReserveVariable() {
-		Map<String, String> variables = connector.getVariables();
+		Map<String, TestVariable> variables = connector.getVariables();
 		connector.getVariables();
 		Assert.assertTrue(variables.size() > 0);
 	}
