@@ -15,7 +15,8 @@ import com.seleniumtests.util.logging.SeleniumRobotLogger;
 	com.seleniumtests.reporter.PerformanceReporter.class,
 	com.seleniumtests.reporter.SeleniumRobotServerTestRecorder.class,
 	com.seleniumtests.reporter.TestManagerReporter.class,
-	com.seleniumtests.reporter.JsonReporter.class})
+	com.seleniumtests.reporter.JsonReporter.class,
+	com.seleniumtests.core.runner.SeleniumRobotTestListener.class})
 public class SeleniumRobotTestPlan {
 	
 	private static Map<Thread, Boolean> cucumberTest = Collections.synchronizedMap(new HashMap<>());
@@ -23,13 +24,11 @@ public class SeleniumRobotTestPlan {
 	
 	public static void setCucumberTest(boolean cucumberTestIn) {
 		SeleniumRobotTestPlan.cucumberTest.put(Thread.currentThread(), cucumberTestIn);
-		System.out.println(Thread.currentThread().getId() + " - " + cucumberTestIn);
 	}
 	
 
 	public static boolean isCucumberTest() {
 		Boolean isCucumberT = SeleniumRobotTestPlan.cucumberTest.get(Thread.currentThread());
-		System.out.println("out " + Thread.currentThread().getId() + " - " + isCucumberT);
 		if (isCucumberT == null) {
 			return false;
 		}

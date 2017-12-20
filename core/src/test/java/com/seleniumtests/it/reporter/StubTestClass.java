@@ -27,6 +27,7 @@ import com.seleniumtests.reporter.TestLogging;
 import com.seleniumtests.reporter.TestMessage;
 import com.seleniumtests.reporter.TestMessage.MessageType;
 import com.seleniumtests.reporter.TestStep;
+import com.seleniumtests.util.helper.WaitHelper;
 
 public class StubTestClass extends StubParentClass {
 	
@@ -48,7 +49,7 @@ public class StubTestClass extends StubParentClass {
 		subStep1.addMessage(new TestMessage("a message", MessageType.LOG));
 		subStep1.addAction(new TestAction("sendKeys to password field", false));
 		step1.addAction(subStep1);
-		
+		WaitHelper.waitForSeconds(3);
 		step1.setDuration(1230L);
 		TestStep step2 = new TestStep("step 2");
 		step2.setDuration(14030L);
