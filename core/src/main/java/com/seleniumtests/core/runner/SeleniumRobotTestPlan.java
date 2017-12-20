@@ -23,11 +23,13 @@ public class SeleniumRobotTestPlan {
 	
 	public static void setCucumberTest(boolean cucumberTestIn) {
 		SeleniumRobotTestPlan.cucumberTest.put(Thread.currentThread(), cucumberTestIn);
+		System.out.println(Thread.currentThread().getId() + " - " + cucumberTestIn);
 	}
 	
 
 	public static boolean isCucumberTest() {
 		Boolean isCucumberT = SeleniumRobotTestPlan.cucumberTest.get(Thread.currentThread());
+		System.out.println("out " + Thread.currentThread().getId() + " - " + isCucumberT);
 		if (isCucumberT == null) {
 			return false;
 		}

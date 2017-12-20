@@ -52,10 +52,6 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 		currentListener = this;
 	}
 
-	public static SeleniumRobotTestListener getCurrentListener() {
-		return currentListener;
-	}
-	
 	public Map<String, Boolean> getIsRetryHandleNeeded() {
 		return isRetryHandleNeeded;
 	}
@@ -161,7 +157,7 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 	@Override
 	public void beforeInvocation(IInvokedMethod method, ITestResult testResult, ITestContext context) {
 		TestLogging.setCurrentTestResult(testResult);
-		
+		System.out.println("before: " + method.getTestMethod().getMethodName() + this.hashCode());
 		if (method.isTestMethod()) {
 	    	configureCucumberTest();
 
@@ -187,7 +183,7 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 	public void afterInvocation(IInvokedMethod method, ITestResult testResult, ITestContext context) {
 		
 		Reporter.setCurrentTestResult(testResult);
-		
+		System.out.println("after: " + method.getTestMethod().getMethodName() + this.hashCode());
 		if (method.isTestMethod()) {
 	        List<TearDownService> serviceList = SeleniumTestsContextManager.getThreadContext().getTearDownServices();
 	        if (serviceList != null && !serviceList.isEmpty()) {
