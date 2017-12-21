@@ -215,6 +215,11 @@ public abstract class SeleniumRobotServerConnector {
 	
 	protected JSONObject getJSonResponse(BaseRequest request) throws UnirestException {
 		HttpResponse<String> response = request.asString();
+
+		if (response.getStatus() == 423) {
+			String error = new JSONObject(response.getBody()).getString("detail");
+			throw new SeleniumRobotServerException(error);
+		}
 		
 		if (response.getStatus() >= 400) {
 			try {

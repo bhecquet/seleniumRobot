@@ -857,7 +857,11 @@ public class SeleniumTestsContext {
     	}
     }
     
-    //Methods for ID_Mapping
+    public SeleniumRobotVariableServerConnector getVariableServer() {
+		return variableServer;
+	}
+
+	//Methods for ID_Mapping
     //get
     public Map<String, HashMap<String, String>> getIdMapping() {
     	return idMapping;
@@ -1509,7 +1513,11 @@ public class SeleniumTestsContext {
     	}
     }
     
+    /**
+     * Get all variables from server is it has been activated
+     */
     private void updateTestConfigurationFromVariableServer() {
+    	
     	if (variableServer != null) {
 			getConfiguration().putAll(variableServer.getVariables());
     	}
@@ -1521,12 +1529,21 @@ public class SeleniumTestsContext {
      * @param key
      * @param value
      */
-    public void createOrUpdateParam(String key, String value) {
+    public void createOrUpdateParam(String key, String newValue) {
     	if (variableServer == null) {
     		throw new ScenarioException("Cannot create or update variable if seleniumRobot server is not connected");
     	}
     	
+    	// check if we update an existing variable
+    	TestVariable variable = getConfiguration().get(key);
+    	if (variable == null) {
+    		variable = new TestVariable(key, newValue);
+    	} else {
+    		variable.setValue(newValue);
+    	}
     	
+    	TestVariable newVariable = variableServer.upsertVariable(variable);
+    	getConfiguration().put(newVariable.getName(), newVariable);
     }
     
     /**

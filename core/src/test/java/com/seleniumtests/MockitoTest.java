@@ -43,7 +43,11 @@ public class MockitoTest  extends PowerMockTestCase {
 	}
 	
 	public void initThreadContext(final ITestContext testNGCtx) {
-		SeleniumTestsContextManager.initThreadContext(testNGCtx, null);
+		initThreadContext(testNGCtx, null);
+	}
+	
+	public void initThreadContext(final ITestContext testNGCtx,  final String testName) {
+		SeleniumTestsContextManager.initThreadContext(testNGCtx, testName);
 		SeleniumTestsContextManager.getThreadContext().setSoftAssertEnabled(false);
 		SeleniumTestsContextManager.getGlobalContext().setSoftAssertEnabled(false);
 	}

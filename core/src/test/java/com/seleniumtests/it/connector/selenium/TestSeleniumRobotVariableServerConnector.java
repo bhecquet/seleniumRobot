@@ -34,13 +34,20 @@ public class TestSeleniumRobotVariableServerConnector extends GenericTest {
 		Assert.assertTrue(variables.size() > 0);
 	}
 	
-	@Test(groups={"it"}, enabled=true)
+	@Test(groups={"it"}, enabled=false)
 	public void testReserveVariable() {
 		Map<String, TestVariable> variables = connector.getVariables();
 		connector.getVariables();
 		Assert.assertTrue(variables.size() > 0);
 	}
 	
-	
+	@Test(groups={"it"}, enabled=true)
+	public void testUpsert() {
+//		TestVariable variable = new TestVariable("key.test", "value");
+		TestVariable variable = new TestVariable(16, "key.test", "value", false, "custom.test.variable.key.test");
+		variable = connector.upsertVariable(variable);
+//		variable.setValue("newValue");
+//		variable = connector.upsertVariable(variable);
+	}
 	
 }
