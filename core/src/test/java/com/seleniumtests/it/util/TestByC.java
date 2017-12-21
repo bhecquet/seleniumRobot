@@ -124,6 +124,36 @@ public class TestByC extends GenericTest {
 	public void testFindElementByNullAttributeValue() {
 		new TextFieldElement("", ByC.attribute("attr", null)).sendKeys("element found by attribute");
 	}
+
+	@Test(groups={"it"})
+	public void testFindElementByText() { 
+		Assert.assertEquals(new TextFieldElement("", ByC.text("Test IFrame", "*")).getTagName(), "h3");
+	}
+	
+	@Test(groups={"it"})
+	public void testFindElementsByText() { 
+		Assert.assertEquals(new TextFieldElement("", ByC.text("Test IFrame", "*")).findElements().size(), 1);
+	}
+	
+	@Test(groups={"it"})
+	public void testFindElementByPartialText() { 
+		Assert.assertEquals(new TextFieldElement("", ByC.partialText("Test IF", "*")).getTagName(), "h3");
+	}
+	
+	@Test(groups={"it"})
+	public void testFindElementsByPartialText() { 
+		Assert.assertTrue(new TextFieldElement("", ByC.partialText("Test select", "*")).findElements().size() >=  3);
+	}
+
+	@Test(groups={"it"}, expectedExceptions=IllegalArgumentException.class)
+	public void testFindElementByNullText() { 
+		new TextFieldElement("", ByC.text(null, "*")).getTagName();
+	}
+	
+	@Test(groups={"it"}, expectedExceptions=IllegalArgumentException.class)
+	public void testFindElementByNullTagName() { 
+		new TextFieldElement("", ByC.text("Test select", null)).getTagName();
+	}
 	
 	
 }
