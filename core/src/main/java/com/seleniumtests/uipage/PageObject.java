@@ -46,6 +46,7 @@ import org.testng.Assert;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.SeleniumTestsPageListener;
+import com.seleniumtests.core.TestVariable;
 import com.seleniumtests.customexception.CustomSeleniumTestsException;
 import com.seleniumtests.customexception.NotCurrentPageException;
 import com.seleniumtests.customexception.ScenarioException;
@@ -215,12 +216,12 @@ public class PageObject extends BasePage implements IPage {
      * @return String
      */
     public static String param(String key) {
-    	String value = SeleniumTestsContextManager.getThreadContext().getConfiguration().get(key).getValue();
+    	TestVariable value = SeleniumTestsContextManager.getThreadContext().getConfiguration().get(key);
     	if (value == null) {
     		TestLogging.error(String.format("Variable %s is not defined", key));
     		return "";
     	}
-    	return value;
+    	return value.getValue();
     }
     
     /**
