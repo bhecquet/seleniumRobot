@@ -13,11 +13,12 @@ import java.util.List;
 
 import org.openqa.selenium.Platform;
 
-import oracle.jdbc.OracleDriver;
-
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.core.TestVariable;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.util.osutility.OSUtility;
+
+import oracle.jdbc.OracleDriver;
 
 /**
  * Class for accessing Oracle DB
@@ -46,20 +47,20 @@ public class Oracle {
     	this.password = password;
     	this.dbName = dbName;
     	
-    	String tnsNamePath = SeleniumTestsContextManager.getThreadContext().getConfiguration().get("tnsnamePath").getValue();
+    	TestVariable tnsNamePath = SeleniumTestsContextManager.getThreadContext().getConfiguration().get("tnsnamePath");
     	
     	// check tnsname.ora path
     	if (tnsNamePath == null) {
     		throw new ConfigurationException("'tnsnamePath' configuration does not exist in env.ini, it must be the path to folder where tnsnames.ora file is");
     	}
-    	if (!new File(tnsNamePath).isDirectory()) {
-    		throw new ConfigurationException("Folder " + tnsNamePath +  " does not exist, check your configuration in env.ini");
+    	if (!new File(tnsNamePath.getValue()).isDirectory()) {
+    		throw new ConfigurationException("Folder " + tnsNamePath.getValue() +  " does not exist, check your configuration in env.ini");
     	}
-    	if (!new File(tnsNamePath + File.separator + "tnsnames.ora").isFile()) {
-    		throw new ConfigurationException("File " + tnsNamePath + " tnsnames.ora does not exist, check your configuration in env.ini");
+    	if (!new File(tnsNamePath.getValue() + File.separator + "tnsnames.ora").isFile()) {
+    		throw new ConfigurationException("File " + tnsNamePath.getValue() + " tnsnames.ora does not exist, check your configuration in env.ini");
     	}
     	
-        System.setProperty("oracle.net.tns_admin", tnsNamePath);
+        System.setProperty("oracle.net.tns_admin", tnsNamePath.getValue());
 
     }
     
