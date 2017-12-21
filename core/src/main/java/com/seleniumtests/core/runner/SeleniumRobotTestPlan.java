@@ -21,7 +21,7 @@ public class SeleniumRobotTestPlan {
 	private static Map<Thread, Boolean> cucumberTest = Collections.synchronizedMap(new HashMap<>());
 	protected static final Logger logger = SeleniumRobotLogger.getLogger(SeleniumRobotTestPlan.class);
 	
-	private SeleniumRobotTestPlan() {
+	public SeleniumRobotTestPlan() {
 		// do nothing
 	}
 	

@@ -76,7 +76,15 @@ public class TestVariable {
 	public String getInternalName() {
 		return internalName;
 	}
-	
+
+	@Override
+	public String toString() {
+		if (getId() != null) {
+			return String.format("%d - %s", getId(), getName());
+		} else {
+			return getName();
+		}
+	}
 	 
     @Override
     public boolean equals(Object obj) {
