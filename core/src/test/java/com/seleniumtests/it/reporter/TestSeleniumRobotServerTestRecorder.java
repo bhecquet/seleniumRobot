@@ -2,8 +2,8 @@ package com.seleniumtests.it.reporter;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
@@ -13,31 +13,15 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.mockito.Mock;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.testng.IInvokedMethodListener;
-import org.testng.IReporter;
-import org.testng.ITestListener;
-import org.testng.TestNG;
-import org.testng.TestRunner;
 import org.testng.annotations.Test;
-import org.testng.xml.XmlClass;
-import org.testng.xml.XmlSuite;
-import org.testng.xml.XmlTest;
 
-import com.seleniumtests.MockitoTest;
-import com.seleniumtests.browserfactory.AppiumLauncherFactory;
 import com.seleniumtests.connectors.selenium.SeleniumRobotSnapshotServerConnector;
-import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.SeleniumRobotServerException;
 import com.seleniumtests.reporter.SeleniumRobotServerTestRecorder;
-import com.seleniumtests.reporter.TestListener;
-import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
 @PrepareForTest({SeleniumRobotSnapshotServerConnector.class, SeleniumRobotServerTestRecorder.class})
 public class TestSeleniumRobotServerTestRecorder extends ReporterTest {

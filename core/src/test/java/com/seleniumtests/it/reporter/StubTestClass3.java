@@ -24,7 +24,7 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
-import com.seleniumtests.core.runner.SeleniumRobotRunner;
+import com.seleniumtests.core.runner.SeleniumRobotTestPlan;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.it.core.aspects.CalcPage;
 
@@ -43,7 +43,7 @@ public class StubTestClass3 extends StubParentClass {
 	
 	@BeforeMethod(groups={"stub"})
 	public void set() {
-		SeleniumRobotRunner.setCucumberTest(false);
+		SeleniumRobotTestPlan.setCucumberTest(false);
 	}
 
 	@Test(groups="stub")

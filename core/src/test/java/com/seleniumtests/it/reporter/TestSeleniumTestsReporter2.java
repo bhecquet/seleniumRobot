@@ -24,29 +24,16 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.velocity.app.VelocityEngine;
 import org.testng.Assert;
-import org.testng.IInvokedMethodListener;
-import org.testng.IReporter;
 import org.testng.ITestContext;
 import org.testng.ITestResult;
-import org.testng.TestNG;
 import org.testng.annotations.Test;
-import org.testng.xml.XmlPackage;
-import org.testng.xml.XmlSuite;
-import org.testng.xml.XmlTest;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.reporter.SeleniumTestsReporter2;
-import com.seleniumtests.reporter.TestListener;
-import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
 public class TestSeleniumTestsReporter2 extends ReporterTest {
 	
@@ -264,7 +251,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	}
 	
 	/**
-	 * Check all steps are present in detailed report file
+	 * Check all steps are present in detailed report file. For cucumber, check that method name is the Scenario name, not the "feature" generic method
 	 * Test OK
 	 * @param testContext
 	 * @throws Exception

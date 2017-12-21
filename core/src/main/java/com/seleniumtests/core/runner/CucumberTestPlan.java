@@ -18,7 +18,9 @@ package com.seleniumtests.core.runner;
 
 import org.testng.ITestContext;
 import org.testng.annotations.AfterTest;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
+import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
@@ -26,12 +28,16 @@ import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
 import cucumber.api.testng.CucumberFeatureWrapper;
 
-public class CucumberRunner extends SeleniumRobotRunner {
-	
-    
+/**
+ * This class initializes context, sets up and tears down and clean up drivers An STF test should extend this class.
+ */
+
+public class CucumberTestPlan extends SeleniumRobotTestPlan {
+
 	private CustomTestNGCucumberRunner testNGCucumberRunner;
 
-	public void configureCucumberTest() {
+	@BeforeClass(alwaysRun=true)
+	public void configure() {
 		setCucumberTest(true);
 	}
 
@@ -65,7 +71,5 @@ public class CucumberRunner extends SeleniumRobotRunner {
     public void tearDown() {
         testNGCucumberRunner.finish();
     }
-
+ 
 }
-
-
