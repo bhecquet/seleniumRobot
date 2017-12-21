@@ -230,7 +230,7 @@ public class PageObject extends BasePage implements IPage {
      * @param value
      */
     public static void createOrUpdateParam(String key, String value) {
-    	
+    	SeleniumTestsContextManager.getThreadContext().createOrUpdateParam(key, value);
     }
 
     public void assertHtmlSource(final String text) {

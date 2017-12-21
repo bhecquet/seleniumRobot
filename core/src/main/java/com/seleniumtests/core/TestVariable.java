@@ -2,6 +2,8 @@ package com.seleniumtests.core;
 
 import org.json.JSONObject;
 
+import com.seleniumtests.core.runner.CucumberScenarioWrapper;
+
 public class TestVariable {
 
 
@@ -74,4 +76,28 @@ public class TestVariable {
 	public String getInternalName() {
 		return internalName;
 	}
+	
+	 
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+        	return false;
+        }
+        if (this.getClass() != obj.getClass()) {
+            return false;
+        }
+        TestVariable other;
+        try {
+        	other = (TestVariable) obj;
+        } catch (Exception e) {
+        	return false;
+        }
+
+        return this.getId() == other.getId() && this.getName() == other.getName();
+    }
+
+    @Override
+    public int hashCode() {
+        return this.toString().hashCode();
+    }
 }
