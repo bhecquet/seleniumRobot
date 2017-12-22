@@ -232,7 +232,7 @@ public class SeleniumTestsContextManager {
      * @param path
      * @return
      */
-    private static void getPathFromClass(Class<?> clazz, StringBuilder path) {
+    public static void getPathFromClass(Class<?> clazz, StringBuilder path) {
 		
 		try {
 			String url = URLDecoder.decode(clazz.getProtectionDomain().getCodeSource().getLocation().getFile(), "UTF-8" );

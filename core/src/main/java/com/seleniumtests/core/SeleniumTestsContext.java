@@ -1402,7 +1402,7 @@ public class SeleniumTestsContext {
     		if (context instanceof TestRunner) {
     			((TestRunner)context).setOutputDirectory(outputDir);
     		}
-    		setAttribute(OUTPUT_DIRECTORY, outputDir);
+    		setAttribute(OUTPUT_DIRECTORY, new File(outputDir).getAbsolutePath().replace(File.separator, "/"));
     	}
     }
     
