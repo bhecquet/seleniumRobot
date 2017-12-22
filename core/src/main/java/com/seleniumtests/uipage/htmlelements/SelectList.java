@@ -50,11 +50,11 @@ public class SelectList extends HtmlElement {
     	super(label, by, parent);
     }
 
-    public SelectList(final String label, final By by, final HtmlElement parent, final int index) {
+    public SelectList(final String label, final By by, final HtmlElement parent, final Integer index) {
     	super(label, by, parent, index);
     }
      
-    public SelectList(final String label, final By by, final int index) {
+    public SelectList(final String label, final By by, final Integer index) {
     	super(label, by, index);
     }
     
@@ -62,7 +62,7 @@ public class SelectList extends HtmlElement {
     	super(label, by, frame);
     }
     
-    public SelectList(final String label, final By by, final FrameElement frame, final int index) {
+    public SelectList(final String label, final By by, final FrameElement frame, final Integer index) {
     	super(label, by, frame, index);
     }
 
@@ -208,7 +208,7 @@ public class SelectList extends HtmlElement {
     }
 
     @ReplayOnError
-    public void deselectByIndex(final int index) {
+    public void deselectByIndex(final Integer index) {
         findElement();
         if (select != null) {
         	select.deselectByIndex(index);
@@ -251,7 +251,7 @@ public class SelectList extends HtmlElement {
     }
 
     @ReplayOnError
-    public void selectByIndex(final int index) {
+    public void selectByIndex(final Integer index) {
         findElement();
 
         if (select != null) {

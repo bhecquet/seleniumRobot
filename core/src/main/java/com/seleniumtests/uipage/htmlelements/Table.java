@@ -41,7 +41,7 @@ public class Table extends HtmlElement {
     	super(label, by, parent);
     }
 
-    public Table(final String label, final By by, final HtmlElement parent, final int index) {
+    public Table(final String label, final By by, final HtmlElement parent, final Integer index) {
     	super(label, by, parent, index);
     }
     
