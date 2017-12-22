@@ -110,7 +110,9 @@ public class DefaultTestNGContext implements ITestContext {
 
     @Override
     public String getOutputDirectory() {
-        return this.getClass().getResource("/").getPath() + "../../test-output/defaultSuite";
+    	StringBuilder path = new StringBuilder();
+    	SeleniumTestsContextManager.getPathFromClass(this.getClass(), path);
+    	return path.toString() + "test-output/defaultSuite"; 
     }
 
     @Override
