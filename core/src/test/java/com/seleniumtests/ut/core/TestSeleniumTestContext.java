@@ -681,6 +681,12 @@ public class TestSeleniumTestContext extends MockitoTest {
 		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), "/home/user/test-output");
 	}
 	@Test(groups="ut context")
+	public void testOutputDirectoryFromSystem(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		System.setProperty(SeleniumTestsContext.OUTPUT_DIRECTORY, "/home/user/test-output");
+		initThreadContext(testNGCtx);
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), "/home/user/test-output");
+	}
+	@Test(groups="ut context")
 	public void testOutputDirectoryNull(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		initThreadContext(testNGCtx);
 		((TestRunner)testNGCtx).setOutputDirectory("/home/other/test-output/testsuite");
