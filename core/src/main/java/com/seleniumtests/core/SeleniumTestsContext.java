@@ -1399,7 +1399,9 @@ public class SeleniumTestsContext {
     	if (outputDir == null) {
     		setAttribute(OUTPUT_DIRECTORY, new File(context.getOutputDirectory()).getParent());
     	} else {
-    		((TestRunner)context).setOutputDirectory(outputDir);
+    		if (context instanceof TestRunner) {
+    			((TestRunner)context).setOutputDirectory(outputDir);
+    		}
     		setAttribute(OUTPUT_DIRECTORY, outputDir);
     	}
     }

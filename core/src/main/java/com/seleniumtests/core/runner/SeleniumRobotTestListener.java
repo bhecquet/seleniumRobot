@@ -201,12 +201,14 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 
 	@Override
 	public void onStart(ISuite suite) {
+
+    	SeleniumRobotLogger.updateLogger(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(),
+										 SeleniumTestsContextManager.getGlobalContext().getDefaultOutputDirectory()); 
+		
     	SeleniumTestsContextManager.generateApplicationPath(suite.getXmlSuite());
     	logger.info(String.format("Application %s version: %s", SeleniumTestsContextManager.getApplicationName(), SeleniumTestsContextManager.getApplicationVersion()));
     	logger.info("Core version: " + SeleniumTestsContextManager.getCoreVersion());
-    	
-    	SeleniumRobotLogger.updateLogger(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(),
-										SeleniumTestsContextManager.getGlobalContext().getDefaultOutputDirectory()); 
+
 		
 	}
 
