@@ -445,4 +445,12 @@ public class TestDriver extends GenericTest {
 		Assert.assertEquals(testPage.divByClass.findElements(By.className("someClass")).size(), 4);
 	}
 	
+	/**
+	 * Check that if no index is specified, first element is get
+	 */
+	@Test(groups={"it"})
+	public void testFindLastElement() {
+		Assert.assertEquals(testPage.multiElementLastText.getValue(), "last text field");
+	}
+	
 }

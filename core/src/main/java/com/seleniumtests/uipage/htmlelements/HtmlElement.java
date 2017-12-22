@@ -96,7 +96,7 @@ public class HtmlElement implements WebElement, Locatable, HasIdentity {
      */
     
     public HtmlElement(final String label, final By by) {
-    	this(label, by, -1);
+    	this(label, by, (Integer)null);
     }
     
     /**
@@ -106,6 +106,9 @@ public class HtmlElement implements WebElement, Locatable, HasIdentity {
      * @param   by     - By type
      * @param	index  - index of the element to find. In this case, robot will search the Nth element corresponding to
      * 					 the By parameter. Equivalent to new HtmlElement(label, by).findElements().get(N)
+     * 					 If index is null, use <code>driver.findElement(By)</code> intenally
+     *  				 If index is negative, search from the last one (-1)
+     *  			     If index is HtmlElement.FIRST_VISIBLE, search the first visible element
      *
      * @sample  {@code new HtmlElement("UserId", By.id(userid), 2)}
      */
@@ -117,7 +120,7 @@ public class HtmlElement implements WebElement, Locatable, HasIdentity {
     }
     
     public HtmlElement(final String label, final By by, final FrameElement frame) {
-    	this(label, by, frame, -1);
+    	this(label, by, frame, null);
     }
     
     public HtmlElement(final String label, final By by, final FrameElement frame, final Integer index) {
@@ -128,7 +131,7 @@ public class HtmlElement implements WebElement, Locatable, HasIdentity {
     }
     
     public HtmlElement(final String label, final By by, final HtmlElement parent) {
-    	this(label, by, parent, -1);
+    	this(label, by, parent, null);
     }
     
     public HtmlElement(final String label, final By by, final HtmlElement parent, final Integer index) {
@@ -374,14 +377,14 @@ public class HtmlElement implements WebElement, Locatable, HasIdentity {
         if (parent != null) {
         	parent.findElement();
         	enterFrame();
-        	if (elementIndex < 0) {
+        	if (elementIndex == null) {
         		element = parent.element.findElement(by);
         	} else {
         		element = getElementByIndex(parent.element.findElements(by));
         	}
         } else {
         	enterFrame();
-	        if (elementIndex < 0) {
+	        if (elementIndex == null) {
 	        	element = driver.findElement(by);
 	        } else {
 	        	element = getElementByIndex(driver.findElements(by));
@@ -411,7 +414,12 @@ public class HtmlElement implements WebElement, Locatable, HasIdentity {
 				}
 			}
 			throw new WebDriverException("no visible element has been found for " + by.toString());
+    	} else if (elementIndex < 0) {
+    		return allElements.get(allElements.size() + elementIndex);
 		} else {
+			if (elementIndex == null) {
+				elementIndex = 0;
+			}
 			return allElements.get(elementIndex);
 		}
     }
