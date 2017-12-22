@@ -675,10 +675,16 @@ public class TestSeleniumTestContext extends MockitoTest {
 	}
 	
 	@Test(groups="ut context")
-	public void testOutputDirectory(final ITestContext testNGCtx, final XmlTest xmlTest) {
+	public void testOutputDirectoryAbsolutePath(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setOutputDirectory("/home/user/test-output", testNGCtx);
 		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), "/home/user/test-output");
+	}
+	@Test(groups="ut context")
+	public void testOutputDirectoryRelativePath(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setOutputDirectory("test-output/someSubdir", testNGCtx);
+		Assert.assertTrue(SeleniumTestsContextManager.getThreadContext().getOutputDirectory().endsWith("core/test-output/someSubdir"));
 	}
 	@Test(groups="ut context")
 	public void testOutputDirectoryFromSystem(final ITestContext testNGCtx, final XmlTest xmlTest) {
