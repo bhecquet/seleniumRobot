@@ -68,6 +68,12 @@ public class DriverTestPage extends PageObject {
 	public static final TextFieldElement uploadedFile = new TextFieldElement("uploadedFile", By.id("uploadedFile"));
 	public static final TextFieldElement textSelectedId = new TextFieldElement("", By.id("textSelectedId"));
 	public static final TextFieldElement textSelectedText = new TextFieldElement("", By.id("textSelectedText"));
+	public static final TextFieldElement multiElementFirstText = new TextFieldElement("", By.className("someClass"));
+	public static final TextFieldElement multiElementFirstTextWithParent = new HtmlElement("", By.className("otherClass")).findTextFieldElement(By.className("someClass"));
+	public static final TextFieldElement multiElementLastText = new TextFieldElement("", By.className("someClass"), -1);
+	public static final TextFieldElement multiElementFirstVisibleText = new TextFieldElement("", By.className("someClass"), HtmlElement.FIRST_VISIBLE);
+	public static final TextFieldElement multiElementFirstVisibleTextWithParent = new HtmlElement("", By.className("otherClass"), HtmlElement.FIRST_VISIBLE).findTextFieldElement(By.className("someClass"));
+	public static final HtmlElement divByClass = new HtmlElement("", By.className("otherClass"), HtmlElement.FIRST_VISIBLE);
 	
 	// Elements inside others
 	public static final TextFieldElement textElement2 = new HtmlElement("", By.id("parentDiv")).findTextFieldElement(By.name("textField"));
@@ -103,6 +109,7 @@ public class DriverTestPage extends PageObject {
 	public static final SelectList selectListIFrame = new SelectList("list", By.id("selectIFrame"), iframe);
 	public static final HtmlElement optionOfSelectListIFrame = selectListIFrame.findElement(By.tagName("option"));
 	public static final Table tableIFrame = new Table("table", By.id("tableIframe"), iframe);
+	public static final HtmlElement rows = new HtmlElement("", By.tagName("tr"), iframe);
 	public static final LabelElement labelIFrame = new LabelElement("label", By.id("labelIFrame"), iframe);
 	
 	public static final TextFieldElement textElementSubIFrame = new TextFieldElement("Text", By.id("textInIFrameWithValue2"), subIframe);

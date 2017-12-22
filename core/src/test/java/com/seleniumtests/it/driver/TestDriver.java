@@ -401,4 +401,48 @@ public class TestDriver extends GenericTest {
 		Assert.assertEquals(testPage.uploadedFile.getAttribute("value"), "config.ini");
 	}
 	
+	/**
+	 * Check that if no index is specified, first element is get
+	 */
+	@Test(groups={"it"})
+	public void testFindFirstElement() {
+		Assert.assertEquals(testPage.multiElementFirstText.getValue(), "0 text field");
+	}
+	
+	/**
+	 * Check that if FIRST_VISIBLE is specified, first visible element is returned
+	 * refresh page to be sure element has not been made visible
+	 */
+	@Test(groups={"it"})
+	public void testFindFirstVisibleElement() {
+		driver.navigate().refresh();
+		Assert.assertEquals(testPage.multiElementFirstVisibleText.getValue(), "second text field");
+	}
+	
+	/**
+	 * Check that if no index is specified, first element is get
+	 */
+	@Test(groups={"it"})
+	public void testFindFirstElementWithParent() {
+		Assert.assertEquals(testPage.multiElementFirstTextWithParent.getValue(), "0 text field");
+	}
+	
+	/**
+	 * Check that if FIRST_VISIBLE is specified, first visible element is returned. In this case, FIRST_VISIBLE has only been applied to the parent element
+	 * refresh page to be sure element has not been made visible
+	 */
+	@Test(groups={"it"})
+	public void testFindFirstVisibleElementWithParent() {
+		driver.navigate().refresh();
+		Assert.assertEquals(testPage.multiElementFirstVisibleTextWithParent.getValue(), "first text field");
+	}
+	
+	/**
+	 * get findElements inside an other one
+	 */
+	@Test(groups={"it"})
+	public void testFindElementsUnderAnOtherElement() {
+		Assert.assertEquals(testPage.divByClass.findElements(By.className("someClass")).size(), 4);
+	}
+	
 }

@@ -16,6 +16,7 @@
  */
 package com.seleniumtests.it.driver;
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.testng.Assert;
@@ -121,6 +122,16 @@ public class TestFrame extends GenericTest {
 	@Test(groups={"it"})
 	public void testIsElementPresentInFrame() {
 		Assert.assertTrue(testPage.tableIFrame.isElementPresent());
+	}
+	
+	@Test(groups={"it"})
+	public void testFindElements() {
+		Assert.assertEquals(testPage.rows.findElements().size(), 2);
+	}
+	
+	@Test(groups={"it"})
+	public void testFindElementsBy() {
+		Assert.assertEquals(testPage.tableIFrame.findElements(By.tagName("tr")).size(), 2);
 	}
 	
 	@Test(groups={"it"})

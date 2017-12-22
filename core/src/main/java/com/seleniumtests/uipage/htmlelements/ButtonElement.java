@@ -28,11 +28,11 @@ public class ButtonElement extends HtmlElement {
     	super(label, by, parent);
     }
     
-    public ButtonElement(final String label, final By by, final HtmlElement parent, final int index) {
+    public ButtonElement(final String label, final By by, final HtmlElement parent, final Integer index) {
     	super(label, by, parent, index);
     }
     
-    public ButtonElement(final String label, final By by, final int index) {
+    public ButtonElement(final String label, final By by, final Integer index) {
     	super(label, by, index);
     }
     
@@ -40,7 +40,7 @@ public class ButtonElement extends HtmlElement {
     	super(label, by, frame);
     }
     
-    public ButtonElement(final String label, final By by, final FrameElement frame, final int index) {
+    public ButtonElement(final String label, final By by, final FrameElement frame, final Integer index) {
     	super(label, by, frame, index);
     }
 
