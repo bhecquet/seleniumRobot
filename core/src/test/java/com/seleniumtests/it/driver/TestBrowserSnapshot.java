@@ -38,16 +38,17 @@ public class TestBrowserSnapshot extends MockitoTest {
 	
 	private static WebDriver driver;
 	private DriverTestPage testPage;
+	private final String browserName = "firefox";
 	
 	@BeforeMethod(groups={"it"})
 	public void initDriver(final ITestContext testNGCtx) throws Exception {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setExplicitWaitTimeout(2);
-		SeleniumTestsContextManager.getThreadContext().setBrowser("firefox");
+		SeleniumTestsContextManager.getThreadContext().setBrowser(browserName);
 		SeleniumTestsContextManager.getThreadContext().setSnapshotBottomCropping(0);
 		SeleniumTestsContextManager.getThreadContext().setSnapshotTopCropping(0);
-		SeleniumTestsContextManager.getThreadContext().setWebDriverGrid("http://127.0.0.1:4444/wd/hub");
-		SeleniumTestsContextManager.getThreadContext().setRunMode("grid");
+//		SeleniumTestsContextManager.getThreadContext().setWebDriverGrid("http://127.0.0.1:4444/wd/hub");
+//		SeleniumTestsContextManager.getThreadContext().setRunMode("grid");
 //		SeleniumTestsContextManager.getThreadContext().setBrowser("firefox");
 //		SeleniumTestsContextManager.getThreadContext().setFirefoxBinary("path to firefox");
 		testPage = new DriverTestPage(true);
@@ -359,5 +360,4 @@ public class TestBrowserSnapshot extends MockitoTest {
 		
 		Assert.assertNotNull(screenshot.getImagePath());
 	}
-	
 }
