@@ -91,6 +91,7 @@ public class SeleniumRobotVariableServerConnector extends SeleniumRobotServerCon
 	 * Create or update variable on the server. This helps centralizing some configurations during the test
 	 * If this is an existing variable, only update the value. Else, create it with current environment, application, version.
 	 * A regular variable with a changed value will be add as a custom variable. There should be no way to update a regular variable from seleniumRobot.
+	 * Variable is created with "internal" flag set
 	 * @return
 	 */
 	public TestVariable upsertVariable(TestVariable variable) {
@@ -105,7 +106,8 @@ public class SeleniumRobotVariableServerConnector extends SeleniumRobotServerCon
 						.field("reservable", false)
 						.field("environment", environmentId)
 						.field("application", applicationId)
-						.field("version", versionId));
+						.field("version", versionId)
+						.field("internal", true));
 				
 				return TestVariable.fromJsonObject(variableJson);
 				

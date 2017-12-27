@@ -26,6 +26,7 @@ import static org.mockito.Mockito.verify;
 import java.io.File;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.velocity.app.VelocityEngine;
 import org.testng.Assert;
 import org.testng.ITestContext;
@@ -216,6 +217,45 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		Assert.assertTrue(detailedReportContent.contains("<div class=\"box collapsed-box success\"><div class=\"box-header with-border\"><button type=\"button\" class=\"btn btn-box-tool\" data-widget=\"collapse\"><i class=\"fa fa-plus\"></i></button> Execution logs"));
 		Assert.assertTrue(detailedReportContent.contains("<div class=\"message-log\">Test is OK</div>"));
 		
+	}
+	
+	
+	/**
+	 * Check all actions done with driver are correctly displayed. This indirectly test the LogAction aspect
+	 * 
+	 * @param testContext
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testReportContainsDriverActions(ITestContext testContext) throws Exception {
+		
+		reporter = new SeleniumTestsReporter2();
+		executeSubTest(new String[] {"com.seleniumtests.it.reporter.StubTestClassForDriverTest"});
+		
+		// read 'testDriver' report. This contains calls to HtmlElement actions
+		String detailedReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport-1.html"));
+		detailedReportContent = detailedReportContent.replace("\n", "").replace("\r",  "").replaceAll(">\\s+<", "><");
+		
+		Assert.assertTrue(detailedReportContent.contains("<li>sendKeys on TextFieldElement Text, by={By.id: text2} with args: (true, true, [a text,])</li>"));
+		Assert.assertTrue(detailedReportContent.contains("<li>click on ButtonElement Reset, by={By.id: button2} </li>"));
+		
+		// check that only on reference to 'click' is present for this buttonelement. This means that only the replayed action has been logged, not the ButtonElement.click() one
+		Assert.assertEquals(StringUtils.countMatches(detailedReportContent, "click on"), 1);
+		
+		// read the 'testDriverNativeActions' test result to see if native actions are also logged (overrideSeleniumNativeAction is true)
+		String detailedReportContent2 = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport-2.html"));
+		detailedReportContent = detailedReportContent2.replace("\n", "").replace("\r",  "").replaceAll(">\\s+<", "><");
+		
+		Assert.assertTrue(detailedReportContent2.contains("<li>sendKeys on HtmlElement , by={By.id: text2} with args: (true, true, [some text,])</li>"));
+		Assert.assertTrue(detailedReportContent2.contains("<li>click on HtmlElement , by={By.id: button2} </li>"));
+		
+		// read the 'testDriverNativeActionsWithoutOverride' test result to see if native actions are not logged (overrideSeleniumNativeAction is false)
+		String detailedReportContent3 = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport-3.html"));
+		detailedReportContent = detailedReportContent3.replace("\n", "").replace("\r",  "").replaceAll(">\\s+<", "><");
+		
+		Assert.assertFalse(detailedReportContent3.contains("<li>sendKeys on HtmlElement , by={By.id: text2} with args: (true, true, [some text,])</li>"));
+		Assert.assertFalse(detailedReportContent3.contains("<li>click on HtmlElement , by={By.id: button2} </li>"));
+				
 	}
 	
 	/**

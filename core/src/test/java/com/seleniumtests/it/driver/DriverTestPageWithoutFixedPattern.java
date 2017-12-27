@@ -25,6 +25,11 @@ import com.seleniumtests.uipage.htmlelements.PictureElement;
 import com.seleniumtests.uipage.htmlelements.Table;
 import com.seleniumtests.uipage.htmlelements.TextFieldElement;
 
+/**
+ * Same as DriverTestPage, but colored rows are not displayed in this page
+ * @author s047432
+ *
+ */
 public class DriverTestPageWithoutFixedPattern extends PageObject {
 	
 	public static final TextFieldElement textElement = new TextFieldElement("Text", By.id("text2"));
