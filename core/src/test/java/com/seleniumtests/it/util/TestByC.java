@@ -70,6 +70,12 @@ public class TestByC extends GenericTest {
 	}
 	
 	@Test(groups={"it"})
+	public void testFindElementByCustomLabelForward() {
+		new TextFieldElement("", ByC.labelForward("Test select", "input", "h3")).sendKeys("element found by h3 tag");
+		Assert.assertEquals(testPage.textSelectedId.getValue(), "element found by h3 tag");
+	}
+	
+	@Test(groups={"it"})
 	public void testFindElementByLabelForwardWithoutTagName() {
 		new TextFieldElement("", ByC.labelForward("By id forward")).sendKeys("element found by label without tagname");
 		Assert.assertEquals(testPage.textSelectedId.getValue(), "element found by label without tagname");
@@ -85,11 +91,23 @@ public class TestByC extends GenericTest {
 		new TextFieldElement("", ByC.partialLabelForward("By id for", "input")).sendKeys("element found by partial label");
 		Assert.assertEquals(testPage.textSelectedId.getValue(), "element found by partial label");
 	}
+
+	@Test(groups={"it"})
+	public void testFindElementByCustomPartialLabelForward() {
+		new TextFieldElement("", ByC.partialLabelForward("Test sele", "input", "h3")).sendKeys("element found by partial h3 tag");
+		Assert.assertEquals(testPage.textSelectedId.getValue(), "element found by partial h3 tag");
+	}
 	
 	@Test(groups={"it"})
 	public void testFindElementByLabelBackward() {
 		new TextFieldElement("", ByC.labelBackward("By id backward", "input")).sendKeys("element found by label backward");
 		Assert.assertEquals(testPage.textSelectedText.getValue(), "element found by label backward");
+	}
+
+	@Test(groups={"it"})
+	public void testFindElementByCustomLabelBackward() {
+		new TextFieldElement("", ByC.labelBackward("Test select Multiple", "input", "h3")).sendKeys("element found by h3 tag backward");
+		Assert.assertEquals(testPage.textSelectedText.getValue(), "element found by h3 tag backward");
 	}
 	
 	@Test(groups={"it"})
@@ -107,6 +125,12 @@ public class TestByC extends GenericTest {
 	public void testFindElementByPartialLabelBackward() {
 		new TextFieldElement("", ByC.partialLabelBackward("By id back", "input")).sendKeys("element found by partial label backward");
 		Assert.assertEquals(testPage.textSelectedText.getValue(), "element found by partial label backward");
+	}
+
+	@Test(groups={"it"})
+	public void testFindElementByPartialCustomLabelBackward() {
+		new TextFieldElement("", ByC.partialLabelBackward("Test select Mult", "input", "h3")).sendKeys("element found by h3 partial tag backward");
+		Assert.assertEquals(testPage.textSelectedText.getValue(), "element found by h3 partial tag backward");
 	}
 
 	@Test(groups={"it"})

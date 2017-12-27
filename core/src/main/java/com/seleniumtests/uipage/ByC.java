@@ -23,7 +23,7 @@ public class ByC extends By {
 	 * @return
 	 */
 	public static ByC labelForward(final String label) {
-		return labelForward(label, "input", false);
+		return labelForward(label, null, false, null);
 	}
 	
 	/**
@@ -33,7 +33,19 @@ public class ByC extends By {
 	 * @return
 	 */
 	public static ByC labelForward(final String label, final String tagName) {
-		return labelForward(label, tagName, false);
+		return labelForward(label, tagName, false, null);
+	}
+	
+	/**
+	 *  Search first element for {@code tagName} after label referenced by partial name
+	 * Use case is {@code <h2>some label</h2><input type="text" value="" />}
+	 * @param label			label to search
+	 * @param tagName		tag name after this label. The element we really search
+	 * @param labelTagName  if label is not in a {@code <label>} tag, define this tag name
+	 * @return
+	 */
+	public static ByC labelForward(final String label, final String tagName, final String labelTagName) {
+		return labelForward(label, tagName, false, labelTagName);
 	}
 
 	/**
@@ -42,21 +54,34 @@ public class ByC extends By {
 	 * @return
 	 */
 	public static ByC partialLabelForward(final String label) {
-		return labelForward(label, "input", true);
+		return labelForward(label, null, true, null);
 	}
 	
 	/**
-	 * Search first element for <code>tagName</code> after label referenced by partial name
+	 * Search first element for {@code tagName} after label referenced by partial name
+	 * Use case is {@code <label>some label</label><input type="text" value="" />}
 	 * @param label
 	 * @param tagName
 	 * @return
 	 */
 	public static ByC partialLabelForward(final String label, final String tagName) {
-		return labelForward(label, tagName, true);
+		return labelForward(label, tagName, true, null);
+	}
+	
+	/**
+	 *  Search first element for {@code tagName} after label referenced by partial name
+	 * Use case is {@code <h2>some label</h2><input type="text" value="" />}
+	 * @param label			label to search
+	 * @param tagName		tag name after this label. The element we really search
+	 * @param labelTagName  if label is not in a {@code <label>} tag, define this tag name
+	 * @return
+	 */
+	public static ByC partialLabelForward(final String label, final String tagName, final String labelTagName) {
+		return labelForward(label, tagName, true, labelTagName);
 	}
 
-	private static ByC labelForward(final String label, String tagName, boolean partial) {
-		return new ByLabelForward(label, tagName, partial);
+	private static ByC labelForward(final String label, String tagName, boolean partial, final String labelTagName) {
+		return new ByLabelForward(label, tagName, partial, labelTagName);
 	}
 	
 	/**
@@ -65,7 +90,7 @@ public class ByC extends By {
 	 * @return
 	 */
 	public static ByC labelBackward(final String label) {
-		return labelBackward(label, "input", false);
+		return labelBackward(label, null, false, null);
 	}
 	
 	/**
@@ -75,7 +100,10 @@ public class ByC extends By {
 	 * @return
 	 */
 	public static ByC labelBackward(final String label, final String tagName) {
-		return labelBackward(label, tagName, false);
+		return labelBackward(label, tagName, false, null);
+	}
+	public static ByC labelBackward(final String label, final String tagName, final String labelTagName) {
+		return labelBackward(label, tagName, false, labelTagName);
 	}
 
 	/**
@@ -84,21 +112,34 @@ public class ByC extends By {
 	 * @return
 	 */
 	public static ByC partialLabelBackward(final String label) {
-		return labelBackward(label, "input", true);
+		return labelBackward(label, null, true, null);
 	}
 	
 	/**
 	 * Search first element for <code>tagName</code> before label referenced by partial name
+	 * Use case is {@code <input type="text" value="" /><label>some label<label>}
 	 * @param label
 	 * @param tagName
 	 * @return
 	 */
 	public static ByC partialLabelBackward(final String label, final String tagName) {
-		return labelBackward(label, tagName, true);
+		return labelBackward(label, tagName, true, null);
 	}
 	
-	private static ByC labelBackward(final String label, String tagName, boolean partial) {
-		return new ByLabelBackward(label, tagName, partial);
+	/**
+	 *  Search first element for {@code tagName} before label referenced by partial name
+	 * Use case is {@code <input type="text" value="" /><h2>some label</h2>}
+	 * @param label			label to search
+	 * @param tagName		tag name after this label. The element we really search
+	 * @param labelTagName  if label is not in a {@code <label>} tag, define this tag name
+	 * @return
+	 */
+	public static ByC partialLabelBackward(final String label, final String tagName, final String labelTagName) {
+		return labelBackward(label, tagName, true, labelTagName);
+	}
+	
+	private static ByC labelBackward(final String label, String tagName, boolean partial, final String labelTagName) {
+		return new ByLabelBackward(label, tagName, partial, labelTagName);
 	}
 	
 	/**
@@ -135,29 +176,35 @@ public class ByC extends By {
 
 		private final String label;
 		private final String tagName;
+		private final String labelTagName; // tag of the label we are searching. default is label
 		private final boolean partial;
 
-		public ByLabelForward(String label, String tagName, boolean partial) {
+		/**
+		 * 
+		 * @param label			Content of the label to search
+		 * @param tagName		Tag name of the element following label, we want to get. Default is "input"
+		 * @param partial		do we search for partial of full label name
+		 * @param labelTagName	tag name of the label element. Default is "label"
+		 */
+		public ByLabelForward(String label, String tagName, boolean partial, String labelTagName) {
 			
 			if (label == null) {
 				throw new IllegalArgumentException("Cannot find elements with a null label attribute.");
 			}
-			if (tagName == null) {
-				tagName = "input";
-			}
-			
+
 			this.label = label;
-			this.tagName = tagName;
+			this.tagName = tagName == null ? "input": tagName;
 			this.partial = partial;
+			this.labelTagName = labelTagName == null ? "label": labelTagName;
 		}
 
 		@Override
 		public List<WebElement> findElements(SearchContext context) {
 			String escapedLabel = escapeQuotes(label);
 			if (partial) {
-				return ((FindsByXPath) context).findElementsByXPath(String.format("//label[contains(text(),%s)]/following::%s", escapedLabel, tagName));
+				return ((FindsByXPath) context).findElementsByXPath(String.format("//%s[contains(text(),%s)]/following::%s", labelTagName, escapedLabel, tagName));
 			} else {
-				return ((FindsByXPath) context).findElementsByXPath(String.format("//label[text() = %s]/following::%s", escapedLabel, tagName));
+				return ((FindsByXPath) context).findElementsByXPath(String.format("//%s[text() = %s]/following::%s", labelTagName, escapedLabel, tagName));
 			}
 		}
 
@@ -165,9 +212,9 @@ public class ByC extends By {
 		public WebElement findElement(SearchContext context) {
 			String escapedLabel = escapeQuotes(label);
 			if (partial) {
-				return ((FindsByXPath) context).findElementByXPath(String.format("//label[contains(text(),%s)]/following::%s", escapedLabel, tagName));
+				return ((FindsByXPath) context).findElementByXPath(String.format("//%s[contains(text(),%s)]/following::%s", labelTagName, escapedLabel, tagName));
 			} else {
-				return ((FindsByXPath) context).findElementByXPath(String.format("//label[text() = %s]/following::%s", escapedLabel, tagName));
+				return ((FindsByXPath) context).findElementByXPath(String.format("//%s[text() = %s]/following::%s", labelTagName, escapedLabel, tagName));
 			}
 		}
 
@@ -184,28 +231,34 @@ public class ByC extends By {
 		private String label;
 		private final String tagName;
 		private final boolean partial;
+		private final String labelTagName; // tag of the label we are searching. default is label
 
-		public ByLabelBackward(String label, String tagName, boolean partial) {
+		/**
+		 * 
+		 * @param label			Content of the label to search
+		 * @param tagName		Tag name of the element following label, we want to get. Default is "input"
+		 * @param partial		do we search for partial of full label name
+		 * @param labelTagName	tag name of the label element. Default is "label"
+		 */
+		public ByLabelBackward(String label, String tagName, boolean partial, String labelTagName) {
 			
 			if (label == null) {
 				throw new IllegalArgumentException("Cannot find elements with a null label attribute.");
 			}
-			if (tagName == null) {
-				tagName = "input";
-			}
 			
 			this.label = label;
-			this.tagName = tagName;
+			this.tagName = tagName == null ? "input": tagName;
 			this.partial = partial;
+			this.labelTagName = labelTagName == null ? "label": labelTagName;
 		}
 		
 		@Override
 		public List<WebElement> findElements(SearchContext context) {
 			String escapedLabel = escapeQuotes(label);
 			if (partial) {
-				return ((FindsByXPath) context).findElementsByXPath(String.format("//label[contains(text(),%s)]/preceding::%s", escapedLabel, tagName));
+				return ((FindsByXPath) context).findElementsByXPath(String.format("//%s[contains(text(),%s)]/preceding::%s", labelTagName, escapedLabel, tagName));
 			} else {
-				return ((FindsByXPath) context).findElementsByXPath(String.format("//label[text() = %s]/preceding::%s", escapedLabel, tagName));
+				return ((FindsByXPath) context).findElementsByXPath(String.format("//%s[text() = %s]/preceding::%s", labelTagName, escapedLabel, tagName));
 			}
 		}
 		
@@ -214,9 +267,9 @@ public class ByC extends By {
 			String escapedLabel = escapeQuotes(label);
 			List<WebElement> elements;
 			if (partial) {
-				elements = ((FindsByXPath) context).findElementsByXPath(String.format("//label[contains(text(),%s)]/preceding::%s", escapedLabel, tagName));
+				elements = ((FindsByXPath) context).findElementsByXPath(String.format("//%s[contains(text(),%s)]/preceding::%s", labelTagName, escapedLabel, tagName));
 			} else {
-				elements = ((FindsByXPath) context).findElementsByXPath(String.format("//label[text() = %s]/preceding::%s", escapedLabel, tagName));
+				elements = ((FindsByXPath) context).findElementsByXPath(String.format("//%s[text() = %s]/preceding::%s", labelTagName, escapedLabel, tagName));
 			}
 			List<WebElement> elementsReverse = elements.subList(0, elements.size());
 			Collections.reverse(elementsReverse);
