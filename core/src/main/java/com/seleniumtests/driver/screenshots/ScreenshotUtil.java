@@ -150,6 +150,11 @@ public class ScreenshotUtil {
     		return;
     	}
     	
+    	// issue #34: prevent getting image from HTMLUnit driver
+    	if (SeleniumTestsContextManager.getThreadContext().getBrowser() == BrowserType.HTMLUNIT) {
+            return;
+        }
+    	
     	((CustomEventFiringWebDriver)driver).scrollTop();
     	String tmpCap = getOutputDirectory() + "/" + SCREENSHOT_DIR + "/" + HashCodeGenerator.getRandomHashCode("tmp") + ".png";
     	
