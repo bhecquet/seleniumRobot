@@ -214,7 +214,11 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 
 	@Override
 	public void onFinish(ISuite suite) {
-        logger.info("Test Suite Execution Time: " + (new Date().getTime() - start.getTime()) / 1000 / 60 + " minutes.");
+		if (start != null) {
+			logger.info("Test Suite Execution Time: " + (new Date().getTime() - start.getTime()) / 1000 / 60 + " minutes.");
+		} else {
+			logger.warn("No test executed");
+		}
         try {
 			SeleniumRobotLogger.parseLogFile();
 		} catch (IOException e) {
