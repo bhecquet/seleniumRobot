@@ -26,7 +26,6 @@ import org.openqa.selenium.interactions.Keyboard;
 import org.openqa.selenium.interactions.Mouse;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.RemoteWebElement;
-import org.openqa.selenium.support.events.EventFiringWebDriver;
 import org.openqa.selenium.support.ui.Select;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
@@ -45,8 +44,8 @@ import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.MobileElement;
 
 /**
- * Test class for checking calls to a standard HTMLElement without using any driver
- * Here, we'll concentrate on verifying that refresh calls are done before any action on element
+ * Test class for checking seleniumNativeAction override
+ * When this option is true, we should have the selenium standard behavior + replay and logging (checked elsewhere) 
  * @author behe
  *
  */

@@ -276,34 +276,5 @@ public class LogAction {
 			.replaceFirst(",?\\s?value=", "")
 			.replaceFirst("\\)$", "");
 	}
-	
-	/**
-	 * Check whether this action has directly been performed on the HtmlElement (e.g: click)
-	 * or through an other type of element (e.g: clic on LinkElement, redirected to HtmlElement)
-	 * In this last case, do not log action as it has already been logged by the specific type of 
-	 * element
-	 * @param stack
-	 * @return
-	 */
-	private boolean isHtmlElementDirectlyCalled(StackTraceElement[] stack) {
-		String stackClass = null;
-		boolean specificElementFound = false;
-		boolean htmlElementFound = false;
-		
-		for(int i=0; i < stack.length; i++) {
-			
-			// when using aspects, class name may contain a "$", remove everything after that symbol
-			stackClass = stack[i].getClassName().split("\\$")[0];
-			if (stackClass.equals("com.seleniumtests.uipage.htmlelements.HtmlElement")) {
-				htmlElementFound = true;
-			} else if (stackClass.startsWith("com.seleniumtests.uipage.htmlelements.")) {
-				specificElementFound = true;
-			}
-		}
-		if (htmlElementFound && specificElementFound) {
-			return false;
-		} else {
-			return true;
-		}
-	}
+
 }

@@ -127,6 +127,16 @@ public class DriverTestPage extends PageObject {
     	return By.id(id);
     }
     
+    public DriverTestPage _writeSomething() {
+    	textElement.sendKeys("a text");
+    	return this;
+    }
+    
+    public DriverTestPage _reset() {
+    	resetButton.click();
+    	return this;
+    }
+    
     public static String getPageUrl() {
     	if (SeleniumTestsContextManager.getThreadContext().getBrowser() == BrowserType.FIREFOX) {
 			return "file://" + Thread.currentThread().getContextClassLoader().getResource("tu/test.html").getFile();

@@ -23,12 +23,14 @@ public class DriverTestPageNativeActions extends PageObject {
         super(textElement, openPageURL ? getPageUrl() : null);
     }
     
-    public void sendKeys() {
+    public DriverTestPageNativeActions sendKeys() {
     	driver.findElement(By.id("text2")).sendKeys("some text");
+    	return this;
     }
     
-    public void reset() {
+    public DriverTestPageNativeActions reset() {
     	driver.findElement(By.id("button2")).click();
+    	return this;
     }
     
     public void select() {
