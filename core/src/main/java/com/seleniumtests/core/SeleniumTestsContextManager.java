@@ -21,10 +21,9 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
@@ -49,6 +48,7 @@ public class SeleniumTestsContextManager {
 	private static String featuresPath;
 	private static String configPath;
 	private static String applicationName;
+	private static String applicationNameWithVersion;
 	private static String applicationVersion;
 	private static String coreVersion;
 	private static Boolean deployedMode;
@@ -295,16 +295,25 @@ public class SeleniumTestsContextManager {
 		
 		// in case launching unit test from eclipse, a temp file is generated outside the standard folder structure
 		// APPLICATION_NAME and DATA_PATH must be rewritten
+		// application name is get from the testNG file path (the subdir name after 'data')
 		try {
-			applicationName = xmlSuite.getFileName().replace(File.separator, "/").split("/"+ DATA_FOLDER_NAME + "/")[1].split("/")[0];
+			applicationNameWithVersion = xmlSuite.getFileName().replace(File.separator, "/").split("/"+ DATA_FOLDER_NAME + "/")[1].split("/")[0];
+			Pattern appVersion = Pattern.compile("([a-zA-Z0-9-]+)(_.*)?");
+			Matcher appVersionMatcher = appVersion.matcher(applicationNameWithVersion);
+			if (appVersionMatcher.matches()) {
+				applicationName = appVersionMatcher.group(1);
+			} else {
+				applicationName = applicationNameWithVersion;
+			}
 			dataPath = xmlSuite.getFileName().replace(File.separator, "/").split("/"+ DATA_FOLDER_NAME + "/")[0] + "/" + DATA_FOLDER_NAME + "/";
 		} catch (IndexOutOfBoundsException e) {
 			applicationName = "core";
+			applicationNameWithVersion = "core";
 			dataPath = Paths.get(rootPath, DATA_FOLDER_NAME).toString();
 		}
 		
-		featuresPath = Paths.get(dataPath, applicationName, "features").toString();
-		configPath = Paths.get(dataPath, applicationName, "config").toString();
+		featuresPath = Paths.get(dataPath, applicationNameWithVersion, "features").toString();
+		configPath = Paths.get(dataPath, applicationNameWithVersion, "config").toString();
 		applicationVersion = readApplicationVersion();
 		coreVersion = readCoreVersion();
 		
@@ -332,6 +341,10 @@ public class SeleniumTestsContextManager {
 
 	public static String getApplicationName() {
 		return applicationName;
+	}
+
+	public static String getApplicationNameWithVersion() {
+		return applicationNameWithVersion;
 	}
 
 	public static String getApplicationVersion() {
