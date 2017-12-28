@@ -20,44 +20,33 @@ import org.openqa.selenium.By;
 
 import com.seleniumtests.uipage.ReplayOnError;
 
-public class TextFieldElement extends HtmlElement {
-    public TextFieldElement(final String label, final By by) {
+public class FileUploadElement extends HtmlElement {
+    public FileUploadElement(final String label, final By by) {
         super(label, by);
     }
     
-    public TextFieldElement(final String label, final By by, final HtmlElement parent) {
+    public FileUploadElement(final String label, final By by, final HtmlElement parent) {
     	super(label, by, parent);
     }
     
-    public TextFieldElement(final String label, final By by, final Integer index) {
+    public FileUploadElement(final String label, final By by, final Integer index) {
     	super(label, by, index);
     }
     
-    public TextFieldElement(final String label, final By by, final HtmlElement parent, final Integer index) {
+    public FileUploadElement(final String label, final By by, final HtmlElement parent, final Integer index) {
     	super(label, by, parent, index);
     }
     
-    public TextFieldElement(final String label, final By by, final FrameElement frame) {
+    public FileUploadElement(final String label, final By by, final FrameElement frame) {
     	super(label, by, frame);
     }
     
-    public TextFieldElement(final String label, final By by, final FrameElement frame, final Integer index) {
+    public FileUploadElement(final String label, final By by, final FrameElement frame, final Integer index) {
     	super(label, by, frame, index);
     }
-
-    @Override
-    @ReplayOnError
-    public void clear() {
-        findElement();
-        if (!"file".equalsIgnoreCase(element.getAttribute("type"))) {
-            element.clear();
-        }
-    }
     
-
     /**
      * Sends the indicated CharSequence to the WebElement.
-     * HtmlElement version do not click on element before sending keys
      *
      * @param 	clear		if true, clear field before writing
      * @param	blurAfter	if true, do blur() after sendKeys has been done
@@ -67,24 +56,6 @@ public class TextFieldElement extends HtmlElement {
     @ReplayOnError
     public void sendKeys(final boolean clear, final boolean blurAfter, CharSequence... keysToSend) {
         findElement(true);
-        
-        if (clear) {
-        	element.clear();
-        } 
-        element.click();
         element.sendKeys(keysToSend);
-        
-        if (blurAfter) {
-        	blur(); 
-        }
-    }
-    
-    public void type(final String keysToSend) {
-        sendKeys(keysToSend);
-    }
-
-    public void clearAndType(final String keysToSend) {
-        clear();
-        type(keysToSend);
     }
 }

@@ -23,6 +23,7 @@ import org.openqa.selenium.UnsupportedCommandException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.remote.LocalFileDetector;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
 import com.seleniumtests.connectors.selenium.SeleniumGridConnector;
@@ -150,6 +151,8 @@ public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implemen
         this.setWebDriver(driver);
 
         runWebDriver();
+
+        ((RemoteWebDriver)driver).setFileDetector(new LocalFileDetector());
 
         return driver;
     }

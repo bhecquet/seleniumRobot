@@ -24,6 +24,7 @@ import com.seleniumtests.uipage.ByC;
 import com.seleniumtests.uipage.PageObject;
 import com.seleniumtests.uipage.htmlelements.ButtonElement;
 import com.seleniumtests.uipage.htmlelements.CheckBoxElement;
+import com.seleniumtests.uipage.htmlelements.FileUploadElement;
 import com.seleniumtests.uipage.htmlelements.FrameElement;
 import com.seleniumtests.uipage.htmlelements.HtmlElement;
 import com.seleniumtests.uipage.htmlelements.LabelElement;
@@ -64,7 +65,7 @@ public class DriverTestPage extends PageObject {
 	public static final PictureElement picture = new PictureElement("picture", "tu/images/logo_text_field.png", table);
 	public static final PictureElement pictureNotPresent = new PictureElement("picture", "tu/images/vosAlertes.png", table);
 	public static final TextFieldElement logoText = new TextFieldElement("logoText", By.id("logoText"));
-	public static final ButtonElement upload = new ButtonElement("upload", By.id("upload"));
+	public static final FileUploadElement upload = new FileUploadElement("upload", By.id("upload"));
 	public static final TextFieldElement uploadedFile = new TextFieldElement("uploadedFile", By.id("uploadedFile"));
 	public static final TextFieldElement textSelectedId = new TextFieldElement("", By.id("textSelectedId"));
 	public static final TextFieldElement textSelectedText = new TextFieldElement("", By.id("textSelectedText"));
