@@ -156,5 +156,25 @@ Email needs `mailServer` variable which is the URL to the server
 ### 10 upload file ###
 
 This should be avoided as much as possible, but some tests may require uploading a file to the tested application.
-With selenium, click on the button to upload the file, then you can call `uploadFile(<filePath>)` which will handle the modal opened by browser.
-The drawbak of this method is that browser MUST have the focus and thus no other test should be executed at the same time.
+
+#### The selenium way (preferred) ####
+This is the most reliable way as it's provided by selenium driver.
+
+Conditions are:
+- you have an `<input type="file" id="uploadFile" />` element
+- this element is visible (not hidden by an other one)
+
+Then, you can do either:
+- `driver.findElement(By.id("uploadFile")).sendKeys(<some file path>);`
+- `new FileUploadElement("upload", By.id("uploadFile")).sendKeys(<some file path);`
+
+Selenium will do the rest for you, locally or in grid mode
+
+#### The selenium robot way (if previous method is not possible) ####
+
+Inside your PageObject:
+- With selenium, click on the button to upload the file
+- then you can call `uploadFile(<filePath>)` which will handle the modal opened by browser.
+
+The drawbak of this method is that browser MUST have the focus and thus no other test should be executed at the same time because we are sending keyboard actions outside of selenium
+
