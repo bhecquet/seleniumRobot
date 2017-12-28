@@ -391,12 +391,30 @@ public class TestDriver extends GenericTest {
 		Assert.assertFalse(((JavascriptExecutor) driver).executeScript("return window.pageYOffset;").equals(0L));
 	}
 	
+	/**
+	 * Test file upload in case selenium method does not work. This uses the java Robot version which controls mouse and keyboard
+	 * @throws AWTException
+	 * @throws InterruptedException
+	 */
 	@Test(groups= {"it"})
-	public void testUploadFile() throws AWTException, InterruptedException {
+	public void testUploadFileWithRobot() throws AWTException, InterruptedException {
 		String path = SeleniumTestsContextManager.getConfigPath() + File.separator + "config.ini";
 		testPage.upload.click();
 		
 		testPage.uploadFile(path);
+		
+		Assert.assertEquals(testPage.uploadedFile.getAttribute("value"), "config.ini");
+	}
+	
+	/**
+	 * Test file upload with standard selenium method
+	 * @throws AWTException
+	 * @throws InterruptedException
+	 */
+	@Test(groups= {"it"})
+	public void testUploadFile() throws AWTException, InterruptedException {
+		String path = SeleniumTestsContextManager.getConfigPath() + File.separator + "config.ini";
+		testPage.upload.sendKeys(path);
 		
 		Assert.assertEquals(testPage.uploadedFile.getAttribute("value"), "config.ini");
 	}

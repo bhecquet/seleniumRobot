@@ -836,7 +836,7 @@ public class HtmlElement implements WebElement, Locatable, HasIdentity {
     	}
     }
     
-    private void blur() {
+    protected void blur() {
     	if (SeleniumTestsContextManager.isWebTest() && "input".equalsIgnoreCase(element.getTagName())) {
     		try {
     			((JavascriptExecutor) driver).executeScript("arguments[0].blur();", element);
@@ -872,7 +872,6 @@ public class HtmlElement implements WebElement, Locatable, HasIdentity {
         if (clear) {
         	element.clear();
         } 
-        element.click();
         element.sendKeys(keysToSend);
         
         if (blurAfter) {
