@@ -142,7 +142,7 @@
 							</goals>
 							<configuration>
 								<skip>${is.not.windows}</skip>
-								<url>${iedriver.url}/3.7/IEDriverServer_Win32_3.7.0.zip</url>
+								<url>${iedriver.url}/3.7/IEDriverServer_Win32_${selenium.version.short}.0.zip</url>
 								<outputDirectory>${driver.path}${os}/dir_IEDriverServer_Win32</outputDirectory>
 							</configuration>
 						</execution>
