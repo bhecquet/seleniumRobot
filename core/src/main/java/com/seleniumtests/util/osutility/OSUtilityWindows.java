@@ -152,6 +152,22 @@ public class OSUtilityWindows extends OSUtility {
 			return Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Microsoft\\Internet Explorer", "version");
 		}
 	}
+	
+	private List<String> searchFirefoxVersions() {
+		List<String> firefoxInstallations = new ArrayList<>();
+		String out = OSCommand.executeCommandAndWait(new String[] {"REG", "QUERY", "HKCR",  "/f", "FirefoxHTML", "/k", "/c"});
+		for (String line: out.split("\n")) {
+			if (line.startsWith("HKEY_CLASSES_ROOT")) {
+				String keyPath = line.replace("HKEY_CLASSES_ROOT\\", "").trim();
+				try {
+					String firefoxPath = Advapi32Util.registryGetStringValue(WinReg.HKEY_CLASSES_ROOT, keyPath + "\\shell\\open\\command", "");
+					firefoxPath = firefoxPath.split(".exe\"")[0].replace("\"", "") + ".exe";
+					firefoxInstallations.add(firefoxPath);
+				} catch (Win32Exception e) {}
+			}
+		}
+		return firefoxInstallations;
+	}
 
 	@Override
 	public Map<BrowserType, BrowserInfo> discoverInstalledBrowsersWithVersion() {
@@ -162,13 +178,11 @@ public class OSUtilityWindows extends OSUtility {
 		browserList.put(BrowserType.PHANTOMJS, new BrowserInfo(BrowserType.PHANTOMJS, LATEST_VERSION, null));
 		
 		// look for Firefox
-		// TODO: handle multiple firefox version (other directories FirefoxHTML-SOMEID)
 		try {
-			String firefoxPath = Advapi32Util.registryGetStringValue(WinReg.HKEY_CLASSES_ROOT, "FirefoxHTML\\shell\\open\\command", "");
-			firefoxPath = firefoxPath.split(".exe\"")[0].replace("\"", "") + ".exe";
+			String firefoxPath = searchFirefoxVersions().get(0);
 			String version = getFirefoxVersion(firefoxPath);
 			browserList.put(BrowserType.FIREFOX, new BrowserInfo(BrowserType.FIREFOX, extractFirefoxVersion(version), firefoxPath));
-		} catch (Win32Exception e) {}
+		} catch (IndexOutOfBoundsException e) {}
 		
 		
 		// look for chrome
