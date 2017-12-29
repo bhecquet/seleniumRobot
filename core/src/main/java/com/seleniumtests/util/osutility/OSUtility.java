@@ -368,6 +368,11 @@ public abstract class OSUtility {
 		return installedBrowsersWithVersion;
 	}
 	
-	
+	/**
+	 * search browsers
+	 */
+	public static void refreshBrowserList() {
+		installedBrowsersWithVersion = OSUtilityFactory.getInstance().discoverInstalledBrowsersWithVersion();
+	}
     
 }
