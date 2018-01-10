@@ -3,7 +3,7 @@
 	
 	#foreach ($testStep in $testSteps)
 		#set($stepDuration = $testStep.getDuration() / 1000.0)
-		<testcase classname="$className" name="$testStep.getName()" time="$stepDuration">
+		<testcase classname="$className" name="Step $velocityCount: $testStep.getName()" time="$stepDuration">
 		#if ($testStep.getFailed() && $testStep.getActionException())
 			<error message="$testStep.getActionException().getMessage()" type="">
 			<![CDATA[$testStep.getExceptionMessage()]]>
