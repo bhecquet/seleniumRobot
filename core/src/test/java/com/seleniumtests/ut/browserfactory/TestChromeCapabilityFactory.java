@@ -1,6 +1,7 @@
 package com.seleniumtests.ut.browserfactory;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.mockito.Mock;
@@ -11,14 +12,21 @@ import org.openqa.selenium.Proxy;
 import org.openqa.selenium.chrome.ChromeDriverService;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.remote.CapabilityType;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import com.seleniumtests.MockitoTest;
+import com.seleniumtests.browserfactory.BrowserInfo;
 import com.seleniumtests.browserfactory.ChromeCapabilitiesFactory;
+import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.DriverConfig;
 import com.seleniumtests.driver.DriverMode;
+import com.seleniumtests.util.osutility.OSUtility;
 
+@PrepareForTest({OSUtility.class})
 public class TestChromeCapabilityFactory extends MockitoTest {
 
 	@Mock
@@ -26,6 +34,15 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 	
 	@Mock
 	private Proxy proxyConfig;
+	
+	@BeforeMethod(groups= {"ut"})
+	public void init() {
+		Map<BrowserType, BrowserInfo> browserInfos = new HashMap<>();
+		browserInfos.put(BrowserType.CHROME, new BrowserInfo(BrowserType.CHROME, "63.0", ""));
+		PowerMockito.mockStatic(OSUtility.class);
+		PowerMockito.when(OSUtility.getInstalledBrowsersWithVersion()).thenReturn(browserInfos);
+		PowerMockito.when(OSUtility.getCurrentPlatorm()).thenReturn(Platform.WINDOWS);
+	}
 	
 	/**
 	 * Check default behaviour
@@ -173,24 +190,4 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 		
 		Assert.assertEquals(((Map<?,?>)capa.getCapability(ChromeOptions.CAPABILITY)).get("args").toString(), "[--user-agent=CHROME 55, --disable-translate]");
 	}
-//	
-//	@Test(groups={"ut"})
-//	public void testCreateCapabilitiesWithProfileInfo() {
-//		
-//		Mockito.when(config.isUseFirefoxDefaultProfile()).thenReturn(false);
-//		Mockito.when(config.isEnableJavascript()).thenReturn(false);
-//		Mockito.when(config.getProxyConfig()).thenReturn(proxyConfig);
-//		Mockito.when(config.getBrowserDownloadDir()).thenReturn("/home");
-//		Mockito.when(config.getNtlmAuthTrustedUris()).thenReturn("http://home.com");
-//		Mockito.when(config.getUserAgentOverride()).thenReturn("");
-//		Mockito.when(config.getFirefoxBinPath()).thenReturn("/home/bin");
-//		
-//		DesiredCapabilities capa = new FirefoxCapabilitiesFactory().createCapabilities(config);
-//		
-//		Assert.assertFalse(capa.is(CapabilityType.SUPPORTS_JAVASCRIPT));
-//		Assert.assertEquals(((FirefoxProfile)capa.getCapability(FirefoxDriver.PROFILE)).getIntegerPreference("browser.download.folderList", 0), 2);
-//		Assert.assertEquals(System.getProperty("webdriver.firefox.bin"), "/home/bin");
-//		Assert.assertEquals(((FirefoxProfile)capa.getCapability(FirefoxDriver.PROFILE)).getStringPreference("general.useragent.override", "_"), "");
-//		Assert.assertEquals(((FirefoxProfile)capa.getCapability(FirefoxDriver.PROFILE)).getStringPreference("network.automatic-ntlm-auth.trusted-uris", ""), "http://home.com");
-//	}
 }
