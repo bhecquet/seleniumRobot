@@ -54,9 +54,8 @@ public class TestFirefoxCapabilitiesFactory extends MockitoTest {
 	public void init() {
 		Map<BrowserType, BrowserInfo> browserInfos = new HashMap<>();
 		browserInfos.put(BrowserType.FIREFOX, new BrowserInfo(BrowserType.FIREFOX, "58.0", "/usr/bin/firefox"));
-		PowerMockito.mockStatic(OSUtility.class);
+		PowerMockito.mockStatic(OSUtility.class, Mockito.CALLS_REAL_METHODS);
 		PowerMockito.when(OSUtility.getInstalledBrowsersWithVersion()).thenReturn(browserInfos);
-		PowerMockito.when(OSUtility.getCurrentPlatorm()).thenReturn(Platform.WINDOWS);
 	}
 	
 	/**

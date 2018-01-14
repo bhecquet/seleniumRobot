@@ -6,6 +6,7 @@ import java.util.Map;
 
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.stubbing.Answer;
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.Platform;
 import org.openqa.selenium.Proxy;
@@ -39,9 +40,8 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 	public void init() {
 		Map<BrowserType, BrowserInfo> browserInfos = new HashMap<>();
 		browserInfos.put(BrowserType.CHROME, new BrowserInfo(BrowserType.CHROME, "63.0", ""));
-		PowerMockito.mockStatic(OSUtility.class);
+		PowerMockito.mockStatic(OSUtility.class, Mockito.CALLS_REAL_METHODS);
 		PowerMockito.when(OSUtility.getInstalledBrowsersWithVersion()).thenReturn(browserInfos);
-		PowerMockito.when(OSUtility.getCurrentPlatorm()).thenReturn(Platform.WINDOWS);
 	}
 	
 	/**

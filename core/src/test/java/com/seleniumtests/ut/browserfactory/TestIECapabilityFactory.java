@@ -35,7 +35,7 @@ import com.seleniumtests.util.osutility.OSUtilityFactory;
 import com.seleniumtests.util.osutility.OSUtilityWindows;
 
 // TODO: enable test on linux platform using mocks
-@PrepareForTest({OSUtility.class, OSUtilityFactory.class, BrowserInfo.class})
+@PrepareForTest({OSUtility.class, OSUtilityFactory.class})
 public class TestIECapabilityFactory extends MockitoTest {
 
 	@Mock
@@ -49,26 +49,23 @@ public class TestIECapabilityFactory extends MockitoTest {
 	
 	@BeforeMethod(groups= {"ut"})
 	public void init() {
-		Map<BrowserType, BrowserInfo> browserInfos = new HashMap<>();
-		browserInfos.put(BrowserType.INTERNET_EXPLORER, new BrowserInfo(BrowserType.INTERNET_EXPLORER, "11", ""));
-		PowerMockito.mockStatic(OSUtility.class);
-		PowerMockito.when(OSUtility.getInstalledBrowsersWithVersion()).thenReturn(browserInfos);
-		PowerMockito.when(OSUtility.getCurrentPlatorm()).thenReturn(Platform.WINDOWS);
-		
-	}
-	
-	@BeforeClass(groups= {"ut"})
-	public void initClass() {
-		
-		if (!OSUtility.isWindows()) {
-			throw new SkipException("Test only available on Windows platform");
-		}
-		
 		PowerMockito.mockStatic(System.class);
 		PowerMockito.when(System.getProperty(anyString())).thenCallRealMethod();
 		PowerMockito.when(System.setProperty(anyString(), anyString())).thenCallRealMethod();
 		PowerMockito.when(System.clearProperty(anyString())).thenCallRealMethod();
 		PowerMockito.when(System.getProperty("os.name")).thenReturn("Windows 10");	
+		
+		Map<BrowserType, BrowserInfo> browserInfos = new HashMap<>();
+		browserInfos.put(BrowserType.INTERNET_EXPLORER, new BrowserInfo(BrowserType.INTERNET_EXPLORER, "11", ""));
+
+		PowerMockito.mockStatic(OSUtility.class);
+		PowerMockito.when(OSUtility.getInstalledBrowsersWithVersion()).thenReturn(browserInfos);
+		PowerMockito.when(OSUtility.getCurrentPlatorm()).thenReturn(Platform.WINDOWS);
+		
+		PowerMockito.mockStatic(OSUtilityFactory.class);
+		PowerMockito.when(OSUtilityFactory.getInstance()).thenReturn(osUtility);
+		
+		when(osUtility.getProgramExtension()).thenReturn(".exe");
 		
 	}
 	
@@ -157,7 +154,7 @@ public class TestIECapabilityFactory extends MockitoTest {
 	public void testCreateIECapabilitiesOverrideDriverPathLocal() {
 		try {
 			Mockito.when(config.getMode()).thenReturn(DriverMode.LOCAL);
-			Mockito.when(config.getChromeDriverPath()).thenReturn("/opt/ie/driver/ie");
+			Mockito.when(config.getIeDriverPath()).thenReturn("/opt/ie/driver/ie");
 			
 			new IECapabilitiesFactory().createCapabilities(config);
 			
