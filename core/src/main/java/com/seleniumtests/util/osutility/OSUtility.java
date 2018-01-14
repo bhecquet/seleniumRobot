@@ -44,7 +44,7 @@ public abstract class OSUtility {
 
 	private String[] webDriverProcessList = {"chromedriver", "geckodriver", "IEDriverServer", "MicrosoftWebDriver"};
 		
-	private static Map<BrowserType, BrowserInfo> installedBrowsersWithVersion = OSUtilityFactory.getInstance().discoverInstalledBrowsersWithVersion();
+	private static Map<BrowserType, BrowserInfo> installedBrowsersWithVersion;
 	
 	/******************************************
 	 *********** OS information ***************
@@ -365,6 +365,9 @@ public abstract class OSUtility {
     }
 
 	public static Map<BrowserType, BrowserInfo> getInstalledBrowsersWithVersion() {
+		if (installedBrowsersWithVersion == null) {
+			refreshBrowserList();
+		}
 		return installedBrowsersWithVersion;
 	}
 	
