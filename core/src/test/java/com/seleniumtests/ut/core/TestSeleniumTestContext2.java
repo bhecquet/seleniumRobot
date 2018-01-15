@@ -16,49 +16,41 @@
  */
 package com.seleniumtests.ut.core;
 
-import java.io.File;
-
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.verify;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-
-import org.mockito.Mock;
-import org.openqa.selenium.Proxy.ProxyType;
-import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
 import org.testng.ITestContext;
-import org.testng.TestRunner;
+import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 import org.testng.xml.XmlTest;
 
-import com.seleniumtests.GenericTest;
 import com.seleniumtests.MockitoTest;
 import com.seleniumtests.connectors.selenium.SeleniumRobotVariableServerConnector;
-import com.seleniumtests.connectors.tms.TestManager;
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
-import com.seleniumtests.core.TestVariable;
-import com.seleniumtests.customexception.ConfigurationException;
-import com.seleniumtests.customexception.ScenarioException;
-import com.seleniumtests.driver.BrowserType;
-import com.seleniumtests.driver.DriverMode;
 
 /**
- * Test parsing of test options into SeleniumTestContext
- * Tests will only be done on ThreadContext
- * This test MUST be executed through the tu.xml file as this file defines some parameters used by this test
- * @author behe
+ * Unit test for correction of issue #65
+ * When setting output directory before some TestNG init occured, context is not a testrunner, so ClassCastException was raised
  *
  */
 @PrepareForTest({SeleniumRobotVariableServerConnector.class, SeleniumTestsContext.class})
-public class TestSeleniumTestContext2 {
+public class TestSeleniumTestContext2 extends MockitoTest {
 
+	@BeforeTest(groups="ut")
+	public void init() {
+		
+		// init of properties is done there so that it's taken into account when creating global context 
+		System.setProperty(SeleniumTestsContext.OUTPUT_DIRECTORY, "/home/user/test-output");
+	}
+	
+	/**
+	 * No error should be raised
+	 * @param testNGCtx
+	 * @param xmlTest
+	 */
 	@Test(groups="ut")
 	public void testOutputDirectoryFromSystem(final ITestContext testNGCtx, final XmlTest xmlTest) {
-		System.setProperty(SeleniumTestsContext.OUTPUT_DIRECTORY, "/home/user/test-output");
-		Assert.assertEquals(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "/home/user/test-output");
+		Assert.assertTrue(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory().endsWith("/home/user/test-output"));
 	}
 
 	
