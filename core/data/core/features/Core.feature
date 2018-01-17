@@ -27,3 +27,6 @@ Feature: Core
 	@new5
 	Scenario: core_6
 		When search
+		
+	Scenario: error_scenario
+		When write_error error 

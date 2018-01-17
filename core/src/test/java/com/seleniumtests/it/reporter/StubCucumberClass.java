@@ -1,6 +1,7 @@
 package com.seleniumtests.it.reporter;
 
 import org.apache.log4j.Logger;
+import org.openqa.selenium.WebDriverException;
 
 import com.seleniumtests.util.helper.WaitHelper;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
@@ -15,5 +16,10 @@ public class StubCucumberClass {
 	public void writeText(String text) {
 		logger.info("write " + text);
 		WaitHelper.waitForSeconds(1);
+	}
+	
+	@When("write_error (\\w+)")
+	public void writeTextWithError(String text) {
+		throw new WebDriverException("no element found");
 	}
 }
