@@ -35,8 +35,10 @@ import com.seleniumtests.core.SeleniumTestsContextManager;
 public class MockitoTest  extends PowerMockTestCase {
 
 	@BeforeMethod(alwaysRun=true)  
-	public void beforeMethod() throws Exception {
+	public void beforeMethod(final ITestContext testNGCtx) throws Exception {
 		beforePowerMockTestMethod();
+		SeleniumTestsContextManager.initGlobalContext(testNGCtx);
+		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setSoftAssertEnabled(false);
 		SeleniumTestsContextManager.getGlobalContext().setSoftAssertEnabled(false);
 		MockitoAnnotations.initMocks(this); 
@@ -47,6 +49,7 @@ public class MockitoTest  extends PowerMockTestCase {
 	}
 	
 	public void initThreadContext(final ITestContext testNGCtx,  final String testName) {
+		SeleniumTestsContextManager.initGlobalContext(testNGCtx);
 		SeleniumTestsContextManager.initThreadContext(testNGCtx, testName);
 		SeleniumTestsContextManager.getThreadContext().setSoftAssertEnabled(false);
 		SeleniumTestsContextManager.getGlobalContext().setSoftAssertEnabled(false);

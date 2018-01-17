@@ -342,7 +342,9 @@ As PageObject exposes the `driver` object, it's possible to write standard Selen
 	driver.findElement(By.id("myId")).click();
 	
 SeleniumRobot intercept selenium calls to create HtmlElement objects (the same as in §2) and thus benefit all SelniumRobot behaviour
-The constraint is that this code *MUST* be placed in a PageObject sub-class
+The constraints are:
+- this code *MUST* be placed in a PageObject sub-class.
+- add `<parameter name="overrideSeleniumNativeAction" value="true" />` to your TestNG XML file 
 
 This should be seen as a way to migrate legacy selenium code to the new format without rewriting every old test 
 

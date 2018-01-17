@@ -27,11 +27,13 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
+import org.testng.ISuite;
 import org.testng.ITestContext;
 import org.testng.xml.XmlSuite;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.driver.TestType;
 import com.seleniumtests.util.TestConfigurationParser;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
@@ -64,10 +66,10 @@ public class SeleniumTestsContextManager {
     private SeleniumTestsContextManager() {
 		// As a utility class, it is not meant to be instantiated.
 	}
-   
+
     public static SeleniumTestsContext getGlobalContext() {
         if (globalContext == null) {
-            initGlobalContext(new DefaultTestNGContext());
+        	throw new ConfigurationException("SeleniumTestsContextManager.getGlobalContext() MUST be called after SeleniumTestsContextManager.initGlobalContext()");
         }
 
         return globalContext;
@@ -75,14 +77,22 @@ public class SeleniumTestsContextManager {
 
     public static SeleniumTestsContext getThreadContext() {
         if (threadLocalContext.get() == null) {
-            initThreadContext(null, null);
+        	throw new ConfigurationException("SeleniumTestsContextManager.getThreadContext() MUST be called after SeleniumTestsContextManager.initGlobalContext()");
         }
 
         return threadLocalContext.get();
     }
     
+    public static void initGlobalContext(ISuite suiteContext) {
+    	if (suiteContext != null ) {
+        	generateApplicationPath(suiteContext.getXmlSuite());
+        }
+    	
+    	ITestContext testNGCtx = new DefaultTestNGContext(suiteContext);
+    	ITestContext newTestNGCtx = getContextFromConfigFile(testNGCtx);
+        globalContext = new SeleniumTestsContext(newTestNGCtx, null);
+    }
     
-
     public static void initGlobalContext(ITestContext testNGCtx) {
     	
     	// generate all paths used by test application
@@ -185,10 +195,12 @@ public class SeleniumTestsContextManager {
                 
                 // 
                 parameters.put(SeleniumTestsContext.DEVICE_LIST, configParser.getDeviceNodesAsJson());
-                    
+    
                 if (iTestContext.getCurrentXmlTest() != null) {
+                	// iTestContext is a test context provided by TestNG
                 	iTestContext.getCurrentXmlTest().getSuite().setParameters(parameters);
                 } else {
+                	// iTestContext is a DefaultTestNGContext
                 	iTestContext.getSuite().getXmlSuite().setParameters(parameters);
                 }
         }
