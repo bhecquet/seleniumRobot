@@ -27,6 +27,7 @@ import org.testng.xml.XmlSuite.ParallelMode;
 import com.seleniumtests.GenericTest;
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.util.PackageUtility;
 
 /**
@@ -221,6 +222,5 @@ public class TestSeleniumTestContextManager extends GenericTest {
 		SeleniumTestsContextManager.generateApplicationPath(suite);
 		Assert.assertEquals(SeleniumTestsContextManager.getApplicationName(), "core");
 	}
-	
 	
 }

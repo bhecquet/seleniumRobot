@@ -932,23 +932,29 @@ public class SeleniumTestsContext {
      * @param  defaultValue
      */
     private String getValueForTest(final String attributeName, final String sysPropertyValue) {
-    	String suiteValue = null;
-        if (testNGContext != null && testNGContext.getCurrentXmlTest() != null) {
+    	String value = null;
+        if (testNGContext != null) {
         	
-        	// priority given to test parameter
-        	String testValue = testNGContext.getCurrentXmlTest().getParameter(attributeName);
+        	// default suite value, even if currentXmlTest is null
+        	value = testNGContext.getSuite().getXmlSuite().getParameter(attributeName);
         	
-        	if (testValue == null) {
-        		
-        		// if test parameter does not exist, look at suite parameter
-        		suiteValue = testNGContext.getCurrentXmlTest().getSuite().getParameter(attributeName);
-        		
-        	} else {
-        		suiteValue = testValue;
+        	if (testNGContext.getCurrentXmlTest() != null) {
+        	
+	        	// priority given to test parameter
+	        	String testValue = testNGContext.getCurrentXmlTest().getParameter(attributeName);
+	        	
+	        	if (testValue == null) {
+	        		
+	        		// if test parameter does not exist, look at suite parameter
+	        		value = testNGContext.getCurrentXmlTest().getSuite().getParameter(attributeName);
+	        		
+	        	} else {
+	        		value = testValue;
+	        	}
         	}
         }
         
-        return sysPropertyValue != null ? sysPropertyValue : suiteValue;
+        return sysPropertyValue != null ? sysPropertyValue : value;
     }
     
     /**

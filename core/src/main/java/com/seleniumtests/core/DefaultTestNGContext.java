@@ -42,6 +42,10 @@ public class DefaultTestNGContext implements ITestContext {
     public DefaultTestNGContext() {
         this.suite = new SeleniumTestsDefaultSuite();
     }
+    
+    public DefaultTestNGContext(ISuite suite) {
+    	this.suite = suite;
+    }
 
     @Override
     public Object getAttribute(final String name) {

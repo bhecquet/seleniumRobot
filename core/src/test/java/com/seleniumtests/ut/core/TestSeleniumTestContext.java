@@ -66,7 +66,6 @@ public class TestSeleniumTestContext extends MockitoTest {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContext seleniumTestsCtx = SeleniumTestsContextManager.getThreadContext();
 		Assert.assertEquals(seleniumTestsCtx.getImplicitWaitTimeout(), 2);
-		
 	}
 	
 	/**
@@ -76,8 +75,7 @@ public class TestSeleniumTestContext extends MockitoTest {
 	public void testMultipleTestShareSameParam(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContext seleniumTestsCtx = SeleniumTestsContextManager.getThreadContext();
-		Assert.assertEquals(seleniumTestsCtx.getAttribute("variable1"), "value1");
-		
+		Assert.assertEquals(seleniumTestsCtx.getAttribute("variable1"), "value1");	
 	}
 	
 	/**

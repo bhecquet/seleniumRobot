@@ -32,6 +32,7 @@ import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import com.seleniumtests.MockitoTest;
@@ -84,9 +85,14 @@ public class TestWebElement extends MockitoTest {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setReplayTimeout(1);
 		SeleniumTestsContextManager.getThreadContext().setBrowser("htmlunit");
-		SeleniumTestsContextManager.getThreadContext().setOverrideSeleniumNativeAction(true);
+		
 		testPage = new DriverTestPageNativeActions(true);
 		realDriver = WebUIDriver.getWebDriver(true);
+	}
+	
+	@BeforeMethod(groups={"ut"})
+	public void overrideNativeActions() {
+		SeleniumTestsContextManager.getThreadContext().setOverrideSeleniumNativeAction(true);
 	}
 	
 	@AfterMethod(groups={"ut"})

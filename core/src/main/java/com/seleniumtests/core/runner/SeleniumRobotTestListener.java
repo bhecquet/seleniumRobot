@@ -202,6 +202,7 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 	@Override
 	public void onStart(ISuite suite) {
 
+		SeleniumTestsContextManager.initGlobalContext(suite);
     	SeleniumRobotLogger.updateLogger(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(),
 										 SeleniumTestsContextManager.getGlobalContext().getDefaultOutputDirectory()); 
 		
