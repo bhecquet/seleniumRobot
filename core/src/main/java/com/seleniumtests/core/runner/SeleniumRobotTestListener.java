@@ -61,16 +61,11 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
     }
 
 	@Override
-	public void onTestStart(ITestResult result) {
-		// TODO Auto-generated method stub
-		
+	public void onTestStart(ITestResult result) {	
 	}
 
 	@Override
 	public void onTestSuccess(ITestResult result) {
-		// capture snap shot at the end of the test
-		logLastStep(result);
-		
 	}
 
 	@Override
@@ -90,11 +85,7 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 
 			logger.info(testResult.getMethod() + " Failed in " + testRetryAnalyzer.getCount() + " times");
 			isRetryHandleNeeded.put(testResult.getTestContext().getName(), true);
-		}
-
-		// capture snap shot
-		logLastStep(testResult);
-		
+		}		
 	}
 
 	@Override
@@ -189,7 +180,7 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 	        }
 
 	        logger.info(SeleniumRobotLogger.END_TEST_PATTERN + testResult.getAttribute(SeleniumRobotLogger.METHOD_NAME));
-	        
+
 	        Reporter.setCurrentTestResult(testResult);
 
 			// Handle Soft CustomAssertion
@@ -200,6 +191,10 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 			if (testResult.getThrowable() != null) {
 				logger.error(testResult.getThrowable().getMessage());
 			}
+			
+			// capture snap shot at the end of the test
+			logLastStep(testResult);
+	        
 		}
 		
 	}
