@@ -154,6 +154,11 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 
 	    	if (SeleniumRobotTestPlan.isCucumberTest()) {
 	    		testResult.setAttribute(SeleniumRobotLogger.METHOD_NAME, testResult.getParameters()[0].toString());
+	    		
+	    		logger.info(SeleniumRobotLogger.START_TEST_PATTERN + testResult.getParameters()[0].toString());
+	            SeleniumTestsContextManager.initThreadContext(context, testResult.getParameters()[0].toString());
+	            SeleniumTestsContextManager.getThreadContext().setTestMethodSignature(testResult.getParameters()[0].toString());
+	    		
 	    	} else {
 	    		testResult.setAttribute(SeleniumRobotLogger.METHOD_NAME, method.getTestMethod().getMethodName());
 	    		
