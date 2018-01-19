@@ -40,12 +40,15 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Base64OutputStream;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
+import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.Dimension;
+import org.openqa.selenium.HasCapabilities;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.remote.FileDetector;
+import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.UselessFileDetector;
 import org.openqa.selenium.support.events.EventFiringWebDriver;
 
@@ -59,7 +62,7 @@ import com.seleniumtests.util.osutility.OSUtilityFactory;
 /**
  * Supports file upload in remote webdriver.
  */
-public class CustomEventFiringWebDriver extends EventFiringWebDriver {
+public class CustomEventFiringWebDriver extends EventFiringWebDriver implements HasCapabilities {
 	
 	private static final Logger logger = SeleniumRobotLogger.getLogger(CustomEventFiringWebDriver.class);
     private FileDetector fileDetector = new UselessFileDetector();
@@ -388,4 +391,9 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver {
 	public BrowserInfo getBrowserInfo() {
 		return browserInfo;
 	}
+
+	@Override
+    public Capabilities getCapabilities() {
+        return ((HasCapabilities)driver).getCapabilities();
+    }
 }
