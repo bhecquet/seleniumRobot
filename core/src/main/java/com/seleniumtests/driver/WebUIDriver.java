@@ -21,9 +21,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.Platform;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.remote.LocalFileDetector;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.events.EventFiringWebDriver;
 import org.openqa.selenium.support.events.WebDriverEventListener;
@@ -263,20 +263,24 @@ public class WebUIDriver {
      * In local mode only, display the browser version
      * For remote, will use either the default one, or version specified in test context
      */
-    private void displayBrowserVersion() {
-    	String version = null;
+    private void checkBrowserAvailable() {
     	if (config.getMode() == DriverMode.LOCAL && !config.getTestType().isMobile()) {
     		Map<BrowserType, BrowserInfo> browsers = OSUtility.getInstalledBrowsersWithVersion();
     		if (!browsers.containsKey(config.getBrowser())) {
     			throw new ConfigurationException(String.format("Browser %s is not available. Available browsers are %s", 
     					config.getBrowser(), browsers));
     		}
-    		version = browsers.get(config.getBrowser()).getVersion();
-    	} else if (!config.getTestType().isMobile()) {
-    		version = SeleniumTestsContextManager.getThreadContext().getWebBrowserVersion();
+    	} 
+    }
+    
+    private void displayBrowserVersion() {
+    	if (driver == null) {
+    		return;
     	}
-    	
-    	logger.info("Browser version is: " + version);
+    	Capabilities caps = ((CustomEventFiringWebDriver) driver).getCapabilities();
+        String browserName = caps.getBrowserName();
+        String browserVersion = caps.getVersion(); 
+        logger.info(String.format("Browser is: %s %s", browserName, browserVersion));
     }
 
     public WebDriver createWebDriver() {
@@ -289,9 +293,10 @@ public class WebUIDriver {
 	
 	
         
-    	displayBrowserVersion();
+    	checkBrowserAvailable();
         driver = createRemoteWebDriver();
-
+        displayBrowserVersion();
+ 
         if (config.getTestType().isMobile()) {
     		logger.info("Finished creating appium driver");
     	} else {
