@@ -12,6 +12,7 @@ import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.driver.screenshots.ScreenShot;
 import com.seleniumtests.driver.screenshots.ScreenshotUtil;
+import com.seleniumtests.it.driver.support.pages.DriverTestPage;
 
 
 public class TestHtmlUnitBrowserSnapshot extends MockitoTest {

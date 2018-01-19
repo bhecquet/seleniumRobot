@@ -24,6 +24,11 @@ import org.testng.annotations.BeforeMethod;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.driver.WebUIDriver;
 
+/**
+ * Parent test class for tests when driver needs to be closed after each test
+ * @author s047432
+ *
+ */
 public class GenericDriverTest {
 	
 	public WebDriver driver = null;

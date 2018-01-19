@@ -1,4 +1,4 @@
-package com.seleniumtests.it.driver;
+package com.seleniumtests.it.driver.support.pages;
 
 import java.util.List;
 

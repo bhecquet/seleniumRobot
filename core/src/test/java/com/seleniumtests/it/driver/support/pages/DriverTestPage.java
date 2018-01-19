@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.seleniumtests.it.driver;
+package com.seleniumtests.it.driver.support.pages;
 
 import org.openqa.selenium.By;
 
@@ -121,6 +121,10 @@ public class DriverTestPage extends PageObject {
     
     public DriverTestPage(boolean openPageURL) throws Exception {
         super(textElement, openPageURL ? getPageUrl() : null);
+    }
+    
+    public DriverTestPage(boolean openPageURL, String url) throws Exception {
+    	super(textElement, openPageURL ? url : null);
     }
     
     //for TestInterceptPage (the loader page of By has to be a PageObject)

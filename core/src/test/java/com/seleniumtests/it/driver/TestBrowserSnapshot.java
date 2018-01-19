@@ -25,6 +25,8 @@ import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.driver.screenshots.ScreenShot;
 import com.seleniumtests.driver.screenshots.ScreenshotUtil;
+import com.seleniumtests.it.driver.support.pages.DriverSubTestPage;
+import com.seleniumtests.it.driver.support.pages.DriverTestPage;
 import com.seleniumtests.util.FileUtility;
 import com.seleniumtests.util.HashCodeGenerator;
 import com.seleniumtests.util.helper.WaitHelper;

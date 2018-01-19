@@ -29,6 +29,7 @@ import org.testng.annotations.Test;
 import com.seleniumtests.GenericTest;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.driver.WebUIDriver;
+import com.seleniumtests.it.driver.support.pages.DriverTestPage;
 
 /**
  * Checks that it's possible to interact with elements in iframe
