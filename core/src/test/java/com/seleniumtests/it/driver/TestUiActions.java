@@ -33,6 +33,7 @@ import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import com.seleniumtests.driver.WebUIDriver;
+import com.seleniumtests.it.driver.support.pages.DriverTestPage;
 
 public class TestUiActions extends GenericTest {
 	

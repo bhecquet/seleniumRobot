@@ -38,7 +38,7 @@ import org.testng.annotations.Test;
 import com.seleniumtests.MockitoTest;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.driver.WebUIDriver;
-import com.seleniumtests.it.driver.DriverTestPageNativeActions;
+import com.seleniumtests.it.driver.support.pages.DriverTestPageNativeActions;
 import com.seleniumtests.uipage.htmlelements.HtmlElement;
 
 import io.appium.java_client.AppiumDriver;

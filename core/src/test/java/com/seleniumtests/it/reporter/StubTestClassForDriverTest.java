@@ -5,8 +5,8 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
-import com.seleniumtests.it.driver.DriverTestPage;
-import com.seleniumtests.it.driver.DriverTestPageNativeActions;
+import com.seleniumtests.it.driver.support.pages.DriverTestPage;
+import com.seleniumtests.it.driver.support.pages.DriverTestPageNativeActions;
 
 public class StubTestClassForDriverTest extends StubParentClass {
 	

@@ -167,6 +167,7 @@
 	        <version>3.8</version>
 	        <scope>test</scope>
         </dependency>
+        
         <dependency>
 			<groupId>net.ricecode</groupId>
 			<artifactId>string-similarity</artifactId>
@@ -202,6 +203,12 @@
             <version>4.11</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+			<groupId>org.seleniumhq.selenium</groupId>
+			<artifactId>jetty-repacked</artifactId>
+			<version>9.4.1.v20170120</version>
+			<scope>test</scope>
+		</dependency>
 		        
 	</dependencies>
 
