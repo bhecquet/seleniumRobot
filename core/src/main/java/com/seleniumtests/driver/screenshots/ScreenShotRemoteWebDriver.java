@@ -18,6 +18,7 @@ package com.seleniumtests.driver.screenshots;
 
 import java.net.URL;
 
+import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.remote.CapabilityType;
@@ -26,11 +27,11 @@ import org.openqa.selenium.remote.DriverCommand;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
 public class ScreenShotRemoteWebDriver extends RemoteWebDriver implements TakesScreenshot {
-    public ScreenShotRemoteWebDriver(final DesiredCapabilities capabilities) {
+    public ScreenShotRemoteWebDriver(final MutableCapabilities capabilities) {
         super(capabilities);
     }
 
-    public ScreenShotRemoteWebDriver(final URL url, final DesiredCapabilities capabilities) {
+    public ScreenShotRemoteWebDriver(final URL url, final MutableCapabilities capabilities) {
         super(url, capabilities);
     }
 

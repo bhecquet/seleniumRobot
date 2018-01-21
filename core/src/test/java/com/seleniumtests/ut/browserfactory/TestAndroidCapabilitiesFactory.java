@@ -16,8 +16,7 @@
  */
 package com.seleniumtests.ut.browserfactory;
 
-import java.util.Map;
-
+import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
@@ -40,17 +39,16 @@ public class TestAndroidCapabilitiesFactory extends GenericTest {
 	@Test(groups={"ut"})
 	public void testCreateDefaultChromeCapabilities() {
 		DriverConfig config = new DriverConfig();
-		config.setBrowser(BrowserType.CHROME);
+		config.setBrowser(BrowserType.FIREFOX);
 		config.setMobilePlatformVersion("8.0");
 		config.setPlatform("android");
 		config.setDeviceName("Samsung Galasy S8");
 		config.setApp("");
 		
-		AndroidCapabilitiesFactory capaFactory = new AndroidCapabilitiesFactory();
-		DesiredCapabilities capa = capaFactory.createCapabilities(config);
+		AndroidCapabilitiesFactory capaFactory = new AndroidCapabilitiesFactory(config);
+		MutableCapabilities capa = capaFactory.createCapabilities();
 		
-		Assert.assertEquals(capa.getCapability(CapabilityType.BROWSER_NAME), BrowserType.CHROME.toString().toLowerCase());
-		Assert.assertEquals(((Map<?,?>)capa.getCapability(ChromeOptions.CAPABILITY)).get("args").toString(), "[--disable-translate]");
+		Assert.assertEquals(capa.getCapability(CapabilityType.BROWSER_NAME), BrowserType.FIREFOX.toString().toLowerCase());
 		Assert.assertEquals(capa.getCapability(MobileCapabilityType.AUTOMATION_NAME), "Appium");
 		Assert.assertEquals(capa.getCapability(MobileCapabilityType.PLATFORM_NAME), "android");
 		Assert.assertEquals(capa.getCapability(MobileCapabilityType.PLATFORM_VERSION), "8.0");
@@ -73,8 +71,8 @@ public class TestAndroidCapabilitiesFactory extends GenericTest {
 		config.setDeviceName("Samsung Galasy S8");
 		config.setApp("");
 		
-		AndroidCapabilitiesFactory capaFactory = new AndroidCapabilitiesFactory();
-		DesiredCapabilities capa = capaFactory.createCapabilities(config);
+		AndroidCapabilitiesFactory capaFactory = new AndroidCapabilitiesFactory(config);
+		MutableCapabilities capa = capaFactory.createCapabilities();
 		
 		Assert.assertEquals(capa.getCapability(CapabilityType.BROWSER_NAME), BrowserType.BROWSER.toString().toLowerCase());
 		Assert.assertNull(capa.getCapability(ChromeOptions.CAPABILITY));
@@ -101,10 +99,10 @@ public class TestAndroidCapabilitiesFactory extends GenericTest {
 		config.setAppActivity("appActivity");
 		config.setApp("com.covea.mobileapp");
 		
-		AndroidCapabilitiesFactory capaFactory = new AndroidCapabilitiesFactory();
-		DesiredCapabilities capa = capaFactory.createCapabilities(config);
+		AndroidCapabilitiesFactory capaFactory = new AndroidCapabilitiesFactory(config);
+		MutableCapabilities capa = capaFactory.createCapabilities();
 		
-		Assert.assertEquals(capa.getCapability(CapabilityType.BROWSER_NAME), null);
+		Assert.assertEquals(capa.getCapability(CapabilityType.BROWSER_NAME), "");
 		Assert.assertEquals(capa.getCapability("app"), "com.covea.mobileapp");
 		Assert.assertEquals(capa.getCapability(MobileCapabilityType.AUTOMATION_NAME), "Appium");
 		Assert.assertEquals(capa.getCapability(MobileCapabilityType.PLATFORM_NAME), "android");
@@ -130,8 +128,8 @@ public class TestAndroidCapabilitiesFactory extends GenericTest {
 		config.setFullReset(true);
 		config.setApp("com.covea.mobileapp");
 		
-		AndroidCapabilitiesFactory capaFactory = new AndroidCapabilitiesFactory();
-		DesiredCapabilities capa = capaFactory.createCapabilities(config);
+		AndroidCapabilitiesFactory capaFactory = new AndroidCapabilitiesFactory(config);
+		MutableCapabilities capa = capaFactory.createCapabilities();
 		
 		Assert.assertEquals(capa.getCapability(MobileCapabilityType.FULL_RESET), "true");
 	}
@@ -150,8 +148,8 @@ public class TestAndroidCapabilitiesFactory extends GenericTest {
 		config.setFullReset(true);
 		config.setApp("com.covea.mobileapp");
 		
-		AndroidCapabilitiesFactory capaFactory = new AndroidCapabilitiesFactory();
-		DesiredCapabilities capa = capaFactory.createCapabilities(config);
+		AndroidCapabilitiesFactory capaFactory = new AndroidCapabilitiesFactory(config);
+		MutableCapabilities capa = capaFactory.createCapabilities();
 		
 		Assert.assertEquals(capa.getCapability(MobileCapabilityType.AUTOMATION_NAME), "Selendroid");
 	}

@@ -44,7 +44,7 @@ public abstract class OSUtility {
 
 	private String[] webDriverProcessList = {"chromedriver", "geckodriver", "IEDriverServer", "MicrosoftWebDriver"};
 		
-	private static Map<BrowserType, BrowserInfo> installedBrowsersWithVersion;
+	private static Map<BrowserType, List<BrowserInfo>> installedBrowsersWithVersion;
 	
 	/******************************************
 	 *********** OS information ***************
@@ -299,7 +299,12 @@ public abstract class OSUtility {
     	return new ArrayList<>(getInstalledBrowsersWithVersion().keySet());
     }
     
-    public abstract Map<BrowserType, BrowserInfo> discoverInstalledBrowsersWithVersion();
+    /**
+     * Returns the list of browsers for each type. For selenium robot local, this will help selecting the right binary
+     * For grid, we will be able to provide each installed browser to the runner
+     * @return
+     */
+    public abstract Map<BrowserType, List<BrowserInfo>> discoverInstalledBrowsersWithVersion();
     
     /**
      * example: Mozilla Firefox 52.0
@@ -364,7 +369,7 @@ public abstract class OSUtility {
     	return versionString.split("\\.")[0];
     }
 
-	public static Map<BrowserType, BrowserInfo> getInstalledBrowsersWithVersion() {
+	public static Map<BrowserType, List<BrowserInfo>> getInstalledBrowsersWithVersion() {
 		if (installedBrowsersWithVersion == null) {
 			refreshBrowserList();
 		}

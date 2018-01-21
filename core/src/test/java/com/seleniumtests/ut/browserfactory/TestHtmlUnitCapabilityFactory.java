@@ -33,7 +33,7 @@ public class TestHtmlUnitCapabilityFactory extends MockitoTest {
 		Mockito.when(config.isEnableJavascript()).thenReturn(true);
 		Mockito.when(config.getProxy()).thenReturn(proxyConfig);
 		
-		MutableCapabilities capa = new HtmlUnitCapabilitiesFactory().createCapabilities(config);
+		MutableCapabilities capa = new HtmlUnitCapabilitiesFactory(config).createCapabilities();
 		
 		Assert.assertTrue(capa.is(CapabilityType.SUPPORTS_JAVASCRIPT));
 		Assert.assertTrue(capa.is(CapabilityType.TAKES_SCREENSHOT));
@@ -49,7 +49,7 @@ public class TestHtmlUnitCapabilityFactory extends MockitoTest {
 		Mockito.when(config.getProxy()).thenReturn(proxyConfig);
 		Mockito.when(config.getWebPlatform()).thenReturn(Platform.WINDOWS);
 		
-		MutableCapabilities capa = new HtmlUnitCapabilitiesFactory().createCapabilities(config);
+		MutableCapabilities capa = new HtmlUnitCapabilitiesFactory(config).createCapabilities();
 		
 		Assert.assertEquals(capa.getPlatform(), Platform.WINDOWS);
 		
@@ -61,7 +61,7 @@ public class TestHtmlUnitCapabilityFactory extends MockitoTest {
 		Mockito.when(config.isEnableJavascript()).thenReturn(false);
 		Mockito.when(config.getProxy()).thenReturn(proxyConfig);
 		
-		MutableCapabilities capa = new HtmlUnitCapabilitiesFactory().createCapabilities(config);
+		MutableCapabilities capa = new HtmlUnitCapabilitiesFactory(config).createCapabilities();
 		
 		Assert.assertFalse(capa.is(CapabilityType.SUPPORTS_JAVASCRIPT));
 		
@@ -70,7 +70,7 @@ public class TestHtmlUnitCapabilityFactory extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testCreateDefaultHtmlUnitCapabilities() {
 		
-		MutableCapabilities capa = new HtmlUnitCapabilitiesFactory().createCapabilities(config);
+		MutableCapabilities capa = new HtmlUnitCapabilitiesFactory(config).createCapabilities();
 		
 		Assert.assertEquals(capa.getCapability(CapabilityType.BROWSER_NAME), "htmlunit");
 	}

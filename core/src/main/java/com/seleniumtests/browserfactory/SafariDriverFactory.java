@@ -17,11 +17,14 @@
 package com.seleniumtests.browserfactory;
 
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.ie.InternetExplorerOptions;
 import org.openqa.selenium.safari.SafariDriver;
 import org.openqa.selenium.safari.SafariOptions;
 
+import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.DriverConfig;
 import com.seleniumtests.reporter.TestLogging;
+import com.seleniumtests.util.osutility.OSUtility;
 
 public class SafariDriverFactory extends AbstractWebDriverFactory implements IWebDriverFactory {
 
@@ -32,7 +35,11 @@ public class SafariDriverFactory extends AbstractWebDriverFactory implements IWe
     @Override
     protected WebDriver createNativeDriver() {
     	synchronized (this.getClass()) {
-    		return new SafariDriver(new SafariOptions(new SafariCapabilitiesFactory().createCapabilities(webDriverConfig)));
+    		SafariCapabilitiesFactory capsFactory = new SafariCapabilitiesFactory(webDriverConfig);
+    		SafariOptions options = (SafariOptions)capsFactory.createCapabilities();
+        	selectedBrowserInfo = capsFactory.getSelectedBrowserInfo();
+    		
+    		return new SafariDriver(options);
     	}
     }
 

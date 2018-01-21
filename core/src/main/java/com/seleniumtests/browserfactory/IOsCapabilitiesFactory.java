@@ -16,65 +16,38 @@
  */
 package com.seleniumtests.browserfactory;
 
-import org.openqa.selenium.remote.CapabilityType;
-import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.MutableCapabilities;
 
-import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.DriverConfig;
 import com.seleniumtests.driver.DriverMode;
 
 import io.appium.java_client.remote.IOSMobileCapabilityType;
-import io.appium.java_client.remote.MobileCapabilityType;
 
-public class IOsCapabilitiesFactory extends ICapabilitiesFactory {
-	
-	private DesiredCapabilities capabilities;
-	
-	public IOsCapabilitiesFactory(DesiredCapabilities caps) {
-		capabilities = caps;
-	}
-	
-	public IOsCapabilitiesFactory() {
-		capabilities = new DesiredCapabilities();
+public class IOsCapabilitiesFactory extends IMobileCapabilityFactory {
+
+	public IOsCapabilitiesFactory(DriverConfig webDriverConfig) {
+		super(webDriverConfig);
 	}
 
 	@Override
-    public DesiredCapabilities createCapabilities(final DriverConfig cfg) {
-    	
-    	DesiredCapabilities caps = new DesiredCapabilities(this.capabilities);
-    	//caps.setCapability(MobileCapabilityType.AUTOMATION_NAME, "Appium");
-    	caps.setCapability(MobileCapabilityType.AUTOMATION_NAME, "XCUITest");
-    	
-    	if (cfg.getMode() == DriverMode.LOCAL) {
-    		caps.setCapability(IOSMobileCapabilityType.XCODE_CONFIG_FILE, System.getenv("APPIUM_HOME") + "/node_modules/appium/node_modules/appium-xcuitest-driver/WebDriverAgent/xcodeConfigFile.xcconfig");
+	protected String getAutomationName() {
+		return "XCUITest"; // for iOS 10+
+	}
+
+	@Override
+	protected MutableCapabilities getSystemSpecificCapabilities() {
+		
+		MutableCapabilities capabilities = new MutableCapabilities();
+
+    	if (webDriverConfig.getMode() == DriverMode.LOCAL) {
+    		capabilities.setCapability(IOSMobileCapabilityType.XCODE_CONFIG_FILE, System.getenv("APPIUM_HOME") + "/node_modules/appium/node_modules/appium-xcuitest-driver/WebDriverAgent/xcodeConfigFile.xcconfig");
     	}
-    		
-    	if (cfg.isFullReset()) {
-    		caps.setCapability(MobileCapabilityType.FULL_RESET, "true");
-    	} else {
-    		caps.setCapability(MobileCapabilityType.FULL_RESET, "false");
-    	}
-    	caps.setCapability(MobileCapabilityType.PLATFORM_NAME, cfg.getPlatform());
+    	
+    	return capabilities;
+	}
 
-        // Set up version and device name else appium server would pick the only available emulator/device
-        // Both of these are ignored for android for now
-    	caps.setCapability(MobileCapabilityType.PLATFORM_VERSION, cfg.getMobilePlatformVersion());
-    	caps.setCapability(MobileCapabilityType.DEVICE_NAME, cfg.getDeviceName());
-
-    	// in case app has not been specified for cloud provider
-    	String app = cfg.getApp();
-    	if (caps.getCapability(MobileCapabilityType.APP) == null) {
-        	caps.setCapability(MobileCapabilityType.APP, app);
-        }
-
-    	// do not configure application and browser as they are mutualy exclusive
-        if (app == null || "".equals(app.trim()) && cfg.getBrowser() != BrowserType.NONE) {
-        	caps.setCapability(CapabilityType.BROWSER_NAME, cfg.getBrowser().toString().toLowerCase());
-        } else {
-        	caps.setCapability(CapabilityType.BROWSER_NAME, "");
-        }
-    	caps.setCapability(MobileCapabilityType.NEW_COMMAND_TIMEOUT, cfg.getNewCommandTimeout());
-
-        return caps;
-    }
+	@Override
+	protected MutableCapabilities getBrowserSpecificCapabilities() {
+		return new MutableCapabilities();
+	}
 }

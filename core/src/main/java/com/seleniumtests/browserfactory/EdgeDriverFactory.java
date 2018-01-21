@@ -38,8 +38,9 @@ public class EdgeDriverFactory extends AbstractWebDriverFactory implements IWebD
      */
     @Override
     protected WebDriver createNativeDriver() {
-    	EdgeOptions options = new EdgeOptions();
-    	options.merge(new EdgeCapabilitiesFactory().createCapabilities(webDriverConfig));
+    	EdgeCapabilitiesFactory capsFactory = new EdgeCapabilitiesFactory(webDriverConfig);
+    	EdgeOptions options = (EdgeOptions)capsFactory.createCapabilities();
+    	selectedBrowserInfo = capsFactory.getSelectedBrowserInfo();
     	return new EdgeDriver(options);
     }
 }

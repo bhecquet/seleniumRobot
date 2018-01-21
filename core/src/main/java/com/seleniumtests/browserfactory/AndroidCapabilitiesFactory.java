@@ -16,85 +16,58 @@
  */
 package com.seleniumtests.browserfactory;
 
-import org.openqa.selenium.remote.CapabilityType;
-import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.MutableCapabilities;
 
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.DriverConfig;
 
 import io.appium.java_client.remote.AndroidMobileCapabilityType;
-import io.appium.java_client.remote.MobileCapabilityType;
 
 /**
  * Sets Android capabilities.
  */
-public class AndroidCapabilitiesFactory extends ICapabilitiesFactory {
+public class AndroidCapabilitiesFactory extends IMobileCapabilityFactory {
 	
-	private DesiredCapabilities capabilities;
-	
-	public AndroidCapabilitiesFactory(DesiredCapabilities caps) {
-		capabilities = caps;
-	}
-	
-	public AndroidCapabilitiesFactory() {
-		capabilities = new DesiredCapabilities();
+	public AndroidCapabilitiesFactory(DriverConfig webDriverConfig) {
+		super(webDriverConfig);
 	}
 
 	@Override
-    public DesiredCapabilities createCapabilities(final DriverConfig cfg) {
-
-    	DesiredCapabilities caps = new DesiredCapabilities(this.capabilities);
-    	String app = cfg.getApp();
-    	
-    	if (!(cfg.getMobilePlatformVersion() == null) && Integer.parseInt(cfg.getMobilePlatformVersion().substring(0, 1)) < 4) {
-    		caps.setCapability(MobileCapabilityType.AUTOMATION_NAME, "Selendroid");
+	protected String getAutomationName() {
+		if (!(webDriverConfig.getMobilePlatformVersion() == null) && Integer.parseInt(webDriverConfig.getMobilePlatformVersion().substring(0, 1)) < 4) {
+    		return "Selendroid";
     	} else {
-    		caps.setCapability(MobileCapabilityType.AUTOMATION_NAME, "Appium");
+    		return "Appium";
     	}
-    	
-    	if (app != null && !"".equals(app.trim())) {
-	    	if (cfg.isFullReset()) {
-	    		caps.setCapability(MobileCapabilityType.FULL_RESET, "true");
-	    	} else {
-	    		caps.setCapability(MobileCapabilityType.FULL_RESET, "false");
-	    	}
-    	}
-    	caps.setCapability(MobileCapabilityType.PLATFORM_NAME, cfg.getPlatform());
-    	
+	}
+
+	@Override
+	protected MutableCapabilities getSystemSpecificCapabilities() {
+		
+		MutableCapabilities capabilities = new MutableCapabilities();
+		  
     	// automatically hide keyboard
-//    	caps.setCapability(AndroidMobileCapabilityType.RESET_KEYBOARD, true);
-//    	caps.setCapability(AndroidMobileCapabilityType.UNICODE_KEYBOARD, true);
+//    	capabilities.setCapability(AndroidMobileCapabilityType.RESET_KEYBOARD, true);
+//    	capabilities.setCapability(AndroidMobileCapabilityType.UNICODE_KEYBOARD, true);
 
-        // Set up version and device name else appium server would pick the only available emulator/device
-        // Both of these are ignored for android for now
-    	caps.setCapability(MobileCapabilityType.PLATFORM_VERSION, cfg.getMobilePlatformVersion());
-    	caps.setCapability(MobileCapabilityType.DEVICE_NAME, cfg.getDeviceName());
-
-    	// in case app has not been specified for cloud provider
-        if (caps.getCapability(MobileCapabilityType.APP) == null && app != null) {
-        	caps.setCapability(MobileCapabilityType.APP, app.replace("\\", "/"));
-        }
-        caps.setCapability(AndroidMobileCapabilityType.APP_PACKAGE, cfg.getAppPackage());
-        caps.setCapability(AndroidMobileCapabilityType.APP_ACTIVITY, cfg.getAppActivity());
+        capabilities.setCapability(AndroidMobileCapabilityType.APP_PACKAGE, webDriverConfig.getAppPackage());
+        capabilities.setCapability(AndroidMobileCapabilityType.APP_ACTIVITY, webDriverConfig.getAppActivity());
         
-        if (cfg.getAppWaitActivity() != null) {
-        	caps.setCapability(AndroidMobileCapabilityType.APP_WAIT_ACTIVITY, cfg.getAppWaitActivity());
+        if (webDriverConfig.getAppWaitActivity() != null) {
+        	capabilities.setCapability(AndroidMobileCapabilityType.APP_WAIT_ACTIVITY, webDriverConfig.getAppWaitActivity());
         }
+        
+        return capabilities;
+	}
 
-        // do not configure application and browser as they are mutualy exclusive
-        if (app != null && "".equals(app.trim()) && cfg.getBrowser() != BrowserType.NONE) {
-        	caps.setCapability(CapabilityType.BROWSER_NAME, cfg.getBrowser().toString().toLowerCase());
-        	
-        	
-        	// set specific configuration for chrome
-        	if (cfg.getBrowser() == BrowserType.CHROME) {
-        		caps.merge(new ChromeCapabilitiesFactory().createMobileCapabilities(cfg));
-        	}
-        }
-        caps.setCapability(MobileCapabilityType.NEW_COMMAND_TIMEOUT, cfg.getNewCommandTimeout());
+	@Override
+	protected MutableCapabilities getBrowserSpecificCapabilities() {
 
-
-        return caps;
-
-    }
+    	// set specific configuration for chrome
+    	if (webDriverConfig.getBrowser() == BrowserType.CHROME) {
+    		return new ChromeCapabilitiesFactory(webDriverConfig).createMobileCapabilities(webDriverConfig);
+    	} else {
+    		return new MutableCapabilities();
+    	}
+	}
 }

@@ -24,6 +24,7 @@ import java.util.List;
 
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -223,7 +224,7 @@ public class TestMobileDeviceSelector extends MockitoTest {
 		deviceSelector.setAndroidReady(true);
 		deviceSelector.setIosReady(false);
 		
-		DesiredCapabilities updatedCaps = deviceSelector.updateCapabilitiesWithSelectedDevice(requestedCaps, DriverMode.LOCAL);
+		MutableCapabilities updatedCaps = deviceSelector.updateCapabilitiesWithSelectedDevice(requestedCaps, DriverMode.LOCAL);
 		Assert.assertEquals(updatedCaps.getCapability(MobileCapabilityType.PLATFORM_NAME), "android");
 		Assert.assertEquals(updatedCaps.getCapability(MobileCapabilityType.DEVICE_NAME), "1234");
 		Assert.assertEquals(updatedCaps.getCapability(MobileCapabilityType.PLATFORM_VERSION), "5.0");
@@ -249,7 +250,7 @@ public class TestMobileDeviceSelector extends MockitoTest {
 		deviceSelector.setAndroidReady(true);
 		deviceSelector.setIosReady(false);
 		
-		DesiredCapabilities updatedCaps = deviceSelector.updateCapabilitiesWithSelectedDevice(requestedCaps, DriverMode.LOCAL);
+		MutableCapabilities updatedCaps = deviceSelector.updateCapabilitiesWithSelectedDevice(requestedCaps, DriverMode.LOCAL);
 		Assert.assertEquals(updatedCaps.getCapability(AndroidMobileCapabilityType.CHROMEDRIVER_EXECUTABLE), "chromedriver.exe");
 		
 	}
@@ -273,7 +274,7 @@ public class TestMobileDeviceSelector extends MockitoTest {
 		deviceSelector.setAndroidReady(true);
 		deviceSelector.setIosReady(false);
 		
-		DesiredCapabilities updatedCaps = deviceSelector.updateCapabilitiesWithSelectedDevice(requestedCaps, DriverMode.SAUCELABS);
+		MutableCapabilities updatedCaps = deviceSelector.updateCapabilitiesWithSelectedDevice(requestedCaps, DriverMode.SAUCELABS);
 		Assert.assertNull(updatedCaps.getCapability(AndroidMobileCapabilityType.CHROMEDRIVER_EXECUTABLE));
 		
 	}

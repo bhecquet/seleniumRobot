@@ -22,6 +22,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Calendar;
 
+import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.DesiredCapabilities;
@@ -121,7 +122,7 @@ public class TestDroidDriverFactory extends AbstractWebDriverFactory implements 
     @Override
     protected WebDriver createNativeDriver() {
 
-    	DesiredCapabilities capabilities = new DesiredCapabilities();
+    	MutableCapabilities capabilities = new MutableCapabilities();
     	
     	// updload application on TestDroid cloud
     	String fileUUID;
@@ -134,22 +135,24 @@ public class TestDroidDriverFactory extends AbstractWebDriverFactory implements 
 			} catch (IOException e) {
 				logger.warn("application may not have been uploaded", e);
 			}
-    		
-    	} else {
-    		capabilities = new DesiredCapabilities();
-    	}
+    	} 
 
     	try {
 	        if("android".equalsIgnoreCase(webDriverConfig.getPlatform())){
 	        	capabilities.setCapability("testdroid_target", "android");
-	            return new AndroidDriver<WebElement>(new URL(webDriverConfig.getAppiumServerURL()), new AndroidCapabilitiesFactory(capabilities).createCapabilities(webDriverConfig));
-	        } else if ("ios".equalsIgnoreCase(webDriverConfig.getPlatform())){
+	        	capabilities.merge(new AndroidCapabilitiesFactory(webDriverConfig).createCapabilities());
+	            return new AndroidDriver<WebElement>(new URL(webDriverConfig.getAppiumServerURL()), capabilities);
+	            
+	        } else if ("ios".equalsIgnoreCase(webDriverConfig.getPlatform())) {
 	        	capabilities.setCapability("testdroid_target", "ios");
-	            return new IOSDriver<WebElement>(new URL(webDriverConfig.getAppiumServerURL()), new IOsCapabilitiesFactory(capabilities).createCapabilities(webDriverConfig));
+	        	capabilities.merge(new IOsCapabilitiesFactory(webDriverConfig).createCapabilities());
+	            return new IOSDriver<WebElement>(new URL(webDriverConfig.getAppiumServerURL()), capabilities);  
+	            
+	        } else {
+	        	capabilities.merge(new TestDroidCapabilitiesFactory(webDriverConfig).createCapabilities());
+	        	return new RemoteWebDriver(new URL(webDriverConfig.getAppiumServerURL()), capabilities);
 	        }
-	
-	        return new RemoteWebDriver(new URL(webDriverConfig.getAppiumServerURL()), new SauceLabsCapabilitiesFactory().createCapabilities(webDriverConfig));
-
+	        
     	} catch (MalformedURLException e) {
     		throw new DriverExceptions("Error creating driver: " + e.getMessage());
     	}

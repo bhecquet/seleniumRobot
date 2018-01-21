@@ -30,6 +30,7 @@ public abstract class AbstractWebDriverFactory {
 
 	protected static final Logger logger = SeleniumRobotLogger.getLogger(AbstractWebDriverFactory.class);
     protected DriverConfig webDriverConfig;
+    protected BrowserInfo selectedBrowserInfo;
 
     protected WebDriver driver;
 
@@ -50,6 +51,10 @@ public abstract class AbstractWebDriverFactory {
         }
     }
     
+	public BrowserInfo getSelectedBrowserInfo() {
+		return selectedBrowserInfo;
+	}
+	
     protected abstract WebDriver createNativeDriver();
     
     public WebDriver createWebDriver() {

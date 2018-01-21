@@ -32,14 +32,10 @@ public class TestTableWithDriver extends GenericDriverTest {
 	
 	private DriverTestPage testPage;
 
-	@BeforeClass(groups={"ut"})
-	public void initPage(final ITestContext testNGCtx) throws Exception {
+	@BeforeMethod(groups={"ut"})
+	public void initDriver(final ITestContext testNGCtx) throws Exception {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setBrowser("htmlunit");
-	}
-		
-	@BeforeMethod(groups={"ut"})
-	public void initDriver() throws Exception {
 		driver = WebUIDriver.getWebDriver(true);
 		testPage = new DriverTestPage(true);
 	}

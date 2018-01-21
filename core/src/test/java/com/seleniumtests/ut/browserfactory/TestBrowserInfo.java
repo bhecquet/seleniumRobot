@@ -23,6 +23,24 @@ public class TestBrowserInfo extends MockitoTest {
 	public void getDriverFiles() throws IOException {
 		Assert.assertFalse(new BrowserInfo(BrowserType.CHROME, "58.0", null).getDriverFiles().isEmpty());
 	}
+	
+	/**
+	 * Test that if a wrong version format is provided (parsable as float), returned version is 0.0
+	 * Else, version is not touched
+	 */
+	@Test(groups= {"ut"})
+	public void testWrongVersion() {
+		BrowserInfo bi = new BrowserInfo(BrowserType.CHROME, "58.alpha", null);
+		Assert.assertEquals(bi.getVersion(), "0.0");
+	}
+	
+	/**
+	 * Test that if a non existent path is provided, error is raised
+	 */
+	@Test(groups= {"ut"}, expectedExceptions=ConfigurationException.class)
+	public void testWrongPath() {
+		new BrowserInfo(BrowserType.CHROME, "58", "/home/tu/browser/chrome");
+	}
 
 	@Test(groups={"ut"})
 	public void testEdgeVersion() {
@@ -215,4 +233,75 @@ public class TestBrowserInfo extends MockitoTest {
 		
 		bInfo.getDriverFileName();
 	}
+	
+	@Test(groups= {"ut"})
+	public void testHighestDriverVersion() {
+		BrowserInfo bi1 = new BrowserInfo(BrowserType.CHROME, "48.0", null);
+		BrowserInfo bi2 = new BrowserInfo(BrowserType.CHROME, "58.0", null);
+		
+		BrowserInfo highestBi = BrowserInfo.getHighestDriverVersion(Arrays.asList(bi1, bi2));
+		Assert.assertEquals(highestBi, bi2);
+	}
+	
+	@Test(groups= {"ut"})
+	public void testHighestDriverVersionNullBrowserInfo() {
+		BrowserInfo bi1 = new BrowserInfo(BrowserType.CHROME, "48.0", null);
+		BrowserInfo bi2 = new BrowserInfo(BrowserType.CHROME, "58.0", null);
+		
+		BrowserInfo highestBi = BrowserInfo.getHighestDriverVersion(Arrays.asList(bi1, null, bi2));
+		Assert.assertEquals(highestBi, bi2);
+	}
+	
+	@Test(groups= {"ut"})
+	public void testGetInfoFromVersion() {
+		BrowserInfo bi1 = new BrowserInfo(BrowserType.CHROME, "48.0", null);
+		BrowserInfo bi2 = new BrowserInfo(BrowserType.CHROME, "58.0", null);
+		
+		BrowserInfo biFromVersion = BrowserInfo.getInfoFromVersion("58.0", Arrays.asList(bi1, bi2));
+		Assert.assertEquals(biFromVersion, bi2);
+	}
+	
+	@Test(groups= {"ut"})
+	public void testGetInfoFromVersionNullInfo() {
+		BrowserInfo bi1 = new BrowserInfo(BrowserType.CHROME, "48.0", null);
+		BrowserInfo bi2 = new BrowserInfo(BrowserType.CHROME, "58.0", null);
+		
+		BrowserInfo biFromVersion = BrowserInfo.getInfoFromVersion("58.0", Arrays.asList(bi1, null, bi2));
+		Assert.assertEquals(biFromVersion, bi2);
+	}
+	
+	@Test(groups= {"ut"}, expectedExceptions=ConfigurationException.class)
+	public void testGetInfoFromNonExistentVersion() {
+		BrowserInfo bi1 = new BrowserInfo(BrowserType.CHROME, "48.0", null);
+		BrowserInfo bi2 = new BrowserInfo(BrowserType.CHROME, "58.0", null);
+		
+		BrowserInfo.getInfoFromVersion("57.0", Arrays.asList(bi1, bi2));
+	}
+	
+	@Test(groups= {"ut"})
+	public void testGetInfoFromPath() {
+		BrowserInfo bi1 = new BrowserInfo(BrowserType.CHROME, "48.0", "/home/tu/chrome", false);
+		BrowserInfo bi2 = new BrowserInfo(BrowserType.CHROME, "58.0", "/home/tu/chrome2", false);
+		
+		BrowserInfo biFromVersion = BrowserInfo.getInfoFromBinary("/home/tu/chrome2", Arrays.asList(bi1, bi2));
+		Assert.assertEquals(biFromVersion, bi2);
+	}
+	
+	@Test(groups= {"ut"})
+	public void testGetInfoFromPathNullInfo() {
+		BrowserInfo bi1 = new BrowserInfo(BrowserType.CHROME, "48.0", "/home/tu/chrome", false);
+		BrowserInfo bi2 = new BrowserInfo(BrowserType.CHROME, "58.0", "/home/tu/chrome2", false);
+		
+		BrowserInfo biFromVersion = BrowserInfo.getInfoFromBinary("/home/tu/chrome2", Arrays.asList(bi1, null, bi2));
+		Assert.assertEquals(biFromVersion, bi2);
+	}
+	
+	@Test(groups= {"ut"}, expectedExceptions=ConfigurationException.class)
+	public void testGetInfoFromNonExistentPath() {
+		BrowserInfo bi1 = new BrowserInfo(BrowserType.CHROME, "48.0", "/home/tu/chrome", false);
+		BrowserInfo bi2 = new BrowserInfo(BrowserType.CHROME, "58.0", "/home/tu/chrome2", false);
+		
+		BrowserInfo.getInfoFromBinary("/home/tu/chrome3", Arrays.asList(bi1, bi2));
+	}
+
 }

@@ -16,17 +16,46 @@
  */
 package com.seleniumtests.browserfactory;
 
+import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
+import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.DriverConfig;
 
-public class PhantomJSCapabilitiesFactory extends ICapabilitiesFactory {
+public class PhantomJSCapabilitiesFactory extends IDesktopCapabilityFactory {
+
+	public PhantomJSCapabilitiesFactory(DriverConfig webDriverConfig) {
+		super(webDriverConfig);
+	}
 
 	@Override
-    public DesiredCapabilities createCapabilities(final DriverConfig cfg) {
-        DesiredCapabilities capability = new DesiredCapabilities();
-        capability.setBrowserName(DesiredCapabilities.phantomjs().getBrowserName());
-        return updateDefaultCapabilities(capability, cfg);
-    }
+	protected MutableCapabilities getDriverOptions() {
+		return DesiredCapabilities.phantomjs();
+	}
+
+	@Override
+	protected String getDriverPath() {
+		return null;
+	}
+
+	@Override
+	protected BrowserType getBrowserType() {
+		return null;
+	}
+
+	@Override
+	protected String getDriverExeProperty() {
+		return null;
+	}
+
+	@Override
+	protected String getBrowserBinaryPath() {
+		return null;
+	}
+
+	@Override
+	protected void updateOptionsWithSelectedBrowserInfo(MutableCapabilities options) {
+		// nothing to do
+	}
 
 }

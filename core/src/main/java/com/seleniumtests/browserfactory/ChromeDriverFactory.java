@@ -30,9 +30,9 @@ public class ChromeDriverFactory extends AbstractWebDriverFactory implements IWe
 
     @Override
     protected WebDriver createNativeDriver() {
-    	ChromeOptions options = new ChromeOptions();
-    	options.merge(new ChromeCapabilitiesFactory().createCapabilities(webDriverConfig));
+    	ChromeCapabilitiesFactory capsFactory = new ChromeCapabilitiesFactory(webDriverConfig);
+    	ChromeOptions options = (ChromeOptions)capsFactory.createCapabilities();
+    	selectedBrowserInfo = capsFactory.getSelectedBrowserInfo();
     	return new ChromeDriver(options);
     }
-
 }

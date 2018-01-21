@@ -17,7 +17,9 @@
 package com.seleniumtests.util.osutility;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.EnumMap;
+import java.util.List;
 import java.util.Map;
 
 import com.seleniumtests.browserfactory.BrowserInfo;
@@ -26,22 +28,23 @@ import com.seleniumtests.driver.BrowserType;
 public class OSUtilityMac extends OSUtilityUnix {
 	
 	@Override
-	public Map<BrowserType, BrowserInfo> discoverInstalledBrowsersWithVersion() {
-		Map<BrowserType, BrowserInfo> browserList = new EnumMap<>(BrowserType.class);
+	public Map<BrowserType, List<BrowserInfo>> discoverInstalledBrowsersWithVersion() {
+		Map<BrowserType, List<BrowserInfo>> browserList = new EnumMap<>(BrowserType.class);
 		
-		browserList.put(BrowserType.HTMLUNIT, new BrowserInfo(BrowserType.HTMLUNIT, LATEST_VERSION, null));
-		browserList.put(BrowserType.PHANTOMJS, new BrowserInfo(BrowserType.PHANTOMJS, LATEST_VERSION, null));
+		browserList.put(BrowserType.HTMLUNIT, Arrays.asList(new BrowserInfo(BrowserType.HTMLUNIT, BrowserInfo.LATEST_VERSION, null)));
+		browserList.put(BrowserType.PHANTOMJS, Arrays.asList(new BrowserInfo(BrowserType.PHANTOMJS, BrowserInfo.LATEST_VERSION, null)));
 		
 		// safari is always installed on mac os
-		browserList.put(BrowserType.SAFARI, new BrowserInfo(BrowserType.SAFARI, LATEST_VERSION, null));
+		browserList.put(BrowserType.SAFARI, Arrays.asList(new BrowserInfo(BrowserType.SAFARI, BrowserInfo.LATEST_VERSION, null)));
 		
+		// TODO: handle multiple installation of Chrome and Firefox. But how to do that without specifying the location
 		if (new File("/Applications/Google Chrome.app").isDirectory()) {
 			String version = getChromeVersion("/Applications/Google Chrome.app/Contents/MacOS/Google Chrome");
-			browserList.put(BrowserType.CHROME, new BrowserInfo(BrowserType.CHROME, extractChromeVersion(version), "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"));
+			browserList.put(BrowserType.CHROME, Arrays.asList(new BrowserInfo(BrowserType.CHROME, extractChromeVersion(version), "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome")));
 		}
 		if (new File("/Applications/Firefox.app").isDirectory()) {
 			String version = getFirefoxVersion("/Applications/Firefox.app/Contents/MacOS/firefox");
-			browserList.put(BrowserType.FIREFOX, new BrowserInfo(BrowserType.FIREFOX, extractFirefoxVersion(version), "/Applications/Firefox.app/Contents/MacOS/firefox"));
+			browserList.put(BrowserType.FIREFOX, Arrays.asList(new BrowserInfo(BrowserType.FIREFOX, extractFirefoxVersion(version), "/Applications/Firefox.app/Contents/MacOS/firefox")));
 		}
 		
 		return browserList;

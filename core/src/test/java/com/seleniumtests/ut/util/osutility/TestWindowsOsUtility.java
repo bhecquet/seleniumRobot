@@ -135,8 +135,9 @@ public class TestWindowsOsUtility extends MockitoTest {
 		
 		
 		OSUtility.refreshBrowserList();
-		Map<BrowserType, BrowserInfo> browsers = OSUtility.getInstalledBrowsersWithVersion();
+		Map<BrowserType, List<BrowserInfo>> browsers = OSUtility.getInstalledBrowsersWithVersion();
 		Assert.assertTrue(browsers.containsKey(BrowserType.FIREFOX));
-		Assert.assertTrue(browsers.get(BrowserType.FIREFOX).getPath().contains("Mozilla Firefox"));
+		Assert.assertEquals(browsers.get(BrowserType.FIREFOX).size(), 2);
+		Assert.assertTrue(browsers.get(BrowserType.FIREFOX).get(0).getPath().contains("Mozilla Firefox"));
 	}
 }

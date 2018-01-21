@@ -1,5 +1,6 @@
 package com.seleniumtests.browserfactory;
 
+import java.io.File;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.nio.charset.Charset;
@@ -27,12 +28,14 @@ public class BrowserInfo {
 
 	private static final Pattern REG_CHROME_VERSION = Pattern.compile(".*chrome-(\\d+)-(\\d+).*");
 	private static final Pattern REG_ANDROID_VERSION = Pattern.compile(".*android-(\\d+\\.\\d+).*");
+	public static final String LATEST_VERSION = "999.9";
 	private static List<String> driverList;
 	
 	private String version;
 	private String path;
 	private String driverFileName;
 	private String os;
+	private boolean checkBrowserPath = true;
 	private BrowserType browser;
 	private boolean driverFileSearched = false;
 	
@@ -44,9 +47,33 @@ public class BrowserInfo {
 	 * @param driverFileName
 	 */
 	public BrowserInfo(BrowserType browser, String version, String path) {
+		this(browser, version, path, true);
+	}
+	
+	/**
+	 * 
+	 * @param browser
+	 * @param version
+	 * @param path				path to browser executable
+	 * @param check				do we check if browser path exists or not. Should not be used outside of tests
+	 */
+	public BrowserInfo(BrowserType browser, String version, String path, boolean check) {
 		this.browser = browser;
 		this.path = path;
-		this.version = version;
+		this.checkBrowserPath = check;
+		
+		if (path != null && !new File(path).exists() && check) {
+			throw new ConfigurationException(String.format("browser file %s does not exists", path));
+		}
+		
+		try {
+			Float.parseFloat(version);
+			this.version = version;
+		} catch (NumberFormatException e) {
+			logger.warn(String.format("Cannot parse browser version %s for browser", version, browser));
+			this.version = "0.0";
+		}
+		
 		os = OSUtility.getCurrentPlatorm().toString().toLowerCase();
 		if (os.equals("linux")) {
 			os = "unix";
@@ -202,7 +229,7 @@ public class BrowserInfo {
 	}
 	
 	/**
-     * use firefox if version is below 47
+     * use firefox (return true) if version is below 48
      * @param versionString
      * @return
      */
@@ -268,7 +295,6 @@ public class BrowserInfo {
 	}
 	
 	/**
-	 * For test only
 	 * @param driverFileName
 	 */
 	public void setDriverFileName(String driverFileName) {
@@ -368,5 +394,55 @@ public class BrowserInfo {
 	public boolean isDriverFileSearched() {
 		return driverFileSearched;
 	}
-
+	
+	/**
+	 * Returns the BrowserInfo with highest version
+	 * @return
+	 */
+	public static BrowserInfo getHighestDriverVersion(List<BrowserInfo> browserInfos) {
+		
+		BrowserInfo highest = null;
+		
+		for (BrowserInfo browserInfo: browserInfos) {
+			if (browserInfo == null) {
+				continue;
+			}
+			
+			if (highest == null || Float.parseFloat(browserInfo.getVersion()) > Float.parseFloat(highest.getVersion())) {
+				highest = browserInfo;
+			}
+		}
+		return highest;
+	}
+	
+	/**
+	 * returns the accurate BrowserInfo according to the expected version. If no version matches, raise a ConfigurationException
+	 * @param version
+	 * @return
+	 * @throws ConfigurationException  if no browserinfo matches
+	 */
+	public static BrowserInfo getInfoFromVersion(String version, List<BrowserInfo> browserInfos) {
+		for (BrowserInfo browserInfo: browserInfos) {
+			if (browserInfo != null && browserInfo.getVersion() != null && browserInfo.getVersion().equals(version)) {
+				return browserInfo;
+			}
+		}
+		throw new ConfigurationException(String.format("Browser is not installed in version %s", version));
+	}
+	
+	/**
+	 * returns the accurate BrowserInfo according to the expected binary. If no matches, raise a ConfigurationException
+	 * Also check that file exists
+	 * @param version
+	 * @return
+	 * @throws ConfigurationException  if no browserinfo matches
+	 */
+	public static BrowserInfo getInfoFromBinary(String binPath, List<BrowserInfo> browserInfos) {
+		for (BrowserInfo browserInfo: browserInfos) {
+			if (browserInfo != null && browserInfo.getPath() != null && browserInfo.getPath().equals(binPath)) {
+				return browserInfo;
+			}
+		}
+		throw new ConfigurationException(String.format("Browser is not present at %s", binPath));
+	}
 }

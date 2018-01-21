@@ -83,6 +83,10 @@ public class DriverExtractor {
 	 */
 	public String extractDriver(String driverName) {
 		
+		if (driverName == null) {
+			return null;
+		}
+		
 		String driverVersion = getDriverVersion(driverName);
 		String robotVersion = PackageUtility.getVersion();
 		Path driverPath = getDriverPath(driverName);

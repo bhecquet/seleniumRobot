@@ -101,25 +101,26 @@ public class OSUtilityUnix extends OSUtility {
 	}
 	
 	@Override
-	public Map<BrowserType, BrowserInfo> discoverInstalledBrowsersWithVersion() {
-		Map<BrowserType, BrowserInfo> browserList = new EnumMap<>(BrowserType.class);
+	public Map<BrowserType, List<BrowserInfo>> discoverInstalledBrowsersWithVersion() {
+		Map<BrowserType, List<BrowserInfo>> browserList = new EnumMap<>(BrowserType.class);
 		
-		browserList.put(BrowserType.HTMLUNIT, new BrowserInfo(BrowserType.HTMLUNIT, LATEST_VERSION, null));
-		browserList.put(BrowserType.PHANTOMJS, new BrowserInfo(BrowserType.PHANTOMJS, LATEST_VERSION, null));
+		browserList.put(BrowserType.HTMLUNIT, Arrays.asList(new BrowserInfo(BrowserType.HTMLUNIT, BrowserInfo.LATEST_VERSION, null)));
+		browserList.put(BrowserType.PHANTOMJS, Arrays.asList(new BrowserInfo(BrowserType.PHANTOMJS, BrowserInfo.LATEST_VERSION, null)));
 		
+		// TODO: handle multiple installation of firefox and Chrome
 		if (!OSCommand.executeCommandAndWait("which firefox").trim().isEmpty()) {
 			String version = getFirefoxVersion("firefox");
-			browserList.put(BrowserType.FIREFOX, new BrowserInfo(BrowserType.FIREFOX, extractFirefoxVersion(version), OSCommand.executeCommandAndWait("which firefox").trim()));
+			browserList.put(BrowserType.FIREFOX, Arrays.asList(new BrowserInfo(BrowserType.FIREFOX, extractFirefoxVersion(version), OSCommand.executeCommandAndWait("which firefox").trim())));
 		} else if (!OSCommand.executeCommandAndWait("which iceweasel").trim().isEmpty()) {
 			String version = getFirefoxVersion("iceweasel");
-			browserList.put(BrowserType.FIREFOX, new BrowserInfo(BrowserType.FIREFOX, extractFirefoxVersion(version), OSCommand.executeCommandAndWait("which iceweasel").trim()));
+			browserList.put(BrowserType.FIREFOX, Arrays.asList(new BrowserInfo(BrowserType.FIREFOX, extractFirefoxVersion(version), OSCommand.executeCommandAndWait("which iceweasel").trim())));
 		}
 		if (!OSCommand.executeCommandAndWait("which chromium-browser").trim().isEmpty()) {
 			String version = getChromeVersion("chromium-browser");
-			browserList.put(BrowserType.CHROME, new BrowserInfo(BrowserType.CHROME, extractChromiumVersion(version), OSCommand.executeCommandAndWait("which chromium-browser").trim()));
+			browserList.put(BrowserType.CHROME, Arrays.asList(new BrowserInfo(BrowserType.CHROME, extractChromiumVersion(version), OSCommand.executeCommandAndWait("which chromium-browser").trim())));
 		} else if (!OSCommand.executeCommandAndWait("which google-chrome").trim().isEmpty()) {
 			String version = getChromeVersion("google-chrome");
-			browserList.put(BrowserType.CHROME, new BrowserInfo(BrowserType.CHROME, extractChromeVersion(version), OSCommand.executeCommandAndWait("which google-chrome").trim()));
+			browserList.put(BrowserType.CHROME, Arrays.asList(new BrowserInfo(BrowserType.CHROME, extractChromeVersion(version), OSCommand.executeCommandAndWait("which google-chrome").trim())));
 		} 
 		
 		return browserList;

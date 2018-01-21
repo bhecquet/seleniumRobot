@@ -31,6 +31,7 @@ import org.apache.http.entity.FileEntity;
 import org.apache.http.impl.auth.BasicScheme;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.DesiredCapabilities;
@@ -130,16 +131,22 @@ public class SauceLabsDriverFactory extends AbstractWebDriverFactory implements 
     @Override
     protected WebDriver createNativeDriver() {
     	
-    	DesiredCapabilities capabilities = createCapabilities();
+    	MutableCapabilities capabilities = createCapabilities();
 
     	try {
 	        if("android".equalsIgnoreCase(webDriverConfig.getPlatform())){
-	            return new AndroidDriver<WebElement>(new URL(webDriverConfig.getAppiumServerURL()), new AndroidCapabilitiesFactory(capabilities).createCapabilities(webDriverConfig));
+	        	capabilities.merge(new AndroidCapabilitiesFactory(webDriverConfig).createCapabilities());
+	            return new AndroidDriver<WebElement>(new URL(webDriverConfig.getAppiumServerURL()), capabilities);
+	            
 	        } else if ("ios".equalsIgnoreCase(webDriverConfig.getPlatform())){
-	            return new IOSDriver<WebElement>(new URL(webDriverConfig.getAppiumServerURL()), new IOsCapabilitiesFactory(capabilities).createCapabilities(webDriverConfig));
+	        	capabilities.merge( new IOsCapabilitiesFactory(webDriverConfig).createCapabilities());
+	            return new IOSDriver<WebElement>(new URL(webDriverConfig.getAppiumServerURL()), capabilities);
+	            
+	        } else {
+	        	capabilities.merge(new SauceLabsCapabilitiesFactory(webDriverConfig).createCapabilities());
+	        	return new RemoteWebDriver(new URL(webDriverConfig.getAppiumServerURL()), capabilities);
 	        }
 	
-	        return new RemoteWebDriver(new URL(webDriverConfig.getAppiumServerURL()), new SauceLabsCapabilitiesFactory().createCapabilities(webDriverConfig));
     	} catch (MalformedURLException e) {
     		throw new DriverExceptions("Error creating driver: " + e.getMessage());
     	}

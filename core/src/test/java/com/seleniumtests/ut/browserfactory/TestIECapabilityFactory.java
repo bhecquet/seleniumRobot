@@ -4,7 +4,9 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.mockito.Mock;
@@ -12,15 +14,12 @@ import org.mockito.Mockito;
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.Platform;
 import org.openqa.selenium.Proxy;
-import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.ie.InternetExplorerDriver;
 import org.openqa.selenium.ie.InternetExplorerDriverService;
 import org.openqa.selenium.remote.CapabilityType;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
-import org.testng.SkipException;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -55,8 +54,8 @@ public class TestIECapabilityFactory extends MockitoTest {
 		PowerMockito.when(System.clearProperty(anyString())).thenCallRealMethod();
 		PowerMockito.when(System.getProperty("os.name")).thenReturn("Windows 10");	
 		
-		Map<BrowserType, BrowserInfo> browserInfos = new HashMap<>();
-		browserInfos.put(BrowserType.INTERNET_EXPLORER, new BrowserInfo(BrowserType.INTERNET_EXPLORER, "11", ""));
+		Map<BrowserType, List<BrowserInfo>> browserInfos = new HashMap<>();
+		browserInfos.put(BrowserType.INTERNET_EXPLORER, Arrays.asList(new BrowserInfo(BrowserType.INTERNET_EXPLORER, "11", "", false)));
 
 		PowerMockito.mockStatic(OSUtility.class);
 		PowerMockito.when(OSUtility.getInstalledBrowsersWithVersion()).thenReturn(browserInfos);
@@ -78,7 +77,7 @@ public class TestIECapabilityFactory extends MockitoTest {
 		Mockito.when(config.isEnableJavascript()).thenReturn(true);
 		Mockito.when(config.getProxy()).thenReturn(proxyConfig);
 		
-		MutableCapabilities capa = new IECapabilitiesFactory().createCapabilities(config);
+		MutableCapabilities capa = new IECapabilitiesFactory(config).createCapabilities();
 		
 		Assert.assertTrue(capa.is(CapabilityType.SUPPORTS_JAVASCRIPT));
 		Assert.assertTrue(capa.is(CapabilityType.TAKES_SCREENSHOT));
@@ -94,7 +93,7 @@ public class TestIECapabilityFactory extends MockitoTest {
 		Mockito.when(config.getProxy()).thenReturn(proxyConfig);
 		Mockito.when(config.getWebPlatform()).thenReturn(Platform.WINDOWS);
 		
-		MutableCapabilities capa = new IECapabilitiesFactory().createCapabilities(config);
+		MutableCapabilities capa = new IECapabilitiesFactory(config).createCapabilities();
 		
 		Assert.assertEquals(capa.getPlatform(), Platform.WINDOWS);
 		
@@ -106,7 +105,7 @@ public class TestIECapabilityFactory extends MockitoTest {
 		Mockito.when(config.isEnableJavascript()).thenReturn(false);
 		Mockito.when(config.getProxy()).thenReturn(proxyConfig);
 		
-		MutableCapabilities capa = new IECapabilitiesFactory().createCapabilities(config);
+		MutableCapabilities capa = new IECapabilitiesFactory(config).createCapabilities();
 		
 		Assert.assertFalse(capa.is(CapabilityType.SUPPORTS_JAVASCRIPT));
 		
@@ -119,7 +118,7 @@ public class TestIECapabilityFactory extends MockitoTest {
 		Mockito.when(config.getProxy()).thenReturn(proxyConfig);
 		Mockito.when(config.getBrowserVersion()).thenReturn("10.0");
 		
-		MutableCapabilities capa = new IECapabilitiesFactory().createCapabilities(config);
+		MutableCapabilities capa = new IECapabilitiesFactory(config).createCapabilities();
 		
 		Assert.assertEquals(capa.getVersion(), "10.0");
 		
@@ -128,7 +127,7 @@ public class TestIECapabilityFactory extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testCreateDefaultIECapabilities() {
 		
-		MutableCapabilities capa = new IECapabilitiesFactory().createCapabilities(config);
+		MutableCapabilities capa = new IECapabilitiesFactory(config).createCapabilities();
 		
 		Assert.assertEquals(capa.getCapability(CapabilityType.BROWSER_NAME), "internet explorer");
 		Assert.assertTrue((Boolean)capa.getCapability(InternetExplorerDriver.IGNORE_ZOOM_SETTING));
@@ -142,7 +141,7 @@ public class TestIECapabilityFactory extends MockitoTest {
 		try {
 			Mockito.when(config.getMode()).thenReturn(DriverMode.LOCAL);
 			
-			new IECapabilitiesFactory().createCapabilities(config);
+			new IECapabilitiesFactory(config).createCapabilities();
 			
 			Assert.assertTrue(System.getProperty(InternetExplorerDriverService.IE_DRIVER_EXE_PROPERTY).replace(File.separator, "/").contains("/drivers/IEDriverServer_"));
 		} finally {
@@ -156,7 +155,7 @@ public class TestIECapabilityFactory extends MockitoTest {
 			Mockito.when(config.getMode()).thenReturn(DriverMode.LOCAL);
 			Mockito.when(config.getIeDriverPath()).thenReturn("/opt/ie/driver/ie");
 			
-			new IECapabilitiesFactory().createCapabilities(config);
+			new IECapabilitiesFactory(config).createCapabilities();
 			
 			Assert.assertEquals(System.getProperty(InternetExplorerDriverService.IE_DRIVER_EXE_PROPERTY).replace(File.separator, "/"), "/opt/ie/driver/ie");
 		} finally {
@@ -168,7 +167,7 @@ public class TestIECapabilityFactory extends MockitoTest {
 	public void testCreateIECapabilitiesStandardDriverPathGrid() {
 		Mockito.when(config.getMode()).thenReturn(DriverMode.GRID);
 		
-		new IECapabilitiesFactory().createCapabilities(config);
+		new IECapabilitiesFactory(config).createCapabilities();
 		
 		Assert.assertNull(System.getProperty(InternetExplorerDriverService.IE_DRIVER_EXE_PROPERTY));
 	}
