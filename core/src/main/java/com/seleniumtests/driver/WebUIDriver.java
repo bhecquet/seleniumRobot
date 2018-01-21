@@ -24,6 +24,7 @@ import org.apache.log4j.Logger;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.Platform;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.remote.LocalFileDetector;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.events.EventFiringWebDriver;
 import org.openqa.selenium.support.events.WebDriverEventListener;
@@ -108,8 +109,8 @@ public class WebUIDriver {
 
         synchronized (createDriverLock) {
         	
-    		// get browser info used to start this driver. It will be used then for 
-        	BrowserInfo browserInfo = OSUtility.getInstalledBrowsersWithVersion().get(config.getBrowser());
+    		// get browser info used to start this driver. It will be used then for managing pids
+        	BrowserInfo browserInfo = webDriverBuilder.getSelectedBrowserInfo();
         	List<Long> existingPids = new ArrayList<>();
 
     		// get pid pre-existing the creation of this driver. This helps filtering drivers launched by other tests or users
@@ -259,18 +260,14 @@ public class WebUIDriver {
         return listeningDriver;
     }
     
-    /**
-     * In local mode only, display the browser version
-     * For remote, will use either the default one, or version specified in test context
-     */
-    private void checkBrowserAvailable() {
+    private void checkBrowserRunnable() {
     	if (config.getMode() == DriverMode.LOCAL && !config.getTestType().isMobile()) {
-    		Map<BrowserType, BrowserInfo> browsers = OSUtility.getInstalledBrowsersWithVersion();
+    		Map<BrowserType, List<BrowserInfo>> browsers = OSUtility.getInstalledBrowsersWithVersion();
     		if (!browsers.containsKey(config.getBrowser())) {
     			throw new ConfigurationException(String.format("Browser %s is not available. Available browsers are %s", 
     					config.getBrowser(), browsers));
     		}
-    	} 
+    	}
     }
     
     private void displayBrowserVersion() {
@@ -290,10 +287,7 @@ public class WebUIDriver {
     	} else {
     		logger.info(String.format("Start creating %s driver", config.getBrowser().getBrowserType()));
     	}
-	
-	
-        
-    	checkBrowserAvailable();
+    	checkBrowserRunnable();
         driver = createRemoteWebDriver();
         displayBrowserVersion();
  

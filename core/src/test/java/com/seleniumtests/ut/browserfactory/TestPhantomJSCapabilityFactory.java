@@ -52,7 +52,7 @@ public class TestPhantomJSCapabilityFactory extends MockitoTest {
 		Mockito.when(config.isEnableJavascript()).thenReturn(true);
 		Mockito.when(config.getProxy()).thenReturn(proxyConfig);
 		
-		MutableCapabilities capa = new PhantomJSCapabilitiesFactory().createCapabilities(config);
+		MutableCapabilities capa = new PhantomJSCapabilitiesFactory(config).createCapabilities();
 		
 		Assert.assertTrue(capa.is(CapabilityType.SUPPORTS_JAVASCRIPT));
 		Assert.assertTrue(capa.is(CapabilityType.TAKES_SCREENSHOT));
@@ -68,7 +68,7 @@ public class TestPhantomJSCapabilityFactory extends MockitoTest {
 		Mockito.when(config.getProxy()).thenReturn(proxyConfig);
 		Mockito.when(config.getWebPlatform()).thenReturn(Platform.WINDOWS);
 		
-		MutableCapabilities capa = new PhantomJSCapabilitiesFactory().createCapabilities(config);
+		MutableCapabilities capa = new PhantomJSCapabilitiesFactory(config).createCapabilities();
 		
 		Assert.assertEquals(capa.getPlatform(), Platform.WINDOWS);
 		
@@ -80,7 +80,7 @@ public class TestPhantomJSCapabilityFactory extends MockitoTest {
 		Mockito.when(config.isEnableJavascript()).thenReturn(false);
 		Mockito.when(config.getProxy()).thenReturn(proxyConfig);
 		
-		MutableCapabilities capa = new PhantomJSCapabilitiesFactory().createCapabilities(config);
+		MutableCapabilities capa = new PhantomJSCapabilitiesFactory(config).createCapabilities();
 		
 		Assert.assertFalse(capa.is(CapabilityType.SUPPORTS_JAVASCRIPT));
 		
@@ -93,7 +93,7 @@ public class TestPhantomJSCapabilityFactory extends MockitoTest {
 		Mockito.when(config.getProxy()).thenReturn(proxyConfig);
 		Mockito.when(config.getBrowserVersion()).thenReturn("10.0");
 		
-		MutableCapabilities capa = new PhantomJSCapabilitiesFactory().createCapabilities(config);
+		MutableCapabilities capa = new PhantomJSCapabilitiesFactory(config).createCapabilities();
 		
 		Assert.assertEquals(capa.getVersion(), "10.0");
 		
@@ -102,7 +102,7 @@ public class TestPhantomJSCapabilityFactory extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testCreateDefaultSafariCapabilities() {
 		
-		MutableCapabilities capa = new PhantomJSCapabilitiesFactory().createCapabilities(config);
+		MutableCapabilities capa = new PhantomJSCapabilitiesFactory(config).createCapabilities();
 		
 		Assert.assertEquals(capa.getCapability(CapabilityType.BROWSER_NAME), "phantomjs");
 	}	

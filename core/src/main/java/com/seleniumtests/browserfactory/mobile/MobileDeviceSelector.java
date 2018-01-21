@@ -19,6 +19,7 @@ package com.seleniumtests.browserfactory.mobile;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
 import com.seleniumtests.customexception.ConfigurationException;
@@ -87,7 +88,7 @@ public class MobileDeviceSelector {
 	 * @throws ConfigurationException if no relevant device is found
 	 * @return
 	 */
-	public MobileDevice getRelevantMobileDevice(DesiredCapabilities capabilities) {
+	public MobileDevice getRelevantMobileDevice(MutableCapabilities capabilities) {
 		isInitialized();
 		Object deviceName = capabilities.getCapability(MobileCapabilityType.DEVICE_NAME);
 		Object platformName = capabilities.getCapability(MobileCapabilityType.PLATFORM_NAME);
@@ -134,13 +135,14 @@ public class MobileDeviceSelector {
 	 * @param capabilities
 	 * @return
 	 */
-	public DesiredCapabilities updateCapabilitiesWithSelectedDevice(DesiredCapabilities capabilities, DriverMode driverMode) {
+	public MutableCapabilities updateCapabilitiesWithSelectedDevice(MutableCapabilities capabilities, DriverMode driverMode) {
 		MobileDevice selectedDevice = getRelevantMobileDevice(capabilities);
 		
 		if ("android".equals(selectedDevice.getPlatform())) {
 			capabilities.setCapability(MobileCapabilityType.DEVICE_NAME, selectedDevice.getId());
 			
 			// set the right chromedriver executable according to android browser / chromeversion
+			// it's only the file name, not it's path
 			if (driverMode == DriverMode.LOCAL && !capabilities.getBrowserName().isEmpty()) {
 				String chromeDriverFile = null;
 				if (BrowserType.CHROME.toString().equalsIgnoreCase(capabilities.getBrowserName())) {
@@ -149,6 +151,7 @@ public class MobileDeviceSelector {
 	        		chromeDriverFile = selectedDevice.getBrowserInfo(BrowserType.BROWSER).getDriverFileName();
 	        	}
 				if (chromeDriverFile != null) {
+					// driver extraction will be done later. For example in AppiumDriverFactory
 					capabilities.setCapability(AndroidMobileCapabilityType.CHROMEDRIVER_EXECUTABLE, chromeDriverFile);
 				}
 			}

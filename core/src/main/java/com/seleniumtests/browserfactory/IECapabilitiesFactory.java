@@ -16,92 +16,54 @@
  */
 package com.seleniumtests.browserfactory;
 
-import java.io.IOException;
-
-import org.openqa.selenium.Proxy;
+import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.ie.InternetExplorerDriver;
 import org.openqa.selenium.ie.InternetExplorerDriverService;
-import org.openqa.selenium.remote.CapabilityType;
-import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.ie.InternetExplorerOptions;
 
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.DriverConfig;
-import com.seleniumtests.driver.DriverExtractor;
-import com.seleniumtests.driver.DriverMode;
-import com.seleniumtests.util.FileUtility;
-import com.seleniumtests.util.osutility.OSUtility;
 
-public class IECapabilitiesFactory extends ICapabilitiesFactory {
+public class IECapabilitiesFactory extends IDesktopCapabilityFactory {
 
-    public void handleExtractResources() throws IOException {
-    	BrowserInfo browserInfo = OSUtility.getInstalledBrowsersWithVersion().get(BrowserType.INTERNET_EXPLORER);
-    	String driverPath = FileUtility.decodePath(new DriverExtractor().extractDriver(browserInfo.getDriverFileName()));
-    	System.setProperty(InternetExplorerDriverService.IE_DRIVER_EXE_PROPERTY, driverPath);
+    public IECapabilitiesFactory(DriverConfig webDriverConfig) {
+		super(webDriverConfig);
+	}
 
+	@Override
+	protected MutableCapabilities getDriverOptions() {
+		InternetExplorerOptions options = new InternetExplorerOptions();
+		
+		options.setCapability(InternetExplorerDriver.INTRODUCE_FLAKINESS_BY_IGNORING_SECURITY_DOMAINS,true);
+        options.setCapability(InternetExplorerDriver.IE_ENSURE_CLEAN_SESSION, true);
+        options.setCapability(InternetExplorerDriver.INITIAL_BROWSER_URL, "about:blank");
+        options.setCapability(InternetExplorerDriver.IGNORE_ZOOM_SETTING, true);
 
-        
-    }
-    
-    /**
-     * Set IEDriver for Local Mode for local mode
-     * @param webDriverConfig
-     */
-    public void setIEDriverLocal(final DriverConfig webDriverConfig){
-    	
-    	// an other driver has been configured through command line
-    	if (webDriverConfig.getIeDriverPath() != null) {
-            System.setProperty(InternetExplorerDriverService.IE_DRIVER_EXE_PROPERTY, webDriverConfig.getIeDriverPath());
-        } else {
-        	// an other driver has been configured in environment
-            if (System.getenv(InternetExplorerDriverService.IE_DRIVER_EXE_PROPERTY) != null) {
-                logger.info("Get IE Driver from property:" + System.getenv(InternetExplorerDriverService.IE_DRIVER_EXE_PROPERTY));
-                System.setProperty(InternetExplorerDriverService.IE_DRIVER_EXE_PROPERTY, System.getenv(InternetExplorerDriverService.IE_DRIVER_EXE_PROPERTY));
-            } else {
-                try {
-                    handleExtractResources();
-                } catch (IOException e) {
-                    logger.error(e);
-                }
-            }
-        }
-    }
+        return options;
+	}
 
-    @Override
-    public DesiredCapabilities createCapabilities(final DriverConfig cfg) {
+	@Override
+	protected String getDriverPath() {
+		return webDriverConfig.getIeDriverPath();
+	}
 
-        if (cfg.getMode() == DriverMode.LOCAL) {
-        	setIEDriverLocal(cfg);
-        }
+	@Override
+	protected BrowserType getBrowserType() {
+		return BrowserType.INTERNET_EXPLORER;
+	}
 
-        DesiredCapabilities capability = DesiredCapabilities.internetExplorer();
+	@Override
+	protected String getDriverExeProperty() {
+		return InternetExplorerDriverService.IE_DRIVER_EXE_PROPERTY;
+	}
 
-        capability.setBrowserName(DesiredCapabilities.internetExplorer().getBrowserName());
+	@Override
+	protected String getBrowserBinaryPath() {
+		return null;
+	}
 
-        if (cfg.isEnableJavascript()) {
-            capability.setJavascriptEnabled(true);
-        } else {
-            capability.setJavascriptEnabled(false);
-        }
-
-        capability.setCapability(CapabilityType.TAKES_SCREENSHOT, true);
-        capability.setCapability(CapabilityType.ACCEPT_SSL_CERTS, true);
-        capability.setCapability("ignoreZoomSetting", true);
-        
-        capability.setCapability(InternetExplorerDriver.INTRODUCE_FLAKINESS_BY_IGNORING_SECURITY_DOMAINS,true);
-        capability.setCapability(InternetExplorerDriver.IE_ENSURE_CLEAN_SESSION, true);
-        capability.setCapability(InternetExplorerDriver.INITIAL_BROWSER_URL, "about:blank");
-
-        if (cfg.getBrowserVersion() != null) {
-            capability.setVersion(cfg.getBrowserVersion());
-        }
-
-        if (cfg.getWebPlatform() != null) {
-            capability.setPlatform(cfg.getWebPlatform());
-        }
-
-        Proxy proxy = cfg.getProxy();
-        capability.setCapability(CapabilityType.PROXY, proxy);
-
-        return capability;
-    }
+	@Override
+	protected void updateOptionsWithSelectedBrowserInfo(MutableCapabilities options) {
+		// nothing to do
+	}
 }

@@ -305,16 +305,16 @@ public class SeleniumTestsContext {
      * that it matches those really used
      */
     private void updateInstalledBrowsers() {
-    	Map<BrowserType, BrowserInfo> installedBrowsers = OSUtility.getInstalledBrowsersWithVersion();
+    	Map<BrowserType, List<BrowserInfo>> installedBrowsers = OSUtility.getInstalledBrowsersWithVersion();
     	
     	if (getFirefoxBinPath() != null) {
     		String version = OSUtility.getFirefoxVersion(getFirefoxBinPath());
-    		installedBrowsers.put(BrowserType.FIREFOX, new BrowserInfo(BrowserType.FIREFOX, version, getFirefoxBinPath()));
+    		installedBrowsers.get(BrowserType.FIREFOX).add(new BrowserInfo(BrowserType.FIREFOX, version, getFirefoxBinPath()));
     	}
     	
     	if (getChromeBinPath() != null) {
     		String version = OSUtility.getChromeVersion(getChromeBinPath());
-    		installedBrowsers.put(BrowserType.CHROME, new BrowserInfo(BrowserType.CHROME, version, getChromeBinPath()));
+    		installedBrowsers.get(BrowserType.CHROME).add(new BrowserInfo(BrowserType.CHROME, version, getChromeBinPath()));
     	}
     }
     

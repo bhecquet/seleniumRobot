@@ -170,23 +170,29 @@ public class OSUtilityWindows extends OSUtility {
 	}
 
 	@Override
-	public Map<BrowserType, BrowserInfo> discoverInstalledBrowsersWithVersion() {
+	public Map<BrowserType, List<BrowserInfo>> discoverInstalledBrowsersWithVersion() {
 			
-		Map<BrowserType, BrowserInfo> browserList = new EnumMap<>(BrowserType.class);
+		Map<BrowserType, List<BrowserInfo>> browserList = new EnumMap<>(BrowserType.class);
 		
-		browserList.put(BrowserType.HTMLUNIT, new BrowserInfo(BrowserType.HTMLUNIT, LATEST_VERSION, null));
-		browserList.put(BrowserType.PHANTOMJS, new BrowserInfo(BrowserType.PHANTOMJS, LATEST_VERSION, null));
+		browserList.put(BrowserType.HTMLUNIT, Arrays.asList(new BrowserInfo(BrowserType.HTMLUNIT, BrowserInfo.LATEST_VERSION, null)));
+		browserList.put(BrowserType.PHANTOMJS, Arrays.asList(new BrowserInfo(BrowserType.PHANTOMJS, BrowserInfo.LATEST_VERSION, null)));
 		
 		// look for Firefox
 		try {
-			String firefoxPath = searchFirefoxVersions().get(0);
-			String version = getFirefoxVersion(firefoxPath);
-			browserList.put(BrowserType.FIREFOX, new BrowserInfo(BrowserType.FIREFOX, extractFirefoxVersion(version), firefoxPath));
+			browserList.put(BrowserType.FIREFOX, new ArrayList<>());
+			
+			for (String firefoxPath: searchFirefoxVersions()) {
+				String version = getFirefoxVersion(firefoxPath);
+				browserList.get(BrowserType.FIREFOX).add(new BrowserInfo(BrowserType.FIREFOX, extractFirefoxVersion(version), firefoxPath));
+			}
 		} catch (IndexOutOfBoundsException e) {}
 		
 		
 		// look for chrome
+		// TODO: handle multiple chrome versions
 		try {
+			browserList.put(BrowserType.CHROME, new ArrayList<>());
+			
 			String chromePath = Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Classes\\ChromeHTML\\shell\\open\\command", "");
 			chromePath = chromePath.split(".exe\"")[0].replace("\"", "") + ".exe";
 			String version;
@@ -195,7 +201,7 @@ public class OSUtilityWindows extends OSUtility {
 			} catch (Win32Exception e) {
 				version = getChromeVersionFromFolder(chromePath);
 			}
-			browserList.put(BrowserType.CHROME, new BrowserInfo(BrowserType.CHROME, extractChromeVersion("Google Chrome " + version), chromePath));
+			browserList.get(BrowserType.CHROME).add(new BrowserInfo(BrowserType.CHROME, extractChromeVersion("Google Chrome " + version), chromePath));
 		} catch (Win32Exception e) {}
 		
 		// look for ie
@@ -203,13 +209,13 @@ public class OSUtilityWindows extends OSUtility {
 			Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Microsoft\\Windows\\CurrentVersion\\App Paths\\IEXPLORE.EXE", "");
 			String version = getIeVersionFromRegistry();
 			
-			browserList.put(BrowserType.INTERNET_EXPLORER, new BrowserInfo(BrowserType.INTERNET_EXPLORER, extractIEVersion(version), null));
+			browserList.put(BrowserType.INTERNET_EXPLORER, Arrays.asList(new BrowserInfo(BrowserType.INTERNET_EXPLORER, extractIEVersion(version), null)));
 		} catch (Win32Exception e) {}
 		
 		// look for edge
 		try {
 			String version = Advapi32Util.registryGetStringValue(WinReg.HKEY_CURRENT_USER, "Software\\Microsoft\\MicrosoftEdge\\Main", "EdgeSwitchingOSBuildNumber");
-			browserList.put(BrowserType.EDGE, new BrowserInfo(BrowserType.EDGE, extractEdgeVersion(version), null));
+			browserList.put(BrowserType.EDGE, Arrays.asList(new BrowserInfo(BrowserType.EDGE, extractEdgeVersion(version), null)));
 		} catch (Win32Exception e) {}
 		
 		return browserList;

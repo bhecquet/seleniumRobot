@@ -17,7 +17,9 @@
 package com.seleniumtests.ut.browserfactory;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.mockito.Mock;
@@ -37,7 +39,7 @@ import org.testng.annotations.Test;
 
 import com.seleniumtests.MockitoTest;
 import com.seleniumtests.browserfactory.BrowserInfo;
-import com.seleniumtests.browserfactory.MarionetteCapabilitiesFactory;
+import com.seleniumtests.browserfactory.FirefoxCapabilitiesFactory;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.DriverConfig;
 import com.seleniumtests.driver.DriverMode;
@@ -55,8 +57,8 @@ public class TestMarionetteCapabilitiesFactory extends MockitoTest {
 
 	@BeforeMethod(groups= {"ut"})
 	public void init() {
-		Map<BrowserType, BrowserInfo> browserInfos = new HashMap<>();
-		browserInfos.put(BrowserType.FIREFOX, new BrowserInfo(BrowserType.FIREFOX, "58.0", "/usr/bin/firefox"));
+		Map<BrowserType, List<BrowserInfo>> browserInfos = new HashMap<>();
+		browserInfos.put(BrowserType.FIREFOX, Arrays.asList(new BrowserInfo(BrowserType.FIREFOX, "58.0", "/usr/bin/firefox", false)));
 		PowerMockito.mockStatic(OSUtility.class, Mockito.CALLS_REAL_METHODS);
 		PowerMockito.when(OSUtility.getInstalledBrowsersWithVersion()).thenReturn(browserInfos);
 	}
@@ -70,7 +72,7 @@ public class TestMarionetteCapabilitiesFactory extends MockitoTest {
 		Mockito.when(config.isEnableJavascript()).thenReturn(true);
 		Mockito.when(config.getProxy()).thenReturn(proxyConfig);
 		
-		MutableCapabilities capa = new MarionetteCapabilitiesFactory().createCapabilities(config);
+		MutableCapabilities capa = new FirefoxCapabilitiesFactory(config).createCapabilities();
 		
 		Assert.assertTrue(capa.is(CapabilityType.SUPPORTS_JAVASCRIPT));
 		Assert.assertTrue(capa.is(CapabilityType.TAKES_SCREENSHOT));
@@ -86,7 +88,7 @@ public class TestMarionetteCapabilitiesFactory extends MockitoTest {
 		Mockito.when(config.getProxy()).thenReturn(proxyConfig);
 		Mockito.when(config.getWebPlatform()).thenReturn(Platform.WINDOWS);
 		
-		MutableCapabilities capa = new MarionetteCapabilitiesFactory().createCapabilities(config);
+		MutableCapabilities capa = new FirefoxCapabilitiesFactory(config).createCapabilities();
 		
 		Assert.assertEquals(capa.getPlatform(), Platform.WINDOWS);
 		
@@ -98,7 +100,7 @@ public class TestMarionetteCapabilitiesFactory extends MockitoTest {
 		Mockito.when(config.isEnableJavascript()).thenReturn(false);
 		Mockito.when(config.getProxy()).thenReturn(proxyConfig);
 		
-		MutableCapabilities capa = new MarionetteCapabilitiesFactory().createCapabilities(config);
+		MutableCapabilities capa = new FirefoxCapabilitiesFactory(config).createCapabilities();
 		
 		Assert.assertFalse(capa.is(CapabilityType.SUPPORTS_JAVASCRIPT));
 		
@@ -111,7 +113,7 @@ public class TestMarionetteCapabilitiesFactory extends MockitoTest {
 		Mockito.when(config.getProxy()).thenReturn(proxyConfig);
 		Mockito.when(config.getBrowserVersion()).thenReturn("60.0");
 		
-		MutableCapabilities capa = new MarionetteCapabilitiesFactory().createCapabilities(config);
+		MutableCapabilities capa = new FirefoxCapabilitiesFactory(config).createCapabilities();
 		
 		Assert.assertEquals(capa.getVersion(), "60.0");
 		
@@ -119,11 +121,12 @@ public class TestMarionetteCapabilitiesFactory extends MockitoTest {
 	
 	@Test(groups={"ut"})
 	public void testCreateDefaultMarionetteCapabilities() {
-		
+
+		Mockito.when(config.getMode()).thenReturn(DriverMode.LOCAL);
 		Mockito.when(config.isSetAcceptUntrustedCertificates()).thenReturn(true);
 		Mockito.when(config.isSetAssumeUntrustedCertificateIssuer()).thenReturn(true);
 		
-		MutableCapabilities capa = new MarionetteCapabilitiesFactory().createCapabilities(config);
+		MutableCapabilities capa = new FirefoxCapabilitiesFactory(config).createCapabilities();
 		
 		Assert.assertEquals(capa.getCapability(CapabilityType.BROWSER_NAME), "firefox");
 		Assert.assertEquals(capa.getCapability(FirefoxDriver.MARIONETTE), true);
@@ -133,10 +136,10 @@ public class TestMarionetteCapabilitiesFactory extends MockitoTest {
 		// check profile
 		Assert.assertTrue(profile.getBooleanPreference("webdriver_accept_untrusted_certs", false));
 		Assert.assertTrue(profile.getBooleanPreference("webdriver_assume_untrusted_issuer", false));
-		Assert.assertEquals(profile.getStringPreference("capability.policy.default.Window.QueryInterface", ""), MarionetteCapabilitiesFactory.ALL_ACCESS);
-		Assert.assertEquals(profile.getStringPreference("capability.policy.default.Window.frameElement.get", ""), MarionetteCapabilitiesFactory.ALL_ACCESS);
-		Assert.assertEquals(profile.getStringPreference("capability.policy.default.HTMLDocument.compatMode.get", ""), MarionetteCapabilitiesFactory.ALL_ACCESS);
-		Assert.assertEquals(profile.getStringPreference("capability.policy.default.Document.compatMode.get", ""), MarionetteCapabilitiesFactory.ALL_ACCESS);
+		Assert.assertEquals(profile.getStringPreference("capability.policy.default.Window.QueryInterface", ""), FirefoxCapabilitiesFactory.ALL_ACCESS);
+		Assert.assertEquals(profile.getStringPreference("capability.policy.default.Window.frameElement.get", ""), FirefoxCapabilitiesFactory.ALL_ACCESS);
+		Assert.assertEquals(profile.getStringPreference("capability.policy.default.HTMLDocument.compatMode.get", ""), FirefoxCapabilitiesFactory.ALL_ACCESS);
+		Assert.assertEquals(profile.getStringPreference("capability.policy.default.Document.compatMode.get", ""), FirefoxCapabilitiesFactory.ALL_ACCESS);
 		Assert.assertEquals(profile.getIntegerPreference("dom.max_chrome_script_run_time", 100), 0);
 		Assert.assertEquals(profile.getIntegerPreference("dom.max_script_run_time", 100), 0);
 	}
@@ -146,7 +149,7 @@ public class TestMarionetteCapabilitiesFactory extends MockitoTest {
 		
 		Mockito.when(config.getUserAgentOverride()).thenReturn("FIREFOX 55");
 		
-		MutableCapabilities capa = new MarionetteCapabilitiesFactory().createCapabilities(config);
+		MutableCapabilities capa = new FirefoxCapabilitiesFactory(config).createCapabilities();
 		
 		FirefoxProfile profile = (FirefoxProfile)capa.getCapability(FirefoxDriver.PROFILE);
 		
@@ -156,26 +159,27 @@ public class TestMarionetteCapabilitiesFactory extends MockitoTest {
 	
 	@Test(groups={"ut"})
 	public void testCreateMarionetteCapabilitiesOverrideBinPath() {
-		try {
-			Mockito.when(config.getFirefoxBinPath()).thenReturn("/opt/firefox/bin/firefox");
-			
-			MutableCapabilities capa = new MarionetteCapabilitiesFactory().createCapabilities(config);
-			
-			Assert.assertEquals(System.getProperty("webdriver.firefox.bin"), "/opt/firefox/bin/firefox");
-		} finally {
-			System.clearProperty("webdriver.firefox.bin");
-		}
+		Mockito.when(config.getMode()).thenReturn(DriverMode.LOCAL);
+		Mockito.when(config.getFirefoxBinPath()).thenReturn("/opt/firefox/bin/firefox");
+		
+		// SeleniumTestsContext class adds a browserInfo when binary path is set
+		Map<BrowserType, List<BrowserInfo>> updatedBrowserInfos = new HashMap<>();
+		updatedBrowserInfos.put(BrowserType.FIREFOX, Arrays.asList(new BrowserInfo(BrowserType.FIREFOX, "57.0", "", false), 
+																	new BrowserInfo(BrowserType.FIREFOX, "58.0", "/opt/firefox/bin/firefox", false)));
+
+		PowerMockito.when(OSUtility.getInstalledBrowsersWithVersion()).thenReturn(updatedBrowserInfos);
+		
+		MutableCapabilities capa = new FirefoxCapabilitiesFactory(config).createCapabilities();
+		
+		Assert.assertEquals(capa.getCapability(FirefoxDriver.BINARY), "/opt/firefox/bin/firefox");
 	}
 	
 	@Test(groups={"ut"})
 	public void testCreateMarionetteCapabilitiesStandardBinPath() {
-		try {
-			MutableCapabilities capa = new MarionetteCapabilitiesFactory().createCapabilities(config);
-	
-			Assert.assertEquals(System.getProperty("webdriver.firefox.bin"), "/usr/bin/firefox");
-		} finally {
-			System.clearProperty("webdriver.firefox.bin");
-		}
+		Mockito.when(config.getMode()).thenReturn(DriverMode.LOCAL);
+		MutableCapabilities capa = new FirefoxCapabilitiesFactory(config).createCapabilities();
+
+		Assert.assertEquals(capa.getCapability(FirefoxDriver.BINARY), "/usr/bin/firefox");
 	}
 	
 	@Test(groups={"ut"})
@@ -183,7 +187,7 @@ public class TestMarionetteCapabilitiesFactory extends MockitoTest {
 		
 		Mockito.when(config.getNtlmAuthTrustedUris()).thenReturn("uri://uri.ntlm");
 		
-		MutableCapabilities capa = new MarionetteCapabilitiesFactory().createCapabilities(config);
+		MutableCapabilities capa = new FirefoxCapabilitiesFactory(config).createCapabilities();
 		
 		FirefoxProfile profile = (FirefoxProfile)capa.getCapability(FirefoxDriver.PROFILE);
 		
@@ -196,7 +200,7 @@ public class TestMarionetteCapabilitiesFactory extends MockitoTest {
 		
 		Mockito.when(config.getBrowserDownloadDir()).thenReturn("/home/download");
 		
-		MutableCapabilities capa = new MarionetteCapabilitiesFactory().createCapabilities(config);
+		MutableCapabilities capa = new FirefoxCapabilitiesFactory(config).createCapabilities();
 		
 		FirefoxProfile profile = (FirefoxProfile)capa.getCapability(FirefoxDriver.PROFILE);
 		
@@ -209,10 +213,11 @@ public class TestMarionetteCapabilitiesFactory extends MockitoTest {
 	
 	@Test(groups={"ut"})
 	public void testCreateMarionetteCapabilitiesStandardDriverPathLocal() {
+		System.clearProperty(GeckoDriverService.GECKO_DRIVER_EXE_PROPERTY);
 		try {
 			Mockito.when(config.getMode()).thenReturn(DriverMode.LOCAL);
 			
-			new MarionetteCapabilitiesFactory().createCapabilities(config);
+			new FirefoxCapabilitiesFactory(config).createCapabilities();
 			
 			Assert.assertTrue(System.getProperty(GeckoDriverService.GECKO_DRIVER_EXE_PROPERTY).replace(File.separator, "/").contains("/drivers/geckodriver"));
 		} finally {
@@ -222,11 +227,12 @@ public class TestMarionetteCapabilitiesFactory extends MockitoTest {
 	
 	@Test(groups={"ut"})
 	public void testCreateMarionetteCapabilitiesOverrideDriverPathLocal() {
+		System.clearProperty(GeckoDriverService.GECKO_DRIVER_EXE_PROPERTY);
 		try {
 			Mockito.when(config.getMode()).thenReturn(DriverMode.LOCAL);
 			Mockito.when(config.getGeckoDriverPath()).thenReturn("/opt/firefox/driver/geckodriver");
 			
-			new MarionetteCapabilitiesFactory().createCapabilities(config);
+			new FirefoxCapabilitiesFactory(config).createCapabilities();
 			
 			Assert.assertEquals(System.getProperty(GeckoDriverService.GECKO_DRIVER_EXE_PROPERTY).replace(File.separator, "/"), "/opt/firefox/driver/geckodriver");
 		} finally {
@@ -236,9 +242,10 @@ public class TestMarionetteCapabilitiesFactory extends MockitoTest {
 	
 	@Test(groups={"ut"})
 	public void testCreateMarionetteCapabilitiesStandardDriverPathGrid() {
+		System.clearProperty(GeckoDriverService.GECKO_DRIVER_EXE_PROPERTY);
 		Mockito.when(config.getMode()).thenReturn(DriverMode.GRID);
 		
-		new MarionetteCapabilitiesFactory().createCapabilities(config);
+		new FirefoxCapabilitiesFactory(config).createCapabilities();
 		
 		Assert.assertNull(System.getProperty(GeckoDriverService.GECKO_DRIVER_EXE_PROPERTY));
 	}

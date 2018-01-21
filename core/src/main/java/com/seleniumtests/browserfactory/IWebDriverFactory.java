@@ -29,4 +29,6 @@ public interface IWebDriverFactory {
     WebDriver getWebDriver();
 
     DriverConfig getWebDriverConfig();
+    
+    BrowserInfo getSelectedBrowserInfo();
 }

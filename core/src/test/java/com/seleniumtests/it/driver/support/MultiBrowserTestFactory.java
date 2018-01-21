@@ -6,7 +6,7 @@ import java.util.List;
 import org.testng.annotations.Factory;
 
 import com.seleniumtests.driver.BrowserType;
-import com.seleniumtests.it.driver.TestDriver2;
+import com.seleniumtests.it.driver.TestDriver;
 import com.seleniumtests.util.osutility.OSUtilityFactory;
 
 public class MultiBrowserTestFactory {
@@ -18,7 +18,7 @@ public class MultiBrowserTestFactory {
 			if (browser == BrowserType.NONE || browser == BrowserType.PHANTOMJS) {
 				continue;
 			}
-			result.add(new TestDriver2(browser.getBrowserType()));
+			result.add(new TestDriver(browser.getBrowserType()));
 		}
 
 		return result.toArray();

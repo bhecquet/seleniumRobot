@@ -20,6 +20,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.DesiredCapabilities;
@@ -45,7 +46,7 @@ public class AppiumDriverFactory extends AbstractWebDriverFactory implements IWe
         super(cfg);
     }
     
-    private void extractAndroidDriver(DesiredCapabilities capabilities) {
+    private void extractAndroidDriver(MutableCapabilities capabilities) {
     	String chromeDriverFile = (String)capabilities.getCapability(AndroidMobileCapabilityType.CHROMEDRIVER_EXECUTABLE);
 		if (chromeDriverFile != null) {
 			String driverPath;
@@ -67,16 +68,15 @@ public class AppiumDriverFactory extends AbstractWebDriverFactory implements IWe
     	appiumLauncher = AppiumLauncherFactory.getInstance();
     	appiumLauncher.startAppium();
     	
-    	DesiredCapabilities capabilities = new DesiredCapabilities();
     	try {
 	        if("android".equalsIgnoreCase(webDriverConfig.getPlatform())) {
-	        	DesiredCapabilities androidCaps = new AndroidCapabilitiesFactory(capabilities).createCapabilities(webDriverConfig);
+	        	MutableCapabilities androidCaps = new AndroidCapabilitiesFactory(webDriverConfig).createCapabilities();
 	        	androidCaps = new MobileDeviceSelector().initialize().updateCapabilitiesWithSelectedDevice(androidCaps, webDriverConfig.getMode());
 	        	extractAndroidDriver(androidCaps);
 	            return new AndroidDriver<WebElement>(new URL(((LocalAppiumLauncher)appiumLauncher).getAppiumServerUrl()), androidCaps);
 	            
 	        } else if ("ios".equalsIgnoreCase(webDriverConfig.getPlatform())){
-	        	DesiredCapabilities iosCaps = new IOsCapabilitiesFactory(capabilities).createCapabilities(webDriverConfig);
+	        	MutableCapabilities iosCaps = new IOsCapabilitiesFactory(webDriverConfig).createCapabilities();
 	        	iosCaps = new MobileDeviceSelector().initialize().updateCapabilitiesWithSelectedDevice(iosCaps, webDriverConfig.getMode());
 	            return new IOSDriver<WebElement>(new URL(((LocalAppiumLauncher)appiumLauncher).getAppiumServerUrl()), iosCaps);
 	            

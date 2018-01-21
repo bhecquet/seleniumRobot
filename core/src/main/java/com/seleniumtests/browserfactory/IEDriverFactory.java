@@ -44,7 +44,9 @@ public class IEDriverFactory extends AbstractWebDriverFactory implements IWebDri
     
     @Override
     protected WebDriver createNativeDriver() {
-    	InternetExplorerOptions options = new InternetExplorerOptions(new IECapabilitiesFactory().createCapabilities(webDriverConfig));
+    	IECapabilitiesFactory capsFactory = new IECapabilitiesFactory(webDriverConfig);
+		InternetExplorerOptions options = (InternetExplorerOptions)capsFactory.createCapabilities();
+    	selectedBrowserInfo = capsFactory.getSelectedBrowserInfo();
         return new InternetExplorerDriver(options);
     }
 

@@ -22,14 +22,19 @@ import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.driver.DriverConfig;
 
 public class SauceLabsCapabilitiesFactory extends ICapabilitiesFactory {
-    @Override
-    public DesiredCapabilities createCapabilities(final DriverConfig cfg) {
+	
+    public SauceLabsCapabilitiesFactory(DriverConfig webDriverConfig) {
+		super(webDriverConfig);
+	}
+
+	@Override
+    public DesiredCapabilities createCapabilities() {
 
         final DesiredCapabilities capabilities = new DesiredCapabilities();
 
-        capabilities.setCapability("browserName", cfg.getBrowser());
-        capabilities.setCapability("platform", cfg.getPlatform());
-        capabilities.setCapability("version", cfg.getVersion());
+        capabilities.setCapability("browserName", webDriverConfig.getBrowser());
+        capabilities.setCapability("platform", webDriverConfig.getPlatform());
+        capabilities.setCapability("version", webDriverConfig.getVersion());
         capabilities.setCapability("name", SeleniumTestsContextManager.getThreadContext().getTestMethodSignature());
 
         return capabilities;

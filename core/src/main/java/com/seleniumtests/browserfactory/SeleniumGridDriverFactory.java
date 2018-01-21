@@ -19,6 +19,7 @@ package com.seleniumtests.browserfactory;
 import java.net.URL;
 import java.util.concurrent.TimeUnit;
 
+import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.UnsupportedCommandException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.CapabilityType;
@@ -50,36 +51,36 @@ public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implemen
      * @param webDriverConfig
      * @return the capability for a given browser
      */
-    public DesiredCapabilities createCapabilityByBrowser(DriverConfig webDriverConfig, DesiredCapabilities capabilities){
+    public MutableCapabilities createCapabilityByBrowser(DriverConfig webDriverConfig, MutableCapabilities capabilities){
 
     	switch (webDriverConfig.getBrowser()) {
 
 	        case FIREFOX :
-	            capabilities.merge(new FirefoxCapabilitiesFactory().createCapabilities(webDriverConfig));
+	            capabilities.merge(new FirefoxCapabilitiesFactory(webDriverConfig).createCapabilities());
 	            break;
 	
 	        case INTERNET_EXPLORER :
-	        	capabilities.merge(new IECapabilitiesFactory().createCapabilities(webDriverConfig));
+	        	capabilities.merge(new IECapabilitiesFactory(webDriverConfig).createCapabilities());
 	            break;
 	
 	        case CHROME :
-	        	capabilities.merge(new ChromeCapabilitiesFactory().createCapabilities(webDriverConfig));
+	        	capabilities.merge(new ChromeCapabilitiesFactory(webDriverConfig).createCapabilities());
 	            break;
 	
 	        case HTMLUNIT :
-	        	capabilities.merge(new HtmlUnitCapabilitiesFactory().createCapabilities(webDriverConfig));
+	        	capabilities.merge(new HtmlUnitCapabilitiesFactory(webDriverConfig).createCapabilities());
 	            break;
 	
 	        case SAFARI :
-	        	capabilities.merge(new SafariCapabilitiesFactory().createCapabilities(webDriverConfig));
+	        	capabilities.merge(new SafariCapabilitiesFactory(webDriverConfig).createCapabilities());
 	            break;
 	
 	        case PHANTOMJS :
-	        	capabilities.merge(new PhantomJSCapabilitiesFactory().createCapabilities(webDriverConfig));
+	        	capabilities.merge(new PhantomJSCapabilitiesFactory(webDriverConfig).createCapabilities());
 	            break;
 	            
 	        case EDGE :
-	        	capabilities.merge(new EdgeCapabilitiesFactory().createCapabilities(webDriverConfig));
+	        	capabilities.merge(new EdgeCapabilitiesFactory(webDriverConfig).createCapabilities());
 	        	break;
 	
 	        default :
@@ -116,14 +117,14 @@ public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implemen
     public WebDriver createWebDriver() {
 
         // create capabilities, specific to OS
-        DesiredCapabilities capabilities = createSpecificGridCapabilities(webDriverConfig);
+        MutableCapabilities capabilities = createSpecificGridCapabilities(webDriverConfig);
         if (SeleniumTestsContextManager.isDesktopWebTest()) {
         	capabilities = createCapabilityByBrowser(webDriverConfig, capabilities);
         } else if (SeleniumTestsContextManager.isMobileTest()) {
         	if("android".equalsIgnoreCase(webDriverConfig.getPlatform())) {
-        		capabilities = new AndroidCapabilitiesFactory(capabilities).createCapabilities(webDriverConfig);
+        		capabilities = new AndroidCapabilitiesFactory(webDriverConfig).createCapabilities();
 	        } else if ("ios".equalsIgnoreCase(webDriverConfig.getPlatform())){
-	        	capabilities = new IOsCapabilitiesFactory(capabilities).createCapabilities(webDriverConfig);
+	        	capabilities = new IOsCapabilitiesFactory(webDriverConfig).createCapabilities();
 	        } else {
 	        	throw new ConfigurationException(String.format("Platform %s is unknown for mobile tests", webDriverConfig.getPlatform()));
 	        }
@@ -157,7 +158,7 @@ public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implemen
         return driver;
     }
     
-    private WebDriver getDriverFirefox(URL url, DesiredCapabilities capability){
+    private WebDriver getDriverFirefox(URL url, MutableCapabilities capability){
     	driver = null;
     	try {
             driver = new ScreenShotRemoteWebDriver(url, capability);

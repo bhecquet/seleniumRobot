@@ -16,75 +16,52 @@
  */
 package com.seleniumtests.browserfactory;
 
-import java.io.IOException;
-
 import org.apache.commons.lang3.SystemUtils;
+import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.edge.EdgeDriverService;
-import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.edge.EdgeOptions;
 
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.DriverConfig;
-import com.seleniumtests.driver.DriverExtractor;
 import com.seleniumtests.driver.DriverMode;
-import com.seleniumtests.util.FileUtility;
-import com.seleniumtests.util.osutility.OSUtility;
 
-public class EdgeCapabilitiesFactory extends ICapabilitiesFactory {
+public class EdgeCapabilitiesFactory extends IDesktopCapabilityFactory {
 
-    /**
-     * Create edge capabilities.
-     */
-    @Override
-    public DesiredCapabilities createCapabilities(final DriverConfig webDriverConfig) {
-        DesiredCapabilities capability = DesiredCapabilities.edge();
-        capability = updateDefaultCapabilities(capability, webDriverConfig);
-        
+    public EdgeCapabilitiesFactory(DriverConfig webDriverConfig) {
+		super(webDriverConfig);
+	}
+
+	@Override
+	protected MutableCapabilities getDriverOptions() {
         if (!SystemUtils.IS_OS_WINDOWS_10 && webDriverConfig.getMode() == DriverMode.LOCAL) {
         	throw new ConfigurationException("Edge browser is only available on Windows 10");
         }
-        
-        // Set Edge for local mode
-        if (webDriverConfig.getMode() == DriverMode.LOCAL) {
-        	setEdgeDriverLocal(webDriverConfig);
-        }
+		return new EdgeOptions();
+	}
 
-        return capability;
-    }
-    
-    
-    
-    /**
-     * Get Windows version as Edge driver is tied to it
-     * @throws IOException
-     */
-    public void handleExtractResources() throws IOException {
-    	BrowserInfo browserInfo = OSUtility.getInstalledBrowsersWithVersion().get(BrowserType.EDGE);
-    	String driverPath = FileUtility.decodePath(new DriverExtractor().extractDriver(browserInfo.getDriverFileName()));
-    	System.setProperty(EdgeDriverService.EDGE_DRIVER_EXE_PROPERTY, driverPath);
-    }
-    
-    /**
-     * Set ChromeDriver for local mode
-     * @param webDriverConfig
-     */
-    public void setEdgeDriverLocal(final DriverConfig webDriverConfig){
-        String edgeDriverPath = webDriverConfig.getEdgeDriverPath();
-        if (edgeDriverPath == null) {
-            try {
-                if (System.getenv(EdgeDriverService.EDGE_DRIVER_EXE_PROPERTY) != null) {
-                    logger.info("get edge driver from property:" + System.getenv(EdgeDriverService.EDGE_DRIVER_EXE_PROPERTY));
-                    System.setProperty(EdgeDriverService.EDGE_DRIVER_EXE_PROPERTY, System.getenv(EdgeDriverService.EDGE_DRIVER_EXE_PROPERTY));
-                } else {
-                    handleExtractResources();
-                }
-            } catch (IOException ex) {
-            	logger.error(ex);
-            }
-        } else {
-            System.setProperty(EdgeDriverService.EDGE_DRIVER_EXE_PROPERTY, edgeDriverPath);
-        }
-    }
+	@Override
+	protected String getDriverPath() {
+		return webDriverConfig.getEdgeDriverPath();
+	}
 
- 
+	@Override
+	protected String getDriverExeProperty() {
+		return EdgeDriverService.EDGE_DRIVER_EXE_PROPERTY;
+	}
+
+	@Override
+	protected String getBrowserBinaryPath() {
+		return null;
+	}
+
+	@Override
+	protected void updateOptionsWithSelectedBrowserInfo(MutableCapabilities options) {
+		// TODO Auto-generated method stub
+	}
+
+	@Override
+	protected BrowserType getBrowserType() {
+		return BrowserType.EDGE;
+	} 
 }

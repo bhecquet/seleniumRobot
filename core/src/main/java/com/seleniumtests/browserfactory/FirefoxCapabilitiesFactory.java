@@ -20,31 +20,73 @@ import java.io.File;
 import java.io.IOException;
 
 import org.apache.commons.io.FileUtils;
+import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.firefox.FirefoxProfile;
-import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.firefox.GeckoDriverService;
 
 import com.seleniumtests.browserfactory.customprofile.FireFoxProfileMarker;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.DriverConfig;
 import com.seleniumtests.reporter.TestLogging;
 import com.seleniumtests.util.FileUtility;
-import com.seleniumtests.util.osutility.OSUtility;
 
-public class FirefoxCapabilitiesFactory extends ICapabilitiesFactory {
-    public static final String ALL_ACCESS = "allAccess";
+public class FirefoxCapabilitiesFactory extends IDesktopCapabilityFactory {
+	
+    public FirefoxCapabilitiesFactory(DriverConfig webDriverConfig) {
+		super(webDriverConfig);
+	}
+
+	public static final String ALL_ACCESS = "allAccess";
 	private static boolean isProfileCreated = false;
     private static Object lockProfile = new Object();
+    
+	@Override
+	protected MutableCapabilities getDriverOptions() {
+		FirefoxOptions options = new FirefoxOptions();
+
+        FirefoxProfile profile = getFirefoxProfile(webDriverConfig);
+        configProfile(profile, webDriverConfig);
+        options.setCapability(FirefoxDriver.PROFILE, profile);
+        return options;
+	}
+	
+	@Override
+	protected String getDriverPath() {
+		return webDriverConfig.getGeckoDriverPath();
+	}
+	
+	@Override
+	protected String getBrowserBinaryPath() {
+		return webDriverConfig.getFirefoxBinPath();
+	}
+	
+	@Override
+	protected BrowserType getBrowserType() {
+		return BrowserType.FIREFOX;
+	}
+	
+	@Override
+	protected String getDriverExeProperty() {
+		return GeckoDriverService.GECKO_DRIVER_EXE_PROPERTY;
+	}
+	
+	@Override
+	protected void updateOptionsWithSelectedBrowserInfo(MutableCapabilities options) {
+		if (BrowserInfo.useLegacyFirefoxVersion(selectedBrowserInfo.getVersion())) {
+			options.setCapability(FirefoxDriver.MARIONETTE, false);
+		} else {
+			options.setCapability(FirefoxDriver.MARIONETTE, true);
+		}
+		
+		((FirefoxOptions)options).setBinary(selectedBrowserInfo.getPath());
+	}
+	
 
     protected void configProfile(final FirefoxProfile profile, final DriverConfig webDriverConfig) {
         profile.setAcceptUntrustedCertificates(webDriverConfig.isSetAcceptUntrustedCertificates());
         profile.setAssumeUntrustedCertificateIssuer(webDriverConfig.isSetAssumeUntrustedCertificateIssuer());
-
-        if (webDriverConfig.getFirefoxBinPath() != null) {
-            System.setProperty("webdriver.firefox.bin", webDriverConfig.getFirefoxBinPath());
-        } else {
-        	System.setProperty("webdriver.firefox.bin", OSUtility.getInstalledBrowsersWithVersion().get(BrowserType.FIREFOX).getPath());
-        }
 
         if (webDriverConfig.getUserAgentOverride() != null) {
             profile.setPreference("general.useragent.override", webDriverConfig.getUserAgentOverride());
@@ -69,24 +111,6 @@ public class FirefoxCapabilitiesFactory extends ICapabilitiesFactory {
         profile.setPreference("capability.policy.default.Document.compatMode.get", ALL_ACCESS);
         profile.setPreference("dom.max_chrome_script_run_time", 0);
         profile.setPreference("dom.max_script_run_time", 0);
-    }
-
-    /**
-     * Create firefox capabilities.
-     */
-    @Override
-    public DesiredCapabilities createCapabilities(final DriverConfig webDriverConfig) {
-        DesiredCapabilities capability;
-        capability = new DesiredCapabilities();
-        capability.setBrowserName(DesiredCapabilities.firefox().getBrowserName());
-        capability = updateDefaultCapabilities(capability, webDriverConfig);
-
-        FirefoxProfile profile = getFirefoxProfile(webDriverConfig);
-        configProfile(profile, webDriverConfig);
-        capability.setCapability(FirefoxDriver.PROFILE, profile);
-        capability.setCapability(FirefoxDriver.MARIONETTE, false);
-
-        return capability;
     }
 
     protected FirefoxProfile createFirefoxProfile(final String path) {

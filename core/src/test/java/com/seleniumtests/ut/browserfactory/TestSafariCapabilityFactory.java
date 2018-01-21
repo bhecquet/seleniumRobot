@@ -3,8 +3,9 @@ package com.seleniumtests.ut.browserfactory;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
-import java.io.File;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.mockito.Mock;
@@ -12,15 +13,10 @@ import org.mockito.Mockito;
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.Platform;
 import org.openqa.selenium.Proxy;
-import org.openqa.selenium.chrome.ChromeOptions;
-import org.openqa.selenium.ie.InternetExplorerDriver;
-import org.openqa.selenium.ie.InternetExplorerDriverService;
 import org.openqa.selenium.remote.CapabilityType;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
-import org.testng.SkipException;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -29,7 +25,6 @@ import com.seleniumtests.browserfactory.BrowserInfo;
 import com.seleniumtests.browserfactory.SafariCapabilitiesFactory;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.DriverConfig;
-import com.seleniumtests.driver.DriverMode;
 import com.seleniumtests.util.osutility.OSUtility;
 import com.seleniumtests.util.osutility.OSUtilityFactory;
 import com.seleniumtests.util.osutility.OSUtilityWindows;
@@ -55,8 +50,8 @@ public class TestSafariCapabilityFactory extends MockitoTest {
 		PowerMockito.when(System.clearProperty(anyString())).thenCallRealMethod();
 		PowerMockito.when(System.getProperty("os.name")).thenReturn("Mac OS X");	
 		
-		Map<BrowserType, BrowserInfo> browserInfos = new HashMap<>();
-		browserInfos.put(BrowserType.SAFARI, new BrowserInfo(BrowserType.SAFARI, "7.2", ""));
+		Map<BrowserType, List<BrowserInfo>> browserInfos = new HashMap<>();
+		browserInfos.put(BrowserType.SAFARI, Arrays.asList(new BrowserInfo(BrowserType.SAFARI, "7.2", "", false)));
 
 		PowerMockito.mockStatic(OSUtility.class);
 		PowerMockito.when(OSUtility.getInstalledBrowsersWithVersion()).thenReturn(browserInfos);
@@ -78,7 +73,7 @@ public class TestSafariCapabilityFactory extends MockitoTest {
 		Mockito.when(config.isEnableJavascript()).thenReturn(true);
 		Mockito.when(config.getProxy()).thenReturn(proxyConfig);
 		
-		MutableCapabilities capa = new SafariCapabilitiesFactory().createCapabilities(config);
+		MutableCapabilities capa = new SafariCapabilitiesFactory(config).createCapabilities();
 		
 		Assert.assertTrue(capa.is(CapabilityType.SUPPORTS_JAVASCRIPT));
 		Assert.assertTrue(capa.is(CapabilityType.TAKES_SCREENSHOT));
@@ -94,7 +89,7 @@ public class TestSafariCapabilityFactory extends MockitoTest {
 		Mockito.when(config.getProxy()).thenReturn(proxyConfig);
 		Mockito.when(config.getWebPlatform()).thenReturn(Platform.MAC);
 		
-		MutableCapabilities capa = new SafariCapabilitiesFactory().createCapabilities(config);
+		MutableCapabilities capa = new SafariCapabilitiesFactory(config).createCapabilities();
 		
 		Assert.assertEquals(capa.getPlatform(), Platform.MAC);
 		
@@ -106,7 +101,7 @@ public class TestSafariCapabilityFactory extends MockitoTest {
 		Mockito.when(config.isEnableJavascript()).thenReturn(false);
 		Mockito.when(config.getProxy()).thenReturn(proxyConfig);
 		
-		MutableCapabilities capa = new SafariCapabilitiesFactory().createCapabilities(config);
+		MutableCapabilities capa = new SafariCapabilitiesFactory(config).createCapabilities();
 		
 		Assert.assertFalse(capa.is(CapabilityType.SUPPORTS_JAVASCRIPT));
 		
@@ -119,7 +114,7 @@ public class TestSafariCapabilityFactory extends MockitoTest {
 		Mockito.when(config.getProxy()).thenReturn(proxyConfig);
 		Mockito.when(config.getBrowserVersion()).thenReturn("10.0");
 		
-		MutableCapabilities capa = new SafariCapabilitiesFactory().createCapabilities(config);
+		MutableCapabilities capa = new SafariCapabilitiesFactory(config).createCapabilities();
 		
 		Assert.assertEquals(capa.getVersion(), "10.0");
 		
@@ -128,7 +123,7 @@ public class TestSafariCapabilityFactory extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testCreateDefaultSafariCapabilities() {
 		
-		MutableCapabilities capa = new SafariCapabilitiesFactory().createCapabilities(config);
+		MutableCapabilities capa = new SafariCapabilitiesFactory(config).createCapabilities();
 		
 		Assert.assertEquals(capa.getCapability(CapabilityType.BROWSER_NAME), "safari");
 	}	

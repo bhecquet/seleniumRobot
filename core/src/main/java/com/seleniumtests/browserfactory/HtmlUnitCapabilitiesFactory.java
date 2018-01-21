@@ -16,15 +16,46 @@
  */
 package com.seleniumtests.browserfactory;
 
+import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
+import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.DriverConfig;
 
-public class HtmlUnitCapabilitiesFactory extends ICapabilitiesFactory {
+public class HtmlUnitCapabilitiesFactory extends IDesktopCapabilityFactory {
+
+	public HtmlUnitCapabilitiesFactory(DriverConfig webDriverConfig) {
+		super(webDriverConfig);
+	}
 
 	@Override
-    public DesiredCapabilities createCapabilities(final DriverConfig webDriverConfig) {
-        DesiredCapabilities capability = DesiredCapabilities.htmlUnit();
-        return updateDefaultCapabilities(capability, webDriverConfig);
-    }
+	protected MutableCapabilities getDriverOptions() {
+		return DesiredCapabilities.htmlUnit();
+	}
+
+	@Override
+	protected String getDriverPath() {
+		return null;
+	}
+
+	@Override
+	protected BrowserType getBrowserType() {
+		return BrowserType.HTMLUNIT;
+	}
+
+	@Override
+	protected String getDriverExeProperty() {
+		return null;
+	}
+
+	@Override
+	protected String getBrowserBinaryPath() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	protected void updateOptionsWithSelectedBrowserInfo(MutableCapabilities options) {
+		// nothing to do
+	}
 }

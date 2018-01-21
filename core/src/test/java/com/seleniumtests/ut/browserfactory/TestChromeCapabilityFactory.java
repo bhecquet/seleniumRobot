@@ -1,12 +1,16 @@
 package com.seleniumtests.ut.browserfactory;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.anyList;
 
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.stubbing.Answer;
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.Platform;
 import org.openqa.selenium.Proxy;
@@ -27,8 +31,10 @@ import com.seleniumtests.driver.DriverConfig;
 import com.seleniumtests.driver.DriverMode;
 import com.seleniumtests.util.osutility.OSUtility;
 
-@PrepareForTest({OSUtility.class})
+@PrepareForTest({OSUtility.class, BrowserInfo.class})
 public class TestChromeCapabilityFactory extends MockitoTest {
+	
+	Map<BrowserType, List<BrowserInfo>> browserInfos;
 
 	@Mock
 	private DriverConfig config;
@@ -38,8 +44,8 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 	
 	@BeforeMethod(groups= {"ut"})
 	public void init() {
-		Map<BrowserType, BrowserInfo> browserInfos = new HashMap<>();
-		browserInfos.put(BrowserType.CHROME, new BrowserInfo(BrowserType.CHROME, "63.0", ""));
+		browserInfos = new HashMap<>();
+		browserInfos.put(BrowserType.CHROME, Arrays.asList(new BrowserInfo(BrowserType.CHROME, "63.0", "", false)));
 		PowerMockito.mockStatic(OSUtility.class, Mockito.CALLS_REAL_METHODS);
 		PowerMockito.when(OSUtility.getInstalledBrowsersWithVersion()).thenReturn(browserInfos);
 	}
@@ -53,7 +59,7 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 		Mockito.when(config.isEnableJavascript()).thenReturn(true);
 		Mockito.when(config.getProxy()).thenReturn(proxyConfig);
 		
-		MutableCapabilities capa = new ChromeCapabilitiesFactory().createCapabilities(config);
+		MutableCapabilities capa = new ChromeCapabilitiesFactory(config).createCapabilities();
 		
 		Assert.assertTrue(capa.is(CapabilityType.SUPPORTS_JAVASCRIPT));
 		Assert.assertTrue(capa.is(CapabilityType.TAKES_SCREENSHOT));
@@ -69,7 +75,7 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 		Mockito.when(config.getProxy()).thenReturn(proxyConfig);
 		Mockito.when(config.getWebPlatform()).thenReturn(Platform.WINDOWS);
 		
-		MutableCapabilities capa = new ChromeCapabilitiesFactory().createCapabilities(config);
+		MutableCapabilities capa = new ChromeCapabilitiesFactory(config).createCapabilities();
 		
 		Assert.assertEquals(capa.getPlatform(), Platform.WINDOWS);
 		
@@ -81,7 +87,7 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 		Mockito.when(config.isEnableJavascript()).thenReturn(false);
 		Mockito.when(config.getProxy()).thenReturn(proxyConfig);
 		
-		MutableCapabilities capa = new ChromeCapabilitiesFactory().createCapabilities(config);
+		MutableCapabilities capa = new ChromeCapabilitiesFactory(config).createCapabilities();
 		
 		Assert.assertFalse(capa.is(CapabilityType.SUPPORTS_JAVASCRIPT));
 		
@@ -94,7 +100,7 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 		Mockito.when(config.getProxy()).thenReturn(proxyConfig);
 		Mockito.when(config.getBrowserVersion()).thenReturn("60.0");
 		
-		MutableCapabilities capa = new ChromeCapabilitiesFactory().createCapabilities(config);
+		MutableCapabilities capa = new ChromeCapabilitiesFactory(config).createCapabilities();
 		
 		Assert.assertEquals(capa.getVersion(), "60.0");
 		
@@ -103,9 +109,9 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testCreateDefaultChromeCapabilities() {
 		
-		MutableCapabilities capa = new ChromeCapabilitiesFactory().createCapabilities(config);
+		MutableCapabilities capa = new ChromeCapabilitiesFactory(config).createCapabilities();
 		
-		Assert.assertEquals(((Map<?,?>)capa.getCapability(ChromeOptions.CAPABILITY)).get("args").toString(), "[--disable-translate]");
+		Assert.assertEquals(((Map<?,?>)(((ChromeOptions)capa).asMap().get(ChromeOptions.CAPABILITY))).get("args").toString(), "[--disable-translate]");
 		Assert.assertEquals(capa.getCapability(CapabilityType.BROWSER_NAME), "chrome");
 	}
 	
@@ -114,19 +120,30 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 		
 		Mockito.when(config.getUserAgentOverride()).thenReturn("CHROME 55");
 		
-		MutableCapabilities capa = new ChromeCapabilitiesFactory().createCapabilities(config);
+		MutableCapabilities capa = new ChromeCapabilitiesFactory(config).createCapabilities();
 		
-		Assert.assertEquals(((Map<?,?>)capa.getCapability(ChromeOptions.CAPABILITY)).get("args").toString(), "[--user-agent=CHROME 55, --disable-translate]");
+		Assert.assertEquals(((Map<?,?>)(((ChromeOptions)capa).asMap().get(ChromeOptions.CAPABILITY))).get("args").toString(), "[--user-agent=CHROME 55, --disable-translate]");
 	}
 	
+	/**
+	 * 
+	 */
 	@Test(groups={"ut"})
 	public void testCreateChromeCapabilitiesOverrideBinPath() {
 		
+		Mockito.when(config.getMode()).thenReturn(DriverMode.LOCAL);
 		Mockito.when(config.getChromeBinPath()).thenReturn("/opt/chrome/bin/chrome");
+
+		// SeleniumTestsContext class adds a browserInfo when binary path is set
+		Map<BrowserType, List<BrowserInfo>> updatedBrowserInfos = new HashMap<>();
+		updatedBrowserInfos.put(BrowserType.CHROME, Arrays.asList(new BrowserInfo(BrowserType.CHROME, "63.0", "", false), 
+																	new BrowserInfo(BrowserType.CHROME, "64.0", "/opt/chrome/bin/chrome", false)));
+
+		PowerMockito.when(OSUtility.getInstalledBrowsersWithVersion()).thenReturn(updatedBrowserInfos);
 		
-		MutableCapabilities capa = new ChromeCapabilitiesFactory().createCapabilities(config);
+		MutableCapabilities capa = new ChromeCapabilitiesFactory(config).createCapabilities();
 		
-		Assert.assertEquals(capa.getCapability("chrome.binary"), "/opt/chrome/bin/chrome");
+		Assert.assertEquals(((Map<?,?>)(((ChromeOptions)capa).asMap().get(ChromeOptions.CAPABILITY))).get("binary").toString(), "/opt/chrome/bin/chrome");
 	}
 	
 	@Test(groups={"ut"})
@@ -134,7 +151,7 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 		try {
 			Mockito.when(config.getMode()).thenReturn(DriverMode.LOCAL);
 			
-			new ChromeCapabilitiesFactory().createCapabilities(config);
+			new ChromeCapabilitiesFactory(config).createCapabilities();
 			
 			Assert.assertTrue(System.getProperty(ChromeDriverService.CHROME_DRIVER_EXE_PROPERTY).replace(File.separator, "/").contains("/drivers/chromedriver_"));
 		} finally {
@@ -148,7 +165,7 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 			Mockito.when(config.getMode()).thenReturn(DriverMode.LOCAL);
 			Mockito.when(config.getChromeDriverPath()).thenReturn("/opt/chrome/driver/chromedriver");
 			
-			new ChromeCapabilitiesFactory().createCapabilities(config);
+			new ChromeCapabilitiesFactory(config).createCapabilities();
 			
 			Assert.assertEquals(System.getProperty(ChromeDriverService.CHROME_DRIVER_EXE_PROPERTY).replace(File.separator, "/"), "/opt/chrome/driver/chromedriver");
 		} finally {
@@ -160,7 +177,7 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 	public void testCreateChromeCapabilitiesStandardDriverPathGrid() {
 		Mockito.when(config.getMode()).thenReturn(DriverMode.GRID);
 		
-		new ChromeCapabilitiesFactory().createCapabilities(config);
+		new ChromeCapabilitiesFactory(config).createCapabilities();
 		
 		Assert.assertNull(System.getProperty(ChromeDriverService.CHROME_DRIVER_EXE_PROPERTY));
 	}
@@ -174,7 +191,7 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 		Mockito.when(config.isEnableJavascript()).thenReturn(true);
 		Mockito.when(config.getProxy()).thenReturn(proxyConfig);
 		
-		MutableCapabilities capa = new ChromeCapabilitiesFactory().createMobileCapabilities(config);
+		MutableCapabilities capa = new ChromeCapabilitiesFactory(config).createMobileCapabilities(config);
 		
 		Assert.assertNull(capa.getCapability(CapabilityType.SUPPORTS_JAVASCRIPT));
 		Assert.assertNull(capa.getCapability(CapabilityType.TAKES_SCREENSHOT));
@@ -186,8 +203,8 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 	public void testCreateMobileCapabilitiesOverrideUserAgent() {
 		Mockito.when(config.getUserAgentOverride()).thenReturn("CHROME 55");
 		
-		MutableCapabilities capa = new ChromeCapabilitiesFactory().createCapabilities(config);
+		MutableCapabilities capa = new ChromeCapabilitiesFactory(config).createCapabilities();
 		
-		Assert.assertEquals(((Map<?,?>)capa.getCapability(ChromeOptions.CAPABILITY)).get("args").toString(), "[--user-agent=CHROME 55, --disable-translate]");
+		Assert.assertEquals(((Map<?,?>)(((ChromeOptions)capa).asMap().get(ChromeOptions.CAPABILITY))).get("args").toString(), "[--user-agent=CHROME 55, --disable-translate]");
 	}
 }

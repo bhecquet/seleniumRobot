@@ -24,33 +24,19 @@ import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
 
 import com.seleniumtests.customexception.DriverExceptions;
-import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.DriverConfig;
 import com.seleniumtests.util.helper.WaitHelper;
-import com.seleniumtests.util.osutility.OSUtility;
 
 public class FirefoxDriverFactory extends AbstractWebDriverFactory implements IWebDriverFactory {
     private long timeout = 1;
-    private static boolean marionetteMode = !useFirefoxDriver();
-
+    private static boolean marionetteMode = true;
+    
     /**
      * @param  cfg  the configuration of the firefoxDriver
      */
     public FirefoxDriverFactory(final DriverConfig cfg) {
         super(cfg);
-    }
-    
-    /**
-     * below firefox 47, we use FirefoxDriver
-     * above, we use Marionette, get version of firefox
-     * By default, use Marionette
-     * @return
-     */
-    public static boolean useFirefoxDriver() {
-    	String output = OSUtility.getInstalledBrowsersWithVersion().get(BrowserType.FIREFOX).getVersion();
-		return BrowserInfo.useLegacyFirefoxVersion(output);
-    }
-   
+    }   
 
     /**
      * create native driver instance, designed for unit testing.
@@ -59,11 +45,15 @@ public class FirefoxDriverFactory extends AbstractWebDriverFactory implements IW
      */
     @Override
     protected WebDriver createNativeDriver() {
-    	if (isMarionetteMode()) {
-    		return new FirefoxDriver(new FirefoxOptions(new MarionetteCapabilitiesFactory().createCapabilities(webDriverConfig)));
+    	FirefoxCapabilitiesFactory capsFactory = new FirefoxCapabilitiesFactory(webDriverConfig);
+    	FirefoxOptions firefoxCaps = (FirefoxOptions)capsFactory.createCapabilities();
+    	if (firefoxCaps.is(FirefoxDriver.MARIONETTE)) {
+    		setMarionetteMode(true);
     	} else {
-    		return new FirefoxDriver(new FirefoxOptions(new FirefoxCapabilitiesFactory().createCapabilities(webDriverConfig)));
-    	}  
+    		setMarionetteMode(false);
+    	}
+    	selectedBrowserInfo = capsFactory.getSelectedBrowserInfo();
+		return new FirefoxDriver(firefoxCaps);
     }
 
     @Override
@@ -125,5 +115,9 @@ public class FirefoxDriverFactory extends AbstractWebDriverFactory implements IW
 
 	public static boolean isMarionetteMode() {
 		return marionetteMode;
+	}
+
+	private static void setMarionetteMode(boolean marionetteMode) {
+		FirefoxDriverFactory.marionetteMode = marionetteMode;
 	}
 }

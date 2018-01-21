@@ -16,15 +16,45 @@
  */
 package com.seleniumtests.browserfactory;
 
-import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.MutableCapabilities;
+import org.openqa.selenium.safari.SafariOptions;
 
+import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.DriverConfig;
 
-public class SafariCapabilitiesFactory extends ICapabilitiesFactory {
+public class SafariCapabilitiesFactory extends IDesktopCapabilityFactory {
+
+	public SafariCapabilitiesFactory(DriverConfig webDriverConfig) {
+		super(webDriverConfig);
+	}
 
 	@Override
-    public DesiredCapabilities createCapabilities(final DriverConfig cfg) {
-        DesiredCapabilities capability = DesiredCapabilities.safari();
-        return updateDefaultCapabilities(capability, cfg);
-    }
+	protected MutableCapabilities getDriverOptions() {
+		return new SafariOptions();
+	}
+
+	@Override
+	protected String getDriverPath() {
+		return null;
+	}
+
+	@Override
+	protected BrowserType getBrowserType() {
+		return BrowserType.SAFARI;
+	}
+
+	@Override
+	protected String getDriverExeProperty() {
+		return null;
+	}
+
+	@Override
+	protected String getBrowserBinaryPath() {
+		return null;
+	}
+
+	@Override
+	protected void updateOptionsWithSelectedBrowserInfo(MutableCapabilities options) {
+		// nothing to do
+	}
 }
