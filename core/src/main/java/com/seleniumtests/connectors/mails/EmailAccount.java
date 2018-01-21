@@ -10,6 +10,7 @@ import org.testng.Assert;
 
 import com.seleniumtests.connectors.mails.EmailClientImpl.SearchMode;
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.core.TestVariable;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
@@ -136,8 +137,13 @@ public class EmailAccount {
 		}
 		
 		logger.info("email " + getEmail() + " will be used to access server");
+		TestVariable mailServerVar = SeleniumTestsContextManager.getThreadContext().getConfiguration().get("mailServer");
 		
-		emailClient = EmailClientSelector.routeEmail(EmailServer.fromJson(SeleniumTestsContextManager.getThreadContext().getConfiguration().get("mailServer")),
+		if (mailServerVar == null) {
+			throw new ConfigurationException("'mailServer' variable is not present");
+		}
+		
+		emailClient = EmailClientSelector.routeEmail(EmailServer.fromJson(mailServerVar.getValue()),
 				getEmail(),
 				getEmailLogin(),
 				getEmailPassword());

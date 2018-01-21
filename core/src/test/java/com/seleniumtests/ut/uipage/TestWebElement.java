@@ -26,27 +26,27 @@ import org.openqa.selenium.interactions.Keyboard;
 import org.openqa.selenium.interactions.Mouse;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.RemoteWebElement;
-import org.openqa.selenium.support.events.EventFiringWebDriver;
 import org.openqa.selenium.support.ui.Select;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import com.seleniumtests.MockitoTest;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.driver.WebUIDriver;
-import com.seleniumtests.it.driver.DriverTestPageNativeActions;
+import com.seleniumtests.it.driver.support.pages.DriverTestPageNativeActions;
 import com.seleniumtests.uipage.htmlelements.HtmlElement;
 
 import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.MobileElement;
 
 /**
- * Test class for checking calls to a standard HTMLElement without using any driver
- * Here, we'll concentrate on verifying that refresh calls are done before any action on element
+ * Test class for checking seleniumNativeAction override
+ * When this option is true, we should have the selenium standard behavior + replay and logging (checked elsewhere) 
  * @author behe
  *
  */
@@ -85,9 +85,14 @@ public class TestWebElement extends MockitoTest {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setReplayTimeout(1);
 		SeleniumTestsContextManager.getThreadContext().setBrowser("htmlunit");
-		SeleniumTestsContextManager.getThreadContext().setOverrideSeleniumNativeAction(true);
+		
 		testPage = new DriverTestPageNativeActions(true);
 		realDriver = WebUIDriver.getWebDriver(true);
+	}
+	
+	@BeforeMethod(groups={"ut"})
+	public void overrideNativeActions() {
+		SeleniumTestsContextManager.getThreadContext().setOverrideSeleniumNativeAction(true);
 	}
 	
 	@AfterMethod(groups={"ut"})

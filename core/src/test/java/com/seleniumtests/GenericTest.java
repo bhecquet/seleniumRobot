@@ -29,13 +29,20 @@ import com.seleniumtests.driver.WebUIDriver;
 
 public class GenericTest {
 
+	/**
+	 * Reinitializes context between tests so that it's clean before test starts
+	 * @param testNGCtx
+	 */
 	@BeforeMethod(groups={"ut", "it"})  
-	public void initTest() {
+	public void initTest(final ITestContext testNGCtx) {
+		SeleniumTestsContextManager.initGlobalContext(testNGCtx);
+		SeleniumTestsContextManager.initThreadContext(testNGCtx, null);
 		SeleniumTestsContextManager.getThreadContext().setSoftAssertEnabled(false);
 		SeleniumTestsContextManager.getGlobalContext().setSoftAssertEnabled(false);
 	}
 	
 	public void initThreadContext(final ITestContext testNGCtx) {
+		SeleniumTestsContextManager.initGlobalContext(testNGCtx);
 		SeleniumTestsContextManager.initThreadContext(testNGCtx, null);
 		SeleniumTestsContextManager.getThreadContext().setSoftAssertEnabled(false);
 		SeleniumTestsContextManager.getGlobalContext().setSoftAssertEnabled(false);

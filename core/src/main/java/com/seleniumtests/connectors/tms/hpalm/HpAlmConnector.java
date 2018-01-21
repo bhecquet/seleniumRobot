@@ -18,6 +18,7 @@ import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import com.seleniumtests.connectors.tms.TestManager;
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.core.TestVariable;
 import com.seleniumtests.customexception.ConfigurationException;
 
 /**
@@ -65,16 +66,23 @@ public class HpAlmConnector extends TestManager {
 
 	@Override
 	public void init() {
-		serverUrl = SeleniumTestsContextManager.getThreadContext().getConfiguration().get(HP_ALM_SERVER_URL);
-		project = SeleniumTestsContextManager.getThreadContext().getConfiguration().get(HP_ALM_PROJECT);
-		domain = SeleniumTestsContextManager.getThreadContext().getConfiguration().get(HP_ALM_DOMAIN);
-		user = SeleniumTestsContextManager.getThreadContext().getConfiguration().get(HP_ALM_USER);
-		password = SeleniumTestsContextManager.getThreadContext().getConfiguration().get(HP_ALM_PASSWORD);
+		TestVariable serverUrlVar = SeleniumTestsContextManager.getThreadContext().getConfiguration().get(HP_ALM_SERVER_URL);
+		TestVariable projectVar = SeleniumTestsContextManager.getThreadContext().getConfiguration().get(HP_ALM_PROJECT);
+		TestVariable domainVar = SeleniumTestsContextManager.getThreadContext().getConfiguration().get(HP_ALM_DOMAIN);
+		TestVariable userVar = SeleniumTestsContextManager.getThreadContext().getConfiguration().get(HP_ALM_USER);
+		TestVariable passwordVar = SeleniumTestsContextManager.getThreadContext().getConfiguration().get(HP_ALM_PASSWORD);
 		
-		if (serverUrl == null || project == null || domain == null || user == null || password == null) {
-			throw new ConfigurationException("HP ALM access not correctly configured. Environment configuration must contain variables"
-					+ "hpAlmServerUrl, hpAlmProject, hpAlmDomain, hpAlmUser, hpAlmPassword");
+		if (serverUrlVar == null || projectVar == null || domainVar == null || userVar == null || passwordVar == null) {
+			throw new ConfigurationException(String.format("HP ALM access not correctly configured. Environment configuration must contain variables"
+					+ "%s, %s, %s, %s, %s", HP_ALM_SERVER_URL, HP_ALM_PASSWORD, HP_ALM_USER, HP_ALM_DOMAIN, HP_ALM_PROJECT));
 		}
+		
+		serverUrl = serverUrlVar.getValue();
+		project = projectVar.getValue();
+		domain = domainVar.getValue();
+		user = userVar.getValue();
+		password = passwordVar.getValue();
+		
 		serverUrl += "/qcbin";
 		initialized = true;
 	}

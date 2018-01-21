@@ -17,14 +17,9 @@
 package com.seleniumtests.it.driver;
 
 import java.awt.AWTException;
-import java.awt.Robot;
-import java.awt.Toolkit;
-import java.awt.datatransfer.StringSelection;
-import java.awt.event.KeyEvent;
 import java.io.File;
 import java.util.regex.Pattern;
 
-import org.apache.xml.serialize.TextSerializer;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.UnhandledAlertException;
@@ -33,43 +28,52 @@ import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.testng.Assert;
 import org.testng.ITestContext;
-import org.testng.annotations.AfterClass;
+import org.testng.SkipException;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import com.seleniumtests.GenericTest;
 import com.seleniumtests.browserfactory.FirefoxDriverFactory;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import com.seleniumtests.driver.WebUIDriver;
+import com.seleniumtests.it.driver.support.GenericMultiBrowserTest;
+import com.seleniumtests.it.driver.support.pages.DriverTestPage;
 import com.seleniumtests.uipage.htmlelements.HtmlElement;
 import com.seleniumtests.util.helper.WaitHelper;
 
-public class TestDriver extends GenericTest {
+public class TestDriver extends GenericMultiBrowserTest {
 	
-	
+	private String browserName;
 
-	private static WebDriver driver;
-	private static DriverTestPage testPage;
-	
 	public TestDriver() throws Exception {
 	}
-	
+
 	public TestDriver(WebDriver driver, DriverTestPage testPage) throws Exception {
 		TestDriver.driver = driver;
 		TestDriver.testPage = testPage;
 	}
 	
+	public TestDriver(String browserName) throws Exception {
+		this.browserName = browserName; 
+	}
+	
 	@BeforeClass(groups={"it"})
-	public void initDriver(final ITestContext testNGCtx) throws Exception {
+	public void init(final ITestContext testNGCtx) throws Exception {
+		if (driver != null) {
+			return;
+		}
+		if (browserName == null) {
+			throw new SkipException("skipped");
+		}
+		logger.info("starting tests with browser: " + browserName);
+		
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setExplicitWaitTimeout(2);
-		SeleniumTestsContextManager.getThreadContext().setBrowser("*chrome");
+		SeleniumTestsContextManager.getThreadContext().setBrowser(browserName);
 		SeleniumTestsContextManager.getThreadContext().setCaptureSnapshot(false);
-//		SeleniumTestsContextManager.getThreadContext().setWebDriverGrid("http://127.0.0.1:4444/wd/hub");
-//		SeleniumTestsContextManager.getThreadContext().setRunMode("grid");
-		testPage = new DriverTestPage(true);
+		
+		testPage = new DriverTestPage(true, String.format("http://%s:%d/test.html", localAddress, server.getServerHost().getPort()));
 		driver = WebUIDriver.getWebDriver(true);
 	}
 	
@@ -80,11 +84,6 @@ public class TestDriver extends GenericTest {
 		} catch (WebDriverException e) {
 			
 		}
-	}
-	
-	@AfterClass(groups={"it"})
-	public void closeBrowser() {
-		WebUIDriver.cleanUp();
 	}
 	
 //	/**
@@ -205,7 +204,7 @@ public class TestDriver extends GenericTest {
 	public void testClickActionDiv() {
 		try {
 			testPage.redSquare.clickAction();
-			Assert.assertEquals("coucou", testPage.textElement.getValue());
+			Assert.assertEquals(testPage.textElement.getValue(), "coucou");
 		} finally {
 			testPage.resetButton.click();
 			Assert.assertEquals("", testPage.textElement.getValue());
@@ -216,7 +215,7 @@ public class TestDriver extends GenericTest {
 	public void testDoubleClickActionDiv() {
 		try {
 			testPage.redSquare.doubleClickAction();
-			Assert.assertEquals("double coucou", testPage.textElement.getValue());
+			Assert.assertEquals(testPage.textElement.getValue(), "double coucou");
 		} finally {
 			testPage.resetButton.click();
 			Assert.assertEquals("", testPage.textElement.getValue());
@@ -246,8 +245,8 @@ public class TestDriver extends GenericTest {
 	@Test(groups={"it"})
 	public void testSendKeys() {
 		try {
-			testPage.textElement.sendKeys("youpi");
-			Assert.assertEquals(testPage.textElement.getValue(), "youpi");
+			testPage.textElement.sendKeys("youpi@[]é");
+			Assert.assertEquals(testPage.textElement.getValue(), "youpi@[]é");
 		} finally {
 			testPage.resetButton.click();
 		}
@@ -256,8 +255,8 @@ public class TestDriver extends GenericTest {
 	@Test(groups={"it"})
 	public void testSendKeysJs() {
 		try {
-			testPage.textElement.simulateSendKeys("youpi");
-			Assert.assertEquals(testPage.textElement.getValue(), "youpi");
+			testPage.textElement.simulateSendKeys("youpi@[]é");
+			Assert.assertEquals(testPage.textElement.getValue(), "youpi@[]é");
 		} finally {
 			driver.findElement(By.id("button2")).click();
 		}
@@ -361,9 +360,9 @@ public class TestDriver extends GenericTest {
 	public void testIsElementPresent1() {
 		try {
 			testPage.delayButton.click();
-			Assert.assertFalse(new HtmlElement("", By.id("newEl")).isElementPresent());
+			Assert.assertFalse(new HtmlElement("", By.id("newEl")).isElementPresent(1));
 			WaitHelper.waitForSeconds(3);
-			Assert.assertTrue(new HtmlElement("", By.id("newEl")).isElementPresent());
+			Assert.assertTrue(new HtmlElement("", By.id("newEl")).isElementPresent(1));
 		} finally {
 			testPage.delayButtonReset.click();
 		}
@@ -391,14 +390,84 @@ public class TestDriver extends GenericTest {
 		Assert.assertFalse(((JavascriptExecutor) driver).executeScript("return window.pageYOffset;").equals(0L));
 	}
 	
+	/**
+	 * Test file upload in case selenium method does not work. This uses the java Robot version which controls mouse and keyboard
+	 * @throws AWTException
+	 * @throws InterruptedException
+	 */
 	@Test(groups= {"it"})
-	public void testUploadFile() throws AWTException, InterruptedException {
+	public void testUploadFileWithRobot() throws AWTException, InterruptedException {
 		String path = SeleniumTestsContextManager.getConfigPath() + File.separator + "config.ini";
 		testPage.upload.click();
 		
 		testPage.uploadFile(path);
 		
 		Assert.assertEquals(testPage.uploadedFile.getAttribute("value"), "config.ini");
+	}
+	
+	/**
+	 * Test file upload with standard selenium method
+	 * @throws AWTException
+	 * @throws InterruptedException
+	 */
+	@Test(groups= {"it"})
+	public void testUploadFile() throws AWTException, InterruptedException {
+		String path = SeleniumTestsContextManager.getConfigPath() + File.separator + "config.ini";
+		testPage.upload.sendKeys(path);
+		
+		Assert.assertEquals(testPage.uploadedFile.getAttribute("value"), "config.ini");
+	}
+	
+	/**
+	 * Check that if no index is specified, first element is get
+	 */
+	@Test(groups={"it"})
+	public void testFindFirstElement() {
+		Assert.assertEquals(testPage.multiElementFirstText.getValue(), "0 text field");
+	}
+	
+	/**
+	 * Check that if FIRST_VISIBLE is specified, first visible element is returned
+	 * refresh page to be sure element has not been made visible
+	 */
+	@Test(groups={"it"})
+	public void testFindFirstVisibleElement() {
+		driver.navigate().refresh();
+		Assert.assertEquals(testPage.multiElementFirstVisibleText.getValue(), "second text field");
+	}
+	
+	/**
+	 * Check that if no index is specified, first element is get
+	 */
+	@Test(groups={"it"})
+	public void testFindFirstElementWithParent() {
+		Assert.assertEquals(testPage.multiElementFirstTextWithParent.getValue(), "0 text field");
+	}
+	
+	/**
+	 * Check that if FIRST_VISIBLE is specified, first visible element is returned. In this case, FIRST_VISIBLE has only been applied to the parent element
+	 * refresh page to be sure element has not been made visible
+	 */
+	@Test(groups={"it"})
+	public void testFindFirstVisibleElementWithParent() {
+		driver.navigate().refresh();
+		Assert.assertEquals(testPage.multiElementFirstVisibleTextWithParent.getValue(), "first text field");
+	}
+	
+	/**
+	 * get findElements inside an other one
+	 */
+	@Test(groups={"it"})
+	public void testFindElementsUnderAnOtherElement() {
+		Assert.assertEquals(testPage.divByClass.findElements(By.className("someClass")).size(), 4);
+	}
+	
+	/**
+	 * Check that if no index is specified, first element is get
+	 */
+	@Test(groups={"it"})
+	public void testFindLastElement() {
+		Assert.assertEquals(testPage.multiElementLastText.getValue(), "last text field");
 	}
 	
 }

@@ -16,6 +16,9 @@
  */
 package com.seleniumtests.ut.browserfactory;
 
+import java.util.Map;
+
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.testng.Assert;
@@ -26,6 +29,7 @@ import com.seleniumtests.browserfactory.AndroidCapabilitiesFactory;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.DriverConfig;
 
+import io.appium.java_client.remote.AndroidMobileCapabilityType;
 import io.appium.java_client.remote.MobileCapabilityType;
 
 public class TestAndroidCapabilitiesFactory extends GenericTest {
@@ -34,35 +38,121 @@ public class TestAndroidCapabilitiesFactory extends GenericTest {
 	 * Check default behaviour
 	 */
 	@Test(groups={"ut"})
-	public void testCreateCapabilities() {
+	public void testCreateDefaultChromeCapabilities() {
 		DriverConfig config = new DriverConfig();
-		config.setBrowser(BrowserType.FIREFOX);
-		config.setMobilePlatformVersion("4.4");
+		config.setBrowser(BrowserType.CHROME);
+		config.setMobilePlatformVersion("8.0");
+		config.setPlatform("android");
+		config.setDeviceName("Samsung Galasy S8");
 		config.setApp("");
 		
 		AndroidCapabilitiesFactory capaFactory = new AndroidCapabilitiesFactory();
 		DesiredCapabilities capa = capaFactory.createCapabilities(config);
 		
-		Assert.assertEquals(capa.getCapability(CapabilityType.BROWSER_NAME), BrowserType.FIREFOX.toString().toLowerCase());
+		Assert.assertEquals(capa.getCapability(CapabilityType.BROWSER_NAME), BrowserType.CHROME.toString().toLowerCase());
+		Assert.assertEquals(((Map<?,?>)capa.getCapability(ChromeOptions.CAPABILITY)).get("args").toString(), "[--disable-translate]");
 		Assert.assertEquals(capa.getCapability(MobileCapabilityType.AUTOMATION_NAME), "Appium");
+		Assert.assertEquals(capa.getCapability(MobileCapabilityType.PLATFORM_NAME), "android");
+		Assert.assertEquals(capa.getCapability(MobileCapabilityType.PLATFORM_VERSION), "8.0");
+		Assert.assertEquals(capa.getCapability(MobileCapabilityType.DEVICE_NAME), "Samsung Galasy S8");
+		Assert.assertNull(capa.getCapability(MobileCapabilityType.NEW_COMMAND_TIMEOUT));
+		Assert.assertNull(capa.getCapability(AndroidMobileCapabilityType.APP_PACKAGE));
+		Assert.assertNull(capa.getCapability(AndroidMobileCapabilityType.APP_ACTIVITY));
+		Assert.assertNull(capa.getCapability(MobileCapabilityType.FULL_RESET));
+	}
+	
+	/**
+	 * Check default behaviour
+	 */
+	@Test(groups={"ut"})
+	public void testCreateDefaultAndroidBrowserCapabilities() {
+		DriverConfig config = new DriverConfig();
+		config.setBrowser(BrowserType.BROWSER);
+		config.setMobilePlatformVersion("8.0");
+		config.setPlatform("android");
+		config.setDeviceName("Samsung Galasy S8");
+		config.setApp("");
+		
+		AndroidCapabilitiesFactory capaFactory = new AndroidCapabilitiesFactory();
+		DesiredCapabilities capa = capaFactory.createCapabilities(config);
+		
+		Assert.assertEquals(capa.getCapability(CapabilityType.BROWSER_NAME), BrowserType.BROWSER.toString().toLowerCase());
+		Assert.assertNull(capa.getCapability(ChromeOptions.CAPABILITY));
+		Assert.assertEquals(capa.getCapability(MobileCapabilityType.AUTOMATION_NAME), "Appium");
+		Assert.assertEquals(capa.getCapability(MobileCapabilityType.PLATFORM_NAME), "android");
+		Assert.assertEquals(capa.getCapability(MobileCapabilityType.PLATFORM_VERSION), "8.0");
+		Assert.assertEquals(capa.getCapability(MobileCapabilityType.DEVICE_NAME), "Samsung Galasy S8");
+		Assert.assertNull(capa.getCapability(MobileCapabilityType.NEW_COMMAND_TIMEOUT));
+		Assert.assertNull(capa.getCapability(AndroidMobileCapabilityType.APP_PACKAGE));
+		Assert.assertNull(capa.getCapability(AndroidMobileCapabilityType.APP_ACTIVITY));
+		Assert.assertNull(capa.getCapability(MobileCapabilityType.FULL_RESET));
 	}
 	
 	/**
 	 * Check mobile test with app
 	 */
 	@Test(groups={"ut"})
-	public void testCreateCapabilities_app() {
+	public void testCreateCapabilitiesWithApplication() {
 		DriverConfig config = new DriverConfig();
-		config.setMobilePlatformVersion("4.4");
-		config.setApp("com.infotel.infolidays");
+		config.setMobilePlatformVersion("8.0");
+		config.setPlatform("android");
+		config.setDeviceName("Samsung Galasy S8");
+		config.setAppPackage("appPackage");
+		config.setAppActivity("appActivity");
+		config.setApp("com.covea.mobileapp");
 		
-		DesiredCapabilities tmpCap = new DesiredCapabilities();
-		tmpCap.setCapability("app", "com.infotel.infolidays");
 		AndroidCapabilitiesFactory capaFactory = new AndroidCapabilitiesFactory();
 		DesiredCapabilities capa = capaFactory.createCapabilities(config);
 		
 		Assert.assertEquals(capa.getCapability(CapabilityType.BROWSER_NAME), null);
-		Assert.assertEquals(capa.getCapability("app"), "com.infotel.infolidays");
+		Assert.assertEquals(capa.getCapability("app"), "com.covea.mobileapp");
 		Assert.assertEquals(capa.getCapability(MobileCapabilityType.AUTOMATION_NAME), "Appium");
+		Assert.assertEquals(capa.getCapability(MobileCapabilityType.PLATFORM_NAME), "android");
+		Assert.assertEquals(capa.getCapability(MobileCapabilityType.PLATFORM_VERSION), "8.0");
+		Assert.assertEquals(capa.getCapability(MobileCapabilityType.DEVICE_NAME), "Samsung Galasy S8");
+		Assert.assertEquals(capa.getCapability(MobileCapabilityType.FULL_RESET), "false");
+		Assert.assertNull(capa.getCapability(MobileCapabilityType.NEW_COMMAND_TIMEOUT));
+		Assert.assertEquals(capa.getCapability(AndroidMobileCapabilityType.APP_PACKAGE), "appPackage");
+		Assert.assertEquals(capa.getCapability(AndroidMobileCapabilityType.APP_ACTIVITY), "appActivity");
+	}
+	
+	/**
+	 * Check mobile test with app
+	 */
+	@Test(groups={"ut"})
+	public void testCreateCapabilitiesWithApplicationOverrideFullReset() {
+		DriverConfig config = new DriverConfig();
+		config.setMobilePlatformVersion("8.0");
+		config.setPlatform("android");
+		config.setDeviceName("Samsung Galasy S8");
+		config.setAppPackage("appPackage");
+		config.setAppActivity("appActivity");
+		config.setFullReset(true);
+		config.setApp("com.covea.mobileapp");
+		
+		AndroidCapabilitiesFactory capaFactory = new AndroidCapabilitiesFactory();
+		DesiredCapabilities capa = capaFactory.createCapabilities(config);
+		
+		Assert.assertEquals(capa.getCapability(MobileCapabilityType.FULL_RESET), "true");
+	}
+	
+	/**
+	 * Check mobile test with app
+	 */
+	@Test(groups={"ut"})
+	public void testCreateCapabilitiesWithApplicationOldAndroid() {
+		DriverConfig config = new DriverConfig();
+		config.setMobilePlatformVersion("2.3");
+		config.setPlatform("android");
+		config.setDeviceName("Samsung Galasy S1");
+		config.setAppPackage("appPackage");
+		config.setAppActivity("appActivity");
+		config.setFullReset(true);
+		config.setApp("com.covea.mobileapp");
+		
+		AndroidCapabilitiesFactory capaFactory = new AndroidCapabilitiesFactory();
+		DesiredCapabilities capa = capaFactory.createCapabilities(config);
+		
+		Assert.assertEquals(capa.getCapability(MobileCapabilityType.AUTOMATION_NAME), "Selendroid");
 	}
 }

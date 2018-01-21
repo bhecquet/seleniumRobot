@@ -1,22 +1,23 @@
 package com.seleniumtests.uipage.aspects;
 
-import org.apache.log4j.Logger;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.openqa.selenium.By;
 
-import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.uipage.htmlelements.FrameElement;
 import com.seleniumtests.uipage.htmlelements.HtmlElement;
-import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
 @Aspect
 public class SeleniumNativeActions {
 
 	private FrameElement currentFrame;
-	private static Boolean override = SeleniumTestsContextManager.getThreadContext().getOverrideSeleniumNativeAction();
+
+	private Boolean doOverride() {
+		return SeleniumTestsContextManager.getThreadContext().getOverrideSeleniumNativeAction();
+	}
+	
 	/**
 	 * Intercept any call to findElement made from a PageObject subclass and returns a HtmlElement instead of a RemoteWebElement
 	 * This way, every action done on this element will benefit from HtmlElement mechanism
@@ -29,7 +30,7 @@ public class SeleniumNativeActions {
 			+ ")"			
 			)
 	public Object interceptFindHtmlElement(ProceedingJoinPoint joinPoint) throws Throwable {
-		if (override) {
+		if (doOverride()) {
 			return new HtmlElement("", (By)(joinPoint.getArgs()[0]), currentFrame);
 		} else {
 			return joinPoint.proceed(joinPoint.getArgs());
@@ -41,7 +42,7 @@ public class SeleniumNativeActions {
 			+ ")"			
 			)
 	public Object interceptFindsHtmlElement(ProceedingJoinPoint joinPoint) throws Throwable {
-		if (override) {
+		if (doOverride()) {
 			return new HtmlElement("", (By)(joinPoint.getArgs()[0]), currentFrame).findElements();
 		} else {
 			return joinPoint.proceed(joinPoint.getArgs());
@@ -60,7 +61,7 @@ public class SeleniumNativeActions {
 			+ ")"			
 			)
 	public Object recordSwitchToFramCalls(ProceedingJoinPoint joinPoint) throws Throwable {
-		if (override) {
+		if (doOverride()) {
 			Object frameArg = joinPoint.getArgs()[0];
 			FrameElement frameEl;
 			
@@ -74,7 +75,7 @@ public class SeleniumNativeActions {
 			} else {
 				return joinPoint.proceed(joinPoint.getArgs());
 			}
-			System.out.println("entering frame " + frameArg.toString());
+
 			if (currentFrame == null) {
 				currentFrame = frameEl;
 			} else {
@@ -103,7 +104,7 @@ public class SeleniumNativeActions {
 			+ ")"			
 			)
 	public Object recordSwitchParentFrame(ProceedingJoinPoint joinPoint) throws Throwable {
-		if (currentFrame == null || !override) {
+		if (currentFrame == null || !doOverride()) {
 			return joinPoint.proceed(joinPoint.getArgs());
 		} else {
 			currentFrame = currentFrame.getFrameElement();
@@ -114,7 +115,6 @@ public class SeleniumNativeActions {
 	
 	
 	
-	// TODO: handle frames (do not reset state when this mode is used (see ReplayAction)
 	// TODO: handle findElementBy... (from RemoteWebDriver) => should be useless as SeleniuRobot only expose a WebDriverInstance
 	// TODO: check behavior with WebDriverWait & CompositeActions
 }

@@ -29,11 +29,11 @@ public class TextFieldElement extends HtmlElement {
     	super(label, by, parent);
     }
     
-    public TextFieldElement(final String label, final By by, final int index) {
+    public TextFieldElement(final String label, final By by, final Integer index) {
     	super(label, by, index);
     }
     
-    public TextFieldElement(final String label, final By by, final HtmlElement parent, final int index) {
+    public TextFieldElement(final String label, final By by, final HtmlElement parent, final Integer index) {
     	super(label, by, parent, index);
     }
     
@@ -41,7 +41,7 @@ public class TextFieldElement extends HtmlElement {
     	super(label, by, frame);
     }
     
-    public TextFieldElement(final String label, final By by, final FrameElement frame, final int index) {
+    public TextFieldElement(final String label, final By by, final FrameElement frame, final Integer index) {
     	super(label, by, frame, index);
     }
 
@@ -51,6 +51,31 @@ public class TextFieldElement extends HtmlElement {
         findElement();
         if (!"file".equalsIgnoreCase(element.getAttribute("type"))) {
             element.clear();
+        }
+    }
+    
+
+    /**
+     * Sends the indicated CharSequence to the WebElement.
+     * HtmlElement version do not click on element before sending keys
+     *
+     * @param 	clear		if true, clear field before writing
+     * @param	blurAfter	if true, do blur() after sendKeys has been done
+     * @param   keysToSend	write this text
+     */
+    @Override
+    @ReplayOnError
+    public void sendKeys(final boolean clear, final boolean blurAfter, CharSequence... keysToSend) {
+        findElement(true);
+        
+        if (clear) {
+        	element.clear();
+        } 
+        element.click();
+        element.sendKeys(keysToSend);
+        
+        if (blurAfter) {
+        	blur(); 
         }
     }
     

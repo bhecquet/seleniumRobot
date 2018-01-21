@@ -4,7 +4,8 @@ A "test application" is the code specific to the Web or Mobile application under
 Use seleniumRobot-example project as a base to develop your own test application
 [https://github.com/bhecquet/seleniumRobot-example](https://github.com/bhecquet/seleniumRobot-example)
 
-- for the remainder, we use a unique name for that new application `appName`
+for the remainder, we use a unique name for that new application `appName`<br/>
+**BE CAREFUL**: application name MUST NOT contain any `_` (underscore character)
 - in pom.xml
 	- remove all unnecessary plugins & configurations (see file comments)
 	- change artifactId, groupId and version according to your organization
@@ -14,27 +15,60 @@ Use seleniumRobot-example project as a base to develop your own test application
 
 #### Requirements are ####
 
-- Test data are in `data/<app_name>/`
+- Test data are in `data/<appName>/`
 	- `features` contains feature files (mandatory if cucumber mode is used)
 	- `testng` contains testng files to start tests (mandatory)
 	- `config` contains centralized env test configuration (optional)
 	- `squash-ta` contains ta files that should override the default ones (optional). See Squash-TA section for details 
 
 - Test code must be in `src/test/java`
-- package name is free but following structure should be used
+- **WARN** When using IntelliJ, you must also create a `src/main/java` with subpackage inside and a main class. This does nothing but IntelliJ cannot weave aspects without that
+- package name is free but following structure MUST be used
 	- `cucumber` subpackage contains cucumber implementation files. As cucumber annotations can be written directly in test page object, it should at least contain code for `@Then` (checks) and `@Given` (initial state).
-If pure TestNG mode is used, this package should not exist.
+If pure TestNG mode is used, this package MUST exist.
 	- `tests` subpackage contains code for pure TestNG tests (not cucumber). If cucumber mode is used, this package should not exist
 	- `webpage` subpackage is mandatory as it contains PageObject implementation
 
 ![](images/package_structure.png)
 
 *If something goes wrong when launching test, check:*
-- project name, folder name under `data`, sub-package name, containing `webpages` *MUST BE THE SAME*
+- project name, folder name under `data`, sub-package name, containing `webpages` **SHOULD BE THE SAME**
 - There is no space in folder structure
 - In cucumber mode, the `@Given` creating the first PageObject must not be in the PageObject class. It should be in `cucumber`subpackage instead
 
 Once done, configure your project with aspectJ compiler. See procedure for eclipse or IntelliJ in file [chap2_Installation.md](chap2_Installation.md)
+
+#### Handle multiple version of the same test application ####
+A SUT can be installed in several environement with different version: v3.0 in integration, v2.0 in acceptance tests, v1.0 in production
+If you use the same seleniumrobot execution environment, you must be able to deploy several versions of the test application at the same time on this environment.
+Therefore, do the following in pom.xml:
+- Change `<finalName>${project.artifactId}</finalName>` by `<finalName>${project.artifactId}-${application.version.short}</finalName>`
+- Change any execution of `maven-resources-plugin` containing `data`: <br/>
+`<outputDirectory>${project.build.directory}/data/${project.artifactId}/config</outputDirectory>` by `<outputDirectory>${project.build.directory}/data/${project.artifactId}_${application.version.short}/config</outputDirectory>` <br/> 
+`<outputDirectory>${project.build.directory}/data/${project.artifactId}/testng</outputDirectory>` by `<outputDirectory>${project.build.directory}/data/${project.artifactId}_${application.version.short}/testng</outputDirectory>` <br/> 
+`<outputDirectory>${project.build.directory}/data/${project.artifactId}/features</outputDirectory>` by `<outputDirectory>${project.build.directory}/data/${project.artifactId}_${application.version.short}/features</outputDirectory>` <br/> 
+- Add the plugin execution. It will be in charge of creating the `application.version.short` variable that we use above:
+
+	<plugin>
+		<groupId>org.codehaus.mojo</groupId>
+		<artifactId>build-helper-maven-plugin</artifactId>
+		<version>3.0.0</version>
+		<executions>
+			<execution>
+				<id>regex-property</id>
+				<goals>
+					<goal>regex-property</goal>
+				</goals>
+				<configuration>
+					<name>application.version.short</name>
+					<value>${project.version}</value>
+					<regex>^([0-9]+)\.([0-9]+)\.([0-9]+)(-SNAPSHOT)?$</regex>
+					<replacement>$1.$2</replacement>
+					<failIfNoMatch>true</failIfNoMatch>
+				</configuration>
+			</execution>
+		</executions>
+	</plugin>
 
 #### Post-installation ####
 
@@ -101,6 +135,8 @@ Additional search using the `ByC` class are
 - search element by attribute: `new TextFieldElement("", ByC.attribute("attr", "attribute")).sendKeys("element found by attribute");`. See: [https://developer.mozilla.org/en-US/docs/Web/CSS/Attribute_selectors] (https://developer.mozilla.org/en-US/docs/Web/CSS/Attribute_selectors) for special syntax like searching with attribute value starting by some pattern `ByC.attribute("attr^", "attributeStartPattern")`
 - search element after a label: `new TextFieldElement("", ByC.labelForward("By id forward", "input")).sendKeys("element found by label");`
 - search element before a label: `new TextFieldElement("", ByC.labelBackward("By id backward", "input")).sendKeys("element found by label backward");`
+- search by first visible element: `new HtmlElement("", By.className("otherClass"), HtmlElement.FIRST_VISIBLE).getText()`
+- search in reverse order (get the last element): `new TextFieldElement("", By.className("someClass"), -1);` get the last element on the list
 
 
 ### 3 Write a test ###
@@ -306,7 +342,9 @@ As PageObject exposes the `driver` object, it's possible to write standard Selen
 	driver.findElement(By.id("myId")).click();
 	
 SeleniumRobot intercept selenium calls to create HtmlElement objects (the same as in §2) and thus benefit all SelniumRobot behaviour
-The constraint is that this code *MUST* be placed in a PageObject sub-class
+The constraints are:
+- this code *MUST* be placed in a PageObject sub-class.
+- add `<parameter name="overrideSeleniumNativeAction" value="true" />` to your TestNG XML file 
 
 This should be seen as a way to migrate legacy selenium code to the new format without rewriting every old test 
 

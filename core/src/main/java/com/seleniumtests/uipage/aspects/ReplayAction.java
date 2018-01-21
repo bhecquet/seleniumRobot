@@ -193,25 +193,29 @@ public class ReplayAction {
 	 * @return
 	 */
 	private boolean isHtmlElementDirectlyCalled(StackTraceElement[] stack) {
-		String stackClass = null;
-		boolean specificElementFound = false;
-		boolean htmlElementFound = false;
+		// disabled as action logging is now done only on @ReplayAction annotations. So there will not be 2 calls to the same action (effect of issue #62)
+		// TODO: should be removed
 		
-		for(int i=0; i < stack.length; i++) {
-			
-			// when using aspects, class name may contain a "$", remove everything after that symbol
-			stackClass = stack[i].getClassName().split("\\$")[0];
-			if (stackClass.equals("com.seleniumtests.uipage.htmlelements.HtmlElement")) {
-				htmlElementFound = true;
-			} else if (stackClass.startsWith("com.seleniumtests.uipage.htmlelements.")) {
-				specificElementFound = true;
-			}
-		}
-		if (htmlElementFound && specificElementFound) {
-			return false;
-		} else {
-			return true;
-		}
+		return true;
+//		String stackClass = null;
+//		boolean specificElementFound = false;
+//		boolean htmlElementFound = false;
+//		
+//		for(int i=0; i < stack.length; i++) {
+//			
+//			// when using aspects, class name may contain a "$", remove everything after that symbol
+//			stackClass = stack[i].getClassName().split("\\$")[0];
+//			if (stackClass.equals("com.seleniumtests.uipage.htmlelements.HtmlElement")) {
+//				htmlElementFound = true;
+//			} else if (stackClass.startsWith("com.seleniumtests.uipage.htmlelements.")) {
+//				specificElementFound = true;
+//			}
+//		}
+//		if (htmlElementFound && specificElementFound) {
+//			return false;
+//		} else {
+//			return true;
+//		}
 	}
 	
     

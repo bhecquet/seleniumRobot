@@ -27,8 +27,8 @@ import org.testng.annotations.Test;
 import com.seleniumtests.GenericTest;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.driver.WebUIDriver;
-import com.seleniumtests.it.driver.DriverTestPage;
 import com.seleniumtests.it.driver.TestDriver;
+import com.seleniumtests.it.driver.support.pages.DriverTestPage;
 import com.seleniumtests.uipage.htmlelements.HtmlElement;
 
 public class TestHtmlElement extends GenericTest {

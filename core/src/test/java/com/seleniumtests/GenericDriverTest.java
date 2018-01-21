@@ -24,17 +24,25 @@ import org.testng.annotations.BeforeMethod;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.driver.WebUIDriver;
 
+/**
+ * Parent test class for tests when driver needs to be closed after each test
+ * @author s047432
+ *
+ */
 public class GenericDriverTest {
 	
 	public WebDriver driver = null;
 
 	@BeforeMethod(groups={"ut", "it"})  
-	public void initTest() {
+	public void initTest(final ITestContext testNGCtx) {
+		SeleniumTestsContextManager.initGlobalContext(testNGCtx);
+		SeleniumTestsContextManager.initThreadContext(testNGCtx, null);
 		SeleniumTestsContextManager.getThreadContext().setSoftAssertEnabled(false);
 		SeleniumTestsContextManager.getGlobalContext().setSoftAssertEnabled(false);
 	}
-
+	
 	public void initThreadContext(final ITestContext testNGCtx) {
+		SeleniumTestsContextManager.initGlobalContext(testNGCtx);
 		SeleniumTestsContextManager.initThreadContext(testNGCtx, null);
 		SeleniumTestsContextManager.getThreadContext().setSoftAssertEnabled(false);
 		SeleniumTestsContextManager.getGlobalContext().setSoftAssertEnabled(false);

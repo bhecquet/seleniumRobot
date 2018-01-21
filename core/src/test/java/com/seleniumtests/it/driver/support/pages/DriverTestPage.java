@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.seleniumtests.it.driver;
+package com.seleniumtests.it.driver.support.pages;
 
 import org.openqa.selenium.By;
 
@@ -24,6 +24,7 @@ import com.seleniumtests.uipage.ByC;
 import com.seleniumtests.uipage.PageObject;
 import com.seleniumtests.uipage.htmlelements.ButtonElement;
 import com.seleniumtests.uipage.htmlelements.CheckBoxElement;
+import com.seleniumtests.uipage.htmlelements.FileUploadElement;
 import com.seleniumtests.uipage.htmlelements.FrameElement;
 import com.seleniumtests.uipage.htmlelements.HtmlElement;
 import com.seleniumtests.uipage.htmlelements.LabelElement;
@@ -64,10 +65,16 @@ public class DriverTestPage extends PageObject {
 	public static final PictureElement picture = new PictureElement("picture", "tu/images/logo_text_field.png", table);
 	public static final PictureElement pictureNotPresent = new PictureElement("picture", "tu/images/vosAlertes.png", table);
 	public static final TextFieldElement logoText = new TextFieldElement("logoText", By.id("logoText"));
-	public static final ButtonElement upload = new ButtonElement("upload", By.id("upload"));
+	public static final FileUploadElement upload = new FileUploadElement("upload", By.id("upload"));
 	public static final TextFieldElement uploadedFile = new TextFieldElement("uploadedFile", By.id("uploadedFile"));
 	public static final TextFieldElement textSelectedId = new TextFieldElement("", By.id("textSelectedId"));
 	public static final TextFieldElement textSelectedText = new TextFieldElement("", By.id("textSelectedText"));
+	public static final TextFieldElement multiElementFirstText = new TextFieldElement("", By.className("someClass"));
+	public static final TextFieldElement multiElementFirstTextWithParent = new HtmlElement("", By.className("otherClass")).findTextFieldElement(By.className("someClass"));
+	public static final TextFieldElement multiElementLastText = new TextFieldElement("", By.className("someClass"), -1);
+	public static final TextFieldElement multiElementFirstVisibleText = new TextFieldElement("", By.className("someClass"), HtmlElement.FIRST_VISIBLE);
+	public static final TextFieldElement multiElementFirstVisibleTextWithParent = new HtmlElement("", By.className("otherClass"), HtmlElement.FIRST_VISIBLE).findTextFieldElement(By.className("someClass"));
+	public static final HtmlElement divByClass = new HtmlElement("", By.className("otherClass"), HtmlElement.FIRST_VISIBLE);
 	
 	// Elements inside others
 	public static final TextFieldElement textElement2 = new HtmlElement("", By.id("parentDiv")).findTextFieldElement(By.name("textField"));
@@ -103,6 +110,7 @@ public class DriverTestPage extends PageObject {
 	public static final SelectList selectListIFrame = new SelectList("list", By.id("selectIFrame"), iframe);
 	public static final HtmlElement optionOfSelectListIFrame = selectListIFrame.findElement(By.tagName("option"));
 	public static final Table tableIFrame = new Table("table", By.id("tableIframe"), iframe);
+	public static final HtmlElement rows = new HtmlElement("", By.tagName("tr"), iframe);
 	public static final LabelElement labelIFrame = new LabelElement("label", By.id("labelIFrame"), iframe);
 	
 	public static final TextFieldElement textElementSubIFrame = new TextFieldElement("Text", By.id("textInIFrameWithValue2"), subIframe);
@@ -115,9 +123,23 @@ public class DriverTestPage extends PageObject {
         super(textElement, openPageURL ? getPageUrl() : null);
     }
     
+    public DriverTestPage(boolean openPageURL, String url) throws Exception {
+    	super(textElement, openPageURL ? url : null);
+    }
+    
     //for TestInterceptPage (the loader page of By has to be a PageObject)
     public By findById(String id) {
     	return By.id(id);
+    }
+    
+    public DriverTestPage _writeSomething() {
+    	textElement.sendKeys("a text");
+    	return this;
+    }
+    
+    public DriverTestPage _reset() {
+    	resetButton.click();
+    	return this;
     }
     
     public static String getPageUrl() {

@@ -28,11 +28,11 @@ public class RadioButtonElement extends HtmlElement {
     	super(label, by, parent);
     }
 
-    public RadioButtonElement(final String label, final By by, final HtmlElement parent, final int index) {
+    public RadioButtonElement(final String label, final By by, final HtmlElement parent, final Integer index) {
     	super(label, by, parent, index);
     }
     
-    public RadioButtonElement(final String label, final By by, final int index) {
+    public RadioButtonElement(final String label, final By by, final Integer index) {
     	super(label, by, index);
     }
     
@@ -40,7 +40,7 @@ public class RadioButtonElement extends HtmlElement {
     	super(label, by, frame);
     }
     
-    public RadioButtonElement(final String label, final By by, final FrameElement frame, final int index) {
+    public RadioButtonElement(final String label, final By by, final FrameElement frame, final Integer index) {
     	super(label, by, frame, index);
     }
 

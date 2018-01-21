@@ -85,8 +85,8 @@ public class TestPerformanceReporter extends ReporterTest {
 		String jmeterReport = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "PERF-com.seleniumtests.it.reporter.StubTestClass.testAndSubActions.xml"));
 		
 		Assert.assertTrue(jmeterReport.contains("<testsuite errors=\"0\" failures=\"1\" hostname=\"\" name=\"testAndSubActions\" tests=\"3\" time=\"15.26\" timestamp="));
-		Assert.assertTrue(jmeterReport.contains("<testcase classname=\"com.seleniumtests.it.reporter.StubTestClass\" name=\"step 1\" time=\"1.23\">"));
-		Assert.assertTrue(jmeterReport.contains("<testcase classname=\"com.seleniumtests.it.reporter.StubTestClass\" name=\"step 2\" time=\"14.03\">"));
+		Assert.assertTrue(jmeterReport.contains("<testcase classname=\"com.seleniumtests.it.reporter.StubTestClass\" name=\"Step 1: step 1\" time=\"1.23\">"));
+		Assert.assertTrue(jmeterReport.contains("<testcase classname=\"com.seleniumtests.it.reporter.StubTestClass\" name=\"Step 2: step 2\" time=\"14.03\">"));
 	}
 	
 	/**
@@ -104,7 +104,7 @@ public class TestPerformanceReporter extends ReporterTest {
 		
 		Assert.assertTrue(jmeterReport.contains("<error message=\"driver exception"));
 		Assert.assertTrue(jmeterReport.contains("<![CDATA[class org.openqa.selenium.WebDriverException: driver exception"));
-		Assert.assertTrue(jmeterReport.contains("at com.seleniumtests.it.reporter.StubTestClass.testAndSubActions(StubTestClass.java:43)"));
+		Assert.assertTrue(jmeterReport.contains("at com.seleniumtests.it.reporter.StubTestClass.testAndSubActions(StubTestClass.java"));
 	}
 	
 	/**

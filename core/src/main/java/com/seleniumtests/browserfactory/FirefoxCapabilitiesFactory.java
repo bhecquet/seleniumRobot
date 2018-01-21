@@ -32,7 +32,7 @@ import com.seleniumtests.util.FileUtility;
 import com.seleniumtests.util.osutility.OSUtility;
 
 public class FirefoxCapabilitiesFactory extends ICapabilitiesFactory {
-    private static final String ALL_ACCESS = "allAccess";
+    public static final String ALL_ACCESS = "allAccess";
 	private static boolean isProfileCreated = false;
     private static Object lockProfile = new Object();
 

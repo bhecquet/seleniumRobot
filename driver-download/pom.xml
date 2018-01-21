@@ -7,7 +7,7 @@
 	<parent>
 	    <groupId>com.infotel.seleniumRobot</groupId>
 	    <artifactId>core-parent</artifactId>
-	    <version>3.5.2-SNAPSHOT</version>
+	    <version>3.5.7-SNAPSHOT</version>
 	</parent>
 
 	<properties>
@@ -52,6 +52,17 @@
 					<executions>
 
 						<!-- CHROMEDRIVER: pattern for file MUST BE chromedriver_<version>_chrome-<minChromeVersion>-<maxChromeVersion> -->
+						<execution>
+							<id>chromedriver 2.34</id>
+							<phase>process-resources</phase>
+							<goals>
+								<goal>wget</goal>
+							</goals>
+							<configuration>
+								<url>${chromedriver.url}/2.34/chromedriver_${chromedriver.suffix}.zip</url>
+								<outputDirectory>${driver.path}${os}/dir_chromedriver_2.34_chrome-61-63</outputDirectory>
+							</configuration>
+						</execution>
 						<execution>
 							<id>chromedriver 2.33</id>
 							<phase>process-resources</phase>

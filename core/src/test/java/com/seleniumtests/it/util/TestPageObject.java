@@ -10,7 +10,7 @@ import com.seleniumtests.GenericDriverTest;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import com.seleniumtests.driver.WebUIDriver;
-import com.seleniumtests.it.driver.DriverTestPage;
+import com.seleniumtests.it.driver.support.pages.DriverTestPage;
 
 public class TestPageObject extends GenericDriverTest {
 

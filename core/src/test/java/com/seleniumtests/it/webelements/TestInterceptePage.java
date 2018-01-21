@@ -27,7 +27,7 @@ import org.testng.xml.XmlTest;
 import com.seleniumtests.GenericTest;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.driver.WebUIDriver;
-import com.seleniumtests.it.driver.DriverTestPage;
+import com.seleniumtests.it.driver.support.pages.DriverTestPage;
 
 
 public class TestInterceptePage extends GenericTest {
