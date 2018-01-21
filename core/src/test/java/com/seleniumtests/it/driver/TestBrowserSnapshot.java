@@ -25,6 +25,8 @@ import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.driver.screenshots.ScreenShot;
 import com.seleniumtests.driver.screenshots.ScreenshotUtil;
+import com.seleniumtests.it.driver.support.pages.DriverSubTestPage;
+import com.seleniumtests.it.driver.support.pages.DriverTestPage;
 import com.seleniumtests.util.FileUtility;
 import com.seleniumtests.util.HashCodeGenerator;
 import com.seleniumtests.util.helper.WaitHelper;
@@ -38,16 +40,17 @@ public class TestBrowserSnapshot extends MockitoTest {
 	
 	private static WebDriver driver;
 	private DriverTestPage testPage;
+	private final String browserName = "firefox";
 	
 	@BeforeMethod(groups={"it"})
 	public void initDriver(final ITestContext testNGCtx) throws Exception {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setExplicitWaitTimeout(2);
-		SeleniumTestsContextManager.getThreadContext().setBrowser("firefox");
+		SeleniumTestsContextManager.getThreadContext().setBrowser(browserName);
 		SeleniumTestsContextManager.getThreadContext().setSnapshotBottomCropping(0);
 		SeleniumTestsContextManager.getThreadContext().setSnapshotTopCropping(0);
-		SeleniumTestsContextManager.getThreadContext().setWebDriverGrid("http://127.0.0.1:4444/wd/hub");
-		SeleniumTestsContextManager.getThreadContext().setRunMode("grid");
+//		SeleniumTestsContextManager.getThreadContext().setWebDriverGrid("http://127.0.0.1:4444/wd/hub");
+//		SeleniumTestsContextManager.getThreadContext().setRunMode("grid");
 //		SeleniumTestsContextManager.getThreadContext().setBrowser("firefox");
 //		SeleniumTestsContextManager.getThreadContext().setFirefoxBinary("path to firefox");
 		testPage = new DriverTestPage(true);
@@ -359,5 +362,4 @@ public class TestBrowserSnapshot extends MockitoTest {
 		
 		Assert.assertNotNull(screenshot.getImagePath());
 	}
-	
 }

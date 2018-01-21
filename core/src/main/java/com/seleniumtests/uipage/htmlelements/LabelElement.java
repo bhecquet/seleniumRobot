@@ -27,11 +27,11 @@ public class LabelElement extends HtmlElement {
     	super(label, by, parent);
     }
 
-    public LabelElement(final String label, final By by, final HtmlElement parent, final int index) {
+    public LabelElement(final String label, final By by, final HtmlElement parent, final Integer index) {
     	super(label, by, parent, index);
     }
     
-    public LabelElement(final String label, final By by, final int index) {
+    public LabelElement(final String label, final By by, final Integer index) {
     	super(label, by, index);
     }
     
@@ -39,7 +39,7 @@ public class LabelElement extends HtmlElement {
     	super(label, by, frame);
     }
     
-    public LabelElement(final String label, final By by, final FrameElement frame, final int index) {
+    public LabelElement(final String label, final By by, final FrameElement frame, final Integer index) {
     	super(label, by, frame, index);
     }
 }

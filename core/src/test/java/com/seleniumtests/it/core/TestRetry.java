@@ -41,4 +41,25 @@ public class TestRetry extends ReporterTest {
 		Assert.assertEquals(StringUtils.countOccurrencesOf(detailedReportContent3, "step 1"), 1); 
 
 	}
+	
+	@Test(groups={"it"})
+	public void testCucumberRetryOnException() throws Exception {
+		
+		executeSubCucumberTests("error_scenario", 1);
+		
+		String mainReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport.html"));
+		Assert.assertTrue(mainReportContent.contains("<a href='SeleniumTestReport-1.html'>error_scenario</a>"));
+		
+		// check failed test is not retried (AssertionError) based on log. No more direct way found
+		String detailedReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport-1.html"));
+		detailedReportContent = detailedReportContent.replace("\n", "").replace("\r",  "").replaceAll(">\\s+<", "><");
+		Assert.assertTrue(detailedReportContent.contains("Failed in 3 times"));
+		Assert.assertTrue(detailedReportContent.contains("[RETRYING] class com.seleniumtests.core.runner.CucumberTestPlan.feature"));
+
+		// check that in case of retry, steps are not logged twice
+		Assert.assertTrue(detailedReportContent.contains("write_error"));
+		Assert.assertEquals(StringUtils.countOccurrencesOf(detailedReportContent, "Start method error_scenario"), 3); 
+		Assert.assertEquals(StringUtils.countOccurrencesOf(detailedReportContent, "Finish method error_scenario"), 3); 
+		
+	}
 }

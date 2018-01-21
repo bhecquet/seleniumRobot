@@ -25,11 +25,12 @@ import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import com.seleniumtests.GenericDriverTest;
+import com.seleniumtests.GenericTest;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.driver.WebUIDriver;
+import com.seleniumtests.it.driver.support.pages.DriverTestPage;
 
-public class TestUiSelect extends GenericDriverTest {
+public class TestUiSelect extends GenericTest {
 	
 	private static WebDriver driver;
 	private static DriverTestPage testPage;
@@ -58,11 +59,6 @@ public class TestUiSelect extends GenericDriverTest {
 		} catch (WebDriverException e) {
 			
 		}
-	}
-	
-	@AfterClass(groups={"it"})
-	public void closeBrowser() {
-		WebUIDriver.cleanUp();
 	}
 	
 	/*

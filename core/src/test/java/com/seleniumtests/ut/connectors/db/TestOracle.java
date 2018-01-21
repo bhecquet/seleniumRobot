@@ -12,6 +12,7 @@ import com.google.common.io.Files;
 import com.seleniumtests.GenericTest;
 import com.seleniumtests.connectors.db.Oracle;
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.core.TestVariable;
 import com.seleniumtests.customexception.ConfigurationException;
 
 public class TestOracle extends GenericTest {
@@ -24,7 +25,7 @@ public class TestOracle extends GenericTest {
 	@Test(groups={"ut"}, expectedExceptions=ConfigurationException.class)
 	public void testWithWrongTnsNamesFolder() {
 		try {
-			SeleniumTestsContextManager.getThreadContext().getConfiguration().put("tnsnamePath", "/home/myFolder/oracle");
+			SeleniumTestsContextManager.getThreadContext().getConfiguration().put("tnsnamePath", new TestVariable("tnsnamePath", "/home/myFolder/oracle"));
 			new Oracle("", "", "");
 		} finally {
 			SeleniumTestsContextManager.getThreadContext().getConfiguration().clear();
@@ -38,7 +39,7 @@ public class TestOracle extends GenericTest {
 	public void testWithFolderOkNoFile() {
 		try {
 			File tmp = Files.createTempDir();
-			SeleniumTestsContextManager.getThreadContext().getConfiguration().put("tnsnamePath", tmp.getAbsolutePath());
+			SeleniumTestsContextManager.getThreadContext().getConfiguration().put("tnsnamePath", new TestVariable("tnsnamePath", tmp.getAbsolutePath()));
 			new Oracle("", "", "");
 		} finally {
 			SeleniumTestsContextManager.getThreadContext().getConfiguration().clear();
@@ -61,7 +62,7 @@ public class TestOracle extends GenericTest {
 										"(SERVICE_NAME = XE)\n" +
 										")\n" +
 									")");
-			SeleniumTestsContextManager.getThreadContext().getConfiguration().put("tnsnamePath", tmp.getAbsolutePath());
+			SeleniumTestsContextManager.getThreadContext().getConfiguration().put("tnsnamePath", new TestVariable("tnsnamePath", tmp.getAbsolutePath()));
 			new Oracle("", "", "");
 			Assert.assertEquals(System.getProperty("oracle.net.tns_admin"), tmp.getAbsolutePath());
 		} finally {

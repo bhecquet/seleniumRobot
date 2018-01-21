@@ -61,16 +61,11 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
     }
 
 	@Override
-	public void onTestStart(ITestResult result) {
-		// TODO Auto-generated method stub
-		
+	public void onTestStart(ITestResult result) {	
 	}
 
 	@Override
 	public void onTestSuccess(ITestResult result) {
-		// capture snap shot at the end of the test
-		logLastStep(result);
-		
 	}
 
 	@Override
@@ -90,11 +85,7 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 
 			logger.info(testResult.getMethod() + " Failed in " + testRetryAnalyzer.getCount() + " times");
 			isRetryHandleNeeded.put(testResult.getTestContext().getName(), true);
-		}
-
-		// capture snap shot
-		logLastStep(testResult);
-		
+		}		
 	}
 
 	@Override
@@ -154,6 +145,11 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 
 	    	if (SeleniumRobotTestPlan.isCucumberTest()) {
 	    		testResult.setAttribute(SeleniumRobotLogger.METHOD_NAME, testResult.getParameters()[0].toString());
+	    		
+	    		logger.info(SeleniumRobotLogger.START_TEST_PATTERN + testResult.getParameters()[0].toString());
+	            SeleniumTestsContextManager.initThreadContext(context, testResult.getParameters()[0].toString());
+	            SeleniumTestsContextManager.getThreadContext().setTestMethodSignature(testResult.getParameters()[0].toString());
+	    		
 	    	} else {
 	    		testResult.setAttribute(SeleniumRobotLogger.METHOD_NAME, method.getTestMethod().getMethodName());
 	    		
@@ -184,7 +180,7 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 	        }
 
 	        logger.info(SeleniumRobotLogger.END_TEST_PATTERN + testResult.getAttribute(SeleniumRobotLogger.METHOD_NAME));
-	        
+
 	        Reporter.setCurrentTestResult(testResult);
 
 			// Handle Soft CustomAssertion
@@ -195,24 +191,35 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 			if (testResult.getThrowable() != null) {
 				logger.error(testResult.getThrowable().getMessage());
 			}
+			
+			// capture snap shot at the end of the test
+			logLastStep(testResult);
+	        
 		}
 		
 	}
 
 	@Override
 	public void onStart(ISuite suite) {
+
+		SeleniumTestsContextManager.initGlobalContext(suite);
+    	SeleniumRobotLogger.updateLogger(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(),
+										 SeleniumTestsContextManager.getGlobalContext().getDefaultOutputDirectory()); 
+		
     	SeleniumTestsContextManager.generateApplicationPath(suite.getXmlSuite());
     	logger.info(String.format("Application %s version: %s", SeleniumTestsContextManager.getApplicationName(), SeleniumTestsContextManager.getApplicationVersion()));
     	logger.info("Core version: " + SeleniumTestsContextManager.getCoreVersion());
-    	
-    	SeleniumRobotLogger.updateLogger(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(),
-										SeleniumTestsContextManager.getGlobalContext().getDefaultOutputDirectory()); 
+
 		
 	}
 
 	@Override
 	public void onFinish(ISuite suite) {
-        logger.info("Test Suite Execution Time: " + (new Date().getTime() - start.getTime()) / 1000 / 60 + " minutes.");
+		if (start != null) {
+			logger.info("Test Suite Execution Time: " + (new Date().getTime() - start.getTime()) / 1000 / 60 + " minutes.");
+		} else {
+			logger.warn("No test executed");
+		}
         try {
 			SeleniumRobotLogger.parseLogFile();
 		} catch (IOException e) {

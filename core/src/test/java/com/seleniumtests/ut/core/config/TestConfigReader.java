@@ -27,6 +27,7 @@ import org.testng.xml.XmlTest;
 import com.seleniumtests.GenericTest;
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.core.TestVariable;
 import com.seleniumtests.core.config.ConfigReader;
 import com.seleniumtests.customexception.ConfigurationException;
 
@@ -34,14 +35,14 @@ public class TestConfigReader extends GenericTest {
 
 	@Test(groups={"ut"})
 	public void readConfigurationWithValueOverride() {
-		Map<String, String> config = new ConfigReader().readConfig(Thread.currentThread().getContextClassLoader().getResourceAsStream("tu/env.ini"), "DEV");
-		Assert.assertEquals(config.get("key1"), "value4", "Key override does not work");
+		Map<String, TestVariable> config = new ConfigReader().readConfig(Thread.currentThread().getContextClassLoader().getResourceAsStream("tu/env.ini"), "DEV");
+		Assert.assertEquals(config.get("key1").getValue(), "value4", "Key override does not work");
 	}
 	
 	@Test(groups={"ut"})
 	public void readConfigurationWithoutValueOverride() {
-		Map<String, String> config = new ConfigReader().readConfig(Thread.currentThread().getContextClassLoader().getResourceAsStream("tu/env.ini"), "VNR");
-		Assert.assertEquals(config.get("key1"), "value1", "Key should not be overriden");
+		Map<String, TestVariable> config = new ConfigReader().readConfig(Thread.currentThread().getContextClassLoader().getResourceAsStream("tu/env.ini"), "VNR");
+		Assert.assertEquals(config.get("key1").getValue(), "value1", "Key should not be overriden");
 	}
 	
 	@Test(groups={"ut context"})
@@ -62,7 +63,7 @@ public class TestConfigReader extends GenericTest {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContext seleniumTestsCtx = SeleniumTestsContextManager.getThreadContext();
 
-		Assert.assertEquals(seleniumTestsCtx.getConfiguration().get("variable1"), "value1", "Value has not been get from xml file");
+		Assert.assertEquals(seleniumTestsCtx.getConfiguration().get("variable1").getValue(), "value1", "Value has not been get from xml file");
 	}
 	
 	/**
@@ -75,7 +76,7 @@ public class TestConfigReader extends GenericTest {
 		SeleniumTestsContext seleniumTestsCtx = SeleniumTestsContextManager.getThreadContext();
 		
 		// check value from a loaded additional ini file is present in configuration
-		Assert.assertEquals(seleniumTestsCtx.getConfiguration().get("key1"), "value4");
+		Assert.assertEquals(seleniumTestsCtx.getConfiguration().get("key1").getValue(), "value4");
 	}
 	
 	/**
@@ -92,17 +93,17 @@ public class TestConfigReader extends GenericTest {
 			SeleniumTestsContext seleniumTestsCtx = SeleniumTestsContextManager.getThreadContext();
 			
 			// check value from a loaded additional ini file is present in configuration
-			Assert.assertEquals(seleniumTestsCtx.getConfiguration().get("key20"), "value20");
+			Assert.assertEquals(seleniumTestsCtx.getConfiguration().get("key20").getValue(), "value20");
 			
 			// check variable overwriting is also OK on loaded files
-			Assert.assertEquals(seleniumTestsCtx.getConfiguration().get("key10"), "value40");
+			Assert.assertEquals(seleniumTestsCtx.getConfiguration().get("key10").getValue(), "value40");
 			
 			// check values are overwritten by loaded ini file if the same exists (for general and env specific)
-			Assert.assertEquals(seleniumTestsCtx.getConfiguration().get("key2"), "value20");
-			Assert.assertEquals(seleniumTestsCtx.getConfiguration().get("key3"), "value30");
+			Assert.assertEquals(seleniumTestsCtx.getConfiguration().get("key2").getValue(), "value20");
+			Assert.assertEquals(seleniumTestsCtx.getConfiguration().get("key3").getValue(), "value30");
 			
 			// check that if value is not present in additional file, it's taken from env.ini/config.ini
-			Assert.assertEquals(seleniumTestsCtx.getConfiguration().get("proxyType"), "direct");
+			Assert.assertEquals(seleniumTestsCtx.getConfiguration().get("proxyType").getValue(), "direct");
 		} finally {
 			System.clearProperty(SeleniumTestsContext.LOAD_INI);
 		}
@@ -121,7 +122,7 @@ public class TestConfigReader extends GenericTest {
 			SeleniumTestsContext seleniumTestsCtx = SeleniumTestsContextManager.getThreadContext();
 			
 			// check variable overwriting is also OK on loaded files
-			Assert.assertEquals(seleniumTestsCtx.getConfiguration().get("key10"), "value100");
+			Assert.assertEquals(seleniumTestsCtx.getConfiguration().get("key10").getValue(), "value100");
 
 		} finally {
 			System.clearProperty(SeleniumTestsContext.LOAD_INI);
@@ -141,13 +142,13 @@ public class TestConfigReader extends GenericTest {
 			SeleniumTestsContext seleniumTestsCtx = SeleniumTestsContextManager.getThreadContext();
 			
 			// check variable overwriting is also OK from last loaded files
-			Assert.assertEquals(seleniumTestsCtx.getConfiguration().get("key10"), "value100");
+			Assert.assertEquals(seleniumTestsCtx.getConfiguration().get("key10").getValue(), "value100");
 			
 			// check values are overwritten by first loaded ini file 
-			Assert.assertEquals(seleniumTestsCtx.getConfiguration().get("key2"), "value20");
+			Assert.assertEquals(seleniumTestsCtx.getConfiguration().get("key2").getValue(), "value20");
 			
 			// check that if value is not present in additional file, it's taken from env.ini/config.ini
-			Assert.assertEquals(seleniumTestsCtx.getConfiguration().get("proxyType"), "direct");
+			Assert.assertEquals(seleniumTestsCtx.getConfiguration().get("proxyType").getValue(), "direct");
 			
 		} finally {
 			System.clearProperty(SeleniumTestsContext.LOAD_INI);

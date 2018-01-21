@@ -42,6 +42,10 @@ public class DefaultTestNGContext implements ITestContext {
     public DefaultTestNGContext() {
         this.suite = new SeleniumTestsDefaultSuite();
     }
+    
+    public DefaultTestNGContext(ISuite suite) {
+    	this.suite = suite;
+    }
 
     @Override
     public Object getAttribute(final String name) {
@@ -110,7 +114,9 @@ public class DefaultTestNGContext implements ITestContext {
 
     @Override
     public String getOutputDirectory() {
-        return this.getClass().getResource("/").getPath() + "../../test-output/defaultSuite";
+    	StringBuilder path = new StringBuilder();
+    	SeleniumTestsContextManager.getPathFromClass(this.getClass(), path);
+    	return path.toString() + "test-output/defaultSuite"; 
     }
 
     @Override

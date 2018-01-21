@@ -26,7 +26,7 @@ import org.testng.annotations.Test;
 import com.seleniumtests.GenericTest;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.driver.WebUIDriver;
-import com.seleniumtests.it.driver.DriverTestPage;
+import com.seleniumtests.it.driver.support.pages.DriverTestPage;
 import com.seleniumtests.uipage.ByC;
 import com.seleniumtests.uipage.htmlelements.TextFieldElement;
 
@@ -70,6 +70,12 @@ public class TestByC extends GenericTest {
 	}
 	
 	@Test(groups={"it"})
+	public void testFindElementByCustomLabelForward() {
+		new TextFieldElement("", ByC.labelForward("Test select", "input", "h3")).sendKeys("element found by h3 tag");
+		Assert.assertEquals(testPage.textSelectedId.getValue(), "element found by h3 tag");
+	}
+	
+	@Test(groups={"it"})
 	public void testFindElementByLabelForwardWithoutTagName() {
 		new TextFieldElement("", ByC.labelForward("By id forward")).sendKeys("element found by label without tagname");
 		Assert.assertEquals(testPage.textSelectedId.getValue(), "element found by label without tagname");
@@ -85,11 +91,23 @@ public class TestByC extends GenericTest {
 		new TextFieldElement("", ByC.partialLabelForward("By id for", "input")).sendKeys("element found by partial label");
 		Assert.assertEquals(testPage.textSelectedId.getValue(), "element found by partial label");
 	}
+
+	@Test(groups={"it"})
+	public void testFindElementByCustomPartialLabelForward() {
+		new TextFieldElement("", ByC.partialLabelForward("Test sele", "input", "h3")).sendKeys("element found by partial h3 tag");
+		Assert.assertEquals(testPage.textSelectedId.getValue(), "element found by partial h3 tag");
+	}
 	
 	@Test(groups={"it"})
 	public void testFindElementByLabelBackward() {
 		new TextFieldElement("", ByC.labelBackward("By id backward", "input")).sendKeys("element found by label backward");
 		Assert.assertEquals(testPage.textSelectedText.getValue(), "element found by label backward");
+	}
+
+	@Test(groups={"it"})
+	public void testFindElementByCustomLabelBackward() {
+		new TextFieldElement("", ByC.labelBackward("Test select Multiple", "input", "h3")).sendKeys("element found by h3 tag backward");
+		Assert.assertEquals(testPage.textSelectedText.getValue(), "element found by h3 tag backward");
 	}
 	
 	@Test(groups={"it"})
@@ -110,6 +128,12 @@ public class TestByC extends GenericTest {
 	}
 
 	@Test(groups={"it"})
+	public void testFindElementByPartialCustomLabelBackward() {
+		new TextFieldElement("", ByC.partialLabelBackward("Test select Mult", "input", "h3")).sendKeys("element found by h3 partial tag backward");
+		Assert.assertEquals(testPage.textSelectedText.getValue(), "element found by h3 partial tag backward");
+	}
+
+	@Test(groups={"it"})
 	public void testFindElementByAttribute() {
 		new TextFieldElement("", ByC.attribute("attr", "attribute")).sendKeys("element found by attribute");
 		Assert.assertEquals(testPage.textSelectedId.getValue(), "element found by attribute");
@@ -123,6 +147,36 @@ public class TestByC extends GenericTest {
 	@Test(groups={"it"}, expectedExceptions=IllegalArgumentException.class)
 	public void testFindElementByNullAttributeValue() {
 		new TextFieldElement("", ByC.attribute("attr", null)).sendKeys("element found by attribute");
+	}
+
+	@Test(groups={"it"})
+	public void testFindElementByText() { 
+		Assert.assertEquals(new TextFieldElement("", ByC.text("Test IFrame", "*")).getTagName(), "h3");
+	}
+	
+	@Test(groups={"it"})
+	public void testFindElementsByText() { 
+		Assert.assertEquals(new TextFieldElement("", ByC.text("Test IFrame", "*")).findElements().size(), 1);
+	}
+	
+	@Test(groups={"it"})
+	public void testFindElementByPartialText() { 
+		Assert.assertEquals(new TextFieldElement("", ByC.partialText("Test IF", "*")).getTagName(), "h3");
+	}
+	
+	@Test(groups={"it"})
+	public void testFindElementsByPartialText() { 
+		Assert.assertTrue(new TextFieldElement("", ByC.partialText("Test select", "*")).findElements().size() >=  3);
+	}
+
+	@Test(groups={"it"}, expectedExceptions=IllegalArgumentException.class)
+	public void testFindElementByNullText() { 
+		new TextFieldElement("", ByC.text(null, "*")).getTagName();
+	}
+	
+	@Test(groups={"it"}, expectedExceptions=IllegalArgumentException.class)
+	public void testFindElementByNullTagName() { 
+		new TextFieldElement("", ByC.text("Test select", null)).getTagName();
 	}
 	
 	

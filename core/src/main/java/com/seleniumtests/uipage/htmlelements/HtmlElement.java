@@ -35,6 +35,7 @@ import org.openqa.selenium.Point;
 import org.openqa.selenium.Rectangle;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.interactions.Actions;
@@ -71,14 +72,14 @@ import io.appium.java_client.TouchAction;
 public class HtmlElement implements WebElement, Locatable, HasIdentity {
 
     protected static final Logger logger = SeleniumRobotLogger.getLogger(HtmlElement.class);
-
+    public static final Integer FIRST_VISIBLE = Integer.MAX_VALUE;
 
     protected WebDriver driver;
     protected WebElement element = null;
     private String label = null;
     private HtmlElement parent = null;
     private FrameElement frameElement = null;
-    private int elementIndex = -1;
+    private Integer elementIndex = -1;
     private By by = null;
 
     public HtmlElement() {
@@ -95,7 +96,7 @@ public class HtmlElement implements WebElement, Locatable, HasIdentity {
      */
     
     public HtmlElement(final String label, final By by) {
-    	this(label, by, -1);
+    	this(label, by, (Integer)null);
     }
     
     /**
@@ -105,10 +106,13 @@ public class HtmlElement implements WebElement, Locatable, HasIdentity {
      * @param   by     - By type
      * @param	index  - index of the element to find. In this case, robot will search the Nth element corresponding to
      * 					 the By parameter. Equivalent to new HtmlElement(label, by).findElements().get(N)
+     * 					 If index is null, use <code>driver.findElement(By)</code> intenally
+     *  				 If index is negative, search from the last one (-1)
+     *  			     If index is HtmlElement.FIRST_VISIBLE, search the first visible element
      *
      * @sample  {@code new HtmlElement("UserId", By.id(userid), 2)}
      */
-    public HtmlElement(final String label, final By by, final int index) {
+    public HtmlElement(final String label, final By by, final Integer index) {
         this.label = label;
         this.by = by;
         this.elementIndex = index;
@@ -116,10 +120,10 @@ public class HtmlElement implements WebElement, Locatable, HasIdentity {
     }
     
     public HtmlElement(final String label, final By by, final FrameElement frame) {
-    	this(label, by, frame, -1);
+    	this(label, by, frame, null);
     }
     
-    public HtmlElement(final String label, final By by, final FrameElement frame, final int index) {
+    public HtmlElement(final String label, final By by, final FrameElement frame, final Integer index) {
     	this.label = label;
     	this.by = by;
     	this.elementIndex = index;
@@ -127,10 +131,10 @@ public class HtmlElement implements WebElement, Locatable, HasIdentity {
     }
     
     public HtmlElement(final String label, final By by, final HtmlElement parent) {
-    	this(label, by, parent, -1);
+    	this(label, by, parent, null);
     }
     
-    public HtmlElement(final String label, final By by, final HtmlElement parent, final int index) {
+    public HtmlElement(final String label, final By by, final HtmlElement parent, final Integer index) {
     	this.label = label;
     	this.by = by;
     	this.parent = parent;
@@ -313,35 +317,35 @@ public class HtmlElement implements WebElement, Locatable, HasIdentity {
      * @param index	index in the list to get
      * @return
      */
-    public HtmlElement findElement(By by, int index) {
+    public HtmlElement findElement(By by, Integer index) {
     	return new HtmlElement(label, by, this, index);
     }
     
-    public ButtonElement findButtonElement(By by, int index) {
+    public ButtonElement findButtonElement(By by, Integer index) {
     	return new ButtonElement(label, by, this, index);
     }
-    public CheckBoxElement findCheckBoxElement(By by, int index) {
+    public CheckBoxElement findCheckBoxElement(By by, Integer index) {
     	return new CheckBoxElement(label, by, this, index);
     }
-    public ImageElement findImageElement(By by, int index) {
+    public ImageElement findImageElement(By by, Integer index) {
     	return new ImageElement(label, by, this, index);
     }
-    public LabelElement findLabelElement(By by, int index) {
+    public LabelElement findLabelElement(By by, Integer index) {
     	return new LabelElement(label, by, this, index);
     }
-    public LinkElement findLinkElement(By by, int index) {
+    public LinkElement findLinkElement(By by, Integer index) {
     	return new LinkElement(label, by, this, index);
     }
-    public RadioButtonElement findRadioButtonElement(By by, int index) {
+    public RadioButtonElement findRadioButtonElement(By by, Integer index) {
     	return new RadioButtonElement(label, by, this, index);
     }
-    public SelectList findSelectList(By by, int index) {
+    public SelectList findSelectList(By by, Integer index) {
     	return new SelectList(label, by, this, index);
     }
-    public Table findTable(By by, int index) {
+    public Table findTable(By by, Integer index) {
     	return new Table(label, by, this, index);
     }
-    public TextFieldElement findTextFieldElement(By by, int index) {
+    public TextFieldElement findTextFieldElement(By by, Integer index) {
     	return new TextFieldElement(label, by, this, index);
     }
     
@@ -373,22 +377,22 @@ public class HtmlElement implements WebElement, Locatable, HasIdentity {
         if (parent != null) {
         	parent.findElement();
         	enterFrame();
-        	if (elementIndex < 0) {
+        	if (elementIndex == null) {
         		element = parent.element.findElement(by);
         	} else {
-        		element = parent.element.findElements(by).get(elementIndex);
+        		element = getElementByIndex(parent.element.findElements(by));
         	}
         } else {
         	enterFrame();
-	        if (elementIndex < 0) {
+	        if (elementIndex == null) {
 	        	element = driver.findElement(by);
 	        } else {
-	        	element = driver.findElements(by).get(elementIndex);
+	        	element = getElementByIndex(driver.findElements(by));
 	        }
 	        
         }
         
-        if (makeVisible) {
+        if (makeVisible) { 
         	makeWebElementVisible(element);
         }
         
@@ -396,6 +400,28 @@ public class HtmlElement implements WebElement, Locatable, HasIdentity {
         if (waitForVisibility && makeVisible) {
         	new WebDriverWait(driver, 1).until(ExpectedConditions.visibilityOf(element));
         }
+    }
+        
+    /**
+     * returns an element depending on configured index
+     * @param allElements
+     */
+    private WebElement getElementByIndex(List<WebElement> allElements) {
+    	if (elementIndex == FIRST_VISIBLE) {
+			for (WebElement el: allElements) {
+				if (el.isDisplayed()) {
+					return el;
+				}
+			}
+			throw new WebDriverException("no visible element has been found for " + by.toString());
+    	} else if (elementIndex < 0) {
+    		return allElements.get(allElements.size() + elementIndex);
+		} else {
+			if (elementIndex == null) {
+				elementIndex = 0;
+			}
+			return allElements.get(elementIndex);
+		}
     }
     
     /**
@@ -428,6 +454,9 @@ public class HtmlElement implements WebElement, Locatable, HasIdentity {
 	 */
 	protected void makeWebElementVisible(WebElement element) {
 		if (SeleniumTestsContextManager.isWebTest()) {
+			if (element.isDisplayed()) {
+				return;
+			}
 			try {
 				
 				if (element.getLocation().x < 0) {
@@ -807,7 +836,7 @@ public class HtmlElement implements WebElement, Locatable, HasIdentity {
     	}
     }
     
-    private void blur() {
+    protected void blur() {
     	if (SeleniumTestsContextManager.isWebTest() && "input".equalsIgnoreCase(element.getTagName())) {
     		try {
     			((JavascriptExecutor) driver).executeScript("arguments[0].blur();", element);
@@ -843,7 +872,6 @@ public class HtmlElement implements WebElement, Locatable, HasIdentity {
         if (clear) {
         	element.clear();
         } 
-        element.click();
         element.sendKeys(keysToSend);
         
         if (blurAfter) {

@@ -32,6 +32,7 @@ import org.ini4j.Ini;
 import org.ini4j.InvalidFileFormatException;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.core.TestVariable;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
@@ -68,7 +69,7 @@ public class ConfigReader {
 		return configFile;
 	}
 
-	public Map<String, String> readConfig(InputStream iniFileStream) {
+	public Map<String, TestVariable> readConfig(InputStream iniFileStream) {
 		return readConfig(iniFileStream, SeleniumTestsContextManager.getThreadContext().getTestEnv());
 	}
 	
@@ -77,8 +78,8 @@ public class ConfigReader {
 	 * read any other provided configuration files (through loadIni parameter)
 	 * @return
 	 */
-	public Map<String, String> readConfig() {
-		Map<String, String> variables = new HashMap<>();
+	public Map<String, TestVariable> readConfig() {
+		Map<String, TestVariable> variables = new HashMap<>();
 		try (InputStream iniFileStream = FileUtils.openInputStream(getConfigFile());){
 			variables.putAll(readConfig(iniFileStream, SeleniumTestsContextManager.getThreadContext().getTestEnv()));
 		} catch (NullPointerException e) {
@@ -107,9 +108,9 @@ public class ConfigReader {
 		return variables;
 	}
 	
-	public Map<String, String> readConfig(InputStream iniFileStream, String environment) {
+	public Map<String, TestVariable> readConfig(InputStream iniFileStream, String environment) {
 		
-		Map<String, String> testConfig = new HashMap<>();
+		Map<String, TestVariable> testConfig = new HashMap<>();
 	
 		try {
 			Ini ini = new Ini();
@@ -143,14 +144,14 @@ public class ConfigReader {
 	 * @param sections
 	 * @return configuration with global options
 	 */
-	private Map<String, String> getGlobalOptions(Map<String, String> testConfig, 
+	private Map<String, TestVariable> getGlobalOptions(Map<String, TestVariable> testConfig, 
 													Set<Ini.Entry<String, Ini.Section>> sections){
 		
 		for (Ini.Entry<String, Ini.Section> section: sections) {
 			
 			if (section.getKey().equals(GLOBAL_SECTION_NAME)) {
 				for (Ini.Entry<String, String> sectionOption: section.getValue().entrySet()) {
-					testConfig.put(sectionOption.getKey(), sectionOption.getValue());
+					testConfig.put(sectionOption.getKey(), new TestVariable(sectionOption.getKey(), sectionOption.getValue()));
 				}
 			}
 		}
@@ -164,7 +165,7 @@ public class ConfigReader {
 	 * @param environment
 	 * @return configuration with local options overriding previous options
 	 */
-	private Map<String, String> getLocalOptions(Map<String, String> testConfig, 
+	private Map<String, TestVariable> getLocalOptions(Map<String, TestVariable> testConfig, 
 												Set<Ini.Entry<String, Ini.Section>> sections, String environment) {
 		boolean envFound = false;
 		for (Ini.Entry<String, Ini.Section> section: sections) {
@@ -172,7 +173,7 @@ public class ConfigReader {
 			if (section.getKey().equals(environment)) {
 				envFound = true;
 				for (Ini.Entry<String, String> sectionOption: section.getValue().entrySet()) {
-					testConfig.put(sectionOption.getKey(), sectionOption.getValue());
+					testConfig.put(sectionOption.getKey(), new TestVariable(sectionOption.getKey(), sectionOption.getValue()));
 				}
 			}
 		}

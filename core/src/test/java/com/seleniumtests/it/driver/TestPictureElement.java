@@ -25,12 +25,13 @@ import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import com.seleniumtests.GenericDriverTest;
+import com.seleniumtests.GenericTest;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.ImageSearchException;
 import com.seleniumtests.driver.WebUIDriver;
+import com.seleniumtests.it.driver.support.pages.DriverTestPageWithoutFixedPattern;
 
-public class TestPictureElement extends GenericDriverTest {
+public class TestPictureElement extends GenericTest {
 	
 	private static WebDriver driver;
 	private static DriverTestPageWithoutFixedPattern testPage;
@@ -55,11 +56,6 @@ public class TestPictureElement extends GenericDriverTest {
 	@AfterMethod(groups={"it"})
 	public void reset() {
 		testPage.logoText.clear();
-	}
-	
-	@AfterClass(groups={"it"})
-	public void closeBrowser() {
-		WebUIDriver.cleanUp();
 	}
 	
 	@Test(groups={"it"})
