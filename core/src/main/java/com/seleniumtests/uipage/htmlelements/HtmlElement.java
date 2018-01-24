@@ -230,6 +230,16 @@ public class HtmlElement implements WebElement, Locatable, HasIdentity {
     }
     
     @ReplayOnError
+    public void simulateDoubleClick() {
+        findElement(true);
+        
+        JavascriptExecutor js = (JavascriptExecutor) driver;
+        String script = "if(document.createEvent){var evObj = document.createEvent('MouseEvents');evObj.initEvent('dblclick', true, false); arguments[0].dispatchEvent(evObj);} else if(document.createEventObject) { arguments[0].fireEvent('ondblclick');}";
+        js.executeScript(script, element);
+
+    }
+    
+    @ReplayOnError
     public void simulateSendKeys(CharSequence... keysToSend) {
     	findElement(true);
     		
