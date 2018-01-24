@@ -153,6 +153,10 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
         fileDetector = detector;
     }
     
+    /**
+     * Method for updating window handles when an operation may create a new window (a click action)
+     * This is called for Composite actions, native actions (from DriverListener) and JS actions
+     */
     public void updateWindowsHandles() {
     	if (isWebTest) {
     		// workaround for ios tests where getWindowHandles sometimes fails
