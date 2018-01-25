@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -62,7 +64,7 @@ public class BrowserInfo {
 		this.path = path;
 		this.checkBrowserPath = check;
 		
-		if (path != null && !new File(path).exists() && check) {
+		if (path != null && check && !Paths.get(path).toFile().exists()) {
 			throw new ConfigurationException(String.format("browser file %s does not exists", path));
 		}
 		

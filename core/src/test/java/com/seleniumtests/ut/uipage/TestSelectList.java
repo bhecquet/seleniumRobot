@@ -44,7 +44,7 @@ public class TestSelectList extends GenericTest {
 		testSelectIt = new TestUiSelect(driver, testPage);
 	}
 	
-	@AfterClass(alwaysRun = true)
+	@AfterClass(groups={"ut"})
 	public void closeBrowser() {
 		WebUIDriver.cleanUp();
 	}
