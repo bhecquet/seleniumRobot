@@ -21,7 +21,10 @@
         </groups>
 
         <packages>
-            <package name="com.seleniumtests.it.*" />
+            <package name="com.seleniumtests.it.*" >
+            <!--  exclude stub tests classes as they make SeleniumRobotTestListener available for listening when executing integration tests -->
+            	<exclude name="com.seleniumtests.it.stubclasses.*"></exclude>
+            </package>
         </packages>
     </test>
     

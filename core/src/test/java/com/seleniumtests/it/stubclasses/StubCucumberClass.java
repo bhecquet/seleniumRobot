@@ -1,4 +1,4 @@
-package com.seleniumtests.it.reporter;
+package com.seleniumtests.it.stubclasses;
 
 import org.apache.log4j.Logger;
 import org.openqa.selenium.WebDriverException;
