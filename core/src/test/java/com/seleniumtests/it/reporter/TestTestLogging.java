@@ -39,7 +39,7 @@ public class TestTestLogging extends ReporterTest {
 	 */
 	@Test(groups = { "it" })
 	public void checkFileLogger() throws Exception {
-		executeSubTest(1, new String[] {"com.seleniumtests.it.reporter.StubTestClassWithWait"});
+		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassWithWait"});
 		Assert.assertTrue(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory() + "/seleniumRobot.log").isFile());
 	}
 	
@@ -50,7 +50,7 @@ public class TestTestLogging extends ReporterTest {
 	 */
 	@Test(groups = { "it" })
 	public void checkLogParsing() throws Exception {
-		executeSubTest(1, new String[] {"com.seleniumtests.it.reporter.StubTestClassWithWait"});
+		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassWithWait"});
 		Assert.assertTrue(SeleniumRobotLogger.getTestLogs().get("test1").contains("test1 finished"));	
 	}
 	
@@ -61,7 +61,7 @@ public class TestTestLogging extends ReporterTest {
 	 */
 	@Test(groups = { "it" })
 	public void checkLogParsingWithThreads() throws Exception {
-		executeSubTest(3, new String[] {"com.seleniumtests.it.reporter.StubTestClassWithWait"});
+		executeSubTest(3, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassWithWait"});
 		Assert.assertTrue(SeleniumRobotLogger.getTestLogs().get("test1").contains("test1 finished"));	
 		Assert.assertTrue(SeleniumRobotLogger.getTestLogs().get("test2").contains("test2 finished"));	
 		Assert.assertTrue(SeleniumRobotLogger.getTestLogs().get("test3").contains("test3 finished"));	
@@ -69,7 +69,7 @@ public class TestTestLogging extends ReporterTest {
 	
 	@Test(groups = { "it" })
 	public void checkLogParsingWithSeveralThreadsPerTest() throws Exception {
-		executeSubTest(2, new String[] {"com.seleniumtests.it.reporter.StubTestClassWithWait"});
+		executeSubTest(2, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassWithWait"});
 		Assert.assertTrue(SeleniumRobotLogger.getTestLogs().get("test1").contains("test1 finished"));	
 		Assert.assertTrue(SeleniumRobotLogger.getTestLogs().get("test2").contains("test2 finished"));	
 		Assert.assertTrue(SeleniumRobotLogger.getTestLogs().get("test3").contains("test3 finished"));	
@@ -77,8 +77,8 @@ public class TestTestLogging extends ReporterTest {
 	
 	@Test(groups = { "it" })
 	public void checkLogParsingWithRetry() throws Exception {
-		executeSubTest(2, new String[] {"com.seleniumtests.it.reporter.StubTestClassWithWait"});	
-		Assert.assertTrue(SeleniumRobotLogger.getTestLogs().get("testSimulatingRetry").contains("TestLogging: [RETRYING] class com.seleniumtests.it.reporter.StubTestClassWithWait FAILED, Retrying 1 time"));	
+		executeSubTest(2, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassWithWait"});	
+		Assert.assertTrue(SeleniumRobotLogger.getTestLogs().get("testSimulatingRetry").contains("TestLogging: [RETRYING] class com.seleniumtests.it.stubclasses.StubTestClassWithWait FAILED, Retrying 1 time"));	
 		Assert.assertTrue(SeleniumRobotLogger.getTestLogs().get("testSimulatingRetry").contains("testSimulatingRetry starting"));	
 	}
 	
@@ -89,7 +89,7 @@ public class TestTestLogging extends ReporterTest {
 	 */
 	@Test(groups = { "it" })
 	public void checkTestStepHandling() throws Exception {
-		executeSubTest(1, new String[] {"com.seleniumtests.it.reporter.StubTestClassForTestSteps"});
+		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForTestSteps"});
 		Assert.assertTrue(SeleniumRobotLogger.getTestLogs().get("testPage").contains("Start method testPage"));	
 		Assert.assertTrue(SeleniumRobotLogger.getTestLogs().get("testPage").contains("TestLogging: tell me why"));
 		

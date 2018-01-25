@@ -14,42 +14,37 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.seleniumtests.it.reporter;
+package com.seleniumtests.it.stubclasses;
 
-import org.testng.Assert;
 import org.testng.annotations.Test;
 
-public class StubTestClass2 extends StubParentClass {
+public class StubTestClassWithWait extends StubParentClass {
 
 	@Test(groups="stub")
 	public void test1() {
-	}
-	
-	/**
-	 * Skipped as test5 failed
-	 */
-	@Test(groups="stub", dependsOnGroups={"stub2"})
-	public void test2() {
-	}
-	
-	/**
-	 * Skipped as test4 failed
-	 */
-	@Test(groups="stub", dependsOnMethods={"test4"})
-	public void test3() {
+		logger.info("test1 starting");
+		logger.info("test1 finished");
 	}
 	
 	@Test(groups="stub")
-	public void test4() {
-		Assert.fail("fail");
+	public void test2() {
+		logger.info("test2 starting");
+		logger.info("test2 finished");
 	}
 	
-	@Test(groups="stub2")
-	public void test5() {
-		Assert.assertTrue(false);
+	@Test(groups="stub")
+	public void test3() {
+		logger.info("test3 starting");
+		logger.info("test3 finished");
 	}
 	
-	@Test(groups="stub", dependsOnMethods={"test1"})
-	public void test6() {
+	@Test(groups="stub")
+	public void testSimulatingRetry() {
+		logger.info("testSimulatingRetry starting");
+		logger.info("Start method testSimulatingRetry");
+		logger.info("TestLogging: [RETRYING] class com.seleniumtests.it.reporter.StubTestClassWithWait FAILED, Retrying 1 time");
+		logger.info("Finish method testSimulatingRetry");
+		logger.info("testSimulatingRetry finished");
 	}
+	
 }

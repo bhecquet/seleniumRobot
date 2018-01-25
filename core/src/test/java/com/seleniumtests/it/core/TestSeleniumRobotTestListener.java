@@ -94,7 +94,7 @@ public class TestSeleniumRobotTestListener extends GenericTest {
 	@Test(groups={"it"})
 	public void testMultiThreadTests(ITestContext testContext) throws Exception {
 		
-		executeSubTest(5, new String[] {"com.seleniumtests.it.reporter.StubTestClass.testAndSubActions"}, "core_3,core_4");
+		executeSubTest(5, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass.testAndSubActions"}, "core_3,core_4");
 		
 		String mainReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport.html"));
 		Assert.assertTrue(mainReportContent.contains(".html'>core_3</a>"));

@@ -50,7 +50,7 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 		when(serverConnector.getActive()).thenReturn(true);
 		new SeleniumRobotSnapshotServerConnector();
 
-		executeSubTest(new String[] {"com.seleniumtests.it.reporter.StubTestClass", "com.seleniumtests.it.reporter.StubTestClass2"});
+		executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClass", "com.seleniumtests.it.stubclasses.StubTestClass2"});
 		
 
 		// check server has been called for all aspects of test (app, version, ...)
@@ -89,7 +89,7 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 		when(reporter.getServerConnector()).thenReturn(serverConnector);
 		when(serverConnector.getActive()).thenReturn(false);
 
-		executeSubTest(new String[] {"com.seleniumtests.it.reporter.StubTestClass", "com.seleniumtests.it.reporter.StubTestClass2"});
+		executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClass", "com.seleniumtests.it.stubclasses.StubTestClass2"});
 		
 
 		// check server has been called for all aspects of test (app, version, ...)
@@ -116,7 +116,7 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 		when(serverConnector.getActive()).thenReturn(true);
 		doThrow(SeleniumRobotServerException.class).when(serverConnector).createApplication();
 
-		executeSubTest(new String[] {"com.seleniumtests.it.reporter.StubTestClass", "com.seleniumtests.it.reporter.StubTestClass2"});
+		executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClass", "com.seleniumtests.it.stubclasses.StubTestClass2"});
 		
 
 		// check that process is interrupted
@@ -144,7 +144,7 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 		when(serverConnector.getActive()).thenReturn(true);
 		doThrow(SeleniumRobotServerException.class).when(serverConnector).recordStepResult(anyBoolean(), anyString(), anyLong());
 
-		executeSubTest(new String[] {"com.seleniumtests.it.reporter.StubTestClass", "com.seleniumtests.it.reporter.StubTestClass2"});
+		executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClass", "com.seleniumtests.it.stubclasses.StubTestClass2"});
 		
 
 		// check server has been called for all aspects of test (app, version, ...)

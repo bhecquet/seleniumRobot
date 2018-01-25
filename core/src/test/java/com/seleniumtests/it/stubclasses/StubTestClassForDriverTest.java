@@ -1,4 +1,4 @@
-package com.seleniumtests.it.reporter;
+package com.seleniumtests.it.stubclasses;
 
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;

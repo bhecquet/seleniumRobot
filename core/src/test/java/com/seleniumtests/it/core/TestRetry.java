@@ -16,7 +16,7 @@ public class TestRetry extends ReporterTest {
 	@Test(groups={"it"})
 	public void testRetryOnException() throws Exception {
 		
-		TestNG tng = executeSubTest(new String[] {"com.seleniumtests.it.reporter.StubTestClass"});
+		TestNG tng = executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"});
 
 		String mainReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport.html"));
 		Assert.assertTrue(mainReportContent.contains("<a href='SeleniumTestReport-2.html'>testInError</a>"));
@@ -26,13 +26,13 @@ public class TestRetry extends ReporterTest {
 		String detailedReportContent2 = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport-2.html"));
 		detailedReportContent2 = detailedReportContent2.replace("\n", "").replace("\r",  "").replaceAll(">\\s+<", "><");
 		Assert.assertTrue(detailedReportContent2.contains("Failed in 1 times"));
-		Assert.assertFalse(detailedReportContent2.contains("[RETRYING] class com.seleniumtests.it.reporter.StubTestClass.testInError"));
+		Assert.assertFalse(detailedReportContent2.contains("[RETRYING] class com.seleniumtests.it.stubclasses.StubTestClass.testInError"));
 		
 		// check test with exception is retried based on log. No more direct way found
 		String detailedReportContent3 = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport-3.html"));
 		detailedReportContent3 = detailedReportContent3.replace("\n", "").replace("\r",  "").replaceAll(">\\s+<", "><");
 		Assert.assertTrue(detailedReportContent3.contains("Failed in 3 times"));
-		Assert.assertTrue(detailedReportContent3.contains("[RETRYING] class com.seleniumtests.it.reporter.StubTestClass.testWithException"));
+		Assert.assertTrue(detailedReportContent3.contains("[RETRYING] class com.seleniumtests.it.stubclasses.StubTestClass.testWithException"));
 		
 		// check that in case of retry, steps are not logged twice
 		Assert.assertTrue(detailedReportContent3.contains("step 1"));

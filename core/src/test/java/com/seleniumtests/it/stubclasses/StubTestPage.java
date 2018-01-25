@@ -14,18 +14,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.seleniumtests.it.reporter;
+package com.seleniumtests.it.stubclasses;
 
 import java.io.IOException;
 
-import org.testng.annotations.Test;
+import com.seleniumtests.reporter.TestLogging;
+import com.seleniumtests.uipage.PageObject;
 
-public class StubTestClassForTestSteps extends StubParentClass {
+public class StubTestPage extends PageObject {
 
-	@Test(groups="stub")
-	public void testPage() throws IOException {
-		new StubTestPage()
-			.doSomething()
-			.doSomethingElse();
+	public StubTestPage() throws IOException {
+		super();
 	}
+	
+	public StubTestPage doSomething() {
+		TestLogging.log("tell me why");
+		TestLogging.info("an info message");
+		return this;
+	}
+	
+	public StubTestPage doSomethingElse() {
+		TestLogging.log("Hello");
+		return this;
+	}
+
 }

@@ -15,7 +15,8 @@ import com.seleniumtests.util.logging.SeleniumRobotLogger;
 	com.seleniumtests.reporter.SeleniumRobotServerTestRecorder.class,
 	com.seleniumtests.reporter.TestManagerReporter.class,
 	com.seleniumtests.reporter.JsonReporter.class,
-	com.seleniumtests.core.runner.SeleniumRobotTestListener.class})
+	com.seleniumtests.core.runner.SeleniumRobotTestListener.class
+	})
 public class SeleniumRobotTestPlan {
 	
 	private static Map<Thread, Boolean> cucumberTest = Collections.synchronizedMap(new HashMap<>());

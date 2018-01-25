@@ -58,7 +58,7 @@ public class TestPerformanceReporter extends ReporterTest {
 		
 		reporter = spy(new PerformanceReporter());
 
-		executeSubTest(new String[] {"com.seleniumtests.it.reporter.StubTestClass"});
+		executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"});
 		String outDir = new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath();
 		List<String> resultFileNames = Arrays.asList(new File(outDir).listFiles())
 				.stream().map(f -> f.getName())
@@ -66,9 +66,9 @@ public class TestPerformanceReporter extends ReporterTest {
 		
 		
 		// check all files are generated with the right name
-		Assert.assertTrue(resultFileNames.contains("PERF-com.seleniumtests.it.reporter.StubTestClass.testAndSubActions.xml"));
-		Assert.assertTrue(resultFileNames.contains("PERF-com.seleniumtests.it.reporter.StubTestClass.testInError.xml"));
-		Assert.assertTrue(resultFileNames.contains("PERF-com.seleniumtests.it.reporter.StubTestClass.testWithException.xml"));
+		Assert.assertTrue(resultFileNames.contains("PERF-com.seleniumtests.it.stubclasses.StubTestClass.testAndSubActions.xml"));
+		Assert.assertTrue(resultFileNames.contains("PERF-com.seleniumtests.it.stubclasses.StubTestClass.testInError.xml"));
+		Assert.assertTrue(resultFileNames.contains("PERF-com.seleniumtests.it.stubclasses.StubTestClass.testWithException.xml"));
 	}
 	
 	/**
@@ -79,14 +79,14 @@ public class TestPerformanceReporter extends ReporterTest {
 	@Test(groups={"it"})
 	public void testReportWithSteps(ITestContext testContext) throws Exception {
 
-		executeSubTest(new String[] {"com.seleniumtests.it.reporter.StubTestClass"});
+		executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"});
 		
 		// check content of summary report file
-		String jmeterReport = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "PERF-com.seleniumtests.it.reporter.StubTestClass.testAndSubActions.xml"));
+		String jmeterReport = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "PERF-com.seleniumtests.it.stubclasses.StubTestClass.testAndSubActions.xml"));
 		
 		Assert.assertTrue(jmeterReport.contains("<testsuite errors=\"0\" failures=\"1\" hostname=\"\" name=\"testAndSubActions\" tests=\"3\" time=\"15.26\" timestamp="));
-		Assert.assertTrue(jmeterReport.contains("<testcase classname=\"com.seleniumtests.it.reporter.StubTestClass\" name=\"Step 1: step 1\" time=\"1.23\">"));
-		Assert.assertTrue(jmeterReport.contains("<testcase classname=\"com.seleniumtests.it.reporter.StubTestClass\" name=\"Step 2: step 2\" time=\"14.03\">"));
+		Assert.assertTrue(jmeterReport.contains("<testcase classname=\"com.seleniumtests.it.stubclasses.StubTestClass\" name=\"Step 1: step 1\" time=\"1.23\">"));
+		Assert.assertTrue(jmeterReport.contains("<testcase classname=\"com.seleniumtests.it.stubclasses.StubTestClass\" name=\"Step 2: step 2\" time=\"14.03\">"));
 	}
 	
 	/**
@@ -97,14 +97,14 @@ public class TestPerformanceReporter extends ReporterTest {
 	@Test(groups={"it"})
 	public void testErrorWithException(ITestContext testContext) throws Exception {
 
-		executeSubTest(new String[] {"com.seleniumtests.it.reporter.StubTestClass"});
+		executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"});
 		
 		// check content of summary report file
-		String jmeterReport = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "PERF-com.seleniumtests.it.reporter.StubTestClass.testAndSubActions.xml"));
+		String jmeterReport = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "PERF-com.seleniumtests.it.stubclasses.StubTestClass.testAndSubActions.xml"));
 		
 		Assert.assertTrue(jmeterReport.contains("<error message=\"driver exception"));
 		Assert.assertTrue(jmeterReport.contains("<![CDATA[class org.openqa.selenium.WebDriverException: driver exception"));
-		Assert.assertTrue(jmeterReport.contains("at com.seleniumtests.it.reporter.StubTestClass.testAndSubActions(StubTestClass.java"));
+		Assert.assertTrue(jmeterReport.contains("at com.seleniumtests.it.stubclasses.StubTestClass.testAndSubActions(StubTestClass.java"));
 	}
 	
 	/**
@@ -115,10 +115,10 @@ public class TestPerformanceReporter extends ReporterTest {
 	@Test(groups={"it"})
 	public void testErrorWithoutException(ITestContext testContext) throws Exception {
 
-		executeSubTest(new String[] {"com.seleniumtests.it.reporter.StubTestClass"});
+		executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"});
 		
 		// check content of summary report file
-		String jmeterReport = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "PERF-com.seleniumtests.it.reporter.StubTestClass.testInError.xml"));
+		String jmeterReport = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "PERF-com.seleniumtests.it.stubclasses.StubTestClass.testInError.xml"));
 		
 		Assert.assertTrue(jmeterReport.contains("<error message=\"Step in error\" type=\"\">"));
 		Assert.assertTrue(jmeterReport.contains("<![CDATA[Error message not available]]>"));

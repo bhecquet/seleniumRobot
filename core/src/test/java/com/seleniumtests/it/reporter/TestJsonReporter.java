@@ -60,7 +60,7 @@ public class TestJsonReporter extends ReporterTest {
 		
 		reporter = spy(new PerformanceReporter());
 
-		executeSubTest(new String[] {"com.seleniumtests.it.reporter.StubTestClass"});
+		executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"});
 		String outDir = new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath();
 
 		// check all files are generated with the right name
@@ -73,7 +73,7 @@ public class TestJsonReporter extends ReporterTest {
 		
 		reporter = spy(new PerformanceReporter());
 		
-		executeSubTest(new String[] {"com.seleniumtests.it.reporter.StubTestClass", "com.seleniumtests.it.reporter.StubTestClass2"});
+		executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClass", "com.seleniumtests.it.stubclasses.StubTestClass2"});
 		String outDir = new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath();
 		
 		JSONObject jsonResult = new JSONObject(FileUtils.readFileToString(Paths.get(outDir, "results.json").toFile()));

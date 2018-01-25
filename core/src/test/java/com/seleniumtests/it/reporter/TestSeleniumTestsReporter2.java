@@ -51,7 +51,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		
 		reporter = spy(new SeleniumTestsReporter2());
 
-		executeSubTest(new String[] {"com.seleniumtests.it.reporter.StubTestClass", "com.seleniumtests.it.reporter.StubTestClass2"});
+		executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClass", "com.seleniumtests.it.stubclasses.StubTestClass2"});
 
 		// check at least one generation occured for each part of the report
 		verify(reporter).generateReport(anyList(), anyList(), anyString()); // 1 time only
@@ -74,7 +74,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		
 		reporter = spy(new SeleniumTestsReporter2());
 
-		executeSubTest(new String[] {"com.seleniumtests.it.reporter.StubTestClass"});
+		executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"});
 		
 		// check content of summary report file
 		String mainReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport.html"));
@@ -102,7 +102,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	@Test(groups={"it"})
 	public void testReportSummaryContentWithDependantTests(ITestContext testContext) throws Exception {
 	
-		executeSubTest(new String[] {"com.seleniumtests.it.reporter.StubTestClass2"});
+		executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClass2"});
 		
 		// check content of summary report file
 		String mainReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport.html"));
@@ -127,7 +127,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		
 		reporter = spy(new SeleniumTestsReporter2());
 
-		executeSubTest(new String[] {"com.seleniumtests.it.reporter.StubTestClass"});
+		executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"});
 		
 		// check style of messages
 		String detailedReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport-2.html"));
@@ -143,7 +143,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	
 	/**
 	 * Check format of steps inside steps
-	 * test1 in com.seleniumtests.it.reporter.StubTestClass defines steps inside other steps
+	 * test1 in com.seleniumtests.it.stubclasses.StubTestClass defines steps inside other steps
 	 * @param testContext
 	 * @throws Exception
 	 */
@@ -152,7 +152,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		
 		reporter = spy(new SeleniumTestsReporter2());
 		
-		executeSubTest(new String[] {"com.seleniumtests.it.reporter.StubTestClass"});
+		executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"});
 		
 		// check content of summary report file
 		String detailedReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport-1.html"));
@@ -183,7 +183,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		
 		reporter = new SeleniumTestsReporter2();
 		
-		executeSubTest(new String[] {"com.seleniumtests.it.reporter.StubTestClass"});
+		executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"});
 		
 		// check content of detailed report file
 		String detailedReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport-1.html"));
@@ -205,7 +205,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		
 		reporter = new SeleniumTestsReporter2();
 		
-		executeSubTest(new String[] {"com.seleniumtests.it.reporter.StubTestClass"});
+		executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"});
 		
 		String detailedReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport-1.html"));
 		detailedReportContent = detailedReportContent.replace("\n", "").replace("\r",  "").replaceAll(">\\s+<", "><");
@@ -230,7 +230,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	public void testReportContainsDriverActions(ITestContext testContext) throws Exception {
 		
 		reporter = new SeleniumTestsReporter2();
-		executeSubTest(new String[] {"com.seleniumtests.it.reporter.StubTestClassForDriverTest"});
+		executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"});
 		
 		// read 'testDriver' report. This contains calls to HtmlElement actions
 		String detailedReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport-1.html"));
@@ -270,7 +270,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		
 		reporter = new SeleniumTestsReporter2();
 		
-		executeSubTest(new String[] {"com.seleniumtests.it.reporter.StubTestClass"});
+		executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"});
 		
 		String detailedReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport-2.html"));
 		
@@ -283,7 +283,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		// Check exception is logged and filtered
 		Assert.assertTrue(detailedReportContent.matches(".*<div class=\"message-error\"><div>class java.lang.AssertionError: error</div>"
 								+ "<div class=\"stack-element\"></div>"
-								+ "<div class=\"stack-element\">at com.seleniumtests.it.reporter.StubTestClass.testInError\\(StubTestClass.java:\\d+\\)</div>"
+								+ "<div class=\"stack-element\">at com.seleniumtests.it.stubclasses.StubTestClass.testInError\\(StubTestClass.java:\\d+\\)</div>"
 								+ "<div class=\"stack-element\">at com.seleniumtests.it.reporter.ReporterTest.executeSubTest\\(ReporterTest.java:\\d+\\)</div>"
 								+ "<div class=\"stack-element\">at com.seleniumtests.it.reporter.ReporterTest.executeSubTest\\(ReporterTest.java:\\d+\\)</div>"
 								+ "<div class=\"stack-element\">at com.seleniumtests.it.reporter.TestSeleniumTestsReporter2.testReportDetailsWithErrors\\(TestSeleniumTestsReporter2.java:\\d+\\)</div>.*"));
