@@ -23,7 +23,6 @@ import java.net.URL;
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.remote.DesiredCapabilities;
 
 import com.seleniumtests.browserfactory.mobile.AppiumLauncher;
 import com.seleniumtests.browserfactory.mobile.LocalAppiumLauncher;
@@ -69,16 +68,13 @@ public class AppiumDriverFactory extends AbstractWebDriverFactory implements IWe
     	appiumLauncher.startAppium();
     	
     	try {
+    		MutableCapabilities capabilities = new MobileDeviceSelector().initialize().updateCapabilitiesWithSelectedDevice(driverOptions, webDriverConfig.getMode());
 	        if("android".equalsIgnoreCase(webDriverConfig.getPlatform())) {
-	        	MutableCapabilities androidCaps = new AndroidCapabilitiesFactory(webDriverConfig).createCapabilities();
-	        	androidCaps = new MobileDeviceSelector().initialize().updateCapabilitiesWithSelectedDevice(androidCaps, webDriverConfig.getMode());
-	        	extractAndroidDriver(androidCaps);
-	            return new AndroidDriver<WebElement>(new URL(((LocalAppiumLauncher)appiumLauncher).getAppiumServerUrl()), androidCaps);
+	        	extractAndroidDriver(capabilities);
+	            return new AndroidDriver<WebElement>(new URL(((LocalAppiumLauncher)appiumLauncher).getAppiumServerUrl()), capabilities);
 	            
 	        } else if ("ios".equalsIgnoreCase(webDriverConfig.getPlatform())){
-	        	MutableCapabilities iosCaps = new IOsCapabilitiesFactory(webDriverConfig).createCapabilities();
-	        	iosCaps = new MobileDeviceSelector().initialize().updateCapabilitiesWithSelectedDevice(iosCaps, webDriverConfig.getMode());
-	            return new IOSDriver<WebElement>(new URL(((LocalAppiumLauncher)appiumLauncher).getAppiumServerUrl()), iosCaps);
+	            return new IOSDriver<WebElement>(new URL(((LocalAppiumLauncher)appiumLauncher).getAppiumServerUrl()), capabilities);
 	            
 	        } else {
 	        	throw new ConfigurationException(String.format("Platform %s is unknown for Appium tests", webDriverConfig.getPlatform()));
@@ -90,6 +86,19 @@ public class AppiumDriverFactory extends AbstractWebDriverFactory implements IWe
 
 	public AppiumLauncher getAppiumLauncher() {
 		return appiumLauncher;
+	}
+
+	@Override
+	protected ICapabilitiesFactory getCapabilitiesFactory() {
+		if("android".equalsIgnoreCase(webDriverConfig.getPlatform())){
+        	return new AndroidCapabilitiesFactory(webDriverConfig);
+            
+        } else if ("ios".equalsIgnoreCase(webDriverConfig.getPlatform())){
+        	return new IOsCapabilitiesFactory(webDriverConfig);
+            
+        } else {
+        	throw new ConfigurationException(String.format("Platform %s is unknown for Appium tests", webDriverConfig.getPlatform()));
+        }
 	}
 
 }

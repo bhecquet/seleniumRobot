@@ -17,10 +17,8 @@
 package com.seleniumtests.browserfactory;
 
 import java.net.URL;
-import java.util.concurrent.TimeUnit;
 
 import org.openqa.selenium.MutableCapabilities;
-import org.openqa.selenium.UnsupportedCommandException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
@@ -44,51 +42,42 @@ public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implemen
     public SeleniumGridDriverFactory(final DriverConfig cfg) {
         super(cfg);
         gridConnector = SeleniumGridConnectorFactory.getInstance(cfg.getHubUrl());
-    }
+    }    
 
-    /**
-     * Create a capability depending on the browser type.
-     * @param webDriverConfig
-     * @return the capability for a given browser
-     */
-    public MutableCapabilities createCapabilityByBrowser(DriverConfig webDriverConfig, MutableCapabilities capabilities){
-
-    	switch (webDriverConfig.getBrowser()) {
-
-	        case FIREFOX :
-	            capabilities.merge(new FirefoxCapabilitiesFactory(webDriverConfig).createCapabilities());
-	            break;
+	@Override
+	protected ICapabilitiesFactory getCapabilitiesFactory() {
+		if (SeleniumTestsContextManager.isDesktopWebTest()) {
+			switch (webDriverConfig.getBrowser()) {
 	
-	        case INTERNET_EXPLORER :
-	        	capabilities.merge(new IECapabilitiesFactory(webDriverConfig).createCapabilities());
-	            break;
-	
-	        case CHROME :
-	        	capabilities.merge(new ChromeCapabilitiesFactory(webDriverConfig).createCapabilities());
-	            break;
-	
-	        case HTMLUNIT :
-	        	capabilities.merge(new HtmlUnitCapabilitiesFactory(webDriverConfig).createCapabilities());
-	            break;
-	
-	        case SAFARI :
-	        	capabilities.merge(new SafariCapabilitiesFactory(webDriverConfig).createCapabilities());
-	            break;
-	
-	        case PHANTOMJS :
-	        	capabilities.merge(new PhantomJSCapabilitiesFactory(webDriverConfig).createCapabilities());
-	            break;
-	            
-	        case EDGE :
-	        	capabilities.merge(new EdgeCapabilitiesFactory(webDriverConfig).createCapabilities());
-	        	break;
-	
-	        default :
-	            break;
-	    }
-    	
-    	return capabilities;
-    }
+		        case FIREFOX :
+		            return new FirefoxCapabilitiesFactory(webDriverConfig);
+		        case INTERNET_EXPLORER :
+		        	return new IECapabilitiesFactory(webDriverConfig);
+		        case CHROME :
+		        	return new ChromeCapabilitiesFactory(webDriverConfig);
+		        case HTMLUNIT :
+		        	return new HtmlUnitCapabilitiesFactory(webDriverConfig);
+		        case SAFARI :
+		        	return new SafariCapabilitiesFactory(webDriverConfig);
+		        case PHANTOMJS :
+		        	return new PhantomJSCapabilitiesFactory(webDriverConfig);
+		        case EDGE :
+		        	return new EdgeCapabilitiesFactory(webDriverConfig);
+		        default :
+		        	throw new ConfigurationException(String.format("Browser %s is unknown for desktop tests", webDriverConfig.getBrowser()));
+		    }
+		} else if (SeleniumTestsContextManager.isMobileTest()) {
+        	if("android".equalsIgnoreCase(webDriverConfig.getPlatform())) {
+        		return new AndroidCapabilitiesFactory(webDriverConfig);
+	        } else if ("ios".equalsIgnoreCase(webDriverConfig.getPlatform())){
+	        	return new IOsCapabilitiesFactory(webDriverConfig);
+	        } else {
+	        	throw new ConfigurationException(String.format("Platform %s is unknown for mobile tests", webDriverConfig.getPlatform()));
+	        }
+		} else {
+			throw new ConfigurationException("Wrong test format detected. Should be either mobile or desktop");
+		}
+	}
     
     /**
      * Creates capabilities specific to seleniumGrid
@@ -99,7 +88,6 @@ public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implemen
      */
     private DesiredCapabilities createSpecificGridCapabilities(DriverConfig webDriverConfig) {
     	DesiredCapabilities capabilities = new DesiredCapabilities();
-    	
     	
     	if (SeleniumTestsContextManager.isMobileTest()) {
     		capabilities.setCapability(CapabilityType.VERSION, webDriverConfig.getMobilePlatformVersion());
@@ -118,19 +106,7 @@ public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implemen
 
         // create capabilities, specific to OS
         MutableCapabilities capabilities = createSpecificGridCapabilities(webDriverConfig);
-        if (SeleniumTestsContextManager.isDesktopWebTest()) {
-        	capabilities = createCapabilityByBrowser(webDriverConfig, capabilities);
-        } else if (SeleniumTestsContextManager.isMobileTest()) {
-        	if("android".equalsIgnoreCase(webDriverConfig.getPlatform())) {
-        		capabilities = new AndroidCapabilitiesFactory(webDriverConfig).createCapabilities();
-	        } else if ("ios".equalsIgnoreCase(webDriverConfig.getPlatform())){
-	        	capabilities = new IOsCapabilitiesFactory(webDriverConfig).createCapabilities();
-	        } else {
-	        	throw new ConfigurationException(String.format("Platform %s is unknown for mobile tests", webDriverConfig.getPlatform()));
-	        }
-        } else {
-        	throw new ConfigurationException("Remote driver is supported for mobile and desktop web tests");
-        }
+        capabilities.merge(driverOptions);
         
         // 
         gridConnector.uploadMobileApp(capabilities);
@@ -146,7 +122,7 @@ public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implemen
 
         setImplicitWaitTimeout(webDriverConfig.getImplicitWaitTimeout());
         if (webDriverConfig.getPageLoadTimeout() >= 0 && SeleniumTestsContextManager.isWebTest()) {
-            setPageLoadTimeout(webDriverConfig.getPageLoadTimeout(), webDriverConfig.getBrowser());
+            setPageLoadTimeout(webDriverConfig.getPageLoadTimeout());
         }
 
         this.setWebDriver(driver);
@@ -177,27 +153,6 @@ public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implemen
     
     private void runWebDriver(){
     	gridConnector.runTest((RemoteWebDriver) driver);
-    }
-
-    protected void setPageLoadTimeout(final long timeout, final BrowserType type) {
-        switch (type) {
-
-            case CHROME :
-            case FIREFOX :
-            case INTERNET_EXPLORER :
-            	setPageLoadTimeoutCommonBrowser(timeout);
-                break;
-
-            default :
-        }
-    }
-    
-    protected void setPageLoadTimeoutCommonBrowser(final long timeout) {
-        try {
-            driver.manage().timeouts().pageLoadTimeout(timeout, TimeUnit.SECONDS);
-        } catch (UnsupportedCommandException e) {
-        	logger.error(e);
-        }
     }
 
 	@Override

@@ -20,7 +20,7 @@ public class TestBrowserInfo extends GenericDriverTest {
 	
 	@Test(groups={"it"})
 	public void testBrowserInfoLegacyFirefox() {
-		BrowserInfo browserInfo = new BrowserInfo(BrowserType.FIREFOX, "47.0", "/some/path");
+		BrowserInfo browserInfo = new BrowserInfo(BrowserType.FIREFOX, "47.0", "/some/path", false);
 		browserInfo.getDriverFileName();
 		
 		Assert.assertTrue(browserInfo.isDriverFileSearched());
@@ -32,7 +32,7 @@ public class TestBrowserInfo extends GenericDriverTest {
 	
 	@Test(groups={"it"})
 	public void testBrowserInfoMarionetteFirefox() {
-		BrowserInfo browserInfo = new BrowserInfo(BrowserType.FIREFOX, "48.0", "/some/path");
+		BrowserInfo browserInfo = new BrowserInfo(BrowserType.FIREFOX, "48.0", "/some/path", false);
 		browserInfo.getDriverFileName();
 		
 		Assert.assertTrue(browserInfo.isDriverFileSearched());
@@ -42,7 +42,7 @@ public class TestBrowserInfo extends GenericDriverTest {
 	
 	@Test(groups={"it"})
 	public void testBrowserInfoChrome() {
-		BrowserInfo browserInfo = new BrowserInfo(BrowserType.CHROME, "58.0", "/some/path");
+		BrowserInfo browserInfo = new BrowserInfo(BrowserType.CHROME, "58.0", "/some/path", false);
 		browserInfo.getDriverFileName();
 		
 		Assert.assertTrue(browserInfo.isDriverFileSearched());
@@ -55,7 +55,7 @@ public class TestBrowserInfo extends GenericDriverTest {
 		if (!SystemUtils.IS_OS_WINDOWS) {
 			throw new SkipException("This test can only be done on Windows");
 		}
-		BrowserInfo browserInfo = new BrowserInfo(BrowserType.INTERNET_EXPLORER, "11", "/some/path");
+		BrowserInfo browserInfo = new BrowserInfo(BrowserType.INTERNET_EXPLORER, "11", "/some/path", false);
 		browserInfo.getDriverFileName();
 		
 		Assert.assertTrue(browserInfo.isDriverFileSearched());
@@ -69,7 +69,7 @@ public class TestBrowserInfo extends GenericDriverTest {
 			throw new SkipException("This test can only be done on Windows 10");
 		}
 
-		BrowserInfo browserInfo = new BrowserInfo(BrowserType.EDGE, "14393", "/some/path");
+		BrowserInfo browserInfo = new BrowserInfo(BrowserType.EDGE, "14393", "/some/path", false);
 		browserInfo.getDriverFileName();
 		
 		Assert.assertTrue(browserInfo.isDriverFileSearched());
@@ -82,7 +82,7 @@ public class TestBrowserInfo extends GenericDriverTest {
 			throw new SkipException("This test can only be done on Mac OS X");
 		}
 		
-		BrowserInfo browserInfo = new BrowserInfo(BrowserType.SAFARI, "7.0", "/some/path");
+		BrowserInfo browserInfo = new BrowserInfo(BrowserType.SAFARI, "7.0", "/some/path", false);
 		browserInfo.getDriverFileName();
 		
 		Assert.assertTrue(browserInfo.isDriverFileSearched());

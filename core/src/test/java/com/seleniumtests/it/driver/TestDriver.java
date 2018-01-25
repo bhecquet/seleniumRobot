@@ -27,64 +27,28 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.testng.Assert;
-import org.testng.ITestContext;
-import org.testng.SkipException;
 import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.seleniumtests.browserfactory.FirefoxDriverFactory;
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.CustomEventFiringWebDriver;
-import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.it.driver.support.GenericMultiBrowserTest;
 import com.seleniumtests.it.driver.support.pages.DriverTestPage;
 import com.seleniumtests.uipage.htmlelements.HtmlElement;
 import com.seleniumtests.util.helper.WaitHelper;
 
 public class TestDriver extends GenericMultiBrowserTest {
-	
-	private String browserName;
-
-	public TestDriver() throws Exception {
-	}
 
 	public TestDriver(WebDriver driver, DriverTestPage testPage) throws Exception {
-		TestDriver.driver = driver;
-		TestDriver.testPage = testPage;
+		super(driver, testPage);
 	}
 	
-	public TestDriver(String browserName) throws Exception {
-		this.browserName = browserName; 
+	public TestDriver(BrowserType browserType) throws Exception {
+		super(browserType); 
 	}
 	
-	@BeforeClass(groups={"it"})
-	public void init(final ITestContext testNGCtx) throws Exception {
-		if (driver != null) {
-			return;
-		}
-		if (browserName == null) {
-			throw new SkipException("skipped");
-		}
-		logger.info("starting tests with browser: " + browserName);
-		
-		initThreadContext(testNGCtx);
-		SeleniumTestsContextManager.getThreadContext().setExplicitWaitTimeout(2);
-		SeleniumTestsContextManager.getThreadContext().setBrowser(browserName);
-		SeleniumTestsContextManager.getThreadContext().setCaptureSnapshot(false);
-		
-		testPage = new DriverTestPage(true, String.format("http://%s:%d/test.html", localAddress, server.getServerHost().getPort()));
-		driver = WebUIDriver.getWebDriver(true);
-	}
-	
-	@AfterMethod(groups={"it"})
-	public void cleanAlert() {
-		try {
-			driver.switchTo().alert().accept();
-		} catch (WebDriverException e) {
-			
-		}
-	}
 	
 //	/**
 //	 * Is browser able to clic on moving elements
