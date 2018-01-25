@@ -296,7 +296,14 @@ public abstract class OSUtility {
     }
     
     public List<BrowserType> getInstalledBrowsers() {
-    	return new ArrayList<>(getInstalledBrowsersWithVersion().keySet());
+    	List<BrowserType> browsers = new ArrayList<>();
+    	Map<BrowserType, List<BrowserInfo>> installedBrowsers = getInstalledBrowsersWithVersion();
+    	for (BrowserType bType: installedBrowsers.keySet()) {
+    		if (!installedBrowsers.get(bType).isEmpty()) {
+    			browsers.add(bType);
+    		}
+    	}
+    	return browsers;
     }
     
     /**

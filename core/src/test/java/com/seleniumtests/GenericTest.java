@@ -31,6 +31,7 @@ public class GenericTest {
 
 	/**
 	 * Reinitializes context between tests so that it's clean before test starts
+	 * Beware that this reset does not affect the set context
 	 * @param testNGCtx
 	 */
 	@BeforeMethod(groups={"ut", "it"})  

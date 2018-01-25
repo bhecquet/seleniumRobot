@@ -190,7 +190,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		detailedReportContent = detailedReportContent.replace("\n", "").replace("\r",  "").replaceAll(">\\s+<", "><");
 		
 		// check log presence
-		Assert.assertTrue(detailedReportContent.contains("[main] SeleniumRobotRunner: Start method testAndSubActions</div>"));
+		Assert.assertTrue(detailedReportContent.contains("[main] SeleniumRobotTestListener: Start method testAndSubActions</div>"));
 		
 	}
 	

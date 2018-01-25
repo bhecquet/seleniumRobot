@@ -87,7 +87,7 @@ public class ReplayAction {
 		
 		try {
 	    	while (systemClock.isNowBefore(end)) {
-	    		
+
 	    		// in case we have switched to an iframe for using previous webElement, go to default content
 	    		if (element.getDriver() != null && SeleniumTestsContextManager.isWebTest()) {
 	    			element.getDriver().switchTo().defaultContent(); // TODO: error when clic is done, closing current window

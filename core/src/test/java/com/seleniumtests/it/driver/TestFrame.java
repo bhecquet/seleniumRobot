@@ -18,17 +18,11 @@ package com.seleniumtests.it.driver;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebDriverException;
 import org.testng.Assert;
-import org.testng.ITestContext;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import com.seleniumtests.GenericTest;
-import com.seleniumtests.core.SeleniumTestsContextManager;
-import com.seleniumtests.driver.WebUIDriver;
+import com.seleniumtests.driver.BrowserType;
+import com.seleniumtests.it.driver.support.GenericMultiBrowserTest;
 import com.seleniumtests.it.driver.support.pages.DriverTestPage;
 
 /**
@@ -36,43 +30,21 @@ import com.seleniumtests.it.driver.support.pages.DriverTestPage;
  * @author behe
  *
  */
-public class TestFrame extends GenericTest {
-	
+public class TestFrame extends GenericMultiBrowserTest {
 
-	private static WebDriver driver;
-	private static DriverTestPage testPage;
-	
-	public TestFrame() throws Exception {
-	}
-	
 	public TestFrame(WebDriver driver, DriverTestPage testPage) throws Exception {
-		TestFrame.driver = driver;
-		TestFrame.testPage = testPage;
+		super(driver, testPage);
 	}
 	
-	@BeforeClass(groups={"it"})
-	public void initDriver(final ITestContext testNGCtx) throws Exception {
-		initThreadContext(testNGCtx);
-		SeleniumTestsContextManager.getThreadContext().setExplicitWaitTimeout(2);
-		SeleniumTestsContextManager.getThreadContext().setBrowser("chrome");
-		testPage = new DriverTestPage(true);
-		driver = WebUIDriver.getWebDriver(true);
+	public TestFrame(BrowserType browserType) throws Exception {
+		super(browserType); 
 	}
 	
-	@AfterMethod(groups={"it"})
-	public void cleanAlert() {
-		try {
-			driver.switchTo().alert().accept();
-		} catch (WebDriverException e) {
-			
-		}
-	}
-	
-	@AfterClass(groups={"it"})
-	public void closeBrowser() {
-		WebUIDriver.cleanUp();
-	}
-	
+//	public TestFrame() throws Exception {
+//		super(BrowserType.FIREFOX); 
+//	}
+//	
+//	
 
 	@Test(groups={"it"})
 	public void testFrameText() {
@@ -145,7 +117,7 @@ public class TestFrame extends GenericTest {
 	 */
 	@Test(groups={"it"})
 	public void testBackToMainFrame() {
-		testPage.labelIFrame.getText();
+		System.out.println(testPage.labelIFrame.getText());
 		try {
 			testPage.textElement.sendKeys("youpi");
 			Assert.assertEquals(testPage.textElement.getValue(), "youpi");

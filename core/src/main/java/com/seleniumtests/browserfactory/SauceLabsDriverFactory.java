@@ -132,18 +132,16 @@ public class SauceLabsDriverFactory extends AbstractWebDriverFactory implements 
     protected WebDriver createNativeDriver() {
     	
     	MutableCapabilities capabilities = createCapabilities();
+    	capabilities.merge(driverOptions);
 
     	try {
 	        if("android".equalsIgnoreCase(webDriverConfig.getPlatform())){
-	        	capabilities.merge(new AndroidCapabilitiesFactory(webDriverConfig).createCapabilities());
 	            return new AndroidDriver<WebElement>(new URL(webDriverConfig.getAppiumServerURL()), capabilities);
 	            
 	        } else if ("ios".equalsIgnoreCase(webDriverConfig.getPlatform())){
-	        	capabilities.merge( new IOsCapabilitiesFactory(webDriverConfig).createCapabilities());
-	            return new IOSDriver<WebElement>(new URL(webDriverConfig.getAppiumServerURL()), capabilities);
+	        	return new IOSDriver<WebElement>(new URL(webDriverConfig.getAppiumServerURL()), capabilities);
 	            
 	        } else {
-	        	capabilities.merge(new SauceLabsCapabilitiesFactory(webDriverConfig).createCapabilities());
 	        	return new RemoteWebDriver(new URL(webDriverConfig.getAppiumServerURL()), capabilities);
 	        }
 	
@@ -151,5 +149,18 @@ public class SauceLabsDriverFactory extends AbstractWebDriverFactory implements 
     		throw new DriverExceptions("Error creating driver: " + e.getMessage());
     	}
     }
+
+	@Override
+	protected ICapabilitiesFactory getCapabilitiesFactory() {
+		if("android".equalsIgnoreCase(webDriverConfig.getPlatform())){
+        	return new AndroidCapabilitiesFactory(webDriverConfig);
+            
+        } else if ("ios".equalsIgnoreCase(webDriverConfig.getPlatform())){
+        	return new IOsCapabilitiesFactory(webDriverConfig);
+            
+        } else {
+        	return new SauceLabsCapabilitiesFactory(webDriverConfig);
+        }
+	}
 
 }

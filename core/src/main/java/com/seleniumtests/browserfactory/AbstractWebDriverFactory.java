@@ -19,6 +19,7 @@ package com.seleniumtests.browserfactory;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
+import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 
@@ -30,12 +31,20 @@ public abstract class AbstractWebDriverFactory {
 
 	protected static final Logger logger = SeleniumRobotLogger.getLogger(AbstractWebDriverFactory.class);
     protected DriverConfig webDriverConfig;
+    protected ICapabilitiesFactory capsFactory;
     protected BrowserInfo selectedBrowserInfo;
-
+    protected MutableCapabilities driverOptions;
     protected WebDriver driver;
 
     public AbstractWebDriverFactory(final DriverConfig cfg) {
         this.webDriverConfig = cfg;
+        
+        capsFactory = getCapabilitiesFactory();
+        driverOptions = capsFactory.createCapabilities();
+        
+        if (capsFactory instanceof IDesktopCapabilityFactory) {
+        	selectedBrowserInfo = ((IDesktopCapabilityFactory)capsFactory).getSelectedBrowserInfo();
+        }
     }
 
     public void cleanUp() {
@@ -57,14 +66,15 @@ public abstract class AbstractWebDriverFactory {
 	
     protected abstract WebDriver createNativeDriver();
     
+    protected abstract ICapabilitiesFactory getCapabilitiesFactory(); 
+    
     public WebDriver createWebDriver() {
-        final DriverConfig cfg = this.getWebDriverConfig();
 
         driver = createNativeDriver();
 
-        setImplicitWaitTimeout(cfg.getImplicitWaitTimeout());
-        if (cfg.getPageLoadTimeout() >= 0) {
-            setPageLoadTimeout(cfg.getPageLoadTimeout());
+        setImplicitWaitTimeout(webDriverConfig.getImplicitWaitTimeout());
+        if (webDriverConfig.getPageLoadTimeout() >= 0) {
+            setPageLoadTimeout(webDriverConfig.getPageLoadTimeout());
         }
 
         this.setWebDriver(driver);
