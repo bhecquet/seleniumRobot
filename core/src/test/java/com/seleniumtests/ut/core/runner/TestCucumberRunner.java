@@ -26,7 +26,7 @@ import com.seleniumtests.core.runner.CustomTestNGCucumberRunner;
 
 public class TestCucumberRunner extends GenericTest {
 	
-	@BeforeMethod(alwaysRun=true)
+	@BeforeMethod(groups={"ut"})
 	public void init() {
 		System.setProperty("cucumberPackage", "com.seleniumTests");
 	}

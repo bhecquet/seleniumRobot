@@ -47,7 +47,7 @@ public class TestHtmlElement extends GenericTest {
 		testDriverIt = new TestDriver(driver, testPage);
 	}
 	
-	@AfterClass(alwaysRun = true)
+	@AfterClass(groups={"ut"})
 	public void closeBrowser() {
 		WebUIDriver.cleanUp();
 	}

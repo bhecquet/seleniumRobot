@@ -183,7 +183,11 @@ public class OSUtilityWindows extends OSUtility {
 			
 			for (String firefoxPath: searchFirefoxVersions()) {
 				String version = getFirefoxVersion(firefoxPath);
-				browserList.get(BrowserType.FIREFOX).add(new BrowserInfo(BrowserType.FIREFOX, extractFirefoxVersion(version), firefoxPath));
+				try {
+					browserList.get(BrowserType.FIREFOX).add(new BrowserInfo(BrowserType.FIREFOX, extractFirefoxVersion(version), firefoxPath));
+				} catch (ConfigurationException e) {
+					continue;
+				}
 			}
 		} catch (IndexOutOfBoundsException e) {}
 		
@@ -202,7 +206,7 @@ public class OSUtilityWindows extends OSUtility {
 				version = getChromeVersionFromFolder(chromePath);
 			}
 			browserList.get(BrowserType.CHROME).add(new BrowserInfo(BrowserType.CHROME, extractChromeVersion("Google Chrome " + version), chromePath));
-		} catch (Win32Exception e) {}
+		} catch (Win32Exception | ConfigurationException e) {}
 		
 		// look for ie
 		try {
@@ -210,13 +214,13 @@ public class OSUtilityWindows extends OSUtility {
 			String version = getIeVersionFromRegistry();
 			
 			browserList.put(BrowserType.INTERNET_EXPLORER, Arrays.asList(new BrowserInfo(BrowserType.INTERNET_EXPLORER, extractIEVersion(version), null)));
-		} catch (Win32Exception e) {}
+		} catch (Win32Exception | ConfigurationException e) {}
 		
 		// look for edge
 		try {
 			String version = Advapi32Util.registryGetStringValue(WinReg.HKEY_CURRENT_USER, "Software\\Microsoft\\MicrosoftEdge\\Main", "EdgeSwitchingOSBuildNumber");
 			browserList.put(BrowserType.EDGE, Arrays.asList(new BrowserInfo(BrowserType.EDGE, extractEdgeVersion(version), null)));
-		} catch (Win32Exception e) {}
+		} catch (Win32Exception | ConfigurationException e) {}
 		
 		return browserList;
 	}

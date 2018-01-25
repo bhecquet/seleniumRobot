@@ -18,10 +18,15 @@ package com.seleniumtests.ut.util.osutility;
 
 import static org.mockito.Mockito.when;
 
+import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.SystemUtils;
+import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
@@ -40,8 +45,20 @@ import com.sun.jna.platform.win32.Advapi32Util;
 import com.sun.jna.platform.win32.Win32Exception;
 import com.sun.jna.platform.win32.WinReg;
 
-@PrepareForTest({Advapi32Util.class, OSUtilityWindows.class, OSCommand.class})
+@PrepareForTest({Advapi32Util.class, OSUtilityWindows.class, OSCommand.class, Paths.class, BrowserInfo.class})
 public class TestWindowsOsUtility extends MockitoTest {
+	
+	@Mock
+	private Path path;
+	
+	@Mock
+	private File browserFile;
+	
+	@Mock
+	private Path path2;
+	
+	@Mock
+	private File browserFile2;
 	
 	@BeforeClass(groups={"ut"})
 	public void isWindows() {
@@ -73,6 +90,11 @@ public class TestWindowsOsUtility extends MockitoTest {
 	public void testFirefoxStandardWindowsInstallation() {
 		PowerMockito.mockStatic(OSCommand.class);
 		PowerMockito.mockStatic(Advapi32Util.class);
+		PowerMockito.mockStatic(Paths.class, Mockito.CALLS_REAL_METHODS);
+		
+		when(Paths.get("C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe")).thenReturn(path);
+		when(path.toFile()).thenReturn(browserFile);
+		when(browserFile.exists()).thenReturn(true);
 
 		when(Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Classes\\ChromeHTML\\shell\\open\\command", "")).thenThrow(Win32Exception.class);
 		when(Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Microsoft\\Windows\\CurrentVersion\\App Paths\\IEXPLORE.EXE", "")).thenThrow(Win32Exception.class);
@@ -95,6 +117,11 @@ public class TestWindowsOsUtility extends MockitoTest {
 	public void testFirefoxServerWindowsInstallation() {
 		PowerMockito.mockStatic(OSCommand.class);
 		PowerMockito.mockStatic(Advapi32Util.class);
+		PowerMockito.mockStatic(Paths.class, Mockito.CALLS_REAL_METHODS);
+		
+		when(Paths.get("C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe")).thenReturn(path);
+		when(path.toFile()).thenReturn(browserFile);
+		when(browserFile.exists()).thenReturn(true);
 		
 		when(Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Classes\\ChromeHTML\\shell\\open\\command", "")).thenThrow(Win32Exception.class);
 		when(Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Microsoft\\Windows\\CurrentVersion\\App Paths\\IEXPLORE.EXE", "")).thenThrow(Win32Exception.class);
@@ -119,6 +146,12 @@ public class TestWindowsOsUtility extends MockitoTest {
 	public void testSeveralFirefoxInstallations() {
 		PowerMockito.mockStatic(OSCommand.class);
 		PowerMockito.mockStatic(Advapi32Util.class);
+		PowerMockito.mockStatic(Paths.class, Mockito.CALLS_REAL_METHODS);
+		
+		when(Paths.get("C:\\Program Files (x86)\\Mozilla2 Firefox\\firefox.exe")).thenReturn(path);
+		when(Paths.get("C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe")).thenReturn(path);
+		when(path.toFile()).thenReturn(browserFile);
+		when(browserFile.exists()).thenReturn(true);
 		
 		when(Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Classes\\ChromeHTML\\shell\\open\\command", "")).thenThrow(Win32Exception.class);
 		when(Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Microsoft\\Windows\\CurrentVersion\\App Paths\\IEXPLORE.EXE", "")).thenThrow(Win32Exception.class);
@@ -132,12 +165,126 @@ public class TestWindowsOsUtility extends MockitoTest {
 				"HKEY_CLASSES_ROOT\\FirefoxHTML-AC250DEAA7389F99\r\n" +
 				"Fin de la recherche : 2 correspondance(s) trouvée(s).");
 
-		
-		
 		OSUtility.refreshBrowserList();
 		Map<BrowserType, List<BrowserInfo>> browsers = OSUtility.getInstalledBrowsersWithVersion();
 		Assert.assertTrue(browsers.containsKey(BrowserType.FIREFOX));
 		Assert.assertEquals(browsers.get(BrowserType.FIREFOX).size(), 2);
 		Assert.assertTrue(browsers.get(BrowserType.FIREFOX).get(0).getPath().contains("Mozilla Firefox"));
+	}
+	
+	/**
+	 * check that only valid installations are returned
+	 */
+	@Test(groups={"ut"})
+	public void testSeveralFirefoxInstallationsMissingBrowser() {
+		PowerMockito.mockStatic(OSCommand.class);
+		PowerMockito.mockStatic(Advapi32Util.class);
+		PowerMockito.mockStatic(Paths.class, Mockito.CALLS_REAL_METHODS);
+		
+		when(Paths.get("C:\\Program Files (x86)\\Mozilla2 Firefox\\firefox.exe")).thenReturn(path2);
+		when(Paths.get("C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe")).thenReturn(path);
+		when(path.toFile()).thenReturn(browserFile);
+		when(path2.toFile()).thenReturn(browserFile2);
+		when(browserFile.exists()).thenReturn(true);
+		when(browserFile2.exists()).thenReturn(false);
+		
+		when(Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Classes\\ChromeHTML\\shell\\open\\command", "")).thenThrow(Win32Exception.class);
+		when(Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Microsoft\\Windows\\CurrentVersion\\App Paths\\IEXPLORE.EXE", "")).thenThrow(Win32Exception.class);
+		when(Advapi32Util.registryGetStringValue(WinReg.HKEY_CURRENT_USER, "Software\\Microsoft\\MicrosoftEdge\\Main", "EdgeSwitchingOSBuildNumber")).thenThrow(Win32Exception.class);
+		when(Advapi32Util.registryGetStringValue(WinReg.HKEY_CLASSES_ROOT, "FirefoxHTML\\shell\\open\\command", "")).thenReturn("\"C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe\" -osint -url \"%1\"");
+		when(Advapi32Util.registryGetStringValue(WinReg.HKEY_CLASSES_ROOT, "FirefoxHTML-AC250DEAA7389F99\\shell\\open\\command", "")).thenReturn("\"C:\\Program Files (x86)\\Mozilla2 Firefox\\firefox.exe\" -osint -url \"%1\"");
+		when(OSCommand.executeCommandAndWait("C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe --version | more")).thenReturn("Mozilla Firefox 56.0");
+		when(OSCommand.executeCommandAndWait("C:\\Program Files (x86)\\Mozilla2 Firefox\\firefox.exe --version | more")).thenReturn("Mozilla Firefox 55.0");
+		when(OSCommand.executeCommandAndWait(new String[] {"REG", "QUERY", "HKCR",  "/f", "FirefoxHTML", "/k", "/c"})).thenReturn("\r\n" +
+				"HKEY_CLASSES_ROOT\\FirefoxHTML\r\n" +
+				"HKEY_CLASSES_ROOT\\FirefoxHTML-AC250DEAA7389F99\r\n" +
+				"Fin de la recherche : 2 correspondance(s) trouvée(s).");
+		
+		OSUtility.refreshBrowserList();
+		Map<BrowserType, List<BrowserInfo>> browsers = OSUtility.getInstalledBrowsersWithVersion();
+		Assert.assertTrue(browsers.containsKey(BrowserType.FIREFOX));
+		Assert.assertEquals(browsers.get(BrowserType.FIREFOX).size(), 1);
+		Assert.assertTrue(browsers.get(BrowserType.FIREFOX).get(0).getPath().contains("Mozilla Firefox"));
+	}
+	
+	/**
+	 * Search chrome
+	 */
+	@Test(groups={"ut"})
+	public void testChromeStandardWindowsInstallation() {
+		PowerMockito.mockStatic(OSCommand.class);
+		PowerMockito.mockStatic(Advapi32Util.class);
+		PowerMockito.mockStatic(Paths.class, Mockito.CALLS_REAL_METHODS);
+
+		when(Paths.get("C:\\Program Files (x86)\\Google_\\Chrome\\Application\\chrome.exe")).thenReturn(path);
+		when(path.toFile()).thenReturn(browserFile);
+		when(browserFile.exists()).thenReturn(true);
+
+		when(Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Classes\\ChromeHTML\\shell\\open\\command", "")).thenReturn("\"C:\\Program Files (x86)\\Google_\\Chrome\\Application\\chrome.exe\" -- \"%1\"");
+		when(Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Wow6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Google Chrome", "version")).thenThrow(Win32Exception.class);
+		when(Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Google\\Chrome\\BLBeacon", "version")).thenReturn("57.0.2987.110");
+		when(Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Microsoft\\Windows\\CurrentVersion\\App Paths\\IEXPLORE.EXE", "")).thenThrow(Win32Exception.class);
+		when(Advapi32Util.registryGetStringValue(WinReg.HKEY_CURRENT_USER, "Software\\Microsoft\\MicrosoftEdge\\Main", "EdgeSwitchingOSBuildNumber")).thenThrow(Win32Exception.class);
+		when(OSCommand.executeCommandAndWait(new String[] {"REG", "QUERY", "HKCR",  "/f", "FirefoxHTML", "/k", "/c"})).thenReturn("");
+
+		OSUtility.refreshBrowserList();
+		Map<BrowserType, List<BrowserInfo>> browsers = OSUtility.getInstalledBrowsersWithVersion();
+		Assert.assertTrue(browsers.keySet().contains(BrowserType.CHROME));
+		Assert.assertEquals(browsers.get(BrowserType.CHROME).size(), 1);
+		Assert.assertTrue(browsers.get(BrowserType.CHROME).get(0).getPath().contains("Application"));
+		Assert.assertEquals(browsers.get(BrowserType.CHROME).get(0).getVersion(), "57.0");
+	}
+	
+	/**
+	 * Search chrome but does not exist on file system
+	 */
+	@Test(groups={"ut"})
+	public void testChromeNotReallyInstalled() {
+		PowerMockito.mockStatic(OSCommand.class);
+		PowerMockito.mockStatic(Advapi32Util.class);
+		PowerMockito.mockStatic(Paths.class, Mockito.CALLS_REAL_METHODS);
+		
+		when(Paths.get("C:\\Program Files (x86)\\Google_\\Chrome\\Application\\chrome.exe")).thenReturn(path);
+		when(path.toFile()).thenReturn(browserFile);
+		when(browserFile.exists()).thenReturn(false);
+		
+		when(Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Classes\\ChromeHTML\\shell\\open\\command", "")).thenReturn("\"C:\\Program Files (x86)\\Google_\\Chrome\\Application\\chrome.exe\" -- \"%1\"");
+		when(Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Wow6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Google Chrome", "version")).thenThrow(Win32Exception.class);
+		when(Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Google\\Chrome\\BLBeacon", "version")).thenReturn("57.0.2987.110");
+		when(Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Microsoft\\Windows\\CurrentVersion\\App Paths\\IEXPLORE.EXE", "")).thenThrow(Win32Exception.class);
+		when(Advapi32Util.registryGetStringValue(WinReg.HKEY_CURRENT_USER, "Software\\Microsoft\\MicrosoftEdge\\Main", "EdgeSwitchingOSBuildNumber")).thenThrow(Win32Exception.class);
+		when(OSCommand.executeCommandAndWait(new String[] {"REG", "QUERY", "HKCR",  "/f", "FirefoxHTML", "/k", "/c"})).thenReturn("");
+		
+		OSUtility.refreshBrowserList();
+		Map<BrowserType, List<BrowserInfo>> browsers = OSUtility.getInstalledBrowsersWithVersion();
+		Assert.assertTrue(browsers.keySet().contains(BrowserType.CHROME));
+		Assert.assertEquals(browsers.get(BrowserType.CHROME).size(), 0);
+	}
+	
+	/**
+	 * Search IE
+	 */
+	@Test(groups={"ut"})
+	public void testIEStandardWindowsInstallation() {
+		PowerMockito.mockStatic(OSCommand.class);
+		PowerMockito.mockStatic(Advapi32Util.class);
+		PowerMockito.mockStatic(Paths.class, Mockito.CALLS_REAL_METHODS);
+		
+		when(Paths.get("C:\\Program Files\\Internet_Explorer\\IEXPLORE.EXE")).thenReturn(path);
+		when(path.toFile()).thenReturn(browserFile);
+		when(browserFile.exists()).thenReturn(true);
+		
+		when(Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Classes\\ChromeHTML\\shell\\open\\command", "")).thenThrow(Win32Exception.class);
+		when(Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Microsoft\\Windows\\CurrentVersion\\App Paths\\IEXPLORE.EXE", "")).thenReturn("C:\\Program Files\\Internet_Explorer\\IEXPLORE.EXE");
+		when(Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Microsoft\\Internet Explorer", "svcVersion")).thenReturn("11.0.9600.18000");
+		when(Advapi32Util.registryGetStringValue(WinReg.HKEY_CURRENT_USER, "Software\\Microsoft\\MicrosoftEdge\\Main", "EdgeSwitchingOSBuildNumber")).thenThrow(Win32Exception.class);
+		when(OSCommand.executeCommandAndWait(new String[] {"REG", "QUERY", "HKCR",  "/f", "FirefoxHTML", "/k", "/c"})).thenReturn("");
+		
+		OSUtility.refreshBrowserList();
+		Map<BrowserType, List<BrowserInfo>> browsers = OSUtility.getInstalledBrowsersWithVersion();
+		Assert.assertTrue(browsers.keySet().contains(BrowserType.INTERNET_EXPLORER));
+		Assert.assertEquals(browsers.get(BrowserType.INTERNET_EXPLORER).size(), 1);
+		Assert.assertNull(browsers.get(BrowserType.INTERNET_EXPLORER).get(0).getPath());
+		Assert.assertEquals(browsers.get(BrowserType.INTERNET_EXPLORER).get(0).getVersion(), "11");
 	}
 }
