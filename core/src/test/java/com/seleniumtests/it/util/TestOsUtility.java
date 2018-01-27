@@ -100,7 +100,7 @@ public class TestOsUtility extends GenericTest {
 	@Test(groups={"it"})
 	public void testGetProcessNameFromPidLinux() {
 		if (OSUtility.isLinux()) {
-			Assert.assertEquals(osUtil.getProgramNameFromPid(processId), "javaw");
+			Assert.assertEquals(osUtil.getProgramNameFromPid(processId).trim(), "java");
 		}
 	}
 }
