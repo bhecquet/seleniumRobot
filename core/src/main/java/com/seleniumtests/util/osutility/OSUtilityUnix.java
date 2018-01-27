@@ -140,7 +140,9 @@ public class OSUtilityUnix extends OSUtility {
         	} catch (NumberFormatException e) {
         		continue;
         	}
-            if((processName == null || processName.equalsIgnoreCase(processSplit[1])) && !existingPids.contains(pid)) {
+        	
+        	// pgrep limits process name to 15 chars so do not compare with entire name
+            if((processName == null || processName.startsWith(processSplit[1])) && !existingPids.contains(pid)) {
             	searchedPids.add(pid);
             }
         }
