@@ -40,11 +40,12 @@ public class TestFrame extends GenericMultiBrowserTest {
 		super(browserType); 
 	}
 	
-//	public TestFrame() throws Exception {
+	public TestFrame() throws Exception {
 //		super(BrowserType.FIREFOX); 
-//	}
-//	
-//	
+		super(null);
+	}
+	
+	
 
 	@Test(groups={"it"})
 	public void testFrameText() {

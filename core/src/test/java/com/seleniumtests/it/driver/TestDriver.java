@@ -49,6 +49,10 @@ public class TestDriver extends GenericMultiBrowserTest {
 		super(browserType); 
 	}
 	
+	public TestDriver() throws Exception {
+		super(null);
+	}
+	
 	
 //	/**
 //	 * Is browser able to clic on moving elements
