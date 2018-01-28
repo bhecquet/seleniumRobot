@@ -71,10 +71,6 @@ public abstract class GenericMultiBrowserTest {
 
 	@BeforeClass(groups={"it"})
 	public void exposeTestPage(final ITestContext testNGCtx) throws Exception {
-		localAddress = Inet4Address.getLocalHost().getHostAddress();
-        server = new WebServer(localAddress, getPageMapping());
-        server.expose();
-        logger.info(String.format("exposing server on http://%s:%d", localAddress, server.getServerHost().getPort()));
 
         // skip following if driver is already defined from an other test
         if (driver != null) {
@@ -83,6 +79,11 @@ public abstract class GenericMultiBrowserTest {
 		if (browserType == null || !installedBrowsers.contains(browserType)) {
 			return;
 		}
+		
+		localAddress = Inet4Address.getLocalHost().getHostAddress();
+        server = new WebServer(localAddress, getPageMapping());
+        server.expose();
+        logger.info(String.format("exposing server on http://%s:%d", localAddress, server.getServerHost().getPort()));
 
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setExplicitWaitTimeout(2);
