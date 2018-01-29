@@ -43,14 +43,11 @@ public abstract class SeleniumRobotServerConnector {
 	public abstract boolean isAlive();
 	
 	protected boolean isAlive(String testUrl) {
-		Unirest.setTimeouts(1500, 1500);
 		try {
 			return Unirest.get(url + testUrl).asString().getStatus() == 200;
 		} catch (UnirestException e) {
 			return false;
-		} finally {
-			Unirest.setTimeouts(10000, 60000);
-		}
+		} 
 	}
 	
 	protected boolean isActive() {
