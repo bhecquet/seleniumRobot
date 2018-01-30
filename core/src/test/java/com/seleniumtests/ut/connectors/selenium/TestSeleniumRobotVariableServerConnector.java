@@ -9,7 +9,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.mockito.ArgumentMatchers;
@@ -76,7 +78,8 @@ public class TestSeleniumRobotVariableServerConnector extends MockitoTest {
 		createVariableServerMock("POST", SeleniumRobotSnapshotServerConnector.TESTCASE_API_URL, 200, "{'id': '3'}");
 		createVariableServerMock("POST", SeleniumRobotVariableServerConnector.VARIABLE_API_URL, 200, "{'id': 13, 'name': 'custom.test.variable.key', 'value': 'value', 'reservable': false}");
 		createVariableServerMock("PATCH", String.format(SeleniumRobotVariableServerConnector.EXISTING_VARIABLE_API_URL, 12), 200, "{'id': 12, 'name': 'custom.test.variable.key', 'value': 'value', 'reservable': false}");
-		createVariableServerMock("GET", SeleniumRobotVariableServerConnector.VARIABLE_API_URL, 200, "[{'id': 1, 'name': 'key1', 'value': 'value1', 'reservable': false}, {'id': 2, 'name': 'key2', 'value': 'value2', 'reservable': false}]");	
+		createVariableServerMock("PATCH", String.format(SeleniumRobotVariableServerConnector.EXISTING_VARIABLE_API_URL, 2), 200, "{}");
+		createVariableServerMock("GET", SeleniumRobotVariableServerConnector.VARIABLE_API_URL, 200, "[{'id': 1, 'name': 'key1', 'value': 'value1', 'reservable': false}, {'id': 2, 'name': 'key2', 'value': 'value2', 'reservable': true}]");	
 
 	}
 	
@@ -253,6 +256,19 @@ public class TestSeleniumRobotVariableServerConnector extends MockitoTest {
 		Map<String, String> variables = SeleniumRobotVariableServerConnector.convertRawTestVariableMapToKeyValuePairs(rawVariables);
 		Assert.assertEquals(variables.get("key1"), "value1");
 		Assert.assertEquals(variables.get("key2"), "value2");
+	}
+	
+	@Test(groups= {"ut"})
+	public void testVariableDereservation() throws UnirestException {
+		configureAliveConnection();
+		SeleniumRobotVariableServerConnector connector= new SeleniumRobotVariableServerConnector("Test1");
+		List<TestVariable> variables = new ArrayList(connector.getVariables().values());
+		
+		connector.unreserveVariables(variables);
+		
+		// only one dereservation should be called
+		PowerMockito.verifyStatic();
+		Unirest.patch(ArgumentMatchers.contains(String.format(SeleniumRobotVariableServerConnector.EXISTING_VARIABLE_API_URL, 2)));
 	}
 
 }

@@ -24,6 +24,7 @@ import org.testng.internal.ResultMap;
 import org.testng.internal.TestResult;
 
 import com.mashape.unirest.http.Unirest;
+import com.seleniumtests.connectors.selenium.SeleniumRobotVariableServerConnector;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.TearDownService;
 import com.seleniumtests.core.testretry.TestRetryAnalyzer;
@@ -194,9 +195,18 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 			
 			// capture snap shot at the end of the test
 			logLastStep(testResult);
+			
+			// unreserve variables
+			unreserveVariables();
 	        
 		}
-		
+	}
+	
+	private void unreserveVariables() {
+		SeleniumRobotVariableServerConnector variableServer = SeleniumTestsContextManager.getThreadContext().getVariableServer();
+		if (variableServer != null) {
+			variableServer.unreserveVariables(new ArrayList<>(SeleniumTestsContextManager.getThreadContext().getConfiguration().values()));
+		}
 	}
 
 	@Override

@@ -1,5 +1,7 @@
 package com.seleniumtests.it.connector.selenium;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import org.testng.Assert;
@@ -13,6 +15,12 @@ import com.seleniumtests.connectors.selenium.SeleniumRobotVariableServerConnecto
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.TestVariable;
 
+/**
+ * This class is for testing with a local variable server
+ * Check is manual. That's why tests are not enabled by default
+ * @author s047432
+ *
+ */
 public class TestSeleniumRobotVariableServerConnector extends GenericTest {
 
 	SeleniumRobotVariableServerConnector connector;
@@ -41,13 +49,24 @@ public class TestSeleniumRobotVariableServerConnector extends GenericTest {
 		Assert.assertTrue(variables.size() > 0);
 	}
 	
-	@Test(groups={"it"}, enabled=true)
+	@Test(groups={"it"}, enabled=false)
 	public void testUpsert() {
 		TestVariable variable = new TestVariable("key.test", "value");
 //		TestVariable variable = new TestVariable(16, "key.test", "value", false, "custom.test.variable.key.test");
 		variable = connector.upsertVariable(variable);
 //		variable.setValue("newValue");
 //		variable = connector.upsertVariable(variable);
+	}
+	
+	/**
+	 * Check manually with the locally started server that variable is correctly released at the end of test
+	 */
+	@Test(groups={"it"}, enabled=false)
+	public void testDeReserveVariable() {
+		Map<String, TestVariable> variables = connector.getVariables();
+		List<TestVariable> vars = new ArrayList<>(variables.values());
+		Assert.assertTrue(vars.size() > 0);
+		connector.unreserveVariables(vars);
 	}
 	
 }

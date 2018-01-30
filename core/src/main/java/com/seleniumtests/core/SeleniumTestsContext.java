@@ -421,7 +421,7 @@ public class SeleniumTestsContext {
 			SeleniumRobotVariableServerConnector vServer = new SeleniumRobotVariableServerConnector(getTestName());
 			
 			if (!vServer.isAlive()) {
-				throw new ConfigurationException(String.format("Variable server %s could not be contacted", SELENIUMROBOTSERVER_URL));
+				throw new ConfigurationException(String.format("Variable server %s could not be contacted", getSeleniumRobotServerUrl()));
 			}
 			
 			return vServer;
@@ -1522,7 +1522,7 @@ public class SeleniumTestsContext {
     }
     
     /**
-     * Get all variables from server is it has been activated
+     * Get all variables from server if it has been activated
      */
     private void updateTestConfigurationFromVariableServer() {
     	
