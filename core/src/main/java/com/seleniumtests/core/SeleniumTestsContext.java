@@ -1556,6 +1556,7 @@ public class SeleniumTestsContext {
     
     /**
      * Read configuration from environment specific data and undefined parameters present un testng xml file
+     * these configurations will be overident by server if it's present
      */
 	public void setTestConfiguration() {
     	Map<String, TestVariable> envConfig = new ConfigReader().readConfig();
