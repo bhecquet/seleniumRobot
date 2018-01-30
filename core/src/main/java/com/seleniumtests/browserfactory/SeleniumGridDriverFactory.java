@@ -41,7 +41,7 @@ public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implemen
 
     public SeleniumGridDriverFactory(final DriverConfig cfg) {
         super(cfg);
-        gridConnector = SeleniumGridConnectorFactory.getInstance(cfg.getHubUrl());
+        gridConnector = SeleniumTestsContextManager.getThreadContext().getSeleniumGridConnector();
     }    
 
 	@Override

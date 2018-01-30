@@ -83,6 +83,18 @@ public class OSUtilityUnix extends OSUtility {
     		return OSCommand.executeCommandAndWait("kill -SIGTERM " + pid);
     	}
     }
+    
+    /**
+     * Kill process by name
+     */
+	@Override
+	public String killProcessByName(String programName, boolean force) {
+		if (force) {
+    		return OSCommand.executeCommandAndWait("killall -I " + programName);
+    	} else {
+    		return OSCommand.executeCommandAndWait("killall -I " + programName);
+    	}
+	}
 
 	@Override
 	public String getProgramExtension() {
@@ -155,5 +167,4 @@ public class OSUtilityUnix extends OSUtility {
 	public String getProgramNameFromPid(Long pid) {
 		return OSCommand.executeCommandAndWait(String.format("ps -p %d -o comm=", pid));
 	}
-
 }

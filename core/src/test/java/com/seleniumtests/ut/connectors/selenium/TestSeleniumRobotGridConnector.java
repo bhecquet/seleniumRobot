@@ -22,17 +22,21 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
+import org.testng.ITestContext;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import com.mashape.unirest.http.Unirest;
+import com.mashape.unirest.http.exceptions.UnirestException;
 import com.seleniumtests.MockitoTest;
 import com.seleniumtests.connectors.selenium.SeleniumGridConnector;
+import com.seleniumtests.connectors.selenium.SeleniumGridConnectorFactory;
 import com.seleniumtests.connectors.selenium.SeleniumRobotGridConnector;
 
 import io.appium.java_client.remote.MobileCapabilityType;
 
 
-@PrepareForTest({HttpClients.class})
+@PrepareForTest({HttpClients.class, Unirest.class})
 public class TestSeleniumRobotGridConnector extends MockitoTest {
 
 	@Mock
@@ -56,6 +60,8 @@ public class TestSeleniumRobotGridConnector extends MockitoTest {
 		when(response.getEntity()).thenReturn(entity);
 		when(response.getStatusLine()).thenReturn(statusLine);
 		when(client.execute((HttpHost)anyObject(), anyObject())).thenReturn(response);
+		
+		PowerMockito.mockStatic(Unirest.class);
 	}
 	
 	@Test(groups={"ut"})
@@ -110,4 +116,14 @@ public class TestSeleniumRobotGridConnector extends MockitoTest {
 		Assert.assertEquals(capabilities.getCapability(MobileCapabilityType.APP), null);
 	}
 	
+	@Test(groups={"ut"})
+	public void testKillProcess() throws UnsupportedOperationException, IOException, UnirestException {
+		
+		createServerMock("POST", SeleniumRobotGridConnector.NODE_TASK_SERVLET, 200, "");	
+		
+		SeleniumGridConnector connector = new SeleniumRobotGridConnector("http://localhost:4444/wd/hub");
+		connector.setNodeUrl("http://localhost:4321");
+		connector.killProcess("myProcess");
+		
+	}
 }

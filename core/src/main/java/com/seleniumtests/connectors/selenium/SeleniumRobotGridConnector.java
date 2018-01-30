@@ -22,6 +22,9 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 
 import com.google.common.net.HttpHeaders;
 import com.google.common.net.MediaType;
+import com.mashape.unirest.http.Unirest;
+import com.mashape.unirest.http.exceptions.UnirestException;
+import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.customexception.SeleniumGridException;
 import com.seleniumtests.util.FileUtility;
 
@@ -29,6 +32,8 @@ import io.appium.java_client.remote.MobileCapabilityType;
 
 public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 
+	public static final String NODE_TASK_SERVLET = "/extra/NodeTaskServlet";
+	
 	public SeleniumRobotGridConnector(String url) {
 		super(url);
 	}
@@ -117,6 +122,26 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 	public BufferedImage captureDesktopToBuffer() {
 		// TODO: call remote API to do capture and get content
 		throw new NotImplementedException("call remote Robot to really upload file");
+	}
+	
+
+	/**
+	 * Kill process
+	 * @param processName
+	 */
+	public void killProcess(String processName) {
+		if (nodeUrl == null) {
+			throw new ScenarioException("You cannot kill a remote process before driver has been created and corresponding node instanciated");
+		}
+		
+		logger.info("killing process: " + processName);
+		try {
+			Unirest.post(String.format("%s%s", nodeUrl, NODE_TASK_SERVLET))
+				.queryString("action", "kill")
+				.queryString("process", processName).asString();
+		} catch (UnirestException e) {
+			logger.warn(String.format("Could not kill process %s: %s", processName, e.getMessage()));
+		}
 	}
 
 }

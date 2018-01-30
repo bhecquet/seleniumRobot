@@ -105,6 +105,20 @@ public class OSUtilityWindows extends OSUtility {
     	}
     	
     }
+    
+    /**
+     * Kill process by name, extension must not be given as it's added automatically
+     * @param 	programName	name of the process without extension
+     * @param	force		do we force program exit
+     */
+	@Override
+	public String killProcessByName(String programName, boolean force) {
+		if (force) {
+    		return OSCommand.executeCommandAndWait("taskkill /F /IM " + programName + getProgramExtension());
+    	} else {
+    		return OSCommand.executeCommandAndWait("taskkill /IM " + programName + getProgramExtension());
+    	}
+	}
 
 	@Override
 	public String getProgramExtension() {

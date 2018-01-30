@@ -45,7 +45,7 @@ public class SeleniumGridConnector {
 	 * @param driver
 	 */
 	public void uploadMobileApp(Capabilities caps) {
-		return;
+		logger.warn("application upload is only available with seleniumRobot grid");
 	}
 	
 	/**
@@ -53,7 +53,15 @@ public class SeleniumGridConnector {
 	 * @param filePath
 	 */
 	public void uploadFile(String filePath) {
-		return;
+		logger.warn("file upload is only available with seleniumRobot grid");
+	}
+	
+	/**
+	 * Kill process
+	 * @param processName
+	 */
+	public void killProcess(String processName) {
+		logger.warn("kill is only available with seleniumRobot grid");
 	}
 	
 	/**
@@ -100,5 +108,9 @@ public class SeleniumGridConnector {
 
 	public String getNodeUrl() {
 		return nodeUrl;
+	}
+
+	public void setNodeUrl(String nodeUrl) {
+		this.nodeUrl = nodeUrl;
 	}
 }
