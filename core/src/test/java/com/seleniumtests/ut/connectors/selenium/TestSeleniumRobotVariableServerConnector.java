@@ -7,9 +7,11 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.times;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -268,6 +270,19 @@ public class TestSeleniumRobotVariableServerConnector extends MockitoTest {
 		
 		// only one dereservation should be called
 		PowerMockito.verifyStatic();
+		Unirest.patch(ArgumentMatchers.contains(String.format(SeleniumRobotVariableServerConnector.EXISTING_VARIABLE_API_URL, 2)));
+	}
+	
+	@Test(groups= {"ut"})
+	public void testVariableDereservationNullId() throws UnirestException {
+		configureAliveConnection();
+		SeleniumRobotVariableServerConnector connector= new SeleniumRobotVariableServerConnector("Test1");
+		List<TestVariable> variables = Arrays.asList(new TestVariable("key", "value"));
+		
+		connector.unreserveVariables(variables);
+		
+		// only one dereservation should be called
+		PowerMockito.verifyStatic(times(0));
 		Unirest.patch(ArgumentMatchers.contains(String.format(SeleniumRobotVariableServerConnector.EXISTING_VARIABLE_API_URL, 2)));
 	}
 
