@@ -16,12 +16,10 @@
  */
 package com.seleniumtests.ut.core;
 
-import java.io.File;
-
-import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.verify;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
+
+import java.io.File;
 
 import org.mockito.Mock;
 import org.openqa.selenium.Proxy.ProxyType;
@@ -33,15 +31,14 @@ import org.testng.TestRunner;
 import org.testng.annotations.Test;
 import org.testng.xml.XmlTest;
 
-import com.seleniumtests.GenericTest;
 import com.seleniumtests.MockitoTest;
+import com.seleniumtests.connectors.selenium.SeleniumGridConnector;
+import com.seleniumtests.connectors.selenium.SeleniumGridConnectorFactory;
 import com.seleniumtests.connectors.selenium.SeleniumRobotVariableServerConnector;
 import com.seleniumtests.connectors.tms.TestManager;
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
-import com.seleniumtests.core.TestVariable;
 import com.seleniumtests.customexception.ConfigurationException;
-import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.DriverMode;
 
@@ -52,7 +49,7 @@ import com.seleniumtests.driver.DriverMode;
  * @author behe
  *
  */
-@PrepareForTest({SeleniumRobotVariableServerConnector.class, SeleniumTestsContext.class})
+@PrepareForTest({SeleniumRobotVariableServerConnector.class, SeleniumTestsContext.class, SeleniumGridConnectorFactory.class})
 public class TestSeleniumTestContext extends MockitoTest {
 	
 	@Mock
@@ -795,49 +792,6 @@ public class TestSeleniumTestContext extends MockitoTest {
 		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getWebProxyExclude(), null);
 		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getWebProxyPac(), null);
 	}
-
-	@Test(groups="ut context", expectedExceptions=ScenarioException.class)
-	public void testUpdateVariableWithoutServer(final ITestContext testNGCtx, final XmlTest xmlTest) {
-		try {
-			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE, "false");
-			initThreadContext(testNGCtx);
-			SeleniumTestsContextManager.getThreadContext().createOrUpdateParam("key", "value");
-		} finally {
-			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE);
-		}
-	}
-	
-	/**
-	 * Check upsert of a new variable
-	 * Verify server is called and configuration is updated according to the new value
-	 * @param testNGCtx
-	 * @param xmlTest
-	 * @throws Exception
-	 */
-	@Test(groups="ut context")
-	public void testUpdateNewVariable(final ITestContext testNGCtx, final XmlTest xmlTest) throws Exception {
-		try {
-			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE, "true");
-			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL, "http://localhost:1234");
-			
-			PowerMockito.whenNew(SeleniumRobotVariableServerConnector.class).withAnyArguments().thenReturn(variableServer);
-			when(variableServer.isAlive()).thenReturn(true);
-			TestVariable varToReturn = new TestVariable(10, "key", "value", false, TestVariable.TEST_VARIABLE_PREFIX + "key");
-			when(variableServer.upsertVariable(any(TestVariable.class))).thenReturn(varToReturn);
-			
-			initThreadContext(testNGCtx, "myTest");
-			SeleniumTestsContextManager.getThreadContext().createOrUpdateParam("key", "value");
-			
-			// check upsert has been called
-			verify(variableServer).upsertVariable(eq(new TestVariable("key", "value")));
-			
-			// check configuration is updated
-			Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getConfiguration().get("key"), varToReturn);
-		} finally {
-			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE);
-			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL);
-		}
-	}
 	
 	/**
 	 * Check we create a variable server if all connexion params are present
@@ -929,6 +883,78 @@ public class TestSeleniumTestContext extends MockitoTest {
 		} finally {
 			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE);
 			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL);
+		}
+	}
+	
+	/**
+	 * Test that a grid connection is created when all parameters are correct
+	 * @param testNGCtx
+	 */
+	@Test(groups="ut context")
+	public void testGridConnection(final ITestContext testNGCtx) {
+		
+		SeleniumGridConnector gridConnector = new SeleniumGridConnector("http://localhost:4444/hub/wd");
+		
+		PowerMockito.mockStatic(SeleniumGridConnectorFactory.class);
+		PowerMockito.when(SeleniumGridConnectorFactory.getInstance("http://localhost:4444/hub/wd")).thenReturn(gridConnector);
+		
+		try {
+			System.setProperty(SeleniumTestsContext.RUN_MODE, "grid");
+			System.setProperty(SeleniumTestsContext.WEB_DRIVER_GRID, "http://localhost:4444/hub/wd");
+			
+			initThreadContext(testNGCtx, "myTest");
+			Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getSeleniumGridConnector(), gridConnector);
+			
+		} finally {
+			System.clearProperty(SeleniumTestsContext.RUN_MODE);
+			System.clearProperty(SeleniumTestsContext.WEB_DRIVER_GRID);
+		}
+	}
+	
+	/**
+	 * Local test, no grid connector
+	 * @param testNGCtx
+	 */
+	@Test(groups="ut context")
+	public void testNoGridConnection(final ITestContext testNGCtx) {
+		
+		SeleniumGridConnector gridConnector = new SeleniumGridConnector("http://localhost:4444/hub/wd");
+		
+		PowerMockito.mockStatic(SeleniumGridConnectorFactory.class);
+		PowerMockito.when(SeleniumGridConnectorFactory.getInstance("http://localhost:4444/hub/wd")).thenReturn(gridConnector);
+		
+		try {
+			System.setProperty(SeleniumTestsContext.RUN_MODE, "local");
+			System.setProperty(SeleniumTestsContext.WEB_DRIVER_GRID, "http://localhost:4444/hub/wd");
+			
+			initThreadContext(testNGCtx, "myTest");
+			Assert.assertNull(SeleniumTestsContextManager.getThreadContext().getSeleniumGridConnector());
+			
+		} finally {
+			System.clearProperty(SeleniumTestsContext.RUN_MODE);
+			System.clearProperty(SeleniumTestsContext.WEB_DRIVER_GRID);
+		}
+	}
+	
+	/**
+	 * grid test but missing url
+	 * @param testNGCtx
+	 */
+	@Test(groups="ut context", expectedExceptions=ConfigurationException.class)
+	public void testGridConnectionWithoutUrl(final ITestContext testNGCtx) {
+		
+		SeleniumGridConnector gridConnector = new SeleniumGridConnector("http://localhost:4444/hub/wd");
+		
+		PowerMockito.mockStatic(SeleniumGridConnectorFactory.class);
+		PowerMockito.when(SeleniumGridConnectorFactory.getInstance("http://localhost:4444/hub/wd")).thenReturn(gridConnector);
+		
+		try {
+			System.setProperty(SeleniumTestsContext.RUN_MODE, "grid");
+			
+			initThreadContext(testNGCtx, "myTest");
+			
+		} finally {
+			System.clearProperty(SeleniumTestsContext.RUN_MODE);
 		}
 	}
 	

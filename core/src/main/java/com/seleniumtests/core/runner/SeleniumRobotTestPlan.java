@@ -7,8 +7,13 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.testng.annotations.Listeners;
 
+import com.seleniumtests.connectors.selenium.SeleniumGridConnector;
+import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.core.TestTasks;
+import com.seleniumtests.driver.DriverMode;
 import com.seleniumtests.uipage.PageObject;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
+import com.seleniumtests.util.osutility.OSUtilityFactory;
 
 @Listeners({com.seleniumtests.reporter.SeleniumTestsReporter2.class, 
 	com.seleniumtests.reporter.PerformanceReporter.class,
@@ -47,7 +52,7 @@ public class SeleniumRobotTestPlan {
      * @return String
      */
     public static String param(String key) {
-    	return PageObject.param(key);
+    	return TestTasks.param(key);
     }
     
     /**
@@ -57,6 +62,14 @@ public class SeleniumRobotTestPlan {
      * @param value
      */
     public static void createOrUpdateParam(String key, String value) {
-    	PageObject.createOrUpdateParam(key, value);
+    	TestTasks.createOrUpdateParam(key, value);
+    }
+    
+    /**
+     * Kills the named process, locally or remotely
+     * @param processName
+     */
+    public static void killProcess(String processName) {
+    	TestTasks.killProcess(processName);
     }
 }

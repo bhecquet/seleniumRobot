@@ -1,6 +1,6 @@
 package com.seleniumtests.ut.connectors.selenium;
 
-import static org.mockito.ArgumentMatchers.anyObject;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -10,6 +10,7 @@ import java.io.InputStream;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
+import org.apache.http.HttpRequest;
 import org.apache.http.StatusLine;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -60,8 +61,8 @@ public class TestSeleniumGridConnector extends MockitoTest {
 		when(HttpClients.createDefault()).thenReturn(client);
 		when(response.getEntity()).thenReturn(entity);
 		when(response.getStatusLine()).thenReturn(statusLine);
-		when(client.execute((HttpHost)anyObject(), anyObject())).thenReturn(response);
-		when(driver.getCapabilities()).thenReturn(capabilities);
+		when(client.execute((HttpHost)any(HttpHost.class), any(HttpRequest.class))).thenReturn(response);
+		when(driver.getCapabilities()).thenReturn(capabilities); 
 		when(driver.getSessionId()).thenReturn(new SessionId("0"));
 	}
 	
@@ -95,6 +96,6 @@ public class TestSeleniumGridConnector extends MockitoTest {
 		SeleniumGridConnector connector = new SeleniumGridConnector("http://localhost:6666");
 		connector.uploadMobileApp(new DesiredCapabilities());
 		
-		verify(client, never()).execute((HttpHost)anyObject(), anyObject());
+		verify(client, never()).execute((HttpHost)any(HttpHost.class), any(HttpRequest.class));
 	}
 }

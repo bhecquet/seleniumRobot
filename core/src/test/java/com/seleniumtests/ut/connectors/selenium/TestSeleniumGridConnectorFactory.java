@@ -1,115 +1,122 @@
 package com.seleniumtests.ut.connectors.selenium;
 
 
-import static org.mockito.ArgumentMatchers.anyObject;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
-import java.io.InputStream;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpHost;
-import org.apache.http.StatusLine;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.tools.ant.filters.StringInputStream;
-import org.mockito.Mock;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
+import org.testng.ITestContext;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import com.mashape.unirest.http.Unirest;
+import com.mashape.unirest.http.exceptions.UnirestException;
 import com.seleniumtests.MockitoTest;
 import com.seleniumtests.connectors.selenium.SeleniumGridConnector;
 import com.seleniumtests.connectors.selenium.SeleniumGridConnectorFactory;
 import com.seleniumtests.connectors.selenium.SeleniumRobotGridConnector;
 import com.seleniumtests.customexception.ConfigurationException;
 
-@PrepareForTest({HttpClients.class})
+@PrepareForTest({Unirest.class})
 public class TestSeleniumGridConnectorFactory extends MockitoTest {
 
-	@Mock
-	private CloseableHttpClient client; 
-	
-	@Mock
-	private CloseableHttpResponse response;
-	
-	@Mock
-	private HttpEntity entity;
-	
-	@Mock
-	private StatusLine statusLine;
-	
-	@BeforeMethod(groups={"ut"})
-	private void init() throws ClientProtocolException, IOException {
-		PowerMockito.mockStatic(HttpClients.class);
-		when(HttpClients.createDefault()).thenReturn(client);
-		when(response.getEntity()).thenReturn(entity);
-		when(response.getStatusLine()).thenReturn(statusLine);
-		when(client.execute((HttpHost)anyObject(), anyObject())).thenReturn(response);
+	private final String guiServletContent = "<html>\r\n" + 
+			"	<head>\r\n" + 
+			"			<link href='/grid/resources/templates/css/report.css' rel='stylesheet' type='text/css' />\r\n" + 
+			"			<script src=\"/grid/resources/templates/js/status.js\"></script>\r\n" + 
+			"			<link href=\"/grid/resources/templates/css/hubCss.css\" rel=\"stylesheet\" type=\"text/css\">\r\n" + 
+			"			<link href=\"/grid/resources/templates/css/bootstrap.min.css\" rel=\"stylesheet\">\r\n" + 
+			"			<script src=\"https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js\"></script>\r\n" + 
+			"			<script src=\"/grid/resources/templates/css/bootstrap.min.js\"></script>\r\n" + 
+			"			<meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\">\r\n" + 
+			"			<link rel=\"icon\" href=\"https://d30y9cdsu7xlg0.cloudfront.net/png/1248-200.png\">\r\n" + 
+			"			<title>Selenium Robot</title>\r\n" + 
+			"	</head>\r\n" + 
+			"	\r\n" + 
+			"	<body>\r\n" + 
+			"			<header>\r\n" + 
+			"					<a ><img src=\"/grid/resources/templates/img/seleniumlogo_low.png\" alt=\"selenium\" id=\"selenium\"></a>\r\n" + 
+			"					<p id=\"titre\" >Infotel</p>\r\n" + 
+			"			</header>\r\n" + 
+			"		\r\n" + 
+			"		\r\n" + 
+			"	<article>\r\n" + 
+			"\r\n" + 
+			"			<h1 id=\"hub\">Hub Status</h1>"
+			+ "</article>\r\n" + 
+			"		\r\n" + 
+			"			\r\n" + 
+			"<footer>\r\n" + 
+			"		<a href=\"#\" class=\"haut\"><img src=\"/grid/resources/templates/img/up.png\" alt=\"haut\" id=\"haut\"></a>\r\n" + 
+			"</footer>\r\n" + 
+			"		\r\n" + 
+			"	</body>\r\n" + 
+			"\r\n" + 
+			"</html>\r\n" + 
+			"";
+
+	@BeforeMethod(groups= {"ut"})
+	public void init(final ITestContext testNGCtx) {
+		initThreadContext(testNGCtx);
+		PowerMockito.mockStatic(Unirest.class);
 	}
 	
 	/**
 	 * If servlet GuiServlet is available, we get a SeleniumRobotGridConnector
 	 * @throws UnsupportedOperationException
 	 * @throws IOException
+	 * @throws UnirestException 
 	 */
 	@Test(groups={"ut"})
-	public void testWithSeleniumRobotGrid() throws UnsupportedOperationException, IOException {
+	public void testWithSeleniumRobotGrid() throws UnsupportedOperationException, IOException, UnirestException {
 		
-		InputStream is = new StringInputStream("Active sessions");
+		createServerMock("GET", SeleniumGridConnectorFactory.GUI_SERVLET, 200, guiServletContent);		
 		
-		when(statusLine.getStatusCode()).thenReturn(200);
-		when(entity.getContent()).thenReturn(is);
-		
-		Assert.assertTrue(SeleniumGridConnectorFactory.getInstance("http://localhost:6666") instanceof SeleniumRobotGridConnector);
+		Assert.assertTrue(SeleniumGridConnectorFactory.getInstance(SERVER_URL + "/wd/hub") instanceof SeleniumRobotGridConnector);
 	}
 	
 	/**
 	 * If servlet GuiServlet is not available, we get a SeleniumGridConnector
 	 * @throws UnsupportedOperationException
 	 * @throws IOException
+	 * @throws UnirestException 
 	 */
 	@Test(groups={"ut"})
-	public void testWithSeleniumGrid() throws UnsupportedOperationException, IOException {
+	public void testWithSeleniumGrid() throws UnsupportedOperationException, IOException, UnirestException {
 		
-		InputStream is = new StringInputStream("default monitoring page");
+		createServerMock("GET", SeleniumGridConnectorFactory.GUI_SERVLET, 200, "default monitoring page");		
 		
-		when(statusLine.getStatusCode()).thenReturn(200);
-		when(entity.getContent()).thenReturn(is);
-		
-		Assert.assertTrue(SeleniumGridConnectorFactory.getInstance("http://localhost:6666") instanceof SeleniumGridConnector);
+		Assert.assertTrue(SeleniumGridConnectorFactory.getInstance(SERVER_URL + "/wd/hub") instanceof SeleniumGridConnector);
 	}
 	
 	/**
 	 * If status code is not 200, throw an error
 	 * @throws UnsupportedOperationException
 	 * @throws IOException
+	 * @throws UnirestException 
 	 */
 	@Test(groups={"ut"}, expectedExceptions=ConfigurationException.class)
-	public void testWithErrorCodeHttp() throws UnsupportedOperationException, IOException {
+	public void testWithErrorCodeHttp() throws UnsupportedOperationException, IOException, UnirestException {
 		
-		InputStream is = new StringInputStream("default monitoring page");
+		createServerMock("GET", SeleniumGridConnectorFactory.GUI_SERVLET, 404, "default monitoring page");
 		
-		when(statusLine.getStatusCode()).thenReturn(404);
-		when(entity.getContent()).thenReturn(is);
-		
-		SeleniumGridConnectorFactory.getInstance("http://localhost:6666");
+		SeleniumGridConnectorFactory.getInstance(SERVER_URL + "/wd/hub");
 	}
 	
 	/**
 	 * If any error occurs when getting servlet, throw an error, grid cannot be contacted
 	 * @throws UnsupportedOperationException
 	 * @throws IOException
+	 * @throws UnirestException 
 	 */
 	@Test(groups={"ut"}, expectedExceptions=ConfigurationException.class)
-	public void testWithError() throws UnsupportedOperationException, IOException {
+	public void testWithError() throws UnsupportedOperationException, IOException, UnirestException {
 		
-		when(client.execute((HttpHost)anyObject(), anyObject())).thenThrow(IOException.class);
-		
-		SeleniumGridConnectorFactory.getInstance("http://localhost:6666");
+		when(Unirest.get(SERVER_URL + SeleniumGridConnectorFactory.GUI_SERVLET)).thenThrow(UnirestException.class);
+
+		SeleniumGridConnectorFactory.getInstance(SERVER_URL + "/wd/hub");
 	}
 }

@@ -220,12 +220,21 @@ public abstract class OSUtility {
 	 ******************************************/
     
     /**
-     * Kill named process
+     * Kill process by PID
      * @param process
      * @param force
      * @throws IOException
      */
     public abstract String killProcess(String pid, boolean force);
+    
+    
+    /**
+     * Kill process by name
+     * @param process
+     * @param force
+     * @throws IOException
+     */
+    public abstract String killProcessByName(String programName, boolean force);
     
 	
     /**

@@ -37,6 +37,8 @@ import org.testng.ITestResult;
 import org.testng.TestRunner;
 
 import com.seleniumtests.browserfactory.BrowserInfo;
+import com.seleniumtests.connectors.selenium.SeleniumGridConnector;
+import com.seleniumtests.connectors.selenium.SeleniumGridConnectorFactory;
 import com.seleniumtests.connectors.selenium.SeleniumRobotVariableServerConnector;
 import com.seleniumtests.connectors.tms.TestManager;
 import com.seleniumtests.core.config.ConfigReader;
@@ -138,7 +140,6 @@ public class SeleniumTestsContext {
     
     public static final String CUCUMBER_TESTS = "cucumberTests";				// liste des tests en mode cucumber
     public static final String CUCUMBER_TAGS = "cucumberTags";					// liste des tags cucumber
-    public static final String TEST_VARIABLES = "testVariables"; 				// configuration (aka variables, get via 'param()' method) used for the current test. It is not updated via XML file
     public static final String TEST_ENV = "env";								// environnement de test pour le SUT. Permet d'accéder aux configurations spécifiques du fichier env.ini
     public static final String CUCUMBER_IMPLEMENTATION_PKG = "cucumberPackage";	// nom du package java pour les classes cucumber, car celui-ci n'est pas accessible par testNG
     
@@ -163,6 +164,9 @@ public class SeleniumTestsContext {
     public static final String PROJECT_NAME = "projectName";					// TestDroid nécessite un nom de projet dans lequel l'automatisation aura lieu	
     
     public static final String TEST_NAME = "testName";
+    
+    // internal storage
+    public static final String TEST_VARIABLES = "testVariables"; 				// configuration (aka variables, get via 'param()' method) used for the current test. It is not updated via XML file
 
     private static final int REPLAY_TIME_OUT_VALUE = 30;
     
@@ -175,10 +179,12 @@ public class SeleniumTestsContext {
 
     private ITestContext testNGContext = null;
     private final SeleniumRobotVariableServerConnector variableServer;
+    private final SeleniumGridConnector seleniumGridConnector;
     
     public SeleniumTestsContext() {
     	// for test purpose only
     	variableServer = null;
+    	seleniumGridConnector = null;
     }
     
     public SeleniumTestsContext(final ITestContext context, final String testName) {
@@ -193,6 +199,12 @@ public class SeleniumTestsContext {
         // create seleniumRobot server instance
         variableServer = connectSeleniumRobotServer();
 
+        setWebDriverGrid(getValueForTest(WEB_DRIVER_GRID, System.getProperty(WEB_DRIVER_GRID)));
+        setRunMode(getValueForTest(RUN_MODE, System.getProperty(RUN_MODE)));
+        
+        // create selenium grid connector
+        seleniumGridConnector = connectGrid();
+
         setTestDataFile(getValueForTest(TEST_DATA_FILE, System.getProperty(TEST_DATA_FILE)));
         setLoadIni(getValueForTest(LOAD_INI, System.getProperty(LOAD_INI)));
         setWebSessionTimeout(getIntValueForTest(WEB_SESSION_TIME_OUT, System.getProperty(WEB_SESSION_TIME_OUT)));
@@ -200,8 +212,6 @@ public class SeleniumTestsContext {
         setExplicitWaitTimeout(getIntValueForTest(EXPLICIT_WAIT_TIME_OUT, System.getProperty(EXPLICIT_WAIT_TIME_OUT)));
         setReplayTimeout(getIntValueForTest(REPLAY_TIME_OUT, System.getProperty(REPLAY_TIME_OUT)));
         setPageLoadTimeout(getIntValueForTest(PAGE_LOAD_TIME_OUT, System.getProperty(PAGE_LOAD_TIME_OUT)));
-        setWebDriverGrid(getValueForTest(WEB_DRIVER_GRID, System.getProperty(WEB_DRIVER_GRID)));
-        setRunMode(getValueForTest(RUN_MODE, System.getProperty(RUN_MODE)));
         setDevMode(getBoolValueForTest(DEV_MODE, System.getProperty(DEV_MODE)));
         setBrowser(getValueForTest(BROWSER, System.getProperty(BROWSER)));
         setBrowserVersion(getValueForTest(BROWSER_VERSION, System.getProperty(BROWSER_VERSION)));
@@ -430,6 +440,22 @@ public class SeleniumTestsContext {
 			logger.info(String.format("%s key not found or set to false, or url key %s has not been set", SELENIUMROBOTSERVER_ACTIVE, SELENIUMROBOTSERVER_URL));
 			return null;
 		}
+    }
+    
+    /**
+     * returns the selenkium grid connector if mode requests it
+     * @return
+     */
+    private SeleniumGridConnector connectGrid() {
+    	if (getRunMode() == DriverMode.GRID) {
+    		if (getWebDriverGrid() != null) {
+    			return SeleniumGridConnectorFactory.getInstance(getWebDriverGrid());
+    		} else {
+    			throw new ConfigurationException("Test should be executed with Selenium Grid but URL is not set");
+    		}
+    	} else {
+    		return null;
+    	}
     }
 
     /**
@@ -860,6 +886,10 @@ public class SeleniumTestsContext {
     public SeleniumRobotVariableServerConnector getVariableServer() {
 		return variableServer;
 	}
+    
+    public SeleniumGridConnector getSeleniumGridConnector() {
+    	return seleniumGridConnector;
+    }
 
 	//Methods for ID_Mapping
     //get
@@ -1529,29 +1559,6 @@ public class SeleniumTestsContext {
     	if (variableServer != null) {
 			getConfiguration().putAll(variableServer.getVariables());
     	}
-    }
-    
-    /**
-     * Method for creating or updating a variable on the seleniumRobot server ONLY. This will raise a ScenarioException if variables are get from
-     * env.ini file 
-     * @param key
-     * @param value
-     */
-    public void createOrUpdateParam(String key, String newValue) {
-    	if (variableServer == null) {
-    		throw new ScenarioException("Cannot create or update variable if seleniumRobot server is not connected");
-    	}
-    	
-    	// check if we update an existing variable
-    	TestVariable variable = getConfiguration().get(key);
-    	if (variable == null) {
-    		variable = new TestVariable(key, newValue);
-    	} else {
-    		variable.setValue(newValue);
-    	}
-    	
-    	TestVariable newVariable = variableServer.upsertVariable(variable);
-    	getConfiguration().put(newVariable.getName(), newVariable);
     }
     
     /**
