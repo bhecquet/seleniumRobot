@@ -88,16 +88,37 @@ public class SeleniumRobotVariableServerConnector extends SeleniumRobotServerCon
 	}
 	
 	/**
+	 * Each variable marked as reservable is unreserved
+	 * @param variables
+	 */
+	public void unreserveVariables(List<TestVariable> variables) {
+		for (TestVariable variable: variables) {
+			unreserveVariable(variable);
+		}
+	}
+	
+	private void unreserveVariable(TestVariable variable) {
+		if (variable.isReservable() && variable.getId() != null) {
+			try {
+				getJSonResponse(Unirest.patch(String.format(url + EXISTING_VARIABLE_API_URL, variable.getId()))
+						.field("releaseDate", ""));
+			} catch (UnirestException e) {
+				logger.warn("variable could not be unreserved, server will do it automatically after reservation period: " + e.getMessage());
+			}
+		}
+	}
+	
+	/**
 	 * Create or update variable on the server. This helps centralizing some configurations during the test
 	 * If this is an existing variable, only update the value. Else, create it with current environment, application, version.
-	 * A regular variable with a changed value will be add as a custom variable. There should be no way to update a regular variable from seleniumRobot.
+	 * A regular variable with a changed value will be added as a custom variable. There should be no way to update a regular variable from seleniumRobot.
 	 * Variable is created with "internal" flag set
 	 * @return
 	 */
 	public TestVariable upsertVariable(TestVariable variable) {
 		
 		// this variable does not exist, create it
-		// OR this variable is a update of an existing, non custom variable
+		// OR this variable is an update of an existing, non custom variable
 		if (variable.getId() == null || !variable.getInternalName().startsWith(TestVariable.TEST_VARIABLE_PREFIX)) {
 			try {
 				JSONObject variableJson = getJSonResponse(Unirest.post(url + VARIABLE_API_URL)

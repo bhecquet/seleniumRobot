@@ -28,8 +28,7 @@ import com.seleniumtests.core.SeleniumTestsContextManager;
 public class TestSeleniumRobotTestListener extends GenericTest {
 
 	private TestNG executeSubTest(int threadCount, String[] testMethods, String cucumberTests) throws IOException {
-//		TestListener testListener = new TestListener();
-		
+
 		XmlSuite suite = new XmlSuite();
 		suite.setName("TmpSuite");
 		suite.setParallel(ParallelMode.FALSE);
