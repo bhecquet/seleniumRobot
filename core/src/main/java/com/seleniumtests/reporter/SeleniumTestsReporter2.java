@@ -245,7 +245,12 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 		
 		// Generate test method reports
 		for (Map.Entry<ITestContext, List<ITestResult>> entry: methodResultsMap.entrySet()) {
+			
 			for (ITestResult testResult: entry.getValue()) {
+				
+				// issue #81: recreate test context from this context (due to multithreading, this context may be null if parallel testing is done
+				SeleniumTestsContextManager.initThreadContext(entry.getKey(), null);
+				
 				try {
 					mOut = createWriter(getOutputDirectory(), (String)testResult.getAttribute(METHOD_RESULT_FILE_NAME));
 					startHtml(getTestStatus(testResult), mOut, "simple");

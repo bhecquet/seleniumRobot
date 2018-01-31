@@ -22,22 +22,20 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
-import org.testng.ITestContext;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
-import com.seleniumtests.MockitoTest;
 import com.seleniumtests.connectors.selenium.SeleniumGridConnector;
-import com.seleniumtests.connectors.selenium.SeleniumGridConnectorFactory;
 import com.seleniumtests.connectors.selenium.SeleniumRobotGridConnector;
+import com.seleniumtests.ut.connectors.ConnectorsTest;
 
 import io.appium.java_client.remote.MobileCapabilityType;
 
 
 @PrepareForTest({HttpClients.class, Unirest.class})
-public class TestSeleniumRobotGridConnector extends MockitoTest {
+public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 
 	@Mock
 	private CloseableHttpClient client; 

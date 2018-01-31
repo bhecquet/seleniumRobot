@@ -33,8 +33,8 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 	private Integer stepResultId;
 	private Integer snapshotId;
 
-	public SeleniumRobotSnapshotServerConnector() {
-		super();
+	public SeleniumRobotSnapshotServerConnector(final boolean useRequested, final String url) {
+		super(useRequested, url);
 		if (!active) {
 			return;
 		}

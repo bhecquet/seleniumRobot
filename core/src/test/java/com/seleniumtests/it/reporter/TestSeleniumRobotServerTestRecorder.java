@@ -48,7 +48,6 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 //		
 //		when(reporter.getServerConnector()).thenReturn(serverConnector);
 		when(serverConnector.getActive()).thenReturn(true);
-		new SeleniumRobotSnapshotServerConnector();
 
 		executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClass", "com.seleniumtests.it.stubclasses.StubTestClass2"});
 		

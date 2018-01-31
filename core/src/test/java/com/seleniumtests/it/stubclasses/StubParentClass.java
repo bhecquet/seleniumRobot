@@ -27,19 +27,19 @@ import com.seleniumtests.util.logging.SeleniumRobotLogger;
 public class StubParentClass extends SeleniumTestPlan {
 	
 	protected static final Logger logger = SeleniumRobotLogger.getLogger(StubParentClass.class);
-
-	/**
-	 * Generate context to have logger correctly initialized
-	 * @param testContext
-	 */
-	@BeforeSuite(groups="stub")
-	public void initSuite(final ITestContext testContext) {
-
-        SeleniumTestsContextManager.initGlobalContext(testContext);
-        SeleniumTestsContextManager.initThreadContext(testContext, null);
-
-		SeleniumTestsContextManager.getThreadContext().setSoftAssertEnabled(false);
-		SeleniumTestsContextManager.getGlobalContext().setSoftAssertEnabled(false);
-        SeleniumRobotLogger.updateLogger(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), SeleniumTestsContextManager.getGlobalContext().getDefaultOutputDirectory());
-	}
+//
+//	/**
+//	 * Generate context to have logger correctly initialized
+//	 * @param testContext
+//	 */
+//	@BeforeSuite(groups="stub")
+//	public void initSuite(final ITestContext testContext) {
+//
+//        SeleniumTestsContextManager.initGlobalContext(testContext);
+//        SeleniumTestsContextManager.initThreadContext(testContext, null);
+//
+//		SeleniumTestsContextManager.getThreadContext().setSoftAssertEnabled(false);
+//		SeleniumTestsContextManager.getGlobalContext().setSoftAssertEnabled(false);
+//        SeleniumRobotLogger.updateLogger(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), SeleniumTestsContextManager.getGlobalContext().getDefaultOutputDirectory());
+//	}
 }

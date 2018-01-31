@@ -19,9 +19,10 @@ import com.seleniumtests.connectors.selenium.SeleniumGridConnector;
 import com.seleniumtests.connectors.selenium.SeleniumGridConnectorFactory;
 import com.seleniumtests.connectors.selenium.SeleniumRobotGridConnector;
 import com.seleniumtests.customexception.ConfigurationException;
+import com.seleniumtests.ut.connectors.ConnectorsTest;
 
 @PrepareForTest({Unirest.class})
-public class TestSeleniumGridConnectorFactory extends MockitoTest {
+public class TestSeleniumGridConnectorFactory extends ConnectorsTest {
 
 	private final String guiServletContent = "<html>\r\n" + 
 			"	<head>\r\n" + 

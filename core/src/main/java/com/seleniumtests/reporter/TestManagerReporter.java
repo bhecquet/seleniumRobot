@@ -18,7 +18,9 @@ public class TestManagerReporter implements IReporter {
 
 	@Override
 	public void generateReport(List<XmlSuite> xmlSuites, List<ISuite> suites, String outputDirectory) {
-		TestManager testManager = SeleniumTestsContextManager.getThreadContext().getTms();
+		
+		// issue #81: use global context instead
+		TestManager testManager = SeleniumTestsContextManager.getGlobalContext().getTms();
 
 		if (testManager == null) {
 			return;
