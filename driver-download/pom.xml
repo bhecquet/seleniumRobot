@@ -53,6 +53,17 @@
 
 						<!-- CHROMEDRIVER: pattern for file MUST BE chromedriver_<version>_chrome-<minChromeVersion>-<maxChromeVersion> -->
 						<execution>
+							<id>chromedriver 2.35</id>
+							<phase>process-resources</phase>
+							<goals>
+								<goal>wget</goal>
+							</goals>
+							<configuration>
+								<url>${chromedriver.url}/2.35/chromedriver_${chromedriver.suffix}.zip</url>
+								<outputDirectory>${driver.path}${os}/dir_chromedriver_2.35_chrome-62-64</outputDirectory>
+							</configuration>
+						</execution>
+						<execution>
 							<id>chromedriver 2.34</id>
 							<phase>process-resources</phase>
 							<goals>

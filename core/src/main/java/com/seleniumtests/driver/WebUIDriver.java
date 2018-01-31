@@ -380,6 +380,8 @@ public class WebUIDriver {
         config.setSetAcceptUntrustedCertificates(SeleniumTestsContextManager.getThreadContext().getAcceptUntrustedCertificates());
 
         config.setEnableJavascript(SeleniumTestsContextManager.getThreadContext().getJavascriptEnabled());
+        
+        config.setHeadlessBrowser(SeleniumTestsContextManager.getThreadContext().isHeadlessBrowser());
 
         if (SeleniumTestsContextManager.getThreadContext().getNtlmAuthTrustedUris() != null) {
             config.setNtlmAuthTrustedUris(SeleniumTestsContextManager.getThreadContext().getNtlmAuthTrustedUris());

@@ -695,6 +695,19 @@ public class TestSeleniumTestContext extends MockitoTest {
 		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), "/home/other/test-output".replace("/", File.separator));
 	}
 	
+	@Test(groups="ut context")
+	public void testHeadlessMode(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setHeadlessBrowser(true);
+		Assert.assertTrue(SeleniumTestsContextManager.getThreadContext().isHeadlessBrowser());
+	}
+	@Test(groups="ut context")
+	public void testHeadlessModeNull(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setHeadlessBrowser(null);
+		Assert.assertFalse(SeleniumTestsContextManager.getThreadContext().isHeadlessBrowser());
+	}
+	
 	/**
 	 * Proxy type is set to "direct" in config.ini. check that this value is taken
 	 */

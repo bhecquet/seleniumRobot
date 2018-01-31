@@ -26,6 +26,7 @@ import org.mockito.Mockito;
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.Platform;
 import org.openqa.selenium.Proxy;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.firefox.FirefoxProfile;
@@ -80,6 +81,7 @@ public class TestFirefoxCapabilitiesFactory extends MockitoTest {
 		Assert.assertTrue(capa.is(CapabilityType.ACCEPT_SSL_CERTS));
 		Assert.assertEquals(capa.getVersion(), "");
 		Assert.assertEquals(capa.getCapability(CapabilityType.PROXY), proxyConfig);
+		Assert.assertEquals(((Map<?,?>)(((FirefoxOptions)capa).asMap().get(FirefoxOptions.FIREFOX_OPTIONS))).get("args").toString(), "[]");
 	}
 	
 	@Test(groups={"ut"})
@@ -104,6 +106,18 @@ public class TestFirefoxCapabilitiesFactory extends MockitoTest {
 		MutableCapabilities capa = new FirefoxCapabilitiesFactory(config).createCapabilities();
 		
 		Assert.assertFalse(capa.is(CapabilityType.SUPPORTS_JAVASCRIPT));
+		
+	}
+	
+	@Test(groups={"ut"})
+	public void testCreateDefaultCapabilitiesWithHeadless() {
+		
+		Mockito.when(config.isEnableJavascript()).thenReturn(false);
+		Mockito.when(config.isHeadlessBrowser()).thenReturn(true);
+		
+		MutableCapabilities capa = new FirefoxCapabilitiesFactory(config).createCapabilities();
+		
+		Assert.assertEquals(((Map<?,?>)(((FirefoxOptions)capa).asMap().get(FirefoxOptions.FIREFOX_OPTIONS))).get("args").toString(), "[-headless, --window-size=1280,1024]");
 		
 	}
 	

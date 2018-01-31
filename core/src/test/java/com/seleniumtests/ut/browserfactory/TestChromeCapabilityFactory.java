@@ -125,6 +125,16 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 		Assert.assertEquals(((Map<?,?>)(((ChromeOptions)capa).asMap().get(ChromeOptions.CAPABILITY))).get("args").toString(), "[--user-agent=CHROME 55, --disable-translate]");
 	}
 	
+	@Test(groups={"ut"})
+	public void testCreateChromeCapabilitiesHeadless() {
+		
+		Mockito.when(config.isHeadlessBrowser()).thenReturn(true);
+		
+		MutableCapabilities capa = new ChromeCapabilitiesFactory(config).createCapabilities();
+		
+		Assert.assertEquals(((Map<?,?>)(((ChromeOptions)capa).asMap().get(ChromeOptions.CAPABILITY))).get("args").toString(), "[--disable-translate, --headless, --window-size=1280,1024, --disable-gpu]");
+	}
+	
 	/**
 	 * 
 	 */

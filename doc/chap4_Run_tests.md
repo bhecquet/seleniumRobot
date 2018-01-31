@@ -34,6 +34,7 @@ In this case, this user passed value will overwrite test or suite parameters
 | devMode 					| false		| The development mode allow all existing browsers to remain. In case test is run from any IDE, devMode will be defaulted to true | 
 | browser 					| firefox	| Browser used to start test. Valid values are:<br/>`firefox`, `chrome`, `safari`, `iexplore`, `htmlunit`, `opera`, `phantomjs`, `none` for no driver, `browser` for android default browser | 
 | browserVersion 			|  			| Browser version to use. By default, it's the last one, or the installed one in local mode. This option has sense when using sauceLabs where browser version can be choosen | 
+| headless					| false		| If true, start browser in headless mode. This is supported by chrome >= 60 and firefox >= 56  |
 | firefoxUserProfilePath 	|  			| Firefox user profile if a specific one is defined | 
 | useFirefoxDefaultProfile	| true		| Use default firefox profile | 
 | operaUserProfilePath 		| 			| Opera user profile if a specific one is defined | 

@@ -62,6 +62,13 @@ public class ChromeCapabilitiesFactory extends IDesktopCapabilityFactory {
         }
         options.addArguments("--disable-translate");
         
+        if (webDriverConfig.isHeadlessBrowser()) {
+        	logger.info("setting chrome in headless mode. Supported for chrome version >= 60");
+	        options.addArguments("--headless");
+	        options.addArguments("--window-size=1280,1024");
+	        options.addArguments("--disable-gpu");
+        }
+        
         return options;
 	}
 
