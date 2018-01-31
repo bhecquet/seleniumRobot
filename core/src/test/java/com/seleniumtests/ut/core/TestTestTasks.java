@@ -4,6 +4,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.doNothing;
 
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.never;
@@ -108,6 +109,7 @@ public class TestTestTasks extends MockitoTest {
 	@Test(groups= {"ut"})
 	public void testKillProcessGrid(final ITestContext testNGCtx) {
 		SeleniumGridConnector gridConnector = spy(new SeleniumRobotGridConnector("http://localhost:4444/hub/wd"));
+		doNothing().when(gridConnector).killProcess("some_process");
 		
 		PowerMockito.mockStatic(SeleniumGridConnectorFactory.class);
 		PowerMockito.when(SeleniumGridConnectorFactory.getInstance("http://localhost:4444/hub/wd")).thenReturn(gridConnector);

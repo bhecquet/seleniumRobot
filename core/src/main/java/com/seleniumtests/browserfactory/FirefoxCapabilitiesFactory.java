@@ -45,6 +45,12 @@ public class FirefoxCapabilitiesFactory extends IDesktopCapabilityFactory {
 	@Override
 	protected MutableCapabilities getDriverOptions() {
 		FirefoxOptions options = new FirefoxOptions();
+		
+        if (webDriverConfig.isHeadlessBrowser()) {
+        	logger.info("setting firefox in headless mode. Supported for firefox version >= 56");
+	        options.addArguments("-headless");
+	        options.addArguments("--window-size=1280,1024");
+        }
 
         FirefoxProfile profile = getFirefoxProfile(webDriverConfig);
         configProfile(profile, webDriverConfig);

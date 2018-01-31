@@ -69,6 +69,7 @@ public class SeleniumTestsContext {
     public static final String WEB_SESSION_TIME_OUT = "webSessionTimeOut";		// timeout de la session du navigateur
     public static final String IMPLICIT_WAIT_TIME_OUT = "implicitWaitTimeOut";	// attente implicite du navigateur
     public static final String EXPLICIT_WAIT_TIME_OUT = "explicitWaitTimeOut";	// attente explicite du navigateur
+    public static final String HEADLESS_BROWSER = "headless";
     public static final String REPLAY_TIME_OUT = "replayTimeOut";				// time during which an action is replayed. By default 30 secs
     public static final String PAGE_LOAD_TIME_OUT = "pageLoadTimeout";			// temps d'attente de chargement d'une page
     public static final String WEB_DRIVER_GRID = "webDriverGrid";				// adresse du serveur seleniumGrid
@@ -214,6 +215,7 @@ public class SeleniumTestsContext {
         setPageLoadTimeout(getIntValueForTest(PAGE_LOAD_TIME_OUT, System.getProperty(PAGE_LOAD_TIME_OUT)));
         setDevMode(getBoolValueForTest(DEV_MODE, System.getProperty(DEV_MODE)));
         setBrowser(getValueForTest(BROWSER, System.getProperty(BROWSER)));
+        setHeadlessBrowser(getBoolValueForTest(HEADLESS_BROWSER, System.getProperty(HEADLESS_BROWSER)));
         setBrowserVersion(getValueForTest(BROWSER_VERSION, System.getProperty(BROWSER_VERSION)));
         setFirefoxUserProfilePath(getValueForTest(FIREFOX_USER_PROFILE_PATH, System.getProperty(FIREFOX_USER_PROFILE_PATH)));
         setUseDefaultFirefoxProfile(getBoolValueForTest(USE_DEFAULT_FIREFOX_PROFILE, System.getProperty(USE_DEFAULT_FIREFOX_PROFILE)));
@@ -791,9 +793,13 @@ public class SeleniumTestsContext {
     public DriverMode getRunMode() {
         return (DriverMode) getAttribute(RUN_MODE);
     }
-    
+  
     public boolean isDevMode() {
         return (Boolean) getAttribute(DEV_MODE);
+    }
+    
+    public boolean isHeadlessBrowser() {
+    	return (Boolean) getAttribute(HEADLESS_BROWSER);
     }
     
 	public Map<String, String> getDeviceList() {
@@ -1145,6 +1151,14 @@ public class SeleniumTestsContext {
     	} else {
     		// default value depends on who starts test. If start is done through jar execution, deployed mode will be true (devMode set to false)
     		setAttribute(DEV_MODE, !SeleniumTestsContextManager.getDeployedMode());
+    	}
+    }
+    
+    public void setHeadlessBrowser(Boolean headless) {
+    	if (headless != null) {
+    		setAttribute(HEADLESS_BROWSER, headless);
+    	} else {
+    		setAttribute(HEADLESS_BROWSER, false);
     	}
     }
 

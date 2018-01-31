@@ -64,6 +64,7 @@ public class DriverConfig {
     private String userAgentOverride;
     private String ntlmAuthTrustedUris;
     private String browserDownloadDir;
+    private boolean headlessBrowser = false;
     private boolean addJSErrorCollectorExtension = false;
     private ArrayList<WebDriverEventListener> webDriverListeners;
     private boolean useFirefoxDefaultProfile = true;
@@ -525,5 +526,13 @@ public class DriverConfig {
 
 	public void setGeckoDriverPath(String geckoDriverPath) {
 		this.geckoDriverPath = geckoDriverPath;
+	}
+
+	public boolean isHeadlessBrowser() {
+		return headlessBrowser;
+	}
+
+	public void setHeadlessBrowser(boolean headlessBrowser) {
+		this.headlessBrowser = headlessBrowser;
 	}
 }
