@@ -87,7 +87,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends MockitoTest {
 		createSnapshotServerMock("GET", SeleniumRobotServerConnector.NAMED_TESTCASE_API_URL, 200, "{'id': 12}");		
 		createSnapshotServerMock("GET", SeleniumRobotServerConnector.NAMED_VERSION_API_URL, 200, "{'id': 11}");		
 		
-		SeleniumRobotSnapshotServerConnector connector = new SeleniumRobotSnapshotServerConnector();
+		SeleniumRobotSnapshotServerConnector connector = new SeleniumRobotSnapshotServerConnector(true, SERVER_URL);
 		
 		// reset default value to force creation
 		connector.setApplicationId(null);
@@ -107,7 +107,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends MockitoTest {
 		
 		SeleniumTestsContextManager.getThreadContext().setSeleniumRobotServerUrl(SERVER_URL);
 		SeleniumTestsContextManager.getThreadContext().setSeleniumRobotServerActive(true);
-		return new SeleniumRobotSnapshotServerConnector();
+		return new SeleniumRobotSnapshotServerConnector(true, SERVER_URL);
 	}
 	
 	/**
@@ -152,7 +152,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends MockitoTest {
 	
 	@Test(groups= {"ut"})
 	public void testServerNotActive() {
-		SeleniumRobotSnapshotServerConnector connector = new SeleniumRobotSnapshotServerConnector();
+		SeleniumRobotSnapshotServerConnector connector = new SeleniumRobotSnapshotServerConnector(false, SERVER_URL);
 		Assert.assertFalse(connector.getActive());
 	}
 	

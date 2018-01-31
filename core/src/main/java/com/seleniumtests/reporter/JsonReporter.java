@@ -18,10 +18,6 @@ import com.seleniumtests.core.SeleniumTestsContextManager;
 
 public class JsonReporter extends CommonReporter implements IReporter {
 
-	public SeleniumRobotSnapshotServerConnector getServerConnector() {
-		return new SeleniumRobotSnapshotServerConnector();
-	}
-	
 	/**
 	 * Generate all test reports
 	 */

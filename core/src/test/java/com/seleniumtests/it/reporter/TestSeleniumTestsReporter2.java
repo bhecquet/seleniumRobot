@@ -32,6 +32,7 @@ import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.ITestResult;
 import org.testng.annotations.Test;
+import org.testng.xml.XmlSuite;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.reporter.SeleniumTestsReporter2;
@@ -70,9 +71,45 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	 * @throws Exception
 	 */
 	@Test(groups={"it"})
-	public void testReportSummaryContentWithSteps(ITestContext testContext) throws Exception {
+	public void testMultithreadReport(ITestContext testContext) throws Exception {
+
+		SeleniumTestsContextManager.removeThreadContext();
+		executeSubTest(5, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"});
 		
-		reporter = spy(new SeleniumTestsReporter2());
+		// check content of summary report file
+		String mainReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport.html"));
+		mainReportContent = mainReportContent.replace("\n", "").replace("\r",  "");
+		
+		Assert.assertTrue(mainReportContent.matches(".*<a href\\='SeleniumTestReport-\\d+\\.html'>testAndSubActions</a>.*"));
+		Assert.assertTrue(mainReportContent.matches(".*<a href\\='SeleniumTestReport-\\d+\\.html'>testInError</a>.*"));
+	}
+	
+	/**
+	 * Check summary format when tests have steps
+	 * @param testContext
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testMultithreadTestReport(ITestContext testContext) throws Exception {
+		
+		SeleniumTestsContextManager.removeThreadContext();
+		executeSubTest(5, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, XmlSuite.ParallelMode.TESTS);
+		
+		// check content of summary report file
+		String mainReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport.html"));
+		mainReportContent = mainReportContent.replace("\n", "").replace("\r",  "");
+		
+		Assert.assertTrue(mainReportContent.matches(".*<a href\\='SeleniumTestReport-\\d+\\.html'>testAndSubActions</a>.*"));
+		Assert.assertTrue(mainReportContent.matches(".*<a href\\='SeleniumTestReport-\\d+\\.html'>testInError</a>.*"));
+	}
+	
+	/**
+	 * Check summary format when tests have steps
+	 * @param testContext
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testReportSummaryContentWithSteps(ITestContext testContext) throws Exception {
 
 		executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"});
 		

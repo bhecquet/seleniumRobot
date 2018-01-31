@@ -77,7 +77,7 @@ public class SeleniumTestsContextManager {
 
     public static SeleniumTestsContext getThreadContext() {
         if (threadLocalContext.get() == null) {
-        	throw new ConfigurationException("SeleniumTestsContextManager.getThreadContext() MUST be called after SeleniumTestsContextManager.initGlobalContext()");
+        	throw new ConfigurationException("SeleniumTestsContextManager.getThreadContext() MUST be called after SeleniumTestsContextManager.initThreadContext()");
         }
 
         return threadLocalContext.get();
@@ -224,7 +224,7 @@ public class SeleniumTestsContextManager {
         
         threadLocalContext.set(seleniumTestsCtx);
         
-        // update some values after init
+        // update some values after init. These init call the thread context previously created
         seleniumTestsCtx.postInit();
 
     }
@@ -235,6 +235,10 @@ public class SeleniumTestsContextManager {
 
     public static void setThreadContext(final SeleniumTestsContext ctx) {
         threadLocalContext.set(ctx);
+    }
+    
+    public static void removeThreadContext() {
+    	threadLocalContext.remove();
     }
     
     /**

@@ -24,7 +24,10 @@ import com.seleniumtests.util.logging.SeleniumRobotLogger;
 public class SeleniumRobotServerTestRecorder extends CommonReporter implements IReporter {
 
 	public SeleniumRobotSnapshotServerConnector getServerConnector() {
-		return new SeleniumRobotSnapshotServerConnector();
+		return new SeleniumRobotSnapshotServerConnector(
+				SeleniumTestsContextManager.getGlobalContext().getSeleniumRobotServerActive(),
+				SeleniumTestsContextManager.getGlobalContext().getSeleniumRobotServerUrl()
+				);
 	}
 	
 	/**
@@ -60,9 +63,10 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 			return;
 		}
 		
-		if (!SeleniumTestsContextManager.getThreadContext().getSeleniumRobotServerActive() 
-				|| !SeleniumTestsContextManager.getThreadContext().getSeleniumRobotServerRecordResults() 
-				&& !SeleniumTestsContextManager.getThreadContext().getSeleniumRobotServerCompareSnapshot()) {
+		// issue #81: use global context because these parameters are known from there (thread context is too narrow)
+		if (!SeleniumTestsContextManager.getGlobalContext().getSeleniumRobotServerActive() 
+				|| !SeleniumTestsContextManager.getGlobalContext().getSeleniumRobotServerRecordResults() 
+				&& !SeleniumTestsContextManager.getGlobalContext().getSeleniumRobotServerCompareSnapshot()) {
 			return;
 		}
 		
@@ -97,10 +101,7 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 	}
 	
 	private void recordSuiteResults(SeleniumRobotSnapshotServerConnector serverConnector, Map<String, ISuiteResult> tests) {
-		
-		String outputDir = SeleniumTestsContextManager.getThreadContext().getOutputDirectory();
-
-		
+	
 		for (ISuiteResult r : tests.values()) {
 			ITestContext context = r.getTestContext();
 			
@@ -115,6 +116,9 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 			
 			// test case in seleniumRobot naming
 			for (ITestResult testResult: methodResults) {
+				
+				// issue #81: recreate test context from this context (due to multithreading, this context may be null if parallel testing is done)
+				SeleniumTestsContextManager.initThreadContext(context, null);
 				
 				// skipped tests has never been executed and so attribute (set in TestListener) has not been applied
 				String testName = getTestName(testResult);
@@ -138,7 +142,7 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 					serverConnector.recordStepResult(!testStep.getFailed(), stepLogs, testStep.getDuration());
 					
 					if (testStep.getSnapshot() != null) {
-						serverConnector.createSnapshot(Paths.get(outputDir, testStep.getSnapshot()).toFile());
+						serverConnector.createSnapshot(Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), testStep.getSnapshot()).toFile());
 					}
 				}
 			}

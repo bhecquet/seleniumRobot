@@ -28,9 +28,8 @@ public class TestSeleniumRobotVariableServerConnector extends GenericTest {
 	@BeforeMethod(groups={"it"})
 	public void init(ITestContext ctx) {
 		initThreadContext(ctx);
-		SeleniumTestsContextManager.getThreadContext().setSeleniumRobotServerUrl("http://localhost:8002");
-		SeleniumTestsContextManager.getThreadContext().setSeleniumRobotServerActive(true);
-		connector = new SeleniumRobotVariableServerConnector("Test 1");
+
+		connector = new SeleniumRobotVariableServerConnector(true, "http://localhost:8002", "Test 1");
 		if (!connector.getActive()) {
 			throw new SkipException("no seleniumrobot server available");
 		}

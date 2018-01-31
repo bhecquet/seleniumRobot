@@ -12,9 +12,7 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import com.seleniumtests.GenericTest;
-import com.seleniumtests.connectors.selenium.SeleniumRobotServerConnector;
 import com.seleniumtests.connectors.selenium.SeleniumRobotSnapshotServerConnector;
-import com.seleniumtests.core.SeleniumTestsContextManager;
 
 public class TestSeleniumRobotSnapshotServerConnector extends GenericTest {
 
@@ -23,9 +21,8 @@ public class TestSeleniumRobotSnapshotServerConnector extends GenericTest {
 	@BeforeMethod(groups={"it"})
 	public void init(ITestContext ctx) {
 		initThreadContext(ctx);
-		SeleniumTestsContextManager.getThreadContext().setSeleniumRobotServerUrl("http://localhost:8002");
-		SeleniumTestsContextManager.getThreadContext().setSeleniumRobotServerActive(true);
-		connector = new SeleniumRobotSnapshotServerConnector();
+
+		connector = new SeleniumRobotSnapshotServerConnector(true, "http://localhost:8002");
 		if (!connector.getActive()) {
 			throw new SkipException("no seleniumrobot server available");
 		}

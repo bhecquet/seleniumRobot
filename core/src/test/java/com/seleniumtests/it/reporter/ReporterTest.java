@@ -30,6 +30,10 @@ public class ReporterTest extends MockitoTest {
 	 * @throws IOException 
 	 */
 	protected TestNG executeSubTest(int threadCount, String[] testClasses) throws IOException {
+		return executeSubTest(threadCount, testClasses, XmlSuite.ParallelMode.METHODS);
+	}
+	
+	protected TestNG executeSubTest(int threadCount, String[] testClasses, XmlSuite.ParallelMode parallelMode) throws IOException {
 //		TestListener testListener = new TestListener();
 		
 		XmlSuite suite = new XmlSuite();

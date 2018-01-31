@@ -31,12 +31,15 @@ public abstract class SeleniumRobotServerConnector {
 
 	protected String url;
 	protected boolean active = false;
+	protected boolean useRequested = false;
 	protected Integer applicationId;
 	protected Integer versionId;
 	protected Integer environmentId;
 	protected Integer testCaseId;
 	
-	public SeleniumRobotServerConnector() {
+	public SeleniumRobotServerConnector(final boolean useRequested, final String url) {
+		this.useRequested = useRequested;
+		this.url = url;
 		active = isActive();
 	}
 	
@@ -51,8 +54,7 @@ public abstract class SeleniumRobotServerConnector {
 	}
 	
 	protected boolean isActive() {
-		if (SeleniumTestsContextManager.getThreadContext().getSeleniumRobotServerActive()) {
-			url = SeleniumTestsContextManager.getThreadContext().getSeleniumRobotServerUrl();
+		if (useRequested) {
 			return true;
 		} else {
 			logger.warn("selenium server won't be used, key 'seleniumrobotServerActive' is not available in testng configuration or in environment variable.");

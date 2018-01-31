@@ -417,6 +417,7 @@ public class SeleniumTestsContext {
     	}
     }
     
+    // TODO: this call should be moved into postInit method as SeleniumRobotVariableServerConnector calls SeleniumTestsContextManager.getThreadContext() which may not be initialized
     private SeleniumRobotVariableServerConnector connectSeleniumRobotServer() {
     	
     	if (getTestName() == null) {
@@ -428,7 +429,7 @@ public class SeleniumTestsContext {
 			logger.info(String.format("%s key found, and set to true, trying to get variable from variable server %s", 
 						SELENIUMROBOTSERVER_ACTIVE, 
 						SELENIUMROBOTSERVER_URL));
-			SeleniumRobotVariableServerConnector vServer = new SeleniumRobotVariableServerConnector(getTestName());
+			SeleniumRobotVariableServerConnector vServer = new SeleniumRobotVariableServerConnector(getSeleniumRobotServerActive(), getSeleniumRobotServerUrl(), getTestName());
 			
 			if (!vServer.isAlive()) {
 				throw new ConfigurationException(String.format("Variable server %s could not be contacted", getSeleniumRobotServerUrl()));
@@ -1501,7 +1502,7 @@ public class SeleniumTestsContext {
     	setAttribute(VIEWPORT_HEIGHT, height);    	
     }
     
-    
+    // ------------------------- FROM THERE, methods need context with calls to SeleniumTestsContextManager.getThreadContext() ------------------
     /**
      * post configuration of the context
      */
