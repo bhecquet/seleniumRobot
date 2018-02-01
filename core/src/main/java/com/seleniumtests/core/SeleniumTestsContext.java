@@ -18,6 +18,7 @@ package com.seleniumtests.core;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -43,11 +44,11 @@ import com.seleniumtests.connectors.selenium.SeleniumRobotVariableServerConnecto
 import com.seleniumtests.connectors.tms.TestManager;
 import com.seleniumtests.core.config.ConfigReader;
 import com.seleniumtests.customexception.ConfigurationException;
-import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.DriverMode;
 import com.seleniumtests.driver.TestType;
 import com.seleniumtests.reporter.PluginsHelper;
+import com.seleniumtests.reporter.ReportInfo;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 import com.seleniumtests.util.osutility.OSUtility;
 
@@ -130,6 +131,8 @@ public class SeleniumTestsContext {
     
     public static final String OUTPUT_DIRECTORY = "outputDirectory";     		// folder where HTML report will be written
     public static final String DEFAULT_OUTPUT_DIRECTORY = "defaultOutputDirectory";    // folder where TestNG would write it's results if not overwritten
+    public static final String CUSTOM_TEST_REPORTS = "customTestReports";
+    public static final String CUSTOM_SUMMARY_REPORTS = "customSummaryReports";
     public static final String WEB_DRIVER_LISTENER = "webDriverListener";
 
     public static final String TEST_METHOD_SIGNATURE = "testMethodSignature";
@@ -170,6 +173,11 @@ public class SeleniumTestsContext {
     // internal storage
     public static final String TEST_VARIABLES = "testVariables"; 				// configuration (aka variables, get via 'param()' method) used for the current test. It is not updated via XML file
 
+    
+    // default values
+    public static final List<ReportInfo> DEFAULT_CUSTOM_TEST_REPORTS = Arrays.asList(new ReportInfo("PERF::xml::reporter/templates/report.perf.vm"));
+    public static final List<ReportInfo> DEFAULT_CUSTOM_SUMMARY_REPORTS = Arrays.asList(new ReportInfo("results::json::reporter/templates/report.summary.json.vm"));
+    
     private static final int REPLAY_TIME_OUT_VALUE = 30;
     
     private LinkedList<TearDownService> tearDownServices = new LinkedList<>();
@@ -282,6 +290,9 @@ public class SeleniumTestsContext {
         setPlatform(getValueForTest(PLATFORM, System.getProperty(PLATFORM)));
         setCloudApiKey(getValueForTest(CLOUD_API_KEY, System.getProperty(CLOUD_API_KEY)));
         setProjectName(getValueForTest(PROJECT_NAME, System.getProperty(PROJECT_NAME)));
+        
+        setCustomTestReports(getValueForTest(CUSTOM_TEST_REPORTS, System.getProperty(CUSTOM_TEST_REPORTS)));
+        setCustomSummaryReports(getValueForTest(CUSTOM_SUMMARY_REPORTS, System.getProperty(CUSTOM_SUMMARY_REPORTS)));
         
         setViewPortWidth(getIntValueForTest(VIEWPORT_WIDTH, System.getProperty(VIEWPORT_WIDTH)));
         setViewPortHeight(getIntValueForTest(VIEWPORT_HEIGHT, System.getProperty(VIEWPORT_HEIGHT)));
@@ -692,6 +703,14 @@ public class SeleniumTestsContext {
         return tearDownServices;
     }
     
+    public List<ReportInfo> getCustomTestReports() {
+    	return (List<ReportInfo>) getAttribute(CUSTOM_TEST_REPORTS);
+    }
+    
+    public List<ReportInfo> getCustomSummaryReports() {
+    	return (List<ReportInfo>) getAttribute(CUSTOM_SUMMARY_REPORTS);
+    }
+    
     public String getTestDataFile() {
         return (String) getAttribute(TEST_DATA_FILE);
     }
@@ -1067,6 +1086,34 @@ public class SeleniumTestsContext {
     		setAttribute(PAGE_LOAD_TIME_OUT, timeout);
     	} else {
     		setAttribute(PAGE_LOAD_TIME_OUT, 90);
+    	}
+    }
+    
+    public void setCustomTestReports(String customReportsStr) {
+    	if (customReportsStr != null) {
+    		List<ReportInfo> reports = new ArrayList<>();
+    		
+    		// check if report is available in resources
+    		for (String customReport: customReportsStr.split(",")) {
+    			reports.add(new ReportInfo(customReport));
+    		}
+    		setAttribute(CUSTOM_TEST_REPORTS, reports);
+    	} else {
+    		setAttribute(CUSTOM_TEST_REPORTS, DEFAULT_CUSTOM_TEST_REPORTS);
+    	}
+    }
+    
+    public void setCustomSummaryReports(String customReportsStr) {
+    	if (customReportsStr != null) {
+    		List<ReportInfo> reports = new ArrayList<>();
+    		
+    		// check if report is available in resources
+    		for (String customReport: customReportsStr.split(",")) {
+    			reports.add(new ReportInfo(customReport));
+    		}
+    		setAttribute(CUSTOM_SUMMARY_REPORTS, reports);
+    	} else {
+    		setAttribute(CUSTOM_SUMMARY_REPORTS, DEFAULT_CUSTOM_SUMMARY_REPORTS);
     	}
     }
     

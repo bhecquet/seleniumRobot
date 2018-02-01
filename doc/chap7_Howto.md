@@ -178,3 +178,35 @@ Inside your PageObject:
 
 The drawbak of this method is that browser MUST have the focus and thus no other test should be executed at the same time because we are sending keyboard actions outside of selenium
 
+### 111 Write custom reports ###
+
+Through `customTestReports` and `customSummaryReports`, you can add or replace some of the reports SeleniumRobot generates
+
+Option is a comma seperated list of `<prefix>::<extension>::<template_file located in resources>`.
+Template file has the Velocity format and must be located in any of the resources seleniumRobot can access (those from test application or from core)
+
+#### available data in test report ####
+
+One file is generated for each test. Name is `<prefix>-<classname>.<methodName>.<extension>`
+
+- `errors`: number of steps in error in test
+- `failures`: number of steps in failure in test
+- `hostname`: host running the test
+- `suiteName`: name of the test method
+- `className`: class where method is located
+- `tests`: number of steps
+- `duration`: overall duration of test
+- `time`: start time of the test
+- `testSteps`: list of TestStep objects. see javadoc for details	
+- `browser`: browser used for test
+- `logs`: logs in raw format (content of seleniumRobot.log file)  
+
+#### available data in summary report ####
+
+One file is generated for the overall session. Name is `<prefix>.<extension>`
+
+- `pass`: number of passed tests during session
+- `fail`: number of failed tests during session
+- `skip`: number of skip tests during session
+- `total`: number of tests during session
+

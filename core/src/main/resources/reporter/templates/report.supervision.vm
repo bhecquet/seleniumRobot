@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+#set($success = $errors==0 && $failures==0)
+#set($startTime = $testSteps.get(0).getStartDate().getTime())
+
+<rapport duration="$duration" success="$success" test="$className.$suiteName" timeScenario="$duration" timestamp="$time" version="$version">
+	<etapes>
+	#foreach ($testStep in $testSteps)
+		#set($stepDuration = $testStep.getDuration() / 1000.0)
+		#set($stepTime = $testStep.getStartDate().getTime() - $startTime)
+		<etape id="$velocityCount">
+			<chrono>$stepTime</chrono>
+            <libelle>$testStep.getName()</libelle>
+            <vraisemblances/>
+        </etape>
+	#end
+	</etapes>
+	<params>
+		<param name="browser" valeur="$browser"/>
+	</params>
+</rapport>

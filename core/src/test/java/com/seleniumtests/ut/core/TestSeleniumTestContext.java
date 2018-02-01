@@ -20,6 +20,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.io.File;
+import java.util.List;
 
 import org.mockito.Mock;
 import org.openqa.selenium.Proxy.ProxyType;
@@ -41,6 +42,7 @@ import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.DriverMode;
+import com.seleniumtests.reporter.ReportInfo;
 
 /**
  * Test parsing of test options into SeleniumTestContext
@@ -707,6 +709,87 @@ public class TestSeleniumTestContext extends MockitoTest {
 		SeleniumTestsContextManager.getThreadContext().setHeadlessBrowser(null);
 		Assert.assertFalse(SeleniumTestsContextManager.getThreadContext().isHeadlessBrowser());
 	}
+	
+	@Test(groups="ut context")
+	public void testManualSteps(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setManualTestSteps(true);
+		Assert.assertTrue(SeleniumTestsContextManager.getThreadContext().isManualTestSteps());
+	}
+	@Test(groups="ut context")
+	public void testManualStepsNull(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setManualTestSteps(null);
+		Assert.assertFalse(SeleniumTestsContextManager.getThreadContext().isManualTestSteps());
+	}
+	
+	@Test(groups="ut context")
+	public void testCustomTestsReports(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setCustomTestReports("PERF::xml::reporter/templates/report.part.test.vm,SUPERVISION::xml::reporter/templates/report.part.test.step.vm");
+		List<ReportInfo> reportInfos = SeleniumTestsContextManager.getThreadContext().getCustomTestReports();
+		Assert.assertEquals(reportInfos.size(), 2);
+		Assert.assertEquals(reportInfos.get(0).getExtension(), ".xml");
+		Assert.assertEquals(reportInfos.get(0).getTemplatePath(), "reporter/templates/report.part.test.vm");
+		Assert.assertEquals(reportInfos.get(0).getPrefix(), "PERF");
+	}
+	@Test(groups="ut context", expectedExceptions=ConfigurationException.class)
+	public void testCustomTestsReportsWrongPath(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setCustomTestReports("PERF::xml::reporter/templates/report.part.test.wrong.vm");
+		SeleniumTestsContextManager.getThreadContext().getCustomTestReports();
+	}
+	@Test(groups="ut context", expectedExceptions=ConfigurationException.class)
+	public void testCustomTestsReportsWrongFormat(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setCustomTestReports("PERF:xml::reporter/templates/report.part.test.wrong.vm");
+		SeleniumTestsContextManager.getThreadContext().getCustomTestReports();
+	}
+	@Test(groups="ut context")
+	public void testCustomTestsReportsNull(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setCustomTestReports(null);
+		List<ReportInfo> reportInfos = SeleniumTestsContextManager.getThreadContext().getCustomTestReports();
+		Assert.assertEquals(reportInfos.size(), 1);
+		Assert.assertEquals(reportInfos.get(0).getExtension(), ".xml");
+		Assert.assertEquals(reportInfos.get(0).getTemplatePath(), "reporter/templates/report.perf.vm");
+		Assert.assertEquals(reportInfos.get(0).getPrefix(), "PERF");
+	}
+	
+	@Test(groups="ut context")
+	public void testCustomSummaryReports(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setCustomSummaryReports("PERF::xml::reporter/templates/report.part.test.vm,SUPERVISION::xml::reporter/templates/report.part.test.step.vm");
+		List<ReportInfo> reportInfos = SeleniumTestsContextManager.getThreadContext().getCustomSummaryReports();
+		Assert.assertEquals(reportInfos.size(), 2);
+		Assert.assertEquals(reportInfos.get(0).getExtension(), ".xml");
+		Assert.assertEquals(reportInfos.get(0).getTemplatePath(), "reporter/templates/report.part.test.vm");
+		Assert.assertEquals(reportInfos.get(0).getPrefix(), "PERF");
+	}
+	@Test(groups="ut context", expectedExceptions=ConfigurationException.class)
+	public void testCustomSummaryReportsWrongPath(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setCustomSummaryReports("PERF::xml::reporter/templates/report.part.test.wrong.vm");
+		SeleniumTestsContextManager.getThreadContext().getCustomSummaryReports();
+	}
+	@Test(groups="ut context", expectedExceptions=ConfigurationException.class)
+	public void testCustomSummaryReportsWrongFormat(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setCustomSummaryReports("PERF:xml::reporter/templates/report.part.test.wrong.vm");
+		SeleniumTestsContextManager.getThreadContext().getCustomSummaryReports();
+	}
+	@Test(groups="ut context")
+	public void testCustomSummaryReportsNull(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setCustomSummaryReports(null);
+		List<ReportInfo> reportInfos = SeleniumTestsContextManager.getThreadContext().getCustomSummaryReports();
+		Assert.assertEquals(reportInfos.size(), 1);
+		Assert.assertEquals(reportInfos.get(0).getExtension(), ".json");
+		Assert.assertEquals(reportInfos.get(0).getTemplatePath(), "reporter/templates/report.summary.json.vm");
+		Assert.assertEquals(reportInfos.get(0).getPrefix(), "results");
+	}
+
+	
 	
 	/**
 	 * Proxy type is set to "direct" in config.ini. check that this value is taken

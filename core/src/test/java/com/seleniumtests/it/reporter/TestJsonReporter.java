@@ -33,11 +33,16 @@ import org.testng.annotations.AfterMethod;
 import org.testng.annotations.Test;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
-import com.seleniumtests.reporter.PerformanceReporter;
+import com.seleniumtests.reporter.CustomReporter;
 
+/**
+ * Test that default reporting contains results.json file (CustomReporter.java) with default summary reports defined in SeleniumTestsContext.DEFAULT_CUSTOM_SUMMARY_REPORTS
+ * @author s047432
+ *
+ */
 public class TestJsonReporter extends ReporterTest {
 	
-	private PerformanceReporter reporter;
+	private CustomReporter reporter;
 
 	
 	@AfterMethod(groups={"it"})
@@ -58,7 +63,7 @@ public class TestJsonReporter extends ReporterTest {
 	@Test(groups={"it"})
 	public void testReportGeneration(ITestContext testContext) throws Exception {
 		
-		reporter = spy(new PerformanceReporter());
+		reporter = spy(new CustomReporter());
 
 		executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"});
 		String outDir = new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath();
@@ -71,7 +76,7 @@ public class TestJsonReporter extends ReporterTest {
 	@Test(groups={"it"})
 	public void testReportContent(ITestContext testContext) throws Exception {
 		
-		reporter = spy(new PerformanceReporter());
+		reporter = spy(new CustomReporter());
 		
 		executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClass", "com.seleniumtests.it.stubclasses.StubTestClass2"});
 		String outDir = new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath();

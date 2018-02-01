@@ -141,6 +141,10 @@ public class TestStep extends TestAction {
 	public void setSnapshot(String snapshot) {
 		this.snapshot = snapshot;
 	}
+
+	public Date getStartDate() {
+		return startDate;
+	}
 	
 	
 }

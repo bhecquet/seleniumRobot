@@ -19,8 +19,11 @@ package com.seleniumtests.reporter;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.velocity.Template;
@@ -29,6 +32,7 @@ import org.apache.velocity.app.VelocityEngine;
 import org.testng.IReporter;
 import org.testng.ISuite;
 import org.testng.ISuiteResult;
+import org.testng.ITestContext;
 import org.testng.ITestResult;
 import org.testng.xml.XmlSuite;
 
@@ -36,7 +40,7 @@ import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
-public class PerformanceReporter extends CommonReporter implements IReporter {
+public class CustomReporter extends CommonReporter implements IReporter {
 	
 	private List<String> generatedFiles;
 
@@ -49,24 +53,43 @@ public class PerformanceReporter extends CommonReporter implements IReporter {
 	public void generateReport(List<XmlSuite> xmlSuites, List<ISuite> suites, String outputDirectory) {
 		generatedFiles = new ArrayList<>();
 		
+		Map<String, Integer> consolidatedResults = new HashMap<>();
+		consolidatedResults.put("pass", 0);
+		consolidatedResults.put("fail", 0);
+		consolidatedResults.put("skip", 0);
+		consolidatedResults.put("total", 0);
+		
 		for (ISuite suite: suites) {
 			for (String suiteString: suite.getResults().keySet()) {
 				ISuiteResult suiteResult = suite.getResults().get(suiteString);
+				
+				ITestContext context = suiteResult.getTestContext();
+				
+				// done in case it was null (issue #81)
+				SeleniumTestsContextManager.initThreadContext(context, null);
+				
 				Set<ITestResult> resultSet = new HashSet<>(); 
 				resultSet.addAll(suiteResult.getTestContext().getFailedTests().getAllResults());
 				resultSet.addAll(suiteResult.getTestContext().getPassedTests().getAllResults());
 				
-				VelocityEngine ve;
-				try {
-					ve = initVelocityEngine();
-				} catch (Exception e) {
-					throw new ScenarioException("Error generating test results");
-				}
+				
+				consolidatedResults.put("fail", consolidatedResults.get("fail") + context.getFailedTests().getAllResults().size());
+				consolidatedResults.put("pass", consolidatedResults.get("pass") + context.getPassedTests().getAllResults().size());
+				consolidatedResults.put("skip", consolidatedResults.get("skip") + context.getSkippedTests().getAllResults().size());
+				
+				Integer total = consolidatedResults.get("pass") + consolidatedResults.get("fail") + consolidatedResults.get("skip");
+				consolidatedResults.put("total", total);
 				
 				for (ITestResult testResult: resultSet) {
-					generateTestReport(ve, testResult);
+					for (ReportInfo reportInfo: SeleniumTestsContextManager.getThreadContext().getCustomTestReports()) {
+						generateTestReport(testResult, reportInfo);
+					}
 				}
 			}
+		}
+		
+		for (ReportInfo reportInfo: SeleniumTestsContextManager.getThreadContext().getCustomSummaryReports()) {
+			generateSummaryReport(consolidatedResults, reportInfo);
 		}
 	}
 	
@@ -75,9 +98,18 @@ public class PerformanceReporter extends CommonReporter implements IReporter {
 	 * @param ve
 	 * @param testResult
 	 */
-	private void generateTestReport(VelocityEngine ve, ITestResult testResult) {
+	private void generateTestReport(ITestResult testResult, ReportInfo reportInfo) {
 		try {
-			Template t = ve.getTemplate( "reporter/templates/report.perf.vm" );
+
+			VelocityEngine ve;
+			try {
+				ve = initVelocityEngine();
+			} catch (Exception e) {
+				throw new ScenarioException("Error generating test results");
+			}
+			
+//			Template t = ve.getTemplate( "reporter/templates/report.perf.vm" );
+			Template t = ve.getTemplate(reportInfo.getTemplatePath());
 			VelocityContext context = new VelocityContext();
 			
 			Long testDuration = 0L;
@@ -101,12 +133,13 @@ public class PerformanceReporter extends CommonReporter implements IReporter {
 			context.put("duration", testDuration / 1000.0);
 			context.put("time", testResult.getStartMillis());	
 			context.put("testSteps", testSteps);	
+			context.put("browser", SeleniumTestsContextManager.getThreadContext().getBrowser());	
 			context.put("logs", 0);	
 			
 			StringWriter writer = new StringWriter();
 			t.merge( context, writer );
 			
-			String fileName = "PERF-" + testResult.getTestClass().getName() + "." + testResult.getAttribute(SeleniumRobotLogger.METHOD_NAME).toString()
+			String fileName = reportInfo.prefix + "-" + testResult.getTestClass().getName() + "." + testResult.getAttribute(SeleniumRobotLogger.METHOD_NAME).toString()
 											.replace(" ",  "_")
 											.replace("'", "")
 											.replace("\"", "")
@@ -119,7 +152,7 @@ public class PerformanceReporter extends CommonReporter implements IReporter {
 											.replace("<", "-")
 											.replace(">", "-")
 											.replace("\\", "_")
-											+ ".xml";
+											+ reportInfo.extension;
 			PrintWriter fileWriter = createWriter(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), fileName);
 			fileWriter.write(writer.toString());
 			fileWriter.flush();
@@ -127,6 +160,36 @@ public class PerformanceReporter extends CommonReporter implements IReporter {
 			generatedFiles.add(fileName);
 		} catch (Exception e) {
 			logger.error(String.format("Error generating test result %s: %s", testResult.getAttribute(SeleniumRobotLogger.METHOD_NAME), e.getMessage()));
+		}
+	}
+	
+	private void generateSummaryReport(Map<String, Integer> consolidatedResults, ReportInfo reportInfo) {
+		
+		try {
+			VelocityEngine ve;
+			try {
+				ve = initVelocityEngine();
+			} catch (Exception e) {
+				throw new ScenarioException("Error generating test results");
+			}
+			
+			Template t = ve.getTemplate(reportInfo.templatePath);
+			VelocityContext context = new VelocityContext();
+			
+			for (Entry<String, Integer> entry: consolidatedResults.entrySet()) {
+				context.put(entry.getKey(), entry.getValue());
+			}
+			
+			StringWriter writer = new StringWriter();
+			t.merge( context, writer );
+			
+			String fileName = reportInfo.prefix + reportInfo.getExtension();
+			PrintWriter fileWriter = createWriter(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), fileName);
+			fileWriter.write(writer.toString());
+			fileWriter.flush();
+			fileWriter.close();
+		} catch (Exception e) {
+			logger.error(String.format("Error generating test summary: %s", e.getMessage()));
 		}
 	}
 }
