@@ -201,7 +201,7 @@ public class PageObject extends BasePage implements IPage {
     protected void assertCurrentPage(final boolean log) {
 
         if (pageIdentifierElement != null && !pageIdentifierElement.isElementPresent()) {
-            new ScreenshotUtil(driver).captureWebPageSnapshot();
+        	ScreenShot screenShot = new ScreenshotUtil(driver).captureWebPageSnapshot();
 
             throw new NotCurrentPageException(getClass().getCanonicalName()
                     + " is not the current page.\nPageIdentifierElement " + pageIdentifierElement.toString()
@@ -221,12 +221,20 @@ public class PageObject extends BasePage implements IPage {
     }
     
     /**
+     * Add step inside a Page
+     * @param stepName
+     */
+    public void addStep(String stepName) {
+    	TestTasks.addStep(stepName);
+    }
+    
+    /**
      * Method for creating or updating a variable on the seleniumRobot server ONLY. This will raise a ScenarioException if variables are get from
      * env.ini file 
      * @param key
      * @param value
      */
-    public static void createOrUpdateParam(String key, String value) {
+    public void createOrUpdateParam(String key, String value) {
     	TestTasks.createOrUpdateParam(key, value);
     }
 

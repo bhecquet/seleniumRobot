@@ -138,6 +138,13 @@ Additional search using the `ByC` class are
 - search by first visible element: `new HtmlElement("", By.className("otherClass"), HtmlElement.FIRST_VISIBLE).getText()`
 - search in reverse order (get the last element): `new TextFieldElement("", By.className("someClass"), -1);` get the last element on the list
 
+#### Add user defined test steps ####
+
+By default, framework creates automatically test steps based on method calls. Every PageObject method called from a Test class is a step (for e.g)
+If this behavior is not what you want, you can disable it by setting `manualTestSteps` as test parameters. 
+Then, in Test class or PageObject sub-class, add `addStep("my step name")` where you want a step to be created
+
+For each step, a snapshot is done and step duration is computed
 
 ### 3 Write a test ###
 A test is a suite of steps defined in several page objects. By convention, they are located in the `tests` folder

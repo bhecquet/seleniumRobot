@@ -27,7 +27,9 @@ import com.mashape.unirest.http.Unirest;
 import com.seleniumtests.connectors.selenium.SeleniumRobotVariableServerConnector;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.TearDownService;
+import com.seleniumtests.core.TestTasks;
 import com.seleniumtests.core.testretry.TestRetryAnalyzer;
+import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.driver.screenshots.ScreenShot;
 import com.seleniumtests.driver.screenshots.ScreenshotUtil;
@@ -248,6 +250,12 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 	 * On test end, will take a snap shot and store it
 	 */
 	private void logLastStep(ITestResult testResult) {
+		
+		// finalize manual steps if we use this mode
+		try {
+			TestTasks.addStep(null);
+		} catch (ConfigurationException e) {}
+		
 		TestStep tearDownStep = new TestStep("Test end");
 		TestLogging.setCurrentRootTestStep(tearDownStep);
 		TestLogging.log(String.format("Test is %s", testResult.isSuccess() ? "OK": "KO with error: " + testResult.getThrowable().getMessage()));

@@ -68,6 +68,16 @@ public class CalcPage extends PageObject {
 		return this;
 	}
 	
+	/**
+	 * Use this method only when manualTestSteps are enabled, or an error will be raised
+	 * @param a
+	 * @return
+	 */
+	public CalcPage minus(int a) {
+		addStep(String.format("minus %d", a));
+		return this;
+	}
+	
 	public CalcPage doNothing() {
 		nonElement.doNothing();
 		return this;

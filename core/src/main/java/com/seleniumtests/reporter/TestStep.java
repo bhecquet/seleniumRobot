@@ -17,6 +17,7 @@
 package com.seleniumtests.reporter;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.json.JSONArray;
@@ -43,12 +44,14 @@ import org.json.JSONObject;
 public class TestStep extends TestAction {
 	private List<TestAction> stepActions;
 	private Long duration;
+	private Date startDate;
 	private String snapshot; // store at most 1 snapshot. It will be the last one if more than one are recorded
 	
 	public TestStep(String name) {
 		super(name, false);
 		stepActions = new ArrayList<>();
 		duration = 0L;
+		startDate = new Date();
 	}
 	
 	public Long getDuration() {
@@ -61,6 +64,10 @@ public class TestStep extends TestAction {
 	 */
 	public void setDuration(Long duration) {
 		this.duration = duration;
+	}
+	
+	public void updateDuration() {
+		duration = new Date().getTime() - startDate.getTime();
 	}
 
 	public List<TestAction> getStepActions() {

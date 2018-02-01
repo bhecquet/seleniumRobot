@@ -74,6 +74,7 @@ public class SeleniumTestsContext {
     public static final String PAGE_LOAD_TIME_OUT = "pageLoadTimeout";			// temps d'attente de chargement d'une page
     public static final String WEB_DRIVER_GRID = "webDriverGrid";				// adresse du serveur seleniumGrid
     public static final String RUN_MODE = "runMode";							// local ou grid. Pourrait également contenir sauceLabs / testDroid
+    public static final String MANUAL_TEST_STEPS = "manualTestSteps";			// set test steps manual (default is false) for creating them inside tests
     public static final String DEV_MODE = "devMode";							// The development mode allow all existing browsers to remain. It is set to "false" by default, which means it closes all existing browsers.
     public static final String BROWSER = "browser";								// navigateur utilisé. Sur Android, le navigateur par défaut est "Browser"
     public static final String BROWSER_VERSION = "browserVersion";				// version de navigateur utilisé
@@ -214,6 +215,7 @@ public class SeleniumTestsContext {
         setReplayTimeout(getIntValueForTest(REPLAY_TIME_OUT, System.getProperty(REPLAY_TIME_OUT)));
         setPageLoadTimeout(getIntValueForTest(PAGE_LOAD_TIME_OUT, System.getProperty(PAGE_LOAD_TIME_OUT)));
         setDevMode(getBoolValueForTest(DEV_MODE, System.getProperty(DEV_MODE)));
+        setManualTestSteps(getBoolValueForTest(MANUAL_TEST_STEPS, System.getProperty(MANUAL_TEST_STEPS)));
         setBrowser(getValueForTest(BROWSER, System.getProperty(BROWSER)));
         setHeadlessBrowser(getBoolValueForTest(HEADLESS_BROWSER, System.getProperty(HEADLESS_BROWSER)));
         setBrowserVersion(getValueForTest(BROWSER_VERSION, System.getProperty(BROWSER_VERSION)));
@@ -802,6 +804,10 @@ public class SeleniumTestsContext {
     	return (Boolean) getAttribute(HEADLESS_BROWSER);
     }
     
+    public boolean isManualTestSteps() {
+    	return (Boolean) getAttribute(MANUAL_TEST_STEPS);
+    }
+    
 	public Map<String, String> getDeviceList() {
     	HashMap<String, String> deviceList = new HashMap<>();
     	if (getAttribute(DEVICE_LIST) == null || "{}".equals(getAttribute(DEVICE_LIST))) {
@@ -1159,6 +1165,14 @@ public class SeleniumTestsContext {
     		setAttribute(HEADLESS_BROWSER, headless);
     	} else {
     		setAttribute(HEADLESS_BROWSER, false);
+    	}
+    }
+    
+    public void setManualTestSteps(Boolean manualTestSteps) {
+    	if (manualTestSteps != null) {
+    		setAttribute(MANUAL_TEST_STEPS, manualTestSteps);
+    	} else {
+    		setAttribute(MANUAL_TEST_STEPS, false);
     	}
     }
 
