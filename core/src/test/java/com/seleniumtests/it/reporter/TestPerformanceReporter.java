@@ -31,11 +31,16 @@ import org.testng.annotations.AfterMethod;
 import org.testng.annotations.Test;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
-import com.seleniumtests.reporter.PerformanceReporter;
+import com.seleniumtests.reporter.CustomReporter;
 
+/**
+ * Test that default reporting contains an XML file per test (CustomReporter.java) with default test reports defined in SeleniumTestsContext.DEFAULT_CUSTOM_TEST_REPORTS
+ * @author s047432
+ *
+ */
 public class TestPerformanceReporter extends ReporterTest {
 	
-	private PerformanceReporter reporter;
+	private CustomReporter reporter;
 
 	
 	@AfterMethod(groups={"it"})
@@ -56,7 +61,7 @@ public class TestPerformanceReporter extends ReporterTest {
 	@Test(groups={"it"})
 	public void testReportGeneration(ITestContext testContext) throws Exception {
 		
-		reporter = spy(new PerformanceReporter());
+		reporter = spy(new CustomReporter());
 
 		executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"});
 		String outDir = new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath();
@@ -122,5 +127,24 @@ public class TestPerformanceReporter extends ReporterTest {
 		
 		Assert.assertTrue(jmeterReport.contains("<error message=\"Step in error\" type=\"\">"));
 		Assert.assertTrue(jmeterReport.contains("<![CDATA[Error message not available]]>"));
+	}
+	
+
+	/**
+	 * Chack that if several custom reports are specified through custom reports, they are all available
+	 * @param testContext
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testMultipleReportsWithSteps(ITestContext testContext) throws Exception {
+
+		System.setProperty("customTestReports", "PERF::xml::reporter/templates/report.perf.vm,PERF2::xml::ti/report.perf.vm");
+		executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"});
+		
+		String jmeterReport1 = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "PERF-com.seleniumtests.it.stubclasses.StubTestClass.testAndSubActions.xml"));
+		String jmeterReport2 = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "PERF2-com.seleniumtests.it.stubclasses.StubTestClass.testAndSubActions.xml"));
+		
+		Assert.assertTrue(jmeterReport1.contains("<testsuite errors=\"0\" failures=\"1\" hostname=\"\" name=\"testAndSubActions\" tests=\"3\" time=\"15.26\" timestamp="));
+		Assert.assertTrue(jmeterReport2.contains("<testsuite errors=\"0\" failures=\"1\" hostname=\"\" name=\"testAndSubActions\" tests=\"3\" time=\"15.26\" timestamp="));
 	}
 }

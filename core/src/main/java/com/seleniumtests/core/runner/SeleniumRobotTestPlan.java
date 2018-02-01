@@ -16,10 +16,10 @@ import com.seleniumtests.util.logging.SeleniumRobotLogger;
 import com.seleniumtests.util.osutility.OSUtilityFactory;
 
 @Listeners({com.seleniumtests.reporter.SeleniumTestsReporter2.class, 
-	com.seleniumtests.reporter.PerformanceReporter.class,
+	com.seleniumtests.reporter.CustomReporter.class,
 	com.seleniumtests.reporter.SeleniumRobotServerTestRecorder.class,
 	com.seleniumtests.reporter.TestManagerReporter.class,
-	com.seleniumtests.reporter.JsonReporter.class,
+//	com.seleniumtests.reporter.JsonReporter.class,
 	com.seleniumtests.core.runner.SeleniumRobotTestListener.class
 	})
 public class SeleniumRobotTestPlan {
