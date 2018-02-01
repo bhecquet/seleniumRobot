@@ -5,9 +5,14 @@ import org.apache.log4j.Logger;
 import com.seleniumtests.connectors.selenium.SeleniumGridConnector;
 import com.seleniumtests.connectors.selenium.SeleniumRobotVariableServerConnector;
 import com.seleniumtests.core.runner.SeleniumRobotTestPlan;
+import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.driver.DriverMode;
+import com.seleniumtests.driver.WebUIDriver;
+import com.seleniumtests.driver.screenshots.ScreenShot;
+import com.seleniumtests.driver.screenshots.ScreenshotUtil;
 import com.seleniumtests.reporter.TestLogging;
+import com.seleniumtests.reporter.TestStep;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 import com.seleniumtests.util.osutility.OSUtilityFactory;
 
@@ -75,5 +80,37 @@ public class TestTasks {
     		return "";
     	}
     	return value.getValue();
+    }
+    
+    /**
+     * Add step to test and add snapshot to it
+     * If a previous step exists, store it
+     * @param stepName	name of the step
+     * 					If name is null, only previous step is stored, no new step is created
+     */
+    public static void addStep(String stepName) {
+    	if (!SeleniumTestsContextManager.getThreadContext().isManualTestSteps()) {
+    		throw new ConfigurationException("manual steps can only be used when automatic steps are disabled ('manualTestSteps' option set to true)");
+    	}
+    	
+    	// log the previous step if it exists and create the new one
+    	TestStep previousStep = TestLogging.getCurrentRootTestStep();
+    	if (previousStep != null) {
+    		previousStep.updateDuration();
+    		TestLogging.logTestStep(previousStep);
+    	}
+    	
+    	if (stepName != null) {
+	    	TestStep step = new TestStep(stepName);
+	    	TestLogging.setCurrentRootTestStep(step);
+	    	capturePageSnapshot();
+    	}
+    }
+    
+    public static void capturePageSnapshot() {
+    	if (WebUIDriver.getWebDriver() != null) {
+    		TestLogging.logScreenshot(new ScreenshotUtil().captureWebPageSnapshot());
+    	}
+
     }
 }

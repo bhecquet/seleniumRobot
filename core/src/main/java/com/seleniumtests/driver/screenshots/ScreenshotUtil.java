@@ -36,6 +36,7 @@ import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.customexception.WebSessionEndedException;
 import com.seleniumtests.driver.BrowserType;
@@ -289,6 +290,9 @@ public class ScreenshotUtil {
 		
 		if (SeleniumTestsContextManager.isMobileTest()) {
 			throw new ScenarioException("Desktop capture can only be done on Desktop tests");
+		}
+		if (driver == null) {
+			throw new ConfigurationException("driver is null, capture cannot be done");
 		}
 		
 		String screenshotString = (String)((CustomEventFiringWebDriver)driver).executeScript(CustomEventFiringWebDriver.NON_JS_CAPTURE_DESKTOP);

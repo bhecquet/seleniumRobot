@@ -28,8 +28,8 @@ import com.seleniumtests.core.runner.SeleniumRobotTestPlan;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.it.core.aspects.CalcPage;
 
-public class StubTestClass3 extends StubParentClass {
-	
+public class StubTestClassManualSteps extends StubParentClass {
+
 	@AfterClass(groups={"stub"})
 	public void teardown() {
 		WebUIDriver.cleanUp();
@@ -42,57 +42,20 @@ public class StubTestClass3 extends StubParentClass {
 
 	@Test(groups="stub")
 	public void testOk() throws IOException {
-		new CalcPage()
-			.add(1, 1);
+
+		SeleniumTestsContextManager.getThreadContext().setManualTestSteps(true);
+		
+		addStep("Test start");
+		CalcPage cPage = new CalcPage();
+		
+		addStep("add some values");
+		cPage.add(1, 1);
+		cPage.add(1, 2);
+		cPage.minus(2);
+		
+		addStep("do nothing");
+		cPage.doNothing();
 	}
-	
-	/**
-	 * Test KO with a runtime exception
-	 * @throws IOException 
-	 */
-	@Test(groups="stub")
-	public void testFailedWithException() throws IOException {
-		new CalcPage()
-			.failAction()
-			.add(1);
-	}
-	
-	/**
-	 * Test KO with assertion, soft assertion disabled
-	 * @throws IOException 
-	 */
-	@Test(groups="stub")
-	public void testFailedWithSoftAssertDisabled() throws IOException {
-		new CalcPage()
-			.assertAction()
-			.add(1);
-	}
-	
-	/**
-	 * Test KO with assertion, soft assertion enabled
-	 * @throws IOException 
-	 */
-	@Test(groups="stub")
-	public void testFailedWithSoftAssertEnabled() throws IOException {
-		SeleniumTestsContextManager.getThreadContext().setSoftAssertEnabled(true);
-		SeleniumTestsContextManager.getGlobalContext().setSoftAssertEnabled(true);
-		new CalcPage()
-			.assertAction()
-			.add(1);
-	}
-	
-	/**
-	 * Test KO with multiple assertions, soft assertion enabled
-	 * @throws IOException 
-	 */
-	@Test(groups="stub")
-	public void testMultipleFailedWithSoftAssertEnabled() throws IOException {
-		SeleniumTestsContextManager.getThreadContext().setSoftAssertEnabled(true);
-		SeleniumTestsContextManager.getGlobalContext().setSoftAssertEnabled(true);
-		new CalcPage()
-			.assertAction()
-			.assertAction2()
-			.add(1);
-	}
+
 
 }

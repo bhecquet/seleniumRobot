@@ -196,6 +196,19 @@ public class TestLogging {
 	}
 	
 	/**
+	 * Returns the previous TestStep in the list or null if no step exists for this test
+	 * @return
+	 */
+	public static TestStep getPreviousStep() {
+		try {
+			List<TestStep> allSteps = TestLogging.testsSteps.get(getCurrentTestResult());
+			return allSteps.get(allSteps.size() - 1);
+		} catch (Exception e) {
+			return null;
+		}
+	}
+	
+	/**
 	 * For Integration tests only
 	 */
 	public static void resetCurrentTestResult() {

@@ -132,6 +132,81 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	}
 	
 	/**
+	 * Check that automatic steps create all steps in report
+	 * @param testContext
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testAutomaticSteps(ITestContext testContext) throws Exception {
+		
+		executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClass3"});
+		
+		// check content of summary report file
+		String mainReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport.html"));
+		
+		Assert.assertTrue(mainReportContent.contains("<a href='SeleniumTestReport-1.html'>testFailedWithException</a>"));
+		Assert.assertTrue(mainReportContent.contains("<a href='SeleniumTestReport-2.html'>testFailedWithSoftAssertDisabled</a>"));
+		Assert.assertTrue(mainReportContent.contains("<a href='SeleniumTestReport-3.html'>testFailedWithSoftAssertEnabled</a>"));
+		Assert.assertTrue(mainReportContent.contains("<a href='SeleniumTestReport-4.html'>testMultipleFailedWithSoftAssertEnabled</a>"));
+		Assert.assertTrue(mainReportContent.contains("<a href='SeleniumTestReport-5.html'>testOk</a>"));
+		
+
+		// check that without soft assertion, 'add' step is skipped
+		String detailedReportContent2 = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport-2.html"));
+		Assert.assertTrue(detailedReportContent2.contains("</button> openPage with args: (null, )"));
+		Assert.assertTrue(detailedReportContent2.contains("</button> assertAction"));
+		Assert.assertFalse(detailedReportContent2.contains("</button> add with args: (1, )"));
+		Assert.assertTrue(detailedReportContent2.contains("</button> Test end"));
+		
+		// check that with soft assertion, all steps are displayed
+		String detailedReportContent3 = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport-3.html"));
+		Assert.assertTrue(detailedReportContent3.contains("</button> openPage with args: (null, )"));
+		Assert.assertTrue(detailedReportContent3.contains("</button> assertAction"));
+		Assert.assertTrue(detailedReportContent3.contains("</button> add with args: (1, )"));
+		Assert.assertTrue(detailedReportContent3.contains("</button> Test end"));
+		
+		// check that with error, remaining steps are skipped
+		String detailedReportContent1 = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport-1.html"));
+		Assert.assertTrue(detailedReportContent1.contains("</button> openPage with args: (null, )"));
+		Assert.assertTrue(detailedReportContent1.contains("</button> failAction"));
+		Assert.assertFalse(detailedReportContent1.contains("</button> add with args: (1, )"));
+		Assert.assertTrue(detailedReportContent1.contains("</button> Test end"));
+		
+	}
+	
+	/**
+	 * Check that manual steps create all steps in report
+	 * manual step option is set inside the StubTestClassManualSteps.testOk() method
+	 * @param testContext
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testManualSteps(ITestContext testContext) throws Exception {
+		
+		executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClassManualSteps"});
+		
+		// check content of summary report file
+		String mainReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport.html"));
+		
+		Assert.assertTrue(mainReportContent.contains("<a href='SeleniumTestReport-1.html'>testOk</a>"));
+		
+		
+		// check that without soft assertion, 'add' step is skipped
+		String detailedReportContent1 = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport-1.html"));
+		Assert.assertTrue(detailedReportContent1.contains("</button> Test start"));
+		Assert.assertTrue(detailedReportContent1.contains("</button> add some values"));
+		Assert.assertTrue(detailedReportContent1.contains("</button> minus 2"));
+		Assert.assertTrue(detailedReportContent1.contains("</button> do nothing"));
+		Assert.assertTrue(detailedReportContent1.contains("</button> Test end"));
+		
+		// assert automatic steps are not present
+		Assert.assertFalse(detailedReportContent1.contains("</button> add with args"));
+		
+		// check we also get actions
+		Assert.assertEquals(StringUtils.countMatches(detailedReportContent1, "doNothing on HtmlElement none"), 3);
+	}
+	
+	/**
 	 * Check state and style of all tests
 	 * @param testContext
 	 * @throws Exception

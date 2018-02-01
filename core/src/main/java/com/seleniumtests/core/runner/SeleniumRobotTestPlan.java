@@ -61,7 +61,7 @@ public class SeleniumRobotTestPlan {
      * @param key
      * @param value
      */
-    public static void createOrUpdateParam(String key, String value) {
+    public void createOrUpdateParam(String key, String value) {
     	TestTasks.createOrUpdateParam(key, value);
     }
     
@@ -69,7 +69,15 @@ public class SeleniumRobotTestPlan {
      * Kills the named process, locally or remotely
      * @param processName
      */
-    public static void killProcess(String processName) {
+    public void killProcess(String processName) {
     	TestTasks.killProcess(processName);
+    }
+    
+    /**
+     * Add step to current test
+     * @param stepName
+     */
+    public void addStep(String stepName) {
+    	TestTasks.addStep(stepName);
     }
 }

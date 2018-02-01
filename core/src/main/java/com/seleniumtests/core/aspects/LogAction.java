@@ -28,6 +28,7 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 
+import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.runner.SeleniumRobotTestPlan;
 import com.seleniumtests.reporter.TestAction;
 import com.seleniumtests.reporter.TestLogging;
@@ -38,14 +39,34 @@ import com.seleniumtests.uipage.PageObject;
  * Aspect to intercept calls to methods of HtmlElement. It allows to retry discovery and action 
  * when something goes wrong with the driver
  * 
+ * Here, we log:
+ * - main steps: either cucumber step if this mode is used, or any webpage method called from a Test class (sub-class of SeleniumTestPlan)
+ * - sub steps: these are webpage methods called from other webpage methods
+ * - actions: these are driver methods (open page, click, ...)
+ * 
+ * Tree call is: 
+ * - logTestStep
+ * 		- logSubTestStep
+ * 			- logPageObjectAction
+ * 			- logPageObjectAction
+ * 		- logSubTestStep
+ * 			- logPageObjectAction
+ * 
+ * to produce:
+ *  * root (TestStep)
+ * 	  +--- action1 (TestAction)
+ *    +--+ sub-step1 (TestStep)
+ *       +--- sub-action1
+ *       +--- message (TestMessage)
+ *       +--- sub-action2
+ *    +--- action2
+ * 
  * @author behe
  *
  */
 @Aspect
 public class LogAction {
 
-	private Date testStepStart = null;
-	
 	/**
 	 * Intercept actions
 	 * @param joinPoint
@@ -93,6 +114,10 @@ public class LogAction {
 			+ "&& !call(public * com.seleniumtests.uipage.PageObject.* (..)))"			
 			)
 	public Object logSubTestStep(ProceedingJoinPoint joinPoint) throws Throwable {
+		if (SeleniumTestsContextManager.getThreadContext().isManualTestSteps()) {
+			return joinPoint.proceed(joinPoint.getArgs());
+		}
+		
 		Object reply = null;
 		
 		String stepName = String.format("%s %s", joinPoint.getSignature().getName(), buildArgString(joinPoint));
@@ -151,23 +176,26 @@ public class LogAction {
 	}
 	
 	private Object logTestStep(ProceedingJoinPoint joinPoint)  throws Throwable {
+		if (SeleniumTestsContextManager.getThreadContext().isManualTestSteps()) {
+			return joinPoint.proceed(joinPoint.getArgs());
+		}
+		
 		Object reply = null;
 		boolean rootStep = false;
 		TestStep previousParent = null;
 		TestStep currentStep = new TestStep(buildRootStepName(joinPoint));
 		
-		// check if any root step is already registered
+		// check if any root step is already registered (a main step)
 		// happens when using cucumber where a cucumber method can call an other method intercepted by this pointcut
 		// ex: Given (url "www.somesite.com") calls "open(url)"
 		// In this case, open becomes a child of Given
 		if (TestLogging.getCurrentRootTestStep() == null) {
 			TestLogging.setCurrentRootTestStep(currentStep); // will also set parent step
-			testStepStart = new Date();
 			rootStep = true;
 		} else {
 			TestLogging.getParentTestStep().addStep(currentStep);
-			TestLogging.setParentTestStep(currentStep);
 			previousParent = TestLogging.getParentTestStep();
+			TestLogging.setParentTestStep(currentStep);
 		}
 		
 		try {
@@ -178,7 +206,7 @@ public class LogAction {
 			throw e;
 		} finally {
 			if (rootStep) {
-				TestLogging.getCurrentRootTestStep().setDuration(new Date().getTime() - testStepStart.getTime());
+				TestLogging.getCurrentRootTestStep().updateDuration();
 				TestLogging.logTestStep(TestLogging.getCurrentRootTestStep());	
 			} else {
 				TestLogging.setParentTestStep(previousParent);
