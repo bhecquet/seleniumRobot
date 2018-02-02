@@ -22,7 +22,13 @@
         </groups>
 
         <packages>
-            <package name="com.seleniumtests.ut.*" />
+            <package name="com.seleniumtests.ut.browserfactory.*" />
+            <package name="com.seleniumtests.ut.connectors.*" />
+            <package name="com.seleniumtests.ut.core.*" />
+            <package name="com.seleniumtests.ut.driver.*" />
+            <package name="com.seleniumtests.ut.reporter.*" />
+            <package name="com.seleniumtests.ut.uipage.*" />
+            <package name="com.seleniumtests.ut.util.*" />
         </packages>
     </test>
     
@@ -55,7 +61,7 @@
         </groups>
 
         <packages>
-            <package name="com.seleniumtests.ut.*" />
+            <package name="com.seleniumtests.ut.core.*" />
         </packages>
     </test>
 

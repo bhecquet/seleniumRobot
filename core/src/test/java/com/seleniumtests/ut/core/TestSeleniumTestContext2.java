@@ -19,6 +19,7 @@ package com.seleniumtests.ut.core;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
 import org.testng.ITestContext;
+import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 import org.testng.xml.XmlTest;
@@ -41,6 +42,10 @@ public class TestSeleniumTestContext2 extends MockitoTest {
 		
 		// init of properties is done there so that it's taken into account when creating global context 
 		System.setProperty(SeleniumTestsContext.OUTPUT_DIRECTORY, "/home/user/test-output");
+	}
+	@AfterTest(groups="ut")
+	public void reset() {
+		System.clearProperty(SeleniumTestsContext.OUTPUT_DIRECTORY);
 	}
 	
 	/**
