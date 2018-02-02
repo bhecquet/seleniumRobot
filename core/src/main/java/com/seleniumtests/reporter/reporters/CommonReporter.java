@@ -138,7 +138,11 @@ public abstract class CommonReporter {
 		if (testResult.getStatus() == ITestResult.SKIP) {
 			return testResult.getName();
 		} else {
-			return testResult.getAttribute(SeleniumRobotLogger.METHOD_NAME).toString();
+			if (testResult.getAttribute(SeleniumRobotLogger.METHOD_NAME) != null) {
+				return testResult.getAttribute(SeleniumRobotLogger.METHOD_NAME).toString();
+			} else {
+				return "N-A";
+			}
 		}
 	}
 }

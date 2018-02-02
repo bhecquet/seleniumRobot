@@ -88,12 +88,13 @@ public class TestTestLogging extends GenericTest {
 	@Test(groups={"ut"})
 	public void testBuildScreenshotString() {
 		ScreenShot screenshot = new ScreenShot();
+		screenshot.setTitle("title");
 		screenshot.setLocation("http://location");
 		screenshot.setHtmlSourcePath("file.html");
 		screenshot.setImagePath("file.png");
 		Snapshot snapshotLogger = new Snapshot(screenshot);
 		String screenshotStr = snapshotLogger.buildScreenshotLog();
-		Assert.assertEquals(screenshotStr, "<a href='http://location' target=url>Application URL</a> | <a href='file.html' target=html>Application HTML Source</a> | <a href='file.png' class='lightbox'>Application Snapshot</a>");
+		Assert.assertEquals(screenshotStr, "Output: title: <a href='http://location' target=url>Application URL</a> | <a href='file.html' target=html>Application HTML Source</a> | <a href='file.png' class='lightbox'>Application Snapshot</a>");
 	}
 	
 	@Test(groups={"ut"})
@@ -101,36 +102,39 @@ public class TestTestLogging extends GenericTest {
 		ScreenShot screenshot = new ScreenShot();
 		Snapshot snapshotLogger = new Snapshot(screenshot);
 		String screenshotStr = snapshotLogger.buildScreenshotLog();
-		Assert.assertEquals(screenshotStr, "");
+		Assert.assertEquals(screenshotStr, "Output: null: ");
 	}
 	
 	@Test(groups={"ut"})
 	public void testBuildScreenshotStringWithoutImage() {
 		ScreenShot screenshot = new ScreenShot();
+		screenshot.setTitle("title");
 		screenshot.setLocation("http://location");
 		screenshot.setHtmlSourcePath("file.html");
 		Snapshot snapshotLogger = new Snapshot(screenshot);
 		String screenshotStr = snapshotLogger.buildScreenshotLog();
-		Assert.assertEquals(screenshotStr, "<a href='http://location' target=url>Application URL</a> | <a href='file.html' target=html>Application HTML Source</a>");
+		Assert.assertEquals(screenshotStr, "Output: title: <a href='http://location' target=url>Application URL</a> | <a href='file.html' target=html>Application HTML Source</a>");
 	}
 	
 	@Test(groups={"ut"})
 	public void testBuildScreenshotStringWithoutSource() {
 		ScreenShot screenshot = new ScreenShot();
+		screenshot.setTitle("title");
 		screenshot.setLocation("http://location");
 		screenshot.setImagePath("file.png");
 		Snapshot snapshotLogger = new Snapshot(screenshot);
 		String screenshotStr = snapshotLogger.buildScreenshotLog();
-		Assert.assertEquals(screenshotStr, "<a href='http://location' target=url>Application URL</a> | <a href='file.png' class='lightbox'>Application Snapshot</a>");
+		Assert.assertEquals(screenshotStr, "Output: title: <a href='http://location' target=url>Application URL</a> | <a href='file.png' class='lightbox'>Application Snapshot</a>");
 	}
 	
 	@Test(groups={"ut"})
 	public void testBuildScreenshotStringWithoutLocation() {
 		ScreenShot screenshot = new ScreenShot();
+		screenshot.setTitle("title");
 		screenshot.setHtmlSourcePath("file.html");
 		screenshot.setImagePath("file.png");
 		Snapshot snapshotLogger = new Snapshot(screenshot);
 		String screenshotStr = snapshotLogger.buildScreenshotLog();
-		Assert.assertEquals(screenshotStr, " | <a href='file.html' target=html>Application HTML Source</a> | <a href='file.png' class='lightbox'>Application Snapshot</a>");
+		Assert.assertEquals(screenshotStr, "Output: title:  | <a href='file.html' target=html>Application HTML Source</a> | <a href='file.png' class='lightbox'>Application Snapshot</a>");
 	}
 }
