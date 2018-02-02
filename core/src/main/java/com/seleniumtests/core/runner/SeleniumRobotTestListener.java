@@ -257,7 +257,7 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 			TestTasks.addStep(null);
 		} catch (ConfigurationException e) {}
 		
-		TestStep tearDownStep = new TestStep("Test end");
+		TestStep tearDownStep = new TestStep("Test end", testResult);
 		TestLogging.setCurrentRootTestStep(tearDownStep);
 		TestLogging.log(String.format("Test is %s", testResult.isSuccess() ? "OK": "KO with error: " + testResult.getThrowable().getMessage()));
 		

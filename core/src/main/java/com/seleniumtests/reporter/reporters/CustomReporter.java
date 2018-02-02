@@ -40,6 +40,7 @@ import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.reporter.logger.TestLogging;
 import com.seleniumtests.reporter.logger.TestStep;
+import com.seleniumtests.util.StringUtility;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
 public class CustomReporter extends CommonReporter implements IReporter {
@@ -141,20 +142,12 @@ public class CustomReporter extends CommonReporter implements IReporter {
 			StringWriter writer = new StringWriter();
 			t.merge( context, writer );
 			
-			String fileName = reportInfo.prefix + "-" + testResult.getTestClass().getName() + "." + testResult.getAttribute(SeleniumRobotLogger.METHOD_NAME).toString()
-											.replace(" ",  "_")
-											.replace("'", "")
-											.replace("\"", "")
-											.replace("/", "")
-											.replace(" ", "_")
-											.replace(":", "-")
-											.replace("*", ".")
-											.replace("?", ".")
-											.replace("|", "")
-											.replace("<", "-")
-											.replace(">", "-")
-											.replace("\\", "_")
-											+ reportInfo.extension;
+			String fileName = reportInfo.prefix 
+								+ "-" 
+								+ testResult.getTestClass().getName() 
+								+ "." 
+								+ StringUtility.replaceOddCharsFromFileName(testResult.getAttribute(SeleniumRobotLogger.METHOD_NAME).toString())
+								+ reportInfo.extension;
 			PrintWriter fileWriter = createWriter(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), fileName);
 			fileWriter.write(writer.toString());
 			fileWriter.flush();

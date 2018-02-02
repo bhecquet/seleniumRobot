@@ -238,17 +238,21 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	public void testReportDetailsMessageStyles(ITestContext testContext) throws Exception {
 		
 		reporter = spy(new SeleniumTestsReporter2());
+		System.setProperty("customTestReports", "PERF::xml::reporter/templates/report.perf.vm,SUP::xml::reporter/templates/report.supervision.vm");
 
 		executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"});
 		
+		
 		// check style of messages
 		String detailedReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport-2.html"));
+		detailedReportContent = detailedReportContent.replace("\n", "").replace("\r",  "").replaceAll(">\\s+<", "><");
 		
 		Assert.assertTrue(detailedReportContent.contains("<div class=\"message-info\">click ok</div>"));
 		Assert.assertTrue(detailedReportContent.contains("<div class=\"message-warning\">Warning: Some warning message</div>"));
 		Assert.assertTrue(detailedReportContent.contains("<div class=\"message-info\">Some Info message</div>"));
 		Assert.assertTrue(detailedReportContent.contains("<div class=\"message-error\">Some Error message</div>"));
 		Assert.assertTrue(detailedReportContent.contains("<div class=\"message-log\">Some log message</div>"));
+		Assert.assertTrue(detailedReportContent.contains("<table class=\"table table-bordered table-condensed\"><tr><th width=\"15%\">Key</td><th width=\"60%\">Message</td><th width=\"25%\">Value</td></tr><tr><td>key</td><td>we found a value of</td><td>10</td></tr></table>"));
 		Assert.assertTrue(detailedReportContent.contains("<li>send keyboard action</li>"));
 		
 	}

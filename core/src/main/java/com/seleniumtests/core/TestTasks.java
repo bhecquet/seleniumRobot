@@ -100,7 +100,7 @@ public class TestTasks {
     	}
     	
     	if (stepName != null) {
-	    	TestStep step = new TestStep(stepName);
+	    	TestStep step = new TestStep(stepName, TestLogging.getCurrentTestResult());
 	    	TestLogging.setCurrentRootTestStep(step);
 	    	capturePageSnapshot();
     	}

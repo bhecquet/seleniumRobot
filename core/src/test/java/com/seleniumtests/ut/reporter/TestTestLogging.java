@@ -39,7 +39,7 @@ public class TestTestLogging extends GenericTest {
 	
 	@Test(groups={"ut"})
 	public void testInfo() {
-		TestLogging.setCurrentRootTestStep(new TestStep("step"));
+		TestLogging.setCurrentRootTestStep(new TestStep("step", null));
 		TestLogging.info("message");
 		Assert.assertEquals(TestLogging.getParentTestStep().getStepActions().size(), 1);
 		Assert.assertTrue(TestLogging.getParentTestStep().getStepActions().get(0) instanceof TestMessage);
@@ -48,35 +48,35 @@ public class TestTestLogging extends GenericTest {
 	
 	@Test(groups={"ut"})
 	public void testWarning() {
-		TestLogging.setCurrentRootTestStep(new TestStep("step"));
+		TestLogging.setCurrentRootTestStep(new TestStep("step", null));
 		TestLogging.warning("message");
 		Assert.assertEquals(((TestMessage)(TestLogging.getParentTestStep().getStepActions().get(0))).getMessageType(), MessageType.WARNING);
 	}
 	
 	@Test(groups={"ut"})
 	public void testError() {
-		TestLogging.setCurrentRootTestStep(new TestStep("step"));
+		TestLogging.setCurrentRootTestStep(new TestStep("step", null));
 		TestLogging.error("message");
 		Assert.assertEquals(((TestMessage)(TestLogging.getParentTestStep().getStepActions().get(0))).getMessageType(), MessageType.ERROR);
 	}
 	
 	@Test(groups={"ut"})
 	public void testLog() {
-		TestLogging.setCurrentRootTestStep(new TestStep("step"));
+		TestLogging.setCurrentRootTestStep(new TestStep("step", null));
 		TestLogging.log("message");
 		Assert.assertEquals(((TestMessage)(TestLogging.getParentTestStep().getStepActions().get(0))).getMessageType(), MessageType.LOG);
 	}
 	
 	@Test(groups={"ut"})
 	public void testLogScreenshotOk() {
-		TestLogging.setCurrentRootTestStep(new TestStep("step"));
+		TestLogging.setCurrentRootTestStep(new TestStep("step", null));
 		TestLogging.logScreenshot(new ScreenShot());
 		Assert.assertEquals(TestLogging.getParentTestStep().getSnapshots().size(), 1);
 	}
 	
 	@Test(groups={"ut"})
 	public void testLogTestStep() {
-		TestStep testStep = new TestStep("step");
+		TestStep testStep = new TestStep("step", null);
 		ITestResult testResult = new TestResult();
 		
 		TestLogging.setCurrentTestResult(testResult);
