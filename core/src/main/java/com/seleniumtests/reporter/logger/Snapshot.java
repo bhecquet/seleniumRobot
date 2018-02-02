@@ -54,12 +54,14 @@ public class Snapshot extends TestAction {
     /**
      * Rename HTML and PNG files so that they do not present an uuid
      * @param testStep
-     * @param stepIdx
+     * @param stepIdx	   	number of this step
+     * @param snapshotIdx	number of this snapshot for this step
      */
-    public void rename(TestStep testStep, int stepIdx) {
-    	String newBaseName = String.format("%s-%d-%s-", 
+    public void rename(TestStep testStep, int stepIdx, int snapshotIdx) {
+    	String newBaseName = String.format("%s_%d-%d_%s-", 
     			StringUtility.replaceOddCharsFromFileName(CommonReporter.getTestName(testStep.getTestResult())),
     			stepIdx, 
+    			snapshotIdx,
     			StringUtility.replaceOddCharsFromFileName(testStep.getName()));
     	
     	if (screenshot.getHtmlSourcePath() != null) {

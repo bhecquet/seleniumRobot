@@ -117,9 +117,15 @@ public class TestStep extends TestAction {
 	public void addStep(TestStep step) {
 		stepActions.add(step);
 	}
-	public void addSnapshot(Snapshot snapshot) {
+	
+	/**
+	 * Add snapshot to this step
+	 * @param snapshot		the snapshot
+	 * @param stepIdx		the index of this step in the test
+	 */
+	public void addSnapshot(Snapshot snapshot, int stepIdx) {
 		// rename file so that user can easily consult it
-		snapshot.rename(this, snapshots.size() + 1);
+		snapshot.rename(this, stepIdx, snapshots.size() + 1);
 		
 		snapshots.add(snapshot);
 	}

@@ -113,10 +113,10 @@ public class TestTestStep extends GenericTest {
 		screenshot.setImagePath(tmpImgFile.getName());
 		screenshot.setHtmlSourcePath(tmpHtmlFile.getName());
 		
-		step.addSnapshot(new Snapshot(screenshot));
+		step.addSnapshot(new Snapshot(screenshot), 0);
 		
-		Assert.assertEquals(step.getSnapshots().get(0).getScreenshot().getImagePath(), "N-A-1-step1-" + tmpImgFile.getName());
-		Assert.assertEquals(step.getSnapshots().get(0).getScreenshot().getHtmlSourcePath(), "N-A-1-step1-" + tmpHtmlFile.getName());
+		Assert.assertEquals(step.getSnapshots().get(0).getScreenshot().getImagePath(), "N-A_0-1_step1-" + tmpImgFile.getName());
+		Assert.assertEquals(step.getSnapshots().get(0).getScreenshot().getHtmlSourcePath(), "N-A_0-1_step1-" + tmpHtmlFile.getName());
 	}
 	@Test(groups={"ut"})
 	public void testSnapshotRenamingWithSubFolder() throws IOException {
@@ -136,10 +136,10 @@ public class TestTestStep extends GenericTest {
 		screenshot.setImagePath("screenshots/" + tmpImgFile2.getName());
 		screenshot.setHtmlSourcePath("htmls/" + tmpHtmlFile2.getName());
 		
-		step.addSnapshot(new Snapshot(screenshot));
+		step.addSnapshot(new Snapshot(screenshot), 0);
 		
-		Assert.assertEquals(step.getSnapshots().get(0).getScreenshot().getImagePath(), "screenshots/N-A-1-step1-" + tmpImgFile2.getName());
-		Assert.assertEquals(step.getSnapshots().get(0).getScreenshot().getHtmlSourcePath(), "htmls/N-A-1-step1-" + tmpHtmlFile2.getName());
+		Assert.assertEquals(step.getSnapshots().get(0).getScreenshot().getImagePath(), "screenshots/N-A_0-1_step1-" + tmpImgFile2.getName());
+		Assert.assertEquals(step.getSnapshots().get(0).getScreenshot().getHtmlSourcePath(), "htmls/N-A_0-1_step1-" + tmpHtmlFile2.getName());
 	}
 	
 	/**
