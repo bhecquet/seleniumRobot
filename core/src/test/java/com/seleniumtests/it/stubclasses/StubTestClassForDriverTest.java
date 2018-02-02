@@ -12,7 +12,7 @@ public class StubTestClassForDriverTest extends StubParentClass {
 	
 	@BeforeMethod(groups="stub")
 	public void init() {
-		System.setProperty("browser", "htmlunit");
+		System.setProperty("browser", "chrome");
 		System.setProperty("overrideSeleniumNativeAction", "true");
 	}
 	

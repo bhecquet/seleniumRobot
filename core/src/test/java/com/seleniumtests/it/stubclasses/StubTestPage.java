@@ -18,7 +18,7 @@ package com.seleniumtests.it.stubclasses;
 
 import java.io.IOException;
 
-import com.seleniumtests.reporter.TestLogging;
+import com.seleniumtests.reporter.logger.TestLogging;
 import com.seleniumtests.uipage.PageObject;
 
 public class StubTestPage extends PageObject {

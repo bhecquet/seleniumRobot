@@ -2,8 +2,6 @@ package com.seleniumtests.core;
 
 import org.json.JSONObject;
 
-import com.seleniumtests.core.runner.CucumberScenarioWrapper;
-
 public class TestVariable {
 
 

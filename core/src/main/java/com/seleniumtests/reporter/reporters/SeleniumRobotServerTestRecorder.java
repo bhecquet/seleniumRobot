@@ -1,4 +1,4 @@
-package com.seleniumtests.reporter;
+package com.seleniumtests.reporter.reporters;
 
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -19,6 +19,8 @@ import com.seleniumtests.connectors.selenium.SeleniumRobotSnapshotServerConnecto
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.SeleniumRobotServerException;
+import com.seleniumtests.reporter.logger.TestLogging;
+import com.seleniumtests.reporter.logger.TestStep;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
 public class SeleniumRobotServerTestRecorder extends CommonReporter implements IReporter {
@@ -141,8 +143,10 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 					
 					serverConnector.recordStepResult(!testStep.getFailed(), stepLogs, testStep.getDuration());
 					
-					if (testStep.getSnapshot() != null) {
-						serverConnector.createSnapshot(Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), testStep.getSnapshot()).toFile());
+					if (!testStep.getSnapshots().isEmpty()) {
+						serverConnector.createSnapshot(Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), 
+																testStep.getSnapshots().get(0).getScreenshot().getImagePath()
+																).toFile());
 					}
 				}
 			}

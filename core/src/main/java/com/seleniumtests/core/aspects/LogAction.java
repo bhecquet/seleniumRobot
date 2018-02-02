@@ -19,7 +19,6 @@ package com.seleniumtests.core.aspects;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import org.aspectj.lang.JoinPoint;
@@ -30,9 +29,9 @@ import org.aspectj.lang.annotation.Pointcut;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.runner.SeleniumRobotTestPlan;
-import com.seleniumtests.reporter.TestAction;
-import com.seleniumtests.reporter.TestLogging;
-import com.seleniumtests.reporter.TestStep;
+import com.seleniumtests.reporter.logger.TestAction;
+import com.seleniumtests.reporter.logger.TestLogging;
+import com.seleniumtests.reporter.logger.TestStep;
 import com.seleniumtests.uipage.PageObject;
 
 /**
@@ -213,23 +212,6 @@ public class LogAction {
 			}
 		}
 		return reply;
-	}
-	
-	@Around("execution(public * com.seleniumtests.reporter.TestLogging.logWebOutput (..))"
-			+ " || execution(public * com.seleniumtests.reporter.TestLogging.logWebStep (..))")
-	public Object interceptLogging(ProceedingJoinPoint joinPoint) throws Throwable {
-		if (TestLogging.getParentTestStep() != null) {
-			Boolean actionFailed;
-			try {
-				actionFailed = (Boolean)joinPoint.getArgs()[1];
-			} catch (ClassCastException | IndexOutOfBoundsException e) {
-				actionFailed = false;
-			}
-			TestLogging.getParentTestStep().addAction(new TestAction(joinPoint.getArgs()[0].toString(), actionFailed));
-			return null;
-		} else {
-			return joinPoint.proceed(joinPoint.getArgs());
-		}
 	}
 	
 	/**

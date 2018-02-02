@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.seleniumtests.reporter;
+package com.seleniumtests.reporter.reporters;
 
 import java.io.BufferedWriter;
 import java.io.File;

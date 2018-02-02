@@ -17,10 +17,7 @@
 package com.seleniumtests.it.stubclasses;
 
 import org.apache.log4j.Logger;
-import org.testng.ITestContext;
-import org.testng.annotations.BeforeSuite;
 
-import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.runner.SeleniumTestPlan;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 

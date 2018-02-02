@@ -21,7 +21,7 @@ import org.openqa.selenium.safari.SafariDriver;
 import org.openqa.selenium.safari.SafariOptions;
 
 import com.seleniumtests.driver.DriverConfig;
-import com.seleniumtests.reporter.TestLogging;
+import com.seleniumtests.reporter.logger.TestLogging;
 
 public class SafariDriverFactory extends AbstractWebDriverFactory implements IWebDriverFactory {
 

@@ -16,6 +16,7 @@
  */
 package com.seleniumtests.core.runner;
 
+import cucumber.api.testng.AbstractTestNGCucumberTests;
 import cucumber.runtime.model.CucumberScenario;
 
 /**

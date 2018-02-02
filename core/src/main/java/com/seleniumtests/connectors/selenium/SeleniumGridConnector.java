@@ -18,7 +18,7 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.SessionId;
 
 import com.seleniumtests.customexception.ConfigurationException;
-import com.seleniumtests.reporter.TestLogging;
+import com.seleniumtests.reporter.logger.TestLogging;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
 public class SeleniumGridConnector {

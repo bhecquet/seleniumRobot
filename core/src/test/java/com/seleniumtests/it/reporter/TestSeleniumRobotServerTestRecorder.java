@@ -21,7 +21,7 @@ import org.testng.annotations.Test;
 
 import com.seleniumtests.connectors.selenium.SeleniumRobotSnapshotServerConnector;
 import com.seleniumtests.customexception.SeleniumRobotServerException;
-import com.seleniumtests.reporter.SeleniumRobotServerTestRecorder;
+import com.seleniumtests.reporter.reporters.SeleniumRobotServerTestRecorder;
 
 @PrepareForTest({SeleniumRobotSnapshotServerConnector.class, SeleniumRobotServerTestRecorder.class})
 public class TestSeleniumRobotServerTestRecorder extends ReporterTest {

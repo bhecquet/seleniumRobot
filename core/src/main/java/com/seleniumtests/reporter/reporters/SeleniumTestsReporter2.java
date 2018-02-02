@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.seleniumtests.reporter;
+package com.seleniumtests.reporter.reporters;
 
 import java.io.File;
 import java.io.IOException;
@@ -51,6 +51,9 @@ import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.SeleniumTestsPageListener;
 import com.seleniumtests.driver.DriverMode;
 import com.seleniumtests.driver.TestType;
+import com.seleniumtests.reporter.PluginsHelper;
+import com.seleniumtests.reporter.logger.TestLogging;
+import com.seleniumtests.reporter.logger.TestStep;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
 /**

@@ -19,7 +19,7 @@ package com.seleniumtests.core.testretry;
 import org.testng.IRetryAnalyzer;
 import org.testng.ITestResult;
 
-import com.seleniumtests.reporter.TestLogging;
+import com.seleniumtests.reporter.logger.TestLogging;
 
 public class TestRetryAnalyzer implements IRetryAnalyzer {
 

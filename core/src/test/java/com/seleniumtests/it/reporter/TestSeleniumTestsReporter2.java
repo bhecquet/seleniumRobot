@@ -35,7 +35,7 @@ import org.testng.annotations.Test;
 import org.testng.xml.XmlSuite;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
-import com.seleniumtests.reporter.SeleniumTestsReporter2;
+import com.seleniumtests.reporter.reporters.SeleniumTestsReporter2;
 
 public class TestSeleniumTestsReporter2 extends ReporterTest {
 	
@@ -350,6 +350,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		
 		Assert.assertTrue(detailedReportContent.contains("<li>sendKeys on TextFieldElement Text, by={By.id: text2} with args: (true, true, [a text,])</li>"));
 		Assert.assertTrue(detailedReportContent.contains("<li>click on ButtonElement Reset, by={By.id: button2} </li>"));
+		Assert.assertTrue(detailedReportContent.contains("<div class=\"message-snapshot\">Output: Current Window: Test page: <a href="));
 		
 		// check that only on reference to 'click' is present for this buttonelement. This means that only the replayed action has been logged, not the ButtonElement.click() one
 		Assert.assertEquals(StringUtils.countMatches(detailedReportContent, "click on"), 1);

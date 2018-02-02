@@ -10,7 +10,7 @@ import org.testng.annotations.Listeners;
 import com.seleniumtests.core.TestTasks;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
-@Listeners({com.seleniumtests.reporter.ReporterControler.class,
+@Listeners({com.seleniumtests.reporter.reporters.ReporterControler.class,
 	com.seleniumtests.core.runner.SeleniumRobotTestListener.class
 	})
 public class SeleniumRobotTestPlan {
