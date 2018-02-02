@@ -178,7 +178,7 @@ Inside your PageObject:
 
 The drawbak of this method is that browser MUST have the focus and thus no other test should be executed at the same time because we are sending keyboard actions outside of selenium
 
-### 111 Write custom reports ###
+### 11 Write custom reports ###
 
 Through `customTestReports` and `customSummaryReports`, you can add or replace some of the reports SeleniumRobot generates
 
@@ -209,4 +209,9 @@ One file is generated for the overall session. Name is `<prefix>.<extension>`
 - `fail`: number of failed tests during session
 - `skip`: number of skip tests during session
 - `total`: number of tests during session
+
+### 12 Monitor error level ###
+
+If you have a script file (shell / batch / ...), and want to know if test went wrong or not, you can look at error level `echo %errorlevel%` for batch and `$?` for shell
+
 
