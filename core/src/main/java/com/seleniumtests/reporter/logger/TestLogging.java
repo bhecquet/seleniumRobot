@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.seleniumtests.reporter;
+package com.seleniumtests.reporter.logger;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -27,7 +27,7 @@ import org.testng.ITestResult;
 import org.testng.Reporter;
 
 import com.seleniumtests.driver.screenshots.ScreenShot;
-import com.seleniumtests.reporter.TestMessage.MessageType;
+import com.seleniumtests.reporter.logger.TestMessage.MessageType;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
 /**
@@ -40,9 +40,6 @@ public class TestLogging {
 	private static Map<Thread, TestStep> parentTestStep = Collections.synchronizedMap(new HashMap<>());
 	private static Map<Thread, ITestResult> currentTestResult = Collections.synchronizedMap(new HashMap<>());
 	private static Logger logger = SeleniumRobotLogger.getLogger(TestLogging.class);
-	
-	public static final String OUTPUT_PATTERN = "Output: ";
-	public static final String SNAPSHOT_PATTERN = "Application Snapshot";
 	
 	private TestLogging() {
 		// As a utility class, it is not meant to be instantiated.
@@ -108,13 +105,8 @@ public class TestLogging {
      * @param  failed
      */
     public static void logScreenshot(final ScreenShot screenshot) {
-    	String screenshotString = TestLogging.buildScreenshotLog(screenshot);
-    	String message = screenshot.getTitle() + ": " + screenshotString;
-        logMessage(OUTPUT_PATTERN + message, MessageType.SNAPSHOT);
-        
-        // store snapshot path to step
-        if (getParentTestStep() != null) {
-    		getParentTestStep().setSnapshot(screenshot.getImagePath());
+    	if (getParentTestStep() != null) {
+    		getParentTestStep().addSnapshot(new Snapshot(screenshot));
     	}
     }
     
@@ -144,33 +136,6 @@ public class TestLogging {
     		TestLogging.setCurrentRootTestStep(null);
 			TestLogging.setParentTestStep(null);
     	}
-    }
-
-    /**
-     * Log Screenshot method
-     * Return: screenshot message with links
-     *
-     * @param  screenShot
-     * 
-     * @return String
-     */
-    public static String buildScreenshotLog(final ScreenShot screenShot) {
-        StringBuilder sbMessage = new StringBuilder("");
-        if (screenShot.getLocation() != null) {
-            sbMessage.append("<a href='" + screenShot.getLocation() + "' target=url>Application URL</a>");
-        }
-
-        if (screenShot.getHtmlSourcePath() != null) {
-            sbMessage.append(" | <a href='" + screenShot.getHtmlSourcePath()
-                    + "' target=html>Application HTML Source</a>");
-        }
-
-        if (screenShot.getImagePath() != null) {
-            sbMessage.append(" | <a href='" + screenShot.getImagePath()
-                    + "' class='lightbox'>" + SNAPSHOT_PATTERN + "</a>");
-        }
-
-        return sbMessage.toString();
     }
 
 	public static void setCurrentRootTestStep(TestStep testStep) {

@@ -48,7 +48,7 @@ import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.DriverMode;
 import com.seleniumtests.driver.TestType;
 import com.seleniumtests.reporter.PluginsHelper;
-import com.seleniumtests.reporter.ReportInfo;
+import com.seleniumtests.reporter.reporters.ReportInfo;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 import com.seleniumtests.util.osutility.OSUtility;
 

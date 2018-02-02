@@ -30,7 +30,7 @@ import org.testng.annotations.Test;
 
 import com.seleniumtests.MockitoTest;
 import com.seleniumtests.connectors.selenium.SeleniumGridConnector;
-import com.seleniumtests.reporter.TestLogging;
+import com.seleniumtests.reporter.logger.TestLogging;
 
 
 @PrepareForTest({HttpClients.class, TestLogging.class})

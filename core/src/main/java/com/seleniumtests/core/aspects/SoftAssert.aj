@@ -22,7 +22,7 @@ import org.aspectj.lang.annotation.Aspect;
 import org.testng.Reporter;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
-import com.seleniumtests.reporter.TestLogging;
+import com.seleniumtests.reporter.logger.TestLogging;
 
 @Aspect
 public class SoftAssert {

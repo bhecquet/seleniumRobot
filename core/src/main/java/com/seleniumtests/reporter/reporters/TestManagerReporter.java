@@ -1,4 +1,4 @@
-package com.seleniumtests.reporter;
+package com.seleniumtests.reporter.reporters;
 
 import java.util.List;
 

@@ -33,8 +33,6 @@ import com.seleniumtests.MockitoTest;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.runner.SeleniumRobotTestListener;
 
-import junit.framework.TestListener;
-
 public class TestSeleniumTestsReporter extends MockitoTest {
 	
 	@Mock

@@ -33,9 +33,9 @@ import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.runner.SeleniumRobotTestPlan;
 import com.seleniumtests.customexception.DriverExceptions;
 import com.seleniumtests.driver.WebUIDriver;
-import com.seleniumtests.reporter.TestAction;
-import com.seleniumtests.reporter.TestLogging;
-import com.seleniumtests.reporter.TestStep;
+import com.seleniumtests.reporter.logger.TestAction;
+import com.seleniumtests.reporter.logger.TestLogging;
+import com.seleniumtests.reporter.logger.TestStep;
 
 public class TestLogActions extends GenericTest {
 	

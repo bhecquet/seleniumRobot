@@ -16,7 +16,6 @@
  */
 package com.seleniumtests.uipage.aspects;
 
-import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -34,8 +33,8 @@ import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.DatasetException;
 import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.driver.WebUIDriver;
-import com.seleniumtests.reporter.TestAction;
-import com.seleniumtests.reporter.TestLogging;
+import com.seleniumtests.reporter.logger.TestAction;
+import com.seleniumtests.reporter.logger.TestLogging;
 import com.seleniumtests.uipage.htmlelements.HtmlElement;
 import com.seleniumtests.util.helper.WaitHelper;
 

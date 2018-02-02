@@ -29,7 +29,7 @@ import org.openqa.selenium.firefox.GeckoDriverService;
 import com.seleniumtests.browserfactory.customprofile.FireFoxProfileMarker;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.DriverConfig;
-import com.seleniumtests.reporter.TestLogging;
+import com.seleniumtests.reporter.logger.TestLogging;
 import com.seleniumtests.util.FileUtility;
 
 public class FirefoxCapabilitiesFactory extends IDesktopCapabilityFactory {

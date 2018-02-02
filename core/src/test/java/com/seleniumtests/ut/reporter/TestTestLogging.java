@@ -24,10 +24,11 @@ import org.testng.internal.TestResult;
 
 import com.seleniumtests.GenericTest;
 import com.seleniumtests.driver.screenshots.ScreenShot;
-import com.seleniumtests.reporter.TestLogging;
-import com.seleniumtests.reporter.TestMessage;
-import com.seleniumtests.reporter.TestMessage.MessageType;
-import com.seleniumtests.reporter.TestStep;
+import com.seleniumtests.reporter.logger.Snapshot;
+import com.seleniumtests.reporter.logger.TestLogging;
+import com.seleniumtests.reporter.logger.TestMessage;
+import com.seleniumtests.reporter.logger.TestMessage.MessageType;
+import com.seleniumtests.reporter.logger.TestStep;
 
 public class TestTestLogging extends GenericTest {
 
@@ -70,7 +71,7 @@ public class TestTestLogging extends GenericTest {
 	public void testLogScreenshotOk() {
 		TestLogging.setCurrentRootTestStep(new TestStep("step"));
 		TestLogging.logScreenshot(new ScreenShot());
-		Assert.assertEquals(((TestMessage)(TestLogging.getParentTestStep().getStepActions().get(0))).getMessageType(), MessageType.SNAPSHOT);
+		Assert.assertEquals(TestLogging.getParentTestStep().getSnapshots().size(), 1);
 	}
 	
 	@Test(groups={"ut"})
@@ -90,14 +91,16 @@ public class TestTestLogging extends GenericTest {
 		screenshot.setLocation("http://location");
 		screenshot.setHtmlSourcePath("file.html");
 		screenshot.setImagePath("file.png");
-		String screenshotStr = TestLogging.buildScreenshotLog(screenshot);
+		Snapshot snapshotLogger = new Snapshot(screenshot);
+		String screenshotStr = snapshotLogger.buildScreenshotLog();
 		Assert.assertEquals(screenshotStr, "<a href='http://location' target=url>Application URL</a> | <a href='file.html' target=html>Application HTML Source</a> | <a href='file.png' class='lightbox'>Application Snapshot</a>");
 	}
 	
 	@Test(groups={"ut"})
 	public void testBuildScreenshotStringWithoutInfo() {
 		ScreenShot screenshot = new ScreenShot();
-		String screenshotStr = TestLogging.buildScreenshotLog(screenshot);
+		Snapshot snapshotLogger = new Snapshot(screenshot);
+		String screenshotStr = snapshotLogger.buildScreenshotLog();
 		Assert.assertEquals(screenshotStr, "");
 	}
 	
@@ -106,7 +109,8 @@ public class TestTestLogging extends GenericTest {
 		ScreenShot screenshot = new ScreenShot();
 		screenshot.setLocation("http://location");
 		screenshot.setHtmlSourcePath("file.html");
-		String screenshotStr = TestLogging.buildScreenshotLog(screenshot);
+		Snapshot snapshotLogger = new Snapshot(screenshot);
+		String screenshotStr = snapshotLogger.buildScreenshotLog();
 		Assert.assertEquals(screenshotStr, "<a href='http://location' target=url>Application URL</a> | <a href='file.html' target=html>Application HTML Source</a>");
 	}
 	
@@ -115,7 +119,8 @@ public class TestTestLogging extends GenericTest {
 		ScreenShot screenshot = new ScreenShot();
 		screenshot.setLocation("http://location");
 		screenshot.setImagePath("file.png");
-		String screenshotStr = TestLogging.buildScreenshotLog(screenshot);
+		Snapshot snapshotLogger = new Snapshot(screenshot);
+		String screenshotStr = snapshotLogger.buildScreenshotLog();
 		Assert.assertEquals(screenshotStr, "<a href='http://location' target=url>Application URL</a> | <a href='file.png' class='lightbox'>Application Snapshot</a>");
 	}
 	
@@ -124,7 +129,8 @@ public class TestTestLogging extends GenericTest {
 		ScreenShot screenshot = new ScreenShot();
 		screenshot.setHtmlSourcePath("file.html");
 		screenshot.setImagePath("file.png");
-		String screenshotStr = TestLogging.buildScreenshotLog(screenshot);
+		Snapshot snapshotLogger = new Snapshot(screenshot);
+		String screenshotStr = snapshotLogger.buildScreenshotLog();
 		Assert.assertEquals(screenshotStr, " | <a href='file.html' target=html>Application HTML Source</a> | <a href='file.png' class='lightbox'>Application Snapshot</a>");
 	}
 }

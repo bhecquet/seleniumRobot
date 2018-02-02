@@ -21,10 +21,10 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import com.seleniumtests.GenericTest;
-import com.seleniumtests.reporter.TestAction;
-import com.seleniumtests.reporter.TestMessage;
-import com.seleniumtests.reporter.TestStep;
-import com.seleniumtests.reporter.TestMessage.MessageType;
+import com.seleniumtests.reporter.logger.TestAction;
+import com.seleniumtests.reporter.logger.TestMessage;
+import com.seleniumtests.reporter.logger.TestMessage.MessageType;
+import com.seleniumtests.reporter.logger.TestStep;
 
 public class TestTestStep extends GenericTest {
 

@@ -43,7 +43,7 @@ import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.DriverMode;
-import com.seleniumtests.reporter.ReportInfo;
+import com.seleniumtests.reporter.reporters.ReportInfo;
 
 /**
  * Test parsing of test options into SeleniumTestContext

@@ -7,7 +7,6 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.DriverConfig;
 
-import io.appium.java_client.remote.AndroidMobileCapabilityType;
 import io.appium.java_client.remote.MobileCapabilityType;
 
 public abstract class IMobileCapabilityFactory extends ICapabilitiesFactory {

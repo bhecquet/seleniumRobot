@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.seleniumtests.reporter;
+package com.seleniumtests.reporter.logger;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -22,6 +22,8 @@ import java.util.List;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+
+import com.seleniumtests.reporter.reporters.CommonReporter;
 
 /**
  * Group of test actions
@@ -45,11 +47,12 @@ public class TestStep extends TestAction {
 	private List<TestAction> stepActions;
 	private Long duration;
 	private Date startDate;
-	private String snapshot; // store at most 1 snapshot. It will be the last one if more than one are recorded
+	private List<Snapshot> snapshots;
 	
 	public TestStep(String name) {
 		super(name, false);
 		stepActions = new ArrayList<>();
+		snapshots = new ArrayList<>();
 		duration = 0L;
 		startDate = new Date();
 	}
@@ -108,6 +111,9 @@ public class TestStep extends TestAction {
 	public void addStep(TestStep step) {
 		stepActions.add(step);
 	}
+	public void addSnapshot(Snapshot snapshot) {
+		snapshots.add(snapshot);
+	}
 	
 	@Override
 	public String toString() {
@@ -134,16 +140,12 @@ public class TestStep extends TestAction {
 		return stepJSon;
 	}
 
-	public String getSnapshot() {
-		return snapshot;
-	}
-
-	public void setSnapshot(String snapshot) {
-		this.snapshot = snapshot;
-	}
-
 	public Date getStartDate() {
 		return startDate;
+	}
+
+	public List<Snapshot> getSnapshots() {
+		return snapshots;
 	}
 	
 	

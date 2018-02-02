@@ -22,11 +22,12 @@ import org.testng.annotations.Test;
 
 import com.seleniumtests.customexception.DriverExceptions;
 import com.seleniumtests.driver.screenshots.ScreenShot;
-import com.seleniumtests.reporter.TestAction;
-import com.seleniumtests.reporter.TestLogging;
-import com.seleniumtests.reporter.TestMessage;
-import com.seleniumtests.reporter.TestMessage.MessageType;
-import com.seleniumtests.reporter.TestStep;
+import com.seleniumtests.reporter.logger.Snapshot;
+import com.seleniumtests.reporter.logger.TestAction;
+import com.seleniumtests.reporter.logger.TestLogging;
+import com.seleniumtests.reporter.logger.TestMessage;
+import com.seleniumtests.reporter.logger.TestMessage.MessageType;
+import com.seleniumtests.reporter.logger.TestStep;
 import com.seleniumtests.util.helper.WaitHelper;
 
 public class StubTestClass extends StubParentClass {
@@ -41,8 +42,7 @@ public class StubTestClass extends StubParentClass {
 		
 		ScreenShot screenshot = new ScreenShot();
 		screenshot.setImagePath("screenshots/image.png");
-		step1.setSnapshot("screenshots/image.png");
-		step1.addMessage(new TestMessage(TestLogging.OUTPUT_PATTERN + TestLogging.buildScreenshotLog(screenshot), MessageType.INFO));
+		step1.addSnapshot(new Snapshot(screenshot));
 		step1.setActionException(new WebDriverException("driver exception"));
 		TestStep subStep1 = new TestStep("step 1.3: open page");
 		subStep1.addAction(new TestAction("click link", false));
