@@ -42,7 +42,7 @@ public class StubTestClass extends StubParentClass {
 		
 		ScreenShot screenshot = new ScreenShot();
 		screenshot.setImagePath("screenshots/image.png");
-		step1.addSnapshot(new Snapshot(screenshot));
+		step1.addSnapshot(new Snapshot(screenshot), 1);
 		step1.setActionException(new WebDriverException("driver exception"));
 		TestStep subStep1 = new TestStep("step 1.3: open page", TestLogging.getCurrentTestResult());
 		subStep1.addAction(new TestAction("click link", false));

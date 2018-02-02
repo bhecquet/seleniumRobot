@@ -278,13 +278,13 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 				"<ul>"													// root step
 					+ "<li>click button</li>"
 					+ "<li>sendKeys to text field</li>"
-					+ "<div class=\"message-info\">Output:  | <a href='screenshots/image.png' class='lightbox'>Application Snapshot</a></div>"
 					+ "<li>step 1.3: open page</li>"					// sub-step
 					+ "<ul>"
 						+ "<li>click link</li>"							// action in sub step
 						+ "<div class=\"message-log\">a message</div>"	// message in sub step
 						+ "<li>sendKeys to password field</li>"			// action in sub step
-					+ "</ul>"
+					+ "</ul>" 
+					+ "<div class=\"message-snapshot\">Output: null:  | <a href='screenshots/image.png' class='lightbox'>Application Snapshot</a></div>"
 				+ "</ul>"));
 		
 	}
@@ -401,6 +401,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		Assert.assertTrue(detailedReportContent.matches(".*<div class=\"message-error\"><div>class java.lang.AssertionError: error</div>"
 								+ "<div class=\"stack-element\"></div>"
 								+ "<div class=\"stack-element\">at com.seleniumtests.it.stubclasses.StubTestClass.testInError\\(StubTestClass.java:\\d+\\)</div>"
+								+ "<div class=\"stack-element\">at com.seleniumtests.it.reporter.ReporterTest.executeSubTest\\(ReporterTest.java:\\d+\\)</div>"
 								+ "<div class=\"stack-element\">at com.seleniumtests.it.reporter.ReporterTest.executeSubTest\\(ReporterTest.java:\\d+\\)</div>"
 								+ "<div class=\"stack-element\">at com.seleniumtests.it.reporter.ReporterTest.executeSubTest\\(ReporterTest.java:\\d+\\)</div>"
 								+ "<div class=\"stack-element\">at com.seleniumtests.it.reporter.TestSeleniumTestsReporter2.testReportDetailsWithErrors\\(TestSeleniumTestsReporter2.java:\\d+\\)</div>.*"));

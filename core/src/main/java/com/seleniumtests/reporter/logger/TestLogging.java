@@ -118,7 +118,7 @@ public class TestLogging {
      */
     public static void logScreenshot(final ScreenShot screenshot) {
     	if (getParentTestStep() != null) {
-    		getParentTestStep().addSnapshot(new Snapshot(screenshot));
+    		getParentTestStep().addSnapshot(new Snapshot(screenshot), testsSteps.get(getCurrentTestResult()).size());
     	}
     }
     
