@@ -64,11 +64,13 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
     }
 
 	@Override
-	public void onTestStart(ITestResult result) {	
+	public void onTestStart(ITestResult result) {
+		// nothing to do
 	}
 
 	@Override
 	public void onTestSuccess(ITestResult result) {
+		// nothing to do
 	}
 
 	@Override
@@ -93,13 +95,13 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 
 	@Override
 	public void onTestSkipped(ITestResult result) {
-		// TODO Auto-generated method stub
+		// nothing to do
 		
 	}
 
 	@Override
 	public void onTestFailedButWithinSuccessPercentage(ITestResult result) {
-		// TODO Auto-generated method stub
+		// nothing to do
 		
 	}
 
@@ -131,13 +133,12 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 
 	@Override
 	public void beforeInvocation(IInvokedMethod method, ITestResult testResult) {
-		
-		
+		// nothing to do
 	}
 
 	@Override
 	public void afterInvocation(IInvokedMethod method, ITestResult testResult) {
-		
+		// nothing to do
 	}
 
 	@Override

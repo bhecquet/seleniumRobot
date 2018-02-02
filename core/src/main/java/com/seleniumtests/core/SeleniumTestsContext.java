@@ -133,6 +133,7 @@ public class SeleniumTestsContext {
     public static final String DEFAULT_OUTPUT_DIRECTORY = "defaultOutputDirectory";    // folder where TestNG would write it's results if not overwritten
     public static final String CUSTOM_TEST_REPORTS = "customTestReports";
     public static final String CUSTOM_SUMMARY_REPORTS = "customSummaryReports";
+    public static final String ARCHIVE_TO_FILE = "archiveToFile";				// path to the file where archive will be done. If null, results are not archived
     public static final String WEB_DRIVER_LISTENER = "webDriverListener";
 
     public static final String TEST_METHOD_SIGNATURE = "testMethodSignature";
@@ -293,6 +294,7 @@ public class SeleniumTestsContext {
         
         setCustomTestReports(getValueForTest(CUSTOM_TEST_REPORTS, System.getProperty(CUSTOM_TEST_REPORTS)));
         setCustomSummaryReports(getValueForTest(CUSTOM_SUMMARY_REPORTS, System.getProperty(CUSTOM_SUMMARY_REPORTS)));
+        setArchiveToFile(getValueForTest(ARCHIVE_TO_FILE, System.getProperty(ARCHIVE_TO_FILE)));
         
         setViewPortWidth(getIntValueForTest(VIEWPORT_WIDTH, System.getProperty(VIEWPORT_WIDTH)));
         setViewPortHeight(getIntValueForTest(VIEWPORT_HEIGHT, System.getProperty(VIEWPORT_HEIGHT)));
@@ -711,6 +713,10 @@ public class SeleniumTestsContext {
     	return (List<ReportInfo>) getAttribute(CUSTOM_SUMMARY_REPORTS);
     }
     
+    public String getArchiveToFile() {
+    	return (String) getAttribute(ARCHIVE_TO_FILE);
+    }
+    
     public String getTestDataFile() {
         return (String) getAttribute(TEST_DATA_FILE);
     }
@@ -1123,6 +1129,17 @@ public class SeleniumTestsContext {
     	} else {
     		setAttribute(REPLAY_TIME_OUT, REPLAY_TIME_OUT_VALUE);
     	}
+    }
+    
+    public void setArchiveToFile(String filePath) {
+    	if (filePath != null) {
+    		if (!filePath.endsWith(".zip")) {
+    			throw new ConfigurationException("You must specify a zip file");
+    		}
+    		new File(filePath).getParentFile().mkdirs();
+
+    	}
+    	setAttribute(ARCHIVE_TO_FILE, filePath);
     }
     
     public void setSeleniumRobotServerUrl(String url) {

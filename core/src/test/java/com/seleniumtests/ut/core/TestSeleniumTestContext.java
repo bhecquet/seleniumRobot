@@ -20,6 +20,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
 import org.mockito.Mock;
@@ -789,7 +790,25 @@ public class TestSeleniumTestContext extends MockitoTest {
 		Assert.assertEquals(reportInfos.get(0).getPrefix(), "results");
 	}
 
-	
+	@Test(groups="ut context")
+	public void testArchiveToFile(final ITestContext testNGCtx, final XmlTest xmlTest) throws IOException {
+		initThreadContext(testNGCtx);
+		File archive = File.createTempFile("archive", ".zip");
+		SeleniumTestsContextManager.getThreadContext().setArchiveToFile(archive.getAbsolutePath());
+		Assert.assertTrue(SeleniumTestsContextManager.getThreadContext().getArchiveToFile().equals(archive.getAbsolutePath()));
+	}
+	@Test(groups="ut context", expectedExceptions=ConfigurationException.class)
+	public void testArchiveToTarFile(final ITestContext testNGCtx, final XmlTest xmlTest) throws IOException {
+		initThreadContext(testNGCtx);
+		File archive = File.createTempFile("archive", ".tar");
+		SeleniumTestsContextManager.getThreadContext().setArchiveToFile(archive.getAbsolutePath());
+	}
+	@Test(groups="ut context")
+	public void testArchiveToFileNull(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setArchiveToFile(null);
+		Assert.assertNull(SeleniumTestsContextManager.getThreadContext().getArchiveToFile());
+	}
 	
 	/**
 	 * Proxy type is set to "direct" in config.ini. check that this value is taken

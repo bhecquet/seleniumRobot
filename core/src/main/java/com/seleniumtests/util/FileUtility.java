@@ -41,6 +41,7 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
+import org.zeroturnaround.zip.ZipUtil;
 
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 import com.seleniumtests.util.osutility.OSUtility;
@@ -219,5 +220,9 @@ public class FileUtility {
             }
         }
         return outputFolder;
+    }
+    
+    public static void zipFolder(final File folder, final File destZipFile) {
+    	ZipUtil.pack(folder, destZipFile);
     }
 }
