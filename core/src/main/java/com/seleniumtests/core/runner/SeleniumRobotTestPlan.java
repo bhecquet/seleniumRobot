@@ -7,19 +7,10 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.testng.annotations.Listeners;
 
-import com.seleniumtests.connectors.selenium.SeleniumGridConnector;
-import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.TestTasks;
-import com.seleniumtests.driver.DriverMode;
-import com.seleniumtests.uipage.PageObject;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
-import com.seleniumtests.util.osutility.OSUtilityFactory;
 
-@Listeners({com.seleniumtests.reporter.SeleniumTestsReporter2.class, 
-	com.seleniumtests.reporter.CustomReporter.class,
-	com.seleniumtests.reporter.SeleniumRobotServerTestRecorder.class,
-	com.seleniumtests.reporter.TestManagerReporter.class,
-//	com.seleniumtests.reporter.JsonReporter.class,
+@Listeners({com.seleniumtests.reporter.ReporterControler.class,
 	com.seleniumtests.core.runner.SeleniumRobotTestListener.class
 	})
 public class SeleniumRobotTestPlan {

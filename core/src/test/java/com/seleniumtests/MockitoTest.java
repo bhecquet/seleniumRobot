@@ -40,10 +40,7 @@ public class MockitoTest  extends PowerMockTestCase {
 	@BeforeMethod(groups={"ut", "it"})  
 	public void beforeMethod(final ITestContext testNGCtx) throws Exception {
 		beforePowerMockTestMethod();
-		SeleniumTestsContextManager.initGlobalContext(testNGCtx);
 		initThreadContext(testNGCtx);
-		SeleniumTestsContextManager.getThreadContext().setSoftAssertEnabled(false);
-		SeleniumTestsContextManager.getGlobalContext().setSoftAssertEnabled(false);
 		MockitoAnnotations.initMocks(this); 
 	}
 	

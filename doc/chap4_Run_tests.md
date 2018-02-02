@@ -91,6 +91,7 @@ In this case, this user passed value will overwrite test or suite parameters
 | overrideSeleniumNativeAction      | false | intercept driver.findElement and driver.frame operations so that seleniumRobot element operations can be use (replay, error handling, ...) even when using standard selenium code. Only findElement(By) and findElements(By) are supported, not findElementByxxx(String). Logging is also better |
 | customTestReports			| PERF::xml::reporter/templates/report.perf.vm | With this option, you can specify which files will be generated for each test. By default, it's the JMeter report. Format is a comma seperated list of <prefix>::<extension>::<template_file located in resources>. resources can be those from test application. Template is in the Velocity format |
 | customSummaryReports		| results::json::reporter/templates/report.summary.json.vm | With this option, you can specify which files will be generated for sumarizing test session. By default, it's a json report. Format is a comma seperated list of <prefix>::<extension>::<template_file located in resources>. resources can be those from test application. Template is in the Velocity format |
+| archiveToFile				| null		| If not specified, no archiving will be done. Else, provide a zip file path and the whole content of `outputDirectory` will be zipped to this file |
 
 
 Other parameters, not accepted in XML file but allowed on command line
