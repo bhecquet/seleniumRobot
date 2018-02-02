@@ -112,5 +112,24 @@ public class StringUtility {
 		return false;
 	}
 	
+	/**
+	 * Replace chars that cannot be used for file names 
+	 * @return
+	 */
+	public static String replaceOddCharsFromFileName(String inString) {
+		return inString.replace(" ",  "_")
+				.replace("'", "")
+				.replace("\"", "")
+				.replace("/", "")
+				.replace(" ", "_")
+				.replace(":", "-")
+				.replace("*", ".")
+				.replace("?", ".")
+				.replace("|", "")
+				.replace("<", "-")
+				.replace(">", "-")
+				.replace("\\", "_");
+	}
+	
 	
 }

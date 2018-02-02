@@ -126,7 +126,11 @@ public abstract class CommonReporter {
 	 * @param testResult
 	 * @return
 	 */
-	protected String getTestName(ITestResult testResult) {
+	public static String getTestName(ITestResult testResult) {
+		if (testResult == null) {
+			return "N-A";
+		}
+		
 		if (testResult.getAttribute(SeleniumRobotLogger.METHOD_NAME) != null) {
 			return testResult.getAttribute(SeleniumRobotLogger.METHOD_NAME).toString();
 		}

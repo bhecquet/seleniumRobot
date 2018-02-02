@@ -22,6 +22,7 @@ import java.util.List;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.testng.ITestResult;
 
 import com.seleniumtests.reporter.reporters.CommonReporter;
 
@@ -48,13 +49,15 @@ public class TestStep extends TestAction {
 	private Long duration;
 	private Date startDate;
 	private List<Snapshot> snapshots;
+	private ITestResult testResult;
 	
-	public TestStep(String name) {
+	public TestStep(String name, ITestResult testResult) {
 		super(name, false);
 		stepActions = new ArrayList<>();
 		snapshots = new ArrayList<>();
 		duration = 0L;
 		startDate = new Date();
+		this.testResult = testResult;
 	}
 	
 	public Long getDuration() {
@@ -108,10 +111,16 @@ public class TestStep extends TestAction {
 	public void addMessage(TestMessage action) {
 		stepActions.add(action);
 	}
+	public void addValue(TestValue value) {
+		stepActions.add(value);
+	}
 	public void addStep(TestStep step) {
 		stepActions.add(step);
 	}
 	public void addSnapshot(Snapshot snapshot) {
+		// rename file so that user can easily consult it
+		snapshot.rename(this, snapshots.size() + 1);
+		
 		snapshots.add(snapshot);
 	}
 	
@@ -146,6 +155,10 @@ public class TestStep extends TestAction {
 
 	public List<Snapshot> getSnapshots() {
 		return snapshots;
+	}
+
+	public ITestResult getTestResult() {
+		return testResult;
 	}
 	
 	

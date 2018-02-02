@@ -115,6 +115,18 @@ public class TestLogging {
     }
     
     /**
+     * Log a value associated to a message
+     * @param id		an id referencing value
+     * @param message	a human readable message
+     * @param value		value of the message
+     */
+    public static void logTestValue(String id, String message, String value) {
+    	if (getParentTestStep() != null) {
+    		getParentTestStep().addValue(new TestValue(id, message, value));
+    	}
+    }
+    
+    /**
      * Logs the testStep for this test
      * Once logging is done, parentTestStep and currentRootTestStep are reset to avoid storing new data in them
      * @param testStep

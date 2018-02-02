@@ -16,14 +16,22 @@
  */
 package com.seleniumtests.ut.reporter;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Paths;
+
+import org.apache.commons.io.FileUtils;
 import org.json.JSONObject;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import com.seleniumtests.GenericTest;
+import com.seleniumtests.driver.screenshots.ScreenShot;
+import com.seleniumtests.reporter.logger.Snapshot;
 import com.seleniumtests.reporter.logger.TestAction;
 import com.seleniumtests.reporter.logger.TestMessage;
 import com.seleniumtests.reporter.logger.TestMessage.MessageType;
+import com.seleniumtests.util.HashCodeGenerator;
 import com.seleniumtests.reporter.logger.TestStep;
 
 public class TestTestStep extends GenericTest {
@@ -33,7 +41,7 @@ public class TestTestStep extends GenericTest {
 	 */
 	@Test(groups={"ut"})
 	public void testGetFailedWithActionKo() {
-		TestStep step = new TestStep("step1");
+		TestStep step = new TestStep("step1", null);
 		step.addAction(new TestAction("action1", false));
 		step.addAction(new TestAction("action2", true));
 		Assert.assertTrue(step.getFailed());
@@ -44,7 +52,7 @@ public class TestTestStep extends GenericTest {
 	 */
 	@Test(groups={"ut"})
 	public void testGetFailedWithActionOk() {
-		TestStep step = new TestStep("step1");
+		TestStep step = new TestStep("step1", null);
 		step.addAction(new TestAction("action1", false));
 		step.addAction(new TestAction("action2", false));
 		Assert.assertFalse(step.getFailed());
@@ -55,7 +63,7 @@ public class TestTestStep extends GenericTest {
 	 */
 	@Test(groups={"ut"})
 	public void testGetFailedWithStepKo() {
-		TestStep step = new TestStep("step1");
+		TestStep step = new TestStep("step1", null);
 		step.setFailed(true);
 		step.addAction(new TestAction("action1", false));
 		step.addAction(new TestAction("action2", false));
@@ -67,8 +75,8 @@ public class TestTestStep extends GenericTest {
 	 */
 	@Test(groups={"ut"})
 	public void testGetFailedWithActionSubStepKo() {
-		TestStep step = new TestStep("step1");
-		TestStep subStep = new TestStep("subStep");
+		TestStep step = new TestStep("step1", null);
+		TestStep subStep = new TestStep("subStep", null);
 		subStep.addAction(new TestAction("action1", true));
 		step.addAction(new TestAction("action2", false));
 		step.addAction(subStep);
@@ -80,11 +88,58 @@ public class TestTestStep extends GenericTest {
 	 */
 	@Test(groups={"ut"})
 	public void testGetFailedWithActionSubStepOk() {
-		TestStep step = new TestStep("step1");
-		TestStep subStep = new TestStep("subStep");
+		TestStep step = new TestStep("step1", null);
+		TestStep subStep = new TestStep("subStep", null);
 		subStep.addAction(new TestAction("action1", false));
 		step.addAction(new TestAction("action2", false));
 		Assert.assertFalse(step.getFailed());
+	}
+	
+	/**
+	 * Test that when adding a snapshot to a test step, it's renamed with a name containing test name, step name and index
+	 * @throws IOException
+	 */
+	@Test(groups={"ut"})
+	public void testSnapshotRenaming() throws IOException {
+		TestStep step = new TestStep("step1", null);
+		ScreenShot screenshot = new ScreenShot();
+		
+		File tmpImgFile = File.createTempFile("img", ".png");
+		File tmpHtmlFile = File.createTempFile("html", ".html");
+		
+		screenshot.setOutputDirectory(tmpImgFile.getParent());
+		screenshot.setLocation("http://mysite.com");
+		screenshot.setTitle("mysite");
+		screenshot.setImagePath(tmpImgFile.getName());
+		screenshot.setHtmlSourcePath(tmpHtmlFile.getName());
+		
+		step.addSnapshot(new Snapshot(screenshot));
+		
+		Assert.assertEquals(step.getSnapshots().get(0).getScreenshot().getImagePath(), "N-A-1-step1-" + tmpImgFile.getName());
+		Assert.assertEquals(step.getSnapshots().get(0).getScreenshot().getHtmlSourcePath(), "N-A-1-step1-" + tmpHtmlFile.getName());
+	}
+	@Test(groups={"ut"})
+	public void testSnapshotRenamingWithSubFolder() throws IOException {
+		TestStep step = new TestStep("step1", null);
+		ScreenShot screenshot = new ScreenShot();
+		
+		File tmpImgFile = File.createTempFile("img", ".png");
+		File tmpImgFile2 = Paths.get(tmpImgFile.getParent(), "screenshots", tmpImgFile.getName()).toFile();
+		FileUtils.moveFile(tmpImgFile, tmpImgFile2);
+		File tmpHtmlFile = File.createTempFile("html", ".html");
+		File tmpHtmlFile2 = Paths.get(tmpHtmlFile.getParent(), "htmls", tmpHtmlFile.getName()).toFile();
+		FileUtils.moveFile(tmpHtmlFile, tmpHtmlFile2);
+		
+		screenshot.setOutputDirectory(tmpImgFile.getParent());
+		screenshot.setLocation("http://mysite.com");
+		screenshot.setTitle("mysite");
+		screenshot.setImagePath("screenshots/" + tmpImgFile2.getName());
+		screenshot.setHtmlSourcePath("htmls/" + tmpHtmlFile2.getName());
+		
+		step.addSnapshot(new Snapshot(screenshot));
+		
+		Assert.assertEquals(step.getSnapshots().get(0).getScreenshot().getImagePath(), "screenshots/N-A-1-step1-" + tmpImgFile2.getName());
+		Assert.assertEquals(step.getSnapshots().get(0).getScreenshot().getHtmlSourcePath(), "htmls/N-A-1-step1-" + tmpHtmlFile2.getName());
 	}
 	
 	/**
@@ -92,11 +147,11 @@ public class TestTestStep extends GenericTest {
 	 */
 	@Test(groups={"ut"})
 	public void testToJson() {
-		TestStep step = new TestStep("step1");
+		TestStep step = new TestStep("step1", null);
 		step.addMessage(new TestMessage("everything OK", MessageType.INFO));
 		step.addAction(new TestAction("action2", false));
 		
-		TestStep subStep = new TestStep("subStep");
+		TestStep subStep = new TestStep("subStep", null);
 		subStep.addMessage(new TestMessage("everything in subStep almost OK", MessageType.WARNING));
 		subStep.addAction(new TestAction("action1", false));
 		step.addAction(subStep);

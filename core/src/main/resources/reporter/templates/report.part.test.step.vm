@@ -12,6 +12,19 @@
 			#set ($messageType = "message-" + $messageType)
 			<div class="$messageType">$action.getName()</div>
 			#set ($messageType = "")
+		#elseif (${action.class.name.equals("com.seleniumtests.reporter.logger.TestValue")})
+			<table class="table table-bordered table-condensed">
+				<tr>
+					<th width="15%">Key</td>
+					<th width="60%">Message</td>
+					<th width="25%">Value</td>
+				</tr>
+				<tr>
+					<td>$action.getName()</td>
+					<td>$action.getMessage()</td>
+					<td>$action.getValue()</td>
+				</tr>
+			</table>
 		#else
 			<li>$action.getName()</li>
 	    #end

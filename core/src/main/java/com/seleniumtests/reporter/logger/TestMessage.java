@@ -27,8 +27,7 @@ public class TestMessage extends TestAction {
 		ERROR,
 		WARNING,	// warning message
 		INFO,		// success message
-		LOG,		// neutral message
-		SNAPSHOT	// this is a snapshot message
+		LOG			// neutral message
 	}
 	
 	public TestMessage(String name, MessageType type) {

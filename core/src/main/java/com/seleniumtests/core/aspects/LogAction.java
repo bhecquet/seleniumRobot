@@ -120,7 +120,7 @@ public class LogAction {
 		Object reply = null;
 		
 		String stepName = String.format("%s %s", joinPoint.getSignature().getName(), buildArgString(joinPoint));
-		TestStep currentStep = new TestStep(stepName);
+		TestStep currentStep = new TestStep(stepName, TestLogging.getCurrentTestResult());
 		TestStep previousParent = TestLogging.getParentTestStep();
 		if (TestLogging.getParentTestStep() != null) {
 			TestLogging.getParentTestStep().addStep(currentStep);
@@ -182,7 +182,7 @@ public class LogAction {
 		Object reply = null;
 		boolean rootStep = false;
 		TestStep previousParent = null;
-		TestStep currentStep = new TestStep(buildRootStepName(joinPoint));
+		TestStep currentStep = new TestStep(buildRootStepName(joinPoint), TestLogging.getCurrentTestResult());
 		
 		// check if any root step is already registered (a main step)
 		// happens when using cucumber where a cucumber method can call an other method intercepted by this pointcut
