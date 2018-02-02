@@ -45,10 +45,6 @@ public class TestLogging {
 		// As a utility class, it is not meant to be instantiated.
 	}
     
-    public static Map<ITestResult, List<TestStep>> getTestsSteps() {
-		return testsSteps;
-	}
-    
     /**
      * Write info to logger and current test step
      *
@@ -89,6 +85,22 @@ public class TestLogging {
         logger.info(message);
     }
     
+    /**
+     * Log a value associated to a message
+     * @param id		an id referencing value
+     * @param message	a human readable message
+     * @param value		value of the message
+     */
+    public static void logTestValue(String id, String message, String value) {
+    	if (getParentTestStep() != null) {
+    		getParentTestStep().addValue(new TestValue(id, message, value));
+    	}
+    }
+    
+    // -------------------- Methods below should not be used directly inside test -----------------
+    public static Map<ITestResult, List<TestStep>> getTestsSteps() {
+		return testsSteps;
+	}
     
     private static void logMessage(final String message, final MessageType messageType) {
     	if (getParentTestStep() != null) {
@@ -98,7 +110,7 @@ public class TestLogging {
 
  
     /**
-     * Log Web Output (add "Output:" to the message)
+     * Log screenshot. Should not be directly used inside tests
      *
      * @param  url
      * @param  message
@@ -114,17 +126,7 @@ public class TestLogging {
     	logTestStep(testStep, true);
     }
     
-    /**
-     * Log a value associated to a message
-     * @param id		an id referencing value
-     * @param message	a human readable message
-     * @param value		value of the message
-     */
-    public static void logTestValue(String id, String message, String value) {
-    	if (getParentTestStep() != null) {
-    		getParentTestStep().addValue(new TestValue(id, message, value));
-    	}
-    }
+    
     
     /**
      * Logs the testStep for this test

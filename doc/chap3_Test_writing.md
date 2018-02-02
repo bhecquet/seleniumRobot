@@ -331,6 +331,16 @@ By default, inside a test, checks will be done using TestNG `Assert` class
 On assert failure, test will continue but error will be reported
 If this behaviour is not expected, then use the parameter `softAssertEnabled` and set it to false
 
+#### Log some information ####
+You can make seleniumrobot display some test information in logs
+
+- `TestLogging.info("my message")`: displays a message (green in HTML report)
+- `TestLogging.warning("my warn")`: displays a warning (orange in HTML report)
+- `TestLogging.error("my error")`: displays an error (red in HTML report)
+- `TestLogging.log("my log")`: displays the message without style
+- `TestLogging.logTestValue("key", "my message", "my value")`: stores the key/value pair (displays a table in HTML report)
+
+
 ### 9 Write good tests and Page Objects ###
 
 According to `http://www.slideshare.net/saucelabs/how-to-grade-your-selenium-tests-by-dave-haeffner-sauce-labs-webinar?mkt_tok=eyJpIjoiTlRFeVpUTXdNbVpoTlRNMiIsInQiOiI2UzdLYnBraTczaHU0cUM0Z1FcL2pxOWZEVFhPdWxRa2h0QjJXZFwvK1B2NXRXRnhpWVk4MlFmcGE5eE5Ub3lkUG40UXNES1JENzhHMmExREg4aG9wRTFMZHBSTGdFaWIyeWEzcXpXb1BvTHRVPSJ9`
