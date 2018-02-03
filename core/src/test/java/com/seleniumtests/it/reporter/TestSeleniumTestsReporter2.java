@@ -338,6 +338,10 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	
 	/**
 	 * Check all actions done with driver are correctly displayed. This indirectly test the LogAction aspect
+	 * We check 
+	 * - all HtmlElement action logging
+	 * - all composite actions logging
+	 * - all PictureElement action logging
 	 * 
 	 * @param testContext
 	 * @throws Exception
@@ -361,18 +365,23 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		
 		// read the 'testDriverNativeActions' test result to see if native actions are also logged (overrideSeleniumNativeAction is true)
 		String detailedReportContent2 = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport-2.html"));
-		detailedReportContent = detailedReportContent2.replace("\n", "").replace("\r",  "").replaceAll(">\\s+<", "><");
+		detailedReportContent2 = detailedReportContent2.replace("\n", "").replace("\r",  "").replaceAll(">\\s+<", "><");
 		
 		Assert.assertTrue(detailedReportContent2.contains("<li>sendKeys on HtmlElement , by={By.id: text2} with args: (true, true, [some text,])</li>"));
 		Assert.assertTrue(detailedReportContent2.contains("<li>click on HtmlElement , by={By.id: button2} </li>"));
 		
 		// read the 'testDriverNativeActionsWithoutOverride' test result to see if native actions are not logged (overrideSeleniumNativeAction is false)
 		String detailedReportContent3 = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport-3.html"));
-		detailedReportContent = detailedReportContent3.replace("\n", "").replace("\r",  "").replaceAll(">\\s+<", "><");
+		detailedReportContent3 = detailedReportContent3.replace("\n", "").replace("\r",  "").replaceAll(">\\s+<", "><");
 		
 		Assert.assertFalse(detailedReportContent3.contains("<li>sendKeys on HtmlElement , by={By.id: text2} with args: (true, true, [some text,])</li>"));
 		Assert.assertFalse(detailedReportContent3.contains("<li>click on HtmlElement , by={By.id: button2} </li>"));
 				
+		// check composite actions. We must have the moveToElement, click and sendKeys actions 
+		Assert.assertTrue(detailedReportContent.contains("<ul><li>moveToElement with args: (TextFieldElement Text, by={By.id: text2}, )</li><li>sendKeys with args: ([composite,])</li><li>moveToElement with args: (ButtonElement Reset, by={By.id: button2}, )</li><li>click </li></ul>"));
+		
+		// check PictureElement action is logged
+		Assert.assertTrue(detailedReportContent.contains("<ul><li>clickAt on Picture from resource tu/images/logo_text_field.png with args: (0, -30, )</li><li>moveToElement with args:"));
 	}
 	
 	/**

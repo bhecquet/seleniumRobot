@@ -27,7 +27,9 @@ public class StubTestClassForDriverTest extends StubParentClass {
 		
 		new DriverTestPage(true)
 			._writeSomething()
-			._reset();
+			._reset()
+			._sendKeysComposite()
+			._clickPicture();
 	}
 	
 	/**
