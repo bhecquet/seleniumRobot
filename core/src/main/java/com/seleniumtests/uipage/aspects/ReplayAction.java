@@ -16,7 +16,9 @@
  */
 package com.seleniumtests.uipage.aspects;
 
+import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.annotation.After;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.DeclarePrecedence;
@@ -36,6 +38,7 @@ import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.reporter.logger.TestAction;
 import com.seleniumtests.reporter.logger.TestLogging;
 import com.seleniumtests.uipage.htmlelements.HtmlElement;
+import com.seleniumtests.uipage.htmlelements.PictureElement;
 import com.seleniumtests.util.helper.WaitHelper;
 
 /**
@@ -73,12 +76,16 @@ public class ReplayAction {
     	element.setDriver(WebUIDriver.getWebDriver());
 		String targetName = joinPoint.getTarget().toString();
     	
-    	String actionName = String.format("%s on %s %s", joinPoint.getSignature().getName(), targetName, LogAction.buildArgString(joinPoint));
-		TestAction currentAction = new TestAction(actionName, false);
+		TestAction currentAction = null;
+    	String methodName = joinPoint.getSignature().getName();
+    	if (methodName != "getCoordinates") {
+    		String actionName = String.format("%s on %s %s", methodName, targetName, LogAction.buildArgString(joinPoint));
+    		currentAction = new TestAction(actionName, false);
+    	}
 
 		// log action before its started. By default, it's OK. Then result may be overwritten if step fails
 		// order of steps is the right one (first called is first displayed)
-		if (isHtmlElementDirectlyCalled(Thread.currentThread().getStackTrace()) && TestLogging.getParentTestStep() != null) {
+		if (currentAction != null && isHtmlElementDirectlyCalled(Thread.currentThread().getStackTrace()) && TestLogging.getParentTestStep() != null) {
 			TestLogging.getParentTestStep().addAction(currentAction);
 		}	
 		
@@ -127,7 +134,7 @@ public class ReplayAction {
 			actionFailed = true;
 			throw e;
 		} finally {
-			if (isHtmlElementDirectlyCalled(Thread.currentThread().getStackTrace()) && TestLogging.getParentTestStep() != null) {
+			if (currentAction != null && isHtmlElementDirectlyCalled(Thread.currentThread().getStackTrace()) && TestLogging.getParentTestStep() != null) {
 				currentAction.setFailed(actionFailed);
 			}		
 		}
@@ -146,31 +153,57 @@ public class ReplayAction {
 		long end = systemClock.laterBy(SeleniumTestsContextManager.getThreadContext().getReplayTimeout() * 1000);
 		Object reply = null;
 		
-		while (systemClock.isNowBefore(end)) {
-			
-			try {
-				reply = joinPoint.proceed(joinPoint.getArgs());
-				WaitHelper.waitForMilliSeconds(200);
-				break;
-			} catch (Throwable e) {
-				
-				// do not replay when error comes from test writing or configuration
-				if (e instanceof ScenarioException 
-						|| e instanceof ConfigurationException
-						|| e instanceof DatasetException
-						) {
-					throw e;
-				}
+		String targetName = joinPoint.getTarget().toString();
+		TestAction currentAction = null;
 
-				if (systemClock.isNowBefore(end - 200)) {
-					WaitHelper.waitForMilliSeconds(100);
-					continue;
-				} else {
-					throw e;
-				}
+		if (joinPoint.getTarget() instanceof PictureElement) {
+	    	String methodName = joinPoint.getSignature().getName();
+			String actionName = String.format("%s on %s %s", methodName, targetName, LogAction.buildArgString(joinPoint));
+			currentAction = new TestAction(actionName, false);
+	
+			// log action before its started. By default, it's OK. Then result may be overwritten if step fails
+			// order of steps is the right one (first called is first displayed)
+			if (isHtmlElementDirectlyCalled(Thread.currentThread().getStackTrace()) && TestLogging.getParentTestStep() != null) {
+				TestLogging.getParentTestStep().addAction(currentAction);
 			}
 		}
-		return reply;
+		
+		boolean actionFailed = false;
+		
+		try {
+			while (systemClock.isNowBefore(end)) {
+				
+				try {
+					reply = joinPoint.proceed(joinPoint.getArgs());
+					WaitHelper.waitForMilliSeconds(200);
+					break;
+				} catch (Throwable e) {
+					
+					// do not replay when error comes from test writing or configuration
+					if (e instanceof ScenarioException 
+							|| e instanceof ConfigurationException
+							|| e instanceof DatasetException
+							) {
+						throw e;
+					}
+	
+					if (systemClock.isNowBefore(end - 200)) {
+						WaitHelper.waitForMilliSeconds(100);
+						continue;
+					} else {
+						throw e;
+					}
+				}
+			}
+			return reply;
+		} catch (Throwable e) {
+			actionFailed = true;
+			throw e;
+		} finally {
+			if (currentAction != null && isHtmlElementDirectlyCalled(Thread.currentThread().getStackTrace()) && TestLogging.getParentTestStep() != null) {
+				currentAction.setFailed(actionFailed);
+			}		
+		}
 	}
 	
 	/**

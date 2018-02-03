@@ -17,8 +17,12 @@
 package com.seleniumtests.it.driver.support.pages;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.interactions.Actions;
+import org.testng.Assert;
+import org.testng.SkipException;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.customexception.ImageSearchException;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.uipage.ByC;
 import com.seleniumtests.uipage.PageObject;
@@ -140,6 +144,17 @@ public class DriverTestPage extends PageObject {
     public DriverTestPage _reset() {
     	resetButton.click();
     	return this;
+    }
+    
+    public DriverTestPage _sendKeysComposite() {
+    	new Actions(driver).moveToElement(textElement).sendKeys("composite").build().perform();
+    	new Actions(driver).moveToElement(resetButton).click().build().perform();
+    	return this;
+    }
+    
+    public DriverTestPage _clickPicture() {
+		picture.clickAt(0, -30);
+		return this;
     }
     
     public static String getPageUrl() {

@@ -23,6 +23,7 @@ import java.util.List;
 
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.annotation.After;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
@@ -212,6 +213,21 @@ public class LogAction {
 			}
 		}
 		return reply;
+	}
+	
+
+	/**
+	 * Log composite action when they are declared
+	 * @param joinPoint
+	 */
+	@After("call(public org.openqa.selenium.interactions.Actions org.openqa.selenium.interactions.Actions.* (..))")
+	public void logCompositeAction(JoinPoint joinPoint)  {
+		String actionName = String.format("%s %s", joinPoint.getSignature().getName(), buildArgString(joinPoint));
+		TestAction currentAction = new TestAction(actionName, false);
+		
+		if (TestLogging.getParentTestStep() != null) {
+			TestLogging.getParentTestStep().addAction(currentAction);
+		}
 	}
 	
 	/**
