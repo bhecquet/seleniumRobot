@@ -220,7 +220,8 @@ public class LogAction {
 	 * Log composite action when they are declared
 	 * @param joinPoint
 	 */
-	@After("call(public org.openqa.selenium.interactions.Actions org.openqa.selenium.interactions.Actions.* (..))")
+	@After("this(com.seleniumtests.uipage.PageObject) && " +	
+			"call(public org.openqa.selenium.interactions.Actions org.openqa.selenium.interactions.Actions.* (..))")
 	public void logCompositeAction(JoinPoint joinPoint)  {
 		String actionName = String.format("%s %s", joinPoint.getSignature().getName(), buildArgString(joinPoint));
 		TestAction currentAction = new TestAction(actionName, false);

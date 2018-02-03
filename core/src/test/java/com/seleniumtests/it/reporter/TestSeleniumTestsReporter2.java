@@ -381,7 +381,10 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		Assert.assertTrue(detailedReportContent.contains("<ul><li>moveToElement with args: (TextFieldElement Text, by={By.id: text2}, )</li><li>sendKeys with args: ([composite,])</li><li>moveToElement with args: (ButtonElement Reset, by={By.id: button2}, )</li><li>click </li></ul>"));
 		
 		// check PictureElement action is logged
-		Assert.assertTrue(detailedReportContent.contains("<ul><li>clickAt on Picture from resource tu/images/logo_text_field.png with args: (0, -30, )</li><li>moveToElement with args:"));
+		Assert.assertTrue(detailedReportContent.contains("<ul><li>clickAt on Picture from resource tu/images/logo_text_field.png with args: (0, -30, )</li>"));
+		
+		// check that when logging PictureElement action which uses composite actions, those are not logged
+		Assert.assertTrue(!detailedReportContent.contains("<ul><li>clickAt on Picture from resource tu/images/logo_text_field.png with args: (0, -30, )</li><li>moveToElement with args:"));
 	}
 	
 	/**
