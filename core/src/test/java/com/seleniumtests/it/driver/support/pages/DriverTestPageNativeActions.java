@@ -29,13 +29,19 @@ public class DriverTestPageNativeActions extends PageObject {
     	return this;
     }
     
+    public DriverTestPageNativeActions sendKeysFailed() {
+    	driver.findElement(By.id("text20")).sendKeys("some text");
+    	return this;
+    }
+    
     public DriverTestPageNativeActions reset() {
     	driver.findElement(By.id("button2")).click();
     	return this;
     }
     
-    public void select() {
+    public DriverTestPageNativeActions select() {
     	new Select(driver.findElement(By.id("select"))).selectByVisibleText("option1");
+    	return this;
     }
     
     public WebElement getElement() {

@@ -374,8 +374,14 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		String detailedReportContent3 = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport-3.html"));
 		detailedReportContent3 = detailedReportContent3.replace("\n", "").replace("\r",  "").replaceAll(">\\s+<", "><");
 		
+		// logging is not done via HtmlElement
 		Assert.assertFalse(detailedReportContent3.contains("<li>sendKeys on HtmlElement , by={By.id: text2} with args: (true, true, [some text,])</li>"));
 		Assert.assertFalse(detailedReportContent3.contains("<li>click on HtmlElement , by={By.id: button2} </li>"));
+		
+		// check that without override, native actions are logged
+		Assert.assertTrue(detailedReportContent3.contains("<ul><li>sendKeys on Element located by id: text2 with args: ([some text,])</li></ul>"));
+		Assert.assertTrue(detailedReportContent3.contains("<ul><li>click on Element located by id: button2 </li></ul>"));
+		Assert.assertTrue(detailedReportContent3.contains("<ul><li>selectByVisibleText on Select with args: (option1, )</li></ul>"));
 				
 		// check composite actions. We must have the moveToElement, click and sendKeys actions 
 		Assert.assertTrue(detailedReportContent.contains("<ul><li>moveToElement with args: (TextFieldElement Text, by={By.id: text2}, )</li><li>sendKeys with args: ([composite,])</li><li>moveToElement with args: (ButtonElement Reset, by={By.id: button2}, )</li><li>click </li></ul>"));
@@ -385,6 +391,12 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		
 		// check that when logging PictureElement action which uses composite actions, those are not logged
 		Assert.assertTrue(!detailedReportContent.contains("<ul><li>clickAt on Picture from resource tu/images/logo_text_field.png with args: (0, -30, )</li><li>moveToElement with args:"));
+		
+		// no action is logged when step fails (findElement exception). Ok because logging is done on action, not search 
+		
+		
+		// TODO: spliter ce test en plusieurs 
+		
 	}
 	
 	/**

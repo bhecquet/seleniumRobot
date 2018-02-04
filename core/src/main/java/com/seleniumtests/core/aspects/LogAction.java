@@ -27,6 +27,9 @@ import org.aspectj.lang.annotation.After;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.remote.RemoteWebElement;
+import org.openqa.selenium.support.ui.Select;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.runner.SeleniumRobotTestPlan;
@@ -229,6 +232,52 @@ public class LogAction {
 		if (TestLogging.getParentTestStep() != null) {
 			TestLogging.getParentTestStep().addAction(currentAction);
 		}
+	}
+	
+	/**
+	 * Log native action only when we do not overide them. Else, it' HTMLElement logging which is used
+	 * @param joinPoint
+	 * @return
+	 */
+	@Pointcut("(this(com.seleniumtests.uipage.PageObject) && " +	
+			"(call(public * org.openqa.selenium.WebElement+.* (..))"
+			+ "|| call(public * org.openqa.selenium.support.ui.Select.* (..)))) && if()")
+	public static boolean isNoNativeActionOverride(ProceedingJoinPoint joinPoint) {
+		return !SeleniumTestsContextManager.getThreadContext().getOverrideSeleniumNativeAction();
+	}
+	
+	@Around("isNoNativeActionOverride(joinPoint)")
+	public Object logNativeAction(ProceedingJoinPoint joinPoint) throws Throwable {
+		String targetName = joinPoint.getTarget().toString();
+		if (joinPoint.getTarget() instanceof Select) {
+			targetName = "Select";
+		} else if (targetName.contains("->")) {
+			try {
+				targetName = "Element located by" + targetName.split("->")[1].replace("]", "");
+			} catch (IndexOutOfBoundsException e) {}
+		}
+		boolean actionFailed = false;
+    	String methodName = joinPoint.getSignature().getName();
+		String actionName = String.format("%s on %s %s", methodName, targetName, LogAction.buildArgString(joinPoint));
+		TestAction currentAction = new TestAction(actionName, false);
+    	
+		// log action before its started. By default, it's OK. Then result may be overwritten if step fails
+		// order of steps is the right one (first called is first displayed)
+		if (TestLogging.getParentTestStep() != null) {
+			TestLogging.getParentTestStep().addAction(currentAction);
+		}	
+		
+		try {
+			return joinPoint.proceed(joinPoint.getArgs());
+		} catch (Throwable e) {
+			actionFailed = true;
+			throw e;
+		} finally {
+			if (TestLogging.getParentTestStep() != null) {
+				currentAction.setFailed(actionFailed);
+			}		
+		}
+		
 	}
 	
 	/**
