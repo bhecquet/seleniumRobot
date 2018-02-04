@@ -6,6 +6,10 @@ import org.aspectj.lang.annotation.Aspect;
 import org.openqa.selenium.By;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.core.aspects.LogAction;
+import com.seleniumtests.reporter.logger.TestAction;
+import com.seleniumtests.reporter.logger.TestLogging;
+import com.seleniumtests.reporter.logger.TestStep;
 import com.seleniumtests.uipage.htmlelements.FrameElement;
 import com.seleniumtests.uipage.htmlelements.HtmlElement;
 
@@ -33,7 +37,7 @@ public class SeleniumNativeActions {
 		if (doOverride()) {
 			return new HtmlElement("", (By)(joinPoint.getArgs()[0]), currentFrame);
 		} else {
-			return joinPoint.proceed(joinPoint.getArgs());
+			return joinPoint.proceed(joinPoint.getArgs());			
 		}
 	}
 	

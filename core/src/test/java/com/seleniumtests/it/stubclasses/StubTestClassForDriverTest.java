@@ -40,7 +40,8 @@ public class StubTestClassForDriverTest extends StubParentClass {
 	public void testDriverNativeActions() throws Exception {
 		new DriverTestPageNativeActions(true)
 		.sendKeys()
-		.reset();
+		.reset()
+		.select();
 	}
 	
 	/**
@@ -50,8 +51,12 @@ public class StubTestClassForDriverTest extends StubParentClass {
 	@Test(groups="stub")
 	public void testDriverNativeActionsWithoutOverride() throws Exception {
 		SeleniumTestsContextManager.getThreadContext().setOverrideSeleniumNativeAction(false);
+		SeleniumTestsContextManager.getThreadContext().setReplayTimeout(1);
+		SeleniumTestsContextManager.getThreadContext().setImplicitWaitTimeout(1);
+		
 		new DriverTestPageNativeActions(true)
 		.sendKeys()
-		.reset();
+		.reset()
+		.select();
 	}
 }
