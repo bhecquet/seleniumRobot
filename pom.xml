@@ -5,7 +5,7 @@
 
 	<groupId>com.infotel.seleniumRobot</groupId>
 	<artifactId>core-parent</artifactId>
-	<version>3.6.1-SNAPSHOT</version>
+	<version>3.6.1</version>
 	<packaging>pom</packaging>
 
 	<name>selenium robot</name>
@@ -32,7 +32,7 @@
 		<connection>scm:git:git@github.com:bhecquet/seleniumRobot.git</connection>
 		<developerConnection>scm:git:git@github.com:bhecquet/seleniumRobot.git</developerConnection>
 		<url>git@github.com:bhecquet/seleniumRobot.git</url>
-		<tag>HEAD</tag>
+		<tag>core-parent-3.6.1</tag>
 	</scm>
 
 	<distributionManagement>
@@ -132,6 +132,11 @@
 		      <artifactId>jna-platform</artifactId>
 		      <version>4.1.0</version>
 		    </dependency>
+		    <dependency>
+			    <groupId>org.zeroturnaround</groupId>
+			    <artifactId>zt-zip</artifactId>
+			    <version>1.11</version>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 
