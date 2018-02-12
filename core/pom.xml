@@ -4,7 +4,7 @@
 	<parent>
 	    <groupId>com.infotel.seleniumRobot</groupId>
 	    <artifactId>core-parent</artifactId>
-	    <version>3.6.1-SNAPSHOT</version>
+	    <version>3.6.1</version>
 	</parent>
 
   	<artifactId>core</artifactId>
@@ -41,6 +41,10 @@
 	      <groupId>net.java.dev.jna</groupId>
 	      <artifactId>jna-platform</artifactId>
 	    </dependency>
+	    <dependency>
+		    <groupId>org.zeroturnaround</groupId>
+		    <artifactId>zt-zip</artifactId>
+		</dependency>
         
 		<dependency>
 			<groupId>org.apache.commons</groupId>
@@ -56,11 +60,6 @@
 		    <groupId>com.mashape.unirest</groupId>
 		    <artifactId>unirest-java</artifactId>
 		    <version>1.4.9</version>
-		</dependency>
-		<dependency>
-		    <groupId>org.zeroturnaround</groupId>
-		    <artifactId>zt-zip</artifactId>
-		    <version>1.11</version>
 		</dependency>
 		<dependency>
 			<groupId>com.hierynomus</groupId>
