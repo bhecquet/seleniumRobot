@@ -26,6 +26,7 @@ import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.runner.SeleniumRobotTestPlan;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.it.core.aspects.CalcPage;
+import com.seleniumtests.util.helper.WaitHelper;
 
 public class StubTestClass3 extends StubParentClass {
 	
@@ -36,6 +37,7 @@ public class StubTestClass3 extends StubParentClass {
 	
 	@BeforeMethod(groups={"stub"})
 	public void set() {
+		WaitHelper.waitForMilliSeconds(100);
 		SeleniumRobotTestPlan.setCucumberTest(false);
 	}
 

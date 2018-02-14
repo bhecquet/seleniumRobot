@@ -23,6 +23,7 @@ import org.testng.Reporter;
 import org.testng.internal.ResultMap;
 import org.testng.internal.TestResult;
 
+import com.google.common.collect.Iterables;
 import com.mashape.unirest.http.Unirest;
 import com.seleniumtests.connectors.selenium.SeleniumRobotVariableServerConnector;
 import com.seleniumtests.core.SeleniumTestsContextManager;
@@ -194,6 +195,19 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 			
 			if (testResult.getThrowable() != null) {
 				logger.error(testResult.getThrowable().getMessage());
+				
+				// when error occurs, exception raised is not added to the step if this error is outside of a PageObject
+				// we add it there as an exception always terminates the test (except for soft assert, but this case is handled in SoftAssertion.aj)
+				TestStep lastStep = TestLogging.getCurrentRootTestStep();
+				if (lastStep == null) {
+					// when steps are automatic, they are closed (lastStep is null) once method is finished
+					lastStep = Iterables.getLast(TestLogging.getTestsSteps().get(testResult));
+				}
+				
+				if (lastStep != null) {
+					lastStep.setFailed(true);
+					lastStep.setActionException(testResult.getThrowable());
+				}
 			}
 			
 			// capture snap shot at the end of the test
