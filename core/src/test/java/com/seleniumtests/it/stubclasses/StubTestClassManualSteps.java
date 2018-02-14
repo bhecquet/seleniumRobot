@@ -55,6 +55,25 @@ public class StubTestClassManualSteps extends StubParentClass {
 		addStep("do nothing");
 		cPage.doNothing();
 	}
+	
+	/**
+	 * Test where we throw an assertion to show if report handles it
+	 * @throws IOException
+	 */
+	@Test(groups="stub")
+	public void testWithAssert() throws IOException {
+		
+		SeleniumTestsContextManager.getThreadContext().setManualTestSteps(true);
+		
+		addStep("Test start");
+		CalcPage cPage = new CalcPage();
+		
+		addStep("assert exception");
+		cPage.assertAction();
+		
+		addStep("do nothing");
+		cPage.doNothing();
+	}
 
 
 }

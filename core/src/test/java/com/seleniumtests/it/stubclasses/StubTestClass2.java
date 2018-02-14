@@ -17,10 +17,18 @@
 package com.seleniumtests.it.stubclasses;
 
 import org.testng.Assert;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
+
+import com.seleniumtests.util.helper.WaitHelper;
 
 public class StubTestClass2 extends StubParentClass {
 
+	@BeforeMethod(groups={"stub", "stub2"})
+	public void set() {
+		WaitHelper.waitForMilliSeconds(100);
+	}
+	
 	@Test(groups="stub")
 	public void test1() {
 	}

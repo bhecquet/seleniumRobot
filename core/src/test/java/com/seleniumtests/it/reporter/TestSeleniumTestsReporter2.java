@@ -35,6 +35,7 @@ import org.testng.annotations.Test;
 import org.testng.xml.XmlSuite;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.reporter.logger.TestLogging;
 import com.seleniumtests.reporter.reporters.SeleniumTestsReporter2;
 
 public class TestSeleniumTestsReporter2 extends ReporterTest {
@@ -177,6 +178,8 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	/**
 	 * Check that manual steps create all steps in report
 	 * manual step option is set inside the StubTestClassManualSteps.testOk() method
+	 * check the failed test case where step should be marked as KO
+	 * Also, error in step should be presented
 	 * @param testContext
 	 * @throws Exception
 	 */
@@ -208,15 +211,17 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		
 		// ----- check manual steps errors ------
 		String detailedReportContent2 = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport-2.html"));
+		detailedReportContent2 = detailedReportContent2.replace("\n", "").replace("\r",  "");
 		
 		// check execution logs are in error
-		Assert.assertTrue(detailedReportContent2.contains("<div class=\"box collapsed-box failed\"><div class=\"box-header with-border\"><button type=\"button\" class=\"btn btn-box-tool\" data-widget=\"collapse\"><i class=\"fa fa-plus\"></i></button> Execution logs"));
+		Assert.assertTrue(detailedReportContent2.contains("<div class=\"box collapsed-box failed\">			<div class=\"box-header with-border\">			<button type=\"button\" class=\"btn btn-box-tool\" data-widget=\"collapse\"><i class=\"fa fa-plus\"></i></button> Execution logs"));
 		
 		// test first step is OK and second one is failed (this shows indirectly that internal step is marked as failed
-		Assert.assertTrue(detailedReportContent2.contains("<div class=\"box collapsed-box success\"><div class=\"box-header with-border\"><button type=\"button\" class=\"btn btn-box-tool\" data-widget=\"collapse\"><i class=\"fa fa-plus\"></i></button> Test start"));
-		Assert.assertTrue(detailedReportContent2.contains("<div class=\"box collapsed-box failed\"><div class=\"box-header with-border\"><button type=\"button\" class=\"btn btn-box-tool\" data-widget=\"collapse\"><i class=\"fa fa-plus\"></i></button> assert exception"));
+		Assert.assertTrue(detailedReportContent2.contains("<div class=\"box collapsed-box success\">			<div class=\"box-header with-border\">			<button type=\"button\" class=\"btn btn-box-tool\" data-widget=\"collapse\"><i class=\"fa fa-plus\"></i></button> Test start"));
+		Assert.assertTrue(detailedReportContent2.contains("<div class=\"box collapsed-box failed\">			<div class=\"box-header with-border\">			<button type=\"button\" class=\"btn btn-box-tool\" data-widget=\"collapse\"><i class=\"fa fa-plus\"></i></button> assert exception"));
 		
-		
+		// check exception is present in step
+		Assert.assertTrue(detailedReportContent2.contains("<div class=\"message-log\">Test is KO with error: false error expected [true] but found [false]</div>"));
 		
 	}
 	
@@ -266,7 +271,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		Assert.assertTrue(detailedReportContent.contains("<div class=\"message-info\">Some Info message</div>"));
 		Assert.assertTrue(detailedReportContent.contains("<div class=\"message-error\">Some Error message</div>"));
 		Assert.assertTrue(detailedReportContent.contains("<div class=\"message-log\">Some log message</div>"));
-		Assert.assertTrue(detailedReportContent.contains("<table class=\"table table-bordered table-condensed\"><tr><th width=\"15%\">Key</td><th width=\"60%\">Message</td><th width=\"25%\">Value</td></tr><tr><td>key</td><td>we found a value of</td><td>10</td></tr></table>"));
+		Assert.assertTrue(detailedReportContent.contains("<table class=\"table table-bordered table-condensed\"><tr><th width=\"15%\">Key</th><th width=\"60%\">Message</th><th width=\"25%\">Value</th></tr><tr><td>key</td><td>we found a value of</td><td>10</td></tr></table>"));
 		Assert.assertTrue(detailedReportContent.contains("<li>send keyboard action</li>"));
 		
 	}
@@ -448,6 +453,27 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 								+ "<div class=\"stack-element\">at com.seleniumtests.it.reporter.ReporterTest.executeSubTest\\(ReporterTest.java:\\d+\\)</div>"
 								+ "<div class=\"stack-element\">at com.seleniumtests.it.reporter.TestSeleniumTestsReporter2.testReportDetailsWithErrors\\(TestSeleniumTestsReporter2.java:\\d+\\)</div>.*"));
 		
+		Assert.assertTrue(detailedReportContent.contains("</ul><div class=\"message-error\">				java.lang.AssertionError: error			</div></div>"));
+	}
+	
+	/**
+	 * Check test values are displayed (call to TestLogging.logTestValue()) shown as a table
+	 * @param testContext
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testReportDetailsWithTestValues(ITestContext testContext) throws Exception {
+		
+		reporter = new SeleniumTestsReporter2();
+		
+		executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"});
+		
+		String detailedReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport-2.html"));
+		
+		detailedReportContent = detailedReportContent.replace("\n", "").replace("\r",  "").replaceAll(">\\s+<", "><");
+		
+		// Check error is present is Last test step
+		Assert.assertTrue(detailedReportContent.contains("<table class=\"table table-bordered table-condensed\"><tr><th width=\"15%\">Key</th><th width=\"60%\">Message</th><th width=\"25%\">Value</th></tr><tr><td>key</td><td>we found a value of</td><td>10</td></tr></table>"));
 	}
 	
 	/**

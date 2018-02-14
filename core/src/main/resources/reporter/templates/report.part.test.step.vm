@@ -15,9 +15,9 @@
 		#elseif (${action.class.name.equals("com.seleniumtests.reporter.logger.TestValue")})
 			<table class="table table-bordered table-condensed">
 				<tr>
-					<th width="15%">Key</td>
-					<th width="60%">Message</td>
-					<th width="25%">Value</td>
+					<th width="15%">Key</th>
+					<th width="60%">Message</th>
+					<th width="25%">Value</th>
 				</tr>
 				<tr>
 					<td>$action.getName()</td>
@@ -48,6 +48,11 @@
 		</div>
 		<div class="box-body">
 			#stepActions($step true)
-	
+			
+			#if($step.getActionException())
+			<div class="message-error">
+				$step.getActionException().toString()
+			</div>
+			#end
 		</div>
 	</div>

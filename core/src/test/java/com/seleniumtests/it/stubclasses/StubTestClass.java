@@ -18,6 +18,7 @@ package com.seleniumtests.it.stubclasses;
 
 import org.openqa.selenium.WebDriverException;
 import org.testng.Assert;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import com.seleniumtests.customexception.DriverExceptions;
@@ -34,6 +35,11 @@ public class StubTestClass extends StubParentClass {
 	
 	private static int count = 0;
 
+	@BeforeMethod(groups={"stub"})
+	public void set() {
+		WaitHelper.waitForMilliSeconds(100);
+	}
+	
 	@Test(groups="stub", description="a test with steps")
 	public void testAndSubActions() {
 		TestStep step1 = new TestStep("step 1", TestLogging.getCurrentTestResult());
