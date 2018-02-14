@@ -22,7 +22,7 @@ for the remainder, we use a unique name for that new application `appName`<br/>
 	- `squash-ta` contains ta files that should override the default ones (optional). See Squash-TA section for details 
 
 - Test code must be in `src/test/java`
-- **WARN** When using IntelliJ, you must also create a `src/main/java` with subpackage inside and a main class. This does nothing but IntelliJ cannot weave aspects without that
+- **WARN** When using IntelliJ, you must also create a `src/main/java` with subpackage inside and a main class. This does nothing but IntelliJ cannot weave aspects without that: you get `Error:Module '<some_module>' tests: org.aspectj.bridge.AbortException: bad aspect library: 'D:\Dev\seleniumRobot-maaffr\target\classes'`
 - package name is free but following structure MUST be used
 	- `cucumber` subpackage contains cucumber implementation files. As cucumber annotations can be written directly in test page object, it should at least contain code for `@Then` (checks) and `@Given` (initial state).
 If pure TestNG mode is used, this package MUST exist.
@@ -178,7 +178,6 @@ A typical method whould be
 For tests extending SeleniumTestPlan, the testNg XML looks like (minimal requirements):
 
 	<suite name="Integration tests" parallel="false" verbose="1" thread-count="1">
-
 	    <test name="order">	    	
 	        <classes>
 	            <class name="com.infotel.seleniumRobot.jpetstore.tests.VmoeTests">

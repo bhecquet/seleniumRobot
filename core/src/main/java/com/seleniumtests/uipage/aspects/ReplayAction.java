@@ -68,7 +68,7 @@ public class ReplayAction {
     	long end = systemClock.laterBy(SeleniumTestsContextManager.getThreadContext().getReplayTimeout() * 1000);
     	Object reply = null;
 
-
+    	
     	// update driver reference of the element
     	// corrects bug of waitElementPresent which threw a SessionNotFoundError because driver reference were not
     	// updated before searching element (it used the driver reference of an old test session)
