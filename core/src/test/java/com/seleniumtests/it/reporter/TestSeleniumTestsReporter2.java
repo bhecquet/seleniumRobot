@@ -189,6 +189,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		String mainReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport.html"));
 		
 		Assert.assertTrue(mainReportContent.contains("<a href='SeleniumTestReport-1.html'>testOk</a>"));
+		Assert.assertTrue(mainReportContent.contains("<a href='SeleniumTestReport-2.html'>testWithAssert</a>"));
 		
 		
 		// check that without soft assertion, 'add' step is skipped
@@ -204,6 +205,19 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		
 		// check we also get actions
 		Assert.assertEquals(StringUtils.countMatches(detailedReportContent1, "doNothing on HtmlElement none"), 3);
+		
+		// ----- check manual steps errors ------
+		String detailedReportContent2 = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport-2.html"));
+		
+		// check execution logs are in error
+		Assert.assertTrue(detailedReportContent2.contains("<div class=\"box collapsed-box failed\"><div class=\"box-header with-border\"><button type=\"button\" class=\"btn btn-box-tool\" data-widget=\"collapse\"><i class=\"fa fa-plus\"></i></button> Execution logs"));
+		
+		// test first step is OK and second one is failed (this shows indirectly that internal step is marked as failed
+		Assert.assertTrue(detailedReportContent2.contains("<div class=\"box collapsed-box success\"><div class=\"box-header with-border\"><button type=\"button\" class=\"btn btn-box-tool\" data-widget=\"collapse\"><i class=\"fa fa-plus\"></i></button> Test start"));
+		Assert.assertTrue(detailedReportContent2.contains("<div class=\"box collapsed-box failed\"><div class=\"box-header with-border\"><button type=\"button\" class=\"btn btn-box-tool\" data-widget=\"collapse\"><i class=\"fa fa-plus\"></i></button> assert exception"));
+		
+		
+		
 	}
 	
 	/**
@@ -353,15 +367,15 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"});
 		
 		// read 'testDriver' report. This contains calls to HtmlElement actions
-		String detailedReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport-1.html"));
-		detailedReportContent = detailedReportContent.replace("\n", "").replace("\r",  "").replaceAll(">\\s+<", "><");
+		String detailedReportContent1 = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport-1.html"));
+		detailedReportContent1 = detailedReportContent1.replace("\n", "").replace("\r",  "").replaceAll(">\\s+<", "><");
 		
-		Assert.assertTrue(detailedReportContent.contains("<li>sendKeys on TextFieldElement Text, by={By.id: text2} with args: (true, true, [a text,])</li>"));
-		Assert.assertTrue(detailedReportContent.contains("<li>click on ButtonElement Reset, by={By.id: button2} </li>"));
-		Assert.assertTrue(detailedReportContent.contains("<div class=\"message-snapshot\">Output: Current Window: Test page: <a href="));
+		Assert.assertTrue(detailedReportContent1.contains("<li>sendKeys on TextFieldElement Text, by={By.id: text2} with args: (true, true, [a text,])</li>"));
+		Assert.assertTrue(detailedReportContent1.contains("<li>click on ButtonElement Reset, by={By.id: button2} </li>"));
+		Assert.assertTrue(detailedReportContent1.contains("<div class=\"message-snapshot\">Output: Current Window: Test page: <a href="));
 		
 		// check that only on reference to 'click' is present for this buttonelement. This means that only the replayed action has been logged, not the ButtonElement.click() one
-		Assert.assertEquals(StringUtils.countMatches(detailedReportContent, "click on"), 1);
+		Assert.assertEquals(StringUtils.countMatches(detailedReportContent1, "click on"), 1);
 		
 		// read the 'testDriverNativeActions' test result to see if native actions are also logged (overrideSeleniumNativeAction is true)
 		String detailedReportContent2 = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport-2.html"));
@@ -384,16 +398,20 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		Assert.assertTrue(detailedReportContent3.contains("<ul><li>selectByVisibleText on Select with args: (option1, )</li></ul>"));
 				
 		// check composite actions. We must have the moveToElement, click and sendKeys actions 
-		Assert.assertTrue(detailedReportContent.contains("<ul><li>moveToElement with args: (TextFieldElement Text, by={By.id: text2}, )</li><li>sendKeys with args: ([composite,])</li><li>moveToElement with args: (ButtonElement Reset, by={By.id: button2}, )</li><li>click </li></ul>"));
+		Assert.assertTrue(detailedReportContent1.contains("<ul><li>moveToElement with args: (TextFieldElement Text, by={By.id: text2}, )</li><li>sendKeys with args: ([composite,])</li><li>moveToElement with args: (ButtonElement Reset, by={By.id: button2}, )</li><li>click </li></ul>"));
 		
 		// check PictureElement action is logged
-		Assert.assertTrue(detailedReportContent.contains("<ul><li>clickAt on Picture from resource tu/images/logo_text_field.png with args: (0, -30, )</li>"));
+		Assert.assertTrue(detailedReportContent1.contains("<ul><li>clickAt on Picture from resource tu/images/logo_text_field.png with args: (0, -30, )</li>"));
 		
 		// check that when logging PictureElement action which uses composite actions, those are not logged
-		Assert.assertTrue(!detailedReportContent.contains("<ul><li>clickAt on Picture from resource tu/images/logo_text_field.png with args: (0, -30, )</li><li>moveToElement with args:"));
+		Assert.assertTrue(!detailedReportContent1.contains("<ul><li>clickAt on Picture from resource tu/images/logo_text_field.png with args: (0, -30, )</li><li>moveToElement with args:"));
 		
 		// no action is logged when step fails (findElement exception). Ok because logging is done on action, not search 
 		
+		
+		// check that seleniumRobot actions are logged only once when overrideNativeAction is enabled (issue #88)
+		String detailedReportContent4 = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport-4.html"));
+		Assert.assertEquals(StringUtils.countMatches(detailedReportContent4, "<li>click on ButtonElement Reset, by={By.id: button2} </li>"), 1);
 		
 		// TODO: spliter ce test en plusieurs 
 		

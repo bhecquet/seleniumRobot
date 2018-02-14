@@ -24,7 +24,7 @@ public class StubTestClassForDriverTest extends StubParentClass {
 
 	@Test(groups="stub")
 	public void testDriver() throws Exception {
-		
+
 		new DriverTestPage(true)
 			._writeSomething()
 			._reset()
@@ -58,5 +58,16 @@ public class StubTestClassForDriverTest extends StubParentClass {
 		.sendKeys()
 		.reset()
 		.select();
+	}
+	
+	@Test(groups="stub")
+	public void testDriverWithHtmlElementWithoutOverride() throws Exception {
+		SeleniumTestsContextManager.getThreadContext().setOverrideSeleniumNativeAction(false);
+		
+		new DriverTestPage(true)
+			._writeSomething()
+			._reset();
+//			._sendKeysComposite()
+//			._clickPicture();
 	}
 }

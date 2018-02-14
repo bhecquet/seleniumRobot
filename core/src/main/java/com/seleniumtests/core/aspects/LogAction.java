@@ -235,12 +235,13 @@ public class LogAction {
 	}
 	
 	/**
-	 * Log native action only when we do not overide them. Else, it' HTMLElement logging which is used
+	 * Log native action only when we do not override them. Else, it' HTMLElement logging which is used
 	 * @param joinPoint
 	 * @return
 	 */
 	@Pointcut("(this(com.seleniumtests.uipage.PageObject) && " +	
-			"(call(public * org.openqa.selenium.WebElement+.* (..))"
+			"(call(public * org.openqa.selenium.WebElement+.* (..)) "
+			+ "&& !call(public * com.seleniumtests.uipage.htmlelements.HtmlElement+.* (..))" // correction of issue #88
 			+ "|| call(public * org.openqa.selenium.support.ui.Select.* (..)))) && if()")
 	public static boolean isNoNativeActionOverride(ProceedingJoinPoint joinPoint) {
 		return !SeleniumTestsContextManager.getThreadContext().getOverrideSeleniumNativeAction();
