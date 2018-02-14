@@ -8,6 +8,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 import org.apache.log4j.Logger;
 import org.testng.IInvokedMethod;
@@ -201,7 +202,9 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 				TestStep lastStep = TestLogging.getCurrentRootTestStep();
 				if (lastStep == null) {
 					// when steps are automatic, they are closed (lastStep is null) once method is finished
-					lastStep = Iterables.getLast(TestLogging.getTestsSteps().get(testResult));
+					try {
+						lastStep = Iterables.getLast(TestLogging.getTestsSteps().get(testResult));
+					} catch (NoSuchElementException e) {} 
 				}
 				
 				if (lastStep != null) {
@@ -334,16 +337,16 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 	 * Remove retrying failed test cases from skipped test cases.
 	 *
 	 * @param   tc
-	 * @param   map
+	 * @param   failedTests
 	 *
 	 * @return
 	 */
-	private void removeIncorrectlySkippedTests(final ITestContext tc, final IResultMap map) {
+	private void removeIncorrectlySkippedTests(final ITestContext tc, final IResultMap failedTests) {
 		List<ITestNGMethod> failsToRemove = new ArrayList<>();
 		IResultMap returnValue = tc.getSkippedTests();
 
 		for (ITestResult result : returnValue.getAllResults()) {
-			for (ITestResult resultToCheck : map.getAllResults()) {
+			for (ITestResult resultToCheck : failedTests.getAllResults()) {
 				if (resultToCheck.getMethod().equals(result.getMethod())) {
 					failsToRemove.add(resultToCheck.getMethod());
 					break;
