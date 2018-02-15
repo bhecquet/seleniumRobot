@@ -19,6 +19,7 @@ package com.seleniumtests.reporter.reporters;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -126,8 +127,17 @@ public class CustomReporter extends CommonReporter implements IReporter {
 					}
 				}
 			}
+			
+			List<String> stack = null;
+			if (testResult.getThrowable() != null) {
+				StringBuilder stackString = new StringBuilder();
+				generateTheStackTrace(testResult.getThrowable(), testResult.getThrowable().getMessage(), stackString);
+				stack = Arrays.asList(stackString.toString().split("\n"));
+			}
 	
+			// if adding some information, don't forget to add them to velocity model for integration tests
 			context.put("errors", 0);
+			context.put("newline", "\n");
 			context.put("failures", errors);
 			context.put("hostname", testResult.getHost() == null ? "": testResult.getHost());
 			context.put("suiteName", testResult.getAttribute(SeleniumRobotLogger.METHOD_NAME));
@@ -137,6 +147,9 @@ public class CustomReporter extends CommonReporter implements IReporter {
 			context.put("time", testResult.getStartMillis());	
 			context.put("testSteps", testSteps);	
 			context.put("browser", SeleniumTestsContextManager.getThreadContext().getBrowser());	
+			context.put("version", SeleniumTestsContextManager.getApplicationVersion());	
+			context.put("parameters", SeleniumTestsContextManager.getThreadContext().getContextDataMap());
+			context.put("stacktrace", stack);
 			context.put("logs", 0);	
 			
 			StringWriter writer = new StringWriter();

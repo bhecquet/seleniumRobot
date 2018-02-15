@@ -138,7 +138,7 @@ public class TestPerformanceReporter extends ReporterTest {
 	@Test(groups={"it"})
 	public void testMultipleReportsWithSteps(ITestContext testContext) throws Exception {
 
-		System.setProperty("customTestReports", "PERF::xml::reporter/templates/report.perf.vm,PERF2::xml::ti/report.perf.vm");
+		System.setProperty("customTestReports", "PERF::xml::reporter/templates/report.perf.vm,PERF2::xml::ti/report.test.vm");
 		executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"});
 		
 		String jmeterReport1 = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "PERF-com.seleniumtests.it.stubclasses.StubTestClass.testAndSubActions.xml"));
