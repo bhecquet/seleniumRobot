@@ -3,6 +3,15 @@
 #set($startTime = $testSteps.get(0).getStartDate().getTime())
 
 <report duration="$duration" success="$success" test="$className.$suiteName" timeScenario="$duration" timestamp="$time" version="$version">
+	<errors>
+#if ($stacktrace)
+		<error>
+	#foreach ($stackline in $stacktrace)
+			$stackline
+	#end
+		</error>
+#end
+	</errors>
 	<steps>
 #foreach ($testStep in $testSteps)
 #set($stepDuration = $testStep.getDuration() / 1000.0)

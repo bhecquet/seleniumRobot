@@ -1,0 +1,6 @@
+{
+	"fail": $fail,
+	"pass": $pass,
+	"skip": $skip,
+	"total": $total
+}

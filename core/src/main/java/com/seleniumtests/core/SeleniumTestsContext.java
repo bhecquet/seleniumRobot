@@ -173,6 +173,7 @@ public class SeleniumTestsContext {
     
     // internal storage
     public static final String TEST_VARIABLES = "testVariables"; 				// configuration (aka variables, get via 'param()' method) used for the current test. It is not updated via XML file
+    																			
 
     
     // default values
@@ -184,8 +185,10 @@ public class SeleniumTestsContext {
     private LinkedList<TearDownService> tearDownServices = new LinkedList<>();
     private Map<ITestResult, List<Throwable>> verificationFailuresMap = new HashMap<>();
 
-    /* Data object to store all context data */
+    // Data object to store all context data
     private Map<String, Object> contextDataMap = Collections.synchronizedMap(new HashMap<String, Object>());
+    
+    // store all parameters present in XML file which are not technical parameters (not defined in the above list of fields)
     private Map<String, TestVariable> testVariables = Collections.synchronizedMap(new HashMap<String, TestVariable>());
 
     private ITestContext testNGContext = null;
@@ -928,6 +931,11 @@ public class SeleniumTestsContext {
     public SeleniumGridConnector getSeleniumGridConnector() {
     	return seleniumGridConnector;
     }
+    
+
+	public Map<String, Object> getContextDataMap() {
+		return contextDataMap;
+	}
 
 	//Methods for ID_Mapping
     //get

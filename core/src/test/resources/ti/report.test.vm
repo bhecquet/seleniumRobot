@@ -1,0 +1,78 @@
+
+{
+	"errors": $errors,
+	"failures": $failures,
+	"hostname": "$hostname",
+	"suiteName": "$suiteName",
+	"className": "$className",
+	"tests": $tests,
+	"duration": $duration,
+	"time": $time,
+	"testSteps": #VelArrayToJSON($testSteps),
+	"browser": $browser,
+	"version": $version,
+	"parameters": #VelListToJSON($parameters),
+	"logs": $logs,
+	"stacktrace": #VelArrayToJSON($stacktrace)
+}
+
+## ------------------------------------------------------- MACROS ------------------------------------------
+## java to json found at https://gist.github.com/narenranjit/1672345
+#set ( $foreachCount = 10 )
+#set ( $obj = '' ) ## dummy object
+#set ( $int_class = $obj.class.forName('java.lang.Number') )
+#set ( $bool_class = $obj.class.forName('java.lang.Boolean') )
+#set ( $string_class = $obj.class.forName('java.lang.String') )
+#set ( $map_class = $obj.class.forName('java.util.Map') )
+#set ( $list_class = $obj.class.forName('java.util.List') )
+
+
+#macro(VelListToJSON $list )
+#set($myList = $list )## dereference
+{
+#foreach($key in $myList.keySet())
+    "$key":##
+    #if ($myList.get($key))
+		#VelToJSON($myList.get($key))
+	#else
+		null##
+	#end
+    #if($foreachCount != $myList.keySet().size()),
+    #end
+#end
+}
+#end
+
+#macro(VelToJSON $item)
+#set($myItem = $item )## dereference
+#if($map_class.isInstance($myItem))
+    #VelListToJSON($myItem)##
+#elseif($list_class.isInstance($myItem))
+    #VelArrayToJSON($myItem)##
+#elseif($bool_class.isInstance($myItem)|| $int_class.isInstance($myItem))
+    $myItem##
+#elseif(!$myItem)
+	null##
+#else ## $string_class.isInstance($myItem)
+	#set($newItem = $myItem.toString().replace($newline, "\n"))
+	#set($newItem = $newItem.replace('\', '\\'))
+	#if ($newItem)
+    "$newItem"##
+    #else
+    "$myItem"##
+    #end
+#end
+#end
+
+#macro(VelArrayToJSON $arr)
+[
+#if($arr)
+#set($myArr = $arr)
+#foreach($x in $myArr)
+#VelToJSON($x) 
+#if($foreachCount != $myArr.size()),
+#end
+#end
+#end
+]
+#end

@@ -330,8 +330,13 @@ public class SeleniumTestsContextManager {
 		
 		featuresPath = Paths.get(dataPath, applicationNameWithVersion, "features").toString();
 		configPath = Paths.get(dataPath, applicationNameWithVersion, "config").toString();
-		applicationVersion = readApplicationVersion();
-		coreVersion = readCoreVersion();
+		
+		if (applicationVersion == null) {
+			applicationVersion = readApplicationVersion();
+		}
+		if (coreVersion == null) {
+			coreVersion = readCoreVersion();
+		}
 		
 		// create data folder if it does not exist (it should already exist)
 		if (!new File(dataPath).isDirectory()) {
