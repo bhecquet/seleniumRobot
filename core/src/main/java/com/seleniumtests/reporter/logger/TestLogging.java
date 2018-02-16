@@ -32,6 +32,26 @@ import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
 /**
  * Log methods for test operations.
+ * This allow to write some data in reports (message, warn, error, test values, ...). This is accessible to tests
+ * 
+ * This class is also responsible for managing test steps, actions, snapshots, ...
+ * We log like this
+ * step1 (TestStep) => a root
+ * 	  +--- action1 (TestAction)
+ *    +--+ sub-step1 (TestStep)
+ *       +--- sub-action1
+ *       +--- message (TestMessage)
+ *       +--- sub-action2
+ *    +--- action2
+ * step2 (TestStep) => a root
+ * 	  +--- action3 (TestAction)
+ * 
+ * When logging, we first create a root step (stored in 'currentRootTestStep' variable which will store all sub-steps
+ * To know where logging is in the tree (from example above, are we currently in step1 or sub-step1), we record parent step 'parentTestStep'
+ * A root step is also a parent step, but inverse is false.
+ * 
+ * 'currentTestResult' helps storing the test being executed in this thread
+ * 'testSteps' records all root steps in the test being executed
  */
 public class TestLogging {
 
@@ -199,6 +219,7 @@ public class TestLogging {
 			logger.warn("Reporter did not inform about the current test result, creating one");
 			setCurrentTestResult(Reporter.getCurrentTestResult());
 		} 
+		
 		return TestLogging.currentTestResult.get(Thread.currentThread());
 	}
 	
@@ -206,6 +227,7 @@ public class TestLogging {
 		TestLogging.currentRootTestStep.clear();
 		TestLogging.testsSteps.clear();
 		TestLogging.parentTestStep.clear();
+		resetCurrentTestResult();
 		
 		SeleniumRobotLogger.reset();
 	}
