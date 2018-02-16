@@ -12,6 +12,9 @@ for the remainder, we use a unique name for that new application `appName`<br/>
 - change test package according to your organization. Last part of the package MUST BE `appName`
 - change folder name under `data` to `appName`
 - in `data/appName/testng/test_qwant.xml`, change value for `cucumberPackage` parameter according to the updated package name
+- write a minimal test (or re-use the example)
+- compile code with `mvn clean package`
+- execute it
 
 #### Requirements are ####
 
@@ -165,7 +168,7 @@ Assuming that the right objects are created, a test looks like:
 		}
 	}
 
-A typical method whould be
+A typical PageObject method whould be
 
 	public FishList goToFish() throws Exception {
     	fishMenu.click();
@@ -173,6 +176,9 @@ A typical method whould be
     }
     
 **WARN** DO NOT give the same test name in different test classes as it leads to wrong logging reporting
+
+**WARN** TestNG allows you to use `@BeforeMethod`, `BeforeClass` annotated method to init the test. These methods does not support editing thread context (`SeleniumTestsContextManager.getThreadContext().setWebProxyType("manual");` for example) because it's loaded right before the `@Test` annotated method. If you do so, a ScenarioException will be raised. 
+`SeleniumTestsContextManager.getGlobalContext().setWebProxyType("manual");` will not help as global context is almost never used, and surely NEVER when initializing driver.
 
 #### TestNG file ####
 For tests extending SeleniumTestPlan, the testNg XML looks like (minimal requirements):

@@ -21,6 +21,7 @@ import org.testng.ITestListener;
 import org.testng.ITestNGMethod;
 import org.testng.ITestResult;
 import org.testng.Reporter;
+import org.testng.internal.ConfigurationMethod;
 import org.testng.internal.ResultMap;
 import org.testng.internal.TestResult;
 
@@ -146,6 +147,11 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 	@Override
 	public void beforeInvocation(IInvokedMethod method, ITestResult testResult, ITestContext context) {
 		TestLogging.setCurrentTestResult(testResult);
+		
+//		// issue #94: add ability to request thread context from a method annotated with @BeforeMethod
+//		if (method.isConfigurationMethod() && ((ConfigurationMethod)method.getTestMethod()).isBeforeMethodConfiguration()) {
+//			SeleniumTestsContextManager.initThreadContext(context, null);
+//		}
 		
 		if (method.isTestMethod()) {
 
