@@ -30,6 +30,10 @@
 #end
 	</steps>
 	<params>
-		<param name="browser" value="$browser"/>
+#foreach ($param in $parameters.entrySet())
+#if ($param.value)
+		<param name="$param.key" value="$param.value"/>
+#end
+#end
 	</params>
 </report>

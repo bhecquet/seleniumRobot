@@ -60,7 +60,7 @@ public class TestCustomReporter extends ReporterTest {
 		Assert.assertNotNull(json.get("version"));
 		Assert.assertTrue(json.getJSONObject("parameters").length() > 70);
 		Assert.assertEquals(json.getJSONObject("parameters").getString("testType"), "NON_GUI");
-		Assert.assertEquals(json.getJSONObject("parameters").getString("replayTimeOut"), "30");
+		Assert.assertEquals(json.getJSONObject("parameters").getInt("replayTimeOut"), 30);
 		Assert.assertEquals(json.getJSONArray("stacktrace").length(), 0);
 	}
 	
@@ -79,6 +79,9 @@ public class TestCustomReporter extends ReporterTest {
 		String detailedReportContent2 = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SUP-com.seleniumtests.it.stubclasses.StubTestClass.testAndSubActions.xml"));
 		detailedReportContent2 = detailedReportContent2.replace("\n", "").replace("\r",  "").replaceAll(">\\s+<", "><");
 		Assert.assertTrue(detailedReportContent2.contains("<errors></errors>"));
+		
+		// check parameters are there
+		Assert.assertTrue(detailedReportContent2.contains("<param name=\"runMode\" value=\"LOCAL\"/>"));
 	}
 	
 	

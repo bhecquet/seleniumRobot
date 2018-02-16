@@ -1,4 +1,10 @@
-
+#set ( $foreachCount = 10 )
+#set ( $obj = '' ) ## dummy object
+#set ( $int_class = $obj.class.forName('java.lang.Number') )
+#set ( $bool_class = $obj.class.forName('java.lang.Boolean') )
+#set ( $string_class = $obj.class.forName('java.lang.String') )
+#set ( $map_class = $obj.class.forName('java.util.Map') )
+#set ( $list_class = $obj.class.forName('java.util.List') )
 {
 	"errors": $errors,
 	"failures": $failures,
@@ -18,26 +24,20 @@
 
 ## ------------------------------------------------------- MACROS ------------------------------------------
 ## java to json found at https://gist.github.com/narenranjit/1672345
-#set ( $foreachCount = 10 )
-#set ( $obj = '' ) ## dummy object
-#set ( $int_class = $obj.class.forName('java.lang.Number') )
-#set ( $bool_class = $obj.class.forName('java.lang.Boolean') )
-#set ( $string_class = $obj.class.forName('java.lang.String') )
-#set ( $map_class = $obj.class.forName('java.util.Map') )
-#set ( $list_class = $obj.class.forName('java.util.List') )
+
 
 
 #macro(VelListToJSON $list )
 #set($myList = $list )## dereference
 {
-#foreach($key in $myList.keySet())
-    "$key":##
-    #if ($myList.get($key))
-		#VelToJSON($myList.get($key))
-	#else
-		null##
-	#end
-    #if($foreachCount != $myList.keySet().size()),
+#foreach($entry in $myList.entrySet())
+    "$entry.key": ##
+#if ($entry.value)
+#VelToJSON($entry.value)
+#else
+null##
+#end
+#if($foreachCount != $myList.keySet().size()),
     #end
 #end
 }
@@ -50,16 +50,16 @@
 #elseif($list_class.isInstance($myItem))
     #VelArrayToJSON($myItem)##
 #elseif($bool_class.isInstance($myItem)|| $int_class.isInstance($myItem))
-    $myItem##
+$myItem##
 #elseif(!$myItem)
-	null##
+null##
 #else ## $string_class.isInstance($myItem)
 	#set($newItem = $myItem.toString().replace($newline, "\n"))
 	#set($newItem = $newItem.replace('\', '\\'))
 	#if ($newItem)
-    "$newItem"##
+"$newItem"##
     #else
-    "$myItem"##
+"$myItem"##
     #end
 #end
 #end
