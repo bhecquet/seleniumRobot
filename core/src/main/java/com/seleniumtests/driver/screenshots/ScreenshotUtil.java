@@ -202,6 +202,7 @@ public class ScreenshotUtil {
 				// all captures done, exit
 				if ((currentImageHeight >= contentDimension.getHeight() && scrollX + image.getWidth() >= contentDimension.getWidth())
 						|| SeleniumTestsContextManager.isAppTest()) {
+					new File(tmpCap).delete();
 					break;
 					
 				// we are at the bottom but something on the right has not been captured, move to the right and go on
