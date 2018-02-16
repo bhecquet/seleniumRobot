@@ -36,9 +36,7 @@ import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.ConfigurationException;
 
 /**
- * Test parsing of test options into SeleniumTestContext
- * Tests will only be done on ThreadContext
- * This test MUST be executed through the tu.xml file as this file defines some parameters used by this test
+ * Test creation of seleniumrobot server connection inside SeleniumTestsContext
  * @author behe
  *
  */

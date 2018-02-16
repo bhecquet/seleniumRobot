@@ -56,7 +56,7 @@ public class TestSeleniumTestContext extends GenericTest {
 	}
 	
 	/**
-	 * If parameter is defined in suite and several tests, check it's the right param value which is picked up
+	 * If parameter is defined in suite and several tests, check it's the right param value which is picked up (the one from test)
 	 */
 	@Test(groups={"ut context"})
 	public void testMultipleTestShareSameParam(final ITestContext testNGCtx, final XmlTest xmlTest) {
@@ -122,6 +122,53 @@ public class TestSeleniumTestContext extends GenericTest {
 		Assert.assertEquals(seleniumTestsCtx.getAttribute("anOtherParam"), "value3");
 	}
 	
+	/**
+	 * Check that user defined arguments passed through command line (-DmyParam=myValue) is copied to testVariables and added to configuration 
+	 */
+	@Test(groups={"ut context"})
+	public void testUserDefinedParamAddedToTestVariables(final ITestContext testNGCtx) {
+		try {
+			System.setProperty("myUserDefinedKey", "myUserDefinedValue");
+			initThreadContext(testNGCtx);
+			SeleniumTestsContext seleniumTestsCtx = SeleniumTestsContextManager.getThreadContext();
+			Assert.assertEquals(seleniumTestsCtx.getConfiguration().get("myUserDefinedKey").getValue(), "myUserDefinedValue");
+			Assert.assertEquals(seleniumTestsCtx.getAttribute("myUserDefinedKey"), "myUserDefinedValue");
+			
+		} finally {
+			System.clearProperty("myUserDefinedKey");
+		}
+	}
+	
+	/**
+	 * Check that when a user defined parameter is both defined in XML and on command line, the command line one has precedence
+	 * @param testNGCtx
+	 */
+	@Test(groups={"ut context"})
+	public void testUserDefinedParamOverriesXMLUserDefined(final ITestContext testNGCtx) {
+		try {
+			System.setProperty("variable1", "myUserDefinedValue");
+			initThreadContext(testNGCtx);
+			SeleniumTestsContext seleniumTestsCtx = SeleniumTestsContextManager.getThreadContext();
+			Assert.assertEquals(seleniumTestsCtx.getConfiguration().get("variable1").getValue(), "myUserDefinedValue");
+			
+		} finally {
+			System.clearProperty("variable1");
+		}
+	}
+	
+	@Test(groups={"ut context"})
+	public void testTechnicalParameterIsNotAddedToVariables(final ITestContext testNGCtx) {
+		try {
+			System.setProperty("browser", "safari");
+			initThreadContext(testNGCtx);
+			SeleniumTestsContext seleniumTestsCtx = SeleniumTestsContextManager.getThreadContext();
+			Assert.assertNull(seleniumTestsCtx.getConfiguration().get("browser"));
+			
+		} finally {
+			System.clearProperty("browser");
+		}
+	}
+
 	/**
 	 * Test parsing of platform name. For Desktop case, version and OS name are not split
 	 * @param testNGCtx

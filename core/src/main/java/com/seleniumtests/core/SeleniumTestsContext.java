@@ -218,7 +218,7 @@ public class SeleniumTestsContext {
         
         // create selenium grid connector
         seleniumGridConnector = connectGrid();
-
+        
         setTestDataFile(getValueForTest(TEST_DATA_FILE, System.getProperty(TEST_DATA_FILE)));
         setLoadIni(getValueForTest(LOAD_INI, System.getProperty(LOAD_INI)));
         setWebSessionTimeout(getIntValueForTest(WEB_SESSION_TIME_OUT, System.getProperty(WEB_SESSION_TIME_OUT)));
@@ -968,11 +968,35 @@ public class SeleniumTestsContext {
     public void setAttribute(final String name, final Object value) {
         contextDataMap.put(name, value);
     }
+    
+    /**
+     * Get all JVM properties and filters the java one so that only user defined JVM arguments are returned
+     * @return
+     */
+    public Map<String, String> getCommandLineProperties() {
+	    Map<String, String> props = new HashMap<>();
+	    for (Entry<Object,Object> entry: System.getProperties().entrySet()) {
+	    	String key = entry.getKey().toString();
+	    	if (key.startsWith("java.") 
+	    			|| key.startsWith("sun.")
+	    			|| key.startsWith("user.")
+	    			|| key.startsWith("os.")
+	    			|| key.startsWith("file.")
+	    			|| key.startsWith("awt.")
+	    			) {
+	    		continue;
+	    	}
+	    	props.put(key, System.getProperty(key));
+	    }
+	    return props;
+    }
 
     /**
-     * Add to contextMap parameters defined in testng file which are not known as technical parameters
+     * Add to contextMap, parameters defined in testng file, which are not known as technical parameters
      * For example, it's possible to add <parameter name="aNewParam" value="aValue" /> in context because it's unknown from 
      * constructor. Whereas <parameter name=browser value="*opera" /> will not be overriden as it's already known
+     * 
+     * Also add command line JVM arguments so that they are also available as test configuration
      * @param context
      */
     private void setContextAttribute(final ITestContext context) {
@@ -984,17 +1008,28 @@ public class SeleniumTestsContext {
         		testParameters = context.getCurrentXmlTest().getAllParameters();
         	}
 
-            for (Entry<String, String> entry : testParameters.entrySet()) {
-                String attributeName = entry.getKey();
+            addUserDefinedParametersToContext(testParameters);
+        }
+        
+        // add command line paramters to testVariables
+        addUserDefinedParametersToContext(getCommandLineProperties());
+    }
+    
+    /**
+     * add parameters to contextDataMap and user defined testVariables
+     * If parameter is already known in contextDataMap (technical parameters defined in this class), it's not added 
+     * @param parameters
+     */
+    private void addUserDefinedParametersToContext(Map<String, String> parameters) {
+    	for (Entry<String, String> entry : parameters.entrySet()) {
+            String attributeName = entry.getKey();
 
-                // contextDataMap already contains all technical parameters
-                if (!contextDataMap.containsKey(entry.getKey())) {
-                    String sysPropertyValue = System.getProperty(entry.getKey());
-                    String suiteValue = entry.getValue();
-                    setContextAttribute(attributeName, sysPropertyValue, suiteValue, null);
-                    testVariables.put(attributeName, new TestVariable(attributeName, getAttribute(attributeName).toString()));
-                }
-
+            // contextDataMap already contains all technical parameters
+            if (!contextDataMap.containsKey(entry.getKey())) {
+                String sysPropertyValue = System.getProperty(entry.getKey());
+                String suiteValue = entry.getValue();
+                setContextAttribute(attributeName, sysPropertyValue, suiteValue, null);
+                testVariables.put(attributeName, new TestVariable(attributeName, getAttribute(attributeName).toString()));
             }
         }
     }
