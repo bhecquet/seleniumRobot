@@ -103,4 +103,10 @@ public class TestSeleniumRobotTestListener extends GenericTest {
 		// all 3 methods are OK
 		Assert.assertEquals(StringUtils.countMatches(mainReportContent, "<i class=\"fa fa-circle circleSuccess\">"), 3);
 	}
+	
+	/* TODO:
+	 * - 2 tests classes with 2 tests each, with @BeforeClass, @BeforeTest, @BeforeMethod, @BeforeGroup
+	 * 	- test all parallel modes available
+	 *  - check with logs, for example, that something added in test context (before) is kept in test and available after test
+	 */
 }

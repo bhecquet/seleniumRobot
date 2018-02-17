@@ -49,8 +49,8 @@ public class CucumberTestPlan extends SeleniumRobotTestPlan {
      */
     @DataProvider
     public Object[][] scenarios(ITestContext testContext) {
-    	SeleniumTestsContextManager.initGlobalContext(testContext);
-        SeleniumTestsContextManager.initThreadContext(testContext, null);  
+//    	SeleniumTestsContextManager.initGlobalContext(testContext);
+//        SeleniumTestsContextManager.initThreadContext(testContext, null);  
         try {
 	        testNGCucumberRunner = new CustomTestNGCucumberRunner(this.getClass());
     	} catch (Exception e) {
