@@ -27,6 +27,7 @@ import org.testng.internal.TestResult;
 import com.google.common.collect.Iterables;
 import com.mashape.unirest.http.Unirest;
 import com.seleniumtests.connectors.selenium.SeleniumRobotVariableServerConnector;
+import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.TearDownService;
 import com.seleniumtests.core.TestTasks;
@@ -43,6 +44,7 @@ import com.seleniumtests.util.logging.SeleniumRobotLogger;
 public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodListener2, ISuiteListener {
 	
 	protected static final Logger logger = SeleniumRobotLogger.getLogger(SeleniumRobotTestListener.class);
+	public static final String THREAD_CONTEXT = "threadContext";
 	private Date start;
 	
 	private Map<String, Boolean> isRetryHandleNeeded = new HashMap<>();
@@ -104,7 +106,6 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 	public void onStart(ITestContext context) {
         start = new Date();
         SeleniumTestsContextManager.initGlobalContext(context);
-        SeleniumTestsContextManager.initThreadContext(context, null);  
         
         isRetryHandleNeeded.put(context.getName(), false);
 		failedTests.put(context.getName(), new ResultMap());
@@ -141,8 +142,11 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 		TestLogging.setCurrentTestResult(testResult);
 		
 		// issue #94: add ability to request thread context from a method annotated with @BeforeMethod
-		if (method.isConfigurationMethod() && ((ConfigurationMethod)method.getTestMethod()).isBeforeMethodConfiguration()) {
+		if (testResult.getAttribute(THREAD_CONTEXT) == null) {
 			SeleniumTestsContextManager.initThreadContext(context, null);
+			testResult.setAttribute(THREAD_CONTEXT, SeleniumTestsContextManager.getThreadContext());
+		} else {
+			SeleniumTestsContextManager.setThreadContextFromTestResult(testResult);
 		}
 		
 		if (method.isTestMethod()) {
@@ -157,12 +161,8 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
     		
     		// when @BeforeMethod has been used, threadContext is already initialized and may have been updated. Do not overwrite options
     		// only reconfigure it
-    		try {
-    			SeleniumTestsContextManager.getThreadContext();
-    			SeleniumTestsContextManager.updateThreadContext((String)testResult.getAttribute(SeleniumRobotLogger.METHOD_NAME));
-    		} catch (ConfigurationException e) {
-    			SeleniumTestsContextManager.initThreadContext(context, (String)testResult.getAttribute(SeleniumRobotLogger.METHOD_NAME));
-    		}
+    		SeleniumTestsContextManager.updateThreadContext((String)testResult.getAttribute(SeleniumRobotLogger.METHOD_NAME));
+    		
             SeleniumTestsContextManager.getThreadContext().setTestMethodSignature((String)testResult.getAttribute(SeleniumRobotLogger.METHOD_NAME));
 	    	
 	    	if (testResult.getMethod().getRetryAnalyzer() == null) {
@@ -219,11 +219,6 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 			// unreserve variables
 			unreserveVariables();
 	        
-		}
-		
-		// issue #94: remove thread context after @AfterMethod annotated method
-		if (method.isConfigurationMethod() && ((ConfigurationMethod)method.getTestMethod()).isAfterMethodConfiguration()) {
-			SeleniumTestsContextManager.removeThreadContext();
 		}
 	}
 	

@@ -37,7 +37,9 @@ import org.testng.ITestContext;
 import org.testng.ITestResult;
 import org.testng.xml.XmlSuite;
 
+import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.core.runner.SeleniumRobotTestListener;
 import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.reporter.logger.TestLogging;
 import com.seleniumtests.reporter.logger.TestStep;
@@ -69,9 +71,6 @@ public class CustomReporter extends CommonReporter implements IReporter {
 				
 				ITestContext context = suiteResult.getTestContext();
 				
-				// done in case it was null (issue #81)
-				SeleniumTestsContextManager.initThreadContext(context, null);
-				
 				Set<ITestResult> resultSet = new HashSet<>(); 
 				resultSet.addAll(suiteResult.getTestContext().getFailedTests().getAllResults());
 				resultSet.addAll(suiteResult.getTestContext().getPassedTests().getAllResults());
@@ -85,6 +84,10 @@ public class CustomReporter extends CommonReporter implements IReporter {
 				consolidatedResults.put("total", total);
 				
 				for (ITestResult testResult: resultSet) {
+					
+					// done in case it was null (issue #81)
+					SeleniumTestsContextManager.setThreadContextFromTestResult(testResult);
+					
 					for (ReportInfo reportInfo: SeleniumTestsContextManager.getThreadContext().getCustomTestReports()) {
 						generateTestReport(testResult, reportInfo);
 					}

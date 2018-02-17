@@ -29,10 +29,12 @@ import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.testng.ISuite;
 import org.testng.ITestContext;
+import org.testng.ITestResult;
 import org.testng.xml.XmlSuite;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import com.seleniumtests.core.runner.SeleniumRobotTestListener;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.driver.TestType;
 import com.seleniumtests.util.TestConfigurationParser;
@@ -245,6 +247,18 @@ public class SeleniumTestsContextManager {
 
     public static void setThreadContext(final SeleniumTestsContext ctx) {
         threadLocalContext.set(ctx);
+    }
+    
+    public static void setThreadContextFromTestResult(ITestResult testResult) {
+    	if (testResult == null) {
+    		throw new ConfigurationException("Cannot set context from testResult as it is null");
+    	}
+    	if (testResult.getAttribute(SeleniumRobotTestListener.THREAD_CONTEXT) != null) {
+    		setThreadContext((SeleniumTestsContext)testResult.getAttribute(SeleniumRobotTestListener.THREAD_CONTEXT));
+    	} else {
+    		logger.error("Result did not contain thread context, initializing a new one");
+    		initThreadContext();
+    	}
     }
     
     public static void removeThreadContext() {

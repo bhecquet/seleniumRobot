@@ -49,6 +49,7 @@ import org.testng.xml.XmlSuite;
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.SeleniumTestsPageListener;
+import com.seleniumtests.core.runner.SeleniumRobotTestListener;
 import com.seleniumtests.driver.DriverMode;
 import com.seleniumtests.driver.TestType;
 import com.seleniumtests.reporter.PluginsHelper;
@@ -252,7 +253,7 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 			for (ITestResult testResult: entry.getValue()) {
 				
 				// issue #81: recreate test context from this context (due to multithreading, this context may be null if parallel testing is done
-				SeleniumTestsContextManager.initThreadContext(entry.getKey(), null);
+				SeleniumTestsContextManager.setThreadContextFromTestResult(testResult);
 				
 				try {
 					mOut = createWriter(getOutputDirectory(), (String)testResult.getAttribute(METHOD_RESULT_FILE_NAME));
