@@ -175,10 +175,15 @@ A typical PageObject method whould be
     	return new FishList();
     }
     
-**WARN** DO NOT give the same test name in different test classes as it leads to wrong logging reporting
+As we use TestNG for test running, it's possible to use any TestNG annotation in your test class. See: [http://testng.org/doc/documentation-main.html] (http://testng.org/doc/documentation-main.html), section "2. annotation"<br/>
+For more information on execution order of TestNG annotations, see [https://stackoverflow.com/questions/30587454/difference-between-beforeclass-and-beforetest-in-testng] (https://stackoverflow.com/questions/30587454/difference-between-beforeclass-and-beforetest-in-testng)
 
-**WARN** TestNG allows you to use `@BeforeMethod`, `BeforeClass` annotated method to init the test. These methods does not support editing thread context (`SeleniumTestsContextManager.getThreadContext().setWebProxyType("manual");` for example) because it's loaded right before the `@Test` annotated method. If you do so, a ScenarioException will be raised. 
-`SeleniumTestsContextManager.getGlobalContext().setWebProxyType("manual");` will not help as global context is almost never used, and surely NEVER when initializing driver.
+**WARN** TestNG allows you to use `@BeforeTest`, `BeforeClass` annotated method to init the test. These methods does not support editing thread context (`SeleniumTestsContextManager.getThreadContext().setWebProxyType("manual");` for example) because it's loaded right before the `@Test` annotated method. If you do so, a ScenarioException will be raised. 
+`SeleniumTestsContextManager.getGlobalContext().setWebProxyType("manual");` will not help as global context is almost never used, and surely NEVER when initializing driver. However, `@BeforeMethod` will support editing context
+
+ 
+    
+**WARN** DO NOT give the same test name in different test classes as it leads to wrong logging reporting
 
 #### TestNG file ####
 For tests extending SeleniumTestPlan, the testNg XML looks like (minimal requirements):
@@ -194,6 +199,8 @@ For tests extending SeleniumTestPlan, the testNg XML looks like (minimal require
 	        </classes>
 	    </test>
 	</suite>
+	
+For more information on execution order of TestNG annotations, see [https://stackoverflow.com/questions/30587454/difference-between-beforeclass-and-beforetest-in-testng] (https://stackoverflow.com/questions/30587454/difference-between-beforeclass-and-beforetest-in-testng)
 
 ### 4 Write a cucumber test ###
 Cucumber styled tests rely on a `.feature` file where each test step is defined. Look at [https://cucumber.io/docs/reference](https://cucumber.io/docs/reference) for more information about writing a feature file.

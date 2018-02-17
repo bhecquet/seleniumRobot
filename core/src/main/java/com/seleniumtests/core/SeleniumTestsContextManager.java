@@ -90,7 +90,7 @@ public class SeleniumTestsContextManager {
     	
     	ITestContext testNGCtx = new DefaultTestNGContext(suiteContext);
     	ITestContext newTestNGCtx = getContextFromConfigFile(testNGCtx);
-        globalContext = new SeleniumTestsContext(newTestNGCtx, null);
+        globalContext = new SeleniumTestsContext(newTestNGCtx);
     }
     
     public static void initGlobalContext(ITestContext testNGCtx) {
@@ -101,7 +101,7 @@ public class SeleniumTestsContextManager {
         }
     	
     	ITestContext newTestNGCtx = getContextFromConfigFile(testNGCtx);
-        globalContext = new SeleniumTestsContext(newTestNGCtx, null);
+        globalContext = new SeleniumTestsContext(newTestNGCtx);
     }
 
     /**
@@ -220,13 +220,23 @@ public class SeleniumTestsContextManager {
         }
     	
     	ITestContext newTestNGCtx = getContextFromConfigFile(testNGCtx);
-    	SeleniumTestsContext seleniumTestsCtx = new SeleniumTestsContext(newTestNGCtx, testName);
+    	SeleniumTestsContext seleniumTestsCtx = new SeleniumTestsContext(newTestNGCtx);
         
         threadLocalContext.set(seleniumTestsCtx);
         
         // update some values after init. These init call the thread context previously created
-        seleniumTestsCtx.postInit();
-
+        seleniumTestsCtx.configureContext(testName);
+    }
+    
+    /**
+     * Update the current thread context without recreating it
+     * This is a correction for issue #94
+     * @param testName
+     */
+    public static void updateThreadContext(String testName) {
+    	if (threadLocalContext.get() != null) {
+    		threadLocalContext.get().configureContext(testName);
+    	}
     }
 
     public static void setGlobalContext(final SeleniumTestsContext ctx) {
