@@ -192,8 +192,8 @@ public class SeleniumTestsContext {
     private Map<String, TestVariable> testVariables = Collections.synchronizedMap(new HashMap<String, TestVariable>());
 
     private ITestContext testNGContext = null;
-    private final SeleniumRobotVariableServerConnector variableServer;
-    private final SeleniumGridConnector seleniumGridConnector;
+    private SeleniumRobotVariableServerConnector variableServer;
+    private SeleniumGridConnector seleniumGridConnector;
     
     public SeleniumTestsContext() {
     	// for test purpose only
@@ -201,24 +201,18 @@ public class SeleniumTestsContext {
     	seleniumGridConnector = null;
     }
     
-    public SeleniumTestsContext(final ITestContext context, final String testName) {
-        this.testNGContext = context;
-        
+    public SeleniumTestsContext(final ITestContext context) {
+        testNGContext = context;
+        buildContextFromConfig();
+    }
+    
+    private void buildContextFromConfig() {
         setSeleniumRobotServerUrl(getValueForTest(SELENIUMROBOTSERVER_URL, System.getProperty(SELENIUMROBOTSERVER_URL)));
         setSeleniumRobotServerActive(getBoolValueForTest(SELENIUMROBOTSERVER_ACTIVE, System.getProperty(SELENIUMROBOTSERVER_ACTIVE)));
         setSeleniumRobotServerCompareSnapshot(getBoolValueForTest(SELENIUMROBOTSERVER_COMPARE_SNAPSHOT, System.getProperty(SELENIUMROBOTSERVER_COMPARE_SNAPSHOT)));
         setSeleniumRobotServerRecordResults(getBoolValueForTest(SELENIUMROBOTSERVER_RECORD_RESULTS, System.getProperty(SELENIUMROBOTSERVER_RECORD_RESULTS)));
-        setTestName(testName);
-
-        // create seleniumRobot server instance
-        variableServer = connectSeleniumRobotServer();
-
         setWebDriverGrid(getValueForTest(WEB_DRIVER_GRID, System.getProperty(WEB_DRIVER_GRID)));
-        setRunMode(getValueForTest(RUN_MODE, System.getProperty(RUN_MODE)));
-        
-        // create selenium grid connector
-        seleniumGridConnector = connectGrid();
-        
+        setRunMode(getValueForTest(RUN_MODE, System.getProperty(RUN_MODE)));       
         setTestDataFile(getValueForTest(TEST_DATA_FILE, System.getProperty(TEST_DATA_FILE)));
         setLoadIni(getValueForTest(LOAD_INI, System.getProperty(LOAD_INI)));
         setWebSessionTimeout(getIntValueForTest(WEB_SESSION_TIME_OUT, System.getProperty(WEB_SESSION_TIME_OUT)));
@@ -301,32 +295,13 @@ public class SeleniumTestsContext {
         
         setViewPortWidth(getIntValueForTest(VIEWPORT_WIDTH, System.getProperty(VIEWPORT_WIDTH)));
         setViewPortHeight(getIntValueForTest(VIEWPORT_HEIGHT, System.getProperty(VIEWPORT_HEIGHT)));
-    
-        updateTestAndMobile(getPlatform());
         
-        // update browser version: replace installed one with those given in parameters
-        updateInstalledBrowsers();
-        
-        if (context != null) {
-        	setOutputDirectory(getValueForTest(OUTPUT_DIRECTORY, System.getProperty(OUTPUT_DIRECTORY)), context);
+        if (testNGContext != null) {
+        	setOutputDirectory(getValueForTest(OUTPUT_DIRECTORY, System.getProperty(OUTPUT_DIRECTORY)), testNGContext);
 
             // parse other parameters that are defined in testng xml but not defined
             // in this context
-            setContextAttribute(context);
-
-            new File(context.getOutputDirectory() + "/screenshots").mkdirs();
-            new File(context.getOutputDirectory() + "/htmls").mkdirs();
-            new File(context.getOutputDirectory() + "/xmls").mkdirs();
-            new File(context.getOutputDirectory() + "/textfiles/").mkdirs();
-
-            String path = (String) getAttribute(PLUGIN_CONFIG_PATH);
-
-            if (path != null && path.trim().length() > 0) {
-                File configFile = new File(path);
-                if (configFile.exists()) {
-                    PluginsHelper.getInstance().loadPlugins(configFile);
-                }
-            }
+            addUserDefinedParameters();
         }
     }
     
@@ -502,7 +477,254 @@ public class SeleniumTestsContext {
         }
     }
 
-    public Boolean getAddJSErrorCollectorExtension() {
+       
+    /**
+     * Get all JVM properties and filters the java one so that only user defined JVM arguments are returned
+     * @return
+     */
+    public Map<String, String> getCommandLineProperties() {
+	    Map<String, String> props = new HashMap<>();
+	    for (Entry<Object,Object> entry: System.getProperties().entrySet()) {
+	    	String key = entry.getKey().toString();
+	    	if (key.startsWith("java.") 
+	    			|| key.startsWith("sun.")
+	    			|| key.startsWith("user.")
+	    			|| key.startsWith("os.")
+	    			|| key.startsWith("file.")
+	    			|| key.startsWith("awt.")
+	    			) {
+	    		continue;
+	    	}
+	    	props.put(key, System.getProperty(key));
+	    }
+	    return props;
+    }
+
+    /**
+     * Add to contextMap, parameters defined in testng file, which are not known as technical parameters
+     * For example, it's possible to add <parameter name="aNewParam" value="aValue" /> in context because it's unknown from 
+     * constructor. Whereas <parameter name=browser value="*opera" /> will not be overriden as it's already known
+     * 
+     * Also add command line JVM arguments so that they are also available as test configuration
+     * @param context
+     */
+    private void addUserDefinedParameters() {
+        if (testNGContext != null) {
+        	Map<String, String> testParameters;
+        	if (testNGContext.getCurrentXmlTest() == null) {
+        		testParameters = testNGContext.getSuite().getXmlSuite().getParameters();
+        	} else {
+        		testParameters = testNGContext.getCurrentXmlTest().getAllParameters();
+        	}
+
+            addUserDefinedParametersToContext(testParameters);
+        }
+        
+        // add command line paramters to testVariables
+        addUserDefinedParametersToContext(getCommandLineProperties());
+    }
+    
+    /**
+     * add parameters to contextDataMap and user defined testVariables
+     * If parameter is already known in contextDataMap (technical parameters defined in this class), it's not added 
+     * @param parameters
+     */
+    private void addUserDefinedParametersToContext(Map<String, String> parameters) {
+    	for (Entry<String, String> entry : parameters.entrySet()) {
+            String attributeName = entry.getKey();
+
+            // contextDataMap already contains all technical parameters
+            if (!contextDataMap.containsKey(entry.getKey())) {
+                String sysPropertyValue = System.getProperty(entry.getKey());
+                String suiteValue = entry.getValue();
+                setContextAttribute(attributeName, sysPropertyValue, suiteValue, null);
+                testVariables.put(attributeName, new TestVariable(attributeName, getAttribute(attributeName).toString()));
+            }
+        }
+    }
+
+    /**
+     * Get (in order of importance) user value (if exist), test value (if exist), suite value (if exist) or null
+     *
+     * @param  context
+     * @param  attributeName
+     * @param  sysPropertyValue
+     * @param  defaultValue
+     */
+    private String getValueForTest(final String attributeName, final String sysPropertyValue) {
+    	String value = null;
+        if (testNGContext != null) {
+        	
+        	// default suite value, even if currentXmlTest is null
+        	value = testNGContext.getSuite().getXmlSuite().getParameter(attributeName);
+        	
+        	if (testNGContext.getCurrentXmlTest() != null) {
+        	
+	        	// priority given to test parameter
+	        	String testValue = testNGContext.getCurrentXmlTest().getParameter(attributeName);
+	        	
+	        	if (testValue == null) {
+	        		
+	        		// if test parameter does not exist, look at suite parameter
+	        		value = testNGContext.getCurrentXmlTest().getSuite().getParameter(attributeName);
+	        		
+	        	} else {
+	        		value = testValue;
+	        	}
+        	}
+        }
+        
+        return sysPropertyValue != null ? sysPropertyValue : value;
+    }
+    
+    /**
+     * Return an int value from test parameters
+     * @param attributeName
+     * @param sysPropertyValue
+     * @return
+     */
+    private Integer getIntValueForTest(final String attributeName, final String sysPropertyValue) {
+    	String value = getValueForTest(attributeName, sysPropertyValue);
+    	return value == null ? null: Integer.parseInt(value);
+    }
+    
+    /**
+     * Return a boolean value from test parameters
+     * @param attributeName
+     * @param sysPropertyValue
+     * @return
+     */
+    private Boolean getBoolValueForTest(final String attributeName, final String sysPropertyValue) {
+    	String value = getValueForTest(attributeName, sysPropertyValue);
+    	return value == null ? null: Boolean.parseBoolean(value);
+    }
+
+    private void setContextAttribute(final String attributeName, final String sysPropertyValue, 
+    									final String suiteValue, final String defaultValue) {
+
+        contextDataMap.put(attributeName,
+            sysPropertyValue != null ? sysPropertyValue : (suiteValue != null ? suiteValue : defaultValue));
+
+    }
+
+    
+   
+    /**
+     * Connect all servers (grid, seleniumRobot server) to this context
+     */
+    private void createContextConnectors() {
+
+        // create seleniumRobot server instance
+        variableServer = connectSeleniumRobotServer();
+
+        // create selenium grid connector
+        seleniumGridConnector = connectGrid();
+        
+        // create Test Manager connector
+    	checkTmsConfiguration();
+    }
+    
+    /**
+     * post configuration of the context
+     */
+    public void configureContext(final String testName) {
+    	
+    	// to do before creating connectors because seleniumRobot server needs it
+        setTestName(testName);
+    	
+    	createContextConnectors();
+
+        updateTestAndMobile(getPlatform());
+        
+        // update browser version: replace installed one with those given in parameters
+        updateInstalledBrowsers();
+      
+        // load pageloading plugins
+        String path = (String) getAttribute(PLUGIN_CONFIG_PATH);
+        if (path != null && path.trim().length() > 0) {
+            File configFile = new File(path);
+            if (configFile.exists()) {
+                PluginsHelper.getInstance().loadPlugins(configFile);
+            }
+        }
+    	
+        // read and set test configuration from env.ini file and from seleniumRobot server
+    	setTestConfiguration();
+    	updateProxyConfig();
+    }
+    
+    /**
+     * Extract proxy settings from environment configuration and write them to context if they are not already present in XML file or on command line
+     */
+    public void updateProxyConfig() {
+    	Map<String, TestVariable> envConfig = getConfiguration();
+    	for (Entry<String, TestVariable> entry: envConfig.entrySet()) {
+    		String key = entry.getKey();
+    		switch (key) {
+    			case WEB_PROXY_TYPE:
+    				setWebProxyType(getWebProxyType() == null ? envConfig.get(key).getValue(): (getWebProxyType() == null ? null: getWebProxyType().name()));
+    				break;
+    			case WEB_PROXY_ADDRESS:
+    				setWebProxyAddress(getWebProxyAddress() == null ? envConfig.get(key).getValue(): getWebProxyAddress());
+    				break;
+    			case WEB_PROXY_PORT:
+    				setWebProxyPort(getWebProxyPort() == null ? Integer.valueOf(envConfig.get(key).getValue()): getWebProxyPort());
+    				break;
+    			case WEB_PROXY_LOGIN:
+    				setWebProxyLogin(getWebProxyLogin() == null ? envConfig.get(key).getValue(): getWebProxyLogin());
+    				break;
+    			case WEB_PROXY_PASSWORD:
+    				setWebProxyPassword(getWebProxyPassword() == null ? envConfig.get(key).getValue(): getWebProxyPassword());
+    				break;
+    			case WEB_PROXY_PAC:
+    				setWebProxyPac(getWebProxyPac() == null ? envConfig.get(key).getValue(): getWebProxyPac());
+    				break;
+    			case WEB_PROXY_EXCLUDE:
+    				setWebProxyExclude(getWebProxyExclude() == null ? envConfig.get(key).getValue(): getWebProxyExclude());
+    				break;
+    			default:
+    				continue;
+    		}
+    	}
+    	
+    	// set default value for proxy type if none as been set before
+    	if (getWebProxyType() == null) {
+    		setWebProxyType("AUTODETECT");
+    	}
+    }
+    
+    /**
+     * Get all variables from server if it has been activated
+     */
+    private void updateTestConfigurationFromVariableServer() {
+    	
+    	if (variableServer != null) {
+			getConfiguration().putAll(variableServer.getVariables());
+    	}
+    }
+    
+    /**
+     * Read configuration from environment specific data and undefined parameters present un testng xml file
+     * these configurations will be overident by server if it's present
+     */
+	public void setTestConfiguration() {
+    	Map<String, TestVariable> envConfig = new ConfigReader().readConfig();
+    	envConfig.putAll(testVariables);
+    	setConfiguration(envConfig);
+    	
+    	updateTestConfigurationFromVariableServer();
+    }
+	
+	public void checkTmsConfiguration() {
+		if (getTms() != null) {
+			getTms().init();
+		}
+	}
+	
+	
+	
+	// ------------------------- accessors ------------------------------------------------------
+	 public Boolean getAddJSErrorCollectorExtension() {
         return (Boolean) getAttribute(ADD_JS_ERROR_COLLECTOR_EXTENSION);
     }
     
@@ -967,135 +1189,6 @@ public class SeleniumTestsContext {
 
     public void setAttribute(final String name, final Object value) {
         contextDataMap.put(name, value);
-    }
-    
-    /**
-     * Get all JVM properties and filters the java one so that only user defined JVM arguments are returned
-     * @return
-     */
-    public Map<String, String> getCommandLineProperties() {
-	    Map<String, String> props = new HashMap<>();
-	    for (Entry<Object,Object> entry: System.getProperties().entrySet()) {
-	    	String key = entry.getKey().toString();
-	    	if (key.startsWith("java.") 
-	    			|| key.startsWith("sun.")
-	    			|| key.startsWith("user.")
-	    			|| key.startsWith("os.")
-	    			|| key.startsWith("file.")
-	    			|| key.startsWith("awt.")
-	    			) {
-	    		continue;
-	    	}
-	    	props.put(key, System.getProperty(key));
-	    }
-	    return props;
-    }
-
-    /**
-     * Add to contextMap, parameters defined in testng file, which are not known as technical parameters
-     * For example, it's possible to add <parameter name="aNewParam" value="aValue" /> in context because it's unknown from 
-     * constructor. Whereas <parameter name=browser value="*opera" /> will not be overriden as it's already known
-     * 
-     * Also add command line JVM arguments so that they are also available as test configuration
-     * @param context
-     */
-    private void setContextAttribute(final ITestContext context) {
-        if (context != null) {
-        	Map<String, String> testParameters;
-        	if (context.getCurrentXmlTest() == null) {
-        		testParameters = context.getSuite().getXmlSuite().getParameters();
-        	} else {
-        		testParameters = context.getCurrentXmlTest().getAllParameters();
-        	}
-
-            addUserDefinedParametersToContext(testParameters);
-        }
-        
-        // add command line paramters to testVariables
-        addUserDefinedParametersToContext(getCommandLineProperties());
-    }
-    
-    /**
-     * add parameters to contextDataMap and user defined testVariables
-     * If parameter is already known in contextDataMap (technical parameters defined in this class), it's not added 
-     * @param parameters
-     */
-    private void addUserDefinedParametersToContext(Map<String, String> parameters) {
-    	for (Entry<String, String> entry : parameters.entrySet()) {
-            String attributeName = entry.getKey();
-
-            // contextDataMap already contains all technical parameters
-            if (!contextDataMap.containsKey(entry.getKey())) {
-                String sysPropertyValue = System.getProperty(entry.getKey());
-                String suiteValue = entry.getValue();
-                setContextAttribute(attributeName, sysPropertyValue, suiteValue, null);
-                testVariables.put(attributeName, new TestVariable(attributeName, getAttribute(attributeName).toString()));
-            }
-        }
-    }
-
-    /**
-     * Get (in order of importance) user value (if exist), test value (if exist), suite value (if exist) or null
-     *
-     * @param  context
-     * @param  attributeName
-     * @param  sysPropertyValue
-     * @param  defaultValue
-     */
-    private String getValueForTest(final String attributeName, final String sysPropertyValue) {
-    	String value = null;
-        if (testNGContext != null) {
-        	
-        	// default suite value, even if currentXmlTest is null
-        	value = testNGContext.getSuite().getXmlSuite().getParameter(attributeName);
-        	
-        	if (testNGContext.getCurrentXmlTest() != null) {
-        	
-	        	// priority given to test parameter
-	        	String testValue = testNGContext.getCurrentXmlTest().getParameter(attributeName);
-	        	
-	        	if (testValue == null) {
-	        		
-	        		// if test parameter does not exist, look at suite parameter
-	        		value = testNGContext.getCurrentXmlTest().getSuite().getParameter(attributeName);
-	        		
-	        	} else {
-	        		value = testValue;
-	        	}
-        	}
-        }
-        
-        return sysPropertyValue != null ? sysPropertyValue : value;
-    }
-    
-    /**
-     * Return an int value from test parameters
-     * @param attributeName
-     * @param sysPropertyValue
-     * @return
-     */
-    private Integer getIntValueForTest(final String attributeName, final String sysPropertyValue) {
-    	String value = getValueForTest(attributeName, sysPropertyValue);
-    	return value == null ? null: Integer.parseInt(value);
-    }
-    
-    /**
-     * Return a boolean value from test parameters
-     * @param attributeName
-     * @param sysPropertyValue
-     * @return
-     */
-    private Boolean getBoolValueForTest(final String attributeName, final String sysPropertyValue) {
-    	String value = getValueForTest(attributeName, sysPropertyValue);
-    	return value == null ? null: Boolean.parseBoolean(value);
-    }
-
-    private void setContextAttribute(final String attributeName, final String sysPropertyValue, 
-    									final String suiteValue, final String defaultValue) {
-
-        contextDataMap.put(attributeName,
-            sysPropertyValue != null ? sysPropertyValue : (suiteValue != null ? suiteValue : defaultValue));
-
     }
 
     public void setTestDataFile(String testDataFile) {
@@ -1636,83 +1729,4 @@ public class SeleniumTestsContext {
     public void setViewPortHeight(Integer height) {
     	setAttribute(VIEWPORT_HEIGHT, height);    	
     }
-    
-    // ------------------------- FROM THERE, methods need context with calls to SeleniumTestsContextManager.getThreadContext() ------------------
-    /**
-     * post configuration of the context
-     */
-    public void postInit() {
-    	setTestConfiguration();
-    	postsetProxyConfig();
-    	checkTmsConfiguration();
-    }
-    
-    /**
-     * Extract proxy settings from environment configuration and write them to context if they are not already present in XML file or on command line
-     */
-    public void postsetProxyConfig() {
-    	Map<String, TestVariable> envConfig = getConfiguration();
-    	for (Entry<String, TestVariable> entry: envConfig.entrySet()) {
-    		String key = entry.getKey();
-    		switch (key) {
-    			case WEB_PROXY_TYPE:
-    				setWebProxyType(getWebProxyType() == null ? envConfig.get(key).getValue(): (getWebProxyType() == null ? null: getWebProxyType().name()));
-    				break;
-    			case WEB_PROXY_ADDRESS:
-    				setWebProxyAddress(getWebProxyAddress() == null ? envConfig.get(key).getValue(): getWebProxyAddress());
-    				break;
-    			case WEB_PROXY_PORT:
-    				setWebProxyPort(getWebProxyPort() == null ? Integer.valueOf(envConfig.get(key).getValue()): getWebProxyPort());
-    				break;
-    			case WEB_PROXY_LOGIN:
-    				setWebProxyLogin(getWebProxyLogin() == null ? envConfig.get(key).getValue(): getWebProxyLogin());
-    				break;
-    			case WEB_PROXY_PASSWORD:
-    				setWebProxyPassword(getWebProxyPassword() == null ? envConfig.get(key).getValue(): getWebProxyPassword());
-    				break;
-    			case WEB_PROXY_PAC:
-    				setWebProxyPac(getWebProxyPac() == null ? envConfig.get(key).getValue(): getWebProxyPac());
-    				break;
-    			case WEB_PROXY_EXCLUDE:
-    				setWebProxyExclude(getWebProxyExclude() == null ? envConfig.get(key).getValue(): getWebProxyExclude());
-    				break;
-    			default:
-    				continue;
-    		}
-    	}
-    	
-    	// set default value for proxy type if none as been set before
-    	if (getWebProxyType() == null) {
-    		setWebProxyType("AUTODETECT");
-    	}
-    }
-    
-    /**
-     * Get all variables from server if it has been activated
-     */
-    private void updateTestConfigurationFromVariableServer() {
-    	
-    	if (variableServer != null) {
-			getConfiguration().putAll(variableServer.getVariables());
-    	}
-    }
-    
-    /**
-     * Read configuration from environment specific data and undefined parameters present un testng xml file
-     * these configurations will be overident by server if it's present
-     */
-	public void setTestConfiguration() {
-    	Map<String, TestVariable> envConfig = new ConfigReader().readConfig();
-    	envConfig.putAll(testVariables);
-    	setConfiguration(envConfig);
-    	
-    	updateTestConfigurationFromVariableServer();
-    }
-	
-	public void checkTmsConfiguration() {
-		if (getTms() != null) {
-			getTms().init();
-		}
-	}
-
 }

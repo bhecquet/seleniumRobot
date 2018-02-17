@@ -6,6 +6,10 @@ Unzip your test application .zip file to the same folder. It will create the cor
 
 Tests are run using command line: `java -cp seleniumRobot.jar;plugins/<app>-tests.jar -D<option1>=<value1> -D<option2>=<value2> org.testng.TestNG <path_to_TestNG_xml_file>"`</br>
 
+After this command, you can specify TestNG options:
+- `-testnames <comma_seperated_list_of_tests>`: list of tests (from XML) to execute
+- `-usedefaultlisteners false`: remove all TestNG default reports. SeleniumRobot provide its own reports so TestNG ones are useless
+
 In the above line, there are 2 option types:
 - seleniumRobot parameters (table below) which are passed as JVM options `-Dkey=value`
 - TestNG parameters ([http://testng.org/doc/documentation-main.html#running-testng]) which must contain at least the xml file to use. For example, if the XML `app-test.xml` file contains several test (testLogin, testCart), you can choose to start only one of them with the line `java -cp seleniumRobot.jar;plugins/<app>-tests.jar -D<option1>=<value1> -D<option2>=<value2> org.testng.TestNG app-test.xml -testnames testLogin`
