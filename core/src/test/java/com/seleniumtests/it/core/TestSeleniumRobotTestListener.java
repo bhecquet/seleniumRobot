@@ -103,4 +103,51 @@ public class TestSeleniumRobotTestListener extends GenericTest {
 		// all 3 methods are OK
 		Assert.assertEquals(StringUtils.countMatches(mainReportContent, "<i class=\"fa fa-circle circleSuccess\">"), 3);
 	}
+	
+	private TestNG executeSubTest2(XmlSuite.ParallelMode parallelMode) throws IOException {
+
+		XmlSuite suite = new XmlSuite();
+		suite.setName("TmpSuite");
+		suite.setParallel(parallelMode);
+		suite.setFileName("/home/test/seleniumRobot/testng/testLoggging.xml");
+		Map<String, String> suiteParameters = new HashMap<>();
+		suiteParameters.put("softAssertEnabled", "false");
+		suite.setParameters(suiteParameters);
+		List<XmlSuite> suites = new ArrayList<XmlSuite>();
+		suites.add(suite);
+	
+		suite.setThreadCount(5);
+		suite.setParallel(parallelMode);
+		
+		// TestNG tests
+		XmlTest test = new XmlTest(suite);
+		test.setName("test1");
+		test.addParameter(SeleniumTestsContext.BROWSER, "none");
+		
+		List<XmlClass> classes = new ArrayList<XmlClass>();
+		XmlClass xmlClass = new XmlClass("com.seleniumtests.it.stubclasses.StubTestClassForListener1");
+		classes.add(xmlClass);
+		test.setXmlClasses(classes) ;
+		
+		TestNG tng = new TestNG(false);
+		tng.setXmlSuites(suites);
+		tng.setOutputDirectory(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory());
+		tng.run(); 
+		
+		return tng;
+	}
+	
+	@Test(groups={"it"})
+	public void testContextStorage(ITestContext testContext) throws Exception {
+		
+		TestNG tng = executeSubTest2(ParallelMode.METHODS);
+		
+		
+	}
+	
+	/* TODO:
+	 * - 2 tests classes with 2 tests each, with @BeforeClass, @BeforeTest, @BeforeMethod, @BeforeGroup
+	 * 	- test all parallel modes available
+	 *  - check with logs, for example, that something added in test context (before) is kept in test and available after test
+	 */
 }

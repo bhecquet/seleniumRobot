@@ -857,7 +857,7 @@ public class TestSeleniumTestContext extends GenericTest {
 		SeleniumTestsContextManager.generateApplicationPath(testNGCtx.getCurrentXmlTest().getSuite());
 		SeleniumTestsContext seleniumContext = new SeleniumTestsContext();
 		seleniumContext.setTestConfiguration();
-		seleniumContext.postsetProxyConfig();
+		seleniumContext.updateProxyConfig();
 		Assert.assertEquals(seleniumContext.getWebProxyType(), ProxyType.DIRECT);
 	}
 	@Test(groups="ut context")

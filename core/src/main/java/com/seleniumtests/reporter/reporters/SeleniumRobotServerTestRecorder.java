@@ -16,7 +16,9 @@ import org.testng.ITestResult;
 import org.testng.xml.XmlSuite;
 
 import com.seleniumtests.connectors.selenium.SeleniumRobotSnapshotServerConnector;
+import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.core.runner.SeleniumRobotTestListener;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.SeleniumRobotServerException;
 import com.seleniumtests.reporter.logger.TestLogging;
@@ -119,8 +121,8 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 			// test case in seleniumRobot naming
 			for (ITestResult testResult: methodResults) {
 				
-				// issue #81: recreate test context from this context (due to multithreading, this context may be null if parallel testing is done)
-				SeleniumTestsContextManager.initThreadContext(context, null);
+				// issue #81: recreate test context from this context (due to multithreading, this context may be null if parallel testing is used)
+				SeleniumTestsContextManager.setThreadContextFromTestResult(testResult);
 				
 				// skipped tests has never been executed and so attribute (set in TestListener) has not been applied
 				String testName = getTestName(testResult);
