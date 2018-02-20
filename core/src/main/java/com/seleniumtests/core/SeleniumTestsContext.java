@@ -57,9 +57,6 @@ import com.seleniumtests.util.osutility.OSUtility;
  */
 public class SeleniumTestsContext {
 	
-	// folder config
-	private Map<String, HashMap<String,String>> idMapping;
-	
 	private static final Logger logger = SeleniumRobotLogger.getLogger(SeleniumTestsContext.class);
 
     /* configuration defined in testng.xml */
@@ -173,17 +170,17 @@ public class SeleniumTestsContext {
     
     // internal storage
     public static final String TEST_VARIABLES = "testVariables"; 				// configuration (aka variables, get via 'param()' method) used for the current test. It is not updated via XML file
-    																			
-
-    
+    																		
     // default values
     public static final List<ReportInfo> DEFAULT_CUSTOM_TEST_REPORTS = Arrays.asList(new ReportInfo("PERF::xml::reporter/templates/report.perf.vm"));
     public static final List<ReportInfo> DEFAULT_CUSTOM_SUMMARY_REPORTS = Arrays.asList(new ReportInfo("results::json::reporter/templates/report.summary.json.vm"));
     
     private static final int REPLAY_TIME_OUT_VALUE = 30;
     
-    private LinkedList<TearDownService> tearDownServices = new LinkedList<>();
     private Map<ITestResult, List<Throwable>> verificationFailuresMap = new HashMap<>();
+
+	// folder config
+	private Map<String, HashMap<String,String>> idMapping;
 
     // Data object to store all context data
     private Map<String, Object> contextDataMap = Collections.synchronizedMap(new HashMap<String, Object>());
@@ -199,6 +196,16 @@ public class SeleniumTestsContext {
     	// for test purpose only
     	variableServer = null;
     	seleniumGridConnector = null;
+    }
+    
+    /**
+     * Create a new context from this one. This does copy only TestNG context and data map / variables
+     * @param toCopy		the context to copy in this one
+     */
+    public SeleniumTestsContext(SeleniumTestsContext toCopy) {
+    	contextDataMap = new HashMap<>(toCopy.contextDataMap); 
+    	testVariables = new HashMap<>(toCopy.testVariables);
+    	testNGContext = toCopy.testNGContext;
     }
     
     public SeleniumTestsContext(final ITestContext context) {
@@ -452,13 +459,6 @@ public class SeleniumTestsContext {
     	} else {
     		return null;
     	}
-    }
-
-    /**
-     * Adds the given tear down.
-     */
-    public void addTearDownService(final TearDownService tearDown) {
-        tearDownServices.add(tearDown);
     }
 
     public void addVerificationFailures(final ITestResult result, final List<Throwable> failures) {
@@ -921,15 +921,6 @@ public class SeleniumTestsContext {
         }
     }
 
-    /**
-     * Returns the tear down list.
-     * 
-     * @return list of teardown services
-     */
-    public List<TearDownService> getTearDownServices() {
-        return tearDownServices;
-    }
-    
     public List<ReportInfo> getCustomTestReports() {
     	return (List<ReportInfo>) getAttribute(CUSTOM_TEST_REPORTS);
     }

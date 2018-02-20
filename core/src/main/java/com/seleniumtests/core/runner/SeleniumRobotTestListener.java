@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 
 import org.apache.log4j.Logger;
+import org.testng.IConfigurationListener;
 import org.testng.IExecutionListener;
 import org.testng.IInvokedMethod;
 import org.testng.IInvokedMethodListener2;
@@ -30,7 +31,6 @@ import com.mashape.unirest.http.Unirest;
 import com.seleniumtests.connectors.selenium.SeleniumRobotVariableServerConnector;
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
-import com.seleniumtests.core.TearDownService;
 import com.seleniumtests.core.TestTasks;
 import com.seleniumtests.core.testretry.TestRetryAnalyzer;
 import com.seleniumtests.customexception.ConfigurationException;
@@ -42,9 +42,10 @@ import com.seleniumtests.reporter.logger.TestStep;
 import com.seleniumtests.reporter.reporters.CommonReporter;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
-public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodListener2, ISuiteListener, IExecutionListener {
+public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodListener2, ISuiteListener, IExecutionListener, IConfigurationListener {
 	
 	protected static final Logger logger = SeleniumRobotLogger.getLogger(SeleniumRobotTestListener.class);
+	
 	public static final String THREAD_CONTEXT = "threadContext";
 	private Date start;
 	
@@ -143,13 +144,39 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 		TestLogging.setCurrentTestResult(testResult);
 		
 		// issue #94: add ability to request thread context from a method annotated with @BeforeMethod
-		if (testResult.getAttribute(THREAD_CONTEXT) == null) {
-			SeleniumTestsContextManager.initThreadContext(context, null);
-			testResult.setAttribute(THREAD_CONTEXT, SeleniumTestsContextManager.getThreadContext());
-		} else {
-			SeleniumTestsContextManager.setThreadContextFromTestResult(testResult);
+		// for each beforemethod, store the current context so that it can be edited by the configuration method
+		if (method.isConfigurationMethod()) {
+			SeleniumTestsContext currentBeforeContext = null;
+			
+			// handle some before methods
+			if (((ConfigurationMethod)method.getTestMethod()).isBeforeTestConfiguration()) {
+				currentBeforeContext = SeleniumTestsContextManager.storeTestContext(context);
+			} else if (((ConfigurationMethod)method.getTestMethod()).isBeforeClassConfiguration()) {
+				currentBeforeContext = SeleniumTestsContextManager.storeClassContext(context, method.getTestMethod().getTestClass().getName());
+			} else if (((ConfigurationMethod)method.getTestMethod()).isBeforeMethodConfiguration()) {
+				try {
+					String className = ((Method)(testResult.getParameters()[0])).getDeclaringClass().getName();
+					String methodName = ((Method)(testResult.getParameters()[0])).getName();
+					currentBeforeContext = SeleniumTestsContextManager.storeMethodContext(context, className, methodName);	 
+				} catch (Exception e) {}
+				
+			// handle some after methods. No change in context in after method will be recorded
+			} else if (((ConfigurationMethod)method.getTestMethod()).isAfterMethodConfiguration()) {
+				String className = ((Method)(testResult.getParameters()[0])).getDeclaringClass().getName();
+				String methodName = ((Method)(testResult.getParameters()[0])).getName();
+				currentBeforeContext = SeleniumTestsContextManager.getMethodContext(context, className, methodName, false);
+			} else if (((ConfigurationMethod)method.getTestMethod()).isAfterClassConfiguration()) {
+				currentBeforeContext = SeleniumTestsContextManager.getClassContext(context, method.getTestMethod().getTestClass().getName());
+			} else if (((ConfigurationMethod)method.getTestMethod()).isAfterTestConfiguration()) {
+				currentBeforeContext = SeleniumTestsContextManager.getTestContext(context);
+			}
+			if (currentBeforeContext != null) {
+				SeleniumTestsContextManager.setThreadContext(currentBeforeContext);
+			} else {
+				SeleniumTestsContextManager.initThreadContext();
+			}
 		}
-		
+
 		if (method.isTestMethod()) {
 
 	    	if (SeleniumRobotTestPlan.isCucumberTest()) {
@@ -162,6 +189,10 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
     		
     		// when @BeforeMethod has been used, threadContext is already initialized and may have been updated. Do not overwrite options
     		// only reconfigure it
+			String className = method.getTestMethod().getTestClass().getName();
+			String methodName = method.getTestMethod().getMethodName();
+			SeleniumTestsContextManager.setThreadContext(SeleniumTestsContextManager.getMethodContext(context, className, methodName, true));
+	
     		SeleniumTestsContextManager.updateThreadContext((String)testResult.getAttribute(SeleniumRobotLogger.METHOD_NAME));
     		
             SeleniumTestsContextManager.getThreadContext().setTestMethodSignature((String)testResult.getAttribute(SeleniumRobotLogger.METHOD_NAME));
@@ -176,15 +207,26 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 	@Override
 	public void afterInvocation(IInvokedMethod method, ITestResult testResult, ITestContext context) {
 		
+		
+		if (method.isConfigurationMethod()) {
+			
+			// store the current thread context back to test/class/method context as it may have been modified in "Before" methods
+			if (((ConfigurationMethod)method.getTestMethod()).isBeforeTestConfiguration()) {
+				SeleniumTestsContextManager.setTestContext(context, SeleniumTestsContextManager.getThreadContext());
+			} else if (((ConfigurationMethod)method.getTestMethod()).isBeforeClassConfiguration()) {
+				SeleniumTestsContextManager.setClassContext(context, method.getTestMethod().getTestClass().getName(), SeleniumTestsContextManager.getThreadContext());
+			} else if (((ConfigurationMethod)method.getTestMethod()).isBeforeMethodConfiguration()) {
+				try {
+					String className = ((Method)(testResult.getParameters()[0])).getDeclaringClass().getName();
+					String methodName = ((Method)(testResult.getParameters()[0])).getName();
+					SeleniumTestsContextManager.setMethodContext(context, className, methodName, SeleniumTestsContextManager.getThreadContext());
+				} catch (Exception e) {}
+			} 
+		}
+		
 		Reporter.setCurrentTestResult(testResult);
 		
 		if (method.isTestMethod()) {
-	        List<TearDownService> serviceList = SeleniumTestsContextManager.getThreadContext().getTearDownServices();
-	        if (serviceList != null && !serviceList.isEmpty()) {
-	            for (TearDownService service : serviceList) {
-	                service.tearDown();
-	            }
-	        }
 
 	        logger.info(SeleniumRobotLogger.END_TEST_PATTERN + testResult.getAttribute(SeleniumRobotLogger.METHOD_NAME));
 
@@ -219,6 +261,11 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 			
 			// unreserve variables
 			unreserveVariables();
+			
+			// store test method context in case it has been modified
+			String className = method.getTestMethod().getTestClass().getName();
+			String methodName = method.getTestMethod().getMethodName();
+			SeleniumTestsContextManager.setMethodContext(context, className, methodName, SeleniumTestsContextManager.getThreadContext());
 	        
 		}
 	}
@@ -420,6 +467,24 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 				returnValue.getAllResults().remove(removeResult);
 			}
 		}
+	}
+
+	@Override
+	public void onConfigurationSuccess(ITestResult itr) {
+//		itr.getTestContext().getPassedConfigurations().addResult(itr, itr.getMethod());
+	}
+
+	@Override
+	public void onConfigurationFailure(ITestResult itr) {
+		logger.error(String.format("Error on configuration method %s.%s: %s", itr.getMethod().getTestClass().getName(), itr.getMethod().getMethodName(), itr.getThrowable().getMessage()));
+		itr.getTestContext().getFailedConfigurations().addResult(itr, itr.getMethod());
+		itr.getThrowable().printStackTrace();
+	}
+
+	@Override
+	public void onConfigurationSkip(ITestResult itr) {
+		logger.error(String.format("Skip on method %s.%s", itr.getMethod().getTestClass().getName(), itr.getMethod().getMethodName()));
+//		itr.getTestContext().getSkippedConfigurations().addResult(itr, itr.getMethod());
 	}
 
 }
