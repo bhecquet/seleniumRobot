@@ -29,10 +29,12 @@ import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.testng.ISuite;
 import org.testng.ITestContext;
+import org.testng.ITestResult;
 import org.testng.xml.XmlSuite;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import com.seleniumtests.core.runner.SeleniumRobotTestListener;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.driver.TestType;
 import com.seleniumtests.util.TestConfigurationParser;
@@ -90,7 +92,7 @@ public class SeleniumTestsContextManager {
     	
     	ITestContext testNGCtx = new DefaultTestNGContext(suiteContext);
     	ITestContext newTestNGCtx = getContextFromConfigFile(testNGCtx);
-        globalContext = new SeleniumTestsContext(newTestNGCtx, null);
+        globalContext = new SeleniumTestsContext(newTestNGCtx);
     }
     
     public static void initGlobalContext(ITestContext testNGCtx) {
@@ -101,7 +103,7 @@ public class SeleniumTestsContextManager {
         }
     	
     	ITestContext newTestNGCtx = getContextFromConfigFile(testNGCtx);
-        globalContext = new SeleniumTestsContext(newTestNGCtx, null);
+        globalContext = new SeleniumTestsContext(newTestNGCtx);
     }
 
     /**
@@ -220,13 +222,23 @@ public class SeleniumTestsContextManager {
         }
     	
     	ITestContext newTestNGCtx = getContextFromConfigFile(testNGCtx);
-    	SeleniumTestsContext seleniumTestsCtx = new SeleniumTestsContext(newTestNGCtx, testName);
+    	SeleniumTestsContext seleniumTestsCtx = new SeleniumTestsContext(newTestNGCtx);
         
         threadLocalContext.set(seleniumTestsCtx);
         
         // update some values after init. These init call the thread context previously created
-        seleniumTestsCtx.postInit();
-
+        seleniumTestsCtx.configureContext(testName);
+    }
+    
+    /**
+     * Update the current thread context without recreating it
+     * This is a correction for issue #94
+     * @param testName
+     */
+    public static void updateThreadContext(String testName) {
+    	if (threadLocalContext.get() != null) {
+    		threadLocalContext.get().configureContext(testName);
+    	}
     }
 
     public static void setGlobalContext(final SeleniumTestsContext ctx) {
@@ -235,6 +247,18 @@ public class SeleniumTestsContextManager {
 
     public static void setThreadContext(final SeleniumTestsContext ctx) {
         threadLocalContext.set(ctx);
+    }
+    
+    public static void setThreadContextFromTestResult(ITestResult testResult) {
+    	if (testResult == null) {
+    		throw new ConfigurationException("Cannot set context from testResult as it is null");
+    	}
+    	if (testResult.getAttribute(SeleniumRobotTestListener.THREAD_CONTEXT) != null) {
+    		setThreadContext((SeleniumTestsContext)testResult.getAttribute(SeleniumRobotTestListener.THREAD_CONTEXT));
+    	} else {
+    		logger.error("Result did not contain thread context, initializing a new one");
+    		initThreadContext();
+    	}
     }
     
     public static void removeThreadContext() {
