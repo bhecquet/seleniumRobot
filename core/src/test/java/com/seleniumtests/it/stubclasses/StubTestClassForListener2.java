@@ -16,28 +16,72 @@
  */
 package com.seleniumtests.it.stubclasses;
 
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import java.lang.reflect.Method;
 
+import org.testng.Assert;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.AfterTest;
+import org.testng.annotations.BeforeTest;
+import org.testng.annotations.Test;
+import org.testng.xml.XmlTest;
+
+import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.util.helper.WaitHelper;
 
 public class StubTestClassForListener2 extends StubParentClass {
 	
-	private static int count = 0;
+	@BeforeTest
+	public void beforeTest(XmlTest xmlTest) {
+		SeleniumTestsContextManager.getThreadContext().setAttribute("test", xmlTest.getName());
+	}
+	
+	@Test(groups="stub1")
+	public void test1Listener2(XmlTest xmlTest) {
+		SeleniumTestsContextManager.getThreadContext().setAttribute("method exec", "test1Listener2");
 
-	@BeforeMethod(groups={"stub"})
-	public void set() {
-		WaitHelper.waitForMilliSeconds(100);
+		// test that all Before method settings are kept in test method
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getAttribute("test"), xmlTest.getName());
+		
+		// check we don't get settings from the other class
+		Assert.assertNull(SeleniumTestsContextManager.getThreadContext().getAttribute("method"));
+		Assert.assertNull(SeleniumTestsContextManager.getThreadContext().getAttribute("class"));
+		SeleniumTestsContextManager.getMethodContext();
 	}
 	
+	/**
+	 * Test method has the same name as in other class. Check settings are correctly kept
+	 */
 	@Test(groups="stub1")
-	public void test1() {
-		
+	public void test2Listener1() {
+		SeleniumTestsContextManager.getThreadContext().setAttribute("method exec", "test2Listener2");
 	}
 	
-	@Test(groups="stub1")
-	public void test2() {
+	@AfterMethod(groups={"stub1"})
+	public void afterMethod(Method method, XmlTest xmlTest) {
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getAttribute("test"), xmlTest.getName());
 		
+		// check we don't get settings from the other class
+		Assert.assertNull(SeleniumTestsContextManager.getThreadContext().getAttribute("method"));
+		Assert.assertNull(SeleniumTestsContextManager.getThreadContext().getAttribute("class"));
+		
+		// check setting added by test method is kept  		
+		if ("test2Listener1".equals(method.getName())) {
+			Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getAttribute("method exec"), "test2Listener2");
+		} else {
+			Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getAttribute("method exec"), method.getName());
+		}
+		WaitHelper.waitForSeconds(1);
+	}
+
+	@AfterClass
+	public void afterClass(XmlTest xmlTest) {
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getAttribute("test"), xmlTest.getName());
+	}
+	
+	@AfterTest
+	public void afterTest(XmlTest xmlTest) {
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getAttribute("test"), xmlTest.getName());
 	}
 
 }

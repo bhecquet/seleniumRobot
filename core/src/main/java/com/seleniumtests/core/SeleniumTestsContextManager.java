@@ -21,7 +21,10 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.file.Paths;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -64,6 +67,15 @@ public class SeleniumTestsContextManager {
 
     // thread level SeleniumTestsContext
     private static ThreadLocal<SeleniumTestsContext> threadLocalContext = new ThreadLocal<>();
+    
+    // relationship between a SeleniumTestsContext and a TestNG test (<test> tag in XML)
+    private static Map<String, SeleniumTestsContext> testContext = Collections.synchronizedMap(new HashMap<String, SeleniumTestsContext>());
+    
+    // relationship between a SeleniumTestsContext and a test class
+    private static Map<String, SeleniumTestsContext> classContext = Collections.synchronizedMap(new HashMap<String, SeleniumTestsContext>());
+    
+    // relationship between a SeleniumTestsContext and a test method
+    private static Map<String, SeleniumTestsContext> methodContext = Collections.synchronizedMap(new HashMap<String, SeleniumTestsContext>());
 
     private SeleniumTestsContextManager() {
 		// As a utility class, it is not meant to be instantiated.
@@ -105,8 +117,122 @@ public class SeleniumTestsContextManager {
     	ITestContext newTestNGCtx = getContextFromConfigFile(testNGCtx);
         globalContext = new SeleniumTestsContext(newTestNGCtx);
     }
-
+    
+    private static String getKeyForMethod(ITestContext testNGCtx, String className, String methodName) {
+    	return testNGCtx.getName() + "_" + className + "." + methodName;
+    }
+    private static String getKeyForClass(ITestContext testNGCtx, String className) {
+    	return testNGCtx.getName() + "_" + className;
+    }
+    
+    public static SeleniumTestsContext storeTestContext(ITestContext testNGCtx) {
+    	SeleniumTestsContext tstContext = new SeleniumTestsContext(getContextFromConfigFile(testNGCtx));
+    	setTestContext(testNGCtx, tstContext);
+    	return tstContext;
+    }
+    
+    public static void setTestContext(ITestContext testNGCtx, SeleniumTestsContext tstContext) {
+    	testContext.put(testNGCtx.getName(), tstContext);
+    }
+    
     /**
+     * Returns test context if it exists. Else, create a new one
+     * @param testNGCtx
+     * @return
+     */
+    public static SeleniumTestsContext getTestContext(ITestContext testNGCtx) {
+    	if (testContext.get(testNGCtx.getName()) != null) {
+    		return testContext.get(testNGCtx.getName());
+    	} else {
+    		return new SeleniumTestsContext(getContextFromConfigFile(testNGCtx));
+    	}
+    }
+    
+    public static SeleniumTestsContext storeClassContext(ITestContext testNGCtx, String className) {
+    	// unicity is on test + class because a class could be executed by 2 tests at the same time (e.g: ParallelMode.TESTS)
+    	String key = getKeyForClass(testNGCtx, className);
+    	SeleniumTestsContext clsContext;
+    	if (classContext.get(key) != null) {
+    		return classContext.get(key);
+    	} else if (testContext.get(testNGCtx.getName()) != null) {
+    		clsContext = new SeleniumTestsContext(testContext.get(testNGCtx.getName()));
+    	} else {
+    		clsContext = new SeleniumTestsContext(getContextFromConfigFile(testNGCtx));
+    	}
+    	setClassContext(testNGCtx, className, clsContext);;
+    	return clsContext;
+    }
+    
+    public static void setClassContext(ITestContext testNGCtx, String className, SeleniumTestsContext clsContext) {
+    	classContext.put(getKeyForClass(testNGCtx, className), clsContext);
+    }
+    
+    /**
+     * Returns class context from test NG context and class name
+     * @param testNGCtx
+     * @param className
+     * @return
+     */
+    public static SeleniumTestsContext getClassContext(ITestContext testNGCtx, String className) {
+    	String keyClass = getKeyForClass(testNGCtx, className);
+    	if (classContext.get(keyClass) != null) {
+    		return classContext.get(keyClass);
+    	} else if (testContext.get(testNGCtx.getName()) != null) {
+    		return testContext.get(testNGCtx.getName());
+    	} else {
+    		return new SeleniumTestsContext(getContextFromConfigFile(testNGCtx));
+    	}
+    }
+    public static SeleniumTestsContext storeMethodContext(ITestContext testNGCtx, String className, String methodName) {
+    	// unicity is on test + class + method because the same method name may exist in several classes or 2 testNG tests could execute the same test methods 
+    	SeleniumTestsContext mtdContext = getMethodContext(testNGCtx, className, methodName, true);
+    	setMethodContext(testNGCtx, className, methodName, mtdContext);
+    	return mtdContext;
+    }
+    public static void setMethodContext(ITestContext testNGCtx, String className, String methodName, SeleniumTestsContext mtdContext) {
+    	methodContext.put(getKeyForMethod(testNGCtx, className, methodName), mtdContext);
+    }
+    
+    /**
+     * Get the context that will be used for the test method
+     * Search for (by order) a specific method context, class context, test context. If none is found, create one 
+     * If found, returns a copy of the context if 'createCopy' is true
+     * @param testNGCtx
+     * @param className
+     * @param methodName
+     * @param createCopy		if true and we find class or test context, returns a copy
+     * @return
+     */
+    public static SeleniumTestsContext getMethodContext(ITestContext testNGCtx, String className, String methodName, boolean createCopy) {
+    	
+    	// unicity is on test + class + method because the same method name may exist in several classes or 2 testNG tests could execute the same test methods 
+    	String keyMethod = getKeyForMethod(testNGCtx, className, methodName);
+    	String keyClass = getKeyForClass(testNGCtx, className);
+    	
+    	if (methodContext.get(keyMethod) != null) {
+    		return methodContext.get(keyMethod);
+    	} else if (classContext.get(keyClass) != null) {
+    		return createCopy ? new SeleniumTestsContext(classContext.get(keyClass)): classContext.get(keyClass);
+    	} else if (testContext.get(testNGCtx.getName()) != null) {
+    		return createCopy ? new SeleniumTestsContext(testContext.get(testNGCtx.getName())): testContext.get(testNGCtx.getName());
+    	} else {
+    		return new SeleniumTestsContext(getContextFromConfigFile(testNGCtx));
+    	}
+    }
+
+    public static Map<String, SeleniumTestsContext> getTestContext() {
+		return testContext;
+	}
+
+	public static Map<String, SeleniumTestsContext> getClassContext() {
+		return classContext;
+	}
+
+	public static Map<String, SeleniumTestsContext> getMethodContext() {
+		return methodContext;
+	}
+
+	/**
      * Get parameters from configuration file.
      * @param iTestContext
      * @param configParser

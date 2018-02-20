@@ -35,21 +35,15 @@ import com.seleniumtests.core.SeleniumTestsContextManager;
 
 public class StubTestClassForListener1 extends StubParentClass {
 	
-	private static int count = 0;
-	
-	@BeforeGroups(groups={"stub1"})
-	public void beforeGroup() {
-		SeleniumTestsContextManager.getThreadContext().setAttribute("group", "stub1");
-	}
-	
-	@BeforeClass
-	public void beforeClass() {
-		SeleniumTestsContextManager.getThreadContext().setAttribute("class", "listener1");
-	}
-	
+
 	@BeforeTest
 	public void beforeTest(XmlTest xmlTest) {
 		SeleniumTestsContextManager.getThreadContext().setAttribute("test", xmlTest.getName());
+	}
+
+	@BeforeClass
+	public void beforeClass() {
+		SeleniumTestsContextManager.getThreadContext().setAttribute("class", "listener1");
 	}
 
 	@BeforeMethod(groups={"stub1"})
@@ -58,13 +52,14 @@ public class StubTestClassForListener1 extends StubParentClass {
 	}
 	
 	@Test(groups="stub1")
-	public void test1Listener1() {
+	public void test1Listener1(XmlTest xmlTest) {
 		SeleniumTestsContextManager.getThreadContext().setAttribute("method exec", "test1Listener1");
 
+		// test that all Before method settings are kept in test method
 		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getAttribute("method"), "test1Listener1");
-		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getAttribute("test"), "test1");
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getAttribute("test"), xmlTest.getName());
 		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getAttribute("class"), "listener1");
-		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getAttribute("group"), "stub1");
+		SeleniumTestsContextManager.getMethodContext();
 	}
 	
 	@Test(groups="stub1")
@@ -73,23 +68,34 @@ public class StubTestClassForListener1 extends StubParentClass {
 	}
 	
 	@AfterMethod(groups={"stub1"})
-	public void afterMethod(Method method) {
+	public void afterMethod(Method method, XmlTest xmlTest) {
+		
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getAttribute("test"), xmlTest.getName());
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getAttribute("class"), "listener1");
 		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getAttribute("method"), method.getName());
+		
+		// check setting added by test method is kept  		
 		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getAttribute("method exec"), method.getName());
+	}
+
+	@AfterClass
+	public void afterClass(XmlTest xmlTest) {
+		// class context should not contain method settings
+		Assert.assertNull(SeleniumTestsContextManager.getThreadContext().getAttribute("method"));
+		Assert.assertNull(SeleniumTestsContextManager.getThreadContext().getAttribute("method exec"));
+		
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getAttribute("class"), "listener1");
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getAttribute("test"), xmlTest.getName());
 	}
 	
 	@AfterTest
 	public void afterTest(XmlTest xmlTest) {
+		// test context should not contain method / class settings
+		Assert.assertNull(SeleniumTestsContextManager.getThreadContext().getAttribute("method"));
+		Assert.assertNull(SeleniumTestsContextManager.getThreadContext().getAttribute("method exec"));
+		Assert.assertNull(SeleniumTestsContextManager.getThreadContext().getAttribute("class"));
+		
 		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getAttribute("test"), xmlTest.getName());
 	}
-	
-	@AfterClass
-	public void afterClass() {
-		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getAttribute("class"), "listener1");
-	}
 
-	@AfterGroups(groups={"stub1"})
-	public void afterGroup() {
-		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getAttribute("group"), "stub1");
-	}
 }

@@ -119,15 +119,28 @@ public class TestSeleniumRobotTestListener extends GenericTest {
 		suite.setThreadCount(5);
 		suite.setParallel(parallelMode);
 		
-		// TestNG tests
-		XmlTest test = new XmlTest(suite);
-		test.setName("test1");
-		test.addParameter(SeleniumTestsContext.BROWSER, "none");
+		XmlClass xmlClass1 = new XmlClass("com.seleniumtests.it.stubclasses.StubTestClassForListener1");
+		XmlClass xmlClass2 = new XmlClass("com.seleniumtests.it.stubclasses.StubTestClassForListener2");
+		XmlClass xmlClass3 = new XmlClass("com.seleniumtests.it.stubclasses.StubTestClassForListener3");
 		
-		List<XmlClass> classes = new ArrayList<XmlClass>();
-		XmlClass xmlClass = new XmlClass("com.seleniumtests.it.stubclasses.StubTestClassForListener1");
-		classes.add(xmlClass);
-		test.setXmlClasses(classes) ;
+		// TestNG test1: 2 classes
+		XmlTest test1 = new XmlTest(suite);
+		test1.setName("test1");
+		test1.addParameter(SeleniumTestsContext.BROWSER, "none");
+	
+		List<XmlClass> classes1 = new ArrayList<XmlClass>();
+		classes1.add(xmlClass1);
+		classes1.add(xmlClass2);
+		test1.setXmlClasses(classes1) ;
+		
+		// TestNG test2: 1 class
+		XmlTest test2 = new XmlTest(suite);
+		test2.setName("test2");
+		test2.addParameter(SeleniumTestsContext.BROWSER, "none");
+		List<XmlClass> classes2 = new ArrayList<XmlClass>();
+		classes2.add(xmlClass1);
+		classes2.add(xmlClass3);
+		test2.setXmlClasses(classes2) ;
 		
 		TestNG tng = new TestNG(false);
 		tng.setXmlSuites(suites);
@@ -138,11 +151,33 @@ public class TestSeleniumRobotTestListener extends GenericTest {
 	}
 	
 	@Test(groups={"it"})
-	public void testContextStorage(ITestContext testContext) throws Exception {
+	public void testContextStorageParallelTests(ITestContext testContext) throws Exception {
 		
-		TestNG tng = executeSubTest2(ParallelMode.METHODS);
+		executeSubTest2(ParallelMode.TESTS);
 		
+		String mainReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport.html"));
+		Assert.assertEquals(StringUtils.countMatches(mainReportContent, "class=\"fa fa-circle circleSuccess\"></i><a href='SeleniumTestReport"), 
+							StringUtils.countMatches(mainReportContent, "></i><a href='SeleniumTestReport-"));
+	}
+	
+	@Test(groups={"it"})
+	public void testContextStorageParallelClasses(ITestContext testContext) throws Exception {
 		
+		executeSubTest2(ParallelMode.CLASSES);
+		
+		String mainReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport.html"));
+		Assert.assertEquals(StringUtils.countMatches(mainReportContent, "class=\"fa fa-circle circleSuccess\"></i><a href='SeleniumTestReport"), 
+				StringUtils.countMatches(mainReportContent, "></i><a href='SeleniumTestReport-"));
+	}
+	
+	@Test(groups={"it"})
+	public void testContextStorageParallelMethods(ITestContext testContext) throws Exception {
+		
+		executeSubTest2(ParallelMode.METHODS);
+		
+		String mainReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport.html"));
+		Assert.assertEquals(StringUtils.countMatches(mainReportContent, "class=\"fa fa-circle circleSuccess\"></i><a href='SeleniumTestReport"), 
+				StringUtils.countMatches(mainReportContent, "></i><a href='SeleniumTestReport-"));
 	}
 	
 	/* TODO:
