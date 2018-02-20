@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 
 import org.apache.log4j.Logger;
+import org.testng.IExecutionListener;
 import org.testng.IInvokedMethod;
 import org.testng.IInvokedMethodListener2;
 import org.testng.IResultMap;
@@ -41,7 +42,7 @@ import com.seleniumtests.reporter.logger.TestStep;
 import com.seleniumtests.reporter.reporters.CommonReporter;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
-public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodListener2, ISuiteListener {
+public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodListener2, ISuiteListener, IExecutionListener {
 	
 	protected static final Logger logger = SeleniumRobotLogger.getLogger(SeleniumRobotTestListener.class);
 	private static Map<Thread, Boolean> cucumberTest = Collections.synchronizedMap(new HashMap<>());
@@ -255,8 +256,17 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 			logger.info("Test Suite Execution Time: " + (new Date().getTime() - start.getTime()) / 1000 / 60 + " minutes.");
 		} else {
 			logger.warn("No test executed");
-		}
-        try {
+		}		
+	}
+	
+	@Override
+	public void onExecutionStart() {
+		// nothing to do at startup
+	}
+
+	@Override
+	public void onExecutionFinish() {
+		try {
 			SeleniumRobotLogger.parseLogFile();
 		} catch (IOException e) {
 			logger.error("cannot read log file", e);
@@ -266,8 +276,8 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 		} catch (IOException e) {
 			logger.error("Cannot stop unirest", e);
 		}
-		
 	}
+	
 	
 
 	/**
@@ -417,5 +427,5 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 			}
 		}
 	}
-	
+
 }
