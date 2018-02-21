@@ -16,11 +16,14 @@
  */
 package com.seleniumtests.it.stubclasses;
 
+import java.lang.reflect.Method;
+
 import org.openqa.selenium.WebDriverException;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.DriverExceptions;
 import com.seleniumtests.driver.screenshots.ScreenShot;
 import com.seleniumtests.reporter.logger.Snapshot;
@@ -36,12 +39,13 @@ public class StubTestClass extends StubParentClass {
 	private static int count = 0;
 
 	@BeforeMethod(groups={"stub"})
-	public void set() {
+	public void set(Method method) {
 		WaitHelper.waitForMilliSeconds(100);
 	}
 	
 	@Test(groups="stub", description="a test with steps")
 	public void testAndSubActions() {
+		System.out.println(SeleniumTestsContextManager.getThreadContext().getCustomSummaryReports());
 		TestStep step1 = new TestStep("step 1", TestLogging.getCurrentTestResult());
 		step1.addAction(new TestAction("click button", false));
 		step1.addAction(new TestAction("sendKeys to text field", true));

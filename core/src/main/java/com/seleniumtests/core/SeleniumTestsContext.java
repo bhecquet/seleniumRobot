@@ -492,6 +492,8 @@ public class SeleniumTestsContext {
 	    			|| key.startsWith("os.")
 	    			|| key.startsWith("file.")
 	    			|| key.startsWith("awt.")
+	    			|| "line.separator".equals(key)
+	    			|| "jnidispatch.path".equals(key)
 	    			) {
 	    		continue;
 	    	}

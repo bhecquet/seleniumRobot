@@ -22,6 +22,7 @@ import org.testng.ITestListener;
 import org.testng.ITestNGMethod;
 import org.testng.ITestResult;
 import org.testng.Reporter;
+import org.testng.annotations.BeforeMethod;
 import org.testng.internal.ConfigurationMethod;
 import org.testng.internal.ResultMap;
 import org.testng.internal.TestResult;
@@ -34,6 +35,7 @@ import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.TestTasks;
 import com.seleniumtests.core.testretry.TestRetryAnalyzer;
 import com.seleniumtests.customexception.ConfigurationException;
+import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.driver.screenshots.ScreenShot;
 import com.seleniumtests.driver.screenshots.ScreenshotUtil;
@@ -46,7 +48,7 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 	
 	protected static final Logger logger = SeleniumRobotLogger.getLogger(SeleniumRobotTestListener.class);
 	
-	public static final String THREAD_CONTEXT = "threadContext";
+	public static final String TEST_CONTEXT = "testContext";
 	private Date start;
 	
 	private Map<String, Boolean> isRetryHandleNeeded = new HashMap<>();
@@ -107,6 +109,8 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 	@Override
 	public void onStart(ITestContext context) {
         start = new Date();
+        
+        // global context of the test
         SeleniumTestsContextManager.initGlobalContext(context);
         
         isRetryHandleNeeded.put(context.getName(), false);
@@ -158,13 +162,18 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 					String className = ((Method)(testResult.getParameters()[0])).getDeclaringClass().getName();
 					String methodName = ((Method)(testResult.getParameters()[0])).getName();
 					currentBeforeContext = SeleniumTestsContextManager.storeMethodContext(context, className, methodName);	 
-				} catch (Exception e) {}
+				} catch (Exception e) {
+					throw new ScenarioException("When using @BeforeMethod in tests, this method MUST have a 'java.lang.reflect.Method' object as first argument. Example: \n\n"
+							+ "@BeforeMethod\n" + 
+							"public void beforeMethod(Method method) {\n"
+							+ "    SeleniumTestsContextManager.getThreadContext().setAttribute(\"some attribute\", \"attribute value\");\n"
+							+ "}\n\n");
+				}
 				
 			// handle some after methods. No change in context in after method will be recorded
 			} else if (((ConfigurationMethod)method.getTestMethod()).isAfterMethodConfiguration()) {
-				String className = ((Method)(testResult.getParameters()[0])).getDeclaringClass().getName();
-				String methodName = ((Method)(testResult.getParameters()[0])).getName();
-				currentBeforeContext = SeleniumTestsContextManager.getMethodContext(context, className, methodName, false);
+				// beforeMethod, testMethod and afterMethod run in the same thread, so it's safe to take the current context
+				currentBeforeContext = SeleniumTestsContextManager.getThreadContext();
 			} else if (((ConfigurationMethod)method.getTestMethod()).isAfterClassConfiguration()) {
 				currentBeforeContext = SeleniumTestsContextManager.getClassContext(context, method.getTestMethod().getTestClass().getName());
 			} else if (((ConfigurationMethod)method.getTestMethod()).isAfterTestConfiguration()) {
@@ -266,6 +275,9 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 			String className = method.getTestMethod().getTestClass().getName();
 			String methodName = method.getTestMethod().getMethodName();
 			SeleniumTestsContextManager.setMethodContext(context, className, methodName, SeleniumTestsContextManager.getThreadContext());
+			
+			// store context in test result
+			testResult.setAttribute(TEST_CONTEXT, SeleniumTestsContextManager.getThreadContext());
 	        
 		}
 	}

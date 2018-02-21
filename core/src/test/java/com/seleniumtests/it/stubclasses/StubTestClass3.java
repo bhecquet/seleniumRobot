@@ -17,6 +17,7 @@
 package com.seleniumtests.it.stubclasses;
 
 import java.io.IOException;
+import java.lang.reflect.Method;
 
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeMethod;
@@ -36,7 +37,7 @@ public class StubTestClass3 extends StubParentClass {
 	}
 	
 	@BeforeMethod(groups={"stub"})
-	public void set() {
+	public void set(Method method) {
 		WaitHelper.waitForMilliSeconds(100);
 		SeleniumRobotTestPlan.setCucumberTest(false);
 	}

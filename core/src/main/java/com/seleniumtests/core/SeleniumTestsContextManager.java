@@ -341,12 +341,7 @@ public class SeleniumTestsContextManager {
     }
 
     public static void initThreadContext(ITestContext testNGCtx, String testName) {
-    	
-    	// generate all paths used by test application
-    	if (testNGCtx != null && testNGCtx.getCurrentXmlTest() != null) {
-        	generateApplicationPath(testNGCtx.getCurrentXmlTest().getSuite());
-        }
-    	
+
     	ITestContext newTestNGCtx = getContextFromConfigFile(testNGCtx);
     	SeleniumTestsContext seleniumTestsCtx = new SeleniumTestsContext(newTestNGCtx);
         
@@ -379,8 +374,8 @@ public class SeleniumTestsContextManager {
     	if (testResult == null) {
     		throw new ConfigurationException("Cannot set context from testResult as it is null");
     	}
-    	if (testResult.getAttribute(SeleniumRobotTestListener.THREAD_CONTEXT) != null) {
-    		setThreadContext((SeleniumTestsContext)testResult.getAttribute(SeleniumRobotTestListener.THREAD_CONTEXT));
+    	if (testResult.getAttribute(SeleniumRobotTestListener.TEST_CONTEXT) != null) {
+    		setThreadContext((SeleniumTestsContext)testResult.getAttribute(SeleniumRobotTestListener.TEST_CONTEXT));
     	} else {
     		logger.error("Result did not contain thread context, initializing a new one");
     		initThreadContext();

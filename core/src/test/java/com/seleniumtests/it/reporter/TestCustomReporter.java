@@ -37,51 +37,59 @@ public class TestCustomReporter extends ReporterTest {
 	@Test(groups={"it"})
 	public void testDataInReport(ITestContext testContext) throws Exception {
 		
-		System.setProperty("customTestReports", "SUP::json::ti/report.test.vm");
-
-		executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"});
+		try {
+			System.setProperty("customTestReports", "SUP::json::ti/report.test.vm");
+	
+			executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"});
+				
+			// check content of the file. It should contains all fields with a value
+			String detailedReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SUP-com.seleniumtests.it.stubclasses.StubTestClass.testAndSubActions.json"));
 			
-		// check content of the file. It should contains all fields with a value
-		String detailedReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SUP-com.seleniumtests.it.stubclasses.StubTestClass.testAndSubActions.json"));
-		
-		JSONObject json = new JSONObject(detailedReportContent);
-		
-		Assert.assertEquals(json.getInt("errors"), 0);
-		Assert.assertEquals(json.getInt("failures"), 1);
-		Assert.assertEquals(json.getString("hostname"), "");
-		Assert.assertEquals(json.getString("suiteName"), "testAndSubActions");
-		Assert.assertEquals(json.getString("className"), "com.seleniumtests.it.stubclasses.StubTestClass");
-		Assert.assertEquals(json.getInt("tests"), 3);
-		Assert.assertEquals(json.get("duration").toString(), "15.26");
-		Assert.assertTrue(json.getLong("time") > 1518709523620L);
-		Assert.assertEquals(json.getJSONArray("testSteps").length(), 3);
-		Assert.assertEquals(json.getJSONArray("testSteps").get(0), "Step step 1\\nclick button\\nsendKeys to text field\\nStep step 1.3: open page\\nclick link\\na message\\nsendKeys to password field");
-		Assert.assertEquals(json.getString("browser"), "NONE");
-		Assert.assertNotNull(json.get("version"));
-		Assert.assertTrue(json.getJSONObject("parameters").length() > 70);
-		Assert.assertEquals(json.getJSONObject("parameters").getString("testType"), "NON_GUI");
-		Assert.assertEquals(json.getJSONObject("parameters").getInt("replayTimeOut"), 30);
-		Assert.assertEquals(json.getJSONArray("stacktrace").length(), 0);
+			JSONObject json = new JSONObject(detailedReportContent);
+			
+			Assert.assertEquals(json.getInt("errors"), 0);
+			Assert.assertEquals(json.getInt("failures"), 1);
+			Assert.assertEquals(json.getString("hostname"), "");
+			Assert.assertEquals(json.getString("suiteName"), "testAndSubActions");
+			Assert.assertEquals(json.getString("className"), "com.seleniumtests.it.stubclasses.StubTestClass");
+			Assert.assertEquals(json.getInt("tests"), 3);
+			Assert.assertEquals(json.get("duration").toString(), "15.26");
+			Assert.assertTrue(json.getLong("time") > 1518709523620L);
+			Assert.assertEquals(json.getJSONArray("testSteps").length(), 3);
+			Assert.assertEquals(json.getJSONArray("testSteps").get(0), "Step step 1\\nclick button\\nsendKeys to text field\\nStep step 1.3: open page\\nclick link\\na message\\nsendKeys to password field");
+			Assert.assertEquals(json.getString("browser"), "NONE");
+			Assert.assertNotNull(json.get("version"));
+			Assert.assertTrue(json.getJSONObject("parameters").length() > 70);
+			Assert.assertEquals(json.getJSONObject("parameters").getString("testType"), "NON_GUI");
+			Assert.assertEquals(json.getJSONObject("parameters").getInt("replayTimeOut"), 30);
+			Assert.assertEquals(json.getJSONArray("stacktrace").length(), 0);
+		} finally {
+			System.clearProperty("customTestReports");
+		}
 	}
 	
 	@Test(groups={"it"})
 	public void testSupervisionReport(ITestContext testContext) throws Exception {
 		
-		System.setProperty("customTestReports", "SUP::xml::reporter/templates/report.supervision.vm");
-
-		executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"});
+		try {
+			System.setProperty("customTestReports", "SUP::xml::reporter/templates/report.supervision.vm");
+	
+			executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"});
+				
+			// check content of the file. It should contain error
+			String detailedReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SUP-com.seleniumtests.it.stubclasses.StubTestClass.testInError.xml"));
+			detailedReportContent = detailedReportContent.replace("\n", "").replace("\r",  "").replaceAll(">\\s+<", "><");
+			Assert.assertTrue(detailedReportContent.contains("<errors><error>				class java.lang.AssertionError: error								at com.seleniumtests"));
 			
-		// check content of the file. It should contain error
-		String detailedReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SUP-com.seleniumtests.it.stubclasses.StubTestClass.testInError.xml"));
-		detailedReportContent = detailedReportContent.replace("\n", "").replace("\r",  "").replaceAll(">\\s+<", "><");
-		Assert.assertTrue(detailedReportContent.contains("<errors><error>				class java.lang.AssertionError: error								at com.seleniumtests"));
-		
-		String detailedReportContent2 = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SUP-com.seleniumtests.it.stubclasses.StubTestClass.testAndSubActions.xml"));
-		detailedReportContent2 = detailedReportContent2.replace("\n", "").replace("\r",  "").replaceAll(">\\s+<", "><");
-		Assert.assertTrue(detailedReportContent2.contains("<errors></errors>"));
-		
-		// check parameters are there
-		Assert.assertTrue(detailedReportContent2.contains("<param name=\"runMode\" value=\"LOCAL\"/>"));
+			String detailedReportContent2 = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SUP-com.seleniumtests.it.stubclasses.StubTestClass.testAndSubActions.xml"));
+			detailedReportContent2 = detailedReportContent2.replace("\n", "").replace("\r",  "").replaceAll(">\\s+<", "><");
+			Assert.assertTrue(detailedReportContent2.contains("<errors></errors>"));
+			
+			// check parameters are there
+			Assert.assertTrue(detailedReportContent2.contains("<param name=\"runMode\" value=\"LOCAL\"/>"));
+		} finally {
+			System.clearProperty("customTestReports");
+		}
 	}
 	
 	
@@ -93,36 +101,46 @@ public class TestCustomReporter extends ReporterTest {
 	@Test(groups={"it"})
 	public void testDataInSummaryReport(ITestContext testContext) throws Exception {
 		
-		System.setProperty("customSummaryReports", "summaryResult::json::ti/report.summary.vm");
-		
-		executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"});
-		
-		// check content of the file. It should contains all fields with a value
-		String detailedReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "summaryResult.json"));
-		
-		JSONObject json = new JSONObject(detailedReportContent);
-		
-		Assert.assertEquals(json.getInt("fail"), 2);
-		Assert.assertEquals(json.getInt("pass"), 1);
-		Assert.assertEquals(json.getInt("skip"), 0);
-		Assert.assertEquals(json.getInt("total"), 3);
+		try {
+			System.setProperty("customSummaryReports", "summaryResult::json::ti/report.summary.vm");
+			
+			executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"});
+			
+			// check content of the file. It should contains all fields with a value
+			String detailedReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "summaryResult.json"));
+			
+			JSONObject json = new JSONObject(detailedReportContent);
+			
+			Assert.assertEquals(json.getInt("fail"), 2);
+			Assert.assertEquals(json.getInt("pass"), 1);
+			Assert.assertEquals(json.getInt("skip"), 0);
+			Assert.assertEquals(json.getInt("total"), 3);
+		} finally {
+			System.clearProperty("customSummaryReports");
+		}
 		
 	}
 	
 	@Test(groups={"it"}, expectedExceptions=ConfigurationException.class)
 	public void testTestReportDoesNotExists(ITestContext testContext) throws Exception {
-		
-		System.setProperty("customTestReports", "SUP::json::ti/report.test.nowhere.vm");
-		
-		executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"});
+		try {
+			System.setProperty("customTestReports", "SUP::json::ti/report.test.nowhere.vm");
+			
+			executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"});
+		} finally {
+			System.clearProperty("customTestReports");
+		}
 	}
 	
 	@Test(groups={"it"}, expectedExceptions=ConfigurationException.class)
 	public void testSummaryReportDoesNotExists(ITestContext testContext) throws Exception {
-		
-		System.setProperty("customSummaryReports", "SUP::json::ti/report.summary.nowhere.vm");
-		
-		executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"});	
+		try {
+			System.setProperty("customSummaryReports", "SUP::json::ti/report.summary.nowhere.vm");
+			
+			executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"});
+		} finally {
+			System.clearProperty("customSummaryReports");
+		}
 	}
 	
 	// tester si le custom report n'existe pas

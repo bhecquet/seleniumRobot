@@ -16,50 +16,26 @@
  */
 package com.seleniumtests.it.stubclasses;
 
-import java.lang.reflect.Method;
-
-import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import com.seleniumtests.util.helper.WaitHelper;
+import com.seleniumtests.core.SeleniumTestsContextManager;
 
-public class StubTestClass2 extends StubParentClass {
 
-	@BeforeMethod(groups={"stub", "stub2"})
-	public void set(Method method) {
-		WaitHelper.waitForMilliSeconds(100);
-	}
-	
-	@Test(groups="stub")
-	public void test1() {
-	}
-	
+public class StubTestClassForListener4 extends StubParentClass {
+
 	/**
-	 * Skipped as test5 failed
+	 * Check that error is raised when no Method parameter is present
 	 */
-	@Test(groups="stub", dependsOnGroups={"stub2"})
-	public void test2() {
+	@BeforeMethod
+	public void init() {
+		
 	}
 	
-	/**
-	 * Skipped as test4 failed
-	 */
-	@Test(groups="stub", dependsOnMethods={"test4"})
-	public void test3() {
+	@Test
+	public void test1Listener4(String data) {
+		SeleniumTestsContextManager.getThreadContext().setAttribute("method exec", "test1Listener3");
+
 	}
 	
-	@Test(groups="stub")
-	public void test4() {
-		Assert.fail("fail");
-	}
-	
-	@Test(groups="stub2")
-	public void test5() {
-		Assert.assertTrue(false);
-	}
-	
-	@Test(groups="stub", dependsOnMethods={"test1"})
-	public void test6() {
-	}
 }

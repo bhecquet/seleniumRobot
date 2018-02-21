@@ -178,9 +178,18 @@ A typical PageObject method whould be
 As we use TestNG for test running, it's possible to use any TestNG annotation in your test class. See: [http://testng.org/doc/documentation-main.html] (http://testng.org/doc/documentation-main.html), section "2. annotation"<br/>
 For more information on execution order of TestNG annotations, see [https://stackoverflow.com/questions/30587454/difference-between-beforeclass-and-beforetest-in-testng] (https://stackoverflow.com/questions/30587454/difference-between-beforeclass-and-beforetest-in-testng)
 
-**WARN** TestNG allows you to use `@BeforeTest`, `BeforeClass` annotated method to init the test. These methods does not support editing thread context (`SeleniumTestsContextManager.getThreadContext().setWebProxyType("manual");` for example) because it's loaded right before the `@Test` annotated method. If you do so, a ScenarioException will be raised. 
-`SeleniumTestsContextManager.getGlobalContext().setWebProxyType("manual");` will not help as global context is almost never used, and surely NEVER when initializing driver. However, `@BeforeMethod` will support editing context
+**WARN** TestNG allows you to use `@BeforeTest`, `@BeforeMethod`, `@BeforeClass` annotated method to init the test. In these methods (as for `@AfterTest`, `@AfterClass`, `@AfterMethod`), you can access the test context using for example  `SeleniumTestsContextManager.getThreadContext().setBrowser("chrome");`. So 3 state context are stored: 
+- test context (the one fetched from TestNG XML file)
+- class context
+- method context
 
+"Method context" inherits from "class context" if existing, which itself inherits from "test context"
+
+- `@AfterTest` context is the same as the one after `@BeforeTest` call. Or it defaults to context from XML file
+- `@AfterClass` context is the same as the one after `@BeforeClass` call, or if not present, the test context
+- `@AfterMethod` context is the same as the one after `@Test` call
+
+`@BeforeMethod` annotated methods MUST declare a java.lang.reflect.Method argument as first parameter to be usable (this is automatically injected by TestNG). Else, a ScenarioException is raised.
  
     
 **WARN** DO NOT give the same test name in different test classes as it leads to wrong logging reporting

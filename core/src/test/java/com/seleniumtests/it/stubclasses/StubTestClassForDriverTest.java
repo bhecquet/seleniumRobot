@@ -1,5 +1,7 @@
 package com.seleniumtests.it.stubclasses;
 
+import java.lang.reflect.Method;
+
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -11,15 +13,9 @@ import com.seleniumtests.it.driver.support.pages.DriverTestPageNativeActions;
 public class StubTestClassForDriverTest extends StubParentClass {
 	
 	@BeforeMethod(groups="stub")
-	public void init() {
-		System.setProperty("browser", "chrome");
-		System.setProperty("overrideSeleniumNativeAction", "true");
-	}
-	
-	@AfterMethod(groups="stub")
-	public void reset() {
-		System.clearProperty("browser");
-		System.clearProperty("overrideSeleniumNativeAction");
+	public void init(Method method) {
+		SeleniumTestsContextManager.getThreadContext().setBrowser("chrome");
+		SeleniumTestsContextManager.getThreadContext().setOverrideSeleniumNativeAction(true);
 	}
 
 	@Test(groups="stub")
@@ -52,7 +48,7 @@ public class StubTestClassForDriverTest extends StubParentClass {
 	public void testDriverNativeActionsWithoutOverride() throws Exception {
 		SeleniumTestsContextManager.getThreadContext().setOverrideSeleniumNativeAction(false);
 		SeleniumTestsContextManager.getThreadContext().setReplayTimeout(1);
-		SeleniumTestsContextManager.getThreadContext().setImplicitWaitTimeout(1);
+		SeleniumTestsContextManager.getThreadContext().setImplicitWaitTimeout(1); 
 		
 		new DriverTestPageNativeActions(true)
 		.sendKeys()

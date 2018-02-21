@@ -101,7 +101,9 @@ public abstract class GenericMultiBrowserTest {
 
 	@AfterClass(groups={"it"})
 	public void stop() throws Exception {
-		server.stop();
+		if (server != null) {
+			server.stop();
+		}
 		driver = null;
 	}
 	
