@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -51,7 +52,7 @@ public class TestSeleniumRobotTestListener extends GenericTest {
 			String methodName = testMethod.substring(testMethod.lastIndexOf(".") + 1);
 
 			XmlTest test = new XmlTest(suite);
-			test.setName(methodName);
+			test.setName(String.format("%s_%d", methodName, new Random().nextInt()));
 			
 			test.addParameter(SeleniumTestsContext.BROWSER, "none");
 			List<XmlClass> classes = new ArrayList<XmlClass>();
@@ -66,7 +67,7 @@ public class TestSeleniumRobotTestListener extends GenericTest {
 		
 		// cucumber tests
 		XmlTest test = new XmlTest(suite);
-		test.setName("cucumberTest");
+		test.setName(String.format("cucumberTest_%d", new Random().nextInt()));
 		XmlPackage xmlPackage = new XmlPackage("com.seleniumtests.core.runner.*");
 		test.setXmlPackages(Arrays.asList(xmlPackage));
 		Map<String, String> parameters = new HashMap<>();
@@ -122,6 +123,7 @@ public class TestSeleniumRobotTestListener extends GenericTest {
 		XmlClass xmlClass1 = new XmlClass("com.seleniumtests.it.stubclasses.StubTestClassForListener1");
 		XmlClass xmlClass2 = new XmlClass("com.seleniumtests.it.stubclasses.StubTestClassForListener2");
 		XmlClass xmlClass3 = new XmlClass("com.seleniumtests.it.stubclasses.StubTestClassForListener3");
+		XmlClass xmlClass4 = new XmlClass("com.seleniumtests.it.stubclasses.StubTestClassForListener4");
 		
 		// TestNG test1: 2 classes
 		XmlTest test1 = new XmlTest(suite);
@@ -140,6 +142,7 @@ public class TestSeleniumRobotTestListener extends GenericTest {
 		List<XmlClass> classes2 = new ArrayList<XmlClass>();
 		classes2.add(xmlClass1);
 		classes2.add(xmlClass3);
+		classes2.add(xmlClass4);
 		test2.setXmlClasses(classes2) ;
 		
 		TestNG tng = new TestNG(false);
@@ -156,8 +159,12 @@ public class TestSeleniumRobotTestListener extends GenericTest {
 		executeSubTest2(ParallelMode.TESTS);
 		
 		String mainReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport.html"));
+		mainReportContent = mainReportContent.replace("\n", "").replace("\r",  "");
 		Assert.assertEquals(StringUtils.countMatches(mainReportContent, "class=\"fa fa-circle circleSuccess\"></i><a href='SeleniumTestReport"), 
-							StringUtils.countMatches(mainReportContent, "></i><a href='SeleniumTestReport-"));
+							StringUtils.countMatches(mainReportContent, "></i><a href='SeleniumTestReport-") - 1);
+
+		// test1Listener4 fails as expected
+		Assert.assertTrue(mainReportContent.matches(".*<i class\\=\"fa fa-circle circleSkipped\"></i><a href\\='SeleniumTestReport-\\d+\\.html'>test1Listener4</a>.*"));
 	}
 	
 	@Test(groups={"it"})
@@ -166,8 +173,12 @@ public class TestSeleniumRobotTestListener extends GenericTest {
 		executeSubTest2(ParallelMode.CLASSES);
 		
 		String mainReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport.html"));
+		mainReportContent = mainReportContent.replace("\n", "").replace("\r",  "");
 		Assert.assertEquals(StringUtils.countMatches(mainReportContent, "class=\"fa fa-circle circleSuccess\"></i><a href='SeleniumTestReport"), 
-				StringUtils.countMatches(mainReportContent, "></i><a href='SeleniumTestReport-"));
+				StringUtils.countMatches(mainReportContent, "></i><a href='SeleniumTestReport-") - 1);
+
+		// test1Listener4 fails as expected
+		Assert.assertTrue(mainReportContent.matches(".*<i class\\=\"fa fa-circle circleSkipped\"></i><a href\\='SeleniumTestReport-\\d+\\.html'>test1Listener4</a>.*"));
 	}
 	
 	@Test(groups={"it"})
@@ -176,8 +187,12 @@ public class TestSeleniumRobotTestListener extends GenericTest {
 		executeSubTest2(ParallelMode.METHODS);
 		
 		String mainReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport.html"));
+		mainReportContent = mainReportContent.replace("\n", "").replace("\r",  "");
 		Assert.assertEquals(StringUtils.countMatches(mainReportContent, "class=\"fa fa-circle circleSuccess\"></i><a href='SeleniumTestReport"), 
-				StringUtils.countMatches(mainReportContent, "></i><a href='SeleniumTestReport-"));
+				StringUtils.countMatches(mainReportContent, "></i><a href='SeleniumTestReport-") - 1);
+		
+		// test1Listener4 fails as expected
+		Assert.assertTrue(mainReportContent.matches(".*<i class\\=\"fa fa-circle circleSkipped\"></i><a href\\='SeleniumTestReport-\\d+\\.html'>test1Listener4</a>.*"));
 	}
 	
 	/* TODO:

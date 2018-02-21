@@ -114,6 +114,7 @@ public class TestTestLogging extends ReporterTest {
 	public void testManualSteps(ITestContext testContext) throws Exception {
 		
 		SeleniumTestsContextManager.getThreadContext().setManualTestSteps(true);
+		TestLogging.reset();
 		
 		try {
 			TestTasks.addStep("Tests start");

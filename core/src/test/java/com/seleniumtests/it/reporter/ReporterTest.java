@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import org.testng.TestNG;
 import org.testng.xml.XmlClass;
@@ -53,7 +54,7 @@ public class ReporterTest extends MockitoTest {
 		
 		for (String testClass: testClasses) {
 			XmlTest test = new XmlTest(suite);
-			test.setName(testClass.substring(testClass.lastIndexOf(".") + 1));
+			test.setName(String.format("%s_%d", testClass.substring(testClass.lastIndexOf(".") + 1), new Random().nextInt()));
 			test.addParameter(SeleniumTestsContext.BROWSER, "none");
 			List<XmlClass> classes = new ArrayList<XmlClass>();
 			classes.add(new XmlClass(testClass));
@@ -93,7 +94,7 @@ public class ReporterTest extends MockitoTest {
 		}
 		
 		XmlTest test = new XmlTest(suite);
-		test.setName("cucumberTest");
+		test.setName(String.format("cucumberTest_%d", new Random().nextInt()));
 		XmlPackage xmlPackage = new XmlPackage("com.seleniumtests.core.runner.*");
 		test.setXmlPackages(Arrays.asList(xmlPackage));
 		Map<String, String> parameters = new HashMap<>();

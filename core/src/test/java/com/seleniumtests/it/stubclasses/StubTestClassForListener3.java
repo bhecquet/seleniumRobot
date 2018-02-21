@@ -19,10 +19,12 @@ package com.seleniumtests.it.stubclasses;
 import java.lang.reflect.Method;
 
 import org.testng.Assert;
+import org.testng.ITestContext;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterGroups;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.AfterTest;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 import org.testng.xml.XmlTest;
 
@@ -31,15 +33,27 @@ import com.seleniumtests.core.SeleniumTestsContextManager;
 
 public class StubTestClassForListener3 extends StubParentClass {
 
-	@Test(groups="stub3")
-	public void test1Listener3(XmlTest xmlTest) {
+	@Test(groups="stub3", dataProvider = "data")
+	public void test1Listener3(String data) {
 		SeleniumTestsContextManager.getThreadContext().setAttribute("method exec", "test1Listener3");
+		SeleniumTestsContextManager.getThreadContext().setAttribute(data, "data");
 
+	}
+	
+	@DataProvider
+	public Object[][] data(ITestContext testContext) {
+		return new String[][] {new String[] {"data1"}, new String[] {"data2"}};
 	}
 
 	@AfterMethod(groups={"stub3"})
 	public void afterMethod(Method method) {
 		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getAttribute("method exec"), method.getName());
+		
+		// check that when test start, it takes a fresh value of the context when using data provider
+		Assert.assertTrue((SeleniumTestsContextManager.getThreadContext().getAttribute("data1") == null 
+							&& SeleniumTestsContextManager.getThreadContext().getAttribute("data2") != null)
+						  || (SeleniumTestsContextManager.getThreadContext().getAttribute("data1") != null 
+							&& SeleniumTestsContextManager.getThreadContext().getAttribute("data2") == null));
 	}
 	
 	@AfterTest
