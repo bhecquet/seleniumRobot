@@ -6,6 +6,9 @@ SeleniumRobot server [https://github.com/bhecquet/seleniumRobot-server](https://
 
 To use this server, 
 - first deploy it (see documentation of seleniumRobot-server project)
+- create test application, environment on server
+- create application version. This is the same version as `major.minor` version in your pom.xml. SeleniumRobot may create it automatically on start
+- populate test variables with the one you placed in env.ini file.
 - set a JVM parameter `seleniumRobotServerUrl` when starting the test, giving the root url of the server. E.g: `http://seleniumRobotServer:8000`. This can be replaced by a parameter inside XML testNG file
 - parameter `seleniumRobotServerActive` must be set to true. By default, only variable fetching is done when server is active
 - parameter `seleniumRobotServerCompareSnapshots` can be set to true for tests where snapshot comparison is required (defaults to false)

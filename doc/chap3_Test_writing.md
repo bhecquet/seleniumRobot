@@ -161,22 +161,42 @@ Assuming that the right objects are created, a test looks like:
 		    )
 		public void consultProductDetails() throws Exception {
 			ProductItem productItem = new JPetStoreHome(true)
-				.goToFish()
-				.accessAngelFish()
-				.showItem("EST-1");
+				._goToFish()
+				._accessAngelFish()
+				._showItem("EST-1");
 			Assert.assertEquals(productItem.getProductDetails().name, "Large Angelfish");
 		}
 	}
 
 A typical PageObject method whould be
 
-	public FishList goToFish() throws Exception {
+	public FishList _goToFish() throws Exception {
     	fishMenu.click();
     	return new FishList();
     }
-    
+
+**WARN** DO NOT give the same test name in different test classes as it leads to wrong logging reporting
+
+#### Accessing test data ####
+See part 6 ("env.ini configuration" and "seleniumRobot server") to see how to get test data in scenario
+
+You may consider putting all test data access in the Test script, not in page object. This helps maintenance when we want to know which variables are used.
+
+	@Test(groups={"recevabilite"})
+	public void testSearch() throws Exception {
+		new MireRH(true)
+				._login(param("login"), param("password"))
+				._arrivee();
+	}
+	
+**WARN** DO NOT try to access test data inside a `@BeforeXXX` method, they are not available.
+
+#### Using TestNG annotations ####
+
 As we use TestNG for test running, it's possible to use any TestNG annotation in your test class. See: [http://testng.org/doc/documentation-main.html] (http://testng.org/doc/documentation-main.html), section "2. annotation"<br/>
 For more information on execution order of TestNG annotations, see [https://stackoverflow.com/questions/30587454/difference-between-beforeclass-and-beforetest-in-testng] (https://stackoverflow.com/questions/30587454/difference-between-beforeclass-and-beforetest-in-testng)
+
+##### Test context #####
 
 **WARN** TestNG allows you to use `@BeforeTest`, `@BeforeMethod`, `@BeforeClass` annotated method to init the test. In these methods (as for `@AfterTest`, `@AfterClass`, `@AfterMethod`), you can access the test context using for example  `SeleniumTestsContextManager.getThreadContext().setBrowser("chrome");`. So 3 state context are stored: 
 - test context (the one fetched from TestNG XML file)
@@ -189,10 +209,10 @@ For more information on execution order of TestNG annotations, see [https://stac
 - `@AfterClass` context is the same as the one after `@BeforeClass` call, or if not present, the test context
 - `@AfterMethod` context is the same as the one after `@Test` call
 
-`@BeforeMethod` annotated methods MUST declare a java.lang.reflect.Method argument as first parameter to be usable (this is automatically injected by TestNG). Else, a ScenarioException is raised.
+`@BeforeMethod` annotated methods MUST declare a `java.lang.reflect.Method` argument as first parameter to be usable (this is automatically injected by TestNG). Else, a ScenarioException is raised.
  
-    
-**WARN** DO NOT give the same test name in different test classes as it leads to wrong logging reporting
+##### Test parameters #####
+
 
 #### TestNG file ####
 For tests extending SeleniumTestPlan, the testNg XML looks like (minimal requirements):
@@ -312,6 +332,8 @@ Keys defined in environment sections override the ones in `General` section.
 This file must be located in "<<t>application root>/data/<<t>application name>/config" folder.
 
 These configurations are also stored in the business configuration.
+
+This file may be empty if seleniumRobot server is used
 
 #### seleniumRobot server ####
 

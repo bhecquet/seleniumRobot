@@ -27,7 +27,7 @@ IntelliJ Ultimate can be used to develop test applications (or seleniumrobot pro
 
 ##### AspectJ activation #####
 This step must be done only once to make IntelliJ work with aspectJ
-- follow this guide to configure AspectJ for IntelliJ: [https://www.jetbrains.com/help/idea/aspectj.html] (https://www.jetbrains.com/help/idea/aspectj.html)
+- follow this guide to configure AspectJ for IntelliJ: [https://www.jetbrains.com/help/idea/aspectj.html](https://www.jetbrains.com/help/idea/aspectj.html)
 - File -> Settings -> Plugins: add aspectJ plugins (search aspectJ in search box and tick all)
 
 ##### Test Application Project configuration #####
@@ -49,7 +49,12 @@ This step must be done only once to make IntelliJ work with aspectJ
 	- tick "post-compile weave mode"<br/>
 	- add seleniumRobot:core dependency in aspect path (in case of a test application. If developing core, aspect path are selenium-api and remode-remote-driver)<br/>
 	
+##### Version control #####
+IntelliJ generate a lot of files. If you want to share the project through version control, some files may be excluded.
+See 
+[https://intellij-support.jetbrains.com/hc/en-us/articles/206544839-How-to-manage-projects-under-Version-Control-Systems](https://intellij-support.jetbrains.com/hc/en-us/articles/206544839-How-to-manage-projects-under-Version-Control-Systems)
 
+As maven project, I remove `.idea/workspace.xml`, and all XML files under `.idea/libraries` 
 
 #### Sign artifact for deploy phase ####
 OSS needs artifacts to be signed before being deployed
