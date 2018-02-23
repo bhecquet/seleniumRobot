@@ -27,8 +27,6 @@ import org.aspectj.lang.annotation.After;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.remote.RemoteWebElement;
 import org.openqa.selenium.support.ui.Select;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
@@ -160,7 +158,7 @@ public class LogAction {
 	
 	@Around("isCucumberTest(joinPoint)")
 	public Object logCucumberTestStep(ProceedingJoinPoint joinPoint) throws Throwable {
-		return logTestStep(joinPoint);
+		return logTestStep(joinPoint, "", false);
 	}	
 	
 	/**
@@ -175,18 +173,59 @@ public class LogAction {
 			+ "|| call(private * com.seleniumtests.uipage.PageObject.openPage (..)))"
 			)
 	public Object logNonCucumberTestStep(ProceedingJoinPoint joinPoint) throws Throwable {
-		return logTestStep(joinPoint);
+		return logTestStep(joinPoint, "", false);
 	}
 	
-	private Object logTestStep(ProceedingJoinPoint joinPoint)  throws Throwable {
-		if (SeleniumTestsContextManager.getThreadContext().isManualTestSteps()) {
+	/**
+	 * Log any  \@BeforeTest \@BeforeClass \@BeforeMethod annotated method (and their \@After counterpart
+	 * They will be used in reporting (ReporterControler) and added to regular test steps
+	 * @param joinPoint
+	 * @return
+	 * @throws Throwable
+	 */
+	@Around("this(com.seleniumtests.core.runner.SeleniumRobotTestPlan) && "
+			+ "(execution(@org.testng.annotations.BeforeMethod public * * (..))"
+			+ "|| execution(@org.testng.annotations.BeforeClass public * * (..))"
+			+ "|| execution(@org.testng.annotations.BeforeTest public * * (..))"
+			+ ")")
+	public Object logBeforeMethods(ProceedingJoinPoint joinPoint) throws Throwable {
+		return logTestStep(joinPoint, "Pre test step: ", true);
+	}
+	
+	@Around("this(com.seleniumtests.core.runner.SeleniumRobotTestPlan) && "
+			+ "(execution(@org.testng.annotations.AfterMethod public * * (..))"
+			+ "|| execution(@org.testng.annotations.AfterClass public * * (..))"
+			+ "|| execution(@org.testng.annotations.AfterTest public * * (..))"
+			+ ")")
+	public Object logAfterMethods(ProceedingJoinPoint joinPoint) throws Throwable {
+		return logTestStep(joinPoint, "Post test step: ", true);
+	}
+	
+	/**
+	 * Log this method call as a test step
+	 * @param joinPoint			the join point
+	 * @param stepNamePrefix	string to add before step name
+	 * @param configStep		is this method call a TestNG configuration method (\@BeforeXXX or \@AfterXXX)
+	 * @return
+	 * @throws Throwable
+	 */
+	private Object logTestStep(ProceedingJoinPoint joinPoint, String stepNamePrefix, boolean configStep)  throws Throwable {
+		
+		// skip test logging when manual steps are active. This avoid having steps logged twice.
+		// do not skip configuration step logging so that debugging remains easy
+		if ((SeleniumTestsContextManager.getThreadContext().isManualTestSteps() && !configStep)
+				// skip internal configuration steps
+				|| joinPoint.getSignature().getDeclaringTypeName().startsWith("com.seleniumtests.core")
+				) {
 			return joinPoint.proceed(joinPoint.getArgs());
 		}
-		
+
 		Object reply = null;
 		boolean rootStep = false;
 		TestStep previousParent = null;
-		TestStep currentStep = new TestStep(buildRootStepName(joinPoint), TestLogging.getCurrentTestResult());
+		
+		// step name will contain method arguments only if it's not a configuration method (as they are generic)
+		TestStep currentStep = new TestStep(stepNamePrefix + buildRootStepName(joinPoint, !configStep), TestLogging.getCurrentTestResult());
 		
 		// check if any root step is already registered (a main step)
 		// happens when using cucumber where a cucumber method can call an other method intercepted by this pointcut
@@ -315,10 +354,16 @@ public class LogAction {
 	 * 
 	 * Else, get method name
 	 * @param joinPoint
+	 * @param returnArgs	if true, returns method arguments
 	 * @return
 	 */
-	private String buildRootStepName(JoinPoint joinPoint) {
-		String stepName = String.format("%s %s", joinPoint.getSignature().getName(), buildArgString(joinPoint));		
+	private String buildRootStepName(JoinPoint joinPoint, boolean returnArgs) {
+		String stepName;
+		if (returnArgs) {
+			stepName = String.format("%s %s", joinPoint.getSignature().getName(), buildArgString(joinPoint));
+		} else {
+			stepName = joinPoint.getSignature().getName();
+		}
 		
 		List<Class<?>> parameters = new ArrayList<>();
 		for (Object arg: joinPoint.getArgs()) {

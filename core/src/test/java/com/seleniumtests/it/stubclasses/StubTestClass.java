@@ -16,10 +16,12 @@
  */
 package com.seleniumtests.it.stubclasses;
 
+import java.io.IOException;
 import java.lang.reflect.Method;
 
 import org.openqa.selenium.WebDriverException;
 import org.testng.Assert;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -41,16 +43,26 @@ public class StubTestClass extends StubParentClass {
 	@BeforeMethod(groups={"stub"})
 	public void set(Method method) {
 		WaitHelper.waitForMilliSeconds(100);
+		TestLogging.info("before count: " + count);
+	}
+	
+	@AfterMethod(groups={"stub"})
+	public void reset(Method method) {
+		TestLogging.info("after count: " + count);
 	}
 	
 	@Test(groups="stub", description="a test with steps")
-	public void testAndSubActions() {
+	public void testAndSubActions() throws IOException {
 		System.out.println(SeleniumTestsContextManager.getThreadContext().getCustomSummaryReports());
 		TestStep step1 = new TestStep("step 1", TestLogging.getCurrentTestResult());
 		step1.addAction(new TestAction("click button", false));
 		step1.addAction(new TestAction("sendKeys to text field", true));
 		
 		ScreenShot screenshot = new ScreenShot();
+//		File tmpImg = File.createTempFile("img", "png");
+//		tmpImg.deleteOnExit();
+//		
+		
 		screenshot.setImagePath("screenshots/image.png");
 		step1.addSnapshot(new Snapshot(screenshot), 1);
 		step1.setActionException(new WebDriverException("driver exception"));

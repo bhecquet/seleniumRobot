@@ -48,7 +48,6 @@ import org.openqa.selenium.Point;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.remote.FileDetector;
-import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.UselessFileDetector;
 import org.openqa.selenium.support.events.EventFiringWebDriver;
 

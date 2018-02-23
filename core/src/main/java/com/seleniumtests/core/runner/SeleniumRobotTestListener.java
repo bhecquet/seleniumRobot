@@ -1,5 +1,6 @@
 package com.seleniumtests.core.runner;
 
+import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -22,7 +23,6 @@ import org.testng.ITestListener;
 import org.testng.ITestNGMethod;
 import org.testng.ITestResult;
 import org.testng.Reporter;
-import org.testng.annotations.BeforeMethod;
 import org.testng.internal.ConfigurationMethod;
 import org.testng.internal.ResultMap;
 import org.testng.internal.TestResult;
@@ -42,6 +42,7 @@ import com.seleniumtests.driver.screenshots.ScreenshotUtil;
 import com.seleniumtests.reporter.logger.TestLogging;
 import com.seleniumtests.reporter.logger.TestStep;
 import com.seleniumtests.reporter.reporters.CommonReporter;
+import com.seleniumtests.util.FileUtility;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
 public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodListener2, ISuiteListener, IExecutionListener, IConfigurationListener {
@@ -150,135 +151,27 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 		// issue #94: add ability to request thread context from a method annotated with @BeforeMethod
 		// for each beforemethod, store the current context so that it can be edited by the configuration method
 		if (method.isConfigurationMethod()) {
-			SeleniumTestsContext currentBeforeContext = null;
-			
-			// handle some before methods
-			if (((ConfigurationMethod)method.getTestMethod()).isBeforeTestConfiguration()) {
-				currentBeforeContext = SeleniumTestsContextManager.storeTestContext(context);
-			} else if (((ConfigurationMethod)method.getTestMethod()).isBeforeClassConfiguration()) {
-				currentBeforeContext = SeleniumTestsContextManager.storeClassContext(context, method.getTestMethod().getTestClass().getName());
-			} else if (((ConfigurationMethod)method.getTestMethod()).isBeforeMethodConfiguration()) {
-				try {
-					String className = ((Method)(testResult.getParameters()[0])).getDeclaringClass().getName();
-					String methodName = ((Method)(testResult.getParameters()[0])).getName();
-					currentBeforeContext = SeleniumTestsContextManager.storeMethodContext(context, className, methodName);	 
-				} catch (Exception e) {
-					throw new ScenarioException("When using @BeforeMethod in tests, this method MUST have a 'java.lang.reflect.Method' object as first argument. Example: \n\n"
-							+ "@BeforeMethod\n" + 
-							"public void beforeMethod(Method method) {\n"
-							+ "    SeleniumTestsContextManager.getThreadContext().setAttribute(\"some attribute\", \"attribute value\");\n"
-							+ "}\n\n");
-				}
-				
-			// handle some after methods. No change in context in after method will be recorded
-			} else if (((ConfigurationMethod)method.getTestMethod()).isAfterMethodConfiguration()) {
-				// beforeMethod, testMethod and afterMethod run in the same thread, so it's safe to take the current context
-				currentBeforeContext = SeleniumTestsContextManager.getThreadContext();
-			} else if (((ConfigurationMethod)method.getTestMethod()).isAfterClassConfiguration()) {
-				currentBeforeContext = SeleniumTestsContextManager.getClassContext(context, method.getTestMethod().getTestClass().getName());
-			} else if (((ConfigurationMethod)method.getTestMethod()).isAfterTestConfiguration()) {
-				currentBeforeContext = SeleniumTestsContextManager.getTestContext(context);
-			}
-			if (currentBeforeContext != null) {
-				SeleniumTestsContextManager.setThreadContext(currentBeforeContext);
-			} else {
-				SeleniumTestsContextManager.initThreadContext();
-			}
+			configureThreadContextBeforeInvoke(method, testResult, context);
 		}
 
 		if (method.isTestMethod()) {
-
-	    	if (SeleniumRobotTestPlan.isCucumberTest()) {
-	    		testResult.setAttribute(SeleniumRobotLogger.METHOD_NAME, testResult.getParameters()[0].toString());
-	    	} else {
-	    		testResult.setAttribute(SeleniumRobotLogger.METHOD_NAME, method.getTestMethod().getMethodName());
-	    	}
-	    	
-    		logger.info(SeleniumRobotLogger.START_TEST_PATTERN + testResult.getAttribute(SeleniumRobotLogger.METHOD_NAME));
-    		
-    		// when @BeforeMethod has been used, threadContext is already initialized and may have been updated. Do not overwrite options
-    		// only reconfigure it
-			String className = method.getTestMethod().getTestClass().getName();
-			String methodName = method.getTestMethod().getMethodName();
-			SeleniumTestsContextManager.setThreadContext(SeleniumTestsContextManager.getMethodContext(context, className, methodName, true));
-	
-    		SeleniumTestsContextManager.updateThreadContext((String)testResult.getAttribute(SeleniumRobotLogger.METHOD_NAME));
-    		
-            SeleniumTestsContextManager.getThreadContext().setTestMethodSignature((String)testResult.getAttribute(SeleniumRobotLogger.METHOD_NAME));
-	    	
-	    	if (testResult.getMethod().getRetryAnalyzer() == null) {
-	    		testResult.getMethod().setRetryAnalyzer(new TestRetryAnalyzer());
-			}	
+			executeBeforeTestMethod(method, testResult, context);	
 		}
 		
 	}
+	
 
 	@Override
 	public void afterInvocation(IInvokedMethod method, ITestResult testResult, ITestContext context) {
-		
-		
-		if (method.isConfigurationMethod()) {
-			
-			// store the current thread context back to test/class/method context as it may have been modified in "Before" methods
-			if (((ConfigurationMethod)method.getTestMethod()).isBeforeTestConfiguration()) {
-				SeleniumTestsContextManager.setTestContext(context, SeleniumTestsContextManager.getThreadContext());
-			} else if (((ConfigurationMethod)method.getTestMethod()).isBeforeClassConfiguration()) {
-				SeleniumTestsContextManager.setClassContext(context, method.getTestMethod().getTestClass().getName(), SeleniumTestsContextManager.getThreadContext());
-			} else if (((ConfigurationMethod)method.getTestMethod()).isBeforeMethodConfiguration()) {
-				try {
-					String className = ((Method)(testResult.getParameters()[0])).getDeclaringClass().getName();
-					String methodName = ((Method)(testResult.getParameters()[0])).getName();
-					SeleniumTestsContextManager.setMethodContext(context, className, methodName, SeleniumTestsContextManager.getThreadContext());
-				} catch (Exception e) {}
-			} 
-		}
-		
+
 		Reporter.setCurrentTestResult(testResult);
 		
+		if (method.isConfigurationMethod()) {
+			configureThreadContextAfterInvoke(method, testResult, context); 
+		}
+		
 		if (method.isTestMethod()) {
-
-	        logger.info(SeleniumRobotLogger.END_TEST_PATTERN + testResult.getAttribute(SeleniumRobotLogger.METHOD_NAME));
-
-	        Reporter.setCurrentTestResult(testResult);
-
-			// Handle Soft CustomAssertion
-			if (method.isTestMethod()) {
-				changeTestResult(testResult);
-			}
-			
-			if (testResult.getThrowable() != null) {
-				logger.error(testResult.getThrowable().getMessage());
-				
-				// when error occurs, exception raised is not added to the step if this error is outside of a PageObject
-				// we add it there as an exception always terminates the test (except for soft assert, but this case is handled in SoftAssertion.aj)
-				TestStep lastStep = TestLogging.getCurrentRootTestStep();
-				if (lastStep == null) {
-					// when steps are automatic, they are closed (lastStep is null) once method is finished
-					try {
-						lastStep = Iterables.getLast(TestLogging.getTestsSteps().get(testResult));
-					} catch (NoSuchElementException e) {} 
-				}
-				
-				if (lastStep != null) {
-					lastStep.setFailed(true);
-					lastStep.setActionException(testResult.getThrowable());
-				}
-			}
-			
-			// capture snap shot at the end of the test
-			logLastStep(testResult);
-			
-			// unreserve variables
-			unreserveVariables();
-			
-			// store test method context in case it has been modified
-			String className = method.getTestMethod().getTestClass().getName();
-			String methodName = method.getTestMethod().getMethodName();
-			SeleniumTestsContextManager.setMethodContext(context, className, methodName, SeleniumTestsContextManager.getThreadContext());
-			
-			// store context in test result
-			testResult.setAttribute(TEST_CONTEXT, SeleniumTestsContextManager.getThreadContext());
-	        
+	        executeAfterTestMethod(method, testResult, context);
 		}
 	}
 	
@@ -319,18 +212,32 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 
 	@Override
 	public void onExecutionFinish() {
-		try {
-			SeleniumRobotLogger.parseLogFile();
-		} catch (IOException e) {
-			logger.error("cannot read log file", e);
-		}
         try {
 			Unirest.shutdown();
 		} catch (IOException e) {
 			logger.error("Cannot stop unirest", e);
 		}
+        
+        // archive results
+        if (SeleniumTestsContextManager.getGlobalContext().getArchiveToFile() != null) {
+			FileUtility.zipFolder(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()), 
+								  new File(SeleniumTestsContextManager.getGlobalContext().getArchiveToFile()));
+		}
 	}
 	
+	@Override
+	public void onConfigurationSuccess(ITestResult itr) {
+	}
+
+	@Override
+	public void onConfigurationFailure(ITestResult itr) {
+		logger.error(String.format("Error on configuration method %s.%s: %s", itr.getMethod().getTestClass().getName(), itr.getMethod().getMethodName(), itr.getThrowable().getMessage()));
+	}
+
+	@Override
+	public void onConfigurationSkip(ITestResult itr) {
+		logger.error(String.format("Skip on method %s.%s", itr.getMethod().getTestClass().getName(), itr.getMethod().getMethodName()));
+	}
 	
 
 	/**
@@ -480,23 +387,153 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 			}
 		}
 	}
+	
 
-	@Override
-	public void onConfigurationSuccess(ITestResult itr) {
-//		itr.getTestContext().getPassedConfigurations().addResult(itr, itr.getMethod());
+	/**
+	 * put in thread context the test / class / method context that may have already be defined in other \@BeforeXXX method
+	 */
+	private void configureThreadContextBeforeInvoke(IInvokedMethod method, ITestResult testResult, ITestContext context) {
+		SeleniumTestsContext currentBeforeContext = null;
+		
+		// handle some before methods
+		if (((ConfigurationMethod)method.getTestMethod()).isBeforeTestConfiguration()) {
+			currentBeforeContext = SeleniumTestsContextManager.storeTestContext(context);
+		} else if (((ConfigurationMethod)method.getTestMethod()).isBeforeClassConfiguration()) {
+			currentBeforeContext = SeleniumTestsContextManager.storeClassContext(context, method.getTestMethod().getTestClass().getName());
+		} else if (((ConfigurationMethod)method.getTestMethod()).isBeforeMethodConfiguration()) {
+			try {
+				String className = ((Method)(testResult.getParameters()[0])).getDeclaringClass().getName();
+				String methodName = ((Method)(testResult.getParameters()[0])).getName();
+				currentBeforeContext = SeleniumTestsContextManager.storeMethodContext(context, className, methodName);	 
+			} catch (Exception e) {
+				throw new ScenarioException("When using @BeforeMethod in tests, this method MUST have a 'java.lang.reflect.Method' object as first argument. Example: \n\n"
+						+ "@BeforeMethod\n" + 
+						"public void beforeMethod(Method method) {\n"
+						+ "    SeleniumTestsContextManager.getThreadContext().setAttribute(\"some attribute\", \"attribute value\");\n"
+						+ "}\n\n");
+			}
+			
+		// handle some after methods. No change in context in after method will be recorded
+		} else if (((ConfigurationMethod)method.getTestMethod()).isAfterMethodConfiguration()) {
+			// beforeMethod, testMethod and afterMethod run in the same thread, so it's safe to take the current context
+			currentBeforeContext = SeleniumTestsContextManager.getThreadContext();
+		} else if (((ConfigurationMethod)method.getTestMethod()).isAfterClassConfiguration()) {
+			currentBeforeContext = SeleniumTestsContextManager.getClassContext(context, method.getTestMethod().getTestClass().getName());
+		} else if (((ConfigurationMethod)method.getTestMethod()).isAfterTestConfiguration()) {
+			currentBeforeContext = SeleniumTestsContextManager.getTestContext(context);
+		}
+		if (currentBeforeContext != null) {
+			SeleniumTestsContextManager.setThreadContext(currentBeforeContext);
+		} else {
+			SeleniumTestsContextManager.initThreadContext();
+		}
 	}
+	
 
-	@Override
-	public void onConfigurationFailure(ITestResult itr) {
-		logger.error(String.format("Error on configuration method %s.%s: %s", itr.getMethod().getTestClass().getName(), itr.getMethod().getMethodName(), itr.getThrowable().getMessage()));
-		itr.getTestContext().getFailedConfigurations().addResult(itr, itr.getMethod());
-		itr.getThrowable().printStackTrace();
+	/**
+	 * Put back modified thread context to test / class / method context
+	 * @param method
+	 * @param testResult
+	 * @param context
+	 */
+	private void configureThreadContextAfterInvoke(IInvokedMethod method, ITestResult testResult, ITestContext context) {
+		// store the current thread context back to test/class/method context as it may have been modified in "Before" methods
+		if (((ConfigurationMethod)method.getTestMethod()).isBeforeTestConfiguration()) {
+			SeleniumTestsContextManager.setTestContext(context, SeleniumTestsContextManager.getThreadContext());
+		} else if (((ConfigurationMethod)method.getTestMethod()).isBeforeClassConfiguration()) {
+			SeleniumTestsContextManager.setClassContext(context, method.getTestMethod().getTestClass().getName(), SeleniumTestsContextManager.getThreadContext());
+		} else if (((ConfigurationMethod)method.getTestMethod()).isBeforeMethodConfiguration()) {
+			try {
+				String className = ((Method)(testResult.getParameters()[0])).getDeclaringClass().getName();
+				String methodName = ((Method)(testResult.getParameters()[0])).getName();
+				SeleniumTestsContextManager.setMethodContext(context, className, methodName, SeleniumTestsContextManager.getThreadContext());
+			} catch (Exception e) {}
+		}
 	}
+	
+	/**
+	 * Execute the actions before test method
+	 */
+	private void executeBeforeTestMethod(IInvokedMethod method, ITestResult testResult, ITestContext context) {
+		if (SeleniumRobotTestPlan.isCucumberTest()) {
+    		testResult.setAttribute(SeleniumRobotLogger.METHOD_NAME, testResult.getParameters()[0].toString());
+    	} else {
+    		testResult.setAttribute(SeleniumRobotLogger.METHOD_NAME, method.getTestMethod().getMethodName());
+    	}
+    	
+		logger.info(SeleniumRobotLogger.START_TEST_PATTERN + testResult.getAttribute(SeleniumRobotLogger.METHOD_NAME));
+		
+		// when @BeforeMethod has been used, threadContext is already initialized and may have been updated. Do not overwrite options
+		// only reconfigure it
+		String className = method.getTestMethod().getTestClass().getName();
+		String methodName = method.getTestMethod().getMethodName();
+		SeleniumTestsContextManager.setThreadContext(SeleniumTestsContextManager.getMethodContext(context, className, methodName, true));
 
-	@Override
-	public void onConfigurationSkip(ITestResult itr) {
-		logger.error(String.format("Skip on method %s.%s", itr.getMethod().getTestClass().getName(), itr.getMethod().getMethodName()));
-//		itr.getTestContext().getSkippedConfigurations().addResult(itr, itr.getMethod());
+		SeleniumTestsContextManager.updateThreadContext((String)testResult.getAttribute(SeleniumRobotLogger.METHOD_NAME));
+		
+        SeleniumTestsContextManager.getThreadContext().setTestMethodSignature((String)testResult.getAttribute(SeleniumRobotLogger.METHOD_NAME));
+    	
+    	if (testResult.getMethod().getRetryAnalyzer() == null) {
+    		testResult.getMethod().setRetryAnalyzer(new TestRetryAnalyzer());
+		}	
+	}
+	
+
+	/**
+	 * Finalize test method execution
+	 * - update result if some tests where skipped or failed, or success but with some asserts
+	 * - set status of the last step and log it
+	 * - dereserve test variables
+	 * - record test method context
+	 * @param method
+	 * @param testResult
+	 * @param context
+	 */
+	private void executeAfterTestMethod(IInvokedMethod method, ITestResult testResult, ITestContext context) {
+		logger.info(SeleniumRobotLogger.END_TEST_PATTERN + testResult.getAttribute(SeleniumRobotLogger.METHOD_NAME));
+
+		Reporter.setCurrentTestResult(testResult);
+
+		// Handle Soft CustomAssertion
+		if (method.isTestMethod()) {
+			changeTestResult(testResult);
+		}
+		
+		if (testResult.getThrowable() != null) {
+			logger.error(testResult.getThrowable().getMessage());
+			
+			// when error occurs, exception raised is not added to the step if this error is outside of a PageObject
+			// we add it there as an exception always terminates the test (except for soft assert, but this case is handled in SoftAssertion.aj)
+			TestStep lastStep = TestLogging.getCurrentRootTestStep();
+			if (lastStep == null) {
+				// when steps are automatic, they are closed (lastStep is null) once method is finished
+				try {
+					lastStep = Iterables.getLast(TestLogging.getTestsSteps().get(testResult));
+				} catch (NoSuchElementException e) {} 
+			}
+			
+			if (lastStep != null) {
+				lastStep.setFailed(true);
+				lastStep.setActionException(testResult.getThrowable());
+			}
+		}
+		
+		// capture snap shot at the end of the test
+		logLastStep(testResult);
+		
+		// unreserve variables
+		unreserveVariables();
+		
+		// store test method context in case it has been modified
+		String className = method.getTestMethod().getTestClass().getName();
+		String methodName = method.getTestMethod().getMethodName();
+		SeleniumTestsContextManager.setMethodContext(context, className, methodName, SeleniumTestsContextManager.getThreadContext());
+		
+		// store context in test result
+		testResult.setAttribute(TEST_CONTEXT, SeleniumTestsContextManager.getThreadContext());
+		
+		// parse logs of this test method
+		SeleniumRobotLogger.parseLogFile();
 	}
 
 }

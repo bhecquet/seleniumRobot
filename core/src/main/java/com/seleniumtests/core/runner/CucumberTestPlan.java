@@ -22,8 +22,6 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
-import com.seleniumtests.core.SeleniumTestsContextManager;
-
 import cucumber.api.testng.CucumberFeatureWrapper;
 
 /**

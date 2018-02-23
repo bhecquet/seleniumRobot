@@ -12,7 +12,6 @@ import org.testng.annotations.Test;
 
 import com.seleniumtests.GenericTest;
 import com.seleniumtests.connectors.selenium.SeleniumRobotVariableServerConnector;
-import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.TestVariable;
 
 /**

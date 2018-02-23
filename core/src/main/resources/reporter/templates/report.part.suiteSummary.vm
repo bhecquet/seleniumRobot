@@ -67,7 +67,11 @@
 			                			#end 
 
 				                		<td name="passed-$testIdx">$passedSteps</td>
-				                  		<td name="failed-$testIdx">$failedSteps</td>
+				                		#if ($failedSteps == 0)
+				                  			<td name="failed-$testIdx">$failedSteps</td>
+				                  		#else
+				                  			<td name="failed-$testIdx" class="failedSteps">$failedSteps</td>
+				                  		#end
 				                  		<td name="stepsTotal-$testIdx">$totalTestSteps</td>
 				                  		<td>$testDuration sec.</td>
 				                  		</tr>

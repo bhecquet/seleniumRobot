@@ -19,8 +19,6 @@ package com.seleniumtests.it.reporter;
 import java.io.File;
 import java.util.List;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.annotations.BeforeMethod;

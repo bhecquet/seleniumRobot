@@ -54,6 +54,12 @@ tbody tr td, thead tr th, tfoot tr th{
 	color: #00CCFF;
 }
 
+.failedSteps {
+	color: red;
+	font-weight: bold;
+	background-color: rgba(255,102,102,0.3);
+}
+
 .testSuccess{
 	border-bottom: 2px solid #2BC400;
 	background-color: rgba(151,208,134,0.2);
