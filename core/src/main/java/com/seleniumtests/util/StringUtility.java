@@ -118,16 +118,9 @@ public class StringUtility {
 	 */
 	public static String replaceOddCharsFromFileName(String inString) {
 		return inString.replace(" ",  "_")
-				.replace("'", "")
-				.replace("\"", "")
-				.replace("/", "")
-				.replace(" ", "_")
-				.replace(":", "-")
-				.replace("*", ".")
-				.replace("?", ".")
-				.replace("|", "")
-				.replace("<", "-")
-				.replace(">", "-")
+				.replaceAll("['\"/|%]", "")
+				.replaceAll("[:*?]", ".")
+				.replaceAll("[<>]", "-")
 				.replace("\\", "_");
 	}
 	

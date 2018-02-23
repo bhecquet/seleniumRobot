@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 
 import com.seleniumtests.driver.screenshots.ScreenShot;
 import com.seleniumtests.reporter.reporters.CommonReporter;
@@ -53,6 +54,7 @@ public class Snapshot extends TestAction {
 
     /**
      * Rename HTML and PNG files so that they do not present an uuid
+     * New name is <test_name>_<step_idx>_<snapshot_idx>_<step_name>_<uuid>
      * @param testStep
      * @param stepIdx	   	number of this step
      * @param snapshotIdx	number of this snapshot for this step
@@ -64,6 +66,7 @@ public class Snapshot extends TestAction {
     			snapshotIdx,
     			StringUtility.replaceOddCharsFromFileName(testStep.getName()));
     	
+    	
     	if (screenshot.getHtmlSourcePath() != null) {
     		String oldFullPath = screenshot.getFullHtmlPath();
     		String oldPath = screenshot.getHtmlSourcePath();
@@ -72,7 +75,10 @@ public class Snapshot extends TestAction {
     		if (oldFile.getParent() != null) {
     			folderName = oldFile.getParent().replace(File.separator, "/") + "/";
     		}
-    		screenshot.setHtmlSourcePath(folderName + newBaseName + oldFile.getName());
+    		
+    		String newName = newBaseName + FilenameUtils.getBaseName(oldFile.getName());
+    		newName = newName.substring(0, Math.min(50, newName.length())) + "." +  FilenameUtils.getExtension(oldFile.getName());
+    		screenshot.setHtmlSourcePath(folderName + newName);
     		
     		// if file cannot be moved, go back to old name
     		try {
@@ -89,7 +95,10 @@ public class Snapshot extends TestAction {
     		if (oldFile.getParent() != null) {
     			folderName = oldFile.getParent().replace(File.separator, "/") + "/";
     		}
-    		screenshot.setImagePath(folderName + newBaseName + oldFile.getName());
+    		
+    		String newName = newBaseName + FilenameUtils.getBaseName(oldFile.getName());
+    		newName = newName.substring(0, Math.min(50, newName.length())) + "." + FilenameUtils.getExtension(oldFile.getName());
+    		screenshot.setImagePath(folderName + newName);
     		
     		// if file cannot be moved, go back to old name
     		try {

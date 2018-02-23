@@ -16,12 +16,15 @@
  */
 package com.seleniumtests.it.stubclasses;
 
+import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Method;
 
+import org.apache.commons.io.FileUtils;
 import org.openqa.selenium.WebDriverException;
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -39,6 +42,11 @@ import com.seleniumtests.util.helper.WaitHelper;
 public class StubTestClass extends StubParentClass {
 	
 	private static int count = 0;
+	
+	@BeforeClass(groups={"stub"})
+	public void setCount() {
+		count = 0;
+	}
 
 	@BeforeMethod(groups={"stub"})
 	public void set(Method method) {
@@ -59,11 +67,11 @@ public class StubTestClass extends StubParentClass {
 		step1.addAction(new TestAction("sendKeys to text field", true));
 		
 		ScreenShot screenshot = new ScreenShot();
-//		File tmpImg = File.createTempFile("img", "png");
-//		tmpImg.deleteOnExit();
-//		
+		File tmpImg = File.createTempFile("img_with_very_very_very_long_name_to_be_shortened", ".png");
+
+		screenshot.setImagePath("screenshot/" + tmpImg.getName());
+		FileUtils.moveFile(tmpImg, new File(screenshot.getFullImagePath()));
 		
-		screenshot.setImagePath("screenshots/image.png");
 		step1.addSnapshot(new Snapshot(screenshot), 1);
 		step1.setActionException(new WebDriverException("driver exception"));
 		TestStep subStep1 = new TestStep("step 1.3: open page", TestLogging.getCurrentTestResult());

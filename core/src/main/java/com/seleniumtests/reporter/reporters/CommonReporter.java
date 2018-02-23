@@ -68,7 +68,7 @@ public abstract class CommonReporter {
 	 * create writer used for writing report file
 	 * @param outDir
 	 * @param fileName
-	 * @return
+	 * @return 
 	 * @throws IOException
 	 */
 	protected PrintWriter createWriter(final String outDir, final String fileName) throws IOException {
