@@ -612,6 +612,21 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		Assert.assertTrue(detailedReportContent.contains("<table class=\"table table-bordered table-condensed\"><tr><th width=\"15%\">Key</th><th width=\"60%\">Message</th><th width=\"25%\">Value</th></tr><tr><td>key</td><td>we found a value of</td><td>10</td></tr></table>"));
 	}
 	
+	@Test(groups={"it"})
+	public void testReportDetailsContainsParentConfigurations() throws Exception {
+		
+		executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForListener1"});
+		
+		String detailedReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport-1.html"));
+		detailedReportContent = detailedReportContent.replace("\n", "").replace("\r",  "").replaceAll(">\\s+<", "><");
+		
+		Assert.assertEquals(StringUtils.countMatches(detailedReportContent, "</button> Pre test step: beforeTestInParent - "), 1);
+		Assert.assertEquals(StringUtils.countMatches(detailedReportContent, "</button> Pre test step: beforeTest -"), 1);
+		Assert.assertEquals(StringUtils.countMatches(detailedReportContent, "</button> Post test step: afterClassInParent - "), 1);
+		
+	}
+		
+	
 	/**
 	 * Check all steps are present in detailed report file. For cucumber, check that method name is the Scenario name, not the "feature" generic method
 	 * Test OK

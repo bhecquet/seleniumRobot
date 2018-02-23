@@ -31,7 +31,7 @@ import org.testng.xml.XmlTest;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 
 
-public class StubTestClassForListener1 extends StubParentClass {
+public class StubTestClassForListener1 extends StubTestClassForListenerParent {
 	
 
 	@BeforeTest
