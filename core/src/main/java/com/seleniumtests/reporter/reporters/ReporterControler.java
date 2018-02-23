@@ -1,5 +1,6 @@
 package com.seleniumtests.reporter.reporters;
 
+import java.io.File;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -13,6 +14,7 @@ import org.testng.ISuiteResult;
 import org.testng.ITestResult;
 import org.testng.xml.XmlSuite;
 
+import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.reporter.logger.TestLogging;
 import com.seleniumtests.reporter.logger.TestStep;
 
@@ -27,6 +29,9 @@ public class ReporterControler implements IReporter {
 	public void generateReport(List<XmlSuite> xmlSuites, List<ISuite> suites, String outputDirectory) {
 
 		updateTestSteps(suites);
+		try {
+			new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).mkdirs();
+		} catch (Exception e) {}
 		
 		try {
 			new SeleniumTestsReporter2().generateReport(xmlSuites, suites, outputDirectory);

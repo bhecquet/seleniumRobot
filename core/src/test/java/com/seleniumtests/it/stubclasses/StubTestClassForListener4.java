@@ -33,7 +33,7 @@ public class StubTestClassForListener4 extends StubParentClass {
 	}
 	
 	@Test
-	public void test1Listener4(String data) {
+	public void test1Listener4() {
 		SeleniumTestsContextManager.getThreadContext().setAttribute("method exec", "test1Listener3");
 
 	}

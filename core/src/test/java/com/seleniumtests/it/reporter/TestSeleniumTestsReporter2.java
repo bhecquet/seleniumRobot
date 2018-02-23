@@ -24,12 +24,15 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import java.io.File;
+import java.lang.reflect.Method;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.velocity.app.VelocityEngine;
 import org.testng.Assert;
+import org.testng.ITestContext;
 import org.testng.ITestResult;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import org.testng.xml.XmlSuite;
 
@@ -40,7 +43,11 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	
 	private SeleniumTestsReporter2 reporter;
 
-	
+//	@BeforeMethod(groups={"it"})
+//	public void setLogs(Method method, ITestContext context) {
+//		SeleniumTestsContextManager.getThreadContext().setOutputDirectory(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory() + "/" + method.getName(), context);
+//		SeleniumTestsContextManager.getGlobalContext().setOutputDirectory(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory() + "/" + method.getName(), context);
+//	}
 	
 	/**
 	 * Disabled because now, it's not easy to get the SeleniumRobotReporterInstance created by testNg
@@ -116,15 +123,15 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		Assert.assertTrue(mainReportContent.contains("<a href='SeleniumTestReport-2.html'>testInError</a>"));
 		
 		// check number of steps is correctly computed. "test1" has 2 main steps, "testInError" has 1 step
-		Assert.assertTrue(mainReportContent.contains("<td name=\"passed-1\">2</td>"));
-		Assert.assertTrue(mainReportContent.contains("<td name=\"failed-1\">1</td>"));
-		Assert.assertTrue(mainReportContent.contains("<td name=\"stepsTotal-1\">3</td>"));
+		Assert.assertTrue(mainReportContent.contains("<td name=\"passed-1\">5</td>"));
+		Assert.assertTrue(mainReportContent.contains("<td name=\"failed-1\" class=\"failedSteps\">1</td>"));
+		Assert.assertTrue(mainReportContent.contains("<td name=\"stepsTotal-1\">6</td>"));
 		
 		// for second test, test is reported KO whereas all steps are OK because we do not use LogAction.aj
 		// which handles assertion errors and report them in test steps
-		Assert.assertTrue(mainReportContent.contains("<td name=\"passed-2\">1</td>"));
-		Assert.assertTrue(mainReportContent.contains("<td name=\"failed-2\">1</td>"));
-		Assert.assertTrue(mainReportContent.contains("<td name=\"stepsTotal-2\">2</td>"));
+		Assert.assertTrue(mainReportContent.contains("<td name=\"passed-2\">4</td>"));
+		Assert.assertTrue(mainReportContent.contains("<td name=\"failed-2\" class=\"failedSteps\">1</td>"));
+		Assert.assertTrue(mainReportContent.contains("<td name=\"stepsTotal-2\">5</td>"));
 	}
 	
 	/**
@@ -167,6 +174,16 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		Assert.assertFalse(detailedReportContent1.contains("</button> add with args: (1, )"));
 		Assert.assertTrue(detailedReportContent1.contains("</button> Test end"));
 		
+	}
+	
+	@Test(groups={"it"})
+	public void testSnapshotRenaming() throws Exception {
+		
+		executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"});
+		
+		// check that with error, remaining steps are skipped
+		String detailedReportContent1 = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport-1.html"));
+		Assert.assertTrue(detailedReportContent1.contains("Output: null:  | <a href='screenshot/testAndSubActions_1-1_step_1-img_with_very_very_ve.png'"));		
 	}
 	
 	/**
@@ -286,7 +303,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		// check content of summary report file
 		String detailedReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport-1.html"));
 		detailedReportContent = detailedReportContent.replace("\n", "").replace("\r",  "").replaceAll(">\\s+<", "><");
-		
+
 		Assert.assertTrue(detailedReportContent.contains(
 				"<ul>"													// root step
 					+ "<li>click button</li>"
@@ -297,7 +314,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 						+ "<div class=\"message-log\">a message</div>"	// message in sub step
 						+ "<li>sendKeys to password field</li>"			// action in sub step
 					+ "</ul>" 
-					+ "<div class=\"message-snapshot\">Output: null:  | <a href='screenshots/image.png' class='lightbox'>Application Snapshot</a></div>"
+					+ "<div class=\"message-snapshot\">Output: null:  | <a href='screenshot/testAndSubActions_1-1_step_1-img_with_very_very_ve.png' class='lightbox'>Application Snapshot</a></div>"
 				+ "</ul>"));
 		
 	}

@@ -1660,6 +1660,9 @@ public class SeleniumTestsContext {
     			((TestRunner)context).setOutputDirectory(outputDir);
     		}
     		setAttribute(OUTPUT_DIRECTORY, new File(outputDir).getAbsolutePath().replace(File.separator, "/"));
+    		try {
+    			new File((String)getAttribute(OUTPUT_DIRECTORY)).mkdirs();
+    		} catch (Exception e) {}
     	}
     }
     
