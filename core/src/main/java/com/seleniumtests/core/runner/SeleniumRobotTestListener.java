@@ -437,17 +437,27 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 	 * @param context
 	 */
 	private void configureThreadContextAfterInvoke(IInvokedMethod method, ITestResult testResult, ITestContext context) {
+		
 		// store the current thread context back to test/class/method context as it may have been modified in "Before" methods
 		if (((ConfigurationMethod)method.getTestMethod()).isBeforeTestConfiguration()) {
 			SeleniumTestsContextManager.setTestContext(context, SeleniumTestsContextManager.getThreadContext());
+			
 		} else if (((ConfigurationMethod)method.getTestMethod()).isBeforeClassConfiguration()) {
 			SeleniumTestsContextManager.setClassContext(context, method.getTestMethod().getTestClass().getName(), SeleniumTestsContextManager.getThreadContext());
+			
 		} else if (((ConfigurationMethod)method.getTestMethod()).isBeforeMethodConfiguration()) {
 			try {
 				String className = ((Method)(testResult.getParameters()[0])).getDeclaringClass().getName();
 				String methodName = ((Method)(testResult.getParameters()[0])).getName();
 				SeleniumTestsContextManager.setMethodContext(context, className, methodName, SeleniumTestsContextManager.getThreadContext());
 			} catch (Exception e) {}
+		}
+		
+		// reparse logs in case some new logs have been written
+		if (((ConfigurationMethod)method.getTestMethod()).isAfterClassConfiguration()
+				|| ((ConfigurationMethod)method.getTestMethod()).isAfterTestConfiguration()
+				|| ((ConfigurationMethod)method.getTestMethod()).isAfterMethodConfiguration()) {
+			SeleniumRobotLogger.parseLogFile();
 		}
 	}
 	
