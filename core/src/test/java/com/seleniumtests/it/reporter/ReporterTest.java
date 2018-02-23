@@ -12,6 +12,7 @@ import org.testng.TestNG;
 import org.testng.xml.XmlClass;
 import org.testng.xml.XmlPackage;
 import org.testng.xml.XmlSuite;
+import org.testng.xml.XmlSuite.FailurePolicy;
 import org.testng.xml.XmlSuite.ParallelMode;
 import org.testng.xml.XmlTest;
 
@@ -39,7 +40,7 @@ public class ReporterTest extends MockitoTest {
 		
 		XmlSuite suite = new XmlSuite();
 		suite.setName("TmpSuite");
-		suite.setParallel(ParallelMode.FALSE);
+		suite.setParallel(ParallelMode.NONE);
 		suite.setFileName("/home/test/seleniumRobot/data/core/testng/testLoggging.xml");
 		Map<String, String> suiteParameters = new HashMap<>();
 		suiteParameters.put("softAssertEnabled", "false");

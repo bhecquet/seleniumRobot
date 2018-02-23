@@ -17,7 +17,6 @@
 package com.seleniumtests.it.util;
 
 import java.lang.management.ManagementFactory;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.testng.Assert;

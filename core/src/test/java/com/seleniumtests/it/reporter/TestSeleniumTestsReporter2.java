@@ -29,13 +29,11 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.velocity.app.VelocityEngine;
 import org.testng.Assert;
-import org.testng.ITestContext;
 import org.testng.ITestResult;
 import org.testng.annotations.Test;
 import org.testng.xml.XmlSuite;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
-import com.seleniumtests.reporter.logger.TestLogging;
 import com.seleniumtests.reporter.reporters.SeleniumTestsReporter2;
 
 public class TestSeleniumTestsReporter2 extends ReporterTest {
@@ -62,17 +60,16 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		verify(reporter, times(9)).generateExecutionReport(any(ITestResult.class));
 		verify(reporter).copyResources();
 
-		// check report is complete without error
+		// check report is complete without error (issue #100)
 		Assert.assertEquals(reporter.getGenerationErrorMessage(), null, "error during generation: " + reporter.getGenerationErrorMessage());		
 	}
 	
 	/**
 	 * Check summary format when tests have steps
-	 * @param testContext
 	 * @throws Exception
 	 */
 	@Test(groups={"it"})
-	public void testMultithreadReport(ITestContext testContext) throws Exception {
+	public void testMultithreadReport() throws Exception {
 
 		SeleniumTestsContextManager.removeThreadContext();
 		executeSubTest(5, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"});
@@ -87,11 +84,10 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	
 	/**
 	 * Check summary format when tests have steps
-	 * @param testContext
 	 * @throws Exception
 	 */
 	@Test(groups={"it"})
-	public void testMultithreadTestReport(ITestContext testContext) throws Exception {
+	public void testMultithreadTestReport() throws Exception {
 		
 		SeleniumTestsContextManager.removeThreadContext();
 		executeSubTest(5, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, XmlSuite.ParallelMode.TESTS);
@@ -106,11 +102,10 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	
 	/**
 	 * Check summary format when tests have steps
-	 * @param testContext
 	 * @throws Exception
 	 */
 	@Test(groups={"it"})
-	public void testReportSummaryContentWithSteps(ITestContext testContext) throws Exception {
+	public void testReportSummaryContentWithSteps() throws Exception {
 
 		executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"});
 		
@@ -134,11 +129,10 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	
 	/**
 	 * Check that automatic steps create all steps in report
-	 * @param testContext
 	 * @throws Exception
 	 */
 	@Test(groups={"it"})
-	public void testAutomaticSteps(ITestContext testContext) throws Exception {
+	public void testAutomaticSteps() throws Exception {
 		
 		executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClass3"});
 		
@@ -180,11 +174,10 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	 * manual step option is set inside the StubTestClassManualSteps.testOk() method
 	 * check the failed test case where step should be marked as KO
 	 * Also, error in step should be presented
-	 * @param testContext
 	 * @throws Exception
 	 */
 	@Test(groups={"it"})
-	public void testManualSteps(ITestContext testContext) throws Exception {
+	public void testManualSteps() throws Exception {
 		
 		executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClassManualSteps"});
 		
@@ -202,6 +195,10 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		Assert.assertTrue(detailedReportContent1.contains("</button> minus 2"));
 		Assert.assertTrue(detailedReportContent1.contains("</button> do nothing"));
 		Assert.assertTrue(detailedReportContent1.contains("</button> Test end"));
+		
+		// check that configuration steps are automatically added
+		Assert.assertTrue(detailedReportContent1.contains("</button> Pre test step: set - "));
+		Assert.assertTrue(detailedReportContent1.contains("</button> Post test step: teardown -"));
 		
 		// assert automatic steps are not present
 		Assert.assertFalse(detailedReportContent1.contains("</button> add with args"));
@@ -227,11 +224,10 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	
 	/**
 	 * Check state and style of all tests
-	 * @param testContext
 	 * @throws Exception
 	 */
 	@Test(groups={"it"})
-	public void testReportSummaryContentWithDependantTests(ITestContext testContext) throws Exception {
+	public void testReportSummaryContentWithDependantTests() throws Exception {
 	
 		executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClass2"});
 		
@@ -250,11 +246,10 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	
 	/**
 	 * Check format of messages in detailed report
-	 * @param testContext
 	 * @throws Exception
 	 */
 	@Test(groups={"it"})
-	public void testReportDetailsMessageStyles(ITestContext testContext) throws Exception {
+	public void testReportDetailsMessageStyles() throws Exception {
 		
 		reporter = spy(new SeleniumTestsReporter2());
 		System.setProperty("customTestReports", "PERF::xml::reporter/templates/report.perf.vm,SUP::xml::reporter/templates/report.supervision.vm");
@@ -279,11 +274,10 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	/**
 	 * Check format of steps inside steps
 	 * test1 in com.seleniumtests.it.stubclasses.StubTestClass defines steps inside other steps
-	 * @param testContext
 	 * @throws Exception
 	 */
 	@Test(groups={"it"})
-	public void testReportDetailsWithSubSteps(ITestContext testContext) throws Exception {
+	public void testReportDetailsWithSubSteps() throws Exception {
 		
 		reporter = spy(new SeleniumTestsReporter2());
 		
@@ -310,11 +304,10 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	
 	/**
 	 * Check logs are written in file
-	 * @param testContext
 	 * @throws Exception
 	 */
 	@Test(groups={"it"})
-	public void testReportDetailsWithLogs(ITestContext testContext) throws Exception {
+	public void testReportDetailsWithLogs() throws Exception {
 		
 		reporter = new SeleniumTestsReporter2();
 		
@@ -332,11 +325,10 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	/**
 	 * Check all steps are present in detailed report file
 	 * Test OK
-	 * @param testContext
 	 * @throws Exception
 	 */
 	@Test(groups={"it"})
-	public void testReportDetailsSteps(ITestContext testContext) throws Exception {
+	public void testReportDetailsSteps() throws Exception {
 		
 		reporter = new SeleniumTestsReporter2();
 		
@@ -352,6 +344,9 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		Assert.assertTrue(detailedReportContent.contains("<div class=\"box collapsed-box success\"><div class=\"box-header with-border\"><button type=\"button\" class=\"btn btn-box-tool\" data-widget=\"collapse\"><i class=\"fa fa-plus\"></i></button> Execution logs"));
 		Assert.assertTrue(detailedReportContent.contains("<div class=\"message-log\">Test is OK</div>"));
 		
+		// check logs are written only once 
+		Assert.assertEquals(StringUtils.countMatches(detailedReportContent, "[main] TestLogging: Test is OK</div>"), 1);
+		
 	}
 	
 	
@@ -362,11 +357,10 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	 * - all composite actions logging
 	 * - all PictureElement action logging
 	 * 
-	 * @param testContext
 	 * @throws Exception
 	 */
 	@Test(groups={"it"})
-	public void testReportContainsDriverActions(ITestContext testContext) throws Exception {
+	public void testReportContainsDriverActions() throws Exception {
 		
 		reporter = new SeleniumTestsReporter2();
 		executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"});
@@ -426,11 +420,10 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	 * Check all errors are recorded in detailed file
 	 * - in execution logs
 	 * - in Test end step
-	 * @param testContext
 	 * @throws Exception
 	 */
 	@Test(groups={"it"})
-	public void testReportDetailsWithErrors(ITestContext testContext) throws Exception {
+	public void testReportDetailsWithErrors() throws Exception {
 		
 		reporter = new SeleniumTestsReporter2();
 		
@@ -457,15 +450,141 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	}
 	
 	/**
-	 * Check test values are displayed (call to TestLogging.logTestValue()) shown as a table
-	 * @param testContext
+	 * Check BeforeXXX configuration error is recorded in detailed file
+	 * - in execution logs
+	 * - a configuration step is displayed
+	 * Check that overall step is skipped
 	 * @throws Exception
 	 */
 	@Test(groups={"it"})
-	public void testReportDetailsWithTestValues(ITestContext testContext) throws Exception {
+	public void testReportDetailsWithBeforeConfigurationError() throws Exception {
 		
-		reporter = new SeleniumTestsReporter2();
+		executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForConfigurationError1"}); 
 		
+		String mainReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport.html"));
+		mainReportContent = mainReportContent.replace("\n", "").replace("\r",  "");
+		
+		// check main result is skipped with step failed in red
+		Assert.assertTrue(mainReportContent.contains("<td name=\"failed-1\" class=\"failedSteps\">1</td>"));
+		
+		String detailedReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport-1.html"));
+		detailedReportContent = detailedReportContent.replace("\n", "").replace("\r",  "").replaceAll(">\\s+<", "><");
+
+		// check test is skipped as before method failed
+		Assert.assertTrue(detailedReportContent.contains("<header class='main-header header-skipped'>"));
+		
+		// Check details of the configuration error is displayed in report (this behaviour is controled by TestNG which adds exception from BeforeXXX to test method throwable)
+		Assert.assertTrue(detailedReportContent.contains("<div>class com.seleniumtests.customexception.ConfigurationException: Some error before method</div>"));
+		
+		// check we have a step for BeforeMethod and it's marked as failed
+		Assert.assertTrue(detailedReportContent.contains("<div class=\"box collapsed-box failed\"><div class=\"box-header with-border\"><button type=\"button\" class=\"btn btn-box-tool\" data-widget=\"collapse\"><i class=\"fa fa-plus\"></i></button> Pre test step: beforeMethod"));
+		
+		// Check details of the configuration error is displayed in report
+		Assert.assertTrue(detailedReportContent.contains("<div class=\"message-error\">				com.seleniumtests.customexception.ConfigurationException: Some error before method"));
+				
+	}
+	
+	/**
+	 * Check AfterXXX configuration error is recorded in detailed file
+	 * - a specific step is displayed
+	 * Check that overall test is OK
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testReportDetailsWithAfterConfigurationError() throws Exception {
+		
+		executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForConfigurationError2"}); 
+		
+		String mainReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport.html"));
+		mainReportContent = mainReportContent.replace("\n", "").replace("\r",  "");
+		
+		// check main result is skipped with step failed in red
+		Assert.assertTrue(mainReportContent.contains("<td name=\"failed-1\" class=\"failedSteps\">1</td>"));
+		
+		String detailedReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport-1.html"));
+		detailedReportContent = detailedReportContent.replace("\n", "").replace("\r",  "").replaceAll(">\\s+<", "><");
+		
+		// Check details of the configuration error is displayed in report
+		Assert.assertTrue(detailedReportContent.contains("<div class=\"message-error\">				com.seleniumtests.customexception.ConfigurationException: Some error after method"));
+		
+		// check test is still OK as only after method failed
+		Assert.assertTrue(detailedReportContent.contains("<header class='main-header header-success'>"));
+		
+		// check execution log does not contain our post configuration step
+		Assert.assertFalse(detailedReportContent.contains("<div>class com.seleniumtests.customexception.ConfigurationException: Some error after method</div>"));
+		
+		// check we have a step for AfterMethod and it's marked as failed
+		Assert.assertTrue(detailedReportContent.contains("<div class=\"box collapsed-box failed\"><div class=\"box-header with-border\"><button type=\"button\" class=\"btn btn-box-tool\" data-widget=\"collapse\"><i class=\"fa fa-plus\"></i></button> Post test step: afterMethod"));
+	}
+	
+	/**
+	 * Check that all configuration steps are logged in detailed report as pre / post test actions
+	 * Also check that configuration step name does not contain method arguments
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testReportDetailsAllConfigurationSteps() throws Exception {
+		
+		executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForListener1"}); 
+		
+		String detailedReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport-1.html"));
+		detailedReportContent = detailedReportContent.replace("\n", "").replace("\r",  "").replaceAll(">\\s+<", "><");
+		
+		Assert.assertTrue(detailedReportContent.contains("</i></button> Pre test step: beforeMethod -"));
+		Assert.assertTrue(detailedReportContent.contains("</i></button> Pre test step: beforeTest -"));
+		Assert.assertTrue(detailedReportContent.contains("</i></button> Pre test step: beforeClass -"));
+		Assert.assertTrue(detailedReportContent.contains("</i></button> Post test step: afterMethod -"));
+		Assert.assertTrue(detailedReportContent.contains("</i></button> Post test step: afterClass -"));
+		Assert.assertTrue(detailedReportContent.contains("</i></button> Post test step: afterTest -"));
+		
+		// check reference to configuration methods for class / test / method are in both results (some are common)
+		String detailedReportContent2 = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport-2.html"));
+		detailedReportContent2 = detailedReportContent2.replace("\n", "").replace("\r",  "").replaceAll(">\\s+<", "><");
+		
+		Assert.assertTrue(detailedReportContent2.contains("</i></button> Pre test step: beforeMethod -"));
+		Assert.assertTrue(detailedReportContent2.contains("</i></button> Pre test step: beforeTest -"));
+		Assert.assertTrue(detailedReportContent2.contains("</i></button> Pre test step: beforeClass -"));
+		Assert.assertTrue(detailedReportContent2.contains("</i></button> Post test step: afterMethod -"));
+		Assert.assertTrue(detailedReportContent2.contains("</i></button> Post test step: afterClass -"));
+		Assert.assertTrue(detailedReportContent2.contains("</i></button> Post test step: afterTest -"));
+	}
+	
+	/**
+	 * detailed report should contain only configuration steps corresponding to the test method / test class / test (TestNG test)
+	 * By default, test context contains all configuration methods. Check we filter them and we have only one configuration step even if it's retried
+	 * (case where test method fails and is retried, \@BeforeMethod is then called several times
+	 */
+	@Test(groups={"it"})
+	public void testReportDetailsOnlyTestConfigurationSteps() throws Exception {
+		executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"});
+		
+		String detailedReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport-1.html"));
+		detailedReportContent = detailedReportContent.replace("\n", "").replace("\r",  "").replaceAll(">\\s+<", "><");
+		
+		Assert.assertEquals(StringUtils.countMatches(detailedReportContent, "</i></button> Pre test step: set -"), 1);
+		
+		String detailedReportContent2 = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport-2.html"));
+		detailedReportContent2 = detailedReportContent2.replace("\n", "").replace("\r",  "").replaceAll(">\\s+<", "><");
+		
+		Assert.assertEquals(StringUtils.countMatches(detailedReportContent2, "</i></button> Pre test step: set -"), 1);
+		
+		String detailedReportContent3 = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport-3.html"));
+		detailedReportContent3 = detailedReportContent3.replace("\n", "").replace("\r",  "").replaceAll(">\\s+<", "><");
+		
+		Assert.assertEquals(StringUtils.countMatches(detailedReportContent3, "</i></button> Pre test step: set -"), 1);
+		Assert.assertEquals(StringUtils.countMatches(detailedReportContent3, "</i></button> Post test step: reset -"), 1);
+		
+		// in case of test method error, it is retried so each Before/After method is also replayed. Check it's the last one we have
+		Assert.assertTrue(detailedReportContent3.contains("<div class=\"message-info\">before count: 2</div>"));
+		Assert.assertTrue(detailedReportContent3.contains("<div class=\"message-info\">after count: 3</div>"));
+	}
+	
+	/**
+	 * Check test values are displayed (call to TestLogging.logTestValue()) shown as a table
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testReportDetailsWithTestValues() throws Exception {
 		executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"});
 		
 		String detailedReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport-2.html"));
@@ -479,11 +598,10 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	/**
 	 * Check all steps are present in detailed report file. For cucumber, check that method name is the Scenario name, not the "feature" generic method
 	 * Test OK
-	 * @param testContext
 	 * @throws Exception
 	 */
 	@Test(groups={"it"})
-	public void testCucumberStart(ITestContext testContext) throws Exception {
+	public void testCucumberStart() throws Exception {
 		
 		executeSubCucumberTests("core_3", 1);
 
@@ -500,11 +618,10 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	/**
 	 * Check that test name is correctly reported in cucumber mode when threads are used
 	 * Test OK
-	 * @param testContext
 	 * @throws Exception
 	 */
 	@Test(groups={"it"})
-	public void testCucumberMultiThread(ITestContext testContext) throws Exception {
+	public void testCucumberMultiThread() throws Exception {
 		
 		executeSubCucumberTests("core_3,core_4", 5);
 		

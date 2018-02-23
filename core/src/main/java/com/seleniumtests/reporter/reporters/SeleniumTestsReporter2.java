@@ -49,7 +49,6 @@ import org.testng.xml.XmlSuite;
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.SeleniumTestsPageListener;
-import com.seleniumtests.core.runner.SeleniumRobotTestListener;
 import com.seleniumtests.driver.DriverMode;
 import com.seleniumtests.driver.TestType;
 import com.seleniumtests.reporter.PluginsHelper;
@@ -152,6 +151,7 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 				t.merge( context, writer );
 				mOut.write(writer.toString());
 			}
+			
 
 		} catch (Exception e) {
 			generationErrorMessage = "generatePanel, Exception creating a singleTest:" + e.getMessage();
@@ -173,7 +173,7 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 			// add logs
 			String logs = SeleniumRobotLogger.getTestLogs().get(getTestName(testResult));
 			if (logs == null) {
-				return;
+				logs = "";
 			}
 			
 			// exception handling

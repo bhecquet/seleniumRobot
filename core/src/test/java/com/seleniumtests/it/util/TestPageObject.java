@@ -1,7 +1,5 @@
 package com.seleniumtests.it.util;
 
-import java.io.IOException;
-
 import org.openqa.selenium.Dimension;
 import org.testng.Assert;
 import org.testng.annotations.Test;

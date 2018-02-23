@@ -37,6 +37,7 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
 
+import com.seleniumtests.core.runner.SeleniumRobotTestListener;
 import com.seleniumtests.util.helper.WaitHelper;
 
 public class SeleniumRobotLogger {
@@ -147,14 +148,21 @@ public class SeleniumRobotLogger {
 	 * @return
 	 * @throws IOException 
 	 */
-	public static void parseLogFile() throws IOException {
+	public static void parseLogFile() {
 		Appender fileLoggerAppender = Logger.getRootLogger().getAppender(FILE_APPENDER_NAME);
 		if (fileLoggerAppender == null) {
 			return;
 		} 
 		
 		// read the file from appender directly
-		List<String> logLines = FileUtils.readLines(new File(((FileAppender)fileLoggerAppender).getFile())); 
+		List<String> logLines;
+		try {
+			logLines = FileUtils.readLines(new File(((FileAppender)fileLoggerAppender).getFile())); 
+		} catch (IOException e) {
+			getLogger(SeleniumRobotLogger.class).error("cannot read log file", e);
+			return;
+		}
+			
 		Map<String, String> testPerThread = new HashMap<>();
 		
 		for (String line: logLines) {

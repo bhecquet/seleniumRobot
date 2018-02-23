@@ -1,5 +1,9 @@
 package com.seleniumtests.it.driver;
 
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -9,11 +13,9 @@ import java.util.List;
 import javax.imageio.ImageIO;
 
 import org.apache.commons.io.FileUtils;
-import org.mockito.Mockito;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
-import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.annotations.AfterMethod;
@@ -31,10 +33,6 @@ import com.seleniumtests.util.FileUtility;
 import com.seleniumtests.util.HashCodeGenerator;
 import com.seleniumtests.util.helper.WaitHelper;
 import com.seleniumtests.util.imaging.ImageDetector;
-
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.verify;
 
 public class TestBrowserSnapshot extends MockitoTest {
 	
