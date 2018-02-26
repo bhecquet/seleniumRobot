@@ -100,7 +100,6 @@ public class SeleniumTestsContext {
     public static final String ENABLE_JAVASCRIPT = "enableJavascript";			// activation du javascrit dans le navigateur.
     public static final String NTLM_AUTH_TRUSTED_URIS = "ntlmAuthTrustedUris";	// Firefox uniquement
     public static final String BROWSER_DOWNLOAD_DIR = "browserDownloadDir";		// répertoire où seront enregistrés les fichiers
-    public static final String ADD_JS_ERROR_COLLECTOR_EXTENSION = "addJSErrorCollectorExtension"; // Firefox uniquement
 
     public static final String SNAPSHOT_TOP_CROPPING = "snapshotTopCropping";
     public static final String SNAPSHOT_BOTTOM_CROPPING = "snapshotBottomCropping";
@@ -134,8 +133,6 @@ public class SeleniumTestsContext {
 
     public static final String TEST_METHOD_SIGNATURE = "testMethodSignature";
     public static final String PLUGIN_CONFIG_PATH = "pluginConfigPath";
-
-    public static final String TEST_DATA_FILE = "testDataFile";
 
     public static final String TEST_TYPE = "testType";							// configured automatically
     public static final String TMS = "tms";										// option for configuring test management system, like HP ALM or Squash TM
@@ -173,8 +170,38 @@ public class SeleniumTestsContext {
     // default values
     public static final List<ReportInfo> DEFAULT_CUSTOM_TEST_REPORTS = Arrays.asList(new ReportInfo("PERF::xml::reporter/templates/report.perf.vm"));
     public static final List<ReportInfo> DEFAULT_CUSTOM_SUMMARY_REPORTS = Arrays.asList(new ReportInfo("results::json::reporter/templates/report.summary.json.vm"));
+	public static final int DEFAULT_NEW_COMMAND_TIMEOUT = 120;
+	public static final String DEFAULT_TEST_ENV = "DEV";
+	public static final String DEFAULT_CUCUMBER_TESTS = "";
+	public static final String DEFAULT_CUCUMBER_TAGS = "";
+	public static final String DEFAULT_APP = "";
+	public static final String DEFAULT_DEVICE_LIST = "{}";
+	public static final boolean DEFAULT_SOFT_ASSERT_ENABLED = true;
+	public static final boolean DEFAULT_ENABLE_EXCEPTION_LISTENER = true;
+	public static final boolean DEFAULT_CAPTURE_SNAPSHOT = true;
+	public static final int DEFAULT_SNAPSHOT_TOP_CROPPING = 0;
+	public static final int DEFAULT_SNAPSHOT_BOTTOM_CROPPING = 0;
+	public static final boolean DEFAULT_ENABLE_JAVASCRIPT = true;
+	public static final boolean DEFAULT_SET_ACCEPT_UNTRUSTED_CERTIFICATES = true;
+	public static final boolean DEFAULT_SET_ASSUME_UNTRUSTED_CERTIFICATE_ISSUER = true;
+	public static final boolean DEFAULT_USE_DEFAULT_FIREFOX_PROFILE = true;
+	public static final String DEFAULT_BROWSER = "none";
+	public static final boolean DEFAULT_MANUAL_TEST_STEPS = false;
+	public static final boolean DEFAULT_HEADLESS_BROWSER = false;
+	public static final String DEFAULT_RUN_MODE = "LOCAL";
+	public static final boolean DEFAULT_OVERRIDE_SELENIUM_NATIVE_ACTION = false;
+	public static final boolean DEFAULT_SELENIUMROBOTSERVER_RECORD_RESULTS = false;
+	public static final boolean DEFAULT_SELENIUMROBOTSERVER_COMPARE_SNAPSHOT = false;
+	public static final boolean DEFAULT_SELENIUMROBOTSERVER_ACTIVE = false;
+	public static final int DEFAULT_PAGE_LOAD_TIME_OUT = 90;
+	public static final int DEFAULT_EXPLICIT_WAIT_TIME_OUT = 15;
+	public static final int DEFAULT_IMPLICIT_WAIT_TIME_OUT = 5;
+	public static final int DEFAULT_WEB_SESSION_TIMEOUT = 90000;
+	public static final String DEFAULT_SELENIUMROBOTSERVER_URL = null;
+	public static final String DEFAULT_TMS = null;
+	public static final String DEFAULT_WEB_PROXY_TYPE = null;
     
-    private static final int REPLAY_TIME_OUT_VALUE = 30;
+    public static final int DEFAULT_REPLAY_TIME_OUT = 30;
     
     private Map<ITestResult, List<Throwable>> verificationFailuresMap = new HashMap<>();
 
@@ -219,7 +246,6 @@ public class SeleniumTestsContext {
         setSeleniumRobotServerRecordResults(getBoolValueForTest(SELENIUMROBOTSERVER_RECORD_RESULTS, System.getProperty(SELENIUMROBOTSERVER_RECORD_RESULTS)));
         setWebDriverGrid(getValueForTest(WEB_DRIVER_GRID, System.getProperty(WEB_DRIVER_GRID)));
         setRunMode(getValueForTest(RUN_MODE, System.getProperty(RUN_MODE)));       
-        setTestDataFile(getValueForTest(TEST_DATA_FILE, System.getProperty(TEST_DATA_FILE)));
         setLoadIni(getValueForTest(LOAD_INI, System.getProperty(LOAD_INI)));
         setWebSessionTimeout(getIntValueForTest(WEB_SESSION_TIME_OUT, System.getProperty(WEB_SESSION_TIME_OUT)));
         setImplicitWaitTimeout(getIntValueForTest(IMPLICIT_WAIT_TIME_OUT, System.getProperty(IMPLICIT_WAIT_TIME_OUT)));
@@ -249,8 +275,6 @@ public class SeleniumTestsContext {
    
         setOverrideSeleniumNativeAction(getBoolValueForTest(OVERRIDE_SELENIUM_NATIVE_ACTION, System.getProperty(OVERRIDE_SELENIUM_NATIVE_ACTION)));
         
-        setJsErrorCollectorExtension(getBoolValueForTest(ADD_JS_ERROR_COLLECTOR_EXTENSION, System.getProperty(ADD_JS_ERROR_COLLECTOR_EXTENSION)));
-
         setWebProxyType(getValueForTest(WEB_PROXY_TYPE, System.getProperty(WEB_PROXY_TYPE)));
         setWebProxyAddress(getValueForTest(WEB_PROXY_ADDRESS, System.getProperty(WEB_PROXY_ADDRESS)));
         setWebProxyLogin(getValueForTest(WEB_PROXY_LOGIN, System.getProperty(WEB_PROXY_LOGIN)));
@@ -725,10 +749,7 @@ public class SeleniumTestsContext {
 	
 	
 	// ------------------------- accessors ------------------------------------------------------
-	 public Boolean getAddJSErrorCollectorExtension() {
-        return (Boolean) getAttribute(ADD_JS_ERROR_COLLECTOR_EXTENSION);
-    }
-    
+
     public Boolean getFullReset() {
         return (Boolean) getAttribute(FULL_RESET);
     }
@@ -773,10 +794,6 @@ public class SeleniumTestsContext {
 
     public boolean getEnableExceptionListener() {
         return (Boolean) getAttribute(ENABLE_EXCEPTION_LISTENER);
-    }
-    
-    public boolean getJsErrorCollectorExtension() {
-    	return (Boolean) getAttribute(ADD_JS_ERROR_COLLECTOR_EXTENSION);
     }
 
     public String getChromeBinPath() {
@@ -862,7 +879,7 @@ public class SeleniumTestsContext {
     	try {
     		return (Integer) getAttribute(REPLAY_TIME_OUT);
     	} catch (Exception e) {
-    		return REPLAY_TIME_OUT_VALUE;
+    		return DEFAULT_REPLAY_TIME_OUT;
     	}
     }
 
@@ -932,10 +949,6 @@ public class SeleniumTestsContext {
     
     public String getArchiveToFile() {
     	return (String) getAttribute(ARCHIVE_TO_FILE);
-    }
-    
-    public String getTestDataFile() {
-        return (String) getAttribute(TEST_DATA_FILE);
     }
 
     public TestType getTestType() {
@@ -1052,7 +1065,7 @@ public class SeleniumTestsContext {
     
 	public Map<String, String> getDeviceList() {
     	HashMap<String, String> deviceList = new HashMap<>();
-    	if (getAttribute(DEVICE_LIST) == null || "{}".equals(getAttribute(DEVICE_LIST))) {
+    	if (getAttribute(DEVICE_LIST) == null || DEFAULT_DEVICE_LIST.equals(getAttribute(DEVICE_LIST))) {
     		return deviceList;
     	}
     	
@@ -1183,43 +1196,39 @@ public class SeleniumTestsContext {
         contextDataMap.put(name, value);
     }
 
-    public void setTestDataFile(String testDataFile) {
-    	if (testDataFile != null) {
-    		setAttribute(TEST_DATA_FILE, testDataFile);
+    /**
+     * 
+     * @param timeout  timeout of driver session in seconds
+     */
+    public void setWebSessionTimeout(Integer timeoutInSecs) {
+    	if (timeoutInSecs != null) {
+    		setAttribute(WEB_SESSION_TIME_OUT, timeoutInSecs * 1000);
     	} else {
-    		setAttribute(TEST_DATA_FILE, "testCase");
-    	}
-    }
-    
-    public void setWebSessionTimeout(Integer timeout) {
-    	if (timeout != null) {
-    		setAttribute(WEB_SESSION_TIME_OUT, timeout);
-    	} else {
-    		setAttribute(WEB_SESSION_TIME_OUT, 90000);
+    		setAttribute(WEB_SESSION_TIME_OUT, DEFAULT_WEB_SESSION_TIMEOUT);
     	}
     }
 
-    public void setImplicitWaitTimeout(Integer timeout) {
-    	if (timeout != null) {
-    		setAttribute(IMPLICIT_WAIT_TIME_OUT, timeout);
+    public void setImplicitWaitTimeout(Integer timeoutInSecs) {
+    	if (timeoutInSecs != null) {
+    		setAttribute(IMPLICIT_WAIT_TIME_OUT, timeoutInSecs);
     	} else {
-    		setAttribute(IMPLICIT_WAIT_TIME_OUT, 5);
+    		setAttribute(IMPLICIT_WAIT_TIME_OUT, DEFAULT_IMPLICIT_WAIT_TIME_OUT);
     	}
     }
     
-    public void setExplicitWaitTimeout(Integer timeout) {
-    	if (timeout != null) {
-    		setAttribute(EXPLICIT_WAIT_TIME_OUT, timeout);
+    public void setExplicitWaitTimeout(Integer timeoutInSecs) {
+    	if (timeoutInSecs != null) {
+    		setAttribute(EXPLICIT_WAIT_TIME_OUT, timeoutInSecs);
     	} else {
-    		setAttribute(EXPLICIT_WAIT_TIME_OUT, 15);
+    		setAttribute(EXPLICIT_WAIT_TIME_OUT, DEFAULT_EXPLICIT_WAIT_TIME_OUT);
     	}
     }
 
-    public void setPageLoadTimeout(Integer timeout) {
-    	if (timeout != null) {
-    		setAttribute(PAGE_LOAD_TIME_OUT, timeout);
+    public void setPageLoadTimeout(Integer timeoutInSecs) {
+    	if (timeoutInSecs != null) {
+    		setAttribute(PAGE_LOAD_TIME_OUT, timeoutInSecs);
     	} else {
-    		setAttribute(PAGE_LOAD_TIME_OUT, 90);
+    		setAttribute(PAGE_LOAD_TIME_OUT, DEFAULT_PAGE_LOAD_TIME_OUT);
     	}
     }
     
@@ -1255,7 +1264,7 @@ public class SeleniumTestsContext {
     	if (timeout != null) {
     		setAttribute(REPLAY_TIME_OUT, timeout);
     	} else {
-    		setAttribute(REPLAY_TIME_OUT, REPLAY_TIME_OUT_VALUE);
+    		setAttribute(REPLAY_TIME_OUT, DEFAULT_REPLAY_TIME_OUT);
     	}
     }
     
@@ -1276,7 +1285,7 @@ public class SeleniumTestsContext {
     	} else if (System.getenv(SELENIUMROBOTSERVER_URL) != null) {
     		setAttribute(SELENIUMROBOTSERVER_URL, System.getenv(SELENIUMROBOTSERVER_URL));
     	} else {
-    		setAttribute(SELENIUMROBOTSERVER_URL, null);
+    		setAttribute(SELENIUMROBOTSERVER_URL, DEFAULT_SELENIUMROBOTSERVER_URL);
     	}
     }
     
@@ -1284,7 +1293,7 @@ public class SeleniumTestsContext {
     	if (active != null) {
     		setAttribute(SELENIUMROBOTSERVER_ACTIVE, active);
     	} else {
-    		setAttribute(SELENIUMROBOTSERVER_ACTIVE, false);
+    		setAttribute(SELENIUMROBOTSERVER_ACTIVE, DEFAULT_SELENIUMROBOTSERVER_ACTIVE);
     	}
     	
     	if (getSeleniumRobotServerUrl() == null && getSeleniumRobotServerActive()) {
@@ -1296,7 +1305,7 @@ public class SeleniumTestsContext {
     	if (capture != null) {
     		setAttribute(SELENIUMROBOTSERVER_COMPARE_SNAPSHOT, capture);
     	} else {
-    		setAttribute(SELENIUMROBOTSERVER_COMPARE_SNAPSHOT, false);
+    		setAttribute(SELENIUMROBOTSERVER_COMPARE_SNAPSHOT, DEFAULT_SELENIUMROBOTSERVER_COMPARE_SNAPSHOT);
     	}
     }
     
@@ -1304,7 +1313,7 @@ public class SeleniumTestsContext {
     	if (record != null) {
     		setAttribute(SELENIUMROBOTSERVER_RECORD_RESULTS, record);
     	} else {
-    		setAttribute(SELENIUMROBOTSERVER_RECORD_RESULTS, false);
+    		setAttribute(SELENIUMROBOTSERVER_RECORD_RESULTS, DEFAULT_SELENIUMROBOTSERVER_RECORD_RESULTS);
     	}
     }
     
@@ -1312,7 +1321,7 @@ public class SeleniumTestsContext {
     	if (record != null) {
     		setAttribute(OVERRIDE_SELENIUM_NATIVE_ACTION, record);
     	} else {
-    		setAttribute(OVERRIDE_SELENIUM_NATIVE_ACTION, false);
+    		setAttribute(OVERRIDE_SELENIUM_NATIVE_ACTION, DEFAULT_OVERRIDE_SELENIUM_NATIVE_ACTION);
     	}
     }
     
@@ -1327,7 +1336,7 @@ public class SeleniumTestsContext {
     
     public void setTms(final String tms) {
     	if (tms == null) {
-    		setAttribute(TMS, null);
+    		setAttribute(TMS, DEFAULT_TMS);
     	} else {
 	    	try {
 	    		JSONObject tmsJson = new JSONObject(tms);
@@ -1339,7 +1348,7 @@ public class SeleniumTestsContext {
     }
     
     public void setRunMode(String runMode) {
-    	String newRunMode = runMode == null ? "LOCAL": runMode;
+    	String newRunMode = runMode == null ? DEFAULT_RUN_MODE: runMode;
         setAttribute(RUN_MODE, DriverMode.fromString(newRunMode));
 	}
     
@@ -1356,7 +1365,7 @@ public class SeleniumTestsContext {
     	if (headless != null) {
     		setAttribute(HEADLESS_BROWSER, headless);
     	} else {
-    		setAttribute(HEADLESS_BROWSER, false);
+    		setAttribute(HEADLESS_BROWSER, DEFAULT_HEADLESS_BROWSER);
     	}
     }
     
@@ -1364,12 +1373,12 @@ public class SeleniumTestsContext {
     	if (manualTestSteps != null) {
     		setAttribute(MANUAL_TEST_STEPS, manualTestSteps);
     	} else {
-    		setAttribute(MANUAL_TEST_STEPS, false);
+    		setAttribute(MANUAL_TEST_STEPS, DEFAULT_MANUAL_TEST_STEPS);
     	}
     }
 
     public void setBrowser(String browser) {
-    	String newBrowser = browser == null ? "none": browser;
+    	String newBrowser = browser == null ? DEFAULT_BROWSER: browser;
     	setAttribute(BROWSER, BrowserType.getBrowserType(newBrowser));
     	
     	// when reconfiguring browser, mostly from integration tests, change test type accordingly
@@ -1390,7 +1399,7 @@ public class SeleniumTestsContext {
 		if (useDefaultffProfile != null) {
 			setAttribute(USE_DEFAULT_FIREFOX_PROFILE, useDefaultffProfile);
 		} else {
-			setAttribute(USE_DEFAULT_FIREFOX_PROFILE, true);
+			setAttribute(USE_DEFAULT_FIREFOX_PROFILE, DEFAULT_USE_DEFAULT_FIREFOX_PROFILE);
     	}
     }
     
@@ -1436,7 +1445,7 @@ public class SeleniumTestsContext {
     	if (assume != null) {
     		setAttribute(SET_ASSUME_UNTRUSTED_CERTIFICATE_ISSUER, assume);
     	} else {
-    		setAttribute(SET_ASSUME_UNTRUSTED_CERTIFICATE_ISSUER, true);
+    		setAttribute(SET_ASSUME_UNTRUSTED_CERTIFICATE_ISSUER, DEFAULT_SET_ASSUME_UNTRUSTED_CERTIFICATE_ISSUER);
     	}
     }
     
@@ -1444,7 +1453,7 @@ public class SeleniumTestsContext {
     	if (accept != null) {
     		setAttribute(SET_ACCEPT_UNTRUSTED_CERTIFICATES, accept);
     	} else {
-    		setAttribute(SET_ACCEPT_UNTRUSTED_CERTIFICATES, true);
+    		setAttribute(SET_ACCEPT_UNTRUSTED_CERTIFICATES, DEFAULT_SET_ACCEPT_UNTRUSTED_CERTIFICATES);
     	}
     }
     
@@ -1452,7 +1461,7 @@ public class SeleniumTestsContext {
     	if (enabled != null) {
     		setAttribute(ENABLE_JAVASCRIPT, enabled);
     	} else {
-    		setAttribute(ENABLE_JAVASCRIPT, true);
+    		setAttribute(ENABLE_JAVASCRIPT, DEFAULT_ENABLE_JAVASCRIPT);
     	}
     }
    
@@ -1462,14 +1471,6 @@ public class SeleniumTestsContext {
     
     public void setBrowserDownloadDir(String downloadDir) {
     	setAttribute(BROWSER_DOWNLOAD_DIR, downloadDir);
-    }
-    
-    public void setJsErrorCollectorExtension(Boolean enabled) {
-    	if (enabled != null) {
-    		setAttribute(ADD_JS_ERROR_COLLECTOR_EXTENSION, enabled);
-    	} else {
-    		setAttribute(ADD_JS_ERROR_COLLECTOR_EXTENSION, false);
-    	}
     }
     
     public void setFullReset(Boolean enabled) {
@@ -1485,7 +1486,7 @@ public class SeleniumTestsContext {
     	try {
     		setAttribute(WEB_PROXY_TYPE, ProxyType.valueOf(proxyType.toUpperCase()));
     	} catch (NullPointerException | IllegalArgumentException e) {
-    		setAttribute(WEB_PROXY_TYPE, null);
+    		setAttribute(WEB_PROXY_TYPE, DEFAULT_WEB_PROXY_TYPE);
     	}
     	
     }
@@ -1520,7 +1521,7 @@ public class SeleniumTestsContext {
     	if (crop != null) {
     		setAttribute(SNAPSHOT_BOTTOM_CROPPING, crop);
     	} else {
-    		setAttribute(SNAPSHOT_BOTTOM_CROPPING, 0);
+    		setAttribute(SNAPSHOT_BOTTOM_CROPPING, DEFAULT_SNAPSHOT_BOTTOM_CROPPING);
     	}
     }
     
@@ -1528,7 +1529,7 @@ public class SeleniumTestsContext {
     	if (crop != null) {
     		setAttribute(SNAPSHOT_TOP_CROPPING, crop);
     	} else {
-    		setAttribute(SNAPSHOT_TOP_CROPPING, 0);
+    		setAttribute(SNAPSHOT_TOP_CROPPING, DEFAULT_SNAPSHOT_TOP_CROPPING);
     	}
     }
     
@@ -1536,7 +1537,7 @@ public class SeleniumTestsContext {
     	if (capture != null) {
     		setAttribute(CAPTURE_SNAPSHOT, capture);
     	} else {
-    		setAttribute(CAPTURE_SNAPSHOT, true);
+    		setAttribute(CAPTURE_SNAPSHOT, DEFAULT_CAPTURE_SNAPSHOT);
     	}
     }
     
@@ -1544,7 +1545,7 @@ public class SeleniumTestsContext {
     	if (enable != null) {
     		setAttribute(ENABLE_EXCEPTION_LISTENER, enable);
     	} else {
-    		setAttribute(ENABLE_EXCEPTION_LISTENER, true);
+    		setAttribute(ENABLE_EXCEPTION_LISTENER, DEFAULT_ENABLE_EXCEPTION_LISTENER);
     	}
     }
     
@@ -1560,7 +1561,7 @@ public class SeleniumTestsContext {
     	if (enable != null) {
     		setAttribute(SOFT_ASSERT_ENABLED, enable);
     	} else {
-    		setAttribute(SOFT_ASSERT_ENABLED, true);
+    		setAttribute(SOFT_ASSERT_ENABLED, DEFAULT_SOFT_ASSERT_ENABLED);
     	}
     }
     
@@ -1580,7 +1581,7 @@ public class SeleniumTestsContext {
     	if (list != null) {
     		setAttribute(DEVICE_LIST, list);
     	} else {
-    		setAttribute(DEVICE_LIST, "{}");
+    		setAttribute(DEVICE_LIST, DEFAULT_DEVICE_LIST);
     	}
     }
     
@@ -1588,7 +1589,7 @@ public class SeleniumTestsContext {
     	if (app != null) {
     		setAttribute(APP, app);
     	} else {
-    		setAttribute(APP, "");
+    		setAttribute(APP, DEFAULT_APP);
     	}
     }
     
@@ -1596,7 +1597,7 @@ public class SeleniumTestsContext {
     	if (tags != null) {
     		setAttribute(CUCUMBER_TAGS, tags);
     	} else {
-    		setAttribute(CUCUMBER_TAGS, "");
+    		setAttribute(CUCUMBER_TAGS, DEFAULT_CUCUMBER_TAGS);
     	}
     }
     
@@ -1604,7 +1605,7 @@ public class SeleniumTestsContext {
     	if (tests != null) {
     		setAttribute(CUCUMBER_TESTS, tests);
     	} else {
-    		setAttribute(CUCUMBER_TESTS, "");
+    		setAttribute(CUCUMBER_TESTS, DEFAULT_CUCUMBER_TESTS);
     	}
     }
     
@@ -1619,7 +1620,7 @@ public class SeleniumTestsContext {
     	if (tests != null) {
     		setAttribute(TEST_ENV, tests);
     	} else {
-    		setAttribute(TEST_ENV, "DEV");
+    		setAttribute(TEST_ENV, DEFAULT_TEST_ENV);
     	}
     }
     
@@ -1647,7 +1648,7 @@ public class SeleniumTestsContext {
     	if (timeout != null) {
     		setAttribute(NEW_COMMAND_TIMEOUT, timeout);
     	} else {
-    		setAttribute(NEW_COMMAND_TIMEOUT, 120);
+    		setAttribute(NEW_COMMAND_TIMEOUT, DEFAULT_NEW_COMMAND_TIMEOUT);
     	}
     }
     

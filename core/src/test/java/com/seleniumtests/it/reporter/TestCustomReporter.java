@@ -52,11 +52,11 @@ public class TestCustomReporter extends ReporterTest {
 			Assert.assertEquals(json.getString("hostname"), "");
 			Assert.assertEquals(json.getString("suiteName"), "testAndSubActions");
 			Assert.assertEquals(json.getString("className"), "com.seleniumtests.it.stubclasses.StubTestClass");
-			Assert.assertEquals(json.getInt("tests"), 5);
+			Assert.assertEquals(json.getInt("tests"), 6);
 			Assert.assertTrue(Float.parseFloat(json.get("duration").toString()) > 15);
 			Assert.assertTrue(json.getLong("time") > 1518709523620L);
-			Assert.assertEquals(json.getJSONArray("testSteps").length(), 5);
-			Assert.assertEquals(json.getJSONArray("testSteps").get(1), "Step step 1\\nclick button\\nsendKeys to text field\\nStep step 1.3: open page\\nclick link\\na message\\nsendKeys to password field");
+			Assert.assertEquals(json.getJSONArray("testSteps").length(), 6);
+			Assert.assertEquals(json.getJSONArray("testSteps").get(2), "Step step 1\\nclick button\\nsendKeys to text field\\nStep step 1.3: open page\\nclick link\\na message\\nsendKeys to password field");
 			Assert.assertEquals(json.getString("browser"), "NONE");
 			Assert.assertNotNull(json.get("version"));
 			Assert.assertTrue(json.getJSONObject("parameters").length() > 70);
