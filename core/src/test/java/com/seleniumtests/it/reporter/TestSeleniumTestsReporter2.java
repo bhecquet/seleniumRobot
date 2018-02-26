@@ -37,17 +37,17 @@ import org.testng.annotations.Test;
 import org.testng.xml.XmlSuite;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.reporter.logger.TestLogging;
 import com.seleniumtests.reporter.reporters.SeleniumTestsReporter2;
 
 public class TestSeleniumTestsReporter2 extends ReporterTest {
 	
 	private SeleniumTestsReporter2 reporter;
 
-//	@BeforeMethod(groups={"it"})
-//	public void setLogs(Method method, ITestContext context) {
-//		SeleniumTestsContextManager.getThreadContext().setOutputDirectory(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory() + "/" + method.getName(), context);
-//		SeleniumTestsContextManager.getGlobalContext().setOutputDirectory(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory() + "/" + method.getName(), context);
-//	}
+	@BeforeMethod(groups={"it"})
+	public void setLogs(Method method, ITestContext context) {
+		TestLogging.reset();
+	}
 	
 	/**
 	 * Disabled because now, it's not easy to get the SeleniumRobotReporterInstance created by testNg
@@ -504,6 +504,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	/**
 	 * Check AfterXXX configuration error is recorded in detailed file
 	 * - a specific step is displayed
+	 * - logs of this specific step is present in execution logs
 	 * Check that overall test is OK
 	 * @throws Exception
 	 */
@@ -532,6 +533,9 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		
 		// check we have a step for AfterMethod and it's marked as failed
 		Assert.assertTrue(detailedReportContent.contains("<div class=\"box collapsed-box failed\"><div class=\"box-header with-border\"><button type=\"button\" class=\"btn btn-box-tool\" data-widget=\"collapse\"><i class=\"fa fa-plus\"></i></button> Post test step: afterMethod"));
+		
+		// check logs written in @AfterXXX are present in execution logs
+		Assert.assertTrue(detailedReportContent.contains("[main] TestLogging: some warning</div>"));
 	}
 	
 	/**
@@ -611,6 +615,21 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		// Check error is present is Last test step
 		Assert.assertTrue(detailedReportContent.contains("<table class=\"table table-bordered table-condensed\"><tr><th width=\"15%\">Key</th><th width=\"60%\">Message</th><th width=\"25%\">Value</th></tr><tr><td>key</td><td>we found a value of</td><td>10</td></tr></table>"));
 	}
+	
+	@Test(groups={"it"})
+	public void testReportDetailsContainsParentConfigurations() throws Exception {
+		
+		executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForListener1"});
+		
+		String detailedReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport-1.html"));
+		detailedReportContent = detailedReportContent.replace("\n", "").replace("\r",  "").replaceAll(">\\s+<", "><");
+		
+		Assert.assertEquals(StringUtils.countMatches(detailedReportContent, "</button> Pre test step: beforeTestInParent - "), 1);
+		Assert.assertEquals(StringUtils.countMatches(detailedReportContent, "</button> Pre test step: beforeTest -"), 1);
+		Assert.assertEquals(StringUtils.countMatches(detailedReportContent, "</button> Post test step: afterClassInParent - "), 1);
+		
+	}
+		
 	
 	/**
 	 * Check all steps are present in detailed report file. For cucumber, check that method name is the Scenario name, not the "feature" generic method

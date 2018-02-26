@@ -265,31 +265,17 @@ public class TestSeleniumTestContext extends GenericTest {
 		}
 	}
 	
-	// test accessor + default values
-	@Test(groups="ut context")
-	public void testDataFile(final ITestContext testNGCtx, final XmlTest xmlTest) {
-		initThreadContext(testNGCtx);
-		SeleniumTestsContextManager.getThreadContext().setTestDataFile("DataFile");
-		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getTestDataFile(), "DataFile");
-	}
-	@Test(groups="ut context")
-	public void testDataFileNull(final ITestContext testNGCtx, final XmlTest xmlTest) {
-		initThreadContext(testNGCtx);
-		SeleniumTestsContextManager.getThreadContext().setTestDataFile(null);
-		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getTestDataFile(), "testCase");
-	}
-	
 	@Test(groups="ut context")
 	public void testWebSessionTimeout(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		initThreadContext(testNGCtx);
-		SeleniumTestsContextManager.getThreadContext().setWebSessionTimeout(15000);
+		SeleniumTestsContextManager.getThreadContext().setWebSessionTimeout(15);
 		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getWebSessionTimeout(), 15000);
 	}
 	@Test(groups="ut context")
 	public void testWebSessionTimeoutNull(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setWebSessionTimeout(null);
-		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getWebSessionTimeout(), 90000);
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getWebSessionTimeout(), SeleniumTestsContext.DEFAULT_WEB_SESSION_TIMEOUT);
 	}
 	
 	@Test(groups="ut context")
@@ -302,7 +288,7 @@ public class TestSeleniumTestContext extends GenericTest {
 	public void testImplicitWaitTimeoutNull(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setImplicitWaitTimeout(null);
-		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getImplicitWaitTimeout(), 5);
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getImplicitWaitTimeout(), SeleniumTestsContext.DEFAULT_IMPLICIT_WAIT_TIME_OUT);
 	}
 	
 	@Test(groups="ut context")
@@ -315,7 +301,7 @@ public class TestSeleniumTestContext extends GenericTest {
 	public void testReplayWaitTimeoutNull(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setReplayTimeout(null);
-		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getReplayTimeout(), 30);
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getReplayTimeout(), SeleniumTestsContext.DEFAULT_REPLAY_TIME_OUT);
 	}
 	
 	@Test(groups="ut context")
@@ -328,7 +314,7 @@ public class TestSeleniumTestContext extends GenericTest {
 	public void testExplicitWaitTimeoutNull(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setExplicitWaitTimeout(null);
-		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getExplicitWaitTimeout(), 15);
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getExplicitWaitTimeout(), SeleniumTestsContext.DEFAULT_EXPLICIT_WAIT_TIME_OUT);
 	}
 	
 	@Test(groups="ut context")
@@ -341,7 +327,7 @@ public class TestSeleniumTestContext extends GenericTest {
 	public void testPageLoadTimeoutNull(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setPageLoadTimeout(null);
-		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getPageLoadTimeout(), 90);
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getPageLoadTimeout(), SeleniumTestsContext.DEFAULT_PAGE_LOAD_TIME_OUT);
 	}
 	
 	@Test(groups="ut context")
@@ -404,7 +390,7 @@ public class TestSeleniumTestContext extends GenericTest {
 	public void testAssumeUntrustedCertificateIssuerNull(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setAssumeUntrustedCertificateIssuer(null);
-		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getAssumeUntrustedCertificateIssuer(), (Boolean)true);
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getAssumeUntrustedCertificateIssuer(), (Boolean)SeleniumTestsContext.DEFAULT_SET_ASSUME_UNTRUSTED_CERTIFICATE_ISSUER);
 	}
 	
 	@Test(groups="ut context")
@@ -417,7 +403,7 @@ public class TestSeleniumTestContext extends GenericTest {
 	public void testAcceptUntrustedCertificatesNull(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setAcceptUntrustedCertificates(null);
-		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getAcceptUntrustedCertificates(), (Boolean)true);
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getAcceptUntrustedCertificates(), (Boolean)SeleniumTestsContext.DEFAULT_SET_ACCEPT_UNTRUSTED_CERTIFICATES);
 	}
 	
 	@Test(groups="ut context")
@@ -430,20 +416,7 @@ public class TestSeleniumTestContext extends GenericTest {
 	public void testJavascriptEnabledNull(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setJavascriptEnabled(null);
-		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getJavascriptEnabled(), (Boolean)true);
-	}
-	
-	@Test(groups="ut context")
-	public void testJsErrorCollectorExtension(final ITestContext testNGCtx, final XmlTest xmlTest) {
-		initThreadContext(testNGCtx);
-		SeleniumTestsContextManager.getThreadContext().setJsErrorCollectorExtension(true);
-		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getJsErrorCollectorExtension(), true);
-	}
-	@Test(groups="ut context")
-	public void testJsErrorCollectorExtensionNull(final ITestContext testNGCtx, final XmlTest xmlTest) {
-		initThreadContext(testNGCtx);
-		SeleniumTestsContextManager.getThreadContext().setJsErrorCollectorExtension(null);
-		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getJsErrorCollectorExtension(), false);
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getJavascriptEnabled(), (Boolean)SeleniumTestsContext.DEFAULT_ENABLE_JAVASCRIPT);
 	}
 	
 	@Test(groups="ut context")
@@ -456,7 +429,7 @@ public class TestSeleniumTestContext extends GenericTest {
 	public void testUseDefaultFirefoxProfileNull(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setUseDefaultFirefoxProfile(null);
-		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().isUseFirefoxDefaultProfile(), true);
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().isUseFirefoxDefaultProfile(), SeleniumTestsContext.DEFAULT_USE_DEFAULT_FIREFOX_PROFILE);
 	}
 	
 	@Test(groups="ut context")
@@ -469,7 +442,7 @@ public class TestSeleniumTestContext extends GenericTest {
 	public void testCaptureSnapshotNull(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setCaptureSnapshot(null);
-		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getCaptureSnapshot(), true);
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getCaptureSnapshot(), SeleniumTestsContext.DEFAULT_CAPTURE_SNAPSHOT);
 	}
 	
 	@Test(groups="ut context")
@@ -482,7 +455,7 @@ public class TestSeleniumTestContext extends GenericTest {
 	public void testSnapshotTopCroppingNull(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setSnapshotTopCropping(null);
-		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getSnapshotTopCropping(), 0);
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getSnapshotTopCropping(), SeleniumTestsContext.DEFAULT_SNAPSHOT_TOP_CROPPING);
 	}
 	
 	@Test(groups="ut context")
@@ -495,7 +468,7 @@ public class TestSeleniumTestContext extends GenericTest {
 	public void testSnapshotBottomCroppingNull(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setSnapshotBottomCropping(null);
-		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getSnapshotBottomCropping(), 0);
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getSnapshotBottomCropping(), SeleniumTestsContext.DEFAULT_SNAPSHOT_BOTTOM_CROPPING);
 	}
 	
 	@Test(groups="ut context", expectedExceptions=ConfigurationException.class)
@@ -541,7 +514,7 @@ public class TestSeleniumTestContext extends GenericTest {
 	public void testCompareSnapshotNull(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setSeleniumRobotServerCompareSnapshot(null);
-		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getSeleniumRobotServerCompareSnapshot(), false);
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getSeleniumRobotServerCompareSnapshot(), SeleniumTestsContext.DEFAULT_SELENIUMROBOTSERVER_COMPARE_SNAPSHOT);
 	}
 	
 	@Test(groups="ut context")
@@ -554,7 +527,7 @@ public class TestSeleniumTestContext extends GenericTest {
 	public void testRecordResultsNull(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setSeleniumRobotServerRecordResults(null);
-		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getSeleniumRobotServerRecordResults(), false);
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getSeleniumRobotServerRecordResults(), SeleniumTestsContext.DEFAULT_SELENIUMROBOTSERVER_RECORD_RESULTS);
 	}
 	
 	@Test(groups="ut context")
@@ -567,7 +540,7 @@ public class TestSeleniumTestContext extends GenericTest {
 	public void testEnableExceptionListenerNull(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setEnableExceptionListener(null);
-		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getEnableExceptionListener(), true);
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getEnableExceptionListener(), SeleniumTestsContext.DEFAULT_ENABLE_EXCEPTION_LISTENER);
 	}
 
 	@Test(groups="ut context")
@@ -580,7 +553,7 @@ public class TestSeleniumTestContext extends GenericTest {
 	public void testSoftAssertEnabledNull(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setSoftAssertEnabled(null);
-		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().isSoftAssertEnabled(), true);
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().isSoftAssertEnabled(), SeleniumTestsContext.DEFAULT_SOFT_ASSERT_ENABLED);
 	}
 	
 	@Test(groups="ut context")
@@ -606,7 +579,7 @@ public class TestSeleniumTestContext extends GenericTest {
 	public void testAppNull(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setApp(null);
-		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getApp(), "");
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getApp(), SeleniumTestsContext.DEFAULT_APP);
 	}
 	
 	@Test(groups="ut context")
@@ -619,7 +592,7 @@ public class TestSeleniumTestContext extends GenericTest {
 	public void testCucumberTagsNull(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setCucumberTags(null);
-		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getCucumberTags(), "");
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getCucumberTags(), SeleniumTestsContext.DEFAULT_CUCUMBER_TAGS);
 	}
 	
 	@Test(groups="ut context")
@@ -653,7 +626,7 @@ public class TestSeleniumTestContext extends GenericTest {
 	public void testTestEnvNull(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setTestEnv(null);
-		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getTestEnv(), "DEV");
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getTestEnv(), SeleniumTestsContext.DEFAULT_TEST_ENV);
 	}
 
 	@Test(groups="ut context")
@@ -703,7 +676,7 @@ public class TestSeleniumTestContext extends GenericTest {
 	public void testNewCommandTimeoutNull(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setNewCommandTimeout(null);
-		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getNewCommandTimeout(), 120);
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getNewCommandTimeout(), SeleniumTestsContext.DEFAULT_NEW_COMMAND_TIMEOUT);
 	}
 	
 	@Test(groups="ut context")

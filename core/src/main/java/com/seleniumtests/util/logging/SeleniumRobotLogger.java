@@ -144,7 +144,7 @@ public class SeleniumRobotLogger {
 
 
 	/**
-	 * Parses log file and returns only lines of the current thread
+	 * Parses log file and store logs of each test in testLogs variable
 	 * @return
 	 * @throws IOException 
 	 */
@@ -162,7 +162,11 @@ public class SeleniumRobotLogger {
 			getLogger(SeleniumRobotLogger.class).error("cannot read log file", e);
 			return;
 		}
+		
+		// clean before reading file. correction of issue #100
+		SeleniumRobotLogger.testLogs.clear();
 			
+		//store the name of the thread for each test
 		Map<String, String> testPerThread = new HashMap<>();
 		
 		for (String line: logLines) {

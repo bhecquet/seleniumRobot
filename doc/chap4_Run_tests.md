@@ -29,10 +29,11 @@ In this case, this user passed value will overwrite test or suite parameters
 | Param name       			| Default 	| Description  |
 | -------------------------	| ------- 	| ------------ |
 | testConfig 				|  			| Additional configuration. This should contain common configuration through all TestNG files.<br/>See `exampleConfigGenericParams.xml` file for format | 
-| webSessionTimeOut 		| 90000 	| browser session timeout in milliseconds | 
+| webSessionTimeOut 		| 90	 	| browser session timeout in seconds | 
 | implicitWaitTimeOut 		| 5			| implicit wait of the browser, in seconds (selenium definition) | 
 | explicitWaitTimeOut 		| 15		| explicit wait of the browser, in seconds. Used when checking is an element is present and no wait value is defined (`waitElementPresent` & `isElementPresent`). This value is also used when checking that browser is on the right page (PageObject constructor) | 
 | pageLoadTimeout 			| 90		| Value defined in selenium driver. Wait delay for page loading | 
+| replayTimeOut				| 30		| Delay during which an action is replayed
 | webDriverGrid 			| 			| Address of seleniumGrid server | 
 | runMode 					| LOCAL		| `local`: current computer<br/>`grid`: seleniumGrid<br/>`sauceLabs`: run on sauceLabs device<br/>`testDroid`: run on testdroid device | 
 | devMode 					| false		| The development mode allow all existing browsers to remain. In case test is run from any IDE, devMode will be defaulted to true | 
@@ -73,7 +74,6 @@ In this case, this user passed value will overwrite test or suite parameters
 | webDriverListener 		| 			| additional driver listener class |
 | testMethodSignature 		|  			| define a specific method signature for hashcodes |
 | pluginConfigPath 			|  			| plugins to add |
-| testDataFile 				|  			| Datafile to read and inject inside tests | 
 | cucumberTests 			|  			| Comma seperated list of tests to execute when using cucumber mode. Test name can be the feature name, the feature file name or the scenario name. You can also give regex that will match String in java. e.g: scenario .* | 
 | cucumberTags 				|  			| List of cucumber tags that will allow determining tests to execute. Format can be:<br/>`@new4 AND @new5` for filtering scenario containing tag new4 AND new5<br/>`@new,@new2` for filtering scenarios containing new OR new2<br/>`@new` for filtering scenario containing new tag | 
 | env 						| DEV		| Test environment for the SUT. Allow accessing param values defined in env.ini file  

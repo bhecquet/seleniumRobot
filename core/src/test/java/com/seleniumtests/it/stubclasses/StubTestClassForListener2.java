@@ -29,7 +29,7 @@ import org.testng.xml.XmlTest;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.util.helper.WaitHelper;
 
-public class StubTestClassForListener2 extends StubParentClass {
+public class StubTestClassForListener2 extends StubTestClassForListenerParent {
 	
 	@BeforeTest
 	public void beforeTest(XmlTest xmlTest) {

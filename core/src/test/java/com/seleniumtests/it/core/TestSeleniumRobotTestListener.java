@@ -32,7 +32,7 @@ public class TestSeleniumRobotTestListener extends GenericTest {
 
 		XmlSuite suite = new XmlSuite();
 		suite.setName("TmpSuite");
-		suite.setParallel(ParallelMode.FALSE);
+		suite.setParallel(ParallelMode.NONE);
 		suite.setFileName("/home/test/seleniumRobot/testng/testLoggging.xml");
 		Map<String, String> suiteParameters = new HashMap<>();
 		suiteParameters.put("softAssertEnabled", "false");
