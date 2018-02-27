@@ -20,7 +20,7 @@ public class TestManagerReporter implements IReporter {
 	public void generateReport(List<XmlSuite> xmlSuites, List<ISuite> suites, String outputDirectory) {
 		
 		// issue #81: use global context instead
-		TestManager testManager = SeleniumTestsContextManager.getGlobalContext().getTms();
+		TestManager testManager = SeleniumTestsContextManager.getGlobalContext().getTestManagerInstance();
 
 		if (testManager == null) {
 			return;

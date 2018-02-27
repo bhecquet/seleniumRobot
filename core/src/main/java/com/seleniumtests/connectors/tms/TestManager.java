@@ -24,7 +24,7 @@ public abstract class TestManager {
 	
 	public abstract void login();
 
-	public abstract void init();
+	public abstract void init(JSONObject connectParams);
 
 	public abstract void logout();
 	

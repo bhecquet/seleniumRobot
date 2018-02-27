@@ -135,7 +135,8 @@ public class SeleniumTestsContext {
     public static final String PLUGIN_CONFIG_PATH = "pluginConfigPath";
 
     public static final String TEST_TYPE = "testType";							// configured automatically
-    public static final String TMS = "tms";										// option for configuring test management system, like HP ALM or Squash TM
+    public static final String TMS_RUN = "tmsRun";									// option for configuring test (from test management system point of view) currently running, like HP ALM or Squash TM
+    public static final String TMS_CONNECT = "tmsConnect";						// option for configuring test management system, like HP ALM or Squash TM (url, user, password, ...)
     
     public static final String CUCUMBER_TESTS = "cucumberTests";				// liste des tests en mode cucumber
     public static final String CUCUMBER_TAGS = "cucumberTags";					// liste des tags cucumber
@@ -198,7 +199,8 @@ public class SeleniumTestsContext {
 	public static final int DEFAULT_IMPLICIT_WAIT_TIME_OUT = 5;
 	public static final int DEFAULT_WEB_SESSION_TIMEOUT = 90000;
 	public static final String DEFAULT_SELENIUMROBOTSERVER_URL = null;
-	public static final String DEFAULT_TMS = null;
+	public static final JSONObject DEFAULT_TMS_RUN = new JSONObject();
+	public static final JSONObject DEFAULT_TMS_CONNECT = new JSONObject();
 	public static final String DEFAULT_WEB_PROXY_TYPE = null;
     
     public static final int DEFAULT_REPLAY_TIME_OUT = 30;
@@ -217,11 +219,13 @@ public class SeleniumTestsContext {
     private ITestContext testNGContext = null;
     private SeleniumRobotVariableServerConnector variableServer;
     private SeleniumGridConnector seleniumGridConnector;
+    private TestManager testManagerIntance;
     
     public SeleniumTestsContext() {
     	// for test purpose only
     	variableServer = null;
     	seleniumGridConnector = null;
+    	testManagerIntance = null;
     }
     
     /**
@@ -294,7 +298,8 @@ public class SeleniumTestsContext {
         setSoftAssertEnabled(getBoolValueForTest(SOFT_ASSERT_ENABLED, System.getProperty(SOFT_ASSERT_ENABLED)));
 
         setWebDriverListener(getValueForTest(WEB_DRIVER_LISTENER, System.getProperty(WEB_DRIVER_LISTENER)));
-        setTms(getValueForTest(TMS, System.getProperty(TMS)));
+        setTmsRun(getValueForTest(TMS_RUN, System.getProperty(TMS_RUN)));
+        setTmsConnect(getValueForTest(TMS_CONNECT, System.getProperty(TMS_CONNECT)));
 
         setAppiumServerUrl(getValueForTest(APPIUM_SERVER_URL, System.getProperty(APPIUM_SERVER_URL)));
         setDeviceName(getValueForTest(DEVICE_NAME, System.getProperty(DEVICE_NAME)));
@@ -329,7 +334,7 @@ public class SeleniumTestsContext {
         if (testNGContext != null) {
         	setOutputDirectory(getValueForTest(OUTPUT_DIRECTORY, System.getProperty(OUTPUT_DIRECTORY)), testNGContext);
 
-            // parse other parameters that are defined in testng xml but not defined
+            // parse other parameters that are defined in testng xml or as user parameters but not defined
             // in this context
             addUserDefinedParameters();
         }
@@ -646,7 +651,7 @@ public class SeleniumTestsContext {
         seleniumGridConnector = connectGrid();
         
         // create Test Manager connector
-    	checkTmsConfiguration();
+    	testManagerIntance = initTestManager();
     }
     
     /**
@@ -740,10 +745,16 @@ public class SeleniumTestsContext {
     	updateTestConfigurationFromVariableServer();
     }
 	
-	public void checkTmsConfiguration() {
-		if (getTms() != null) {
-			getTms().init();
+	public TestManager initTestManager() {
+		if (getTmsRun() != null && getTmsRun().length() > 0) {
+			TestManager tms = TestManager.getInstance(getTmsRun());
+			
+			if (getTmsConnect() != null) {
+				tms.init(getTmsConnect());
+			}
+			return tms;
 		}
+		return null;
 	}
 	
 	
@@ -1007,8 +1018,12 @@ public class SeleniumTestsContext {
         return (String) getAttribute(BROWSER_VERSION);
     }
     
-    public TestManager getTms() {
-    	return (TestManager) getAttribute(TMS);
+    public JSONObject getTmsRun() {
+    	return (JSONObject) getAttribute(TMS_RUN);
+    }
+    
+    public JSONObject getTmsConnect() {
+    	return (JSONObject) getAttribute(TMS_CONNECT);
     }
 
     public String getWebDriverGrid() {
@@ -1157,6 +1172,10 @@ public class SeleniumTestsContext {
     
     public SeleniumGridConnector getSeleniumGridConnector() {
     	return seleniumGridConnector;
+    }
+    
+    public TestManager getTestManagerInstance() {
+    	return testManagerIntance;
     }
     
 
@@ -1334,16 +1353,29 @@ public class SeleniumTestsContext {
     	setAttribute(TEST_VARIABLES, variables);
     }
     
-    public void setTms(final String tms) {
+    public void setTmsRun(final String tms) {
     	if (tms == null) {
-    		setAttribute(TMS, DEFAULT_TMS);
+    		setAttribute(TMS_RUN, DEFAULT_TMS_RUN);
     	} else {
 	    	try {
 	    		JSONObject tmsJson = new JSONObject(tms);
-	    		setAttribute(TMS, TestManager.getInstance(tmsJson));
+	    		setAttribute(TMS_RUN, tmsJson);
 	    	} catch (JSONException e) {
 	    		throw new ConfigurationException("tms option must have the JSON format like {'type': 'hp', 'run': '3'}");
 	    	}
+    	}
+    }
+    
+    public void setTmsConnect(final String tms) {
+    	if (tms == null) {
+    		setAttribute(TMS_CONNECT, DEFAULT_TMS_CONNECT);
+    	} else {
+    		try {
+    			JSONObject tmsJson = new JSONObject(tms);
+    			setAttribute(TMS_CONNECT, tmsJson);
+    		} catch (JSONException e) {
+    			throw new ConfigurationException("tms option must have the JSON format like {'hpAlmServerUrl': 'http://myamlserver:8080', 'hpAlmProject': '12', 'hpAlmDomain': 'mydomain', 'hpAlmUser': 'user', 'hpAlmPassword': 'pass'}");
+    		}
     	}
     }
     

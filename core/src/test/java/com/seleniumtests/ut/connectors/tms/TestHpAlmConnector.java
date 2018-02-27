@@ -8,7 +8,6 @@ import org.testng.annotations.Test;
 import com.seleniumtests.GenericTest;
 import com.seleniumtests.connectors.tms.hpalm.HpAlmConnector;
 import com.seleniumtests.core.SeleniumTestsContextManager;
-import com.seleniumtests.core.TestVariable;
 import com.seleniumtests.customexception.ConfigurationException;
 
 public class TestHpAlmConnector extends GenericTest {
@@ -33,75 +32,81 @@ public class TestHpAlmConnector extends GenericTest {
 	
 	@Test(groups={"ut"})
 	public void testInitWithAllParameters() {
-		SeleniumTestsContextManager.getThreadContext().getConfiguration().put(HpAlmConnector.HP_ALM_SERVER_URL, new TestVariable(HpAlmConnector.HP_ALM_SERVER_URL, "http://myServer"));
-		SeleniumTestsContextManager.getThreadContext().getConfiguration().put(HpAlmConnector.HP_ALM_DOMAIN, new TestVariable(HpAlmConnector.HP_ALM_DOMAIN, "domain"));
-		SeleniumTestsContextManager.getThreadContext().getConfiguration().put(HpAlmConnector.HP_ALM_PROJECT, new TestVariable(HpAlmConnector.HP_ALM_PROJECT, "project"));
-		SeleniumTestsContextManager.getThreadContext().getConfiguration().put(HpAlmConnector.HP_ALM_USER, new TestVariable(HpAlmConnector.HP_ALM_USER, "user"));
-		SeleniumTestsContextManager.getThreadContext().getConfiguration().put(HpAlmConnector.HP_ALM_PASSWORD, new TestVariable(HpAlmConnector.HP_ALM_PASSWORD, "password"));
+		JSONObject connect = new JSONObject();
+		connect.put(HpAlmConnector.HP_ALM_SERVER_URL, "http://myServer");
+		connect.put(HpAlmConnector.HP_ALM_DOMAIN, "domain");
+		connect.put(HpAlmConnector.HP_ALM_PROJECT, "project");
+		connect.put(HpAlmConnector.HP_ALM_USER, "user");
+		connect.put(HpAlmConnector.HP_ALM_PASSWORD, "password");
 		
 		String config = "{'type': 'hp', 'run': '3'}";
 		HpAlmConnector hp = new HpAlmConnector(new JSONObject(config));
-		hp.init();
+		hp.init(connect);
 		Assert.assertTrue(hp.getInitialized());
 	}
 	
 	@Test(groups={"ut"}, expectedExceptions=ConfigurationException.class)
 	public void testInitWithoutUrlParameter() {
-		SeleniumTestsContextManager.getThreadContext().getConfiguration().put(HpAlmConnector.HP_ALM_DOMAIN, new TestVariable(HpAlmConnector.HP_ALM_DOMAIN, "domain"));
-		SeleniumTestsContextManager.getThreadContext().getConfiguration().put(HpAlmConnector.HP_ALM_PROJECT, new TestVariable(HpAlmConnector.HP_ALM_PROJECT, "project"));
-		SeleniumTestsContextManager.getThreadContext().getConfiguration().put(HpAlmConnector.HP_ALM_USER, new TestVariable(HpAlmConnector.HP_ALM_USER, "user"));
-		SeleniumTestsContextManager.getThreadContext().getConfiguration().put(HpAlmConnector.HP_ALM_PASSWORD, new TestVariable(HpAlmConnector.HP_ALM_PASSWORD, "password"));
+		JSONObject connect = new JSONObject();
+		connect.put(HpAlmConnector.HP_ALM_DOMAIN, "domain");
+		connect.put(HpAlmConnector.HP_ALM_PROJECT, "project");
+		connect.put(HpAlmConnector.HP_ALM_USER, "user");
+		connect.put(HpAlmConnector.HP_ALM_PASSWORD, "password");
 		
 		String config = "{'type': 'hp', 'run': '3'}";
 		HpAlmConnector hp = new HpAlmConnector(new JSONObject(config));
-		hp.init();
+		hp.init(connect);
 	}
 	
 	@Test(groups={"ut"}, expectedExceptions=ConfigurationException.class)
 	public void testInitWithoutDomainParameter() {
-		SeleniumTestsContextManager.getThreadContext().getConfiguration().put(HpAlmConnector.HP_ALM_SERVER_URL, new TestVariable(HpAlmConnector.HP_ALM_SERVER_URL, "http://myServer"));
-		SeleniumTestsContextManager.getThreadContext().getConfiguration().put(HpAlmConnector.HP_ALM_PROJECT, new TestVariable(HpAlmConnector.HP_ALM_PROJECT, "project"));
-		SeleniumTestsContextManager.getThreadContext().getConfiguration().put(HpAlmConnector.HP_ALM_USER, new TestVariable(HpAlmConnector.HP_ALM_USER, "user"));
-		SeleniumTestsContextManager.getThreadContext().getConfiguration().put(HpAlmConnector.HP_ALM_PASSWORD, new TestVariable(HpAlmConnector.HP_ALM_PASSWORD, "password"));
+		JSONObject connect = new JSONObject();
+		connect.put(HpAlmConnector.HP_ALM_SERVER_URL, "http://myServer");
+		connect.put(HpAlmConnector.HP_ALM_PROJECT, "project");
+		connect.put(HpAlmConnector.HP_ALM_USER, "user");
+		connect.put(HpAlmConnector.HP_ALM_PASSWORD, "password");
 		
 		String config = "{'type': 'hp', 'run': '3'}";
 		HpAlmConnector hp = new HpAlmConnector(new JSONObject(config));
-		hp.init();
+		hp.init(connect);
 	}
 	
 	@Test(groups={"ut"}, expectedExceptions=ConfigurationException.class)
 	public void testInitWithoutProjectParameter() {
-		SeleniumTestsContextManager.getThreadContext().getConfiguration().put(HpAlmConnector.HP_ALM_SERVER_URL, new TestVariable(HpAlmConnector.HP_ALM_SERVER_URL, "http://myServer"));
-		SeleniumTestsContextManager.getThreadContext().getConfiguration().put(HpAlmConnector.HP_ALM_DOMAIN, new TestVariable(HpAlmConnector.HP_ALM_DOMAIN, "domain"));
-		SeleniumTestsContextManager.getThreadContext().getConfiguration().put(HpAlmConnector.HP_ALM_USER, new TestVariable(HpAlmConnector.HP_ALM_USER, "user"));
-		SeleniumTestsContextManager.getThreadContext().getConfiguration().put(HpAlmConnector.HP_ALM_PASSWORD, new TestVariable(HpAlmConnector.HP_ALM_PASSWORD, "password"));
+		JSONObject connect = new JSONObject();
+		connect.put(HpAlmConnector.HP_ALM_SERVER_URL, "http://myServer");
+		connect.put(HpAlmConnector.HP_ALM_DOMAIN, "domain");
+		connect.put(HpAlmConnector.HP_ALM_USER, "user");
+		connect.put(HpAlmConnector.HP_ALM_PASSWORD, "password");
 		
 		String config = "{'type': 'hp', 'run': '3'}";
 		HpAlmConnector hp = new HpAlmConnector(new JSONObject(config));
-		hp.init();
+		hp.init(connect);
 	}
 	
 	@Test(groups={"ut"}, expectedExceptions=ConfigurationException.class)
 	public void testInitWithoutUserParameter() {
-		SeleniumTestsContextManager.getThreadContext().getConfiguration().put(HpAlmConnector.HP_ALM_SERVER_URL, new TestVariable(HpAlmConnector.HP_ALM_SERVER_URL, "http://myServer"));
-		SeleniumTestsContextManager.getThreadContext().getConfiguration().put(HpAlmConnector.HP_ALM_DOMAIN, new TestVariable(HpAlmConnector.HP_ALM_DOMAIN, "domain"));
-		SeleniumTestsContextManager.getThreadContext().getConfiguration().put(HpAlmConnector.HP_ALM_PROJECT, new TestVariable(HpAlmConnector.HP_ALM_PROJECT, "project"));
-		SeleniumTestsContextManager.getThreadContext().getConfiguration().put(HpAlmConnector.HP_ALM_PASSWORD, new TestVariable(HpAlmConnector.HP_ALM_PASSWORD, "password"));
+		JSONObject connect = new JSONObject();
+		connect.put(HpAlmConnector.HP_ALM_SERVER_URL, "http://myServer");
+		connect.put(HpAlmConnector.HP_ALM_DOMAIN, "domain");
+		connect.put(HpAlmConnector.HP_ALM_PROJECT, "project");
+		connect.put(HpAlmConnector.HP_ALM_PASSWORD, "password");
 		
 		String config = "{'type': 'hp', 'run': '3'}";
 		HpAlmConnector hp = new HpAlmConnector(new JSONObject(config));
-		hp.init();
+		hp.init(connect);
 	}
 	
 	@Test(groups={"ut"}, expectedExceptions=ConfigurationException.class)
 	public void testInitWithoutPasswordParameter() {
-		SeleniumTestsContextManager.getThreadContext().getConfiguration().put(HpAlmConnector.HP_ALM_SERVER_URL, new TestVariable(HpAlmConnector.HP_ALM_SERVER_URL, "http://myServer"));
-		SeleniumTestsContextManager.getThreadContext().getConfiguration().put(HpAlmConnector.HP_ALM_DOMAIN, new TestVariable(HpAlmConnector.HP_ALM_DOMAIN, "domain"));
-		SeleniumTestsContextManager.getThreadContext().getConfiguration().put(HpAlmConnector.HP_ALM_PROJECT, new TestVariable(HpAlmConnector.HP_ALM_PROJECT, "project"));
-		SeleniumTestsContextManager.getThreadContext().getConfiguration().put(HpAlmConnector.HP_ALM_USER, new TestVariable(HpAlmConnector.HP_ALM_USER, "user"));
+		JSONObject connect = new JSONObject();
+		connect.put(HpAlmConnector.HP_ALM_SERVER_URL, "http://myServer");
+		connect.put(HpAlmConnector.HP_ALM_DOMAIN, "domain");
+		connect.put(HpAlmConnector.HP_ALM_PROJECT, "project");
+		connect.put(HpAlmConnector.HP_ALM_USER, "user");
 		
 		String config = "{'type': 'hp', 'run': '3'}";
 		HpAlmConnector hp = new HpAlmConnector(new JSONObject(config));
-		hp.init();
+		hp.init(connect);
 	}
 }

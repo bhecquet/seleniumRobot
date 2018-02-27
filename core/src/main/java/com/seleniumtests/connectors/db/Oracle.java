@@ -37,31 +37,41 @@ public class Oracle {
 	/**
 	 * Constructor
 	 * 
-	 * @param dbName	DB name as stated in tnsnames.ora
-	 * @param user		user to connect to database
-	 * @param password	password to connect to database
+	 * @param dbName		DB name as stated in tnsnames.ora
+	 * @param user			user to connect to database
+	 * @param password		password to connect to database
+	 * @param tnsNamePath	path to folder where tnsnames.ora file is located
 	 */
-    public Oracle(String dbName, String user, String password) {
+    public Oracle(String dbName, String user, String password, String tnsNamePath) {
     	
     	this.user = user;
     	this.password = password;
     	this.dbName = dbName;
-    	
-    	TestVariable tnsNamePath = SeleniumTestsContextManager.getThreadContext().getConfiguration().get("tnsnamePath");
-    	
+
     	// check tnsname.ora path
     	if (tnsNamePath == null) {
-    		throw new ConfigurationException("'tnsnamePath' configuration does not exist in env.ini, it must be the path to folder where tnsnames.ora file is");
+    		throw new ConfigurationException("'tnsnamePath' configuration is null, it must be the path to folder where tnsnames.ora file is");
     	}
-    	if (!new File(tnsNamePath.getValue()).isDirectory()) {
-    		throw new ConfigurationException("Folder " + tnsNamePath.getValue() +  " does not exist, check your configuration in env.ini");
+    	if (!new File(tnsNamePath).isDirectory()) {
+    		throw new ConfigurationException("Folder " + tnsNamePath +  " does not exist, check your configuration in env.ini");
     	}
-    	if (!new File(tnsNamePath.getValue() + File.separator + "tnsnames.ora").isFile()) {
-    		throw new ConfigurationException("File " + tnsNamePath.getValue() + " tnsnames.ora does not exist, check your configuration in env.ini");
+    	if (!new File(tnsNamePath + File.separator + "tnsnames.ora").isFile()) {
+    		throw new ConfigurationException("File " + tnsNamePath + " tnsnames.ora does not exist, check your configuration in env.ini");
     	}
     	
-        System.setProperty("oracle.net.tns_admin", tnsNamePath.getValue());
+        System.setProperty("oracle.net.tns_admin", tnsNamePath);
 
+    }
+    
+    /**
+     * Configure database using tnsnamePath configuration found in env.ini or variable server
+     * @param dbName
+     * @param user
+     * @param password
+     */
+    @Deprecated
+    public Oracle(String dbName, String user, String password) {
+    	this(dbName, user, password, SeleniumTestsContextManager.getThreadContext().getConfiguration().get("tnsnamePath").getValue());
     }
     
     public Oracle(String dbName, String host, String port, String user, String password) {

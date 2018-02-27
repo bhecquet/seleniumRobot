@@ -189,7 +189,7 @@ You may consider putting all test data access in the Test script, not in page ob
 				._arrivee();
 	}
 	
-**WARN** DO NOT try to access test data inside a `@BeforeXXX` method, they are not available.
+**WARN** DO NOT try to access test data inside a `@BeforeXXX` method, they are not available. Only parameters defined in XML or as user parameters are available. At this stage, `env.ini` file or variable server have not been read.
 
 #### Using TestNG annotations ####
 
@@ -197,6 +197,11 @@ As we use TestNG for test running, it's possible to use any TestNG annotation in
 For more information on execution order of TestNG annotations, see [https://stackoverflow.com/questions/30587454/difference-between-beforeclass-and-beforetest-in-testng] (https://stackoverflow.com/questions/30587454/difference-between-beforeclass-and-beforetest-in-testng)
 
 ##### Test context #####
+
+Test context is a set of technical information used to run the test (connect parameters, browser, ...). These information come from TestNG XML file and from user parameters (`DmyParam=myValue`)
+It's managed by `SeleniumTestsContextManager` class which handles `SeleniumTestsContext` instances.
+
+Only at start of test method, the context is completed with test data coming from `env.ini` file or from variable server.
 
 **WARN** TestNG allows you to use `@BeforeTest`, `@BeforeMethod`, `@BeforeClass` annotated method to init the test. In these methods (as for `@AfterTest`, `@AfterClass`, `@AfterMethod`), you can access the test context using for example  `SeleniumTestsContextManager.getThreadContext().setBrowser("chrome");`. So 3 state context are stored: 
 - test context (the one fetched from TestNG XML file)

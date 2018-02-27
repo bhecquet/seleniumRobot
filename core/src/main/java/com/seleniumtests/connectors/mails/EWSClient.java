@@ -120,7 +120,7 @@ public class EWSClient extends EmailClientImpl {
 		service = new ExchangeService(version);
 		ExchangeCredentials credentials = new WebCredentials(username, password, domain);
 		service.setCredentials(credentials);
-		service.setUrl(new URI("http://" + host + "/EWS/Exchange.asmx"));
+		service.setUrl(new URI("https://" + host + "/EWS/Exchange.asmx"));
 		
 		// mailbox to use (a mailbox could have several emails
 		mb = new Mailbox();

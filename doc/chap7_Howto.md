@@ -142,16 +142,21 @@ connection and disconnection are done automatically
 	Oracle db = new Oracle(<dbName>, <dbHost>, <dbPort>, <dbUser>, <dbPassword>);
 	db.executeParamQuery("SELECT * FROM TAB1 WHERE id=?", id);
 	
-Oracle DB needs `tnsnamePath` variable: path to folder where tnsnames.ora file
+or
+
+	Oracle db = new Oracle(<dbName>, <dbUser>, <dbPassword>, <tnsNamesPath>);
+	db.executeParamQuery("SELECT * FROM TAB1 WHERE id=?", id);
 	
 ### 9 Using emails ###
 
 SeleniumRobot provides several email clients to allow reading email content and attachments
 
-	EmailAccount account = EmailAccount(<email_address>, <login>, <password>);
+	EmailAccount account = EmailAccount(<email_address>, <login>, <password>, <emailServer>);
 	Email emailFound = account.checkEmailPresence(<email_title>, new String[] {"attachment1"});
 	
-Email needs `mailServer` variable which is the URL to the server
+emailServer is an object created by 
+
+	EmailServer server = new EmailServer("<mail_server_urs>", EmailServerTypes.EXCHANGE_EWS, "<domain_for_user>");
 	
 ### 10 upload file ###
 
@@ -214,4 +219,13 @@ One file is generated for the overall session. Name is `<prefix>.<extension>`
 
 If you have a script file (shell / batch / ...), and want to know if test went wrong or not, you can look at error level `echo %errorlevel%` for batch and `$?` for shell
 
+### 13 Access remote servers through HTTPS ###
+
+When accessing remote server, you can use Unirest API which ease sending HTTP requests.
+In case access to HTTPS is done inside a dependency, you may encounter problems with certificate chain (e.g: accessing an exchange server through EWS).
+You then need to add the remote certificate to a truststore and give it to the JVM (which uses by default it's internal truststore ($JAVA_HOME$/jre/lib/security/cacerts)
+
+To override the default truststore, use `-Djavax.net.ssl.trustStore=<path_to_truststore>`
+
+To debug, use `-Djavax.net.debug=ssl` 
 

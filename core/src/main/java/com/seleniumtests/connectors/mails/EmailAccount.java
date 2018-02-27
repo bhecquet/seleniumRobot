@@ -21,6 +21,7 @@ public class EmailAccount {
 	private String emailPassword;
 	private LocalDateTime creationDate;
 	private EmailClient emailClient;
+	private EmailServer emailServer;
 	private static final String DEFAULT_EMAIL = "no.email@free.fr";
 	private static final Logger logger = SeleniumRobotLogger.getLogger(EmailAccount.class);
 	
@@ -29,13 +30,19 @@ public class EmailAccount {
 	 * @param email
 	 * @param emailLogin
 	 * @param emailPassword
+	 * @param emailServer		the mail server instance to connect to
 	 */
-	public EmailAccount(String email, String emailLogin, String emailPassword) {
+	public EmailAccount(String email, String emailLogin, String emailPassword, EmailServer emailServer) {
 		this.email = email;
 		this.emailLogin = emailLogin;
 		this.emailPassword = emailPassword;
 		this.emailClient = null;
+		this.emailServer = emailServer;
 		creationDate = LocalDateTime.now();
+	}
+	
+	public EmailAccount(String email, String emailLogin, String emailPassword) {
+		this(email, emailLogin, emailPassword, null);
 	}
 
 	public EmailAccount() {
@@ -137,13 +144,12 @@ public class EmailAccount {
 		}
 		
 		logger.info("email " + getEmail() + " will be used to access server");
-		TestVariable mailServerVar = SeleniumTestsContextManager.getThreadContext().getConfiguration().get("mailServer");
 		
-		if (mailServerVar == null) {
-			throw new ConfigurationException("'mailServer' variable is not present");
+		if (emailServer == null) {
+			throw new ConfigurationException("email server has not been configured");
 		}
 		
-		emailClient = EmailClientSelector.routeEmail(EmailServer.fromJson(mailServerVar.getValue()),
+		emailClient = EmailClientSelector.routeEmail(emailServer,
 				getEmail(),
 				getEmailLogin(),
 				getEmailPassword());
@@ -177,5 +183,13 @@ public class EmailAccount {
 
 	public String getEmailPassword() {
 		return emailPassword;
+	}
+
+	public EmailServer getEmailServer() {
+		return emailServer;
+	}
+
+	public void setEmailServer(EmailServer emailServer) {
+		this.emailServer = emailServer;
 	}
 }

@@ -18,7 +18,6 @@ import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import com.seleniumtests.connectors.tms.TestManager;
 import com.seleniumtests.core.SeleniumTestsContextManager;
-import com.seleniumtests.core.TestVariable;
 import com.seleniumtests.customexception.ConfigurationException;
 
 /**
@@ -62,26 +61,28 @@ public class HpAlmConnector extends TestManager {
 		} catch (JSONException e) {
 			throw new ConfigurationException("Test manager configuration does not contain 'run' parameter");
 		}
+
 	}
 
 	@Override
-	public void init() {
-		TestVariable serverUrlVar = SeleniumTestsContextManager.getThreadContext().getConfiguration().get(HP_ALM_SERVER_URL);
-		TestVariable projectVar = SeleniumTestsContextManager.getThreadContext().getConfiguration().get(HP_ALM_PROJECT);
-		TestVariable domainVar = SeleniumTestsContextManager.getThreadContext().getConfiguration().get(HP_ALM_DOMAIN);
-		TestVariable userVar = SeleniumTestsContextManager.getThreadContext().getConfiguration().get(HP_ALM_USER);
-		TestVariable passwordVar = SeleniumTestsContextManager.getThreadContext().getConfiguration().get(HP_ALM_PASSWORD);
+	public void init(JSONObject connectParams) {
 		
+		String serverUrlVar = connectParams.optString(HP_ALM_SERVER_URL, null);
+		String projectVar = connectParams.optString(HP_ALM_PROJECT, null);
+		String domainVar = connectParams.optString(HP_ALM_DOMAIN, null);
+		String userVar = connectParams.optString(HP_ALM_USER, null);
+		String passwordVar = connectParams.optString(HP_ALM_PASSWORD, null);
+
 		if (serverUrlVar == null || projectVar == null || domainVar == null || userVar == null || passwordVar == null) {
 			throw new ConfigurationException(String.format("HP ALM access not correctly configured. Environment configuration must contain variables"
 					+ "%s, %s, %s, %s, %s", HP_ALM_SERVER_URL, HP_ALM_PASSWORD, HP_ALM_USER, HP_ALM_DOMAIN, HP_ALM_PROJECT));
 		}
 		
-		serverUrl = serverUrlVar.getValue();
-		project = projectVar.getValue();
-		domain = domainVar.getValue();
-		user = userVar.getValue();
-		password = passwordVar.getValue();
+		serverUrl = serverUrlVar;
+		project = projectVar;
+		domain = domainVar;
+		user = userVar;
+		password = passwordVar;
 		
 		serverUrl += "/qcbin";
 		initialized = true;
@@ -93,7 +94,7 @@ public class HpAlmConnector extends TestManager {
 	@Override
 	public void login() {
 		if (!initialized) {
-			init();
+			throw new ConfigurationException("test manager has not been previously initialized");
 		}
 		
 		try {
