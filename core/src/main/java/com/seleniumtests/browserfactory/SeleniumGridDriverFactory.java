@@ -28,10 +28,7 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import com.seleniumtests.connectors.selenium.SeleniumGridConnector;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.ConfigurationException;
-import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.DriverConfig;
-import com.seleniumtests.driver.screenshots.ScreenShotRemoteWebDriver;
-import com.seleniumtests.reporter.logger.TestLogging;
 import com.seleniumtests.util.helper.WaitHelper;
 
 public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implements IWebDriverFactory {
@@ -111,13 +108,7 @@ public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implemen
         gridConnector.uploadMobileApp(capabilities);
 
         // connection to grid is made here
-        // TODO: remote ScreenShotRemoteWebDriver reference (seems useless)
-        // 			check TAKE_SCREENSHOT capability is always present
-        if (SeleniumTestsContextManager.isWebTest() && (BrowserType.FIREFOX).equals(webDriverConfig.getBrowser())) {
-            driver = getDriverFirefox(gridConnector.getHubUrl(), capabilities);
-        } else {
-            driver = new ScreenShotRemoteWebDriver(gridConnector.getHubUrl(), capabilities);
-        }
+        driver = getDriver(gridConnector.getHubUrl(), capabilities);
 
         setImplicitWaitTimeout(webDriverConfig.getImplicitWaitTimeout());
         if (webDriverConfig.getPageLoadTimeout() >= 0 && SeleniumTestsContextManager.isWebTest()) {
@@ -133,19 +124,13 @@ public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implemen
         return driver;
     }
     
-    private WebDriver getDriverFirefox(URL url, MutableCapabilities capability){
+    private WebDriver getDriver(URL url, MutableCapabilities capability){
     	driver = null;
     	try {
-            driver = new ScreenShotRemoteWebDriver(url, capability);
+            driver = new RemoteWebDriver(url, capability);
         } catch (RuntimeException e) {
-            if (e.getMessage().contains(
-                        "Unable to connect to host localhost on port 7062 after 45000 ms. Firefox console output")) {
-                TestLogging.log("Firefox Driver creation got port customexception, retry after 5 seconds");
                 WaitHelper.waitForSeconds(5);
-                driver = new ScreenShotRemoteWebDriver(url, capability);
-            } else {
-                throw e;
-            }
+            driver = new RemoteWebDriver(url, capability);
         }
     	return driver;
     }
