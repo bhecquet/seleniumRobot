@@ -28,6 +28,7 @@ import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.ElementNotVisibleException;
+import org.openqa.selenium.HasCapabilities;
 import org.openqa.selenium.InvalidElementStateException;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.OutputType;
@@ -44,6 +45,7 @@ import org.openqa.selenium.interactions.Mouse;
 import org.openqa.selenium.interactions.internal.Coordinates;
 import org.openqa.selenium.interactions.internal.Locatable;
 import org.openqa.selenium.internal.HasIdentity;
+import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
@@ -1151,7 +1153,11 @@ public class HtmlElement implements WebElement, Locatable, HasIdentity {
 	@Override
 	public <X> X getScreenshotAs(OutputType<X> target) {
 		findElement();
-		return element.getScreenshotAs(target);
+		if (((HasCapabilities) driver).getCapabilities().getCapability(CapabilityType.TAKES_SCREENSHOT) != null) {
+			return element.getScreenshotAs(target);
+		} else {
+			return null;
+		}
 	}
 
 	@Override
