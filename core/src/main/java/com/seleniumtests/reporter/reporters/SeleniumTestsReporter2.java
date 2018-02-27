@@ -305,7 +305,7 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 					
 				}
 				resultList.addAll(methodResults);
-
+				
 				methodResultsMap.put(context, resultList);
 			}
 		}
@@ -478,6 +478,8 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 			VelocityContext velocityContext = new VelocityContext();
 			
 			velocityContext.put("testName", getTestName(testResult));
+			velocityContext.put("description", testResult.getMethod().getDescription());
+			
 			
 			// Application information
 			fillContextWithTestParams(velocityContext);       
