@@ -96,6 +96,8 @@ In this case, this user passed value will overwrite test or suite parameters
 | customTestReports			| PERF::xml::reporter/templates/report.perf.vm | With this option, you can specify which files will be generated for each test. By default, it's the JMeter report. Format is a comma seperated list of <prefix>::<extension>::<template_file located in resources>. resources can be those from test application. Template is in the Velocity format |
 | customSummaryReports		| results::json::reporter/templates/report.summary.json.vm | With this option, you can specify which files will be generated for sumarizing test session. By default, it's a json report. Format is a comma seperated list of <prefix>::<extension>::<template_file located in resources>. resources can be those from test application. Template is in the Velocity format |
 | archiveToFile				| null		| If not specified, no archiving will be done. Else, provide a zip file path and the whole content of `outputDirectory` will be zipped to this file |
+| tmsRun					| null		| Configuration string (JSON format) for identifying test that is run in test management system. E.g: {'type': 'hp', 'run': '3'} |
+| tmsConnect				| null		| Configuration string (JSON format) for test management system if you plan to use it. E.g: {'hpAlmServerUrl': 'http://myamlserver:8080', 'hpAlmProject': '12', 'hpAlmDomain': 'mydomain', 'hpAlmUser': 'user', 'hpAlmPassword': 'pass'}  |
 
 
 Other parameters, not accepted in XML file but allowed on command line

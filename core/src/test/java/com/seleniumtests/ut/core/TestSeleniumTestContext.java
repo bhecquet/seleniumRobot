@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
+import org.json.JSONObject;
 import org.openqa.selenium.Proxy.ProxyType;
 import org.testng.Assert;
 import org.testng.ITestContext;
@@ -645,25 +646,51 @@ public class TestSeleniumTestContext extends GenericTest {
 	@Test(groups="ut context")
 	public void testTms(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		initThreadContext(testNGCtx);
-		SeleniumTestsContextManager.getThreadContext().setTms("{'type':'hp', 'run':1}");
-		Assert.assertNotNull(SeleniumTestsContextManager.getThreadContext().getTms());
-		Assert.assertTrue(SeleniumTestsContextManager.getThreadContext().getTms() instanceof TestManager);
+		SeleniumTestsContextManager.getThreadContext().setTmsRun("{'type':'hp', 'run':1}");
+		Assert.assertNotNull(SeleniumTestsContextManager.getThreadContext().getTmsRun());
+		Assert.assertTrue(SeleniumTestsContextManager.getThreadContext().getTmsRun() instanceof JSONObject);
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getTmsRun().length(), 2);
 	}
 	@Test(groups="ut context", expectedExceptions=ConfigurationException.class)
 	public void testWrongType(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		initThreadContext(testNGCtx);
-		SeleniumTestsContextManager.getThreadContext().setTms("{'type':'sonar'}");
+		SeleniumTestsContextManager.getThreadContext().setTmsRun("{'type':'sonar'}");
+		SeleniumTestsContextManager.getThreadContext().configureContext(null);
 	}
 	@Test(groups="ut context", expectedExceptions=ConfigurationException.class)
 	public void testWrongFormat(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		initThreadContext(testNGCtx);
-		SeleniumTestsContextManager.getThreadContext().setTms("hp");
+		SeleniumTestsContextManager.getThreadContext().setTmsRun("hp");
 	}
 	@Test(groups="ut context")
 	public void testTmsNull(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		initThreadContext(testNGCtx);
-		SeleniumTestsContextManager.getThreadContext().setTms(null);
-		Assert.assertNull(SeleniumTestsContextManager.getThreadContext().getTms());
+		SeleniumTestsContextManager.getThreadContext().setTmsRun(null);
+		Assert.assertNotNull(SeleniumTestsContextManager.getThreadContext().getTmsRun());
+		Assert.assertTrue(SeleniumTestsContextManager.getThreadContext().getTmsRun() instanceof JSONObject);
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getTmsRun().length(), 0);
+	}
+	
+	@Test(groups="ut context")
+	public void testTmsConnect(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setTmsConnect("{'user':'hp', password': 'hp'}");
+		Assert.assertNotNull(SeleniumTestsContextManager.getThreadContext().getTmsConnect());
+		Assert.assertTrue(SeleniumTestsContextManager.getThreadContext().getTmsConnect() instanceof JSONObject);
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getTmsConnect().length(), 2);
+	}
+	@Test(groups="ut context", expectedExceptions=ConfigurationException.class)
+	public void testWrongFormatConnect(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setTmsConnect("hp");
+	}
+	@Test(groups="ut context")
+	public void testTmsConnectNull(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setTmsRun(null);
+		Assert.assertNotNull(SeleniumTestsContextManager.getThreadContext().getTmsConnect());
+		Assert.assertTrue(SeleniumTestsContextManager.getThreadContext().getTmsConnect() instanceof JSONObject);
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getTmsConnect().length(), 0);
 	}
 	
 	@Test(groups="ut context")

@@ -155,16 +155,15 @@ e.g: `"default-src 'self' fonts.googleapis.com cdnjs.cloudflare.com fonts.gstati
 From ALM v11 HP ALM can run seleniumRobot tests using VBScript connector
 
 **WARNING**: This connector is not currently fully fonctional as launch_SeleniumRobot.bat script does not exist anymore
-VBS script should be updated, for example, using a direct java call with JVM options and TestNG parameters lcearly identified
+VBS script should be updated, for example, using a direct java call with JVM options and TestNG parameters clearly identified
 
 #### 3.0 Configure environment to access HP ALM ####
 
-Put connection information into env.ini file:
-- `hpAlmServerUrl`: url to server. It should not contain the '/qcbin' part
-- `hpAlmProject`: project to connect to
-- `hpAlmDomain`: domain of the project
-- `hpAlmUser`: user
-- `hpAlmPassword`: password 
+Put connection information into `tmsConnect` parameter : `{'hpAlmServerUrl': 'http://myamlserver:8080', 'hpAlmProject': '12', 'hpAlmDomain': 'mydomain', 'hpAlmUser': 'user', 'hpAlmPassword': 'pass'}`
+This paramater is common to all tests and can be written in TestNG XML file or in a common configuration file loaded by TestNG XML file (param `testConfig`) 
+
+Run information (specific to test running) must be put in `tmsRun` variable. E.g: `{'type': 'hp', 'run': '3'}`
+
  
 #### 3.1 Configure test runner computer ####
  
@@ -219,7 +218,7 @@ In Test plan, go to newly created test, "Test script" tab and paste the followin
 	
 	
 	  ' Run seleniumBot application
-	  result = XTools.run(seleniumRobotHome , options & " -Dtms={'type':'hp','run':" & CurrentRun.ID & "}", -1)
+	  result = XTools.run(seleniumRobotHome , options & " -DtmsRun={'type':'hp','run':" & CurrentRun.ID & "}", -1)
 	
 	  If Err.Number <> 0 Or result <> 0 Then
 	    TDOutput.Print "Run-time error [" & Err.Number & "] : " & Err.Description

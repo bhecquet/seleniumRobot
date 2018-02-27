@@ -119,16 +119,19 @@ public class DriverTestPage extends PageObject {
 	
 	public static final TextFieldElement textElementSubIFrame = new TextFieldElement("Text", By.id("textInIFrameWithValue2"), subIframe);
 	
+	private String openedPageUrl;
+	
 	public DriverTestPage() throws Exception {
         super(textElement);
     }
     
     public DriverTestPage(boolean openPageURL) throws Exception {
-        super(textElement, openPageURL ? getPageUrl() : null);
+    	this(openPageURL, getPageUrl());
     }
     
     public DriverTestPage(boolean openPageURL, String url) throws Exception {
     	super(textElement, openPageURL ? url : null);
+    	openedPageUrl = url;
     }
     
     //for TestInterceptPage (the loader page of By has to be a PageObject)
@@ -164,4 +167,8 @@ public class DriverTestPage extends PageObject {
 			return "file:///" + Thread.currentThread().getContextClassLoader().getResource("tu/test.html").getFile();
 		}
     }
+
+	public String getOpenedPageUrl() {
+		return openedPageUrl;
+	}
 }
