@@ -2,4 +2,8 @@
   	<div class="row">
     	<div class="col-xs-12">
     		<h4> Test Details - $testName</h4>
+    		#if ($description)
+    			<pre>$description</pre>
+    		#end
       		<p><b>$applicationType </b> $application<br/></p>
+      		

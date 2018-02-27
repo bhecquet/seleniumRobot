@@ -50,20 +50,24 @@
 			                			#set ($totalPassed = $totalPassed + $passedSteps)
 			                			#set ($totalFailed = $totalFailed + $failedSteps)
 			                			#set ($totalSteps = $totalSteps + $totalTestSteps)
-			                		
+			                			#if ($testResult.getMethod().getDescription())
+			                				#set ($description = $testResult.getMethod().getDescription())
+			                			#else
+			                				#set ($description = "no description available")
+			                			#end
 			                			
 			                			#if ($testResult.getStatus() == 1)
 			                				<tr class="testSuccess">
 			                				<td>$testContext.key.getName()</td>
-			                				<td class="alignleft"><i class="fa fa-circle circleSuccess"></i><a href='$testResult.getAttribute("methodResultFileName")'>$testResult.getAttribute("methodName")</a></td>
+			                				<td class="alignleft"><i class="fa fa-circle circleSuccess"></i><a href='$testResult.getAttribute("methodResultFileName")' data-toggle="tooltip" title="$description">$testResult.getAttribute("methodName")</a></td>
 			                			#elseif ($testResult.getStatus() == 2)
 			                				<tr class="testFailed">
 			                				<td>$testContext.key.getName()</td>
-			                				<td class="alignleft"><i class="fa fa-circle circleFailed"></i><a href='$testResult.getAttribute("methodResultFileName")'>$testResult.getAttribute("methodName")</a></td>
+			                				<td class="alignleft"><i class="fa fa-circle circleFailed"></i><a href='$testResult.getAttribute("methodResultFileName")' data-toggle="tooltip" title="$description">$testResult.getAttribute("methodName")</a></td>
 			                			#else 
 			                				<tr class="testSkipped">
 			                				<td>$testContext.key.getName()</td>
-			                				<td class="alignleft"><i class="fa fa-circle circleSkipped"></i><a href='$testResult.getAttribute("methodResultFileName")'>$testResult.getAttribute("methodName")</a></td>
+			                				<td class="alignleft"><i class="fa fa-circle circleSkipped"></i><a href='$testResult.getAttribute("methodResultFileName")' data-toggle="tooltip" title="$description">$testResult.getAttribute("methodName")</a></td>
 			                			#end 
 
 				                		<td name="passed-$testIdx">$passedSteps</td>
