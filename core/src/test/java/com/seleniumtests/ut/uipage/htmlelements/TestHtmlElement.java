@@ -38,6 +38,7 @@ import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.WebDriver.TargetLocator;
 import org.openqa.selenium.WebDriverException;
@@ -56,6 +57,8 @@ import org.openqa.selenium.support.events.EventFiringWebDriver;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
+import org.testng.ITestContext;
+import org.testng.ITestResult;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -67,6 +70,8 @@ import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import com.seleniumtests.driver.DriverExceptionListener;
 import com.seleniumtests.driver.TestType;
 import com.seleniumtests.driver.WebUIDriver;
+import com.seleniumtests.reporter.logger.TestLogging;
+import com.seleniumtests.reporter.logger.TestStep;
 import com.seleniumtests.uipage.htmlelements.HtmlElement;
 
 import io.appium.java_client.AppiumDriver;
@@ -301,12 +306,45 @@ public class TestHtmlElement extends MockitoTest {
 	public void testIsDisplayedException() throws Exception {
 		SeleniumTestsContextManager.getThreadContext().setReplayTimeout(1);
 		when(element.isDisplayed()).thenThrow(new WebDriverException("error"));
-		Assert.assertEquals(el.isDisplayed(), false);
+		Assert.assertFalse(el.isDisplayed());
 		
 		// updateDriver is called on every replay, so if we have 2 invocations, it means that replay has been done
 		PowerMockito.verifyPrivate(el, atLeast(2)).invoke("updateDriver");
 		
 		verify(el, times(1)).isDisplayedRetry();
+	}
+	
+	/**
+	 * Check that when using isElementPresent, step is not marked as failed. So report will show step as green
+	 * check correction of issue #103
+	 * @throws Exception
+	 */
+	@Test(groups={"ut"})
+	public void testIsPresentExceptionDoNotSetStepFailed() throws Exception {
+		TestStep step = new TestStep("step 1", null);
+		TestLogging.setParentTestStep(step);
+		
+		SeleniumTestsContextManager.getThreadContext().setReplayTimeout(1);
+		when(driver.findElements(By.id("el"))).thenThrow(new NoSuchElementException(""));
+		Assert.assertEquals(el.isElementPresent(1), false);
+		
+		Assert.assertFalse(step.getFailed());
+	}
+	
+	/**
+	 * check correction of issue #103: step should be failed for all other actions but waitForPresent
+	 * @throws Exception
+	 */
+	@Test(groups={"ut"})
+	public void testIsDisplayedExceptionSetStepFailed() throws Exception {
+		TestStep step = new TestStep("step 1", null);
+		TestLogging.setParentTestStep(step);
+		
+		SeleniumTestsContextManager.getThreadContext().setReplayTimeout(1);
+		when(element.isDisplayed()).thenThrow(new WebDriverException("error"));
+		Assert.assertFalse(el.isDisplayed());
+		
+		Assert.assertTrue(step.getFailed());
 	}
 	
 	@Test(groups={"ut"})
