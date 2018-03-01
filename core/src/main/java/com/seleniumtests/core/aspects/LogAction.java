@@ -27,6 +27,7 @@ import org.aspectj.lang.annotation.After;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
+import org.aspectj.lang.reflect.MethodSignature;
 import org.openqa.selenium.support.ui.Select;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
@@ -329,16 +330,29 @@ public class LogAction {
 		String argString = "";
 		if (joinPoint.getArgs().length > 0) {
 			argString = "with args: (";
+			
+			int paramIdx = 0;
 			for (Object arg: joinPoint.getArgs()) {
-				if (arg instanceof CharSequence[]) {
-					argString += "[";
-					for (Object obj: (CharSequence[])arg) {
-						argString += obj.toString() + ",";
-					}
-					argString += "]";
+				
+				String argName = "";
+				try {
+					argName = ((MethodSignature)joinPoint.getSignature()).getParameterNames()[paramIdx];
+				} catch (ClassCastException | IndexOutOfBoundsException e) {}
+				
+				if (argName.toLowerCase().contains("password")) {
+					argString += "** pwd **";
 				} else {
-					argString += (arg == null ? "null": arg.toString()) + ", ";
+					if (arg instanceof CharSequence[]) {
+						argString += "[";
+						for (Object obj: (CharSequence[])arg) {
+							argString += obj.toString() + ",";
+						}
+						argString += "]";
+					} else {
+						argString += (arg == null ? "null": arg.toString()) + ", ";
+					}
 				}
+				paramIdx++;
 			}
 			argString += ")";
 		}

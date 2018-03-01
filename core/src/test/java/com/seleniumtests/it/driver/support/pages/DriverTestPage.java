@@ -149,6 +149,11 @@ public class DriverTestPage extends PageObject {
     	return this;
     }
     
+    public DriverTestPage _setPassword(String password) {
+    	textElement.sendKeys(password);
+    	return this;
+    }
+    
     public DriverTestPage _sendKeysComposite() {
     	new Actions(driver).moveToElement(textElement).sendKeys("composite").build().perform();
     	new Actions(driver).moveToElement(resetButton).click().build().perform();
