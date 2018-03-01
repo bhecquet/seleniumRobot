@@ -16,9 +16,7 @@
  */
 package com.seleniumtests.uipage.aspects;
 
-import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
-import org.aspectj.lang.annotation.After;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.DeclarePrecedence;
@@ -90,6 +88,7 @@ public class ReplayAction {
 		}	
 		
 		boolean actionFailed = false;
+		boolean ignoreFailure = false;
 		
 		try {
 	    	while (systemClock.isNowBefore(end)) {
@@ -111,6 +110,7 @@ public class ReplayAction {
 		    		// only check that cause is the not found element and not an other error (NoSucheSessionError for example)
 		    		if (e instanceof TimeoutException && joinPoint.getSignature().getName().equals("waitForPresent")) {
 		    			if (e.getCause() instanceof NoSuchElementException) {
+		    				ignoreFailure = true;  // issue #103: do not log error when waitForPresent raises TimeoutException
 		    				throw e;
 		    			}
 		    		}
@@ -131,7 +131,7 @@ public class ReplayAction {
 	    	}
 	    	return reply;
 		} catch (Throwable e) {
-			actionFailed = true;
+			actionFailed = true && !ignoreFailure;
 			throw e;
 		} finally {
 			if (currentAction != null && isHtmlElementDirectlyCalled(Thread.currentThread().getStackTrace()) && TestLogging.getParentTestStep() != null) {

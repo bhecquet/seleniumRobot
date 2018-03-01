@@ -1119,6 +1119,7 @@ public class HtmlElement implements WebElement, Locatable, HasIdentity {
     /**
      * Wait element to present using Explicit Waits with timeout in seconds. This method is used for special element
      * which needs long time to present.
+     * This method is replayed because it may fail if frame is not present at start. The replay is not done if TimeOutException raises (see ReplayAction class)
      */
     @ReplayOnError
     public void waitForPresent(final int timeout) {
