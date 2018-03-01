@@ -42,6 +42,7 @@ public class TestTasks {
 	/**
      * Method for creating or updating a variable on the seleniumRobot server ONLY. This will raise a ScenarioException if variables are get from
      * env.ini file 
+     * Moreover, created custom variable is specific to tuple (application, version, test environment)
      * @param key
      * @param value
      */

@@ -100,7 +100,7 @@ public class EmailAccount {
 	/**
 	 * Check email has been get
 	 * 
-	 * @param emailTitle	email title to get
+	 * @param emailTitle	email title to get. This can be a regular expression as underlying used method is String.matches()
 	 * @param attachments	list of attachments in email
 	 * 
 	 * TODO: should be moved elsewhere
