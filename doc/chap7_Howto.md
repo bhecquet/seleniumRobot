@@ -152,11 +152,26 @@ or
 SeleniumRobot provides several email clients to allow reading email content and attachments
 
 	EmailAccount account = EmailAccount(<email_address>, <login>, <password>, <emailServer>);
+	...
+	some actions that send an email
+	...
 	Email emailFound = account.checkEmailPresence(<email_title>, new String[] {"attachment1"});
+	
+Email title and attachment names can be regular expression as String.matches() is used to search for the right emails
+**WARN** create your email server connection before email is sent so that `checkEmailPresence` can look at the last received emails (it keeps an index on already seen mails)
 	
 emailServer is an object created by 
 
 	EmailServer server = new EmailServer("<mail_server_urs>", EmailServerTypes.EXCHANGE_EWS, "<domain_for_user>");
+	
+Using variables, it's also possible to write:
+
+	EmailAccount emailAccount = EmailAccount.fromJson(param("emailAccount"));
+	emailAccount.setEmailServer(EmailServer.fromJson(param("emailServer")));
+	
+where `emailAccount` is `{'email': 'mymail@compmail.com', 'login': 'login', 'password': 'passwd'}` and `emailServer` is `	{'url': 'msg.compmail.com', 'type': 'EXCHANGE_EWS', 'domain': 'compmail.com'}`
+
+	
 	
 ### 10 upload file ###
 
