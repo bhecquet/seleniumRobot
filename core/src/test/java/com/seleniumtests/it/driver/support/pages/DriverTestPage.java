@@ -16,15 +16,13 @@
  */
 package com.seleniumtests.it.driver.support.pages;
 
+import java.util.List;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.interactions.Actions;
-import org.testng.Assert;
-import org.testng.SkipException;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
-import com.seleniumtests.customexception.ImageSearchException;
 import com.seleniumtests.driver.BrowserType;
-import com.seleniumtests.uipage.ByC;
 import com.seleniumtests.uipage.PageObject;
 import com.seleniumtests.uipage.htmlelements.ButtonElement;
 import com.seleniumtests.uipage.htmlelements.CheckBoxElement;
@@ -149,8 +147,23 @@ public class DriverTestPage extends PageObject {
     	return this;
     }
     
-    public DriverTestPage _setPassword(String password) {
-    	textElement.sendKeys(password);
+    public DriverTestPage _setPassword(String passWordShort) {
+    	textElement.sendKeys(passWordShort);
+    	return this;
+    }
+    
+    public DriverTestPage _setPassword2(String pwd) {
+    	textElement.sendKeys(pwd);
+    	return this;
+    }
+    
+    public DriverTestPage _setPasswords(String ... passwords) {
+    	textElement.sendKeys(passwords[0]);
+    	return this;
+    }
+    
+    public DriverTestPage _setPasswords(List<String> passwords) {
+    	textElement.sendKeys(passwords.get(0));
     	return this;
     }
     

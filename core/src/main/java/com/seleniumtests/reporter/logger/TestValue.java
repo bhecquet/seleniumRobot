@@ -1,5 +1,7 @@
 package com.seleniumtests.reporter.logger;
 
+import java.util.ArrayList;
+
 import org.json.JSONObject;
 
 /**
@@ -14,7 +16,7 @@ public class TestValue extends TestAction {
 	private String value;
 
 	public TestValue(String id, String humanReadableMessage, String value) {
-		super(id, false);
+		super(id, false, new ArrayList<>());
 		this.message = humanReadableMessage;
 		this.value = value;
 	}

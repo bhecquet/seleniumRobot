@@ -37,6 +37,8 @@ import com.seleniumtests.reporter.logger.TestLogging;
 import com.seleniumtests.reporter.logger.TestStep;
 import com.seleniumtests.uipage.PageObject;
 
+import oracle.net.aso.p;
+
 /**
  * Aspect to intercept calls to methods of HtmlElement. It allows to retry discovery and action 
  * when something goes wrong with the driver
@@ -84,10 +86,12 @@ public class LogAction {
 	public Object logPageObjectAction(ProceedingJoinPoint joinPoint) throws Throwable {
 		PageObject page = (PageObject)joinPoint.getTarget();
 		String pageName = page == null ? "": "on page " + page.getClass().getSimpleName();
-		String actionName = String.format("%s %s %s", joinPoint.getSignature().getName(), pageName, buildArgString(joinPoint));
+
+    	List<String> pwdToReplace = new ArrayList<>();
+		String actionName = String.format("%s %s %s", joinPoint.getSignature().getName(), pageName, buildArgString(joinPoint, pwdToReplace));
 		Object reply = null;
 		boolean actionFailed = false;
-		TestAction currentAction = new TestAction(actionName, false);
+		TestAction currentAction = new TestAction(actionName, false, pwdToReplace);
 		
 		if (TestLogging.getParentTestStep() != null) {
 			TestLogging.getParentTestStep().addAction(currentAction);
@@ -121,9 +125,10 @@ public class LogAction {
 		}
 		
 		Object reply = null;
-		
-		String stepName = String.format("%s %s", joinPoint.getSignature().getName(), buildArgString(joinPoint));
-		TestStep currentStep = new TestStep(stepName, TestLogging.getCurrentTestResult());
+
+    	List<String> pwdToReplace = new ArrayList<>();
+		String stepName = String.format("%s %s", joinPoint.getSignature().getName(), buildArgString(joinPoint, pwdToReplace));
+		TestStep currentStep = new TestStep(stepName, TestLogging.getCurrentTestResult(), pwdToReplace);
 		TestStep previousParent = TestLogging.getParentTestStep();
 		if (TestLogging.getParentTestStep() != null) {
 			TestLogging.getParentTestStep().addStep(currentStep);
@@ -226,7 +231,7 @@ public class LogAction {
 		TestStep previousParent = null;
 		
 		// step name will contain method arguments only if it's not a configuration method (as they are generic)
-		TestStep currentStep = new TestStep(stepNamePrefix + buildRootStepName(joinPoint, !configStep), TestLogging.getCurrentTestResult());
+		TestStep currentStep = buildRootStep(joinPoint, stepNamePrefix, !configStep);
 		
 		// check if any root step is already registered (a main step)
 		// happens when using cucumber where a cucumber method can call an other method intercepted by this pointcut
@@ -266,8 +271,10 @@ public class LogAction {
 	@After("this(com.seleniumtests.uipage.PageObject) && " +	
 			"call(public org.openqa.selenium.interactions.Actions org.openqa.selenium.interactions.Actions.* (..))")
 	public void logCompositeAction(JoinPoint joinPoint)  {
-		String actionName = String.format("%s %s", joinPoint.getSignature().getName(), buildArgString(joinPoint));
-		TestAction currentAction = new TestAction(actionName, false);
+
+    	List<String> pwdToReplace = new ArrayList<>();
+		String actionName = String.format("%s %s", joinPoint.getSignature().getName(), buildArgString(joinPoint, pwdToReplace));
+		TestAction currentAction = new TestAction(actionName, false, pwdToReplace);
 		
 		if (TestLogging.getParentTestStep() != null) {
 			TestLogging.getParentTestStep().addAction(currentAction);
@@ -299,8 +306,9 @@ public class LogAction {
 		}
 		boolean actionFailed = false;
     	String methodName = joinPoint.getSignature().getName();
-		String actionName = String.format("%s on %s %s", methodName, targetName, LogAction.buildArgString(joinPoint));
-		TestAction currentAction = new TestAction(actionName, false);
+    	List<String> pwdToReplace = new ArrayList<>();
+		String actionName = String.format("%s on %s %s", methodName, targetName, LogAction.buildArgString(joinPoint, pwdToReplace));
+		TestAction currentAction = new TestAction(actionName, false, pwdToReplace);
     	
 		// log action before its started. By default, it's OK. Then result may be overwritten if step fails
 		// order of steps is the right one (first called is first displayed)
@@ -323,13 +331,16 @@ public class LogAction {
 	
 	/**
 	 * Build argument string of the join point
+	 * If one of the arguments is a password (name contains 'password'), it's replaced and replacement is stored so that any subsequent call to this
+	 * string is also replaced
 	 * @param joinPoint
+	 * @param stringToReplace	an empty list containing all strings to replace so that passwords cannot be visible
 	 * @return
 	 */
-	public static String buildArgString(JoinPoint joinPoint) {
-		String argString = "";
+	public static String buildArgString(JoinPoint joinPoint, List<String> stringToReplace) {
+		StringBuilder argString = new StringBuilder();
 		if (joinPoint.getArgs().length > 0) {
-			argString = "with args: (";
+			argString.append("with args: (");
 			
 			int paramIdx = 0;
 			for (Object arg: joinPoint.getArgs()) {
@@ -339,28 +350,40 @@ public class LogAction {
 					argName = ((MethodSignature)joinPoint.getSignature()).getParameterNames()[paramIdx];
 				} catch (ClassCastException | IndexOutOfBoundsException e) {}
 				
-				if (argName.toLowerCase().contains("password")) {
-					argString += "** pwd **";
-				} else {
+				// store the value of the argument containing a password
+				if (argName.toLowerCase().contains("password") || argName.toLowerCase().contains("pwd") || argName.toLowerCase().contains("passwd")) {
 					if (arg instanceof CharSequence[]) {
-						argString += "[";
 						for (Object obj: (CharSequence[])arg) {
-							argString += obj.toString() + ",";
+							stringToReplace.add(obj.toString());
 						}
-						argString += "]";
+					} else if (arg instanceof List) {
+						for (Object obj: (List<?>)arg) {
+							stringToReplace.add(obj.toString());
+						}
 					} else {
-						argString += (arg == null ? "null": arg.toString()) + ", ";
+						stringToReplace.add(arg.toString());
 					}
+				} 
+				
+				// add arguments to the name of the method
+				if (arg instanceof CharSequence[]) {
+					argString.append("[");
+					for (Object obj: (CharSequence[])arg) {
+						argString.append(obj.toString() + ",");
+					}
+					argString.append("]");
+				} else {
+					argString.append((arg == null ? "null": arg.toString()) + ", ");
 				}
 				paramIdx++;
 			}
-			argString += ")";
+			argString.append(")");
 		}
-		return argString;
+		return argString.toString();
 	}
 	
 	/**
-	 * Returns step name depending on step type
+	 * Returns step with name depending on step type
 	 * In case of cucumber step, get the annotation value. 
 	 * /!\ THIS WORKS ONLY IF
 	 * 	parameters of the annotated method are the Object version ones. Use 'Integer' instead of 'int' for example, when declaring 
@@ -371,34 +394,27 @@ public class LogAction {
 	 * @param returnArgs	if true, returns method arguments
 	 * @return
 	 */
-	private String buildRootStepName(JoinPoint joinPoint, boolean returnArgs) {
+	private TestStep buildRootStep(JoinPoint joinPoint, String stepNamePrefix, boolean returnArgs) {
 		String stepName;
+		List<String> pwdToReplace = new ArrayList<>();
 		if (returnArgs) {
-			stepName = String.format("%s %s", joinPoint.getSignature().getName(), buildArgString(joinPoint));
+			stepName = String.format("%s %s", joinPoint.getSignature().getName(), buildArgString(joinPoint, pwdToReplace));
 		} else {
 			stepName = joinPoint.getSignature().getName();
 		}
 		
-		List<Class<?>> parameters = new ArrayList<>();
-		for (Object arg: joinPoint.getArgs()) {
-			parameters.add(arg == null ? Object.class: arg.getClass());
-		}
-		Class<?>[] pType  = parameters.toArray(new Class<?>[0]);
-		Method method;
-		try {
-			method = joinPoint.getSignature().getDeclaringType().getDeclaredMethod(joinPoint.getSignature().getName(), pType);
-		} catch (NoSuchMethodException | SecurityException e) {
-			return stepName;
-		}
+		// Get the method called by this joinPoint
+		Method method = ((MethodSignature)joinPoint.getSignature()).getMethod();
 		
 		for (Annotation cucumberAnnotation: method.getAnnotations()) {
 			if (cucumberAnnotation.annotationType().getCanonicalName().contains("cucumber.api.java.en")) {
 				stepName = getAnnotationValue(cucumberAnnotation);
-				stepName += " " + buildArgString(joinPoint);
+				pwdToReplace.clear();
+				stepName += " " + buildArgString(joinPoint, pwdToReplace);
 				break;
 			}
 		}
-		return stepName;
+		return new TestStep(stepNamePrefix + stepName, TestLogging.getCurrentTestResult(), pwdToReplace);
 	}
 	
 	/**

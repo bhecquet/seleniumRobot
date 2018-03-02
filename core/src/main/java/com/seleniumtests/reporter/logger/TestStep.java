@@ -51,8 +51,14 @@ public class TestStep extends TestAction {
 	private List<Snapshot> snapshots;
 	private ITestResult testResult;
 	
-	public TestStep(String name, ITestResult testResult) {
-		super(name, false);
+	/**
+	 * 
+	 * @param name			action name
+	 * @param testResult	associated TestNG result
+	 * @param pwdToReplace	list of string to replace when returning actions so that passwords are masked
+	 */
+	public TestStep(String name, ITestResult testResult, List<String> pwdToReplace) {
+		super(name, false, pwdToReplace);
 		stepActions = new ArrayList<>();
 		snapshots = new ArrayList<>();
 		duration = 0L;
@@ -107,15 +113,24 @@ public class TestStep extends TestAction {
 
 	public void addAction(TestAction action) {
 		stepActions.add(action);
+		
+		// add replacement of the parent to this action
+		action.pwdToReplace.addAll(pwdToReplace);
 	}
-	public void addMessage(TestMessage action) {
-		stepActions.add(action);
+	public void addMessage(TestMessage message) {
+		stepActions.add(message);
+
+		// add replacement of the parent to this message
+		message.pwdToReplace.addAll(pwdToReplace);
 	}
 	public void addValue(TestValue value) {
 		stepActions.add(value);
 	}
 	public void addStep(TestStep step) {
 		stepActions.add(step);
+		
+		// add replacement of the parent step to this step
+		step.pwdToReplace.addAll(pwdToReplace);
 	}
 	
 	/**
@@ -144,7 +159,7 @@ public class TestStep extends TestAction {
 	public JSONObject toJson() {
 		JSONObject stepJSon = new JSONObject();
 		
-		stepJSon.put("name", name);
+		stepJSon.put("name", getName());
 		stepJSon.put("type", "step");
 		
 		stepJSon.put("actions", new JSONArray());

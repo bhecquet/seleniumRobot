@@ -16,6 +16,8 @@
  */
 package com.seleniumtests.ut.reporter;
 
+import java.util.ArrayList;
+
 import org.testng.Assert;
 import org.testng.ITestResult;
 import org.testng.annotations.BeforeMethod;
@@ -39,7 +41,7 @@ public class TestTestLogging extends GenericTest {
 	
 	@Test(groups={"ut"})
 	public void testInfo() {
-		TestLogging.setCurrentRootTestStep(new TestStep("step", null));
+		TestLogging.setCurrentRootTestStep(new TestStep("step", null, new ArrayList<>()));
 		TestLogging.info("message");
 		Assert.assertEquals(TestLogging.getParentTestStep().getStepActions().size(), 1);
 		Assert.assertTrue(TestLogging.getParentTestStep().getStepActions().get(0) instanceof TestMessage);
@@ -48,35 +50,35 @@ public class TestTestLogging extends GenericTest {
 	
 	@Test(groups={"ut"})
 	public void testWarning() {
-		TestLogging.setCurrentRootTestStep(new TestStep("step", null));
+		TestLogging.setCurrentRootTestStep(new TestStep("step", null, new ArrayList<>()));
 		TestLogging.warning("message");
 		Assert.assertEquals(((TestMessage)(TestLogging.getParentTestStep().getStepActions().get(0))).getMessageType(), MessageType.WARNING);
 	}
 	
 	@Test(groups={"ut"})
 	public void testError() {
-		TestLogging.setCurrentRootTestStep(new TestStep("step", null));
+		TestLogging.setCurrentRootTestStep(new TestStep("step", null, new ArrayList<>()));
 		TestLogging.error("message");
 		Assert.assertEquals(((TestMessage)(TestLogging.getParentTestStep().getStepActions().get(0))).getMessageType(), MessageType.ERROR);
 	}
 	
 	@Test(groups={"ut"})
 	public void testLog() {
-		TestLogging.setCurrentRootTestStep(new TestStep("step", null));
+		TestLogging.setCurrentRootTestStep(new TestStep("step", null, new ArrayList<>()));
 		TestLogging.log("message");
 		Assert.assertEquals(((TestMessage)(TestLogging.getParentTestStep().getStepActions().get(0))).getMessageType(), MessageType.LOG);
 	}
 	
 	@Test(groups={"ut"})
 	public void testLogScreenshotOk() {
-		TestLogging.setCurrentRootTestStep(new TestStep("step", null));
+		TestLogging.setCurrentRootTestStep(new TestStep("step", null, new ArrayList<>()));
 		TestLogging.logScreenshot(new ScreenShot());
 		Assert.assertEquals(TestLogging.getParentTestStep().getSnapshots().size(), 1);
 	}
 	
 	@Test(groups={"ut"})
 	public void testLogTestStep() {
-		TestStep testStep = new TestStep("step", null);
+		TestStep testStep = new TestStep("step", null, new ArrayList<>());
 		ITestResult testResult = new TestResult();
 		
 		TestLogging.setCurrentTestResult(testResult);

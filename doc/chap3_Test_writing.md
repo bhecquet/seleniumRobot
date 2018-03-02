@@ -189,6 +189,8 @@ You may consider putting all test data access in the Test script, not in page ob
 				._arrivee();
 	}
 	
+Test data are get using `param(<key>)` or updated via `createOrUpdateParam(<key>, <value>)`. The later is only available when seleniumRobot server is used.
+	
 **WARN** DO NOT try to access test data inside a `@BeforeXXX` method, they are not available. Only parameters defined in XML or as user parameters are available. At this stage, `env.ini` file or variable server have not been read.
 
 #### Using TestNG annotations ####
@@ -216,8 +218,23 @@ Only at start of test method, the context is completed with test data coming fro
 
 `@BeforeMethod` annotated methods MUST declare a `java.lang.reflect.Method` argument as first parameter to be usable (this is automatically injected by TestNG). Else, a ScenarioException is raised.
  
-##### Test parameters #####
+#### masking password ####
 
+Most of tests needs to write password to application to authenticate, open some view, ...
+By default, reports produced by SeleniumRobot display all actions, steps containing method calls with arguments. Then all password may be visible to anyone.
+To avoid this potential security risk, name your method arguments containing a password with one of this 3 ways: `password`, `pwd`, `passwd`.
+Any argument name containing one of these words will be masked.
+e.g: `myPassWordLong` will also be masked as containing `password`
+
+	Step _setPassword with args: (myPass, )
+	sendKeys on TextFieldElement Text, by={By.id: text2} with args: (true, true, [myPass,])
+	
+becomes
+
+	Step _setPassword with args: (******, )
+	sendKeys on TextFieldElement Text, by={By.id: text2} with args: (true, true, [******,])
+	
+because method `_setPassword` signature is `public DriverTestPage _setPassword(String passWordShort) {`T
 
 #### TestNG file ####
 For tests extending SeleniumTestPlan, the testNg XML looks like (minimal requirements):
