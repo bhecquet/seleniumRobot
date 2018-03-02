@@ -2,6 +2,7 @@ package com.seleniumtests.reporter.logger;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -18,7 +19,7 @@ public class Snapshot extends TestAction {
 	public static final String OUTPUT_PATTERN = "Output: ";
 
 	public Snapshot(final ScreenShot screenshot) {
-		super(screenshot.getImagePath(), false);
+		super(screenshot.getImagePath(), false, new ArrayList<>());
 		this.screenshot = screenshot;
 	}
 	

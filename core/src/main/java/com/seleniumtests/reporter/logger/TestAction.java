@@ -16,6 +16,8 @@
  */
 package com.seleniumtests.reporter.logger;
 
+import java.util.List;
+
 import org.json.JSONObject;
 
 
@@ -28,14 +30,30 @@ public class TestAction {
 	protected String name;
 	protected Boolean failed;
 	protected Throwable actionException;
+	protected List<String> pwdToReplace;
 	
-	public TestAction(String name, Boolean failed) {
+	/**
+	 * 
+	 * @param name			action name
+	 * @param failed		true if this action is failed
+	 * @param pwdToReplace	list of string to replace when returning actions so that passwords are masked
+	 */
+	public TestAction(String name, Boolean failed, List<String> pwdToReplace) {
 		this.name = name;
 		this.failed = failed;
+		this.pwdToReplace = pwdToReplace;
 	}
 
+	/**
+	 * Get the name of the action, replacing passwords
+	 * @return
+	 */
 	public String getName() {
-		return name;
+		String newName = name;
+		for (String pwd: pwdToReplace) {
+			newName = newName.replace(pwd, "******");
+		}
+		return newName;
 	}
 
 	public Boolean getFailed() {
@@ -56,7 +74,7 @@ public class TestAction {
 	
 	@Override
 	public String toString() {
-		return name;
+		return getName();
 	}
 	
 	public JSONObject toJson() {

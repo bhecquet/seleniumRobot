@@ -1,5 +1,7 @@
 package com.seleniumtests.core;
 
+import java.util.ArrayList;
+
 import org.apache.log4j.Logger;
 
 import com.seleniumtests.connectors.selenium.SeleniumGridConnector;
@@ -101,7 +103,7 @@ public class TestTasks {
     	}
     	
     	if (stepName != null) {
-	    	TestStep step = new TestStep(stepName, TestLogging.getCurrentTestResult());
+	    	TestStep step = new TestStep(stepName, TestLogging.getCurrentTestResult(), new ArrayList<>());
 	    	TestLogging.setCurrentRootTestStep(step);
 	    	capturePageSnapshot();
     	}

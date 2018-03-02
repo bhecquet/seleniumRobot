@@ -19,6 +19,7 @@ package com.seleniumtests.it.stubclasses;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 
 import org.apache.commons.io.FileUtils;
 import org.openqa.selenium.WebDriverException;
@@ -62,9 +63,9 @@ public class StubTestClass extends StubParentClass {
 	@Test(groups="stub", description="a test with steps")
 	public void testAndSubActions() throws IOException {
 		System.out.println(SeleniumTestsContextManager.getThreadContext().getCustomSummaryReports());
-		TestStep step1 = new TestStep("step 1", TestLogging.getCurrentTestResult());
-		step1.addAction(new TestAction("click button", false));
-		step1.addAction(new TestAction("sendKeys to text field", true));
+		TestStep step1 = new TestStep("step 1", TestLogging.getCurrentTestResult(), new ArrayList<>());
+		step1.addAction(new TestAction("click button", false, new ArrayList<>()));
+		step1.addAction(new TestAction("sendKeys to text field", true, new ArrayList<>()));
 		
 		ScreenShot screenshot = new ScreenShot();
 		File tmpImg = File.createTempFile("img_with_very_very_very_long_name_to_be_shortened", ".png");
@@ -74,14 +75,14 @@ public class StubTestClass extends StubParentClass {
 		
 		step1.addSnapshot(new Snapshot(screenshot), 1);
 		step1.setActionException(new WebDriverException("driver exception"));
-		TestStep subStep1 = new TestStep("step 1.3: open page", TestLogging.getCurrentTestResult());
-		subStep1.addAction(new TestAction("click link", false));
+		TestStep subStep1 = new TestStep("step 1.3: open page", TestLogging.getCurrentTestResult(), new ArrayList<>());
+		subStep1.addAction(new TestAction("click link", false, new ArrayList<>()));
 		subStep1.addMessage(new TestMessage("a message", MessageType.LOG));
-		subStep1.addAction(new TestAction("sendKeys to password field", false));
+		subStep1.addAction(new TestAction("sendKeys to password field", false, new ArrayList<>()));
 		step1.addAction(subStep1);
 		WaitHelper.waitForSeconds(3);
 		step1.setDuration(1230L);
-		TestStep step2 = new TestStep("step 2", TestLogging.getCurrentTestResult());
+		TestStep step2 = new TestStep("step 2", TestLogging.getCurrentTestResult(), new ArrayList<>());
 		step2.setDuration(14030L);
 		TestLogging.logTestStep(step1);
 		TestLogging.logTestStep(step2);
@@ -89,9 +90,9 @@ public class StubTestClass extends StubParentClass {
 	
 	@Test(groups="stub")
 	public void testInError() {
-		TestStep step1 = new TestStep("step 1", TestLogging.getCurrentTestResult());
+		TestStep step1 = new TestStep("step 1", TestLogging.getCurrentTestResult(), new ArrayList<>());
 		TestLogging.setCurrentRootTestStep(step1);
-		TestLogging.getParentTestStep().addAction(new TestAction("click button", false));
+		TestLogging.getParentTestStep().addAction(new TestAction("click button", false, new ArrayList<>()));
 		TestLogging.getParentTestStep().addMessage(new TestMessage("click ok", MessageType.INFO));
 		TestLogging.warning("Some warning message");
 		TestLogging.info("Some Info message");
@@ -99,7 +100,7 @@ public class StubTestClass extends StubParentClass {
 		TestLogging.log("Some log message");
 		TestLogging.logTestValue("key", "we found a value of", "10");
 		
-		TestLogging.getParentTestStep().addAction(new TestAction("send keyboard action", false));
+		TestLogging.getParentTestStep().addAction(new TestAction("send keyboard action", false, new ArrayList<>()));
 		TestLogging.logTestStep(TestLogging.getCurrentRootTestStep());
 		Assert.fail("error");
 	}
@@ -107,9 +108,9 @@ public class StubTestClass extends StubParentClass {
 	@Test(groups="stub")
 	public void testWithException() {
 		count++;
-		TestStep step1 = new TestStep("step 1", TestLogging.getCurrentTestResult());
-		step1.addAction(new TestAction(String.format("played %d times", count), false));
-		step1.addAction(new TestAction("click button", false));
+		TestStep step1 = new TestStep("step 1", TestLogging.getCurrentTestResult(), new ArrayList<>());
+		step1.addAction(new TestAction(String.format("played %d times", count), false, new ArrayList<>()));
+		step1.addAction(new TestAction("click button", false, new ArrayList<>()));
 		TestLogging.logTestStep(step1);
 		throw new DriverExceptions("some exception");
 	}

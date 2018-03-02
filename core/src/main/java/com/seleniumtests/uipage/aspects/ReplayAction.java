@@ -16,6 +16,9 @@
  */
 package com.seleniumtests.uipage.aspects;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -77,8 +80,9 @@ public class ReplayAction {
 		TestAction currentAction = null;
     	String methodName = joinPoint.getSignature().getName();
     	if (methodName != "getCoordinates") {
-    		String actionName = String.format("%s on %s %s", methodName, targetName, LogAction.buildArgString(joinPoint));
-    		currentAction = new TestAction(actionName, false);
+    		List<String> pwdToReplace = new ArrayList<>();
+    		String actionName = String.format("%s on %s %s", methodName, targetName, LogAction.buildArgString(joinPoint, pwdToReplace));
+    		currentAction = new TestAction(actionName, false, pwdToReplace);
     	}
 
 		// log action before its started. By default, it's OK. Then result may be overwritten if step fails
@@ -158,8 +162,9 @@ public class ReplayAction {
 
 		if (joinPoint.getTarget() instanceof PictureElement) {
 	    	String methodName = joinPoint.getSignature().getName();
-			String actionName = String.format("%s on %s %s", methodName, targetName, LogAction.buildArgString(joinPoint));
-			currentAction = new TestAction(actionName, false);
+	    	List<String> pwdToReplace = new ArrayList<>();
+			String actionName = String.format("%s on %s %s", methodName, targetName, LogAction.buildArgString(joinPoint, pwdToReplace));
+			currentAction = new TestAction(actionName, false, pwdToReplace);
 	
 			// log action before its started. By default, it's OK. Then result may be overwritten if step fails
 			// order of steps is the right one (first called is first displayed)

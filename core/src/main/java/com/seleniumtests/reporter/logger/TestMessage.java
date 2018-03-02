@@ -16,6 +16,8 @@
  */
 package com.seleniumtests.reporter.logger;
 
+import java.util.ArrayList;
+
 import org.json.JSONObject;
 
 public class TestMessage extends TestAction {
@@ -31,7 +33,7 @@ public class TestMessage extends TestAction {
 	}
 	
 	public TestMessage(String name, MessageType type) {
-		super(name, type == MessageType.ERROR ? true: false);
+		super(name, type == MessageType.ERROR ? true: false, new ArrayList<>());
 		messageType = type;
 	}
 
