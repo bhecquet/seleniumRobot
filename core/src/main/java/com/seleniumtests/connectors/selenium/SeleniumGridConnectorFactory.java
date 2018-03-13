@@ -1,17 +1,10 @@
 package com.seleniumtests.connectors.selenium;
 
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import org.apache.commons.io.IOUtils;
-import org.apache.http.HttpHost;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.utils.URIBuilder;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
 import org.apache.log4j.Logger;
+import org.openqa.selenium.support.ui.SystemClock;
 
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
@@ -27,6 +20,8 @@ import com.seleniumtests.util.logging.SeleniumRobotLogger;
 public class SeleniumGridConnectorFactory {
 	
 	private static ThreadLocal<SeleniumGridConnector> seleniumGridConnector = new ThreadLocal<>();
+	public static final int DEFAULT_RETRY_TIMEOUT = 60; // timeout in seconds
+	private static int retryTimeout = DEFAULT_RETRY_TIMEOUT;
 	
 	protected static final Logger logger = SeleniumRobotLogger.getLogger(SeleniumGridConnector.class);
 	
@@ -51,21 +46,41 @@ public class SeleniumGridConnectorFactory {
 		} catch (MalformedURLException e1) {
 			throw new ConfigurationException(String.format("Hub url '%s' is invalid: %s", url, e1.getMessage()));
 		}
+		SystemClock clock = new SystemClock();
+		long end = clock.laterBy(retryTimeout * 1000L);
+		Exception currentException = null;
 		
-		try {
-			HttpResponse<String> response = Unirest.get(String.format("http://%s:%s%s", hubUrl.getHost(), hubUrl.getPort(), GUI_SERVLET)).asString();
-			if (response.getStatus() == 200) {
-				if (response.getBody().contains("default monitoring page")) {
-        			seleniumGridConnector.set(new SeleniumGridConnector(url));
-        		} else {
-        			seleniumGridConnector.set(new SeleniumRobotGridConnector(url));
-        		}
-        		return seleniumGridConnector.get();
-        	} else {
-        		throw new ConfigurationException("Cannot connect to the grid hub at " + url);
-        	}
-		} catch (Exception ex) {
-        	throw new ConfigurationException("Cannot connect to the grid hub at " + url, ex);
+		while (clock.isNowBefore(end)) {
+			try {
+				HttpResponse<String> response = Unirest.get(String.format("http://%s:%s%s", hubUrl.getHost(), hubUrl.getPort(), GUI_SERVLET)).asString();
+				if (response.getStatus() == 200) {
+					if (response.getBody().contains("default monitoring page")) {
+	        			seleniumGridConnector.set(new SeleniumGridConnector(url));
+	        		} else {
+	        			seleniumGridConnector.set(new SeleniumRobotGridConnector(url));
+	        		}
+	        		return seleniumGridConnector.get();
+	        	} else {
+	        		throw new ConfigurationException("Cannot connect to the grid hub at " + url);
+	        	}
+			} catch (Exception ex) {
+				currentException = ex;
+				continue;
+			}
 		}
+
+    	throw new ConfigurationException("Cannot connect to the grid hub at " + url, currentException);
+	}
+
+	public static int getRetryTimeout() {
+		return retryTimeout;
+	}
+
+	/**
+	 * set retry timeout in seconds
+	 * @param retryTimeout
+	 */
+	public static void setRetryTimeout(int retryTimeout) {
+		SeleniumGridConnectorFactory.retryTimeout = retryTimeout;
 	}
 }

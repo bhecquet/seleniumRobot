@@ -661,8 +661,6 @@ public class SeleniumTestsContext {
     	
     	// to do before creating connectors because seleniumRobot server needs it
         setTestName(testName);
-    	
-    	createContextConnectors();
 
         updateTestAndMobile(getPlatform());
         
@@ -677,6 +675,8 @@ public class SeleniumTestsContext {
                 PluginsHelper.getInstance().loadPlugins(configFile);
             }
         }
+
+    	createContextConnectors();
     	
         // read and set test configuration from env.ini file and from seleniumRobot server
     	setTestConfiguration();

@@ -441,8 +441,12 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 			}
 			velocityContext.put(APPLICATION, "");
 			
+			if (testType == null) {
+				velocityContext.put(APPLICATION_TYPE, "Error in initialization");
+		
+			
 			// Log URL for web test and app info for app test
-			if (testType.family().equals(TestType.WEB)) {
+			} else if (testType.family().equals(TestType.WEB)) {
 				velocityContext.put(APPLICATION_TYPE, "Browser :");
 				velocityContext.put(APPLICATION, browser);
 			} else if (testType.family().equals(TestType.APP)) {
