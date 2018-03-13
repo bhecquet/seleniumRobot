@@ -249,6 +249,9 @@
 		        				<include>com/seleniumtests/customexception/**</include>
 		        				<include>com/seleniumtests/uipage/**</include>
 		        			</includes>
+		        			<excludes>
+		        				<exclude>com/seleniumtests/uipage/aspects/**</exclude>
+		        			</excludes>
 		        		</configuration>
 		        	</execution>
 		        </executions>
