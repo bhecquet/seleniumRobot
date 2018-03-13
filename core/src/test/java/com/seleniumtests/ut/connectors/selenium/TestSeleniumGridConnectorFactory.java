@@ -4,6 +4,7 @@ package com.seleniumtests.ut.connectors.selenium;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -109,6 +110,7 @@ public class TestSeleniumGridConnectorFactory extends ConnectorsTest {
 	
 	/**
 	 * If any error occurs when getting servlet, throw an error, grid cannot be contacted
+	 * Check also that we retry connection during N seconds (defined by retryTimeout)
 	 * @throws UnsupportedOperationException
 	 * @throws IOException
 	 * @throws UnirestException 
@@ -118,6 +120,17 @@ public class TestSeleniumGridConnectorFactory extends ConnectorsTest {
 		
 		when(Unirest.get(SERVER_URL + SeleniumGridConnectorFactory.GUI_SERVLET)).thenThrow(UnirestException.class);
 
-		SeleniumGridConnectorFactory.getInstance(SERVER_URL + "/wd/hub");
+		LocalDateTime start = LocalDateTime.now();
+		try {
+			SeleniumGridConnectorFactory.setRetryTimeout(5);
+			SeleniumGridConnectorFactory.getInstance(SERVER_URL + "/wd/hub");
+		} catch (ConfigurationException e) {
+			
+			// check connection duration
+			Assert.assertTrue(LocalDateTime.now().minusSeconds(5).isAfter(start));
+			throw e;
+		} finally {
+			SeleniumGridConnectorFactory.setRetryTimeout(SeleniumGridConnectorFactory.DEFAULT_RETRY_TIMEOUT);
+		}
 	}
 }

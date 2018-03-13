@@ -19,21 +19,28 @@ package com.seleniumtests.browserfactory;
 import java.net.URL;
 
 import org.openqa.selenium.MutableCapabilities;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.LocalFileDetector;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.remote.UnreachableBrowserException;
+import org.openqa.selenium.support.ui.SystemClock;
 
 import com.seleniumtests.connectors.selenium.SeleniumGridConnector;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.ConfigurationException;
+import com.seleniumtests.customexception.SeleniumGridException;
 import com.seleniumtests.driver.DriverConfig;
 import com.seleniumtests.util.helper.WaitHelper;
 
 public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implements IWebDriverFactory {
 	
 	private SeleniumGridConnector gridConnector;
+	public static final int DEFAULT_RETRY_TIMEOUT = 1800; // timeout in seconds (wait 30 mins for connecting to grid)
+	private static int retryTimeout = DEFAULT_RETRY_TIMEOUT;
 
     public SeleniumGridDriverFactory(final DriverConfig cfg) {
         super(cfg);
@@ -124,14 +131,34 @@ public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implemen
         return driver;
     }
     
+    /**
+     * Connect to grid using RemoteWebDriver
+     * @param url
+     * @param capability
+     * @return
+     */
     private WebDriver getDriver(URL url, MutableCapabilities capability){
     	driver = null;
-    	try {
-            driver = new RemoteWebDriver(url, capability);
-        } catch (RuntimeException e) {
-                WaitHelper.waitForSeconds(5);
-            driver = new RemoteWebDriver(url, capability);
-        }
+    	
+    	SystemClock clock = new SystemClock();
+		long end = clock.laterBy(retryTimeout * 1000L);
+		Exception currentException = null;
+    	
+		while (clock.isNowBefore(end)) {
+			try {
+				driver = new RemoteWebDriver(url, capability);
+				break;
+			} catch (WebDriverException e) {
+				logger.warn("Error creating driver, retrying: " + e.getMessage());
+				currentException = e;
+				continue;
+			}
+		}
+		
+		if (driver == null) {
+			throw new SeleniumGridException("Cannot create driver on grid, it may be fully used", currentException);
+		}
+    	
     	return driver;
     }
     
