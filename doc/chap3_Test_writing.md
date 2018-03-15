@@ -141,6 +141,12 @@ Additional search using the `ByC` class are
 - search by first visible element: `new HtmlElement("", By.className("otherClass"), HtmlElement.FIRST_VISIBLE).getText()`
 - search in reverse order (get the last element): `new TextFieldElement("", By.className("someClass"), -1);` get the last element on the list
 
+When an element needs to be searched by several criteria to be uniquely identified, you can use the Selenium feature of chaining `By`. <br/>
+E.g: `driver.findElement(By.tagName("h1").className("cls2"))` or  `new HtmlElement("", By.tagName("h1").className("cls2"))`
+
+In case search is done with a ByC instance, this MUST be the placed first<br/>
+E.g: `new HtmlElement("", ByC.attribute("attr", "attribute").className("cls2"))`
+
 #### Add user defined test steps ####
 
 By default, framework creates automatically test steps based on method calls. Every PageObject method called from a Test class is a step (for e.g)
