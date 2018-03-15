@@ -372,6 +372,16 @@ Each webpage can use the configurations defined above using (getting variable `t
 
 ![](images/get_param_example.png)
 
+#### Order of use ####
+
+The business configuration are read in the following order (the last overwrites its predecessors)
+
+- suite parameter (from TestNG XML file)
+- test parameter (from TestNG XML file)
+- system property (user defined value by -D<key>=<value> on command line)
+- parameter defined in env.ini
+- parameter defined in seleniumrobot server (if used)
+
 ### 7 Test script configuration mapping ###
 #### Mapping files utility ####
 
