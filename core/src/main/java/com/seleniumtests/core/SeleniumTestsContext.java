@@ -213,8 +213,6 @@ public class SeleniumTestsContext {
     // Data object to store all context data
     private Map<String, Object> contextDataMap = Collections.synchronizedMap(new HashMap<String, Object>());
     
-    // store all parameters present in XML file which are not technical parameters (not defined in the above list of fields)
-    private Map<String, TestVariable> testVariables = Collections.synchronizedMap(new HashMap<String, TestVariable>());
 
     private ITestContext testNGContext = null;
     private SeleniumRobotVariableServerConnector variableServer;
@@ -234,7 +232,6 @@ public class SeleniumTestsContext {
      */
     public SeleniumTestsContext(SeleniumTestsContext toCopy) {
     	contextDataMap = new HashMap<>(toCopy.contextDataMap); 
-    	testVariables = new HashMap<>(toCopy.testVariables);
     	testNGContext = toCopy.testNGContext;
     }
     
@@ -244,6 +241,8 @@ public class SeleniumTestsContext {
     }
     
     private void buildContextFromConfig() {
+    	setConfiguration(new HashMap<>());
+    	
         setSeleniumRobotServerUrl(getValueForTest(SELENIUMROBOTSERVER_URL, System.getProperty(SELENIUMROBOTSERVER_URL)));
         setSeleniumRobotServerActive(getBoolValueForTest(SELENIUMROBOTSERVER_ACTIVE, System.getProperty(SELENIUMROBOTSERVER_ACTIVE)));
         setSeleniumRobotServerCompareSnapshot(getBoolValueForTest(SELENIUMROBOTSERVER_COMPARE_SNAPSHOT, System.getProperty(SELENIUMROBOTSERVER_COMPARE_SNAPSHOT)));
@@ -335,8 +334,8 @@ public class SeleniumTestsContext {
         	setOutputDirectory(getValueForTest(OUTPUT_DIRECTORY, System.getProperty(OUTPUT_DIRECTORY)), testNGContext);
 
             // parse other parameters that are defined in testng xml or as user parameters but not defined
-            // in this context
-            addUserDefinedParameters();
+            // in this context. Called here so that user defined parameters can be accessed inside @Before / @After annotated methods
+            setTestConfiguration();
         }
     }
     
@@ -529,17 +528,21 @@ public class SeleniumTestsContext {
 	    }
 	    return props;
     }
-
+    
     /**
-     * Add to contextMap, parameters defined in testng file, which are not known as technical parameters
-     * For example, it's possible to add <parameter name="aNewParam" value="aValue" /> in context because it's unknown from 
-     * constructor. Whereas <parameter name=browser value="*opera" /> will not be overriden as it's already known
-     * 
-     * Also add command line JVM arguments so that they are also available as test configuration
-     * @param context
+     * Returns list of variables defined by user from command line
+     * @return
      */
-    private void addUserDefinedParameters() {
-        if (testNGContext != null) {
+    private Map<String, TestVariable> getUserDefinedVariablesFromCommandLine() {
+    	return extractCustomVariables(getCommandLineProperties());
+    }
+    
+    /**
+     * Returns list of variables defined by user from TestNG XML file
+     * @return
+     */
+    private Map<String, TestVariable> getUserDefinedVariablesFromXMLFile() {
+    	if (testNGContext != null) {
         	Map<String, String> testParameters;
         	if (testNGContext.getCurrentXmlTest() == null) {
         		testParameters = testNGContext.getSuite().getXmlSuite().getParameters();
@@ -547,30 +550,29 @@ public class SeleniumTestsContext {
         		testParameters = testNGContext.getCurrentXmlTest().getAllParameters();
         	}
 
-            addUserDefinedParametersToContext(testParameters);
+            return extractCustomVariables(testParameters);
         }
-        
-        // add command line paramters to testVariables
-        addUserDefinedParametersToContext(getCommandLineProperties());
+    	return new HashMap<>();
     }
     
     /**
-     * add parameters to contextDataMap and user defined testVariables
+     * from a list of variables, extract those who are variables created by user (not seleniumRobot technical variables)
      * If parameter is already known in contextDataMap (technical parameters defined in this class), it's not added 
      * @param parameters
      */
-    private void addUserDefinedParametersToContext(Map<String, String> parameters) {
+    private Map<String, TestVariable> extractCustomVariables(Map<String, String> parameters) {
+    	Map<String, TestVariable> variables = new HashMap<>();
+    	
     	for (Entry<String, String> entry : parameters.entrySet()) {
             String attributeName = entry.getKey();
 
             // contextDataMap already contains all technical parameters
             if (!contextDataMap.containsKey(entry.getKey())) {
-                String sysPropertyValue = System.getProperty(entry.getKey());
-                String suiteValue = entry.getValue();
-                setContextAttribute(attributeName, sysPropertyValue, suiteValue, null);
-                testVariables.put(attributeName, new TestVariable(attributeName, getAttribute(attributeName).toString()));
+                variables.put(attributeName, new TestVariable(attributeName, entry.getValue()));
             }
         }
+    	
+    	return variables;
     }
 
     /**
@@ -628,16 +630,6 @@ public class SeleniumTestsContext {
     	String value = getValueForTest(attributeName, sysPropertyValue);
     	return value == null ? null: Boolean.parseBoolean(value);
     }
-
-    private void setContextAttribute(final String attributeName, final String sysPropertyValue, 
-    									final String suiteValue, final String defaultValue) {
-
-        contextDataMap.put(attributeName,
-            sysPropertyValue != null ? sysPropertyValue : (suiteValue != null ? suiteValue : defaultValue));
-
-    }
-
-    
    
     /**
      * Connect all servers (grid, seleniumRobot server) to this context
@@ -724,25 +716,27 @@ public class SeleniumTestsContext {
     }
     
     /**
-     * Get all variables from server if it has been activated
-     */
-    private void updateTestConfigurationFromVariableServer() {
-    	
-    	if (variableServer != null) {
-			getConfiguration().putAll(variableServer.getVariables());
-    	}
-    }
-    
-    /**
      * Read configuration from environment specific data and undefined parameters present un testng xml file
-     * these configurations will be overident by server if it's present
+     * these configurations will be overiden by server if it's present
      */
 	public void setTestConfiguration() {
-    	Map<String, TestVariable> envConfig = new ConfigReader().readConfig();
-    	envConfig.putAll(testVariables);
-    	setConfiguration(envConfig);
+		
+		// get variables from XML
+    	getConfiguration().putAll(getUserDefinedVariablesFromXMLFile());
+		
+		// get variables from env.ini
+    	getConfiguration().putAll(new ConfigReader(getTestEnv(), getLoadIni()).readConfig());
     	
-    	updateTestConfigurationFromVariableServer();
+    	// get variables from command line
+    	getConfiguration().putAll(getUserDefinedVariablesFromCommandLine());
+    	
+    	if (variableServer != null) {
+    		// get variable from server
+			getConfiguration().putAll(variableServer.getVariables());
+			
+			// give priority to command line parameters over those from server, so overwrite variable server if overlapping
+			getConfiguration().putAll(getUserDefinedVariablesFromCommandLine());
+    	}
     }
 	
 	public TestManager initTestManager() {

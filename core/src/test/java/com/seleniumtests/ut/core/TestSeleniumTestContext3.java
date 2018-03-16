@@ -19,6 +19,9 @@ package com.seleniumtests.ut.core;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.mockito.Mock;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -33,6 +36,7 @@ import com.seleniumtests.connectors.selenium.SeleniumGridConnectorFactory;
 import com.seleniumtests.connectors.selenium.SeleniumRobotVariableServerConnector;
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.core.TestVariable;
 import com.seleniumtests.customexception.ConfigurationException;
 
 /**
@@ -209,6 +213,38 @@ public class TestSeleniumTestContext3 extends MockitoTest {
 			
 		} finally {
 			System.clearProperty(SeleniumTestsContext.RUN_MODE);
+		}
+	}
+	
+	
+	/**
+	 * If parameter is defined in variable server and as JVM parameter (user defined), the user defined parameter must be used
+	 * @throws Exception 
+	 */
+	@Test(groups={"ut"})
+	public void testUserDefinedParamOverridesVariableServer(final ITestContext testNGCtx, final XmlTest xmlTest) throws Exception {
+		
+		Map<String, TestVariable> variables = new HashMap<>();
+		variables.put("key1", new TestVariable("key1", "val1"));
+		
+		try {
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE, "true");
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL, "http://localhost:1234");
+			
+			PowerMockito.whenNew(SeleniumRobotVariableServerConnector.class).withAnyArguments().thenReturn(variableServer);
+			when(variableServer.isAlive()).thenReturn(true);
+			when(variableServer.getVariables()).thenReturn(variables);
+			System.setProperty("key1", "userValue");
+			
+			initThreadContext(testNGCtx, "myTest");
+			
+			SeleniumTestsContext seleniumTestsCtx = SeleniumTestsContextManager.getThreadContext();
+			Assert.assertEquals(seleniumTestsCtx.getConfiguration().get("key1").getValue(), "userValue");
+			
+		} finally {
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE);
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL);
+			System.clearProperty("key1");
 		}
 	}
 	

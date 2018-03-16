@@ -18,6 +18,7 @@ package com.seleniumtests.ut.core;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 
 import org.json.JSONObject;
@@ -63,7 +64,7 @@ public class TestSeleniumTestContext extends GenericTest {
 	public void testMultipleTestShareSameParam(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContext seleniumTestsCtx = SeleniumTestsContextManager.getThreadContext();
-		Assert.assertEquals(seleniumTestsCtx.getAttribute("variable1"), "value1");	
+		Assert.assertEquals(seleniumTestsCtx.getConfiguration().get("variable1").getValue(), "value1");	
 	}
 	
 	/**
@@ -85,7 +86,7 @@ public class TestSeleniumTestContext extends GenericTest {
 	public void testTestLevelParam2(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContext seleniumTestsCtx = SeleniumTestsContextManager.getThreadContext();
-		Assert.assertEquals(seleniumTestsCtx.getAttribute("variable1"), "value1");
+		Assert.assertEquals(seleniumTestsCtx.getConfiguration().get("variable1").getValue(), "value1");
 	}
 	
 	/**
@@ -104,13 +105,28 @@ public class TestSeleniumTestContext extends GenericTest {
 	}
 	
 	/**
+	 * If parameter is defined in env.ini and as JVM parameter (user defined), the user defined parameter must be used
+	 */
+	@Test(groups={"ut context"})
+	public void testUserDefinedParamOverridesEnvIni(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		try {
+			System.setProperty("key1", "userValue");
+			initThreadContext(testNGCtx);
+			SeleniumTestsContext seleniumTestsCtx = SeleniumTestsContextManager.getThreadContext();
+			Assert.assertEquals(seleniumTestsCtx.getConfiguration().get("key1").getValue(), "userValue");
+		} finally {
+			System.clearProperty("key1");
+		}
+	}
+	
+	/**
 	 * Check that unknown parameters are also stored in contextMap
 	 */
 	@Test(groups={"ut context"})
 	public void testUndefinedParam(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContext seleniumTestsCtx = SeleniumTestsContextManager.getThreadContext();
-		Assert.assertEquals(seleniumTestsCtx.getAttribute("aParam"), "value1");
+		Assert.assertEquals(seleniumTestsCtx.getConfiguration().get("aParam").getValue(), "value1");
 	}
 	
 	/**
@@ -120,7 +136,7 @@ public class TestSeleniumTestContext extends GenericTest {
 	public void testUndefinedParamOverride(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContext seleniumTestsCtx = SeleniumTestsContextManager.getThreadContext();
-		Assert.assertEquals(seleniumTestsCtx.getAttribute("anOtherParam"), "value3");
+		Assert.assertEquals(seleniumTestsCtx.getConfiguration().get("anOtherParam").getValue(), "value3");
 	}
 	
 	/**
@@ -133,7 +149,6 @@ public class TestSeleniumTestContext extends GenericTest {
 			initThreadContext(testNGCtx);
 			SeleniumTestsContext seleniumTestsCtx = SeleniumTestsContextManager.getThreadContext();
 			Assert.assertEquals(seleniumTestsCtx.getConfiguration().get("myUserDefinedKey").getValue(), "myUserDefinedValue");
-			Assert.assertEquals(seleniumTestsCtx.getAttribute("myUserDefinedKey"), "myUserDefinedValue");
 			
 		} finally {
 			System.clearProperty("myUserDefinedKey");
@@ -856,6 +871,7 @@ public class TestSeleniumTestContext extends GenericTest {
 	public void testProxyPreset(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		SeleniumTestsContextManager.generateApplicationPath(testNGCtx.getCurrentXmlTest().getSuite());
 		SeleniumTestsContext seleniumContext = new SeleniumTestsContext();
+		seleniumContext.setConfiguration(new HashMap<>());
 		seleniumContext.setTestConfiguration();
 		seleniumContext.updateProxyConfig();
 		Assert.assertEquals(seleniumContext.getWebProxyType(), ProxyType.DIRECT);

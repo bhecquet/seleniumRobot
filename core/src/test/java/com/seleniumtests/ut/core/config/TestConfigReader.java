@@ -35,13 +35,13 @@ public class TestConfigReader extends GenericTest {
 
 	@Test(groups={"ut"})
 	public void readConfigurationWithValueOverride() {
-		Map<String, TestVariable> config = new ConfigReader().readConfig(Thread.currentThread().getContextClassLoader().getResourceAsStream("tu/env.ini"), "DEV");
+		Map<String, TestVariable> config = new ConfigReader("DEV", null).readConfig(Thread.currentThread().getContextClassLoader().getResourceAsStream("tu/env.ini"));
 		Assert.assertEquals(config.get("key1").getValue(), "value4", "Key override does not work");
 	}
 	
 	@Test(groups={"ut"})
 	public void readConfigurationWithoutValueOverride() {
-		Map<String, TestVariable> config = new ConfigReader().readConfig(Thread.currentThread().getContextClassLoader().getResourceAsStream("tu/env.ini"), "VNR");
+		Map<String, TestVariable> config = new ConfigReader("VNR", null).readConfig(Thread.currentThread().getContextClassLoader().getResourceAsStream("tu/env.ini"));
 		Assert.assertEquals(config.get("key1").getValue(), "value1", "Key should not be overriden");
 	}
 	

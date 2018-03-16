@@ -43,6 +43,19 @@ public class ConfigReader {
 	private static final Logger logger = SeleniumRobotLogger.getLogger(ConfigReader.class);
 	private static File configFile;
 	
+	private String testEnv;
+	private String iniFiles;
+	
+	/**
+	 * Creates a config reader
+	 * @param environment	the test environment to use to read data from file
+	 * @param iniFileList	comma separated list of file names to read after env.ini file
+	 */
+	public ConfigReader(String environment, String iniFileList) {
+		testEnv = environment;
+		iniFiles = iniFileList;
+	}
+	
 	/**
 	 * Get config file path
 	 * In case SeleniumTestsContextManager.generateApplicationPath has not already been called, return null as configFile won't be 
@@ -70,7 +83,7 @@ public class ConfigReader {
 	}
 
 	public Map<String, TestVariable> readConfig(InputStream iniFileStream) {
-		return readConfig(iniFileStream, SeleniumTestsContextManager.getThreadContext().getTestEnv());
+		return readConfig(iniFileStream, testEnv);
 	}
 	
 	/**
@@ -81,7 +94,7 @@ public class ConfigReader {
 	public Map<String, TestVariable> readConfig() {
 		Map<String, TestVariable> variables = new HashMap<>();
 		try (InputStream iniFileStream = FileUtils.openInputStream(getConfigFile());){
-			variables.putAll(readConfig(iniFileStream, SeleniumTestsContextManager.getThreadContext().getTestEnv()));
+			variables.putAll(readConfig(iniFileStream, testEnv));
 		} catch (NullPointerException e) {
 			logger.warn("config file is null, check config path has been set using 'SeleniumTestsContextManager.generateApplicationPath()'");
 			return variables;
@@ -91,14 +104,14 @@ public class ConfigReader {
 		}
 		
 		// read additional files
-		if (SeleniumTestsContextManager.getThreadContext().getLoadIni() != null) {
-			for (String fileName: SeleniumTestsContextManager.getThreadContext().getLoadIni().split(",")) {
+		if (iniFiles != null) {
+			for (String fileName: iniFiles.split(",")) {
 				fileName = fileName.trim();
 				File currentConfFile = Paths.get(SeleniumTestsContextManager.getConfigPath(), fileName).toFile();
 				logger.info("reading file " + currentConfFile.getAbsolutePath());
 				
 				try (InputStream iniFileStream = FileUtils.openInputStream(currentConfFile);) {
-					variables.putAll(readConfig(iniFileStream, SeleniumTestsContextManager.getThreadContext().getTestEnv()));
+					variables.putAll(readConfig(iniFileStream, testEnv));
 				} catch (IOException e) {
 					throw new ConfigurationException(String.format("File %s does not exist in data/<app>/config folder", fileName));
 				}
