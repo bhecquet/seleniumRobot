@@ -71,6 +71,7 @@ public class SeleniumTestsContext {
     public static final String PAGE_LOAD_TIME_OUT = "pageLoadTimeout";			// temps d'attente de chargement d'une page
     public static final String WEB_DRIVER_GRID = "webDriverGrid";				// adresse du serveur seleniumGrid
     public static final String RUN_MODE = "runMode";							// local ou grid. Pourrait également contenir sauceLabs / testDroid
+    public static final String MASK_PASSWORD = "maskPassword";					// whether seleniumRobot should hide passwords or not
     public static final String MANUAL_TEST_STEPS = "manualTestSteps";			// set test steps manual (default is false) for creating them inside tests
     public static final String DEV_MODE = "devMode";							// The development mode allow all existing browsers to remain. It is set to "false" by default, which means it closes all existing browsers.
     public static final String BROWSER = "browser";								// navigateur utilisé. Sur Android, le navigateur par défaut est "Browser"
@@ -189,6 +190,7 @@ public class SeleniumTestsContext {
 	public static final String DEFAULT_BROWSER = "none";
 	public static final boolean DEFAULT_MANUAL_TEST_STEPS = false;
 	public static final boolean DEFAULT_HEADLESS_BROWSER = false;
+	public static final boolean DEFAULT_MASK_PASSWORD = true;
 	public static final String DEFAULT_RUN_MODE = "LOCAL";
 	public static final boolean DEFAULT_OVERRIDE_SELENIUM_NATIVE_ACTION = false;
 	public static final boolean DEFAULT_SELENIUMROBOTSERVER_RECORD_RESULTS = false;
@@ -249,6 +251,7 @@ public class SeleniumTestsContext {
         setSeleniumRobotServerRecordResults(getBoolValueForTest(SELENIUMROBOTSERVER_RECORD_RESULTS, System.getProperty(SELENIUMROBOTSERVER_RECORD_RESULTS)));
         setWebDriverGrid(getValueForTest(WEB_DRIVER_GRID, System.getProperty(WEB_DRIVER_GRID)));
         setRunMode(getValueForTest(RUN_MODE, System.getProperty(RUN_MODE)));       
+        setMaskPassword(getBoolValueForTest(MASK_PASSWORD, System.getProperty(MASK_PASSWORD)));       
         setLoadIni(getValueForTest(LOAD_INI, System.getProperty(LOAD_INI)));
         setWebSessionTimeout(getIntValueForTest(WEB_SESSION_TIME_OUT, System.getProperty(WEB_SESSION_TIME_OUT)));
         setImplicitWaitTimeout(getIntValueForTest(IMPLICIT_WAIT_TIME_OUT, System.getProperty(IMPLICIT_WAIT_TIME_OUT)));
@@ -917,6 +920,10 @@ public class SeleniumTestsContext {
     	return (String) getAttribute(DEFAULT_OUTPUT_DIRECTORY);
     }
     
+	public Boolean getMaskedPassword() {
+		return (Boolean) getAttribute(MASK_PASSWORD);
+	}
+    
     public String getLoadIni() {
         return (String) getAttribute(LOAD_INI);
     }
@@ -1377,6 +1384,15 @@ public class SeleniumTestsContext {
     	String newRunMode = runMode == null ? DEFAULT_RUN_MODE: runMode;
         setAttribute(RUN_MODE, DriverMode.fromString(newRunMode));
 	}
+    
+
+    public void setMaskPassword(Boolean maskPassword) {
+    	if (maskPassword != null) {
+    		setAttribute(MASK_PASSWORD, maskPassword);
+    	} else {
+    		setAttribute(MASK_PASSWORD, DEFAULT_MASK_PASSWORD);
+    	}
+    }
     
     public void setDevMode(Boolean devMode) {
     	if (devMode != null) {
