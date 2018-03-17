@@ -365,6 +365,20 @@ public class TestSeleniumTestContext extends GenericTest {
 	}
 	
 	@Test(groups="ut context")
+	public void testMaskPassword(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setMaskPassword(false);
+		Assert.assertFalse(SeleniumTestsContextManager.getThreadContext().getMaskedPassword());
+	}
+	// by default, devMode is true if tests are launched from IDE
+	@Test(groups="ut context")
+	public void testMaskPasswordNull(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setMaskPassword(null);
+		Assert.assertTrue(SeleniumTestsContextManager.getThreadContext().getMaskedPassword());
+	}
+	
+	@Test(groups="ut context")
 	public void testDevMode(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setDevMode(true);

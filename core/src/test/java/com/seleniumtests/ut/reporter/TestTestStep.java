@@ -28,6 +28,7 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import com.seleniumtests.GenericTest;
+import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.driver.screenshots.ScreenShot;
 import com.seleniumtests.reporter.logger.Snapshot;
 import com.seleniumtests.reporter.logger.TestAction;
@@ -213,5 +214,25 @@ public class TestTestStep extends GenericTest {
 		Assert.assertEquals(action.getName(), "action in step1 with args: (foo, ******)");
 		Assert.assertEquals(message.getName(), "everything OK on ******");
 		Assert.assertEquals(substep.getName(), "substep with args: (******)");
+	}
+	
+	/**
+	 * Check that if a substep adds password values, parent step is not impacted
+	 */
+	@Test(groups={"ut"})
+	public void testNoPasswordMasking() {
+		SeleniumTestsContextManager.getThreadContext().setMaskPassword(false);
+		TestStep step = new TestStep("step1 with args: (bar, passwd)", null, new ArrayList<>());
+		TestStep substep = new TestStep("substep with args: (passwd)", null, Arrays.asList("passwd"));
+		TestAction action = new TestAction("action in step1 with args: (foo, passwd)", false, new ArrayList<>());
+		TestMessage message = new TestMessage("everything OK on passwd", MessageType.INFO);
+		step.addAction(substep);
+		substep.addAction(action);
+		substep.addMessage(message);
+		
+		Assert.assertEquals(step.getName(), "step1 with args: (bar, passwd)");
+		Assert.assertEquals(action.getName(), "action in step1 with args: (foo, passwd)");
+		Assert.assertEquals(message.getName(), "everything OK on passwd");
+		Assert.assertEquals(substep.getName(), "substep with args: (passwd)");
 	}
 }

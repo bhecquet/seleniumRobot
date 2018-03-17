@@ -20,6 +20,8 @@ import java.util.List;
 
 import org.json.JSONObject;
 
+import com.seleniumtests.core.SeleniumTestsContextManager;
+
 
 /**
  * This is an action made inside the test: click on an element, ...
@@ -50,8 +52,10 @@ public class TestAction {
 	 */
 	public String getName() {
 		String newName = name;
-		for (String pwd: pwdToReplace) {
-			newName = newName.replace(pwd, "******");
+		if (SeleniumTestsContextManager.getThreadContext().getMaskedPassword()) {
+			for (String pwd: pwdToReplace) {
+				newName = newName.replace(pwd, "******");
+			}
 		}
 		return newName;
 	}
