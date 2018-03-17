@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import org.apache.commons.io.FileUtils;
 import org.json.JSONObject;
@@ -217,7 +218,7 @@ public class TestTestStep extends GenericTest {
 	}
 	
 	/**
-	 * Check that if a substep adds password values, parent step is not impacted
+	 * check that when disabled, password masking does not change test step
 	 */
 	@Test(groups={"ut"})
 	public void testNoPasswordMasking() {
@@ -234,5 +235,42 @@ public class TestTestStep extends GenericTest {
 		Assert.assertEquals(action.getName(), "action in step1 with args: (foo, passwd)");
 		Assert.assertEquals(message.getName(), "everything OK on passwd");
 		Assert.assertEquals(substep.getName(), "substep with args: (passwd)");
+	}
+	
+
+	/**
+	 * Check that password masking does not work with empty strings
+	 */
+	@Test(groups={"ut"})
+	public void testPasswordMaskingWithEmptyPassword() {
+		List<String> toReplace = new ArrayList<>();
+		toReplace.add("");
+		TestStep step = new TestStep("step1 with args: (bar, to)", null, toReplace);
+
+		Assert.assertEquals(step.getName(), "step1 with args: (bar, to)");
+	}
+	
+	/**
+	 * Check that password masking does not work with strings shorter than 5 characters
+	 */
+	@Test(groups={"ut"})
+	public void testPasswordMaskingWithTooShortPassword() {
+		List<String> toReplace = new ArrayList<>();
+		toReplace.add("passw");
+		TestStep step = new TestStep("step1 with args: (bar, passw)", null, toReplace);
+		
+		Assert.assertEquals(step.getName(), "step1 with args: (bar, passw)");
+	}
+	
+	/**
+	 * Check that password masking does work with strings longer or equal to 5 characters
+	 */
+	@Test(groups={"ut"})
+	public void testPasswordMaskingWithLongerPassword() {
+		List<String> toReplace = new ArrayList<>();
+		toReplace.add("passwd");
+		TestStep step = new TestStep("step1 with args: (bar, passwd)", null, toReplace);
+		
+		Assert.assertEquals(step.getName(), "step1 with args: (bar, ******)");
 	}
 }

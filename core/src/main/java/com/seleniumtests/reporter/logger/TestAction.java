@@ -17,6 +17,7 @@
 package com.seleniumtests.reporter.logger;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.json.JSONObject;
 
@@ -38,12 +39,14 @@ public class TestAction {
 	 * 
 	 * @param name			action name
 	 * @param failed		true if this action is failed
-	 * @param pwdToReplace	list of string to replace when returning actions so that passwords are masked
+	 * @param pwdToReplace	list of string to replace when returning actions so that passwords are masked. Only password longer that 5 characters are replaced to avoid replacing non password strings
 	 */
 	public TestAction(String name, Boolean failed, List<String> pwdToReplace) {
 		this.name = name;
 		this.failed = failed;
-		this.pwdToReplace = pwdToReplace;
+		this.pwdToReplace = pwdToReplace.stream()
+					.filter(s -> s.length() > 5)
+					.collect(Collectors.toList());
 	}
 
 	/**
