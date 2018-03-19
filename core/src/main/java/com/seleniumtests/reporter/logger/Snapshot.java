@@ -3,12 +3,15 @@ package com.seleniumtests.reporter.logger;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 
+import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.driver.screenshots.ScreenShot;
 import com.seleniumtests.reporter.reporters.CommonReporter;
+import com.seleniumtests.util.FileUtility;
 import com.seleniumtests.util.StringUtility;
 
 public class Snapshot extends TestAction {
@@ -79,11 +82,20 @@ public class Snapshot extends TestAction {
     		
     		String newName = newBaseName + FilenameUtils.getBaseName(oldFile.getName());
     		newName = newName.substring(0, Math.min(50, newName.length())) + "." +  FilenameUtils.getExtension(oldFile.getName());
-    		screenshot.setHtmlSourcePath(folderName + newName);
     		
     		// if file cannot be moved, go back to old name
     		try {
-				FileUtils.moveFile(new File(oldFullPath), new File(screenshot.getFullHtmlPath()));
+    			oldFile = new File(oldFullPath);
+    			if (SeleniumTestsContextManager.getGlobalContext().getOptimizeReports()) {
+    				screenshot.setHtmlSourcePath(folderName + newName + ".zip");
+    				oldFile = FileUtility.createZipArchiveFromFiles(Arrays.asList(oldFile));
+    			} else {
+    				screenshot.setHtmlSourcePath(folderName + newName);
+    			}
+    			
+				FileUtils.copyFile(oldFile, new File(screenshot.getFullHtmlPath()));
+				new File(oldFullPath).delete();
+				
 			} catch (IOException e) {
 				screenshot.setHtmlSourcePath(oldPath);
 			}

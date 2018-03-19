@@ -587,6 +587,19 @@ public class TestSeleniumTestContext extends GenericTest {
 	}
 	
 	@Test(groups="ut context")
+	public void testOptimizeReports(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setOptimizeReports(true);
+		Assert.assertTrue(SeleniumTestsContextManager.getThreadContext().getOptimizeReports());
+	}
+	@Test(groups="ut context")
+	public void testOptimizeReportsNull(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setOptimizeReports(null);
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getOptimizeReports(), SeleniumTestsContext.DEFAULT_OPTIMIZE_REPORTS);
+	}
+	
+	@Test(groups="ut context")
 	public void testDeviceList(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setDeviceList("{'dev1':'Samsung'}");

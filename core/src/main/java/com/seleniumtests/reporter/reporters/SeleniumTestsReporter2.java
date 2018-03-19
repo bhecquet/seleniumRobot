@@ -22,6 +22,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -82,12 +83,26 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 	 */
 	public void copyResources() throws IOException {
 		
-		String[] styleFiles = new String[] {"bootstrap.min.css", "bootstrap.min.js", "Chart.min.js", "jQuery-2.2.0.min.js",
-											"seleniumRobot.css", "app.min.js", "seleniumRobot_solo.css", "seleniumtests_test1.gif",
-											"seleniumtests_test2.gif", "seleniumtests_test3.gif", "AdminLTE.min.css",
-											"seleniumRobot.js", "lobsterTwo.css", "css/font-awesome.min.css", 
-											"fonts/fontawesome-webfont.eot", "fonts/fontawesome-webfont.svg", "fonts/fontawesome-webfont.ttf", 
-											"fonts/fontawesome-webfont.woff", "fonts/fontawesome-webfont.woff2", "fonts/FontAwesome.otf"};
+		List<String> styleFiles = Arrays.asList("seleniumRobot.css", "app.min.js", "seleniumRobot_solo.css", "seleniumtests_test1.gif",
+											"seleniumtests_test2.gif", "seleniumtests_test3.gif", "seleniumRobot.js");
+		styleFiles = new ArrayList<>(styleFiles);
+		
+		if (!SeleniumTestsContextManager.getGlobalContext().getOptimizeReports()) {
+			styleFiles.add("bootstrap.min.css");
+			styleFiles.add("bootstrap.min.js");
+			styleFiles.add("Chart.min.js");
+			styleFiles.add("jQuery-2.2.0.min.js");
+			styleFiles.add("AdminLTE.min.css");
+			styleFiles.add("lobsterTwo.css");
+			styleFiles.add("css/font-awesome.min.css");
+			styleFiles.add("fonts/fontawesome-webfont.eot");
+			styleFiles.add("fonts/fontawesome-webfont.svg");
+			styleFiles.add("fonts/fontawesome-webfont.ttf");
+			styleFiles.add("fonts/fontawesome-webfont.woff");
+			styleFiles.add("fonts/fontawesome-webfont.woff2");
+			styleFiles.add("fonts/FontAwesome.otf");
+		} 
+		
 		for (String fileName: styleFiles) {
 			FileUtils.copyInputStreamToFile(Thread.currentThread().getContextClassLoader().getResourceAsStream("reporter/templates/" + fileName), 
 											Paths.get(outputDirectory, RESOURCES_DIR, "templates", fileName).toFile());
@@ -379,6 +394,9 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 
 			String userName = System.getProperty("user.name");
 			context.put("userName", userName);
+			
+			// optimize reports means that resources are get from internet
+			context.put("localResources", !SeleniumTestsContextManager.getGlobalContext().getOptimizeReports());
 			context.put("currentDate", new Date().toString());
 
 			DriverMode mode = SeleniumTestsContextManager.getGlobalContext().getRunMode();
