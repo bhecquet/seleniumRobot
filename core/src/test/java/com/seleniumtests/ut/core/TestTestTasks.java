@@ -1,6 +1,7 @@
 package com.seleniumtests.ut.core;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -76,13 +77,45 @@ public class TestTestTasks extends MockitoTest {
 			PowerMockito.whenNew(SeleniumRobotVariableServerConnector.class).withAnyArguments().thenReturn(variableServer);
 			when(variableServer.isAlive()).thenReturn(true);
 			TestVariable varToReturn = new TestVariable(10, "key", "value", false, TestVariable.TEST_VARIABLE_PREFIX + "key");
-			when(variableServer.upsertVariable(any(TestVariable.class))).thenReturn(varToReturn);
+			when(variableServer.upsertVariable(any(TestVariable.class), anyBoolean())).thenReturn(varToReturn);
 			
 			initThreadContext(testNGCtx, "myTest");
 			TestTasks.createOrUpdateParam("key", "value");
 			
 			// check upsert has been called
-			verify(variableServer).upsertVariable(eq(new TestVariable("key", "value")));
+			verify(variableServer).upsertVariable(eq(new TestVariable("key", "value")), eq(true));
+			
+			// check configuration is updated
+			Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getConfiguration().get("key"), varToReturn);
+		} finally {
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE);
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL);
+		}
+	}
+	
+	/**
+	 * Check upsert of a new variable which will not be version specific
+	 * Verify server is called and configuration is updated according to the new value
+	 * @param testNGCtx
+	 * @param xmlTest
+	 * @throws Exception
+	 */
+	@Test(groups= {"ut"})
+	public void testUpdateNewVariableNotSpecificToVersion(final ITestContext testNGCtx, final XmlTest xmlTest) throws Exception {
+		try {
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE, "true");
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL, "http://localhost:1234");
+			
+			PowerMockito.whenNew(SeleniumRobotVariableServerConnector.class).withAnyArguments().thenReturn(variableServer);
+			when(variableServer.isAlive()).thenReturn(true);
+			TestVariable varToReturn = new TestVariable(10, "key", "value", false, TestVariable.TEST_VARIABLE_PREFIX + "key");
+			when(variableServer.upsertVariable(any(TestVariable.class), anyBoolean())).thenReturn(varToReturn);
+			
+			initThreadContext(testNGCtx, "myTest");
+			TestTasks.createOrUpdateParam("key", "value", false);
+			
+			// check upsert has been called
+			verify(variableServer).upsertVariable(eq(new TestVariable("key", "value")), eq(false));
 			
 			// check configuration is updated
 			Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getConfiguration().get("key"), varToReturn);

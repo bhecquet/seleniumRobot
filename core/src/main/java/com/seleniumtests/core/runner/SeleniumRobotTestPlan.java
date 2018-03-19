@@ -48,12 +48,24 @@ public class SeleniumRobotTestPlan {
     
     /**
      * Method for creating or updating a variable on the seleniumRobot server ONLY. This will raise a ScenarioException if variables are get from
-     * env.ini file 
-     * @param key
-     * @param value
+     * env.ini file. Variable will be stored as a variable of the current tested application
+     * @param key				name of the param
+     * @param value				value of the parameter (or new value if we update it)
      */
     public void createOrUpdateParam(String key, String value) {
     	TestTasks.createOrUpdateParam(key, value);
+    }
+    
+    /**
+     * Method for creating or updating a variable on the seleniumRobot server ONLY. This will raise a ScenarioException if variables are get from
+     * env.ini file 
+     * @param key					name of the param
+     * @param value					value of the parameter (or new value if we update it)
+     * @param specificToVersion		if true, this param will be stored on server with a reference to the application version. This will have no effect if changing a 
+     * 								current variable.
+     */
+    public void createOrUpdateParam(String key, String value, boolean specificToVersion) {
+    	TestTasks.createOrUpdateParam(key, value, specificToVersion);
     }
     
     /**

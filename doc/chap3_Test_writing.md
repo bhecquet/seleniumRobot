@@ -195,7 +195,9 @@ You may consider putting all test data access in the Test script, not in page ob
 				._arrivee();
 	}
 	
-Test data are get using `param(<key>)` or updated via `createOrUpdateParam(<key>, <value>)`. The later is only available when seleniumRobot server is used.
+Test data are get using `param(<key>)` or updated via `createOrUpdateParam`. The later is only available when seleniumRobot server is used.
+`createOrUpdateParam(<key>, <value>)` is used to store a variable with reference to environment, application and application version
+`createOrUpdateParam(<key>, <value>, <boolean>)` is used to store a variable with reference to environment, application. Reference to application version is optional
 	
 **WARN** DO NOT try to access test data inside a `@BeforeXXX` method, they are not available. Only parameters defined in XML or as user parameters are available. At this stage, `env.ini` file or variable server have not been read.
 
