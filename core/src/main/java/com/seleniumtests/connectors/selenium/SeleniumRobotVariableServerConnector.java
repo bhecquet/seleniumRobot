@@ -12,6 +12,8 @@ import org.json.JSONObject;
 
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
+import com.mashape.unirest.request.HttpRequestWithBody;
+import com.mashape.unirest.request.body.MultipartBody;
 import com.seleniumtests.core.TestVariable;
 import com.seleniumtests.customexception.SeleniumRobotServerException;
 
@@ -115,20 +117,25 @@ public class SeleniumRobotVariableServerConnector extends SeleniumRobotServerCon
 	 * Variable is created with "internal" flag set
 	 * @return
 	 */
-	public TestVariable upsertVariable(TestVariable variable) {
+	public TestVariable upsertVariable(TestVariable variable, boolean specificToVersion) {
 		
 		// this variable does not exist, create it
 		// OR this variable is an update of an existing, non custom variable
 		if (variable.getId() == null || !variable.getInternalName().startsWith(TestVariable.TEST_VARIABLE_PREFIX)) {
 			try {
-				JSONObject variableJson = getJSonResponse(Unirest.post(url + VARIABLE_API_URL)
+				MultipartBody request = Unirest.post(url + VARIABLE_API_URL)
 						.field("name", TestVariable.TEST_VARIABLE_PREFIX + variable.getName())
 						.field("value", variable.getValue())
 						.field("reservable", false)
 						.field("environment", environmentId)
 						.field("application", applicationId)
-						.field("version", versionId)
-						.field("internal", true));
+						.field("internal", true);
+				
+				if (specificToVersion) {
+					request = request.field("version", versionId);
+				}
+				
+				JSONObject variableJson = getJSonResponse(request);
 				
 				return TestVariable.fromJsonObject(variableJson);
 				
