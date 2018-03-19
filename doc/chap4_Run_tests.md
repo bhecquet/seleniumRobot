@@ -4,7 +4,9 @@
 Unzip seleniumRobot-core.zip file (can be found on maven central or build it with maven) to any folder
 Unzip your test application .zip file to the same folder. It will create the correct folder structure
 
-Tests are run using command line: `java -cp seleniumRobot.jar;plugins/<app>-tests.jar -D<option1>=<value1> -D<option2>=<value2> org.testng.TestNG <path_to_TestNG_xml_file>"`</br>
+Tests are run using command line : `java -cp seleniumRobot.jar;plugins/<app>-tests.jar -D<option1>=<value1> -D<option2>=<value2> org.testng.TestNG <path_to_TestNG_xml_file>"`</br>
+
+Launch test from folder where seleniumRobot.jar is deployed!
 
 After this command, you can specify TestNG options:
 - `-testnames <comma_seperated_list_of_tests>`: list of tests (from XML) to execute
