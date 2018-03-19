@@ -5,22 +5,16 @@
 
     <title>SeleniumRobot</title>
 
-	<link rel="stylesheet" type="text/css" href="resources/templates/AdminLTE.min.css">
-	<link rel="stylesheet" type="text/css" href="resources/templates/bootstrap.min.css">
-    #if ($report.equals("complete"))
-    <link rel="stylesheet" type="text/css" href="resources/templates/seleniumRobot.css">
-    #else
-	<link rel="stylesheet" type="text/css" href="resources/templates/seleniumRobot_solo.css">
-    #end
-    <link rel="stylesheet" type="text/css" href="resources/templates/lobsterTwo.css"> 
-    <link rel="stylesheet" type="text/css" href="resources/templates/css/font-awesome.min.css">
-    
-    <script src="resources/templates/jQuery-2.2.0.min.js"></script>
-	<script src="resources/templates/bootstrap.min.js"></script>
-	#if ($report.equals("complete"))
-	<script src="resources/templates/Chart.min.js"></script>
+	#if ($localResources)
+	#parse("reporter/templates/html.head.local.vm")
 	#else
-	<script src="resources/templates/app.min.js"></script>
+	#parse("reporter/templates/html.head.remote.vm")
+	#end
+	
+	 #if ($report.equals("complete"))
+	<link rel="stylesheet" type="text/css" href="resources/templates/seleniumRobot.css">
+	#else
+	<link rel="stylesheet" type="text/css" href="resources/templates/seleniumRobot_solo.css">
 	#end
 	<script src="resources/templates/seleniumRobot.js"></script>
 

@@ -131,6 +131,7 @@ public class SeleniumTestsContext {
     public static final String CUSTOM_SUMMARY_REPORTS = "customSummaryReports";
     public static final String ARCHIVE_TO_FILE = "archiveToFile";				// path to the file where archive will be done. If null, results are not archived
     public static final String WEB_DRIVER_LISTENER = "webDriverListener";
+    public static final String OPTIMIZE_REPORTS = "optimizeReports";
 
     public static final String TEST_METHOD_SIGNATURE = "testMethodSignature";
     public static final String PLUGIN_CONFIG_PATH = "pluginConfigPath";
@@ -204,6 +205,7 @@ public class SeleniumTestsContext {
 	public static final JSONObject DEFAULT_TMS_RUN = new JSONObject();
 	public static final JSONObject DEFAULT_TMS_CONNECT = new JSONObject();
 	public static final String DEFAULT_WEB_PROXY_TYPE = null;
+	public static final boolean DEFAULT_OPTIMIZE_REPORTS = false;
     
     public static final int DEFAULT_REPLAY_TIME_OUT = 30;
     
@@ -329,6 +331,7 @@ public class SeleniumTestsContext {
         setCustomTestReports(getValueForTest(CUSTOM_TEST_REPORTS, System.getProperty(CUSTOM_TEST_REPORTS)));
         setCustomSummaryReports(getValueForTest(CUSTOM_SUMMARY_REPORTS, System.getProperty(CUSTOM_SUMMARY_REPORTS)));
         setArchiveToFile(getValueForTest(ARCHIVE_TO_FILE, System.getProperty(ARCHIVE_TO_FILE)));
+        setOptimizeReports(getBoolValueForTest(OPTIMIZE_REPORTS, System.getProperty(OPTIMIZE_REPORTS)));
         
         setViewPortWidth(getIntValueForTest(VIEWPORT_WIDTH, System.getProperty(VIEWPORT_WIDTH)));
         setViewPortHeight(getIntValueForTest(VIEWPORT_HEIGHT, System.getProperty(VIEWPORT_HEIGHT)));
@@ -957,6 +960,10 @@ public class SeleniumTestsContext {
     
     public List<ReportInfo> getCustomSummaryReports() {
     	return (List<ReportInfo>) getAttribute(CUSTOM_SUMMARY_REPORTS);
+    }
+    
+    public boolean getOptimizeReports() {
+        return (Boolean) getAttribute(OPTIMIZE_REPORTS);
     }
     
     public String getArchiveToFile() {
@@ -1711,6 +1718,14 @@ public class SeleniumTestsContext {
     
     public void setDefaultOutputDirectory(ITestContext context) {
     	setAttribute(DEFAULT_OUTPUT_DIRECTORY, new File(context.getOutputDirectory()).getParent());
+    }
+    
+    public void setOptimizeReports(Boolean optimize) {
+    	if (optimize != null) {
+    		setAttribute(OPTIMIZE_REPORTS, optimize);
+    	} else {
+    		setAttribute(OPTIMIZE_REPORTS, DEFAULT_OPTIMIZE_REPORTS);
+    	}
     }
     
     public void setVersion(String version) {
