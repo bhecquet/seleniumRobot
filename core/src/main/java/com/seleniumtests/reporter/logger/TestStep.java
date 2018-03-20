@@ -16,9 +16,11 @@
  */
 package com.seleniumtests.reporter.logger;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -182,5 +184,30 @@ public class TestStep extends TestAction {
 		return testResult;
 	}
 	
+	/**
+	 * Returns the list of files referenced by this test step and sub-steps
+	 * @return
+	 */
+	public List<File> getAllAttachments() {
+		List<File> usedFiles = new ArrayList<>();
+		for (Snapshot snapshot: snapshots) {
+			if (snapshot == null || snapshot.getScreenshot() == null ) {
+				continue;
+			}
+			
+			if (snapshot.getScreenshot().getFullHtmlPath() != null) {
+				usedFiles.add(new File(snapshot.getScreenshot().getFullHtmlPath()));
+			}
+			if (snapshot.getScreenshot().getFullImagePath() != null) {
+				usedFiles.add(new File(snapshot.getScreenshot().getFullImagePath()));
+			}
+		}
+		
+		for (TestAction subStep: stepActions.stream().filter(a -> a instanceof TestStep).collect(Collectors.toList())) {
+			usedFiles.addAll(((TestStep)subStep).getAllAttachments());
+		}
+		
+		return usedFiles;
+	}
 	
 }

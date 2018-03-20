@@ -2,6 +2,7 @@ package com.seleniumtests.reporter.reporters;
 
 import java.io.File;
 import java.lang.reflect.Method;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -32,6 +33,7 @@ public class ReporterControler implements IReporter {
 		try {
 			new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).mkdirs();
 		} catch (Exception e) {}
+		cleanAttachments();
 		
 		try {
 			new SeleniumTestsReporter2().generateReport(xmlSuites, suites, outputDirectory);
@@ -51,7 +53,7 @@ public class ReporterControler implements IReporter {
 	}
 	
 	/**
-	 * Add configurations methods to list of test steps
+	 * Add configurations methods to list of test steps so that they can be used by reporters
 	 * @param suites
 	 */
 	private void updateTestSteps(final List<ISuite> suites) {
@@ -67,6 +69,40 @@ public class ReporterControler implements IReporter {
 				
 				for (ITestResult testResult: resultSet) {
 					TestLogging.getTestsSteps().put(testResult, getAllTestSteps(testResult));			
+				}
+			}
+		}
+	}
+	
+	/**
+	 * Delete all files in html and screenshot folders that are not directly references by test step
+	 * @param suites
+	 */
+	private void cleanAttachments() {
+		List<File> usedFiles = new ArrayList<>();
+		
+		// retrieve list of all files used by test steps
+		for (List<TestStep> testSteps: TestLogging.getTestsSteps().values()) {
+			for (TestStep testStep: testSteps) {
+				usedFiles.addAll(testStep.getAllAttachments());
+			}
+		}
+		
+		File htmlDir = Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "htmls").toFile();
+		File screenshotDir = Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "screenshots").toFile();
+		
+		// now delete all files that are not in this list
+		if (htmlDir.isDirectory()) {
+			for (File htmlFile: htmlDir.listFiles()) {
+				if (!usedFiles.contains(htmlFile)) {
+					htmlFile.delete();
+				}
+			}
+		}
+		if (screenshotDir.isDirectory()) {
+			for (File imgFile: screenshotDir.listFiles()) {
+				if (!usedFiles.contains(imgFile)) {
+					imgFile.delete();
 				}
 			}
 		}

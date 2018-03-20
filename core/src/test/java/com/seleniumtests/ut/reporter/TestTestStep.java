@@ -121,6 +121,7 @@ public class TestTestStep extends GenericTest {
 		Assert.assertEquals(step.getSnapshots().get(0).getScreenshot().getImagePath(), "N-A_0-1_step1-" + tmpImgFile.getName());
 		Assert.assertEquals(step.getSnapshots().get(0).getScreenshot().getHtmlSourcePath(), "N-A_0-1_step1-" + tmpHtmlFile.getName());
 	}
+	
 	@Test(groups={"ut"})
 	public void testSnapshotRenamingWithSubFolder() throws IOException {
 		TestStep step = new TestStep("step1", null, new ArrayList<>());
@@ -144,6 +145,59 @@ public class TestTestStep extends GenericTest {
 		Assert.assertEquals(step.getSnapshots().get(0).getScreenshot().getImagePath(), "screenshots/N-A_0-1_step1-" + tmpImgFile2.getName());
 		Assert.assertEquals(step.getSnapshots().get(0).getScreenshot().getHtmlSourcePath(), "htmls/N-A_0-1_step1-" + tmpHtmlFile2.getName());
 	}
+	
+	/**
+	 * Check we get all files from a step and its sub steps
+	 * @throws IOException
+	 */
+	@Test(groups={"ut"})
+	public void testListAllAttachments() throws IOException {
+		TestStep step = new TestStep("step1", null, new ArrayList<>());
+		
+		// create screenshot for main step
+		ScreenShot screenshot1 = new ScreenShot();
+		
+		File tmpImgFile = File.createTempFile("img", ".png");
+		File tmpImgFile2 = Paths.get(tmpImgFile.getParent(), "screenshots", tmpImgFile.getName()).toFile();
+		FileUtils.moveFile(tmpImgFile, tmpImgFile2);
+		File tmpHtmlFile = File.createTempFile("html", ".html");
+		File tmpHtmlFile2 = Paths.get(tmpHtmlFile.getParent(), "htmls", tmpHtmlFile.getName()).toFile();
+		FileUtils.moveFile(tmpHtmlFile, tmpHtmlFile2);
+		
+		screenshot1.setOutputDirectory(tmpImgFile.getParent());
+		screenshot1.setLocation("http://mysite.com");
+		screenshot1.setTitle("mysite");
+		screenshot1.setImagePath("screenshots/" + tmpImgFile2.getName());
+		screenshot1.setHtmlSourcePath("htmls/" + tmpHtmlFile2.getName());
+		step.addSnapshot(new Snapshot(screenshot1), 0);
+		
+		TestStep subStep = new TestStep("subStep", null, new ArrayList<>());
+		
+		// create screenshot for sub step
+		ScreenShot screenshot2 = new ScreenShot();
+		
+		File tmpImgFile3 = File.createTempFile("img", ".png");
+		File tmpImgFile4 = Paths.get(tmpImgFile3.getParent(), "screenshots", tmpImgFile3.getName()).toFile();
+		FileUtils.moveFile(tmpImgFile3, tmpImgFile4);
+		
+		screenshot2.setOutputDirectory(tmpImgFile3.getParent());
+		screenshot2.setLocation("http://mysite.com");
+		screenshot2.setTitle("mysite");
+		screenshot2.setImagePath("screenshots/" + tmpImgFile4.getName());
+		subStep.addSnapshot(new Snapshot(screenshot2), 0);
+		 
+		subStep.addAction(new TestAction("action1", true, new ArrayList<>()));
+		step.addAction(new TestAction("action2", false, new ArrayList<>()));
+		step.addAction(subStep);
+		
+		List<File> attachments = step.getAllAttachments();
+		Assert.assertEquals(attachments.size(), 3);
+		Assert.assertEquals(attachments.get(0).getName(), "N-A_0-1_step1-" + tmpHtmlFile2.getName());
+		Assert.assertEquals(attachments.get(1).getName(), "N-A_0-1_step1-" + tmpImgFile2.getName());
+		Assert.assertEquals(attachments.get(2).getName(), "N-A_0-1_subStep-" + tmpImgFile4.getName());
+	}
+	
+	
 	
 	/**
 	 * Checks getFailed correctly compute test step status if sub step is not failed
