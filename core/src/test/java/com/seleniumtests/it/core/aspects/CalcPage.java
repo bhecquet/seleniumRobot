@@ -68,6 +68,10 @@ public class CalcPage extends PageObject {
 		return this;
 	}
 	
+	public CalcPage connect(String login, String password) {
+		return this;
+	}
+	
 	/**
 	 * Use this method only when manualTestSteps are enabled, or an error will be raised
 	 * @param a

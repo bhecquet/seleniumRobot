@@ -351,7 +351,7 @@ public class LogAction {
 				} catch (ClassCastException | IndexOutOfBoundsException e) {}
 				
 				// store the value of the argument containing a password
-				if (argName.toLowerCase().contains("password") || argName.toLowerCase().contains("pwd") || argName.toLowerCase().contains("passwd")) {
+				if (arg != null && (argName.toLowerCase().contains("password") || argName.toLowerCase().contains("pwd") || argName.toLowerCase().contains("passwd"))) {
 					if (arg instanceof CharSequence[]) {
 						for (Object obj: (CharSequence[])arg) {
 							stringToReplace.add(obj.toString());

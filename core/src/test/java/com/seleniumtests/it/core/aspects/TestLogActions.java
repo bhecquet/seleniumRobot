@@ -203,4 +203,52 @@ public class TestLogActions extends GenericTest {
 		TestStep subSubStep = (TestStep)subStep.getStepActions().get(0);
 		Assert.assertEquals(subSubStep.getName(), "doNothing ");
 	}
+	
+	/**
+	 * Check password replacement not done when not requested
+	 * @throws IOException
+	 */
+	@Test(groups={"it"})
+	public void testPasswordNoReplacement() throws IOException {
+		SeleniumTestsContextManager.getThreadContext().setMaskPassword(false);
+		new CalcPage()
+				.connect("login", "somePassToConnect");
+
+		List<TestStep> steps = TestLogging.getTestsSteps().get(Reporter.getCurrentTestResult());
+		Assert.assertEquals(steps.size(), 2);
+		Assert.assertEquals(steps.get(0).getName(), "openPage with args: (null, )");
+		Assert.assertEquals(steps.get(1).getName(), "connect with args: (login, somePassToConnect, )");
+	}
+	
+	/**
+	 * Check password replacement done when requested by start option
+	 * @throws IOException
+	 */
+	@Test(groups={"it"})
+	public void testPasswordReplacement() throws IOException {
+		SeleniumTestsContextManager.getThreadContext().setMaskPassword(true);
+		new CalcPage()
+			.connect("login", "somePassToConnect");
+		
+		List<TestStep> steps = TestLogging.getTestsSteps().get(Reporter.getCurrentTestResult());
+		Assert.assertEquals(steps.size(), 2);
+		Assert.assertEquals(steps.get(0).getName(), "openPage with args: (null, )");
+		Assert.assertEquals(steps.get(1).getName(), "connect with args: (login, ******, )");
+	}
+	
+	/**
+	 * Check password replacement is not done if password is null
+	 * @throws IOException
+	 */
+	@Test(groups={"it"})
+	public void testNullPasswordReplacement() throws IOException {
+		SeleniumTestsContextManager.getThreadContext().setMaskPassword(true);
+		new CalcPage()
+		.connect("login", null);
+		
+		List<TestStep> steps = TestLogging.getTestsSteps().get(Reporter.getCurrentTestResult());
+		Assert.assertEquals(steps.size(), 2);
+		Assert.assertEquals(steps.get(0).getName(), "openPage with args: (null, )");
+		Assert.assertEquals(steps.get(1).getName(), "connect with args: (login, null, )");
+	}
 }
