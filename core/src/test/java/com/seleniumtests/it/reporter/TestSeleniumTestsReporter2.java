@@ -115,9 +115,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	@Test(groups={"it"})
 	public void testReportSummaryContentWithSteps() throws Exception {
 
-		System.setProperty("optimizeReports", "true");
 		executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"});
-		
 		
 		// check content of summary report file
 		String mainReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport.html"));
@@ -259,13 +257,35 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	}
 	
 	@Test(groups={"it"})
-	public void testSnapshotRenaming() throws Exception {
+	public void testAttachmentRenaming() throws Exception {
 		
 		executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"});
 		
 		// check that with error, remaining steps are skipped
 		String detailedReportContent1 = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport-1.html"));
-		Assert.assertTrue(detailedReportContent1.contains("Output: null:  | <a href='screenshot/testAndSubActions_1-1_step_1-img_with_very_very_ve.png'"));		
+		Assert.assertTrue(detailedReportContent1.contains(" | <a href='screenshot/testAndSubActions_1-1_step_1-img_with_very_very_ve.png'"));		
+		Assert.assertTrue(detailedReportContent1.contains(" | <a href='htmls/testAndSubActions_1-1_step_1-html_with_very_very_v.html' target=html>"));	
+		
+		Assert.assertTrue(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "htmls", "testAndSubActions_1-1_step_1-html_with_very_very_v.html").toFile().exists());
+	}
+	
+	@Test(groups={"it"})
+	public void testAttachmentRenamingWithOptimizeReports() throws Exception {
+		try {
+			System.setProperty("optimizeReports", "true");
+			executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"});
+		} finally {
+			System.clearProperty("optimizeReports");
+		}
+		
+		// check that with error, remaining steps are skipped
+		String detailedReportContent1 = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport-1.html"));
+		Assert.assertTrue(detailedReportContent1.contains(" | <a href='screenshot/testAndSubActions_1-1_step_1-img_with_very_very_ve.png'"));		
+		Assert.assertTrue(detailedReportContent1.contains(" | <a href='htmls/testAndSubActions_1-1_step_1-html_with_very_very_v.html.zip' target=html>"));	
+		
+		// check file has been moved
+		Assert.assertTrue(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "htmls", "testAndSubActions_1-1_step_1-html_with_very_very_v.html.zip").toFile().exists());
+		Assert.assertFalse(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "htmls", "testAndSubActions_1-1_step_1-html_with_very_very_v.html").toFile().exists());
 	}
 	
 	/**
@@ -282,6 +302,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		
 		// check content of summary report file
 		String mainReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport.html"));
+		mainReportContent = mainReportContent.replace("\n", "").replace("\r",  "");
 		
 		Assert.assertTrue(mainReportContent.matches(".*<a href\\='SeleniumTestReport-1\\.html'.*?>testOk</a>.*"));
 		Assert.assertTrue(mainReportContent.matches(".*<a href\\='SeleniumTestReport-2\\.html'.*?>testWithAssert</a>.*"));
@@ -334,12 +355,12 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		String mainReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport.html"));
 		mainReportContent = mainReportContent.replace("\n", "").replace("\r",  "");
 		
-		Assert.assertTrue(mainReportContent.matches(".*class=\"fa fa-circle circleSuccess\"></i><a href='SeleniumTestReport-\\d.html'>test1</a>.*"));
-		Assert.assertTrue(mainReportContent.matches(".*class=\"fa fa-circle circleFailed\"></i><a href='SeleniumTestReport-\\d.html'>test4</a>.*"));
-		Assert.assertTrue(mainReportContent.matches(".*class=\"fa fa-circle circleSkipped\"></i><a href='SeleniumTestReport-\\d.html'>test3</a>.*"));
-		Assert.assertTrue(mainReportContent.matches(".*class=\"fa fa-circle circleFailed\"></i><a href='SeleniumTestReport-\\d.html'>test5</a>.*"));
-		Assert.assertTrue(mainReportContent.matches(".*class=\"fa fa-circle circleSkipped\"></i><a href='SeleniumTestReport-\\d.html'>test2</a>.*"));
-		Assert.assertTrue(mainReportContent.matches(".*class=\"fa fa-circle circleSuccess\"></i><a href='SeleniumTestReport-\\d.html'>test1</a>.*"));
+		Assert.assertTrue(mainReportContent.matches(".*class\\=\"fa fa-circle circleSuccess\"></i><a href\\='SeleniumTestReport-\\d\\.html'.*?>test1</a>.*"));
+		Assert.assertTrue(mainReportContent.matches(".*class\\=\"fa fa-circle circleFailed\"></i><a href\\='SeleniumTestReport-\\d\\.html'.*?>test4</a>.*"));
+		Assert.assertTrue(mainReportContent.matches(".*class\\=\"fa fa-circle circleSkipped\"></i><a href\\='SeleniumTestReport-\\d\\.html'.*?>test3</a>.*"));
+		Assert.assertTrue(mainReportContent.matches(".*class\\=\"fa fa-circle circleFailed\"></i><a href\\='SeleniumTestReport-\\d\\.html'.*?>test5</a>.*"));
+		Assert.assertTrue(mainReportContent.matches(".*class\\=\"fa fa-circle circleSkipped\"></i><a href\\='SeleniumTestReport-\\d\\.html'.*?>test2</a>.*"));
+		Assert.assertTrue(mainReportContent.matches(".*class\\=\"fa fa-circle circleSuccess\"></i><a href\\='SeleniumTestReport-\\d\\.html'.*?>test1</a>.*"));
 		Assert.assertFalse(mainReportContent.contains("$testResult.getAttribute(\"methodName\")")); // check all test methods are filled
 	}
 	
@@ -396,7 +417,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 						+ "<div class=\"message-log\">a message</div>"	// message in sub step
 						+ "<li>sendKeys to password field</li>"			// action in sub step
 					+ "</ul>" 
-					+ "<div class=\"message-snapshot\">Output: null:  | <a href='screenshot/testAndSubActions_1-1_step_1-img_with_very_very_ve.png' class='lightbox'>Application Snapshot</a></div>"
+					+ "<div class=\"message-snapshot\">Output: null:  | <a href='htmls/testAndSubActions_1-1_step_1-html_with_very_very_v.html' target=html>Application HTML Source</a> | <a href='screenshot/testAndSubActions_1-1_step_1-img_with_very_very_ve.png' class='lightbox'>Application Snapshot</a></div>"
 				+ "</ul>"));
 		
 	}
