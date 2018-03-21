@@ -1,12 +1,12 @@
-<link rel="stylesheet" type="text/css" href="resources/templates/AdminLTE.min.css">
-<link rel="stylesheet" type="text/css" href="resources/templates/bootstrap.min.css">
-<link rel="stylesheet" type="text/css" href="resources/templates/lobsterTwo.css"> 
-<link rel="stylesheet" type="text/css" href="resources/templates/css/font-awesome.min.css">
+<link rel="stylesheet" type="text/css" href="${staticPathPrefix}resources/templates/AdminLTE.min.css">
+<link rel="stylesheet" type="text/css" href="${staticPathPrefix}resources/templates/bootstrap.min.css">
+<link rel="stylesheet" type="text/css" href="${staticPathPrefix}resources/templates/lobsterTwo.css"> 
+<link rel="stylesheet" type="text/css" href="${staticPathPrefix}resources/templates/css/font-awesome.min.css">
 
-<script src="resources/templates/jQuery-2.2.0.min.js"></script>
-<script src="resources/templates/bootstrap.min.js"></script>
+<script src="${staticPathPrefix}resources/templates/jQuery-2.2.0.min.js"></script>
+<script src="${staticPathPrefix}resources/templates/bootstrap.min.js"></script>
 #if ($report.equals("complete"))
-<script src="resources/templates/Chart.min.js"></script>
+<script src="${staticPathPrefix}resources/templates/Chart.min.js"></script>
 #else
-<script src="resources/templates/app.min.js"></script>
+<script src="${staticPathPrefix}resources/templates/app.min.js"></script>
 #end

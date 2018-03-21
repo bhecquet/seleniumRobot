@@ -697,7 +697,7 @@ public class TestSeleniumTestContext extends GenericTest {
 	public void testWrongType(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setTmsRun("{'type':'sonar'}");
-		SeleniumTestsContextManager.getThreadContext().configureContext(null);
+		SeleniumTestsContextManager.getThreadContext().configureContext(null, null);
 	}
 	@Test(groups="ut context", expectedExceptions=ConfigurationException.class)
 	public void testWrongFormat(final ITestContext testNGCtx, final XmlTest xmlTest) {
@@ -751,26 +751,26 @@ public class TestSeleniumTestContext extends GenericTest {
 	@Test(groups="ut context")
 	public void testOutputDirectoryAbsolutePath(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		initThreadContext(testNGCtx);
-		SeleniumTestsContextManager.getThreadContext().setOutputDirectory("/home/user/test-output", testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setOutputDirectory("/home/user/test-output", testNGCtx, false);
 		Assert.assertTrue(SeleniumTestsContextManager.getThreadContext().getOutputDirectory().endsWith("/home/user/test-output"));
 	}
 	@Test(groups="ut context")
 	public void testOutputDirectoryRelativePath(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		initThreadContext(testNGCtx);
-		SeleniumTestsContextManager.getThreadContext().setOutputDirectory("test-output/someSubdir", testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setOutputDirectory("test-output/someSubdir", testNGCtx, false);
 		Assert.assertTrue(SeleniumTestsContextManager.getThreadContext().getOutputDirectory().endsWith("core/test-output/someSubdir"));
 	}
 	@Test(groups="ut context")
 	public void testOutputDirectoryFromSystem(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		System.setProperty(SeleniumTestsContext.OUTPUT_DIRECTORY, "/home/user/test-output");
 		initThreadContext(testNGCtx);
-		Assert.assertTrue(SeleniumTestsContextManager.getThreadContext().getOutputDirectory().endsWith("/home/user/test-output"));
+		Assert.assertTrue(SeleniumTestsContextManager.getThreadContext().getOutputDirectory().endsWith("/home/user/test-output/null")); // test name is null
 	}
 	@Test(groups="ut context")
 	public void testOutputDirectoryNull(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		initThreadContext(testNGCtx);
 		((TestRunner)testNGCtx).setOutputDirectory("/home/other/test-output/testsuite");
-		SeleniumTestsContextManager.getThreadContext().setOutputDirectory(null, testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setOutputDirectory(null, testNGCtx, false);
 		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), "/home/other/test-output".replace("/", File.separator));
 	}
 	

@@ -159,12 +159,9 @@ public class CustomReporter extends CommonReporter implements IReporter {
 			t.merge( context, writer );
 			
 			String fileName = reportInfo.prefix 
-								+ "-" 
-								+ testResult.getTestClass().getName() 
-								+ "." 
-								+ StringUtility.replaceOddCharsFromFileName(testResult.getAttribute(SeleniumRobotLogger.METHOD_NAME).toString())
+								+ "-result" 
 								+ reportInfo.extension;
-			PrintWriter fileWriter = createWriter(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), fileName);
+			PrintWriter fileWriter = createWriter(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), fileName);
 			fileWriter.write(writer.toString());
 			fileWriter.flush();
 			fileWriter.close();

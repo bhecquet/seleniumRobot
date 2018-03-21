@@ -63,7 +63,7 @@ public abstract class GenericMultiBrowserTest {
 
 	public void initThreadContext(final ITestContext testNGCtx) {
 		SeleniumTestsContextManager.initGlobalContext(testNGCtx);
-		SeleniumTestsContextManager.initThreadContext(testNGCtx, null);
+		SeleniumTestsContextManager.initThreadContext(testNGCtx, null, null);
 		SeleniumTestsContextManager.getThreadContext().setSoftAssertEnabled(false);
 		SeleniumTestsContextManager.getGlobalContext().setSoftAssertEnabled(false);
 	}
