@@ -477,9 +477,12 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 		// only reconfigure it
 		String className = method.getTestMethod().getTestClass().getName();
 		String methodName = method.getTestMethod().getMethodName();
-		SeleniumTestsContextManager.setThreadContext(SeleniumTestsContextManager.getMethodContext(context, className, methodName, true));
+		SeleniumTestsContextManager.setThreadContext(SeleniumTestsContextManager.getMethodContext(context, 
+											className, 
+											testResult.getAttribute(SeleniumRobotLogger.METHOD_NAME).toString(), 
+											true));
 
-		SeleniumTestsContextManager.updateThreadContext((String)testResult.getAttribute(SeleniumRobotLogger.METHOD_NAME));
+		SeleniumTestsContextManager.updateThreadContext((String)testResult.getAttribute(SeleniumRobotLogger.METHOD_NAME), testResult);
 		
         SeleniumTestsContextManager.getThreadContext().setTestMethodSignature((String)testResult.getAttribute(SeleniumRobotLogger.METHOD_NAME));
     	

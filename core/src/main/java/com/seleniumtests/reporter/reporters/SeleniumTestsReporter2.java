@@ -50,6 +50,7 @@ import org.testng.xml.XmlSuite;
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.SeleniumTestsPageListener;
+import com.seleniumtests.core.runner.SeleniumRobotTestListener;
 import com.seleniumtests.driver.DriverMode;
 import com.seleniumtests.driver.TestType;
 import com.seleniumtests.reporter.PluginsHelper;
@@ -271,7 +272,7 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 				SeleniumTestsContextManager.setThreadContextFromTestResult(testResult);
 				
 				try {
-					mOut = createWriter(getOutputDirectory(), (String)testResult.getAttribute(METHOD_RESULT_FILE_NAME));
+					mOut = createWriter(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), "TestReport.html");
 					startHtml(getTestStatus(testResult), mOut, "simple");
 					generateExecutionReport(testResult);
 					endHtml();
@@ -295,7 +296,6 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 		
 		// build result list for each TestNG test
 		Map<ITestContext, List<ITestResult>> methodResultsMap = new LinkedHashMap<>();
-		Integer fileIndex = 0;
 		
 		for (ISuite suite : suites) {
 			Map<String, ISuiteResult> tests = suite.getResults();
@@ -313,8 +313,14 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 							.collect(Collectors.toList());
 				
 				for (ITestResult result: methodResults) {
-					fileIndex++;
-					String fileName = "SeleniumTestReport-" + fileIndex + ".html";
+					SeleniumTestsContext testContext = (SeleniumTestsContext)result.getAttribute(SeleniumRobotTestListener.TEST_CONTEXT);
+					
+					String fileName;
+					if (testContext != null) {
+						fileName = testContext.getRelativeOutputDir() + "/TestReport.html";
+					} else {
+						fileName = getTestName(result) + "/TestReport.html";
+					}
 					result.setAttribute(METHOD_RESULT_FILE_NAME, fileName);
 					result.setAttribute(SeleniumRobotLogger.METHOD_NAME, getTestName(result));
 					
@@ -371,7 +377,7 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 		this.resources = resources;
 	}
 	
-	public String getOutputDirectory() {
+	public String getOutputDirectory() {	
 		return outputDirectory;
 	}
 
@@ -394,6 +400,7 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 
 			String userName = System.getProperty("user.name");
 			context.put("userName", userName);
+			context.put("staticPathPrefix", "complete".equals(type) ? "": "../");
 			
 			// optimize reports means that resources are get from internet
 			context.put("localResources", !SeleniumTestsContextManager.getGlobalContext().getOptimizeReports());

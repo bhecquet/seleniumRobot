@@ -6,6 +6,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -15,7 +16,9 @@ import org.testng.ISuiteResult;
 import org.testng.ITestResult;
 import org.testng.xml.XmlSuite;
 
+import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.core.runner.SeleniumRobotTestListener;
 import com.seleniumtests.reporter.logger.TestLogging;
 import com.seleniumtests.reporter.logger.TestStep;
 
@@ -75,34 +78,40 @@ public class ReporterControler implements IReporter {
 	}
 	
 	/**
-	 * Delete all files in html and screenshot folders that are not directly references by test step
+	 * Delete all files in html and screenshot folders that are not directly references by any test step
 	 * @param suites
 	 */
 	private void cleanAttachments() {
-		List<File> usedFiles = new ArrayList<>();
 		
 		// retrieve list of all files used by test steps
-		for (List<TestStep> testSteps: TestLogging.getTestsSteps().values()) {
-			for (TestStep testStep: testSteps) {
+		for (Entry<ITestResult, List<TestStep>> testSteps: TestLogging.getTestsSteps().entrySet()) {
+			List<File> usedFiles = new ArrayList<>();
+			for (TestStep testStep: testSteps.getValue()) {
 				usedFiles.addAll(testStep.getAllAttachments());
 			}
-		}
-		
-		File htmlDir = Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "htmls").toFile();
-		File screenshotDir = Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "screenshots").toFile();
-		
-		// now delete all files that are not in this list
-		if (htmlDir.isDirectory()) {
-			for (File htmlFile: htmlDir.listFiles()) {
-				if (!usedFiles.contains(htmlFile)) {
-					htmlFile.delete();
+
+			SeleniumTestsContext testContext = (SeleniumTestsContext)testSteps.getKey().getAttribute(SeleniumRobotTestListener.TEST_CONTEXT);
+			
+			if (testContext == null) {
+				continue;
+			}
+			
+			File htmlDir = Paths.get(testContext.getOutputDirectory(), "htmls").toFile();
+			File screenshotDir = Paths.get(testContext.getOutputDirectory(), "screenshots").toFile();
+			
+			// now delete all files that are not in this list
+			if (htmlDir.isDirectory()) {
+				for (File htmlFile: htmlDir.listFiles()) {
+					if (!usedFiles.contains(htmlFile)) {
+						htmlFile.delete();
+					}
 				}
 			}
-		}
-		if (screenshotDir.isDirectory()) {
-			for (File imgFile: screenshotDir.listFiles()) {
-				if (!usedFiles.contains(imgFile)) {
-					imgFile.delete();
+			if (screenshotDir.isDirectory()) {
+				for (File imgFile: screenshotDir.listFiles()) {
+					if (!usedFiles.contains(imgFile)) {
+						imgFile.delete();
+					}
 				}
 			}
 		}

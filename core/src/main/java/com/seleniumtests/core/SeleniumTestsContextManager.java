@@ -336,10 +336,10 @@ public class SeleniumTestsContextManager {
     }
 
     public static void initThreadContext() {
-        initThreadContext(globalContext.getTestNGContext(), null);
+        initThreadContext(globalContext.getTestNGContext(), null, null);
     }
 
-    public static void initThreadContext(ITestContext testNGCtx, String testName) {
+    public static void initThreadContext(ITestContext testNGCtx, String testName, ITestResult testResult) {
 
     	ITestContext newTestNGCtx = getContextFromConfigFile(testNGCtx);
     	SeleniumTestsContext seleniumTestsCtx = new SeleniumTestsContext(newTestNGCtx);
@@ -347,7 +347,7 @@ public class SeleniumTestsContextManager {
         threadLocalContext.set(seleniumTestsCtx);
         
         // update some values after init. These init call the thread context previously created
-        seleniumTestsCtx.configureContext(testName);
+        seleniumTestsCtx.configureContext(testName, testResult);
     }
     
     /**
@@ -355,9 +355,9 @@ public class SeleniumTestsContextManager {
      * This is a correction for issue #94
      * @param testName
      */
-    public static void updateThreadContext(String testName) {
+    public static void updateThreadContext(String testName, ITestResult testResult) {
     	if (threadLocalContext.get() != null) {
-    		threadLocalContext.get().configureContext(testName);
+    		threadLocalContext.get().configureContext(testName, testResult);
     	}
     }
 

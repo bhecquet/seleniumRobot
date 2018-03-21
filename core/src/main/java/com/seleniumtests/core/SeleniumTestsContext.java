@@ -17,6 +17,8 @@
 package com.seleniumtests.core;
 
 import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -25,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.UUID;
 
 import org.apache.log4j.Logger;
 import org.json.JSONException;
@@ -48,6 +51,7 @@ import com.seleniumtests.driver.DriverMode;
 import com.seleniumtests.driver.TestType;
 import com.seleniumtests.reporter.PluginsHelper;
 import com.seleniumtests.reporter.reporters.ReportInfo;
+import com.seleniumtests.util.StringUtility;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 import com.seleniumtests.util.osutility.OSUtility;
 
@@ -57,6 +61,7 @@ import com.seleniumtests.util.osutility.OSUtility;
 public class SeleniumTestsContext {
 	
 	private static final Logger logger = SeleniumRobotLogger.getLogger(SeleniumTestsContext.class);
+	private static Map<String, String> outputFolderNames = Collections.synchronizedMap(new HashMap<>());
 
     /* configuration defined in testng.xml */
     public static final String TEST_CONFIGURATION = "testConfig"; 				// parameter name for additional configuration to load (should only be used in XML)
@@ -166,6 +171,7 @@ public class SeleniumTestsContext {
     public static final String PROJECT_NAME = "projectName";					// TestDroid nécessite un nom de projet dans lequel l'automatisation aura lieu	
     
     public static final String TEST_NAME = "testName";
+    public static final String RELATIVE_OUTPUT_DIR = "relativeOutputDir";
     
     // internal storage
     public static final String TEST_VARIABLES = "testVariables"; 				// configuration (aka variables, get via 'param()' method) used for the current test. It is not updated via XML file
@@ -222,6 +228,7 @@ public class SeleniumTestsContext {
     private SeleniumRobotVariableServerConnector variableServer;
     private SeleniumGridConnector seleniumGridConnector;
     private TestManager testManagerIntance;
+    private String baseOutputDirectory; // the 'test-output' folder if not overridden
     
     public SeleniumTestsContext() {
     	// for test purpose only
@@ -237,6 +244,7 @@ public class SeleniumTestsContext {
     public SeleniumTestsContext(SeleniumTestsContext toCopy) {
     	contextDataMap = new HashMap<>(toCopy.contextDataMap); 
     	testNGContext = toCopy.testNGContext;
+    	baseOutputDirectory = toCopy.baseOutputDirectory;
     }
     
     public SeleniumTestsContext(final ITestContext context) {
@@ -337,7 +345,10 @@ public class SeleniumTestsContext {
         setViewPortHeight(getIntValueForTest(VIEWPORT_HEIGHT, System.getProperty(VIEWPORT_HEIGHT)));
         
         if (testNGContext != null) {
-        	setOutputDirectory(getValueForTest(OUTPUT_DIRECTORY, System.getProperty(OUTPUT_DIRECTORY)), testNGContext);
+        	
+        	// this value will be overwritten for thread context by a call to "configureContext"
+        	setOutputDirectory(getValueForTest(OUTPUT_DIRECTORY, System.getProperty(OUTPUT_DIRECTORY)), testNGContext, true);
+        	baseOutputDirectory = getOutputDirectory();
 
             // parse other parameters that are defined in testng xml or as user parameters but not defined
             // in this context. Called here so that user defined parameters can be accessed inside @Before / @After annotated methods
@@ -653,9 +664,61 @@ public class SeleniumTestsContext {
     }
     
     /**
+     * Created the directory specific to this test. It must be unique even if the same test is executed twice
+     * So the created directory is 'test-ouput/<test_name>-<index>'
+     */
+    private void createTestSpecificOutputDirectory(final ITestResult testNGResult) {
+    	String testOutputFolderName = hashTest(testNGResult);
+    	
+    	// use base directory as it's fixed along the life of the test
+		Path outputDir = Paths.get(baseOutputDirectory, testOutputFolderName);
+		setRelativeOutputDir(testOutputFolderName);
+		setOutputDirectory(outputDir.toString(), testNGContext, false);
+
+    }
+    
+    /**
+     * Returns the name of the folder where all files (result, snapshots) will be stored insite 'test-output' folder
+     * By default, folder name is the name of the test. But if the same test is executed twice, with for example DataProvider or through different suites / tests, 
+     * then increment a suffix so that there is no collision between test results
+     * @param testNGResult
+     * @return
+     */
+    private String hashTest(final ITestResult testNGResult) {
+    	String testNameModified = StringUtility.replaceOddCharsFromFileName(getTestName());
+    	String uniqueIdentifier;
+    	if (testNGResult != null) {
+    		uniqueIdentifier = testNGContext.getSuite().getName()
+	    			+ "-" + testNGContext.getName()
+	    			+ "-" + testNGResult.getTestClass().getName()
+	    			+ "-" + testNameModified
+	    			+ "-" + Arrays.hashCode(testNGResult.getParameters());
+    	} else {
+    		uniqueIdentifier = testNGContext.getSuite().getName()
+	    			+ "-" + testNGContext.getName()
+	    			+ "-" + testNameModified;
+    	}
+    	
+    	if (!outputFolderNames.containsKey(uniqueIdentifier)) {
+    		if (!outputFolderNames.values().contains(testNameModified)) {
+    			outputFolderNames.put(uniqueIdentifier, testNameModified);
+    		} else {
+	    		int i = 0;
+	    		while (i++ < 1000) {
+	    			if (!outputFolderNames.values().contains(testNameModified + "-" + i)) {
+	        			outputFolderNames.put(uniqueIdentifier, testNameModified + "-" + i);
+	        			break;
+	    			}
+	    		}
+    		}
+    	}
+    	return outputFolderNames.get(uniqueIdentifier);
+    }
+    
+    /**
      * post configuration of the context
      */
-    public void configureContext(final String testName) {
+    public void configureContext(final String testName, final ITestResult testNGResult) {
     	
     	// to do before creating connectors because seleniumRobot server needs it
         setTestName(testName);
@@ -664,6 +727,9 @@ public class SeleniumTestsContext {
         
         // update browser version: replace installed one with those given in parameters
         updateInstalledBrowsers();
+        
+        // update ouput directory
+        createTestSpecificOutputDirectory(testNGResult);
       
         // load pageloading plugins
         String path = (String) getAttribute(PLUGIN_CONFIG_PATH);
@@ -1153,6 +1219,10 @@ public class SeleniumTestsContext {
     
     public String getTestName() {
     	return (String) getAttribute(TEST_NAME);
+    }
+
+    public String getRelativeOutputDir() {
+    	return (String) getAttribute(RELATIVE_OUTPUT_DIR);
     }
     
     public Integer getViewPortWidth() {
@@ -1701,12 +1771,12 @@ public class SeleniumTestsContext {
     	}
     }
     
-    public void setOutputDirectory(String outputDir, ITestContext context) {
+    public void setOutputDirectory(String outputDir, ITestContext context, boolean configureTestNg) {
     	setDefaultOutputDirectory(context);
     	if (outputDir == null) {
     		setAttribute(OUTPUT_DIRECTORY, new File(context.getOutputDirectory()).getParent());
     	} else {
-    		if (context instanceof TestRunner) {
+    		if (context instanceof TestRunner && configureTestNg) {
     			((TestRunner)context).setOutputDirectory(outputDir);
     		}
     		setAttribute(OUTPUT_DIRECTORY, new File(outputDir).getAbsolutePath().replace(File.separator, "/"));
@@ -1769,6 +1839,10 @@ public class SeleniumTestsContext {
     
     public void setTestName(String name) {
     	setAttribute(TEST_NAME, name);
+    }
+    
+    public void setRelativeOutputDir(String name) {
+    	setAttribute(RELATIVE_OUTPUT_DIR, name);
     }
     
     public void setMobilePlatformVersion(final String version) {
