@@ -102,7 +102,7 @@ public class TestSeleniumGridConnectorFactory extends ConnectorsTest {
 	 */
 	@Test(groups={"ut"}, expectedExceptions=ConfigurationException.class)
 	public void testWithErrorCodeHttp() throws UnsupportedOperationException, IOException, UnirestException {
-		
+		SeleniumGridConnectorFactory.setRetryTimeout(1);
 		createServerMock("GET", SeleniumGridConnectorFactory.GUI_SERVLET, 404, "default monitoring page");
 		
 		SeleniumGridConnectorFactory.getInstance(SERVER_URL + "/wd/hub");
