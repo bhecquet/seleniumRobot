@@ -32,7 +32,7 @@ public class TestArchiving extends ReporterTest {
 			
 			Assert.assertTrue(Paths.get(outputFolder.getAbsolutePath(), "SeleniumTestReport.html").toFile().exists());
 			Assert.assertTrue(Paths.get(outputFolder.getAbsolutePath(), "results.json").toFile().exists());
-			Assert.assertTrue(Paths.get(outputFolder.getAbsolutePath(), "PERF-com.seleniumtests.it.stubclasses.StubTestClass.testAndSubActions.xml").toFile().exists());
+			Assert.assertTrue(Paths.get(outputFolder.getAbsolutePath(), "testAndSubActions", "PERF-result.xml").toFile().exists());
 		} finally {
 			System.clearProperty(SeleniumTestsContext.ARCHIVE_TO_FILE);
 		}

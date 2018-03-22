@@ -16,17 +16,14 @@
  */
 package com.seleniumtests.it.reporter;
 
-import static org.mockito.Mockito.spy;
-
 import java.io.File;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
+import java.io.IOException;
+import java.nio.file.Paths;
 
 import org.apache.commons.io.FileUtils;
 import org.testng.Assert;
 import org.testng.ITestContext;
-import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
@@ -42,17 +39,10 @@ public class TestPerformanceReporter extends ReporterTest {
 	private CustomReporter reporter;
 
 	
-	@AfterMethod(groups={"it"})
-	private void deleteGeneratedFiles() {
-		if (reporter == null) {
-			return;
-		}
-		File outDir = new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory());
-		for (File file: outDir.listFiles()) {
-			if (file.getName().startsWith("PERF")) {
-				file.delete();
-			}
-		}
+	@BeforeMethod(groups={"it"})
+	private void deleteGeneratedFiles() throws IOException {
+		FileUtils.deleteDirectory(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()));
+		
 		
 	}
 	
@@ -60,19 +50,13 @@ public class TestPerformanceReporter extends ReporterTest {
 	@Test(groups={"it"})
 	public void testReportGeneration(ITestContext testContext) throws Exception {
 		
-		reporter = spy(new CustomReporter());
-
 		executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"});
-		String outDir = new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath();
-		List<String> resultFileNames = Arrays.asList(new File(outDir).listFiles())
-				.stream().map(f -> f.getName())
-				.collect(Collectors.toList());
-		
-		
+
 		// check all files are generated with the right name
-		Assert.assertTrue(resultFileNames.contains("PERF-com.seleniumtests.it.stubclasses.StubTestClass.testAndSubActions.xml"));
-		Assert.assertTrue(resultFileNames.contains("PERF-com.seleniumtests.it.stubclasses.StubTestClass.testInError.xml"));
-		Assert.assertTrue(resultFileNames.contains("PERF-com.seleniumtests.it.stubclasses.StubTestClass.testWithException.xml"));
+		Assert.assertTrue(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testAndSubActions", "PERF-result.xml").toFile().exists());
+		Assert.assertTrue(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testInError", "PERF-result.xml").toFile().exists());
+		Assert.assertTrue(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testWithException", "PERF-result.xml").toFile().exists());
+
 	}
 	
 	/**
@@ -86,7 +70,7 @@ public class TestPerformanceReporter extends ReporterTest {
 		executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"});
 		
 		// check content of summary report file
-		String jmeterReport = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "PERF-com.seleniumtests.it.stubclasses.StubTestClass.testAndSubActions.xml"));
+		String jmeterReport = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testAndSubActions", "PERF-result.xml").toFile());
 		
 		Assert.assertTrue(jmeterReport.contains("<testsuite errors=\"0\" failures=\"1\" hostname=\"\" name=\"testAndSubActions\" tests=\"6\" time=\"15"));
 		Assert.assertTrue(jmeterReport.contains("<testcase classname=\"com.seleniumtests.it.stubclasses.StubTestClass\" name=\"Step 3: step 1\" time=\"1.23\">"));
@@ -107,7 +91,7 @@ public class TestPerformanceReporter extends ReporterTest {
 		executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"});
 		
 		// check content of summary report file
-		String jmeterReport = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "PERF-com.seleniumtests.it.stubclasses.StubTestClass.testAndSubActions.xml"));
+		String jmeterReport = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testAndSubActions", "PERF-result.xml").toFile());
 		
 		Assert.assertTrue(jmeterReport.contains("<error message=\"driver exception"));
 		Assert.assertTrue(jmeterReport.contains("<![CDATA[class org.openqa.selenium.WebDriverException: driver exception"));
@@ -122,13 +106,17 @@ public class TestPerformanceReporter extends ReporterTest {
 	@Test(groups={"it"})
 	public void testMultipleReportsWithSteps(ITestContext testContext) throws Exception {
 
-		System.setProperty("customTestReports", "PERF::xml::reporter/templates/report.perf.vm,PERF2::json::ti/report.test.vm");
-		executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"});
-		
-		String jmeterReport1 = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "PERF-com.seleniumtests.it.stubclasses.StubTestClass.testAndSubActions.xml"));
-		String jmeterReport2 = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "PERF2-com.seleniumtests.it.stubclasses.StubTestClass.testAndSubActions.json"));
-		
-		Assert.assertTrue(jmeterReport1.contains("<testsuite errors=\"0\" failures=\"1\" hostname=\"\" name=\"testAndSubActions\" tests=\"6\" time=\"15"));
-		Assert.assertTrue(jmeterReport2.contains("\"suiteName\": \"testAndSubActions\""));
+		try {
+			System.setProperty("customTestReports", "PERF::xml::reporter/templates/report.perf.vm,PERF2::json::ti/report.test.vm");
+			executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"});
+			
+			String jmeterReport1 = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testAndSubActions", "PERF-result.xml").toFile());
+			String jmeterReport2 = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testAndSubActions", "PERF2-result.json").toFile());
+			
+			Assert.assertTrue(jmeterReport1.contains("<testsuite errors=\"0\" failures=\"1\" hostname=\"\" name=\"testAndSubActions\" tests=\"6\" time=\"15"));
+			Assert.assertTrue(jmeterReport2.contains("\"suiteName\": \"testAndSubActions\""));
+		} finally {
+			System.clearProperty("customTestReports");
+		}
 	}
 }

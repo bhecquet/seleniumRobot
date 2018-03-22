@@ -336,10 +336,10 @@ public class SeleniumTestsContextManager {
     }
 
     public static void initThreadContext() {
-        initThreadContext(globalContext.getTestNGContext(), null, null);
+        initThreadContext(globalContext.getTestNGContext(), null, null, null);
     }
 
-    public static void initThreadContext(ITestContext testNGCtx, String testName, ITestResult testResult) {
+    public static void initThreadContext(ITestContext testNGCtx, String testName, String className, ITestResult testResult) {
 
     	ITestContext newTestNGCtx = getContextFromConfigFile(testNGCtx);
     	SeleniumTestsContext seleniumTestsCtx = new SeleniumTestsContext(newTestNGCtx);
@@ -347,7 +347,7 @@ public class SeleniumTestsContextManager {
         threadLocalContext.set(seleniumTestsCtx);
         
         // update some values after init. These init call the thread context previously created
-        seleniumTestsCtx.configureContext(testName, testResult);
+        seleniumTestsCtx.configureContext(testName, className, testResult);
     }
     
     /**
@@ -355,9 +355,9 @@ public class SeleniumTestsContextManager {
      * This is a correction for issue #94
      * @param testName
      */
-    public static void updateThreadContext(String testName, ITestResult testResult) {
+    public static void updateThreadContext(String testName, String className, ITestResult testResult) {
     	if (threadLocalContext.get() != null) {
-    		threadLocalContext.get().configureContext(testName, testResult);
+    		threadLocalContext.get().configureContext(testName, className, testResult);
     	}
     }
 
@@ -369,7 +369,13 @@ public class SeleniumTestsContextManager {
         threadLocalContext.set(ctx);
     }
     
-    public static void setThreadContextFromTestResult(ITestResult testResult) {
+    /**
+     * get SR context stored in test result if it exists. Else, create a new one (happens when a test method has been skipped for example)
+     * @param testNGCtx
+     * @param testName
+     * @param testResult
+     */
+    public static void setThreadContextFromTestResult(ITestContext testNGCtx, String testName, String className, ITestResult testResult) {
     	if (testResult == null) {
     		throw new ConfigurationException("Cannot set context from testResult as it is null");
     	}
@@ -377,7 +383,8 @@ public class SeleniumTestsContextManager {
     		setThreadContext((SeleniumTestsContext)testResult.getAttribute(SeleniumRobotTestListener.TEST_CONTEXT));
     	} else {
     		logger.error("Result did not contain thread context, initializing a new one");
-    		initThreadContext();
+    		initThreadContext(testNGCtx, testName, className, testResult);
+    		testResult.setAttribute(SeleniumRobotTestListener.TEST_CONTEXT, getThreadContext());
     	}
     }
     

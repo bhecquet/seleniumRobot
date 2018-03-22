@@ -152,4 +152,12 @@ public abstract class CommonReporter {
 			}
 		}
 	}
+	
+	public String getClassName(final ITestResult testResult) {
+		if (testResult.getTestClass() != null) {
+			return testResult.getTestClass().getName();
+		} else {
+			return "noclass";
+		}
+	}
 }

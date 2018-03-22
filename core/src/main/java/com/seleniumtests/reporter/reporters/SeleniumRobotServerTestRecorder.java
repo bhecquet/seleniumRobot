@@ -122,7 +122,7 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 			for (ITestResult testResult: methodResults) {
 				
 				// issue #81: recreate test context from this context (due to multithreading, this context may be null if parallel testing is used)
-				SeleniumTestsContextManager.setThreadContextFromTestResult(testResult);
+				SeleniumTestsContextManager.setThreadContextFromTestResult(context, getTestName(testResult), getClassName(testResult), testResult);
 				
 				// skipped tests has never been executed and so attribute (set in TestListener) has not been applied
 				String testName = getTestName(testResult);

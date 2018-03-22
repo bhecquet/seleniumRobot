@@ -63,7 +63,7 @@ public class TestOsUtility extends GenericTest {
 	@Test(groups={"it"})
 	public void testLinuxProcessList() {
 		if (OSUtility.isLinux()) {
-			if (osUtil.isProcessRunning("dbus-daemon")) {
+			if (osUtil.isProcessRunning("dbus-daemon") || osUtil.isProcessRunning("/usr/sbin/cron")) {
 				return;
 			}
 			Assert.fail("no dbus process found");

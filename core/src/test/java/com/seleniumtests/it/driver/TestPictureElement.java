@@ -46,7 +46,7 @@ public class TestPictureElement extends GenericTest {
 	@BeforeClass(groups={"it"})
 	public void initDriver(final ITestContext testNGCtx) throws Exception {
 		initThreadContext(testNGCtx);
-		SeleniumTestsContextManager.getThreadContext().setBrowser("chrome");
+		SeleniumTestsContextManager.getThreadContext().setBrowser("firefox");
 		SeleniumTestsContextManager.getThreadContext().setExplicitWaitTimeout(2);
 		testPage = new DriverTestPageWithoutFixedPattern(true);
 		driver = WebUIDriver.getWebDriver(true);

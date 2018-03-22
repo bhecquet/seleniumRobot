@@ -37,13 +37,10 @@ import org.testng.ITestContext;
 import org.testng.ITestResult;
 import org.testng.xml.XmlSuite;
 
-import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
-import com.seleniumtests.core.runner.SeleniumRobotTestListener;
 import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.reporter.logger.TestLogging;
 import com.seleniumtests.reporter.logger.TestStep;
-import com.seleniumtests.util.StringUtility;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
 public class CustomReporter extends CommonReporter implements IReporter {
@@ -86,7 +83,7 @@ public class CustomReporter extends CommonReporter implements IReporter {
 				for (ITestResult testResult: resultSet) {
 					
 					// done in case it was null (issue #81)
-					SeleniumTestsContextManager.setThreadContextFromTestResult(testResult);
+					SeleniumTestsContextManager.setThreadContextFromTestResult(context, getTestName(testResult), getClassName(testResult), testResult);
 					
 					for (ReportInfo reportInfo: SeleniumTestsContextManager.getThreadContext().getCustomTestReports()) {
 						generateTestReport(testResult, reportInfo);

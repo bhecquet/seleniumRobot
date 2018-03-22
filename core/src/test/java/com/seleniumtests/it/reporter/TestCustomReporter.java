@@ -17,6 +17,7 @@
 package com.seleniumtests.it.reporter;
 
 import java.io.File;
+import java.nio.file.Paths;
 
 import org.apache.commons.io.FileUtils;
 import org.json.JSONObject;
@@ -43,7 +44,7 @@ public class TestCustomReporter extends ReporterTest {
 			executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"});
 				
 			// check content of the file. It should contains all fields with a value
-			String detailedReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SUP-com.seleniumtests.it.stubclasses.StubTestClass.testAndSubActions.json"));
+			String detailedReportContent = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testAndSubActions", "SUP-result.json").toFile());
 			
 			JSONObject json = new JSONObject(detailedReportContent);
 			
@@ -77,11 +78,11 @@ public class TestCustomReporter extends ReporterTest {
 			executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"});
 				
 			// check content of the file. It should contain error
-			String detailedReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SUP-com.seleniumtests.it.stubclasses.StubTestClass.testInError.xml"));
+			String detailedReportContent = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testInError", "SUP-result.xml").toFile());
 			detailedReportContent = detailedReportContent.replace("\n", "").replace("\r",  "").replaceAll(">\\s+<", "><");
 			Assert.assertTrue(detailedReportContent.contains("<errors><error>				class java.lang.AssertionError: error								at com.seleniumtests"));
 			
-			String detailedReportContent2 = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SUP-com.seleniumtests.it.stubclasses.StubTestClass.testAndSubActions.xml"));
+			String detailedReportContent2 = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testAndSubActions", "SUP-result.xml").toFile());
 			detailedReportContent2 = detailedReportContent2.replace("\n", "").replace("\r",  "").replaceAll(">\\s+<", "><");
 			Assert.assertTrue(detailedReportContent2.contains("<errors></errors>"));
 			

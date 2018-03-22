@@ -1,6 +1,8 @@
 package com.seleniumtests.it.reporter;
 
+import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -8,20 +10,30 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+import org.apache.commons.io.FileUtils;
+import org.testng.ITestContext;
 import org.testng.TestNG;
+import org.testng.annotations.BeforeMethod;
 import org.testng.xml.XmlClass;
 import org.testng.xml.XmlPackage;
 import org.testng.xml.XmlSuite;
-import org.testng.xml.XmlSuite.FailurePolicy;
 import org.testng.xml.XmlSuite.ParallelMode;
 import org.testng.xml.XmlTest;
 
 import com.seleniumtests.MockitoTest;
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.reporter.logger.TestLogging;
 
 public class ReporterTest extends MockitoTest {
+	
 
+	@BeforeMethod(groups={"it"})
+	public void setLogs(Method method, ITestContext context) {
+		TestLogging.reset();
+		SeleniumTestsContext.resetOutputFolderNames();
+	}
+	
 	protected TestNG executeSubTest(String[] testClasses) throws IOException {
 		return executeSubTest(1, testClasses);
 	}
