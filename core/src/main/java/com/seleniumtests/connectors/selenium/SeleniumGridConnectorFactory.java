@@ -9,6 +9,7 @@ import org.openqa.selenium.support.ui.SystemClock;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 import com.seleniumtests.customexception.ConfigurationException;
+import com.seleniumtests.util.helper.WaitHelper;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
 /**
@@ -64,6 +65,7 @@ public class SeleniumGridConnectorFactory {
 	        		throw new ConfigurationException("Cannot connect to the grid hub at " + url);
 	        	}
 			} catch (Exception ex) {
+				WaitHelper.waitForMilliSeconds(500);
 				currentException = ex;
 				continue;
 			}
