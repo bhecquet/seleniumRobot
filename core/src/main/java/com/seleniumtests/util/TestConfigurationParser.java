@@ -41,6 +41,10 @@ public class TestConfigurationParser {
 	private Document doc;
 	
 	public TestConfigurationParser(final String xmlFileName) {
+		
+		// issue #113: corrects the error when executing integration tests
+		Thread.currentThread().setContextClassLoader(TestConfigurationParser.class.getClassLoader());
+		
 		File xmlFile = new File(xmlFileName);
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder dBuilder;

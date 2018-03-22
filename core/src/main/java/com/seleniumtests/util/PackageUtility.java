@@ -37,6 +37,8 @@ public class PackageUtility {
 	 */
 	public static String getVersionFromPom(InputStream pomStream) throws IOException, SAXException, ParserConfigurationException, XPathExpressionException {
 		
+		// issue #113: corrects the error when executing integration tests
+		Thread.currentThread().setContextClassLoader(PackageUtility.class.getClassLoader());
 		Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(pomStream);
 		doc.getDocumentElement().normalize();
 		String version = (String) XPathFactory.newInstance()
