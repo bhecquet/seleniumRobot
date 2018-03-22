@@ -56,7 +56,6 @@ public class PictureElement {
 	private HtmlElement intoElement;
 	private Rectangle detectedObjectRectangle;
 	private double pictureSizeRatio;
-	private EventFiringWebDriver driver;
 	private ImageDetector detector;
 	private ScreenshotUtil screenshotUtil;
 	private SystemClock clock = new SystemClock();
@@ -72,7 +71,7 @@ public class PictureElement {
 	public PictureElement(String label, String resourcePath, HtmlElement intoElement, double detectionThreshold) {
 		this(label, createFileFromResource(resourcePath), intoElement, detectionThreshold);
 		this.resourcePath = resourcePath;
-		driver = (EventFiringWebDriver)WebUIDriver.getWebDriver();
+		
 	}
 	
 	public PictureElement(String label, File pictureFile, HtmlElement intoElement) {
@@ -91,7 +90,6 @@ public class PictureElement {
 		detector = new ImageDetector();
 		detector.setDetectionThreshold(detectionThreshold);
 		setObjectPictureFile(pictureFile);
-		screenshotUtil = new ScreenshotUtil();
 	}
 	
 	private static File createFileFromResource(String resource)  {
@@ -117,9 +115,9 @@ public class PictureElement {
 		
 		File screenshotFile;
 		if (searchOnly) {
-			screenshotFile = screenshotUtil.captureWebPageToFile();
+			screenshotFile = new ScreenshotUtil(getWebDriver()).captureWebPageToFile();
 		} else {
-			screenshotFile = screenshotUtil.captureDesktopToFile();
+			screenshotFile = new ScreenshotUtil(getWebDriver()).captureDesktopToFile();
 		}
 		if (screenshotFile == null) {
 			throw new WebDriverException("Screenshot does not exist");
@@ -182,13 +180,13 @@ public class PictureElement {
 	}
 	
 	public void moveAndClick(WebElement element, int coordX, int coordY) {
-		new Actions(driver).moveToElement(element, coordX, coordY).click().build().perform();
+		new Actions(getWebDriver()).moveToElement(element, coordX, coordY).click().build().perform();
 	}
 	
 	public void sendKeys(final CharSequence text, int xOffset, int yOffset) {
 		clickAt(xOffset, yOffset);
 		
-		new Actions(driver).sendKeys(text).build().perform();
+		new Actions(getWebDriver()).sendKeys(text).build().perform();
 	}
 
 	public void sendKeys(final CharSequence text) {
@@ -237,10 +235,14 @@ public class PictureElement {
 	}
 	
 	private AppiumDriver<?> getMobileDriver() {
-		if (!(((CustomEventFiringWebDriver)driver).getWebDriver() instanceof AppiumDriver<?>)) {
+		if (!(((CustomEventFiringWebDriver)getWebDriver()).getWebDriver() instanceof AppiumDriver<?>)) {
     		throw new ScenarioException("action is available only for mobile platforms");
     	}
-		return (AppiumDriver<?>)((CustomEventFiringWebDriver)driver).getWebDriver();
+		return (AppiumDriver<?>)((CustomEventFiringWebDriver)getWebDriver()).getWebDriver();
+	}
+	
+	private EventFiringWebDriver getWebDriver() {
+		return (EventFiringWebDriver)WebUIDriver.getWebDriver();
 	}
 	
 	// TODO: actions for mobile

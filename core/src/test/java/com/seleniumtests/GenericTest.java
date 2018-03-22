@@ -37,14 +37,14 @@ public class GenericTest {
 	@BeforeMethod(groups={"ut", "it"})  
 	public void initTest(final ITestContext testNGCtx) {
 		SeleniumTestsContextManager.initGlobalContext(testNGCtx);
-		SeleniumTestsContextManager.initThreadContext(testNGCtx, null, null);
+		SeleniumTestsContextManager.initThreadContext(testNGCtx, null, null, null);
 		SeleniumTestsContextManager.getThreadContext().setSoftAssertEnabled(false);
 		SeleniumTestsContextManager.getGlobalContext().setSoftAssertEnabled(false);
 	}
 	
 	public void initThreadContext(final ITestContext testNGCtx) {
 		SeleniumTestsContextManager.initGlobalContext(testNGCtx);
-		SeleniumTestsContextManager.initThreadContext(testNGCtx, null, null);
+		SeleniumTestsContextManager.initThreadContext(testNGCtx, null, null, null);
 		SeleniumTestsContextManager.getThreadContext().setSoftAssertEnabled(false);
 		SeleniumTestsContextManager.getGlobalContext().setSoftAssertEnabled(false);
 	}

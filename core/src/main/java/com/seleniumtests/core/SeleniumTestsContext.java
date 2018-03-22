@@ -214,21 +214,22 @@ public class SeleniumTestsContext {
 	public static final boolean DEFAULT_OPTIMIZE_REPORTS = false;
     
     public static final int DEFAULT_REPLAY_TIME_OUT = 30;
-    
-    private Map<ITestResult, List<Throwable>> verificationFailuresMap = new HashMap<>();
 
-	// folder config
-	private Map<String, HashMap<String,String>> idMapping;
+	
 
+	// group of fields below must be copied in SeleniumTestsContext constructor because they are not rediscovered with 'configureContext' method
     // Data object to store all context data
     private Map<String, Object> contextDataMap = Collections.synchronizedMap(new HashMap<String, Object>());
-    
-
+    private String baseOutputDirectory; // the 'test-output' folder if not overridden
     private ITestContext testNGContext = null;
+    private Map<ITestResult, List<Throwable>> verificationFailuresMap = new HashMap<>();
+    
     private SeleniumRobotVariableServerConnector variableServer;
     private SeleniumGridConnector seleniumGridConnector;
     private TestManager testManagerIntance;
-    private String baseOutputDirectory; // the 'test-output' folder if not overridden
+    
+    // folder config
+ 	private Map<String, HashMap<String,String>> idMapping;
     
     public SeleniumTestsContext() {
     	// for test purpose only
@@ -245,6 +246,7 @@ public class SeleniumTestsContext {
     	contextDataMap = new HashMap<>(toCopy.contextDataMap); 
     	testNGContext = toCopy.testNGContext;
     	baseOutputDirectory = toCopy.baseOutputDirectory;
+    	verificationFailuresMap = new HashMap<>(toCopy.verificationFailuresMap);
     }
     
     public SeleniumTestsContext(final ITestContext context) {
@@ -667,8 +669,8 @@ public class SeleniumTestsContext {
      * Created the directory specific to this test. It must be unique even if the same test is executed twice
      * So the created directory is 'test-ouput/<test_name>-<index>'
      */
-    private void createTestSpecificOutputDirectory(final ITestResult testNGResult) {
-    	String testOutputFolderName = hashTest(testNGResult);
+    private void createTestSpecificOutputDirectory(final ITestResult testNGResult, final String className) {
+    	String testOutputFolderName = hashTest(testNGResult, className);
     	
     	// use base directory as it's fixed along the life of the test
 		Path outputDir = Paths.get(baseOutputDirectory, testOutputFolderName);
@@ -684,18 +686,19 @@ public class SeleniumTestsContext {
      * @param testNGResult
      * @return
      */
-    private String hashTest(final ITestResult testNGResult) {
+    private String hashTest(final ITestResult testNGResult, final String className) {
     	String testNameModified = StringUtility.replaceOddCharsFromFileName(getTestName());
     	String uniqueIdentifier;
     	if (testNGResult != null) {
     		uniqueIdentifier = testNGContext.getSuite().getName()
 	    			+ "-" + testNGContext.getName()
-	    			+ "-" + testNGResult.getTestClass().getName()
+	    			+ "-" + className
 	    			+ "-" + testNameModified
 	    			+ "-" + Arrays.hashCode(testNGResult.getParameters());
     	} else {
     		uniqueIdentifier = testNGContext.getSuite().getName()
 	    			+ "-" + testNGContext.getName()
+	    			+ "-" + className
 	    			+ "-" + testNameModified;
     	}
     	
@@ -718,7 +721,7 @@ public class SeleniumTestsContext {
     /**
      * post configuration of the context
      */
-    public void configureContext(final String testName, final ITestResult testNGResult) {
+    public void configureContext(final String testName, final String className, final ITestResult testNGResult) {
     	
     	// to do before creating connectors because seleniumRobot server needs it
         setTestName(testName);
@@ -729,7 +732,7 @@ public class SeleniumTestsContext {
         updateInstalledBrowsers();
         
         // update ouput directory
-        createTestSpecificOutputDirectory(testNGResult);
+        createTestSpecificOutputDirectory(testNGResult, className);
       
         // load pageloading plugins
         String path = (String) getAttribute(PLUGIN_CONFIG_PATH);
@@ -1855,5 +1858,12 @@ public class SeleniumTestsContext {
     
     public void setViewPortHeight(Integer height) {
     	setAttribute(VIEWPORT_HEIGHT, height);    	
+    }
+    
+    /**
+     * To be used by unit tests exclusively
+     */
+    public static void resetOutputFolderNames() {
+    	outputFolderNames.clear();
     }
 }

@@ -697,7 +697,7 @@ public class TestSeleniumTestContext extends GenericTest {
 	public void testWrongType(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setTmsRun("{'type':'sonar'}");
-		SeleniumTestsContextManager.getThreadContext().configureContext(null, null);
+		SeleniumTestsContextManager.getThreadContext().configureContext(null, null, null);
 	}
 	@Test(groups="ut context", expectedExceptions=ConfigurationException.class)
 	public void testWrongFormat(final ITestContext testNGCtx, final XmlTest xmlTest) {

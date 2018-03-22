@@ -97,9 +97,9 @@ public class TestSeleniumRobotTestListener extends GenericTest {
 		executeSubTest(5, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass.testAndSubActions"}, "core_3,core_4");
 		
 		String mainReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport.html"));
-		Assert.assertTrue(mainReportContent.contains(".html'>core_3</a>"));
-		Assert.assertTrue(mainReportContent.contains(".html'>core_4</a>"));
-		Assert.assertTrue(mainReportContent.contains(".html'>testAndSubActions</a>"));
+		Assert.assertTrue(mainReportContent.contains(">core_3</a>"));
+		Assert.assertTrue(mainReportContent.contains(">core_4</a>"));
+		Assert.assertTrue(mainReportContent.contains(">testAndSubActions</a>"));
 		
 		// all 3 methods are OK
 		Assert.assertEquals(StringUtils.countMatches(mainReportContent, "<i class=\"fa fa-circle circleSuccess\">"), 3);
@@ -160,11 +160,11 @@ public class TestSeleniumRobotTestListener extends GenericTest {
 		
 		String mainReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport.html"));
 		mainReportContent = mainReportContent.replace("\n", "").replace("\r",  "");
-		Assert.assertEquals(StringUtils.countMatches(mainReportContent, "class=\"fa fa-circle circleSuccess\"></i><a href='SeleniumTestReport"), 
-							StringUtils.countMatches(mainReportContent, "></i><a href='SeleniumTestReport-") - 1);
+		Assert.assertEquals(StringUtils.countMatches(mainReportContent, "class=\"fa fa-circle circleSuccess\">"), 
+							StringUtils.countMatches(mainReportContent, "TestReport.html") - 1);
 
 		// test1Listener4 fails as expected
-		Assert.assertTrue(mainReportContent.matches(".*<i class\\=\"fa fa-circle circleSkipped\"></i><a href\\='SeleniumTestReport-\\d+\\.html'>test1Listener4</a>.*"));
+		Assert.assertTrue(mainReportContent.matches(".*<i class\\=\"fa fa-circle circleSkipped\"></i><a href\\='test1Listener4/TestReport\\.html'.*?>test1Listener4</a>.*"));
 	}
 	
 	@Test(groups={"it"})
@@ -174,11 +174,11 @@ public class TestSeleniumRobotTestListener extends GenericTest {
 		
 		String mainReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport.html"));
 		mainReportContent = mainReportContent.replace("\n", "").replace("\r",  "");
-		Assert.assertEquals(StringUtils.countMatches(mainReportContent, "class=\"fa fa-circle circleSuccess\"></i><a href='SeleniumTestReport"), 
-				StringUtils.countMatches(mainReportContent, "></i><a href='SeleniumTestReport-") - 1);
+		Assert.assertEquals(StringUtils.countMatches(mainReportContent, "class=\"fa fa-circle circleSuccess\">"), 
+				StringUtils.countMatches(mainReportContent, "TestReport.html") - 1);
 
 		// test1Listener4 fails as expected
-		Assert.assertTrue(mainReportContent.matches(".*<i class\\=\"fa fa-circle circleSkipped\"></i><a href\\='SeleniumTestReport-\\d+\\.html'>test1Listener4</a>.*"));
+		Assert.assertTrue(mainReportContent.matches(".*<i class\\=\"fa fa-circle circleSkipped\"></i><a href\\='test1Listener4/TestReport\\.html'.*?>test1Listener4</a>.*"));
 	}
 	
 	@Test(groups={"it"})
@@ -188,16 +188,10 @@ public class TestSeleniumRobotTestListener extends GenericTest {
 		
 		String mainReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport.html"));
 		mainReportContent = mainReportContent.replace("\n", "").replace("\r",  "");
-		Assert.assertEquals(StringUtils.countMatches(mainReportContent, "class=\"fa fa-circle circleSuccess\"></i><a href='SeleniumTestReport"), 
-				StringUtils.countMatches(mainReportContent, "></i><a href='SeleniumTestReport-") - 1);
+		Assert.assertEquals(StringUtils.countMatches(mainReportContent, "class=\"fa fa-circle circleSuccess\">"), 
+				StringUtils.countMatches(mainReportContent, "TestReport.html") - 1);
 		
 		// test1Listener4 fails as expected
-		Assert.assertTrue(mainReportContent.matches(".*<i class\\=\"fa fa-circle circleSkipped\"></i><a href\\='SeleniumTestReport-\\d+\\.html'>test1Listener4</a>.*"));
+		Assert.assertTrue(mainReportContent.matches(".*<i class\\=\"fa fa-circle circleSkipped\"></i><a href\\='test1Listener4/TestReport\\.html'.*?>test1Listener4</a>.*"));
 	}
-	
-	/* TODO:
-	 * - 2 tests classes with 2 tests each, with @BeforeClass, @BeforeTest, @BeforeMethod, @BeforeGroup
-	 * 	- test all parallel modes available
-	 *  - check with logs, for example, that something added in test context (before) is kept in test and available after test
-	 */
 }

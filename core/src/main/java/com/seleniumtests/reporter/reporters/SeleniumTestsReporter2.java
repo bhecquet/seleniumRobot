@@ -269,7 +269,7 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 			for (ITestResult testResult: entry.getValue()) {
 				
 				// issue #81: recreate test context from this context (due to multithreading, this context may be null if parallel testing is done
-				SeleniumTestsContextManager.setThreadContextFromTestResult(testResult);
+				SeleniumTestsContextManager.setThreadContextFromTestResult(entry.getKey(), getTestName(testResult), getClassName(testResult), testResult);
 				
 				try {
 					mOut = createWriter(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), "TestReport.html");

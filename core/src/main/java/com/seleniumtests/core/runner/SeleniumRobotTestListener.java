@@ -252,8 +252,16 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 		
 		TestStep tearDownStep = new TestStep("Test end", testResult, new ArrayList<>());
 		TestLogging.setCurrentRootTestStep(tearDownStep);
-		TestLogging.log(String.format("Test is %s", testResult.isSuccess() ? "OK": "KO with error: " + testResult.getThrowable().getMessage()));
 		
+		if (testResult.isSuccess()) {
+			TestLogging.log("Test is OK");
+		} else if (testResult.getStatus() == ITestResult.FAILURE) {
+			String error = testResult.getThrowable() != null ? testResult.getThrowable().getMessage(): "no error found";
+			TestLogging.log("Test is KO with error: " + error);
+		} else {
+			TestLogging.log("Test has not started or has been skipped");
+		}
+
 		if (WebUIDriver.getWebDriver(false) != null) {
 			for (ScreenShot screenshot: new ScreenshotUtil().captureWebPageSnapshots(true)) {
 				TestLogging.logScreenshot(screenshot);
@@ -461,28 +469,31 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 		}
 	}
 	
+	private String getTestMethodName(IInvokedMethod method, ITestResult testResult) {
+		if (SeleniumRobotTestPlan.isCucumberTest()) {
+    		return testResult.getParameters()[0].toString();
+    	} else {
+    		return method.getTestMethod().getMethodName();
+    	}
+	}
+	
 	/**
 	 * Execute the actions before test method
 	 */
 	private void executeBeforeTestMethod(IInvokedMethod method, ITestResult testResult, ITestContext context) {
-		if (SeleniumRobotTestPlan.isCucumberTest()) {
-    		testResult.setAttribute(SeleniumRobotLogger.METHOD_NAME, testResult.getParameters()[0].toString());
-    	} else {
-    		testResult.setAttribute(SeleniumRobotLogger.METHOD_NAME, method.getTestMethod().getMethodName());
-    	}
+		testResult.setAttribute(SeleniumRobotLogger.METHOD_NAME, getTestMethodName(method, testResult));
     	
 		logger.info(SeleniumRobotLogger.START_TEST_PATTERN + testResult.getAttribute(SeleniumRobotLogger.METHOD_NAME));
 		
 		// when @BeforeMethod has been used, threadContext is already initialized and may have been updated. Do not overwrite options
 		// only reconfigure it
 		String className = method.getTestMethod().getTestClass().getName();
-		String methodName = method.getTestMethod().getMethodName();
 		SeleniumTestsContextManager.setThreadContext(SeleniumTestsContextManager.getMethodContext(context, 
 											className, 
 											testResult.getAttribute(SeleniumRobotLogger.METHOD_NAME).toString(), 
 											true));
 
-		SeleniumTestsContextManager.updateThreadContext((String)testResult.getAttribute(SeleniumRobotLogger.METHOD_NAME), testResult);
+		SeleniumTestsContextManager.updateThreadContext((String)testResult.getAttribute(SeleniumRobotLogger.METHOD_NAME), className, testResult);
 		
         SeleniumTestsContextManager.getThreadContext().setTestMethodSignature((String)testResult.getAttribute(SeleniumRobotLogger.METHOD_NAME));
     	

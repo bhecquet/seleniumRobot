@@ -46,6 +46,7 @@ public class StubTestClass extends StubParentClass {
 	
 	@BeforeClass(groups={"stub"})
 	public void setCount() {
+		WaitHelper.waitForMilliSeconds(100);
 		count = 0;
 	}
 
