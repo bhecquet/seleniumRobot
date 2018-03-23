@@ -504,13 +504,13 @@ public class HtmlElement implements WebElement, Locatable, HasIdentity {
 	 */
 	public void scrollToElement(int yOffset) {
 		findElement();
-		new Actions(driver).moveToElement(element).build().perform();
 		
 		if (SeleniumTestsContextManager.isWebTest()) {
 			((JavascriptExecutor) driver).executeScript("window.top.scroll(" + Math.max(element.getLocation().x - 200, 0) + "," + Math.max(element.getLocation().y + yOffset, 0) + ")");
 		} else {
 			logger.warn("scrollToElement is only available for Web tests");
 		}
+		new Actions(driver).moveToElement(element).build().perform();
 		
 	}
 
