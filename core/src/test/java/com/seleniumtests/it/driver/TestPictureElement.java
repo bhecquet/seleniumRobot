@@ -22,11 +22,13 @@ import org.testng.ITestContext;
 import org.testng.SkipException;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import com.seleniumtests.GenericTest;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.ImageSearchException;
+import com.seleniumtests.driver.TestType;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.it.driver.support.pages.DriverTestPageWithoutFixedPattern;
 
@@ -46,10 +48,15 @@ public class TestPictureElement extends GenericTest {
 	@BeforeClass(groups={"it"})
 	public void initDriver(final ITestContext testNGCtx) throws Exception {
 		initThreadContext(testNGCtx);
-		SeleniumTestsContextManager.getThreadContext().setBrowser("firefox");
+		SeleniumTestsContextManager.getThreadContext().setBrowser("chrome");
 		SeleniumTestsContextManager.getThreadContext().setExplicitWaitTimeout(2);
 		testPage = new DriverTestPageWithoutFixedPattern(true);
 		driver = WebUIDriver.getWebDriver(true);
+	}
+	
+	@BeforeMethod(groups={"it"}) 
+	public void initMethod() {
+		SeleniumTestsContextManager.getThreadContext().setTestType(TestType.WEB);
 	}
 	
 	@AfterMethod(groups={"it"})
@@ -60,7 +67,7 @@ public class TestPictureElement extends GenericTest {
 	@Test(groups={"it"})
 	public void testClickOnPicture() {
 		try {
-			testPage.picture.clickAt(0, -30);
+			testPage.picture.clickAt(0, -20);
 		} catch (ImageSearchException e) {
 			throw new SkipException("Image not found, we may be on screenless slave", e);
 		}
@@ -71,7 +78,7 @@ public class TestPictureElement extends GenericTest {
 	public void testSendKeysOnPicture() {
 		try {
 			testPage.logoText.clear();
-			testPage.picture.sendKeys("hello", 0, 5);
+			testPage.picture.sendKeys("hello", 0, 40);
 		} catch (ImageSearchException e) {
 			throw new SkipException("Image not found, we may be on screenless slave", e);
 		}

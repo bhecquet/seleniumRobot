@@ -157,7 +157,11 @@ public class PictureElement {
 		Point intoElementPos = intoElement.getCoordinates().onPage();
 		int relativeX = detectedObjectRectangle.x + detectedObjectRectangle.width / 2 - intoElementPos.x;
 		int relativeY = detectedObjectRectangle.y + detectedObjectRectangle.height / 2 - intoElementPos.y;
-		
+		System.out.println(intoElementPos);
+		System.out.println(relativeX);
+		System.out.println(relativeY);
+		System.out.println(detectedObjectRectangle.getPoint());
+		System.out.println(detectedObjectRectangle.getDimension());
 		moveAndClick(intoElement, relativeX + (int)(xOffset * pictureSizeRatio), relativeY + (int)(yOffset * pictureSizeRatio));
 	}
 	
