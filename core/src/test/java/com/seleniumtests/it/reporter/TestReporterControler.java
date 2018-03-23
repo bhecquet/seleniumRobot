@@ -17,25 +17,17 @@
 package com.seleniumtests.it.reporter;
 
 import java.io.File;
-import java.lang.reflect.Method;
 import java.nio.file.Paths;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.testng.Assert;
-import org.testng.ITestContext;
-import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
-import com.seleniumtests.reporter.logger.TestLogging;
 
 public class TestReporterControler extends ReporterTest {
 
-	@BeforeMethod(groups={"it"})
-	public void setLogs(Method method, ITestContext context) {
-		TestLogging.reset();
-	}	
 	
 	/**
 	 * Check that files by robot but not integrated to tests are deleted
