@@ -48,7 +48,7 @@ public class DriverTestPageWithoutFixedPattern extends PageObject {
     
     //for TestInterceptPage (the loader page of By has to be a PageObject)
     public By findById(String id) {
-    	return By.id(id);
+    	return By.id(id); 
     }
     
     public static String getPageUrl() {
