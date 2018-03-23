@@ -2,6 +2,7 @@ package com.seleniumtests.it.core;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -14,6 +15,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.TestNG;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import org.testng.xml.XmlClass;
 import org.testng.xml.XmlInclude;
@@ -25,6 +27,7 @@ import org.testng.xml.XmlTest;
 import com.seleniumtests.GenericTest;
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.reporter.logger.TestLogging;
 
 public class TestSeleniumRobotTestListener extends GenericTest {
 
@@ -81,6 +84,13 @@ public class TestSeleniumRobotTestListener extends GenericTest {
 		tng.run(); 
 		
 		return tng;
+	}
+	
+	@BeforeMethod(groups={"it"})
+	public void setLogs(Method method, ITestContext context) throws IOException {
+		TestLogging.reset();
+		SeleniumTestsContext.resetOutputFolderNames();
+		FileUtils.deleteDirectory(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()));
 	}
 	
 	/**
