@@ -30,7 +30,7 @@ public class TestReporterControler extends ReporterTest {
 
 	
 	/**
-	 * Check that files by robot but not integrated to tests are deleted
+	 * Check that files created by robot but not integrated to tests are deleted
 	 * 
 	 * @throws Exception
 	 */

@@ -9,6 +9,11 @@ import com.seleniumtests.util.StringUtility;
 public class TestStringUtility extends GenericTest {
 
 	@Test(groups={"ut"})
+	public void testOddCharWithNull() {
+		Assert.assertEquals(StringUtility.replaceOddCharsFromFileName(null), "null");
+	}
+	
+	@Test(groups={"ut"})
 	public void testOddCharRemovalQuote() {
 		Assert.assertEquals(StringUtility.replaceOddCharsFromFileName("''"), "");
 	}

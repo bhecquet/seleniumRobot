@@ -680,7 +680,7 @@ public class SeleniumTestsContext {
     }
     
     /**
-     * Returns the name of the folder where all files (result, snapshots) will be stored insite 'test-output' folder
+     * Returns the name of the folder where all files (result, snapshots) will be stored inside 'test-output' folder
      * By default, folder name is the name of the test. But if the same test is executed twice, with for example DataProvider or through different suites / tests, 
      * then increment a suffix so that there is no collision between test results
      * @param testNGResult
@@ -1866,4 +1866,8 @@ public class SeleniumTestsContext {
     public static void resetOutputFolderNames() {
     	outputFolderNames.clear();
     }
+
+	public static Map<String, String> getOutputFolderNames() {
+		return outputFolderNames;
+	}
 }
