@@ -18,6 +18,7 @@ package com.seleniumtests.ut.core;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 
@@ -25,8 +26,10 @@ import org.json.JSONObject;
 import org.openqa.selenium.Proxy.ProxyType;
 import org.testng.Assert;
 import org.testng.ITestContext;
+import org.testng.ITestResult;
 import org.testng.TestRunner;
 import org.testng.annotations.Test;
+import org.testng.internal.TestResult;
 import org.testng.xml.XmlTest;
 
 import com.seleniumtests.GenericTest;
@@ -985,5 +988,115 @@ public class TestSeleniumTestContext extends GenericTest {
 		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getWebProxyPac(), null);
 	}
 	
+
+	/**
+	 * Check that with a test name, we create an output folder for this test whose name is the name of the test
+	 */
+	@Test(groups="ut")
+	public void testNewOutputFolder(final ITestContext testNGCtx) {
+		initThreadContext(testNGCtx);
+		
+		ITestResult testResult = new TestResult();
+		testResult.setParameters(new String[] {"foo", "bar"});
+		
+		int outputNamesInitialSize = SeleniumTestsContext.getOutputFolderNames().size();
+		
+		SeleniumTestsContextManager.updateThreadContext("myTest", "com.seleniumtests.tests", testResult);
+		Assert.assertEquals(SeleniumTestsContext.getOutputFolderNames().size(), outputNamesInitialSize + 1);
+		
+		String key = testNGCtx.getSuite().getName()
+				+ "-" + testNGCtx.getName()
+				+ "-" + "com.seleniumtests.tests"
+				+ "-" + "myTest"
+				+ "-" + "3247054";
+		Assert.assertTrue(SeleniumTestsContext.getOutputFolderNames().containsKey(key));
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getRelativeOutputDir(), "myTest");
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), 
+							Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "myTest").toString().replace(File.separator, "/"));
+		
+	}
+	
+	/**
+	 * Check that if a context is reinitialized, (test is retried), the same folder is used
+	 */
+	@Test(groups="ut")
+	public void testOutputFolderWhenRetryingTest(final ITestContext testNGCtx) {
+		initThreadContext(testNGCtx);
+		
+		ITestResult testResult = new TestResult();
+		testResult.setParameters(new String[] {"foo", "bar"});
+		
+		int outputNamesInitialSize = SeleniumTestsContext.getOutputFolderNames().size();
+		
+		SeleniumTestsContextManager.updateThreadContext("myTest", "com.seleniumtests.tests", testResult);
+		
+		// reinitialize
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.updateThreadContext("myTest", "com.seleniumtests.tests", testResult);
+		
+		// check that only one folder is created
+		Assert.assertEquals(SeleniumTestsContext.getOutputFolderNames().size(), outputNamesInitialSize + 1);
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getRelativeOutputDir(), "myTest");
+		
+	}
+	
+	/**
+	 * Check that if test name already exists for an other test (the case with DataProvider where only parameters change), create an other directory
+	 * suffixed with "-1" as it's the same test method but not the same test execution
+	 */
+	@Test(groups="ut")
+	public void testExistingOutputFolder(final ITestContext testNGCtx) {
+		initThreadContext(testNGCtx);
+		ITestResult testResult = new TestResult();
+		testResult.setParameters(new String[] {"foo", "bar"});
+		SeleniumTestsContextManager.updateThreadContext("myTest", "com.seleniumtests.tests", testResult);
+		
+		initThreadContext(testNGCtx);
+		ITestResult testResult2 = new TestResult();
+		testResult2.setParameters(new String[] {"foo", "bar2"});
+		SeleniumTestsContextManager.updateThreadContext("myTest", "com.seleniumtests.tests", testResult2);
+		
+		
+		String key = testNGCtx.getSuite().getName()
+				+ "-" + testNGCtx.getName()
+				+ "-" + "com.seleniumtests.tests"
+				+ "-" + "myTest"
+				+ "-" + "3247054";
+		String key2 = testNGCtx.getSuite().getName()
+				+ "-" + testNGCtx.getName()
+				+ "-" + "com.seleniumtests.tests"
+				+ "-" + "myTest"
+				+ "-" + "6166074";
+		Assert.assertTrue(SeleniumTestsContext.getOutputFolderNames().containsKey(key));
+		Assert.assertTrue(SeleniumTestsContext.getOutputFolderNames().containsKey(key2));
+		
+		// check second created context
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getRelativeOutputDir(), "myTest-1");
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), 
+				Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "myTest-1").toString().replace(File.separator, "/"));
+		
+	}
+	
+	/**
+	 * Check that with a test name containing special characters, we create an output folder for this test whose name is the name of the test
+	 */
+	@Test(groups="ut")
+	public void testNewOutputFolderWithOddTestName(final ITestContext testNGCtx) {
+		initThreadContext(testNGCtx);
+		
+		ITestResult testResult = new TestResult();
+		testResult.setParameters(new String[] {"foo", "bar"});
+		
+		SeleniumTestsContextManager.updateThreadContext("<test | with @ chars>", "com.seleniumtests.tests", testResult);
+
+		String key = testNGCtx.getSuite().getName()
+				+ "-" + testNGCtx.getName()
+				+ "-" + "com.seleniumtests.tests"
+				+ "-" + "-test__with_@_chars-"
+				+ "-" + "3247054";
+		Assert.assertTrue(SeleniumTestsContext.getOutputFolderNames().containsKey(key));
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getRelativeOutputDir(), "-test__with_@_chars-");
+
+	}
 	
 }

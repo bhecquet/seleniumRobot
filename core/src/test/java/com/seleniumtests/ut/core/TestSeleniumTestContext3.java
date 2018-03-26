@@ -19,15 +19,21 @@ package com.seleniumtests.ut.core;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.io.File;
+import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
 import org.testng.ITestContext;
+import org.testng.ITestResult;
 import org.testng.annotations.Test;
+import org.testng.internal.TestResult;
 import org.testng.xml.XmlTest;
 
 import com.seleniumtests.MockitoTest;
@@ -40,7 +46,8 @@ import com.seleniumtests.core.TestVariable;
 import com.seleniumtests.customexception.ConfigurationException;
 
 /**
- * Test creation of seleniumrobot server connection inside SeleniumTestsContext
+ * - Test creation of seleniumrobot server connection inside SeleniumTestsContext
+ * - test handling of output directory (issue #112)
  * @author behe
  *
  */
@@ -49,8 +56,7 @@ public class TestSeleniumTestContext3 extends MockitoTest {
 	
 	@Mock
 	private SeleniumRobotVariableServerConnector variableServer;
-	
-	
+
 	/**
 	 * Check we create a variable server if all connexion params are present
 	 * @param testNGCtx
@@ -246,7 +252,5 @@ public class TestSeleniumTestContext3 extends MockitoTest {
 			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL);
 			System.clearProperty("key1");
 		}
-	}
-	
-	
+	}	
 }
