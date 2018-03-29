@@ -8,5 +8,5 @@
 #if ($report.equals("complete"))
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/1.0.2/Chart.min.js"></script>
 #else
-<script src="resources/templates/app.min.js"></script>
+<script src="${staticPathPrefix}resources/templates/app.min.js"></script>
 #end
