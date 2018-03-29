@@ -101,6 +101,7 @@ In this case, this user passed value will overwrite test or suite parameters
 | archiveToFile				| null		| If not specified, no archiving will be done. Else, provide a zip file path and the whole content of `outputDirectory` will be zipped to this file |
 | tmsRun					| null		| Configuration string (JSON format) for identifying test that is run in test management system. E.g: {'type': 'hp', 'run': '3'} |
 | tmsConnect				| null		| Configuration string (JSON format) for test management system if you plan to use it. E.g: {'hpAlmServerUrl': 'http://myamlserver:8080', 'hpAlmProject': '12', 'hpAlmDomain': 'mydomain', 'hpAlmUser': 'user', 'hpAlmPassword': 'pass'}  |
+| optimizeReports			| false		| If true, compress HTML, get HTML resources from internet so that logs are smaller |
 
 
 Other parameters, not accepted in XML file but allowed on command line
