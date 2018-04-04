@@ -2,18 +2,28 @@ package com.seleniumtests.browserfactory;
 
 import java.io.File;
 import java.io.UnsupportedEncodingException;
+import java.net.InetSocketAddress;
 import java.util.List;
 
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.Proxy;
+import org.openqa.selenium.Proxy.ProxyType;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
+import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.DriverConfig;
 import com.seleniumtests.driver.DriverExtractor;
 import com.seleniumtests.driver.DriverMode;
 import com.seleniumtests.util.osutility.OSUtility;
+
+import net.lightbody.bmp.BrowserMobProxy;
+import net.lightbody.bmp.BrowserMobProxyServer;
+import net.lightbody.bmp.client.ClientUtil;
+import net.lightbody.bmp.proxy.CaptureType;
+import net.lightbody.bmp.proxy.auth.AuthType;
 
 public abstract class IDesktopCapabilityFactory extends ICapabilitiesFactory {
 
@@ -108,9 +118,43 @@ public abstract class IDesktopCapabilityFactory extends ICapabilitiesFactory {
             capability.setPlatform(webDriverConfig.getWebPlatform());
         }
 
-        Proxy proxy = webDriverConfig.getProxy();
-        capability.setCapability(CapabilityType.PROXY, proxy);
+        configureProxyCap(capability);
 
         return capability;
-    }   
+    }  
+    
+    /**
+     * Add proxy capability
+     * If network capture is enabled, start browsermob proxy and set it into browser
+     * @param capability
+     */
+    private void configureProxyCap(MutableCapabilities capability) {
+    	Proxy proxy = webDriverConfig.getProxy();
+
+        if (webDriverConfig.getCaptureNetwork()) {
+        	
+        	if (webDriverConfig.getWebProxyType() == ProxyType.PAC) {
+        		throw new ConfigurationException("PAC proxy cannot be used with browsermob");
+        	}
+        	
+			BrowserMobProxy mobProxy = new BrowserMobProxyServer();
+			
+			if (webDriverConfig.getWebProxyType() == ProxyType.MANUAL) {
+				mobProxy.setChainedProxy(new InetSocketAddress(webDriverConfig.getWebProxyAddress(), webDriverConfig.getWebProxyPort()));
+				
+				if (webDriverConfig.getWebProxyLogin() != null && webDriverConfig.getWebProxyPassword() != null) {
+					mobProxy.chainedProxyAuthorization(webDriverConfig.getWebProxyLogin(), webDriverConfig.getWebProxyPassword(), AuthType.BASIC);
+				}
+			}
+			mobProxy.setTrustAllServers(true);
+			mobProxy.enableHarCaptureTypes(CaptureType.REQUEST_CONTENT, CaptureType.RESPONSE_CONTENT, CaptureType.REQUEST_HEADERS, CaptureType.RESPONSE_HEADERS);
+			mobProxy.start(0);
+		    Proxy seleniumProxy = ClientUtil.createSeleniumProxy(mobProxy);
+	    
+		    capability.setCapability(CapabilityType.PROXY, seleniumProxy);
+		    webDriverConfig.setBrowserMobProxy(mobProxy);
+        } else {
+            capability.setCapability(CapabilityType.PROXY, proxy);
+        }
+    }
 }
