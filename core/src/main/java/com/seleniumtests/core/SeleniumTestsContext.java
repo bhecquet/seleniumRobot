@@ -47,6 +47,7 @@ import com.seleniumtests.connectors.tms.TestManager;
 import com.seleniumtests.core.config.ConfigReader;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.driver.BrowserType;
+import com.seleniumtests.driver.DriverExceptionListener;
 import com.seleniumtests.driver.DriverMode;
 import com.seleniumtests.driver.TestType;
 import com.seleniumtests.reporter.PluginsHelper;
@@ -121,6 +122,7 @@ public class SeleniumTestsContext {
     public static final String TEST_ENTITY = "testEntity";						// Jamais utilisé
 
     public static final String CAPTURE_SNAPSHOT = "captureSnapshot";
+    public static final String CAPTURE_NETWORK = "captureNetwork";
     public static final String ENABLE_EXCEPTION_LISTENER = "enableExceptionListener";	// TODO: voir son effet, activé par défaut
 
     public static final String DP_TAGS_INCLUDE = "dpTagsInclude";				// 
@@ -188,6 +190,7 @@ public class SeleniumTestsContext {
 	public static final boolean DEFAULT_SOFT_ASSERT_ENABLED = true;
 	public static final boolean DEFAULT_ENABLE_EXCEPTION_LISTENER = true;
 	public static final boolean DEFAULT_CAPTURE_SNAPSHOT = true;
+	public static final boolean DEFAULT_CAPTURE_NETWORK = false;
 	public static final int DEFAULT_SNAPSHOT_TOP_CROPPING = 0;
 	public static final int DEFAULT_SNAPSHOT_BOTTOM_CROPPING = 0;
 	public static final boolean DEFAULT_ENABLE_JAVASCRIPT = true;
@@ -304,6 +307,7 @@ public class SeleniumTestsContext {
         setSnapshotBottomCropping(getIntValueForTest(SNAPSHOT_BOTTOM_CROPPING, System.getProperty(SNAPSHOT_BOTTOM_CROPPING)));
         setSnapshotTopCropping(getIntValueForTest(SNAPSHOT_TOP_CROPPING, System.getProperty(SNAPSHOT_TOP_CROPPING)));
         setCaptureSnapshot(getBoolValueForTest(CAPTURE_SNAPSHOT, System.getProperty(CAPTURE_SNAPSHOT)));
+        setCaptureNetwork(getBoolValueForTest(CAPTURE_NETWORK, System.getProperty(CAPTURE_NETWORK)));
         setEnableExceptionListener(getBoolValueForTest(ENABLE_EXCEPTION_LISTENER, System.getProperty(ENABLE_EXCEPTION_LISTENER)));
 
         setDpTagsInclude(getValueForTest(DP_TAGS_INCLUDE, System.getProperty(DP_TAGS_INCLUDE)));
@@ -751,7 +755,7 @@ public class SeleniumTestsContext {
     }
     
     /**
-     * Extract proxy settings from environment configuration and write them to context if they are not already present in XML file or on command line
+     * Extract proxy settings from environment configuration (env.ini) and write them to context if they are not already present in XML file or on command line
      */
     public void updateProxyConfig() {
     	Map<String, TestVariable> envConfig = getConfiguration();
@@ -787,6 +791,11 @@ public class SeleniumTestsContext {
     	// set default value for proxy type if none as been set before
     	if (getWebProxyType() == null) {
     		setWebProxyType("AUTODETECT");
+    	}
+    	
+    	// exclude browserMobProxy if proxy type is set to PAC
+    	if (getCaptureNetwork() && getWebProxyType() != ProxyType.DIRECT && getWebProxyType() != ProxyType.MANUAL) {
+    		throw new ConfigurationException("Browsermob proxy (captureNetwork option) is only compatible with DIRECT and MANUAL");
     	}
     }
     
@@ -858,20 +867,22 @@ public class SeleniumTestsContext {
     public boolean getCaptureSnapshot() {
         if (getAttribute(CAPTURE_SNAPSHOT) == null) {
 
-            // IE grid default value set to false
+            // safari grid default value set to false
             if (this.getRunMode() == DriverMode.GRID
-                    && (this.getBrowser() == BrowserType.INTERNET_EXPLORER 
-                    || this.getBrowser() == BrowserType.SAFARI)) {
+                    && this.getBrowser() == BrowserType.SAFARI) {
                 this.setAttribute(CAPTURE_SNAPSHOT, false);
             } else {
-                this.setAttribute(CAPTURE_SNAPSHOT, true);
+                this.setAttribute(CAPTURE_SNAPSHOT, DEFAULT_CAPTURE_SNAPSHOT);
             }
         }
 
         return (Boolean) getAttribute(CAPTURE_SNAPSHOT);
     }
+    
+    public boolean getCaptureNetwork() {    	
+    	return (Boolean) getAttribute(CAPTURE_NETWORK);
+    }
  
-
     public boolean getEnableExceptionListener() {
         return (Boolean) getAttribute(ENABLE_EXCEPTION_LISTENER);
     }
@@ -1078,8 +1089,8 @@ public class SeleniumTestsContext {
         return getAttribute(TEST_ENTITY);
     }
 
-    public String getWebDriverListener() {
-        return (String) getAttribute(WEB_DRIVER_LISTENER);
+    public List<String> getWebDriverListener() {
+        return (List<String>) getAttribute(WEB_DRIVER_LISTENER);
     }
 
     public String getUserAgent() {
@@ -1663,6 +1674,14 @@ public class SeleniumTestsContext {
     	}
     }
     
+    public void setCaptureNetwork(Boolean capture) {
+    	if (capture != null) {
+    		setAttribute(CAPTURE_NETWORK, capture);
+    	} else {
+    		setAttribute(CAPTURE_NETWORK, DEFAULT_CAPTURE_NETWORK);
+    	}
+    }
+    
     public void setEnableExceptionListener(Boolean enable) {
     	if (enable != null) {
     		setAttribute(ENABLE_EXCEPTION_LISTENER, enable);
@@ -1688,7 +1707,13 @@ public class SeleniumTestsContext {
     }
     
     public void setWebDriverListener(String listener) {
-    	setAttribute(WEB_DRIVER_LISTENER, listener);
+    	List<String> listeners = new ArrayList<>();
+		listeners.add(DriverExceptionListener.class.getName());
+    	if (listener != null && !listener.isEmpty()) {
+    		listeners.addAll(Arrays.asList(listener.split(",")));
+    	}
+    		
+		setAttribute(WEB_DRIVER_LISTENER, listeners);
     }
     
     public void setAppiumServerUrl(String url) {

@@ -28,132 +28,87 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.events.WebDriverEventListener;
 
 import com.google.gson.JsonObject;
+import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.proxy.ProxyConfig;
 import com.seleniumtests.customexception.DriverExceptions;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
+
+import net.lightbody.bmp.BrowserMobProxy;
 
 public class DriverConfig {
 	
 	private static final Logger logger = SeleniumRobotLogger.getLogger(DriverConfig.class);
 
-    private boolean setAssumeUntrustedCertificateIssuer = true;
-    private boolean setAcceptUntrustedCertificates = true;
-    private boolean enableJavascript = true;
     private WebDriver driver;
-    private BrowserType browser = BrowserType.FIREFOX;
-    private DriverMode mode = DriverMode.LOCAL;
-    private String hubUrl;
-    private String ffProfilePath;
-    private String operaProfilePath;
-    private String ffBinPath;
-    private String ieDriverPath;
-    private String chromeDriverPath;
-    private String edgeDriverPath;
-    private String geckoDriverPath;
-    private String chromeBinPath;
-    private int webSessionTimeout = 90 * 1000;
-    public static final int DEFAULT_IMPLICIT_WAIT_TIMEOUT = 5;
-    public static final int DEFAULT_EXPLICIT_WAIT_TIME_OUT = 15;
-    public static final int DEFAULT_PAGE_LOAD_TIMEOUT = 90;
-    private double implicitWaitTimeout = DEFAULT_IMPLICIT_WAIT_TIMEOUT;
-    private int explicitWaitTimeout = DEFAULT_EXPLICIT_WAIT_TIME_OUT;
-    private int pageLoadTimeout = DEFAULT_PAGE_LOAD_TIMEOUT;
-    private String outputDirectory;
-    private String browserVersion;
-    private Platform webPlatform;
-    private String userAgentOverride;
-    private String ntlmAuthTrustedUris;
-    private String browserDownloadDir;
-    private boolean headlessBrowser = false;
-    private ArrayList<WebDriverEventListener> webDriverListeners;
-    private boolean useFirefoxDefaultProfile = true;
-
-    private ProxyConfig proxyConfig;
-
-    private TestType testType;
-
-    // Use same platform property as the one used for browser
-    private String appiumServerURL;
-    private String mobilePlatformVersion;
-    private String deviceName;
-    private String app;
-    private boolean fullReset;
+    private BrowserMobProxy browserMobProxy;
+    private SeleniumTestsContext testContext;
     
-    private String appPackage;
-    private String appActivity;
-    private String appWaitActivity;
-    private Integer newCommandTimeout;
-
-    private String platform;
-    private String version;
-    private String cloudApiKey;
-    private String projectName;
+    public DriverConfig(SeleniumTestsContext testContext) {
+    	this.testContext = testContext;
+    }
 
     public List<WebDriverEventListener> getWebDriverListeners() {
-        return webDriverListeners;
-    }
-
-    public void setWebDriverListeners(final List<WebDriverEventListener> webDriverListeners) {
-        this.webDriverListeners = (ArrayList<WebDriverEventListener>) webDriverListeners;
-    }
-
-    public void setWebDriverListeners(final String listeners) {
+    	List<String> listeners = testContext.getWebDriverListener();
+        
         ArrayList<WebDriverEventListener> listenerList = new ArrayList<>();
-        String[] list = listeners.split(",");
-        for (String aList : list) {
+        for (String listenerName : listeners) {
 
             WebDriverEventListener listener = null;
             try {
-                if (!"".equals(aList)) {
-                    listener = (WebDriverEventListener) (Class.forName(aList)).newInstance();
+                if (!"".equals(listenerName)) {
+                    listener = (WebDriverEventListener) (Class.forName(listenerName)).newInstance();
                     listenerList.add(listener);
                 }
             } catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
                 logger.error(e);
             }
         }
-
-        this.webDriverListeners = listenerList;
+        
+        return listenerList;
     }
 
     public BrowserType getBrowser() {
-        return browser;
+        return testContext.getBrowser();
     }
 
     public String getBrowserDownloadDir() {
-        return browserDownloadDir;
+        return testContext.getBrowserDownloadDir();
     }
 
     public String getBrowserVersion() {
-        return browserVersion;
+        return testContext.getWebBrowserVersion();
     }
 
     public String getChromeBinPath() {
-        return chromeBinPath;
+        return testContext.getChromeBinPath();
     }
 
     public String getChromeDriverPath() {
-        return chromeDriverPath;
+        return testContext.getChromeDriverPath();
     }
 
     public WebDriver getDriver() {
         return driver;
     }
+    
+    public boolean getCaptureNetwork() {
+    	return testContext.getCaptureNetwork();
+    }
 
     public int getExplicitWaitTimeout() {
-        if (explicitWaitTimeout < getImplicitWaitTimeout()) {
+        if (testContext.getExplicitWaitTimeout() < getImplicitWaitTimeout()) {
             return (int) getImplicitWaitTimeout();
         } else {
-            return explicitWaitTimeout;
+            return testContext.getExplicitWaitTimeout();
         }
     }
 
     public String getFirefoxBinPath() {
-        return ffBinPath;
+        return testContext.getFirefoxBinPath();
     }
 
     public String getFirefoxProfilePath() {
-        if (ffProfilePath == null && getClass().getResource("/profiles/customProfileDirCUSTFF") != null) {
+        if (testContext.getFirefoxUserProfilePath() == null && getClass().getResource("/profiles/customProfileDirCUSTFF") != null) {
 
             try {
                 return getClass().getResource("/profiles/customProfileDirCUSTFF").toURI().getPath();
@@ -161,32 +116,32 @@ public class DriverConfig {
                 throw new DriverExceptions(e.getMessage());
             }
         } else {
-            return ffProfilePath;
+            return testContext.getFirefoxUserProfilePath();
         }
     }
 
     public String getHubUrl() {
-        return hubUrl;
+        return testContext.getWebDriverGrid();
     }
 
     public String getIeDriverPath() {
-        return ieDriverPath;
+        return testContext.getIEDriverPath();
     }
 
     public double getImplicitWaitTimeout() {
-        return implicitWaitTimeout;
+        return testContext.getImplicitWaitTimeout();
     }
 
     public DriverMode getMode() {
-        return mode;
+        return testContext.getRunMode();
     }
 
     public String getNtlmAuthTrustedUris() {
-        return ntlmAuthTrustedUris;
+        return testContext.getNtlmAuthTrustedUris();
     }
 
     public String getOperaProfilePath() {
-        if (operaProfilePath == null && getClass().getResource("/profiles/operaProfile") != null) {
+        if (testContext.getOperaUserProfilePath() == null && getClass().getResource("/profiles/operaProfile") != null) {
 
             try {
                 return getClass().getResource("/profiles/operaProfile").toURI().getPath();
@@ -195,22 +150,24 @@ public class DriverConfig {
             }
         }
 
-        return operaProfilePath;
+        return testContext.getOperaUserProfilePath();
     }
 
     public String getOutputDirectory() {
-        return outputDirectory;
+        return testContext.getOutputDirectory();
     }
 
     public int getPageLoadTimeout() {
-        return pageLoadTimeout;
+        return testContext.getPageLoadTimeout();
     }
 
     public Platform getWebPlatform() {
-        return webPlatform;
+        return Platform.fromString(testContext.getPlatform());
     }
     
     public JsonObject getJsonProxy() {
+    	ProxyConfig proxyConfig = getProxyConfig();
+    	
     	JsonObject json = new JsonObject();
 		json.addProperty("proxyType", proxyConfig.getType().toString());
 		
@@ -238,6 +195,8 @@ public class DriverConfig {
     }
 
     public Proxy getProxy() {
+    	ProxyConfig proxyConfig = getProxyConfig();
+    	
     	Proxy proxy = new Proxy();
     	proxy.setProxyType(proxyConfig.getType());
     	
@@ -264,266 +223,146 @@ public class DriverConfig {
     }
 
     public ProxyConfig getProxyConfig() {
+    	ProxyConfig proxyConfig = new ProxyConfig();
+        proxyConfig.setType(testContext.getWebProxyType());
+        proxyConfig.setAddress(testContext.getWebProxyAddress());
+        proxyConfig.setPort(testContext.getWebProxyPort());
+        proxyConfig.setLogin(testContext.getWebProxyLogin());
+        proxyConfig.setPassword(testContext.getWebProxyPassword());
+        proxyConfig.setExclude(testContext.getWebProxyExclude());
+        proxyConfig.setPac(testContext.getWebProxyPac());
         return proxyConfig;
+    }
+    
+    public ProxyType getWebProxyType() {
+    	return testContext.getWebProxyType();
+    }
+    
+    public String getWebProxyAddress() {
+    	return testContext.getWebProxyAddress();
+    }
+    
+    public Integer getWebProxyPort() {
+    	return testContext.getWebProxyPort();
+    }
+    
+    public String getWebProxyLogin() {
+    	return testContext.getWebProxyLogin();
+    }
+    
+    public String getWebProxyPassword() {
+    	return testContext.getWebProxyPassword();
+    }
+    
+    public String getWebProxyExclude() {
+    	return testContext.getWebProxyExclude();
+    }
+    
+    public String getWebProxyPac() {
+    	return testContext.getWebProxyPac();
     }
 
     public String getUserAgentOverride() {
-        return this.userAgentOverride;
+        return testContext.getUserAgent();
     }
 
     public int getWebSessionTimeout() {
-        return webSessionTimeout;
+        return testContext.getWebSessionTimeout();
     }
 
     public boolean isUseFirefoxDefaultProfile() {
-        return this.useFirefoxDefaultProfile;
-    }
-
-    public void setUseFirefoxDefaultProfile(final boolean useFirefoxDefaultProfile) {
-        this.useFirefoxDefaultProfile = useFirefoxDefaultProfile;
+        return testContext.isUseFirefoxDefaultProfile();
     }
 
     public boolean isEnableJavascript() {
-        return enableJavascript;
+        return testContext.getJavascriptEnabled();
     }
 
     public boolean isSetAcceptUntrustedCertificates() {
-        return setAcceptUntrustedCertificates;
+        return testContext.getAcceptUntrustedCertificates();
     }
 
     public boolean isSetAssumeUntrustedCertificateIssuer() {
-        return setAssumeUntrustedCertificateIssuer;
-    }
-
-    public void setBrowser(final BrowserType browser) {
-        this.browser = browser;
-    }
-
-    public void setBrowserDownloadDir(final String browserDownloadDir) {
-        this.browserDownloadDir = browserDownloadDir;
-    }
-
-    public void setBrowserVersion(final String browserVersion) {
-        this.browserVersion = browserVersion;
-    }
-
-    public void setChromeBinPath(final String chromeBinPath) {
-        this.chromeBinPath = chromeBinPath;
-    }
-
-    public void setChromeDriverPath(final String chromeDriverPath) {
-        this.chromeDriverPath = chromeDriverPath;
+        return testContext.getAssumeUntrustedCertificateIssuer();
     }
 
     public void setDriver(final WebDriver driver) {
         this.driver = driver;
     }
 
-    public void setEnableJavascript(final boolean enableJavascript) {
-        this.enableJavascript = enableJavascript;
-    }
-
-    public void setExplicitWaitTimeout(final int explicitWaitTimeout) {
-        this.explicitWaitTimeout = explicitWaitTimeout;
-    }
-
-    public void setFfBinPath(final String ffBinPath) {
-        this.ffBinPath = ffBinPath;
-    }
-
-    public void setFfProfilePath(final String ffProfilePath) {
-        this.ffProfilePath = ffProfilePath;
-    }
-
-    public void setHubUrl(final String hubUrl) {
-        this.hubUrl = hubUrl;
-    }
-
-    public void setIeDriverPath(final String ieDriverPath) {
-        this.ieDriverPath = ieDriverPath;
-    }
-
-    public void setImplicitWaitTimeout(final double implicitWaitTimeout) {
-        this.implicitWaitTimeout = implicitWaitTimeout;
-    }
-
-    public void setMode(final DriverMode mode) {
-        this.mode = mode;
-    }
-
-    public void setNtlmAuthTrustedUris(final String ntlmAuthTrustedUris) {
-        this.ntlmAuthTrustedUris = ntlmAuthTrustedUris;
-    }
-
-    public void setOperaProfilePath(final String operaProfilePath) {
-        this.operaProfilePath = operaProfilePath;
-    }
-
-    public void setOutputDirectory(final String outputDirectory) {
-        this.outputDirectory = outputDirectory;
-    }
-
-    public void setPageLoadTimeout(final int pageLoadTimeout) {
-        this.pageLoadTimeout = pageLoadTimeout;
-    }
-
-    public void setWebPlatform(final Platform webPlatform) {
-        this.webPlatform = webPlatform;
-    }
-
-    public void setProxyConfig(final ProxyConfig proxy) {
-        this.proxyConfig = proxy;
-    }
-
-    public void setSetAcceptUntrustedCertificates(final boolean setAcceptUntrustedCertificates) {
-        this.setAcceptUntrustedCertificates = setAcceptUntrustedCertificates;
-    }
-
-    public void setSetAssumeUntrustedCertificateIssuer(final boolean setAssumeUntrustedCertificateIssuer) {
-        this.setAssumeUntrustedCertificateIssuer = setAssumeUntrustedCertificateIssuer;
-    }
-
-    public void setUserAgentOverride(final String userAgentOverride) {
-        this.userAgentOverride = userAgentOverride;
-    }
-
-    public void setWebSessionTimeout(final int webSessionTimeout) {
-        this.webSessionTimeout = webSessionTimeout;
-    }
-
     public String getMobilePlatformVersion() {
-        return mobilePlatformVersion;
-    }
-
-    public void setMobilePlatformVersion(final String mobilePlatformVersion) {
-        this.mobilePlatformVersion = mobilePlatformVersion;
+        return testContext.getMobilePlatformVersion();
     }
 
     public String getDeviceName() {
-        return deviceName;
-    }
-
-    public void setDeviceName(final String deviceName) {
-        this.deviceName = deviceName;
+        return testContext.getDeviceName();
     }
 
     public String getApp() {
-        return app;
-    }
-
-    public void setApp(final String app) {
-        this.app = app;
+        return testContext.getApp();
     }
 
     public String getAppPackage() {
-        return appPackage;
-    }
-
-    public void setAppPackage(final String appPackage) {
-        this.appPackage = appPackage;
+        return testContext.getAppPackage();
     }
 
     public String getAppActivity() {
-        return appActivity;
-    }
-
-    public void setAppActivity(final String appActivity) {
-        this.appActivity = appActivity;
+        return testContext.getAppActivity();
     }
 
     public String getEdgeDriverPath() {
-		return edgeDriverPath;
-	}
-
-	public void setEdgeDriverPath(String edgeDriverPath) {
-		this.edgeDriverPath = edgeDriverPath;
+		return testContext.getEdgeDriverPath();
 	}
 
 	public Integer getNewCommandTimeout() {
-        return newCommandTimeout;
+        return testContext.getNewCommandTimeout();
     }
-
-    public void setNewCommandTimeout(final Integer newCommandTimeout) {
-        this.newCommandTimeout = newCommandTimeout;
-    }
-
+	
     public String getAppiumServerURL() {
-        return appiumServerURL;
-    }
-
-    public void setAppiumServerURL(final String appiumServerURL) {
-        this.appiumServerURL = appiumServerURL;
+        return testContext.getAppiumServerURL();
     }
 
     public TestType getTestType() {
-        return testType;
-    }
-
-    public void setTestType(final TestType testType) {
-        this.testType = testType;
+        return testContext.getTestType();
     }
 
     public String getPlatform() {
-        return platform;
-    }
-
-    public void setPlatform(final String platform) {
-        this.platform = platform;
+        return testContext.getPlatform();
     }
 
     public String getVersion() {
-        return version;
-    }
-
-    public void setVersion(final String version) {
-        this.version = version;
+        return testContext.getVersion();
     }
 
 	public String getCloudApiKey() {
-		return cloudApiKey;
-	}
-
-	public void setCloudApiKey(final String cloudApiKey) {
-		this.cloudApiKey = cloudApiKey;
+		return testContext.getCloudApiKey();
 	}
 
 	public String getProjectName() {
-		return projectName;
-	}
-
-	public void setProjectName(String projectName) {
-		this.projectName = projectName;
+		return testContext.getProjectName();
 	}
 
 	public String getAppWaitActivity() {
-		return appWaitActivity;
-	}
-
-	public void setAppWaitActivity(String appWaitActivity) {
-		this.appWaitActivity = appWaitActivity;
+		return testContext.getAppWaitActivity();
 	}
 
 	public boolean isFullReset() {
-		return fullReset;
-	}
-
-	public void setFullReset(boolean fullReset) {
-		this.fullReset = fullReset;
+		return testContext.getFullReset();
 	}
 
 	public String getGeckoDriverPath() {
-		return geckoDriverPath;
-	}
-
-	public void setGeckoDriverPath(String geckoDriverPath) {
-		this.geckoDriverPath = geckoDriverPath;
+		return testContext.getGeckoDriverPath();
 	}
 
 	public boolean isHeadlessBrowser() {
-		return headlessBrowser;
+		return testContext.isHeadlessBrowser();
 	}
 
-	public void setHeadlessBrowser(boolean headlessBrowser) {
-		this.headlessBrowser = headlessBrowser;
+	public BrowserMobProxy getBrowserMobProxy() {
+		return browserMobProxy;
+	}
+
+	public void setBrowserMobProxy(BrowserMobProxy browserMobProxy) {
+		this.browserMobProxy = browserMobProxy;
 	}
 }

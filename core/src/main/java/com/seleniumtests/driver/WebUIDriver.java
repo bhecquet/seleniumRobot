@@ -22,7 +22,6 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.openqa.selenium.Capabilities;
-import org.openqa.selenium.Platform;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.events.EventFiringWebDriver;
 import org.openqa.selenium.support.events.WebDriverEventListener;
@@ -40,7 +39,6 @@ import com.seleniumtests.browserfactory.SauceLabsDriverFactory;
 import com.seleniumtests.browserfactory.SeleniumGridDriverFactory;
 import com.seleniumtests.browserfactory.TestDroidDriverFactory;
 import com.seleniumtests.core.SeleniumTestsContextManager;
-import com.seleniumtests.core.proxy.ProxyConfig;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.DriverExceptions;
 import com.seleniumtests.util.helper.WaitHelper;
@@ -59,13 +57,16 @@ public class WebUIDriver {
     private static ThreadLocal<WebDriver> driverSession = new ThreadLocal<>();
     private static ThreadLocal<WebUIDriver> uxDriverSession = new ThreadLocal<>();
     private String node;
-    private DriverConfig config = new DriverConfig();
+    private DriverConfig config;
     private WebDriver driver;
     private IWebDriverFactory webDriverBuilder;
     private final static Object createDriverLock = new Object();
 
     public WebUIDriver() {
-        init();
+    	if (SeleniumTestsContextManager.getThreadContext() == null) {
+            return;
+        }
+        config = new DriverConfig(SeleniumTestsContextManager.getThreadContext());
         uxDriverSession.set(this);
     }
 
@@ -297,157 +298,6 @@ public class WebUIDriver {
 
         driverSession.set(driver);
         return driver;
-    }
-
-    private void init() {
-        if (SeleniumTestsContextManager.getThreadContext() == null) {
-            return;
-        }
-
-        BrowserType browser = SeleniumTestsContextManager.getThreadContext().getBrowser();
-        config.setBrowser(browser);
-
-        DriverMode mode = SeleniumTestsContextManager.getThreadContext().getRunMode();
-        config.setMode(mode);
-
-        String hubUrl = SeleniumTestsContextManager.getThreadContext().getWebDriverGrid();
-        config.setHubUrl(hubUrl);
-
-        String ffProfilePath = SeleniumTestsContextManager.getThreadContext().getFirefoxUserProfilePath();
-        config.setFfProfilePath(ffProfilePath);
-
-        String operaProfilePath = SeleniumTestsContextManager.getThreadContext().getOperaUserProfilePath();
-        config.setOperaProfilePath(operaProfilePath);
-
-        String ffBinPath = SeleniumTestsContextManager.getThreadContext().getFirefoxBinPath();
-        config.setFfBinPath(ffBinPath);
-
-        String chromeBinPath = SeleniumTestsContextManager.getThreadContext().getChromeBinPath();
-        config.setChromeBinPath(chromeBinPath);
-
-        String chromeDriverPath = SeleniumTestsContextManager.getThreadContext().getChromeDriverPath();
-        config.setChromeDriverPath(chromeDriverPath);
-        
-        
-        String geckoDriverPath = SeleniumTestsContextManager.getThreadContext().getGeckoDriverPath();
-        config.setGeckoDriverPath(geckoDriverPath);
-        
-        String edgeDriverPath = SeleniumTestsContextManager.getThreadContext().getEdgeDriverPath();
-        config.setEdgeDriverPath(edgeDriverPath);
-
-        String ieDriverPath = SeleniumTestsContextManager.getThreadContext().getIEDriverPath();
-        config.setIeDriverPath(ieDriverPath);
-
-        int webSessionTimeout = SeleniumTestsContextManager.getThreadContext().getWebSessionTimeout();
-        config.setWebSessionTimeout(webSessionTimeout);
-
-        double implicitWaitTimeout = SeleniumTestsContextManager.getThreadContext().getImplicitWaitTimeout();
-        config.setImplicitWaitTimeout(implicitWaitTimeout);
-
-        int explicitWaitTimeout = SeleniumTestsContextManager.getThreadContext().getExplicitWaitTimeout();
-        config.setExplicitWaitTimeout(explicitWaitTimeout);
-        config.setPageLoadTimeout(SeleniumTestsContextManager.getThreadContext().getPageLoadTimeout());
-
-        String outputDirectory = SeleniumTestsContextManager.getGlobalContext().getOutputDirectory();
-        config.setOutputDirectory(outputDirectory);
-        
-        // set proxy config
-        ProxyConfig proxyConfig = new ProxyConfig();
-        proxyConfig.setType(SeleniumTestsContextManager.getThreadContext().getWebProxyType());
-        proxyConfig.setAddress(SeleniumTestsContextManager.getThreadContext().getWebProxyAddress());
-        proxyConfig.setPort(SeleniumTestsContextManager.getThreadContext().getWebProxyPort());
-        proxyConfig.setLogin(SeleniumTestsContextManager.getThreadContext().getWebProxyLogin());
-        proxyConfig.setPassword(SeleniumTestsContextManager.getThreadContext().getWebProxyPassword());
-        proxyConfig.setExclude(SeleniumTestsContextManager.getThreadContext().getWebProxyExclude());
-        proxyConfig.setPac(SeleniumTestsContextManager.getThreadContext().getWebProxyPac());
-        config.setProxyConfig(proxyConfig);
-
-
-        String browserVersion = SeleniumTestsContextManager.getThreadContext().getWebBrowserVersion();
-        config.setBrowserVersion(browserVersion);
-
-        String webPlatform = SeleniumTestsContextManager.getThreadContext().getPlatform();
-        
-        // this configuration is only used for web tests
-        if (webPlatform != null && !webPlatform.toLowerCase().contains("ios")) {
-            config.setWebPlatform(Platform.fromString(webPlatform));
-        }
-
-        config.setSetAssumeUntrustedCertificateIssuer(SeleniumTestsContextManager.getThreadContext().getAssumeUntrustedCertificateIssuer());
-
-        config.setSetAcceptUntrustedCertificates(SeleniumTestsContextManager.getThreadContext().getAcceptUntrustedCertificates());
-
-        config.setEnableJavascript(SeleniumTestsContextManager.getThreadContext().getJavascriptEnabled());
-        
-        config.setHeadlessBrowser(SeleniumTestsContextManager.getThreadContext().isHeadlessBrowser());
-
-        if (SeleniumTestsContextManager.getThreadContext().getNtlmAuthTrustedUris() != null) {
-            config.setNtlmAuthTrustedUris(SeleniumTestsContextManager.getThreadContext().getNtlmAuthTrustedUris());
-        }
-
-        if (SeleniumTestsContextManager.getThreadContext().getBrowserDownloadDir() != null) {
-            config.setBrowserDownloadDir(SeleniumTestsContextManager.getThreadContext().getBrowserDownloadDir());
-        }
-
-        String ua;
-        if (SeleniumTestsContextManager.getThreadContext().getUserAgent() != null) {
-            ua = SeleniumTestsContextManager.getThreadContext().getUserAgent();
-        } else {
-            ua = null;
-        }
-
-        config.setUserAgentOverride(ua);
-
-        String listeners = SeleniumTestsContextManager.getThreadContext().getWebDriverListener();
-        if (SeleniumTestsContextManager.getThreadContext().getEnableExceptionListener()) {
-            if (listeners != null) {
-                listeners = listeners + ",";
-            } else {
-                listeners = "";
-            }
-
-            listeners = listeners + DriverExceptionListener.class.getName();
-        }
-
-        if (listeners != null && !"".equals(listeners)) {
-            config.setWebDriverListeners(listeners);
-        } else {
-            config.setWebDriverListeners("");
-        }
-
-        config.setUseFirefoxDefaultProfile(SeleniumTestsContextManager.getThreadContext().isUseFirefoxDefaultProfile());
-
-        String appiumServerURL = SeleniumTestsContextManager.getThreadContext().getAppiumServerURL();
-        config.setAppiumServerURL(appiumServerURL);
-        
-        String mobilePlatformVersion = SeleniumTestsContextManager.getThreadContext().getMobilePlatformVersion();
-        config.setMobilePlatformVersion(mobilePlatformVersion);
-
-        String deviceName = SeleniumTestsContextManager.getThreadContext().getDeviceName();
-        config.setDeviceName(deviceName);
-
-        String app = SeleniumTestsContextManager.getThreadContext().getApp();
-        config.setApp(app);
-
-        String appPackage = SeleniumTestsContextManager.getThreadContext().getAppPackage();
-        config.setAppPackage(appPackage);
-
-        String appActivity = SeleniumTestsContextManager.getThreadContext().getAppActivity();
-        config.setAppActivity(appActivity);
-        
-        String appWaitActivity = SeleniumTestsContextManager.getThreadContext().getAppWaitActivity();
-        config.setAppWaitActivity(appWaitActivity);
-
-        Integer newCommandTimeOut = SeleniumTestsContextManager.getThreadContext().getNewCommandTimeout();
-        config.setNewCommandTimeout(newCommandTimeOut);
-        
-        config.setFullReset(SeleniumTestsContextManager.getThreadContext().getFullReset());
-
-        config.setVersion(SeleniumTestsContextManager.getThreadContext().getVersion());
-        config.setPlatform(SeleniumTestsContextManager.getThreadContext().getPlatform());
-        config.setCloudApiKey(SeleniumTestsContextManager.getThreadContext().getCloudApiKey());
-        config.setProjectName(SeleniumTestsContextManager.getThreadContext().getProjectName());
-        config.setTestType(SeleniumTestsContextManager.getThreadContext().getTestType());
     }
 
     public static void main(final String[] args) {

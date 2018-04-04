@@ -63,6 +63,9 @@ import com.seleniumtests.uipage.htmlelements.LinkElement;
 import com.seleniumtests.util.helper.WaitHelper;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
+import net.lightbody.bmp.BrowserMobProxy;
+import net.lightbody.bmp.core.har.Har;
+
 public class PageObject extends BasePage implements IPage {
 
 	private static final Logger logger = SeleniumRobotLogger.getLogger(PageObject.class);
@@ -122,8 +125,17 @@ public class PageObject extends BasePage implements IPage {
         this.pageIdentifierElement = pageIdentifierElement;
         driver = WebUIDriver.getWebDriver();
 
+//      /// test browsermobproxy
+//        BrowserMobProxy mobProxy = (BrowserMobProxy)SeleniumTestsContextManager.getThreadContext().getAttribute("mobProxy");
+//        mobProxy.newHar(url);
+//      /// test browsermobproxy
+        
         // open page
         openPage(url);
+//      /// test browsermobproxy
+//        Har har = mobProxy.getHar();
+//        har.writeTo(new File("C:\\tmp\\har.har"));
+//      /// test browsermobproxy
 
         assertCurrentPage(false);
 
