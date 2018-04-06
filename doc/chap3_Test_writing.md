@@ -18,19 +18,19 @@ for the remainder, we use a unique name for that new application `appName`<br/>
 
 #### Requirements are ####
 
-- Test data are in `data/<appName>/`
-	- `features` contains feature files (mandatory if cucumber mode is used)
-	- `testng` contains testng files to start tests (mandatory)
-	- `config` contains centralized env test configuration (optional)
-	- `squash-ta` contains ta files that should override the default ones (optional). See Squash-TA section for details 
+- Test data are in `data/<appName>/`<br/>
+	- `features` contains feature files (mandatory if cucumber mode is used)<br/>
+	- `testng` contains testng files to start tests (mandatory)<br/>
+	- `config` contains centralized env test configuration (optional)<br/>
+	- `squash-ta` contains ta files that should override the default ones (optional). See Squash-TA section for details <br/>
 
 - Test code must be in `src/test/java`
 - **WARN** When using IntelliJ, you must also create a `src/main/java` with subpackage inside and a main class. This does nothing but IntelliJ cannot weave aspects without that: you get `Error:Module '<some_module>' tests: org.aspectj.bridge.AbortException: bad aspect library: 'D:\Dev\seleniumRobot-maaffr\target\classes'`
-- package name is free but following structure MUST be used
-	- `cucumber` subpackage contains cucumber implementation files. As cucumber annotations can be written directly in test page object, it should at least contain code for `@Then` (checks) and `@Given` (initial state).
-If pure TestNG mode is used, this package MUST exist.
-	- `tests` subpackage contains code for pure TestNG tests (not cucumber). If cucumber mode is used, this package should not exist
-	- `webpage` subpackage is mandatory as it contains PageObject implementation
+- package name is free but following structure MUST be used<br/>
+	- `cucumber` subpackage contains cucumber implementation files. As cucumber annotations can be written directly in test page object, it should at least contain code for `@Then` (checks) and `@Given` (initial state).<br/>
+If pure TestNG mode is used, this package MUST exist.<br/>
+	- `tests` subpackage contains code for pure TestNG tests (not cucumber). If cucumber mode is used, this package should not exist<br/>
+	- `webpage` subpackage is mandatory as it contains PageObject implementation<br/>
 
 ![](images/package_structure.png)
 

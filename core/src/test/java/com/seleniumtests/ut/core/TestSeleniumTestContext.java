@@ -479,6 +479,19 @@ public class TestSeleniumTestContext extends GenericTest {
 	}
 	
 	@Test(groups="ut context")
+	public void testNetworkSnapshot(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setCaptureNetwork(true);
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getCaptureNetwork(), true);
+	}
+	@Test(groups="ut context")
+	public void testNetworkSnapshotNull(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setCaptureNetwork(null);
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getCaptureNetwork(), SeleniumTestsContext.DEFAULT_CAPTURE_NETWORK);
+	}
+	
+	@Test(groups="ut context")
 	public void testSnapshotTopCropping(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setSnapshotTopCropping(5);
@@ -901,10 +914,42 @@ public class TestSeleniumTestContext extends GenericTest {
 	public void testProxyPreset(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		SeleniumTestsContextManager.generateApplicationPath(testNGCtx.getCurrentXmlTest().getSuite());
 		SeleniumTestsContext seleniumContext = new SeleniumTestsContext();
+		seleniumContext.setCaptureNetwork(false);
 		seleniumContext.setConfiguration(new HashMap<>());
 		seleniumContext.setTestConfiguration();
 		seleniumContext.updateProxyConfig();
 		Assert.assertEquals(seleniumContext.getWebProxyType(), ProxyType.DIRECT);
+	}
+	@Test(groups="ut context", expectedExceptions=ConfigurationException.class)
+	public void testProxyPresetExcludeCaptureNetworkWithAutoDetect(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		SeleniumTestsContextManager.generateApplicationPath(testNGCtx.getCurrentXmlTest().getSuite());
+		SeleniumTestsContext seleniumContext = new SeleniumTestsContext();
+		seleniumContext.setCaptureNetwork(true);
+		seleniumContext.setWebProxyType("AUTODETECT");
+		seleniumContext.setConfiguration(new HashMap<>());
+		seleniumContext.setTestConfiguration();
+		seleniumContext.updateProxyConfig();
+	}
+	@Test(groups="ut context", expectedExceptions=ConfigurationException.class)
+	public void testProxyPresetExcludeCaptureNetworkWithPac(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		SeleniumTestsContextManager.generateApplicationPath(testNGCtx.getCurrentXmlTest().getSuite());
+		SeleniumTestsContext seleniumContext = new SeleniumTestsContext();
+		seleniumContext.setCaptureNetwork(true);
+		seleniumContext.setWebProxyType("PAC");
+		seleniumContext.setConfiguration(new HashMap<>());
+		seleniumContext.setTestConfiguration();
+		seleniumContext.updateProxyConfig();
+	}
+	@Test(groups="ut context")
+	public void testProxyPresetCaptureNetworkWithManual(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		SeleniumTestsContextManager.generateApplicationPath(testNGCtx.getCurrentXmlTest().getSuite());
+		SeleniumTestsContext seleniumContext = new SeleniumTestsContext();
+		seleniumContext.setCaptureNetwork(true);
+		seleniumContext.setWebProxyType("MANUAL");
+		seleniumContext.setConfiguration(new HashMap<>());
+		seleniumContext.setTestConfiguration();
+		seleniumContext.updateProxyConfig();
+		Assert.assertEquals(seleniumContext.getWebProxyType(), ProxyType.MANUAL);
 	}
 	@Test(groups="ut context")
 	public void testProxyOverride(final ITestContext testNGCtx, final XmlTest xmlTest) {
@@ -1051,7 +1096,6 @@ public class TestSeleniumTestContext extends GenericTest {
 		testResult.setParameters(new String[] {"foo", "bar"});
 		SeleniumTestsContextManager.updateThreadContext("myTest", "com.seleniumtests.tests", testResult);
 		
-		initThreadContext(testNGCtx);
 		ITestResult testResult2 = new TestResult();
 		testResult2.setParameters(new String[] {"foo", "bar2"});
 		SeleniumTestsContextManager.updateThreadContext("myTest", "com.seleniumtests.tests", testResult2);
