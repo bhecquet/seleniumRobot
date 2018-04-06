@@ -19,12 +19,13 @@ package com.seleniumtests.ut.browserfactory;
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.remote.CapabilityType;
-import org.openqa.selenium.remote.DesiredCapabilities;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import com.seleniumtests.GenericTest;
 import com.seleniumtests.browserfactory.AndroidCapabilitiesFactory;
+import com.seleniumtests.core.SeleniumTestsContext;
+import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.DriverConfig;
 
@@ -38,12 +39,15 @@ public class TestAndroidCapabilitiesFactory extends GenericTest {
 	 */
 	@Test(groups={"ut"})
 	public void testCreateDefaultChromeCapabilities() {
-		DriverConfig config = new DriverConfig();
-		config.setBrowser(BrowserType.FIREFOX);
-		config.setMobilePlatformVersion("8.0");
-		config.setPlatform("android");
-		config.setDeviceName("Samsung Galasy S8");
-		config.setApp("");
+		SeleniumTestsContext context = new SeleniumTestsContext(SeleniumTestsContextManager.getThreadContext());
+		context.setBrowser(BrowserType.FIREFOX.toString());
+		context.setMobilePlatformVersion("8.0");
+		context.setPlatform("android");
+		context.setDeviceName("Samsung Galasy S8");
+		context.setApp("");
+		
+		DriverConfig config = new DriverConfig(context);
+		
 		
 		AndroidCapabilitiesFactory capaFactory = new AndroidCapabilitiesFactory(config);
 		MutableCapabilities capa = capaFactory.createCapabilities();
@@ -53,7 +57,6 @@ public class TestAndroidCapabilitiesFactory extends GenericTest {
 		Assert.assertEquals(capa.getCapability(MobileCapabilityType.PLATFORM_NAME), "android");
 		Assert.assertEquals(capa.getCapability(MobileCapabilityType.PLATFORM_VERSION), "8.0");
 		Assert.assertEquals(capa.getCapability(MobileCapabilityType.DEVICE_NAME), "Samsung Galasy S8");
-		Assert.assertNull(capa.getCapability(MobileCapabilityType.NEW_COMMAND_TIMEOUT));
 		Assert.assertNull(capa.getCapability(AndroidMobileCapabilityType.APP_PACKAGE));
 		Assert.assertNull(capa.getCapability(AndroidMobileCapabilityType.APP_ACTIVITY));
 		Assert.assertNull(capa.getCapability(MobileCapabilityType.FULL_RESET));
@@ -64,12 +67,15 @@ public class TestAndroidCapabilitiesFactory extends GenericTest {
 	 */
 	@Test(groups={"ut"})
 	public void testCreateDefaultAndroidBrowserCapabilities() {
-		DriverConfig config = new DriverConfig();
-		config.setBrowser(BrowserType.BROWSER);
-		config.setMobilePlatformVersion("8.0");
-		config.setPlatform("android");
-		config.setDeviceName("Samsung Galasy S8");
-		config.setApp("");
+		SeleniumTestsContext context = new SeleniumTestsContext(SeleniumTestsContextManager.getThreadContext());
+		context.setBrowser(BrowserType.BROWSER.toString());
+		context.setMobilePlatformVersion("8.0");
+		context.setPlatform("android");
+		context.setDeviceName("Samsung Galasy S8");
+		context.setApp("");
+		
+		DriverConfig config = new DriverConfig(context);
+		
 		
 		AndroidCapabilitiesFactory capaFactory = new AndroidCapabilitiesFactory(config);
 		MutableCapabilities capa = capaFactory.createCapabilities();
@@ -80,7 +86,6 @@ public class TestAndroidCapabilitiesFactory extends GenericTest {
 		Assert.assertEquals(capa.getCapability(MobileCapabilityType.PLATFORM_NAME), "android");
 		Assert.assertEquals(capa.getCapability(MobileCapabilityType.PLATFORM_VERSION), "8.0");
 		Assert.assertEquals(capa.getCapability(MobileCapabilityType.DEVICE_NAME), "Samsung Galasy S8");
-		Assert.assertNull(capa.getCapability(MobileCapabilityType.NEW_COMMAND_TIMEOUT));
 		Assert.assertNull(capa.getCapability(AndroidMobileCapabilityType.APP_PACKAGE));
 		Assert.assertNull(capa.getCapability(AndroidMobileCapabilityType.APP_ACTIVITY));
 		Assert.assertNull(capa.getCapability(MobileCapabilityType.FULL_RESET));
@@ -91,13 +96,14 @@ public class TestAndroidCapabilitiesFactory extends GenericTest {
 	 */
 	@Test(groups={"ut"})
 	public void testCreateCapabilitiesWithApplication() {
-		DriverConfig config = new DriverConfig();
-		config.setMobilePlatformVersion("8.0");
-		config.setPlatform("android");
-		config.setDeviceName("Samsung Galasy S8");
-		config.setAppPackage("appPackage");
-		config.setAppActivity("appActivity");
-		config.setApp("com.covea.mobileapp");
+		SeleniumTestsContext context = new SeleniumTestsContext(SeleniumTestsContextManager.getThreadContext());
+		context.setMobilePlatformVersion("8.0");
+		context.setPlatform("android");
+		context.setDeviceName("Samsung Galasy S8");
+		context.setAppPackage("appPackage");
+		context.setAppActivity("appActivity");
+		context.setApp("com.covea.mobileapp");
+		DriverConfig config = new DriverConfig(context);
 		
 		AndroidCapabilitiesFactory capaFactory = new AndroidCapabilitiesFactory(config);
 		MutableCapabilities capa = capaFactory.createCapabilities();
@@ -108,8 +114,7 @@ public class TestAndroidCapabilitiesFactory extends GenericTest {
 		Assert.assertEquals(capa.getCapability(MobileCapabilityType.PLATFORM_NAME), "android");
 		Assert.assertEquals(capa.getCapability(MobileCapabilityType.PLATFORM_VERSION), "8.0");
 		Assert.assertEquals(capa.getCapability(MobileCapabilityType.DEVICE_NAME), "Samsung Galasy S8");
-		Assert.assertEquals(capa.getCapability(MobileCapabilityType.FULL_RESET), "false");
-		Assert.assertNull(capa.getCapability(MobileCapabilityType.NEW_COMMAND_TIMEOUT));
+		Assert.assertEquals(capa.getCapability(MobileCapabilityType.FULL_RESET), "true");
 		Assert.assertEquals(capa.getCapability(AndroidMobileCapabilityType.APP_PACKAGE), "appPackage");
 		Assert.assertEquals(capa.getCapability(AndroidMobileCapabilityType.APP_ACTIVITY), "appActivity");
 	}
@@ -119,19 +124,20 @@ public class TestAndroidCapabilitiesFactory extends GenericTest {
 	 */
 	@Test(groups={"ut"})
 	public void testCreateCapabilitiesWithApplicationOverrideFullReset() {
-		DriverConfig config = new DriverConfig();
-		config.setMobilePlatformVersion("8.0");
-		config.setPlatform("android");
-		config.setDeviceName("Samsung Galasy S8");
-		config.setAppPackage("appPackage");
-		config.setAppActivity("appActivity");
-		config.setFullReset(true);
-		config.setApp("com.covea.mobileapp");
+		SeleniumTestsContext context = new SeleniumTestsContext(SeleniumTestsContextManager.getThreadContext());
+		context.setMobilePlatformVersion("8.0");
+		context.setPlatform("android");
+		context.setDeviceName("Samsung Galasy S8");
+		context.setAppPackage("appPackage");
+		context.setAppActivity("appActivity");
+		context.setFullReset(false);
+		context.setApp("com.covea.mobileapp");
+		DriverConfig config = new DriverConfig(context);
 		
 		AndroidCapabilitiesFactory capaFactory = new AndroidCapabilitiesFactory(config);
 		MutableCapabilities capa = capaFactory.createCapabilities();
 		
-		Assert.assertEquals(capa.getCapability(MobileCapabilityType.FULL_RESET), "true");
+		Assert.assertEquals(capa.getCapability(MobileCapabilityType.FULL_RESET), "false");
 	}
 	
 	/**
@@ -139,14 +145,15 @@ public class TestAndroidCapabilitiesFactory extends GenericTest {
 	 */
 	@Test(groups={"ut"})
 	public void testCreateCapabilitiesWithApplicationOldAndroid() {
-		DriverConfig config = new DriverConfig();
-		config.setMobilePlatformVersion("2.3");
-		config.setPlatform("android");
-		config.setDeviceName("Samsung Galasy S1");
-		config.setAppPackage("appPackage");
-		config.setAppActivity("appActivity");
-		config.setFullReset(true);
-		config.setApp("com.covea.mobileapp");
+		SeleniumTestsContext context = new SeleniumTestsContext(SeleniumTestsContextManager.getThreadContext());
+		context.setMobilePlatformVersion("2.3");
+		context.setPlatform("android");
+		context.setDeviceName("Samsung Galasy S1");
+		context.setAppPackage("appPackage");
+		context.setAppActivity("appActivity");
+		context.setFullReset(true);
+		context.setApp("com.covea.mobileapp");
+		DriverConfig config = new DriverConfig(context);
 		
 		AndroidCapabilitiesFactory capaFactory = new AndroidCapabilitiesFactory(config);
 		MutableCapabilities capa = capaFactory.createCapabilities();

@@ -24,6 +24,7 @@ import org.testng.ITestContext;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeMethod;
 
+import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.driver.WebUIDriver;
 
@@ -40,6 +41,7 @@ public class GenericTest {
 		SeleniumTestsContextManager.initThreadContext(testNGCtx, null, null, null);
 		SeleniumTestsContextManager.getThreadContext().setSoftAssertEnabled(false);
 		SeleniumTestsContextManager.getGlobalContext().setSoftAssertEnabled(false);
+		SeleniumTestsContext.resetOutputFolderNames();
 	}
 	
 	public void initThreadContext(final ITestContext testNGCtx) {
@@ -47,6 +49,7 @@ public class GenericTest {
 		SeleniumTestsContextManager.initThreadContext(testNGCtx, null, null, null);
 		SeleniumTestsContextManager.getThreadContext().setSoftAssertEnabled(false);
 		SeleniumTestsContextManager.getGlobalContext().setSoftAssertEnabled(false);
+		SeleniumTestsContext.resetOutputFolderNames();
 	}
 	
 	@AfterClass(groups={"ut", "it"})
