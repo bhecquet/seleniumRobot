@@ -87,27 +87,7 @@ public class LogAction {
 		PageObject page = (PageObject)joinPoint.getTarget();
 		String pageName = page == null ? "": "on page " + page.getClass().getSimpleName();
 
-    	List<String> pwdToReplace = new ArrayList<>();
-		String actionName = String.format("%s %s %s", joinPoint.getSignature().getName(), pageName, buildArgString(joinPoint, pwdToReplace));
-		Object reply = null;
-		boolean actionFailed = false;
-		TestAction currentAction = new TestAction(actionName, false, pwdToReplace);
-		
-		if (TestLogging.getParentTestStep() != null) {
-			TestLogging.getParentTestStep().addAction(currentAction);
-		}
-		
-		try {
-			reply = joinPoint.proceed(joinPoint.getArgs());
-		} catch (Throwable e) {
-			actionFailed = true;
-			throw e;
-		} finally {
-			if (TestLogging.getParentTestStep() != null) {
-				currentAction.setFailed(actionFailed);
-			}
-		}
-		return reply;
+    	return logAction(joinPoint, pageName);
 	}
 	
 	/**
@@ -124,29 +104,7 @@ public class LogAction {
 			return joinPoint.proceed(joinPoint.getArgs());
 		}
 		
-		Object reply = null;
-
-    	List<String> pwdToReplace = new ArrayList<>();
-		String stepName = String.format("%s %s", joinPoint.getSignature().getName(), buildArgString(joinPoint, pwdToReplace));
-		TestStep currentStep = new TestStep(stepName, TestLogging.getCurrentTestResult(), pwdToReplace);
-		TestStep previousParent = TestLogging.getParentTestStep();
-		if (TestLogging.getParentTestStep() != null) {
-			TestLogging.getParentTestStep().addStep(currentStep);
-			TestLogging.setParentTestStep(currentStep);
-		}
-		
-		try {
-			reply = joinPoint.proceed(joinPoint.getArgs());
-		} catch (Throwable e) {
-			currentStep.setFailed(true);
-			currentStep.setActionException(e);
-			throw e;
-		} finally {
-			if (TestLogging.getParentTestStep() != null && previousParent != null) {
-				TestLogging.setParentTestStep(previousParent);
-			}				
-		}
-		return reply;
+		return commonLogTestStep(joinPoint, "", false);
 	}
 	
 	/**
@@ -225,42 +183,8 @@ public class LogAction {
 				) {
 			return joinPoint.proceed(joinPoint.getArgs());
 		}
-
-		Object reply = null;
-		boolean rootStep = false;
-		TestStep previousParent = null;
 		
-		// step name will contain method arguments only if it's not a configuration method (as they are generic)
-		TestStep currentStep = buildRootStep(joinPoint, stepNamePrefix, !configStep);
-		
-		// check if any root step is already registered (a main step)
-		// happens when using cucumber where a cucumber method can call an other method intercepted by this pointcut
-		// ex: Given (url "www.somesite.com") calls "open(url)"
-		// In this case, open becomes a child of Given
-		if (TestLogging.getCurrentRootTestStep() == null) {
-			TestLogging.setCurrentRootTestStep(currentStep); // will also set parent step
-			rootStep = true;
-		} else {
-			TestLogging.getParentTestStep().addStep(currentStep);
-			previousParent = TestLogging.getParentTestStep();
-			TestLogging.setParentTestStep(currentStep);
-		}
-		
-		try {
-			reply = joinPoint.proceed(joinPoint.getArgs());
-		} catch (Throwable e) {
-			currentStep.setFailed(true);
-			currentStep.setActionException(e);
-			throw e;
-		} finally {
-			if (rootStep) {
-				TestLogging.getCurrentRootTestStep().updateDuration();
-				TestLogging.logTestStep(TestLogging.getCurrentRootTestStep());	
-			} else {
-				TestLogging.setParentTestStep(previousParent);
-			}
-		}
-		return reply;
+		return commonLogTestStep(joinPoint, stepNamePrefix, configStep);
 	}
 	
 
@@ -296,6 +220,8 @@ public class LogAction {
 	
 	@Around("isNoNativeActionOverride(joinPoint)")
 	public Object logNativeAction(ProceedingJoinPoint joinPoint) throws Throwable {
+		
+		// build the name of the element
 		String targetName = joinPoint.getTarget().toString();
 		if (joinPoint.getTarget() instanceof Select) {
 			targetName = "Select";
@@ -304,29 +230,8 @@ public class LogAction {
 				targetName = "Element located by" + targetName.split("->")[1].replace("]", "");
 			} catch (IndexOutOfBoundsException e) {}
 		}
-		boolean actionFailed = false;
-    	String methodName = joinPoint.getSignature().getName();
-    	List<String> pwdToReplace = new ArrayList<>();
-		String actionName = String.format("%s on %s %s", methodName, targetName, LogAction.buildArgString(joinPoint, pwdToReplace));
-		TestAction currentAction = new TestAction(actionName, false, pwdToReplace);
-    	
-		// log action before its started. By default, it's OK. Then result may be overwritten if step fails
-		// order of steps is the right one (first called is first displayed)
-		if (TestLogging.getParentTestStep() != null) {
-			TestLogging.getParentTestStep().addAction(currentAction);
-		}	
 		
-		try {
-			return joinPoint.proceed(joinPoint.getArgs());
-		} catch (Throwable e) {
-			actionFailed = true;
-			throw e;
-		} finally {
-			if (TestLogging.getParentTestStep() != null) {
-				currentAction.setFailed(actionFailed);
-			}		
-		}
-		
+		return logAction(joinPoint, targetName);
 	}
 	
 	/**
@@ -427,6 +332,84 @@ public class LogAction {
 			.replace("@" + annotation.annotationType().getCanonicalName() + "(", "")
 			.replaceFirst(",?\\s?value=", "")
 			.replaceFirst("\\)$", "");
+	}
+	
+	/**
+	 * Log an action inside a TestStep
+	 * @param joinPoint		the joinPoint
+	 * @param targetName	target on which action is done (page or element)
+	 * @return
+	 * @throws Throwable 
+	 */
+	private Object logAction(ProceedingJoinPoint joinPoint, String targetName) throws Throwable {
+		List<String> pwdToReplace = new ArrayList<>();
+		String actionName = String.format("%s on %s %s", joinPoint.getSignature().getName(), targetName, buildArgString(joinPoint, pwdToReplace));
+		Object reply = null;
+		boolean actionFailed = false;
+		TestAction currentAction = new TestAction(actionName, false, pwdToReplace);
+		
+		// log action before its started. By default, it's OK. Then result may be overwritten if step fails
+		// order of steps is the right one (first called is first displayed)	
+		if (TestLogging.getParentTestStep() != null) {
+			TestLogging.getParentTestStep().addAction(currentAction);
+		}
+		
+		try {
+			reply = joinPoint.proceed(joinPoint.getArgs());
+		} catch (Throwable e) {
+			actionFailed = true;
+			throw e;
+		} finally {
+			if (TestLogging.getParentTestStep() != null) {
+				currentAction.setFailed(actionFailed);
+			}
+		}
+		return reply;
+	}
+	
+	/**
+	 * Log a TestStep, inside a parent TestStep or not
+	 * Common method used for all test step logging
+	 * @return
+	 * @throws Throwable 
+	 */
+	private Object commonLogTestStep(ProceedingJoinPoint joinPoint, String stepNamePrefix, boolean configStep) throws Throwable {
+		Object reply = null;
+		boolean rootStep = false;
+		TestStep previousParent = null;
+		
+		// step name will contain method arguments only if it's not a configuration method (as they are generic)
+		TestStep currentStep = buildRootStep(joinPoint, stepNamePrefix, !configStep);
+		
+		// check if any root step is already registered (a main step)
+		// happens when using cucumber where a cucumber method can call an other method intercepted by this pointcut
+		// ex: Given (url "www.somesite.com") calls "open(url)"
+		// In this case, open becomes a child of Given
+		// if rootStep is null, parent step is also null
+		if (TestLogging.getCurrentRootTestStep() == null) {
+			TestLogging.setCurrentRootTestStep(currentStep); // will also set parent step
+			rootStep = true;
+		} else {
+			TestLogging.getParentTestStep().addStep(currentStep);
+			previousParent = TestLogging.getParentTestStep();
+			TestLogging.setParentTestStep(currentStep);
+		}
+		
+		try {
+			reply = joinPoint.proceed(joinPoint.getArgs());
+		} catch (Throwable e) {
+			currentStep.setFailed(true);
+			currentStep.setActionException(e);
+			throw e;
+		} finally {
+			if (rootStep) {
+				TestLogging.getCurrentRootTestStep().updateDuration();
+				TestLogging.logTestStep(TestLogging.getCurrentRootTestStep());	
+			} else {
+				TestLogging.setParentTestStep(previousParent);
+			}
+		}
+		return reply;
 	}
 
 }
