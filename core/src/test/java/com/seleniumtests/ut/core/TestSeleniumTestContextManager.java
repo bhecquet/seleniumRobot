@@ -151,11 +151,13 @@ public class TestSeleniumTestContextManager extends GenericTest {
 	public void testGenerateApplicationPath() {
 		XmlSuite suite = new XmlSuite();
 		suite.setName("TmpSuite");
-		suite.setParallel(ParallelMode.FALSE);
+		suite.setParallel(ParallelMode.NONE);
 		suite.setFileName("/home/test/seleniumRobot/data/myApp/testng/testSRTCManager.xml");
 		
 		SeleniumTestsContextManager.generateApplicationPath(suite);
 		Assert.assertEquals(SeleniumTestsContextManager.getApplicationName(), "myApp");
+		Assert.assertEquals(SeleniumTestsContextManager.getApplicationDataPath().replace(File.separator, "/"), "/home/test/seleniumRobot/data/myApp");
+		Assert.assertEquals(SeleniumTestsContextManager.getDataPath().replace(File.separator, "/"), "/home/test/seleniumRobot/data/");
 		Assert.assertEquals(SeleniumTestsContextManager.getConfigPath(), "/home/test/seleniumRobot/data/myApp/config".replace("/", File.separator));
 	}
 	
@@ -167,11 +169,13 @@ public class TestSeleniumTestContextManager extends GenericTest {
 	public void testGenerateApplicationPathWithVersion() {
 		XmlSuite suite = new XmlSuite();
 		suite.setName("TmpSuite");
-		suite.setParallel(ParallelMode.FALSE);
+		suite.setParallel(ParallelMode.NONE);
 		suite.setFileName("/home/test/seleniumRobot/data/myApp_1.0.0/testng/testSRTCManager.xml");
 		
 		SeleniumTestsContextManager.generateApplicationPath(suite);
 		Assert.assertEquals(SeleniumTestsContextManager.getApplicationName(), "myApp");
+		Assert.assertEquals(SeleniumTestsContextManager.getApplicationDataPath().replace(File.separator, "/"), "/home/test/seleniumRobot/data/myApp_1.0.0");
+		Assert.assertEquals(SeleniumTestsContextManager.getDataPath().replace(File.separator, "/"), "/home/test/seleniumRobot/data/");
 		Assert.assertEquals(SeleniumTestsContextManager.getConfigPath(), "/home/test/seleniumRobot/data/myApp_1.0.0/config".replace("/", File.separator));
 	}
 	
@@ -184,7 +188,7 @@ public class TestSeleniumTestContextManager extends GenericTest {
 	public void testGenerateApplicationPathWithShortVersion() {
 		XmlSuite suite = new XmlSuite();
 		suite.setName("TmpSuite");
-		suite.setParallel(ParallelMode.FALSE);
+		suite.setParallel(ParallelMode.NONE);
 		suite.setFileName("/home/test/seleniumRobot/data/myApp_1/testng/testSRTCManager.xml");
 		
 		SeleniumTestsContextManager.generateApplicationPath(suite);
@@ -201,7 +205,7 @@ public class TestSeleniumTestContextManager extends GenericTest {
 	public void testGenerateApplicationPathWithComplicatedVersion() {
 		XmlSuite suite = new XmlSuite();
 		suite.setName("TmpSuite");
-		suite.setParallel(ParallelMode.FALSE);
+		suite.setParallel(ParallelMode.NONE);
 		suite.setFileName("/home/test/seleniumRobot/data/myApp_alpha.1.2-beta/testng/testSRTCManager.xml");
 		
 		SeleniumTestsContextManager.generateApplicationPath(suite);
@@ -216,7 +220,7 @@ public class TestSeleniumTestContextManager extends GenericTest {
 	public void testGenerateApplicationPathForIDE() {
 		XmlSuite suite = new XmlSuite();
 		suite.setName("TmpSuite");
-		suite.setParallel(ParallelMode.FALSE);
+		suite.setParallel(ParallelMode.NONE);
 		suite.setFileName("/home/test/testng/testSRTCManager.xml");
 		
 		SeleniumTestsContextManager.generateApplicationPath(suite);

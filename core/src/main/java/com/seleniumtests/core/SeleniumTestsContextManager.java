@@ -51,6 +51,7 @@ public class SeleniumTestsContextManager {
 	
 	private static String rootPath;
 	private static String dataPath;
+	private static String appDataPath;
 	private static String featuresPath;
 	private static String configPath;
 	private static String applicationName;
@@ -481,6 +482,7 @@ public class SeleniumTestsContextManager {
 		
 		featuresPath = Paths.get(dataPath, applicationNameWithVersion, "features").toString();
 		configPath = Paths.get(dataPath, applicationNameWithVersion, "config").toString();
+		appDataPath = Paths.get(dataPath, applicationNameWithVersion).toString();
 		
 		if (applicationVersion == null) {
 			applicationVersion = readApplicationVersion();
@@ -492,6 +494,9 @@ public class SeleniumTestsContextManager {
 		// create data folder if it does not exist (it should already exist)
 		if (!new File(dataPath).isDirectory()) {
 			new File(dataPath).mkdirs();
+		}
+		if (!new File(appDataPath).isDirectory()) {
+			new File(appDataPath).mkdirs();
 		}
 	}
     
@@ -541,6 +546,9 @@ public class SeleniumTestsContextManager {
 	 */
 	public static String getDataPath() {
 		return dataPath;
+	}
+	public static String getApplicationDataPath() {
+		return appDataPath;
 	}
 
     public static Boolean getDeployedMode() {
