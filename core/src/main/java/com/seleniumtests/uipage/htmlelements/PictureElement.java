@@ -157,11 +157,11 @@ public class PictureElement {
 		Point intoElementPos = intoElement.getCoordinates().onPage();
 		int relativeX = detectedObjectRectangle.x + detectedObjectRectangle.width / 2 - intoElementPos.x;
 		int relativeY = detectedObjectRectangle.y + detectedObjectRectangle.height / 2 - intoElementPos.y;
-		System.out.println(intoElementPos);
-		System.out.println(relativeX);
-		System.out.println(relativeY);
-		System.out.println(detectedObjectRectangle.getPoint());
-		System.out.println(detectedObjectRectangle.getDimension());
+//		System.out.println(intoElementPos);
+//		System.out.println(relativeX);
+//		System.out.println(relativeY);
+//		System.out.println(detectedObjectRectangle.getPoint());
+//		System.out.println(detectedObjectRectangle.getDimension());
 		moveAndClick(intoElement, relativeX + (int)(xOffset * pictureSizeRatio), relativeY + (int)(yOffset * pictureSizeRatio));
 	}
 	
@@ -204,15 +204,31 @@ public class PictureElement {
 	}
 	
 	/**
-	 * check whether picture is present or not
+	 * check whether picture is present or not on browser or on application (for mobile) as it uses driver capture
 	 * @param waitMs
 	 * @return
 	 */
 	public boolean isElementPresent(int waitMs) {
+		return isElementPresent(waitMs, true);
+	}
+	
+	/**
+	 * Check if picture is visible on desktop. This is only available for desktop tests
+	 * @param waitMs
+	 * @return
+	 */
+	public boolean isElementPresentOnDesktop(int waitMs) {
+		return isElementPresent(waitMs, false);
+	}
+	public boolean isElementPresentOnDesktop() {
+		return isElementPresent(0, false);
+	}
+	
+	private boolean isElementPresent(int waitMs, boolean captureByDriver) {
 		long end = clock.laterBy(waitMs);
 		while (clock.isNowBefore(end) || waitMs == 0) {
 			try {
-				findElement(true);
+				findElement(captureByDriver);
 				return true;
 			} catch (ImageSearchException e) {
 				if (waitMs == 0) {
@@ -223,8 +239,9 @@ public class PictureElement {
 			}
 		}
 		return false;
-		
 	}
+	
+	
 	
 	@Override
 	public String toString() {
