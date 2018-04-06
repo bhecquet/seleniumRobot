@@ -86,8 +86,13 @@ public class TestPictureElement extends GenericTest {
 	}
 
 	@Test(groups={"it"})
-	public void testIsVisible() {
+	public void testIsVisible() { 
 		Assert.assertTrue(testPage.picture.isElementPresent());
+	}
+	
+	@Test(groups={"it"})
+	public void testIsVisibleOnDesktop() {
+		Assert.assertTrue(testPage.googleForDesktop.isElementPresentOnDesktop());
 	}
 	
 	@Test(groups={"it"})

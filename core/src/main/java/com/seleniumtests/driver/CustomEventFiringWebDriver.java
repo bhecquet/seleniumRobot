@@ -285,15 +285,26 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
 		
 		GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
 		GraphicsDevice defaultGraphicDevice = ge.getDefaultScreenDevice();
-		Integer screenWidth = defaultGraphicDevice.getDisplayMode().getWidth();
-		Integer screenHeight = defaultGraphicDevice.getDisplayMode().getHeight();
 		
-		// Capture the screen shot of the area of the screen defined by the rectangle
+		Rectangle screenRect = new Rectangle(0, 0, 0, 0);
+		for (GraphicsDevice gd : ge.getScreenDevices()) {
+		    screenRect = screenRect.union(gd.getDefaultConfiguration().getBounds());
+		}
 		try {
-			return new Robot().createScreenCapture(new Rectangle(screenWidth, screenHeight));
+			return new Robot().createScreenCapture(screenRect);
 		} catch (AWTException e) {
 			throw new ScenarioException("Cannot capture image", e);
 		}
+		
+//		Integer screenWidth = defaultGraphicDevice.getDisplayMode().getWidth();
+//		Integer screenHeight = defaultGraphicDevice.getDisplayMode().getHeight();
+//		
+//		// Capture the screen shot of the area of the screen defined by the rectangle
+//		try {
+//			return new Robot().createScreenCapture(new Rectangle(screenWidth, screenHeight));
+//		} catch (AWTException e) {
+//			throw new ScenarioException("Cannot capture image", e);
+//		}
 	}
 
 	/**
