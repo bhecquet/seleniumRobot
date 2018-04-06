@@ -248,7 +248,12 @@ public class WebUIDriver {
     }
 
     protected WebDriver handleListeners(WebDriver driver, BrowserInfo browserInfo, List<Long> driverPids) {
-    	EventFiringWebDriver listeningDriver = new CustomEventFiringWebDriver(driver, driverPids, browserInfo, SeleniumTestsContextManager.isWebTest(), SeleniumTestsContextManager.getThreadContext().getRunMode());
+    	EventFiringWebDriver listeningDriver = new CustomEventFiringWebDriver(driver, 
+    																			driverPids, 
+    																			browserInfo, 
+    																			SeleniumTestsContextManager.isWebTest(), 
+    																			SeleniumTestsContextManager.getThreadContext().getRunMode(),
+    																			config.getBrowserMobProxy());
         List<WebDriverEventListener> listeners = config.getWebDriverListeners();
         if (listeners != null && !listeners.isEmpty()) {
             for (int i = 0; i < config.getWebDriverListeners().size(); i++) {

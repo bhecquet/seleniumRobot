@@ -58,6 +58,8 @@ import com.seleniumtests.util.helper.WaitHelper;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 import com.seleniumtests.util.osutility.OSUtilityFactory;
 
+import net.lightbody.bmp.BrowserMobProxy;
+
 /**
  * Supports file upload in remote webdriver.
  */
@@ -71,6 +73,7 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
 	private final boolean isWebTest;
 	private final DriverMode driverMode;
 	private final BrowserInfo browserInfo;
+	private final BrowserMobProxy mobProxy;
     
     private static final String JS_GET_VIEWPORT_SIZE =
     		"var pixelRatio;" +
@@ -132,16 +135,17 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
     		"var action = 'capture_desktop_snapshot_to_base64_string';return '';";
     
     public CustomEventFiringWebDriver(final WebDriver driver) {
-    	this(driver, null, null, true, DriverMode.LOCAL);
+    	this(driver, null, null, true, DriverMode.LOCAL, null);
     }
 
-	public CustomEventFiringWebDriver(final WebDriver driver, List<Long> driverPids, BrowserInfo browserInfo, Boolean isWebTest, DriverMode localDriver) {
+	public CustomEventFiringWebDriver(final WebDriver driver, List<Long> driverPids, BrowserInfo browserInfo, Boolean isWebTest, DriverMode localDriver, BrowserMobProxy mobProxy) {
         super(driver);
         this.driverPids = driverPids == null ? new ArrayList<>(): driverPids;
 		this.driver = driver;
 		this.browserInfo = browserInfo;
 		this.isWebTest = isWebTest;
 		this.driverMode = localDriver;
+		this.mobProxy = mobProxy;
     }
 
     public void setFileDetector(final FileDetector detector) {
