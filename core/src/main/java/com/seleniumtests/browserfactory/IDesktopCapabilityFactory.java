@@ -133,8 +133,8 @@ public abstract class IDesktopCapabilityFactory extends ICapabilitiesFactory {
 
         if (webDriverConfig.getCaptureNetwork()) {
         	
-        	if (webDriverConfig.getWebProxyType() == ProxyType.PAC) {
-        		throw new ConfigurationException("PAC proxy cannot be used with browsermob");
+        	if (webDriverConfig.getWebProxyType() != ProxyType.DIRECT && webDriverConfig.getWebProxyType() != ProxyType.MANUAL) {
+        		throw new ConfigurationException("PAC/AUTODETECT/SYSTEM proxy cannot be used with browsermob proxy");
         	}
         	
 			BrowserMobProxy mobProxy = new BrowserMobProxyServer();
