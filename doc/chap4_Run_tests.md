@@ -64,6 +64,7 @@ In this case, this user passed value will overwrite test or suite parameters
 | proxyPac 					| 			| Automatic configuration address, if PAC type is choosen | 
 | reportGenerationConfig 	| summaryPerSuite | Type of report generation.
 | captureSnapshot 			| true 		| Capture page snapshots. Captures are done only when a new page is opened |
+| captureNetwork			| false		| If true, creates a HAR file which capture traffic. This is only available with MANUAL and DIRECT proxy settings because there is no way, when automatic mode is used, to know which proxy is used by browser and the authentication used. |
 | snapshotTopCropping		| 0			| number of pixel that will be cropped from the top when capturing snapshot. This only applies to snapshots done with several captures (like from chrome) when a portion of the GUI is fixed when scrolling |
 | snapshotBottomCropping	| 0			| same as snapshotTopCropping for bottom cropping |
 | seleniumRobotServerActive	| false		| whether we use seleniumRobot server. If true, seleniumRobotServerUrl MUST be specified (in XML, command line or through env variable |
