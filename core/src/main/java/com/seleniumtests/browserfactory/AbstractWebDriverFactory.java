@@ -50,7 +50,7 @@ public abstract class AbstractWebDriverFactory {
     public void cleanUp() {
         if (driver != null) {
             try {
-                TestLogging.log("quiting webdriver" + Thread.currentThread().getId());
+                TestLogging.log("quiting webdriver " + Thread.currentThread().getId());
                 driver.quit();
             } catch (Exception ex) {
                 TestLogging.log("Exception encountered when quiting driver:" + ex.getMessage());

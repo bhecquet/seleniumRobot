@@ -57,8 +57,8 @@ public class TestAndroidCapabilitiesFactory extends GenericTest {
 		Assert.assertEquals(capa.getCapability(MobileCapabilityType.PLATFORM_NAME), "android");
 		Assert.assertEquals(capa.getCapability(MobileCapabilityType.PLATFORM_VERSION), "8.0");
 		Assert.assertEquals(capa.getCapability(MobileCapabilityType.DEVICE_NAME), "Samsung Galasy S8");
-		Assert.assertNull(capa.getCapability(AndroidMobileCapabilityType.APP_PACKAGE));
-		Assert.assertNull(capa.getCapability(AndroidMobileCapabilityType.APP_ACTIVITY));
+		Assert.assertEquals(capa.getCapability(AndroidMobileCapabilityType.APP_PACKAGE), "com.infotel.mobile"); // from exampleConfigGenericParams.xml when tu.xml is executed, else, null
+		Assert.assertEquals(capa.getCapability(AndroidMobileCapabilityType.APP_ACTIVITY), "com.infotel.mobile.StartActivity"); // from exampleConfigGenericParams.xml when tu.xml is executed, else, null
 		Assert.assertNull(capa.getCapability(MobileCapabilityType.FULL_RESET));
 	}
 	
@@ -86,8 +86,8 @@ public class TestAndroidCapabilitiesFactory extends GenericTest {
 		Assert.assertEquals(capa.getCapability(MobileCapabilityType.PLATFORM_NAME), "android");
 		Assert.assertEquals(capa.getCapability(MobileCapabilityType.PLATFORM_VERSION), "8.0");
 		Assert.assertEquals(capa.getCapability(MobileCapabilityType.DEVICE_NAME), "Samsung Galasy S8");
-		Assert.assertNull(capa.getCapability(AndroidMobileCapabilityType.APP_PACKAGE));
-		Assert.assertNull(capa.getCapability(AndroidMobileCapabilityType.APP_ACTIVITY));
+		Assert.assertEquals(capa.getCapability(AndroidMobileCapabilityType.APP_PACKAGE), "com.infotel.mobile"); // from exampleConfigGenericParams.xml when tu.xml is executed, else, null
+		Assert.assertEquals(capa.getCapability(AndroidMobileCapabilityType.APP_ACTIVITY), "com.infotel.mobile.StartActivity"); // from exampleConfigGenericParams.xml when tu.xml is executed, else, null
 		Assert.assertNull(capa.getCapability(MobileCapabilityType.FULL_RESET));
 	}
 	

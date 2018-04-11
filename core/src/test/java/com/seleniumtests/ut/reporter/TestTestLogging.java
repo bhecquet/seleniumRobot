@@ -16,6 +16,8 @@
  */
 package com.seleniumtests.ut.reporter;
 
+import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 
 import org.testng.Assert;
@@ -25,11 +27,18 @@ import org.testng.annotations.Test;
 import org.testng.internal.TestResult;
 
 import com.seleniumtests.GenericTest;
+import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.driver.screenshots.ScreenShot;
+import com.seleniumtests.reporter.logger.HarCapture;
 import com.seleniumtests.reporter.logger.Snapshot;
 import com.seleniumtests.reporter.logger.TestLogging;
 import com.seleniumtests.reporter.logger.TestMessage;
 import com.seleniumtests.reporter.logger.TestMessage.MessageType;
+
+import net.lightbody.bmp.core.har.Har;
+import net.lightbody.bmp.core.har.HarLog;
+import net.lightbody.bmp.core.har.HarPage;
+
 import com.seleniumtests.reporter.logger.TestStep;
 
 public class TestTestLogging extends GenericTest {
@@ -74,6 +83,23 @@ public class TestTestLogging extends GenericTest {
 		TestLogging.setCurrentRootTestStep(new TestStep("step", null, new ArrayList<>()));
 		TestLogging.logScreenshot(new ScreenShot());
 		Assert.assertEquals(TestLogging.getParentTestStep().getSnapshots().size(), 1);
+	}
+	
+	@Test(groups={"ut"})
+	public void testLogHarOk() {
+		TestLogging.setCurrentRootTestStep(new TestStep("step", null, new ArrayList<>()));
+		Har har = new Har(new HarLog());
+		har.getLog().addPage(new HarPage("title", "a title"));
+		TestLogging.logNetworkCapture(har);
+		Assert.assertNotNull(TestLogging.getParentTestStep().getHarCapture());
+		Assert.assertTrue(Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), "networkCapture.har").toFile().exists());
+	}
+	
+	@Test(groups={"ut"})
+	public void testLogHarNull() {
+		TestLogging.setCurrentRootTestStep(new TestStep("step", null, new ArrayList<>()));
+		TestLogging.logNetworkCapture(null);
+		Assert.assertNull(TestLogging.getParentTestStep().getHarCapture());
 	}
 	
 	@Test(groups={"ut"})
@@ -138,5 +164,15 @@ public class TestTestLogging extends GenericTest {
 		Snapshot snapshotLogger = new Snapshot(screenshot);
 		String screenshotStr = snapshotLogger.buildScreenshotLog();
 		Assert.assertEquals(screenshotStr, "Output: title:  | <a href='file.html' target=html>Application HTML Source</a> | <a href='file.png' class='lightbox'>Application Snapshot</a>");
+	}
+	
+
+	@Test(groups={"ut"})
+	public void testBuildHarLog() throws IOException {
+		TestLogging.setCurrentRootTestStep(new TestStep("step", null, new ArrayList<>()));
+		Har har = new Har(new HarLog());
+		har.getLog().addPage(new HarPage("title", "a title"));
+		HarCapture capture = new HarCapture(har);
+		Assert.assertEquals(capture.buildHarLog(), "Network capture: <a href='networkCapture.har'>HAR file</a>");
 	}
 }

@@ -147,7 +147,7 @@ public abstract class IDesktopCapabilityFactory extends ICapabilitiesFactory {
 				}
 			}
 			mobProxy.setTrustAllServers(true);
-			mobProxy.enableHarCaptureTypes(CaptureType.REQUEST_CONTENT, CaptureType.RESPONSE_CONTENT, CaptureType.REQUEST_HEADERS, CaptureType.RESPONSE_HEADERS);
+			mobProxy.enableHarCaptureTypes(CaptureType.REQUEST_CONTENT, CaptureType.REQUEST_HEADERS, CaptureType.RESPONSE_HEADERS);
 			mobProxy.start(0);
 		    Proxy seleniumProxy = ClientUtil.createSeleniumProxy(mobProxy);
 	    

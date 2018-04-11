@@ -31,11 +31,16 @@ import org.testng.annotations.Test;
 import com.seleniumtests.GenericTest;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.driver.screenshots.ScreenShot;
+import com.seleniumtests.reporter.logger.HarCapture;
 import com.seleniumtests.reporter.logger.Snapshot;
 import com.seleniumtests.reporter.logger.TestAction;
 import com.seleniumtests.reporter.logger.TestMessage;
 import com.seleniumtests.reporter.logger.TestMessage.MessageType;
 import com.seleniumtests.reporter.logger.TestStep;
+
+import net.lightbody.bmp.core.har.Har;
+import net.lightbody.bmp.core.har.HarLog;
+import net.lightbody.bmp.core.har.HarPage;
 
 public class TestTestStep extends GenericTest {
 
@@ -201,12 +206,17 @@ public class TestTestStep extends GenericTest {
 	
 	/**
 	 * Checks getFailed correctly compute test step status if sub step is not failed
+	 * @throws IOException 
 	 */
 	@Test(groups={"ut"})
-	public void testToJson() {
+	public void testToJson() throws IOException {
 		TestStep step = new TestStep("step1", null, new ArrayList<>());
 		step.addMessage(new TestMessage("everything OK", MessageType.INFO));
 		step.addAction(new TestAction("action2", false, new ArrayList<>()));
+		
+		Har har = new Har(new HarLog());
+		har.getLog().addPage(new HarPage("title", "a title"));
+		step.addNetworkCapture(new HarCapture(har));
 		
 		TestStep subStep = new TestStep("subStep", null, new ArrayList<>());
 		subStep.addMessage(new TestMessage("everything in subStep almost OK", MessageType.WARNING));
@@ -227,9 +237,13 @@ public class TestTestStep extends GenericTest {
 		Assert.assertEquals(stepJson.getJSONArray("actions").getJSONObject(1).getString("name"), "action2");
 		Assert.assertEquals(stepJson.getJSONArray("actions").getJSONObject(1).getBoolean("failed"), false);
 		
+		Assert.assertEquals(stepJson.getJSONObject("harCapture").getString("type"), "networkCapture");
+		Assert.assertEquals(stepJson.getJSONObject("harCapture").getString("name"), "a title");
+		
 		Assert.assertEquals(stepJson.getJSONArray("actions").getJSONObject(2).getString("type"), "step");
 		Assert.assertEquals(stepJson.getJSONArray("actions").getJSONObject(2).getString("name"), "subStep");
 		Assert.assertEquals(stepJson.getJSONArray("actions").getJSONObject(2).getJSONArray("actions").length(), 2);
+		
 		
 	}
 	

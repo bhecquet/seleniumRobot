@@ -50,6 +50,7 @@ public class TestStep extends TestAction {
 	private List<TestAction> stepActions;
 	private Long duration;
 	private Date startDate;
+	private HarCapture harCapture;
 	private List<Snapshot> snapshots;
 	private ITestResult testResult;
 	
@@ -134,6 +135,9 @@ public class TestStep extends TestAction {
 		// add replacement of the parent step to this step
 		step.pwdToReplace.addAll(pwdToReplace);
 	}
+	public void addNetworkCapture(HarCapture har) {
+		harCapture = har;
+	}
 	
 	/**
 	 * Add snapshot to this step
@@ -163,6 +167,7 @@ public class TestStep extends TestAction {
 		
 		stepJSon.put("name", getName());
 		stepJSon.put("type", "step");
+		stepJSon.put("harCapture", harCapture != null ? harCapture.toJson(): null);
 		
 		stepJSon.put("actions", new JSONArray());
 		for (TestAction testAction: getStepActions()) {
@@ -208,6 +213,14 @@ public class TestStep extends TestAction {
 		}
 		
 		return usedFiles;
+	}
+
+	public HarCapture getHarCapture() {
+		return harCapture;
+	}
+
+	public void setHarCapture(HarCapture harCapture) {
+		this.harCapture = harCapture;
 	}
 	
 }
