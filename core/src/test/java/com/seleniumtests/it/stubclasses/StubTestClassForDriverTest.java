@@ -27,6 +27,18 @@ public class StubTestClassForDriverTest extends StubParentClass {
 			._clickPicture();
 	}
 	
+	@Test(groups="stub")
+	public void testDriverManualSteps() throws Exception {
+
+		SeleniumTestsContextManager.getThreadContext().setManualTestSteps(true);
+
+		addStep("Write");
+		DriverTestPage page = new DriverTestPage(true)
+			._writeSomething();
+		addStep("Reset");
+		page._reset();
+	}
+	
 	/**
 	 * check that with selenium override, logging is done
 	 * @throws Exception

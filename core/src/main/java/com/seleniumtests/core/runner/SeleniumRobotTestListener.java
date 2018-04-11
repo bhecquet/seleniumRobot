@@ -267,9 +267,10 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 				TestLogging.logScreenshot(screenshot);
 			}
 		}
+        WebUIDriver.cleanUp();
+        
 		TestLogging.logTestStep(tearDownStep);
 		
-        WebUIDriver.cleanUp();
 	}
 	
 

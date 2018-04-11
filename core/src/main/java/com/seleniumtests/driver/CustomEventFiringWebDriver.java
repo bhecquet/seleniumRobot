@@ -414,4 +414,8 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
     public Capabilities getCapabilities() {
         return ((HasCapabilities)driver).getCapabilities();
     }
+
+	public BrowserMobProxy getMobProxy() {
+		return mobProxy;
+	}
 }

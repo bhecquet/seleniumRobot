@@ -18,8 +18,10 @@ package com.seleniumtests.core.aspects;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -32,12 +34,17 @@ import org.openqa.selenium.support.ui.Select;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.runner.SeleniumRobotTestPlan;
+import com.seleniumtests.driver.CustomEventFiringWebDriver;
+import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.reporter.logger.TestAction;
 import com.seleniumtests.reporter.logger.TestLogging;
 import com.seleniumtests.reporter.logger.TestStep;
 import com.seleniumtests.uipage.PageObject;
+import com.seleniumtests.util.FileUtility;
+import com.seleniumtests.util.StringUtility;
 
-import oracle.net.aso.p;
+import net.lightbody.bmp.BrowserMobProxy;
+import net.lightbody.bmp.core.har.Har;
 
 /**
  * Aspect to intercept calls to methods of HtmlElement. It allows to retry discovery and action 
@@ -381,6 +388,8 @@ public class LogAction {
 		// step name will contain method arguments only if it's not a configuration method (as they are generic)
 		TestStep currentStep = buildRootStep(joinPoint, stepNamePrefix, !configStep);
 		
+		BrowserMobProxy mobProxy = WebUIDriver.getBrowserMobProxy();
+		
 		// check if any root step is already registered (a main step)
 		// happens when using cucumber where a cucumber method can call an other method intercepted by this pointcut
 		// ex: Given (url "www.somesite.com") calls "open(url)"
@@ -389,6 +398,11 @@ public class LogAction {
 		if (TestLogging.getCurrentRootTestStep() == null) {
 			TestLogging.setCurrentRootTestStep(currentStep); // will also set parent step
 			rootStep = true;
+			
+			if (mobProxy != null) {
+				mobProxy.newPage(currentStep.getName());
+			}
+			
 		} else {
 			TestLogging.getParentTestStep().addStep(currentStep);
 			previousParent = TestLogging.getParentTestStep();

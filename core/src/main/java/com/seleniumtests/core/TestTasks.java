@@ -9,6 +9,7 @@ import com.seleniumtests.connectors.selenium.SeleniumRobotVariableServerConnecto
 import com.seleniumtests.core.runner.SeleniumRobotTestPlan;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.ScenarioException;
+import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import com.seleniumtests.driver.DriverMode;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.driver.screenshots.ScreenshotUtil;
@@ -16,6 +17,8 @@ import com.seleniumtests.reporter.logger.TestLogging;
 import com.seleniumtests.reporter.logger.TestStep;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 import com.seleniumtests.util.osutility.OSUtilityFactory;
+
+import net.lightbody.bmp.BrowserMobProxy;
 
 /**
  * Class for storing tasks that can be used in test and / or in webpages
@@ -96,6 +99,7 @@ public class TestTasks {
     	}
     	return value.getValue();
     }
+   
     
     /**
      * Add step to test and add snapshot to it
@@ -119,6 +123,11 @@ public class TestTasks {
 	    	TestStep step = new TestStep(stepName, TestLogging.getCurrentTestResult(), new ArrayList<>());
 	    	TestLogging.setCurrentRootTestStep(step);
 	    	capturePageSnapshot();
+	    	
+	    	BrowserMobProxy mobProxy = WebUIDriver.getBrowserMobProxy();
+	    	if (mobProxy != null) {
+	    		mobProxy.newPage(stepName);
+	    	}
     	}
     }
     

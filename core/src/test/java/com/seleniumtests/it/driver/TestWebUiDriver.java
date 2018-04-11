@@ -23,9 +23,13 @@ import static org.mockito.Mockito.when;
 import static org.powermock.api.mockito.PowerMockito.whenNew;
 
 import java.net.URL;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.io.FileUtils;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.mockito.Mock;
 import org.openqa.selenium.WebDriver.Options;
 import org.openqa.selenium.WebDriver.Timeouts;
@@ -34,27 +38,30 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.testng.Assert;
 import org.testng.SkipException;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.Test;
+import org.testng.xml.XmlSuite.ParallelMode;
 
-import com.seleniumtests.MockitoTest;
 import com.seleniumtests.browserfactory.AppiumDriverFactory;
 import com.seleniumtests.browserfactory.AppiumLauncherFactory;
 import com.seleniumtests.browserfactory.mobile.AdbWrapper;
 import com.seleniumtests.browserfactory.mobile.LocalAppiumLauncher;
 import com.seleniumtests.browserfactory.mobile.MobileDevice;
 import com.seleniumtests.browserfactory.mobile.MobileDeviceSelector;
+import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.driver.TestType;
 import com.seleniumtests.driver.WebUIDriver;
+import com.seleniumtests.it.reporter.ReporterTest;
 
 import io.appium.java_client.android.AndroidDriver;
 
 @PowerMockIgnore("javax.net.ssl.*")
 @PrepareForTest({AdbWrapper.class, AndroidDriver.class, MobileDeviceSelector.class, AppiumDriverFactory.class, AppiumLauncherFactory.class})
-public class TestWebUiDriver extends MockitoTest {
+public class TestWebUiDriver extends ReporterTest {
 	
 
 	@Mock
@@ -105,6 +112,65 @@ public class TestWebUiDriver extends MockitoTest {
 				
 		WebUIDriver.cleanUp();
 		verify(appiumLauncher).stopAppium();
+	}
+	
+	/**
+	 * Check that HAR capture file is present 
+	 * Check it contains one page per TestStep
+	 * 
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testHarCaptureExists() throws Exception {
+		
+		try {
+			System.setProperty(SeleniumTestsContext.CAPTURE_NETWORK, "true");
+			
+			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriver"});
+			
+			Assert.assertTrue(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriver", "networkCapture.har").toFile().exists());
+			
+			JSONObject json = new JSONObject(FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriver", "networkCapture.har").toFile()));
+			JSONArray pages = json.getJSONObject("log").getJSONArray("pages");
+			Assert.assertEquals(pages.length(), 7);
+			Assert.assertEquals(pages.getJSONObject(0).getString("id").trim(), "testDriver");
+			Assert.assertEquals(pages.getJSONObject(1).getString("id").trim(), "getPageUrl");
+			Assert.assertTrue(pages.getJSONObject(2).getString("id").startsWith("openPage with args"));
+			Assert.assertEquals(pages.getJSONObject(3).getString("id").trim(), "_writeSomething");
+			Assert.assertEquals(pages.getJSONObject(4).getString("id").trim(), "_reset");
+			Assert.assertEquals(pages.getJSONObject(5).getString("id").trim(), "_sendKeysComposite");
+			Assert.assertEquals(pages.getJSONObject(6).getString("id").trim(), "_clickPicture");
+			
+		} finally {
+			System.clearProperty(SeleniumTestsContext.CAPTURE_NETWORK);
+		}
+		
+	}
+	
+	/**
+	 * Check that HAR capture file is present in result with manual steps
+	 * 
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testReportContainsHarCaptureWithManualSteps() throws Exception {
+		
+		try {
+			System.setProperty(SeleniumTestsContext.CAPTURE_NETWORK, "true");
+			
+			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriverManualSteps"});
+			
+			Assert.assertTrue(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriverManualSteps", "networkCapture.har").toFile().exists());
+			JSONObject json = new JSONObject(FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriverManualSteps", "networkCapture.har").toFile()));
+			JSONArray pages = json.getJSONObject("log").getJSONArray("pages");
+			Assert.assertEquals(pages.length(), 3);
+			Assert.assertEquals(pages.getJSONObject(0).getString("id").trim(), "testDriverManualSteps");
+			Assert.assertEquals(pages.getJSONObject(1).getString("id").trim(), "Write");
+			Assert.assertEquals(pages.getJSONObject(2).getString("id").trim(), "Reset");
+		} finally {
+			System.clearProperty(SeleniumTestsContext.CAPTURE_NETWORK);
+		}
+		
 	}
 	
 	@AfterMethod(groups={"it"})

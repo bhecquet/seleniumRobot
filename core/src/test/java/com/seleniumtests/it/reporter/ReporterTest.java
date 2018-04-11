@@ -15,6 +15,7 @@ import org.testng.ITestContext;
 import org.testng.TestNG;
 import org.testng.annotations.BeforeMethod;
 import org.testng.xml.XmlClass;
+import org.testng.xml.XmlInclude;
 import org.testng.xml.XmlPackage;
 import org.testng.xml.XmlSuite;
 import org.testng.xml.XmlSuite.ParallelMode;
@@ -45,10 +46,10 @@ public class ReporterTest extends MockitoTest {
 	 * @throws IOException 
 	 */
 	protected TestNG executeSubTest(int threadCount, String[] testClasses) throws IOException {
-		return executeSubTest(threadCount, testClasses, XmlSuite.ParallelMode.METHODS);
+		return executeSubTest(threadCount, testClasses, XmlSuite.ParallelMode.METHODS, new String[] {});
 	}
 	
-	protected TestNG executeSubTest(int threadCount, String[] testClasses, XmlSuite.ParallelMode parallelMode) throws IOException {
+	protected TestNG executeSubTest(int threadCount, String[] testClasses, XmlSuite.ParallelMode parallelMode, String[] methods) throws IOException {
 //		TestListener testListener = new TestListener();
 		
 		XmlSuite suite = new XmlSuite();
@@ -71,7 +72,15 @@ public class ReporterTest extends MockitoTest {
 			test.setName(String.format("%s_%d", testClass.substring(testClass.lastIndexOf(".") + 1), new Random().nextInt()));
 			test.addParameter(SeleniumTestsContext.BROWSER, "none");
 			List<XmlClass> classes = new ArrayList<XmlClass>();
-			classes.add(new XmlClass(testClass));
+			XmlClass xmlClass = new XmlClass(testClass);
+			if (methods.length > 0) {
+				List<XmlInclude> includes = new ArrayList<>();
+				for (String method: methods) {
+					includes.add(new XmlInclude(method));
+				}
+				xmlClass.setIncludedMethods(includes);
+			}
+			classes.add(xmlClass);
 			test.setXmlClasses(classes) ;
 		}		
 		

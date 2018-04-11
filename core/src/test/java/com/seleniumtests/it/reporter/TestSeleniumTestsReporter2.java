@@ -36,6 +36,7 @@ import org.testng.ITestResult;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import org.testng.xml.XmlSuite;
+import org.testng.xml.XmlSuite.ParallelMode;
 
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
@@ -94,7 +95,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	public void testMultithreadTestReport() throws Exception {
 		
 		SeleniumTestsContextManager.removeThreadContext();
-		executeSubTest(5, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, XmlSuite.ParallelMode.TESTS);
+		executeSubTest(5, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, XmlSuite.ParallelMode.TESTS, new String[] {});
 		
 		// check content of summary report file
 		String mainReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport.html"));
@@ -467,6 +468,59 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	
 	
 	/**
+	 * Check that HAR capture file is present in result
+	 * 
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testReportContainsHarCapture() throws Exception {
+		
+		try {
+			System.setProperty(SeleniumTestsContext.CAPTURE_NETWORK, "true");
+			
+			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriver"});
+			
+			// read 'testDriver' report. This contains calls to HtmlElement actions
+			String detailedReportContent1 = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriver", "TestReport.html").toFile());
+			detailedReportContent1 = detailedReportContent1.replace("\n", "").replace("\r",  "").replaceAll(">\\s+<", "><");
+			
+			Assert.assertTrue(detailedReportContent1.contains("<li>sendKeys on TextFieldElement Text, by={By.id: text2} with args: (true, true, [a text,])</li>"));	
+			Assert.assertTrue(detailedReportContent1.contains("Network capture: <a href='networkCapture.har'>HAR file</a>"));
+			Assert.assertTrue(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriver", "networkCapture.har").toFile().exists());
+			
+		} finally {
+			System.clearProperty(SeleniumTestsContext.CAPTURE_NETWORK);
+		}
+		
+	}
+	
+	/**
+	 * Check that HAR capture file is not present in result if option is disabled
+	 * 
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testReportDoNotContainsHarCapture() throws Exception {
+		
+		try {
+			System.setProperty(SeleniumTestsContext.CAPTURE_NETWORK, "false");
+			
+			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriver"});
+			
+			// read 'testDriver' report. This contains calls to HtmlElement actions
+			String detailedReportContent1 = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriver", "TestReport.html").toFile());
+			detailedReportContent1 = detailedReportContent1.replace("\n", "").replace("\r",  "").replaceAll(">\\s+<", "><");
+			
+			Assert.assertTrue(detailedReportContent1.contains("<li>sendKeys on TextFieldElement Text, by={By.id: text2} with args: (true, true, [a text,])</li>"));	
+			Assert.assertFalse(detailedReportContent1.contains("Network capture: <a href='networkCapture.har'>HAR file</a>"));
+			Assert.assertFalse(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriver", "networkCapture.har").toFile().exists());
+		} finally {
+			System.clearProperty(SeleniumTestsContext.CAPTURE_NETWORK);
+		}
+		
+	}
+	
+	/**
 	 * Check all actions done with driver are correctly displayed. This indirectly test the LogAction aspect
 	 * We check 
 	 * - all HtmlElement action logging
@@ -479,7 +533,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	public void testReportContainsDriverActions() throws Exception {
 		
 		reporter = new SeleniumTestsReporter2();
-		executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"});
+		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriver", "testDriverNativeActions", "testDriverNativeActionsWithoutOverride"});
 		
 		// read 'testDriver' report. This contains calls to HtmlElement actions
 		String detailedReportContent1 = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriver", "TestReport.html").toFile());

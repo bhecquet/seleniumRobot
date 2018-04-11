@@ -16,6 +16,7 @@
  */
 package com.seleniumtests.reporter.logger;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -29,6 +30,8 @@ import org.testng.Reporter;
 import com.seleniumtests.driver.screenshots.ScreenShot;
 import com.seleniumtests.reporter.logger.TestMessage.MessageType;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
+
+import net.lightbody.bmp.core.har.Har;
 
 /**
  * Log methods for test operations.
@@ -128,6 +131,18 @@ public class TestLogging {
     	}
     }
 
+    public static void logNetworkCapture(Har har) {
+    	if (getParentTestStep() != null) {
+    		try {
+				getParentTestStep().addNetworkCapture(new HarCapture(har));
+			} catch (IOException e) {
+				logger.error("cannot create network capture file: " + e.getMessage(), e);
+			} catch (NullPointerException e) {
+				logger.error("HAR capture is null");
+			}
+    	}
+    	
+    }
  
     /**
      * Log screenshot. Should not be directly used inside tests

@@ -16,6 +16,8 @@
  */
 package com.seleniumtests.driver;
 
+import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -41,10 +43,15 @@ import com.seleniumtests.browserfactory.TestDroidDriverFactory;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.DriverExceptions;
+import com.seleniumtests.reporter.logger.TestLogging;
+import com.seleniumtests.util.StringUtility;
 import com.seleniumtests.util.helper.WaitHelper;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 import com.seleniumtests.util.osutility.OSUtility;
 import com.seleniumtests.util.osutility.OSUtilityFactory;
+
+import net.lightbody.bmp.BrowserMobProxy;
+import net.lightbody.bmp.core.har.Har;
 
 /**
  * This class provides factory to create webDriver session.
@@ -104,7 +111,7 @@ public class WebUIDriver {
         	}
         }
         
-        logger.info("driver mode: "+config.getMode());
+        logger.info("driver mode: "+ config.getMode());
 
         synchronized (createDriverLock) {
         	
@@ -129,6 +136,10 @@ public class WebUIDriver {
             
             driver = handleListeners(driver, browserInfo, driverPids);
     	
+
+			if (config.getBrowserMobProxy() != null) {
+				config.getBrowserMobProxy().newHar(SeleniumTestsContextManager.getThreadContext().getRelativeOutputDir());
+			}
         }
 
         
@@ -145,6 +156,13 @@ public class WebUIDriver {
     }
 
     public static void cleanUp() {
+    	
+    	// stop HAR capture
+		if (getWebUIDriver().getConfig().getBrowserMobProxy() != null) {
+			Har har = getWebUIDriver().getConfig().getBrowserMobProxy().endHar();
+			TestLogging.logNetworkCapture(har);
+		}
+    	
         IWebDriverFactory iWebDriverFactory = getWebUIDriver().webDriverBuilder;
         if (iWebDriverFactory != null) {
             iWebDriverFactory.cleanUp();
@@ -176,6 +194,15 @@ public class WebUIDriver {
     public static WebDriver getNativeWebDriver() {
         return ((CustomEventFiringWebDriver) getWebDriver(true)).getWebDriver();
     }
+
+	public static BrowserMobProxy getBrowserMobProxy() {
+		CustomEventFiringWebDriver driver = (CustomEventFiringWebDriver)WebUIDriver.getWebDriver(false);
+		BrowserMobProxy mobProxy = null;
+		if (driver != null) {
+			mobProxy = driver.getMobProxy();
+		}
+		return mobProxy;
+	}
 
     /**
      * Get EventFiringWebDriver.
