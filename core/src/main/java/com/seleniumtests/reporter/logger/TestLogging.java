@@ -238,6 +238,9 @@ public class TestLogging {
 		return TestLogging.currentTestResult.get(Thread.currentThread());
 	}
 	
+	/**
+	 * For Integration tests only
+	 */
 	public static void reset() {
 		TestLogging.currentRootTestStep.clear();
 		TestLogging.testsSteps.clear();
