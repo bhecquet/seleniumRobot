@@ -16,8 +16,6 @@
  */
 package com.seleniumtests.driver;
 
-import java.io.IOException;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -44,7 +42,6 @@ import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.DriverExceptions;
 import com.seleniumtests.reporter.logger.TestLogging;
-import com.seleniumtests.util.StringUtility;
 import com.seleniumtests.util.helper.WaitHelper;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 import com.seleniumtests.util.osutility.OSUtility;

@@ -64,11 +64,19 @@ public class SeleniumRobotLogger {
 	    	
 	        BasicConfigurator.configure();
 	        Logger rootLogger = Logger.getRootLogger();
-	        rootLogger.setLevel(Level.INFO);
 	
 	        Appender appender = (Appender) rootLogger.getAllAppenders().nextElement();
 	        appender.setLayout(new PatternLayout(SeleniumRobotLogger.LOG_PATTERN));
 	    }
+	    
+        // use System property instead of SeleniumTestsContext class as SeleniumrobotLogger class is used for grid extension package and 
+        // we do not want to 
+	    Logger rootLogger = Logger.getRootLogger();
+        if (System.getProperty("devMode") != null && "true".equals(System.getProperty("devMode"))) {
+        	rootLogger.setLevel(Level.DEBUG);
+        } else {
+        	rootLogger.setLevel(Level.INFO);
+        }
 	
 	    return Logger.getLogger(cls);
 	}
@@ -101,7 +109,13 @@ public class SeleniumRobotLogger {
 			        fileAppender.setName(FILE_APPENDER_NAME);
 			        fileAppender.setFile(outputDir + "/" + SeleniumRobotLogger.LOG_FILE_NAME);
 			        fileAppender.setLayout(new PatternLayout(LOG_PATTERN));
-			        fileAppender.setThreshold(Level.INFO);
+			        
+			        if (System.getProperty("devMode") != null && "true".equals(System.getProperty("devMode"))) {
+			        	fileAppender.setThreshold(Level.DEBUG);
+			        } else {
+			        	fileAppender.setThreshold(Level.INFO);
+			        }
+			        
 			        fileAppender.activateOptions();
 			        break;
 				} catch (Exception e) {

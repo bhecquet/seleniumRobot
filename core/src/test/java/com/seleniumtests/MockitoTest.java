@@ -16,6 +16,8 @@
  */
 package com.seleniumtests;
 
+import java.lang.reflect.Method;
+
 import org.mockito.MockitoAnnotations;
 import org.powermock.modules.testng.PowerMockTestCase;
 import org.testng.ITestContext;
@@ -38,10 +40,18 @@ public class MockitoTest  extends PowerMockTestCase {
 	protected static final String SERVER_URL = "http://localhost:4321";
 
 	@BeforeMethod(groups={"ut", "it"})  
-	public void beforeMethod(final ITestContext testNGCtx) throws Exception {
+	public void beforeMethod(final Method method, final ITestContext testNGCtx) throws Exception {
+		doBeforeMethod(method);
 		beforePowerMockTestMethod();
 		initThreadContext(testNGCtx);
 		MockitoAnnotations.initMocks(this); 
+	}
+	
+	/**
+	 * Something to do at the beginning of \@BerforeMethod in case this MUST be done before context initialization
+	 */
+	protected void doBeforeMethod(final Method method) {
+		// do nothing
 	}
 	
 	public void initThreadContext(final ITestContext testNGCtx) {
