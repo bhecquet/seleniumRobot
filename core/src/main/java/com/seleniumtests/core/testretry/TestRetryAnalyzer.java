@@ -23,15 +23,11 @@ import com.seleniumtests.reporter.logger.TestLogging;
 
 public class TestRetryAnalyzer implements IRetryAnalyzer {
 
-    private static final String TEST_RETRY_COUNT = "testRetryCount";
     private int count = 1;
     private int maxCount = 2;
 
-    public TestRetryAnalyzer() {
-        String retryMaxCount = System.getProperty(TEST_RETRY_COUNT);
-        if (retryMaxCount != null) {
-            maxCount = Integer.parseInt(retryMaxCount);
-        }
+    public TestRetryAnalyzer(int maxRetryCount) {
+    	maxCount = maxRetryCount;
     }
 
     public void setMaxCount(final int count) {

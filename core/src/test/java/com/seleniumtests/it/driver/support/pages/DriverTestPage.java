@@ -40,6 +40,7 @@ import com.seleniumtests.uipage.htmlelements.TextFieldElement;
 public class DriverTestPage extends PageObject {
 	
 	public static final TextFieldElement textElement = new TextFieldElement("Text", By.id("text2"));
+	public static final TextFieldElement textElementNotPresent = new TextFieldElement("Text", By.id("text___"));
 	public static final RadioButtonElement radioElement = new RadioButtonElement("Radio", By.id("radioClick"));
 	public static final CheckBoxElement checkElement = new CheckBoxElement("Check", By.id("checkboxClick"));
 	public static final ButtonElement startButton = new ButtonElement("Start Animation", By.id("button"));
@@ -139,6 +140,11 @@ public class DriverTestPage extends PageObject {
     
     public DriverTestPage _writeSomething() {
     	textElement.sendKeys("a text");
+    	return this;
+    }
+    
+    public DriverTestPage _writeSomethingOnNonExistentElement() {
+    	textElementNotPresent.sendKeys("a text");
     	return this;
     }
     

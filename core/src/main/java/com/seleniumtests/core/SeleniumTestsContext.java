@@ -129,7 +129,8 @@ public class SeleniumTestsContext {
     public static final String DP_TAGS_EXCLUDE = "dpTagsExclude";				// Utilisé pour la lecture de fichiers CSV/XLS des DataProvider TODO: a étudier comment cela fonctionne
 
     public static final String SOFT_ASSERT_ENABLED = "softAssertEnabled";		// le test ne s'arrête pas lorsqu'une assertion est rencontrée
-
+    public static final String TEST_RETRY_COUNT = "testRetryCount";				// number of times the test can be retried
+    
     public static final String OVERRIDE_SELENIUM_NATIVE_ACTION = "overrideSeleniumNativeAction";	// intercept driver.findElement and driver.frame operations to move to HtmlElement methods 
     
     public static final String OUTPUT_DIRECTORY = "outputDirectory";     		// folder where HTML report will be written
@@ -210,6 +211,7 @@ public class SeleniumTestsContext {
 	public static final int DEFAULT_EXPLICIT_WAIT_TIME_OUT = 15;
 	public static final int DEFAULT_IMPLICIT_WAIT_TIME_OUT = 5;
 	public static final int DEFAULT_WEB_SESSION_TIMEOUT = 90000;
+	public static final int DEFAULT_TEST_RETRY_COUNT = 2;
 	public static final String DEFAULT_SELENIUMROBOTSERVER_URL = null;
 	public static final JSONObject DEFAULT_TMS_RUN = new JSONObject();
 	public static final JSONObject DEFAULT_TMS_CONNECT = new JSONObject();
@@ -314,6 +316,7 @@ public class SeleniumTestsContext {
         setDpTagsExclude(getValueForTest(DP_TAGS_EXCLUDE, System.getProperty(DP_TAGS_EXCLUDE)));
 
         setSoftAssertEnabled(getBoolValueForTest(SOFT_ASSERT_ENABLED, System.getProperty(SOFT_ASSERT_ENABLED)));
+        setTestRetryCount(getIntValueForTest(TEST_RETRY_COUNT, System.getProperty(TEST_RETRY_COUNT)));
 
         setWebDriverListener(getValueForTest(WEB_DRIVER_LISTENER, System.getProperty(WEB_DRIVER_LISTENER)));
         setTmsRun(getValueForTest(TMS_RUN, System.getProperty(TMS_RUN)));
@@ -1178,6 +1181,10 @@ public class SeleniumTestsContext {
     	}
     	return deviceList;
     }
+	
+	public Integer getTestRetryCount() {
+    	return (Integer) getAttribute(TEST_RETRY_COUNT);
+    }
 
     public int getWebSessionTimeout() {
         return (Integer) getAttribute(WEB_SESSION_TIME_OUT);
@@ -1790,6 +1797,14 @@ public class SeleniumTestsContext {
 
     public void setAppWaitActivity(String name) {
     	setAttribute(APP_WAIT_ACTIVITY, name);
+    }
+
+    public void setTestRetryCount(Integer retry) {
+    	if (retry != null) {
+    		setAttribute(TEST_RETRY_COUNT, retry);
+    	} else {
+    		setAttribute(TEST_RETRY_COUNT, DEFAULT_TEST_RETRY_COUNT);
+    	}
     }
     
     public void setNewCommandTimeout(Integer timeout) {

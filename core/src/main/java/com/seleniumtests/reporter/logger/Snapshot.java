@@ -2,6 +2,10 @@ package com.seleniumtests.reporter.logger;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.CopyOption;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -115,7 +119,7 @@ public class Snapshot extends TestAction {
     		
     		// if file cannot be moved, go back to old name
     		try {
-				FileUtils.moveFile(new File(oldFullPath), new File(screenshot.getFullImagePath()));
+    			Files.move(Paths.get(oldFullPath), Paths.get(screenshot.getFullImagePath()), StandardCopyOption.REPLACE_EXISTING);
 			} catch (IOException e) {
 				screenshot.setImagePath(oldPath);
 			}

@@ -4,6 +4,7 @@ import java.io.File;
 import java.lang.reflect.Method;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
@@ -32,11 +33,11 @@ public class ReporterControler implements IReporter {
 	@Override
 	public void generateReport(List<XmlSuite> xmlSuites, List<ISuite> suites, String outputDirectory) {
 
-		updateTestSteps(suites);
+		Set<ITestResult> resultSet = updateTestSteps(suites);
 		try {
 			new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).mkdirs();
 		} catch (Exception e) {}
-		cleanAttachments();
+		cleanAttachments(resultSet);
 		
 		try {
 			new SeleniumTestsReporter2().generateReport(xmlSuites, suites, outputDirectory);
@@ -59,7 +60,9 @@ public class ReporterControler implements IReporter {
 	 * Add configurations methods to list of test steps so that they can be used by reporters
 	 * @param suites
 	 */
-	private void updateTestSteps(final List<ISuite> suites) {
+	private Set<ITestResult> updateTestSteps(final List<ISuite> suites) {
+		Set<ITestResult> allResultSet = new HashSet<>();
+		
 		for (ISuite suite: suites) {
 			for (String suiteString: suite.getResults().keySet()) {
 				ISuiteResult suiteResult = suite.getResults().get(suiteString);
@@ -68,24 +71,34 @@ public class ReporterControler implements IReporter {
 				resultSet.addAll(suiteResult.getTestContext().getFailedTests().getAllResults());
 				resultSet.addAll(suiteResult.getTestContext().getPassedTests().getAllResults());
 				resultSet.addAll(suiteResult.getTestContext().getSkippedTests().getAllResults());
-
+				allResultSet.addAll(resultSet);
 				
 				for (ITestResult testResult: resultSet) {
 					TestLogging.getTestsSteps().put(testResult, getAllTestSteps(testResult));			
 				}
 			}
 		}
+		
+		return allResultSet;
 	}
 	
 	/**
 	 * Delete all files in html and screenshot folders that are not directly references by any test step
 	 * @param suites
 	 */
-	private void cleanAttachments() {
+	private void cleanAttachments(Set<ITestResult> resultSet) {
+		
+		List<File> usedFiles = new ArrayList<>();
+		List<File> allFiles = new ArrayList<>();
 		
 		// retrieve list of all files used by test steps
 		for (Entry<ITestResult, List<TestStep>> testSteps: TestLogging.getTestsSteps().entrySet()) {
-			List<File> usedFiles = new ArrayList<>();
+			
+			// do not keep results of tests that has been retried
+			if (!resultSet.contains(testSteps.getKey())) {
+				continue;
+			}
+			
 			for (TestStep testStep: testSteps.getValue()) {
 				usedFiles.addAll(testStep.getAllAttachments());
 			}
@@ -99,20 +112,18 @@ public class ReporterControler implements IReporter {
 			File htmlDir = Paths.get(testContext.getOutputDirectory(), "htmls").toFile();
 			File screenshotDir = Paths.get(testContext.getOutputDirectory(), "screenshots").toFile();
 			
-			// now delete all files that are not in this list
+			// get list of existing files
 			if (htmlDir.isDirectory()) {
-				for (File htmlFile: htmlDir.listFiles()) {
-					if (!usedFiles.contains(htmlFile)) {
-						htmlFile.delete();
-					}
-				}
+				allFiles.addAll(Arrays.asList(htmlDir.listFiles()));
 			}
 			if (screenshotDir.isDirectory()) {
-				for (File imgFile: screenshotDir.listFiles()) {
-					if (!usedFiles.contains(imgFile)) {
-						imgFile.delete();
-					}
-				}
+				allFiles.addAll(Arrays.asList(screenshotDir.listFiles()));
+			}
+		}
+		
+		for (File file: allFiles) {
+			if (!usedFiles.contains(file)) {
+				file.delete();
 			}
 		}
 	}
