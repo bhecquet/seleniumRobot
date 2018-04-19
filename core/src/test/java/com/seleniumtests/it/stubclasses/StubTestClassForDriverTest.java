@@ -15,6 +15,7 @@ public class StubTestClassForDriverTest extends StubParentClass {
 	public void init(Method method) {
 		SeleniumTestsContextManager.getThreadContext().setBrowser("chrome");
 		SeleniumTestsContextManager.getThreadContext().setOverrideSeleniumNativeAction(true);
+		SeleniumTestsContextManager.getThreadContext().setTestRetryCount(1);
 	}
 
 	@Test(groups="stub")
@@ -25,6 +26,15 @@ public class StubTestClassForDriverTest extends StubParentClass {
 			._reset()
 			._sendKeysComposite()
 			._clickPicture();
+	}
+	
+	@Test(groups="stub")
+	public void testDriverWithFailure() throws Exception {
+		SeleniumTestsContextManager.getThreadContext().setReplayTimeout(1);
+		
+		new DriverTestPage(true)
+		._writeSomething()
+		._writeSomethingOnNonExistentElement();
 	}
 	
 	@Test(groups="stub")

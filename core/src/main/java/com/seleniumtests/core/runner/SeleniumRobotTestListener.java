@@ -499,7 +499,7 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
         SeleniumTestsContextManager.getThreadContext().setTestMethodSignature((String)testResult.getAttribute(SeleniumRobotLogger.METHOD_NAME));
     	
     	if (testResult.getMethod().getRetryAnalyzer() == null) {
-    		testResult.getMethod().setRetryAnalyzer(new TestRetryAnalyzer());
+    		testResult.getMethod().setRetryAnalyzer(new TestRetryAnalyzer(SeleniumTestsContextManager.getThreadContext().getTestRetryCount()));
 		}	
 	}
 	

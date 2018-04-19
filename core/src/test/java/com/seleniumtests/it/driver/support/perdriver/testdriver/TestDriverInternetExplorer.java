@@ -8,5 +8,4 @@ public class TestDriverInternetExplorer extends TestDriver {
 	public TestDriverInternetExplorer() throws Exception {
 		super(BrowserType.INTERNET_EXPLORER);
 	}
-
 }

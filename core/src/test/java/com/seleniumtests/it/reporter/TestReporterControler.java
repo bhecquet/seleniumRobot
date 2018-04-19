@@ -23,6 +23,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.testng.Assert;
 import org.testng.annotations.Test;
+import org.testng.xml.XmlSuite.ParallelMode;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
 
@@ -37,7 +38,7 @@ public class TestReporterControler extends ReporterTest {
 	@Test(groups={"it"})
 	public void testUnusedCaptureAreDeleted() throws Exception {
 		
-		executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"});
+		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriverNativeActions"});
 		
 		// if a file belongs to a step, it's renamed
 		for (File htmlFile: Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriverNativeActions", "htmls").toFile().listFiles()) {
@@ -45,6 +46,28 @@ public class TestReporterControler extends ReporterTest {
 		}
 		for (File imgFile: Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriverNativeActions", "screenshots").toFile().listFiles()) {
 			Assert.assertTrue(imgFile.getName().startsWith("testDriver"));
+		}
+	}
+	
+	/**
+	 * Checks that if a test is retried, captures of the last execution are kept (issue #121)
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testUnusedCaptureAreDeletedWhenTestFails() throws Exception {
+		
+		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriverWithFailure"});
+		
+		// check files are there
+		Assert.assertEquals(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriverWithFailure", "htmls").toFile().listFiles().length, 2);
+		Assert.assertEquals(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriverWithFailure", "screenshots").toFile().listFiles().length, 2);
+		
+		// if a file belongs to a step, it's renamed
+		for (File htmlFile: Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriverWithFailure", "htmls").toFile().listFiles()) {
+			Assert.assertTrue(htmlFile.getName().startsWith("testDriverWithFailure"));
+		}
+		for (File imgFile: Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriverWithFailure", "screenshots").toFile().listFiles()) {
+			Assert.assertTrue(imgFile.getName().startsWith("testDriverWithFailure"));
 		}
 	}
 	
