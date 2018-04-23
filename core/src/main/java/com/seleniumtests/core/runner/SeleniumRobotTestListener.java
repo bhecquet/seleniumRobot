@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -18,6 +20,7 @@ import org.testng.IInvokedMethodListener2;
 import org.testng.IResultMap;
 import org.testng.ISuite;
 import org.testng.ISuiteListener;
+import org.testng.ISuiteResult;
 import org.testng.ITestContext;
 import org.testng.ITestListener;
 import org.testng.ITestNGMethod;
@@ -39,6 +42,7 @@ import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.driver.screenshots.ScreenShot;
 import com.seleniumtests.driver.screenshots.ScreenshotUtil;
+import com.seleniumtests.reporter.logger.ArchiveMode;
 import com.seleniumtests.reporter.logger.TestLogging;
 import com.seleniumtests.reporter.logger.TestStep;
 import com.seleniumtests.reporter.reporters.CommonReporter;
@@ -50,6 +54,7 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 	protected static final Logger logger = SeleniumRobotLogger.getLogger(SeleniumRobotTestListener.class);
 	
 	public static final String TEST_CONTEXT = "testContext";
+	private static List<ISuite> suiteList = Collections.synchronizedList(new ArrayList<>());
 	private Date start;
 	
 	private Map<String, Boolean> isRetryHandleNeeded = new HashMap<>();
@@ -202,7 +207,8 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 			logger.info("Test Suite Execution Time: " + (new Date().getTime() - start.getTime()) / 1000 / 60 + " minutes.");
 		} else {
 			logger.warn("No test executed");
-		}		
+		}	
+		suiteList.add(suite);
 	}
 	
 	@Override
@@ -218,8 +224,22 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 			logger.error("Cannot stop unirest", e);
 		}
         
+        boolean failed = false;
+        for (ISuite suite : suiteList) {
+			Map<String, ISuiteResult> tests = suite.getResults();
+			for (ISuiteResult r : tests.values()) {
+				if (!r.getTestContext().getFailedTests().getAllResults().isEmpty()) {
+					failed = true;
+					break;
+				}
+			}
+        }
+        
         // archive results
-        if (SeleniumTestsContextManager.getGlobalContext().getArchiveToFile() != null) {
+        if ((SeleniumTestsContextManager.getThreadContext().getArchive() == ArchiveMode.TRUE
+        		|| (SeleniumTestsContextManager.getThreadContext().getArchive() == ArchiveMode.ON_SUCCESS && !failed)
+        		|| (SeleniumTestsContextManager.getThreadContext().getArchive() == ArchiveMode.ON_ERROR && failed)) 
+        		&& SeleniumTestsContextManager.getGlobalContext().getArchiveToFile() != null) {
 			FileUtility.zipFolder(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()), 
 								  new File(SeleniumTestsContextManager.getGlobalContext().getArchiveToFile()));
 		}

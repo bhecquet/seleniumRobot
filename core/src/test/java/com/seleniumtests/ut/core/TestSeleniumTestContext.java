@@ -39,6 +39,7 @@ import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.DriverMode;
+import com.seleniumtests.reporter.logger.ArchiveMode;
 import com.seleniumtests.reporter.reporters.ReportInfo;
 
 /**
@@ -366,6 +367,26 @@ public class TestSeleniumTestContext extends GenericTest {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setRunMode("unknown");
 	}
+	
+	@Test(groups="ut context")
+	public void testArchiveMode(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setArchive("onSuccess");
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getArchive(),ArchiveMode.ON_SUCCESS);
+	}
+	@Test(groups="ut context")
+	public void testArchiveModeNull(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setArchive(null);
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getArchive(), ArchiveMode.FALSE);
+	}
+	@Test(groups="ut context", expectedExceptions=ConfigurationException.class)
+	public void testArchiveModeKo(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setArchive("unknown");
+	}
+	
+	
 	
 	@Test(groups="ut context")
 	public void testMaskPassword(final ITestContext testNGCtx, final XmlTest xmlTest) {

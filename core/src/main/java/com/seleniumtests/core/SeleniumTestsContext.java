@@ -51,6 +51,7 @@ import com.seleniumtests.driver.DriverExceptionListener;
 import com.seleniumtests.driver.DriverMode;
 import com.seleniumtests.driver.TestType;
 import com.seleniumtests.reporter.PluginsHelper;
+import com.seleniumtests.reporter.logger.ArchiveMode;
 import com.seleniumtests.reporter.reporters.ReportInfo;
 import com.seleniumtests.util.StringUtility;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
@@ -137,7 +138,9 @@ public class SeleniumTestsContext {
     public static final String DEFAULT_OUTPUT_DIRECTORY = "defaultOutputDirectory";    // folder where TestNG would write it's results if not overwritten
     public static final String CUSTOM_TEST_REPORTS = "customTestReports";
     public static final String CUSTOM_SUMMARY_REPORTS = "customSummaryReports";
-    public static final String ARCHIVE_TO_FILE = "archiveToFile";				// path to the file where archive will be done. If null, results are not archived
+    public static final String ARCHIVE_TO_FILE = "archiveToFile";				// path to the file where archive will be done.
+    public static final String ARCHIVE = "archive";								// whether archiving is done. DEfault is false, other values are 'true', 'onSuccess', 'onError'
+    
     public static final String WEB_DRIVER_LISTENER = "webDriverListener";
     public static final String OPTIMIZE_REPORTS = "optimizeReports";
 
@@ -217,6 +220,7 @@ public class SeleniumTestsContext {
 	public static final JSONObject DEFAULT_TMS_CONNECT = new JSONObject();
 	public static final String DEFAULT_WEB_PROXY_TYPE = null;
 	public static final boolean DEFAULT_OPTIMIZE_REPORTS = false;
+	public static final String DEFAULT_ARCHIVE= "false";
     
     public static final int DEFAULT_REPLAY_TIME_OUT = 30;
 
@@ -348,6 +352,7 @@ public class SeleniumTestsContext {
         setCustomTestReports(getValueForTest(CUSTOM_TEST_REPORTS, System.getProperty(CUSTOM_TEST_REPORTS)));
         setCustomSummaryReports(getValueForTest(CUSTOM_SUMMARY_REPORTS, System.getProperty(CUSTOM_SUMMARY_REPORTS)));
         setArchiveToFile(getValueForTest(ARCHIVE_TO_FILE, System.getProperty(ARCHIVE_TO_FILE)));
+        setArchive(getValueForTest(ARCHIVE, System.getProperty(ARCHIVE)));
         setOptimizeReports(getBoolValueForTest(OPTIMIZE_REPORTS, System.getProperty(OPTIMIZE_REPORTS)));
         
         setViewPortWidth(getIntValueForTest(VIEWPORT_WIDTH, System.getProperty(VIEWPORT_WIDTH)));
@@ -1052,6 +1057,10 @@ public class SeleniumTestsContext {
     public String getArchiveToFile() {
     	return (String) getAttribute(ARCHIVE_TO_FILE);
     }
+    
+    public ArchiveMode getArchive() {
+    	return (ArchiveMode) getAttribute(ARCHIVE);
+    }
 
     public TestType getTestType() {
         return (TestType) getAttribute(TEST_TYPE);
@@ -1395,6 +1404,18 @@ public class SeleniumTestsContext {
 
     	}
     	setAttribute(ARCHIVE_TO_FILE, filePath);
+    }
+    
+    public void setArchive(String archive) {
+    	if (archive == null) {
+    		setAttribute(ARCHIVE, ArchiveMode.FALSE);
+    	} else {
+    		try {
+    			setAttribute(ARCHIVE, ArchiveMode.fromString(archive));
+    		} catch (IllegalArgumentException e) {
+    			throw new ConfigurationException(e.getMessage());
+    		}
+    	}
     }
     
     public void setSeleniumRobotServerUrl(String url) {
