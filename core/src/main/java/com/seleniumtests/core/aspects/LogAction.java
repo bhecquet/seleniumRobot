@@ -88,6 +88,7 @@ public class LogAction {
     		+ "&& !execution(* com.seleniumtests.uipage.PageObject.close* (..))"
     		+ "&& !execution(* com.seleniumtests.uipage.PageObject.param (..))"
     		+ "&& !execution(* com.seleniumtests.uipage.PageObject.assert* (..))"
+    		+ "&& !execution(* com.seleniumtests.uipage.PageObject.addStep* (..))"
     		+ "&& !execution(* com.seleniumtests.uipage.PageObject.capture*Snapshot (..))"
     		)
 	public Object logPageObjectAction(ProceedingJoinPoint joinPoint) throws Throwable {

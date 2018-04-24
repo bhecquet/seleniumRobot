@@ -340,6 +340,26 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	}
 	
 	/**
+	 * Check that manual also mask password if user requests it (gives password to mask in report)
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testManualStepsPasswordMasking() throws Exception {
+		
+		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassManualSteps"}, ParallelMode.METHODS, new String[] {"testOkPassword"});
+
+		// check that without soft assertion, 'add' step is skipped
+		String detailedReportContent1 = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testOkPassword", "TestReport.html").toFile());
+		
+		// if step specifies string to mask, hide it
+		Assert.assertFalse(detailedReportContent1.contains("<div class=\"message-info\">password is aPassPhrase</div>"));	
+		Assert.assertTrue(detailedReportContent1.contains("<div class=\"message-info\">password is ******</div>"));
+		
+		// if step does not specifies string to mask, it's displayed
+		Assert.assertTrue(detailedReportContent1.contains("<div class=\"message-info\">password is anOtherPassPhrase</div>"));
+	}
+	
+	/**
 	 * Check state and style of all tests
 	 * @throws Exception
 	 */

@@ -1,6 +1,7 @@
 package com.seleniumtests.core;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import org.apache.log4j.Logger;
 
@@ -104,10 +105,11 @@ public class TestTasks {
     /**
      * Add step to test and add snapshot to it
      * If a previous step exists, store it
-     * @param stepName	name of the step
-     * 					If name is null, only previous step is stored, no new step is created
+     * @param stepName			name of the step
+     * 							If name is null, only previous step is stored, no new step is created
+     * @param passwordsToMask	array of strings that must be replaced by '*****' in reports
      */
-    public static void addStep(String stepName) {
+    public static void addStep(String stepName, String ... passwordsToMask ) {
     	if (!SeleniumTestsContextManager.getThreadContext().isManualTestSteps()) {
     		throw new ConfigurationException("manual steps can only be used when automatic steps are disabled ('manualTestSteps' option set to true)");
     	}
@@ -120,7 +122,7 @@ public class TestTasks {
     	}
     	
     	if (stepName != null) {
-	    	TestStep step = new TestStep(stepName, TestLogging.getCurrentTestResult(), new ArrayList<>());
+	    	TestStep step = new TestStep(stepName, TestLogging.getCurrentTestResult(), Arrays.asList(passwordsToMask));
 	    	TestLogging.setCurrentRootTestStep(step);
 	    	capturePageSnapshot();
 	    	
