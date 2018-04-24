@@ -151,10 +151,14 @@ public class TestLogging {
      * @param  message
      * @param  failed
      */
-    public static void logScreenshot(final ScreenShot screenshot) {
+    public static void logScreenshot(final ScreenShot screenshot, final String screenshotName) {
     	if (getParentTestStep() != null) {
-    		getParentTestStep().addSnapshot(new Snapshot(screenshot), testsSteps.get(getCurrentTestResult()).size());
+    		getParentTestStep().addSnapshot(new Snapshot(screenshot), testsSteps.get(getCurrentTestResult()).size(), screenshotName);
     	}
+    }
+    
+    public static void logScreenshot(final ScreenShot screenshot) {
+    	logScreenshot(screenshot, null);
     }
     
     public static void logTestStep(TestStep testStep) {

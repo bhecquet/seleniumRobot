@@ -29,6 +29,15 @@ public class StubTestClassForDriverTest extends StubParentClass {
 	}
 	
 	@Test(groups="stub")
+	public void testDriverCustomSnapshot() throws Exception {
+		
+		new DriverTestPage(true)
+		._writeSomething()
+		._captureSnapshot("my snapshot")
+		._reset();
+	}
+	
+	@Test(groups="stub")
 	public void testDriverWithFailure() throws Exception {
 		SeleniumTestsContextManager.getThreadContext().setReplayTimeout(1);
 		

@@ -2,7 +2,6 @@ package com.seleniumtests.reporter.logger;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.CopyOption;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
@@ -26,7 +25,7 @@ public class Snapshot extends TestAction {
 	public static final String OUTPUT_PATTERN = "Output: ";
 
 	public Snapshot(final ScreenShot screenshot) {
-		super(screenshot.getImagePath(), false, new ArrayList<>());
+		super(screenshot.getTitle(), false, new ArrayList<>());
 		this.screenshot = screenshot;
 	}
 	
@@ -66,13 +65,19 @@ public class Snapshot extends TestAction {
      * @param testStep
      * @param stepIdx	   	number of this step
      * @param snapshotIdx	number of this snapshot for this step
+     * @param userGivenName	name specified by user, rename to this name
      */
-    public void rename(TestStep testStep, int stepIdx, int snapshotIdx) {
-    	String newBaseName = String.format("%s_%d-%d_%s-", 
-    			StringUtility.replaceOddCharsFromFileName(CommonReporter.getTestName(testStep.getTestResult())),
-    			stepIdx, 
-    			snapshotIdx,
-    			StringUtility.replaceOddCharsFromFileName(testStep.getName()));
+    public void rename(final TestStep testStep, final int stepIdx, final int snapshotIdx, final String userGivenName) {
+    	String newBaseName;
+    	if (userGivenName == null) {
+	    	newBaseName = String.format("%s_%d-%d_%s-", 
+	    			StringUtility.replaceOddCharsFromFileName(CommonReporter.getTestName(testStep.getTestResult())),
+	    			stepIdx, 
+	    			snapshotIdx,
+	    			StringUtility.replaceOddCharsFromFileName(testStep.getName()));
+    	} else {
+    		newBaseName = StringUtility.replaceOddCharsFromFileName(userGivenName);
+    	}
     	
     	
     	if (screenshot.getHtmlSourcePath() != null) {

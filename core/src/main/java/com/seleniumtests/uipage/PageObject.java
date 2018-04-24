@@ -280,7 +280,12 @@ public class PageObject extends BasePage implements IPage {
 
     @Override
     public void capturePageSnapshot() {
-        ScreenShot screenShot = new ScreenshotUtil(driver).captureWebPageSnapshot();
+        capturePageSnapshot(null);
+
+    }
+    
+    public void capturePageSnapshot(String snapshotName) {
+    	ScreenShot screenShot = new ScreenshotUtil(driver).captureWebPageSnapshot();
         this.title = screenShot.getTitle();
 
         if (screenShot.getHtmlSourcePath() != null) {
@@ -291,9 +296,11 @@ public class PageObject extends BasePage implements IPage {
         if (screenShot.getImagePath() != null) {
             imageFilePath = screenShot.getImagePath().replace(suiteName, outputDirectory);
         }
+        if (snapshotName != null) {
+        	screenShot.setTitle(snapshotName);
+        }
 
-        TestLogging.logScreenshot(screenShot);
-
+        TestLogging.logScreenshot(screenShot, snapshotName);
     }
 
     /**

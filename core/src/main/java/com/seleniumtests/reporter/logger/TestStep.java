@@ -143,10 +143,11 @@ public class TestStep extends TestAction {
 	 * Add snapshot to this step
 	 * @param snapshot		the snapshot
 	 * @param stepIdx		the index of this step in the test
+	 * @param userGivenName name of the snapshot, user wants to display
 	 */
-	public void addSnapshot(Snapshot snapshot, int stepIdx) {
+	public void addSnapshot(Snapshot snapshot, int stepIdx, String userGivenName) {
 		// rename file so that user can easily consult it
-		snapshot.rename(this, stepIdx, snapshots.size() + 1);
+		snapshot.rename(this, stepIdx, snapshots.size() + 1, userGivenName);
 		
 		snapshots.add(snapshot);
 	}
