@@ -121,10 +121,35 @@ public class TestTestStep extends GenericTest {
 		screenshot.setImagePath(tmpImgFile.getName());
 		screenshot.setHtmlSourcePath(tmpHtmlFile.getName());
 		
-		step.addSnapshot(new Snapshot(screenshot), 0);
+		step.addSnapshot(new Snapshot(screenshot), 0, null);
 		
 		Assert.assertEquals(step.getSnapshots().get(0).getScreenshot().getImagePath(), "N-A_0-1_step1-" + tmpImgFile.getName());
 		Assert.assertEquals(step.getSnapshots().get(0).getScreenshot().getHtmlSourcePath(), "N-A_0-1_step1-" + tmpHtmlFile.getName());
+	}
+	
+	/**
+	 * Test that when adding a snapshot to a test step, with a custom name, it's renamed with this custom name
+	 * Custom name contains forbidden characters
+	 * @throws IOException
+	 */
+	@Test(groups={"ut"})
+	public void testSnapshotRenamingWithCustomName() throws IOException {
+		TestStep step = new TestStep("step1", null, new ArrayList<>());
+		ScreenShot screenshot = new ScreenShot();
+		
+		File tmpImgFile = File.createTempFile("img", ".png");
+		File tmpHtmlFile = File.createTempFile("html", ".html");
+		
+		screenshot.setOutputDirectory(tmpImgFile.getParent());
+		screenshot.setLocation("http://mysite.com");
+		screenshot.setTitle("mysite");
+		screenshot.setImagePath(tmpImgFile.getName());
+		screenshot.setHtmlSourcePath(tmpHtmlFile.getName());
+		
+		step.addSnapshot(new Snapshot(screenshot), 0, "my snapshot <name>");
+		
+		Assert.assertEquals(step.getSnapshots().get(0).getScreenshot().getImagePath(), "my_snapshot_-name-" + tmpImgFile.getName());
+		Assert.assertEquals(step.getSnapshots().get(0).getScreenshot().getHtmlSourcePath(), "my_snapshot_-name-" + tmpHtmlFile.getName());
 	}
 	
 	@Test(groups={"ut"})
@@ -145,7 +170,7 @@ public class TestTestStep extends GenericTest {
 		screenshot.setImagePath("screenshots/" + tmpImgFile2.getName());
 		screenshot.setHtmlSourcePath("htmls/" + tmpHtmlFile2.getName());
 		
-		step.addSnapshot(new Snapshot(screenshot), 0);
+		step.addSnapshot(new Snapshot(screenshot), 0, null);
 		
 		Assert.assertEquals(step.getSnapshots().get(0).getScreenshot().getImagePath(), "screenshots/N-A_0-1_step1-" + tmpImgFile2.getName());
 		Assert.assertEquals(step.getSnapshots().get(0).getScreenshot().getHtmlSourcePath(), "htmls/N-A_0-1_step1-" + tmpHtmlFile2.getName());
@@ -174,7 +199,7 @@ public class TestTestStep extends GenericTest {
 		screenshot1.setTitle("mysite");
 		screenshot1.setImagePath("screenshots/" + tmpImgFile2.getName());
 		screenshot1.setHtmlSourcePath("htmls/" + tmpHtmlFile2.getName());
-		step.addSnapshot(new Snapshot(screenshot1), 0);
+		step.addSnapshot(new Snapshot(screenshot1), 0, null);
 		
 		TestStep subStep = new TestStep("subStep", null, new ArrayList<>());
 		
@@ -189,7 +214,7 @@ public class TestTestStep extends GenericTest {
 		screenshot2.setLocation("http://mysite.com");
 		screenshot2.setTitle("mysite");
 		screenshot2.setImagePath("screenshots/" + tmpImgFile4.getName());
-		subStep.addSnapshot(new Snapshot(screenshot2), 0);
+		subStep.addSnapshot(new Snapshot(screenshot2), 0, null);
 		 
 		subStep.addAction(new TestAction("action1", true, new ArrayList<>()));
 		step.addAction(new TestAction("action2", false, new ArrayList<>()));

@@ -153,6 +153,12 @@ public class DriverTestPage extends PageObject {
     	return this;
     }
     
+    public DriverTestPage _captureSnapshot(String snapshotName) {
+    	capturePageSnapshot(snapshotName);
+    	return this;
+    	
+    }
+    
     public DriverTestPage _setPassword(String passWordShort) {
     	textElement.sendKeys(passWordShort);
     	return this;

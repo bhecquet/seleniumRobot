@@ -466,6 +466,22 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		
 	}
 	
+	@Test(groups={"it"})
+	public void testReportContainsCustomScreenshot() throws Exception {
+		
+		System.setProperty(SeleniumTestsContext.CAPTURE_NETWORK, "true");
+		
+		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriverCustomSnapshot"});
+		
+		// read 'testDriver' report. This contains calls to HtmlElement actions
+		String detailedReportContent1 = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriverCustomSnapshot", "TestReport.html").toFile());
+		detailedReportContent1 = detailedReportContent1.replace("\n", "").replace("\r",  "").replaceAll(">\\s+<", "><");
+		
+		Assert.assertTrue(detailedReportContent1.contains("<a href='screenshots/my_snapshot"));	
+		Assert.assertTrue(detailedReportContent1.contains("<a href='htmls/my_snapshot"));	
+		Assert.assertTrue(detailedReportContent1.contains("<div class=\"message-snapshot\">Output: my snapshot:"));	
+	}
+	
 	
 	/**
 	 * Check that HAR capture file is present in result
