@@ -14,6 +14,20 @@ for the remainder, we use a unique name for that new application `appName`<br/>
 - in `data/appName/testng/test_qwant.xml`, change value for `cucumberPackage` parameter according to the updated package name
 - write a minimal test (or re-use the example)
 - compile code with `mvn clean package`
+- **WARNING Oracle JDBC**: when compiling test application code, dependency ojdbc6.jar is searched. If your test application does not use Oracle DB connection, exclude oracle artifact from core using 
+
+	<dependency>
+		<groupId>com.infotel.seleniumRobot</groupId>
+		<artifactId>core</artifactId>
+		<version>[3.9.1,)</version>
+		<exclusions>
+			<exclusion>
+				<groupId>com.oracle</groupId>
+				<artifactId>ojdbc6</artifactId>
+			</exclusion>
+		</exclusions>
+	</dependency>
+	
 - execute it
 
 #### Requirements are ####
@@ -150,10 +164,14 @@ E.g: `new HtmlElement("", ByC.attribute("attr", "attribute").className("cls2"))`
 #### Add user defined test steps ####
 
 By default, framework creates automatically test steps based on method calls. Every PageObject method called from a Test class is a step (for e.g)
-If this behavior is not what you want, you can disable it by setting `manualTestSteps` as test parameters. 
-Then, in Test class or PageObject sub-class, add `addStep("my step name")` where you want a step to be created
+If this behavior is not what you want, you can disable it by setting `manualTestSteps` to `true` as test parameters. 
+Then, in Test class or PageObject sub-class, add `addStep("my step name")` where you want a step to be created. Every subsequent actions will be recorded to this step
 
 For each step, a snapshot is done and step duration is computed
+
+If, inside a step, you need to mask a password, (see: "masking password" section), give the value (generally, the variable name) to the `addStep` method
+
+	addStep("my step name", myValueForPassword)
 
 ### 3 Write a test ###
 A test is a suite of steps defined in several page objects. By convention, they are located in the `tests` folder
@@ -242,7 +260,13 @@ becomes
 	Step _setPassword with args: (******, )
 	sendKeys on TextFieldElement Text, by={By.id: text2} with args: (true, true, [******,])
 	
-because method `_setPassword` signature is `public DriverTestPage _setPassword(String passWordShort) {`T
+because method `_setPassword` signature is `public DriverTestPage _setPassword(String passWordShort) {`
+
+
+**WARN: ** With manual steps, you have to explicitly give the passwords to mask when creating test steps 
+
+	addStep("my step name", myValueForPassword)
+	addStep("my step name", myValueForPassword1, myValueForPassword2)
 
 #### TestNG file ####
 For tests extending SeleniumTestPlan, the testNg XML looks like (minimal requirements):

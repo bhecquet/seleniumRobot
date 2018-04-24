@@ -232,11 +232,12 @@ public class PageObject extends BasePage implements IPage {
     }
     
     /**
-     * Add step inside a Page
+     * Add step inside a page
      * @param stepName
+     * @param passwordsToMask	array of strings that must be replaced by '*****' in reports
      */
-    public void addStep(String stepName) {
-    	TestTasks.addStep(stepName);
+    public void addStep(String stepName, String ... passwordToMask) {
+    	TestTasks.addStep(stepName, passwordToMask);
     }
     
     /**

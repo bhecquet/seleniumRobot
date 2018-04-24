@@ -58,6 +58,26 @@ public class StubTestClassManualSteps extends StubParentClass {
 	}
 	
 	/**
+	 * Test that if we specify a password to mask, it's not shown in report
+	 * @throws IOException
+	 */
+	@Test(groups="stub")
+	public void testOkPassword() throws IOException {
+		
+		SeleniumTestsContextManager.getThreadContext().setManualTestSteps(true);
+		
+		addStep("Test start");
+		CalcPage cPage = new CalcPage();
+		
+		addStep("Connect to calc", "aPassPhrase");
+		cPage.connect("login", "aPassPhrase");
+		
+		addStep("Reconnect to calc");
+		cPage.connect("login", "anOtherPassPhrase");
+
+	}
+	
+	/**
 	 * Test where we throw an assertion to show if report handles it
 	 * @throws IOException
 	 */

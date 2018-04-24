@@ -22,6 +22,7 @@ import org.openqa.selenium.By;
 import org.testng.Assert;
 
 import com.seleniumtests.customexception.DriverExceptions;
+import com.seleniumtests.reporter.logger.TestLogging;
 import com.seleniumtests.uipage.PageObject;
 import com.seleniumtests.uipage.htmlelements.HtmlElement;
 
@@ -69,6 +70,8 @@ public class CalcPage extends PageObject {
 	}
 	
 	public CalcPage connect(String login, String password) {
+		TestLogging.info("login is " + login);
+		TestLogging.info("password is " + password);
 		return this;
 	}
 	

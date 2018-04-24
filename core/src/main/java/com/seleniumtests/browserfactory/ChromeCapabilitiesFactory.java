@@ -61,6 +61,7 @@ public class ChromeCapabilitiesFactory extends IDesktopCapabilityFactory {
             options.addArguments("--user-agent=" + webDriverConfig.getUserAgentOverride());
         }
         options.addArguments("--disable-translate");
+        options.addArguments("--no-sandbox");
         
         if (webDriverConfig.isHeadlessBrowser()) {
         	logger.info("setting chrome in headless mode. Supported for chrome version >= 60");
