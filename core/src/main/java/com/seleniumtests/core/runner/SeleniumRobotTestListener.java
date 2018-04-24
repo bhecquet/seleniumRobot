@@ -240,8 +240,13 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
         		|| (SeleniumTestsContextManager.getThreadContext().getArchive() == ArchiveMode.ON_SUCCESS && !failed)
         		|| (SeleniumTestsContextManager.getThreadContext().getArchive() == ArchiveMode.ON_ERROR && failed)) 
         		&& SeleniumTestsContextManager.getGlobalContext().getArchiveToFile() != null) {
-			FileUtility.zipFolder(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()), 
-								  new File(SeleniumTestsContextManager.getGlobalContext().getArchiveToFile()));
+        	try {
+				FileUtility.zipFolder(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()), 
+									  new File(SeleniumTestsContextManager.getGlobalContext().getArchiveToFile()));
+				logger.info("Archiving OK => " + SeleniumTestsContextManager.getGlobalContext().getArchiveToFile());
+        	} catch (Exception e) {
+        		logger.error(String.format("Archiving KO [%s] => %s", e.getMessage(), SeleniumTestsContextManager.getGlobalContext().getArchiveToFile()));
+        	}
 		}
 	}
 	
