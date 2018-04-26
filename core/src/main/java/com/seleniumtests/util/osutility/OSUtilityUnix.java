@@ -119,20 +119,29 @@ public class OSUtilityUnix extends OSUtility {
 		browserList.put(BrowserType.HTMLUNIT, Arrays.asList(new BrowserInfo(BrowserType.HTMLUNIT, BrowserInfo.LATEST_VERSION, null)));
 		browserList.put(BrowserType.PHANTOMJS, Arrays.asList(new BrowserInfo(BrowserType.PHANTOMJS, BrowserInfo.LATEST_VERSION, null)));
 		
+		
+		
 		// TODO: handle multiple installation of firefox and Chrome
-		if (!OSCommand.executeCommandAndWait("which firefox").trim().isEmpty()) {
+		String firefoxLocation = OSCommand.executeCommandAndWait("which firefox").trim();
+		String iceweaselLocation = OSCommand.executeCommandAndWait("which iceweasel").trim();
+		String chromeLocation = OSCommand.executeCommandAndWait("which google-chrome").trim();
+		String chromiumLocation = OSCommand.executeCommandAndWait("which chromium-browser").trim();
+		
+		if (!firefoxLocation.isEmpty() && !firefoxLocation.contains("bin/which")) {
 			String version = getFirefoxVersion("firefox");
-			browserList.put(BrowserType.FIREFOX, Arrays.asList(new BrowserInfo(BrowserType.FIREFOX, extractFirefoxVersion(version), OSCommand.executeCommandAndWait("which firefox").trim())));
-		} else if (!OSCommand.executeCommandAndWait("which iceweasel").trim().isEmpty()) {
+			browserList.put(BrowserType.FIREFOX, Arrays.asList(new BrowserInfo(BrowserType.FIREFOX, extractFirefoxVersion(version), firefoxLocation)));
+			
+		} else if (!iceweaselLocation.isEmpty() && !iceweaselLocation.contains("bin/which")) {
 			String version = getFirefoxVersion("iceweasel");
-			browserList.put(BrowserType.FIREFOX, Arrays.asList(new BrowserInfo(BrowserType.FIREFOX, extractFirefoxVersion(version), OSCommand.executeCommandAndWait("which iceweasel").trim())));
+			browserList.put(BrowserType.FIREFOX, Arrays.asList(new BrowserInfo(BrowserType.FIREFOX, extractFirefoxVersion(version), iceweaselLocation)));
 		}
-		if (!OSCommand.executeCommandAndWait("which chromium-browser").trim().isEmpty()) {
+		if (!chromiumLocation.isEmpty() && !chromiumLocation.contains("bin/which")) {
 			String version = getChromeVersion("chromium-browser");
-			browserList.put(BrowserType.CHROME, Arrays.asList(new BrowserInfo(BrowserType.CHROME, extractChromiumVersion(version), OSCommand.executeCommandAndWait("which chromium-browser").trim())));
-		} else if (!OSCommand.executeCommandAndWait("which google-chrome").trim().isEmpty()) {
+			browserList.put(BrowserType.CHROME, Arrays.asList(new BrowserInfo(BrowserType.CHROME, extractChromiumVersion(version), chromiumLocation)));
+			
+		} else if (!chromeLocation.isEmpty() && !chromeLocation.contains("bin/which")) {
 			String version = getChromeVersion("google-chrome");
-			browserList.put(BrowserType.CHROME, Arrays.asList(new BrowserInfo(BrowserType.CHROME, extractChromeVersion(version), OSCommand.executeCommandAndWait("which google-chrome").trim())));
+			browserList.put(BrowserType.CHROME, Arrays.asList(new BrowserInfo(BrowserType.CHROME, extractChromeVersion(version), chromeLocation)));
 		} 
 		
 		return browserList;
