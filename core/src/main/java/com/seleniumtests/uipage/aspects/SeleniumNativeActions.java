@@ -4,6 +4,9 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchFrameException;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.support.ui.ExpectedCondition;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.aspects.LogAction;
@@ -61,22 +64,63 @@ public class SeleniumNativeActions {
 	 * @throws Throwable
 	 */
 	@Around("this(com.seleniumtests.uipage.PageObject) && " +					// caller is a PageObject
+			"(call(public * org.openqa.selenium.support.ui.ExpectedConditions.frameToBeAvailableAndSwitchToIt (..))"
+			+ ")"			
+			)
+	public Object recordFrameSwitch(ProceedingJoinPoint joinPoint) throws Throwable {
+		if (doOverride()) {
+			Object frameArg = joinPoint.getArgs()[0];
+			FrameElement frameEl = getFrameElement(frameArg);
+			
+			if (frameEl == null) {
+				return joinPoint.proceed(joinPoint.getArgs());
+			}
+			
+			if (currentFrame == null) {
+				currentFrame = frameEl;
+			} else {
+				frameEl.setFrameElement(currentFrame);
+				currentFrame = frameEl;
+			}
+
+			return new ExpectedCondition<WebDriver>() {
+			      @Override
+			      public WebDriver apply(WebDriver driver) {
+			        try {
+			          return driver;
+			        } catch (NoSuchFrameException e) {
+			          return null;
+			        }
+			      }
+
+			      @Override
+			      public String toString() {
+			        return "frame to be available: " + frameArg;
+			      }
+			    };
+			
+		} else {
+			return joinPoint.proceed(joinPoint.getArgs());
+		}
+	}
+	
+	/**
+	 * Method interceptFindHtmlElement creates an HtmlElement from findElement, but does not handle frames. 
+	 * Here, we record all switchTo().frame(WebElement) call to create a FrameElement chain
+	 * @param joinPoint
+	 * @return
+	 * @throws Throwable
+	 */
+	@Around("this(com.seleniumtests.uipage.PageObject) && " +					// caller is a PageObject
 			"(call(public * org.openqa.selenium.WebDriver.TargetLocator+.frame (..))"
 			+ ")"			
 			)
 	public Object recordSwitchToFramCalls(ProceedingJoinPoint joinPoint) throws Throwable {
 		if (doOverride()) {
 			Object frameArg = joinPoint.getArgs()[0];
-			FrameElement frameEl;
+			FrameElement frameEl = getFrameElement(frameArg);
 			
-			if (frameArg instanceof HtmlElement) {
-				frameEl = new FrameElement("", ((HtmlElement)frameArg).getBy());
-			} else if (frameArg instanceof Integer) {
-				frameEl = new FrameElement("", By.tagName("iframe"), 0);
-			} else if (frameArg instanceof String) {
-				String name = ((String)frameArg).replaceAll("(['\"\\\\#.:;,!?+<>=~*^$|%&@`{}\\-/\\[\\]\\(\\)])", "\\\\$1");
-				frameEl = new FrameElement("", By.cssSelector("frame[name='" + name + "'],iframe[name='" + name + "'],frame#" + name + ",iframe#" + name));
-			} else {
+			if (frameEl == null) {
 				return joinPoint.proceed(joinPoint.getArgs());
 			}
 
@@ -90,7 +134,27 @@ public class SeleniumNativeActions {
 		} else {
 			return joinPoint.proceed(joinPoint.getArgs());
 		}
-
+	}
+	
+	/**
+	 * Returns a FrameElement based on the object passed in argument
+	 * @param frameArg
+	 * @return
+	 */
+	private FrameElement getFrameElement(Object frameArg) {
+		FrameElement frameEl = null;
+		
+		if (frameArg instanceof HtmlElement) {
+			frameEl = new FrameElement("", ((HtmlElement)frameArg).getBy());
+		} else if (frameArg instanceof By) {
+			frameEl = new FrameElement("", (By)frameArg);
+		} else if (frameArg instanceof Integer) {
+			frameEl = new FrameElement("", By.tagName("iframe"), 0);
+		} else if (frameArg instanceof String) {
+			String name = ((String)frameArg).replaceAll("(['\"\\\\#.:;,!?+<>=~*^$|%&@`{}\\-/\\[\\]\\(\\)])", "\\\\$1");
+			frameEl = new FrameElement("", By.cssSelector("frame[name='" + name + "'],iframe[name='" + name + "'],frame#" + name + ",iframe#" + name));
+		}
+		return frameEl;
 	}
 	
 	@Around("this(com.seleniumtests.uipage.PageObject) && " +					// caller is a PageObject

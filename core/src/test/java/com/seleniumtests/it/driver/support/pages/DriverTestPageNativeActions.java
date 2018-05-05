@@ -2,10 +2,13 @@ package com.seleniumtests.it.driver.support.pages;
 
 import java.util.List;
 
+import org.junit.rules.ExpectedException;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.driver.BrowserType;
@@ -60,6 +63,18 @@ public class DriverTestPageNativeActions extends PageObject {
     
     public void switchToFirstFrameByIndex() {
     	driver.switchTo().frame(0);
+    }
+    
+    public void switchToFrameWithExpectedConditionsById() {
+    	new WebDriverWait(driver, 5).until(ExpectedConditions.frameToBeAvailableAndSwitchToIt(By.id("myIFrame")));
+    }
+    
+    public void switchToFrameWithExpectedConditionsByName() {
+    	new WebDriverWait(driver, 5).until(ExpectedConditions.frameToBeAvailableAndSwitchToIt("myIFrame"));
+    }
+    
+    public void switchToFrameWithExpectedConditionsByIndex() {
+    	new WebDriverWait(driver, 5).until(ExpectedConditions.frameToBeAvailableAndSwitchToIt(0));
     }
     
     public void switchToFirstFrameByNameOrId() {
