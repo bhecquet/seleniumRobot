@@ -37,6 +37,7 @@ import org.testng.annotations.Test;
 
 import com.seleniumtests.MockitoTest;
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.driver.TestType;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.it.driver.support.pages.DriverTestPageNativeActions;
 import com.seleniumtests.uipage.htmlelements.HtmlElement;
@@ -93,6 +94,7 @@ public class TestWebElement extends MockitoTest {
 	@BeforeMethod(groups={"ut"})
 	public void overrideNativeActions() {
 		SeleniumTestsContextManager.getThreadContext().setOverrideSeleniumNativeAction(true);
+		SeleniumTestsContextManager.getThreadContext().setTestType(TestType.WEB);
 	}
 	
 	@AfterMethod(groups={"ut"})
@@ -165,6 +167,49 @@ public class TestWebElement extends MockitoTest {
 		testPage.switchToSecondFrameByElement();
 		WebElement el = testPage.getElementInsideFrameOfFrame();
 		Assert.assertEquals(el.getAttribute("value"), "an other value in iframe");
+	}
+	
+
+	/**
+	 * Check that with override, behavior is correct
+	 */
+	@Test(groups={"ut"})
+	public void testExpectedConditionsForSwitchingFrame() {
+		testPage.switchToFrameWithExpectedConditionsById();
+		WebElement el = testPage.getElementInsideFrame();
+		Assert.assertEquals(el.getAttribute("value"), "a value");
+	}
+	
+	/**
+	 * Check that with override, behavior is correct
+	 */
+	@Test(groups={"ut"})
+	public void testExpectedConditionsForSwitchingFrameByName() {
+		testPage.switchToFrameWithExpectedConditionsByName();
+		WebElement el = testPage.getElementInsideFrame();
+		Assert.assertEquals(el.getAttribute("value"), "a value");
+	}
+	
+	/**
+	 * Check that with override, behavior is correct
+	 */
+	@Test(groups={"ut"})
+	public void testExpectedConditionsForSwitchingFrameIndex() {
+		testPage.switchToFrameWithExpectedConditionsByIndex();
+		WebElement el = testPage.getElementInsideFrame();
+		Assert.assertEquals(el.getAttribute("value"), "a value");
+	}
+	
+	/**
+	 * Check that without override, behavior is correct
+	 */
+	@Test(groups={"ut"})
+	public void testExpectedConditionsForSwitchingFrameWithoutOverride() {
+
+		SeleniumTestsContextManager.getThreadContext().setOverrideSeleniumNativeAction(false);
+		testPage.switchToFrameWithExpectedConditionsById();
+		WebElement el = testPage.getElementInsideFrame();
+		Assert.assertEquals(el.getAttribute("value"), "a value");
 	}
 	
 	/**
