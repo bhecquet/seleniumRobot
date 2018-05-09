@@ -59,15 +59,15 @@
 			                			#if ($testResult.getStatus() == 1)
 			                				<tr class="testSuccess">
 			                				<td>$testContext.key.getName()</td>
-			                				<td class="alignleft"><i class="fa fa-circle circleSuccess"></i><a href='$testResult.getAttribute("methodResultFileName")' data-toggle="tooltip" title="$description">$testResult.getAttribute("methodName")</a></td>
+			                				<td class="alignleft"><i class="fa fa-circle circleSuccess"></i><a href='$testResult.getAttribute("methodResultFileName")' data-toggle="tooltip" title="$description">$testResult.getAttribute("uniqueMethodName")</a></td>
 			                			#elseif ($testResult.getStatus() == 2)
 			                				<tr class="testFailed">
 			                				<td>$testContext.key.getName()</td>
-			                				<td class="alignleft"><i class="fa fa-circle circleFailed"></i><a href='$testResult.getAttribute("methodResultFileName")' data-toggle="tooltip" title="$description">$testResult.getAttribute("methodName")</a></td>
+			                				<td class="alignleft"><i class="fa fa-circle circleFailed"></i><a href='$testResult.getAttribute("methodResultFileName")' data-toggle="tooltip" title="$description">$testResult.getAttribute("uniqueMethodName")</a></td>
 			                			#else 
 			                				<tr class="testSkipped">
 			                				<td>$testContext.key.getName()</td>
-			                				<td class="alignleft"><i class="fa fa-circle circleSkipped"></i><a href='$testResult.getAttribute("methodResultFileName")' data-toggle="tooltip" title="$description">$testResult.getAttribute("methodName")</a></td>
+			                				<td class="alignleft"><i class="fa fa-circle circleSkipped"></i><a href='$testResult.getAttribute("methodResultFileName")' data-toggle="tooltip" title="$description">$testResult.getAttribute("uniqueMethodName")</a></td>
 			                			#end 
 
 				                		<td name="passed-$testIdx">$passedSteps</td>

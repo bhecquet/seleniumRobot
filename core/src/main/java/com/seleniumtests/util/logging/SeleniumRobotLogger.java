@@ -51,7 +51,8 @@ public class SeleniumRobotLogger {
 	
 	public static final String START_TEST_PATTERN = "Start method ";
 	public static final String END_TEST_PATTERN = "Finish method ";
-	public static final String METHOD_NAME = "methodName";
+	public static final String METHOD_NAME = "methodName";				// name of the test method (or the cucumber scenario)
+	public static final String UNIQUE_METHOD_NAME = "uniqueMethodName"; // unique name of the test (in case several tests have the same name)
 	public static final String LOG_FILE_NAME = "seleniumRobot.log";
 	
 	private SeleniumRobotLogger() {

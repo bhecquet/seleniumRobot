@@ -118,6 +118,11 @@ public class TestSeleniumRobotTestListener extends GenericTest {
 		Assert.assertEquals(StringUtils.countMatches(mainReportContent, "<i class=\"fa fa-circle circleSuccess\">"), 3);
 	}
 	
+	/**
+	 * Checks that with a data provider, test context does not overlap between test methods and that displayed logs correspond to the method execution and not all method executions
+	 * @param testContext
+	 * @throws Exception
+	 */
 	@Test(groups={"it"})
 	public void testContextWithDataProvider(ITestContext testContext) throws Exception {
 		
@@ -128,19 +133,24 @@ public class TestSeleniumRobotTestListener extends GenericTest {
 		
 		// check that all tests are OK and present into summary file. If test is KO (issue #115), the same context is taken for subsequent test method calls
 		Assert.assertTrue(mainReportContent.matches(".*<i class=\"fa fa-circle circleSuccess\"></i><a href='testMethod/TestReport.html' .*?>testMethod</a>.*"));
-		Assert.assertTrue(mainReportContent.matches(".*<i class=\"fa fa-circle circleSuccess\"></i><a href='testMethod-1/TestReport.html' .*?>testMethod</a>.*"));
-		Assert.assertTrue(mainReportContent.matches(".*<i class=\"fa fa-circle circleSuccess\"></i><a href='testMethod-2/TestReport.html' .*?>testMethod</a>.*"));
+		Assert.assertTrue(mainReportContent.matches(".*<i class=\"fa fa-circle circleSuccess\"></i><a href='testMethod-1/TestReport.html' .*?>testMethod-1</a>.*"));
+		Assert.assertTrue(mainReportContent.matches(".*<i class=\"fa fa-circle circleSuccess\"></i><a href='testMethod-2/TestReport.html' .*?>testMethod-2</a>.*"));
 
 		// check each result file to see if it exists and if it only contains information about this method context (log of this method only)
 		String detailedReportContent1 = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testMethod", "TestReport.html").toFile());
 		detailedReportContent1 = detailedReportContent1.replace("\n", "").replace("\r",  "").replaceAll(">\\s+<", "><");
 		Assert.assertEquals(StringUtils.countMatches(detailedReportContent1, "data written"), 1);
+		Assert.assertTrue(detailedReportContent1.contains("data written: data1"));
 		
 		String detailedReportContent2 = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testMethod-1", "TestReport.html").toFile());
 		detailedReportContent2 = detailedReportContent2.replace("\n", "").replace("\r",  "").replaceAll(">\\s+<", "><");
+		Assert.assertEquals(StringUtils.countMatches(detailedReportContent2, "data written"), 1);
+		Assert.assertTrue(detailedReportContent2.contains("data written: data2"));
 		
 		String detailedReportContent3 = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testMethod-2", "TestReport.html").toFile());
 		detailedReportContent3 = detailedReportContent3.replace("\n", "").replace("\r",  "").replaceAll(">\\s+<", "><");
+		Assert.assertEquals(StringUtils.countMatches(detailedReportContent3, "data written"), 1);
+		Assert.assertTrue(detailedReportContent3.contains("data written: data3"));
 	}
 	
 	private TestNG executeSubTest2(XmlSuite.ParallelMode parallelMode) throws IOException {

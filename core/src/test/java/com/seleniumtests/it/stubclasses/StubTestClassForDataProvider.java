@@ -26,6 +26,7 @@ import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.reporter.logger.TestLogging;
 
 /* test class for showing the issue #115
@@ -43,8 +44,7 @@ public class StubTestClassForDataProvider extends StubParentClass {
 	
 	@BeforeMethod(groups={"stub"})
 	public void before(Method method, ITestContext ctx, ITestResult res) {
-		ctx.getAttributeNames();
-		System.out.println("before: " + res.getMethod().getConstructorOrMethod().getMethod().getParameters().hashCode());
+		
 	}
 	
 	@DataProvider
