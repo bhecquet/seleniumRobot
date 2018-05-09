@@ -3,6 +3,7 @@ package com.seleniumtests.it.core;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Method;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -69,14 +70,16 @@ public class TestSeleniumRobotTestListener extends GenericTest {
 		}	
 		
 		// cucumber tests
-		XmlTest test = new XmlTest(suite);
-		test.setName(String.format("cucumberTest_%d", new Random().nextInt()));
-		XmlPackage xmlPackage = new XmlPackage("com.seleniumtests.core.runner.*");
-		test.setXmlPackages(Arrays.asList(xmlPackage));
-		Map<String, String> parameters = new HashMap<>();
-		parameters.put("cucumberTests", cucumberTests);
-		parameters.put("cucumberTags", "");
-		test.setParameters(parameters);
+		if (!cucumberTests.isEmpty()) {
+			XmlTest test = new XmlTest(suite);
+			test.setName(String.format("cucumberTest_%d", new Random().nextInt()));
+			XmlPackage xmlPackage = new XmlPackage("com.seleniumtests.core.runner.*");
+			test.setXmlPackages(Arrays.asList(xmlPackage));
+			Map<String, String> parameters = new HashMap<>();
+			parameters.put("cucumberTests", cucumberTests);
+			parameters.put("cucumberTags", "");
+			test.setParameters(parameters);
+		}
 		
 		TestNG tng = new TestNG(false);
 		tng.setXmlSuites(suites);
@@ -113,6 +116,31 @@ public class TestSeleniumRobotTestListener extends GenericTest {
 		
 		// all 3 methods are OK
 		Assert.assertEquals(StringUtils.countMatches(mainReportContent, "<i class=\"fa fa-circle circleSuccess\">"), 3);
+	}
+	
+	@Test(groups={"it"})
+	public void testContextWithDataProvider(ITestContext testContext) throws Exception {
+		
+		executeSubTest(5, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDataProvider.testMethod"}, "");
+		
+		String mainReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport.html"));
+		mainReportContent = mainReportContent.replace("\n", "").replace("\r",  "");
+		
+		// check that all tests are OK and present into summary file. If test is KO (issue #115), the same context is taken for subsequent test method calls
+		Assert.assertTrue(mainReportContent.matches(".*<i class=\"fa fa-circle circleSuccess\"></i><a href='testMethod/TestReport.html' .*?>testMethod</a>.*"));
+		Assert.assertTrue(mainReportContent.matches(".*<i class=\"fa fa-circle circleSuccess\"></i><a href='testMethod-1/TestReport.html' .*?>testMethod</a>.*"));
+		Assert.assertTrue(mainReportContent.matches(".*<i class=\"fa fa-circle circleSuccess\"></i><a href='testMethod-2/TestReport.html' .*?>testMethod</a>.*"));
+
+		// check each result file to see if it exists and if it only contains information about this method context (log of this method only)
+		String detailedReportContent1 = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testMethod", "TestReport.html").toFile());
+		detailedReportContent1 = detailedReportContent1.replace("\n", "").replace("\r",  "").replaceAll(">\\s+<", "><");
+		Assert.assertEquals(StringUtils.countMatches(detailedReportContent1, "data written"), 1);
+		
+		String detailedReportContent2 = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testMethod-1", "TestReport.html").toFile());
+		detailedReportContent2 = detailedReportContent2.replace("\n", "").replace("\r",  "").replaceAll(">\\s+<", "><");
+		
+		String detailedReportContent3 = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testMethod-2", "TestReport.html").toFile());
+		detailedReportContent3 = detailedReportContent3.replace("\n", "").replace("\r",  "").replaceAll(">\\s+<", "><");
 	}
 	
 	private TestNG executeSubTest2(XmlSuite.ParallelMode parallelMode) throws IOException {
