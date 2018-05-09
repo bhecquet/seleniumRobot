@@ -140,7 +140,7 @@ public class CustomReporter extends CommonReporter implements IReporter {
 			context.put("newline", "\n");
 			context.put("failures", errors);
 			context.put("hostname", testResult.getHost() == null ? "": testResult.getHost());
-			context.put("suiteName", testResult.getAttribute(SeleniumRobotLogger.METHOD_NAME));
+			context.put("suiteName", testResult.getAttribute(SeleniumRobotLogger.UNIQUE_METHOD_NAME));
 			context.put("className", testResult.getTestClass().getName());
 			context.put("tests", testSteps == null ? 0: testSteps.size());
 			context.put("duration", testDuration / 1000.0);
@@ -164,7 +164,7 @@ public class CustomReporter extends CommonReporter implements IReporter {
 			fileWriter.close();
 			generatedFiles.add(fileName);
 		} catch (Exception e) {
-			logger.error(String.format("Error generating test result %s: %s", testResult.getAttribute(SeleniumRobotLogger.METHOD_NAME), e.getMessage()));
+			logger.error(String.format("Error generating test result %s: %s", testResult.getAttribute(SeleniumRobotLogger.UNIQUE_METHOD_NAME), e.getMessage()));
 		}
 	}
 	

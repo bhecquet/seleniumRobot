@@ -322,7 +322,7 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 						fileName = getTestName(result) + "/TestReport.html";
 					}
 					result.setAttribute(METHOD_RESULT_FILE_NAME, fileName);
-					result.setAttribute(SeleniumRobotLogger.METHOD_NAME, getTestName(result));
+					result.setAttribute(SeleniumRobotLogger.UNIQUE_METHOD_NAME, getTestName(result));
 					
 				}
 				resultList.addAll(methodResults);

@@ -138,15 +138,15 @@ public abstract class CommonReporter {
 			return "N-A";
 		}
 		
-		if (testResult.getAttribute(SeleniumRobotLogger.METHOD_NAME) != null) {
-			return testResult.getAttribute(SeleniumRobotLogger.METHOD_NAME).toString();
+		if (testResult.getAttribute(SeleniumRobotLogger.UNIQUE_METHOD_NAME) != null) {
+			return testResult.getAttribute(SeleniumRobotLogger.UNIQUE_METHOD_NAME).toString();
 		}
 		
 		if (testResult.getStatus() == ITestResult.SKIP) {
 			return testResult.getName();
 		} else {
-			if (testResult.getAttribute(SeleniumRobotLogger.METHOD_NAME) != null) {
-				return testResult.getAttribute(SeleniumRobotLogger.METHOD_NAME).toString();
+			if (testResult.getAttribute(SeleniumRobotLogger.UNIQUE_METHOD_NAME) != null) {
+				return testResult.getAttribute(SeleniumRobotLogger.UNIQUE_METHOD_NAME).toString();
 			} else {
 				return "N-A";
 			}
