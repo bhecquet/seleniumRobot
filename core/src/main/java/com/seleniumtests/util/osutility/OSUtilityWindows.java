@@ -151,6 +151,9 @@ public class OSUtilityWindows extends OSUtility {
 	 * @return
 	 */
 	private String getChromeVersionFromFolder(String chromePath) {
+		if (!new File(chromePath).exists()) {
+			throw new ConfigurationException("Chrome version could not be get from folder, chrome path does not exist");
+		}
 		for (File file: new File(chromePath.replace("chrome.exe", "")).listFiles()) {
 			if (file.isDirectory() && file.getName().matches("^\\d+.*")) {
 				return file.getName();
