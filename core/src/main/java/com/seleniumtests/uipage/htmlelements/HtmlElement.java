@@ -21,6 +21,7 @@ import java.lang.reflect.Method;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -46,6 +47,7 @@ import org.openqa.selenium.interactions.internal.Coordinates;
 import org.openqa.selenium.interactions.internal.Locatable;
 import org.openqa.selenium.internal.HasIdentity;
 import org.openqa.selenium.remote.CapabilityType;
+import org.openqa.selenium.remote.RemoteWebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
@@ -1023,8 +1025,15 @@ public class HtmlElement implements WebElement, Locatable, HasIdentity {
     
     @ReplayOnError
     public Point getCenter() {
-    	checkForMobile();
-    	return ((MobileElement)getUnderlyingElement(element)).getCenter();
+    	try {
+    		checkForMobile();
+    		return ((MobileElement)getUnderlyingElement(element)).getCenter();
+    	} catch (ScenarioException e) {
+    		logger.error(e.getMessage());
+    	}
+    	return null;
+    	
+    	
     }
     
     @ReplayOnError
@@ -1179,6 +1188,11 @@ public class HtmlElement implements WebElement, Locatable, HasIdentity {
 	public String getId() {
 		findElement();
 		return ((HasIdentity)getUnderlyingElement(element)).getId();
+	}
+	
+	public Map<String, Object> toJson() {
+		findElement();
+		return ((RemoteWebElement)getUnderlyingElement(element)).toJson();
 	}
 
 	/**
