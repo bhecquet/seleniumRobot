@@ -112,7 +112,6 @@ public class CustomReporter extends CommonReporter implements IReporter {
 				throw new ScenarioException("Error generating test results");
 			}
 			
-//			Template t = ve.getTemplate( "reporter/templates/report.perf.vm" );
 			Template t = ve.getTemplate(reportInfo.getTemplatePath());
 			VelocityContext context = new VelocityContext();
 			

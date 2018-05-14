@@ -30,6 +30,7 @@ import org.testng.annotations.Test;
 
 import com.seleniumtests.GenericTest;
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.customexception.CustomSeleniumTestsException;
 import com.seleniumtests.driver.screenshots.ScreenShot;
 import com.seleniumtests.reporter.logger.HarCapture;
 import com.seleniumtests.reporter.logger.Snapshot;
@@ -37,6 +38,7 @@ import com.seleniumtests.reporter.logger.TestAction;
 import com.seleniumtests.reporter.logger.TestMessage;
 import com.seleniumtests.reporter.logger.TestMessage.MessageType;
 import com.seleniumtests.reporter.logger.TestStep;
+import com.seleniumtests.reporter.logger.TestValue;
 
 import net.lightbody.bmp.core.har.Har;
 import net.lightbody.bmp.core.har.HarLog;
@@ -225,6 +227,90 @@ public class TestTestStep extends GenericTest {
 		Assert.assertEquals(attachments.get(0).getName(), "N-A_0-1_step1-" + tmpHtmlFile2.getName());
 		Assert.assertEquals(attachments.get(1).getName(), "N-A_0-1_step1-" + tmpImgFile2.getName());
 		Assert.assertEquals(attachments.get(2).getName(), "N-A_0-1_subStep-" + tmpImgFile4.getName());
+	}
+	
+	@Test(groups={"ut"}, expectedExceptions=CustomSeleniumTestsException.class)
+	public void testTestStepEncodeUnexpected() {
+		TestStep step = new TestStep("step1 \"'<>&", null, new ArrayList<>());
+		step.encode("wrongFormat");
+	}
+	
+	@Test(groups={"ut"})
+	public void testTestStepEncodeHtml() {
+		TestStep step = new TestStep("step1 \"'<>&\u0192", null, new ArrayList<>());
+		TestStep encodedTestStep = step.encode("html");
+		Assert.assertTrue(encodedTestStep.toString().contains("Step step1 &quot;'&lt;&gt;&amp;&fnof;"));
+	}
+	
+	@Test(groups={"ut"})
+	public void testTestStepEncodeJson() {
+		TestStep step = new TestStep("step1 \"/\\", null, new ArrayList<>());
+		TestStep encodedTestStep = step.encode("json");
+		Assert.assertTrue(encodedTestStep.toString().contains("Step step1 \\\"\\/\\\\"));
+	}
+	
+	@Test(groups={"ut"})
+	public void testTestStepEncodeXml() {
+		TestStep step = new TestStep("step1 \"'<>&", null, new ArrayList<>());
+		TestStep encodedTestStep = step.encode("xml");
+		Assert.assertTrue(encodedTestStep.toString().contains("Step step1 &quot;&apos;&lt;&gt;&amp;"));
+	}
+	
+	@Test(groups={"ut"})
+	public void testTestMessageEncodeXml() {
+		TestMessage msg = new TestMessage("everything OK \"'<>&", MessageType.INFO);
+		TestMessage encodedMsg = msg.encode("xml");
+		Assert.assertTrue(encodedMsg.toString().contains("everything OK &quot;&apos;&lt;&gt;&amp;"));
+	}
+	
+	@Test(groups={"ut"})
+	public void testTestActionEncodeXml() {
+		TestAction action = new TestAction("action2 \"'<>&", false, new ArrayList<>());
+		TestAction encodedAction = action.encode("xml");
+		Assert.assertTrue(encodedAction.toString().contains("action2 &quot;&apos;&lt;&gt;&amp;"));
+	}
+	
+	@Test(groups={"ut"})
+	public void testTestValueEncodeXml() {
+		TestValue value = new TestValue("id &", "key <>", "value \"'");
+		TestValue encodedValue = value.encode("xml");
+		Assert.assertTrue(encodedValue.toString().contains("id &amp;"));
+		Assert.assertTrue(encodedValue.getMessage().contains("key &lt;&gt;"));
+		Assert.assertTrue(encodedValue.getValue().contains("value &quot;&apos;"));
+	}
+	
+	/** 
+	 * check we do not re-encode an already encoded message
+	 * 
+	 */
+	@Test(groups={"ut"})
+	public void testTestStepNoreencodeXml() {
+		TestStep step = new TestStep("step1 \"'<>&", null, new ArrayList<>());
+		TestStep encodedTestStep = step.encode("xml");
+		TestStep encodedTestStep2 = encodedTestStep.encode("xml");
+		Assert.assertTrue(encodedTestStep2.toString().contains("Step step1 &quot;&apos;&lt;&gt;&amp;"));
+	}
+	
+	/**
+	 * Check Step / sub-step encoding with XML
+	 */
+	@Test(groups={"ut"})
+	public void testEncodeXml() {
+		TestStep step = new TestStep("step1 \"'<>&", null, new ArrayList<>());
+		step.addMessage(new TestMessage("everything OK \"'<>&", MessageType.INFO));
+		step.addAction(new TestAction("action2 \"'<>&", false, new ArrayList<>()));
+		
+		TestStep subStep = new TestStep("subStep", null, new ArrayList<>());
+		subStep.addMessage(new TestMessage("everything in subStep almost OK", MessageType.WARNING));
+		subStep.addAction(new TestAction("action1 \"'<>&", false, new ArrayList<>()));
+		step.addAction(subStep);
+		
+		TestStep encodedTestStep = step.encode("xml");
+		Assert.assertTrue(encodedTestStep.toString().contains("Step step1 &quot;&apos;&lt;&gt;&amp;"));
+		Assert.assertTrue(encodedTestStep.toString().contains("everything OK &quot;&apos;&lt;&gt;&amp;"));
+		Assert.assertTrue(encodedTestStep.toString().contains("action2 &quot;&apos;&lt;&gt;&amp;"));
+		Assert.assertTrue(encodedTestStep.toString().contains("action1 &quot;&apos;&lt;&gt;&amp;"));
+		
 	}
 	
 	

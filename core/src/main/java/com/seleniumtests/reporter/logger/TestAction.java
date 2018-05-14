@@ -16,12 +16,15 @@
  */
 package com.seleniumtests.reporter.logger;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.apache.commons.text.StringEscapeUtils;
 import org.json.JSONObject;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.customexception.CustomSeleniumTestsException;
 
 
 /**
@@ -34,6 +37,7 @@ public class TestAction {
 	protected Boolean failed;
 	protected Throwable actionException;
 	protected List<String> pwdToReplace;
+	protected boolean encoded = false;		// true if we have encoded messages
 	
 	/**
 	 * 
@@ -88,11 +92,42 @@ public class TestAction {
 		JSONObject actionJson = new JSONObject();
 		
 		actionJson.put("type", "action");
-		actionJson.put("name", name);
+		actionJson.put("name", encodeString(name, "json"));
 		actionJson.put("exception", actionException == null ? null: actionException.toString());
 		actionJson.put("failed", failed);
 		
 		return actionJson;
+	}
+	
+	protected String encodeString(String message, String format) {
+		if (encoded) {
+			return message;
+		}
+		String newMessage;
+		switch (format) {
+		case "xml":
+			newMessage = StringEscapeUtils.escapeXml11(message);
+			break;
+		case "csv":
+			newMessage = StringEscapeUtils.escapeCsv(message);
+			break;
+		case "html":
+			newMessage = StringEscapeUtils.escapeHtml4(message);
+			break;
+		case "json":
+			newMessage = StringEscapeUtils.escapeJson(message);
+			break;
+		default:
+			throw new CustomSeleniumTestsException("only escaping of 'xml', 'html', 'csv', 'json' is allowed");
+		}
+		return newMessage;
+	}
+
+	public TestAction encode(String format) {
+		TestAction encodedAction = new TestAction(encodeString(name, format), failed, new ArrayList<String>(pwdToReplace));
+		encodedAction.actionException = actionException;
+		encodedAction.encoded = true;
+		return encodedAction;
 	}
 
 }
