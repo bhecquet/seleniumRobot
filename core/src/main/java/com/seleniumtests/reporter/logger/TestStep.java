@@ -166,7 +166,7 @@ public class TestStep extends TestAction {
 	public JSONObject toJson() {
 		JSONObject stepJSon = new JSONObject();
 		
-		stepJSon.put("name", getName());
+		stepJSon.put("name", encodeString(getName(), "json"));
 		stepJSon.put("type", "step");
 		stepJSon.put("harCapture", harCapture != null ? harCapture.toJson(): null);
 		
@@ -222,6 +222,23 @@ public class TestStep extends TestAction {
 
 	public void setHarCapture(HarCapture harCapture) {
 		this.harCapture = harCapture;
+	}
+	
+
+	@Override
+	public TestStep encode(String format) {
+		TestStep step = new TestStep(encodeString(name, format), testResult, new ArrayList<>(pwdToReplace));
+		
+		step.stepActions = new ArrayList<>();
+		for (TestAction testAction: stepActions) {
+			step.stepActions.add(testAction.encode(format));
+		}
+		
+		step.snapshots = new ArrayList<>(snapshots);
+		step.encoded = true;
+		step.duration = duration;
+		step.startDate = startDate;
+		return step;
 	}
 	
 }

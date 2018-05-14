@@ -10,6 +10,7 @@ import java.util.Arrays;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.StringEscapeUtils;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.driver.screenshots.ScreenShot;
@@ -40,7 +41,7 @@ public class Snapshot extends TestAction {
     public String buildScreenshotLog() {
 
         StringBuilder sbMessage = new StringBuilder("");
-        sbMessage.append(OUTPUT_PATTERN + screenshot.getTitle() + ": ");
+        sbMessage.append(OUTPUT_PATTERN + StringEscapeUtils.escapeHtml4(screenshot.getTitle()) + ": ");
         
         if (screenshot.getLocation() != null) {
             sbMessage.append("<a href='" + screenshot.getLocation() + "' target=url>Application URL</a>");

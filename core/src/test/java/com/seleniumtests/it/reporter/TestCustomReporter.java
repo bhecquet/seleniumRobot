@@ -144,6 +144,17 @@ public class TestCustomReporter extends ReporterTest {
 		}
 	}
 	
+	@Test(groups={"it"})
+	public void testXmlCharacterEscape(ITestContext testContext) throws Exception {
+		try {
+			System.setProperty("customSummaryReports", "SUP::xml::reporter/templates/report.supervision.vm");
+			
+			executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForEncoding"});
+		} finally {
+			System.clearProperty("customSummaryReports");
+		}
+	}
+	
 	// tester si le custom report n'existe pas
 	// tester si le summary report n'existe pas
 }

@@ -46,9 +46,16 @@ public class TestMessage extends TestAction {
 		JSONObject actionJson = new JSONObject();
 		
 		actionJson.put("type", "message");
-		actionJson.put("name", name);
+		actionJson.put("name", encodeString(name, "json"));
 		actionJson.put("messageType", messageType.toString());
 		
 		return actionJson;
+	}
+	
+	@Override
+	public TestMessage encode(String format) {
+		TestMessage msg = new TestMessage(encodeString(name, format), messageType);
+		msg.encoded = true;
+		return msg;
 	}
 }

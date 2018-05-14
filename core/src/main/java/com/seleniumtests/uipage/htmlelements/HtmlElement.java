@@ -507,10 +507,7 @@ public class HtmlElement implements WebElement, Locatable, HasIdentity {
 	 */
 	public void scrollToElement(int yOffset) {
 		findElement();
-		((CustomEventFiringWebDriver)driver).scrollToElement(element, yOffset);
-		
-//		new Actions(driver).moveToElement(element).build().perform();
-		
+		((CustomEventFiringWebDriver)driver).scrollToElement(element, yOffset);		
 	}
 
     /**
@@ -1026,11 +1023,9 @@ public class HtmlElement implements WebElement, Locatable, HasIdentity {
     		checkForMobile();
     		return ((MobileElement)getUnderlyingElement(element)).getCenter();
     	} catch (ScenarioException e) {
-    		logger.error(e.getMessage());
-    	}
-    	return null;
-    	
-    	
+    		Rectangle rectangle = element.getRect();
+    		return new Point(rectangle.x + rectangle.width / 2, rectangle.y + rectangle.height / 2);
+    	}	
     }
     
     @ReplayOnError
