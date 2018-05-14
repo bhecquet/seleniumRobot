@@ -199,8 +199,9 @@ public class HtmlElement implements WebElement, Locatable, HasIdentity {
      */
     @ReplayOnError
     public void clickAt(int xOffset, int yOffset) {
-        findElement(true);
-
+    	findElement();
+		((CustomEventFiringWebDriver)driver).scrollToElement(element, yOffset);
+        
         try {
             new Actions(driver).moveToElement(element, xOffset, yOffset).click()
                 .perform();
@@ -506,13 +507,9 @@ public class HtmlElement implements WebElement, Locatable, HasIdentity {
 	 */
 	public void scrollToElement(int yOffset) {
 		findElement();
+		((CustomEventFiringWebDriver)driver).scrollToElement(element, yOffset);
 		
-		if (SeleniumTestsContextManager.isWebTest()) {
-			((JavascriptExecutor) driver).executeScript("window.top.scroll(" + Math.max(element.getLocation().x - 200, 0) + "," + Math.max(element.getLocation().y + yOffset, 0) + ")");
-		} else {
-			logger.warn("scrollToElement is only available for Web tests");
-		}
-		new Actions(driver).moveToElement(element).build().perform();
+//		new Actions(driver).moveToElement(element).build().perform();
 		
 	}
 

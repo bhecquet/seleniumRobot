@@ -47,6 +47,7 @@ import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.FileDetector;
 import org.openqa.selenium.remote.UselessFileDetector;
 import org.openqa.selenium.support.events.EventFiringWebDriver;
@@ -267,6 +268,18 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
 				i++;
 			} while (i < 10);
 		} 
+	}
+	
+	/**
+	 * scroll to the given element
+	 * we scroll 200 px to the left of the element so that we see all of it
+	 * @param element
+	 */
+	public void scrollToElement(WebElement element, int yOffset) {
+		if (isWebTest) {
+//			((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", element);
+			((JavascriptExecutor) driver).executeScript("window.top.scroll(" + Math.max(element.getLocation().x - 200, 0) + "," + Math.max(element.getLocation().y + yOffset, 0) + ")");
+		}
 	}
 	
 	/**
