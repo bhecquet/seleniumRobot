@@ -22,6 +22,7 @@ import java.io.IOException;
 import org.apache.commons.io.FileUtils;
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.firefox.FirefoxDriverLogLevel;
 import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.firefox.FirefoxProfile;
 import org.openqa.selenium.firefox.GeckoDriverService;
@@ -55,6 +56,7 @@ public class FirefoxCapabilitiesFactory extends IDesktopCapabilityFactory {
         FirefoxProfile profile = getFirefoxProfile(webDriverConfig);
         configProfile(profile, webDriverConfig);
         options.setCapability(FirefoxDriver.PROFILE, profile);
+//        options.setLogLevel(FirefoxDriverLogLevel.TRACE);
         return options;
 	}
 	
