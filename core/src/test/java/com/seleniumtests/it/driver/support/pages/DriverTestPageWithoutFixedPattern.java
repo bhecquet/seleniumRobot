@@ -39,12 +39,19 @@ public class DriverTestPageWithoutFixedPattern extends PageObject {
 	public static final PictureElement googleForDesktop = new PictureElement("picture", "tu/googleSearch.png", null);
 	public static final TextFieldElement logoText = new TextFieldElement("logoText", By.id("logoText"));
 	
+	private String openedPageUrl;
+	
 	public DriverTestPageWithoutFixedPattern() throws Exception {
         super(textElement);
     }
     
     public DriverTestPageWithoutFixedPattern(boolean openPageURL) throws Exception {
         super(textElement, openPageURL ? getPageUrl() : null);
+    }
+
+    public DriverTestPageWithoutFixedPattern(boolean openPageURL, String url) throws Exception {
+    	super(textElement, openPageURL ? url : null);
+    	openedPageUrl = url;
     }
     
     //for TestInterceptPage (the loader page of By has to be a PageObject)
@@ -59,4 +66,8 @@ public class DriverTestPageWithoutFixedPattern extends PageObject {
 			return "file:///" + Thread.currentThread().getContextClassLoader().getResource("tu/testWithoutFixedPattern.html").getFile();
 		}
     }
+    
+	public String getOpenedPageUrl() {
+		return openedPageUrl;
+	}
 }

@@ -175,6 +175,11 @@ $(document).ready(function(){
   $("#button").click(function(){
     $("div").animate({left:'1450px'}, 600);
   });
+  $(document).click(function(e) {
+	var x = e.pageX;
+	var y = e.pageY;
+    console.log("click at: " + x + "-" + y);
+  });
 });
 
 function addText(id, text) {

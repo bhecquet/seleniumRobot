@@ -17,13 +17,11 @@
 package com.seleniumtests.it.driver;
 
 import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.it.driver.support.GenericMultiBrowserTest;
-import com.seleniumtests.it.driver.support.pages.DriverTestPage;
 
 /**
  * Checks that it's possible to interact with elements in iframe
@@ -32,17 +30,13 @@ import com.seleniumtests.it.driver.support.pages.DriverTestPage;
  */
 public class TestFrame extends GenericMultiBrowserTest {
 
-	public TestFrame(WebDriver driver, DriverTestPage testPage) throws Exception {
-		super(driver, testPage);
-	}
-	
 	public TestFrame(BrowserType browserType) throws Exception {
-		super(browserType); 
+		super(browserType, "DriverTestPage"); 
 	}
 	
 	public TestFrame() throws Exception {
 //		super(BrowserType.FIREFOX); 
-		super(null);
+		super(null, "DriverTestPage");
 	}
 	
 	

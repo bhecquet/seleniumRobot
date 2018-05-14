@@ -44,11 +44,11 @@ public class TestDriver extends GenericMultiBrowserTest {
 	}
 	
 	public TestDriver(BrowserType browserType) throws Exception {
-		super(browserType); 
+		super(browserType, "DriverTestPage"); 
 	}
 	
 	public TestDriver() throws Exception {
-		super(null);
+		super(null, "DriverTestPage");
 	}
 	
 	

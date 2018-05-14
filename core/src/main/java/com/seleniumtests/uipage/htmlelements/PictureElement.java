@@ -23,6 +23,7 @@ import java.time.Duration;
 import javax.swing.ImageIcon;
 
 import org.apache.commons.io.FileUtils;
+import org.openqa.selenium.By;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.Rectangle;
 import org.openqa.selenium.WebDriverException;
@@ -31,9 +32,11 @@ import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.events.EventFiringWebDriver;
 import org.openqa.selenium.support.ui.SystemClock;
 
+import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.ImageSearchException;
 import com.seleniumtests.customexception.ScenarioException;
+import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.driver.screenshots.ScreenshotUtil;
@@ -86,8 +89,17 @@ public class PictureElement {
 	 * @param intoElement	HtmlElement inside of which our picture is. It allows scrolling to the zone where 
 	 * 						picture is searched before doing capture
 	 */
-	public PictureElement(String label, File pictureFile, HtmlElement intoElement, double detectionThreshold) {
-		this.intoElement = intoElement;
+	public PictureElement(String label, File pictureFile, HtmlElement intoElement, double detectionThreshold) {		
+		if (intoElement == null) {
+			if (SeleniumTestsContextManager.isWebTest()) {
+				this.intoElement = new HtmlElement("", By.tagName("body"));
+			} else {
+				this.intoElement = new HtmlElement("", By.xpath("/*"));
+			}
+		} else {
+			this.intoElement = intoElement;
+		}
+		
 		detector = new ImageDetector();
 		detector.setDetectionThreshold(detectionThreshold);
 		setObjectPictureFile(pictureFile);
@@ -130,9 +142,9 @@ public class PictureElement {
 		pictureSizeRatio = detector.getSizeRatio();
 		
 		// scroll to element where our picture is so that we will be able to act on it
+		// scrolling will display, on top of window, the top of the element
 		if (intoElement != null) {
-			ImageIcon image = new ImageIcon(objectPictureFile.getAbsolutePath());
-			intoElement.scrollToElement(200 + image.getIconHeight());
+			intoElement.scrollToElement(0);
 		}
 	}
 
@@ -153,7 +165,7 @@ public class PictureElement {
 	@ReplayOnError
 	public void clickAt(int xOffset, int yOffset) {
 		findElement(true);
-		
+
 		Point intoElementPos = intoElement.getCoordinates().onPage();
 		int relativeX = detectedObjectRectangle.x + detectedObjectRectangle.width / 2 - intoElementPos.x;
 		int relativeY = detectedObjectRectangle.y + detectedObjectRectangle.height / 2 - intoElementPos.y;
@@ -186,6 +198,14 @@ public class PictureElement {
 	}
 	
 	public void moveAndClick(WebElement element, int coordX, int coordY) {
+		// issue #133: handle new actions specific case
+		// more browsers will be added to this conditions once they are migrated to new composite actions
+		// 
+		if (SeleniumTestsContextManager.isWebTest() && SeleniumTestsContextManager.getThreadContext().getBrowser() == BrowserType.FIREFOX) {
+			coordX -= element.getSize().width / 2;
+			coordY -= element.getSize().height / 2;
+		}
+		
 		new Actions(driver).moveToElement(element, coordX, coordY).click().build().perform();
 	}
 	

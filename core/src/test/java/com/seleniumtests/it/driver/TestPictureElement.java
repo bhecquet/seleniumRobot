@@ -18,67 +18,64 @@ package com.seleniumtests.it.driver;
 
 import org.openqa.selenium.WebDriver;
 import org.testng.Assert;
-import org.testng.ITestContext;
 import org.testng.SkipException;
 import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import com.seleniumtests.GenericTest;
-import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.ImageSearchException;
-import com.seleniumtests.driver.TestType;
-import com.seleniumtests.driver.WebUIDriver;
+import com.seleniumtests.driver.BrowserType;
+import com.seleniumtests.it.driver.support.GenericMultiBrowserTest;
+import com.seleniumtests.it.driver.support.pages.DriverTestPage;
 import com.seleniumtests.it.driver.support.pages.DriverTestPageWithoutFixedPattern;
 
-public class TestPictureElement extends GenericTest {
+public class TestPictureElement extends GenericMultiBrowserTest {
 	
-	private static WebDriver driver;
-	private static DriverTestPageWithoutFixedPattern testPage;
+	public TestPictureElement(WebDriver driver, DriverTestPage testPage) throws Exception {
+		super(driver, testPage);
+	}
+	
+	public TestPictureElement(BrowserType browserType) throws Exception {
+		super(browserType, "DriverTestPageWithoutFixedPattern"); 
+	}
 	
 	public TestPictureElement() throws Exception {
-	}
-	
-	public TestPictureElement(WebDriver driver, DriverTestPageWithoutFixedPattern testPage) throws Exception {
-		TestPictureElement.driver = driver;
-		TestPictureElement.testPage = testPage;
-	}
-
-	@BeforeClass(groups={"it"})
-	public void initDriver(final ITestContext testNGCtx) throws Exception {
-		initThreadContext(testNGCtx);
-		SeleniumTestsContextManager.getThreadContext().setBrowser("chrome");
-		SeleniumTestsContextManager.getThreadContext().setExplicitWaitTimeout(2);
-		testPage = new DriverTestPageWithoutFixedPattern(true);
-		driver = WebUIDriver.getWebDriver(true);
-	}
-	
-	@BeforeMethod(groups={"it"}) 
-	public void initMethod() {
-		SeleniumTestsContextManager.getThreadContext().setTestType(TestType.WEB);
+		super(null, "DriverTestPageWithoutFixedPattern");
 	}
 	
 	@AfterMethod(groups={"it"})
 	public void reset() {
-		testPage.logoText.clear();
+		testPageWithoutPattern.logoText.clear();
+		testPageWithoutPattern.textElement.clear();
 	}
 	
 	@Test(groups={"it"})
 	public void testClickOnPicture() {
 		try {
-			testPage.picture.clickAt(0, -20);
+			testPageWithoutPattern.picture.clickAt(0, -20);
 		} catch (ImageSearchException e) {
 			throw new SkipException("Image not found, we may be on screenless slave", e);
 		}
 		Assert.assertEquals(testPage.logoText.getValue(), "ff logo");
 	}
 	
+	/**
+	 * test correction of issue #131 by clicking on element which does not have a "intoElement" parameter
+	 */
+	@Test(groups={"it"})
+	public void testClickOnGooglePicture() {
+		try {
+			testPageWithoutPattern.googleForDesktop.click();
+		} catch (ImageSearchException e) {
+			throw new SkipException("Image not found, we may be on screenless slave", e);
+		}
+		Assert.assertEquals(testPage.textElement.getValue(), "image");
+	}
+	
 	@Test(groups={"it"})
 	public void testSendKeysOnPicture() {
 		try {
-			testPage.logoText.clear();
-			testPage.picture.sendKeys("hello", 0, 40);
+			testPageWithoutPattern.logoText.clear();
+			testPageWithoutPattern.picture.sendKeys("hello", 0, 40);
 		} catch (ImageSearchException e) {
 			throw new SkipException("Image not found, we may be on screenless slave", e);
 		}
@@ -87,17 +84,17 @@ public class TestPictureElement extends GenericTest {
 
 	@Test(groups={"it"})
 	public void testIsVisible() { 
-		Assert.assertTrue(testPage.picture.isElementPresent());
+		Assert.assertTrue(testPageWithoutPattern.picture.isElementPresent());
 	}
 	
 	@Test(groups={"it"})
 	public void testIsVisibleOnDesktop() {
-		Assert.assertTrue(testPage.googleForDesktop.isElementPresentOnDesktop());
+		Assert.assertTrue(testPageWithoutPattern.googleForDesktop.isElementPresentOnDesktop());
 	}
 	
 	@Test(groups={"it"})
 	public void testIsNotVisible() {
-		Assert.assertFalse(testPage.pictureNotPresent.isElementPresent());
+		Assert.assertFalse(testPageWithoutPattern.pictureNotPresent.isElementPresent());
 	}
 	
 	
