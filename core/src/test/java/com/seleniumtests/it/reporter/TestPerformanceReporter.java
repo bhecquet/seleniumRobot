@@ -119,4 +119,19 @@ public class TestPerformanceReporter extends ReporterTest {
 			System.clearProperty("customTestReports");
 		}
 	}
+	
+	/**
+	 * Test that performance reporter is correctly encoded
+	 * @param testContext
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testXmlCharacterEscape(ITestContext testContext) throws Exception {
+		executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForEncoding"});
+		
+		String detailedReportContent = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testAndSubActions", "PERF-result.xml").toFile());
+		
+		// check step 1 has been encoded
+		Assert.assertTrue(detailedReportContent.contains("name=\"Step 1: step 1 &lt;&gt;&quot;&apos;&amp;/\""));
+	}
 }

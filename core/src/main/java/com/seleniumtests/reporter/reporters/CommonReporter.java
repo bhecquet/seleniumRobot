@@ -24,19 +24,13 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.Writer;
-import java.util.ArrayList;
 import java.util.GregorianCalendar;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
+import org.apache.commons.text.StringEscapeUtils;
 import org.apache.log4j.Logger;
 import org.apache.velocity.app.VelocityEngine;
 import org.testng.ITestResult;
 
-import com.seleniumtests.reporter.logger.TestLogging;
-import com.seleniumtests.reporter.logger.TestStep;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
 public abstract class CommonReporter {
@@ -108,7 +102,7 @@ public abstract class CommonReporter {
 	 * @param contentBuffer
 	 */
 	public static void generateTheStackTrace(final Throwable exception, final String title, final StringBuilder contentBuffer) {
-		contentBuffer.append(exception.getClass() + ": " + title + "\n");
+		contentBuffer.append(exception.getClass() + ": " + StringEscapeUtils.escapeHtml4(title) + "\n");
 
 		StackTraceElement[] s1 = exception.getStackTrace();
 		Throwable t2 = exception.getCause();
@@ -118,7 +112,7 @@ public abstract class CommonReporter {
 		for (int x = 0; x < s1.length; x++) {
 			String message = filterStackTrace(s1[x].toString());
 			if (message != null) {
-				contentBuffer.append("\nat " + message);
+				contentBuffer.append("\nat " + StringEscapeUtils.escapeHtml4(message));
 			}
 		}
 
