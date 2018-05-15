@@ -115,14 +115,27 @@ public class CustomReporter extends CommonReporter implements IReporter {
 			Template t = ve.getTemplate(reportInfo.getTemplatePath());
 			VelocityContext context = new VelocityContext();
 			
+			String reportFormat = reportInfo.getExtension().substring(1);
 			Long testDuration = 0L;
 			Integer errors = 0;
 			List<TestStep> testSteps = TestLogging.getTestsSteps().get(testResult);
+			List<TestStep> newTestSteps = new ArrayList<>();
 			if (testSteps != null) {
 				for (TestStep step: testSteps) {
 					testDuration += step.getDuration();
 					if (step.getFailed()) {
 						errors++;
+					}
+					
+					// encode each step
+					if ("xml".equalsIgnoreCase(reportFormat.toLowerCase()) 
+							|| "json".equalsIgnoreCase(reportFormat.toLowerCase())
+							|| "html".equalsIgnoreCase(reportFormat.toLowerCase())
+							|| "csv".equalsIgnoreCase(reportFormat.toLowerCase())
+							) {
+						newTestSteps.add(step.encode(reportFormat.toLowerCase()));
+					} else {
+						newTestSteps.add(step);
 					}
 				}
 			}
@@ -141,10 +154,10 @@ public class CustomReporter extends CommonReporter implements IReporter {
 			context.put("hostname", testResult.getHost() == null ? "": testResult.getHost());
 			context.put("suiteName", testResult.getAttribute(SeleniumRobotLogger.UNIQUE_METHOD_NAME));
 			context.put("className", testResult.getTestClass().getName());
-			context.put("tests", testSteps == null ? 0: testSteps.size());
+			context.put("tests", newTestSteps == null ? 0: newTestSteps.size());
 			context.put("duration", testDuration / 1000.0);
 			context.put("time", testResult.getStartMillis());	
-			context.put("testSteps", testSteps);	
+			context.put("testSteps", newTestSteps);	
 			context.put("browser", SeleniumTestsContextManager.getThreadContext().getBrowser());	
 			context.put("version", SeleniumTestsContextManager.getApplicationVersion());	
 			context.put("parameters", SeleniumTestsContextManager.getThreadContext().getContextDataMap());
