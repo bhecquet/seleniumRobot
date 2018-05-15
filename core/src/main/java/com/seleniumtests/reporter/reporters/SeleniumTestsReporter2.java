@@ -35,6 +35,7 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.text.StringEscapeUtils;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
@@ -152,16 +153,17 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 			
 			for (TestStep testStep: testSteps) {
 				
+				TestStep encodedTestStep = testStep.encode("html");
 				// step status
-				if (testStep.getFailed()) {
+				if (encodedTestStep.getFailed()) {
 					context.put(STATUS, FAILED_TEST);
 				} else {
 					context.put(STATUS, PASSED_TEST);
 				}
 				
-				context.put("stepName", testStep.getName());
-				context.put("stepDuration", testStep.getDuration() / (double)1000);
-				context.put("step", testStep);	
+				context.put("stepName", encodedTestStep.getName());
+				context.put("stepDuration", encodedTestStep.getDuration() / (double)1000);
+				context.put("step", encodedTestStep);	
 				
 				StringWriter writer = new StringWriter();
 				t.merge( context, writer );
@@ -192,6 +194,7 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 				logs = "";
 			}
 			
+			
 			// exception handling
 			String[] stack = null;
 			if (testResult.getThrowable() != null) {
@@ -200,7 +203,11 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 				stack = stackString.toString().split("\n");
 			}
 			
-			String[] logLines = logs.split("\n");
+			// encode logs
+			List<String> logLines = new ArrayList<>();
+			for (String line: logs.split("\n")) {
+				logLines.add(StringEscapeUtils.escapeHtml4(line));
+			}
 			context.put(STATUS, getTestStatus(testResult));
 			context.put("stacktrace", stack);
 			context.put("logs", logLines);

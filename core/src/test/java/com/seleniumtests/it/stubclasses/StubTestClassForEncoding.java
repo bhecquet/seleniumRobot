@@ -21,6 +21,7 @@ import java.util.ArrayList;
 
 import org.testng.annotations.Test;
 
+import com.seleniumtests.customexception.DriverExceptions;
 import com.seleniumtests.reporter.logger.TestAction;
 import com.seleniumtests.reporter.logger.TestLogging;
 import com.seleniumtests.reporter.logger.TestMessage;
@@ -35,6 +36,14 @@ public class StubTestClassForEncoding extends StubParentClass {
 		step1.addAction(new TestAction("click button  <>\"'&", false, new ArrayList<>()));
 		step1.addMessage(new TestMessage("a message <>\"'&", MessageType.LOG));
 		TestLogging.logTestStep(step1);
+	}
+	
+	@Test(groups="stub")
+	public void testWithException() {
+		TestStep step1 = new TestStep("step 1", TestLogging.getCurrentTestResult(), new ArrayList<>());
+		step1.addAction(new TestAction("click button", false, new ArrayList<>()));
+		TestLogging.logTestStep(step1);
+		throw new DriverExceptions("some exception with <strong><a href='http://someurl/link' style='background-color: red;'>HTML to encode</a></strong>");
 	}
 
 }

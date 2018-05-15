@@ -725,4 +725,30 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		mainReportContent = mainReportContent.replace("\n", "").replace("\r",  "");
 		Assert.assertTrue(mainReportContent.matches(".*<a href\\='core_3/TestReport\\.html'.*?>core_3</a>.*"));
 	}
+	
+
+	/**
+	 * Test that HTML report is correctly encoded
+	 * @param testContext
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testHtmlCharacterEscape(ITestContext testContext) throws Exception {
+		executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForEncoding"});
+		
+		String detailedReportContent = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testWithException", "TestReport.html").toFile());
+		detailedReportContent = detailedReportContent.replace("\n", "").replace("\r",  "").replaceAll(">\\s+<", "><");
+		
+		// check step 1 has been encoded
+		Assert.assertTrue(detailedReportContent.contains("<div class=\"message-log\">Test is KO with error: some exception with &lt;strong&gt;&lt;a href='http://someurl/link' style='background-color: red;'&gt;HTML to encode&lt;/a&gt;&lt;/strong&gt;"));
+		
+		// check logs are also encoded
+		Assert.assertTrue(detailedReportContent.contains("[main] TestLogging: Test is KO with error: some exception with &lt;strong&gt;&lt;a href='http://someurl/link' style='background-color: red;'&gt;HTML to encode&lt;/a&gt;&lt;/strong&gt;"));
+		
+		// check exception stack trace is encoded
+		Assert.assertTrue(detailedReportContent.contains("class com.seleniumtests.customexception.DriverExceptions: some exception with &lt;strong&gt;&lt;a href='http://someurl/link' style='background-color: red;'&gt;HTML to encode&lt;/a&gt;&lt;/strong&gt;"));
+		
+		// check no HTML code remains in file
+		Assert.assertFalse(detailedReportContent.contains("<strong>"));
+	}
 }
