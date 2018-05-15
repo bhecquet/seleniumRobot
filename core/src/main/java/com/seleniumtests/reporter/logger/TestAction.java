@@ -71,6 +71,10 @@ public class TestAction {
 		return failed;
 	}
 
+	public List<String> getPwdToReplace() {
+		return pwdToReplace;
+	}
+
 	public void setFailed(Boolean failed) {
 		this.failed = failed;
 	}
