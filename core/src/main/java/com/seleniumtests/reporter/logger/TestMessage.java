@@ -55,7 +55,9 @@ public class TestMessage extends TestAction {
 	@Override
 	public TestMessage encode(String format) {
 		TestMessage msg = new TestMessage(encodeString(name, format), messageType);
+		msg.pwdToReplace = new ArrayList<>(pwdToReplace);
 		msg.encoded = true;
+		msg.actionException = actionException;
 		return msg;
 	}
 }

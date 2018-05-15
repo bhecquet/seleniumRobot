@@ -642,7 +642,6 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		// Check error is present is Last test step
 		Assert.assertTrue(detailedReportContent.contains("<div class=\"box-body\"><ul><div class=\"message-log\">Test is KO with error: error</div>"));
 		
-		// /!\: lines in error message may change
 		// Check exception is logged and filtered
 		Assert.assertTrue(detailedReportContent.matches(".*<div class=\"message-error\"><div>class java.lang.AssertionError: error</div>"
 								+ "<div class=\"stack-element\"></div>"
@@ -652,6 +651,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 								+ "<div class=\"stack-element\">at com.seleniumtests.it.reporter.ReporterTest.executeSubTest\\(ReporterTest.java:\\d+\\)</div>"
 								+ "<div class=\"stack-element\">at com.seleniumtests.it.reporter.TestSeleniumTestsReporter2.testReportDetailsWithErrors\\(TestSeleniumTestsReporter2.java:\\d+\\)</div>.*"));
 		
+		// error message of the assertion is displayed in step
 		Assert.assertTrue(detailedReportContent.contains("</ul><div class=\"message-error\">				java.lang.AssertionError: error			</div></div>"));
 		
 		// check that when test is KO, error cause is displayed

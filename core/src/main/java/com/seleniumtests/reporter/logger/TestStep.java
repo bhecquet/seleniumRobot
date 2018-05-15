@@ -234,10 +234,13 @@ public class TestStep extends TestAction {
 			step.stepActions.add(testAction.encode(format));
 		}
 		
+		step.failed = failed;
 		step.snapshots = new ArrayList<>(snapshots);
 		step.encoded = true;
 		step.duration = duration;
 		step.startDate = startDate;
+		step.harCapture = harCapture;
+		step.actionException = actionException;
 		return step;
 	}
 	

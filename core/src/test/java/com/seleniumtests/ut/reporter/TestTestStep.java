@@ -256,6 +256,44 @@ public class TestTestStep extends GenericTest {
 		Assert.assertEquals("Step step1 &quot;&apos;&lt;&gt;&amp;", encodedTestStep.toString());
 	}
 	
+	/**
+	 * check failed status is kept
+	 */
+	@Test(groups={"ut"})
+	public void testTestStepEncodeXmlStatusFailed() {
+		TestStep step = new TestStep("step1 \"'<>&", null, new ArrayList<>());
+		step.setFailed(true);
+		TestStep encodedTestStep = step.encode("xml");
+		Assert.assertTrue(encodedTestStep.getFailed());
+	}
+	
+	@Test(groups={"ut"})
+	public void testTestStepEncodeXmlPasswordKept() {
+		TestStep step = new TestStep("step1 \"'<>&", null, Arrays.asList("myPassword"));
+		TestStep encodedTestStep = step.encode("xml");
+		Assert.assertTrue(encodedTestStep.getPwdToReplace().contains("myPassword"));
+	}
+	
+	@Test(groups={"ut"})
+	public void testTestStepEncodeXmlExceptionKept() {
+		TestStep step = new TestStep("step1 \"'<>&", null, new ArrayList<>());
+		step.setActionException(new Throwable());
+		TestStep encodedTestStep = step.encode("xml");
+		Assert.assertNotNull(encodedTestStep.getActionException());
+	}
+	
+	@Test(groups={"ut"})
+	public void testTestStepEncodeXmlHarKept() throws IOException {
+		Har har = new Har(new HarLog());
+		har.getLog().addPage(new HarPage("title", "a title"));
+		HarCapture cap = new HarCapture(har);
+		
+		TestStep step = new TestStep("step1 \"'<>&", null, new ArrayList<>());
+		step.setHarCapture(cap);
+		TestStep encodedTestStep = step.encode("xml");
+		Assert.assertEquals(encodedTestStep.getHarCapture(), cap);
+	}
+	
 	@Test(groups={"ut"})
 	public void testTestMessageEncodeXml() {
 		TestMessage msg = new TestMessage("everything OK \"'<>&", MessageType.INFO);
@@ -264,10 +302,47 @@ public class TestTestStep extends GenericTest {
 	}
 	
 	@Test(groups={"ut"})
+	public void testTestMessageEncodeXmlErrorMessage() {
+		TestMessage msg = new TestMessage("everything OK \"'<>&", MessageType.ERROR);
+		TestMessage encodedMsg = msg.encode("xml");
+		Assert.assertTrue(encodedMsg.getFailed());
+	}
+
+	@Test(groups={"ut"})
+	public void testTestMessageEncodeXmlPasswordKept() {
+		TestMessage msg = new TestMessage("everything OK \"'<>&", MessageType.INFO);
+		msg.getPwdToReplace().add("myPassword");
+		TestMessage encodedMsg = msg.encode("xml");
+		Assert.assertTrue(encodedMsg.getPwdToReplace().contains("myPassword"));
+	}
+	
+	@Test(groups={"ut"})
 	public void testTestActionEncodeXml() {
 		TestAction action = new TestAction("action2 \"'<>&", false, new ArrayList<>());
 		TestAction encodedAction = action.encode("xml");
 		Assert.assertEquals("action2 &quot;&apos;&lt;&gt;&amp;", encodedAction.toString());
+	}
+	
+	@Test(groups={"ut"})
+	public void testTestActionEncodeXmlFailedStatus() {
+		TestAction action = new TestAction("action2 \"'<>&", true, new ArrayList<>());
+		TestAction encodedAction = action.encode("xml");
+		Assert.assertTrue(encodedAction.getFailed());
+	}
+	
+	@Test(groups={"ut"})
+	public void testTestActionEncodeXmlPasswordKept() {
+		TestAction action = new TestAction("action2 \"'<>&", false, Arrays.asList("myPassword"));
+		TestAction encodedAction = action.encode("xml");
+		Assert.assertTrue(encodedAction.getPwdToReplace().contains("myPassword"));
+	}
+	
+	@Test(groups={"ut"})
+	public void testTestActionEncodeXmlExceptionKept() {
+		TestAction action = new TestAction("action2 \"'<>&", false, new ArrayList<>());
+		action.setActionException(new Throwable());
+		TestAction encodedAction = action.encode("xml");
+		Assert.assertNotNull(encodedAction.getActionException());
 	}
 	
 	@Test(groups={"ut"})
