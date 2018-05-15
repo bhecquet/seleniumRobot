@@ -147,9 +147,32 @@ public class TestCustomReporter extends ReporterTest {
 	@Test(groups={"it"})
 	public void testXmlCharacterEscape(ITestContext testContext) throws Exception {
 		try {
-			System.setProperty("customSummaryReports", "SUP::xml::reporter/templates/report.supervision.vm");
+			System.setProperty("customTestReports", "SUP::xml::reporter/templates/report.supervision.vm");
 			
 			executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForEncoding"});
+			
+			String detailedReportContent = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testAndSubActions", "SUP-result.xml").toFile());
+			
+			// check step 1 has been encoded
+			Assert.assertTrue(detailedReportContent.contains("<name>step 1 &lt;&gt;&quot;&apos;&amp;/</name>"));
+			
+		} finally {
+			System.clearProperty("customSummaryReports");
+		}
+	}
+	
+	@Test(groups={"it"})
+	public void testJsonCharacterEscape(ITestContext testContext) throws Exception {
+		try {
+			System.setProperty("customTestReports", "SUP::json::ti/report.test.vm");
+			
+			executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForEncoding"});
+			
+			String detailedReportContent = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testAndSubActions", "SUP-result.json").toFile());
+			
+			// check step 1 has been encoded
+			Assert.assertTrue(detailedReportContent.contains("Step step 1 <>\\\\\"'&\\\\/\\\\nclick button  <>\\\\\"'&\\\\na message <>\\\\\"'&"));
+			
 		} finally {
 			System.clearProperty("customSummaryReports");
 		}
