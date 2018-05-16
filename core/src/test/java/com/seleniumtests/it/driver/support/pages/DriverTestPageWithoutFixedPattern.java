@@ -16,6 +16,8 @@
  */
 package com.seleniumtests.it.driver.support.pages;
 
+import java.nio.file.Paths;
+
 import org.openqa.selenium.By;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
@@ -37,6 +39,7 @@ public class DriverTestPageWithoutFixedPattern extends PageObject {
 	public static final PictureElement picture = new PictureElement("picture", "tu/images/logo_text_field.png", table);
 	public static final PictureElement pictureNotPresent = new PictureElement("picture", "tu/images/vosAlertes.png", table);
 	public static final PictureElement googleForDesktop = new PictureElement("picture", "tu/googleSearch.png", null);
+	public static final PictureElement googleForDesktopWithFile = new PictureElement("picture", Paths.get(SeleniumTestsContextManager.getApplicationDataPath(), "images", "googleSearch.png").toFile(), null);
 	public static final TextFieldElement logoText = new TextFieldElement("logoText", By.id("logoText"));
 	
 	private String openedPageUrl;

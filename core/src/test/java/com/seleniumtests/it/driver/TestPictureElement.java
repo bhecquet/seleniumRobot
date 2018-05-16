@@ -71,6 +71,19 @@ public class TestPictureElement extends GenericMultiBrowserTest {
 		Assert.assertEquals(testPage.textElement.getValue(), "image");
 	}
 	
+	/**
+	 * test correction of issue #134 by clicking on element defined by a File object
+	 */
+	@Test(groups={"it"})
+	public void testClickOnGooglePictureFromFile() {
+		try {
+			testPageWithoutPattern.googleForDesktopWithFile.click();
+		} catch (ImageSearchException e) {
+			throw new SkipException("Image not found, we may be on screenless slave", e);
+		}
+		Assert.assertEquals(testPage.textElement.getValue(), "image");
+	}
+	
 	@Test(groups={"it"})
 	public void testSendKeysOnPicture() {
 		try {
