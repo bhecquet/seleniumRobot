@@ -75,7 +75,6 @@ public class PictureElement {
 	public PictureElement(String label, String resourcePath, HtmlElement intoElement, double detectionThreshold) {
 		this(label, createFileFromResource(resourcePath), intoElement, detectionThreshold);
 		this.resourcePath = resourcePath;
-		driver = (EventFiringWebDriver)WebUIDriver.getWebDriver();
 	}
 	
 	public PictureElement(String label, File pictureFile, HtmlElement intoElement) {
@@ -104,6 +103,8 @@ public class PictureElement {
 		detector.setDetectionThreshold(detectionThreshold);
 		setObjectPictureFile(pictureFile);
 		screenshotUtil = new ScreenshotUtil();
+		
+		driver = (EventFiringWebDriver)WebUIDriver.getWebDriver();
 	}
 	
 	private static File createFileFromResource(String resource)  {
