@@ -127,19 +127,19 @@ public class OSUtilityUnix extends OSUtility {
 		String chromeLocation = OSCommand.executeCommandAndWait("which google-chrome").trim();
 		String chromiumLocation = OSCommand.executeCommandAndWait("which chromium-browser").trim();
 		
-		if (!firefoxLocation.isEmpty() && !firefoxLocation.contains("bin/which")) {
+		if (!firefoxLocation.isEmpty() && !firefoxLocation.contains("which:")) {
 			String version = getFirefoxVersion("firefox");
 			browserList.put(BrowserType.FIREFOX, Arrays.asList(new BrowserInfo(BrowserType.FIREFOX, extractFirefoxVersion(version), firefoxLocation)));
 			
-		} else if (!iceweaselLocation.isEmpty() && !iceweaselLocation.contains("bin/which")) {
+		} else if (!iceweaselLocation.isEmpty() && !iceweaselLocation.contains("which:")) {
 			String version = getFirefoxVersion("iceweasel");
 			browserList.put(BrowserType.FIREFOX, Arrays.asList(new BrowserInfo(BrowserType.FIREFOX, extractFirefoxVersion(version), iceweaselLocation)));
 		}
-		if (!chromiumLocation.isEmpty() && !chromiumLocation.contains("bin/which")) {
+		if (!chromiumLocation.isEmpty() && !chromiumLocation.contains("which:")) {
 			String version = getChromeVersion("chromium-browser");
 			browserList.put(BrowserType.CHROME, Arrays.asList(new BrowserInfo(BrowserType.CHROME, extractChromiumVersion(version), chromiumLocation)));
 			
-		} else if (!chromeLocation.isEmpty() && !chromeLocation.contains("bin/which")) {
+		} else if (!chromeLocation.isEmpty() && !chromeLocation.contains("which:")) {
 			String version = getChromeVersion("google-chrome");
 			browserList.put(BrowserType.CHROME, Arrays.asList(new BrowserInfo(BrowserType.CHROME, extractChromeVersion(version), chromeLocation)));
 		} 
