@@ -27,6 +27,7 @@ for the remainder, we use a unique name for that new application `appName`<br/>
 			</exclusion>
 		</exclusions>
 	</dependency>
+- else, install ojdbc via `mvn install:install-file -DgroupId=com.oracle -DartifactId=ojdbc6 -Dversion=11.2.0 -Dpackaging=jar -DcreateChecksum=true -Dfile=<path_to_ojdb6.jar>`
 	
 - execute it
 
@@ -284,6 +285,16 @@ For tests extending SeleniumTestPlan, the testNg XML looks like (minimal require
 	</suite>
 	
 For more information on execution order of TestNG annotations, see [https://stackoverflow.com/questions/30587454/difference-between-beforeclass-and-beforetest-in-testng] (https://stackoverflow.com/questions/30587454/difference-between-beforeclass-and-beforetest-in-testng)
+
+#### Access some path on disk ####
+
+When you want to access a file on seleniumRobot path (for example, a file you put in data), you cas access relative path using `SeleniumTestsContextManager` static methods
+
+- `SeleniumTestsContextManager.getApplicationDataPath()` => <seleniumRobot path>/data/<application>
+- `SeleniumTestsContextManager.getConfigPath()` => <seleniumRobot path>/data/<application>/config
+- `SeleniumTestsContextManager.getFeaturePath()` => <seleniumRobot path>/data/<application>/features
+- `SeleniumTestsContextManager.getDataPath()` => <seleniumRobot path>/data/
+- `SeleniumTestsContextManager.getRootPath()` => <seleniumRobot path>
 
 ### 4 Write a cucumber test ###
 Cucumber styled tests rely on a `.feature` file where each test step is defined. Look at [https://cucumber.io/docs/reference](https://cucumber.io/docs/reference) for more information about writing a feature file.

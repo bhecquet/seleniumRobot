@@ -372,6 +372,21 @@ public class TestDriver extends GenericMultiBrowserTest {
 	}
 	
 	/**
+	 * Force driver to use full keyboard typing when writing text instead of using copy-paste feature
+	 * @throws AWTException
+	 * @throws InterruptedException
+	 */
+	@Test(groups= {"it"})
+	public void testUploadFileWithRobotKeyboard() throws AWTException, InterruptedException {
+		String path = SeleniumTestsContextManager.getConfigPath() + File.separator + "config.ini";
+//		testPage.upload.click();
+		testPage.upload.clickAction(); // due to restrictions clicking a <input type="file"> element with firefox, use clickAction instead
+		((CustomEventFiringWebDriver)driver).uploadFileUsingKeyboardTyping(new File(path));
+		
+		Assert.assertEquals(testPage.uploadedFile.getAttribute("value"), "config.ini");
+	}
+	
+	/**
 	 * Test file upload with standard selenium method
 	 * @throws AWTException
 	 * @throws InterruptedException
