@@ -343,12 +343,10 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
 		}
 	}
 	
-	private void uploadFile(String fileName, String base64Content) throws IOException {
-		
-		byte[] byteArray = base64Content.getBytes();
-        File tempFile = new File("tmp/" + fileName);
-        byte[] decodeBuffer = Base64.decodeBase64(byteArray);
-        FileUtils.writeByteArrayToFile(tempFile, decodeBuffer);
+	/**
+	 * Use copy to clipboard and copy-paste keyboard shortcut to write something on upload window
+	 */
+	public void uploadFileUsingClipboard(File tempFile) {
 
 		// Copy to clipboard
 		Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(tempFile.getAbsolutePath()), null);
@@ -379,6 +377,50 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
 		} catch (AWTException e) {
 			throw new ScenarioException("could not initialize robot to upload file: " + e.getMessage());
 		}
+	}
+	
+	/**
+	 * Upload file typing file path directly
+	 * @param tempFile
+	 */
+	public void uploadFileUsingKeyboardTyping(File tempFile) {
+		try {
+			Keyboard keyboard = new Keyboard();
+			Robot robot = keyboard.getRobot();
+			
+			WaitHelper.waitForSeconds(1);
+			
+			// Press Enter
+			robot.keyPress(KeyEvent.VK_ENTER);
+	
+			// Release Enter
+			robot.keyRelease(KeyEvent.VK_ENTER);
+			
+			keyboard.typeKeys(tempFile.getAbsolutePath());
+			
+			WaitHelper.waitForSeconds(1);
+			
+			// Press Enter
+			robot.keyPress(KeyEvent.VK_ENTER);
+			robot.keyRelease(KeyEvent.VK_ENTER);
+			
+		} catch (AWTException e) {
+			throw new ScenarioException("could not initialize robot to upload file typing keys: " + e.getMessage());
+		}
+	}
+	
+	public void uploadFile(String fileName, String base64Content) throws IOException {
+		
+		byte[] byteArray = base64Content.getBytes();
+        File tempFile = new File("tmp/" + fileName);
+        byte[] decodeBuffer = Base64.decodeBase64(byteArray);
+        FileUtils.writeByteArrayToFile(tempFile, decodeBuffer);
+
+        try {
+        	uploadFileUsingClipboard(tempFile);
+        } catch (IllegalStateException e) {
+        	uploadFileUsingKeyboardTyping(tempFile);
+        }
 	}
 	
 	/**
