@@ -3,12 +3,14 @@ package com.seleniumtests.driver;
 import java.awt.AWTException;
 import java.awt.Robot;
 import java.awt.event.KeyEvent;
+import java.awt.im.InputContext;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
 
-import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
 public class Keyboard {
@@ -131,8 +133,16 @@ public class Keyboard {
     public Keyboard() throws AWTException{
         robot = new Robot();
         
-        // TODO: detect keyboard layout
-        strokeMap = strokeFrMap;
+        InputContext context = InputContext.getInstance(); 
+        String language = context.getLocale().getLanguage();
+        if (language.equals(new Locale("en").getLanguage())) {
+        	strokeMap = strokeUsMap;
+        } else if (language.equals(new Locale("fr").getLanguage())) {
+        	strokeMap = strokeFrMap;
+        } else {
+        	throw new ConfigurationException("only french and english keyboards are supported");
+        }
+		
         
     }
     
