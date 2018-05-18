@@ -153,10 +153,6 @@ public class Keyboard {
 	    }
     }
     
-    public void findMapping() {
-    	SeleniumTestsContextManager.getRootPath()()
-    }
-    
     private class KeyStroke{
         int code;
         boolean isShifted;
