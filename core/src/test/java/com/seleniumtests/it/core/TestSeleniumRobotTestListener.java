@@ -13,6 +13,7 @@ import java.util.Random;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.json.JSONObject;
 import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.TestNG;
@@ -28,73 +29,13 @@ import org.testng.xml.XmlTest;
 import com.seleniumtests.GenericTest;
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.customexception.ScenarioException;
+import com.seleniumtests.it.reporter.ReporterTest;
 import com.seleniumtests.reporter.logger.TestLogging;
 
-public class TestSeleniumRobotTestListener extends GenericTest {
+public class TestSeleniumRobotTestListener extends ReporterTest {
 
-	private TestNG executeSubTest(int threadCount, String[] testMethods, String cucumberTests) throws IOException {
-
-		XmlSuite suite = new XmlSuite();
-		suite.setName("TmpSuite");
-		suite.setParallel(ParallelMode.NONE);
-		suite.setFileName("/home/test/seleniumRobot/testng/testLoggging.xml");
-		Map<String, String> suiteParameters = new HashMap<>();
-		suiteParameters.put("softAssertEnabled", "false");
-		suiteParameters.put("cucumberPackage", "com.seleniumtests");
-		suite.setParameters(suiteParameters);
-		List<XmlSuite> suites = new ArrayList<XmlSuite>();
-		suites.add(suite);
-		
-		if (threadCount > 1) {
-			suite.setThreadCount(threadCount);
-			suite.setParallel(XmlSuite.ParallelMode.TESTS);
-		}
-		
-		// TestNG tests
-		for (String testMethod: testMethods) {
-			String className = testMethod.substring(0, testMethod.lastIndexOf("."));
-			String methodName = testMethod.substring(testMethod.lastIndexOf(".") + 1);
-
-			XmlTest test = new XmlTest(suite);
-			test.setName(String.format("%s_%d", methodName, new Random().nextInt()));
-			
-			test.addParameter(SeleniumTestsContext.BROWSER, "none");
-			List<XmlClass> classes = new ArrayList<XmlClass>();
-			XmlClass xmlClass = new XmlClass(className);
-			
-			List<XmlInclude> include = new ArrayList<>();
-			include.add(new XmlInclude(methodName));
-			xmlClass.setIncludedMethods(include);
-			classes.add(xmlClass);
-			test.setXmlClasses(classes) ;
-		}	
-		
-		// cucumber tests
-		if (!cucumberTests.isEmpty()) {
-			XmlTest test = new XmlTest(suite);
-			test.setName(String.format("cucumberTest_%d", new Random().nextInt()));
-			XmlPackage xmlPackage = new XmlPackage("com.seleniumtests.core.runner.*");
-			test.setXmlPackages(Arrays.asList(xmlPackage));
-			Map<String, String> parameters = new HashMap<>();
-			parameters.put("cucumberTests", cucumberTests);
-			parameters.put("cucumberTags", "");
-			test.setParameters(parameters);
-		}
-		
-		TestNG tng = new TestNG(false);
-		tng.setXmlSuites(suites);
-		tng.setOutputDirectory(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory());
-		tng.run(); 
-		
-		return tng;
-	}
-	
-	@BeforeMethod(groups={"it"})
-	public void setLogs(Method method, ITestContext context) throws IOException {
-		TestLogging.reset();
-		SeleniumTestsContext.resetOutputFolderNames();
-		FileUtils.deleteDirectory(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()));
-	}
+	private static final String DRIVER_BLOCKED_MSG = "Driver creation forbidden before @BeforeMethod and after @AfterMethod execution";
 	
 	/**
 	 * Test that 2 tests (1 cucumber and 1 TestNG) are correctly executed in parallel
@@ -107,7 +48,7 @@ public class TestSeleniumRobotTestListener extends GenericTest {
 	@Test(groups={"it"})
 	public void testMultiThreadTests(ITestContext testContext) throws Exception {
 		
-		executeSubTest(5, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass.testAndSubActions"}, "core_3,core_4");
+		executeSubTest(5, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass.testAndSubActions"}, "core_3,core_4", "");
 		
 		String mainReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport.html"));
 		Assert.assertTrue(mainReportContent.contains(">core_3</a>"));
@@ -126,7 +67,7 @@ public class TestSeleniumRobotTestListener extends GenericTest {
 	@Test(groups={"it"})
 	public void testContextWithDataProvider(ITestContext testContext) throws Exception {
 		
-		executeSubTest(5, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDataProvider.testMethod"}, "");
+		executeSubTest(5, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDataProvider.testMethod"}, "", "");
 		
 		String mainReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport.html"));
 		mainReportContent = mainReportContent.replace("\n", "").replace("\r",  "");
@@ -241,5 +182,227 @@ public class TestSeleniumRobotTestListener extends GenericTest {
 		
 		// test1Listener4 fails as expected
 		Assert.assertTrue(mainReportContent.matches(".*<i class\\=\"fa fa-circle circleSkipped\"></i><a href\\='test1Listener4/TestReport\\.html'.*?>test1Listener4</a>.*"));
+	}
+	
+	@Test(groups={"it"})
+	public void testContextDriverBlockingBeforeSuite(ITestContext testContext) throws Exception {
+		
+		try {
+			System.setProperty(SeleniumTestsContext.BROWSER, "htmlunit");
+			System.setProperty("startLocation", "beforeSuite");
+			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForListener5.test1Listener5",
+											"com.seleniumtests.it.stubclasses.StubTestClassForListener5.test2Listener5"}, "", "stub1");
+		} finally {
+			System.clearProperty(SeleniumTestsContext.BROWSER);
+		}
+		
+		String detailedReportContent1 = readTestMethodResultFile("test1Listener5");
+		Assert.assertTrue(detailedReportContent1.contains(DRIVER_BLOCKED_MSG));
+		Assert.assertFalse(detailedReportContent1.contains("start suite"));
+		Assert.assertFalse(detailedReportContent1.contains("start test"));
+		
+		String outDir = new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath();
+		JSONObject jsonResult = new JSONObject(FileUtils.readFileToString(Paths.get(outDir, "results.json").toFile()));
+		
+		// All tests should be skipped because configuration method is skipped
+		Assert.assertEquals(jsonResult.getInt("skip"), 2);
+	}
+	
+	@Test(groups={"it"})
+	public void testContextDriverBlockingBeforeTest(ITestContext testContext) throws Exception {
+		
+		try {
+			System.setProperty(SeleniumTestsContext.BROWSER, "htmlunit");
+			System.setProperty("startLocation", "beforeTest");
+			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForListener5.test1Listener5",
+			"com.seleniumtests.it.stubclasses.StubTestClassForListener5.test2Listener5"}, "", "stub1");
+		} finally {
+			System.clearProperty(SeleniumTestsContext.BROWSER);
+		}
+		
+		String detailedReportContent1 = readTestMethodResultFile("test1Listener5");
+		Assert.assertTrue(detailedReportContent1.contains(DRIVER_BLOCKED_MSG));
+		Assert.assertTrue(detailedReportContent1.contains("start suite"));
+		Assert.assertFalse(detailedReportContent1.contains("start test"));
+		
+
+		String outDir = new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath();
+		JSONObject jsonResult = new JSONObject(FileUtils.readFileToString(Paths.get(outDir, "results.json").toFile()));
+		
+		// All tests should be skipped because configuration method is skipped
+		Assert.assertEquals(jsonResult.getInt("skip"), 2);
+	}
+	
+	@Test(groups={"it"})
+	public void testContextDriverBlockingBeforeClass(ITestContext testContext) throws Exception {
+		
+		try {
+			System.setProperty(SeleniumTestsContext.BROWSER, "htmlunit");
+			System.setProperty("startLocation", "beforeClass");
+			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForListener5.test1Listener5",
+			"com.seleniumtests.it.stubclasses.StubTestClassForListener5.test2Listener5"}, "", "stub1");
+		} finally {
+			System.clearProperty(SeleniumTestsContext.BROWSER);
+		}
+		
+		String detailedReportContent1 = readTestMethodResultFile("test1Listener5");
+		Assert.assertTrue(detailedReportContent1.contains(DRIVER_BLOCKED_MSG));
+		Assert.assertTrue(detailedReportContent1.contains("start suite"));
+		Assert.assertTrue(detailedReportContent1.contains("start test"));
+		Assert.assertFalse(detailedReportContent1.contains("start class"));
+		
+		
+		String outDir = new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath();
+		JSONObject jsonResult = new JSONObject(FileUtils.readFileToString(Paths.get(outDir, "results.json").toFile()));
+		
+		// All tests should be skipped because configuration method is skipped
+		Assert.assertEquals(jsonResult.getInt("skip"), 2);
+	}
+	
+	@Test(groups={"it"})
+	public void testContextDriverBlockingBeforeMethod(ITestContext testContext) throws Exception {
+		
+		try {
+			System.setProperty(SeleniumTestsContext.BROWSER, "htmlunit");
+			System.setProperty("startLocation", "beforeMethod");
+			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForListener5.test1Listener5",
+			"com.seleniumtests.it.stubclasses.StubTestClassForListener5.test2Listener5"}, "", "stub1");
+		} finally {
+			System.clearProperty(SeleniumTestsContext.BROWSER);
+		}
+		
+		String detailedReportContent1 = readTestMethodResultFile("test1Listener5");
+		Assert.assertTrue(detailedReportContent1.contains(DRIVER_BLOCKED_MSG));
+		Assert.assertTrue(detailedReportContent1.contains("start suite"));
+		Assert.assertTrue(detailedReportContent1.contains("start test"));
+		Assert.assertTrue(detailedReportContent1.contains("start class"));
+		Assert.assertFalse(detailedReportContent1.contains("start method"));
+		
+		
+		String outDir = new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath();
+		JSONObject jsonResult = new JSONObject(FileUtils.readFileToString(Paths.get(outDir, "results.json").toFile()));
+		
+		// All tests should be skipped because configuration method is skipped
+		Assert.assertEquals(jsonResult.getInt("skip"), 2);
+	}
+	
+	@Test(groups={"it"})
+	public void testContextDriverNotBlockingInTest(ITestContext testContext) throws Exception {
+		
+		try {
+			System.setProperty(SeleniumTestsContext.BROWSER, "htmlunit");
+			System.setProperty("startLocation", "test");
+			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForListener5.test1Listener5",
+			"com.seleniumtests.it.stubclasses.StubTestClassForListener5.test2Listener5"}, "", "stub1");
+		} finally {
+			System.clearProperty(SeleniumTestsContext.BROWSER);
+		}
+		
+		String detailedReportContent1 = readTestMethodResultFile("test1Listener5");
+		Assert.assertFalse(detailedReportContent1.contains(DRIVER_BLOCKED_MSG));
+		Assert.assertTrue(detailedReportContent1.contains("Finished creating *htmlunit driver"));
+		Assert.assertTrue(detailedReportContent1.contains("start suite"));
+		Assert.assertTrue(detailedReportContent1.contains("start test"));
+		Assert.assertTrue(detailedReportContent1.contains("start class"));
+		Assert.assertTrue(detailedReportContent1.contains("start method"));
+		Assert.assertTrue(detailedReportContent1.contains("test 1"));
+		String detailedReportContent2 = readTestMethodResultFile("test2Listener5");
+		Assert.assertTrue(detailedReportContent2.contains("test 2"));
+		
+		String outDir = new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath();
+		JSONObject jsonResult = new JSONObject(FileUtils.readFileToString(Paths.get(outDir, "results.json").toFile()));
+		
+		// All tests should be skipped because configuration method is skipped
+		Assert.assertEquals(jsonResult.getInt("success"), 2);
+	}
+	
+	@Test(groups={"it"})
+	public void testContextDriverNotBlockingInAfterMethod(ITestContext testContext) throws Exception {
+		
+		try {
+			System.setProperty(SeleniumTestsContext.BROWSER, "htmlunit");
+			System.setProperty("startLocation", "afterMethod");
+			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForListener5.test1Listener5",
+			"com.seleniumtests.it.stubclasses.StubTestClassForListener5.test2Listener5"}, "", "stub1");
+		} finally {
+			System.clearProperty(SeleniumTestsContext.BROWSER);
+		}
+		
+		String detailedReportContent1 = readTestMethodResultFile("test1Listener5");
+		Assert.assertFalse(detailedReportContent1.contains(DRIVER_BLOCKED_MSG));
+		Assert.assertTrue(detailedReportContent1.contains("Finished creating *htmlunit driver"));
+		Assert.assertTrue(detailedReportContent1.contains("start suite"));
+		Assert.assertTrue(detailedReportContent1.contains("start test"));
+		Assert.assertTrue(detailedReportContent1.contains("start class"));
+		Assert.assertTrue(detailedReportContent1.contains("start method"));
+		Assert.assertTrue(detailedReportContent1.contains("test 1"));
+		Assert.assertTrue(detailedReportContent1.contains("end method"));
+		
+		String outDir = new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath();
+		JSONObject jsonResult = new JSONObject(FileUtils.readFileToString(Paths.get(outDir, "results.json").toFile()));
+		
+		// All tests should be skipped because configuration method is skipped
+		Assert.assertEquals(jsonResult.getInt("pass"), 2);
+	}
+
+	@Test(groups={"it"})
+	public void testContextDriverBlockingAfterClass(ITestContext testContext) throws Exception {
+		
+		try {
+			System.setProperty(SeleniumTestsContext.BROWSER, "htmlunit");
+			System.setProperty("startLocation", "afterClass");
+			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForListener5.test1Listener5",
+			"com.seleniumtests.it.stubclasses.StubTestClassForListener5.test2Listener5"}, "", "stub1");
+		} finally {
+			System.clearProperty(SeleniumTestsContext.BROWSER);
+		}
+		
+		String detailedReportContent1 = readTestMethodResultFile("test1Listener5");
+		Assert.assertTrue(detailedReportContent1.contains(DRIVER_BLOCKED_MSG));
+		Assert.assertTrue(detailedReportContent1.contains("start suite"));
+		Assert.assertTrue(detailedReportContent1.contains("start test"));
+		Assert.assertTrue(detailedReportContent1.contains("start class"));
+		Assert.assertTrue(detailedReportContent1.contains("start method"));
+		Assert.assertTrue(detailedReportContent1.contains("test 1"));
+		Assert.assertTrue(detailedReportContent1.contains("end method"));
+		Assert.assertFalse(detailedReportContent1.contains("end class"));
+		
+		
+		String outDir = new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath();
+		JSONObject jsonResult = new JSONObject(FileUtils.readFileToString(Paths.get(outDir, "results.json").toFile()));
+		
+		// All tests should be skipped because configuration method is skipped
+		Assert.assertEquals(jsonResult.getInt("pass"), 2);
+	}
+	
+	@Test(groups={"it"})
+	public void testContextDriverBlockingAfterTest(ITestContext testContext) throws Exception {
+		
+		try {
+			System.setProperty(SeleniumTestsContext.BROWSER, "htmlunit");
+			System.setProperty("startLocation", "afterTest");
+			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForListener5.test1Listener5",
+			"com.seleniumtests.it.stubclasses.StubTestClassForListener5.test2Listener5"}, "", "stub1");
+		} finally {
+			System.clearProperty(SeleniumTestsContext.BROWSER);
+		}
+		
+		String detailedReportContent1 = readTestMethodResultFile("test1Listener5");
+		Assert.assertTrue(detailedReportContent1.contains(DRIVER_BLOCKED_MSG));
+		Assert.assertTrue(detailedReportContent1.contains("start suite"));
+		Assert.assertTrue(detailedReportContent1.contains("start test"));
+		Assert.assertTrue(detailedReportContent1.contains("start class"));
+		Assert.assertTrue(detailedReportContent1.contains("start method"));
+		Assert.assertTrue(detailedReportContent1.contains("test 1"));
+		Assert.assertTrue(detailedReportContent1.contains("end method"));
+		Assert.assertTrue(detailedReportContent1.contains("end class"));
+		Assert.assertFalse(detailedReportContent1.contains("end test"));
+		
+		
+		String outDir = new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath();
+		JSONObject jsonResult = new JSONObject(FileUtils.readFileToString(Paths.get(outDir, "results.json").toFile()));
+		
+		// All tests should be skipped because configuration method is skipped
+		Assert.assertEquals(jsonResult.getInt("pass"), 2);
 	}
 }

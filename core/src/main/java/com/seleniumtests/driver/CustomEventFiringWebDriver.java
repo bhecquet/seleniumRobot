@@ -298,7 +298,7 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
 	/**
 	 * Take screenshot of the desktop and put it in a file
 	 */
-	private BufferedImage captureDesktopToBuffer() {
+	private static BufferedImage captureDesktopToBuffer() {
 		
 		GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
 		GraphicsDevice defaultGraphicDevice = ge.getDefaultScreenDevice();
@@ -423,6 +423,18 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
         }
 	}
 	
+	public static String captureDesktopToBase64String() {
+		BufferedImage bi = captureDesktopToBuffer();
+		ByteArrayOutputStream os = new ByteArrayOutputStream();
+		OutputStream b64 = new Base64OutputStream(os);
+		try {
+			ImageIO.write(bi, "png", b64);
+			return os.toString("UTF-8");
+		} catch (IOException e) {
+			return "";
+		}
+	}
+	
 	/**
 	 * Intercept specific scripts to do some non selenium actions
 	 */
@@ -442,15 +454,7 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
 			}
 			
 		} else if (driverMode == DriverMode.LOCAL && NON_JS_CAPTURE_DESKTOP.equals(script)) {
-			BufferedImage bi = captureDesktopToBuffer();
-			ByteArrayOutputStream os = new ByteArrayOutputStream();
-			OutputStream b64 = new Base64OutputStream(os);
-			try {
-				ImageIO.write(bi, "png", b64);
-				return os.toString("UTF-8");
-			} catch (IOException e) {
-				return "";
-			}
+			return captureDesktopToBase64String();
 		} else {
 			return super.executeScript(script, args);
 		}

@@ -41,6 +41,7 @@ import com.seleniumtests.browserfactory.TestDroidDriverFactory;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.DriverExceptions;
+import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.reporter.logger.TestLogging;
 import com.seleniumtests.util.helper.WaitHelper;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
@@ -309,6 +310,10 @@ public class WebUIDriver {
     }
 
     public WebDriver createWebDriver() {
+    	
+    	if (SeleniumTestsContextManager.getThreadContext().isDriverCreationBlocked()) {
+    		throw new ScenarioException("Driver creation forbidden before @BeforeMethod and after @AfterMethod execution");
+    	}
     	
     	if (config.getTestType().isMobile()) {
     		logger.info("Start creating appium driver");

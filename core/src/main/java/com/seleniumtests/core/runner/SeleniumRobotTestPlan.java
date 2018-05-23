@@ -5,9 +5,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.Listeners;
 
+import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.TestTasks;
+import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
 @Listeners({com.seleniumtests.reporter.reporters.ReporterControler.class,
@@ -33,6 +36,16 @@ public class SeleniumRobotTestPlan {
 			return false;
 		}
 		return isCucumberT;
+	}
+	
+	/**
+	 * According to TestNG doc, this method will be executed after the \@AfterMethod inside test classes
+	 * #issue 136: This will close any remaining browser for this thread and forbid user to create a new driver in other \@AfterXXX
+	 */
+	@AfterMethod(alwaysRun=true)
+	public void finishTestMethod() {
+		WebUIDriver.cleanUp();
+		SeleniumTestsContextManager.getThreadContext().setDriverCreationBlocked(true);
 	}
 
 	/**
