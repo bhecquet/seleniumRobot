@@ -162,7 +162,7 @@ public class SeleniumRobotLogger {
 	 * @return
 	 * @throws IOException 
 	 */
-	public static void parseLogFile() {
+	public static synchronized void parseLogFile() {
 		Appender fileLoggerAppender = Logger.getRootLogger().getAppender(FILE_APPENDER_NAME);
 		if (fileLoggerAppender == null) {
 			return;
