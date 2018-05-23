@@ -19,14 +19,12 @@ package com.seleniumtests.browserfactory;
 import java.net.URL;
 
 import org.openqa.selenium.MutableCapabilities;
-import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.LocalFileDetector;
 import org.openqa.selenium.remote.RemoteWebDriver;
-import org.openqa.selenium.remote.UnreachableBrowserException;
 import org.openqa.selenium.support.ui.SystemClock;
 
 import com.seleniumtests.connectors.selenium.SeleniumGridConnector;
@@ -34,7 +32,6 @@ import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.SeleniumGridException;
 import com.seleniumtests.driver.DriverConfig;
-import com.seleniumtests.util.helper.WaitHelper;
 
 public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implements IWebDriverFactory {
 	

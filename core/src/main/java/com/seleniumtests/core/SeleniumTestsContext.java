@@ -236,6 +236,7 @@ public class SeleniumTestsContext {
     private SeleniumRobotVariableServerConnector variableServer;
     private SeleniumGridConnector seleniumGridConnector;
     private TestManager testManagerIntance;
+    private boolean driverCreationBlocked = false;		// if true, inside this thread, driver creation will be forbidden
     
     // folder config
  	private Map<String, HashMap<String,String>> idMapping;
@@ -670,8 +671,8 @@ public class SeleniumTestsContext {
         // create seleniumRobot server instance
         variableServer = connectSeleniumRobotServer();
 
-        // create selenium grid connector
-        seleniumGridConnector = connectGrid();
+        // create selenium grid connector. It will be created if it's null
+        getSeleniumGridConnector();
         
         // create Test Manager connector
     	testManagerIntance = initTestManager();
@@ -1066,7 +1067,11 @@ public class SeleniumTestsContext {
         return (TestType) getAttribute(TEST_TYPE);
     }
 
-    public String getCucumberTags() {
+    public boolean isDriverCreationBlocked() {
+		return driverCreationBlocked;
+	}
+
+	public String getCucumberTags() {
     	return (String) getAttribute(CUCUMBER_TAGS);
     }
     
@@ -1279,6 +1284,9 @@ public class SeleniumTestsContext {
 	}
     
     public SeleniumGridConnector getSeleniumGridConnector() {
+    	if (seleniumGridConnector == null) {
+    		seleniumGridConnector = connectGrid();
+    	}
     	return seleniumGridConnector;
     }
     
@@ -1922,7 +1930,11 @@ public class SeleniumTestsContext {
     	setAttribute(VIEWPORT_HEIGHT, height);    	
     }
     
-    /**
+    public void setDriverCreationBlocked(boolean driverCreationBlocked) {
+		this.driverCreationBlocked = driverCreationBlocked;
+	}
+
+	/**
      * To be used by unit tests exclusively
      */
     public static void resetOutputFolderNames() {

@@ -20,8 +20,6 @@ import java.io.File;
 import java.io.IOException;
 import java.time.Duration;
 
-import javax.swing.ImageIcon;
-
 import org.apache.commons.io.FileUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Point;
@@ -59,9 +57,7 @@ public class PictureElement {
 	private HtmlElement intoElement;
 	private Rectangle detectedObjectRectangle;
 	private double pictureSizeRatio;
-	private EventFiringWebDriver driver;
 	private ImageDetector detector;
-	private ScreenshotUtil screenshotUtil;
 	private SystemClock clock = new SystemClock();
 
 	public PictureElement() {
@@ -102,9 +98,7 @@ public class PictureElement {
 		detector = new ImageDetector();
 		detector.setDetectionThreshold(detectionThreshold);
 		setObjectPictureFile(pictureFile);
-		screenshotUtil = new ScreenshotUtil();
-		
-		driver = (EventFiringWebDriver)WebUIDriver.getWebDriver();
+	
 	}
 	
 	private static File createFileFromResource(String resource)  {
@@ -130,9 +124,10 @@ public class PictureElement {
 		
 		File screenshotFile;
 		if (searchOnly) {
-			screenshotFile = screenshotUtil.captureWebPageToFile();
+			screenshotFile = new ScreenshotUtil().captureWebPageToFile();
 		} else {
-			screenshotFile = screenshotUtil.captureDesktopToFile();
+			// issue #136: we don't need driver when checking desktop
+			screenshotFile = new ScreenshotUtil(null).captureDesktopToFile();
 		}
 		if (screenshotFile == null) {
 			throw new WebDriverException("Screenshot does not exist");
@@ -207,13 +202,13 @@ public class PictureElement {
 			coordY -= element.getSize().height / 2;
 		}
 		
-		new Actions(driver).moveToElement(element, coordX, coordY).click().build().perform();
+		new Actions(WebUIDriver.getWebDriver()).moveToElement(element, coordX, coordY).click().build().perform();
 	}
 	
 	public void sendKeys(final CharSequence text, int xOffset, int yOffset) {
 		clickAt(xOffset, yOffset);
 		
-		new Actions(driver).sendKeys(text).build().perform();
+		new Actions(WebUIDriver.getWebDriver()).sendKeys(text).build().perform();
 	}
 
 	public void sendKeys(final CharSequence text) {
@@ -279,10 +274,10 @@ public class PictureElement {
 	}
 	
 	private AppiumDriver<?> getMobileDriver() {
-		if (!(((CustomEventFiringWebDriver)driver).getWebDriver() instanceof AppiumDriver<?>)) {
+		if (!(((CustomEventFiringWebDriver)WebUIDriver.getWebDriver()).getWebDriver() instanceof AppiumDriver<?>)) {
     		throw new ScenarioException("action is available only for mobile platforms");
     	}
-		return (AppiumDriver<?>)((CustomEventFiringWebDriver)driver).getWebDriver();
+		return (AppiumDriver<?>)((CustomEventFiringWebDriver)WebUIDriver.getWebDriver()).getWebDriver();
 	}
 	
 	// TODO: actions for mobile
