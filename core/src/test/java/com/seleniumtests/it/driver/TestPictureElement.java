@@ -26,7 +26,6 @@ import com.seleniumtests.customexception.ImageSearchException;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.it.driver.support.GenericMultiBrowserTest;
 import com.seleniumtests.it.driver.support.pages.DriverTestPage;
-import com.seleniumtests.it.driver.support.pages.DriverTestPageWithoutFixedPattern;
 
 public class TestPictureElement extends GenericMultiBrowserTest {
 	
@@ -44,8 +43,10 @@ public class TestPictureElement extends GenericMultiBrowserTest {
 	
 	@AfterMethod(groups={"it"})
 	public void reset() {
-		testPageWithoutPattern.logoText.clear();
-		testPageWithoutPattern.textElement.clear();
+		if (driver != null) {
+			testPageWithoutPattern.logoText.clear();
+			testPageWithoutPattern.textElement.clear();
+		}
 	}
 	
 	@Test(groups={"it"})
