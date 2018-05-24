@@ -18,6 +18,7 @@ package com.seleniumtests.it.stubclasses;
 
 import java.lang.reflect.Method;
 
+import org.junit.Assert;
 import org.openqa.selenium.WebDriver;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterGroups;
@@ -96,7 +97,6 @@ public class StubTestClassForListener5 extends StubTestClassForListenerParent {
 		if ("test".equals(System.getProperty("startLocation"))) {
 			startDriver();
 		}
-		startDriver();
 		logger.info("test 1");
 	}
 	
@@ -112,6 +112,11 @@ public class StubTestClassForListener5 extends StubTestClassForListenerParent {
 	public void afterMethod(Method method, XmlTest xmlTest) {
 		if ("afterMethod".equals(System.getProperty("startLocation"))) {
 			startDriver();
+		}
+		
+		// in case driver has been created in test, check it's already there
+		if ("test".equals(System.getProperty("startLocation"))) {
+			Assert.assertNotNull(WebUIDriver.getWebDriver(false));
 		}
 		logger.info("end method");
 	}
