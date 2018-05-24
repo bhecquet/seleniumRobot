@@ -36,6 +36,7 @@ public class TestAction {
 	protected String name;
 	protected Boolean failed;
 	protected Throwable actionException;
+	protected String actionExceptionMessage;
 	protected List<String> pwdToReplace;
 	protected boolean encoded = false;		// true if we have encoded messages
 	
@@ -81,6 +82,10 @@ public class TestAction {
 	
 	public Throwable getActionException() {
 		return actionException;
+	}
+	
+	public String getActionExceptionMessage() {
+		return actionExceptionMessage;
 	}
 
 	public void setActionException(Throwable actionException) {
@@ -131,6 +136,9 @@ public class TestAction {
 		TestAction encodedAction = new TestAction(encodeString(name, format), failed, new ArrayList<String>(pwdToReplace));
 		encodedAction.actionException = actionException;
 		encodedAction.encoded = true;
+		if (actionException != null) {
+			encodedAction.actionExceptionMessage = actionException.getClass().toString() + ": " + encodeString(actionException.getMessage(), format);
+		}
 		return encodedAction;
 	}
 

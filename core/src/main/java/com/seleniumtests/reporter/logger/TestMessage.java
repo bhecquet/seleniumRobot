@@ -58,6 +58,9 @@ public class TestMessage extends TestAction {
 		msg.pwdToReplace = new ArrayList<>(pwdToReplace);
 		msg.encoded = true;
 		msg.actionException = actionException;
+		if (actionException != null) {
+			msg.actionExceptionMessage = actionException.getClass().toString() + ": " + encodeString(actionException.getMessage(), format);
+		}
 		return msg;
 	}
 }
