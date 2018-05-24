@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -48,6 +47,8 @@ import com.seleniumtests.reporter.logger.TestStep;
 import com.seleniumtests.reporter.reporters.CommonReporter;
 import com.seleniumtests.util.FileUtility;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
+
+import net.lightbody.bmp.core.har.Har;
 
 public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodListener2, ISuiteListener, IExecutionListener, IConfigurationListener {
 	
@@ -213,7 +214,7 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 	
 	@Override
 	public void onExecutionStart() {
-		// nothing to do at startup
+		suiteList = Collections.synchronizedList(new ArrayList<>());
 	}
 
 	@Override
@@ -291,7 +292,14 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 			for (ScreenShot screenshot: new ScreenshotUtil().captureWebPageSnapshots(true)) {
 				TestLogging.logScreenshot(screenshot);
 			}
+			
+	    	// stop HAR capture
+			if (WebUIDriver.getWebUIDriver().getConfig().getBrowserMobProxy() != null) {
+				Har har = WebUIDriver.getWebUIDriver().getConfig().getBrowserMobProxy().endHar();
+				TestLogging.logNetworkCapture(har);
+			}
 		}
+		
         
 		TestLogging.logTestStep(tearDownStep);
 		
