@@ -195,11 +195,11 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 		} finally {
 			System.clearProperty(SeleniumTestsContext.BROWSER);
 		}
-		
-		String detailedReportContent1 = readTestMethodResultFile("test1Listener5");
-		Assert.assertTrue(detailedReportContent1.contains(DRIVER_BLOCKED_MSG));
-		Assert.assertFalse(detailedReportContent1.contains("start suite"));
-		Assert.assertFalse(detailedReportContent1.contains("start test"));
+
+		String logs = readSeleniumRobotLogFile();
+		Assert.assertTrue(logs.contains(DRIVER_BLOCKED_MSG));
+		Assert.assertFalse(logs.contains("start suite"));
+		Assert.assertFalse(logs.contains("start test"));
 		
 		String outDir = new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath();
 		JSONObject jsonResult = new JSONObject(FileUtils.readFileToString(Paths.get(outDir, "results.json").toFile()));
@@ -222,8 +222,10 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 		
 		String detailedReportContent1 = readTestMethodResultFile("test1Listener5");
 		Assert.assertTrue(detailedReportContent1.contains(DRIVER_BLOCKED_MSG));
-		Assert.assertTrue(detailedReportContent1.contains("start suite"));
-		Assert.assertFalse(detailedReportContent1.contains("start test"));
+		
+		String logs = readSeleniumRobotLogFile();
+		Assert.assertTrue(logs.contains("start suite"));
+		Assert.assertFalse(logs.contains("start test"));
 		
 
 		String outDir = new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath();
@@ -247,9 +249,11 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 		
 		String detailedReportContent1 = readTestMethodResultFile("test1Listener5");
 		Assert.assertTrue(detailedReportContent1.contains(DRIVER_BLOCKED_MSG));
-		Assert.assertTrue(detailedReportContent1.contains("start suite"));
-		Assert.assertTrue(detailedReportContent1.contains("start test"));
-		Assert.assertFalse(detailedReportContent1.contains("start class"));
+
+		String logs = readSeleniumRobotLogFile();
+		Assert.assertTrue(logs.contains("start suite"));
+		Assert.assertTrue(logs.contains("start test"));
+		Assert.assertFalse(logs.contains("start class"));
 		
 		
 		String outDir = new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath();
@@ -273,10 +277,12 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 		
 		String detailedReportContent1 = readTestMethodResultFile("test1Listener5");
 		Assert.assertTrue(detailedReportContent1.contains(DRIVER_BLOCKED_MSG));
-		Assert.assertTrue(detailedReportContent1.contains("start suite"));
-		Assert.assertTrue(detailedReportContent1.contains("start test"));
-		Assert.assertTrue(detailedReportContent1.contains("start class"));
-		Assert.assertFalse(detailedReportContent1.contains("start method"));
+
+		String logs = readSeleniumRobotLogFile();
+		Assert.assertTrue(logs.contains("start suite"));
+		Assert.assertTrue(logs.contains("start test"));
+		Assert.assertTrue(logs.contains("start class"));
+		Assert.assertFalse(logs.contains("start method"));
 		
 		
 		String outDir = new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath();
@@ -300,20 +306,21 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 		
 		String detailedReportContent1 = readTestMethodResultFile("test1Listener5");
 		Assert.assertFalse(detailedReportContent1.contains(DRIVER_BLOCKED_MSG));
-		Assert.assertTrue(detailedReportContent1.contains("Finished creating *htmlunit driver"));
-		Assert.assertTrue(detailedReportContent1.contains("start suite"));
-		Assert.assertTrue(detailedReportContent1.contains("start test"));
-		Assert.assertTrue(detailedReportContent1.contains("start class"));
-		Assert.assertTrue(detailedReportContent1.contains("start method"));
-		Assert.assertTrue(detailedReportContent1.contains("test 1"));
-		String detailedReportContent2 = readTestMethodResultFile("test2Listener5");
-		Assert.assertTrue(detailedReportContent2.contains("test 2"));
+
+		String logs = readSeleniumRobotLogFile();
+		Assert.assertTrue(logs.contains("Finished creating *htmlunit driver"));
+		Assert.assertTrue(logs.contains("start suite"));
+		Assert.assertTrue(logs.contains("start test"));
+		Assert.assertTrue(logs.contains("start class"));
+		Assert.assertTrue(logs.contains("start method"));
+		Assert.assertTrue(logs.contains("test 1"));
+		Assert.assertTrue(logs.contains("test 2"));
 		
 		String outDir = new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath();
 		JSONObject jsonResult = new JSONObject(FileUtils.readFileToString(Paths.get(outDir, "results.json").toFile()));
 		
 		// All tests should be skipped because configuration method is skipped
-		Assert.assertEquals(jsonResult.getInt("success"), 2);
+		Assert.assertEquals(jsonResult.getInt("pass"), 2);
 	}
 	
 	@Test(groups={"it"})
@@ -330,13 +337,15 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 		
 		String detailedReportContent1 = readTestMethodResultFile("test1Listener5");
 		Assert.assertFalse(detailedReportContent1.contains(DRIVER_BLOCKED_MSG));
-		Assert.assertTrue(detailedReportContent1.contains("Finished creating *htmlunit driver"));
-		Assert.assertTrue(detailedReportContent1.contains("start suite"));
-		Assert.assertTrue(detailedReportContent1.contains("start test"));
-		Assert.assertTrue(detailedReportContent1.contains("start class"));
-		Assert.assertTrue(detailedReportContent1.contains("start method"));
-		Assert.assertTrue(detailedReportContent1.contains("test 1"));
-		Assert.assertTrue(detailedReportContent1.contains("end method"));
+
+		String logs = readSeleniumRobotLogFile();
+		Assert.assertTrue(logs.contains("Finished creating *htmlunit driver"));
+		Assert.assertTrue(logs.contains("start suite"));
+		Assert.assertTrue(logs.contains("start test"));
+		Assert.assertTrue(logs.contains("start class"));
+		Assert.assertTrue(logs.contains("start method"));
+		Assert.assertTrue(logs.contains("test 1"));
+		Assert.assertTrue(logs.contains("end method"));
 		
 		String outDir = new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath();
 		JSONObject jsonResult = new JSONObject(FileUtils.readFileToString(Paths.get(outDir, "results.json").toFile()));
@@ -359,13 +368,15 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 		
 		String detailedReportContent1 = readTestMethodResultFile("test1Listener5");
 		Assert.assertTrue(detailedReportContent1.contains(DRIVER_BLOCKED_MSG));
-		Assert.assertTrue(detailedReportContent1.contains("start suite"));
-		Assert.assertTrue(detailedReportContent1.contains("start test"));
-		Assert.assertTrue(detailedReportContent1.contains("start class"));
-		Assert.assertTrue(detailedReportContent1.contains("start method"));
-		Assert.assertTrue(detailedReportContent1.contains("test 1"));
-		Assert.assertTrue(detailedReportContent1.contains("end method"));
-		Assert.assertFalse(detailedReportContent1.contains("end class"));
+
+		String logs = readSeleniumRobotLogFile();
+		Assert.assertTrue(logs.contains("start suite"));
+		Assert.assertTrue(logs.contains("start test"));
+		Assert.assertTrue(logs.contains("start class"));
+		Assert.assertTrue(logs.contains("start method"));
+		Assert.assertTrue(logs.contains("test 1"));
+		Assert.assertTrue(logs.contains("end method"));
+		Assert.assertFalse(logs.contains("end class"));
 		
 		
 		String outDir = new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath();
@@ -389,14 +400,16 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 		
 		String detailedReportContent1 = readTestMethodResultFile("test1Listener5");
 		Assert.assertTrue(detailedReportContent1.contains(DRIVER_BLOCKED_MSG));
-		Assert.assertTrue(detailedReportContent1.contains("start suite"));
-		Assert.assertTrue(detailedReportContent1.contains("start test"));
-		Assert.assertTrue(detailedReportContent1.contains("start class"));
-		Assert.assertTrue(detailedReportContent1.contains("start method"));
-		Assert.assertTrue(detailedReportContent1.contains("test 1"));
-		Assert.assertTrue(detailedReportContent1.contains("end method"));
-		Assert.assertTrue(detailedReportContent1.contains("end class"));
-		Assert.assertFalse(detailedReportContent1.contains("end test"));
+
+		String logs = readSeleniumRobotLogFile();
+		Assert.assertTrue(logs.contains("start suite"));
+		Assert.assertTrue(logs.contains("start test"));
+		Assert.assertTrue(logs.contains("start class"));
+		Assert.assertTrue(logs.contains("start method"));
+		Assert.assertTrue(logs.contains("test 1"));
+		Assert.assertTrue(logs.contains("end method"));
+		Assert.assertTrue(logs.contains("end class"));
+		Assert.assertFalse(logs.contains("end test"));
 		
 		
 		String outDir = new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath();
