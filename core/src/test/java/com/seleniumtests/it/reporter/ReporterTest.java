@@ -224,4 +224,9 @@ public class ReporterTest extends MockitoTest {
 		String detailedReportContent = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), testName, "TestReport.html").toFile());
 		return detailedReportContent.replace("\n", "").replace("\r",  "").replaceAll(">\\s+<", "><");
 	}
+	
+	protected String readSeleniumRobotLogFile() throws IOException {
+		String logContent = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "seleniumRobot.log").toFile());
+		return logContent.replace("\n", "").replace("\r",  "");
+	}
 }

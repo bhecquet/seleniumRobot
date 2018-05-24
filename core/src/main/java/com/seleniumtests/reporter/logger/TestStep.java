@@ -241,6 +241,9 @@ public class TestStep extends TestAction {
 		step.startDate = startDate;
 		step.harCapture = harCapture;
 		step.actionException = actionException;
+		if (actionException != null) {
+			step.actionExceptionMessage = actionException.getClass().toString() + ": " + encodeString(actionException.getMessage(), format);
+		}
 		return step;
 	}
 	

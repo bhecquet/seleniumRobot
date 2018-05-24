@@ -55,7 +55,8 @@
 			
 			#if($step.getActionException())
 			<div class="message-error">
-				$step.getActionException().toString()
+				#set($exceptionMessage = $step.getActionExceptionMessage())
+				$exceptionMessage
 			</div>
 			#end
 		</div>
