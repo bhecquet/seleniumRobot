@@ -155,12 +155,6 @@ public class WebUIDriver {
 
     public static void cleanUp() {
     	
-    	// stop HAR capture
-		if (getWebUIDriver().getConfig().getBrowserMobProxy() != null) {
-			Har har = getWebUIDriver().getConfig().getBrowserMobProxy().endHar();
-			TestLogging.logNetworkCapture(har);
-		}
-    	
         IWebDriverFactory iWebDriverFactory = getWebUIDriver().webDriverBuilder;
         if (iWebDriverFactory != null) {
             iWebDriverFactory.cleanUp();
