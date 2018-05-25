@@ -132,14 +132,15 @@ public class TestWebUiDriver extends ReporterTest {
 			
 			JSONObject json = new JSONObject(FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriver", "networkCapture.har").toFile()));
 			JSONArray pages = json.getJSONObject("log").getJSONArray("pages");
-			Assert.assertEquals(pages.length(), 7);
+			
+			// 7 steps in HTML but only 6 in HAR because 'getPageUrl' step is called before driver is created, so not logged in HAR
+			Assert.assertEquals(pages.length(), 6);
 			Assert.assertEquals(pages.getJSONObject(0).getString("id").trim(), "testDriver");
-			Assert.assertEquals(pages.getJSONObject(1).getString("id").trim(), "getPageUrl");
-			Assert.assertTrue(pages.getJSONObject(2).getString("id").startsWith("openPage with args"));
-			Assert.assertEquals(pages.getJSONObject(3).getString("id").trim(), "_writeSomething");
-			Assert.assertEquals(pages.getJSONObject(4).getString("id").trim(), "_reset");
-			Assert.assertEquals(pages.getJSONObject(5).getString("id").trim(), "_sendKeysComposite");
-			Assert.assertEquals(pages.getJSONObject(6).getString("id").trim(), "_clickPicture");
+			Assert.assertTrue(pages.getJSONObject(1).getString("id").startsWith("openPage with args"));
+			Assert.assertEquals(pages.getJSONObject(2).getString("id").trim(), "_writeSomething");
+			Assert.assertEquals(pages.getJSONObject(3).getString("id").trim(), "_reset");
+			Assert.assertEquals(pages.getJSONObject(4).getString("id").trim(), "_sendKeysComposite");
+			Assert.assertEquals(pages.getJSONObject(5).getString("id").trim(), "_clickPicture");
 			
 		} finally {
 			System.clearProperty(SeleniumTestsContext.CAPTURE_NETWORK);
