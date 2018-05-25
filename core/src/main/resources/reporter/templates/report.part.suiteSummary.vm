@@ -4,7 +4,7 @@
 </div>
 
 <section class="content-header">
-	<h1> Integration tests</h1>
+	<h1> Integration tests <span>(<a href="seleniumRobot.log" style="font-size: 15px;">full logs</a>)</span></h1>
 </section>
 
 <section class="content">
