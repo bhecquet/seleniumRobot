@@ -131,6 +131,9 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		Assert.assertTrue(mainReportContent.contains("<td name=\"passed-2\">4</td>"));
 		Assert.assertTrue(mainReportContent.contains("<td name=\"failed-2\" class=\"failedSteps\">1</td>"));
 		Assert.assertTrue(mainReportContent.contains("<td name=\"stepsTotal-2\">5</td>"));
+		
+		// check full log file is there
+		Assert.assertTrue(mainReportContent.contains("<a href=\"seleniumRobot.log\""));
 	}
 	
 	/**
