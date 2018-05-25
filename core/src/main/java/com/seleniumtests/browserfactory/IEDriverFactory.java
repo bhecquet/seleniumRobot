@@ -29,18 +29,6 @@ public class IEDriverFactory extends AbstractWebDriverFactory implements IWebDri
     public IEDriverFactory(final DriverConfig webDriverConfig1) {
         super(webDriverConfig1);
     }
-
-    @Override
-    public void cleanUp() {
-        try {
-            if (driver != null) {
-                driver.quit();
-                driver = null;
-            }
-        } catch (Exception e) {
-            logger.error(e);
-        }
-    }
     
     @Override
     protected WebDriver createNativeDriver() {

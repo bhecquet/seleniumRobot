@@ -329,17 +329,28 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
 	 */
 	@Override
 	public void quit() {
+		
+		// get list of pids we could have to kill. Sometimes, Chrome does not close all its processes
+		// so we have to know which processes to kill when driver is still active
+		List<Long> pidsToKill = new ArrayList<>();
+		if (browserInfo != null && driverMode == DriverMode.LOCAL) {
+			pidsToKill.addAll(browserInfo.getAllBrowserSubprocessPids(driverPids));
+		}
+		
 		try {
 			driver.quit();
 		} finally {
+			
+			// wait for browser processes to stop
+			WaitHelper.waitForSeconds(2);
+			
 			// only kill processes in local mode
-			if (browserInfo == null || driverMode != DriverMode.LOCAL) {
-				return;
+			if (!pidsToKill.isEmpty()) {
+		    	for (Long pid: pidsToKill) {
+		    		OSUtilityFactory.getInstance().killProcess(pid.toString(), true);
+		    	}
 			}
-			List<Long> pidsToKill = browserInfo.getAllBrowserSubprocessPids(driverPids);
-	    	for (Long pid: pidsToKill) {
-	    		OSUtilityFactory.getInstance().killProcess(pid.toString(), true);
-	    	}
+			
 		}
 	}
 	

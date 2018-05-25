@@ -52,7 +52,7 @@ public class ChromeCapabilitiesFactory extends IDesktopCapabilityFactory {
         
         return capabilities;
 	}
-
+ 
 	@Override
 	protected MutableCapabilities getDriverOptions() {
 		ChromeOptions options = new ChromeOptions();

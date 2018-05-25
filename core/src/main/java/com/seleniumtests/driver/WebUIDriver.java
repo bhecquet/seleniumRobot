@@ -155,19 +155,20 @@ public class WebUIDriver {
 
     public static void cleanUp() {
     	
-        IWebDriverFactory iWebDriverFactory = getWebUIDriver().webDriverBuilder;
+        WebDriver driver = driverSession.get();
+    	if (driver != null) {
+    		try {
+	            TestLogging.log("quiting webdriver " + Thread.currentThread().getId());
+	            driver.quit();
+        	} catch (Exception ex) {
+        		TestLogging.error("Exception encountered when quiting driver:" + ex.getMessage());
+        	}
+        }
+        
+    	IWebDriverFactory iWebDriverFactory = getWebUIDriver().webDriverBuilder;
         if (iWebDriverFactory != null) {
             iWebDriverFactory.cleanUp();
-        } else {
-            WebDriver driver = driverSession.get();
-            if (driver != null) {
-                try {
-                    driver.quit();
-                } catch (Exception ex) {
-                    logger.error(ex);
-                }
-            }
-        }
+        } 
         
         // in case of mobile test with appium, stop appium server
         if (iWebDriverFactory instanceof AppiumDriverFactory) {
