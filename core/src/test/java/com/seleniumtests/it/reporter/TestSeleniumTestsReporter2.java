@@ -111,7 +111,6 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	 */
 	@Test(groups={"it"})
 	public void testTestReportContainsOnlyItsAfterMethodSteps() throws Exception {
-		System.setProperty("testRetryCount", "1");
 		executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForIssue143"});
 		
 		String detailedReportContent1 = readTestMethodResultFile("testOk1");
@@ -123,6 +122,22 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		String logs = readSeleniumRobotLogFile();
 		Assert.assertTrue(logs.contains("When using @AfterMethod in tests")); // check error message is shown
 		Assert.assertTrue(logs.contains("public void com.seleniumtests.it.stubclasses.StubTestClassForIssue143.reset()")); // check method name is displayed
+	}
+	
+	/**
+	 * Check issue #141 where \@AfterMethod calls are displayed as many times as test retries
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testRetriedTestReportContainsOnlyItsAfterMethod() throws Exception {
+		System.setProperty("testRetryCount", "1");
+		executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForIssue141"});
+		
+		// check we only display the second call 
+		String detailedReportContent1 = readTestMethodResultFile("testOk1");
+		Assert.assertFalse(detailedReportContent1.contains("<div class=\"message-info\">after method 1</div>"));
+		Assert.assertTrue(detailedReportContent1.contains("<div class=\"message-info\">after method 2</div>"));
+		
 	}
 	
 	/**
