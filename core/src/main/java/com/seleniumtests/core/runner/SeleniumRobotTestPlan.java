@@ -1,5 +1,6 @@
 package com.seleniumtests.core.runner;
 
+import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -43,7 +44,7 @@ public class SeleniumRobotTestPlan {
 	 * #issue 136: This will close any remaining browser for this thread and forbid user to create a new driver in other \@AfterXXX
 	 */
 	@AfterMethod(alwaysRun=true)
-	public void finishTestMethod() {
+	public void finishTestMethod(Method method) {
 		WebUIDriver.cleanUp();
 		SeleniumTestsContextManager.getThreadContext().setDriverCreationBlocked(true);
 	}

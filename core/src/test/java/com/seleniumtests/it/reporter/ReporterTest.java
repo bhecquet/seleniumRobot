@@ -19,6 +19,7 @@ import org.testng.xml.XmlClass;
 import org.testng.xml.XmlInclude;
 import org.testng.xml.XmlPackage;
 import org.testng.xml.XmlSuite;
+import org.testng.xml.XmlSuite.FailurePolicy;
 import org.testng.xml.XmlSuite.ParallelMode;
 import org.testng.xml.XmlTest;
 
@@ -69,8 +70,10 @@ public class ReporterTest extends MockitoTest {
 		Map<String, String> suiteParameters = new HashMap<>();
 		suiteParameters.put("softAssertEnabled", "false");
 		suite.setParameters(suiteParameters);
+		suite.setConfigFailurePolicy(FailurePolicy.CONTINUE);
 		List<XmlSuite> suites = new ArrayList<XmlSuite>();
 		suites.add(suite);
+		
 		
 		if (threadCount > 1) {
 			suite.setThreadCount(threadCount);

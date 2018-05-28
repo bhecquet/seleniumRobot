@@ -210,6 +210,7 @@ public class ReporterControler implements IReporter {
 					continue;
 				}
 			} else if (config.getMethod().isAfterMethodConfiguration()) {
+				
 				try {
 					String methodName = ((Method)(config.getParameters()[0])).getName();
 					if (!methodName.equals(testResult.getName())) {
