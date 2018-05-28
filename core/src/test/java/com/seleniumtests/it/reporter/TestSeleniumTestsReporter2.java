@@ -106,6 +106,26 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	}
 	
 	/**
+	 * Check issue #143 where all \@AfterMethod calls are displayed in all test if its first parameter is not a method reference 
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testTestReportContainsOnlyItsAfterMethodSteps() throws Exception {
+		System.setProperty("testRetryCount", "1");
+		executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForIssue143"});
+		
+		String detailedReportContent1 = readTestMethodResultFile("testOk1");
+		Assert.assertEquals(StringUtils.countMatches(detailedReportContent1, "Post test step: reset2"), 1);
+		
+		String detailedReportContent2 = readTestMethodResultFile("testOk2");
+		Assert.assertEquals(StringUtils.countMatches(detailedReportContent2, "Post test step: reset2"), 1);
+		
+		String logs = readSeleniumRobotLogFile();
+		Assert.assertTrue(logs.contains("When using @AfterMethod in tests")); // check error message is shown
+		Assert.assertTrue(logs.contains("public void com.seleniumtests.it.stubclasses.StubTestClassForIssue143.reset()")); // check method name is displayed
+	}
+	
+	/**
 	 * Check summary format when tests have steps
 	 * @throws Exception
 	 */

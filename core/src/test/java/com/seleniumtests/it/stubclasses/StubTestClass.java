@@ -63,7 +63,6 @@ public class StubTestClass extends StubParentClass {
 	
 	@Test(groups="stub", description="a test with steps")
 	public void testAndSubActions() throws IOException {
-		System.out.println(SeleniumTestsContextManager.getThreadContext().getCustomSummaryReports());
 		TestStep step1 = new TestStep("step 1", TestLogging.getCurrentTestResult(), new ArrayList<>());
 		step1.addAction(new TestAction("click button", false, new ArrayList<>()));
 		step1.addAction(new TestAction("sendKeys to text field", true, new ArrayList<>()));

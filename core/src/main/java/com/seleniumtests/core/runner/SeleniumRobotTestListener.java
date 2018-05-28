@@ -459,6 +459,21 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 		} else if (configMethod.isAfterMethodConfiguration()) {
 			// beforeMethod, testMethod and afterMethod run in the same thread, so it's safe to take the current context
 			currentBeforeContext = SeleniumTestsContextManager.getThreadContext();
+			
+			try {
+				((Method)(testResult.getParameters()[0])).getName();
+			} catch (Exception e) {
+				logger.error("\n\n\n---------------------------------------------------------------------------------------------------\n"
+						+ configMethod.getConstructorOrMethod().getMethod().toGenericString()
+						+ "\nWhen using @AfterMethod in tests, this method MUST have a 'java.lang.reflect.Method' object as first argument. Example: \n\n"
+						+ "@AfterMethod\n" + 
+						"public void afterMethod(Method method) {\n"
+						+ "    ... some code here ...\n"
+						+ "}\n\n"
+						+ "Else, this method will be displayed in each test result even if it does not belong to the test itself\n"
+						+ "---------------------------------------------------------------------------------------------------\n\n\n");
+			}
+			
 		} else if (configMethod.isAfterClassConfiguration()) {
 			currentBeforeContext = SeleniumTestsContextManager.getClassContext(context, method.getTestMethod().getTestClass().getName());
 		} else if (configMethod.isAfterTestConfiguration()) {
