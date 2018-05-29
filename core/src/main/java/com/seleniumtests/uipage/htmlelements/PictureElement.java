@@ -127,7 +127,7 @@ public class PictureElement {
 			screenshotFile = new ScreenshotUtil().captureWebPageToFile();
 		} else {
 			// issue #136: we don't need driver when checking desktop
-			screenshotFile = new ScreenshotUtil(null).captureDesktopToFile();
+			screenshotFile = new ScreenshotUtil().captureDesktopToFile();
 		}
 		if (screenshotFile == null) {
 			throw new WebDriverException("Screenshot does not exist");

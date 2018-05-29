@@ -297,8 +297,9 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
 	
 	/**
 	 * Take screenshot of the desktop and put it in a file
+	 * Do not expose this method because we need to check that we have a graphical environment. 
 	 */
-	private static BufferedImage captureDesktopToBuffer() {
+	private BufferedImage captureDesktopToBuffer() {
 		
 		GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
 		GraphicsDevice defaultGraphicDevice = ge.getDefaultScreenDevice();
@@ -434,7 +435,7 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
         }
 	}
 	
-	public static String captureDesktopToBase64String() {
+	private String captureDesktopToBase64String() {
 		BufferedImage bi = captureDesktopToBuffer();
 		ByteArrayOutputStream os = new ByteArrayOutputStream();
 		OutputStream b64 = new Base64OutputStream(os);
