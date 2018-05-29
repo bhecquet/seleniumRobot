@@ -1,0 +1,8 @@
+<differences>
+  <difference>
+    <className>**/driver/CustomEventFiringWebDriver</className>
+    <differenceType>7009</differenceType>
+    <method>java.lang.String captureDesktopToBase64String()</method>
+    <justification>this method was set to public by error. It should not be possible to access it directly</justification>
+  </difference>
+</differences>
