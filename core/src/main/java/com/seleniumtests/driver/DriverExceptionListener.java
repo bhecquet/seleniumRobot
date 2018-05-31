@@ -182,7 +182,7 @@ public class DriverExceptionListener implements WebDriverEventListener {
         if (arg1 != null) {
 
             try {
-                new ScreenshotUtil(arg1).captureWebPageSnapshot();
+                new ScreenshotUtil().captureWebPageSnapshot();
             } catch (Exception e) {
             	logger.warn("could not capture error snapshot: " + e.getMessage());
             }
