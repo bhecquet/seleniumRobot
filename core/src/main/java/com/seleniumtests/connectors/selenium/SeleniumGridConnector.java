@@ -1,7 +1,6 @@
 package com.seleniumtests.connectors.selenium;
 
 import java.awt.event.KeyEvent;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -20,7 +19,6 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.SessionId;
 
 import com.seleniumtests.customexception.ConfigurationException;
-import com.seleniumtests.reporter.logger.TestLogging;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
 public class SeleniumGridConnector {
@@ -136,7 +134,7 @@ public class SeleniumGridConnector {
             String browserName = driver.getCapabilities().getBrowserName();
             String version = driver.getCapabilities().getVersion();
             sessionId = driver.getSessionId();
-            TestLogging.info("WebDriver is running on node " + node + ", " + browserName + " " + version + ", session " + sessionId);
+            logger.info("WebDriver is running on node " + node + ", " + browserName + " " + version + ", session " + sessionId);
             
         } catch (Exception ex) {
         	logger.error(ex);
