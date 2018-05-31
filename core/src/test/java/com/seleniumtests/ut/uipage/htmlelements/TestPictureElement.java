@@ -39,7 +39,6 @@ import org.testng.annotations.AfterMethod;
 import org.testng.annotations.Test;
 
 import com.seleniumtests.MockitoTest;
-import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.ImageSearchException;
 import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import com.seleniumtests.driver.WebUIDriver;
@@ -111,7 +110,7 @@ public class TestPictureElement extends MockitoTest {
 		
 		Assert.assertFalse(picElement.isElementPresent());
 		
-		verify(picElement).findElement(true);
+		verify(picElement).findElement();
 		
 	}
 	
@@ -124,7 +123,7 @@ public class TestPictureElement extends MockitoTest {
 		
 		Assert.assertFalse(picElement.isElementPresent(350));
 		
-		verify(picElement, times(2)).findElement(true);
+		verify(picElement, times(2)).findElement();
 		
 	}
 	
@@ -137,7 +136,7 @@ public class TestPictureElement extends MockitoTest {
 		when(imageDetector.getSizeRatio()).thenReturn(1.0);
 		
 		Assert.assertTrue(picElement.isElementPresent(2000));
-		verify(picElement).findElement(true);
+		verify(picElement).findElement();
 		
 	}
 

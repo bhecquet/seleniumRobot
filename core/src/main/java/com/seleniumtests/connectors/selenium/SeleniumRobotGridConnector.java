@@ -1,13 +1,25 @@
 package com.seleniumtests.connectors.selenium;
 
+import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URISyntaxException;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
+import javax.imageio.ImageIO;
+
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.codec.binary.Base64InputStream;
+import org.apache.commons.codec.binary.Base64OutputStream;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.NotImplementedException;
 import org.apache.http.HttpHost;
@@ -85,6 +97,7 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 	 * Upload a file given file path
 	 * @param filePath
 	 */
+	@Override
 	public void uploadFile(String filePath) {
 		try (CloseableHttpClient client = HttpClients.createDefault();) {
 			// zip file
@@ -116,19 +129,154 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 	}
 	
 	/**
+	 * Left clic on desktop at x,y
+	 * @param x		x coordinate
+	 * @param y		y coordinate
+	 */
+	@Override
+	public void leftClic(int x, int y) {
+		if (nodeUrl == null) {
+			throw new ScenarioException("You cannot clic left before driver has been created and corresponding node instanciated");
+		}
+		
+		logger.info(String.format("clic left: %d,%d", x, y));
+		try {
+			Unirest.post(String.format("%s%s", nodeUrl, NODE_TASK_SERVLET))
+				.queryString("action", "leftClic")
+				.queryString("x", x)
+				.queryString("y", y)
+				.asString();
+		} catch (UnirestException e) {
+			logger.warn(String.format("Could not clic left: %s", e.getMessage()));
+		}
+	}
+	
+	/**
+	 * right clic on desktop at x,y
+	 * @param x		x coordinate
+	 * @param y		y coordinate
+	 */
+	@Override
+	public void rightClic(int x, int y) {
+		if (nodeUrl == null) {
+			throw new ScenarioException("You cannot clic right before driver has been created and corresponding node instanciated");
+		}
+		
+		logger.info(String.format("clic right: %d,%d", x, y));
+		try {
+			Unirest.post(String.format("%s%s", nodeUrl, NODE_TASK_SERVLET))
+				.queryString("action", "rightClic")
+				.queryString("x", x)
+				.queryString("y", y)
+				.asString();
+		} catch (UnirestException e) {
+			logger.warn(String.format("Could not clic right: %s", e.getMessage()));
+		}
+	}
+	
+	/**
 	 * Take screenshot of the full desktop
 	 * @return
 	 */
-	public BufferedImage captureDesktopToBuffer() {
-		// TODO: call remote API to do capture and get content
-		throw new NotImplementedException("call remote Robot to really upload file");
+	@Override
+	public String captureDesktopToBuffer() {
+		if (nodeUrl == null) {
+			throw new ScenarioException("You cannot take screenshot before driver has been created and corresponding node instanciated");
+		}
+		
+		logger.info("capturing desktop");
+		try {
+			return Unirest.get(String.format("%s%s", nodeUrl, NODE_TASK_SERVLET))
+				.routeParam("action", "screenshot")
+				.asString().getBody();
+			
+		} catch (UnirestException e) {
+			logger.warn(String.format("Could not capture desktop: %s", e.getMessage()));
+		}
+		return "";
 	}
 	
-
+	/**
+	 * upload file to browser
+	 * @param keys
+	 */
+	@Override
+	public void uploadFileToBrowser(String fileName, File fileToUpload) {
+		if (nodeUrl == null) {
+			throw new ScenarioException("You cannot upload file to browser before driver has been created and corresponding node instanciated");
+		}
+		
+		String b64FileContent = "";
+		try {
+			String fileContent = FileUtils.readFileToString(fileToUpload, Charset.forName("UTF-8"));
+			b64FileContent = Base64.encodeBase64String(fileContent.getBytes());
+		} catch (IOException e) {
+			new ScenarioException(String.format("cannot encode file %s: %s", fileToUpload, e.getMessage()));
+		}
+		
+		logger.info("uploading file to browser: " + fileName);
+		try {
+			Unirest.post(String.format("%s%s", nodeUrl, NODE_TASK_SERVLET))
+			.queryString("action", "uploadFile")
+			.queryString("content", b64FileContent)
+			.queryString("name", fileName)
+			.asString();
+		} catch (UnirestException e) {
+			logger.warn(String.format("Could send keys: %s", e.getMessage()));
+		}
+	}
+	
+	/**
+	 * Send keys to desktop
+	 * @param keys
+	 */
+	@Override
+	public void sendKeysWithKeyboard(KeyEvent ... keys) {
+		if (nodeUrl == null) {
+			throw new ScenarioException("You cannot use keyboard before driver has been created and corresponding node instanciated");
+		}
+		
+		String keyCodeString = String.join(",", Arrays.asList(keys)
+								.stream()
+								.map(k -> Integer.toString(k.getKeyCode()))
+								.collect(Collectors.toList()));
+		
+		logger.info("sending keys: " + keys);
+		try {
+			Unirest.post(String.format("%s%s", nodeUrl, NODE_TASK_SERVLET))
+				.queryString("action", "sendKeys")
+				.queryString("keycodes", keyCodeString).asString();
+		} catch (UnirestException e) {
+			logger.warn(String.format("Could send keys: %s", e.getMessage()));
+		}
+	}
+	
+	/**
+	 * Write text to desktop using keyboard
+	 * @param text
+	 */
+	@Override
+	public void writeText(String text) {
+		if (nodeUrl == null) {
+			throw new ScenarioException("You cannot write text before driver has been created and corresponding node instanciated");
+		}
+		
+		logger.info("writing text: " + text);
+		try {
+			Unirest.post(String.format("%s%s", nodeUrl, NODE_TASK_SERVLET))
+				.queryString("action", "writeText")
+				.queryString("text", text).asString();
+		} catch (UnirestException e) {
+			logger.warn(String.format("Could not write text: %s", e.getMessage()));
+		}
+	}
+	
+	
 	/**
 	 * Kill process
 	 * @param processName
 	 */
+	@Override
 	public void killProcess(String processName) {
 		if (nodeUrl == null) {
 			throw new ScenarioException("You cannot kill a remote process before driver has been created and corresponding node instanciated");

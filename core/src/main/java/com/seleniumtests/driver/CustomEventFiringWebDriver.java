@@ -23,6 +23,7 @@ import java.awt.Rectangle;
 import java.awt.Robot;
 import java.awt.Toolkit;
 import java.awt.datatransfer.StringSelection;
+import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
@@ -299,7 +300,7 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
 	 * Take screenshot of the desktop and put it in a file
 	 * Do not expose this method because we need to check that we have a graphical environment. 
 	 */
-	private BufferedImage captureDesktopToBuffer() {
+	private static BufferedImage captureDesktopToBuffer() {
 		
 		GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
 		GraphicsDevice defaultGraphicDevice = ge.getDefaultScreenDevice();
@@ -358,7 +359,7 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
 	/**
 	 * Use copy to clipboard and copy-paste keyboard shortcut to write something on upload window
 	 */
-	public void uploadFileUsingClipboard(File tempFile) {
+	public static void uploadFileUsingClipboard(File tempFile) {
 
 		// Copy to clipboard
 		Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(tempFile.getAbsolutePath()), null);
@@ -395,7 +396,7 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
 	 * Upload file typing file path directly
 	 * @param tempFile
 	 */
-	public void uploadFileUsingKeyboardTyping(File tempFile) {
+	public static void uploadFileUsingKeyboardTyping(File tempFile) {
 		try {
 			Keyboard keyboard = new Keyboard();
 			Robot robot = keyboard.getRobot();
@@ -421,7 +422,7 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
 		}
 	}
 	
-	public void uploadFile(String fileName, String base64Content) throws IOException {
+	public static void uploadFile(String fileName, String base64Content) throws IOException {
 		
 		byte[] byteArray = base64Content.getBytes();
         File tempFile = new File("tmp/" + fileName);
@@ -435,7 +436,80 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
         }
 	}
 	
-	private String captureDesktopToBase64String() {
+	/**
+	 * Left clic at coordinates on desktop. Coordinates are from screen point of view
+	 * @param x
+	 * @param y
+	 */
+	public static void leftClicOnDesktopAt(int x, int y) {
+		try {
+			Robot robot = new Robot();
+			robot.mouseMove(x, y);
+			robot.mousePress(InputEvent.BUTTON1_DOWN_MASK);
+			robot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
+		} catch (AWTException e) {
+			throw new ScenarioException("leftClicOnDesktopAt: problem using Robot: " + e.getMessage());
+		}
+	}
+	
+	/**
+	 * right clic at coordinates on desktop. Coordinates are from screen point of view
+	 * @param x
+	 * @param y
+	 */
+	public static void rightClicOnDesktopAt(int x, int y) {
+		try {
+			Robot robot = new Robot();
+			robot.mouseMove(x, y);
+			robot.mousePress(InputEvent.BUTTON2_DOWN_MASK);
+			robot.mouseRelease(InputEvent.BUTTON2_DOWN_MASK);
+		} catch (AWTException e) {
+			throw new ScenarioException("rightClicOnDesktopAt: problem using Robot: " + e.getMessage());
+		}
+	}
+	
+	/**
+	 * write text to desktop.
+	 * @param textToWrite	text to write
+	 * @return
+	 */
+	public static void writeToDesktop(String textToWrite) {
+		try {
+			Keyboard keyboard = new Keyboard();
+			keyboard.typeKeys(textToWrite);
+		} catch (AWTException e) {
+			throw new ScenarioException("writeToDesktop: could not initialize robot to type keys: " + e.getMessage());
+		}
+	}
+	
+	/**
+	 * send keys to desktop
+	 * This is useful for typing special keys like ENTER
+	 * @param keys
+	 */
+	public static void sendKeysToDesktop(List<Integer> keyCodes) {
+		try {
+			Robot robot = new Robot();
+			
+			WaitHelper.waitForSeconds(1);
+			
+			for (Integer key: keyCodes) {
+				robot.keyPress(key);
+				robot.keyRelease(key);
+			}
+		} catch (AWTException e) {
+			throw new ScenarioException("could not initialize robot to type keys: " + e.getMessage());
+		}
+	}
+	public static void sendKeysToDesktop(KeyEvent ... keys) {
+		List<Integer> keyCodes = new ArrayList<>();
+		for (KeyEvent key: keys) {
+			keyCodes.add(key.getKeyCode());
+		}
+		sendKeysToDesktop(keyCodes);
+	}
+	
+	public static String captureDesktopToBase64String() {
 		BufferedImage bi = captureDesktopToBuffer();
 		ByteArrayOutputStream os = new ByteArrayOutputStream();
 		OutputStream b64 = new Base64OutputStream(os);

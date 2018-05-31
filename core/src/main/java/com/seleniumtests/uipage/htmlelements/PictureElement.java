@@ -16,18 +16,21 @@
  */
 package com.seleniumtests.uipage.htmlelements;
 
+import java.awt.AWTException;
+import java.awt.Robot;
+import java.awt.event.InputEvent;
 import java.io.File;
 import java.io.IOException;
 import java.time.Duration;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.Rectangle;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
-import org.openqa.selenium.support.events.EventFiringWebDriver;
 import org.openqa.selenium.support.ui.SystemClock;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
@@ -41,6 +44,7 @@ import com.seleniumtests.driver.screenshots.ScreenshotUtil;
 import com.seleniumtests.uipage.ReplayOnError;
 import com.seleniumtests.util.helper.WaitHelper;
 import com.seleniumtests.util.imaging.ImageDetector;
+import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
 import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.TouchAction;
@@ -51,6 +55,7 @@ import io.appium.java_client.TouchAction;
  *
  */
 public class PictureElement {
+	protected static final Logger logger = SeleniumRobotLogger.getLogger(PictureElement.class);
 	
 	private File objectPictureFile;
 	private String resourcePath;
@@ -58,6 +63,7 @@ public class PictureElement {
 	private Rectangle detectedObjectRectangle;
 	private double pictureSizeRatio;
 	private ImageDetector detector;
+	private boolean searchOnDesktop;
 	private SystemClock clock = new SystemClock();
 
 	public PictureElement() {
@@ -67,14 +73,24 @@ public class PictureElement {
 	public PictureElement(String label, String resourcePath, HtmlElement intoElement) {
 		this(label, resourcePath, intoElement, 0.1);
 	}
-
+	public PictureElement(String label, String resourcePath, HtmlElement intoElement, boolean searchOnDesktop) {
+		this(label, resourcePath, intoElement, 0.1, searchOnDesktop);
+	}
+	
 	public PictureElement(String label, String resourcePath, HtmlElement intoElement, double detectionThreshold) {
 		this(label, createFileFromResource(resourcePath), intoElement, detectionThreshold);
+		this.resourcePath = resourcePath;
+	}
+	public PictureElement(String label, String resourcePath, HtmlElement intoElement, double detectionThreshold, boolean searchOnDesktop) {
+		this(label, createFileFromResource(resourcePath), intoElement, detectionThreshold, searchOnDesktop);
 		this.resourcePath = resourcePath;
 	}
 	
 	public PictureElement(String label, File pictureFile, HtmlElement intoElement) {
 		this(label, pictureFile, intoElement, 0.1);
+	}
+	public PictureElement(String label, File pictureFile, HtmlElement intoElement, boolean searchOnDesktop) {
+		this(label, pictureFile, intoElement, 0.1, searchOnDesktop);
 	}
 	
 	/**
@@ -84,7 +100,19 @@ public class PictureElement {
 	 * @param intoElement	HtmlElement inside of which our picture is. It allows scrolling to the zone where 
 	 * 						picture is searched before doing capture
 	 */
-	public PictureElement(String label, File pictureFile, HtmlElement intoElement, double detectionThreshold) {		
+	public PictureElement(String label, File pictureFile, HtmlElement intoElement, double detectionThreshold) {
+		this(label, pictureFile, intoElement, detectionThreshold, false);
+	}
+	/**
+	 * 
+	 * @param label
+	 * @param pictureFile			picture to search for in snapshot or on desktop
+	 * @param intoElement			HtmlElement inside of which our picture is. It allows scrolling to the zone where 
+	 * 								picture is searched before doing capture
+	 * @param detectionThreshold	sensitivity of search between 0 and 1. Be default, 0.1. More sensitivity means search can be less accurate, detect unwanted zones
+	 * @param searchOnDesktop		By default, false: search in driver snapshot. If true, we take a desktop screenshot, allwing searching into other elements that browser
+	 */
+	public PictureElement(String label, File pictureFile, HtmlElement intoElement, double detectionThreshold, boolean searchOnDesktop) {		
 		if (intoElement == null) {
 			if (SeleniumTestsContextManager.isWebTest()) {
 				this.intoElement = new HtmlElement("", By.tagName("body"));
@@ -95,6 +123,7 @@ public class PictureElement {
 			this.intoElement = intoElement;
 		}
 		
+		this.searchOnDesktop = searchOnDesktop;
 		detector = new ImageDetector();
 		detector.setDetectionThreshold(detectionThreshold);
 		setObjectPictureFile(pictureFile);
@@ -119,15 +148,21 @@ public class PictureElement {
 	 * WebDriver is used in mobile, because Robot is not available for mobile platforms
 	 * 
 	 * @param searchOnly
+	 * 
+	 * @deprecated use findElement instead
 	 */
+	@Deprecated
 	public void findElement(boolean searchOnly) {
+		findElement();
+	}
+	public void findElement() {
 		
 		File screenshotFile;
-		if (searchOnly) {
-			screenshotFile = new ScreenshotUtil().captureWebPageToFile();
-		} else {
+		if (searchOnDesktop) {
 			// issue #136: we don't need driver when checking desktop
 			screenshotFile = new ScreenshotUtil().captureDesktopToFile();
+		} else {
+			screenshotFile = new ScreenshotUtil().captureWebPageToFile();
 		}
 		if (screenshotFile == null) {
 			throw new WebDriverException("Screenshot does not exist");
@@ -160,55 +195,76 @@ public class PictureElement {
 	 */
 	@ReplayOnError
 	public void clickAt(int xOffset, int yOffset) {
-		findElement(true);
+		int relativeX;
+		int relativeY;
+		
+		findElement();
 
-		Point intoElementPos = intoElement.getCoordinates().onPage();
-		int relativeX = detectedObjectRectangle.x + detectedObjectRectangle.width / 2 - intoElementPos.x;
-		int relativeY = detectedObjectRectangle.y + detectedObjectRectangle.height / 2 - intoElementPos.y;
-//		System.out.println(intoElementPos);
-//		System.out.println(relativeX);
-//		System.out.println(relativeY);
-//		System.out.println(detectedObjectRectangle.getPoint());
-//		System.out.println(detectedObjectRectangle.getDimension());
+		if (searchOnDesktop) {
+			relativeX = detectedObjectRectangle.x + detectedObjectRectangle.width / 2;
+			relativeY = detectedObjectRectangle.y + detectedObjectRectangle.height / 2;
+		} else {
+			Point intoElementPos = intoElement.getCoordinates().onPage();
+			relativeX = detectedObjectRectangle.x + detectedObjectRectangle.width / 2 - intoElementPos.x;
+			relativeY = detectedObjectRectangle.y + detectedObjectRectangle.height / 2 - intoElementPos.y;
+		}
 		moveAndClick(intoElement, relativeX + (int)(xOffset * pictureSizeRatio), relativeY + (int)(yOffset * pictureSizeRatio));
 	}
 	
 	@ReplayOnError
     public void swipe(int xMove, int yMove) {
-		findElement(true);
+		findElement();
 		
-		int xInit = detectedObjectRectangle.x + detectedObjectRectangle.width / 2;
-		int yInit = detectedObjectRectangle.y + detectedObjectRectangle.height / 2;
-		
-		new TouchAction(getMobileDriver()).press(xInit, yInit)
-			.waitAction(Duration.ofMillis(500))
-			.moveTo(xInit + xMove, yInit + yMove)
-			.release()
-			.perform();
+		if (searchOnDesktop) {
+			throw new ScenarioException("swipe is not supported for desktop capture");
+		} else {
+			int xInit = detectedObjectRectangle.x + detectedObjectRectangle.width / 2;
+			int yInit = detectedObjectRectangle.y + detectedObjectRectangle.height / 2;
+			
+			new TouchAction(getMobileDriver()).press(xInit, yInit)
+				.waitAction(Duration.ofMillis(500))
+				.moveTo(xInit + xMove, yInit + yMove)
+				.release()
+				.perform();
+		}
 	}
 	
 	@ReplayOnError
     public void tap() {
-		findElement(true);
-		new TouchAction(getMobileDriver()).tap(detectedObjectRectangle.x + detectedObjectRectangle.width / 2, detectedObjectRectangle.y + detectedObjectRectangle.height / 2).perform();
+		findElement();
+		
+		if (searchOnDesktop) {
+			throw new ScenarioException("tap is not supported for desktop capture");
+		} else {
+			new TouchAction(getMobileDriver()).tap(detectedObjectRectangle.x + detectedObjectRectangle.width / 2, detectedObjectRectangle.y + detectedObjectRectangle.height / 2).perform();
+		}
 	}
 	
 	public void moveAndClick(WebElement element, int coordX, int coordY) {
-		// issue #133: handle new actions specific case
-		// more browsers will be added to this conditions once they are migrated to new composite actions
-		// 
-		if (SeleniumTestsContextManager.isWebTest() && SeleniumTestsContextManager.getThreadContext().getBrowser() == BrowserType.FIREFOX) {
-			coordX -= element.getSize().width / 2;
-			coordY -= element.getSize().height / 2;
-		}
 		
-		new Actions(WebUIDriver.getWebDriver()).moveToElement(element, coordX, coordY).click().build().perform();
+		if (searchOnDesktop) {
+			CustomEventFiringWebDriver.leftClicOnDesktopAt(coordX, coordY);
+		} else {
+			// issue #133: handle new actions specific case
+			// more browsers will be added to this conditions once they are migrated to new composite actions
+			// 
+			if (SeleniumTestsContextManager.isWebTest() && SeleniumTestsContextManager.getThreadContext().getBrowser() == BrowserType.FIREFOX) {
+				coordX -= element.getSize().width / 2;
+				coordY -= element.getSize().height / 2;
+			}
+			
+			new Actions(WebUIDriver.getWebDriver()).moveToElement(element, coordX, coordY).click().build().perform();
+		}
 	}
 	
 	public void sendKeys(final CharSequence text, int xOffset, int yOffset) {
 		clickAt(xOffset, yOffset);
 		
-		new Actions(WebUIDriver.getWebDriver()).sendKeys(text).build().perform();
+		if (searchOnDesktop) {
+			CustomEventFiringWebDriver.writeToDesktop(text.toString());
+		} else {
+			new Actions(WebUIDriver.getWebDriver()).sendKeys(text).build().perform();
+		}
 	}
 
 	public void sendKeys(final CharSequence text) {
@@ -220,31 +276,30 @@ public class PictureElement {
 	}
 	
 	/**
-	 * check whether picture is present or not on browser or on application (for mobile) as it uses driver capture
-	 * @param waitMs
-	 * @return
-	 */
-	public boolean isElementPresent(int waitMs) {
-		return isElementPresent(waitMs, true);
-	}
-	
-	/**
 	 * Check if picture is visible on desktop. This is only available for desktop tests
 	 * @param waitMs
 	 * @return
+	 * 
+	 * @deprecated use isElementPresent instead
 	 */
+	@Deprecated
 	public boolean isElementPresentOnDesktop(int waitMs) {
-		return isElementPresent(waitMs, false);
-	}
-	public boolean isElementPresentOnDesktop() {
-		return isElementPresent(0, false);
+		return isElementPresent(waitMs);
 	}
 	
-	private boolean isElementPresent(int waitMs, boolean captureByDriver) {
+	/**
+	 * @deprecated use isElementPresent instead
+	 */
+	@Deprecated
+	public boolean isElementPresentOnDesktop() {
+		return isElementPresent(0);
+	}
+	
+	public boolean isElementPresent(int waitMs) {
 		long end = clock.laterBy(waitMs);
 		while (clock.isNowBefore(end) || waitMs == 0) {
 			try {
-				findElement(captureByDriver);
+				findElement();
 				return true;
 			} catch (ImageSearchException e) {
 				if (waitMs == 0) {
