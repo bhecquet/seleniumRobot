@@ -54,6 +54,7 @@ import org.openqa.selenium.remote.UselessFileDetector;
 import org.openqa.selenium.support.events.EventFiringWebDriver;
 
 import com.seleniumtests.browserfactory.BrowserInfo;
+import com.seleniumtests.connectors.selenium.SeleniumGridConnector;
 import com.seleniumtests.customexception.DriverExceptions;
 import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.util.helper.WaitHelper;
@@ -76,6 +77,7 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
 	private final DriverMode driverMode;
 	private final BrowserInfo browserInfo;
 	private final BrowserMobProxy mobProxy;
+	private final SeleniumGridConnector gridConnector;
     
     private static final String JS_GET_VIEWPORT_SIZE =
     		"var pixelRatio;" +
@@ -140,7 +142,7 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
     	this(driver, null, null, true, DriverMode.LOCAL, null);
     }
 
-	public CustomEventFiringWebDriver(final WebDriver driver, List<Long> driverPids, BrowserInfo browserInfo, Boolean isWebTest, DriverMode localDriver, BrowserMobProxy mobProxy) {
+	public CustomEventFiringWebDriver(final WebDriver driver, List<Long> driverPids, BrowserInfo browserInfo, Boolean isWebTest, DriverMode localDriver, BrowserMobProxy mobProxy, SeleniumGridConnector gridConnector) {
         super(driver);
         this.driverPids = driverPids == null ? new ArrayList<>(): driverPids;
 		this.driver = driver;
@@ -148,6 +150,7 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
 		this.isWebTest = isWebTest;
 		this.driverMode = localDriver;
 		this.mobProxy = mobProxy;
+		this.gridConnector = gridConnector;
     }
 
     public void setFileDetector(final FileDetector detector) {
