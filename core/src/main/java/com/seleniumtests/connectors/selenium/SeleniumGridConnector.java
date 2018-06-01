@@ -68,7 +68,7 @@ public class SeleniumGridConnector {
 	 * Upload a file to a browser uplpoad window
 	 * @param filePath
 	 */
-	public void uploadFileToBrowser(String fileName, File fileToUpload) {
+	public void uploadFileToBrowser(String fileName, String base64Content) {
 		logger.warn("file upload to browser is only available with seleniumRobot grid");
 	}
 	

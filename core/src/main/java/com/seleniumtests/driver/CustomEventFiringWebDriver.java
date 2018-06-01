@@ -139,7 +139,22 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
     		"var action = 'capture_desktop_snapshot_to_base64_string';return '';";
     
     public CustomEventFiringWebDriver(final WebDriver driver) {
-    	this(driver, null, null, true, DriverMode.LOCAL, null);
+    	this(driver, null, null, true, DriverMode.LOCAL, null, null);
+    }
+    
+    /**
+     * constructor for using driver instance without a real driver (only used by grid)
+     * @param driverMode
+     */
+    public CustomEventFiringWebDriver(DriverMode driverMode) {
+    	super(null); // TODO: won't work!!
+    	this.driverPids = new ArrayList<>();
+		this.driver = null;
+		this.browserInfo = null;
+		this.isWebTest = true;
+		this.driverMode = driverMode;
+		this.mobProxy = null;
+		this.gridConnector = null;
     }
 
 	public CustomEventFiringWebDriver(final WebDriver driver, List<Long> driverPids, BrowserInfo browserInfo, Boolean isWebTest, DriverMode localDriver, BrowserMobProxy mobProxy, SeleniumGridConnector gridConnector) {
@@ -362,7 +377,7 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
 	/**
 	 * Use copy to clipboard and copy-paste keyboard shortcut to write something on upload window
 	 */
-	public static void uploadFileUsingClipboard(File tempFile) {
+	public void uploadFileUsingClipboard(File tempFile) {
 
 		// Copy to clipboard
 		Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(tempFile.getAbsolutePath()), null);
@@ -399,7 +414,7 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
 	 * Upload file typing file path directly
 	 * @param tempFile
 	 */
-	public static void uploadFileUsingKeyboardTyping(File tempFile) {
+	public void uploadFileUsingKeyboardTyping(File tempFile) {
 		try {
 			Keyboard keyboard = new Keyboard();
 			Robot robot = keyboard.getRobot();
@@ -425,18 +440,24 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
 		}
 	}
 	
-	public static void uploadFile(String fileName, String base64Content) throws IOException {
+	public void uploadFile(String fileName, String base64Content) throws IOException {
 		
-		byte[] byteArray = base64Content.getBytes();
-        File tempFile = new File("tmp/" + fileName);
-        byte[] decodeBuffer = Base64.decodeBase64(byteArray);
-        FileUtils.writeByteArrayToFile(tempFile, decodeBuffer);
-
-        try {
-        	uploadFileUsingClipboard(tempFile);
-        } catch (IllegalStateException e) {
-        	uploadFileUsingKeyboardTyping(tempFile);
-        }
+		if (driverMode == DriverMode.LOCAL) {
+			byte[] byteArray = base64Content.getBytes();
+	        File tempFile = new File("tmp/" + fileName);
+	        byte[] decodeBuffer = Base64.decodeBase64(byteArray);
+	        FileUtils.writeByteArrayToFile(tempFile, decodeBuffer);
+	
+	        try {
+	        	uploadFileUsingClipboard(tempFile);
+	        } catch (IllegalStateException e) {
+	        	uploadFileUsingKeyboardTyping(tempFile);
+	        }
+		} else if (driverMode == DriverMode.GRID && gridConnector != null) {
+			gridConnector.uploadFileToBrowser(fileName, base64Content);
+		} else {
+			throw new ScenarioException("driver supports uploadFile only in local and grid mode");
+		}
 	}
 	
 	/**
@@ -444,14 +465,21 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
 	 * @param x
 	 * @param y
 	 */
-	public static void leftClicOnDesktopAt(int x, int y) {
-		try {
-			Robot robot = new Robot();
-			robot.mouseMove(x, y);
-			robot.mousePress(InputEvent.BUTTON1_DOWN_MASK);
-			robot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
-		} catch (AWTException e) {
-			throw new ScenarioException("leftClicOnDesktopAt: problem using Robot: " + e.getMessage());
+	public void leftClicOnDesktopAt(int x, int y) {
+		
+		if (driverMode == DriverMode.LOCAL) {
+			try {
+				Robot robot = new Robot();
+				robot.mouseMove(x, y);
+				robot.mousePress(InputEvent.BUTTON1_DOWN_MASK);
+				robot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
+			} catch (AWTException e) {
+				throw new ScenarioException("leftClicOnDesktopAt: problem using Robot: " + e.getMessage());
+			}
+		} else if (driverMode == DriverMode.GRID && gridConnector != null) {
+			gridConnector.leftClic(x, y);
+		} else {
+			throw new ScenarioException("driver supports sendKeysToDesktop only in local and grid mode");
 		}
 	}
 	
@@ -460,14 +488,21 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
 	 * @param x
 	 * @param y
 	 */
-	public static void rightClicOnDesktopAt(int x, int y) {
-		try {
-			Robot robot = new Robot();
-			robot.mouseMove(x, y);
-			robot.mousePress(InputEvent.BUTTON2_DOWN_MASK);
-			robot.mouseRelease(InputEvent.BUTTON2_DOWN_MASK);
-		} catch (AWTException e) {
-			throw new ScenarioException("rightClicOnDesktopAt: problem using Robot: " + e.getMessage());
+	public void rightClicOnDesktopAt(int x, int y) {
+		
+		if (driverMode == DriverMode.LOCAL) {
+			try {
+				Robot robot = new Robot();
+				robot.mouseMove(x, y);
+				robot.mousePress(InputEvent.BUTTON2_DOWN_MASK);
+				robot.mouseRelease(InputEvent.BUTTON2_DOWN_MASK);
+			} catch (AWTException e) {
+				throw new ScenarioException("rightClicOnDesktopAt: problem using Robot: " + e.getMessage());
+			}
+		} else if (driverMode == DriverMode.GRID && gridConnector != null) {
+			gridConnector.rightClic(x, y);
+		} else {
+			throw new ScenarioException("driver supports sendKeysToDesktop only in local and grid mode");
 		}
 	}
 	
@@ -476,12 +511,19 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
 	 * @param textToWrite	text to write
 	 * @return
 	 */
-	public static void writeToDesktop(String textToWrite) {
-		try {
-			Keyboard keyboard = new Keyboard();
-			keyboard.typeKeys(textToWrite);
-		} catch (AWTException e) {
-			throw new ScenarioException("writeToDesktop: could not initialize robot to type keys: " + e.getMessage());
+	public void writeToDesktop(String textToWrite) {
+		if (driverMode == DriverMode.LOCAL) {
+	
+			try {
+				Keyboard keyboard = new Keyboard();
+				keyboard.typeKeys(textToWrite);
+			} catch (AWTException e) {
+				throw new ScenarioException("writeToDesktop: could not initialize robot to type keys: " + e.getMessage());
+			}
+		} else if (driverMode == DriverMode.GRID && gridConnector != null) {
+			gridConnector.writeText(textToWrite);
+		} else {
+			throw new ScenarioException("driver supports sendKeysToDesktop only in local and grid mode");
 		}
 	}
 	
@@ -490,37 +532,53 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
 	 * This is useful for typing special keys like ENTER
 	 * @param keys
 	 */
-	public static void sendKeysToDesktop(List<Integer> keyCodes) {
-		try {
-			Robot robot = new Robot();
-			
-			WaitHelper.waitForSeconds(1);
-			
-			for (Integer key: keyCodes) {
-				robot.keyPress(key);
-				robot.keyRelease(key);
+	public void sendKeysToDesktop(List<Integer> keyCodes) {
+		if (driverMode == DriverMode.LOCAL) {
+			try {
+				Robot robot = new Robot();
+				
+				WaitHelper.waitForSeconds(1);
+				
+				for (Integer key: keyCodes) {
+					robot.keyPress(key);
+					robot.keyRelease(key);
+				}
+			} catch (AWTException e) {
+				throw new ScenarioException("could not initialize robot to type keys: " + e.getMessage());
 			}
-		} catch (AWTException e) {
-			throw new ScenarioException("could not initialize robot to type keys: " + e.getMessage());
+		} else {
+			throw new ScenarioException("driver supports sendKeysToDesktop only in local");
 		}
 	}
-	public static void sendKeysToDesktop(KeyEvent ... keys) {
-		List<Integer> keyCodes = new ArrayList<>();
-		for (KeyEvent key: keys) {
-			keyCodes.add(key.getKeyCode());
+	public void sendKeysToDesktop(KeyEvent ... keys) {
+		if (driverMode == DriverMode.LOCAL) {
+			List<Integer> keyCodes = new ArrayList<>();
+			for (KeyEvent key: keys) {
+				keyCodes.add(key.getKeyCode());
+			}
+			sendKeysToDesktop(keyCodes);
+		} else if (driverMode == DriverMode.GRID && gridConnector != null) {
+			gridConnector.sendKeysWithKeyboard(keys);
+		} else {
+			throw new ScenarioException("driver supports sendKeysToDesktop only in local and grid mode");
 		}
-		sendKeysToDesktop(keyCodes);
 	}
 	
-	public static String captureDesktopToBase64String() {
-		BufferedImage bi = captureDesktopToBuffer();
-		ByteArrayOutputStream os = new ByteArrayOutputStream();
-		OutputStream b64 = new Base64OutputStream(os);
-		try {
-			ImageIO.write(bi, "png", b64);
-			return os.toString("UTF-8");
-		} catch (IOException e) {
-			return "";
+	public String captureDesktopToBase64String() {
+		if (driverMode == DriverMode.LOCAL) {
+			BufferedImage bi = captureDesktopToBuffer();
+			ByteArrayOutputStream os = new ByteArrayOutputStream();
+			OutputStream b64 = new Base64OutputStream(os);
+			try {
+				ImageIO.write(bi, "png", b64);
+				return os.toString("UTF-8");
+			} catch (IOException e) {
+				return "";
+			}
+		} else if (driverMode == DriverMode.GRID && gridConnector != null) {
+			return gridConnector.captureDesktopToBuffer();
+		} else {
+			throw new ScenarioException("driver supports captureDesktopToBase64String only in local and grid mode");
 		}
 	}
 	
