@@ -799,9 +799,13 @@ public class TestSeleniumTestContext extends GenericTest {
 	}
 	@Test(groups="ut context")
 	public void testOutputDirectoryFromSystem(final ITestContext testNGCtx, final XmlTest xmlTest) {
-		System.setProperty(SeleniumTestsContext.OUTPUT_DIRECTORY, "/home/user/test-output");
-		initThreadContext(testNGCtx);
-		Assert.assertTrue(SeleniumTestsContextManager.getThreadContext().getOutputDirectory().endsWith("/home/user/test-output/null")); // test name is null
+		try {
+			System.setProperty(SeleniumTestsContext.OUTPUT_DIRECTORY, "/home/user/test-output");
+			initThreadContext(testNGCtx);
+			Assert.assertTrue(SeleniumTestsContextManager.getThreadContext().getOutputDirectory().endsWith("/home/user/test-output/null")); // test name is null
+		} finally {
+			System.clearProperty(SeleniumTestsContext.OUTPUT_DIRECTORY);
+		}
 	}
 	@Test(groups="ut context")
 	public void testOutputDirectoryNull(final ITestContext testNGCtx, final XmlTest xmlTest) {
