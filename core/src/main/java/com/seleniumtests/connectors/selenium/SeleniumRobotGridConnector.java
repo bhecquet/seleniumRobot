@@ -187,7 +187,7 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 		logger.info("capturing desktop");
 		try {
 			return Unirest.get(String.format("%s%s", nodeUrl, NODE_TASK_SERVLET))
-				.routeParam("action", "screenshot")
+				.queryString("action", "screenshot")
 				.asString().getBody();
 			
 		} catch (UnirestException e) {
@@ -224,17 +224,17 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 	 * @param keys
 	 */
 	@Override
-	public void sendKeysWithKeyboard(KeyEvent ... keys) {
+	public void sendKeysWithKeyboard(List<Integer> keyCodes) {
 		if (nodeUrl == null) {
 			throw new ScenarioException("You cannot use keyboard before driver has been created and corresponding node instanciated");
 		}
 		
-		String keyCodeString = String.join(",", Arrays.asList(keys)
+		String keyCodeString = String.join(",", keyCodes
 								.stream()
-								.map(k -> Integer.toString(k.getKeyCode()))
+								.map(k -> Integer.toString(k))
 								.collect(Collectors.toList()));
 		
-		logger.info("sending keys: " + keys);
+		logger.info("sending keys: " + keyCodes);
 		try {
 			Unirest.post(String.format("%s%s", nodeUrl, NODE_TASK_SERVLET))
 				.queryString("action", "sendKeys")
