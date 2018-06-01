@@ -16,6 +16,9 @@
  */
 package com.seleniumtests.it.driver;
 
+import java.awt.event.KeyEvent;
+
+import org.openqa.selenium.Rectangle;
 import org.openqa.selenium.WebDriver;
 import org.testng.Assert;
 import org.testng.SkipException;
@@ -24,23 +27,21 @@ import org.testng.annotations.Test;
 
 import com.seleniumtests.customexception.ImageSearchException;
 import com.seleniumtests.driver.BrowserType;
+import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import com.seleniumtests.it.driver.support.GenericMultiBrowserTest;
 import com.seleniumtests.it.driver.support.pages.DriverTestPage;
+import com.seleniumtests.uipage.htmlelements.ScreenZone;
 
-public class TestPictureElement extends GenericMultiBrowserTest {
+public class TestScreenZone extends GenericMultiBrowserTest {
 	
-	public TestPictureElement(WebDriver driver, DriverTestPage testPage) throws Exception {
+	public TestScreenZone(WebDriver driver, DriverTestPage testPage) throws Exception {
 		super(driver, testPage);
 	}
 	
-	public TestPictureElement(BrowserType browserType) throws Exception {
-		super(browserType, "DriverTestPageWithoutFixedPattern"); 
+	public TestScreenZone() throws Exception {
+		super(BrowserType.CHROME, "DriverTestPageWithoutFixedPattern");  
 	}
-	
-	public TestPictureElement() throws Exception {
-		super(null, "DriverTestPageWithoutFixedPattern");
-	}
-	
+
 	@AfterMethod(groups={"it"})
 	public void reset() {
 		if (driver != null) {
@@ -50,22 +51,27 @@ public class TestPictureElement extends GenericMultiBrowserTest {
 	}
 	
 	@Test(groups={"it"})
-	public void testClickOnPicture() {
+	public void testClickOnGooglePicture() {
 		try {
-			testPageWithoutPattern.picture.clickAt(0, -20);
+			testPageWithoutPattern.googleForDesktop.click();
 		} catch (ImageSearchException e) {
 			throw new SkipException("Image not found, we may be on screenless slave", e);
 		}
-		Assert.assertEquals(testPage.logoText.getValue(), "ff logo");
+		Assert.assertEquals(testPage.textElement.getValue(), "image");
 	}
 	
 	/**
-	 * test correction of issue #131 by clicking on element which does not have a "intoElement" parameter
+	 * Clic at given coordinate on screen without picture reference
 	 */
 	@Test(groups={"it"})
-	public void testClickOnGooglePicture() {
+	public void testClickAtCoordinates() {
 		try {
-			testPageWithoutPattern.googlePicture.click();
+			// search zone to clic
+			testPageWithoutPattern.googleForDesktop.findElement();
+			Rectangle rectangle = testPageWithoutPattern.googleForDesktop.getDetectedObjectRectangle();
+			
+			// clic with a new ScreenZone
+			new ScreenZone("image").clickAt(rectangle.x + 10, rectangle.y + 10);
 		} catch (ImageSearchException e) {
 			throw new SkipException("Image not found, we may be on screenless slave", e);
 		}
@@ -78,7 +84,7 @@ public class TestPictureElement extends GenericMultiBrowserTest {
 	@Test(groups={"it"})
 	public void testClickOnGooglePictureFromFile() {
 		try {
-			testPageWithoutPattern.googlePictureWithFile.click();
+			testPageWithoutPattern.googleForDesktopWithFile.click();
 		} catch (ImageSearchException e) {
 			throw new SkipException("Image not found, we may be on screenless slave", e);
 		}
@@ -89,21 +95,34 @@ public class TestPictureElement extends GenericMultiBrowserTest {
 	public void testSendKeysOnPicture() {
 		try {
 			testPageWithoutPattern.logoText.clear();
-			testPageWithoutPattern.picture.sendKeys("hello", 0, 40);
+			((CustomEventFiringWebDriver)driver).scrollToElement(testPageWithoutPattern.table, 200);
+			testPageWithoutPattern.firefoxForDesktop.sendKeys("hello", 0, 40);
 		} catch (ImageSearchException e) {
 			throw new SkipException("Image not found, we may be on screenless slave", e);
 		}
 		Assert.assertEquals(testPage.logoText.getValue(), "hello");
 	}
+	
+	@Test(groups={"it"})
+	public void testSendKeyboardKeysOnPicture() { 
+		try {
+			testPageWithoutPattern.logoText.clear();
+			((CustomEventFiringWebDriver)driver).scrollToElement(testPageWithoutPattern.table, 200);
+			testPageWithoutPattern.firefoxForDesktop.sendKeys(0, 40, KeyEvent.VK_A, KeyEvent.VK_B);
+		} catch (ImageSearchException e) {
+			throw new SkipException("Image not found, we may be on screenless slave", e);
+		}
+		Assert.assertEquals(testPage.logoText.getValue(), "ab");
+	}
 
 	@Test(groups={"it"})
 	public void testIsVisible() { 
-		Assert.assertTrue(testPageWithoutPattern.picture.isElementPresent());
+		Assert.assertTrue(testPageWithoutPattern.googleForDesktop.isElementPresent());
 	}
 	
 	@Test(groups={"it"})
 	public void testIsNotVisible() {
-		Assert.assertFalse(testPageWithoutPattern.pictureNotPresent.isElementPresent());
+		Assert.assertFalse(testPageWithoutPattern.zoneNotPresent.isElementPresent());
 	}
 	
 	

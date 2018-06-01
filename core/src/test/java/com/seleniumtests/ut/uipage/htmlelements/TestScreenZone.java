@@ -23,15 +23,12 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.awt.AWTException;
+import java.awt.event.KeyEvent;
 import java.io.File;
 
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.openqa.selenium.Point;
 import org.openqa.selenium.Rectangle;
-import org.openqa.selenium.interactions.Keyboard;
-import org.openqa.selenium.interactions.Mouse;
-import org.openqa.selenium.interactions.internal.Coordinates;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
@@ -41,15 +38,14 @@ import org.testng.annotations.Test;
 
 import com.seleniumtests.MockitoTest;
 import com.seleniumtests.customexception.ImageSearchException;
+import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.driver.CustomEventFiringWebDriver;
-import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.driver.screenshots.ScreenshotUtil;
-import com.seleniumtests.uipage.htmlelements.HtmlElement;
-import com.seleniumtests.uipage.htmlelements.PictureElement;
+import com.seleniumtests.uipage.htmlelements.ScreenZone;
 import com.seleniumtests.util.imaging.ImageDetector;
 
-@PrepareForTest(WebUIDriver.class)
-public class TestPictureElement extends MockitoTest {
+@PrepareForTest(CustomEventFiringWebDriver.class)
+public class TestScreenZone extends MockitoTest {
 	
 	@Mock
 	ImageDetector imageDetector;
@@ -57,49 +53,58 @@ public class TestPictureElement extends MockitoTest {
 	@Mock
 	ScreenshotUtil screenshotUtil;
 	
-	@Mock
-	HtmlElement intoElement;
-	
-	@Mock
-	Coordinates coordinates;
-	
-	@Mock
-	CustomEventFiringWebDriver driver;
-	
-	@Mock
-	Mouse mouse;
-	@Mock
-	Keyboard keyboard;
-
 	@InjectMocks
-	PictureElement pictureElement = new PictureElement();
+	ScreenZone screenZone = new ScreenZone();
 	
+
 	@Test(groups={"ut"})
 	public void testClick() {
-		PictureElement picElement = spy(pictureElement);
+		ScreenZone picElement = spy(screenZone);
 		picElement.setObjectPictureFile(new File(""));
 
-		PowerMockito.mockStatic(WebUIDriver.class);
-		when(WebUIDriver.getWebDriver()).thenReturn(driver);
-		when(driver.getMouse()).thenReturn(mouse);
-		when(driver.getKeyboard()).thenReturn(keyboard);
-		when(screenshotUtil.captureWebPageToFile()).thenReturn(new File(""));
+		PowerMockito.mockStatic(CustomEventFiringWebDriver.class);
+		when(screenshotUtil.captureDesktopToFile()).thenReturn(new File(""));
 		when(imageDetector.getDetectedRectangle()).thenReturn(new Rectangle(10, 10, 100, 50));
 		when(imageDetector.getSizeRatio()).thenReturn(1.0);
-		when(coordinates.inViewPort()).thenReturn(new Point(100, 120));
-		when(coordinates.onPage()).thenReturn(new Point(100, 120));
-		when(intoElement.getCoordinates()).thenReturn(coordinates);
 		
 		picElement.click();
-		verify(picElement).moveAndClick(intoElement, -65, -60);
+		verify(picElement).moveAndLeftClick(35, 60);
+	}
+
+	@Test(groups={"ut"})
+	public void testRightClick() {
+		ScreenZone picElement = spy(screenZone);
+		picElement.setObjectPictureFile(new File(""));
+		
+		PowerMockito.mockStatic(CustomEventFiringWebDriver.class);
+		when(screenshotUtil.captureDesktopToFile()).thenReturn(new File(""));
+		when(imageDetector.getDetectedRectangle()).thenReturn(new Rectangle(10, 10, 100, 50));
+		when(imageDetector.getSizeRatio()).thenReturn(1.0);
+		
+		picElement.rightClickAt(0, 0);
+		verify(picElement).moveAndRightClick(35, 60);
+	}
+
+	@Test(groups={"ut"})
+	public void testSendKeys() {
+		ScreenZone picElement = spy(screenZone);
+		picElement.setObjectPictureFile(new File(""));
+		
+		PowerMockito.mockStatic(CustomEventFiringWebDriver.class);
+		when(screenshotUtil.captureDesktopToFile()).thenReturn(new File(""));
+		when(imageDetector.getDetectedRectangle()).thenReturn(new Rectangle(10, 10, 100, 50));
+		when(imageDetector.getSizeRatio()).thenReturn(1.0);
+		
+		picElement.sendKeys(0, 0, KeyEvent.VK_0);
+		verify(picElement).moveAndLeftClick(35, 60);
 	}
 	
 	
 	@Test(groups={"ut"})
 	public void testPictureNotVisible() throws AWTException {
-		PictureElement picElement = spy(pictureElement);
+		ScreenZone picElement = spy(screenZone);
 		picElement.setObjectPictureFile(new File(""));
-		when(screenshotUtil.captureWebPageToFile()).thenReturn(new File(""));
+		when(screenshotUtil.captureDesktopToFile()).thenReturn(new File(""));
 		doThrow(ImageSearchException.class).when(imageDetector).detectExactZoneWithScale();
 		
 		Assert.assertFalse(picElement.isElementPresent());
@@ -110,28 +115,36 @@ public class TestPictureElement extends MockitoTest {
 	
 	@Test(groups={"ut"})
 	public void testPictureNotVisibleWithReplay() throws AWTException {
-		PictureElement picElement = spy(pictureElement);
+		ScreenZone picElement = spy(screenZone);
 		picElement.setObjectPictureFile(new File(""));
-		when(screenshotUtil.captureWebPageToFile()).thenReturn(new File(""));
+		when(screenshotUtil.captureDesktopToFile()).thenReturn(new File(""));
 		doThrow(ImageSearchException.class).when(imageDetector).detectExactZoneWithScale();
 		
 		Assert.assertFalse(picElement.isElementPresent(350));
 		
 		verify(picElement, times(2)).findElement();
-		
 	}
 	
 	@Test(groups={"ut"})
 	public void testPictureVisible() throws AWTException {
-		PictureElement picElement = spy(pictureElement);
+		ScreenZone picElement = spy(screenZone);
 		picElement.setObjectPictureFile(new File(""));
-		when(screenshotUtil.captureWebPageToFile()).thenReturn(new File(""));
+		when(screenshotUtil.captureDesktopToFile()).thenReturn(new File(""));
 		when(imageDetector.getDetectedRectangle()).thenReturn(new Rectangle(10, 10, 100, 50));
 		when(imageDetector.getSizeRatio()).thenReturn(1.0);
 		
 		Assert.assertTrue(picElement.isElementPresent(2000));
 		verify(picElement).findElement();
-		
+	}
+	
+	@Test(groups={"ut"}, expectedExceptions=ScenarioException.class)
+	public void testTapOnDesktop() throws AWTException {	
+		screenZone.tap();
+	}
+	
+	@Test(groups={"ut"}, expectedExceptions=ScenarioException.class)
+	public void testSwipeOnDesktop() throws AWTException {	
+		screenZone.swipe(0, 0);
 	}
 
 	

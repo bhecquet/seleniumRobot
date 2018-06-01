@@ -692,7 +692,11 @@ public class PageObject extends BasePage implements IPage {
 	public void uploadFile(String filePath) {
 		try {
 			byte[] encoded = Base64.encodeBase64(FileUtils.readFileToByteArray(new File(filePath)));
-			((JavascriptExecutor) driver).executeScript(CustomEventFiringWebDriver.NON_JS_UPLOAD_FILE_THROUGH_POPUP, new File(filePath).getName(), new String(encoded));
+			CustomEventFiringWebDriver.uploadFile(new File(filePath).getName(), 
+					new String(encoded), 
+					SeleniumTestsContextManager.getThreadContext().getRunMode(), 
+					SeleniumTestsContextManager.getThreadContext().getSeleniumGridConnector());
+//			((JavascriptExecutor) driver).executeScript(CustomEventFiringWebDriver.NON_JS_UPLOAD_FILE_THROUGH_POPUP, new File(filePath).getName(), new String(encoded));
 			
 			Alert alert = waitForAlert(5);
 			if (alert != null) {

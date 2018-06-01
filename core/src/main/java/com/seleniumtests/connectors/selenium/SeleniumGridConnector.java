@@ -1,9 +1,8 @@
 package com.seleniumtests.connectors.selenium;
 
-import java.awt.event.KeyEvent;
-import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.List;
 
 import org.apache.http.HttpHost;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -103,7 +102,7 @@ public class SeleniumGridConnector {
 	 * Send keys to desktop
 	 * @param keys
 	 */
-	public void sendKeysWithKeyboard(KeyEvent ... keys) {
+	public void sendKeysWithKeyboard(List<Integer> keyCodes) {
 		logger.warn("send keys is only available with seleniumRobot grid");
 	}
 	

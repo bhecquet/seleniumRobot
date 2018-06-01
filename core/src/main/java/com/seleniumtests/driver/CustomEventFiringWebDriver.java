@@ -141,21 +141,6 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
     public CustomEventFiringWebDriver(final WebDriver driver) {
     	this(driver, null, null, true, DriverMode.LOCAL, null, null);
     }
-    
-    /**
-     * constructor for using driver instance without a real driver (only used by grid)
-     * @param driverMode
-     */
-    public CustomEventFiringWebDriver(DriverMode driverMode) {
-    	super(null); // TODO: won't work!!
-    	this.driverPids = new ArrayList<>();
-		this.driver = null;
-		this.browserInfo = null;
-		this.isWebTest = true;
-		this.driverMode = driverMode;
-		this.mobProxy = null;
-		this.gridConnector = null;
-    }
 
 	public CustomEventFiringWebDriver(final WebDriver driver, List<Long> driverPids, BrowserInfo browserInfo, Boolean isWebTest, DriverMode localDriver, BrowserMobProxy mobProxy, SeleniumGridConnector gridConnector) {
         super(driver);
@@ -315,18 +300,26 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
 	}
 	
 	/**
-	 * Take screenshot of the desktop and put it in a file
-	 * Do not expose this method because we need to check that we have a graphical environment. 
+	 * Returns the rectangle of all screens on the system
+	 * @return
 	 */
-	private static BufferedImage captureDesktopToBuffer() {
-		
+	private static Rectangle getScreensRectangle() {
 		GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
-		GraphicsDevice defaultGraphicDevice = ge.getDefaultScreenDevice();
 		
 		Rectangle screenRect = new Rectangle(0, 0, 0, 0);
 		for (GraphicsDevice gd : ge.getScreenDevices()) {
 		    screenRect = screenRect.union(gd.getDefaultConfiguration().getBounds());
 		}
+		return screenRect;
+	}
+	
+	/**
+	 * Take screenshot of the desktop and put it in a file
+	 * Do not expose this method because we need to check that we have a graphical environment. 
+	 */
+	private static BufferedImage captureDesktopToBuffer() {
+		
+		Rectangle screenRect = getScreensRectangle();
 		try {
 			return new Robot().createScreenCapture(screenRect);
 		} catch (AWTException e) {
@@ -377,7 +370,7 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
 	/**
 	 * Use copy to clipboard and copy-paste keyboard shortcut to write something on upload window
 	 */
-	public void uploadFileUsingClipboard(File tempFile) {
+	public static void uploadFileUsingClipboard(File tempFile) {
 
 		// Copy to clipboard
 		Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(tempFile.getAbsolutePath()), null);
@@ -414,7 +407,7 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
 	 * Upload file typing file path directly
 	 * @param tempFile
 	 */
-	public void uploadFileUsingKeyboardTyping(File tempFile) {
+	public static void uploadFileUsingKeyboardTyping(File tempFile) {
 		try {
 			Keyboard keyboard = new Keyboard();
 			Robot robot = keyboard.getRobot();
@@ -440,7 +433,7 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
 		}
 	}
 	
-	public void uploadFile(String fileName, String base64Content) throws IOException {
+	public static void uploadFile(String fileName, String base64Content, DriverMode driverMode, SeleniumGridConnector gridConnector) throws IOException {
 		
 		if (driverMode == DriverMode.LOCAL) {
 			byte[] byteArray = base64Content.getBytes();
@@ -461,16 +454,25 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
 	}
 	
 	/**
+	 * move mouse taking screen placing into account. Sometimes, coordinates may be negative if first screen has an other screen on the left 
+	 * @param robot
+	 */
+	private static void moveMouse(Robot robot, int x, int y) {
+		Rectangle screenRectangle = getScreensRectangle();
+		robot.mouseMove(x + screenRectangle.x, y + screenRectangle.y);
+	}
+	
+	/**
 	 * Left clic at coordinates on desktop. Coordinates are from screen point of view
 	 * @param x
 	 * @param y
 	 */
-	public void leftClicOnDesktopAt(int x, int y) {
+	public static void leftClicOnDesktopAt(int x, int y, DriverMode driverMode, SeleniumGridConnector gridConnector) {
 		
 		if (driverMode == DriverMode.LOCAL) {
 			try {
 				Robot robot = new Robot();
-				robot.mouseMove(x, y);
+				moveMouse(robot, x, y);
 				robot.mousePress(InputEvent.BUTTON1_DOWN_MASK);
 				robot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
 			} catch (AWTException e) {
@@ -488,12 +490,12 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
 	 * @param x
 	 * @param y
 	 */
-	public void rightClicOnDesktopAt(int x, int y) {
+	public static void rightClicOnDesktopAt(int x, int y, DriverMode driverMode, SeleniumGridConnector gridConnector) {
 		
 		if (driverMode == DriverMode.LOCAL) {
 			try {
 				Robot robot = new Robot();
-				robot.mouseMove(x, y);
+				moveMouse(robot, x, y);
 				robot.mousePress(InputEvent.BUTTON2_DOWN_MASK);
 				robot.mouseRelease(InputEvent.BUTTON2_DOWN_MASK);
 			} catch (AWTException e) {
@@ -511,7 +513,7 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
 	 * @param textToWrite	text to write
 	 * @return
 	 */
-	public void writeToDesktop(String textToWrite) {
+	public static void writeToDesktop(String textToWrite, DriverMode driverMode, SeleniumGridConnector gridConnector) {
 		if (driverMode == DriverMode.LOCAL) {
 	
 			try {
@@ -532,7 +534,7 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
 	 * This is useful for typing special keys like ENTER
 	 * @param keys
 	 */
-	public void sendKeysToDesktop(List<Integer> keyCodes) {
+	public static void sendKeysToDesktop(List<Integer> keyCodes, DriverMode driverMode, SeleniumGridConnector gridConnector) {
 		if (driverMode == DriverMode.LOCAL) {
 			try {
 				Robot robot = new Robot();
@@ -546,25 +548,14 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
 			} catch (AWTException e) {
 				throw new ScenarioException("could not initialize robot to type keys: " + e.getMessage());
 			}
-		} else {
-			throw new ScenarioException("driver supports sendKeysToDesktop only in local");
-		}
-	}
-	public void sendKeysToDesktop(KeyEvent ... keys) {
-		if (driverMode == DriverMode.LOCAL) {
-			List<Integer> keyCodes = new ArrayList<>();
-			for (KeyEvent key: keys) {
-				keyCodes.add(key.getKeyCode());
-			}
-			sendKeysToDesktop(keyCodes);
 		} else if (driverMode == DriverMode.GRID && gridConnector != null) {
-			gridConnector.sendKeysWithKeyboard(keys);
+			gridConnector.sendKeysWithKeyboard(keyCodes);
 		} else {
 			throw new ScenarioException("driver supports sendKeysToDesktop only in local and grid mode");
 		}
 	}
 	
-	public String captureDesktopToBase64String() {
+	public static String captureDesktopToBase64String(DriverMode driverMode, SeleniumGridConnector gridConnector) {
 		if (driverMode == DriverMode.LOCAL) {
 			BufferedImage bi = captureDesktopToBuffer();
 			ByteArrayOutputStream os = new ByteArrayOutputStream();
@@ -584,6 +575,8 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
 	
 	/**
 	 * Intercept specific scripts to do some non selenium actions
+	 * 
+	 * @deprecated: should be removed (kept here for compatibility with old robots)
 	 */
 	@Override
 	public Object executeScript(String script, Object... args) {
@@ -594,14 +587,14 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
 				throw new DriverExceptions("Upload feature through executeScript needs 2 string arguments (file name, base64 content)");
 			}
 			try {
-				uploadFile((String)args[0], (String)args[1]);
+				uploadFile((String)args[0], (String)args[1], driverMode, gridConnector);
 				return null; 
 			} catch (IOException e) {
 				return null;
 			}
 			
 		} else if (driverMode == DriverMode.LOCAL && NON_JS_CAPTURE_DESKTOP.equals(script)) {
-			return captureDesktopToBase64String();
+			return captureDesktopToBase64String(driverMode, gridConnector);
 		} else {
 			return super.executeScript(script, args);
 		}

@@ -71,13 +71,56 @@ For better reliability, all actions currently implemented in SeleniumRobot are m
 
 ### 4 Working with images ###
 
-SeleniumRobot exposes 2 elements to work with images
+SeleniumRobot exposes 3 elements to work with images
 
 - `ImageElement` is used to handle HTML images `<img src=" ... `
-- `PictureElement` is used to find arbitrary images in web page or application and interact with it (click, sendKeys). The later point is only available locally on web browsers
+- `PictureElement` is used to find arbitrary images in web page or application and interact with it (click, sendKeys). The later point is only available on web browsers
+- `ScreenZone` is used to interact with desktop only. You can write text, send keys (e.g: windows key), clic at coordinate. 
 
-Behind the scene, PictureElement takes a screenshot, and then uses openCV to search the picture inside the screenshot. Rotation and resizing are supported.
-The `intoElement` parameters helps scrolling in page. It must be an element right above the picture to search, or the element enclosing this picture. If not specified, no scrolling will be done
+Behind the scene, PictureElement and ScreenZone take a screenshot, and then uses openCV to search the picture inside the screenshot. Rotation and resizing are supported.
+The `intoElement` (for PictureElement only) parameters helps scrolling in page. It must be an element right above the picture to search, or the element enclosing this picture. If not specified, no scrolling will be done
+
+#### Using PictureElement ####
+
+Search for picture in browser, without the need to scroll down and click on it
+
+	PictureElement googlePicture = new PictureElement("picture", "tu/googleSearch.png", null);
+	googlePicture.click()
+	
+or search for picture (physically located inside src/test/resources/tu/images/logo_text_field.png) in browser, being placed after the table element and click on it
+
+	Table table = new Table("table", By.id("table"));
+	PictureElement picture = new PictureElement("picture", "tu/images/logo_text_field.png", table);
+	picture.click()
+	
+or search for picture (physically located inside /data/<application>/images/googleSearch.png)  in browser and click on it. No scrolling will be performed
+
+	PictureElement googlePictureWithFile = new PictureElement("picture", Paths.get(SeleniumTestsContextManager.getApplicationDataPath(), "images", "googleSearch.png").toFile(), null);
+	googlePictureWithFile.click()
+
+
+#### Using ScreenZone ####
+
+ScreenZone represents the computer desktop
+
+Search for picture (physically located inside src/test/resources/tu/googleSearch.png) on desktop and click on it
+
+	ScreenZone googleForDesktop = new ScreenZone("picture", "tu/googleSearch.png");
+	googleForDesktop.click();
+	
+or interract with desktop directly without specifying a picture. Thus, click coordinates will be absolute ones
+
+	new ScreenZone("image").clickAt(rectangle.x + 10, rectangle.y + 10);
+	
+or send text
+
+	ScreenZone firefoxForDesktop = new ScreenZone("picture", "tu/images/logo_text_field.png");
+	firefoxForDesktop.sendKeys("hello", 0, 40);
+	
+or send keys (will write "ab")
+
+	ScreenZone firefoxForDesktop = new ScreenZone("picture", "tu/images/logo_text_field.png");
+	firefoxForDesktop.sendKeys(0, 40, KeyEvent.VK_A, KeyEvent.VK_B);
 
 ### 5 Working with PDF files ###
 
@@ -184,7 +227,7 @@ Conditions are:
 - you have an `<input type="file" id="uploadFile" />` element
 - this element is visible (not hidden by an other one)
 
-Then, you can do either:
+Then, you can do either (the later is advised:
 - `driver.findElement(By.id("uploadFile")).sendKeys(<some file path>);`
 - `new FileUploadElement("upload", By.id("uploadFile")).sendKeys(<some file path);`
 
@@ -192,11 +235,13 @@ Selenium will do the rest for you, locally or in grid mode
 
 #### The selenium robot way (if previous method is not possible) ####
 
+This may happen if the button / text field on which you click to upload is not an `input` element of type `file`
+
 Inside your PageObject:
 - With selenium, click on the button to upload the file
-- then you can call `uploadFile(<filePath>)` which will handle the modal opened by browser.
+- then you can call `uploadFile(<filePath>)` inside your PageObject which will handle the modal opened by browser.
 
-The drawbak of this method is that browser MUST have the focus and thus no other test should be executed at the same time because we are sending keyboard actions outside of selenium
+The drawback of this method is that browser MUST have the focus and thus no other test should be executed at the same time because we are sending keyboard actions outside of selenium
 
 ### 11 Write custom reports ###
 

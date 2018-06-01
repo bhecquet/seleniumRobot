@@ -24,6 +24,7 @@ import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.uipage.PageObject;
 import com.seleniumtests.uipage.htmlelements.PictureElement;
+import com.seleniumtests.uipage.htmlelements.ScreenZone;
 import com.seleniumtests.uipage.htmlelements.Table;
 import com.seleniumtests.uipage.htmlelements.TextFieldElement;
 
@@ -38,8 +39,12 @@ public class DriverTestPageWithoutFixedPattern extends PageObject {
 	public static final Table table = new Table("table", By.id("table"));
 	public static final PictureElement picture = new PictureElement("picture", "tu/images/logo_text_field.png", table);
 	public static final PictureElement pictureNotPresent = new PictureElement("picture", "tu/images/vosAlertes.png", table);
-	public static final PictureElement googleForDesktop = new PictureElement("picture", "tu/googleSearch.png", null);
-	public static final PictureElement googleForDesktopWithFile = new PictureElement("picture", Paths.get(SeleniumTestsContextManager.getApplicationDataPath(), "images", "googleSearch.png").toFile(), null);
+	public static final PictureElement googlePicture = new PictureElement("picture", "tu/googleSearch.png", null);
+	public static final PictureElement googlePictureWithFile = new PictureElement("picture", Paths.get(SeleniumTestsContextManager.getApplicationDataPath(), "images", "googleSearch.png").toFile(), null);
+	public static final ScreenZone googleForDesktop = new ScreenZone("picture", "tu/googleSearch.png");
+	public static final ScreenZone googleForDesktopWithFile = new ScreenZone("picture", Paths.get(SeleniumTestsContextManager.getApplicationDataPath(), "images", "googleSearch.png").toFile());
+	public static final ScreenZone firefoxForDesktop = new ScreenZone("picture", "tu/images/logo_text_field.png");
+	public static final ScreenZone zoneNotPresent = new ScreenZone("picture", "tu/images/vosAlertes.png");
 	public static final TextFieldElement logoText = new TextFieldElement("logoText", By.id("logoText"));
 	
 	private String openedPageUrl;

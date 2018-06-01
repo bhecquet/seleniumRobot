@@ -36,7 +36,6 @@ import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
-import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.customexception.WebSessionEndedException;
 import com.seleniumtests.driver.BrowserType;
@@ -247,7 +246,7 @@ public class ScreenshotUtil {
     private void handleImage(final ScreenShot screenShot) {
         try {
         	String imagePath = SCREENSHOT_DIR + filename + ".png";
-        	captureEntirePageToFile(WebUIDriver.getWebDriver(), outputDirectory + "/" + imagePath);
+        	captureEntirePageToFile(driver, outputDirectory + "/" + imagePath);
         	
         	if (new File(outputDirectory + "/" + imagePath).exists()) {
         		screenShot.setImagePath(imagePath);
@@ -255,7 +254,7 @@ public class ScreenshotUtil {
         } catch (Exception e) {
             logger.warn(e);
         }
-        ((CustomEventFiringWebDriver)WebUIDriver.getWebDriver()).scrollTop();
+        ((CustomEventFiringWebDriver)driver).scrollTop();
     }
 
     private void handleTitle(String title, final ScreenShot screenShot) {
@@ -292,13 +291,10 @@ public class ScreenshotUtil {
 		if (SeleniumTestsContextManager.isMobileTest()) {
 			throw new ScenarioException("Desktop capture can only be done on Desktop tests");
 		}
-
-		if (driver == null) {
-			throw new ConfigurationException("driver is null, capture cannot be done");
-		}
 		
 		// use driver because, we need remote desktop capture when using grid mode
-		String screenshotString = (String)((CustomEventFiringWebDriver)driver).executeScript(CustomEventFiringWebDriver.NON_JS_CAPTURE_DESKTOP);
+		String screenshotString = CustomEventFiringWebDriver.captureDesktopToBase64String(SeleniumTestsContextManager.getThreadContext().getRunMode(), 
+																							SeleniumTestsContextManager.getThreadContext().getSeleniumGridConnector());
 		 
 		try {
 			if (screenshotString != null && !screenshotString.isEmpty()) {
