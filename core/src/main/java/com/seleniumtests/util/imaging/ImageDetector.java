@@ -85,7 +85,7 @@ public class ImageDetector {
 	// In case of "UnsatisfiedLinkError, library already loaded in another class loader", during unit tests, check that 
 	// this class or a calling one is not "prepared" through PowerMockito (which reloads the class in another class loader)
 	static {
-		nu.pattern.OpenCV.loadShared();
+		nu.pattern.OpenCV.loadLocally();
 	}
 	
 	class TemplateMatchProperties {
@@ -681,6 +681,9 @@ public class ImageDetector {
 	}
 
 	public void setObjectImage(File objectImage) {
+		if (objectImage == null) {
+			throw new ImageSearchException("Object image file is null");
+		}
 		if (!objectImage.exists()) {
 			throw new ImageSearchException(String.format("File for scene to detect object in %s does not exist", objectImage));
 		}
