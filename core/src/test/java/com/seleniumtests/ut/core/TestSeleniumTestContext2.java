@@ -39,10 +39,11 @@ public class TestSeleniumTestContext2 extends MockitoTest {
 
 	@BeforeTest(groups="ut")
 	public void init() {
-		
+	
 		// init of properties is done there so that it's taken into account when creating global context 
-		System.setProperty(SeleniumTestsContext.OUTPUT_DIRECTORY, "/home/user/test-output");
+		System.setProperty(SeleniumTestsContext.OUTPUT_DIRECTORY, System.getProperty("java.io.tmpdir") + "/home/user/test-output");
 	}
+	
 	@AfterTest(groups="ut")
 	public void reset() {
 		System.clearProperty(SeleniumTestsContext.OUTPUT_DIRECTORY);

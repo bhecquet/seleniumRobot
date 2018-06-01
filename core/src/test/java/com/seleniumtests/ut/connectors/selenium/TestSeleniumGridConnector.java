@@ -4,9 +4,11 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.spy;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Field;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
@@ -16,6 +18,7 @@ import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.log4j.Logger;
 import org.apache.tools.ant.filters.StringInputStream;
 import org.mockito.Mock;
 import org.openqa.selenium.Capabilities;
@@ -31,6 +34,7 @@ import org.testng.annotations.Test;
 import com.seleniumtests.MockitoTest;
 import com.seleniumtests.connectors.selenium.SeleniumGridConnector;
 import com.seleniumtests.reporter.logger.TestLogging;
+import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
 
 @PrepareForTest({HttpClients.class, TestLogging.class})
@@ -67,7 +71,7 @@ public class TestSeleniumGridConnector extends MockitoTest {
 	}
 	
 	@Test(groups={"ut"})
-	public void testRunTest() throws UnsupportedOperationException, IOException {
+	public void testRunTest() throws UnsupportedOperationException, IOException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
 		
 		// prepare app file
 		((DesiredCapabilities)capabilities).setCapability(CapabilityType.BROWSER_NAME, "firefox");
@@ -78,10 +82,15 @@ public class TestSeleniumGridConnector extends MockitoTest {
 		when(entity.getContent()).thenReturn(is);
 		
 		SeleniumGridConnector connector = new SeleniumGridConnector("http://localhost:6666");
+		
+		Logger logger = spy(SeleniumRobotLogger.getLogger(SeleniumGridConnector.class));
+		Field loggerField = SeleniumGridConnector.class.getDeclaredField("logger");
+		loggerField.setAccessible(true);
+		loggerField.set(connector, logger);
+		
 		connector.runTest(driver);
 		
-		PowerMockito.verifyStatic();
-		TestLogging.info("WebDriver is running on node node, firefox 50.0, session 0");
+		verify(logger).info("WebDriver is running on node node, firefox 50.0, session 0");
 	}
 	
 	/**

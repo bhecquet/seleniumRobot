@@ -27,7 +27,7 @@ public class SeleniumGridConnector {
 	protected int hubPort;
 	protected SessionId sessionId;
 	protected String nodeUrl;
-	protected static final Logger logger = SeleniumRobotLogger.getLogger(SeleniumGridConnector.class);
+	protected static Logger logger = SeleniumRobotLogger.getLogger(SeleniumGridConnector.class);
 	
 	public SeleniumGridConnector(String url) {
 		try {
