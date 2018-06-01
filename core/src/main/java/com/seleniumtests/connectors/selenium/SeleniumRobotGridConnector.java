@@ -176,7 +176,7 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 	
 	/**
 	 * Take screenshot of the full desktop
-	 * @return
+	 * @return a string with base64 content of the image
 	 */
 	@Override
 	public String captureDesktopToBuffer() {
@@ -198,27 +198,20 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 	
 	/**
 	 * upload file to browser
-	 * @param keys
+	 * @param fileName		name of the file to upload
+	 * @param base64Content	content of the file, encoded in base 64
 	 */
 	@Override
-	public void uploadFileToBrowser(String fileName, File fileToUpload) {
+	public void uploadFileToBrowser(String fileName, String base64Content) {
 		if (nodeUrl == null) {
 			throw new ScenarioException("You cannot upload file to browser before driver has been created and corresponding node instanciated");
 		}
-		
-		String b64FileContent = "";
-		try {
-			String fileContent = FileUtils.readFileToString(fileToUpload, Charset.forName("UTF-8"));
-			b64FileContent = Base64.encodeBase64String(fileContent.getBytes());
-		} catch (IOException e) {
-			new ScenarioException(String.format("cannot encode file %s: %s", fileToUpload, e.getMessage()));
-		}
-		
+
 		logger.info("uploading file to browser: " + fileName);
 		try {
 			Unirest.post(String.format("%s%s", nodeUrl, NODE_TASK_SERVLET))
 			.queryString("action", "uploadFile")
-			.queryString("content", b64FileContent)
+			.queryString("content", base64Content)
 			.queryString("name", fileName)
 			.asString();
 		} catch (UnirestException e) {
