@@ -24,7 +24,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import java.io.File;
-import java.lang.reflect.Method;
 import java.nio.file.Paths;
 
 import org.apache.commons.io.FileUtils;
@@ -33,14 +32,12 @@ import org.apache.velocity.app.VelocityEngine;
 import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.ITestResult;
-import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import org.testng.xml.XmlSuite;
 import org.testng.xml.XmlSuite.ParallelMode;
 
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
-import com.seleniumtests.reporter.logger.TestLogging;
 import com.seleniumtests.reporter.reporters.SeleniumTestsReporter2;
 
 public class TestSeleniumTestsReporter2 extends ReporterTest {
@@ -427,23 +424,26 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	public void testReportDetailsMessageStyles() throws Exception {
 		
 		reporter = spy(new SeleniumTestsReporter2());
-		System.setProperty("customTestReports", "PERF::xml::reporter/templates/report.perf.vm,SUP::xml::reporter/templates/report.supervision.vm");
-
-		executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"});
-		
-		
-		// check style of messages
-		String detailedReportContent = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testInError", "TestReport.html").toFile());
-		detailedReportContent = detailedReportContent.replace("\n", "").replace("\r",  "").replaceAll(">\\s+<", "><");
-		
-		Assert.assertTrue(detailedReportContent.contains("<div class=\"message-info\">click ok</div>"));
-		Assert.assertTrue(detailedReportContent.contains("<div class=\"message-warning\">Warning: Some warning message</div>"));
-		Assert.assertTrue(detailedReportContent.contains("<div class=\"message-info\">Some Info message</div>"));
-		Assert.assertTrue(detailedReportContent.contains("<div class=\"message-error\">Some Error message</div>"));
-		Assert.assertTrue(detailedReportContent.contains("<div class=\"message-log\">Some log message</div>"));
-		Assert.assertTrue(detailedReportContent.contains("<table class=\"table table-bordered table-condensed\"><tr><th width=\"15%\">Key</th><th width=\"60%\">Message</th><th width=\"25%\">Value</th></tr><tr><td>key</td><td>we found a value of</td><td>10</td></tr></table>"));
-		Assert.assertTrue(detailedReportContent.contains("<li>send keyboard action</li>"));
-		
+		try {
+			System.setProperty("customTestReports", "PERF::xml::reporter/templates/report.perf.vm,SUP::xml::reporter/templates/report.supervision.vm");
+	
+			executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"});
+			
+			
+			// check style of messages
+			String detailedReportContent = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testInError", "TestReport.html").toFile());
+			detailedReportContent = detailedReportContent.replace("\n", "").replace("\r",  "").replaceAll(">\\s+<", "><");
+			
+			Assert.assertTrue(detailedReportContent.contains("<div class=\"message-info\">click ok</div>"));
+			Assert.assertTrue(detailedReportContent.contains("<div class=\"message-warning\">Warning: Some warning message</div>"));
+			Assert.assertTrue(detailedReportContent.contains("<div class=\"message-info\">Some Info message</div>"));
+			Assert.assertTrue(detailedReportContent.contains("<div class=\"message-error\">Some Error message</div>"));
+			Assert.assertTrue(detailedReportContent.contains("<div class=\"message-log\">Some log message</div>"));
+			Assert.assertTrue(detailedReportContent.contains("<table class=\"table table-bordered table-condensed\"><tr><th width=\"15%\">Key</th><th width=\"60%\">Message</th><th width=\"25%\">Value</th></tr><tr><td>key</td><td>we found a value of</td><td>10</td></tr></table>"));
+			Assert.assertTrue(detailedReportContent.contains("<li>send keyboard action</li>"));
+		} finally {
+			System.clearProperty("customTestReports");
+		}
 	}
 	
 	/**
@@ -644,10 +644,10 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		Assert.assertTrue(detailedReportContent1.contains("<ul><li>moveToElement with args: (TextFieldElement Text, by={By.id: text2}, )</li><li>sendKeys with args: ([composite,])</li><li>moveToElement with args: (ButtonElement Reset, by={By.id: button2}, )</li><li>click </li></ul>"));
 		
 		// check PictureElement action is logged
-		Assert.assertTrue(detailedReportContent1.contains("<ul><li>clickAt on Picture from resource tu/images/logo_text_field.png with args: (0, -30, )</li>"));
+		Assert.assertTrue(detailedReportContent1.contains("<ul><li>clickAt on Picture picture from resource tu/images/logo_text_field.png with args: (0, -30, )</li>"));
 		
 		// check that when logging PictureElement action which uses composite actions, those are not logged
-		Assert.assertTrue(!detailedReportContent1.contains("<ul><li>clickAt on Picture from resource tu/images/logo_text_field.png with args: (0, -30, )</li><li>moveToElement with args:"));
+		Assert.assertFalse(detailedReportContent1.contains("<ul><li>clickAt on Picture picture from resource tu/images/logo_text_field.png with args: (0, -30, )</li><li>moveToElement with args:"));
 		
 		// no action is logged when step fails (findElement exception). Ok because logging is done on action, not search 
 		
@@ -690,7 +690,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 								+ "<div class=\"stack-element\">at com.seleniumtests.it.reporter.TestSeleniumTestsReporter2.testReportDetailsWithErrors\\(TestSeleniumTestsReporter2.java:\\d+\\)</div>.*"));
 		
 		// error message of the assertion is displayed in step
-		Assert.assertTrue(detailedReportContent.contains("</ul><div class=\"message-error\">				java.lang.AssertionError: error			</div></div>"));
+		Assert.assertTrue(detailedReportContent.matches(".*</ul><div class=\"message-error\">\\s+class java.lang.AssertionError: error\\s+</div></div>.*"));
 		
 		// check that when test is KO, error cause is displayed
 		Assert.assertTrue(detailedReportContent.contains("[main] TestLogging: Test is KO with error: "));

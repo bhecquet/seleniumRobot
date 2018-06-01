@@ -103,7 +103,7 @@ public class TestReporterControler extends ReporterTest {
 		Assert.assertTrue(detailedReportContent.contains("<div class=\"box collapsed-box failed\"><div class=\"box-header with-border\"><button type=\"button\" class=\"btn btn-box-tool\" data-widget=\"collapse\"><i class=\"fa fa-plus\"></i></button> Pre test step: beforeMethod"));
 		
 		// Check details of the configuration error is displayed in report
-		Assert.assertTrue(detailedReportContent.contains("<div class=\"message-error\">				com.seleniumtests.customexception.ConfigurationException: Some error before method"));
+		Assert.assertTrue(detailedReportContent.matches(".*<div class=\"message-error\">\\s+class com.seleniumtests.customexception.ConfigurationException: Some error before method.*"));
 
 		// check that when test is skipped, a message on test status is displayed
 		Assert.assertTrue(detailedReportContent.contains("[main] TestLogging: Test has not started or has been skipped</div>"));
@@ -133,7 +133,7 @@ public class TestReporterControler extends ReporterTest {
 		detailedReportContent = detailedReportContent.replace("\n", "").replace("\r",  "").replaceAll(">\\s+<", "><");
 		
 		// Check details of the configuration error is displayed in report
-		Assert.assertTrue(detailedReportContent.contains("<div class=\"message-error\">				com.seleniumtests.customexception.ConfigurationException: Some error after method"));
+		Assert.assertTrue(detailedReportContent.matches(".*<div class=\"message-error\">\\s+class com.seleniumtests.customexception.ConfigurationException: Some error after method.*"));
 		
 		// check test is still OK as only after method failed
 		Assert.assertTrue(detailedReportContent.contains("<header class='main-header header-success'>"));
