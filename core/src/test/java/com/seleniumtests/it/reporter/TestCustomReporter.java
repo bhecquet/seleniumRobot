@@ -45,7 +45,7 @@ public class TestCustomReporter extends ReporterTest {
 				
 			// check content of the file. It should contains all fields with a value
 			String detailedReportContent = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testAndSubActions", "SUP-result.json").toFile());
-			
+			System.out.println(detailedReportContent);
 			JSONObject json = new JSONObject(detailedReportContent);
 			
 			Assert.assertEquals(json.getInt("errors"), 0);
@@ -157,7 +157,7 @@ public class TestCustomReporter extends ReporterTest {
 			Assert.assertTrue(detailedReportContent.contains("<name>step 1 &lt;&gt;&quot;&apos;&amp;/</name>"));
 			
 		} finally {
-			System.clearProperty("customSummaryReports");
+			System.clearProperty("customTestReports");
 		}
 	}
 	
@@ -174,7 +174,7 @@ public class TestCustomReporter extends ReporterTest {
 			Assert.assertTrue(detailedReportContent.contains("Step step 1 <>\\\\\"'&\\\\/\\\\nclick button  <>\\\\\"'&\\\\na message <>\\\\\"'&"));
 			
 		} finally {
-			System.clearProperty("customSummaryReports");
+			System.clearProperty("customTestReports");
 		}
 	}
 	
