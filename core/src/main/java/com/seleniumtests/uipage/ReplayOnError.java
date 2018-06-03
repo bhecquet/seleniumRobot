@@ -16,6 +16,12 @@
  */
 package com.seleniumtests.uipage;
 
+import static java.lang.annotation.ElementType.METHOD;
+import static java.lang.annotation.ElementType.TYPE;
+
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
+
 /**
  * This annotation is used in ReplayAction.aj so that any HtmlElement method annotated by ReplayOnError
  * will be replayed during 30 secs if any error occurs
@@ -34,6 +40,10 @@ package com.seleniumtests.uipage;
  * @author behe
  *
  */
-public @interface ReplayOnError {
 
+@Retention(java.lang.annotation.RetentionPolicy.RUNTIME)
+@Target(METHOD)
+public @interface ReplayOnError {
+	public int replayDelayMs() default 100;
+	public int replayTimes() default -1;
 }

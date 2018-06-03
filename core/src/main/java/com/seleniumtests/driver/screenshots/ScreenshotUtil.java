@@ -94,7 +94,7 @@ public class ScreenshotUtil {
             return screenshotB64;
         } catch (Exception ex) {
             // Ignore all exceptions
-            logger.error(ex);
+            logger.error("capturePageScreenshotToString: ", ex);
         }
 
         return "";
@@ -252,7 +252,7 @@ public class ScreenshotUtil {
         		screenShot.setImagePath(imagePath);
         	}
         } catch (Exception e) {
-            logger.warn(e);
+            logger.warn("handleImage: ", e);
         }
         ((CustomEventFiringWebDriver)driver).scrollTop();
     }
