@@ -38,6 +38,7 @@ import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.reporter.logger.TestAction;
 import com.seleniumtests.reporter.logger.TestLogging;
+import com.seleniumtests.uipage.ReplayOnError;
 import com.seleniumtests.uipage.htmlelements.HtmlElement;
 import com.seleniumtests.uipage.htmlelements.PictureElement;
 import com.seleniumtests.util.helper.WaitHelper;
@@ -63,8 +64,8 @@ public class ReplayAction {
 	 * @throws Throwable
 	 */
 	@Around("execution(public * com.seleniumtests.uipage.htmlelements.HtmlElement+.* (..))"
-			+ "&& execution(@com.seleniumtests.uipage.ReplayOnError public * * (..))")
-    public Object replayHtmlElement(ProceedingJoinPoint joinPoint) throws Throwable {
+			+ "&& execution(@com.seleniumtests.uipage.ReplayOnError public * * (..)) && @annotation(replay)")
+    public Object replayHtmlElement(ProceedingJoinPoint joinPoint, ReplayOnError replay) throws Throwable {
 
     	long end = systemClock.laterBy(SeleniumTestsContextManager.getThreadContext().getReplayTimeout() * 1000);
     	Object reply = null;
@@ -120,7 +121,7 @@ public class ReplayAction {
 		    		}
 	
 		    		if (systemClock.isNowBefore(end - 200)) {
-		    			WaitHelper.waitForMilliSeconds(100);
+		    			WaitHelper.waitForMilliSeconds(replay.replayDelayMs());
 						continue;
 					} else {
 						if (e instanceof NoSuchElementException) {
@@ -151,8 +152,10 @@ public class ReplayAction {
 	 * @throws Throwable
 	 */
 	@Around("!execution(public * com.seleniumtests.uipage.htmlelements.HtmlElement+.* (..))"
-			+ "&& execution(@com.seleniumtests.uipage.ReplayOnError public * * (..))")
-	public Object replay(ProceedingJoinPoint joinPoint) throws Throwable {
+			+ "&& execution(@com.seleniumtests.uipage.ReplayOnError public * * (..)) && @annotation(replay)")
+	public Object replay(ProceedingJoinPoint joinPoint, ReplayOnError replay) throws Throwable {
+		
+		int replayDelayMs = replay != null ? replay.replayDelayMs(): 100;
 		
 		long end = systemClock.laterBy(SeleniumTestsContextManager.getThreadContext().getReplayTimeout() * 1000);
 		Object reply = null;
@@ -193,7 +196,7 @@ public class ReplayAction {
 					}
 	
 					if (systemClock.isNowBefore(end - 200)) {
-						WaitHelper.waitForMilliSeconds(100);
+						WaitHelper.waitForMilliSeconds(replayDelayMs);
 						continue;
 					} else {
 						throw e;
@@ -217,7 +220,7 @@ public class ReplayAction {
 	 */
 	@Around("execution(public void org.openqa.selenium.interactions.Actions.BuiltAction.perform ())")
 	public Object replayCompositeAction(ProceedingJoinPoint joinPoint) throws Throwable {
-		return replay(joinPoint);
+		return replay(joinPoint, null);
 
 	}
 	

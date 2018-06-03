@@ -92,8 +92,8 @@ public class StubTestClassForDriverTest extends StubParentClass {
 		
 		new DriverTestPage(true)
 			._writeSomething()
-			._reset();
-//			._sendKeysComposite()
-//			._clickPicture();
+			._reset()
+			._clickPicture()
+			._sendKeysComposite();
 	}
 }
