@@ -248,6 +248,7 @@
         			</includes>
         			<excludes>
         				<exclude>com/seleniumtests/uipage/aspects/**</exclude>
+        				<exclude>com/seleniumtests/uipage/ReplayOnError</exclude>
         			</excludes>
         		</configuration>
 		        <executions>
