@@ -31,6 +31,8 @@ import com.google.gson.JsonObject;
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.proxy.ProxyConfig;
 import com.seleniumtests.customexception.DriverExceptions;
+import com.seleniumtests.driver.screenshots.VideoCaptureMode;
+import com.seleniumtests.driver.screenshots.VideoRecorder;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
 import net.lightbody.bmp.BrowserMobProxy;
@@ -41,6 +43,7 @@ public class DriverConfig {
 
     private WebDriver driver;
     private BrowserMobProxy browserMobProxy;
+    private VideoRecorder videoRecorder;
     private SeleniumTestsContext testContext;
     
     public DriverConfig(SeleniumTestsContext testContext) {
@@ -337,6 +340,10 @@ public class DriverConfig {
 	public String getCloudApiKey() {
 		return testContext.getCloudApiKey();
 	}
+	
+	public VideoCaptureMode getVideoCapture() {
+		return testContext.getVideoCapture();
+	}
 
 	public String getProjectName() {
 		return testContext.getProjectName();
@@ -364,5 +371,13 @@ public class DriverConfig {
 
 	public void setBrowserMobProxy(BrowserMobProxy browserMobProxy) {
 		this.browserMobProxy = browserMobProxy;
+	}
+
+	public VideoRecorder getVideoRecorder() {
+		return videoRecorder;
+	}
+
+	public void setVideoRecorder(VideoRecorder videoRecorder) {
+		this.videoRecorder = videoRecorder;
 	}
 }

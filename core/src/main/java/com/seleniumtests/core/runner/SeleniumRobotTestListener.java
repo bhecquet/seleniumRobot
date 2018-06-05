@@ -3,6 +3,8 @@ package com.seleniumtests.core.runner;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Method;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -297,6 +299,21 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 			if (WebUIDriver.getWebUIDriver().getConfig().getBrowserMobProxy() != null) {
 				Har har = WebUIDriver.getWebUIDriver().getConfig().getBrowserMobProxy().endHar();
 				TestLogging.logNetworkCapture(har);
+			}
+			
+			// stop video capture
+			if (WebUIDriver.getWebUIDriver().getConfig().getVideoRecorder() != null) {
+				File videoFile;
+				try {
+					videoFile = WebUIDriver.getWebUIDriver().getConfig().getVideoRecorder().stop();
+					Path pathAbsolute = Paths.get(videoFile.getAbsolutePath());
+			        Path pathBase = Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory());
+			        Path pathRelative = pathBase.relativize(pathAbsolute);
+					
+					TestLogging.logFile(pathRelative.toFile(), "Video capture");
+				} catch (IOException e) {
+					logger.error("cannot attach video capture", e);
+				}		
 			}
 		}
 		

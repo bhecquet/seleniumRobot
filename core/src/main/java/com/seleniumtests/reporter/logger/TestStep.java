@@ -51,6 +51,7 @@ public class TestStep extends TestAction {
 	private Long duration;
 	private Date startDate;
 	private HarCapture harCapture;
+	private List<GenericFile> files;
 	private List<Snapshot> snapshots;
 	private ITestResult testResult;
 	
@@ -63,6 +64,7 @@ public class TestStep extends TestAction {
 	public TestStep(String name, ITestResult testResult, List<String> pwdToReplace) {
 		super(name, false, pwdToReplace);
 		stepActions = new ArrayList<>();
+		files = new ArrayList<>();
 		snapshots = new ArrayList<>();
 		duration = 0L;
 		startDate = new Date();
@@ -137,6 +139,9 @@ public class TestStep extends TestAction {
 	}
 	public void addNetworkCapture(HarCapture har) {
 		harCapture = har;
+	}
+	public void addFile(GenericFile file) {
+		files.add(file);
 	}
 	
 	/**
@@ -225,6 +230,10 @@ public class TestStep extends TestAction {
 	}
 	
 
+	public List<GenericFile> getFiles() {
+		return files;
+	}
+
 	@Override
 	public TestStep encode(String format) {
 		TestStep step = new TestStep(encodeString(name, format), testResult, new ArrayList<>(pwdToReplace));
@@ -236,6 +245,11 @@ public class TestStep extends TestAction {
 		
 		step.failed = failed;
 		step.snapshots = new ArrayList<>(snapshots);
+		step.files = new ArrayList<>();
+		for (GenericFile file: files) {
+			step.files.add(file.encode(format));
+		}
+		
 		step.encoded = true;
 		step.duration = duration;
 		step.startDate = startDate;

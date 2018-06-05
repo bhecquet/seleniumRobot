@@ -34,6 +34,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.UUID;
 
 import javax.imageio.ImageIO;
 
@@ -50,6 +51,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.FileDetector;
+import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.UselessFileDetector;
 import org.openqa.selenium.support.events.EventFiringWebDriver;
 
@@ -57,6 +59,7 @@ import com.seleniumtests.browserfactory.BrowserInfo;
 import com.seleniumtests.connectors.selenium.SeleniumGridConnector;
 import com.seleniumtests.customexception.DriverExceptions;
 import com.seleniumtests.customexception.ScenarioException;
+import com.seleniumtests.driver.screenshots.VideoRecorder;
 import com.seleniumtests.util.helper.WaitHelper;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 import com.seleniumtests.util.osutility.OSUtilityFactory;
@@ -64,7 +67,15 @@ import com.seleniumtests.util.osutility.OSUtilityFactory;
 import net.lightbody.bmp.BrowserMobProxy;
 
 /**
- * Supports file upload in remote webdriver.
+ * This class acts as a proxy for everything related to selenium driver actions (mostly a bypass) or with the machine holding
+ * the browser
+ * - send keys via keyboard
+ * - move mouse
+ * - upload file to browser
+ * - capture video
+ * 
+ * When action do not need a real driver, static methods are provided
+ * It also handles the grid mode, masking it to requester.
  */
 public class CustomEventFiringWebDriver extends EventFiringWebDriver implements HasCapabilities {
 	
@@ -189,6 +200,14 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
 
     public WebDriver getWebDriver() {
         return driver;
+    }
+    
+    public String getSessionId() {
+    	try {
+    		return ((RemoteWebDriver)driver).getSessionId().toString();
+    	} catch (ClassCastException e) {
+    		return UUID.randomUUID().toString();
+    	}
     }
     
     /**
@@ -555,6 +574,12 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
 		}
 	}
 	
+	/**
+	 * Returns a Base64 string of the desktop
+	 * @param driverMode
+	 * @param gridConnector
+	 * @return
+	 */
 	public static String captureDesktopToBase64String(DriverMode driverMode, SeleniumGridConnector gridConnector) {
 		if (driverMode == DriverMode.LOCAL) {
 			BufferedImage bi = captureDesktopToBuffer();
@@ -568,6 +593,42 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
 			}
 		} else if (driverMode == DriverMode.GRID && gridConnector != null) {
 			return gridConnector.captureDesktopToBuffer();
+		} else {
+			throw new ScenarioException("driver supports captureDesktopToBase64String only in local and grid mode");
+		}
+	}
+	
+	/**
+	 * Start video capture using VideoRecorder class
+	 * @param driverMode
+	 * @param gridConnector
+	 * @param videoName		name of the video to record so that it's unique. Only used locally. In remote, grid sessionId is used
+	 */
+	public static VideoRecorder startVideoCapture(DriverMode driverMode, SeleniumGridConnector gridConnector, File videoFolder, String videoName) {
+		if (driverMode == DriverMode.LOCAL) {
+			VideoRecorder recorder = new VideoRecorder(videoFolder, videoName);
+			recorder.start();
+			return recorder;
+			
+		} else if (driverMode == DriverMode.GRID && gridConnector != null) {
+			gridConnector.startVideoCapture();
+			return null;
+		} else {
+			throw new ScenarioException("driver supports captureDesktopToBase64String only in local and grid mode");
+		}
+	}
+	
+	/**
+	 * Stop video capture using VideoRecorder class
+	 * @param driverMode
+	 * @param gridConnector
+	 * @throws IOException 
+	 */
+	public static File stopVideoCapture(DriverMode driverMode, SeleniumGridConnector gridConnector, VideoRecorder recorder) throws IOException {
+		if (driverMode == DriverMode.LOCAL) {
+			return recorder.stop();
+		} else if (driverMode == DriverMode.GRID && gridConnector != null) {
+			return gridConnector.stopVideoCapture();
 		} else {
 			throw new ScenarioException("driver supports captureDesktopToBase64String only in local and grid mode");
 		}

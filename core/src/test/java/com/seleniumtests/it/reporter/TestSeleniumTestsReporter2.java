@@ -542,6 +542,31 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	
 	
 	/**
+	 * Check that video capture file is present in result
+	 * 
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testReportContainsVideoCapture() throws Exception {
+		
+		try {
+			System.setProperty(SeleniumTestsContext.VIDEO_CAPTURE, "true");
+			
+			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriver"});
+			
+			// read 'testDriver' report. This contains calls to HtmlElement actions
+			String detailedReportContent1 = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriver", "TestReport.html").toFile());
+			detailedReportContent1 = detailedReportContent1.replace("\n", "").replace("\r",  "").replaceAll(">\\s+<", "><");
+			
+			Assert.assertTrue(detailedReportContent1.contains("<li>sendKeys on TextFieldElement Text, by={By.id: text2} with args: (true, true, [a text,])</li>"));	
+			
+		} finally {
+			System.clearProperty(SeleniumTestsContext.VIDEO_CAPTURE);
+		}
+		
+	}
+	
+	/**
 	 * Check that HAR capture file is present in result
 	 * 
 	 * @throws Exception

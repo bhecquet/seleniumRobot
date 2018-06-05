@@ -1,5 +1,6 @@
 package com.seleniumtests.connectors.selenium;
 
+import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
@@ -104,6 +105,15 @@ public class SeleniumGridConnector {
 	 */
 	public void sendKeysWithKeyboard(List<Integer> keyCodes) {
 		logger.warn("send keys is only available with seleniumRobot grid");
+	}
+	
+	public void startVideoCapture() {
+		logger.warn("video capture is only available with seleniumRobot grid");
+	}
+	
+	public File stopVideoCapture() {
+		logger.warn("video capture is only available with seleniumRobot grid");
+		return null;
 	}
 	
 	/**

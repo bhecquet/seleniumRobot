@@ -27,7 +27,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.UUID;
 
 import org.apache.log4j.Logger;
 import org.json.JSONException;
@@ -50,6 +49,7 @@ import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.DriverExceptionListener;
 import com.seleniumtests.driver.DriverMode;
 import com.seleniumtests.driver.TestType;
+import com.seleniumtests.driver.screenshots.VideoCaptureMode;
 import com.seleniumtests.reporter.PluginsHelper;
 import com.seleniumtests.reporter.logger.ArchiveMode;
 import com.seleniumtests.reporter.reporters.ReportInfo;
@@ -124,6 +124,7 @@ public class SeleniumTestsContext {
 
     public static final String CAPTURE_SNAPSHOT = "captureSnapshot";
     public static final String CAPTURE_NETWORK = "captureNetwork";
+    public static final String VIDEO_CAPTURE = "captureVideo";
     public static final String ENABLE_EXCEPTION_LISTENER = "enableExceptionListener";	// TODO: voir son effet, activé par défaut
 
     public static final String DP_TAGS_INCLUDE = "dpTagsInclude";				// 
@@ -195,6 +196,7 @@ public class SeleniumTestsContext {
 	public static final boolean DEFAULT_ENABLE_EXCEPTION_LISTENER = true;
 	public static final boolean DEFAULT_CAPTURE_SNAPSHOT = true;
 	public static final boolean DEFAULT_CAPTURE_NETWORK = false;
+	public static final String DEFAULT_VIDEO_CAPTURE = "onError";
 	public static final int DEFAULT_SNAPSHOT_TOP_CROPPING = 0;
 	public static final int DEFAULT_SNAPSHOT_BOTTOM_CROPPING = 0;
 	public static final boolean DEFAULT_ENABLE_JAVASCRIPT = true;
@@ -315,6 +317,7 @@ public class SeleniumTestsContext {
         setSnapshotTopCropping(getIntValueForTest(SNAPSHOT_TOP_CROPPING, System.getProperty(SNAPSHOT_TOP_CROPPING)));
         setCaptureSnapshot(getBoolValueForTest(CAPTURE_SNAPSHOT, System.getProperty(CAPTURE_SNAPSHOT)));
         setCaptureNetwork(getBoolValueForTest(CAPTURE_NETWORK, System.getProperty(CAPTURE_NETWORK)));
+        setVideoCapture(getValueForTest(VIDEO_CAPTURE, System.getProperty(VIDEO_CAPTURE)));
         setEnableExceptionListener(getBoolValueForTest(ENABLE_EXCEPTION_LISTENER, System.getProperty(ENABLE_EXCEPTION_LISTENER)));
 
         setDpTagsInclude(getValueForTest(DP_TAGS_INCLUDE, System.getProperty(DP_TAGS_INCLUDE)));
@@ -649,7 +652,11 @@ public class SeleniumTestsContext {
      */
     private Integer getIntValueForTest(final String attributeName, final String sysPropertyValue) {
     	String value = getValueForTest(attributeName, sysPropertyValue);
-    	return value == null ? null: Integer.parseInt(value);
+    	try {
+    		return value == null ? null: Integer.parseInt(value);
+    	} catch (NumberFormatException e) {
+    		throw new ConfigurationException(String.format("Option [%s] value should be integer or null, found [%s]", attributeName, value));
+    	}
     }
     
     /**
@@ -890,6 +897,10 @@ public class SeleniumTestsContext {
     
     public boolean getCaptureNetwork() {    	
     	return (Boolean) getAttribute(CAPTURE_NETWORK);
+    }
+    
+    public VideoCaptureMode getVideoCapture() {    	
+    	return (VideoCaptureMode) getAttribute(VIDEO_CAPTURE);
     }
  
     public boolean getEnableExceptionListener() {
@@ -1717,6 +1728,11 @@ public class SeleniumTestsContext {
     	} else {
     		setAttribute(CAPTURE_NETWORK, DEFAULT_CAPTURE_NETWORK);
     	}
+    }
+    
+    public void setVideoCapture(String capture) {
+    	String newCapture = capture == null ? DEFAULT_VIDEO_CAPTURE: capture;
+        setAttribute(VIDEO_CAPTURE, VideoCaptureMode.fromString(newCapture));
     }
     
     public void setEnableExceptionListener(Boolean enable) {
