@@ -33,6 +33,10 @@
 		#set($snapshotLog = $snapshot.buildScreenshotLog())
 		<div class="message-snapshot">$snapshotLog</div>
 	#end
+	#foreach( $file in $localStep.getFiles() )
+		#set($log = $file.buildLog())
+		<div class="message-snapshot">$log</div>
+	#end
 	#if( $localStep.getHarCapture() )
 		#set($harLog = $localStep.getHarCapture().buildHarLog())
 		<div class="message-snapshot">$harLog</div>

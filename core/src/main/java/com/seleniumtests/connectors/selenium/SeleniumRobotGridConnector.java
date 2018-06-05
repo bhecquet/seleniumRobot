@@ -1,25 +1,15 @@
 package com.seleniumtests.connectors.selenium;
 
-import java.awt.event.KeyEvent;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import javax.imageio.ImageIO;
-
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.codec.binary.Base64InputStream;
-import org.apache.commons.codec.binary.Base64OutputStream;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.NotImplementedException;
 import org.apache.http.HttpHost;
@@ -34,6 +24,7 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 
 import com.google.common.net.HttpHeaders;
 import com.google.common.net.MediaType;
+import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import com.seleniumtests.customexception.ScenarioException;
@@ -282,6 +273,48 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 				.queryString("process", processName).asString();
 		} catch (UnirestException e) {
 			logger.warn(String.format("Could not kill process %s: %s", processName, e.getMessage()));
+		}
+	}
+	
+	@Override
+	public void startVideoCapture() {
+		if (nodeUrl == null) {
+			throw new ScenarioException("You cannot start video capture before driver has been created and corresponding node instanciated");
+		}
+		
+		logger.info("starting capture");
+		try {
+			Unirest.post(String.format("%s%s", nodeUrl, NODE_TASK_SERVLET))
+				.queryString("action", "startVideoCapture")
+				.queryString("session", sessionId).asString();
+		} catch (UnirestException e) {
+			logger.warn(String.format("Could start video capture: %s", e.getMessage()));
+		}
+	}
+	
+	@Override
+	public File stopVideoCapture() {
+		if (nodeUrl == null) {
+			throw new ScenarioException("You cannot stop video capture before driver has been created and corresponding node instanciated");
+		}
+		
+		logger.info("stopping capture");
+		try {
+			HttpResponse<InputStream> videoResponse = Unirest.post(String.format("%s%s", nodeUrl, NODE_TASK_SERVLET))
+				.queryString("action", "stopVideoCapture")
+				.queryString("session", sessionId).asBinary();
+			InputStream videoI = videoResponse.getBody();
+			
+			File videoFile = File.createTempFile("video", ".avi");
+			FileOutputStream os = new FileOutputStream(videoFile);
+			IOUtils.copy(videoI, os);
+			os.close();
+			
+			return videoFile;
+			
+		} catch (UnirestException | IOException e) {
+			logger.warn(String.format("Could not stop video capture: %s", e.getMessage()));
+			return null;
 		}
 	}
 

@@ -1,6 +1,5 @@
 package com.seleniumtests.uipage.htmlelements;
 
-import java.awt.event.KeyEvent;
 import java.io.File;
 import java.util.Arrays;
 

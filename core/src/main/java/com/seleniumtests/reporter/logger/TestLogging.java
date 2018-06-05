@@ -16,6 +16,7 @@
  */
 package com.seleniumtests.reporter.logger;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -140,6 +141,13 @@ public class TestLogging {
 			} catch (NullPointerException e) {
 				logger.error("HAR capture is null");
 			}
+    	}
+    	
+    }
+    
+    public static void logFile(File file, String description) {
+    	if (getParentTestStep() != null) {
+    		getParentTestStep().addFile(new GenericFile(file, description));
     	}
     	
     }

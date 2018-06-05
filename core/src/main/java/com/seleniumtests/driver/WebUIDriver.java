@@ -16,6 +16,7 @@
  */
 package com.seleniumtests.driver;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -42,6 +43,8 @@ import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.DriverExceptions;
 import com.seleniumtests.customexception.ScenarioException;
+import com.seleniumtests.driver.screenshots.VideoCaptureMode;
+import com.seleniumtests.driver.screenshots.VideoRecorder;
 import com.seleniumtests.reporter.logger.TestLogging;
 import com.seleniumtests.util.helper.WaitHelper;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
@@ -136,6 +139,18 @@ public class WebUIDriver {
 
 			if (config.getBrowserMobProxy() != null) {
 				config.getBrowserMobProxy().newHar(SeleniumTestsContextManager.getThreadContext().getRelativeOutputDir());
+			}
+			
+			if (config.getVideoCapture() != VideoCaptureMode.FALSE) {
+				try {
+					VideoRecorder recorder = CustomEventFiringWebDriver.startVideoCapture(SeleniumTestsContextManager.getThreadContext().getRunMode(), 
+																						SeleniumTestsContextManager.getThreadContext().getSeleniumGridConnector(),
+																						new File(SeleniumTestsContextManager.getThreadContext().getOutputDirectory()),
+																						"videoCapture.avi");
+					config.setVideoRecorder(recorder);
+				} catch (ScenarioException e) {
+					logger.warn("Video capture won't start: " + e.getMessage());
+				}
 			}
         }
 
