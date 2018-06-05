@@ -289,3 +289,12 @@ To override the default truststore, use `-Djavax.net.ssl.trustStore=<path_to_tru
 
 To debug, use `-Djavax.net.debug=ssl` 
 
+### Inheritance between test applications ###
+
+You can split a big test application into several ones
+
+	parent-app (generic features)
+		|--- child-app1 (app1)
+		|--- child-app2 (app2)
+		
+Drawback is that each test application MUST contain all variables of the generic features it uses
