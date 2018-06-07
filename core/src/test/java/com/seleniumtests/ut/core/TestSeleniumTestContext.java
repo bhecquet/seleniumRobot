@@ -39,6 +39,7 @@ import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.DriverMode;
+import com.seleniumtests.driver.screenshots.VideoCaptureMode;
 import com.seleniumtests.reporter.logger.ArchiveMode;
 import com.seleniumtests.reporter.reporters.ReportInfo;
 
@@ -384,6 +385,30 @@ public class TestSeleniumTestContext extends GenericTest {
 	public void testArchiveModeKo(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setArchive("unknown");
+	}
+	
+	@Test(groups="ut context")
+	public void testVideoCaptureModeOnSuccess(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setVideoCapture("onSuccess");
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getVideoCapture(),VideoCaptureMode.ON_SUCCESS);
+	}
+	@Test(groups="ut context")
+	public void testVideoCaptureModeOnError(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setVideoCapture("onError");
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getVideoCapture(),VideoCaptureMode.ON_ERROR);
+	}
+	@Test(groups="ut context")
+	public void testVideoCaptureModeNull(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setVideoCapture(null);
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getVideoCapture(), VideoCaptureMode.ON_ERROR);
+	}
+	@Test(groups="ut context", expectedExceptions=ConfigurationException.class)
+	public void testVideoCaptureModeKo(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setVideoCapture("unknown");
 	}
 	
 	

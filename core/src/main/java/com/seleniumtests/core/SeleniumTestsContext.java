@@ -1732,7 +1732,11 @@ public class SeleniumTestsContext {
     
     public void setVideoCapture(String capture) {
     	String newCapture = capture == null ? DEFAULT_VIDEO_CAPTURE: capture;
-        setAttribute(VIDEO_CAPTURE, VideoCaptureMode.fromString(newCapture));
+    	try {
+    		setAttribute(VIDEO_CAPTURE, VideoCaptureMode.fromString(newCapture));
+    	} catch (IllegalArgumentException e) {
+    		throw new ConfigurationException("Only 'true', 'false', 'onSuccess', 'onError' are supported for video capture");
+    	}
     }
     
     public void setEnableExceptionListener(Boolean enable) {

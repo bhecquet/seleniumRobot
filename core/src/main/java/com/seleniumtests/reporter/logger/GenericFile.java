@@ -32,6 +32,7 @@ public class GenericFile extends TestAction {
 		
 		actionJson.put("type", "file");
 		actionJson.put("name", name);
+		actionJson.put("file", this.file.getAbsolutePath());
 		
 		return actionJson;
 	}

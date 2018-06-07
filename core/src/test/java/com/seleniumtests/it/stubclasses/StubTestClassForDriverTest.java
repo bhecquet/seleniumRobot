@@ -29,6 +29,19 @@ public class StubTestClassForDriverTest extends StubParentClass {
 	}
 	
 	@Test(groups="stub")
+	public void testDriverShort() throws Exception {
+		new DriverTestPage(true);
+	}
+	
+	@Test(groups="stub")
+	public void testDriverShortKo() throws Exception {
+		SeleniumTestsContextManager.getThreadContext().setReplayTimeout(1);
+		
+		new DriverTestPage(true)
+			._writeSomethingOnNonExistentElement();
+	}
+	
+	@Test(groups="stub")
 	public void testDriverCustomSnapshot() throws Exception {
 		
 		new DriverTestPage(true)

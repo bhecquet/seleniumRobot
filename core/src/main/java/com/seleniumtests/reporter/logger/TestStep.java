@@ -180,6 +180,11 @@ public class TestStep extends TestAction {
 			stepJSon.getJSONArray("actions").put(testAction.toJson());
 		}
 		
+		stepJSon.put("files", new JSONArray());
+		for (GenericFile file: getFiles()) {
+			stepJSon.getJSONArray("files").put(file.toJson());
+		}
+		
 		return stepJSon;
 	}
 

@@ -32,6 +32,7 @@ import com.seleniumtests.GenericTest;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.CustomSeleniumTestsException;
 import com.seleniumtests.driver.screenshots.ScreenShot;
+import com.seleniumtests.reporter.logger.GenericFile;
 import com.seleniumtests.reporter.logger.HarCapture;
 import com.seleniumtests.reporter.logger.Snapshot;
 import com.seleniumtests.reporter.logger.TestAction;
@@ -295,6 +296,18 @@ public class TestTestStep extends GenericTest {
 	}
 	
 	@Test(groups={"ut"})
+	public void testTestStepEncodeXmlFileKept() throws IOException {
+
+		GenericFile file = new GenericFile(File.createTempFile("video", ".avi"), "video file");
+		
+		
+		TestStep step = new TestStep("step1 \"'<>&", null, new ArrayList<>());
+		step.addFile(file);
+		TestStep encodedTestStep = step.encode("xml");
+		Assert.assertEquals(encodedTestStep.getFiles().get(0).getFile(), file.getFile());
+	}
+	
+	@Test(groups={"ut"})
 	public void testTestMessageEncodeXml() {
 		TestMessage msg = new TestMessage("everything OK \"'<>&", MessageType.INFO);
 		TestMessage encodedMsg = msg.encode("xml");
@@ -412,6 +425,9 @@ public class TestTestStep extends GenericTest {
 		har.getLog().addPage(new HarPage("title", "a title"));
 		step.addNetworkCapture(new HarCapture(har));
 		
+		GenericFile file = new GenericFile(File.createTempFile("video", ".avi"), "video file");
+		step.addFile(file);
+		
 		TestStep subStep = new TestStep("subStep", null, new ArrayList<>());
 		subStep.addMessage(new TestMessage("everything in subStep almost OK", MessageType.WARNING));
 		subStep.addAction(new TestAction("action1", false, new ArrayList<>()));
@@ -437,6 +453,10 @@ public class TestTestStep extends GenericTest {
 		Assert.assertEquals(stepJson.getJSONArray("actions").getJSONObject(2).getString("type"), "step");
 		Assert.assertEquals(stepJson.getJSONArray("actions").getJSONObject(2).getString("name"), "subStep");
 		Assert.assertEquals(stepJson.getJSONArray("actions").getJSONObject(2).getJSONArray("actions").length(), 2);
+		
+		Assert.assertEquals(stepJson.getJSONArray("files").getJSONObject(0).getString("type"), "file");
+		Assert.assertEquals(stepJson.getJSONArray("files").getJSONObject(0).getString("name"), "video file");
+		Assert.assertTrue(stepJson.getJSONArray("files").getJSONObject(0).getString("file").contains(".avi"));
 		
 		
 	}

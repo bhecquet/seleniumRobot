@@ -43,6 +43,7 @@ import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.driver.screenshots.ScreenShot;
 import com.seleniumtests.driver.screenshots.ScreenshotUtil;
+import com.seleniumtests.driver.screenshots.VideoCaptureMode;
 import com.seleniumtests.reporter.logger.ArchiveMode;
 import com.seleniumtests.reporter.logger.TestLogging;
 import com.seleniumtests.reporter.logger.TestStep;
@@ -309,8 +310,15 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 					Path pathAbsolute = Paths.get(videoFile.getAbsolutePath());
 			        Path pathBase = Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory());
 			        Path pathRelative = pathBase.relativize(pathAbsolute);
-					
-					TestLogging.logFile(pathRelative.toFile(), "Video capture");
+			        
+			        if (SeleniumTestsContextManager.getThreadContext().getVideoCapture() == VideoCaptureMode.TRUE
+			        		|| (SeleniumTestsContextManager.getThreadContext().getVideoCapture() == VideoCaptureMode.ON_SUCCESS && testResult.isSuccess())
+			        		|| (SeleniumTestsContextManager.getThreadContext().getVideoCapture() == VideoCaptureMode.ON_ERROR && !testResult.isSuccess())) {
+			        	TestLogging.logFile(pathRelative.toFile(), "Video capture");
+					} else {
+						pathAbsolute.toFile().delete();
+					}
+
 				} catch (IOException e) {
 					logger.error("cannot attach video capture", e);
 				}		

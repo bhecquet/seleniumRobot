@@ -600,7 +600,6 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	 */
 	@Test(groups={"it"})
 	public void testReportDoNotContainsHarCapture() throws Exception {
-		
 		try {
 			System.setProperty(SeleniumTestsContext.CAPTURE_NETWORK, "false");
 			
