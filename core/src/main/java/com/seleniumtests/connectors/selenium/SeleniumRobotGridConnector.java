@@ -284,7 +284,7 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 		
 		logger.info("starting capture");
 		try {
-			Unirest.post(String.format("%s%s", nodeUrl, NODE_TASK_SERVLET))
+			Unirest.get(String.format("%s%s", nodeUrl, NODE_TASK_SERVLET))
 				.queryString("action", "startVideoCapture")
 				.queryString("session", sessionId).asString();
 		} catch (UnirestException e) {
@@ -293,19 +293,19 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 	}
 	
 	@Override
-	public File stopVideoCapture() {
+	public File stopVideoCapture(String outputFile) {
 		if (nodeUrl == null) {
 			throw new ScenarioException("You cannot stop video capture before driver has been created and corresponding node instanciated");
 		}
 		
 		logger.info("stopping capture");
 		try {
-			HttpResponse<InputStream> videoResponse = Unirest.post(String.format("%s%s", nodeUrl, NODE_TASK_SERVLET))
+			HttpResponse<InputStream> videoResponse = Unirest.get(String.format("%s%s", nodeUrl, NODE_TASK_SERVLET))
 				.queryString("action", "stopVideoCapture")
 				.queryString("session", sessionId).asBinary();
 			InputStream videoI = videoResponse.getBody();
 			
-			File videoFile = File.createTempFile("video", ".avi");
+			File videoFile = new File(outputFile);
 			FileOutputStream os = new FileOutputStream(videoFile);
 			IOUtils.copy(videoI, os);
 			os.close();

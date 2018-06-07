@@ -111,7 +111,7 @@ public class SeleniumGridConnector {
 		logger.warn("video capture is only available with seleniumRobot grid");
 	}
 	
-	public File stopVideoCapture() {
+	public File stopVideoCapture(String outputFile) {
 		logger.warn("video capture is only available with seleniumRobot grid");
 		return null;
 	}

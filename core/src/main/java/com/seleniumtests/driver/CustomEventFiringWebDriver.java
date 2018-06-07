@@ -30,6 +30,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -612,7 +613,7 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
 			
 		} else if (driverMode == DriverMode.GRID && gridConnector != null) {
 			gridConnector.startVideoCapture();
-			return null;
+			return new VideoRecorder(videoFolder, videoName, false);
 		} else {
 			throw new ScenarioException("driver supports captureDesktopToBase64String only in local and grid mode");
 		}
@@ -625,10 +626,11 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
 	 * @throws IOException 
 	 */
 	public static File stopVideoCapture(DriverMode driverMode, SeleniumGridConnector gridConnector, VideoRecorder recorder) throws IOException {
-		if (driverMode == DriverMode.LOCAL) {
+		if (driverMode == DriverMode.LOCAL && recorder != null) {
 			return recorder.stop();
 		} else if (driverMode == DriverMode.GRID && gridConnector != null) {
-			return gridConnector.stopVideoCapture();
+			return gridConnector.stopVideoCapture(Paths.get(recorder.getFolderPath().getAbsolutePath(), recorder.getFileName()).toString());
+			
 		} else {
 			throw new ScenarioException("driver supports captureDesktopToBase64String only in local and grid mode");
 		}

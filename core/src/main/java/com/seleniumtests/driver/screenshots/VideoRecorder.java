@@ -26,6 +26,7 @@ import org.monte.media.math.Rational;
 import org.monte.screenrecorder.ScreenRecorder;
 import org.monte.screenrecorder.ScreenRecorder.State;
 
+import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
 
@@ -36,23 +37,39 @@ public class VideoRecorder {
 	private File folderPath;
 	private static final Logger logger = SeleniumRobotLogger.getLogger(VideoRecorder.class);
 	
+	/**
+	 * Constructor for grid mode only.
+	 */
 	public VideoRecorder(File folderPath, String fileName) {
+		this(folderPath, fileName, true);
+	}
 	
-		//Create a instance of GraphicsConfiguration to get the Graphics configuration
-		//of the Screen. This is needed for ScreenRecorder class.
-		GraphicsConfiguration gc = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration();
+	/**
+	 * 
+	 * @param folderPath
+	 * @param fileName
+	 * @param localRecording		if true, we will capture something locally. Else grid mode is used
+	 */
+	public VideoRecorder(File folderPath, String fileName, boolean localRecording) {
 	
+		
 		//Create a instance of ScreenRecorder with the required configurations
-		try {
-			screenRecorder = new ScreenRecorder(gc, 
-							null,
-							new Format(MediaTypeKey, MediaType.FILE, MimeTypeKey, MIME_AVI),
-							new Format(MediaTypeKey, MediaType.VIDEO, EncodingKey, ENCODING_AVI_TECHSMITH_SCREEN_CAPTURE, CompressorNameKey, ENCODING_AVI_TECHSMITH_SCREEN_CAPTURE, DepthKey, (int)24, FrameRateKey, Rational.valueOf(25), QualityKey, 1.0f, KeyFrameIntervalKey, (int) (15 * 60)),
-							null,
-							null,
-							folderPath);
-		} catch (Exception e) {
-			logger.error("Error while creating video recording", e);
+		if (localRecording) {
+			//Create a instance of GraphicsConfiguration to get the Graphics configuration
+			//of the Screen. This is needed for ScreenRecorder class.
+			GraphicsConfiguration gc = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration();
+			
+			try {
+				screenRecorder = new ScreenRecorder(gc, 
+								null,
+								new Format(MediaTypeKey, MediaType.FILE, MimeTypeKey, MIME_AVI),
+								new Format(MediaTypeKey, MediaType.VIDEO, EncodingKey, ENCODING_AVI_TECHSMITH_SCREEN_CAPTURE, CompressorNameKey, ENCODING_AVI_TECHSMITH_SCREEN_CAPTURE, DepthKey, (int)24, FrameRateKey, Rational.valueOf(25), QualityKey, 1.0f, KeyFrameIntervalKey, (int) (15 * 60)),
+								null,
+								null,
+								folderPath);
+			} catch (Exception e) {
+				logger.error("Error while creating video recording", e);
+			}
 		}
 		
 		this.fileName = fileName;
@@ -63,6 +80,9 @@ public class VideoRecorder {
 	 * Start capture. Cancel previous one if it exists
 	 */
 	public void start() {
+		if (screenRecorder == null) {
+			throw new ScenarioException("recorder is null!. do not use the default constructor");
+		}
 		
 		try {
 			if (screenRecorder.getState() == State.RECORDING) {
@@ -75,6 +95,10 @@ public class VideoRecorder {
 	}
 	
 	public File stop() throws IOException {
+		if (screenRecorder == null) {
+			throw new ScenarioException("recorder is null!. do not use the default constructor");
+		}
+		
 		screenRecorder.stop();
 		List<File> createdFiles = screenRecorder.getCreatedMovieFiles();
 		if (!createdFiles.isEmpty()) {
@@ -91,6 +115,14 @@ public class VideoRecorder {
 		} else {
 			return null;
 		}
+	}
+
+	public String getFileName() {
+		return fileName;
+	}
+
+	public File getFolderPath() {
+		return folderPath;
 	}
 
 }
