@@ -11,6 +11,7 @@ import org.testng.xml.XmlSuite.ParallelMode;
 
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.driver.DriverMode;
 import com.seleniumtests.driver.screenshots.VideoRecorder;
 import com.seleniumtests.it.reporter.ReporterTest;
 import com.seleniumtests.util.FileUtility;
@@ -44,6 +45,8 @@ public class TestVideoRecorder extends ReporterTest {
 
 		try {
 			System.setProperty(SeleniumTestsContext.VIDEO_CAPTURE, "true");
+			System.setProperty(SeleniumTestsContext.RUN_MODE, "grid");
+			System.setProperty(SeleniumTestsContext.WEB_DRIVER_GRID, "http://localhost:4444/wd/hub");
 
 			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriverShort"});
 		

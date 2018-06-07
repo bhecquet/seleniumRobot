@@ -40,6 +40,7 @@ import com.seleniumtests.core.TestTasks;
 import com.seleniumtests.core.testretry.TestRetryAnalyzer;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.ScenarioException;
+import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.driver.screenshots.ScreenShot;
 import com.seleniumtests.driver.screenshots.ScreenshotUtil;
@@ -306,7 +307,10 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 			if (WebUIDriver.getWebUIDriver().getConfig().getVideoRecorder() != null) {
 				File videoFile;
 				try {
-					videoFile = WebUIDriver.getWebUIDriver().getConfig().getVideoRecorder().stop();
+					videoFile = CustomEventFiringWebDriver.stopVideoCapture(SeleniumTestsContextManager.getThreadContext().getRunMode(), 
+																			SeleniumTestsContextManager.getThreadContext().getSeleniumGridConnector(),
+																			WebUIDriver.getWebUIDriver().getConfig().getVideoRecorder());
+					
 					Path pathAbsolute = Paths.get(videoFile.getAbsolutePath());
 			        Path pathBase = Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory());
 			        Path pathRelative = pathBase.relativize(pathAbsolute);
