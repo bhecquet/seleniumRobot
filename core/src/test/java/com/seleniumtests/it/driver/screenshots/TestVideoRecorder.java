@@ -45,8 +45,8 @@ public class TestVideoRecorder extends ReporterTest {
 
 		try {
 			System.setProperty(SeleniumTestsContext.VIDEO_CAPTURE, "true");
-			System.setProperty(SeleniumTestsContext.RUN_MODE, "grid");
-			System.setProperty(SeleniumTestsContext.WEB_DRIVER_GRID, "http://localhost:4444/wd/hub");
+//			System.setProperty(SeleniumTestsContext.RUN_MODE, "grid");
+//			System.setProperty(SeleniumTestsContext.WEB_DRIVER_GRID, "http://localhost:4444/wd/hub");
 
 			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriverShort"});
 		
