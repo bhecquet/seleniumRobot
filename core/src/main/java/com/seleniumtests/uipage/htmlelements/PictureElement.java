@@ -97,7 +97,7 @@ public class PictureElement extends GenericPictureElement {
 		findElement();
 	}
 	public void findElement() {
-		screenshotUtil = new ScreenshotUtil(); // keep this for unit tests
+		screenshotUtil = new ScreenshotUtil(); // update driver
 	
 		File screenshotFile = screenshotUtil.captureWebPageToFile();
 		super.findElement(screenshotFile);
