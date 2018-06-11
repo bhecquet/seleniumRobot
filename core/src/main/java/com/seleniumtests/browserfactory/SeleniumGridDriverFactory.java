@@ -32,6 +32,7 @@ import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.SeleniumGridException;
 import com.seleniumtests.driver.DriverConfig;
+import com.seleniumtests.util.helper.WaitHelper;
 
 public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implements IWebDriverFactory {
 	
@@ -147,6 +148,7 @@ public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implemen
 				break;
 			} catch (WebDriverException e) {
 				logger.warn("Error creating driver, retrying: " + e.getMessage());
+				WaitHelper.waitForSeconds(2);
 				currentException = e;
 				continue;
 			}

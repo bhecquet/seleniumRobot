@@ -1,5 +1,6 @@
 package com.seleniumtests.browserfactory;
 
+import java.io.File;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.nio.charset.Charset;
@@ -262,10 +263,20 @@ public class BrowserInfo {
 	 * IE driver version depends on IE version itself
 	 */
 	private void addInternetExplorerDriverFile() {
+		// assume windows is installed on C:
+		
+		
 		if (Integer.parseInt(version) < 10) {
 			driverFileName = "IEDriverServer_x64";
     	} else {
-    		driverFileName = "IEDriverServer_Win32";
+    		// issue #147: handle case where only C:\\Program Files\\Internet Explorer\\iexplore.exe exists, so IE starts in full x64
+    		} if (new File("C:\\Program Files\\Internet Explorer\\iexplore.exe").exists() && !new File("C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe").exists()) {
+    			driverFileName = "IEDriverServer_x64";
+    			
+    		// in all other cases, IE starts with mix 64 and 32 bits (2 processes) which needs 32 bit driver (https://github.com/SeleniumHQ/selenium-google-code-issue-archive/issues/5116#issuecomment-192106556)
+    		} else {
+    			driverFileName = "IEDriverServer_Win32";
+    		
     	}
 		
 	}
