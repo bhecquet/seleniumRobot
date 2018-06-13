@@ -56,7 +56,7 @@ public class ReporterTest extends MockitoTest {
 	 * @param threadCount
 	 * @param testClasses
 	 * @param parallelMode
-	 * @param methods
+	 * @param methods			If methods is not empty, then testClasses must contain only one element.
 	 * @return
 	 * @throws IOException
 	 */
@@ -225,6 +225,11 @@ public class ReporterTest extends MockitoTest {
 	 */
 	protected String readTestMethodResultFile(String testName) throws IOException {
 		String detailedReportContent = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), testName, "TestReport.html").toFile());
+		return detailedReportContent.replace("\n", "").replace("\r",  "").replaceAll(">\\s+<", "><");
+	}
+	
+	protected String readSummaryFile() throws IOException {
+		String detailedReportContent = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "SeleniumTestReport.html").toFile());
 		return detailedReportContent.replace("\n", "").replace("\r",  "").replaceAll(">\\s+<", "><");
 	}
 	

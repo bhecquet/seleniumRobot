@@ -43,6 +43,7 @@ import com.seleniumtests.util.helper.WaitHelper;
 public class StubTestClass extends StubParentClass {
 	
 	private static int count = 0;
+	private static boolean failed = false;
 	
 	@BeforeClass(groups={"stub"})
 	public void setCount() {
@@ -116,5 +117,22 @@ public class StubTestClass extends StubParentClass {
 		step1.addAction(new TestAction("click button", false, new ArrayList<>()));
 		TestLogging.logTestStep(step1);
 		throw new DriverExceptions("some exception");
+	}
+	
+	/**
+	 * Test which fails only on first execution
+	 */
+	@Test(groups="stub")
+	public void testWithExceptionOnFirstExec() {
+
+		TestStep step1 = new TestStep("step 10", TestLogging.getCurrentTestResult(), new ArrayList<>());
+		step1.addAction(new TestAction(String.format("played %d times", count), false, new ArrayList<>()));
+		step1.addAction(new TestAction("click button", false, new ArrayList<>()));
+		TestLogging.logTestStep(step1);
+		
+		if (!failed) {
+			failed = true;
+			throw new DriverExceptions("some exception");
+		}
 	}
 }
