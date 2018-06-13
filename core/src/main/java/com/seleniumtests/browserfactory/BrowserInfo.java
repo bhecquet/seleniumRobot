@@ -22,6 +22,9 @@ import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 import com.seleniumtests.util.osutility.OSUtility;
 import com.seleniumtests.util.osutility.OSUtilityFactory;
+import com.sun.jna.platform.win32.Advapi32Util;
+import com.sun.jna.platform.win32.Win32Exception;
+import com.sun.jna.platform.win32.WinReg;
 
 public class BrowserInfo {
 	
@@ -269,13 +272,26 @@ public class BrowserInfo {
 		if (Integer.parseInt(version) < 10) {
 			driverFileName = "IEDriverServer_x64";
     	} else {
-    		// issue #147: handle case where only C:\\Program Files\\Internet Explorer\\iexplore.exe exists, so IE starts in full x64
-    		} if (new File("C:\\Program Files\\Internet Explorer\\iexplore.exe").exists() && !new File("C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe").exists()) {
+    		
+    		// https://stackoverflow.com/questions/21458588/ie-tabs-are-not-running-in-64-bit-mode-even-after-enabling-enhanced-protected-mo
+    		// https://blogs.msdn.microsoft.com/askie/2009/03/09/opening-a-new-tab-may-launch-a-new-process-with-internet-explorer-8-0/
+    		// issue #147: key HKEY_CURRENT_USER\\Software\\Microsoft\\Internet Explorer\\Main\\TabProcGrowth controls the starting of processes in IE
+    		// if not existing or if value is 1, a 32 bits process is started
+    		// if value is 0, 64 bit process is started
+    		String tabProcGrowth;
+    		try {
+    			tabProcGrowth = Advapi32Util.registryGetValue(WinReg.HKEY_CURRENT_USER, "Software\\Microsoft\\Internet Explorer\\Main", "TabProcGrowth").toString();
+    		} catch (Win32Exception e) {
+    			tabProcGrowth = "1";
+    		}
+    		
+    		if ("0".equals(tabProcGrowth)) {
     			driverFileName = "IEDriverServer_x64";
     			
     		// in all other cases, IE starts with mix 64 and 32 bits (2 processes) which needs 32 bit driver (https://github.com/SeleniumHQ/selenium-google-code-issue-archive/issues/5116#issuecomment-192106556)
     		} else {
     			driverFileName = "IEDriverServer_Win32";
+    		}
     		
     	}
 		
