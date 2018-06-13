@@ -24,6 +24,7 @@ import org.json.JSONObject;
 import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.annotations.Test;
+import org.testng.xml.XmlSuite.ParallelMode;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.ConfigurationException;
@@ -41,7 +42,7 @@ public class TestCustomReporter extends ReporterTest {
 		try {
 			System.setProperty("customTestReports", "SUP::json::ti/report.test.vm");
 	
-			executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"});
+			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions", "testInError", "testWithException"});
 				
 			// check content of the file. It should contains all fields with a value
 			String detailedReportContent = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testAndSubActions", "SUP-result.json").toFile());
@@ -75,7 +76,7 @@ public class TestCustomReporter extends ReporterTest {
 		try {
 			System.setProperty("customTestReports", "SUP::xml::reporter/templates/report.supervision.vm");
 	
-			executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"});
+			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions", "testInError", "testWithException"});
 				
 			// check content of the file. It should contain error
 			String detailedReportContent = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testInError", "SUP-result.xml").toFile());
@@ -105,7 +106,7 @@ public class TestCustomReporter extends ReporterTest {
 		try {
 			System.setProperty("customSummaryReports", "summaryResult::json::ti/report.summary.vm");
 			
-			executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"});
+			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions", "testInError", "testWithException"});
 			
 			// check content of the file. It should contains all fields with a value
 			String detailedReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "summaryResult.json"));
@@ -127,7 +128,7 @@ public class TestCustomReporter extends ReporterTest {
 		try {
 			System.setProperty("customTestReports", "SUP::json::ti/report.test.nowhere.vm");
 			
-			executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"});
+			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions", "testInError", "testWithException"});
 		} finally {
 			System.clearProperty("customTestReports");
 		}
@@ -138,7 +139,7 @@ public class TestCustomReporter extends ReporterTest {
 		try {
 			System.setProperty("customSummaryReports", "SUP::json::ti/report.summary.nowhere.vm");
 			
-			executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"});
+			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions", "testInError", "testWithException"});
 		} finally {
 			System.clearProperty("customSummaryReports");
 		}

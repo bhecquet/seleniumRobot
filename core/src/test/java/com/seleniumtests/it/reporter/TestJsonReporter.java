@@ -27,6 +27,7 @@ import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.Test;
+import org.testng.xml.XmlSuite.ParallelMode;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.reporter.reporters.CustomReporter;
@@ -61,7 +62,7 @@ public class TestJsonReporter extends ReporterTest {
 		
 		reporter = spy(new CustomReporter());
 
-		executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"});
+		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions", "testInError", "testWithException"});
 		String outDir = new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath();
 
 		// check all files are generated with the right name
@@ -80,10 +81,10 @@ public class TestJsonReporter extends ReporterTest {
 		JSONObject jsonResult = new JSONObject(FileUtils.readFileToString(Paths.get(outDir, "results.json").toFile()));
 		
 		// Check content of result file
-		Assert.assertEquals(jsonResult.getInt("pass"), 3);
+		Assert.assertEquals(jsonResult.getInt("pass"), 4);
 		Assert.assertEquals(jsonResult.getInt("fail"), 4);
 		Assert.assertEquals(jsonResult.getInt("skip"), 2);
-		Assert.assertEquals(jsonResult.getInt("total"), 9);
+		Assert.assertEquals(jsonResult.getInt("total"), 10);
 		
 	}
 
