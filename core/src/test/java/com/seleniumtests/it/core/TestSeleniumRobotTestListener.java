@@ -151,6 +151,7 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 		mainReportContent = mainReportContent.replace("\n", "").replace("\r",  "");
 		Assert.assertEquals(StringUtils.countMatches(mainReportContent, "class=\"fa fa-circle circleSuccess\">"), 
 							StringUtils.countMatches(mainReportContent, "TestReport.html") - 1);
+		Assert.assertEquals(StringUtils.countMatches(mainReportContent, "TestReport.html"), 9);
 
 		// test1Listener4 fails as expected
 		Assert.assertTrue(mainReportContent.matches(".*<i class\\=\"fa fa-circle circleSkipped\"></i><a href\\='test1Listener4/TestReport\\.html'.*?>test1Listener4</a>.*"));
@@ -165,6 +166,7 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 		mainReportContent = mainReportContent.replace("\n", "").replace("\r",  "");
 		Assert.assertEquals(StringUtils.countMatches(mainReportContent, "class=\"fa fa-circle circleSuccess\">"), 
 				StringUtils.countMatches(mainReportContent, "TestReport.html") - 1);
+		Assert.assertEquals(StringUtils.countMatches(mainReportContent, "TestReport.html"), 9);
 
 		// test1Listener4 fails as expected
 		Assert.assertTrue(mainReportContent.matches(".*<i class\\=\"fa fa-circle circleSkipped\"></i><a href\\='test1Listener4/TestReport\\.html'.*?>test1Listener4</a>.*"));
@@ -179,6 +181,7 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 		mainReportContent = mainReportContent.replace("\n", "").replace("\r",  "");
 		Assert.assertEquals(StringUtils.countMatches(mainReportContent, "class=\"fa fa-circle circleSuccess\">"), 
 				StringUtils.countMatches(mainReportContent, "TestReport.html") - 1);
+		Assert.assertEquals(StringUtils.countMatches(mainReportContent, "TestReport.html"), 9);
 		
 		// test1Listener4 fails as expected
 		Assert.assertTrue(mainReportContent.matches(".*<i class\\=\"fa fa-circle circleSkipped\"></i><a href\\='test1Listener4/TestReport\\.html'.*?>test1Listener4</a>.*"));

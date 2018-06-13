@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
 import org.testng.IConfigurationListener;
@@ -61,15 +62,6 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 	public static final String TEST_CONTEXT = "testContext";
 	private static List<ISuite> suiteList = Collections.synchronizedList(new ArrayList<>());
 	private Date start;
-	
-	private Map<String, Boolean> isRetryHandleNeeded = new HashMap<>();
-	private Map<String, IResultMap> failedTests = new HashMap<>();
-	private Map<String, IResultMap> skippedTests = new HashMap<>();
-	private Map<String, IResultMap> passedTests = new HashMap<>();
-
-	public Map<String, Boolean> getIsRetryHandleNeeded() {
-		return isRetryHandleNeeded;
-	}
 
 	protected String buildMethodSignature(final Method method) {
         return method.getDeclaringClass().getCanonicalName() + "." + method.getName() + "()";
@@ -82,6 +74,7 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 
 	@Override
 	public void onTestSuccess(ITestResult result) {
+		System.out.println("success");
 		// nothing to do
 	}
 
@@ -94,21 +87,16 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 			if (testRetryAnalyzer.retryPeek(testResult)) {
 				testResult.setStatus(ITestResult.SKIP);
 				Reporter.setCurrentTestResult(null);
-			} else {
-				IResultMap rMap = failedTests.get(testResult.getTestContext().getName());
-				rMap.addResult(testResult, testResult.getMethod());
-				failedTests.put(testResult.getTestContext().getName(), rMap);
-			}
+			} 
 
 			logger.info(testResult.getMethod() + " Failed in " + testRetryAnalyzer.getCount() + " times");
-			isRetryHandleNeeded.put(testResult.getTestContext().getName(), true);
 		}		
 	}
 
 	@Override
 	public void onTestSkipped(ITestResult result) {
 		// nothing to do
-		
+		System.out.println("skipped");
 	}
 
 	@Override
@@ -122,26 +110,52 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
         start = new Date();
         
         // global context of the test
-        SeleniumTestsContextManager.initGlobalContext(context);
-        
-        isRetryHandleNeeded.put(context.getName(), false);
-		failedTests.put(context.getName(), new ResultMap());
-		skippedTests.put(context.getName(), new ResultMap());
-		passedTests.put(context.getName(), new ResultMap());
-		
+        SeleniumTestsContextManager.initGlobalContext(context);		
 	}
 
+	/**
+	 * Filter TestNG results to keep only the last one for each test execution
+	 * E.g: if test failed and is retried (ok / ko / skip) keep the last state only
+	 * changed with issue #148
+	 */
 	@Override
 	public void onFinish(ITestContext context) {
-		if (isRetryHandleNeeded.get(context.getName())) {
-			removeIncorrectlySkippedTests(context, failedTests.get(context.getName()));
-			removeFailedTestsInTestNG(context);
-		} else {
-			failedTests.put(context.getName(), context.getFailedTests());
-			skippedTests.put(context.getName(), context.getSkippedTests());
-			passedTests.put(context.getName(), context.getPassedTests());
+		
+		// get an ordered list of test results so that we keep the last one of each test
+		List<ITestResult> allResults = new ArrayList<>();
+		allResults.addAll(context.getFailedTests().getAllResults());
+		allResults.addAll(context.getSkippedTests().getAllResults());
+		allResults.addAll(context.getPassedTests().getAllResults());
+		
+		allResults = allResults.stream()
+				.sorted((r1, r2) -> Long.compare(r1.getStartMillis(), r2.getStartMillis()))
+				.collect(Collectors.toList());
+		
+		// contains only the results to keep
+		Map<String, ITestResult> uniqueResults = new HashMap<>();
+		for (ITestResult result: allResults) {
+			String hash = SeleniumTestsContextManager.getHashForTest(result);
+			uniqueResults.put(hash, result);
 		}
 		
+		// remove results we do not want from context
+		List<ITestResult> resultsToKeep = new ArrayList<>(uniqueResults.values());
+		
+		for (ITestResult result: context.getFailedTests().getAllResults()) {
+			if (!resultsToKeep.contains(result)) {
+				context.getFailedTests().removeResult(result);
+			}
+		}
+		for (ITestResult result: context.getSkippedTests().getAllResults()) {
+			if (!resultsToKeep.contains(result)) {
+				context.getSkippedTests().removeResult(result);
+			}
+		}
+		for (ITestResult result: context.getPassedTests().getAllResults()) {
+			if (!resultsToKeep.contains(result)) {
+				context.getPassedTests().removeResult(result);
+			}
+		}
 	}
 
 	@Override
@@ -167,7 +181,6 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 		if (method.isTestMethod()) {
 			executeBeforeTestMethod(method, testResult, context);	
 		}
-		
 	}
 	
 
@@ -377,87 +390,7 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 			result.getTestContext().getPassedTests().removeResult(result);
 			result.getTestContext().getFailedTests().addResult(result, result.getMethod());
 		}
-	}
-	
-	/**
-	 * Remove retrying failed test cases from skipped test cases.
-	 *
-	 * @param   tc
-	 * @param   failedTests
-	 *
-	 * @return
-	 */
-	private void removeIncorrectlySkippedTests(final ITestContext tc, final IResultMap failedTests) {
-		List<ITestNGMethod> failsToRemove = new ArrayList<>();
-		IResultMap returnValue = tc.getSkippedTests();
-
-		for (ITestResult result : returnValue.getAllResults()) {
-			for (ITestResult resultToCheck : failedTests.getAllResults()) {
-				if (resultToCheck.getMethod().equals(result.getMethod())) {
-					failsToRemove.add(resultToCheck.getMethod());
-					break;
-				}
-			}
-
-			for (ITestResult resultToCheck : tc.getPassedTests().getAllResults()) {
-				if (resultToCheck.getMethod().equals(result.getMethod())) {
-					failsToRemove.add(resultToCheck.getMethod());
-					break;
-				}
-			}
-		}
-
-		for (ITestNGMethod method : failsToRemove) {
-			returnValue.removeResult(method);
-		}
-
-		skippedTests.put(tc.getName(), tc.getSkippedTests());
-
-	}
-
-
-	/**
-	 * Remove failed test cases in TestNG.
-	 *
-	 * @param   tc
-	 *
-	 * @return
-	 */
-	private void removeFailedTestsInTestNG(final ITestContext tc) {
-		IResultMap returnValue = tc.getFailedTests();
-		ResultMap removeMap = new ResultMap();
-		for (ITestResult result : returnValue.getAllResults()) {
-			boolean isFailed = false;
-			for (ITestResult resultToCheck : failedTests.get(tc.getName()).getAllResults()) {
-				if (result.getMethod().equals(resultToCheck.getMethod())
-						&& result.getEndMillis() == resultToCheck.getEndMillis()) {
-					isFailed = true;
-					break;
-				}
-			}
-
-			if (!isFailed) {
-				logger.info("Removed failed cases:" + result.getMethod().getMethodName());
-				removeMap.addResult(result, result.getMethod());
-			}
-		}
-
-		for (ITestResult result : removeMap.getAllResults()) {
-			ITestResult removeResult = null;
-			for (ITestResult resultToCheck : returnValue.getAllResults()) {
-				if (result.getMethod().equals(resultToCheck.getMethod())
-						&& result.getEndMillis() == resultToCheck.getEndMillis()) {
-					removeResult = resultToCheck;
-					break;
-				}
-			}
-
-			if (removeResult != null) {
-				returnValue.getAllResults().remove(removeResult);
-			}
-		}
-	}
-	
+	}	
 
 	/**
 	 * put in thread context the test / class / method context that may have already be defined in other \@BeforeXXX method

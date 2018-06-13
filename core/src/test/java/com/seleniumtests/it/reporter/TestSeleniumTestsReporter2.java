@@ -77,8 +77,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		executeSubTest(5, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions", "testInError", "testWithException"});
 		
 		// check content of summary report file
-		String mainReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport.html"));
-		mainReportContent = mainReportContent.replace("\n", "").replace("\r",  "");
+		String mainReportContent = readSummaryFile();
 		
 		Assert.assertTrue(mainReportContent.matches(".*<a href\\='testAndSubActions/TestReport\\.html'.*?>testAndSubActions</a>.*"));
 		Assert.assertTrue(mainReportContent.matches(".*<a href\\='testInError/TestReport\\.html'.*?>testInError</a>.*"));
@@ -95,8 +94,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		executeSubTest(5, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.TESTS, new String[] {"testAndSubActions", "testInError", "testWithException"});
 		
 		// check content of summary report file
-		String mainReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport.html"));
-		mainReportContent = mainReportContent.replace("\n", "").replace("\r",  "");
+		String mainReportContent = readSummaryFile();
 		
 		Assert.assertTrue(mainReportContent.matches(".*<a href\\='testAndSubActions/TestReport\\.html'.*?>testAndSubActions</a>.*"));
 		Assert.assertTrue(mainReportContent.matches(".*<a href\\='testInError/TestReport\\.html'.*?>testInError</a>.*"));
@@ -112,9 +110,11 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		
 		String detailedReportContent1 = readTestMethodResultFile("testOk1");
 		Assert.assertEquals(StringUtils.countMatches(detailedReportContent1, "Post test step: reset2"), 1);
+		Assert.assertEquals(StringUtils.countMatches(detailedReportContent1, "Post test step: reset "), 2); // displayed twice because no Method parameter present
 		
 		String detailedReportContent2 = readTestMethodResultFile("testOk2");
 		Assert.assertEquals(StringUtils.countMatches(detailedReportContent2, "Post test step: reset2"), 1);
+		Assert.assertEquals(StringUtils.countMatches(detailedReportContent2, "Post test step: reset "), 2); // displayed twice because no Method parameter present
 		
 		String logs = readSeleniumRobotLogFile();
 		Assert.assertTrue(logs.contains("When using @AfterMethod in tests")); // check error message is shown
@@ -147,8 +147,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions", "testInError", "testWithException"});
 		
 		// check content of summary report file
-		String mainReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport.html"));
-		mainReportContent = mainReportContent.replace("\n", "").replace("\r",  "");
+		String mainReportContent = readSummaryFile();
 		
 		Assert.assertTrue(mainReportContent.matches(".*<a href\\='testAndSubActions/TestReport\\.html'.*?>testAndSubActions</a>.*"));
 		Assert.assertTrue(mainReportContent.matches(".*<a href\\='testInError/TestReport\\.html'.*?>testInError</a>.*"));
@@ -182,7 +181,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		String mainReportContent = readSummaryFile();
 		
 		// only the last execution (ok) is shown
-		Assert.assertEquals(StringUtils.countMatches(mainReportContent, ".*>testWithExceptionOnFirstExec</a>.*"), 1);
+		Assert.assertEquals(StringUtils.countMatches(mainReportContent, ">testWithExceptionOnFirstExec</a>"), 1);
 		Assert.assertFalse(mainReportContent.contains("<i class=\"fa fa-circle circleSkipped\">"));
 		
 		// check log contain the 2 executions
@@ -206,8 +205,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		}
 		
 		// check content of summary report file
-		String mainReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport.html"));
-		mainReportContent = mainReportContent.replace("\n", "").replace("\r",  "");
+		String mainReportContent = readSummaryFile();
 		
 		Assert.assertTrue(mainReportContent.contains("<link rel=\"stylesheet\" href=\"https://maxcdn.bootstrapcdn.com"));
 		
@@ -231,8 +229,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		}
 		
 		// check content of summary report file
-		String mainReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport.html"));
-		mainReportContent = mainReportContent.replace("\n", "").replace("\r",  "");
+		String mainReportContent = readSummaryFile();
 		
 		Assert.assertTrue(mainReportContent.contains("<script src=\"resources/templates/bootstrap.min.js\"></script>"));
 		
@@ -250,7 +247,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions", "testInError", "testWithException"});
 		
 		// check content of summary report file
-		String mainReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport.html"));
+		String mainReportContent = readSummaryFile();
 		
 		// if description is available, it's displayed
 		// else, "no description available" is shown
@@ -259,11 +256,10 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		Assert.assertTrue(mainReportContent.contains("data-toggle=\"tooltip\" title=\"no description available\">testWithException</a>"));
 		
 		// Check description is displayed if available
-		String detailedReportContent1 = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testAndSubActions", "TestReport.html").toFile());
-		detailedReportContent1 = detailedReportContent1.replace("\n", "").replace("\r",  "").replaceAll(">\\s+<", "><");
+		String detailedReportContent1 = readTestMethodResultFile("testAndSubActions");
 		Assert.assertTrue(detailedReportContent1.contains("<h4> Test Details - testAndSubActions</h4><pre>a test with steps</pre>"));
 		
-		String detailedReportContent2 = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testInError", "TestReport.html").toFile());
+		String detailedReportContent2 = readTestMethodResultFile("testInError");
 		Assert.assertFalse(detailedReportContent2.contains("<h4> Test Details - testInError</h4><pre>"));
 		
 	}
@@ -278,8 +274,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClass3"});
 		
 		// check content of summary report file
-		String mainReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport.html"));
-		mainReportContent = mainReportContent.replace("\n", "").replace("\r",  "");
+		String mainReportContent = readSummaryFile();
 		
 		Assert.assertTrue(mainReportContent.matches(".*<a href\\='testFailedWithException/TestReport\\.html'.*?>testFailedWithException</a>.*"));
 		Assert.assertTrue(mainReportContent.matches(".*<a href\\='testFailedWithSoftAssertDisabled/TestReport\\.html'.*?>testFailedWithSoftAssertDisabled</a>.*"));
@@ -356,8 +351,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClassManualSteps"});
 		
 		// check content of summary report file
-		String mainReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport.html"));
-		mainReportContent = mainReportContent.replace("\n", "").replace("\r",  "");
+		String mainReportContent = readSummaryFile();
 		
 		Assert.assertTrue(mainReportContent.matches(".*<a href\\='testOk/TestReport\\.html'.*?>testOk</a>.*"));
 		Assert.assertTrue(mainReportContent.matches(".*<a href\\='testWithAssert/TestReport\\.html'.*?>testWithAssert</a>.*"));
@@ -427,8 +421,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClass2"});
 		
 		// check content of summary report file
-		String mainReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport.html"));
-		mainReportContent = mainReportContent.replace("\n", "").replace("\r",  "");
+		String mainReportContent = readSummaryFile();
 		
 		Assert.assertTrue(mainReportContent.matches(".*class\\=\"fa fa-circle circleSuccess\"></i><a href\\='test1/TestReport\\.html'.*?>test1</a>.*"));
 		Assert.assertTrue(mainReportContent.matches(".*class\\=\"fa fa-circle circleFailed\"></i><a href\\='test4/TestReport\\.html'.*?>test4</a>.*"));
@@ -723,8 +716,6 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 								+ "<div class=\"stack-element\"></div>"
 								+ "<div class=\"stack-element\">at com.seleniumtests.it.stubclasses.StubTestClass.testInError\\(StubTestClass.java:\\d+\\)</div>"
 								+ "<div class=\"stack-element\">at com.seleniumtests.it.reporter.ReporterTest.executeSubTest\\(ReporterTest.java:\\d+\\)</div>"
-								+ "<div class=\"stack-element\">at com.seleniumtests.it.reporter.ReporterTest.executeSubTest\\(ReporterTest.java:\\d+\\)</div>"
-								+ "<div class=\"stack-element\">at com.seleniumtests.it.reporter.ReporterTest.executeSubTest\\(ReporterTest.java:\\d+\\)</div>"
 								+ "<div class=\"stack-element\">at com.seleniumtests.it.reporter.TestSeleniumTestsReporter2.testReportDetailsWithErrors\\(TestSeleniumTestsReporter2.java:\\d+\\)</div>.*"));
 		
 		// error message of the assertion is displayed in step
@@ -776,8 +767,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		
 		executeSubCucumberTests("core_3", 1);
 
-		String mainReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport.html"));
-		mainReportContent = mainReportContent.replace("\n", "").replace("\r",  "");
+		String mainReportContent = readSummaryFile();
 		Assert.assertTrue(mainReportContent.matches(".*<a href\\='core_3/TestReport\\.html'.*?>core_3</a>.*"));
 	
 		String detailedReportContent = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "core_3", "TestReport.html").toFile());
@@ -797,8 +787,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		
 		executeSubCucumberTests("core_3,core_4", 5);
 		
-		String mainReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport.html"));
-		mainReportContent = mainReportContent.replace("\n", "").replace("\r",  "");
+		String mainReportContent = readSummaryFile();
 		Assert.assertTrue(mainReportContent.matches(".*<a href\\='core_3/TestReport\\.html'.*?>core_3</a>.*"));
 	}
 	

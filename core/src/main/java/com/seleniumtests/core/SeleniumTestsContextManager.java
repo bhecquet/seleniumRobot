@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -36,9 +37,12 @@ import org.testng.xml.XmlSuite;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import com.seleniumtests.core.runner.CucumberScenarioWrapper;
 import com.seleniumtests.core.runner.SeleniumRobotTestListener;
+import com.seleniumtests.core.runner.SeleniumRobotTestPlan;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.driver.TestType;
+import com.seleniumtests.util.StringUtility;
 import com.seleniumtests.util.TestConfigurationParser;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
@@ -391,6 +395,37 @@ public class SeleniumTestsContextManager {
     
     public static void removeThreadContext() {
     	threadLocalContext.remove();
+    }
+    
+    /**
+     * Generate a String which is unique for each combination of suite/testNG test/class/test method/parameters
+     * @return
+     */
+    public static String getHashForTest(ITestResult testNGResult) {
+
+    	String uniqueIdentifier;
+    	if (testNGResult != null) {
+    		String testName;
+        	if (testNGResult.getParameters().length == 1 
+        			&& testNGResult.getParameters()[0] instanceof CucumberScenarioWrapper 
+        			&& "CucumberTestPlan".equals(testNGResult.getMethod().getTestClass().getName())) {
+        		testName = testNGResult.getParameters()[0].toString();
+        	} else {
+        		testName = testNGResult.getMethod().getMethodName();
+        	}
+        	
+    		String testNameModified = StringUtility.replaceOddCharsFromFileName(testName);
+    		
+    		uniqueIdentifier = testNGResult.getTestContext().getSuite().getName()
+	    			+ "-" + testNGResult.getTestContext().getName()
+	    			+ "-" + testNGResult.getMethod().getTestClass().getName()
+	    			+ "-" + testNameModified
+	    			+ "-" + Arrays.hashCode(testNGResult.getParameters());
+    	} else {
+    		uniqueIdentifier = "null-null-null-null-0";
+    	}
+    	
+    	return uniqueIdentifier;
     }
     
     /**
