@@ -68,8 +68,8 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 		verify(serverConnector).createTestCase("test4");
 		verify(serverConnector).createTestCase("test5");
 		verify(serverConnector).createTestCase("test6");
-		verify(serverConnector, times(9)).addLogsToTestCaseInSession(anyString());
-		verify(serverConnector, times(9)).createTestCaseInSession(); 
+		verify(serverConnector, times(10)).addLogsToTestCaseInSession(anyString());
+		verify(serverConnector, times(10)).createTestCaseInSession(); 
 		verify(serverConnector, times(3)).createTestStep("step 1");
 		verify(serverConnector).createTestStep("step 2");
 		verify(serverConnector).createSnapshot(any(File.class));

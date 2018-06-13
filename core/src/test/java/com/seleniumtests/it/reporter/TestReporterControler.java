@@ -191,7 +191,7 @@ public class TestReporterControler extends ReporterTest {
 	 */
 	@Test(groups={"it"})
 	public void testReportDetailsOnlyTestConfigurationSteps() throws Exception {
-		executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"});
+		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions", "testInError", "testWithException"});
 		
 		String detailedReportContent = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testAndSubActions", "TestReport.html").toFile());
 		detailedReportContent = detailedReportContent.replace("\n", "").replace("\r",  "").replaceAll(">\\s+<", "><");

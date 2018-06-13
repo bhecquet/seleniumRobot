@@ -27,7 +27,7 @@ public class TestArchiving extends ReporterTest {
 			System.setProperty(SeleniumTestsContext.ARCHIVE_TO_FILE, tmpZip.getAbsolutePath());
 			System.setProperty(SeleniumTestsContext.ARCHIVE, "true");
 
-			executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"});
+			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions"});
 		
 			Assert.assertTrue(tmpZip.exists());
 			File outputFolder = FileUtility.unzipFile(tmpZip);
@@ -145,7 +145,7 @@ public class TestArchiving extends ReporterTest {
 		try {
 			System.setProperty(SeleniumTestsContext.ARCHIVE, "true");
 			
-			executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"});
+			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions"});
 			
 			Assert.assertFalse(tmpZip.exists());
 		} finally {
@@ -163,7 +163,7 @@ public class TestArchiving extends ReporterTest {
 		File tmpZip = File.createTempFile("archive", ".zip");
 		tmpZip.delete();
 
-		executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"});
+		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions"});
 		
 		Assert.assertFalse(tmpZip.exists());
 	}

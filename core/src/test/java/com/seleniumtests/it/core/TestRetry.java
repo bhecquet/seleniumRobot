@@ -8,6 +8,7 @@ import org.springframework.util.StringUtils;
 import org.testng.Assert;
 import org.testng.TestNG;
 import org.testng.annotations.Test;
+import org.testng.xml.XmlSuite.ParallelMode;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.it.reporter.ReporterTest;
@@ -17,7 +18,7 @@ public class TestRetry extends ReporterTest {
 	@Test(groups={"it"})
 	public void testRetryOnException() throws Exception {
 		
-		TestNG tng = executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"});
+		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions", "testInError", "testWithException"});
 
 		String mainReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport.html"));
 		mainReportContent = mainReportContent.replace("\n", "").replace("\r",  "");

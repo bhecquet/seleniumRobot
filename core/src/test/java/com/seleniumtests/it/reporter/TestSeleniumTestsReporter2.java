@@ -58,8 +58,8 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		// check at least one generation occured for each part of the report
 		verify(reporter).generateReport(anyList(), anyList(), anyString()); // 1 time only
 		verify(reporter).generateSuiteSummaryReport(anyList());				// 1 call
-		verify(reporter, times(9)).generatePanel(any(VelocityEngine.class),any(ITestResult.class)); 	// 1 call per test method => 8 calls
-		verify(reporter, times(9)).generateExecutionReport(any(ITestResult.class));
+		verify(reporter, times(10)).generatePanel(any(VelocityEngine.class),any(ITestResult.class)); 	// 1 call per test method => 8 calls
+		verify(reporter, times(10)).generateExecutionReport(any(ITestResult.class));
 		verify(reporter).copyResources();
 
 		// check report is complete without error (issue #100)
@@ -74,7 +74,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	public void testMultithreadReport() throws Exception {
 
 		SeleniumTestsContextManager.removeThreadContext();
-		executeSubTest(5, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"});
+		executeSubTest(5, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions", "testInError", "testWithException"});
 		
 		// check content of summary report file
 		String mainReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport.html"));
@@ -92,7 +92,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	public void testMultithreadTestReport() throws Exception {
 		
 		SeleniumTestsContextManager.removeThreadContext();
-		executeSubTest(5, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, XmlSuite.ParallelMode.TESTS, new String[] {});
+		executeSubTest(5, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.TESTS, new String[] {"testAndSubActions", "testInError", "testWithException"});
 		
 		// check content of summary report file
 		String mainReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport.html"));
@@ -144,7 +144,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	@Test(groups={"it"})
 	public void testReportSummaryContentWithSteps() throws Exception {
 
-		executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"});
+		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions", "testInError", "testWithException"});
 		
 		// check content of summary report file
 		String mainReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport.html"));
@@ -169,6 +169,29 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	}
 	
 	/**
+	 * issue #148: Check that when test is retried and retry is OK, summary is correct
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testFailsOnlyOnceAndRetriedOk() throws Exception {
+		
+		// execute only the test that fails the first time it's executed
+		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testWithExceptionOnFirstExec"});
+		
+		// check content of summary report file
+		String mainReportContent = readSummaryFile();
+		
+		// only the last execution (ok) is shown
+		Assert.assertEquals(StringUtils.countMatches(mainReportContent, ".*>testWithExceptionOnFirstExec</a>.*"), 1);
+		Assert.assertFalse(mainReportContent.contains("<i class=\"fa fa-circle circleSkipped\">"));
+		
+		// check log contain the 2 executions
+		String detailedReportContent1 = readTestMethodResultFile("testWithExceptionOnFirstExec");
+		Assert.assertTrue(detailedReportContent1.contains("Test is KO with error: some exception"));
+		Assert.assertTrue(detailedReportContent1.contains("Test is OK"));
+	}
+	
+	/**
 	 * Check resources referenced in header are get from CDN and resources files are not copied to ouput folder
 	 * @throws Exception
 	 */
@@ -177,7 +200,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		
 		try {
 			System.setProperty("optimizeReports", "true");
-			executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"});
+			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions", "testInError", "testWithException"});
 		} finally {
 			System.clearProperty("optimizeReports");
 		}
@@ -202,7 +225,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		
 		try {
 			System.setProperty("optimizeReports", "false");
-			executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"});
+			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions", "testInError", "testWithException"});
 		} finally {
 			System.clearProperty("optimizeReports");
 		}
@@ -224,7 +247,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	@Test(groups={"it"})
 	public void testTestDescription() throws Exception {
 		
-		executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"});
+		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions", "testInError", "testWithException"});
 		
 		// check content of summary report file
 		String mainReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport.html"));
@@ -291,7 +314,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	@Test(groups={"it"})
 	public void testAttachmentRenaming() throws Exception {
 		
-		executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"});
+		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions", "testInError", "testWithException"});
 		
 		// check that with error, remaining steps are skipped
 		String detailedReportContent1 = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testAndSubActions", "TestReport.html").toFile());
@@ -305,7 +328,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	public void testAttachmentRenamingWithOptimizeReports() throws Exception {
 		try {
 			System.setProperty("optimizeReports", "true");
-			executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"});
+			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions", "testInError", "testWithException"});
 		} finally {
 			System.clearProperty("optimizeReports");
 		}
@@ -427,7 +450,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		try {
 			System.setProperty("customTestReports", "PERF::xml::reporter/templates/report.perf.vm,SUP::xml::reporter/templates/report.supervision.vm");
 	
-			executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"});
+			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions", "testInError", "testWithException"});
 			
 			
 			// check style of messages
@@ -454,9 +477,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	@Test(groups={"it"})
 	public void testReportDetailsWithSubSteps() throws Exception {
 		
-		reporter = spy(new SeleniumTestsReporter2());
-		
-		executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"});
+		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions", "testInError", "testWithException"});
 		
 		// check content of summary report file
 		String detailedReportContent = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testAndSubActions", "TestReport.html").toFile());
@@ -484,9 +505,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	@Test(groups={"it"})
 	public void testReportDetailsWithLogs() throws Exception {
 		
-		reporter = new SeleniumTestsReporter2();
-		
-		executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"});
+		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions", "testInError", "testWithException"});
 		
 		// check content of detailed report file
 		String detailedReportContent = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testAndSubActions", "TestReport.html").toFile());
@@ -505,9 +524,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	@Test(groups={"it"})
 	public void testReportDetailsSteps() throws Exception {
 		
-		reporter = new SeleniumTestsReporter2();
-		
-		executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"});
+		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions", "testInError", "testWithException"});
 		
 		String detailedReportContent = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testAndSubActions", "TestReport.html").toFile());
 		detailedReportContent = detailedReportContent.replace("\n", "").replace("\r",  "").replaceAll(">\\s+<", "><");
@@ -692,9 +709,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	@Test(groups={"it"})
 	public void testReportDetailsWithErrors() throws Exception {
 		
-		reporter = new SeleniumTestsReporter2();
-		
-		executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"});
+		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions", "testInError", "testWithException"});
 		
 		String detailedReportContent = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testInError", "TestReport.html").toFile());
 		
@@ -726,7 +741,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	 */
 	@Test(groups={"it"})
 	public void testReportDetailsWithTestValues() throws Exception {
-		executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"});
+		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions", "testInError", "testWithException"});
 		
 		String detailedReportContent = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testInError", "TestReport.html").toFile());
 		
