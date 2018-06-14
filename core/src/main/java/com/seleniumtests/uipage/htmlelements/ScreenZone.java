@@ -37,12 +37,16 @@ public class ScreenZone extends GenericPictureElement {
 		super(label, pictureFile, detectionThreshold, true, new ScreenshotUtil(null));
 	}
 	
+	public ScreenshotUtil getScreenshotUtil() {
+		return new ScreenshotUtil(null);
+	}
+	
 	/**
 	 * Search the picture in the screenshot taken by Robot
 	 * 
 	 */
 	public void findElement() {
-		screenshotUtil = new ScreenshotUtil(null); // keep this for unit tests
+		screenshotUtil = getScreenshotUtil(); // keep this for unit tests
 
 		// issue #136: we don't need driver when checking desktop
 		File screenshotFile = screenshotUtil.captureDesktopToFile();

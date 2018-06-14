@@ -83,6 +83,10 @@ public class PictureElement extends GenericPictureElement {
 		}
 	}
 	
+	public ScreenshotUtil getScreenshotUtil() {
+		return new ScreenshotUtil();
+	}
+	
 	/**
 	 * Search the picture in the screenshot taken by Robot or WebDriver
 	 * Robot is used in Desktop mode
@@ -97,7 +101,7 @@ public class PictureElement extends GenericPictureElement {
 		findElement();
 	}
 	public void findElement() {
-		screenshotUtil = new ScreenshotUtil(); // update driver
+		screenshotUtil = getScreenshotUtil(); // update driver
 	
 		File screenshotFile = screenshotUtil.captureWebPageToFile();
 		super.findElement(screenshotFile);

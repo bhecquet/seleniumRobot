@@ -17,6 +17,7 @@
 package com.seleniumtests.ut.uipage.htmlelements;
 
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -40,8 +41,10 @@ import org.testng.annotations.AfterMethod;
 import org.testng.annotations.Test;
 
 import com.seleniumtests.MockitoTest;
+import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.ImageSearchException;
 import com.seleniumtests.driver.CustomEventFiringWebDriver;
+import com.seleniumtests.driver.TestType;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.driver.screenshots.ScreenshotUtil;
 import com.seleniumtests.uipage.htmlelements.HtmlElement;
@@ -74,6 +77,11 @@ public class TestPictureElement extends MockitoTest {
 	@InjectMocks
 	PictureElement pictureElement = new PictureElement();
 	
+//	@Test(groups={"ut"})
+//	public void init() {
+//		SeleniumTestsContextManager.getThreadContext().setTestType(TestType.WEB);
+//	}
+	
 	@Test(groups={"ut"})
 	public void testClick() {
 		PictureElement picElement = spy(pictureElement);
@@ -89,6 +97,7 @@ public class TestPictureElement extends MockitoTest {
 		when(coordinates.inViewPort()).thenReturn(new Point(100, 120));
 		when(coordinates.onPage()).thenReturn(new Point(100, 120));
 		when(intoElement.getCoordinates()).thenReturn(coordinates);
+		doReturn(screenshotUtil).when(picElement).getScreenshotUtil();
 		
 		picElement.click();
 		verify(picElement).moveAndClick(intoElement, -65, -60);
@@ -100,6 +109,7 @@ public class TestPictureElement extends MockitoTest {
 		PictureElement picElement = spy(pictureElement);
 		picElement.setObjectPictureFile(new File(""));
 		when(screenshotUtil.captureWebPageToFile()).thenReturn(new File(""));
+		doReturn(screenshotUtil).when(picElement).getScreenshotUtil();
 		doThrow(ImageSearchException.class).when(imageDetector).detectExactZoneWithScale();
 		
 		Assert.assertFalse(picElement.isElementPresent());
@@ -112,6 +122,7 @@ public class TestPictureElement extends MockitoTest {
 	public void testPictureNotVisibleWithReplay() throws AWTException {
 		PictureElement picElement = spy(pictureElement);
 		picElement.setObjectPictureFile(new File(""));
+		doReturn(screenshotUtil).when(picElement).getScreenshotUtil();
 		when(screenshotUtil.captureWebPageToFile()).thenReturn(new File(""));
 		doThrow(ImageSearchException.class).when(imageDetector).detectExactZoneWithScale();
 		
@@ -125,6 +136,7 @@ public class TestPictureElement extends MockitoTest {
 	public void testPictureVisible() throws AWTException {
 		PictureElement picElement = spy(pictureElement);
 		picElement.setObjectPictureFile(new File(""));
+		doReturn(screenshotUtil).when(picElement).getScreenshotUtil();
 		when(screenshotUtil.captureWebPageToFile()).thenReturn(new File(""));
 		when(imageDetector.getDetectedRectangle()).thenReturn(new Rectangle(10, 10, 100, 50));
 		when(imageDetector.getSizeRatio()).thenReturn(1.0);

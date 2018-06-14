@@ -16,6 +16,7 @@
  */
 package com.seleniumtests.ut.uipage.htmlelements;
 
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
@@ -63,6 +64,7 @@ public class TestScreenZone extends MockitoTest {
 		picElement.setObjectPictureFile(new File(""));
 
 		PowerMockito.mockStatic(CustomEventFiringWebDriver.class);
+		doReturn(screenshotUtil).when(picElement).getScreenshotUtil();
 		when(screenshotUtil.captureDesktopToFile()).thenReturn(new File(""));
 		when(imageDetector.getDetectedRectangle()).thenReturn(new Rectangle(10, 10, 100, 50));
 		when(imageDetector.getSizeRatio()).thenReturn(1.0);
@@ -77,6 +79,7 @@ public class TestScreenZone extends MockitoTest {
 		picElement.setObjectPictureFile(new File(""));
 		
 		PowerMockito.mockStatic(CustomEventFiringWebDriver.class);
+		doReturn(screenshotUtil).when(picElement).getScreenshotUtil();
 		when(screenshotUtil.captureDesktopToFile()).thenReturn(new File(""));
 		when(imageDetector.getDetectedRectangle()).thenReturn(new Rectangle(10, 10, 100, 50));
 		when(imageDetector.getSizeRatio()).thenReturn(1.0);
@@ -91,6 +94,7 @@ public class TestScreenZone extends MockitoTest {
 		picElement.setObjectPictureFile(new File(""));
 		
 		PowerMockito.mockStatic(CustomEventFiringWebDriver.class);
+		doReturn(screenshotUtil).when(picElement).getScreenshotUtil();
 		when(screenshotUtil.captureDesktopToFile()).thenReturn(new File(""));
 		when(imageDetector.getDetectedRectangle()).thenReturn(new Rectangle(10, 10, 100, 50));
 		when(imageDetector.getSizeRatio()).thenReturn(1.0);
@@ -104,6 +108,7 @@ public class TestScreenZone extends MockitoTest {
 	public void testPictureNotVisible() throws AWTException {
 		ScreenZone picElement = spy(screenZone);
 		picElement.setObjectPictureFile(new File(""));
+		doReturn(screenshotUtil).when(picElement).getScreenshotUtil();
 		when(screenshotUtil.captureDesktopToFile()).thenReturn(new File(""));
 		doThrow(ImageSearchException.class).when(imageDetector).detectExactZoneWithScale();
 		
@@ -117,6 +122,7 @@ public class TestScreenZone extends MockitoTest {
 	public void testPictureNotVisibleWithReplay() throws AWTException {
 		ScreenZone picElement = spy(screenZone);
 		picElement.setObjectPictureFile(new File(""));
+		doReturn(screenshotUtil).when(picElement).getScreenshotUtil();
 		when(screenshotUtil.captureDesktopToFile()).thenReturn(new File(""));
 		doThrow(ImageSearchException.class).when(imageDetector).detectExactZoneWithScale();
 		
@@ -129,6 +135,7 @@ public class TestScreenZone extends MockitoTest {
 	public void testPictureVisible() throws AWTException {
 		ScreenZone picElement = spy(screenZone);
 		picElement.setObjectPictureFile(new File(""));
+		doReturn(screenshotUtil).when(picElement).getScreenshotUtil();
 		when(screenshotUtil.captureDesktopToFile()).thenReturn(new File(""));
 		when(imageDetector.getDetectedRectangle()).thenReturn(new Rectangle(10, 10, 100, 50));
 		when(imageDetector.getSizeRatio()).thenReturn(1.0);

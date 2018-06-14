@@ -21,6 +21,7 @@ import java.lang.reflect.Method;
 import org.mockito.MockitoAnnotations;
 import org.powermock.modules.testng.PowerMockTestCase;
 import org.testng.ITestContext;
+import org.testng.ITestResult;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
@@ -40,10 +41,10 @@ public class MockitoTest  extends PowerMockTestCase {
 	protected static final String SERVER_URL = "http://localhost:4321";
 
 	@BeforeMethod(groups={"ut", "it"})  
-	public void beforeMethod(final Method method, final ITestContext testNGCtx) throws Exception {
+	public void beforeMethod(final Method method, final ITestContext testNGCtx, final ITestResult testResult) throws Exception {
 		doBeforeMethod(method);
 		beforePowerMockTestMethod();
-		initThreadContext(testNGCtx);
+		initThreadContext(testNGCtx, null, testResult);
 		MockitoAnnotations.initMocks(this); 
 	}
 	
@@ -55,12 +56,12 @@ public class MockitoTest  extends PowerMockTestCase {
 	}
 	
 	public void initThreadContext(final ITestContext testNGCtx) {
-		initThreadContext(testNGCtx, null);
+		initThreadContext(testNGCtx, null, null);
 	}
 	
-	public void initThreadContext(final ITestContext testNGCtx,  final String testName) {
+	public void initThreadContext(final ITestContext testNGCtx,  final String testName, final ITestResult testResult) {
 		SeleniumTestsContextManager.initGlobalContext(testNGCtx);
-		SeleniumTestsContextManager.initThreadContext(testNGCtx, testName, null, null);
+		SeleniumTestsContextManager.initThreadContext(testNGCtx, testName, null, testResult);
 		SeleniumTestsContextManager.getThreadContext().setSoftAssertEnabled(false);
 		SeleniumTestsContextManager.getGlobalContext().setSoftAssertEnabled(false);
 	}

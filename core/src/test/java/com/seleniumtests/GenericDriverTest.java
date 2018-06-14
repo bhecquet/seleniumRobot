@@ -18,6 +18,7 @@ package com.seleniumtests;
 
 import org.openqa.selenium.WebDriver;
 import org.testng.ITestContext;
+import org.testng.ITestResult;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 
@@ -34,16 +35,20 @@ public class GenericDriverTest {
 	public WebDriver driver = null;
 
 	@BeforeMethod(groups={"ut", "it"})  
-	public void initTest(final ITestContext testNGCtx) {
+	public void initTest(final ITestContext testNGCtx, final ITestResult testResult) {
 		SeleniumTestsContextManager.initGlobalContext(testNGCtx);
-		SeleniumTestsContextManager.initThreadContext(testNGCtx, null, null, null);
+		SeleniumTestsContextManager.initThreadContext(testNGCtx, null, null, testResult);
 		SeleniumTestsContextManager.getThreadContext().setSoftAssertEnabled(false);
 		SeleniumTestsContextManager.getGlobalContext().setSoftAssertEnabled(false);
 	}
 	
 	public void initThreadContext(final ITestContext testNGCtx) {
 		SeleniumTestsContextManager.initGlobalContext(testNGCtx);
-		SeleniumTestsContextManager.initThreadContext(testNGCtx, null, null, null);
+		try {
+			SeleniumTestsContextManager.initThreadContext(testNGCtx, null, null, GenericTest.generateResult(testNGCtx, getClass()));
+		} catch (NoSuchMethodException | SecurityException | NoSuchFieldException | IllegalArgumentException
+				| IllegalAccessException e) {
+		}
 		SeleniumTestsContextManager.getThreadContext().setSoftAssertEnabled(false);
 		SeleniumTestsContextManager.getGlobalContext().setSoftAssertEnabled(false);
 	}

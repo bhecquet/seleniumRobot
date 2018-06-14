@@ -37,6 +37,7 @@ import org.openqa.selenium.WebDriverException;
 import org.testng.ITestContext;
 import org.testng.ITestResult;
 import org.testng.TestRunner;
+import org.testng.internal.TestResult;
 
 import com.seleniumtests.browserfactory.BrowserInfo;
 import com.seleniumtests.connectors.selenium.SeleniumGridConnector;
@@ -737,6 +738,11 @@ public class SeleniumTestsContext {
     	
     	// to do before creating connectors because seleniumRobot server needs it
     	this.testNGResult = testNGResult; 
+    	
+    	// context may be missing from testNgResult, so add it to avoid problems when getting hash for test
+    	if (testNGResult.getTestContext() == null) {
+    		((TestResult)testNGResult).setContext(testNGContext);
+    	}
 
         updateTestAndMobile(getPlatform());
         

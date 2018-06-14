@@ -18,6 +18,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.testng.Assert;
 import org.testng.ITestContext;
+import org.testng.ITestResult;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -41,8 +42,8 @@ public class TestBrowserSnapshot extends MockitoTest {
 	private final String browserName = "firefox";
 	
 	@BeforeMethod(groups={"it"})
-	public void initDriver(final ITestContext testNGCtx) throws Exception {
-		initThreadContext(testNGCtx);
+	public void initDriver(final ITestContext testNGCtx, final ITestResult testResult) throws Exception {
+		initThreadContext(testNGCtx, null, testResult);
 		SeleniumTestsContextManager.getThreadContext().setExplicitWaitTimeout(2);
 		SeleniumTestsContextManager.getThreadContext().setBrowser(browserName);
 		SeleniumTestsContextManager.getThreadContext().setSnapshotBottomCropping(0);
