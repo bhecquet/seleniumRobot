@@ -81,4 +81,8 @@ public class MockitoTest  extends PowerMockTestCase {
 		afterPowerMockTestClass();
 	}
 	
+	public void myTest() {
+		
+	}
+	
 }

@@ -108,4 +108,8 @@ public class GenericTest {
 		
 		return testResult;
 	}
+	
+	public void myTest() {
+		
+	}
 }

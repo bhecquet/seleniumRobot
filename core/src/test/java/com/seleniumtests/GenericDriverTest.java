@@ -62,4 +62,8 @@ public class GenericDriverTest {
 			WebUIDriver.cleanUp();
 		}
 	}
+	
+	public void myTest() {
+		
+	}
 }

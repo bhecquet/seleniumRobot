@@ -222,7 +222,7 @@ public class SeleniumTestsContext {
 	public static final String DEFAULT_SELENIUMROBOTSERVER_URL = null;
 	public static final JSONObject DEFAULT_TMS_RUN = new JSONObject();
 	public static final JSONObject DEFAULT_TMS_CONNECT = new JSONObject();
-	public static final String DEFAULT_WEB_PROXY_TYPE = null;
+	public static final ProxyType DEFAULT_WEB_PROXY_TYPE = ProxyType.AUTODETECT;
 	public static final boolean DEFAULT_OPTIMIZE_REPORTS = false;
 	public static final String DEFAULT_ARCHIVE= "false";
     
@@ -804,7 +804,7 @@ public class SeleniumTestsContext {
     	
     	// set default value for proxy type if none as been set before
     	if (getWebProxyType() == null) {
-    		setWebProxyType("AUTODETECT");
+    		setWebProxyType(DEFAULT_WEB_PROXY_TYPE.toString());
     	}
     	
     	// exclude browserMobProxy if proxy type is set to PAC
