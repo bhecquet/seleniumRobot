@@ -1,6 +1,7 @@
 package com.seleniumtests.ut.browserfactory;
 
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import java.io.File;
@@ -32,9 +33,11 @@ import com.seleniumtests.driver.DriverMode;
 import com.seleniumtests.util.osutility.OSUtility;
 import com.seleniumtests.util.osutility.OSUtilityFactory;
 import com.seleniumtests.util.osutility.OSUtilityWindows;
+import com.sun.jna.platform.win32.Advapi32Util;
+import com.sun.jna.platform.win32.WinReg.HKEY;
 
 // TODO: enable test on linux platform using mocks
-@PrepareForTest({OSUtility.class, OSUtilityFactory.class})
+@PrepareForTest({OSUtility.class, OSUtilityFactory.class, Advapi32Util.class})
 public class TestIECapabilityFactory extends MockitoTest {
 
 	@Mock
@@ -139,6 +142,8 @@ public class TestIECapabilityFactory extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testCreateIECapabilitiesStandardDriverPathLocal() {
 		try {
+			PowerMockito.mockStatic(Advapi32Util.class);
+			PowerMockito.when(Advapi32Util.registryGetValue(any(HKEY.class), anyString(), anyString())).thenReturn("1");
 			Mockito.when(config.getMode()).thenReturn(DriverMode.LOCAL);
 			
 			new IECapabilitiesFactory(config).createCapabilities();
@@ -152,6 +157,8 @@ public class TestIECapabilityFactory extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testCreateIECapabilitiesOverrideDriverPathLocal() {
 		try {
+			PowerMockito.mockStatic(Advapi32Util.class);
+			PowerMockito.when(Advapi32Util.registryGetValue(any(HKEY.class), anyString(), anyString())).thenReturn("1");
 			Mockito.when(config.getMode()).thenReturn(DriverMode.LOCAL);
 			Mockito.when(config.getIeDriverPath()).thenReturn("/opt/ie/driver/ie");
 			

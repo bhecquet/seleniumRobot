@@ -765,10 +765,10 @@ public class TestSeleniumTestContext extends GenericTest {
 		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getTmsRun().length(), 2);
 	}
 	@Test(groups="ut context", expectedExceptions=ConfigurationException.class)
-	public void testWrongType(final ITestContext testNGCtx, final XmlTest xmlTest) {
+	public void testWrongType(final ITestContext testNGCtx, final XmlTest xmlTest) throws NoSuchMethodException, SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setTmsRun("{'type':'sonar'}");
-		SeleniumTestsContextManager.getThreadContext().configureContext(null);
+		SeleniumTestsContextManager.getThreadContext().configureContext(GenericTest.generateResult(testNGCtx, getClass()));
 	}
 	@Test(groups="ut context", expectedExceptions=ConfigurationException.class)
 	public void testWrongFormat(final ITestContext testNGCtx, final XmlTest xmlTest) {
@@ -836,7 +836,7 @@ public class TestSeleniumTestContext extends GenericTest {
 		try {
 			System.setProperty(SeleniumTestsContext.OUTPUT_DIRECTORY, "/home/user/test-output");
 			initThreadContext(testNGCtx);
-			Assert.assertTrue(SeleniumTestsContextManager.getThreadContext().getOutputDirectory().endsWith("/home/user/test-output/null")); // test name is null
+			Assert.assertTrue(SeleniumTestsContextManager.getThreadContext().getOutputDirectory().endsWith("/home/user/test-output/myTest")); // test name is myTest due to TestResult generation in GenericTest class
 		} finally {
 			System.clearProperty(SeleniumTestsContext.OUTPUT_DIRECTORY);
 		}
