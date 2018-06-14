@@ -64,8 +64,8 @@ public class TestLinuxOsUtility extends MockitoTest {
 	@BeforeClass(groups={"ut"})
 	public void isWindows() {
 		
-		if (!OSUtility.isWindows()) {
-			throw new SkipException("Test only available on Windows platform");
+		if (!OSUtility.isLinux()) {
+			throw new SkipException("Test only available on Linux platform");
 		}
 	}
 	
