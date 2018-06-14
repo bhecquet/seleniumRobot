@@ -18,6 +18,8 @@ package com.seleniumtests.ut.core;
 
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.mock;
 
 import java.io.File;
 import java.nio.file.Paths;
@@ -31,6 +33,7 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
 import org.testng.ITestContext;
+import org.testng.ITestNGMethod;
 import org.testng.ITestResult;
 import org.testng.annotations.Test;
 import org.testng.internal.TestResult;
@@ -43,7 +46,10 @@ import com.seleniumtests.connectors.selenium.SeleniumRobotVariableServerConnecto
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.TestVariable;
+import com.seleniumtests.core.runner.CucumberScenarioWrapper;
 import com.seleniumtests.customexception.ConfigurationException;
+
+import cucumber.runtime.model.CucumberScenario;
 
 /**
  * - Test creation of seleniumrobot server connection inside SeleniumTestsContext
@@ -56,6 +62,14 @@ public class TestSeleniumTestContext3 extends MockitoTest {
 	
 	@Mock
 	private SeleniumRobotVariableServerConnector variableServer;
+	
+//	@Mock
+//	private ITestResult testResult;
+//	@Mock
+//	private ITestResult testResult2;
+//	
+//	@Mock
+//	private ITestNGMethod testMethod;
 
 	/**
 	 * Check we create a variable server if all connexion params are present
@@ -253,4 +267,39 @@ public class TestSeleniumTestContext3 extends MockitoTest {
 			System.clearProperty("key1");
 		}
 	}	
+	
+
+	/**
+	 * Check that with a test name containing special characters, we create an output folder for this test whose name is the name of the test
+	 * @throws IllegalAccessException 
+	 * @throws IllegalArgumentException 
+	 * @throws NoSuchFieldException 
+	 * @throws SecurityException 
+	 * @throws NoSuchMethodException 
+	 */
+	@Test(groups="ut")
+	public void testNewOutputFolderWithOddTestName(final ITestContext testNGCtx) throws NoSuchMethodException, SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
+		initThreadContext(testNGCtx);
+		
+		ITestResult testResult = TestSeleniumTestContext.generateResult(testNGCtx, getClass());
+		
+		CucumberScenarioWrapper scenarioWrapper = mock(CucumberScenarioWrapper.class);
+		when(scenarioWrapper.toString()).thenReturn("<test | with @ chars>");
+		CucumberScenarioWrapper[] params = new CucumberScenarioWrapper[] {scenarioWrapper};
+		testResult.setParameters(params);
+		
+		SeleniumTestsContextManager.updateThreadContext(testResult);
+
+		String key = testNGCtx.getSuite().getName()
+				+ "-" + testNGCtx.getName()
+				+ "-" + "com.seleniumtests.ut.core.TestSeleniumTestContext3"
+				+ "-" + "-test__with_@_chars-"
+				+ "-" + Arrays.hashCode(params);
+		Assert.assertTrue(SeleniumTestsContext.getOutputFolderNames().containsKey(key));
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getRelativeOutputDir(), "-test__with_@_chars-");
+
+	}
+	
+	// used for generating TestResult
+	public void myTest() {}
 }

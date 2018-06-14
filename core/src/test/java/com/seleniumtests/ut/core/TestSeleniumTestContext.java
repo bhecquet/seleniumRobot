@@ -18,6 +18,8 @@ package com.seleniumtests.ut.core;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
@@ -26,22 +28,29 @@ import org.json.JSONObject;
 import org.openqa.selenium.Proxy.ProxyType;
 import org.testng.Assert;
 import org.testng.ITestContext;
+import org.testng.ITestNGMethod;
 import org.testng.ITestResult;
 import org.testng.TestRunner;
 import org.testng.annotations.Test;
+import org.testng.internal.TestNGMethod;
 import org.testng.internal.TestResult;
+import org.testng.internal.annotations.DefaultAnnotationTransformer;
+import org.testng.internal.annotations.JDK15AnnotationFinder;
+import org.testng.xml.XmlSuite;
 import org.testng.xml.XmlTest;
 
 import com.seleniumtests.GenericTest;
-import com.seleniumtests.connectors.tms.TestManager;
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.core.runner.CucumberScenarioWrapper;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.DriverMode;
 import com.seleniumtests.driver.screenshots.VideoCaptureMode;
 import com.seleniumtests.reporter.logger.ArchiveMode;
 import com.seleniumtests.reporter.reporters.ReportInfo;
+
+import cucumber.runtime.model.CucumberScenario;
 
 /**
  * Test parsing of test options into SeleniumTestContext
@@ -759,7 +768,7 @@ public class TestSeleniumTestContext extends GenericTest {
 	public void testWrongType(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setTmsRun("{'type':'sonar'}");
-		SeleniumTestsContextManager.getThreadContext().configureContext(null, null, null);
+		SeleniumTestsContextManager.getThreadContext().configureContext(null);
 	}
 	@Test(groups="ut context", expectedExceptions=ConfigurationException.class)
 	public void testWrongFormat(final ITestContext testNGCtx, final XmlTest xmlTest) {
@@ -1081,27 +1090,62 @@ public class TestSeleniumTestContext extends GenericTest {
 		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getWebProxyPassword(), null);
 		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getWebProxyExclude(), null);
 		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getWebProxyPac(), null);
-	}
+	}	
 	
 
 	/**
+	 * Generate a ITestResult from scratch
+	 * @param testNGCtx
+	 * @return
+	 * @throws NoSuchMethodException
+	 * @throws SecurityException
+	 * @throws NoSuchFieldException
+	 * @throws IllegalArgumentException
+	 * @throws IllegalAccessException
+	 */
+	public static ITestResult generateResult(final ITestContext testNGCtx, final Class<?> clazz) throws NoSuchMethodException, SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
+		ITestResult testResult = new TestResult();
+		testResult.setParameters(new String[] {"foo", "bar"});
+		
+		XmlSuite suite = new XmlSuite();
+		suite.setName("TmpSuite");
+		XmlTest test = new XmlTest(suite);
+		test.setName("myTestNg");
+		
+		ITestNGMethod testMethod = new TestNGMethod(clazz.getMethod("myTest"), new JDK15AnnotationFinder(new DefaultAnnotationTransformer()), test, null);
+		Field methodField = TestResult.class.getDeclaredField("m_method");
+		methodField.setAccessible(true);
+		methodField.set(testResult, testMethod);
+		Field contextField = TestResult.class.getDeclaredField("m_context");
+		contextField.setAccessible(true);
+		contextField.set(testResult, testNGCtx);
+		
+		return testResult;
+	}
+	
+	/**
 	 * Check that with a test name, we create an output folder for this test whose name is the name of the test
+	 * @throws IllegalAccessException 
+	 * @throws IllegalArgumentException 
+	 * @throws NoSuchFieldException 
+	 * @throws SecurityException 
+	 * @throws NoSuchMethodException 
 	 */
 	@Test(groups="ut")
-	public void testNewOutputFolder(final ITestContext testNGCtx) {
+	public void testNewOutputFolder(final ITestContext testNGCtx) throws NoSuchMethodException, SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
 		initThreadContext(testNGCtx);
 		
-		ITestResult testResult = new TestResult();
+		ITestResult testResult = generateResult(testNGCtx, getClass());
 		testResult.setParameters(new String[] {"foo", "bar"});
 		
 		int outputNamesInitialSize = SeleniumTestsContext.getOutputFolderNames().size();
 		
-		SeleniumTestsContextManager.updateThreadContext("myTest", "com.seleniumtests.tests", testResult);
+		SeleniumTestsContextManager.updateThreadContext(testResult);
 		Assert.assertEquals(SeleniumTestsContext.getOutputFolderNames().size(), outputNamesInitialSize + 1);
 		
 		String key = testNGCtx.getSuite().getName()
 				+ "-" + testNGCtx.getName()
-				+ "-" + "com.seleniumtests.tests"
+				+ "-" + "com.seleniumtests.ut.core.TestSeleniumTestContext"
 				+ "-" + "myTest"
 				+ "-" + "3247054";
 		Assert.assertTrue(SeleniumTestsContext.getOutputFolderNames().containsKey(key));
@@ -1113,21 +1157,26 @@ public class TestSeleniumTestContext extends GenericTest {
 	
 	/**
 	 * Check that if a context is reinitialized, (test is retried), the same folder is used
+	 * @throws IllegalAccessException 
+	 * @throws IllegalArgumentException 
+	 * @throws NoSuchFieldException 
+	 * @throws SecurityException 
+	 * @throws NoSuchMethodException 
 	 */
 	@Test(groups="ut")
-	public void testOutputFolderWhenRetryingTest(final ITestContext testNGCtx) {
+	public void testOutputFolderWhenRetryingTest(final ITestContext testNGCtx) throws NoSuchMethodException, SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
 		initThreadContext(testNGCtx);
 		
-		ITestResult testResult = new TestResult();
+		ITestResult testResult = generateResult(testNGCtx, getClass());
 		testResult.setParameters(new String[] {"foo", "bar"});
 		
 		int outputNamesInitialSize = SeleniumTestsContext.getOutputFolderNames().size();
 		
-		SeleniumTestsContextManager.updateThreadContext("myTest", "com.seleniumtests.tests", testResult);
+		SeleniumTestsContextManager.updateThreadContext(testResult);
 		
 		// reinitialize
 		initThreadContext(testNGCtx);
-		SeleniumTestsContextManager.updateThreadContext("myTest", "com.seleniumtests.tests", testResult);
+		SeleniumTestsContextManager.updateThreadContext(testResult);
 		
 		// check that only one folder is created
 		Assert.assertEquals(SeleniumTestsContext.getOutputFolderNames().size(), outputNamesInitialSize + 1);
@@ -1138,27 +1187,33 @@ public class TestSeleniumTestContext extends GenericTest {
 	/**
 	 * Check that if test name already exists for an other test (the case with DataProvider where only parameters change), create an other directory
 	 * suffixed with "-1" as it's the same test method but not the same test execution
+	 * @throws IllegalAccessException 
+	 * @throws IllegalArgumentException 
+	 * @throws SecurityException 
+	 * @throws NoSuchFieldException 
+	 * @throws NoSuchMethodException 
 	 */
 	@Test(groups="ut")
-	public void testExistingOutputFolder(final ITestContext testNGCtx) {
+	public void testExistingOutputFolder(final ITestContext testNGCtx) throws IllegalArgumentException, IllegalAccessException, NoSuchFieldException, SecurityException, NoSuchMethodException {
 		initThreadContext(testNGCtx);
-		ITestResult testResult = new TestResult();
+		ITestResult testResult = generateResult(testNGCtx, getClass());
 		testResult.setParameters(new String[] {"foo", "bar"});
-		SeleniumTestsContextManager.updateThreadContext("myTest", "com.seleniumtests.tests", testResult);
 		
-		ITestResult testResult2 = new TestResult();
+		SeleniumTestsContextManager.updateThreadContext(testResult);
+		
+		ITestResult testResult2 = generateResult(testNGCtx, getClass());
 		testResult2.setParameters(new String[] {"foo", "bar2"});
-		SeleniumTestsContextManager.updateThreadContext("myTest", "com.seleniumtests.tests", testResult2);
+		SeleniumTestsContextManager.updateThreadContext(testResult2);
 		
 		
 		String key = testNGCtx.getSuite().getName()
 				+ "-" + testNGCtx.getName()
-				+ "-" + "com.seleniumtests.tests"
+				+ "-" + "com.seleniumtests.ut.core.TestSeleniumTestContext"
 				+ "-" + "myTest"
 				+ "-" + "3247054";
 		String key2 = testNGCtx.getSuite().getName()
 				+ "-" + testNGCtx.getName()
-				+ "-" + "com.seleniumtests.tests"
+				+ "-" + "com.seleniumtests.ut.core.TestSeleniumTestContext"
 				+ "-" + "myTest"
 				+ "-" + "6166074";
 		Assert.assertTrue(SeleniumTestsContext.getOutputFolderNames().containsKey(key));
@@ -1171,26 +1226,5 @@ public class TestSeleniumTestContext extends GenericTest {
 		
 	}
 	
-	/**
-	 * Check that with a test name containing special characters, we create an output folder for this test whose name is the name of the test
-	 */
-	@Test(groups="ut")
-	public void testNewOutputFolderWithOddTestName(final ITestContext testNGCtx) {
-		initThreadContext(testNGCtx);
-		
-		ITestResult testResult = new TestResult();
-		testResult.setParameters(new String[] {"foo", "bar"});
-		
-		SeleniumTestsContextManager.updateThreadContext("<test | with @ chars>", "com.seleniumtests.tests", testResult);
-
-		String key = testNGCtx.getSuite().getName()
-				+ "-" + testNGCtx.getName()
-				+ "-" + "com.seleniumtests.tests"
-				+ "-" + "-test__with_@_chars-"
-				+ "-" + "3247054";
-		Assert.assertTrue(SeleniumTestsContext.getOutputFolderNames().containsKey(key));
-		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getRelativeOutputDir(), "-test__with_@_chars-");
-
-	}
-	
+	public void myTest() {}
 }

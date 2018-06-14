@@ -44,6 +44,7 @@ import com.seleniumtests.connectors.selenium.SeleniumGridConnectorFactory;
 import com.seleniumtests.connectors.selenium.SeleniumRobotVariableServerConnector;
 import com.seleniumtests.connectors.tms.TestManager;
 import com.seleniumtests.core.config.ConfigReader;
+import com.seleniumtests.core.utils.TestNGResultUtils;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.DriverExceptionListener;
@@ -233,6 +234,7 @@ public class SeleniumTestsContext {
     private Map<String, Object> contextDataMap = Collections.synchronizedMap(new HashMap<String, Object>());
     private String baseOutputDirectory; // the 'test-output' folder if not overridden
     private ITestContext testNGContext = null;
+    private ITestResult testNGResult = null;
     private Map<ITestResult, List<Throwable>> verificationFailuresMap = new HashMap<>();
     
     private SeleniumRobotVariableServerConnector variableServer;
@@ -257,6 +259,7 @@ public class SeleniumTestsContext {
     public SeleniumTestsContext(SeleniumTestsContext toCopy) {
     	contextDataMap = new HashMap<>(toCopy.contextDataMap); 
     	testNGContext = toCopy.testNGContext;
+    	testNGResult = toCopy.testNGResult;
     	baseOutputDirectory = toCopy.baseOutputDirectory;
     	verificationFailuresMap = new HashMap<>(toCopy.verificationFailuresMap);
     }
@@ -484,7 +487,7 @@ public class SeleniumTestsContext {
     // TODO: this call should be moved into postInit method as SeleniumRobotVariableServerConnector calls SeleniumTestsContextManager.getThreadContext() which may not be initialized
     private SeleniumRobotVariableServerConnector connectSeleniumRobotServer() {
     	
-    	if (getTestName() == null) {
+    	if (testNGResult == null) {
     		return null;
     	}
     	
@@ -493,7 +496,7 @@ public class SeleniumTestsContext {
 			logger.info(String.format("%s key found, and set to true, trying to get variable from variable server %s", 
 						SELENIUMROBOTSERVER_ACTIVE, 
 						SELENIUMROBOTSERVER_URL));
-			SeleniumRobotVariableServerConnector vServer = new SeleniumRobotVariableServerConnector(getSeleniumRobotServerActive(), getSeleniumRobotServerUrl(), getTestName());
+			SeleniumRobotVariableServerConnector vServer = new SeleniumRobotVariableServerConnector(getSeleniumRobotServerActive(), getSeleniumRobotServerUrl(), TestNGResultUtils.getTestName(testNGResult));
 			
 			if (!vServer.isAlive()) {
 				throw new ConfigurationException(String.format("Variable server %s could not be contacted", getSeleniumRobotServerUrl()));
@@ -689,8 +692,8 @@ public class SeleniumTestsContext {
      * Created the directory specific to this test. It must be unique even if the same test is executed twice
      * So the created directory is 'test-ouput/<test_name>-<index>'
      */
-    private void createTestSpecificOutputDirectory(final ITestResult testNGResult, final String className) {
-    	String testOutputFolderName = hashTest(testNGResult, className);
+    private void createTestSpecificOutputDirectory(final ITestResult testNGResult) {
+    	String testOutputFolderName = hashTest(testNGResult);
     	
     	// use base directory as it's fixed along the life of the test
 		Path outputDir = Paths.get(baseOutputDirectory, testOutputFolderName);
@@ -706,21 +709,9 @@ public class SeleniumTestsContext {
      * @param testNGResult
      * @return
      */
-    private String hashTest(final ITestResult testNGResult, final String className) {
-    	String testNameModified = StringUtility.replaceOddCharsFromFileName(getTestName());
-    	String uniqueIdentifier;
-    	if (testNGResult != null) {
-    		uniqueIdentifier = testNGContext.getSuite().getName()
-	    			+ "-" + testNGContext.getName()
-	    			+ "-" + className
-	    			+ "-" + testNameModified
-	    			+ "-" + Arrays.hashCode(testNGResult.getParameters());
-    	} else {
-    		uniqueIdentifier = testNGContext.getSuite().getName()
-	    			+ "-" + testNGContext.getName()
-	    			+ "-" + className
-	    			+ "-" + testNameModified;
-    	}
+    private String hashTest(final ITestResult testNGResult) {
+    	String uniqueIdentifier = TestNGResultUtils.getHashForTest(testNGResult);
+    	String testNameModified = StringUtility.replaceOddCharsFromFileName(TestNGResultUtils.getTestName(testNGResult));
     	
     	if (!outputFolderNames.containsKey(uniqueIdentifier)) {
     		if (!outputFolderNames.values().contains(testNameModified)) {
@@ -740,11 +731,12 @@ public class SeleniumTestsContext {
     
     /**
      * post configuration of the context
+     * This should be done only inside the test method as we need the 'Test' method result and not an 'Before' or 'After' method result
      */
-    public void configureContext(final String testName, final String className, final ITestResult testNGResult) {
+    public void configureContext(final ITestResult testNGResult) {
     	
     	// to do before creating connectors because seleniumRobot server needs it
-        setTestName(testName);
+    	this.testNGResult = testNGResult; 
 
         updateTestAndMobile(getPlatform());
         
@@ -752,7 +744,7 @@ public class SeleniumTestsContext {
         updateInstalledBrowsers();
         
         // update ouput directory
-        createTestSpecificOutputDirectory(testNGResult, className);
+        createTestSpecificOutputDirectory(testNGResult);
       
         // load pageloading plugins
         String path = (String) getAttribute(PLUGIN_CONFIG_PATH);
@@ -1261,10 +1253,6 @@ public class SeleniumTestsContext {
     
     public String getProjectName() {
     	return (String) getAttribute(PROJECT_NAME);
-    }
-    
-    public String getTestName() {
-    	return (String) getAttribute(TEST_NAME);
     }
 
     public String getRelativeOutputDir() {
@@ -1929,11 +1917,7 @@ public class SeleniumTestsContext {
     public void setProjectName(String name) {
     	setAttribute(PROJECT_NAME, name);
     }
-    
-    public void setTestName(String name) {
-    	setAttribute(TEST_NAME, name);
-    }
-    
+
     public void setRelativeOutputDir(String name) {
     	setAttribute(RELATIVE_OUTPUT_DIR, name);
     }
