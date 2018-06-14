@@ -39,6 +39,7 @@ import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.TestTasks;
 import com.seleniumtests.core.testretry.TestRetryAnalyzer;
+import com.seleniumtests.core.utils.TestNGResultUtils;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.driver.CustomEventFiringWebDriver;
@@ -134,7 +135,7 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 		// contains only the results to keep
 		Map<String, ITestResult> uniqueResults = new HashMap<>();
 		for (ITestResult result: allResults) {
-			String hash = SeleniumTestsContextManager.getHashForTest(result);
+			String hash = TestNGResultUtils.getHashForTest(result);
 			uniqueResults.put(hash, result);
 		}
 		
@@ -492,20 +493,12 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 		}
 	}
 	
-	private String getTestMethodName(IInvokedMethod method, ITestResult testResult) {
-		if (SeleniumRobotTestPlan.isCucumberTest()) {
-    		return testResult.getParameters()[0].toString();
-    	} else {
-    		return method.getTestMethod().getMethodName();
-    	}
-	}
-	
 	/**
 	 * Execute the actions before test method
 	 */
 	private void executeBeforeTestMethod(IInvokedMethod method, ITestResult testResult, ITestContext context) {
-		testResult.setAttribute(SeleniumRobotLogger.METHOD_NAME, getTestMethodName(method, testResult));
-		testResult.setAttribute(SeleniumRobotLogger.UNIQUE_METHOD_NAME, getTestMethodName(method, testResult)); // initialize it so that it's always set
+		testResult.setAttribute(SeleniumRobotLogger.METHOD_NAME, TestNGResultUtils.getTestName(testResult));
+		testResult.setAttribute(SeleniumRobotLogger.UNIQUE_METHOD_NAME, TestNGResultUtils.getTestName(testResult)); // initialize it so that it's always set
 		
 		// when @BeforeMethod has been used, threadContext is already initialized and may have been updated. Do not overwrite options
 		// only reconfigure it
@@ -522,7 +515,7 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 		
 		SeleniumTestsContextManager.setThreadContext(currentContext);
 
-		SeleniumTestsContextManager.updateThreadContext((String)testResult.getAttribute(SeleniumRobotLogger.METHOD_NAME), className, testResult);
+		SeleniumTestsContextManager.updateThreadContext(testResult);
 		
         SeleniumTestsContextManager.getThreadContext().setTestMethodSignature((String)testResult.getAttribute(SeleniumRobotLogger.METHOD_NAME));
     	

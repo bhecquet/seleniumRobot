@@ -352,7 +352,9 @@ public class SeleniumTestsContextManager {
         threadLocalContext.set(seleniumTestsCtx);
         
         // update some values after init. These init call the thread context previously created
-        seleniumTestsCtx.configureContext(testName, className, testResult);
+        if (testResult != null) {
+        	seleniumTestsCtx.configureContext(testResult);
+        }
     }
     
     /**
@@ -360,9 +362,9 @@ public class SeleniumTestsContextManager {
      * This is a correction for issue #94
      * @param testName
      */
-    public static void updateThreadContext(String testName, String className, ITestResult testResult) {
+    public static void updateThreadContext(ITestResult testResult) {
     	if (threadLocalContext.get() != null) {
-    		threadLocalContext.get().configureContext(testName, className, testResult);
+    		threadLocalContext.get().configureContext(testResult);
     	}
     }
 
@@ -376,6 +378,7 @@ public class SeleniumTestsContextManager {
     
     /**
      * get SR context stored in test result if it exists. Else, create a new one (happens when a test method has been skipped for example)
+     * called from reporters only
      * @param testNGCtx
      * @param testName
      * @param testResult
@@ -395,37 +398,6 @@ public class SeleniumTestsContextManager {
     
     public static void removeThreadContext() {
     	threadLocalContext.remove();
-    }
-    
-    /**
-     * Generate a String which is unique for each combination of suite/testNG test/class/test method/parameters
-     * @return
-     */
-    public static String getHashForTest(ITestResult testNGResult) {
-
-    	String uniqueIdentifier;
-    	if (testNGResult != null) {
-    		String testName;
-        	if (testNGResult.getParameters().length == 1 
-        			&& testNGResult.getParameters()[0] instanceof CucumberScenarioWrapper 
-        			&& "CucumberTestPlan".equals(testNGResult.getMethod().getTestClass().getName())) {
-        		testName = testNGResult.getParameters()[0].toString();
-        	} else {
-        		testName = testNGResult.getMethod().getMethodName();
-        	}
-        	
-    		String testNameModified = StringUtility.replaceOddCharsFromFileName(testName);
-    		
-    		uniqueIdentifier = testNGResult.getTestContext().getSuite().getName()
-	    			+ "-" + testNGResult.getTestContext().getName()
-	    			+ "-" + testNGResult.getMethod().getTestClass().getName()
-	    			+ "-" + testNameModified
-	    			+ "-" + Arrays.hashCode(testNGResult.getParameters());
-    	} else {
-    		uniqueIdentifier = "null-null-null-null-0";
-    	}
-    	
-    	return uniqueIdentifier;
     }
     
     /**
