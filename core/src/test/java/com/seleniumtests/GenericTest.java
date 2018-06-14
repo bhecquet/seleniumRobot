@@ -18,11 +18,20 @@ package com.seleniumtests;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Field;
 
 import org.apache.commons.io.FileUtils;
 import org.testng.ITestContext;
+import org.testng.ITestNGMethod;
+import org.testng.ITestResult;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeMethod;
+import org.testng.internal.TestNGMethod;
+import org.testng.internal.TestResult;
+import org.testng.internal.annotations.DefaultAnnotationTransformer;
+import org.testng.internal.annotations.JDK15AnnotationFinder;
+import org.testng.xml.XmlSuite;
+import org.testng.xml.XmlTest;
 
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
@@ -36,9 +45,9 @@ public class GenericTest {
 	 * @param testNGCtx
 	 */
 	@BeforeMethod(groups={"ut", "it"})  
-	public void initTest(final ITestContext testNGCtx) {
+	public void initTest(final ITestContext testNGCtx, final ITestResult testResult) {
 		SeleniumTestsContextManager.initGlobalContext(testNGCtx);
-		SeleniumTestsContextManager.initThreadContext(testNGCtx, null, null, null);
+		SeleniumTestsContextManager.initThreadContext(testNGCtx, null, null, testResult);
 		SeleniumTestsContextManager.getThreadContext().setSoftAssertEnabled(false);
 		SeleniumTestsContextManager.getGlobalContext().setSoftAssertEnabled(false);
 		SeleniumTestsContext.resetOutputFolderNames();
@@ -46,7 +55,11 @@ public class GenericTest {
 	
 	public void initThreadContext(final ITestContext testNGCtx) {
 		SeleniumTestsContextManager.initGlobalContext(testNGCtx);
-		SeleniumTestsContextManager.initThreadContext(testNGCtx, null, null, null);
+		try {
+			SeleniumTestsContextManager.initThreadContext(testNGCtx, null, null, generateResult(testNGCtx, getClass()));
+		} catch (NoSuchMethodException | SecurityException | NoSuchFieldException | IllegalArgumentException
+				| IllegalAccessException e) {
+		}
 		SeleniumTestsContextManager.getThreadContext().setSoftAssertEnabled(false);
 		SeleniumTestsContextManager.getGlobalContext().setSoftAssertEnabled(false);
 		SeleniumTestsContext.resetOutputFolderNames();
@@ -63,5 +76,36 @@ public class GenericTest {
 		FileUtils.copyInputStreamToFile(Thread.currentThread().getContextClassLoader().getResourceAsStream(resource), tempFile);
 		
 		return tempFile;
+	}
+	
+
+	/**
+	 * Generate a ITestResult from scratch
+	 * @param testNGCtx
+	 * @return
+	 * @throws NoSuchMethodException
+	 * @throws SecurityException
+	 * @throws NoSuchFieldException
+	 * @throws IllegalArgumentException
+	 * @throws IllegalAccessException
+	 */
+	public static ITestResult generateResult(final ITestContext testNGCtx, final Class<?> clazz) throws NoSuchMethodException, SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
+		ITestResult testResult = new TestResult();
+		testResult.setParameters(new String[] {"foo", "bar"});
+		
+		XmlSuite suite = new XmlSuite();
+		suite.setName("TmpSuite");
+		XmlTest test = new XmlTest(suite);
+		test.setName("myTestNg");
+		
+		ITestNGMethod testMethod = new TestNGMethod(clazz.getMethod("myTest"), new JDK15AnnotationFinder(new DefaultAnnotationTransformer()), test, null);
+		Field methodField = TestResult.class.getDeclaredField("m_method");
+		methodField.setAccessible(true);
+		methodField.set(testResult, testMethod);
+		Field contextField = TestResult.class.getDeclaredField("m_context");
+		contextField.setAccessible(true);
+		contextField.set(testResult, testNGCtx);
+		
+		return testResult;
 	}
 }

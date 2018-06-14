@@ -1092,37 +1092,6 @@ public class TestSeleniumTestContext extends GenericTest {
 		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getWebProxyPac(), null);
 	}	
 	
-
-	/**
-	 * Generate a ITestResult from scratch
-	 * @param testNGCtx
-	 * @return
-	 * @throws NoSuchMethodException
-	 * @throws SecurityException
-	 * @throws NoSuchFieldException
-	 * @throws IllegalArgumentException
-	 * @throws IllegalAccessException
-	 */
-	public static ITestResult generateResult(final ITestContext testNGCtx, final Class<?> clazz) throws NoSuchMethodException, SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
-		ITestResult testResult = new TestResult();
-		testResult.setParameters(new String[] {"foo", "bar"});
-		
-		XmlSuite suite = new XmlSuite();
-		suite.setName("TmpSuite");
-		XmlTest test = new XmlTest(suite);
-		test.setName("myTestNg");
-		
-		ITestNGMethod testMethod = new TestNGMethod(clazz.getMethod("myTest"), new JDK15AnnotationFinder(new DefaultAnnotationTransformer()), test, null);
-		Field methodField = TestResult.class.getDeclaredField("m_method");
-		methodField.setAccessible(true);
-		methodField.set(testResult, testMethod);
-		Field contextField = TestResult.class.getDeclaredField("m_context");
-		contextField.setAccessible(true);
-		contextField.set(testResult, testNGCtx);
-		
-		return testResult;
-	}
-	
 	/**
 	 * Check that with a test name, we create an output folder for this test whose name is the name of the test
 	 * @throws IllegalAccessException 

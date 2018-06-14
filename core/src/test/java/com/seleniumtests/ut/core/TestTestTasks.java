@@ -15,10 +15,12 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
 import org.testng.ITestContext;
+import org.testng.ITestResult;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import org.testng.xml.XmlTest;
 
+import com.seleniumtests.GenericTest;
 import com.seleniumtests.MockitoTest;
 import com.seleniumtests.connectors.selenium.SeleniumGridConnector;
 import com.seleniumtests.connectors.selenium.SeleniumGridConnectorFactory;
@@ -79,7 +81,8 @@ public class TestTestTasks extends MockitoTest {
 			TestVariable varToReturn = new TestVariable(10, "key", "value", false, TestVariable.TEST_VARIABLE_PREFIX + "key");
 			when(variableServer.upsertVariable(any(TestVariable.class), anyBoolean())).thenReturn(varToReturn);
 			
-			initThreadContext(testNGCtx, "myTest");
+			ITestResult testResult = GenericTest.generateResult(testNGCtx, getClass());
+			initThreadContext(testNGCtx, "myTest", testResult);
 			TestTasks.createOrUpdateParam("key", "value");
 			
 			// check upsert has been called
@@ -111,7 +114,8 @@ public class TestTestTasks extends MockitoTest {
 			TestVariable varToReturn = new TestVariable(10, "key", "value", false, TestVariable.TEST_VARIABLE_PREFIX + "key");
 			when(variableServer.upsertVariable(any(TestVariable.class), anyBoolean())).thenReturn(varToReturn);
 			
-			initThreadContext(testNGCtx, "myTest");
+			ITestResult testResult = GenericTest.generateResult(testNGCtx, getClass());
+			initThreadContext(testNGCtx, "myTest", testResult);
 			TestTasks.createOrUpdateParam("key", "value", false);
 			
 			// check upsert has been called
