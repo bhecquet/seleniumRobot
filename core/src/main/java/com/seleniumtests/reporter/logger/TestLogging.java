@@ -161,7 +161,11 @@ public class TestLogging {
      */
     public static void logScreenshot(final ScreenShot screenshot, final String screenshotName) {
     	if (getParentTestStep() != null) {
-    		getParentTestStep().addSnapshot(new Snapshot(screenshot), testsSteps.get(getCurrentTestResult()).size(), screenshotName);
+    		try {
+    			getParentTestStep().addSnapshot(new Snapshot(screenshot), testsSteps.get(getCurrentTestResult()).size(), screenshotName);
+    		} catch (NullPointerException e) {
+    			logger.error("screenshot is null");
+    		}
     	}
     }
     
