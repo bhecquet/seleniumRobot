@@ -296,6 +296,16 @@ When you want to access a file on seleniumRobot path (for example, a file you pu
 - `SeleniumTestsContextManager.getDataPath()` => <seleniumRobot path>/data/
 - `SeleniumTestsContextManager.getRootPath()` => <seleniumRobot path>
 
+#### Access robot configuration ####
+
+Access to robot configuration can be done through `SeleniumTestsContextManager.getThreadContext()`
+
+As of 3.10.4, robot configuration can be accessed in test and web page with `robotConfig()`
+This is also possible to access the paths described above using:
+`robotConfig().getApplicationDataPath()` for example
+
+
+
 ### 4 Write a cucumber test ###
 Cucumber styled tests rely on a `.feature` file where each test step is defined. Look at [https://cucumber.io/docs/reference](https://cucumber.io/docs/reference) for more information about writing a feature file.
 
