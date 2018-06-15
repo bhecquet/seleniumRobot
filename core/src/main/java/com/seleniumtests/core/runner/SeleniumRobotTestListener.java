@@ -29,6 +29,7 @@ import org.testng.ITestNGMethod;
 import org.testng.ITestResult;
 import org.testng.Reporter;
 import org.testng.internal.ConfigurationMethod;
+import org.testng.internal.Invoker;
 import org.testng.internal.ResultMap;
 import org.testng.internal.TestResult;
 
@@ -184,25 +185,36 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 		}
 	}
 	
-
+	/**
+	 * Do after configuration or method call
+	 * issue #150: intercept any exception so that \@AfterMethod gets called even if this method fails (see {@link Invoker.class.invokeMethod()}) 
+	 */
 	@Override
 	public void afterInvocation(IInvokedMethod method, ITestResult testResult, ITestContext context) {
 
 		Reporter.setCurrentTestResult(testResult);
 		
-		if (method.isConfigurationMethod()) {
-			configureThreadContextAfterInvoke(method, testResult, context); 
-		}
-		
-		if (method.isTestMethod()) {
-	        executeAfterTestMethod(method, testResult, context);
+		try {
+			if (method.isConfigurationMethod()) {
+				configureThreadContextAfterInvoke(method, testResult, context); 
+			}
+			
+			if (method.isTestMethod()) {
+		        executeAfterTestMethod(method, testResult, context);
+			}
+		} catch (Exception e) {
+			logger.error(String.format("error while finishing invocation of %s : %s", method.getTestMethod().getQualifiedName(), e.getMessage()));
 		}
 	}
 	
 	private void unreserveVariables() {
-		SeleniumRobotVariableServerConnector variableServer = SeleniumTestsContextManager.getThreadContext().getVariableServer();
-		if (variableServer != null) {
-			variableServer.unreserveVariables(new ArrayList<>(SeleniumTestsContextManager.getThreadContext().getConfiguration().values()));
+		try {
+			SeleniumRobotVariableServerConnector variableServer = SeleniumTestsContextManager.getThreadContext().getVariableServer();
+			if (variableServer != null) {
+				variableServer.unreserveVariables(new ArrayList<>(SeleniumTestsContextManager.getThreadContext().getConfiguration().values()));
+			}
+		} catch (Exception e) {
+			logger.error("could not unreserve variable: " + e.getMessage());
 		}
 	}
 
@@ -305,41 +317,51 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 		} else {
 			TestLogging.log("Test has not started or has been skipped");
 		}
+		
+//		ITestResult res= null;
+//		res.getAttribute("toto");
 
 		if (WebUIDriver.getWebDriver(false) != null) {
-			for (ScreenShot screenshot: new ScreenshotUtil().captureWebPageSnapshots(true)) {
-				TestLogging.logScreenshot(screenshot);
-			}
-			
-	    	// stop HAR capture
-			if (WebUIDriver.getWebUIDriver().getConfig().getBrowserMobProxy() != null) {
-				Har har = WebUIDriver.getWebUIDriver().getConfig().getBrowserMobProxy().endHar();
-				TestLogging.logNetworkCapture(har);
-			}
-			
-			// stop video capture
-			if (WebUIDriver.getWebUIDriver().getConfig().getVideoRecorder() != null) {
-				File videoFile;
-				try {
-					videoFile = CustomEventFiringWebDriver.stopVideoCapture(SeleniumTestsContextManager.getThreadContext().getRunMode(), 
-																			SeleniumTestsContextManager.getThreadContext().getSeleniumGridConnector(),
-																			WebUIDriver.getWebUIDriver().getConfig().getVideoRecorder());
-					
-					Path pathAbsolute = Paths.get(videoFile.getAbsolutePath());
-			        Path pathBase = Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory());
-			        Path pathRelative = pathBase.relativize(pathAbsolute);
-			        
-			        if (SeleniumTestsContextManager.getThreadContext().getVideoCapture() == VideoCaptureMode.TRUE
-			        		|| (SeleniumTestsContextManager.getThreadContext().getVideoCapture() == VideoCaptureMode.ON_SUCCESS && testResult.isSuccess())
-			        		|| (SeleniumTestsContextManager.getThreadContext().getVideoCapture() == VideoCaptureMode.ON_ERROR && !testResult.isSuccess())) {
-			        	TestLogging.logFile(pathRelative.toFile(), "Video capture");
-					} else {
-						pathAbsolute.toFile().delete();
-					}
-
-				} catch (IOException e) {
-					logger.error("cannot attach video capture", e);
-				}		
+			try {
+				for (ScreenShot screenshot: new ScreenshotUtil().captureWebPageSnapshots(true)) {
+					TestLogging.logScreenshot(screenshot);
+				}
+				
+		    	// stop HAR capture
+				if (WebUIDriver.getWebUIDriver().getConfig().getBrowserMobProxy() != null) {
+					Har har = WebUIDriver.getWebUIDriver().getConfig().getBrowserMobProxy().endHar();
+					TestLogging.logNetworkCapture(har);
+				}
+				
+				// stop video capture
+				if (WebUIDriver.getWebUIDriver().getConfig().getVideoRecorder() != null) {
+					File videoFile = null;
+					try {
+						videoFile = CustomEventFiringWebDriver.stopVideoCapture(SeleniumTestsContextManager.getThreadContext().getRunMode(), 
+																				SeleniumTestsContextManager.getThreadContext().getSeleniumGridConnector(),
+																				WebUIDriver.getWebUIDriver().getConfig().getVideoRecorder());
+						
+						if (videoFile != null) {
+							Path pathAbsolute = Paths.get(videoFile.getAbsolutePath());
+					        Path pathBase = Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory());
+					        Path pathRelative = pathBase.relativize(pathAbsolute);
+					        
+					        if (SeleniumTestsContextManager.getThreadContext().getVideoCapture() == VideoCaptureMode.TRUE
+					        		|| (SeleniumTestsContextManager.getThreadContext().getVideoCapture() == VideoCaptureMode.ON_SUCCESS && testResult.isSuccess())
+					        		|| (SeleniumTestsContextManager.getThreadContext().getVideoCapture() == VideoCaptureMode.ON_ERROR && !testResult.isSuccess())) {
+					        	TestLogging.logFile(pathRelative.toFile(), "Video capture");
+							} else {
+								pathAbsolute.toFile().delete();
+							}
+						}
+						
+	
+					} catch (IOException e) {
+						logger.error("cannot attach video capture", e);
+					}		
+				}
+			} catch (Exception e) {
+				TestLogging.log("Error while logging: " + e.getMessage());
 			}
 		}
 		
@@ -578,7 +600,11 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 		testResult.setAttribute(TEST_CONTEXT, SeleniumTestsContextManager.getThreadContext());
 		
 		// parse logs of this test method
-		SeleniumRobotLogger.parseLogFile();
+		try {
+			SeleniumRobotLogger.parseLogFile();
+		} catch (Exception e) {
+			logger.error("log parsing failed: " + e.getMessage());
+		}
 	}
 
 }

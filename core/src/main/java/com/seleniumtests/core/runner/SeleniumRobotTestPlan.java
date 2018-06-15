@@ -7,6 +7,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Listeners;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
@@ -37,6 +38,16 @@ public class SeleniumRobotTestPlan {
 			return false;
 		}
 		return isCucumberT;
+	}
+	
+	/**
+	 * issue #150: set driver to null in case it was not cleaned before
+	 * This method will be called before any other before method
+	 * @param method
+	 */
+	@BeforeMethod(alwaysRun=true) 
+	public void startTestMethod(Method method) {
+		WebUIDriver.setWebDriver(null);
 	}
 	
 	/**
