@@ -852,7 +852,66 @@ public class SeleniumTestsContext {
 	
 	
 	// ------------------------- accessors ------------------------------------------------------
+	
+	// getters from contextManager
+	public String getApplicationName() {
+		return SeleniumTestsContextManager.getApplicationName();
+	}
 
+	public String getApplicationNameWithVersion() {
+		return SeleniumTestsContextManager.getApplicationNameWithVersion();
+	}
+
+	public String getApplicationVersion() {
+		return SeleniumTestsContextManager.getApplicationVersion();
+	}
+
+	public String getCoreVersion() {
+		return SeleniumTestsContextManager.getCoreVersion();
+	}
+	
+	/**
+     * Returns application root path
+     * @return
+     */
+    public String getRootPath() {
+		return SeleniumTestsContextManager.getRootPath();
+	}
+
+    /**
+     * Returns location of feature files
+     * /<root>/data/<app>/features/
+     * @return
+     */
+	public String getFeaturePath() {
+		return SeleniumTestsContextManager.getFeaturePath();
+	}
+
+	/**
+	 * Returns location of config files: /<root>/data/<app>/config/
+	 * @return
+	 */
+	public String getConfigPath() {
+		return SeleniumTestsContextManager.getConfigPath();
+	}
+	
+	/**
+	 * Returns location of data folder: /<root>/data/
+	 * @return
+	 */
+	public String getDataPath() {
+		return SeleniumTestsContextManager.getDataPath();
+	}
+	
+	/**
+	 * Returns location of application specific data: /<root>/data/<app>/
+	 * @return
+	 */
+	public String getApplicationDataPath() {
+		return SeleniumTestsContextManager.getApplicationDataPath();
+	}
+	
+	// getters for this object
     public Boolean getFullReset() {
         return (Boolean) getAttribute(FULL_RESET);
     }

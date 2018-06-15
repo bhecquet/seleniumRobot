@@ -1092,6 +1092,28 @@ public class TestSeleniumTestContext extends GenericTest {
 		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getWebProxyPac(), null);
 	}	
 	
+
+	@Test(groups="ut context")
+	public void testGetConfigPath(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		Assert.assertTrue(SeleniumTestsContextManager.getThreadContext().getConfigPath().replace(File.separator, "/").endsWith("data/core/config"));
+	}
+	@Test(groups="ut context")
+	public void testGetDataPath(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		Assert.assertTrue(SeleniumTestsContextManager.getThreadContext().getDataPath().replace(File.separator, "/").endsWith("data"));
+	}
+	@Test(groups="ut context")
+	public void testGetApplicationDataPath(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		Assert.assertTrue(SeleniumTestsContextManager.getThreadContext().getApplicationDataPath().replace(File.separator, "/").endsWith("data/core"));
+	}
+	@Test(groups="ut context")
+	public void testGetFeaturePath(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		Assert.assertTrue(SeleniumTestsContextManager.getThreadContext().getFeaturePath().replace(File.separator, "/").endsWith("data/core/features"));
+	}
+	
 	/**
 	 * Check that with a test name, we create an output folder for this test whose name is the name of the test
 	 * @throws IllegalAccessException 

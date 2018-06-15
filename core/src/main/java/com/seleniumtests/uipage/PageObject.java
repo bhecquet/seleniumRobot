@@ -44,6 +44,7 @@ import org.openqa.selenium.support.ui.SystemClock;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.Assert;
 
+import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.SeleniumTestsPageListener;
 import com.seleniumtests.core.TestTasks;
@@ -124,18 +125,9 @@ public class PageObject extends BasePage implements IPage {
 
         this.pageIdentifierElement = pageIdentifierElement;
         driver = WebUIDriver.getWebDriver();
-
-//      /// test browsermobproxy
-//        BrowserMobProxy mobProxy = (BrowserMobProxy)SeleniumTestsContextManager.getThreadContext().getAttribute("mobProxy");
-//        mobProxy.newHar(url);
-//      /// test browsermobproxy
         
         // open page
         openPage(url);
-//      /// test browsermobproxy
-//        Har har = mobProxy.getHar();
-//        har.writeTo(new File("C:\\tmp\\har.har"));
-//      /// test browsermobproxy
 
         assertCurrentPage(false);
 
@@ -229,6 +221,14 @@ public class PageObject extends BasePage implements IPage {
      */
     public static String param(String key) {
     	return TestTasks.param(key);
+    }
+    
+    /**
+     * returns the robot configuration
+     * @return
+     */
+    public SeleniumTestsContext robotConfig() {
+    	return SeleniumTestsContextManager.getThreadContext();
     }
     
     /**

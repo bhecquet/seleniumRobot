@@ -10,6 +10,7 @@ import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Listeners;
 
+import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.TestTasks;
 import com.seleniumtests.driver.WebUIDriver;
@@ -108,5 +109,13 @@ public class SeleniumRobotTestPlan {
      */
     public void addStep(String stepName, String ... passwordToMask) {
     	TestTasks.addStep(stepName, passwordToMask);
+    }
+    
+    /**
+     * returns the robot configuration
+     * @return
+     */
+    public SeleniumTestsContext robotConfig() {
+    	return SeleniumTestsContextManager.getThreadContext();
     }
 }
