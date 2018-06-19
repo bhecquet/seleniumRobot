@@ -537,8 +537,6 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	@Test(groups={"it"})
 	public void testReportContainsCustomScreenshot() throws Exception {
 		
-		System.setProperty(SeleniumTestsContext.CAPTURE_NETWORK, "true");
-		
 		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriverCustomSnapshot"});
 		
 		// read 'testDriver' report. This contains calls to HtmlElement actions
@@ -586,6 +584,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		
 		try {
 			System.setProperty(SeleniumTestsContext.CAPTURE_NETWORK, "true");
+			System.setProperty(SeleniumTestsContext.WEB_PROXY_TYPE, "direct");
 			
 			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriver"});
 			
@@ -599,6 +598,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			
 		} finally {
 			System.clearProperty(SeleniumTestsContext.CAPTURE_NETWORK);
+			System.clearProperty(SeleniumTestsContext.WEB_PROXY_TYPE);
 		}
 		
 	}
