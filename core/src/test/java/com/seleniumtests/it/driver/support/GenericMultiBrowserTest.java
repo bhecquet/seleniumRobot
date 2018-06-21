@@ -19,6 +19,8 @@ import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.TestType;
 import com.seleniumtests.driver.WebUIDriver;
+import com.seleniumtests.driver.screenshots.VideoCaptureMode;
+import com.seleniumtests.it.driver.support.pages.DriverSubAngularTestPage;
 import com.seleniumtests.it.driver.support.pages.DriverTestPage;
 import com.seleniumtests.it.driver.support.pages.DriverTestPageWithoutFixedPattern;
 import com.seleniumtests.it.driver.support.server.WebServer;
@@ -33,6 +35,7 @@ public abstract class GenericMultiBrowserTest {
 	protected WebDriver driver;
 	protected DriverTestPage testPage;
 	protected DriverTestPageWithoutFixedPattern testPageWithoutPattern;
+	protected DriverSubAngularTestPage angularPage;
 	private String testPageName;
 	
 	protected List<BrowserType> installedBrowsers = OSUtilityFactory.getInstance().getInstalledBrowsers();
@@ -65,6 +68,13 @@ public abstract class GenericMultiBrowserTest {
 		mapping.put("/tu/googleSearch.png", "/googleSearch.png");
 		mapping.put("/tu/jquery.min.js", "/jquery.min.js");
 		
+		// angular app
+		mapping.put("/tu/angularApp/index.html", "/angularApp/index.html");
+		mapping.put("/tu/angularApp/inline.bundle.js", "/angularApp/inline.bundle.js");
+		mapping.put("/tu/angularApp/main.bundle.js", "/angularApp/main.bundle.js");
+		mapping.put("/tu/angularApp/polyfills.bundle.js", "/angularApp/polyfills.bundle.js");
+		mapping.put("/tu/angularApp/styles.bundle.css", "/angularApp/styles.bundle.css");
+		
 		return mapping;
 	}
 	
@@ -73,7 +83,9 @@ public abstract class GenericMultiBrowserTest {
 		SeleniumTestsContextManager.initGlobalContext(testNGCtx);
 		SeleniumTestsContextManager.initThreadContext(testNGCtx, null, null, null);
 		SeleniumTestsContextManager.getThreadContext().setSoftAssertEnabled(false);
+		SeleniumTestsContextManager.getThreadContext().setVideoCapture(VideoCaptureMode.FALSE.toString());
 		SeleniumTestsContextManager.getGlobalContext().setSoftAssertEnabled(false);
+		SeleniumTestsContextManager.getGlobalContext().setVideoCapture(VideoCaptureMode.FALSE.toString());
 	}
 
 	@BeforeClass(groups={"it"})
@@ -102,10 +114,15 @@ public abstract class GenericMultiBrowserTest {
 //		SeleniumTestsContextManager.getThreadContext().setWebDriverGrid("http://127.0.0.1:4444/wd/hub");
 //		SeleniumTestsContextManager.getThreadContext().setRunMode("grid");
 		
-		if ("DriverTestPageWithoutFixedPattern".equals(testPageName)) {
+		switch (testPageName) {
+		case "DriverTestPageWithoutFixedPattern":
 			testPageWithoutPattern = new DriverTestPageWithoutFixedPattern(true, String.format("http://%s:%d/testWithoutFixedPattern.html", localAddress, server.getServerHost().getPort()));
-		} else {
+			break;
+		case "DriverTestPage":
 			testPage = new DriverTestPage(true, String.format("http://%s:%d/test.html", localAddress, server.getServerHost().getPort()));
+			break;
+		case "DriverSubAngularTestPage":
+			angularPage = new DriverSubAngularTestPage(true, String.format("http://%s:%d/angularApp/index.html", localAddress, server.getServerHost().getPort()));
 		}
 		
 		driver = WebUIDriver.getWebDriver(true);
