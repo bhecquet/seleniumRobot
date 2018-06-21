@@ -313,11 +313,12 @@ public class PageObject extends BasePage implements IPage {
     
     /**
      * Get focus on this page, using the handle we stored when creating it
+     * When called, you should write myPage.<MyPageClassName>getFocus().someMethodOfMyPage();
      * @return
      */
-    public PageObject getFocus() {
+    public <T extends PageObject> T getFocus() {
     	selectWindow(windowHandle);
-    	return this;
+    	return (T)this;
     }
 
     /**

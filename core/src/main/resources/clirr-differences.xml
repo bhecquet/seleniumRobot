@@ -5,4 +5,10 @@
     <method>java.lang.String captureDesktopToBase64String()</method>
     <justification>this method was set to public by error. It should not be possible to access it directly</justification>
   </difference>
+  <difference>
+    <className>**/uipage/PageObject</className>
+    <differenceType>7002</differenceType>
+    <method>java.lang.String getPopupWindowName()</method>
+    <justification>Never used and returned value was never set</justification>
+  </difference>
 </differences>
