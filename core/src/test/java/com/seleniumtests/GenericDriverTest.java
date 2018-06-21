@@ -24,6 +24,7 @@ import org.testng.annotations.BeforeMethod;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.driver.WebUIDriver;
+import com.seleniumtests.driver.screenshots.VideoCaptureMode;
 
 /**
  * Parent test class for tests when driver needs to be closed after each test
@@ -40,6 +41,8 @@ public class GenericDriverTest {
 		SeleniumTestsContextManager.initThreadContext(testNGCtx, null, null, testResult);
 		SeleniumTestsContextManager.getThreadContext().setSoftAssertEnabled(false);
 		SeleniumTestsContextManager.getGlobalContext().setSoftAssertEnabled(false);
+		SeleniumTestsContextManager.getThreadContext().setVideoCapture(VideoCaptureMode.FALSE.toString());
+		SeleniumTestsContextManager.getGlobalContext().setVideoCapture(VideoCaptureMode.FALSE.toString());
 	}
 	
 	public void initThreadContext(final ITestContext testNGCtx) {
@@ -51,6 +54,8 @@ public class GenericDriverTest {
 		}
 		SeleniumTestsContextManager.getThreadContext().setSoftAssertEnabled(false);
 		SeleniumTestsContextManager.getGlobalContext().setSoftAssertEnabled(false);
+		SeleniumTestsContextManager.getThreadContext().setVideoCapture(VideoCaptureMode.FALSE.toString());
+		SeleniumTestsContextManager.getGlobalContext().setVideoCapture(VideoCaptureMode.FALSE.toString());
 	}
 	
 	/**

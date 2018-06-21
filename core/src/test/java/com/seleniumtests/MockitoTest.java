@@ -28,6 +28,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.driver.screenshots.VideoCaptureMode;
 
 /**
  * Redefine calls to PowerMockTestCase methods as they are not called when using TestNG groups
@@ -64,6 +65,8 @@ public class MockitoTest  extends PowerMockTestCase {
 		SeleniumTestsContextManager.initThreadContext(testNGCtx, testName, null, testResult);
 		SeleniumTestsContextManager.getThreadContext().setSoftAssertEnabled(false);
 		SeleniumTestsContextManager.getGlobalContext().setSoftAssertEnabled(false);
+		SeleniumTestsContextManager.getThreadContext().setVideoCapture(VideoCaptureMode.FALSE.toString());
+		SeleniumTestsContextManager.getGlobalContext().setVideoCapture(VideoCaptureMode.FALSE.toString());
 	}
 	
 	@BeforeClass(groups={"ut", "it"})  

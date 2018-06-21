@@ -36,6 +36,7 @@ import org.testng.xml.XmlTest;
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.driver.WebUIDriver;
+import com.seleniumtests.driver.screenshots.VideoCaptureMode;
 
 public class GenericTest {
 
@@ -50,6 +51,8 @@ public class GenericTest {
 		SeleniumTestsContextManager.initThreadContext(testNGCtx, null, null, testResult);
 		SeleniumTestsContextManager.getThreadContext().setSoftAssertEnabled(false);
 		SeleniumTestsContextManager.getGlobalContext().setSoftAssertEnabled(false);
+		SeleniumTestsContextManager.getThreadContext().setVideoCapture(VideoCaptureMode.FALSE.toString());
+		SeleniumTestsContextManager.getGlobalContext().setVideoCapture(VideoCaptureMode.FALSE.toString());
 		SeleniumTestsContext.resetOutputFolderNames();
 	}
 	
@@ -62,6 +65,8 @@ public class GenericTest {
 		}
 		SeleniumTestsContextManager.getThreadContext().setSoftAssertEnabled(false);
 		SeleniumTestsContextManager.getGlobalContext().setSoftAssertEnabled(false);
+		SeleniumTestsContextManager.getThreadContext().setVideoCapture(VideoCaptureMode.FALSE.toString());
+		SeleniumTestsContextManager.getGlobalContext().setVideoCapture(VideoCaptureMode.FALSE.toString());
 		SeleniumTestsContext.resetOutputFolderNames();
 	}
 	
