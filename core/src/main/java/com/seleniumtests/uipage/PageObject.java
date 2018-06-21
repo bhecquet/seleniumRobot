@@ -18,8 +18,11 @@ package com.seleniumtests.uipage;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -64,16 +67,13 @@ import com.seleniumtests.uipage.htmlelements.LinkElement;
 import com.seleniumtests.util.helper.WaitHelper;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
-import net.lightbody.bmp.BrowserMobProxy;
-import net.lightbody.bmp.core.har.Har;
-
 public class PageObject extends BasePage implements IPage {
 
 	private static final Logger logger = SeleniumRobotLogger.getLogger(PageObject.class);
     private boolean frameFlag = false;
     private HtmlElement pageIdentifierElement = null;
-    private String popupWindowName = null;
     private String title = null;
+    private String windowHandle = null; // store the window / tab on which this page is loaded
     private String url = null;
     private String htmlSource = null;
     private String suiteName = null;
@@ -105,8 +105,11 @@ public class PageObject extends BasePage implements IPage {
 
     /**
      * Base Constructor.
+     * Represents a page on our web site or mobile application.
      *
-     * @param   url
+     * @param	pageIdentifierElement	The element to search for so that we check we are on the right page. 
+     * 									May be null if we do not want to check we are on the page
+     * @param   url						the URL to which we should connect. May be null if we do not want to go to a specific URL
      * @throws IOException 
      *
      * @throws  Exception
@@ -141,6 +144,8 @@ public class PageObject extends BasePage implements IPage {
         if ((endTime - startTime) / 1000 > 0) {
             TestLogging.log("Open web page in :" + (endTime - startTime) / 1000 + "seconds");
         }
+        
+        
     }
 
     protected void setTitle(final String title) {
@@ -157,6 +162,7 @@ public class PageObject extends BasePage implements IPage {
 
     @Override
     public String getHtmlSource() {
+    	capturePageSnapshot();
         return htmlSource;
     }
 
@@ -168,11 +174,6 @@ public class PageObject extends BasePage implements IPage {
     public String getLocation() {
         return driver.getCurrentUrl();
     }
-
-    public String getPopupWindowName() {
-        return popupWindowName;
-    }
-
 
     /**
      * Open page 
@@ -305,11 +306,23 @@ public class PageObject extends BasePage implements IPage {
         }
 
         TestLogging.logScreenshot(screenShot, snapshotName);
+        
+        // store the window / tab on which this page is loaded
+        windowHandle = driver.getWindowHandle();
+    }
+    
+    /**
+     * Get focus on this page, using the handle we stored when creating it
+     * @return
+     */
+    public PageObject getFocus() {
+    	selectWindow(windowHandle);
+    	return this;
     }
 
     /**
      * Close a PageObject. This method can be called when a web session opens several pages and one of them is closed after some action
-     * In case there are multiple windows opened, swith back to the first window in the list
+     * In case there are multiple windows opened, swith back to the previous window in the list
      * 
      * @throws NotCurrentPageException
      */
@@ -323,7 +336,8 @@ public class PageObject extends BasePage implements IPage {
         TestLogging.info(title +" close web page");
 
         boolean isMultipleWindow = false;
-        if (driver.getWindowHandles().size() > 1) {
+        List<String> handles = new ArrayList<>(driver.getWindowHandles());
+        if (handles.size() > 1) {
             isMultipleWindow = true;
         }
         
@@ -339,7 +353,11 @@ public class PageObject extends BasePage implements IPage {
 
         try {
             if (isMultipleWindow) {
-                selectMainWindow();
+            	try { 
+            		selectWindow(handles.get(handles.indexOf(windowHandle) - 1));
+            	} catch (IndexOutOfBoundsException e) {
+            		selectMainWindow();
+            	}
             } else {
                 WebUIDriver.setWebDriver(null);
             }
@@ -347,8 +365,21 @@ public class PageObject extends BasePage implements IPage {
             WebUIDriver.setWebDriver(null);
 
         }
-        
-
+    }
+    
+    /**
+     * Close the current tab / window which leads to the previous window / tab in the list.
+     * This uses the default constructor which MUST be available
+     * @param previousPage		the page we go back to, so that we can check we are on the right page
+     * @return
+     */
+    public <T extends PageObject> T close(Class<T> previousPage) {
+    	close();
+    	try {
+			return previousPage.getConstructor().newInstance();
+		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
+			throw new ScenarioException("Cannot check for previous page: " + e.getMessage(), e);
+		}
     }
 
     /**
@@ -554,9 +585,6 @@ public class PageObject extends BasePage implements IPage {
 
     public final void selectMainWindow() {
     	selectWindow(0);
-
-        // Check whether it's the expected page.
-        assertCurrentPage(true);
     }
 
     public final void selectWindow(final int index) {
@@ -569,10 +597,19 @@ public class PageObject extends BasePage implements IPage {
         WaitHelper.waitForSeconds(1);
     }
     
+    /**
+     * Selects the first unknown window. To use we an action creates a new window or tab
+     * @return
+     */
     public final String selectNewWindow() {
     	return selectNewWindow(SeleniumTestsContextManager.getThreadContext().getExplicitWaitTimeout() * 1000);
     }
     
+    /**
+     * Selects the first unknown window. To use we an action creates a new window or tab
+     * @param waitMs	wait for N milliseconds before raising error
+     * @return
+     */
     public final String selectNewWindow(int waitMs) {
     	// app test are not compatible with window
     	if (SeleniumTestsContextManager.getThreadContext().getTestType().family() == TestType.APP) {
@@ -639,6 +676,9 @@ public class PageObject extends BasePage implements IPage {
         
     }
 
+    /**
+     * Switch to the default content
+     */
     public void switchToDefaultContent() {
         try {
             driver.switchTo().defaultContent();

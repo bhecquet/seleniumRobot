@@ -56,6 +56,7 @@ public class DriverTestPage extends PageObject {
 	public static final LinkElement link2 = new LinkElement("My link", By.id("link2"));
 	public static final LinkElement linkPopup = new LinkElement("My link", By.id("linkPopup"));
 	public static final LinkElement linkPopup2 = new LinkElement("My link", By.id("linkPopup2"));
+	public static final LinkElement linkAngular = new LinkElement("Link angular", By.id("angularApp"));
 	public static final TextFieldElement onBlurField = new TextFieldElement("On Blur", By.id("textOnBlur"));
 	public static final TextFieldElement onBlurFieldDest = new TextFieldElement("On Blur", By.id("textOnBlurDest"));
 	public static final CheckBoxElement hiddenCheckBox = new CheckBoxElement("check", By.id("hiddenCheckbox"));
@@ -169,6 +170,12 @@ public class DriverTestPage extends PageObject {
     	return this;
     }
     
+    public DriverSubTestPage _goToNewPage() throws Exception {
+    	link.click();
+    	selectNewWindow();
+    	return new DriverSubTestPage();
+    }
+    
     public DriverTestPage _setPasswords(String ... passwords) {
     	textElement.sendKeys(passwords[0]);
     	return this;
@@ -188,6 +195,12 @@ public class DriverTestPage extends PageObject {
     public DriverTestPage _clickPicture() {
 		picture.clickAt(0, -30);
 		return this;
+    }
+    
+    public DriverTestPage _switchAngularWindow() {
+    	linkAngular.click();
+    	selectNewWindow();
+    	return this;
     }
     
     public static String getPageUrl() {

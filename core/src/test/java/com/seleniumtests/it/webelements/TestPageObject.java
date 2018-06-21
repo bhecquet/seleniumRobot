@@ -19,12 +19,13 @@ package com.seleniumtests.it.webelements;
 import org.openqa.selenium.WebDriver;
 import org.testng.Assert;
 import org.testng.ITestContext;
-import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import com.seleniumtests.GenericTest;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.driver.WebUIDriver;
+import com.seleniumtests.it.driver.support.pages.DriverSubTestPage;
 import com.seleniumtests.it.driver.support.pages.DriverTestPage;
 
 /**
@@ -37,18 +38,46 @@ public class TestPageObject extends GenericTest {
 	private static DriverTestPage testPage;
 	private WebDriver driver;
 
-	@BeforeClass()
+	@BeforeMethod(groups= {"it"})
 	public void initDriver(final ITestContext testNGCtx) throws Exception {
 		initThreadContext(testNGCtx);
-		SeleniumTestsContextManager.getThreadContext().setBrowser("htmlunit");
+		SeleniumTestsContextManager.getThreadContext().setBrowser("chrome");
 		testPage = new DriverTestPage(true);
 		driver = WebUIDriver.getWebDriver(true);
 	}
 	
-	@Test()
+	@Test(groups= {"it"})
 	public void testPageParam() {
 		Assert.assertEquals(testPage.param("variable1"), "value3");
 	}
 
+	/**
+	 * open 3 pages and check that when we close the last one, we go to the previous, not the first one 
+	 * @throws Exception 
+	 */
+	@Test(groups= {"it"})
+	public void testCloseLastTab() throws Exception {
+		DriverSubTestPage subPage = testPage._goToNewPage();
+		testPage.getFocus();
+		DriverSubTestPage subPage2 = testPage._goToNewPage();
+		subPage2.close();
+		
+		// check we are on the seconde page (an instance of the DriverSubTestPage)
+		// next line will produce error if we are not on the page
+		new DriverSubTestPage();
+	}
 	
+	/**
+	 * open 2 pages and check that when we close the first one, we remain on the second one
+	 * @throws Exception 
+	 */
+	@Test(groups= {"it"})
+	public void testCloseFirstTab() throws Exception {
+		DriverSubTestPage subPage2 = testPage._goToNewPage();
+		testPage.getFocus().close();
+		
+		// check we are on the seconde page (an instance of the DriverSubTestPage)
+		// next line will produce error if we are not on the page
+		new DriverSubTestPage();
+	}
 }
