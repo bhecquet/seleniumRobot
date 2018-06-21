@@ -80,4 +80,15 @@ public class TestPageObject extends GenericTest {
 		// next line will produce error if we are not on the page
 		new DriverSubTestPage();
 	}
+	
+	/**
+	 * open 2 pages and check that when we close the first one, we remain on the second one
+	 * Use the embedded check inside close method
+	 * @throws Exception 
+	 */
+	@Test(groups= {"it"})
+	public void testCloseFirstTabAndCheck() throws Exception {
+		DriverSubTestPage subPage2 = testPage._goToNewPage();
+		testPage.getFocus().close(DriverSubTestPage.class);
+	}
 }
