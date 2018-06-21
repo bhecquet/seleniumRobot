@@ -4,6 +4,23 @@ Import this project into eclipse.
 
 In case eclipse does not weave aspects (.aj files do not have the 'A' icon), check in build path parameters that **/*.aj files are included to "sources on build path)
 
+#### Install requirements for angular test applicatio ####
+
+Integration tests embed an angular test application (version 5) for testing interactions with angular-material [https://material.angular.io/](https://material.angular.io/)
+To modify this application, do the following
+
+- get source code at:
+- install node (>= 6.11.5) + npm ( >= 3.10.10)
+- install angular-cli (1.5.0 for angular 5) [https://cli.angular.io/](https://cli.angular.io/): `npm install -g @angular/cli@1.5.0`
+- `cd <dir_where_app_is_cloned>`
+- install dependencies: `npm install`: this will read packages.json and fetch the required dependencies
+- go to `src/app/` and modify html. Doc for material components can be found here [https://material.angular.io/components/categories](https://material.angular.io/components/categories)
+
+Test your modifications with `ng serve`
+Build the updated application with `ng build --prod`
+Replace the built application into seleniumRobot resources
+
+
 ### 2 Build ###
 Create build (for core and test apps):
 
