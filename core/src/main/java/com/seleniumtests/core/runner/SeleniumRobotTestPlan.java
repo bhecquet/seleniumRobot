@@ -25,7 +25,7 @@ public class SeleniumRobotTestPlan {
 	protected static final Logger logger = SeleniumRobotLogger.getLogger(SeleniumRobotTestPlan.class);
 	
 	public SeleniumRobotTestPlan() {
-		// do nothing
+		System.setProperty( "file.encoding", "UTF-8" );
 	}
 	
 	public static void setCucumberTest(boolean cucumberTestIn) {
