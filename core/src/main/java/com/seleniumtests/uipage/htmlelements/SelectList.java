@@ -18,6 +18,7 @@ package com.seleniumtests.uipage.htmlelements;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
@@ -91,10 +92,23 @@ public class SelectList extends HtmlElement {
             	
             	// click on arrow to display options
             	element.findElement(By.className("mat-select-arrow")).click();
-            	options = driver.findElement(By.tagName("mat-select-content")).findElements(By.tagName("mat-option"));
+            	options = new HtmlElement("options", By.className("mat-select-content"), frameElement)
+            				.findHtmlElements(By.tagName("mat-option"))
+            				.stream()
+            				.map(CachedHtmlElement::new)
+            				.collect(Collectors.toList());
             	selectType = Type.ANGULAR_MATERIAL;
             }
         }
+    }
+    
+    private void finalizeAction() {
+    	if (selectType == Type.ANGULAR_MATERIAL) {
+    		HtmlElement selectContent = new HtmlElement("options", By.className("mat-select-content"), frameElement);
+    		if (selectContent.isElementPresent()) {
+    			element.sendKeys(Keys.ESCAPE);
+    		}
+    	}
     }
 
     /**
@@ -120,8 +134,12 @@ public class SelectList extends HtmlElement {
 
     @ReplayOnError
     public List<WebElement> getOptions() {
-        findElement();
-        return options;
+    	try {
+	        findElement();
+	        return options;
+    	} finally {
+    		finalizeAction();
+    	}
     }
     
     /**
@@ -131,26 +149,11 @@ public class SelectList extends HtmlElement {
      */
     @ReplayOnError
     public WebElement getFirstSelectedOption() {
-    	findElement();
-    	switch(selectType) {
-			case ANGULAR_MATERIAL:
-				for (WebElement option : options) {
-					if (option.getAttribute("class").contains("mat-selected")) {
-						return option;
-					}
-				}
-				return null;
-			case HTML:
-				for (WebElement option : options) {
-					if (option.isSelected()) {
-						return option;
-					}
-				}
-				return null;
-			case LIST:
-				return null;
-			default:
-				throw new CustomSeleniumTestsException(selectType + "not recognized ");
+    	List<WebElement> allSelectedOptions = getAllSelectedOptions();
+    	try {
+    		return allSelectedOptions.get(0);
+    	} catch (IndexOutOfBoundsException e) {
+			return null;
 		}
     }
     
@@ -161,28 +164,31 @@ public class SelectList extends HtmlElement {
     public List<WebElement> getAllSelectedOptions() {
     	List<WebElement> toReturn = new ArrayList<>();
       
-    	findElement();
-		switch (selectType) {
-		case ANGULAR_MATERIAL:
-			for (WebElement option : options) {
-				if (option.getAttribute("class").contains("mat-selected")) {
-					toReturn.add(option);
+    	try {
+	    	findElement();
+			switch (selectType) {
+			case ANGULAR_MATERIAL:
+				for (WebElement option : options) {
+					if (option.getAttribute("class").contains("mat-selected")) {
+						toReturn.add(option);
+					}
 				}
-			}
-			return null;
-		case HTML:
-			for (WebElement option : options) {
-				if (option.isSelected()) {
-					toReturn.add(option);
+			case HTML:
+				for (WebElement option : options) {
+					if (option.isSelected()) {
+						toReturn.add(option);
+					}
 				}
+			case LIST:
+				break;
+			default:
+				throw new CustomSeleniumTestsException(selectType + "not recognized ");
 			}
-		case LIST:
-			break;
-		default:
-			throw new CustomSeleniumTestsException(selectType + "not recognized ");
-		}
-		
-		return toReturn;
+			
+			return toReturn;
+    	} finally {
+    		finalizeAction();
+    	}
 	}
 
     @ReplayOnError
@@ -233,10 +239,14 @@ public class SelectList extends HtmlElement {
 
     @ReplayOnError
     public boolean isMultiple() {
-        findElement();
-
-        String value = element.getAttribute("multiple");
-        return value != null && !"false".equals(value);
+    	try {
+	        findElement();
+	
+	        String value = element.getAttribute("multiple");
+	        return value != null && !"false".equals(value);
+    	} finally {
+    		finalizeAction();
+    	}
     }
     
     /**
@@ -260,19 +270,23 @@ public class SelectList extends HtmlElement {
             throw new UnsupportedOperationException("You may only deselect options of a multi-select");
         }
     	
-    	findElement();
-		switch (selectType) {
-			case HTML:
-				select.deselectByIndex(index);
-				break;
-			case ANGULAR_MATERIAL:
-			case LIST:
-				WebElement option = options.get(index);
-		        setDeselected(option);
-				break;
-			default:
-				throw new CustomSeleniumTestsException(selectType + "not recognized ");
-		}
+    	try {
+	    	findElement();
+			switch (selectType) {
+				case HTML:
+					select.deselectByIndex(index);
+					break;
+				case ANGULAR_MATERIAL:
+				case LIST:
+					WebElement option = options.get(index);
+			        setDeselected(option);
+					break;
+				default:
+					throw new CustomSeleniumTestsException(selectType + "not recognized ");
+			}
+    	} finally {
+    		finalizeAction();
+    	}
     }
 
     @ReplayOnError
@@ -281,23 +295,27 @@ public class SelectList extends HtmlElement {
             throw new UnsupportedOperationException("You may only deselect all options of a multi-select");
         }
     	
-    	findElement();
-		switch (selectType) {
-			case HTML:
-				select.deselectByVisibleText(text);
-				break;
-			case ANGULAR_MATERIAL:
-			case LIST:
-				for (WebElement option : options) {
-		            if (option.getText().equals(text)) {
-		            	setDeselected(option);
-		                break;
-		            }
-		        }
-				break;
-			default:
-				throw new CustomSeleniumTestsException(selectType + "not recognized ");
-		}
+    	try {
+	    	findElement();
+			switch (selectType) {
+				case HTML:
+					select.deselectByVisibleText(text);
+					break;
+				case ANGULAR_MATERIAL:
+				case LIST:
+					for (WebElement option : options) {
+			            if (option.getText().equals(text)) {
+			            	setDeselected(option);
+			                break;
+			            }
+			        }
+					break;
+				default:
+					throw new CustomSeleniumTestsException(selectType + "not recognized ");
+			}
+    	} finally {
+    		finalizeAction();
+    	}
     }
 
     @ReplayOnError
@@ -306,64 +324,76 @@ public class SelectList extends HtmlElement {
             throw new UnsupportedOperationException("You may only deselect all options of a multi-select");
         }
     	
-    	findElement();
-		switch (selectType) {
-
-			case HTML:
-				select.deselectByValue(value);
-				break;
-			case ANGULAR_MATERIAL:
-			case LIST:
-				for (WebElement option : options) {
-		            if (getOptionValue(option).equals(value)) {
-		            	setDeselected(option);
-		                break;
-		            }
-		        }
-				break;
-			default:
-				throw new CustomSeleniumTestsException(selectType + "not recognized ");
-		}
+    	try {
+	    	findElement();
+			switch (selectType) {
+	
+				case HTML:
+					select.deselectByValue(value);
+					break;
+				case ANGULAR_MATERIAL:
+				case LIST:
+					for (WebElement option : options) {
+			            if (getOptionValue(option).equals(value)) {
+			            	setDeselected(option);
+			                break;
+			            }
+			        }
+					break;
+				default:
+					throw new CustomSeleniumTestsException(selectType + "not recognized ");
+			}
+    	} finally {
+    		finalizeAction();
+    	}
     }
 
     @ReplayOnError
     public void selectByIndex(final Integer index) {
-        findElement();
-        
-		switch (selectType) {
-			case HTML:
-				select.selectByIndex(index);
-				break;
-			case ANGULAR_MATERIAL:
-			case LIST:
-				WebElement option = options.get(index);
-				setSelected(option);
-				break;
-			default:
-				throw new CustomSeleniumTestsException(selectType + "not recognized ");
-		}
+    	try {
+	        findElement();
+	        
+			switch (selectType) {
+				case HTML:
+					select.selectByIndex(index);
+					break;
+				case ANGULAR_MATERIAL:
+				case LIST:
+					WebElement option = options.get(index);
+					setSelected(option);
+					break;
+				default:
+					throw new CustomSeleniumTestsException(selectType + "not recognized ");
+			}
+    	} finally {
+    		finalizeAction();
+    	}
     }
 
     @ReplayOnError
     public void selectByIndex(final int[] indexs) {
-        findElement();
-        
-        switch (selectType) {
-			case HTML:
-				for (int j = 0; j < indexs.length; j++) {
-					select.selectByIndex(indexs[j]);
-				}
-				break;
-			case ANGULAR_MATERIAL:
-			case LIST:
-				for (int k = 0; k < indexs.length; k++) {
-		            WebElement option = options.get(indexs[k]);
-		            setSelected(option);
-		        }
-				break;
-			default:
-				throw new CustomSeleniumTestsException(selectType + "not recognized ");
-		}
+        try {
+	    	findElement();
+	        
+	        switch (selectType) {
+				case HTML:
+					for (int j = 0; j < indexs.length; j++) {
+						select.selectByIndex(indexs[j]);
+					}
+					break;
+				case ANGULAR_MATERIAL:
+				case LIST:
+					for (int k = 0; k < indexs.length; k++) {
+			            WebElement option = options.get(indexs[k]);
+			            setSelected(option);
+			        }
+					break;
+				default:
+					throw new CustomSeleniumTestsException(selectType + "not recognized ");
+			}
+    	} finally {
+    		finalizeAction();
+    	}
     }
 
     /**
@@ -373,58 +403,66 @@ public class SelectList extends HtmlElement {
      */
     @ReplayOnError
     public void selectByText(final String text) {
-    	findElement();
-        
-		switch (selectType) {
-			case HTML:
-				select.selectByVisibleText(text);
-				break;
-			case ANGULAR_MATERIAL:
-			case LIST:
-				for (WebElement option : options) {
-		            String selectedText;
-		            if (!option.getAttribute("title").isEmpty()) {
-		                selectedText = option.getAttribute("title");
-		            } else {
-		                selectedText = option.getText();
-		            }
-		
-		            if (selectedText.equals(text)) {
-		                setSelected(option);
-		                break;
-		            }
-		        }
-				break;
-			default:
-				throw new CustomSeleniumTestsException(selectType + "not recognized ");
-		}
+    	try {
+	    	findElement();
+	        
+			switch (selectType) {
+				case HTML:
+					select.selectByVisibleText(text);
+					break;
+				case ANGULAR_MATERIAL:
+				case LIST:
+					for (WebElement option : options) {
+			            String selectedText;
+			            if (!option.getAttribute("title").isEmpty()) {
+			                selectedText = option.getAttribute("title");
+			            } else {
+			                selectedText = option.getText();
+			            }
+			
+			            if (selectedText.equals(text)) {
+			                setSelected(option);
+			                break;
+			            }
+			        }
+					break;
+				default:
+					throw new CustomSeleniumTestsException(selectType + "not recognized ");
+			}
+    	} finally {
+    		finalizeAction();
+    	}
     }
 
     @ReplayOnError
     public void selectByText(final String[] texts) {
-        findElement();
-        
-        switch (selectType) {
-
-			case HTML:
-				for (int i = 0; i < texts.length; i++) {
-					select.selectByVisibleText(texts[i]);
-				}
-				break;
-			case ANGULAR_MATERIAL:
-			case LIST:
-				for (int i = 0; i < texts.length; i++) {
-		            for (WebElement option : options) {
-		                if (option.getText().equals(texts[i])) {
-		                    setSelected(option);
-		                    break;
-		                }
-		            }
-		        }
-				break;
-			default:
-				throw new CustomSeleniumTestsException(selectType + "not recognized ");
-		}
+    	try {
+	        findElement();
+	        
+	        switch (selectType) {
+	
+				case HTML:
+					for (int i = 0; i < texts.length; i++) {
+						select.selectByVisibleText(texts[i]);
+					}
+					break;
+				case ANGULAR_MATERIAL:
+				case LIST:
+					for (int i = 0; i < texts.length; i++) {
+			            for (WebElement option : options) {
+			                if (option.getText().equals(texts[i])) {
+			                    setSelected(option);
+			                    break;
+			                }
+			            }
+			        }
+					break;
+				default:
+					throw new CustomSeleniumTestsException(selectType + "not recognized ");
+			}
+    	} finally {
+    		finalizeAction();
+    	}
     }
     
     /**
@@ -434,20 +472,52 @@ public class SelectList extends HtmlElement {
      */
     @ReplayOnError
     public void selectByCorrespondingText(String text) {
-    	findElement();
-    	double score = 0;
-    	WebElement optionToSelect = null;
-    	for (WebElement option : options) {
-    		String source = option.getText();
-    		if (service.score(source, text) > score) {
-    			score = service.score(source, text);
-    			optionToSelect = option;
-    		}
+    	try {
+	    	findElement();
+	    	double score = 0;
+	    	WebElement optionToSelect = null;
+	    	for (WebElement option : options) {
+	    		String source = option.getText();
+	    		if (service.score(source, text) > score) {
+	    			score = service.score(source, text);
+	    			optionToSelect = option;
+	    		}
+	    	}
+	    	if (optionToSelect != null) {
+	    		setSelected(optionToSelect);
+	    	} else {
+	    		logger.error("No option matches " + text);
+	    	}
+    	} finally {
+    		finalizeAction();
     	}
-    	if (optionToSelect != null) {
-    		setSelected(optionToSelect);
-    	} else {
-    		logger.error("No option matches " + text);
+    }
+    
+    @ReplayOnError
+    public void deselectByCorrespondingText(final String text) {
+    	if (!isMultiple()) {
+            throw new UnsupportedOperationException("You may only deselect all options of a multi-select");
+        }
+    	
+    	try {
+    		findElement();
+	    	double score = 0;
+	    	WebElement optionToSelect = null;
+	    	for (WebElement option : options) {
+	    		String source = option.getText();
+	    		if (service.score(source, text) > score) {
+	    			score = service.score(source, text);
+	    			optionToSelect = option;
+	    		}
+	    	}
+	    	if (optionToSelect != null) {
+	    		setDeselected(optionToSelect);
+	    	} else {
+	    		logger.error("No option matches " + text);
+	    	}
+    		
+    	} finally {
+    		finalizeAction();
     	}
     }
     
@@ -458,58 +528,70 @@ public class SelectList extends HtmlElement {
      */
     @ReplayOnError
     public void selectByCorrespondingText(String[] text) {
-    	findElement();
-    	for (int i = 0; i < text.length; i++) {
-    		double score = 0;
-        	WebElement optionToSelect = null;
-        	for (WebElement option : options) {
-        		String source = option.getText();
-        		if (service.score(source, text[i]) > score) {
-        			score = service.score(source, text[i]);
-        			optionToSelect = option;
-        		}
-        	}
-        	if (optionToSelect != null) {
-        		setSelected(optionToSelect);
-        	} else {
-        		logger.error("No option matches " + text);
-        	}
+    	try {
+	    	findElement();
+	    	for (int i = 0; i < text.length; i++) {
+	    		double score = 0;
+	        	WebElement optionToSelect = null;
+	        	for (WebElement option : options) {
+	        		String source = option.getText();
+	        		if (service.score(source, text[i]) > score) {
+	        			score = service.score(source, text[i]);
+	        			optionToSelect = option;
+	        		}
+	        	}
+	        	if (optionToSelect != null) {
+	        		setSelected(optionToSelect);
+	        	} else {
+	        		logger.error("No option matches " + text);
+	        	}
+	    	}
+    	} finally {
+    		finalizeAction();
     	}
     }
 
     @ReplayOnError
     public void selectByValue(final String value) {
-    	findElement();
-        
-		switch (selectType) {
-			case HTML:
-				select.selectByValue(value);
-				break;
-			case ANGULAR_MATERIAL:
-			case LIST:
-				for (WebElement option : options) {
-		            if (getOptionValue(option).equals(value)) {
-		                setSelected(option);
-		                break;
-		            }
-		        }
-				break;
-			default:
-				throw new CustomSeleniumTestsException(selectType + "not recognized ");
-		}
+    	try {
+	    	findElement();
+	        
+			switch (selectType) {
+				case HTML:
+					select.selectByValue(value);
+					break;
+				case ANGULAR_MATERIAL:
+				case LIST:
+					for (WebElement option : options) {
+			            if (getOptionValue(option).equals(value)) {
+			                setSelected(option);
+			                break;
+			            }
+			        }
+					break;
+				default:
+					throw new CustomSeleniumTestsException(selectType + "not recognized ");
+			}
+    	} finally {
+    		finalizeAction();
+    	}
     }
 
     @ReplayOnError
     public void selectByValue(final String[] values) {
-        findElement();
-        for (int i = 0; i < values.length; i++) {
-            for (WebElement option : options) {
-                if (getOptionValue(option).equals(values[i])) {
-                    setSelected(option);
-                    break;
-                }
-            }
-        }
+    	try {
+	        findElement();
+	        for (int i = 0; i < values.length; i++) {
+	            for (WebElement option : options) {
+	                if (getOptionValue(option).equals(values[i])) {
+	                    setSelected(option);
+	                    break;
+	                }
+	            }
+	        }
+    	} finally {
+    		finalizeAction();
+    	}
     }
 
     private void setSelected(final WebElement option) {
@@ -517,7 +599,13 @@ public class SelectList extends HtmlElement {
     	switch (selectType) {
 			case ANGULAR_MATERIAL:
 				if ("false".equals(option.getAttribute("aria-selected"))) {
-					option.findElement(By.tagName("mat-pseudo-checkbox")).click();
+					// here list should still be visible
+					HtmlElement checkbox = ((HtmlElement)((CachedHtmlElement)option).getRealElement()).findElement(By.tagName("mat-pseudo-checkbox"));
+					if (checkbox.isElementPresent(0)) {
+						checkbox.click();
+					} else {
+						((CachedHtmlElement)option).getRealElement().click();
+					}
 				}
 				break;
 			case HTML:
@@ -535,7 +623,12 @@ public class SelectList extends HtmlElement {
     	switch (selectType) {
 			case ANGULAR_MATERIAL:
 				if ("true".equals(option.getAttribute("aria-selected"))) {
-					option.findElement(By.tagName("mat-pseudo-checkbox")).click();
+					HtmlElement checkbox = ((HtmlElement)((CachedHtmlElement)option).getRealElement()).findElement(By.tagName("mat-pseudo-checkbox"));
+					if (checkbox.isElementPresent(0)) {
+						checkbox.click();
+					} else {
+						((CachedHtmlElement)option).getRealElement().click();
+					}
 				}
 				break;
 			case HTML:
