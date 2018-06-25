@@ -81,6 +81,7 @@ public class DriverTestPage extends PageObject {
 	public static final HtmlElement divByClass = new HtmlElement("", By.className("otherClass"), HtmlElement.FIRST_VISIBLE);
 	
 	// Elements inside others
+	public static final HtmlElement parentDiv = new HtmlElement("", By.id("parentDiv"));
 	public static final TextFieldElement textElement2 = new HtmlElement("", By.id("parentDiv")).findTextFieldElement(By.name("textField"));
 	public static final RadioButtonElement radioElement2 = new HtmlElement("", By.id("parentDiv")).findRadioButtonElement(By.name("radioClick"));
 	public static final CheckBoxElement checkElement2 = new HtmlElement("", By.id("parentDiv")).findCheckBoxElement(By.name("checkboxClick"));
@@ -123,6 +124,7 @@ public class DriverTestPage extends PageObject {
 	
 	public DriverTestPage() throws Exception {
         super(textElement);
+        driver.findElement(By.id("sdmfkjmlkj"));
     }
     
     public DriverTestPage(boolean openPageURL) throws Exception {

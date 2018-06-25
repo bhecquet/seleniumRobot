@@ -17,12 +17,11 @@
 package com.seleniumtests.it.driver;
 
 import org.testng.Assert;
-import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.Test;
 
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.it.driver.support.GenericMultiBrowserTest;
-import com.seleniumtests.it.driver.support.pages.DriverSubAngularTestPage;
 
 public class TestAngularControls extends GenericMultiBrowserTest {
 
@@ -31,15 +30,117 @@ public class TestAngularControls extends GenericMultiBrowserTest {
 	public TestAngularControls() throws Exception {
 		super(BrowserType.CHROME, "DriverSubAngularTestPage"); 
 	}
-   
 	
-	/**
-	 * Test native click
-	 */
+	@AfterMethod(groups={"it"})
+	public void reset() {
+		driver.navigate().refresh();
+	}
    
+
 	@Test(groups={"it"})
-	public void testSelect() {
-		angularPage.selectList.selectByText("Option");
+	public void testSelectByText() {
+		angularPage.selectList.selectByText("Option 1");
+		Assert.assertEquals(angularPage.selectList.getSelectedText(), "Option 1");
+	}
+	
+	@Test(groups={"it"})
+	public void testSelectByIndex() {
+		angularPage.selectList.selectByIndex(2);
+		Assert.assertEquals(angularPage.selectList.getSelectedText(), "Option 2");
+	}
+	
+	@Test(groups={"it"})
+	public void testSelectByValue() {
+		angularPage.selectList.selectByValue("option3");
+		Assert.assertEquals(angularPage.selectList.getSelectedText(), "Option 3");
+	}
+	
+	@Test(groups={"it"})
+	public void testSelectByCorrespondingText() {
+		angularPage.selectList.selectByCorrespondingText("ption 1");
+		Assert.assertEquals(angularPage.selectList.getSelectedText(), "Option 1");
+	}
+	
+	@Test(groups={"it"})
+	public void testSelectMultipleByText() {
+		angularPage.selectMultipleList.selectByText(new String[] {"Multiple Option 1", "Multiple Option 2"});
+		String[] selectedTexts = angularPage.selectMultipleList.getSelectedTexts();
+		Assert.assertEquals(selectedTexts.length, 2);
+		Assert.assertEquals(selectedTexts[0], "Multiple Option 1");
+		Assert.assertEquals(selectedTexts[1], "Multiple Option 2");
+	}
+	
+	@Test(groups={"it"})
+	public void testSelectMultipleByIndex() {
+		angularPage.selectMultipleList.selectByIndex(new int[] {0, 2});
+		String[] selectedTexts = angularPage.selectMultipleList.getSelectedTexts();
+		Assert.assertEquals(selectedTexts.length, 2);
+		Assert.assertEquals(selectedTexts[0], "None");
+		Assert.assertEquals(selectedTexts[1], "Multiple Option 2");
+	}
+	
+	@Test(groups={"it"})
+	public void testSelectMultipleByValue() {
+		angularPage.selectMultipleList.selectByValue(new String[] {"option1", "option2"});
+		String[] selectedTexts = angularPage.selectMultipleList.getSelectedTexts();
+		Assert.assertEquals(selectedTexts.length, 2);
+		Assert.assertEquals(selectedTexts[0], "Multiple Option 1");
+		Assert.assertEquals(selectedTexts[1], "Multiple Option 2");
+	}
+	
+	@Test(groups={"it"})
+	public void testSelectMultipleByCorrespondingText() {
+		angularPage.selectMultipleList.selectByCorrespondingText(new String[] {"ple Option 1", "ple Option 2"});
+		String[] selectedTexts = angularPage.selectMultipleList.getSelectedTexts();
+		Assert.assertEquals(selectedTexts.length, 2);
+		Assert.assertEquals(selectedTexts[0], "Multiple Option 1");
+		Assert.assertEquals(selectedTexts[1], "Multiple Option 2");
+	}
+	
+	@Test(groups={"it"})
+	public void testDeselectByText() {
+		angularPage.selectMultipleList.selectByText(new String[] {"Multiple Option 1", "Multiple Option 2"});
+		angularPage.selectMultipleList.deselectByText("Multiple Option 1");
+		String[] selectedTexts = angularPage.selectMultipleList.getSelectedTexts();
+		Assert.assertEquals(selectedTexts[0], "Multiple Option 2");
+		Assert.assertEquals(selectedTexts.length, 1);
+	}
+	
+	@Test(groups={"it"})
+	public void testDeselectByIndex() {
+		angularPage.selectMultipleList.selectByIndex(new int[] {0, 2});
+		angularPage.selectMultipleList.deselectByIndex(2);
+		String[] selectedTexts = angularPage.selectMultipleList.getSelectedTexts();
+		Assert.assertEquals(selectedTexts.length, 1);
+		Assert.assertEquals(selectedTexts[0], "None");
+	}
+	
+	@Test(groups={"it"})
+	public void testDeselectByValue() {
+		angularPage.selectMultipleList.selectByValue(new String[] {"option1", "option2"});
+		angularPage.selectMultipleList.deselectByValue("option1");
+		String[] selectedTexts = angularPage.selectMultipleList.getSelectedTexts();
+		Assert.assertEquals(selectedTexts.length, 1);
+		Assert.assertEquals(selectedTexts[0], "Multiple Option 2");
+	}
+	
+	@Test(groups={"it"})
+	public void testDeselectByCorrespondingText() {
+		angularPage.selectMultipleList.selectByCorrespondingText(new String[] {"ple Option 1", "ple Option 2"});
+		angularPage.selectMultipleList.deselectByCorrespondingText("ple Option 1");
+		String[] selectedTexts = angularPage.selectMultipleList.getSelectedTexts();
+		Assert.assertEquals(selectedTexts.length, 1);
+		Assert.assertEquals(selectedTexts[0], "Multiple Option 2");
+	}
+	
+	@Test(groups={"it"})
+	public void testSelectNotMultiple() {
+		Assert.assertFalse(angularPage.selectList.isMultiple());
+	}
+	 
+	@Test(groups={"it"})
+	public void testSelectMultiple() { 
+		Assert.assertTrue(angularPage.selectMultipleList.isMultiple());
 	}
 	
 }

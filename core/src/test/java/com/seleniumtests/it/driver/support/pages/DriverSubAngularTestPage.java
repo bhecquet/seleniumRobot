@@ -34,7 +34,8 @@ import com.seleniumtests.uipage.htmlelements.TextFieldElement;
 
 public class DriverSubAngularTestPage extends PageObject {
 
-	public static final SelectList selectList = new SelectList("list", By.id("select"));
+	public static final SelectList selectList = new SelectList("list", By.id("angularSelect"));
+	public static final SelectList selectMultipleList = new SelectList("list", By.id("angularMultipleSelect"));
 
 	private String openedPageUrl;
 	

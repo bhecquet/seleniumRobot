@@ -80,9 +80,9 @@ public class HtmlElement implements WebElement, Locatable, HasIdentity {
 
     protected WebDriver driver;
     protected WebElement element = null;
-    private String label = null;
-    private HtmlElement parent = null;
-    private FrameElement frameElement = null;
+    protected String label = null;
+    protected HtmlElement parent = null;
+    protected FrameElement frameElement = null;
     private Integer elementIndex = -1;
     private By by = null;
 
@@ -128,10 +128,7 @@ public class HtmlElement implements WebElement, Locatable, HasIdentity {
     }
     
     public HtmlElement(final String label, final By by, final FrameElement frame, final Integer index) {
-    	this.label = label;
-    	this.by = by;
-    	this.elementIndex = index;
-    	this.frameElement = frame;
+    	this(label, by, frame, null, index);
     }
     
     public HtmlElement(final String label, final By by, final HtmlElement parent) {
@@ -139,11 +136,15 @@ public class HtmlElement implements WebElement, Locatable, HasIdentity {
     }
     
     public HtmlElement(final String label, final By by, final HtmlElement parent, final Integer index) {
+    	this(label, by, null, parent, index);
+    }
+    
+    public HtmlElement(final String label, final By by, final FrameElement frame, final HtmlElement parent, final Integer index) {
     	this.label = label;
     	this.by = by;
-    	this.parent = parent;
     	this.elementIndex = index;
-    	this.frameElement = null;
+    	this.frameElement = frame;
+    	this.parent = parent;
     }
 
     /**
@@ -283,6 +284,19 @@ public class HtmlElement implements WebElement, Locatable, HasIdentity {
     	// find the root element
     	findElement();
         return element.findElements(by);
+    }
+
+    @ReplayOnError
+    public List<WebElement> findHtmlElements(By by) {
+    	
+    	// find the root element
+    	findElement();
+    	List<WebElement> htmlElements = new ArrayList<>();
+    	List<WebElement> elements = element.findElements(by);
+    	for (int i = 0; i < elements.size(); i++) {
+    		htmlElements.add(new HtmlElement("", by, frameElement, parent, i));
+    	}
+    	return htmlElements;
     }
     
     /**

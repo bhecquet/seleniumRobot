@@ -17,7 +17,7 @@ To modify this application, do the following
 - go to `src/app/` and modify html. Doc for material components can be found here [https://material.angular.io/components/categories](https://material.angular.io/components/categories)
 
 Test your modifications with `ng serve`
-Build the updated application with `ng build --prod`
+Build the updated application with `ng build --prod --output-hashing=none --output-path=angularApp --base-href=.`
 Replace the built application into seleniumRobot resources
 
 

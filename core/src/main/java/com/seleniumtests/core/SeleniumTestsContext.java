@@ -993,7 +993,7 @@ public class SeleniumTestsContext {
         try {
             timeout = (Integer) getAttribute(EXPLICIT_WAIT_TIME_OUT);
         } catch (Exception e) {
-            timeout = 15;
+            timeout = DEFAULT_EXPLICIT_WAIT_TIME_OUT;
         }
 
         if (timeout < getImplicitWaitTimeout()) {
