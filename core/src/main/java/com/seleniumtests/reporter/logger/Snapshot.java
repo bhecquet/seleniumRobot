@@ -28,6 +28,7 @@ public class Snapshot extends TestAction {
 	public Snapshot(final ScreenShot screenshot) {
 		super(screenshot.getTitle(), false, new ArrayList<>());
 		this.screenshot = screenshot;
+		durationToExclude = screenshot.getDuration();
 	}
 	
     /**

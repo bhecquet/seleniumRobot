@@ -124,7 +124,6 @@ public class DriverTestPage extends PageObject {
 	
 	public DriverTestPage() throws Exception {
         super(textElement);
-        driver.findElement(By.id("sdmfkjmlkj"));
     }
     
     public DriverTestPage(boolean openPageURL) throws Exception {

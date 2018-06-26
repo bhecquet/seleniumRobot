@@ -39,6 +39,7 @@ import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.reporter.logger.TestAction;
 import com.seleniumtests.reporter.logger.TestLogging;
 import com.seleniumtests.uipage.ReplayOnError;
+import com.seleniumtests.uipage.htmlelements.GenericPictureElement;
 import com.seleniumtests.uipage.htmlelements.HtmlElement;
 import com.seleniumtests.uipage.htmlelements.PictureElement;
 import com.seleniumtests.util.helper.WaitHelper;
@@ -163,7 +164,7 @@ public class ReplayAction {
 		String targetName = joinPoint.getTarget().toString();
 		TestAction currentAction = null;
 
-		if (joinPoint.getTarget() instanceof PictureElement) {
+		if (joinPoint.getTarget() instanceof GenericPictureElement) {
 	    	String methodName = joinPoint.getSignature().getName();
 	    	List<String> pwdToReplace = new ArrayList<>();
 			String actionName = String.format("%s on %s %s", methodName, targetName, LogAction.buildArgString(joinPoint, pwdToReplace));
@@ -210,6 +211,10 @@ public class ReplayAction {
 		} finally {
 			if (currentAction != null && isHtmlElementDirectlyCalled(Thread.currentThread().getStackTrace()) && TestLogging.getParentTestStep() != null) {
 				currentAction.setFailed(actionFailed);
+				
+				if (joinPoint.getTarget() instanceof GenericPictureElement) {
+					currentAction.setDurationToExclude(((GenericPictureElement)joinPoint.getTarget()).getActionDuration());
+				}
 			}		
 		}
 	}

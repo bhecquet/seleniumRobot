@@ -365,7 +365,7 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 			}
 		}
 		
-        
+		tearDownStep.updateDuration();
 		TestLogging.logTestStep(tearDownStep);
 		
 	}

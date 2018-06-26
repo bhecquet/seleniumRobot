@@ -1,6 +1,8 @@
 package com.seleniumtests.uipage.htmlelements;
 
 import java.io.File;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
@@ -45,12 +47,17 @@ public class ScreenZone extends GenericPictureElement {
 	 * Search the picture in the screenshot taken by Robot
 	 * 
 	 */
-	public void findElement() {
+	protected File getScreenshotFile() {
 		screenshotUtil = getScreenshotUtil(); // keep this for unit tests
 
 		// issue #136: we don't need driver when checking desktop
 		File screenshotFile = screenshotUtil.captureDesktopToFile();
-		super.findElement(screenshotFile);
+		
+		return screenshotFile;
+	}
+	
+	protected void doAfterPictureSearch() {
+		// nothing to do
 	}
 
 	

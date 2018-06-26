@@ -91,6 +91,21 @@ public class TestScreenZone extends GenericMultiBrowserTest {
 		Assert.assertEquals(testPage.textElement.getValue(), "image");
 	}
 	
+
+	/**
+	 * test that an action changed actionDuration value
+	 */
+	@Test(groups={"it"})
+	public void testActionDurationIsLogged() {
+		Assert.assertEquals(testPageWithoutPattern.googleForDesktopWithFile.getActionDuration(), 0);
+		try {
+			testPageWithoutPattern.googleForDesktopWithFile.click();
+		} catch (ImageSearchException e) {
+			throw new SkipException("Image not found, we may be on screenless slave", e);
+		}
+		Assert.assertTrue(testPageWithoutPattern.googleForDesktopWithFile.getActionDuration() > 0);
+	}
+	
 	@Test(groups={"it"})
 	public void testSendKeysOnPicture() {
 		try {

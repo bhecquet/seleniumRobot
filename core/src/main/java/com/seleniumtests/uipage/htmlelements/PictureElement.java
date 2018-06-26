@@ -18,6 +18,7 @@ package com.seleniumtests.uipage.htmlelements;
 
 import java.io.File;
 import java.time.Duration;
+import java.time.LocalDateTime;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.Point;
@@ -100,12 +101,16 @@ public class PictureElement extends GenericPictureElement {
 	public void findElement(boolean searchOnly) {
 		findElement();
 	}
-	public void findElement() {
+	public File getScreenshotFile() {
 		screenshotUtil = getScreenshotUtil(); // update driver
-	
-		File screenshotFile = screenshotUtil.captureWebPageToFile();
-		super.findElement(screenshotFile);
 		
+		File screenshotFile = screenshotUtil.captureWebPageToFile();
+		
+		return screenshotFile;
+		
+	}
+	
+	protected void doAfterPictureSearch() {
 		// scroll to element where our picture is so that we will be able to act on it
 		// scrolling will display, on top of window, the top of the element
 		intoElement.scrollToElement(0);
