@@ -18,6 +18,8 @@ package com.seleniumtests.uipage.htmlelements;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.Duration;
+import java.time.LocalDateTime;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
@@ -46,6 +48,7 @@ public abstract class GenericPictureElement {
 	protected double pictureSizeRatio;
 	protected ImageDetector detector;
 	protected boolean searchOnDesktop;
+	protected long actionDuration;
 	protected String label;
 	protected ScreenshotUtil screenshotUtil;
 	protected SystemClock clock = new SystemClock();
@@ -95,7 +98,12 @@ public abstract class GenericPictureElement {
 	 * WebDriver is used in mobile, because Robot is not available for mobile platforms
 	 * 
 	 */
-	protected void findElement(File screenshotFile) {
+	public void findElement() {
+		
+
+		LocalDateTime start = LocalDateTime.now();
+	
+		File screenshotFile = getScreenshotFile();
 		
 		if (screenshotFile == null) {
 			throw new WebDriverException("Screenshot does not exist");
@@ -111,9 +119,21 @@ public abstract class GenericPictureElement {
 			detectedObjectRectangle = new Rectangle(0, 0, 0, 0);
 			pictureSizeRatio = 1.0;
 		}
+		actionDuration = Duration.between(start, LocalDateTime.now()).toMillis();
+		
+		doAfterPictureSearch();
 	}
 	
-	public abstract void findElement();
+	/**
+	 * Get File containing the screeenshot, either on desktop or on browser
+	 * @return
+	 */
+	protected abstract File getScreenshotFile();
+	
+	/**
+	 * Some action to perform once picture has been found
+	 */
+	protected abstract void doAfterPictureSearch();
 	
 	/**
 	 * Click at the coordinates xOffset, yOffset of the center of the found picture. Use negative offset to click on the left or
@@ -184,5 +204,9 @@ public abstract class GenericPictureElement {
 
 	public Rectangle getDetectedObjectRectangle() {
 		return detectedObjectRectangle;
+	}
+
+	public long getActionDuration() {
+		return actionDuration;
 	}
 }

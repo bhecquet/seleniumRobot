@@ -72,7 +72,25 @@ public class TestStep extends TestAction {
 	}
 	
 	public Long getDuration() {
-		return duration;
+		long consolidatedDuration = duration;
+		consolidatedDuration -= getDurationToExclude();
+
+		return consolidatedDuration;
+	}
+	
+	@Override
+	public long getDurationToExclude() {
+		long consolidatedDurationToExclude = durationToExclude; 
+		
+		for (Snapshot snapshot: snapshots) {
+			consolidatedDurationToExclude += snapshot.getDurationToExclude();
+		}
+		
+		for (TestAction action: stepActions) {
+			consolidatedDurationToExclude += action.getDurationToExclude();
+		}
+		
+		return consolidatedDurationToExclude;
 	}
 
 	/**
@@ -85,6 +103,7 @@ public class TestStep extends TestAction {
 	
 	public void updateDuration() {
 		duration = new Date().getTime() - startDate.getTime();
+		
 	}
 
 	public List<TestAction> getStepActions() {

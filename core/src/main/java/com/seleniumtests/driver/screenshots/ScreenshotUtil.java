@@ -19,6 +19,9 @@ package com.seleniumtests.driver.screenshots;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.temporal.TemporalAmount;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -275,8 +278,12 @@ public class ScreenshotUtil {
      */
     public File captureWebPageToFile() {
     	ScreenShot screenShot = new ScreenShot();
+    	LocalDateTime start = LocalDateTime.now();
     	filename = HashCodeGenerator.getRandomHashCode("web");
     	handleImage(screenShot);
+    	
+    	// record duration of screenshot
+    	screenShot.setDuration(Duration.between(start, LocalDateTime.now()).toMillis());
     	if (screenShot.getImagePath() == null) {
     		return null;
     	}
@@ -320,8 +327,12 @@ public class ScreenshotUtil {
 	 */
 	public ScreenShot captureDesktopToScreenshot() {
 		ScreenShot screenShot = new ScreenShot();
+		LocalDateTime start = LocalDateTime.now();
 		screenShot.setTitle("Desktop");
 		File screenshotFile = captureDesktopToFile();
+
+    	// record duration of screenshot
+    	screenShot.setDuration(Duration.between(start, LocalDateTime.now()).toMillis());
 		screenShot.setImagePath(SCREENSHOT_DIR + screenshotFile.getName());
 		return screenShot;
 	}
@@ -402,6 +413,8 @@ public class ScreenshotUtil {
      */
     private ScreenShot captureWebPageToScreenshot(String titlePrefix) {
     	ScreenShot screenShot = new ScreenShot();
+    	LocalDateTime start = LocalDateTime.now();
+    	
     	screenShot.setSuiteName(getSuiteName());
 
         try {
@@ -438,6 +451,10 @@ public class ScreenshotUtil {
         } catch (Exception ex) {
         	logger.error(ex);
         }
+        
+
+    	// record duration of screenshot
+    	screenShot.setDuration(Duration.between(start, LocalDateTime.now()).toMillis());
 
         return screenShot;
     }

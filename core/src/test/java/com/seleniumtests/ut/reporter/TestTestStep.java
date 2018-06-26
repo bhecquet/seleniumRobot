@@ -555,4 +555,49 @@ public class TestTestStep extends GenericTest {
 		
 		Assert.assertEquals(step.getName(), "step1 with args: (bar, ******)");
 	}
+	
+
+	/**
+	 * Check duration is correctly handled in simple step with action exclusions
+	 */
+	@Test(groups={"ut"})
+	public void testDuration() {
+		TestStep step = new TestStep("step1", null, new ArrayList<>());
+		step.setDuration(5000L);
+		step.setDurationToExclude(500L);
+		TestAction action = new TestAction("action2", false, new ArrayList<>());
+		action.setDurationToExclude(600L);
+		step.addAction(action);
+		Assert.assertEquals(step.getDuration(), (Long)3900L);
+	}
+	
+	/**
+	 * Check duration is correctly handled with sub steps
+	 */
+	@Test(groups={"ut"})
+	public void testDurationWithSubStep() {
+		TestStep step = new TestStep("step1", null, new ArrayList<>());
+		step.setDuration(5000L);
+		step.setDurationToExclude(500L);
+		
+		TestStep subStep = new TestStep("subStep", null, new ArrayList<>());
+		TestAction action = new TestAction("action2", false, new ArrayList<>());
+		action.setDurationToExclude(600L);
+		subStep.addAction(action);
+		step.addAction(subStep);
+		Assert.assertEquals(step.getDuration(), (Long)3900L);
+	}
+	
+	@Test(groups={"ut"})
+	public void testDurationWithSnapshot() {
+		TestStep step = new TestStep("step1", null, new ArrayList<>());
+		step.setDuration(5000L);
+		step.setDurationToExclude(500L);
+		
+		ScreenShot screenshot = new ScreenShot();
+		screenshot.setDuration(200);
+		Snapshot snapshot = new Snapshot(screenshot);
+		step.addSnapshot(snapshot, 0, "name");
+		Assert.assertEquals(step.getDuration(), (Long)4300L);
+	}
 }

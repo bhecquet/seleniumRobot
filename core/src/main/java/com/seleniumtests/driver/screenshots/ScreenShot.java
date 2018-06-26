@@ -34,6 +34,7 @@ public class ScreenShot {
     private String imagePath;
     private String title;
     private String suiteName;
+    private long duration;
     private boolean isException;
     private String outputDirectory;
 
@@ -134,4 +135,12 @@ public class ScreenShot {
         return "!!!EXCEPTION:" + this.isException + "|APPLICATION URL:" + this.location + "|PAGE TITLE:" + this.title
                 + "|PAGE HTML SOURCE:" + this.getFullHtmlPath() + "|PAGE IMAGE:" + this.getFullImagePath();
     }
+
+	public long getDuration() {
+		return duration;
+	}
+
+	public void setDuration(long duration) {
+		this.duration = duration;
+	}
 }

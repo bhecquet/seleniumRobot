@@ -73,6 +73,20 @@ public class TestPictureElement extends GenericMultiBrowserTest {
 	}
 	
 	/**
+	 * test that an action changed actionDuration value
+	 */
+	@Test(groups={"it"})
+	public void testActionDurationIsLogged() {
+		Assert.assertEquals(testPageWithoutPattern.googlePicture.getActionDuration(), 0);
+		try {
+			testPageWithoutPattern.googlePicture.click();
+		} catch (ImageSearchException e) {
+			throw new SkipException("Image not found, we may be on screenless slave", e);
+		}
+		Assert.assertTrue(testPageWithoutPattern.googlePicture.getActionDuration() > 0);
+	}
+	
+	/**
 	 * test correction of issue #134 by clicking on element defined by a File object
 	 */
 	@Test(groups={"it"})
