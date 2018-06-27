@@ -16,10 +16,13 @@
  */
 package com.seleniumtests.it.driver;
 
+import org.openqa.selenium.NoSuchElementException;
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.it.driver.support.GenericMultiBrowserTest;
 
@@ -29,6 +32,11 @@ public class TestAngularControls extends GenericMultiBrowserTest {
 	
 	public TestAngularControls() throws Exception {
 		super(BrowserType.CHROME, "DriverSubAngularTestPage"); 
+	}
+	
+	@BeforeMethod(groups= {"it"})
+	public void init() {
+		SeleniumTestsContextManager.getThreadContext().setReplayTimeout(1);
 	}
 	
 	@AfterMethod(groups={"it"})
@@ -142,5 +150,47 @@ public class TestAngularControls extends GenericMultiBrowserTest {
 	public void testSelectMultiple() { 
 		Assert.assertTrue(angularPage.selectMultipleList.isMultiple());
 	}
+	
+	/**
+	 * Check that if we specify the same option 2 times, it's not deselected
+	 */
+	@Test(groups={"it"})
+	public void testSelectSameTextMultipleTimes() {
+		angularPage.selectMultipleList.selectByText(new String[] {"Multiple Option 1", "Multiple Option 1"});
+		String[] selectedTexts = angularPage.selectMultipleList.getSelectedTexts();
+		Assert.assertEquals(selectedTexts.length, 1);
+		Assert.assertEquals(selectedTexts[0], "Multiple Option 1");
+	}
+	
+	@Test(groups={"it"}, expectedExceptions=NoSuchElementException.class)
+	public void testSelectByInvalidText() {
+		angularPage.selectList.selectByText("Option 12");
+	}
+	
+	@Test(groups={"it"}, expectedExceptions=NoSuchElementException.class)
+	public void testSelectByInvalidTexts() {
+		angularPage.selectList.selectByText(new String[] {"Option 12"});
+	}
+	
+	@Test(groups={"it"}, expectedExceptions=NoSuchElementException.class)
+	public void testSelectInvalidIndex() {
+		angularPage.selectList.selectByIndex(20);
+	}
+	
+	@Test(groups={"it"}, expectedExceptions=NoSuchElementException.class)
+	public void testSelectInvalidIndexes() {
+		angularPage.selectList.selectByIndex(new int[] {10, 20});
+	}
+	
+	@Test(groups={"it"}, expectedExceptions=NoSuchElementException.class)
+	public void testSelectByInvalidValue() {
+		angularPage.selectList.selectByValue("option30");
+	}
+	
+	@Test(groups={"it"}, expectedExceptions=NoSuchElementException.class)
+	public void testSelectByInvalidValues() {
+		angularPage.selectList.selectByValue(new String[] {"option30"});
+	}
+	
 	
 }
