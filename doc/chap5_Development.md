@@ -9,7 +9,7 @@ In case eclipse does not weave aspects (.aj files do not have the 'A' icon), che
 Integration tests embed an angular test application (version 5) for testing interactions with angular-material [https://material.angular.io/](https://material.angular.io/)
 To modify this application, do the following
 
-- get source code at:
+- get source code at: [https://github.com/bhecquet/seleniumRobot-angular-demoapp](https://github.com/bhecquet/seleniumRobot-angular-demoapp)
 - install node (>= 6.11.5) + npm ( >= 3.10.10)
 - install angular-cli (1.5.0 for angular 5) [https://cli.angular.io/](https://cli.angular.io/): `npm install -g @angular/cli@1.5.0`
 - `cd <dir_where_app_is_cloned>`
