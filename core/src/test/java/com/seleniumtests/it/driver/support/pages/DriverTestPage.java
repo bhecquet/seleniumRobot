@@ -120,6 +120,10 @@ public class DriverTestPage extends PageObject {
 	
 	public static final TextFieldElement textElementSubIFrame = new TextFieldElement("Text", By.id("textInIFrameWithValue2"), subIframe);
 	
+	// Elements for Angular IFrame
+	public static final FrameElement angularIFrame = new FrameElement("IFrame angular", By.id("angularIFrame"));
+	public static final SelectList angularSelectListIFrame = new SelectList("list", By.id("angularSelect"), angularIFrame);
+	
 	private String openedPageUrl;
 	
 	public DriverTestPage() throws Exception {

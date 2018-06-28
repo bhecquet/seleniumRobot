@@ -122,5 +122,14 @@ public class TestFrame extends GenericMultiBrowserTest {
 		
 	}
 	
+	/**
+	 * Check that even in frame, subelements can be found
+	 */
+	@Test(groups={"it"})
+	public void testAngularSelectByText() {
+		testPage.angularSelectListIFrame.selectByText("Option 1");
+		Assert.assertEquals(testPage.angularSelectListIFrame.getSelectedText(), "Option 1");
+	}
+	
  	
 }
