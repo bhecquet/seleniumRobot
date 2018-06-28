@@ -36,6 +36,9 @@ public class DriverSubAngularTestPage extends PageObject {
 
 	public static final SelectList selectList = new SelectList("list", By.id("angularSelect"));
 	public static final SelectList selectMultipleList = new SelectList("list", By.id("angularMultipleSelect"));
+	public static final CheckBoxElement checkbox = new CheckBoxElement("checkbox", By.id("angularCheckbox"));
+	public static final CheckBoxElement checkboxInput = new CheckBoxElement("checkbox", By.id("angularCheckbox-input"));
+	public static final RadioButtonElement radio = new RadioButtonElement("radio", By.id("angularRadio1"));
 
 	private String openedPageUrl;
 	

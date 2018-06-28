@@ -267,5 +267,23 @@ public class TestAngularControls extends GenericMultiBrowserTest {
 		angularPage.selectList.selectByValue(new String[] {"option30"});
 	}
 	
+	@Test(groups= {"it"})
+	public void testCheckBox() {
+		angularPage.checkbox.check();
+		Assert.assertTrue(angularPage.checkbox.isSelected());
+	}
+	
+	@Test(groups= {"it"})
+	public void testUncheckCheckBox() {
+		angularPage.checkbox.check();
+		angularPage.checkbox.uncheck();
+		Assert.assertFalse(angularPage.checkbox.isSelected());
+	}
+
+	@Test(groups= {"it"})
+	public void testRadio() {
+		angularPage.radio.check();
+		Assert.assertTrue(angularPage.radio.isSelected());
+	}
 	
 }

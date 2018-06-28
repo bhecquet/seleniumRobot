@@ -18,6 +18,8 @@ package com.seleniumtests.uipage.htmlelements;
 
 import org.openqa.selenium.By;
 
+import com.seleniumtests.uipage.ReplayOnError;
+
 public class CheckBoxElement extends HtmlElement {
 
     public CheckBoxElement(final String label, final By by) {
@@ -53,6 +55,19 @@ public class CheckBoxElement extends HtmlElement {
     public void uncheck() {
         if (isSelected()) {
             super.click();
+        }
+    }
+    
+    @Override
+    @ReplayOnError
+    public boolean isSelected() {
+        findElement();
+
+        // handle angular-material case
+        if ("mat-checkbox".equals(element.getTagName())) {
+        	return element.getAttribute("class").contains("mat-checkbox-checked");
+        } else {
+        	return element.isSelected();
         }
     }
 }
