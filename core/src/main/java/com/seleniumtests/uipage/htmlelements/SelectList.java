@@ -272,14 +272,19 @@ public class SelectList extends HtmlElement {
     	
     	try {
 	    	findElement();
+	    	boolean matched = false;
 			switch (selectType) {
 				case HTML:
 					select.deselectByIndex(index);
 					break;
 				case ANGULAR_MATERIAL:
 				case LIST:
-					WebElement option = options.get(index);
-			        setDeselected(option);
+					try {
+						WebElement option = options.get(index);
+				        setDeselected(option);
+					} catch (IndexOutOfBoundsException e) {
+						throw new NoSuchElementException("Cannot locate element with index: " + index);
+					}
 					break;
 				default:
 					throw new CustomSeleniumTestsException(selectType + "not recognized ");
@@ -297,6 +302,7 @@ public class SelectList extends HtmlElement {
     	
     	try {
 	    	findElement();
+	    	boolean matched = false;
 			switch (selectType) {
 				case HTML:
 					select.deselectByVisibleText(text);
@@ -306,9 +312,13 @@ public class SelectList extends HtmlElement {
 					for (WebElement option : options) {
 			            if (option.getText().equals(text)) {
 			            	setDeselected(option);
+			            	matched = true;
 			                break;
 			            }
 			        }
+					if (!matched) {
+				      throw new NoSuchElementException("Cannot locate element with text: " + text);
+				    }
 					break;
 				default:
 					throw new CustomSeleniumTestsException(selectType + "not recognized ");
@@ -326,6 +336,7 @@ public class SelectList extends HtmlElement {
     	
     	try {
 	    	findElement();
+	    	boolean matched = false;
 			switch (selectType) {
 	
 				case HTML:
@@ -336,9 +347,13 @@ public class SelectList extends HtmlElement {
 					for (WebElement option : options) {
 			            if (getOptionValue(option).equals(value)) {
 			            	setDeselected(option);
+			            	matched = true;
 			                break;
 			            }
 			        }
+					if (!matched) {
+				      throw new NoSuchElementException("Cannot locate element with value: " + value);
+				    }
 					break;
 				default:
 					throw new CustomSeleniumTestsException(selectType + "not recognized ");
@@ -499,7 +514,7 @@ public class SelectList extends HtmlElement {
     	if (optionToSelect != null) {
     		setSelected(optionToSelect);
     	} else {
-    		logger.error("No option matches " + text);
+    		throw new NoSuchElementException("Cannot locate option with corresponding text " + text);
     	}
     }
     
@@ -523,7 +538,7 @@ public class SelectList extends HtmlElement {
 	    	if (optionToSelect != null) {
 	    		setDeselected(optionToSelect);
 	    	} else {
-	    		logger.error("No option matches " + text);
+	    		throw new NoSuchElementException("Cannot locate option with corresponding text " + text);
 	    	}
     		
     	} finally {

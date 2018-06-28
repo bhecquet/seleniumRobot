@@ -469,6 +469,7 @@ public class HtmlElement implements WebElement, Locatable, HasIdentity {
 
 		for (FrameElement frameEl: frameTree) {
 			WebElement frameWebElement = driver.findElement(frameEl.getBy());
+			((CustomEventFiringWebDriver)driver).scrollToElement(frameWebElement, -20);		
 			driver.switchTo().frame(frameWebElement);
 		}
     }

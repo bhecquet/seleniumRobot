@@ -141,6 +141,78 @@ public class TestAngularControls extends GenericMultiBrowserTest {
 		Assert.assertEquals(selectedTexts[0], "Multiple Option 2");
 	}
 	
+	/**
+	 * Check deselecting a non multiple element raises an error
+	 */
+	@Test(groups={"it"}, expectedExceptions=UnsupportedOperationException.class)
+	public void testDeselectByTextNonMultipleSelect() {
+		angularPage.selectList.deselectByText("Multiple Option 1");
+	}
+	
+	@Test(groups={"it"}, expectedExceptions=UnsupportedOperationException.class)
+	public void testDeselectByIndexNonMultipleSelect() {
+		angularPage.selectList.deselectByIndex(2);
+	}
+	
+	@Test(groups={"it"}, expectedExceptions=UnsupportedOperationException.class)
+	public void testDeselectByValueNonMultipleSelect() {
+		angularPage.selectList.deselectByValue("option1");
+	}
+	
+	@Test(groups={"it"}, expectedExceptions=UnsupportedOperationException.class)
+	public void testDeselectByCorrespondingTextNonMultipleSelect() {
+		angularPage.selectList.deselectByCorrespondingText("ple Option 1");
+	}
+	
+	/**
+	 * Check deselecting a not selected element does not raise error
+	 */
+	@Test(groups={"it"})
+	public void testDeselectByTextNotSelected() {
+		angularPage.selectMultipleList.deselectByText("Multiple Option 1");
+		String[] selectedTexts = angularPage.selectMultipleList.getSelectedTexts();
+		Assert.assertEquals(selectedTexts.length, 0);
+	}
+	
+	@Test(groups={"it"})
+	public void testDeselectByIndexNotSelected() {
+		angularPage.selectMultipleList.deselectByIndex(2);
+		String[] selectedTexts = angularPage.selectMultipleList.getSelectedTexts();
+		Assert.assertEquals(selectedTexts.length, 0);
+	}
+	
+	@Test(groups={"it"})
+	public void testDeselectByValueNotSelected() {
+		angularPage.selectMultipleList.deselectByValue("option1");
+		String[] selectedTexts = angularPage.selectMultipleList.getSelectedTexts();
+		Assert.assertEquals(selectedTexts.length, 0);
+	}
+	
+	@Test(groups={"it"})
+	public void testDeselectByCorrespondingTextNotSelected() {
+		angularPage.selectMultipleList.deselectByCorrespondingText("ple Option 1");
+		String[] selectedTexts = angularPage.selectMultipleList.getSelectedTexts();
+		Assert.assertEquals(selectedTexts.length, 0);
+	}
+	
+	/**
+	 * Check deselecting an invalid value raises an error
+	 */
+	@Test(groups={"it"}, expectedExceptions=NoSuchElementException.class)
+	public void testDeselectByInvalidText() {
+		angularPage.selectMultipleList.deselectByText("Multiple Option 10");
+	}
+	
+	@Test(groups={"it"}, expectedExceptions=NoSuchElementException.class)
+	public void testDeselectByInvalidIndex() {
+		angularPage.selectMultipleList.deselectByIndex(20);
+	}
+	
+	@Test(groups={"it"}, expectedExceptions=NoSuchElementException.class)
+	public void testDeselectByInvalidValue() {
+		angularPage.selectMultipleList.deselectByValue("option10");
+	}
+	
 	@Test(groups={"it"})
 	public void testSelectNotMultiple() {
 		Assert.assertFalse(angularPage.selectList.isMultiple());
@@ -162,6 +234,9 @@ public class TestAngularControls extends GenericMultiBrowserTest {
 		Assert.assertEquals(selectedTexts[0], "Multiple Option 1");
 	}
 	
+	/**
+	 * Check trying to select an element which does not exist raises an error
+	 */
 	@Test(groups={"it"}, expectedExceptions=NoSuchElementException.class)
 	public void testSelectByInvalidText() {
 		angularPage.selectList.selectByText("Option 12");
