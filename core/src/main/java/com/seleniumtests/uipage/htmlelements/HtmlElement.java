@@ -499,6 +499,7 @@ public class HtmlElement implements WebElement, Locatable, HasIdentity {
 				if (element.getAttribute("style").toLowerCase().replace(" ", "").contains("display:none")) {
 					changeCssAttribute(element, "display", "block");
 				}
+//				changeCssAttribute(element, "clip", "auto");
 				changeCssAttribute(element, "zIndex", "100000");
 			} catch (Exception e) {
 				return;

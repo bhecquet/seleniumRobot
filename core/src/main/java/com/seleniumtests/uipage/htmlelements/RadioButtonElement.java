@@ -18,6 +18,8 @@ package com.seleniumtests.uipage.htmlelements;
 
 import org.openqa.selenium.By;
 
+import com.seleniumtests.uipage.ReplayOnError;
+
 public class RadioButtonElement extends HtmlElement {
 
     public RadioButtonElement(final String label, final By by) {
@@ -46,5 +48,18 @@ public class RadioButtonElement extends HtmlElement {
 
     public void check() {
         super.click();
+    }
+    
+    @Override
+    @ReplayOnError
+    public boolean isSelected() {
+        findElement();
+
+        // handle angular-material case
+        if ("mat-radio-button".equals(element.getTagName())) {
+        	return element.getAttribute("class").contains("mat-radio-checked");
+        } else {
+        	return element.isSelected();
+        }
     }
 }
