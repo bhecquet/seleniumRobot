@@ -57,9 +57,9 @@ public class DriverSubAngularTestPage extends PageObject {
     
     private static String getPageUrl() {
     	if (SeleniumTestsContextManager.getThreadContext().getBrowser() == BrowserType.FIREFOX) {
-			return "file://" + Thread.currentThread().getContextClassLoader().getResource("tu/testIFrame.html").getFile();
+			return "file://" + Thread.currentThread().getContextClassLoader().getResource("tu/angularApp/index.html").getFile();
 		} else {
-			return "file:///" + Thread.currentThread().getContextClassLoader().getResource("tu/testIFrame.html").getFile();
+			return "file:///" + Thread.currentThread().getContextClassLoader().getResource("tu/angularApp/index.html").getFile();
 		}
     }
 }

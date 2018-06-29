@@ -13,6 +13,5 @@ public class TestFrameFirefox extends TestFrame {
 	
 	@Test(groups= {"nogroup"})
 	public void test() {
-		testAngularSelectByText();
 	}
 }
