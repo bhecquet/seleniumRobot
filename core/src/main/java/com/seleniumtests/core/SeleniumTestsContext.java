@@ -115,6 +115,7 @@ public class SeleniumTestsContext {
     public static final String SNAPSHOT_BOTTOM_CROPPING = "snapshotBottomCropping";
     
     public static final String WEB_PROXY_TYPE = "proxyType";					// type de proxy. AUTO, MANUAL, NO
+    public static final String WEB_PROXY_TYPE_FROM_USER = "proxyTypeFromUser";	// issue #158: proxy type as requested by user. Store it 
     public static final String WEB_PROXY_ADDRESS = "proxyAddress";				// adresse du proxy. 
     public static final String WEB_PROXY_PORT = "proxyPort";					// port du proxy
     public static final String WEB_PROXY_LOGIN = "proxyLogin";					// login du proxy (si nécessaire)
@@ -777,7 +778,7 @@ public class SeleniumTestsContext {
     		String key = entry.getKey();
     		switch (key) {
     			case WEB_PROXY_TYPE:
-    				setWebProxyType(getWebProxyType() == null ? envConfig.get(key).getValue(): (getWebProxyType() == null ? null: getWebProxyType().name()));
+    				setWebProxyType(getAttribute(WEB_PROXY_TYPE_FROM_USER) == null ? envConfig.get(key).getValue(): getWebProxyType().name());
     				break;
     			case WEB_PROXY_ADDRESS:
     				setWebProxyAddress(getWebProxyAddress() == null ? envConfig.get(key).getValue(): getWebProxyAddress());
@@ -1719,8 +1720,10 @@ public class SeleniumTestsContext {
     public void setWebProxyType(String proxyType) {
     	try {
     		setAttribute(WEB_PROXY_TYPE, ProxyType.valueOf(proxyType.toUpperCase()));
+    		setAttribute(WEB_PROXY_TYPE_FROM_USER, proxyType.toUpperCase());
     	} catch (NullPointerException | IllegalArgumentException e) {
     		setAttribute(WEB_PROXY_TYPE, DEFAULT_WEB_PROXY_TYPE);
+    		setAttribute(WEB_PROXY_TYPE_FROM_USER, null);
     	}
     	
     }

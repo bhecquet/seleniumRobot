@@ -21,6 +21,7 @@ import com.seleniumtests.driver.TestType;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.driver.screenshots.VideoCaptureMode;
 import com.seleniumtests.it.driver.support.pages.DriverSubAngularTestPage;
+import com.seleniumtests.it.driver.support.pages.DriverTestAngularFrame;
 import com.seleniumtests.it.driver.support.pages.DriverTestPage;
 import com.seleniumtests.it.driver.support.pages.DriverTestPageWithoutFixedPattern;
 import com.seleniumtests.it.driver.support.server.WebServer;
@@ -36,6 +37,7 @@ public abstract class GenericMultiBrowserTest {
 	protected DriverTestPage testPage;
 	protected DriverTestPageWithoutFixedPattern testPageWithoutPattern;
 	protected DriverSubAngularTestPage angularPage;
+	protected DriverTestAngularFrame angularFramePage;
 	private String testPageName;
 	
 	protected List<BrowserType> installedBrowsers = OSUtilityFactory.getInstance().getInstalledBrowsers();
@@ -62,6 +64,7 @@ public abstract class GenericMultiBrowserTest {
 		mapping.put("/tu/test.html", "/test.html");
 		mapping.put("/tu/testWithoutFixedPattern.html", "/testWithoutFixedPattern.html");
 		mapping.put("/tu/testIFrame.html", "/testIFrame.html");
+		mapping.put("/tu/testAngularIFrame.html", "/testAngularIFrame.html");
 		mapping.put("/tu/testIFrame2.html", "/testIFrame2.html");
 		mapping.put("/tu/ffLogo1.png", "/ffLogo1.png");
 		mapping.put("/tu/ffLogo2.png", "/ffLogo2.png");
@@ -120,6 +123,9 @@ public abstract class GenericMultiBrowserTest {
 			break;
 		case "DriverTestPage":
 			testPage = new DriverTestPage(true, String.format("http://%s:%d/test.html", localAddress, server.getServerHost().getPort()));
+			break;
+		case "DriverTestAngularFrame":
+			angularFramePage = new DriverTestAngularFrame(true, String.format("http://%s:%d/testAngularIFrame.html", localAddress, server.getServerHost().getPort()));
 			break;
 		case "DriverSubAngularTestPage":
 			angularPage = new DriverSubAngularTestPage(true, String.format("http://%s:%d/angularApp/index.html", localAddress, server.getServerHost().getPort()));
