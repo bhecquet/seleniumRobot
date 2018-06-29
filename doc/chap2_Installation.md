@@ -115,8 +115,17 @@ For publishing artifacts to OSS Sonatype server
     
 #### Oracle library for core compile ####
 
-In order to compile core artifact, you must provide the ojdb6.jar file into src/lib folder so that it can be automatically installed in maven local repository when doing `mvn clean`
-This is not necessary when developping only test applications
+In order to compile core artifact, you must have the ojdb6.jar file 
+To have it, use the [https://repo.jenkins-ci.org](https://repo.jenkins-ci.org) repository (add the following in settings.xml)
+
+	<mirrors>
+	    <mirror>
+	      <mirrorOf>*</mirrorOf>
+	      <name>public</name>
+	      <url>https://repo.jenkins-ci.org/public</url>
+	      <id>public</id>
+	    </mirror>
+	  </mirrors>
 
 #### Download drivers ####
 From seleniumRobot 3.3.0, drivers are not provided anymore with source code, they are downloaded by a maven build (driver-download module)
