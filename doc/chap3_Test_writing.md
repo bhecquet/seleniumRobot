@@ -27,7 +27,20 @@ for the remainder, we use a unique name for that new application `appName`<br/>
 			</exclusion>
 		</exclusions>
 	</dependency>
-- else, install ojdbc via `mvn install:install-file -DgroupId=com.oracle -DartifactId=ojdbc6 -Dversion=11.2.0 -Dpackaging=jar -DcreateChecksum=true -Dfile=<path_to_ojdb6.jar>`
+- else, you should add Jenkins repository which exposes it: <br/>
+	> go to [https://repo.jenkins-ci.org/webapp/#/home](https://repo.jenkins-ci.org/webapp/#/home)<br/>
+	> click on 'Set me up' and generate maven settings<br/>
+	> important part is the mirror one
+	
+	<mirrors>
+    <mirror>
+      <mirrorOf>*</mirrorOf>
+      <name>public</name>
+      <url>https://repo.jenkins-ci.org/public</url>
+      <id>public</id>
+    </mirror>
+  </mirrors>
+	
 	
 - execute it
 
