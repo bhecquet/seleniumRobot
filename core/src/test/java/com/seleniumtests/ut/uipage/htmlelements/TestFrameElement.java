@@ -16,9 +16,13 @@
  */
 package com.seleniumtests.ut.uipage.htmlelements;
 
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -26,6 +30,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.WebDriver.TargetLocator;
 import org.openqa.selenium.WebDriverException;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.RemoteWebElement;
 import org.powermock.api.mockito.PowerMockito;
@@ -35,6 +40,7 @@ import org.testng.annotations.Test;
 
 import com.seleniumtests.MockitoTest;
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.uipage.htmlelements.ButtonElement;
 import com.seleniumtests.uipage.htmlelements.CheckBoxElement;
@@ -69,6 +75,8 @@ public class TestFrameElement extends MockitoTest {
 	private RemoteWebElement frameEl;
 	@Mock
 	private RemoteWebElement frameEl2;
+	
+	private CustomEventFiringWebDriver eventDriver;
 
 	@Mock
 	private TargetLocator locator;
@@ -78,13 +86,15 @@ public class TestFrameElement extends MockitoTest {
 	private void init() {
 		SeleniumTestsContextManager.getThreadContext().setBrowser("firefox");
 		
+		eventDriver = spy(new CustomEventFiringWebDriver(driver));
 		PowerMockito.mockStatic(WebUIDriver.class);
-		when(WebUIDriver.getWebDriver()).thenReturn(driver);
+		when(WebUIDriver.getWebDriver()).thenReturn(eventDriver);
 		when(driver.findElement(By.id("el"))).thenReturn(element);
 		when(element.findElement(By.id("link"))).thenReturn(link);
 		when(driver.findElement(By.id("frameId"))).thenReturn(frameEl);
 		when(driver.findElement(By.id("frameId2"))).thenReturn(frameEl2);
 		when(driver.switchTo()).thenReturn(locator);
+		doNothing().when(eventDriver).scrollToElement(any(WebElement.class),  anyInt());
 		
 		when(element.getSize()).thenReturn(new Dimension(1, 1));
 		when(element.isDisplayed()).thenReturn(true);
@@ -97,7 +107,7 @@ public class TestFrameElement extends MockitoTest {
 		HtmlElement el = new HtmlElement("", By.id("el"), frame);
 		el.click();
 		
-		verify(locator).frame(frameEl);
+		verify(locator).frame(any(WebElement.class));
 		verify(locator).defaultContent();
 	}
 	
@@ -110,7 +120,7 @@ public class TestFrameElement extends MockitoTest {
 		el.click();
 		
 		// 2 invocations because first call to click raises an error
-		verify(locator, times(2)).frame(frameEl);
+		verify(locator, times(2)).frame(any(WebElement.class));
 		verify(locator, times(2)).defaultContent();
 	}
 	
@@ -121,8 +131,8 @@ public class TestFrameElement extends MockitoTest {
 		HtmlElement el = new HtmlElement("", By.id("el"), frame2);
 		el.click();
 		
-		verify(locator).frame(frameEl);
-		verify(locator).frame(frameEl2);
+		// switch to each frame
+		verify(locator, times(2)).frame(any(WebElement.class));
 		verify(locator).defaultContent();
 	}
 	
@@ -131,17 +141,21 @@ public class TestFrameElement extends MockitoTest {
 		HtmlElement el = new HtmlElement("", By.id("el"));
 		el.click();
 		
-		verify(locator, times(0)).frame(frameEl);
+		verify(locator, times(0)).frame(any(WebElement.class));
 	}
 	
 	/* tests for each element defined in framework */
+	/**
+	 * check we switched to default content and frame
+	 * @throws Exception
+	 */
 	@Test(groups={"ut"})
 	public void testButtonElementInsideFrame() throws Exception {
 		FrameElement frame = new FrameElement("", By.id("frameId"));
 		ButtonElement el = new ButtonElement("", By.id("el"), frame);
 		el.submit();
 		
-		verify(locator).frame(frameEl);
+		verify(locator).frame(any(WebElement.class));
 		verify(locator).defaultContent();
 	}
 	@Test(groups={"ut"})
@@ -149,7 +163,7 @@ public class TestFrameElement extends MockitoTest {
 		ButtonElement el = new ButtonElement("", By.id("el"));
 		el.submit();
 		
-		verify(locator, times(0)).frame(frameEl);
+		verify(locator, times(0)).frame(any(WebElement.class));
 	}
 	
 	@Test(groups={"ut"})
@@ -158,7 +172,7 @@ public class TestFrameElement extends MockitoTest {
 		CheckBoxElement el = new CheckBoxElement("", By.id("el"), frame);
 		el.check();
 		
-		verify(locator, times(2)).frame(frameEl);
+		verify(locator, times(2)).frame(any(WebElement.class));
 		verify(locator, times(2)).defaultContent();
 	}
 	@Test(groups={"ut"})
@@ -166,7 +180,7 @@ public class TestFrameElement extends MockitoTest {
 		CheckBoxElement el = new CheckBoxElement("", By.id("el"));
 		el.uncheck();
 		
-		verify(locator, times(0)).frame(frameEl);
+		verify(locator, times(0)).frame(any(WebElement.class));
 	}
 	
 	@Test(groups={"ut"})
@@ -175,7 +189,7 @@ public class TestFrameElement extends MockitoTest {
 		ImageElement el = new ImageElement("", By.id("el"), frame);
 		el.getWidth();
 		
-		verify(locator).frame(frameEl);
+		verify(locator).frame(any(WebElement.class));
 		verify(locator).defaultContent();
 	}
 	@Test(groups={"ut"})
@@ -183,7 +197,7 @@ public class TestFrameElement extends MockitoTest {
 		ImageElement el = new ImageElement("", By.id("el"));
 		el.getWidth();
 		
-		verify(locator, times(0)).frame(frameEl);
+		verify(locator, times(0)).frame(any(WebElement.class));
 	}
 	
 	@Test(groups={"ut"})
@@ -192,7 +206,7 @@ public class TestFrameElement extends MockitoTest {
 		LabelElement el = new LabelElement("", By.id("el"), frame);
 		el.click();
 		
-		verify(locator).frame(frameEl);
+		verify(locator).frame(any(WebElement.class));
 		verify(locator).defaultContent();
 	}
 	@Test(groups={"ut"})
@@ -200,7 +214,7 @@ public class TestFrameElement extends MockitoTest {
 		LabelElement el = new LabelElement("", By.id("el"));
 		el.click();
 		
-		verify(locator, times(0)).frame(frameEl);
+		verify(locator, times(0)).frame(any(WebElement.class));
 	}
 	
 	@Test(groups={"ut"})
@@ -209,7 +223,7 @@ public class TestFrameElement extends MockitoTest {
 		LinkElement el = new LinkElement("", By.id("el"), frame);
 		el.click();
 		
-		verify(locator).frame(frameEl);
+		verify(locator).frame(any(WebElement.class));
 		verify(locator).defaultContent();
 	}
 	@Test(groups={"ut"})
@@ -217,7 +231,7 @@ public class TestFrameElement extends MockitoTest {
 		LinkElement el = new LinkElement("", By.id("el"));
 		el.click();
 		
-		verify(locator, times(0)).frame(frameEl);
+		verify(locator, times(0)).frame(any(WebElement.class));
 	}
 	
 	@Test(groups={"ut"})
@@ -226,7 +240,7 @@ public class TestFrameElement extends MockitoTest {
 		RadioButtonElement el = new RadioButtonElement("", By.id("el"), frame);
 		el.check();
 		
-		verify(locator).frame(frameEl);
+		verify(locator).frame(any(WebElement.class));
 		verify(locator).defaultContent();
 	}
 	@Test(groups={"ut"})
@@ -234,7 +248,7 @@ public class TestFrameElement extends MockitoTest {
 		RadioButtonElement el = new RadioButtonElement("", By.id("el"));
 		el.check();
 		
-		verify(locator, times(0)).frame(frameEl);
+		verify(locator, times(0)).frame(any(WebElement.class));
 	}
 	
 	@Test(groups={"ut"})
@@ -245,8 +259,8 @@ public class TestFrameElement extends MockitoTest {
 		SelectList el = new SelectList("", By.id("el"), frame);
 		el.getSelectedText();
 		
-		verify(locator).frame(frameEl);
-		verify(locator).defaultContent();
+		verify(locator).frame(any(WebElement.class));
+		verify(locator, times(3)).defaultContent();
 	}
 	@Test(groups={"ut"})
 	public void testSelectListOutsideFrame() throws Exception {
@@ -254,7 +268,7 @@ public class TestFrameElement extends MockitoTest {
 		
 		SelectList el = new SelectList("", By.id("el"));
 		el.getSelectedText();
-		verify(locator, times(0)).frame(frameEl);
+		verify(locator, times(0)).frame(any(WebElement.class));
 	}
 	
 	@Test(groups={"ut"})
@@ -263,7 +277,7 @@ public class TestFrameElement extends MockitoTest {
 		Table el = new Table("", By.id("el"), frame);
 		el.getColumns();
 		
-		verify(locator).frame(frameEl);
+		verify(locator).frame(any(WebElement.class));
 		verify(locator).defaultContent();
 	}
 	@Test(groups={"ut"})
@@ -271,7 +285,7 @@ public class TestFrameElement extends MockitoTest {
 		Table el = new Table("", By.id("el"));
 		el.getColumns();
 		
-		verify(locator, times(0)).frame(frameEl);
+		verify(locator, times(0)).frame(any(WebElement.class));
 	}
 	
 	@Test(groups={"ut"})
@@ -280,7 +294,7 @@ public class TestFrameElement extends MockitoTest {
 		TextFieldElement el = new TextFieldElement("", By.id("el"), frame);
 		el.sendKeys("toto");
 		
-		verify(locator).frame(frameEl);
+		verify(locator).frame(any(WebElement.class));
 		verify(locator).defaultContent();
 	}
 	@Test(groups={"ut"})
@@ -288,7 +302,7 @@ public class TestFrameElement extends MockitoTest {
 		TextFieldElement el = new TextFieldElement("", By.id("el"));
 		el.sendKeys("toto");
 		
-		verify(locator, times(0)).frame(frameEl);
+		verify(locator, times(0)).frame(any(WebElement.class));
 	}
 	
 	/**
@@ -302,7 +316,7 @@ public class TestFrameElement extends MockitoTest {
 		LinkElement link = el.findLinkElement(By.id("link"));
 		link.click();
 		
-		verify(locator).frame(frameEl);
+		verify(locator).frame(any(WebElement.class));
 		verify(locator).defaultContent();
 	}
 	
