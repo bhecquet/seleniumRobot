@@ -1083,7 +1083,7 @@ public class TestSeleniumTestContext extends GenericTest {
 		initThreadContext(testNGCtx);
 		
 		// default proxy type value get from config.ini file
-		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getWebProxyType(), ProxyType.AUTODETECT);
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getWebProxyType(), ProxyType.DIRECT);
 		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getWebProxyAddress(), null);
 		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getWebProxyPort(), null);
 		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getWebProxyLogin(), null);
@@ -1101,7 +1101,7 @@ public class TestSeleniumTestContext extends GenericTest {
 	@Test(groups="ut context")
 	public void testGetDataPath(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		initThreadContext(testNGCtx);
-		Assert.assertTrue(SeleniumTestsContextManager.getThreadContext().getDataPath().replace(File.separator, "/").endsWith("data"));
+		Assert.assertTrue(SeleniumTestsContextManager.getThreadContext().getDataPath().replace(File.separator, "/").endsWith("data/"));
 	}
 	@Test(groups="ut context")
 	public void testGetApplicationDataPath(final ITestContext testNGCtx, final XmlTest xmlTest) {

@@ -484,7 +484,7 @@ public class SeleniumTestsContextManager {
 		} catch (IndexOutOfBoundsException e) {
 			applicationName = "core";
 			applicationNameWithVersion = "core";
-			dataPath = Paths.get(rootPath, DATA_FOLDER_NAME).toString();
+			dataPath = Paths.get(rootPath, DATA_FOLDER_NAME).toString() + "/";
 		}
 		
 		featuresPath = Paths.get(dataPath, applicationNameWithVersion, "features").toString();
