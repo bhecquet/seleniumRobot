@@ -162,8 +162,7 @@ public class PageObject extends BasePage implements IPage {
 
     @Override
     public String getHtmlSource() {
-    	capturePageSnapshot();
-        return htmlSource;
+    	return driver.getPageSource();
     }
 
     public String getImageFilePath() {
