@@ -167,6 +167,13 @@ public class WebUIDriver {
         this.node = node;
     }
 
+    /**
+     * Cleans the driver created by this class: 
+     * quit  browser
+     * remove pids
+     * stop appium
+     * dereference driver in this WebUIDriver
+     */
     public static void cleanUp() {
     	
         WebDriver driver = driverSession.get();
@@ -190,6 +197,12 @@ public class WebUIDriver {
         }
 
         driverSession.remove();
+    }
+    
+    /**
+     * dereference this WebUIDriver from the thread
+     */
+    public static void cleanUpWebUIDriver() {
         uxDriverSession.remove();
     }
 
@@ -245,7 +258,11 @@ public class WebUIDriver {
      * @return
      */
     public static WebUIDriver getWebUIDriver() {
-        if (uxDriverSession.get() == null) {
+    	return getWebUIDriver(true);
+    }
+    
+    public static WebUIDriver getWebUIDriver(boolean create) {
+        if (uxDriverSession.get() == null && create) {
 //        	if (!SeleniumTestsContextManager.getThreadContext().isDevMode()){
 //        		cleanWebDrivers();
 //        	}

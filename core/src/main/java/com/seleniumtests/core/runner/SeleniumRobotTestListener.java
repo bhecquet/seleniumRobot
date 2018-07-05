@@ -317,29 +317,32 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 		} else {
 			TestLogging.log("Test has not started or has been skipped");
 		}
-		
-//		ITestResult res= null;
-//		res.getAttribute("toto");
 
 		if (WebUIDriver.getWebDriver(false) != null) {
 			try {
 				for (ScreenShot screenshot: new ScreenshotUtil().captureWebPageSnapshots(true)) {
 					TestLogging.logScreenshot(screenshot);
 				}
-				
+			} catch (Exception e) {
+				TestLogging.log("Error while logging: " + e.getMessage());
+			}
+		}
+		
+		if (WebUIDriver.getWebUIDriver(false) != null) {
+			try {
 		    	// stop HAR capture
-				if (WebUIDriver.getWebUIDriver().getConfig().getBrowserMobProxy() != null) {
-					Har har = WebUIDriver.getWebUIDriver().getConfig().getBrowserMobProxy().endHar();
+				if (WebUIDriver.getWebUIDriver(false).getConfig().getBrowserMobProxy() != null) {
+					Har har = WebUIDriver.getWebUIDriver(false).getConfig().getBrowserMobProxy().endHar();
 					TestLogging.logNetworkCapture(har);
 				}
 				
 				// stop video capture
-				if (WebUIDriver.getWebUIDriver().getConfig().getVideoRecorder() != null) {
+				if (WebUIDriver.getWebUIDriver(false).getConfig().getVideoRecorder() != null) {
 					File videoFile = null;
 					try {
 						videoFile = CustomEventFiringWebDriver.stopVideoCapture(SeleniumTestsContextManager.getThreadContext().getRunMode(), 
 																				SeleniumTestsContextManager.getThreadContext().getSeleniumGridConnector(),
-																				WebUIDriver.getWebUIDriver().getConfig().getVideoRecorder());
+																				WebUIDriver.getWebUIDriver(false).getConfig().getVideoRecorder());
 						
 						if (videoFile != null) {
 							Path pathAbsolute = Paths.get(videoFile.getAbsolutePath());
@@ -363,6 +366,7 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 			} catch (Exception e) {
 				TestLogging.log("Error while logging: " + e.getMessage());
 			}
+			WebUIDriver.cleanUpWebUIDriver();
 		}
 		
 		tearDownStep.updateDuration();
