@@ -56,7 +56,7 @@ public class FirefoxCapabilitiesFactory extends IDesktopCapabilityFactory {
         FirefoxProfile profile = getFirefoxProfile(webDriverConfig);
         configProfile(profile, webDriverConfig);
         options.setCapability(FirefoxDriver.PROFILE, profile);
-        options.setLogLevel(FirefoxDriverLogLevel.TRACE);
+        options.setLogLevel(FirefoxDriverLogLevel.ERROR);
         
         // handle https://bugzilla.mozilla.org/show_bug.cgi?id=1429338#c4 and https://github.com/mozilla/geckodriver/issues/789
         options.setCapability("moz:useNonSpecCompliantPointerOrigin", true);
