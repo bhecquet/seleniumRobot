@@ -17,26 +17,29 @@
 package com.seleniumtests.it.stubclasses;
 
 import org.apache.log4j.Logger;
+import org.testng.ITestContext;
+import org.testng.annotations.AfterSuite;
+import org.testng.annotations.BeforeSuite;
 
+import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.runner.SeleniumTestPlan;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
 public class StubParentClass extends SeleniumTestPlan {
 	
 	protected static final Logger logger = SeleniumRobotLogger.getLogger(StubParentClass.class);
-//
-//	/**
-//	 * Generate context to have logger correctly initialized
-//	 * @param testContext
-//	 */
-//	@BeforeSuite(groups="stub")
-//	public void initSuite(final ITestContext testContext) {
-//
-//        SeleniumTestsContextManager.initGlobalContext(testContext);
-//        SeleniumTestsContextManager.initThreadContext(testContext, null);
-//
-//		SeleniumTestsContextManager.getThreadContext().setSoftAssertEnabled(false);
-//		SeleniumTestsContextManager.getGlobalContext().setSoftAssertEnabled(false);
-//        SeleniumRobotLogger.updateLogger(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), SeleniumTestsContextManager.getGlobalContext().getDefaultOutputDirectory());
-//	}
+
+	/**
+	 * Generate context to have logger correctly initialized
+	 * @param testContext
+	 */
+	@BeforeSuite(groups="stub")
+	public void initSuite(final ITestContext testContext) {
+		System.setProperty(SeleniumTestsContext.VIDEO_CAPTURE, "false");
+	}
+	
+	@AfterSuite(groups="stub")
+	public void resetSuite(final ITestContext testContext) {
+		System.clearProperty(SeleniumTestsContext.VIDEO_CAPTURE);
+	}
 }
