@@ -365,6 +365,8 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 				}
 			} catch (Exception e) {
 				TestLogging.log("Error while logging: " + e.getMessage());
+				WebUIDriver.getWebUIDriver(false).getConfig().setVideoRecorder(null);
+				WebUIDriver.getWebUIDriver(false).getConfig().setBrowserMobProxy(null);
 			}
 			WebUIDriver.cleanUpWebUIDriver();
 		}
