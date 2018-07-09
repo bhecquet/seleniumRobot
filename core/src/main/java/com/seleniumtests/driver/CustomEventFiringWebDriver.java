@@ -236,8 +236,12 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
     @SuppressWarnings("unchecked")
 	public Dimension getViewPortDimensionWithoutScrollbar() {
     	if (isWebTest) {
-    		List<Long> dims = (List<Long>)((JavascriptExecutor)driver).executeScript(JS_GET_VIEWPORT_SIZE);
-    		return new Dimension(dims.get(0).intValue(), dims.get(1).intValue());
+    		try {
+	    		List<Long> dims = (List<Long>)((JavascriptExecutor)driver).executeScript(JS_GET_VIEWPORT_SIZE);
+	    		return new Dimension(dims.get(0).intValue(), dims.get(1).intValue());
+    		} catch (Exception e) {
+    			return driver.manage().window().getSize();
+    		}
     	} else {
     		return driver.manage().window().getSize();
     	}
@@ -252,8 +256,12 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
 	@SuppressWarnings("unchecked")
     public Dimension getContentDimension() {
     	if (isWebTest) {
-			List<Long> dims = (List<Long>)((JavascriptExecutor)driver).executeScript(JS_GET_CONTENT_ENTIRE_SIZE);
-	    	return new Dimension(dims.get(0).intValue(), dims.get(1).intValue());
+    		try {
+				List<Long> dims = (List<Long>)((JavascriptExecutor)driver).executeScript(JS_GET_CONTENT_ENTIRE_SIZE);
+		    	return new Dimension(dims.get(0).intValue(), dims.get(1).intValue());
+    		} catch (Exception e) {
+    			return driver.manage().window().getSize();
+    		}
     	} else {
     		return driver.manage().window().getSize();
     	}
