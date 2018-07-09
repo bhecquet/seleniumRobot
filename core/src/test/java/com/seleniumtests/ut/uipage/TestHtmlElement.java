@@ -248,6 +248,7 @@ public class TestHtmlElement extends GenericTest {
 	
 	@Test(groups={"ut"})
 	public void testFindLinkElementsInsideHtmlElement() {
+		System.out.println("URL: " + testPage.linkElement3.getUrl());
 		Assert.assertTrue(testPage.linkElement3.getUrl().contains("http://www.googleFrance.fr"));
 	}
 	
