@@ -199,7 +199,7 @@ public class TestHtmlElement extends GenericTest {
 	
 	@Test(groups={"ut"})
 	public void testFindLinkElementInsideHtmlElement() {
-		Assert.assertTrue(testPage.linkElement2.getUrl().contains("http://www.googleFrance.fr"));
+		Assert.assertTrue(testPage.linkElement2.getUrl().toLowerCase().contains("http://www.googlefrance.fr"));
 	}
 	
 	@Test(groups={"ut"})
@@ -248,8 +248,7 @@ public class TestHtmlElement extends GenericTest {
 	
 	@Test(groups={"ut"})
 	public void testFindLinkElementsInsideHtmlElement() {
-		System.out.println("URL: " + testPage.linkElement3.getUrl());
-		Assert.assertTrue(testPage.linkElement3.getUrl().contains("http://www.googleFrance.fr"));
+		Assert.assertTrue(testPage.linkElement3.getUrl().toLowerCase().contains("http://www.googlefrance.fr"));
 	}
 	
 	@Test(groups={"ut"})

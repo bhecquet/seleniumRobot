@@ -21,6 +21,7 @@ import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.Rectangle;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebDriverException;
 import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.annotations.AfterClass;
@@ -192,7 +193,14 @@ public class TestCachedHtmlElement extends GenericTest {
 	
 	@Test(groups={"ut"})
 	public void testGetRectangle() {
-		Assert.assertEquals(new CachedHtmlElement(testPage.selectList.getElement()).getRect(),  testPage.selectList.getElement().getRect());
+		// depends on where we execute the test, rectangle may throw an exception
+		Rectangle rect;
+		try {
+			rect = testPage.selectList.getElement().getRect();
+		} catch (WebDriverException e) {
+			rect = new Rectangle(testPage.selectList.getElement().getLocation(), testPage.selectList.getElement().getSize());
+		}
+		Assert.assertEquals(new CachedHtmlElement(testPage.selectList.getElement()).getRect(), rect);
 	}
 	
 	
