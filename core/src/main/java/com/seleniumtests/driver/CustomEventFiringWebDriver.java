@@ -320,8 +320,12 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
 	@SuppressWarnings("unchecked")
 	public Point getScrollPosition() {
 		if (isWebTest) {
-			List<Long> dims = (List<Long>)((JavascriptExecutor) driver).executeScript(JS_GET_CURRENT_SCROLL_POSITION);
-			return new Point(dims.get(0).intValue(), dims.get(1).intValue());
+			try {
+				List<Long> dims = (List<Long>)((JavascriptExecutor) driver).executeScript(JS_GET_CURRENT_SCROLL_POSITION);
+				return new Point(dims.get(0).intValue(), dims.get(1).intValue());
+			} catch (Exception e) {
+    			return new Point(0, 0);
+    		}
 		} else {
 			throw new WebDriverException("scroll position can only be get for web");
 		}
