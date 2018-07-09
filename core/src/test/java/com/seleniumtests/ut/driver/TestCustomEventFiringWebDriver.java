@@ -9,6 +9,7 @@ import java.util.Arrays;
 
 import org.mockito.Mock;
 import org.openqa.selenium.Dimension;
+import org.openqa.selenium.Point;
 import org.openqa.selenium.WebDriver.Options;
 import org.openqa.selenium.WebDriver.Window;
 import org.openqa.selenium.WebDriverException;
@@ -126,4 +127,41 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 		Assert.assertEquals(dim.height, 100);
 		Assert.assertEquals(dim.width, 100);
 	}
+	
+	/**
+	 * check that if an error occurs during javascript invocation, window size is returned (issue #161)
+	 */
+	@Test(groups = {"ut"})
+	public void testNullJavascriptReplyForScrollPosition() {
+		Point point = ((CustomEventFiringWebDriver)eventDriver).getScrollPosition();
+		
+		// check we get the default position: (0,0)
+		Assert.assertEquals(point.x, 0);
+		Assert.assertEquals(point.y, 0);
+	}
+	
+	/**
+	 * Check standard web case where dimension comes from javascript call
+	 */
+	@Test(groups = {"ut"})
+	public void testScrollPosition() {
+		when(driver.executeScript(anyString())).thenReturn(Arrays.asList(120L, 80L));
+		Point point = ((CustomEventFiringWebDriver)eventDriver).getScrollPosition();
+		
+		// check we get the scroll position
+		Assert.assertEquals(point.x, 120);
+		Assert.assertEquals(point.y, 80);
+	}
+	
+	/**
+	 * For non web test, dimension is returned from driver call, not javascript
+	 */
+	@Test(groups = {"ut"}, expectedExceptions=WebDriverException.class)
+	public void testScrollPositionNonWebTest() {
+		eventDriver = spy(new CustomEventFiringWebDriver(driver, null, null, false, DriverMode.LOCAL, null, null).register(new DriverExceptionListener()));
+		when(driver.executeScript(anyString())).thenReturn(Arrays.asList(120L, 80L));
+		((CustomEventFiringWebDriver)eventDriver).getScrollPosition();
+
+	}
+	
 }
