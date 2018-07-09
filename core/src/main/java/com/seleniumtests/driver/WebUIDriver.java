@@ -17,6 +17,9 @@
 package com.seleniumtests.driver;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -52,6 +55,7 @@ import com.seleniumtests.util.osutility.OSUtility;
 import com.seleniumtests.util.osutility.OSUtilityFactory;
 
 import net.lightbody.bmp.BrowserMobProxy;
+import net.lightbody.bmp.core.har.Har;
 
 /**
  * This class provides factory to create webDriver session.
@@ -192,9 +196,35 @@ public class WebUIDriver {
         } 
         
         // in case of mobile test with appium, stop appium server
-        if (iWebDriverFactory instanceof AppiumDriverFactory) {
-        	((AppiumDriverFactory) iWebDriverFactory).getAppiumLauncher().stopAppium();
+        try {
+	        if (iWebDriverFactory instanceof AppiumDriverFactory) {
+	        	((AppiumDriverFactory) iWebDriverFactory).getAppiumLauncher().stopAppium();
+	        }
+        } catch (Exception e) {
+        	logger.error("Error stopping Appium: " + e.getMessage());
         }
+        
+        // stop HAR capture in case it has not already been done by SeleniumRobotTestListener. This may be the case when a driver is created in @AfterMethod
+		try {
+	        if (getWebUIDriver(false).getConfig().getBrowserMobProxy() != null) {
+				getWebUIDriver(false).getConfig().getBrowserMobProxy().endHar();
+				getWebUIDriver(false).getConfig().setBrowserMobProxy(null);
+			}
+		} catch (Exception e) {
+			logger.error("Error stopping browsermob proxy: " + e.getMessage());
+		}
+		
+		// stop video capture
+		try {
+			if (getWebUIDriver(false).getConfig().getVideoRecorder() != null) {
+				CustomEventFiringWebDriver.stopVideoCapture(SeleniumTestsContextManager.getThreadContext().getRunMode(), 
+															SeleniumTestsContextManager.getThreadContext().getSeleniumGridConnector(),
+															WebUIDriver.getWebUIDriver(false).getConfig().getVideoRecorder());
+				getWebUIDriver(false).getConfig().setVideoRecorder(null);
+			}
+		} catch (Exception e) {
+			logger.error("Error stopping video capture: " + e.getMessage());
+		}
 
         driverSession.remove();
     }
