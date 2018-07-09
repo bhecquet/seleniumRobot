@@ -177,19 +177,22 @@ public class TestCachedHtmlElement extends GenericTest {
 		Assert.assertTrue(new CachedHtmlElement(testPage.selectList.getElement()).isDisplayed());
 	}
 	
+	/**
+	 * Check cached location is the same as the real element location
+	 */
 	@Test(groups={"ut"})
 	public void testGetLocation() {
-		Assert.assertEquals(new CachedHtmlElement(testPage.selectList.getElement()).getLocation(), new Point(5, 5));
+		Assert.assertEquals(new CachedHtmlElement(testPage.selectList.getElement()).getLocation(), testPage.selectList.getElement().getLocation());
 	}
 	
 	@Test(groups={"ut"})
 	public void testGetSize() {
-		Assert.assertEquals(new CachedHtmlElement(testPage.selectList.getElement()).getSize(), new Dimension(1264, 54));
+		Assert.assertEquals(new CachedHtmlElement(testPage.selectList.getElement()).getSize(), testPage.selectList.getElement().getSize());
 	}
 	
 	@Test(groups={"ut"})
 	public void testGetRectangle() {
-		Assert.assertEquals(new CachedHtmlElement(testPage.selectList.getElement()).getRect(), new Rectangle(new Point(5, 5), new Dimension(1264, 54)));
+		Assert.assertEquals(new CachedHtmlElement(testPage.selectList.getElement()).getRect(),  testPage.selectList.getElement().getRect());
 	}
 	
 	
