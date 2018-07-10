@@ -213,6 +213,9 @@ public class SeleniumRobotLogger {
 		Appender fileAppender = Logger.getRootLogger().getAppender(FILE_APPENDER_NAME);
 		if (fileAppender != null) {
 			fileAppender.close();
+			
+			// wait for handler to be closed
+			WaitHelper.waitForSeconds(1);
 			Logger.getRootLogger().removeAppender(FILE_APPENDER_NAME);
 			new File(outputDirectory + "/" + SeleniumRobotLogger.LOG_FILE_NAME).delete();
 		}
