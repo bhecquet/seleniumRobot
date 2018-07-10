@@ -53,6 +53,7 @@ public class TestSeleniumRobotLogger extends MockitoTest {
 			
 		} finally {
 			System.clearProperty("devMode");
+			SeleniumRobotLogger.reset();
 		}
 	}
 	
@@ -82,6 +83,7 @@ public class TestSeleniumRobotLogger extends MockitoTest {
 			
 		} finally {
 			System.clearProperty("devMode");
+			SeleniumRobotLogger.reset();
 		}
 	}
 }
