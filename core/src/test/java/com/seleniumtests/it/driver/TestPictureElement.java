@@ -26,6 +26,7 @@ import com.seleniumtests.customexception.ImageSearchException;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.it.driver.support.GenericMultiBrowserTest;
 import com.seleniumtests.it.driver.support.pages.DriverTestPage;
+import com.seleniumtests.util.helper.WaitHelper;
 
 public class TestPictureElement extends GenericMultiBrowserTest {
 	
@@ -56,6 +57,7 @@ public class TestPictureElement extends GenericMultiBrowserTest {
 		} catch (ImageSearchException e) {
 			throw new SkipException("Image not found, we may be on screenless slave", e);
 		}
+		WaitHelper.waitForMilliSeconds(500); // in case of browser slowness
 		Assert.assertEquals(testPage.logoText.getValue(), "ff logo");
 	}
 	
@@ -69,6 +71,7 @@ public class TestPictureElement extends GenericMultiBrowserTest {
 		} catch (ImageSearchException e) {
 			throw new SkipException("Image not found, we may be on screenless slave", e);
 		}
+		WaitHelper.waitForMilliSeconds(500); // in case of browser slowness
 		Assert.assertEquals(testPage.textElement.getValue(), "image");
 	}
 	
@@ -77,7 +80,8 @@ public class TestPictureElement extends GenericMultiBrowserTest {
 	 */
 	@Test(groups={"it"})
 	public void testActionDurationIsLogged() {
-		Assert.assertEquals(testPageWithoutPattern.googlePicture.getActionDuration(), 0);
+		// be sure action duration has been reset
+		testPageWithoutPattern.googlePicture.setActionDuration(0);
 		try {
 			testPageWithoutPattern.googlePicture.click();
 		} catch (ImageSearchException e) {
@@ -96,6 +100,7 @@ public class TestPictureElement extends GenericMultiBrowserTest {
 		} catch (ImageSearchException e) {
 			throw new SkipException("Image not found, we may be on screenless slave", e);
 		}
+		WaitHelper.waitForMilliSeconds(500); // in case of browser slowness
 		Assert.assertEquals(testPage.textElement.getValue(), "image");
 	}
 	
@@ -107,6 +112,7 @@ public class TestPictureElement extends GenericMultiBrowserTest {
 		} catch (ImageSearchException e) {
 			throw new SkipException("Image not found, we may be on screenless slave", e);
 		}
+		WaitHelper.waitForMilliSeconds(500); // in case of browser slowness
 		Assert.assertEquals(testPage.logoText.getValue(), "hello");
 	}
 

@@ -209,4 +209,8 @@ public abstract class GenericPictureElement {
 	public long getActionDuration() {
 		return actionDuration;
 	}
+
+	public void setActionDuration(long actionDuration) {
+		this.actionDuration = actionDuration;
+	}
 }

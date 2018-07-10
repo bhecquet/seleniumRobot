@@ -87,7 +87,7 @@ public class TestOsUtility extends GenericTest {
 	@Test(groups={"it"})
 	public void testGetProcessNameFromPid() {
 		if (OSUtility.isWindows()) {
-			Assert.assertEquals(osUtil.getProgramNameFromPid(processId), "javaw.exe");
+			Assert.assertTrue(osUtil.getProgramNameFromPid(processId).startsWith("java"));
 		}
 	}
 	
