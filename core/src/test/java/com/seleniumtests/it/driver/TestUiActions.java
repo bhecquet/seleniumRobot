@@ -116,6 +116,7 @@ public class TestUiActions extends GenericTest {
 	public void destroyDriver() {
 		if (driver != null) {
 			WebUIDriver.cleanUp();
+			WebUIDriver.cleanUpWebUIDriver();
 		}
 	}
 }

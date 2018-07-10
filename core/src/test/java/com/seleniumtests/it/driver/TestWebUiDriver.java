@@ -111,6 +111,7 @@ public class TestWebUiDriver extends ReporterTest {
 		PowerMockito.verifyNew(AndroidDriver.class).withArguments(any(URL.class), any(DesiredCapabilities.class));
 				
 		WebUIDriver.cleanUp();
+		WebUIDriver.cleanUpWebUIDriver();
 		verify(appiumLauncher).stopAppium();
 	}
 	
@@ -181,6 +182,7 @@ public class TestWebUiDriver extends ReporterTest {
 	public void closeBrowser() {
 		try {
 			WebUIDriver.cleanUp();
+			WebUIDriver.cleanUpWebUIDriver();
 		} catch (WebDriverException e) {
 			
 		}

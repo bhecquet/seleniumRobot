@@ -34,6 +34,7 @@ public class TestHtmlUnitBrowserSnapshot extends MockitoTest {
 	@AfterMethod(groups={"it"})
 	public void closeBrowser() {
 		WebUIDriver.cleanUp();
+		WebUIDriver.cleanUpWebUIDriver();
 	}
 	
 	/**

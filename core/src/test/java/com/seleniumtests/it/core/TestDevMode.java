@@ -98,6 +98,7 @@ public class TestDevMode extends GenericTest {
 			testHomePage.selectList.selectByText("option2");
 			if (driver != null) {
 				WebUIDriver.cleanUp();
+				WebUIDriver.cleanUpWebUIDriver();
 			}
 		} catch (Exception e) {
 			logger.error(e);

@@ -47,6 +47,7 @@ public class TestNewWindow extends GenericTest {
 	@AfterClass(groups={"it"})
 	public void closeBrowser() {
 		WebUIDriver.cleanUp();
+		WebUIDriver.cleanUpWebUIDriver();
 	}
 	
 	/**

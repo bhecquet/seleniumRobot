@@ -73,6 +73,7 @@ public class GenericTest {
 	@AfterClass(groups={"ut", "it"})
 	public void closeBrowser() {
 		WebUIDriver.cleanUp();
+		WebUIDriver.cleanUpWebUIDriver();
 	}
 	
 	protected File createFileFromResource(String resource) throws IOException {
