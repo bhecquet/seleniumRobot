@@ -102,25 +102,25 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		// check content for details results
 		String detailedReportContent1 = readTestMethodResultFile("testAndSubActions");
 		Assert.assertEquals(StringUtils.countMatches(detailedReportContent1, "Pre test step: setCount"), 1);
-		Assert.assertEquals(StringUtils.countMatches(detailedReportContent1, "Pre test step: set"), 1);
-		Assert.assertEquals(StringUtils.countMatches(detailedReportContent1, "step 1"), 1);
-		Assert.assertEquals(StringUtils.countMatches(detailedReportContent1, "step 2"), 1);
+		Assert.assertEquals(StringUtils.countMatches(detailedReportContent1, "Pre test step: set "), 1);
+		Assert.assertEquals(StringUtils.countMatches(detailedReportContent1, "step 1 -"), 1);
+		Assert.assertEquals(StringUtils.countMatches(detailedReportContent1, "step 2 -"), 1);
 		Assert.assertEquals(StringUtils.countMatches(detailedReportContent1, "Test end"), 1);
 		Assert.assertEquals(StringUtils.countMatches(detailedReportContent1, "Post test step: reset"), 1);
 		
 		// check content for details results
 		String detailedReportContent2 = readTestMethodResultFile("testInError");
 		Assert.assertEquals(StringUtils.countMatches(detailedReportContent2, "Pre test step: setCount"), 1);
-		Assert.assertEquals(StringUtils.countMatches(detailedReportContent2, "Pre test step: set"), 1);
-		Assert.assertEquals(StringUtils.countMatches(detailedReportContent2, "step 1"), 1);
+		Assert.assertEquals(StringUtils.countMatches(detailedReportContent2, "Pre test step: set "), 1);
+		Assert.assertEquals(StringUtils.countMatches(detailedReportContent2, "step 1 -"), 1);
 		Assert.assertEquals(StringUtils.countMatches(detailedReportContent2, "Test end"), 1);
 		Assert.assertEquals(StringUtils.countMatches(detailedReportContent2, "Post test step: reset"), 1);
 		
 		// check content for details results
 		String detailedReportContent3 = readTestMethodResultFile("testWithException");
 		Assert.assertEquals(StringUtils.countMatches(detailedReportContent3, "Pre test step: setCount"), 1);
-		Assert.assertEquals(StringUtils.countMatches(detailedReportContent3, "Pre test step: set"), 1);
-		Assert.assertEquals(StringUtils.countMatches(detailedReportContent3, "step 1"), 1);
+		Assert.assertEquals(StringUtils.countMatches(detailedReportContent3, "Pre test step: set "), 1);
+		Assert.assertEquals(StringUtils.countMatches(detailedReportContent3, "step 1 -"), 1);
 		Assert.assertEquals(StringUtils.countMatches(detailedReportContent3, "Test end"), 1);
 		Assert.assertEquals(StringUtils.countMatches(detailedReportContent3, "Post test step: reset"), 1);
 	}

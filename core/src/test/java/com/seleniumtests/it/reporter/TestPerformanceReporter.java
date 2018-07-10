@@ -42,7 +42,7 @@ public class TestPerformanceReporter extends ReporterTest {
 	
 	@BeforeMethod(groups={"it"})
 	private void deleteGeneratedFiles() throws IOException {
-		FileUtils.deleteDirectory(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()));
+		FileUtils.deleteQuietly(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()));
 		
 		
 	}

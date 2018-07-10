@@ -11,10 +11,8 @@ import org.testng.xml.XmlSuite.ParallelMode;
 
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
-import com.seleniumtests.driver.DriverMode;
 import com.seleniumtests.driver.screenshots.VideoRecorder;
 import com.seleniumtests.it.reporter.ReporterTest;
-import com.seleniumtests.util.FileUtility;
 import com.seleniumtests.util.helper.WaitHelper;
 
 public class TestVideoRecorder extends ReporterTest {

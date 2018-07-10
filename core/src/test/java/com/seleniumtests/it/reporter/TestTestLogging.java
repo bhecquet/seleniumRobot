@@ -112,6 +112,7 @@ public class TestTestLogging extends ReporterTest {
 	public void testManualSteps(ITestContext testContext) throws Exception {
 		
 		SeleniumTestsContextManager.getThreadContext().setManualTestSteps(true);
+		SeleniumTestsContextManager.getThreadContext().setBrowser("htmlunit");
 		TestLogging.reset();
 		
 		try {
