@@ -142,6 +142,7 @@ public abstract class GenericMultiBrowserTest {
 		}
 		if (driver != null) {
 			WebUIDriver.cleanUp();
+			WebUIDriver.cleanUpWebUIDriver();
 		}
 		driver = null;
 	}

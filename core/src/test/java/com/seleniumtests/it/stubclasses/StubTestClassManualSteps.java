@@ -33,6 +33,7 @@ public class StubTestClassManualSteps extends StubParentClass {
 	@AfterClass(groups={"stub"})
 	public void teardown() {
 		WebUIDriver.cleanUp();
+		WebUIDriver.cleanUpWebUIDriver();
 	}
 	
 	@BeforeMethod(groups={"stub"})
