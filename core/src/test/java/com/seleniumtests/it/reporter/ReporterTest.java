@@ -34,8 +34,9 @@ public class ReporterTest extends MockitoTest {
 	@BeforeMethod(groups={"it"})
 	public void setLogs(Method method, ITestContext context) throws IOException {
 		TestLogging.reset();
+	
 		SeleniumTestsContext.resetOutputFolderNames();
-		FileUtils.deleteDirectory(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()));
+		FileUtils.deleteQuietly(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()));
 	}
 	
 	protected TestNG executeSubTest(String[] testClasses) throws IOException {
