@@ -35,7 +35,9 @@ public class StubParentClass extends SeleniumTestPlan {
 	 */
 	@BeforeSuite(groups="stub")
 	public void initSuite(final ITestContext testContext) {
-		System.setProperty(SeleniumTestsContext.VIDEO_CAPTURE, "false");
+		if (System.getProperty(SeleniumTestsContext.VIDEO_CAPTURE) == null) {
+			System.setProperty(SeleniumTestsContext.VIDEO_CAPTURE, "false");
+		}
 	}
 	
 	@AfterSuite(groups="stub")
