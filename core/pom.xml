@@ -432,7 +432,7 @@
 				<configuration>
 					<complianceLevel>1.8</complianceLevel>
 					<source>1.8</source>
-					<showWeaveInfo>false</showWeaveInfo>
+					<showWeaveInfo>true</showWeaveInfo>
 					<weaveDependencies>
 			            <weaveDependency>
 			              <groupId>org.seleniumhq.selenium</groupId>
@@ -458,6 +458,9 @@
 						<goals>
 							<goal>test-compile</goal>     
 						</goals>
+						<configuration>
+						
+						</configuration>
 					</execution>
 				</executions>
 			</plugin>
