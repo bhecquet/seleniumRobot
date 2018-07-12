@@ -103,7 +103,8 @@ public class SeleniumTestsContext {
     public static final String SELENIUMROBOTSERVER_URL = "seleniumRobotServerUrl";
     public static final String SELENIUMROBOTSERVER_ACTIVE = "seleniumRobotServerActive";
     public static final String SELENIUMROBOTSERVER_COMPARE_SNAPSHOT = "seleniumRobotServerCompareSnapshots";			// whether we should use the snapshots created by robot to compare them to a previous execution. This option only operates when SeleniumRobot server is connected
-    public static final String SELENIUMROBOTSERVER_RECORD_RESULTS = "seleniumRobotServerRecordResults";			// whether we should record test results to server. This option only operates when SeleniumRobot server is connected
+    public static final String SELENIUMROBOTSERVER_RECORD_RESULTS = "seleniumRobotServerRecordResults";				// whether we should record test results to server. This option only operates when SeleniumRobot server is connected
+    public static final String SELENIUMROBOTSERVER_VARIABLES_OLDER_THAN = "seleniumRobotServerVariablesOlderThan";	// whether we should get from server variables which were created at least X days ago
     
     public static final String SET_ASSUME_UNTRUSTED_CERTIFICATE_ISSUER = "setAssumeUntrustedCertificateIssuer"; // Firefox uniquement pour qu'il ne prenne pas en compte les certificats invalides 
     public static final String SET_ACCEPT_UNTRUSTED_CERTIFICATES = "setAcceptUntrustedCertificates"; // Firefox uniquement pour qu'il ne prenne pas en compte les certificats invalides
@@ -215,6 +216,7 @@ public class SeleniumTestsContext {
 	public static final boolean DEFAULT_SELENIUMROBOTSERVER_RECORD_RESULTS = false;
 	public static final boolean DEFAULT_SELENIUMROBOTSERVER_COMPARE_SNAPSHOT = false;
 	public static final boolean DEFAULT_SELENIUMROBOTSERVER_ACTIVE = false;
+	public static final int DEFAULT_SELENIUMROBOTSERVER_VARIABLES_OLDER_THAN = 0;
 	public static final int DEFAULT_PAGE_LOAD_TIME_OUT = 90;
 	public static final int DEFAULT_EXPLICIT_WAIT_TIME_OUT = 15;
 	public static final int DEFAULT_IMPLICIT_WAIT_TIME_OUT = 5;
@@ -278,6 +280,8 @@ public class SeleniumTestsContext {
         setSeleniumRobotServerActive(getBoolValueForTest(SELENIUMROBOTSERVER_ACTIVE, System.getProperty(SELENIUMROBOTSERVER_ACTIVE)));
         setSeleniumRobotServerCompareSnapshot(getBoolValueForTest(SELENIUMROBOTSERVER_COMPARE_SNAPSHOT, System.getProperty(SELENIUMROBOTSERVER_COMPARE_SNAPSHOT)));
         setSeleniumRobotServerRecordResults(getBoolValueForTest(SELENIUMROBOTSERVER_RECORD_RESULTS, System.getProperty(SELENIUMROBOTSERVER_RECORD_RESULTS)));
+        setSeleniumRobotServerVariableOlderThan(getIntValueForTest(SELENIUMROBOTSERVER_VARIABLES_OLDER_THAN, System.getProperty(SELENIUMROBOTSERVER_VARIABLES_OLDER_THAN)));
+        
         setWebDriverGrid(getValueForTest(WEB_DRIVER_GRID, System.getProperty(WEB_DRIVER_GRID)));
         setRunMode(getValueForTest(RUN_MODE, System.getProperty(RUN_MODE)));       
         setMaskPassword(getBoolValueForTest(MASK_PASSWORD, System.getProperty(MASK_PASSWORD)));       
@@ -831,7 +835,7 @@ public class SeleniumTestsContext {
     	
     	if (variableServer != null) {
     		// get variable from server
-			getConfiguration().putAll(variableServer.getVariables());
+			getConfiguration().putAll(variableServer.getVariables(getSeleniumRobotServerVariableOlderThan()));
 			
 			// give priority to command line parameters over those from server, so overwrite variable server if overlapping
 			getConfiguration().putAll(getUserDefinedVariablesFromCommandLine());
@@ -1026,6 +1030,10 @@ public class SeleniumTestsContext {
     
     public boolean getSeleniumRobotServerCompareSnapshot() {
     	return (Boolean) getAttribute(SELENIUMROBOTSERVER_COMPARE_SNAPSHOT);
+    }
+    
+    public Integer getSeleniumRobotServerVariableOlderThan() {
+    	return (Integer) getAttribute(SELENIUMROBOTSERVER_VARIABLES_OLDER_THAN);
     }
     
     public boolean getSeleniumRobotServerRecordResults() {
@@ -1518,6 +1526,14 @@ public class SeleniumTestsContext {
     		setAttribute(SELENIUMROBOTSERVER_COMPARE_SNAPSHOT, capture);
     	} else {
     		setAttribute(SELENIUMROBOTSERVER_COMPARE_SNAPSHOT, DEFAULT_SELENIUMROBOTSERVER_COMPARE_SNAPSHOT);
+    	}
+    }
+    
+    public void setSeleniumRobotServerVariableOlderThan(Integer olderThan) {
+    	if (olderThan != null) {
+    		setAttribute(SELENIUMROBOTSERVER_VARIABLES_OLDER_THAN, olderThan);
+    	} else {
+    		setAttribute(SELENIUMROBOTSERVER_VARIABLES_OLDER_THAN, DEFAULT_SELENIUMROBOTSERVER_VARIABLES_OLDER_THAN);
     	}
     }
     

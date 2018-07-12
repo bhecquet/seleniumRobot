@@ -38,13 +38,19 @@ public class SeleniumRobotVariableServerConnector extends SeleniumRobotServerCon
 	public boolean isAlive() {
 		return isAlive("/variable/api/");
 	}
+	
+	public Map<String, TestVariable> getVariables() {
+		return getVariables(0);
+	}
 
 	/**
 	 * Retrieve all variables from the server
 	 * Display a warning when a custom variable prefix "custom.test.variable." overwrites or is overwritten by a regular one
+	 * 
+	 * @param variablesOlderThanDays number of days since this variable should be created before it can be returned. This only applies to variables which have a time to live (a.k.a: where destroyAfterDays parameter is > 0) 
 	 * @return
 	 */
-	public Map<String, TestVariable> getVariables() {
+	public Map<String, TestVariable> getVariables(Integer variablesOlderThanDays) {
 		if (!active) {
 			throw new SeleniumRobotServerException("Server is not active");
 		}
@@ -56,6 +62,7 @@ public class SeleniumRobotVariableServerConnector extends SeleniumRobotServerCon
 					.queryString("version", versionId)
 					.queryString("environment", environmentId)
 					.queryString("test", testCaseId)
+					.queryString("olderThan", variablesOlderThanDays)
 					.queryString("format", "json"));
 			
 			Map<String, TestVariable> variables = new HashMap<>();
@@ -115,7 +122,9 @@ public class SeleniumRobotVariableServerConnector extends SeleniumRobotServerCon
 	 * If this is an existing variable, only update the value. Else, create it with current environment, application, version.
 	 * A regular variable with a changed value will be added as a custom variable. There should be no way to update a regular variable from seleniumRobot.
 	 * Variable is created with "internal" flag set
-	 * @return
+	 * @param variable				the TestVariable instance to save
+	 * @param specificToVersion		if true, this variable will be assigned to the current application version. Else, it's assigned to the whole application
+	 * @return the updated TestVariable
 	 */
 	public TestVariable upsertVariable(TestVariable variable, boolean specificToVersion) {
 		
@@ -126,10 +135,11 @@ public class SeleniumRobotVariableServerConnector extends SeleniumRobotServerCon
 				MultipartBody request = Unirest.post(url + VARIABLE_API_URL)
 						.field("name", TestVariable.TEST_VARIABLE_PREFIX + variable.getName())
 						.field("value", variable.getValue())
-						.field("reservable", false)
+						.field("reservable", variable.isReservable())
 						.field("environment", environmentId)
 						.field("application", applicationId)
-						.field("internal", true);
+						.field("internal", true)
+						.field("timeToLive", variable.getTimeToLive());
 				
 				if (specificToVersion) {
 					request = request.field("version", versionId);
@@ -145,7 +155,8 @@ public class SeleniumRobotVariableServerConnector extends SeleniumRobotServerCon
 		} else {
 			try {
 				JSONObject variableJson = getJSonResponse(Unirest.patch(String.format(url + EXISTING_VARIABLE_API_URL, variable.getId()))
-						.field("value", variable.getValue()));
+						.field("value", variable.getValue())
+						.field("reservable", variable.isReservable()));
 				
 				return TestVariable.fromJsonObject(variableJson);
 				

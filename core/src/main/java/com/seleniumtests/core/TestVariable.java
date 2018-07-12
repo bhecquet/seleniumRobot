@@ -6,12 +6,14 @@ public class TestVariable {
 
 
 	public static final String TEST_VARIABLE_PREFIX = "custom.test.variable.";
+	public static final int TIME_TO_LIVE_INFINITE = -1; // value for saying that varible will never be deleted
 	private Integer id; 
 	private String name;
 	private String internalName;	// name of the variable as stored in variable server. For variables added by test, a prefix is prepended for storage
 									// this prefix is not visible to user.
 	private String value;
 	private boolean reservable;
+	private int timeToLive;
 	
 	
 	/**
@@ -22,11 +24,16 @@ public class TestVariable {
 	 * @param reservable
 	 */
 	public TestVariable(Integer id, String name, String value, boolean reservable, String internalName) {
+		this(id, name, value, reservable, internalName, TIME_TO_LIVE_INFINITE);
+	}
+	
+	public TestVariable(Integer id, String name, String value, boolean reservable, String internalName, int timeToLive) {
 		this.id = id;
 		this.name = name;
 		this.internalName = internalName;
 		this.value = value;
 		this.reservable = reservable;
+		this.timeToLive = timeToLive;
 	}
 	
 	/**
@@ -35,11 +42,7 @@ public class TestVariable {
 	 * @param value
 	 */
 	public TestVariable(String name, String value) {
-		this.id = null;
-		this.name = name;
-		this.internalName = name;
-		this.value = value;
-		this.reservable = false;
+		this(null, name, value, false, name, TIME_TO_LIVE_INFINITE);
 	}
 	
 	public static TestVariable fromJsonObject(JSONObject variableJson) {
@@ -48,7 +51,8 @@ public class TestVariable {
 							name, 
 							variableJson.getString("value"),
 							variableJson.optBoolean("reservable", false),
-							variableJson.getString("name"));
+							variableJson.getString("name"),
+							variableJson.optInt("timeToLive", TIME_TO_LIVE_INFINITE));
 	}
 	
 	public void setValue(String newValue) {
@@ -67,12 +71,32 @@ public class TestVariable {
 		return name;
 	}
 
+	public int getTimeToLive() {
+		return timeToLive;
+	}
+
 	public String getValue() {
 		return value;
 	}
 
 	public String getInternalName() {
 		return internalName;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public void setInternalName(String internalName) {
+		this.internalName = internalName;
+	}
+
+	public void setReservable(boolean reservable) {
+		this.reservable = reservable;
+	}
+
+	public void setTimeToLive(int timeToLive) {
+		this.timeToLive = timeToLive;
 	}
 
 	@Override
@@ -99,7 +123,10 @@ public class TestVariable {
         	return false;
         }
 
-        return this.getId() == other.getId() && this.getName() == other.getName();
+        return (this.getId() == other.getId() 
+        		&& this.getName() == other.getName() 
+        		&& this.isReservable() == other.isReservable()
+        		&& this.getTimeToLive() == other.getTimeToLive());
     }
 
     @Override

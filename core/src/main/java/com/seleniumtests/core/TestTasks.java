@@ -64,20 +64,42 @@ public class TestTasks {
      * 								current variable.
      */
 	public static void createOrUpdateParam(String key, String newValue, boolean specificToVersion) {
+		createOrUpdateParam(key, newValue, specificToVersion, TestVariable.TIME_TO_LIVE_INFINITE, false);
+	}
+		
+	/**
+     * Method for creating or updating a variable on the seleniumRobot server ONLY. This will raise a ScenarioException if variables are get from
+     * env.ini file 
+     * Moreover, created custom variable is specific to tuple (application, version, test environment)
+     * @param key					name of the param
+     * @param newValue				value of the parameter (or new value if we update it)
+     * @param specificToVersion		if true, this param will be stored on server with a reference to the application version. This will have no effect if changing a 
+     * 								current variable.
+     * @param timeToLive			if > 0, this variable will be destroyed after some days (defined by variable). A positive value is mandatory if reservable is set to true 
+     * 								because multiple variable can be created
+     * @param reservable			if true, this variable will be set as reservable in variable server. This means it can be used by only one test at the same time
+     * 								True value also means that multiple variables of the same name can be created and a timeToLive > 0 MUST be provided so that server database is regularly purged
+     */
+	public static void createOrUpdateParam(String key, String newValue, boolean specificToVersion, int timeToLive, boolean reservable) {
 		
 		SeleniumRobotVariableServerConnector variableServer = SeleniumTestsContextManager.getThreadContext().getVariableServer();
 		
 		if (variableServer == null) {
 			throw new ScenarioException("Cannot create or update variable if seleniumRobot server is not connected");
 		}
+		if (reservable && timeToLive <= 0) {
+			throw new ScenarioException("When creating a variable as reservable, a positive timeToLive value MUST be provided");
+		}
 		
 		// check if we update an existing variable
 		TestVariable variable = SeleniumTestsContextManager.getThreadContext().getConfiguration().get(key);
-		if (variable == null) {
-			variable = new TestVariable(key, newValue);
+		if (variable == null || reservable) {
+			variable = new TestVariable(key, newValue);	
 		} else {
 			variable.setValue(newValue);
 		}
+		variable.setReservable(reservable);
+		variable.setTimeToLive(timeToLive);
 		
 		TestVariable newVariable = variableServer.upsertVariable(variable, specificToVersion);
 		SeleniumTestsContextManager.getThreadContext().getConfiguration().put(newVariable.getName(), newVariable);
