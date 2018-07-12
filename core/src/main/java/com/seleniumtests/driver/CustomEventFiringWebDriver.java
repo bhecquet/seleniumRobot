@@ -237,7 +237,7 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
 	public Dimension getViewPortDimensionWithoutScrollbar() {
     	if (isWebTest) {
     		try {
-	    		List<Long> dims = (List<Long>)((JavascriptExecutor)driver).executeScript(JS_GET_VIEWPORT_SIZE);
+	    		List<Number> dims = (List<Number>)((JavascriptExecutor)driver).executeScript(JS_GET_VIEWPORT_SIZE);
 	    		return new Dimension(dims.get(0).intValue(), dims.get(1).intValue());
     		} catch (Exception e) {
     			return driver.manage().window().getSize();
@@ -257,7 +257,7 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
     public Dimension getContentDimension() {
     	if (isWebTest) {
     		try {
-				List<Long> dims = (List<Long>)((JavascriptExecutor)driver).executeScript(JS_GET_CONTENT_ENTIRE_SIZE);
+				List<Number> dims = (List<Number>)((JavascriptExecutor)driver).executeScript(JS_GET_CONTENT_ENTIRE_SIZE);
 		    	return new Dimension(dims.get(0).intValue(), dims.get(1).intValue());
     		} catch (Exception e) {
     			return driver.manage().window().getSize();
@@ -321,7 +321,7 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
 	public Point getScrollPosition() {
 		if (isWebTest) {
 			try {
-				List<Long> dims = (List<Long>)((JavascriptExecutor) driver).executeScript(JS_GET_CURRENT_SCROLL_POSITION);
+				List<Number> dims = (List<Number>)((JavascriptExecutor) driver).executeScript(JS_GET_CURRENT_SCROLL_POSITION);
 				return new Point(dims.get(0).intValue(), dims.get(1).intValue());
 			} catch (Exception e) {
     			return new Point(0, 0);
