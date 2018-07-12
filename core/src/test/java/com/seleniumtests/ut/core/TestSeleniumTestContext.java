@@ -606,6 +606,19 @@ public class TestSeleniumTestContext extends GenericTest {
 	}
 	
 	@Test(groups="ut context")
+	public void testSeleniumRobotVariablesOlderThan(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setSeleniumRobotServerVariableOlderThan(5);
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getSeleniumRobotServerVariableOlderThan(), (Integer)5);
+	}
+	@Test(groups="ut context")
+	public void testSeleniumRobotVariablesOlderThanNull(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setSeleniumRobotServerVariableOlderThan(null);
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getSeleniumRobotServerVariableOlderThan(), (Integer)SeleniumTestsContext.DEFAULT_SELENIUMROBOTSERVER_VARIABLES_OLDER_THAN);
+	}
+	
+	@Test(groups="ut context")
 	public void testCompareSnapshot(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setSeleniumRobotServerCompareSnapshot(true);

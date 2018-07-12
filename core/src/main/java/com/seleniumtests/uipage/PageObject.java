@@ -264,6 +264,21 @@ public class PageObject extends BasePage implements IPage {
     public void createOrUpdateParam(String key, String value, boolean specificToVersion) {
     	TestTasks.createOrUpdateParam(key, value, specificToVersion);
     }
+    
+    /**
+     * Method for creating or updating a variable on the seleniumRobot server ONLY. This will raise a ScenarioException if variables are get from
+     * env.ini file 
+     * Moreover, created custom variable is specific to tuple (application, version, test environment)
+     * @param key					name of the param
+     * @param newValue				value of the parameter (or new value if we update it)
+     * @param specificToVersion		if true, this param will be stored on server with a reference to the application version. This will have no effect if changing a 
+     * 								current variable.
+     * @param timeToLive			if > 0, this variable will be destroyed after some days (defined by variable)
+     * @param reservable			if true, this variable will be set as reservable in variable server. This means it can be used by only one test at the same time
+     */
+    public void createOrUpdateParam(String key, String value, boolean specificToVersion, int timeToLive, boolean reservable) {
+    	TestTasks.createOrUpdateParam(key, value, specificToVersion, timeToLive, reservable);
+    }
 
     public void assertHtmlSource(final String text) {
         assertHTML(getHtmlSource().contains(text), "Text: {" + text + "} not found on page source.");

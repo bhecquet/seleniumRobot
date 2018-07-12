@@ -50,6 +50,8 @@ public class TestSeleniumRobotVariableServerConnector extends GenericTest {
 	@Test(groups={"it"}, enabled=false)
 	public void testUpsert() {
 		TestVariable variable = new TestVariable("key.test", "value");
+		variable.setReservable(true);
+		variable.setTimeToLive(3);
 //		TestVariable variable = new TestVariable(16, "key.test", "value", false, "custom.test.variable.key.test");
 		variable = connector.upsertVariable(variable, false);
 //		variable.setValue("newValue");

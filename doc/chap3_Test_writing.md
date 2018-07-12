@@ -215,7 +215,7 @@ A typical PageObject method whould be
 
 **WARN** DO NOT give the same test name in different test classes as it leads to wrong logging reporting
 
-#### Accessing test data ####
+#### Accessing test data and storing temp data ####
 See part 6 ("env.ini configuration" and "seleniumRobot server") to see how to get test data in scenario
 
 You may consider putting all test data access in the Test script, not in page object. This helps maintenance when we want to know which variables are used.
@@ -228,10 +228,22 @@ You may consider putting all test data access in the Test script, not in page ob
 	}
 	
 Test data are get using `param(<key>)` or updated via `createOrUpdateParam`. The later is only available when seleniumRobot server is used.
-`createOrUpdateParam(<key>, <value>)` is used to store a variable with reference to environment, application and application version
-`createOrUpdateParam(<key>, <value>, <boolean>)` is used to store a variable with reference to environment, application. Reference to application version is optional
+`createOrUpdateParam(<key>, <value>)` is used to store a variable with reference to environment, application
+`createOrUpdateParam(<key>, <value>, <attach_to_version>)` is used to store a variable with reference to environment, application. Reference to application version is optional
+`createOrUpdateParam(<key>, <value>, <attach_to_version>, <time_to_live>, <reservable>)` is used to store a variable with reference to environment, application. Reference to application version is optional. In this case, we can specify that server will destroy variable after X days (the time to live) and that this variable can be reserved. 
 	
 **WARN** DO NOT try to access test data inside a `@BeforeXXX` method, they are not available. Only parameters defined in XML or as user parameters are available. At this stage, `env.ini` file or variable server have not been read.
+
+#### Use variable server to hold variables during some days ####
+
+The use case is: 
+- test script creates some object (say, a client)
+- test script stores the client name or id to selenium server for later reuse
+- several other test scripts needs a client reference to work on, so they need to reserve it so that they do not work on the same client at the same time. Clients created recently cannot be used because some batch needs to be executed and it's executed during the next night. So, we need client from the day before on which batch has been executed
+- to avoid having too many clients stored in selenium server database, these temp variables are destroyed after timeToLive value.
+
+When storing your variable, use: `createOrUpdateParam(<key>, <value>, <attach_to_version>, <time_to_live>, <reservable>)` with reservable=true and time_to_live > 0
+When executing test, use parameter `seleniumRobotServerVariablesOlderThan=1` so that we only get variables created the day before. Keep in mind that this parameter only applies to variables created with a timeToLive value > 0. Other variables are returned without restriction.
 
 #### Using TestNG annotations ####
 

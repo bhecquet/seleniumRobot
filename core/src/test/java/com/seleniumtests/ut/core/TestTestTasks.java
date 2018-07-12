@@ -97,6 +97,75 @@ public class TestTestTasks extends MockitoTest {
 	}
 	
 	/**
+	 * Check that if variable exists but we request a reservable variable, it's recreated so that we can have multiple variables
+	 * @param testNGCtx
+	 * @param xmlTest
+	 * @throws Exception
+	 */
+	@Test(groups= {"ut"})
+	public void testUpdateExistingVariable(final ITestContext testNGCtx, final XmlTest xmlTest) throws Exception {
+		try {
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE, "true");
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL, "http://localhost:1234");
+			
+			PowerMockito.whenNew(SeleniumRobotVariableServerConnector.class).withAnyArguments().thenReturn(variableServer);
+			when(variableServer.isAlive()).thenReturn(true);
+			TestVariable varToReturn = new TestVariable(10, "key", "value", false, TestVariable.TEST_VARIABLE_PREFIX + "key");
+			when(variableServer.upsertVariable(any(TestVariable.class), anyBoolean())).thenReturn(varToReturn);
+			
+			SeleniumTestsContextManager.getThreadContext().getConfiguration().put("key", new TestVariable(10, "key", "value", false, TestVariable.TEST_VARIABLE_PREFIX + "key", 2));
+			
+			ITestResult testResult = GenericTest.generateResult(testNGCtx, getClass());
+			initThreadContext(testNGCtx, "myTest", testResult);
+			TestTasks.createOrUpdateParam("key", "value", false, 3, true);
+			
+			// check upsert has been called
+			verify(variableServer).upsertVariable(eq(new TestVariable(null, "key", "value", true, "key", 3)), eq(false));
+			
+			// check configuration is updated
+			Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getConfiguration().get("key"), varToReturn);
+		} finally {
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE);
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL);
+		}
+	}
+	
+	/**
+	 * Check that if variable exists, it's updated, if we do not request it to be reservable
+	 * @param testNGCtx
+	 * @param xmlTest
+	 * @throws Exception
+	 */
+	@Test(groups= {"ut"})
+	public void testRecreateExistingVariableIfReservable(final ITestContext testNGCtx, final XmlTest xmlTest) throws Exception {
+		try {
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE, "true");
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL, "http://localhost:1234");
+			
+			PowerMockito.whenNew(SeleniumRobotVariableServerConnector.class).withAnyArguments().thenReturn(variableServer);
+			when(variableServer.isAlive()).thenReturn(true);
+			TestVariable varToReturn = new TestVariable(10, "key", "value", false, TestVariable.TEST_VARIABLE_PREFIX + "key");
+			when(variableServer.upsertVariable(any(TestVariable.class), anyBoolean())).thenReturn(varToReturn);
+			
+			
+			ITestResult testResult = GenericTest.generateResult(testNGCtx, getClass());
+			initThreadContext(testNGCtx, "myTest", testResult);
+			SeleniumTestsContextManager.getThreadContext().getConfiguration().put("key", new TestVariable(10, "key", "value", false, TestVariable.TEST_VARIABLE_PREFIX + "key", 2));
+			
+			TestTasks.createOrUpdateParam("key", "value", false, 3, false);
+			
+			// check upsert has been called
+			verify(variableServer).upsertVariable(eq(new TestVariable(10, "key", "value", false, "key", 3)), eq(false));
+			
+			// check configuration is updated
+			Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getConfiguration().get("key"), varToReturn);
+		} finally {
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE);
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL);
+		}
+	}
+	
+	/**
 	 * Check upsert of a new variable which will not be version specific
 	 * Verify server is called and configuration is updated according to the new value
 	 * @param testNGCtx
@@ -123,6 +192,63 @@ public class TestTestTasks extends MockitoTest {
 			
 			// check configuration is updated
 			Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getConfiguration().get("key"), varToReturn);
+		} finally {
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE);
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL);
+		}
+	}
+	
+	/**
+	 * Check error is raised when TTL is not specified ( <= 0) for a reservable variable
+	 * @param testNGCtx
+	 * @param xmlTest
+	 * @throws Exception
+	 */
+	@Test(groups= {"ut"}, expectedExceptions=ScenarioException.class)
+	public void testUpdateReservableVariableWithoutTTL(final ITestContext testNGCtx, final XmlTest xmlTest) throws Exception {
+		try {
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE, "true");
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL, "http://localhost:1234");
+			
+			PowerMockito.whenNew(SeleniumRobotVariableServerConnector.class).withAnyArguments().thenReturn(variableServer);
+			when(variableServer.isAlive()).thenReturn(true);
+			TestVariable varToReturn = new TestVariable(10, "key", "value", false, TestVariable.TEST_VARIABLE_PREFIX + "key");
+			when(variableServer.upsertVariable(any(TestVariable.class), anyBoolean())).thenReturn(varToReturn);
+			
+			ITestResult testResult = GenericTest.generateResult(testNGCtx, getClass());
+			initThreadContext(testNGCtx, "myTest", testResult);
+			TestTasks.createOrUpdateParam("key", "value", false, 0, true);
+		
+		} finally {
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE);
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL);
+		}
+	}
+	
+	/**
+	 * Check that if TTL and reservable is set, all information are passer to server
+	 * @param testNGCtx
+	 * @param xmlTest
+	 * @throws Exception
+	 */
+	@Test(groups= {"ut"})
+	public void testUpdateReservableVariableWithTTL(final ITestContext testNGCtx, final XmlTest xmlTest) throws Exception {
+		try {
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE, "true");
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL, "http://localhost:1234");
+			
+			PowerMockito.whenNew(SeleniumRobotVariableServerConnector.class).withAnyArguments().thenReturn(variableServer);
+			when(variableServer.isAlive()).thenReturn(true);
+			TestVariable varToReturn = new TestVariable(10, "key", "value", false, TestVariable.TEST_VARIABLE_PREFIX + "key");
+			when(variableServer.upsertVariable(any(TestVariable.class), anyBoolean())).thenReturn(varToReturn);
+			
+			ITestResult testResult = GenericTest.generateResult(testNGCtx, getClass());
+			initThreadContext(testNGCtx, "myTest", testResult);
+			TestTasks.createOrUpdateParam("key", "value", false, 1, true);
+			
+			// check upsert has been called
+			verify(variableServer).upsertVariable(eq(new TestVariable(null, "key", "value", true, "key", 1)), eq(false));
+			
 		} finally {
 			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE);
 			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL);
