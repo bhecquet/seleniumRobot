@@ -21,7 +21,7 @@ public class TestScreenshotUtil extends ReporterTest {
 	 * @throws Exception
 	 */
 	@Test(groups={"it"})
-	public void testScrenshotDurationIsLogged(ITestContext testContext) throws Exception {
+	public void testScreenshotDurationIsLogged(ITestContext testContext) throws Exception {
 
 		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriverShort"});
 
@@ -39,8 +39,5 @@ public class TestScreenshotUtil extends ReporterTest {
 				}
 			}
 		}
-		
-		
-
 	}
 }

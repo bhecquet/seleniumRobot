@@ -75,6 +75,19 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	}
 	
 	/**
+	 * issue #165: Check case where browser is not at 100% zoom and so, double reply is returned
+	 */
+	@Test(groups = {"ut"})
+	public void testContentDimensionWithZoomFactor() {
+		when(driver.executeScript(anyString())).thenReturn(Arrays.asList(120.5, 80.67));
+		Dimension dim = ((CustomEventFiringWebDriver)eventDriver).getContentDimension();
+		
+		// check we get the window dimension
+		Assert.assertEquals(dim.height, 80);
+		Assert.assertEquals(dim.width, 120);
+	}
+	
+	/**
 	 * For non web test, dimension is returned from driver call, not javascript
 	 */
 	@Test(groups = {"ut"})
@@ -104,7 +117,7 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	 * Check standard web case where dimension comes from javascript call
 	 */
 	@Test(groups = {"ut"})
-	public void getViewPortDimensionWithoutScrollbar() {
+	public void testViewPortDimensionWithoutScrollbar() {
 		when(driver.executeScript(anyString())).thenReturn(Arrays.asList(120L, 80L));
 		Dimension dim = ((CustomEventFiringWebDriver)eventDriver).getViewPortDimensionWithoutScrollbar();
 		
@@ -112,7 +125,19 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 		Assert.assertEquals(dim.height, 80);
 		Assert.assertEquals(dim.width, 120);
 	}
-	
+
+	/**
+	 * issue #165: Check case where browser is not at 100% zoom and so, double reply is returned
+	 */
+	@Test(groups = {"ut"})
+	public void testViewPortDimensionWithoutScrollbarWithZoomFactor() {
+		when(driver.executeScript(anyString())).thenReturn(Arrays.asList(120.5, 80.67));
+		Dimension dim = ((CustomEventFiringWebDriver)eventDriver).getViewPortDimensionWithoutScrollbar();
+		
+		// check we get the window dimension
+		Assert.assertEquals(dim.height, 80);
+		Assert.assertEquals(dim.width, 120);
+	}
 
 	/**
 	 * For non web test, dimension is returned from driver call, not javascript
@@ -149,6 +174,19 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 		Point point = ((CustomEventFiringWebDriver)eventDriver).getScrollPosition();
 		
 		// check we get the scroll position
+		Assert.assertEquals(point.x, 120);
+		Assert.assertEquals(point.y, 80);
+	}
+
+	/**
+	 * issue #165: Check case where browser is not at 100% zoom and so, double reply is returned
+	 */
+	@Test(groups = {"ut"})
+	public void testScrollPositionWithZoomFactor() {
+		when(driver.executeScript(anyString())).thenReturn(Arrays.asList(120.5, 80.67));
+		Point point = ((CustomEventFiringWebDriver)eventDriver).getScrollPosition();
+		
+		// check we get the window dimension
 		Assert.assertEquals(point.x, 120);
 		Assert.assertEquals(point.y, 80);
 	}
