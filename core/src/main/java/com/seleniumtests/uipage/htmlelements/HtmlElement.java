@@ -16,6 +16,7 @@
  */
 package com.seleniumtests.uipage.htmlelements;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.time.Duration;
@@ -27,6 +28,7 @@ import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
+import org.openqa.selenium.By.ByXPath;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.ElementNotVisibleException;
 import org.openqa.selenium.HasCapabilities;
@@ -53,6 +55,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 import com.seleniumtests.browserfactory.FirefoxDriverFactory;
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.customexception.CustomSeleniumTestsException;
 import com.seleniumtests.customexception.DriverExceptions;
 import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.driver.CustomEventFiringWebDriver;
@@ -406,6 +409,7 @@ public class HtmlElement implements WebElement, Locatable, HasIdentity {
         if (parent != null) {
         	parent.findElement();
         	enterFrame();
+
         	if (elementIndex == null) {
         		element = parent.element.findElement(by);
         	} else {
@@ -533,9 +537,16 @@ public class HtmlElement implements WebElement, Locatable, HasIdentity {
      */
 	@ReplayOnError
     public List<WebElement> findElements() {
+		
+		// call findElement to enter any specified frame and search for parent elements
         findElement();
 
-        return driver.findElements(by);
+        // issue #167: if we have a parent, search elements inside it
+        if (parent != null) {
+        	return parent.element.findElements(by);
+        } else {
+        	return driver.findElements(by);
+        }
     }
 
     /**
