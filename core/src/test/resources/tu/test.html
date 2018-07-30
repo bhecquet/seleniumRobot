@@ -46,11 +46,14 @@
 		<option value="opt2">option2</option>
 		<option value="opt3">option numero 3</option>
 	</select>
-	<label for="textSelectedId">By id forward</label>
-	<input id="textSelectedId" attr="attribute"/>
-	<input id="textSelectedValue"/>
-	<input id="textSelectedText"/>
-	<label for="textSelectedText">By id backward</label>
+	
+	<div id="labelTests">
+		<label for="textSelectedId">By id forward</label>
+		<input id="textSelectedId" attr="attribute"/>
+		<input id="textSelectedValue"/>
+		<input id="textSelectedText"/>
+		<label for="textSelectedText">By id backward</label>
+	</div>
 	
 	<div id="selectHidable">
 		<select onChange="javascript:hideSelect();">
@@ -91,14 +94,16 @@
 	<input id="textOnBlurDest"/>
 	
 	<h3>Test findElement</h3>
+	<label>findElement</label>
 	<div id="divFind" name="divFindName" attr="attrValue" class="myClass">a text</div>
 	<div id="divFind2" name="divFindName" attr="attrValue" class="myClass">an other text</div>
+	<div id="child3" name="child">first child</div>
 	<div id="parent">
+		<label>findElement</label>
 		<div id="child1" class="myClass">first child</div>
 		<div id="child2">second child</div>
 		<div id="child4" class="myClass" name="child4Name">fourth child</div>
 	</div>
-	<div id="child3" name="child">first child</div>
 	<input type="checkbox" style="position:absolute; left: -1000px" id="hiddenCheckbox"/>
 	
 	<h3>Test delay</h3>

@@ -409,6 +409,23 @@ public class HtmlElement implements WebElement, Locatable, HasIdentity {
         if (parent != null) {
         	parent.findElement();
         	enterFrame();
+        	
+        	// issue #166: add a dot in front of xpath expression if we search the element inside a parent
+        	if (by instanceof ByXPath) {
+        		try {
+					Field xpathExpressionField = ByXPath.class.getDeclaredField("xpathExpression");
+					xpathExpressionField.setAccessible(true);
+					String xpath = (String)xpathExpressionField.get(by);
+					
+					if (xpath.startsWith("//")) {
+						by = By.xpath("." + xpath);
+					}
+					
+				} catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e) {
+					throw new CustomSeleniumTestsException(e);
+				}
+        		
+        	}
 
         	if (elementIndex == null) {
         		element = parent.element.findElement(by);

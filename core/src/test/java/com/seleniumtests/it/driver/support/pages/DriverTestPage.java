@@ -79,6 +79,7 @@ public class DriverTestPage extends PageObject {
 	public static final TextFieldElement multiElementFirstVisibleText = new TextFieldElement("", By.className("someClass"), HtmlElement.FIRST_VISIBLE);
 	public static final TextFieldElement multiElementFirstVisibleTextWithParent = new HtmlElement("", By.className("otherClass"), HtmlElement.FIRST_VISIBLE).findTextFieldElement(By.className("someClass"));
 	public static final HtmlElement divByClass = new HtmlElement("", By.className("otherClass"), HtmlElement.FIRST_VISIBLE);
+	public static final HtmlElement searchByXpath = new HtmlElement("", By.xpath("//option[@value=\"opt1\"]"));
 	
 	// Elements inside others
 	public static final HtmlElement parentDiv = new HtmlElement("", By.id("parentDiv"));
@@ -88,6 +89,8 @@ public class DriverTestPage extends PageObject {
 	public static final ButtonElement resetButton2 = new HtmlElement("", By.id("parentDiv")).findButtonElement(By.name("resetButton"));
 	public static final LinkElement linkElement2 = new HtmlElement("", By.id("parentDiv")).findLinkElement(By.name("googleLink"));
 	public static final SelectList selectList2 = new HtmlElement("", By.id("parentDiv")).findSelectList(By.name("select"));
+	public static final HtmlElement optionByXpath = new HtmlElement("", By.id("parentDiv")).findElement(By.xpath("//option[@value=\"opt1\"]"));
+	public static final HtmlElement optionByRelativeXpath = new HtmlElement("", By.id("parentDiv")).findElement(By.xpath(".//option[@value=\"opt1\"]"));
 	public static final Table table2 = new HtmlElement("", By.id("parentDiv")).findTable(By.tagName("table"));
 	
 	// bug check when we search element in select, and this select is in an other element
