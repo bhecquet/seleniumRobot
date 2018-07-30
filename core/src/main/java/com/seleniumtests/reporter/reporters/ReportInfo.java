@@ -1,6 +1,8 @@
 /**
  * Orignal work: Copyright 2015 www.seleniumtests.com
  * Modified work: Copyright 2016 www.infotel.com
+ * 				Copyright 2017 B.Hecquet
+ * 				Copyright 2018 Covea
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +16,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.seleniumtests.reporter.reporters;
 
 import java.io.InputStream;
