@@ -15,7 +15,7 @@ public class TestDriverChrome extends TestDriver {
 	
 	@Test(groups= {"nogroup"})
 	public void test() throws AWTException, InterruptedException {
-		testUploadFileWithRobot();
+		testFindElementsInsideParent();
 	}
 
 }
