@@ -128,7 +128,6 @@ public class TestDriver extends GenericMultiBrowserTest {
 		}
 	}
   
-	
 	/**
 	 * Test javascript actions
 	 */
@@ -436,11 +435,19 @@ public class TestDriver extends GenericMultiBrowserTest {
 	}
 	
 	/**
-	 * get findElements inside an other one
+	 * get findElements inside an other one using findElements(By) method
 	 */
 	@Test(groups={"it"})
 	public void testFindElementsUnderAnOtherElement() {
 		Assert.assertEquals(testPage.divByClass.findElements(By.className("someClass")).size(), 4);
+	}
+	
+	/**
+	 * get findElements inside an other one using findElements() method
+	 */
+	@Test(groups={"it"})
+	public void testFindElementsInsideParent() {
+		Assert.assertEquals(testPage.parent.findElement(By.className("myClass")).findElements().size(), 2);
 	}
 	
 	/**
@@ -449,6 +456,33 @@ public class TestDriver extends GenericMultiBrowserTest {
 	@Test(groups={"it"})
 	public void testFindLastElement() {
 		Assert.assertEquals(testPage.multiElementLastText.getValue(), "last text field");
+	}
+	
+	/**
+	 * issue #166: Check that when searching an element by XPath, and this element is specified as being located in an other element, 
+	 * we still get the element with an xpath relative to the parent element
+	 */
+	@Test(groups={"it"})
+	public void testFindSubElementByXpath() {
+		Assert.assertEquals(testPage.optionByXpath.getText(), "option1Parent");
+	}
+	
+	/**
+	 * Check that when searching an element by XPath, and this element is specified as being located in an other element, 
+	 * we still get the element with an xpath relative to the parent element. In this case, the xpath is already specified as relative. No modification should
+	 * be done by robot
+	 */
+	@Test(groups={"it"})
+	public void testFindSubElementByRelativeXpath() {
+		Assert.assertEquals(testPage.optionByRelativeXpath.getText(), "option1Parent");
+	}
+	
+	/**
+	 * Check search by XPath without parent is correctly performed (no change due to correction of issue #166)
+	 */
+	@Test(groups={"it"})
+	public void testFindElementByXpath() {
+		Assert.assertEquals(testPage.searchByXpath.getText(), "option1");
 	}
 	
 }

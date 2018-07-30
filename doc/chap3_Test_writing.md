@@ -158,9 +158,46 @@ Example of a shopping cart class:
 
 #### Search elements ####
 
+##### Standard search #####
+
 SeleniumRobot supports standard search through `By` class
 
 	LinkElement proceed = new LinkElement("Checkout", By.linkText("Proceed to Checkout"));
+	
+If you search an element by XPath (avoid this if possible), and your xpath should be relative to a parent element (`new HtmlElement("", By.id("parentDiv")).findElement(By.xpath("//option[@value=\"opt1\"]"));`), add a `.` in front of your xpath expression so that you search relatively to the parent element. Else, SeleniumRobot do this for you.
+
+The available elements are:
+- ButtonElement
+- CheckBoxElement
+- FileUploadElement: to handle `<input type="file">` elements
+- FrameElement: to define a frame to be used inside other elements (see: "5 Working with frames" chapter for details)
+- HtmlElement: the parent of all elements defined here
+- LabelElement
+- LinkElement
+- ImageElement: to handle `<img src=...>` elements
+- RadioButtonElement
+- SelectList
+- Table
+- TextFieldElement
+
+Most of them are here for readability so that when you read test code, you know what type of element this object corresponds to. Use HtmlElement only when the type of element is not very clear (e.g: a div / span or DOM area)
+
+##### Search inside an other element #####
+
+Using Selenium syntax, you would use: `driver.findElement(By.id("myId")).findElement(By.tagName("myTag"))`<br/>
+This obviously still works in seleniumRobot, but using seleniumRobot syntax, you have to ways:
+ 
+	new HtmlElement("", By.id("myId")).findElement(By.tagName("myTag"))
+	
+- or
+	
+	HtmlElement parent = new HtmlElement("", By.id("myId"));
+	HtmlElement myElement = new HtmlElement("", By.tagName("myTag"), parent)
+
+##### Search inside frame #####
+see: "5 Working with frames" chapter for details
+
+##### Additional search capabilities #####
 	
 Additional search using the `ByC` class are
 - search element by attribute: `new TextFieldElement("", ByC.attribute("attr", "attribute")).sendKeys("element found by attribute");`. See: [https://developer.mozilla.org/en-US/docs/Web/CSS/Attribute_selectors] (https://developer.mozilla.org/en-US/docs/Web/CSS/Attribute_selectors) for special syntax like searching with attribute value starting by some pattern `ByC.attribute("attr^", "attributeStartPattern")`

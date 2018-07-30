@@ -16,7 +16,11 @@
  */
 package com.seleniumtests.it.util;
 
+import java.util.List;
+
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.annotations.AfterClass;
@@ -28,6 +32,7 @@ import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.it.driver.support.pages.DriverTestPage;
 import com.seleniumtests.uipage.ByC;
+import com.seleniumtests.uipage.htmlelements.HtmlElement;
 import com.seleniumtests.uipage.htmlelements.TextFieldElement;
 
 public class TestByC extends GenericTest {
@@ -178,6 +183,66 @@ public class TestByC extends GenericTest {
 	@Test(groups={"it"}, expectedExceptions=IllegalArgumentException.class)
 	public void testFindElementByNullTagName() { 
 		new TextFieldElement("", ByC.text("Test select", null)).getTagName();
+	}
+	
+	/**
+	 * issue #166: Search subElement by attribute
+	 */
+	@Test(groups={"it"})
+	public void testFindElementRelativeByAttribute() {
+		Assert.assertEquals(new HtmlElement("", By.id("parentDiv")).findRadioButtonElement(ByC.attribute("name", "radioClick")).getAttribute("id"), "radioClickParent");
+	}
+	@Test(groups={"it"})
+	public void testFindElementsRelativeByAttribute() {
+		Assert.assertEquals(new HtmlElement("", By.id("parentDiv")).findRadioButtonElement(ByC.attribute("name", "radioClick")).findElements().size(), 1);
+	}
+	
+	/**
+	 * issue #166: check we get the first element inside the parent one when searching by label, partial or not
+	 */
+	@Test(groups={"it"})
+	public void testFindElementRelativeByPartialLabel() {
+		Assert.assertEquals(new HtmlElement("", By.id("parent")).findElement(ByC.partialLabelForward("findElement", "div")).getAttribute("id"), "child1");
+	}
+	@Test(groups={"it"})
+	public void testFindElementsRelativeByPartialLabel() {
+		List<WebElement> elements = new HtmlElement("", By.id("parent")).findElement(ByC.partialLabelForward("findElement", "div")).findElements();
+		Assert.assertTrue(elements.size() >= 3);
+		Assert.assertEquals(elements.get(0).getAttribute("id"), "child1");
+	}
+	@Test(groups={"it"})
+	public void testFindElementRelativeByLabel() {
+		Assert.assertEquals(new HtmlElement("", By.id("parent")).findElement(ByC.labelForward("findElement", "div")).getAttribute("id"), "child1");
+	}
+	@Test(groups={"it"})
+	public void testFindElementsRelativeByLabel() {
+		List<WebElement> elements = new HtmlElement("", By.id("parent")).findElement(ByC.labelForward("findElement", "div")).findElements();
+		Assert.assertTrue(elements.size() >= 3);
+		Assert.assertEquals(elements.get(0).getAttribute("id"), "child1");
+	}
+	
+	/**
+	 * issue #166: check we get the first element inside the parent one when searching by text, partial or not
+	 */
+	@Test(groups={"it"})
+	public void testFindElementRelativeByPartialText() {
+		Assert.assertEquals(new HtmlElement("", By.id("parent")).findElement(ByC.partialText("first chi", "div")).getAttribute("id"), "child1");
+	}
+	@Test(groups={"it"})
+	public void testFindElementsRelativeByPartialText() {
+		List<WebElement> elements = new HtmlElement("", By.id("parent")).findElement(ByC.partialText("first chi", "div")).findElements();
+		Assert.assertEquals(elements.size(), 1);
+		Assert.assertEquals(elements.get(0).getAttribute("id"), "child1");
+	}
+	@Test(groups={"it"})
+	public void testFindElementRelativeByText() {
+		Assert.assertEquals(new HtmlElement("", By.id("parent")).findElement(ByC.text("first child", "div")).getAttribute("id"), "child1");
+	}
+	@Test(groups={"it"})
+	public void testFindElementsRelativeByText() {
+		List<WebElement> elements = new HtmlElement("", By.id("parent")).findElement(ByC.text("first child", "div")).findElements();
+		Assert.assertEquals(elements.size(), 1);Assert.assertEquals(elements.size(), 1);
+		Assert.assertEquals(elements.get(0).getAttribute("id"), "child1");
 	}
 	
 	

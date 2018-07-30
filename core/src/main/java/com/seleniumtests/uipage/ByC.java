@@ -202,9 +202,9 @@ public class ByC extends By {
 		public List<WebElement> findElements(SearchContext context) {
 			String escapedLabel = escapeQuotes(label);
 			if (partial) {
-				return ((FindsByXPath) context).findElementsByXPath(String.format("//%s[contains(text(),%s)]/following::%s", labelTagName, escapedLabel, tagName));
+				return ((FindsByXPath) context).findElementsByXPath(String.format(".//%s[contains(text(),%s)]/following::%s", labelTagName, escapedLabel, tagName));
 			} else {
-				return ((FindsByXPath) context).findElementsByXPath(String.format("//%s[text() = %s]/following::%s", labelTagName, escapedLabel, tagName));
+				return ((FindsByXPath) context).findElementsByXPath(String.format(".//%s[text() = %s]/following::%s", labelTagName, escapedLabel, tagName));
 			}
 		}
 
@@ -212,9 +212,9 @@ public class ByC extends By {
 		public WebElement findElement(SearchContext context) {
 			String escapedLabel = escapeQuotes(label);
 			if (partial) {
-				return ((FindsByXPath) context).findElementByXPath(String.format("//%s[contains(text(),%s)]/following::%s", labelTagName, escapedLabel, tagName));
+				return ((FindsByXPath) context).findElementByXPath(String.format(".//%s[contains(text(),%s)]/following::%s", labelTagName, escapedLabel, tagName));
 			} else {
-				return ((FindsByXPath) context).findElementByXPath(String.format("//%s[text() = %s]/following::%s", labelTagName, escapedLabel, tagName));
+				return ((FindsByXPath) context).findElementByXPath(String.format(".//%s[text() = %s]/following::%s", labelTagName, escapedLabel, tagName));
 			}
 		}
 
@@ -256,9 +256,9 @@ public class ByC extends By {
 		public List<WebElement> findElements(SearchContext context) {
 			String escapedLabel = escapeQuotes(label);
 			if (partial) {
-				return ((FindsByXPath) context).findElementsByXPath(String.format("//%s[contains(text(),%s)]/preceding::%s", labelTagName, escapedLabel, tagName));
+				return ((FindsByXPath) context).findElementsByXPath(String.format(".//%s[contains(text(),%s)]/preceding::%s", labelTagName, escapedLabel, tagName));
 			} else {
-				return ((FindsByXPath) context).findElementsByXPath(String.format("//%s[text() = %s]/preceding::%s", labelTagName, escapedLabel, tagName));
+				return ((FindsByXPath) context).findElementsByXPath(String.format(".//%s[text() = %s]/preceding::%s", labelTagName, escapedLabel, tagName));
 			}
 		}
 		
@@ -267,9 +267,9 @@ public class ByC extends By {
 			String escapedLabel = escapeQuotes(label);
 			List<WebElement> elements;
 			if (partial) {
-				elements = ((FindsByXPath) context).findElementsByXPath(String.format("//%s[contains(text(),%s)]/preceding::%s", labelTagName, escapedLabel, tagName));
+				elements = ((FindsByXPath) context).findElementsByXPath(String.format(".//%s[contains(text(),%s)]/preceding::%s", labelTagName, escapedLabel, tagName));
 			} else {
-				elements = ((FindsByXPath) context).findElementsByXPath(String.format("//%s[text() = %s]/preceding::%s", labelTagName, escapedLabel, tagName));
+				elements = ((FindsByXPath) context).findElementsByXPath(String.format(".//%s[text() = %s]/preceding::%s", labelTagName, escapedLabel, tagName));
 			}
 			List<WebElement> elementsReverse = elements.subList(0, elements.size());
 			Collections.reverse(elementsReverse);
@@ -306,13 +306,13 @@ public class ByC extends By {
 		@Override
 		public List<WebElement> findElements(SearchContext context) {
 			String escapedAttributeValue = escapeQuotes(attributeValue);
-			return ((FindsByCssSelector) context).findElementsByCssSelector(String.format("[%s=%s]", attributeName, escapedAttributeValue));
+			return ((FindsByXPath) context).findElementsByXPath(String.format(".//*[@%s=%s]", attributeName, escapedAttributeValue));
 		}
 
 		@Override
 		public WebElement findElement(SearchContext context) {
 			String escapedAttributeValue = escapeQuotes(attributeValue);
-			return ((FindsByCssSelector) context).findElementByCssSelector(String.format("[%s=%s]", attributeName, escapedAttributeValue));
+			return ((FindsByXPath) context).findElementByXPath(String.format(".//*[@%s=%s]", attributeName, escapedAttributeValue));
 		}
 
 		@Override
@@ -352,9 +352,9 @@ public class ByC extends By {
 		public List<WebElement> findElements(SearchContext context) {
 			String escapedText = escapeQuotes(text);
 			if (partial) {
-				return ((FindsByXPath) context).findElementsByXPath(String.format("//%s[contains(text(),%s)]", tagName, escapedText));
+				return ((FindsByXPath) context).findElementsByXPath(String.format(".//%s[contains(text(),%s)]", tagName, escapedText));
 			} else {
-				return ((FindsByXPath) context).findElementsByXPath(String.format("//%s[text() = %s]", tagName, escapedText));
+				return ((FindsByXPath) context).findElementsByXPath(String.format(".//%s[text() = %s]", tagName, escapedText));
 			}
 		}
 
@@ -362,9 +362,9 @@ public class ByC extends By {
 		public WebElement findElement(SearchContext context) {
 			String escapedText = escapeQuotes(text);
 			if (partial) {
-				return ((FindsByXPath) context).findElementByXPath(String.format("//%s[contains(text(),%s)]", tagName, escapedText));
+				return ((FindsByXPath) context).findElementByXPath(String.format(".//%s[contains(text(),%s)]", tagName, escapedText));
 			} else {
-				return ((FindsByXPath) context).findElementByXPath(String.format("//%s[text() = %s]", tagName, escapedText));
+				return ((FindsByXPath) context).findElementByXPath(String.format(".//%s[text() = %s]", tagName, escapedText));
 			}
 		}
 
