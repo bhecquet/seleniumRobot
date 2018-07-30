@@ -485,22 +485,22 @@ public class TestDriver extends GenericMultiBrowserTest {
 		Assert.assertEquals(testPage.searchByXpath.getText(), "option1");
 	}
 	
-	@Test(groups={"ut"})
+	@Test(groups={"it", "ut"})
 	public void testIsElementPresent() {
 		Assert.assertTrue(testPage.textElement.isElementPresent(2));
 	}
 	
-	@Test(groups={"ut"})
+	@Test(groups={"it", "ut"})
 	public void testIsElementNotPresent() {
 		Assert.assertFalse(new HtmlElement("", By.id("divNotFound")).isElementPresent(2));
 	}
 	
-	@Test(groups={"ut"})
+	@Test(groups={"it", "ut"})
 	public void testFindTextElementInsideHtmlElement() {
 		Assert.assertEquals(testPage.textElement2.getValue(), "default");
 	}
 	
-	@Test(groups={"ut"})
+	@Test(groups={"it", "ut"})
 	public void testFindRadioElementInsideHtmlElement() {
 		try {
 			testPage.radioElement2.click();
@@ -510,7 +510,7 @@ public class TestDriver extends GenericMultiBrowserTest {
 		}
 	}
 	
-	@Test(groups={"ut"})
+	@Test(groups={"it", "ut"})
 	public void testFindCheckElementInsideHtmlElement() {
 		try {
 			testPage.checkElement2.click();
@@ -520,22 +520,22 @@ public class TestDriver extends GenericMultiBrowserTest {
 		}
 	}
 	
-	@Test(groups={"ut"})
+	@Test(groups={"it", "ut"})
 	public void testFindButtonElementInsideHtmlElement() {
 		Assert.assertEquals(testPage.resetButton2.getText(), "reset button");
 	}
 	
-	@Test(groups={"ut"})
+	@Test(groups={"it", "ut"})
 	public void testFindLinkElementInsideHtmlElement() {
 		Assert.assertTrue(testPage.linkElement2.getUrl().toLowerCase().contains("http://www.googlefrance.fr"));
 	}
 	
-	@Test(groups={"ut"})
+	@Test(groups={"it", "ut"})
 	public void testFindSelectElementInsideHtmlElement() {
 		Assert.assertEquals(testPage.selectList2.getOptions().size(), 2);
 	}
 	
-	@Test(groups={"ut"})
+	@Test(groups={"it", "ut"})
 	public void testFindTableInsideHtmlElement() {
 		Assert.assertEquals(testPage.table2.getRowCount(), 2);
 	}
@@ -544,12 +544,12 @@ public class TestDriver extends GenericMultiBrowserTest {
 	 * Use elements searched by index inside other elements 
 	 */
 	
-	@Test(groups={"ut"})
+	@Test(groups={"it", "ut"})
 	public void testFindTextElementsInsideHtmlElement() {
 		Assert.assertEquals(testPage.textElement3.getValue(), "default");
 	}
 	
-	@Test(groups={"ut"})
+	@Test(groups={"it", "ut"})
 	public void testFindRadioElementsInsideHtmlElement() {
 		try {
 			testPage.radioElement3.click();
@@ -559,7 +559,7 @@ public class TestDriver extends GenericMultiBrowserTest {
 		}
 	}
 	
-	@Test(groups={"ut"})
+	@Test(groups={"it", "ut"})
 	public void testFindCheckElementsInsideHtmlElement() {
 		try {
 			testPage.checkElement3.click();
@@ -569,22 +569,22 @@ public class TestDriver extends GenericMultiBrowserTest {
 		}
 	}
 	
-	@Test(groups={"ut"})
+	@Test(groups={"it", "ut"})
 	public void testFindButtonElementsInsideHtmlElement() {
 		Assert.assertEquals(testPage.resetButton3.getText(), "reset button");
 	}
 	
-	@Test(groups={"ut"})
+	@Test(groups={"it", "ut"})
 	public void testFindLinkElementsInsideHtmlElement() {
 		Assert.assertTrue(testPage.linkElement3.getUrl().toLowerCase().contains("http://www.googlefrance.fr"));
 	}
 	
-	@Test(groups={"ut"})
+	@Test(groups={"it", "ut"})
 	public void testFindSelectElementsInsideHtmlElement() {
 		Assert.assertEquals(testPage.selectList3.getOptions().size(), 2);
 	}
 	
-	@Test(groups={"ut"})
+	@Test(groups={"it", "ut"})
 	public void testFindTablesInsideHtmlElement() {
 		Assert.assertEquals(testPage.table3.getRowCount(), 2);
 	}
