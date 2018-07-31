@@ -30,8 +30,6 @@ import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.jar.JarFile;
@@ -47,8 +45,6 @@ import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.zeroturnaround.zip.ZipUtil;
 
-import com.seleniumtests.core.SeleniumTestsContextManager;
-import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 import com.seleniumtests.util.osutility.OSUtility;
 
