@@ -30,6 +30,7 @@ import static org.mockito.Mockito.doNothing;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -141,6 +142,7 @@ public class TestHtmlElement extends MockitoTest {
 		when(driver.getKeyboard()).thenReturn(keyboard);
 		when(driver.getMouse()).thenReturn(mouse);
 		when(driver.switchTo()).thenReturn(locator);
+		when(driver.executeScript(anyString())).thenReturn(Arrays.asList(100, 100));
 
 		when(element.findElement(By.name("subEl"))).thenReturn(subElement1);
 		when(element.findElements(By.name("subEl"))).thenReturn(subElList);
@@ -172,6 +174,7 @@ public class TestHtmlElement extends MockitoTest {
 		mobileDriver = Mockito.spy(new AppiumDriver(ce, new DesiredCapabilities()));
 		
 		SeleniumTestsContextManager.getThreadContext().setTestType(TestType.WEB);
+		SeleniumTestsContextManager.getThreadContext().setBrowser("htmlunit");
 	}
 	
 	private void finalCheck(boolean findElement) throws Exception {
