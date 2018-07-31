@@ -109,7 +109,7 @@ public abstract class GenericMultiBrowserTest {
 		SeleniumTestsContextManager.getGlobalContext().setVideoCapture(VideoCaptureMode.FALSE.toString());
 	}
 
-	@BeforeClass(groups={"it"})
+	@BeforeClass(groups={"it", "ut"})
 	public void exposeTestPage(final ITestContext testNGCtx) throws Exception {
 
         // skip following if driver is already defined from an other test
@@ -153,7 +153,7 @@ public abstract class GenericMultiBrowserTest {
 	}
 	
 
-	@AfterClass(groups={"it"})
+	@AfterClass(groups={"it", "ut"})
 	public void stop() throws Exception {
 		if (server != null) {
 			server.stop();
@@ -165,7 +165,7 @@ public abstract class GenericMultiBrowserTest {
 		driver = null;
 	}
 	
-	@BeforeMethod(groups={"it"}) 
+	@BeforeMethod(groups={"it", "ut"}) 
 	public void skipIfDriverNull() {
 		if (driver == null) {
 			throw new SkipException("skipped, browser not installed: " + browserType);
@@ -173,7 +173,7 @@ public abstract class GenericMultiBrowserTest {
 	}
 	
 
-	@AfterMethod(groups={"it"})
+	@AfterMethod(groups={"it", "ut"})
 	public void cleanAlert() {
 		if (driver == null) {
 			return;
