@@ -30,6 +30,8 @@ import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.jar.JarFile;
@@ -45,6 +47,8 @@ import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.zeroturnaround.zip.ZipUtil;
 
+import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 import com.seleniumtests.util.osutility.OSUtility;
 
@@ -225,6 +229,14 @@ public class FileUtility {
     }
     
     public static void zipFolder(final File folder, final File destZipFile) {
-    	ZipUtil.pack(folder, destZipFile);
+    	try {
+			File tempZip = File.createTempFile(destZipFile.getName(), ".zip");
+			tempZip.deleteOnExit();
+			ZipUtil.pack(folder, tempZip);
+			FileUtils.copyFile(tempZip, destZipFile);
+		} catch (IOException e) {
+			logger.error("cannot create zip file", e);
+		}
+    	
     }
 }
