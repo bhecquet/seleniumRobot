@@ -27,6 +27,7 @@ import org.testng.annotations.Test;
 import org.testng.xml.XmlSuite.ParallelMode;
 
 import com.seleniumtests.core.SeleniumTestsContext;
+import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.util.FileUtility;
 
 public class TestArchiving extends ReporterTest {
@@ -49,6 +50,33 @@ public class TestArchiving extends ReporterTest {
 		
 			Assert.assertTrue(tmpZip.exists());
 			File outputFolder = FileUtility.unzipFile(tmpZip);
+			
+			Assert.assertTrue(Paths.get(outputFolder.getAbsolutePath(), "SeleniumTestReport.html").toFile().exists());
+			Assert.assertTrue(Paths.get(outputFolder.getAbsolutePath(), "results.json").toFile().exists());
+			Assert.assertTrue(Paths.get(outputFolder.getAbsolutePath(), "testAndSubActions", "PERF-result.xml").toFile().exists());
+		} finally {
+			System.clearProperty(SeleniumTestsContext.ARCHIVE_TO_FILE);
+			System.clearProperty(SeleniumTestsContext.ARCHIVE);
+		}
+	}
+	
+	/**
+	 * Check that we are able to create a zip file inside the output directory itself without writing the zip file in itself (issue #168)
+	 * @param testContext
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testArchivingInOutputDirectory(ITestContext testContext) throws Exception {
+		String zipFilePath = SeleniumTestsContextManager.getGlobalContext().getOutputDirectory() + File.separator + "result.zip";
+		
+		try {
+			System.setProperty(SeleniumTestsContext.ARCHIVE_TO_FILE, zipFilePath);
+			System.setProperty(SeleniumTestsContext.ARCHIVE, "true");
+			
+			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions"});
+			
+			Assert.assertTrue(new File(zipFilePath).exists());
+			File outputFolder = FileUtility.unzipFile(new File(zipFilePath));
 			
 			Assert.assertTrue(Paths.get(outputFolder.getAbsolutePath(), "SeleniumTestReport.html").toFile().exists());
 			Assert.assertTrue(Paths.get(outputFolder.getAbsolutePath(), "results.json").toFile().exists());
