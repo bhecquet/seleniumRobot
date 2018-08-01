@@ -181,20 +181,27 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
      */
     public void updateWindowsHandles() {
     	if (isWebTest) {
-    		// workaround for ios tests where getWindowHandles sometimes fails
-    		for (int i = 0; i < 10; i++) {
-    			try  {
-    				currentHandles = driver.getWindowHandles();
-    				break;
-    			} catch (Exception e) {
-    				logger.info("getting window handles");
-    				WaitHelper.waitForSeconds(2);
-    			}
-    		}
+    		currentHandles = getWindowHandles();
     			
     	} else {
     		currentHandles = new TreeSet<>();
     	}
+    }
+    
+    @Override
+    public Set<String> getWindowHandles() {
+    	
+    	// issue #169: workaround for ios / IE tests where getWindowHandles sometimes fails with: class org.openqa.selenium.WebDriverException: Returned value cannot be converted to List<String>: true
+    	for (int i = 0; i < 10; i++) {
+			try  {
+				return super.getWindowHandles();
+			} catch (Exception e) {
+				logger.info("getting window handles");
+				WaitHelper.waitForSeconds(2);
+			}
+		}
+    	return super.getWindowHandles();
+    	
     }
 
     public FileDetector getFileDetector() {
