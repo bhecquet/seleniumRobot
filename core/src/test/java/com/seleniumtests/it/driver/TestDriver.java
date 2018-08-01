@@ -329,7 +329,7 @@ public class TestDriver extends GenericMultiBrowserTest {
 			testPage.delayButton.click();
 			Assert.assertFalse(new HtmlElement("", By.id("newEl")).isElementPresent(1));
 			WaitHelper.waitForSeconds(3);
-			Assert.assertTrue(new HtmlElement("", By.id("newEl")).isElementPresent(1));
+			Assert.assertTrue(new HtmlElement("", By.id("newEl")).isElementPresent(4));
 		} finally {
 			testPage.delayButtonReset.click();
 		}
