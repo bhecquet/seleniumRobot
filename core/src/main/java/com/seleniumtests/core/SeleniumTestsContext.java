@@ -501,8 +501,9 @@ public class SeleniumTestsContext {
     	
     	// in case we find the url of variable server and it's marked as active, use it
 		if (getSeleniumRobotServerActive() != null && getSeleniumRobotServerActive() && getSeleniumRobotServerUrl() != null) {
-			logger.info(String.format("%s key found, and set to true, trying to get variable from variable server %s", 
+			logger.info(String.format("%s key found, and set to true, trying to get variable from variable server %s [%s]", 
 						SELENIUMROBOTSERVER_ACTIVE, 
+						getSeleniumRobotServerUrl(),
 						SELENIUMROBOTSERVER_URL));
 			SeleniumRobotVariableServerConnector vServer = new SeleniumRobotVariableServerConnector(getSeleniumRobotServerActive(), getSeleniumRobotServerUrl(), TestNGResultUtils.getTestName(testNGResult));
 			

@@ -53,6 +53,8 @@ public class FirefoxCapabilitiesFactory extends IDesktopCapabilityFactory {
         	logger.info("setting firefox in headless mode. Supported for firefox version >= 56");
 	        options.addArguments("-headless");
 	        options.addArguments("--window-size=1280,1024");
+	        options.addArguments("--width=1280");
+	        options.addArguments("--height=1024");
         }
 
         FirefoxProfile profile = getFirefoxProfile(webDriverConfig);
