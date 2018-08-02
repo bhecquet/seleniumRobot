@@ -52,7 +52,18 @@
 					<executions>
 
 						<!-- CHROMEDRIVER: pattern for file MUST BE chromedriver_<version>_chrome-<minChromeVersion>-<maxChromeVersion> -->
-						<execution>
+                                                <execution>
+							<id>chromedriver 2.41</id>
+							<phase>process-resources</phase>
+							<goals>
+								<goal>wget</goal>
+							</goals>
+							<configuration>
+								<url>${chromedriver.url}/2.41/chromedriver_${chromedriver.suffix}.zip</url>
+								<outputDirectory>${driver.path}${os}/dir_chromedriver_2.41_chrome-67-69</outputDirectory>
+							</configuration>
+                                                </execution>	
+                                                <execution>
 							<id>chromedriver 2.38</id>
 							<phase>process-resources</phase>
 							<goals>
@@ -64,17 +75,6 @@
 							</configuration>
 						</execution>
 						<execution>
-							<id>chromedriver 2.37</id>
-							<phase>process-resources</phase>
-							<goals>
-								<goal>wget</goal>
-							</goals>
-							<configuration>
-								<url>${chromedriver.url}/2.37/chromedriver_${chromedriver.suffix}.zip</url>
-								<outputDirectory>${driver.path}${os}/dir_chromedriver_2.37_chrome-64-66</outputDirectory>
-							</configuration>
-						</execution>
-						<execution>
 							<id>chromedriver 2.35</id>
 							<phase>process-resources</phase>
 							<goals>
@@ -83,17 +83,6 @@
 							<configuration>
 								<url>${chromedriver.url}/2.35/chromedriver_${chromedriver.suffix}.zip</url>
 								<outputDirectory>${driver.path}${os}/dir_chromedriver_2.35_chrome-62-64</outputDirectory>
-							</configuration>
-						</execution>
-						<execution>
-							<id>chromedriver 2.34</id>
-							<phase>process-resources</phase>
-							<goals>
-								<goal>wget</goal>
-							</goals>
-							<configuration>
-								<url>${chromedriver.url}/2.34/chromedriver_${chromedriver.suffix}.zip</url>
-								<outputDirectory>${driver.path}${os}/dir_chromedriver_2.34_chrome-61-63</outputDirectory>
 							</configuration>
 						</execution>
 						<execution>
