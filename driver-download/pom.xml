@@ -132,13 +132,13 @@
 
 						<!-- GECKODRIVER -->
 						<execution>
-							<id>geckodriver 0.20.1</id>
+							<id>geckodriver 0.21.0</id>
 							<phase>process-resources</phase>
 							<goals>
 								<goal>wget</goal>
 							</goals>
 							<configuration>
-								<url>${geckodriver.url}/v0.20.1/geckodriver-v0.20.1-${geckodriver.suffix}${geckodriver.ext}</url>
+								<url>${geckodriver.url}/v0.21.0/geckodriver-v0.21.0-${geckodriver.suffix}${geckodriver.ext}</url>
 								<outputDirectory>${driver.path}${os}/dir_geckodriver</outputDirectory>
 							</configuration>
 						</execution>
