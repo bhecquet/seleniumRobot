@@ -20,18 +20,11 @@ package com.seleniumtests.it.stubclasses;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.Test;
 
-import com.seleniumtests.core.SeleniumTestsContextManager;
-import com.seleniumtests.customexception.DriverExceptions;
-import com.seleniumtests.customexception.ScenarioException;
-import com.seleniumtests.driver.WebUIDriver;
-import com.seleniumtests.reporter.logger.TestAction;
 import com.seleniumtests.reporter.logger.TestLogging;
-import com.seleniumtests.reporter.logger.TestStep;
 
 /**
  * Stub class for correction of issue #143: [HTML] All tests show the @AfterMethod of all tests

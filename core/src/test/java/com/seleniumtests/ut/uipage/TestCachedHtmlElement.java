@@ -19,10 +19,7 @@
 package com.seleniumtests.ut.uipage;
 
 import org.openqa.selenium.By;
-import org.openqa.selenium.Dimension;
-import org.openqa.selenium.Point;
 import org.openqa.selenium.Rectangle;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.testng.Assert;
 import org.testng.ITestContext;
@@ -38,17 +35,13 @@ import com.seleniumtests.it.driver.support.pages.DriverTestPage;
 import com.seleniumtests.uipage.htmlelements.CachedHtmlElement;
 
 public class TestCachedHtmlElement extends GenericTest {
-
-	private static WebDriver driver;
-	private static DriverTestPage testPage;
 	
 	@BeforeClass(groups={"ut"})
 	public void initDriver(final ITestContext testNGCtx) throws Exception {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setReplayTimeout(1);
 		SeleniumTestsContextManager.getThreadContext().setBrowser("htmlunit");
-		testPage = new DriverTestPage(true);
-		driver = WebUIDriver.getWebDriver(true);
+		new DriverTestPage(true); // start displaying page
 	}
 	
 	@AfterClass(groups={"ut"})
@@ -59,126 +52,126 @@ public class TestCachedHtmlElement extends GenericTest {
 	
 	@Test(groups={"ut"}, expectedExceptions=ScenarioException.class)
 	public void testClick() {
-		new CachedHtmlElement(testPage.selectList.getElement()).click();
+		new CachedHtmlElement(DriverTestPage.selectList.getElement()).click();
 	}
 	
 	@Test(groups={"ut"}, expectedExceptions=ScenarioException.class)
 	public void testSubmit() {
-		new CachedHtmlElement(testPage.selectList.getElement()).submit();
+		new CachedHtmlElement(DriverTestPage.selectList.getElement()).submit();
 	}
 	
 	@Test(groups={"ut"}, expectedExceptions=ScenarioException.class)
 	public void testSendKeys() {
-		new CachedHtmlElement(testPage.textElement.getElement()).sendKeys("foo");
+		new CachedHtmlElement(DriverTestPage.textElement.getElement()).sendKeys("foo");
 	}
 	
 	@Test(groups={"ut"}, expectedExceptions=ScenarioException.class)
 	public void testClear() {
-		new CachedHtmlElement(testPage.textElement.getElement()).clear();
+		new CachedHtmlElement(DriverTestPage.textElement.getElement()).clear();
 	}
 
 	@Test(groups={"ut"})
 	public void testTagName() {
-		Assert.assertEquals(new CachedHtmlElement(testPage.selectList.getElement()).getTagName(), "select");
+		Assert.assertEquals(new CachedHtmlElement(DriverTestPage.selectList.getElement()).getTagName(), "select");
 	}
 
 	@Test(groups={"ut"})
 	public void testGetText() {
-		Assert.assertEquals(new CachedHtmlElement(testPage.selectList.getElement()).getText(), "option1 option2 option numero 3");
+		Assert.assertEquals(new CachedHtmlElement(DriverTestPage.selectList.getElement()).getText(), "option1 option2 option numero 3");
 	}
 	
 	@Test(groups={"ut"})
 	public void testGetAttribute() {
-		Assert.assertEquals(new CachedHtmlElement(testPage.selectList.getElement()).getAttribute("name"), "select");
+		Assert.assertEquals(new CachedHtmlElement(DriverTestPage.selectList.getElement()).getAttribute("name"), "select");
 	}
 	
 	@Test(groups={"ut"})
 	public void testIsSelected() {
-		Assert.assertFalse(new CachedHtmlElement(testPage.selectList.getElement()).isSelected());
+		Assert.assertFalse(new CachedHtmlElement(DriverTestPage.selectList.getElement()).isSelected());
 	}
 	
 	@Test(groups={"ut"})
 	public void testIsOptionSelected() {
-		testPage.selectList.selectByIndex(0);
-		Assert.assertTrue(new CachedHtmlElement(testPage.selectList.findElement(By.tagName("option"))).isSelected());
+		DriverTestPage.selectList.selectByIndex(0);
+		Assert.assertTrue(new CachedHtmlElement(DriverTestPage.selectList.findElement(By.tagName("option"))).isSelected());
 	}
 	
 	@Test(groups={"ut"})
 	public void testIsRadioSelected() {
 		try {
-			testPage.radioElement.click();
-			Assert.assertTrue(new CachedHtmlElement(testPage.radioElement.getElement()).isSelected());
+			DriverTestPage.radioElement.click();
+			Assert.assertTrue(new CachedHtmlElement(DriverTestPage.radioElement.getElement()).isSelected());
 		} finally {
-			testPage.resetButton.click();
+			DriverTestPage.resetButton.click();
 		}
 	}
 	
 	@Test(groups={"ut"})
 	public void testIsRadioNotSelected() {
 		try {
-			Assert.assertFalse(new CachedHtmlElement(testPage.radioElement.getElement()).isSelected());
+			Assert.assertFalse(new CachedHtmlElement(DriverTestPage.radioElement.getElement()).isSelected());
 		} finally {
-			testPage.resetButton.click();
+			DriverTestPage.resetButton.click();
 		}
 	}
 	
 	@Test(groups={"ut"})
 	public void testIsCheckboxSelected() {
 		try {
-			testPage.checkElement.click();
-			Assert.assertTrue(new CachedHtmlElement(testPage.checkElement.getElement()).isSelected());
+			DriverTestPage.checkElement.click();
+			Assert.assertTrue(new CachedHtmlElement(DriverTestPage.checkElement.getElement()).isSelected());
 		} finally {
-			testPage.resetButton.click();
+			DriverTestPage.resetButton.click();
 		}
 	}
 	
 	@Test(groups={"ut"})
 	public void testIsCheckboxNotSelected() {
 		try {
-			Assert.assertFalse(new CachedHtmlElement(testPage.checkElement.getElement()).isSelected());
+			Assert.assertFalse(new CachedHtmlElement(DriverTestPage.checkElement.getElement()).isSelected());
 		} finally {
-			testPage.resetButton.click();
+			DriverTestPage.resetButton.click();
 		}
 	}
 	
 	@Test(groups={"ut"})
 	public void testIsEnabled() {
-		Assert.assertTrue(new CachedHtmlElement(testPage.selectList.getElement()).isEnabled());
+		Assert.assertTrue(new CachedHtmlElement(DriverTestPage.selectList.getElement()).isEnabled());
 	}
 	
 	@Test(groups={"ut"})
 	public void testFindElementByTagName() {
-		Assert.assertEquals(new CachedHtmlElement(testPage.selectList.getElement()).findElement(By.tagName("option")).getAttribute("value"), "opt1");
+		Assert.assertEquals(new CachedHtmlElement(DriverTestPage.selectList.getElement()).findElement(By.tagName("option")).getAttribute("value"), "opt1");
 	}
 	
 	@Test(groups={"ut"})
 	public void testFindElementById() {
-		Assert.assertEquals(new CachedHtmlElement(testPage.parent.getElement()).findElement(By.id("child2")).getText(), "second child");
+		Assert.assertEquals(new CachedHtmlElement(DriverTestPage.parent.getElement()).findElement(By.id("child2")).getText(), "second child");
 	}
 	
 	@Test(groups={"ut"})
 	public void testFindElementByClassName() {
-		Assert.assertEquals(new CachedHtmlElement(testPage.parent.getElement()).findElement(By.className("myClass")).getText(), "first child");
+		Assert.assertEquals(new CachedHtmlElement(DriverTestPage.parent.getElement()).findElement(By.className("myClass")).getText(), "first child");
 	}
 	
 	@Test(groups={"ut"})
 	public void testFindElementByName() {
-		Assert.assertEquals(new CachedHtmlElement(testPage.parent.getElement()).findElement(By.name("child4Name")).getText(), "fourth child");
+		Assert.assertEquals(new CachedHtmlElement(DriverTestPage.parent.getElement()).findElement(By.name("child4Name")).getText(), "fourth child");
 	}
 	
 	@Test(groups={"ut"})
 	public void testFindElementByLinkText() {
-		Assert.assertEquals(new CachedHtmlElement(testPage.parentDiv.getElement()).findElement(By.linkText("My link Parent")).getAttribute("name"), "googleLink");
+		Assert.assertEquals(new CachedHtmlElement(DriverTestPage.parentDiv.getElement()).findElement(By.linkText("My link Parent")).getAttribute("name"), "googleLink");
 	}
 	
 	@Test(groups={"ut"})
 	public void testFindElementsByTagName() {
-		Assert.assertEquals(new CachedHtmlElement(testPage.selectList.getElement()).findElements(By.tagName("option")).size(), 3);
+		Assert.assertEquals(new CachedHtmlElement(DriverTestPage.selectList.getElement()).findElements(By.tagName("option")).size(), 3);
 	}
 
 	@Test(groups={"ut"})
 	public void testIsDisplayed() {
-		Assert.assertTrue(new CachedHtmlElement(testPage.selectList.getElement()).isDisplayed());
+		Assert.assertTrue(new CachedHtmlElement(DriverTestPage.selectList.getElement()).isDisplayed());
 	}
 	
 	/**
@@ -186,12 +179,12 @@ public class TestCachedHtmlElement extends GenericTest {
 	 */
 	@Test(groups={"ut"})
 	public void testGetLocation() {
-		Assert.assertEquals(new CachedHtmlElement(testPage.selectList.getElement()).getLocation(), testPage.selectList.getElement().getLocation());
+		Assert.assertEquals(new CachedHtmlElement(DriverTestPage.selectList.getElement()).getLocation(), DriverTestPage.selectList.getElement().getLocation());
 	}
 	
 	@Test(groups={"ut"})
 	public void testGetSize() {
-		Assert.assertEquals(new CachedHtmlElement(testPage.selectList.getElement()).getSize(), testPage.selectList.getElement().getSize());
+		Assert.assertEquals(new CachedHtmlElement(DriverTestPage.selectList.getElement()).getSize(), DriverTestPage.selectList.getElement().getSize());
 	}
 	
 	@Test(groups={"ut"})
@@ -199,11 +192,11 @@ public class TestCachedHtmlElement extends GenericTest {
 		// depends on where we execute the test, rectangle may throw an exception
 		Rectangle rect;
 		try {
-			rect = testPage.selectList.getElement().getRect();
+			rect = DriverTestPage.selectList.getElement().getRect();
 		} catch (WebDriverException e) {
-			rect = new Rectangle(testPage.selectList.getElement().getLocation(), testPage.selectList.getElement().getSize());
+			rect = new Rectangle(DriverTestPage.selectList.getElement().getLocation(), DriverTestPage.selectList.getElement().getSize());
 		}
-		Assert.assertEquals(new CachedHtmlElement(testPage.selectList.getElement()).getRect(), rect);
+		Assert.assertEquals(new CachedHtmlElement(DriverTestPage.selectList.getElement()).getRect(), rect);
 	}
 	
 	

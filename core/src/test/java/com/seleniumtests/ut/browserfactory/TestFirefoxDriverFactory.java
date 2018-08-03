@@ -23,8 +23,6 @@ import org.testng.annotations.Test;
 
 import com.seleniumtests.GenericTest;
 import com.seleniumtests.browserfactory.BrowserInfo;
-import com.seleniumtests.browserfactory.FirefoxDriverFactory;
-import com.seleniumtests.driver.DriverConfig;
 
 public class TestFirefoxDriverFactory extends GenericTest {
 

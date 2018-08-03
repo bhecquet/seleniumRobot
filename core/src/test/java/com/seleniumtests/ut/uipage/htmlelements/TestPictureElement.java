@@ -18,8 +18,8 @@
  */
 package com.seleniumtests.ut.uipage.htmlelements;
 
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -43,10 +43,8 @@ import org.testng.annotations.AfterMethod;
 import org.testng.annotations.Test;
 
 import com.seleniumtests.MockitoTest;
-import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.ImageSearchException;
 import com.seleniumtests.driver.CustomEventFiringWebDriver;
-import com.seleniumtests.driver.TestType;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.driver.screenshots.ScreenshotUtil;
 import com.seleniumtests.uipage.htmlelements.HtmlElement;

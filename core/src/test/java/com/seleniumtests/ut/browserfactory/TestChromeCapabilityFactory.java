@@ -24,9 +24,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.anyList;
-
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.openqa.selenium.MutableCapabilities;

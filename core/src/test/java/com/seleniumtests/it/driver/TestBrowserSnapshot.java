@@ -56,7 +56,6 @@ import com.seleniumtests.util.imaging.ImageDetector;
 public class TestBrowserSnapshot extends MockitoTest {
 	
 	private static WebDriver driver;
-	private DriverTestPage testPage;
 	private final String browserName = "firefox";
 	
 	@BeforeMethod(groups={"it"})
@@ -70,7 +69,7 @@ public class TestBrowserSnapshot extends MockitoTest {
 //		SeleniumTestsContextManager.getThreadContext().setRunMode("grid");
 //		SeleniumTestsContextManager.getThreadContext().setBrowser("firefox");
 //		SeleniumTestsContextManager.getThreadContext().setFirefoxBinary("path to firefox");
-		testPage = new DriverTestPage(true);
+		new DriverTestPage(true); // start displaying page
 		driver = WebUIDriver.getWebDriver(true);
 	}
 	
@@ -321,7 +320,7 @@ public class TestBrowserSnapshot extends MockitoTest {
 	@Test(groups= {"it"})
 	public void testMultipleWindowsCapture() {
 		String currentWindowHandle = driver.getWindowHandle();
-		testPage.link.click();
+		DriverTestPage.link.click();
 		List<ScreenShot> screenshots = new ScreenshotUtil().captureWebPageSnapshots(true);
 		
 		Assert.assertEquals(screenshots.size(), 2);
@@ -334,7 +333,7 @@ public class TestBrowserSnapshot extends MockitoTest {
 	 */
 	@Test(groups= {"it"})
 	public void testMultipleWindowsCaptureWithError() {
-		testPage.link.click();
+		DriverTestPage.link.click();
 		
 		WebDriver mockedDriver = spy(driver);
 		ScreenshotUtil screenshotUtil = spy(new ScreenshotUtil(mockedDriver));
@@ -363,7 +362,7 @@ public class TestBrowserSnapshot extends MockitoTest {
 	@Test(groups= {"it"})
 	public void testCurrentWindowsCapture() {
 		String currentWindowHandle = driver.getWindowHandle();
-		testPage.link.click();
+		DriverTestPage.link.click();
 		List<ScreenShot> screenshots = new ScreenshotUtil().captureWebPageSnapshots(false);
 		
 		Assert.assertEquals(screenshots.size(), 1);
@@ -375,7 +374,7 @@ public class TestBrowserSnapshot extends MockitoTest {
 	 */
 	@Test(groups= {"it"})
 	public void testCurrentWindowsCapture2() {
-		testPage.link.click();
+		DriverTestPage.link.click();
 		ScreenShot screenshot = new ScreenshotUtil().captureWebPageSnapshot();
 		
 		Assert.assertNotNull(screenshot.getImagePath());

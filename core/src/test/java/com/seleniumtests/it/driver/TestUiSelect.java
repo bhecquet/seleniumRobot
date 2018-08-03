@@ -34,26 +34,29 @@ import com.seleniumtests.it.driver.support.pages.DriverTestPage;
 public class TestUiSelect extends GenericTest {
 	
 	private static WebDriver driver;
-	private static DriverTestPage testPage;
 	
-	public TestUiSelect() throws Exception {
-	}
-	
-	public TestUiSelect(WebDriver driver, DriverTestPage testPage) throws Exception {
-		TestUiSelect.driver = driver;
-		TestUiSelect.testPage = testPage;
-	}
+//	public TestUiSelect()  {
+//	}
+//	
+//	public TestUiSelect(WebDriver driver, DriverTestPage testPage) throws Exception {
+//		TestUiSelect.driver = driver;
+//		TestUiSelect.testPage = testPage;
+//	}
 
-	@BeforeClass(groups={"it"})
+	@BeforeClass(groups={"it", "ut"})
 	public void initDriver(final ITestContext testNGCtx) throws Exception {
 		initThreadContext(testNGCtx);
-		SeleniumTestsContextManager.getThreadContext().setBrowser("chrome");
+		setBrowser();
 		SeleniumTestsContextManager.getThreadContext().setExplicitWaitTimeout(2);
-		testPage = new DriverTestPage(true);
+		new DriverTestPage(true);
 		driver = WebUIDriver.getWebDriver(true);
 	}
+
+	public void setBrowser() {
+		SeleniumTestsContextManager.getThreadContext().setBrowser("chrome");
+	}
 	
-	@AfterMethod(groups={"it"})
+	@AfterMethod(groups={"it", "ut"})
 	public void cleanAlert() {
 		try {
 			driver.switchTo().alert().accept();
@@ -67,135 +70,135 @@ public class TestUiSelect extends GenericTest {
 	 */
 	@Test(groups={"it"})
 	public void testIsTextSelect() {
-			testPage.selectList.selectByText("option2");
-			Assert.assertTrue(testPage.selectList.getSelectedText().equals("option2"));
+			DriverTestPage.selectList.selectByText("option2");
+			Assert.assertTrue(DriverTestPage.selectList.getSelectedText().equals("option2"));
 	}
 	
 	@Test(groups={"it"})
 	public void testIsMultipleTextSelect() {
-			testPage.selectMultipleList.deselectAll();
+			DriverTestPage.selectMultipleList.deselectAll();
 			String[] toSelect = {"option2", "option4"};
-			testPage.selectMultipleList.selectByText(toSelect);
-			Assert.assertTrue(toSelect[0].equals(testPage.selectMultipleList.getSelectedTexts()[0]));
-			Assert.assertTrue(toSelect[1].equals(testPage.selectMultipleList.getSelectedTexts()[1]));
+			DriverTestPage.selectMultipleList.selectByText(toSelect);
+			Assert.assertTrue(toSelect[0].equals(DriverTestPage.selectMultipleList.getSelectedTexts()[0]));
+			Assert.assertTrue(toSelect[1].equals(DriverTestPage.selectMultipleList.getSelectedTexts()[1]));
 	}
 	
 	@Test(groups={"it"})
 	public void testIsValueSelect() {
-		testPage.selectList.selectByValue("opt2");
-		Assert.assertTrue(testPage.selectList.getSelectedValue().equals("opt2"));
+		DriverTestPage.selectList.selectByValue("opt2");
+		Assert.assertTrue(DriverTestPage.selectList.getSelectedValue().equals("opt2"));
 	}
 	
 	@Test(groups={"it"})
 	public void testIsMultipleValueSelect() {
-			testPage.selectMultipleList.deselectAll();
+			DriverTestPage.selectMultipleList.deselectAll();
 			String[] toSelect = {"opt2", "opt4"};
-			testPage.selectMultipleList.selectByValue(toSelect);
-			Assert.assertTrue(toSelect[0].equals(testPage.selectMultipleList.getSelectedValues()[0]));
-			Assert.assertTrue(toSelect[1].equals(testPage.selectMultipleList.getSelectedValues()[1]));
+			DriverTestPage.selectMultipleList.selectByValue(toSelect);
+			Assert.assertTrue(toSelect[0].equals(DriverTestPage.selectMultipleList.getSelectedValues()[0]));
+			Assert.assertTrue(toSelect[1].equals(DriverTestPage.selectMultipleList.getSelectedValues()[1]));
 	}
 	
 	@Test(groups={"it"})
 	public void testGetFirstSelectedOption() {
-		testPage.selectMultipleList.deselectAll();
+		DriverTestPage.selectMultipleList.deselectAll();
 		String[] toSelect = {"opt2", "opt4"};
-		testPage.selectMultipleList.selectByValue(toSelect);
-		Assert.assertTrue("option2".equals(testPage.selectMultipleList.getFirstSelectedOption().getText()));
+		DriverTestPage.selectMultipleList.selectByValue(toSelect);
+		Assert.assertTrue("option2".equals(DriverTestPage.selectMultipleList.getFirstSelectedOption().getText()));
 	}
 	
 	@Test(groups={"it"})
 	public void testGetFirstSelectedOptionNoSelection() {
-		testPage.selectMultipleList.deselectAll();
-		Assert.assertNull(testPage.selectMultipleList.getFirstSelectedOption());
+		DriverTestPage.selectMultipleList.deselectAll();
+		Assert.assertNull(DriverTestPage.selectMultipleList.getFirstSelectedOption());
 	}
 	
 
 	@Test(groups={"it"})
 	public void testGetAllSelectedOptions() {
-		testPage.selectMultipleList.deselectAll();
+		DriverTestPage.selectMultipleList.deselectAll();
 		String[] toSelect = {"opt2", "opt4"};
-		testPage.selectMultipleList.selectByValue(toSelect);
-		Assert.assertTrue("option2".equals(testPage.selectMultipleList.getAllSelectedOptions().get(0).getText()));
-		Assert.assertTrue("option4".equals(testPage.selectMultipleList.getAllSelectedOptions().get(1).getText()));
+		DriverTestPage.selectMultipleList.selectByValue(toSelect);
+		Assert.assertTrue("option2".equals(DriverTestPage.selectMultipleList.getAllSelectedOptions().get(0).getText()));
+		Assert.assertTrue("option4".equals(DriverTestPage.selectMultipleList.getAllSelectedOptions().get(1).getText()));
 	}
 	
 	
 	@Test(groups={"it"})
 	public void testIsCorrespondingTextSelect() {
-			testPage.selectList.selectByCorrespondingText("option 2");
-			Assert.assertTrue(testPage.selectList.getSelectedValue().equals("opt2"));
+			DriverTestPage.selectList.selectByCorrespondingText("option 2");
+			Assert.assertTrue(DriverTestPage.selectList.getSelectedValue().equals("opt2"));
 	}
 	
 	@Test(groups={"it"})
 	public void testIsMultipleCorrespondingTextSelect() {
-			testPage.selectMultipleList.deselectAll();
+			DriverTestPage.selectMultipleList.deselectAll();
 			String[] toSelect = {"option 2", "opti4"};
-			testPage.selectMultipleList.selectByCorrespondingText(toSelect);
+			DriverTestPage.selectMultipleList.selectByCorrespondingText(toSelect);
 			String[] toFind = {"opt2", "opt4"};
-			Assert.assertTrue(toFind[0].equals(testPage.selectMultipleList.getSelectedValues()[0]));
-			Assert.assertTrue(toFind[1].equals(testPage.selectMultipleList.getSelectedValues()[1]));
+			Assert.assertTrue(toFind[0].equals(DriverTestPage.selectMultipleList.getSelectedValues()[0]));
+			Assert.assertTrue(toFind[1].equals(DriverTestPage.selectMultipleList.getSelectedValues()[1]));
 	}
 	
 	@Test(groups={"it"})
 	public void testIsAllDeselected() {
 		String[] toSelect = {"opt1", "opt2", "opt3", "opt4"};
-		testPage.selectMultipleList.selectByCorrespondingText(toSelect);
-		testPage.selectMultipleList.deselectAll();
-		Assert.assertTrue(testPage.selectMultipleList.getSelectedValues().length == 0);
+		DriverTestPage.selectMultipleList.selectByCorrespondingText(toSelect);
+		DriverTestPage.selectMultipleList.deselectAll();
+		Assert.assertTrue(DriverTestPage.selectMultipleList.getSelectedValues().length == 0);
 	}
 	
 	@Test(groups={"it"})
 	public void testIsIndexSelect() {
-		testPage.selectList.selectByIndex(1);
-		Assert.assertTrue(testPage.selectList.getSelectedValue().equals("opt2"));
+		DriverTestPage.selectList.selectByIndex(1);
+		Assert.assertTrue(DriverTestPage.selectList.getSelectedValue().equals("opt2"));
 	}
 	
 	@Test(groups={"it"})
 	public void testIsMultipleIndexSelect() {
-		testPage.selectMultipleList.deselectAll();
+		DriverTestPage.selectMultipleList.deselectAll();
 		int[] toSelect = {1, 2};
-		testPage.selectMultipleList.selectByIndex(toSelect);
-		Assert.assertTrue(testPage.selectMultipleList.getSelectedValues()[0].equals("opt2"));
-		Assert.assertTrue(testPage.selectMultipleList.getSelectedValues()[1].equals("opt3"));
+		DriverTestPage.selectMultipleList.selectByIndex(toSelect);
+		Assert.assertTrue(DriverTestPage.selectMultipleList.getSelectedValues()[0].equals("opt2"));
+		Assert.assertTrue(DriverTestPage.selectMultipleList.getSelectedValues()[1].equals("opt3"));
 	}
 	
 	@Test(groups={"it"})
 	public void testIsIndexDeselect() {
-		testPage.selectMultipleList.deselectAll();
-		testPage.selectMultipleList.selectByIndex(1);
-		testPage.selectMultipleList.deselectByIndex(1);
-		Assert.assertTrue(testPage.selectMultipleList.getSelectedValues().length == 0);
+		DriverTestPage.selectMultipleList.deselectAll();
+		DriverTestPage.selectMultipleList.selectByIndex(1);
+		DriverTestPage.selectMultipleList.deselectByIndex(1);
+		Assert.assertTrue(DriverTestPage.selectMultipleList.getSelectedValues().length == 0);
 	}
 	
 	@Test(groups={"it"})
 	public void testIsTextDeselect() {
-		testPage.selectMultipleList.deselectAll();
-		testPage.selectMultipleList.selectByText("option1");
-		testPage.selectMultipleList.deselectByText("option1");
-		Assert.assertTrue(testPage.selectMultipleList.getSelectedValues().length == 0);
+		DriverTestPage.selectMultipleList.deselectAll();
+		DriverTestPage.selectMultipleList.selectByText("option1");
+		DriverTestPage.selectMultipleList.deselectByText("option1");
+		Assert.assertTrue(DriverTestPage.selectMultipleList.getSelectedValues().length == 0);
 	}
 	
 	@Test(groups={"it"})
 	public void testIsValueDeselect() {
-		testPage.selectMultipleList.deselectAll();
-		testPage.selectMultipleList.selectByValue("opt1");
-		testPage.selectMultipleList.deselectByValue("opt1");
-		Assert.assertTrue(testPage.selectMultipleList.getSelectedValues().length == 0);
+		DriverTestPage.selectMultipleList.deselectAll();
+		DriverTestPage.selectMultipleList.selectByValue("opt1");
+		DriverTestPage.selectMultipleList.deselectByValue("opt1");
+		Assert.assertTrue(DriverTestPage.selectMultipleList.getSelectedValues().length == 0);
 	}	
 	
 	// test of select as UL/LI lists
 	@Test(groups={"it"})
 	public void testSelectUlList() {
-		testPage.ulliListTrigger.click();
-		testPage.selectUlLiList.selectByText("English");
-		Assert.assertEquals(testPage.ulliListTrigger.getValue(), "English");
+		DriverTestPage.ulliListTrigger.click();
+		DriverTestPage.selectUlLiList.selectByText("English");
+		Assert.assertEquals(DriverTestPage.ulliListTrigger.getValue(), "English");
 	}
 	
 	@Test(groups={"it"})
 	public void testInputInSelectUlList() {
-		testPage.ulliListTrigger.click();
+		DriverTestPage.ulliListTrigger.click();
 		
 		// should not raise any exception
-		testPage.textInselectUlLiList.sendKeys("text");
+		DriverTestPage.textInselectUlLiList.sendKeys("text");
 	}
 }

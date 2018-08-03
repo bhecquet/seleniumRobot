@@ -24,7 +24,6 @@ import java.nio.file.Paths;
 import org.apache.commons.io.FileUtils;
 import org.springframework.util.StringUtils;
 import org.testng.Assert;
-import org.testng.TestNG;
 import org.testng.annotations.Test;
 import org.testng.xml.XmlSuite.ParallelMode;
 

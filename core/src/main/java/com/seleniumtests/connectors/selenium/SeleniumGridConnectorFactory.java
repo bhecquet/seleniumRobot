@@ -22,10 +22,10 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import org.apache.log4j.Logger;
-import org.openqa.selenium.support.ui.SystemClock;
 
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
+import com.seleniumtests.core.utils.SystemClock;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.util.helper.WaitHelper;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;

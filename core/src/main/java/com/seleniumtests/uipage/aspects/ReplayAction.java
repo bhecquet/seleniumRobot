@@ -30,10 +30,10 @@ import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.remote.UnreachableBrowserException;
-import org.openqa.selenium.support.ui.SystemClock;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.aspects.LogAction;
+import com.seleniumtests.core.utils.SystemClock;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.DatasetException;
 import com.seleniumtests.customexception.ScenarioException;
@@ -43,7 +43,6 @@ import com.seleniumtests.reporter.logger.TestLogging;
 import com.seleniumtests.uipage.ReplayOnError;
 import com.seleniumtests.uipage.htmlelements.GenericPictureElement;
 import com.seleniumtests.uipage.htmlelements.HtmlElement;
-import com.seleniumtests.uipage.htmlelements.PictureElement;
 import com.seleniumtests.util.helper.WaitHelper;
 
 /**

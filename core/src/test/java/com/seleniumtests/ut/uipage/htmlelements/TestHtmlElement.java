@@ -19,21 +19,20 @@
 package com.seleniumtests.ut.uipage.htmlelements;
 
 import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.anyObject;
 import static org.mockito.Mockito.atLeast;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.doNothing;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Pattern;
 
 import org.mockito.Mock;
@@ -48,10 +47,7 @@ import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Keyboard;
 import org.openqa.selenium.interactions.Mouse;
-import org.openqa.selenium.remote.Command;
-import org.openqa.selenium.remote.CommandExecutor;
 import org.openqa.selenium.remote.DesiredCapabilities;
-import org.openqa.selenium.remote.DriverCommand;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.RemoteWebElement;
 import org.openqa.selenium.remote.Response;
@@ -60,12 +56,9 @@ import org.openqa.selenium.support.events.EventFiringWebDriver;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
-import org.testng.ITestContext;
-import org.testng.ITestResult;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import com.google.common.collect.ImmutableMap;
 import com.seleniumtests.MockitoTest;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.ScenarioException;
@@ -93,7 +86,7 @@ public class TestHtmlElement extends MockitoTest {
 	@Mock
 	private RemoteWebDriver driver;
 	
-	private AppiumDriver mobileDriver;
+	private AppiumDriver<?> mobileDriver;
 	
 	@Mock
 	private MobileElement mobileElement;
@@ -170,8 +163,8 @@ public class TestHtmlElement extends MockitoTest {
 		findResponse.setValue(mobileElement);
 
 		// newSession, getSession, getSession, findElement
-		when(ce.execute(anyObject())).thenReturn(response, response, response, findResponse);
-		mobileDriver = Mockito.spy(new AppiumDriver(ce, new DesiredCapabilities()));
+		when(ce.execute(any())).thenReturn(response, response, response, findResponse);
+		mobileDriver = Mockito.spy(new AppiumDriver<>(ce, new DesiredCapabilities()));
 		
 		SeleniumTestsContextManager.getThreadContext().setTestType(TestType.WEB);
 		SeleniumTestsContextManager.getThreadContext().setBrowser("htmlunit");

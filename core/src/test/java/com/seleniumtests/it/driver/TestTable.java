@@ -20,7 +20,6 @@ package com.seleniumtests.it.driver;
 
 import java.util.regex.Pattern;
 
-import org.openqa.selenium.WebDriver;
 import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.annotations.AfterClass;
@@ -34,16 +33,12 @@ import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.it.driver.support.pages.DriverTestPage;
 
 public class TestTable extends GenericTest {
-	
-	private static DriverTestPage testPage;
-	private static WebDriver driver;
 
 	@BeforeClass(groups={"it"})
 	public void initPage(final ITestContext testNGCtx) throws Exception {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setBrowser("chrome");
-		driver = WebUIDriver.getWebDriver(true);
-		testPage = new DriverTestPage(true);
+		new DriverTestPage(true);
 	}
 		
 
@@ -56,42 +51,42 @@ public class TestTable extends GenericTest {
 	
 	@Test(groups={"it"})
 	public void testGetContent() {
-		Assert.assertEquals(testPage.table.getContent(0, 0), "Id");
+		Assert.assertEquals(DriverTestPage.table.getContent(0, 0), "Id");
 	}
 	
 	@Test(groups={"it"}, expectedExceptions=ScenarioException.class)
 	public void testGetContentEmptyTable() {
-		testPage.emptyTable.getContent(0, 0);
+		DriverTestPage.emptyTable.getContent(0, 0);
 	}
 	
 	@Test(groups={"it"}, expectedExceptions=IndexOutOfBoundsException.class)
 	public void testGetContentOutsideRange() {
-		Assert.assertEquals(testPage.table.getContent(10, 0), "Id");
+		Assert.assertEquals(DriverTestPage.table.getContent(10, 0), "Id");
 	}
 	
 	@Test(groups={"it"})
 	public void testGetCellFromContent() {
-		Assert.assertEquals(testPage.table.getCellFromContent(Pattern.compile("Jav.*"), 1).getText(), "Java");
+		Assert.assertEquals(DriverTestPage.table.getCellFromContent(Pattern.compile("Jav.*"), 1).getText(), "Java");
 	}
 	
 	@Test(groups={"it"}, expectedExceptions=ScenarioException.class)
 	public void testGetCellFromWrongContent() {
-		testPage.table.getCellFromContent(Pattern.compile("Jai.*"), 1).getText();
+		DriverTestPage.table.getCellFromContent(Pattern.compile("Jai.*"), 1).getText();
 	}
 	
 	@Test(groups={"it"})
 	public void testRowCount() {
-		Assert.assertEquals(testPage.table.getRowCount(), 3);
+		Assert.assertEquals(DriverTestPage.table.getRowCount(), 3);
 	}
 	
 	@Test(groups={"it"})
 	public void testRowCountEmptyTable() {
-		Assert.assertEquals(testPage.emptyTable.getRowCount(), 0);
+		Assert.assertEquals(DriverTestPage.emptyTable.getRowCount(), 0);
 	}
 	
 	@Test(groups={"it"})
 	public void testColCount() {
-		Assert.assertEquals(testPage.table.getColumnCount(), 2);
+		Assert.assertEquals(DriverTestPage.table.getColumnCount(), 2);
 	}
 	
 }

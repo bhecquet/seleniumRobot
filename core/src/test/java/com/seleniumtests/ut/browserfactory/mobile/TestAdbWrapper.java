@@ -20,12 +20,9 @@ package com.seleniumtests.ut.browserfactory.mobile;
 
 import static org.mockito.Mockito.when;
 
-import java.io.IOException;
-import java.nio.charset.Charset;
 import java.nio.file.Paths;
 import java.util.List;
 
-import org.apache.commons.io.IOUtils;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;

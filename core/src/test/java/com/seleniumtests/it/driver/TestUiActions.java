@@ -73,8 +73,7 @@ public class TestUiActions extends GenericTest {
 	@Test(groups={"it"}, enabled=false)
 	public void testNewActionWithHtmlElement() throws Exception {
 		try {
-			DriverTestPage testPage = new DriverTestPage(false);
-			new Actions(((CustomEventFiringWebDriver)driver).getWebDriver()).moveToElement(testPage.redSquare).click().build().perform();
+			new Actions(((CustomEventFiringWebDriver)driver).getWebDriver()).moveToElement(DriverTestPage.redSquare).click().build().perform();
 			Assert.assertEquals("coucou", driver.findElement(By.id("text2")).getAttribute("value"));
 		} finally {
 			new Actions(driver).moveToElement(driver.findElement(By.id("button2"))).click().build().perform();
@@ -105,10 +104,9 @@ public class TestUiActions extends GenericTest {
 	
 	@Test(groups={"it"}) 
 	public void testSendKeysWithHtmlElement() throws Exception {
-		DriverTestPage testPage = new DriverTestPage(false);
 		try {
-			new Actions(driver).moveToElement(testPage.textElement).click().sendKeys("youpi2").build().perform();
-			Assert.assertEquals("youpi2", testPage.textElement.getAttribute("value"));
+			new Actions(driver).moveToElement(DriverTestPage.textElement).click().sendKeys("youpi2").build().perform();
+			Assert.assertEquals("youpi2", DriverTestPage.textElement.getAttribute("value"));
 		} finally {
 			driver.findElement(By.id("button2")).click();
 		}

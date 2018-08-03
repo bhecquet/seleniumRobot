@@ -32,7 +32,6 @@ import java.util.List;
 import org.openqa.selenium.Platform;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
-import com.seleniumtests.core.TestVariable;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.util.osutility.OSUtility;
 

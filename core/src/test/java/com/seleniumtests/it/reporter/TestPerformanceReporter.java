@@ -30,7 +30,6 @@ import org.testng.annotations.Test;
 import org.testng.xml.XmlSuite.ParallelMode;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
-import com.seleniumtests.reporter.reporters.CustomReporter;
 
 /**
  * Test that default reporting contains an XML file per test (CustomReporter.java) with default test reports defined in SeleniumTestsContext.DEFAULT_CUSTOM_TEST_REPORTS
@@ -38,10 +37,7 @@ import com.seleniumtests.reporter.reporters.CustomReporter;
  *
  */
 public class TestPerformanceReporter extends ReporterTest {
-	
-	private CustomReporter reporter;
 
-	
 	@BeforeMethod(groups={"it"})
 	private void deleteGeneratedFiles() throws IOException {
 		FileUtils.deleteQuietly(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()));
@@ -49,7 +45,6 @@ public class TestPerformanceReporter extends ReporterTest {
 		
 	}
 	
-	@SuppressWarnings("unchecked")
 	@Test(groups={"it"})
 	public void testReportGeneration(ITestContext testContext) throws Exception {
 		

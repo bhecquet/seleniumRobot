@@ -19,8 +19,6 @@
 package com.seleniumtests.uipage.htmlelements;
 
 import java.io.File;
-import java.time.Duration;
-import java.time.LocalDateTime;
 import java.util.Arrays;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;

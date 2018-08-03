@@ -23,7 +23,6 @@ import java.io.File;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.time.temporal.TemporalAmount;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -73,7 +72,8 @@ public class ScreenshotUtil {
         this.driver = driver;
     }
 	
-    public static String capturePageScreenshotToString(final WebDriver driver) {
+    @SuppressWarnings("unchecked")
+	public static String capturePageScreenshotToString(final WebDriver driver) {
         if (driver == null) {
             return "";
         }

@@ -34,9 +34,7 @@ import org.testng.ITestResult;
 import org.testng.xml.XmlSuite;
 
 import com.seleniumtests.connectors.selenium.SeleniumRobotSnapshotServerConnector;
-import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
-import com.seleniumtests.core.runner.SeleniumRobotTestListener;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.SeleniumRobotServerException;
 import com.seleniumtests.reporter.logger.TestLogging;

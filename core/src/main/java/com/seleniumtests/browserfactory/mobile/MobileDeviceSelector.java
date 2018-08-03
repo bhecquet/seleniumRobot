@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.openqa.selenium.MutableCapabilities;
-import org.openqa.selenium.remote.DesiredCapabilities;
 
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.driver.BrowserType;

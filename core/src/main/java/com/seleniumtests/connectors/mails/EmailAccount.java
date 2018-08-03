@@ -27,8 +27,6 @@ import org.json.JSONObject;
 import org.testng.Assert;
 
 import com.seleniumtests.connectors.mails.EmailClientImpl.SearchMode;
-import com.seleniumtests.core.SeleniumTestsContextManager;
-import com.seleniumtests.core.TestVariable;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 

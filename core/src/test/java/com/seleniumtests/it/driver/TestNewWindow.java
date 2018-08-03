@@ -61,7 +61,7 @@ public class TestNewWindow extends GenericTest {
 
 		String mainHandle = null;
 		try {
-			testPage.link.click();
+			DriverTestPage.link.click();
 		
 			// go to new opened window
 			mainHandle = testPage.selectNewWindow();
@@ -75,7 +75,7 @@ public class TestNewWindow extends GenericTest {
 				}
 			}
 		}
-		Assert.assertTrue(testPage.link.getUrl().contains("testIFrame.html"));
+		Assert.assertTrue(DriverTestPage.link.getUrl().contains("testIFrame.html"));
 	}
 	
 	/**
@@ -88,13 +88,13 @@ public class TestNewWindow extends GenericTest {
 		
 		
 		try {
-			testPage.link.click();
+			DriverTestPage.link.click();
 			
 		
 			// go to new opened window
 			mainHandle = testPage.selectNewWindow();
-			DriverSubTestPage subTestPage = new DriverSubTestPage(false);
-			subTestPage.closeButton.click();
+			new DriverSubTestPage(false); // check we are on the page
+			DriverSubTestPage.closeButton.click();
 			testPage.selectWindow(mainHandle);
 		} finally {
 			// go back to main window

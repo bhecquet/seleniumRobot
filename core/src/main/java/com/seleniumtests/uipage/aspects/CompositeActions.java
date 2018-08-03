@@ -56,6 +56,9 @@ public class CompositeActions {
 	 * Update window handles when a click is requested in a composite Action (to get the same behavior between native clicks
 	 * and clicks in CompositeAction
 	 * Capture is done on all Action sub-classes, else it would never be done
+	 * 
+	 * TO KEEP until ClickAction and other equivalents are there in selenium code
+	 * 
 	 * @param joinPoint
 	 * @throws SecurityException 
 	 * @throws NoSuchFieldException 
@@ -70,6 +73,7 @@ public class CompositeActions {
 		CompositeAction compositeAction = (CompositeAction)joinPoint.getTarget();
 		Field actionListField = CompositeAction.class.getDeclaredField("actionsList");
 		actionListField.setAccessible(true);
+		@SuppressWarnings("unchecked")
 		List<Action> actionsList = (List<Action>)actionListField.get(compositeAction);
 		
 		boolean clickRequested = false;
@@ -96,11 +100,13 @@ public class CompositeActions {
 	@Before("execution(public void org.openqa.selenium.remote.RemoteWebDriver.perform (..))")
 	public void updateHandlesNewActions(JoinPoint joinPoint) throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
 
+		@SuppressWarnings("unchecked")
 		Collection<Sequence> sequences = (Collection<Sequence>)joinPoint.getArgs()[0];
 
 		for (Sequence sequence: sequences) {
 			Field actionsField = Sequence.class.getDeclaredField("actions");
 			actionsField.setAccessible(true);
+			@SuppressWarnings("unchecked")
 			LinkedList<Interaction> actionsList = (LinkedList<Interaction>)actionsField.get(sequence);
 			
 			Boolean clic = null;

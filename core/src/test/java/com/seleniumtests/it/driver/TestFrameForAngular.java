@@ -23,6 +23,7 @@ import org.testng.annotations.Test;
 
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.it.driver.support.GenericMultiBrowserTest;
+import com.seleniumtests.it.driver.support.pages.DriverTestAngularFrame;
 
 /**
  * Checks that it's possible to interact with elements in iframe
@@ -40,8 +41,8 @@ public class TestFrameForAngular extends GenericMultiBrowserTest {
 	 */
 	@Test(groups={"it"})
 	public void testAngularSelectByText() { 
-		angularFramePage.angularSelectListIFrame.selectByText("Option 1");
-		Assert.assertEquals(angularFramePage.angularSelectListIFrame.getSelectedText(), "Option 1");
+		DriverTestAngularFrame.angularSelectListIFrame.selectByText("Option 1");
+		Assert.assertEquals(DriverTestAngularFrame.angularSelectListIFrame.getSelectedText(), "Option 1");
 	}
 	
  	

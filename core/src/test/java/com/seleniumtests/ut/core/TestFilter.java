@@ -18,19 +18,19 @@
  */
 package com.seleniumtests.ut.core;
 
-import com.seleniumtests.GenericTest;
-import com.seleniumtests.core.Filter;
-
-import org.testng.Assert;
-import org.testng.annotations.Test;
-import org.testng.annotations.BeforeClass;
-
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
+
+import com.seleniumtests.GenericTest;
+import com.seleniumtests.core.Filter;
 
 public class TestFilter extends GenericTest {
 

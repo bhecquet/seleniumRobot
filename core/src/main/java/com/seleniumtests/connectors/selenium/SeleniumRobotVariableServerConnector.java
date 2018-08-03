@@ -30,7 +30,6 @@ import org.json.JSONObject;
 
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
-import com.mashape.unirest.request.HttpRequestWithBody;
 import com.mashape.unirest.request.body.MultipartBody;
 import com.seleniumtests.core.TestVariable;
 import com.seleniumtests.customexception.SeleniumRobotServerException;

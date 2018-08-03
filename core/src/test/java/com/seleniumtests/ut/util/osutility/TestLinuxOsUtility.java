@@ -26,7 +26,6 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang3.SystemUtils;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
@@ -43,10 +42,7 @@ import com.seleniumtests.util.osutility.OSCommand;
 import com.seleniumtests.util.osutility.OSUtility;
 import com.seleniumtests.util.osutility.OSUtilityFactory;
 import com.seleniumtests.util.osutility.OSUtilityUnix;
-import com.seleniumtests.util.osutility.OSUtilityWindows;
 import com.sun.jna.platform.win32.Advapi32Util;
-import com.sun.jna.platform.win32.Win32Exception;
-import com.sun.jna.platform.win32.WinReg;
 
 @PrepareForTest({Advapi32Util.class, OSUtilityUnix.class, OSUtilityFactory.class, OSCommand.class, Paths.class, BrowserInfo.class})
 public class TestLinuxOsUtility extends MockitoTest {

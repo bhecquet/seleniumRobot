@@ -18,7 +18,7 @@
  */
 package com.seleniumtests.ut.connectors.selenium;
 
-import static org.mockito.ArgumentMatchers.anyObject;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -75,7 +75,7 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 		when(HttpClients.createDefault()).thenReturn(client);
 		when(response.getEntity()).thenReturn(entity);
 		when(response.getStatusLine()).thenReturn(statusLine);
-		when(client.execute((HttpHost)anyObject(), anyObject())).thenReturn(response);
+		when(client.execute((HttpHost)any(), any())).thenReturn(response);
 		
 		PowerMockito.mockStatic(Unirest.class);
 	}
@@ -112,7 +112,7 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 		SeleniumGridConnector connector = new SeleniumRobotGridConnector("http://localhost:6666");
 		connector.uploadMobileApp(capabilities);
 		
-		verify(client, never()).execute((HttpHost)anyObject(), anyObject());
+		verify(client, never()).execute((HttpHost)any(), any());
 		Assert.assertEquals(capabilities.getCapability(MobileCapabilityType.APP), "http://server:port/data/application.apk");
 	}
 	
@@ -128,7 +128,7 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 		SeleniumGridConnector connector = new SeleniumRobotGridConnector("http://localhost:6666");
 		connector.uploadMobileApp(new DesiredCapabilities());
 		
-		verify(client, never()).execute((HttpHost)anyObject(), anyObject());
+		verify(client, never()).execute((HttpHost)any(), any());
 		Assert.assertEquals(capabilities.getCapability(MobileCapabilityType.APP), null);
 	}
 	

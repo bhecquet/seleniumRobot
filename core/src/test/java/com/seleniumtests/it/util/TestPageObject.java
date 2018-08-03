@@ -45,7 +45,7 @@ public class TestPageObject extends GenericDriverTest {
 	public void testResizeWindowHeadless() throws Exception {
 		SeleniumTestsContextManager.getThreadContext().setBrowser("*htmlunit");
 		driver = WebUIDriver.getWebDriver(true);
-		DriverTestPage testPage = new DriverTestPage(true);
+		new DriverTestPage(true);
 		new DriverTestPage(true).resizeTo(600, 400);
 		Dimension viewPortSize = ((CustomEventFiringWebDriver)driver).getViewPortDimensionWithoutScrollbar();
 		Assert.assertEquals(viewPortSize.width, 600);
