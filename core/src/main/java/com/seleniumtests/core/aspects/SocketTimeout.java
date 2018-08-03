@@ -18,40 +18,65 @@
  */
 package com.seleniumtests.core.aspects;
 
-import static java.util.concurrent.TimeUnit.SECONDS;
+import java.lang.reflect.Field;
+import java.net.URL;
+import java.time.Duration;
 
-import org.aspectj.lang.ProceedingJoinPoint;
-import org.aspectj.lang.annotation.Around;
+import org.apache.log4j.Logger;
+import org.aspectj.lang.JoinPoint;
+import org.aspectj.lang.annotation.After;
 import org.aspectj.lang.annotation.Aspect;
+import org.openqa.selenium.remote.HttpCommandExecutor;
 import org.openqa.selenium.remote.http.HttpClient;
-import org.openqa.selenium.remote.internal.ApacheHttpClient;
-import org.openqa.selenium.remote.internal.HttpClientFactory;
+import org.openqa.selenium.remote.internal.OkHttpClient;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
 @Aspect
 public class SocketTimeout {
 	
-	
-	public static final Integer DEFAULT_TIMEOUT = 60000;
-	private static final int TIMEOUT_TWO_MINUTES = (int) SECONDS.toMillis(60 * 2);
-	
-	private static HttpClient.Factory httpClientFactory = new ApacheHttpClient.Factory(new HttpClientFactory(TIMEOUT_TWO_MINUTES, TIMEOUT_TWO_MINUTES));
-	private static HttpClient.Factory httpClientFactoryLong = new ApacheHttpClient.Factory(new HttpClientFactory(TIMEOUT_TWO_MINUTES * 3, TIMEOUT_TWO_MINUTES * 3));
-	
+	private static boolean socketTimeoutUpdated = false;
+	private static final Logger logger = SeleniumRobotLogger.getLogger(SocketTimeout.class);
+
 	/**
+	 * Change timeout after HttpCommandExecutor creation
+	 * 
 	 * HttpCommandExecutor is responsible for sending commands to browser
 	 * Sometimes, browser is stuck. Default behaviour is a 3 hours wait
 	 * Change this to avoid test to be stuck during this time
+	 * 
 	 * @param joinPoint
+	 * @throws NoSuchFieldException
+	 * @throws SecurityException
+	 * @throws IllegalArgumentException
+	 * @throws IllegalAccessException
 	 */
-	@Around("execution(private * org.openqa.selenium.remote.HttpCommandExecutor.getDefaultClientFactory (..))")
-    public HttpClient.Factory changetTimeout(ProceedingJoinPoint joinPoint) {
+	@After("initialization(org.openqa.selenium.remote.HttpCommandExecutor.new (..))")
+	public void changeTimeout2(JoinPoint joinPoint) throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
+		HttpClient.Factory httpClientFactory;
 		if (SeleniumTestsContextManager.isMobileTest()) {
-			return httpClientFactoryLong;
+			httpClientFactory = new OkHttpClient.Factory(Duration.ofMinutes(6), Duration.ofMinutes(6));
 		} else {
-			return httpClientFactory;
+			httpClientFactory = new OkHttpClient.Factory(Duration.ofMinutes(2), Duration.ofMinutes(2));
 		}
+		
+		HttpCommandExecutor commandExecutor = (HttpCommandExecutor)joinPoint.getThis();
+		URL url = (URL) joinPoint.getArgs()[0];
+		
+		HttpClient client = httpClientFactory.createClient(url);
+		
+		Field clientField = HttpCommandExecutor.class.getDeclaredField("client");
+		clientField.setAccessible(true);
+		clientField.set(commandExecutor, client);
+		
+		logger.info("Socket timeout for driver communication updated");
+		
+		socketTimeoutUpdated = true;
+	}
+
+	public static boolean isSocketTimeoutUpdated() {
+		return socketTimeoutUpdated;
 	}
 	
 }
