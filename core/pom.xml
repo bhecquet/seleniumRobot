@@ -111,12 +111,7 @@
 		<dependency>
 			<groupId>org.apache.velocity</groupId>
 			<artifactId>velocity</artifactId>
-			<version>1.6.2</version>
-		</dependency>
-		<dependency>
-			<groupId>com.thoughtworks.qdox</groupId>
-			<artifactId>qdox</artifactId>
-			<version>1.12.1</version>
+			<version>1.7</version>
 		</dependency>
         <dependency>
             <groupId>org.hamcrest</groupId>
@@ -156,15 +151,10 @@
         	<artifactId>ini4j</artifactId>
         	<version>0.5.4</version>
         </dependency>
-        <!-- <dependency>
-        	<groupId>org.sikuli</groupId>
-        	<artifactId>sikuli-api</artifactId>
-        	<version>1.2.0</version>
-        </dependency> -->
         <dependency>
         	<groupId>org.aspectj</groupId>
         	<artifactId>aspectjrt</artifactId>
-        	<version>1.8.9</version>
+        	<version>${aspectj.version}</version>
         </dependency>
         <dependency>
 		    <groupId>com.github.javaparser</groupId>
@@ -208,12 +198,6 @@
 	      <version>${powermock.version}</version>
 	      <scope>test</scope>
 	   </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.11</version>
-            <scope>test</scope>
-        </dependency>
         <dependency>
 			<groupId>org.seleniumhq.selenium</groupId>
 			<artifactId>jetty-repacked</artifactId>
@@ -428,7 +412,14 @@
             <plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>aspectj-maven-plugin</artifactId>
-				<version>1.9</version>
+				<version>1.11</version>
+				<dependencies>
+					<dependency>
+						<groupId>org.aspectj</groupId>
+			            <artifactId>aspectjtools</artifactId>
+			            <version>${aspectj.version}</version>
+					</dependency>
+				</dependencies>
 				<configuration>
 					<complianceLevel>1.8</complianceLevel>
 					<source>1.8</source>

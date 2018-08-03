@@ -18,7 +18,6 @@
  */
 package com.seleniumtests.browserfactory;
 
-import java.io.File;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.nio.charset.Charset;
@@ -57,7 +56,6 @@ public class BrowserInfo {
 	private String path;
 	private String driverFileName;
 	private String os;
-	private boolean checkBrowserPath = true;
 	private BrowserType browser;
 	private boolean driverFileSearched = false;
 	
@@ -82,7 +80,6 @@ public class BrowserInfo {
 	public BrowserInfo(BrowserType browser, String version, String path, boolean check) {
 		this.browser = browser;
 		this.path = path;
-		this.checkBrowserPath = check;
 		
 		if (path != null && check && !Paths.get(path).toFile().exists()) {
 			throw new ConfigurationException(String.format("browser file %s does not exists", path));

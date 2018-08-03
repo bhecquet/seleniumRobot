@@ -21,7 +21,6 @@ package com.seleniumtests.it.util;
 import java.util.List;
 
 import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.testng.Assert;
 import org.testng.ITestContext;
@@ -39,17 +38,7 @@ import com.seleniumtests.uipage.htmlelements.TextFieldElement;
 
 public class TestByC extends GenericTest {
 	
-	
-
-	private static WebDriver driver;
-	private static DriverTestPage testPage;
-	
 	public TestByC() throws Exception {
-	}
-	
-	public TestByC(WebDriver driver, DriverTestPage testPage) throws Exception {
-		TestByC.driver = driver;
-		TestByC.testPage = testPage;
 	}
 	
 	@BeforeClass(groups={"it"})
@@ -60,8 +49,7 @@ public class TestByC extends GenericTest {
 		SeleniumTestsContextManager.getThreadContext().setCaptureSnapshot(false);
 //		SeleniumTestsContextManager.getThreadContext().setWebDriverGrid("http://127.0.0.1:4444/wd/hub");
 //		SeleniumTestsContextManager.getThreadContext().setRunMode("grid");
-		testPage = new DriverTestPage(true);
-		driver = WebUIDriver.getWebDriver(true);
+		new DriverTestPage(true); // start displaying page
 	}
 	
 	
@@ -74,19 +62,19 @@ public class TestByC extends GenericTest {
 	@Test(groups={"it"})
 	public void testFindElementByLabelForward() {
 		new TextFieldElement("", ByC.labelForward("By id forward", "input")).sendKeys("element found by label");
-		Assert.assertEquals(testPage.textSelectedId.getValue(), "element found by label");
+		Assert.assertEquals(DriverTestPage.textSelectedId.getValue(), "element found by label");
 	}
 	
 	@Test(groups={"it"})
 	public void testFindElementByCustomLabelForward() {
 		new TextFieldElement("", ByC.labelForward("Test select", "input", "h3")).sendKeys("element found by h3 tag");
-		Assert.assertEquals(testPage.textSelectedId.getValue(), "element found by h3 tag");
+		Assert.assertEquals(DriverTestPage.textSelectedId.getValue(), "element found by h3 tag");
 	}
 	
 	@Test(groups={"it"})
 	public void testFindElementByLabelForwardWithoutTagName() {
 		new TextFieldElement("", ByC.labelForward("By id forward")).sendKeys("element found by label without tagname");
-		Assert.assertEquals(testPage.textSelectedId.getValue(), "element found by label without tagname");
+		Assert.assertEquals(DriverTestPage.textSelectedId.getValue(), "element found by label without tagname");
 	}
 	
 	@Test(groups={"it"})
@@ -97,31 +85,31 @@ public class TestByC extends GenericTest {
 	@Test(groups={"it"})
 	public void testFindElementByPartialLabelForward() {
 		new TextFieldElement("", ByC.partialLabelForward("By id for", "input")).sendKeys("element found by partial label");
-		Assert.assertEquals(testPage.textSelectedId.getValue(), "element found by partial label");
+		Assert.assertEquals(DriverTestPage.textSelectedId.getValue(), "element found by partial label");
 	}
 
 	@Test(groups={"it"})
 	public void testFindElementByCustomPartialLabelForward() {
 		new TextFieldElement("", ByC.partialLabelForward("Test sele", "input", "h3")).sendKeys("element found by partial h3 tag");
-		Assert.assertEquals(testPage.textSelectedId.getValue(), "element found by partial h3 tag");
+		Assert.assertEquals(DriverTestPage.textSelectedId.getValue(), "element found by partial h3 tag");
 	}
 	
 	@Test(groups={"it"})
 	public void testFindElementByLabelBackward() {
 		new TextFieldElement("", ByC.labelBackward("By id backward", "input")).sendKeys("element found by label backward");
-		Assert.assertEquals(testPage.textSelectedText.getValue(), "element found by label backward");
+		Assert.assertEquals(DriverTestPage.textSelectedText.getValue(), "element found by label backward");
 	}
 
 	@Test(groups={"it"})
 	public void testFindElementByCustomLabelBackward() {
 		new TextFieldElement("", ByC.labelBackward("Test select Multiple", "input", "h3")).sendKeys("element found by h3 tag backward");
-		Assert.assertEquals(testPage.textSelectedText.getValue(), "element found by h3 tag backward");
+		Assert.assertEquals(DriverTestPage.textSelectedText.getValue(), "element found by h3 tag backward");
 	}
 	
 	@Test(groups={"it"})
 	public void testFindElementByLabelBackwardWithoutTagName() {
 		new TextFieldElement("", ByC.labelBackward("By id backward")).sendKeys("element found by label backward without tagname");
-		Assert.assertEquals(testPage.textSelectedText.getValue(), "element found by label backward without tagname");
+		Assert.assertEquals(DriverTestPage.textSelectedText.getValue(), "element found by label backward without tagname");
 	}
 	
 	@Test(groups={"it"})
@@ -132,19 +120,19 @@ public class TestByC extends GenericTest {
 	@Test(groups={"it"})
 	public void testFindElementByPartialLabelBackward() {
 		new TextFieldElement("", ByC.partialLabelBackward("By id back", "input")).sendKeys("element found by partial label backward");
-		Assert.assertEquals(testPage.textSelectedText.getValue(), "element found by partial label backward");
+		Assert.assertEquals(DriverTestPage.textSelectedText.getValue(), "element found by partial label backward");
 	}
 
 	@Test(groups={"it"})
 	public void testFindElementByPartialCustomLabelBackward() {
 		new TextFieldElement("", ByC.partialLabelBackward("Test select Mult", "input", "h3")).sendKeys("element found by h3 partial tag backward");
-		Assert.assertEquals(testPage.textSelectedText.getValue(), "element found by h3 partial tag backward");
+		Assert.assertEquals(DriverTestPage.textSelectedText.getValue(), "element found by h3 partial tag backward");
 	}
 
 	@Test(groups={"it"})
 	public void testFindElementByAttribute() {
 		new TextFieldElement("", ByC.attribute("attr", "attribute")).sendKeys("element found by attribute");
-		Assert.assertEquals(testPage.textSelectedId.getValue(), "element found by attribute");
+		Assert.assertEquals(DriverTestPage.textSelectedId.getValue(), "element found by attribute");
 	}
 	
 	@Test(groups={"it"}, expectedExceptions=IllegalArgumentException.class)

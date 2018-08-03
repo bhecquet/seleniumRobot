@@ -25,7 +25,6 @@ import java.util.List;
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.internal.FindsByCssSelector;
 import org.openqa.selenium.internal.FindsByXPath;
 
 public class ByC extends By {

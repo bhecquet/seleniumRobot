@@ -18,6 +18,7 @@
  */
 package com.seleniumtests.ut.core;
 
+import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.annotations.Test;
 
@@ -42,7 +43,7 @@ public class TestSeleniumTestContextManagerWithoutInit {
 			SeleniumTestsContextManager.initGlobalContext(testContext.getSuite()); 
 			SeleniumTestsContext context = SeleniumTestsContextManager.getGlobalContext();
 			context.setSoftAssertEnabled(false); 
-			org.junit.Assert.assertEquals(context.getApp(), "myMobileApp.apk");
+			Assert.assertEquals(context.getApp(), "myMobileApp.apk");
 		} finally {
 			SeleniumTestsContextManager.setGlobalContext(null);
 		}

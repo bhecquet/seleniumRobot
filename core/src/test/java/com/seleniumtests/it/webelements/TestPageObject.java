@@ -18,7 +18,6 @@
  */
 package com.seleniumtests.it.webelements;
 
-import org.openqa.selenium.WebDriver;
 import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.annotations.BeforeMethod;
@@ -26,7 +25,6 @@ import org.testng.annotations.Test;
 
 import com.seleniumtests.GenericTest;
 import com.seleniumtests.core.SeleniumTestsContextManager;
-import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.it.driver.support.pages.DriverSubTestPage;
 import com.seleniumtests.it.driver.support.pages.DriverTestPage;
 
@@ -38,19 +36,17 @@ import com.seleniumtests.it.driver.support.pages.DriverTestPage;
 public class TestPageObject extends GenericTest {
 	
 	private static DriverTestPage testPage;
-	private WebDriver driver;
 
 	@BeforeMethod(groups= {"it"})
 	public void initDriver(final ITestContext testNGCtx) throws Exception {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setBrowser("chrome");
 		testPage = new DriverTestPage(true);
-		driver = WebUIDriver.getWebDriver(true);
 	}
 	
 	@Test(groups= {"it"})
 	public void testPageParam() {
-		Assert.assertEquals(testPage.param("variable1"), "value3");
+		Assert.assertEquals(DriverTestPage.param("variable1"), "value3");
 	}
 
 	/**
@@ -59,7 +55,7 @@ public class TestPageObject extends GenericTest {
 	 */
 	@Test(groups= {"it"})
 	public void testCloseLastTab() throws Exception {
-		DriverSubTestPage subPage = testPage._goToNewPage();
+		testPage._goToNewPage();
 		testPage.getFocus();
 		DriverSubTestPage subPage2 = testPage._goToNewPage();
 		subPage2.close();
@@ -75,7 +71,7 @@ public class TestPageObject extends GenericTest {
 	 */
 	@Test(groups= {"it"})
 	public void testCloseFirstTab() throws Exception {
-		DriverSubTestPage subPage2 = testPage._goToNewPage();
+		testPage._goToNewPage();
 		testPage.getFocus().close();
 		
 		// check we are on the seconde page (an instance of the DriverSubTestPage)
@@ -90,7 +86,7 @@ public class TestPageObject extends GenericTest {
 	 */
 	@Test(groups= {"it"})
 	public void testCloseFirstTabAndCheck() throws Exception {
-		DriverSubTestPage subPage2 = testPage._goToNewPage();
+		testPage._goToNewPage();
 		testPage.getFocus().close(DriverSubTestPage.class);
 	}
 }

@@ -38,7 +38,6 @@ import com.google.inject.Module;
 
 public class DefaultTestNGContext implements ITestContext {
 
-    private static final long serialVersionUID = 2710769637263878789L;
     ISuite suite;
 
     public DefaultTestNGContext() {

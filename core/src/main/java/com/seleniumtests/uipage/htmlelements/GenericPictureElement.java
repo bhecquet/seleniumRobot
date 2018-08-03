@@ -27,8 +27,8 @@ import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.openqa.selenium.Rectangle;
 import org.openqa.selenium.WebDriverException;
-import org.openqa.selenium.support.ui.SystemClock;
 
+import com.seleniumtests.core.utils.SystemClock;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.ImageSearchException;
 import com.seleniumtests.driver.screenshots.ScreenshotUtil;
@@ -41,7 +41,7 @@ import com.seleniumtests.util.logging.SeleniumRobotLogger;
  * @author behe
  *
  */
-public abstract class GenericPictureElement {
+public abstract class GenericPictureElement extends Element {
 	protected static final Logger logger = SeleniumRobotLogger.getLogger(GenericPictureElement.class);
 	
 	protected File objectPictureFile;
@@ -92,6 +92,10 @@ public abstract class GenericPictureElement {
 		} catch (IOException e) {
 			throw new ConfigurationException("Resource cannot be found", e);
 		}
+	}
+	
+	protected void findElement(boolean waitForVisibility) {
+		findElement();
 	}
 	
 	/**

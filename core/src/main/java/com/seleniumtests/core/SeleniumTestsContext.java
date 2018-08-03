@@ -1123,11 +1123,13 @@ public class SeleniumTestsContext {
         }
     }
 
-    public List<ReportInfo> getCustomTestReports() {
+    @SuppressWarnings("unchecked")
+	public List<ReportInfo> getCustomTestReports() {
     	return (List<ReportInfo>) getAttribute(CUSTOM_TEST_REPORTS);
     }
     
-    public List<ReportInfo> getCustomSummaryReports() {
+    @SuppressWarnings("unchecked")
+	public List<ReportInfo> getCustomSummaryReports() {
     	return (List<ReportInfo>) getAttribute(CUSTOM_SUMMARY_REPORTS);
     }
     
@@ -1186,7 +1188,8 @@ public class SeleniumTestsContext {
         return getAttribute(TEST_ENTITY);
     }
 
-    public List<String> getWebDriverListener() {
+    @SuppressWarnings("unchecked")
+	public List<String> getWebDriverListener() {
         return (List<String>) getAttribute(WEB_DRIVER_LISTENER);
     }
 

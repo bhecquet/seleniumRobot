@@ -37,18 +37,14 @@ import org.testng.IConfigurationListener;
 import org.testng.IExecutionListener;
 import org.testng.IInvokedMethod;
 import org.testng.IInvokedMethodListener2;
-import org.testng.IResultMap;
 import org.testng.ISuite;
 import org.testng.ISuiteListener;
 import org.testng.ISuiteResult;
 import org.testng.ITestContext;
 import org.testng.ITestListener;
-import org.testng.ITestNGMethod;
 import org.testng.ITestResult;
 import org.testng.Reporter;
 import org.testng.internal.ConfigurationMethod;
-import org.testng.internal.Invoker;
-import org.testng.internal.ResultMap;
 import org.testng.internal.TestResult;
 
 import com.google.common.collect.Iterables;

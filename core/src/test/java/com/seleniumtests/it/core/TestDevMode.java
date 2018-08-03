@@ -43,7 +43,6 @@ public class TestDevMode extends GenericTest {
 	private OSUtility osUtil;
 	
 	private static WebDriver driver;
-	private static DriverTestPage testHomePage;
 	
 	@BeforeClass(groups={"it"})
 	public void initContext(final ITestContext testNGCtx) throws Exception {
@@ -96,8 +95,8 @@ public class TestDevMode extends GenericTest {
 	private void launchPageTest(){
 		try {
 			driver = WebUIDriver.getWebDriver(true);
-			testHomePage = new DriverTestPage(true);
-			testHomePage.selectList.selectByText("option2");
+			new DriverTestPage(true);
+			DriverTestPage.selectList.selectByText("option2");
 			if (driver != null) {
 				WebUIDriver.cleanUp();
 				WebUIDriver.cleanUpWebUIDriver();

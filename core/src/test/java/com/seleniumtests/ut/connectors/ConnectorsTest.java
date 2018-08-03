@@ -48,6 +48,7 @@ public class ConnectorsTest extends MockitoTest {
 	 */
 	protected void createServerMock(String requestType, String apiPath, int statusCode, String replyData) throws UnirestException {
 		
+		@SuppressWarnings("unchecked")
 		HttpResponse<String> response = mock(HttpResponse.class);
 		HttpRequest request = mock(HttpRequest.class);
 		MultipartBody requestMultipartBody = mock(MultipartBody.class);

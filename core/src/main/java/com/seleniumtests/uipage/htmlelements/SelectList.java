@@ -274,7 +274,6 @@ public class SelectList extends HtmlElement {
     	
     	try {
 	    	findElement();
-	    	boolean matched = false;
 			switch (selectType) {
 				case HTML:
 					select.deselectByIndex(index);

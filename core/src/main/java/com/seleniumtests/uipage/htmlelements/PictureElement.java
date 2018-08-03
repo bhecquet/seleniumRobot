@@ -20,7 +20,6 @@ package com.seleniumtests.uipage.htmlelements;
 
 import java.io.File;
 import java.time.Duration;
-import java.time.LocalDateTime;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.Point;
@@ -28,15 +27,14 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
-import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.driver.BrowserType;
-import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.driver.screenshots.ScreenshotUtil;
 import com.seleniumtests.uipage.ReplayOnError;
 
-import io.appium.java_client.AppiumDriver;
-import io.appium.java_client.TouchAction;
+import io.appium.java_client.touch.TapOptions;
+import io.appium.java_client.touch.WaitOptions;
+import io.appium.java_client.touch.offset.PointOption;
 
 /**
  * Element which is found inside driver snapshot
@@ -143,9 +141,9 @@ public class PictureElement extends GenericPictureElement {
 		int xInit = detectedObjectRectangle.x + detectedObjectRectangle.width / 2;
 		int yInit = detectedObjectRectangle.y + detectedObjectRectangle.height / 2;
 		
-		new TouchAction(getMobileDriver()).press(xInit, yInit)
-			.waitAction(Duration.ofMillis(500))
-			.moveTo(xInit + xMove, yInit + yMove)
+		createTouchAction().press(PointOption.point(xInit, yInit))
+			.waitAction(WaitOptions.waitOptions(Duration.ofMillis(500)))
+			.moveTo(PointOption.point(xInit + xMove, yInit + yMove))
 			.release()
 			.perform();
 	}
@@ -154,7 +152,9 @@ public class PictureElement extends GenericPictureElement {
     public void tap() {
 		findElement();
 
-		new TouchAction(getMobileDriver()).tap(detectedObjectRectangle.x + detectedObjectRectangle.width / 2, detectedObjectRectangle.y + detectedObjectRectangle.height / 2).perform();
+		createTouchAction()
+			.moveTo(PointOption.point(detectedObjectRectangle.x + detectedObjectRectangle.width / 2, detectedObjectRectangle.y + detectedObjectRectangle.height / 2))
+			.tap(TapOptions.tapOptions().withTapsCount(1)).perform();
 	}
 	
 	public void moveAndClick(WebElement element, int coordX, int coordY) {
@@ -194,13 +194,6 @@ public class PictureElement extends GenericPictureElement {
 	@Deprecated
 	public boolean isElementPresentOnDesktop() {
 		return isElementPresent(0);
-	}
-	
-	private AppiumDriver<?> getMobileDriver() {
-		if (!(((CustomEventFiringWebDriver)WebUIDriver.getWebDriver()).getWebDriver() instanceof AppiumDriver<?>)) {
-    		throw new ScenarioException("action is available only for mobile platforms");
-    	}
-		return (AppiumDriver<?>)((CustomEventFiringWebDriver)WebUIDriver.getWebDriver()).getWebDriver();
 	}
 	
 	// TODO: actions for mobile

@@ -20,6 +20,7 @@ package com.seleniumtests.driver;
 
 import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
+import org.openqa.selenium.OutputType;
 import org.openqa.selenium.UnsupportedCommandException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -210,5 +211,41 @@ public class DriverExceptionListener implements WebDriverEventListener {
 	@Override
 	public void beforeAlertDismiss(WebDriver arg0) {
 		// do nothing
+	}
+
+	@Override
+	public <X> void afterGetScreenshotAs(OutputType<X> arg0, X arg1) {
+		// do nothing
+		
+	}
+
+	@Override
+	public void afterGetText(WebElement arg0, WebDriver arg1, String arg2) {
+		// do nothing
+		
+	}
+
+	@Override
+	public void afterSwitchToWindow(String arg0, WebDriver arg1) {
+		// do nothing
+		
+	}
+
+	@Override
+	public <X> void beforeGetScreenshotAs(OutputType<X> arg0) {
+		// do nothing
+		
+	}
+
+	@Override
+	public void beforeGetText(WebElement arg0, WebDriver arg1) {
+		// do nothing
+		
+	}
+
+	@Override
+	public void beforeSwitchToWindow(String arg0, WebDriver arg1) {
+		// do nothing
+		
 	}	
 }

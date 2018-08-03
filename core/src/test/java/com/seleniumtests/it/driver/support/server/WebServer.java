@@ -21,8 +21,6 @@ package com.seleniumtests.it.driver.support.server;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import javax.servlet.http.HttpServlet;
-
 import org.apache.http.HttpHost;
 import org.seleniumhq.jetty9.server.Server;
 import org.seleniumhq.jetty9.server.ServerConnector;

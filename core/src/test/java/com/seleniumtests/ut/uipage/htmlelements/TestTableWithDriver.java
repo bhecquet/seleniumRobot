@@ -21,25 +21,20 @@ package com.seleniumtests.ut.uipage.htmlelements;
 import org.openqa.selenium.By;
 import org.testng.Assert;
 import org.testng.ITestContext;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import com.seleniumtests.GenericDriverTest;
 import com.seleniumtests.core.SeleniumTestsContextManager;
-import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.it.driver.support.pages.DriverTestPage;
 
 public class TestTableWithDriver extends GenericDriverTest {
 	
-	private DriverTestPage testPage;
-
 	@BeforeMethod(groups={"ut"})
 	public void initDriver(final ITestContext testNGCtx) throws Exception {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setBrowser("htmlunit");
-		driver = WebUIDriver.getWebDriver(true);
-		testPage = new DriverTestPage(true);
+		new DriverTestPage(true);
 	}
 	
 	/* 
@@ -50,11 +45,11 @@ public class TestTableWithDriver extends GenericDriverTest {
 	 */
 	@Test(groups={"ut"})
 	public void testTableRefresh1() {
-		Assert.assertEquals(testPage.table.getRows().get(1).findElements(By.tagName("td")).size(), 2);
+		Assert.assertEquals(DriverTestPage.table.getRows().get(1).findElements(By.tagName("td")).size(), 2);
 	}
 	
 	@Test(groups={"ut"})
 	public void testTableRefresh2() {
-		Assert.assertEquals(testPage.table.getRows().get(1).findElements(By.tagName("td")).size(), 2);
+		Assert.assertEquals(DriverTestPage.table.getRows().get(1).findElements(By.tagName("td")).size(), 2);
 	}
 }

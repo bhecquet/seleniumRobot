@@ -18,11 +18,11 @@
  */
 package com.seleniumtests.ut.connectors.selenium;
 
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyBoolean;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
@@ -134,6 +134,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends MockitoTest {
 	 */
 	private void createSnapshotServerMock(String requestType, String apiPath, int statusCode, String replyData) throws UnirestException {
 		
+		@SuppressWarnings("unchecked")
 		HttpResponse<String> response = mock(HttpResponse.class);
 		MultipartBody requestMultipartBody = mock(MultipartBody.class);
 		HttpRequestWithBody postRequest = mock(HttpRequestWithBody.class);

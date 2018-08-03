@@ -32,6 +32,7 @@ import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import com.seleniumtests.it.driver.support.GenericMultiBrowserTest;
 import com.seleniumtests.it.driver.support.pages.DriverTestPage;
+import com.seleniumtests.it.driver.support.pages.DriverTestPageWithoutFixedPattern;
 import com.seleniumtests.uipage.htmlelements.ScreenZone;
 
 public class TestScreenZone extends GenericMultiBrowserTest {
@@ -47,19 +48,19 @@ public class TestScreenZone extends GenericMultiBrowserTest {
 	@AfterMethod(groups={"it"})
 	public void reset() {
 		if (driver != null) {
-			testPageWithoutPattern.logoText.clear();
-			testPageWithoutPattern.textElement.clear();
+			DriverTestPageWithoutFixedPattern.logoText.clear();
+			DriverTestPageWithoutFixedPattern.textElement.clear();
 		}
 	}
 	
 	@Test(groups={"it"})
 	public void testClickOnGooglePicture() {
 		try {
-			testPageWithoutPattern.googleForDesktop.click();
+			DriverTestPageWithoutFixedPattern.googleForDesktop.click();
 		} catch (ImageSearchException e) {
 			throw new SkipException("Image not found, we may be on screenless slave", e);
 		}
-		Assert.assertEquals(testPage.textElement.getValue(), "image");
+		Assert.assertEquals(DriverTestPageWithoutFixedPattern.textElement.getValue(), "image");
 	}
 	
 	/**
@@ -69,15 +70,15 @@ public class TestScreenZone extends GenericMultiBrowserTest {
 	public void testClickAtCoordinates() {
 		try {
 			// search zone to clic
-			testPageWithoutPattern.googleForDesktop.findElement();
-			Rectangle rectangle = testPageWithoutPattern.googleForDesktop.getDetectedObjectRectangle();
+			DriverTestPageWithoutFixedPattern.googleForDesktop.findElement();
+			Rectangle rectangle = DriverTestPageWithoutFixedPattern.googleForDesktop.getDetectedObjectRectangle();
 			
 			// clic with a new ScreenZone
 			new ScreenZone("image").clickAt(rectangle.x + 10, rectangle.y + 10);
 		} catch (ImageSearchException e) {
 			throw new SkipException("Image not found, we may be on screenless slave", e);
 		}
-		Assert.assertEquals(testPage.textElement.getValue(), "image");
+		Assert.assertEquals(DriverTestPageWithoutFixedPattern.textElement.getValue(), "image");
 	}
 	
 	/**
@@ -86,11 +87,11 @@ public class TestScreenZone extends GenericMultiBrowserTest {
 	@Test(groups={"it"})
 	public void testClickOnGooglePictureFromFile() {
 		try {
-			testPageWithoutPattern.googleForDesktopWithFile.click();
+			DriverTestPageWithoutFixedPattern.googleForDesktopWithFile.click();
 		} catch (ImageSearchException e) {
 			throw new SkipException("Image not found, we may be on screenless slave", e);
 		}
-		Assert.assertEquals(testPage.textElement.getValue(), "image");
+		Assert.assertEquals(DriverTestPageWithoutFixedPattern.textElement.getValue(), "image");
 	}
 	
 
@@ -99,47 +100,47 @@ public class TestScreenZone extends GenericMultiBrowserTest {
 	 */
 	@Test(groups={"it"})
 	public void testActionDurationIsLogged() {
-		Assert.assertEquals(testPageWithoutPattern.googleForDesktopWithFile.getActionDuration(), 0);
+		Assert.assertEquals(DriverTestPageWithoutFixedPattern.googleForDesktopWithFile.getActionDuration(), 0);
 		try {
-			testPageWithoutPattern.googleForDesktopWithFile.click();
+			DriverTestPageWithoutFixedPattern.googleForDesktopWithFile.click();
 		} catch (ImageSearchException e) {
 			throw new SkipException("Image not found, we may be on screenless slave", e);
 		}
-		Assert.assertTrue(testPageWithoutPattern.googleForDesktopWithFile.getActionDuration() > 0);
+		Assert.assertTrue(DriverTestPageWithoutFixedPattern.googleForDesktopWithFile.getActionDuration() > 0);
 	}
 	
 	@Test(groups={"it"})
 	public void testSendKeysOnPicture() {
 		try {
-			testPageWithoutPattern.logoText.clear();
-			((CustomEventFiringWebDriver)driver).scrollToElement(testPageWithoutPattern.table, 200);
-			testPageWithoutPattern.firefoxForDesktop.sendKeys("hello", 0, 40);
+			DriverTestPageWithoutFixedPattern.logoText.clear();
+			((CustomEventFiringWebDriver)driver).scrollToElement(DriverTestPageWithoutFixedPattern.table, 200);
+			DriverTestPageWithoutFixedPattern.firefoxForDesktop.sendKeys("hello", 0, 40);
 		} catch (ImageSearchException e) {
 			throw new SkipException("Image not found, we may be on screenless slave", e);
 		}
-		Assert.assertEquals(testPage.logoText.getValue(), "hello");
+		Assert.assertEquals(DriverTestPageWithoutFixedPattern.logoText.getValue(), "hello");
 	}
 	
 	@Test(groups={"it"})
 	public void testSendKeyboardKeysOnPicture() { 
 		try {
-			testPageWithoutPattern.logoText.clear();
-			((CustomEventFiringWebDriver)driver).scrollToElement(testPageWithoutPattern.table, 200);
-			testPageWithoutPattern.firefoxForDesktop.sendKeys(0, 40, KeyEvent.VK_A, KeyEvent.VK_B);
+			DriverTestPageWithoutFixedPattern.logoText.clear();
+			((CustomEventFiringWebDriver)driver).scrollToElement(DriverTestPageWithoutFixedPattern.table, 200);
+			DriverTestPageWithoutFixedPattern.firefoxForDesktop.sendKeys(0, 40, KeyEvent.VK_A, KeyEvent.VK_B);
 		} catch (ImageSearchException e) {
 			throw new SkipException("Image not found, we may be on screenless slave", e);
 		}
-		Assert.assertEquals(testPage.logoText.getValue(), "ab");
+		Assert.assertEquals(DriverTestPageWithoutFixedPattern.logoText.getValue(), "ab");
 	}
 
 	@Test(groups={"it"})
 	public void testIsVisible() { 
-		Assert.assertTrue(testPageWithoutPattern.googleForDesktop.isElementPresent());
+		Assert.assertTrue(DriverTestPageWithoutFixedPattern.googleForDesktop.isElementPresent());
 	}
 	
 	@Test(groups={"it"})
 	public void testIsNotVisible() {
-		Assert.assertFalse(testPageWithoutPattern.zoneNotPresent.isElementPresent());
+		Assert.assertFalse(DriverTestPageWithoutFixedPattern.zoneNotPresent.isElementPresent());
 	}
 	
 	

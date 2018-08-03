@@ -20,9 +20,9 @@ package com.seleniumtests.ut.connectors.selenium;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.spy;
 
 import java.io.IOException;
 import java.io.InputStream;

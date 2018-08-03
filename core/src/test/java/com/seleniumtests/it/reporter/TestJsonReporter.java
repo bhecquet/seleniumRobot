@@ -58,7 +58,6 @@ public class TestJsonReporter extends ReporterTest {
 		
 	}
 	
-	@SuppressWarnings("unchecked")
 	@Test(groups={"it"})
 	public void testReportGeneration(ITestContext testContext) throws Exception {
 		
@@ -71,7 +70,6 @@ public class TestJsonReporter extends ReporterTest {
 		Assert.assertTrue(Paths.get(outDir, "results.json").toFile().exists());
 	}
 	
-	@SuppressWarnings("unchecked")
 	@Test(groups={"it"})
 	public void testReportContent(ITestContext testContext) throws Exception {
 		

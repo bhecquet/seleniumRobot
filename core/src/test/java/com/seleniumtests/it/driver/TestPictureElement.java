@@ -28,6 +28,7 @@ import com.seleniumtests.customexception.ImageSearchException;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.it.driver.support.GenericMultiBrowserTest;
 import com.seleniumtests.it.driver.support.pages.DriverTestPage;
+import com.seleniumtests.it.driver.support.pages.DriverTestPageWithoutFixedPattern;
 import com.seleniumtests.util.helper.WaitHelper;
 
 public class TestPictureElement extends GenericMultiBrowserTest {
@@ -47,20 +48,20 @@ public class TestPictureElement extends GenericMultiBrowserTest {
 	@AfterMethod(groups={"it"})
 	public void reset() {
 		if (driver != null) {
-			testPageWithoutPattern.logoText.clear();
-			testPageWithoutPattern.textElement.clear();
+			DriverTestPageWithoutFixedPattern.logoText.clear();
+			DriverTestPageWithoutFixedPattern.textElement.clear();
 		}
 	}
 	
 	@Test(groups={"it"})
 	public void testClickOnPicture() {
 		try {
-			testPageWithoutPattern.picture.clickAt(0, -20);
+			DriverTestPageWithoutFixedPattern.picture.clickAt(0, -20);
 		} catch (ImageSearchException e) {
 			throw new SkipException("Image not found, we may be on screenless slave", e);
 		}
 		WaitHelper.waitForMilliSeconds(500); // in case of browser slowness
-		Assert.assertEquals(testPage.logoText.getValue(), "ff logo");
+		Assert.assertEquals(DriverTestPageWithoutFixedPattern.logoText.getValue(), "ff logo");
 	}
 	
 	/**
@@ -69,12 +70,12 @@ public class TestPictureElement extends GenericMultiBrowserTest {
 	@Test(groups={"it"})
 	public void testClickOnGooglePicture() {
 		try {
-			testPageWithoutPattern.googlePicture.click();
+			DriverTestPageWithoutFixedPattern.googlePicture.click();
 		} catch (ImageSearchException e) {
 			throw new SkipException("Image not found, we may be on screenless slave", e);
 		}
 		WaitHelper.waitForMilliSeconds(500); // in case of browser slowness
-		Assert.assertEquals(testPage.textElement.getValue(), "image");
+		Assert.assertEquals(DriverTestPageWithoutFixedPattern.textElement.getValue(), "image");
 	}
 	
 	/**
@@ -83,13 +84,13 @@ public class TestPictureElement extends GenericMultiBrowserTest {
 	@Test(groups={"it"})
 	public void testActionDurationIsLogged() {
 		// be sure action duration has been reset
-		testPageWithoutPattern.googlePicture.setActionDuration(0);
+		DriverTestPageWithoutFixedPattern.googlePicture.setActionDuration(0);
 		try {
-			testPageWithoutPattern.googlePicture.click();
+			DriverTestPageWithoutFixedPattern.googlePicture.click();
 		} catch (ImageSearchException e) {
 			throw new SkipException("Image not found, we may be on screenless slave", e);
 		}
-		Assert.assertTrue(testPageWithoutPattern.googlePicture.getActionDuration() > 0);
+		Assert.assertTrue(DriverTestPageWithoutFixedPattern.googlePicture.getActionDuration() > 0);
 	}
 	
 	/**
@@ -98,34 +99,34 @@ public class TestPictureElement extends GenericMultiBrowserTest {
 	@Test(groups={"it"})
 	public void testClickOnGooglePictureFromFile() {
 		try {
-			testPageWithoutPattern.googlePictureWithFile.click();
+			DriverTestPageWithoutFixedPattern.googlePictureWithFile.click();
 		} catch (ImageSearchException e) {
 			throw new SkipException("Image not found, we may be on screenless slave", e);
 		}
 		WaitHelper.waitForMilliSeconds(500); // in case of browser slowness
-		Assert.assertEquals(testPage.textElement.getValue(), "image");
+		Assert.assertEquals(DriverTestPageWithoutFixedPattern.textElement.getValue(), "image");
 	}
 	
 	@Test(groups={"it"})
 	public void testSendKeysOnPicture() {
 		try {
-			testPageWithoutPattern.logoText.clear();
-			testPageWithoutPattern.picture.sendKeys("hello", 0, 40);
+			DriverTestPageWithoutFixedPattern.logoText.clear();
+			DriverTestPageWithoutFixedPattern.picture.sendKeys("hello", 0, 40);
 		} catch (ImageSearchException e) {
 			throw new SkipException("Image not found, we may be on screenless slave", e);
 		}
 		WaitHelper.waitForMilliSeconds(500); // in case of browser slowness
-		Assert.assertEquals(testPage.logoText.getValue(), "hello");
+		Assert.assertEquals(DriverTestPageWithoutFixedPattern.logoText.getValue(), "hello");
 	}
 
 	@Test(groups={"it"})
 	public void testIsVisible() { 
-		Assert.assertTrue(testPageWithoutPattern.picture.isElementPresent());
+		Assert.assertTrue(DriverTestPageWithoutFixedPattern.picture.isElementPresent());
 	}
 	
 	@Test(groups={"it"})
 	public void testIsNotVisible() {
-		Assert.assertFalse(testPageWithoutPattern.pictureNotPresent.isElementPresent());
+		Assert.assertFalse(DriverTestPageWithoutFixedPattern.pictureNotPresent.isElementPresent());
 	}
 	
 	

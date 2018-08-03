@@ -45,7 +45,6 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.remote.UnreachableBrowserException;
 import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.SystemClock;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.Assert;
 
@@ -53,6 +52,7 @@ import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.SeleniumTestsPageListener;
 import com.seleniumtests.core.TestTasks;
+import com.seleniumtests.core.utils.SystemClock;
 import com.seleniumtests.customexception.CustomSeleniumTestsException;
 import com.seleniumtests.customexception.NotCurrentPageException;
 import com.seleniumtests.customexception.ScenarioException;
@@ -77,7 +77,6 @@ public class PageObject extends BasePage implements IPage {
     private String title = null;
     private String windowHandle = null; // store the window / tab on which this page is loaded
     private String url = null;
-    private String htmlSource = null;
     private String suiteName = null;
     private String outputDirectory = null;
     private String htmlFilePath = null;
@@ -311,7 +310,6 @@ public class PageObject extends BasePage implements IPage {
 
         if (screenShot.getHtmlSourcePath() != null) {
             htmlFilePath = screenShot.getHtmlSourcePath().replace(suiteName, outputDirectory);
-            htmlSource = screenShot.getHtmlSource();
         }
 
         if (screenShot.getImagePath() != null) {
@@ -329,10 +327,11 @@ public class PageObject extends BasePage implements IPage {
     
     /**
      * Get focus on this page, using the handle we stored when creating it
-     * When called, you should write myPage.<MyPageClassName>getFocus().someMethodOfMyPage();
+     * When called, you should write {@code myPage.<MyPageClassName>getFocus().someMethodOfMyPage();}
      * @return
      */
-    public <T extends PageObject> T getFocus() {
+    @SuppressWarnings("unchecked")
+	public <T extends PageObject> T getFocus() {
     	selectWindow(windowHandle);
     	return (T)this;
     }

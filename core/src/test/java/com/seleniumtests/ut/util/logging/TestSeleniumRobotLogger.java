@@ -27,7 +27,7 @@ import java.lang.reflect.Method;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.spi.LoggingEvent;
-import org.junit.Assert;
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import com.seleniumtests.MockitoTest;

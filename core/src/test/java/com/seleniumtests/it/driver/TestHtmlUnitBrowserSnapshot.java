@@ -18,7 +18,6 @@
  */
 package com.seleniumtests.it.driver;
 
-import org.openqa.selenium.WebDriver;
 import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.annotations.AfterMethod;
@@ -35,8 +34,6 @@ import com.seleniumtests.it.driver.support.pages.DriverTestPage;
 
 public class TestHtmlUnitBrowserSnapshot extends MockitoTest {
 	
-	private static WebDriver driver;
-	private DriverTestPage testPage;
 	private final String browserName = "htmlunit";
 	
 	@BeforeMethod(groups={"it"})
@@ -44,8 +41,7 @@ public class TestHtmlUnitBrowserSnapshot extends MockitoTest {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setExplicitWaitTimeout(2);
 		SeleniumTestsContextManager.getThreadContext().setBrowser(browserName);
-		testPage = new DriverTestPage(true);
-		driver = WebUIDriver.getWebDriver(true);
+		new DriverTestPage(true);
 	}
 	
 

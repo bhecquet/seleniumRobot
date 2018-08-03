@@ -20,8 +20,8 @@ package com.seleniumtests.it.stubclasses;
 
 import java.lang.reflect.Method;
 
-import org.junit.Assert;
 import org.openqa.selenium.WebDriver;
+import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterGroups;
 import org.testng.annotations.AfterMethod;

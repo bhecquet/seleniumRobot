@@ -20,10 +20,8 @@ package com.seleniumtests.core.aspects;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -36,17 +34,13 @@ import org.openqa.selenium.support.ui.Select;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.runner.SeleniumRobotTestPlan;
-import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.reporter.logger.TestAction;
 import com.seleniumtests.reporter.logger.TestLogging;
 import com.seleniumtests.reporter.logger.TestStep;
 import com.seleniumtests.uipage.PageObject;
-import com.seleniumtests.util.FileUtility;
-import com.seleniumtests.util.StringUtility;
 
 import net.lightbody.bmp.BrowserMobProxy;
-import net.lightbody.bmp.core.har.Har;
 
 /**
  * Aspect to intercept calls to methods of HtmlElement. It allows to retry discovery and action 

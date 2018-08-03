@@ -19,9 +19,7 @@
 package com.seleniumtests.util;
 
 import java.math.BigInteger;
-
 import java.security.MessageDigest;
-
 import java.util.UUID;
 
 import org.apache.log4j.Logger;

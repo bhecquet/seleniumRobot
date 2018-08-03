@@ -20,8 +20,6 @@ package com.seleniumtests.ut.core;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
@@ -30,29 +28,20 @@ import org.json.JSONObject;
 import org.openqa.selenium.Proxy.ProxyType;
 import org.testng.Assert;
 import org.testng.ITestContext;
-import org.testng.ITestNGMethod;
 import org.testng.ITestResult;
 import org.testng.TestRunner;
 import org.testng.annotations.Test;
-import org.testng.internal.TestNGMethod;
-import org.testng.internal.TestResult;
-import org.testng.internal.annotations.DefaultAnnotationTransformer;
-import org.testng.internal.annotations.JDK15AnnotationFinder;
-import org.testng.xml.XmlSuite;
 import org.testng.xml.XmlTest;
 
 import com.seleniumtests.GenericTest;
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
-import com.seleniumtests.core.runner.CucumberScenarioWrapper;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.DriverMode;
 import com.seleniumtests.driver.screenshots.VideoCaptureMode;
 import com.seleniumtests.reporter.logger.ArchiveMode;
 import com.seleniumtests.reporter.reporters.ReportInfo;
-
-import cucumber.runtime.model.CucumberScenario;
 
 /**
  * Test parsing of test options into SeleniumTestContext

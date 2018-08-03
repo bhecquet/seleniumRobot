@@ -33,8 +33,6 @@ public class DriverTestAngularFrame extends PageObject {
 	public static final FrameElement angularIFrame = new FrameElement("IFrame angular", By.id("angularIFrame"));
 	public static final SelectList angularSelectListIFrame = new SelectList("list", By.id("angularSelect"), angularIFrame);
 	
-
-	private String openedPageUrl;
 	
 	public DriverTestAngularFrame() throws Exception {
         super(angularIFrame);
@@ -46,7 +44,6 @@ public class DriverTestAngularFrame extends PageObject {
     
     public DriverTestAngularFrame(boolean openPageURL, String url) throws Exception {
     	super(angularIFrame, openPageURL ? url : null);
-    	openedPageUrl = url;
     }
     
     private static String getPageUrl() {

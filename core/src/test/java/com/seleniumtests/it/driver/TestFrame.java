@@ -24,6 +24,7 @@ import org.testng.annotations.Test;
 
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.it.driver.support.GenericMultiBrowserTest;
+import com.seleniumtests.it.driver.support.pages.DriverTestPage;
 
 /**
  * Checks that it's possible to interact with elements in iframe
@@ -45,68 +46,68 @@ public class TestFrame extends GenericMultiBrowserTest {
 
 	@Test(groups={"it"})
 	public void testFrameText() {
-		Assert.assertEquals(testPage.textElementIFrame.getValue(), "a value");
+		Assert.assertEquals(DriverTestPage.textElementIFrame.getValue(), "a value");
 	}
 	
 	@Test(groups={"it"})
 	public void testFrameRadio() {
-		Assert.assertEquals(testPage.radioElementIFrame.getAttribute("name"), "radio");
+		Assert.assertEquals(DriverTestPage.radioElementIFrame.getAttribute("name"), "radio");
 	}
 	
 	@Test(groups={"it"})
 	public void testFrameCheckbox() {
-		Assert.assertEquals(testPage.checkElementIFrame.getAttribute("type"), "checkbox");
+		Assert.assertEquals(DriverTestPage.checkElementIFrame.getAttribute("type"), "checkbox");
 	}
 	
 	@Test(groups={"it"})
 	public void testFrameButton() {
-		testPage.buttonIFrame.click();
-		Assert.assertEquals(testPage.buttonIFrame.getText(), "A button");
+		DriverTestPage.buttonIFrame.click();
+		Assert.assertEquals(DriverTestPage.buttonIFrame.getText(), "A button");
 	}
 	
 	@Test(groups={"it"})
 	public void testFrameLabel() {
-		Assert.assertEquals(testPage.labelIFrame.getText(), "A label");
+		Assert.assertEquals(DriverTestPage.labelIFrame.getText(), "A label");
 	}
 	
 	@Test(groups={"it"})
 	public void testFrameLink() {
-		Assert.assertTrue(testPage.linkIFrame.getUrl().startsWith("http://www.google.fr"));
+		Assert.assertTrue(DriverTestPage.linkIFrame.getUrl().startsWith("http://www.google.fr"));
 	}
 	
 	@Test(groups={"it"})
 	public void testFrameSelect() {
-		Assert.assertEquals(testPage.selectListIFrame.getOptions().size(), 1);
+		Assert.assertEquals(DriverTestPage.selectListIFrame.getOptions().size(), 1);
 	}
 	
 	@Test(groups={"it"})
 	public void testElementInsideOtherElementWithFrame() {
-		Assert.assertEquals(testPage.optionOfSelectListIFrame.getText(), "option1 frame");
+		Assert.assertEquals(DriverTestPage.optionOfSelectListIFrame.getText(), "option1 frame");
 	}
 	
 	@Test(groups={"it"})
 	public void testFrameTable() {
-		Assert.assertEquals(testPage.tableIFrame.getRowCount(), 2);
+		Assert.assertEquals(DriverTestPage.tableIFrame.getRowCount(), 2);
 	}
 	
 	@Test(groups={"it"})
 	public void testIsElementPresentInFrame() {
-		Assert.assertTrue(testPage.tableIFrame.isElementPresent());
+		Assert.assertTrue(DriverTestPage.tableIFrame.isElementPresent());
 	}
 	
 	@Test(groups={"it"})
 	public void testFindElements() {
-		Assert.assertEquals(testPage.rows.findElements().size(), 2);
+		Assert.assertEquals(DriverTestPage.rows.findElements().size(), 2);
 	}
 	
 	@Test(groups={"it"})
 	public void testFindElementsBy() {
-		Assert.assertEquals(testPage.tableIFrame.findElements(By.tagName("tr")).size(), 2);
+		Assert.assertEquals(DriverTestPage.tableIFrame.findElements(By.tagName("tr")).size(), 2);
 	}
 	
 	@Test(groups={"it"})
 	public void testFrameInFrameText() {
-		Assert.assertEquals(testPage.textElementSubIFrame.getValue(), "an other value in iframe");
+		Assert.assertEquals(DriverTestPage.textElementSubIFrame.getValue(), "an other value in iframe");
 	}
 	
 	/**
@@ -114,12 +115,12 @@ public class TestFrame extends GenericMultiBrowserTest {
 	 */
 	@Test(groups={"it"})
 	public void testBackToMainFrame() {
-		System.out.println(testPage.labelIFrame.getText());
+		System.out.println(DriverTestPage.labelIFrame.getText());
 		try {
-			testPage.textElement.sendKeys("youpi");
-			Assert.assertEquals(testPage.textElement.getValue(), "youpi");
+			DriverTestPage.textElement.sendKeys("youpi");
+			Assert.assertEquals(DriverTestPage.textElement.getValue(), "youpi");
 		} finally {
-			testPage.resetButton.click();
+			DriverTestPage.resetButton.click();
 		}
 		
 	}	

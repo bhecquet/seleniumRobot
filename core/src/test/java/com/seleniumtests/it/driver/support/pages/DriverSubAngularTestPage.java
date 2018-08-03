@@ -23,16 +23,9 @@ import org.openqa.selenium.By;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.uipage.PageObject;
-import com.seleniumtests.uipage.htmlelements.ButtonElement;
 import com.seleniumtests.uipage.htmlelements.CheckBoxElement;
-import com.seleniumtests.uipage.htmlelements.FrameElement;
-import com.seleniumtests.uipage.htmlelements.HtmlElement;
-import com.seleniumtests.uipage.htmlelements.LabelElement;
-import com.seleniumtests.uipage.htmlelements.LinkElement;
 import com.seleniumtests.uipage.htmlelements.RadioButtonElement;
 import com.seleniumtests.uipage.htmlelements.SelectList;
-import com.seleniumtests.uipage.htmlelements.Table;
-import com.seleniumtests.uipage.htmlelements.TextFieldElement;
 
 public class DriverSubAngularTestPage extends PageObject {
 
@@ -42,7 +35,6 @@ public class DriverSubAngularTestPage extends PageObject {
 	public static final CheckBoxElement checkboxInput = new CheckBoxElement("checkbox", By.id("angularCheckbox-input"));
 	public static final RadioButtonElement radio = new RadioButtonElement("radio", By.id("angularRadio1"));
 
-	private String openedPageUrl;
 	
 	public DriverSubAngularTestPage() throws Exception {
         super(selectList);
@@ -54,7 +46,6 @@ public class DriverSubAngularTestPage extends PageObject {
     
     public DriverSubAngularTestPage(boolean openPageURL, String url) throws Exception {
     	super(selectList, openPageURL ? url : null);
-    	openedPageUrl = url;
     }
     
     private static String getPageUrl() {

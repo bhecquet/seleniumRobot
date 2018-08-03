@@ -36,12 +36,11 @@ import com.seleniumtests.reporter.logger.Snapshot;
 import com.seleniumtests.reporter.logger.TestLogging;
 import com.seleniumtests.reporter.logger.TestMessage;
 import com.seleniumtests.reporter.logger.TestMessage.MessageType;
+import com.seleniumtests.reporter.logger.TestStep;
 
 import net.lightbody.bmp.core.har.Har;
 import net.lightbody.bmp.core.har.HarLog;
 import net.lightbody.bmp.core.har.HarPage;
-
-import com.seleniumtests.reporter.logger.TestStep;
 
 public class TestTestLogging extends GenericTest {
 

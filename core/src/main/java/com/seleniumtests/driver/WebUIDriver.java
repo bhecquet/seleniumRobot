@@ -19,9 +19,6 @@
 package com.seleniumtests.driver;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -57,7 +54,6 @@ import com.seleniumtests.util.osutility.OSUtility;
 import com.seleniumtests.util.osutility.OSUtilityFactory;
 
 import net.lightbody.bmp.BrowserMobProxy;
-import net.lightbody.bmp.core.har.Har;
 
 /**
  * This class provides factory to create webDriver session.

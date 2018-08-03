@@ -18,7 +18,6 @@
  */
 package com.seleniumtests.it.webelements;
 
-import org.openqa.selenium.WebDriver;
 import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.annotations.AfterClass;
@@ -37,7 +36,6 @@ public class TestInterceptePage extends GenericTest {
 		super();
 	} 
 
-	private WebDriver driver;
 	private static DriverTestPage testPage;
 	
 	@BeforeClass(groups={"it"})
@@ -46,7 +44,6 @@ public class TestInterceptePage extends GenericTest {
 		SeleniumTestsContextManager.getThreadContext().setBrowser("chrome");
 		SeleniumTestsContextManager.getThreadContext().setExplicitWaitTimeout(2);
 		testPage = new DriverTestPage(true);
-		driver = WebUIDriver.getWebDriver(true);
 	}
 	
 	@AfterClass(groups={"it"})

@@ -46,9 +46,9 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.interactions.HasInputDevices;
+import org.openqa.selenium.interactions.Locatable;
 import org.openqa.selenium.interactions.Mouse;
 import org.openqa.selenium.interactions.internal.Coordinates;
-import org.openqa.selenium.interactions.internal.Locatable;
 import org.openqa.selenium.internal.HasIdentity;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.RemoteWebElement;
@@ -72,13 +72,16 @@ import io.appium.java_client.MobileElement;
 import io.appium.java_client.MultiTouchAction;
 import io.appium.java_client.PerformsTouchActions;
 import io.appium.java_client.TouchAction;
+import io.appium.java_client.touch.WaitOptions;
+import io.appium.java_client.touch.offset.ElementOption;
+import io.appium.java_client.touch.offset.PointOption;
 
 
 /**
  * Provides methods to interact with a web page. All HTML element (ButtonElement, LinkElement, TextFieldElement, etc.)
  * extends from this class.
  */
-public class HtmlElement implements WebElement, Locatable, HasIdentity {
+public class HtmlElement extends Element implements WebElement, Locatable, HasIdentity {
 
     protected static final Logger logger = SeleniumRobotLogger.getLogger(HtmlElement.class);
     public static final Integer FIRST_VISIBLE = Integer.MAX_VALUE;
@@ -309,7 +312,7 @@ public class HtmlElement implements WebElement, Locatable, HasIdentity {
      * @param by
      * @return
      */
-    @SuppressWarnings("unchecked")
+	@SuppressWarnings("unchecked")
 	@Override
     public HtmlElement findElement(By by) {
     	return new HtmlElement(label, by, this);
@@ -1030,18 +1033,6 @@ public class HtmlElement implements WebElement, Locatable, HasIdentity {
     /*
      * Methods for mobile actions only
      */
-    /**
-     * Check if the current platform is a mobile platform
-     * if it's the case, search for the element, else, raise a ScenarioException
-     */
-    private PerformsTouchActions checkForMobile() {
-    	if (!SeleniumTestsContextManager.isMobileTest()) {
-    		throw new ScenarioException("action is available only for mobile platforms");
-    	}
-    	findElement(true);
-    	
-    	return (PerformsTouchActions) ((CustomEventFiringWebDriver)driver).getWebDriver();
-    }
     
     /**
      * findElement returns a EventFiringWebElement which is not compatible with MobileElement
@@ -1086,11 +1077,11 @@ public class HtmlElement implements WebElement, Locatable, HasIdentity {
 		Point center = mobElement.getCenter();
 		int yOffset = center.getY() - upperLeft.getY();
 		
-		TouchAction action0 = new TouchAction(performTouchActions).press(mobElement, center.getX(), center.getY() - yOffset)
-																	.moveTo(mobElement)
+		TouchAction<?> action0 = createTouchAction().press(ElementOption.element(mobElement, center.getX(), center.getY() - yOffset))
+																	.moveTo(ElementOption.element(mobElement))
 																	.release();
-		TouchAction action1 = new TouchAction(performTouchActions).press(mobElement, center.getX(), center.getY() + yOffset)
-																	.moveTo(mobElement)
+		TouchAction<?> action1 = createTouchAction().press(ElementOption.element(mobElement, center.getX(), center.getY() + yOffset))
+																	.moveTo(ElementOption.element(mobElement))
 																	.release();
 		
 		multiTouch.add(action0).add(action1).perform();
@@ -1106,12 +1097,11 @@ public class HtmlElement implements WebElement, Locatable, HasIdentity {
      */
     @ReplayOnError
     public void swipe(int xOffset, int yOffset, int xMove, int yMove) {
-    	PerformsTouchActions performTouchActions = checkForMobile();
     	MobileElement mobElement = (MobileElement) getUnderlyingElement(element);
         
-        new TouchAction(performTouchActions).press(mobElement, xOffset, yOffset)
+        createTouchAction().press(ElementOption.element(mobElement, xOffset, yOffset))
 			.waitAction()
-			.moveTo(mobElement, xMove, yMove)
+			.moveTo(ElementOption.element(mobElement, xMove, yMove))
 			.release().perform();
     }
     
@@ -1129,8 +1119,8 @@ public class HtmlElement implements WebElement, Locatable, HasIdentity {
     	MultiTouchAction multiTouch = new MultiTouchAction(performTouchActions);
 
         for (int i = 0; i < fingers; i++) {
-            TouchAction tap = new TouchAction(performTouchActions);
-            multiTouch.add(tap.press(mobElement).waitAction(Duration.ofMillis(duration)).release());
+            TouchAction<?> tap = createTouchAction();
+            multiTouch.add(tap.press(ElementOption.element(mobElement)).waitAction(WaitOptions.waitOptions(Duration.ofMillis(duration))).release());
         }
 
         multiTouch.perform();
@@ -1147,11 +1137,11 @@ public class HtmlElement implements WebElement, Locatable, HasIdentity {
         Point center = mobElement.getCenter();
         int yOffset = center.getY() - upperLeft.getY();
 
-        TouchAction action0 = new TouchAction(performTouchActions).press(center.getX(), center.getY())
-                												.moveTo(mobElement, center.getX(), center.getY() - yOffset)
+        TouchAction<?> action0 = createTouchAction().press(PointOption.point(center.getX(), center.getY()))
+                												.moveTo(ElementOption.element(mobElement, center.getX(), center.getY() - yOffset))
                 												.release();
-        TouchAction action1 = new TouchAction(performTouchActions).press(center.getX(), center.getY())
-                												.moveTo(mobElement, center.getX(), center.getY() + yOffset)
+        TouchAction<?> action1 = createTouchAction().press(PointOption.point(center.getX(), center.getY()))
+                												.moveTo(ElementOption.element(mobElement, center.getX(), center.getY() + yOffset))
                 												.release();
         multiTouch.add(action0).add(action1).perform();
     }
@@ -1192,9 +1182,10 @@ public class HtmlElement implements WebElement, Locatable, HasIdentity {
 	 * @param frameElement
 	 * @return
 	 */
+	@SuppressWarnings("unchecked")
 	public <T extends HtmlElement> T changeFrame(FrameElement frameElement, Class<T> type) {
 		setFrameElement(frameElement);
-	
+
 		return (T)this;
 	}
 

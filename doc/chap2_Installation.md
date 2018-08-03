@@ -3,7 +3,7 @@
 #### eclipse ####
 SeleniumRobot is developed using eclipse IDE. Following plugins are mandatory:
 
-- aspectj plugin (AJDT): use the dev version are older versions are not compatible with recent eclipse versions
+- aspectj plugin (AJDT): use the dev version for aspectj 9 (the version used by maven) as older versions are not compatible with recent eclipse versions: http://download.eclipse.org/tools/ajdt/47_aj9/dev/update
 - m2e plugin (maven)
 - subeclipse (if using SVN for test application)
 - TestNG (execute testNG tests)

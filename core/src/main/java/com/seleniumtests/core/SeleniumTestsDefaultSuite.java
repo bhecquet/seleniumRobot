@@ -39,7 +39,6 @@ import com.google.inject.Injector;
 
 public class SeleniumTestsDefaultSuite implements ISuite {
 
-    private static final long serialVersionUID = -152933123712833411L;
     private XmlSuite xmlSuite;
 
     public SeleniumTestsDefaultSuite() {
