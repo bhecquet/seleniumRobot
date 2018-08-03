@@ -20,11 +20,14 @@ package com.seleniumtests.ut.uipage.htmlelements;
 
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -48,6 +51,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Keyboard;
 import org.openqa.selenium.interactions.Mouse;
 import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.remote.DriverCommand;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.RemoteWebElement;
 import org.openqa.selenium.remote.Response;
@@ -156,14 +160,19 @@ public class TestHtmlElement extends MockitoTest {
 		when(mobileElement.getId()).thenReturn("12");
 		
 		// init for mobile tests
-		AppiumCommandExecutor ce = Mockito.mock(AppiumCommandExecutor.class);
+		AppiumCommandExecutor ce = Mockito.mock(AppiumCommandExecutor.class);		
 		Response response = new Response(new SessionId("1"));
 		response.setValue(new HashMap<String, Object>());
 		Response findResponse = new Response(new SessionId("1"));
 		findResponse.setValue(mobileElement);
+		
+		when(ce.execute(any())).thenReturn(response, response, response, findResponse);
+		doReturn(response).when(ce).execute(argThat(command -> DriverCommand.NEW_SESSION.equals(command.getName())));
+		doReturn(response).when(ce).execute(argThat(command -> DriverCommand.FIND_ELEMENT.equals(command.getName())));
+		doReturn(response).when(ce).execute(argThat(command -> "getSession".equals(command.getName())));
 
 		// newSession, getSession, getSession, findElement
-		when(ce.execute(any())).thenReturn(response, response, response, findResponse);
+		
 		mobileDriver = Mockito.spy(new AppiumDriver<>(ce, new DesiredCapabilities()));
 		
 		SeleniumTestsContextManager.getThreadContext().setTestType(TestType.WEB);
@@ -438,52 +447,57 @@ public class TestHtmlElement extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testPinch() throws Exception {
 		SeleniumTestsContextManager.getThreadContext().setTestType(TestType.APPIUM_WEB_ANDROID);
+		SeleniumTestsContextManager.getThreadContext().setPlatform("android");
 		when(WebUIDriver.getWebDriver()).thenReturn(new CustomEventFiringWebDriver(mobileDriver));
 		doNothing().when(el).findElement(anyBoolean(), anyBoolean());
 		el.setElement(mobileElement);
 		el.pinch();
-		PowerMockito.verifyPrivate(el).invoke("checkForMobile");
+		PowerMockito.verifyPrivate(el, atLeastOnce()).invoke("checkForMobile");
 	}
 	
 	@Test(groups={"ut"})
 	public void testGetCenter() throws Exception {
 		
 		SeleniumTestsContextManager.getThreadContext().setTestType(TestType.APPIUM_WEB_ANDROID);
+		SeleniumTestsContextManager.getThreadContext().setPlatform("android");
 		when(WebUIDriver.getWebDriver()).thenReturn(new CustomEventFiringWebDriver(mobileDriver));
 		doNothing().when(el).findElement(anyBoolean(), anyBoolean());
 		el.setElement(mobileElement);
 		el.getCenter();
-		PowerMockito.verifyPrivate(el).invoke("checkForMobile");
+		PowerMockito.verifyPrivate(el, atLeastOnce()).invoke("checkForMobile");
 	}
 	
 	@Test(groups={"ut"})
 	public void testSwipe1() throws Exception {
 		SeleniumTestsContextManager.getThreadContext().setTestType(TestType.APPIUM_WEB_ANDROID);
+		SeleniumTestsContextManager.getThreadContext().setPlatform("android");
 		when(WebUIDriver.getWebDriver()).thenReturn(new CustomEventFiringWebDriver(mobileDriver));
 		doNothing().when(el).findElement(anyBoolean(), anyBoolean());
 		el.setElement(mobileElement);
 		el.swipe(0, 0, 0, 10);
-		PowerMockito.verifyPrivate(el).invoke("checkForMobile");
+		PowerMockito.verifyPrivate(el, atLeastOnce()).invoke("checkForMobile");
 	}
 	
 	@Test(groups={"ut"})
 	public void testTap() throws Exception {
 		SeleniumTestsContextManager.getThreadContext().setTestType(TestType.APPIUM_WEB_ANDROID);
+		SeleniumTestsContextManager.getThreadContext().setPlatform("android");
 		when(WebUIDriver.getWebDriver()).thenReturn(new CustomEventFiringWebDriver(mobileDriver));
 		doNothing().when(el).findElement(anyBoolean(), anyBoolean());
 		el.setElement(mobileElement);
 		el.tap(2, 2);
-		PowerMockito.verifyPrivate(el).invoke("checkForMobile");
+		PowerMockito.verifyPrivate(el, atLeastOnce()).invoke("checkForMobile");
 	}
 	
 	@Test(groups={"ut"})
 	public void testZoom() throws Exception {
 		SeleniumTestsContextManager.getThreadContext().setTestType(TestType.APPIUM_WEB_ANDROID);
+		SeleniumTestsContextManager.getThreadContext().setPlatform("android");
 		when(WebUIDriver.getWebDriver()).thenReturn(new CustomEventFiringWebDriver(mobileDriver));
 		doNothing().when(el).findElement(anyBoolean(), anyBoolean());
 		el.setElement(mobileElement);
 		el.zoom();
-		PowerMockito.verifyPrivate(el).invoke("checkForMobile");
+		PowerMockito.verifyPrivate(el, atLeastOnce()).invoke("checkForMobile");
 	}
 
 	

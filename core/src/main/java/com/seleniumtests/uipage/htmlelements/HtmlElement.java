@@ -46,9 +46,9 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.interactions.HasInputDevices;
-import org.openqa.selenium.interactions.Locatable;
 import org.openqa.selenium.interactions.Mouse;
 import org.openqa.selenium.interactions.internal.Coordinates;
+import org.openqa.selenium.interactions.internal.Locatable;
 import org.openqa.selenium.internal.HasIdentity;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.RemoteWebElement;
@@ -80,8 +80,13 @@ import io.appium.java_client.touch.offset.PointOption;
 /**
  * Provides methods to interact with a web page. All HTML element (ButtonElement, LinkElement, TextFieldElement, etc.)
  * extends from this class.
+ * 
+ * 
  */
-public class HtmlElement extends Element implements WebElement, Locatable, HasIdentity {
+public class HtmlElement extends Element implements WebElement, Locatable, HasIdentity { 
+	// WARNING!!!: we use the deprecated Locatable interface because it's used by Actions class
+	// unit test TestPicutreElement.testClick() fails if the new interface is used
+	// so wait to this old interface to be really removed
 
     protected static final Logger logger = SeleniumRobotLogger.getLogger(HtmlElement.class);
     public static final Integer FIRST_VISIBLE = Integer.MAX_VALUE;
