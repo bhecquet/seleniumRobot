@@ -289,8 +289,9 @@ To override the default truststore, use `-Djavax.net.ssl.trustStore=<path_to_tru
 
 To debug, use `-Djavax.net.debug=ssl` 
 
-### Inheritance between test applications ###
+### 14 Inheritance between test applications ###
 
+Originaly, a test application corresponds to a full web or mobile application. But if your application is big, or can easily be split into parts that have a few things in common, you can create several test application which will be easier to maintain. E.g: an application with a front-office and a back-office.
 You can split a big test application into several ones
 
 	parent-app (generic features)
@@ -298,3 +299,9 @@ You can split a big test application into several ones
 		|--- child-app2 (app2)
 		
 Drawback is that each test application MUST contain all variables of the generic features it uses
+
+pom.xml of each child application will declare the parent-app as dependency, not the core, which is held by parent-app.
+	  
+	  
+	  
+	  
