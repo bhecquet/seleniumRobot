@@ -35,6 +35,7 @@ import org.openqa.selenium.Rectangle;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 
+import com.seleniumtests.customexception.CustomSeleniumTestsException;
 import com.seleniumtests.customexception.ScenarioException;
 
 public class CachedHtmlElement implements WebElement {
@@ -150,17 +151,19 @@ public class CachedHtmlElement implements WebElement {
 				field.setAccessible(true);
 				foundElements.add(new CachedHtmlElement(cachedElement.getElementById((String)field.get(by))));
 			} catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e) {
+				throw new CustomSeleniumTestsException("problem searching By field during reflection: core should be checked", e);
 			}	
 		} else if (by instanceof By.ByTagName) {
 			Field field;
 			try {
-				field = By.ByTagName.class.getDeclaredField("name");
+				field = By.ByTagName.class.getDeclaredField("tagName");
 				field.setAccessible(true);
 				foundElements.addAll(cachedElement.getElementsByTag((String)field.get(by))
 									.stream()
 									.map(CachedHtmlElement::new)
 									.collect(Collectors.toList()));
 			} catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e) {
+				throw new CustomSeleniumTestsException("problem searching By field during reflection: core should be checked", e);
 			} 
 		} else if (by instanceof By.ByClassName) {
 			Field field;
@@ -172,6 +175,7 @@ public class CachedHtmlElement implements WebElement {
 									.map(CachedHtmlElement::new)
 									.collect(Collectors.toList()));
 			} catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e) {
+				throw new CustomSeleniumTestsException("problem searching By field during reflection: core should be checked", e);
 			} 
 		} else if (by instanceof By.ByName) {
 			Field field;
@@ -183,6 +187,7 @@ public class CachedHtmlElement implements WebElement {
 									.map(CachedHtmlElement::new)
 									.collect(Collectors.toList()));
 			} catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e) {
+				throw new CustomSeleniumTestsException("problem searching By field during reflection: core should be checked", e);
 			} 
 		} else if (by instanceof By.ByLinkText || by instanceof By.ByPartialLinkText) {
 			Field field;
@@ -198,6 +203,7 @@ public class CachedHtmlElement implements WebElement {
 					}
 				}
 			} catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e) {
+				throw new CustomSeleniumTestsException("problem searching By field during reflection: core should be checked", e);
 			} 
 		} else {
 			throw new NotImplementedException(String.format("%s is not implemented in cached element", by.getClass()));

@@ -63,7 +63,7 @@
 
 		<!-- when changing selenium version, do not forget to change selenium-api 
 			version in project file (for aspectj build path) -->
-		<selenium.version>3.14.0</selenium.version>
+		<selenium.version>3.13.0</selenium.version>
 		<appium.version>6.1.0</appium.version>
 		<aspectj.version>1.9.1</aspectj.version>
 		<htmlunitdriver.version>2.32.0</htmlunitdriver.version>

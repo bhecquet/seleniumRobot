@@ -40,7 +40,7 @@ public class TestCachedHtmlElement extends GenericTest {
 	public void initDriver(final ITestContext testNGCtx) throws Exception {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setReplayTimeout(1);
-		SeleniumTestsContextManager.getThreadContext().setBrowser("htmlunit");
+		SeleniumTestsContextManager.getThreadContext().setBrowser("firefox");
 		new DriverTestPage(true); // start displaying page
 	}
 	

@@ -63,5 +63,9 @@ public class TestHtmlElement extends TestDriver {
 	public void testUploadFileWithRobotKeyboard() {
 		// skip as htmlunit does not support it
 	}
+	
+	@Test(groups= {"nogroup"})
+	public void test() {
+	}
 
 }
