@@ -119,7 +119,7 @@ public class TestFirefoxCapabilitiesFactory extends MockitoTest {
 		
 		MutableCapabilities capa = new FirefoxCapabilitiesFactory(config).createCapabilities();
 		
-		Assert.assertEquals(((Map<?,?>)(((FirefoxOptions)capa).asMap().get(FirefoxOptions.FIREFOX_OPTIONS))).get("args").toString(), "[-headless, --window-size=1280,1024]");
+		Assert.assertEquals(((Map<?,?>)(((FirefoxOptions)capa).asMap().get(FirefoxOptions.FIREFOX_OPTIONS))).get("args").toString(), "[-headless, --window-size=1280,1024, --width=1280, --height=1024]");
 		
 	}
 	
