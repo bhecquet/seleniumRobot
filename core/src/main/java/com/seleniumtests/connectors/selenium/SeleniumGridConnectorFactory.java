@@ -45,6 +45,7 @@ public class SeleniumGridConnectorFactory {
 	protected static final Logger logger = SeleniumRobotLogger.getLogger(SeleniumGridConnector.class);
 	
 	public static final String GUI_SERVLET = "/grid/admin/GuiServlet/";
+	public static final String CONSOLE_SERVLET = "/grid/console/";
 	
 	private SeleniumGridConnectorFactory() {
 		// nothing to do
@@ -71,12 +72,13 @@ public class SeleniumGridConnectorFactory {
 		
 		while (clock.isNowBefore(end)) {
 			try {
-				HttpResponse<String> response = Unirest.get(String.format("http://%s:%s%s", hubUrl.getHost(), hubUrl.getPort(), GUI_SERVLET)).asString();
+				HttpResponse<String> response = Unirest.get(String.format("http://%s:%s%s", hubUrl.getHost(), hubUrl.getPort(), CONSOLE_SERVLET)).asString();
 				if (response.getStatus() == 200) {
-					if (response.getBody().contains("default monitoring page")) {
-	        			seleniumGridConnector.set(new SeleniumGridConnector(url));
+					HttpResponse<String> responseGuiServlet = Unirest.get(String.format("http://%s:%s%s", hubUrl.getHost(), hubUrl.getPort(), GUI_SERVLET)).asString();
+					if (responseGuiServlet.getStatus() == 200) {
+						seleniumGridConnector.set(new SeleniumRobotGridConnector(url));
 	        		} else {
-	        			seleniumGridConnector.set(new SeleniumRobotGridConnector(url));
+	        			seleniumGridConnector.set(new SeleniumGridConnector(url));
 	        		}
 	        		return seleniumGridConnector.get();
 	        	} else {

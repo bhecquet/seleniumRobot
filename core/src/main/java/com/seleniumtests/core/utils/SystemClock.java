@@ -14,4 +14,8 @@ public class SystemClock {
 	public boolean isNowBefore(long endInMillis) {
 		return System.currentTimeMillis() < endInMillis;
 	}
+	
+	public long now() {
+	    return System.currentTimeMillis();
+	}
 }
