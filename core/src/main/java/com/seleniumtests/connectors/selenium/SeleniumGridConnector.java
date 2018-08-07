@@ -23,19 +23,15 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 
-import org.apache.http.HttpHost;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
-import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
 import org.json.JSONObject;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.SessionId;
 
+import com.mashape.unirest.http.Unirest;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
@@ -146,16 +142,12 @@ public class SeleniumGridConnector {
 		
         // logging node ip address:
         try (CloseableHttpClient client = HttpClients.createDefault()) {
-        	HttpHost serverHost = new HttpHost(hubUrl.getHost(), hubUrl.getPort());
-        	URIBuilder builder = new URIBuilder();
-        	builder.setPath("/grid/api/testsession/");
-        	builder.addParameter("session", driver.getSessionId().toString());
-        	HttpPost httpPost = new HttpPost(builder.build());
-	        CloseableHttpResponse response = client.execute(serverHost, httpPost);
-
-            String responseContent = EntityUtils.toString(response.getEntity());
-            
-            JSONObject object = new JSONObject(responseContent);
+        	JSONObject object = Unirest.get(String.format("http://%s:%d/grid/api/testsession/", hubUrl.getHost(), hubUrl.getPort()))
+        		.queryString("session", driver.getSessionId().toString())
+        		.asJson()
+        		.getBody()
+        		.getObject();
+        	
             nodeUrl = (String) object.get("proxyId");
             String node = nodeUrl.split("//")[1].split(":")[0];
             String browserName = driver.getCapabilities().getBrowserName();

@@ -133,6 +133,7 @@ public abstract class IDesktopCapabilityFactory extends ICapabilitiesFactory {
 
         if (webDriverConfig.getWebPlatform() != null) {
             capability.setPlatform(webDriverConfig.getWebPlatform());
+            capability.setCapability(CapabilityType.PLATFORM_NAME, webDriverConfig.getWebPlatform());
         }
 
         configureProxyCap(capability);

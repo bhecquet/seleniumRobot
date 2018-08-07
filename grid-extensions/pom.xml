@@ -84,6 +84,7 @@
 						<include>**/util/osutility/**</include>
 						<include>**/util/FileUtility.java</include>
 						<include>**/driver/CustomEventFiringWebDriver.java</include>
+						<include>**/core/utils/SystemClock.java</include>
 					</includes>
 				</configuration>
 			</plugin>
