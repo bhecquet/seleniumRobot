@@ -46,17 +46,22 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.SessionId;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import com.mashape.unirest.http.Unirest;
+import com.mashape.unirest.http.exceptions.UnirestException;
 import com.seleniumtests.MockitoTest;
 import com.seleniumtests.connectors.selenium.SeleniumGridConnector;
+import com.seleniumtests.connectors.selenium.SeleniumRobotGridConnector;
 import com.seleniumtests.reporter.logger.TestLogging;
+import com.seleniumtests.ut.connectors.ConnectorsTest;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
 
-@PrepareForTest({HttpClients.class, TestLogging.class})
-public class TestSeleniumGridConnector extends MockitoTest {
+@PrepareForTest({HttpClients.class, TestLogging.class, Unirest.class})
+public class TestSeleniumGridConnector extends ConnectorsTest {
 
 	@Mock
 	private CloseableHttpClient client; 
@@ -79,6 +84,7 @@ public class TestSeleniumGridConnector extends MockitoTest {
 	private void init() throws ClientProtocolException, IOException {
 		PowerMockito.mockStatic(HttpClients.class);
 		PowerMockito.mockStatic(TestLogging.class);
+		PowerMockito.mockStatic(Unirest.class);
 		
 		when(HttpClients.createDefault()).thenReturn(client);
 		when(response.getEntity()).thenReturn(entity);
@@ -89,7 +95,9 @@ public class TestSeleniumGridConnector extends MockitoTest {
 	}
 	
 	@Test(groups={"ut"})
-	public void testRunTest() throws UnsupportedOperationException, IOException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
+	public void testRunTest() throws UnsupportedOperationException, IOException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, UnirestException {
+		
+		createServerMock("GET", "/grid/api/testsession/", 200, "{'proxyId': 'http://localhost:43210'}");	
 		
 		// prepare app file
 		((DesiredCapabilities)capabilities).setCapability(CapabilityType.BROWSER_NAME, "firefox");
@@ -99,7 +107,7 @@ public class TestSeleniumGridConnector extends MockitoTest {
 		InputStream is = new StringInputStream("{'proxyId':'proxy//node:0'}");
 		when(entity.getContent()).thenReturn(is);
 		
-		SeleniumGridConnector connector = new SeleniumGridConnector("http://localhost:6666");
+		SeleniumGridConnector connector = new SeleniumGridConnector(SERVER_URL);
 		
 		Logger logger = spy(SeleniumRobotLogger.getLogger(SeleniumGridConnector.class));
 		Field loggerField = SeleniumGridConnector.class.getDeclaredField("logger");
@@ -108,7 +116,8 @@ public class TestSeleniumGridConnector extends MockitoTest {
 		
 		connector.runTest(driver);
 		
-		verify(logger).info("WebDriver is running on node node, firefox 50.0, session 0");
+		verify(logger).info("WebDriver is running on node localhost, firefox 50.0, session 0");
+		Assert.assertEquals(connector.getNodeUrl(), "http://localhost:43210");
 	}
 	
 	/**

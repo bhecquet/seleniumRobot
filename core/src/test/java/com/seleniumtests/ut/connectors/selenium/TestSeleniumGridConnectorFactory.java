@@ -76,6 +76,18 @@ public class TestSeleniumGridConnectorFactory extends ConnectorsTest {
 			"\r\n" + 
 			"</html>\r\n" + 
 			"";
+	
+	private final String consoleServletContent = "<html>"
+			+ "<head></head>"
+			+ "<body>"
+			+ "		<div id='main-content'>"
+			+ "			<div id='header'>"
+			+ "				<h1><a href='/grid/console'>Selenium</a></h1>"
+			+ "				<h2>Grid Console v.3.8.1</h2>"
+			+ "			</div>"
+			+ "		</div>"
+			+ "</body>"
+			+ "</html>";
 
 	@BeforeMethod(groups= {"ut"})
 	public void init(final ITestContext testNGCtx) {
@@ -93,6 +105,7 @@ public class TestSeleniumGridConnectorFactory extends ConnectorsTest {
 	public void testWithSeleniumRobotGrid() throws UnsupportedOperationException, IOException, UnirestException {
 		
 		createServerMock("GET", SeleniumGridConnectorFactory.GUI_SERVLET, 200, guiServletContent);		
+		createServerMock("GET", SeleniumGridConnectorFactory.CONSOLE_SERVLET, 200, consoleServletContent);		
 		
 		Assert.assertTrue(SeleniumGridConnectorFactory.getInstance(SERVER_URL + "/wd/hub") instanceof SeleniumRobotGridConnector);
 	}
@@ -106,7 +119,8 @@ public class TestSeleniumGridConnectorFactory extends ConnectorsTest {
 	@Test(groups={"ut"})
 	public void testWithSeleniumGrid() throws UnsupportedOperationException, IOException, UnirestException {
 		
-		createServerMock("GET", SeleniumGridConnectorFactory.GUI_SERVLET, 200, "default monitoring page");		
+		createServerMock("GET", SeleniumGridConnectorFactory.GUI_SERVLET, 404, "default monitoring page");
+		createServerMock("GET", SeleniumGridConnectorFactory.CONSOLE_SERVLET, 200, consoleServletContent);			
 		
 		Assert.assertTrue(SeleniumGridConnectorFactory.getInstance(SERVER_URL + "/wd/hub") instanceof SeleniumGridConnector);
 	}
@@ -120,7 +134,7 @@ public class TestSeleniumGridConnectorFactory extends ConnectorsTest {
 	@Test(groups={"ut"}, expectedExceptions=ConfigurationException.class)
 	public void testWithErrorCodeHttp() throws UnsupportedOperationException, IOException, UnirestException {
 		SeleniumGridConnectorFactory.setRetryTimeout(1);
-		createServerMock("GET", SeleniumGridConnectorFactory.GUI_SERVLET, 404, "default monitoring page");
+		createServerMock("GET", SeleniumGridConnectorFactory.CONSOLE_SERVLET, 404, "default monitoring page");	
 		
 		SeleniumGridConnectorFactory.getInstance(SERVER_URL + "/wd/hub");
 	}
@@ -135,7 +149,7 @@ public class TestSeleniumGridConnectorFactory extends ConnectorsTest {
 	@Test(groups={"ut"}, expectedExceptions=ConfigurationException.class)
 	public void testWithError() throws UnsupportedOperationException, IOException, UnirestException {
 		
-		when(Unirest.get(SERVER_URL + SeleniumGridConnectorFactory.GUI_SERVLET)).thenThrow(UnirestException.class);
+		when(Unirest.get(SERVER_URL + SeleniumGridConnectorFactory.CONSOLE_SERVLET)).thenThrow(UnirestException.class);
 
 		LocalDateTime start = LocalDateTime.now();
 		try {

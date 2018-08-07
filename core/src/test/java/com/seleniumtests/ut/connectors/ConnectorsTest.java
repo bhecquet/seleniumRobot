@@ -28,9 +28,12 @@ import static org.mockito.Mockito.when;
 
 import java.io.File;
 
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 
 import com.mashape.unirest.http.HttpResponse;
+import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import com.mashape.unirest.request.GetRequest;
@@ -50,7 +53,9 @@ public class ConnectorsTest extends MockitoTest {
 		
 		@SuppressWarnings("unchecked")
 		HttpResponse<String> response = mock(HttpResponse.class);
+		HttpResponse<JsonNode> jsonResponse = mock(HttpResponse.class);
 		HttpRequest request = mock(HttpRequest.class);
+		JsonNode json = mock(JsonNode.class);
 		MultipartBody requestMultipartBody = mock(MultipartBody.class);
 		HttpRequestWithBody postRequest = mock(HttpRequestWithBody.class);
 		
@@ -61,11 +66,10 @@ public class ConnectorsTest extends MockitoTest {
 				GetRequest getRequest = mock(GetRequest.class); 
 				when(Unirest.get(SERVER_URL + apiPath)).thenReturn(getRequest);
 				when(getRequest.asString()).thenReturn(response);
+				when(getRequest.asJson()).thenReturn(jsonResponse);
 				when(getRequest.queryString(anyString(), anyString())).thenReturn(getRequest);
 				when(getRequest.queryString(anyString(), anyInt())).thenReturn(getRequest);
-				when(response.getStatus()).thenReturn(statusCode);
 				when(getRequest.getHttpRequest()).thenReturn(request);
-				when(response.getBody()).thenReturn(replyData);
 				break;
 			case "POST":
 				when(Unirest.post(SERVER_URL + apiPath)).thenReturn(postRequest);
@@ -83,10 +87,17 @@ public class ConnectorsTest extends MockitoTest {
 				when(requestMultipartBody.field(anyString(), anyLong())).thenReturn(requestMultipartBody);
 				when(requestMultipartBody.field(anyString(), any(File.class))).thenReturn(requestMultipartBody);
 				when(requestMultipartBody.asString()).thenReturn(response);
-				when(response.getStatus()).thenReturn(statusCode);
-				when(response.getBody()).thenReturn(replyData);
 				break;
 			
 		}
+		
+		when(response.getStatus()).thenReturn(statusCode);
+		when(response.getBody()).thenReturn(replyData);
+		when(jsonResponse.getStatus()).thenReturn(statusCode);
+		when(jsonResponse.getBody()).thenReturn(json);
+		try {
+			JSONObject jsonReply = new JSONObject(replyData);
+			when(json.getObject()).thenReturn(jsonReply);
+		} catch (JSONException e) {}
 	}
 }
