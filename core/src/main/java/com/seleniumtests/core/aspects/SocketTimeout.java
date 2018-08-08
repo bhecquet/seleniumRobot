@@ -62,7 +62,10 @@ public class SocketTimeout {
 		}
 		
 		HttpCommandExecutor commandExecutor = (HttpCommandExecutor)joinPoint.getThis();
-		URL url = (URL) joinPoint.getArgs()[0];
+		
+		Field remoteServerField = HttpCommandExecutor.class.getDeclaredField("remoteServer");
+		remoteServerField.setAccessible(true);
+		URL url = (URL) remoteServerField.get(commandExecutor);
 		
 		HttpClient client = httpClientFactory.createClient(url);
 		
