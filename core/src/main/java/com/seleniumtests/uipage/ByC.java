@@ -304,8 +304,8 @@ public class ByC extends By {
 
 		private static final long serialVersionUID = 5341968046120372161L;
 
-		private final String attributeName;
-		private final String attributeValue;
+		private String attributeName;
+		private String attributeValue;
 
 		public ByAttribute(String attributeName, String attributeValue) {
 			
@@ -319,17 +319,40 @@ public class ByC extends By {
 			this.attributeName = attributeName;
 			this.attributeValue = attributeValue;
 		}
+		
+		/**
+		 *Build a xpath selector so that we understand the CSS syntax: https://www.w3schools.com/cssref/css_selectors.asp
+		 * '*' => contains
+		 * '^' => starts with
+		 * '$' => ends with
+		 * @return
+		 */
+		private String buildSelector() {
+			String escapedAttributeValue = escapeQuotes(attributeValue);
+			
+			if (attributeName.endsWith("*")) {
+				attributeName = attributeName.substring(0, attributeName.length() - 1);
+				return String.format("[contains(@%s,%s)]", attributeName, escapedAttributeValue);
+			} else if (attributeName.endsWith("^")) {
+				attributeName = attributeName.substring(0, attributeName.length() - 1);
+				return String.format("[starts-with(@%s,%s)]", attributeName, escapedAttributeValue);
+			} else if (attributeName.endsWith("$")) {
+				attributeName = attributeName.substring(0, attributeName.length() - 1);
+				//return String.format("[ends-with(@%s,%s)]", attributeName, escapedAttributeValue); // would by valid with xpath 2.0
+				return String.format("[substring(@%s, string-length(@%s) - string-length(%s) +1) = %s]", attributeName, attributeName, escapedAttributeValue, escapedAttributeValue);
+			} else {
+				return String.format("[@%s=%s]", attributeName, escapedAttributeValue);
+			}
+		}
 
 		@Override
 		public List<WebElement> findElements(SearchContext context) {
-			String escapedAttributeValue = escapeQuotes(attributeValue);
-			return ((FindsByXPath) context).findElementsByXPath(String.format(".//*[@%s=%s]", attributeName, escapedAttributeValue));
+			return ((FindsByXPath) context).findElementsByXPath(String.format(".//*%s", buildSelector()));
 		}
 
 		@Override
 		public WebElement findElement(SearchContext context) {
-			String escapedAttributeValue = escapeQuotes(attributeValue);
-			return ((FindsByXPath) context).findElementByXPath(String.format(".//*[@%s=%s]", attributeName, escapedAttributeValue));
+			return ((FindsByXPath) context).findElementByXPath(String.format(".//*%s", buildSelector()));
 		}
 
 		@Override
