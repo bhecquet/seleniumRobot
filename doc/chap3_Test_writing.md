@@ -51,12 +51,14 @@ for the remainder, we use a unique name for that new application `appName`<br/>
 		</dependency>
 	</dependencies>
 	
+Also update aspectj-maven-plugin version to 1.11
+
 inside aspectj-maven-plugin definition (in pom.xml) so that it looks like:
 
 	<plugin>
 		<groupId>org.codehaus.mojo</groupId>
 		<artifactId>aspectj-maven-plugin</artifactId>
-		<version>1.8</version>
+		<version>1.11</version>
 		<dependencies>
 			<dependency>
 				<groupId>org.aspectj</groupId>
