@@ -84,6 +84,17 @@ inside aspectj-maven-plugin definition (in pom.xml) so that it looks like:
 			</execution>
 		</executions>
 	</plugin>
+	
+Moreover, you MUST set the minimal version of core to 3.14.0 in application dependencies:
+
+	<dependencies>
+		<dependency>
+			<groupId>com.infotel.seleniumRobot</groupId>
+			<artifactId>core</artifactId>
+			<version>[3.14.0,)</version>
+			...
+		</dependency>
+	</dependencies>
 
 - execute it
 
