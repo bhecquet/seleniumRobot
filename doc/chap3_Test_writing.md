@@ -41,7 +41,50 @@ for the remainder, we use a unique name for that new application `appName`<br/>
     </mirror>
   </mirrors>
 	
+- **WARNING ASPECTJ**: from seleniumRobot 3.14.0 version, aspectJ version has be changed (from 1.8.9 to 1.9.1) which introduces incompatibilities when building but not running tests. To use this seleniumRobot version, do the following: add 
+
+	<dependencies>
+		<dependency>
+			<groupId>org.aspectj</groupId>
+			<artifactId>aspectjtools</artifactId>
+			<version>1.9.1</version>
+		</dependency>
+	</dependencies>
 	
+inside aspectj-maven-plugin definition (in pom.xml) so that it looks like:
+
+	<plugin>
+		<groupId>org.codehaus.mojo</groupId>
+		<artifactId>aspectj-maven-plugin</artifactId>
+		<version>1.8</version>
+		<dependencies>
+			<dependency>
+				<groupId>org.aspectj</groupId>
+				<artifactId>aspectjtools</artifactId>
+				<version>1.9.1</version>
+			</dependency>
+		</dependencies>
+		<configuration>
+			<showWeaveInfo>true</showWeaveInfo>
+			<aspectLibraries>
+				<aspectLibrary>
+					<groupId>com.infotel.seleniumRobot</groupId>
+					<artifactId>core</artifactId>
+				</aspectLibrary>
+			</aspectLibraries>
+			<complianceLevel>1.8</complianceLevel>
+			<source>1.8</source>
+			<target>1.8</target>
+		</configuration>
+		<executions>
+			<execution>
+				<goals>
+					<goal>test-compile</goal>
+				</goals>
+			</execution>
+		</executions>
+	</plugin>
+
 - execute it
 
 #### Requirements are ####
