@@ -135,6 +135,24 @@ public class TestByC extends GenericTest {
 		Assert.assertEquals(DriverTestPage.textSelectedId.getValue(), "element found by attribute");
 	}
 	
+	@Test(groups={"it"})
+	public void testFindElementByPartialAttribute() {
+		new TextFieldElement("", ByC.attribute("attr*", "ttribut")).sendKeys("element found by attribute");
+		Assert.assertEquals(DriverTestPage.textSelectedId.getValue(), "element found by attribute");
+	}
+	
+	@Test(groups={"it"})
+	public void testFindElementByAttributeStartingWith() {
+		new TextFieldElement("", ByC.attribute("attr^", "attribu")).sendKeys("element found by attribute");
+		Assert.assertEquals(DriverTestPage.textSelectedId.getValue(), "element found by attribute");
+	}
+	
+	@Test(groups={"it"})
+	public void testFindElementByAttributeEndingWith() {
+		new TextFieldElement("", ByC.attribute("attr$", "tribute")).sendKeys("element found by attribute");
+		Assert.assertEquals(DriverTestPage.textSelectedId.getValue(), "element found by attribute");
+	}
+	
 	@Test(groups={"it"}, expectedExceptions=IllegalArgumentException.class)
 	public void testFindElementByNullAttribute() {
 		new TextFieldElement("", ByC.attribute(null, "attribute")).sendKeys("element found by attribute");
