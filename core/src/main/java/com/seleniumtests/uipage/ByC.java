@@ -336,15 +336,15 @@ public class ByC extends By {
 			String escapedAttributeValue = escapeQuotes(attributeValue);
 			
 			if (attributeName.endsWith("*")) {
-				attributeName = attributeName.substring(0, attributeName.length() - 1);
-				return String.format("[contains(@%s,%s)]", attributeName, escapedAttributeValue);
+				String tmpAttributeName = attributeName.substring(0, attributeName.length() - 1);
+				return String.format("[contains(@%s,%s)]", tmpAttributeName, escapedAttributeValue);
 			} else if (attributeName.endsWith("^")) {
-				attributeName = attributeName.substring(0, attributeName.length() - 1);
-				return String.format("[starts-with(@%s,%s)]", attributeName, escapedAttributeValue);
+				String tmpAttributeName = attributeName.substring(0, attributeName.length() - 1);
+				return String.format("[starts-with(@%s,%s)]", tmpAttributeName, escapedAttributeValue);
 			} else if (attributeName.endsWith("$")) {
-				attributeName = attributeName.substring(0, attributeName.length() - 1);
+				String tmpAttributeName = attributeName.substring(0, attributeName.length() - 1);
 				//return String.format("[ends-with(@%s,%s)]", attributeName, escapedAttributeValue); // would by valid with xpath 2.0
-				return String.format("[substring(@%s, string-length(@%s) - string-length(%s) +1) = %s]", attributeName, attributeName, escapedAttributeValue, escapedAttributeValue);
+				return String.format("[substring(@%s, string-length(@%s) - string-length(%s) +1) = %s]", tmpAttributeName, tmpAttributeName, escapedAttributeValue, escapedAttributeValue);
 			} else {
 				return String.format("[@%s=%s]", attributeName, escapedAttributeValue);
 			}
