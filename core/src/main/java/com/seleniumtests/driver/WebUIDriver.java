@@ -188,7 +188,8 @@ public class WebUIDriver {
         	}
         }
         
-    	IWebDriverFactory iWebDriverFactory = getWebUIDriver().webDriverBuilder;
+    	// issue #176: do not create the WebUiDriver if it does not exist
+    	IWebDriverFactory iWebDriverFactory = getWebUIDriver(false).webDriverBuilder;
         if (iWebDriverFactory != null) {
             iWebDriverFactory.cleanUp();
         } 
@@ -274,21 +275,19 @@ public class WebUIDriver {
      */
     public static WebDriver getWebDriver(final Boolean isCreate) {
         if (driverSession.get() == null && isCreate && !SeleniumTestsContextManager.isNonGuiTest()) {
-        	getWebUIDriver().createWebDriver();
+        	getWebUIDriver(true).createWebDriver();
         }
 
         return driverSession.get();
     }
 
     /**
-     * Returns WebUIDriver instance Creates new WebUIDriver instance if it is null.
+     * Returns WebUIDriver instance
+     * @param create	create instance if it does not exist in this thread. Beware that this instance will have to be deleted at the end of test
+     * 					(for regular seleniumRobot tests, this is done in <code>SeleniumRobotTestPlan.finishTestMethod</code>
      *
      * @return
      */
-    public static WebUIDriver getWebUIDriver() {
-    	return getWebUIDriver(true);
-    }
-    
     public static WebUIDriver getWebUIDriver(boolean create) {
         if (uxDriverSession.get() == null && create) {
 //        	if (!SeleniumTestsContextManager.getThreadContext().isDevMode()){
@@ -321,7 +320,7 @@ public class WebUIDriver {
             driverSession.remove();
         } else {
         	// create WebUiDriver if it does not exist
-            getWebUIDriver();
+            getWebUIDriver(true);
             driverSession.set(driver);
         }
     }

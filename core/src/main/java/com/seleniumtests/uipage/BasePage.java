@@ -51,7 +51,7 @@ public abstract class BasePage {
     
     public void init() {
     	driver = WebUIDriver.getWebDriver();
-    	webUXDriver = WebUIDriver.getWebUIDriver();
+    	webUXDriver = WebUIDriver.getWebUIDriver(false);
     }
 
     public void acceptAlert() {
