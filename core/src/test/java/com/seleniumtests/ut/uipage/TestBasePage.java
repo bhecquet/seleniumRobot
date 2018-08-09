@@ -20,6 +20,7 @@ package com.seleniumtests.ut.uipage;
 
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.WebDriver.TargetLocator;
 import org.openqa.selenium.remote.RemoteWebElement;
@@ -61,7 +62,7 @@ public class TestBasePage extends MockitoTest {
 		
 		PowerMockito.mockStatic(WebUIDriver.class);
 		Mockito.when(WebUIDriver.getWebDriver()).thenReturn(driver);
-		Mockito.when(WebUIDriver.getWebUIDriver()).thenReturn(webUiDriver);
+		Mockito.when(WebUIDriver.getWebUIDriver(anyBoolean())).thenReturn(webUiDriver);
 		
 		// use this to test abstract class
 		page = Mockito.mock(BasePage.class, Mockito.CALLS_REAL_METHODS);
