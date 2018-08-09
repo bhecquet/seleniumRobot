@@ -153,7 +153,7 @@
 							<configuration>
 								<skip>${is.not.windows}</skip>
 								<!-- <url>${iedriver.url}/${selenium.version.short}/IEDriverServer_x64_${selenium.version.short}.0.zip</url>-->
-								<url>${iedriver.url}/3.10/IEDriverServer_x64_3.10.0.zip</url>
+								<url>${iedriver.url}/3.14/IEDriverServer_x64_3.14.0.zip</url>
 								<outputDirectory>${driver.path}${os}/dir_IEDriverServer_x64</outputDirectory>
 							</configuration>
 						</execution>
@@ -165,7 +165,7 @@
 							</goals>
 							<configuration>
 								<skip>${is.not.windows}</skip>
-								<url>${iedriver.url}/3.10/IEDriverServer_Win32_3.10.0.zip</url>
+								<url>${iedriver.url}/3.14/IEDriverServer_Win32_3.14.0.zip</url>
 								<outputDirectory>${driver.path}${os}/dir_IEDriverServer_Win32</outputDirectory>
 							</configuration>
 						</execution>
