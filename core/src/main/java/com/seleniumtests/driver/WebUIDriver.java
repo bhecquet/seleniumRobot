@@ -189,19 +189,24 @@ public class WebUIDriver {
         }
         
     	// issue #176: do not create the WebUiDriver if it does not exist
-    	IWebDriverFactory iWebDriverFactory = getWebUIDriver(false).webDriverBuilder;
-        if (iWebDriverFactory != null) {
-            iWebDriverFactory.cleanUp();
-        } 
-        
-        // in case of mobile test with appium, stop appium server
-        try {
-	        if (iWebDriverFactory instanceof AppiumDriverFactory) {
-	        	((AppiumDriverFactory) iWebDriverFactory).getAppiumLauncher().stopAppium();
+    	WebUIDriver webuiDriver = getWebUIDriver(false);
+    	if (webuiDriver != null) {
+	    	IWebDriverFactory iWebDriverFactory = webuiDriver.webDriverBuilder;
+	        if (iWebDriverFactory != null) {
+	            iWebDriverFactory.cleanUp();
+	        } 
+	        
+	        // in case of mobile test with appium, stop appium server
+	        try {
+		        if (iWebDriverFactory instanceof AppiumDriverFactory) {
+		        	((AppiumDriverFactory) iWebDriverFactory).getAppiumLauncher().stopAppium();
+		        }
+	        } catch (Exception e) {
+	        	logger.error("Error stopping Appium: " + e.getMessage());
 	        }
-        } catch (Exception e) {
-        	logger.error("Error stopping Appium: " + e.getMessage());
-        }
+    	}
+        
+        
         
         // stop HAR capture in case it has not already been done by SeleniumRobotTestListener. This may be the case when a driver is created in @AfterMethod
 		try {
