@@ -367,6 +367,7 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 					        		|| (SeleniumTestsContextManager.getThreadContext().getVideoCapture() == VideoCaptureMode.ON_SUCCESS && testResult.isSuccess())
 					        		|| (SeleniumTestsContextManager.getThreadContext().getVideoCapture() == VideoCaptureMode.ON_ERROR && !testResult.isSuccess())) {
 					        	TestLogging.logFile(pathRelative.toFile(), "Video capture");
+					        	logger.info("Video file copied to " + pathAbsolute.toFile().getAbsolutePath());
 							} else {
 								pathAbsolute.toFile().delete();
 							}

@@ -18,6 +18,7 @@
  */
 package com.seleniumtests.reporter.logger;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -36,8 +37,11 @@ public class HarCapture extends TestAction {
 	public HarCapture(Har har) throws IOException {
 		super(har.getLog().getPages().get(0).getTitle(), false, new ArrayList<>());
 		harFile = har;
+		File harFile = Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), HAR_FILE_NAME).toFile();
+		
+		har.writeTo(harFile);
 
-		har.writeTo(Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), HAR_FILE_NAME).toFile());
+		logger.info("HAR capture file copied to " + harFile.getAbsolutePath());
 	}
 	
 	public String buildHarLog() {

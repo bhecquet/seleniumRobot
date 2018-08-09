@@ -403,11 +403,11 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		String detailedReportContent2 = readTestMethodResultFile("testWithAssert");
 		
 		// check execution logs are in error
-		Assert.assertTrue(detailedReportContent2.contains("<div class=\"box collapsed-box failed\">			<div class=\"box-header with-border\">			<button type=\"button\" class=\"btn btn-box-tool\" data-widget=\"collapse\"><i class=\"fa fa-plus\"></i></button> Execution logs"));
+		Assert.assertTrue(detailedReportContent2.contains("<div class=\"box collapsed-box failed\"><div class=\"box-header with-border\"><button type=\"button\" class=\"btn btn-box-tool\" data-widget=\"collapse\"><i class=\"fa fa-plus\"></i></button> Execution logs"));
 		
 		// test first step is OK and second one is failed (this shows indirectly that internal step is marked as failed
-		Assert.assertTrue(detailedReportContent2.contains("<div class=\"box collapsed-box success\">			<div class=\"box-header with-border\">			<button type=\"button\" class=\"btn btn-box-tool\" data-widget=\"collapse\"><i class=\"fa fa-plus\"></i></button> Test start"));
-		Assert.assertTrue(detailedReportContent2.contains("<div class=\"box collapsed-box failed\">			<div class=\"box-header with-border\">			<button type=\"button\" class=\"btn btn-box-tool\" data-widget=\"collapse\"><i class=\"fa fa-plus\"></i></button> assert exception"));
+		Assert.assertTrue(detailedReportContent2.contains("<div class=\"box collapsed-box success\"><div class=\"box-header with-border\"><button type=\"button\" class=\"btn btn-box-tool\" data-widget=\"collapse\"><i class=\"fa fa-plus\"></i></button> Test start"));
+		Assert.assertTrue(detailedReportContent2.contains("<div class=\"box collapsed-box failed\"><div class=\"box-header with-border\"><button type=\"button\" class=\"btn btn-box-tool\" data-widget=\"collapse\"><i class=\"fa fa-plus\"></i></button> assert exception"));
 		
 		// check exception is present in step
 		Assert.assertTrue(detailedReportContent2.contains("<div class=\"message-log\">Test is KO with error: false error expected [true] but found [false]</div>"));

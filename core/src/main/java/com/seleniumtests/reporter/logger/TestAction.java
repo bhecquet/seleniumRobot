@@ -23,10 +23,13 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.apache.commons.text.StringEscapeUtils;
+import org.apache.log4j.Logger;
 import org.json.JSONObject;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.core.runner.SeleniumRobotTestListener;
 import com.seleniumtests.customexception.CustomSeleniumTestsException;
+import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
 
 /**
@@ -35,6 +38,10 @@ import com.seleniumtests.customexception.CustomSeleniumTestsException;
  *
  */
 public class TestAction {
+	
+
+	protected static final Logger logger = SeleniumRobotLogger.getLogger(TestAction.class);
+	
 	protected String name;
 	protected Boolean failed;
 	protected Throwable actionException;
