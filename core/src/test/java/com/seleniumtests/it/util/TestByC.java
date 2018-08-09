@@ -34,6 +34,7 @@ import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.it.driver.support.pages.DriverTestPage;
 import com.seleniumtests.uipage.ByC;
 import com.seleniumtests.uipage.htmlelements.HtmlElement;
+import com.seleniumtests.uipage.htmlelements.RadioButtonElement;
 import com.seleniumtests.uipage.htmlelements.TextFieldElement;
 
 public class TestByC extends GenericTest {
@@ -136,11 +137,23 @@ public class TestByC extends GenericTest {
 	}
 	
 	@Test(groups={"it"})
+	public void testFindElemenstByAttribute() {
+		Assert.assertEquals(new RadioButtonElement("", ByC.attribute("name", "radioClick")).findElements().size(), 2);
+	}
+	
+	// test attribute "*" syntax
+	@Test(groups={"it"})
 	public void testFindElementByPartialAttribute() {
 		new TextFieldElement("", ByC.attribute("attr*", "ttribut")).sendKeys("element found by attribute");
 		Assert.assertEquals(DriverTestPage.textSelectedId.getValue(), "element found by attribute");
 	}
 	
+	@Test(groups={"it"})
+	public void testFindElemenstByPartialAttribute() {
+		Assert.assertEquals(new RadioButtonElement("", ByC.attribute("name*", "adioCli")).findElements().size(), 2);
+	}
+	
+	// test attribute "^" syntax"
 	@Test(groups={"it"})
 	public void testFindElementByAttributeStartingWith() {
 		new TextFieldElement("", ByC.attribute("attr^", "attribu")).sendKeys("element found by attribute");
@@ -148,9 +161,20 @@ public class TestByC extends GenericTest {
 	}
 	
 	@Test(groups={"it"})
+	public void testFindElemenstByAttributeStartingWith() {
+		Assert.assertEquals(new RadioButtonElement("", ByC.attribute("name^", "radioCli")).findElements().size(), 2);
+	}
+	
+	// test attribute "$" syntax"
+	@Test(groups={"it"})
 	public void testFindElementByAttributeEndingWith() {
 		new TextFieldElement("", ByC.attribute("attr$", "tribute")).sendKeys("element found by attribute");
 		Assert.assertEquals(DriverTestPage.textSelectedId.getValue(), "element found by attribute");
+	}
+
+	@Test(groups={"it"})
+	public void testFindElemenstByAttributeEndingWith() {
+		Assert.assertEquals(new RadioButtonElement("", ByC.attribute("name$", "adioClick")).findElements().size(), 2);
 	}
 	
 	@Test(groups={"it"}, expectedExceptions=IllegalArgumentException.class)
