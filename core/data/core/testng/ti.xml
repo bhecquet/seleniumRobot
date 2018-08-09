@@ -17,6 +17,7 @@
         <groups>
             <run>
                 <include name="it"/>
+                <exclude name="pageobject" /> <!--  exclude pageobject groups as this class is already tested in "Page Object" test -->
             </run>
         </groups>
 
@@ -24,7 +25,6 @@
             <package name="com.seleniumtests.it.*" >
             <!--  exclude stub tests classes as they make SeleniumRobotTestListener available for listening when executing integration tests -->
             	<exclude name="com.seleniumtests.it.stubclasses.*"></exclude>
-            	<exclude name="com.seleniumtests.it.webelements.TestPageObject"></exclude>
             </package>
         </packages>
     </test>
