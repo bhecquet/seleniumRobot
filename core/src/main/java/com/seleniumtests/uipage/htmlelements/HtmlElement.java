@@ -44,6 +44,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.ie.InternetExplorerDriver;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.interactions.HasInputDevices;
 import org.openqa.selenium.interactions.Mouse;
@@ -267,7 +268,11 @@ public class HtmlElement extends Element implements WebElement, Locatable, HasId
     	JavascriptExecutor js = (JavascriptExecutor) driver;
         js.executeScript("arguments[0].focus();", element);
         
-        if (((CustomEventFiringWebDriver)driver).getWebDriver() instanceof FirefoxDriver && FirefoxDriverFactory.isMarionetteMode()) {
+        WebDriver realDriver = ((CustomEventFiringWebDriver)driver).getWebDriver();
+        
+        // handle org.openqa.selenium.UnsupportedCommandException: sendKeysToActiveElement which are not available for firefox and IE
+        if ((realDriver instanceof FirefoxDriver && FirefoxDriverFactory.isMarionetteMode())
+        		|| realDriver instanceof InternetExplorerDriver) {
         	logger.warn("using specific Marionette method");
         	js.executeScript(String.format("arguments[0].value='%s';", keysToSend[0].toString()), element);
         } else {
