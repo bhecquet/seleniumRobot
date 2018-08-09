@@ -37,14 +37,14 @@ public class TestPageObject extends GenericTest {
 	
 	private static DriverTestPage testPage;
 
-	@BeforeMethod(groups= {"it"})
+	@BeforeMethod(groups= {"it", "pageobject"})
 	public void initDriver(final ITestContext testNGCtx) throws Exception {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setBrowser("chrome");
 		testPage = new DriverTestPage(true);
 	}
 	
-	@Test(groups= {"it"})
+	@Test(groups= {"it", "pageobject"})
 	public void testPageParam() {
 		Assert.assertEquals(DriverTestPage.param("variable1"), "value3");
 	}
@@ -53,7 +53,7 @@ public class TestPageObject extends GenericTest {
 	 * open 3 pages and check that when we close the last one, we go to the previous, not the first one 
 	 * @throws Exception 
 	 */
-	@Test(groups= {"it"})
+	@Test(groups= {"it", "pageobject"})
 	public void testCloseLastTab() throws Exception {
 		testPage._goToNewPage();
 		testPage.getFocus();
@@ -69,7 +69,7 @@ public class TestPageObject extends GenericTest {
 	 * open 2 pages and check that when we close the first one, we remain on the second one
 	 * @throws Exception 
 	 */
-	@Test(groups= {"it"})
+	@Test(groups= {"it", "pageobject"})
 	public void testCloseFirstTab() throws Exception {
 		testPage._goToNewPage();
 		testPage.getFocus().close();
@@ -84,7 +84,7 @@ public class TestPageObject extends GenericTest {
 	 * Use the embedded check inside close method
 	 * @throws Exception 
 	 */
-	@Test(groups= {"it"})
+	@Test(groups= {"it", "pageobject"})
 	public void testCloseFirstTabAndCheck() throws Exception {
 		testPage._goToNewPage();
 		testPage.getFocus().close(DriverSubTestPage.class);
