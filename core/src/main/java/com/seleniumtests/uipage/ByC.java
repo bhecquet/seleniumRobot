@@ -161,7 +161,12 @@ public class ByC extends By {
 	
 	/**
 	 * Search element by attribute name and attribute value
-	 * Name and value can have value accepted for CSS selector: <a>https://developer.mozilla.org/en-US/docs/Web/CSS/Attribute_selectors</a>
+	 * Name and value can have some value accepted for CSS selector: <a>https://developer.mozilla.org/en-US/docs/Web/CSS/Attribute_selectors</a>
+	 * 'attributeName*' => attribute value contains the provided value
+	 * 'attributeName^' => attribute value starts with the provided value
+	 * 'attributeName$' => attribute value ends with the provided value
+	 * 'attributeName' => attribute value equals the provided value
+	 * 
 	 * @param attributeName
 	 * @param attributeValue
 	 * @return
