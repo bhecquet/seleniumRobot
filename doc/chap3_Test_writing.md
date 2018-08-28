@@ -41,8 +41,9 @@ for the remainder, we use a unique name for that new application `appName`<br/>
     </mirror>
   </mirrors>
 	
-- **WARNING ASPECTJ**: from seleniumRobot 3.14.0 version, aspectJ version has be changed (from 1.8.9 to 1.9.1) which introduces incompatibilities when building but not running tests. To use this seleniumRobot version, do the following: add 
+- **WARNING ASPECTJ**: from seleniumRobot 3.14.0 version, aspectJ version has be changed (from 1.8.9 to 1.9.1) which introduces incompatibilities when building but not running tests. To use this seleniumRobot version, do the following
 
+add:
 
 	<dependencies>
 		<dependency>
