@@ -43,6 +43,7 @@ for the remainder, we use a unique name for that new application `appName`<br/>
 	
 - **WARNING ASPECTJ**: from seleniumRobot 3.14.0 version, aspectJ version has be changed (from 1.8.9 to 1.9.1) which introduces incompatibilities when building but not running tests. To use this seleniumRobot version, do the following
 
+inside aspectj-maven-plugin definition (in pom.xml)
 add:
 
 	<dependencies>
@@ -56,7 +57,7 @@ add:
 
 Also update aspectj-maven-plugin version to 1.11
 
-inside aspectj-maven-plugin definition (in pom.xml) so that it looks like:
+The resulting plugin definition should look like:
 
 	<plugin>
 		<groupId>org.codehaus.mojo</groupId>
