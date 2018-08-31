@@ -91,16 +91,19 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 		detailedReportContent1 = detailedReportContent1.replace("\n", "").replace("\r",  "").replaceAll(">\\s+<", "><");
 		Assert.assertEquals(StringUtils.countMatches(detailedReportContent1, "data written"), 1);
 		Assert.assertTrue(detailedReportContent1.contains("data written: data1"));
+		Assert.assertTrue(detailedReportContent1.contains("Test Details - testMethod with params: (data1)"));
 		
 		String detailedReportContent2 = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testMethod-1", "TestReport.html").toFile());
 		detailedReportContent2 = detailedReportContent2.replace("\n", "").replace("\r",  "").replaceAll(">\\s+<", "><");
 		Assert.assertEquals(StringUtils.countMatches(detailedReportContent2, "data written"), 1);
 		Assert.assertTrue(detailedReportContent2.contains("data written: data2"));
+		Assert.assertTrue(detailedReportContent2.contains("Test Details - testMethod-1 with params: (data2)"));
 		
 		String detailedReportContent3 = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testMethod-2", "TestReport.html").toFile());
 		detailedReportContent3 = detailedReportContent3.replace("\n", "").replace("\r",  "").replaceAll(">\\s+<", "><");
 		Assert.assertEquals(StringUtils.countMatches(detailedReportContent3, "data written"), 1);
 		Assert.assertTrue(detailedReportContent3.contains("data written: data3"));
+		Assert.assertTrue(detailedReportContent3.contains("Test Details - testMethod-2 with params: (data3)"));
 	}
 	
 	private TestNG executeSubTest2(XmlSuite.ParallelMode parallelMode) throws IOException {
