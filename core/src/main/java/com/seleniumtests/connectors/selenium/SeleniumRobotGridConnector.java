@@ -58,6 +58,7 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 
 	public static final String NODE_TASK_SERVLET = "/extra/NodeTaskServlet";
 	public static final String STATUS_SERVLET = "/grid/admin/StatusServlet";
+	public static final String GUI_SERVLET = "/grid/admin/GuiServlet/";
 	
 	public SeleniumRobotGridConnector(String url) {
 		super(url);
