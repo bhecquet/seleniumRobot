@@ -39,7 +39,7 @@ import com.seleniumtests.util.logging.SeleniumRobotLogger;
 public class SeleniumGridConnectorFactory {
 	
 	private static ThreadLocal<SeleniumGridConnector> seleniumGridConnector = new ThreadLocal<>();
-	public static final int DEFAULT_RETRY_TIMEOUT = 60; // timeout in seconds
+	public static final int DEFAULT_RETRY_TIMEOUT = 180; // timeout in seconds. 3 minutes to wait for grid hub to be there
 	private static int retryTimeout = DEFAULT_RETRY_TIMEOUT;
 	
 	protected static final Logger logger = SeleniumRobotLogger.getLogger(SeleniumGridConnector.class);

@@ -31,8 +31,12 @@ import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.SessionId;
 
+import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
+import com.mashape.unirest.http.exceptions.UnirestException;
 import com.seleniumtests.customexception.ConfigurationException;
+import com.seleniumtests.customexception.SeleniumGridException;
+import com.seleniumtests.util.helper.WaitHelper;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
 public class SeleniumGridConnector {
@@ -128,6 +132,28 @@ public class SeleniumGridConnector {
 	public File stopVideoCapture(String outputFile) {
 		logger.warn("video capture is only available with seleniumRobot grid");
 		return null;
+	}
+	
+	/**
+	 * 
+	 * @return true if grid is active. Raises an exception if it's not there anymore
+	 */
+	public boolean isGridActive() {
+		HttpResponse<String> response;
+		try {
+			response = Unirest.get(String.format("http://%s:%s%s", hubUrl.getHost(), hubUrl.getPort(), SeleniumGridConnectorFactory.CONSOLE_SERVLET)).asString();
+			
+			if (response.getStatus() != 200) {
+	    		logger.warn("Error connecting to the grid hub at " + hubUrl);
+	    		return false;
+	    	} else {
+	    		return true;
+	    	}
+		} catch (UnirestException e) {
+			logger.warn("Cannot connect to the grid hub at " + hubUrl);
+			return false;
+		}
+		
 	}
 	
 	/**

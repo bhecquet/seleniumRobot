@@ -54,6 +54,7 @@ import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import com.seleniumtests.MockitoTest;
 import com.seleniumtests.connectors.selenium.SeleniumGridConnector;
+import com.seleniumtests.connectors.selenium.SeleniumGridConnectorFactory;
 import com.seleniumtests.connectors.selenium.SeleniumRobotGridConnector;
 import com.seleniumtests.reporter.logger.TestLogging;
 import com.seleniumtests.ut.connectors.ConnectorsTest;
@@ -133,5 +134,32 @@ public class TestSeleniumGridConnector extends ConnectorsTest {
 		connector.uploadMobileApp(new DesiredCapabilities());
 		
 		verify(client, never()).execute((HttpHost)any(HttpHost.class), any(HttpRequest.class));
+	}
+	
+	@Test(groups={"ut"})
+	public void testIsGridActiveWithGridNotPresent() throws ClientProtocolException, IOException {
+		
+		SeleniumGridConnector connector = new SeleniumGridConnector(SERVER_URL);
+		when(Unirest.get(SERVER_URL + SeleniumGridConnectorFactory.CONSOLE_SERVLET)).thenThrow(UnirestException.class);
+		
+		Assert.assertFalse(connector.isGridActive());
+	}
+	
+	@Test(groups={"ut"})
+	public void testIsGridActiveWithGridPresent() throws ClientProtocolException, IOException, UnirestException {
+		
+		SeleniumGridConnector connector = new SeleniumGridConnector(SERVER_URL);
+		createServerMock("GET", SeleniumGridConnectorFactory.CONSOLE_SERVLET, 200, "some text");	
+		
+		Assert.assertTrue(connector.isGridActive());
+	}
+	
+	@Test(groups={"ut"})
+	public void testIsGridActiveWithGridInError() throws ClientProtocolException, IOException, UnirestException {
+		
+		SeleniumGridConnector connector = new SeleniumGridConnector(SERVER_URL);
+		createServerMock("GET", SeleniumGridConnectorFactory.CONSOLE_SERVLET, 500, "some text");	
+		
+		Assert.assertFalse(connector.isGridActive());
 	}
 }

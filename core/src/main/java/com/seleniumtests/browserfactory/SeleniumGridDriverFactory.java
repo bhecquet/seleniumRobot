@@ -145,12 +145,20 @@ public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implemen
 		Exception currentException = null;
     	
 		while (clock.isNowBefore(end)) {
+			
+			// if grid is not active, wait 30 secs
+			if (!gridConnector.isGridActive()) {
+				logger.warn("grid is not active, waiting 30 secs before retry");
+				WaitHelper.waitForSeconds(30);
+				continue;
+			}
+			
 			try {
 				driver = new RemoteWebDriver(url, capability);
 				break;
 			} catch (WebDriverException e) {
 				logger.warn("Error creating driver, retrying: " + e.getMessage());
-				WaitHelper.waitForSeconds(2);
+				WaitHelper.waitForSeconds(5);
 				currentException = e;
 				continue;
 			}
