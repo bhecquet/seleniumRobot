@@ -515,7 +515,26 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 			// create a context and add data
 			VelocityContext velocityContext = new VelocityContext();
 			
-			velocityContext.put("testName", getTestName(testResult));
+			Object[] testParameters = testResult.getParameters();
+			StringBuilder testName = new StringBuilder(getTestName(testResult));
+			
+			// issue #163: add test parameter to test name
+			if (testParameters.length > 0) {
+				testName.append(" with params: (");
+				
+				int i = 0;
+				
+				for (Object param: testParameters) {
+					testName.append(param.toString());
+					if (i < testParameters.length - 1) {
+						testName.append(",");
+					}
+					i++;
+				}
+				testName.append(")");
+			}
+			
+			velocityContext.put("testName", testName);
 			velocityContext.put("description", testResult.getMethod().getDescription());
 			
 			
