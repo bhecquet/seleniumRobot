@@ -154,15 +154,6 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 	}
 	
 	@Test(groups={"ut"})
-	public void testIsGridActiveWithGridPresent() throws ClientProtocolException, IOException, UnirestException {
-		
-		SeleniumGridConnector connector = new SeleniumRobotGridConnector(SERVER_URL);
-		createServerMock("GET", SeleniumGridConnectorFactory.CONSOLE_SERVLET, 200, "some text");	
-		
-		Assert.assertTrue(connector.isGridActive());
-	}
-	
-	@Test(groups={"ut"})
 	public void testIsGridActiveWithGridInError() throws ClientProtocolException, IOException, UnirestException {
 		
 		SeleniumGridConnector connector = new SeleniumRobotGridConnector(SERVER_URL);

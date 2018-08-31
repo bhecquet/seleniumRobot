@@ -347,7 +347,10 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 	 */
 	@Override
 	public boolean isGridActive() {
-		super.isGridActive();
+		boolean gridActive = super.isGridActive();
+		if (!gridActive) {
+			return false;
+		}
 		
 		HttpResponse<JsonNode> response;
 		try {
