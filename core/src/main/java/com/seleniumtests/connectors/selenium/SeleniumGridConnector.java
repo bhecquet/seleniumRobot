@@ -35,8 +35,6 @@ import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import com.seleniumtests.customexception.ConfigurationException;
-import com.seleniumtests.customexception.SeleniumGridException;
-import com.seleniumtests.util.helper.WaitHelper;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
 public class SeleniumGridConnector {
@@ -46,6 +44,7 @@ public class SeleniumGridConnector {
 	protected int hubPort;
 	protected SessionId sessionId;
 	protected String nodeUrl;
+	public static final String CONSOLE_SERVLET = "/grid/console/";
 	protected static Logger logger = SeleniumRobotLogger.getLogger(SeleniumGridConnector.class);
 	
 	public SeleniumGridConnector(String url) {
@@ -141,7 +140,7 @@ public class SeleniumGridConnector {
 	public boolean isGridActive() {
 		HttpResponse<String> response;
 		try {
-			response = Unirest.get(String.format("http://%s:%s%s", hubUrl.getHost(), hubUrl.getPort(), SeleniumGridConnectorFactory.CONSOLE_SERVLET)).asString();
+			response = Unirest.get(String.format("http://%s:%s%s", hubUrl.getHost(), hubUrl.getPort(), SeleniumGridConnector.CONSOLE_SERVLET)).asString();
 			
 			if (response.getStatus() != 200) {
 	    		logger.warn("Error connecting to the grid hub at " + hubUrl);
