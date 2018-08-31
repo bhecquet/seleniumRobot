@@ -37,12 +37,15 @@ import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.InputStreamEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
 import com.google.common.net.HttpHeaders;
 import com.google.common.net.MediaType;
 import com.mashape.unirest.http.HttpResponse;
+import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import com.seleniumtests.customexception.ScenarioException;
@@ -54,6 +57,7 @@ import io.appium.java_client.remote.MobileCapabilityType;
 public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 
 	public static final String NODE_TASK_SERVLET = "/extra/NodeTaskServlet";
+	public static final String STATUS_SERVLET = "/grid/admin/StatusServlet";
 	
 	public SeleniumRobotGridConnector(String url) {
 		super(url);
@@ -333,6 +337,36 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 		} catch (UnirestException | IOException e) {
 			logger.warn(String.format("Could not stop video capture: %s", e.getMessage()));
 			return null;
+		}
+	}
+	
+	/**
+	 * @return 	true: if grid hub is active and and there is at least 1 node
+	 * 			false: if grid hub is upgrading or no node is present
+	 * 
+	 */
+	@Override
+	public boolean isGridActive() {
+		super.isGridActive();
+		
+		HttpResponse<JsonNode> response;
+		try {
+			response = Unirest.get(String.format("http://%s:%s%s", hubUrl.getHost(), hubUrl.getPort(), STATUS_SERVLET)).asJson();
+			if (response.getStatus() != 200) {
+	    		logger.warn("Cannot connect to the grid hub at " + hubUrl);
+	    		return false;
+	    	} 
+		} catch (UnirestException e) {
+			logger.warn("Cannot connect to the grid hub at " + hubUrl);
+			return false;
+		}
+		
+		try {
+			JSONObject hubStatus = response.getBody().getObject();
+			
+			return hubStatus.getJSONObject("hub").getString("status").equalsIgnoreCase("ACTIVE") && hubStatus.length() > 2;	
+		} catch (JSONException | NullPointerException e) {
+			return false;
 		}
 	}
 

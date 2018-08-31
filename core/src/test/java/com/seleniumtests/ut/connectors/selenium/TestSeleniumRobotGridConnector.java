@@ -46,6 +46,7 @@ import org.testng.annotations.Test;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import com.seleniumtests.connectors.selenium.SeleniumGridConnector;
+import com.seleniumtests.connectors.selenium.SeleniumGridConnectorFactory;
 import com.seleniumtests.connectors.selenium.SeleniumRobotGridConnector;
 import com.seleniumtests.ut.connectors.ConnectorsTest;
 
@@ -141,5 +142,156 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 		connector.setNodeUrl("http://localhost:4321");
 		connector.killProcess("myProcess");
 		
+	}
+	
+	@Test(groups={"ut"})
+	public void testIsGridActiveWithGridNotPresent() throws ClientProtocolException, IOException {
+		
+		SeleniumGridConnector connector = new SeleniumRobotGridConnector(SERVER_URL);
+		when(Unirest.get(SERVER_URL + SeleniumGridConnectorFactory.CONSOLE_SERVLET)).thenThrow(UnirestException.class);
+		
+		Assert.assertFalse(connector.isGridActive());
+	}
+	
+	@Test(groups={"ut"})
+	public void testIsGridActiveWithGridPresent() throws ClientProtocolException, IOException, UnirestException {
+		
+		SeleniumGridConnector connector = new SeleniumRobotGridConnector(SERVER_URL);
+		createServerMock("GET", SeleniumGridConnectorFactory.CONSOLE_SERVLET, 200, "some text");	
+		
+		Assert.assertTrue(connector.isGridActive());
+	}
+	
+	@Test(groups={"ut"})
+	public void testIsGridActiveWithGridInError() throws ClientProtocolException, IOException, UnirestException {
+		
+		SeleniumGridConnector connector = new SeleniumRobotGridConnector(SERVER_URL);
+		createServerMock("GET", SeleniumGridConnectorFactory.CONSOLE_SERVLET, 500, "some text");	
+		
+		Assert.assertFalse(connector.isGridActive());
+	}
+	
+	/**
+	 * Check that we get true if the grid is ACTIVE and at least one node is present
+	 * @throws ClientProtocolException
+	 * @throws IOException
+	 * @throws UnirestException
+	 */
+	@Test(groups={"ut"})
+	public void testIsGridActiveWithRobotGridActive() throws ClientProtocolException, IOException, UnirestException {
+		
+		String hubStatus = "{" +
+				"\"http:\\u002f\\u002fnode1.company.com:5555\": {\r\n" + 
+				"    \"busy\": false,\r\n" + 
+				"    \"lastSessionStart\": \"2018-08-31T08:30:06Z\",\r\n" + 
+				"    \"version\": \"3.14.0\",\r\n" + 
+				"    \"usedTestSlots\": 0,\r\n" + 
+				"    \"testSlots\": 1,\r\n" + 
+				"    \"status\": \"ACTIVE\"\r\n" + 
+				"  },\r\n" + 
+				"  \"hub\": {\r\n" + 
+				"    \"version\": \"3.14.0\",\r\n" + 
+				"    \"status\": \"ACTIVE\"\r\n" + 
+				"  },\r\n" + 
+				"  \"success\": true\r\n" + 
+				"}";
+		
+		SeleniumGridConnector connector = new SeleniumRobotGridConnector(SERVER_URL);
+		createServerMock("GET", SeleniumGridConnectorFactory.CONSOLE_SERVLET, 200, "some text");	
+		createServerMock("GET", SeleniumRobotGridConnector.STATUS_SERVLET, 200, hubStatus);	
+		
+		Assert.assertTrue(connector.isGridActive());
+	}
+	
+	/**
+	 * Check that we get false if the grid is INACTIVE
+	 * @throws ClientProtocolException
+	 * @throws IOException
+	 * @throws UnirestException
+	 */
+	@Test(groups={"ut"})
+	public void testIsGridActiveWithRobotGridInactive() throws ClientProtocolException, IOException, UnirestException {
+		
+		String hubStatus = "{" +
+				"\"http:\\u002f\\u002fnode1.company.com:5555\": {\r\n" + 
+				"    \"busy\": false,\r\n" + 
+				"    \"lastSessionStart\": \"2018-08-31T08:30:06Z\",\r\n" + 
+				"    \"version\": \"3.14.0\",\r\n" + 
+				"    \"usedTestSlots\": 0,\r\n" + 
+				"    \"testSlots\": 1,\r\n" + 
+				"    \"status\": \"INACTIVE\"\r\n" + 
+				"  },\r\n" + 
+				"  \"hub\": {\r\n" + 
+				"    \"version\": \"3.14.0\",\r\n" + 
+				"    \"status\": \"INACTIVE\"\r\n" + 
+				"  },\r\n" + 
+				"  \"success\": true\r\n" + 
+				"}";
+		
+		SeleniumGridConnector connector = new SeleniumRobotGridConnector(SERVER_URL);
+		createServerMock("GET", SeleniumGridConnectorFactory.CONSOLE_SERVLET, 200, "some text");	
+		createServerMock("GET", SeleniumRobotGridConnector.STATUS_SERVLET, 200, hubStatus);	
+		
+		Assert.assertFalse(connector.isGridActive());
+	}
+	
+	/**
+	 * Check that we get false if the grid is ACTIVE and no node is present
+	 * @throws ClientProtocolException
+	 * @throws IOException
+	 * @throws UnirestException
+	 */
+	@Test(groups={"ut"})
+	public void testIsGridActiveWithRobotGridActiveWithoutNodes() throws ClientProtocolException, IOException, UnirestException {
+		
+		String hubStatus = "{" +
+				"  \"hub\": {\r\n" + 
+				"    \"version\": \"3.14.0\",\r\n" + 
+				"    \"status\": \"ACTIVE\"\r\n" + 
+				"  },\r\n" + 
+				"  \"success\": true\r\n" + 
+				"}";
+		
+		SeleniumGridConnector connector = new SeleniumRobotGridConnector(SERVER_URL);
+		createServerMock("GET", SeleniumGridConnectorFactory.CONSOLE_SERVLET, 200, "some text");	
+		createServerMock("GET", SeleniumRobotGridConnector.STATUS_SERVLET, 200, hubStatus);	
+		
+		Assert.assertFalse(connector.isGridActive());
+	}
+	
+	/**
+	 * Check that we get false if the status returned by grid is invalid (no JSON)
+	 * @throws ClientProtocolException
+	 * @throws IOException
+	 * @throws UnirestException
+	 */
+	@Test(groups={"ut"})
+	public void testIsGridActiveWithRobotGridActiveInvalidStatus() throws ClientProtocolException, IOException, UnirestException {
+		
+		String hubStatus = "null";
+		
+		SeleniumGridConnector connector = new SeleniumRobotGridConnector(SERVER_URL);
+		createServerMock("GET", SeleniumGridConnectorFactory.CONSOLE_SERVLET, 200, "some text");	
+		createServerMock("GET", SeleniumRobotGridConnector.STATUS_SERVLET, 200, hubStatus);	
+		
+		Assert.assertFalse(connector.isGridActive());
+	}
+	
+	/**
+	 * Check that we get false if the server returns code != 200
+	 * @throws ClientProtocolException
+	 * @throws IOException
+	 * @throws UnirestException
+	 */
+	@Test(groups={"ut"})
+	public void testIsGridActiveWithRobotGridReplyInError() throws ClientProtocolException, IOException, UnirestException {
+		
+		String hubStatus = "Internal Server Error";
+		
+		SeleniumGridConnector connector = new SeleniumRobotGridConnector(SERVER_URL);
+		createServerMock("GET", SeleniumGridConnectorFactory.CONSOLE_SERVLET, 200, "some text");	
+		createServerMock("GET", SeleniumRobotGridConnector.STATUS_SERVLET, 500, hubStatus);	
+		
+		Assert.assertFalse(connector.isGridActive());
 	}
 }
