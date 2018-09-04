@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>driver-download</artifactId>
 	<packaging>pom</packaging>
-	<version>4.0.0-SNAPSHOT</version>
+	<version>4.0.1-SNAPSHOT</version>
 	
 	<parent>
 	    <groupId>com.infotel.seleniumRobot</groupId>
@@ -305,16 +305,6 @@
 					</executions>
 				</plugin>
 				<plugin>
-					<groupId>org.sonatype.plugins</groupId>
-					<artifactId>nexus-staging-maven-plugin</artifactId>
-					<version>1.6.3</version>
-					<extensions>true</extensions>
-					<configuration>
-						<skipNexusStagingDeployMojo>true</skipNexusStagingDeployMojo>
-						<skipRemoteStaging>true</skipRemoteStaging>
-					</configuration>
-				</plugin>
-				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 				    <artifactId>maven-antrun-plugin</artifactId>
 				    <version>1.7</version>
@@ -341,7 +331,7 @@
 				            <configuration>
 				                <target>
 				                	<copy todir="${project.basedir}/src/main/java/fr/covea/seleniumRobot/driversdownload/" overwrite="true">
-									  <fileset dir="${project.basedir}/../src/main/java/fr/covea/seleniumRobot/driversdownload/"/>
+									  <fileset dir="${project.basedir}/../src/main/java/fr/covea/seleniumRobot/driversdownload/" />
 									</copy>
 				                    <echo file="${project.basedir}/src/main/java/fr/covea/seleniumRobot/driversdownload/HelloDriver${os}.java">package fr.covea.seleniumRobot.driversdownload;public class HelloDriver${os} {}</echo>
 				                </target>
