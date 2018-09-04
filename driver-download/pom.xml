@@ -1,8 +1,8 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>fr.test</groupId>
 	<artifactId>driver-download</artifactId>
 	<packaging>pom</packaging>
+	<version>4.0.0-SNAPSHOT</version>
 	
 	<parent>
 	    <groupId>com.infotel.seleniumRobot</groupId>
@@ -14,7 +14,7 @@
 		<os>linux</os>
 		<is.not.windows>true</is.not.windows>
 		<root.path>${project.basedir}</root.path>
-		<driver.path>${root.path}/../core/src/main/resources/drivers/</driver.path>
+		<driver.path>${root.path}/src/main/resources/drivers/</driver.path>
 		<chromedriver.url>https://chromedriver.storage.googleapis.com</chromedriver.url>
 		<geckodriver.url>https://github.com/mozilla/geckodriver/releases/download</geckodriver.url>
 		<iedriver.url>http://selenium-release.storage.googleapis.com</iedriver.url>
@@ -39,6 +39,7 @@
 	</dependencies>
 
 	<build>
+		<finalName>${project.artifactId}</finalName>
 		<pluginManagement>
 			<plugins>
 				<plugin>
@@ -212,29 +213,28 @@
 						</execution>						
 					</executions>
 				</plugin>
-				<!-- <plugin>
-					<artifactId>maven-assembly-plugin</artifactId>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-jar-plugin</artifactId>
 					<version>2.6</version>
 					<configuration>
-						<skipAssembly>true</skipAssembly>
+						<finalName>${project.artifactId}</finalName>
+						<archive>
+							<manifest>
+								<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+	                			<addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+							</manifest>
+						</archive>
 					</configuration>
 					<executions>
 						<execution>
-							<id>archive</id>
-							<phase>package</phase>
+							<id>jar</id>
 							<goals>
-								<goal>single</goal>
+								<goal>jar</goal>
 							</goals>
-							<configuration>
-								<finalName>seleniumRobot-${os}-driver</finalName>
-								<appendAssemblyId>false</appendAssemblyId>
-								<archiveBaseDirectory>${project.build.directory}</archiveBaseDirectory>
-								<outputDirectory>${project.build.directory}</outputDirectory>
-								<descriptor>${root.path}/zipDrivers.xml</descriptor>
-							</configuration>
 						</execution>
 					</executions>
-				</plugin> -->
+				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-compiler-plugin</artifactId>
@@ -296,33 +296,57 @@
 						<skipRemoteStaging>true</skipRemoteStaging>
 					</configuration>
 				</plugin>
-
-			</plugins>
-		</pluginManagement>
-		<plugins>
-			<!-- <plugin>
-				<artifactId>maven-clean-plugin</artifactId>
-				<version>3.0.0</version>
-				<executions>
-					<execution>
-						<phase>clean</phase>
-						<id>driver-clean</id>
-						<goals>
-							<goal>clean</goal>
-						</goals>
-						<configuration>
-							<skip>${skip.clean.driver}</skip>
-							<filesets>
-								<fileset>
-									<directory>${driver.path}</directory>
-									<followSymlinks>false</followSymlinks>
-								</fileset>
-							</filesets>
-						</configuration>
-					</execution>
-				</executions>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+				    <artifactId>maven-antrun-plugin</artifactId>
+				    <version>1.7</version>
+				    <executions>
+				        <execution>
+				        	<id>generate-driver-list</id>
+				            <phase>compile</phase>
+				            <configuration>
+				                <target>
+				                    <fileset id="driver-fileset" dir="src/main/resources/drivers" />
+				                    <pathconvert targetos="unix" pathsep="," property="driver-file-list" refid="driver-fileset">
+				                        <map from="${project.basedir}/src/main/resources/drivers/" to="" />
+				                    </pathconvert>
+				                    <echo file="${project.basedir}/target/classes/driver-list-${os}.txt">${driver-file-list}</echo>
+				                </target>
+				            </configuration>
+				            <goals>
+				                <goal>run</goal>
+				            </goals>
+				        </execution>
+				        <execution>
+				        	<id>generate-os-specific-class</id>
+				            <phase>generate-sources</phase>
+				            <configuration>
+				                <target>
+				                	<copy todir="${project.basedir}/src/main/java/fr/covea/seleniumRobot/driversdownload/" overwrite="true">
+									  <fileset dir="${project.basedir}/../src/main/java/fr/covea/seleniumRobot/driversdownload/"/>
+									</copy>
+				                    <echo file="${project.basedir}/src/main/java/fr/covea/seleniumRobot/driversdownload/HelloDriver${os}.java">package fr.covea.seleniumRobot.driversdownload;public class HelloDriver${os} {}</echo>
+				                </target>
+				            </configuration>
+				            <goals>
+				                <goal>run</goal>
+				            </goals>
+				        </execution>
+				    </executions>
+				</plugin>
+				<!-- <plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-gpg-plugin</artifactId>
+				<version>1.5</version>
+				<configuration>
+					<skip>true</skip>
+				</configuration>
+				
 			</plugin> -->
-		</plugins>
+			</plugins>
+			
+		</pluginManagement>
+
 	</build>
 
 </project>
