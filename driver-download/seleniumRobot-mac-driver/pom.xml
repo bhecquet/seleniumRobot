@@ -1,9 +1,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-		<groupId>fr.test</groupId>
+		<groupId>com.infotel.seleniumRobot</groupId>
 		<artifactId>driver-download</artifactId>
-		<version>3.14.3-SNAPSHOT</version>
+		<version>3.14.0-SNAPSHOT</version>
 	</parent>
 	<artifactId>seleniumRobot-mac-driver</artifactId>
 
@@ -14,10 +14,9 @@
 		<geckodriver.suffix>macos</geckodriver.suffix>
 		<geckodriver.ext>.tar.gz</geckodriver.ext>
 		<skip.clean.driver>true</skip.clean.driver>
-		<root.path>${project.basedir}/..</root.path>
+		<root.path>${project.basedir}</root.path>
 	</properties>
 	<build>
-		<sourceDirectory>../src/main/java</sourceDirectory>
 		<plugins>
 			<plugin>
 				<groupId>com.googlecode.maven-download-plugin</groupId>
@@ -39,6 +38,10 @@
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>exec-maven-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-antrun-plugin</artifactId>	
 			</plugin>
 		</plugins>
 	</build>
