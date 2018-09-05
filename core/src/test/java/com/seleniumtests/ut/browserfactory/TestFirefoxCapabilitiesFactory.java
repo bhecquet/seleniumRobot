@@ -41,6 +41,7 @@ import org.testng.annotations.Test;
 import com.seleniumtests.MockitoTest;
 import com.seleniumtests.browserfactory.BrowserInfo;
 import com.seleniumtests.browserfactory.FirefoxCapabilitiesFactory;
+import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.DriverConfig;
 import com.seleniumtests.driver.DriverMode;
@@ -57,6 +58,9 @@ public class TestFirefoxCapabilitiesFactory extends MockitoTest {
 	@Mock
 	private Proxy proxyConfig;
 	
+	@Mock
+	private SeleniumTestsContext context;
+	
 
 	@BeforeMethod(groups= {"ut"})
 	public void init() {
@@ -64,6 +68,8 @@ public class TestFirefoxCapabilitiesFactory extends MockitoTest {
 		browserInfos.put(BrowserType.FIREFOX, Arrays.asList(new BrowserInfo(BrowserType.FIREFOX, "47.0", "/usr/bin/firefox", false)));
 		PowerMockito.mockStatic(OSUtility.class, Mockito.CALLS_REAL_METHODS);
 		PowerMockito.when(OSUtility.getInstalledBrowsersWithVersion()).thenReturn(browserInfos);
+		Mockito.when(config.getTestContext()).thenReturn(context);
+		Mockito.when(context.isDevMode()).thenReturn(false);
 	}
 	
 	/**
