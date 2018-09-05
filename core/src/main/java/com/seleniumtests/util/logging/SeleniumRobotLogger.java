@@ -21,6 +21,8 @@ package com.seleniumtests.util.logging;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
@@ -208,7 +210,7 @@ public class SeleniumRobotLogger {
 		}
 	}
 	
-	public static void reset() {
+	public static void reset() throws IOException {
 		SeleniumRobotLogger.testLogs.clear();
 		
 		// clear log file
@@ -219,7 +221,10 @@ public class SeleniumRobotLogger {
 			// wait for handler to be closed
 			WaitHelper.waitForMilliSeconds(200);
 			Logger.getRootLogger().removeAppender(FILE_APPENDER_NAME);
-			new File(outputDirectory + "/" + SeleniumRobotLogger.LOG_FILE_NAME).delete();
+		}
+		Path logFilePath = Paths.get(outputDirectory, SeleniumRobotLogger.LOG_FILE_NAME).toAbsolutePath();
+		if (logFilePath.toFile().exists()) {
+			Files.delete(logFilePath);
 		}
 	}
 

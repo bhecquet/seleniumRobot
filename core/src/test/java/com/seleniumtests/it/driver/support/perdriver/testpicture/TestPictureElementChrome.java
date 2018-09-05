@@ -31,6 +31,5 @@ public class TestPictureElementChrome extends TestPictureElement {
 
 	@Test(groups={"nogroup"})
 	public void test() {
-		testActionDurationIsLogged();
 	}
 }
