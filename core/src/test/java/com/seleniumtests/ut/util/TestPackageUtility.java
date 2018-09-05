@@ -42,4 +42,10 @@ public class TestPackageUtility extends GenericTest {
 		String version = PackageUtility.getVersionFromPom(stream);
 		Assert.assertEquals(version, "2.7.0-SNAPSHOT");
 	}
+	
+	@Test(groups={"ut"}, enabled=false)
+	public void testDriverVersion() throws Exception {
+		String version = PackageUtility.getDriverVersion();
+		System.out.println(version);
+	}
 }

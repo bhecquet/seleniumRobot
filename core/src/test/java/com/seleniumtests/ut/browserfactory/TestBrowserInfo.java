@@ -18,11 +18,14 @@
  */
 package com.seleniumtests.ut.browserfactory;
 
+import static org.mockito.Mockito.when;
+
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.lang3.SystemUtils;
+import org.openqa.selenium.Platform;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
@@ -32,8 +35,9 @@ import com.seleniumtests.MockitoTest;
 import com.seleniumtests.browserfactory.BrowserInfo;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.driver.BrowserType;
+import com.seleniumtests.util.osutility.OSUtility;
 
-@PrepareForTest(BrowserInfo.class)
+@PrepareForTest({BrowserInfo.class, OSUtility.class})
 public class TestBrowserInfo extends MockitoTest {
 	
 
@@ -235,6 +239,55 @@ public class TestBrowserInfo extends MockitoTest {
 		PowerMockito.doNothing().when(bInfo, "checkResourceExists");
 		
 		bInfo.getDriverFileName();
+	}
+
+	/**
+	 * Check that we get the driver list if driver artifact is installed for the right OS
+	 * @throws Exception 
+	 */
+	@Test(groups={"ut"})
+	public void testGetDriverFilesWithInstalledArtifact() throws Exception {
+		PowerMockito.mockStatic(OSUtility.class);
+		when(OSUtility.getCurrentPlatorm()).thenReturn(Platform.WINDOWS);
+		
+		String[] driversFiles = new String[] {"windows/chromedriver_2.20_chrome-55-57_android-6.0.exe", "windows/chromedriver_2.29_chrome-56-58_android-7.0.exe", "windows/chromedriver_2.31_chrome-58-60.exe"};
+		
+		BrowserInfo bInfo = PowerMockito.spy(new BrowserInfo(BrowserType.CHROME, "55.0", null));
+		PowerMockito.when(bInfo, "getDriverListFromJarResources", "driver-list-windows.txt").thenReturn(driversFiles);
+		
+		Assert.assertEquals(bInfo.getDriverFiles().size(), 3);
+	}
+	
+	/**
+	 * If artifact is not installed, getDriverListFromJarResources raises NullPointerException
+	 * @throws Exception
+	 */
+	@Test(groups={"ut"}, expectedExceptions=ConfigurationException.class)
+	public void testGetDriverFilesWithNotInstalledArtifact() throws Exception {
+		PowerMockito.mockStatic(OSUtility.class);
+		when(OSUtility.getCurrentPlatorm()).thenReturn(Platform.WINDOWS);
+		
+		BrowserInfo bInfo = PowerMockito.spy(new BrowserInfo(BrowserType.CHROME, "55.0", null));
+		PowerMockito.when(bInfo, "getDriverListFromJarResources", "driver-list-windows.txt").thenThrow(NullPointerException.class);
+		
+		Assert.assertEquals(bInfo.getDriverFiles().size(), 3);
+	}
+	
+	/**
+	 * Check we filter drivers by OS
+	 * @throws Exception
+	 */
+	@Test(groups={"ut"})
+	public void testGetDriverFilesWithInstalledArtifactForOtherOS() throws Exception {
+		PowerMockito.mockStatic(OSUtility.class);
+		when(OSUtility.getCurrentPlatorm()).thenReturn(Platform.LINUX);
+		
+		String[] driversFiles = new String[] {"windows/chromedriver_2.20_chrome-55-57_android-6.0.exe", "windows/chromedriver_2.29_chrome-56-58_android-7.0.exe", "windows/chromedriver_2.31_chrome-58-60.exe"};
+		
+		BrowserInfo bInfo = PowerMockito.spy(new BrowserInfo(BrowserType.CHROME, "55.0", null));
+		PowerMockito.when(bInfo, "getDriverListFromJarResources", "driver-list-linux.txt").thenReturn(driversFiles);
+		
+		Assert.assertEquals(bInfo.getDriverFiles().size(), 0);
 	}
 	
 	/**

@@ -36,6 +36,7 @@ import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
 import com.seleniumtests.customexception.DriverExceptions;
+import com.seleniumtests.util.osutility.OSUtility;
 
 public class PackageUtility {
 	
@@ -84,12 +85,12 @@ public class PackageUtility {
 		return null;
 	}
 
-	private static String getVersionFromPom() {
+	private static String getVersionFromPom(Class<?> clazz) {
 		// Try to get version number from pom.xml (available in Eclipse)
 		try {
-			String className = DriverExceptions.class.getName();
+			String className = clazz.getName();
 			String classfileName = "/" + className.replace('.', '/') + ".class";
-			URL classfileResource = PackageUtility.class.getResource(classfileName);
+			URL classfileResource = clazz.getResource(classfileName);
 			
 			if (classfileResource != null) {
 				Path absolutePackagePath = Paths.get(classfileResource.toURI()).getParent();
@@ -112,9 +113,23 @@ public class PackageUtility {
 		}
 	}
 	
-	private static String getVersionFromMetaInf() {
+	private static String getCoreVersionFromPom() {
+		return getVersionFromPom(PackageUtility.class);
+	}
+	
+	private static String getDriverVersionFromPom() {
+		try {
+			Class<?> helloDriverClass = Class.forName(String.format("fr.covea.seleniumRobot.driversdownload.HelloDriver%s", OSUtility.getCurrentPlatorm().toString().toLowerCase()));
+			return getVersionFromPom(helloDriverClass);
+		} catch (ClassNotFoundException e) {
+			return null;
+		}
+		
+	}
+	
+	private static String getVersionFromMetaInf(String propertiesFile) {
 		// Try to get version number from maven properties in jar's META-INF
-		try (InputStream is = PackageUtility.class.getResourceAsStream("/META-INF/maven/com.infotel.seleniumRobot/core/pom.properties")) {
+		try (InputStream is = PackageUtility.class.getResourceAsStream(propertiesFile)) {
 			if (is != null) {
 				Properties p = new Properties();
 				p.load(is);
@@ -129,6 +144,31 @@ public class PackageUtility {
 		}
 	}
 	
+	private static String getCoreVersionFromMetaInf() {
+		return getVersionFromMetaInf("/META-INF/maven/com.infotel.seleniumRobot/core/pom.properties");
+	}
+	
+	public static String getDriverVersionFromMetaInf() {
+		return getVersionFromMetaInf(String.format("/META-INF/maven/com.infotel.seleniumRobot/seleniumRobot-%s-driver/pom.properties", OSUtility.getCurrentPlatorm().toString().toLowerCase()));
+	}
+	
+	private static String getDriverVersionFromManifest() {
+		String version = null;
+		Package pkg;
+		try {
+			pkg = Class.forName(String.format("fr.covea.seleniumRobot.driversdownload.HelloDriver%s", OSUtility.getCurrentPlatorm().toString().toLowerCase())).getPackage();
+		} catch (ClassNotFoundException e) {
+			return null;
+		}
+		if (pkg != null) {
+			version = pkg.getImplementationVersion();
+			if (version == null) {
+				version = pkg.getSpecificationVersion();
+			}
+		}
+		return version;
+	}
+	
 	private static String getVersionFromManifest() {
 		String version = null;
 		Package pkg = PackageUtility.class.getPackage();
@@ -141,17 +181,40 @@ public class PackageUtility {
 		return version;
 	}
 	
+	/**
+	 * Get core version
+	 * @return
+	 */
 	public static final synchronized String getVersion() {
 		
-		String version = getVersionFromPom();
+		String version = getCoreVersionFromPom();
 		
 		if (version == null) {
-			version = getVersionFromMetaInf();
+			version = getCoreVersionFromMetaInf();
 		}
 		if (version == null) {
 			version = getVersionFromManifest();
 		}
 
+		version = version == null ? "" : version.trim();
+		return version.isEmpty() ? "unknown" : version;
+	}
+	
+	/**
+	 * Get version associated to seleniumRobot-<os>-driver dependency
+	 * @return
+	 */
+	public static final synchronized String getDriverVersion() {
+		
+		String version = getDriverVersionFromPom();
+		
+		if (version == null) {
+			version = getDriverVersionFromMetaInf();
+		}
+		if (version == null) {
+			version = getDriverVersionFromManifest();
+		}
+		
 		version = version == null ? "" : version.trim();
 		return version.isEmpty() ? "unknown" : version;
 	}

@@ -55,6 +55,18 @@
 		    <groupId>com.mashape.unirest</groupId>
 		    <artifactId>unirest-java</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>com.infotel.seleniumRobot</groupId>
+			<artifactId>seleniumRobot-windows-driver</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.infotel.seleniumRobot</groupId>
+			<artifactId>seleniumRobot-linux-driver</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.infotel.seleniumRobot</groupId>
+			<artifactId>seleniumRobot-mac-driver</artifactId>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -92,24 +104,6 @@
 					</includes>
 				</configuration>
 			</plugin>
-            <plugin> 
-                <artifactId>maven-dependency-plugin</artifactId>
-                <executions> 
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>copy-dependencies</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>${project.build.directory}/lib</outputDirectory>
-                            <overWriteReleases>true</overWriteReleases>
-							<overWriteSnapshots>false</overWriteSnapshots>
-							<overWriteIfNewer>true</overWriteIfNewer>
-							<includeScope>compile</includeScope>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-source-plugin</artifactId>
@@ -222,27 +216,6 @@
 		        </execution>
 		      </executions>
 		    </plugin>
-			<plugin>
-			    <artifactId>maven-antrun-plugin</artifactId>
-			    <version>1.7</version>
-			    <executions>
-			        <execution>
-			            <phase>generate-sources</phase>
-			            <configuration>
-			                <target>
-			                    <fileset id="driver-fileset" dir="../core/src/main/resources/drivers" />
-			                    <pathconvert targetos="unix" pathsep="," property="driver-file-list" refid="driver-fileset">
-			                        <map from="${rootDirectory}/core/src/main/resources/drivers/" to="" />
-			                    </pathconvert>
-			                    <echo file="${project.basedir}/target/classes/driver-list.txt">${driver-file-list}</echo>
-			                </target>
-			            </configuration>
-			            <goals>
-			                <goal>run</goal>
-			            </goals>
-			        </execution>
-			    </executions>
-			</plugin>
         </plugins>
         
 		<resources>

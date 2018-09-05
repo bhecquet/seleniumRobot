@@ -116,17 +116,17 @@
 			<dependency>
 				<groupId>com.infotel.seleniumRobot</groupId>
 				<artifactId>seleniumRobot-windows-driver</artifactId>
-				<version>[3.14.0-SNAPSHOT,)</version>
+				<version>[4.0.1,)</version>
 			</dependency>
 			<dependency>
 				<groupId>com.infotel.seleniumRobot</groupId>
 				<artifactId>seleniumRobot-linux-driver</artifactId>
-				<version>[3.14.0-SNAPSHOT,)</version>
+				<version>[4.0.1,)</version>
 			</dependency>
 			<dependency>
 				<groupId>com.infotel.seleniumRobot</groupId>
 				<artifactId>seleniumRobot-mac-driver</artifactId>
-				<version>[3.14.0-SNAPSHOT,)</version>
+				<version>[4.0.1,)</version>
 			</dependency>
 			<dependency>
 			    <groupId>com.mashape.unirest</groupId>
@@ -172,7 +172,6 @@
 	</dependencyManagement>
 
 	<modules>
-		<!-- <module>driver-download</module> -->
 		<module>core</module>
 		<module>grid-extensions</module>
 	</modules>
@@ -210,7 +209,7 @@
 							<overWriteSnapshots>false</overWriteSnapshots>
 							<overWriteIfNewer>true</overWriteIfNewer>
 							<includeScope>compile</includeScope>
-							<excludeArtifactIds>seleniumRobot-linux-driver,seleniumRobot-mac-driver,seleniumRobot-windows-driver</excludeArtifactIds>
+							<excludeArtifactIds>seleniumRobot-linux-driver,seleniumRobot-mac-driver,seleniumRobot-windows-driver,opencv</excludeArtifactIds>
 						</configuration>
 					</execution>
 				</executions>
