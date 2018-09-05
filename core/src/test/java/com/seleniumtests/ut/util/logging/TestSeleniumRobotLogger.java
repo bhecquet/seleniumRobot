@@ -23,6 +23,7 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
+import java.io.IOException;
 import java.lang.reflect.Method;
 
 import org.apache.log4j.Logger;
@@ -47,9 +48,10 @@ public class TestSeleniumRobotLogger extends MockitoTest {
 	
 	/**
 	 * Check that in DEV mode, debug logs are displayed
+	 * @throws IOException 
 	 */
 	@Test(groups= {"ut"})
-	public void testLogInDevMode() {
+	public void testLogInDevMode() throws IOException {
 		try {
 			SeleniumRobotLogger.reset();
 			SeleniumRobotLogger.updateLogger(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), SeleniumTestsContextManager.getThreadContext().getDefaultOutputDirectory());
@@ -77,9 +79,10 @@ public class TestSeleniumRobotLogger extends MockitoTest {
 	
 	/**
 	 * Check that in RUN mode, debug logs are not displayed
+	 * @throws IOException 
 	 */
 	@Test(groups= {"ut"})
-	public void testLogInRunMode() {
+	public void testLogInRunMode() throws IOException {
 		try {
 			SeleniumRobotLogger.reset();
 			SeleniumRobotLogger.updateLogger(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), SeleniumTestsContextManager.getThreadContext().getDefaultOutputDirectory());

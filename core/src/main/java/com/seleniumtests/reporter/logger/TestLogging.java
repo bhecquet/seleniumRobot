@@ -265,7 +265,11 @@ public class TestLogging {
 		TestLogging.parentTestStep.clear();
 		resetCurrentTestResult();
 		
-		SeleniumRobotLogger.reset();
+		try {
+			SeleniumRobotLogger.reset();
+		} catch (IOException e) {
+			logger.error("Cannot delete log file", e);
+		}
 	}
 	
 }
