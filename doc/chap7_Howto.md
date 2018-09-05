@@ -302,6 +302,20 @@ Drawback is that each test application MUST contain all variables of the generic
 
 pom.xml of each child application will declare the parent-app as dependency, not the core, which is held by parent-app.
 	  
-	  
+### 15 Record network traffic ###
+
+Developpers sometimes use network traffic monitor inside browsers to debug display errors (latency, ...)
+For debugging test, this can also be helpful so you can activate network capture by setting the `captureNetwork` parameter to `true` when launching test
+Then, an HAR file is recorded.
+
+**INFO**: Network capture is only available with DIRECT and MANUAL proxy settings. Other settings are forbidden because the recording proxy cannot know the address and port of your corporate proxy in automatic mode
+
+**WARN**: If using manual steps with network capture, beware that test steps are only recorded once the driver is created. This means that with the code below, step "Write" will not be displayed in HAR capture. Traffic will still be recorded in the init step (named with the test name). Driver is created with the call to `new DriverTestPage(true)`.
+	
+	addStep("Write");
+	DriverTestPage page = new DriverTestPage(true)
+		._writeSomething();
+	addStep("Reset");
+	page._reset();
 	  
 	  
