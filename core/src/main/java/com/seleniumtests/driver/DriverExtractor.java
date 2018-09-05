@@ -58,11 +58,13 @@ public class DriverExtractor {
 		this.rootPath = rootPath;
 		
 		os = OSUtility.getCurrentPlatorm().toString().toLowerCase();
-		if (os.equals("linux")) {
-			os = "unix";
-		}
 	}
 	
+	/**
+	 * Get the version of the driver from text file which is created when a driver is copied to /drivers/ folder
+	 * @param driverName
+	 * @return
+	 */
 	private String getDriverVersion(String driverName) {
 		try {
 			return FileUtils.readFileToString(Paths.get(getDriverPath().toFile().getAbsolutePath(), getDriverVersionFileName(driverName)).toFile());
@@ -89,18 +91,19 @@ public class DriverExtractor {
 			return null;
 		}
 		
-		String driverVersion = getDriverVersion(driverName);
-		String robotVersion = PackageUtility.getVersion();
+		String installedDriverVersion = getDriverVersion(driverName);
+		String driverArtifactVersion = PackageUtility.getDriverVersion();
 		Path driverPath = getDriverPath(driverName);
 		
-		if (driverPath.toFile().exists() && (driverVersion == null || !driverVersion.equals(robotVersion))
+		// copy driver only when it was not copied for this driver artifact version
+		if (driverPath.toFile().exists() && (installedDriverVersion == null || !installedDriverVersion.equals(driverArtifactVersion))
 				|| !driverPath.toFile().exists()) {
 			copyDriver(driverName);
 		} 
 		
 		// write version file
 		try {
-			FileUtils.writeStringToFile(Paths.get(getDriverPath().toFile().getAbsolutePath(), getDriverVersionFileName(driverName)).toFile(), robotVersion);
+			FileUtils.writeStringToFile(Paths.get(getDriverPath().toFile().getAbsolutePath(), getDriverVersionFileName(driverName)).toFile(), driverArtifactVersion);
 		} catch (IOException e) {
 			logger.error("driver version not written", e);
 		}
