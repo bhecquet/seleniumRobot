@@ -41,6 +41,7 @@ import org.testng.annotations.Test;
 import com.seleniumtests.MockitoTest;
 import com.seleniumtests.browserfactory.BrowserInfo;
 import com.seleniumtests.browserfactory.ChromeCapabilitiesFactory;
+import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.DriverConfig;
 import com.seleniumtests.driver.DriverMode;
@@ -57,12 +58,17 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 	@Mock
 	private Proxy proxyConfig;
 	
+	@Mock
+	private SeleniumTestsContext context;
+	
 	@BeforeMethod(groups= {"ut"})
 	public void init() {
 		browserInfos = new HashMap<>();
 		browserInfos.put(BrowserType.CHROME, Arrays.asList(new BrowserInfo(BrowserType.CHROME, "63.0", "", false)));
 		PowerMockito.mockStatic(OSUtility.class, Mockito.CALLS_REAL_METHODS);
 		PowerMockito.when(OSUtility.getInstalledBrowsersWithVersion()).thenReturn(browserInfos);
+		Mockito.when(config.getTestContext()).thenReturn(context);
+		Mockito.when(context.isDevMode()).thenReturn(false);
 	}
 	
 	/**

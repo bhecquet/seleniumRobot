@@ -45,6 +45,7 @@ import org.testng.annotations.Test;
 import com.seleniumtests.MockitoTest;
 import com.seleniumtests.browserfactory.BrowserInfo;
 import com.seleniumtests.browserfactory.IECapabilitiesFactory;
+import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.DriverConfig;
 import com.seleniumtests.driver.DriverMode;
@@ -63,6 +64,9 @@ public class TestIECapabilityFactory extends MockitoTest {
 	
 	@Mock
 	private Proxy proxyConfig;
+	
+	@Mock
+	private SeleniumTestsContext context;
 	
 	@Mock
 	private OSUtilityWindows osUtility;
@@ -86,6 +90,9 @@ public class TestIECapabilityFactory extends MockitoTest {
 		PowerMockito.when(OSUtilityFactory.getInstance()).thenReturn(osUtility);
 		
 		when(osUtility.getProgramExtension()).thenReturn(".exe");
+		
+		when(config.getTestContext()).thenReturn(context);
+		when(context.isDevMode()).thenReturn(false);
 		
 	}
 	
