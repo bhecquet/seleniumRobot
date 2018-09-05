@@ -382,4 +382,8 @@ public class DriverConfig {
 	public void setVideoRecorder(VideoRecorder videoRecorder) {
 		this.videoRecorder = videoRecorder;
 	}
+
+	public SeleniumTestsContext getTestContext() {
+		return testContext;
+	}
 }
