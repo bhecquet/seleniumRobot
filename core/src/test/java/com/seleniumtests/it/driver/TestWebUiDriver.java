@@ -170,10 +170,11 @@ public class TestWebUiDriver extends ReporterTest {
 			Assert.assertTrue(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriverManualSteps", "networkCapture.har").toFile().exists());
 			JSONObject json = new JSONObject(FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriverManualSteps", "networkCapture.har").toFile()));
 			JSONArray pages = json.getJSONObject("log").getJSONArray("pages");
-			Assert.assertEquals(pages.length(), 3);
+			Assert.assertEquals(pages.length(), 2);
 			Assert.assertEquals(pages.getJSONObject(0).getString("id").trim(), "testDriverManualSteps");
-			Assert.assertEquals(pages.getJSONObject(1).getString("id").trim(), "Write");
-			Assert.assertEquals(pages.getJSONObject(2).getString("id").trim(), "Reset");
+			Assert.assertEquals(pages.getJSONObject(1).getString("id").trim(), "Reset");
+			
+			// step "Write" is not recorded because the driver is not created before the DriverTestPage object is created
 		} finally {
 			System.clearProperty(SeleniumTestsContext.CAPTURE_NETWORK);
 		}
