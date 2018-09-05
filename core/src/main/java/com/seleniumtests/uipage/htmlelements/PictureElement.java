@@ -22,12 +22,14 @@ import java.io.File;
 import java.time.Duration;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.driver.BrowserType;
+import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.driver.screenshots.ScreenshotUtil;
 import com.seleniumtests.uipage.ReplayOnError;
@@ -159,12 +161,20 @@ public class PictureElement extends GenericPictureElement {
 	
 	public void moveAndClick(WebElement element, int coordX, int coordY) {
 
-		// issue #133: handle new actions specific case
-		// more browsers will be added to this conditions once they are migrated to new composite actions
-		// 
-		if (SeleniumTestsContextManager.isWebTest() && SeleniumTestsContextManager.getThreadContext().getBrowser() == BrowserType.FIREFOX) {
-			coordX -= element.getSize().width / 2;
-			coordY -= element.getSize().height / 2;
+		
+		if (SeleniumTestsContextManager.isWebTest()) {
+			// issue #133: handle new actions specific case
+			// more browsers will be added to this conditions once they are migrated to new composite actions
+			if (SeleniumTestsContextManager.getThreadContext().getBrowser() == BrowserType.FIREFOX) {
+				// issue #133: firefox moves to center of element in page
+				coordX -= element.getSize().width / 2;
+				coordY -= element.getSize().height / 2;
+			} else if (SeleniumTestsContextManager.getThreadContext().getBrowser() == BrowserType.INTERNET_EXPLORER) {
+				// issue #180: internet explorer moves to center of element in viewport
+				Dimension viewportDim = ((CustomEventFiringWebDriver)(WebUIDriver.getWebDriver())).getViewPortDimensionWithoutScrollbar();
+				coordX -= Math.min(element.getSize().width, viewportDim.width) / 2;
+				coordY -= Math.min(element.getSize().height, viewportDim.height) / 2;
+			}
 		}
 		
 		new Actions(WebUIDriver.getWebDriver()).moveToElement(element, coordX, coordY).click().build().perform();
