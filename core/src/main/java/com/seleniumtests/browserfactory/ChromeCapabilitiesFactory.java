@@ -18,6 +18,8 @@
  */
 package com.seleniumtests.browserfactory;
 
+import java.nio.file.Paths;
+
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.chrome.ChromeDriverService;
 import org.openqa.selenium.chrome.ChromeOptions;
@@ -50,9 +52,23 @@ public class ChromeCapabilitiesFactory extends IDesktopCapabilityFactory {
         
         if (webDriverConfig.getMode() == DriverMode.LOCAL) {
         	capabilities.setCapability(AndroidMobileCapabilityType.CHROMEDRIVER_EXECUTABLE, System.getProperty(ChromeDriverService.CHROME_DRIVER_EXE_PROPERTY));
+        	
+        	// driver logging
+        	setLogging();
         }
         
         return capabilities;
+	}
+	
+	private void setLogging() {
+
+    	// driver logging
+    	if (webDriverConfig.getTestContext().isDevMode()) {
+    		String chromeDriverLogPath = Paths.get(webDriverConfig.getOutputDirectory(), "chromedriver.log").toString();
+        	System.setProperty(ChromeDriverService.CHROME_DRIVER_VERBOSE_LOG_PROPERTY, "true");
+        	System.setProperty(ChromeDriverService.CHROME_DRIVER_LOG_PROPERTY, chromeDriverLogPath);
+        	logger.info("Chromedriver logs will be written to " + chromeDriverLogPath);
+    	}
 	}
  
 	@Override
@@ -70,6 +86,10 @@ public class ChromeCapabilitiesFactory extends IDesktopCapabilityFactory {
 	        options.addArguments("--headless");
 	        options.addArguments("--window-size=1280,1024");
 	        options.addArguments("--disable-gpu");
+        }
+        
+        if (webDriverConfig.getMode() == DriverMode.LOCAL) {
+        	setLogging();
         }
         
         return options;

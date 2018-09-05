@@ -1,10 +1,22 @@
 
 ### 0 preparation ###
 
+#### Install ####
 Unzip seleniumRobot-core.zip file (can be found on maven central or build it with maven) to any folder
+Install drivers for robot (seleniumRobot > 3.14.x). Drivers are available as a jar file (seleniumRobot-windows-driver.jar / seleniumRobot-linux-driver.jar / seleniumRobot-mac-driver.jar)
+Install openCV for robot (seleniumRobot > 3.14.x). This as been removed from seleniumRobot as it's a huge file (63 MB)
 Unzip your test application .zip file to the same folder. It will create the correct folder structure
 
-Tests are run using command line : `java -cp seleniumRobot.jar;plugins/<app>-tests.jar -D<option1>=<value1> -D<option2>=<value2> org.testng.TestNG <path_to_TestNG_xml_file>"`</br>
+These operations can be done using maven:
+- Install core: `mvn -U org.apache.maven.plugins:maven-dependency-plugin:2.8:unpack -Dartifact=com.infotel.seleniumRobot:core:RELEASE:zip -DoutputDirectory=<path_to_deployed_selenium_robot>  -Dmdep.overWriteReleases=true`
+- Install driver according to operating system into /lib/drivers folder (optional if you plan to use your robot with a grid): `mvn -U org.apache.maven.plugins:maven-dependency-plugin:2.8:copy -Dartifact=com.infotel.seleniumRobot:seleniumRobot-windows-driver:RELEASE:jar -DoutputDirectory=<path_to_deployed_selenium_robot>/lib/drivers  -Dmdep.overWriteReleases=true -Dmdep.stripVersion=true`
+- Install openCV into /lib folder: `mvn -U org.apache.maven.plugins:maven-dependency-plugin:2.8:copy -Dartifact=org.openpnp:opencv:3.2.0-1:jar -DoutputDirectory=<path_to_deployed_selenium_robot>/lib -Dmdep.overWriteReleases=true`
+- Install test application: `mvn -U org.apache.maven.plugins:maven-dependency-plugin:2.8:unpack -Dartifact=<app_groupId>:<app_artifactId>:RELEASE:zip -DoutputDirectory=<path_to_deployed_selenium_robot>  -Dmdep.overWriteReleases=true`
+
+Previous commands will take the last release by default, but you can replace 'RELEASE' by a specific version
+
+#### Run ####
+Tests are run using command line (`;lib/drivers/*` is mandatory for seleniumRobot > 3.14.x)  : `java -cp seleniumRobot.jar;plugins/<app>-tests.jar;lib/drivers/* -D<option1>=<value1> -D<option2>=<value2> org.testng.TestNG <path_to_TestNG_xml_file>"`</br>
 
 Launch test from folder where seleniumRobot.jar is deployed!
 
@@ -38,7 +50,7 @@ In this case, this user passed value will overwrite test or suite parameters
 | replayTimeOut				| 30		| Delay during which an action is replayed
 | webDriverGrid 			| 			| Address of seleniumGrid server | 
 | runMode 					| LOCAL		| `local`: current computer<br/>`grid`: seleniumGrid<br/>`sauceLabs`: run on sauceLabs device<br/>`testDroid`: run on testdroid device | 
-| devMode 					| false		| The development mode. If true, DEBUG logs are displayed, else, minimal log level is INFO | 
+| devMode 					| false		| The development mode. If true, DEBUG logs are displayed, else, minimal log level is INFO. Driver logs are also displayed | 
 | manualTestSteps			| false		| If true, it's possible to add test steps in Test and Page Object (`addTest("my step name")`). An error will be raised if manual steps are added when automatic steps are enabled |
 | browser 					| firefox	| Browser used to start test. Valid values are:<br/>`firefox`, `chrome`, `safari`, `iexplore`, `htmlunit`, `opera`, `phantomjs`, `none` for no driver, `browser` for android default browser | 
 | browserVersion 			|  			| Browser version to use. By default, it's the last one, or the installed one in local mode. This option has sense when using sauceLabs where browser version can be choosen | 
