@@ -18,6 +18,8 @@
  */
 package com.seleniumtests.it.driver.support.perdriver.testframe;
 
+import org.testng.annotations.Test;
+
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.it.driver.TestFrame;
 
@@ -26,4 +28,74 @@ public class TestFrameHtmlUnit extends TestFrame {
 	public TestFrameHtmlUnit() throws Exception {
 		super(BrowserType.HTMLUNIT);
 	}
+
+	@Test(groups={"it"})
+	public void testFrameText() {
+		super.testFrameText();
+	}
+	
+	@Test(groups={"it"})
+	public void testFrameRadio() {
+		super.testFrameRadio();
+	}
+	
+	@Test(groups={"it"})
+	public void testFrameCheckbox() {
+		super.testFrameCheckbox();
+	}
+	
+	@Test(groups={"it"})
+	public void testFrameButton() {
+		super.testFrameButton();
+	}
+	
+	@Test(groups={"it"})
+	public void testFrameLabel() {
+		super.testFrameLabel();
+	}
+	
+	@Test(groups={"it"})
+	public void testFrameLink() {
+		super.testFrameLink();
+	}
+	
+	@Test(groups={"it"})
+	public void testFrameSelect() {
+		super.testFrameSelect();
+	}
+	
+	@Test(groups={"it"})
+	public void testElementInsideOtherElementWithFrame() {
+		super.testElementInsideOtherElementWithFrame();
+	}
+	
+	@Test(groups={"it"})
+	public void testFrameTable() {
+		super.testFrameTable();
+	}
+	
+	@Test(groups={"it"})
+	public void testIsElementPresentInFrame() {
+		super.testIsElementPresentInFrame();
+	}
+	
+	@Test(groups={"it"})
+	public void testFindElements() {
+		super.testFindElements();
+	}
+	
+	@Test(groups={"it"})
+	public void testFindElementsBy() {
+		super.testFindElementsBy();
+	}
+	
+	@Test(groups={"it"})
+	public void testFrameInFrameText() {
+		super.testFrameInFrameText();
+	}
+	
+	@Test(groups={"it"})
+	public void testBackToMainFrame() {
+		super.testBackToMainFrame();
+	}	
 }
