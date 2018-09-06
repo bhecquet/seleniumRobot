@@ -31,6 +31,7 @@ import org.testng.annotations.BeforeMethod;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.driver.screenshots.VideoCaptureMode;
+import com.seleniumtests.reporter.logger.TestLogging;
 
 /**
  * Redefine calls to PowerMockTestCase methods as they are not called when using TestNG groups
@@ -79,6 +80,8 @@ public class MockitoTest  extends PowerMockTestCase {
 	@AfterMethod(groups={"ut", "it"})
 	public void afterMethod() throws Exception {
 		afterPowerMockTestMethod();
+
+		TestLogging.reset();
 	}
 	
 	@AfterClass(groups={"ut", "it"})

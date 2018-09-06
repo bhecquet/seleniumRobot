@@ -43,6 +43,7 @@ import com.seleniumtests.it.driver.support.pages.DriverTestAngularFrame;
 import com.seleniumtests.it.driver.support.pages.DriverTestPage;
 import com.seleniumtests.it.driver.support.pages.DriverTestPageWithoutFixedPattern;
 import com.seleniumtests.it.driver.support.server.WebServer;
+import com.seleniumtests.reporter.logger.TestLogging;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 import com.seleniumtests.util.osutility.OSUtilityFactory;
 
@@ -180,6 +181,7 @@ public abstract class GenericMultiBrowserTest {
 
 	@AfterMethod(groups={"it", "ut"})
 	public void cleanAlert() {
+		TestLogging.reset();
 		if (driver == null) {
 			return;
 		}
@@ -188,5 +190,6 @@ public abstract class GenericMultiBrowserTest {
 		} catch (WebDriverException e) {
 			
 		}
+
 	}
 }

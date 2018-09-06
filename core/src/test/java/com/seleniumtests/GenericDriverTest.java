@@ -27,6 +27,7 @@ import org.testng.annotations.BeforeMethod;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.driver.screenshots.VideoCaptureMode;
+import com.seleniumtests.reporter.logger.TestLogging;
 
 /**
  * Parent test class for tests when driver needs to be closed after each test
@@ -69,6 +70,8 @@ public class GenericDriverTest {
 			WebUIDriver.cleanUp();
 			WebUIDriver.cleanUpWebUIDriver();
 		}
+
+		TestLogging.reset();
 	}
 	
 	public void myTest() {
