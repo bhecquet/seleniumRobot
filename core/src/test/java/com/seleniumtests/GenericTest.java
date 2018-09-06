@@ -27,6 +27,7 @@ import org.testng.ITestContext;
 import org.testng.ITestNGMethod;
 import org.testng.ITestResult;
 import org.testng.annotations.AfterClass;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.internal.TestNGMethod;
 import org.testng.internal.TestResult;
@@ -39,6 +40,7 @@ import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.driver.screenshots.VideoCaptureMode;
+import com.seleniumtests.reporter.logger.TestLogging;
 
 public class GenericTest {
 
@@ -70,6 +72,11 @@ public class GenericTest {
 		SeleniumTestsContextManager.getThreadContext().setVideoCapture(VideoCaptureMode.FALSE.toString());
 		SeleniumTestsContextManager.getGlobalContext().setVideoCapture(VideoCaptureMode.FALSE.toString());
 		SeleniumTestsContext.resetOutputFolderNames();
+	}
+	
+	@AfterMethod(groups={"ut", "it"}) 
+	public void reset() {
+		TestLogging.reset();
 	}
 	
 	@AfterClass(groups={"ut", "it"})
