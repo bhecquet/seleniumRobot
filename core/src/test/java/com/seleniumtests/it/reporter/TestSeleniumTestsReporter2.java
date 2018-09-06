@@ -37,6 +37,7 @@ import org.testng.xml.XmlSuite.ParallelMode;
 
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.it.stubclasses.StubTestClass;
 import com.seleniumtests.reporter.reporters.SeleniumTestsReporter2;
 
 public class TestSeleniumTestsReporter2 extends ReporterTest {
@@ -197,6 +198,8 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	 */
 	@Test(groups={"it"})
 	public void testFailsOnlyOnceAndRetriedOk() throws Exception {
+		
+		StubTestClass.failed = false;
 		
 		// execute only the test that fails the first time it's executed
 		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testWithExceptionOnFirstExec"});

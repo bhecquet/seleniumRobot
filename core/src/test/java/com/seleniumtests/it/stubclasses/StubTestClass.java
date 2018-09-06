@@ -44,7 +44,7 @@ import com.seleniumtests.util.helper.WaitHelper;
 public class StubTestClass extends StubParentClass {
 	
 	private static int count = 0;
-	private static boolean failed = false;
+	public static boolean failed = false;
 	
 	@BeforeClass(groups={"stub"})
 	public void setCount() {
