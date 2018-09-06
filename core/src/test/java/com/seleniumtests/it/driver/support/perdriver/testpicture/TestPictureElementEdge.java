@@ -18,6 +18,8 @@
  */
 package com.seleniumtests.it.driver.support.perdriver.testpicture;
 
+import org.testng.annotations.Test;
+
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.it.driver.TestPictureElement;
 
@@ -25,5 +27,42 @@ public class TestPictureElementEdge extends TestPictureElement {
 
 	public TestPictureElementEdge() throws Exception {
 		super(BrowserType.EDGE);
+	}
+	
+	
+	//copy all tests so that they can be played individually for debug
+	@Test(groups={"it"})
+	public void testClickOnPicture() {
+		super.testClickOnPicture();
+	}
+	
+	@Test(groups={"it"})
+	public void testClickOnGooglePicture() {	
+		super.testClickOnGooglePicture();
+	}
+
+	@Test(groups={"it"})
+	public void testActionDurationIsLogged() {
+		super.testActionDurationIsLogged();
+	}
+
+	@Test(groups={"it"})
+	public void testClickOnGooglePictureFromFile() {
+		super.testClickOnGooglePictureFromFile();
+	}
+	
+	@Test(groups={"it"})
+	public void testSendKeysOnPicture() {
+		super.testSendKeysOnPicture();
+	}
+
+	@Test(groups={"it"})
+	public void testIsVisible() { 
+		super.testIsVisible();
+	}
+	
+	@Test(groups={"it"})
+	public void testIsNotVisible() {
+		super.testIsNotVisible();
 	}
 }

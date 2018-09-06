@@ -9,6 +9,12 @@
 
   	<artifactId>core</artifactId>
   	<packaging>jar</packaging>
+  	
+  	<properties>
+	    <skipTests>false</skipTests>
+	    <skipITs>${skipTests}</skipITs>
+	    <skipUTs>${skipTests}</skipUTs>
+	</properties>
 
 	<dependencies>
 	
@@ -299,6 +305,7 @@
 					<suiteXmlFiles>
 						<suiteXmlFile>data/core/testng/tu.xml</suiteXmlFile>
 					</suiteXmlFiles>
+					<skipTests>${skipUTs}</skipTests>
 					<properties>
 						<property>
 							<name>usedefaultlisteners</name>
@@ -329,7 +336,9 @@
 									<value>false</value>
 								</property>
 							</properties>
-								<argLine>${failsafeArgLine}</argLine>
+							<argLine>${failsafeArgLine}</argLine>
+							<skipTests>${skipTests}</skipTests>
+                			<skipITs>${skipITs}</skipITs>
 						</configuration>
 					</execution>
 				</executions>

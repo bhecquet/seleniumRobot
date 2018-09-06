@@ -28,8 +28,40 @@ public class TestPictureElementChrome extends TestPictureElement {
 	public TestPictureElementChrome() throws Exception {
 		super(BrowserType.CHROME);
 	}
+	
+	//copy all tests so that they can be played individually for debug
+	@Test(groups={"it"})
+	public void testClickOnPicture() {
+		super.testClickOnPicture();
+	}
+	
+	@Test(groups={"it"})
+	public void testClickOnGooglePicture() {	
+		super.testClickOnGooglePicture();
+	}
 
-	@Test(groups={"nogroup"})
-	public void test() {
+	@Test(groups={"it"})
+	public void testActionDurationIsLogged() {
+		super.testActionDurationIsLogged();
+	}
+
+	@Test(groups={"it"})
+	public void testClickOnGooglePictureFromFile() {
+		super.testClickOnGooglePictureFromFile();
+	}
+	
+	@Test(groups={"it"})
+	public void testSendKeysOnPicture() {
+		super.testSendKeysOnPicture();
+	}
+
+	@Test(groups={"it"})
+	public void testIsVisible() { 
+		super.testIsVisible();
+	}
+	
+	@Test(groups={"it"})
+	public void testIsNotVisible() {
+		super.testIsNotVisible();
 	}
 }
