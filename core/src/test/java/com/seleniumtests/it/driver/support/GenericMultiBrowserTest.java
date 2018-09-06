@@ -101,12 +101,17 @@ public abstract class GenericMultiBrowserTest {
 	
 
 	public void initThreadContext(final ITestContext testNGCtx) {
-		SeleniumTestsContextManager.initGlobalContext(testNGCtx);
-		SeleniumTestsContextManager.initThreadContext(testNGCtx, null, null, null);
-		SeleniumTestsContextManager.getThreadContext().setSoftAssertEnabled(false);
-		SeleniumTestsContextManager.getThreadContext().setVideoCapture(VideoCaptureMode.FALSE.toString());
-		SeleniumTestsContextManager.getGlobalContext().setSoftAssertEnabled(false);
-		SeleniumTestsContextManager.getGlobalContext().setVideoCapture(VideoCaptureMode.FALSE.toString());
+		try {
+			SeleniumTestsContextManager.initGlobalContext(testNGCtx);
+			SeleniumTestsContextManager.initThreadContext(testNGCtx, null, null, null);
+			SeleniumTestsContextManager.getThreadContext().setSoftAssertEnabled(false);
+			SeleniumTestsContextManager.getThreadContext().setVideoCapture(VideoCaptureMode.FALSE.toString());
+			SeleniumTestsContextManager.getGlobalContext().setSoftAssertEnabled(false); 
+			SeleniumTestsContextManager.getGlobalContext().setVideoCapture(VideoCaptureMode.FALSE.toString());
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw e;
+		}
 	}
 
 	@BeforeClass(groups={"it", "ut"})
