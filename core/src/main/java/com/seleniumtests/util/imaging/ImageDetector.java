@@ -321,6 +321,22 @@ public class ImageDetector {
 		recordDetectedRectangle(p1, p2, p3, p4);
 	}
 
+	/**
+	 * Detect the object inside the scene
+	 * We also search the scale of the scene from 20% to 120% scale by steps
+	 * steps are 10%, with 0.6 accuracy
+	 * then when a good match is found, we search around by 5% scale steps with 0.7 accuracy
+	 * then when a good match is found, we search around by 2.5% scale steps with 0.8 accuracy
+	 * 
+	 * example:
+	 * first pass: scales are: 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200
+	 * 				good matches are found around 600 and 700
+	 * second pass: scales are 550, 600, 650, 700, 750
+	 * 				good matches are found at 650
+	 * third pass: scales are 625, 650, 675
+	 * 
+	 * The best match is at 675
+	 */
 	public void detectExactZoneWithScale() {
 		
 		Mat sceneImageMat = Imgcodecs.imread(sceneImage.getAbsolutePath(), Imgcodecs.CV_LOAD_IMAGE_GRAYSCALE);
