@@ -57,6 +57,7 @@ public abstract class GenericMultiBrowserTest {
 	protected DriverTestPageWithoutFixedPattern testPageWithoutPattern;
 	protected DriverSubAngularTestPage angularPage;
 	protected DriverTestAngularFrame angularFramePage;
+	protected ITestContext testNGCtx;
 	private String testPageName;
 	
 	protected List<BrowserType> installedBrowsers = OSUtilityFactory.getInstance().getInstalledBrowsers();
@@ -132,6 +133,7 @@ public abstract class GenericMultiBrowserTest {
         logger.info(String.format("exposing server on http://%s:%d", localAddress, server.getServerHost().getPort()));
 
 		initThreadContext(testNGCtx);
+		this.testNGCtx = testNGCtx;
 		SeleniumTestsContextManager.getThreadContext().setExplicitWaitTimeout(2);
 		SeleniumTestsContextManager.getThreadContext().setBrowser(browserType.getBrowserType());
 		SeleniumTestsContextManager.getThreadContext().setCaptureSnapshot(false);
