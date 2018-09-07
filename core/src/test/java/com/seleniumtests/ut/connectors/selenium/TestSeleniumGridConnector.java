@@ -52,9 +52,7 @@ import org.testng.annotations.Test;
 
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
-import com.seleniumtests.MockitoTest;
 import com.seleniumtests.connectors.selenium.SeleniumGridConnector;
-import com.seleniumtests.connectors.selenium.SeleniumRobotGridConnector;
 import com.seleniumtests.reporter.logger.TestLogging;
 import com.seleniumtests.ut.connectors.ConnectorsTest;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;

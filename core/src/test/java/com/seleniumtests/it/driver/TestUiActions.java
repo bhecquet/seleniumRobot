@@ -19,43 +19,26 @@
 package com.seleniumtests.it.driver;
 
 import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.interactions.Actions;
 import org.testng.Assert;
-import org.testng.ITestContext;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import com.seleniumtests.GenericTest;
-import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.CustomEventFiringWebDriver;
-import com.seleniumtests.driver.WebUIDriver;
+import com.seleniumtests.it.driver.support.GenericMultiBrowserTest;
 import com.seleniumtests.it.driver.support.pages.DriverTestPage;
 
-public class TestUiActions extends GenericTest {
-	
-	private WebDriver driver;
-	
-	@BeforeClass(groups={"it"})
-	public void initDriver(final ITestContext testNGCtx) throws Exception {
-		initThreadContext(testNGCtx);
-		SeleniumTestsContextManager.getThreadContext().setBrowser("chrome");
-		driver = WebUIDriver.getWebDriver(true);
-		if (SeleniumTestsContextManager.getThreadContext().getBrowser() == BrowserType.FIREFOX) {
-			driver.get("file://" + Thread.currentThread().getContextClassLoader().getResource("tu/test.html").getFile());
-		} else {
-			driver.get("file:///" + Thread.currentThread().getContextClassLoader().getResource("tu/test.html").getFile());
-		}
+public class TestUiActions extends GenericMultiBrowserTest {
+
+	public TestUiActions(BrowserType browserType) throws Exception {
+		super(browserType, "DriverTestPage"); 
 	}
 	
-	/**
-	 * Test with the real driver, it should try to use new actions
-	 * TODO: this test takes 30 secs because new actions are not currently (3.4.0) supported by chromedriver, so we fall back to old behaviour
-	 * @throws Exception 
-	 */
-	@Test(groups={"it"}, enabled=false)
+	public TestUiActions() throws Exception {
+		super(null, "DriverTestPage");
+	}
+
+	@Test(groups={"it"})
 	public void testNewAction() {
 		try {
 			new Actions(((CustomEventFiringWebDriver)driver).getWebDriver()).moveToElement(driver.findElement(By.id("carre2"))).click().build().perform();
@@ -65,12 +48,8 @@ public class TestUiActions extends GenericTest {
 			Assert.assertEquals("", driver.findElement(By.id("text2")).getAttribute("value"));
 		}
 	}
-	
-	/**
-	 * TODO: same as test above
-	 * @throws Exception
-	 */
-	@Test(groups={"it"}, enabled=false)
+
+	@Test(groups={"it"})
 	public void testNewActionWithHtmlElement() throws Exception {
 		try {
 			new Actions(((CustomEventFiringWebDriver)driver).getWebDriver()).moveToElement(DriverTestPage.redSquare).click().build().perform();
@@ -109,14 +88,6 @@ public class TestUiActions extends GenericTest {
 			Assert.assertEquals("youpi2", DriverTestPage.textElement.getAttribute("value"));
 		} finally {
 			driver.findElement(By.id("button2")).click();
-		}
-	}
-	
-	@AfterClass(groups={"it"})
-	public void destroyDriver() {
-		if (driver != null) {
-			WebUIDriver.cleanUp();
-			WebUIDriver.cleanUpWebUIDriver();
 		}
 	}
 }
