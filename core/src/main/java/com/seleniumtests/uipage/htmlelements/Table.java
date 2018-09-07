@@ -31,6 +31,11 @@ import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import com.seleniumtests.uipage.ReplayOnError;
 
+/**
+ * Class that represents an html table. Only these tables are supported
+ * @author s047432
+ *
+ */
 public class Table extends HtmlElement {
     private List<WebElement> rows = null;
     private List<WebElement> columns = null;
@@ -51,6 +56,11 @@ public class Table extends HtmlElement {
     	super(label, by, frame);
     }
 
+    /**
+     * Get rows and columns
+     * rows correspond to <tr> html elements
+     * columns correspond to <th> elements if they exist, or the <td> elements of the first row
+     */
     public void findTableElement() {
         super.findElement();
         rows = element.findElements(By.tagName("tr"));
@@ -76,6 +86,10 @@ public class Table extends HtmlElement {
         }
     }
     
+    /**
+     * Returns column list
+     * @return
+     */
     @ReplayOnError
     public List<WebElement> getColumns() {
     	findTableElement();
@@ -83,12 +97,21 @@ public class Table extends HtmlElement {
  
     }
 
+    /**
+     * Returns the number of columns
+     * @return
+     */
     @ReplayOnError
     public int getColumnCount() {
     	findTableElement();
         return columns.size();
     }
     
+    /**
+     * Given a row WebElement (represents a <tr> html element), returns the list of elements (<tr> or <th>)
+     * @param row	the row to analyze
+     * @return
+     */
     public List<WebElement> getRowCells(WebElement row) {
     	List<WebElement> cells;
     	if (row == null) {
@@ -143,6 +166,13 @@ public class Table extends HtmlElement {
     	}
     }
     
+    /**
+     * Get a table cell at row,column coordinates
+     * @param row		the row index
+     * @param column	the column index
+     * @param focus		if true, scroll to this cell
+     * @return
+     */
     public WebElement getCell(final int row, final int column, boolean focus) {
     	WebElement cell = getCell(row, column);
     	if (focus) {
@@ -178,11 +208,19 @@ public class Table extends HtmlElement {
     	throw new ScenarioException("There are no rows in this table");
     }
 
+    /**
+     * Returns the number of rows
+     * @return
+     */
     public int getRowCount() {
         getRows();
         return rows.size();
     }
 
+    /**
+     * Returns list of rows
+     * @return
+     */
     @ReplayOnError
     public List<WebElement> getRows() {
     	findTableElement();

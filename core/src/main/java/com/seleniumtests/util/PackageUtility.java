@@ -35,7 +35,6 @@ import javax.xml.xpath.XPathFactory;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
-import com.seleniumtests.customexception.DriverExceptions;
 import com.seleniumtests.util.osutility.OSUtility;
 
 public class PackageUtility {
