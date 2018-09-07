@@ -216,8 +216,8 @@ public class WebUIDriver {
 					} catch (FileNotFoundException | UnsupportedEncodingException e) {
 					}
         		}
-             } catch (UnsupportedCommandException e) {
-             }
+            } catch (Exception e) {
+            }
     		
     		
     		try {
