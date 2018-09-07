@@ -20,7 +20,9 @@ package com.seleniumtests.it.driver.support.perdriver.testdriver;
 
 import java.awt.AWTException;
 
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.UnhandledAlertException;
+import org.testng.ITestContext;
 import org.testng.annotations.Test;
 
 import com.seleniumtests.driver.BrowserType;
@@ -177,9 +179,26 @@ public class TestDriverInternetExplorer extends TestDriver {
 		super.testUploadFileWithRobotKeyboard();
 	}
 	
+	/**
+	 * Retry file upload if something goes wrong
+	 * @param testNGCtx
+	 * @throws Exception
+	 */
 	@Test(groups= {"it", "ut"})
 	public void testUploadFile() throws AWTException, InterruptedException {
-		super.testUploadFile();
+		try {
+			super.testUploadFile();
+		} catch (TimeoutException e) {
+			logger.warn("test upload failed and retried due to session timeout exception");
+			try {
+				stop();
+				exposeTestPage(testNGCtx);
+			} catch (Exception e1) {
+				throw e;
+			}
+			super.testUploadFile();
+		}
+		
 	}
 	
 	@Test(groups={"it", "ut"})

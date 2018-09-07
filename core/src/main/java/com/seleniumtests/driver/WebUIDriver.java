@@ -19,13 +19,23 @@
 package com.seleniumtests.driver;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.openqa.selenium.Capabilities;
+import org.openqa.selenium.UnsupportedCommandException;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.logging.LogEntries;
+import org.openqa.selenium.logging.LogEntry;
 import org.openqa.selenium.support.events.EventFiringWebDriver;
 import org.openqa.selenium.support.events.WebDriverEventListener;
 
@@ -79,6 +89,15 @@ public class WebUIDriver {
         uxDriverSession.set(this);
     }
 
+    /**
+     * prepare driver:
+     * - create it
+     * - add listeners
+     * - create and start video capture
+     * - create and start network capture proxy
+     * - record driver and browser pid so that they can be deleted at the end of test session
+     * @return
+     */
 	public WebDriver createRemoteWebDriver()  {
         
         // TODO: use grid with appium ?
@@ -179,7 +198,28 @@ public class WebUIDriver {
     public static void cleanUp() {
     	
         WebDriver driver = driverSession.get();
+        WebUIDriver webuiDriver = getWebUIDriver(false);
+        
     	if (driver != null) {
+    		
+    		// write logs
+    		try {
+        		for (String logType: driver.manage().logs().getAvailableLogTypes()) {
+
+        			PrintWriter writer;
+					try {
+						writer = new PrintWriter(Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), String.format("driver-log-%s.txt", logType)).toFile().getAbsolutePath(), "UTF-8");
+						for (LogEntry line: driver.manage().logs().get(logType).getAll()) {
+	        				writer.println(line.toString());
+	        			}
+	        			writer.close();
+					} catch (FileNotFoundException | UnsupportedEncodingException e) {
+					}
+        		}
+             } catch (UnsupportedCommandException e) {
+             }
+    		
+    		
     		try {
 	            TestLogging.log("quiting webdriver " + Thread.currentThread().getId());
 	            driver.quit();
@@ -189,8 +229,9 @@ public class WebUIDriver {
         }
         
     	// issue #176: do not create the WebUiDriver if it does not exist
-    	WebUIDriver webuiDriver = getWebUIDriver(false);
     	if (webuiDriver != null) {
+    		
+    		
 	    	IWebDriverFactory iWebDriverFactory = webuiDriver.webDriverBuilder;
 	        if (iWebDriverFactory != null) {
 	            iWebDriverFactory.cleanUp();
@@ -356,6 +397,9 @@ public class WebUIDriver {
     	}
     }
     
+    /**
+     * Get version from browser capabilities and display it
+     */
     private void displayBrowserVersion() {
     	if (driver == null) {
     		return;
@@ -366,6 +410,11 @@ public class WebUIDriver {
         logger.info(String.format("Browser is: %s %s", browserName, browserVersion));
     }
 
+    /**
+     * create the driver
+     * @return the driver
+     * @throws ScenarioException in case we are not allowed to create it (if we are in @BeforeMethod and after @AfterMethod)
+     */
     public WebDriver createWebDriver() {
     	
     	if (SeleniumTestsContextManager.getThreadContext().isDriverCreationBlocked()) {

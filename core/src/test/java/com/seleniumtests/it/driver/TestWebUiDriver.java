@@ -151,6 +151,21 @@ public class TestWebUiDriver extends ReporterTest {
 		} finally {
 			System.clearProperty(SeleniumTestsContext.CAPTURE_NETWORK);
 		}
+	}
+	
+	/**
+	 * Check that browser logs are written to file (only available for chrome)
+	 * 
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testBrowserLogsExists() throws Exception {
+
+		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriver"});
+		
+		Assert.assertTrue(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriver", "driver-log-browser.txt").toFile().exists());
+		Assert.assertTrue(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriver", "driver-log-client.txt").toFile().exists());
+		Assert.assertTrue(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriver", "driver-log-driver.txt").toFile().exists());
 		
 	}
 	

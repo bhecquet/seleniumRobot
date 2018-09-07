@@ -32,7 +32,7 @@ import com.seleniumtests.driver.WebUIDriver;
 public class TestDesktopDrivers extends GenericDriverTest {
 	
 	
-	@Test(groups={"it"}, enabled=false)
+	@Test(groups={"it"})
 	public void testFirefoxStartup(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setBrowser("*firefox");
