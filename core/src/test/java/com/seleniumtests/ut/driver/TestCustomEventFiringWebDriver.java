@@ -18,13 +18,31 @@
  */
 package com.seleniumtests.ut.driver;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.awt.AWTException;
+import java.awt.Image;
+import java.awt.Rectangle;
+import java.awt.Robot;
+import java.awt.event.InputEvent;
+import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
+import javax.imageio.ImageIO;
+
+import org.apache.commons.io.FileUtils;
 import org.mockito.Mock;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Point;
@@ -32,16 +50,26 @@ import org.openqa.selenium.WebDriver.Options;
 import org.openqa.selenium.WebDriver.Window;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.remote.SessionId;
 import org.openqa.selenium.support.events.EventFiringWebDriver;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import com.seleniumtests.MockitoTest;
+import com.seleniumtests.browserfactory.BrowserInfo;
+import com.seleniumtests.connectors.selenium.SeleniumGridConnector;
+import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import com.seleniumtests.driver.DriverExceptionListener;
 import com.seleniumtests.driver.DriverMode;
+import com.seleniumtests.driver.Keyboard;
+import com.seleniumtests.util.osutility.OSUtility;
+import com.seleniumtests.util.osutility.OSUtilityFactory;
 
+@PrepareForTest({OSUtilityFactory.class, CustomEventFiringWebDriver.class})
 public class TestCustomEventFiringWebDriver extends MockitoTest {
 
 
@@ -54,17 +82,75 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	@Mock
 	private Window window;
 	
+	@Mock
+	private OSUtility osUtility;
+	
+	@Mock
+	private BrowserInfo browserInfo;
+	
+	@Mock
+	private Robot robot;
+	
+	@Mock
+	private Keyboard keyboard;
+	
+	@Mock 
+	private SeleniumGridConnector gridConnector;
+	
 	private EventFiringWebDriver eventDriver;
 
 	@BeforeMethod(groups={"ut"})
-	private void init() throws WebDriverException, IOException {
+	private void init() throws Exception {
+		
+
+		PowerMockito.spy(CustomEventFiringWebDriver.class);
 		
 		// add DriverExceptionListener to reproduce driver behavior
-		eventDriver = spy(new CustomEventFiringWebDriver(driver).register(new DriverExceptionListener()));
+		eventDriver = spy(new CustomEventFiringWebDriver(driver, null, browserInfo, true, DriverMode.LOCAL, null, null).register(new DriverExceptionListener()));
 		
 		when(driver.manage()).thenReturn(options);
+		when(driver.getSessionId()).thenReturn(new SessionId("1234"));
+		when(driver.getPageSource()).thenReturn("<html></html>");
 		when(options.window()).thenReturn(window);
 		when(window.getSize()).thenReturn(new Dimension(100, 100));
+		
+		PowerMockito.mockStatic(OSUtilityFactory.class);
+		when(OSUtilityFactory.getInstance()).thenReturn(osUtility);
+		
+		PowerMockito.whenNew(Robot.class).withNoArguments().thenReturn(robot);
+		PowerMockito.whenNew(Keyboard.class).withNoArguments().thenReturn(keyboard);
+		PowerMockito.doReturn(new Rectangle(1900, 1000)).when(CustomEventFiringWebDriver.class, "getScreensRectangle");
+		
+		
+	}
+	
+	@Test(groups = {"ut"})
+	public void testGetSessionId() {
+		Assert.assertEquals(((CustomEventFiringWebDriver)eventDriver).getSessionId(), "1234");
+	}
+	
+	/**
+	 * Test the case where driver is not a RemoteWebDriver (htmlunit)
+	 * We shoud get a generated id
+	 */
+	@Test(groups = {"ut"})
+	public void testGetSessionIdWithIncopmatibleDriver() {
+		when(driver.getSessionId()).thenThrow(ClassCastException.class);
+		Assert.assertNotEquals(((CustomEventFiringWebDriver)eventDriver).getSessionId(), "1234");
+	}
+	
+	@Test(groups = {"ut"})
+	public void testGetPageSource() {
+		Assert.assertEquals(((CustomEventFiringWebDriver)eventDriver).getPageSource(), "<html></html>");
+	}
+	
+	/**
+	 * Test the case where driver cannot return page source (case for mobile browsers or old edge versions for example)
+	 */
+	@Test(groups = {"ut"})
+	public void testGetPageSourceWithIncopmatibleDriver() {
+		doThrow(new WebDriverException("some error")).when(driver).getPageSource();
+		Assert.assertNull(((CustomEventFiringWebDriver)eventDriver).getPageSource());
 	}
 	
 	/**
@@ -218,6 +304,218 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 		when(driver.executeScript(anyString())).thenReturn(Arrays.asList(120L, 80L));
 		((CustomEventFiringWebDriver)eventDriver).getScrollPosition();
 
+	}
+	
+	/**
+	 * Check driver is quit and all pids are killed
+	 */
+	@Test(groups = {"ut"})
+	public void testQuit() {
+		when(browserInfo.getAllBrowserSubprocessPids(new ArrayList<>())).thenReturn(Arrays.asList(1000L));
+		
+		((CustomEventFiringWebDriver)eventDriver).quit();
+		verify(osUtility).killProcess(eq("1000"), eq(true));
+	}
+	
+	/**
+	 * Check that even if error is raised when driver is quit, killing process is done
+	 */
+	@Test(groups = {"ut"})
+	public void testQuitInError() {
+		when(browserInfo.getAllBrowserSubprocessPids(new ArrayList<>())).thenReturn(Arrays.asList(1000L));
+		doThrow(new WebDriverException("some error")).when(driver).quit();
+		
+		try {
+			((CustomEventFiringWebDriver)eventDriver).quit();
+		} catch (WebDriverException e) {}
+		verify(osUtility).killProcess(eq("1000"), eq(true));
+	}
+	
+	/**
+	 * Test left clic in local mode
+	 */
+	@Test(groups = {"ut"})
+	public void testLeftClickOnDesktop() {
+		CustomEventFiringWebDriver.leftClicOnDesktopAt(0, 0, DriverMode.LOCAL, gridConnector);
+		
+		verify(robot).mousePress(eq(InputEvent.BUTTON1_DOWN_MASK));
+		verify(robot).mouseRelease(eq(InputEvent.BUTTON1_DOWN_MASK));
+		verify(robot).mouseMove(eq(0), eq(0));
+		verify(gridConnector, never()).leftClic(eq(0), eq(0));
+	}
+	
+	/**
+	 * Test left clic in headless mode: an error should be raised because there is no session
+	 * @throws Exception 
+	 */
+	@Test(groups = {"ut"}, expectedExceptions=ScenarioException.class)
+	public void testLeftClickOnDesktopWithoutDesktop() throws Exception {
+		PowerMockito.whenNew(Robot.class).withNoArguments().thenThrow(AWTException.class);
+		
+		CustomEventFiringWebDriver.leftClicOnDesktopAt(0, 0, DriverMode.LOCAL, gridConnector);
+	}
+	
+	/**
+	 * Test left clic in grid mode
+	 */
+	@Test(groups = {"ut"})
+	public void testLeftClickOnDesktopWithGrid() {
+		CustomEventFiringWebDriver.leftClicOnDesktopAt(0, 0, DriverMode.GRID, gridConnector);
+		
+		verify(robot, never()).mousePress(eq(InputEvent.BUTTON1_DOWN_MASK));
+		verify(robot, never()).mouseRelease(eq(InputEvent.BUTTON1_DOWN_MASK));
+		verify(robot, never()).mouseMove(eq(0), eq(0));
+		verify(gridConnector).leftClic(eq(0), eq(0));
+	}
+	
+	/**
+	 * Test right clic in local mode
+	 */
+	@Test(groups = {"ut"})
+	public void testRightClickOnDesktop() {
+		CustomEventFiringWebDriver.rightClicOnDesktopAt(0, 0, DriverMode.LOCAL, gridConnector);
+		
+		verify(robot).mousePress(eq(InputEvent.BUTTON2_DOWN_MASK));
+		verify(robot).mouseRelease(eq(InputEvent.BUTTON2_DOWN_MASK));
+		verify(robot).mouseMove(eq(0), eq(0));
+		verify(gridConnector, never()).rightClic(eq(0), eq(0));
+	}
+	
+	/**
+	 * Test right clic in headless mode: an error should be raised because there is no session
+	 * @throws Exception 
+	 */
+	@Test(groups = {"ut"}, expectedExceptions=ScenarioException.class)
+	public void testRightClickOnDesktopWithoutDesktop() throws Exception {
+		PowerMockito.whenNew(Robot.class).withNoArguments().thenThrow(AWTException.class);
+		
+		CustomEventFiringWebDriver.rightClicOnDesktopAt(0, 0, DriverMode.LOCAL, gridConnector);
+	}
+	
+	/**
+	 * Test right clic in grid mode
+	 */
+	@Test(groups = {"ut"})
+	public void testRightClickOnDesktopWithGrid() {
+		CustomEventFiringWebDriver.rightClicOnDesktopAt(0, 0, DriverMode.GRID, gridConnector);
+		
+		verify(robot, never()).mousePress(eq(InputEvent.BUTTON2_DOWN_MASK));
+		verify(robot, never()).mouseRelease(eq(InputEvent.BUTTON2_DOWN_MASK));
+		verify(robot, never()).mouseMove(eq(0), eq(0));
+		verify(gridConnector).rightClic(eq(0), eq(0));
+	}
+	
+	/**
+	 * write to desktop in local mode
+	 */
+	@Test(groups = {"ut"})
+	public void testWriteToDesktop() {
+		CustomEventFiringWebDriver.writeToDesktop("text", DriverMode.LOCAL, gridConnector);
+		
+		verify(keyboard).typeKeys(eq("text"));
+		verify(gridConnector, never()).writeText(anyString());
+	}
+
+	/**
+	 * Write text in headless mode: an error should be raised because there is no session
+	 * @throws Exception 
+	 */
+	@Test(groups = {"ut"}, expectedExceptions=ScenarioException.class)
+	public void testWriteToDesktopWithoutDesktop() throws Exception {
+		PowerMockito.whenNew(Keyboard.class).withNoArguments().thenThrow(AWTException.class);
+		
+		CustomEventFiringWebDriver.writeToDesktop("text", DriverMode.LOCAL, gridConnector);
+	}
+	
+	/**
+	 * write to desktop in grid mode
+	 */
+	@Test(groups = {"ut"})
+	public void testWriteToDesktopWithGrid() {
+		CustomEventFiringWebDriver.writeToDesktop("text", DriverMode.GRID, gridConnector);
+
+		verify(keyboard, never()).typeKeys("text");
+		verify(gridConnector).writeText(eq("text"));
+	}
+	
+	/**
+	 * send keys to desktop in local mode
+	 */
+	@Test(groups = {"ut"})
+	public void testSendKeysToDesktop() {
+		CustomEventFiringWebDriver.sendKeysToDesktop(Arrays.asList(10, 20), DriverMode.LOCAL, gridConnector);
+		
+		verify(robot).keyPress(eq(10));
+		verify(robot).keyPress(eq(20));
+		verify(robot).keyRelease(eq(10));
+		verify(robot).keyRelease(eq(20));
+		verify(gridConnector, never()).sendKeysWithKeyboard(any(List.class));
+	}
+
+	/**
+	 * Write text in headless mode: an error should be raised because there is no session
+	 * @throws Exception 
+	 */
+	@Test(groups = {"ut"}, expectedExceptions=ScenarioException.class)
+	public void testSendKeysToDesktopWithoutDesktop() throws Exception {
+		PowerMockito.whenNew(Robot.class).withNoArguments().thenThrow(AWTException.class);
+		
+		CustomEventFiringWebDriver.sendKeysToDesktop(Arrays.asList(10, 20), DriverMode.LOCAL, gridConnector);
+	}
+	
+	/**
+	 * send keys to desktop in grid mode
+	 */
+	@Test(groups = {"ut"})
+	public void testSendKeysToDesktopWithGrid() {
+		CustomEventFiringWebDriver.sendKeysToDesktop(Arrays.asList(10, 20), DriverMode.GRID, gridConnector);
+
+		verify(robot, never()).keyPress(eq(10));
+		verify(robot, never()).keyPress(eq(20));
+		verify(robot, never()).keyRelease(eq(10));
+		verify(robot, never()).keyRelease(eq(20));
+		verify(gridConnector).sendKeysWithKeyboard(any(List.class));
+	}
+	
+	/**
+	 * capture picture in local mode
+	 * @throws IOException 
+	 */
+	@Test(groups = {"ut"})
+	public void testCaptureDesktop() throws IOException {
+		File imageFile = File.createTempFile("image-", ".png");
+		FileUtils.copyInputStreamToFile(getClass().getClassLoader().getResourceAsStream("tu/images/ffLogoConcat.png"), imageFile);
+		BufferedImage bi = ImageIO.read(imageFile);
+
+		when(robot.createScreenCapture(any(Rectangle.class))).thenReturn(bi);
+		
+		String b64img = CustomEventFiringWebDriver.captureDesktopToBase64String(DriverMode.LOCAL, gridConnector);
+		Assert.assertTrue(b64img.startsWith("iVBORw0KGgoAAAANSUhEUgAAALoAAACMCAIAAABETyQWAACAAElEQVR42pT8ZVRbafs+fmeKx3B3"));
+		verify(gridConnector, never()).captureDesktopToBuffer();
+	}
+	
+	/**
+	 * capture picture in local headless mode, ScenarioException should be raised
+	 * @throws IOException 
+	 */
+	@Test(groups = {"ut"}, expectedExceptions=ScenarioException.class)
+	public void testCaptureDesktopWithoutDesktop() throws IOException {
+
+		when(robot.createScreenCapture(any(Rectangle.class))).thenThrow(AWTException.class);
+		
+		CustomEventFiringWebDriver.captureDesktopToBase64String(DriverMode.LOCAL, gridConnector);
+	}
+	
+
+	/**
+	 * capture picture in grid mode
+	 * @throws IOException 
+	 */
+	@Test(groups = {"ut"})
+	public void testCaptureDesktopWithGrid() throws IOException {
+
+		CustomEventFiringWebDriver.captureDesktopToBase64String(DriverMode.GRID, gridConnector);
+		verify(gridConnector).captureDesktopToBuffer();
 	}
 	
 }
