@@ -22,14 +22,13 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.awt.AWTException;
-import java.awt.Image;
+import java.awt.HeadlessException;
 import java.awt.Rectangle;
 import java.awt.Robot;
 import java.awt.event.InputEvent;
@@ -53,6 +52,7 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.SessionId;
 import org.openqa.selenium.support.events.EventFiringWebDriver;
 import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
@@ -66,10 +66,12 @@ import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import com.seleniumtests.driver.DriverExceptionListener;
 import com.seleniumtests.driver.DriverMode;
 import com.seleniumtests.driver.Keyboard;
+import com.seleniumtests.driver.screenshots.VideoRecorder;
 import com.seleniumtests.util.osutility.OSUtility;
 import com.seleniumtests.util.osutility.OSUtilityFactory;
 
 @PrepareForTest({OSUtilityFactory.class, CustomEventFiringWebDriver.class})
+@PowerMockIgnore("javax.imageio.*")
 public class TestCustomEventFiringWebDriver extends MockitoTest {
 
 
@@ -97,6 +99,9 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	@Mock 
 	private SeleniumGridConnector gridConnector;
 	
+	@Mock
+	private VideoRecorder videoRecorder;
+	
 	private EventFiringWebDriver eventDriver;
 
 	@BeforeMethod(groups={"ut"})
@@ -118,6 +123,7 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 		when(OSUtilityFactory.getInstance()).thenReturn(osUtility);
 		
 		PowerMockito.whenNew(Robot.class).withNoArguments().thenReturn(robot);
+		PowerMockito.whenNew(VideoRecorder.class).withAnyArguments().thenReturn(videoRecorder);
 		PowerMockito.whenNew(Keyboard.class).withNoArguments().thenReturn(keyboard);
 		PowerMockito.doReturn(new Rectangle(1900, 1000)).when(CustomEventFiringWebDriver.class, "getScreensRectangle");
 		
@@ -356,6 +362,15 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	}
 	
 	/**
+	 * Test left click with device providers: this is not supported, so exception should be raised
+	 * @throws Exception 
+	 */
+	@Test(groups = {"ut"}, expectedExceptions=ScenarioException.class)
+	public void testLeftClickWithDeviceProviders() throws Exception {
+		CustomEventFiringWebDriver.leftClicOnDesktopAt(0, 0, DriverMode.SAUCELABS, gridConnector);
+	}
+	
+	/**
 	 * Test left clic in grid mode
 	 */
 	@Test(groups = {"ut"})
@@ -390,6 +405,15 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 		PowerMockito.whenNew(Robot.class).withNoArguments().thenThrow(AWTException.class);
 		
 		CustomEventFiringWebDriver.rightClicOnDesktopAt(0, 0, DriverMode.LOCAL, gridConnector);
+	}
+
+	/**
+	 * Test right click with device providers: this is not supported, so exception should be raised
+	 * @throws Exception 
+	 */
+	@Test(groups = {"ut"}, expectedExceptions=ScenarioException.class)
+	public void testRightClickWithDeviceProviders() throws Exception {
+		CustomEventFiringWebDriver.rightClicOnDesktopAt(0, 0, DriverMode.SAUCELABS, gridConnector);
 	}
 	
 	/**
@@ -426,6 +450,15 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 		
 		CustomEventFiringWebDriver.writeToDesktop("text", DriverMode.LOCAL, gridConnector);
 	}
+
+	/**
+	 * write textk with device providers: this is not supported, so exception should be raised
+	 * @throws Exception 
+	 */
+	@Test(groups = {"ut"}, expectedExceptions=ScenarioException.class)
+	public void testWriteTextWithDeviceProviders() throws Exception {
+		CustomEventFiringWebDriver.writeToDesktop("text", DriverMode.SAUCELABS, gridConnector);
+	}
 	
 	/**
 	 * write to desktop in grid mode
@@ -461,6 +494,15 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 		PowerMockito.whenNew(Robot.class).withNoArguments().thenThrow(AWTException.class);
 		
 		CustomEventFiringWebDriver.sendKeysToDesktop(Arrays.asList(10, 20), DriverMode.LOCAL, gridConnector);
+	}
+
+	/**
+	 * send keys with device providers: this is not supported, so exception should be raised
+	 * @throws Exception 
+	 */
+	@Test(groups = {"ut"}, expectedExceptions=ScenarioException.class)
+	public void testSendKeysWithDeviceProviders() throws Exception {
+		CustomEventFiringWebDriver.sendKeysToDesktop(Arrays.asList(10, 20), DriverMode.SAUCELABS, gridConnector);
 	}
 	
 	/**
@@ -506,6 +548,15 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 		CustomEventFiringWebDriver.captureDesktopToBase64String(DriverMode.LOCAL, gridConnector);
 	}
 	
+	/**
+	 * capture desktop with device providers: this is not supported, so exception should be raised
+	 * @throws Exception 
+	 */
+	@Test(groups = {"ut"}, expectedExceptions=ScenarioException.class)
+	public void testCaptureDesktopWithDeviceProviders() throws Exception {
+		CustomEventFiringWebDriver.captureDesktopToBase64String(DriverMode.SAUCELABS, gridConnector);
+	}
+	
 
 	/**
 	 * capture picture in grid mode
@@ -517,5 +568,98 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 		CustomEventFiringWebDriver.captureDesktopToBase64String(DriverMode.GRID, gridConnector);
 		verify(gridConnector).captureDesktopToBuffer();
 	}
+
+	/**
+	 * start video capture to desktop in local mode
+	 * @throws IOException 
+	 */
+	@Test(groups = {"ut"})
+	public void testStartVideoCaptureToDesktop() throws IOException {
+		File videoFolder = File.createTempFile("video", ".avi").getParentFile();
+		CustomEventFiringWebDriver.startVideoCapture(DriverMode.LOCAL, gridConnector, videoFolder, "video.avi");
+		
+		verify(videoRecorder).start();
+		verify(gridConnector, never()).startVideoCapture();
+	}
+
+	/**
+	 * start video capture in headless mode: an error should be raised because there is no session
+	 * @throws Exception 
+	 */
+	@Test(groups = {"ut"}, expectedExceptions=ScenarioException.class)
+	public void testStartVideoCaptureToDesktopWithoutDesktop() throws Exception {
+		File videoFolder = File.createTempFile("video", ".avi").getParentFile();
+		PowerMockito.whenNew(VideoRecorder.class).withArguments(any(File.class), anyString()).thenThrow(HeadlessException.class);
+
+		CustomEventFiringWebDriver.startVideoCapture(DriverMode.LOCAL, gridConnector, videoFolder, "video.avi");
+	}
+
+	/**
+	 * start video capture with device providers: this is not supported, so exception should be raised
+	 * @throws Exception 
+	 */
+	@Test(groups = {"ut"}, expectedExceptions=ScenarioException.class)
+	public void testStartVideoCaptureWithDeviceProviders() throws Exception {
+		File videoFolder = File.createTempFile("video", ".avi").getParentFile();
+		CustomEventFiringWebDriver.startVideoCapture(DriverMode.SAUCELABS, gridConnector, videoFolder, "video.avi");
+	}
 	
+	/**
+	 * start video capture to desktop in grid mode
+	 * @throws IOException 
+	 */
+	@Test(groups = {"ut"})
+	public void testStartVideoCaptureToDesktopWithGrid() throws IOException {
+		File videoFolder = File.createTempFile("video", ".avi").getParentFile();
+		CustomEventFiringWebDriver.startVideoCapture(DriverMode.GRID, gridConnector, videoFolder, "video.avi");
+
+		verify(videoRecorder, never()).start();
+		verify(gridConnector).startVideoCapture();
+	}
+	
+	/**
+	 * stop video capture to desktop in local mode
+	 * @throws IOException 
+	 */
+	@Test(groups = {"ut"})
+	public void testStopVideoCaptureToDesktop() throws IOException {
+		CustomEventFiringWebDriver.stopVideoCapture(DriverMode.LOCAL, gridConnector, videoRecorder);
+		
+		verify(videoRecorder).stop();
+		verify(gridConnector, never()).stopVideoCapture(anyString());
+	}
+	
+	/**
+	 * stop video capture whereas it has not been started, ScenarioException should be raised
+	 * @throws Exception 
+	 */
+	@Test(groups = {"ut"}, expectedExceptions=ScenarioException.class)
+	public void testStopVideoCaptureIfNotStarted() throws Exception {
+		CustomEventFiringWebDriver.stopVideoCapture(DriverMode.LOCAL, gridConnector, null);
+	}
+
+	/**
+	 * stop video capture with device providers: this is not supported, so exception should be raised
+	 * @throws Exception 
+	 */
+	@Test(groups = {"ut"}, expectedExceptions=ScenarioException.class)
+	public void testStopVideoCaptureWithDeviceProviders() throws Exception {
+		CustomEventFiringWebDriver.stopVideoCapture(DriverMode.SAUCELABS, gridConnector, videoRecorder);
+	}
+	
+	/**
+	 * stop video capture to desktop in grid mode
+	 * @throws IOException 
+	 */
+	@Test(groups = {"ut"})
+	public void testStopVideoCaptureToDesktopWithGrid() throws IOException {
+
+		File videoFile = File.createTempFile("video", ".avi");
+		when(videoRecorder.getFolderPath()).thenReturn(videoFile.getParentFile());
+		when(videoRecorder.getFileName()).thenReturn(videoFile.getName());
+		CustomEventFiringWebDriver.stopVideoCapture(DriverMode.GRID, gridConnector, videoRecorder);
+		
+		verify(videoRecorder, never()).start();
+		verify(gridConnector).stopVideoCapture(anyString());
+	}
 }
