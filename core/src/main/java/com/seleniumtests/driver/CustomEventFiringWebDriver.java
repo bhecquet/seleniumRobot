@@ -21,6 +21,7 @@ package com.seleniumtests.driver;
 import java.awt.AWTException;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
+import java.awt.HeadlessException;
 import java.awt.Rectangle;
 import java.awt.Robot;
 import java.awt.Toolkit;
@@ -628,9 +629,13 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
 	 */
 	public static VideoRecorder startVideoCapture(DriverMode driverMode, SeleniumGridConnector gridConnector, File videoFolder, String videoName) {
 		if (driverMode == DriverMode.LOCAL) {
-			VideoRecorder recorder = new VideoRecorder(videoFolder, videoName);
-			recorder.start();
-			return recorder;
+			try {
+				VideoRecorder recorder = new VideoRecorder(videoFolder, videoName);
+				recorder.start();
+				return recorder;
+			} catch (HeadlessException e) {
+				throw new ScenarioException("could not initialize video capture with headless robot: " + e.getMessage());
+			}
 			
 		} else if (driverMode == DriverMode.GRID && gridConnector != null) {
 			gridConnector.startVideoCapture();
