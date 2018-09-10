@@ -22,7 +22,6 @@ import java.awt.AWTException;
 
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.UnhandledAlertException;
-import org.testng.ITestContext;
 import org.testng.annotations.Test;
 
 import com.seleniumtests.driver.BrowserType;
@@ -188,7 +187,7 @@ public class TestDriverInternetExplorer extends TestDriver {
 	public void testUploadFile() throws AWTException, InterruptedException {
 		try {
 			super.testUploadFile();
-		} catch (TimeoutException e) {
+		} catch (Throwable e) {
 			logger.warn("test upload failed and retried due to session timeout exception");
 			try {
 				stop();
