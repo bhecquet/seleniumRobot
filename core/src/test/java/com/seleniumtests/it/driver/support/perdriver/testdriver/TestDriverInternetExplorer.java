@@ -19,12 +19,16 @@
 package com.seleniumtests.it.driver.support.perdriver.testdriver;
 
 import java.awt.AWTException;
+import java.awt.event.KeyEvent;
+import java.util.Arrays;
 
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.UnhandledAlertException;
 import org.testng.annotations.Test;
 
 import com.seleniumtests.driver.BrowserType;
+import com.seleniumtests.driver.CustomEventFiringWebDriver;
+import com.seleniumtests.driver.DriverMode;
 import com.seleniumtests.it.driver.TestDriver;
 
 public class TestDriverInternetExplorer extends TestDriver {
@@ -189,12 +193,13 @@ public class TestDriverInternetExplorer extends TestDriver {
 			super.testUploadFile();
 		} catch (Throwable e) {
 			logger.warn("test upload failed and retried due to session timeout exception");
-			try {
-				stop();
-				exposeTestPage(testNGCtx);
-			} catch (Exception e1) {
-				throw e;
-			}
+			CustomEventFiringWebDriver.sendKeysToDesktop(Arrays.asList(KeyEvent.VK_ESCAPE), DriverMode.LOCAL, null);
+//			try {
+//				stop();
+//				exposeTestPage(testNGCtx);
+//			} catch (Exception e1) {
+//				throw e;
+//			}
 			super.testUploadFile();
 		}
 		
