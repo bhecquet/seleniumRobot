@@ -138,7 +138,7 @@ public class TestWebUiDriver extends ReporterTest {
 			
 			// 7 steps in HTML 
 			// 'getPageUrl' step should be called before driver is created but creating PictureElement starts driver
-			Assert.assertEquals(pages.length(), 7);
+			Assert.assertEquals(pages.length(), 7, "content is: " + json.toString());
 			Assert.assertEquals(pages.getJSONObject(0).getString("id").trim(), "testDriver");
 			Assert.assertEquals(pages.getJSONObject(1).getString("id").trim(), "getPageUrl");
 			Assert.assertTrue(pages.getJSONObject(2).getString("id").startsWith("openPage with args"));
