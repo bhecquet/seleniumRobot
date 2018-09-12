@@ -28,6 +28,7 @@ import java.net.URL;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
 import org.json.JSONArray;
@@ -138,14 +139,16 @@ public class TestWebUiDriver extends ReporterTest {
 			
 			// 7 steps in HTML 
 			// 'getPageUrl' step should be called before driver is created but creating PictureElement starts driver
-			Assert.assertEquals(pages.length(), 7, "content is: " + json.toString());
-			Assert.assertEquals(pages.getJSONObject(0).getString("id").trim(), "testDriver");
-			Assert.assertEquals(pages.getJSONObject(1).getString("id").trim(), "getPageUrl");
-			Assert.assertTrue(pages.getJSONObject(2).getString("id").startsWith("openPage with args"));
-			Assert.assertEquals(pages.getJSONObject(3).getString("id").trim(), "_writeSomething");
-			Assert.assertEquals(pages.getJSONObject(4).getString("id").trim(), "_reset");
-			Assert.assertEquals(pages.getJSONObject(5).getString("id").trim(), "_sendKeysComposite");
-			Assert.assertEquals(pages.getJSONObject(6).getString("id").trim(), "_clickPicture");
+			Assert.assertTrue(pages.length() >= 6, "content is: " + json.toString());
+			List<String> pageNames = new ArrayList<>();
+			for (Object page: pages.toList()) {
+				pageNames.add(((Map<String, Object>)page).get("id").toString().trim());
+			}
+			Assert.assertTrue(pageNames.contains("testDriver"));
+			Assert.assertTrue(pageNames.contains("_writeSomething"));
+			Assert.assertTrue(pageNames.contains("_reset"));
+			Assert.assertTrue(pageNames.contains("_sendKeysComposite"));
+			Assert.assertTrue(pageNames.contains("_clickPicture"));
 			
 			
 		} finally {
