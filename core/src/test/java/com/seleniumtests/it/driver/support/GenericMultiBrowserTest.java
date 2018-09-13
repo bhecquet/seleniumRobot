@@ -89,6 +89,7 @@ public abstract class GenericMultiBrowserTest {
 		mapping.put("/tu/ffLogo1.png", "/ffLogo1.png");
 		mapping.put("/tu/ffLogo2.png", "/ffLogo2.png");
 		mapping.put("/tu/googleSearch.png", "/googleSearch.png");
+		mapping.put("/tu/images/bouton_enregistrer.png", "/images/bouton_enregistrer.png");
 		mapping.put("/tu/jquery.min.js", "/jquery.min.js");
 		
 		// angular app
