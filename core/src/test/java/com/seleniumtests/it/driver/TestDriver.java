@@ -364,12 +364,12 @@ public class TestDriver extends GenericMultiBrowserTest {
 	 */
 	@Test(groups= {"it", "ut"})
 	public void testUploadFileWithRobot() throws AWTException, InterruptedException {
-		String path = SeleniumTestsContextManager.getConfigPath() + File.separator + "config.ini";
+		String path = SeleniumTestsContextManager.getConfigPath() + File.separator + "envSpecific.ini";
 //		DriverTestPage.upload.click();
 		DriverTestPage.upload.clickAction(); // due to restrictions clicking a <input type="file"> element with firefox, use clickAction instead
 		testPage.uploadFile(path);
 		
-		Assert.assertEquals(DriverTestPage.uploadedFile.getAttribute("value"), "config.ini");
+		Assert.assertEquals(DriverTestPage.uploadedFile.getAttribute("value"), "envSpecific.ini");
 	}
 	
 	/**
@@ -379,12 +379,12 @@ public class TestDriver extends GenericMultiBrowserTest {
 	 */
 	@Test(groups= {"it", "ut"})
 	public void testUploadFileWithRobotKeyboard() throws AWTException, InterruptedException {
-		String path = SeleniumTestsContextManager.getConfigPath() + File.separator + "config.ini";
+		String path = SeleniumTestsContextManager.getConfigPath() + File.separator + "objectMapping.ini";
 //		DriverTestPage.upload.click();
 		DriverTestPage.upload.clickAction(); // due to restrictions clicking a <input type="file"> element with firefox, use clickAction instead
 		CustomEventFiringWebDriver.uploadFileUsingKeyboardTyping(new File(path));
 		
-		Assert.assertEquals(DriverTestPage.uploadedFile.getAttribute("value"), "config.ini");
+		Assert.assertEquals(DriverTestPage.uploadedFile.getAttribute("value"), "objectMapping.ini");
 	}
 	
 	/**
