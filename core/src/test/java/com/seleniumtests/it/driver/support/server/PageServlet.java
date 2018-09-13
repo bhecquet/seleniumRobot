@@ -50,6 +50,9 @@ public class PageServlet extends HttpServlet {
      */
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		try {
+			if (this.resourceFile.endsWith(".css")) {
+				resp.addHeader("Content-Type", "text/css ");
+			}
 			IOUtils.copy(getClass().getResourceAsStream(this.resourceFile), resp.getOutputStream());
 		} catch (IOException e) {
         	resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Error while handling request: " + e.getMessage());
