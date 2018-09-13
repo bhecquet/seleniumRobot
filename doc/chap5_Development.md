@@ -4,7 +4,7 @@ Import this project into eclipse.
 
 In case eclipse does not weave aspects (.aj files do not have the 'A' icon), check in build path parameters that **/*.aj files are included to "sources on build path)
 
-#### Install requirements for angular test applicatio ####
+#### Install requirements for angular test application ####
 
 Integration tests embed an angular test application (version 5) for testing interactions with angular-material [https://material.angular.io/](https://material.angular.io/)
 To modify this application, do the following
