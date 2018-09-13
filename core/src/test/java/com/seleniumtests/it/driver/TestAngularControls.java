@@ -32,7 +32,11 @@ import com.seleniumtests.it.driver.support.pages.DriverSubAngularTestPage;
 public class TestAngularControls extends GenericMultiBrowserTest {
 
 	public TestAngularControls() throws Exception {
-		super(BrowserType.CHROME, "DriverSubAngularTestPage"); 
+		super(null, "DriverSubAngularTestPage"); 
+	}
+	
+	public TestAngularControls(BrowserType browserType) throws Exception {
+		super(browserType, "DriverSubAngularTestPage"); 
 	}
 	
 	@BeforeMethod(groups= {"it"})
