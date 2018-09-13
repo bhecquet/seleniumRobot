@@ -40,8 +40,8 @@ public class IECapabilitiesFactory extends IDesktopCapabilityFactory {
         options.setCapability(InternetExplorerDriver.IE_ENSURE_CLEAN_SESSION, true);
         options.setCapability(InternetExplorerDriver.INITIAL_BROWSER_URL, "about:blank");
         options.setCapability(InternetExplorerDriver.IGNORE_ZOOM_SETTING, true);
-        options.setCapability(InternetExplorerDriver.REQUIRE_WINDOW_FOCUS, true);
-        options.setCapability(InternetExplorerDriver.NATIVE_EVENTS, true);
+//        options.setCapability(InternetExplorerDriver.REQUIRE_WINDOW_FOCUS, true);
+//        options.setCapability(InternetExplorerDriver.NATIVE_EVENTS, true);
         
         if (webDriverConfig.getTestContext().isDevMode()) {
         	options.setCapability(InternetExplorerDriver.LOG_LEVEL, "TRACE");
