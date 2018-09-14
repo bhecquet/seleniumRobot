@@ -46,7 +46,9 @@ public class TestAngularControls extends GenericMultiBrowserTest {
 	
 	@AfterMethod(groups={"it"}, alwaysRun=true)
 	public void reset() {
-		driver.navigate().refresh();
+		if (driver != null) {
+			driver.navigate().refresh();
+		}
 	}
    
 
