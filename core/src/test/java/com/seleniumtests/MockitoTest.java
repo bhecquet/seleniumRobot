@@ -19,6 +19,9 @@
 package com.seleniumtests;
 
 import java.lang.reflect.Method;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.mockito.MockitoAnnotations;
 import org.powermock.modules.testng.PowerMockTestCase;
@@ -43,11 +46,13 @@ import com.seleniumtests.reporter.logger.TestLogging;
 public class MockitoTest  extends PowerMockTestCase {
 
 	protected static final String SERVER_URL = "http://localhost:4321";
+	private static Map<Method, Boolean> beforeMethodDone = Collections.synchronizedMap(new HashMap<>());
 
 	@BeforeMethod(groups={"ut", "it"})  
 	public void beforeMethod(final Method method, final ITestContext testNGCtx, final ITestResult testResult) throws Exception {
 		doBeforeMethod(method);
 		beforePowerMockTestMethod();
+		beforeMethodDone.put(method, true);
 		initThreadContext(testNGCtx, null, testResult);
 		MockitoAnnotations.initMocks(this); 
 	}
@@ -78,8 +83,10 @@ public class MockitoTest  extends PowerMockTestCase {
 	}
 	
 	@AfterMethod(groups={"ut", "it"}, alwaysRun=true)
-	public void afterMethod() throws Exception {
-		afterPowerMockTestMethod();
+	public void afterMethod(final Method method) throws Exception {
+		if (beforeMethodDone.getOrDefault(method, false) == true) {
+			afterPowerMockTestMethod();
+		}
 
 		TestLogging.reset();
 	}
