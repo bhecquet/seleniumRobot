@@ -16,6 +16,11 @@ public class TestAngularControlsEdge extends TestAngularControls {
 	public void testSelectByText() {
 		super.testSelectByText();
 	}
+
+	@Test(groups={"it"})
+	public void testSelectByTextAtBottomOfList() {
+		super.testSelectByTextAtBottomOfList();
+	}
 	
 	@Test(groups={"it"})
 	public void testSelectByIndex() {
@@ -185,5 +190,10 @@ public class TestAngularControlsEdge extends TestAngularControls {
 	@Test(groups= {"it"})
 	public void testRadio() {
 		super.testRadio();
+	}
+
+	@Test(groups= {"it"})
+	public void testTextField() {
+		super.testTextField();
 	}
 }
