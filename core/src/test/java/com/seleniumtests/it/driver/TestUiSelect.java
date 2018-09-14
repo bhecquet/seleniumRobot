@@ -59,7 +59,9 @@ public class TestUiSelect extends GenericTest {
 	@AfterMethod(groups={"it", "ut"}, alwaysRun=true)
 	public void cleanAlert() {
 		try {
-			driver.switchTo().alert().accept();
+			if (driver != null) {
+				driver.switchTo().alert().accept();
+			}
 		} catch (WebDriverException e) {
 			
 		}

@@ -1,15 +1,22 @@
 package com.seleniumtests.it.driver.support.perdriver.testangularcontrols;
 
 import org.openqa.selenium.NoSuchElementException;
+import org.testng.SkipException;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.it.driver.TestAngularControls;
 
 public class TestAngularControlsHtmlUnit extends TestAngularControls {
 
 	public TestAngularControlsHtmlUnit() throws Exception {
-		super(BrowserType.HTMLUNIT);
+		
+//		super(BrowserType.HTMLUNIT);
+	}
+	
+	@BeforeClass(groups={"it"})
+	public void init() {
+		throw new SkipException("HTMLUnit cannot load angular page due to: https://sourceforge.net/p/htmlunit/bugs/1897/");
 	}
 
 	@Test(groups={"it"})
