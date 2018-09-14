@@ -77,14 +77,14 @@ public class MockitoTest  extends PowerMockTestCase {
 		beforePowerMockTestClass();
 	}
 	
-	@AfterMethod(groups={"ut", "it"})
+	@AfterMethod(groups={"ut", "it"}, alwaysRun=true)
 	public void afterMethod() throws Exception {
 		afterPowerMockTestMethod();
 
 		TestLogging.reset();
 	}
 	
-	@AfterClass(groups={"ut", "it"})
+	@AfterClass(groups={"ut", "it"}, alwaysRun=true)
 	public void afterClass() throws Exception {
 		afterPowerMockTestClass();
 	}

@@ -162,12 +162,12 @@ public abstract class GenericMultiBrowserTest {
 	}
 	
 
-	@AfterClass(groups={"it", "ut"})
+	@AfterClass(groups={"it", "ut"}, alwaysRun=true)
 	public void stop() throws Exception {
 		if (server != null) {
 			server.stop();
 		}
-		if (driver != null) {
+		if (WebUIDriver.getWebDriver(false) != null) {
 			WebUIDriver.cleanUp();
 			WebUIDriver.cleanUpWebUIDriver();
 		}

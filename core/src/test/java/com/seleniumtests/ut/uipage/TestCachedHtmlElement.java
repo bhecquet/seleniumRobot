@@ -44,7 +44,7 @@ public class TestCachedHtmlElement extends GenericTest {
 		new DriverTestPage(true); // start displaying page
 	}
 	
-	@AfterClass(groups={"ut"})
+	@AfterClass(groups={"ut"}, alwaysRun=true)
 	public void closeBrowser() {
 		WebUIDriver.cleanUp();
 		WebUIDriver.cleanUpWebUIDriver();

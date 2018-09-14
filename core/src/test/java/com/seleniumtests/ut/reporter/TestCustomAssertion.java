@@ -87,7 +87,7 @@ public class TestCustomAssertion extends GenericTest {
 		}
 	}
 	
-	@AfterClass(groups={"ut"})
+	@AfterClass(groups={"ut"}, alwaysRun=true)
 	public void clean() {
 		SeleniumTestsContextManager.getThreadContext().setSoftAssertEnabled(false);
 	}

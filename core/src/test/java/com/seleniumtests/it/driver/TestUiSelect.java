@@ -56,7 +56,7 @@ public class TestUiSelect extends GenericTest {
 		SeleniumTestsContextManager.getThreadContext().setBrowser("chrome");
 	}
 	
-	@AfterMethod(groups={"it", "ut"})
+	@AfterMethod(groups={"it", "ut"}, alwaysRun=true)
 	public void cleanAlert() {
 		try {
 			driver.switchTo().alert().accept();

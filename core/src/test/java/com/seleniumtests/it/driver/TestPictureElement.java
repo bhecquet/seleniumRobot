@@ -45,7 +45,7 @@ public class TestPictureElement extends GenericMultiBrowserTest {
 		super(null, "DriverTestPageWithoutFixedPattern");
 	}
 	
-	@AfterMethod(groups={"it"})
+	@AfterMethod(groups={"it"}, alwaysRun=true)
 	public void reset() {
 		if (driver != null) {
 			DriverTestPageWithoutFixedPattern.logoText.clear();

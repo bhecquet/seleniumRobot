@@ -45,7 +45,7 @@ public class TestScreenZone extends GenericMultiBrowserTest {
 		super(BrowserType.CHROME, "DriverTestPageWithoutFixedPattern");  
 	}
 
-	@AfterMethod(groups={"it"})
+	@AfterMethod(groups={"it"}, alwaysRun=true)
 	public void reset() {
 		if (driver != null) {
 			DriverTestPageWithoutFixedPattern.logoText.clear();

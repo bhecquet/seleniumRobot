@@ -64,9 +64,9 @@ public class GenericDriverTest {
 	/**
 	 * destroys the driver if one has been created
 	 */
-	@AfterMethod(groups={"ut", "it"})
+	@AfterMethod(groups={"ut", "it"}, alwaysRun=true)
 	public void destroyDriver() {
-		if (driver != null) {
+		if (WebUIDriver.getWebDriver(false) != null) {
 			WebUIDriver.cleanUp();
 			WebUIDriver.cleanUpWebUIDriver();
 		}
