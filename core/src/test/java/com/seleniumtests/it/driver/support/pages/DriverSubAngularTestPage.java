@@ -22,10 +22,12 @@ import org.openqa.selenium.By;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.driver.BrowserType;
+import com.seleniumtests.uipage.ByC;
 import com.seleniumtests.uipage.PageObject;
 import com.seleniumtests.uipage.htmlelements.CheckBoxElement;
 import com.seleniumtests.uipage.htmlelements.RadioButtonElement;
 import com.seleniumtests.uipage.htmlelements.SelectList;
+import com.seleniumtests.uipage.htmlelements.TextFieldElement;
 
 public class DriverSubAngularTestPage extends PageObject {
 
@@ -34,6 +36,8 @@ public class DriverSubAngularTestPage extends PageObject {
 	public static final CheckBoxElement checkbox = new CheckBoxElement("checkbox", By.id("angularCheckbox"));
 	public static final CheckBoxElement checkboxInput = new CheckBoxElement("checkbox", By.id("angularCheckbox-input"));
 	public static final RadioButtonElement radio = new RadioButtonElement("radio", By.id("angularRadio1"));
+	public static final TextFieldElement textField = new TextFieldElement("text", By.id("angularTextField"));
+	public static final TextFieldElement textFieldAutocomplete = new TextFieldElement("text", ByC.attribute("aria-autocomplete", "list"));
 
 	
 	public DriverSubAngularTestPage() throws Exception {

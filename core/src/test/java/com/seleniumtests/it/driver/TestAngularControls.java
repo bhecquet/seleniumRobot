@@ -44,7 +44,7 @@ public class TestAngularControls extends GenericMultiBrowserTest {
 		SeleniumTestsContextManager.getThreadContext().setReplayTimeout(1);
 	}
 	
-	@AfterMethod(groups={"it"})
+	@AfterMethod(groups={"it"}, alwaysRun=true)
 	public void reset() {
 		driver.navigate().refresh();
 	}
@@ -54,6 +54,12 @@ public class TestAngularControls extends GenericMultiBrowserTest {
 	public void testSelectByText() {
 		DriverSubAngularTestPage.selectList.selectByText("Option 1");
 		Assert.assertEquals(DriverSubAngularTestPage.selectList.getSelectedText(), "Option 1");
+	}
+	
+	@Test(groups={"it"})
+	public void testSelectByTextAtBottomOfList() {
+		DriverSubAngularTestPage.selectList.selectByText("Option 9");
+		Assert.assertEquals(DriverSubAngularTestPage.selectList.getSelectedText(), "Option 9");
 	}
 	
 	@Test(groups={"it"})
@@ -289,6 +295,12 @@ public class TestAngularControls extends GenericMultiBrowserTest {
 	public void testRadio() {
 		DriverSubAngularTestPage.radio.check();
 		Assert.assertTrue(DriverSubAngularTestPage.radio.isSelected());
+	}
+	
+	@Test(groups= {"it"})
+	public void testTextField() {
+		DriverSubAngularTestPage.textField.sendKeys("my text");
+		Assert.assertEquals(DriverSubAngularTestPage.textField.getText(), "my text");
 	}
 	
 }

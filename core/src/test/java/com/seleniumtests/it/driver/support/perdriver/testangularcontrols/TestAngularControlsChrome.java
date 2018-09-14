@@ -1,10 +1,12 @@
 package com.seleniumtests.it.driver.support.perdriver.testangularcontrols;
 
 import org.openqa.selenium.NoSuchElementException;
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.it.driver.TestAngularControls;
+import com.seleniumtests.it.driver.support.pages.DriverSubAngularTestPage;
 
 public class TestAngularControlsChrome extends TestAngularControls {
 
@@ -15,6 +17,11 @@ public class TestAngularControlsChrome extends TestAngularControls {
 	@Test(groups={"it"})
 	public void testSelectByText() {
 		super.testSelectByText();
+	}
+
+	@Test(groups={"it"})
+	public void testSelectByTextAtBottomOfList() {
+		super.testSelectByTextAtBottomOfList();
 	}
 	
 	@Test(groups={"it"})
@@ -185,5 +192,10 @@ public class TestAngularControlsChrome extends TestAngularControls {
 	@Test(groups= {"it"})
 	public void testRadio() {
 		super.testRadio();
+	}
+
+	@Test(groups= {"it"})
+	public void testTextField() {
+		super.testTextField();
 	}
 }
