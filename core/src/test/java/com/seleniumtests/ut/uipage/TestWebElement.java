@@ -99,7 +99,7 @@ public class TestWebElement extends MockitoTest {
 		SeleniumTestsContextManager.getThreadContext().setTestType(TestType.WEB);
 	}
 	
-	@AfterMethod(groups={"ut"})
+	@AfterMethod(groups={"ut"}, alwaysRun=true)
 	public void reset() {
 		
 		// call testPage switchTo().defaultContent() so that it can be intercepted and seleniumRobot internal state can be reset

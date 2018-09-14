@@ -46,7 +46,7 @@ public class TestInterceptePage extends GenericTest {
 		testPage = new DriverTestPage(true);
 	}
 	
-	@AfterClass(groups={"it"})
+	@AfterClass(groups={"it"}, alwaysRun=true)
 	public void closeBrowser() {
 		WebUIDriver.cleanUp();
 		WebUIDriver.cleanUpWebUIDriver();

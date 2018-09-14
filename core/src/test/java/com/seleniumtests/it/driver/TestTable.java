@@ -42,7 +42,7 @@ public class TestTable extends GenericTest {
 	}
 		
 
-	@AfterClass(groups={"it"})
+	@AfterClass(groups={"it"}, alwaysRun=true)
 	public void closeBrowser() {
 		WebUIDriver.cleanUp();
 		WebUIDriver.cleanUpWebUIDriver();

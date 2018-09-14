@@ -157,7 +157,7 @@ public class TestScreenZone extends MockitoTest {
 	}
 
 	
-	@AfterMethod(groups={"ut"})
+	@AfterMethod(groups={"ut"}, alwaysRun=true)
 	public void reset(ITestContext testNGCtx) {
 		initThreadContext(testNGCtx);
 	}

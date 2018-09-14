@@ -74,12 +74,12 @@ public class GenericTest {
 		SeleniumTestsContext.resetOutputFolderNames();
 	}
 	
-	@AfterMethod(groups={"ut", "it"}) 
+	@AfterMethod(groups={"ut", "it"}, alwaysRun=true) 
 	public void reset() {
 		TestLogging.reset();
 	}
 	
-	@AfterClass(groups={"ut", "it"})
+	@AfterClass(groups={"ut", "it"}, alwaysRun=true)
 	public void closeBrowser() {
 		WebUIDriver.cleanUp();
 		WebUIDriver.cleanUpWebUIDriver();
