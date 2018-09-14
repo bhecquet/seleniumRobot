@@ -300,7 +300,7 @@ public class TestAngularControls extends GenericMultiBrowserTest {
 	@Test(groups= {"it"})
 	public void testTextField() {
 		DriverSubAngularTestPage.textField.sendKeys("my text");
-		Assert.assertEquals(DriverSubAngularTestPage.textField.getText(), "my text");
+		Assert.assertEquals(DriverSubAngularTestPage.textField.getValue(), "my text");
 	}
 	
 }
