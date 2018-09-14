@@ -25,6 +25,7 @@ import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.uipage.ByC;
 import com.seleniumtests.uipage.PageObject;
 import com.seleniumtests.uipage.htmlelements.CheckBoxElement;
+import com.seleniumtests.uipage.htmlelements.DatePickerElement;
 import com.seleniumtests.uipage.htmlelements.RadioButtonElement;
 import com.seleniumtests.uipage.htmlelements.SelectList;
 import com.seleniumtests.uipage.htmlelements.TextFieldElement;
@@ -38,6 +39,7 @@ public class DriverSubAngularTestPage extends PageObject {
 	public static final RadioButtonElement radio = new RadioButtonElement("radio", By.id("angularRadio1"));
 	public static final TextFieldElement textField = new TextFieldElement("text", By.id("angularTextField"));
 	public static final TextFieldElement textFieldAutocomplete = new TextFieldElement("text", ByC.attribute("aria-autocomplete", "list"));
+	public static final DatePickerElement textFieldDate = new DatePickerElement("date", By.id("mat-input-3"));
 
 	
 	public DriverSubAngularTestPage() throws Exception {

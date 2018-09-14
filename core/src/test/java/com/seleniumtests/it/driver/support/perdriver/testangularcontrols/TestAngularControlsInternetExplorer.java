@@ -196,4 +196,14 @@ public class TestAngularControlsInternetExplorer extends TestAngularControls {
 	public void testTextField() {
 		super.testTextField();
 	}
+
+	@Test(groups= {"it"})
+	public void testClearDatePicker() {
+		super.testClearDatePicker();
+	}
+
+	@Test(groups= {"it"})
+	public void testSendKeysDatePicker() {
+		super.testSendKeysDatePicker();
+	}
 }

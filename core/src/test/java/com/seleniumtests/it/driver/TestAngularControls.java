@@ -18,6 +18,9 @@
  */
 package com.seleniumtests.it.driver;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+
 import org.openqa.selenium.NoSuchElementException;
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
@@ -303,6 +306,24 @@ public class TestAngularControls extends GenericMultiBrowserTest {
 	public void testTextField() {
 		DriverSubAngularTestPage.textField.sendKeys("my text");
 		Assert.assertEquals(DriverSubAngularTestPage.textField.getValue(), "my text");
+	}
+	
+	/**
+	 * Clear a pre-filled date field
+	 */
+	@Test(groups= {"it"})
+	public void testClearDatePicker() {
+		DriverSubAngularTestPage.textFieldDate.clear();
+		Assert.assertEquals(DriverSubAngularTestPage.textFieldDate.getValue(), "");
+	}
+	
+	/**
+	 * Send keys to a pre-filled date field
+	 */
+	@Test(groups= {"it"})
+	public void testSendKeysDatePicker() {
+		DriverSubAngularTestPage.textFieldDate.sendKeys("1/1/2000");
+		Assert.assertEquals(DriverSubAngularTestPage.textFieldDate.getValue(), "1/1/2000");
 	}
 	
 }

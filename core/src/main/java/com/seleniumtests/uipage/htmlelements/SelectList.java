@@ -54,6 +54,14 @@ public class SelectList extends HtmlElement {
 	private SimilarityStrategy strategy = new JaroWinklerStrategy();
 	private StringSimilarityService service = new StringSimilarityServiceImpl(strategy);
 
+	/**
+	 * Creates a SelectList element which represents either
+	 * - a standard HTML element => locator should point to the "select" element itself
+	 * - a select list built with HTML lists (ul / li) => locator should point to <ul> element
+	 * - an angular materials select => locator should point to the <mat-select> element
+	 * @param text
+	 * @param by
+	 */
     public SelectList(final String text, final By by) {
         super(text, by);
     }

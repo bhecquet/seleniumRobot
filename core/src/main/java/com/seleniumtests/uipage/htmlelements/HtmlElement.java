@@ -91,7 +91,30 @@ public class HtmlElement extends Element implements WebElement, Locatable, HasId
 
     protected static final Logger logger = SeleniumRobotLogger.getLogger(HtmlElement.class);
     public static final Integer FIRST_VISIBLE = Integer.MAX_VALUE;
+    
+    String JS_CLICK_TRIPLE = 
+    		  "var target = arguments[0];" +
+    		  "emit('mousedown', {buttons: 1}); " +
+    		  "emit('mouseup',   {});" +
+    		  "emit('mousedown', {buttons: 1}); " +
+    		  "emit('mouseup',   {});" +
+    		  "emit('mousedown', {buttons: 1}); " +
+    		  "emit('mouseup',   {});" +
+    		  "emit('click',     {detail: 3});  " +
+    		  "" +
+    		  "function emit(name, init) {" +
+    		    "target.dispatchEvent(new MouseEvent(name, init));" +
+    		  "}" ;
 
+    String JS_CLICK_DOUBLE = 
+    		"if(document.createEvent){"
+    		+ "		var evObj = document.createEvent('MouseEvents');"
+    		+ "		evObj.initEvent('dblclick', true, false); "
+    		+ "		arguments[0].dispatchEvent(evObj);"
+    		+ "} else if(document.createEventObject) { "
+    		+ "		arguments[0].fireEvent('ondblclick');"
+    		+ "}";
+    
     protected WebDriver driver;
     protected WebElement element = null;
     protected String label = null;
@@ -131,10 +154,7 @@ public class HtmlElement extends Element implements WebElement, Locatable, HasId
      * @sample  {@code new HtmlElement("UserId", By.id(userid), 2)}
      */
     public HtmlElement(final String label, final By by, final Integer index) {
-        this.label = label;
-        this.by = by;
-        this.elementIndex = index;
-        this.frameElement = null;
+    	this(label, by, null, index);
     }
     
     public HtmlElement(final String label, final By by, final FrameElement frame) {
@@ -254,8 +274,7 @@ public class HtmlElement extends Element implements WebElement, Locatable, HasId
         findElement(true);
         
         JavascriptExecutor js = (JavascriptExecutor) driver;
-        String script = "if(document.createEvent){var evObj = document.createEvent('MouseEvents');evObj.initEvent('dblclick', true, false); arguments[0].dispatchEvent(evObj);} else if(document.createEventObject) { arguments[0].fireEvent('ondblclick');}";
-        js.executeScript(script, element);
+        js.executeScript(JS_CLICK_DOUBLE, element);
 
     }
     
