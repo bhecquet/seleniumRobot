@@ -32,6 +32,12 @@ Build creates a file named seleniumBot-core.zip.
 SeleniumRobot contains Unit tests, executed through the maven "test" phase. They tend to be quick and do not use any browser. They are configured using the `data/core/testng/tu.xml` file.
 
 Integration tests are executed in the maven "verify" phase. They are configured using the `data/core/testng/ti.xml` file. These tests can start browser to check specific features.
+The integration tests can be customized with several maven-failsafe-plugin option plus seleniumRobot specific options
+
+- do execute only integration tests: use `-DskipUTs=true`
+- execute specific integration tests: use `-Dit.test=<test lists>`. Refer to failsafe plugin documentation for details
+- debug maven integration tests: use `-Dmaven.failsafe.debug=true`. Refer to failsafe plugin documentation for details
+- display / do not display driver logs (they can be quite big). This corresponds to the devMode option of seleniumRobot: `-DseleniumRobot.devMode=false` or `-DseleniumRobot.devMode=true`
 
 ### 4 Deploy ###
 Unzip this file to any folder.

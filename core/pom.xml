@@ -14,6 +14,7 @@
 	    <skipTests>false</skipTests>
 	    <skipITs>${skipTests}</skipITs>
 	    <skipUTs>${skipTests}</skipUTs>
+	    <seleniumRobot.devMode>false</seleniumRobot.devMode>
 	</properties>
 
 	<dependencies>
@@ -336,7 +337,7 @@
 									<value>false</value>
 								</property>
 							</properties>
-							<argLine>${failsafeArgLine}</argLine>
+							<argLine>${failsafeArgLine} -DdevMode=${seleniumRobot.devMode}</argLine>
 							<skipTests>${skipTests}</skipTests>
                 			<skipITs>${skipITs}</skipITs>
 						</configuration>
