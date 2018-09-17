@@ -77,7 +77,7 @@ public class SeleniumRobotLogger {
         // use System property instead of SeleniumTestsContext class as SeleniumrobotLogger class is used for grid extension package and 
         // we do not want to depend on "SeleniumTestsContext" class here
 	    Logger rootLogger = Logger.getRootLogger();
-        if (System.getProperty("devMode") != null && "true".equals(System.getProperty("devMode"))) {
+        if (System.getProperty("internalDevMode") != null && "true".equals(System.getProperty("internalDevMode"))) {
         	rootLogger.setLevel(Level.DEBUG);
         } else {
         	rootLogger.setLevel(Level.INFO);
@@ -115,7 +115,7 @@ public class SeleniumRobotLogger {
 			        fileAppender.setFile(outputDir + "/" + SeleniumRobotLogger.LOG_FILE_NAME);
 			        fileAppender.setLayout(new PatternLayout(LOG_PATTERN));
 			        
-			        if (System.getProperty("devMode") != null && "true".equals(System.getProperty("devMode"))) {
+			        if (System.getProperty("internalDevMode") != null && "true".equals(System.getProperty("internalDevMode"))) {
 			        	fileAppender.setThreshold(Level.DEBUG);
 			        } else {
 			        	fileAppender.setThreshold(Level.INFO);

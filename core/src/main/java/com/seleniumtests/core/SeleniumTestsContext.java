@@ -85,6 +85,7 @@ public class SeleniumTestsContext {
     public static final String MASK_PASSWORD = "maskPassword";					// whether seleniumRobot should hide passwords or not
     public static final String MANUAL_TEST_STEPS = "manualTestSteps";			// set test steps manual (default is false) for creating them inside tests
     public static final String DEV_MODE = "devMode";							// The development mode allow all existing browsers to remain. It is set to "false" by default, which means it closes all existing browsers.
+    public static final String INTERNAL_DEV_MODE = "internalDevMode";			// The development mode for internal use to avoid reading the same property for user use and internal use
     public static final String BROWSER = "browser";								// navigateur utilisé. Sur Android, le navigateur par défaut est "Browser"
     public static final String BROWSER_VERSION = "browserVersion";				// version de navigateur utilisé
     public static final String FIREFOX_USER_PROFILE_PATH = "firefoxUserProfilePath";	// profile utilisateur firefox
@@ -1608,14 +1609,19 @@ public class SeleniumTestsContext {
     	}
     }
     
+    /**
+     * Record DEV_MODE
+     * also store an INTERNAL_DEV_MODE System property to be used internally with SeleniumRobotLogger class
+     * @param devMode
+     */
     public void setDevMode(Boolean devMode) {
     	if (devMode != null) {
-    		System.setProperty(DEV_MODE, devMode.toString());
     		setAttribute(DEV_MODE, devMode);
+    		System.setProperty(INTERNAL_DEV_MODE, devMode.toString());
     	} else {
     		// default value depends on who starts test. If start is done through jar execution, deployed mode will be true (devMode set to false)
     		setAttribute(DEV_MODE, false);
-    		System.setProperty(DEV_MODE, "false");
+    		System.setProperty(INTERNAL_DEV_MODE, "false");
     	}
     }
     
