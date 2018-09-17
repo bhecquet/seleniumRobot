@@ -429,16 +429,20 @@ public class TestSeleniumTestContext extends GenericTest {
 	
 	@Test(groups="ut context")
 	public void testDevMode(final ITestContext testNGCtx, final XmlTest xmlTest) {
-		initThreadContext(testNGCtx);
-		SeleniumTestsContextManager.getThreadContext().setDevMode(true);
-		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().isDevMode(), true);
+		try {
+			initThreadContext(testNGCtx);
+			SeleniumTestsContextManager.getThreadContext().setDevMode(true);
+			Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().isDevMode(), true);
+		} finally {
+			SeleniumTestsContextManager.getThreadContext().setDevMode(null);
+		}
 	}
 	// by default, devMode is true if tests are launched from IDE
 	@Test(groups="ut context")
 	public void testDevModeNull(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setDevMode(null);
-		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().isDevMode(), true);
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().isDevMode(), false);
 	}
 	
 	@Test(groups="ut context")
