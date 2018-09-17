@@ -40,9 +40,9 @@ public class TestSeleniumRobotLogger extends MockitoTest {
 
 	public void doBeforeMethod(final Method method) {
 		if ("testLogInDevMode".equals(method.getName())) {
-			System.setProperty("devMode", "true");
+			System.setProperty("internalDevMode", "true");
 		} else {
-			System.setProperty("devMode", "false");
+			System.setProperty("internalDevMode", "false");
 		}
 	}
 	
@@ -72,7 +72,7 @@ public class TestSeleniumRobotLogger extends MockitoTest {
 			Assert.assertTrue(logs.contains("some debug"));
 			
 		} finally {
-			System.clearProperty("devMode");
+			System.clearProperty("internalDevMode");
 			SeleniumRobotLogger.reset();
 		}
 	}
@@ -103,7 +103,7 @@ public class TestSeleniumRobotLogger extends MockitoTest {
 			Assert.assertFalse(logs.contains("some debug"));
 			
 		} finally {
-			System.clearProperty("devMode");
+			System.clearProperty("internalDevMode");
 			SeleniumRobotLogger.reset();
 		}
 	}
