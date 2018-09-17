@@ -422,11 +422,11 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
 		
 			WaitHelper.waitForSeconds(1);
 	
-			// Press Enter
-			robot.keyPress(KeyEvent.VK_ENTER);
-	
-			// Release Enter
-			robot.keyRelease(KeyEvent.VK_ENTER);
+//			// Press Enter
+//			robot.keyPress(KeyEvent.VK_ENTER);
+//	
+//			// Release Enter
+//			robot.keyRelease(KeyEvent.VK_ENTER);
 	
 			// Press CTRL+V
 			robot.keyPress(KeyEvent.VK_CONTROL);
@@ -456,11 +456,11 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
 			
 			WaitHelper.waitForSeconds(1);
 			
-			// Press Enter
-			robot.keyPress(KeyEvent.VK_ENTER);
-	
-			// Release Enter
-			robot.keyRelease(KeyEvent.VK_ENTER);
+//			// Press Enter
+//			robot.keyPress(KeyEvent.VK_ENTER);
+//	
+//			// Release Enter
+//			robot.keyRelease(KeyEvent.VK_ENTER);
 			
 			keyboard.typeKeys(tempFile.getAbsolutePath());
 			

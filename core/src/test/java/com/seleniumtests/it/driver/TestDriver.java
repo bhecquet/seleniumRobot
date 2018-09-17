@@ -383,7 +383,7 @@ public class TestDriver extends GenericMultiBrowserTest {
 //		DriverTestPage.upload.click();
 		DriverTestPage.upload.clickAction(); // due to restrictions clicking a <input type="file"> element with firefox, use clickAction instead
 		CustomEventFiringWebDriver.uploadFileUsingKeyboardTyping(new File(path));
-		
+		WaitHelper.waitForSeconds(1);
 		Assert.assertEquals(DriverTestPage.uploadedFile.getAttribute("value"), "objectMapping.ini");
 	}
 	
