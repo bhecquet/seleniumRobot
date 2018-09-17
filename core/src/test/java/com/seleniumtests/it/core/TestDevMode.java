@@ -97,12 +97,14 @@ public class TestDevMode extends GenericTest {
 			driver = WebUIDriver.getWebDriver(true);
 			new DriverTestPage(true);
 			DriverTestPage.selectList.selectByText("option2");
-			if (driver != null) {
+			
+		} catch (Exception e) {
+			logger.error(e);
+		} finally {
+			if (WebUIDriver.getWebDriver(false) != null) {
 				WebUIDriver.cleanUp();
 				WebUIDriver.cleanUpWebUIDriver();
 			}
-		} catch (Exception e) {
-			logger.error(e);
 		}
 	}
 	
