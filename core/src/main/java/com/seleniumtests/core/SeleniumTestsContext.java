@@ -1614,7 +1614,7 @@ public class SeleniumTestsContext {
     		setAttribute(DEV_MODE, devMode);
     	} else {
     		// default value depends on who starts test. If start is done through jar execution, deployed mode will be true (devMode set to false)
-    		setAttribute(DEV_MODE, !SeleniumTestsContextManager.getDeployedMode());
+    		setAttribute(DEV_MODE, false);
     	}
     }
     
