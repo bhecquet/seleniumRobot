@@ -38,22 +38,16 @@ import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
 public class TestSeleniumRobotLogger extends MockitoTest {
 
-	public void doBeforeMethod(final Method method) {
-		if ("testLogInDevMode".equals(method.getName())) {
-			System.setProperty("internalDevMode", "true");
-		} else {
-			System.setProperty("internalDevMode", "false");
-		}
-	}
 	
 	/**
 	 * Check that in DEV mode, debug logs are displayed
 	 * @throws IOException 
-	 */
+	 */ 
 	@Test(groups= {"ut"})
 	public void testLogInDevMode() throws IOException {
 		try {
 			SeleniumRobotLogger.reset();
+			System.setProperty("internalDevMode", "true");
 			SeleniumRobotLogger.updateLogger(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), SeleniumTestsContextManager.getThreadContext().getDefaultOutputDirectory());
 			
 			Logger logger = spy(SeleniumRobotLogger.getLogger(TestSeleniumRobotLogger.class));
@@ -85,6 +79,7 @@ public class TestSeleniumRobotLogger extends MockitoTest {
 	public void testLogInRunMode() throws IOException {
 		try {
 			SeleniumRobotLogger.reset();
+			System.setProperty("internalDevMode", "false");
 			SeleniumRobotLogger.updateLogger(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), SeleniumTestsContextManager.getThreadContext().getDefaultOutputDirectory());
 			
 			Logger logger = spy(SeleniumRobotLogger.getLogger(TestSeleniumRobotLogger.class));
