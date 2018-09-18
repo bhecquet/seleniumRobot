@@ -199,7 +199,7 @@
 				<version>2.8</version>
 				<executions>
 					<execution>
-						<phase>package</phase>
+						<phase>prepare-package</phase>
 						<goals>
 							<goal>copy-dependencies</goal>
 						</goals>
