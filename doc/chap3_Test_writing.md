@@ -229,6 +229,7 @@ If you search an element by XPath (avoid this if possible), and your xpath shoul
 The available elements are:
 - ButtonElement
 - CheckBoxElement
+- DatePickerElement: to handle angular materials date picker. For now, it only handles the sendKeys / clear methods which may behave differently than in TextFieldElement.
 - FileUploadElement: to handle `<input type="file">` elements
 - FrameElement: to define a frame to be used inside other elements (see: "5 Working with frames" chapter for details)
 - HtmlElement: the parent of all elements defined here
@@ -236,7 +237,7 @@ The available elements are:
 - LinkElement
 - ImageElement: to handle `<img src=...>` elements
 - RadioButtonElement
-- SelectList
+- SelectList: handle `<select>` elements, `<ul>` select styled lists and `<mat-select>` (from angular-materials) select list.
 - Table
 - TextFieldElement
 
