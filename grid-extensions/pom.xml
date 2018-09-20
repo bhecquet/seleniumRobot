@@ -200,6 +200,13 @@
 		        </configuration>
 			</plugin>
 			<plugin>
+		        <artifactId>maven-surefire-plugin</artifactId>
+		        <version>2.12.4</version>
+		        <configuration>
+		        	<failIfNoTests>false</failIfNoTests>
+		        </configuration>
+		      </plugin>
+			<plugin>
 		      <groupId>org.commonjava.maven.plugins</groupId>
 		      <artifactId>directory-maven-plugin</artifactId>
 		      <version>0.1</version>
