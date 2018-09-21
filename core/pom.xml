@@ -381,6 +381,20 @@
                     </execution>
                     <execution>
                         <id>default-restore-instrumented-classes</id>
+ 						<phase>prepare-package</phase>
+                        <goals>
+                            <goal>restore-instrumented-classes</goal>
+                        </goals>
+                    </execution>
+                	<execution>
+                        <id>default-instrument-it</id>
+                        <phase>pre-integration-test</phase>
+                        <goals>
+                            <goal>instrument</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>default-restore-instrumented-classes-it</id>
  						<phase>post-integration-test</phase>
                         <goals>
                             <goal>restore-instrumented-classes</goal>
@@ -391,6 +405,7 @@
                         <goals>
                             <goal>report</goal>
                         </goals>
+                        <phase>package</phase>
                         <configuration>
                         	<excludes>
                         		<exclude>org/openqa/**/*</exclude>
@@ -532,29 +547,6 @@
 				  	</execution>
 				</executions>
 			</plugin>
-			<!-- <plugin>
-			    <groupId>org.apache.maven.plugins</groupId>
-			    <artifactId>maven-install-plugin</artifactId>
-			    <version>2.3.1</version>
-			    <executions>
-			        <execution>
-			            <id>install-oracle-jdbc</id>
-			            <goals>
-			                <goal>install-file</goal>
-			            </goals>
-			            <phase>clean</phase>
-			            <configuration>
-			                <groupId>com.oracle</groupId>
-			                <artifactId>ojdbc6</artifactId>
-			                <version>11.2.0</version>
-			                <packaging>jar</packaging>
-			                <generatePom>true</generatePom>
-			                <createChecksum>true</createChecksum>
-			                <file>${project.basedir}/src/lib/ojdbc6.jar</file>
-			            </configuration>
-			        </execution>
-			    </executions>
-			</plugin>-->
 			<plugin>
 				<artifactId>maven-resources-plugin</artifactId>
 				<version>2.7</version> 
