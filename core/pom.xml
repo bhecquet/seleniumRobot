@@ -334,11 +334,25 @@
 		        <groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-failsafe-plugin</artifactId>
 				<version>2.19.1</version>
+				<configuration>
+					<skipTests>${skipTests}</skipTests>
+                	<skipITs>${skipITs}</skipITs>
+                	<!-- comment for online instrumentation -->
+					<systemPropertyVariables>
+                        <jacoco-agent.destfile>${project.build.directory}/coverage-reports/jacoco-it.exec</jacoco-agent.destfile>
+					</systemPropertyVariables>
+					<argLine>-DdevMode=${seleniumRobot.devMode}</argLine>
+				<!-- /comment -->
+				<!-- uncomment for online instrumentation -->
+					<!-- <argLine>${failsafeArgLine} -DdevMode=${seleniumRobot.devMode}</argLine> -->
+				<!-- /uncomment -->
+				
+				</configuration>
 				<executions>
 					<execution>
+						<id>default</id>
 						<goals>
 							<goal>integration-test</goal>
-							<goal>verify</goal>
 						</goals>
 						<configuration>
 							<suiteXmlFiles>
@@ -350,19 +364,13 @@
 									<value>false</value>
 								</property>
 							</properties>
-						<!-- comment for online instrumentation -->
-							<systemPropertyVariables>
-		                        <jacoco-agent.destfile>${project.build.directory}/coverage-reports/jacoco-it.exec</jacoco-agent.destfile>
-							</systemPropertyVariables>
-							<argLine>-DdevMode=${seleniumRobot.devMode}</argLine>
-						<!-- /comment -->
-						<!-- uncomment for online instrumentation -->
-							<!-- <argLine>${failsafeArgLine} -DdevMode=${seleniumRobot.devMode}</argLine> -->
-						<!-- /uncomment -->
-						
-							<skipTests>${skipTests}</skipTests>
-                			<skipITs>${skipITs}</skipITs>
 						</configuration>
+					</execution>
+					<execution>
+						<id>verify</id>
+						<goals>
+							<goal>verify</goal>
+						</goals>
 					</execution>
 				</executions>
     		</plugin>
@@ -380,20 +388,6 @@
                         </goals>
                     </execution>
                     <execution>
-                        <id>default-restore-instrumented-classes</id>
- 						<phase>prepare-package</phase>
-                        <goals>
-                            <goal>restore-instrumented-classes</goal>
-                        </goals>
-                    </execution>
-                	<execution>
-                        <id>default-instrument-it</id>
-                        <phase>pre-integration-test</phase>
-                        <goals>
-                            <goal>instrument</goal>
-                        </goals>
-                    </execution>
-                    <execution>
                         <id>default-restore-instrumented-classes-it</id>
  						<phase>post-integration-test</phase>
                         <goals>
@@ -405,7 +399,7 @@
                         <goals>
                             <goal>report</goal>
                         </goals>
-                        <phase>package</phase>
+                        <phase>verify</phase>
                         <configuration>
                         	<excludes>
                         		<exclude>org/openqa/**/*</exclude>
@@ -418,6 +412,7 @@
                         <goals>
                             <goal>report-integration</goal>
                         </goals>
+                        <phase>verify</phase>
                         <configuration>
                         	<excludes>
                         		<exclude>org/openqa/**/*</exclude>
