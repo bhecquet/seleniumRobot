@@ -100,6 +100,12 @@ public abstract class IDesktopCapabilityFactory extends ICapabilitiesFactory {
 			} catch (UnsupportedEncodingException e) {
 			}
         }
+
+        // add node tags
+        if (webDriverConfig.getNodeTags().size() > 0 && webDriverConfig.getMode() == DriverMode.GRID) {
+        	options.setCapability(SeleniumRobotCapabilityType.NODE_TAGS, webDriverConfig.getNodeTags());
+        }
+        
         return options;
     }
     

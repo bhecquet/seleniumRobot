@@ -91,6 +91,14 @@ public class DriverConfig {
     public String getChromeDriverPath() {
         return testContext.getChromeDriverPath();
     }
+    
+    public List<String> getNodeTags() {
+    	return testContext.getNodeTags();
+    }
+    
+    public boolean isDevMode() {
+    	return testContext.isDevMode();
+    }
 
     public WebDriver getDriver() {
         return driver;

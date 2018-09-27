@@ -42,7 +42,7 @@ public class PhantomJSCapabilitiesFactory extends IDesktopCapabilityFactory {
 
 	@Override
 	protected BrowserType getBrowserType() {
-		return null;
+		return BrowserType.PHANTOMJS;
 	}
 
 	@Override
