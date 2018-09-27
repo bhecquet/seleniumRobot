@@ -24,6 +24,7 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.DriverConfig;
+import com.seleniumtests.driver.DriverMode;
 
 import io.appium.java_client.remote.MobileCapabilityType;
 
@@ -75,8 +76,14 @@ public abstract class IMobileCapabilityFactory extends ICapabilitiesFactory {
         	capabilities.setCapability(CapabilityType.BROWSER_NAME, "");
         }
         
+        // add node tags
+        if (webDriverConfig.getNodeTags().size() > 0 && webDriverConfig.getMode() == DriverMode.GRID) {
+        	capabilities.setCapability(SeleniumRobotCapabilityType.NODE_TAGS, webDriverConfig.getNodeTags());
+        }
+        
         // add OS specific capabilities
         capabilities.merge(getSystemSpecificCapabilities());
+        
         
         return capabilities;
     }

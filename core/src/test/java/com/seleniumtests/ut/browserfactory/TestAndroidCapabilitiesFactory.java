@@ -18,6 +18,8 @@
  */
 package com.seleniumtests.ut.browserfactory;
 
+import java.util.Arrays;
+
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.remote.CapabilityType;
@@ -26,6 +28,7 @@ import org.testng.annotations.Test;
 
 import com.seleniumtests.GenericTest;
 import com.seleniumtests.browserfactory.AndroidCapabilitiesFactory;
+import com.seleniumtests.browserfactory.SeleniumRobotCapabilityType;
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.driver.BrowserType;
@@ -42,7 +45,7 @@ public class TestAndroidCapabilitiesFactory extends GenericTest {
 	@Test(groups={"ut"})
 	public void testCreateDefaultChromeCapabilities() {
 		SeleniumTestsContext context = new SeleniumTestsContext(SeleniumTestsContextManager.getThreadContext());
-		context.setBrowser(BrowserType.FIREFOX.toString());
+		context.setBrowser(BrowserType.CHROME.toString());
 		context.setMobilePlatformVersion("8.0");
 		context.setPlatform("android");
 		context.setDeviceName("Samsung Galasy S8");
@@ -54,14 +57,61 @@ public class TestAndroidCapabilitiesFactory extends GenericTest {
 		AndroidCapabilitiesFactory capaFactory = new AndroidCapabilitiesFactory(config);
 		MutableCapabilities capa = capaFactory.createCapabilities();
 		
-		Assert.assertEquals(capa.getCapability(CapabilityType.BROWSER_NAME), BrowserType.FIREFOX.toString().toLowerCase());
+		Assert.assertEquals(capa.getCapability(CapabilityType.BROWSER_NAME), BrowserType.CHROME.toString().toLowerCase());
 		Assert.assertEquals(capa.getCapability(MobileCapabilityType.AUTOMATION_NAME), "Appium");
 		Assert.assertEquals(capa.getCapability(MobileCapabilityType.PLATFORM_NAME), "android");
 		Assert.assertEquals(capa.getCapability(MobileCapabilityType.PLATFORM_VERSION), "8.0");
 		Assert.assertEquals(capa.getCapability(MobileCapabilityType.DEVICE_NAME), "Samsung Galasy S8");
+		Assert.assertFalse(capa.is(SeleniumRobotCapabilityType.NODE_TAGS));
 		Assert.assertEquals(capa.getCapability(AndroidMobileCapabilityType.APP_PACKAGE), "com.infotel.mobile"); // from exampleConfigGenericParams.xml when tu.xml is executed, else, null
 		Assert.assertEquals(capa.getCapability(AndroidMobileCapabilityType.APP_ACTIVITY), "com.infotel.mobile.StartActivity"); // from exampleConfigGenericParams.xml when tu.xml is executed, else, null
 		Assert.assertNull(capa.getCapability(MobileCapabilityType.FULL_RESET));
+	}
+	
+	/**
+	 * Check default behaviour when node tags are defined in grid mode
+	 * tags are transferred to driver 
+	 */
+	@Test(groups={"ut"})
+	public void testCreateDefaultCapabilitiesWithNodeTagsInGridMode() {
+		SeleniumTestsContext context = new SeleniumTestsContext(SeleniumTestsContextManager.getThreadContext());
+		context.setBrowser(BrowserType.CHROME.toString());
+		context.setNodeTags("foo,bar");
+		context.setRunMode("grid");
+		context.setMobilePlatformVersion("8.0");
+		context.setPlatform("android");
+		context.setDeviceName("Samsung Galasy S8");
+		context.setApp("");
+		
+		DriverConfig config = new DriverConfig(context);
+		
+		AndroidCapabilitiesFactory capaFactory = new AndroidCapabilitiesFactory(config);
+		MutableCapabilities capa = capaFactory.createCapabilities();
+		
+		Assert.assertEquals(capa.getCapability(SeleniumRobotCapabilityType.NODE_TAGS), Arrays.asList("foo", "bar"));
+	}
+	
+	/**
+	 * Check default behaviour when node tags are defined in local mode
+	 * tags are not transferred to driver 
+	 */
+	@Test(groups={"ut"})
+	public void testCreateDefaultCapabilitiesWithNodeTagsInLocalMode() {
+		SeleniumTestsContext context = new SeleniumTestsContext(SeleniumTestsContextManager.getThreadContext());
+		context.setBrowser(BrowserType.CHROME.toString());
+		context.setNodeTags("foo,bar");
+		context.setRunMode("local");
+		context.setMobilePlatformVersion("8.0");
+		context.setPlatform("android");
+		context.setDeviceName("Samsung Galasy S8");
+		context.setApp("");
+		
+		DriverConfig config = new DriverConfig(context);
+		
+		AndroidCapabilitiesFactory capaFactory = new AndroidCapabilitiesFactory(config);
+		MutableCapabilities capa = capaFactory.createCapabilities();
+
+		Assert.assertFalse(capa.is(SeleniumRobotCapabilityType.NODE_TAGS));
 	}
 	
 	/**

@@ -28,6 +28,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.stream.Collectors;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -82,6 +83,7 @@ public class SeleniumTestsContext {
     public static final String PAGE_LOAD_TIME_OUT = "pageLoadTimeout";			// temps d'attente de chargement d'une page
     public static final String WEB_DRIVER_GRID = "webDriverGrid";				// adresse du serveur seleniumGrid
     public static final String RUN_MODE = "runMode";							// local ou grid. Pourrait également contenir sauceLabs / testDroid
+    public static final String NODE_TAGS = "nodeTags";							// Commat seperated list of strings. Requests that this test should execute only on a node (grid mode only) announcing all of these tags (issue #190)
     public static final String MASK_PASSWORD = "maskPassword";					// whether seleniumRobot should hide passwords or not
     public static final String MANUAL_TEST_STEPS = "manualTestSteps";			// set test steps manual (default is false) for creating them inside tests
     public static final String DEV_MODE = "devMode";							// The development mode allow all existing browsers to remain. It is set to "false" by default, which means it closes all existing browsers.
@@ -231,6 +233,7 @@ public class SeleniumTestsContext {
 	public static final ProxyType DEFAULT_WEB_PROXY_TYPE = ProxyType.AUTODETECT;
 	public static final boolean DEFAULT_OPTIMIZE_REPORTS = false;
 	public static final String DEFAULT_ARCHIVE= "false";
+	public static final String DEFAULT_NODE_TAGS = "";
     
     public static final int DEFAULT_REPLAY_TIME_OUT = 30;
 
@@ -286,7 +289,9 @@ public class SeleniumTestsContext {
         setSeleniumRobotServerVariableOlderThan(getIntValueForTest(SELENIUMROBOTSERVER_VARIABLES_OLDER_THAN, System.getProperty(SELENIUMROBOTSERVER_VARIABLES_OLDER_THAN)));
         
         setWebDriverGrid(getValueForTest(WEB_DRIVER_GRID, System.getProperty(WEB_DRIVER_GRID)));
-        setRunMode(getValueForTest(RUN_MODE, System.getProperty(RUN_MODE)));       
+        setRunMode(getValueForTest(RUN_MODE, System.getProperty(RUN_MODE)));   
+        setNodeTags(getValueForTest(NODE_TAGS, System.getProperty(NODE_TAGS)));   
+        
         setMaskPassword(getBoolValueForTest(MASK_PASSWORD, System.getProperty(MASK_PASSWORD)));       
         setLoadIni(getValueForTest(LOAD_INI, System.getProperty(LOAD_INI)));
         setWebSessionTimeout(getIntValueForTest(WEB_SESSION_TIME_OUT, System.getProperty(WEB_SESSION_TIME_OUT)));
@@ -1254,6 +1259,10 @@ public class SeleniumTestsContext {
     public DriverMode getRunMode() {
         return (DriverMode) getAttribute(RUN_MODE);
     }
+    
+    public List<String> getNodeTags() {
+    	return (List<String>) getAttribute(NODE_TAGS);
+    }
   
     public boolean isDevMode() {
         return (Boolean) getAttribute(DEV_MODE);
@@ -1600,7 +1609,18 @@ public class SeleniumTestsContext {
         setAttribute(RUN_MODE, DriverMode.fromString(newRunMode));
 	}
     
-
+    public void setNodeTags(String nodeTags) {
+    	if (nodeTags == null || nodeTags.isEmpty()) {
+    		setAttribute(NODE_TAGS, new ArrayList<>());
+    	} else {
+	    	setAttribute(NODE_TAGS, Arrays.asList(nodeTags.split(","))
+										.stream()
+										.map(String::trim)
+										.collect(Collectors.toList())
+						);
+    	}
+    }
+    
     public void setMaskPassword(Boolean maskPassword) {
     	if (maskPassword != null) {
     		setAttribute(MASK_PASSWORD, maskPassword);

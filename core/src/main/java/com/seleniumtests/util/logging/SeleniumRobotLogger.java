@@ -94,6 +94,10 @@ public class SeleniumRobotLogger {
 	 * 
 	 */
 	public static void updateLogger(String outputDir, String defaultOutputDir) {
+		updateLogger(outputDir, defaultOutputDir, SeleniumRobotLogger.LOG_FILE_NAME);
+	}
+	
+	public static void updateLogger(String outputDir, String defaultOutputDir, String logFileName) {
 		outputDirectory = outputDir;
 		defaultOutputDirectory = defaultOutputDir;
 		Appender fileLoggerAppender = Logger.getRootLogger().getAppender(FILE_APPENDER_NAME);
@@ -112,7 +116,7 @@ public class SeleniumRobotLogger {
 			        
 			        
 			        fileAppender.setName(FILE_APPENDER_NAME);
-			        fileAppender.setFile(outputDir + "/" + SeleniumRobotLogger.LOG_FILE_NAME);
+			        fileAppender.setFile(outputDir + "/" + logFileName);
 			        fileAppender.setLayout(new PatternLayout(LOG_PATTERN));
 			        
 			        if (System.getProperty("internalDevMode") != null && "true".equals(System.getProperty("internalDevMode"))) {

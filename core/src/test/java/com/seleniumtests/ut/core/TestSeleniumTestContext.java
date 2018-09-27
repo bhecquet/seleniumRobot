@@ -21,6 +21,7 @@ package com.seleniumtests.ut.core;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -367,6 +368,25 @@ public class TestSeleniumTestContext extends GenericTest {
 	public void testRunModeKo(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setRunMode("unknown");
+	}
+	
+	@Test(groups="ut context")
+	public void testNodeTags(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setNodeTags("foo, bar");
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getNodeTags(), Arrays.asList("foo", "bar"));
+	}
+	@Test(groups="ut context")
+	public void testNodeTagsEmpty(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setNodeTags("");
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getNodeTags().size(), 0);
+	}
+	@Test(groups="ut context")
+	public void testNodeTagsNull(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setNodeTags(null);
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getNodeTags().size(), 0);
 	}
 	
 	@Test(groups="ut context")

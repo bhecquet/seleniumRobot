@@ -19,6 +19,7 @@
 package com.seleniumtests.ut.browserfactory;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -41,7 +42,9 @@ import org.testng.annotations.Test;
 
 import com.seleniumtests.MockitoTest;
 import com.seleniumtests.browserfactory.BrowserInfo;
+import com.seleniumtests.browserfactory.ChromeCapabilitiesFactory;
 import com.seleniumtests.browserfactory.FirefoxCapabilitiesFactory;
+import com.seleniumtests.browserfactory.SeleniumRobotCapabilityType;
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.DriverConfig;
@@ -67,7 +70,7 @@ public class TestMarionetteCapabilitiesFactory extends MockitoTest {
 		PowerMockito.mockStatic(OSUtility.class, Mockito.CALLS_REAL_METHODS);
 		PowerMockito.when(OSUtility.getInstalledBrowsersWithVersion()).thenReturn(browserInfos);
 		Mockito.when(config.getTestContext()).thenReturn(context);
-		Mockito.when(context.isDevMode()).thenReturn(false);
+		Mockito.when(config.isDevMode()).thenReturn(false);
 	}
 	
 	/**
@@ -78,14 +81,48 @@ public class TestMarionetteCapabilitiesFactory extends MockitoTest {
 		
 		Mockito.when(config.isEnableJavascript()).thenReturn(true);
 		Mockito.when(config.getProxy()).thenReturn(proxyConfig);
+		Mockito.when(config.getNodeTags()).thenReturn(new ArrayList<>());
 		
 		MutableCapabilities capa = new FirefoxCapabilitiesFactory(config).createCapabilities();
 		
 		Assert.assertTrue(capa.is(CapabilityType.SUPPORTS_JAVASCRIPT));
 		Assert.assertTrue(capa.is(CapabilityType.TAKES_SCREENSHOT));
 		Assert.assertTrue(capa.is(CapabilityType.ACCEPT_SSL_CERTS));
+		Assert.assertFalse(capa.is(SeleniumRobotCapabilityType.NODE_TAGS));
 		Assert.assertEquals(capa.getVersion(), "");
 		Assert.assertEquals(capa.getCapability(CapabilityType.PROXY), proxyConfig);
+	}
+
+	/**
+	 * Check default behaviour when node tags are defined in grid mode
+	 * tags are transferred to driver
+	 */
+	@Test(groups={"ut"})
+	public void testCreateDefaultCapabilitiesWithNodeTagsInGridMode() {
+		
+		Mockito.when(config.isEnableJavascript()).thenReturn(true);
+		Mockito.when(config.getProxy()).thenReturn(proxyConfig);
+		Mockito.when(config.getNodeTags()).thenReturn(Arrays.asList("foo", "bar"));
+		Mockito.when(config.getMode()).thenReturn(DriverMode.GRID);
+		
+		MutableCapabilities capa = new FirefoxCapabilitiesFactory(config).createCapabilities();
+		
+		Assert.assertEquals(capa.getCapability(SeleniumRobotCapabilityType.NODE_TAGS), Arrays.asList("foo", "bar"));
+	}
+	
+	/**
+	 * Check default behaviour when node tags are defined in local mode
+	 * tags are not transferred to driver 
+	 */
+	@Test(groups={"ut"})
+	public void testCreateDefaultCapabilitiesWithNodeTagsInLocalMode() {
+		
+		Mockito.when(config.getNodeTags()).thenReturn(Arrays.asList("foo", "bar"));
+		Mockito.when(config.getMode()).thenReturn(DriverMode.LOCAL);
+		
+		MutableCapabilities capa = new FirefoxCapabilitiesFactory(config).createCapabilities();
+		
+		Assert.assertFalse(capa.is(SeleniumRobotCapabilityType.NODE_TAGS));
 	}
 	
 	@Test(groups={"ut"})
