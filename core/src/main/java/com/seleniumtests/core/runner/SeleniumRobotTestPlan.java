@@ -28,6 +28,7 @@ import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Listeners;
 
+import com.seleniumtests.connectors.extools.ExternalTool;
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.TestTasks;
@@ -133,6 +134,19 @@ public class SeleniumRobotTestPlan {
      */
     public void killProcess(String processName) {
     	TestTasks.killProcess(processName);
+    }
+    
+    /**
+     * Add the named program to the list of programs mandatory for executing the test
+     * Call this method at the very beginning of the test, before call to the first page, so that driver knows these tools.
+     * this will be added as capabilities when starting driver
+     * It will the be necessary to start / stop the program inside the test
+     * @return	the program object on which start and stop will be called
+     */
+    public ExternalTool useProgram(String programName, String ...args) {
+    	ExternalTool tool = new ExternalTool(programName, args);
+    	robotConfig().addExternalProgram(programName);
+    	return tool;
     }
     
     /**
