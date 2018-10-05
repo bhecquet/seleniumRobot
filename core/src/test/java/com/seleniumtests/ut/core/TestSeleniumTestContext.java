@@ -390,6 +390,18 @@ public class TestSeleniumTestContext extends GenericTest {
 	}
 	
 	@Test(groups="ut context")
+	public void testExternalPrograms(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().addExternalProgram("foo");
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getExternalPrograms(), Arrays.asList("foo"));
+	}
+	@Test(groups="ut context")
+	public void testExternalProgramsNull(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getExternalPrograms().size(), 0);
+	}
+	
+	@Test(groups="ut context")
 	public void testArchiveMode(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setArchive("onSuccess");

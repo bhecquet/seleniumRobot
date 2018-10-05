@@ -170,6 +170,10 @@ public class FileUtility {
         return URLDecoder.decode(path, "UTF-8");
     }
     
+    public static boolean fileExists(String path) {
+		return new File(path).exists();	
+	}
+    
     /**
      * Create a zip file from list of files to a temp directory. They will be added at the root of zip file
      * @param files

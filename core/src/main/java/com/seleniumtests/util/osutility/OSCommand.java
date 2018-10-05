@@ -48,6 +48,16 @@ public class OSCommand {
         }
 	}
 	
+	public static Process executeCommand(final String[] cmd) {
+		Process proc;
+		try {
+			proc = Runtime.getRuntime().exec(cmd);
+			return proc;
+		} catch (IOException e1) {
+			throw new CustomSeleniumTestsException("cannot start process: " + cmd, e1);
+		}
+	}
+	
 	/**
      * Execute a command in command line terminal
      * @param cmd
@@ -95,29 +105,15 @@ public class OSCommand {
      * @return 
      */
     public static String executeCommandAndWait(final String cmd) {
-        String output = "";
         Process proc;
         try {
 			proc = Runtime.getRuntime().exec(cmd);
+			return readOutput(proc);
 			
-	        BufferedReader stdInput = new BufferedReader(new InputStreamReader(proc.getInputStream()));
-	
-	    	BufferedReader stdError = new BufferedReader(new InputStreamReader(proc.getErrorStream()));
-	        
-	        String s;
-	        
-        	// read result output from command
-            while ((s = stdInput.readLine()) != null) {
-                output += s + "\n";
-            }
-            // read error output from command
-            while ((s = stdError.readLine()) != null) {
-                output += s + "\n";
-            }
         } catch (IOException e1) {
         	logger.error(e1);
         }
         
-        return output;
+        return "";
     }
 }
