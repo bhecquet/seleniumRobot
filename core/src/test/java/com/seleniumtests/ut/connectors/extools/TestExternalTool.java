@@ -2,7 +2,6 @@ package com.seleniumtests.ut.connectors.extools;
 
 import static org.mockito.Mockito.verify;
 
-import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -10,7 +9,7 @@ import org.mockito.Mock;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
-import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import com.seleniumtests.MockitoTest;
@@ -26,7 +25,7 @@ public class TestExternalTool extends MockitoTest {
 	@Mock
 	Process process;
 	
-	@BeforeClass(groups={"ut"})
+	@BeforeMethod(groups={"ut"})
 	public void init() throws Exception {
 		PowerMockito.spy(ExternalTool.class);
 		PowerMockito.spy(FileUtility.class);
