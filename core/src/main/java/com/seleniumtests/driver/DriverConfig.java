@@ -96,6 +96,10 @@ public class DriverConfig {
     	return testContext.getNodeTags();
     }
     
+    public List<String> getExternalPrograms() {
+    	return testContext.getExternalPrograms();
+    }
+    
     public boolean isDevMode() {
     	return testContext.isDevMode();
     }

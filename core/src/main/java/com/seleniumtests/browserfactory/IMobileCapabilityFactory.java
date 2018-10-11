@@ -80,6 +80,10 @@ public abstract class IMobileCapabilityFactory extends ICapabilitiesFactory {
         if (webDriverConfig.getNodeTags().size() > 0 && webDriverConfig.getMode() == DriverMode.GRID) {
         	capabilities.setCapability(SeleniumRobotCapabilityType.NODE_TAGS, webDriverConfig.getNodeTags());
         }
+
+        if (webDriverConfig.getExternalPrograms().size() > 0 && webDriverConfig.getMode() == DriverMode.GRID) {
+        	capabilities.setCapability(SeleniumRobotCapabilityType.TOOLS, webDriverConfig.getExternalPrograms());
+        }
         
         // add OS specific capabilities
         capabilities.merge(getSystemSpecificCapabilities());
