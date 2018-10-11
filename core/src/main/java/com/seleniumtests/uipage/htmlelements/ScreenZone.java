@@ -27,6 +27,11 @@ import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import com.seleniumtests.driver.screenshots.ScreenshotUtil;
 import com.seleniumtests.uipage.ReplayOnError;
 
+/**
+ * Defines a zone on desktop where we should search for a control to interract with
+ * @author s047432
+ *
+ */
 public class ScreenZone extends GenericPictureElement {
 
 	

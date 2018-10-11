@@ -106,6 +106,10 @@ public abstract class IDesktopCapabilityFactory extends ICapabilitiesFactory {
         	options.setCapability(SeleniumRobotCapabilityType.NODE_TAGS, webDriverConfig.getNodeTags());
         }
         
+        if (webDriverConfig.getExternalPrograms().size() > 0 && webDriverConfig.getMode() == DriverMode.GRID) {
+        	options.setCapability(SeleniumRobotCapabilityType.TOOLS, webDriverConfig.getExternalPrograms());
+        }
+        
         return options;
     }
     

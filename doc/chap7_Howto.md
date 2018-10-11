@@ -291,14 +291,16 @@ To debug, use `-Djavax.net.debug=ssl`
 
 ### 14 Inheritance between test applications ###
 
-Originaly, a test application corresponds to a full web or mobile application. But if your application is big, or can easily be split into parts that have a few things in common, you can create several test application which will be easier to maintain. E.g: an application with a front-office and a back-office.
+Originally, a test application corresponds to a full web or mobile application. But if your application is big, or can easily be split into parts that have a few things in common, you can create several test application which will be easier to maintain. E.g: an application with a front-office and a back-office.
 You can split a big test application into several ones
 
 	parent-app (generic features)
 		|--- child-app1 (app1)
 		|--- child-app2 (app2)
 		
-Drawback is that each test application MUST contain all variables of the generic features it uses
+**Beware**:
+- each test application MUST contain all variables of the generic features it uses
+- when executing test outside your IDE, classpath MUST contain the test application jar and the parent one: `java -cp seleniumRobot.jar;plugins/<app>-tests.jar;plugins/<parent-app>-tests.jar;lib/drivers/* -D<option1>=<value1> -D<option2>=<value2> org.testng.TestNG <path_to_TestNG_xml_file>"`
 
 pom.xml of each child application will declare the parent-app as dependency, not the core, which is held by parent-app.
 	  
