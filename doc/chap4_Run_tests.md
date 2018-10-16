@@ -14,7 +14,7 @@ These operations can be done using maven:
 - Install test application: `mvn -U org.apache.maven.plugins:maven-dependency-plugin:2.8:unpack -Dartifact=<app_groupId>:<app_artifactId>:RELEASE:zip -DoutputDirectory=<path_to_deployed_selenium_robot>  -Dmdep.overWriteReleases=true`
 
 Previous commands will take the last release by default, but you can replace 'RELEASE' by a specific version
-
+ 
 #### Run ####
 Tests are run using command line (`;lib/drivers/*` is mandatory for seleniumRobot > 3.14.x)  : `java -cp seleniumRobot.jar;plugins/<app>-tests.jar;lib/drivers/* -D<option1>=<value1> -D<option2>=<value2> org.testng.TestNG <path_to_TestNG_xml_file>"`</br>
 
