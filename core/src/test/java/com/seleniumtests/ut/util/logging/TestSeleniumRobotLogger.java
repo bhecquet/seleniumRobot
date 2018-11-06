@@ -23,9 +23,11 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
+import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Method;
+import java.nio.file.Paths;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.apache.log4j.spi.LoggingEvent;
 import org.testng.Assert;
@@ -33,6 +35,7 @@ import org.testng.annotations.Test;
 
 import com.seleniumtests.MockitoTest;
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.util.helper.WaitHelper;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
 
@@ -99,6 +102,34 @@ public class TestSeleniumRobotLogger extends MockitoTest {
 			
 		} finally {
 			System.clearProperty("internalDevMode");
+			SeleniumRobotLogger.reset();
+		}
+	}
+	
+	/**
+	 * #issue #192: check not NPE is raised when cleaning default output directory which does not exists
+	 * This occurs when default output directory is not the same as the user defined output directory
+	 * @throws IOException 
+	 */
+	@Test(groups= {"ut"})
+	public void testCleanOutputDir() throws IOException {
+		
+		
+		
+		try {
+			// delete default output directory so that it does not exist when trying to clean it
+			try {
+				FileUtils.deleteDirectory(new File(SeleniumTestsContextManager.getThreadContext().getDefaultOutputDirectory()));
+				WaitHelper.waitForSeconds(1);
+			} catch (IOException e) {
+				// do nothing
+			}
+			
+			SeleniumRobotLogger.reset();
+			SeleniumRobotLogger.updateLogger(Paths.get(System.getProperty("java.io.tmpdir"), "SR").toString(), SeleniumTestsContextManager.getThreadContext().getDefaultOutputDirectory());
+
+			
+		} finally {
 			SeleniumRobotLogger.reset();
 		}
 	}

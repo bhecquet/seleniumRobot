@@ -152,16 +152,18 @@ public class SeleniumRobotLogger {
 		new File(outputDirectory).mkdirs();
 		WaitHelper.waitForSeconds(1);
     	
-    	for (File directory: new File(defaultOutputDirectory).listFiles(file -> file.isDirectory())) {
-    		try {
-				if (Files.readAttributes(directory.toPath(), BasicFileAttributes.class).lastAccessTime().toInstant().atZone(ZoneOffset.UTC).toLocalTime()
-						.isBefore(ZonedDateTime.now().minusMinutes(300).withZoneSameInstant(ZoneOffset.UTC).toLocalTime())) {
-					FileUtils.deleteDirectory(directory);
+		if (new File(defaultOutputDirectory).exists()) {
+	    	for (File directory: new File(defaultOutputDirectory).listFiles(file -> file.isDirectory())) {
+	    		try {
+					if (Files.readAttributes(directory.toPath(), BasicFileAttributes.class).lastAccessTime().toInstant().atZone(ZoneOffset.UTC).toLocalTime()
+							.isBefore(ZonedDateTime.now().minusMinutes(300).withZoneSameInstant(ZoneOffset.UTC).toLocalTime())) {
+						FileUtils.deleteDirectory(directory);
+					}
+				} catch (IOException e) {
 				}
-			} catch (IOException e) {
-			}
-    	
-    	}
+	    	
+	    	}
+		}
 	}
 
 
