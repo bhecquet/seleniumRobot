@@ -130,7 +130,25 @@ public class ScreenZone extends GenericPictureElement {
 		
 	}
 	
+	/**
+	 * Replaced by sendKeys(int xOffset, int yOffset, final CharSequence text)
+	 */
+	@Deprecated
 	public void sendKeys(final CharSequence text, int xOffset, int yOffset) {
+		clickAt(xOffset, yOffset);
+		
+		CustomEventFiringWebDriver.writeToDesktop(text.toString(), 
+				SeleniumTestsContextManager.getThreadContext().getRunMode(), 
+				SeleniumTestsContextManager.getThreadContext().getSeleniumGridConnector());
+	}
+	
+	/**
+	 * Send text to desktop using keyboard at xOffset, yOffset. Before sending keys, we robot clicks on position to gain focus
+	 * @param xOffset	
+	 * @param yOffset
+	 * @param text		Text to write
+	 */
+	public void sendKeys(int xOffset, int yOffset, final CharSequence text) {
 		clickAt(xOffset, yOffset);
 		
 		CustomEventFiringWebDriver.writeToDesktop(text.toString(), 
@@ -143,11 +161,24 @@ public class ScreenZone extends GenericPictureElement {
 	 * Beware of key mapping which may be different depending on locale and keyboard. Use this to send control keys like "VK_ENTER"
 	 * @param xOffset
 	 * @param yOffset
-	 * @param events
+	 * @param events	Key events to send
 	 */
 	public void sendKeys(int xOffset, int yOffset, Integer ... events) {
 		clickAt(xOffset, yOffset);
 		
+		CustomEventFiringWebDriver.sendKeysToDesktop( 
+				Arrays.asList(events),
+				SeleniumTestsContextManager.getThreadContext().getRunMode(), 
+				SeleniumTestsContextManager.getThreadContext().getSeleniumGridConnector());
+	}
+	
+	/**
+	 * Example of use: page.zone.sendKeys(KeyEvent.VK_A, KeyEvent.VK_B);
+	 * Beware of key mapping which may be different depending on locale and keyboard. Use this to send control keys like "VK_ENTER"
+	 * Keys will be typed anywhere where focus is
+	 * @param events	Key events to send
+	 */
+	public void sendKeysNoFocus(Integer ... events) {
 		CustomEventFiringWebDriver.sendKeysToDesktop( 
 				Arrays.asList(events),
 				SeleniumTestsContextManager.getThreadContext().getRunMode(), 
