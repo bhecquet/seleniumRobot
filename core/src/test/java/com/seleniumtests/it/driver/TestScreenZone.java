@@ -114,7 +114,7 @@ public class TestScreenZone extends GenericMultiBrowserTest {
 		try {
 			DriverTestPageWithoutFixedPattern.logoText.clear();
 			((CustomEventFiringWebDriver)driver).scrollToElement(DriverTestPageWithoutFixedPattern.table, 200);
-			DriverTestPageWithoutFixedPattern.firefoxForDesktop.sendKeys("hello", 0, 40);
+			DriverTestPageWithoutFixedPattern.firefoxForDesktop.sendKeys(0, 40, "hello");
 		} catch (ImageSearchException e) {
 			throw new SkipException("Image not found, we may be on screenless slave", e);
 		}
