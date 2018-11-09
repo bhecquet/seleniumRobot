@@ -101,7 +101,7 @@ public class TestTable extends MockitoTest {
 		colEl.add(col1);
 		colEl.add(col2);
 		
-		when(row1.findElements(By.tagName("td"))).thenReturn(colEl);
+		when(table.getRowCells(row1)).thenReturn(colEl);
 		
 		Assert.assertEquals(table.getColumns().size(), 2);
 	}
@@ -120,42 +120,10 @@ public class TestTable extends MockitoTest {
 		colEl.add(col1);
 		colEl.add(col2);
 		
-		when(row2.findElements(By.tagName("td"))).thenReturn(colEl);
+
+		when(table.getRowCells(row2)).thenReturn(colEl);
 		
 		Assert.assertEquals(table.getColumns().size(), 2);
 	}
-	
-	@Test(groups={"ut"})
-	public void testGetColumnsWithOnlyFirstHeaderRow() throws Exception {
-		
-		List<WebElement> colEl = new ArrayList<>();
-		colEl.add(col1);
-		colEl.add(col2);
-		colEl.add(col1);
-		
-		List<WebElement> rowEl = new ArrayList<>();
-		rowEl.add(row1);
-		
-		when(tableEl.findElements(By.tagName("tr"))).thenReturn(rowEl);
-		
-		when(row1.findElements(By.tagName("th"))).thenReturn(colEl);
-		
-		Assert.assertEquals(table.getColumns().size(), 3);
-	}
-	
-	@Test(groups={"ut"})
-	public void testGetColumnsWithFirstHeaderRow() throws Exception {
-		
-		List<WebElement> colEl = new ArrayList<>();
-		colEl.add(col1);
-		colEl.add(col2);
-		colEl.add(col1);
-	
-		when(tableEl.findElements(By.tagName("tr"))).thenReturn(rowEl);
-		
-		when(row1.findElements(By.tagName("th"))).thenReturn(colEl);
-		when(row2.findElements(By.tagName("td"))).thenReturn(colEl);
-		
-		Assert.assertEquals(table.getColumns().size(), 3);
-	}
+
 }

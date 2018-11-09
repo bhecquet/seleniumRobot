@@ -71,14 +71,11 @@ public class Table extends HtmlElement {
         
         // Need to check whether rows is null AND whether or not the list of rows is empty
         if (rows != null && !rows.isEmpty()) {
-            columns = rows.get(0).findElements(By.tagName("td"));
-            if (columns == null || columns.isEmpty()) {
-
-                if (rows.size() > 1) {
-                    columns = rows.get(1).findElements(By.tagName("td"));
-                } else {
-                    columns = rows.get(0).findElements(By.tagName("th"));
-                }
+        	
+        	columns = getRowCells(rows.get(0));
+        	
+            if ((columns == null || columns.isEmpty()) && rows.size() > 1) {
+                columns = getRowCells(rows.get(1));
             }
             return columns;
         } else {
@@ -117,10 +114,7 @@ public class Table extends HtmlElement {
     	if (row == null) {
     		return new ArrayList<>();
     	}
-    	cells = row.findElements(By.tagName("td"));
-    	if (cells.isEmpty()) {
-    		cells = row.findElements(By.tagName("th"));
-    	}
+    	cells = row.findElements(By.xpath(".//descendant::*[name()=\"th\" or name()=\"td\"]"));
     	return cells;
     }
 
@@ -143,17 +137,13 @@ public class Table extends HtmlElement {
     	
     	if (rows != null && !rows.isEmpty()) {
     		for (WebElement row: rows) {
-    			columns = row.findElements(By.tagName("td"));
+    			List<WebElement> cols = getRowCells(row);
     			
-    			if (columns == null || columns.isEmpty()) {
-        			columns = row.findElements(By.tagName("th"));
+    			if (cols.isEmpty()) {
+        			throw new ScenarioException("There are no columns in this row");
         		}
     			
-    			if (columns.isEmpty()) {
-        			throw new ScenarioException("There are no columns in this table");
-        		}
-    			
-    			WebElement cell = columns.get(column);
+    			WebElement cell = cols.get(column);
 				Matcher matcher = content.matcher(cell.getText());
 				if (matcher.matches()) {
 					return cell;
@@ -190,19 +180,13 @@ public class Table extends HtmlElement {
     	findTableElement();
     	
     	if (rows != null && !rows.isEmpty()) {
-    		columns = rows.get(row).findElements(By.tagName("td"));
+    		List<WebElement> cols = getRowCells(rows.get(row));
     		
-    		if (columns == null || columns.isEmpty()) {
-    			columns = rows.get(row).findElements(By.tagName("th"));
-    		}
-    		
-    		if (columns.isEmpty()) {
+    		if (cols.isEmpty()) {
     			throw new ScenarioException(String.format("Cell at (%d, %d) could not be found", row, column));
     		}
     		
-    		
-    		
-    		return columns.get(column);
+    		return cols.get(column);
     	}
     	
     	throw new ScenarioException("There are no rows in this table");
