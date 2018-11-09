@@ -1252,6 +1252,18 @@ public class HtmlElement extends Element implements WebElement, Locatable, HasId
 		findElement();
 		return ((RemoteWebElement)getUnderlyingElement(element)).toJson();
 	}
+	
+	public HtmlElement getParent() {
+		return parent;
+	}
+
+	public void setParent(HtmlElement parent) {
+		this.parent = parent;
+	}
+
+	public void setBy(By by) {
+		this.by = by;
+	}
 
 	/**
 	 * USE ONLY for testing
@@ -1260,4 +1272,6 @@ public class HtmlElement extends Element implements WebElement, Locatable, HasId
 	public void setElement(WebElement element) {
 		this.element = element;
 	}
+
+
 }
