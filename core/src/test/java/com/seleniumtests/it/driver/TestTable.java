@@ -20,6 +20,7 @@ package com.seleniumtests.it.driver;
 
 import java.util.regex.Pattern;
 
+import org.openqa.selenium.WebElement;
 import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.annotations.AfterClass;
@@ -76,7 +77,7 @@ public class TestTable extends GenericTest {
 	
 	@Test(groups={"it"})
 	public void testRowCount() {
-		Assert.assertEquals(DriverTestPage.table.getRowCount(), 3);
+		Assert.assertEquals(DriverTestPage.table.getRowCount(), 4);
 	}
 	
 	@Test(groups={"it"})
@@ -89,4 +90,30 @@ public class TestTable extends GenericTest {
 		Assert.assertEquals(DriverTestPage.table.getColumnCount(), 2);
 	}
 	
+	/**
+	 * Get Cells from a row containing only th
+	 */
+	@Test(groups={"it"})
+	public void testRowCellsTH() {
+		WebElement row = DriverTestPage.table.getRows().get(0);
+		Assert.assertEquals(DriverTestPage.table.getRowCells(row).size(), 2);
+	}
+	
+	/**
+	 * Get Cells from a row containing only tr
+	 */
+	@Test(groups={"it"})
+	public void testRowCellsTR() {
+		WebElement row = DriverTestPage.table.getRows().get(1);
+		Assert.assertEquals(DriverTestPage.table.getRowCells(row).size(), 2);
+	}
+	
+	/**
+	 * Get Cells from a row containing tr and th
+	 */
+	@Test(groups={"it"})
+	public void testRowCellsTRTH() {
+		WebElement row = DriverTestPage.table.getRows().get(3);
+		Assert.assertEquals(DriverTestPage.table.getRowCells(row).size(), 2);
+	}
 }
