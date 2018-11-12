@@ -132,6 +132,7 @@ public class Table extends HtmlElement {
      * @param column	column where pattern should be searched
      * @return
      */
+    @ReplayOnError
     public WebElement getCellFromContent(final Pattern content, final int column) {
     	findTableElement();
     	
