@@ -19,6 +19,8 @@
 package com.seleniumtests.core;
 
 import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
 
@@ -34,6 +36,7 @@ import com.seleniumtests.reporter.logger.TestLogging;
 import com.seleniumtests.reporter.logger.TestStep;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 import com.seleniumtests.util.osutility.OSUtilityFactory;
+import com.seleniumtests.util.osutility.ProcessInfo;
 
 import net.lightbody.bmp.BrowserMobProxy;
 
@@ -60,6 +63,27 @@ public class TestTasks {
     		logger.error("killing a process is only supported in local and grid mode");
     	}
     }
+	
+	/**
+	 * returns the list of processes, on the node, whose name without extension is the requested one
+	 * e.g: getProcessList("WINWORD")
+	 * Case will be ignored
+	 * @param processName
+	 * @return
+	 */
+	public static List<Integer> getProcessList(String processName) {
+		if (SeleniumTestsContextManager.getThreadContext().getRunMode() == DriverMode.LOCAL) {
+			return OSUtilityFactory.getInstance().getRunningProcesses(processName).stream()
+				.map(ProcessInfo::getPid)
+				.map(Integer::valueOf)
+				.collect(Collectors.toList());
+		} else if (SeleniumTestsContextManager.getThreadContext().getRunMode() == DriverMode.GRID) {
+			SeleniumGridConnector gridConnector = SeleniumTestsContextManager.getThreadContext().getSeleniumGridConnector();
+			return gridConnector.getProcessList(processName);
+		} else {
+			throw new ScenarioException("killing a process is only supported in local and grid mode");
+		}
+	}
 	
 	/**
      * Method for creating or updating a variable on the seleniumRobot server ONLY. This will raise a ScenarioException if variables are get from

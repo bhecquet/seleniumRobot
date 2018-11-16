@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -297,6 +298,32 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 		} catch (UnirestException e) {
 			logger.warn(String.format("Could not kill process %s: %s", processName, e.getMessage()));
 		}
+	}
+	
+	/**
+	 * returns the list of processes, on the node, whose name without extension is the requested one
+	 * e.g: getProcessList("WINWORD")
+	 * Case will be ignored
+	 */
+	public List<Integer> getProcessList(String processName) {
+		if (nodeUrl == null) {
+			throw new ScenarioException("You cannot get a remote process before driver has been created and corresponding node instanciated");
+		}
+		
+		logger.info("getting process list for: " + processName);
+		try {
+			List<String> pidListStr = Arrays.asList(Unirest.get(String.format("%s%s", nodeUrl, NODE_TASK_SERVLET))
+				.queryString("action", "processList")
+				.queryString("name", processName)
+				.asString()
+				.getBody()
+				.split(","));
+			return pidListStr.stream().map(Integer::valueOf).collect(Collectors.toList());
+		} catch (UnirestException e) {
+			logger.warn(String.format("Could not get process list of %s: %s", processName, e.getMessage()));
+		}
+		
+		return new ArrayList<>();
 	}
 	
 	@Override
