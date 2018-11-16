@@ -21,6 +21,7 @@ package com.seleniumtests.connectors.selenium;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -131,6 +132,11 @@ public class SeleniumGridConnector {
 	public File stopVideoCapture(String outputFile) {
 		logger.warn("video capture is only available with seleniumRobot grid");
 		return null;
+	}
+
+	public List<Integer> getProcessList(String processName) {
+		logger.warn("process list is only available with seleniumRobot grid");
+		return new ArrayList<>();
 	}
 	
 	/**

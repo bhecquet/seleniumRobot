@@ -21,6 +21,7 @@ package com.seleniumtests.core.runner;
 import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -134,6 +135,14 @@ public class SeleniumRobotTestPlan {
      */
     public void killProcess(String processName) {
     	TestTasks.killProcess(processName);
+    }
+    
+    /**
+     * get list of the named process, locally or remotely
+     * @param processName
+     */
+    public List<Integer> getProcessList(String processName) {
+    	return TestTasks.getProcessList(processName);
     }
     
     /**

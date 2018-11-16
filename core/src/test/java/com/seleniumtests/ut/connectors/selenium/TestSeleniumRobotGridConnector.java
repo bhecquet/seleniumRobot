@@ -26,6 +26,7 @@ import static org.mockito.Mockito.when;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
@@ -47,6 +48,7 @@ import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import com.seleniumtests.connectors.selenium.SeleniumGridConnector;
 import com.seleniumtests.connectors.selenium.SeleniumRobotGridConnector;
+import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.ut.connectors.ConnectorsTest;
 
 import io.appium.java_client.remote.MobileCapabilityType;
@@ -132,6 +134,12 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 		Assert.assertEquals(capabilities.getCapability(MobileCapabilityType.APP), null);
 	}
 	
+	/**
+	 * Test killing process
+	 * @throws UnsupportedOperationException
+	 * @throws IOException
+	 * @throws UnirestException
+	 */
 	@Test(groups={"ut"})
 	public void testKillProcess() throws UnsupportedOperationException, IOException, UnirestException {
 		
@@ -139,8 +147,48 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 		
 		SeleniumGridConnector connector = new SeleniumRobotGridConnector("http://localhost:4444/wd/hub");
 		connector.setNodeUrl("http://localhost:4321");
-		connector.killProcess("myProcess");
+		connector.killProcess("myProcess");	
+	}
+	
+	/**
+	 * Test killing process when node is still unknown (driver not initialized). In this case, ScenarioException must be thrown
+	 * @throws UnsupportedOperationException
+	 * @throws IOException
+	 * @throws UnirestException
+	 */
+	@Test(groups={"ut"}, expectedExceptions=ScenarioException.class)
+	public void testKillProcessWithoutNodeUrl() throws UnsupportedOperationException, IOException, UnirestException {
 		
+		createServerMock("POST", SeleniumRobotGridConnector.NODE_TASK_SERVLET, 200, "");	
+		
+		SeleniumGridConnector connector = new SeleniumRobotGridConnector("http://localhost:4444/wd/hub");
+		connector.killProcess("myProcess");	
+	}
+	
+	@Test(groups={"ut"})
+	public void testGetProcessList() throws UnsupportedOperationException, IOException, UnirestException {
+		
+		createServerMock("GET", SeleniumRobotGridConnector.NODE_TASK_SERVLET, 200, "100,200");	
+		
+		SeleniumGridConnector connector = new SeleniumRobotGridConnector("http://localhost:4444/wd/hub");
+		connector.setNodeUrl("http://localhost:4321");
+		Assert.assertEquals(connector.getProcessList("myProcess"), Arrays.asList(100, 200));
+	}
+	
+
+	/**
+	 * Test getting process list when node is still unknown (driver not initialized). In this case, ScenarioException must be thrown
+	 * @throws UnsupportedOperationException
+	 * @throws IOException
+	 * @throws UnirestException
+	 */
+	@Test(groups={"ut"}, expectedExceptions=ScenarioException.class)
+	public void testGetProcessListWithoutNodeUrl() throws UnsupportedOperationException, IOException, UnirestException {
+		
+		createServerMock("GET", SeleniumRobotGridConnector.NODE_TASK_SERVLET, 200, "100,200");	
+		
+		SeleniumGridConnector connector = new SeleniumRobotGridConnector("http://localhost:4444/wd/hub");
+		connector.getProcessList("myProcess");
 	}
 	
 	@Test(groups={"ut"})
