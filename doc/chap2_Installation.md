@@ -23,7 +23,7 @@ Therefore, right click on test application project -> properties -> Build path -
 Add either the `core` project if you have it in eclipse or add the `core-x.y.z.jar` file. 
 
 #### intelliJ ####
-IntelliJ Ultimate can be used to develop test applications (or seleniumrobot project itself) but requires some configuration to activate AspectJ
+IntelliJ Ultimate can be used to develop test applications (or seleniumrobot project itself) but requires some configuration to activate AspectJ. TestNG plugins must also be installed
 
 ##### AspectJ activation #####
 This step must be done only once to make IntelliJ work with aspectJ
