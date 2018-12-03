@@ -41,7 +41,7 @@ public abstract class OSUtility {
 	
 	protected static final String LATEST_VERSION = "latest";
 	
-	private String[] webBrowserProcessList = {"chrome", "firefox",  "iexplore"};
+	private String[] webBrowserProcessList = {"chrome", "firefox", "iexplore", "safari"};
 
 	private String[] webDriverProcessList = {"chromedriver", "geckodriver", "IEDriverServer", "MicrosoftWebDriver"};
 		

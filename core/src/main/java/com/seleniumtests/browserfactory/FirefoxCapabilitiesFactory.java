@@ -61,7 +61,7 @@ public class FirefoxCapabilitiesFactory extends IDesktopCapabilityFactory {
         options.setCapability(FirefoxDriver.PROFILE, profile);
         options.setLogLevel(FirefoxDriverLogLevel.ERROR);
         
-        if (webDriverConfig.getTestContext().isDevMode()) {
+        if (webDriverConfig.isDevMode()) {
         	options.setLogLevel(FirefoxDriverLogLevel.TRACE);
         }
         
