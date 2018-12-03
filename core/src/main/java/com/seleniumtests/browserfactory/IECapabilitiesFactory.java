@@ -42,7 +42,7 @@ public class IECapabilitiesFactory extends IDesktopCapabilityFactory {
 //        options.setCapability(InternetExplorerDriver.REQUIRE_WINDOW_FOCUS, true);
 //        options.setCapability(InternetExplorerDriver.NATIVE_EVENTS, true);
         
-        if (webDriverConfig.getTestContext().isDevMode()) {
+        if (webDriverConfig.isDevMode()) {
         	options.setCapability(InternetExplorerDriver.LOG_LEVEL, "TRACE");
         }
 
