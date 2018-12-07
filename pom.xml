@@ -22,9 +22,9 @@
 	<developers>
 		<developer>
 			<name>Bertrand Hecquet</name>
-			<email>bertrand.hecquet@groupe-mma.fr</email>
-			<organization>covea</organization>
-			<organizationUrl>http://www.covea.eu</organizationUrl>
+			<email>bertrand.hecquet@org.com</email>
+			<organization>org</organization>
+			<organizationUrl>http://www.org.com</organizationUrl>
 		</developer>
 	</developers>
 
