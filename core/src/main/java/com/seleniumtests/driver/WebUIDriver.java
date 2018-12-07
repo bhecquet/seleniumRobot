@@ -21,9 +21,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,13 +28,13 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.openqa.selenium.Capabilities;
-import org.openqa.selenium.UnsupportedCommandException;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.logging.LogEntries;
 import org.openqa.selenium.logging.LogEntry;
 import org.openqa.selenium.support.events.EventFiringWebDriver;
 import org.openqa.selenium.support.events.WebDriverEventListener;
 
+import com.neotys.selenium.proxies.NLWebDriver;
+import com.neotys.selenium.proxies.NLWebDriverFactory;
 import com.seleniumtests.browserfactory.AppiumDriverFactory;
 import com.seleniumtests.browserfactory.BrowserInfo;
 import com.seleniumtests.browserfactory.ChromeDriverFactory;
@@ -295,6 +292,19 @@ public class WebUIDriver {
 		}
 		return mobProxy;
 	}
+	
+	/**
+	 * Returns the Neoload driver for the current running driver
+	 * @return
+	 */
+	public static NLWebDriver getNeoloadDriver() {
+		CustomEventFiringWebDriver driver = (CustomEventFiringWebDriver)WebUIDriver.getWebDriver(false);
+		if (driver != null && driver.getNeoloadDriver() != null) {
+			return driver.getNeoloadDriver();
+		} else {
+			return null;
+		}
+	}
 
     /**
      * Get EventFiringWebDriver.
@@ -369,6 +379,14 @@ public class WebUIDriver {
     }
 
     protected WebDriver handleListeners(WebDriver driver, BrowserInfo browserInfo, List<Long> driverPids) {
+
+    	// Use of Neoload
+    	// we must configure the user path, and the proxy mode
+    	// In this case, the read driver is "replaced" by the proxy to the driver
+    	if (config.isNeoloadActive()) {
+    		driver = NLWebDriverFactory.newNLWebDriver(driver, config.getNeoloadUserPath());
+    	}
+    	
     	EventFiringWebDriver listeningDriver = new CustomEventFiringWebDriver(driver, 
     																			driverPids, 
     																			browserInfo, 
@@ -376,6 +394,7 @@ public class WebUIDriver {
     																			SeleniumTestsContextManager.getThreadContext().getRunMode(),
     																			config.getBrowserMobProxy(),
     																			SeleniumTestsContextManager.getThreadContext().getSeleniumGridConnector());
+    	
         List<WebDriverEventListener> listeners = config.getWebDriverListeners();
         if (listeners != null && !listeners.isEmpty()) {
             for (int i = 0; i < config.getWebDriverListeners().size(); i++) {

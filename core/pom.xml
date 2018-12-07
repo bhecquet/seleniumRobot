@@ -16,6 +16,19 @@
 	    <skipUTs>${skipTests}</skipUTs>
 	    <seleniumRobot.devMode>false</seleniumRobot.devMode>
 	</properties>
+	
+	<repositories>
+		<repository>
+			<id>neotys-public-releases</id>
+			<url>http://maven.neotys.com/content/repositories/releases/</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+	</repositories>
 
 	<dependencies>
 	
@@ -168,6 +181,13 @@
             <artifactId>testdroid-api</artifactId>
             <version>1.4.8</version>
         </dependency>
+        
+        <!-- Specific Neoload -->
+        <dependency>
+			<groupId>com.neotys.selenium</groupId>
+			<artifactId>neotys-selenium-proxy</artifactId>
+			<version>2.1.0</version>
+		</dependency>
 
         <dependency>
         	<groupId>org.ini4j</groupId>

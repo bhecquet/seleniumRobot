@@ -28,6 +28,7 @@ import org.openqa.selenium.Proxy.ProxyType;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
+import com.neotys.selenium.proxies.NLWebDriverFactory;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.DriverConfig;
@@ -127,6 +128,7 @@ public abstract class IDesktopCapabilityFactory extends ICapabilitiesFactory {
     private MutableCapabilities updateDefaultCapabilities() {
 
     	DesiredCapabilities capability = new DesiredCapabilities();
+    	
         if (webDriverConfig.isEnableJavascript()) {
             capability.setJavascriptEnabled(true);
         } else {
@@ -146,6 +148,14 @@ public abstract class IDesktopCapabilityFactory extends ICapabilitiesFactory {
         }
 
         configureProxyCap(capability);
+        
+    	// NEOLOAD //
+        if (webDriverConfig.isNeoloadActive()) {
+        	if ("Design".equals(System.getProperty("nl.selenium.proxy.mode"))) {
+        		logger.warn("Enabling Neoload Design mode automatically configures a manual proxy through neoload instance, other proxy settings are overriden and network capture won't be possible");
+        	}
+        	capability = NLWebDriverFactory.addProxyCapabilitiesIfNecessary(capability);
+        }
 
         return capability;
     }  
