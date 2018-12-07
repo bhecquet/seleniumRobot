@@ -397,4 +397,12 @@ public class DriverConfig {
 	public SeleniumTestsContext getTestContext() {
 		return testContext;
 	}
+	
+	public String getNeoloadUserPath() {
+    	return testContext.getNeoloadUserPath();
+    }
+	
+	public boolean isNeoloadActive() {
+		return getNeoloadUserPath() != null && System.getProperty("nl.selenium.proxy.mode") != null;
+	}
 }

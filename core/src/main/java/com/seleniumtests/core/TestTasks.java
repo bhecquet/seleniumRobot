@@ -23,6 +23,7 @@ import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
 
+import com.neotys.selenium.proxies.NLWebDriver;
 import com.seleniumtests.connectors.selenium.SeleniumGridConnector;
 import com.seleniumtests.connectors.selenium.SeleniumRobotVariableServerConnector;
 import com.seleniumtests.core.runner.SeleniumRobotTestPlan;
@@ -175,22 +176,35 @@ public class TestTasks {
     		throw new ConfigurationException("manual steps can only be used when automatic steps are disabled ('manualTestSteps' option set to true)");
     	}
     	
+    	NLWebDriver neoloadDriver = WebUIDriver.getNeoloadDriver();
+    	
     	// log the previous step if it exists and create the new one
     	TestStep previousStep = TestLogging.getCurrentRootTestStep();
     	if (previousStep != null) {
     		previousStep.updateDuration();
     		TestLogging.logTestStep(previousStep);
+    		
+    		if (neoloadDriver != null) {
+				neoloadDriver.stopTransaction();
+			}
     	}
     	
+    	// stepName is null when test is terminating. We don't create a new step
     	if (stepName != null) {
 	    	TestStep step = new TestStep(stepName, TestLogging.getCurrentTestResult(), Arrays.asList(passwordsToMask));
 	    	TestLogging.setCurrentRootTestStep(step);
 	    	capturePageSnapshot();
 	    	
+	    	// start a new page when using BrowserMobProxy (network capture)
 	    	BrowserMobProxy mobProxy = WebUIDriver.getBrowserMobProxy();
 	    	if (mobProxy != null) {
 	    		mobProxy.newPage(stepName);
 	    	}
+	    	
+	    	// start a new transaction when using Neoload
+	    	if (neoloadDriver != null) {
+				neoloadDriver.startTransaction(stepName);
+			}
     	}
     }
     

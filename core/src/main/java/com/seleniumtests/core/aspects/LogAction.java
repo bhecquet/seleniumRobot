@@ -31,6 +31,7 @@ import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.openqa.selenium.support.ui.Select;
 
+import com.neotys.selenium.proxies.NLWebDriver;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.runner.SeleniumRobotTestPlan;
 import com.seleniumtests.driver.WebUIDriver;
@@ -385,6 +386,7 @@ public class LogAction {
 		TestStep currentStep = buildRootStep(joinPoint, stepNamePrefix, !configStep);
 		
 		BrowserMobProxy mobProxy = WebUIDriver.getBrowserMobProxy();
+		NLWebDriver neoloadDriver = WebUIDriver.getNeoloadDriver();
 		
 		// check if any root step is already registered (a main step)
 		// happens when using cucumber where a cucumber method can call an other method intercepted by this pointcut
@@ -397,6 +399,9 @@ public class LogAction {
 			
 			if (mobProxy != null) {
 				mobProxy.newPage(currentStep.getName());
+			}
+			if (neoloadDriver != null) {
+				neoloadDriver.startTransaction(currentStep.getName());
 			}
 			
 		} else {
@@ -414,7 +419,11 @@ public class LogAction {
 		} finally {
 			if (rootStep) {
 				TestLogging.getCurrentRootTestStep().updateDuration();
-				TestLogging.logTestStep(TestLogging.getCurrentRootTestStep());	
+				TestLogging.logTestStep(TestLogging.getCurrentRootTestStep());
+				
+				if (neoloadDriver != null) {
+					neoloadDriver.stopTransaction();
+				}
 			} else {
 				TestLogging.setParentTestStep(previousParent);
 			}

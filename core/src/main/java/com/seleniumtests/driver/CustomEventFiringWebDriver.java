@@ -58,6 +58,7 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.UselessFileDetector;
 import org.openqa.selenium.support.events.EventFiringWebDriver;
 
+import com.neotys.selenium.proxies.NLWebDriver;
 import com.seleniumtests.browserfactory.BrowserInfo;
 import com.seleniumtests.connectors.selenium.SeleniumGridConnector;
 import com.seleniumtests.customexception.DriverExceptions;
@@ -87,6 +88,7 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
     private Set<String> currentHandles;
     private final List<Long> driverPids;
 	private final WebDriver driver;
+	private final NLWebDriver neoloadDriver;
 	private final boolean isWebTest;
 	private final DriverMode driverMode;
 	private final BrowserInfo browserInfo;
@@ -165,6 +167,13 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
 		this.driverMode = localDriver;
 		this.mobProxy = mobProxy;
 		this.gridConnector = gridConnector;
+		
+		// NEOLOAD //
+		if (driver instanceof NLWebDriver) {
+			neoloadDriver = (NLWebDriver)driver;
+		} else {
+			neoloadDriver = null;
+		}
     }
 
     public void setFileDetector(final FileDetector detector) {
@@ -704,5 +713,10 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
 
 	public BrowserMobProxy getMobProxy() {
 		return mobProxy;
+	}
+
+	// NEOLOAD //
+	public NLWebDriver getNeoloadDriver() {
+		return neoloadDriver;
 	}
 }
