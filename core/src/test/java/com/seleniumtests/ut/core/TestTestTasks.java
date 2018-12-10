@@ -36,6 +36,7 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import org.testng.xml.XmlTest;
 
+import com.neotys.selenium.proxies.NLWebDriver;
 import com.seleniumtests.GenericTest;
 import com.seleniumtests.MockitoTest;
 import com.seleniumtests.connectors.selenium.SeleniumGridConnector;
@@ -46,11 +47,16 @@ import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.TestTasks;
 import com.seleniumtests.core.TestVariable;
+import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.ScenarioException;
+import com.seleniumtests.driver.WebUIDriver;
+import com.seleniumtests.reporter.logger.TestLogging;
 import com.seleniumtests.util.osutility.OSUtilityFactory;
 import com.seleniumtests.util.osutility.OSUtilityWindows;
 
-@PrepareForTest({SeleniumRobotVariableServerConnector.class, SeleniumTestsContext.class, OSUtilityFactory.class, SeleniumGridConnectorFactory.class})
+import net.lightbody.bmp.BrowserMobProxy;
+
+@PrepareForTest({SeleniumRobotVariableServerConnector.class, SeleniumTestsContext.class, OSUtilityFactory.class, SeleniumGridConnectorFactory.class, WebUIDriver.class})
 public class TestTestTasks extends MockitoTest {
 
 	@Mock
@@ -58,6 +64,12 @@ public class TestTestTasks extends MockitoTest {
 	
 	@Mock
 	private OSUtilityWindows osUtility;
+	
+	@Mock
+	private BrowserMobProxy mobProxy;
+	
+	@Mock
+	private NLWebDriver neoloadDriver;
 	
 	@BeforeMethod(groups= {"ut"})
 	public void init() {
@@ -331,6 +343,88 @@ public class TestTestTasks extends MockitoTest {
 			System.clearProperty(SeleniumTestsContext.RUN_MODE);
 			System.clearProperty(SeleniumTestsContext.PLATFORM);
 			System.clearProperty(SeleniumTestsContext.WEB_DRIVER_GRID);
+		}
+	}
+	
+	/**
+	 * It should not be possible to create a manual step when automatic steps are enabled
+	 * @param testNGCtx
+	 * @param xmlTest
+	 * @throws Exception
+	 */
+	@Test(groups= {"ut"}, expectedExceptions=ConfigurationException.class)
+	public void testAddManualStepInAutomaticMode(final ITestContext testNGCtx, final XmlTest xmlTest) throws Exception {
+		TestTasks.addStep("foo");
+
+	}
+	
+	/**
+	 * Creation of a manual step, check it's written
+	 * @param testNGCtx
+	 * @param xmlTest
+	 * @throws Exception
+	 */
+	@Test(groups= {"ut"})
+	public void testAddManualStepInManualMode(final ITestContext testNGCtx, final XmlTest xmlTest) throws Exception {
+		try {
+			SeleniumTestsContextManager.getThreadContext().setManualTestSteps(true);
+			TestTasks.addStep("foo");
+			TestTasks.addStep(null); // add a final step so that previous step is written
+			Assert.assertEquals(TestLogging.getTestsSteps().get(TestLogging.getCurrentTestResult()).size(), 1);
+			Assert.assertEquals(TestLogging.getTestsSteps().get(TestLogging.getCurrentTestResult()).get(0).getName(), "foo");
+		} finally {
+			TestLogging.reset();
+		}
+	}
+	
+	/**
+	 * Creation of a manual step, check it's written
+	 * @param testNGCtx
+	 * @param xmlTest
+	 * @throws Exception
+	 */
+	@Test(groups= {"ut"})
+	public void testAddManualStepWithBrowserMobProxy(final ITestContext testNGCtx, final XmlTest xmlTest) throws Exception {
+		
+		PowerMockito.mockStatic(WebUIDriver.class);
+		when(WebUIDriver.getBrowserMobProxy()).thenReturn(mobProxy);
+		
+		try {
+			SeleniumTestsContextManager.getThreadContext().setManualTestSteps(true);
+			TestTasks.addStep("foo");
+			TestTasks.addStep(null); 
+			
+			// check we crate a new page
+			verify(mobProxy).newPage("foo");
+			
+		} finally {
+			TestLogging.reset();
+		}
+	}
+	
+	/**
+	 * Creation of a manual step, check it's written
+	 * @param testNGCtx
+	 * @param xmlTest
+	 * @throws Exception
+	 */
+	@Test(groups= {"ut"})
+	public void testAddManualStepWithNeoload(final ITestContext testNGCtx, final XmlTest xmlTest) throws Exception {
+		
+		PowerMockito.mockStatic(WebUIDriver.class);
+		when(WebUIDriver.getNeoloadDriver()).thenReturn(neoloadDriver);
+		
+		try {
+			SeleniumTestsContextManager.getThreadContext().setManualTestSteps(true);
+			TestTasks.addStep("foo");
+			TestTasks.addStep(null); 
+			
+			// check we crate a new page
+			verify(neoloadDriver).startTransaction("foo");
+			verify(neoloadDriver).stopTransaction();
+			
+		} finally {
+			TestLogging.reset();
 		}
 	}
 }
