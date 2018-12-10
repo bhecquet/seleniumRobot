@@ -154,7 +154,13 @@ public abstract class IDesktopCapabilityFactory extends ICapabilitiesFactory {
         	if ("Design".equals(System.getProperty("nl.selenium.proxy.mode"))) {
         		logger.warn("Enabling Neoload Design mode automatically configures a manual proxy through neoload instance, other proxy settings are overriden and network capture won't be possible");
         	}
-        	capability = NLWebDriverFactory.addProxyCapabilitiesIfNecessary(capability);
+        	try {
+        		capability = NLWebDriverFactory.addProxyCapabilitiesIfNecessary(capability);
+        	} catch (ExceptionInInitializerError e) {
+        		throw new ConfigurationException("Error while contacting Neoload Design API", e);
+        	} catch (RuntimeException e) {
+        		throw new ConfigurationException("Error while getting neoload project, check license and loaded project", e);
+        	}
         }
 
         return capability;

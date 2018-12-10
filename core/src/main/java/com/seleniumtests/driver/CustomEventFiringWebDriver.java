@@ -49,6 +49,7 @@ import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.HasCapabilities;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
@@ -708,7 +709,11 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
 
 	@Override
     public Capabilities getCapabilities() {
-        return ((HasCapabilities)driver).getCapabilities();
+		try {
+			return ((HasCapabilities)driver).getCapabilities();
+		} catch (ClassCastException e) {
+			return new MutableCapabilities();
+		}
     }
 
 	public BrowserMobProxy getMobProxy() {
