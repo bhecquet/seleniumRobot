@@ -28,6 +28,10 @@
 			<artifactId>selenium-java</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>com.neotys.selenium</groupId>
+			<artifactId>neotys-selenium-proxy</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>com.vdurmont</groupId>
 			<artifactId>semver4j</artifactId>
 		</dependency>
