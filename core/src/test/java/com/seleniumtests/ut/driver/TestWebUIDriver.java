@@ -8,6 +8,7 @@ import org.openqa.selenium.WebDriver;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.Test;
 
 import com.neotys.selenium.proxies.NLWebDriver;
@@ -16,6 +17,7 @@ import com.seleniumtests.MockitoTest;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import com.seleniumtests.driver.WebUIDriver;
+import com.seleniumtests.reporter.logger.TestLogging;
 
 @PrepareForTest({NLWebDriverFactory.class})
 public class TestWebUIDriver extends MockitoTest {
@@ -58,7 +60,19 @@ public class TestWebUIDriver extends MockitoTest {
 		} finally {
 			System.clearProperty("nl.selenium.proxy.mode");
 		}
-		
-		
+	}
+	
+
+	/**
+	 * destroys the driver if one has been created
+	 */
+	@AfterMethod(groups={"ut", "it"}, alwaysRun=true)
+	public void destroyDriver() {
+		if (WebUIDriver.getWebDriver(false) != null) {
+			WebUIDriver.cleanUp();
+			WebUIDriver.cleanUpWebUIDriver();
+		}
+
+		TestLogging.reset();
 	}
 }
