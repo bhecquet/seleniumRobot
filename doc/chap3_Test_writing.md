@@ -6,9 +6,10 @@ Use seleniumRobot-example project as a base to develop your own test application
 
 for the remainder, we use a unique name for that new application `appName`<br/>
 **BE CAREFUL**: application name MUST NOT contain any `_` (underscore character)
+**AND**: `appName` MUST BE THE SAME AS artifactId in your pom.xml for a correct build
 - in pom.xml
 	- remove all unnecessary plugins & configurations (see file comments)
-	- change artifactId, groupId and version according to your organization
+	- change artifactId, groupId and version according to your organization. artifactId is `appName`
 - change test package according to your organization. Last part of the package MUST BE `appName`
 - change folder name under `data` to `appName`
 - in `data/appName/testng/test_qwant.xml`, change value for `cucumberPackage` parameter according to the updated package name
