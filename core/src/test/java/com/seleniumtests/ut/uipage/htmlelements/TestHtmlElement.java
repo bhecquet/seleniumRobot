@@ -322,7 +322,7 @@ public class TestHtmlElement extends MockitoTest {
 	
 	/**
 	 * Check that when using isElementPresent, step is not marked as failed. So report will show step as green
-	 * check correction of issue #103
+	 * check correction of issue #104
 	 * @throws Exception
 	 */
 	@Test(groups={"ut"})
@@ -338,7 +338,7 @@ public class TestHtmlElement extends MockitoTest {
 	}
 	
 	/**
-	 * check correction of issue #103: step should be failed for all other actions but waitForPresent
+	 * check correction of issue #10': step should be failed for all other actions but waitForPresent
 	 * @throws Exception
 	 */
 	@Test(groups={"ut"})

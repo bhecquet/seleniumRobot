@@ -114,11 +114,16 @@ public class ReplayAction {
 		    		
 		    		// don't prevent TimeoutException to be thrown when coming from waitForPresent
 		    		// only check that cause is the not found element and not an other error (NoSucheSessionError for example)
-		    		if (e instanceof TimeoutException && joinPoint.getSignature().getName().equals("waitForPresent")) {
-		    			if (e.getCause() instanceof NoSuchElementException) {
-		    				ignoreFailure = true;  // issue #103: do not log error when waitForPresent raises TimeoutException
-		    				throw e;
-		    			}
+		    		if ((e instanceof TimeoutException 
+		    				&& joinPoint.getSignature().getName().equals("waitForPresent") 
+		    				&& e.getCause() instanceof NoSuchElementException) // issue #104: do not log error when waitForPresent raises TimeoutException
+		    			|| (e instanceof NoSuchElementException
+		    				&& isFromExpectedConditions(Thread.currentThread().getStackTrace())) // issue #194: return immediately if the action has been performed from ExpectedConditions class
+		    																					 //   This way, we let the FluentWait process to retry or re-raise the exception
+		    			) 
+		    		{
+	    				ignoreFailure = true;  
+	    				throw e;
 		    		}
 	
 		    		if (systemClock.isNowBefore(end - 200)) {
@@ -261,6 +266,27 @@ public class ReplayAction {
 //		} else {
 //			return true;
 //		}
+	}
+	
+	/**
+	 * issu #194: Returns true if the call to element action has been done from the org.openqa.selenium.support.ui.ExpectedConditions selenium class
+	 *
+	 * @param stack
+	 * @return
+	 */
+	private boolean isFromExpectedConditions(StackTraceElement[] stack) {
+		
+		for(int i=0; i < stack.length; i++) {
+			
+			// when using aspects, class name may contain a "$", remove everything after that symbol
+			String stackClass = stack[i].getClassName().split("\\$")[0];
+			if (stackClass.equals("org.openqa.selenium.support.ui.ExpectedConditions")) {
+				return true;
+			}
+
+		}
+		return false;
+
 	}
 	
     
