@@ -1272,5 +1272,17 @@ public class HtmlElement extends Element implements WebElement, Locatable, HasId
 		this.element = element;
 	}
 
+	public Integer getElementIndex() {
+		return elementIndex;
+	}
+
+	/**
+	 * Change the search index of the element (its order in element list)
+	 * @param elementIndex
+	 */
+	public void setElementIndex(Integer elementIndex) {
+		this.elementIndex = elementIndex;
+	}
+
 
 }
