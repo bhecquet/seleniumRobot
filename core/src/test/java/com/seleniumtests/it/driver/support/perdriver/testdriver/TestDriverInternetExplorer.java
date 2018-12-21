@@ -160,6 +160,16 @@ public class TestDriverInternetExplorer extends TestDriver {
 	public void testHiddenElement() {
 		super.testHiddenElement(); 
 	}
+
+	@Test(groups={"it", "ut"})
+	public void testWebDriverWaitWithLowTimeout() {
+		super.testWebDriverWaitWithLowTimeout();
+	}
+	
+	@Test(groups={"it", "ut"})
+	public void testSearchDoneSeveralTimes() {
+		super.testSearchDoneSeveralTimes();
+	}
 	
 	@Test(groups={"it", "ut"})
 	public void testIsElementPresent1() {

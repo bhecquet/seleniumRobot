@@ -19,13 +19,18 @@ package com.seleniumtests.it.driver;
 
 import java.awt.AWTException;
 import java.io.File;
+import java.util.Date;
 import java.util.regex.Pattern;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -322,8 +327,36 @@ public class TestDriver extends GenericMultiBrowserTest {
 		Assert.assertTrue(DriverTestPage.hiddenCheckBox.isDisplayed());
 	}
 	
+	/**
+	 * issue #194: check that the WebDriverWait timeout is the one really applied
+	 */
 	@Test(groups={"it", "ut"})
-	public void testIsElementPresent1() {
+	public void testWebDriverWaitWithLowTimeout() {
+		long start = new Date().getTime();
+		try {
+			new WebDriverWait(driver, 2).until(ExpectedConditions.visibilityOf(new HtmlElement("", By.id("someNonExistentId"))));
+		} catch (TimeoutException e) {}
+		
+		// we cannot check precise timing as it depends on the hardware, but we should never wait more that 10 secs (the default timeout for searching element is 30 secs)
+		Assert.assertTrue(new Date().getTime() - start < 10);
+	}
+	
+	@Test(groups={"it", "ut"})
+	public void testSearchDoneSeveralTimes() {
+
+		SeleniumTestsContextManager.getThreadContext().setReplayTimeout(7);
+		long start = new Date().getTime();
+		try {
+			new HtmlElement("", By.id("someNonExistentId")).getText();
+		} catch (NoSuchElementException e) {}
+		
+		// Check we wait at least for the timeout set
+		Assert.assertTrue(new Date().getTime() - start > 7);
+	}
+	
+	@Test(groups={"it", "ut"})
+	public void testIsElementPresent1() {		
+		
 		try {
 			DriverTestPage.delayButton.click();
 			Assert.assertFalse(new HtmlElement("", By.id("newEl")).isElementPresent(1));
