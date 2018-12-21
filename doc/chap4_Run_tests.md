@@ -39,21 +39,63 @@ Test parameter will overwrite suite parameters
 These parameters may also be passed java properties / JVM options (`-D<paramName>=<value>`).
 In this case, this user passed value will overwrite test or suite parameters
 
+#### Common params ####
 
 | Param name       			| Default 	| Description  |
 | -------------------------	| ------- 	| ------------ |
-| testConfig 				|  			| Additional configuration. This should contain common configuration through all TestNG files.<br/>See `exampleConfigGenericParams.xml` file for format | 
-| webSessionTimeOut 		| 90	 	| browser session timeout in seconds | 
-| implicitWaitTimeOut 		| 5			| implicit wait of the browser, in seconds (selenium definition) | 
-| explicitWaitTimeOut 		| 15		| explicit wait of the browser, in seconds. Used when checking is an element is present and no wait value is defined (`waitElementPresent` & `isElementPresent`). This value is also used when checking that browser is on the right page (PageObject constructor) | 
-| pageLoadTimeout 			| 90		| Value defined in selenium driver. Wait delay for page loading | 
-| replayTimeOut				| 30		| Delay during which an action is replayed
 | webDriverGrid 			| 			| Address of seleniumGrid server | 
 | runMode 					| LOCAL		| `local`: current computer<br/>`grid`: seleniumGrid<br/>`sauceLabs`: run on sauceLabs device<br/>`testDroid`: run on testdroid device | 
 | nodeTags					| null		| Commat seperated list of strings. Requests that this test should execute only on a node (grid mode only) announcing all of these tags. On grid, this is declared with option `-nodeTags <tag1>,<tag2>`. If no slot matches the requested tags, session is not created |
-| devMode 					| false		| The development mode. If true, DEBUG logs are displayed, else, minimal log level is INFO. Driver logs are also displayed | 
-| manualTestSteps			| false		| If true, it's possible to add test steps in Test and Page Object (`addTest("my step name")`). An error will be raised if manual steps are added when automatic steps are enabled |
 | browser 					| firefox	| Browser used to start test. Valid values are:<br/>`firefox`, `chrome`, `safari`, `iexplore`, `htmlunit`, `opera`, `phantomjs`, `none` for no driver, `browser` for android default browser | 
+| env 						| DEV		| Test environment for the SUT. Allow accessing param values defined in env.ini file  
+| captureVideo				| onError	| If `true`, always capture video. Other possible values are: `onSuccess` (keep video when test is OK), `false` and `onError` (capture video when test is KO) |
+| captureNetwork			| false		| If true, creates a HAR file which capture traffic. This is only available with MANUAL and DIRECT proxy settings because there is no way, when automatic mode is used, to know which proxy is used by browser and the authentication used. |
+| testRetryCount			| 2			| Number of times a failed test is retried. Set to 0 for no retry. **This parameter is not accepted in XML file, only on command line**|
+| seleniumRobotServerActive	| false		| whether we use seleniumRobot server. If true, seleniumRobotServerUrl MUST be specified (in XML, command line or through env variable |
+| seleniumRobotServerUrl	| 			| URL of the seleniumRobot server. Can be specified as an environment variable |
+| outputDirectory 			| <exec folder>	| folder where HTML report will be written. By default, it's 'test-output' subfolder. If you want to write test in an other directory, use `test-output/myResult` to write them relative to SeleniumRobot root. An absolute path may also be specified. This will allow to execute several tests in parallel without overwritting existing results | 
+
+
+
+#### Proxy settings ####
+
+| Param name       			| Default 	| Description  |
+| -------------------------	| ------- 	| ------------ |
+| proxyType 				| AUTO		| Proxy type. Valid values are `AUTODETECT`, `MANUAL`, `DIRECT`, `PAC`, `SYSTEM` | 
+| proxyAddress 				| 			| Proxy address, if MANUAL type is choosen | 
+| proxyPort 				| 			| Proxy port, if MANUAL type is choosen | 
+| proxyLogin 				| 			| Proxy login, if MANUAL type is choosen |  
+| proxyPassword 			| 			| Proxy password, if MANUAL type is choosen | 
+| proxyExclude 				|			| Proxy address exclusion, if MANUAL type is choosen | 
+| proxyPac 					| 			| Automatic configuration address, if PAC type is choosen | 
+
+#### Test execution settings ####
+
+Settings for changing the test behavior 
+
+| Param name       			| Default 	| Description  |
+| -------------------------	| ------- 	| ------------ |
+| devMode 					| false		| The development mode. If true, DEBUG logs are displayed, else, minimal log level is INFO. Driver logs are also displayed | 
+| softAssertEnabled 		| true		| Test does not stop is an assertion fails. Only valid when using assertions defined in `CustomAssertion` class or assert methods in `BasePage` class | 
+| loadIni					|			| comma separated list of path to ini formatted files to load. Their values will overwrite those from env.ini file if the same key is present. Path is relative to data/<app>/config path |
+| overrideSeleniumNativeAction      | false | intercept driver.findElement and driver.frame operations so that seleniumRobot element operations can be use (replay, error handling, ...) even when using standard selenium code. Only findElement(By) and findElements(By) are supported, not findElementByxxx(String). Logging is also better |
+
+
+Cucumber options
+
+| Param name       			| Default 	| Description  |
+| -------------------------	| ------- 	| ------------ |
+| cucumberTests 			|  			| Comma seperated list of tests to execute when using cucumber mode. Test name can be the feature name, the feature file name or the scenario name. You can also give regex that will match String in java. e.g: scenario .* | 
+| cucumberTags 				|  			| List of cucumber tags that will allow determining tests to execute. Format can be:<br/>`@new4 AND @new5` for filtering scenario containing tag new4 AND new5<br/>`@new,@new2` for filtering scenarios containing new OR new2<br/>`@new` for filtering scenario containing new tag | 
+| cucumberPackage 			| 			| **Mandatory for cucumberTests:** name of the package where cucumber implementation class reside | 
+
+
+#### Browser specific settings ####
+
+Settings for customizing the default seleniumRobot driver features. By default, selenium looks at the installed drivers and browser and choose the best one
+
+| Param name       			| Default 	| Description  |
+| -------------------------	| ------- 	| ------------ |
 | browserVersion 			|  			| Browser version to use. By default, it's the last one, or the installed one in local mode. This option has sense when using sauceLabs where browser version can be choosen | 
 | headless					| false		| If true, start browser in headless mode. This is supported by chrome >= 60 and firefox >= 56  |
 | firefoxUserProfilePath 	|  			| Firefox user profile if a specific one is defined | 
@@ -67,39 +109,41 @@ In this case, this user passed value will overwrite test or suite parameters
 | edgeDriverPath			| 			| Path to a different edge driver executable |
 | userAgent 				| 			| Allow defining a specific user-agent in chrome and firefox only | 
 | enableJavascript 			| true		| Javascript activation |
-| browserDownloadDir 		| 			| Path where files are downloaded. Firefox only | 
-| proxyType 				| AUTO		| Proxy type. Valid values are `AUTODETECT`, `MANUAL`, `DIRECT`, `PAC`, `SYSTEM` | 
-| proxyAddress 				| 			| Proxy address, if MANUAL type is choosen | 
-| proxyPort 				| 			| Proxy port, if MANUAL type is choosen | 
-| proxyLogin 				| 			| Proxy login, if MANUAL type is choosen |  
-| proxyPassword 			| 			| Proxy password, if MANUAL type is choosen | 
-| proxyExclude 				|			| Proxy address exclusion, if MANUAL type is choosen | 
-| proxyPac 					| 			| Automatic configuration address, if PAC type is choosen | 
-| reportGenerationConfig 	| summaryPerSuite | Type of report generation.
-| captureSnapshot 			| true 		| Capture page snapshots. Captures are done only when a new page is opened |
-| captureNetwork			| false		| If true, creates a HAR file which capture traffic. This is only available with MANUAL and DIRECT proxy settings because there is no way, when automatic mode is used, to know which proxy is used by browser and the authentication used. |
-| snapshotTopCropping		| 0			| number of pixel that will be cropped from the top when capturing snapshot. This only applies to snapshots done with several captures (like from chrome) when a portion of the GUI is fixed when scrolling |
-| snapshotBottomCropping	| 0			| same as snapshotTopCropping for bottom cropping |
+| browserDownloadDir 		| 			| Path where files are downloaded. Firefox only |
+| viewPortWidth				|			| Width of the viewPort when doing web tests. No effect for mobile apps. If not set, window will be maximized |
+| viewPortHeight			|			| Height of the viewPort when doing web tests. No effect for mobile apps. If not set, window will be maximized | 
+
+
+Settings for customizing timeouts
+
+| Param name       			| Default 	| Description  |
+| -------------------------	| ------- 	| ------------ |
+| webSessionTimeOut 		| 90	 	| browser session timeout in seconds | 
+| implicitWaitTimeOut 		| 5			| implicit wait of the browser, in seconds (selenium definition) | 
+| explicitWaitTimeOut 		| 15		| explicit wait of the browser, in seconds. Used when checking is an element is present and no wait value is defined (`waitElementPresent` & `isElementPresent`). This value is also used when checking that browser is on the right page (PageObject constructor) | 
+| pageLoadTimeout 			| 90		| Value defined in selenium driver. Wait delay for page loading | 
+| replayTimeOut				| 30		| Delay during which an action is replayed
+
+#### Selenium server params ####
+
+| Param name       			| Default 	| Description  |
+| -------------------------	| ------- 	| ------------ |
 | seleniumRobotServerActive	| false		| whether we use seleniumRobot server. If true, seleniumRobotServerUrl MUST be specified (in XML, command line or through env variable |
 | seleniumRobotServerUrl	| 			| URL of the seleniumRobot server. Can be specified as an environment variable |
 | seleniumRobotServerCompareSnapshots	| false		| whether we should use the snapshots created by robot to compare them to a previous execution. This option only operates when SeleniumRobot server is connected. See chap6 documentation for details on connecting to server |
 | seleniumRobotServerRecordResults		| false		| whether we should record test results to seleniumrobot server. This option only operates when SeleniumRobot server is connected. See chap6 documentation for details on connecting to server |
 | seleniumRobotServerVariablesOlderThan | 0			| whether we should get from server variables which were created at least X days ago |
-| softAssertEnabled 		| true		| Test does not stop is an assertion fails. Only valid when using assertions defined in `CustomAssertion` class or assert methods in `BasePage` class | 
-| outputDirectory 			| <exec folder>	| folder where HTML report will be written. By default, it's 'test-output' subfolder. If you want to write test in an other directory, use `test-output/myResult` to write them relative to SeleniumRobot root. An absolute path may also be specified. This will allow to execute several tests in parallel without overwritting existing results | 
-| loadIni					|			| comma separated list of path to ini formatted files to load. Their values will overwrite those from env.ini file if the same key is present. Path is relative to data/<app>/config path |
-| webDriverListener 		| 			| additional driver listener class |
-| testMethodSignature 		|  			| define a specific method signature for hashcodes |
-| pluginConfigPath 			|  			| plugins to add |
-| cucumberTests 			|  			| Comma seperated list of tests to execute when using cucumber mode. Test name can be the feature name, the feature file name or the scenario name. You can also give regex that will match String in java. e.g: scenario .* | 
-| cucumberTags 				|  			| List of cucumber tags that will allow determining tests to execute. Format can be:<br/>`@new4 AND @new5` for filtering scenario containing tag new4 AND new5<br/>`@new,@new2` for filtering scenarios containing new OR new2<br/>`@new` for filtering scenario containing new tag | 
-| env 						| DEV		| Test environment for the SUT. Allow accessing param values defined in env.ini file  
-| cucumberPackage 			| 			| **Mandatory for cucumberTests:** name of the package where cucumber implementation class reside | 
+
+#### Mobile params ####
+
+Params for mobile testing
+
+| Param name       			| Default 	| Description  |
+| -------------------------	| ------- 	| ------------ |
 | app 						| 			| Path to the application file (local or remote) | 
 | appiumServerURL 			| 			| Appium server url. May be local or remote | 
 | deviceName 				| 			| Name of the device to use for mobile tests. It's the Human readable name (e.g: Nexus 6 as given by `adb -s <id_device> shell getprop`, line [ro.product.model] property on Android or `instruments -s devices`), not it's id. SeleniumRobot will replace this name with id when communicating with Appium | 
 | fullReset 				| true		| enable full reset capability for appium tests | 
-| maskPassword 				| true		| Whether seleniumRobot should detect passwords in method calls and mask them in reports | 
 | appPackage 				| 			| Package name of application (android only) | 
 | appActivity 				| 			| Activity started by mobile application (Android) | 
 | appWaitActivity 			| 			| In some cases, the first started activity is not the main app activity | 
@@ -108,25 +152,45 @@ In this case, this user passed value will overwrite test or suite parameters
 | platform 					| 			| platform on which test should execute. Ex: Windows 7, Android 5.0, iOS 9.1, Linux, OS X 10.10. Defaults to the current platform | 
 | cloudApiKey 				| 			| Access key for service | 
 | projectName 				| 			| Project name for Testdroid tests only | 
-| viewPortWidth				|			| Width of the viewPort when doing web tests. No effect for mobile apps. If not set, window will be maximized |
-| viewPortHeight			|			| Height of the viewPort when doing web tests. No effect for mobile apps. If not set, window will be maximized |
-| overrideSeleniumNativeAction      | false | intercept driver.findElement and driver.frame operations so that seleniumRobot element operations can be use (replay, error handling, ...) even when using standard selenium code. Only findElement(By) and findElements(By) are supported, not findElementByxxx(String). Logging is also better |
+| testConfig 				|  			| Additional configuration. This should contain common configuration through all TestNG files.<br/>See `exampleConfigGenericParams.xml` file for format | 
+
+#### Reporting ####
+
+| Param name       			| Default 	| Description  |
+| -------------------------	| ------- 	| ------------ |
 | customTestReports			| PERF::xml::reporter/templates/report.perf.vm | With this option, you can specify which files will be generated for each test. By default, it's the JMeter report. Format is a comma seperated list of <prefix>::<extension>::<template_file located in resources>. resources can be those from test application. Template is in the Velocity format |
 | customSummaryReports		| results::json::reporter/templates/report.summary.json.vm | With this option, you can specify which files will be generated for sumarizing test session. By default, it's a json report. Format is a comma seperated list of <prefix>::<extension>::<template_file located in resources>. resources can be those from test application. Template is in the Velocity format |
 | archiveToFile				| null		| If not specified, no archiving will be done. Else, provide a zip file path and the whole content of `outputDirectory` will be zipped to this file in case archive is enabled |
 | archive					| false		| If `true`, always archive results to `archiveToFile` file. Other possible values are: `onSuccess` (archive when test is OK) and `onError` (archive when test is KO) |
-| captureVideo				| onError	| If `true`, always capture video. Other possible values are: `onSuccess` (keep video when test is OK), `false` and `onError` (capture video when test is KO) |
 | tmsRun					| null		| Configuration string (JSON format) for identifying test that is run in test management system. E.g: {'type': 'hp', 'run': '3'} |
 | tmsConnect				| null		| Configuration string (JSON format) for test management system if you plan to use it. E.g: {'hpAlmServerUrl': 'http://myamlserver:8080', 'hpAlmProject': '12', 'hpAlmDomain': 'mydomain', 'hpAlmUser': 'user', 'hpAlmPassword': 'pass'}  |
 | optimizeReports			| false		| If true, compress HTML, get HTML resources from internet so that logs are smaller |
-| neoloadUserPath 			| null		| a name to give to your Neoload recordings. See chap7 for details on how to use Neoload with SeleniumRobot |
+| manualTestSteps			| false		| If true, it's possible to add test steps in Test and Page Object (`addTest("my step name")`). An error will be raised if manual steps are added when automatic steps are enabled |
+| maskPassword 				| true		| Whether seleniumRobot should detect passwords in method calls and mask them in reports | 
 
 
-Other parameters, not accepted in XML file but allowed on command line
+Performance reporting
 
 | Param name       			| Default 	| Description  |
 | -------------------------	| ------- 	| ------------ |
-| testRetryCount			| 2			| Number of times a failed test is retried. Set to 0 for no retry
+| neoloadUserPath 			| null		| a name to give to your Neoload recordings. See chap7 for details on how to use Neoload with SeleniumRobot |
+| nl.selenium.proxy.mode    | null		| 'Design' or 'EndUserExperience'. It's the mode in which test will be run. See How to §16 |
+
+Snapshots
+
+| Param name       			| Default 	| Description  |
+| -------------------------	| ------- 	| ------------ |
+| captureSnapshot 			| true 		| Capture page snapshots. Captures are done only when a new page is opened |
+| snapshotTopCropping		| 0			| number of pixel that will be cropped from the top when capturing snapshot. This only applies to snapshots done with several captures (like from chrome) when a portion of the GUI is fixed when scrolling |
+| snapshotBottomCropping	| 0			| same as snapshotTopCropping for bottom cropping |
+
+#### Deprecated ####
+
+| Param name       			| Default 	| Description  |
+| -------------------------	| ------- 	| ------------ |
+| webDriverListener 		| 			| additional driver listener class |
+| testMethodSignature 		|  			| define a specific method signature for hashcodes |
+| pluginConfigPath 			|  			| plugins to add |
 
 #### Minimal Configuration ####
 
