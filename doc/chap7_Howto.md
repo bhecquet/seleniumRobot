@@ -342,7 +342,7 @@ For test to start, prerequisites are:
 
 #### End User Experience ####
 
-To enable End User Experience, you have to add `-Dnl.selenium.proxy.mode=EndUserExperience`
+To enable End User Experience, you have to add `-Dnl.selenium.proxy.mode=EndUserExperience` and `-DneoloadUserPath=<userPath>`
 
 Test MUST be started from Neoload itself, either through a java test script action or a command line action. Launching options are the same as for any other test launching. See chap4_Run_tests for details. .
 	  
