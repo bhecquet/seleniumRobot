@@ -23,8 +23,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
 import org.apache.log4j.Logger;
 import org.json.JSONObject;
 import org.openqa.selenium.Capabilities;
@@ -44,6 +42,7 @@ public class SeleniumGridConnector {
 	protected int hubPort;
 	protected SessionId sessionId;
 	protected String nodeUrl;
+	
 	public static final String CONSOLE_SERVLET = "/grid/console/";
 	protected static Logger logger = SeleniumRobotLogger.getLogger(SeleniumGridConnector.class);
 	
@@ -171,7 +170,7 @@ public class SeleniumGridConnector {
 	public void runTest(RemoteWebDriver driver) {
 		
         // logging node ip address:
-        try (CloseableHttpClient client = HttpClients.createDefault()) {
+        try {
         	JSONObject object = Unirest.get(String.format("http://%s:%d/grid/api/testsession/", hubUrl.getHost(), hubUrl.getPort()))
         		.queryString("session", driver.getSessionId().toString())
         		.asJson()

@@ -17,7 +17,7 @@
  */
 package com.seleniumtests.browserfactory;
 
-import java.net.URL;
+import java.util.List;
 
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.WebDriver;
@@ -37,13 +37,14 @@ import com.seleniumtests.util.helper.WaitHelper;
 
 public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implements IWebDriverFactory {
 	
-	private SeleniumGridConnector gridConnector;
+	private List<SeleniumGridConnector> gridConnectors;
+	private SeleniumGridConnector activeGridConnector;
 	public static final int DEFAULT_RETRY_TIMEOUT = 1800; // timeout in seconds (wait 30 mins for connecting to grid)
 	private static int retryTimeout = DEFAULT_RETRY_TIMEOUT;
 
     public SeleniumGridDriverFactory(final DriverConfig cfg) {
         super(cfg);
-        gridConnector = SeleniumTestsContextManager.getThreadContext().getSeleniumGridConnector();
+        gridConnectors = SeleniumTestsContextManager.getThreadContext().getSeleniumGridConnectors();
     }    
 
 	@Override
@@ -110,11 +111,14 @@ public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implemen
         MutableCapabilities capabilities = createSpecificGridCapabilities(webDriverConfig);
         capabilities.merge(driverOptions);
         
-        // 
-        gridConnector.uploadMobileApp(capabilities);
+        // app must be uploaded before driver creation because driver will need it in mobile app testing
+        // upload file on all available grids as we don't know which one will be chosen before driver has been created
+        for (SeleniumGridConnector gridConnector: gridConnectors) {
+        	gridConnector.uploadMobileApp(capabilities);
+        }
 
         // connection to grid is made here
-        driver = getDriver(gridConnector.getHubUrl(), capabilities);
+        driver = getDriver(capabilities);
 
         setImplicitWaitTimeout(webDriverConfig.getImplicitWaitTimeout());
         if (webDriverConfig.getPageLoadTimeout() >= 0 && SeleniumTestsContextManager.isWebTest()) {
@@ -132,11 +136,12 @@ public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implemen
     
     /**
      * Connect to grid using RemoteWebDriver
+     * As we may have several grid available, takes the first one where driver is created
      * @param url
      * @param capability
      * @return
      */
-    private WebDriver getDriver(URL url, MutableCapabilities capability){
+    private WebDriver getDriver(MutableCapabilities capability){
     	driver = null;
     	
     	SystemClock clock = new SystemClock();
@@ -145,21 +150,42 @@ public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implemen
     	
 		while (clock.isNowBefore(end)) {
 			
-			// if grid is not active, wait 30 secs
-			if (!gridConnector.isGridActive()) {
-				logger.warn("grid is not active, waiting 30 secs before retry");
-				WaitHelper.waitForSeconds(30);
-				continue;
+			for (SeleniumGridConnector gridConnector: gridConnectors) {
+			
+				// if grid is not active, wait 30 secs
+				if (!gridConnector.isGridActive()) {
+					logger.warn(String.format("grid %s is not active, looking for the next one", gridConnector.getHubUrl().toString()));
+					continue;
+				}
+				
+				try {
+					driver = new RemoteWebDriver(gridConnector.getHubUrl(), capability);
+					activeGridConnector = gridConnector;
+					break;
+				} catch (WebDriverException e) {
+					logger.warn(String.format("Error creating driver on hub %s: %s", gridConnector.getHubUrl().toString(), e.getMessage()));
+					currentException = e;
+					continue;
+				}
 			}
 			
-			try {
-				driver = new RemoteWebDriver(url, capability);
+			// do not wait more
+			if (driver != null) {
 				break;
-			} catch (WebDriverException e) {
-				logger.warn("Error creating driver, retrying: " + e.getMessage());
+			}
+			
+			if (currentException != null) {
 				WaitHelper.waitForSeconds(5);
-				currentException = e;
-				continue;
+			} else {
+				// we are here if no grid connector is available
+				logger.warn("No grid available, wait 30 secs and retry");
+				
+				// for test only, reduce wiat
+				if (retryTimeout > 1) {
+					WaitHelper.waitForSeconds(30);
+				} else {
+					WaitHelper.waitForSeconds(1);
+				}
 			}
 		}
 		
@@ -171,11 +197,19 @@ public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implemen
     }
     
     private void runWebDriver(){
-    	gridConnector.runTest((RemoteWebDriver) driver);
+    	activeGridConnector.runTest((RemoteWebDriver) driver);
     }
 
 	@Override
 	protected WebDriver createNativeDriver() {
 		return null;
+	}
+
+	public static int getRetryTimeout() {
+		return retryTimeout;
+	}
+
+	public static void setRetryTimeout(int retryTimeout) {
+		SeleniumGridDriverFactory.retryTimeout = retryTimeout;
 	}
 }

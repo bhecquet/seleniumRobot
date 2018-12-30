@@ -58,7 +58,11 @@ public class TestTasks {
     		OSUtilityFactory.getInstance().killProcessByName(processName, true);
     	} else if (SeleniumTestsContextManager.getThreadContext().getRunMode() == DriverMode.GRID) {
     		SeleniumGridConnector gridConnector = SeleniumTestsContextManager.getThreadContext().getSeleniumGridConnector();
-    		gridConnector.killProcess(processName);
+    		if (gridConnector != null) {
+    			gridConnector.killProcess(processName);
+    		} else {
+				throw new ScenarioException("No grid connector active");
+			}
     	} else {
     		logger.error("killing a process is only supported in local and grid mode");
     	}
@@ -79,7 +83,11 @@ public class TestTasks {
 				.collect(Collectors.toList());
 		} else if (SeleniumTestsContextManager.getThreadContext().getRunMode() == DriverMode.GRID) {
 			SeleniumGridConnector gridConnector = SeleniumTestsContextManager.getThreadContext().getSeleniumGridConnector();
-			return gridConnector.getProcessList(processName);
+			if (gridConnector != null) {
+				return gridConnector.getProcessList(processName);
+			} else {
+				throw new ScenarioException("No grid connector active");
+			}
 		} else {
 			throw new ScenarioException("killing a process is only supported in local and grid mode");
 		}

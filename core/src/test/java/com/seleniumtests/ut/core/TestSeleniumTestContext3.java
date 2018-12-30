@@ -17,15 +17,18 @@
  */
 package com.seleniumtests.ut.core;
 
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.spy;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.mockito.Mock;
+import org.openqa.selenium.remote.SessionId;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
@@ -174,10 +177,13 @@ public class TestSeleniumTestContext3 extends MockitoTest {
 	@Test(groups="ut")
 	public void testGridConnection(final ITestContext testNGCtx) throws NoSuchMethodException, SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
 		
-		SeleniumGridConnector gridConnector = new SeleniumGridConnector("http://localhost:4444/hub/wd");
+		SeleniumGridConnector gridConnector = spy(new SeleniumGridConnector("http://localhost:4444/hub/wd"));
+		
+		// grid connector is in use only if session Id exists
+		doReturn(new SessionId("1234")).when(gridConnector).getSessionId();
 		
 		PowerMockito.mockStatic(SeleniumGridConnectorFactory.class);
-		PowerMockito.when(SeleniumGridConnectorFactory.getInstance("http://localhost:4444/hub/wd")).thenReturn(gridConnector);
+		PowerMockito.when(SeleniumGridConnectorFactory.getInstances(Arrays.asList("http://localhost:4444/hub/wd"))).thenReturn(Arrays.asList(gridConnector));
 		
 		try {
 			System.setProperty(SeleniumTestsContext.RUN_MODE, "grid");
@@ -194,6 +200,31 @@ public class TestSeleniumTestContext3 extends MockitoTest {
 	}
 	
 	/**
+	 * Test when grid mode is set, but no grid URL is configured. A configuration exception should be raised
+	 * @param testNGCtx
+	 * @throws NoSuchMethodException
+	 * @throws SecurityException
+	 * @throws NoSuchFieldException
+	 * @throws IllegalArgumentException
+	 * @throws IllegalAccessException
+	 */
+	@Test(groups="ut", expectedExceptions=ConfigurationException.class)
+	public void testGridConnectionEmpty(final ITestContext testNGCtx) throws NoSuchMethodException, SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
+		
+		try {
+			System.setProperty(SeleniumTestsContext.RUN_MODE, "grid");
+			
+			ITestResult testResult = GenericTest.generateResult(testNGCtx, getClass());
+			initThreadContext(testNGCtx, "myTest", testResult);
+			SeleniumTestsContextManager.getThreadContext().getSeleniumGridConnector();
+			
+		} finally {
+			System.clearProperty(SeleniumTestsContext.RUN_MODE);
+		}
+	}
+	
+	
+	/**
 	 * Local test, no grid connector
 	 * @param testNGCtx
 	 * @throws IllegalAccessException 
@@ -204,11 +235,14 @@ public class TestSeleniumTestContext3 extends MockitoTest {
 	 */
 	@Test(groups="ut")
 	public void testNoGridConnection(final ITestContext testNGCtx) throws NoSuchMethodException, SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
+
+		SeleniumGridConnector gridConnector = spy(new SeleniumGridConnector("http://localhost:4444/hub/wd"));
 		
-		SeleniumGridConnector gridConnector = new SeleniumGridConnector("http://localhost:4444/hub/wd");
+		// grid connector is in use only if session Id exists
+		doReturn(new SessionId("1234")).when(gridConnector).getSessionId();
 		
 		PowerMockito.mockStatic(SeleniumGridConnectorFactory.class);
-		PowerMockito.when(SeleniumGridConnectorFactory.getInstance("http://localhost:4444/hub/wd")).thenReturn(gridConnector);
+		PowerMockito.when(SeleniumGridConnectorFactory.getInstances(Arrays.asList("http://localhost:4444/hub/wd"))).thenReturn(Arrays.asList(gridConnector));
 		
 		try {
 			System.setProperty(SeleniumTestsContext.RUN_MODE, "local");
@@ -235,11 +269,14 @@ public class TestSeleniumTestContext3 extends MockitoTest {
 	 */
 	@Test(groups="ut", expectedExceptions=ConfigurationException.class)
 	public void testGridConnectionWithoutUrl(final ITestContext testNGCtx) throws NoSuchMethodException, SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
+
+		SeleniumGridConnector gridConnector = spy(new SeleniumGridConnector("http://localhost:4444/hub/wd"));
 		
-		SeleniumGridConnector gridConnector = new SeleniumGridConnector("http://localhost:4444/hub/wd");
+		// grid connector is in use only if session Id exists
+		doReturn(new SessionId("1234")).when(gridConnector).getSessionId();
 		
 		PowerMockito.mockStatic(SeleniumGridConnectorFactory.class);
-		PowerMockito.when(SeleniumGridConnectorFactory.getInstance("http://localhost:4444/hub/wd")).thenReturn(gridConnector);
+		PowerMockito.when(SeleniumGridConnectorFactory.getInstances(Arrays.asList("http://localhost:4444/hub/wd"))).thenReturn(Arrays.asList(gridConnector));
 		
 		try {
 			System.setProperty(SeleniumTestsContext.RUN_MODE, "grid");

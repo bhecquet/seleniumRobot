@@ -388,6 +388,25 @@ public class TestSeleniumTestContext extends GenericTest {
 		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getNodeTags().size(), 0);
 	}
 	
+
+	@Test(groups="ut context")
+	public void testWebDriverGrid(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setWebDriverGrid("http://localhost:4444/wd/hub,http://localhost:4445/wd/hub");
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getWebDriverGrid(), Arrays.asList("http://localhost:4444/wd/hub", "http://localhost:4445/wd/hub"));
+	}
+	@Test(groups="ut context", expectedExceptions=ConfigurationException.class)
+	public void testWebDriverGridEmpty(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setWebDriverGrid("");
+	}
+	@Test(groups="ut context")
+	public void testWebDriverGridNull(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setWebDriverGrid(null);
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getWebDriverGrid().size(), 0);
+	}
+	
 	@Test(groups="ut context")
 	public void testExternalPrograms(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		initThreadContext(testNGCtx);
