@@ -136,7 +136,7 @@ public class DriverConfig {
         }
     }
 
-    public String getHubUrl() {
+    public List<String> getHubUrl() {
         return testContext.getWebDriverGrid();
     }
 

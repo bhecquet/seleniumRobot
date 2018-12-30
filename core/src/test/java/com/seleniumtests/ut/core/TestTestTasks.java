@@ -21,12 +21,16 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.Arrays;
+
 import org.mockito.Mock;
+import org.openqa.selenium.remote.SessionId;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
@@ -302,13 +306,47 @@ public class TestTestTasks extends MockitoTest {
 		SeleniumGridConnector gridConnector = spy(new SeleniumRobotGridConnector("http://localhost:4444/hub/wd"));
 		doNothing().when(gridConnector).killProcess("some_process");
 		
+		// grid connector is in use only if session Id exists
+		doReturn(new SessionId("1234")).when(gridConnector).getSessionId();
+		
 		PowerMockito.mockStatic(SeleniumGridConnectorFactory.class);
-		PowerMockito.when(SeleniumGridConnectorFactory.getInstance("http://localhost:4444/hub/wd")).thenReturn(gridConnector);
+		PowerMockito.when(SeleniumGridConnectorFactory.getInstances(Arrays.asList("http://localhost:4444/hub/wd"))).thenReturn(Arrays.asList(gridConnector));
 		
 		try {
 			System.setProperty(SeleniumTestsContext.RUN_MODE, "grid");
 			System.setProperty(SeleniumTestsContext.WEB_DRIVER_GRID, "http://localhost:4444/hub/wd");
 			initThreadContext(testNGCtx);
+			
+			SeleniumTestsContextManager.getThreadContext().getSeleniumGridConnectors();
+			TestTasks.killProcess("some_process");
+			
+			verify(gridConnector).killProcess("some_process");
+			
+		} finally {
+			System.clearProperty(SeleniumTestsContext.RUN_MODE);
+			System.clearProperty(SeleniumTestsContext.WEB_DRIVER_GRID);
+		}
+	}
+	
+	/**
+	 * Test when the grid connector is not initialized
+	 * When grid connector does not return any sessionId, it's not active
+	 * @param testNGCtx
+	 */
+	@Test(groups= {"ut"}, expectedExceptions=ScenarioException.class)
+	public void testKillProcessGridNotUsed(final ITestContext testNGCtx) {
+		SeleniumGridConnector gridConnector = spy(new SeleniumRobotGridConnector("http://localhost:4444/hub/wd"));
+		doNothing().when(gridConnector).killProcess("some_process");
+		
+		PowerMockito.mockStatic(SeleniumGridConnectorFactory.class);
+		PowerMockito.when(SeleniumGridConnectorFactory.getInstances(Arrays.asList("http://localhost:4444/hub/wd"))).thenReturn(Arrays.asList(gridConnector));
+		
+		try {
+			System.setProperty(SeleniumTestsContext.RUN_MODE, "grid");
+			System.setProperty(SeleniumTestsContext.WEB_DRIVER_GRID, "http://localhost:4444/hub/wd");
+			initThreadContext(testNGCtx);
+			
+			SeleniumTestsContextManager.getThreadContext().getSeleniumGridConnectors();
 			TestTasks.killProcess("some_process");
 			
 			verify(gridConnector).killProcess("some_process");
@@ -328,7 +366,7 @@ public class TestTestTasks extends MockitoTest {
 		SeleniumGridConnector gridConnector = spy(new SeleniumRobotGridConnector("http://saucelabs:4444/hub/wd"));
 		
 		PowerMockito.mockStatic(SeleniumGridConnectorFactory.class);
-		PowerMockito.when(SeleniumGridConnectorFactory.getInstance("http://saucelabs:4444/hub/wd")).thenReturn(gridConnector);
+		PowerMockito.when(SeleniumGridConnectorFactory.getInstances(Arrays.asList("http://saucelabs:4444/hub/wd"))).thenReturn(Arrays.asList(gridConnector));
 		
 		try {
 			System.setProperty(SeleniumTestsContext.RUN_MODE, "saucelabs");
@@ -338,6 +376,102 @@ public class TestTestTasks extends MockitoTest {
 			TestTasks.killProcess("some_process");
 			
 			verify(gridConnector, never()).killProcess("some_process");
+			
+		} finally {
+			System.clearProperty(SeleniumTestsContext.RUN_MODE);
+			System.clearProperty(SeleniumTestsContext.PLATFORM);
+			System.clearProperty(SeleniumTestsContext.WEB_DRIVER_GRID);
+		}
+	}
+	
+
+	@Test(groups= {"ut"})
+	public void testGetProcessListLocal(final ITestContext testNGCtx) {
+		try {
+			System.setProperty(SeleniumTestsContext.RUN_MODE, "local");
+			initThreadContext(testNGCtx);
+			TestTasks.getProcessList("some_process");
+			
+			verify(osUtility).getRunningProcesses("some_process");
+			
+		} finally {
+			System.clearProperty(SeleniumTestsContext.RUN_MODE);
+		}
+	}
+	
+	@Test(groups= {"ut"})
+	public void testGetProcessListGrid(final ITestContext testNGCtx) {
+		SeleniumGridConnector gridConnector = spy(new SeleniumRobotGridConnector("http://localhost:4444/hub/wd"));
+		doReturn(Arrays.asList(10, 20)).when(gridConnector).getProcessList("some_process");
+		
+		// grid connector is in use only if session Id exists
+		doReturn(new SessionId("1234")).when(gridConnector).getSessionId();
+		
+		PowerMockito.mockStatic(SeleniumGridConnectorFactory.class);
+		PowerMockito.when(SeleniumGridConnectorFactory.getInstances(Arrays.asList("http://localhost:4444/hub/wd"))).thenReturn(Arrays.asList(gridConnector));
+		
+		try {
+			System.setProperty(SeleniumTestsContext.RUN_MODE, "grid");
+			System.setProperty(SeleniumTestsContext.WEB_DRIVER_GRID, "http://localhost:4444/hub/wd");
+			initThreadContext(testNGCtx);
+			
+			SeleniumTestsContextManager.getThreadContext().getSeleniumGridConnectors();
+			TestTasks.getProcessList("some_process");
+			
+			verify(gridConnector).getProcessList("some_process");
+			
+		} finally {
+			System.clearProperty(SeleniumTestsContext.RUN_MODE);
+			System.clearProperty(SeleniumTestsContext.WEB_DRIVER_GRID);
+		}
+	}
+	
+	/**
+	 * Test when the grid connector is not initialized
+	 * When grid connector does not return any sessionId, it's not active
+	 * @param testNGCtx
+	 */
+	@Test(groups= {"ut"}, expectedExceptions=ScenarioException.class)
+	public void testGetProcessListGridNotUsed(final ITestContext testNGCtx) {
+		SeleniumGridConnector gridConnector = spy(new SeleniumRobotGridConnector("http://localhost:4444/hub/wd"));
+		doReturn(Arrays.asList(10, 20)).when(gridConnector).getProcessList("some_process");
+		
+		PowerMockito.mockStatic(SeleniumGridConnectorFactory.class);
+		PowerMockito.when(SeleniumGridConnectorFactory.getInstances(Arrays.asList("http://localhost:4444/hub/wd"))).thenReturn(Arrays.asList(gridConnector));
+		
+		try {
+			System.setProperty(SeleniumTestsContext.RUN_MODE, "grid");
+			System.setProperty(SeleniumTestsContext.WEB_DRIVER_GRID, "http://localhost:4444/hub/wd");
+			initThreadContext(testNGCtx);
+			
+			SeleniumTestsContextManager.getThreadContext().getSeleniumGridConnectors();
+			TestTasks.getProcessList("some_process");
+			
+			verify(gridConnector).getProcessList("some_process");
+			
+		} finally {
+			System.clearProperty(SeleniumTestsContext.RUN_MODE);
+			System.clearProperty(SeleniumTestsContext.WEB_DRIVER_GRID);
+		}
+	}
+	
+	/**
+	 * Test kill process is not called when not using local or grid mode
+	 * @param testNGCtx
+	 */
+	@Test(groups= {"ut"}, expectedExceptions=ScenarioException.class)
+	public void testGetProcessListOtherRunMode(final ITestContext testNGCtx) {
+		SeleniumGridConnector gridConnector = spy(new SeleniumRobotGridConnector("http://saucelabs:4444/hub/wd"));
+		
+		PowerMockito.mockStatic(SeleniumGridConnectorFactory.class);
+		PowerMockito.when(SeleniumGridConnectorFactory.getInstances(Arrays.asList("http://saucelabs:4444/hub/wd"))).thenReturn(Arrays.asList(gridConnector));
+		
+		try {
+			System.setProperty(SeleniumTestsContext.RUN_MODE, "saucelabs");
+			System.setProperty(SeleniumTestsContext.PLATFORM, "windows");
+			System.setProperty(SeleniumTestsContext.WEB_DRIVER_GRID, "http://saucelabs:4444/hub/wd");
+			initThreadContext(testNGCtx);
+			TestTasks.getProcessList("some_process");
 			
 		} finally {
 			System.clearProperty(SeleniumTestsContext.RUN_MODE);

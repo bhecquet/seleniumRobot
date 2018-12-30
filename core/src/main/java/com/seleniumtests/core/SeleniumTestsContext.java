@@ -252,6 +252,7 @@ public class SeleniumTestsContext {
     
     private SeleniumRobotVariableServerConnector variableServer;
     private SeleniumGridConnector seleniumGridConnector;
+    private List<SeleniumGridConnector> seleniumGridConnectors;
     private TestManager testManagerIntance;
     private boolean driverCreationBlocked = false;		// if true, inside this thread, driver creation will be forbidden
     
@@ -262,6 +263,7 @@ public class SeleniumTestsContext {
     	// for test purpose only
     	variableServer = null;
     	seleniumGridConnector = null;
+    	seleniumGridConnectors = new ArrayList<>();
     	testManagerIntance = null;
     }
     
@@ -531,13 +533,13 @@ public class SeleniumTestsContext {
     }
     
     /**
-     * returns the selenkium grid connector if mode requests it
+     * returns the selenium grid connector if mode requests it
      * @return
      */
-    private SeleniumGridConnector connectGrid() {
+    private List<SeleniumGridConnector> connectGrid() {
     	if (getRunMode() == DriverMode.GRID) {
-    		if (getWebDriverGrid() != null) {
-    			return SeleniumGridConnectorFactory.getInstance(getWebDriverGrid());
+    		if (getWebDriverGrid() != null && !getWebDriverGrid().isEmpty()) {
+    			return SeleniumGridConnectorFactory.getInstances(getWebDriverGrid());
     		} else {
     			throw new ConfigurationException("Test should be executed with Selenium Grid but URL is not set");
     		}
@@ -701,8 +703,9 @@ public class SeleniumTestsContext {
         // create seleniumRobot server instance
         variableServer = connectSeleniumRobotServer();
 
-        // create selenium grid connector. It will be created if it's null
-        getSeleniumGridConnector();
+        // create selenium grid connectors. They will be created if it's null
+        // in this phase, we chek that grid is alive
+        getSeleniumGridConnectors();
         
         // create Test Manager connector
     	testManagerIntance = initTestManager();
@@ -1229,8 +1232,8 @@ public class SeleniumTestsContext {
     	return (JSONObject) getAttribute(TMS_CONNECT);
     }
 
-    public String getWebDriverGrid() {
-        return (String) getAttribute(WEB_DRIVER_GRID);
+    public List<String> getWebDriverGrid() {
+        return (List<String>) getAttribute(WEB_DRIVER_GRID);
     }
 
     public String getWebProxyAddress() {
@@ -1395,9 +1398,26 @@ public class SeleniumTestsContext {
 		return variableServer;
 	}
     
+    public List<SeleniumGridConnector> getSeleniumGridConnectors() {
+    	if (seleniumGridConnectors == null) {
+    		seleniumGridConnectors = connectGrid();
+    	}
+    	return seleniumGridConnectors;
+    }
+    
+    /**
+     * from the list of all grid connectors, returns the first one where a session has been created
+     * It means that the test runs on it because sessionId is get once driver is created
+     * @return
+     */
     public SeleniumGridConnector getSeleniumGridConnector() {
-    	if (seleniumGridConnector == null) {
-    		seleniumGridConnector = connectGrid();
+    	if (seleniumGridConnector == null && seleniumGridConnectors != null) {
+    		for (SeleniumGridConnector gridConnector: seleniumGridConnectors) {
+    			if (gridConnector.getSessionId() != null) {
+    				seleniumGridConnector = gridConnector;
+    				break;
+    			}
+    		}
     	}
     	return seleniumGridConnector;
     }
@@ -1593,7 +1613,17 @@ public class SeleniumTestsContext {
     }
     
     public void setWebDriverGrid(final String driverGrid) {
-        setAttribute(WEB_DRIVER_GRID, driverGrid);
+    	if (driverGrid == null) {
+    		setAttribute(WEB_DRIVER_GRID, new ArrayList<>());
+    	} else {
+    		String[] gridList = driverGrid.split(",");
+    		for (String gridAddress: gridList) {
+    			if (!gridAddress.startsWith("http")) {
+    				throw new ConfigurationException("grid address should be http://<host>:<port>/wd/hub");
+    			}
+    		}
+    		setAttribute(WEB_DRIVER_GRID, Arrays.asList(driverGrid.split(",")));
+    	}
     }
     
     public void setNeoloadUserPath(final String userPath) {

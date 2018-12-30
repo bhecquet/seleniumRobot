@@ -415,8 +415,12 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 			context.put("currentDate", new Date().toString());
 
 			DriverMode mode = SeleniumTestsContextManager.getGlobalContext().getRunMode();
-			String hubUrl = SeleniumTestsContextManager.getGlobalContext().getWebDriverGrid();
-			context.put("gridHub", "<a href='" + hubUrl + "' target=hub>" + hubUrl + "</a>");
+			List<String> hubUrls = SeleniumTestsContextManager.getGlobalContext().getWebDriverGrid();
+			String hubLink = "";
+			for (String hubUrl: hubUrls) {
+				hubLink += "<a href='" + hubUrl + "' target=hub>" + hubUrl + "</a>";
+			}
+			context.put("gridHub", hubLink);
 
 			context.put("mode", mode.toString());
 

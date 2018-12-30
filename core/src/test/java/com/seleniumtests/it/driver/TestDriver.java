@@ -338,7 +338,7 @@ public class TestDriver extends GenericMultiBrowserTest {
 		} catch (TimeoutException e) {}
 		
 		// we cannot check precise timing as it depends on the hardware, but we should never wait more that 10 secs (the default timeout for searching element is 30 secs)
-		Assert.assertTrue(new Date().getTime() - start < 10);
+		Assert.assertTrue(new Date().getTime() - start < 10000);
 	}
 	
 	@Test(groups={"it", "ut"})
@@ -351,7 +351,7 @@ public class TestDriver extends GenericMultiBrowserTest {
 		} catch (NoSuchElementException e) {}
 		
 		// Check we wait at least for the timeout set
-		Assert.assertTrue(new Date().getTime() - start > 7);
+		Assert.assertTrue(new Date().getTime() - start > 7000);
 	}
 	
 	@Test(groups={"it", "ut"})

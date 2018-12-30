@@ -65,6 +65,7 @@ public class TestHtmlElement extends TestDriver {
 	
 	@Test(groups= {"nogroup"})
 	public void test() {
+		super.testWebDriverWaitWithLowTimeout();
 	}
 
 }

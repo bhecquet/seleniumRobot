@@ -22,6 +22,8 @@ import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.List;
 
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -106,7 +108,50 @@ public class TestSeleniumGridConnectorFactory extends ConnectorsTest {
 		createServerMock("GET", SeleniumRobotGridConnector.GUI_SERVLET, 200, guiServletContent);		
 		createServerMock("GET", SeleniumGridConnector.CONSOLE_SERVLET, 200, consoleServletContent);		
 		
-		Assert.assertTrue(SeleniumGridConnectorFactory.getInstance(SERVER_URL + "/wd/hub") instanceof SeleniumRobotGridConnector);
+		Assert.assertTrue(SeleniumGridConnectorFactory.getInstances(Arrays.asList(SERVER_URL + "/wd/hub")).get(0) instanceof SeleniumRobotGridConnector);
+	}
+	
+	/**
+	 * Check that with several selenium grid URL (seleniumRobot or pure selenium), several grid connectors are created, one for each URL
+	 * if they are all accessible 
+	 * @throws UnsupportedOperationException
+	 * @throws IOException
+	 * @throws UnirestException
+	 */
+	@Test(groups={"ut"})
+	public void testWithSeveralSeleniumRobotGrid() throws UnsupportedOperationException, IOException, UnirestException {
+		
+		createServerMock("GET", SeleniumRobotGridConnector.GUI_SERVLET, 200, guiServletContent);		
+		createServerMock("GET", SeleniumGridConnector.CONSOLE_SERVLET, 200, consoleServletContent);	
+
+		createServerMock("GET", "5" + SeleniumRobotGridConnector.GUI_SERVLET, 404, "default monitoring page");
+		createServerMock("GET", "5" + SeleniumGridConnector.CONSOLE_SERVLET, 200, consoleServletContent);		
+		
+		List<SeleniumGridConnector> gridConnectors = SeleniumGridConnectorFactory.getInstances(Arrays.asList(SERVER_URL + "/wd/hub", SERVER_URL + "5/wd/hub"));
+		
+		Assert.assertEquals(gridConnectors.size(), 2);
+		Assert.assertTrue(gridConnectors.get(0) instanceof SeleniumRobotGridConnector);
+		Assert.assertTrue(gridConnectors.get(1) instanceof SeleniumGridConnector);
+	}
+	
+	/**
+	 * Check that grid connectors are only created if the selenium grid is accessible (replies before timeout) 
+	 * @throws UnsupportedOperationException
+	 * @throws IOException
+	 * @throws UnirestException
+	 */
+	@Test(groups={"ut"})
+	public void testWithSeveralSeleniumGridNotAllThere() throws UnsupportedOperationException, IOException, UnirestException {
+				
+		// only the second grid replies
+		createServerMock("GET", "5" + SeleniumRobotGridConnector.GUI_SERVLET, 404, "default monitoring page");
+		createServerMock("GET", "5" + SeleniumGridConnector.CONSOLE_SERVLET, 200, consoleServletContent);		
+		
+		// 2 grid URL given
+		List<SeleniumGridConnector> gridConnectors = SeleniumGridConnectorFactory.getInstances(Arrays.asList(SERVER_URL + "/wd/hub", SERVER_URL + "5/wd/hub"));
+		
+		Assert.assertEquals(gridConnectors.size(), 1);
+		Assert.assertTrue(gridConnectors.get(0) instanceof SeleniumGridConnector);
 	}
 	
 	/**
@@ -121,7 +166,7 @@ public class TestSeleniumGridConnectorFactory extends ConnectorsTest {
 		createServerMock("GET", SeleniumRobotGridConnector.GUI_SERVLET, 404, "default monitoring page");
 		createServerMock("GET", SeleniumGridConnector.CONSOLE_SERVLET, 200, consoleServletContent);			
 		
-		Assert.assertTrue(SeleniumGridConnectorFactory.getInstance(SERVER_URL + "/wd/hub") instanceof SeleniumGridConnector);
+		Assert.assertTrue(SeleniumGridConnectorFactory.getInstances(Arrays.asList(SERVER_URL + "/wd/hub")).get(0) instanceof SeleniumGridConnector);
 	}
 	
 	/**
@@ -135,7 +180,7 @@ public class TestSeleniumGridConnectorFactory extends ConnectorsTest {
 		SeleniumGridConnectorFactory.setRetryTimeout(1);
 		createServerMock("GET", SeleniumGridConnector.CONSOLE_SERVLET, 404, "default monitoring page");	
 		
-		SeleniumGridConnectorFactory.getInstance(SERVER_URL + "/wd/hub");
+		SeleniumGridConnectorFactory.getInstances(Arrays.asList(SERVER_URL + "/wd/hub"));
 	}
 	
 	/**
@@ -153,7 +198,7 @@ public class TestSeleniumGridConnectorFactory extends ConnectorsTest {
 		LocalDateTime start = LocalDateTime.now();
 		try {
 			SeleniumGridConnectorFactory.setRetryTimeout(5);
-			SeleniumGridConnectorFactory.getInstance(SERVER_URL + "/wd/hub");
+			SeleniumGridConnectorFactory.getInstances(Arrays.asList(SERVER_URL + "/wd/hub"));
 		} catch (ConfigurationException e) {
 			
 			// check connection duration

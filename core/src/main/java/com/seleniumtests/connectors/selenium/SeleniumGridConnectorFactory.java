@@ -19,6 +19,8 @@ package com.seleniumtests.connectors.selenium;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 
@@ -47,47 +49,76 @@ public class SeleniumGridConnectorFactory {
 		// nothing to do
 	}
 	
-	public static SeleniumGridConnector getInstance() {
-		if (seleniumGridConnector.get() == null) {
-			throw new ConfigurationException("getInstance() should be called after getInstance(String url) has been called once");
-		}
-		return seleniumGridConnector.get();
-	}
+//	public static SeleniumGridConnector getInstance() {
+//		if (seleniumGridConnector.get() == null) {
+//			throw new ConfigurationException("getInstance() should be called after getInstance(String url) has been called once");
+//		}
+//		return seleniumGridConnector.get();
+//	}
 
-	public synchronized static SeleniumGridConnector getInstance(String url) {
+	/**
+	 * Returns the list of available grid connectors
+	 * From a list of grid URL, look for grids which are available at the time of request
+	 * If all grids are available, returns all
+	 * If none are available, wait for at least one to be there
+	 * @param urls
+	 * @return
+	 */
+	public synchronized static List<SeleniumGridConnector> getInstances(List<String> urls) {
 		
-		URL hubUrl;
-		try {
-			hubUrl = new URL(url);
-		} catch (MalformedURLException e1) {
-			throw new ConfigurationException(String.format("Hub url '%s' is invalid: %s", url, e1.getMessage()));
+		if (urls.isEmpty()) {
+			throw new ConfigurationException("cannot create grid, no address provided");
 		}
+		
+		// check addresses
+		List<URL> hubUrls = new ArrayList<>();
+		for (String url: urls) {
+			try {
+				hubUrls.add(new URL(url));
+			} catch (MalformedURLException e1) {
+				throw new ConfigurationException(String.format("Hub url '%s' is invalid: %s", url, e1.getMessage()));
+			}
+		}
+		
 		SystemClock clock = new SystemClock();
 		long end = clock.laterBy(retryTimeout * 1000L);
 		Exception currentException = null;
 		
+		
 		while (clock.isNowBefore(end)) {
-			try {
-				HttpResponse<String> response = Unirest.get(String.format("http://%s:%s%s", hubUrl.getHost(), hubUrl.getPort(), SeleniumGridConnector.CONSOLE_SERVLET)).asString();
-				if (response.getStatus() == 200) {
-					HttpResponse<String> responseGuiServlet = Unirest.get(String.format("http://%s:%s%s", hubUrl.getHost(), hubUrl.getPort(), SeleniumRobotGridConnector.GUI_SERVLET)).asString();
-					if (responseGuiServlet.getStatus() == 200) {
-						seleniumGridConnector.set(new SeleniumRobotGridConnector(url));
-	        		} else {
-	        			seleniumGridConnector.set(new SeleniumGridConnector(url));
-	        		}
-	        		return seleniumGridConnector.get();
-	        	} else {
-	        		throw new ConfigurationException("Cannot connect to the grid hub at " + url);
-	        	}
-			} catch (Exception ex) {
-				WaitHelper.waitForMilliSeconds(500);
-				currentException = ex;
-				continue;
+			
+			List<SeleniumGridConnector> seleniumGridConnectors = new ArrayList<>();
+			
+			for (URL hubUrl: hubUrls) {
+				// connect to console page to see if grid replies
+				try {
+					HttpResponse<String> response = Unirest.get(String.format("http://%s:%s%s", hubUrl.getHost(), hubUrl.getPort(), SeleniumGridConnector.CONSOLE_SERVLET)).asString();
+					if (response.getStatus() == 200) {
+						
+						// try to connect to a SeleniumRobot grid specific servlet. If it replies, we are on a seleniumRobot grid
+						HttpResponse<String> responseGuiServlet = Unirest.get(String.format("http://%s:%s%s", hubUrl.getHost(), hubUrl.getPort(), SeleniumRobotGridConnector.GUI_SERVLET)).asString();
+						if (responseGuiServlet.getStatus() == 200) {
+							seleniumGridConnectors.add(new SeleniumRobotGridConnector(hubUrl.toString()));
+		        		} else {
+		        			seleniumGridConnectors.add(new SeleniumGridConnector(hubUrl.toString()));
+		        		}
+		        	} else {
+		        		logger.error("Cannot connect to the grid hub at " + hubUrl.toString());
+		        	}
+				} catch (Exception ex) {
+					WaitHelper.waitForMilliSeconds(500);
+					currentException = ex;
+					continue;
+				}
+			}
+			
+			// if at least one hub replies, continue
+			if (!seleniumGridConnectors.isEmpty()) {
+				return seleniumGridConnectors;
 			}
 		}
 
-    	throw new ConfigurationException("Cannot connect to the grid hub at " + url, currentException);
+    	throw new ConfigurationException("Cannot connect to the grid hubs at " + urls, currentException);
 	}
 
 	public static int getRetryTimeout() {
