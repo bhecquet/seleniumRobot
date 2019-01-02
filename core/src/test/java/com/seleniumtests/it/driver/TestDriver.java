@@ -351,7 +351,7 @@ public class TestDriver extends GenericMultiBrowserTest {
 		} catch (NoSuchElementException e) {}
 		
 		// Check we wait at least for the timeout set
-		Assert.assertTrue(new Date().getTime() - start > 7000);
+		Assert.assertTrue(new Date().getTime() - start > 6900);
 	}
 	
 	@Test(groups={"it", "ut"})
