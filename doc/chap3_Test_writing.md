@@ -103,6 +103,35 @@ Moreover, you MUST set the minimal version of core to 3.14.0 in application depe
 		</dependency>
 	</dependencies>
 
+- If your repo do not include neotys artifacts (mandatory for compilation), add the following
+
+	<repository>
+		<id>neotys-public-releases</id>
+		<url>http://maven.neotys.com/content/repositories/releases/</url>
+		<releases>
+			<enabled>true</enabled>
+		</releases>
+		<snapshots>
+			<enabled>false</enabled>
+		</snapshots>
+	</repository>
+	
+to repository list in settings.xml, and 
+
+	<pluginRepository>
+		<id>neotys-public-releases</id>
+		<url>http://maven.neotys.com/content/repositories/releases/</url>
+		<releases>
+			<enabled>true</enabled>
+		</releases>
+		<snapshots>
+			<enabled>false</enabled>
+		</snapshots>
+	</pluginRepository>
+	
+to pluginRepository list in settings.xml
+
+
 - execute it
 
 #### Requirements are ####

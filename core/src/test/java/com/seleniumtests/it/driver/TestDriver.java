@@ -346,11 +346,13 @@ public class TestDriver extends GenericMultiBrowserTest {
 
 		SeleniumTestsContextManager.getThreadContext().setReplayTimeout(7);
 		long start = new Date().getTime();
+		logger.info("start: " + start);
 		try {
 			new HtmlElement("", By.id("someNonExistentId")).getText();
 		} catch (NoSuchElementException e) {}
 		
 		// Check we wait at least for the timeout set
+		logger.info("end: " + new Date().getTime());
 		Assert.assertTrue(new Date().getTime() - start > 6900);
 	}
 	
