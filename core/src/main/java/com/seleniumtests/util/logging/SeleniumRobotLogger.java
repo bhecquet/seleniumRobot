@@ -98,6 +98,10 @@ public class SeleniumRobotLogger {
 	}
 	
 	public static void updateLogger(String outputDir, String defaultOutputDir, String logFileName) {
+		updateLogger(outputDir, defaultOutputDir, logFileName, true);
+	}
+	
+	public static void updateLogger(String outputDir, String defaultOutputDir, String logFileName, boolean doCleanResults) {
 		outputDirectory = outputDir;
 		defaultOutputDirectory = defaultOutputDir;
 		Appender fileLoggerAppender = Logger.getRootLogger().getAppender(FILE_APPENDER_NAME);
@@ -106,7 +110,9 @@ public class SeleniumRobotLogger {
 			FileAppender fileAppender = new FileAppender();
 			
 			// clean output dir
-			cleanResults();
+			if (doCleanResults) {
+				cleanResults();
+			}
 			
 			for (int i=0; i < 4; i++) {
 				try {
