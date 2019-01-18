@@ -17,6 +17,8 @@
  */
 package com.seleniumtests.browserfactory;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.openqa.selenium.MutableCapabilities;
@@ -44,7 +46,10 @@ public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implemen
 
     public SeleniumGridDriverFactory(final DriverConfig cfg) {
         super(cfg);
-        gridConnectors = SeleniumTestsContextManager.getThreadContext().getSeleniumGridConnectors();
+        gridConnectors = new ArrayList<>(SeleniumTestsContextManager.getThreadContext().getSeleniumGridConnectors());
+        
+        // reorder list so that we do not always use the same grid for connection
+        Collections.shuffle(gridConnectors);
     }    
 
 	@Override

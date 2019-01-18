@@ -175,9 +175,6 @@ public class TestSeleniumGridDriverFactory extends MockitoTest {
 		PowerMockito.whenNew(RemoteWebDriver.class).withParameterTypes(URL.class, Capabilities.class).withArguments(eq(new URL("http://localhost:2222/wd/hub")), any(DesiredCapabilities.class)).thenReturn(driver2);
 		WebDriver newDriver = new SeleniumGridDriverFactory(config).createWebDriver();
 		Assert.assertNotNull(newDriver);
-
-		// the first connector has been chosen because it was available
-		Assert.assertEquals(newDriver, driver);
 	}
 	
 	/**
@@ -203,6 +200,10 @@ public class TestSeleniumGridDriverFactory extends MockitoTest {
 		Assert.assertEquals(newDriver, driver2);
 	}
 	
+	/**
+	 * Check we use the connector which is not in error
+	 * @throws Exception
+	 */
 	@Test(groups={"ut"})
 	public void testDriverCreationWithSeveralGridConnectorsOneInError() throws Exception {
 		
