@@ -104,7 +104,7 @@ public class TestLogActions extends GenericDriverTest {
 		// all occurences of the password have been replaced
 		Assert.assertFalse(step.toString().contains("someText"));
 		Assert.assertFalse(step.toString().contains("someOtherText"));
-		Assert.assertTrue(step.toString().contains("sendKeys on TextFieldElement Text, by={By.id: text2} with args: (true, true, [******,])"));
+		Assert.assertTrue(step.toString().contains("sendKeys on TextFieldElement Text, by={By.id: text2} with args: (true, true, [******,], )"));
 		Assert.assertEquals(StringUtils.countMatches(step.toString(), "******"), 3);
 	}
 	
