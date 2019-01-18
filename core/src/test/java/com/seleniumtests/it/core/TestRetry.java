@@ -76,7 +76,7 @@ public class TestRetry extends ReporterTest {
 		Assert.assertTrue(detailedReportContent.contains("Failed in 3 times"));
 		Assert.assertTrue(detailedReportContent.contains("[RETRYING] class com.seleniumtests.core.runner.CucumberTestPlan.feature"));
 
-		// check that in case of retry, steps are not logged twice
+		// check that in case of retry, steps are not logged twice and step name is the cucumber step name (defined by annotation
 		Assert.assertTrue(detailedReportContent.contains("write_error"));
 		Assert.assertEquals(StringUtils.countOccurrencesOf(detailedReportContent, "Start method error_scenario"), 3); 
 		Assert.assertEquals(StringUtils.countOccurrencesOf(detailedReportContent, "Finish method error_scenario"), 3); 

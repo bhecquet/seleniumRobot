@@ -20,7 +20,10 @@ package com.seleniumtests.core.aspects;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -33,6 +36,7 @@ import org.openqa.selenium.support.ui.Select;
 
 import com.neotys.selenium.proxies.NLWebDriver;
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.core.StepName;
 import com.seleniumtests.core.runner.SeleniumRobotTestPlan;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.reporter.logger.TestAction;
@@ -201,7 +205,7 @@ public class LogAction {
 	public void logCompositeAction(JoinPoint joinPoint)  {
 
     	List<String> pwdToReplace = new ArrayList<>();
-		String actionName = String.format("%s %s", joinPoint.getSignature().getName(), buildArgString(joinPoint, pwdToReplace));
+		String actionName = String.format("%s %s", joinPoint.getSignature().getName(), buildArgString(joinPoint, pwdToReplace, new HashMap<>()));
 		TestAction currentAction = new TestAction(actionName, false, pwdToReplace);
 		
 		if (TestLogging.getParentTestStep() != null) {
@@ -244,9 +248,10 @@ public class LogAction {
 	 * string is also replaced
 	 * @param joinPoint
 	 * @param stringToReplace	an empty list containing all strings to replace so that passwords cannot be visible
+	 * @param argValues			an empty map which will be filled with argument name and value
 	 * @return
 	 */
-	public static String buildArgString(JoinPoint joinPoint, List<String> stringToReplace) {
+	public static String buildArgString(JoinPoint joinPoint, List<String> stringToReplace, Map<String, String> argValues) {
 		StringBuilder argString = new StringBuilder();
 		if (joinPoint.getArgs().length > 0) {
 			argString.append("with args: (");
@@ -257,7 +262,9 @@ public class LogAction {
 				String argName = "";
 				try {
 					argName = ((MethodSignature)joinPoint.getSignature()).getParameterNames()[paramIdx];
-				} catch (ClassCastException | IndexOutOfBoundsException e) {}
+				} catch (ClassCastException | IndexOutOfBoundsException e) {
+					argName = "_";
+				}
 				
 				// store the value of the argument containing a password
 				if (arg != null && (argName.toLowerCase().contains("password") || argName.toLowerCase().contains("pwd") || argName.toLowerCase().contains("passwd"))) {
@@ -274,16 +281,20 @@ public class LogAction {
 					}
 				} 
 				
+				StringBuilder argValue = new StringBuilder();
 				// add arguments to the name of the method
-				if (arg instanceof CharSequence[]) {
-					argString.append("[");
-					for (Object obj: (CharSequence[])arg) {
-						argString.append(obj.toString() + ",");
+				if (arg instanceof Object[]) {
+					argValue.append("[");
+					for (Object obj: (Object[])arg) {
+						argValue.append(obj.toString() + ",");
 					}
-					argString.append("]");
+					argValue.append("]");
 				} else {
-					argString.append((arg == null ? "null": arg.toString()) + ", ");
+					argValue.append((arg == null ? "null": arg.toString()));
 				}
+//				argString.append(String.format("%s=%s, ", argName, argValue.toString()));
+				argString.append(String.format("%s, ", argValue.toString()));
+				argValues.put(argName, argValue.toString());
 				paramIdx++;
 			}
 			argString.append(")");
@@ -306,8 +317,10 @@ public class LogAction {
 	private TestStep buildRootStep(JoinPoint joinPoint, String stepNamePrefix, boolean returnArgs) {
 		String stepName;
 		List<String> pwdToReplace = new ArrayList<>();
+		Map<String, String> arguments = new HashMap<>();
+		String argumentString = buildArgString(joinPoint, pwdToReplace, arguments);
 		if (returnArgs) {
-			stepName = String.format("%s %s", joinPoint.getSignature().getName(), buildArgString(joinPoint, pwdToReplace));
+			stepName = String.format("%s %s", joinPoint.getSignature().getName(), argumentString);
 		} else {
 			stepName = joinPoint.getSignature().getName();
 		}
@@ -315,11 +328,18 @@ public class LogAction {
 		// Get the method called by this joinPoint
 		Method method = ((MethodSignature)joinPoint.getSignature()).getMethod();
 		
-		for (Annotation cucumberAnnotation: method.getAnnotations()) {
-			if (cucumberAnnotation.annotationType().getCanonicalName().contains("cucumber.api.java.en")) {
-				stepName = getAnnotationValue(cucumberAnnotation);
-				pwdToReplace.clear();
-				stepName += " " + buildArgString(joinPoint, pwdToReplace);
+		for (Annotation annotation: method.getAnnotations()) {
+			if (annotation.annotationType().getCanonicalName().contains("cucumber.api.java.en") && SeleniumRobotTestPlan.isCucumberTest()) {
+				stepName = getAnnotationValue(annotation);
+				stepName += " " + argumentString;
+				break;
+			} else if (annotation instanceof StepName) {
+				stepName = ((StepName)annotation).value();
+				
+				// replaces argument placeholders with values
+				for (Entry<String, String> entry: arguments.entrySet()) {
+					stepName = stepName.replaceAll(stepName.format("\\$\\{%s\\}",  entry.getKey()), entry.getValue().toString());
+				}
 				break;
 			}
 		}
@@ -347,7 +367,7 @@ public class LogAction {
 	 */
 	private Object logAction(ProceedingJoinPoint joinPoint, String targetName) throws Throwable {
 		List<String> pwdToReplace = new ArrayList<>();
-		String actionName = String.format("%s on %s %s", joinPoint.getSignature().getName(), targetName, buildArgString(joinPoint, pwdToReplace));
+		String actionName = String.format("%s on %s %s", joinPoint.getSignature().getName(), targetName, buildArgString(joinPoint, pwdToReplace, new HashMap<>()));
 		Object reply = null;
 		boolean actionFailed = false;
 		TestAction currentAction = new TestAction(actionName, false, pwdToReplace);

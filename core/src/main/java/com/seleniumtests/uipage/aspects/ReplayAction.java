@@ -18,6 +18,7 @@
 package com.seleniumtests.uipage.aspects;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -83,7 +84,7 @@ public class ReplayAction {
     	String methodName = joinPoint.getSignature().getName();
     	if (methodName != "getCoordinates") {
     		List<String> pwdToReplace = new ArrayList<>();
-    		String actionName = String.format("%s on %s %s", methodName, targetName, LogAction.buildArgString(joinPoint, pwdToReplace));
+    		String actionName = String.format("%s on %s %s", methodName, targetName, LogAction.buildArgString(joinPoint, pwdToReplace, new HashMap<>()));
     		currentAction = new TestAction(actionName, false, pwdToReplace);
     	}
 
@@ -172,7 +173,7 @@ public class ReplayAction {
 		if (joinPoint.getTarget() instanceof GenericPictureElement) {
 	    	String methodName = joinPoint.getSignature().getName();
 	    	List<String> pwdToReplace = new ArrayList<>();
-			String actionName = String.format("%s on %s %s", methodName, targetName, LogAction.buildArgString(joinPoint, pwdToReplace));
+			String actionName = String.format("%s on %s %s", methodName, targetName, LogAction.buildArgString(joinPoint, pwdToReplace, new HashMap<>()));
 			currentAction = new TestAction(actionName, false, pwdToReplace);
 	
 			// log action before its started. By default, it's OK. Then result may be overwritten if step fails
