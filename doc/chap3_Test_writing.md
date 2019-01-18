@@ -233,6 +233,7 @@ Example of a shopping cart class:
 			return amount;
 		}
 		
+		@StepName("checkout cart")
 		public SignIn checkout() throws Exception {
 			proceed.click();
 			return new SignIn(); 
@@ -245,6 +246,7 @@ Example of a shopping cart class:
 	}
 	
 **WARN:** If you write your class combined with cucumber feature (methods annotated with @Given, @When, ...), only write methods returning `void`. Else, report will contain new page create step twice.
+
 
 #### Search elements ####
 
@@ -302,6 +304,20 @@ E.g: `driver.findElement(By.tagName("h1").className("cls2"))` or  `new HtmlEleme
 
 In case search is done with a ByC instance, this MUST be the placed first<br/>
 E.g: `new HtmlElement("", ByC.attribute("attr", "attribute").className("cls2"))`
+
+
+#### Document your tests ####
+
+By default, when reporting is built, step names come from method names. For more readability, you can annotate your steps with @StepName annotation
+This way, step name will be the name defined in annotation
+	
+	@StepName("checkout cart")
+
+Step name can also use placeholders for method parameters. They will be replaced by real values in report
+
+	@StepName("order ${number} ${product}")
+	
+where method takes 'number' and 'product' arguments 
 
 #### Add user defined test steps ####
 
