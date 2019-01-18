@@ -88,6 +88,73 @@ public class TestLogActions extends GenericTest {
 	}
 	
 	/**
+	 * Only test presence of root steps. there should be:
+	 * - page opening
+	 * - add something to total (this step has the @StepName description
+	 * Checks that root steps are correctly intercepted
+	 * @throws IOException
+	 */
+	@Test(groups={"it"})
+	public void testSimpleNonCucumberStepLoggingWithStepDescription() throws IOException {
+		new CalcPage()
+		.addWithName(1);
+		
+		List<TestStep> steps = TestLogging.getTestsSteps().get(Reporter.getCurrentTestResult());
+		Assert.assertEquals(steps.size(), 2);
+		Assert.assertEquals(steps.get(0).getName(), "openPage with args: (null, )");
+		Assert.assertEquals(steps.get(1).getName(), "add something to total");
+	}
+	
+	/**
+	 * Check that if step definition contains argument name, this one is replaced
+	 * - page opening
+	 * - 'add 1 to total' (this step has the @StepName description
+	 * Checks that root steps are correctly intercepted
+	 * @throws IOException
+	 */
+	@Test(groups={"it"})
+	public void testSimpleNonCucumberStepLoggingWithStepDescriptionAndArgs() throws IOException {
+		new CalcPage()
+		.addWithName2(1);
+		
+		List<TestStep> steps = TestLogging.getTestsSteps().get(Reporter.getCurrentTestResult());
+		Assert.assertEquals(steps.size(), 2);
+		Assert.assertEquals(steps.get(1).getName(), "add 1 to total");
+	}
+	
+	/**
+	 * Check that if step definition contains argument name and one of argument is password, it's masked
+	 * - Connect to calc with login/******
+	 * @throws IOException
+	 */
+	@Test(groups={"it"})
+	public void testSimpleNonCucumberStepLoggingWithStepDescriptionPassword() throws IOException {
+		SeleniumTestsContextManager.getThreadContext().setMaskPassword(true);
+		new CalcPage()
+			.connectWithName("login", "somePassToConnect");
+		
+		List<TestStep> steps = TestLogging.getTestsSteps().get(Reporter.getCurrentTestResult());
+		Assert.assertEquals(steps.size(), 2);
+		Assert.assertEquals(steps.get(1).getName(), "Connect to calc with login/******");
+	}
+	
+	/**
+	 * Check that if step definition contains argument name and one of argument is password, it's masked
+	 * - Connect to calc with login/******
+	 * @throws IOException
+	 */
+	@Test(groups={"it"})
+	public void testSimpleNonCucumberStepLoggingWithStepDescriptionArray() throws IOException {
+		SeleniumTestsContextManager.getThreadContext().setMaskPassword(true);
+		new CalcPage()
+		.addWithName3(1, 2, 3);
+		
+		List<TestStep> steps = TestLogging.getTestsSteps().get(Reporter.getCurrentTestResult());
+		Assert.assertEquals(steps.size(), 2);
+		Assert.assertEquals(steps.get(1).getName(), "add 1 and [2,3,] to total");
+	}
+	
+	/**
 	 * Only test presence of steps with cucumber annotations
 	 * - page opening
 	 * 		- addC		=> first interception by calling addC: never happens in real cucumber test

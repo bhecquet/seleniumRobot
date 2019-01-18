@@ -22,6 +22,7 @@ import java.io.IOException;
 import org.openqa.selenium.By;
 import org.testng.Assert;
 
+import com.seleniumtests.core.StepName;
 import com.seleniumtests.customexception.DriverExceptions;
 import com.seleniumtests.reporter.logger.TestLogging;
 import com.seleniumtests.uipage.PageObject;
@@ -65,12 +66,40 @@ public class CalcPage extends PageObject {
 		return this;
 	}
 	
+	@StepName("add something to total")
+	public CalcPage addWithName(int a) {
+		add(result, a);
+		return this;
+	}
+	
+	@StepName("add ${a} to total")
+	public CalcPage addWithName2(int a) {
+		add(result, a);
+		return this;
+	}
+	
+	@StepName("add ${a} and ${b} to total")
+	public CalcPage addWithName3(Integer a, Integer ... b) {
+		add(result, a);
+		for (int c: b) {
+			add(result, c);
+		}
+		return this;
+	}
+	
 	public CalcPage add(int a) {
 		add(result, a);
 		return this;
 	}
 	
 	public CalcPage connect(String login, String password) {
+		TestLogging.info("login is " + login);
+		TestLogging.info("password is " + password);
+		return this;
+	}
+	
+	@StepName("Connect to calc with ${login}/${password}")
+	public CalcPage connectWithName(String login, String password) {
 		TestLogging.info("login is " + login);
 		TestLogging.info("password is " + password);
 		return this;
