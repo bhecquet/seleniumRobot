@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 #set($success = $errors==0 && $failures==0)
+#set($stepNumber = $testSteps.size() - 1)
 #set($startTime = $testSteps.get(0).getStartDate().getTime())
+#set($totalDuration = ($testSteps.get($stepNumber).getStartDate().getTime() - $startTime) / 1000.0)
 
-<report duration="$duration" success="$success" test="$className.$suiteName" timeScenario="$duration" timestamp="$time" version="$version">
+<report duration="$totalDuration" success="$success" test="$className.$suiteName" timeScenario="$duration" timestamp="$startDate" version="$version">
 	<errors>
 #if ($stacktrace)
 		<error>

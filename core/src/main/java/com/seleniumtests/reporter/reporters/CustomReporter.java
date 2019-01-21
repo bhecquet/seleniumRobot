@@ -21,6 +21,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -158,6 +159,7 @@ public class CustomReporter extends CommonReporter implements IReporter {
 			context.put("tests", newTestSteps == null ? 0: newTestSteps.size());
 			context.put("duration", testDuration / 1000.0);
 			context.put("time", testResult.getStartMillis());	
+			context.put("startDate", new Date(testResult.getStartMillis()));	
 			context.put("testSteps", newTestSteps);	
 			context.put("browser", SeleniumTestsContextManager.getThreadContext().getBrowser());	
 			context.put("version", SeleniumTestsContextManager.getApplicationVersion());	
