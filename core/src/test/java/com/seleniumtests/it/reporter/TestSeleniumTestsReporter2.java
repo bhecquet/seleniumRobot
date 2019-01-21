@@ -585,7 +585,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			// read 'testDriver' report. This contains calls to HtmlElement actions
 			String detailedReportContent1 = readTestMethodResultFile("testDriver");
 			
-			Assert.assertTrue(detailedReportContent1.contains("<li>sendKeys on TextFieldElement Text, by={By.id: text2} with args: (true, true, [a text,])</li>"));	
+			Assert.assertTrue(detailedReportContent1.contains("<li>sendKeys on TextFieldElement Text, by={By.id: text2} with args: (true, true, [a text,], )</li>"));	
 			
 		} finally {
 			System.clearProperty(SeleniumTestsContext.VIDEO_CAPTURE);
@@ -610,7 +610,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			// read 'testDriver' report. This contains calls to HtmlElement actions
 			String detailedReportContent1 = readTestMethodResultFile("testDriver");
 			
-			Assert.assertTrue(detailedReportContent1.contains("<li>sendKeys on TextFieldElement Text, by={By.id: text2} with args: (true, true, [a text,])</li>"));	
+			Assert.assertTrue(detailedReportContent1.contains("<li>sendKeys on TextFieldElement Text, by={By.id: text2} with args: (true, true, [a text,], )</li>"));	
 			Assert.assertTrue(detailedReportContent1.contains("Network capture: <a href='networkCapture.har'>HAR file</a>"));
 			Assert.assertTrue(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriver", "networkCapture.har").toFile().exists());
 			
@@ -636,7 +636,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			// read 'testDriver' report. This contains calls to HtmlElement actions
 			String detailedReportContent1 = readTestMethodResultFile("testDriver");
 			
-			Assert.assertTrue(detailedReportContent1.contains("<li>sendKeys on TextFieldElement Text, by={By.id: text2} with args: (true, true, [a text,])</li>"));	
+			Assert.assertTrue(detailedReportContent1.contains("<li>sendKeys on TextFieldElement Text, by={By.id: text2} with args: (true, true, [a text,], )</li>"));	
 			Assert.assertFalse(detailedReportContent1.contains("Network capture: <a href='networkCapture.har'>HAR file</a>"));
 			Assert.assertFalse(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriver", "networkCapture.har").toFile().exists());
 		} finally {
@@ -661,8 +661,8 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		
 		// read 'testDriver' report. This contains calls to HtmlElement actions
 		String detailedReportContent1 = readTestMethodResultFile("testDriver");
-		
-		Assert.assertTrue(detailedReportContent1.contains("<li>sendKeys on TextFieldElement Text, by={By.id: text2} with args: (true, true, [a text,])</li>"));
+		 
+		Assert.assertTrue(detailedReportContent1.contains("<li>sendKeys on TextFieldElement Text, by={By.id: text2} with args: (true, true, [a text,], )</li>"));
 		Assert.assertTrue(detailedReportContent1.contains("<li>click on ButtonElement Reset, by={By.id: button2} </li>"));
 		Assert.assertTrue(detailedReportContent1.contains("<div class=\"message-snapshot\">Output: Current Window: Test page: <a href="));
 		
@@ -672,23 +672,23 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		// read the 'testDriverNativeActions' test result to see if native actions are also logged (overrideSeleniumNativeAction is true)
 		String detailedReportContent2 = readTestMethodResultFile("testDriverNativeActions");
 		
-		Assert.assertTrue(detailedReportContent2.contains("<li>sendKeys on HtmlElement , by={By.id: text2} with args: (true, true, [some text,])</li>"));
+		Assert.assertTrue(detailedReportContent2.contains("<li>sendKeys on HtmlElement , by={By.id: text2} with args: (true, true, [some text,], )</li>"));
 		Assert.assertTrue(detailedReportContent2.contains("<li>click on HtmlElement , by={By.id: button2} </li>"));
 		
 		// read the 'testDriverNativeActionsWithoutOverride' test result to see if native actions are not logged (overrideSeleniumNativeAction is false)
 		String detailedReportContent3 = readTestMethodResultFile("testDriverNativeActionsWithoutOverride");
 		
 		// logging is not done via HtmlElement
-		Assert.assertFalse(detailedReportContent3.contains("<li>sendKeys on HtmlElement , by={By.id: text2} with args: (true, true, [some text,])</li>"));
+		Assert.assertFalse(detailedReportContent3.contains("<li>sendKeys on HtmlElement , by={By.id: text2} with args: (true, true, [some text,], )</li>"));
 		Assert.assertFalse(detailedReportContent3.contains("<li>click on HtmlElement , by={By.id: button2} </li>"));
 		
 		// check that without override, native actions are logged
-		Assert.assertTrue(detailedReportContent3.contains("<ul><li>sendKeys on Element located by id: text2 with args: ([some text,])</li></ul>"));
+		Assert.assertTrue(detailedReportContent3.contains("<ul><li>sendKeys on Element located by id: text2 with args: ([some text,], )</li></ul>"));
 		Assert.assertTrue(detailedReportContent3.contains("<ul><li>click on Element located by id: button2 </li></ul>"));
 		Assert.assertTrue(detailedReportContent3.contains("<ul><li>selectByVisibleText on Select with args: (option1, )</li></ul>"));
 				
 		// check composite actions. We must have the moveToElement, click and sendKeys actions 
-		Assert.assertTrue(detailedReportContent1.contains("<ul><li>moveToElement with args: (TextFieldElement Text, by={By.id: text2}, )</li><li>sendKeys with args: ([composite,])</li><li>moveToElement with args: (ButtonElement Reset, by={By.id: button2}, )</li><li>click </li></ul>"));
+		Assert.assertTrue(detailedReportContent1.contains("<ul><li>moveToElement with args: (TextFieldElement Text, by={By.id: text2}, )</li><li>sendKeys with args: ([composite,], )</li><li>moveToElement with args: (ButtonElement Reset, by={By.id: button2}, )</li><li>click </li></ul>"));
 		
 		// check PictureElement action is logged
 		Assert.assertTrue(detailedReportContent1.contains("<ul><li>clickAt on Picture picture from resource tu/images/logo_text_field.png with args: (0, -30, )</li>"));
