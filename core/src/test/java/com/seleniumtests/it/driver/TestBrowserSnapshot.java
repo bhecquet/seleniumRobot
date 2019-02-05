@@ -45,6 +45,7 @@ import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.driver.screenshots.ScreenShot;
 import com.seleniumtests.driver.screenshots.ScreenshotUtil;
+import com.seleniumtests.driver.screenshots.ScreenshotUtil.Target;
 import com.seleniumtests.it.driver.support.pages.DriverSubTestPage;
 import com.seleniumtests.it.driver.support.pages.DriverTestPage;
 import com.seleniumtests.util.FileUtility;
@@ -139,7 +140,7 @@ public class TestBrowserSnapshot extends MockitoTest {
 	}
 	
 	private void captureSnapshot(String filePath) {
-		String b64Img = ScreenshotUtil.capturePageScreenshotToString(driver);
+		String b64Img = new ScreenshotUtil(driver).capture(Target.PAGE, String.class);
 		byte[] byteArray = b64Img.getBytes();
 		FileUtility.writeImage(filePath, byteArray);
 	}
@@ -159,9 +160,7 @@ public class TestBrowserSnapshot extends MockitoTest {
 		Dimension screenshotDim = getViewPortDimension(new File(origFilePath));
 		
 		// get cropped picture
-		String filePath = generateCaptureFilePath();
-		ScreenshotUtil.capturePageScreenshotToFile(driver, filePath, 0, 0);
-		BufferedImage image = ImageIO.read(new File(filePath));
+		BufferedImage image = new ScreenshotUtil(driver).capture(Target.PAGE, BufferedImage.class);
 		
 		// check all scrollbars where already removed from screenshot
 		Assert.assertEquals(image.getWidth(), screenshotDim.width);
@@ -183,9 +182,7 @@ public class TestBrowserSnapshot extends MockitoTest {
 		Dimension screenshotDim = getViewPortDimension(new File(origFilePath));
 		
 		// get cropped picture
-		String filePath = generateCaptureFilePath();
-		ScreenshotUtil.capturePageScreenshotToFile(driver, filePath, 0, 0);
-		BufferedImage image = ImageIO.read(new File(filePath));
+		BufferedImage image = new ScreenshotUtil(driver).capture(Target.PAGE, BufferedImage.class);
 		
 		// check all scrollbars where already removed from screenshot
 		Assert.assertEquals(image.getWidth(), screenshotDim.width);
@@ -203,7 +200,8 @@ public class TestBrowserSnapshot extends MockitoTest {
 
 		// get cropped picture
 		String filePath = generateCaptureFilePath();
-		ScreenshotUtil.capturePageScreenshotToFile(driver, filePath, 6, 0);
+		BufferedImage image = new ScreenshotUtil(driver).capturePage(6, 0);
+		FileUtility.writeImage(filePath, image);
 		
 		int[] headerFooter = getHeaderAndFooterPixels(new File(filePath));
 		
@@ -224,8 +222,9 @@ public class TestBrowserSnapshot extends MockitoTest {
 		
 		// get cropped picture
 		String filePath = generateCaptureFilePath();
-		ScreenshotUtil.capturePageScreenshotToFile(driver, filePath, 0, 5);
-		
+		BufferedImage image = new ScreenshotUtil(driver).capturePage(0, 5);
+		FileUtility.writeImage(filePath, image);
+
 		int[] headerFooter = getHeaderAndFooterPixels(new File(filePath));
 		
 		// header should have been removed, not footer
@@ -245,8 +244,9 @@ public class TestBrowserSnapshot extends MockitoTest {
 		
 		// get cropped picture
 		String filePath = generateCaptureFilePath();
-		ScreenshotUtil.capturePageScreenshotToFile(driver, filePath, 6, 5);
-		
+		BufferedImage image = new ScreenshotUtil(driver).capturePage(6, 5);
+		FileUtility.writeImage(filePath, image);
+
 		int[] headerFooter = getHeaderAndFooterPixels(new File(filePath));
 		
 		// header should have been removed, not footer
@@ -267,17 +267,16 @@ public class TestBrowserSnapshot extends MockitoTest {
 		WaitHelper.waitForSeconds(1);
 		
 		String topFilePath = generateCaptureFilePath();
-		ScreenshotUtil.capturePageScreenshotToFile(driver, topFilePath, 0, 0);
+		FileUtility.writeImage(topFilePath, new ScreenshotUtil(driver).capturePage(0, 0));
 		
 		// get full picture
-		String filePath = generateCaptureFilePath();
-		ScreenshotUtil.captureEntirePageToFile(driver, filePath);
+		File image = new ScreenshotUtil(driver).capture(Target.PAGE, File.class);
 		
 		String bottomFilePath = generateCaptureFilePath();
-		ScreenshotUtil.capturePageScreenshotToFile(driver, bottomFilePath, 0, 0);
+		FileUtility.writeImage(bottomFilePath, new ScreenshotUtil(driver).capturePage(0, 0));
 
 		// exception thrown if nothing found
-		ImageDetector detectorTop = new ImageDetector(new File(filePath), new File(topFilePath), 0.001);
+		ImageDetector detectorTop = new ImageDetector(image, new File(topFilePath), 0.001);
 		detectorTop.detectExactZoneWithScale();
 	}
 	
@@ -291,24 +290,22 @@ public class TestBrowserSnapshot extends MockitoTest {
 		WaitHelper.waitForSeconds(1);
 		
 		// get full picture without cropping
-		String filePathFull = generateCaptureFilePath();
-		ScreenshotUtil.captureEntirePageToFile(driver, filePathFull);
+		File imageFull = new ScreenshotUtil(driver).capture(Target.PAGE, File.class);
 		
 		SeleniumTestsContextManager.getThreadContext().setSnapshotBottomCropping(5);
 		SeleniumTestsContextManager.getThreadContext().setSnapshotTopCropping(6);
 		
 		// get picture with header and footer cropped
-		String filePath = generateCaptureFilePath();
-		ScreenshotUtil.captureEntirePageToFile(driver, filePath);
+		File image = new ScreenshotUtil(driver).capture(Target.PAGE, File.class);
 		
-		int[] headerFooter = getHeaderAndFooterPixels(new File(filePath));
-		int[] headerFooterFull = getHeaderAndFooterPixels(new File(filePathFull));
+		int[] headerFooter = getHeaderAndFooterPixels(image);
+		int[] headerFooterFull = getHeaderAndFooterPixels(imageFull);
 		
 		// header and footer should have been removed
 		Assert.assertEquals(6, headerFooter[0]);
 		Assert.assertEquals(5, headerFooter[1]);
 		Assert.assertTrue(headerFooter[2] >= headerFooterFull[2]); // depending on browser window size (depends on OS) image is split in more or less sections
-		Assert.assertEquals(ImageIO.read(new File(filePath)).getHeight(), ImageIO.read(new File(filePathFull)).getHeight());
+		Assert.assertEquals(ImageIO.read(image).getHeight(), ImageIO.read(imageFull).getHeight());
 	}
 	
 	/**
@@ -320,7 +317,7 @@ public class TestBrowserSnapshot extends MockitoTest {
 	public void testMultipleWindowsCapture() {
 		String currentWindowHandle = driver.getWindowHandle();
 		DriverTestPage.link.click();
-		List<ScreenShot> screenshots = new ScreenshotUtil().captureWebPageSnapshots(true);
+		List<ScreenShot> screenshots = new ScreenshotUtil().capture(Target.PAGE, ScreenShot.class, true);
 		
 		Assert.assertEquals(screenshots.size(), 2);
 		Assert.assertEquals(currentWindowHandle, driver.getWindowHandle());
@@ -339,10 +336,10 @@ public class TestBrowserSnapshot extends MockitoTest {
 		
 		when(mockedDriver.getWindowHandles()).thenThrow(WebDriverException.class);
 		
-		List<ScreenShot> screenshots = screenshotUtil.captureWebPageSnapshots(true);
+		List<ScreenShot> screenshots = screenshotUtil.capture(Target.PAGE, ScreenShot.class, true);
 		
 		Assert.assertEquals(screenshots.size(), 1);
-		verify(screenshotUtil).captureDesktopToFile();
+		verify(screenshotUtil).captureDesktop();
 		
 	}
 	
@@ -351,7 +348,7 @@ public class TestBrowserSnapshot extends MockitoTest {
 	 */
 	@Test(groups= {"it"})
 	public void testDesktopSnapshot() {
-		File output = new ScreenshotUtil(driver).captureDesktopToFile();
+		File output = new ScreenshotUtil(driver).capture(Target.SCREEN, File.class);
 		Assert.assertTrue(FileUtils.sizeOf(output) > 0);
 	}
 	
@@ -362,7 +359,7 @@ public class TestBrowserSnapshot extends MockitoTest {
 	public void testCurrentWindowsCapture() {
 		String currentWindowHandle = driver.getWindowHandle();
 		DriverTestPage.link.click();
-		List<ScreenShot> screenshots = new ScreenshotUtil().captureWebPageSnapshots(false);
+		List<ScreenShot> screenshots = new ScreenshotUtil(driver).capture(Target.PAGE, ScreenShot.class, false);
 		
 		Assert.assertEquals(screenshots.size(), 1);
 		Assert.assertEquals(currentWindowHandle, driver.getWindowHandle());
@@ -374,7 +371,7 @@ public class TestBrowserSnapshot extends MockitoTest {
 	@Test(groups= {"it"})
 	public void testCurrentWindowsCapture2() {
 		DriverTestPage.link.click();
-		ScreenShot screenshot = new ScreenshotUtil().captureWebPageSnapshot();
+		ScreenShot screenshot = new ScreenshotUtil(driver).capture(Target.PAGE, ScreenShot.class);
 		
 		Assert.assertNotNull(screenshot.getImagePath());
 	}

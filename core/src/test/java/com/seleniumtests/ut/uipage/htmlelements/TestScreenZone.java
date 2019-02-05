@@ -43,6 +43,7 @@ import com.seleniumtests.customexception.ImageSearchException;
 import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import com.seleniumtests.driver.screenshots.ScreenshotUtil;
+import com.seleniumtests.driver.screenshots.ScreenshotUtil.Target;
 import com.seleniumtests.uipage.htmlelements.ScreenZone;
 import com.seleniumtests.util.imaging.ImageDetector;
 
@@ -66,7 +67,7 @@ public class TestScreenZone extends MockitoTest {
 
 		PowerMockito.mockStatic(CustomEventFiringWebDriver.class);
 		doReturn(screenshotUtil).when(picElement).getScreenshotUtil();
-		when(screenshotUtil.captureDesktopToFile()).thenReturn(new File(""));
+		when(screenshotUtil.capture(Target.SCREEN, File.class)).thenReturn(new File(""));
 		when(imageDetector.getDetectedRectangle()).thenReturn(new Rectangle(10, 10, 100, 50));
 		when(imageDetector.getSizeRatio()).thenReturn(1.0);
 		
@@ -81,7 +82,7 @@ public class TestScreenZone extends MockitoTest {
 		
 		PowerMockito.mockStatic(CustomEventFiringWebDriver.class);
 		doReturn(screenshotUtil).when(picElement).getScreenshotUtil();
-		when(screenshotUtil.captureDesktopToFile()).thenReturn(new File(""));
+		when(screenshotUtil.capture(Target.SCREEN, File.class)).thenReturn(new File(""));
 		when(imageDetector.getDetectedRectangle()).thenReturn(new Rectangle(10, 10, 100, 50));
 		when(imageDetector.getSizeRatio()).thenReturn(1.0);
 		
@@ -96,7 +97,7 @@ public class TestScreenZone extends MockitoTest {
 		
 		PowerMockito.mockStatic(CustomEventFiringWebDriver.class);
 		doReturn(screenshotUtil).when(picElement).getScreenshotUtil();
-		when(screenshotUtil.captureDesktopToFile()).thenReturn(new File(""));
+		when(screenshotUtil.capture(Target.SCREEN, File.class)).thenReturn(new File(""));
 		when(imageDetector.getDetectedRectangle()).thenReturn(new Rectangle(10, 10, 100, 50));
 		when(imageDetector.getSizeRatio()).thenReturn(1.0);
 		
@@ -110,7 +111,7 @@ public class TestScreenZone extends MockitoTest {
 		ScreenZone picElement = spy(screenZone);
 		picElement.setObjectPictureFile(new File(""));
 		doReturn(screenshotUtil).when(picElement).getScreenshotUtil();
-		when(screenshotUtil.captureDesktopToFile()).thenReturn(new File(""));
+		when(screenshotUtil.capture(Target.SCREEN, File.class)).thenReturn(new File(""));
 		doThrow(ImageSearchException.class).when(imageDetector).detectExactZoneWithScale();
 		
 		Assert.assertFalse(picElement.isElementPresent());
@@ -124,7 +125,7 @@ public class TestScreenZone extends MockitoTest {
 		ScreenZone picElement = spy(screenZone);
 		picElement.setObjectPictureFile(new File(""));
 		doReturn(screenshotUtil).when(picElement).getScreenshotUtil();
-		when(screenshotUtil.captureDesktopToFile()).thenReturn(new File(""));
+		when(screenshotUtil.capture(Target.SCREEN, File.class)).thenReturn(new File(""));
 		doThrow(ImageSearchException.class).when(imageDetector).detectExactZoneWithScale();
 		
 		Assert.assertFalse(picElement.isElementPresent(350));
@@ -137,7 +138,7 @@ public class TestScreenZone extends MockitoTest {
 		ScreenZone picElement = spy(screenZone);
 		picElement.setObjectPictureFile(new File(""));
 		doReturn(screenshotUtil).when(picElement).getScreenshotUtil();
-		when(screenshotUtil.captureDesktopToFile()).thenReturn(new File(""));
+		when(screenshotUtil.capture(Target.SCREEN, File.class)).thenReturn(new File(""));
 		when(imageDetector.getDetectedRectangle()).thenReturn(new Rectangle(10, 10, 100, 50));
 		when(imageDetector.getSizeRatio()).thenReturn(1.0);
 		

@@ -593,4 +593,8 @@ public class SeleniumTestsContextManager {
     public static boolean isDesktopWebTest() {
     	return getThreadContext().getTestType().family().equals(TestType.WEB) && !getThreadContext().getTestType().isMobile();
     }
+    
+    public static String getSuiteName() {
+    	return getGlobalContext().getTestNGContext().getSuite().getName();
+    }
 }
