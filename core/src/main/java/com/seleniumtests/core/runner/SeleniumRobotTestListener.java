@@ -60,6 +60,7 @@ import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.driver.screenshots.ScreenShot;
 import com.seleniumtests.driver.screenshots.ScreenshotUtil;
+import com.seleniumtests.driver.screenshots.ScreenshotUtil.Target;
 import com.seleniumtests.driver.screenshots.VideoCaptureMode;
 import com.seleniumtests.reporter.logger.ArchiveMode;
 import com.seleniumtests.reporter.logger.TestLogging;
@@ -333,7 +334,7 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 
 		if (WebUIDriver.getWebDriver(false) != null) {
 			try {
-				for (ScreenShot screenshot: new ScreenshotUtil().captureWebPageSnapshots(true)) {
+				for (ScreenShot screenshot: new ScreenshotUtil().capture(Target.PAGE, ScreenShot.class, true)) {
 					TestLogging.logScreenshot(screenshot);
 				}
 			} catch (Exception e) {

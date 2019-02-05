@@ -50,6 +50,12 @@ public class ImageProcessor {
 		return ImageIO.read(in);  
 	}
 	
+	public static BufferedImage loadFromB64String(String b64String) throws IOException {
+		byte[] byteArray = b64String.getBytes();
+        byte[] decodeBuffer = org.apache.commons.codec.binary.Base64.decodeBase64(byteArray);
+        return loadFromFile(decodeBuffer);
+	}
+	
 	public static String toBase64(BufferedImage img) throws IOException {   
 	    ByteArrayOutputStream os = new ByteArrayOutputStream();
         OutputStream b64 = new Base64.OutputStream(os);

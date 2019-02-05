@@ -62,6 +62,7 @@ import com.seleniumtests.driver.TestType;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.driver.screenshots.ScreenShot;
 import com.seleniumtests.driver.screenshots.ScreenshotUtil;
+import com.seleniumtests.driver.screenshots.ScreenshotUtil.Target;
 import com.seleniumtests.reporter.logger.TestLogging;
 import com.seleniumtests.uipage.htmlelements.HtmlElement;
 import com.seleniumtests.uipage.htmlelements.LinkElement;
@@ -204,7 +205,7 @@ public class PageObject extends BasePage implements IPage {
     protected void assertCurrentPage(final boolean log) {
 
         if (pageIdentifierElement != null && !pageIdentifierElement.isElementPresent()) {
-        	ScreenShot screenShot = new ScreenshotUtil(driver).captureWebPageSnapshot();
+        	ScreenShot screenShot = new ScreenshotUtil(driver).capture(Target.PAGE, ScreenShot.class);
 
             throw new NotCurrentPageException(getClass().getCanonicalName()
                     + " is not the current page.\nPageIdentifierElement " + pageIdentifierElement.toString()
@@ -304,7 +305,7 @@ public class PageObject extends BasePage implements IPage {
     }
     
     public void capturePageSnapshot(String snapshotName) {
-    	ScreenShot screenShot = new ScreenshotUtil(driver).captureWebPageSnapshot();
+    	ScreenShot screenShot = new ScreenshotUtil(driver).capture(Target.PAGE, ScreenShot.class);
         this.title = screenShot.getTitle();
 
         if (screenShot.getHtmlSourcePath() != null) {

@@ -20,6 +20,8 @@ package com.seleniumtests.driver.screenshots;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -70,11 +72,106 @@ public class ScreenshotUtil {
         outputDirectory = getOutputDirectory();
         this.driver = driver;
     }
-	
-    @SuppressWarnings("unchecked")
-	public static String capturePageScreenshotToString(final WebDriver driver) {
+
+    private static String getOutputDirectory() {
+        return SeleniumTestsContextManager.getThreadContext().getOutputDirectory();
+    }
+    
+    public enum Target {SCREEN, PAGE}
+    
+    private class NamedBufferedImage {
+    	public BufferedImage image;
+    	public String prefix;
+    	
+    	public NamedBufferedImage(BufferedImage image, String prefix) {
+    		this.prefix = prefix;
+    		this.image = image;
+    	}
+    }
+    
+    /**
+     * Capture a picture
+     * @param target		which picture to take, screen or page.
+     * @param exportClass	The type of export to perform (File, ScreenShot, String, BufferedImage)
+     * @param prefix		prefix to add to screenshot when exportClass is ScreenShot
+     * @return
+     */
+    public <T extends Object> T capture(Target target, Class<T> exportClass) {
+    	try {
+			return capture(target, exportClass, false).get(0);
+		} catch (IndexOutOfBoundsException e) {
+			try {
+				return (T)exportClass.getConstructor().newInstance();
+			} catch (Exception e1) {
+				return null;
+			}
+		}
+    }
+    
+    /**
+     * Capture a picture
+     * @param target		which picture to take, screen or page.
+     * @param exportClass	The type of export to perform (File, ScreenShot, String, BufferedImage)
+     * @param prefix		prefix to add to screenshot when exportClass is ScreenShot
+     * @param allWindows	if true, will take a screenshot for all windows (only available for browser capture)
+     * @return
+     */
+    public <T extends Object> List<T> capture(Target target, Class<T> exportClass, boolean allWindows) {
+    	
+    	if (SeleniumTestsContextManager.getThreadContext() == null 
+        		|| getOutputDirectory() == null 
+        		|| !SeleniumTestsContextManager.getThreadContext().getCaptureSnapshot()) {
+            return new ArrayList<>();
+        }
+    	
+    	List<NamedBufferedImage> capturedImages = new ArrayList<>();
+    	LocalDateTime start = LocalDateTime.now();
+    	
+    	if (target == Target.SCREEN && SeleniumTestsContextManager.isDesktopWebTest()) {
+    		// capture desktop
+    		capturedImages.add(new NamedBufferedImage(captureDesktop(), ""));
+    	} else if (target == Target.PAGE && SeleniumTestsContextManager.isWebTest()) {
+    		// capture web avec scrolling
+    		capturedImages.addAll(captureWebPages(allWindows));
+	    } else if (target == Target.PAGE && SeleniumTestsContextManager.isAppTest()){
+    		capturedImages.add(new NamedBufferedImage(capturePage(-1, -1), ""));
+    	} else {
+    		throw new ScenarioException("Capturing page is only possible for web and application tests. Capturing desktop possible for desktop web tests only");
+    	}
+    	
+    	// back to page top
+    	((CustomEventFiringWebDriver)driver).scrollTop();
+    	
+    	List<T> out = new ArrayList<>();
+    	for (NamedBufferedImage capturedImage: capturedImages) {
+    		if (capturedImage != null) {
+		    	if (exportClass.equals(File.class)) {
+		    		out.add((T)exportToFile(capturedImage.image));
+		    	} else if (exportClass.equals(ScreenShot.class)) {
+		    		out.add((T)exportToScreenshot(capturedImage.image, capturedImage.prefix, Duration.between(start, LocalDateTime.now()).toMillis()));
+		    	} else if (exportClass.equals(String.class)) {
+		    		try {
+						out.add((T)ImageProcessor.toBase64(capturedImage.image));
+					} catch (IOException e) {
+						logger.error("ScreenshotUtil: cannot write image");
+					}
+		    	} else if (exportClass.equals(BufferedImage.class)) {
+		    		out.add((T)capturedImage.image);
+		    	}
+    		}
+    	}
+    	
+    	return out;
+    }
+    
+    /**
+     * Capture current page (either web or app page)
+     * This is a wrapper around the selenium screenshot capability
+     * @return
+     */
+    public BufferedImage capturePage(int cropTop, int cropBottom) {
         if (driver == null) {
-            return "";
+            return null;
         }
 
         try {
@@ -84,6 +181,11 @@ public class ScreenshotUtil {
             }
 
             TakesScreenshot screenShot = (TakesScreenshot) driver;
+            
+         // TEST_MOBILE
+//                ((AndroidDriver<WebElement>)((CustomEventFiringWebDriver)driver).getWebDriver()).getContextHandles();
+//                ((AndroidDriver<WebElement>)((CustomEventFiringWebDriver)driver).getWebDriver()).context("CHROMIUM");
+         // TEST_MOBILE
             
             // android does not support screenshot from webview context, switch temporarly to native_app context to take screenshot
             if (SeleniumTestsContextManager.getThreadContext().getBrowser() == BrowserType.BROWSER) {
@@ -95,278 +197,62 @@ public class ScreenshotUtil {
             	((AndroidDriver<WebElement>)((CustomEventFiringWebDriver)driver).getWebDriver()).context("WEBVIEW");
             }
             
-            return screenshotB64;
+            BufferedImage capturedImage = ImageProcessor.loadFromB64String(screenshotB64);
+            
+            // crop capture by removing headers
+            if (cropTop >= 0 && cropBottom >= 0) {
+            	
+
+                // in case driver already capture the whole content, do not crop anything as cropping is used to remove static headers when scrolling
+                Dimension contentDimension = ((CustomEventFiringWebDriver)driver).getContentDimension();
+                if (capturedImage.getWidth() == contentDimension.width && capturedImage.getHeight() == contentDimension.height) {
+                	return capturedImage;
+                }
+            	
+	            Dimension dimensions = ((CustomEventFiringWebDriver)driver).getViewPortDimensionWithoutScrollbar();
+	            capturedImage = ImageProcessor.cropImage(capturedImage, 0, cropTop, dimensions.getWidth(), dimensions.getHeight() - cropTop - cropBottom);
+            }
+            
+            return capturedImage;
         } catch (Exception ex) {
             // Ignore all exceptions
             logger.error("capturePageScreenshotToString: ", ex);
         }
 
-        return "";
+        return null;
     }
     
     /**
-     * take snapshot and write it to file
-     * @param driver		driver used to capture snapshot
-     * @param filePath		file where snapshot will be written
-     * @throws IOException 
+     * Capture desktop screenshot. This is not available for mobile tests
+     * @return
      */
-    public static void capturePageScreenshotToFile(final WebDriver driver, String filePath, int cropTop, int cropBottom) throws IOException {
-    	String screenshotString = capturePageScreenshotToString(driver);
-
-        if (screenshotString != null && !screenshotString.isEmpty() && driver != null) {
-            byte[] byteArray = screenshotString.getBytes();
-            byte[] decodeBuffer = Base64.decodeBase64(byteArray);
-            BufferedImage img = ImageProcessor.loadFromFile(decodeBuffer);
-            FileUtility.writeImage(filePath, img);
-            
-            // in case driver already capture the whole content, do not crop anything
-            Dimension contentDimension = ((CustomEventFiringWebDriver)driver).getContentDimension();
-            if (img.getWidth() == contentDimension.width && img.getHeight() == contentDimension.height) {
-            	return;
-            }
-            
-            // crop capture by removing scrollbars
-            Dimension dimensions = ((CustomEventFiringWebDriver)driver).getViewPortDimensionWithoutScrollbar();
-            BufferedImage croppedImg = ImageProcessor.cropImage(img, 0, cropTop, dimensions.getWidth(), dimensions.getHeight() - cropTop - cropBottom);
-            
-            FileUtility.writeImage(filePath, croppedImg);
-        }
-    }
-    
-    /**
-     * Capture the whole content even if screenshot from selenium is partial. Scroll inside page to 
-     * retrieve all the content
-     * @param driver
-     * @param filePath
-     */
-    public static void captureEntirePageToFile(final WebDriver driver, String filePath) {
-    	Dimension contentDimension = ((CustomEventFiringWebDriver)driver).getContentDimension();
-    	Dimension viewDimensions = ((CustomEventFiringWebDriver)driver).getViewPortDimensionWithoutScrollbar();
-    	int topPixelsToCrop = SeleniumTestsContextManager.getThreadContext().getSnapshotTopCropping();
-    	int bottomPixelsToCrop = SeleniumTestsContextManager.getThreadContext().getSnapshotBottomCropping();
+    public BufferedImage captureDesktop() {
     	
-    	if (SeleniumTestsContextManager.isAppTest()) {
-    		try {
-				capturePageScreenshotToFile(driver, filePath, 0, 0);
-			} catch (IOException e) {
-				logger.error("Cannot capture page", e);
-			}
-    		return;
-    	}
-    	
-    	// issue #34: prevent getting image from HTMLUnit driver
-    	if (SeleniumTestsContextManager.getThreadContext().getBrowser() == BrowserType.HTMLUNIT) {
-            return;
-        }
-    	
-    	((CustomEventFiringWebDriver)driver).scrollTop();
-    	String tmpCap = getOutputDirectory() + "/" + SCREENSHOT_DIR + "/" + HashCodeGenerator.getRandomHashCode("tmp") + ".png";
-    	
-    	int scrollY = 0;
-    	int scrollX = 0;
-    	int maxLoops = ((contentDimension.height / (viewDimensions.height - topPixelsToCrop - bottomPixelsToCrop)) + 1) * ((contentDimension.width / viewDimensions.width) + 1) + 3;
-    	int loops = 0;
-    	int currentImageHeight = 0;
-    	
-    	BufferedImage currentImage = null;
-    	while (loops < maxLoops) {
-    		try {
-    			// do not crop top for the first vertical capture
-    			// do not crop bottom for the last vertical capture
-    			int cropTop = currentImageHeight != 0 ? topPixelsToCrop : 0;
-    			int cropBottom = currentImageHeight + viewDimensions.height < contentDimension.height ? bottomPixelsToCrop : 0;
-    			
-    			// do not scroll to much so that we can crop fixed header without loosing content
-    			scrollY = currentImageHeight - cropTop;
-				((CustomEventFiringWebDriver)driver).scrollTo(scrollX, scrollY);
-				
-    			capturePageScreenshotToFile(driver, tmpCap, cropTop, cropBottom);
-				BufferedImage image = ImageIO.read(new File(tmpCap));
-				
-				if (currentImage == null) {
-					currentImage = new BufferedImage(contentDimension.getWidth(), contentDimension.getHeight(), BufferedImage.TYPE_INT_RGB);
-					currentImage.createGraphics().drawImage(image, 0, 0, null);
-					currentImageHeight = image.getHeight();
-				} else {
-					
-					// crop top of the picture in case of the last vertical snapshot. It prevents duplication of content
-					if (currentImageHeight + image.getHeight() > contentDimension.getHeight() || scrollX + image.getWidth() > contentDimension.getWidth()) {
-						image = ImageProcessor.cropImage(image, 
-								Math.max(0, image.getWidth() - (contentDimension.getWidth() - scrollX)), 
-								Math.max(0, image.getHeight() - (contentDimension.getHeight() - currentImageHeight)), 
-								Math.min(image.getWidth(), contentDimension.getWidth() - scrollX), 
-								Math.min(image.getHeight(), contentDimension.getHeight() - currentImageHeight));
-					}
-					
-					currentImage = ImageProcessor.concat(currentImage, image, scrollX, currentImageHeight);
-					currentImageHeight += image.getHeight();
-				}
-				
-				// all captures done, exit
-				if ((currentImageHeight >= contentDimension.getHeight() && scrollX + image.getWidth() >= contentDimension.getWidth())
-						|| SeleniumTestsContextManager.isAppTest()) {
-					new File(tmpCap).delete();
-					break;
-					
-				// we are at the bottom but something on the right has not been captured, move to the right and go on
-				} else if (currentImageHeight >= contentDimension.getHeight()) {
-					scrollX += image.getWidth();
-					currentImageHeight = 0;
-				}
-			} catch (IOException e) {
-				logger.error("Cannot capture page", e);
-				break;
-			}
-    		loops += 1;
-    	}
-
-    	FileUtility.writeImage(filePath, currentImage);    	
-    }
-
-    private static String getSuiteName() {
-    	return SeleniumTestsContextManager.getGlobalContext().getTestNGContext().getSuite().getName();
-    }
-
-    private static String getOutputDirectory() {
-        return SeleniumTestsContextManager.getThreadContext().getOutputDirectory();
-    }
-
-    private void handleSource(String htmlSource, final ScreenShot screenShot) {
-    	String newHtmlSource = htmlSource;
-        if (newHtmlSource == null) {
-        	newHtmlSource = driver.getPageSource();
-        }
-
-        if (newHtmlSource != null) {
-            try {
-                FileUtils.writeStringToFile(new File(outputDirectory + "/" + HTML_DIR + filename + ".html"), newHtmlSource);
-                screenShot.setHtmlSourcePath(HTML_DIR + filename + ".html");
-            } catch (IOException e) {
-                logger.warn("Ex", e);
-            }
-        }
-    }
-
-    private void handleImage(final ScreenShot screenShot) {
-        try {
-        	String imagePath = SCREENSHOT_DIR + filename + ".png";
-        	captureEntirePageToFile(driver, outputDirectory + "/" + imagePath);
-        	
-        	if (new File(outputDirectory + "/" + imagePath).exists()) {
-        		screenShot.setImagePath(imagePath);
-        	}
-        } catch (Exception e) {
-            logger.warn("handleImage: ", e);
-        }
-        ((CustomEventFiringWebDriver)driver).scrollTop();
-    }
-
-    private void handleTitle(String title, final ScreenShot screenShot) {
-    	String newTitle = title;
-        if (newTitle == null) {
-            newTitle = driver.getTitle();
-        }
-
-        if (newTitle == null) {
-            newTitle = "";
-        }
-
-        screenShot.setTitle(newTitle);
-    }
-    
-    /**
-     * Capture driver snapshot to file
-     */
-    public File captureWebPageToFile() {
-    	ScreenShot screenShot = new ScreenShot();
-    	LocalDateTime start = LocalDateTime.now();
-    	filename = HashCodeGenerator.getRandomHashCode("web");
-    	handleImage(screenShot);
-    	
-    	// record duration of screenshot
-    	screenShot.setDuration(Duration.between(start, LocalDateTime.now()).toMillis());
-    	if (screenShot.getImagePath() == null) {
-    		return null;
-    	}
-    	return new File(screenShot.getFullImagePath());
-    }
-	
-	/**
-	 * Take screenshot and put it in a file
-	 */
-	public File captureDesktopToFile() {
-		
 		if (SeleniumTestsContextManager.isMobileTest()) {
 			throw new ScenarioException("Desktop capture can only be done on Desktop tests");
 		}
-		
+
 		// use driver because, we need remote desktop capture when using grid mode
-		String screenshotString = CustomEventFiringWebDriver.captureDesktopToBase64String(SeleniumTestsContextManager.getThreadContext().getRunMode(), 
+		String screenshotB64 =  CustomEventFiringWebDriver.captureDesktopToBase64String(SeleniumTestsContextManager.getThreadContext().getRunMode(), 
 																							SeleniumTestsContextManager.getThreadContext().getSeleniumGridConnector());
-		 
 		try {
-			if (screenshotString != null && !screenshotString.isEmpty()) {
-	            byte[] byteArray = screenshotString.getBytes();
-	            filename = HashCodeGenerator.getRandomHashCode("web");
-	            String filePath = outputDirectory + "/" + SCREENSHOT_DIR + filename + ".png";
-	            byte[] decodeBuffer = Base64.decodeBase64(byteArray);
-	            BufferedImage img = ImageProcessor.loadFromFile(decodeBuffer);
-	            FileUtility.writeImage(filePath, img);
-	            return new File(filePath);
-			} else {
-				throw new ScenarioException("Erreur while creating screenshot");
-			}
+			return ImageProcessor.loadFromB64String(screenshotB64);
 		} catch (IOException e) {
-			throw new ScenarioException("Erreur while creating screenshot:  " + e.getMessage(), e);
+			logger.error("captureDesktopToString: ", e);
 		}
-		
-		
-	}
-	
-	/**
-	 * Take screenshot and put it in a screenshot object
-	 */
-	public ScreenShot captureDesktopToScreenshot() {
-		ScreenShot screenShot = new ScreenShot();
-		LocalDateTime start = LocalDateTime.now();
-		screenShot.setTitle("Desktop");
-		File screenshotFile = captureDesktopToFile();
-
-    	// record duration of screenshot
-    	screenShot.setDuration(Duration.between(start, LocalDateTime.now()).toMillis());
-		screenShot.setImagePath(SCREENSHOT_DIR + screenshotFile.getName());
-		return screenShot;
-	}
-	
-	/**
-     * Capture snapshot if seleniumContext is configured to do so
-     * @return
-     */
-	public ScreenShot captureWebPageSnapshot() {
-		try {
-			return captureWebPageSnapshots(false).get(0);
-		} catch (IndexOutOfBoundsException e) {
-			return new ScreenShot();
-		}
-	}
-
+		return null;
+    }
+    
     /**
-     * Capture browser windows to screenshot objects
-     * Current window will be the last captured one so that it can be recorded in the current step (see <code>TestLogging.logScreenshot</code>)
-     * If an error occurs when getting driver, desktop snapshot is taken
-     * @param allWindows 	if true, all windows created by this browsing session will be captured
+     * Captures all web pages if requested and if the browser has multiple windows / tabs opened
+     * At the end, focus is on the previously selected tab/window
+     * @param allWindows		if true, all tabs/windows will be returned
      * @return
      */
-    public List<ScreenShot> captureWebPageSnapshots(boolean allWindows) {
-
-        if (SeleniumTestsContextManager.getThreadContext() == null 
-        		|| outputDirectory == null 
-        		|| !SeleniumTestsContextManager.getThreadContext().getCaptureSnapshot()) {
-            return new ArrayList<>();
-        }
+    private List<NamedBufferedImage> captureWebPages(boolean allWindows) {
+    	 // check driver is accessible
+        List<NamedBufferedImage> images = new ArrayList<>();
         
-        // check driver is accessible
-        List<ScreenShot> screenshots = new ArrayList<>();
         Set<String> windowHandles;
         String currentWindowHandle;
         try {
@@ -374,11 +260,11 @@ public class ScreenshotUtil {
 	        currentWindowHandle = driver.getWindowHandle();
         } catch (Exception e) {
         	try {
-        		screenshots.add(captureDesktopToScreenshot());
+        		images.add(new NamedBufferedImage(captureDesktop(), "Desktop"));
         	} catch (ScenarioException e1) {
         		logger.warn("could not capture desktop: " + e1.getMessage());
         	}
-        	return screenshots;
+        	return images;
         }
 
         // capture all but the current window
@@ -389,7 +275,7 @@ public class ScreenshotUtil {
 	        			continue;
 	        		}
 	        		driver.switchTo().window(windowHandle);
-	        		screenshots.add(captureWebPageToScreenshot(""));
+	        		images.add(new NamedBufferedImage(captureWebPage(), ""));
 	        	}
 	        }
 	        
@@ -399,64 +285,157 @@ public class ScreenshotUtil {
         		driver.switchTo().window(currentWindowHandle);
         		
         		// capture current window
-                screenshots.add(captureWebPageToScreenshot("Current Window: "));
+        		images.add(new NamedBufferedImage(captureWebPage(), "Current Window: "));
         		
         	} catch (Exception e) {
             }
         }
 
-        return screenshots;
+        return images;
     }
     
     /**
-     * Capture current browser window to screenshot object 
+     * Captures a web page. If the browser natively returns the whole page, nothing more is done. Else (only webview is returned), we scroll down the page to get more of the page  
      * @return
      */
-    private ScreenShot captureWebPageToScreenshot(String titlePrefix) {
-    	ScreenShot screenShot = new ScreenShot();
-    	LocalDateTime start = LocalDateTime.now();
+    private BufferedImage captureWebPage() {
+
+    	Dimension contentDimension = ((CustomEventFiringWebDriver)driver).getContentDimension();
+    	Dimension viewDimensions = ((CustomEventFiringWebDriver)driver).getViewPortDimensionWithoutScrollbar();
+    	int topPixelsToCrop = SeleniumTestsContextManager.getThreadContext().getSnapshotTopCropping();
+    	int bottomPixelsToCrop = SeleniumTestsContextManager.getThreadContext().getSnapshotBottomCropping();
+
     	
-    	screenShot.setSuiteName(getSuiteName());
-
-        try {
-            String url = "app";
-            String title = titlePrefix + "app";
-            String pageSource = "";
-            if (SeleniumTestsContextManager.getThreadContext().getTestType().family().equals(TestType.WEB)) {
-            	try {
-                    url = driver.getCurrentUrl();
-                } catch (org.openqa.selenium.UnhandledAlertException ex) {
-
-                    // ignore alert customexception
-                    logger.error(ex);
-                    url = driver.getCurrentUrl();
-                }
-
-                title = titlePrefix + driver.getTitle();
-                
-                try {
-                	pageSource = driver.getPageSource();
-                } catch (WebDriverException e) {
-                	pageSource = "";
-                }
-            } 
-            
-            this.filename = HashCodeGenerator.getRandomHashCode("web");
-            screenShot.setLocation(url);
-
-            handleTitle(title, screenShot);
-            handleSource(pageSource, screenShot);
-            handleImage(screenShot);
-        } catch (WebSessionEndedException e) {
-            throw e;
-        } catch (Exception ex) {
-        	logger.error(ex);
+    	// issue #34: prevent getting image from HTMLUnit driver
+    	if (SeleniumTestsContextManager.getThreadContext().getBrowser() == BrowserType.HTMLUNIT) {
+            return null;
         }
-        
+    	
+    	((CustomEventFiringWebDriver)driver).scrollTop();
+    	
+    	int scrollY = 0;
+    	int scrollX = 0;
+    	int maxLoops = ((contentDimension.height / (viewDimensions.height - topPixelsToCrop - bottomPixelsToCrop)) + 1) * ((contentDimension.width / viewDimensions.width) + 1) + 3;
+    	int loops = 0;
+    	int currentImageHeight = 0;
+    	
+    	BufferedImage currentImage = null;
+    	while (loops < maxLoops) {
+			// do not crop top for the first vertical capture
+			// do not crop bottom for the last vertical capture
+			int cropTop = currentImageHeight != 0 ? topPixelsToCrop : 0;
+			int cropBottom = currentImageHeight + viewDimensions.height < contentDimension.height ? bottomPixelsToCrop : 0;
+			
+			// do not scroll to much so that we can crop fixed header without loosing content
+			scrollY = currentImageHeight - cropTop;
+			((CustomEventFiringWebDriver)driver).scrollTo(scrollX, scrollY);
+			
+			BufferedImage image = capturePage(cropTop, cropBottom);
+			if (image == null) {
+				logger.error("Cannot capture page");
+				break;
+			}
+			
+			if (currentImage == null) {
+				currentImage = new BufferedImage(contentDimension.getWidth(), contentDimension.getHeight(), BufferedImage.TYPE_INT_RGB);
+				currentImage.createGraphics().drawImage(image, 0, 0, null);
+				currentImageHeight = image.getHeight();
+			} else {
+				
+				// crop top of the picture in case of the last vertical snapshot. It prevents duplication of content
+				if (currentImageHeight + image.getHeight() > contentDimension.getHeight() || scrollX + image.getWidth() > contentDimension.getWidth()) {
+					image = ImageProcessor.cropImage(image, 
+							Math.max(0, image.getWidth() - (contentDimension.getWidth() - scrollX)), 
+							Math.max(0, image.getHeight() - (contentDimension.getHeight() - currentImageHeight)), 
+							Math.min(image.getWidth(), contentDimension.getWidth() - scrollX), 
+							Math.min(image.getHeight(), contentDimension.getHeight() - currentImageHeight));
+				}
+				
+				currentImage = ImageProcessor.concat(currentImage, image, scrollX, currentImageHeight);
+				currentImageHeight += image.getHeight();
+			}
+			
+			// all captures done, exit
+			if ((currentImageHeight >= contentDimension.getHeight() && scrollX + image.getWidth() >= contentDimension.getWidth())
+					|| SeleniumTestsContextManager.isAppTest()) {
+				break;
+				
+			// we are at the bottom but something on the right has not been captured, move to the right and go on
+			} else if (currentImageHeight >= contentDimension.getHeight()) {
+				scrollX += image.getWidth();
+				currentImageHeight = 0;
+			}
+
+    		loops += 1;
+    	}
+
+    	return currentImage;
+    	
+    }
+    
+    /**
+     * Export buffered image to file
+     * @param image
+     * @return
+     */
+    private File exportToFile(BufferedImage image) {
+    	filename = HashCodeGenerator.getRandomHashCode("web");
+        String filePath = getOutputDirectory() + "/" + SCREENSHOT_DIR + filename + ".png";
+        FileUtility.writeImage(filePath, image);
+        return new File(filePath);
+    }
+    
+    /**
+     * Export buffered image to screenshot object, adding HTML source, title, ...
+     * @param image
+     * @param prefix
+     * @param duration
+     * @return
+     */
+    private ScreenShot exportToScreenshot(BufferedImage image, String prefix, long duration) {
+    	ScreenShot screenShot = new ScreenShot();
+    	
+    	String url = "app";
+        String title = prefix + "app";
+        String pageSource = "";
+    	
+    	if (SeleniumTestsContextManager.isWebTest()) {
+    		try {
+                url = driver.getCurrentUrl();
+            } catch (org.openqa.selenium.UnhandledAlertException ex) {
+                // ignore alert customexception
+                logger.error(ex);
+                url = driver.getCurrentUrl();
+            }
+
+            title = driver.getTitle();
+    		title = prefix + title == null ? "": prefix + title;
+    		
+    		try {
+            	pageSource = driver.getPageSource();
+            } catch (WebDriverException e) {
+            	pageSource = "";
+            }
+    	}
+    	
+    	File screenshotFile = exportToFile(image);
+    	
+        screenShot.setLocation(url);
+        screenShot.setTitle(title);
+        try {
+            FileUtils.writeStringToFile(new File(outputDirectory + "/" + HTML_DIR + filename + ".html"), pageSource);
+            screenShot.setHtmlSourcePath(HTML_DIR + filename + ".html");
+        } catch (IOException e) {
+            logger.warn("Ex", e);
+        }
 
     	// record duration of screenshot
-    	screenShot.setDuration(Duration.between(start, LocalDateTime.now()).toMillis());
-
-        return screenShot;
+    	screenShot.setDuration(duration);
+    	if (screenshotFile.exists()) {
+    		Path pathAbsolute = Paths.get(screenshotFile.getAbsolutePath());
+	        Path pathBase = Paths.get(getOutputDirectory());
+    		screenShot.setImagePath(pathBase.relativize(pathAbsolute).toString());
+    	}
+		return screenShot;
     }
 }

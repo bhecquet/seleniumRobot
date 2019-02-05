@@ -31,7 +31,9 @@ import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.driver.DriverMode;
 import com.seleniumtests.driver.WebUIDriver;
+import com.seleniumtests.driver.screenshots.ScreenShot;
 import com.seleniumtests.driver.screenshots.ScreenshotUtil;
+import com.seleniumtests.driver.screenshots.ScreenshotUtil.Target;
 import com.seleniumtests.reporter.logger.TestLogging;
 import com.seleniumtests.reporter.logger.TestStep;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
@@ -218,7 +220,7 @@ public class TestTasks {
     
     public static void capturePageSnapshot() {
     	if (WebUIDriver.getWebDriver(false) != null) {
-    		TestLogging.logScreenshot(new ScreenshotUtil().captureWebPageSnapshot());
+    		TestLogging.logScreenshot(new ScreenshotUtil().capture(Target.PAGE, ScreenShot.class));
     	}
 
     }
