@@ -27,6 +27,7 @@ import org.json.JSONObject;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.CustomSeleniumTestsException;
+import com.seleniumtests.util.StringUtility;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
 
@@ -128,24 +129,8 @@ public class TestAction {
 		if (encoded) {
 			return message;
 		}
-		String newMessage;
-		switch (format) {
-		case "xml":
-			newMessage = StringEscapeUtils.escapeXml11(message);
-			break;
-		case "csv":
-			newMessage = StringEscapeUtils.escapeCsv(message);
-			break;
-		case "html":
-			newMessage = StringEscapeUtils.escapeHtml4(message);
-			break;
-		case "json":
-			newMessage = StringEscapeUtils.escapeJson(message);
-			break;
-		default:
-			throw new CustomSeleniumTestsException("only escaping of 'xml', 'html', 'csv', 'json' is allowed");
-		}
-		return newMessage;
+		
+		return StringUtility.encodeString(message, format);
 	}
 
 	public TestAction encode(String format) {

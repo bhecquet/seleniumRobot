@@ -22,8 +22,10 @@ import java.lang.reflect.Method;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+import org.apache.commons.text.StringEscapeUtils;
 import org.apache.log4j.Logger;
 
+import com.seleniumtests.customexception.CustomSeleniumTestsException;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
 public class StringUtility {
@@ -126,6 +128,37 @@ public class StringUtility {
 				.replaceAll("[:*?]", ".")
 				.replaceAll("[<>]", "-")
 				.replace("\\", "_");
+	}
+	
+
+	/**
+	 * Encode string according to provided format
+	 * @param message		message to encode
+	 * @param format		'xml', 'csv', 'html', 'json', 'text'. the later does not change anything
+	 * @return
+	 */
+	public static String encodeString(String message, String format) {
+		String newMessage;
+		switch (format) {
+		case "xml":
+			newMessage = StringEscapeUtils.escapeXml11(message);
+			break;
+		case "csv":
+			newMessage = StringEscapeUtils.escapeCsv(message);
+			break;
+		case "html":
+			newMessage = StringEscapeUtils.escapeHtml4(message);
+			break;
+		case "json":
+			newMessage = StringEscapeUtils.escapeJson(message);
+			break;
+		case "text":
+			newMessage = message;
+			break;
+		default:
+			throw new CustomSeleniumTestsException("only escaping of 'xml', 'html', 'csv', 'json' is allowed");
+		}
+		return newMessage;
 	}
 	
 	

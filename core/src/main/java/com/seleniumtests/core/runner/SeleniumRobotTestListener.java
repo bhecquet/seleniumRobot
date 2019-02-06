@@ -415,7 +415,7 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 			StringBuilder stackString = new StringBuilder("!!! Many Test Failures (").append(size).append(")\n\n");
 			
 			for (int i = 0; i < size - 1; i++) {
-				CommonReporter.generateTheStackTrace(verificationFailures.get(i), String.format("Failure %d of %d%n", i + 1, size), stackString);
+				CommonReporter.generateTheStackTrace(verificationFailures.get(i), String.format("Failure %d of %d%n", i + 1, size), stackString, "text");
 			}
 			
 			Throwable last = verificationFailures.get(size - 1);

@@ -353,7 +353,7 @@ public class TestDriver extends GenericMultiBrowserTest {
 		
 		// Check we wait at least for the timeout set
 		logger.info("end: " + new Date().getTime());
-		Assert.assertTrue(new Date().getTime() - start > 6900);
+		Assert.assertTrue(new Date().getTime() - start > 6500);
 	}
 	
 	@Test(groups={"it", "ut"})

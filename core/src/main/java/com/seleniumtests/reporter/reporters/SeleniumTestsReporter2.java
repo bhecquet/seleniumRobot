@@ -200,7 +200,7 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 			String[] stack = null;
 			if (testResult.getThrowable() != null) {
 				StringBuilder stackString = new StringBuilder();
-				generateTheStackTrace(testResult.getThrowable(), testResult.getThrowable().getMessage(), stackString);
+				generateTheStackTrace(testResult.getThrowable(), testResult.getThrowable().getMessage(), stackString, "html");
 				stack = stackString.toString().split("\n");
 			}
 			

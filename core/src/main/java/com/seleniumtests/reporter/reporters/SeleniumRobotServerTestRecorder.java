@@ -62,7 +62,7 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 		// exception handling
 		StringBuilder stackString = new StringBuilder();
 		if (testResult.getThrowable() != null) {
-			generateTheStackTrace(testResult.getThrowable(), testResult.getThrowable().getMessage(), stackString);
+			generateTheStackTrace(testResult.getThrowable(), testResult.getThrowable().getMessage(), stackString, "html");
 		}
 		
 		executionLogs.put("stacktrace", stackString.toString());

@@ -32,6 +32,7 @@ import org.apache.log4j.Logger;
 import org.apache.velocity.app.VelocityEngine;
 import org.testng.ITestResult;
 
+import com.seleniumtests.util.StringUtility;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
 public abstract class CommonReporter {
@@ -98,12 +99,13 @@ public abstract class CommonReporter {
 	
 	/**
 	 * Method to generate the formated stacktrace
-	 * @param exception
-	 * @param title
-	 * @param contentBuffer
+	 * @param exception		Exception to format
+	 * @param title			title of the exception
+	 * @param contentBuffer	
+	 * @param format		format to use to encode ('html', 'csv', 'xml', 'json')
 	 */
-	public static void generateTheStackTrace(final Throwable exception, final String title, final StringBuilder contentBuffer) {
-		contentBuffer.append(exception.getClass() + ": " + StringEscapeUtils.escapeHtml4(title) + "\n");
+	public static void generateTheStackTrace(final Throwable exception, final String title, final StringBuilder contentBuffer, String format) {
+		contentBuffer.append(exception.getClass() + ": " + StringUtility.encodeString(title, format) + "\n");
 
 		StackTraceElement[] s1 = exception.getStackTrace();
 		Throwable t2 = exception.getCause();
@@ -113,12 +115,12 @@ public abstract class CommonReporter {
 		for (int x = 0; x < s1.length; x++) {
 			String message = filterStackTrace(s1[x].toString());
 			if (message != null) {
-				contentBuffer.append("\nat " + StringEscapeUtils.escapeHtml4(message));
+				contentBuffer.append("\nat " + StringUtility.encodeString(message, format));
 			}
 		}
 
 		if (t2 != null) {
-			generateTheStackTrace(t2, "Caused by " + t2.getLocalizedMessage(), contentBuffer);
+			generateTheStackTrace(t2, "Caused by " + t2.getLocalizedMessage(), contentBuffer, format);
 		}
 	}
 	
