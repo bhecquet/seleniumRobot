@@ -124,7 +124,7 @@ public class TestPerformanceReporter extends ReporterTest {
 	 */
 	@Test(groups={"it"})
 	public void testXmlCharacterEscape(ITestContext testContext) throws Exception {
-		executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForEncoding"});
+		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForEncoding"}, ParallelMode.METHODS, new String[] {"testAndSubActions"});
 		
 		String detailedReportContent = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testAndSubActions", "PERF-result.xml").toFile());
 		
@@ -140,7 +140,7 @@ public class TestPerformanceReporter extends ReporterTest {
 	 */
 	@Test(groups={"it"})
 	public void testXmlErrorMessageEscape(ITestContext testContext) throws Exception {
-		executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForEncoding"});
+		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForEncoding"}, ParallelMode.METHODS, new String[] {"testWithException"});
 		
 		String detailedReportContent = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testWithException", "PERF-result.xml").toFile());
 		
@@ -149,5 +149,24 @@ public class TestPerformanceReporter extends ReporterTest {
 		
 		// check CDATA error text is not encoded
 		Assert.assertTrue(detailedReportContent.contains("<![CDATA[class com.seleniumtests.customexception.DriverExceptions: & some exception \"with \" <strong><a href='http://someurl/link' style='background-color: red;'>HTML to encode</a></strong>"));
+	}
+	
+	/**
+	 * Test all exceptions are there. The root one is only present in text
+	 * @param testContext
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testXmlErrorMessageEscapeDoubleException(ITestContext testContext) throws Exception {
+		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForEncoding"}, ParallelMode.METHODS, new String[] {"testWithChainedException"});
+		
+		String detailedReportContent = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testWithChainedException", "PERF-result.xml").toFile());
+		
+		// check error message is correctly XML encoded
+		Assert.assertTrue(detailedReportContent.contains("<error message=\"class com.seleniumtests.customexception.DriverExceptions: &amp; some exception &quot;with &quot; &lt;strong&gt;&lt;a href=&apos;http://someurl/link&apos; style=&apos;background-color: red;&apos;&gt;HTML to encode&lt;/a&gt;&lt;/strong&gt;\" type=\"\">"));
+		
+		// check CDATA error text is not encoded
+		Assert.assertTrue(detailedReportContent.contains("<![CDATA[class com.seleniumtests.customexception.DriverExceptions: & some exception \"with \" <strong><a href='http://someurl/link' style='background-color: red;'>HTML to encode</a></strong>"));
+		Assert.assertTrue(detailedReportContent.contains("class com.seleniumtests.customexception.DriverExceptions: Caused by root <error>"));
 	}
 }
