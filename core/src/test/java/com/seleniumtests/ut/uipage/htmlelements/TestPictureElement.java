@@ -92,7 +92,7 @@ public class TestPictureElement extends MockitoTest {
 		when(WebUIDriver.getWebDriver()).thenReturn(driver);
 		when(driver.getMouse()).thenReturn(mouse);
 		when(driver.getKeyboard()).thenReturn(keyboard);
-		when(screenshotUtil.capture(Target.PAGE, File.class)).thenReturn(new File(""));
+		when(screenshotUtil.capture(Target.PAGE, File.class, true)).thenReturn(new File(""));
 		when(imageDetector.getDetectedRectangle()).thenReturn(new Rectangle(10, 10, 100, 50));
 		when(imageDetector.getSizeRatio()).thenReturn(1.0);
 		when(coordinates.inViewPort()).thenReturn(new Point(100, 120));
@@ -109,7 +109,7 @@ public class TestPictureElement extends MockitoTest {
 	public void testPictureNotVisible() throws AWTException {
 		PictureElement picElement = spy(pictureElement);
 		picElement.setObjectPictureFile(new File(""));
-		when(screenshotUtil.capture(Target.PAGE, File.class)).thenReturn(new File(""));
+		when(screenshotUtil.capture(Target.PAGE, File.class, true)).thenReturn(new File(""));
 		doReturn(screenshotUtil).when(picElement).getScreenshotUtil();
 		doThrow(ImageSearchException.class).when(imageDetector).detectExactZoneWithScale();
 		
@@ -124,7 +124,7 @@ public class TestPictureElement extends MockitoTest {
 		PictureElement picElement = spy(pictureElement);
 		picElement.setObjectPictureFile(new File(""));
 		doReturn(screenshotUtil).when(picElement).getScreenshotUtil();
-		when(screenshotUtil.capture(Target.PAGE, File.class)).thenReturn(new File(""));
+		when(screenshotUtil.capture(Target.PAGE, File.class, true)).thenReturn(new File(""));
 		doThrow(ImageSearchException.class).when(imageDetector).detectExactZoneWithScale();
 		
 		Assert.assertFalse(picElement.isElementPresent(350));
@@ -138,7 +138,7 @@ public class TestPictureElement extends MockitoTest {
 		PictureElement picElement = spy(pictureElement);
 		picElement.setObjectPictureFile(new File(""));
 		doReturn(screenshotUtil).when(picElement).getScreenshotUtil();
-		when(screenshotUtil.capture(Target.PAGE, File.class)).thenReturn(new File(""));
+		when(screenshotUtil.capture(Target.PAGE, File.class, true)).thenReturn(new File(""));
 		when(imageDetector.getDetectedRectangle()).thenReturn(new Rectangle(10, 10, 100, 50));
 		when(imageDetector.getSizeRatio()).thenReturn(1.0);
 		

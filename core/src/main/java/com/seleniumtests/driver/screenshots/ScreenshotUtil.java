@@ -90,15 +90,25 @@ public class ScreenshotUtil {
     }
     
     /**
-     * Capture a picture
+     * Capture a picture only if SeleniumTestsContext.getCaptureSnapshot() allows it
      * @param target		which picture to take, screen or page.
      * @param exportClass	The type of export to perform (File, ScreenShot, String, BufferedImage)
-     * @param prefix		prefix to add to screenshot when exportClass is ScreenShot
      * @return
      */
     public <T extends Object> T capture(Target target, Class<T> exportClass) {
+    	return capture(target, exportClass, false);
+    }
+    
+    /**
+     * Capture a picture
+     * @param target		which picture to take, screen or page.
+     * @param exportClass	The type of export to perform (File, ScreenShot, String, BufferedImage)
+     * @param force			force capture even if set to false in SeleniumTestContext. This allows PictureElement and ScreenZone to work
+     * @return
+     */
+    public <T extends Object> T capture(Target target, Class<T> exportClass, boolean force) {
     	try {
-			return capture(target, exportClass, false).get(0);
+			return capture(target, exportClass, false, force).get(0);
 		} catch (IndexOutOfBoundsException e) {
 			try {
 				return (T)exportClass.getConstructor().newInstance();
@@ -112,15 +122,15 @@ public class ScreenshotUtil {
      * Capture a picture
      * @param target		which picture to take, screen or page.
      * @param exportClass	The type of export to perform (File, ScreenShot, String, BufferedImage)
-     * @param prefix		prefix to add to screenshot when exportClass is ScreenShot
      * @param allWindows	if true, will take a screenshot for all windows (only available for browser capture)
+     * @param force			force capture even if set to false in SeleniumTestContext. This allows PictureElement and ScreenZone to work
      * @return
      */
-    public <T extends Object> List<T> capture(Target target, Class<T> exportClass, boolean allWindows) {
+    public <T extends Object> List<T> capture(Target target, Class<T> exportClass, boolean allWindows, boolean force) {
     	
-    	if (SeleniumTestsContextManager.getThreadContext() == null 
+    	if (!force && (SeleniumTestsContextManager.getThreadContext() == null 
         		|| getOutputDirectory() == null 
-        		|| !SeleniumTestsContextManager.getThreadContext().getCaptureSnapshot()) {
+        		|| !SeleniumTestsContextManager.getThreadContext().getCaptureSnapshot())) {
             return new ArrayList<>();
         }
     	
@@ -140,7 +150,15 @@ public class ScreenshotUtil {
     	}
     	
     	// back to page top
-    	((CustomEventFiringWebDriver)driver).scrollTop();
+    	try {
+    		if (target == Target.PAGE) {
+    			((CustomEventFiringWebDriver)driver).scrollTop();
+    		}
+    	} catch (WebDriverException e) {
+    		// ignore errors here.
+    		// com.seleniumtests.it.reporter.TestTestLogging.testManualSteps() with HTMLUnit driver
+    		// org.openqa.selenium.WebDriverException: Can't execute JavaScript before a page has been loaded!
+    	}
     	
     	List<T> out = new ArrayList<>();
     	for (NamedBufferedImage capturedImage: capturedImages) {

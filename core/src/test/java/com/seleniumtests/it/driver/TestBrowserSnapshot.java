@@ -317,7 +317,7 @@ public class TestBrowserSnapshot extends MockitoTest {
 	public void testMultipleWindowsCapture() {
 		String currentWindowHandle = driver.getWindowHandle();
 		DriverTestPage.link.click();
-		List<ScreenShot> screenshots = new ScreenshotUtil().capture(Target.PAGE, ScreenShot.class, true);
+		List<ScreenShot> screenshots = new ScreenshotUtil().capture(Target.PAGE, ScreenShot.class, true, false);
 		
 		Assert.assertEquals(screenshots.size(), 2);
 		Assert.assertEquals(currentWindowHandle, driver.getWindowHandle());
@@ -336,7 +336,7 @@ public class TestBrowserSnapshot extends MockitoTest {
 		
 		when(mockedDriver.getWindowHandles()).thenThrow(WebDriverException.class);
 		
-		List<ScreenShot> screenshots = screenshotUtil.capture(Target.PAGE, ScreenShot.class, true);
+		List<ScreenShot> screenshots = screenshotUtil.capture(Target.PAGE, ScreenShot.class, true, false);
 		
 		Assert.assertEquals(screenshots.size(), 1);
 		verify(screenshotUtil).captureDesktop();
@@ -359,7 +359,7 @@ public class TestBrowserSnapshot extends MockitoTest {
 	public void testCurrentWindowsCapture() {
 		String currentWindowHandle = driver.getWindowHandle();
 		DriverTestPage.link.click();
-		List<ScreenShot> screenshots = new ScreenshotUtil(driver).capture(Target.PAGE, ScreenShot.class, false);
+		List<ScreenShot> screenshots = new ScreenshotUtil(driver).capture(Target.PAGE, ScreenShot.class, false, false);
 		
 		Assert.assertEquals(screenshots.size(), 1);
 		Assert.assertEquals(currentWindowHandle, driver.getWindowHandle());
