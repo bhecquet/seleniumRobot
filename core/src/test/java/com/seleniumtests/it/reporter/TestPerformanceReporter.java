@@ -90,7 +90,7 @@ public class TestPerformanceReporter extends ReporterTest {
 		// check content of summary report file
 		String jmeterReport = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testAndSubActions", "PERF-result.xml").toFile());
 		
-		Assert.assertTrue(jmeterReport.contains("<error message=\"driver exception"));
+		Assert.assertTrue(jmeterReport.contains("<error message=\"class org.openqa.selenium.WebDriverException: driver exception"));
 		Assert.assertTrue(jmeterReport.contains("<![CDATA[class org.openqa.selenium.WebDriverException: driver exception"));
 		Assert.assertTrue(jmeterReport.contains("at com.seleniumtests.it.stubclasses.StubTestClass.testAndSubActions(StubTestClass.java"));
 	}	
@@ -130,5 +130,24 @@ public class TestPerformanceReporter extends ReporterTest {
 		
 		// check step 1 has been encoded
 		Assert.assertTrue(detailedReportContent.contains("name=\"Step 1: step 1 &lt;&gt;&quot;&apos;&amp;/\""));
+	}
+	
+	/**
+	 * issue #205
+	 * Test that performance reporter correctly encode error messages
+	 * @param testContext
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testXmlErrorMessageEscape(ITestContext testContext) throws Exception {
+		executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForEncoding"});
+		
+		String detailedReportContent = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testWithException", "PERF-result.xml").toFile());
+		
+		// check error message is correctly XML encoded
+		Assert.assertTrue(detailedReportContent.contains("<error message=\"class com.seleniumtests.customexception.DriverExceptions: &amp; some exception &quot;with &quot; &lt;strong&gt;&lt;a href=&apos;http://someurl/link&apos; style=&apos;background-color: red;&apos;&gt;HTML to encode&lt;/a&gt;&lt;/strong&gt;\" type=\"\">"));
+		
+		// check CDATA error text is not encoded
+		Assert.assertTrue(detailedReportContent.contains("<![CDATA[class com.seleniumtests.customexception.DriverExceptions: & some exception \"with \" <strong><a href='http://someurl/link' style='background-color: red;'>HTML to encode</a></strong>"));
 	}
 }

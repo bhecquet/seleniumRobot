@@ -735,8 +735,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		
 		// check that when test is KO, error cause is displayed
 		Assert.assertTrue(detailedReportContent.contains("[main] TestLogging: Test is KO with error: "));
-	}
-	
+	}	
 	
 	/**
 	 * Check test values are displayed (call to TestLogging.logTestValue()) shown as a table
@@ -822,5 +821,22 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		
 		// check no HTML code remains in file
 		Assert.assertFalse(detailedReportContent.contains("<strong>"));
+	}
+	
+	/**
+	 * Test that HTML report is correctly encoded with 2 exceptions
+	 * @param testContext
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testHtmlCharacterEscapeMultipleExceptions(ITestContext testContext) throws Exception {
+		executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForEncoding"});
+		
+		String detailedReportContent = readTestMethodResultFile("testWithChainedException");
+
+		// check exception stack trace is encoded with the 2 exceptions
+		Assert.assertTrue(detailedReportContent.contains("<div>class com.seleniumtests.customexception.DriverExceptions: &amp; some exception &quot;with &quot; &lt;strong&gt;&lt;a href='http://someurl/link' style='background-color: red;'&gt;HTML to encode&lt;/a&gt;&lt;/strong&gt;</div>"));
+		Assert.assertTrue(detailedReportContent.contains("Caused by root &lt;error&gt;</div>"));
+		
 	}
 }

@@ -145,7 +145,7 @@ public class CustomReporter extends CommonReporter implements IReporter {
 			List<String> stack = null;
 			if (testResult.getThrowable() != null) {
 				StringBuilder stackString = new StringBuilder();
-				generateTheStackTrace(testResult.getThrowable(), testResult.getThrowable().getMessage(), stackString);
+				generateTheStackTrace(testResult.getThrowable(), testResult.getThrowable().getMessage(), stackString, reportFormat.toLowerCase());
 				stack = Arrays.asList(stackString.toString().split("\n"));
 			}
 	

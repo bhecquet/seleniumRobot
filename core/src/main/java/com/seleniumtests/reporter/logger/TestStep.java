@@ -127,12 +127,12 @@ public class TestStep extends TestAction {
 		return false;
 	}
 	
-	public String getExceptionMessage() {
+	public String getExceptionMessage(String format) {
 		if (actionException == null) {
 			return "";
 		}
 		StringBuilder stackString = new StringBuilder();
-		CommonReporter.generateTheStackTrace(actionException, actionException.getMessage(), stackString);
+		CommonReporter.generateTheStackTrace(actionException, actionException.getMessage(), stackString, format);
 		return stackString.toString();
 	}
 
