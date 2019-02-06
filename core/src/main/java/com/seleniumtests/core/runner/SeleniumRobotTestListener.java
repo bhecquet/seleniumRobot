@@ -334,7 +334,7 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 
 		if (WebUIDriver.getWebDriver(false) != null) {
 			try {
-				for (ScreenShot screenshot: new ScreenshotUtil().capture(Target.PAGE, ScreenShot.class, true)) {
+				for (ScreenShot screenshot: new ScreenshotUtil().capture(Target.PAGE, ScreenShot.class, true, true)) {
 					TestLogging.logScreenshot(screenshot);
 				}
 			} catch (Exception e) {

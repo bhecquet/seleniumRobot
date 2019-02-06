@@ -106,7 +106,7 @@ public class PictureElement extends GenericPictureElement {
 	public File getScreenshotFile() {
 		screenshotUtil = getScreenshotUtil(); // update driver
 		
-		return screenshotUtil.capture(Target.PAGE, File.class);		
+		return screenshotUtil.capture(Target.PAGE, File.class, true);		
 	}
 	
 	protected void doAfterPictureSearch() {

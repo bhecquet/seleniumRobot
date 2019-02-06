@@ -72,7 +72,7 @@ public class ScreenZone extends GenericPictureElement {
 		screenshotUtil = getScreenshotUtil(); // keep this for unit tests
 
 		// issue #136: we don't need driver when checking desktop
-		return screenshotUtil.capture(Target.SCREEN, File.class);
+		return screenshotUtil.capture(Target.SCREEN, File.class, true);
 	}
 	
 	protected void doAfterPictureSearch() {
