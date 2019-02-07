@@ -158,7 +158,8 @@ public class TestPerformanceReporter extends ReporterTest {
 	 */
 	@Test(groups={"it"})
 	public void testXmlErrorMessageEscapeDoubleException(ITestContext testContext) throws Exception {
-		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForEncoding"}, ParallelMode.METHODS, new String[] {"testWithChainedException"});
+		executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForEncoding"});
+//		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForEncoding"}, ParallelMode.METHODS, new String[] {"testWithChainedException"});
 		
 		String detailedReportContent = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testWithChainedException", "PERF-result.xml").toFile());
 		
