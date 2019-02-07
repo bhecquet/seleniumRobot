@@ -811,13 +811,13 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		String detailedReportContent = readTestMethodResultFile("testWithException");
 		
 		// check step 1 has been encoded
-		Assert.assertTrue(detailedReportContent.contains("<div class=\"message-log\">Test is KO with error: some exception with &lt;strong&gt;&lt;a href='http://someurl/link' style='background-color: red;'&gt;HTML to encode&lt;/a&gt;&lt;/strong&gt;"));
+		Assert.assertTrue(detailedReportContent.contains("<div class=\"message-log\">Test is KO with error: &amp; some exception &quot;with &quot; &lt;strong&gt;&lt;a href='http://someurl/link' style='background-color: red;'&gt;HTML to encode&lt;/a&gt;&lt;/strong&gt;"));
 		
 		// check logs are also encoded
-		Assert.assertTrue(detailedReportContent.contains("[main] TestLogging: Test is KO with error: some exception with &lt;strong&gt;&lt;a href='http://someurl/link' style='background-color: red;'&gt;HTML to encode&lt;/a&gt;&lt;/strong&gt;"));
+		Assert.assertTrue(detailedReportContent.contains("[main] TestLogging: Test is KO with error: &amp; some exception &quot;with &quot; &lt;strong&gt;&lt;a href='http://someurl/link' style='background-color: red;'&gt;HTML to encode&lt;/a&gt;&lt;/strong&gt;"));
 		
 		// check exception stack trace is encoded
-		Assert.assertTrue(detailedReportContent.contains("class com.seleniumtests.customexception.DriverExceptions: some exception with &lt;strong&gt;&lt;a href='http://someurl/link' style='background-color: red;'&gt;HTML to encode&lt;/a&gt;&lt;/strong&gt;"));
+		Assert.assertTrue(detailedReportContent.contains("class com.seleniumtests.customexception.DriverExceptions: &amp; some exception &quot;with &quot; &lt;strong&gt;&lt;a href='http://someurl/link' style='background-color: red;'&gt;HTML to encode&lt;/a&gt;&lt;/strong&gt;"));
 		
 		// check no HTML code remains in file
 		Assert.assertFalse(detailedReportContent.contains("<strong>"));
