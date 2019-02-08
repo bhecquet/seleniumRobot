@@ -177,15 +177,15 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		Assert.assertTrue(mainReportContent.matches(".*<a href\\='testInError/TestReport\\.html'.*?>testInError</a>.*"));
 		
 		// check number of steps is correctly computed. "test1" has 2 main steps, "testInError" has 1 step
-		Assert.assertTrue(mainReportContent.contains("<td name=\"passed-1\">5</td>"));
+		Assert.assertTrue(mainReportContent.contains("<td name=\"passed-1\">6</td>"));
 		Assert.assertTrue(mainReportContent.contains("<td name=\"failed-1\" class=\"failedSteps\">1</td>"));
-		Assert.assertTrue(mainReportContent.contains("<td name=\"stepsTotal-1\">6</td>"));
+		Assert.assertTrue(mainReportContent.contains("<td name=\"stepsTotal-1\">7</td>"));
 		
 		// for second test, test is reported KO whereas all steps are OK because we do not use LogAction.aj
 		// which handles assertion errors and report them in test steps
-		Assert.assertTrue(mainReportContent.contains("<td name=\"passed-2\">4</td>"));
+		Assert.assertTrue(mainReportContent.contains("<td name=\"passed-2\">5</td>"));
 		Assert.assertTrue(mainReportContent.contains("<td name=\"failed-2\" class=\"failedSteps\">1</td>"));
-		Assert.assertTrue(mainReportContent.contains("<td name=\"stepsTotal-2\">5</td>"));
+		Assert.assertTrue(mainReportContent.contains("<td name=\"stepsTotal-2\">6</td>"));
 		
 		// check full log file is there
 		Assert.assertTrue(mainReportContent.contains("<a href=\"seleniumRobot.log\""));
