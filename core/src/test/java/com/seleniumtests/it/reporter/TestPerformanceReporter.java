@@ -69,12 +69,12 @@ public class TestPerformanceReporter extends ReporterTest {
 		// check content of summary report file
 		String jmeterReport = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testAndSubActions", "PERF-result.xml").toFile());
 		
-		Assert.assertTrue(jmeterReport.contains("<testsuite errors=\"0\" failures=\"1\" hostname=\"\" name=\"testAndSubActions\" tests=\"6\" time=\"15"));
-		Assert.assertTrue(jmeterReport.contains("<testcase classname=\"com.seleniumtests.it.stubclasses.StubTestClass\" name=\"Step 3: step 1\" time=\"1.23\">"));
-		Assert.assertTrue(jmeterReport.contains("<testcase classname=\"com.seleniumtests.it.stubclasses.StubTestClass\" name=\"Step 4: step 2\" time=\"14.03\">"));
+		Assert.assertTrue(jmeterReport.contains("<testsuite errors=\"0\" failures=\"1\" hostname=\"\" name=\"testAndSubActions\" tests=\"7\" time=\"15"));
+		Assert.assertTrue(jmeterReport.contains("<testcase classname=\"com.seleniumtests.it.stubclasses.StubTestClass\" name=\"Step 4: step 1\" time=\"1.23\">"));
+		Assert.assertTrue(jmeterReport.contains("<testcase classname=\"com.seleniumtests.it.stubclasses.StubTestClass\" name=\"Step 5: step 2\" time=\"14.03\">"));
 		
 		// check report contains configuration steps and not internal configuration steps (call to configure() method should not be the first step)
-		Assert.assertTrue(jmeterReport.contains("<testcase classname=\"com.seleniumtests.it.stubclasses.StubTestClass\" name=\"Step 2: Pre test step: set\" time="));
+		Assert.assertTrue(jmeterReport.contains("<testcase classname=\"com.seleniumtests.it.stubclasses.StubTestClass\" name=\"Step 3: Pre test step: set\" time="));
 	}
 	
 	/**
@@ -110,7 +110,7 @@ public class TestPerformanceReporter extends ReporterTest {
 			String jmeterReport1 = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testAndSubActions", "PERF-result.xml").toFile());
 			String jmeterReport2 = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testAndSubActions", "PERF2-result.json").toFile());
 			
-			Assert.assertTrue(jmeterReport1.contains("<testsuite errors=\"0\" failures=\"1\" hostname=\"\" name=\"testAndSubActions\" tests=\"6\" time=\"15"));
+			Assert.assertTrue(jmeterReport1.contains("<testsuite errors=\"0\" failures=\"1\" hostname=\"\" name=\"testAndSubActions\" tests=\"7\" time=\"15"));
 			Assert.assertTrue(jmeterReport2.contains("\"suiteName\": \"testAndSubActions\""));
 		} finally {
 			System.clearProperty("customTestReports");
@@ -129,7 +129,7 @@ public class TestPerformanceReporter extends ReporterTest {
 		String detailedReportContent = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testAndSubActions", "PERF-result.xml").toFile());
 		
 		// check step 1 has been encoded
-		Assert.assertTrue(detailedReportContent.contains("name=\"Step 1: step 1 &lt;&gt;&quot;&apos;&amp;/\""));
+		Assert.assertTrue(detailedReportContent.contains("name=\"Step 2: step 1 &lt;&gt;&quot;&apos;&amp;/\""));
 	}
 	
 	/**
