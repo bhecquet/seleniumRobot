@@ -201,6 +201,10 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
     @Override
     public Set<String> getWindowHandles() {
     	
+    	if (!isWebTest) {
+    		return new TreeSet<>();
+    	}
+    	
     	// issue #169: workaround for ios / IE tests where getWindowHandles sometimes fails with: class org.openqa.selenium.WebDriverException: Returned value cannot be converted to List<String>: true
     	for (int i = 0; i < 10; i++) {
 			try  {
@@ -211,6 +215,17 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
 			}
 		}
     	return super.getWindowHandles();
+    	
+    }
+    
+    @Override
+    public String getWindowHandle() {
+    	
+    	if (!isWebTest) {
+    		return "";
+    	}
+    	
+    	return super.getWindowHandle();
     	
     }
 
