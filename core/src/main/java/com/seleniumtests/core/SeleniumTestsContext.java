@@ -168,7 +168,6 @@ public class SeleniumTestsContext {
     
     // Appium specific properties
     public static final String APP = "app";										// Chemin de l'application mobile (local ou distant)
-    public static final String APPIUM_SERVER_URL = "appiumServerURL";			// URL du serveur appium en local ou à distance
     public static final String MOBILE_PLATFORM_VERSION = "mobilePlatformVersion";// Mobile OS version. It's deduced from platform name and not read directly from parameters
     public static final String DEVICE_NAME = "deviceName";						// Nom du terminal utilisé pour le test
     public static final String FULL_RESET = "fullReset";						// whether we should do a full reset (default is true)
@@ -182,10 +181,7 @@ public class SeleniumTestsContext {
     public static final String VERSION = "version";								// browser version
     public static final String PLATFORM = "platform";							// platform on which test should execute. Ex: Windows 7, Android, iOS, Linux, OS X 10.10. 	
     public static final String CLOUD_API_KEY = "cloudApiKey";					// clé d'accès (dépend des services)
-    
-    // Testdroid specific properties
-    public static final String PROJECT_NAME = "projectName";					// TestDroid nécessite un nom de projet dans lequel l'automatisation aura lieu	
-    
+
     public static final String TEST_NAME = "testName";
     public static final String RELATIVE_OUTPUT_DIR = "relativeOutputDir";
     
@@ -352,7 +348,6 @@ public class SeleniumTestsContext {
         setTmsRun(getValueForTest(TMS_RUN, System.getProperty(TMS_RUN)));
         setTmsConnect(getValueForTest(TMS_CONNECT, System.getProperty(TMS_CONNECT)));
 
-        setAppiumServerUrl(getValueForTest(APPIUM_SERVER_URL, System.getProperty(APPIUM_SERVER_URL)));
         setDeviceName(getValueForTest(DEVICE_NAME, System.getProperty(DEVICE_NAME)));
         setDeviceList(getValueForTest(DEVICE_LIST, null));
         setFullReset(getBoolValueForTest(FULL_RESET, System.getProperty(FULL_RESET)));
@@ -373,7 +368,6 @@ public class SeleniumTestsContext {
         setVersion(getValueForTest(VERSION, System.getProperty(VERSION)));
         setPlatform(getValueForTest(PLATFORM, System.getProperty(PLATFORM)));
         setCloudApiKey(getValueForTest(CLOUD_API_KEY, System.getProperty(CLOUD_API_KEY)));
-        setProjectName(getValueForTest(PROJECT_NAME, System.getProperty(PROJECT_NAME)));
         
         setCustomTestReports(getValueForTest(CUSTOM_TEST_REPORTS, System.getProperty(CUSTOM_TEST_REPORTS)));
         setCustomSummaryReports(getValueForTest(CUSTOM_SUMMARY_REPORTS, System.getProperty(CUSTOM_SUMMARY_REPORTS)));
@@ -1323,10 +1317,6 @@ public class SeleniumTestsContext {
         return (Integer) getAttribute(WEB_SESSION_TIME_OUT);
     }
 
-    public String getAppiumServerURL() {
-        return (String) getAttribute(APPIUM_SERVER_URL);
-    }
-
     public String getMobilePlatformVersion() {
         return (String) getAttribute(MOBILE_PLATFORM_VERSION);
     }
@@ -1365,10 +1355,6 @@ public class SeleniumTestsContext {
     
     public String getCloudApiKey() {
     	return (String) getAttribute(CLOUD_API_KEY);
-    }
-    
-    public String getProjectName() {
-    	return (String) getAttribute(PROJECT_NAME);
     }
 
     public String getRelativeOutputDir() {
@@ -1948,10 +1934,6 @@ public class SeleniumTestsContext {
 		setAttribute(WEB_DRIVER_LISTENER, listeners);
     }
     
-    public void setAppiumServerUrl(String url) {
-    	setAttribute(APPIUM_SERVER_URL, url);
-    }
-    
     public void setDeviceName(String name) {
     	setAttribute(DEVICE_NAME, name);
     }
@@ -2096,15 +2078,7 @@ public class SeleniumTestsContext {
     public void setTestType(final TestType testType) {
         setAttribute(TEST_TYPE, testType);
     }
-    
-    /**
-     * For testdroid tests only
-     * @param name
-     */
-    public void setProjectName(String name) {
-    	setAttribute(PROJECT_NAME, name);
-    }
-
+   
     public void setRelativeOutputDir(String name) {
     	setAttribute(RELATIVE_OUTPUT_DIR, name);
     }

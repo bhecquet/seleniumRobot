@@ -46,7 +46,7 @@ public class TestSeleniumTestContextManager extends GenericTest {
 		iTestContext = SeleniumTestsContextManager.getContextFromConfigFile(iTestContext);
 		
 		Assert.assertEquals(iTestContext.getCurrentXmlTest().getSuite().getParameter(SeleniumTestsContext.DEVICE_LIST), "{\"Samsung Galaxy Nexus SPH-L700 4.3\":\"Android 4.3\",\"Android Emulator\":\"Android 5.1\"}");
-		Assert.assertEquals(iTestContext.getCurrentXmlTest().getSuite().getParameter(SeleniumTestsContext.APPIUM_SERVER_URL), "http://localhost:4723/wd/hub");
+		Assert.assertEquals(iTestContext.getCurrentXmlTest().getSuite().getParameter(SeleniumTestsContext.WEB_DRIVER_GRID), "http://localhost:4723/wd/hub");
 		Assert.assertEquals(iTestContext.getCurrentXmlTest().getSuite().getParameter(SeleniumTestsContext.APP_PACKAGE), "com.infotel.mobile");
 	}
 	
@@ -72,7 +72,7 @@ public class TestSeleniumTestContextManager extends GenericTest {
 			System.setProperty("runMode", "saucelabs");
 			iTestContext = SeleniumTestsContextManager.getContextFromConfigFile(iTestContext);
 			
-			Assert.assertEquals(iTestContext.getCurrentXmlTest().getSuite().getParameter(SeleniumTestsContext.APPIUM_SERVER_URL), "http://xxx:aaaaa-26d7-44fa-bbbb-b2c75cdccafd@ondemand.saucelabs.com:80/wd/hub");
+			Assert.assertEquals(iTestContext.getCurrentXmlTest().getSuite().getParameter(SeleniumTestsContext.WEB_DRIVER_GRID), "http://xxx:aaaaa-26d7-44fa-bbbb-b2c75cdccafd@ondemand.saucelabs.com:80/wd/hub");
 		} finally {
 			System.clearProperty("runMode");
 		}

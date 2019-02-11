@@ -72,7 +72,7 @@
     <test name="Android m-site Test" parallel="false">
     	<parameter name="EXCLUDE_FROM_SQUASH_TA" value="" />
         <parameter name="browser" value="*android" />
-        <parameter name="appiumServerURL" value="http://localhost:4723/wd/hub"/>
+        <parameter name="webDriverGrid" value="http://localhost:4723/wd/hub"/>
         <parameter name="automationName" value="Appium"/>
         <parameter name="platform" value="Android"/>
         <parameter name="mobilePlatformVersion" value="5.1"/>
@@ -96,7 +96,7 @@
     <test name="Android App test" parallel="false">
     	<parameter name="EXCLUDE_FROM_SQUASH_TA" value="" />
         <parameter name="browser" value="*android" />     
-        <parameter name="appiumServerURL" value="http://localhost:4723/wd/hub"/>
+        <parameter name="webDriverGrid" value="http://localhost:4723/wd/hub"/>
         <parameter name="automationName" value="Appium"/>
         <parameter name="platform" value="Android"/>
         <parameter name="mobilePlatformVersion" value="5.1"/>
