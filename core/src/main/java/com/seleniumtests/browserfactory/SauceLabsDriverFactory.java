@@ -74,22 +74,21 @@ public class SauceLabsDriverFactory extends AbstractWebDriverFactory implements 
      * Upload application to saucelabs server
      * @param targetAppPath
      * @param serverURL
-     * @param testdroid_apikey
      * @return
      * @throws IOException
      * @throws AuthenticationException 
      */
     protected static boolean uploadFile(String targetAppPath) throws IOException, AuthenticationException {
 
-    	// extract user name and password from appiumServerURL
-    	Matcher matcher = REG_USER_PASSWORD.matcher(SeleniumTestsContextManager.getThreadContext().getAppiumServerURL());
+    	// extract user name and password from getWebDriverGrid
+    	Matcher matcher = REG_USER_PASSWORD.matcher(SeleniumTestsContextManager.getThreadContext().getWebDriverGrid().get(0));
     	String user;
     	String password;
     	if (matcher.matches()) {
     		user = matcher.group(1);
     		password = matcher.group(2);
     	} else {
-    		throw new ConfigurationException("appiumServerURL variable does not have the right format for connecting to sauceLabs");
+    		throw new ConfigurationException("getWebDriverGrid variable does not have the right format for connecting to sauceLabs");
     	}
     	
     	FileEntity entity = new FileEntity(new File(targetAppPath));
@@ -137,13 +136,13 @@ public class SauceLabsDriverFactory extends AbstractWebDriverFactory implements 
 
     	try {
 	        if("android".equalsIgnoreCase(webDriverConfig.getPlatform())){
-	            return new AndroidDriver<WebElement>(new URL(webDriverConfig.getAppiumServerURL()), capabilities);
+	            return new AndroidDriver<WebElement>(new URL(webDriverConfig.getHubUrl().get(0)), capabilities);
 	            
 	        } else if ("ios".equalsIgnoreCase(webDriverConfig.getPlatform())){
-	        	return new IOSDriver<WebElement>(new URL(webDriverConfig.getAppiumServerURL()), capabilities);
+	        	return new IOSDriver<WebElement>(new URL(webDriverConfig.getHubUrl().get(0)), capabilities);
 	            
 	        } else {
-	        	return new RemoteWebDriver(new URL(webDriverConfig.getAppiumServerURL()), capabilities);
+	        	return new RemoteWebDriver(new URL(webDriverConfig.getHubUrl().get(0)), capabilities);
 	        }
 	
     	} catch (MalformedURLException e) {

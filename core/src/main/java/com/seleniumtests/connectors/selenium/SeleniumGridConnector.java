@@ -181,6 +181,8 @@ public class SeleniumGridConnector {
             String node = nodeUrl.split("//")[1].split(":")[0];
             String browserName = driver.getCapabilities().getBrowserName();
             String version = driver.getCapabilities().getVersion();
+            
+            // setting sessionId ensures that this connector is the active one
             sessionId = driver.getSessionId();
             logger.info("WebDriver is running on node " + node + ", " + browserName + " " + version + ", session " + sessionId);
             

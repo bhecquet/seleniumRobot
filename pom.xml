@@ -71,8 +71,8 @@
 	<properties>
 		<jacoco.version>0.8.2</jacoco.version>
 
-		<!-- when changing selenium version, do not forget to change selenium-api 
-			version in project file (for aspectj build path) -->
+		<!-- /!\ when changing selenium version, do not forget to change selenium-api version in project file (for aspectj build path) -->
+		<!-- /!\ Also change version in SeleniumTestContextManager.java -->
 		<selenium.version>3.14.0</selenium.version>
 		<appium.version>6.1.0</appium.version>
 		<aspectj.version>1.9.1</aspectj.version>
