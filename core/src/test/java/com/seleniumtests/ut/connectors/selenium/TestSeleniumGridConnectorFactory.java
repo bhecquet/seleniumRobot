@@ -34,6 +34,7 @@ import org.testng.annotations.Test;
 
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
+import com.seleniumtests.connectors.selenium.BrowserStackGridConnector;
 import com.seleniumtests.connectors.selenium.SeleniumGridConnector;
 import com.seleniumtests.connectors.selenium.SeleniumGridConnectorFactory;
 import com.seleniumtests.connectors.selenium.SeleniumRobotGridConnector;
@@ -207,5 +208,17 @@ public class TestSeleniumGridConnectorFactory extends ConnectorsTest {
 		} finally {
 			SeleniumGridConnectorFactory.setRetryTimeout(SeleniumGridConnectorFactory.DEFAULT_RETRY_TIMEOUT);
 		}
+	}
+	
+
+	/**
+	 * If URL contains browserstack, returns a browserstack connector
+	 * @throws UnsupportedOperationException
+	 * @throws IOException
+	 * @throws UnirestException 
+	 */
+	@Test(groups={"ut"})
+	public void testWithBrowserStack() throws UnsupportedOperationException, IOException, UnirestException {
+		Assert.assertTrue(SeleniumGridConnectorFactory.getInstances(Arrays.asList("http://<user>:<key>@hub-cloud.browserstack.com/wd/hub")).get(0) instanceof BrowserStackGridConnector);
 	}
 }
