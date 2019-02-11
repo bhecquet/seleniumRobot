@@ -20,8 +20,7 @@ package com.seleniumtests.driver;
 public enum DriverMode {
     LOCAL ("local"),
     GRID ("grid"),
-    SAUCELABS ("saucelabs"),
-    TESTDROID ("testdroid");
+    SAUCELABS ("saucelabs");
 	
 	String[] dMode;
 	

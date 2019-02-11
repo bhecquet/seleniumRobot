@@ -46,7 +46,6 @@ import com.seleniumtests.browserfactory.IWebDriverFactory;
 import com.seleniumtests.browserfactory.SafariDriverFactory;
 import com.seleniumtests.browserfactory.SauceLabsDriverFactory;
 import com.seleniumtests.browserfactory.SeleniumGridDriverFactory;
-import com.seleniumtests.browserfactory.TestDroidDriverFactory;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.DriverExceptions;
@@ -101,8 +100,7 @@ public class WebUIDriver {
             webDriverBuilder = new SeleniumGridDriverFactory(this.config);
         } else if (config.getMode() == DriverMode.SAUCELABS) {
         	webDriverBuilder = new SauceLabsDriverFactory(this.config);
-        } else if (config.getMode() == DriverMode.TESTDROID) {
-        	webDriverBuilder = new TestDroidDriverFactory(this.config);
+        
         	
         // local mode
         } else {
