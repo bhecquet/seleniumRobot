@@ -36,16 +36,11 @@
 	</service>
 	
 	<service name="local">
-		<parameter name="appiumServerURL" value="http://localhost:4723/wd/hub" />
+		<parameter name="webDriverGrid" value="http://localhost:4723/wd/hub" />
 	</service>
 	
 	<service name="saucelabs">
-		<parameter name="appiumServerURL" value="http://xxx:aaaaa-26d7-44fa-bbbb-b2c75cdccafd@ondemand.saucelabs.com:80/wd/hub" />
+		<parameter name="webDriverGrid" value="http://xxx:aaaaa-26d7-44fa-bbbb-b2c75cdccafd@ondemand.saucelabs.com:80/wd/hub" />
 	</service>
 	
-	<service name="testdroid">
-		<parameter name="appiumServerURL" value="http://appium.testdroid.com/wd/hub" />
-	    <parameter name="cloudApiKey" value="aaaaaaaaaa93Ua0uQNPxBktPSfZv"/>
-		<parameter name="projectName" value="Test_testdroid" />
-	</service>
 </parameters>

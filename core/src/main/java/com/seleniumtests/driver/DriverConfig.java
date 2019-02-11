@@ -333,10 +333,6 @@ public class DriverConfig {
 	public Integer getNewCommandTimeout() {
         return testContext.getNewCommandTimeout();
     }
-	
-    public String getAppiumServerURL() {
-        return testContext.getAppiumServerURL();
-    }
 
     public TestType getTestType() {
         return testContext.getTestType();
@@ -356,10 +352,6 @@ public class DriverConfig {
 	
 	public VideoCaptureMode getVideoCapture() {
 		return testContext.getVideoCapture();
-	}
-
-	public String getProjectName() {
-		return testContext.getProjectName();
 	}
 
 	public String getAppWaitActivity() {

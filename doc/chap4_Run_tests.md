@@ -44,7 +44,7 @@ In this case, this user passed value will overwrite test or suite parameters
 | Param name       			| Default 	| Description  |
 | -------------------------	| ------- 	| ------------ |
 | webDriverGrid 			| 			| Address of seleniumGrid server | 
-| runMode 					| LOCAL		| `local`: current computer<br/>`grid`: seleniumGrid<br/>`sauceLabs`: run on sauceLabs device<br/>`testDroid`: run on testdroid device | 
+| runMode 					| LOCAL		| `local`: current computer<br/>`grid`: seleniumGrid<br/>`sauceLabs`: run on sauceLabs device<br/> | 
 | nodeTags					| null		| Commat seperated list of strings. Requests that this test should execute only on a node (grid mode only) announcing all of these tags. On grid, this is declared with option `-nodeTags <tag1>,<tag2>`. If no slot matches the requested tags, session is not created |
 | browser 					| firefox	| Browser used to start test. Valid values are:<br/>`firefox`, `chrome`, `safari`, `iexplore`, `htmlunit`, `opera`, `phantomjs`, `none` for no driver, `browser` for android default browser | 
 | env 						| DEV		| Test environment for the SUT. Allow accessing param values defined in env.ini file  
@@ -141,7 +141,6 @@ Params for mobile testing
 | Param name       			| Default 	| Description  |
 | -------------------------	| ------- 	| ------------ |
 | app 						| 			| Path to the application file (local or remote) | 
-| appiumServerURL 			| 			| Appium server url. May be local or remote | 
 | deviceName 				| 			| Name of the device to use for mobile tests. It's the Human readable name (e.g: Nexus 6 as given by `adb -s <id_device> shell getprop`, line [ro.product.model] property on Android or `instruments -s devices`), not it's id. SeleniumRobot will replace this name with id when communicating with Appium | 
 | fullReset 				| true		| enable full reset capability for appium tests | 
 | appPackage 				| 			| Package name of application (android only) | 
@@ -150,8 +149,7 @@ Params for mobile testing
 | newCommandTimeout 		| 120		| Max wait between 2 appium commands in seconds | 
 | version 					| 			| Platform version | 
 | platform 					| 			| platform on which test should execute. Ex: Windows 7, Android 5.0, iOS 9.1, Linux, OS X 10.10. Defaults to the current platform | 
-| cloudApiKey 				| 			| Access key for service | 
-| projectName 				| 			| Project name for Testdroid tests only | 
+| cloudApiKey 				| 			| Access key for service |  
 | testConfig 				|  			| Additional configuration. This should contain common configuration through all TestNG files.<br/>See `exampleConfigGenericParams.xml` file for format | 
 
 #### Reporting ####
@@ -220,18 +218,13 @@ Below is an example of this file extending TestNG configuration
 		</service>
 		
 		<service name="local">
-			<parameter name="appiumServerURL" value="http://localhost:4723/wd/hub" />
+			<parameter name="webDriverGrid" value="http://localhost:4723/wd/hub" />
 		</service>
 		
 		<service name="saucelabs">
-			<parameter name="appiumServerURL" value="http://xxx:aaaaa-26d7-44fa-bbbb-b2c75cdccafd@ondemand.saucelabs.com:80/wd/hub" />
+			<parameter name="webDriverGrid" value="http://xxx:aaaaa-26d7-44fa-bbbb-b2c75cdccafd@ondemand.saucelabs.com:80/wd/hub" />
 		</service>
 		
-		<service name="testdroid">
-			<parameter name="appiumServerURL" value="http://appium.testdroid.com/wd/hub" />
-		    <parameter name="cloudApiKey" value="aaaaaaaaaa93Ua0uQNPxBktPSfZv"/>
-			<parameter name="projectName" value="Test_testdroid" />
-		</service>
 	<parameters>
 	
 You can define:
@@ -245,9 +238,9 @@ and
 `<parameter name="platform" value="Android 4.3" />`
 
 - *service definition* used for runMode option<br/>
-You can define one service for each runMode, with the same name: local, grid, saucelabs, testdroid<br/>
+You can define one service for each runMode, with the same name: local, grid, saucelabs<br/>
 Under each service, you can then add any parameter needed to address this runMode as in the above example.
-_e.g_: if user select "testdroid" runMode, then the 3 parameters (appiumServerURL, cloudApiKey, projectName) will be added to configuration
+_e.g_: if user select "saucelabs" runMode, then the 1 parameter (webDriverGrid) will be added to configuration
 
 ### 2 Test WebApp with desktop browser ###
 
@@ -329,30 +322,7 @@ Define test as follows
         </packages>
     </test>
 
-### 4 Test with Testdroid ###
 
-Define test as follows
-
-	<test name="tnr_testdroid_mobile_app" parallel="false">
-    	<parameter name="cucumberTests" value="Configuration" />
-	    <parameter name="cucumberTags" value="" />
-	    <parameter name="runMode" value="testdroid" />
-	    
-        <parameter name="appiumServerURL" value="http://appium.testdroid.com/wd/hub"/>
-        <parameter name="cloudApiKey" value="<key>"/>
-        <parameter name="deviceName" value="Samsung Galaxy Nexus SPH-L700 4.3"/>
-        <parameter name="platform" value="Android 4.3"/>
-        
-        <parameter name="app" value="<local_path_to_apk>"/>
-    	<parameter name="appPackage" value="com.infotel.mobile.infolidays"/>
-    	<parameter name="appActivity" value="com.infotel.mobile.mesconges.view.activity.StartActivity"/>
-        
-        <parameter name="projectName" value="Test_testdroid"/>
-        
-        <packages>
-            <package name="com.seleniumtests.core.runner.*"/>
-        </packages>
-    </test>
     
 ### 5 Test with SeleniumGrid ###
 
