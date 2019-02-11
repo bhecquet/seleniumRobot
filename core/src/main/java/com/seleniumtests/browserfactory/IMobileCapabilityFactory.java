@@ -42,7 +42,7 @@ public abstract class IMobileCapabilityFactory extends ICapabilitiesFactory {
 	@Override
     public MutableCapabilities createCapabilities() {
 
-    	String app = webDriverConfig.getApp();
+    	String app = webDriverConfig.getApp().trim();
     	
     	DesiredCapabilities capabilities = new DesiredCapabilities();
     	capabilities.setCapability(MobileCapabilityType.AUTOMATION_NAME, getAutomationName());
@@ -63,12 +63,12 @@ public abstract class IMobileCapabilityFactory extends ICapabilitiesFactory {
     	capabilities.setCapability(MobileCapabilityType.NEW_COMMAND_TIMEOUT, webDriverConfig.getNewCommandTimeout());
     	
     	// in case app has not been specified for cloud provider
-        if (capabilities.getCapability(MobileCapabilityType.APP) == null && app != null) {
+        if (capabilities.getCapability(MobileCapabilityType.APP) == null && app != null && !app.isEmpty()) {
         	capabilities.setCapability(MobileCapabilityType.APP, app.replace("\\", "/"));
         }
     	
     	// do not configure application and browser as they are mutualy exclusive
-        if (app == null || "".equals(app.trim()) && webDriverConfig.getBrowser() != BrowserType.NONE) {
+        if (app == null || app.isEmpty() && webDriverConfig.getBrowser() != BrowserType.NONE) {
         	capabilities.setCapability(CapabilityType.BROWSER_NAME, webDriverConfig.getBrowser().toString().toLowerCase());
         	capabilities.merge(getBrowserSpecificCapabilities());
         } else {
