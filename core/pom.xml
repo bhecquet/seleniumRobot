@@ -157,18 +157,6 @@
 		    <version>3.6.21</version>
 		</dependency>
         
-        <!-- Specific Testdroid -->
-        <dependency>
-            <groupId>com.google.http-client</groupId>
-            <artifactId>google-http-client-jackson2</artifactId>
-            <version>1.15.0-rc</version>
-        </dependency>
-        <dependency>
-            <groupId>com.testdroid</groupId>
-            <artifactId>testdroid-api</artifactId>
-            <version>1.4.8</version>
-        </dependency>
-        
         <!-- Specific Neoload -->
         <dependency>
 			<groupId>com.neotys.selenium</groupId>
