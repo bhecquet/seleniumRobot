@@ -37,6 +37,7 @@ import com.neotys.selenium.proxies.NLWebDriver;
 import com.neotys.selenium.proxies.NLWebDriverFactory;
 import com.seleniumtests.browserfactory.AppiumDriverFactory;
 import com.seleniumtests.browserfactory.BrowserInfo;
+import com.seleniumtests.browserfactory.BrowserStackDriverFactory;
 import com.seleniumtests.browserfactory.ChromeDriverFactory;
 import com.seleniumtests.browserfactory.EdgeDriverFactory;
 import com.seleniumtests.browserfactory.FirefoxDriverFactory;
@@ -95,11 +96,12 @@ public class WebUIDriver {
      */
 	public WebDriver createRemoteWebDriver()  {
         
-        // TODO: use grid with appium ?
         if (config.getMode() == DriverMode.GRID) {
             webDriverBuilder = new SeleniumGridDriverFactory(this.config);
         } else if (config.getMode() == DriverMode.SAUCELABS) {
         	webDriverBuilder = new SauceLabsDriverFactory(this.config);
+        } else if (config.getMode() == DriverMode.BROWSERSTACK) {
+        	webDriverBuilder = new BrowserStackDriverFactory(this.config);
         
         	
         // local mode

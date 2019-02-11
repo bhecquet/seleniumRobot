@@ -90,6 +90,12 @@ public class SeleniumGridConnectorFactory {
 			List<SeleniumGridConnector> seleniumGridConnectors = new ArrayList<>();
 			
 			for (URL hubUrl: hubUrls) {
+				
+				if (hubUrl.getHost().contains("browserstack")) {
+					seleniumGridConnectors.add(new BrowserStackGridConnector(hubUrl.toString()));
+					break;
+				}
+				
 				// connect to console page to see if grid replies
 				try {
 					HttpResponse<String> response = Unirest.get(String.format("http://%s:%s%s", hubUrl.getHost(), hubUrl.getPort(), SeleniumGridConnector.CONSOLE_SERVLET)).asString();

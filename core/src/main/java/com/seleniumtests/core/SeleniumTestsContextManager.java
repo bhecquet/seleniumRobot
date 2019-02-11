@@ -62,6 +62,7 @@ public class SeleniumTestsContextManager {
 	private static Boolean deployedMode;
 
 	public static final String DATA_FOLDER_NAME = "data";
+	public static final String SELENIUM_VERSION = "3.14.0";
 
     // global level context
     private static SeleniumTestsContext globalContext;

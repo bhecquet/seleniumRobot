@@ -20,6 +20,7 @@ package com.seleniumtests.driver;
 public enum DriverMode {
     LOCAL ("local"),
     GRID ("grid"),
+    BROWSERSTACK ("browserstack"),
     SAUCELABS ("saucelabs");
 	
 	String[] dMode;

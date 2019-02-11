@@ -19,10 +19,8 @@ package com.seleniumtests.browserfactory;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.regex.Pattern;
 
 import org.openqa.selenium.MutableCapabilities;
-import org.openqa.selenium.Platform;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.DesiredCapabilities;
@@ -47,9 +45,6 @@ import io.appium.java_client.ios.IOSDriver;
  *
  */
 public class BrowserStackDriverFactory extends AbstractWebDriverFactory implements IWebDriverFactory {
-
-	private static final String SAUCE_UPLOAD_URL = "https://saucelabs.com/rest/v1/storage/%s/%s?overwrite=true";
-	private static final Pattern REG_USER_PASSWORD = Pattern.compile("http://(.*?):(.*?)@ondemand.saucelabs.com:80/wd/hub");
 
     public BrowserStackDriverFactory(final DriverConfig cfg) {
         super(cfg);
@@ -85,16 +80,7 @@ public class BrowserStackDriverFactory extends AbstractWebDriverFactory implemen
     	capabilities.merge(driverOptions);
 
     	try {
-	        if("android".equalsIgnoreCase(webDriverConfig.getPlatform())){
-	            return new AndroidDriver<WebElement>(new URL(webDriverConfig.getHubUrl().get(0)), capabilities);
-	            
-	        } else if ("ios".equalsIgnoreCase(webDriverConfig.getPlatform())){
-	        	return new IOSDriver<WebElement>(new URL(webDriverConfig.getHubUrl().get(0)), capabilities);
-	            
-	        } else {
-	        	return new RemoteWebDriver(new URL(webDriverConfig.getHubUrl().get(0)), capabilities);
-	        }
-	
+	        return new RemoteWebDriver(new URL(webDriverConfig.getHubUrl().get(0)), capabilities);
     	} catch (MalformedURLException e) {
     		throw new DriverExceptions("Error creating driver: " + e.getMessage());
     	}
