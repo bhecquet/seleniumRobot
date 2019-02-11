@@ -192,7 +192,7 @@ Snapshots
 
 #### Minimal Configuration ####
 
-See §3.3 for the minimal TestNG XML file
+See §3.3 - 'TestNG file' for the minimal TestNG XML file to use to start a test
 
 #### Centralized XML configuration ####
 
@@ -244,8 +244,33 @@ _e.g_: if user select "saucelabs" runMode, then the 1 parameter (webDriverGrid) 
 
 ### 2 Test WebApp with desktop browser ###
 
+#### Test locally ####
+
 The minimal parameters to pass to SeleniumRobot are:
 `browser`: MUST be defined because default browser is None
+
+#### Test with SeleniumRobot Grid ####
+
+Test must be configured with `runMode` and `webDriverGrid` options (or use `-DrunMode=grid -DwebDriverGrid=http://127.0.0.1:4444/wd/hub`)
+ 
+	<test name="MRH">
+    	<parameter name="runMode" value="grid" />
+    	<parameter name="webDriverGrid" value="http://127.0.0.1:4444/wd/hub" />
+    	
+        <packages> 
+            <package name="com.seleniumtests.core.runner.*"/>
+        </packages>
+    </test>
+
+#### Test with BrowserStack ####
+
+BrowserStack is seen as a selenium grid.
+You the MUST use options:
+- `runMode=browserstack` to enable browserstack
+- `DwebDriverGrid=http://<user>:<key>@hub-cloud.browserstack.com/wd/hub` => see browserstack documentation
+- `platform=<platform>` => Use browserstack [capabilities generator](https://www.browserstack.com/automate/capabilities) to see which platforms are available. Platform to set here is the concatenation of `os` and `os_version` for desktop. E.g: "Windows 10"
+
+If you run behind a proxy, also use the JVM options: `-Dhttp.proxyHost=<host> -Dhttp.proxyPort=<port> -Dhttp.nonProxyHosts=<nonProxy> -Dhttps.proxyHost=<host> -Dhttps.proxyPort=<port>`
 
 ### 3 Test with Appium locally ###
 
@@ -309,7 +334,7 @@ Define test as follows
 	    <parameter name="cucumberTags" value="" />
 	    <parameter name="runMode" value="saucelabs" />
 	    
-        <parameter name="appiumServerURL" value="http://<user>:<key>@ondemand.saucelabs.com:80/wd/hub"/>
+        <parameter name="webDriverGrid" value="http://<user>:<key>@ondemand.saucelabs.com:80/wd/hub"/>
         <parameter name="deviceName" value="Android Emulator"/>
         <parameter name="platform" value="Android 5.1"/>
         
@@ -321,9 +346,18 @@ Define test as follows
             <package name="com.seleniumtests.core.runner.*"/>
         </packages>
     </test>
-
-
     
+### 4 Test with BrowserStack ####
+
+BrowserStack is seen as a selenium grid.
+You the MUST use options:
+- `runMode=browserstack` to enable browserstack
+- `DwebDriverGrid=http://<user>:<key>@hub-cloud.browserstack.com/wd/hub` => see browserstack documentation
+- `platform=<platform>` => Use browserstack [capabilities generator](https://www.browserstack.com/automate/capabilities) to see which platforms are available. Platform to set here "Android X.Y" or "iOS X"
+- `deviceName=<name>` => name of the device to use. Use browserstack [capabilities generator](https://www.browserstack.com/automate/capabilities) to get the list
+
+If you run behind a proxy, also use the JVM options: `-Dhttp.proxyHost=<host> -Dhttp.proxyPort=<port> -Dhttp.nonProxyHosts=<nonProxy> -Dhttps.proxyHost=<host> -Dhttps.proxyPort=<port>`
+ 
 ### 5 Test with SeleniumGrid ###
 
 SeleniumGrid allows to address multiple selenium nodes from one central point
@@ -336,7 +370,7 @@ For better features, prefer using seleniumRobot-grid which is based on standard 
 
 Test must be configured like the example below (or use `-DrunMode=grid -DwebDriverGrid=http://127.0.0.1:4444/wd/hub`)
  
- 	<test name="MRH">
+	<test name="MRH">
     	<parameter name="runMode" value="grid" />
     	<parameter name="webDriverGrid" value="http://127.0.0.1:4444/wd/hub" />
     	
@@ -346,12 +380,18 @@ Test must be configured like the example below (or use `-DrunMode=grid -DwebDriv
     </test>
 
 #### Configure Grid hub ####
+
+**/!\ Useless with SeleniumRobot grid !!**
+
 Hub configuration from command line or JSON is provided here: 
 [https://github.com/SeleniumHQ/selenium/wiki/Grid2](https://github.com/SeleniumHQ/selenium/wiki/Grid2)
 
 Hub configuration should use a browserTimeout of 60 seconds
 
 #### Configure Grid node ####
+
+**/!\ Useless with SeleniumRobot grid !!**
+
 Node configuration from command line or JSON is provided here: 
 [https://github.com/SeleniumHQ/selenium/wiki/Grid2](https://github.com/SeleniumHQ/selenium/wiki/Grid2)
 
@@ -386,34 +426,34 @@ Node configuration should use a timeout of 45 seconds
 To use mobile tests and SeleniumGrid, we use appium directly.<br/>
 Create a node.json configuration file for this node. (In the example below, We have 1 mobile device in Android 6.0 version, supporting either chrome or default android browser)
 
-	{
-  	"capabilities":
-      [
-        {
-			"browserName": "browser",
-			"deviceName": "192.168.228.101:5555",
-			 "version":"6.0",
-			 "maxInstances": 1,
-			 "platform":"android"
-        },
 		{
-			"browserName": "chrome",
-			"deviceName": "192.168.228.101:5555",
-			 "version":"6.0",
-			 "maxInstances": 1,
-			 "platform":"android"
-        }
-      ],
-  "configuration":
-  {
-    "proxy": "org.openqa.grid.selenium.proxy.DefaultRemoteProxy",
-    "maxSession": 1,
-    "register": true,
-    "registerCycle": 5000,
-    "hubPort": 4444,
-    "hubHost": "172.22.2.2"
-  }
-}
+	  	"capabilities":
+	      [
+	        {
+				"browserName": "browser",
+				"deviceName": "192.168.228.101:5555",
+				 "version":"6.0",
+				 "maxInstances": 1,
+				 "platform":"android"
+	        },
+			{
+				"browserName": "chrome",
+				"deviceName": "192.168.228.101:5555",
+				 "version":"6.0",
+				 "maxInstances": 1,
+				 "platform":"android"
+	        }
+	      ],
+	  "configuration":
+	  {
+	    "proxy": "org.openqa.grid.selenium.proxy.DefaultRemoteProxy",
+	    "maxSession": 1,
+	    "register": true,
+	    "registerCycle": 5000,
+	    "hubPort": 4444,
+	    "hubHost": "172.22.2.2"
+	  }
+	}
 
 From command line, use
 `appium --nodeconfig /path/to/nodeconfig.json`

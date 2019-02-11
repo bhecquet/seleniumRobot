@@ -63,7 +63,7 @@ public class BrowserStackDriverFactory extends AbstractWebDriverFactory implemen
 			capabilities.setCapability("browserName", webDriverConfig.getBrowser() == BrowserType.SAFARI ? "iPhone": "android"); 
 			capabilities.setCapability("device", webDriverConfig.getDeviceName()); // pour deviceName
 			capabilities.setCapability("realMobile", "true");
-			capabilities.setCapability("os_version", webDriverConfig.getVersion());
+			capabilities.setCapability("os_version", webDriverConfig.getMobilePlatformVersion());
 		} 
            
 		capabilities.setCapability("name", SeleniumTestsContextManager.getThreadContext().getTestMethodSignature());
