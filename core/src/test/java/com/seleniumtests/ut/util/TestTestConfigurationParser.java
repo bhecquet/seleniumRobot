@@ -45,7 +45,7 @@ public class TestTestConfigurationParser extends GenericTest {
 	
 	@Test(groups={"ut"})
 	public void testServiceNodes() {
-		Assert.assertEquals(configParser.getServiceNodes().size(), 4);
+		Assert.assertEquals(configParser.getServiceNodes().size(), 3);
 	}
 	
 	@Test(groups={"ut"})
