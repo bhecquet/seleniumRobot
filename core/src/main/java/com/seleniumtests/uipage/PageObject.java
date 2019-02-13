@@ -763,4 +763,29 @@ public class PageObject extends BasePage implements IPage {
 			throw new ScenarioException(String.format("could not read file to upload %s: %s", filePath, e.getMessage()));
 		}
 	}
+	
+	 
+	/**
+	 * get the name of the PageObject that made the call
+	 * 
+	 * @param stack : the stacktrace of the caller
+	 */
+	public static String getCallingPage(StackTraceElement[] stack) {
+		String page = null;
+		Class<?> stackClass = null;
+		
+		//find the PageObject Loader
+		for(int i=0; i<stack.length;i++){
+			try{
+				 stackClass = Class.forName(stack[i].getClassName());
+			} catch (ClassNotFoundException e){
+				continue;
+			}
+			
+			if (PageObject.class.isAssignableFrom(stackClass)){
+				page = stack[i].getClassName();	
+			}
+		}
+		return page;
+	}
 }

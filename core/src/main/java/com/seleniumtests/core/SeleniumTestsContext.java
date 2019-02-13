@@ -57,6 +57,7 @@ import com.seleniumtests.driver.screenshots.VideoCaptureMode;
 import com.seleniumtests.reporter.PluginsHelper;
 import com.seleniumtests.reporter.logger.ArchiveMode;
 import com.seleniumtests.reporter.reporters.ReportInfo;
+import com.seleniumtests.uipage.htmlelements.ElementInfo;
 import com.seleniumtests.util.StringUtility;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 import com.seleniumtests.util.osutility.OSUtility;
@@ -103,6 +104,9 @@ public class SeleniumTestsContext {
 
     public static final String VIEWPORT_WIDTH = "viewPortWidth";					// width of viewport	
     public static final String VIEWPORT_HEIGHT = "viewPortHeight";					// height of viewport
+    
+    public static final String ADVANCED_ELEMENT_SEARCH = "advancedElementSearch";	// 'false' (default), 'full', 'dom'. if 'dom', store and possibly use found element information to adapt to changes in DOM, using only DOM information. If element is not found, it will try to use other element information to find it
+    																				// if 'full', search will also be done using element picture, if available
     
     // selenium robot server parameters
     public static final String SELENIUMROBOTSERVER_URL = "seleniumRobotServerUrl";
@@ -233,6 +237,7 @@ public class SeleniumTestsContext {
 	public static final boolean DEFAULT_OPTIMIZE_REPORTS = false;
 	public static final String DEFAULT_ARCHIVE= "false";
 	public static final String DEFAULT_NODE_TAGS = "";
+	public static final ElementInfo.Mode DEFAULT_ADVANCED_ELEMENT_SEARCH = ElementInfo.Mode.FALSE;
     
     public static final int DEFAULT_REPLAY_TIME_OUT = 30;
 
@@ -322,6 +327,8 @@ public class SeleniumTestsContext {
         setBrowserDownloadDir(getValueForTest(BROWSER_DOWNLOAD_DIR, System.getProperty(BROWSER_DOWNLOAD_DIR)));
    
         setOverrideSeleniumNativeAction(getBoolValueForTest(OVERRIDE_SELENIUM_NATIVE_ACTION, System.getProperty(OVERRIDE_SELENIUM_NATIVE_ACTION)));
+
+        setAdvancedElementSearch(getValueForTest(ADVANCED_ELEMENT_SEARCH, System.getProperty(ADVANCED_ELEMENT_SEARCH)));
         
         setWebProxyType(getValueForTest(WEB_PROXY_TYPE, System.getProperty(WEB_PROXY_TYPE)));
         setWebProxyAddress(getValueForTest(WEB_PROXY_ADDRESS, System.getProperty(WEB_PROXY_ADDRESS)));
@@ -1156,6 +1163,10 @@ public class SeleniumTestsContext {
     public ArchiveMode getArchive() {
     	return (ArchiveMode) getAttribute(ARCHIVE);
     }
+    
+    public ElementInfo.Mode getAdvancedElementSearch() {
+    	return (ElementInfo.Mode) getAttribute(ADVANCED_ELEMENT_SEARCH);
+    }
 
     public TestType getTestType() {
         return (TestType) getAttribute(TEST_TYPE);
@@ -1538,6 +1549,17 @@ public class SeleniumTestsContext {
     	} else {
     		try {
     			setAttribute(ARCHIVE, ArchiveMode.fromString(archive));
+    		} catch (IllegalArgumentException e) {
+    			throw new ConfigurationException(e.getMessage());
+    		}
+    	}
+    }
+    public void setAdvancedElementSearch(String advanceElementSearchMode) {
+    	if (advanceElementSearchMode == null) {
+    		setAttribute(ADVANCED_ELEMENT_SEARCH, DEFAULT_ADVANCED_ELEMENT_SEARCH);
+    	} else {
+    		try {
+    			setAttribute(ADVANCED_ELEMENT_SEARCH, ElementInfo.Mode.valueOf(advanceElementSearchMode.toUpperCase()));
     		} catch (IllegalArgumentException e) {
     			throw new ConfigurationException(e.getMessage());
     		}

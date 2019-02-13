@@ -81,6 +81,7 @@ public class DriverTestPage extends PageObject {
 	public static final TextFieldElement multiElementFirstVisibleTextWithParent = new HtmlElement("", By.className("otherClass"), HtmlElement.FIRST_VISIBLE).findTextFieldElement(By.className("someClass"));
 	public static final HtmlElement divByClass = new HtmlElement("", By.className("otherClass"), HtmlElement.FIRST_VISIBLE);
 	public static final HtmlElement searchByXpath = new HtmlElement("", By.xpath("//option[@value=\"opt1\"]"));
+	public static final HtmlElement scrollButton = new HtmlElement("button after scroll", By.id("buttonScroll"));
 	
 	// Elements inside others
 	public static final HtmlElement parentDiv = new HtmlElement("", By.id("parentDiv"));

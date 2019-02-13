@@ -64,6 +64,7 @@ import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import com.seleniumtests.driver.TestType;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.reporter.logger.TestLogging;
+import com.seleniumtests.uipage.PageObject;
 import com.seleniumtests.uipage.ReplayOnError;
 import com.seleniumtests.util.helper.WaitHelper;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
@@ -121,6 +122,7 @@ public class HtmlElement extends Element implements WebElement, Locatable, HasId
     protected FrameElement frameElement = null;
     private Integer elementIndex = -1;
     private By by = null;
+    private String origin  = null;
 
     public HtmlElement() {
     	this("", By.id(""));
@@ -178,6 +180,8 @@ public class HtmlElement extends Element implements WebElement, Locatable, HasId
     	this.elementIndex = index;
     	this.frameElement = frame;
     	this.parent = parent;
+    	
+    	origin = PageObject.getCallingPage(Thread.currentThread().getStackTrace());
     }
 
     /**
@@ -197,7 +201,7 @@ public class HtmlElement extends Element implements WebElement, Locatable, HasId
     	findElement(true);
     	
     	// element must be fully visible (for example checkbox), to be actionned
-    	scrollToElement(-20);
+		((CustomEventFiringWebDriver)driver).scrollToElement(element, -20);	
     	try {
             new Actions(driver).click(element).perform();
         } catch (InvalidElementStateException e) {
@@ -213,7 +217,7 @@ public class HtmlElement extends Element implements WebElement, Locatable, HasId
     	findElement(true);
     	
     	// element must be fully visible (for example checkbox), to be actionned
-    	scrollToElement(-20);
+		((CustomEventFiringWebDriver)driver).scrollToElement(element, -20);	
     	try {
             new Actions(driver).doubleClick(element).perform();
         } catch (InvalidElementStateException e) {
@@ -471,18 +475,32 @@ public class HtmlElement extends Element implements WebElement, Locatable, HasId
 	        	element = driver.findElement(by);
 	        } else {
 	        	element = getElementByIndex(driver.findElements(by));
-	        }
-	        
+	        }      
         }
+        
         
         if (makeVisible) { 
         	makeWebElementVisible(element);
+    		((CustomEventFiringWebDriver)driver).scrollToElement(element, -20);	
         }
         
         // wait for element to be really visible. should be done only for actions on element
         if (waitForVisibility && makeVisible) {
         	new WebDriverWait(driver, 1).until(ExpectedConditions.visibilityOf(element));
         }
+        
+        //storeElementSearchCriteria();
+    }
+    
+    private void storeElementSearchCriteria() {
+    	try {
+    		// TODO: to move elsewere
+    		ElementInfo elementInfo = ElementInfo.getInstance(this);
+    		elementInfo.updateInfo(this, driver);
+    		elementInfo.exportToJsonFile(this);
+    	} catch (Throwable e) {
+    		logger.warn("Error storing element information: " + e.getMessage());
+    	}
     }
         
     /**
@@ -574,7 +592,7 @@ public class HtmlElement extends Element implements WebElement, Locatable, HasId
 	/**
 	 * Move to element
 	 * @param element
-	 */
+	 */	
 	public void scrollToElement(int yOffset) {
 		findElement();
 		((CustomEventFiringWebDriver)driver).scrollToElement(element, yOffset);		
@@ -1276,6 +1294,14 @@ public class HtmlElement extends Element implements WebElement, Locatable, HasId
 	public Integer getElementIndex() {
 		return elementIndex;
 	}
+	
+	/**
+	 * Returns the real web element or null if it has not been searched
+	 * @return
+	 */
+	public WebElement getRealElement() {
+		return element;
+	}
 
 	/**
 	 * Change the search index of the element (its order in element list)
@@ -1283,6 +1309,10 @@ public class HtmlElement extends Element implements WebElement, Locatable, HasId
 	 */
 	public void setElementIndex(Integer elementIndex) {
 		this.elementIndex = elementIndex;
+	}
+
+	public String getOrigin() {
+		return origin;
 	}
 
 
