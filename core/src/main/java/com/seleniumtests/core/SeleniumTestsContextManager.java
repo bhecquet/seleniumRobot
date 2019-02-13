@@ -52,6 +52,7 @@ public class SeleniumTestsContextManager {
 	
 	private static String rootPath;
 	private static String dataPath;
+	private static String cachePath;
 	private static String appDataPath;
 	private static String featuresPath;
 	private static String configPath;
@@ -62,6 +63,7 @@ public class SeleniumTestsContextManager {
 	private static Boolean deployedMode;
 
 	public static final String DATA_FOLDER_NAME = "data";
+	public static final String CACHE_FOLDER_NAME = "cache";
 	public static final String SELENIUM_VERSION = "3.14.0";
 
     // global level context
@@ -488,6 +490,7 @@ public class SeleniumTestsContextManager {
 		featuresPath = Paths.get(dataPath, applicationNameWithVersion, "features").toString();
 		configPath = Paths.get(dataPath, applicationNameWithVersion, "config").toString();
 		appDataPath = Paths.get(dataPath, applicationNameWithVersion).toString();
+		cachePath = Paths.get(rootPath, CACHE_FOLDER_NAME, applicationNameWithVersion).toString();
 		
 		if (applicationVersion == null) {
 			applicationVersion = readApplicationVersion();
@@ -502,6 +505,9 @@ public class SeleniumTestsContextManager {
 		}
 		if (!new File(appDataPath).isDirectory()) {
 			new File(appDataPath).mkdirs();
+		}
+		if (!new File(cachePath).isDirectory()) {
+			new File(cachePath).mkdirs();
 		}
 	}
     
@@ -552,8 +558,21 @@ public class SeleniumTestsContextManager {
 	public static String getDataPath() {
 		return dataPath;
 	}
+	
+	/**
+	 * Returns location of data folder for this application
+	 * @return
+	 */
 	public static String getApplicationDataPath() {
 		return appDataPath;
+	}
+	
+	/**
+	 * Returns location of cache folder for this application
+	 * @return
+	 */
+	public static String getCachePath() {
+		return cachePath;
 	}
 
     public static Boolean getDeployedMode() {

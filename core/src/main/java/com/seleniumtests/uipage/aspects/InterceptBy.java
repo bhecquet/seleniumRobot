@@ -90,21 +90,12 @@ public class InterceptBy {
 	 * @param stack : the stacktrace of the caller
 	 */
 	public String getCallerName(StackTraceElement[] stack) {
-		String page = getPage();
-		Class<?> stackClass = null;
-		
-		//find the PageObject Loader
-		for(int i=0; i<stack.length;i++){
-			try{
-				 stackClass = Class.forName(stack[i].getClassName());
-			}catch (ClassNotFoundException e){
-				System.out.println(e);
-			}
-			if(PageObject.class.isAssignableFrom(stackClass)){
-				page=last(stack[i].getClassName().split("\\."));	
-			}
+		String foundPage = PageObject.getCallingPage(stack);
+		if (foundPage == null) {
+			return getPage();
+		} else {
+			return last(foundPage.split("\\."));
 		}
-		return page;
 	}
 
 	//return the last element of the table

@@ -387,7 +387,7 @@ public class TestDriver extends GenericMultiBrowserTest {
 	@Test(groups={"it", "ut"})
 	public void testAutoScrolling() {
 		((JavascriptExecutor) driver).executeScript("window.scrollTo(0, 0);");
-		new HtmlElement("", By.id("buttonScroll")).click();
+		DriverTestPage.scrollButton.click();
 		Assert.assertFalse(((JavascriptExecutor) driver).executeScript("return window.pageYOffset;").equals(0L));
 	}
 	
