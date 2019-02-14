@@ -378,25 +378,7 @@ public class TestHtmlElement extends MockitoTest {
 		Assert.assertEquals(el.isTextPresent("text"), true);
 		finalCheck(true);
 	}
-	
-	@Test(groups={"ut"})
-	public void testMouseDown() throws Exception {
-		el.mouseDown();
-		finalCheck(true);
-	}
-	
-	@Test(groups={"ut"})
-	public void testMouseOver() throws Exception {
-		el.mouseOver();
-		finalCheck(true);
-	}
-	
-	@Test(groups={"ut"})
-	public void testMouseUp() throws Exception {
-		el.mouseUp();
-		finalCheck(true);
-	}
-	
+
 	@Test(groups={"ut"})
 	public void testSimulateMouseOver() throws Exception {
 		el.simulateMouseOver();
