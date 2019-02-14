@@ -178,7 +178,8 @@ public class DriverExceptionListener implements WebDriverEventListener {
         for (int i = 0; i < ex.getStackTrace().length; i++) // avoid dead loop
         {
             String method = ex.getStackTrace()[i].getMethodName();
-            if (method.contains("getScreenshotAs") || method.contains("capture") || method.contains("captureWebPages")) {
+            String className = ex.getStackTrace()[i].getClassName();
+            if (method.contains("getScreenshotAs") || (className.contains("ScreenshotUtil") && (method.contains("capture") || method.contains("captureWebPages")))) {
                 return;
             }
         }
