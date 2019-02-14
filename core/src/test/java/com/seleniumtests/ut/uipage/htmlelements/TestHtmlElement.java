@@ -152,6 +152,8 @@ public class TestHtmlElement extends MockitoTest {
 
 		when(subElement1.isDisplayed()).thenReturn(true);
 		when(subElement2.isDisplayed()).thenReturn(true);
+		when(subElement1.getLocation()).thenReturn(new Point(5, 5));
+		when(subElement2.getLocation()).thenReturn(new Point(5, 5));
 		
 		when(mobileElement.getCenter()).thenReturn(new Point(2, 2));
 		when(mobileElement.getLocation()).thenReturn(new Point(1, 1));
