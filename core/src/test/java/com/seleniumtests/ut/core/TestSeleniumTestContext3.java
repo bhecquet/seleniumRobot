@@ -261,7 +261,7 @@ public class TestSeleniumTestContext3 extends MockitoTest {
 	}
 	
 	/**
-	 * grid test but missing url
+	 * grid test but missing url. An error should be raised
 	 * @param testNGCtx
 	 * @throws IllegalAccessException 
 	 * @throws IllegalArgumentException 
@@ -282,12 +282,14 @@ public class TestSeleniumTestContext3 extends MockitoTest {
 		
 		try {
 			System.setProperty(SeleniumTestsContext.RUN_MODE, "grid");
+			System.setProperty(SeleniumTestsContext.WEB_DRIVER_GRID, "");
 			
 			ITestResult testResult = GenericTest.generateResult(testNGCtx, getClass());
 			initThreadContext(testNGCtx, "myTest", testResult);
 			
 		} finally {
 			System.clearProperty(SeleniumTestsContext.RUN_MODE);
+			System.clearProperty(SeleniumTestsContext.WEB_DRIVER_GRID);
 		}
 	}
 	

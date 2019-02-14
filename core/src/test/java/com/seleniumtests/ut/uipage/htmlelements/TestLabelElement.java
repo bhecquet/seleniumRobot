@@ -20,7 +20,6 @@ package com.seleniumtests.ut.uipage.htmlelements;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriver.TargetLocator;
 import org.openqa.selenium.WebElement;
 import org.powermock.api.mockito.PowerMockito;
@@ -29,6 +28,7 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import com.seleniumtests.MockitoTest;
+import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.uipage.htmlelements.LabelElement;
 
@@ -37,7 +37,7 @@ import com.seleniumtests.uipage.htmlelements.LabelElement;
 public class TestLabelElement extends MockitoTest {
 	
 	@Mock
-	private WebDriver driver;
+	private CustomEventFiringWebDriver driver;
 	
 	@Mock
 	private WebElement element;
