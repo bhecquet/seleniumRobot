@@ -16,10 +16,12 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
+import org.openqa.selenium.Dimension;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.Rectangle;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebDriverException;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
@@ -119,7 +121,17 @@ public class ElementInfo {
 		}
 		
     	String newText = htmlElement.getRealElement().getText();
-    	Rectangle newRectangle = htmlElement.getRealElement().getRect();
+    	
+    	// depending on drivers, rect may raise an error
+    	Rectangle newRectangle;
+    	try {
+    		newRectangle = htmlElement.getRealElement().getRect();
+		} catch (WebDriverException e) {
+			Point location = htmlElement.getRealElement().getLocation();
+			Dimension size = htmlElement.getRealElement().getSize();
+			newRectangle = new Rectangle(location, size);
+		}
+    	
     	String newB64Image = "";
     	String newTagName = "";
     	Map<String, Object> newAttributes = new HashMap<>();
