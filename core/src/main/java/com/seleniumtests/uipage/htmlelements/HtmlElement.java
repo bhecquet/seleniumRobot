@@ -46,11 +46,8 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.ie.InternetExplorerDriver;
 import org.openqa.selenium.interactions.Actions;
-import org.openqa.selenium.interactions.HasInputDevices;
-import org.openqa.selenium.interactions.Mouse;
-import org.openqa.selenium.interactions.internal.Coordinates;
-import org.openqa.selenium.interactions.internal.Locatable;
-import org.openqa.selenium.internal.HasIdentity;
+import org.openqa.selenium.interactions.Coordinates;
+import org.openqa.selenium.interactions.Locatable;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.RemoteWebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -85,7 +82,7 @@ import io.appium.java_client.touch.offset.PointOption;
  * 
  * 
  */
-public class HtmlElement extends Element implements WebElement, Locatable, HasIdentity { 
+public class HtmlElement extends Element implements WebElement, Locatable { 
 	// WARNING!!!: we use the deprecated Locatable interface because it's used by Actions class
 	// unit test TestPicutreElement.testClick() fails if the new interface is used
 	// so wait to this old interface to be really removed
@@ -901,30 +898,6 @@ public class HtmlElement extends Element implements WebElement, Locatable, HasId
     }
 
     /**
-     * Forces a mouseDown event on the WebElement.
-     */
-    @ReplayOnError
-    public void mouseDown() {
-        findElement(true);
-
-        Locatable item = (Locatable) element;
-        Mouse mouse = ((HasInputDevices) driver).getMouse();
-        mouse.mouseDown(item.getCoordinates());
-    }
-
-    /**
-     * Forces a mouseOver event on the WebElement.
-     */
-    @ReplayOnError
-    public void mouseOver() {
-        findElement(true);
-
-        Locatable hoverItem = (Locatable) element;
-        Mouse mouse = ((HasInputDevices) driver).getMouse();
-        mouse.mouseMove(hoverItem.getCoordinates());
-    }
-
-    /**
      * Forces a mouseOver event on the WebElement using simulate by JavaScript way for some dynamic menu.
      */
     @ReplayOnError
@@ -935,18 +908,6 @@ public class HtmlElement extends Element implements WebElement, Locatable, HasId
             "if(document.createEvent){var evObj = document.createEvent('MouseEvents');evObj.initEvent('mouseover', true, false); arguments[0].dispatchEvent(evObj);} else if(document.createEventObject) { arguments[0].fireEvent('onmouseover');}";
         JavascriptExecutor js = (JavascriptExecutor) driver;
         js.executeScript(mouseOverScript, element);
-    }
-
-    /**
-     * Forces a mouseUp event on the WebElement.
-     */
-    @ReplayOnError
-    public void mouseUp() {
-        findElement(true);
-
-        Locatable item = (Locatable) element;
-        Mouse mouse = ((HasInputDevices) driver).getMouse();
-        mouse.mouseUp(item.getCoordinates());
     }
     
     @Override
@@ -1282,12 +1243,6 @@ public class HtmlElement extends Element implements WebElement, Locatable, HasId
 	public Coordinates getCoordinates() {
 		findElement();
 		return ((Locatable)element).getCoordinates();
-	}
-	
-	@Override
-	public String getId() {
-		findElement();
-		return ((HasIdentity)getUnderlyingElement(element)).getId();
 	}
 	
 	public Map<String, Object> toJson() {
