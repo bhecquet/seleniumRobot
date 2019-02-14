@@ -53,6 +53,7 @@ public class DriverTestPage extends PageObject {
 	public static final HtmlElement parent  = new HtmlElement("parent", By.id("parent"));
 	public static final HtmlElement child  = parent.findElement(By.className("myClass"), 1);
 	public static final HtmlElement divFindName  = new HtmlElement("parent", By.name("divFindName"), 1);
+	public static final HtmlElement divFindNameMultipleCriteria  = new HtmlElement("parent", By.name("divFindName").id("divFind2"));
 	public static final LinkElement link = new LinkElement("My link", By.id("link"));
 	public static final LinkElement link2 = new LinkElement("My link", By.id("link2"));
 	public static final LinkElement linkPopup = new LinkElement("My link", By.id("linkPopup"));

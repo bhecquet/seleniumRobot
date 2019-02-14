@@ -42,6 +42,7 @@ import com.seleniumtests.driver.DriverMode;
 import com.seleniumtests.driver.screenshots.VideoCaptureMode;
 import com.seleniumtests.reporter.logger.ArchiveMode;
 import com.seleniumtests.reporter.reporters.ReportInfo;
+import com.seleniumtests.uipage.htmlelements.ElementInfo;
 
 /**
  * Test parsing of test options into SeleniumTestContext
@@ -461,8 +462,31 @@ public class TestSeleniumTestContext extends GenericTest {
 		SeleniumTestsContextManager.getThreadContext().setVideoCapture("unknown");
 	}
 	
-	
-	
+	@Test(groups="ut context")
+	public void testAdvancedElementSearchFalse(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setAdvancedElementSearch("false");
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getAdvancedElementSearch(), ElementInfo.Mode.FALSE);
+	}
+	@Test(groups="ut context")
+	public void testAdvancedElementSearchDom(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setAdvancedElementSearch("dom");
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getAdvancedElementSearch(), ElementInfo.Mode.DOM);
+	}
+	@Test(groups="ut context")
+	public void testAdvancedElementSearchFull(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setAdvancedElementSearch("full");
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getAdvancedElementSearch(), ElementInfo.Mode.FULL);
+	}
+	@Test(groups="ut context")
+	public void testAdvancedElementSearchNull(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setAdvancedElementSearch(null);
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getAdvancedElementSearch(), ElementInfo.Mode.FALSE);
+	}
+
 	@Test(groups="ut context")
 	public void testMaskPassword(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		initThreadContext(testNGCtx);

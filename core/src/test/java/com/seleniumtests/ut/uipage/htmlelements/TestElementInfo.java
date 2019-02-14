@@ -130,26 +130,6 @@ public class TestElementInfo extends MockitoTest {
 			"	}" + 
 			"}";
 	
-	/*
-	 * 		
-	 * 
-	 * TESTS: images pas dans le scope (TI)
-	 * 		cas standard (TI)
-	 * 		taille de la capture d'image par rapport à la taille de l'élément
-	 * 		élément caché (TI)
-	 *  	multiples critères de recherche => à quoi ressemble le BY, est-ce que l'ordre est conservé ?  (TI)
-	 * 		erreur si le label n'est pas fourni (TU)
-	 * 		label avec caractères non conformes(TU)
-	 * 		erreur si on update in elementInfo alors que l'élément réel n'est pas trouvé(TU)
-	 * 		le By a changé, on remplace l'élément(TU)
-	 * 		recherche d'une ElementInfo existante(TU)
-	 * 		mise à jour des infos d'un élément existant(TU)
-	 * 		paramètre de lancement(TU) => full, dom, false
-	 * 		error quand on rapatrie les informations sur l'élement
-	 * 		le test n'est pas un test web
-	 * 		les indicateurs de stabilité
-	 */
-	
 	@Mock
 	private HtmlElement htmlElement;
 	

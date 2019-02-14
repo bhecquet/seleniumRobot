@@ -38,6 +38,7 @@ import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.Rectangle;
+import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
@@ -440,12 +441,19 @@ public class HtmlElement extends Element implements WebElement, Locatable, HasId
     	//((AndroidDriver) driver).findElementByAndroidUIAutomator("new UiScrollable(new UiSelector())
     	//		.scrollIntoView(new UiSelector().text(DESTINATION_ELEMENT_TEXT))");
         
+    	ElementInfo elementInfo = null;
+    	
+    	// search element information. Do not stop if something goes wrong here
+    	if (SeleniumTestsContextManager.getThreadContext().getAdvancedElementSearch() != ElementInfo.Mode.FALSE) {
+    		try {
+    			elementInfo = ElementInfo.getInstance(this);
+    		} catch (Throwable e) {}
+    	}
     	
     	// if a parent is defined, search for it before getting the sub element
     	driver = updateDriver();
         if (parent != null) {
         	parent.findElement();
-        	enterFrame();
         	
         	// issue #166: add a dot in front of xpath expression if we search the element inside a parent
         	if (by instanceof ByXPath) {
@@ -463,19 +471,11 @@ public class HtmlElement extends Element implements WebElement, Locatable, HasId
 				}
         		
         	}
+        	
+        	element = findSeleniumElement(parent.element, elementInfo);
 
-        	if (elementIndex == null) {
-        		element = parent.element.findElement(by);
-        	} else {
-        		element = getElementByIndex(parent.element.findElements(by));
-        	}
         } else {
-        	enterFrame();
-	        if (elementIndex == null) {
-	        	element = driver.findElement(by);
-	        } else {
-	        	element = getElementByIndex(driver.findElements(by));
-	        }      
+        	element = findSeleniumElement(driver, elementInfo);
         }
         
         
@@ -489,17 +489,41 @@ public class HtmlElement extends Element implements WebElement, Locatable, HasId
         	new WebDriverWait(driver, 1).until(ExpectedConditions.visibilityOf(element));
         }
         
-        //storeElementSearchCriteria();
+        // If we are here, element has been found, update elementInformation
+        if (elementInfo != null) {
+        	try {
+	        	elementInfo.updateInfo(this, driver);
+	        	elementInfo.exportToJsonFile(this);
+        	} catch (Throwable e) {
+        		logger.warn("Error storing element information: " + e.getMessage());
+        	}
+        }
     }
     
-    private void storeElementSearchCriteria() {
+    /**
+     * Call driver to really search the element
+     * If index is specified, return the Nth element corresponding to search
+     * 
+     * @param context
+     * @param elementInfo
+     * @return
+     */
+    private WebElement findSeleniumElement(SearchContext context, ElementInfo elementInfo) {
+    	enterFrame();
+    	
+		WebElement seleniumElement;
     	try {
-    		// TODO: to move elsewere
-    		ElementInfo elementInfo = ElementInfo.getInstance(this);
-    		elementInfo.updateInfo(this, driver);
-    		elementInfo.exportToJsonFile(this);
-    	} catch (Throwable e) {
-    		logger.warn("Error storing element information: " + e.getMessage());
+	    	if (elementIndex == null) {
+	    		seleniumElement = context.findElement(by);
+	    	} else {
+	    		seleniumElement = getElementByIndex(context.findElements(by));
+	    	}
+	    	return seleniumElement;
+    	} catch (WebDriverException e) {
+    		
+    		// element not found, raise exception
+    		// this code is here to prepare advanced element search
+    		throw e;
     	}
     }
         

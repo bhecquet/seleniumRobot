@@ -9,10 +9,10 @@ import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-
-import javax.imageio.ImageIO;
+import java.util.stream.Collectors;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
@@ -289,19 +289,20 @@ public class ElementInfo {
 			try {
 				Files.walk(ELEMENT_INFO_LOCATION)
 				        .filter(Files::isRegularFile)
-				        .filter(p -> p.toFile().lastModified() < LocalDateTime.now().minusDays(delay).toEpochSecond(ZoneOffset.UTC))
+				        .filter(p -> p.toFile().lastModified() < LocalDateTime.now().minusDays(delay).toEpochSecond(ZoneOffset.UTC) * 1000)
 				        .forEach(t -> {
 							try {
 								Files.delete(t);
 							} catch (IOException e) {}
 						});
+				
 			} catch (IOException e) {
 			}
 
 	}
 	
 	public static void purgeAll() {
-		purgeElementInfo(0);
+		purgeElementInfo(-1);
 	}
 
 	public String getPath() {
@@ -392,7 +393,7 @@ public class ElementInfo {
 	 * Returns path where element information are stored
 	 * @return
 	 */
-	public Path getElementInfoLocation() {
+	public static Path getElementInfoLocation() {
 		return ELEMENT_INFO_LOCATION;
 	}
 	
