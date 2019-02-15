@@ -298,7 +298,7 @@ Additional search using the `ByC` class are
 - search element before a label: `new TextFieldElement("", ByC.labelBackward("By id backward", "input")).sendKeys("element found by label backward");`
 - search by first visible element: `new HtmlElement("", By.className("otherClass"), HtmlElement.FIRST_VISIBLE).getText()`
 - search in reverse order (get the last element): `new TextFieldElement("", By.className("someClass"), -1);` get the last element on the list
-
+- search with several criteria: `new TextFieldElement("", ByC.and(By.tagName("input"), By.name("textField")))`
 
 #### Document your tests ####
 

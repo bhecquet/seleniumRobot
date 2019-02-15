@@ -19,7 +19,10 @@ package com.seleniumtests.it.driver;
 
 import java.awt.AWTException;
 import java.io.File;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.Date;
+import java.util.List;
 import java.util.regex.Pattern;
 
 import org.openqa.selenium.By;
@@ -28,6 +31,7 @@ import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -245,12 +249,66 @@ public class TestDriver extends GenericMultiBrowserTest {
 	
 	@Test(groups={"it", "ut"})
 	public void testFindElements() {
-		// 2 éléments à trouver
+		// 2 elements to find
 		Assert.assertEquals(new HtmlElement("", By.name("divFindName")).findElements().size(), 2);
 		
-		// 3 éléments dont l'un dans une branche
+		// 4 elements to find, one in a branch
 		Assert.assertEquals(new HtmlElement("", By.className("myClass")).findElements().size(), 4);
 	}
+	
+	/**
+	 * Check that if no element is returned, no error is raised but we should have searched several times
+	 */
+	@Test(groups={"it", "ut"})
+	public void testFindElementsNotExist() {
+		SeleniumTestsContextManager.getThreadContext().setReplayTimeout(7);
+		long start = new Date().getTime();
+		Assert.assertEquals(new HtmlElement("", By.name("foobar")).findElements().size(), 0);
+		Assert.assertTrue(new Date().getTime() - start > 6500);
+	}
+	
+	/**
+	 * Tests finding sub-elements of an HTMLElement
+	 */
+	@Test(groups={"it", "ut"})
+	public void testFindElementsBy() {
+		Assert.assertEquals(new HtmlElement("", By.id("parent")).findElements(By.className("myClass")).size(), 2);
+	}
+	
+	/**
+	 * Tests NOT finding sub-elements of an HTMLElement
+	 * No exception should be raised but search should be done several times
+	 */
+	@Test(groups={"it", "ut"})
+	public void testFindElementsByNotExist() {
+		SeleniumTestsContextManager.getThreadContext().setReplayTimeout(7);
+		long start = new Date().getTime();
+		Assert.assertEquals(new HtmlElement("", By.className("myClass")).findElements(By.id("foobarId")).size(), 0);
+		Assert.assertTrue(new Date().getTime() - start > 6500);
+	}
+	
+	/**
+	 * Tests finding sub-elements of an HTMLElement
+	 */
+	@Test(groups={"it", "ut"})
+	public void testFindHtmlElementsBy() {
+		List<WebElement> htmlElements = new HtmlElement("", By.id("parent")).findHtmlElements(By.className("myClass"));
+		Assert.assertEquals(htmlElements.size(), 2);
+		Assert.assertTrue(htmlElements.get(0) instanceof HtmlElement);
+	}
+	
+	/**
+	 * Tests NOT finding sub-elements of an HTMLElement
+	 * No exception should be raised but search should be done several times
+	 */
+	@Test(groups={"it", "ut"})
+	public void testFindHtmlElementsByNotExist() {
+		SeleniumTestsContextManager.getThreadContext().setReplayTimeout(7);
+		long start = new Date().getTime();
+		Assert.assertEquals(new HtmlElement("", By.className("myClass")).findHtmlElements(By.id("foobarId")).size(), 0);
+		Assert.assertTrue(new Date().getTime() - start > 6500);
+	}
+
 
 	/**
 	 * Search an element inside an other one
@@ -346,13 +404,11 @@ public class TestDriver extends GenericMultiBrowserTest {
 
 		SeleniumTestsContextManager.getThreadContext().setReplayTimeout(7);
 		long start = new Date().getTime();
-		logger.info("start: " + start);
 		try {
 			new HtmlElement("", By.id("someNonExistentId")).getText();
 		} catch (NoSuchElementException e) {}
 		
 		// Check we wait at least for the timeout set
-		logger.info("end: " + new Date().getTime());
 		Assert.assertTrue(new Date().getTime() - start > 6500);
 	}
 	

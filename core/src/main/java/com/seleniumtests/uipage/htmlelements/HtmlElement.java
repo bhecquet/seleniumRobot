@@ -35,6 +35,7 @@ import org.openqa.selenium.ElementNotVisibleException;
 import org.openqa.selenium.HasCapabilities;
 import org.openqa.selenium.InvalidElementStateException;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.Rectangle;
@@ -314,6 +315,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     /**
      * Find elements inside this element
      * @param by
+     * @return 	List of selenium WebElement 
      */
     @Override
     @ReplayOnError
@@ -321,9 +323,21 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     	
     	// find the root element
     	findElement();
-        return element.findElements(by);
+    	List<WebElement> elements = element.findElements(by);
+    	
+    	// throw exception so that behavior is the same as with 'findElements()' call which retries search
+    	if (elements.isEmpty()) {
+    		throw new NoSuchElementException("No elements found for " + by.toString());
+    	} else {
+    		return elements;
+    	}
     }
 
+    /**
+     * Find elements inside this element
+     * @param by
+     * @return	List of HtmlElement's based on real WebElement
+     */
     @ReplayOnError
     public List<WebElement> findHtmlElements(By by) {
     	
@@ -331,6 +345,12 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     	findElement();
     	List<WebElement> htmlElements = new ArrayList<>();
     	List<WebElement> elements = element.findElements(by);
+    	
+    	// throw exception so that behavior is the same as with 'findElements()' call which retries search
+    	if (elements.isEmpty()) {
+    		throw new NoSuchElementException("No elements found for " + by.toString());
+    	}
+    	
     	for (int i = 0; i < elements.size(); i++) {
     		htmlElements.add(new HtmlElement("", by, frameElement, parent, i));
     	}
@@ -628,7 +648,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     public List<WebElement> findElements() {
 		
 		// call findElement to enter any specified frame and search for parent elements
-        findElement();
+		findElement();
 
         // issue #167: if we have a parent, search elements inside it
         if (parent != null) {

@@ -29,6 +29,7 @@ import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.WebDriverException;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.UnreachableBrowserException;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
@@ -143,8 +144,16 @@ public class ReplayAction {
 	    	}
 	    	return reply;
 		} catch (Throwable e) {
-			actionFailed = true && !ignoreFailure;
-			throw e;
+
+			if (e instanceof NoSuchElementException 
+					&& joinPoint.getTarget() instanceof HtmlElement
+					&& (joinPoint.getSignature().getName().equals("findElements")
+							|| joinPoint.getSignature().getName().equals("findHtmlElements"))) {
+				return new ArrayList<WebElement>();
+			} else {
+				actionFailed = true && !ignoreFailure;
+				throw e;
+			}
 		} finally {
 			if (currentAction != null && isHtmlElementDirectlyCalled(Thread.currentThread().getStackTrace()) && TestLogging.getParentTestStep() != null) {
 				currentAction.setFailed(actionFailed);

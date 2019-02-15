@@ -20,6 +20,7 @@ package com.seleniumtests.it.util;
 import java.util.List;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 import org.testng.Assert;
 import org.testng.ITestContext;
@@ -29,6 +30,8 @@ import org.testng.annotations.Test;
 
 import com.seleniumtests.GenericTest;
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.customexception.ScenarioException;
+import com.seleniumtests.driver.TestType;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.it.driver.support.pages.DriverTestPage;
 import com.seleniumtests.uipage.ByC;
@@ -47,6 +50,7 @@ public class TestByC extends GenericTest {
 		SeleniumTestsContextManager.getThreadContext().setExplicitWaitTimeout(2);
 		SeleniumTestsContextManager.getThreadContext().setBrowser("*chrome");
 		SeleniumTestsContextManager.getThreadContext().setCaptureSnapshot(false);
+		SeleniumTestsContextManager.getThreadContext().setTestType(TestType.WEB);
 //		SeleniumTestsContextManager.getThreadContext().setWebDriverGrid("http://127.0.0.1:4444/wd/hub");
 //		SeleniumTestsContextManager.getThreadContext().setRunMode("grid");
 		new DriverTestPage(true); // start displaying page
@@ -275,6 +279,33 @@ public class TestByC extends GenericTest {
 		Assert.assertEquals(elements.size(), 1);Assert.assertEquals(elements.size(), 1);
 		Assert.assertEquals(elements.get(0).getAttribute("id"), "child1");
 	}
+
+	@Test(groups={"it"})
+	public void testFindElementsBySeveralCriteria() { 
+		Assert.assertEquals(new TextFieldElement("", ByC.and(By.tagName("input"), By.name("textField"))).findElements().size(), 2);
+	}
+	@Test(groups={"it"})
+	public void testFindElementBySeveralCriteria() { 
+		TextFieldElement el = new TextFieldElement("", ByC.and(By.tagName("input"), By.name("textField")));
+		Assert.assertEquals(el.getTagName(), "input");
+		Assert.assertEquals(el.getAttribute("name"), "textField");
+	}
 	
+	@Test(groups={"it"}, expectedExceptions=NoSuchElementException.class)
+	public void testFindElementBySeveralCriteriaNothingFound() { 
+		SeleniumTestsContextManager.getThreadContext().setReplayTimeout(7);
+		new TextFieldElement("", ByC.and(By.tagName("input"), By.name("noElement"))).getTagName();
+	}
 	
+	@Test(groups={"it"})
+	public void testFindElementsBySeveralCriteriaNothingFound() { 
+		SeleniumTestsContextManager.getThreadContext().setReplayTimeout(7);
+		Assert.assertEquals(new TextFieldElement("", ByC.and(By.tagName("input"), By.name("noElement"))).findElements().size(), 0);
+	}
+	
+	@Test(groups={"it"})
+	public void testFindElementsBySeveralCriteriaNothingFound2() { 
+		SeleniumTestsContextManager.getThreadContext().setReplayTimeout(7);
+		Assert.assertEquals(new TextFieldElement("", ByC.and(By.tagName("noElement"), By.name("textField"))).findElements().size(), 0);
+	}
 }

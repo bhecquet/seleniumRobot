@@ -18,12 +18,19 @@
 package com.seleniumtests.it.driver.support.perdriver.testdriver;
 
 import java.awt.AWTException;
+import java.util.Date;
+import java.util.List;
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.UnhandledAlertException;
+import org.openqa.selenium.WebElement;
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.it.driver.TestDriver;
+import com.seleniumtests.uipage.htmlelements.HtmlElement;
 
 public class TestDriverChrome extends TestDriver {
 
@@ -108,6 +115,31 @@ public class TestDriverChrome extends TestDriver {
 	@Test(groups={"it", "ut"})
 	public void testFindElements() {
 		super.testFindElements();
+	}
+	
+	@Test(groups={"it", "ut"})
+	public void testFindElementsNotExist() {
+		super.testFindElementsNotExist();
+	}
+
+	@Test(groups={"it", "ut"})
+	public void testFindElementsBy() {
+		super.testFindElementsBy();
+	}
+
+	@Test(groups={"it", "ut"})
+	public void testFindElementsByNotExist() {
+		super.testFindElementsByNotExist();
+	}
+
+	@Test(groups={"it", "ut"})
+	public void testFindHtmlElementsBy() {
+		super.testFindHtmlElementsBy();
+	}
+
+	@Test(groups={"it", "ut"})
+	public void testFindHtmlElementsByNotExist() {
+		super.testFindHtmlElementsByNotExist();
 	}
 
 	@Test(groups={"it", "ut"})

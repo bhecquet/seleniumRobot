@@ -18,13 +18,19 @@
 package com.seleniumtests.uipage;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.commons.collections.ListUtils;
 import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.internal.FindsByXPath;
+
+import com.seleniumtests.customexception.ScenarioException;
 
 public class ByC extends By {
 
@@ -189,6 +195,16 @@ public class ByC extends By {
 
 	private static ByC text(final String textToSearch, String tagName, boolean partial) {
 		return new ByText(textToSearch, tagName, partial);
+	}
+	
+	/**
+	 * Search an element with several criteria
+	 * Only returns element(s) which matches all criteria
+	 * @param bies
+	 * @return
+	 */
+	public static ByC and(By ... bies) {
+		return new And(bies);
 	}
 
 	public static class ByLabelForward extends ByC implements Serializable {
@@ -415,6 +431,56 @@ public class ByC extends By {
 		@Override
 		public String toString() {
 			return String.format("%s By.text: %s", tagName, text);
+		}
+	}
+	
+	/**
+	 * Allow to search elements with several criteria
+	 * It will create intersection between a search for each criteria
+	 * @author s047432
+	 *
+	 */
+	public static class And extends ByC implements Serializable {
+		
+		private By[] bies;
+		
+		public And(By ... bies) {
+			if (bies.length == 0) {
+				throw new ScenarioException("At least on locator must be provided");
+			}
+			this.bies = bies;
+		}
+		
+
+		@Override
+		public List<WebElement> findElements(SearchContext context) {
+			List<WebElement> elements = bies[0].findElements(context);
+			for (int i = 1; i < bies.length; i++) {
+				elements = ListUtils.retainAll(elements, bies[i].findElements(context));
+			}
+			return elements;
+			
+		}
+
+		@Override
+		public WebElement findElement(SearchContext context) {
+			try {
+				return findElements(context).get(0);
+			} catch (IndexOutOfBoundsException e) {
+				throw new NoSuchElementException("Cannot find element with such criteria " + toString());
+			}
+		}
+		
+
+		@Override
+		public String toString() {
+			
+			List<String> biesString = new ArrayList<>();
+			for (By by: bies) {
+				biesString.add(by.toString());
+			}
+			
+			return String.join(" and ", biesString);
 		}
 	}
 	
