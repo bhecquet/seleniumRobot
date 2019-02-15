@@ -20,6 +20,8 @@ package com.seleniumtests.uipage;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.time.Clock;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -51,7 +53,6 @@ import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.SeleniumTestsPageListener;
 import com.seleniumtests.core.TestTasks;
-import com.seleniumtests.core.utils.SystemClock;
 import com.seleniumtests.customexception.CustomSeleniumTestsException;
 import com.seleniumtests.customexception.NotCurrentPageException;
 import com.seleniumtests.customexception.ScenarioException;
@@ -81,7 +82,7 @@ public class PageObject extends BasePage implements IPage {
     private String outputDirectory = null;
     private String htmlFilePath = null;
     private String imageFilePath = null;
-    private SystemClock systemClock;
+    private Clock systemClock;
 
     /**
      * Constructor for non-entry point page. The control is supposed to have reached the page from other API call.
@@ -117,7 +118,7 @@ public class PageObject extends BasePage implements IPage {
      */
     public PageObject(final HtmlElement pageIdentifierElement, final String url) throws IOException {
 
-    	systemClock = new SystemClock();
+    	systemClock = Clock.systemUTC();
         Calendar start = Calendar.getInstance();
         start.setTime(new Date());
 
@@ -642,11 +643,11 @@ public class PageObject extends BasePage implements IPage {
  		}
 
  		// wait for window to be displayed
- 		long end = systemClock.laterBy(waitMs + 250L);
+ 		Instant end = systemClock.instant().plusMillis(waitMs + 250L);
  		Set<String> handles = new TreeSet<>();
  		boolean found = false;
  		
- 		while (systemClock.isNowBefore(end) && !found) {
+ 		while (end.isAfter(systemClock.instant()) && !found) {
  			
  			handles = driver.getWindowHandles();
 
@@ -661,8 +662,8 @@ public class PageObject extends BasePage implements IPage {
 				
 				// wait for a valid address
 				String address = "";
-				long endLoad = systemClock.laterBy(5000);
-				while (address.isEmpty() && systemClock.isNowBefore(endLoad)) {
+				Instant endLoad = systemClock.instant().plusMillis(5000);
+				while (address.isEmpty() && endLoad.isAfter(systemClock.instant())) {
 					address = driver.getCurrentUrl();
 				}
 				
@@ -721,9 +722,9 @@ public class PageObject extends BasePage implements IPage {
     }
     
 	public Alert waitForAlert(int waitInSeconds) {
-		long end = systemClock.laterBy(waitInSeconds * 1000);
+		Instant end = systemClock.instant().plusSeconds(waitInSeconds);
 
-		while (systemClock.isNowBefore(end)) {
+		while (end.isAfter(systemClock.instant())) {
 			try {
 				return driver.switchTo().alert();
 			} catch (NoAlertPresentException e) {

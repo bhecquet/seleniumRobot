@@ -19,6 +19,8 @@ package com.seleniumtests.connectors.selenium;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.time.Clock;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,7 +28,6 @@ import org.apache.log4j.Logger;
 
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
-import com.seleniumtests.core.utils.SystemClock;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.util.helper.WaitHelper;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
@@ -80,12 +81,11 @@ public class SeleniumGridConnectorFactory {
 			}
 		}
 		
-		SystemClock clock = new SystemClock();
-		long end = clock.laterBy(retryTimeout * 1000L);
+		Clock clock = Clock.systemUTC();
+		Instant end = clock.instant().plusSeconds(retryTimeout);
 		Exception currentException = null;
 		
-		
-		while (clock.isNowBefore(end)) {
+		while (end.isAfter(clock.instant())) {
 			
 			List<SeleniumGridConnector> seleniumGridConnectors = new ArrayList<>();
 			

@@ -17,6 +17,8 @@
  */
 package com.seleniumtests.uipage.aspects;
 
+import java.time.Clock;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -34,7 +36,6 @@ import org.openqa.selenium.remote.UnreachableBrowserException;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.aspects.LogAction;
-import com.seleniumtests.core.utils.SystemClock;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.DatasetException;
 import com.seleniumtests.customexception.ScenarioException;
@@ -57,7 +58,7 @@ import com.seleniumtests.util.helper.WaitHelper;
 @DeclarePrecedence("LogAction, ReplayAction")
 public class ReplayAction {
 
-	private static SystemClock systemClock = new SystemClock();
+	private static Clock systemClock = Clock.systemUTC();
 	
 	/**
 	 * Replay all HtmlElement actions annotated by ReplayOnError.
@@ -70,7 +71,7 @@ public class ReplayAction {
 			+ "&& execution(@com.seleniumtests.uipage.ReplayOnError public * * (..)) && @annotation(replay)")
     public Object replayHtmlElement(ProceedingJoinPoint joinPoint, ReplayOnError replay) throws Throwable {
 
-    	long end = systemClock.laterBy(SeleniumTestsContextManager.getThreadContext().getReplayTimeout() * 1000);
+		Instant end = systemClock.instant().plusSeconds(SeleniumTestsContextManager.getThreadContext().getReplayTimeout());
     	Object reply = null;
 
     	
@@ -99,7 +100,7 @@ public class ReplayAction {
 		boolean ignoreFailure = false;
 		
 		try {
-	    	while (systemClock.isNowBefore(end)) {
+	    	while (end.isAfter(systemClock.instant())) {
 
 	    		// in case we have switched to an iframe for using previous webElement, go to default content
 	    		if (element.getDriver() != null && SeleniumTestsContextManager.isWebTest()) {
@@ -128,7 +129,7 @@ public class ReplayAction {
 	    				throw e;
 		    		}
 	
-		    		if (systemClock.isNowBefore(end - 200)) {
+		    		if (end.minusMillis(200).isAfter(systemClock.instant())) {
 		    			WaitHelper.waitForMilliSeconds(replay.replayDelayMs());
 						continue;
 					} else {
@@ -173,7 +174,7 @@ public class ReplayAction {
 		
 		int replayDelayMs = replay != null ? replay.replayDelayMs(): 100;
 		
-		long end = systemClock.laterBy(SeleniumTestsContextManager.getThreadContext().getReplayTimeout() * 1000);
+		Instant end = systemClock.instant().plusSeconds(SeleniumTestsContextManager.getThreadContext().getReplayTimeout());
 		Object reply = null;
 		
 		String targetName = joinPoint.getTarget().toString();
@@ -195,7 +196,7 @@ public class ReplayAction {
 		boolean actionFailed = false;
 		
 		try {
-			while (systemClock.isNowBefore(end)) {
+			while (end.isAfter(systemClock.instant())) {
 				
 				try {
 					reply = joinPoint.proceed(joinPoint.getArgs());
@@ -211,7 +212,7 @@ public class ReplayAction {
 						throw e;
 					}
 	
-					if (systemClock.isNowBefore(end - 200)) {
+					if (end.minusMillis(200).isAfter(systemClock.instant())) {
 						WaitHelper.waitForMilliSeconds(replayDelayMs);
 						continue;
 					} else {

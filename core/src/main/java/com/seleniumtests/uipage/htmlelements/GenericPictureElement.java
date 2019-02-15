@@ -19,7 +19,9 @@ package com.seleniumtests.uipage.htmlelements;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.Clock;
 import java.time.Duration;
+import java.time.Instant;
 import java.time.LocalDateTime;
 
 import org.apache.commons.io.FileUtils;
@@ -27,7 +29,6 @@ import org.apache.log4j.Logger;
 import org.openqa.selenium.Rectangle;
 import org.openqa.selenium.WebDriverException;
 
-import com.seleniumtests.core.utils.SystemClock;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.ImageSearchException;
 import com.seleniumtests.driver.screenshots.ScreenshotUtil;
@@ -52,7 +53,7 @@ public abstract class GenericPictureElement extends Element {
 	protected long actionDuration;
 	protected String label;
 	protected ScreenshotUtil screenshotUtil;
-	protected SystemClock clock = new SystemClock();
+	protected Clock clock = Clock.systemUTC();
 
 	public GenericPictureElement() {
 		// for mocks
@@ -175,8 +176,8 @@ public abstract class GenericPictureElement extends Element {
 	 * @return
 	 */
 	public boolean isElementPresent(int waitMs) {
-		long end = clock.laterBy(waitMs);
-		while (clock.isNowBefore(end) || waitMs == 0) {
+		Instant end = clock.instant().plusMillis(waitMs);
+		while (end.isAfter(clock.instant()) || waitMs == 0) {
 			try {
 				findElement();
 				return true;
