@@ -111,6 +111,30 @@ public class TestDriverEdge extends TestDriver {
 	}
 
 	@Test(groups={"it", "ut"})
+	public void testFindElementsNotExist() {
+		super.testFindElementsNotExist();
+	}
+	@Test(groups={"it", "ut"})
+	public void testFindElementsBy() {
+		super.testFindElementsBy();
+	}
+
+	@Test(groups={"it", "ut"})
+	public void testFindElementsByNotExist() {
+		super.testFindElementsByNotExist();
+	}
+
+	@Test(groups={"it", "ut"})
+	public void testFindHtmlElementsBy() {
+		super.testFindHtmlElementsBy();
+	}
+
+	@Test(groups={"it", "ut"})
+	public void testFindHtmlElementsByNotExist() {
+		super.testFindHtmlElementsByNotExist();
+	}
+
+	@Test(groups={"it", "ut"})
 	public void testFindSubElement() {
 		super.testFindSubElement();
 	}
