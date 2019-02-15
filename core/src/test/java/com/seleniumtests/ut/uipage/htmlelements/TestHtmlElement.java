@@ -333,7 +333,7 @@ public class TestHtmlElement extends MockitoTest {
 		TestLogging.setParentTestStep(step);
 		
 		SeleniumTestsContextManager.getThreadContext().setReplayTimeout(1);
-		when(driver.findElements(By.id("el"))).thenThrow(new NoSuchElementException(""));
+		when(driver.findElement(By.id("el"))).thenThrow(new NoSuchElementException(""));
 		Assert.assertEquals(el.isElementPresent(1), false);
 		
 		Assert.assertFalse(step.getFailed());
