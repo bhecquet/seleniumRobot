@@ -17,6 +17,8 @@
  */
 package com.seleniumtests.browserfactory;
 
+import java.time.Clock;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -31,7 +33,6 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 
 import com.seleniumtests.connectors.selenium.SeleniumGridConnector;
 import com.seleniumtests.core.SeleniumTestsContextManager;
-import com.seleniumtests.core.utils.SystemClock;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.SeleniumGridException;
 import com.seleniumtests.driver.DriverConfig;
@@ -149,11 +150,11 @@ public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implemen
     private WebDriver getDriver(MutableCapabilities capability){
     	driver = null;
     	
-    	SystemClock clock = new SystemClock();
-		long end = clock.laterBy(retryTimeout * 1000L);
+    	Clock clock = Clock.systemUTC();
+		Instant end = clock.instant().plusSeconds(retryTimeout);
 		Exception currentException = null;
     	
-		while (clock.isNowBefore(end)) {
+		while (end.isAfter(clock.instant())) {
 			
 			for (SeleniumGridConnector gridConnector: gridConnectors) {
 			
