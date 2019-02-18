@@ -62,7 +62,6 @@ public class TestAndroidCapabilitiesFactory extends GenericTest {
 		Assert.assertEquals(capa.getCapability(MobileCapabilityType.PLATFORM_VERSION), "8.0");
 		Assert.assertEquals(capa.getCapability(MobileCapabilityType.DEVICE_NAME), "Samsung Galasy S8");
 		Assert.assertFalse(capa.is(SeleniumRobotCapabilityType.NODE_TAGS));
-		Assert.assertFalse(capa.is(SeleniumRobotCapabilityType.TOOLS));
 		Assert.assertEquals(capa.getCapability(AndroidMobileCapabilityType.APP_PACKAGE), "com.infotel.mobile"); // from exampleConfigGenericParams.xml when tu.xml is executed, else, null
 		Assert.assertEquals(capa.getCapability(AndroidMobileCapabilityType.APP_ACTIVITY), "com.infotel.mobile.StartActivity"); // from exampleConfigGenericParams.xml when tu.xml is executed, else, null
 		Assert.assertNull(capa.getCapability(MobileCapabilityType.FULL_RESET));
@@ -92,29 +91,6 @@ public class TestAndroidCapabilitiesFactory extends GenericTest {
 	}
 	
 	/**
-	 * Check default behaviour when external programs are defined in grid mode
-	 * tools are transferred to driver 
-	 */
-	@Test(groups={"ut"})
-	public void testCreateDefaultCapabilitiesWithToolsInGridMode() {
-		SeleniumTestsContext context = new SeleniumTestsContext(SeleniumTestsContextManager.getThreadContext());
-		context.setBrowser(BrowserType.CHROME.toString());
-		context.addExternalProgram("foo");
-		context.setRunMode("grid");
-		context.setMobilePlatformVersion("8.0");
-		context.setPlatform("android");
-		context.setDeviceName("Samsung Galasy S8");
-		context.setApp("");
-		
-		DriverConfig config = new DriverConfig(context);
-		
-		AndroidCapabilitiesFactory capaFactory = new AndroidCapabilitiesFactory(config);
-		MutableCapabilities capa = capaFactory.createCapabilities();
-		
-		Assert.assertEquals(capa.getCapability(SeleniumRobotCapabilityType.TOOLS), Arrays.asList("foo"));
-	}
-	
-	/**
 	 * Check default behaviour when node tags are defined in local mode
 	 * tags are not transferred to driver 
 	 */
@@ -135,29 +111,6 @@ public class TestAndroidCapabilitiesFactory extends GenericTest {
 		MutableCapabilities capa = capaFactory.createCapabilities();
 
 		Assert.assertFalse(capa.is(SeleniumRobotCapabilityType.NODE_TAGS));
-	}
-	
-	/**
-	 * Check default behaviour when external programs are defined in local mode
-	 * tags are not transferred to driver 
-	 */
-	@Test(groups={"ut"})
-	public void testCreateDefaultCapabilitiesWithToolsInLocalMode() {
-		SeleniumTestsContext context = new SeleniumTestsContext(SeleniumTestsContextManager.getThreadContext());
-		context.setBrowser(BrowserType.CHROME.toString());
-		context.setNodeTags("foo,bar");
-		context.setRunMode("local");
-		context.setMobilePlatformVersion("8.0");
-		context.setPlatform("android");
-		context.setDeviceName("Samsung Galasy S8");
-		context.setApp("");
-		
-		DriverConfig config = new DriverConfig(context);
-		
-		AndroidCapabilitiesFactory capaFactory = new AndroidCapabilitiesFactory(config);
-		MutableCapabilities capa = capaFactory.createCapabilities();
-		
-		Assert.assertFalse(capa.is(SeleniumRobotCapabilityType.TOOLS));
 	}
 	
 	/**

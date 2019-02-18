@@ -145,19 +145,6 @@ public class SeleniumRobotTestPlan {
     }
     
     /**
-     * Add the named program to the list of programs mandatory for executing the test
-     * Call this method at the very beginning of the test, before call to the first page, so that driver knows these tools.
-     * this will be added as capabilities when starting driver
-     * It will the be necessary to start / stop the program inside the test
-     * @return	the program object on which start and stop will be called
-     */
-    public ExternalTool useProgram(String programName, String ...args) {
-    	ExternalTool tool = new ExternalTool(programName, args);
-    	robotConfig().addExternalProgram(programName);
-    	return tool;
-    }
-    
-    /**
      * Add step to current test
      * @param stepName
      * @param passwordsToMask	array of strings that must be replaced by '*****' in reports

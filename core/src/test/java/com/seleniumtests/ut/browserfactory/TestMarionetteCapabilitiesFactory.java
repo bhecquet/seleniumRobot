@@ -88,7 +88,6 @@ public class TestMarionetteCapabilitiesFactory extends MockitoTest {
 		Assert.assertTrue(capa.is(CapabilityType.TAKES_SCREENSHOT));
 		Assert.assertTrue(capa.is(CapabilityType.ACCEPT_SSL_CERTS));
 		Assert.assertFalse(capa.is(SeleniumRobotCapabilityType.NODE_TAGS));
-		Assert.assertFalse(capa.is(SeleniumRobotCapabilityType.TOOLS));
 		Assert.assertEquals(capa.getVersion(), "");
 		Assert.assertEquals(capa.getCapability(CapabilityType.PROXY), proxyConfig);
 	}
@@ -123,38 +122,6 @@ public class TestMarionetteCapabilitiesFactory extends MockitoTest {
 		MutableCapabilities capa = new FirefoxCapabilitiesFactory(config).createCapabilities();
 		
 		Assert.assertFalse(capa.is(SeleniumRobotCapabilityType.NODE_TAGS));
-	}
-
-	/**
-	 * Check default behaviour when external programs are defined in grid mode
-	 * tools are transferred to driver 
-	 */
-	@Test(groups={"ut"})
-	public void testCreateDefaultCapabilitiesWithToolsInGridMode() {
-		
-		Mockito.when(config.isEnableJavascript()).thenReturn(true);
-		Mockito.when(config.getProxy()).thenReturn(proxyConfig);
-		Mockito.when(config.getExternalPrograms()).thenReturn(Arrays.asList("foo"));
-		Mockito.when(config.getMode()).thenReturn(DriverMode.GRID);
-		
-		MutableCapabilities capa = new FirefoxCapabilitiesFactory(config).createCapabilities();
-
-		Assert.assertEquals(capa.getCapability(SeleniumRobotCapabilityType.TOOLS), Arrays.asList("foo"));
-	}
-
-	/**
-	 * Check default behaviour when external programs are defined in local mode
-	 * tags are not transferred to driver 
-	 */
-	@Test(groups={"ut"})
-	public void testCreateDefaultCapabilitiesWithToolsInLocalMode() {
-		
-		Mockito.when(config.getExternalPrograms()).thenReturn(Arrays.asList("foo"));
-		Mockito.when(config.getMode()).thenReturn(DriverMode.LOCAL);
-		
-		MutableCapabilities capa = new FirefoxCapabilitiesFactory(config).createCapabilities();
-
-		Assert.assertFalse(capa.is(SeleniumRobotCapabilityType.TOOLS));
 	}
 	
 	@Test(groups={"ut"})
