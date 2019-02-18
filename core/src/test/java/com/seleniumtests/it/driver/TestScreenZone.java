@@ -49,6 +49,7 @@ public class TestScreenZone extends GenericMultiBrowserTest {
 		if (driver != null) {
 			DriverTestPageWithoutFixedPattern.logoText.clear();
 			DriverTestPageWithoutFixedPattern.textElement.clear();
+			((CustomEventFiringWebDriver)driver).scrollTop();
 		}
 	}
 	
