@@ -84,7 +84,6 @@ public class SeleniumTestsContext {
     public static final String WEB_DRIVER_GRID = "webDriverGrid";				// adresse du serveur seleniumGrid
     public static final String RUN_MODE = "runMode";							// local ou grid. Pourrait également contenir sauceLabs / testDroid
     public static final String NODE_TAGS = "nodeTags";							// Comma seperated list of strings. Requests that this test should execute only on a node (grid mode only) announcing all of these tags (issue #190)
-    public static final String EXTERNAL_PROGRAM = "externalTools";				// list of programs to be used by the test. This setting cannot be set via command line
     public static final String MASK_PASSWORD = "maskPassword";					// whether seleniumRobot should hide passwords or not
     public static final String MANUAL_TEST_STEPS = "manualTestSteps";			// set test steps manual (default is false) for creating them inside tests
     public static final String DEV_MODE = "devMode";							// The development mode allow all existing browsers to remain. It is set to "false" by default, which means it closes all existing browsers.
@@ -1285,15 +1284,6 @@ public class SeleniumTestsContext {
     		return extTools;
     	}
     }
-    
-    public List<String> getExternalPrograms() {
-    	List<String> programs = (List<String>) getAttribute(EXTERNAL_PROGRAM);
-    	if (programs == null) {
-    		return new ArrayList<>();
-    	} else {
-    		return programs;
-    	}
-    }
   
     public boolean isDevMode() {
         return (Boolean) getAttribute(DEV_MODE);
@@ -1682,20 +1672,6 @@ public class SeleniumTestsContext {
 										.map(String::trim)
 										.collect(Collectors.toList())
 						);
-    	}
-    }
-    
-    /**
-     * Add a program to the list of mandatory programs to be used by the test
-     * @param toolName
-     */
-    public void addExternalProgram(String toolName) {
-    	if (toolName == null || toolName.isEmpty()) {
-    		return;
-    	} else {
-    		List<String> currentPrograms = getExternalPrograms();
-    		currentPrograms.add(toolName);
-    		setAttribute(EXTERNAL_PROGRAM, currentPrograms);
     	}
     }
     
