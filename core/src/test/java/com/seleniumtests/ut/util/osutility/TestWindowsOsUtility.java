@@ -42,6 +42,7 @@ import com.seleniumtests.util.osutility.OSCommand;
 import com.seleniumtests.util.osutility.OSUtility;
 import com.seleniumtests.util.osutility.OSUtilityFactory;
 import com.seleniumtests.util.osutility.OSUtilityWindows;
+import com.seleniumtests.util.osutility.ProcessInfo;
 import com.sun.jna.platform.win32.Advapi32Util;
 import com.sun.jna.platform.win32.Win32Exception;
 import com.sun.jna.platform.win32.WinReg;
@@ -82,6 +83,24 @@ public class TestWindowsOsUtility extends MockitoTest {
 		if (SystemUtils.IS_OS_WINDOWS_10) { 
 			Assert.assertTrue(browsers.contains(BrowserType.EDGE));
 		}
+	}
+	
+	@Test(groups={"ut"})
+	public void testGetProcessList() {
+
+		PowerMockito.mockStatic(OSCommand.class);
+		when(OSCommand.executeCommandAndWait("C:\\windows\\system32\\tasklist.exe /NH /SVC")).thenReturn("eclipse.exe                   6480 N/A\r\n" + 
+				"javaw.exe                     7280 N/A\r\n" + 
+				"chromedriver_2.45_chrome-    11252 N/A\r\n"
+				+ "svchost.exe                   1784 CryptSvc, Dnscache, LanmanWorkstation,\r\n" + 
+				"                                   NlaSvc, TermService, WinRM");
+		List<ProcessInfo> plist= OSUtilityFactory.getInstance().getRunningProcessList();
+		Assert.assertEquals(plist.size(), 4);
+		Assert.assertEquals(plist.get(0).getName(), "eclipse");
+		Assert.assertEquals(plist.get(0).getPid(), "6480");
+		Assert.assertEquals(plist.get(1).getName(), "javaw");
+		Assert.assertEquals(plist.get(2).getName(), "chromedriver_2.45_chrome-");
+		Assert.assertEquals(plist.get(3).getName(), "svchost");
 	}
 	
 	/**
