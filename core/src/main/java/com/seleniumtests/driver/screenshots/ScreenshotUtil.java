@@ -113,6 +113,13 @@ public class ScreenshotUtil {
 		}
     }
     
+    private void removeAlert() {
+    	try {
+	    	Alert alert = driver.switchTo().alert();
+			alert.dismiss();
+    	} catch (Exception e) {}
+    }
+    
     /**
      * Capture a picture
      * @param target		which picture to take, screen or page.
@@ -137,6 +144,7 @@ public class ScreenshotUtil {
     		capturedImages.add(new NamedBufferedImage(captureDesktop(), ""));
     	} else if (target == Target.PAGE && SeleniumTestsContextManager.isWebTest()) {
     		// capture web avec scrolling
+    		removeAlert();
     		capturedImages.addAll(captureWebPages(allWindows));
 	    } else if (target == Target.PAGE && SeleniumTestsContextManager.isAppTest()){
     		capturedImages.add(new NamedBufferedImage(capturePage(-1, -1), ""));
