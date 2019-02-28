@@ -45,12 +45,14 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Base64OutputStream;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
+import org.openqa.selenium.Alert;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.HasCapabilities;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.Point;
+import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
@@ -209,6 +211,10 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
     	for (int i = 0; i < 10; i++) {
 			try  {
 				return super.getWindowHandles();
+			} catch (UnhandledAlertException e) {
+	    		logger.info("getWindowHandles: Handling alert");
+	    		handleAlert();
+	    		return super.getWindowHandles();
 			} catch (Exception e) {
 				logger.info("getting window handles");
 				WaitHelper.waitForSeconds(2);
@@ -218,6 +224,13 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
     	
     }
     
+    private void handleAlert() {
+    	try {
+	    	Alert alert = driver.switchTo().alert();
+			alert.dismiss();
+    	} catch (Exception e) {}
+    }
+    
     @Override
     public String getWindowHandle() {
     	
@@ -225,9 +238,49 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
     		return "";
     	}
     	
-    	return super.getWindowHandle();
-    	
+    	try {
+    		return super.getWindowHandle();
+    	} catch (UnhandledAlertException e) {
+    		logger.info("getWindowHandle: Handling alert");
+    		handleAlert();
+    		return super.getWindowHandle();
+    	}
     }
+    
+    @Override
+    public void close() {
+    	try {
+    		super.close();
+    	} catch (UnhandledAlertException e) {
+    		logger.info("close: Handling alert");
+    		handleAlert();
+    		super.close();
+    	}
+    }
+    
+    @Override
+    public String getCurrentUrl() {
+    	try {
+	    	return super.getCurrentUrl();
+	    } catch (UnhandledAlertException e) {
+    		logger.info("getCurrentUrl: Handling alert");
+			handleAlert();
+			return super.getCurrentUrl();
+		}
+    }
+    
+    @Override
+    public String getTitle() {
+    	try {
+    		return super.getTitle();
+    	} catch (UnhandledAlertException e) {
+    		logger.info("getTitle: Handling alert");
+			handleAlert();
+			return super.getTitle();
+    	}
+    }
+    
+    
 
     public FileDetector getFileDetector() {
         return fileDetector;
@@ -252,6 +305,10 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
     public String getPageSource() {
     	try {
     		return super.getPageSource();
+    	} catch (UnhandledAlertException e) {
+    		logger.info("getPageSource: Handling alert");
+			handleAlert();
+			return super.getPageSource();
     	} catch (WebDriverException e) {
     		logger.info("page source not get: " + e.getMessage());
     		return null;
