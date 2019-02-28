@@ -494,7 +494,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
         
         if (makeVisible) { 
         	makeWebElementVisible(element);
-    		((CustomEventFiringWebDriver)driver).scrollToElement(element, -20);	
+    		((CustomEventFiringWebDriver)driver).scrollToElement(element, -200);	
         }
         
         // wait for element to be really visible. should be done only for actions on element
