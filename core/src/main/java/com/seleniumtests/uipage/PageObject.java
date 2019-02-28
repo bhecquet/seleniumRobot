@@ -339,7 +339,7 @@ public class PageObject extends BasePage implements IPage {
 
     /**
      * Close a PageObject. This method can be called when a web session opens several pages and one of them is closed after some action
-     * In case there are multiple windows opened, swith back to the previous window in the list
+     * In case there are multiple windows opened, switch back to the previous window in the list
      * 
      * @throws NotCurrentPageException
      */
@@ -364,9 +364,8 @@ public class PageObject extends BasePage implements IPage {
         	logger.info("Error closing driver: " + ignore.getMessage());
         }
 
-        if (SeleniumTestsContextManager.getThreadContext().getRunMode() == DriverMode.LOCAL) {
-        	WaitHelper.waitForSeconds(2);
-        }
+        // wait a bit before going back to main window
+        WaitHelper.waitForSeconds(2);
 
         try {
             if (isMultipleWindow) {
