@@ -912,6 +912,24 @@ public class HtmlElement extends Element implements WebElement, Locatable {
         String text = getText();
         return text != null && (text.contains(pattern) || text.matches(pattern));
     }
+    
+    /**
+     * @deprecated (due to selenium Mouse deprecation)
+     * Forces a mouseDown event on the WebElement.
+     */
+    @Deprecated
+    public void mouseDown() {
+        logger.error("use 'new Actions(driver).moveToElement(element).click().perform();' instead");
+    }
+
+    /**
+     * @deprecated (due to selenium Mouse deprecation)
+     * Forces a mouseOver event on the WebElement.
+     */
+    @Deprecated
+    public void mouseOver() {
+    	logger.error("use 'new Actions(driver).moveToElement(element).click().perform();' instead");
+    }
 
     /**
      * Forces a mouseOver event on the WebElement using simulate by JavaScript way for some dynamic menu.
