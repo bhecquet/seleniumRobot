@@ -216,7 +216,7 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
 	    		handleAlert();
 	    		return super.getWindowHandles();
 			} catch (Exception e) {
-				logger.info("getting window handles");
+				logger.info("error getting window handles: " + e.getMessage());
 				WaitHelper.waitForSeconds(2);
 			}
 		}
