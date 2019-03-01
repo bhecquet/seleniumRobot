@@ -68,7 +68,7 @@ public class TestSeleniumRobotLogger extends MockitoTest {
 			Assert.assertTrue(logs.contains("some debug"));
 			
 		} finally {
-			System.clearProperty("internalDevMode");
+			System.clearProperty(SeleniumRobotLogger.INTERNAL_DEBUG);
 			SeleniumRobotLogger.reset();
 		}
 	}
@@ -100,7 +100,7 @@ public class TestSeleniumRobotLogger extends MockitoTest {
 			Assert.assertFalse(logs.contains("some debug"));
 			
 		} finally {
-			System.clearProperty("internalDevMode");
+			System.clearProperty(SeleniumRobotLogger.INTERNAL_DEBUG);
 			SeleniumRobotLogger.reset();
 		}
 	}
@@ -112,9 +112,7 @@ public class TestSeleniumRobotLogger extends MockitoTest {
 	 */
 	@Test(groups= {"ut"})
 	public void testCleanOutputDir() throws IOException {
-		
-		
-		
+
 		try {
 			// delete default output directory so that it does not exist when trying to clean it
 			try {

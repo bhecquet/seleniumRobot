@@ -124,8 +124,8 @@ public class SeleniumRobotLogger {
 			        fileAppender.setName(FILE_APPENDER_NAME);
 			        fileAppender.setFile(outputDir + "/" + logFileName);
 			        fileAppender.setLayout(new PatternLayout(LOG_PATTERN));
-			        
-			        if (System.getProperty("internalDevMode") != null && "true".equals(System.getProperty("internalDevMode"))) {
+
+			        if (System.getProperty(INTERNAL_DEBUG) != null && System.getProperty(INTERNAL_DEBUG).contains("core")) {
 			        	fileAppender.setThreshold(Level.DEBUG);
 			        } else {
 			        	fileAppender.setThreshold(Level.INFO);
