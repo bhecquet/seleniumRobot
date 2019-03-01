@@ -603,7 +603,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 					Integer heightPosition = element.getLocation().y > viewportHeight ? element.getLocation().y - viewportHeight.intValue(): element.getLocation().y;
 					changeCssAttribute(element, "left", "20px");
 					changeCssAttribute(element, "top", heightPosition + "px"); 
-					changeCssAttribute(element, "position", "fixed");
+					changeCssAttribute(element, "position", "inherit");
 				}
 				if (element.getAttribute("style").toLowerCase().replace(" ", "").contains("display:none")) {
 					changeCssAttribute(element, "display", "block");
