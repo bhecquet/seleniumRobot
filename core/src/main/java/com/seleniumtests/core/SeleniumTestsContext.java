@@ -88,7 +88,6 @@ public class SeleniumTestsContext {
     public static final String MASK_PASSWORD = "maskPassword";					// whether seleniumRobot should hide passwords or not
     public static final String MANUAL_TEST_STEPS = "manualTestSteps";			// set test steps manual (default is false) for creating them inside tests
     public static final String DEV_MODE = "devMode";							// The development mode allow all existing browsers to remain. It is set to "false" by default, which means it closes all existing browsers.
-    public static final String INTERNAL_DEV_MODE = "internalDevMode";			// The development mode for internal use to avoid reading the same property for user use and internal use
     public static final String DEBUG = "debug";									// whether to debug test (logs from browser / core). Valid values are: 'none', 'core', 'driver' or 'core,driver'
     public static final String INTERNAL_DEBUG = "internalDebug";
     public static final String BROWSER = "browser";								// navigateur utilisé. Sur Android, le navigateur par défaut est "Browser"
