@@ -49,7 +49,7 @@ public class TestSeleniumRobotLogger extends MockitoTest {
 	public void testLogInDevMode() throws IOException {
 		try {
 			SeleniumRobotLogger.reset();
-			System.setProperty("internalDevMode", "true");
+			System.setProperty(SeleniumRobotLogger.INTERNAL_DEBUG, "core");
 			SeleniumRobotLogger.updateLogger(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), SeleniumTestsContextManager.getThreadContext().getDefaultOutputDirectory());
 			
 			Logger logger = spy(SeleniumRobotLogger.getLogger(TestSeleniumRobotLogger.class));
@@ -81,7 +81,7 @@ public class TestSeleniumRobotLogger extends MockitoTest {
 	public void testLogInRunMode() throws IOException {
 		try {
 			SeleniumRobotLogger.reset();
-			System.setProperty("internalDevMode", "false");
+			System.setProperty(SeleniumRobotLogger.INTERNAL_DEBUG, "none");
 			SeleniumRobotLogger.updateLogger(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), SeleniumTestsContextManager.getThreadContext().getDefaultOutputDirectory());
 			
 			Logger logger = spy(SeleniumRobotLogger.getLogger(TestSeleniumRobotLogger.class));
