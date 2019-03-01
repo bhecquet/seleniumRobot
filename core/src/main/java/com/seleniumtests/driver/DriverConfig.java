@@ -34,6 +34,7 @@ import com.seleniumtests.core.proxy.ProxyConfig;
 import com.seleniumtests.customexception.DriverExceptions;
 import com.seleniumtests.driver.screenshots.VideoCaptureMode;
 import com.seleniumtests.driver.screenshots.VideoRecorder;
+import com.seleniumtests.util.logging.DebugMode;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
 import net.lightbody.bmp.BrowserMobProxy;
@@ -95,8 +96,8 @@ public class DriverConfig {
     	return testContext.getNodeTags();
     }
     
-    public boolean isDevMode() {
-    	return testContext.isDevMode();
+    public List<DebugMode> getDebug() {
+    	return testContext.getDebug();
     }
 
     public WebDriver getDriver() {

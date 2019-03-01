@@ -47,6 +47,7 @@ import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.DriverConfig;
 import com.seleniumtests.driver.DriverMode;
+import com.seleniumtests.util.logging.DebugMode;
 import com.seleniumtests.util.osutility.OSUtility;
 
 @PrepareForTest({OSUtility.class, BrowserInfo.class})
@@ -71,7 +72,7 @@ public class TestFirefoxCapabilitiesFactory extends MockitoTest {
 		PowerMockito.mockStatic(OSUtility.class, Mockito.CALLS_REAL_METHODS);
 		PowerMockito.when(OSUtility.getInstalledBrowsersWithVersion()).thenReturn(browserInfos);
 		Mockito.when(config.getTestContext()).thenReturn(context);
-		Mockito.when(config.isDevMode()).thenReturn(false);
+		Mockito.when(config.getDebug()).thenReturn(Arrays.asList(DebugMode.NONE));
 	}
 	
 	/**

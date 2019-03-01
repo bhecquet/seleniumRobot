@@ -20,11 +20,14 @@ package com.seleniumtests.core.aspects;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Logger;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.After;
@@ -43,6 +46,7 @@ import com.seleniumtests.reporter.logger.TestAction;
 import com.seleniumtests.reporter.logger.TestLogging;
 import com.seleniumtests.reporter.logger.TestStep;
 import com.seleniumtests.uipage.PageObject;
+import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
 import net.lightbody.bmp.BrowserMobProxy;
 
@@ -77,6 +81,9 @@ import net.lightbody.bmp.BrowserMobProxy;
  */
 @Aspect
 public class LogAction {
+	
+	private static final Logger logger = SeleniumRobotLogger.getLogger(LogAction.class);
+	private static Map<Thread, Integer> indent = Collections.synchronizedMap(new HashMap<>());
 
 	/**
 	 * Intercept actions
@@ -96,6 +103,48 @@ public class LogAction {
 		String pageName = page == null ? "": "on page " + page.getClass().getSimpleName();
 
     	return logAction(joinPoint, pageName);
+	}
+	
+	@Around("execution(public * com.seleniumtests.uipage.PageObject+.* (..)) "
+			+ "|| execution(public * com.seleniumtests.uipage.htmlelements.HtmlElement+.* (..))")
+	public Object logDebug(ProceedingJoinPoint joinPoint) throws Throwable {
+		if (LogAction.indent.get(Thread.currentThread()) == null) {
+			LogAction.indent.put(Thread.currentThread(), 0);
+		}
+		
+		String currentIndent = StringUtils.repeat(" ", LogAction.indent.get(Thread.currentThread()));
+		logger.debug(String.format("%sEntering %s", currentIndent, joinPoint.getSignature()));
+		Object reply = null;
+		try {
+			LogAction.indent.put(Thread.currentThread(), LogAction.indent.get(Thread.currentThread()) + 2);
+			reply = joinPoint.proceed(joinPoint.getArgs());
+		} catch (Throwable e) {
+			logger.debug(String.format("%sError in %s: %s - %s", currentIndent, joinPoint.getSignature(), e.getClass().getName(), e.getMessage()));
+			throw e;
+		} finally {
+			LogAction.indent.put(Thread.currentThread(), LogAction.indent.get(Thread.currentThread()) - 2);
+			logger.debug(String.format("%sFinishing %s: %s", currentIndent, joinPoint.getSignature(), buildReplyValues(reply)));
+		}
+		return reply;
+	}
+	
+	private String buildReplyValues(Object reply) {
+		List<String> replyList = new ArrayList<>();
+		if (reply == null) {
+			return "null";
+		}
+		if (reply instanceof CharSequence[]) {
+			for (Object obj: (CharSequence[])reply) {
+				replyList.add(obj.toString());
+			}
+		} else if (reply instanceof List) {
+			for (Object obj: (List<?>)reply) {
+				replyList.add(obj.toString());
+			}
+		} else {
+			replyList.add(reply.toString());
+		}
+		return replyList.toString();
 	}
 	
 	/**

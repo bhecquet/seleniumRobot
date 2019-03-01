@@ -33,6 +33,7 @@ import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.DriverConfig;
 import com.seleniumtests.reporter.logger.TestLogging;
 import com.seleniumtests.util.FileUtility;
+import com.seleniumtests.util.logging.DebugMode;
 
 public class FirefoxCapabilitiesFactory extends IDesktopCapabilityFactory {
 	
@@ -61,7 +62,7 @@ public class FirefoxCapabilitiesFactory extends IDesktopCapabilityFactory {
         options.setCapability(FirefoxDriver.PROFILE, profile);
         options.setLogLevel(FirefoxDriverLogLevel.ERROR);
         
-        if (webDriverConfig.isDevMode()) {
+        if (webDriverConfig.getDebug().contains(DebugMode.DRIVER)) {
         	options.setLogLevel(FirefoxDriverLogLevel.TRACE);
         }
         

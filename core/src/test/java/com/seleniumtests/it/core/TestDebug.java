@@ -35,9 +35,9 @@ import com.seleniumtests.util.osutility.OSUtility;
 import com.seleniumtests.util.osutility.OSUtilityFactory;
 import com.seleniumtests.util.osutility.ProcessInfo;
 
-public class TestDevMode extends GenericTest {
+public class TestDebug extends GenericTest {
 
-	private static final Logger logger = SeleniumRobotLogger.getLogger(TestDevMode.class);
+	private static final Logger logger = SeleniumRobotLogger.getLogger(TestDebug.class);
 	
 	private OSUtility osUtil;
 	
@@ -58,33 +58,12 @@ public class TestDevMode extends GenericTest {
 	public void testDevModeFalse() {
 		
 		logger.info("Test, dev mode = " + false);
-		SeleniumTestsContextManager.getThreadContext().setDevMode(false);
+		SeleniumTestsContextManager.getThreadContext().setDebug("none");
 		
 		launchPageTest();
 		
 		if (osUtil.isWebBrowserRunning(true)) {
 			Assert.fail("All web browser processes should be over.");
-		}
-	}
-	
-	/**
-	 * Forces devMode to true, and check if it the browser processes remain.
-	 * NOTE : if those got closed in previous tests, this one becomes useless...
-	 */
-	@Test(groups={"it"})
-	public void testDevModeTrue() {	
-		logger.info("Test, dev mode = " + true);
-		SeleniumTestsContextManager.getThreadContext().setDevMode(true);
-		List<ProcessInfo> webBrowserRunningListBefore = osUtil.whichWebBrowserRunning();
-		
-		launchPageTest();
-		
-		List<ProcessInfo> webBrowserRunningListAfter = osUtil.whichWebBrowserRunning();
-
-		for (ProcessInfo info: webBrowserRunningListBefore) {
-			if (!webBrowserRunningListAfter.contains(info)) {
-				Assert.fail("a browser has been closed");
-			}
 		}
 	}
 	
