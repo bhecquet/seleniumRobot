@@ -1,28 +1,3 @@
 <differences>
-  <difference>
-    <className>**/uipage/PageObject</className>
-    <differenceType>7002</differenceType>
-    <method>java.lang.String getPopupWindowName()</method>
-    <justification>Never used and returned value was never set</justification>
-  </difference>
-  
-  <!-- 3.11.1 -->
-  <difference>
-  	<className>**/uipage/htmlelements/GenericPictureElement</className>
-    <differenceType>7013</differenceType>
-    <method>void doAfterPictureSearch()</method>
-    <justification>used internally</justification>
-  </difference>
-  <difference>
-  	<className>**/uipage/htmlelements/GenericPictureElement</className>
-    <differenceType>7013</differenceType>
-    <method>java.io.File getScreenshotFile()</method>
-    <justification>used internally</justification>
-  </difference>
-  <difference>
-  	<className>**/uipage/htmlelements/GenericPictureElement</className>
-    <differenceType>7002</differenceType>
-    <method>void findElement(java.io.File)</method>
-    <justification>used internally</justification>
-  </difference>
+
 </differences>
