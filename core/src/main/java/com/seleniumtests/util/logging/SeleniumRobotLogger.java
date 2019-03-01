@@ -57,7 +57,7 @@ public class SeleniumRobotLogger {
 	public static final String METHOD_NAME = "methodName";				// name of the test method (or the cucumber scenario)
 	public static final String UNIQUE_METHOD_NAME = "uniqueMethodName"; // unique name of the test (in case several tests have the same name)
 	public static final String LOG_FILE_NAME = "seleniumRobot.log";
-	private static final String INTERNAL_DEV_MODE = "internalDevMode";
+	private static final String INTERNAL_DEBUG = "internalDebug";
 	
 	private SeleniumRobotLogger() {
 		// As a utility class, it is not meant to be instantiated.
@@ -77,7 +77,7 @@ public class SeleniumRobotLogger {
         // use System property instead of SeleniumTestsContext class as SeleniumrobotLogger class is used for grid extension package and 
         // we do not want to depend on "SeleniumTestsContext" class here
 	    Logger rootLogger = Logger.getRootLogger();
-        if (System.getProperty(INTERNAL_DEV_MODE) != null && "true".equals(System.getProperty(INTERNAL_DEV_MODE))) {
+        if (System.getProperty(INTERNAL_DEBUG) != null && System.getProperty(INTERNAL_DEBUG).contains("core")) {
         	rootLogger.setLevel(Level.DEBUG);
         } else {
         	rootLogger.setLevel(Level.INFO);

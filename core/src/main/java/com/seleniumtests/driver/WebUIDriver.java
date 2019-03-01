@@ -358,7 +358,7 @@ public class WebUIDriver {
      * This may not be desirable
      */
     private static void cleanWebDrivers() {
-    	logger.info("Dev. mode : " + SeleniumTestsContextManager.getThreadContext().isDevMode()
+    	logger.info("Dev. mode : " + SeleniumTestsContextManager.getThreadContext().getDebug()
     					+" , web browser running processes will terminate ! ");
 		osUtil.killAllWebBrowserProcess(false); //true to force the kill
 	}

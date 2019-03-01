@@ -24,6 +24,7 @@ import org.openqa.selenium.ie.InternetExplorerOptions;
 
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.DriverConfig;
+import com.seleniumtests.util.logging.DebugMode;
 
 public class IECapabilitiesFactory extends IDesktopCapabilityFactory {
 
@@ -42,7 +43,7 @@ public class IECapabilitiesFactory extends IDesktopCapabilityFactory {
 //        options.setCapability(InternetExplorerDriver.REQUIRE_WINDOW_FOCUS, true);
 //        options.setCapability(InternetExplorerDriver.NATIVE_EVENTS, true);
         
-        if (webDriverConfig.isDevMode()) {
+        if (webDriverConfig.getDebug().contains(DebugMode.DRIVER)) {
         	options.setCapability(InternetExplorerDriver.LOG_LEVEL, "TRACE");
         }
 

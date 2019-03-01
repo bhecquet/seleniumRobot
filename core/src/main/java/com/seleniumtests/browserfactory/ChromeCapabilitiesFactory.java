@@ -27,6 +27,7 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.DriverConfig;
 import com.seleniumtests.driver.DriverMode;
+import com.seleniumtests.util.logging.DebugMode;
 
 import io.appium.java_client.remote.AndroidMobileCapabilityType;
 
@@ -49,6 +50,10 @@ public class ChromeCapabilitiesFactory extends IDesktopCapabilityFactory {
 
         capabilities.setCapability(ChromeOptions.CAPABILITY, options);
         
+        // TEST_MOBILE
+        capabilities.setCapability(AndroidMobileCapabilityType.NATIVE_WEB_SCREENSHOT, true);
+        // TEST_MOBILE
+        
         if (webDriverConfig.getMode() == DriverMode.LOCAL) {
         	capabilities.setCapability(AndroidMobileCapabilityType.CHROMEDRIVER_EXECUTABLE, System.getProperty(ChromeDriverService.CHROME_DRIVER_EXE_PROPERTY));
         	
@@ -62,7 +67,7 @@ public class ChromeCapabilitiesFactory extends IDesktopCapabilityFactory {
 	private void setLogging() {
 
     	// driver logging
-    	if (webDriverConfig.isDevMode()) {
+    	if (webDriverConfig.getDebug().contains(DebugMode.DRIVER)) {
     		String chromeDriverLogPath = Paths.get(webDriverConfig.getOutputDirectory(), "chromedriver.log").toString();
         	System.setProperty(ChromeDriverService.CHROME_DRIVER_VERBOSE_LOG_PROPERTY, "true");
 //        	System.setProperty(ChromeDriverService.CHROME_DRIVER_LOG_PROPERTY, chromeDriverLogPath);

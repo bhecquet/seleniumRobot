@@ -59,6 +59,7 @@ import com.seleniumtests.reporter.logger.ArchiveMode;
 import com.seleniumtests.reporter.reporters.ReportInfo;
 import com.seleniumtests.uipage.htmlelements.ElementInfo;
 import com.seleniumtests.util.StringUtility;
+import com.seleniumtests.util.logging.DebugMode;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 import com.seleniumtests.util.osutility.OSUtility;
 
@@ -88,6 +89,8 @@ public class SeleniumTestsContext {
     public static final String MANUAL_TEST_STEPS = "manualTestSteps";			// set test steps manual (default is false) for creating them inside tests
     public static final String DEV_MODE = "devMode";							// The development mode allow all existing browsers to remain. It is set to "false" by default, which means it closes all existing browsers.
     public static final String INTERNAL_DEV_MODE = "internalDevMode";			// The development mode for internal use to avoid reading the same property for user use and internal use
+    public static final String DEBUG = "debug";									// whether to debug test (logs from browser / core). Valid values are: 'none', 'core', 'driver' or 'core,driver'
+    public static final String INTERNAL_DEBUG = "internalDebug";
     public static final String BROWSER = "browser";								// navigateur utilisé. Sur Android, le navigateur par défaut est "Browser"
     public static final String BROWSER_VERSION = "browserVersion";				// version de navigateur utilisé
     public static final String FIREFOX_USER_PROFILE_PATH = "firefoxUserProfilePath";	// profile utilisateur firefox
@@ -236,6 +239,7 @@ public class SeleniumTestsContext {
 	public static final boolean DEFAULT_OPTIMIZE_REPORTS = false;
 	public static final String DEFAULT_ARCHIVE= "false";
 	public static final String DEFAULT_NODE_TAGS = "";
+	public static final String DEFAULT_DEBUG = "none";
 	public static final ElementInfo.Mode DEFAULT_ADVANCED_ELEMENT_SEARCH = ElementInfo.Mode.FALSE;
     
     public static final int DEFAULT_REPLAY_TIME_OUT = 30;
@@ -304,7 +308,7 @@ public class SeleniumTestsContext {
         setExplicitWaitTimeout(getIntValueForTest(EXPLICIT_WAIT_TIME_OUT, System.getProperty(EXPLICIT_WAIT_TIME_OUT)));
         setReplayTimeout(getIntValueForTest(REPLAY_TIME_OUT, System.getProperty(REPLAY_TIME_OUT)));
         setPageLoadTimeout(getIntValueForTest(PAGE_LOAD_TIME_OUT, System.getProperty(PAGE_LOAD_TIME_OUT)));
-        setDevMode(getBoolValueForTest(DEV_MODE, System.getProperty(DEV_MODE)));
+        setDebug(getValueForTest(DEBUG, System.getProperty(DEBUG)));
         setManualTestSteps(getBoolValueForTest(MANUAL_TEST_STEPS, System.getProperty(MANUAL_TEST_STEPS)));
         setBrowser(getValueForTest(BROWSER, System.getProperty(BROWSER)));
         setHeadlessBrowser(getBoolValueForTest(HEADLESS_BROWSER, System.getProperty(HEADLESS_BROWSER)));
@@ -1284,9 +1288,9 @@ public class SeleniumTestsContext {
     		return extTools;
     	}
     }
-  
-    public boolean isDevMode() {
-        return (Boolean) getAttribute(DEV_MODE);
+
+    public List<DebugMode> getDebug() {
+    	return (List<DebugMode>) getAttribute(DEBUG);
     }
     
     public boolean isHeadlessBrowser() {
@@ -1684,18 +1688,18 @@ public class SeleniumTestsContext {
     }
     
     /**
-     * Record DEV_MODE
-     * also store an INTERNAL_DEV_MODE System property to be used internally with SeleniumRobotLogger class
+     * Record DEBUG
+     * also store an INTERNAL_DEBUG System property to be used internally with SeleniumRobotLogger class
      * @param devMode
      */
-    public void setDevMode(Boolean devMode) {
-    	if (devMode != null) {
-    		setAttribute(DEV_MODE, devMode);
-    		System.setProperty(INTERNAL_DEV_MODE, devMode.toString());
+    public void setDebug(String debug) {
+    	if (debug != null) {
+    		setAttribute(DEBUG, DebugMode.fromString(debug));
+    		System.setProperty(INTERNAL_DEBUG, debug);
     	} else {
     		// default value depends on who starts test. If start is done through jar execution, deployed mode will be true (devMode set to false)
-    		setAttribute(DEV_MODE, false);
-    		System.setProperty(INTERNAL_DEV_MODE, "false");
+    		setAttribute(DEBUG, DebugMode.fromString(DEFAULT_DEBUG));
+    		System.setProperty(INTERNAL_DEBUG, DEFAULT_DEBUG);
     	}
     }
     

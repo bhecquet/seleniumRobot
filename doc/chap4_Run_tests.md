@@ -75,7 +75,7 @@ Settings for changing the test behavior
 
 | Param name       			| Default 	| Description  |
 | -------------------------	| ------- 	| ------------ |
-| devMode 					| false		| The development mode. If true, DEBUG logs are displayed, else, minimal log level is INFO. Driver logs are also displayed | 
+| debug 					| none		| The debug mode. If 'core', DEBUG logs are displayed, else, minimal log level is INFO. If 'driver', driver logs are displayed. It's also possible to specify 'core,driver' to display all logs | 
 | softAssertEnabled 		| true		| Test does not stop is an assertion fails. Only valid when using assertions defined in `CustomAssertion` class or assert methods in `BasePage` class | 
 | loadIni					|			| comma separated list of path to ini formatted files to load. Their values will overwrite those from env.ini file if the same key is present. Path is relative to data/<app>/config path |
 | overrideSeleniumNativeAction      | false | intercept driver.findElement and driver.frame operations so that seleniumRobot element operations can be use (replay, error handling, ...) even when using standard selenium code. Only findElement(By) and findElements(By) are supported, not findElementByxxx(String). Logging is also better |

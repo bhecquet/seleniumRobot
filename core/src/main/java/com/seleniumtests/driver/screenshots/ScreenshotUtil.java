@@ -428,14 +428,22 @@ public class ScreenshotUtil {
                 // ignore alert customexception
                 logger.error(ex);
                 url = driver.getCurrentUrl();
+            } catch (Throwable e) {
+            	// allow screenshot even if some problem occurs
+            	url = "http://no/url/available";
             }
 
-            title = driver.getTitle();
+    		try {
+    			title = driver.getTitle();
+    		} catch (Throwable e) {
+    			// allow screenshot even if some problem occurs
+    			title = "No Title";
+    		}
     		title = prefix + title == null ? "": prefix + title;
     		
     		try {
             	pageSource = driver.getPageSource();
-            } catch (WebDriverException e) {
+            } catch (Throwable e) {
             	pageSource = "";
             }
     	}

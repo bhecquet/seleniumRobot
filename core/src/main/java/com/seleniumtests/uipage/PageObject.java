@@ -350,13 +350,14 @@ public class PageObject extends BasePage implements IPage {
         }
 
         SeleniumTestsPageListener.informPageUnload(this);
-        TestLogging.info(title +" close web page");
+        TestLogging.info("close web page: " + getTitle());
 
         boolean isMultipleWindow = false;
         List<String> handles = new ArrayList<>(driver.getWindowHandles());
         if (handles.size() > 1) {
             isMultipleWindow = true;
         }
+        logger.debug("Current handles: " + handles);
         
         try {
             driver.close();
@@ -640,6 +641,7 @@ public class PageObject extends BasePage implements IPage {
  		} catch (Exception e) {
  			mainWindowHandle = "";
  		}
+ 		logger.debug("Current handle: " + mainWindowHandle);
 
  		// wait for window to be displayed
  		Instant end = systemClock.instant().plusMillis(waitMs + 250L);
@@ -649,6 +651,7 @@ public class PageObject extends BasePage implements IPage {
  		while (end.isAfter(systemClock.instant()) && !found) {
  			
  			handles = driver.getWindowHandles();
+ 			logger.debug("All handles: " + handles.toString());
 
  			for (String handle: handles) {
  				

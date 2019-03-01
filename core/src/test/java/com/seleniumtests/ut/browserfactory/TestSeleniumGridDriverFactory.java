@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.Proxy;
 import org.openqa.selenium.WebDriver;
@@ -35,6 +36,7 @@ import com.seleniumtests.customexception.SeleniumGridException;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.DriverConfig;
 import com.seleniumtests.driver.TestType;
+import com.seleniumtests.util.logging.DebugMode;
 
 @PowerMockIgnore("javax.net.ssl.*")
 @PrepareForTest({SeleniumGridDriverFactory.class})
@@ -71,7 +73,7 @@ public class TestSeleniumGridDriverFactory extends MockitoTest {
 	@BeforeMethod(groups= {"ut"})
 	public void init() throws Exception {
 		when(config.getTestContext()).thenReturn(context);
-		when(config.isDevMode()).thenReturn(false);
+		Mockito.when(config.getDebug()).thenReturn(Arrays.asList(DebugMode.NONE));
 
 		when(config.getBrowser()).thenReturn(BrowserType.HTMLUNIT);
 		when(config.getPlatform()).thenReturn("windows");

@@ -43,6 +43,7 @@ import com.seleniumtests.driver.screenshots.VideoCaptureMode;
 import com.seleniumtests.reporter.logger.ArchiveMode;
 import com.seleniumtests.reporter.reporters.ReportInfo;
 import com.seleniumtests.uipage.htmlelements.ElementInfo;
+import com.seleniumtests.util.logging.DebugMode;
 
 /**
  * Test parsing of test options into SeleniumTestContext
@@ -490,21 +491,42 @@ public class TestSeleniumTestContext extends GenericTest {
 	}
 	
 	@Test(groups="ut context")
-	public void testDevMode(final ITestContext testNGCtx, final XmlTest xmlTest) {
+	public void testDebugCore(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		try {
 			initThreadContext(testNGCtx);
-			SeleniumTestsContextManager.getThreadContext().setDevMode(true);
-			Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().isDevMode(), true);
+			SeleniumTestsContextManager.getThreadContext().setDebug("core");
+			Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getDebug(), Arrays.asList(DebugMode.CORE));
 		} finally {
-			SeleniumTestsContextManager.getThreadContext().setDevMode(null);
+			SeleniumTestsContextManager.getThreadContext().setDebug(null);
+		}
+	}
+	
+	@Test(groups="ut context")
+	public void testDebugCoreAndDriver(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		try {
+			initThreadContext(testNGCtx);
+			SeleniumTestsContextManager.getThreadContext().setDebug("core,driver");
+			Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getDebug(), Arrays.asList(DebugMode.CORE, DebugMode.DRIVER));
+		} finally {
+			SeleniumTestsContextManager.getThreadContext().setDebug(null);
+		}
+	}
+	@Test(groups="ut context")
+	public void testDebugDriver(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		try {
+			initThreadContext(testNGCtx);
+			SeleniumTestsContextManager.getThreadContext().setDebug("driver");
+			Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getDebug(), Arrays.asList(DebugMode.DRIVER));
+		} finally {
+			SeleniumTestsContextManager.getThreadContext().setDebug(null);
 		}
 	}
 	// by default, devMode is true if tests are launched from IDE
 	@Test(groups="ut context")
-	public void testDevModeNull(final ITestContext testNGCtx, final XmlTest xmlTest) {
+	public void testDebugNull(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		initThreadContext(testNGCtx);
-		SeleniumTestsContextManager.getThreadContext().setDevMode(null);
-		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().isDevMode(), false);
+		SeleniumTestsContextManager.getThreadContext().setDebug(null);
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getDebug(), Arrays.asList(DebugMode.NONE));
 	}
 	
 	@Test(groups="ut context")

@@ -51,6 +51,7 @@ import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.DriverConfig;
 import com.seleniumtests.driver.DriverMode;
+import com.seleniumtests.util.logging.DebugMode;
 import com.seleniumtests.util.osutility.OSUtility;
 import com.seleniumtests.util.osutility.OSUtilityFactory;
 import com.seleniumtests.util.osutility.OSUtilityWindows;
@@ -94,7 +95,7 @@ public class TestIECapabilityFactory extends MockitoTest {
 		when(osUtility.getProgramExtension()).thenReturn(".exe");
 		
 		when(config.getTestContext()).thenReturn(context);
-		Mockito.when(config.isDevMode()).thenReturn(false);
+		Mockito.when(config.getDebug()).thenReturn(Arrays.asList(DebugMode.NONE));
 		
 	}
 	

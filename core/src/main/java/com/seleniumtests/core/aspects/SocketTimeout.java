@@ -17,10 +17,7 @@
  */
 package com.seleniumtests.core.aspects;
 
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
-
 import java.lang.reflect.Field;
-import java.net.Proxy;
 import java.net.URL;
 import java.time.Duration;
 
@@ -30,18 +27,10 @@ import org.aspectj.lang.annotation.After;
 import org.aspectj.lang.annotation.Aspect;
 import org.openqa.selenium.remote.HttpCommandExecutor;
 import org.openqa.selenium.remote.http.HttpClient;
-import org.openqa.selenium.remote.http.HttpClient.Builder;
-import org.openqa.selenium.remote.internal.OkHttpClient;
 
-import com.google.common.base.Strings;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.util.NetworkUtility;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
-
-import okhttp3.ConnectionPool;
-import okhttp3.Credentials;
-import okhttp3.Request;
-import okhttp3.Response;
 
 @Aspect
 public class SocketTimeout {

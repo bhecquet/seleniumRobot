@@ -46,6 +46,7 @@ import com.seleniumtests.browserfactory.SeleniumRobotCapabilityType;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.DriverConfig;
 import com.seleniumtests.driver.DriverMode;
+import com.seleniumtests.util.logging.DebugMode;
 import com.seleniumtests.util.osutility.OSUtility;
 import com.seleniumtests.util.osutility.OSUtilityFactory;
 import com.seleniumtests.util.osutility.OSUtilityWindows;
@@ -82,7 +83,7 @@ public class TestSafariCapabilityFactory extends MockitoTest {
 		PowerMockito.when(OSUtilityFactory.getInstance()).thenReturn(osUtility);
 		
 		when(osUtility.getProgramExtension()).thenReturn(".exe");
-		Mockito.when(config.isDevMode()).thenReturn(false);
+		Mockito.when(config.getDebug()).thenReturn(Arrays.asList(DebugMode.NONE));
 		
 	}
 	
