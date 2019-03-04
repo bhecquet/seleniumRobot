@@ -37,7 +37,7 @@ The integration tests can be customized with several maven-failsafe-plugin optio
 - do execute only integration tests: use `-DskipUTs=true`
 - execute specific integration tests: use `-Dit.test=<test lists>`. Refer to failsafe plugin documentation for details
 - debug maven integration tests: use `-Dmaven.failsafe.debug=true`. Refer to failsafe plugin documentation for details
-- display / do not display driver logs (they can be quite big). This corresponds to the devMode option of seleniumRobot: `-DseleniumRobot.devMode=false` or `-DseleniumRobot.devMode=true`
+- display / do not display driver logs (they can be quite big). This corresponds to the d option of seleniumRobot: `-DseleniumRobot.debug=driver` or `-DseleniumRobot.debug=none`
 
 ### 4 Deploy ###
 Unzip this file to any folder.

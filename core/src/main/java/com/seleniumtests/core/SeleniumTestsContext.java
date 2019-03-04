@@ -87,7 +87,6 @@ public class SeleniumTestsContext {
     public static final String NODE_TAGS = "nodeTags";							// Comma seperated list of strings. Requests that this test should execute only on a node (grid mode only) announcing all of these tags (issue #190)
     public static final String MASK_PASSWORD = "maskPassword";					// whether seleniumRobot should hide passwords or not
     public static final String MANUAL_TEST_STEPS = "manualTestSteps";			// set test steps manual (default is false) for creating them inside tests
-    public static final String DEV_MODE = "devMode";							// The development mode allow all existing browsers to remain. It is set to "false" by default, which means it closes all existing browsers.
     public static final String DEBUG = "debug";									// whether to debug test (logs from browser / core). Valid values are: 'none', 'core', 'driver' or 'core,driver'
     public static final String INTERNAL_DEBUG = "internalDebug";
     public static final String BROWSER = "browser";								// navigateur utilisé. Sur Android, le navigateur par défaut est "Browser"
@@ -1689,7 +1688,7 @@ public class SeleniumTestsContext {
     /**
      * Record DEBUG
      * also store an INTERNAL_DEBUG System property to be used internally with SeleniumRobotLogger class
-     * @param devMode
+     * @param debug
      */
     public void setDebug(String debug) {
     	if (debug != null) {
