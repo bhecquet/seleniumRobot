@@ -8,7 +8,7 @@
 	<parameter name="anOtherParam" value="value2" />
 	<parameter name="variable1" value="value4" />
     <parameter name="testConfig" value="exampleConfigGenericParams.xml" />
-	<parameter name="devMode" value="true" />
+	<parameter name="debug" value="core" />
 
     <test name="SquashTa_cucumber_test" parallel="false">
     	<!-- cucumber part -->

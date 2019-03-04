@@ -14,7 +14,7 @@
 	    <skipTests>false</skipTests>
 	    <skipITs>${skipTests}</skipITs>
 	    <skipUTs>${skipTests}</skipUTs>
-	    <seleniumRobot.devMode>false</seleniumRobot.devMode>
+	    <seleniumRobot.debug>none</seleniumRobot.debug>
 	</properties>
 
 	<dependencies>
@@ -342,10 +342,10 @@
 					<systemPropertyVariables>
                         <jacoco-agent.destfile>${project.build.directory}/coverage-reports/jacoco-it.exec</jacoco-agent.destfile>
 					</systemPropertyVariables>
-					<argLine>-DdevMode=${seleniumRobot.devMode}</argLine>
+					<argLine>-Ddebug=${seleniumRobot.debug}</argLine>
 				<!-- /comment -->
 				<!-- uncomment for online instrumentation -->
-					<!-- <argLine>${failsafeArgLine} -DdevMode=${seleniumRobot.devMode}</argLine> -->
+					<!-- <argLine>${failsafeArgLine} -Ddebug=${seleniumRobot.debug}</argLine> -->
 				<!-- /uncomment -->
 				
 				</configuration>
