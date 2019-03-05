@@ -31,6 +31,7 @@ import org.apache.commons.lang3.SystemUtils;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.openqa.selenium.MutableCapabilities;
+import org.openqa.selenium.PageLoadStrategy;
 import org.openqa.selenium.Platform;
 import org.openqa.selenium.Proxy;
 import org.openqa.selenium.edge.EdgeDriverService;
@@ -85,6 +86,7 @@ public class TestEdgeCapabilityFactory extends MockitoTest {
 		PowerMockito.when(OSUtilityFactory.getInstance()).thenReturn(osUtility);
 
 		Mockito.when(config.getDebug()).thenReturn(Arrays.asList(DebugMode.NONE));
+		Mockito.when(config.getPageLoadStrategy()).thenReturn(PageLoadStrategy.NORMAL);
 		
 		when(osUtility.getProgramExtension()).thenReturn(".exe");
 	}

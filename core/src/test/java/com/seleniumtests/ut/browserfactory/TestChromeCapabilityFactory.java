@@ -27,6 +27,7 @@ import java.util.Map;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.openqa.selenium.MutableCapabilities;
+import org.openqa.selenium.PageLoadStrategy;
 import org.openqa.selenium.Platform;
 import org.openqa.selenium.Proxy;
 import org.openqa.selenium.chrome.ChromeDriverService;
@@ -71,6 +72,7 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 		PowerMockito.when(OSUtility.getInstalledBrowsersWithVersion()).thenReturn(browserInfos);
 		Mockito.when(config.getTestContext()).thenReturn(context);
 		Mockito.when(config.getDebug()).thenReturn(Arrays.asList(DebugMode.NONE));
+		Mockito.when(config.getPageLoadStrategy()).thenReturn(PageLoadStrategy.NORMAL);
 	}
 	
 	/**
