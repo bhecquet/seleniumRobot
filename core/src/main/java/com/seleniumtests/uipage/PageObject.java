@@ -37,6 +37,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.NoAlertPresentException;
+import org.openqa.selenium.PageLoadStrategy;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.UnhandledAlertException;
@@ -708,7 +709,11 @@ public class PageObject extends BasePage implements IPage {
 
     private void waitForPageToLoad() {
     	try {
-    		new WebDriverWait(driver, 5).until(ExpectedConditions.jsReturnsValue("if (document.readyState === \"complete\") { return \"ok\"; }"));
+    		if (robotConfig().getPageLoadStrategy() == PageLoadStrategy.NORMAL) {
+    			new WebDriverWait(driver, 5).until(ExpectedConditions.jsReturnsValue("if (document.readyState === \"complete\") { return \"ok\"; }"));
+    		} else if (robotConfig().getPageLoadStrategy() == PageLoadStrategy.EAGER) {
+    			new WebDriverWait(driver, 5).until(ExpectedConditions.jsReturnsValue("if (document.readyState === \"interactive\") { return \"ok\"; }"));
+    		}
     	} catch (TimeoutException e) {
     		// nothing
     	}
