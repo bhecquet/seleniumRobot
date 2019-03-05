@@ -23,6 +23,7 @@ import java.net.InetSocketAddress;
 import java.util.List;
 
 import org.openqa.selenium.MutableCapabilities;
+import org.openqa.selenium.PageLoadStrategy;
 import org.openqa.selenium.Proxy;
 import org.openqa.selenium.Proxy.ProxyType;
 import org.openqa.selenium.remote.CapabilityType;

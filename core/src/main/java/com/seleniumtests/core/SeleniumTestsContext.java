@@ -33,6 +33,7 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.openqa.selenium.PageLoadStrategy;
 import org.openqa.selenium.Platform;
 import org.openqa.selenium.Proxy.ProxyType;
 import org.openqa.selenium.WebDriverException;
@@ -82,6 +83,7 @@ public class SeleniumTestsContext {
     public static final String HEADLESS_BROWSER = "headless";
     public static final String REPLAY_TIME_OUT = "replayTimeOut";				// time during which an action is replayed. By default 30 secs
     public static final String PAGE_LOAD_TIME_OUT = "pageLoadTimeout";			// temps d'attente de chargement d'une page
+    public static final String PAGE_LOAD_STRATEGY = "pageLoadStrategy";			// page load strategy as defined in selenium spec. Will be applied to driver
     public static final String WEB_DRIVER_GRID = "webDriverGrid";				// adresse du serveur seleniumGrid
     public static final String RUN_MODE = "runMode";							// local ou grid. Pourrait également contenir sauceLabs / testDroid
     public static final String NODE_TAGS = "nodeTags";							// Comma seperated list of strings. Requests that this test should execute only on a node (grid mode only) announcing all of these tags (issue #190)
@@ -226,6 +228,7 @@ public class SeleniumTestsContext {
 	public static final boolean DEFAULT_SELENIUMROBOTSERVER_ACTIVE = false;
 	public static final int DEFAULT_SELENIUMROBOTSERVER_VARIABLES_OLDER_THAN = 0;
 	public static final int DEFAULT_PAGE_LOAD_TIME_OUT = 90;
+	public static final PageLoadStrategy DEFAULT_PAGE_LOAD_STRATEGY = PageLoadStrategy.NORMAL;
 	public static final int DEFAULT_EXPLICIT_WAIT_TIME_OUT = 15;
 	public static final int DEFAULT_IMPLICIT_WAIT_TIME_OUT = 5;
 	public static final int DEFAULT_WEB_SESSION_TIMEOUT = 90000;
@@ -306,6 +309,7 @@ public class SeleniumTestsContext {
         setExplicitWaitTimeout(getIntValueForTest(EXPLICIT_WAIT_TIME_OUT, System.getProperty(EXPLICIT_WAIT_TIME_OUT)));
         setReplayTimeout(getIntValueForTest(REPLAY_TIME_OUT, System.getProperty(REPLAY_TIME_OUT)));
         setPageLoadTimeout(getIntValueForTest(PAGE_LOAD_TIME_OUT, System.getProperty(PAGE_LOAD_TIME_OUT)));
+        setPageLoadStrategy(getValueForTest(PAGE_LOAD_STRATEGY, System.getProperty(PAGE_LOAD_STRATEGY)));
         setDebug(getValueForTest(DEBUG, System.getProperty(DEBUG)));
         setManualTestSteps(getBoolValueForTest(MANUAL_TEST_STEPS, System.getProperty(MANUAL_TEST_STEPS)));
         setBrowser(getValueForTest(BROWSER, System.getProperty(BROWSER)));
@@ -1082,6 +1086,10 @@ public class SeleniumTestsContext {
     		return DEFAULT_REPLAY_TIME_OUT;
     	}
     }
+    
+    public PageLoadStrategy getPageLoadStrategy() {
+    	return (PageLoadStrategy) getAttribute(PAGE_LOAD_STRATEGY);
+    }
 
     public String getNtlmAuthTrustedUris() {
         return (String) getAttribute(NTLM_AUTH_TRUSTED_URIS);
@@ -1485,6 +1493,18 @@ public class SeleniumTestsContext {
     		setAttribute(PAGE_LOAD_TIME_OUT, timeoutInSecs);
     	} else {
     		setAttribute(PAGE_LOAD_TIME_OUT, DEFAULT_PAGE_LOAD_TIME_OUT);
+    	}
+    }
+    
+    public void setPageLoadStrategy(String strategy) {
+    	if (strategy != null) {
+    		PageLoadStrategy pls = PageLoadStrategy.fromString(strategy);
+    		if (pls == null) {
+    			throw new ConfigurationException("PageLoadStrategy values are 'eager', 'normal' (default one) and 'none'");
+    		}
+    		setAttribute(PAGE_LOAD_STRATEGY, pls);
+    	} else {
+    		setAttribute(PAGE_LOAD_STRATEGY, DEFAULT_PAGE_LOAD_STRATEGY);
     	}
     }
     

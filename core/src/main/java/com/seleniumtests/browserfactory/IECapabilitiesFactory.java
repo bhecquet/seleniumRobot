@@ -46,6 +46,8 @@ public class IECapabilitiesFactory extends IDesktopCapabilityFactory {
         if (webDriverConfig.getDebug().contains(DebugMode.DRIVER)) {
         	options.setCapability(InternetExplorerDriver.LOG_LEVEL, "TRACE");
         }
+        
+        options.setPageLoadStrategy(webDriverConfig.getPageLoadStrategy());
 
         return options;
 	}

@@ -38,7 +38,11 @@ public class EdgeCapabilitiesFactory extends IDesktopCapabilityFactory {
         if (!SystemUtils.IS_OS_WINDOWS_10 && webDriverConfig.getMode() == DriverMode.LOCAL) {
         	throw new ConfigurationException("Edge browser is only available on Windows 10");
         }
-		return new EdgeOptions();
+        
+        EdgeOptions options = new EdgeOptions();
+        options.setPageLoadStrategy(webDriverConfig.getPageLoadStrategy().toString());
+        
+		return options;
 	}
 
 	@Override

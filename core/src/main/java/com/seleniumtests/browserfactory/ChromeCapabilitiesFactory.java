@@ -47,6 +47,7 @@ public class ChromeCapabilitiesFactory extends IDesktopCapabilityFactory {
             options.addArguments("--user-agent=" + webDriverConfig.getUserAgentOverride());
         }
         options.addArguments("--disable-translate");
+        options.setPageLoadStrategy(webDriverConfig.getPageLoadStrategy());
 
         capabilities.setCapability(ChromeOptions.CAPABILITY, options);
         
@@ -95,6 +96,8 @@ public class ChromeCapabilitiesFactory extends IDesktopCapabilityFactory {
         if (webDriverConfig.getMode() == DriverMode.LOCAL) {
         	setLogging();
         }
+        
+        options.setPageLoadStrategy(webDriverConfig.getPageLoadStrategy());
         
         return options;
 	}
