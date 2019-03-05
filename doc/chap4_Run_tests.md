@@ -123,6 +123,7 @@ Settings for customizing timeouts
 | explicitWaitTimeOut 		| 15		| explicit wait of the browser, in seconds. Used when checking is an element is present and no wait value is defined (`waitElementPresent` & `isElementPresent`). This value is also used when checking that browser is on the right page (PageObject constructor) | 
 | pageLoadTimeout 			| 90		| Value defined in selenium driver. Wait delay for page loading | 
 | replayTimeOut				| 30		| Delay during which an action is replayed
+| pageLoadStrategy			| normal	| set page load strategy as defined in [https://www.w3.org/TR/webdriver/#dfn-table-of-page-load-strategies](https://www.w3.org/TR/webdriver/#dfn-table-of-page-load-strategies). Values are 'normal', 'eager', 'none'|
 
 #### Selenium server params ####
 

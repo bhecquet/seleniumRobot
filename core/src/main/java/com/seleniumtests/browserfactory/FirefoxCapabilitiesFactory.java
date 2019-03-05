@@ -22,6 +22,7 @@ import java.io.IOException;
 
 import org.apache.commons.io.FileUtils;
 import org.openqa.selenium.MutableCapabilities;
+import org.openqa.selenium.PageLoadStrategy;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxDriverLogLevel;
 import org.openqa.selenium.firefox.FirefoxOptions;
@@ -61,6 +62,7 @@ public class FirefoxCapabilitiesFactory extends IDesktopCapabilityFactory {
         configProfile(profile, webDriverConfig);
         options.setCapability(FirefoxDriver.PROFILE, profile);
         options.setLogLevel(FirefoxDriverLogLevel.ERROR);
+        options.setPageLoadStrategy(webDriverConfig.getPageLoadStrategy());
         
         if (webDriverConfig.getDebug().contains(DebugMode.DRIVER)) {
         	options.setLogLevel(FirefoxDriverLogLevel.TRACE);

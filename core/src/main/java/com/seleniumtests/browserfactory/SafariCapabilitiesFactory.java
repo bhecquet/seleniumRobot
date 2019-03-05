@@ -31,7 +31,11 @@ public class SafariCapabilitiesFactory extends IDesktopCapabilityFactory {
 
 	@Override
 	protected MutableCapabilities getDriverOptions() {
-		return new SafariOptions();
+		SafariOptions options = new SafariOptions();
+		
+		// not yet supported
+        //options.setPageLoadStrategy(webDriverConfig.getPageLoadStrategy());
+		return options;
 	}
 
 	@Override

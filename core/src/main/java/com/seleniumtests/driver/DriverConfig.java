@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.openqa.selenium.PageLoadStrategy;
 import org.openqa.selenium.Platform;
 import org.openqa.selenium.Proxy;
 import org.openqa.selenium.Proxy.ProxyType;
@@ -172,6 +173,10 @@ public class DriverConfig {
 
     public int getPageLoadTimeout() {
         return testContext.getPageLoadTimeout();
+    }
+    
+    public PageLoadStrategy getPageLoadStrategy() {
+    	return testContext.getPageLoadStrategy();
     }
 
     public Platform getWebPlatform() {

@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.json.JSONObject;
+import org.openqa.selenium.PageLoadStrategy;
 import org.openqa.selenium.Proxy.ProxyType;
 import org.testng.Assert;
 import org.testng.ITestContext;
@@ -299,6 +300,24 @@ public class TestSeleniumTestContext extends GenericTest {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setWebSessionTimeout(null);
 		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getWebSessionTimeout(), SeleniumTestsContext.DEFAULT_WEB_SESSION_TIMEOUT);
+	}
+	
+	@Test(groups="ut context")
+	public void testPageLoadStrategy(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setPageLoadStrategy("eager");
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getPageLoadStrategy(), PageLoadStrategy.EAGER);
+	}
+	@Test(groups="ut context", expectedExceptions=ConfigurationException.class)
+	public void testWrongPageLoadStrategy(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setPageLoadStrategy("foo");
+	}
+	@Test(groups="ut context")
+	public void testPageLoadStrategyNull(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setPageLoadStrategy(null);
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getPageLoadStrategy(), PageLoadStrategy.NORMAL);
 	}
 	
 	@Test(groups="ut context")
