@@ -170,7 +170,7 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 		
 		MutableCapabilities capa = new ChromeCapabilitiesFactory(config).createCapabilities();
 		
-		Assert.assertEquals(((Map<?,?>)(((ChromeOptions)capa).asMap().get(ChromeOptions.CAPABILITY))).get("args").toString(), "[--disable-translate, --no-sandbox]");
+		Assert.assertEquals(((Map<?,?>)(((ChromeOptions)capa).asMap().get(ChromeOptions.CAPABILITY))).get("args").toString(), "[--disable-translate, --disable-web-security, --no-sandbox]");
 		Assert.assertEquals(capa.getCapability(CapabilityType.BROWSER_NAME), "chrome");
 	}
 	
@@ -181,7 +181,7 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 		
 		MutableCapabilities capa = new ChromeCapabilitiesFactory(config).createCapabilities();
 		
-		Assert.assertEquals(((Map<?,?>)(((ChromeOptions)capa).asMap().get(ChromeOptions.CAPABILITY))).get("args").toString(), "[--user-agent=CHROME 55, --disable-translate, --no-sandbox]");
+		Assert.assertEquals(((Map<?,?>)(((ChromeOptions)capa).asMap().get(ChromeOptions.CAPABILITY))).get("args").toString(), "[--user-agent=CHROME 55, --disable-translate, --disable-web-security, --no-sandbox]");
 	}
 	
 	@Test(groups={"ut"})
@@ -191,7 +191,7 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 		
 		MutableCapabilities capa = new ChromeCapabilitiesFactory(config).createCapabilities();
 		
-		Assert.assertEquals(((Map<?,?>)(((ChromeOptions)capa).asMap().get(ChromeOptions.CAPABILITY))).get("args").toString(), "[--disable-translate, --no-sandbox, --headless, --window-size=1280,1024, --disable-gpu]");
+		Assert.assertEquals(((Map<?,?>)(((ChromeOptions)capa).asMap().get(ChromeOptions.CAPABILITY))).get("args").toString(), "[--disable-translate, --disable-web-security, --no-sandbox, --headless, --window-size=1280,1024, --disable-gpu]");
 	}
 	
 	/**
@@ -265,7 +265,7 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 		Assert.assertNull(capa.getCapability(CapabilityType.SUPPORTS_JAVASCRIPT));
 		Assert.assertNull(capa.getCapability(CapabilityType.TAKES_SCREENSHOT));
 		Assert.assertNull(capa.getCapability(CapabilityType.ACCEPT_SSL_CERTS));
-		Assert.assertEquals(((Map<?,?>)capa.getCapability(ChromeOptions.CAPABILITY)).get("args").toString(), "[--disable-translate]");
+		Assert.assertEquals(((Map<?,?>)capa.getCapability(ChromeOptions.CAPABILITY)).get("args").toString(), "[--disable-translate, --disable-web-security]");
 	}
 	
 	@Test(groups={"ut"})
@@ -274,6 +274,6 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 		
 		MutableCapabilities capa = new ChromeCapabilitiesFactory(config).createCapabilities();
 		
-		Assert.assertEquals(((Map<?,?>)(((ChromeOptions)capa).asMap().get(ChromeOptions.CAPABILITY))).get("args").toString(), "[--user-agent=CHROME 55, --disable-translate, --no-sandbox]");
+		Assert.assertEquals(((Map<?,?>)(((ChromeOptions)capa).asMap().get(ChromeOptions.CAPABILITY))).get("args").toString(), "[--user-agent=CHROME 55, --disable-translate, --disable-web-security, --no-sandbox]");
 	}
 }
