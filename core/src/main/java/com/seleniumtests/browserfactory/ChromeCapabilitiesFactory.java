@@ -47,6 +47,7 @@ public class ChromeCapabilitiesFactory extends IDesktopCapabilityFactory {
             options.addArguments("--user-agent=" + webDriverConfig.getUserAgentOverride());
         }
         options.addArguments("--disable-translate");
+        options.addArguments("--disable-web-security");
         options.setPageLoadStrategy(webDriverConfig.getPageLoadStrategy());
 
         capabilities.setCapability(ChromeOptions.CAPABILITY, options);
@@ -84,6 +85,7 @@ public class ChromeCapabilitiesFactory extends IDesktopCapabilityFactory {
             options.addArguments("--user-agent=" + webDriverConfig.getUserAgentOverride());
         }
         options.addArguments("--disable-translate");
+        options.addArguments("--disable-web-security");
         options.addArguments("--no-sandbox");
         
         if (webDriverConfig.isHeadlessBrowser()) {
