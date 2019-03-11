@@ -19,10 +19,11 @@ package com.seleniumtests.browserfactory;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
+import java.util.Map.Entry;
 
 import org.apache.commons.io.FileUtils;
 import org.openqa.selenium.MutableCapabilities;
-import org.openqa.selenium.PageLoadStrategy;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxDriverLogLevel;
 import org.openqa.selenium.firefox.FirefoxOptions;
@@ -66,6 +67,19 @@ public class FirefoxCapabilitiesFactory extends IDesktopCapabilityFactory {
         
         if (webDriverConfig.getDebug().contains(DebugMode.DRIVER)) {
         	options.setLogLevel(FirefoxDriverLogLevel.TRACE);
+        }
+        
+
+        // extensions
+        List<BrowserExtension> extensions = BrowserExtension.getExtensions(webDriverConfig.getTestContext().getConfiguration());
+        if (!extensions.isEmpty()) {
+        	for (BrowserExtension ext: extensions) {
+        		profile.addExtension(ext.getExtensionPath());
+        		for (Entry<String, String> entry: ext.getOptions().entrySet()) {
+        			profile.setPreference(entry.getKey(), entry.getValue());
+        		}
+        	}
+        	
         }
         
         // handle https://bugzilla.mozilla.org/show_bug.cgi?id=1429338#c4 and https://github.com/mozilla/geckodriver/issues/789
