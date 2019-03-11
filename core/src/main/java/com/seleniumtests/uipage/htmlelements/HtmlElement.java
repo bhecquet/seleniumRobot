@@ -318,7 +318,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     public List<WebElement> findElements(By by) {
     	
     	// find the root element
-    	findElement();
+    	findElement(false, false);
     	List<WebElement> elements = element.findElements(by);
     	
     	// throw exception so that behavior is the same as with 'findElements()' call which retries search
@@ -338,7 +338,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     public List<WebElement> findHtmlElements(By by) {
     	
     	// find the root element
-    	findElement();
+    	findElement(false, false);
     	List<WebElement> htmlElements = new ArrayList<>();
     	List<WebElement> elements = element.findElements(by);
     	
@@ -466,7 +466,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     	// if a parent is defined, search for it before getting the sub element
     	driver = updateDriver();
         if (parent != null) {
-        	parent.findElement();
+        	parent.findElement(false, false);
         	
         	// issue #166: add a dot in front of xpath expression if we search the element inside a parent
         	if (by instanceof ByXPath) {
@@ -644,7 +644,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     public List<WebElement> findElements() {
 		
 		// call findElement to enter any specified frame and search for parent elements
-		findElement();
+		findElement(false, false);
 
         // issue #167: if we have a parent, search elements inside it
         if (parent != null) {
@@ -663,7 +663,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
      */
 	@ReplayOnError
     public String getAttribute(final String name) {
-        findElement();
+        findElement(false, false);
 
         return element.getAttribute(name);
     }
@@ -687,7 +687,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     @Override
     @ReplayOnError
     public String getCssValue(final String propertyName) {
-        findElement();
+        findElement(false, false);
 
         return element.getCssValue(propertyName);
     }
@@ -727,7 +727,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
      */
     @ReplayOnError
     public String getEval(final String script) {
-        findElement();
+        findElement(false, false);
         
         return (String) ((JavascriptExecutor) driver).executeScript(script, element);
     }
@@ -739,7 +739,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
      */
     @ReplayOnError
     public int getHeight() {
-        findElement();
+        findElement(false, false);
 
         return element.getSize().getHeight();
     }
@@ -761,7 +761,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     @Override
     @ReplayOnError
     public Point getLocation() {
-        findElement();
+        findElement(false, false);
 
         return element.getLocation();
     }
@@ -770,7 +770,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 	@Override
 	@ReplayOnError
 	public Rectangle getRect() {
-		findElement();
+		findElement(false, false);
 		return new Rectangle(element.getLocation(), element.getSize());
 	}
 
@@ -782,7 +782,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     @Override
     @ReplayOnError
     public Dimension getSize() {
-        findElement();
+        findElement(false, false);
 
         return element.getSize();
     }
@@ -795,7 +795,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     @Override
     @ReplayOnError
     public String getTagName() {
-        findElement();
+        findElement(false, false);
 
         return element.getTagName();
     }
@@ -808,7 +808,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     @Override
     @ReplayOnError
     public String getText() {
-        findElement();
+        findElement(false, false);
 
         return element.getText();
     }
@@ -820,7 +820,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
      */
     @ReplayOnError
     public String getValue() {
-        findElement();
+        findElement(false, false);
 
         return element.getAttribute("value");
     }
@@ -832,7 +832,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
      */
     @ReplayOnError
     public int getWidth() {
-        findElement();
+        findElement(false, false);
 
         return element.getSize().getWidth();
     }
@@ -883,7 +883,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     @Override
     @ReplayOnError
     public boolean isEnabled() {
-        findElement();
+        findElement(false, false);
 
         return element.isEnabled();
     }
@@ -896,7 +896,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     @Override
     @ReplayOnError
     public boolean isSelected() {
-        findElement();
+        findElement(false, false);
 
         return element.isSelected();
     }
@@ -1024,7 +1024,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 	 */
     @ReplayOnError
 	public String findPattern(Pattern pattern, String attributeName) {
-		findElement();
+		findElement(false, false);
 		String attributeValue;
 		if ("text".equals(attributeName)) {
 			attributeValue = element.getText();
@@ -1275,7 +1275,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 	@Override
 	@ReplayOnError
 	public Coordinates getCoordinates() {
-		findElement();
+		findElement(false, false);
 		return ((Locatable)element).getCoordinates();
 	}
 	
