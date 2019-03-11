@@ -37,6 +37,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.NoAlertPresentException;
+import org.openqa.selenium.NoSuchWindowException;
 import org.openqa.selenium.PageLoadStrategy;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.TimeoutException;
@@ -373,7 +374,7 @@ public class PageObject extends BasePage implements IPage {
             if (isMultipleWindow) {
             	try { 
             		selectWindow(handles.get(handles.indexOf(windowHandle) - 1));
-            	} catch (IndexOutOfBoundsException e) {
+            	} catch (IndexOutOfBoundsException | NoSuchWindowException e) {
             		selectMainWindow();
             	}
             } else {
