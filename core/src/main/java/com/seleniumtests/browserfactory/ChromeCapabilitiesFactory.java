@@ -17,13 +17,21 @@
  */
 package com.seleniumtests.browserfactory;
 
+import java.io.File;
+import java.io.IOException;
 import java.nio.file.Paths;
+import java.util.List;
+import java.util.stream.Collectors;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.chrome.ChromeDriverService;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
+import com.mashape.unirest.http.Unirest;
+import com.mashape.unirest.http.exceptions.UnirestException;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.DriverConfig;
 import com.seleniumtests.driver.DriverMode;
@@ -98,6 +106,15 @@ public class ChromeCapabilitiesFactory extends IDesktopCapabilityFactory {
         if (webDriverConfig.getMode() == DriverMode.LOCAL) {
         	setLogging();
         }
+        
+        // extensions
+        List<BrowserExtension> extensions = BrowserExtension.getExtensions(webDriverConfig.getTestContext().getConfiguration());
+        if (!extensions.isEmpty()) {
+        	options.addExtensions(extensions.stream()
+        		.map(BrowserExtension::getExtensionPath)
+        		.collect(Collectors.toList()));
+        }
+        
         
         options.setPageLoadStrategy(webDriverConfig.getPageLoadStrategy());
         

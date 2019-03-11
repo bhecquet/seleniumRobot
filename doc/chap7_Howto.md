@@ -347,7 +347,16 @@ To enable End User Experience, you have to add `-Dnl.selenium.proxy.mode=EndUser
 
 Test MUST be started from Neoload itself, either through a java test script action or a command line action. Launching options are the same as for any other test launching. See chap4_Run_tests for details. .
 	  
-	  
+### 17 Add extension to the browser ###
+
+It's possible to add extension to browser provided you have downloaded it and it's located locally, or remotely through http/s server.
+Example: `-Dextension0.path=http://localhost:8000/myExt.crx -Dextension0.options="key=value"`
+
+Options are only supported for Firefox.
+
+To download extension file, you can:
+- on chrome, use the "Get CRX" extension
+- on firefox, go to addons.mozilla.org, search your extension and right click on "add to firefox" button. It will give you the extension path
 	  
 	  
 	  
