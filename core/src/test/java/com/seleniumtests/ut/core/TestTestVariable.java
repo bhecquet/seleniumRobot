@@ -17,6 +17,8 @@
  */
 package com.seleniumtests.ut.core;
 
+import java.time.LocalDateTime;
+
 import org.json.JSONObject;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -34,6 +36,9 @@ public class TestTestVariable extends GenericTest {
 		Assert.assertFalse(var.isReservable());
 	}
 	
+	/**
+	 * Test variable without date
+	 */
 	@Test(groups={"ut"})
 	public void testFromJSon() {
 		JSONObject jsonObject = new JSONObject();
@@ -51,6 +56,31 @@ public class TestTestVariable extends GenericTest {
 		Assert.assertEquals(var.getValue(), "value");
 		Assert.assertEquals(var.isReservable(), false);
 		Assert.assertEquals(var.getInternalName(), "key");
+		Assert.assertNull(var.getCreationDate());
+	}
+	
+	/**
+	 * Test variable with date
+	 */
+	@Test(groups={"ut"})
+	public void testFromJSonWithDate() {
+		JSONObject jsonObject = new JSONObject();
+		jsonObject.put("id", 1);
+		jsonObject.put("name", "key");
+		jsonObject.put("value", "value");
+		jsonObject.put("reservable", false);
+		jsonObject.put("environment", 1);
+		jsonObject.put("application", 2);
+		jsonObject.put("version", 3);
+		jsonObject.put("creationDate", "2018-07-12T08:42:56.156727Z");
+		
+		TestVariable var = TestVariable.fromJsonObject(jsonObject);
+		Assert.assertEquals(var.getId(), (Integer)1);
+		Assert.assertEquals(var.getName(), "key");
+		Assert.assertEquals(var.getValue(), "value");
+		Assert.assertEquals(var.isReservable(), false);
+		Assert.assertEquals(var.getInternalName(), "key");
+		Assert.assertEquals(var.getCreationDate(), LocalDateTime.of(2018, 7, 12, 8, 42, 56, 156727000));
 	}
 	
 	@Test(groups={"ut"})
@@ -70,5 +100,6 @@ public class TestTestVariable extends GenericTest {
 		Assert.assertEquals(var.getValue(), "value");
 		Assert.assertEquals(var.isReservable(), false);
 		Assert.assertEquals(var.getInternalName(), "custom.test.variable.key");
+		Assert.assertNull(var.getCreationDate());
 	}
 }
