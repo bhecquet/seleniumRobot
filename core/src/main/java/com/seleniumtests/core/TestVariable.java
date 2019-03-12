@@ -17,6 +17,9 @@
  */
 package com.seleniumtests.core;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
 import org.json.JSONObject;
 
 public class TestVariable {
@@ -29,6 +32,7 @@ public class TestVariable {
 	private String internalName;	// name of the variable as stored in variable server. For variables added by test, a prefix is prepended for storage
 									// this prefix is not visible to user.
 	private String value;
+	private LocalDateTime creationDate;
 	private boolean reservable;
 	private int timeToLive;
 	
@@ -41,16 +45,17 @@ public class TestVariable {
 	 * @param reservable
 	 */
 	public TestVariable(Integer id, String name, String value, boolean reservable, String internalName) {
-		this(id, name, value, reservable, internalName, TIME_TO_LIVE_INFINITE);
+		this(id, name, value, reservable, internalName, TIME_TO_LIVE_INFINITE, null);
 	}
 	
-	public TestVariable(Integer id, String name, String value, boolean reservable, String internalName, int timeToLive) {
+	public TestVariable(Integer id, String name, String value, boolean reservable, String internalName, int timeToLive, LocalDateTime creationDate) {
 		this.id = id;
 		this.name = name;
 		this.internalName = internalName;
 		this.value = value;
 		this.reservable = reservable;
 		this.timeToLive = timeToLive;
+		this.creationDate = creationDate;
 	}
 	
 	/**
@@ -59,17 +64,25 @@ public class TestVariable {
 	 * @param value
 	 */
 	public TestVariable(String name, String value) {
-		this(null, name, value, false, name, TIME_TO_LIVE_INFINITE);
+		this(null, name, value, false, name, TIME_TO_LIVE_INFINITE, null);
 	}
 	
 	public static TestVariable fromJsonObject(JSONObject variableJson) {
 		String name = variableJson.getString("name").replace(TEST_VARIABLE_PREFIX, "");
+		LocalDateTime creationDate;
+		try {
+			creationDate = LocalDateTime.parse(variableJson.getString("creationDate"), DateTimeFormatter.ISO_DATE_TIME);
+		} catch (Exception e) {
+			creationDate = null;
+		}
+		
 		return new TestVariable(variableJson.getInt("id"), 
 							name, 
 							variableJson.getString("value"),
 							variableJson.optBoolean("reservable", false),
 							variableJson.getString("name"),
-							variableJson.optInt("timeToLive", TIME_TO_LIVE_INFINITE));
+							variableJson.optInt("timeToLive", TIME_TO_LIVE_INFINITE),
+							creationDate);
 	}
 	
 	public void setValue(String newValue) {
@@ -98,6 +111,10 @@ public class TestVariable {
 
 	public String getInternalName() {
 		return internalName;
+	}
+
+	public LocalDateTime getCreationDate() {
+		return creationDate;
 	}
 
 	public void setName(String name) {
