@@ -143,17 +143,17 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 	}
 	
 	/**
-	 * Left clic on desktop at x,y
+	 * Left click on desktop at x,y
 	 * @param x		x coordinate
 	 * @param y		y coordinate
 	 */
 	@Override
 	public void leftClic(int x, int y) {
 		if (nodeUrl == null) {
-			throw new ScenarioException("You cannot clic left before driver has been created and corresponding node instanciated");
+			throw new ScenarioException("You cannot click left before driver has been created and corresponding node instanciated");
 		}
 		
-		logger.info(String.format("clic left: %d,%d", x, y));
+		logger.info(String.format("click left: %d,%d", x, y));
 		try {
 			Unirest.post(String.format("%s%s", nodeUrl, NODE_TASK_SERVLET))
 				.queryString("action", "leftClic")
@@ -161,19 +161,42 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 				.queryString("y", y)
 				.asString();
 		} catch (UnirestException e) {
-			logger.warn(String.format("Could not clic left: %s", e.getMessage()));
+			logger.warn(String.format("Could not click left: %s", e.getMessage()));
 		}
 	}
 	
 	/**
-	 * right clic on desktop at x,y
+	 * Double click on desktop at x,y
+	 * @param x		x coordinate
+	 * @param y		y coordinate
+	 */
+	@Override
+	public void doubleClick(int x, int y) {
+		if (nodeUrl == null) {
+			throw new ScenarioException("You cannot double click before driver has been created and corresponding node instanciated");
+		}
+		
+		logger.info(String.format("double click: %d,%d", x, y));
+		try {
+			Unirest.post(String.format("%s%s", nodeUrl, NODE_TASK_SERVLET))
+			.queryString("action", "doubleClick")
+			.queryString("x", x)
+			.queryString("y", y)
+			.asString();
+		} catch (UnirestException e) {
+			logger.warn(String.format("Could not double click: %s", e.getMessage()));
+		}
+	}
+	
+	/**
+	 * right click on desktop at x,y
 	 * @param x		x coordinate
 	 * @param y		y coordinate
 	 */
 	@Override
 	public void rightClic(int x, int y) {
 		if (nodeUrl == null) {
-			throw new ScenarioException("You cannot clic right before driver has been created and corresponding node instanciated");
+			throw new ScenarioException("You cannot click right before driver has been created and corresponding node instanciated");
 		}
 		
 		logger.info(String.format("clic right: %d,%d", x, y));
@@ -184,7 +207,7 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 				.queryString("y", y)
 				.asString();
 		} catch (UnirestException e) {
-			logger.warn(String.format("Could not clic right: %s", e.getMessage()));
+			logger.warn(String.format("Could not click right: %s", e.getMessage()));
 		}
 	}
 	
