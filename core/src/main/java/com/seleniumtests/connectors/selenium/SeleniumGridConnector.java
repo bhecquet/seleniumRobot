@@ -98,6 +98,15 @@ public class SeleniumGridConnector {
 	}
 	
 	/**
+	 * double clic on desktop at x,y
+	 * @param x		x coordinate
+	 * @param y		y coordinate
+	 */
+	public void doubleClick(int x, int y) {
+		logger.warn("left clic is only available with seleniumRobot grid");
+	}
+	
+	/**
 	 * right clic on desktop at x,y
 	 * @param x		x coordinate
 	 * @param y		y coordinate

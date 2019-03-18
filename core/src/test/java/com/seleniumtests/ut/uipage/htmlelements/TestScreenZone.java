@@ -74,6 +74,21 @@ public class TestScreenZone extends MockitoTest {
 		picElement.click();
 		verify(picElement).moveAndLeftClick(35, 60);
 	}
+	
+	@Test(groups={"ut"})
+	public void testDoubleClick() {
+		ScreenZone picElement = spy(screenZone);
+		picElement.setObjectPictureFile(new File(""));
+		
+		PowerMockito.mockStatic(CustomEventFiringWebDriver.class);
+		doReturn(screenshotUtil).when(picElement).getScreenshotUtil();
+		when(screenshotUtil.capture(Target.SCREEN, File.class, true)).thenReturn(new File(""));
+		when(imageDetector.getDetectedRectangle()).thenReturn(new Rectangle(10, 10, 100, 50));
+		when(imageDetector.getSizeRatio()).thenReturn(1.0);
+		
+		picElement.doubleClickAt(0, 0);
+		verify(picElement).moveAndDoubleClick(35, 60);
+	}
 
 	@Test(groups={"ut"})
 	public void testRightClick() {

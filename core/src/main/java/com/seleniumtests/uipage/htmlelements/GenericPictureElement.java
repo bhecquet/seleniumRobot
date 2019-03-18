@@ -148,6 +148,14 @@ public abstract class GenericPictureElement extends Element {
 	 * the source offset so that it's compatible with any screen size and resolution
 	 */
 	public abstract void clickAt(int xOffset, int yOffset);
+	
+	/**
+	 * Double Click at the coordinates xOffset, yOffset of the center of the found picture. Use negative offset to click on the left or
+	 * top of the picture center
+	 * In case the size ratio between searched picture and found picture is not 1, then, offset is
+	 * the source offset so that it's compatible with any screen size and resolution
+	 */
+	public abstract void doubleClickAt(int xOffset, int yOffset);
 
 	public abstract void swipe(int xMove, int yMove);
 	
@@ -160,6 +168,13 @@ public abstract class GenericPictureElement extends Element {
 	 */
 	public void click() {
 		clickAt(0, 0);
+	}
+	
+	/**
+	 * Double click in the center of the found picture
+	 */
+	public void doubleClick() {
+		doubleClickAt(0, 0);
 	}
 	
 	public void sendKeys(final CharSequence text) {

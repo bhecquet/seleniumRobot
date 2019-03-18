@@ -134,6 +134,17 @@ public class PictureElement extends GenericPictureElement {
 	}
 	
 	@ReplayOnError(replayDelayMs=1000)
+	public void doubleClickAt(int xOffset, int yOffset) {
+		findElement();
+		
+		Point intoElementPos = intoElement.getCoordinates().onPage();
+		int relativeX = detectedObjectRectangle.x + detectedObjectRectangle.width / 2 - intoElementPos.x;
+		int relativeY = detectedObjectRectangle.y + detectedObjectRectangle.height / 2 - intoElementPos.y;
+		
+		moveAndClick(intoElement, relativeX + (int)(xOffset * pictureSizeRatio), relativeY + (int)(yOffset * pictureSizeRatio));
+	}
+	
+	@ReplayOnError(replayDelayMs=1000)
     public void swipe(int xMove, int yMove) {
 		findElement();
 
@@ -157,8 +168,18 @@ public class PictureElement extends GenericPictureElement {
 	}
 	
 	public void moveAndClick(WebElement element, int coordX, int coordY) {
+		move(element, coordX, coordY).click().build().perform();
+	}
+	
+	/**
+	 * Move to the center of the picture
+	 * @param element	The element to move to
+	 * @param coordX	x offset from the center of the element
+	 * @param coordY	y offset from the center of the element
+	 * @return
+	 */
+	private Actions move(WebElement element, int coordX, int coordY) {
 
-		
 		if (SeleniumTestsContextManager.isWebTest()) {
 			// issue #133: handle new actions specific case
 			// more browsers will be added to this conditions once they are migrated to new composite actions
@@ -174,7 +195,11 @@ public class PictureElement extends GenericPictureElement {
 			}
 		}
 		
-		new Actions(WebUIDriver.getWebDriver()).moveToElement(element, coordX, coordY).click().build().perform();
+		return new Actions(WebUIDriver.getWebDriver()).moveToElement(element, coordX, coordY);
+	}
+	
+	public void moveAndDoubleClick(WebElement element, int coordX, int coordY) {
+		move(element, coordX, coordY).doubleClick().build().perform();
 	}
 	
 	public void sendKeys(final CharSequence text, int xOffset, int yOffset) {

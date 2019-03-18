@@ -97,6 +97,16 @@ public class ScreenZone extends GenericPictureElement {
 	}
 	
 	@ReplayOnError
+	public void doubleClickAt(int xOffset, int yOffset) {
+		findElement();
+		
+		int relativeX = detectedObjectRectangle.x + detectedObjectRectangle.width / 2;
+		int relativeY = detectedObjectRectangle.y + detectedObjectRectangle.height / 2;
+		
+		moveAndDoubleClick(relativeX + (int)(xOffset * pictureSizeRatio), relativeY + (int)(yOffset * pictureSizeRatio));
+	}
+	
+	@ReplayOnError
 	public void rightClickAt(int xOffset, int yOffset) {
 		findElement();
 		
@@ -118,7 +128,12 @@ public class ScreenZone extends GenericPictureElement {
 		CustomEventFiringWebDriver.leftClicOnDesktopAt(coordX, coordY, 
 				SeleniumTestsContextManager.getThreadContext().getRunMode(), 
 				SeleniumTestsContextManager.getThreadContext().getSeleniumGridConnector());
-		
+	}
+	
+	public void moveAndDoubleClick(int coordX, int coordY) {
+		CustomEventFiringWebDriver.doubleClickOnDesktopAt(coordX, coordY, 
+				SeleniumTestsContextManager.getThreadContext().getRunMode(), 
+				SeleniumTestsContextManager.getThreadContext().getSeleniumGridConnector());
 	}
 	
 	public void moveAndRightClick(int coordX, int coordY) {
