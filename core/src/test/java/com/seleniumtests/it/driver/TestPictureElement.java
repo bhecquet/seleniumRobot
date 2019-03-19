@@ -63,6 +63,17 @@ public class TestPictureElement extends GenericMultiBrowserTest {
 		Assert.assertEquals(DriverTestPageWithoutFixedPattern.logoText.getValue(), "ff logo");
 	}
 	
+	@Test(groups={"it"})
+	public void testDoubleClickOnPicture() {
+		try {
+			DriverTestPageWithoutFixedPattern.picture.doubleClickAt(0, -20);
+		} catch (ImageSearchException e) {
+			throw new SkipException("Image not found, we may be on screenless slave", e);
+		}
+		WaitHelper.waitForMilliSeconds(500); // in case of browser slowness
+		Assert.assertEquals(DriverTestPageWithoutFixedPattern.logoText.getValue(), "double click ff logo");
+	}
+	
 	/**
 	 * test correction of issue #131 by clicking on element which does not have a "intoElement" parameter
 	 */

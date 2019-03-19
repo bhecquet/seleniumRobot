@@ -22,6 +22,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -389,10 +390,10 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	public void testDoubleClickOnDesktop() {
 		CustomEventFiringWebDriver.doubleClickOnDesktopAt(0, 0, DriverMode.LOCAL, gridConnector);
 		
-		verify(robot).mousePress(eq(InputEvent.BUTTON1_DOWN_MASK));
-		verify(robot).mouseRelease(eq(InputEvent.BUTTON1_DOWN_MASK));
+		verify(robot, times(2)).mousePress(eq(InputEvent.BUTTON1_DOWN_MASK));
+		verify(robot, times(2)).mouseRelease(eq(InputEvent.BUTTON1_DOWN_MASK));
 		verify(robot).mouseMove(eq(0), eq(0));
-		verify(gridConnector, never()).leftClic(eq(0), eq(0));
+		verify(gridConnector, never()).doubleClick(eq(0), eq(0));
 	}
 	
 	/**

@@ -36,6 +36,7 @@ import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.Assert;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.Test;
 
 import com.seleniumtests.browserfactory.FirefoxDriverFactory;
@@ -44,6 +45,7 @@ import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import com.seleniumtests.it.driver.support.GenericMultiBrowserTest;
 import com.seleniumtests.it.driver.support.pages.DriverTestPage;
+import com.seleniumtests.it.driver.support.pages.DriverTestPageWithoutFixedPattern;
 import com.seleniumtests.uipage.htmlelements.HtmlElement;
 import com.seleniumtests.util.helper.WaitHelper;
 
@@ -59,6 +61,16 @@ public class TestDriver extends GenericMultiBrowserTest {
 	
 	public TestDriver() throws Exception {
 		super(null, "DriverTestPage");
+	}
+	
+
+	@AfterMethod(groups={"it"}, alwaysRun=true)
+	public void reset() {
+		if (driver != null) {
+			DriverTestPage.logoText.clear();
+			DriverTestPage.textElement.clear();
+			((CustomEventFiringWebDriver)driver).scrollTop();
+		}
 	}
 	
 	

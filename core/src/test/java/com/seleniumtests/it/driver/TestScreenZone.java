@@ -69,7 +69,7 @@ public class TestScreenZone extends GenericMultiBrowserTest {
 	@Test(groups={"it"})
 	public void testClickAtCoordinates() {
 		try {
-			// search zone to clic
+			// search zone to click
 			DriverTestPageWithoutFixedPattern.googleForDesktop.findElement();
 			Rectangle rectangle = DriverTestPageWithoutFixedPattern.googleForDesktop.getDetectedObjectRectangle();
 			
@@ -79,6 +79,24 @@ public class TestScreenZone extends GenericMultiBrowserTest {
 			throw new SkipException("Image not found, we may be on screenless slave", e);
 		}
 		Assert.assertEquals(DriverTestPageWithoutFixedPattern.textElement.getValue(), "image");
+	}
+	
+	/**
+	 * Clic at given coordinate on screen without picture reference
+	 */
+	@Test(groups={"it"})
+	public void testDoubleClickAtCoordinates() {
+		try {
+			// search zone to click
+			DriverTestPageWithoutFixedPattern.googleForDesktop.findElement();
+			Rectangle rectangle = DriverTestPageWithoutFixedPattern.googleForDesktop.getDetectedObjectRectangle();
+			
+			// clic with a new ScreenZone
+			new ScreenZone("image").doubleClickAt(rectangle.x + 10, rectangle.y + 10);
+		} catch (ImageSearchException e) {
+			throw new SkipException("Image not found, we may be on screenless slave", e);
+		}
+		Assert.assertEquals(DriverTestPageWithoutFixedPattern.textElement.getValue(), "double click image");
 	}
 	
 	/**
