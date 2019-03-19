@@ -1,3 +1,9 @@
 <differences>
 
+	<difference>
+		<className>**/htmlelements/GenericPictureElement</className>
+		<differenceType>7013</differenceType>
+		<method>void doubleClickAt(int, int)</method>
+		<justification>internal use</justification>
+	</difference>
 </differences>
