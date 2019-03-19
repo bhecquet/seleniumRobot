@@ -621,11 +621,11 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
 				moveMouse(robot, x, y);
 				robot.mousePress(InputEvent.BUTTON1_DOWN_MASK);
 				robot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
-				WaitHelper.waitForMilliSeconds(10);
+				robot.delay(10);
 				robot.mousePress(InputEvent.BUTTON1_DOWN_MASK);
 				robot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
 			} catch (AWTException e) {
-				throw new ScenarioException("leftClickOnDesktopAt: problem using Robot: " + e.getMessage());
+				throw new ScenarioException("doubleClickOnDesktopAt: problem using Robot: " + e.getMessage());
 			}
 		} else if (driverMode == DriverMode.GRID && gridConnector != null) {
 			gridConnector.doubleClick(x, y);

@@ -38,7 +38,7 @@
 	<div style="display: inline-block;"><input id="text2" name="textField"/></div>
 	<input type="radio" id="radioClick" name="radioClick">
 	<input type="checkbox" id="checkboxClick" name="checkboxClick">
-	<input type="image" id="image" name="image" src="googleSearch.png" onclick="javascript:addText('text2', 'image');">
+	<input type="image" id="image" name="image" src="googleSearch.png" onclick="javascript:addText('text2', 'image');" ondblclick="javascript:addText('text2', 'double click image');">
 	
 	<h3>Test select</h3>
 	<select id="select" name="select" onChange="javascript:addText('textSelectedId', this.selectedIndex);javascript:addText('textSelectedValue', this.options[selectedIndex].value);javascript:addText('textSelectedText', this.options[selectedIndex].text);">
@@ -149,7 +149,7 @@
 	<table id="emptyTable"></table>
 	
 	<h3>Test PictureElement</h3>
-	<img src="ffLogo1.png" onclick="javascript:addText('logoText', 'ff logo');"/><br/>
+	<img src="ffLogo1.png" onclick="javascript:addText('logoText', 'ff logo');" ondblclick="javascript:addText('logoText', 'double click ff logo');"/><br/>
 	<input id="logoText" /><br/>
 	<img src="ffLogo2.png" />
 	
