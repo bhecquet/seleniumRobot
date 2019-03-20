@@ -36,6 +36,11 @@ public class TestPictureElementFirefox extends TestPictureElement {
 	}
 	
 	@Test(groups={"it"})
+	public void testDoubleClickOnPicture() {
+		super.testDoubleClickOnPicture();
+	}
+	
+	@Test(groups={"it"})
 	public void testClickOnGooglePicture() {	
 		super.testClickOnGooglePicture();
 	}

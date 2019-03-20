@@ -22,6 +22,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -337,7 +338,7 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	}
 	
 	/**
-	 * Test left clic in local mode
+	 * Test left click in local mode
 	 */
 	@Test(groups = {"ut"})
 	public void testLeftClickOnDesktop() {
@@ -350,7 +351,7 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	}
 	
 	/**
-	 * Test left clic in headless mode: an error should be raised because there is no session
+	 * Test left click in headless mode: an error should be raised because there is no session
 	 * @throws Exception 
 	 */
 	@Test(groups = {"ut"}, expectedExceptions=ScenarioException.class)
@@ -370,7 +371,7 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	}
 	
 	/**
-	 * Test left clic in grid mode
+	 * Test left click in grid mode
 	 */
 	@Test(groups = {"ut"})
 	public void testLeftClickOnDesktopWithGrid() {
@@ -380,6 +381,52 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 		verify(robot, never()).mouseRelease(eq(InputEvent.BUTTON1_DOWN_MASK));
 		verify(robot, never()).mouseMove(eq(0), eq(0));
 		verify(gridConnector).leftClic(eq(0), eq(0));
+	}
+	
+	/**
+	 * Test double click in local mode
+	 */
+	@Test(groups = {"ut"})
+	public void testDoubleClickOnDesktop() {
+		CustomEventFiringWebDriver.doubleClickOnDesktopAt(0, 0, DriverMode.LOCAL, gridConnector);
+		
+		verify(robot, times(2)).mousePress(eq(InputEvent.BUTTON1_DOWN_MASK));
+		verify(robot, times(2)).mouseRelease(eq(InputEvent.BUTTON1_DOWN_MASK));
+		verify(robot).mouseMove(eq(0), eq(0));
+		verify(gridConnector, never()).doubleClick(eq(0), eq(0));
+	}
+	
+	/**
+	 * Test double click in headless mode: an error should be raised because there is no session
+	 * @throws Exception 
+	 */
+	@Test(groups = {"ut"}, expectedExceptions=ScenarioException.class)
+	public void testDoubleClickOnDesktopWithoutDesktop() throws Exception {
+		PowerMockito.whenNew(Robot.class).withNoArguments().thenThrow(AWTException.class);
+		
+		CustomEventFiringWebDriver.doubleClickOnDesktopAt(0, 0, DriverMode.LOCAL, gridConnector);
+	}
+	
+	/**
+	 * Test double click with device providers: this is not supported, so exception should be raised
+	 * @throws Exception 
+	 */
+	@Test(groups = {"ut"}, expectedExceptions=ScenarioException.class)
+	public void testDoubleClickWithDeviceProviders() throws Exception {
+		CustomEventFiringWebDriver.doubleClickOnDesktopAt(0, 0, DriverMode.SAUCELABS, gridConnector);
+	}
+	
+	/**
+	 * Test double click in grid mode
+	 */
+	@Test(groups = {"ut"})
+	public void testDoubleClickOnDesktopWithGrid() {
+		CustomEventFiringWebDriver.doubleClickOnDesktopAt(0, 0, DriverMode.GRID, gridConnector);
+		
+		verify(robot, never()).mousePress(eq(InputEvent.BUTTON1_DOWN_MASK));
+		verify(robot, never()).mouseRelease(eq(InputEvent.BUTTON1_DOWN_MASK));
+		verify(robot, never()).mouseMove(eq(0), eq(0));
+		verify(gridConnector).doubleClick(eq(0), eq(0));
 	}
 	
 	/**
