@@ -604,7 +604,33 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
 		} else if (driverMode == DriverMode.GRID && gridConnector != null) {
 			gridConnector.leftClic(x, y);
 		} else {
-			throw new ScenarioException("driver supports sendKeysToDesktop only in local and grid mode");
+			throw new ScenarioException("driver supports leftClicOnDesktopAt only in local and grid mode");
+		}
+	}
+	
+	/**
+	 * Left clic at coordinates on desktop. Coordinates are from screen point of view
+	 * @param x
+	 * @param y
+	 */
+	public static void doubleClickOnDesktopAt(int x, int y, DriverMode driverMode, SeleniumGridConnector gridConnector) {
+		
+		if (driverMode == DriverMode.LOCAL) {
+			try {
+				Robot robot = new Robot();
+				moveMouse(robot, x, y);
+				robot.mousePress(InputEvent.BUTTON1_DOWN_MASK);
+				robot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
+				robot.delay(10);
+				robot.mousePress(InputEvent.BUTTON1_DOWN_MASK);
+				robot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
+			} catch (AWTException e) {
+				throw new ScenarioException("doubleClickOnDesktopAt: problem using Robot: " + e.getMessage());
+			}
+		} else if (driverMode == DriverMode.GRID && gridConnector != null) {
+			gridConnector.doubleClick(x, y);
+		} else {
+			throw new ScenarioException("driver supports doubleClickOnDesktopAt only in local and grid mode");
 		}
 	}
 	

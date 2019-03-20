@@ -33,6 +33,11 @@ public class TestPictureElementInternetExplorer extends TestPictureElement {
 	public void testClickOnPicture() {
 		super.testClickOnPicture();
 	}
+
+	@Test(groups={"it"})
+	public void testDoubleClickOnPicture() {
+		super.testDoubleClickOnPicture();
+	}
 	
 	@Test(groups={"it"})
 	public void testClickOnGooglePicture() {	
