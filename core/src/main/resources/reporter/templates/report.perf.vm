@@ -5,9 +5,13 @@
 		#set($stepDuration = $testStep.getDuration() / 1000.0)
 		<testcase classname="$className" name="Step $velocityCount: $testStep.getName()" time="$stepDuration">
 		#if ($testStep.getFailed() && $testStep.getActionException())
-			<error message="$testStep.getActionExceptionMessage()" type="">
-			<![CDATA[$testStep.getExceptionMessage("text")]]>
-			</error>
+			#if (${testStep.getActionException().class.name.equals("org.testng.SkipException")})
+				<skipped/>
+			#else
+				<error message="$testStep.getActionExceptionMessage()" type="">
+				<![CDATA[$testStep.getExceptionMessage("text")]]>
+				</error>
+			#end
 		#elseif($testStep.getFailed() && !$testStep.getActionException())
 			<error message="Step in error" type="">
 			<![CDATA[Error message not available]]>

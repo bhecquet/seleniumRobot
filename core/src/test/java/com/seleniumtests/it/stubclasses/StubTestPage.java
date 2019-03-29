@@ -19,6 +19,8 @@ package com.seleniumtests.it.stubclasses;
 
 import java.io.IOException;
 
+import org.testng.SkipException;
+
 import com.seleniumtests.reporter.logger.TestLogging;
 import com.seleniumtests.uipage.PageObject;
 
@@ -37,6 +39,10 @@ public class StubTestPage extends PageObject {
 	public StubTestPage doSomethingElse() {
 		TestLogging.log("Hello");
 		return this;
+	}
+	
+	public StubTestPage skipStep() {
+		throw new SkipException("skip this");
 	}
 
 }

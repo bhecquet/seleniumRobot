@@ -17,11 +17,14 @@
  */
 package com.seleniumtests.it.reporter;
 
+import static org.mockito.Mockito.spy;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
 
 import org.apache.commons.io.FileUtils;
+import org.json.JSONObject;
 import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.annotations.BeforeMethod;
@@ -29,6 +32,7 @@ import org.testng.annotations.Test;
 import org.testng.xml.XmlSuite.ParallelMode;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.reporter.reporters.CustomReporter;
 
 /**
  * Test that default reporting contains an XML file per test (CustomReporter.java) with default test reports defined in SeleniumTestsContext.DEFAULT_CUSTOM_TEST_REPORTS
@@ -169,5 +173,43 @@ public class TestPerformanceReporter extends ReporterTest {
 		// check CDATA error text is not encoded
 		Assert.assertTrue(detailedReportContent.contains("<![CDATA[class com.seleniumtests.customexception.DriverExceptions: & some exception \"with \" <strong><a href='http://someurl/link' style='background-color: red;'>HTML to encode</a></strong>"));
 		Assert.assertTrue(detailedReportContent.contains("class com.seleniumtests.customexception.DriverExceptions: Caused by root <error>"));
+	}
+	
+	/**
+	 * Check that if a test is skipped, a performance report is still generated
+	 * @param testContext
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testSkippedTestGeneration(ITestContext testContext) throws Exception {
+
+		executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClass2"});
+
+		// check that files are present and that they contain no step
+		String detailedReportContent = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "test2", "PERF-result.xml").toFile());
+		Assert.assertTrue(detailedReportContent.contains("<system-out><![CDATA[Test skipped]]></system-out>"));
+		Assert.assertFalse(detailedReportContent.contains("<testcase classname"));
+		
+		// check other file contains steps
+		String detailedReportContent2 = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "test1", "PERF-result.xml").toFile());
+		Assert.assertTrue(detailedReportContent2.contains("<testcase classname=\"com.seleniumtests.it.stubclasses.StubTestClass2\" name=\"Step 1: Pre test step: slow\""));
+		Assert.assertTrue(detailedReportContent2.contains("<testcase classname=\"com.seleniumtests.it.stubclasses.StubTestClass2\" name=\"Step 2: Pre test step: set\""));
+	}
+	
+	/**
+	 * Check that if a step is skipped, a performance report is still generated
+	 * @param testContext
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testSkippedStepInTest(ITestContext testContext) throws Exception {
+		
+		executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForTestSteps"});
+		
+		String detailedReportContent = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testSkippedStep", "PERF-result.xml").toFile());
+		detailedReportContent = detailedReportContent.replace("\n", "").replace("\r",  "").replaceAll(">\\s+<", "><");
+		
+		Assert.assertTrue(detailedReportContent.matches(".*<testcase classname=\"com.seleniumtests.it.stubclasses.StubTestClassForTestSteps\" name=\"Step 4: skipStep \" time=\"\\d+\\.\\d+\"><skipped/>.*"));
+		Assert.assertTrue(detailedReportContent.contains("failures=\"-1\""));
 	}
 }

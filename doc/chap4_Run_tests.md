@@ -330,7 +330,7 @@ Define test as follows (minimal needed options)
     </test>
 
 
-### 3 Test with SauceLabs ###
+### 4 Test with SauceLabs ###
 
 Define test as follows
 
@@ -352,7 +352,7 @@ Define test as follows
         </packages>
     </test>
     
-### 4 Test with BrowserStack ####
+### 5 Test with BrowserStack ####
 
 BrowserStack is seen as a selenium grid.
 You the MUST use options:
@@ -363,7 +363,7 @@ You the MUST use options:
 
 If you run behind a proxy, also use the JVM options: `-Dhttp.proxyHost=<host> -Dhttp.proxyPort=<port> -Dhttp.nonProxyHosts=<nonProxy> -Dhttps.proxyHost=<host> -Dhttps.proxyPort=<port>`
  
-### 5 Test with SeleniumGrid ###
+### 6 Test with SeleniumGrid ###
 
 SeleniumGrid allows to address multiple selenium nodes from one central point
 ![](/images/seleniumGrid.png) 
@@ -503,3 +503,71 @@ Finally, configure a shell / batch script to use the created variable "%BROWSER%
 
 Jenkins offers Selenium Capability Axis to create a matrix configured through Selenium Grid
 
+### 7 The test results ###
+
+SeleniumRobot generates several test results after run
+Results are written in the directory pointed by the option `-DoutputDirectory=<dir>` or by default in the `test-output` directory
+
+#### HTML result ####
+
+`SeleniumTestReport.html` file shows global result. It links to per-test file
+
+#### JUnit XML global result ####
+
+In `junitreports` for each Test class, an XML file TEST-xxx.xml is generated. It contains the list of tests and the error messages.
+This can be used to publish results in Jenkins for example.
+
+#### JUnit XML per test result ####
+
+In each test sub-directory, a file `PERF-result.xml` is generated. In this case, the testsuite is the test itself and the testcase is a test step.
+This can be used to build more detailed results from this data.
+This can also be used by Jenkins Performance Publisher plugin
+
+#### JSON global result ####
+
+Only shows number of tests, skipped, failed, ...
+
+#### Custom result ####
+
+You can also build your own test result based on your template
+
+##### Custom Test report #####
+
+Option `customTestReports` allows to build a custom per-test report. See usage above
+
+Reporter provides the following data to the template:
+- *errors*: number of errors (0)
+- *failures*: number of failures
+- *hostname*: computer which executes test
+- *suiteName*: name of the test
+- *className*: name of test class
+- *tests*: number of steps
+- *duration*: total duration of the test
+- *time*: start time (milliseconds since epoch)
+- *startDate*: start date
+- *testSteps*: list of test steps (TestStep object)
+- *browser*: used browser
+- *version*: version of test application
+- *parameters*: list of test parameters
+- *stacktrace*: stacktrace if available
+- *logs*: logs
+
+Allowed output formats are: 'xml', 'json', 'html', 'csv'
+
+##### Custom Summary report #####
+
+Option `customSummaryReports` allows to build a summary report. See usage above
+
+Reporter provides the following data to the template:
+
+- *pass*: number of passed tests
+- *fail*: number of failed tests
+- *skip*: number of skipped tests
+- *total*: total number of tests
+
+#### Default TestNG reports ####
+
+By default, TestNG produces its own reports
+they are located in the folder pointed by `-d` option, by default `test-ouput` where test is launched.
+
+If you do not want to generate these files, add `usedefaultlistener false` to your TestNG options
