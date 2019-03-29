@@ -73,6 +73,7 @@ public class CustomReporter extends CommonReporter implements IReporter {
 				Set<ITestResult> resultSet = new HashSet<>(); 
 				resultSet.addAll(suiteResult.getTestContext().getFailedTests().getAllResults());
 				resultSet.addAll(suiteResult.getTestContext().getPassedTests().getAllResults());
+				resultSet.addAll(suiteResult.getTestContext().getSkippedTests().getAllResults());
 				
 				
 				consolidatedResults.put("fail", consolidatedResults.get("fail") + context.getFailedTests().getAllResults().size());
@@ -142,6 +143,11 @@ public class CustomReporter extends CommonReporter implements IReporter {
 				}
 			}
 			
+			// issue #227: number of errors set to -1 to distinguish skipped tests
+			if (testResult.getStatus() == ITestResult.SKIP) {
+				errors = -1;
+			}
+			
 			List<String> stack = null;
 			if (testResult.getThrowable() != null) {
 				StringBuilder stackString = new StringBuilder();
@@ -165,7 +171,8 @@ public class CustomReporter extends CommonReporter implements IReporter {
 			context.put("version", SeleniumTestsContextManager.getApplicationVersion());	
 			context.put("parameters", SeleniumTestsContextManager.getThreadContext().getContextDataMap());
 			context.put("stacktrace", stack);
-			context.put("logs", 0);	
+			String logs = SeleniumRobotLogger.getTestLogs().get(getTestName(testResult));
+			context.put("logs", logs == null ? "Test skipped": logs);	
 			
 			StringWriter writer = new StringWriter();
 			t.merge( context, writer );

@@ -29,4 +29,11 @@ public class StubTestClassForTestSteps extends StubParentClass {
 			.doSomething()
 			.doSomethingElse();
 	}
+	
+	@Test(groups="stub")
+	public void testSkippedStep() throws IOException {
+		new StubTestPage()
+		.doSomething()
+		.skipStep();
+	}
 }
