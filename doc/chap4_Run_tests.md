@@ -537,7 +537,7 @@ Option `customTestReports` allows to build a custom per-test report. See usage a
 
 Reporter provides the following data to the template:
 - *errors*: number of errors (0)
-- *failures*: number of failures
+- *failures*: number of failures. It test is skipped, this number is -1
 - *hostname*: computer which executes test
 - *suiteName*: name of the test
 - *className*: name of test class
