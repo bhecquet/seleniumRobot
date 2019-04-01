@@ -40,6 +40,7 @@ import com.seleniumtests.driver.screenshots.VideoCaptureMode;
 import com.seleniumtests.it.driver.support.pages.DriverSubAngularTestPage;
 import com.seleniumtests.it.driver.support.pages.DriverTestAngularFrame;
 import com.seleniumtests.it.driver.support.pages.DriverTestPage;
+import com.seleniumtests.it.driver.support.pages.DriverTestPageNativeActions;
 import com.seleniumtests.it.driver.support.pages.DriverTestPageWithoutFixedPattern;
 import com.seleniumtests.it.driver.support.server.WebServer;
 import com.seleniumtests.reporter.logger.TestLogging;
@@ -53,6 +54,7 @@ public abstract class GenericMultiBrowserTest {
 	protected String localAddress;
 	protected WebDriver driver;
 	protected DriverTestPage testPage;
+	protected DriverTestPageNativeActions testPageNativeActions;
 	protected DriverTestPageWithoutFixedPattern testPageWithoutPattern;
 	protected DriverSubAngularTestPage angularPage;
 	protected DriverTestAngularFrame angularFramePage;
@@ -149,6 +151,9 @@ public abstract class GenericMultiBrowserTest {
 			break;
 		case "DriverTestPage":
 			testPage = new DriverTestPage(true, String.format("http://%s:%d/test.html", localAddress, server.getServerHost().getPort()));
+			break;
+		case "DriverTestPageNativeActions":
+			testPageNativeActions = new DriverTestPageNativeActions(true, String.format("http://%s:%d/test.html", localAddress, server.getServerHost().getPort()));
 			break;
 		case "DriverTestAngularFrame":
 			angularFramePage = new DriverTestAngularFrame(true, String.format("http://%s:%d/testAngularIFrame.html", localAddress, server.getServerHost().getPort()));

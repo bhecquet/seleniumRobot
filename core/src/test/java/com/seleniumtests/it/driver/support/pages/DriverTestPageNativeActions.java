@@ -41,6 +41,10 @@ public class DriverTestPageNativeActions extends PageObject {
     public DriverTestPageNativeActions(boolean openPageURL) throws Exception {
         super(textElement, openPageURL ? getPageUrl() : null);
     }
+
+    public DriverTestPageNativeActions(boolean openPageURL, String url) throws Exception {
+    	super(textElement, openPageURL ? url : null);
+    }
     
     public DriverTestPageNativeActions sendKeys() {
     	driver.findElement(By.id("text2")).sendKeys("some text");
@@ -68,6 +72,11 @@ public class DriverTestPageNativeActions extends PageObject {
     
     public void switchToFirstFrameByElement() {
     	WebElement el = driver.findElement(By.id("myIFrame"));
+    	driver.switchTo().frame(el);
+    }
+    
+    public void switchToSubFrame() {
+    	WebElement el = driver.findElement(By.name("mySecondIFrame"));
     	driver.switchTo().frame(el);
     }
     
