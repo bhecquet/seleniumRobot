@@ -144,7 +144,7 @@ public class ScreenshotUtil {
     		// capture desktop
     		capturedImages.add(new NamedBufferedImage(captureDesktop(), ""));
     	} else if (target == Target.PAGE && SeleniumTestsContextManager.isWebTest()) {
-    		// capture web avec scrolling
+    		// capture web with scrolling
     		removeAlert();
     		capturedImages.addAll(captureWebPages(allWindows));
 	    } else if (target == Target.PAGE && SeleniumTestsContextManager.isAppTest()){
@@ -290,6 +290,7 @@ public class ScreenshotUtil {
         }
 
         // capture all but the current window
+        String windowWithSeleniumfocus = currentWindowHandle;
         try {
 	        if (allWindows) {
 	        	for (String windowHandle: windowHandles) {
@@ -297,6 +298,7 @@ public class ScreenshotUtil {
 	        			continue;
 	        		}
 	        		driver.switchTo().window(windowHandle);
+	        		windowWithSeleniumfocus = windowHandle;
 	        		images.add(new NamedBufferedImage(captureWebPage(), ""));
 	        	}
 	        }
@@ -304,7 +306,10 @@ public class ScreenshotUtil {
 	    // be sure to go back to the window we left before capture 
         } finally {
         	try {
-        		driver.switchTo().window(currentWindowHandle);
+        		// issue #228: only switch to window if we went out of it
+        		if (windowWithSeleniumfocus != currentWindowHandle) {
+        			driver.switchTo().window(currentWindowHandle);
+        		}
         		
         		// capture current window
         		images.add(new NamedBufferedImage(captureWebPage(), "Current Window: "));
