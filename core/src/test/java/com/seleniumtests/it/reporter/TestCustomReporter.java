@@ -51,7 +51,7 @@ public class TestCustomReporter extends ReporterTest {
 			JSONObject json = new JSONObject(detailedReportContent);
 			
 			Assert.assertEquals(json.getInt("errors"), 0);
-			Assert.assertEquals(json.getInt("failures"), 1);
+			Assert.assertEquals(json.getInt("failures"), 0);
 			Assert.assertEquals(json.getString("hostname"), "");
 			Assert.assertEquals(json.getString("suiteName"), "testAndSubActions");
 			Assert.assertEquals(json.getString("className"), "com.seleniumtests.it.stubclasses.StubTestClass");
