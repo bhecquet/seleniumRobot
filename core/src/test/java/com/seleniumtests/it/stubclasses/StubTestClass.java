@@ -119,6 +119,18 @@ public class StubTestClass extends StubParentClass {
 		throw new DriverExceptions("some exception");
 	}
 	
+	
+	/**
+	 * Issue #229: test with a step in error but test OK
+	 */
+	@Test(groups="stub")
+	public void testOkWithOneStepFailed() {
+		TestStep step1 = new TestStep("step 1", TestLogging.getCurrentTestResult(), new ArrayList<>());
+		step1.addAction(new TestAction("first action failed", true, new ArrayList<>()));
+		step1.addAction(new TestAction("click button", false, new ArrayList<>()));
+		TestLogging.logTestStep(step1);
+	}
+	
 	/**
 	 * Test which fails only on first execution
 	 */

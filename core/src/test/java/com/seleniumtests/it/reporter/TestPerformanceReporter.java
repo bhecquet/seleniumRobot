@@ -82,6 +82,22 @@ public class TestPerformanceReporter extends ReporterTest {
 	}
 	
 	/**
+	 * Check all steps of test case are available
+	 * @param testContext
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testWithStepOkAndStepInError(ITestContext testContext) throws Exception {
+		
+		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testOkWithOneStepFailed"});
+		
+		// check content of summary report file
+		String jmeterReport = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testOkWithOneStepFailed", "PERF-result.xml").toFile());
+		
+		Assert.assertTrue(jmeterReport.contains("<testsuite errors=\"0\" failures=\"0\" hostname=\"\" name=\"testOkWithOneStepFailed\" tests=\"6\""));
+	}
+	
+	/**
 	 * Check that when a step contains an exception, this one is written in file
 	 * @param testContext
 	 * @throws Exception
