@@ -5,6 +5,7 @@
 #set ( $string_class = $obj.class.forName('java.lang.String') )
 #set ( $map_class = $obj.class.forName('java.util.Map') )
 #set ( $list_class = $obj.class.forName('java.util.List') )
+#set ( $json_logs =  $logs.replace($newline, "\n") )
 {
 	"errors": $errors,
 	"failures": $failures,
@@ -18,7 +19,7 @@
 	"browser": $browser,
 	"version": $version,
 	"parameters": #VelListToJSON($parameters),
-	"logs": $logs,
+	"logs": "$json_logs",
 	"stacktrace": #VelArrayToJSON($stacktrace)
 }
 
