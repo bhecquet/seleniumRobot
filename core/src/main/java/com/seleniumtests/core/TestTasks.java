@@ -167,7 +167,7 @@ public class TestTasks {
     public static String param(String key) {
     	TestVariable value = SeleniumTestsContextManager.getThreadContext().getConfiguration().get(key);
     	if (value == null) {
-    		TestLogging.error(String.format("Variable %s is not defined", key));
+    		TestLogging.warning(String.format("Variable %s is not defined", key));
     		return "";
     	}
     	return value.getValue();
