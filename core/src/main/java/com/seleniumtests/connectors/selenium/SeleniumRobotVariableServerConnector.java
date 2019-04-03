@@ -146,6 +146,7 @@ public class SeleniumRobotVariableServerConnector extends SeleniumRobotServerCon
 		
 		// this variable does not exist, create it
 		// OR this variable is an update of an existing, non custom variable
+		//     this copy would not contain the "test" reference 
 		if (variable.getId() == null || !variable.getInternalName().startsWith(TestVariable.TEST_VARIABLE_PREFIX)) {
 			try {
 				MultipartBody request = Unirest.post(url + VARIABLE_API_URL)
