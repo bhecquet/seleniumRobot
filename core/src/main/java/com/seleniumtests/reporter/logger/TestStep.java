@@ -76,7 +76,7 @@ public class TestStep extends TestAction {
 		long consolidatedDuration = duration;
 		consolidatedDuration -= getDurationToExclude();
 
-		return consolidatedDuration;
+		return Math.max(0, consolidatedDuration);
 	}
 	
 	@Override

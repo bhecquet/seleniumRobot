@@ -96,7 +96,15 @@ public class ReporterControler implements IReporter {
 				allResultSet.addAll(resultSet);
 				
 				for (ITestResult testResult: resultSet) {
-					TestLogging.getTestsSteps().put(testResult, getAllTestSteps(testResult));			
+					List<TestStep> testSteps = getAllTestSteps(testResult);
+					TestLogging.getTestsSteps().put(testResult, testSteps);	
+					
+					Long testDuration = 0L;
+					for (TestStep step: testSteps) {
+						testDuration += step.getDuration();
+					}
+					
+					testResult.setEndMillis(testResult.getStartMillis() + testDuration);
 				}
 			}
 		}
