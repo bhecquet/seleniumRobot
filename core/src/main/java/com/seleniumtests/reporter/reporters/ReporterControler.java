@@ -32,7 +32,6 @@ import org.testng.IReporter;
 import org.testng.ISuite;
 import org.testng.ISuiteResult;
 import org.testng.ITestResult;
-import org.testng.reporters.JUnitReportReporter;
 import org.testng.xml.XmlSuite;
 
 import com.seleniumtests.core.SeleniumTestsContext;
@@ -74,7 +73,7 @@ public class ReporterControler implements IReporter {
 		} catch (Exception e) {}
 		
 		try {
-			new JUnitReportReporter().generateReport(xmlSuites, suites, SeleniumTestsContextManager.getGlobalContext().getOutputDirectory());
+			new JUnitReporter().generateReport(xmlSuites, suites, SeleniumTestsContextManager.getGlobalContext().getOutputDirectory());
 		} catch (Exception e) {}
 	}
 	
