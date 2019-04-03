@@ -21,6 +21,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -46,6 +47,7 @@ import com.seleniumtests.reporter.logger.TestAction;
 import com.seleniumtests.reporter.logger.TestLogging;
 import com.seleniumtests.reporter.logger.TestStep;
 import com.seleniumtests.uipage.PageObject;
+import com.seleniumtests.uipage.htmlelements.GenericPictureElement;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
 import net.lightbody.bmp.BrowserMobProxy;
@@ -438,6 +440,29 @@ public class LogAction {
 			}
 		}
 		return reply;
+	}
+	
+	/**
+	 * exclude driver creation from the time of the current step
+	 * @param joinPoint
+	 * @return
+	 * @throws Throwable
+	 */
+	@Around("execution(public org.openqa.selenium.WebDriver com.seleniumtests.driver.WebUIDriver.createRemoteWebDriver (..))")
+	public Object measureDriverCreation(ProceedingJoinPoint joinPoint) throws Throwable {
+		TestStep cuurrentTestStep = TestLogging.getCurrentRootTestStep();
+		long start = new Date().getTime();
+		
+		try {
+			return joinPoint.proceed(joinPoint.getArgs());
+		} finally {
+
+			long duration = new Date().getTime() - start;
+			if (cuurrentTestStep != null) {
+				cuurrentTestStep.setDurationToExclude(duration);
+			}
+			TestLogging.info(String.format("driver creation took: %f secs", duration / 1000.0));
+		}
 	}
 	
 	/**

@@ -45,7 +45,7 @@ public class TestAction {
 	protected Boolean failed;
 	protected Throwable actionException;
 	protected String actionExceptionMessage;
-	protected long durationToExclude; 	// the duration to exclude from the action duration
+	protected long durationToExclude = 0L; 	// the duration to exclude from the action duration
 	protected List<String> pwdToReplace;
 	protected boolean encoded = false;		// true if we have encoded messages
 	
@@ -98,7 +98,7 @@ public class TestAction {
 	}
 
 	public void setDurationToExclude(long durationToExclude) {
-		this.durationToExclude = durationToExclude;
+		this.durationToExclude += durationToExclude;
 	}
 
 	public String getActionExceptionMessage() {
