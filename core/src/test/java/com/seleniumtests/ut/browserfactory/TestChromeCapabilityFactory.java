@@ -67,7 +67,7 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 	@BeforeMethod(groups= {"ut"})
 	public void init() {
 		browserInfos = new HashMap<>();
-		browserInfos.put(BrowserType.CHROME, Arrays.asList(new BrowserInfo(BrowserType.CHROME, "63.0", "", false)));
+		browserInfos.put(BrowserType.CHROME, Arrays.asList(new BrowserInfo(BrowserType.CHROME, "72.0", "", false)));
 		PowerMockito.mockStatic(OSUtility.class, Mockito.CALLS_REAL_METHODS);
 		PowerMockito.when(OSUtility.getInstalledBrowsersWithVersion()).thenReturn(browserInfos);
 		Mockito.when(config.getTestContext()).thenReturn(context);
@@ -205,8 +205,8 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 
 		// SeleniumTestsContext class adds a browserInfo when binary path is set
 		Map<BrowserType, List<BrowserInfo>> updatedBrowserInfos = new HashMap<>();
-		updatedBrowserInfos.put(BrowserType.CHROME, Arrays.asList(new BrowserInfo(BrowserType.CHROME, "63.0", "", false), 
-																	new BrowserInfo(BrowserType.CHROME, "64.0", "/opt/chrome/bin/chrome", false)));
+		updatedBrowserInfos.put(BrowserType.CHROME, Arrays.asList(new BrowserInfo(BrowserType.CHROME, "72.0", "", false), 
+																	new BrowserInfo(BrowserType.CHROME, "73.0", "/opt/chrome/bin/chrome", false)));
 
 		PowerMockito.when(OSUtility.getInstalledBrowsersWithVersion()).thenReturn(updatedBrowserInfos);
 		
