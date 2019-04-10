@@ -47,7 +47,7 @@
 			                					#set ($passedSteps = $passedSteps + 1)
 			                				#end
 			                				#set ($totalTestSteps = $totalTestSteps + 1)
-			                				#set ($stepsDuration = $stepsDuration + $testStep.getDuration() / 1000.0)
+			                				#set ($stepsDuration = $stepsDuration + $testStep.getDuration() / 1000)
 			                			#end
 			                			#set ($totalPassed = $totalPassed + $passedSteps)
 			                			#set ($totalFailed = $totalFailed + $failedSteps)
