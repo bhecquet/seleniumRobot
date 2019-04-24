@@ -17,6 +17,8 @@
  */
 package com.seleniumtests.browserfactory;
 
+import java.util.Map;
+
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.ie.InternetExplorerDriver;
 import org.openqa.selenium.ie.InternetExplorerDriverService;
@@ -36,6 +38,7 @@ public class IECapabilitiesFactory extends IDesktopCapabilityFactory {
 	protected MutableCapabilities getDriverOptions() {
 		InternetExplorerOptions options = new InternetExplorerOptions();
 		
+		
 		options.setCapability(InternetExplorerDriver.INTRODUCE_FLAKINESS_BY_IGNORING_SECURITY_DOMAINS,true);
         options.setCapability(InternetExplorerDriver.IE_ENSURE_CLEAN_SESSION, true);
         options.setCapability(InternetExplorerDriver.INITIAL_BROWSER_URL, "about:blank");
@@ -47,6 +50,11 @@ public class IECapabilitiesFactory extends IDesktopCapabilityFactory {
         	options.setCapability(InternetExplorerDriver.LOG_LEVEL, "TRACE");
         }
         
+        if (webDriverConfig.getAndResetAttachExistingDriver() != null) {
+	        options.setCapability("attachExistingBrowser", true);
+			((Map<String, Object>) options.getCapability("se:ieOptions")).put("attachExistingBrowser", true);
+        }
+		
         options.setPageLoadStrategy(webDriverConfig.getPageLoadStrategy());
 
         return options;

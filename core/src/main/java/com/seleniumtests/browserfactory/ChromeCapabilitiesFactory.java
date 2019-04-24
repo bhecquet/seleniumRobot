@@ -21,6 +21,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.FileUtils;
@@ -113,6 +114,10 @@ public class ChromeCapabilitiesFactory extends IDesktopCapabilityFactory {
         	options.addExtensions(extensions.stream()
         		.map(BrowserExtension::getExtensionPath)
         		.collect(Collectors.toList()));
+        }
+        
+        if (webDriverConfig.getAndResetAttachExistingDriver() != null) {
+        	options.setExperimentalOption("debuggerAddress", "127.0.0.1:" + webDriverConfig.getAndResetAttachExistingDriver());
         }
         
         
