@@ -103,8 +103,8 @@ public class ElementInfo {
 		locator = htmlElement.getBy().toString();
 	}
 	
-	public BufferedImage getScreenshot(WebDriver driver) {
-		return new ScreenshotUtil(driver).capturePage(0, 0);
+	public BufferedImage getScreenshot() {
+		return new ScreenshotUtil().capturePage(0, 0);
 	}
 	
 	/**
@@ -112,7 +112,7 @@ public class ElementInfo {
 	 * @param htmlElement
 	 * @param driver
 	 */
-	public void updateInfo(HtmlElement htmlElement, WebDriver driver) {
+	public void updateInfo(HtmlElement htmlElement) {
 		
 		if (htmlElement.getRealElement() == null) {
 			throw new CustomSeleniumTestsException(String.format("Updating element information [%s] is not possible if real element has not yet been searched", name));
@@ -138,7 +138,7 @@ public class ElementInfo {
     	if (SeleniumTestsContextManager.getThreadContext().getAdvancedElementSearch() == Mode.FULL) {
 			
 	    	try {
-		    	BufferedImage  fullImg = getScreenshot(driver);
+		    	BufferedImage  fullImg = getScreenshot();
 		    	
 		    	// Get the location of htmlElement on the page
 		    	Point point = newRectangle.getPoint();
@@ -146,7 +146,7 @@ public class ElementInfo {
 		    	// Get width and height of the element
 		    	int eleWidth = newRectangle.getWidth();
 		    	int eleHeight = newRectangle.getHeight();
-		    	Point scrollPosition = ((CustomEventFiringWebDriver)driver).getScrollPosition();
+		    	Point scrollPosition = ((CustomEventFiringWebDriver)htmlElement.getDriver()).getScrollPosition();
 		
 		    	// Crop the entire page screenshot to get only element screenshot. Keep 20 px around the picture
 		    	BufferedImage eleScreenshot = ImageProcessor.cropImage(fullImg, Math.max(0, point.getX() - scrollPosition.getX() - 20), 
@@ -168,7 +168,7 @@ public class ElementInfo {
     	if (SeleniumTestsContextManager.isWebTest()) {
 
     		newTagName = htmlElement.getRealElement().getTagName();
-        	newAttributes = (Map<String, Object>) ((JavascriptExecutor)driver).executeScript(JAVASCRIPT_GET_ATTRIBUTES, htmlElement.getRealElement());
+        	newAttributes = (Map<String, Object>) ((JavascriptExecutor)htmlElement.getDriver()).executeScript(JAVASCRIPT_GET_ATTRIBUTES, htmlElement.getRealElement());
     	}
     	
     	// record stability information (is the information stable over time or not)

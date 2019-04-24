@@ -68,8 +68,8 @@ public abstract class IMobileCapabilityFactory extends ICapabilitiesFactory {
         }
     	
     	// do not configure application and browser as they are mutualy exclusive
-        if (app == null || app.isEmpty() && webDriverConfig.getBrowser() != BrowserType.NONE) {
-        	capabilities.setCapability(CapabilityType.BROWSER_NAME, webDriverConfig.getBrowser().toString().toLowerCase());
+        if (app == null || app.isEmpty() && webDriverConfig.getBrowserType() != BrowserType.NONE) {
+        	capabilities.setCapability(CapabilityType.BROWSER_NAME, webDriverConfig.getBrowserType().toString().toLowerCase());
         	capabilities.merge(getBrowserSpecificCapabilities());
         } else {
         	capabilities.setCapability(CapabilityType.BROWSER_NAME, "");

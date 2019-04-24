@@ -48,7 +48,7 @@ public class BrowserStackCapabilitiesFactory extends ICapabilitiesFactory {
         	throw new ConfigurationException("Only Windows and Mac are supported desktop platforms ('Windows xxx' or 'OS X xxx'). See https://www.browserstack.com/automate/capabilities for details. 'platform' param is " + platform);
         }
         
-        capabilities.setCapability("browser", webDriverConfig.getBrowser());
+        capabilities.setCapability("browser", webDriverConfig.getBrowserType());
         if (webDriverConfig.getBrowserVersion() != null) {
         	capabilities.setCapability("browser_version", webDriverConfig.getBrowserVersion());
         }

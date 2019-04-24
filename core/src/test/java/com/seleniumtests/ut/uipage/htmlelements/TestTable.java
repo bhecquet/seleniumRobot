@@ -17,6 +17,7 @@
  */
 package com.seleniumtests.ut.uipage.htmlelements;
 
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -69,7 +70,7 @@ public class TestTable extends MockitoTest {
 	@BeforeMethod(groups={"ut"})
 	private void init() {
 		PowerMockito.mockStatic(WebUIDriver.class);
-		when(WebUIDriver.getWebDriver()).thenReturn(driver);
+		when(WebUIDriver.getWebDriver(anyBoolean())).thenReturn(driver);
 		when(driver.findElement(By.id("table"))).thenReturn(tableEl);
 		when(driver.switchTo()).thenReturn(locator);
 		

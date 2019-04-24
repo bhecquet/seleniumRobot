@@ -130,7 +130,7 @@ public class TestHtmlElement extends MockitoTest {
 		eventDriver = spy(new CustomEventFiringWebDriver(driver).register(new DriverExceptionListener()));
 		
 		PowerMockito.mockStatic(WebUIDriver.class);
-		when(WebUIDriver.getWebDriver()).thenReturn(eventDriver);
+		when(WebUIDriver.getWebDriver(anyBoolean())).thenReturn(eventDriver);
 		when(driver.findElement(By.id("el"))).thenReturn(element);
 		when(driver.findElements(By.name("subEl"))).thenReturn(subElList);
 		when(driver.findElement(By.name("subEl"))).thenReturn(subElement1);
@@ -431,7 +431,7 @@ public class TestHtmlElement extends MockitoTest {
 	public void testPinch() throws Exception {
 		SeleniumTestsContextManager.getThreadContext().setTestType(TestType.APPIUM_WEB_ANDROID);
 		SeleniumTestsContextManager.getThreadContext().setPlatform("android");
-		when(WebUIDriver.getWebDriver()).thenReturn(new CustomEventFiringWebDriver(mobileDriver));
+		when(WebUIDriver.getWebDriver(anyBoolean())).thenReturn(new CustomEventFiringWebDriver(mobileDriver));
 		doNothing().when(el).findElement(anyBoolean(), anyBoolean());
 		el.setElement(mobileElement);
 		el.pinch();
@@ -443,7 +443,7 @@ public class TestHtmlElement extends MockitoTest {
 		
 		SeleniumTestsContextManager.getThreadContext().setTestType(TestType.APPIUM_WEB_ANDROID);
 		SeleniumTestsContextManager.getThreadContext().setPlatform("android");
-		when(WebUIDriver.getWebDriver()).thenReturn(new CustomEventFiringWebDriver(mobileDriver));
+		when(WebUIDriver.getWebDriver(anyBoolean())).thenReturn(new CustomEventFiringWebDriver(mobileDriver));
 		doNothing().when(el).findElement(anyBoolean(), anyBoolean());
 		el.setElement(mobileElement);
 		el.getCenter();
@@ -454,7 +454,7 @@ public class TestHtmlElement extends MockitoTest {
 	public void testSwipe1() throws Exception {
 		SeleniumTestsContextManager.getThreadContext().setTestType(TestType.APPIUM_WEB_ANDROID);
 		SeleniumTestsContextManager.getThreadContext().setPlatform("android");
-		when(WebUIDriver.getWebDriver()).thenReturn(new CustomEventFiringWebDriver(mobileDriver));
+		when(WebUIDriver.getWebDriver(anyBoolean())).thenReturn(new CustomEventFiringWebDriver(mobileDriver));
 		doNothing().when(el).findElement(anyBoolean(), anyBoolean());
 		el.setElement(mobileElement);
 		el.swipe(0, 0, 0, 10);
@@ -465,7 +465,7 @@ public class TestHtmlElement extends MockitoTest {
 	public void testTap() throws Exception {
 		SeleniumTestsContextManager.getThreadContext().setTestType(TestType.APPIUM_WEB_ANDROID);
 		SeleniumTestsContextManager.getThreadContext().setPlatform("android");
-		when(WebUIDriver.getWebDriver()).thenReturn(new CustomEventFiringWebDriver(mobileDriver));
+		when(WebUIDriver.getWebDriver(anyBoolean())).thenReturn(new CustomEventFiringWebDriver(mobileDriver));
 		doNothing().when(el).findElement(anyBoolean(), anyBoolean());
 		el.setElement(mobileElement);
 		el.tap(2, 2);
@@ -476,7 +476,7 @@ public class TestHtmlElement extends MockitoTest {
 	public void testZoom() throws Exception {
 		SeleniumTestsContextManager.getThreadContext().setTestType(TestType.APPIUM_WEB_ANDROID);
 		SeleniumTestsContextManager.getThreadContext().setPlatform("android");
-		when(WebUIDriver.getWebDriver()).thenReturn(new CustomEventFiringWebDriver(mobileDriver));
+		when(WebUIDriver.getWebDriver(anyBoolean())).thenReturn(new CustomEventFiringWebDriver(mobileDriver));
 		doNothing().when(el).findElement(anyBoolean(), anyBoolean());
 		el.setElement(mobileElement);
 		el.zoom();

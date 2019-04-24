@@ -79,7 +79,7 @@ public class ReplayAction {
     	// corrects bug of waitElementPresent which threw a SessionNotFoundError because driver reference were not
     	// updated before searching element (it used the driver reference of an old test session)
     	HtmlElement element = (HtmlElement)joinPoint.getTarget();
-    	element.setDriver(WebUIDriver.getWebDriver());
+    	element.setDriver(WebUIDriver.getWebDriver(false));
 		String targetName = joinPoint.getTarget().toString();
     	
 		TestAction currentAction = null;

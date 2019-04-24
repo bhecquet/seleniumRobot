@@ -46,7 +46,7 @@ import com.seleniumtests.driver.WebUIDriver;
 public class StubTestClassForListener5 extends StubTestClassForListenerParent {
 	
 	private void startDriver() {
-		WebDriver driver = WebUIDriver.getWebDriver();
+		WebDriver driver = WebUIDriver.getWebDriver(true);
 		driver.get("file:///" + Thread.currentThread().getContextClassLoader().getResource("tu/test.html").getFile());
 	}
 	

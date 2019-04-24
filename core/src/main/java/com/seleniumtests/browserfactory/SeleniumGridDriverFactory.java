@@ -56,7 +56,7 @@ public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implemen
 	@Override
 	protected ICapabilitiesFactory getCapabilitiesFactory() {
 		if (SeleniumTestsContextManager.isDesktopWebTest()) {
-			switch (webDriverConfig.getBrowser()) {
+			switch (webDriverConfig.getBrowserType()) {
 	
 		        case FIREFOX :
 		            return new FirefoxCapabilitiesFactory(webDriverConfig);
@@ -73,7 +73,7 @@ public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implemen
 		        case EDGE :
 		        	return new EdgeCapabilitiesFactory(webDriverConfig);
 		        default :
-		        	throw new ConfigurationException(String.format("Browser %s is unknown for desktop tests", webDriverConfig.getBrowser()));
+		        	throw new ConfigurationException(String.format("Browser %s is unknown for desktop tests", webDriverConfig.getBrowserType()));
 		    }
 		} else if (SeleniumTestsContextManager.isMobileTest()) {
         	if("android".equalsIgnoreCase(webDriverConfig.getPlatform())) {

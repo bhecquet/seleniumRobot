@@ -250,7 +250,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     @ReplayOnError
     public void simulateClick() {
     	if (SeleniumTestsContextManager.isWebTest()) {
-    		((CustomEventFiringWebDriver)WebUIDriver.getWebDriver()).updateWindowsHandles();
+    		((CustomEventFiringWebDriver)updateDriver()).updateWindowsHandles();
     	}
     	
         findElement(true);
@@ -505,7 +505,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
         // If we are here, element has been found, update elementInformation
         if (elementInfo != null) {
         	try {
-	        	elementInfo.updateInfo(this, driver);
+	        	elementInfo.updateInfo(this);
 	        	elementInfo.exportToJsonFile(this);
         	} catch (Throwable e) {
         		logger.warn("Error storing element information: " + e.getMessage());
@@ -693,10 +693,14 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     }
 
     /**
-     * Get and refresh underlying WebDriver.
+     * Get underlying WebDriver.
      */
     protected WebDriver updateDriver() {
-        return WebUIDriver.getWebDriver();
+    	driver = WebUIDriver.getWebDriver(false);
+    	if (driver == null) {
+    		throw new ScenarioException("Driver has not already been created");
+    	}
+    	return driver;
     }
     
     public WebDriver getDriver() {

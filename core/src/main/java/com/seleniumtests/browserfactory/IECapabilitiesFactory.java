@@ -50,7 +50,7 @@ public class IECapabilitiesFactory extends IDesktopCapabilityFactory {
         	options.setCapability(InternetExplorerDriver.LOG_LEVEL, "TRACE");
         }
         
-        if (webDriverConfig.getAndResetAttachExistingDriver() != null) {
+        if (webDriverConfig.getAttachExistingDriverPort() != null) {
 	        options.setCapability("attachExistingBrowser", true);
 			((Map<String, Object>) options.getCapability("se:ieOptions")).put("attachExistingBrowser", true);
         }

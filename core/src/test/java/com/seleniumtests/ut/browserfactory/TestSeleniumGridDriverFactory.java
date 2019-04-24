@@ -75,7 +75,7 @@ public class TestSeleniumGridDriverFactory extends MockitoTest {
 		when(config.getTestContext()).thenReturn(context);
 		Mockito.when(config.getDebug()).thenReturn(Arrays.asList(DebugMode.NONE));
 
-		when(config.getBrowser()).thenReturn(BrowserType.HTMLUNIT);
+		when(config.getBrowserType()).thenReturn(BrowserType.HTMLUNIT);
 		when(config.getPlatform()).thenReturn("windows");
 		
 		// configure driver

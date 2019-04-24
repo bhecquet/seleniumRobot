@@ -116,8 +116,8 @@ public class ChromeCapabilitiesFactory extends IDesktopCapabilityFactory {
         		.collect(Collectors.toList()));
         }
         
-        if (webDriverConfig.getAndResetAttachExistingDriver() != null) {
-        	options.setExperimentalOption("debuggerAddress", "127.0.0.1:" + webDriverConfig.getAndResetAttachExistingDriver());
+        if (webDriverConfig.getAttachExistingDriverPort() != null) {
+        	options.setExperimentalOption("debuggerAddress", "127.0.0.1:" + webDriverConfig.getAttachExistingDriverPort());
         }
         
         

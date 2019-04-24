@@ -17,6 +17,8 @@
  */
 package com.seleniumtests.ut.uipage.htmlelements;
 
+import static org.mockito.ArgumentMatchers.anyBoolean;
+
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.openqa.selenium.By;
@@ -48,7 +50,7 @@ public class TestLabelElement extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testLabelElement() throws Exception {
 		PowerMockito.mockStatic(WebUIDriver.class);
-		Mockito.when(WebUIDriver.getWebDriver()).thenReturn(driver);
+		Mockito.when(WebUIDriver.getWebDriver(anyBoolean())).thenReturn(driver);
 		Mockito.when(driver.findElement(By.id("label"))).thenReturn(element);
 		Mockito.when(element.getText()).thenReturn("textual label");
 		Mockito.when(driver.switchTo()).thenReturn(locator);

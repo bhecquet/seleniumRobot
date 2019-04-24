@@ -17,6 +17,7 @@
  */
 package com.seleniumtests.ut.uipage.htmlelements;
 
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyCollection;
 import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.doThrow;
@@ -72,7 +73,7 @@ public class TestCompositeActions extends MockitoTest {
 		eventDriver = spy(new CustomEventFiringWebDriver(driver));
 		
 		PowerMockito.mockStatic(WebUIDriver.class);
-		when(WebUIDriver.getWebDriver()).thenReturn(eventDriver);
+		when(WebUIDriver.getWebDriver(anyBoolean())).thenReturn(eventDriver);
 		when(driver.getMouse()).thenReturn(mouse);
 		Mockito.doCallRealMethod().when(driver).perform(ArgumentMatchers.anyCollection());
 		

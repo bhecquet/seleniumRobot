@@ -62,14 +62,19 @@ public abstract class Element {
      * if it's the case, search for the element, else, raise a ScenarioException
      */
     protected PerformsTouchActions checkForMobile() {
+    	CustomEventFiringWebDriver driver = (CustomEventFiringWebDriver)WebUIDriver.getWebDriver(false);
+    	if (driver == null) {
+    		throw new ScenarioException("Driver has not already been created");
+    	}
+    	
     	if (!SeleniumTestsContextManager.isMobileTest()) {
     		throw new ScenarioException("action is available only for mobile platforms");
     	}
-    	if (!(((CustomEventFiringWebDriver)WebUIDriver.getWebDriver()).getWebDriver() instanceof AppiumDriver<?>)) {
+    	if (!(driver.getWebDriver() instanceof AppiumDriver<?>)) {
     		throw new ScenarioException("action is available only for mobile platforms");
     	}
     	findElement(true);
     	
-    	return (PerformsTouchActions) ((CustomEventFiringWebDriver)WebUIDriver.getWebDriver()).getWebDriver();    	
+    	return (PerformsTouchActions) driver.getWebDriver();    	
     }
 }

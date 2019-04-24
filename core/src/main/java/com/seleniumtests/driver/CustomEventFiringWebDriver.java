@@ -286,6 +286,10 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
         return fileDetector;
     }
 
+    /**
+     * Returns the Selenium driver
+     * @return
+     */
     public WebDriver getWebDriver() {
         return driver;
     }
