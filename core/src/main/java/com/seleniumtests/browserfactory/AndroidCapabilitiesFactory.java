@@ -65,7 +65,7 @@ public class AndroidCapabilitiesFactory extends IMobileCapabilityFactory {
 	protected MutableCapabilities getBrowserSpecificCapabilities() {
 
     	// set specific configuration for chrome
-    	if (webDriverConfig.getBrowser() == BrowserType.CHROME) {
+    	if (webDriverConfig.getBrowserType() == BrowserType.CHROME) {
     		return new ChromeCapabilitiesFactory(webDriverConfig).createMobileCapabilities(webDriverConfig);
     	} else {
     		return new MutableCapabilities();

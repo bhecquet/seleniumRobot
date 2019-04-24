@@ -80,7 +80,7 @@ public class DriverExceptionListener implements WebDriverEventListener {
     @Override
     public void beforeClickOn(final WebElement arg0, final WebDriver driver) {
     	if (SeleniumTestsContextManager.isWebTest()) {
-    		((CustomEventFiringWebDriver)WebUIDriver.getWebDriver()).updateWindowsHandles();
+    		((CustomEventFiringWebDriver)WebUIDriver.getWebDriver(false)).updateWindowsHandles();
     	}
     }
 

@@ -83,7 +83,7 @@ public class CompositeActions {
 		}
 		
 		if (clickRequested) {
-			((CustomEventFiringWebDriver)WebUIDriver.getWebDriver()).updateWindowsHandles();
+			((CustomEventFiringWebDriver)WebUIDriver.getWebDriver(false)).updateWindowsHandles();
 		}
 	}
 	
@@ -143,7 +143,7 @@ public class CompositeActions {
 			}
 			
 			if (clickRequested) {
-				((CustomEventFiringWebDriver)WebUIDriver.getWebDriver()).updateWindowsHandles();
+				((CustomEventFiringWebDriver)WebUIDriver.getWebDriver(false)).updateWindowsHandles();
 			}
 		}
 	}

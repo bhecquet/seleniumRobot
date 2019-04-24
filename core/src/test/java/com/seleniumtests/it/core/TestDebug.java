@@ -81,7 +81,6 @@ public class TestDebug extends GenericTest {
 		} finally {
 			if (WebUIDriver.getWebDriver(false) != null) {
 				WebUIDriver.cleanUp();
-				WebUIDriver.cleanUpWebUIDriver();
 			}
 		}
 	}

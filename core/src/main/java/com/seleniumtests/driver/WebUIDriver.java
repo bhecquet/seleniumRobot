@@ -23,6 +23,7 @@ import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -57,7 +58,6 @@ import com.seleniumtests.reporter.logger.TestLogging;
 import com.seleniumtests.util.helper.WaitHelper;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 import com.seleniumtests.util.osutility.OSUtility;
-import com.seleniumtests.util.osutility.OSUtilityFactory;
 
 import net.lightbody.bmp.BrowserMobProxy;
 
@@ -66,23 +66,29 @@ import net.lightbody.bmp.BrowserMobProxy;
  */
 public class WebUIDriver {
 
+	public static final String DEFAULT_DRIVER_NAME = "main";
 	private static final Logger logger = SeleniumRobotLogger.getLogger(WebUIDriver.class);
-	private static OSUtility osUtil = OSUtilityFactory.getInstance();
 	
-    private static ThreadLocal<WebDriver> driverSession = new ThreadLocal<>();
-    private static ThreadLocal<WebUIDriver> uxDriverSession = new ThreadLocal<>();
-    private String node;
+    private static ThreadLocal<Map<String, WebUIDriver>> uxDriverSession = new ThreadLocal<>();
+    private static ThreadLocal<VideoRecorder> videoRecorder = new ThreadLocal<>();
+    private static ThreadLocal<String> currentWebUiDriverName = new ThreadLocal<>();
+    private String name;
     private DriverConfig config;
     private WebDriver driver;
     private IWebDriverFactory webDriverBuilder;
     private final static Object createDriverLock = new Object();
 
-    public WebUIDriver() {
+    public WebUIDriver(String name) {
     	if (SeleniumTestsContextManager.getThreadContext() == null) {
             return;
         }
+    	this.name = name;
         config = new DriverConfig(SeleniumTestsContextManager.getThreadContext());
-        uxDriverSession.set(this);
+        if (uxDriverSession.get() == null) {
+            uxDriverSession.set(new HashMap<>());
+        }
+        uxDriverSession.get().put(name, this);
+        currentWebUiDriverName.set(name);
     }
 
     /**
@@ -110,20 +116,20 @@ public class WebUIDriver {
         		webDriverBuilder = new AppiumDriverFactory(this.config);
         	} else {
         		
-	            if (config.getBrowser() == BrowserType.FIREFOX) {
+	            if (config.getBrowserType() == BrowserType.FIREFOX) {
 	                webDriverBuilder = new FirefoxDriverFactory(this.config);
-	            } else if (config.getBrowser() == BrowserType.INTERNET_EXPLORER) {
+	            } else if (config.getBrowserType() == BrowserType.INTERNET_EXPLORER) {
 	                webDriverBuilder = new IEDriverFactory(this.config);
-	            } else if (config.getBrowser() == BrowserType.EDGE) {
+	            } else if (config.getBrowserType() == BrowserType.EDGE) {
 	            	webDriverBuilder = new EdgeDriverFactory(this.config);
-	            } else if (config.getBrowser() == BrowserType.CHROME) {
+	            } else if (config.getBrowserType() == BrowserType.CHROME) {
 	                webDriverBuilder = new ChromeDriverFactory(this.config);
-	            } else if (config.getBrowser() == BrowserType.HTMLUNIT) {
+	            } else if (config.getBrowserType() == BrowserType.HTMLUNIT) {
 	                webDriverBuilder = new HtmlUnitDriverFactory(this.config);
-	            } else if (config.getBrowser() == BrowserType.SAFARI) {
+	            } else if (config.getBrowserType() == BrowserType.SAFARI) {
 	                webDriverBuilder = new SafariDriverFactory(this.config);
 	            } else {
-	                throw new DriverExceptions("Unsupported browser: " + config.getBrowser().toString());
+	                throw new DriverExceptions("Unsupported browser: " + config.getBrowserType().toString());
 	            }
         	}
         }
@@ -158,13 +164,13 @@ public class WebUIDriver {
 				config.getBrowserMobProxy().newHar(SeleniumTestsContextManager.getThreadContext().getRelativeOutputDir());
 			}
 			
-			if (config.getVideoCapture() != VideoCaptureMode.FALSE) {
+			if (config.getVideoCapture() != VideoCaptureMode.FALSE && videoRecorder.get() == null) {
 				try {
 					VideoRecorder recorder = CustomEventFiringWebDriver.startVideoCapture(SeleniumTestsContextManager.getThreadContext().getRunMode(), 
 																						SeleniumTestsContextManager.getThreadContext().getSeleniumGridConnector(),
 																						new File(SeleniumTestsContextManager.getThreadContext().getOutputDirectory()),
 																						"videoCapture.avi");
-					config.setVideoRecorder(recorder);
+					videoRecorder.set(recorder);
 				} catch (ScenarioException e) {
 					logger.warn("Video capture won't start: " + e.getMessage());
 				}
@@ -175,15 +181,22 @@ public class WebUIDriver {
 
         return driver;
     }
-    
-    public String getNode() {
-        return node;
-    }
 
-    public void setNode(final String node) {
-        this.node = node;
-    }
+    /**
+     * Clean all WebUIDriver for this thread
+     */
+    public static void cleanUp() {
+    	
+    	for (WebUIDriver webuiDriver: uxDriverSession.get().values()) {
+    		if (webuiDriver != null) {
+    			webuiDriver.clean();
+    		}
+    	}
+    	
+		cleanUpWebUIDriver();
 
+    }
+    	
     /**
      * Cleans the driver created by this class: 
      * quit  browser
@@ -191,11 +204,10 @@ public class WebUIDriver {
      * stop appium
      * dereference driver in this WebUIDriver
      */
-    public static void cleanUp() {
-    	
-        WebDriver driver = driverSession.get();
-        WebUIDriver webuiDriver = getWebUIDriver(false);
-        
+    private void clean() {
+
+    	// issue #176: do not create the WebUiDriver if it does not exist
+
     	if (driver != null) {
     		
     		// write logs
@@ -222,56 +234,50 @@ public class WebUIDriver {
         	} catch (Exception ex) {
         		TestLogging.error("Exception encountered when quiting driver:" + ex.getMessage());
         	}
+    		driver = null;
         }
+		
+        if (webDriverBuilder != null) {
+        	webDriverBuilder.cleanUp();
+        } 
         
-    	// issue #176: do not create the WebUiDriver if it does not exist
-    	if (webuiDriver != null) {
-    		
-    		
-	    	IWebDriverFactory iWebDriverFactory = webuiDriver.webDriverBuilder;
-	        if (iWebDriverFactory != null) {
-	            iWebDriverFactory.cleanUp();
-	        } 
-	        
-	        // in case of mobile test with appium, stop appium server
-	        try {
-		        if (iWebDriverFactory instanceof AppiumDriverFactory) {
-		        	((AppiumDriverFactory) iWebDriverFactory).getAppiumLauncher().stopAppium();
-		        }
-	        } catch (Exception e) {
-	        	logger.error("Error stopping Appium: " + e.getMessage());
+        // in case of mobile test with appium, stop appium server
+        try {
+	        if (webDriverBuilder instanceof AppiumDriverFactory) {
+	        	((AppiumDriverFactory) webDriverBuilder).getAppiumLauncher().stopAppium();
 	        }
-        
-	        // stop HAR capture in case it has not already been done by SeleniumRobotTestListener. This may be the case when a driver is created in @AfterMethod
-			try {
-		        if (webuiDriver.getConfig().getBrowserMobProxy() != null) {
-					webuiDriver.getConfig().getBrowserMobProxy().endHar();
-					webuiDriver.getConfig().setBrowserMobProxy(null);
-				}
-			} catch (Exception e) {
-				logger.error("Error stopping browsermob proxy: " + e.getMessage());
+        } catch (Exception e) {
+        	logger.error("Error stopping Appium: " + e.getMessage());
+        }
+    
+        // stop HAR capture in case it has not already been done by SeleniumRobotTestListener. This may be the case when a driver is created in @AfterMethod
+		try {
+	        if (config.getBrowserMobProxy() != null) {
+	        	config.getBrowserMobProxy().endHar();
+	        	config.setBrowserMobProxy(null);
 			}
-			
-			// stop video capture
-			try {
-				if (webuiDriver.getConfig().getVideoRecorder() != null) {
-					CustomEventFiringWebDriver.stopVideoCapture(SeleniumTestsContextManager.getThreadContext().getRunMode(), 
-																SeleniumTestsContextManager.getThreadContext().getSeleniumGridConnector(),
-																webuiDriver.getConfig().getVideoRecorder());
-					webuiDriver.getConfig().setVideoRecorder(null);
-				}
-			} catch (Exception e) {
-				logger.error("Error stopping video capture: " + e.getMessage());
+		} catch (Exception e) {
+			logger.error("Error stopping browsermob proxy: " + e.getMessage());
+		}
+		
+		// stop video capture
+		try {
+			if (videoRecorder.get() != null) {
+				CustomEventFiringWebDriver.stopVideoCapture(SeleniumTestsContextManager.getThreadContext().getRunMode(), 
+															SeleniumTestsContextManager.getThreadContext().getSeleniumGridConnector(),
+															videoRecorder.get());
+				videoRecorder.remove();
 			}
-    	}
-
-        driverSession.remove();
+		} catch (Exception e) {
+			logger.error("Error stopping video capture: " + e.getMessage());
+		}
+		
     }
     
     /**
      * dereference this WebUIDriver from the thread
      */
-    public static void cleanUpWebUIDriver() {
+    private static void cleanUpWebUIDriver() {
         uxDriverSession.remove();
     }
 
@@ -309,8 +315,10 @@ public class WebUIDriver {
     /**
      * Get EventFiringWebDriver.
      *
+     * @deprecated use getWebDriver(boolean) instead
      * @return  webDriver
      */
+	@Deprecated
     public static WebDriver getWebDriver() {
         return getWebDriver(true);
     }
@@ -327,41 +335,86 @@ public class WebUIDriver {
      * @return
      */
     public static WebDriver getWebDriver(final Boolean isCreate) {
-        if (driverSession.get() == null && isCreate && !SeleniumTestsContextManager.isNonGuiTest()) {
-        	getWebUIDriver(true).createWebDriver();
+    	return getWebDriver(isCreate, null, getCurrentWebUiDriverName(), null);
+    }
+    
+    /**
+     * Returns WebDriver instance Creates a new WebDriver Instance if it is null and isCreate is true.
+     *
+     * @param   isCreate  					create webdriver or not
+     * @param	browserType					the new browser type to create. If null, and creation is requested, then the browser configured by user or configuration will be created
+     * @param	driverName					a logical name to give to the created driver
+     * @param	attachExistingDriverPort 	if we need to attach to an existing browser instead of creating one, then specify the port here
+     *
+     * @return
+     */
+    public static WebDriver getWebDriver(Boolean isCreate, BrowserType browserType, String driverName, Integer attachExistingDriverPort) {
+    	
+    	if (driverName == null) {
+    		throw new ScenarioException("A name must be given to the driver");
+    	}
+    	
+        if ((uxDriverSession.get() == null || uxDriverSession.get().get(driverName) == null || uxDriverSession.get().get(driverName).driver == null) && isCreate && !SeleniumTestsContextManager.isNonGuiTest()) {
+        	WebUIDriver uiDriver = getWebUIDriver(true, driverName);
+        	uiDriver.config.setAttachExistingDriverPort(attachExistingDriverPort);
+        	
+        	if (browserType == null) {
+        		uiDriver.config.setBrowserType(SeleniumTestsContextManager.getThreadContext().getBrowser());
+        	} else {
+        		uiDriver.config.setBrowserType(browserType);
+        	}
+        	uiDriver.createWebDriver();
         }
 
-        return driverSession.get();
+        try {
+        	return uxDriverSession.get().get(driverName).driver;
+        } catch (NullPointerException e) {
+        	return null;
+        }
+        
+    }
+    
+    /**
+     * Switch to one of the created driver, referenced by name
+     * @param driverName	the driver name to return
+     */
+    public static void switchToDriver(String driverName) {
+    	if (uxDriverSession.get() == null || !uxDriverSession.get().containsKey(driverName)) {
+    		throw new ScenarioException(String.format("driver with name %s has not been created", driverName));
+    	}
+    	currentWebUiDriverName.set(driverName);
     }
 
     /**
-     * Returns WebUIDriver instance
+     * Returns current WebUIDriver instance
      * @param create	create instance if it does not exist in this thread. Beware that this instance will have to be deleted at the end of test
      * 					(for regular seleniumRobot tests, this is done in <code>SeleniumRobotTestPlan.finishTestMethod</code>
      *
      * @return
      */
     public static WebUIDriver getWebUIDriver(boolean create) {
-        if (uxDriverSession.get() == null && create) {
-//        	if (!SeleniumTestsContextManager.getThreadContext().isDevMode()){
-//        		cleanWebDrivers();
-//        	}
-            uxDriverSession.set(new WebUIDriver());
-        }
-
-        return uxDriverSession.get();
+    	return getWebUIDriver(create, getCurrentWebUiDriverName());
     }
-
+    
     /**
-     * Close all the opened web browser processes. Not called in development mode.
-     * 
-     * This may not be desirable
+     * Returns current WebUIDriver instance for given name
+     * If a new WebUIDriver instance is created, this become the current one
+     * @param create	create instance if it does not exist in this thread. Beware that this instance will have to be deleted at the end of test
+     * 					(for regular seleniumRobot tests, this is done in <code>SeleniumRobotTestPlan.finishTestMethod</code>
+     * @param name		the name of the driver instance to retrieve (default is 'main', the first created driver)
+     * @return
      */
-    private static void cleanWebDrivers() {
-    	logger.info("Dev. mode : " + SeleniumTestsContextManager.getThreadContext().getDebug()
-    					+" , web browser running processes will terminate ! ");
-		osUtil.killAllWebBrowserProcess(false); //true to force the kill
-	}
+    public static WebUIDriver getWebUIDriver(boolean create, String name) {
+        if ((uxDriverSession.get() == null || uxDriverSession.get().get(name) == null) && create) {
+            new WebUIDriver(name);
+        }
+        
+        try {
+        	return uxDriverSession.get().get(name);
+        } catch (NullPointerException e) {
+        	return null;
+        }
+    }
 
 	/**
      * Lets user set their own driver This can be retrieved as WebUIDriver.getWebDriver().
@@ -370,11 +423,13 @@ public class WebUIDriver {
      */
     public static void setWebDriver(final WebDriver driver) {
         if (driver == null) {
-            driverSession.remove();
+        	if (uxDriverSession.get() != null && uxDriverSession.get().get(getCurrentWebUiDriverName()) != null) {
+        		uxDriverSession.get().get(getCurrentWebUiDriverName()).driver = null;
+        	}
         } else {
         	// create WebUiDriver if it does not exist
             getWebUIDriver(true);
-            driverSession.set(driver);
+            uxDriverSession.get().get(getCurrentWebUiDriverName()).driver = driver;
         }
     }
 
@@ -408,9 +463,9 @@ public class WebUIDriver {
     private void checkBrowserRunnable() {
     	if (config.getMode() == DriverMode.LOCAL && !config.getTestType().isMobile()) {
     		Map<BrowserType, List<BrowserInfo>> browsers = OSUtility.getInstalledBrowsersWithVersion();
-    		if (!browsers.containsKey(config.getBrowser())) {
+    		if (!browsers.containsKey(config.getBrowserType())) {
     			throw new ConfigurationException(String.format("Browser %s is not available. Available browsers are %s", 
-    					config.getBrowser(), browsers));
+    					config.getBrowserType(), browsers));
     		}
     	}
     }
@@ -442,7 +497,7 @@ public class WebUIDriver {
     	if (config.getTestType().isMobile()) {
     		logger.info("Start creating appium driver");
     	} else {
-    		logger.info(String.format("Start creating %s driver", config.getBrowser().getBrowserType()));
+    		logger.info(String.format("Start creating %s driver", config.getBrowserType().getBrowserType()));
     	}
     	checkBrowserRunnable();
         driver = createRemoteWebDriver();
@@ -451,10 +506,9 @@ public class WebUIDriver {
         if (config.getTestType().isMobile()) {
     		logger.info("Finished creating appium driver");
     	} else {
-    		logger.info(String.format("Finished creating %s driver", config.getBrowser().getBrowserType()));
+    		logger.info(String.format("Finished creating %s driver", config.getBrowserType().getBrowserType()));
     	}
 
-        driverSession.set(driver);
         return driver;
     }
 
@@ -477,8 +531,23 @@ public class WebUIDriver {
 	public DriverConfig getConfig() {
 		return config;
 	}
-	
-    public static ThreadLocal<WebUIDriver> getUxDriverSession() {
-		return uxDriverSession;
+
+	public static ThreadLocal<VideoRecorder> getVideoRecorder() {
+		return videoRecorder;
+	}
+
+	public static String getCurrentWebUiDriverName() {
+		if (currentWebUiDriverName.get() == null) {
+			currentWebUiDriverName.set(DEFAULT_DRIVER_NAME);
+		}
+		return currentWebUiDriverName.get();
+	}
+
+	/**
+	 * Gets the driver created inside this WebUIDriver
+	 * @return
+	 */
+	public WebDriver getDriver() {
+		return driver;
 	}
 }

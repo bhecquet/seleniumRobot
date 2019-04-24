@@ -75,6 +75,7 @@ public class SeleniumRobotTestPlan {
 	 */
 	@AfterMethod(alwaysRun=true)
 	public void finishTestMethod(Method method) {
+
 		WebUIDriver.cleanUp();
 		SeleniumTestsContextManager.getThreadContext().setDriverCreationBlocked(true);
 	}

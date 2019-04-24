@@ -17,6 +17,8 @@
  */
 package com.seleniumtests.ut.uipage.htmlelements;
 
+import static org.mockito.ArgumentMatchers.anyBoolean;
+
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.openqa.selenium.By;
@@ -49,7 +51,7 @@ public class TestImageElement extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testImageElement() throws Exception {
 		PowerMockito.mockStatic(WebUIDriver.class);
-		Mockito.when(WebUIDriver.getWebDriver()).thenReturn(driver);
+		Mockito.when(WebUIDriver.getWebDriver(anyBoolean())).thenReturn(driver);
 		Mockito.when(driver.findElement(By.id("img"))).thenReturn(element);
 		Mockito.when(driver.switchTo()).thenReturn(locator);
 		Mockito.when(element.getSize()).thenReturn(new Dimension(10,10));

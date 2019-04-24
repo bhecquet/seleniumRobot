@@ -105,7 +105,7 @@ public class TestWebUiDriver extends ReporterTest {
 			appiumLauncher = spy(new LocalAppiumLauncher());
 			when(AppiumLauncherFactory.getInstance()).thenReturn(appiumLauncher);	
 		
-			WebUIDriver.getWebDriver();
+			WebUIDriver.getWebDriver(true);
 		} catch (ConfigurationException e) {
 			throw new SkipException("Test skipped, appium not correctly configured", e);
 		}
@@ -113,7 +113,6 @@ public class TestWebUiDriver extends ReporterTest {
 		PowerMockito.verifyNew(AndroidDriver.class).withArguments(any(URL.class), any(DesiredCapabilities.class));
 				
 		WebUIDriver.cleanUp();
-		WebUIDriver.cleanUpWebUIDriver();
 		verify(appiumLauncher).stopAppium();
 	}
 	
@@ -202,7 +201,6 @@ public class TestWebUiDriver extends ReporterTest {
 	public void closeBrowser() {
 		try {
 			WebUIDriver.cleanUp();
-			WebUIDriver.cleanUpWebUIDriver();
 		} catch (WebDriverException e) {
 			
 		}

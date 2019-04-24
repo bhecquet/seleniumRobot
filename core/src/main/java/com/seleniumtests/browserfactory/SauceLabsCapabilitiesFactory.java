@@ -33,7 +33,7 @@ public class SauceLabsCapabilitiesFactory extends ICapabilitiesFactory {
 
         final DesiredCapabilities capabilities = new DesiredCapabilities();
 
-        capabilities.setCapability("browserName", webDriverConfig.getBrowser());
+        capabilities.setCapability("browserName", webDriverConfig.getBrowserType());
         capabilities.setCapability("platform", webDriverConfig.getPlatform());
         capabilities.setCapability("version", webDriverConfig.getVersion());
         capabilities.setCapability("name", SeleniumTestsContextManager.getThreadContext().getTestMethodSignature());

@@ -40,18 +40,7 @@ import com.seleniumtests.driver.WebUIDriver;
 public abstract class BasePage {
 
     protected WebDriver driver;
-    protected WebUIDriver webUXDriver;
     private int explictWaitTimeout = SeleniumTestsContextManager.getThreadContext().getExplicitWaitTimeout();
-    
-
-    public BasePage() {
-    	init();
-    }
-    
-    public void init() {
-    	driver = WebUIDriver.getWebDriver();
-    	webUXDriver = WebUIDriver.getWebUIDriver(false);
-    }
 
     public void acceptAlert() {
         Alert alert = getAlert();
@@ -90,7 +79,7 @@ public abstract class BasePage {
     protected abstract void capturePageSnapshot();
 
     public WebDriver getDriver() {
-        return WebUIDriver.getWebDriver();
+        return WebUIDriver.getWebDriver(true);
     }
 
     public boolean isTextPresent(final String text) {

@@ -17,6 +17,7 @@
  */
 package com.seleniumtests.ut.uipage.htmlelements;
 
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.spy;
@@ -89,7 +90,7 @@ public class TestPictureElement extends MockitoTest {
 		picElement.setObjectPictureFile(new File(""));
 
 		PowerMockito.mockStatic(WebUIDriver.class);
-		when(WebUIDriver.getWebDriver()).thenReturn(driver);
+		when(WebUIDriver.getWebDriver(anyBoolean())).thenReturn(driver);
 		when(driver.getMouse()).thenReturn(mouse);
 		when(driver.getKeyboard()).thenReturn(keyboard);
 		when(screenshotUtil.capture(Target.PAGE, File.class, true)).thenReturn(new File(""));

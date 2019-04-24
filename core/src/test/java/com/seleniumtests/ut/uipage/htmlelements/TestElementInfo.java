@@ -212,9 +212,9 @@ public class TestElementInfo extends MockitoTest {
 		SeleniumTestsContextManager.getThreadContext().setTestType(TestType.WEB);
 		
 		ElementInfo elInfo = spy(ElementInfo.getInstance(htmlElement));
-		doReturn(image).when(elInfo).getScreenshot(driver);
+		doReturn(image).when(elInfo).getScreenshot();
 
-		elInfo.updateInfo(htmlElement, driver);
+		elInfo.updateInfo(htmlElement);
 		
 		// check element info is created with basic information
 		Assert.assertNotNull(elInfo);
@@ -240,9 +240,9 @@ public class TestElementInfo extends MockitoTest {
 		SeleniumTestsContextManager.getThreadContext().setTestType(TestType.WEB);
 		
 		ElementInfo elInfo = spy(ElementInfo.getInstance(htmlElement));
-		doReturn(image).when(elInfo).getScreenshot(driver);
+		doReturn(image).when(elInfo).getScreenshot();
 
-		elInfo.updateInfo(htmlElement, driver);
+		elInfo.updateInfo(htmlElement);
 		
 		// in dom mode, no picture generated
 		Assert.assertNotNull(elInfo);
@@ -259,9 +259,9 @@ public class TestElementInfo extends MockitoTest {
 		SeleniumTestsContextManager.getThreadContext().setTestType(TestType.APP);
 		
 		ElementInfo elInfo = spy(ElementInfo.getInstance(htmlElement));
-		doReturn(image).when(elInfo).getScreenshot(driver);
+		doReturn(image).when(elInfo).getScreenshot();
 
-		elInfo.updateInfo(htmlElement, driver);
+		elInfo.updateInfo(htmlElement);
 		
 		// check element info is created with basic information
 		Assert.assertNotNull(elInfo);
@@ -279,7 +279,7 @@ public class TestElementInfo extends MockitoTest {
 		ElementInfo elInfo = ElementInfo.getInstance(htmlElement);
 		when(htmlElement.getRealElement()).thenReturn(null);
 		
-		elInfo.updateInfo(htmlElement, driver);
+		elInfo.updateInfo(htmlElement);
 	}
 	
 	/**
@@ -300,12 +300,12 @@ public class TestElementInfo extends MockitoTest {
 		// we should get the existing information
 		Assert.assertEquals(elInfo.getTagName(), "h1");
 		
-		doReturn(image).when(elInfo).getScreenshot(driver);
+		doReturn(image).when(elInfo).getScreenshot();
 		
 		// change information of the underlying element
 		when(element.getTagName()).thenReturn("h2");
 
-		elInfo.updateInfo(htmlElement, driver);
+		elInfo.updateInfo(htmlElement);
 		
 		Assert.assertEquals(elInfo.getTagName(), "h2");
 	}
@@ -394,9 +394,9 @@ public class TestElementInfo extends MockitoTest {
 		Assert.assertEquals(elInfo.getRectangleStability(), 0);
 		Assert.assertEquals(elInfo.getAttributesStability().get("id"), (Integer)0);
 		
-		doReturn(image).when(elInfo).getScreenshot(driver);
+		doReturn(image).when(elInfo).getScreenshot();
 
-		elInfo.updateInfo(htmlElement, driver);
+		elInfo.updateInfo(htmlElement);
 		
 		// check stability indicators have been updated
 		Assert.assertEquals(elInfo.getTotalSearch(), 2);
@@ -421,12 +421,12 @@ public class TestElementInfo extends MockitoTest {
 		ElementInfo elInfo = spy(ElementInfo.getInstance(htmlElement));
 		Assert.assertEquals(elInfo.getTotalSearch(), 1);
 		
-		doReturn(image).when(elInfo).getScreenshot(driver);
+		doReturn(image).when(elInfo).getScreenshot();
 		
 		// change text value
 		when(element.getText()).thenReturn("newText");
 
-		elInfo.updateInfo(htmlElement, driver);
+		elInfo.updateInfo(htmlElement);
 		
 		// check stability indicators have been updated. Text indicator is reset to 0 as value has changed
 		Assert.assertEquals(elInfo.getTotalSearch(), 2);
@@ -447,7 +447,7 @@ public class TestElementInfo extends MockitoTest {
 		ElementInfo elInfo = spy(ElementInfo.getInstance(htmlElement));
 		Assert.assertEquals(elInfo.getTotalSearch(), 1);
 		
-		doReturn(image).when(elInfo).getScreenshot(driver);
+		doReturn(image).when(elInfo).getScreenshot();
 		
 		// change attribute values (one added and one removed)
 		Map<String, Object> attributes = new HashMap<>();
@@ -455,7 +455,7 @@ public class TestElementInfo extends MockitoTest {
 		attributes.put("id", "foo");
 		when(driver.executeScript(ElementInfo.JAVASCRIPT_GET_ATTRIBUTES, element)).thenReturn(attributes);
 
-		elInfo.updateInfo(htmlElement, driver);
+		elInfo.updateInfo(htmlElement);
 		
 		// check stability indicators have been updated. Text indicator is reset to 0 as value has changed
 		Assert.assertEquals(elInfo.getTotalSearch(), 2);

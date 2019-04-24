@@ -351,12 +351,12 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 				}
 				
 				// stop video capture
-				if (WebUIDriver.getWebUIDriver(false).getConfig().getVideoRecorder() != null) {
+				if (WebUIDriver.getVideoRecorder().get() != null) {
 					File videoFile = null;
 					try {
 						videoFile = CustomEventFiringWebDriver.stopVideoCapture(SeleniumTestsContextManager.getThreadContext().getRunMode(), 
 																				SeleniumTestsContextManager.getThreadContext().getSeleniumGridConnector(),
-																				WebUIDriver.getWebUIDriver(false).getConfig().getVideoRecorder());
+																				WebUIDriver.getVideoRecorder().get());
 						
 						if (videoFile != null) {
 							Path pathAbsolute = Paths.get(videoFile.getAbsolutePath());
@@ -380,10 +380,9 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 				}
 			} catch (Exception e) {
 				TestLogging.log("Error while logging: " + e.getMessage());
-				WebUIDriver.getWebUIDriver(false).getConfig().setVideoRecorder(null);
+				WebUIDriver.getVideoRecorder().remove();
 				WebUIDriver.getWebUIDriver(false).getConfig().setBrowserMobProxy(null);
 			}
-			WebUIDriver.cleanUpWebUIDriver();
 		}
 		
 		tearDownStep.updateDuration();

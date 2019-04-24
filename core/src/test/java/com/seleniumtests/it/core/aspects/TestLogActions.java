@@ -51,7 +51,6 @@ public class TestLogActions extends GenericTest {
 	public void teardown() {
 		System.clearProperty("browser");
 		WebUIDriver.cleanUp();
-		WebUIDriver.cleanUpWebUIDriver();
 	}
 	
 	@BeforeMethod(groups={"it"})

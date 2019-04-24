@@ -34,7 +34,6 @@ import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.proxy.ProxyConfig;
 import com.seleniumtests.customexception.DriverExceptions;
 import com.seleniumtests.driver.screenshots.VideoCaptureMode;
-import com.seleniumtests.driver.screenshots.VideoRecorder;
 import com.seleniumtests.util.logging.DebugMode;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
@@ -47,11 +46,12 @@ public class DriverConfig {
     private WebDriver driver;
     private Integer attachExistingDriverPort = null;
     private BrowserMobProxy browserMobProxy;
-    private VideoRecorder videoRecorder;
     private SeleniumTestsContext testContext;
+    private BrowserType browserType;
     
     public DriverConfig(SeleniumTestsContext testContext) {
     	this.testContext = testContext;
+    	this.browserType = testContext.getBrowser();
     }
 
     public List<WebDriverEventListener> getWebDriverListeners() {
@@ -74,11 +74,15 @@ public class DriverConfig {
         return listenerList;
     }
 
-    public BrowserType getBrowser() {
-        return testContext.getBrowser();
+    public BrowserType getBrowserType() {
+        return browserType;
     }
 
-    public String getBrowserDownloadDir() {
+    public void setBrowserType(BrowserType browserType) {
+		this.browserType = browserType;
+	}
+
+	public String getBrowserDownloadDir() {
         return testContext.getBrowserDownloadDir();
     }
 
@@ -381,14 +385,6 @@ public class DriverConfig {
 		this.browserMobProxy = browserMobProxy;
 	}
 
-	public VideoRecorder getVideoRecorder() {
-		return videoRecorder;
-	}
-
-	public void setVideoRecorder(VideoRecorder videoRecorder) {
-		this.videoRecorder = videoRecorder;
-	}
-
 	public SeleniumTestsContext getTestContext() {
 		return testContext;
 	}
@@ -402,13 +398,11 @@ public class DriverConfig {
 	}
 	
 	/**
-	 * Returns the current value for 'attachExistingDriver' and reset it so that the next created browser does not get a wrong value
+	 * Returns the current value for 'attachExistingDriver'
 	 * @return
 	 */
-	public Integer getAndResetAttachExistingDriver() {
-		Integer currentAttachExistingDriverPort = attachExistingDriverPort;
-		attachExistingDriverPort = null;
-		return currentAttachExistingDriverPort;
+	public Integer getAttachExistingDriverPort() {
+		return attachExistingDriverPort;
 	}
 
 	/**
@@ -418,7 +412,7 @@ public class DriverConfig {
 	 * 									In case of internet explorer, value may be anything
 	 * 									If null is given, we create a new driver
 	 */
-	public void setAttachExistingDriver(Integer attachExistingDriverPort) {
+	public void setAttachExistingDriverPort(Integer attachExistingDriverPort) {
 		this.attachExistingDriverPort = attachExistingDriverPort;
 	}
 }

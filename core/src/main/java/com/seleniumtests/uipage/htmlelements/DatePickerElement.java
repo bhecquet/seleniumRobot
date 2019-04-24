@@ -80,7 +80,7 @@ public class DatePickerElement extends HtmlElement {
     		throw new ScenarioException("Element should not be null");
     	}
     	
-    	BrowserType browser = WebUIDriver.getWebUIDriver(false).getConfig().getBrowser();
+    	BrowserType browser = WebUIDriver.getWebUIDriver(false).getConfig().getBrowserType();
     	if (browser == BrowserType.INTERNET_EXPLORER) {
 	    	new Actions(driver)
 	    		.doubleClick(element)

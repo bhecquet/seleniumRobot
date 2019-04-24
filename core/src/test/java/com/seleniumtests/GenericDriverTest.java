@@ -67,7 +67,6 @@ public class GenericDriverTest {
 	public void destroyDriver() {
 		if (WebUIDriver.getWebDriver(false) != null) {
 			WebUIDriver.cleanUp();
-			WebUIDriver.cleanUpWebUIDriver();
 		}
 
 		TestLogging.reset();

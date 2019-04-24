@@ -60,12 +60,11 @@ public class TestBasePage extends MockitoTest {
 		SeleniumTestsContextManager.getThreadContext().setBrowser("firefox");
 		
 		PowerMockito.mockStatic(WebUIDriver.class);
-		Mockito.when(WebUIDriver.getWebDriver()).thenReturn(driver);
+		Mockito.when(WebUIDriver.getWebDriver(anyBoolean())).thenReturn(driver);
 		Mockito.when(WebUIDriver.getWebUIDriver(anyBoolean())).thenReturn(webUiDriver);
 		
 		// use this to test abstract class
 		page = Mockito.mock(BasePage.class, Mockito.CALLS_REAL_METHODS);
-		page.init();
 		
 		Mockito.when(driver.switchTo()).thenReturn(targetLocator);
 		Mockito.when(driver.findElement(Mockito.any())).thenReturn(element);

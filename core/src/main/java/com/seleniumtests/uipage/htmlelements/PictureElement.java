@@ -27,6 +27,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import com.seleniumtests.driver.WebUIDriver;
@@ -171,6 +172,19 @@ public class PictureElement extends GenericPictureElement {
 		move(element, coordX, coordY).click().build().perform();
 	}
 	
+	private WebUIDriver isDriverCreated() {
+		WebUIDriver uiDriver = WebUIDriver.getWebUIDriver(false);
+		if (uiDriver == null) {
+			throw new ScenarioException("Driver has not already been created");
+		}
+		
+		CustomEventFiringWebDriver driver = (CustomEventFiringWebDriver)uiDriver.getDriver();
+    	if (driver == null) {
+    		throw new ScenarioException("Driver has not already been created");
+    	}
+    	return uiDriver;
+	}
+	
 	/**
 	 * Move to the center of the picture
 	 * @param element	The element to move to
@@ -179,23 +193,26 @@ public class PictureElement extends GenericPictureElement {
 	 * @return
 	 */
 	private Actions move(WebElement element, int coordX, int coordY) {
+		
+		WebUIDriver uiDriver = isDriverCreated();
 
 		if (SeleniumTestsContextManager.isWebTest()) {
 			// issue #133: handle new actions specific case
 			// more browsers will be added to this conditions once they are migrated to new composite actions
-			if (SeleniumTestsContextManager.getThreadContext().getBrowser() == BrowserType.FIREFOX) {
+			if (uiDriver.getConfig().getBrowserType() == BrowserType.FIREFOX) {
 				// issue #133: firefox moves to center of element in page
 				coordX -= element.getSize().width / 2;
 				coordY -= element.getSize().height / 2;
-			} else if (SeleniumTestsContextManager.getThreadContext().getBrowser() == BrowserType.INTERNET_EXPLORER) {
+				
+			} else if (uiDriver.getConfig().getBrowserType() == BrowserType.INTERNET_EXPLORER) {
 				// issue #180: internet explorer moves to center of element in viewport
-				Dimension viewportDim = ((CustomEventFiringWebDriver)(WebUIDriver.getWebDriver())).getViewPortDimensionWithoutScrollbar();
+				Dimension viewportDim = ((CustomEventFiringWebDriver)uiDriver.getDriver()).getViewPortDimensionWithoutScrollbar();
 				coordX -= Math.min(element.getSize().width, viewportDim.width) / 2;
 				coordY -= Math.min(element.getSize().height, viewportDim.height) / 2;
 			}
 		}
 		
-		return new Actions(WebUIDriver.getWebDriver()).moveToElement(element, coordX, coordY);
+		return new Actions(uiDriver.getDriver()).moveToElement(element, coordX, coordY);
 	}
 	
 	public void moveAndDoubleClick(WebElement element, int coordX, int coordY) {
@@ -205,7 +222,7 @@ public class PictureElement extends GenericPictureElement {
 	public void sendKeys(final CharSequence text, int xOffset, int yOffset) {
 		clickAt(xOffset, yOffset);
 
-		new Actions(WebUIDriver.getWebDriver()).sendKeys(text).build().perform();
+		new Actions(isDriverCreated().getDriver()).sendKeys(text).build().perform();
 	}
 	
 	/**

@@ -46,7 +46,6 @@ public class TestCachedHtmlElement extends GenericTest {
 	@AfterClass(groups={"ut"}, alwaysRun=true)
 	public void closeBrowser() {
 		WebUIDriver.cleanUp();
-		WebUIDriver.cleanUpWebUIDriver();
 	}
 	
 	@Test(groups={"ut"}, expectedExceptions=ScenarioException.class)

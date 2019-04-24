@@ -55,13 +55,19 @@ public class ScreenshotUtil {
 
     private String outputDirectory;
     private WebDriver driver;
+    private WebUIDriver uiDriver;
     private String filename;
     private static final String SCREENSHOT_DIR = "screenshots/";
     private static final String HTML_DIR = "htmls/";
 	
 	public ScreenshotUtil() {
+		uiDriver = WebUIDriver.getWebUIDriver(false);
+		driver = uiDriver.getDriver();
+    	if (driver == null) {
+    		throw new ScenarioException("Driver has not already been created");
+    	}
+		
         outputDirectory = getOutputDirectory();
-        this.driver = WebUIDriver.getWebDriver();
     }
 
     public ScreenshotUtil(final WebDriver driver) {
@@ -198,7 +204,7 @@ public class ScreenshotUtil {
 
         try {
             // Don't capture snapshot for htmlunit
-            if (SeleniumTestsContextManager.getThreadContext().getBrowser() == BrowserType.HTMLUNIT) {
+            if (uiDriver != null && uiDriver.getConfig().getBrowserType() == BrowserType.HTMLUNIT) {
                 return null;
             }
 
@@ -210,12 +216,12 @@ public class ScreenshotUtil {
          // TEST_MOBILE
             
             // android does not support screenshot from webview context, switch temporarly to native_app context to take screenshot
-            if (SeleniumTestsContextManager.getThreadContext().getBrowser() == BrowserType.BROWSER) {
+            if (uiDriver != null && uiDriver.getConfig().getBrowserType() == BrowserType.BROWSER) {
             	((AndroidDriver<WebElement>)((CustomEventFiringWebDriver)driver).getWebDriver()).context("NATIVE_APP");
             }
 
             String screenshotB64 = screenShot.getScreenshotAs(OutputType.BASE64);
-            if (SeleniumTestsContextManager.getThreadContext().getBrowser() == BrowserType.BROWSER) {
+            if (uiDriver != null && uiDriver.getConfig().getBrowserType() == BrowserType.BROWSER) {
             	((AndroidDriver<WebElement>)((CustomEventFiringWebDriver)driver).getWebDriver()).context("WEBVIEW");
             }
             
@@ -334,7 +340,7 @@ public class ScreenshotUtil {
 
     	
     	// issue #34: prevent getting image from HTMLUnit driver
-    	if (SeleniumTestsContextManager.getThreadContext().getBrowser() == BrowserType.HTMLUNIT) {
+    	if (uiDriver != null && uiDriver.getConfig().getBrowserType() == BrowserType.HTMLUNIT) {
             return null;
         }
     	

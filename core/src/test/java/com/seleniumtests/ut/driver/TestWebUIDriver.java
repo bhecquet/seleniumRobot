@@ -70,7 +70,6 @@ public class TestWebUIDriver extends MockitoTest {
 	public void destroyDriver() {
 		if (WebUIDriver.getWebDriver(false) != null) {
 			WebUIDriver.cleanUp();
-			WebUIDriver.cleanUpWebUIDriver();
 		}
 
 		TestLogging.reset();

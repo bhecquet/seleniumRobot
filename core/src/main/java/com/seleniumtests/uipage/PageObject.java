@@ -76,7 +76,6 @@ public class PageObject extends BasePage implements IPage {
 	private static final Logger logger = SeleniumRobotLogger.getLogger(PageObject.class);
     private boolean frameFlag = false;
     private HtmlElement pageIdentifierElement = null;
-    private String title = null;
     private String windowHandle = null; // store the window / tab on which this page is loaded
     private String url = null;
     private String suiteName = null;
@@ -105,6 +104,10 @@ public class PageObject extends BasePage implements IPage {
     public PageObject(final HtmlElement pageIdentifierElement) throws IOException  {
         this(pageIdentifierElement, null);
     }
+    
+    public PageObject(final HtmlElement pageIdentifierElement, final String url) throws IOException {
+    	this(pageIdentifierElement, url, SeleniumTestsContextManager.getThreadContext().getBrowser(), WebUIDriver.DEFAULT_DRIVER_NAME, null);
+    }
 
     /**
      * Base Constructor.
@@ -113,11 +116,14 @@ public class PageObject extends BasePage implements IPage {
      * @param	pageIdentifierElement	The element to search for so that we check we are on the right page. 
      * 									May be null if we do not want to check we are on the page
      * @param   url						the URL to which we should connect. May be null if we do not want to go to a specific URL
+     * @param	browserType				the new browser type to create
+     * @param	driverName				a logical name to give to the created driver
+     * @param	attachExistingDriverPort 	 if we need to attach to an existing browser instead of creating one, then specify the port here
      * @throws IOException 
      *
      * @throws  Exception
      */
-    public PageObject(final HtmlElement pageIdentifierElement, final String url) throws IOException {
+    public PageObject(HtmlElement pageIdentifierElement, String url, BrowserType browserType, String driverName, Integer attachExistingDriverPort) throws IOException {
 
     	systemClock = Clock.systemUTC();
         Calendar start = Calendar.getInstance();
@@ -130,7 +136,7 @@ public class PageObject extends BasePage implements IPage {
         }
 
         this.pageIdentifierElement = pageIdentifierElement;
-        driver = WebUIDriver.getWebDriver();
+        driver = WebUIDriver.getWebDriver(true, browserType, driverName, attachExistingDriverPort);
         
         // open page
         openPage(url);
@@ -149,10 +155,6 @@ public class PageObject extends BasePage implements IPage {
         }
         
         
-    }
-
-    protected void setTitle(final String title) {
-        this.title = title;
     }
 
     protected void setUrl(final String openUrl) {
@@ -207,7 +209,7 @@ public class PageObject extends BasePage implements IPage {
     protected void assertCurrentPage(final boolean log) {
 
         if (pageIdentifierElement != null && !pageIdentifierElement.isElementPresent()) {
-        	ScreenShot screenShot = new ScreenshotUtil(driver).capture(Target.PAGE, ScreenShot.class);
+        	ScreenShot screenShot = new ScreenshotUtil().capture(Target.PAGE, ScreenShot.class);
 
             throw new NotCurrentPageException(getClass().getCanonicalName()
                     + " is not the current page.\nPageIdentifierElement " + pageIdentifierElement.toString()
@@ -307,8 +309,7 @@ public class PageObject extends BasePage implements IPage {
     }
     
     public void capturePageSnapshot(String snapshotName) {
-    	ScreenShot screenShot = new ScreenshotUtil(driver).capture(Target.PAGE, ScreenShot.class);
-        this.title = screenShot.getTitle();
+    	ScreenShot screenShot = new ScreenshotUtil().capture(Target.PAGE, ScreenShot.class);
 
         if (screenShot.getHtmlSourcePath() != null) {
             htmlFilePath = screenShot.getHtmlSourcePath().replace(suiteName, outputDirectory);
@@ -346,7 +347,7 @@ public class PageObject extends BasePage implements IPage {
      */
     public final void close() { 
     	
-        if (WebUIDriver.getWebDriver() == null) {
+        if (WebUIDriver.getWebDriver(false) == null) {
             return;
         }
 
@@ -502,10 +503,6 @@ public class PageObject extends BasePage implements IPage {
 
     private void open(final String url) {
 
-        if (this.getDriver() == null) {
-            driver = webUXDriver.createWebDriver();
-        }
-
         setUrl(url);
         try {
 
@@ -515,15 +512,16 @@ public class PageObject extends BasePage implements IPage {
                 driver.navigate().to(url);
             }
         } catch (UnreachableBrowserException e) {
-
-            driver = webUXDriver.createWebDriver();
+        	// recreate the driver without recreating the enclosing WebUiDriver
+        	driver = WebUIDriver.getWebUIDriver(false).createWebDriver();
             if (SeleniumTestsContextManager.isWebTest()) {
 	            setWindowToRequestedSize();
 	            driver.navigate().to(url);
             }
         } catch (UnsupportedCommandException e) {
             TestLogging.log("get UnsupportedCommandException, retry");
-            driver = webUXDriver.createWebDriver();
+            // recreate the driver without recreating the enclosing WebUiDriver
+            driver = WebUIDriver.getWebUIDriver(false).createWebDriver();
             if (SeleniumTestsContextManager.isWebTest()) {
             	setWindowToRequestedSize();
 	            driver.navigate().to(url);

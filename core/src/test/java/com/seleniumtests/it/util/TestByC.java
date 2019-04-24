@@ -60,7 +60,6 @@ public class TestByC extends GenericTest {
 	@AfterClass(groups={"it"}, alwaysRun=true)
 	public void closeBrowser() {
 		WebUIDriver.cleanUp();
-		WebUIDriver.cleanUpWebUIDriver();
 	}
 	
 	@Test(groups={"it"})
