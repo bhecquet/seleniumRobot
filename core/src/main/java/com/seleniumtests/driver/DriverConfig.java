@@ -45,6 +45,7 @@ public class DriverConfig {
 	private static final Logger logger = SeleniumRobotLogger.getLogger(DriverConfig.class);
 
     private WebDriver driver;
+    private Integer attachExistingDriverPort = null;
     private BrowserMobProxy browserMobProxy;
     private VideoRecorder videoRecorder;
     private SeleniumTestsContext testContext;
@@ -398,5 +399,26 @@ public class DriverConfig {
 	
 	public boolean isNeoloadActive() {
 		return getNeoloadUserPath() != null && System.getProperty("nl.selenium.proxy.mode") != null;
+	}
+	
+	/**
+	 * Returns the current value for 'attachExistingDriver' and reset it so that the next created browser does not get a wrong value
+	 * @return
+	 */
+	public Integer getAndResetAttachExistingDriver() {
+		Integer currentAttachExistingDriverPort = attachExistingDriverPort;
+		attachExistingDriverPort = null;
+		return currentAttachExistingDriverPort;
+	}
+
+	/**
+	 * Set the value for attaching an existing driver.
+	 * 
+	 * @param attachExistingDriverPort	In case of chrome, value is the debugger port
+	 * 									In case of internet explorer, value may be anything
+	 * 									If null is given, we create a new driver
+	 */
+	public void setAttachExistingDriver(Integer attachExistingDriverPort) {
+		this.attachExistingDriverPort = attachExistingDriverPort;
 	}
 }
