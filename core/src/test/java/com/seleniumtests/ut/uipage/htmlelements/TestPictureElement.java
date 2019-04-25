@@ -40,13 +40,17 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import com.seleniumtests.MockitoTest;
+import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.ImageSearchException;
+import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.CustomEventFiringWebDriver;
+import com.seleniumtests.driver.DriverConfig;
+import com.seleniumtests.driver.TestType;
 import com.seleniumtests.driver.WebUIDriver;
-import com.seleniumtests.driver.screenshots.ScreenShot;
 import com.seleniumtests.driver.screenshots.ScreenshotUtil;
 import com.seleniumtests.driver.screenshots.ScreenshotUtil.Target;
 import com.seleniumtests.uipage.htmlelements.HtmlElement;
@@ -72,6 +76,12 @@ public class TestPictureElement extends MockitoTest {
 	CustomEventFiringWebDriver driver;
 	
 	@Mock
+	WebUIDriver uiDriver;
+	
+	@Mock
+	DriverConfig driverConfig;
+	
+	@Mock
 	Mouse mouse;
 	@Mock
 	Keyboard keyboard;
@@ -79,10 +89,10 @@ public class TestPictureElement extends MockitoTest {
 	@InjectMocks
 	PictureElement pictureElement = new PictureElement();
 	
-//	@Test(groups={"ut"})
-//	public void init() {
-//		SeleniumTestsContextManager.getThreadContext().setTestType(TestType.WEB);
-//	}
+	@BeforeMethod(groups={"ut"})
+	public void init() {
+		SeleniumTestsContextManager.getThreadContext().setTestType(TestType.WEB);
+	}
 	
 	@Test(groups={"ut"})
 	public void testClick() {
@@ -91,6 +101,10 @@ public class TestPictureElement extends MockitoTest {
 
 		PowerMockito.mockStatic(WebUIDriver.class);
 		when(WebUIDriver.getWebDriver(anyBoolean())).thenReturn(driver);
+		when(WebUIDriver.getWebUIDriver(anyBoolean())).thenReturn(uiDriver);
+		when(uiDriver.getDriver()).thenReturn(driver);
+		when(uiDriver.getConfig()).thenReturn(driverConfig);
+		when(driverConfig.getBrowserType()).thenReturn(BrowserType.CHROME);
 		when(driver.getMouse()).thenReturn(mouse);
 		when(driver.getKeyboard()).thenReturn(keyboard);
 		when(screenshotUtil.capture(Target.PAGE, File.class, true)).thenReturn(new File(""));

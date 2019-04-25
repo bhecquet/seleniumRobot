@@ -187,6 +187,10 @@ public class WebUIDriver {
      */
     public static void cleanUp() {
     	
+    	if (uxDriverSession.get() == null) {
+    		return;
+    	}
+    	
     	for (WebUIDriver webuiDriver: uxDriverSession.get().values()) {
     		if (webuiDriver != null) {
     			webuiDriver.clean();

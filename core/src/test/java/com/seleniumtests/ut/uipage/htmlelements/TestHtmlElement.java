@@ -182,7 +182,7 @@ public class TestHtmlElement extends MockitoTest {
 	
 	private void finalCheck(boolean findElement) throws Exception {
 		// check we called getDriver before using it
-		PowerMockito.verifyPrivate(el).invoke("updateDriver");
+		PowerMockito.verifyPrivate(el, atLeastOnce()).invoke("updateDriver");
 		
 		// isElementPresent does not call findElement as we use WebDriverWait
 		if (findElement) {

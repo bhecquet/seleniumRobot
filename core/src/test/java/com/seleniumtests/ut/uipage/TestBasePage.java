@@ -65,6 +65,7 @@ public class TestBasePage extends MockitoTest {
 		
 		// use this to test abstract class
 		page = Mockito.mock(BasePage.class, Mockito.CALLS_REAL_METHODS);
+		page.setDriver(driver);
 		
 		Mockito.when(driver.switchTo()).thenReturn(targetLocator);
 		Mockito.when(driver.findElement(Mockito.any())).thenReturn(element);

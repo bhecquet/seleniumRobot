@@ -74,7 +74,7 @@ public class PictureElement extends GenericPictureElement {
 	 * @param detectionThreshold	sensitivity of search between 0 and 1. Be default, 0.1. More sensitivity means search can be less accurate, detect unwanted zones
 	 */
 	public PictureElement(String label, File pictureFile, HtmlElement intoElement, double detectionThreshold) {		
-		super(label, pictureFile, detectionThreshold, false, new ScreenshotUtil());
+		super(label, pictureFile, detectionThreshold, false);
 		
 		if (intoElement == null) {
 			if (SeleniumTestsContextManager.isWebTest()) {

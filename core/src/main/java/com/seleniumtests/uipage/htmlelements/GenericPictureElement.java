@@ -68,10 +68,9 @@ public abstract class GenericPictureElement extends Element {
 	 * @param detectionThreshold	sensitivity of search between 0 and 1. Be default, 0.1. More sensitivity means search can be less accurate, detect unwanted zones
 	 * @param searchOnDesktop		By default, false: search in driver snapshot. If true, we take a desktop screenshot, allwing searching into other elements that browser
 	 */
-	public GenericPictureElement(String label, File pictureFile, double detectionThreshold, boolean searchOnDesktop, ScreenshotUtil screenshotUtil) {		
+	public GenericPictureElement(String label, File pictureFile, double detectionThreshold, boolean searchOnDesktop) {		
 		
 		this.searchOnDesktop = searchOnDesktop;
-		this.screenshotUtil = screenshotUtil;
 		this.label = label;
 		
 		if (pictureFile != null) {

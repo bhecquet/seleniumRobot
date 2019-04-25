@@ -150,6 +150,7 @@ public class TestElementInfo extends MockitoTest {
 		ElementInfo.purgeAll();
 		SeleniumTestsContextManager.getThreadContext().setAdvancedElementSearch("full");
 		
+		when(htmlElement.getDriver()).thenReturn(driver);
 		when(htmlElement.getLabel()).thenReturn("mylabel");
 		when(htmlElement.getOrigin()).thenReturn("foo.bar.Page");
 		when(htmlElement.getBy()).thenReturn(By.id("foo"));
