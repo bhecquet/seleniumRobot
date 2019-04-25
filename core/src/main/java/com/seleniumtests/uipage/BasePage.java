@@ -79,13 +79,20 @@ public abstract class BasePage {
     protected abstract void capturePageSnapshot();
 
     public WebDriver getDriver() {
-        return WebUIDriver.getWebDriver(true);
+        return driver;
     }
+    
+    /**
+     * For unit tests because in test scenarios, driver is already created on page initialization
+     * @param driver
+     */
+	public void setDriver(WebDriver driver) {
+		this.driver = driver;
+	}
 
     public boolean isTextPresent(final String text) {
     	if (SeleniumTestsContextManager.isWebTest()) {
 	        Assert.assertNotNull(text, "isTextPresent: text should not be null!");
-	        driver = getDriver();
 	
 	        WebElement body = driver.findElement(By.tagName("body"));
 	
@@ -127,5 +134,6 @@ public abstract class BasePage {
 	public Set<String> getCurrentHandles() {
 		return ((CustomEventFiringWebDriver)driver).getCurrentHandles();
 	}
+
 
 }

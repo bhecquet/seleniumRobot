@@ -57,7 +57,7 @@ public class ScreenZone extends GenericPictureElement {
 	}
 	
 	public ScreenZone(String label, File pictureFile, double detectionThreshold) {		
-		super(label, pictureFile, detectionThreshold, true, new ScreenshotUtil(null));
+		super(label, pictureFile, detectionThreshold, true);
 	}
 	
 	public ScreenshotUtil getScreenshotUtil() {
