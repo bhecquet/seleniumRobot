@@ -37,8 +37,8 @@
 		#set($log = $file.buildLog())
 		<div class="message-snapshot">$log</div>
 	#end
-	#if( $localStep.getHarCapture() )
-		#set($harLog = $localStep.getHarCapture().buildHarLog())
+	#foreach( $har in $localStep.getHarCaptures() )
+		#set($harLog = $har.buildHarLog())
 		<div class="message-snapshot">$harLog</div>
 	#end
 	</ul>

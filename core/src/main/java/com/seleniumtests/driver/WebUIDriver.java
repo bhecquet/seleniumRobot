@@ -19,6 +19,7 @@ package com.seleniumtests.driver;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.nio.file.Paths;
@@ -52,6 +53,9 @@ import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.DriverExceptions;
 import com.seleniumtests.customexception.ScenarioException;
+import com.seleniumtests.driver.screenshots.ScreenShot;
+import com.seleniumtests.driver.screenshots.ScreenshotUtil;
+import com.seleniumtests.driver.screenshots.ScreenshotUtil.Target;
 import com.seleniumtests.driver.screenshots.VideoCaptureMode;
 import com.seleniumtests.driver.screenshots.VideoRecorder;
 import com.seleniumtests.reporter.logger.TestLogging;
@@ -60,6 +64,7 @@ import com.seleniumtests.util.logging.SeleniumRobotLogger;
 import com.seleniumtests.util.osutility.OSUtility;
 
 import net.lightbody.bmp.BrowserMobProxy;
+import net.lightbody.bmp.core.har.Har;
 
 /**
  * This class provides factory to create webDriver session.
@@ -88,7 +93,8 @@ public class WebUIDriver {
             uxDriverSession.set(new HashMap<>());
         }
         uxDriverSession.get().put(name, this);
-        currentWebUiDriverName.set(name);
+        
+        switchToDriver(name);
     }
 
     /**
@@ -200,6 +206,71 @@ public class WebUIDriver {
 		cleanUpWebUIDriver();
 
     }
+    
+    /**
+     * logs the current state of the driver
+     * Used when terminating test, before closing browser
+     * extract the video file recorded by test
+     */
+    public static File logFinalDriversState() {
+    	if (uxDriverSession.get() == null) {
+    		return null;
+    	}
+    	
+    	for (WebUIDriver webuiDriver: uxDriverSession.get().values()) {
+    		if (webuiDriver != null) {
+    			webuiDriver.logFinalDriverState();
+    		}
+    	}
+    	
+    	File videoFile = null;
+    	
+    	// stop video capture
+		if (videoRecorder.get() != null) {
+			
+			try {
+				videoFile = CustomEventFiringWebDriver.stopVideoCapture(SeleniumTestsContextManager.getThreadContext().getRunMode(), 
+																		SeleniumTestsContextManager.getThreadContext().getSeleniumGridConnector(),
+																		WebUIDriver.getVideoRecorder().get());
+
+			} catch (IOException e) {
+				logger.error("cannot attach video capture", e);
+			} catch (Exception e) {
+				videoRecorder.remove();
+			}
+		}
+		
+		return videoFile;
+    }
+    
+    /**
+     * Logs current state of the browser
+     */
+    private void logFinalDriverState() {
+    	if (driver != null) {
+			try {
+				for (ScreenShot screenshot: new ScreenshotUtil().capture(Target.PAGE, ScreenShot.class, true, true)) {
+					TestLogging.logScreenshot(screenshot, null, name);
+				}
+			} catch (Exception e) {
+				TestLogging.log("Error while logging: " + e.getMessage());
+			}
+		}
+		
+		try {
+	    	// stop HAR capture
+			if (config.getBrowserMobProxy() != null) {
+				Har har = config.getBrowserMobProxy().endHar();
+				TestLogging.logNetworkCapture(har, name);
+			}
+			
+			
+		} catch (Exception e) {
+			TestLogging.log("Error while logging: " + e.getMessage());
+		} finally {
+			config.setBrowserMobProxy(null);
+		}
+    }
     	
     /**
      * Cleans the driver created by this class: 
@@ -209,8 +280,6 @@ public class WebUIDriver {
      * dereference driver in this WebUIDriver
      */
     private void clean() {
-
-    	// issue #176: do not create the WebUiDriver if it does not exist
 
     	if (driver != null) {
     		
@@ -258,10 +327,11 @@ public class WebUIDriver {
 		try {
 	        if (config.getBrowserMobProxy() != null) {
 	        	config.getBrowserMobProxy().endHar();
-	        	config.setBrowserMobProxy(null);
 			}
-		} catch (Exception e) {
+		} catch (Throwable e) {
 			logger.error("Error stopping browsermob proxy: " + e.getMessage());
+		} finally {
+			config.setBrowserMobProxy(null);
 		}
 		
 		// stop video capture
@@ -269,11 +339,12 @@ public class WebUIDriver {
 			if (videoRecorder.get() != null) {
 				CustomEventFiringWebDriver.stopVideoCapture(SeleniumTestsContextManager.getThreadContext().getRunMode(), 
 															SeleniumTestsContextManager.getThreadContext().getSeleniumGridConnector(),
-															videoRecorder.get());
-				videoRecorder.remove();
+															videoRecorder.get());	
 			}
-		} catch (Exception e) {
+		} catch (Throwable e) {
 			logger.error("Error stopping video capture: " + e.getMessage());
+		} finally {
+			videoRecorder.remove();
 		}
 		
     }
@@ -387,6 +458,12 @@ public class WebUIDriver {
     		throw new ScenarioException(String.format("driver with name %s has not been created", driverName));
     	}
     	currentWebUiDriverName.set(driverName);
+    	
+    	if (uxDriverSession.get().get(driverName).driver != null && ((CustomEventFiringWebDriver)(uxDriverSession.get().get(driverName).driver)).getSessionId() == null) {
+    		throw new ScenarioException("Cannot switch to a closed driver");
+    	}
+    	
+    	TestLogging.info(String.format("Switching to driver named '%s'", driverName));
     }
 
     /**
@@ -553,5 +630,17 @@ public class WebUIDriver {
 	 */
 	public WebDriver getDriver() {
 		return driver;
+	}
+
+	/**
+	 * FOR TEST ONLY
+	 * @param driver
+	 */
+	public void setDriver(WebDriver driver) {
+		this.driver = driver;
+	}
+
+	public static ThreadLocal<Map<String, WebUIDriver>> getUxDriverSession() {
+		return uxDriverSession;
 	}
 }

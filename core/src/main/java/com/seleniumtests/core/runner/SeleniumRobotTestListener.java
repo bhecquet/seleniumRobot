@@ -331,57 +331,20 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 		} else {
 			TestLogging.log("Test has not started or has been skipped");
 		}
-
-		if (WebUIDriver.getWebDriver(false) != null) {
-			try {
-				for (ScreenShot screenshot: new ScreenshotUtil().capture(Target.PAGE, ScreenShot.class, true, true)) {
-					TestLogging.logScreenshot(screenshot);
-				}
-			} catch (Exception e) {
-				TestLogging.log("Error while logging: " + e.getMessage());
-			}
-		}
 		
-		if (WebUIDriver.getWebUIDriver(false) != null) {
-			try {
-		    	// stop HAR capture
-				if (WebUIDriver.getWebUIDriver(false).getConfig().getBrowserMobProxy() != null) {
-					Har har = WebUIDriver.getWebUIDriver(false).getConfig().getBrowserMobProxy().endHar();
-					TestLogging.logNetworkCapture(har);
-				}
-				
-				// stop video capture
-				if (WebUIDriver.getVideoRecorder().get() != null) {
-					File videoFile = null;
-					try {
-						videoFile = CustomEventFiringWebDriver.stopVideoCapture(SeleniumTestsContextManager.getThreadContext().getRunMode(), 
-																				SeleniumTestsContextManager.getThreadContext().getSeleniumGridConnector(),
-																				WebUIDriver.getVideoRecorder().get());
-						
-						if (videoFile != null) {
-							Path pathAbsolute = Paths.get(videoFile.getAbsolutePath());
-					        Path pathBase = Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory());
-					        Path pathRelative = pathBase.relativize(pathAbsolute);
-					        
-					        if (SeleniumTestsContextManager.getThreadContext().getVideoCapture() == VideoCaptureMode.TRUE
-					        		|| (SeleniumTestsContextManager.getThreadContext().getVideoCapture() == VideoCaptureMode.ON_SUCCESS && testResult.isSuccess())
-					        		|| (SeleniumTestsContextManager.getThreadContext().getVideoCapture() == VideoCaptureMode.ON_ERROR && !testResult.isSuccess())) {
-					        	TestLogging.logFile(pathRelative.toFile(), "Video capture");
-					        	logger.info("Video file copied to " + pathAbsolute.toFile().getAbsolutePath());
-							} else {
-								pathAbsolute.toFile().delete();
-							}
-						}
-						
-	
-					} catch (IOException e) {
-						logger.error("cannot attach video capture", e);
-					}		
-				}
-			} catch (Exception e) {
-				TestLogging.log("Error while logging: " + e.getMessage());
-				WebUIDriver.getVideoRecorder().remove();
-				WebUIDriver.getWebUIDriver(false).getConfig().setBrowserMobProxy(null);
+		File videoFile = WebUIDriver.logFinalDriversState();
+		if (videoFile != null) {
+			Path pathAbsolute = Paths.get(videoFile.getAbsolutePath());
+	        Path pathBase = Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory());
+	        Path pathRelative = pathBase.relativize(pathAbsolute);
+	        
+	        if (SeleniumTestsContextManager.getThreadContext().getVideoCapture() == VideoCaptureMode.TRUE
+	        		|| (SeleniumTestsContextManager.getThreadContext().getVideoCapture() == VideoCaptureMode.ON_SUCCESS && testResult.isSuccess())
+	        		|| (SeleniumTestsContextManager.getThreadContext().getVideoCapture() == VideoCaptureMode.ON_ERROR && !testResult.isSuccess())) {
+	        	TestLogging.logFile(pathRelative.toFile(), "Video capture");
+	        	logger.info("Video file copied to " + pathAbsolute.toFile().getAbsolutePath());
+			} else {
+				pathAbsolute.toFile().delete();
 			}
 		}
 		

@@ -29,6 +29,7 @@ import org.apache.log4j.Logger;
 import org.testng.ITestResult;
 import org.testng.Reporter;
 
+import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.driver.screenshots.ScreenShot;
 import com.seleniumtests.reporter.logger.TestMessage.MessageType;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
@@ -133,10 +134,10 @@ public class TestLogging {
     	}
     }
 
-    public static void logNetworkCapture(Har har) {
+    public static void logNetworkCapture(Har har, String name) {
     	if (getParentTestStep() != null) {
     		try {
-				getParentTestStep().addNetworkCapture(new HarCapture(har));
+				getParentTestStep().addNetworkCapture(new HarCapture(har, name));
 			} catch (IOException e) {
 				logger.error("cannot create network capture file: " + e.getMessage(), e);
 			} catch (NullPointerException e) {
@@ -156,14 +157,24 @@ public class TestLogging {
     /**
      * Log screenshot. Should not be directly used inside tests
      *
-     * @param  url
-     * @param  message
-     * @param  failed
+     * @param screenshot		screenshot to log
+	 * @param screenshotName name of the snapshot, user wants to display
      */
-    public static void logScreenshot(final ScreenShot screenshot, final String screenshotName) {
+    public static void logScreenshot(ScreenShot screenshot, String screenshotName) {
+    	logScreenshot(screenshot, screenshotName, WebUIDriver.getCurrentWebUiDriverName());
+    }
+    
+    /**
+     * Log screenshot. Should not be directly used inside tests
+     *
+     * @param screenshot		screenshot to log
+	 * @param screenshotName 	name of the snapshot, user wants to display
+	 * @param driverName		the name of the driver that did the screenshot
+     */
+    public static void logScreenshot(ScreenShot screenshot, String screenshotName, String driverName) {
     	if (getParentTestStep() != null) {
     		try {
-    			getParentTestStep().addSnapshot(new Snapshot(screenshot), testsSteps.get(getCurrentTestResult()).size(), screenshotName);
+    			getParentTestStep().addSnapshot(new Snapshot(screenshot, driverName), testsSteps.get(getCurrentTestResult()).size(), screenshotName);
     		} catch (NullPointerException e) {
     			logger.error("screenshot is null");
     		}
@@ -171,7 +182,7 @@ public class TestLogging {
     }
     
     public static void logScreenshot(final ScreenShot screenshot) {
-    	logScreenshot(screenshot, null);
+    	logScreenshot(screenshot, null, WebUIDriver.getCurrentWebUiDriverName());
     }
     
     public static void logTestStep(TestStep testStep) {

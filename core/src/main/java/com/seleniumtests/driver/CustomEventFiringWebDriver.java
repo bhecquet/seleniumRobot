@@ -299,6 +299,8 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
     		return ((RemoteWebDriver)driver).getSessionId().toString();
     	} catch (ClassCastException e) {
     		return UUID.randomUUID().toString();
+    	} catch (NullPointerException e) {
+    		return null;
     	}
     }
     

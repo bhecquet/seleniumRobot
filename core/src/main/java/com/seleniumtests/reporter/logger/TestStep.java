@@ -51,7 +51,7 @@ public class TestStep extends TestAction {
 	private List<TestAction> stepActions;
 	private Long duration;
 	private Date startDate;
-	private HarCapture harCapture;
+	private List<HarCapture> harCaptures;
 	private List<GenericFile> files;
 	private List<Snapshot> snapshots;
 	private ITestResult testResult;
@@ -66,6 +66,7 @@ public class TestStep extends TestAction {
 		super(name, false, pwdToReplace);
 		stepActions = new ArrayList<>();
 		files = new ArrayList<>();
+		harCaptures = new ArrayList<>();
 		snapshots = new ArrayList<>();
 		duration = 0L;
 		startDate = new Date();
@@ -158,7 +159,7 @@ public class TestStep extends TestAction {
 		step.pwdToReplace.addAll(pwdToReplace);
 	}
 	public void addNetworkCapture(HarCapture har) {
-		harCapture = har;
+		harCaptures.add(har);
 	}
 	public void addFile(GenericFile file) {
 		files.add(file);
@@ -193,7 +194,10 @@ public class TestStep extends TestAction {
 		
 		stepJSon.put("name", encodeString(getName(), "json"));
 		stepJSon.put("type", "step");
-		stepJSon.put("harCapture", harCapture != null ? harCapture.toJson(): null);
+		stepJSon.put("harCaptures", new JSONArray());
+		for (HarCapture harCapture: getHarCaptures()) {
+			stepJSon.getJSONArray("harCaptures").put(harCapture.toJson());
+		}
 		
 		stepJSon.put("actions", new JSONArray());
 		for (TestAction testAction: getStepActions()) {
@@ -246,12 +250,12 @@ public class TestStep extends TestAction {
 		return usedFiles;
 	}
 
-	public HarCapture getHarCapture() {
-		return harCapture;
+	public List<HarCapture> getHarCaptures() {
+		return harCaptures;
 	}
 
-	public void setHarCapture(HarCapture harCapture) {
-		this.harCapture = harCapture;
+	public void setHarCaptures(List<HarCapture> harCaptures) {
+		this.harCaptures = harCaptures;
 	}
 	
 
@@ -278,7 +282,10 @@ public class TestStep extends TestAction {
 		step.encoded = true;
 		step.duration = duration;
 		step.startDate = startDate;
-		step.harCapture = harCapture;
+		step.harCaptures = new ArrayList<>();
+		for (HarCapture har: harCaptures) {
+			step.harCaptures.add(har);
+		}
 		step.actionException = actionException;
 		if (actionException != null) {
 			step.actionExceptionMessage = actionException.getClass().toString() + ": " + encodeString(actionException.getMessage(), format);

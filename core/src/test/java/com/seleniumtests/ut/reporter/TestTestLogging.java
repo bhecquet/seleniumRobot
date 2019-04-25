@@ -90,16 +90,16 @@ public class TestTestLogging extends GenericTest {
 		TestLogging.setCurrentRootTestStep(new TestStep("step", null, new ArrayList<>()));
 		Har har = new Har(new HarLog());
 		har.getLog().addPage(new HarPage("title", "a title"));
-		TestLogging.logNetworkCapture(har);
-		Assert.assertNotNull(TestLogging.getParentTestStep().getHarCapture());
-		Assert.assertTrue(Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), "networkCapture.har").toFile().exists());
+		TestLogging.logNetworkCapture(har, "main");
+		Assert.assertFalse(TestLogging.getParentTestStep().getHarCaptures().isEmpty());
+		Assert.assertTrue(Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), "main-networkCapture.har").toFile().exists());
 	}
 	
 	@Test(groups={"ut"})
 	public void testLogHarNull() {
 		TestLogging.setCurrentRootTestStep(new TestStep("step", null, new ArrayList<>()));
-		TestLogging.logNetworkCapture(null);
-		Assert.assertNull(TestLogging.getParentTestStep().getHarCapture());
+		TestLogging.logNetworkCapture(null, "main");
+		Assert.assertTrue(TestLogging.getParentTestStep().getHarCaptures().isEmpty());
 	}
 	
 	@Test(groups={"ut"})
@@ -120,17 +120,17 @@ public class TestTestLogging extends GenericTest {
 		screenshot.setLocation("http://location");
 		screenshot.setHtmlSourcePath("file.html");
 		screenshot.setImagePath("file.png");
-		Snapshot snapshotLogger = new Snapshot(screenshot);
+		Snapshot snapshotLogger = new Snapshot(screenshot, "main");
 		String screenshotStr = snapshotLogger.buildScreenshotLog();
-		Assert.assertEquals(screenshotStr, "Output: title: <a href='http://location' target=url>Application URL</a> | <a href='file.html' target=html>Application HTML Source</a> | <a href='file.png' class='lightbox'>Application Snapshot</a>");
+		Assert.assertEquals(screenshotStr, "Output 'main' browser: title: <a href='http://location' target=url>Application URL</a> | <a href='file.html' target=html>Application HTML Source</a> | <a href='file.png' class='lightbox'>Application Snapshot</a>");
 	}
 	
 	@Test(groups={"ut"})
 	public void testBuildScreenshotStringWithoutInfo() {
 		ScreenShot screenshot = new ScreenShot();
-		Snapshot snapshotLogger = new Snapshot(screenshot);
+		Snapshot snapshotLogger = new Snapshot(screenshot, "main");
 		String screenshotStr = snapshotLogger.buildScreenshotLog();
-		Assert.assertEquals(screenshotStr, "Output: null: ");
+		Assert.assertEquals(screenshotStr, "Output 'main' browser: null: ");
 	}
 	
 	@Test(groups={"ut"})
@@ -139,9 +139,9 @@ public class TestTestLogging extends GenericTest {
 		screenshot.setTitle("title");
 		screenshot.setLocation("http://location");
 		screenshot.setHtmlSourcePath("file.html");
-		Snapshot snapshotLogger = new Snapshot(screenshot);
+		Snapshot snapshotLogger = new Snapshot(screenshot, "main");
 		String screenshotStr = snapshotLogger.buildScreenshotLog();
-		Assert.assertEquals(screenshotStr, "Output: title: <a href='http://location' target=url>Application URL</a> | <a href='file.html' target=html>Application HTML Source</a>");
+		Assert.assertEquals(screenshotStr, "Output 'main' browser: title: <a href='http://location' target=url>Application URL</a> | <a href='file.html' target=html>Application HTML Source</a>");
 	}
 	
 	@Test(groups={"ut"})
@@ -150,9 +150,9 @@ public class TestTestLogging extends GenericTest {
 		screenshot.setTitle("title");
 		screenshot.setLocation("http://location");
 		screenshot.setImagePath("file.png");
-		Snapshot snapshotLogger = new Snapshot(screenshot);
+		Snapshot snapshotLogger = new Snapshot(screenshot, "main");
 		String screenshotStr = snapshotLogger.buildScreenshotLog();
-		Assert.assertEquals(screenshotStr, "Output: title: <a href='http://location' target=url>Application URL</a> | <a href='file.png' class='lightbox'>Application Snapshot</a>");
+		Assert.assertEquals(screenshotStr, "Output 'main' browser: title: <a href='http://location' target=url>Application URL</a> | <a href='file.png' class='lightbox'>Application Snapshot</a>");
 	}
 	
 	@Test(groups={"ut"})
@@ -161,9 +161,9 @@ public class TestTestLogging extends GenericTest {
 		screenshot.setTitle("title");
 		screenshot.setHtmlSourcePath("file.html");
 		screenshot.setImagePath("file.png");
-		Snapshot snapshotLogger = new Snapshot(screenshot);
+		Snapshot snapshotLogger = new Snapshot(screenshot, "main");
 		String screenshotStr = snapshotLogger.buildScreenshotLog();
-		Assert.assertEquals(screenshotStr, "Output: title:  | <a href='file.html' target=html>Application HTML Source</a> | <a href='file.png' class='lightbox'>Application Snapshot</a>");
+		Assert.assertEquals(screenshotStr, "Output 'main' browser: title:  | <a href='file.html' target=html>Application HTML Source</a> | <a href='file.png' class='lightbox'>Application Snapshot</a>");
 	}
 	
 
@@ -172,7 +172,7 @@ public class TestTestLogging extends GenericTest {
 		TestLogging.setCurrentRootTestStep(new TestStep("step", null, new ArrayList<>()));
 		Har har = new Har(new HarLog());
 		har.getLog().addPage(new HarPage("title", "a title"));
-		HarCapture capture = new HarCapture(har);
-		Assert.assertEquals(capture.buildHarLog(), "Network capture: <a href='networkCapture.har'>HAR file</a>");
+		HarCapture capture = new HarCapture(har, "main");
+		Assert.assertEquals(capture.buildHarLog(), "Network capture 'main' browser: <a href='main-networkCapture.har'>HAR file</a>");
 	}
 }

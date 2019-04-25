@@ -40,10 +40,10 @@ public class Snapshot extends TestAction {
 	private ScreenShot screenshot;
 
 	public static final String SNAPSHOT_PATTERN = "Application Snapshot";
-	public static final String OUTPUT_PATTERN = "Output: ";
+	public static final String OUTPUT_PATTERN = "Output '%s' browser: ";
 
-	public Snapshot(final ScreenShot screenshot) {
-		super(screenshot.getTitle(), false, new ArrayList<>());
+	public Snapshot(final ScreenShot screenshot, String driverName) {
+		super(driverName, false, new ArrayList<>());
 		this.screenshot = screenshot;
 		durationToExclude = screenshot.getDuration();
 	}
@@ -59,7 +59,7 @@ public class Snapshot extends TestAction {
     public String buildScreenshotLog() {
 
         StringBuilder sbMessage = new StringBuilder("");
-        sbMessage.append(OUTPUT_PATTERN + StringEscapeUtils.escapeHtml4(screenshot.getTitle()) + ": ");
+        sbMessage.append(String.format(OUTPUT_PATTERN, name) + StringEscapeUtils.escapeHtml4(screenshot.getTitle()) + ": ");
         
         if (screenshot.getLocation() != null) {
             sbMessage.append("<a href='" + screenshot.getLocation() + "' target=url>Application URL</a>");
