@@ -137,7 +137,11 @@ public class DriverTestPage extends PageObject {
     }
     
     public DriverTestPage(boolean openPageURL) throws Exception {
-    	this(openPageURL, getPageUrl());
+    	this(openPageURL, getPageUrl(SeleniumTestsContextManager.getThreadContext().getBrowser()));
+    }
+    
+    public DriverTestPage(boolean openPageURL, BrowserType browserType) throws Exception {
+    	super(textElement, getPageUrl(browserType), browserType, "second", null);
     }
     
     public DriverTestPage(boolean openPageURL, String url) throws Exception {
@@ -214,8 +218,8 @@ public class DriverTestPage extends PageObject {
     	return this;
     }
     
-    public static String getPageUrl() {
-    	if (SeleniumTestsContextManager.getThreadContext().getBrowser() == BrowserType.FIREFOX) {
+    public static String getPageUrl(BrowserType browserType) {
+    	if (browserType == BrowserType.FIREFOX) {
 			return "file://" + Thread.currentThread().getContextClassLoader().getResource("tu/test.html").getFile();
 		} else {
 			return "file:///" + Thread.currentThread().getContextClassLoader().getResource("tu/test.html").getFile();

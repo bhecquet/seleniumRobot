@@ -23,6 +23,7 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.it.driver.support.pages.DriverTestPage;
 import com.seleniumtests.it.driver.support.pages.DriverTestPageNativeActions;
 
@@ -43,6 +44,17 @@ public class StubTestClassForDriverTest extends StubParentClass {
 			._reset()
 			._sendKeysComposite()
 			._clickPicture();
+	}
+	
+	@Test(groups="stub")
+	public void testMultipleDriver() throws Exception {
+		
+		new DriverTestPage(true)
+		._writeSomething()
+		._reset();
+		new DriverTestPage(true, BrowserType.FIREFOX)
+		._writeSomething()
+		._reset();
 	}
 	
 	@Test(groups="stub")

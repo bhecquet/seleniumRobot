@@ -33,9 +33,12 @@ import org.apache.commons.io.FileUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.mockito.Mock;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriver.Options;
 import org.openqa.selenium.WebDriver.Timeouts;
 import org.openqa.selenium.WebDriverException;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
@@ -55,6 +58,9 @@ import com.seleniumtests.browserfactory.mobile.MobileDeviceSelector;
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.ConfigurationException;
+import com.seleniumtests.customexception.ScenarioException;
+import com.seleniumtests.driver.BrowserType;
+import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import com.seleniumtests.driver.TestType;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.it.reporter.ReporterTest;
@@ -194,6 +200,67 @@ public class TestWebUiDriver extends ReporterTest {
 		} finally {
 			System.clearProperty(SeleniumTestsContext.CAPTURE_NETWORK);
 		}
+	}
+	
+	@Test(groups={"it"})
+	public void testMultipleBrowserCreation() {
+		
+		SeleniumTestsContextManager.getThreadContext().setTestType(TestType.WEB);
+		
+		// creates the first driver
+		WebDriver driver1 = WebUIDriver.getWebDriver(true, BrowserType.CHROME, "main", null);
+		driver1.get("chrome://settings/");
+		
+		// creates the second driver
+		WebDriver driver2 = WebUIDriver.getWebDriver(true, BrowserType.FIREFOX, "second", null);
+		driver2.get("about:config");
+		
+		// last created driver has the focus
+		Assert.assertEquals(WebUIDriver.getWebDriver(false), driver2);
+		
+		// created browser is of the requested type
+		Assert.assertTrue(((CustomEventFiringWebDriver)driver1).getWebDriver() instanceof ChromeDriver);
+		Assert.assertTrue(((CustomEventFiringWebDriver)driver2).getWebDriver() instanceof FirefoxDriver);
+	}
+	
+	/**
+	 * Test we can switch between browsers
+	 */
+	@Test(groups={"it"})
+	public void testMultiBrowserSwitching() {
+		SeleniumTestsContextManager.getThreadContext().setTestType(TestType.WEB);
+		
+		// creates the first driver
+		WebDriver driver1 = WebUIDriver.getWebDriver(true, BrowserType.CHROME, "main", null);
+		driver1.get("chrome://settings/");
+		
+		// creates the second driver
+		WebDriver driver2 = WebUIDriver.getWebDriver(true, BrowserType.FIREFOX, "second", null);
+		driver2.get("about:config");
+		
+		WebUIDriver.switchToDriver("main");
+		Assert.assertEquals(WebUIDriver.getWebDriver(false).getCurrentUrl(), "chrome://settings/");
+		WebUIDriver.switchToDriver("second");
+		Assert.assertEquals(WebUIDriver.getWebDriver(false).getCurrentUrl(), "about:config");
+	}
+	
+	/**
+	 * Check error is raised if we try to switch to a closed browser
+	 */
+	@Test(groups={"it"}, expectedExceptions=ScenarioException.class)
+	public void testMultiBrowserCloseOneBrowser() {
+		SeleniumTestsContextManager.getThreadContext().setTestType(TestType.WEB);
+		
+		// creates the first driver
+		WebDriver driver1 = WebUIDriver.getWebDriver(true, BrowserType.CHROME, "main", null);
+		driver1.get("chrome://settings/");
+		
+		// creates the second driver
+		WebDriver driver2 = WebUIDriver.getWebDriver(true, BrowserType.FIREFOX, "second", null);
+		driver2.get("about:config");
+		
+		driver1.quit();
+		WebUIDriver.switchToDriver("main");
 		
 	}
 	

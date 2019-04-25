@@ -125,7 +125,7 @@ public class TestTestStep extends GenericTest {
 		screenshot.setImagePath(tmpImgFile.getName());
 		screenshot.setHtmlSourcePath(tmpHtmlFile.getName());
 		
-		step.addSnapshot(new Snapshot(screenshot), 0, null);
+		step.addSnapshot(new Snapshot(screenshot, "main"), 0, null);
 		
 		Assert.assertEquals(step.getSnapshots().get(0).getScreenshot().getImagePath(), "N-A_0-1_step1-" + tmpImgFile.getName());
 		Assert.assertEquals(step.getSnapshots().get(0).getScreenshot().getHtmlSourcePath(), "N-A_0-1_step1-" + tmpHtmlFile.getName());
@@ -150,7 +150,7 @@ public class TestTestStep extends GenericTest {
 		screenshot.setImagePath(tmpImgFile.getName());
 		screenshot.setHtmlSourcePath(tmpHtmlFile.getName());
 		
-		step.addSnapshot(new Snapshot(screenshot), 0, "my snapshot <name>");
+		step.addSnapshot(new Snapshot(screenshot, "main"), 0, "my snapshot <name>");
 		
 		Assert.assertEquals(step.getSnapshots().get(0).getScreenshot().getImagePath(), "my_snapshot_-name-" + tmpImgFile.getName());
 		Assert.assertEquals(step.getSnapshots().get(0).getScreenshot().getHtmlSourcePath(), "my_snapshot_-name-" + tmpHtmlFile.getName());
@@ -174,7 +174,7 @@ public class TestTestStep extends GenericTest {
 		screenshot.setImagePath("screenshots/" + tmpImgFile2.getName());
 		screenshot.setHtmlSourcePath("htmls/" + tmpHtmlFile2.getName());
 		
-		step.addSnapshot(new Snapshot(screenshot), 0, null);
+		step.addSnapshot(new Snapshot(screenshot, "main"), 0, null);
 		
 		Assert.assertEquals(step.getSnapshots().get(0).getScreenshot().getImagePath(), "screenshots/N-A_0-1_step1-" + tmpImgFile2.getName());
 		Assert.assertEquals(step.getSnapshots().get(0).getScreenshot().getHtmlSourcePath(), "htmls/N-A_0-1_step1-" + tmpHtmlFile2.getName());
@@ -203,7 +203,7 @@ public class TestTestStep extends GenericTest {
 		screenshot1.setTitle("mysite");
 		screenshot1.setImagePath("screenshots/" + tmpImgFile2.getName());
 		screenshot1.setHtmlSourcePath("htmls/" + tmpHtmlFile2.getName());
-		step.addSnapshot(new Snapshot(screenshot1), 0, null);
+		step.addSnapshot(new Snapshot(screenshot1, "main"), 0, null);
 		
 		TestStep subStep = new TestStep("subStep", null, new ArrayList<>());
 		
@@ -218,7 +218,7 @@ public class TestTestStep extends GenericTest {
 		screenshot2.setLocation("http://mysite.com");
 		screenshot2.setTitle("mysite");
 		screenshot2.setImagePath("screenshots/" + tmpImgFile4.getName());
-		subStep.addSnapshot(new Snapshot(screenshot2), 0, null);
+		subStep.addSnapshot(new Snapshot(screenshot2, "main"), 0, null);
 		 
 		subStep.addAction(new TestAction("action1", true, new ArrayList<>()));
 		step.addAction(new TestAction("action2", false, new ArrayList<>()));
@@ -288,12 +288,12 @@ public class TestTestStep extends GenericTest {
 	public void testTestStepEncodeXmlHarKept() throws IOException {
 		Har har = new Har(new HarLog());
 		har.getLog().addPage(new HarPage("title", "a title"));
-		HarCapture cap = new HarCapture(har);
+		HarCapture cap = new HarCapture(har, "main");
 		
 		TestStep step = new TestStep("step1 \"'<>&", null, new ArrayList<>());
-		step.setHarCapture(cap);
+		step.setHarCaptures(Arrays.asList(cap));
 		TestStep encodedTestStep = step.encode("xml");
-		Assert.assertEquals(encodedTestStep.getHarCapture(), cap);
+		Assert.assertEquals(encodedTestStep.getHarCaptures().get(0), cap);
 	}
 	
 	@Test(groups={"ut"})
@@ -424,7 +424,7 @@ public class TestTestStep extends GenericTest {
 		
 		Har har = new Har(new HarLog());
 		har.getLog().addPage(new HarPage("title", "a title"));
-		step.addNetworkCapture(new HarCapture(har));
+		step.addNetworkCapture(new HarCapture(har, "main"));
 		
 		GenericFile file = new GenericFile(File.createTempFile("video", ".avi"), "video file");
 		step.addFile(file);
@@ -448,8 +448,8 @@ public class TestTestStep extends GenericTest {
 		Assert.assertEquals(stepJson.getJSONArray("actions").getJSONObject(1).getString("name"), "action2");
 		Assert.assertEquals(stepJson.getJSONArray("actions").getJSONObject(1).getBoolean("failed"), false);
 		
-		Assert.assertEquals(stepJson.getJSONObject("harCapture").getString("type"), "networkCapture");
-		Assert.assertEquals(stepJson.getJSONObject("harCapture").getString("name"), "a title");
+		Assert.assertEquals(stepJson.getJSONArray("harCaptures").getJSONObject(0).getString("type"), "networkCapture");
+		Assert.assertEquals(stepJson.getJSONArray("harCaptures").getJSONObject(0).getString("name"), "main");
 		
 		Assert.assertEquals(stepJson.getJSONArray("actions").getJSONObject(2).getString("type"), "step");
 		Assert.assertEquals(stepJson.getJSONArray("actions").getJSONObject(2).getString("name"), "subStep");
@@ -597,7 +597,7 @@ public class TestTestStep extends GenericTest {
 		
 		ScreenShot screenshot = new ScreenShot();
 		screenshot.setDuration(200);
-		Snapshot snapshot = new Snapshot(screenshot);
+		Snapshot snapshot = new Snapshot(screenshot, "main");
 		step.addSnapshot(snapshot, 0, "name");
 		Assert.assertEquals(step.getDuration(), (Long)4300L);
 	}
