@@ -204,7 +204,7 @@ public class TestWebUiDriver extends ReporterTest {
 	
 	@Test(groups={"it"})
 	public void testMultipleBrowserCreation() {
-		
+
 		SeleniumTestsContextManager.getThreadContext().setTestType(TestType.WEB);
 		
 		// creates the first driver
@@ -221,6 +221,25 @@ public class TestWebUiDriver extends ReporterTest {
 		// created browser is of the requested type
 		Assert.assertTrue(((CustomEventFiringWebDriver)driver1).getWebDriver() instanceof ChromeDriver);
 		Assert.assertTrue(((CustomEventFiringWebDriver)driver2).getWebDriver() instanceof FirefoxDriver);
+	}
+	
+	@Test(groups={"it"}, enabled=true)
+	public void testMultipleBrowserCreationGridMode() {
+
+		SeleniumTestsContextManager.getThreadContext().setTestType(TestType.WEB);
+		SeleniumTestsContextManager.getThreadContext().setRunMode("grid");
+		SeleniumTestsContextManager.getThreadContext().setWebDriverGrid("http://SN782980:4444/wd/hub");
+		
+		// creates the first driver
+		WebDriver driver1 = WebUIDriver.getWebDriver(true, BrowserType.CHROME, "main", null);
+		driver1.get("chrome://settings/");
+		
+		// creates the second driver
+		WebDriver driver2 = WebUIDriver.getWebDriver(true, BrowserType.FIREFOX, "second", null);
+		driver2.get("about:config");
+		
+		// last created driver has the focus
+		Assert.assertEquals(WebUIDriver.getWebDriver(false), driver2);
 	}
 	
 	/**

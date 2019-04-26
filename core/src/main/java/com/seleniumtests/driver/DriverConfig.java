@@ -30,6 +30,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.events.WebDriverEventListener;
 
 import com.google.gson.JsonObject;
+import com.seleniumtests.connectors.selenium.SeleniumGridConnector;
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.proxy.ProxyConfig;
 import com.seleniumtests.customexception.DriverExceptions;
@@ -45,6 +46,7 @@ public class DriverConfig {
 
     private WebDriver driver;
     private Integer attachExistingDriverPort = null;
+    private String runOnSameNode = null;
     private BrowserMobProxy browserMobProxy;
     private SeleniumTestsContext testContext;
     private BrowserType browserType;
@@ -269,6 +271,10 @@ public class DriverConfig {
     	return testContext.getWebProxyPort();
     }
     
+    public SeleniumGridConnector getSeleniumGridConnector() {
+    	return testContext.getSeleniumGridConnector();
+    }
+    
     public String getWebProxyLogin() {
     	return testContext.getWebProxyLogin();
     }
@@ -414,5 +420,13 @@ public class DriverConfig {
 	 */
 	public void setAttachExistingDriverPort(Integer attachExistingDriverPort) {
 		this.attachExistingDriverPort = attachExistingDriverPort;
+	}
+
+	public String getRunOnSameNode() {
+		return runOnSameNode;
+	}
+
+	public void setRunOnSameNode(String runOnSameNode) {
+		this.runOnSameNode = runOnSameNode;
 	}
 }

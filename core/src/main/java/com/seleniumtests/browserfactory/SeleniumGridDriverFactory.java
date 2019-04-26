@@ -107,6 +107,11 @@ public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implemen
     		}
     	}
     	
+    	// configure the node were browser should be created
+    	if (webDriverConfig.getRunOnSameNode() != null) {
+    		capabilities.setCapability(SeleniumRobotCapabilityType.ATTACH_SESSION_ON_NODE, webDriverConfig.getRunOnSameNode());
+    	}
+    	
     	return capabilities;
     }
     
@@ -158,9 +163,14 @@ public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implemen
 			
 			for (SeleniumGridConnector gridConnector: gridConnectors) {
 			
-				// if grid is not active, wait 30 secs
+				// if grid is not active, try the next one
 				if (!gridConnector.isGridActive()) {
 					logger.warn(String.format("grid %s is not active, looking for the next one", gridConnector.getHubUrl().toString()));
+					continue;
+				}
+				
+				// if we are launching a second driver for the same test, do it on the same hub
+				if (webDriverConfig.getRunOnSameNode() != null && webDriverConfig.getSeleniumGridConnector() != gridConnector) {
 					continue;
 				}
 				
