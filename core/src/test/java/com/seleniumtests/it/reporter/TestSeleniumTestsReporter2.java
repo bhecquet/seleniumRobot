@@ -636,7 +636,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			
 			Assert.assertTrue(detailedReportContent1.contains("<li>sendKeys on TextFieldElement Text, by={By.id: text2} with args: (true, true, [a text,], )</li>"));	
 			Assert.assertTrue(detailedReportContent1.contains("Network capture 'main' browser: <a href='main-networkCapture.har'>HAR file</a>"));
-			Assert.assertTrue(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriver", "networkCapture.har").toFile().exists());
+			Assert.assertTrue(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriver", "main-networkCapture.har").toFile().exists());
 			
 		} finally {
 			System.clearProperty(SeleniumTestsContext.CAPTURE_NETWORK);
