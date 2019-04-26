@@ -19,5 +19,15 @@ package com.seleniumtests.browserfactory;
 
 public interface SeleniumRobotCapabilityType {
 
-	String NODE_TAGS = "nodeTags"; // value must be a list of strings
+	/**
+	 * parameter to force a test to execute on a specific node or set of nodes
+	 * value must be a list of strings
+	 */
+	String NODE_TAGS = "nodeTags"; 
+	
+	
+	/**
+	 * parameter to route browser creation on a specific node on grid even if maxSession is reached
+	 */
+	String ATTACH_SESSION_ON_NODE = "attachSessionOnNode"; 
 }

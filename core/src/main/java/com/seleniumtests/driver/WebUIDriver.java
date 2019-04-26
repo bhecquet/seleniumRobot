@@ -430,6 +430,8 @@ public class WebUIDriver {
     	}
     	
         if ((uxDriverSession.get() == null || uxDriverSession.get().get(driverName) == null || uxDriverSession.get().get(driverName).driver == null) && isCreate && !SeleniumTestsContextManager.isNonGuiTest()) {
+        	
+        	
         	WebUIDriver uiDriver = getWebUIDriver(true, driverName);
         	uiDriver.config.setAttachExistingDriverPort(attachExistingDriverPort);
         	
@@ -438,6 +440,12 @@ public class WebUIDriver {
         	} else {
         		uiDriver.config.setBrowserType(browserType);
         	}
+        	
+        	// expect the new driver to run on same node as the previous ones
+        	if (uxDriverSession.get() != null && uxDriverSession.get().size() > 1 && SeleniumTestsContextManager.getThreadContext().getSeleniumGridConnector() != null) {
+        		uiDriver.config.setRunOnSameNode(SeleniumTestsContextManager.getThreadContext().getSeleniumGridConnector().getNodeUrl());
+        	}
+        	
         	uiDriver.createWebDriver();
         }
 
