@@ -335,7 +335,14 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
     	if (isWebTest) {
     		try {
 	    		List<Number> dims = (List<Number>)((JavascriptExecutor)driver).executeScript(JS_GET_VIEWPORT_SIZE);
-	    		return new Dimension(dims.get(0).intValue(), dims.get(1).intValue());
+	    		Dimension foundDimension = new Dimension(dims.get(0).intValue(), dims.get(1).intValue());
+	    		
+	    		// issue #233: prevent too big size at it may be used to process images and Buffe
+	    		if (foundDimension.width * foundDimension.height * 8L > Integer.MAX_VALUE) {
+	    			return new Dimension(2000, 10000);
+	    		} else {
+	    			return foundDimension;
+	    		}
     		} catch (Exception e) {
     			return driver.manage().window().getSize();
     		}
