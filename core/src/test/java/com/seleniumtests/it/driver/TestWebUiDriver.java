@@ -136,9 +136,9 @@ public class TestWebUiDriver extends ReporterTest {
 			
 			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriver"});
 			
-			Assert.assertTrue(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriver", "networkCapture.har").toFile().exists());
+			Assert.assertTrue(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriver", "main-networkCapture.har").toFile().exists());
 			
-			JSONObject json = new JSONObject(FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriver", "networkCapture.har").toFile()));
+			JSONObject json = new JSONObject(FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriver", "main-networkCapture.har").toFile()));
 			JSONArray pages = json.getJSONObject("log").getJSONArray("pages");
 			
 			// 7 steps in HTML 
@@ -189,8 +189,8 @@ public class TestWebUiDriver extends ReporterTest {
 			
 			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriverManualSteps"});
 			
-			Assert.assertTrue(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriverManualSteps", "networkCapture.har").toFile().exists());
-			JSONObject json = new JSONObject(FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriverManualSteps", "networkCapture.har").toFile()));
+			Assert.assertTrue(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriverManualSteps", "main-networkCapture.har").toFile().exists());
+			JSONObject json = new JSONObject(FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriverManualSteps", "main-networkCapture.har").toFile()));
 			JSONArray pages = json.getJSONObject("log").getJSONArray("pages");
 			Assert.assertEquals(pages.length(), 2);
 			Assert.assertEquals(pages.getJSONObject(0).getString("id").trim(), "testDriverManualSteps");
