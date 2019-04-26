@@ -235,6 +235,20 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 		Assert.assertEquals(dim.height, 80);
 		Assert.assertEquals(dim.width, 120);
 	}
+	
+	/**
+	 * issue #233: Test the case where JS_GET_VIEWPORT_SIZE returns 100000x100000 because dimension is not found
+	 * In this case, return the browser size
+	 */
+	@Test(groups = {"ut"})
+	public void testViewPortDimensionWithoutScrollbarNotReturned() {
+		when(driver.executeScript(anyString())).thenReturn(Arrays.asList(100000L, 100000L));
+		Dimension dim = ((CustomEventFiringWebDriver)eventDriver).getViewPortDimensionWithoutScrollbar();
+		
+		// check we get the window dimension
+		Assert.assertEquals(dim.height, 10000);
+		Assert.assertEquals(dim.width, 2000);
+	}
 
 	/**
 	 * issue #165: Check case where browser is not at 100% zoom and so, double reply is returned
