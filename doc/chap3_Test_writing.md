@@ -664,3 +664,40 @@ The handled methods are the most used in selenium writing:
 - switchTo().frame(String)
 - switchTo().defaultContent()
 - switchTo().parentFrame()
+
+### 11 Use several browsers inside on test scenario ###
+
+Some rare tests require to start several browsers (one for each application which should be tested at the same time). For example, you have to create a client account on front-office with Chrome, then delete this client onto the back-office with Internet Explorer.
+To do so, you can request a PageObject to create a new driver. By default, it creates it only if none already exists.
+
+- Test is driven by Chrome, it's configured so in TestNG XML file. With the code below, we will create a chrome browser on URL "http://front-office.mycompany.com". Chrome will be referenced under the name `main` which is the default name for the first created driver
+
+	public FrontOfficePage() throws Exception {
+    	super(myFOElementToCheck, "http://front-office.mycompany.com");
+    }
+    
+- After having created the client, we will connect to the back-office using Internet Explorer. At this point, the default driver becomes the newly created one (Internet Explorer). It's referenced under the name `bo-browser`
+	
+	public BackOfficePage() throws Exception {
+		super(myBOElementToCheck, "http://back-office.mycompany.com", BrowserType.INTERNET_EXPLORER, "bo-browser", null);
+	}
+
+- The test will look like this
+	
+	// create client on front-office
+	FrontOfficePage foPage = new FrontOfficePage()._createClient()
+																._doSomethingElse();
+								
+	// delete client on back-office
+	new BackOfficePage()._accessClient()
+								._deleteClient();
+								
+	// switch back to Chrome for any other operations. 'main' is the name of Chrome when it has been created
+	switchToDriver("main");
+	
+	foPage._recreateClient();
+	
+	
+	
+	
+	
