@@ -17,38 +17,9 @@
  */
 package com.seleniumtests.driver;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.log4j.Logger;
-import org.openqa.selenium.Capabilities;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.logging.LogEntry;
-import org.openqa.selenium.support.events.EventFiringWebDriver;
-import org.openqa.selenium.support.events.WebDriverEventListener;
-
 import com.neotys.selenium.proxies.NLWebDriver;
 import com.neotys.selenium.proxies.NLWebDriverFactory;
-import com.seleniumtests.browserfactory.AppiumDriverFactory;
-import com.seleniumtests.browserfactory.BrowserInfo;
-import com.seleniumtests.browserfactory.BrowserStackDriverFactory;
-import com.seleniumtests.browserfactory.ChromeDriverFactory;
-import com.seleniumtests.browserfactory.EdgeDriverFactory;
-import com.seleniumtests.browserfactory.FirefoxDriverFactory;
-import com.seleniumtests.browserfactory.HtmlUnitDriverFactory;
-import com.seleniumtests.browserfactory.IEDriverFactory;
-import com.seleniumtests.browserfactory.IWebDriverFactory;
-import com.seleniumtests.browserfactory.SafariDriverFactory;
-import com.seleniumtests.browserfactory.SauceLabsDriverFactory;
-import com.seleniumtests.browserfactory.SeleniumGridDriverFactory;
+import com.seleniumtests.browserfactory.*;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.DriverExceptions;
@@ -62,9 +33,21 @@ import com.seleniumtests.reporter.logger.TestLogging;
 import com.seleniumtests.util.helper.WaitHelper;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 import com.seleniumtests.util.osutility.OSUtility;
-
 import net.lightbody.bmp.BrowserMobProxy;
 import net.lightbody.bmp.core.har.Har;
+import org.apache.log4j.Logger;
+import org.openqa.selenium.Capabilities;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.logging.LogEntry;
+import org.openqa.selenium.support.events.EventFiringWebDriver;
+import org.openqa.selenium.support.events.WebDriverEventListener;
+
+import java.io.*;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * This class provides factory to create webDriver session.
@@ -442,7 +425,7 @@ public class WebUIDriver {
         	}
         	
         	// expect the new driver to run on same node as the previous ones
-        	if (uxDriverSession.get() != null && uxDriverSession.get().size() > 1 && SeleniumTestsContextManager.getThreadContext().getSeleniumGridConnector() != null) {
+        	if (uxDriverSession.get() != null && uxDriverSession.get().size() > 1 && uiDriver.config.getSeleniumGridConnector() != null) {
         		uiDriver.config.setRunOnSameNode(SeleniumTestsContextManager.getThreadContext().getSeleniumGridConnector().getNodeUrl());
         	}
         	

@@ -129,6 +129,14 @@ public class SeleniumRobotTestPlan {
     }
     
     /**
+     * In case the scenario uses several drivers, switch to one or another using this method, so that any new calls will go through this driver
+     * @param driverName
+     */
+    public void switchToDriver(String driverName) {
+    	WebUIDriver.switchToDriver(driverName);
+    }
+    
+    /**
      * Kills the named process, locally or remotely
      * @param processName
      */
