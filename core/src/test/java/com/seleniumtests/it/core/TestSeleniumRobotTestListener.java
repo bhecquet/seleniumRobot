@@ -198,6 +198,11 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 		Assert.assertTrue(mainReportContent.matches(".*<i class\\=\"fa fa-circle circleSkipped\"></i><a href\\='test1Listener4/TestReport\\.html'.*?>test1Listener4</a>.*"));
 	}
 	
+	/**
+	 * Test we cannot create a driver in '@BeforeSuite' methods
+	 * @param testContext
+	 * @throws Exception
+	 */
 	@Test(groups={"it"})
 	public void testContextDriverBlockingBeforeSuite(ITestContext testContext) throws Exception {
 		
@@ -222,6 +227,11 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 		Assert.assertEquals(jsonResult.getInt("skip"), 2);
 	}
 	
+	/**
+	 * Test we cannot create a driver in '@BeforeTest' methods
+	 * @param testContext
+	 * @throws Exception
+	 */
 	@Test(groups={"it"})
 	public void testContextDriverBlockingBeforeTest(ITestContext testContext) throws Exception {
 		
@@ -248,7 +258,12 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 		// All tests should be skipped because configuration method is skipped
 		Assert.assertEquals(jsonResult.getInt("skip"), 2);
 	}
-	
+
+	/**
+	 * Test we cannot create a driver in '@BeforeClass' methods
+	 * @param testContext
+	 * @throws Exception
+	 */
 	@Test(groups={"it"})
 	public void testContextDriverBlockingBeforeClass(ITestContext testContext) throws Exception {
 		
@@ -277,6 +292,12 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 		Assert.assertEquals(jsonResult.getInt("skip"), 2);
 	}
 	
+
+	/**
+	 * Test we cannot create a driver in '@BeforeMethod' methods
+	 * @param testContext
+	 * @throws Exception
+	 */
 	@Test(groups={"it"})
 	public void testContextDriverBlockingBeforeMethod(ITestContext testContext) throws Exception {
 		
@@ -306,6 +327,12 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 		Assert.assertEquals(jsonResult.getInt("skip"), 2);
 	}
 	
+
+	/**
+	 * Test we can create a driver in '@Test' methods
+	 * @param testContext
+	 * @throws Exception
+	 */
 	@Test(groups={"it"})
 	public void testContextDriverNotBlockingInTest(ITestContext testContext) throws Exception {
 		
@@ -336,7 +363,12 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 		// All tests should be skipped because configuration method is skipped
 		Assert.assertEquals(jsonResult.getInt("pass"), 2);
 	}
-	
+
+	/**
+	 * Test we can create a driver in '@AfterMethod' methods
+	 * @param testContext
+	 * @throws Exception
+	 */
 	@Test(groups={"it"})
 	public void testContextDriverNotBlockingInAfterMethod(ITestContext testContext) throws Exception {
 		
@@ -368,6 +400,11 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 		Assert.assertEquals(jsonResult.getInt("pass"), 2);
 	}
 
+	/**
+	 * Test we cannot create a driver in '@AfterClass' methods
+	 * @param testContext
+	 * @throws Exception
+	 */
 	@Test(groups={"it"})
 	public void testContextDriverBlockingAfterClass(ITestContext testContext) throws Exception {
 		
@@ -399,7 +436,12 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 		// All tests should be skipped because configuration method is skipped
 		Assert.assertEquals(jsonResult.getInt("pass"), 2);
 	}
-	
+
+	/**
+	 * Test we cannot create a driver in '@AfterTest' methods
+	 * @param testContext
+	 * @throws Exception
+	 */
 	@Test(groups={"it"})
 	public void testContextDriverBlockingAfterTest(ITestContext testContext) throws Exception {
 		

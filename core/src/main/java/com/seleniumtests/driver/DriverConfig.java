@@ -271,6 +271,11 @@ public class DriverConfig {
     	return testContext.getWebProxyPort();
     }
     
+    /**
+     * /!\ take the grid connector from test context because this one stores the current grid connector when a driver is created
+     *     This is used by issue #231 to know on which grid connector a previous driver has been created, and create the new driver on the same grid
+     * @return
+     */
     public SeleniumGridConnector getSeleniumGridConnector() {
     	return testContext.getSeleniumGridConnector();
     }

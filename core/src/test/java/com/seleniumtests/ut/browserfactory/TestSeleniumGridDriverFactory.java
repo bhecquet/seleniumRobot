@@ -4,15 +4,19 @@ package com.seleniumtests.ut.browserfactory;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
+import static org.mockito.hamcrest.MockitoHamcrest.argThat;
+import static org.hamcrest.Matchers.hasEntry;
 
 import java.awt.AWTException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.openqa.selenium.Capabilities;
+import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.Proxy;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriver.Options;
@@ -29,14 +33,17 @@ import org.testng.annotations.Test;
 
 import com.seleniumtests.MockitoTest;
 import com.seleniumtests.browserfactory.SeleniumGridDriverFactory;
+import com.seleniumtests.browserfactory.SeleniumRobotCapabilityType;
 import com.seleniumtests.connectors.selenium.SeleniumGridConnector;
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.customexception.SeleniumGridException;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.DriverConfig;
 import com.seleniumtests.driver.TestType;
 import com.seleniumtests.util.logging.DebugMode;
+import com.sun.mail.iap.Argument;
 
 @PowerMockIgnore("javax.net.ssl.*")
 @PrepareForTest({SeleniumGridDriverFactory.class})
@@ -227,6 +234,107 @@ public class TestSeleniumGridDriverFactory extends MockitoTest {
 			
 			Assert.assertEquals(newDriver, driver2);
 			
+		} finally {
+			SeleniumGridDriverFactory.setRetryTimeout(SeleniumGridDriverFactory.DEFAULT_RETRY_TIMEOUT);
+		}	
+	}
+	
+	
+
+	/**
+	 * Check we can force driver to be created on the same node using capabilities if DriverConfig.getRunOnSameNode() specifies the node name
+	 * For this to work a previous driver must have been created for one of the configured grid connector
+	 * @throws Exception
+	 */
+	@Test(groups={"ut"})
+	public void testDriverCreationOnSameNode() throws Exception {
+		
+		SeleniumTestsContextManager.setThreadContext(context);
+		when(context.getTestType()).thenReturn(TestType.WEB);
+		
+		when(gridConnector1.isGridActive()).thenReturn(true);
+		when(context.getSeleniumGridConnectors()).thenReturn(Arrays.asList(gridConnector1));
+		when(config.getRunOnSameNode()).thenReturn("http://localhost:5556/");
+		when(config.getSeleniumGridConnector()).thenReturn(gridConnector1); // simulate a previously created driver
+		
+		// connect to grid
+		PowerMockito.whenNew(RemoteWebDriver.class).withAnyArguments().thenReturn(driver);
+		WebDriver newDriver = new SeleniumGridDriverFactory(config).createWebDriver();
+		Assert.assertNotNull(newDriver);
+		Assert.assertEquals(newDriver, driver);
+	}
+	
+	/**
+	 * Check capability is correctly set when requested to run on same node
+	 * @throws Exception
+	 */
+	@Test(groups={"ut"})
+	public void testCapabilitiesCreationOnSameNode() throws Exception {
+		
+		SeleniumTestsContextManager.setThreadContext(context);
+		when(context.getTestType()).thenReturn(TestType.WEB);
+		
+		when(gridConnector1.isGridActive()).thenReturn(true);
+		when(context.getSeleniumGridConnectors()).thenReturn(Arrays.asList(gridConnector1));
+		when(config.getRunOnSameNode()).thenReturn("http://localhost:5556/");
+		when(config.getSeleniumGridConnector()).thenReturn(gridConnector1); // simulate a previously created driver
+		
+	
+		DesiredCapabilities caps = new SeleniumGridDriverFactory(config).createSpecificGridCapabilities(config);
+		Assert.assertEquals(caps.getCapability(SeleniumRobotCapabilityType.ATTACH_SESSION_ON_NODE), "http://localhost:5556/");
+
+	}
+	
+	/**
+	 * Check we can force driver to be created on the same node using capabilities if DriverConfig.getRunOnSameNode() specifies the node name
+	 * For this to work a previous driver must have been created for one of the configured grid connector
+	 * @throws Exception
+	 */
+	@Test(groups={"ut"})
+	public void testDriverCreationOnSameNodeMultipleHubs() throws Exception {
+		
+		SeleniumTestsContextManager.setThreadContext(context);
+		when(context.getTestType()).thenReturn(TestType.WEB);
+		
+		when(gridConnector1.isGridActive()).thenReturn(true);
+		when(gridConnector2.isGridActive()).thenReturn(true);
+		when(context.getSeleniumGridConnectors()).thenReturn(Arrays.asList(gridConnector1, gridConnector2));
+		when(config.getRunOnSameNode()).thenReturn("http://localhost:5556/");
+		when(config.getSeleniumGridConnector()).thenReturn(gridConnector2); // simulate a previously created driver
+
+		// connect to grid
+		PowerMockito.whenNew(RemoteWebDriver.class)
+						.withAnyArguments().thenReturn(driver);
+		SeleniumGridDriverFactory driverFactory = new SeleniumGridDriverFactory(config);
+		WebDriver newDriver = driverFactory.createWebDriver();
+		Assert.assertNotNull(newDriver);
+		Assert.assertEquals(newDriver, driver);
+
+		// Check selected grid connector is the requested one
+		Assert.assertEquals(driverFactory.getActiveGridConnector(), gridConnector2);
+	}
+	
+	/**
+	 * Check that it's not possible to create a driver on same node is no previous driver has been created before (gridConnector is null in context)
+	 * @throws Exception
+	 */
+	@Test(groups={"ut"}, expectedExceptions=ScenarioException.class)
+	public void testDriverDoNotCreateDriverOnSameNodeWithoutPreviousOne() throws Exception {
+		
+		try {
+			SeleniumGridDriverFactory.setRetryTimeout(1);
+			SeleniumTestsContextManager.setThreadContext(context);
+			when(context.getTestType()).thenReturn(TestType.WEB);
+			
+			when(gridConnector1.isGridActive()).thenReturn(true);
+			when(context.getSeleniumGridConnectors()).thenReturn(Arrays.asList(gridConnector1));
+			when(config.getRunOnSameNode()).thenReturn("http://localhost:5556/");
+			when(config.getSeleniumGridConnector()).thenReturn(null);			// simulate the case where no previous driver was created
+			
+			// connect to grid
+			PowerMockito.whenNew(RemoteWebDriver.class).withAnyArguments().thenReturn(driver);
+			WebDriver newDriver = new SeleniumGridDriverFactory(config).createWebDriver();
+
 		} finally {
 			SeleniumGridDriverFactory.setRetryTimeout(SeleniumGridDriverFactory.DEFAULT_RETRY_TIMEOUT);
 		}	

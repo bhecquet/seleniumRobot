@@ -1,18 +1,20 @@
 package com.seleniumtests.ut.driver;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.ArgumentMatchers.eq;
-
-import java.io.File;
-import java.io.FileNotFoundException;
-
+import com.neotys.selenium.proxies.NLWebDriver;
+import com.neotys.selenium.proxies.NLWebDriverFactory;
+import com.seleniumtests.MockitoTest;
+import com.seleniumtests.connectors.selenium.SeleniumGridConnector;
+import com.seleniumtests.connectors.selenium.SeleniumGridConnectorFactory;
+import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.customexception.ScenarioException;
+import com.seleniumtests.driver.BrowserType;
+import com.seleniumtests.driver.CustomEventFiringWebDriver;
+import com.seleniumtests.driver.DriverMode;
+import com.seleniumtests.driver.WebUIDriver;
+import com.seleniumtests.driver.screenshots.VideoRecorder;
+import com.seleniumtests.reporter.logger.TestLogging;
+import net.lightbody.bmp.BrowserMobProxy;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.htmlunit.HtmlUnitDriver;
@@ -23,22 +25,14 @@ import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.Test;
 
-import com.neotys.selenium.proxies.NLWebDriver;
-import com.neotys.selenium.proxies.NLWebDriverFactory;
-import com.seleniumtests.MockitoTest;
-import com.seleniumtests.connectors.selenium.SeleniumGridConnector;
-import com.seleniumtests.core.SeleniumTestsContextManager;
-import com.seleniumtests.customexception.ScenarioException;
-import com.seleniumtests.driver.BrowserType;
-import com.seleniumtests.driver.CustomEventFiringWebDriver;
-import com.seleniumtests.driver.DriverMode;
-import com.seleniumtests.driver.WebUIDriver;
-import com.seleniumtests.driver.screenshots.VideoRecorder;
-import com.seleniumtests.reporter.logger.TestLogging;
+import java.io.File;
 
-import net.lightbody.bmp.BrowserMobProxy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.*;
 
-@PrepareForTest({NLWebDriverFactory.class, CustomEventFiringWebDriver.class})
+@PrepareForTest({NLWebDriverFactory.class, CustomEventFiringWebDriver.class, SeleniumGridConnectorFactory.class})
 @PowerMockIgnore("javax.net.ssl.*")
 public class TestWebUIDriver extends MockitoTest {
 	
@@ -46,10 +40,19 @@ public class TestWebUIDriver extends MockitoTest {
 	private NLWebDriver neoloadDriver;
 	
 	@Mock
+	private WebDriver drv1;
+	
+	@Mock
+	private WebDriver drv2;
+	
+	@Mock
 	private VideoRecorder videoRecorder;
 	
 	@Mock
 	private CustomEventFiringWebDriver eventDriver;
+	
+	@Mock
+	private SeleniumGridConnector gridConnector;
 	
 	@Mock
 	private BrowserMobProxy mobProxy;
@@ -123,6 +126,33 @@ public class TestWebUIDriver extends MockitoTest {
 	
 	/**
 	 * Test that 2 drivers can be created specifying different name
+	 */
+	@Test(groups={"ut"})
+	public void testNewDriverCreationInGrid() {
+		SeleniumTestsContextManager.getThreadContext().setBrowser("htmlunit");
+		SeleniumTestsContextManager.getThreadContext().setWebDriverGrid("http://localhost:4444/wd/hub");
+		SeleniumTestsContextManager.getThreadContext().setRunMode("grid");
+		
+		WebUIDriver uiDriver1 = spy(WebUIDriver.getWebUIDriver(true, "main")); // create it so that we can control it via mock
+		WebUIDriver.getUxDriverSession().get().put("main", uiDriver1);
+		doReturn(drv1).when(uiDriver1).createWebDriver();
+		WebDriver driver1 = WebUIDriver.getWebDriver(true, BrowserType.HTMLUNIT, "main", null);
+
+		// set connector to simulate the driver creation on grid
+		SeleniumTestsContextManager.getThreadContext().setSeleniumGridConnector(gridConnector);
+		when(gridConnector.getNodeUrl()).thenReturn("http://localhost:5555/");
+		
+		WebUIDriver uiDriver2 = spy(WebUIDriver.getWebUIDriver(true, "other"));
+		WebUIDriver.getUxDriverSession().get().put("other", uiDriver2);
+		doReturn(drv2).when(uiDriver2).createWebDriver();
+		WebDriver driver2 = WebUIDriver.getWebDriver(true, BrowserType.HTMLUNIT, "other", null);
+		Assert.assertNull(uiDriver1.getConfig().getRunOnSameNode());
+		Assert.assertNotNull(uiDriver2.getConfig().getRunOnSameNode());
+
+	}
+	
+	/**
+	 * Check that with grid execution, we set the name of the previous driver execution node on this new driver
 	 */
 	@Test(groups={"ut"})
 	public void testNewDriverCreation() {

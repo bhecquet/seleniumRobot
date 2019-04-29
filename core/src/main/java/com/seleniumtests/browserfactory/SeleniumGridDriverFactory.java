@@ -34,6 +34,7 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import com.seleniumtests.connectors.selenium.SeleniumGridConnector;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.ConfigurationException;
+import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.customexception.SeleniumGridException;
 import com.seleniumtests.driver.DriverConfig;
 import com.seleniumtests.util.helper.WaitHelper;
@@ -95,7 +96,7 @@ public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implemen
      * OS version is only updated for mobile. It has no real sense on desktop
      * @return
      */
-    private DesiredCapabilities createSpecificGridCapabilities(DriverConfig webDriverConfig) {
+    public DesiredCapabilities createSpecificGridCapabilities(DriverConfig webDriverConfig) {
     	DesiredCapabilities capabilities = new DesiredCapabilities();
     	
     	if (SeleniumTestsContextManager.isMobileTest()) {
@@ -158,6 +159,10 @@ public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implemen
     	Clock clock = Clock.systemUTC();
 		Instant end = clock.instant().plusSeconds(retryTimeout);
 		Exception currentException = null;
+		
+		if (webDriverConfig.getRunOnSameNode() != null && webDriverConfig.getSeleniumGridConnector() == null) {
+			throw new ScenarioException("Cannot create a driver on the same node as an other driver if no previous driver has been created through grid");
+		}
     	
 		while (end.isAfter(clock.instant())) {
 			
@@ -227,5 +232,9 @@ public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implemen
 
 	public static void setRetryTimeout(int retryTimeout) {
 		SeleniumGridDriverFactory.retryTimeout = retryTimeout;
+	}
+
+	public SeleniumGridConnector getActiveGridConnector() {
+		return activeGridConnector;
 	}
 }

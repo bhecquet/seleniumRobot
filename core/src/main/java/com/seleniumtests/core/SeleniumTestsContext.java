@@ -1632,7 +1632,15 @@ public class SeleniumTestsContext {
     	}
     }
     
-    public void setWebDriverGrid(final String driverGrid) {
+    /**
+     *  /!\ FOR TEST ONLY!
+     * @param seleniumGridConnector
+     */
+    public void setSeleniumGridConnector(SeleniumGridConnector seleniumGridConnector) {
+		this.seleniumGridConnector = seleniumGridConnector;
+	}
+
+	public void setWebDriverGrid(final String driverGrid) {
     	if (driverGrid == null) {
     		setAttribute(WEB_DRIVER_GRID, new ArrayList<>());
     	} else {
