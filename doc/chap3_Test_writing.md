@@ -697,7 +697,26 @@ To do so, you can request a PageObject to create a new driver. By default, it cr
 	
 	foPage._recreateClient();
 	
+### 12 Attach an existing browser inside your scenario ###
+
+Sometimes, a scenario needs a browser launched by an other application (web or not)
+By default, selenium does not permit this easily but with seleniumRobot, you can do this (only for Internet Explorer and Chrome for now)
+
+This attaching can be done only from a page creation
+
+- For Internet Explorer, note the last parameter when creating the new page (any integer is valid):
+
+	public BackOfficePage() throws Exception {
+		super(myBOElementToCheck, "http://back-office.mycompany.com", BrowserType.INTERNET_EXPLORER, "bo-browser", 0);
+	}
 	
+- For Chrome, start your browser with `--remote-debugging-port=xxxx`. In the example below, xxxx = 11111. Then, in your page creation (note the 11111 as last parameter which tells robot to connect to chrome on debugger port 11111)
+
+	public BackOfficePage() throws Exception {
+		super(myBOElementToCheck, "http://back-office.mycompany.com", BrowserType.CHROME, "bo-browser", 11111);
+	}
 	
-	
-	
+**WARN**: for Internet explorer, a modified version of IEDriverServer is required. Provided in seleniumRobot-driver artifact
+
+**LIMIT**: This approach is limited to one Internet Explorer started programmatically. It will not work with IE started manually as IE must be started the same way IEDriverServer starts it.
+
