@@ -223,7 +223,7 @@ public class TestWebUiDriver extends ReporterTest {
 		Assert.assertTrue(((CustomEventFiringWebDriver)driver2).getWebDriver() instanceof FirefoxDriver);
 	}
 	
-	@Test(groups={"it"}, enabled=true)
+	@Test(groups={"it"}, enabled=false)
 	public void testMultipleBrowserCreationGridMode() {
 
 		SeleniumTestsContextManager.getThreadContext().setTestType(TestType.WEB);
