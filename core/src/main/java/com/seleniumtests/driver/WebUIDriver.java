@@ -206,24 +206,32 @@ public class WebUIDriver {
     		}
     	}
     	
-    	File videoFile = null;
-    	
-    	// stop video capture
-		if (videoRecorder.get() != null) {
+    	File videoFile = stopVideoCapture();
+		
+		return videoFile;
+    }
+    
+    /**
+     * Stop video capture
+     */
+    private static File stopVideoCapture() {
+    	if (videoRecorder.get() != null) {
 			
 			try {
-				videoFile = CustomEventFiringWebDriver.stopVideoCapture(SeleniumTestsContextManager.getThreadContext().getRunMode(), 
+				return CustomEventFiringWebDriver.stopVideoCapture(SeleniumTestsContextManager.getThreadContext().getRunMode(), 
 																		SeleniumTestsContextManager.getThreadContext().getSeleniumGridConnector(),
 																		WebUIDriver.getVideoRecorder().get());
 
 			} catch (IOException e) {
 				logger.error("cannot attach video capture", e);
-			} catch (Exception e) {
+			} catch (Throwable e) {
+				logger.error("Error stopping video capture: " + e.getMessage());
+			} finally {
 				videoRecorder.remove();
 			}
 		}
-		
-		return videoFile;
+    	
+    	return null;
     }
     
     /**
@@ -318,17 +326,7 @@ public class WebUIDriver {
 		}
 		
 		// stop video capture
-		try {
-			if (videoRecorder.get() != null) {
-				CustomEventFiringWebDriver.stopVideoCapture(SeleniumTestsContextManager.getThreadContext().getRunMode(), 
-															SeleniumTestsContextManager.getThreadContext().getSeleniumGridConnector(),
-															videoRecorder.get());	
-			}
-		} catch (Throwable e) {
-			logger.error("Error stopping video capture: " + e.getMessage());
-		} finally {
-			videoRecorder.remove();
-		}
+		stopVideoCapture();
 		
     }
     
