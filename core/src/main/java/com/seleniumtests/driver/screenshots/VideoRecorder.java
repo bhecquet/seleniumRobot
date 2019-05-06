@@ -116,19 +116,24 @@ public class VideoRecorder {
 			throw new ScenarioException("recorder is null!. do not use the default constructor");
 		}
 		
-		screenRecorder.stop();
-		List<File> createdFiles = screenRecorder.getCreatedMovieFiles();
-		if (!createdFiles.isEmpty()) {
-			File lastFile = createdFiles.get(createdFiles.size() - 1);
-			File videoFile = Paths.get(folderPath.getAbsolutePath(), fileName).toFile();
-			FileUtils.copyFile(lastFile, videoFile);
-			
-			// remove temp files
-			for (File f: createdFiles) {
-				f.delete();
+		if (screenRecorder.getState() == State.RECORDING) {
+		
+			screenRecorder.stop();
+			List<File> createdFiles = screenRecorder.getCreatedMovieFiles();
+			if (!createdFiles.isEmpty()) {
+				File lastFile = createdFiles.get(createdFiles.size() - 1);
+				File videoFile = Paths.get(folderPath.getAbsolutePath(), fileName).toFile();
+				FileUtils.copyFile(lastFile, videoFile);
+				
+				// remove temp files
+				for (File f: createdFiles) {
+					f.delete();
+				}
+				
+				return videoFile;
+			} else {
+				return null;
 			}
-			
-			return videoFile;
 		} else {
 			return null;
 		}
