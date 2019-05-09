@@ -240,7 +240,9 @@ public class WebUIDriver {
     private void logFinalDriverState() {
     	if (driver != null) {
 			try {
-				for (ScreenShot screenshot: new ScreenshotUtil().capture(Target.PAGE, ScreenShot.class, true, true)) {
+				
+				// force screenshotUtil to use the driver of this WebUiDriver, not the currently selected one
+				for (ScreenShot screenshot: new ScreenshotUtil(driver).capture(Target.PAGE, ScreenShot.class, true, true)) {
 					TestLogging.logScreenshot(screenshot, null, name);
 				}
 			} catch (Exception e) {
