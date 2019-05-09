@@ -24,6 +24,8 @@ import org.openqa.selenium.By;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.uipage.PageObject;
+import com.seleniumtests.uipage.htmlelements.FrameElement;
+import com.seleniumtests.uipage.htmlelements.LinkElement;
 import com.seleniumtests.uipage.htmlelements.PictureElement;
 import com.seleniumtests.uipage.htmlelements.ScreenZone;
 import com.seleniumtests.uipage.htmlelements.Table;
@@ -46,7 +48,11 @@ public class DriverTestPageWithoutFixedPattern extends PageObject {
 	public static final ScreenZone googleForDesktopWithFile = new ScreenZone("picture", Paths.get(SeleniumTestsContextManager.getApplicationDataPath(), "images", "googleSearch.png").toFile());
 	public static final ScreenZone firefoxForDesktop = new ScreenZone("picture", "tu/images/logo_text_field.png");
 	public static final ScreenZone zoneNotPresent = new ScreenZone("picture", "tu/images/vosAlertes.png");
+	public static final LinkElement newpage = new LinkElement("New Page", By.id("newpage"));
 	public static final TextFieldElement logoText = new TextFieldElement("logoText", By.id("logoText"));
+	
+	public static final FrameElement iframe = new FrameElement("IFrame", By.id("myIFrame"));
+	public static final TextFieldElement textElementIFrame = new TextFieldElement("Text", By.id("textInIFrameWithValue"), iframe);
 	
 	private String openedPageUrl;
 	
@@ -66,6 +72,12 @@ public class DriverTestPageWithoutFixedPattern extends PageObject {
     //for TestInterceptPage (the loader page of By has to be a PageObject)
     public By findById(String id) {
     	return By.id(id); 
+    }
+    
+
+    public DriverTestPageWithoutFixedPattern _goToNewPage() {
+    	newpage.click();
+    	return this;
     }
     
     public static String getPageUrl() {

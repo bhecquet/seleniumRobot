@@ -46,6 +46,7 @@ import org.mockito.Mock;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.WebDriver.Options;
+import org.openqa.selenium.WebDriver.TargetLocator;
 import org.openqa.selenium.WebDriver.Window;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.remote.RemoteWebDriver;
@@ -100,6 +101,9 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	private SeleniumGridConnector gridConnector;
 	
 	@Mock
+	private TargetLocator target;
+	
+	@Mock
 	private VideoRecorder videoRecorder;
 	
 	private EventFiringWebDriver eventDriver;
@@ -114,6 +118,7 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 		eventDriver = spy(new CustomEventFiringWebDriver(driver, null, browserInfo, true, DriverMode.LOCAL, null, null).register(new DriverExceptionListener()));
 		
 		when(driver.manage()).thenReturn(options);
+		when(driver.switchTo()).thenReturn(target);
 		when(driver.getSessionId()).thenReturn(new SessionId("1234"));
 		when(driver.getPageSource()).thenReturn("<html></html>");
 		when(options.window()).thenReturn(window);
@@ -179,6 +184,9 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 		when(driver.executeScript(anyString())).thenReturn(Arrays.asList(120L, 80L));
 		Dimension dim = ((CustomEventFiringWebDriver)eventDriver).getContentDimension();
 		
+		// no need to switch to default content if size is correctly returned
+		verify(driver, never()).switchTo();
+		
 		// check we get the window dimension
 		Assert.assertEquals(dim.height, 80);
 		Assert.assertEquals(dim.width, 120);
@@ -191,6 +199,34 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	public void testContentDimensionWithZoomFactor() {
 		when(driver.executeScript(anyString())).thenReturn(Arrays.asList(120.5, 80.67));
 		Dimension dim = ((CustomEventFiringWebDriver)eventDriver).getContentDimension();
+		
+		// check we get the window dimension
+		Assert.assertEquals(dim.height, 80);
+		Assert.assertEquals(dim.width, 120);
+	}
+	
+	/**
+	 * issue #238: sometimes, when trying to capture screenshot, if browser context do not correspond to driver context 
+	 * (we have switched to an iframe but never went back whereas displayed page is different), getContentDimension returns (0,0) which prevent screenshot from 
+	 * being stored
+	 */
+	@Test(groups = {"ut"})
+	public void testContentDimensionNotGet() {
+		when(driver.executeScript(anyString())).thenReturn(Arrays.asList(100, 0)).thenReturn(Arrays.asList(120, 80));
+		Dimension dim = ((CustomEventFiringWebDriver)eventDriver).getContentDimension();
+		
+		verify(driver).switchTo();
+		
+		// check we get the window dimension
+		Assert.assertEquals(dim.height, 80);
+		Assert.assertEquals(dim.width, 120);
+	}
+	@Test(groups = {"ut"})
+	public void testContentDimensionNotGet2() {
+		when(driver.executeScript(anyString())).thenReturn(Arrays.asList(0, 100)).thenReturn(Arrays.asList(120, 80));
+		Dimension dim = ((CustomEventFiringWebDriver)eventDriver).getContentDimension();
+		
+		verify(driver).switchTo();
 		
 		// check we get the window dimension
 		Assert.assertEquals(dim.height, 80);
@@ -230,6 +266,35 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	public void testViewPortDimensionWithoutScrollbar() {
 		when(driver.executeScript(anyString())).thenReturn(Arrays.asList(120L, 80L));
 		Dimension dim = ((CustomEventFiringWebDriver)eventDriver).getViewPortDimensionWithoutScrollbar();
+		
+		// no need to switch to default content if size is correctly returned
+		verify(driver, never()).switchTo();
+		
+		// check we get the window dimension
+		Assert.assertEquals(dim.height, 80);
+		Assert.assertEquals(dim.width, 120);
+	}
+	
+	/**
+	 * issue #238: check that if at least 1 dimension is the max one, switch to default content to retrieve it
+	 */
+	@Test(groups = {"ut"})
+	public void testViewPortDimensionWithoutScrollbarNotGet() {
+		when(driver.executeScript(anyString())).thenReturn(Arrays.asList(100000L, 1500L)).thenReturn(Arrays.asList(120, 80));
+		Dimension dim = ((CustomEventFiringWebDriver)eventDriver).getViewPortDimensionWithoutScrollbar();
+		
+		verify(driver).switchTo();
+		
+		// check we get the window dimension
+		Assert.assertEquals(dim.height, 80);
+		Assert.assertEquals(dim.width, 120);
+	}
+	@Test(groups = {"ut"})
+	public void testViewPortDimensionWithoutScrollbarNotGet2() {
+		when(driver.executeScript(anyString())).thenReturn(Arrays.asList(1500L, 100000L)).thenReturn(Arrays.asList(120, 80));
+		Dimension dim = ((CustomEventFiringWebDriver)eventDriver).getViewPortDimensionWithoutScrollbar();
+		
+		verify(driver).switchTo();
 		
 		// check we get the window dimension
 		Assert.assertEquals(dim.height, 80);
