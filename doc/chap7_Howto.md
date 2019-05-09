@@ -359,4 +359,16 @@ To download extension file, you can:
 - on firefox, go to addons.mozilla.org, search your extension and right click on "add to firefox" button. It will give you the extension path
 	  
 	  
+### 18 Add current date in test-output folder
+
+#### for windows ####
+
+    for /f %%a in ('powershell -Command "Get-Date -format yyyy_MM_dd__HH_mm_ss"') do set datetime=%%a
+	
+and then, in command line
+
+    -DoutputDirectory=test-output_%datetime%
+ 	
+ 	
+	  
 	  
