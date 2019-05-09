@@ -20,7 +20,9 @@ package com.seleniumtests.uipage.htmlelements;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.time.Clock;
 import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -1233,10 +1235,19 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     	
     	// refresh driver
     	driver = updateDriver();
-    	enterFrame();
-        WebDriverWait wait = new WebDriverWait(driver, timeout);
-        wait.until(ExpectedConditions.presenceOfElementLocated(by));
-        
+    	
+    	Clock clock = Clock.systemUTC();
+    	Instant end = clock.instant().plusSeconds(timeout);
+    	
+    	while (end.isAfter(clock.instant())) {
+    		try {
+	    		enterFrame();
+	    		new WebDriverWait(driver, 1).until(ExpectedConditions.presenceOfElementLocated(by));
+	    		return;
+    		} catch (TimeoutException e) {
+    		}
+    	}
+    	throw new TimeoutException("Element is not present", new NoSuchElementException(toString()));
     }
 
 	public FrameElement getFrameElement() {
