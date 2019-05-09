@@ -486,6 +486,14 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
 			pidsToKill.addAll(browserInfo.getAllBrowserSubprocessPids(driverPids));
 		}
 		
+		// close windows before quitting (this is the only way to close chrome attached browser when it's not started by selenium)
+		try {
+			for (String handle: getWindowHandles()) {
+				driver.switchTo().window(handle);
+				driver.close();
+			}
+		} catch (Throwable e) {}
+		
 		try {
 			driver.quit();
 		} finally {
