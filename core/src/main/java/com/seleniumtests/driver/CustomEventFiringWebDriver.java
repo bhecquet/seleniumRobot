@@ -88,6 +88,7 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
 	
 	private static final Logger logger = SeleniumRobotLogger.getLogger(CustomEventFiringWebDriver.class);
     private FileDetector fileDetector = new UselessFileDetector();
+    private static final int MAX_DIMENSION = 100000;
     private Set<String> currentHandles;
     private final List<Long> driverPids;
 	private final WebDriver driver;
@@ -98,11 +99,11 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
 	private final BrowserMobProxy mobProxy;
 	private final SeleniumGridConnector gridConnector;
     
-    private static final String JS_GET_VIEWPORT_SIZE =
+    private static final String JS_GET_VIEWPORT_SIZE = String.format(
     		"var pixelRatio;" +
     	    "try{pixelRatio = devicePixelRatio} catch(err){pixelRatio=1}" +
-            "var height = 100000;"
-                + "var width = 100000;"
+            "var height = %d;"
+                + "var width = %d;"
                 + " if (window.innerHeight) {"
                 + "		height = Math.min(window.innerHeight, height);"
                 + " }"
@@ -123,7 +124,7 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
                 + "	if (b.clientWidth) {"
                 + "		width = Math.min(b.clientWidth, width);"
                 + "	}"
-                + "	return [width * pixelRatio, height * pixelRatio];";
+                + "	return [width * pixelRatio, height * pixelRatio];", MAX_DIMENSION, MAX_DIMENSION);
 
     private static final String JS_GET_CURRENT_SCROLL_POSITION =
             "var doc = document.documentElement; "
@@ -335,6 +336,13 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
     	if (isWebTest) {
     		try {
 	    		List<Number> dims = (List<Number>)((JavascriptExecutor)driver).executeScript(JS_GET_VIEWPORT_SIZE);
+	    		
+	    		// issue #238: check we get a non max size
+	    		if (dims.get(0).intValue() == MAX_DIMENSION || dims.get(1).intValue() == MAX_DIMENSION) {
+	    			driver.switchTo().defaultContent();
+		    		dims = (List<Number>)((JavascriptExecutor)driver).executeScript(JS_GET_VIEWPORT_SIZE);
+	    		}
+	    		
 	    		Dimension foundDimension = new Dimension(dims.get(0).intValue(), dims.get(1).intValue());
 	    		
 	    		// issue #233: prevent too big size at it may be used to process images and Buffe
@@ -362,7 +370,15 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
     	if (isWebTest) {
     		try {
 				List<Number> dims = (List<Number>)((JavascriptExecutor)driver).executeScript(JS_GET_CONTENT_ENTIRE_SIZE);
+		    	
+		    	// issue #238: check we get a non zero size
+		    	if (dims.get(0).intValue() == 0 || dims.get(1).intValue() == 0) {
+		    		driver.switchTo().defaultContent();
+		    		dims = (List<Number>)((JavascriptExecutor)driver).executeScript(JS_GET_CONTENT_ENTIRE_SIZE);
+		    	}
+		    	
 		    	return new Dimension(dims.get(0).intValue(), dims.get(1).intValue());
+		    	
     		} catch (Exception e) {
     			return driver.manage().window().getSize();
     		}
