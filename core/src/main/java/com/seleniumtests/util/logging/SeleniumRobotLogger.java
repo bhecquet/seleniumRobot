@@ -73,10 +73,10 @@ public class SeleniumRobotLogger {
 
 	        Appender appender = (Appender) rootLogger.getAllAppenders().nextElement();
 	        appender.setLayout(new PatternLayout(SeleniumRobotLogger.LOG_PATTERN));
-
+	        	
 	        // redirect standard output and error to logger so that all logs are written to log file
-	        System.setErr(new PrintStream(new LoggingOutputStream(rootLogger, Level.ERROR), true));
-	        System.setOut(new PrintStream(new LoggingOutputStream(rootLogger, Level.INFO), true));
+	        System.setErr(new PrintStream(new Sys.Error(rootLogger), true));
+	        System.setOut(new PrintStream(new Sys.Out(rootLogger), true));
 	    }
 	    
         // use System property instead of SeleniumTestsContext class as SeleniumrobotLogger class is used for grid extension package and 
