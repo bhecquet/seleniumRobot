@@ -109,7 +109,7 @@ public abstract class LoggingOutputStream extends OutputStream {
         final byte[] bytes = new byte[count];
         System.arraycopy(buf, 0, bytes, 0, count);
         String str = new String(bytes);
-        str = str.replaceAll("\\r\\n$", "");
+        str = str.replaceAll("\\r\\n$", "").replaceAll("\\n$", "");
         if (!str.isEmpty()) {
         	log(str);
         }
