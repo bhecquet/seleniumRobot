@@ -11,7 +11,7 @@ import org.apache.log4j.Logger;
  * @author s047432
  *
  */
-public class LoggingOutputStream extends OutputStream {
+public abstract class LoggingOutputStream extends OutputStream {
 
     /**
      * Default number of bytes in the buffer.
@@ -41,12 +41,12 @@ public class LoggingOutputStream extends OutputStream {
     /**
      * The logger to write to.
      */
-    private Logger log;
+    protected Logger log;
 
     /**
      * The log level.
      */
-    private Level level;
+    protected Level level;
 
     /**
      * Creates the Logging instance to flush to the given logger.
@@ -109,9 +109,14 @@ public class LoggingOutputStream extends OutputStream {
         final byte[] bytes = new byte[count];
         System.arraycopy(buf, 0, bytes, 0, count);
         String str = new String(bytes);
-        log.log(level, str);
+        str = str.replaceAll("\\r\\n$", "");
+        if (!str.isEmpty()) {
+        	log(str);
+        }
         count = 0;
     }
+    
+    protected abstract void log(String str);
 
     /**
      * Closes this output stream and releases any system resources
