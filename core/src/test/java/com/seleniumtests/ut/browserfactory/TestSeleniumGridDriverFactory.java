@@ -109,7 +109,12 @@ public class TestSeleniumGridDriverFactory extends MockitoTest {
 		
 		// connect to grid
 		PowerMockito.whenNew(RemoteWebDriver.class).withAnyArguments().thenReturn(driver);
-		WebDriver newDriver = new SeleniumGridDriverFactory(config).createWebDriver();
+		SeleniumGridDriverFactory driverFactory = new SeleniumGridDriverFactory(config);
+		WebDriver newDriver = driverFactory.createWebDriver();
+		
+		// check that with a single driver creation, retry timeout is 30 mins
+		Assert.assertEquals(driverFactory.getInstanceRetryTimeout(), SeleniumGridDriverFactory.DEFAULT_RETRY_TIMEOUT);
+		
 		Assert.assertNotNull(newDriver);
 		Assert.assertEquals(newDriver, driver);
 	}
@@ -122,7 +127,7 @@ public class TestSeleniumGridDriverFactory extends MockitoTest {
 	public void testDriverNotCreatedIfGridNotActive() throws Exception {
 		
 		try {
-			SeleniumGridDriverFactory.setRetryTimeout(1);
+			SeleniumGridDriverFactory.setRetryTimeout(2);
 			
 			SeleniumTestsContextManager.setThreadContext(context);
 			when(context.getTestType()).thenReturn(TestType.WEB);
@@ -132,7 +137,8 @@ public class TestSeleniumGridDriverFactory extends MockitoTest {
 			
 			// connect to grid
 			PowerMockito.whenNew(RemoteWebDriver.class).withAnyArguments().thenReturn(driver);
-			new SeleniumGridDriverFactory(config).createWebDriver();
+			SeleniumGridDriverFactory driverFactory = new SeleniumGridDriverFactory(config);
+			driverFactory.createWebDriver();
 			
 		} finally {
 			SeleniumGridDriverFactory.setRetryTimeout(SeleniumGridDriverFactory.DEFAULT_RETRY_TIMEOUT);
@@ -259,7 +265,12 @@ public class TestSeleniumGridDriverFactory extends MockitoTest {
 		
 		// connect to grid
 		PowerMockito.whenNew(RemoteWebDriver.class).withAnyArguments().thenReturn(driver);
-		WebDriver newDriver = new SeleniumGridDriverFactory(config).createWebDriver();
+		SeleniumGridDriverFactory driverFactory = new SeleniumGridDriverFactory(config);
+		WebDriver newDriver = driverFactory.createWebDriver();
+		
+		// check that with a multiple drivers creation, retry timeout is 2 mins for the second drivers because runOnSameNode is set
+		Assert.assertEquals(driverFactory.getInstanceRetryTimeout(), 120);
+		
 		Assert.assertNotNull(newDriver);
 		Assert.assertEquals(newDriver, driver);
 	}

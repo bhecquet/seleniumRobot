@@ -45,10 +45,12 @@ public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implemen
 	private SeleniumGridConnector activeGridConnector;
 	public static final int DEFAULT_RETRY_TIMEOUT = 1800; // timeout in seconds (wait 30 mins for connecting to grid)
 	private static int retryTimeout = DEFAULT_RETRY_TIMEOUT;
+	private int instanceRetryTimeout; 
 
     public SeleniumGridDriverFactory(final DriverConfig cfg) {
         super(cfg);
         gridConnectors = new ArrayList<>(SeleniumTestsContextManager.getThreadContext().getSeleniumGridConnectors());
+        instanceRetryTimeout = retryTimeout;
         
         // reorder list so that we do not always use the same grid for connection
         Collections.shuffle(gridConnectors);
@@ -111,6 +113,7 @@ public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implemen
     	// configure the node were browser should be created
     	if (webDriverConfig.getRunOnSameNode() != null) {
     		capabilities.setCapability(SeleniumRobotCapabilityType.ATTACH_SESSION_ON_NODE, webDriverConfig.getRunOnSameNode());
+    		instanceRetryTimeout = Math.min(120, DEFAULT_RETRY_TIMEOUT / 2);
     	}
     	
     	return capabilities;
@@ -157,7 +160,7 @@ public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implemen
     	driver = null;
     	
     	Clock clock = Clock.systemUTC();
-		Instant end = clock.instant().plusSeconds(retryTimeout);
+		Instant end = clock.instant().plusSeconds(instanceRetryTimeout);
 		Exception currentException = null;
 		
 		if (webDriverConfig.getRunOnSameNode() != null && webDriverConfig.getSeleniumGridConnector() == null) {
@@ -202,7 +205,7 @@ public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implemen
 				logger.warn("No grid available, wait 30 secs and retry");
 				
 				// for test only, reduce wiat
-				if (retryTimeout > 1) {
+				if (instanceRetryTimeout > 1) {
 					WaitHelper.waitForSeconds(30);
 				} else {
 					WaitHelper.waitForSeconds(1);
@@ -236,5 +239,9 @@ public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implemen
 
 	public SeleniumGridConnector getActiveGridConnector() {
 		return activeGridConnector;
+	}
+
+	public int getInstanceRetryTimeout() {
+		return instanceRetryTimeout;
 	}
 }
