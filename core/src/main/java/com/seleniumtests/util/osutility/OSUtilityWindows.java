@@ -100,6 +100,9 @@ public class OSUtilityWindows extends OSUtility {
     public String killProcess(String pid, boolean force) {
 
     	if (force) {
+    		try {
+    			OSCommand.executeCommandAndWait(String.format("wmic process where \"processid='%s'\" delete", pid));
+    		} catch (Throwable e) {}
     		return OSCommand.executeCommandAndWait("taskkill /F /PID " + pid);
     	} else {
     		return OSCommand.executeCommandAndWait("taskkill /PID " + pid);

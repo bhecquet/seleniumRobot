@@ -25,6 +25,8 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.seleniumtests.GenericTest;
+import com.seleniumtests.util.helper.WaitHelper;
+import com.seleniumtests.util.osutility.OSCommand;
 import com.seleniumtests.util.osutility.OSUtility;
 import com.seleniumtests.util.osutility.OSUtilityFactory;
 import com.seleniumtests.util.osutility.ProcessInfo;
@@ -89,6 +91,16 @@ public class TestOsUtility extends GenericTest {
 	public void testGetProcessNameFromPid() {
 		if (OSUtility.isWindows()) {
 			Assert.assertTrue(osUtil.getProgramNameFromPid(processId).startsWith("java"));
+		}
+	}
+
+	@Test(groups={"it"})
+	public void testKillProcess() {
+		if (OSUtility.isWindows()) {
+			OSCommand.executeCommand("calc");
+			WaitHelper.waitForSeconds(2);
+			osUtil.killProcess(osUtil.getRunningProcess("calc").getPid(), true);
+			Assert.assertNull(osUtil.getRunningProcess("calc"));
 		}
 	}
 	
