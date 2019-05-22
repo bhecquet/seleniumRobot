@@ -113,7 +113,7 @@ public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implemen
     	// configure the node were browser should be created
     	if (webDriverConfig.getRunOnSameNode() != null) {
     		capabilities.setCapability(SeleniumRobotCapabilityType.ATTACH_SESSION_ON_NODE, webDriverConfig.getRunOnSameNode());
-    		instanceRetryTimeout = Math.min(120, DEFAULT_RETRY_TIMEOUT / 2);
+    		instanceRetryTimeout = Math.min(90, DEFAULT_RETRY_TIMEOUT / 2);
     	}
     	
     	return capabilities;
