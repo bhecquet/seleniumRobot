@@ -176,7 +176,11 @@ public class SeleniumGridConnector {
 		logger.warn("writeText is only available with seleniumRobot grid");
 	}
 	
-	public void runTest(RemoteWebDriver driver) {
+	/**
+	 * Retrieves session information about the created driver
+	 * @param driver
+	 */
+	public void getSessionInformationFromGrid(RemoteWebDriver driver) {
 		
         // logging node ip address:
         try {
@@ -192,7 +196,11 @@ public class SeleniumGridConnector {
             String version = driver.getCapabilities().getVersion();
             
             // setting sessionId ensures that this connector is the active one
-            sessionId = driver.getSessionId();
+            // issue #242: check if sessionId has already been set by a previous driver in this test session
+            // 				if so, keep the previous sessionId so that recordings are correctly handled
+            if (sessionId == null) {
+            	setSessionId(driver.getSessionId());
+            }
             logger.info("WebDriver is running on node " + node + ", " + browserName + " " + version + ", session " + sessionId);
             
         } catch (Exception ex) {
@@ -206,6 +214,10 @@ public class SeleniumGridConnector {
 
 	public SessionId getSessionId() {
 		return sessionId;
+	}
+
+	public void setSessionId(SessionId sessionId) {
+		this.sessionId = sessionId;
 	}
 
 	public String getNodeUrl() {

@@ -75,6 +75,9 @@ public class TestSeleniumGridConnector extends ConnectorsTest {
 	@Mock
 	private RemoteWebDriver driver;
 	
+	@Mock
+	private RemoteWebDriver driver2;
+	
 	private Capabilities capabilities = new DesiredCapabilities();
 	
 	@BeforeMethod(groups={"ut"})
@@ -89,10 +92,12 @@ public class TestSeleniumGridConnector extends ConnectorsTest {
 		when(client.execute((HttpHost)any(HttpHost.class), any(HttpRequest.class))).thenReturn(response);
 		when(driver.getCapabilities()).thenReturn(capabilities); 
 		when(driver.getSessionId()).thenReturn(new SessionId("0"));
+		when(driver2.getCapabilities()).thenReturn(capabilities); 
+		when(driver2.getSessionId()).thenReturn(new SessionId("1"));
 	}
 	
 	@Test(groups={"ut"})
-	public void testRunTest() throws UnsupportedOperationException, IOException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, UnirestException {
+	public void testGetSessionInformationFromGrid() throws UnsupportedOperationException, IOException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, UnirestException {
 		
 		createServerMock("GET", "/grid/api/testsession/", 200, "{'proxyId': 'http://localhost:43210'}");	
 		
@@ -104,16 +109,53 @@ public class TestSeleniumGridConnector extends ConnectorsTest {
 		InputStream is = new StringInputStream("{'proxyId':'proxy//node:0'}");
 		when(entity.getContent()).thenReturn(is);
 		
-		SeleniumGridConnector connector = new SeleniumGridConnector(SERVER_URL);
+		SeleniumGridConnector connector = spy(new SeleniumGridConnector(SERVER_URL));
 		
 		Logger logger = spy(SeleniumRobotLogger.getLogger(SeleniumGridConnector.class));
 		Field loggerField = SeleniumGridConnector.class.getDeclaredField("logger");
 		loggerField.setAccessible(true);
 		loggerField.set(connector, logger);
 		
-		connector.runTest(driver);
+		connector.getSessionInformationFromGrid(driver);
 		
 		verify(logger).info("WebDriver is running on node localhost, firefox 50.0, session 0");
+		
+		// check sessionId is set when test is started
+		verify(connector).setSessionId(any(SessionId.class));
+		Assert.assertEquals(connector.getNodeUrl(), "http://localhost:43210");
+	}
+	
+	/**
+	 * 
+	 * @throws UnsupportedOperationException
+	 * @throws IOException
+	 * @throws NoSuchFieldException
+	 * @throws SecurityException
+	 * @throws IllegalArgumentException
+	 * @throws IllegalAccessException
+	 * @throws UnirestException
+	 */
+	@Test(groups={"ut"})
+	public void testGetSessionInformationFromGridWithSecondDriver() throws UnsupportedOperationException, IOException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, UnirestException {
+		
+		createServerMock("GET", "/grid/api/testsession/", 200, "{'proxyId': 'http://localhost:43210'}");	
+		
+		// prepare app file
+		((DesiredCapabilities)capabilities).setCapability(CapabilityType.BROWSER_NAME, "firefox");
+		((DesiredCapabilities)capabilities).setCapability(CapabilityType.VERSION, "50.0");
+		
+		// prepare response
+		InputStream is = new StringInputStream("{'proxyId':'proxy//node:0'}");
+		when(entity.getContent()).thenReturn(is);
+		
+		SeleniumGridConnector connector = spy(new SeleniumGridConnector(SERVER_URL));
+
+		// 2 drivers created inside the same test
+		connector.getSessionInformationFromGrid(driver);
+		connector.getSessionInformationFromGrid(driver2);
+		
+		// issue #242: check sessionId is set only once when first driver is created
+		verify(connector).setSessionId(any(SessionId.class));
 		Assert.assertEquals(connector.getNodeUrl(), "http://localhost:43210");
 	}
 	
