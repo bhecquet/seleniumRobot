@@ -221,7 +221,7 @@ public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implemen
     }
     
     private void runWebDriver(){
-    	activeGridConnector.runTest((RemoteWebDriver) driver);
+    	activeGridConnector.getSessionInformationFromGrid((RemoteWebDriver) driver);
     }
 
 	@Override

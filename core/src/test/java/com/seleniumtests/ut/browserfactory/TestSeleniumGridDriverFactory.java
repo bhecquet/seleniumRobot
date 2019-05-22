@@ -293,7 +293,6 @@ public class TestSeleniumGridDriverFactory extends MockitoTest {
 	
 		DesiredCapabilities caps = new SeleniumGridDriverFactory(config).createSpecificGridCapabilities(config);
 		Assert.assertEquals(caps.getCapability(SeleniumRobotCapabilityType.ATTACH_SESSION_ON_NODE), "http://localhost:5556/");
-
 	}
 	
 	/**
