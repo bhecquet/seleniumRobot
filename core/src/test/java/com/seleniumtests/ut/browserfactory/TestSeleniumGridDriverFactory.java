@@ -268,8 +268,8 @@ public class TestSeleniumGridDriverFactory extends MockitoTest {
 		SeleniumGridDriverFactory driverFactory = new SeleniumGridDriverFactory(config);
 		WebDriver newDriver = driverFactory.createWebDriver();
 		
-		// check that with a multiple drivers creation, retry timeout is 2 mins for the second drivers because runOnSameNode is set
-		Assert.assertEquals(driverFactory.getInstanceRetryTimeout(), 120);
+		// check that with a multiple drivers creation, retry timeout is 1 min 30 for the second drivers because runOnSameNode is set
+		Assert.assertEquals(driverFactory.getInstanceRetryTimeout(), 90);
 		
 		Assert.assertNotNull(newDriver);
 		Assert.assertEquals(newDriver, driver);
