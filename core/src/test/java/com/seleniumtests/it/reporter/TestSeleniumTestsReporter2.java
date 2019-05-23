@@ -585,7 +585,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			// read 'testDriver' report. This contains calls to HtmlElement actions
 			String detailedReportContent1 = readTestMethodResultFile("testDriver");
 			
-			Assert.assertTrue(detailedReportContent1.contains("<li>sendKeys on TextFieldElement Text, by={By.id: text2} with args: (true, true, [a text,], )</li>"));	
+			Assert.assertTrue(detailedReportContent1.contains("Video capture: <a href='videoCapture.avi'>file</a>"));	
 			
 		} finally {
 			System.clearProperty(SeleniumTestsContext.VIDEO_CAPTURE);
@@ -609,7 +609,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			// read 'testDriver' report. This contains calls to HtmlElement actions
 			String detailedReportContent1 = readTestMethodResultFile("testMultipleDriver");
 			
-			Assert.assertTrue(detailedReportContent1.contains("<li>sendKeys on TextFieldElement Text, by={By.id: text2} with args: (true, true, [a text,], )</li>"));	
+			Assert.assertEquals(StringUtils.countMatches(detailedReportContent1, "Video capture: <a href='videoCapture.avi'>file</a>"), 1);	
 			
 		} finally {
 			System.clearProperty(SeleniumTestsContext.VIDEO_CAPTURE);
