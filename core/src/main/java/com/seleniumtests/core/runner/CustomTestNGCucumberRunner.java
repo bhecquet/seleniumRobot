@@ -95,6 +95,9 @@ public class CustomTestNGCucumberRunner {
         
         // add feature path
         cucumberOptions += " '" + SeleniumTestsContextManager.getFeaturePath() + "'";
+        
+        // correct issue #243: as we write to log files, colors cannot be rendered in text files
+        cucumberOptions += " --monochrome";
 
         // get filtered features, based on tags
         runtimeOptions = new RuntimeOptions(cucumberOptions);
