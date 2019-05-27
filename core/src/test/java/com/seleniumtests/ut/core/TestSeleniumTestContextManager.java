@@ -145,6 +145,36 @@ public class TestSeleniumTestContextManager extends GenericTest {
 	}
 	
 	/**
+	 * Empty version => 0.0
+	 * @param iTestContext
+	 */
+	@Test(groups={"ut"})
+	public void testReadFullEmptyApplicationVersion(ITestContext iTestContext) {
+		initThreadContext(iTestContext);
+		Assert.assertEquals(SeleniumTestsContextManager.readApplicationVersion("tu/core-version-empty.txt", true), "0.0");
+	}
+	
+	/**
+	 * 1.2alpha-all.3 => 1.2alpha-all.3
+	 * @param iTestContext
+	 */
+	@Test(groups={"ut"})
+	public void testReadFullComplicatedApplicationVersion(ITestContext iTestContext) {
+		initThreadContext(iTestContext);
+		Assert.assertEquals(SeleniumTestsContextManager.readApplicationVersion("tu/core-version-complicated.txt", true), "1.2alpha-all.3");
+	}
+	
+	/**
+	 * no version => 0.0
+	 * @param iTestContext
+	 */
+	@Test(groups={"ut"})
+	public void testReadFullUnexistingApplicationVersion(ITestContext iTestContext) {
+		initThreadContext(iTestContext);
+		Assert.assertEquals(SeleniumTestsContextManager.readApplicationVersion("tu/version.txt", true), "0.0");
+	}
+	
+	/**
 	 * Check application path is read from TestNG xml file path
 	 */
 	@Test(groups= {"ut"})

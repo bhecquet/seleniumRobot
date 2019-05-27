@@ -785,7 +785,7 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
 			gridConnector.startVideoCapture();
 			return new VideoRecorder(videoFolder, videoName, false);
 		} else {
-			throw new ScenarioException("driver supports captureDesktopToBase64String only in local and grid mode");
+			throw new ScenarioException("driver supports startVideoCapture only in local and grid mode");
 		}
 	}
 	
@@ -802,7 +802,7 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
 			return gridConnector.stopVideoCapture(Paths.get(recorder.getFolderPath().getAbsolutePath(), recorder.getFileName()).toString());
 			
 		} else {
-			throw new ScenarioException("driver supports captureDesktopToBase64String only in local and grid mode");
+			throw new ScenarioException("driver supports stopVideoCapture only in local and grid mode");
 		}
 	}
 	

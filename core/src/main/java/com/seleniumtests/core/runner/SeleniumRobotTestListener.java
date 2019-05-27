@@ -240,8 +240,10 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 										 SeleniumTestsContextManager.getGlobalContext().getDefaultOutputDirectory()); 
 		
     	SeleniumTestsContextManager.generateApplicationPath(suite.getXmlSuite());
-    	logger.info(String.format("Application %s version: %s", SeleniumTestsContextManager.getApplicationName(), SeleniumTestsContextManager.getApplicationVersion()));
-    	logger.info("Core version: " + SeleniumTestsContextManager.getCoreVersion());
+    	logger.info(String.format("Application %s version: %s (%s)", SeleniumTestsContextManager.getApplicationName(), 
+    									SeleniumTestsContextManager.getApplicationVersion(),
+    									SeleniumTestsContextManager.getApplicationFullVersion()));
+    	logger.info(String.format("Core version: %s (%s)", SeleniumTestsContextManager.getCoreVersion(), SeleniumTestsContextManager.getCoreFullVersion()));
 
 		
 	}
