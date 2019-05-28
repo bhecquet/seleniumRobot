@@ -720,3 +720,45 @@ This attaching can be done only from a page creation
 
 **LIMIT**: This approach is limited to one Internet Explorer started programmatically. It will not work with IE started manually as IE must be started the same way IEDriverServer starts it.
 
+### 13 Use external dependencies ###
+
+If for some reason, you need to include dependencies to your test application, add them as dependencies in your pom.xml without any scope, so that they can be included automatically in the generated zip file.
+
+Moreover, the maven-dependency-plugin must be configured. By default, We have the following, which allows adding new artifacts
+
+	<plugin>
+		<groupId>org.apache.maven.plugins</groupId>
+		<artifactId>maven-dependency-plugin</artifactId>
+		<executions>
+			<execution>
+				<id>copy-dependencies</id>
+				<phase>package</phase>
+				<goals>
+					<goal>copy-dependencies</goal>
+				</goals>
+				<configuration>
+					<outputDirectory>${project.build.directory}/lib</outputDirectory>
+					<overWriteReleases>false</overWriteReleases>
+					<overWriteSnapshots>false</overWriteSnapshots>
+					<overWriteIfNewer>true</overWriteIfNewer>
+					<excludeTransitive>true</excludeTransitive>
+					<excludeGroupIds>com.infotel.seleniumRobot</excludeGroupIds>
+					<excludeArtifactIds>core</excludeArtifactIds>
+				</configuration>
+			</execution>
+		</executions>
+	</plugin>
+	
+If the dependency needs other dependencues, we have to change configuration to (example for adding spring and cucumber-spring to test application):
+
+	<configuration>
+		<outputDirectory>${project.build.directory}/lib</outputDirectory>
+		<overWriteReleases>false</overWriteReleases>
+		<overWriteSnapshots>false</overWriteSnapshots>
+		<overWriteIfNewer>true</overWriteIfNewer>
+		<excludeTransitive>false</excludeTransitive>
+		<includeGroupIds>org.springframework.ws,org.springframework,info.cukes</includeGroupIds>
+		<excludeArtifactIds>cucumber-core,cucumber-testng,cucumber-html,cucumber-jvm-deps,cucumber-java,gherkin,cucumber-java8</excludeArtifactIds>
+	</configuration>
+
+The key point is `excludeTransitive` which is set to false to allow sub-dependecies to be retrieved, and then we filter by groupdId and artifactId to avoid retrieving to many dependencies
