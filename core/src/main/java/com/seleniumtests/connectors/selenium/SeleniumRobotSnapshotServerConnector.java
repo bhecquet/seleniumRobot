@@ -28,7 +28,6 @@ import java.util.stream.Collectors;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import com.mashape.unirest.request.body.MultipartBody;
 import com.seleniumtests.core.SeleniumTestsContextManager;
@@ -51,7 +50,11 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 	private Integer snapshotId;
 
 	public SeleniumRobotSnapshotServerConnector(final boolean useRequested, final String url) {
-		super(useRequested, url);
+		this(useRequested, url, null);
+	}
+	
+	public SeleniumRobotSnapshotServerConnector(final boolean useRequested, final String url, String authToken) {
+		super(useRequested, url, authToken);
 		if (!active) {
 			return;
 		}
@@ -81,7 +84,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 			browser = browser == null ? BrowserType.NONE : browser;
 			sessionUUID = UUID.randomUUID().toString();
 			
-			JSONObject sessionJson = getJSonResponse(Unirest.post(url + SESSION_API_URL)
+			JSONObject sessionJson = getJSonResponse(buildPostRequest(url + SESSION_API_URL)
 					.field("sessionId", sessionUUID)
 					.field("date", LocalDate.now().format(DateTimeFormatter.ISO_DATE))
 					.field("browser", browser.getBrowserType())
@@ -108,7 +111,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 			throw new ConfigurationException("Test case must be previously defined");
 		}
 		try {
-			JSONObject testInSessionJson = getJSonResponse(Unirest.post(url + TESTCASEINSESSION_API_URL)
+			JSONObject testInSessionJson = getJSonResponse(buildPostRequest(url + TESTCASEINSESSION_API_URL)
 					.field("testCase", testCaseId)
 					.field("session", sessionId));
 			testCaseInSessionId = testInSessionJson.getInt("id");
@@ -126,7 +129,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 			return;
 		}
 		try {
-			JSONObject stepJson = getJSonResponse(Unirest.post(url + TESTSTEP_API_URL)
+			JSONObject stepJson = getJSonResponse(buildPostRequest(url + TESTSTEP_API_URL)
 					.field("name", testStep));
 			testStepId = stepJson.getInt("id");
 			addCurrentTestStepToTestCase();
@@ -153,7 +156,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 		}
 		try {
 			snapshotId = null;
-			getJSonResponse(Unirest.post(url + SNAPSHOT_API_URL)
+			getJSonResponse(buildPostRequest(url + SNAPSHOT_API_URL)
 					.field("stepResult", stepResultId)
 					.field("sessionId", sessionUUID)
 					.field("testCase", testCaseInSessionId)
@@ -186,7 +189,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 		}
 		try {
 			stepResultId = null;
-			JSONObject resultJson = getJSonResponse(Unirest.post(url + STEPRESULT_API_URL)
+			JSONObject resultJson = getJSonResponse(buildPostRequest(url + STEPRESULT_API_URL)
 					.field("step", testStepId)
 					.field("testCase", testCaseInSessionId)
 					.field("result", result)
@@ -210,7 +213,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 		
 		try {
 
-			JSONObject sessionJson = getJSonResponse(Unirest.get(url + TESTCASEINSESSION_API_URL + testCaseInSessionId));
+			JSONObject sessionJson = getJSonResponse(buildGetRequest(url + TESTCASEINSESSION_API_URL + testCaseInSessionId));
 			return sessionJson.getJSONArray("testSteps")
 					.toList()
 					.stream()
@@ -248,7 +251,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 			return new JSONObject();
 		}
 		
-		MultipartBody request = Unirest.patch(url + TESTCASEINSESSION_API_URL + testCaseInSessionId + "/").field("testSteps", testSteps.get(0));
+		MultipartBody request = buildPatchRequest(url + TESTCASEINSESSION_API_URL + testCaseInSessionId + "/").field("testSteps", testSteps.get(0));
 		for (String tc: testSteps.subList(1, testSteps.size())) {
 			request = request.field("testSteps", tc);
 		}
@@ -261,7 +264,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 		}
 		
 		try {
-			getJSonResponse(Unirest.patch(url + TESTCASEINSESSION_API_URL + testCaseInSessionId + "/").field("stacktrace", logs));
+			getJSonResponse(buildPatchRequest(url + TESTCASEINSESSION_API_URL + testCaseInSessionId + "/").field("stacktrace", logs));
 		} catch (UnirestException e) {
 			throw new SeleniumRobotServerException("cannot add logs to test case", e);
 		}

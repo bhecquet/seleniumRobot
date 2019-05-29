@@ -113,6 +113,7 @@ public class SeleniumTestsContext {
     // selenium robot server parameters
     public static final String SELENIUMROBOTSERVER_URL = "seleniumRobotServerUrl";
     public static final String SELENIUMROBOTSERVER_ACTIVE = "seleniumRobotServerActive";
+    public static final String SELENIUMROBOTSERVER_TOKEN = "seleniumRobotServerToken";
     public static final String SELENIUMROBOTSERVER_COMPARE_SNAPSHOT = "seleniumRobotServerCompareSnapshots";			// whether we should use the snapshots created by robot to compare them to a previous execution. This option only operates when SeleniumRobot server is connected
     public static final String SELENIUMROBOTSERVER_RECORD_RESULTS = "seleniumRobotServerRecordResults";				// whether we should record test results to server. This option only operates when SeleniumRobot server is connected
     public static final String SELENIUMROBOTSERVER_VARIABLES_OLDER_THAN = "seleniumRobotServerVariablesOlderThan";	// whether we should get from server variables which were created at least X days ago
@@ -226,6 +227,7 @@ public class SeleniumTestsContext {
 	public static final boolean DEFAULT_SELENIUMROBOTSERVER_RECORD_RESULTS = false;
 	public static final boolean DEFAULT_SELENIUMROBOTSERVER_COMPARE_SNAPSHOT = false;
 	public static final boolean DEFAULT_SELENIUMROBOTSERVER_ACTIVE = false;
+	public static final String DEFAULT_SELENIUMROBOTSERVER_TOKEN = null;
 	public static final int DEFAULT_SELENIUMROBOTSERVER_VARIABLES_OLDER_THAN = 0;
 	public static final int DEFAULT_PAGE_LOAD_TIME_OUT = 90;
 	public static final PageLoadStrategy DEFAULT_PAGE_LOAD_STRATEGY = PageLoadStrategy.NORMAL;
@@ -294,6 +296,7 @@ public class SeleniumTestsContext {
     	
         setSeleniumRobotServerUrl(getValueForTest(SELENIUMROBOTSERVER_URL, System.getProperty(SELENIUMROBOTSERVER_URL)));
         setSeleniumRobotServerActive(getBoolValueForTest(SELENIUMROBOTSERVER_ACTIVE, System.getProperty(SELENIUMROBOTSERVER_ACTIVE)));
+        setSeleniumRobotServerToken(getValueForTest(SELENIUMROBOTSERVER_TOKEN, System.getProperty(SELENIUMROBOTSERVER_TOKEN)));
         setSeleniumRobotServerCompareSnapshot(getBoolValueForTest(SELENIUMROBOTSERVER_COMPARE_SNAPSHOT, System.getProperty(SELENIUMROBOTSERVER_COMPARE_SNAPSHOT)));
         setSeleniumRobotServerRecordResults(getBoolValueForTest(SELENIUMROBOTSERVER_RECORD_RESULTS, System.getProperty(SELENIUMROBOTSERVER_RECORD_RESULTS)));
         setSeleniumRobotServerVariableOlderThan(getIntValueForTest(SELENIUMROBOTSERVER_VARIABLES_OLDER_THAN, System.getProperty(SELENIUMROBOTSERVER_VARIABLES_OLDER_THAN)));
@@ -524,7 +527,7 @@ public class SeleniumTestsContext {
 						SELENIUMROBOTSERVER_ACTIVE, 
 						getSeleniumRobotServerUrl(),
 						SELENIUMROBOTSERVER_URL));
-			SeleniumRobotVariableServerConnector vServer = new SeleniumRobotVariableServerConnector(getSeleniumRobotServerActive(), getSeleniumRobotServerUrl(), TestNGResultUtils.getTestName(testNGResult));
+			SeleniumRobotVariableServerConnector vServer = new SeleniumRobotVariableServerConnector(getSeleniumRobotServerActive(), getSeleniumRobotServerUrl(), TestNGResultUtils.getTestName(testNGResult), getSeleniumRobotServerToken());
 			
 			if (!vServer.isAlive()) {
 				throw new ConfigurationException(String.format("Variable server %s could not be contacted", getSeleniumRobotServerUrl()));
@@ -1053,6 +1056,10 @@ public class SeleniumTestsContext {
     
     public Boolean getSeleniumRobotServerActive() {
     	return (Boolean) getAttribute(SELENIUMROBOTSERVER_ACTIVE);
+    }
+    
+    public String getSeleniumRobotServerToken() {
+    	return (String) getAttribute(SELENIUMROBOTSERVER_TOKEN);
     }
     
     public boolean getSeleniumRobotServerCompareSnapshot() {
@@ -1597,6 +1604,14 @@ public class SeleniumTestsContext {
     	
     	if (getSeleniumRobotServerUrl() == null && getSeleniumRobotServerActive()) {
     		throw new ConfigurationException("SeleniumRobot server is requested but URL is not found, either in parameters, command line or through environment variable");
+    	}
+    }
+    
+    public void setSeleniumRobotServerToken(String token) {
+    	if (token != null) {
+    		setAttribute(SELENIUMROBOTSERVER_TOKEN, token);
+    	} else {
+    		setAttribute(SELENIUMROBOTSERVER_TOKEN, DEFAULT_SELENIUMROBOTSERVER_TOKEN);
     	}
     }
     

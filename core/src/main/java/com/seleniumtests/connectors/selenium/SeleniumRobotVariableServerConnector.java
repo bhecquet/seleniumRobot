@@ -27,7 +27,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import com.mashape.unirest.request.body.MultipartBody;
 import com.seleniumtests.core.TestVariable;
@@ -37,9 +36,13 @@ public class SeleniumRobotVariableServerConnector extends SeleniumRobotServerCon
 	
 	public static final String VARIABLE_API_URL = "/variable/api/variable/";
 	public static final String EXISTING_VARIABLE_API_URL = "/variable/api/variable/%d/";
-		
+
 	public SeleniumRobotVariableServerConnector(final boolean useRequested, final String url, String testName) {
-		super(useRequested, url);
+		this(useRequested, url, testName, null);
+	}
+		
+	public SeleniumRobotVariableServerConnector(final boolean useRequested, final String url, String testName, String authToken) {
+		super(useRequested, url, authToken);
 		if (!active) {
 			return;
 		}
@@ -74,7 +77,7 @@ public class SeleniumRobotVariableServerConnector extends SeleniumRobotServerCon
 			
 			List<String> varNames = new ArrayList<>();
 			
-			JSONArray variablesJson = getJSonArray(Unirest.get(url + VARIABLE_API_URL)
+			JSONArray variablesJson = getJSonArray(buildGetRequest(url + VARIABLE_API_URL)
 					.queryString("version", versionId)
 					.queryString("environment", environmentId)
 					.queryString("test", testCaseId)
@@ -125,7 +128,7 @@ public class SeleniumRobotVariableServerConnector extends SeleniumRobotServerCon
 	private void unreserveVariable(TestVariable variable) {
 		if (variable.isReservable() && variable.getId() != null) {
 			try {
-				getJSonResponse(Unirest.patch(String.format(url + EXISTING_VARIABLE_API_URL, variable.getId()))
+				getJSonResponse(buildPatchRequest(String.format(url + EXISTING_VARIABLE_API_URL, variable.getId()))
 						.field("releaseDate", ""));
 			} catch (UnirestException e) {
 				logger.warn("variable could not be unreserved, server will do it automatically after reservation period: " + e.getMessage());
@@ -149,7 +152,7 @@ public class SeleniumRobotVariableServerConnector extends SeleniumRobotServerCon
 		//     this copy would not contain the "test" reference 
 		if (variable.getId() == null || !variable.getInternalName().startsWith(TestVariable.TEST_VARIABLE_PREFIX)) {
 			try {
-				MultipartBody request = Unirest.post(url + VARIABLE_API_URL)
+				MultipartBody request = buildPostRequest(url + VARIABLE_API_URL)
 						.field("name", TestVariable.TEST_VARIABLE_PREFIX + variable.getName())
 						.field("value", variable.getValue())
 						.field("reservable", variable.isReservable())
@@ -171,7 +174,7 @@ public class SeleniumRobotVariableServerConnector extends SeleniumRobotServerCon
 			} 
 		} else {
 			try {
-				JSONObject variableJson = getJSonResponse(Unirest.patch(String.format(url + EXISTING_VARIABLE_API_URL, variable.getId()))
+				JSONObject variableJson = getJSonResponse(buildPatchRequest(String.format(url + EXISTING_VARIABLE_API_URL, variable.getId()))
 						.field("value", variable.getValue())
 						.field("reservable", variable.isReservable()));
 				
