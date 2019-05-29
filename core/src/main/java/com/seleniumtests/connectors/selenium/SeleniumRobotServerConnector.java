@@ -26,6 +26,8 @@ import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import com.mashape.unirest.request.BaseRequest;
+import com.mashape.unirest.request.GetRequest;
+import com.mashape.unirest.request.HttpRequestWithBody;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.SeleniumRobotServerException;
@@ -47,6 +49,7 @@ public abstract class SeleniumRobotServerConnector {
 	public static final String TESTCASE_API_URL = "/commons/api/testcase/";
 
 	protected String url;
+	protected String authToken;
 	protected boolean active = false;
 	protected boolean useRequested = false;
 	protected Integer applicationId;
@@ -54,9 +57,17 @@ public abstract class SeleniumRobotServerConnector {
 	protected Integer environmentId;
 	protected Integer testCaseId;
 	
-	public SeleniumRobotServerConnector(final boolean useRequested, final String url) {
+	public SeleniumRobotServerConnector(boolean useRequested, String url) {
+		this(useRequested, url, null);
+	}
+	public SeleniumRobotServerConnector(boolean useRequested, String url, String authToken) {
 		this.useRequested = useRequested;
 		this.url = url;
+		this.authToken = authToken;
+		
+		if (this.authToken != null) {
+			this.authToken = "Token " + authToken;
+		}
 		active = isActive();
 	}
 	
@@ -64,7 +75,7 @@ public abstract class SeleniumRobotServerConnector {
 	
 	protected boolean isAlive(String testUrl) {
 		try {
-			return Unirest.get(url + testUrl).asString().getStatus() == 200;
+			return buildGetRequest(url + testUrl).asString().getStatus() == 200;
 		} catch (UnirestException e) {
 			return false;
 		} 
@@ -102,7 +113,7 @@ public abstract class SeleniumRobotServerConnector {
 			return applicationId;
 		}
 		try {
-			JSONObject response = getJSonResponse(Unirest.get(url + NAMED_APPLICATION_API_URL)
+			JSONObject response = getJSonResponse(buildGetRequest(url + NAMED_APPLICATION_API_URL)
 					.queryString("name", SeleniumTestsContextManager.getApplicationName()));
 			applicationId = response.getInt("id");
 			return applicationId;
@@ -121,7 +132,7 @@ public abstract class SeleniumRobotServerConnector {
 			return environmentId;
 		}
 		try {
-			JSONObject response = getJSonResponse(Unirest.get(url + NAMED_ENVIRONMENT_API_URL)
+			JSONObject response = getJSonResponse(buildGetRequest(url + NAMED_ENVIRONMENT_API_URL)
 					.queryString("name", SeleniumTestsContextManager.getThreadContext().getTestEnv()));
 			environmentId = response.getInt("id");
 			return environmentId;
@@ -173,7 +184,7 @@ public abstract class SeleniumRobotServerConnector {
 		}
 
 		try {
-			JSONObject testJson = getJSonResponse(Unirest.post(url + TESTCASE_API_URL)
+			JSONObject testJson = getJSonResponse(buildPostRequest(url + TESTCASE_API_URL)
 					.field("name", testName)
 					.field("application", applicationId));
 			testCaseId = testJson.getInt("id");
@@ -194,7 +205,7 @@ public abstract class SeleniumRobotServerConnector {
 			createApplication();
 		}
 		try {
-			JSONObject versionJson = getJSonResponse(Unirest.post(url + VERSION_API_URL)
+			JSONObject versionJson = getJSonResponse(buildPostRequest(url + VERSION_API_URL)
 					.field("name", SeleniumTestsContextManager.getApplicationVersion())
 					.field("application", applicationId));
 			versionId = versionJson.getInt("id");
@@ -208,7 +219,7 @@ public abstract class SeleniumRobotServerConnector {
 			return;
 		}
 		try {
-			JSONObject envJson = getJSonResponse(Unirest.post(url + ENVIRONMENT_API_URL)
+			JSONObject envJson = getJSonResponse(buildPostRequest(url + ENVIRONMENT_API_URL)
 					.field("name", SeleniumTestsContextManager.getThreadContext().getTestEnv()));
 			environmentId = envJson.getInt("id");
 		} catch (UnirestException | JSONException e) {
@@ -221,7 +232,7 @@ public abstract class SeleniumRobotServerConnector {
 			return;
 		}
 		try {
-			JSONObject applicationJson = getJSonResponse(Unirest.post(url + APPLICATION_API_URL)
+			JSONObject applicationJson = getJSonResponse(buildPostRequest(url + APPLICATION_API_URL)
 					.field("name", SeleniumTestsContextManager.getApplicationName()));
 			applicationId = applicationJson.getInt("id");
 		} catch (UnirestException | JSONException e) {
@@ -229,7 +240,32 @@ public abstract class SeleniumRobotServerConnector {
 		}
 	}
 	
+	protected GetRequest buildGetRequest(String url) {
+		if (authToken != null) {
+			return Unirest.get(url).header("Authorization", authToken);
+		} else {
+			return Unirest.get(url);
+		}
+	}
+	
+	protected HttpRequestWithBody buildPostRequest(String url) {
+		if (authToken != null) {
+			return Unirest.post(url).header("Authorization", authToken);
+		} else {
+			return Unirest.post(url);
+		}
+	}
+	
+	protected HttpRequestWithBody buildPatchRequest(String url) {
+		if (authToken != null) {
+			return Unirest.patch(url).header("Authorization", authToken);
+		} else {
+			return Unirest.patch(url);
+		}
+	}
+	
 	protected JSONObject getJSonResponse(BaseRequest request) throws UnirestException {
+
 		HttpResponse<String> response = request.asString();
 
 		if (response.getStatus() == 423) {
