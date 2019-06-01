@@ -21,8 +21,10 @@ import java.time.Clock;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
+import org.joda.time.LocalDateTime;
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
@@ -133,7 +135,9 @@ public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implemen
         }
 
         // connection to grid is made here
+        long start = new Date().getTime();
         driver = getDriver(capabilities);
+        long duration = new Date().getTime() - start;
 
         setImplicitWaitTimeout(webDriverConfig.getImplicitWaitTimeout());
         if (webDriverConfig.getPageLoadTimeout() >= 0 && SeleniumTestsContextManager.isWebTest()) {
@@ -142,7 +146,7 @@ public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implemen
 
         this.setWebDriver(driver);
 
-        runWebDriver();
+        runWebDriver(duration);
 
         ((RemoteWebDriver)driver).setFileDetector(new LocalFileDetector());
 
@@ -220,8 +224,8 @@ public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implemen
     	return driver;
     }
     
-    private void runWebDriver(){
-    	activeGridConnector.getSessionInformationFromGrid((RemoteWebDriver) driver);
+    private void runWebDriver(long driverCreationDuration){
+    	activeGridConnector.getSessionInformationFromGrid((RemoteWebDriver) driver, driverCreationDuration);
     }
 
 	@Override

@@ -457,11 +457,11 @@ public class LogAction {
 			return joinPoint.proceed(joinPoint.getArgs());
 		} finally {
 
-			long duration = new Date().getTime() - start;
+			long duration = new Date().getTime() - start - 2000; // remove 2 secs as createRemoteWebDriver adds a wait
 			if (cuurrentTestStep != null) {
 				cuurrentTestStep.setDurationToExclude(duration);
 			}
-			TestLogging.info(String.format("driver creation took: %f secs", duration / 1000.0));
+			TestLogging.info(String.format("driver creation took: %.1f secs", duration / 1000.0));
 		}
 	}
 	
