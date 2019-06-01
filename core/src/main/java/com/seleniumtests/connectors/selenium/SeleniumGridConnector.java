@@ -181,6 +181,9 @@ public class SeleniumGridConnector {
 	 * @param driver
 	 */
 	public void getSessionInformationFromGrid(RemoteWebDriver driver) {
+		getSessionInformationFromGrid(driver, 0);
+	}
+	public void getSessionInformationFromGrid(RemoteWebDriver driver, long driverCreationDuration) {
 		
         // logging node ip address:
         try {
@@ -201,7 +204,7 @@ public class SeleniumGridConnector {
             if (sessionId == null) {
             	setSessionId(driver.getSessionId());
             }
-            logger.info("WebDriver is running on node " + node + ", " + browserName + " " + version + ", session " + sessionId);
+            logger.info(String.format("Brower %s (%s) created in %.1f secs  on node %s [%s], session %s", browserName, version, driverCreationDuration / 1000.0, node, hubUrl, sessionId));
             
         } catch (Exception ex) {
         	logger.error(ex);
