@@ -118,7 +118,7 @@ public class TestSeleniumGridConnector extends ConnectorsTest {
 		
 		connector.getSessionInformationFromGrid(driver);
 		
-		verify(logger).info("WebDriver is running on node localhost, firefox 50.0, session 0");
+		verify(logger).info("Brower firefox (50.0) created in 0.0 secs on node localhost [http://localhost:4321] with session 0");
 		
 		// check sessionId is set when test is started
 		verify(connector).setSessionId(any(SessionId.class));

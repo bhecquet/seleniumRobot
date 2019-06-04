@@ -204,7 +204,7 @@ public class SeleniumGridConnector {
             if (sessionId == null) {
             	setSessionId(driver.getSessionId());
             }
-            logger.info(String.format("Brower %s (%s) created in %.1f secs  on node %s [%s], session %s", browserName, version, driverCreationDuration / 1000.0, node, hubUrl, sessionId));
+            logger.info(String.format("Brower %s (%s) created in %.1f secs on node %s [%s] with session %s", browserName, version, driverCreationDuration / 1000.0, node, hubUrl, sessionId).replace(",", "."));
             
         } catch (Exception ex) {
         	logger.error(ex);
