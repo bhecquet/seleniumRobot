@@ -17,6 +17,8 @@
  */
 package com.seleniumtests.ut.core;
 
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
@@ -82,7 +84,7 @@ public class TestSeleniumTestContext3 extends MockitoTest {
 			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE, "true");
 			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL, "http://localhost:1234");
 			
-			PowerMockito.whenNew(SeleniumRobotVariableServerConnector.class).withAnyArguments().thenReturn(variableServer);
+			PowerMockito.whenNew(SeleniumRobotVariableServerConnector.class).withArguments(eq(true), eq("http://localhost:1234"), anyString(), eq(null)).thenReturn(variableServer);
 			when(variableServer.isAlive()).thenReturn(true);
 			
 			ITestResult testResult = GenericTest.generateResult(testNGCtx, getClass());
@@ -153,7 +155,7 @@ public class TestSeleniumTestContext3 extends MockitoTest {
 			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE, "true");
 			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL, "http://localhost:1234");
 			
-			PowerMockito.whenNew(SeleniumRobotVariableServerConnector.class).withAnyArguments().thenReturn(variableServer);
+			PowerMockito.whenNew(SeleniumRobotVariableServerConnector.class).withArguments(eq(true), eq("http://localhost:1234"), anyString(), eq(null)).thenReturn(variableServer);
 			when(variableServer.isAlive()).thenReturn(false);
 			
 			ITestResult testResult = GenericTest.generateResult(testNGCtx, getClass());
@@ -308,7 +310,7 @@ public class TestSeleniumTestContext3 extends MockitoTest {
 			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE, "true");
 			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL, "http://localhost:1234");
 			
-			PowerMockito.whenNew(SeleniumRobotVariableServerConnector.class).withAnyArguments().thenReturn(variableServer);
+			PowerMockito.whenNew(SeleniumRobotVariableServerConnector.class).withArguments(eq(true), eq("http://localhost:1234"), anyString(), eq(null)).thenReturn(variableServer);
 			when(variableServer.isAlive()).thenReturn(true);
 			when(variableServer.getVariables()).thenReturn(variables);
 			System.setProperty("key1", "userValue");

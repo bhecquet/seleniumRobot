@@ -31,6 +31,7 @@ import com.mashape.unirest.request.HttpRequestWithBody;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.SeleniumRobotServerException;
+import com.seleniumtests.reporter.logger.TestLogging;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
 public abstract class SeleniumRobotServerConnector {
@@ -75,7 +76,17 @@ public abstract class SeleniumRobotServerConnector {
 	
 	protected boolean isAlive(String testUrl) {
 		try {
-			return buildGetRequest(url + testUrl).asString().getStatus() == 200;
+			int status = buildGetRequest(url + testUrl).asString().getStatus();
+			if (status == 401) {
+				logger.error("-------------------------------------------------------------------------------------");
+				TestLogging.error("Access to seleniumRobot server unauthorized, access token must be provided");
+				TestLogging.error("Token can be set via 'seleniumRobotServerToken' parameter: '-DseleniumRobotServerToken=<token>");
+				TestLogging.error(String.format("Access token can be generated using your browser at %s/api-token-auth/?username=<user>&password=<password>", url));
+				logger.error("-------------------------------------------------------------------------------------");
+				throw new ConfigurationException("Access to seleniumRobot server unauthorized, access token must be provided by adding '-DseleniumRobotServerToken=<token>' to test command line");
+			} else {
+				return status == 200;
+			}
 		} catch (UnirestException e) {
 			return false;
 		} 
