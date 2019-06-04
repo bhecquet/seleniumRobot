@@ -37,11 +37,11 @@ public class SeleniumRobotVariableServerConnector extends SeleniumRobotServerCon
 	public static final String VARIABLE_API_URL = "/variable/api/variable/";
 	public static final String EXISTING_VARIABLE_API_URL = "/variable/api/variable/%d/";
 
-	public SeleniumRobotVariableServerConnector(final boolean useRequested, final String url, String testName) {
+	public SeleniumRobotVariableServerConnector(boolean useRequested, String url, String testName) {
 		this(useRequested, url, testName, null);
 	}
 		
-	public SeleniumRobotVariableServerConnector(final boolean useRequested, final String url, String testName, String authToken) {
+	public SeleniumRobotVariableServerConnector(boolean useRequested, String url, String testName, String authToken) {
 		super(useRequested, url, authToken);
 		if (!active) {
 			return;

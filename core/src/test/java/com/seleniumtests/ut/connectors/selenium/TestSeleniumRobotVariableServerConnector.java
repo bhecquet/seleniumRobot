@@ -100,12 +100,12 @@ public class TestSeleniumRobotVariableServerConnector extends ConnectorsTest {
 		when(getAliveRequest.asString()).thenThrow(UnirestException.class);
 		when(Unirest.get(SERVER_URL + "/variable/api/")).thenReturn(getAliveRequest);
 		
-		return new SeleniumRobotVariableServerConnector(true, SERVER_URL, "Test1");
+		return new SeleniumRobotVariableServerConnector(true, SERVER_URL, "Test1", null);
 	}
 	
 	@Test(groups= {"ut"})
 	public void testServerNotActive() {
-		SeleniumRobotVariableServerConnector connector = new SeleniumRobotVariableServerConnector(false, SERVER_URL, "Test1");
+		SeleniumRobotVariableServerConnector connector = new SeleniumRobotVariableServerConnector(false, SERVER_URL, "Test1", null);
 		Assert.assertFalse(connector.getActive());
 	}
 	
@@ -118,7 +118,7 @@ public class TestSeleniumRobotVariableServerConnector extends ConnectorsTest {
 	@Test(groups= {"ut"})
 	public void testServerActiveAndAlive() throws UnirestException {
 		configureAliveConnection();
-		SeleniumRobotVariableServerConnector connector = new SeleniumRobotVariableServerConnector(true, SERVER_URL, "Test1");
+		SeleniumRobotVariableServerConnector connector = new SeleniumRobotVariableServerConnector(true, SERVER_URL, "Test1", null);
 		Assert.assertTrue(connector.getActive());
 		Assert.assertEquals(connector.getApplicationId(), 1);
 		Assert.assertEquals(connector.getEnvironmentId(), 2);
@@ -135,7 +135,7 @@ public class TestSeleniumRobotVariableServerConnector extends ConnectorsTest {
 
 		configureAliveConnection();
 		createServerMock("GET", SeleniumRobotVariableServerConnector.NAMED_APPLICATION_API_URL, 404, "");		
-		new SeleniumRobotVariableServerConnector(true, SERVER_URL, "Test1");
+		new SeleniumRobotVariableServerConnector(true, SERVER_URL, "Test1", null);
 	}
 	
 	/**
@@ -147,14 +147,14 @@ public class TestSeleniumRobotVariableServerConnector extends ConnectorsTest {
 		
 		configureAliveConnection();
 		createServerMock("GET", SeleniumRobotVariableServerConnector.NAMED_ENVIRONMENT_API_URL, 404, "");		
-		new SeleniumRobotVariableServerConnector(true, SERVER_URL, "Test1");
+		new SeleniumRobotVariableServerConnector(true, SERVER_URL, "Test1", null);
 	}
 	
 	@Test(groups= {"ut"})
 	public void testFetchVariable() throws UnirestException {
 		
 		configureAliveConnection();
-		SeleniumRobotVariableServerConnector connector= new SeleniumRobotVariableServerConnector(true, SERVER_URL, "Test1");
+		SeleniumRobotVariableServerConnector connector= new SeleniumRobotVariableServerConnector(true, SERVER_URL, "Test1", null);
 		Map<String, TestVariable> variables = connector.getVariables();
 		Assert.assertEquals(variables.get("key1").getValue(), "value1");
 		Assert.assertEquals(variables.get("key2").getValue(), "value2");
@@ -165,7 +165,7 @@ public class TestSeleniumRobotVariableServerConnector extends ConnectorsTest {
 	public void testVariableUpdateExistingVariable() throws UnirestException {
 		
 		configureAliveConnection();
-		SeleniumRobotVariableServerConnector connector= new SeleniumRobotVariableServerConnector(true, SERVER_URL, "Test1");
+		SeleniumRobotVariableServerConnector connector= new SeleniumRobotVariableServerConnector(true, SERVER_URL, "Test1", null);
 		TestVariable existingVariable = new TestVariable(12, "key", "value", false, TestVariable.TEST_VARIABLE_PREFIX + "key");
 		TestVariable variable = connector.upsertVariable(existingVariable, true);
 		
@@ -183,7 +183,7 @@ public class TestSeleniumRobotVariableServerConnector extends ConnectorsTest {
 	public void testVariableRecreateExistingVariable() throws UnirestException {
 		
 		configureAliveConnection();
-		SeleniumRobotVariableServerConnector connector= new SeleniumRobotVariableServerConnector(true, SERVER_URL, "Test1");
+		SeleniumRobotVariableServerConnector connector= new SeleniumRobotVariableServerConnector(true, SERVER_URL, "Test1", null);
 		TestVariable existingVariable = new TestVariable(12, "key", "value", false, "key");
 		TestVariable variable = connector.upsertVariable(existingVariable, true);
 		
@@ -197,7 +197,7 @@ public class TestSeleniumRobotVariableServerConnector extends ConnectorsTest {
 	public void testVariableCreateNewVariable() throws UnirestException {
 		
 		configureAliveConnection();
-		SeleniumRobotVariableServerConnector connector= new SeleniumRobotVariableServerConnector(true, SERVER_URL, "Test1");
+		SeleniumRobotVariableServerConnector connector= new SeleniumRobotVariableServerConnector(true, SERVER_URL, "Test1", null);
 		TestVariable existingVariable = new TestVariable("key", "value");
 		TestVariable variable = connector.upsertVariable(existingVariable, true);
 		
@@ -223,7 +223,7 @@ public class TestSeleniumRobotVariableServerConnector extends ConnectorsTest {
 	@Test(groups= {"ut"})
 	public void testVariableDereservation() throws UnirestException {
 		configureAliveConnection();
-		SeleniumRobotVariableServerConnector connector= new SeleniumRobotVariableServerConnector(true, SERVER_URL, "Test1");
+		SeleniumRobotVariableServerConnector connector= new SeleniumRobotVariableServerConnector(true, SERVER_URL, "Test1", null);
 		List<TestVariable> variables = new ArrayList(connector.getVariables().values());
 		
 		connector.unreserveVariables(variables);
@@ -236,7 +236,7 @@ public class TestSeleniumRobotVariableServerConnector extends ConnectorsTest {
 	@Test(groups= {"ut"})
 	public void testVariableDereservationNullId() throws UnirestException {
 		configureAliveConnection();
-		SeleniumRobotVariableServerConnector connector= new SeleniumRobotVariableServerConnector(true, SERVER_URL, "Test1");
+		SeleniumRobotVariableServerConnector connector= new SeleniumRobotVariableServerConnector(true, SERVER_URL, "Test1", null);
 		List<TestVariable> variables = Arrays.asList(new TestVariable("key", "value"));
 		
 		connector.unreserveVariables(variables);
