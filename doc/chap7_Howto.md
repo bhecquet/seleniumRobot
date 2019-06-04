@@ -82,10 +82,11 @@ The `intoElement` (for PictureElement only) parameters helps scrolling in page. 
 
 #### Using PictureElement ####
 
-Search for picture in browser, without the need to scroll down and click on it
+Search for picture in browser, without the need to scroll down and click on it. It will then search for the "body" element. If you search the picture inside a frame, and main document has no "body" tag, then you should specify an element inside frame, or the frame itself
 
 	PictureElement googlePicture = new PictureElement("picture", "tu/googleSearch.png", null);
 	googlePicture.click()
+	
 	
 or search for picture (physically located inside src/test/resources/tu/images/logo_text_field.png) in browser, being placed after the table element and click on it
 
