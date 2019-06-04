@@ -704,6 +704,19 @@ public class TestSeleniumTestContext extends GenericTest {
 	}
 	
 	@Test(groups="ut context")
+	public void testSeleniumRobotServerToken(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setSeleniumRobotServerToken("123");
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getSeleniumRobotServerToken(), "123");
+	}
+	@Test(groups="ut context")
+	public void testSeleniumRobotServerTokenNull(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setSeleniumRobotServerToken(null);
+		Assert.assertNull(SeleniumTestsContextManager.getThreadContext().getSeleniumRobotServerToken());
+	}
+	
+	@Test(groups="ut context")
 	public void testSeleniumRobotVariablesOlderThan(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setSeleniumRobotServerVariableOlderThan(5);
