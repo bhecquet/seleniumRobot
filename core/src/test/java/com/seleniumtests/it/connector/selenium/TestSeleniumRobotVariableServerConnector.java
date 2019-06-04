@@ -45,7 +45,7 @@ public class TestSeleniumRobotVariableServerConnector extends GenericTest {
 	public void init(ITestContext ctx) {
 		initThreadContext(ctx);
 
-		connector = new SeleniumRobotVariableServerConnector(true, "http://localhost:8002", "Test 1");
+		connector = new SeleniumRobotVariableServerConnector(true, "http://localhost:8002", "Test 1", "37023c02b9df77b5e5939cca85bc2f20cd3d001d");
 		if (!connector.getActive()) {
 			throw new SkipException("no seleniumrobot server available");
 		}
@@ -64,11 +64,11 @@ public class TestSeleniumRobotVariableServerConnector extends GenericTest {
 		Assert.assertTrue(variables.size() > 0);
 	}
 	
-	@Test(groups={"it"}, enabled=false)
+	@Test(groups={"it"}, enabled=true)
 	public void testUpsert() {
 		TestVariable variable = new TestVariable("key.test", "value");
 		variable.setReservable(true);
-		variable.setTimeToLive(3);
+//		variable.setTimeToLive(3);
 //		TestVariable variable = new TestVariable(16, "key.test", "value", false, "custom.test.variable.key.test");
 		variable = connector.upsertVariable(variable, false);
 //		variable.setValue("newValue");

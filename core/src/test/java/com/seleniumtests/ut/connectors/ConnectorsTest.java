@@ -48,7 +48,7 @@ public class ConnectorsTest extends MockitoTest {
 	 * Method for creating server reply mock
 	 * @throws UnirestException 
 	 */
-	protected void createServerMock(String requestType, String apiPath, int statusCode, String replyData) throws UnirestException {
+	protected HttpRequest createServerMock(String requestType, String apiPath, int statusCode, String replyData) throws UnirestException {
 		
 		@SuppressWarnings("unchecked")
 		HttpResponse<String> response = mock(HttpResponse.class);
@@ -59,17 +59,28 @@ public class ConnectorsTest extends MockitoTest {
 		HttpRequestWithBody postRequest = mock(HttpRequestWithBody.class);
 		
 		when(request.getUrl()).thenReturn(SERVER_URL);
+		when(response.getStatus()).thenReturn(statusCode);
+		when(response.getBody()).thenReturn(replyData);
+		when(jsonResponse.getStatus()).thenReturn(statusCode);
+		when(jsonResponse.getBody()).thenReturn(json);
+		try {
+			JSONObject jsonReply = new JSONObject(replyData);
+			when(json.getObject()).thenReturn(jsonReply);
+		} catch (JSONException e) {}
 		
 		switch(requestType) {
 			case "GET":
 				GetRequest getRequest = mock(GetRequest.class); 
+				
 				when(Unirest.get(SERVER_URL + apiPath)).thenReturn(getRequest);
+
+				when(getRequest.header(anyString(), anyString())).thenReturn(getRequest);
 				when(getRequest.asString()).thenReturn(response);
 				when(getRequest.asJson()).thenReturn(jsonResponse);
 				when(getRequest.queryString(anyString(), anyString())).thenReturn(getRequest);
 				when(getRequest.queryString(anyString(), anyInt())).thenReturn(getRequest);
 				when(getRequest.getHttpRequest()).thenReturn(request);
-				break;
+				return getRequest;
 			case "POST":
 				when(Unirest.post(SERVER_URL + apiPath)).thenReturn(postRequest);
 			case "PATCH":
@@ -80,23 +91,17 @@ public class ConnectorsTest extends MockitoTest {
 				when(postRequest.field(anyString(), any(File.class))).thenReturn(requestMultipartBody);
 				when(postRequest.queryString(anyString(), anyString())).thenReturn(postRequest);
 				when(postRequest.queryString(anyString(), anyInt())).thenReturn(postRequest);
+				when(postRequest.header(anyString(), anyString())).thenReturn(postRequest);
 				when(requestMultipartBody.field(anyString(), anyInt())).thenReturn(requestMultipartBody);
 				when(requestMultipartBody.field(anyString(), anyBoolean())).thenReturn(requestMultipartBody);
 				when(requestMultipartBody.field(anyString(), anyString())).thenReturn(requestMultipartBody);
 				when(requestMultipartBody.field(anyString(), anyLong())).thenReturn(requestMultipartBody);
 				when(requestMultipartBody.field(anyString(), any(File.class))).thenReturn(requestMultipartBody);
 				when(requestMultipartBody.asString()).thenReturn(response);
-				break;
+				return postRequest;
 			
 		}
+		return null;
 		
-		when(response.getStatus()).thenReturn(statusCode);
-		when(response.getBody()).thenReturn(replyData);
-		when(jsonResponse.getStatus()).thenReturn(statusCode);
-		when(jsonResponse.getBody()).thenReturn(json);
-		try {
-			JSONObject jsonReply = new JSONObject(replyData);
-			when(json.getObject()).thenReturn(jsonReply);
-		} catch (JSONException e) {}
 	}
 }

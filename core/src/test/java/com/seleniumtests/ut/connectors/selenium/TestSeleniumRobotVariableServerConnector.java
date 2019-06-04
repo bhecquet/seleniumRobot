@@ -18,7 +18,11 @@
 package com.seleniumtests.ut.connectors.selenium;
 
 import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.verify;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -66,12 +70,27 @@ public class TestSeleniumRobotVariableServerConnector extends ConnectorsTest {
 		PowerMockito.mockStatic(Unirest.class);
 	}
 	
+	private GetRequest namedApplicationRequest;
+	private GetRequest namedEnvironmentRequest;
+	private GetRequest namedTestCaseRequest;
+	private GetRequest namedVersionRequest;
+	private GetRequest variablesRequest;
+	private HttpRequestWithBody createApplicationRequest;
+	private HttpRequestWithBody createEnvironmentRequest;
+	private HttpRequestWithBody createVersionRequest;
+	private HttpRequestWithBody createTestCaseRequest;
+	private HttpRequestWithBody createVariableRequest;
+	private HttpRequestWithBody updateVariableRequest;
+	private HttpRequestWithBody updateVariableRequest2;
+	
+	
 	/**
 	 * simulate an alive sever responding to all requests
 	 * @throws UnirestException 
 	 */
 	private void configureAliveConnection() throws UnirestException {
 		when(getAliveRequest.asString()).thenReturn(responseAliveString);
+		when(getAliveRequest.header(anyString(), anyString())).thenReturn(getAliveRequest);
 		when(responseAliveString.getStatus()).thenReturn(200);
 		when(Unirest.get(SERVER_URL + "/variable/api/")).thenReturn(getAliveRequest);
 		
@@ -79,16 +98,18 @@ public class TestSeleniumRobotVariableServerConnector extends ConnectorsTest {
 		SeleniumTestsContextManager.getThreadContext().setSeleniumRobotServerActive(true);
 		
 		// set default reply from server. To override this behaviour, redefine some steps in test after connector creation
-		createServerMock("GET", SeleniumRobotVariableServerConnector.NAMED_APPLICATION_API_URL, 200, "{'id': 1}");		
-		createServerMock("GET", SeleniumRobotVariableServerConnector.NAMED_ENVIRONMENT_API_URL, 200, "{'id': 2}");		
-		createServerMock("GET", SeleniumRobotVariableServerConnector.NAMED_TESTCASE_API_URL, 200, "{'id': 3}");		
-		createServerMock("GET", SeleniumRobotVariableServerConnector.NAMED_VERSION_API_URL, 200, "{'id': 4}");	
-		createServerMock("POST", SeleniumRobotSnapshotServerConnector.VERSION_API_URL, 200, "{'id': '4'}");	
-		createServerMock("POST", SeleniumRobotSnapshotServerConnector.TESTCASE_API_URL, 200, "{'id': '3'}");
-		createServerMock("POST", SeleniumRobotVariableServerConnector.VARIABLE_API_URL, 200, "{'id': 13, 'name': 'custom.test.variable.key', 'value': 'value', 'reservable': false}");
-		createServerMock("PATCH", String.format(SeleniumRobotVariableServerConnector.EXISTING_VARIABLE_API_URL, 12), 200, "{'id': 12, 'name': 'custom.test.variable.key', 'value': 'value', 'reservable': false}");
-		createServerMock("PATCH", String.format(SeleniumRobotVariableServerConnector.EXISTING_VARIABLE_API_URL, 2), 200, "{}");
-		createServerMock("GET", SeleniumRobotVariableServerConnector.VARIABLE_API_URL, 200, "[{'id': 1, 'name': 'key1', 'value': 'value1', 'reservable': false}, {'id': 2, 'name': 'key2', 'value': 'value2', 'reservable': true}]");	
+		namedApplicationRequest = (GetRequest) createServerMock("GET", SeleniumRobotVariableServerConnector.NAMED_APPLICATION_API_URL, 200, "{'id': 1}");		
+		namedEnvironmentRequest = (GetRequest) createServerMock("GET", SeleniumRobotVariableServerConnector.NAMED_ENVIRONMENT_API_URL, 200, "{'id': 2}");		
+		namedTestCaseRequest = (GetRequest) createServerMock("GET", SeleniumRobotVariableServerConnector.NAMED_TESTCASE_API_URL, 200, "{'id': 3}");		
+		namedVersionRequest = (GetRequest) createServerMock("GET", SeleniumRobotVariableServerConnector.NAMED_VERSION_API_URL, 200, "{'id': 4}");	
+		createApplicationRequest = (HttpRequestWithBody) createServerMock("POST", SeleniumRobotSnapshotServerConnector.APPLICATION_API_URL, 200, "{'id': '1'}");	
+		createEnvironmentRequest = (HttpRequestWithBody) createServerMock("POST", SeleniumRobotSnapshotServerConnector.ENVIRONMENT_API_URL, 200, "{'id': '2'}");	
+		createVersionRequest = (HttpRequestWithBody) createServerMock("POST", SeleniumRobotSnapshotServerConnector.VERSION_API_URL, 200, "{'id': '4'}");	
+		createTestCaseRequest = (HttpRequestWithBody) createServerMock("POST", SeleniumRobotSnapshotServerConnector.TESTCASE_API_URL, 200, "{'id': '3'}");
+		createVariableRequest = (HttpRequestWithBody) createServerMock("POST", SeleniumRobotVariableServerConnector.VARIABLE_API_URL, 200, "{'id': 13, 'name': 'custom.test.variable.key', 'value': 'value', 'reservable': false}");
+		updateVariableRequest = (HttpRequestWithBody) createServerMock("PATCH", String.format(SeleniumRobotVariableServerConnector.EXISTING_VARIABLE_API_URL, 12), 200, "{'id': 12, 'name': 'custom.test.variable.key', 'value': 'value', 'reservable': false}");
+		updateVariableRequest2 = (HttpRequestWithBody) createServerMock("PATCH", String.format(SeleniumRobotVariableServerConnector.EXISTING_VARIABLE_API_URL, 2), 200, "{}");
+		variablesRequest = (GetRequest) createServerMock("GET", SeleniumRobotVariableServerConnector.VARIABLE_API_URL, 200, "[{'id': 1, 'name': 'key1', 'value': 'value1', 'reservable': false}, {'id': 2, 'name': 'key2', 'value': 'value2', 'reservable': true}]");	
 
 	}
 	
@@ -124,6 +145,35 @@ public class TestSeleniumRobotVariableServerConnector extends ConnectorsTest {
 		Assert.assertEquals(connector.getEnvironmentId(), 2);
 		Assert.assertEquals(connector.getTestCaseId("Test1"), 3);
 		Assert.assertEquals(connector.getVersionId(), 4);
+	}
+	
+	/**
+	 * test exception is raised if no token is provided whereas server is secured
+	 * @throws UnirestException
+	 */
+	@Test(groups= {"ut"}, expectedExceptions=ConfigurationException.class)
+	public void testServerActiveAliveAndSecured() throws UnirestException {
+		configureAliveConnection();
+		when(responseAliveString.getStatus()).thenReturn(401);
+		SeleniumRobotVariableServerConnector connector = new SeleniumRobotVariableServerConnector(true, SERVER_URL, "Test1", null);
+	}
+	
+	/**
+	 * test connection is done if token provided
+	 * @throws UnirestException
+	 */
+	@Test(groups= {"ut"})
+	public void testServerActiveAliveAndSecuredWithToken() throws UnirestException {
+		configureAliveConnection();
+		SeleniumRobotVariableServerConnector connector = new SeleniumRobotVariableServerConnector(true, SERVER_URL, "Test1", "123");
+		verify(getAliveRequest).header("Authorization", "Token 123");
+	}
+	
+	@Test(groups= {"ut"})
+	public void testServerActiveAliveAndSecuredWithoutToken() throws UnirestException {
+		configureAliveConnection();
+		SeleniumRobotVariableServerConnector connector = new SeleniumRobotVariableServerConnector(true, SERVER_URL, "Test1", null);
+		verify(getAliveRequest, never()).header("Authorization", "Token 123");
 	}
 
 	/**
@@ -173,6 +223,18 @@ public class TestSeleniumRobotVariableServerConnector extends ConnectorsTest {
 		Unirest.patch(ArgumentMatchers.contains(SeleniumRobotVariableServerConnector.VARIABLE_API_URL));
 		
 		Assert.assertEquals(variable.getValue(), "value");
+	}
+	
+	@Test(groups= {"ut"})
+	public void testVariableUpdateExistingVariableWithToken() throws UnirestException {
+		
+		configureAliveConnection();
+		SeleniumRobotVariableServerConnector connector= new SeleniumRobotVariableServerConnector(true, SERVER_URL, "Test1", "123");
+		TestVariable existingVariable = new TestVariable(12, "key", "value", false, TestVariable.TEST_VARIABLE_PREFIX + "key");
+		TestVariable variable = connector.upsertVariable(existingVariable, true);
+		
+
+		verify(variablesRequest, never()).header(eq("Authorization"), eq("Token 123"));
 	}
 	
 	/**
@@ -245,5 +307,172 @@ public class TestSeleniumRobotVariableServerConnector extends ConnectorsTest {
 		PowerMockito.verifyStatic(times(0));
 		Unirest.patch(ArgumentMatchers.contains(String.format(SeleniumRobotVariableServerConnector.EXISTING_VARIABLE_API_URL, 2)));
 	}
-
+	
+	/**
+	 * Check tokens are not added to request when not provided
+	 * @throws UnirestException
+	 */
+	@Test(groups= {"ut"})
+	public void testGetApplicationIdWithoutToken() throws UnirestException {
+		configureAliveConnection();
+		SeleniumRobotVariableServerConnector connector= new SeleniumRobotVariableServerConnector(true, SERVER_URL, "Test1", null);
+		Assert.assertEquals(connector.getApplicationId(), 1);
+		verify(namedApplicationRequest, never()).header(eq("Authorization"), anyString());
+	}
+	
+	/**
+	 * Check tokens are not added to request when not provided
+	 * @throws UnirestException
+	 */
+	@Test(groups= {"ut"})
+	public void testGetEnvironmentIdWithoutToken() throws UnirestException {
+		configureAliveConnection();
+		SeleniumRobotVariableServerConnector connector= new SeleniumRobotVariableServerConnector(true, SERVER_URL, "Test1", null);
+		Assert.assertEquals(connector.getEnvironmentId(), 2);
+		verify(namedEnvironmentRequest, never()).header(eq("Authorization"), anyString());
+	}
+	
+	/**
+	 * Check tokens are not added to request when not provided
+	 * @throws UnirestException
+	 */
+	@Test(groups= {"ut"})
+	public void testGetVersionIdWithoutToken() throws UnirestException {
+		configureAliveConnection();
+		SeleniumRobotVariableServerConnector connector= new SeleniumRobotVariableServerConnector(true, SERVER_URL, "Test1", null);
+		Assert.assertEquals(connector.getVersionId(), 4);
+		verify(namedVersionRequest, never()).header(eq("Authorization"), anyString());
+	}
+	
+	/**
+	 * Check tokens are not added to request when not provided
+	 * @throws UnirestException
+	 */
+	@Test(groups= {"ut"})
+	public void testGetTestCaseIdWithoutToken() throws UnirestException {
+		configureAliveConnection();
+		SeleniumRobotVariableServerConnector connector= new SeleniumRobotVariableServerConnector(true, SERVER_URL, "Test1", null);
+		Assert.assertEquals(connector.getTestCaseId("foo"), 3);
+		verify(namedTestCaseRequest, never()).header(eq("Authorization"), anyString());
+	}
+	
+	/**
+	 * Check tokens are not added to request when not provided
+	 * @throws UnirestException
+	 */
+	@Test(groups= {"ut"})
+	public void testCreateTestCaseWithoutToken() throws UnirestException {
+		configureAliveConnection();
+		SeleniumRobotVariableServerConnector connector= new SeleniumRobotVariableServerConnector(true, SERVER_URL, "Test1", null);
+		connector.createTestCase("foo");
+		verify(createTestCaseRequest, never()).header(eq("Authorization"), anyString());
+	}
+	
+	/**
+	 * Check tokens are not added to request when not provided
+	 * @throws UnirestException
+	 */
+	@Test(groups= {"ut"})
+	public void testCreateVersionWithoutToken() throws UnirestException {
+		configureAliveConnection();
+		SeleniumRobotVariableServerConnector connector= new SeleniumRobotVariableServerConnector(true, SERVER_URL, "Test1", null);
+		connector.createVersion();
+		verify(createVersionRequest, never()).header(eq("Authorization"), anyString());
+	}
+	
+	/**
+	 * Check tokens are not added to request when not provided
+	 * @throws UnirestException
+	 */
+	@Test(groups= {"ut"})
+	public void testCreateEnvironmentWithoutToken() throws UnirestException {
+		configureAliveConnection();
+		SeleniumRobotVariableServerConnector connector= new SeleniumRobotVariableServerConnector(true, SERVER_URL, "Test1", null);
+		connector.createEnvironment();
+		verify(createEnvironmentRequest, never()).header(eq("Authorization"), anyString());
+	}
+	
+	/**
+	 * Check tokens are not added to request when not provided
+	 * @throws UnirestException
+	 */
+	@Test(groups= {"ut"})
+	public void testCreateApplicationWithoutToken() throws UnirestException {
+		configureAliveConnection();
+		SeleniumRobotVariableServerConnector connector= new SeleniumRobotVariableServerConnector(true, SERVER_URL, "Test1", null);
+		connector.createApplication();
+		verify(createApplicationRequest, never()).header(eq("Authorization"), anyString());
+	}
+	
+	/**
+	 * Check tokens are not added to request when not provided
+	 * @throws UnirestException
+	 */
+	@Test(groups= {"ut"})
+	public void testGetApplicationIdWithToken() throws UnirestException {
+		configureAliveConnection();
+		SeleniumRobotVariableServerConnector connector= new SeleniumRobotVariableServerConnector(true, SERVER_URL, "Test1", "123");
+		Assert.assertEquals(connector.getApplicationId(), 1);
+		verify(namedApplicationRequest, times(1)).header(eq("Authorization"), eq("Token 123"));
+	}
+	
+	/**
+	 * Check tokens are not added to request when not provided
+	 * @throws UnirestException
+	 */
+	@Test(groups= {"ut"})
+	public void testGetEnvironmentIdWithToken() throws UnirestException {
+		configureAliveConnection();
+		SeleniumRobotVariableServerConnector connector= new SeleniumRobotVariableServerConnector(true, SERVER_URL, "Test1", "123");
+		Assert.assertEquals(connector.getEnvironmentId(), 2);
+		verify(namedEnvironmentRequest, times(1)).header(eq("Authorization"), eq("Token 123"));
+	}
+	
+	/**
+	 * Check tokens are not added to request when not provided
+	 * @throws UnirestException
+	 */
+	@Test(groups= {"ut"})
+	public void testCreateTestCaseWithToken() throws UnirestException {
+		configureAliveConnection();
+		SeleniumRobotVariableServerConnector connector= new SeleniumRobotVariableServerConnector(true, SERVER_URL, "Test1", "123");
+		connector.createTestCase("foo");
+		verify(createTestCaseRequest, times(2)).header(eq("Authorization"), eq("Token 123"));
+	}
+	
+	/**
+	 * Check tokens are not added to request when not provided
+	 * @throws UnirestException
+	 */
+	@Test(groups= {"ut"})
+	public void testCreateVersionWithToken() throws UnirestException {
+		configureAliveConnection();
+		SeleniumRobotVariableServerConnector connector= new SeleniumRobotVariableServerConnector(true, SERVER_URL, "Test1", "123");
+		connector.createVersion();
+		verify(createVersionRequest, times(2)).header(eq("Authorization"), eq("Token 123"));
+	}
+	
+	/**
+	 * Check tokens are not added to request when not provided
+	 * @throws UnirestException
+	 */
+	@Test(groups= {"ut"})
+	public void testCreateEnvironmentWithToken() throws UnirestException {
+		configureAliveConnection();
+		SeleniumRobotVariableServerConnector connector= new SeleniumRobotVariableServerConnector(true, SERVER_URL, "Test1", "123");
+		connector.createEnvironment();
+		verify(createEnvironmentRequest, times(1)).header(eq("Authorization"), eq("Token 123"));
+	}
+	
+	/**
+	 * Check tokens are not added to request when not provided
+	 * @throws UnirestException
+	 */
+	@Test(groups= {"ut"})
+	public void testCreateApplicationWithToken() throws UnirestException {
+		configureAliveConnection();
+		SeleniumRobotVariableServerConnector connector= new SeleniumRobotVariableServerConnector(true, SERVER_URL, "Test1", "123");
+		connector.createApplication();
+		verify(createApplicationRequest, times(1)).header(eq("Authorization"), eq("Token 123"));
+	}
 }
