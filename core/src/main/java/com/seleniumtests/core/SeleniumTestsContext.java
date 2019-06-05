@@ -724,7 +724,7 @@ public class SeleniumTestsContext {
      * Created the directory specific to this test. It must be unique even if the same test is executed twice
      * So the created directory is 'test-ouput/<test_name>-<index>'
      */
-    private void createTestSpecificOutputDirectory(final ITestResult testNGResult) {
+    private void createTestSpecificOutputDirectory(ITestResult testNGResult) {
     	String testOutputFolderName = hashTest(testNGResult);
     	
     	// use base directory as it's fixed along the life of the test
@@ -741,7 +741,7 @@ public class SeleniumTestsContext {
      * @param testNGResult
      * @return
      */
-    private String hashTest(final ITestResult testNGResult) {
+    private String hashTest(ITestResult testNGResult) {
     	String uniqueIdentifier = TestNGResultUtils.getHashForTest(testNGResult);
     	String testNameModified = StringUtility.replaceOddCharsFromFileName(TestNGResultUtils.getTestName(testNGResult));
     	
@@ -765,7 +765,7 @@ public class SeleniumTestsContext {
      * post configuration of the context
      * This should be done only inside the test method as we need the 'Test' method result and not an 'Before' or 'After' method result
      */
-    public void configureContext(final ITestResult testNGResult) {
+    public void configureContext(ITestResult testNGResult) {
     	
     	// to do before creating connectors because seleniumRobot server needs it
     	this.testNGResult = testNGResult; 

@@ -67,6 +67,7 @@ import com.seleniumtests.reporter.logger.TestLogging;
 import com.seleniumtests.reporter.logger.TestStep;
 import com.seleniumtests.reporter.reporters.CommonReporter;
 import com.seleniumtests.util.FileUtility;
+import com.seleniumtests.util.StringUtility;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
 import net.lightbody.bmp.core.har.Har;
@@ -417,6 +418,10 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 				String className = ((Method)(testResult.getParameters()[0])).getDeclaringClass().getName();
 				String methodName = ((Method)(testResult.getParameters()[0])).getName();
 				currentBeforeContext = SeleniumTestsContextManager.storeMethodContext(context, className, methodName);
+				
+				// issue #136: be sure that driver created in beforeMethod has the same set of parameters as a driver created in Test method
+				// 			behavior is undefined if used inside a cucumber test
+				SeleniumTestsContextManager.updateThreadContext(testResult);
 			} catch (Exception e) {
 				throw new ScenarioException("When using @BeforeMethod in tests, this method MUST have a 'java.lang.reflect.Method' object as first argument. Example: \n\n"
 						+ "@BeforeMethod\n" + 
@@ -458,8 +463,7 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 		// issue #136: block driver creation outside of @BeforeMethod / @AfterMethod so that a driver may not remain open without being used
 		// other reason is that context for Class/Test/Group is shared among several test methods
 		// WebDriver.cleanup() is called after @AfterMethod
-//		if (configMethod.isBeforeMethodConfiguration() || configMethod.isAfterMethodConfiguration()) { // TODO: to activate but for now, creating driver without having called "updateThreadContext" may raise exception (seen with HTMLUnit and proxy parameter 
-		if (configMethod.isAfterMethodConfiguration()) {
+		if (configMethod.isBeforeMethodConfiguration() || configMethod.isAfterMethodConfiguration()) { // TODO: to activate but for now, creating driver without having called "updateThreadContext" may raise exception (seen with HTMLUnit and proxy parameter 
 			SeleniumTestsContextManager.getThreadContext().setDriverCreationBlocked(false);
 		} else {
 			SeleniumTestsContextManager.getThreadContext().setDriverCreationBlocked(true);
@@ -591,5 +595,4 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 			logger.error("log parsing failed: " + e.getMessage());
 		}
 	}
-
 }

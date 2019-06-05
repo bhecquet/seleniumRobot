@@ -17,6 +17,7 @@
  */
 package com.seleniumtests.core.utils;
 
+import java.lang.reflect.Method;
 import java.util.Arrays;
 
 import org.testng.ITestResult;
@@ -41,7 +42,13 @@ public class TestNGResultUtils {
     			) {
     		return testNGResult.getParameters()[0].toString();
     	} else {
-    		return testNGResult.getMethod().getMethodName();
+    		// issue #136: in case we are in a BeforeMethod, take class name and method name from TestMethod
+    		if (testNGResult.getMethod().isBeforeMethodConfiguration()) {
+    			Method testMethod = (Method)(testNGResult.getParameters()[0]);
+    			return "before-" + testMethod.getName();
+    		} else {
+    			return testNGResult.getMethod().getMethodName();
+    		}
     	}
 	}
 	
@@ -54,14 +61,27 @@ public class TestNGResultUtils {
     	String uniqueIdentifier;
     	if (testNGResult != null) {
     		
+    		String suiteName = testNGResult.getTestContext().getSuite().getName();
+    		String xmlTestName = testNGResult.getTestContext().getName();
+			String className = testNGResult.getMethod().getRealClass().getName();
+			String testMethodName = getTestName(testNGResult);
+			Object[] testMethodParams = testNGResult.getParameters();
+			
+    		// issue #136: in case we are in a BeforeMethod, take class name and method name from TestMethod
+    		if (testNGResult.getMethod().isBeforeMethodConfiguration()) {
+    			Method testMethod = (Method)(testNGResult.getParameters()[0]);
+    			className = testMethod.getDeclaringClass().getName();
+    			testMethodName = "before-" + testMethod.getName();
+    			testMethodParams = testMethod.getParameters();
+    		}
         	
-    		String testNameModified = StringUtility.replaceOddCharsFromFileName(getTestName(testNGResult));
+    		String testNameModified = StringUtility.replaceOddCharsFromFileName(testMethodName);
     		
-    		uniqueIdentifier = testNGResult.getTestContext().getSuite().getName()
-	    			+ "-" + testNGResult.getTestContext().getName()
-	    			+ "-" + testNGResult.getMethod().getRealClass().getName()
+			uniqueIdentifier = suiteName
+	    			+ "-" + xmlTestName
+	    			+ "-" + className
 	    			+ "-" + testNameModified
-	    			+ "-" + Arrays.hashCode(testNGResult.getParameters());
+	    			+ "-" + Arrays.hashCode(testMethodParams);
     	} else {
     		uniqueIdentifier = "null-null-null-null-0";
     	}
