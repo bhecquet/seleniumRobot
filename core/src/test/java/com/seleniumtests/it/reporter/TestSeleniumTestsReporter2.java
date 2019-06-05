@@ -24,7 +24,9 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
+import java.io.File;
 import java.nio.file.Paths;
+import java.util.Arrays;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.velocity.app.VelocityEngine;
@@ -287,6 +289,33 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		
 		String detailedReportContent2 = readTestMethodResultFile("testInError");
 		Assert.assertFalse(detailedReportContent2.contains("<h4> Test Details - testInError</h4><pre>"));
+		
+	}
+	
+
+	/**
+	 * Check that with driver starting and operations in BeforeMethod method, screenshots are available in HTML report
+	 */
+	@Test(groups={"it"})
+	public void testAllScreenshotsArePresent() throws Exception {
+		
+		try {
+			System.setProperty(SeleniumTestsContext.BROWSER, "chrome");
+			System.setProperty("startLocation", "beforeMethod");
+			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForListener5.test1Listener5"}, "", "stub1");
+		} finally {
+			System.clearProperty(SeleniumTestsContext.BROWSER);
+		}
+		
+		String outDir = new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath();
+		String detailedReportContent1 = readTestMethodResultFile("test1Listener5");
+		
+		// check all files are displayed
+		Assert.assertTrue(detailedReportContent1.contains("<a href='../before-test1Listener5/screenshots/N-A_0-1_Pre_test_step._beforeMethod-"));
+		Assert.assertTrue(detailedReportContent1.contains("<a href='../before-test1Listener5/htmls/N-A_0-1_Pre_test_step._beforeMethod-"));
+		Assert.assertTrue(detailedReportContent1.contains("<a href='../test1Listener5/screenshots/test1Listener5_0-1_Test_end"));
+		Assert.assertTrue(detailedReportContent1.contains("<a href='../test1Listener5/htmls/test1Listener5_0-1_Test_end"));
+
 		
 	}
 	

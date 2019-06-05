@@ -19,13 +19,17 @@ package com.seleniumtests.it.reporter;
 
 import java.io.File;
 import java.nio.file.Paths;
+import java.util.Arrays;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.json.JSONObject;
 import org.testng.Assert;
+import org.testng.ITestContext;
 import org.testng.annotations.Test;
 import org.testng.xml.XmlSuite.ParallelMode;
 
+import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 
 public class TestReporterControler extends ReporterTest {
@@ -70,6 +74,40 @@ public class TestReporterControler extends ReporterTest {
 		for (File imgFile: Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriverWithFailure", "screenshots").toFile().listFiles()) {
 			Assert.assertTrue(imgFile.getName().startsWith("testDriverWithFailure"));
 		}
+	}
+	
+	/**
+	 * Check that with driver starting and operations in BeforeMethod method, screenshots are correctyl handled
+	 * - copied in the relevant folder
+	 * - always present at the end of the test 
+	 */
+	@Test(groups={"it"})
+	public void testBeforeMethodCapturesArePresent() throws Exception {
+		
+		try {
+			System.setProperty(SeleniumTestsContext.BROWSER, "htmlunit");
+			System.setProperty("startLocation", "beforeMethod");
+			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForListener5.test1Listener5"}, "", "stub1");
+		} finally {
+			System.clearProperty(SeleniumTestsContext.BROWSER);
+		}
+		
+		String outDir = new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath();
+
+		
+		// check that there is not folder named 'beforeMethod' or 'startTestMethod', which correspond to @BeforeMethod annotated methods
+		for (String fileName: new File(outDir).list()) {
+			if (fileName.startsWith("beforeMethod") || fileName.startsWith("startTestMethod")) {
+				Assert.fail("execution of '@BeforeMethod' should not create output folders");
+			}
+		}
+		
+		// check that a 'before-test1Listener5' has been created and contains html capture
+		Assert.assertTrue(Arrays.asList(new File(outDir).list()).contains("before-test1Listener5"));
+		Assert.assertEquals(Paths.get(outDir, "before-test1Listener5", "htmls").toFile().list().length, 1);
+		
+		// check that a 'test1Listener5' has been created and contains html capture
+		Assert.assertEquals(Paths.get(outDir, "test1Listener5", "htmls").toFile().list().length, 1);
 	}
 	
 

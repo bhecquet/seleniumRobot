@@ -138,8 +138,12 @@ public class ReporterControler implements IReporter {
 				continue;
 			}
 			
-			File htmlDir = Paths.get(testContext.getOutputDirectory(), "htmls").toFile();
-			File screenshotDir = Paths.get(testContext.getOutputDirectory(), "screenshots").toFile();
+			String outputSubDirectory = new File(testContext.getOutputDirectory()).getName();
+			String outputDirectoryParent = new File(testContext.getOutputDirectory()).getParent();
+			File htmlDir = Paths.get(outputDirectoryParent, outputSubDirectory, "htmls").toFile();
+			File htmlBeforeDir = Paths.get(outputDirectoryParent, "before-" + outputSubDirectory, "htmls").toFile();
+			File screenshotDir = Paths.get(outputDirectoryParent, outputSubDirectory, "screenshots").toFile();
+			File screenshotBeforeDir = Paths.get(outputDirectoryParent, "before-" + outputSubDirectory, "screenshots").toFile();
 			
 			// get list of existing files
 			if (htmlDir.isDirectory()) {
@@ -147,6 +151,12 @@ public class ReporterControler implements IReporter {
 			}
 			if (screenshotDir.isDirectory()) {
 				allFiles.addAll(Arrays.asList(screenshotDir.listFiles()));
+			}
+			if (htmlBeforeDir.isDirectory()) {
+				allFiles.addAll(Arrays.asList(htmlBeforeDir.listFiles()));
+			}
+			if (screenshotBeforeDir.isDirectory()) {
+				allFiles.addAll(Arrays.asList(screenshotBeforeDir.listFiles()));
 			}
 		}
 		

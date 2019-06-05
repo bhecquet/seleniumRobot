@@ -21,6 +21,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -299,7 +300,7 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 	 * @throws Exception
 	 */
 	@Test(groups={"it"})
-	public void testContextDriverBlockingBeforeMethod(ITestContext testContext) throws Exception {
+	public void testContextDriverNotBlockingBeforeMethod(ITestContext testContext) throws Exception {
 		
 		try {
 			System.setProperty(SeleniumTestsContext.BROWSER, "htmlunit");
@@ -311,20 +312,20 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 		}
 		
 		String detailedReportContent1 = readTestMethodResultFile("test1Listener5");
-		Assert.assertTrue(detailedReportContent1.contains(DRIVER_BLOCKED_MSG));
+		Assert.assertFalse(detailedReportContent1.contains(DRIVER_BLOCKED_MSG));
 
 		String logs = readSeleniumRobotLogFile();
 		Assert.assertTrue(logs.contains("start suite"));
 		Assert.assertTrue(logs.contains("start test"));
 		Assert.assertTrue(logs.contains("start class"));
-		Assert.assertFalse(logs.contains("start method"));
+		Assert.assertTrue(logs.contains("start method"));
 		
 		
 		String outDir = new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath();
 		JSONObject jsonResult = new JSONObject(FileUtils.readFileToString(Paths.get(outDir, "results.json").toFile()));
 		
-		// All tests should be skipped because configuration method is skipped
-		Assert.assertEquals(jsonResult.getInt("skip"), 2);
+		// All tests should not be skipped
+		Assert.assertEquals(jsonResult.getInt("skip"), 0);
 	}
 	
 

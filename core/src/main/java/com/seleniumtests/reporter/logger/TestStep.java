@@ -18,6 +18,7 @@
 package com.seleniumtests.reporter.logger;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -236,10 +237,16 @@ public class TestStep extends TestAction {
 			}
 			
 			if (snapshot.getScreenshot().getFullHtmlPath() != null) {
-				usedFiles.add(new File(snapshot.getScreenshot().getFullHtmlPath()));
+				try {
+					usedFiles.add(new File(snapshot.getScreenshot().getFullHtmlPath()).getCanonicalFile());
+				} catch (IOException e) {
+				}
 			}
 			if (snapshot.getScreenshot().getFullImagePath() != null) {
-				usedFiles.add(new File(snapshot.getScreenshot().getFullImagePath()));
+				try {
+					usedFiles.add(new File(snapshot.getScreenshot().getFullImagePath()).getCanonicalFile());
+				} catch (IOException e) {
+				}
 			}
 		}
 		
