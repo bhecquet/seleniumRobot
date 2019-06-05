@@ -258,6 +258,7 @@ public class SeleniumTestsContext {
     private Map<ITestResult, List<Throwable>> verificationFailuresMap = new HashMap<>();
     
     private SeleniumRobotVariableServerConnector variableServer;
+    private boolean variableServerAlreadyRequested = false;
     private SeleniumGridConnector seleniumGridConnector;
     private List<SeleniumGridConnector> seleniumGridConnectors;
     private TestManager testManagerIntance;
@@ -281,6 +282,7 @@ public class SeleniumTestsContext {
     public SeleniumTestsContext(SeleniumTestsContext toCopy) {
     	contextDataMap = new HashMap<>(toCopy.contextDataMap); 
     	testNGContext = toCopy.testNGContext;
+    	variableServerAlreadyRequested = toCopy.variableServerAlreadyRequested;
     	testNGResult = toCopy.testNGResult;
     	baseOutputDirectory = toCopy.baseOutputDirectory;
     	verificationFailuresMap = new HashMap<>(toCopy.verificationFailuresMap);
@@ -859,9 +861,10 @@ public class SeleniumTestsContext {
     	// get variables from command line
     	getConfiguration().putAll(getUserDefinedVariablesFromCommandLine());
     	
-    	if (variableServer != null) {
+    	if (variableServer != null && !variableServerAlreadyRequested) {
     		// get variable from server
 			getConfiguration().putAll(variableServer.getVariables(getSeleniumRobotServerVariableOlderThan()));
+			variableServerAlreadyRequested = true;
 			
 			// give priority to command line parameters over those from server, so overwrite variable server if overlapping
 			getConfiguration().putAll(getUserDefinedVariablesFromCommandLine());

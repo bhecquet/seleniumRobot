@@ -312,7 +312,7 @@ public class TestSeleniumTestContext3 extends MockitoTest {
 			
 			PowerMockito.whenNew(SeleniumRobotVariableServerConnector.class).withArguments(eq(true), eq("http://localhost:1234"), anyString(), eq(null)).thenReturn(variableServer);
 			when(variableServer.isAlive()).thenReturn(true);
-			when(variableServer.getVariables()).thenReturn(variables);
+			when(variableServer.getVariables(0)).thenReturn(variables);
 			System.setProperty("key1", "userValue");
 			
 			ITestResult testResult = GenericTest.generateResult(testNGCtx, getClass());
@@ -325,6 +325,111 @@ public class TestSeleniumTestContext3 extends MockitoTest {
 			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE);
 			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL);
 			System.clearProperty("key1");
+		}
+	}	
+	
+	/**
+	 * Check variables can be get from variable server
+	 * @param testNGCtx
+	 * @param xmlTest
+	 * @throws Exception
+	 */
+	@Test(groups={"ut"})
+	public void testVariablesFromVariableServer(final ITestContext testNGCtx, final XmlTest xmlTest) throws Exception {
+		
+		Map<String, TestVariable> variables = new HashMap<>();
+		variables.put("key1", new TestVariable("key1", "val1"));
+		
+		try {
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE, "true");
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL, "http://localhost:1234");
+			
+			PowerMockito.whenNew(SeleniumRobotVariableServerConnector.class).withArguments(eq(true), eq("http://localhost:1234"), anyString(), eq(null)).thenReturn(variableServer);
+			when(variableServer.isAlive()).thenReturn(true);
+			when(variableServer.getVariables(0)).thenReturn(variables);
+			
+			ITestResult testResult = GenericTest.generateResult(testNGCtx, getClass());
+			initThreadContext(testNGCtx, "myTest", testResult);
+			
+			SeleniumTestsContext seleniumTestsCtx = SeleniumTestsContextManager.getThreadContext();
+			seleniumTestsCtx.configureContext(testResult);
+			Assert.assertEquals(seleniumTestsCtx.getConfiguration().get("key1").getValue(), "val1");
+			
+		} finally {
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE);
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL);
+		}
+	}	
+	
+	/**
+	 * Check that if we request variable configuration several times, seleniumRobot server is called only once to avoid problems with variable reservation
+	 * @param testNGCtx
+	 * @param xmlTest
+	 * @throws Exception
+	 */
+	@Test(groups={"ut"})
+	public void testVariablesAreGetOnlyOnce(final ITestContext testNGCtx, final XmlTest xmlTest) throws Exception {
+		
+		Map<String, TestVariable> variables = new HashMap<>();
+		variables.put("key", new TestVariable("key", "val1"));
+		
+		try {
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE, "true");
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL, "http://localhost:1234");
+			
+			PowerMockito.whenNew(SeleniumRobotVariableServerConnector.class).withArguments(eq(true), eq("http://localhost:1234"), anyString(), eq(null)).thenReturn(variableServer);
+			when(variableServer.isAlive()).thenReturn(true);
+			when(variableServer.getVariables(0)).thenReturn(variables);
+			
+			ITestResult testResult = GenericTest.generateResult(testNGCtx, getClass());
+			initThreadContext(testNGCtx, "myTest", testResult);
+			
+			SeleniumTestsContext seleniumTestsCtx = SeleniumTestsContextManager.getThreadContext();
+			
+			// do a second parameter retrieving
+			seleniumTestsCtx.setTestConfiguration();
+			Assert.assertEquals(seleniumTestsCtx.getConfiguration().get("key").getValue(), "val1");
+			
+			verify(variableServer).getVariables(0);
+			
+		} finally {
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE);
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL);
+		}
+	}	
+	
+	@Test(groups={"ut"})
+	public void testVariablesAreGetOnlyOnceWithContextCopy(final ITestContext testNGCtx, final XmlTest xmlTest) throws Exception {
+		
+		Map<String, TestVariable> variables = new HashMap<>();
+		variables.put("key", new TestVariable("key", "val1"));
+		
+		try {
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE, "true");
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL, "http://localhost:1234");
+			
+			PowerMockito.whenNew(SeleniumRobotVariableServerConnector.class).withArguments(eq(true), eq("http://localhost:1234"), anyString(), eq(null)).thenReturn(variableServer);
+			when(variableServer.isAlive()).thenReturn(true);
+			when(variableServer.getVariables(0)).thenReturn(variables);
+			
+			ITestResult testResult = GenericTest.generateResult(testNGCtx, getClass());
+			initThreadContext(testNGCtx, "myTest", testResult);
+			
+			SeleniumTestsContext seleniumTestsCtx = SeleniumTestsContextManager.getThreadContext();
+			
+			// do a parameter retrieving for copied context
+			SeleniumTestsContext seleniumTestsCtx2 = new SeleniumTestsContext(seleniumTestsCtx);
+			seleniumTestsCtx2.setTestConfiguration();
+			
+			// check that variables are kept even if variable server has not been re-called
+			Assert.assertEquals(seleniumTestsCtx2.getConfiguration().get("key").getValue(), "val1");
+			
+			// only one call, done by first context init
+			verify(variableServer).getVariables(0);
+			
+		} finally {
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE);
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL);
 		}
 	}	
 	
