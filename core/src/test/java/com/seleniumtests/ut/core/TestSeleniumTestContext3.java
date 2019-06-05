@@ -24,6 +24,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.times;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -398,6 +399,12 @@ public class TestSeleniumTestContext3 extends MockitoTest {
 		}
 	}	
 	
+	/**
+	 * Check that when copying context, it's possible to prevent it to retrieve variables from server
+	 * @param testNGCtx
+	 * @param xmlTest
+	 * @throws Exception
+	 */
 	@Test(groups={"ut"})
 	public void testVariablesAreGetOnlyOnceWithContextCopy(final ITestContext testNGCtx, final XmlTest xmlTest) throws Exception {
 		
@@ -418,14 +425,55 @@ public class TestSeleniumTestContext3 extends MockitoTest {
 			SeleniumTestsContext seleniumTestsCtx = SeleniumTestsContextManager.getThreadContext();
 			
 			// do a parameter retrieving for copied context
-			SeleniumTestsContext seleniumTestsCtx2 = new SeleniumTestsContext(seleniumTestsCtx);
-			seleniumTestsCtx2.setTestConfiguration();
+			SeleniumTestsContext seleniumTestsCtx2 = new SeleniumTestsContext(seleniumTestsCtx, false);
+			seleniumTestsCtx2.configureContext(testResult);
 			
 			// check that variables are kept even if variable server has not been re-called
 			Assert.assertEquals(seleniumTestsCtx2.getConfiguration().get("key").getValue(), "val1");
 			
-			// only one call, done by first context init
+			// only one call, done by first context init, further retrieving is forbidden
 			verify(variableServer).getVariables(0);
+			
+		} finally {
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE);
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL);
+		}
+	}	
+	
+	/**
+	 * Check that when copying context, it's possible to allow it to retrieve variables from server
+	 * @param testNGCtx
+	 * @param xmlTest
+	 * @throws Exception
+	 */
+	@Test(groups={"ut"})
+	public void testVariablesAreGetMultipleTimesWithContextCopy(final ITestContext testNGCtx, final XmlTest xmlTest) throws Exception {
+		
+		Map<String, TestVariable> variables = new HashMap<>();
+		variables.put("key", new TestVariable("key", "val1"));
+		
+		try {
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE, "true");
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL, "http://localhost:1234");
+			
+			PowerMockito.whenNew(SeleniumRobotVariableServerConnector.class).withArguments(eq(true), eq("http://localhost:1234"), anyString(), eq(null)).thenReturn(variableServer);
+			when(variableServer.isAlive()).thenReturn(true);
+			when(variableServer.getVariables(0)).thenReturn(variables);
+			
+			ITestResult testResult = GenericTest.generateResult(testNGCtx, getClass());
+			initThreadContext(testNGCtx, "myTest", testResult);
+			
+			SeleniumTestsContext seleniumTestsCtx = SeleniumTestsContextManager.getThreadContext();
+			
+			// do a parameter retrieving for copied context. Context is copied with permitting calls to variable server
+			SeleniumTestsContext seleniumTestsCtx2 = new SeleniumTestsContext(seleniumTestsCtx);
+			seleniumTestsCtx2.configureContext(testResult);
+			
+			// check that variables are kept even if variable server has not been re-called
+			Assert.assertEquals(seleniumTestsCtx2.getConfiguration().get("key").getValue(), "val1");
+			
+			// 2 calls, one for each context because we allow variable retrieving when copying
+			verify(variableServer, times(2)).getVariables(0);
 			
 		} finally {
 			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE);

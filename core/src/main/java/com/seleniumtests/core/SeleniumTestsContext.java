@@ -280,9 +280,15 @@ public class SeleniumTestsContext {
      * @param toCopy		the context to copy in this one
      */
     public SeleniumTestsContext(SeleniumTestsContext toCopy) {
+    	this(toCopy, true);
+    }
+    
+    public SeleniumTestsContext(SeleniumTestsContext toCopy, boolean allowRequestsToVariableServer) {
     	contextDataMap = new HashMap<>(toCopy.contextDataMap); 
     	testNGContext = toCopy.testNGContext;
-    	variableServerAlreadyRequested = toCopy.variableServerAlreadyRequested;
+    	if (!allowRequestsToVariableServer) {
+    		variableServerAlreadyRequested = toCopy.variableServerAlreadyRequested;
+    	}
     	testNGResult = toCopy.testNGResult;
     	baseOutputDirectory = toCopy.baseOutputDirectory;
     	verificationFailuresMap = new HashMap<>(toCopy.verificationFailuresMap);

@@ -521,7 +521,7 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 		SeleniumTestsContext currentContext = new SeleniumTestsContext(SeleniumTestsContextManager.getMethodContext(context, 
 				className, 
 				testResult.getAttribute(SeleniumRobotLogger.METHOD_NAME).toString(), 
-				true));
+				true), false);
 		
 		// allow driver to be created		
 		currentContext.setDriverCreationBlocked(false);
