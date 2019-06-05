@@ -421,7 +421,9 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 				
 				// issue #136: be sure that driver created in beforeMethod has the same set of parameters as a driver created in Test method
 				// 			behavior is undefined if used inside a cucumber test
-				SeleniumTestsContextManager.updateThreadContext(testResult);
+				if (!configMethod.getConstructorOrMethod().getMethod().getDeclaringClass().equals(SeleniumRobotTestPlan.class)) {
+					SeleniumTestsContextManager.updateThreadContext(testResult);
+				}
 			} catch (Exception e) {
 				throw new ScenarioException("When using @BeforeMethod in tests, this method MUST have a 'java.lang.reflect.Method' object as first argument. Example: \n\n"
 						+ "@BeforeMethod\n" + 

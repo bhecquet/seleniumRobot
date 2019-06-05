@@ -165,7 +165,7 @@ public class SeleniumTestsContextManager {
     	} else {
     		clsContext = new SeleniumTestsContext(getContextFromConfigFile(testNGCtx));
     	}
-    	setClassContext(testNGCtx, className, clsContext);;
+    	setClassContext(testNGCtx, className, clsContext);
     	return clsContext;
     }
     
