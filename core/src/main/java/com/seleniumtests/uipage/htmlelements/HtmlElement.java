@@ -46,6 +46,7 @@ import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.ie.InternetExplorerDriver;
 import org.openqa.selenium.interactions.Actions;
@@ -61,6 +62,7 @@ import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.CustomSeleniumTestsException;
 import com.seleniumtests.customexception.DriverExceptions;
 import com.seleniumtests.customexception.ScenarioException;
+import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import com.seleniumtests.driver.TestType;
 import com.seleniumtests.driver.WebUIDriver;
@@ -291,7 +293,9 @@ public class HtmlElement extends Element implements WebElement, Locatable {
         
         // handle org.openqa.selenium.UnsupportedCommandException: sendKeysToActiveElement which are not available for firefox and IE
         if ((realDriver instanceof FirefoxDriver && FirefoxDriverFactory.isMarionetteMode())
-        		|| realDriver instanceof InternetExplorerDriver) {
+        		|| realDriver instanceof InternetExplorerDriver
+	        	|| (realDriver instanceof ChromeDriver 
+	        			&& WebUIDriver.getWebUIDriver(false).getConfig().getMajorBrowserVersion() >= 75)) {
         	logger.warn("using specific Marionette method");
         	js.executeScript(String.format("arguments[0].value='%s';", keysToSend[0].toString()), element);
         } else {

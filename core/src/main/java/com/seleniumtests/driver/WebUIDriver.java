@@ -552,6 +552,14 @@ public class WebUIDriver {
     	Capabilities caps = ((CustomEventFiringWebDriver) driver).getCapabilities();
         String browserName = caps.getBrowserName();
         String browserVersion = caps.getVersion(); 
+        
+        Integer majorVersion;
+        try {
+        	majorVersion = Integer.parseInt(browserVersion.split("\\.")[0]);
+        } catch (NumberFormatException e) {
+        	majorVersion = 1;
+        }
+        config.setMajorBrowserVersion(majorVersion);
         logger.info(String.format("Browser is: %s %s", browserName, browserVersion));
     }
 

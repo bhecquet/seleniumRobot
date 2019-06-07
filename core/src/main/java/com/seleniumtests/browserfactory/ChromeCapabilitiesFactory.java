@@ -81,8 +81,8 @@ public class ChromeCapabilitiesFactory extends IDesktopCapabilityFactory {
     	if (webDriverConfig.getDebug().contains(DebugMode.DRIVER)) {
     		String chromeDriverLogPath = Paths.get(webDriverConfig.getOutputDirectory(), "chromedriver.log").toString();
         	System.setProperty(ChromeDriverService.CHROME_DRIVER_VERBOSE_LOG_PROPERTY, "true");
-//        	System.setProperty(ChromeDriverService.CHROME_DRIVER_LOG_PROPERTY, chromeDriverLogPath);
-//        	logger.info("Chromedriver logs will be written to " + chromeDriverLogPath);
+        	System.setProperty(ChromeDriverService.CHROME_DRIVER_LOG_PROPERTY, chromeDriverLogPath);
+        	logger.info("Chromedriver logs will be written to " + chromeDriverLogPath);
     	}
 	}
  
