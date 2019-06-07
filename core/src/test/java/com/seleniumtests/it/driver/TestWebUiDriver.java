@@ -168,12 +168,17 @@ public class TestWebUiDriver extends ReporterTest {
 	@Test(groups={"it"})
 	public void testBrowserLogsExists() throws Exception {
 
-		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriver"});
-		
-		Assert.assertTrue(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriver", "driver-log-browser.txt").toFile().exists());
-		Assert.assertTrue(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriver", "driver-log-client.txt").toFile().exists());
-		Assert.assertTrue(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriver", "driver-log-driver.txt").toFile().exists());
-		
+		try {
+			System.setProperty(SeleniumTestsContext.DEBUG, "driver");
+			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriver"});
+			
+			Assert.assertTrue(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriver", "chromedriver.log").toFile().exists());
+//			Assert.assertTrue(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriver", "driver-log-browser.txt").toFile().exists());
+//			Assert.assertTrue(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriver", "driver-log-client.txt").toFile().exists());
+//			Assert.assertTrue(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriver", "driver-log-driver.txt").toFile().exists());
+		} finally {
+			System.clearProperty(SeleniumTestsContext.DEBUG);
+		}
 	}
 	
 	/**
