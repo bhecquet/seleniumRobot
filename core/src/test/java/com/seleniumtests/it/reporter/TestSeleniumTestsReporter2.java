@@ -26,7 +26,6 @@ import static org.mockito.Mockito.verify;
 
 import java.io.File;
 import java.nio.file.Paths;
-import java.util.Arrays;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.velocity.app.VelocityEngine;
@@ -592,8 +591,8 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		// read 'testDriver' report. This contains calls to HtmlElement actions
 		String detailedReportContent1 = readTestMethodResultFile("testDriverCustomSnapshot");
 		
-		Assert.assertTrue(detailedReportContent1.contains("<a href='screenshots/my_snapshot"));	
-		Assert.assertTrue(detailedReportContent1.contains("<a href='htmls/my_snapshot"));	
+		Assert.assertTrue(detailedReportContent1.contains("<a href='../testDriverCustomSnapshot/screenshots/my_snapshot"));	
+		Assert.assertTrue(detailedReportContent1.contains("<a href='../testDriverCustomSnapshot/htmls/my_snapshot"));	
 		Assert.assertTrue(detailedReportContent1.contains("<div class=\"message-snapshot\">Output 'main' browser: my snapshot:"));	
 	}
 	
