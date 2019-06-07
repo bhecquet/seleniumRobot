@@ -50,6 +50,7 @@ public class DriverConfig {
     private BrowserMobProxy browserMobProxy;
     private SeleniumTestsContext testContext;
     private BrowserType browserType;
+    private Integer majorBrowserVersion;
     
     public DriverConfig(SeleniumTestsContext testContext) {
     	this.testContext = testContext;
@@ -433,5 +434,13 @@ public class DriverConfig {
 
 	public void setRunOnSameNode(String runOnSameNode) {
 		this.runOnSameNode = runOnSameNode;
+	}
+
+	public Integer getMajorBrowserVersion() {
+		return majorBrowserVersion;
+	}
+
+	public void setMajorBrowserVersion(Integer majorBrowserVersion) {
+		this.majorBrowserVersion = majorBrowserVersion;
 	}
 }

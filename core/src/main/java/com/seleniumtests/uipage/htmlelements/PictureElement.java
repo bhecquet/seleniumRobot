@@ -204,7 +204,9 @@ public class PictureElement extends GenericPictureElement {
 				coordX -= element.getSize().width / 2;
 				coordY -= element.getSize().height / 2;
 				
-			} else if (uiDriver.getConfig().getBrowserType() == BrowserType.INTERNET_EXPLORER) {
+			} else if (uiDriver.getConfig().getBrowserType() == BrowserType.INTERNET_EXPLORER
+					|| (uiDriver.getConfig().getBrowserType() == BrowserType.CHROME 
+						&& uiDriver.getConfig().getMajorBrowserVersion() >= 75)) {
 				// issue #180: internet explorer moves to center of element in viewport
 				Dimension viewportDim = ((CustomEventFiringWebDriver)uiDriver.getDriver()).getViewPortDimensionWithoutScrollbar();
 				coordX -= Math.min(element.getSize().width, viewportDim.width) / 2;
