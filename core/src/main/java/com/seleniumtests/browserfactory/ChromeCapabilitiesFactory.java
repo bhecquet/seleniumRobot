@@ -83,6 +83,10 @@ public class ChromeCapabilitiesFactory extends IDesktopCapabilityFactory {
         	System.setProperty(ChromeDriverService.CHROME_DRIVER_VERBOSE_LOG_PROPERTY, "true");
         	System.setProperty(ChromeDriverService.CHROME_DRIVER_LOG_PROPERTY, chromeDriverLogPath);
         	logger.info("Chromedriver logs will be written to " + chromeDriverLogPath);
+    	} else {
+    		// avoid keeping these properties as it breaks chrome during integration tests
+    		System.clearProperty(ChromeDriverService.CHROME_DRIVER_VERBOSE_LOG_PROPERTY);
+    		System.clearProperty(ChromeDriverService.CHROME_DRIVER_LOG_PROPERTY);
     	}
 	}
  
