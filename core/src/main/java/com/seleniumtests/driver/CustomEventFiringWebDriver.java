@@ -66,6 +66,7 @@ import com.seleniumtests.browserfactory.BrowserInfo;
 import com.seleniumtests.connectors.selenium.SeleniumGridConnector;
 import com.seleniumtests.customexception.DriverExceptions;
 import com.seleniumtests.customexception.ScenarioException;
+import com.seleniumtests.customexception.WebSessionEndedException;
 import com.seleniumtests.driver.screenshots.VideoRecorder;
 import com.seleniumtests.util.helper.WaitHelper;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
@@ -216,6 +217,9 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
 	    		logger.info("getWindowHandles: Handling alert");
 	    		handleAlert();
 	    		return super.getWindowHandles();
+			} catch (WebSessionEndedException e) {
+				logger.warn("session already terminated");
+				return new TreeSet<>();
 			} catch (Exception e) {
 				logger.info("error getting window handles: " + e.getMessage());
 				WaitHelper.waitForSeconds(2);
