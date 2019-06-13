@@ -28,6 +28,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.mashape.unirest.http.exceptions.UnirestException;
+import com.mashape.unirest.request.HttpRequest;
 import com.mashape.unirest.request.body.MultipartBody;
 import com.seleniumtests.core.TestVariable;
 import com.seleniumtests.customexception.SeleniumRobotServerException;
@@ -61,6 +62,17 @@ public class SeleniumRobotVariableServerConnector extends SeleniumRobotServerCon
 	public Map<String, TestVariable> getVariables() {
 		return getVariables(0);
 	}
+	
+
+	/**
+	 * Returns the list of variables whose name is 'name' and value is 'value'. Name or value may be null
+	 * @param name		name of the variables to retrieve. If given, only one variable will be get because server only returns one variable for each name
+	 * @param value		value of the variables to retrieve
+	 * @return			the map of found variables
+	 */
+	public Map<String, TestVariable> getVariables(String name, String value) {
+		return getVariables(0, name, value, true);
+	}
 
 	/**
 	 * Retrieve all variables from the server
@@ -70,6 +82,21 @@ public class SeleniumRobotVariableServerConnector extends SeleniumRobotServerCon
 	 * @return
 	 */
 	public Map<String, TestVariable> getVariables(Integer variablesOlderThanDays) {
+		return getVariables(variablesOlderThanDays, null, null, true);
+	}
+	
+	/**
+	 * Retrieve all variables from the server
+	 * Display a warning when a custom variable prefix "custom.test.variable." overwrites or is overwritten by a regular one
+	 * 
+	 * 
+	 * @param variablesOlderThanDays 	number of days since this variable should be created before it can be returned. This only applies to variables which have a time to live (a.k.a: where destroyAfterDays parameter is > 0) 
+	 * @param name						name of the variables to retrieve. If given, only one variable will be get because server only returns one variable for each name
+	 * @param value						value of the variables to retrieve
+	 * @param reserve					if true, reserve the reservable variables, else, only return searched variables
+	 * @return
+	 */
+	public Map<String, TestVariable> getVariables(Integer variablesOlderThanDays, String name, String value, boolean reserve) {
 		if (!active) {
 			throw new SeleniumRobotServerException("Server is not active");
 		}
@@ -77,12 +104,22 @@ public class SeleniumRobotVariableServerConnector extends SeleniumRobotServerCon
 			
 			List<String> varNames = new ArrayList<>();
 			
-			JSONArray variablesJson = getJSonArray(buildGetRequest(url + VARIABLE_API_URL)
+			HttpRequest request = buildGetRequest(url + VARIABLE_API_URL)
 					.queryString("version", versionId)
 					.queryString("environment", environmentId)
 					.queryString("test", testCaseId)
 					.queryString("olderThan", variablesOlderThanDays)
-					.queryString("format", "json"));
+					.queryString("reserve", reserve)
+					.queryString("format", "json");
+			
+			if (name != null) {
+				request = request.queryString("name", name);
+			}
+			if (value != null) {
+				request = request.queryString("value", value);
+			}
+			
+			JSONArray variablesJson = getJSonArray(request);
 			
 			Map<String, TestVariable> variables = new HashMap<>();
 			for (int i=0; i < variablesJson.length(); i++) {
