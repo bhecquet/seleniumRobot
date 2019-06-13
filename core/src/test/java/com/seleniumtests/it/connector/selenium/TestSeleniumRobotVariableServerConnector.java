@@ -65,6 +65,18 @@ public class TestSeleniumRobotVariableServerConnector extends GenericTest {
 	}
 	
 	@Test(groups={"it"}, enabled=true)
+	public void testGetVariablesWithName() {
+		Map<String, TestVariable> variables = connector.getVariables("custom.test.variable.key.test", null);
+		Assert.assertEquals(variables.size(), 1);
+	}
+	
+	@Test(groups={"it"}, enabled=true)
+	public void testGetVariablesWithValue() {
+		Map<String, TestVariable> variables = connector.getVariables(null, "value");
+		Assert.assertEquals(variables.size(), 1);
+	}
+	
+	@Test(groups={"it"}, enabled=true)
 	public void testUpsert() {
 		TestVariable variable = new TestVariable("key.test", "value");
 		variable.setReservable(true);
