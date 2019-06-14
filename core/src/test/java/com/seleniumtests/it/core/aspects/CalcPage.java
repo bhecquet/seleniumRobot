@@ -66,6 +66,13 @@ public class CalcPage extends PageObject {
 		return this;
 	}
 	
+	public CalcPage addWithSubStepCatchedError(int a) {
+		try {
+			addWithCatchedError(a);
+		} catch (Exception e) {}
+		return this;
+	}
+	
 	public CalcPage addWithCatchedError(int a) {
 		try {
 			failAction();

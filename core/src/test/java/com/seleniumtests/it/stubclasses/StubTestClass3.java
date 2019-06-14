@@ -67,6 +67,13 @@ public class StubTestClass3 extends StubParentClass {
 		.add(1);
 	}
 	
+	@Test(groups="stub")
+	public void testOkWithOneSubStepFailed() throws IOException {
+		new CalcPage()
+		.addWithSubStepCatchedError(1)
+		.add(1);
+	}
+	
 	/**
 	 * Test KO with assertion, soft assertion disabled
 	 * @throws IOException 
