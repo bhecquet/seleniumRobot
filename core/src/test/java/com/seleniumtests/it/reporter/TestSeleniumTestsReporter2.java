@@ -163,6 +163,21 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	}
 	
 	/**
+	 * issue #251: check error message is displayed for any action that failed
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testDetailedReportWithOneStepFailed() throws Exception {
+		
+		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass3"}, ParallelMode.METHODS, new String[] {"testOkWithOneStepFailed"});
+		
+		// check content of summary report file
+		String detailedReportContent = readTestMethodResultFile("testOkWithOneStepFailed");
+		detailedReportContent.contains("<li class=\"header-failed\">failAction bt<br/>class com.seleniumtests.customexception.DriverExceptions: fail</li>");
+		
+	}
+	
+	/**
 	 * Check summary format when tests have steps
 	 * @throws Exception
 	 */

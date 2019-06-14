@@ -66,6 +66,13 @@ public class CalcPage extends PageObject {
 		return this;
 	}
 	
+	public CalcPage addWithCatchedError(int a) {
+		try {
+			failAction();
+		} catch (Exception e) {}
+		return this;
+	}
+	
 	@StepName("add something to total")
 	public CalcPage addWithName(int a) {
 		add(result, a);
