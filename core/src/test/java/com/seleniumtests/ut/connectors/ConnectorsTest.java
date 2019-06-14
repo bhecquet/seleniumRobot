@@ -79,6 +79,7 @@ public class ConnectorsTest extends MockitoTest {
 				when(getRequest.asJson()).thenReturn(jsonResponse);
 				when(getRequest.queryString(anyString(), anyString())).thenReturn(getRequest);
 				when(getRequest.queryString(anyString(), anyInt())).thenReturn(getRequest);
+				when(getRequest.queryString(anyString(), anyBoolean())).thenReturn(getRequest);
 				when(getRequest.getHttpRequest()).thenReturn(request);
 				return getRequest;
 			case "POST":
@@ -91,6 +92,7 @@ public class ConnectorsTest extends MockitoTest {
 				when(postRequest.field(anyString(), any(File.class))).thenReturn(requestMultipartBody);
 				when(postRequest.queryString(anyString(), anyString())).thenReturn(postRequest);
 				when(postRequest.queryString(anyString(), anyInt())).thenReturn(postRequest);
+				when(postRequest.queryString(anyString(), anyBoolean())).thenReturn(postRequest);
 				when(postRequest.header(anyString(), anyString())).thenReturn(postRequest);
 				when(requestMultipartBody.field(anyString(), anyInt())).thenReturn(requestMultipartBody);
 				when(requestMultipartBody.field(anyString(), anyBoolean())).thenReturn(requestMultipartBody);
