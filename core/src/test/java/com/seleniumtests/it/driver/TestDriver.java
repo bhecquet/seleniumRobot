@@ -129,6 +129,17 @@ public class TestDriver extends GenericMultiBrowserTest {
 			Assert.assertEquals("", DriverTestPage.textElement.getValue());
 		}
 	}
+
+	@Test(groups={"it", "ut"})
+	public void testDoubleClickDiv() {
+		try {
+			DriverTestPage.redSquare.simulateDoubleClick();
+			Assert.assertEquals(DriverTestPage.textElement.getValue(), "double coucou");
+		} finally {
+			DriverTestPage.resetButton.click();
+			Assert.assertEquals("", DriverTestPage.textElement.getValue());
+		}
+	}
    
 	@Test(groups={"it", "ut"})
 	public void testClickRadio() {

@@ -261,8 +261,15 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     	
         findElement(true);
 
-        String mouseOverScript =
-            "if(document.createEvent){var evObj = document.createEvent('MouseEvents');evObj.initEvent('mouseover', true, false); arguments[0].dispatchEvent(evObj);} else if(document.createEventObject) { arguments[0].fireEvent('onmouseover');}";
+        String mouseOverScript;
+        if (realDriver instanceof FirefoxDriver && FirefoxDriverFactory.isMarionetteMode()
+            	|| realDriver instanceof ChromeDriver && WebUIDriver.getWebUIDriver(false).getConfig().getMajorBrowserVersion() >= 75) {
+        		mouseOverScript = "var event = new MouseEvent('mouseover', {view: window, bubbles: true, cancelable: true}) ;"
+                			+ "arguments[0].dispatchEvent(event);";
+            } else {
+            	mouseOverScript = "if(document.createEvent){var evObj = document.createEvent('MouseEvents');evObj.initEvent('mouseover', true, false); arguments[0].dispatchEvent(evObj);} else if(document.createEventObject) { arguments[0].fireEvent('onmouseover');}";
+            }
+        
         JavascriptExecutor js = (JavascriptExecutor) driver;
         js.executeScript(mouseOverScript, element);
         WaitHelper.waitForSeconds(2);
@@ -270,12 +277,8 @@ public class HtmlElement extends Element implements WebElement, Locatable {
         String clickScript = "";
         if (realDriver instanceof FirefoxDriver && FirefoxDriverFactory.isMarionetteMode()
         	|| realDriver instanceof ChromeDriver && WebUIDriver.getWebUIDriver(false).getConfig().getMajorBrowserVersion() >= 75) {
-        	clickScript = "if(document.createEvent) {"
-            		+ "		var event = new MouseEvent('click', {view: window, bubbles: true, cancelable: true}) ;"
-            		+ "  	arguments[0].dispatchEvent(event);"
-            		+ "} else if(document.createEventObject) { "
-            		+ "		arguments[0].fireEvent('onclick');"
-            		+ "}";
+        	clickScript = "var event = new MouseEvent('click', {view: window, bubbles: true, cancelable: true}) ;"
+            			+ "arguments[0].dispatchEvent(event);";
         } else {
         	clickScript = "if(document.createEvent){var evObj = document.createEvent('MouseEvents');evObj.initEvent('click', true, false); arguments[0].dispatchEvent(evObj);} else if(document.createEventObject) { arguments[0].fireEvent('onclick');}";
         }
@@ -288,8 +291,19 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     public void simulateDoubleClick() {
         findElement(true);
         
+        WebDriver realDriver = ((CustomEventFiringWebDriver)driver).getWebDriver();
+        
+        String doubleClickScript;
+        if (realDriver instanceof FirefoxDriver && FirefoxDriverFactory.isMarionetteMode()
+            	|| realDriver instanceof ChromeDriver && WebUIDriver.getWebUIDriver(false).getConfig().getMajorBrowserVersion() >= 75) {
+        		doubleClickScript = "var event = new MouseEvent('dblclick', {view: window, bubbles: true, cancelable: true}) ;"
+                			+ "arguments[0].dispatchEvent(event);";
+            } else {
+            	doubleClickScript = JS_CLICK_DOUBLE;
+            }
+        
         JavascriptExecutor js = (JavascriptExecutor) driver;
-        js.executeScript(JS_CLICK_DOUBLE, element);
+        js.executeScript(doubleClickScript, element);
 
     }
     
