@@ -59,6 +59,11 @@ public class TestDriverFirefox extends TestDriver {
 	public void testClickJsDiv() {
 		super.testClickJsDiv();
 	}
+	
+	@Test(groups={"it", "ut"})
+	public void testDoubleClickDiv() {
+		super.testDoubleClickDiv();
+	}
    
 	@Test(groups={"it", "ut"})
 	public void testClickJsRadio() {
