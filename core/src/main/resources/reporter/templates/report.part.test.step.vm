@@ -1,7 +1,11 @@
 #macro( stepActions $localStep $directCall)
 
 	#if (!$directCall)
-		<li>$localStep.getName()</li>
+		#if ($localStep.getFailed())
+			<li class="header-failed">$localStep.getName()<br/>$localStep.getActionExceptionMessage()</li>
+		#else
+			<li>$localStep.getName()</li>
+		#end
 	#end
 	<ul>
 	#foreach( $action in $localStep.getStepActions() )
@@ -26,7 +30,11 @@
 				</tr>
 			</table>
 		#else
-			<li>$action.getName()</li>
+			#if ($action.getFailed())
+				<li class="header-failed">$action.getName()<br/>$action.getActionExceptionMessage()</li>
+			#else
+				<li>$action.getName()</li>
+			#end
 	    #end
 	#end
 	#foreach( $snapshot in $localStep.getSnapshots() )
