@@ -419,11 +419,6 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 				String methodName = ((Method)(testResult.getParameters()[0])).getName();
 				currentBeforeContext = SeleniumTestsContextManager.storeMethodContext(context, className, methodName);
 				
-				// issue #136: be sure that driver created in beforeMethod has the same set of parameters as a driver created in Test method
-				// 			behavior is undefined if used inside a cucumber test
-				if (!configMethod.getConstructorOrMethod().getMethod().getDeclaringClass().equals(SeleniumRobotTestPlan.class)) {
-					SeleniumTestsContextManager.updateThreadContext(testResult);
-				}
 			} catch (Exception e) {
 				throw new ScenarioException("When using @BeforeMethod in tests, this method MUST have a 'java.lang.reflect.Method' object as first argument. Example: \n\n"
 						+ "@BeforeMethod\n" + 
@@ -431,6 +426,13 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 						+ "    SeleniumTestsContextManager.getThreadContext().setAttribute(\"some attribute\", \"attribute value\");\n"
 						+ "}\n\n");
 			}
+			
+			// issue #136: be sure that driver created in beforeMethod has the same set of parameters as a driver created in Test method
+			// 			behavior is undefined if used inside a cucumber test
+			if (!configMethod.getConstructorOrMethod().getMethod().getDeclaringClass().equals(SeleniumRobotTestPlan.class)) {
+				SeleniumTestsContextManager.updateThreadContext(testResult);
+			}
+			
 			
 		// handle some after methods. No change in context in after method will be recorded
 		} else if (configMethod.isAfterMethodConfiguration()) {
