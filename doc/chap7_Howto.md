@@ -125,6 +125,10 @@ or send keys (will write "ab")
 
 	ScreenZone firefoxForDesktop = new ScreenZone("picture", "tu/images/logo_text_field.png");
 	firefoxForDesktop.sendKeys(0, 40, KeyEvent.VK_A, KeyEvent.VK_B);
+	
+#### Check if image is matching ####
+
+`java -cp seleniumRobot.jar com.seleniumtests.util.imaging.ImageDetector <scene_file_path> <object_to_detect_file_path> <threshold=0.1>`
 
 ### 5 Working with PDF files ###
 
