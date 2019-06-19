@@ -43,7 +43,7 @@ In this case, this user passed value will overwrite test or suite parameters
 
 | Param name       			| Default 	| Description  |
 | -------------------------	| ------- 	| ------------ |
-| webDriverGrid 			| 			| Address of seleniumGrid server | 
+| webDriverGrid 			| 			| Address of seleniumGrid server. It's possible to specify several URL `http://grid1.company.com,http://grid2.company.com`. This way, seleniumRobot will choose one of the available grid | 
 | runMode 					| LOCAL		| `local`: current computer<br/>`grid`: seleniumGrid<br/>`sauceLabs`: run on sauceLabs device<br/> | 
 | nodeTags					| null		| Commat seperated list of strings. Requests that this test should execute only on a node (grid mode only) announcing all of these tags. On grid, this is declared with option `-nodeTags <tag1>,<tag2>`. If no slot matches the requested tags, session is not created |
 | browser 					| firefox	| Browser used to start test. Valid values are:<br/>`firefox`, `chrome`, `safari`, `iexplore`, `htmlunit`, `opera`, `phantomjs`, `none` for no driver, `browser` for android default browser | 
