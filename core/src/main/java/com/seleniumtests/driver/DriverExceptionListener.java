@@ -165,7 +165,8 @@ public class DriverExceptionListener implements WebDriverEventListener {
         } else {
             String message = ex.getMessage().split("\\n")[0];
             logger.warn("Got exception:" + message);
-            if (message.matches("Session (/S*) was terminated due to(.|\\n)*")
+            if (message.matches("Session .*? was terminated due to(.|\\n)*")
+            		|| message.matches("Session .*? not available .*")
                     || message.matches("cannot forward the request .*")
                     || message.matches("Session ID is null.*")) {
                 WebUIDriver.setWebDriver(null); // can't quit anymore, save time.

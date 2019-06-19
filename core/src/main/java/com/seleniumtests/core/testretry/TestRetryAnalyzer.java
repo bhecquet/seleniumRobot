@@ -63,6 +63,7 @@ public class TestRetryAnalyzer implements IRetryAnalyzer {
         if (count <= maxCount) {
         	
         	if (result.getThrowable() instanceof AssertionError) {
+        		TestLogging.log("[NOT RETRYING] due to failed Assertion");
         		return false;
         	}
         	
@@ -70,9 +71,12 @@ public class TestRetryAnalyzer implements IRetryAnalyzer {
 	            result.setAttribute("RETRY", new Integer(count));
 	            TestLogging.log("[RETRYING] " + testClassName + " FAILED, " + "Retrying " + count + " time");
 	            count += 1;
+        	} else {
+        		TestLogging.log("Test will be retried");
         	}
             return true;
         }
+        TestLogging.log(String.format("[NOT RETRYING] max retry count (%d) reached", maxCount));
 
         return false;
     }
