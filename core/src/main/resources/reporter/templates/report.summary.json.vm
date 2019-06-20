@@ -1,6 +1,14 @@
+#set($driverIdx = 0)
+#set($driversSize = $driverUsages.size())
 {
 	"fail": $fail,
 	"pass": $pass,
 	"skip": $skip,
-	"total": $total
+	"total": $total,
+	"drivers": [
+	#foreach( $driverUsage in $driverUsages ) 
+		#set($driverIdx = $driverIdx + 1)
+		$driverUsage.asJson()#if( $driverIdx != $driversSize),#end
+	#end
+	]
 }

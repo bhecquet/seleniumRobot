@@ -34,6 +34,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -64,10 +65,14 @@ import org.openqa.selenium.support.events.EventFiringWebDriver;
 import com.neotys.selenium.proxies.NLWebDriver;
 import com.seleniumtests.browserfactory.BrowserInfo;
 import com.seleniumtests.connectors.selenium.SeleniumGridConnector;
+import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.core.StatisticsStorage;
+import com.seleniumtests.core.StatisticsStorage.DriverUsage;
 import com.seleniumtests.customexception.DriverExceptions;
 import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.customexception.WebSessionEndedException;
 import com.seleniumtests.driver.screenshots.VideoRecorder;
+import com.seleniumtests.reporter.logger.TestLogging;
 import com.seleniumtests.util.helper.WaitHelper;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 import com.seleniumtests.util.osutility.OSUtilityFactory;
@@ -99,6 +104,7 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
 	private final BrowserInfo browserInfo;
 	private final BrowserMobProxy mobProxy;
 	private final SeleniumGridConnector gridConnector;
+	private MutableCapabilities internalCapabilities = new MutableCapabilities();
     
     private static final String JS_GET_VIEWPORT_SIZE = String.format(
     		"var pixelRatio;" +
@@ -505,6 +511,7 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
 		if (browserInfo != null && driverMode == DriverMode.LOCAL) {
 			pidsToKill.addAll(browserInfo.getAllBrowserSubprocessPids(driverPids));
 		}
+		Capabilities caps = getCapabilities();
 		
 		// close windows before quitting (this is the only way to close chrome attached browser when it's not started by selenium)
 		try {
@@ -513,6 +520,25 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
 				driver.close();
 			}
 		} catch (Throwable e) {}
+		
+		
+		Long duration = 0L;
+		try {
+			duration = new Date().getTime() - (Long)internalCapabilities.getCapability(DriverUsage.START_TIME);
+		} catch (Exception e) {}
+		String gridHub = caps.getCapability(DriverUsage.GRID_HUB) != null ? caps.getCapability(DriverUsage.GRID_HUB).toString(): null;
+		String sessionId = caps.getCapability(DriverUsage.SESSION_ID) != null ? caps.getCapability(DriverUsage.SESSION_ID).toString(): null;
+		
+		// store driver stats
+		DriverUsage usage = new DriverUsage(gridHub, 
+				(String) caps.getCapability(DriverUsage.GRID_NODE), 
+				(Long) internalCapabilities.getCapability(DriverUsage.START_TIME), 
+				duration, 
+				sessionId, 
+				caps.getBrowserName(), 
+				(Long) internalCapabilities.getCapability(DriverUsage.STARTUP_DURATION), 
+				"");
+		StatisticsStorage.addDriverUsage(usage);
 		
 		try {
 			driver.quit();
@@ -862,5 +888,9 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
 	// NEOLOAD //
 	public NLWebDriver getNeoloadDriver() {
 		return neoloadDriver;
+	}
+
+	public MutableCapabilities getInternalCapabilities() {
+		return internalCapabilities;
 	}
 }

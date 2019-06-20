@@ -21,6 +21,7 @@ import com.neotys.selenium.proxies.NLWebDriver;
 import com.neotys.selenium.proxies.NLWebDriverFactory;
 import com.seleniumtests.browserfactory.*;
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.core.StatisticsStorage.DriverUsage;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.DriverExceptions;
 import com.seleniumtests.customexception.ScenarioException;
@@ -30,6 +31,7 @@ import com.seleniumtests.driver.screenshots.ScreenshotUtil.Target;
 import com.seleniumtests.driver.screenshots.VideoCaptureMode;
 import com.seleniumtests.driver.screenshots.VideoRecorder;
 import com.seleniumtests.reporter.logger.TestLogging;
+import com.seleniumtests.reporter.logger.TestStep;
 import com.seleniumtests.util.helper.WaitHelper;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 import com.seleniumtests.util.osutility.OSUtility;
@@ -37,6 +39,7 @@ import net.lightbody.bmp.BrowserMobProxy;
 import net.lightbody.bmp.core.har.Har;
 import org.apache.log4j.Logger;
 import org.openqa.selenium.Capabilities;
+import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.logging.LogEntry;
 import org.openqa.selenium.support.events.EventFiringWebDriver;
@@ -45,6 +48,7 @@ import org.openqa.selenium.support.events.WebDriverEventListener;
 import java.io.*;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -136,7 +140,22 @@ public class WebUIDriver {
         		existingPids.addAll(browserInfo.getDriverAndBrowserPid(new ArrayList<>()));
         	}
         	
-            driver = webDriverBuilder.createWebDriver();
+    		TestStep cuurrentTestStep = TestLogging.getCurrentRootTestStep();
+    		long start = new Date().getTime();
+    		long duration;
+    		
+    		try {
+    			
+    			driver = webDriverBuilder.createWebDriver();
+    		} finally {
+
+    			duration = new Date().getTime() - start;
+    			if (cuurrentTestStep != null) {
+    				cuurrentTestStep.setDurationToExclude(duration);
+    			}
+    			TestLogging.info(String.format("driver creation took: %.1f secs", duration / 1000.0));
+    		}
+ 
             WaitHelper.waitForSeconds(2);
             
             List<Long> driverPids = new ArrayList<>();
@@ -147,6 +166,12 @@ public class WebUIDriver {
     		}
             
             driver = handleListeners(driver, browserInfo, driverPids);
+            
+            if (driver != null) {
+    			MutableCapabilities caps = ((CustomEventFiringWebDriver)driver).getInternalCapabilities();
+    			caps.setCapability(DriverUsage.STARTUP_DURATION, duration);
+                caps.setCapability(DriverUsage.START_TIME, start);
+			}
     	
 
 			if (config.getBrowserMobProxy() != null) {
