@@ -141,6 +141,14 @@ public class ImageDetector {
 		}
 	}
 	
+	public static void main(String[] args) {
+		ImageDetector detector = new ImageDetector(new File(args[0]), new File(args[1]), new Double(args[2]));
+		
+		detector.detectExactZoneWithScale();
+		Rectangle detectedObjectRectangle = detector.getDetectedRectangle();
+		double pictureSizeRatio = detector.getSizeRatio();
+	}
+	
 	public ImageDetector() {
 		// do nothing, only for test
 	}
