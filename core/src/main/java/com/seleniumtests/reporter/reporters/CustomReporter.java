@@ -40,6 +40,7 @@ import org.testng.ITestResult;
 import org.testng.xml.XmlSuite;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.core.StatisticsStorage;
 import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.reporter.logger.TestLogging;
 import com.seleniumtests.reporter.logger.TestStep;
@@ -212,6 +213,8 @@ public class CustomReporter extends CommonReporter implements IReporter {
 			for (Entry<String, Integer> entry: consolidatedResults.entrySet()) {
 				context.put(entry.getKey(), entry.getValue());
 			}
+
+			context.put("driverUsages", StatisticsStorage.getDriverUsage());
 			
 			StringWriter writer = new StringWriter();
 			t.merge( context, writer );

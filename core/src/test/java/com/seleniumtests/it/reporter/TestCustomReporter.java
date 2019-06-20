@@ -124,6 +124,36 @@ public class TestCustomReporter extends ReporterTest {
 		
 	}
 	
+	@Test(groups={"it"})
+	public void testDriverStatsInReport(ITestContext testContext) throws Exception {
+		
+		try {
+			System.setProperty("customSummaryReports", "summaryResult::json::reporter/templates/report.summary.json.vm");
+			
+			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriverShort"});
+			
+			// check content of the file. It should contains all fields with a value
+			String detailedReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "summaryResult.json"));
+			
+			JSONObject json = new JSONObject(detailedReportContent);
+			
+			Assert.assertEquals(json.getInt("fail"), 0);
+			Assert.assertEquals(json.getInt("pass"), 1);
+			Assert.assertEquals(json.getInt("skip"), 0);
+			Assert.assertEquals(json.getInt("total"), 1);
+			Assert.assertEquals(json.getJSONArray("drivers").length(), 1);
+			Assert.assertEquals(json.getJSONArray("drivers").getJSONObject(0).getString("browserName"), "chrome");
+			Assert.assertTrue(json.getJSONArray("drivers").getJSONObject(0).getLong("duration") > 0);
+			Assert.assertNull(json.getJSONArray("drivers").getJSONObject(0).opt("gridHub"));
+			Assert.assertNull(json.getJSONArray("drivers").getJSONObject(0).opt("gridNode"));
+			Assert.assertTrue(json.getJSONArray("drivers").getJSONObject(0).getLong("startTime") > 0);
+			Assert.assertTrue(json.getJSONArray("drivers").getJSONObject(0).getLong("startupDuration") > 0);
+		} finally {
+			System.clearProperty("customSummaryReports");
+		}
+		
+	}
+	
 	@Test(groups={"it"}, expectedExceptions=ConfigurationException.class)
 	public void testTestReportDoesNotExists(ITestContext testContext) throws Exception {
 		try {

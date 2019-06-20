@@ -443,29 +443,6 @@ public class LogAction {
 	}
 	
 	/**
-	 * exclude driver creation from the time of the current step
-	 * @param joinPoint
-	 * @return
-	 * @throws Throwable
-	 */
-	@Around("execution(public org.openqa.selenium.WebDriver com.seleniumtests.driver.WebUIDriver.createRemoteWebDriver (..))")
-	public Object measureDriverCreation(ProceedingJoinPoint joinPoint) throws Throwable {
-		TestStep cuurrentTestStep = TestLogging.getCurrentRootTestStep();
-		long start = new Date().getTime();
-		
-		try {
-			return joinPoint.proceed(joinPoint.getArgs());
-		} finally {
-
-			long duration = new Date().getTime() - start - 2000; // remove 2 secs as createRemoteWebDriver adds a wait
-			if (cuurrentTestStep != null) {
-				cuurrentTestStep.setDurationToExclude(duration);
-			}
-			TestLogging.info(String.format("driver creation took: %.1f secs", duration / 1000.0));
-		}
-	}
-	
-	/**
 	 * Log a TestStep, inside a parent TestStep or not
 	 * Common method used for all test step logging
 	 * @return

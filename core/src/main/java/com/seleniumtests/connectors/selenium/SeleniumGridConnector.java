@@ -21,17 +21,22 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.joda.time.LocalDateTime;
 import org.json.JSONObject;
 import org.openqa.selenium.Capabilities;
+import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.SessionId;
 
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
+import com.seleniumtests.core.StatisticsStorage;
+import com.seleniumtests.core.StatisticsStorage.DriverUsage;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
@@ -204,6 +209,13 @@ public class SeleniumGridConnector {
             if (sessionId == null) {
             	setSessionId(driver.getSessionId());
             }
+            
+            // store some information about driver creation
+            MutableCapabilities caps = (MutableCapabilities)driver.getCapabilities();
+            caps.setCapability(DriverUsage.GRID_HUB, hubUrl);
+            caps.setCapability(DriverUsage.SESSION_ID, sessionId);
+            caps.setCapability(DriverUsage.GRID_NODE, node);
+            
             logger.info(String.format("Brower %s (%s) created in %.1f secs on node %s [%s] with session %s", browserName, version, driverCreationDuration / 1000.0, node, hubUrl, sessionId).replace(",", "."));
             
         } catch (Exception ex) {

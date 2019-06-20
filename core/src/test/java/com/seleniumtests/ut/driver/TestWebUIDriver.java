@@ -6,6 +6,8 @@ import com.seleniumtests.MockitoTest;
 import com.seleniumtests.connectors.selenium.SeleniumGridConnector;
 import com.seleniumtests.connectors.selenium.SeleniumGridConnectorFactory;
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.core.StatisticsStorage;
+import com.seleniumtests.core.StatisticsStorage.DriverUsage;
 import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.CustomEventFiringWebDriver;
@@ -15,6 +17,7 @@ import com.seleniumtests.driver.screenshots.VideoRecorder;
 import com.seleniumtests.reporter.logger.TestLogging;
 import net.lightbody.bmp.BrowserMobProxy;
 import org.mockito.Mock;
+import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.htmlunit.HtmlUnitDriver;
@@ -26,6 +29,7 @@ import org.testng.annotations.AfterMethod;
 import org.testng.annotations.Test;
 
 import java.io.File;
+import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -67,6 +71,28 @@ public class TestWebUIDriver extends MockitoTest {
 		
 		Assert.assertTrue(driver instanceof CustomEventFiringWebDriver);
 		Assert.assertNull(((CustomEventFiringWebDriver)driver).getNeoloadDriver());
+		
+		Capabilities caps = ((CustomEventFiringWebDriver)driver).getInternalCapabilities();
+		Assert.assertNotNull(caps.getCapability(DriverUsage.START_TIME));
+		Assert.assertNotNull(caps.getCapability(DriverUsage.STARTUP_DURATION));
+	}
+	
+	/**
+	 * Check that usage duration is added on driver quit
+	 */
+	@Test(groups={"ut"})
+	public void testCapsOnDriverQuit() {
+		SeleniumTestsContextManager.getThreadContext().setBrowser("htmlunit");
+		CustomEventFiringWebDriver driver = (CustomEventFiringWebDriver)WebUIDriver.getWebDriver(true);
+		driver.quit();
+		
+		List<DriverUsage> driverUsages = StatisticsStorage.getDriverUsage();
+		Assert.assertEquals(driverUsages.size(), 1);
+		Assert.assertEquals(driverUsages.get(0).getBrowserName(), "htmlunit");
+		Assert.assertTrue(driverUsages.get(0).getDuration() > 0.0);
+		Assert.assertNull(driverUsages.get(0).getGridHub());
+		Assert.assertNull(driverUsages.get(0).getGridNode());
+		Assert.assertTrue(driverUsages.get(0).getStartTime() > 0);
 	}
 	
 	/**
