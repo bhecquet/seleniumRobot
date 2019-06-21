@@ -17,11 +17,17 @@
  */
 package com.seleniumtests.it.core;
 
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.when;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,6 +35,10 @@ import java.util.Map;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONObject;
+import org.mockito.Mock;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
+import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.TestNG;
@@ -38,13 +48,20 @@ import org.testng.xml.XmlSuite;
 import org.testng.xml.XmlSuite.ParallelMode;
 import org.testng.xml.XmlTest;
 
+import com.seleniumtests.connectors.selenium.SeleniumGridConnectorFactory;
+import com.seleniumtests.connectors.selenium.SeleniumRobotVariableServerConnector;
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.it.reporter.ReporterTest;
 
+@PrepareForTest({SeleniumRobotVariableServerConnector.class, SeleniumGridConnectorFactory.class, SeleniumTestsContext.class})
+@PowerMockIgnore("javax.net.ssl.*")
 public class TestSeleniumRobotTestListener extends ReporterTest {
 
 	private static final String DRIVER_BLOCKED_MSG = "Driver creation forbidden before @BeforeMethod and after @AfterMethod execution";
+	
+	@Mock
+	private SeleniumRobotVariableServerConnector variableServer;
 	
 	/**
 	 * Test that 2 tests (1 cucumber and 1 TestNG) are correctly executed in parallel
@@ -66,6 +83,65 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 		
 		// all 3 methods are OK
 		Assert.assertEquals(StringUtils.countMatches(mainReportContent, "<i class=\"fa fa-circle circleSuccess\">"), 3);
+	}
+	
+	/**
+	 * issue #254: Check we get variable for each test execution (and each retry)
+	 * @param testContext
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testWithRetry(ITestContext testContext) throws Exception {
+		
+		try {
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE, "true");
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL, "http://localhost:1234");
+			System.setProperty(SeleniumTestsContext.TEST_RETRY_COUNT, "2");
+			
+			PowerMockito.whenNew(SeleniumRobotVariableServerConnector.class).withArguments(eq(true), eq("http://localhost:1234"), anyString(), eq(null)).thenReturn(variableServer);
+			when(variableServer.isAlive()).thenReturn(true);
+			
+
+			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass3"}, ParallelMode.METHODS, new String[] {"testFailedWithException"});
+			
+			// check get variables has been called once for each retry
+			verify(variableServer, times(3)).getVariables(0);
+			verify(variableServer, times(3)).unreserveVariables(anyList());
+			
+		} finally {
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE);
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL);
+			System.clearProperty(SeleniumTestsContext.TEST_RETRY_COUNT);
+		}
+	}
+	
+	/**
+	 * Check variables are get only once when testing
+	 * @param testContext
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testWithoutRetry(ITestContext testContext) throws Exception {
+		
+		try {
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE, "true");
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL, "http://localhost:1234");
+			System.setProperty(SeleniumTestsContext.TEST_RETRY_COUNT, "0");
+			
+			PowerMockito.whenNew(SeleniumRobotVariableServerConnector.class).withArguments(eq(true), eq("http://localhost:1234"), anyString(), eq(null)).thenReturn(variableServer);
+			when(variableServer.isAlive()).thenReturn(true);
+			
+			
+			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass3"}, ParallelMode.METHODS, new String[] {"testFailedWithException"});
+			
+			// check get variables has been called once for each retry
+			verify(variableServer).getVariables(0);
+			
+		} finally {
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE);
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL);
+			System.clearProperty(SeleniumTestsContext.TEST_RETRY_COUNT);
+		}
 	}
 	
 	/**

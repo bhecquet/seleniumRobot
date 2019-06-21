@@ -491,6 +491,12 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 				String methodName = ((Method)(testResult.getParameters()[0])).getName();
 				SeleniumTestsContextManager.setMethodContext(context, className, methodName, SeleniumTestsContextManager.getThreadContext());
 			} catch (Exception e) {}
+		} else if (configMethod.isAfterMethodConfiguration()) {
+			// issue #254: forget the variables got from server once test method is finished so that, on retry, variable can be get
+
+			String className = ((Method)(testResult.getParameters()[0])).getDeclaringClass().getName();
+			String methodName = ((Method)(testResult.getParameters()[0])).getName();
+			SeleniumTestsContextManager.setMethodContext(context, className, methodName, null);
 		}
 		
 		// reparse logs in case some new logs have been written
