@@ -86,4 +86,8 @@ public class StatisticsStorage {
 	public static void addDriverUsage(DriverUsage usage) {
 		driverUsage.add(usage);
 	}
+	
+	public static void reset() {
+		driverUsage.clear();
+	}
 }

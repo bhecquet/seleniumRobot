@@ -43,6 +43,7 @@ import org.testng.xml.XmlTest;
 import com.seleniumtests.MockitoTest;
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.core.StatisticsStorage;
 import com.seleniumtests.reporter.logger.TestLogging;
 
 public class ReporterTest extends MockitoTest {
@@ -54,6 +55,7 @@ public class ReporterTest extends MockitoTest {
 	
 		SeleniumTestsContext.resetOutputFolderNames();
 		FileUtils.deleteQuietly(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()));
+		StatisticsStorage.reset();
 	}
 	
 	protected TestNG executeSubTest(String[] testClasses) throws IOException {
