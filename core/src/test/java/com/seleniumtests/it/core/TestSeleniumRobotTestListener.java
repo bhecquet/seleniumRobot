@@ -117,6 +117,7 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 	
 	/**
 	 * Check variables are get only once when testing
+	 * issue #255: also check that seleniumRobot server is called with the right test name
 	 * @param testContext
 	 * @throws Exception
 	 */
@@ -128,9 +129,8 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL, "http://localhost:1234");
 			System.setProperty(SeleniumTestsContext.TEST_RETRY_COUNT, "0");
 			
-			PowerMockito.whenNew(SeleniumRobotVariableServerConnector.class).withArguments(eq(true), eq("http://localhost:1234"), anyString(), eq(null)).thenReturn(variableServer);
+			PowerMockito.whenNew(SeleniumRobotVariableServerConnector.class).withArguments(eq(true), eq("http://localhost:1234"), eq("testFailedWithException"), eq(null)).thenReturn(variableServer);
 			when(variableServer.isAlive()).thenReturn(true);
-			
 			
 			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass3"}, ParallelMode.METHODS, new String[] {"testFailedWithException"});
 			
