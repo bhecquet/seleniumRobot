@@ -1651,7 +1651,11 @@ public class SeleniumTestsContext {
     	}
     }
     
-    public void setOverrideSeleniumNativeAction(Boolean record) {
+    public void setVariableAlreadyRequestedFromServer(Map<String, TestVariable> variableAlreadyRequestedFromServer) {
+		this.variableAlreadyRequestedFromServer = variableAlreadyRequestedFromServer;
+	}
+
+	public void setOverrideSeleniumNativeAction(Boolean record) {
     	if (record != null) {
     		setAttribute(OVERRIDE_SELENIUM_NATIVE_ACTION, record);
     	} else {

@@ -74,7 +74,7 @@ public class TestSeleniumTestContext3 extends MockitoTest {
 //	private ITestNGMethod testMethod;
 
 	/**
-	 * Check we create a variable server if all connexion params are present
+	 * Check we create a variable server if all connection params are present
 	 * @param testNGCtx
 	 * @param xmlTest
 	 * @throws Exception
