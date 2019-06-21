@@ -535,7 +535,7 @@ public class SeleniumTestsContext {
 						SELENIUMROBOTSERVER_ACTIVE, 
 						getSeleniumRobotServerUrl(),
 						SELENIUMROBOTSERVER_URL));
-			SeleniumRobotVariableServerConnector vServer = new SeleniumRobotVariableServerConnector(getSeleniumRobotServerActive(), getSeleniumRobotServerUrl(), TestNGResultUtils.getTestName(testNGResult), getSeleniumRobotServerToken());
+			SeleniumRobotVariableServerConnector vServer = new SeleniumRobotVariableServerConnector(getSeleniumRobotServerActive(), getSeleniumRobotServerUrl(), TestNGResultUtils.getTestName(testNGResult).replaceAll("^before-", ""), getSeleniumRobotServerToken());
 			
 			if (!vServer.isAlive()) {
 				throw new ConfigurationException(String.format("Variable server %s could not be contacted", getSeleniumRobotServerUrl()));

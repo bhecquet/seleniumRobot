@@ -42,7 +42,7 @@ public class TestNGResultUtils {
     			) {
     		return testNGResult.getParameters()[0].toString();
     	} else {
-    		// issue #136: in case we are in a BeforeMethod, take class name and method name from TestMethod
+    		// issue #137: in case we are in a BeforeMethod, take class name and method name from TestMethod
     		if (testNGResult.getMethod().isBeforeMethodConfiguration()) {
     			Method testMethod = (Method)(testNGResult.getParameters()[0]);
     			return "before-" + testMethod.getName();
@@ -67,7 +67,7 @@ public class TestNGResultUtils {
 			String testMethodName = getTestName(testNGResult);
 			Object[] testMethodParams = testNGResult.getParameters();
 			
-    		// issue #136: in case we are in a BeforeMethod, take class name and method name from TestMethod
+    		// issue #137: in case we are in a BeforeMethod, take class name and method name from TestMethod
     		if (testNGResult.getMethod().isBeforeMethodConfiguration()) {
     			Method testMethod = (Method)(testNGResult.getParameters()[0]);
     			className = testMethod.getDeclaringClass().getName();

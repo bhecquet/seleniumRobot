@@ -420,7 +420,7 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 						+ "}\n\n");
 			}
 			
-			// issue #136: be sure that driver created in beforeMethod has the same set of parameters as a driver created in Test method
+			// issue #137: be sure that driver created in beforeMethod has the same set of parameters as a driver created in Test method
 			// 			behavior is undefined if used inside a cucumber test
 			if (!configMethod.getConstructorOrMethod().getMethod().getDeclaringClass().equals(SeleniumRobotTestPlan.class)) {
 				SeleniumTestsContextManager.updateThreadContext(testResult);
@@ -457,7 +457,7 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 			SeleniumTestsContextManager.initThreadContext();
 		}
 		
-		// issue #136: block driver creation outside of @BeforeMethod / @AfterMethod so that a driver may not remain open without being used
+		// issue #137: block driver creation outside of @BeforeMethod / @AfterMethod so that a driver may not remain open without being used
 		// other reason is that context for Class/Test/Group is shared among several test methods
 		// WebDriver.cleanup() is called after @AfterMethod
 		if (configMethod.isBeforeMethodConfiguration() || configMethod.isAfterMethodConfiguration()) { // TODO: to activate but for now, creating driver without having called "updateThreadContext" may raise exception (seen with HTMLUnit and proxy parameter 
