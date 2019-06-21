@@ -43,6 +43,7 @@ import javax.imageio.ImageIO;
 
 import org.apache.commons.io.FileUtils;
 import org.mockito.Mock;
+import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.WebDriver.Options;
@@ -106,6 +107,9 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	@Mock
 	private VideoRecorder videoRecorder;
 	
+	@Mock
+	private Capabilities capabilities;
+	
 	private EventFiringWebDriver eventDriver;
 
 	@BeforeMethod(groups={"ut"})
@@ -118,6 +122,7 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 		eventDriver = spy(new CustomEventFiringWebDriver(driver, null, browserInfo, true, DriverMode.LOCAL, null, null).register(new DriverExceptionListener()));
 		
 		when(driver.manage()).thenReturn(options);
+		when(driver.getCapabilities()).thenReturn(capabilities);
 		when(driver.switchTo()).thenReturn(target);
 		when(driver.getSessionId()).thenReturn(new SessionId("1234"));
 		when(driver.getPageSource()).thenReturn("<html></html>");
