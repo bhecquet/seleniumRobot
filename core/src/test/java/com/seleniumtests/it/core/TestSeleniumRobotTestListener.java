@@ -55,7 +55,7 @@ import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.it.reporter.ReporterTest;
 
 @PrepareForTest({SeleniumRobotVariableServerConnector.class, SeleniumGridConnectorFactory.class, SeleniumTestsContext.class})
-@PowerMockIgnore("javax.net.ssl.*")
+@PowerMockIgnore({"javax.net.ssl.*", "com.google.inject.*"})
 public class TestSeleniumRobotTestListener extends ReporterTest {
 
 	private static final String DRIVER_BLOCKED_MSG = "Driver creation forbidden before @BeforeMethod and after @AfterMethod execution";
