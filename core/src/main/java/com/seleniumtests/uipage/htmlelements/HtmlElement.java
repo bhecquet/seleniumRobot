@@ -538,7 +538,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
         if (elementInfo != null) {
         	try {
 	        	elementInfo.updateInfo(this);
-	        	elementInfo.exportToJsonFile(this);
+	        	elementInfo.exportToJsonFile(false, this);
         	} catch (Throwable e) {
         		logger.warn("Error storing element information: " + e.getMessage());
         	}
