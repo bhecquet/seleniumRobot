@@ -55,7 +55,6 @@ import com.seleniumtests.driver.DriverExceptionListener;
 import com.seleniumtests.driver.DriverMode;
 import com.seleniumtests.driver.TestType;
 import com.seleniumtests.driver.screenshots.VideoCaptureMode;
-import com.seleniumtests.reporter.PluginsHelper;
 import com.seleniumtests.reporter.logger.ArchiveMode;
 import com.seleniumtests.reporter.reporters.ReportInfo;
 import com.seleniumtests.uipage.htmlelements.ElementInfo;
@@ -162,7 +161,7 @@ public class SeleniumTestsContext {
     public static final String OPTIMIZE_REPORTS = "optimizeReports";
 
     public static final String TEST_METHOD_SIGNATURE = "testMethodSignature";
-    public static final String PLUGIN_CONFIG_PATH = "pluginConfigPath";
+    public static final String REPORTER_PLUGIN_CLASS = "reporterPluginClass";	// class to call when a custom reporter needs to be added
 
     public static final String TEST_TYPE = "testType";							// configured automatically
     public static final String TMS_RUN = "tmsRun";									// option for configuring test (from test management system point of view) currently running, like HP ALM or Squash TM
@@ -363,6 +362,7 @@ public class SeleniumTestsContext {
 
         setDpTagsInclude(getValueForTest(DP_TAGS_INCLUDE, System.getProperty(DP_TAGS_INCLUDE)));
         setDpTagsExclude(getValueForTest(DP_TAGS_EXCLUDE, System.getProperty(DP_TAGS_EXCLUDE)));
+        setReporterPluginClass(getValueForTest(REPORTER_PLUGIN_CLASS, System.getProperty(REPORTER_PLUGIN_CLASS)));
 
         setSoftAssertEnabled(getBoolValueForTest(SOFT_ASSERT_ENABLED, System.getProperty(SOFT_ASSERT_ENABLED)));
         setTestRetryCount(getIntValueForTest(TEST_RETRY_COUNT, System.getProperty(TEST_RETRY_COUNT)));
@@ -790,15 +790,6 @@ public class SeleniumTestsContext {
         
         // update ouput directory
         createTestSpecificOutputDirectory(testNGResult);
-      
-        // load pageloading plugins
-        String path = (String) getAttribute(PLUGIN_CONFIG_PATH);
-        if (path != null && path.trim().length() > 0) {
-            File configFile = new File(path);
-            if (configFile.exists()) {
-                PluginsHelper.getInstance().loadPlugins(configFile);
-            }
-        }
 
     	createContextConnectors();
     	
@@ -1029,6 +1020,10 @@ public class SeleniumTestsContext {
 
     public String getDPTagsInclude() {
         return (String) getAttribute(DP_TAGS_INCLUDE);
+    }
+    
+    public String getReporterPluginClass() {
+    	return (String) getAttribute(REPORTER_PLUGIN_CLASS);
     }
 
     public String getNeoloadUserPath() {
@@ -1973,6 +1968,17 @@ public class SeleniumTestsContext {
     
     public void setDpTagsExclude(String tags) {
     	setAttribute(DP_TAGS_EXCLUDE, tags);
+    }
+    
+    public void setReporterPluginClass(String className) {
+    	if (className != null) {
+    		try {
+				Class.forName(className);
+			} catch (ClassNotFoundException e) {
+				throw new ConfigurationException("");
+			}
+    	} 
+    	setAttribute(REPORTER_PLUGIN_CLASS, className);
     }
     
     public void setSoftAssertEnabled(Boolean enable) {
