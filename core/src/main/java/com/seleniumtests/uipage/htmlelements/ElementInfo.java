@@ -11,6 +11,7 @@ import java.time.ZoneOffset;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
@@ -18,7 +19,6 @@ import org.openqa.selenium.Dimension;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.Rectangle;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 
 import com.google.gson.Gson;
@@ -42,6 +42,7 @@ public class ElementInfo {
 	
 	protected static final Logger logger = SeleniumRobotLogger.getLogger(ElementInfo.class);
 	private static final Path ELEMENT_INFO_LOCATION = Paths.get(SeleniumTestsContextManager.getCachePath());
+	private static final Path ELEMENT_INFO_REFERENCE_LOCATION = Paths.get(SeleniumTestsContextManager.getCachePath() + "_reference");
 	private static final int EXPIRE_INFO_DELAY_DAYS = 180;
 	public static final String JAVASCRIPT_GET_ATTRIBUTES = "var items = {}; for (index = 0; index < arguments[0].attributes.length; ++index) { items[arguments[0].attributes[index].name] = arguments[0].attributes[index].value }; return items;";
 
@@ -52,11 +53,14 @@ public class ElementInfo {
 	private String locator;
 	private String tagName;
 	private String text;
-	private Rectangle rectangle;
+	private Integer width;
+	private Integer height;
+	private Integer coordX;
+	private Integer coordY;
 	private String b64Image;
 	private Map<String, Object> attributes = new HashMap<>();
 	
-	// confidence indicator
+	// TODO: confidence indicator
 	private float tagConfidence;
 	private float textConfidence;
 	private float rectangleConfidence;
@@ -175,7 +179,7 @@ public class ElementInfo {
     	totalSearch += 1;
     	textStability = newText.equals(text) ? textStability+1: 0;
     	tagStability = newTagName.equals(tagName) ? tagStability+1: 0;
-    	rectangleStability = newRectangle.equals(rectangle) ? rectangleStability+1: 0;
+    	rectangleStability = newRectangle.equals(new Rectangle(coordX, coordY, height, width)) ? rectangleStability+1: 0;
 
     	for (Entry<String, Object> entryAttr: newAttributes.entrySet()) {
     		// attribute was unknown
@@ -203,7 +207,10 @@ public class ElementInfo {
     	b64ImageStability = 0;
     	
     	text = newText;
-    	rectangle = newRectangle;
+    	coordX = newRectangle.x;
+    	coordY = newRectangle.y;
+    	width = newRectangle.width;
+    	height = newRectangle.height;
     	b64Image = newB64Image;
     	tagName = newTagName;
     	attributes = newAttributes;
@@ -220,7 +227,6 @@ public class ElementInfo {
 		String name = htmlElement.getLabel();
 		name = StringUtility.replaceOddCharsFromFileName(name);
 		
-		
 		if (name == null || name.isEmpty()) {
 			throw new ScenarioException("not storing element information, no label provided");
 		}
@@ -233,10 +239,20 @@ public class ElementInfo {
 	 * @return
 	 * @throws IOException 
 	 */
-	public File exportToJsonFile(HtmlElement htmlElement) throws IOException {
+	public synchronized File exportToJsonFile(boolean reference, HtmlElement htmlElement) throws IOException {
 		
 		Gson gson = new Gson();
-		File outputFile = buildElementInfoPath(htmlElement);
+	
+		File outputFile;
+		if (htmlElement == null) {
+			if (reference) {
+				outputFile = ELEMENT_INFO_REFERENCE_LOCATION.resolve(Paths.get(id + ".json")).toFile();
+			} else {
+				outputFile = ELEMENT_INFO_LOCATION.resolve(Paths.get(id + ".json")).toFile();
+			}
+		} else {
+			outputFile = buildElementInfoPath(htmlElement);
+		}
 		path = outputFile.getAbsolutePath();
 		FileUtils.writeStringToFile(outputFile, gson.toJson(this));
 		return outputFile;
@@ -254,6 +270,27 @@ public class ElementInfo {
 			info.path = elementInfoFile.getAbsolutePath();
 			return info;
 		} catch (JsonSyntaxException | IOException e) {
+			return null;
+		}
+		
+	}
+	
+	/**
+	 * Read an ElementInfo from json string
+	 * @param elementInfoJson
+	 * @return
+	 */
+	public static ElementInfo readFromJson(String elementInfoJson) {
+		
+		Gson gson = new Gson();
+		try {
+			ElementInfo info = gson.fromJson(elementInfoJson, ElementInfo.class);
+			
+			if (info == null) {
+				return null;
+			}
+			return info;
+		} catch (JsonSyntaxException e) {
 			return null;
 		}
 		
@@ -288,6 +325,29 @@ public class ElementInfo {
 	}
 	
 	/**
+	 * Returns the list of element infos stored on disk
+	 * @param reference
+	 * @return
+	 */
+	public static Map<String, ElementInfo> getAllStoredElementInfos(boolean reference) {
+		Map<String, ElementInfo> elementInfos = new HashMap<>();
+		try {
+			for (Path jsonFile: Files.walk(reference ? ELEMENT_INFO_REFERENCE_LOCATION: ELEMENT_INFO_LOCATION)
+			        .filter(Files::isRegularFile)
+			        .collect(Collectors.toList())) {
+				
+				ElementInfo elementInfo = ElementInfo.readFromJsonFile(jsonFile.toFile());
+				try {
+					elementInfos.put(elementInfo.getId(), elementInfo);
+				} catch (NullPointerException e) {}
+			}
+		} catch (IOException e) {
+		}
+		
+		return elementInfos;
+	}
+	
+	/**
 	 * Remove old element information objects from file system
 	 * This will only remove objects that have not been used in the last N days
 	 */
@@ -296,18 +356,18 @@ public class ElementInfo {
 	}
 	private static void purgeElementInfo(int delay) {
 
-			try {
-				Files.walk(ELEMENT_INFO_LOCATION)
-				        .filter(Files::isRegularFile)
-				        .filter(p -> p.toFile().lastModified() < LocalDateTime.now().minusDays(delay).toEpochSecond(ZoneOffset.UTC) * 1000)
-				        .forEach(t -> {
-							try {
-								Files.delete(t);
-							} catch (IOException e) {}
-						});
-				
-			} catch (IOException e) {
-			}
+		try {
+			Files.walk(ELEMENT_INFO_LOCATION)
+			        .filter(Files::isRegularFile)
+			        .filter(p -> p.toFile().lastModified() < LocalDateTime.now().minusDays(delay).toEpochSecond(ZoneOffset.UTC) * 1000)
+			        .forEach(t -> {
+						try {
+							Files.delete(t);
+						} catch (IOException e) {}
+					});
+			
+		} catch (IOException e) {
+		}
 
 	}
 	
@@ -341,10 +401,6 @@ public class ElementInfo {
 
 	public String getText() {
 		return text;
-	}
-
-	public Rectangle getRectangle() {
-		return rectangle;
 	}
 
 	public String getB64Image() {
@@ -406,5 +462,20 @@ public class ElementInfo {
 	public static Path getElementInfoLocation() {
 		return ELEMENT_INFO_LOCATION;
 	}
-	
+
+	public Integer getWidth() {
+		return width;
+	}
+
+	public Integer getHeight() {
+		return height;
+	}
+
+	public Integer getCoordX() {
+		return coordX;
+	}
+
+	public Integer getCoordY() {
+		return coordY;
+	}
 }
