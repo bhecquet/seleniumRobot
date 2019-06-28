@@ -53,7 +53,6 @@ import org.testng.Assert;
 
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
-import com.seleniumtests.core.SeleniumTestsPageListener;
 import com.seleniumtests.core.TestTasks;
 import com.seleniumtests.customexception.CustomSeleniumTestsException;
 import com.seleniumtests.customexception.NotCurrentPageException;
@@ -142,8 +141,6 @@ public class PageObject extends BasePage implements IPage {
         openPage(url);
 
         assertCurrentPage(false);
-
-        SeleniumTestsPageListener.informPageLoad(this);
 
         Calendar end = Calendar.getInstance();
         start.setTime(new Date());
@@ -351,7 +348,6 @@ public class PageObject extends BasePage implements IPage {
             return;
         }
 
-        SeleniumTestsPageListener.informPageUnload(this);
         TestLogging.info("close web page: " + getTitle());
 
         boolean isMultipleWindow = false;

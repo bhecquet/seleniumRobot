@@ -27,7 +27,6 @@ import java.io.PrintWriter;
 import java.io.Writer;
 import java.util.GregorianCalendar;
 
-import org.apache.commons.text.StringEscapeUtils;
 import org.apache.log4j.Logger;
 import org.apache.velocity.app.VelocityEngine;
 import org.testng.ITestResult;
