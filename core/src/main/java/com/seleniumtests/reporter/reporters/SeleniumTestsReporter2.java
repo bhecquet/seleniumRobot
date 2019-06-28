@@ -51,11 +51,9 @@ import org.testng.xml.XmlSuite;
 
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
-import com.seleniumtests.core.SeleniumTestsPageListener;
 import com.seleniumtests.core.runner.SeleniumRobotTestListener;
 import com.seleniumtests.driver.DriverMode;
 import com.seleniumtests.driver.TestType;
-import com.seleniumtests.reporter.PluginsHelper;
 import com.seleniumtests.reporter.logger.TestLogging;
 import com.seleniumtests.reporter.logger.TestStep;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
@@ -427,12 +425,6 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 			StringBuilder sbGroups = new StringBuilder();
 			sbGroups.append("envt,test");
 
-			List<SeleniumTestsPageListener> pageListenerList = PluginsHelper.getInstance().getPageListeners();
-			if (pageListenerList != null && !pageListenerList.isEmpty()) {
-				for (SeleniumTestsPageListener abstractPageListener : pageListenerList) {
-					sbGroups.append(",").append(abstractPageListener.getClass().getSimpleName());
-				}
-			}
 			context.put("groups", sbGroups.toString());
 			context.put("report", type);
 
