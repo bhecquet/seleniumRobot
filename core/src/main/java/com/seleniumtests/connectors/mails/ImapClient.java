@@ -36,6 +36,7 @@ import javax.mail.Store;
 import javax.mail.internet.MimeMessage;
 import javax.mail.search.SearchTerm;
 
+import org.apache.commons.lang.NotImplementedException;
 import org.apache.commons.lang3.StringEscapeUtils;
 
 
@@ -285,6 +286,12 @@ public class ImapClient extends EmailClientImpl {
 	@Override
 	public void setFromDate(LocalDateTime fromDate) {
 		this.fromDate = fromDate;
+	}
+
+	@Override
+	public void sendMessage(List<String> to, String title, String body) throws Exception {
+		throw new NotImplementedException();
+		
 	}
 
 }

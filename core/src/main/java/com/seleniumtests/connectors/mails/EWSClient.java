@@ -39,14 +39,17 @@ import microsoft.exchange.webservices.data.core.enumeration.property.BasePropert
 import microsoft.exchange.webservices.data.core.enumeration.property.WellKnownFolderName;
 import microsoft.exchange.webservices.data.core.enumeration.search.FolderTraversal;
 import microsoft.exchange.webservices.data.core.service.folder.Folder;
+import microsoft.exchange.webservices.data.core.service.item.EmailMessage;
 import microsoft.exchange.webservices.data.core.service.item.Item;
 import microsoft.exchange.webservices.data.core.service.schema.FolderSchema;
 import microsoft.exchange.webservices.data.core.service.schema.ItemSchema;
 import microsoft.exchange.webservices.data.credential.ExchangeCredentials;
 import microsoft.exchange.webservices.data.credential.WebCredentials;
 import microsoft.exchange.webservices.data.property.complex.Attachment;
+import microsoft.exchange.webservices.data.property.complex.EmailAddress;
 import microsoft.exchange.webservices.data.property.complex.FolderId;
 import microsoft.exchange.webservices.data.property.complex.Mailbox;
+import microsoft.exchange.webservices.data.property.complex.MessageBody;
 import microsoft.exchange.webservices.data.search.FindFoldersResults;
 import microsoft.exchange.webservices.data.search.FolderView;
 import microsoft.exchange.webservices.data.search.ItemView;
@@ -232,5 +235,18 @@ public class EWSClient extends EmailClientImpl {
 	@Override
 	public int getLastMessageIndex() {
 		return lastMessageIndex;
+	}
+
+
+	@Override
+	public void sendMessage(List<String> to, String title, String body) throws Exception {
+		EmailMessage message = new EmailMessage(service);
+		message.setSubject(title);
+		message.setBody(new MessageBody(body));
+		for (String address: to) {
+			message.getToRecipients().add(new EmailAddress(address));
+		}
+		message.sendAndSaveCopy();
+		
 	}
 }
