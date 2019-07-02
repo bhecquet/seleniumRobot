@@ -17,7 +17,6 @@ import org.mockito.Mock;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.Rectangle;
-import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -58,12 +57,10 @@ public class TestElementInfo extends MockitoTest {
 			"	\"locator\": \"By.id: buttonScroll\"," + 
 			"	\"tagName\": \"button\"," + 
 			"	\"text\": \"set\"," + 
-			"	\"rectangle\": {" + 
-			"		\"x\": 8," + 
-			"		\"y\": 1829," + 
-			"		\"height\": 22," + 
-			"		\"width\": 39" + 
-			"	}," + 
+		"		\"coordX\": 8," + 
+		"		\"coordY\": 1829," + 
+		"		\"height\": 22," + 
+		"		\"width\": 39," + 
 			"	\"b64Image\": \"iVBORw0KGgoAAAANSUhEUgAAAE8AAAA+CAIAAADlKNG1AAACAUlEQVR42u2YzUoCURiGz/2oYLfiz8q6hzajuNUWNhsRIRQvQClahUhJm3ZWEEVI1KIYXagZmo4GGtg3moo/cwr0NMd4Hwad883xe3lmhpEzbGACY7xtQ2GwhS1sYQtb2MIWtrCFLWxhC1vYwha2sIWtTLaW8/yi5c8vjo5P1rj9YBuPxwOBwK5IqD+lLEZrpVq13vy7a7uvqrFYrFKpfIqE+lMKZS3a/umdrChKrVbr9XotkVB/SqEsi23pNqNz3xIPpVCW9bb9fv9dPJQii21TPBLZNlblcIdt7V3zZshiS4+Qt1XJbDNn+Io3g1Jksa1zIJEJ25m50rBwGXbOz1hEIttXMwohJ3OGCqNB2udLz5SMXaNkHJpOW44stt1u98mMfNDBmDc1V5kUJoOUlzmC+ScOlCKL7SMHEhnjTc0Mp0Wjag+e8drIYtvpdB5+Q9LDmCc5+lxyzB445f2aUmSxLZqRcNv9ue/9nN9uDOiLTYo5v3u4m3Az5k4UOchiq+v6vSkHruk9a1OyC8VxLavYhmPXgUkjSpHF9k48sti22+1b8VCK9ba0CtM0jf79b0RC/SnF+hWfqqrRaLRcLrdFQv0pRbV8NU9EIhE660Lf1FB/SrH+TY216PpHqdpY77axL0v/2bWFLWxhC1vYwha2sIUtbGELW9jCFrawHQy+AKNXbZ/fKJeiAAAAAElFTkSuQmCC\"," + 
 			"	\"attributes\": {" + 
 			"		\"onclick\": \"javascript:addText(\\u0027text5\\u0027, \\u0027a text\\u0027);\"," + 
@@ -104,12 +101,10 @@ public class TestElementInfo extends MockitoTest {
 			"	\"locator\": \"By.id: foo\"," + 
 			"	\"tagName\": \"h1\"," + 
 			"	\"text\": \"sometext\"," + 
-			"	\"rectangle\": {" + 
-			"		\"x\": 10," + 
-			"		\"y\": 20," + 
-			"		\"height\": 30," + 
-			"		\"width\": 40" + 
-			"	}," + 
+		"		\"coordX\": 10," + 
+		"		\"coordY\": 20," + 
+		"		\"height\": 30," + 
+		"		\"width\": 40," + 
 			"	\"b64Image\": \"ABCD\"," + 
 			"	\"attributes\": {" + 
 			"		\"class\": \"someClass\"," + 
@@ -188,10 +183,10 @@ public class TestElementInfo extends MockitoTest {
 		Assert.assertEquals(elInfo.getLocator(), "By.id: foo");
 		Assert.assertNull(elInfo.getTagName());
 		Assert.assertNull(elInfo.getText());
-		Assert.assertNull(elInfo.getCoordX());
-		Assert.assertNull(elInfo.getCoordY());
-		Assert.assertNull(elInfo.getWidth());
-		Assert.assertNull(elInfo.getHeight());
+		Assert.assertEquals((Integer)0, elInfo.getCoordX());
+		Assert.assertEquals((Integer)0, elInfo.getCoordY());
+		Assert.assertEquals((Integer)0, elInfo.getWidth());
+		Assert.assertEquals((Integer)0, elInfo.getHeight());
 		Assert.assertEquals(elInfo.getTotalSearch(), 0);
 	}
 	

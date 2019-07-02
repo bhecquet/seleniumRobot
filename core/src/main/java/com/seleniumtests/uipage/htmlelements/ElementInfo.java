@@ -53,10 +53,10 @@ public class ElementInfo {
 	private String locator;
 	private String tagName;
 	private String text;
-	private Integer width;
-	private Integer height;
-	private Integer coordX;
-	private Integer coordY;
+	private Integer width = 0;
+	private Integer height = 0;
+	private Integer coordX = 0;
+	private Integer coordY = 0;
 	private String b64Image;
 	private Map<String, Object> attributes = new HashMap<>();
 	
