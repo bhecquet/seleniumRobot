@@ -49,5 +49,6 @@ public interface EmailClient {
 	public void setSearchMode(SearchMode searchMode);
 	public LocalDateTime getFromDate();
 	public void setFromDate(LocalDateTime fromDate);
+	public void sendMessage(List<String> to, String title, String body) throws Exception;
 	
 }
