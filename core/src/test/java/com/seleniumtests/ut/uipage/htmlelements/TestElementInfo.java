@@ -188,7 +188,10 @@ public class TestElementInfo extends MockitoTest {
 		Assert.assertEquals(elInfo.getLocator(), "By.id: foo");
 		Assert.assertNull(elInfo.getTagName());
 		Assert.assertNull(elInfo.getText());
-		Assert.assertNull(elInfo.getRectangle());
+		Assert.assertNull(elInfo.getCoordX());
+		Assert.assertNull(elInfo.getCoordY());
+		Assert.assertNull(elInfo.getWidth());
+		Assert.assertNull(elInfo.getHeight());
 		Assert.assertEquals(elInfo.getTotalSearch(), 0);
 	}
 	
@@ -220,7 +223,10 @@ public class TestElementInfo extends MockitoTest {
 		// check element info is created with basic information
 		Assert.assertNotNull(elInfo);
 		Assert.assertEquals(elInfo.getText(), "sometext");
-		Assert.assertEquals(elInfo.getRectangle(), new Rectangle(10,  20, 30, 40));
+		Assert.assertEquals(elInfo.getCoordX(), (Integer)10);
+		Assert.assertEquals(elInfo.getCoordY(),  (Integer)20);
+		Assert.assertEquals(elInfo.getHeight(),  (Integer)30);
+		Assert.assertEquals(elInfo.getWidth(),  (Integer)40);
 		Assert.assertEquals(elInfo.getTotalSearch(), 1);
 		Assert.assertEquals(elInfo.getTagName(), "h1");
 		Assert.assertEquals(elInfo.getAttributes().get("class"), "someClass");
@@ -267,7 +273,10 @@ public class TestElementInfo extends MockitoTest {
 		// check element info is created with basic information
 		Assert.assertNotNull(elInfo);
 		Assert.assertEquals(elInfo.getText(), "sometext");
-		Assert.assertEquals(elInfo.getRectangle(), new Rectangle(10,  20, 30, 40));
+		Assert.assertEquals(elInfo.getCoordX(), (Integer)10);
+		Assert.assertEquals(elInfo.getCoordY(),  (Integer)20);
+		Assert.assertEquals(elInfo.getHeight(),  (Integer)30);
+		Assert.assertEquals(elInfo.getWidth(),  (Integer)40);
 		Assert.assertEquals(elInfo.getTotalSearch(), 1);
 		Assert.assertEquals(elInfo.getTagName(), "");			// tagname not initialized for apps
 		Assert.assertEquals(elInfo.getAttributes().size(), 0);	// attributes not initalized for apps
@@ -477,7 +486,7 @@ public class TestElementInfo extends MockitoTest {
 		einfoFile.deleteOnExit();
 		ElementInfo elementInfo = ElementInfo.readFromJsonFile(einfoFile);
 		
-		File out = elementInfo.exportToJsonFile(htmlElement);
+		File out = elementInfo.exportToJsonFile(false, htmlElement);
 		out.deleteOnExit();
 		Assert.assertTrue(out.exists());
 		String content = FileUtils.readFileToString(out);
@@ -500,7 +509,7 @@ public class TestElementInfo extends MockitoTest {
 		Assert.assertEquals(elementInfo.getText(), "set");
 		Assert.assertEquals(elementInfo.getTagName(), "button");
 		Assert.assertEquals(elementInfo.getLocator(), "By.id: buttonScroll");
-		Assert.assertEquals(elementInfo.getRectangle().getX(), 8);
+		Assert.assertEquals(elementInfo.getCoordX(), (Integer)8);
 		Assert.assertNotNull(elementInfo.getB64Image());
 		Assert.assertEquals(elementInfo.getAttributes().size(), 2);
 		Assert.assertEquals(elementInfo.getAttributes().get("id"), "buttonScroll");

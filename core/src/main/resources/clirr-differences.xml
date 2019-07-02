@@ -1,51 +1,10 @@
 <differences>
 
+
 	<difference>
-		<className>**/htmlelements/GenericPictureElement</className>
-		<differenceType>7013</differenceType>
-		<method>void doubleClickAt(int, int)</method>
-		<justification>internal use</justification>
-	</difference>
-	<difference>
-		<className>**/uipage/BasePage</className>
-		<differenceType>6001</differenceType>
-		<field>webUXDriver</field>
-		<justification>internal use</justification>
-	</difference>
-	<difference>
-		<className>**/uipage/BasePage</className>
-		<differenceType>7002</differenceType>
-		<method>void init()</method>
-		<justification>internal use</justification>
-	</difference>
-	<difference>
-		<className>**/uipage/PageObject</className>
-		<differenceType>7002</differenceType>
-		<method>void setTitle(java.lang.String)</method>
-		<justification>not used</justification>
-	</difference>
-	<difference>
-		<className>**/htmlelements/ElementInfo</className>
-		<differenceType>7004</differenceType>
-		<method>java.awt.image.BufferedImage getScreenshot(org.openqa.selenium.WebDriver)</method>
-		<justification>not used</justification>
-	</difference>
-	<difference>
-		<className>**/htmlelements/ElementInfo</className>
-		<differenceType>7004</differenceType>
-		<method>void updateInfo(com.seleniumtests.uipage.htmlelements.HtmlElement, org.openqa.selenium.WebDriver)</method>
-		<justification>not used</justification>
-	</difference>
-	<difference>
-		<className>**/htmlelements/GenericPictureElement</className>
-		<differenceType>7004</differenceType>
-		<method>GenericPictureElement(java.lang.String, java.io.File, double, boolean, com.seleniumtests.driver.screenshots.ScreenshotUtil)</method>
-		<justification>internal use</justification>
-	</difference>
-	<difference>
-		<className>**/connectors/selenium/SeleniumGridConnector</className>
-		<differenceType>7002</differenceType>
-		<method>void runTest(org.openqa.selenium.remote.RemoteWebDriver)</method>
+		<className>**/connectors/mails/EmailClient</className>
+		<differenceType>7012</differenceType>
+		<method>void sendMessage(java.util.List, java.lang.String, java.lang.String)</method>
 		<justification>internal use</justification>
 	</difference>
 </differences>

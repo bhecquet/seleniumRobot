@@ -217,6 +217,10 @@ public class ElementInfo {
     	lastUpdate = LocalDateTime.now();
 	}
 	
+	public Rectangle getRectangle() {
+		return new Rectangle(coordX, coordY, height, width);
+	}
+	
 	/**
 	 * Build element info id from name and origin
 	 * @param htmlElement
@@ -239,6 +243,9 @@ public class ElementInfo {
 	 * @return
 	 * @throws IOException 
 	 */
+	public synchronized File exportToJsonFile(HtmlElement htmlElement) throws IOException {
+		return exportToJsonFile(false, htmlElement);
+	}
 	public synchronized File exportToJsonFile(boolean reference, HtmlElement htmlElement) throws IOException {
 		
 		Gson gson = new Gson();
