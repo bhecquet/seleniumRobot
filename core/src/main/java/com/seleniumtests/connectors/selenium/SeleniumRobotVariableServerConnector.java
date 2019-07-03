@@ -213,7 +213,8 @@ public class SeleniumRobotVariableServerConnector extends SeleniumRobotServerCon
 			try {
 				JSONObject variableJson = getJSonResponse(buildPatchRequest(String.format(url + EXISTING_VARIABLE_API_URL, variable.getId()))
 						.field("value", variable.getValue())
-						.field("reservable", variable.isReservable()));
+						.field("reservable", variable.isReservable())
+						.field("timeToLive", variable.getTimeToLive()));
 				
 				return TestVariable.fromJsonObject(variableJson);
 				
