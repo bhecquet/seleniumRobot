@@ -42,7 +42,9 @@ import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.DriverMode;
 import com.seleniumtests.driver.screenshots.VideoCaptureMode;
 import com.seleniumtests.reporter.logger.ArchiveMode;
+import com.seleniumtests.reporter.reporters.JUnitReporter;
 import com.seleniumtests.reporter.reporters.ReportInfo;
+import com.seleniumtests.reporter.reporters.TestManagerReporter;
 import com.seleniumtests.uipage.htmlelements.ElementInfo;
 import com.seleniumtests.util.logging.DebugMode;
 
@@ -1030,6 +1032,26 @@ public class TestSeleniumTestContext extends GenericTest {
 		Assert.assertEquals(reportInfos.get(0).getExtension(), ".xml");
 		Assert.assertEquals(reportInfos.get(0).getTemplatePath(), "reporter/templates/report.perf.vm");
 		Assert.assertEquals(reportInfos.get(0).getPrefix(), "PERF");
+	}
+	
+	@Test(groups="ut context")
+	public void testPluginReporterClass(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setReporterPluginClasses("com.seleniumtests.reporter.reporters.JUnitReporter,com.seleniumtests.reporter.reporters.TestManagerReporter");
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getReporterPluginClasses().size(), 2);
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getReporterPluginClasses().get(0), JUnitReporter.class);
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getReporterPluginClasses().get(1), TestManagerReporter.class);
+	}
+	@Test(groups="ut context", expectedExceptions=ConfigurationException.class)
+	public void testBadPluginReporterClass(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setReporterPluginClasses("com.seleniumtests.reporter.reporters.CommonReporter");
+	}
+	@Test(groups="ut context")
+	public void testNullPluginReporterClass(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setReporterPluginClasses(null);
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getReporterPluginClasses().size(), 0);
 	}
 	
 	@Test(groups="ut context")

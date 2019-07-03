@@ -37,6 +37,7 @@ import org.openqa.selenium.PageLoadStrategy;
 import org.openqa.selenium.Platform;
 import org.openqa.selenium.Proxy.ProxyType;
 import org.openqa.selenium.WebDriverException;
+import org.testng.IReporter;
 import org.testng.ITestContext;
 import org.testng.ITestResult;
 import org.testng.TestRunner;
@@ -56,7 +57,11 @@ import com.seleniumtests.driver.DriverMode;
 import com.seleniumtests.driver.TestType;
 import com.seleniumtests.driver.screenshots.VideoCaptureMode;
 import com.seleniumtests.reporter.logger.ArchiveMode;
+import com.seleniumtests.reporter.reporters.CustomReporter;
 import com.seleniumtests.reporter.reporters.ReportInfo;
+import com.seleniumtests.reporter.reporters.SeleniumRobotServerTestRecorder;
+import com.seleniumtests.reporter.reporters.SeleniumTestsReporter2;
+import com.seleniumtests.reporter.reporters.TestManagerReporter;
 import com.seleniumtests.uipage.htmlelements.ElementInfo;
 import com.seleniumtests.util.StringUtility;
 import com.seleniumtests.util.logging.DebugMode;
@@ -161,7 +166,7 @@ public class SeleniumTestsContext {
     public static final String OPTIMIZE_REPORTS = "optimizeReports";
 
     public static final String TEST_METHOD_SIGNATURE = "testMethodSignature";
-    public static final String REPORTER_PLUGIN_CLASS = "reporterPluginClass";	// class to call when a custom reporter needs to be added
+    public static final String REPORTER_PLUGIN_CLASSES = "reporterPluginClasses";	// comma-seperated list of classes to call when a custom reporter needs to be added
 
     public static final String TEST_TYPE = "testType";							// configured automatically
     public static final String TMS_RUN = "tmsRun";									// option for configuring test (from test management system point of view) currently running, like HP ALM or Squash TM
@@ -362,7 +367,7 @@ public class SeleniumTestsContext {
 
         setDpTagsInclude(getValueForTest(DP_TAGS_INCLUDE, System.getProperty(DP_TAGS_INCLUDE)));
         setDpTagsExclude(getValueForTest(DP_TAGS_EXCLUDE, System.getProperty(DP_TAGS_EXCLUDE)));
-        setReporterPluginClass(getValueForTest(REPORTER_PLUGIN_CLASS, System.getProperty(REPORTER_PLUGIN_CLASS)));
+        setReporterPluginClasses(getValueForTest(REPORTER_PLUGIN_CLASSES, System.getProperty(REPORTER_PLUGIN_CLASSES)));
 
         setSoftAssertEnabled(getBoolValueForTest(SOFT_ASSERT_ENABLED, System.getProperty(SOFT_ASSERT_ENABLED)));
         setTestRetryCount(getIntValueForTest(TEST_RETRY_COUNT, System.getProperty(TEST_RETRY_COUNT)));
@@ -1022,8 +1027,16 @@ public class SeleniumTestsContext {
         return (String) getAttribute(DP_TAGS_INCLUDE);
     }
     
-    public String getReporterPluginClass() {
-    	return (String) getAttribute(REPORTER_PLUGIN_CLASS);
+    @SuppressWarnings("unchecked")
+	public List<Class<?>> getReporterPluginClasses() {
+    	List<Class<?>> userDefinedClasses = (List<Class<?>>) getAttribute(REPORTER_PLUGIN_CLASSES);
+    	
+    	// add core reporter classes
+    	userDefinedClasses.add(SeleniumTestsReporter2.class);
+    	userDefinedClasses.add(TestManagerReporter.class);
+		userDefinedClasses.add(SeleniumRobotServerTestRecorder.class);
+		userDefinedClasses.add(CustomReporter.class);
+    	return userDefinedClasses;
     }
 
     public String getNeoloadUserPath() {
@@ -1970,15 +1983,27 @@ public class SeleniumTestsContext {
     	setAttribute(DP_TAGS_EXCLUDE, tags);
     }
     
-    public void setReporterPluginClass(String className) {
-    	if (className != null) {
-    		try {
-				Class.forName(className);
-			} catch (ClassNotFoundException e) {
-				throw new ConfigurationException("");
-			}
-    	} 
-    	setAttribute(REPORTER_PLUGIN_CLASS, className);
+    public void setReporterPluginClasses(String classNames) {
+    	if (classNames != null) {
+    		List<Class<IReporter>> reporterClasses = new ArrayList<>();
+    		for (String className: classNames.split(",")) {
+	    		try {
+					Class<IReporter> clazz = (Class<IReporter>) Class.forName(className);
+					if (!IReporter.class.isAssignableFrom(clazz)) {
+						throw new ClassCastException();
+					}
+					reporterClasses.add(clazz);
+				} catch (ClassNotFoundException e) {
+					throw new ConfigurationException(String.format("Class %s cannot be loaded: %s", className, e.getMessage()));
+				} catch (ClassCastException e) {
+					throw new ConfigurationException(String.format("Class %s does not implement IReporter interface", className));
+				}
+    		}
+
+        	setAttribute(REPORTER_PLUGIN_CLASSES, reporterClasses);
+    	} else {
+    		setAttribute(REPORTER_PLUGIN_CLASSES, new ArrayList<>());
+    	}
     }
     
     public void setSoftAssertEnabled(Boolean enable) {

@@ -56,25 +56,17 @@ public class ReporterControler implements IReporter {
 		} catch (Exception e) {}
 		cleanAttachments(resultSet);
 		
-		try {
-			new SeleniumTestsReporter2().generateReport(xmlSuites, suites, outputDirectory);
-		} catch (Exception e) {}
-		
-		try {
-			new CustomReporter().generateReport(xmlSuites, suites, outputDirectory);
-		} catch (Exception e) {}
-		
-		try {
-			new SeleniumRobotServerTestRecorder().generateReport(xmlSuites, suites, outputDirectory);
-		} catch (Exception e) {}
-		
-		try {
-			new TestManagerReporter().generateReport(xmlSuites, suites, outputDirectory);
-		} catch (Exception e) {}
 		
 		try {
 			new JUnitReporter().generateReport(xmlSuites, suites, SeleniumTestsContextManager.getGlobalContext().getOutputDirectory());
 		} catch (Exception e) {}
+		
+		for (Class<?> reporterClass: SeleniumTestsContextManager.getGlobalContext().getReporterPluginClasses()) {
+			try {
+				IReporter reporter = (IReporter) reporterClass.getConstructor().newInstance();
+				reporter.generateReport(xmlSuites, suites, outputDirectory);
+			} catch (Exception e) {}
+		}
 	}
 	
 	/**
