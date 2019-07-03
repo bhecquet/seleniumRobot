@@ -1038,7 +1038,7 @@ public class TestSeleniumTestContext extends GenericTest {
 	public void testPluginReporterClass(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setReporterPluginClasses("com.seleniumtests.reporter.reporters.JUnitReporter,com.seleniumtests.reporter.reporters.TestManagerReporter");
-		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getReporterPluginClasses().size(), 2);
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getReporterPluginClasses().size(), 6); // 6 classes, the last 4 are internal seleniumRobot reporters
 		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getReporterPluginClasses().get(0), JUnitReporter.class);
 		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getReporterPluginClasses().get(1), TestManagerReporter.class);
 	}
@@ -1051,7 +1051,7 @@ public class TestSeleniumTestContext extends GenericTest {
 	public void testNullPluginReporterClass(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setReporterPluginClasses(null);
-		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getReporterPluginClasses().size(), 0);
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getReporterPluginClasses().size(), 4); // the 4 classes are internal seleniumRobot reporters
 	}
 	
 	@Test(groups="ut context")
