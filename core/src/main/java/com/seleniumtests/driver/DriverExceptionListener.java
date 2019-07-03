@@ -169,6 +169,7 @@ public class DriverExceptionListener implements WebDriverEventListener {
             		|| message.matches("Session .*? not available .*")
                     || message.matches("cannot forward the request .*")
                     || message.matches("Session is closed")
+                    || message.contains("Unable to get browser")
                     || message.matches("Session ID is null.*")
                     || message.contains("java.net.ConnectException: Failed to connect")) {
                 WebUIDriver.setWebDriver(null); // can't quit anymore, save time.
