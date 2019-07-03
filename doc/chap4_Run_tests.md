@@ -162,8 +162,8 @@ Params for mobile testing
 
 | Param name       			| Default 	| Description  |
 | -------------------------	| ------- 	| ------------ |
-| customTestReports			| PERF::xml::reporter/templates/report.perf.vm | With this option, you can specify which files will be generated for each test. By default, it's the JMeter report. Format is a comma seperated list of <prefix>::<extension>::<template_file located in resources>. resources can be those from test application. Template is in the Velocity format |
-| customSummaryReports		| results::json::reporter/templates/report.summary.json.vm | With this option, you can specify which files will be generated for sumarizing test session. By default, it's a json report. Format is a comma seperated list of <prefix>::<extension>::<template_file located in resources>. resources can be those from test application. Template is in the Velocity format |
+| customTestReports			| PERF::xml::reporter/templates/report.perf.vm | With this option, you can specify which files will be generated for each test. By default, it's the JMeter report. Format is a comma seperated list of <prefix>::<extension>::<template_file located in resources>. resources can be those from test application. Template is in the Velocity format. See chap7_Howto.md, §11 |
+| customSummaryReports		| results::json::reporter/templates/report.summary.json.vm | With this option, you can specify which files will be generated for sumarizing test session. By default, it's a json report. Format is a comma seperated list of <prefix>::<extension>::<template_file located in resources>. resources can be those from test application. Template is in the Velocity format. See chap7_Howto.md, §11 |
 | archiveToFile				| null		| If not specified, no archiving will be done. Else, provide a zip file path and the whole content of `outputDirectory` will be zipped to this file in case archive is enabled |
 | archive					| false		| If `true`, always archive results to `archiveToFile` file. Other possible values are: `onSuccess` (archive when test is OK) and `onError` (archive when test is KO) |
 | tmsRun					| null		| Configuration string (JSON format) for identifying test that is run in test management system. E.g: {'type': 'hp', 'run': '3'} |
@@ -171,6 +171,7 @@ Params for mobile testing
 | optimizeReports			| false		| If true, compress HTML, get HTML resources from internet so that logs are smaller |
 | manualTestSteps			| false		| If true, it's possible to add test steps in Test and Page Object (`addTest("my step name")`). An error will be raised if manual steps are added when automatic steps are enabled |
 | maskPassword 				| true		| Whether seleniumRobot should detect passwords in method calls and mask them in reports | 
+| reporterPluginClasses     | null		| comma-seperated list of classes to call when a custom reporter needs to be added. See chap7_Howto.md, §19 |
 
 
 Performance reporting
