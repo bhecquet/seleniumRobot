@@ -377,6 +377,12 @@ and then, in command line
 
     -DoutputDirectory=test-output_%datetime%
  	
- 	
+### 19 Create a custom reporter ###
+
+For textual reports, you can look at §11 which uses Velocity template engine to generate summary and per test reports
+For more complex reports (send errors to Jira, send results to Squash, ...), you can write a custom reporter which implements the `IReporter` interface.
+
+This way, you can scan test results and do some actions based on results. Look at `CustomReporter.java` for example
+To enable this report, use parameter `-DreporterPluginClasses=my.reporter.CustomClass` 
 	  
 	  
