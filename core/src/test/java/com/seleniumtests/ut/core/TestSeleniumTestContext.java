@@ -1039,8 +1039,8 @@ public class TestSeleniumTestContext extends GenericTest {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setReporterPluginClasses("com.seleniumtests.reporter.reporters.JUnitReporter,com.seleniumtests.reporter.reporters.TestManagerReporter");
 		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getReporterPluginClasses().size(), 6); // 6 classes, the last 4 are internal seleniumRobot reporters
-		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getReporterPluginClasses().get(0), JUnitReporter.class);
-		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getReporterPluginClasses().get(1), TestManagerReporter.class);
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getReporterPluginClasses().get(4), JUnitReporter.class);
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getReporterPluginClasses().get(5), TestManagerReporter.class);
 	}
 	@Test(groups="ut context", expectedExceptions=ConfigurationException.class)
 	public void testBadPluginReporterClass(final ITestContext testNGCtx, final XmlTest xmlTest) {
