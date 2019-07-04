@@ -1029,13 +1029,16 @@ public class SeleniumTestsContext {
     
     @SuppressWarnings("unchecked")
 	public List<Class<?>> getReporterPluginClasses() {
-    	List<Class<?>> userDefinedClasses = (List<Class<?>>) getAttribute(REPORTER_PLUGIN_CLASSES);
-    	
+    	List<Class<?>> userDefinedClasses = new ArrayList<>();
+
     	// add core reporter classes
     	userDefinedClasses.add(SeleniumTestsReporter2.class);
     	userDefinedClasses.add(TestManagerReporter.class);
 		userDefinedClasses.add(SeleniumRobotServerTestRecorder.class);
 		userDefinedClasses.add(CustomReporter.class);
+    	
+		userDefinedClasses.addAll((List<Class<?>>) getAttribute(REPORTER_PLUGIN_CLASSES));
+    	
     	return userDefinedClasses;
     }
 
