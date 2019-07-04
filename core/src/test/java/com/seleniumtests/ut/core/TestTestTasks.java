@@ -562,4 +562,44 @@ public class TestTestTasks extends MockitoTest {
 			TestLogging.reset();
 		}
 	}
+	
+	/**
+	 * Check we get parameters from the thread context
+	 */
+	@Test(groups= {"ut"})
+	public void testParam() {
+		SeleniumTestsContextManager.getThreadContext().getConfiguration().put("foo", new TestVariable("foo", "bar"));
+		SeleniumTestsContextManager.getGlobalContext().getConfiguration().put("foo", new TestVariable("foo", "bar2"));
+		Assert.assertEquals(TestTasks.param("foo"), "bar");
+	}
+	
+	/**
+	 * Check empty string is returned if parameter is not known
+	 */
+	@Test(groups= {"ut"})
+	public void testParamDoesNotExist() {
+		SeleniumTestsContextManager.getThreadContext().getConfiguration().put("foo", new TestVariable("foo", "bar"));
+		SeleniumTestsContextManager.getGlobalContext().getConfiguration().put("foo", new TestVariable("foo", "bar2"));
+		Assert.assertEquals(TestTasks.param("foo2"), "");
+	}
+	
+	/**
+	 * Check we look at global context if thread context is not initialized
+	 */
+	@Test(groups= {"ut"})
+	public void testParamThreadContextNotInitialized() {
+		SeleniumTestsContextManager.setThreadContext(null);
+		SeleniumTestsContextManager.getGlobalContext().getConfiguration().put("foo", new TestVariable("foo", "bar2"));
+		Assert.assertEquals(TestTasks.param("foo"), "bar2");
+	}
+	
+	/**
+	 * Check error is raised if thread and global context are not initialized
+	 */
+	@Test(groups= {"ut"}, expectedExceptions=ConfigurationException.class)
+	public void testParamGlobalContextNotInitialized() {
+		SeleniumTestsContextManager.setThreadContext(null);
+		SeleniumTestsContextManager.setGlobalContext(null);
+		TestTasks.param("foo");
+	}
 }
