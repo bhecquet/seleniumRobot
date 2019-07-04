@@ -159,19 +159,31 @@ public class TestTasks {
 	
 	 /**
      * Get parameter from configuration
+     * If configuration can be get from threadContext, it's done, else, we look at global context
      * 
      * @param key
      * 
      * @return String
      */
     public static String param(String key) {
-    	TestVariable value = SeleniumTestsContextManager.getThreadContext().getConfiguration().get(key);
+    	try {
+    		return getParam(SeleniumTestsContextManager.getThreadContext(), key);
+    	} catch (ConfigurationException e) {
+    		return getParam(SeleniumTestsContextManager.getGlobalContext(), key);
+    	}
+    }
+  
+    
+    private static String getParam(SeleniumTestsContext context, String key) {
+    	TestVariable value = context.getConfiguration().get(key);
     	if (value == null) {
     		TestLogging.warning(String.format("Variable %s is not defined", key));
     		return "";
     	}
     	return value.getValue();
     }
+    
+    
    
     
     /**
