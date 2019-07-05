@@ -80,7 +80,7 @@ public class OSUtilityWindows extends OSUtility {
 			Matcher m = pTasklist.matcher(sentence);
 			
 			if (m.matches()) {
-				processInfo.setName(m.group(1).replaceAll(".exe", ""));
+				processInfo.setName(m.group(1).replaceAll(".exe", "").toLowerCase());
 				processInfo.setPid(m.group(2));
 				
 				processInfoList.add(processInfo);
