@@ -104,6 +104,12 @@ public class TestOsUtility extends GenericTest {
 		}
 	}
 	
+
+	@Test(groups={"it"})
+	public void testKillAllWebDriverProcess() {
+		osUtil.killAllWebDriverProcess();
+	}
+	
 	@Test(groups={"it"})
 	public void testGetProcessNameFromNonExistingPid() {
 		Assert.assertEquals(osUtil.getProgramNameFromPid(999999L), "");

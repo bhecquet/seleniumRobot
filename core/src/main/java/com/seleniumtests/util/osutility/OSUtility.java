@@ -43,7 +43,7 @@ public abstract class OSUtility {
 	
 	private String[] webBrowserProcessList = {"chrome", "firefox", "iexplore", "safari"};
 
-	private String[] webDriverProcessList = {"chromedriver", "geckodriver", "IEDriverServer", "MicrosoftWebDriver"};
+	private String[] webDriverProcessList = {"chromedriver", "geckodriver", "iedriverserver", "microsoftwebdriver"};
 		
 	private static Map<BrowserType, List<BrowserInfo>> installedBrowsersWithVersion;
 	
