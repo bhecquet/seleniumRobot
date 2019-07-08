@@ -437,8 +437,12 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
 	 */
 	public void scrollToElement(WebElement element, int yOffset) {
 		if (isWebTest) {
-//			((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", element);
-			((JavascriptExecutor) driver).executeScript("window.top.scroll(" + Math.max(element.getLocation().x - 200, 0) + "," + Math.max(element.getLocation().y + yOffset, 0) + ")");
+			try {
+				((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", element);
+			} catch (Exception e) {
+				// fall back to legacy behavior
+				((JavascriptExecutor) driver).executeScript("window.top.scroll(" + Math.max(element.getLocation().x - 200, 0) + "," + Math.max(element.getLocation().y + yOffset, 0) + ")");
+			}
 		}
 	}
 	
