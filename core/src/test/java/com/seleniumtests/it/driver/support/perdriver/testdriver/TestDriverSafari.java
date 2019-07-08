@@ -348,5 +348,10 @@ public class TestDriverSafari extends TestDriver {
 	public void testFindTablesInsideHtmlElement() {
 		super.testFindTablesInsideHtmlElement();
 	}
+	
+	@Test(groups={"it", "ut"})
+	public void testScrollIntoDiv() {
+		super.testScrollIntoDiv();
+	}
 
 }

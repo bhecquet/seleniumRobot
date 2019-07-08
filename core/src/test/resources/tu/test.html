@@ -22,6 +22,21 @@
 	#languages > li:hover {
 	    background: #aaa;
 	}
+	
+	.box {
+	  width: 80%;
+	  border: 2px dashed;
+	  height: 180px;
+	  overflow: auto;
+	  scroll-behavior: smooth; /* <-- for smooth scroll */
+	}
+	
+	.boxChild {
+	  margin: 600px 0 300px;
+	  width: 40px;
+	  height: 40px;
+	  background: green;
+	}
 </style>
 </head>
  
@@ -197,6 +212,11 @@
 		<input class="someClass" value="second text field">
 		<input class="someClass" value="third text field">
 		<input class="someClass" value="last text field">
+	</div>
+	
+	<h3>Test scrolling into div</h3>
+	<div class='box'>
+	  <div class='boxChild' id='greenBox' onclick="javascript:addText('text2', 'greenbox');"></div>
 	</div>
 	
 <script src="jquery.min.js">

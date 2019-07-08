@@ -704,4 +704,13 @@ public class TestDriver extends GenericMultiBrowserTest {
 		Assert.assertEquals(DriverTestPage.table3.getRowCount(), 2);
 	}
 	
+	/**
+	 * issue #262: check we can scroll and click to an element inside div
+	 */
+	@Test(groups={"it", "ut"})
+	public void testScrollIntoDiv() {
+		DriverTestPage.greenBox.click();
+		Assert.assertEquals(DriverTestPage.textElement.getValue(), "greenbox");
+	}
+	
 }
