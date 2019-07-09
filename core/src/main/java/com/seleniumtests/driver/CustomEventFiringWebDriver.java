@@ -60,6 +60,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.FileDetector;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.UselessFileDetector;
+import org.openqa.selenium.safari.SafariDriver;
 import org.openqa.selenium.support.events.EventFiringWebDriver;
 
 import com.neotys.selenium.proxies.NLWebDriver;
@@ -157,6 +158,27 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
             "var maxBodyHeight = Math.max(bodyClientHeight, bodyScrollHeight); " +
             "var totalHeight = Math.max(maxDocElementHeight, maxBodyHeight); " +
             "return [totalWidth * pixelRatio, totalHeight * pixelRatio];";
+    
+    // according to https://www.w3schools.com/jsref/prop_element_scrolltop.asp
+    // root scrollable (overflow) element is 'document.body' for safari and 'document.documentElement' for other browsers
+    private static final String JS_SCROLL_PARENT = "function getScrollParent(element, includeHidden, browserName) {" + 
+    		"    var rootElement = browserName === \"safari\" ? document.body: document.documentElement;" +
+    		"    var style = getComputedStyle(element);" + 
+    		"    var excludeStaticParent = style.position === \"absolute\";" + 
+    		"    var overflowRegex = includeHidden ? /(auto|scroll|hidden)/ : /(auto|scroll)/;" + 
+    		"" + 
+    		"    if (style.position === \"fixed\") return rootElement;" + 
+    		"    for (var parent = element; (parent = parent.parentElement);) {" + 
+    		"        style = getComputedStyle(parent);" + 
+    		"        if (excludeStaticParent && style.position === \"static\") {" + 
+    		"            continue;" + 
+    		"        }" + 
+    		"        if (overflowRegex.test(style.overflow + style.overflowY + style.overflowX)) return parent;" + 
+    		"    }" + 
+    		"" + 
+    		"    return rootElement;" + 
+    		"}" +
+    		"return getScrollParent(arguments[0], false);";
     
     public static final String NON_JS_UPLOAD_FILE_THROUGH_POPUP = 
     		"var action = 'upload_file_through_popup';";
@@ -439,6 +461,11 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
 		if (isWebTest) {
 			try {
 				((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", element);
+				WebElement parentScrollableElement = (WebElement) ((JavascriptExecutor) driver).executeScript(JS_SCROLL_PARENT, element, (driver instanceof SafariDriver) ? "safari": "other");
+				if (parentScrollableElement != null) {
+					((JavascriptExecutor) driver).executeScript("arguments[0].scrollTop += arguments[1]", parentScrollableElement, yOffset);
+				}
+				
 			} catch (Exception e) {
 				// fall back to legacy behavior
 				((JavascriptExecutor) driver).executeScript("window.top.scroll(" + Math.max(element.getLocation().x - 200, 0) + "," + Math.max(element.getLocation().y + yOffset, 0) + ")");
