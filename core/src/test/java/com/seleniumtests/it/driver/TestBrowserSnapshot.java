@@ -56,7 +56,7 @@ import com.seleniumtests.util.imaging.ImageDetector;
 public class TestBrowserSnapshot extends MockitoTest {
 	
 	private static WebDriver driver;
-	private final String browserName = "firefox";
+	private final String browserName = "chrome";
 	
 	@BeforeMethod(groups={"it"})
 	public void initDriver(final ITestContext testNGCtx, final ITestResult testResult) throws Exception {

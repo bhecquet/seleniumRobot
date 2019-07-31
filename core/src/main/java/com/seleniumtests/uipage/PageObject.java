@@ -730,6 +730,8 @@ public class PageObject extends BasePage implements IPage {
 				return driver.switchTo().alert();
 			} catch (NoAlertPresentException e) {
 				WaitHelper.waitForSeconds(1);
+			} catch (NoSuchWindowException e) {
+				return null;
 			}
 		}
 		return null;

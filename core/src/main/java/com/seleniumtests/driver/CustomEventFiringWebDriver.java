@@ -52,6 +52,7 @@ import org.openqa.selenium.Dimension;
 import org.openqa.selenium.HasCapabilities;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.MutableCapabilities;
+import org.openqa.selenium.NoSuchWindowException;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.WebDriver;
@@ -297,6 +298,8 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
     		logger.info("getCurrentUrl: Handling alert");
 			handleAlert();
 			return super.getCurrentUrl();
+		} catch (NoSuchWindowException e) {
+			return "";
 		}
     }
     
@@ -308,6 +311,8 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
     		logger.info("getTitle: Handling alert");
 			handleAlert();
 			return super.getTitle();
+    	} catch (NoSuchWindowException e) {
+			return "";
     	}
     }
     

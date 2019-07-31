@@ -355,5 +355,10 @@ public class TestDriverChrome extends TestDriver {
 	public void testScrollIntoDiv() {
 		super.testScrollIntoDiv();
 	}
+	
+	@Test(groups= {"it", "ut"})
+	public void testCaptureWhenWindowIsClosed() throws Exception {
+		super.testCaptureWhenWindowIsClosed();
+	}
 
 }

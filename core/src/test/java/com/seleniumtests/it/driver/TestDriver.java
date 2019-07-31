@@ -25,9 +25,11 @@ import java.util.Date;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.NoSuchWindowException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.WebDriver;
@@ -43,7 +45,9 @@ import com.seleniumtests.browserfactory.FirefoxDriverFactory;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.CustomEventFiringWebDriver;
+import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.it.driver.support.GenericMultiBrowserTest;
+import com.seleniumtests.it.driver.support.pages.DriverSubTestPage;
 import com.seleniumtests.it.driver.support.pages.DriverTestPage;
 import com.seleniumtests.it.driver.support.pages.DriverTestPageWithoutFixedPattern;
 import com.seleniumtests.uipage.htmlelements.HtmlElement;
@@ -711,6 +715,30 @@ public class TestDriver extends GenericMultiBrowserTest {
 	public void testScrollIntoDiv() {
 		DriverTestPage.greenBox.click();
 		Assert.assertEquals(DriverTestPage.textElement.getValue(), "greenbox");
+	}
+	
+	/**
+	 * 
+	 * @throws Exception
+	 */
+	@Test(groups= {"it", "ut"})
+	public void testCaptureWhenWindowIsClosed() throws Exception {
+		DriverTestPage page = new DriverTestPage();
+		page._goToNewPage();
+
+		// close window
+		DriverSubTestPage.closeButton.click();
+		Alert alert = page.waitForAlert(3);
+		if (alert != null) {
+			alert.accept();
+		}
+		
+		try {
+			driver.getCurrentUrl();
+		} catch (NoSuchWindowException e) {
+		}
+		
+		Assert.assertNotNull(WebUIDriver.getWebDriver(false));
 	}
 	
 }
