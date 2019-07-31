@@ -17,8 +17,12 @@
  */
 package com.seleniumtests.driver;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchWindowException;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.UnsupportedCommandException;
 import org.openqa.selenium.WebDriver;
@@ -162,6 +166,16 @@ public class DriverExceptionListener implements WebDriverEventListener {
             return;
         } else if (ex instanceof org.openqa.selenium.UnsupportedCommandException) {
             return;
+        } else if (ex instanceof NoSuchWindowException) {
+        	try {
+	        	WebDriver driver = WebUIDriver.getWebDriver(false);
+	        	List<String> handles = new ArrayList<>(driver.getWindowHandles());
+	        	logger.info("Current window has been closed, switching to first window to avoid problems in future commands");
+	        	if (!handles.isEmpty()) {
+	        		driver.switchTo().window(handles.get(0));
+	        	} 
+        	} catch (Exception e) {}
+        	return;
         } else {
             String message = ex.getMessage().split("\\n")[0];
             logger.warn("Got exception:" + message);
