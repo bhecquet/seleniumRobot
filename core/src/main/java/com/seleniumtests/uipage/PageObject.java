@@ -206,7 +206,6 @@ public class PageObject extends BasePage implements IPage {
     protected void assertCurrentPage(final boolean log) {
 
         if (pageIdentifierElement != null && !pageIdentifierElement.isElementPresent()) {
-        	ScreenShot screenShot = new ScreenshotUtil().capture(Target.PAGE, ScreenShot.class);
 
             throw new NotCurrentPageException(getClass().getCanonicalName()
                     + " is not the current page.\nPageIdentifierElement " + pageIdentifierElement.toString()
