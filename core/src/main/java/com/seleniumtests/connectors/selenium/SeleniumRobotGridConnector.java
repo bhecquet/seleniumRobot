@@ -247,10 +247,10 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 		logger.info("uploading file to browser: " + fileName);
 		try {
 			Unirest.post(String.format("%s%s", nodeUrl, NODE_TASK_SERVLET))
-			.queryString("action", "uploadFile")
-			.queryString("content", base64Content)
-			.queryString("name", fileName)
-			.asString();
+				.queryString("action", "uploadFile")
+				.queryString("name", fileName)
+				.field("content", base64Content)
+				.asString();
 		} catch (UnirestException e) {
 			logger.warn(String.format("Could send keys: %s", e.getMessage()));
 		}
