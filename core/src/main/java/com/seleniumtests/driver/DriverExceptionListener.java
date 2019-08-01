@@ -31,9 +31,6 @@ import org.openqa.selenium.support.events.WebDriverEventListener;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.WebSessionEndedException;
-import com.seleniumtests.driver.screenshots.ScreenShot;
-import com.seleniumtests.driver.screenshots.ScreenshotUtil;
-import com.seleniumtests.driver.screenshots.ScreenshotUtil.Target;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
 public class DriverExceptionListener implements WebDriverEventListener {
