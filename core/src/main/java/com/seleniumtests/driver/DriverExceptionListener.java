@@ -167,9 +167,15 @@ public class DriverExceptionListener implements WebDriverEventListener {
         	try {
 	        	WebDriver driver = WebUIDriver.getWebDriver(false);
 	        	List<String> handles = new ArrayList<>(driver.getWindowHandles());
-	        	logger.info("Current window has been closed, switching to first window to avoid problems in future commands");
+	        	
 	        	if (!handles.isEmpty()) {
-	        		driver.switchTo().window(handles.get(0));
+	        		try {
+	        			driver.switchTo().window(handles.get(handles.size() - 1));
+	        			logger.info("Current window has been closed, switching to previous window to avoid problems in future commands");
+	        		} catch (IndexOutOfBoundsException | NoSuchWindowException e) {
+	        			driver.switchTo().window(handles.get(0));
+	        			logger.info("Current window has been closed, switching to first window to avoid problems in future commands");
+	            	}
 	        	} 
         	} catch (Exception e) {}
         	return;
