@@ -200,6 +200,8 @@ or
 	
 ### 9 Using emails ###
 
+#### 9.1 Getting email ####
+
 SeleniumRobot provides several email clients to allow reading email content and attachments
 
 	EmailAccount account = EmailAccount(<email_address>, <login>, <password>, <emailServer>);
@@ -222,7 +224,13 @@ Using variables, it's also possible to write:
 	
 where `emailAccount` is `{'email': 'mymail@compmail.com', 'login': 'login', 'password': 'passwd'}` and `emailServer` is `	{'url': 'msg.compmail.com', 'type': 'EXCHANGE_EWS', 'domain': 'compmail.com'}`
 
-	
+#### 9.2 Writing email ####
+
+To write an email for exchange server (the only one supported): 
+
+	EmailServer server = new EmailServer("<mail_server_urs>", EmailServerTypes.EXCHANGE_EWS, "<domain_for_user>");
+	EmailClient client = EmailClientSelector.routeEmail(server, "<email_of_mailbox_to_consult>", "<user_to_connect_to_mailbox>", "<password>");
+	client.sendMessage(Arrays.asList("myaddress@mydomain.com"), "hello", "hello");
 	
 ### 10 upload file ###
 
