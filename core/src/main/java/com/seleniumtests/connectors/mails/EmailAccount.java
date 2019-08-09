@@ -117,10 +117,20 @@ public class EmailAccount {
 	 * 
 	 * @param emailTitle	email title to get. This can be a regular expression as underlying used method is String.matches()
 	 * @param attachments	list of attachments in email
-	 * 
-	 * TODO: should be moved elsewhere
 	 */
 	public Email checkEmailPresence(String emailTitle, String[] attachments) {
+		return checkEmailPresence(emailTitle, attachments, 90);
+		
+	}
+	
+	/**
+	 * Check email has been get
+	 * 
+	 * @param emailTitle		email title to get. This can be a regular expression as underlying used method is String.matches()
+	 * @param attachments		list of attachments in email
+	 * @param timeoutInSeconds	time to wait for expected message
+	 */
+	public Email checkEmailPresence(String emailTitle, String[] attachments, int timeoutInSeconds) {
 
 		// is client configured
 		getEmailClient();
@@ -129,7 +139,7 @@ public class EmailAccount {
 		if (emailClient != null) {
 			List<String> missingAttachments;
 			try {
-				missingAttachments = emailClient.checkMessagePresenceInLastMessages(emailTitle, attachments, foundEmail);
+				missingAttachments = emailClient.checkMessagePresenceInLastMessages(emailTitle, attachments, foundEmail, timeoutInSeconds);
 			} catch (Exception e) {
 				logger.error("Could not get messages", e);
 				missingAttachments = null;
