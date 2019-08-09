@@ -32,6 +32,7 @@ import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 
+import com.seleniumtests.MockitoTest;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.TestType;
@@ -47,7 +48,7 @@ import com.seleniumtests.reporter.logger.TestLogging;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 import com.seleniumtests.util.osutility.OSUtilityFactory;
 
-public abstract class GenericMultiBrowserTest {
+public abstract class GenericMultiBrowserTest extends MockitoTest {
 	
 	protected BrowserType browserType;
 	protected WebServer server;
@@ -60,6 +61,7 @@ public abstract class GenericMultiBrowserTest {
 	protected DriverTestAngularFrame angularFramePage;
 	protected ITestContext testNGCtx;
 	private String testPageName;
+	protected String testPageUrl;
 	
 	protected List<BrowserType> installedBrowsers = OSUtilityFactory.getInstance().getInstalledBrowsers();
 	protected static final Logger logger = SeleniumRobotLogger.getLogger(GenericMultiBrowserTest.class);
@@ -147,19 +149,24 @@ public abstract class GenericMultiBrowserTest {
 		
 		switch (testPageName) {
 		case "DriverTestPageWithoutFixedPattern":
-			testPageWithoutPattern = new DriverTestPageWithoutFixedPattern(true, String.format("http://%s:%d/testWithoutFixedPattern.html", localAddress, server.getServerHost().getPort()));
+			testPageUrl = String.format("http://%s:%d/testWithoutFixedPattern.html", localAddress, server.getServerHost().getPort());
+			testPageWithoutPattern = new DriverTestPageWithoutFixedPattern(true, testPageUrl);
 			break;
 		case "DriverTestPage":
-			testPage = new DriverTestPage(true, String.format("http://%s:%d/test.html", localAddress, server.getServerHost().getPort()));
+			testPageUrl = String.format("http://%s:%d/test.html", localAddress, server.getServerHost().getPort());
+			testPage = new DriverTestPage(true, testPageUrl);
 			break;
 		case "DriverTestPageNativeActions":
-			testPageNativeActions = new DriverTestPageNativeActions(true, String.format("http://%s:%d/test.html", localAddress, server.getServerHost().getPort()));
+			testPageUrl = String.format("http://%s:%d/test.html", localAddress, server.getServerHost().getPort());
+			testPageNativeActions = new DriverTestPageNativeActions(true, testPageUrl);
 			break;
 		case "DriverTestAngularFrame":
-			angularFramePage = new DriverTestAngularFrame(true, String.format("http://%s:%d/testAngularIFrame.html", localAddress, server.getServerHost().getPort()));
+			testPageUrl = String.format("http://%s:%d/testAngularIFrame.html", localAddress, server.getServerHost().getPort());
+			angularFramePage = new DriverTestAngularFrame(true, testPageUrl);
 			break;
 		case "DriverSubAngularTestPage":
-			angularPage = new DriverSubAngularTestPage(true, String.format("http://%s:%d/angularApp/index.html", localAddress, server.getServerHost().getPort()));
+			testPageUrl = String.format("http://%s:%d/angularApp/index.html", localAddress, server.getServerHost().getPort());
+			angularPage = new DriverSubAngularTestPage(true, testPageUrl);
 		}
 		
 		driver = WebUIDriver.getWebDriver(true);

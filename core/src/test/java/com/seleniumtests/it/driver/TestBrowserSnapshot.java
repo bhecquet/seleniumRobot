@@ -19,7 +19,10 @@ package com.seleniumtests.it.driver;
 
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.anyInt;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
@@ -31,6 +34,7 @@ import javax.imageio.ImageIO;
 
 import org.apache.commons.io.FileUtils;
 import org.openqa.selenium.Dimension;
+import org.openqa.selenium.JavascriptException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.testng.Assert;
@@ -40,12 +44,14 @@ import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import com.seleniumtests.MockitoTest;
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.driver.BrowserType;
+import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.driver.screenshots.ScreenShot;
 import com.seleniumtests.driver.screenshots.ScreenshotUtil;
 import com.seleniumtests.driver.screenshots.ScreenshotUtil.Target;
+import com.seleniumtests.it.driver.support.GenericMultiBrowserTest;
 import com.seleniumtests.it.driver.support.pages.DriverSubTestPage;
 import com.seleniumtests.it.driver.support.pages.DriverTestPage;
 import com.seleniumtests.util.FileUtility;
@@ -53,10 +59,18 @@ import com.seleniumtests.util.HashCodeGenerator;
 import com.seleniumtests.util.helper.WaitHelper;
 import com.seleniumtests.util.imaging.ImageDetector;
 
-public class TestBrowserSnapshot extends MockitoTest {
+public class TestBrowserSnapshot extends GenericMultiBrowserTest {
 	
-	private static WebDriver driver;
-	private final String browserName = "chrome";
+	
+	private final String browserName = "iexplore";
+	
+	public TestBrowserSnapshot(WebDriver driver, DriverTestPage testPage) throws Exception {
+		super(driver, testPage);
+	}
+	
+	public TestBrowserSnapshot() throws Exception {
+		super(BrowserType.CHROME, "DriverTestPage");  
+	}
 	
 	@BeforeMethod(groups={"it"})
 	public void initDriver(final ITestContext testNGCtx, final ITestResult testResult) throws Exception {
@@ -69,7 +83,7 @@ public class TestBrowserSnapshot extends MockitoTest {
 //		SeleniumTestsContextManager.getThreadContext().setRunMode("grid");
 //		SeleniumTestsContextManager.getThreadContext().setBrowser("firefox");
 //		SeleniumTestsContextManager.getThreadContext().setFirefoxBinary("path to firefox");
-		new DriverTestPage(true); // start displaying page
+		new DriverTestPage(true, testPageUrl); // start displaying page
 		driver = WebUIDriver.getWebDriver(true);
 	}
 	
@@ -186,6 +200,55 @@ public class TestBrowserSnapshot extends MockitoTest {
 		// check all scrollbars where already removed from screenshot
 		Assert.assertEquals(image.getWidth(), screenshotDim.width);
 		Assert.assertEquals(image.getHeight(), screenshotDim.height);
+	}
+	
+	/**
+	 * issue #272: Test taking snapshot inside an iframe when some javascript error occurs. This happens with some website where access to iframe seems denied
+	 * We want to get source and title, even if picture is not get
+	 * @throws Exception 
+	 */
+	@Test(groups={"it"})
+	public void testSnapshotWithJavascriptErrors() throws Exception {
+		
+		driver.switchTo().frame(DriverTestPage.iframe.getElement());
+		
+		// get real capture
+		String origFilePath = generateCaptureFilePath();
+		
+
+		CustomEventFiringWebDriver mockedDriver = (CustomEventFiringWebDriver) spy(driver);
+		ScreenshotUtil screenshotUtil = spy(new ScreenshotUtil(mockedDriver));
+		
+		doThrow(JavascriptException.class).when(mockedDriver).scrollTop();
+		doThrow(JavascriptException.class).when(mockedDriver).scrollTo(anyInt(), anyInt());
+		
+		ScreenShot screenshot = screenshotUtil.capture(Target.PAGE, ScreenShot.class);
+		Assert.assertNotNull(screenshot.getHtmlSourcePath());
+		Assert.assertNotNull(screenshot.getFullImagePath());
+	}
+	
+	/**
+	 * Test that if an unexpected error occurs when snapshot is taken, take desktop
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testSnapshotWithErrors() throws Exception {
+		
+		driver.switchTo().frame(DriverTestPage.iframe.getElement());
+		
+		// get real capture
+		String origFilePath = generateCaptureFilePath();
+		
+		
+		CustomEventFiringWebDriver mockedDriver = (CustomEventFiringWebDriver) spy(driver);
+		ScreenshotUtil screenshotUtil = spy(new ScreenshotUtil(mockedDriver));
+		
+		doThrow(WebDriverException.class).when(mockedDriver).scrollTop();
+		doThrow(JavascriptException.class).when(mockedDriver).scrollTo(anyInt(), anyInt());
+		
+		ScreenShot screenshot = screenshotUtil.capture(Target.PAGE, ScreenShot.class);
+		Assert.assertNotNull(screenshot.getHtmlSourcePath());
+		Assert.assertNotNull(screenshot.getFullImagePath());
 	}
 
 	/**
