@@ -43,6 +43,8 @@ public interface EmailClient {
 	public List<String> checkMessagePresenceInLastMessages(String subject, String[] attachmentNames) throws Exception;
 	public List<String> checkMessagePresenceInLastMessages(String subject, List<String> attachmentNames, Email email) throws Exception;
 	public List<String> checkMessagePresenceInLastMessages(String subject, String[] attachmentNames, Email email) throws Exception;
+	public List<String> checkMessagePresenceInLastMessages(String subject, List<String> attachmentNames, Email email, int timeoutInSeconds) throws Exception;
+	public List<String> checkMessagePresenceInLastMessages(String subject, String[] attachmentNames, Email email, int timeoutInSeconds) throws Exception;
 	public Email getEmail(String subject, List<String> attachmentNames) throws Exception;
 	public Email getEmail(String subject, String[] attachmentNames) throws Exception;
 	public SearchMode getSearchMode();
