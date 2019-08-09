@@ -237,7 +237,12 @@ public class EWSClient extends EmailClientImpl {
 		return lastMessageIndex;
 	}
 
-
+	/**
+	 * Sends a message
+	 * @param to	list of recipients
+	 * @param title	email title
+	 * @param body	content of the email
+	 */
 	@Override
 	public void sendMessage(List<String> to, String title, String body) throws Exception {
 		EmailMessage message = new EmailMessage(service);

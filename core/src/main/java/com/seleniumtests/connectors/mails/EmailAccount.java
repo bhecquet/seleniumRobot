@@ -158,6 +158,23 @@ public class EmailAccount {
 	}
 	
 	/**
+	 * Sends a message
+	 * @param to	list of recipients
+	 * @param title	email title
+	 * @param body	content of the email
+	 * @throws Exception 
+	 */
+	public void sendMessage(List<String> to, String title, String body) throws Exception {
+		
+		getEmailClient();
+		if (emailClient != null) {
+			emailClient.sendMessage(to, title, body);
+		} else {
+			throw new ConfigurationException("Mail server client has not been configured");
+		}
+	}
+	
+	/**
 	 * configure mail account
 	 * @param emailAccount		email account to use
 	 * @return email client
