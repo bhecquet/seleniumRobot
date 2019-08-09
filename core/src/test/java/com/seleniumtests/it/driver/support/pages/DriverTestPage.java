@@ -50,6 +50,7 @@ public class DriverTestPage extends PageObject {
 	public static final ButtonElement delayButtonReset = new ButtonElement("Reset", By.id("buttonDelayReset"));
 	public static final HtmlElement greenSquare = new HtmlElement("Green square", By.id("carre"));
 	public static final HtmlElement redSquare = new HtmlElement("Red Square", By.id("carre2"));
+	public static final HtmlElement bottomSquare = new HtmlElement("Bottom Square", By.id("carreBottom"));
 	public static final HtmlElement parent  = new HtmlElement("parent", By.id("parent"));
 	public static final HtmlElement child  = parent.findElement(By.className("myClass"), 1);
 	public static final HtmlElement divFindName  = new HtmlElement("parent", By.name("divFindName"), 1);
@@ -84,6 +85,7 @@ public class DriverTestPage extends PageObject {
 	public static final HtmlElement searchByXpath = new HtmlElement("", By.xpath("//option[@value=\"opt1\"]"));
 	public static final HtmlElement scrollButton = new HtmlElement("button after scroll", By.id("buttonScroll"));
 	public static final HtmlElement greenBox = new HtmlElement("button to scroll into view", By.id("greenBox"));
+	public static final ButtonElement bigFooterButton = new ButtonElement("Display Big footer", By.id("displayBigFooter"));
 	
 	// Elements inside others
 	public static final HtmlElement parentDiv = new HtmlElement("", By.id("parentDiv"));

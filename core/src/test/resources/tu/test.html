@@ -219,6 +219,12 @@
 	  <div class='boxChild' id='greenBox' onclick="javascript:addText('text2', 'greenbox');"></div>
 	</div>
 	
+	<h3>Test click bottom element</h3>
+	<button id="displayBigFooter" name="displayBigFooter" onclick="javascript:displayBigFooter();">footer</button>
+	<div style="background:orange;height:20px;width:20px;display: inline-block;" onclick="javascript:addText('text2', 'coucou bottom');" id="carreBottom"></div>
+	<div style="height:50px;width:20px;display: block;"></div>
+	<div id="bigfoot" style="background:blue;height:50px;width:500px;position:fixed;bottom:0px;left:0px;display:none;"></div>
+	
 <script src="jquery.min.js">
 </script>
 <script> 
@@ -237,11 +243,17 @@ function addText(id, text) {
 	$("#" + id).val(text);
 }
 
+function displayBigFooter() {
+	console.log("cououc");
+	$('#bigfoot').css("display", "block");
+}
+
 function resetState() {
 	$('#checkboxClick').prop("checked", false);
 	$('#radioClick').prop("checked", false);
 	$('#radioClickParent').prop("checked", false);
 	$('#checkboxClickParent').prop("checked", false);
+	$('#bigfoot').css("display", "none");
 }
 
 function display() {
