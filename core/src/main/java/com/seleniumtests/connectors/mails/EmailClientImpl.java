@@ -203,7 +203,7 @@ public abstract class EmailClientImpl implements EmailClient {
 	
 	@Override
 	public List<String> checkMessagePresenceInLastMessages(String subject, String[] attachmentNames, Email emailOut, int timeoutInSeconds) throws Exception {
-		return checkMessagePresenceInLastMessages(subject, Arrays.asList(attachmentNames), emailOut, 90);
+		return checkMessagePresenceInLastMessages(subject, Arrays.asList(attachmentNames), emailOut, timeoutInSeconds);
 	}
 	
 	/**
