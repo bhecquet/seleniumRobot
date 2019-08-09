@@ -54,27 +54,29 @@ public class TestEmailClient extends MockitoTest {
 	private String password = "";
 	
 	@Mock
-	private ImapClient emailClient;
+	private ImapClient emailClientMock;
 
 	@BeforeMethod(groups={"ut"})
 	public void init() throws Exception {
 		PowerMockito.mockStatic(EmailClientSelector.class);
-		when(EmailClientSelector.routeEmail(any(EmailServer.class), anyString(), anyString(), anyString())).thenReturn(emailClient);
-		when(emailClient.getEmail(anyString(), anyList())).thenCallRealMethod();
-		when(emailClient.getEmail(anyString(), any(String[].class))).thenCallRealMethod();
-		when(emailClient.checkMessagePresenceInLastMessages(anyString(), any(String[].class))).thenCallRealMethod();
-		when(emailClient.checkMessagePresenceInLastMessages(anyString(), anyList())).thenCallRealMethod();
-		when(emailClient.checkMessagePresenceInLastMessages(anyString(), any(String[].class), any(Email.class))).thenCallRealMethod();
-		when(emailClient.checkMessagePresenceInLastMessages(anyString(), anyList(), any(Email.class))).thenCallRealMethod();
-		when(emailClient.getLastEmails(nullable(String.class))).thenCallRealMethod();
-		when(emailClient.getLastEmails()).thenCallRealMethod();
-		when(emailClient.getEmails(anyString())).thenCallRealMethod();
-		when(emailClient.getEmails(anyInt())).thenCallRealMethod();
-		when(emailClient.getEmails(nullable(String.class), anyInt())).thenCallRealMethod();
-		when(emailClient.getEmails(nullable(String.class), nullable(LocalDateTime.class))).thenCallRealMethod();
-		when(emailClient.getEmails(nullable(LocalDateTime.class))).thenCallRealMethod();
-		when(emailClient.getLastMessageIndex()).thenReturn(1);
-		when(emailClient.isTestMode()).thenReturn(true);
+		when(EmailClientSelector.routeEmail(any(EmailServer.class), anyString(), anyString(), anyString())).thenReturn(emailClientMock);
+		when(emailClientMock.getEmail(anyString(), anyList())).thenCallRealMethod();
+		when(emailClientMock.getEmail(anyString(), any(String[].class))).thenCallRealMethod();
+		when(emailClientMock.checkMessagePresenceInLastMessages(anyString(), any(String[].class))).thenCallRealMethod();
+		when(emailClientMock.checkMessagePresenceInLastMessages(anyString(), anyList())).thenCallRealMethod();
+		when(emailClientMock.checkMessagePresenceInLastMessages(anyString(), any(String[].class), any(Email.class))).thenCallRealMethod();
+		when(emailClientMock.checkMessagePresenceInLastMessages(anyString(), anyList(), any(Email.class))).thenCallRealMethod();
+		when(emailClientMock.checkMessagePresenceInLastMessages(anyString(), any(String[].class), any(Email.class), anyInt())).thenCallRealMethod();
+		when(emailClientMock.checkMessagePresenceInLastMessages(anyString(), anyList(), any(Email.class), anyInt())).thenCallRealMethod();
+		when(emailClientMock.getLastEmails(nullable(String.class))).thenCallRealMethod();
+		when(emailClientMock.getLastEmails()).thenCallRealMethod();
+		when(emailClientMock.getEmails(anyString())).thenCallRealMethod();
+		when(emailClientMock.getEmails(anyInt())).thenCallRealMethod();
+		when(emailClientMock.getEmails(nullable(String.class), anyInt())).thenCallRealMethod();
+		when(emailClientMock.getEmails(nullable(String.class), nullable(LocalDateTime.class))).thenCallRealMethod();
+		when(emailClientMock.getEmails(nullable(LocalDateTime.class))).thenCallRealMethod();
+		when(emailClientMock.getLastMessageIndex()).thenReturn(1);
+		when(emailClientMock.isTestMode()).thenReturn(true);
 	}
 	
 	/**
@@ -88,7 +90,7 @@ public class TestEmailClient extends MockitoTest {
 		emails.add(new Email("subject", "text", "someone@company.com", LocalDateTime.now(), new ArrayList<>()));
 		emails.add(new Email("subject2", "text", "someone@company.com", LocalDateTime.now(), new ArrayList<>()));
 		
-		when(emailClient.getEmails(nullable(String.class), eq(1), nullable(LocalDateTime.class))).thenReturn(emails);
+		when(emailClientMock.getEmails(nullable(String.class), eq(1), nullable(LocalDateTime.class))).thenReturn(emails);
 		
 		EmailServer server = new EmailServer(serverUrl, EmailServerTypes.EXCHANGE, "");
 		EmailClient emailClient = EmailClientSelector.routeEmail(server, emailAddress, login, password);
@@ -113,7 +115,7 @@ public class TestEmailClient extends MockitoTest {
 		emails.add(new Email("subject", "text", "someone@company.com", LocalDateTime.now(), new ArrayList<>()));
 		emails.add(new Email("subject2", "text", "someone@company.com", LocalDateTime.now(), new ArrayList<>()));
 		
-		when(emailClient.getEmails(nullable(String.class), eq(1), nullable(LocalDateTime.class))).thenReturn(emails);
+		when(emailClientMock.getEmails(nullable(String.class), eq(1), nullable(LocalDateTime.class))).thenReturn(emails);
 		
 		EmailServer server = new EmailServer(serverUrl, EmailServerTypes.EXCHANGE, "");
 		EmailClient emailClient = EmailClientSelector.routeEmail(server, emailAddress, login, password);
@@ -133,7 +135,7 @@ public class TestEmailClient extends MockitoTest {
 		emails.add(new Email("subject", "text", "someone@company.com", LocalDateTime.now(), Arrays.asList(new String[] {"infos.pdf", "contract-123.txt"})));
 		emails.add(new Email("subject2", "text", "someone@company.com", LocalDateTime.now(), Arrays.asList(new String[] {"contract-123.pdf", "infos.txt"})));
 		
-		when(emailClient.getEmails(nullable(String.class), eq(1), nullable(LocalDateTime.class))).thenReturn(emails);
+		when(emailClientMock.getEmails(nullable(String.class), eq(1), nullable(LocalDateTime.class))).thenReturn(emails);
 		
 		EmailServer server = new EmailServer(serverUrl, EmailServerTypes.EXCHANGE, "");
 		EmailClient emailClient = EmailClientSelector.routeEmail(server, emailAddress, login, password);
@@ -153,7 +155,7 @@ public class TestEmailClient extends MockitoTest {
 		emails.add(new Email("subject", "text", "someone@company.com", LocalDateTime.now(), Arrays.asList(new String[] {"infos.pdf", "contract-123.txt"})));
 		emails.add(new Email("subject2", "text", "someone@company.com", LocalDateTime.now(), Arrays.asList(new String[] {"contract-123.pdf"})));
 		
-		when(emailClient.getEmails(nullable(String.class), eq(1), nullable(LocalDateTime.class))).thenReturn(emails);
+		when(emailClientMock.getEmails(nullable(String.class), eq(1), nullable(LocalDateTime.class))).thenReturn(emails);
 		
 		EmailServer server = new EmailServer(serverUrl, EmailServerTypes.EXCHANGE, "");
 		EmailClient emailClient = EmailClientSelector.routeEmail(server, emailAddress, login, password);
@@ -174,8 +176,8 @@ public class TestEmailClient extends MockitoTest {
 		emails.add(new Email("subject", "text", "someone@company.com", LocalDateTime.now(), Arrays.asList(new String[] {"infos.pdf", "contract-123.txt"})));
 		emails.add(new Email("subject2", "text", "someone@company.com", LocalDateTime.now(), Arrays.asList(new String[] {"contract-123.pdf", "infos.txt"})));
 		
-		when(emailClient.getEmails(nullable(String.class), eq(1), nullable(LocalDateTime.class))).thenReturn(emails.subList(0, 1), emails);
-		when(emailClient.isTestMode()).thenReturn(false);
+		when(emailClientMock.getEmails(nullable(String.class), eq(1), nullable(LocalDateTime.class))).thenReturn(emails.subList(0, 1), emails);
+		when(emailClientMock.isTestMode()).thenReturn(false);
 		
 		EmailServer server = new EmailServer(serverUrl, EmailServerTypes.EXCHANGE, "");
 		EmailClient emailClient = EmailClientSelector.routeEmail(server, emailAddress, login, password);
@@ -195,7 +197,7 @@ public class TestEmailClient extends MockitoTest {
 		emails.add(new Email("subject", "text", "someone@company.com", LocalDateTime.now(), Arrays.asList(new String[] {"infos.pdf", "contract-123.txt"})));
 		emails.add(new Email("subject2", "text", "someone@company.com", LocalDateTime.now(), Arrays.asList(new String[] {"contract-123.pdf", "infos.txt"})));
 		
-		when(emailClient.getEmails(nullable(String.class), eq(1), nullable(LocalDateTime.class))).thenReturn(emails);
+		when(emailClientMock.getEmails(nullable(String.class), eq(1), nullable(LocalDateTime.class))).thenReturn(emails);
 		
 		EmailServer server = new EmailServer(serverUrl, EmailServerTypes.EXCHANGE, "");
 		EmailClient emailClient = EmailClientSelector.routeEmail(server, emailAddress, login, password);
@@ -217,7 +219,7 @@ public class TestEmailClient extends MockitoTest {
 		emails.add(new Email("subject", "text", "someone@company.com", LocalDateTime.now(), Arrays.asList(new String[] {"infos.pdf", "contract-123.txt"})));
 		emails.add(new Email("subject2", "text", "someone@company.com", LocalDateTime.now(), Arrays.asList(new String[] {"contract-123.pdf"})));
 		
-		when(emailClient.getEmails(nullable(String.class), eq(1), nullable(LocalDateTime.class))).thenReturn(emails);
+		when(emailClientMock.getEmails(nullable(String.class), eq(1), nullable(LocalDateTime.class))).thenReturn(emails);
 		
 		EmailServer server = new EmailServer(serverUrl, EmailServerTypes.EXCHANGE, "");
 		EmailClient emailClient = EmailClientSelector.routeEmail(server, emailAddress, login, password);
@@ -240,7 +242,7 @@ public class TestEmailClient extends MockitoTest {
 		emails.add(new Email("subject", "text", "someone@company.com", LocalDateTime.now(), Arrays.asList(new String[] {"infos.pdf", "contract-123.txt"})));
 		emails.add(new Email("subject2", "text", "someone@company.com", LocalDateTime.now(), Arrays.asList(new String[] {"contract-123.pdf"})));
 		
-		when(emailClient.getEmails(nullable(String.class), eq(1), nullable(LocalDateTime.class))).thenReturn(emails);
+		when(emailClientMock.getEmails(nullable(String.class), eq(1), nullable(LocalDateTime.class))).thenReturn(emails);
 		
 		EmailServer server = new EmailServer(serverUrl, EmailServerTypes.EXCHANGE, "");
 		EmailClient emailClient = EmailClientSelector.routeEmail(server, emailAddress, login, password);
@@ -263,7 +265,7 @@ public class TestEmailClient extends MockitoTest {
 		emails.add(new Email("subject2", "text", "someone@company.com", LocalDateTime.now(), Arrays.asList(new String[] {"contract-123.pdf", "infos.txt"})));
 		emails.add(new Email("subject3", "text", "someone@company.com", LocalDateTime.now(), Arrays.asList(new String[] {"contract-123.pdf"})));
 		
-		when(emailClient.getEmails(nullable(String.class), eq(1), nullable(LocalDateTime.class))).thenReturn(emails);
+		when(emailClientMock.getEmails(nullable(String.class), eq(1), nullable(LocalDateTime.class))).thenReturn(emails);
 		
 		EmailServer server = new EmailServer(serverUrl, EmailServerTypes.EXCHANGE, "");
 		EmailClient emailClient = EmailClientSelector.routeEmail(server, emailAddress, login, password);
