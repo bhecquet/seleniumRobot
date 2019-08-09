@@ -54,6 +54,7 @@ import org.testng.Assert;
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.TestTasks;
+import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.CustomSeleniumTestsException;
 import com.seleniumtests.customexception.NotCurrentPageException;
 import com.seleniumtests.customexception.ScenarioException;
@@ -136,6 +137,10 @@ public class PageObject extends BasePage implements IPage {
 
         this.pageIdentifierElement = pageIdentifierElement;
         driver = WebUIDriver.getWebDriver(true, browserType, driverName, attachExistingDriverPort);
+        
+        if (driver == null && url != null) {
+        	throw new ConfigurationException("driver is null, 'browser' configuration may be empty");
+        }
         
         // open page
         openPage(url);
