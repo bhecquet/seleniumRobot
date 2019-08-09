@@ -354,6 +354,11 @@ public class TestDriverFirefox extends TestDriver {
 		super.testScrollIntoDiv();
 	}
 
+	@Test(groups={"it", "ut"})
+	public void testScrollToBottom() {
+		super.testScrollToBottom();
+	}
+
 	@Test(groups= {"it", "ut"})
 	public void testCaptureWhenWindowIsClosed() throws Exception {
 		super.testCaptureWhenWindowIsClosed();

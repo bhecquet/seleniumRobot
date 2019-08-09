@@ -24,7 +24,6 @@ import org.testng.annotations.Test;
 
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.it.driver.TestDriver;
-import com.seleniumtests.it.driver.support.pages.DriverTestPage;
 
 public class TestDriverChrome extends TestDriver {
 
@@ -354,6 +353,11 @@ public class TestDriverChrome extends TestDriver {
 	@Test(groups={"it", "ut"})
 	public void testScrollIntoDiv() {
 		super.testScrollIntoDiv();
+	}
+	
+	@Test(groups={"it", "ut"})
+	public void testScrollToBottom() {
+		super.testScrollToBottom();
 	}
 	
 	@Test(groups= {"it", "ut"})

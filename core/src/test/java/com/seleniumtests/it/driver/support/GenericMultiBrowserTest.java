@@ -105,21 +105,19 @@ public abstract class GenericMultiBrowserTest extends MockitoTest {
 		return mapping;
 	}
 	
+	@BeforeMethod(groups={"ut", "it"})  
+	public void initBeforeMethod() {
+		SeleniumTestsContextManager.getThreadContext().setExplicitWaitTimeout(2);
+		SeleniumTestsContextManager.getThreadContext().setBrowser(browserType.getBrowserType());
+		SeleniumTestsContextManager.getThreadContext().setCaptureSnapshot(false);
+		SeleniumTestsContextManager.getThreadContext().setTestType(TestType.WEB);
 
-	public void initThreadContext(final ITestContext testNGCtx) {
-		try {
-			SeleniumTestsContextManager.initGlobalContext(testNGCtx);
-			SeleniumTestsContextManager.initThreadContext(testNGCtx, null, null, null);
-			SeleniumTestsContextManager.getThreadContext().setSoftAssertEnabled(false);
-			SeleniumTestsContextManager.getThreadContext().setVideoCapture(VideoCaptureMode.FALSE.toString());
-			SeleniumTestsContextManager.getGlobalContext().setSoftAssertEnabled(false); 
-			SeleniumTestsContextManager.getGlobalContext().setVideoCapture(VideoCaptureMode.FALSE.toString());
-		} catch (Exception e) {
-			e.printStackTrace();
-			throw e;
-		}
+		// grid support
+//		SeleniumTestsContextManager.getThreadContext().setWebDriverGrid("http://127.0.0.1:4444/wd/hub");
+//		SeleniumTestsContextManager.getThreadContext().setRunMode("grid");
 	}
-
+	
+	
 	@BeforeClass(groups={"it", "ut"})
 	public void exposeTestPage(final ITestContext testNGCtx) throws Exception {
 
@@ -137,15 +135,7 @@ public abstract class GenericMultiBrowserTest extends MockitoTest {
         logger.info(String.format("exposing server on http://%s:%d", localAddress, server.getServerHost().getPort()));
 
 		initThreadContext(testNGCtx);
-		this.testNGCtx = testNGCtx;
-		SeleniumTestsContextManager.getThreadContext().setExplicitWaitTimeout(2);
-		SeleniumTestsContextManager.getThreadContext().setBrowser(browserType.getBrowserType());
-		SeleniumTestsContextManager.getThreadContext().setCaptureSnapshot(false);
-		SeleniumTestsContextManager.getThreadContext().setTestType(TestType.WEB);
 		
-		// grid support
-//		SeleniumTestsContextManager.getThreadContext().setWebDriverGrid("http://127.0.0.1:4444/wd/hub");
-//		SeleniumTestsContextManager.getThreadContext().setRunMode("grid");
 		
 		switch (testPageName) {
 		case "DriverTestPageWithoutFixedPattern":

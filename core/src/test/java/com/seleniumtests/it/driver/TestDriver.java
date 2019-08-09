@@ -19,8 +19,6 @@ package com.seleniumtests.it.driver;
 
 import java.awt.AWTException;
 import java.io.File;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import java.util.Date;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -49,7 +47,6 @@ import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.it.driver.support.GenericMultiBrowserTest;
 import com.seleniumtests.it.driver.support.pages.DriverSubTestPage;
 import com.seleniumtests.it.driver.support.pages.DriverTestPage;
-import com.seleniumtests.it.driver.support.pages.DriverTestPageWithoutFixedPattern;
 import com.seleniumtests.uipage.htmlelements.HtmlElement;
 import com.seleniumtests.util.helper.WaitHelper;
 
@@ -713,8 +710,28 @@ public class TestDriver extends GenericMultiBrowserTest {
 	 */
 	@Test(groups={"it", "ut"})
 	public void testScrollIntoDiv() {
-		DriverTestPage.greenBox.click();
-		Assert.assertEquals(DriverTestPage.textElement.getValue(), "greenbox");
+		try {
+			DriverTestPage.greenBox.click();
+			Assert.assertEquals(DriverTestPage.textElement.getValue(), "greenbox");
+		} finally {
+			DriverTestPage.resetButton.click();
+			Assert.assertEquals("", DriverTestPage.textElement.getValue());
+		}
+	}
+	
+	/**
+	 * issue #274: check that scrolling is correct and we can click on an element at the bottom of the page
+	 */
+	@Test(groups={"it", "ut"})
+	public void testScrollToBottom() {
+		try {
+			DriverTestPage.bigFooterButton.click();
+			DriverTestPage.bottomSquare.click();
+			Assert.assertEquals("coucou bottom", DriverTestPage.textElement.getValue());
+		} finally {
+			DriverTestPage.resetButton.click();
+			Assert.assertEquals("", DriverTestPage.textElement.getValue());
+		}
 	}
 	
 	/**

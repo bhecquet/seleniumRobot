@@ -93,6 +93,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 
     protected static final Logger logger = SeleniumRobotLogger.getLogger(HtmlElement.class);
     public static final Integer FIRST_VISIBLE = Integer.MAX_VALUE;
+    public static final Integer OPTIMAL_SCROLLING = Integer.MAX_VALUE;
     
     String JS_CLICK_TRIPLE = 
     		  "var target = arguments[0];" +
@@ -526,7 +527,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
         
         if (makeVisible) { 
         	makeWebElementVisible(element);
-    		((CustomEventFiringWebDriver)driver).scrollToElement(element, -200);	
+    		((CustomEventFiringWebDriver)driver).scrollToElement(element, OPTIMAL_SCROLLING);	
         }
         
         // wait for element to be really visible. should be done only for actions on element

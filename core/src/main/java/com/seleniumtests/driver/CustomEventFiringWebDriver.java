@@ -468,6 +468,16 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
 				((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", element);
 				WebElement parentScrollableElement = (WebElement) ((JavascriptExecutor) driver).executeScript(JS_SCROLL_PARENT, element, (driver instanceof SafariDriver) ? "safari": "other");
 				if (parentScrollableElement != null) {
+					// check if scrollbar of parent is at bottom. In this case, going upside (yOffset < 0), could hide searched element.
+					// scrollIntoView is configured position scrollbar to top position of the searched element.
+					// in case offset is > 0, this has no impact as scrollBottom will always be < 0
+					Long scrollBottom = -(Long) ((JavascriptExecutor) driver).executeScript("return arguments[0].scrollHeight - arguments[0].scrollTop - arguments[0].clientHeight", parentScrollableElement);
+					
+					// in case of optimal scrolling, by default, we will go upside by 200 px in order to prevent "header" presence.
+					if (yOffset == Integer.MAX_VALUE) {// equivalent to HtmlElement.OPTIMAL_SCROLLING but, for grid, we do not want dependency between the 2 classes
+						yOffset = (int) Math.max(scrollBottom, -200);
+					}
+					
 					((JavascriptExecutor) driver).executeScript("arguments[0].scrollTop += arguments[1]", parentScrollableElement, yOffset);
 				}
 				
