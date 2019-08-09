@@ -141,12 +141,18 @@ public class ImageDetector {
 		}
 	}
 	
+	/**
+	 * Allow to test Image matching directly outside of a test
+	 * @param args
+	 */
 	public static void main(String[] args) {
 		ImageDetector detector = new ImageDetector(new File(args[0]), new File(args[1]), new Double(args[2]));
 		
 		detector.detectExactZoneWithScale();
 		Rectangle detectedObjectRectangle = detector.getDetectedRectangle();
+		System.out.println("Detected Zone: " + detectedObjectRectangle.toString());
 		double pictureSizeRatio = detector.getSizeRatio();
+		System.out.println("Aspect ratio: " + pictureSizeRatio);
 	}
 	
 	public ImageDetector() {

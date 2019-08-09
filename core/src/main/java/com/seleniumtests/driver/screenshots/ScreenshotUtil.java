@@ -32,6 +32,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.Dimension;
+import org.openqa.selenium.JavascriptException;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
@@ -321,6 +322,11 @@ public class ScreenshotUtil {
         		images.add(new NamedBufferedImage(captureWebPage(), "Current Window: "));
         		
         	} catch (Exception e) {
+        		try {
+            		images.add(new NamedBufferedImage(captureDesktop(), "Desktop"));
+            	} catch (ScenarioException e1) {
+            		logger.warn("could not capture desktop: " + e1.getMessage());
+            	}
             }
         }
 
@@ -344,13 +350,17 @@ public class ScreenshotUtil {
             return null;
         }
     	
-    	((CustomEventFiringWebDriver)driver).scrollTop();
-    	
     	int scrollY = 0;
     	int scrollX = 0;
     	int maxLoops = ((contentDimension.height / (viewDimensions.height - topPixelsToCrop - bottomPixelsToCrop)) + 1) * ((contentDimension.width / viewDimensions.width) + 1) + 3;
     	int loops = 0;
     	int currentImageHeight = 0;
+    	
+    	try {
+    		((CustomEventFiringWebDriver)driver).scrollTop();
+    	} catch (JavascriptException e) {
+    		maxLoops = 1;
+		}
     	
     	BufferedImage currentImage = null;
     	while (loops < maxLoops) {
@@ -361,7 +371,10 @@ public class ScreenshotUtil {
 			
 			// do not scroll to much so that we can crop fixed header without loosing content
 			scrollY = currentImageHeight - cropTop;
-			((CustomEventFiringWebDriver)driver).scrollTo(scrollX, scrollY);
+			
+			try {
+				((CustomEventFiringWebDriver)driver).scrollTo(scrollX, scrollY);
+			} catch (JavascriptException e) {}
 			
 			BufferedImage image = capturePage(cropTop, cropBottom);
 			if (image == null) {
