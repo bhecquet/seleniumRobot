@@ -18,6 +18,8 @@
 package com.seleniumtests.connectors.mails;
 
 import java.io.IOException;
+import java.time.Clock;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -186,7 +188,7 @@ public abstract class EmailClientImpl implements EmailClient {
 	}
 	
 	/**
-	 * Check that email whose subject and attachements are specified have been received
+	 * Check that email whose subject and attachements are specified have been received. Wait 90 secs
 	 * @param subject			subject title. Regex are accepted
 	 * @param attachmentNames	list of attachment names. Regex are allowed
 	 * @param emailOut			an empty email which will store found email
@@ -196,12 +198,35 @@ public abstract class EmailClientImpl implements EmailClient {
 	 */
 	@Override
 	public List<String> checkMessagePresenceInLastMessages(String subject, List<String> attachmentNames, Email emailOut) throws Exception {
+		return checkMessagePresenceInLastMessages(subject, attachmentNames, emailOut, 90);
+	}
+	
+	@Override
+	public List<String> checkMessagePresenceInLastMessages(String subject, String[] attachmentNames, Email emailOut, int timeoutInSeconds) throws Exception {
+		return checkMessagePresenceInLastMessages(subject, Arrays.asList(attachmentNames), emailOut, 90);
+	}
+	
+	/**
+	 * Check that email whose subject and attachements are specified have been received
+	 * @param subject			subject title. Regex are accepted
+	 * @param attachmentNames	list of attachment names. Regex are allowed
+	 * @param emailOut			an empty email which will store found email
+	 * @param timeoutInSeconds	time to wait for the requested emails
+	 * 
+	 * @return null if no email found or list of missing attachments if an email has been found
+	 * @throws Exception 
+	 */
+	@Override
+	public List<String> checkMessagePresenceInLastMessages(String subject, List<String> attachmentNames, Email emailOut, int timeoutInSeconds) throws Exception {
 		
 		List<Email> emailList = getEmails(subject);
 		Map<Email, List<String>> missingAttachmentsPerEmail = new HashMap<>();
 		
+		Clock clock = Clock.systemUTC();
+		Instant end = clock.instant().plusSeconds(timeoutInSeconds);
+		
 		// try several times
-		for (int i = 0; i < 10; i++) {
+		while (end.isAfter(clock.instant())) {
 			
 			for (Email email: emailList) {
 				List<String> missingAttachments = getMissingAttachments(attachmentNames, email);
