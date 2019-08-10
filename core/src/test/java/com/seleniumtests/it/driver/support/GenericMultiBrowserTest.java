@@ -135,7 +135,7 @@ public abstract class GenericMultiBrowserTest extends MockitoTest {
         logger.info(String.format("exposing server on http://%s:%d", localAddress, server.getServerHost().getPort()));
 
 		initThreadContext(testNGCtx);
-		
+		initBeforeMethod();
 		
 		switch (testPageName) {
 		case "DriverTestPageWithoutFixedPattern":
