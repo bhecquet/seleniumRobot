@@ -107,6 +107,10 @@ public abstract class GenericMultiBrowserTest extends MockitoTest {
 	
 	@BeforeMethod(groups={"ut", "it"})  
 	public void initBeforeMethod() {
+		if (browserType == null || !installedBrowsers.contains(browserType)) {
+			return;
+		}
+		
 		SeleniumTestsContextManager.getThreadContext().setExplicitWaitTimeout(2);
 		SeleniumTestsContextManager.getThreadContext().setBrowser(browserType.getBrowserType());
 		SeleniumTestsContextManager.getThreadContext().setCaptureSnapshot(false);
