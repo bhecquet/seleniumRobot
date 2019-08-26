@@ -62,7 +62,7 @@ import com.seleniumtests.util.imaging.ImageDetector;
 public class TestBrowserSnapshot extends GenericMultiBrowserTest {
 	
 	
-	private final String browserName = "iexplore";
+	private final String browserName = "chrome";
 	
 	public TestBrowserSnapshot(WebDriver driver, DriverTestPage testPage) throws Exception {
 		super(driver, testPage);
@@ -175,7 +175,7 @@ public class TestBrowserSnapshot extends GenericMultiBrowserTest {
 		// get cropped picture
 		BufferedImage image = new ScreenshotUtil(driver).capture(Target.PAGE, BufferedImage.class);
 		
-		// check all scrollbars where already removed from screenshot
+		// check all scrollbars were already removed from screenshot
 		Assert.assertEquals(image.getWidth(), screenshotDim.width);
 		Assert.assertEquals(image.getHeight(), screenshotDim.height);
 	}
