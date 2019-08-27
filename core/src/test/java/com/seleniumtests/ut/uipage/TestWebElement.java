@@ -102,6 +102,7 @@ public class TestWebElement extends MockitoTest {
 	public void reset() {
 		
 		// call testPage switchTo().defaultContent() so that it can be intercepted and seleniumRobot internal state can be reset
+		// issue #275: state is not automatically reset because the driver is the same
 		if (testPage != null) {
 			testPage.switchDefaultContent();
 		}

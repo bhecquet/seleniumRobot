@@ -47,7 +47,6 @@ public class DriverTestPageNativeActions extends PageObject {
     }
     
     public DriverTestPageNativeActions sendKeys() {
-    	System.out.println("source: " + driver.getPageSource());
     	driver.findElement(By.id("text2")).sendKeys("some text");
     	return this;
     }
