@@ -20,34 +20,21 @@ package com.seleniumtests.it.driver;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.testng.Assert;
-import org.testng.ITestContext;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import com.seleniumtests.GenericTest;
-import com.seleniumtests.core.SeleniumTestsContextManager;
-import com.seleniumtests.driver.WebUIDriver;
+import com.seleniumtests.driver.BrowserType;
+import com.seleniumtests.it.driver.support.GenericMultiBrowserTest;
 import com.seleniumtests.it.driver.support.pages.DriverSubTestPage;
 import com.seleniumtests.it.driver.support.pages.DriverTestPage;
 
-public class TestNewWindow extends GenericTest {
-
-	private static WebDriver driver;
-	private static DriverTestPage testPage;
+public class TestNewWindow  extends GenericMultiBrowserTest {
 	
-	@BeforeClass(groups={"it"})
-	public void initDriver(final ITestContext testNGCtx) throws Exception {
-		initThreadContext(testNGCtx);
-		SeleniumTestsContextManager.getThreadContext().setExplicitWaitTimeout(2);
-		SeleniumTestsContextManager.getThreadContext().setBrowser("chrome");
-		testPage = new DriverTestPage(true);
-		driver = WebUIDriver.getWebDriver(true);
+	public TestNewWindow(WebDriver driver, DriverTestPage testPage) throws Exception {
+		super(driver, testPage);
 	}
-
-	@AfterClass(groups={"it"}, alwaysRun=true)
-	public void closeBrowser() {
-		WebUIDriver.cleanUp();
+	
+	public TestNewWindow() throws Exception {
+		super(BrowserType.CHROME, "DriverTestPage");  
 	}
 	
 	/**
