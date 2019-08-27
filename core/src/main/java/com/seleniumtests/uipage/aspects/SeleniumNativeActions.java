@@ -17,6 +17,9 @@
  */
 package com.seleniumtests.uipage.aspects;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -26,16 +29,37 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.uipage.htmlelements.FrameElement;
 import com.seleniumtests.uipage.htmlelements.HtmlElement;
 
 @Aspect
 public class SeleniumNativeActions {
 
-	private FrameElement currentFrame;
+	private Map<WebUIDriver, FrameElement> currentFrame = new HashMap<>();
 
 	private Boolean doOverride() {
 		return SeleniumTestsContextManager.getThreadContext().getOverrideSeleniumNativeAction();
+	}
+	
+	private FrameElement getCurrentFrame() {
+		WebUIDriver uiDriver = WebUIDriver.getWebUIDriver(false);
+		if (uiDriver == null) {
+			return null;
+		}
+		if (!currentFrame.containsKey(uiDriver)) {
+			currentFrame.put(uiDriver, null);
+		}
+		
+		return currentFrame.get(uiDriver);
+	}
+	
+	private void setCurrentFrame(FrameElement frame) {
+		WebUIDriver uiDriver = WebUIDriver.getWebUIDriver(false);
+		if (uiDriver == null) {
+			return;
+		}
+		currentFrame.put(uiDriver, frame);
 	}
 	
 	/**
@@ -51,7 +75,7 @@ public class SeleniumNativeActions {
 			)
 	public Object interceptFindHtmlElement(ProceedingJoinPoint joinPoint) throws Throwable {
 		if (doOverride()) {
-			return new HtmlElement("", (By)(joinPoint.getArgs()[0]), currentFrame);
+			return new HtmlElement("", (By)(joinPoint.getArgs()[0]), getCurrentFrame());
 		} else {
 			return joinPoint.proceed(joinPoint.getArgs());			
 		}
@@ -63,7 +87,7 @@ public class SeleniumNativeActions {
 			)
 	public Object interceptFindsHtmlElement(ProceedingJoinPoint joinPoint) throws Throwable {
 		if (doOverride()) {
-			return new HtmlElement("", (By)(joinPoint.getArgs()[0]), currentFrame).findElements();
+			return new HtmlElement("", (By)(joinPoint.getArgs()[0]), getCurrentFrame()).findElements();
 		} else {
 			return joinPoint.proceed(joinPoint.getArgs());
 		}
@@ -89,11 +113,11 @@ public class SeleniumNativeActions {
 				return joinPoint.proceed(joinPoint.getArgs());
 			}
 			
-			if (currentFrame == null) {
-				currentFrame = frameEl;
+			if (getCurrentFrame() == null) {
+				setCurrentFrame(frameEl);
 			} else {
-				frameEl.setFrameElement(currentFrame);
-				currentFrame = frameEl;
+				frameEl.setFrameElement(getCurrentFrame());
+				setCurrentFrame(frameEl);
 			}
 
 			return new ExpectedCondition<WebDriver>() {
@@ -137,11 +161,11 @@ public class SeleniumNativeActions {
 				return joinPoint.proceed(joinPoint.getArgs());
 			}
 
-			if (currentFrame == null) {
-				currentFrame = frameEl;
+			if (getCurrentFrame() == null) {
+				setCurrentFrame(frameEl);
 			} else {
-				frameEl.setFrameElement(currentFrame);
-				currentFrame = frameEl;
+				frameEl.setFrameElement(getCurrentFrame());
+				setCurrentFrame(frameEl);
 			}
 			return null;
 		} else {
@@ -162,7 +186,7 @@ public class SeleniumNativeActions {
 		} else if (frameArg instanceof By) {
 			frameEl = new FrameElement("", (By)frameArg);
 		} else if (frameArg instanceof Integer) {
-			frameEl = new FrameElement("", By.tagName("iframe"), 0);
+			frameEl = new FrameElement("", By.tagName("iframe"), (Integer) frameArg);
 		} else if (frameArg instanceof String) {
 			String name = ((String)frameArg).replaceAll("(['\"\\\\#.:;,!?+<>=~*^$|%&@`{}\\-/\\[\\]\\(\\)])", "\\\\$1");
 			frameEl = new FrameElement("", By.cssSelector("frame[name='" + name + "'],iframe[name='" + name + "'],frame#" + name + ",iframe#" + name));
@@ -175,7 +199,7 @@ public class SeleniumNativeActions {
 			+ ")"			
 			)
 	public Object recordSwitchDefaultContext(ProceedingJoinPoint joinPoint) throws Throwable {
-		currentFrame = null;
+		setCurrentFrame(null);
 		return joinPoint.proceed(joinPoint.getArgs());
 	}
 	
@@ -185,10 +209,10 @@ public class SeleniumNativeActions {
 			+ ")"			
 			)
 	public Object recordSwitchParentFrame(ProceedingJoinPoint joinPoint) throws Throwable {
-		if (currentFrame == null || !doOverride()) {
+		if (getCurrentFrame() == null || !doOverride()) {
 			return joinPoint.proceed(joinPoint.getArgs());
 		} else {
-			currentFrame = currentFrame.getFrameElement();
+			setCurrentFrame(getCurrentFrame().getFrameElement());
 		}
 		return null;
 		
