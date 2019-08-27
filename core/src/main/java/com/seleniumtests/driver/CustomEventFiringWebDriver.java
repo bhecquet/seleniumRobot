@@ -526,6 +526,7 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
 						}
 						
 						((JavascriptExecutor) driver).executeScript("arguments[0].scrollTop += arguments[1]", parentScrollableElement, yOffset);
+						WaitHelper.waitForMilliSeconds(500); // wait a bit so that scrolling is complete
 					}
 				} else {
 					// go to default behavior
