@@ -788,7 +788,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		
 		// read the 'testDriverNativeActions' test result to see if native actions are also logged (overrideSeleniumNativeAction is true)
 		String detailedReportContent2 = readTestMethodResultFile("testDriverNativeActions");
-		
+		System.out.println(detailedReportContent2);
 		Assert.assertTrue(detailedReportContent2.contains("<li>sendKeys on HtmlElement , by={By.id: text2} with args: (true, true, [some text,], )</li>"));
 		Assert.assertTrue(detailedReportContent2.contains("<li>click on HtmlElement , by={By.id: button2} </li>"));
 		
