@@ -169,9 +169,11 @@ public abstract class GenericMultiBrowserTest extends MockitoTest {
 	@AfterClass(groups={"it", "ut"}, alwaysRun=true)
 	public void stop() throws Exception {
 		if (server != null) {
+			logger.info("stopping web server");
 			server.stop();
 		}
 		if (WebUIDriver.getWebDriver(false) != null) {
+			logger.info("closing driver after all tests");
 			WebUIDriver.cleanUp();
 		}
 		driver = null;
