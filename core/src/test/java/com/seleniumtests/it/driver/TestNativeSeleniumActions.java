@@ -49,17 +49,6 @@ public class TestNativeSeleniumActions extends GenericMultiBrowserTest {
 		}
 	}
 	
-	@AfterMethod(groups={"it", "ut"}, alwaysRun=true)
-	public void cleanAlert() {
-		try {
-			if (driver != null) {
-				driver.switchTo().alert().accept();
-			}
-		} catch (WebDriverException e) {
-			
-		}
-	}
-	
 	/**
 	 * issue #228: check that searching a non existing element inside frame does not lose frame focus
 	 */

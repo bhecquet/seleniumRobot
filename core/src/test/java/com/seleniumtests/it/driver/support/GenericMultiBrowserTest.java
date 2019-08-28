@@ -37,7 +37,6 @@ import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.TestType;
 import com.seleniumtests.driver.WebUIDriver;
-import com.seleniumtests.driver.screenshots.VideoCaptureMode;
 import com.seleniumtests.it.driver.support.pages.DriverSubAngularTestPage;
 import com.seleniumtests.it.driver.support.pages.DriverTestAngularFrame;
 import com.seleniumtests.it.driver.support.pages.DriverTestPage;
