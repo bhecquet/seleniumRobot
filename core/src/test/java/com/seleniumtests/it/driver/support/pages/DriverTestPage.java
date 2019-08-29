@@ -127,6 +127,10 @@ public class DriverTestPage extends PageObject {
 	public static final HtmlElement rows = new HtmlElement("", By.tagName("tr"), iframe);
 	public static final LabelElement labelIFrame = new LabelElement("label", By.id("labelIFrame"), iframe);
 	
+	// second IFrame on main page
+	public static final FrameElement secondIframe = new FrameElement("IFrame", By.tagName("iframe"), 1);
+	public static final TextFieldElement textElementSecondIFrame = new TextFieldElement("Text", By.id("textInIFrameWithValue2"), secondIframe);
+	
 	public static final TextFieldElement textElementSubIFrame = new TextFieldElement("Text", By.id("textInIFrameWithValue2"), subIframe);
 	
 	// Elements for Angular IFrame

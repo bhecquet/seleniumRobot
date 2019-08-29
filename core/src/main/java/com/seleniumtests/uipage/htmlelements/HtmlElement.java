@@ -610,7 +610,13 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 		}
 
 		for (FrameElement frameEl: frameTree) {
-			WebElement frameWebElement = driver.findElement(frameEl.getBy());
+			Integer idx = frameEl.getElementIndex() == null ? 0: frameEl.getElementIndex();
+			WebElement frameWebElement;
+			try {
+				frameWebElement = driver.findElements(frameEl.getBy()).get(idx);
+			} catch (IndexOutOfBoundsException e) {
+				throw new ScenarioException(String.format("Frame %s with index %d has not been found", frameEl, idx));
+			}
 			((CustomEventFiringWebDriver)driver).scrollToElement(frameWebElement, -20);		
 			driver.switchTo().frame(frameWebElement);
 		}
