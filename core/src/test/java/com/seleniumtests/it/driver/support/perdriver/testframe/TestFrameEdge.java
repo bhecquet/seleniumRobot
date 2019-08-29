@@ -96,5 +96,10 @@ public class TestFrameEdge extends TestFrame {
 	@Test(groups={"it"})
 	public void testBackToMainFrame() {
 		super.testBackToMainFrame();
-	}	
+	}
+
+	@Test(groups={"it"})
+	public void testFrameInSecondFrameText() {
+		super.testFrameInSecondFrameText();
+	}
 }

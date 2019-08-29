@@ -110,6 +110,14 @@ public class TestFrame extends GenericMultiBrowserTest {
 	}
 	
 	/**
+	 * issue #276: check we can get an element inside second iframe (searching by index)
+	 */
+	@Test(groups={"it"})
+	public void testFrameInSecondFrameText() {
+		Assert.assertEquals(DriverTestPage.textElementSecondIFrame.getValue(), "an other value in iframe");
+	}
+	
+	/**
 	 * test that when working with an element inside frame, we automatically go back to default content before next element action
 	 */
 	@Test(groups={"it"})

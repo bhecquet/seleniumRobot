@@ -17,15 +17,18 @@
  */
 package com.seleniumtests.ut.uipage.htmlelements;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyBoolean;
-import static org.mockito.ArgumentMatchers.anyInt;
 
+import java.util.Arrays;
+
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.openqa.selenium.By;
@@ -37,11 +40,13 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.RemoteWebElement;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import com.seleniumtests.MockitoTest;
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.uipage.htmlelements.ButtonElement;
@@ -77,6 +82,8 @@ public class TestFrameElement extends MockitoTest {
 	private RemoteWebElement frameEl;
 	@Mock
 	private RemoteWebElement frameEl2;
+	@Mock
+	private RemoteWebElement subFrameEl;
 	
 	private CustomEventFiringWebDriver eventDriver;
 
@@ -93,10 +100,15 @@ public class TestFrameElement extends MockitoTest {
 		when(WebUIDriver.getWebDriver(anyBoolean())).thenReturn(eventDriver);
 		when(driver.findElement(By.id("el"))).thenReturn(element);
 		when(element.findElement(By.id("link"))).thenReturn(link);
-		when(driver.findElement(By.id("frameId"))).thenReturn(frameEl);
-		when(driver.findElement(By.id("frameId2"))).thenReturn(frameEl2);
+		when(driver.findElements(By.id("frameId"))).thenReturn(Arrays.asList(frameEl));
+		when(driver.findElements(By.id("frameId2"))).thenReturn(Arrays.asList(subFrameEl));
+		when(driver.findElements(By.tagName("iframe"))).thenReturn(Arrays.asList(frameEl));
+		when(driver.findElements(By.tagName("iframe"))).thenReturn(Arrays.asList(frameEl, frameEl2));
 		when(driver.switchTo()).thenReturn(locator);
 		doNothing().when(eventDriver).scrollToElement(any(WebElement.class),  anyInt());
+		
+		when(frameEl.getText()).thenReturn("111");
+		when(frameEl2.getText()).thenReturn("222");
 		
 		when(element.getSize()).thenReturn(new Dimension(1, 1));
 		when(element.isDisplayed()).thenReturn(true);
@@ -105,12 +117,42 @@ public class TestFrameElement extends MockitoTest {
 
 	@Test(groups={"ut"})
 	public void testUseElementInsideFrame() throws Exception {
+
+		ArgumentCaptor<WebElement> frameArgument = ArgumentCaptor.forClass(WebElement.class);
 		FrameElement frame = new FrameElement("", By.id("frameId"));
 		HtmlElement el = new HtmlElement("", By.id("el"), frame);
 		el.click();
-		
-		verify(locator).frame(any(WebElement.class));
+
+		verify(locator).frame(frameArgument.capture());
+		Assert.assertEquals(frameArgument.getValue().getText(), "111");
 		verify(locator).defaultContent();
+	}
+
+	/**
+	 * issue #276: Check that we can switch to a frame by index
+	 * @throws Exception
+	 */
+	@Test(groups={"ut"})
+	public void testUseElementInsideFrameWithIndex() throws Exception {
+		ArgumentCaptor<WebElement> frameArgument = ArgumentCaptor.forClass(WebElement.class);
+		
+		FrameElement frame = new FrameElement("", By.tagName("iframe"), 1);
+		HtmlElement el = new HtmlElement("", By.id("el"), frame);
+		el.click();
+		
+		verify(locator).frame(frameArgument.capture());
+		Assert.assertEquals(frameArgument.getValue().getText(), "222");
+		verify(locator).defaultContent();
+	}
+	/**
+	 * issue #276: Check a clear error is raised when an invalid index is given for finding a frame
+	 * @throws Exception
+	 */
+	@Test(groups={"ut"}, expectedExceptions=ScenarioException.class)
+	public void testUseElementInsideFrameWithWrongIndex() throws Exception {
+		FrameElement frame = new FrameElement("", By.tagName("iframe"), 2);
+		HtmlElement el = new HtmlElement("", By.id("el"), frame);
+		el.click();
 	}
 	
 	@Test(groups={"ut"})

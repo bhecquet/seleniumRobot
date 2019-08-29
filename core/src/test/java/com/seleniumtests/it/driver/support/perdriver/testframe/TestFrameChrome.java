@@ -97,5 +97,10 @@ public class TestFrameChrome extends TestFrame {
 	public void testBackToMainFrame() {
 		super.testBackToMainFrame();
 	}	
+	
+	@Test(groups={"it"})
+	public void testFrameInSecondFrameText() {
+		super.testFrameInSecondFrameText();
+	}
  	
 }

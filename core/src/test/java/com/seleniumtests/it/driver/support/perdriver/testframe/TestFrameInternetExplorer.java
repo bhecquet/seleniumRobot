@@ -97,4 +97,9 @@ public class TestFrameInternetExplorer extends TestFrame {
 	public void testBackToMainFrame() {
 		super.testBackToMainFrame();
 	}	
+
+	@Test(groups={"it"})
+	public void testFrameInSecondFrameText() {
+		super.testFrameInSecondFrameText();
+	}
 }

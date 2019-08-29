@@ -97,4 +97,9 @@ public class TestFrameSafari extends TestFrame {
 	public void testBackToMainFrame() {
 		super.testBackToMainFrame();
 	}	
+
+	@Test(groups={"it"})
+	public void testFrameInSecondFrameText() {
+		super.testFrameInSecondFrameText();
+	}
 }
