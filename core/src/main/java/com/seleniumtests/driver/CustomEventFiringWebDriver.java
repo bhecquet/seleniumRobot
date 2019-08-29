@@ -522,7 +522,7 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
 						
 						// in case of optimal scrolling, by default, we will go upside by 100 px in order to prevent "header" presence.
 						if (yOffset == Integer.MAX_VALUE) {// equivalent to HtmlElement.OPTIMAL_SCROLLING but, for grid, we do not want dependency between the 2 classes
-							yOffset = (int) Math.max(scrollBottom, -100);
+							yOffset = (int) Math.max(scrollBottom, -200);
 						}
 						
 						((JavascriptExecutor) driver).executeScript("arguments[0].scrollTop += arguments[1]", parentScrollableElement, yOffset);
