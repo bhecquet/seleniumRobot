@@ -520,7 +520,7 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
 						WaitHelper.waitForMilliSeconds(500); // wait a bit so that scrolling is complete
 						Long scrollBottom = -(Long) ((JavascriptExecutor) driver).executeScript("return arguments[0].scrollHeight - arguments[0].scrollTop - arguments[0].clientHeight", parentScrollableElement);
 						
-						// in case of optimal scrolling, by default, we will go upside by 100 px in order to prevent "header" presence.
+						// in case of optimal scrolling, by default, we will go upside by 200 px in order to prevent "header" presence.
 						if (yOffset == Integer.MAX_VALUE) {// equivalent to HtmlElement.OPTIMAL_SCROLLING but, for grid, we do not want dependency between the 2 classes
 							yOffset = (int) Math.max(scrollBottom, -200);
 						}
