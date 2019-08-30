@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Test page</title>
+<style type="text/css">
+	
+	.box {
+	  width: 80%;
+	  border: 2px dashed;
+	  height: 220px;
+	  overflow: auto;
+	  scroll-behavior: smooth; /* <-- for smooth scroll */
+	}
+	
+	.boxChild {
+	  margin: 600px 0 300px;
+	  width: 40px;
+	  height: 40px;
+	  background: green;
+	}
+</style>
+</head>
+ 
+<body>
+	<div style="background:#FFFF00;height:130px;width:500px;position:fixed;top:0px;left:0px;"></div>
+	<div style="height:140px;width:10px;display: block;"></div>
+	<button id="button2" name="resetButton" onclick="javascript:addText('text2', '');javascript:resetState();">reset</button>
+	<div style="display: inline-block;"><input id="text2" name="textField"/></div>
+	<span style="height:1400px;width:200px;display: block;border: 1px solid">
+		some interesting text
+	</span>
+	
+	<div class='box'>
+	  <div class='boxChild' id='greenBox' onclick="javascript:addText('text2', 'greenbox');"></div>
+	</div>
+	<button id="button2" name="resetButton" onclick="javascript:addText('text2', 'bottom button');">set</button>
+	
+	<div style="height:100px;width:10px;display: block;bottom:0px;"></div>
+	<div style="background:#FFC800;height:100px;width:500px;position:fixed;bottom:0px;left:0px;"></div>
+	
+<script src="jquery.min.js">
+</script>
+<script> 
+$(document).ready(function(){
+  $("#button").click(function(){
+    $("div").animate({left:'1450px'}, 600);
+  });
+  $(document).click(function(e) {
+	var x = e.pageX;
+	var y = e.pageY;
+    console.log("click at: " + x + "-" + y);
+  });
+});
+
+function addText(id, text) {
+	$("#" + id).val(text);
+}
+
+function resetState() {
+	$('#checkboxClick').prop("checked", false);
+	$('#radioClick').prop("checked", false);
+	$('#radioClickParent').prop("checked", false);
+	$('#checkboxClickParent').prop("checked", false);
+	$('#bigfoot').css("display", "none");
+}
+
+function display() {
+	setTimeout(function() {
+      $("#displayContent").html('<input id="newEl" value="my value"/>');
+     }, 7000);
+	
+}
+
+
+</script> 
+</body>
+</html>

@@ -123,6 +123,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     protected String label = null;
     protected HtmlElement parent = null;
     protected FrameElement frameElement = null;
+    private boolean scrollToElementBeforeAction = false;
     private Integer elementIndex = -1;
     private By by = null;
     private String origin  = null;
@@ -527,7 +528,10 @@ public class HtmlElement extends Element implements WebElement, Locatable {
         
         if (makeVisible) { 
         	makeWebElementVisible(element);
-    		((CustomEventFiringWebDriver)driver).scrollToElement(element, OPTIMAL_SCROLLING);	
+        	
+        	if (scrollToElementBeforeAction) {
+        		((CustomEventFiringWebDriver)driver).scrollToElement(element, OPTIMAL_SCROLLING);
+        	}
         }
         
         // wait for element to be really visible. should be done only for actions on element
@@ -1378,6 +1382,14 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 
 	public String getOrigin() {
 		return origin;
+	}
+
+	public boolean isScrollToElementBeforeAction() {
+		return scrollToElementBeforeAction;
+	}
+
+	public void setScrollToElementBeforeAction(boolean scrollToElementBeforeAction) {
+		this.scrollToElementBeforeAction = scrollToElementBeforeAction;
 	}
 
 

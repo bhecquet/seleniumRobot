@@ -27,6 +27,7 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.DeclarePrecedence;
+import org.openqa.selenium.ElementNotInteractableException;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.UnhandledAlertException;
@@ -113,6 +114,16 @@ public class ReplayAction {
 		    		break;
 		    	} catch (UnhandledAlertException e) {
 		    		throw e;
+		    	} catch (ElementNotInteractableException e) {
+		    		
+		    		// if click has been intercepted, it means element could not be interacted, so allow auto scrolling for further retries
+		    		// to avoid trying always the same method, we try without scrolling, then with scrolling, then without, ...
+		    		
+		    		if (element.isScrollToElementBeforeAction()) {
+		    			element.setScrollToElementBeforeAction(false);
+		    		} else {
+		    			element.setScrollToElementBeforeAction(true);
+		    		}
 		    	} catch (WebDriverException e) { 
 		    		
 		    		// don't prevent TimeoutException to be thrown when coming from waitForPresent
@@ -158,7 +169,10 @@ public class ReplayAction {
 		} finally {
 			if (currentAction != null && isHtmlElementDirectlyCalled(Thread.currentThread().getStackTrace()) && TestLogging.getParentTestStep() != null) {
 				currentAction.setFailed(actionFailed);
-			}		
+			}	
+			
+			// restore element scrolling flag for further uses
+    		element.setScrollToElementBeforeAction(false);
 		}
    }
     
