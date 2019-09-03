@@ -182,36 +182,109 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
     		"}" +
     		"return getScrollParent(arguments[0], false, arguments[1]);";
     
-    private static final String JS_SCROLL_IF_NEEDED = "function getScrollParent(element, includeHidden, browserName) {" + 
-    		"    var rootElement = browserName === \"safari\" ? document.body: document.documentElement;" +
-    		"    var style = getComputedStyle(element);" + 
-    		"    var excludeStaticParent = style.position === \"absolute\";" + 
-    		"    var overflowRegex = includeHidden ? /(auto|scroll|hidden)/ : /(auto|scroll)/;" + 
-    		"" + 
-    		"    if (style.position === \"fixed\") return rootElement;" + 
-    		"    for (var parent = element; (parent = parent.parentElement);) {" + 
-    		"        style = getComputedStyle(parent);" + 
-    		"        if (excludeStaticParent && style.position === \"static\") {" + 
-    		"            continue;" + 
+
+    // returns the top pixel from which fixed positioned headers are not present
+    private static final String JS_GET_TOP_HEADER = "function getStyle( dom ) {" + 
+    		"    var style;" + 
+    		"    var returns = {};" + 
+    		"    /* FireFox and Chrome way */" + 
+    		"    if(window.getComputedStyle){" + 
+    		"        style = window.getComputedStyle(dom, null);" + 
+    		"        for(var i = 0, l = style.length; i < l; i++){" + 
+    		"            var prop = style[i];" + 
+    		"            var val = style.getPropertyValue(prop);" + 
+    		"            returns[prop] = val;" + 
     		"        }" + 
-    		"        if (overflowRegex.test(style.overflow + style.overflowY + style.overflowX)) return parent;" + 
+    		"        return returns;" + 
     		"    }" + 
+    		"    /* IE and Opera way */" + 
+    		"    if(dom.currentStyle){" + 
+    		"        style = dom.currentStyle;" + 
+    		"        for(var prop in style){" + 
+    		"            returns[prop] = style[prop];" + 
+    		"        }" + 
+    		"        return returns;" + 
+    		"    }" + 
+    		"    /* Style from style attribute */" + 
+    		"    if(style = dom.style){" + 
+    		"        for(var prop in style){" + 
+    		"            if(typeof style[prop] != 'function'){" + 
+    		"                returns[prop] = style[prop];" + 
+    		"            }" + 
+    		"        }" + 
+    		"        return returns;" + 
+    		"    }" + 
+    		"    return returns;" + 
+    		"}" + 
     		"" + 
-    		"    return rootElement;" + 
+    		"function isVisible(elem) {" + 
+    		"    const style = getStyle(elem);" + 
+    		"" + 
+    		"    if (style['display'] === 'none') return false;" + 
+    		"    if (style['visibility'] !== 'visible') return false;" + 
+    		"    if (style['opacity'] === 0) return false;" + 
+    		"" + 
+    		"    if (" + 
+    		"        elem.offsetWidth +" + 
+    		"        elem.offsetHeight +" + 
+    		"        elem.getBoundingClientRect().height +" + 
+    		"        elem.getBoundingClientRect().width === 0" + 
+    		"    ) return false;" + 
+    		"" + 
+    		"    const elementPoints = {" + 
+    		"        center: {" + 
+    		"            x: elem.getBoundingClientRect().left + elem.offsetWidth / 2," + 
+    		"            y: elem.getBoundingClientRect().top + elem.offsetHeight / 2," + 
+    		"        }," + 
+    		"        topLeft: {" + 
+    		"            x: elem.getBoundingClientRect().left," + 
+    		"            y: elem.getBoundingClientRect().top," + 
+    		"        }," + 
+    		"        topRight: {" + 
+    		"            x: elem.getBoundingClientRect().right," + 
+    		"            y: elem.getBoundingClientRect().top," + 
+    		"        }," + 
+    		"        bottomLeft: {" + 
+    		"            x: elem.getBoundingClientRect().left," + 
+    		"            y: elem.getBoundingClientRect().bottom," + 
+    		"        }," + 
+    		"        bottomRight: {" + 
+    		"            x: elem.getBoundingClientRect().right," + 
+    		"            y: elem.getBoundingClientRect().bottom," + 
+    		"        }," + 
+    		"    };" + 
+    		"" + 
+    		"    const docWidth = document.documentElement.clientWidth || window.innerWidth;" + 
+    		"    const docHeight = document.documentElement.clientHeight || window.innerHeight;" + 
+    		"" + 
+    		"    if (elementPoints.topLeft.x > docWidth) return false;" + 
+    		"    if (elementPoints.topLeft.y > docHeight) return false;" + 
+    		"    if (elementPoints.bottomRight.x < 0) return false;" + 
+    		"    if (elementPoints.bottomRight.y < 0) return false;" + 
+    		"" + 
+    		"    for (let index in elementPoints) {" + 
+    		"        const point = elementPoints[index];" + 
+    		"        let pointContainer = document.elementFromPoint(point.x, point.y);" + 
+    		"        if (pointContainer !== null) {" + 
+    		"            do {" + 
+    		"                if (pointContainer === elem) return true;" + 
+    		"            } while (pointContainer = pointContainer.parentNode);" + 
+    		"        }" + 
+    		"    }" + 
+    		"    return false;" + 
     		"}" +
-    		"var yOffset = arguments[2];" + 
-    		"arguments[0].scrollIntoView(true);" +
-    		"var scrollParent = getScrollParent(arguments[0], false, arguments[1]);" + 
-    		"console.log(scrollParent);" +
-    		"if (scrollParent) {" + 
-    		"	var scrollBottom = -(scrollParent.scrollHeight - scrollParent.scrollTop - scrollParent.clientHeight);" +
-    		"	console.log('scroll:' + scrollBottom);" +
-    		"	if (yOffset == 2147483647) {" +
-    		"		yOffset = Math.max(scrollBottom, -200);" +
-    		"	}" + 
-    		"	console.log('scroll2:' + yOffset);" +
-    		"	scrollParent.scrollTop += yOffset" +
-    		"}";
+    		"var headers = Array.from(document.querySelectorAll('div,header'))" + 
+    		"		.filter(e => getComputedStyle(e)['position'] === 'fixed' && isVisible(e))" + 
+    		"		.sort(e => e.offsetTop);" + 
+    		"var topPixel = 0;" + 
+    		"for (var h of headers) {" +
+    		"	if(h.offsetTop <= topPixel + 10) {" +
+    		"		topPixel = h.offsetTop + h.scrollHeight" +
+    		"	} else {" +
+    		"		break;" +
+    		"	}" +
+    		"}" +
+    		"return topPixel;";
     
     public static final String NON_JS_UPLOAD_FILE_THROUGH_POPUP = 
     		"var action = 'upload_file_through_popup';";
@@ -498,6 +571,7 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
 		if (isWebTest) {
 			try {
 				WebElement parentScrollableElement = (WebElement) ((JavascriptExecutor) driver).executeScript(JS_SCROLL_PARENT, element, (driver instanceof SafariDriver) ? "safari": "other");
+				Long topHeaderSize = (Long) ((JavascriptExecutor) driver).executeScript(JS_GET_TOP_HEADER);
 				
 				if (parentScrollableElement != null) {
 					String parentTagName = parentScrollableElement.getTagName();
@@ -505,7 +579,7 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
 					// When the scrollable element is the document itself (html or body), use the legacy behavior scrolling the window itself
 					if ("html".equalsIgnoreCase(parentTagName) || "body".equalsIgnoreCase(parentTagName)) {
 						if (yOffset == Integer.MAX_VALUE) {// equivalent to HtmlElement.OPTIMAL_SCROLLING but, for grid, we do not want dependency between the 2 classes
-							yOffset = -200;
+							yOffset = (int) Math.min(-200, -topHeaderSize);
 						}
 						
 						scrollWindowToElement(element, yOffset);
@@ -518,14 +592,17 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
 						// scrollIntoView is configured to position scrollbar to top position of the searched element.
 						// in case offset is > 0, this has no impact as scrollBottom will always be < 0
 						WaitHelper.waitForMilliSeconds(500); // wait a bit so that scrolling is complete
-						Long scrollBottom = -(Long) ((JavascriptExecutor) driver).executeScript("return arguments[0].scrollHeight - arguments[0].scrollTop - arguments[0].clientHeight", parentScrollableElement);
 						
-						// in case of optimal scrolling, by default, we will go upside by 200 px in order to prevent "header" presence.
-						if (yOffset == Integer.MAX_VALUE) {// equivalent to HtmlElement.OPTIMAL_SCROLLING but, for grid, we do not want dependency between the 2 classes
-							yOffset = (int) Math.max(scrollBottom, -200);
+						// if top header is present, scroll up so that our element is not hidden behind it (scrollIntoView scrolls so that element is at the top of the view even if header masks it)
+						if (topHeaderSize > 0) {// equivalent to HtmlElement.OPTIMAL_SCROLLING but, for grid, we do not want dependency between the 2 classes
+							Integer scrollOffset = (int) (yOffset == Integer.MAX_VALUE ? topHeaderSize: topHeaderSize - yOffset);
+							((JavascriptExecutor) driver).executeScript(
+									"if((arguments[0].scrollHeight - arguments[0].scrollTop - arguments[0].clientHeight) > 0) {" +
+									"	var rootElement = arguments[1] === \"safari\" ? document.body: document.documentElement;" +
+									"	rootElement.scrollTop -= " + scrollOffset + ";" +
+									"}", parentScrollableElement, (driver instanceof SafariDriver) ? "safari": "other");
 						}
 						
-						((JavascriptExecutor) driver).executeScript("arguments[0].scrollTop += arguments[1]", parentScrollableElement, yOffset);
 						WaitHelper.waitForMilliSeconds(500); // wait a bit so that scrolling is complete
 					}
 				} else {

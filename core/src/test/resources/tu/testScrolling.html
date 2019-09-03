@@ -7,36 +7,43 @@
 	.box {
 	  width: 80%;
 	  border: 2px dashed;
-	  height: 220px;
+	  height: 1200px;
 	  overflow: auto;
-	  scroll-behavior: smooth; /* <-- for smooth scroll */
+	  /* scroll-behavior: smooth; <-- for smooth scroll */
 	}
 	
-	.boxChild {
-	  margin: 600px 0 300px;
+	.boxChildGreen {
+	  margin: 2600px 0 300px;
 	  width: 40px;
 	  height: 40px;
 	  background: green;
+	}
+	.boxChildBlue {
+	  margin: 1600px 0 300px;
+	  width: 40px;
+	  height: 40px;
+	  background: blue;
 	}
 </style>
 </head>
  
 <body>
-	<div style="background:#FFFF00;height:130px;width:500px;position:fixed;top:0px;left:0px;"></div>
+	<div id="header" style="background:#FFFF00;height:130px;width:500px;position:fixed;top:0px;left:0px;"></div>
 	<div style="height:140px;width:10px;display: block;"></div>
 	<button id="button2" name="resetButton" onclick="javascript:addText('text2', '');javascript:resetState();">reset</button>
+	<button id="hide" name="hide" onclick="hideHeaderAndFooter();">hide header/footer</button>
 	<div style="display: inline-block;"><input id="text2" name="textField"/></div>
-	<span style="height:1400px;width:200px;display: block;border: 1px solid">
-		some interesting text
-	</span>
 	
 	<div class='box'>
-	  <div class='boxChild' id='greenBox' onclick="javascript:addText('text2', 'greenbox');"></div>
+	  <button id="buttonScrollTop" name="buttonScrollTop" onclick="javascript:addText('text2', 'scroll top');">scrollTop</button>
+	  <div class='boxChildBlue' id='blueBox' onclick="javascript:addText('text2', 'bluebox');"></div>
+	  <div class='boxChildGreen' id='greenBox' onclick="javascript:addText('text2', 'greenbox');"></div>
+	  <button id="buttonScrollBottom" name="buttonScrollBottom" onclick="javascript:addText('text2', 'scroll bottom');">scrollBottom</button>
 	</div>
-	<button id="button2" name="resetButton" onclick="javascript:addText('text2', 'bottom button');">set</button>
+	<button id="buttonSet" name="setButton" onclick="javascript:addText('text2', 'bottom button');">set</button>
 	
 	<div style="height:100px;width:10px;display: block;bottom:0px;"></div>
-	<div style="background:#FFC800;height:100px;width:500px;position:fixed;bottom:0px;left:0px;"></div>
+	<div id="footer" style="background:#FFC800;height:100px;width:500px;position:fixed;bottom:0px;left:0px;"></div>
 	
 <script src="jquery.min.js">
 </script>
@@ -61,7 +68,13 @@ function resetState() {
 	$('#radioClick').prop("checked", false);
 	$('#radioClickParent').prop("checked", false);
 	$('#checkboxClickParent').prop("checked", false);
-	$('#bigfoot').css("display", "none");
+	$('#footer').css("display", "block");
+	$('#header').css("display", "block");
+}
+
+function hideHeaderAndFooter() {
+	$('#footer').css("display", "none");
+	$('#header').css("display", "none");
 }
 
 function display() {

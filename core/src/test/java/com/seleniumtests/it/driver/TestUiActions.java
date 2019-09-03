@@ -18,10 +18,12 @@
 package com.seleniumtests.it.driver;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.interactions.Actions;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import com.seleniumtests.it.driver.support.GenericMultiBrowserTest;
@@ -37,6 +39,9 @@ public class TestUiActions extends GenericMultiBrowserTest {
 		super(null, "DriverTestPage");
 	}
 
+	/**
+	 * Test composite action with standard selenium syntax and native driver
+	 */
 	@Test(groups={"it"})
 	public void testNewAction() {
 		try {
@@ -48,6 +53,10 @@ public class TestUiActions extends GenericMultiBrowserTest {
 		}
 	}
 
+	/**
+	 * Test composite action with seleniumRobot syntax (HtmlElement) and native driver
+	 * @throws Exception
+	 */
 	@Test(groups={"it"})
 	public void testNewActionWithHtmlElement() throws Exception {
 		try {
@@ -59,6 +68,9 @@ public class TestUiActions extends GenericMultiBrowserTest {
 		}
 	}
 
+	/**
+	 * Test composite action with standard selenium syntax and custom driver
+	 */
 	@Test(groups={"it"})
 	public void testMoveClick() {
 		try {
@@ -85,6 +97,16 @@ public class TestUiActions extends GenericMultiBrowserTest {
 		try {
 			new Actions(driver).moveToElement(DriverTestPage.textElement).click().sendKeys("youpi2").build().perform();
 			Assert.assertEquals("youpi2", DriverTestPage.textElement.getAttribute("value"));
+		} finally {
+			driver.findElement(By.id("button2")).click();
+		}
+	}
+	
+	@Test(groups={"it"}, expectedExceptions=WebDriverException.class) 
+	public void testSendKeysWithHtmlElementNotPresent() throws Exception {
+		SeleniumTestsContextManager.getThreadContext().setReplayTimeout(1);
+		try {
+			new Actions(driver).moveToElement(DriverTestPage.textElementNotPresent).click().sendKeys("youpi2").build().perform();
 		} finally {
 			driver.findElement(By.id("button2")).click();
 		}

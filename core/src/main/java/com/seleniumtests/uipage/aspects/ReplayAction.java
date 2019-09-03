@@ -17,11 +17,15 @@
  */
 package com.seleniumtests.uipage.aspects;
 
+import java.lang.reflect.Field;
 import java.time.Clock;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -33,6 +37,12 @@ import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.interactions.InputSource;
+import org.openqa.selenium.interactions.Interaction;
+import org.openqa.selenium.interactions.MoveTargetOutOfBoundsException;
+import org.openqa.selenium.interactions.PointerInput;
+import org.openqa.selenium.interactions.Sequence;
 import org.openqa.selenium.remote.UnreachableBrowserException;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
@@ -40,6 +50,8 @@ import com.seleniumtests.core.aspects.LogAction;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.DatasetException;
 import com.seleniumtests.customexception.ScenarioException;
+import com.seleniumtests.driver.BrowserType;
+import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.reporter.logger.TestAction;
 import com.seleniumtests.reporter.logger.TestLogging;
@@ -114,7 +126,7 @@ public class ReplayAction {
 		    		break;
 		    	} catch (UnhandledAlertException e) {
 		    		throw e;
-		    	} catch (ElementNotInteractableException e) {
+		    	} catch (MoveTargetOutOfBoundsException | ElementNotInteractableException e) {
 		    		
 		    		// if click has been intercepted, it means element could not be interacted, so allow auto scrolling for further retries
 		    		// to avoid trying always the same method, we try without scrolling, then with scrolling, then without, ...
@@ -212,19 +224,24 @@ public class ReplayAction {
 		try {
 			while (end.isAfter(systemClock.instant())) {
 				
+				// chrome automatically scrolls to element before interacting but it may scroll behind fixed header and no error is 
+				// raised if action cannot be performed
+				if (((CustomEventFiringWebDriver)WebUIDriver.getWebDriver(false)).getBrowserInfo().getBrowser() == BrowserType.CHROME) {
+					updateScrollFlagForElement(joinPoint, true);
+				}
+				
 				try {
 					reply = joinPoint.proceed(joinPoint.getArgs());
 					WaitHelper.waitForMilliSeconds(200);
 					break;
-				} catch (Throwable e) {
 					
-					// do not replay when error comes from test writing or configuration
-					if (e instanceof ScenarioException 
-							|| e instanceof ConfigurationException
-							|| e instanceof DatasetException
-							) {
-						throw e;
-					}
+				// do not replay if error comes from scenario
+				} catch (ScenarioException | ConfigurationException | DatasetException e) {
+					throw e;
+				// do not replay here when an element cannot be interacted with. Caller will handle it
+				} catch (MoveTargetOutOfBoundsException | ElementNotInteractableException e) {
+					updateScrollFlagForElement(joinPoint, null);
+				} catch (Throwable e) {
 	
 					if (end.minusMillis(200).isAfter(systemClock.instant())) {
 						WaitHelper.waitForMilliSeconds(replayDelayMs);
@@ -256,7 +273,48 @@ public class ReplayAction {
 	@Around("execution(public void org.openqa.selenium.interactions.Actions.BuiltAction.perform ())")
 	public Object replayCompositeAction(ProceedingJoinPoint joinPoint) throws Throwable {
 		return replay(joinPoint, null);
-
+	}
+	
+	/**
+	 * Updates the scrollToelementBeforeAction flag of HtmlElement for CompositeActions
+	 * @throws SecurityException 
+	 * @throws NoSuchFieldException 
+	 * @throws IllegalAccessException 
+	 * @throws IllegalArgumentException 
+	 */
+	private void updateScrollFlagForElement(ProceedingJoinPoint joinPoint, Boolean forcedValue) throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
+		Object actions = joinPoint.getTarget();
+		
+		Field sequencesField = actions.getClass().getDeclaredField("sequences");
+		sequencesField.setAccessible(true);
+		Map<InputSource, Sequence> sequences = (Map<InputSource, Sequence>) sequencesField.get(actions);
+		
+		for (Sequence sequence: sequences.values()) {
+			Field actionsField = Sequence.class.getDeclaredField("actions");
+			actionsField.setAccessible(true);
+			
+			LinkedList<Interaction> actionsList = (LinkedList<Interaction>)actionsField.get(sequence);
+			
+			for (Interaction action: actionsList) {
+				if (action.getClass().getName().contains("PointerInput$Move")) {
+					Field originField = action.getClass().getDeclaredField("origin");
+					originField.setAccessible(true);
+					try {
+						PointerInput.Origin origin = (PointerInput.Origin) originField.get(action);
+						HtmlElement element = (HtmlElement) origin.asArg();
+						if (forcedValue == null) {
+							if (element.isScrollToElementBeforeAction()) {
+				    			element.setScrollToElementBeforeAction(false);
+				    		} else {
+				    			element.setScrollToElementBeforeAction(true);
+				    		}
+						} else {
+							element.setScrollToElementBeforeAction(forcedValue);
+						}
+					} catch (ClassCastException e1) {}
+				}
+			}
+		}
 	}
 	
 	/**
