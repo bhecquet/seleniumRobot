@@ -37,6 +37,7 @@ import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.TestType;
 import com.seleniumtests.driver.WebUIDriver;
+import com.seleniumtests.it.driver.support.pages.DriverScrollingTestPage;
 import com.seleniumtests.it.driver.support.pages.DriverSubAngularTestPage;
 import com.seleniumtests.it.driver.support.pages.DriverTestAngularFrame;
 import com.seleniumtests.it.driver.support.pages.DriverTestPage;
@@ -58,6 +59,7 @@ public abstract class GenericMultiBrowserTest extends MockitoTest {
 	protected DriverTestPageWithoutFixedPattern testPageWithoutPattern;
 	protected DriverSubAngularTestPage angularPage;
 	protected DriverTestAngularFrame angularFramePage;
+	protected DriverScrollingTestPage scrollingTestPage;
 	protected ITestContext testNGCtx;
 	private String testPageName;
 	protected String testPageUrl;
@@ -84,6 +86,7 @@ public abstract class GenericMultiBrowserTest extends MockitoTest {
 	protected Map<String, String> getPageMapping() {
 		Map<String, String> mapping = new HashMap<>();
 		mapping.put("/tu/test.html", "/test.html");
+		mapping.put("/tu/testScrolling.html", "/testScrolling.html");
 		mapping.put("/tu/testWithoutFixedPattern.html", "/testWithoutFixedPattern.html");
 		mapping.put("/tu/testIFrame.html", "/testIFrame.html");
 		mapping.put("/tu/testAngularIFrame.html", "/testAngularIFrame.html");
@@ -160,6 +163,10 @@ public abstract class GenericMultiBrowserTest extends MockitoTest {
 		case "DriverSubAngularTestPage":
 			testPageUrl = String.format("http://%s:%d/angularApp/index.html", localAddress, server.getServerHost().getPort());
 			angularPage = new DriverSubAngularTestPage(true, testPageUrl);
+			break;
+		case "DriverScrollingTestPage":
+			testPageUrl = String.format("http://%s:%d/testScrolling.html", localAddress, server.getServerHost().getPort());
+			scrollingTestPage = new DriverScrollingTestPage(true, testPageUrl);
 		}
 		
 		driver = WebUIDriver.getWebDriver(true);

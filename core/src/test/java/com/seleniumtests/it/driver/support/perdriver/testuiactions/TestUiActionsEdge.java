@@ -17,6 +17,7 @@
  */
 package com.seleniumtests.it.driver.support.perdriver.testuiactions;
 
+import org.openqa.selenium.WebDriverException;
 import org.testng.annotations.Test;
 
 import com.seleniumtests.driver.BrowserType;
@@ -51,5 +52,10 @@ public class TestUiActionsEdge extends TestUiActions {
 	@Test(groups={"it"}) 
 	public void testSendKeysWithHtmlElement() throws Exception {
 		super.testSendKeysWithHtmlElement();
+	}
+
+	@Test(groups={"it"}, expectedExceptions=WebDriverException.class) 
+	public void testSendKeysWithHtmlElementNotPresent() throws Exception {
+		super.testSendKeysWithHtmlElementNotPresent();
 	}
 }

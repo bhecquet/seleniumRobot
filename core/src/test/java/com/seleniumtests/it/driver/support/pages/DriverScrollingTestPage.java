@@ -30,7 +30,12 @@ public class DriverScrollingTestPage extends PageObject {
 	
 	public static final TextFieldElement textElement = new TextFieldElement("Text", By.id("text2"));
 	public static final ButtonElement resetButton = new ButtonElement("Reset", By.id("button2"));
+	public static final ButtonElement hideButton = new ButtonElement("Hide header / footer", By.id("hide"));
+	public static final ButtonElement setButton = new ButtonElement("set", By.id("buttonSet"));
+	public static final ButtonElement buttonScrollTop = new ButtonElement("set top", By.name("buttonScrollTop"));
+	public static final ButtonElement buttonScrollBottom = new ButtonElement("set bottom", By.name("buttonScrollBottom"));
 	public static final HtmlElement greenBox = new HtmlElement("button to scroll into view", By.id("greenBox"));
+	public static final HtmlElement blueBox = new HtmlElement("button to scroll into view", By.id("blueBox"));
 	
 	
 	private String openedPageUrl;
