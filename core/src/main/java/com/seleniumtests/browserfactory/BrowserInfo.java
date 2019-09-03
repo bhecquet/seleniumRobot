@@ -306,7 +306,7 @@ public class BrowserInfo {
     		String tabProcGrowth;
     		try {
     			tabProcGrowth = Advapi32Util.registryGetValue(WinReg.HKEY_CURRENT_USER, "Software\\Microsoft\\Internet Explorer\\Main", "TabProcGrowth").toString();
-    		} catch (Win32Exception | NullPointerException e) {
+    		} catch (Win32Exception | NullPointerException | UnsatisfiedLinkError e) {
     			tabProcGrowth = "1";
     		}
     		
