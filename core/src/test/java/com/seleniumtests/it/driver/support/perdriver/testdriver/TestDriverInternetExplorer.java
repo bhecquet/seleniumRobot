@@ -21,7 +21,6 @@ import java.awt.AWTException;
 import java.awt.event.KeyEvent;
 import java.util.Arrays;
 
-import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.UnhandledAlertException;
 import org.testng.annotations.Test;
 
