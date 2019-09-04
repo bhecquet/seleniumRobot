@@ -30,6 +30,7 @@ import java.io.File;
 
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.Rectangle;
 import org.openqa.selenium.interactions.Keyboard;
@@ -44,6 +45,7 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import com.seleniumtests.MockitoTest;
+import com.seleniumtests.browserfactory.BrowserInfo;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.ImageSearchException;
 import com.seleniumtests.driver.BrowserType;
@@ -82,6 +84,9 @@ public class TestPictureElement extends MockitoTest {
 	DriverConfig driverConfig;
 	
 	@Mock
+	BrowserInfo browserInfo;
+	
+	@Mock
 	Mouse mouse;
 	@Mock
 	Keyboard keyboard;
@@ -104,15 +109,19 @@ public class TestPictureElement extends MockitoTest {
 		when(WebUIDriver.getWebUIDriver(anyBoolean())).thenReturn(uiDriver);
 		when(uiDriver.getDriver()).thenReturn(driver);
 		when(uiDriver.getConfig()).thenReturn(driverConfig);
-		when(driverConfig.getBrowserType()).thenReturn(BrowserType.CHROME);
+		when(driverConfig.getBrowserType()).thenReturn(BrowserType.FIREFOX);
 		when(driver.getMouse()).thenReturn(mouse);
 		when(driver.getKeyboard()).thenReturn(keyboard);
+		when(driver.getBrowserInfo()).thenReturn(browserInfo);
+		when(browserInfo.getBrowser()).thenReturn(BrowserType.FIREFOX);
 		when(screenshotUtil.capture(Target.PAGE, File.class, true)).thenReturn(new File(""));
 		when(imageDetector.getDetectedRectangle()).thenReturn(new Rectangle(10, 10, 100, 50));
 		when(imageDetector.getSizeRatio()).thenReturn(1.0);
 		when(coordinates.inViewPort()).thenReturn(new Point(100, 120));
 		when(coordinates.onPage()).thenReturn(new Point(100, 120));
 		when(intoElement.getCoordinates()).thenReturn(coordinates);
+		when(intoElement.getSize()).thenReturn(new Dimension(200, 200));
+		
 		doReturn(screenshotUtil).when(picElement).getScreenshotUtil();
 		
 		picElement.click();
