@@ -43,6 +43,7 @@ import org.openqa.selenium.interactions.Interaction;
 import org.openqa.selenium.interactions.MoveTargetOutOfBoundsException;
 import org.openqa.selenium.interactions.PointerInput;
 import org.openqa.selenium.interactions.Sequence;
+import org.openqa.selenium.remote.RemoteWebElement;
 import org.openqa.selenium.remote.UnreachableBrowserException;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
@@ -227,7 +228,7 @@ public class ReplayAction {
 				// chrome automatically scrolls to element before interacting but it may scroll behind fixed header and no error is 
 				// raised if action cannot be performed
 				if (((CustomEventFiringWebDriver)WebUIDriver.getWebDriver(false)).getBrowserInfo().getBrowser() == BrowserType.CHROME) {
-					updateScrollFlagForElement(joinPoint, true);
+					updateScrollFlagForElement(joinPoint, true, null);
 				}
 				
 				try {
@@ -240,7 +241,7 @@ public class ReplayAction {
 					throw e;
 				// do not replay here when an element cannot be interacted with. Caller will handle it
 				} catch (MoveTargetOutOfBoundsException | ElementNotInteractableException e) {
-					updateScrollFlagForElement(joinPoint, null);
+					updateScrollFlagForElement(joinPoint, null, e);
 				} catch (Throwable e) {
 	
 					if (end.minusMillis(200).isAfter(systemClock.instant())) {
@@ -277,13 +278,20 @@ public class ReplayAction {
 	
 	/**
 	 * Updates the scrollToelementBeforeAction flag of HtmlElement for CompositeActions
+	 * Therefore, it looks at origin field of PointerInput$Move CompositeAction and update the flag
 	 * @throws SecurityException 
 	 * @throws NoSuchFieldException 
 	 * @throws IllegalAccessException 
 	 * @throws IllegalArgumentException 
 	 */
-	private void updateScrollFlagForElement(ProceedingJoinPoint joinPoint, Boolean forcedValue) throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
+	private void updateScrollFlagForElement(ProceedingJoinPoint joinPoint, Boolean forcedValue, WebDriverException parentException) throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
 		Object actions = joinPoint.getTarget();
+		
+		// the calling method 'replay(ProceedingJoinPoint joinPoint, ReplayOnError replay)' may be called from GenericPictureElement.class or from Selenium 'Composite Actions'
+		// Only the later case is covered here
+		if (!actions.getClass().toString().contains("BuiltAction")) {
+			return;
+		}
 		
 		Field sequencesField = actions.getClass().getDeclaredField("sequences");
 		sequencesField.setAccessible(true);
@@ -301,15 +309,22 @@ public class ReplayAction {
 					originField.setAccessible(true);
 					try {
 						PointerInput.Origin origin = (PointerInput.Origin) originField.get(action);
-						HtmlElement element = (HtmlElement) origin.asArg();
-						if (forcedValue == null) {
-							if (element.isScrollToElementBeforeAction()) {
-				    			element.setScrollToElementBeforeAction(false);
-				    		} else {
-				    			element.setScrollToElementBeforeAction(true);
-				    		}
-						} else {
-							element.setScrollToElementBeforeAction(forcedValue);
+						
+						// we can change 'scrollToelementBeforeAction' flag only for HtmlElement objects. For RemoteWebElement, this cannot be done so we rethrow the exception
+						// so that it can be treated elsewhere (mainly inside replayHtmlElement())
+						if (origin.asArg() instanceof HtmlElement) {
+							HtmlElement element = (HtmlElement) origin.asArg();
+							if (forcedValue == null) {
+								if (element.isScrollToElementBeforeAction()) {
+					    			element.setScrollToElementBeforeAction(false);
+					    		} else {
+					    			element.setScrollToElementBeforeAction(true);
+					    		}
+							} else {
+								element.setScrollToElementBeforeAction(forcedValue);
+							}
+						} else if (origin.asArg() instanceof RemoteWebElement && parentException != null) {
+							throw parentException;
 						}
 					} catch (ClassCastException e1) {}
 				}

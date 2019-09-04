@@ -21,6 +21,9 @@ public class TestAutoScrolling extends GenericMultiBrowserTest {
 	
 	@AfterMethod(groups={"it", "ut"})
 	public void reset() {
+		if (driver == null) {
+			return;
+		}
 		DriverScrollingTestPage.resetButton.click();
 		Assert.assertEquals("", DriverScrollingTestPage.textElement.getValue());
 	}

@@ -52,4 +52,9 @@ public class TestUiActionsHtmlUnit extends TestUiActions {
 	public void testSendKeysWithHtmlElement() throws Exception {
 		// skip as htmlunit does not support it
 	}
+	
+	@Test(groups={"it"}) 
+	public void testSendKeysWithHtmlElementNotPresent() throws Exception {
+		// skip as htmlunit does not support it
+	}
 }
