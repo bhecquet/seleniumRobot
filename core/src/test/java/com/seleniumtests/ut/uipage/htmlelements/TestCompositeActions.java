@@ -43,6 +43,8 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import com.seleniumtests.MockitoTest;
+import com.seleniumtests.browserfactory.BrowserInfo;
+import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.util.helper.WaitHelper;
@@ -62,6 +64,9 @@ public class TestCompositeActions extends MockitoTest {
 	@Mock
 	private Coordinates coordinates;
 	
+	@Mock
+	private BrowserInfo browserInfo;
+	
 	private CustomEventFiringWebDriver eventDriver;
 	
 
@@ -74,6 +79,8 @@ public class TestCompositeActions extends MockitoTest {
 		
 		PowerMockito.mockStatic(WebUIDriver.class);
 		when(WebUIDriver.getWebDriver(anyBoolean())).thenReturn(eventDriver);
+		when(eventDriver.getBrowserInfo()).thenReturn(browserInfo);
+		when(browserInfo.getBrowser()).thenReturn(BrowserType.CHROME);
 		when(driver.getMouse()).thenReturn(mouse);
 		Mockito.doCallRealMethod().when(driver).perform(ArgumentMatchers.anyCollection());
 		
