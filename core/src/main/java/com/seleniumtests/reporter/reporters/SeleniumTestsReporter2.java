@@ -74,9 +74,11 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 	protected PrintWriter mOut;
 
 	private String outputDirectory;
-	private String resources;
 	private String generationErrorMessage = null;
 
+	public SeleniumTestsReporter2() {
+		setOutputDirectory(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath());
+	}
 	
 	/**
 	 * Copy resources necessary for result file
@@ -105,8 +107,14 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 		} 
 		
 		for (String fileName: styleFiles) {
+			File destFile = Paths.get(outputDirectory, RESOURCES_DIR, "templates", fileName).toFile();
+			
+			// do not copy resources if it has already been done
+			if (destFile.exists()) {
+				break;
+			}
 			FileUtils.copyInputStreamToFile(Thread.currentThread().getContextClassLoader().getResourceAsStream("reporter/templates/" + fileName), 
-											Paths.get(outputDirectory, RESOURCES_DIR, "templates", fileName).toFile());
+					destFile);
 		}
 	}
 
@@ -249,9 +257,7 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 			return;
 		}
 		
-		File f = new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory());
-		setOutputDirectory(f.getAbsolutePath());
-		setResources(getOutputDirectory() + "/" + RESOURCES_DIR);      
+		setOutputDirectory(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath());     
 		
 		// Generate general report
 		Map<ITestContext, List<ITestResult>> methodResultsMap = new HashMap<>(); 
@@ -271,24 +277,33 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 		
 		// Generate test method reports
 		for (Map.Entry<ITestContext, List<ITestResult>> entry: methodResultsMap.entrySet()) {
-			
 			for (ITestResult testResult: entry.getValue()) {
-				
-				// issue #81: recreate test context from this context (due to multithreading, this context may be null if parallel testing is done
-				SeleniumTestsContextManager.setThreadContextFromTestResult(entry.getKey(), getTestName(testResult), getClassName(testResult), testResult);
-				
-				try {
-					mOut = createWriter(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), "TestReport.html");
-					startHtml(getTestStatus(testResult), mOut, "simple");
-					generateExecutionReport(testResult);
-					endHtml();
-					logger.info("Completed Report Generation.");
-				} catch (IOException e) {
-					logger.error("Error writing test report: " + getTestName(testResult), e);
-				}  
+				generateSingleTestReport(testResult);
 			}
 		}
+	}
+	
+	/**
+	 * Generate HTML report for a single test
+	 * @param testResult
+	 */
+	public void generateSingleTestReport(ITestResult testResult) {
 
+		
+		// issue #81: recreate test context from this context (due to multithreading, this context may be null if parallel testing is done)
+		SeleniumTestsContextManager.setThreadContextFromTestResult(testResult.getTestContext(), getTestName(testResult), getClassName(testResult), testResult);
+		
+		try {
+			copyResources();
+			
+			mOut = createWriter(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), "TestReport.html");
+			startHtml(getTestStatus(testResult), mOut, "simple");
+			generateExecutionReport(testResult);
+			endHtml();
+			logger.info("Completed Report Generation.");
+		} catch (IOException e) {
+			logger.error("Error writing test report: " + getTestName(testResult), e);
+		}  
 	}
 
 	/**
@@ -378,17 +393,9 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 	public void setOutputDirectory(final String outtimestamped) {
 		this.outputDirectory = outtimestamped;
 	}
-
-	public void setResources(final String resources) {
-		this.resources = resources;
-	}
 	
 	public String getOutputDirectory() {	
 		return outputDirectory;
-	}
-
-	public String getResources() {
-		return resources;
 	}
 
 	/**

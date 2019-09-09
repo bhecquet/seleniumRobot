@@ -62,6 +62,7 @@ import com.seleniumtests.reporter.logger.ArchiveMode;
 import com.seleniumtests.reporter.logger.TestLogging;
 import com.seleniumtests.reporter.logger.TestStep;
 import com.seleniumtests.reporter.reporters.CommonReporter;
+import com.seleniumtests.reporter.reporters.SeleniumTestsReporter2;
 import com.seleniumtests.util.FileUtility;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
@@ -86,6 +87,7 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 	public void onTestSuccess(ITestResult result) {
 		System.out.println("success");
 		// nothing to do
+		generateTempReport(result);
 	}
 
 	@Override
@@ -101,18 +103,30 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 
 			logger.info(testResult.getMethod() + " Failed in " + testRetryAnalyzer.getCount() + " times");
 		}		
+		
+		generateTempReport(testResult);
 	}
 
 	@Override
 	public void onTestSkipped(ITestResult result) {
 		// nothing to do
 		System.out.println("skipped");
+		
+		generateTempReport(result);
 	}
 
 	@Override
 	public void onTestFailedButWithinSuccessPercentage(ITestResult result) {
 		// nothing to do
 		
+	}
+	
+	private void generateTempReport(ITestResult result) {
+		try {
+			new SeleniumTestsReporter2().generateSingleTestReport(result);
+		} catch (Throwable e) {
+			// do not crash for a temp report
+		}
 	}
 
 	@Override
