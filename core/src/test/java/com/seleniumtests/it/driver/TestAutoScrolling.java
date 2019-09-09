@@ -1,11 +1,14 @@
 package com.seleniumtests.it.driver;
 
+import org.openqa.selenium.By;
+import org.openqa.selenium.ie.InternetExplorerDriver;
 import org.openqa.selenium.interactions.Actions;
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.Test;
 
 import com.seleniumtests.driver.BrowserType;
+import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import com.seleniumtests.it.driver.support.GenericMultiBrowserTest;
 import com.seleniumtests.it.driver.support.pages.DriverScrollingTestPage;
 
@@ -162,6 +165,28 @@ public class TestAutoScrolling extends GenericMultiBrowserTest {
 			Assert.assertEquals(DriverScrollingTestPage.textElement.getValue(), "bottom button");
 		} finally {
 
+			DriverScrollingTestPage.setButton.setScrollToElementBeforeAction(false);
+		}
+	}
+	
+	/**
+	 * Check behaviour with menu
+	 */
+	@Test(groups={"it", "ut"})
+	public void testAutoScrollToMenu() {
+		// test is known not to work with IE because menu disappears immediately after the first 'moveToElement'
+		// this bheavior is pure Selenium
+		if (((CustomEventFiringWebDriver)driver).getWebDriver() instanceof InternetExplorerDriver) {
+			return;
+		}
+		try {
+			DriverScrollingTestPage.dropdownMenu.setScrollToElementBeforeAction(true);
+			DriverScrollingTestPage.menuLink2.setScrollToElementBeforeAction(true);
+			new Actions(driver).moveToElement(DriverScrollingTestPage.dropdownMenu).perform();
+			new Actions(driver).moveToElement(DriverScrollingTestPage.menuLink2).click().moveToElement(DriverScrollingTestPage.textElement).perform();
+			Assert.assertEquals(DriverScrollingTestPage.textElement.getValue(), "Link 2");
+		} finally {
+			
 			DriverScrollingTestPage.setButton.setScrollToElementBeforeAction(false);
 		}
 	}
