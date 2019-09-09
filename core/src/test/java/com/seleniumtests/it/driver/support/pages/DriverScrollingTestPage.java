@@ -21,9 +21,11 @@ import org.openqa.selenium.By;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.driver.BrowserType;
+import com.seleniumtests.uipage.ByC;
 import com.seleniumtests.uipage.PageObject;
 import com.seleniumtests.uipage.htmlelements.ButtonElement;
 import com.seleniumtests.uipage.htmlelements.HtmlElement;
+import com.seleniumtests.uipage.htmlelements.LinkElement;
 import com.seleniumtests.uipage.htmlelements.TextFieldElement;
 
 public class DriverScrollingTestPage extends PageObject {
@@ -34,6 +36,8 @@ public class DriverScrollingTestPage extends PageObject {
 	public static final ButtonElement setButton = new ButtonElement("set", By.id("buttonSet"));
 	public static final ButtonElement buttonScrollTop = new ButtonElement("set top", By.name("buttonScrollTop"));
 	public static final ButtonElement buttonScrollBottom = new ButtonElement("set bottom", By.name("buttonScrollBottom"));
+	public static final ButtonElement dropdownMenu = new ButtonElement("dropdown menu", ByC.text("Dropdown", "button"));
+	public static final LinkElement menuLink2 = new LinkElement("link 2", By.linkText("Link 2"));
 	public static final HtmlElement greenBox = new HtmlElement("button to scroll into view", By.id("greenBox"));
 	public static final HtmlElement blueBox = new HtmlElement("button to scroll into view", By.id("blueBox"));
 	

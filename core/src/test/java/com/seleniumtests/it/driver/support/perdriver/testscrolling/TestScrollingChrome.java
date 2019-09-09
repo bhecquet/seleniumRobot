@@ -87,4 +87,9 @@ public class TestScrollingChrome extends TestAutoScrolling {
 	public void testAutoScrollToBottom() {
 		super.testAutoScrollToBottom();
 	}
+	
+	@Test(groups={"it", "ut"})
+	public void testAutoScrollToMenu() {
+		super.testAutoScrollToMenu();
+	}
 }

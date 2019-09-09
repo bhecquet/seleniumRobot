@@ -24,12 +24,57 @@
 	  height: 40px;
 	  background: blue;
 	}
+	.dropbtn {
+	  background-color: #4CAF50;
+	  color: white;
+	  font-size: 10px;
+	  border: none;
+	}
+	
+	.dropdown {
+	  position: relative;
+	  display: inline-block;
+	}
+	
+	.dropdown-content {
+	  display: none;
+	  position: absolute;
+	  background-color: #f1f1f1;
+	  min-width: 160px;
+	  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+	  z-index: 1;
+	}
+	
+	.dropdown-content a {
+	  color: black;
+	  padding: 12px 16px;
+	  text-decoration: none;
+	  display: block;
+	}
+	
+	.dropdown-content a:hover {background-color: #ddd;}
+	
+	.dropdown:hover .dropdown-content {display: block;}
+	
+	.dropdown:hover .dropbtn {background-color: #3e8e41;}
 </style>
 </head>
  
 <body>
-	<div id="header" style="background:#FFFF00;height:130px;width:500px;position:fixed;top:0px;left:0px;"></div>
-	<div style="height:140px;width:10px;display: block;"></div>
+	<div id="header" style="background:#FFFF00;height:130px;width:500px;position:fixed;top:0px;left:0px;">
+		Fixed header
+	</div>
+	<div id="header" style="background:#FFF000;height:15px;width:500px;position:fixed;top:135px;left:0px;">
+		<div class="dropdown">
+			<button class="dropbtn">Dropdown</button>
+			<div class="dropdown-content">
+			    <a href="#" onclick="javascript:addText('text2', 'Link 1');">Link 1</a>
+			    <a href="#" onclick="javascript:addText('text2', 'Link 2');">Link 2</a>
+			    <a href="#" onclick="javascript:addText('text2', 'Link 3');">Link 3</a>
+			</div>
+		</div>
+	</div>
+	<div style="height:150px;width:10px;display: block;"></div>
 	<button id="button2" name="resetButton" onclick="javascript:addText('text2', '');javascript:resetState();">reset</button>
 	<button id="hide" name="hide" onclick="hideHeaderAndFooter();">hide header/footer</button>
 	<div style="display: inline-block;"><input id="text2" name="textField"/></div>
