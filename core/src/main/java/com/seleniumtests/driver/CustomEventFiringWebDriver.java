@@ -275,7 +275,7 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
     		"}" +
     		"var headers = Array.from(document.querySelectorAll('div,header'))" + 
     		"		.filter(e => getComputedStyle(e)['position'] === 'fixed' && isVisible(e))" + 
-    		"		.sort(e => e.offsetTop);" + 
+    		"		.sort((a, b) => a.offsetTop - b.offsetTop);" + 
     		"var topPixel = 0;" + 
     		"for (var h of headers) {" +
     		"	if(h.offsetTop <= topPixel + 10) {" +
