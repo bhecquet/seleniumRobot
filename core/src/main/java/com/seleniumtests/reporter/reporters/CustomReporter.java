@@ -41,9 +41,11 @@ import org.testng.xml.XmlSuite;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.StatisticsStorage;
+import com.seleniumtests.customexception.CustomSeleniumTestsException;
 import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.reporter.logger.TestLogging;
 import com.seleniumtests.reporter.logger.TestStep;
+import com.seleniumtests.util.StringUtility;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
 public class CustomReporter extends CommonReporter implements IReporter {
@@ -179,7 +181,11 @@ public class CustomReporter extends CommonReporter implements IReporter {
 			context.put("parameters", SeleniumTestsContextManager.getThreadContext().getContextDataMap());
 			context.put("stacktrace", stack);
 			String logs = SeleniumRobotLogger.getTestLogs().get(getTestName(testResult));
-			context.put("logs", logs == null ? "Test skipped": logs);	
+			try {
+				context.put("logs", logs == null ? "Test skipped": StringUtility.encodeString(logs, reportFormat.toLowerCase()));
+			} catch (CustomSeleniumTestsException e) {
+				context.put("logs", logs);
+			}
 			
 			StringWriter writer = new StringWriter();
 			t.merge( context, writer );
