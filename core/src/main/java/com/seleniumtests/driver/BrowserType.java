@@ -39,7 +39,7 @@ public enum BrowserType {
     public static BrowserType getBrowserType(final String browserType) {
         if (browserType.toLowerCase().contains("firefox")) {
             return BrowserType.FIREFOX;
-        } else if (browserType.toLowerCase().contains("iexplore")) {
+        } else if (browserType.toLowerCase().contains("iexplore") || browserType.toLowerCase().contains("internet explorer")) {
             return BrowserType.INTERNET_EXPLORER;
         } else if (browserType.toLowerCase().contains("edge")) {
         	return BrowserType.EDGE;
@@ -51,7 +51,7 @@ public enum BrowserType {
             return BrowserType.HTMLUNIT;
         }  else if (browserType.toLowerCase().contains("safari")) {
             return BrowserType.SAFARI;
-        } else if (browserType.toLowerCase().contains("browser")) {
+        } else if (browserType.toLowerCase().contains("browser") || browserType.toLowerCase().contains("android")) {
         	return BrowserType.BROWSER;
         } else if (browserType.toLowerCase().contains("phantomjs")) {
             return BrowserType.PHANTOMJS;

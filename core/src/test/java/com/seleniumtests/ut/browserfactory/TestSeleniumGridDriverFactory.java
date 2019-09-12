@@ -4,15 +4,12 @@ package com.seleniumtests.ut.browserfactory;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
-import static org.mockito.hamcrest.MockitoHamcrest.argThat;
-import static org.hamcrest.Matchers.hasEntry;
 
-import java.awt.AWTException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
-import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.openqa.selenium.Capabilities;
@@ -22,6 +19,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriver.Options;
 import org.openqa.selenium.WebDriver.Timeouts;
 import org.openqa.selenium.WebDriverException;
+import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.powermock.api.mockito.PowerMockito;
@@ -43,7 +41,6 @@ import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.DriverConfig;
 import com.seleniumtests.driver.TestType;
 import com.seleniumtests.util.logging.DebugMode;
-import com.sun.mail.iap.Argument;
 
 @PowerMockIgnore("javax.net.ssl.*")
 @PrepareForTest({SeleniumGridDriverFactory.class})
@@ -86,7 +83,13 @@ public class TestSeleniumGridDriverFactory extends MockitoTest {
 		when(config.getPlatform()).thenReturn("windows");
 		
 		// configure driver
+		Map<String, String> capsMap = new HashMap<>();
+		capsMap.put(CapabilityType.BROWSER_NAME, "htmlunit");
+		capsMap.put(CapabilityType.VERSION, "70.0.1.2.3");
+		Capabilities caps = new MutableCapabilities(capsMap);
+		
 		when(driver.manage()).thenReturn(options);
+		when(driver.getCapabilities()).thenReturn(caps);
 		when(driver2.manage()).thenReturn(options);
 		when(options.timeouts()).thenReturn(timeouts);
 		
@@ -115,8 +118,12 @@ public class TestSeleniumGridDriverFactory extends MockitoTest {
 		// check that with a single driver creation, retry timeout is 30 mins
 		Assert.assertEquals(driverFactory.getInstanceRetryTimeout(), SeleniumGridDriverFactory.DEFAULT_RETRY_TIMEOUT);
 		
+		// issue #280: also check that BrowserInfo is not null
 		Assert.assertNotNull(newDriver);
 		Assert.assertEquals(newDriver, driver);
+		Assert.assertNotNull(driverFactory.getSelectedBrowserInfo());
+		Assert.assertEquals(driverFactory.getSelectedBrowserInfo().getBrowser(), BrowserType.HTMLUNIT);
+		Assert.assertEquals(driverFactory.getSelectedBrowserInfo().getVersion(), "70.0.1.2.3");
 	}
 	
 	/**
