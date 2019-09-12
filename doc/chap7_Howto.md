@@ -83,6 +83,8 @@ In this case, provide an other top level element.
 
 **/!\**: resource name is case-sensitive. It may not be obvious in IntelliJ, but with standart execution, if the resource name you provide and its name in src/test/resources is not exactly the same, you will get a `class java.lang.ExceptionInInitializerError: null` or `class java.lang.NoClassDefFoundError: Could not initialize class` when creating the PictureElement
 
+**/!\**: `OpenCV Error: Assertion failed (corrsize.height <= img.rows + templ.rows - 1 && corrsize.width <= img.cols + templ.cols - 1) in cv::crossCorr` is raised when wrong format is used for picture to detect (e.g: GIF instead of PNG, cf issue #269)
+
 #### Using PictureElement ####
 
 Search for picture in browser, without the need to scroll down and click on it. It will then search for the "body" element. If you search the picture inside a frame, and main document has no "body" tag, then you should specify an element inside frame, or the frame itself
