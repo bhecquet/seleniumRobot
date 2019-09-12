@@ -24,6 +24,7 @@ import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 
+import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.DriverConfig;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
@@ -44,6 +45,8 @@ public abstract class AbstractWebDriverFactory {
         
         if (capsFactory instanceof IDesktopCapabilityFactory) {
         	selectedBrowserInfo = ((IDesktopCapabilityFactory)capsFactory).getSelectedBrowserInfo();
+        } else {
+        	selectedBrowserInfo = new BrowserInfo(BrowserType.NONE, "0.0");
         }
     }
 

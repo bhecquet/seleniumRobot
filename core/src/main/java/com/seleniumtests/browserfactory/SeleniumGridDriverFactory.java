@@ -24,7 +24,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-import org.joda.time.LocalDateTime;
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
@@ -38,6 +37,7 @@ import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.customexception.SeleniumGridException;
+import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.DriverConfig;
 import com.seleniumtests.util.helper.WaitHelper;
 
@@ -148,7 +148,12 @@ public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implemen
 
         runWebDriver(duration);
 
+        // sets a file detector. This is only useful for remote drivers
         ((RemoteWebDriver)driver).setFileDetector(new LocalFileDetector());
+        
+        // create a BrowserInfo based on information get from grid hub
+        selectedBrowserInfo = new BrowserInfo(BrowserType.getBrowserTypeFromSeleniumBrowserType(((RemoteWebDriver)driver).getCapabilities().getBrowserName()), 
+	        									((RemoteWebDriver)driver).getCapabilities().getVersion());
 
         return driver;
     }

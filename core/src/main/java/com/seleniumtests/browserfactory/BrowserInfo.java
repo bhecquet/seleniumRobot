@@ -59,6 +59,17 @@ public class BrowserInfo {
 	private boolean driverFileSearched = false;
 	
 	/**
+	 * Creates a stub BrowserInfo with the information provided 
+	 */
+	public BrowserInfo(BrowserType browser, String version) {
+		this.version = version;
+		this.browser = browser;
+		driverFileSearched = true;
+		driverFileName = null;
+		path = "grid-node";
+	}
+	
+	/**
 	 * Create information about the 
 	 * @param browser
 	 * @param version

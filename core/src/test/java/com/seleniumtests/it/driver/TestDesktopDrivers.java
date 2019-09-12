@@ -26,6 +26,8 @@ import org.testng.xml.XmlTest;
 
 import com.seleniumtests.GenericDriverTest;
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.driver.BrowserType;
+import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import com.seleniumtests.driver.WebUIDriver;
 
 public class TestDesktopDrivers extends GenericDriverTest {
@@ -37,6 +39,10 @@ public class TestDesktopDrivers extends GenericDriverTest {
 		SeleniumTestsContextManager.getThreadContext().setBrowser("*firefox");
 		driver = WebUIDriver.getWebDriver(true);
 		Assert.assertTrue(driver.getCurrentUrl().equals("about:blank") || driver.getCurrentUrl().contains("http"));
+		
+		// issue #280: check BrowserInfo exists
+		Assert.assertNotNull(((CustomEventFiringWebDriver)driver).getBrowserInfo());
+		Assert.assertEquals(((CustomEventFiringWebDriver)driver).getBrowserInfo().getBrowser(), BrowserType.FIREFOX);
 	}
 	
 	@Test(groups={"it"})
@@ -45,6 +51,10 @@ public class TestDesktopDrivers extends GenericDriverTest {
 		SeleniumTestsContextManager.getThreadContext().setBrowser("*chrome");
 		driver = WebUIDriver.getWebDriver(true);
 		Assert.assertEquals(driver.getCurrentUrl(), "data:,");
+		
+		// issue #280: check BrowserInfo exists
+		Assert.assertNotNull(((CustomEventFiringWebDriver)driver).getBrowserInfo());
+		Assert.assertEquals(((CustomEventFiringWebDriver)driver).getBrowserInfo().getBrowser(), BrowserType.CHROME);
 	}
 	
 	@Test(groups={"it"})
@@ -54,6 +64,10 @@ public class TestDesktopDrivers extends GenericDriverTest {
 			SeleniumTestsContextManager.getThreadContext().setBrowser("*safari");
 			driver = WebUIDriver.getWebDriver(true);
 			Assert.assertEquals(driver.getCurrentUrl(), "data:,");
+			
+			// issue #280: check BrowserInfo exists
+			Assert.assertNotNull(((CustomEventFiringWebDriver)driver).getBrowserInfo());
+			Assert.assertEquals(((CustomEventFiringWebDriver)driver).getBrowserInfo().getBrowser(), BrowserType.SAFARI);
 		}
 	}
 	
@@ -66,6 +80,10 @@ public class TestDesktopDrivers extends GenericDriverTest {
 		SeleniumTestsContextManager.getThreadContext().setBrowser("*iexplore");
 		driver = WebUIDriver.getWebDriver(true);
 		Assert.assertTrue(driver.getCurrentUrl().contains("http://localhost:") || driver.getCurrentUrl().contains("about:blank"));
+		
+		// issue #280: check BrowserInfo exists
+		Assert.assertNotNull(((CustomEventFiringWebDriver)driver).getBrowserInfo());
+		Assert.assertEquals(((CustomEventFiringWebDriver)driver).getBrowserInfo().getBrowser(), BrowserType.INTERNET_EXPLORER);
 	}
 	
 	@Test(groups={"it"})
@@ -77,5 +95,9 @@ public class TestDesktopDrivers extends GenericDriverTest {
 		SeleniumTestsContextManager.getThreadContext().setBrowser("*edge");
 		driver = WebUIDriver.getWebDriver(true);
 		Assert.assertTrue(driver.getCurrentUrl().contains("http://localhost:") || driver.getCurrentUrl().contains("about:start"));
+		
+		// issue #280: check BrowserInfo exists
+		Assert.assertNotNull(((CustomEventFiringWebDriver)driver).getBrowserInfo());
+		Assert.assertEquals(((CustomEventFiringWebDriver)driver).getBrowserInfo().getBrowser(), BrowserType.EDGE);
 	}
 }
