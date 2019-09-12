@@ -91,6 +91,7 @@ public class TestSeleniumGridDriverFactory extends MockitoTest {
 		when(driver.manage()).thenReturn(options);
 		when(driver.getCapabilities()).thenReturn(caps);
 		when(driver2.manage()).thenReturn(options);
+		when(driver2.getCapabilities()).thenReturn(caps);
 		when(options.timeouts()).thenReturn(timeouts);
 		
 		when(gridConnector1.getHubUrl()).thenReturn(new URL("http://localhost:1111/wd/hub"));
