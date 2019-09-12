@@ -49,6 +49,7 @@ public class BrowserInfo {
 	private static final Pattern REG_CHROME_VERSION = Pattern.compile(".*chrome-(\\d+)-(\\d+).*");
 	private static final Pattern REG_ANDROID_VERSION = Pattern.compile(".*android-(\\d+\\.\\d+).*");
 	public static final String LATEST_VERSION = "999.9";
+	public static final String GRID_BROWSER = "grid-browser";
 	private static List<String> driverList;
 	
 	private String version;
@@ -66,7 +67,7 @@ public class BrowserInfo {
 		this.browser = browser;
 		driverFileSearched = true;
 		driverFileName = null;
-		path = "grid-node";
+		path = GRID_BROWSER;
 	}
 	
 	/**
@@ -405,6 +406,10 @@ public class BrowserInfo {
     	
     	List<Long> pids = new ArrayList<>();
     	
+    	// browser on grid node, we do not need pids
+    	if (GRID_BROWSER.equals(path)) {
+    		return pids;
+    	}
     	// no driver used to connect to browser
     	if ((browser == BrowserType.FIREFOX && driverFileName == null) || browser == BrowserType.SAFARI) {
     		pids.addAll(getBrowserPid(existingPids));

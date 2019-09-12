@@ -165,7 +165,9 @@ public class WebUIDriver {
     			driverPids = browserInfo.getDriverAndBrowserPid(existingPids);
     		}
             
-            driver = handleListeners(driver, browserInfo, driverPids);
+            // issue #280: we use 'webDriverBuilder.getSelectedBrowserInfo()' as 'browserInfo' variable is null for grid, whereas, 'webDriverBuilder.getSelectedBrowserInfo()'
+            // gets an updated version once the driver has been created on grid
+            driver = handleListeners(driver, webDriverBuilder.getSelectedBrowserInfo(), driverPids);
             
             if (driver != null) {
     			MutableCapabilities caps = ((CustomEventFiringWebDriver)driver).getInternalCapabilities();
