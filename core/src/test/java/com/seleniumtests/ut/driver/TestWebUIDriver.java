@@ -1,21 +1,20 @@
 package com.seleniumtests.ut.driver;
 
-import com.neotys.selenium.proxies.NLWebDriver;
-import com.neotys.selenium.proxies.NLWebDriverFactory;
-import com.seleniumtests.MockitoTest;
-import com.seleniumtests.connectors.selenium.SeleniumGridConnector;
-import com.seleniumtests.connectors.selenium.SeleniumGridConnectorFactory;
-import com.seleniumtests.core.SeleniumTestsContextManager;
-import com.seleniumtests.core.StatisticsStorage;
-import com.seleniumtests.core.StatisticsStorage.DriverUsage;
-import com.seleniumtests.customexception.ScenarioException;
-import com.seleniumtests.driver.BrowserType;
-import com.seleniumtests.driver.CustomEventFiringWebDriver;
-import com.seleniumtests.driver.DriverMode;
-import com.seleniumtests.driver.WebUIDriver;
-import com.seleniumtests.driver.screenshots.VideoRecorder;
-import com.seleniumtests.reporter.logger.TestLogging;
-import net.lightbody.bmp.BrowserMobProxy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.powermock.api.mockito.PowerMockito.whenNew;
+
+import java.io.File;
+import java.util.Arrays;
+import java.util.List;
+
 import org.mockito.Mock;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.WebDriver;
@@ -28,15 +27,27 @@ import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.Test;
 
-import java.io.File;
-import java.util.List;
+import com.neotys.selenium.proxies.NLWebDriver;
+import com.neotys.selenium.proxies.NLWebDriverFactory;
+import com.seleniumtests.MockitoTest;
+import com.seleniumtests.browserfactory.BrowserInfo;
+import com.seleniumtests.browserfactory.SeleniumGridDriverFactory;
+import com.seleniumtests.connectors.selenium.SeleniumGridConnector;
+import com.seleniumtests.connectors.selenium.SeleniumGridConnectorFactory;
+import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.core.StatisticsStorage;
+import com.seleniumtests.core.StatisticsStorage.DriverUsage;
+import com.seleniumtests.customexception.ScenarioException;
+import com.seleniumtests.driver.BrowserType;
+import com.seleniumtests.driver.CustomEventFiringWebDriver;
+import com.seleniumtests.driver.DriverMode;
+import com.seleniumtests.driver.WebUIDriver;
+import com.seleniumtests.driver.screenshots.VideoRecorder;
+import com.seleniumtests.reporter.logger.TestLogging;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.*;
+import net.lightbody.bmp.BrowserMobProxy;
 
-@PrepareForTest({NLWebDriverFactory.class, CustomEventFiringWebDriver.class, SeleniumGridConnectorFactory.class})
+@PrepareForTest({NLWebDriverFactory.class, CustomEventFiringWebDriver.class, SeleniumGridConnectorFactory.class, SeleniumGridDriverFactory.class, WebUIDriver.class})
 @PowerMockIgnore("javax.net.ssl.*")
 public class TestWebUIDriver extends MockitoTest {
 	
@@ -60,6 +71,9 @@ public class TestWebUIDriver extends MockitoTest {
 	
 	@Mock
 	private BrowserMobProxy mobProxy;
+	
+	@Mock
+	private SeleniumGridDriverFactory gridDriverFactory;
 
 	/**
 	 * When driver is created, no Neoload driver is instanciated if neoload parameters are not set
@@ -148,6 +162,31 @@ public class TestWebUIDriver extends MockitoTest {
 		
 		WebUIDriver uiDriver = WebUIDriver.getWebUIDriver(false);
 		Assert.assertNotNull(uiDriver.getConfig().getBrowserMobProxy());
+	}
+	
+	/**
+	 * issue #280: check that selectedBrowserInfo is available in grid mode
+	 * @throws Exception 
+	 */
+	@Test(groups={"ut"})
+	public void testDriverCreationInGrid() throws Exception {
+		SeleniumTestsContextManager.getThreadContext().setBrowser("htmlunit");
+		SeleniumTestsContextManager.getThreadContext().setWebDriverGrid("http://localhost:4444/wd/hub");
+		SeleniumTestsContextManager.getThreadContext().setRunMode("grid");
+		
+		
+		// set connector to simulate the driver creation on grid
+		SeleniumTestsContextManager.getThreadContext().setSeleniumGridConnectors(Arrays.asList(gridConnector));
+		when(gridConnector.getNodeUrl()).thenReturn("http://localhost:5555/");
+		
+		whenNew(SeleniumGridDriverFactory.class).withAnyArguments().thenReturn(gridDriverFactory);
+		when(gridDriverFactory.createWebDriver()).thenReturn(drv1);
+		when(gridDriverFactory.getSelectedBrowserInfo()).thenReturn(new BrowserInfo(BrowserType.HTMLUNIT, "1.1"));
+		
+		CustomEventFiringWebDriver ceDriver = (CustomEventFiringWebDriver)WebUIDriver.getWebDriver(true);
+		Assert.assertNotNull(ceDriver.getBrowserInfo());
+		Assert.assertEquals(ceDriver.getBrowserInfo().getVersion(), "1.1");
+		
 	}
 	
 	/**

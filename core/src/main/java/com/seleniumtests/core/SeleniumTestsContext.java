@@ -2192,6 +2192,10 @@ public class SeleniumTestsContext {
 		this.driverCreationBlocked = driverCreationBlocked;
 	}
 
+	public static Map<String, String> getOutputFolderNames() {
+		return outputFolderNames;
+	}
+
 	/**
      * To be used by unit tests exclusively
      */
@@ -2199,7 +2203,10 @@ public class SeleniumTestsContext {
     	outputFolderNames.clear();
     }
 
-	public static Map<String, String> getOutputFolderNames() {
-		return outputFolderNames;
+	/**
+     * To be used by unit tests exclusively
+     */
+	public void setSeleniumGridConnectors(List<SeleniumGridConnector> seleniumGridConnectors) {
+		this.seleniumGridConnectors = seleniumGridConnectors;
 	}
 }
