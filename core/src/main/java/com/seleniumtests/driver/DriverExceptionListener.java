@@ -22,11 +22,14 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
+import org.openqa.selenium.ElementClickInterceptedException;
+import org.openqa.selenium.ElementNotInteractableException;
 import org.openqa.selenium.NoSuchWindowException;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.UnsupportedCommandException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.MoveTargetOutOfBoundsException;
 import org.openqa.selenium.support.events.WebDriverEventListener;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
@@ -179,6 +182,9 @@ public class DriverExceptionListener implements WebDriverEventListener {
 	        	} 
         	} catch (Exception e) {}
         	return;
+        // exception raised when element is non clickable
+        } else if (ex instanceof MoveTargetOutOfBoundsException || ex instanceof ElementNotInteractableException) {
+        	return;
         } else {
             String message = ex.getMessage().split("\\n")[0];
             logger.warn("Got exception:" + message);
@@ -196,6 +202,10 @@ public class DriverExceptionListener implements WebDriverEventListener {
                 // since the session was
                 // terminated.
                 throw new WebSessionEndedException(ex);
+                
+            // issue #281: chrome < 73: WebDriverException is raised instead of ElementClickInterceptedException
+            } else if (message.contains("Other element would receive the click")) {
+            	throw new ElementClickInterceptedException(message);
             }
         }
 
