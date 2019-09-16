@@ -470,6 +470,14 @@ As of 3.10.4, robot configuration can be accessed in test and web page with `rob
 This is also possible to access the paths described above using:
 `robotConfig().getApplicationDataPath()` for example
 
+#### Increase number of retries ( >= 4.8.8) ####
+
+By default, a test is retried 2 times (3 executions). You can customize this number with `testRetryCount` parameter
+In case you want to dynamically (inside the running test), increase the maxretry count, call `increadMaxRetry()` from the test method
+
+This is useful, if, for example, you have detected that your dataset is not available anymore and you do not want to consume a retry for that
+
+Test will be retried at most `2 * testRetryCount`
 
 
 ### 4 Write a cucumber test ###

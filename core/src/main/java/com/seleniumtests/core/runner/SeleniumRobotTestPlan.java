@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.testng.IRetryAnalyzer;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Listeners;
@@ -31,7 +32,9 @@ import org.testng.annotations.Listeners;
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.TestTasks;
+import com.seleniumtests.core.testretry.TestRetryAnalyzer;
 import com.seleniumtests.driver.WebUIDriver;
+import com.seleniumtests.reporter.logger.TestLogging;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
 @Listeners({com.seleniumtests.reporter.reporters.ReporterControler.class,
@@ -167,5 +170,26 @@ public class SeleniumRobotTestPlan {
      */
     public SeleniumTestsContext robotConfig() {
     	return SeleniumTestsContextManager.getThreadContext();
+    }
+    
+    /**
+     * Allow to increment the maxRetry in case an event occurs
+     * Increment will be allowed up to 2 times the total defined by configuration (default is 2)
+     */
+    public void increaseMaxRetry() {
+    	int maxAllowedRetry = Math.max(robotConfig().getTestRetryCount() * 2, SeleniumTestsContext.DEFAULT_TEST_RETRY_COUNT);
+    	
+    	try {
+    		TestRetryAnalyzer retryAnalyzer = (TestRetryAnalyzer)TestLogging.getCurrentTestResult().getMethod().getRetryAnalyzer();
+    		
+    		if (retryAnalyzer != null && retryAnalyzer.getMaxCount() < maxAllowedRetry) {
+        		retryAnalyzer.setMaxCount(retryAnalyzer.getMaxCount() + 1);
+        	} else {
+        		logger.info("cannot increase max retry, limit is reached");
+        	}
+	    } catch (ClassCastException | NullPointerException e) {
+			logger.error("Retry analyzer is not a TestRetryAnalyzer instance");
+		}
+    	
     }
 }
