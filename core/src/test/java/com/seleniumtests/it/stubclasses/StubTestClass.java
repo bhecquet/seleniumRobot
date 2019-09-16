@@ -119,6 +119,46 @@ public class StubTestClass extends StubParentClass {
 		throw new DriverExceptions("some exception");
 	}
 	
+	/**
+	 * Increase max retry
+	 */
+	@Test(groups="stub")
+	public void testWithExceptionAndMaxRetryIncreased() {
+		count++;
+		TestStep step1 = new TestStep("step 1", TestLogging.getCurrentTestResult(), new ArrayList<>());
+		step1.addAction(new TestAction(String.format("played %d times", count), false, new ArrayList<>()));
+		step1.addAction(new TestAction("click button", false, new ArrayList<>()));
+		TestLogging.logTestStep(step1);
+		
+		try {
+			throw new DriverExceptions("some exception");
+		} finally {
+			if (count < 3) {
+				increaseMaxRetry();
+			}
+		}
+	}
+	
+	/**
+	 * Increase max retry above limit
+	 */
+	@Test(groups="stub")
+	public void testWithExceptionAndMaxRetryIncreasedWithLimit() {
+		count++;
+		TestStep step1 = new TestStep("step 1", TestLogging.getCurrentTestResult(), new ArrayList<>());
+		step1.addAction(new TestAction(String.format("played %d times", count), false, new ArrayList<>()));
+		step1.addAction(new TestAction("click button", false, new ArrayList<>()));
+		TestLogging.logTestStep(step1);
+		
+		try {
+			throw new DriverExceptions("some exception");
+		} finally {
+			if (count < 4) {
+				increaseMaxRetry();
+			}
+		}
+	}
+	
 	
 	/**
 	 * Issue #229: test with a step in error but test OK
