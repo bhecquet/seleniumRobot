@@ -23,7 +23,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
 import org.openqa.selenium.ElementClickInterceptedException;
-import org.openqa.selenium.ElementNotInteractableException;
+import org.openqa.selenium.InvalidElementStateException;
 import org.openqa.selenium.NoSuchWindowException;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.UnsupportedCommandException;
@@ -183,7 +183,7 @@ public class DriverExceptionListener implements WebDriverEventListener {
         	} catch (Exception e) {}
         	return;
         // exception raised when element is non clickable
-        } else if (ex instanceof MoveTargetOutOfBoundsException || ex instanceof ElementNotInteractableException) {
+        } else if (ex instanceof MoveTargetOutOfBoundsException || ex instanceof InvalidElementStateException) {
         	return;
         } else {
             String message = ex.getMessage().split("\\n")[0];
