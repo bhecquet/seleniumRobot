@@ -32,6 +32,7 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.DeclarePrecedence;
 import org.openqa.selenium.ElementNotInteractableException;
+import org.openqa.selenium.InvalidElementStateException;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.UnhandledAlertException;
@@ -127,7 +128,7 @@ public class ReplayAction {
 		    		break;
 		    	} catch (UnhandledAlertException e) {
 		    		throw e;
-		    	} catch (MoveTargetOutOfBoundsException | ElementNotInteractableException e) {
+		    	} catch (MoveTargetOutOfBoundsException | InvalidElementStateException e) {
 		    		
 		    		// if click has been intercepted, it means element could not be interacted, so allow auto scrolling for further retries
 		    		// to avoid trying always the same method, we try without scrolling, then with scrolling, then without, ...
@@ -239,8 +240,7 @@ public class ReplayAction {
 				// do not replay if error comes from scenario
 				} catch (ScenarioException | ConfigurationException | DatasetException e) {
 					throw e;
-				// do not replay here when an element cannot be interacted with. Caller will handle it
-				} catch (MoveTargetOutOfBoundsException | ElementNotInteractableException e) {
+				} catch (MoveTargetOutOfBoundsException | InvalidElementStateException e) {
 					updateScrollFlagForElement(joinPoint, null, e);
 				} catch (Throwable e) {
 	
