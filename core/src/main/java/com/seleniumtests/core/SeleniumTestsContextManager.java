@@ -367,6 +367,9 @@ public class SeleniumTestsContextManager {
     public static void updateThreadContext(ITestResult testResult) {
     	if (threadLocalContext.get() != null) {
     		threadLocalContext.get().configureContext(testResult);
+    		
+    		// issue #283: store test context as soon as we have it
+    		testResult.setAttribute(SeleniumRobotTestListener.TEST_CONTEXT, getThreadContext());
     	}
     }
 
