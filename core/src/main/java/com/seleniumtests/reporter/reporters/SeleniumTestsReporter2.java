@@ -21,6 +21,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -35,6 +36,8 @@ import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.filefilter.FileFilterUtils;
+import org.apache.commons.io.filefilter.IOFileFilter;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.text.StringEscapeUtils;
 import org.apache.velocity.Template;
@@ -86,7 +89,7 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 	 */
 	public void copyResources() throws IOException {
 		
-		List<String> styleFiles = Arrays.asList("seleniumRobot.css", "app.min.js", "seleniumRobot_solo.css", "seleniumtests_test1.gif",
+		List<String> styleFiles = Arrays.asList("seleniumRobot.css", "seleniumtests_test1.gif",
 											"seleniumtests_test2.gif", "seleniumtests_test3.gif", "seleniumRobot.js");
 		styleFiles = new ArrayList<>(styleFiles);
 		
@@ -231,6 +234,44 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 	}
 	
 	/**
+	 * Generate HTML part for the previous execution results
+	 * If 'keepAllResults' is false, we place a message saying how to generate it
+	 * Else, display all zip files available (if any)
+	 */
+	public void generatePreviousExecutionLinks(final VelocityEngine ve) {
+		
+		try {
+			Template t = ve.getTemplate( "reporter/templates/report.part.test.previous.exec.vm" );
+			VelocityContext context = new VelocityContext();
+			
+			// do we have previous execution results
+			if (SeleniumTestsContextManager.getGlobalContext().getKeepAllResults()) {
+				List<String> executionResults = FileUtils.listFiles(new File(SeleniumTestsContextManager.getThreadContext().getOutputDirectory()), 
+															FileFilterUtils.suffixFileFilter(".zip"), null).stream()
+						.map(File::getName)
+						.collect(Collectors.toList());
+				if (executionResults.isEmpty()) {
+					return;
+				} else {
+					context.put("files", executionResults);
+					context.put("title", "Previous execution results");
+				}
+			} else {
+				context.put("title", "No previous execution results, you can enable it via parameter '-DkeepAllResults=true'");
+			}
+
+			StringWriter writer = new StringWriter();
+			t.merge( context, writer );
+			mOut.write(writer.toString());
+			
+			
+		} catch (Exception e) {
+			generationErrorMessage = "generateExecutionLogs, Exception creating execution logs:" + e.getMessage();
+			logger.error("Exception creating execution logs.", e);
+		}
+	}
+	
+	/**
 	 * Returns the test status as a string
 	 * @param testResult
 	 * @return
@@ -288,16 +329,22 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 	 * @param testResult
 	 */
 	public void generateSingleTestReport(ITestResult testResult) {
+		generateSingleTestReport(testResult, SeleniumTestsContextManager.getGlobalContext().getOptimizeReports());
+	}
+	public void generateSingleTestReport(ITestResult testResult, boolean resourcesFromCdn) {
 
-		
 		// issue #81: recreate test context from this context (due to multithreading, this context may be null if parallel testing is done)
 		SeleniumTestsContextManager.setThreadContextFromTestResult(testResult.getTestContext(), getTestName(testResult), getClassName(testResult), testResult);
 		
 		try {
 			copyResources();
 			
+			// issue #284: copy resources specific to the single test report. They are moved here so that the file can be used without global resources
+			FileUtils.copyInputStreamToFile(Thread.currentThread().getContextClassLoader().getResourceAsStream("reporter/templates/seleniumRobot_solo.css"), Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), "resources", "seleniumRobot_solo.css").toFile());
+			FileUtils.copyInputStreamToFile(Thread.currentThread().getContextClassLoader().getResourceAsStream("reporter/templates/app.min.js"), Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), "resources", "app.min.js").toFile());
+			
 			mOut = createWriter(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), "TestReport.html");
-			startHtml(getTestStatus(testResult), mOut, "simple");
+			startHtml(getTestStatus(testResult), mOut, "simple", resourcesFromCdn);
 			generateExecutionReport(testResult);
 			endHtml();
 			logger.info("Completed Report Generation.");
@@ -405,6 +452,17 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 	 * @param type
 	 */
 	protected void startHtml(final String testStatus, final PrintWriter out, final String type) {
+		startHtml(testStatus, out, type, SeleniumTestsContextManager.getGlobalContext().getOptimizeReports());
+	}
+	
+	/**
+	 * Begin HTML file
+	 * @param testPassed	true if test is OK, false if test is KO, null if test is skipped
+	 * @param out
+	 * @param type
+	 * @param resourcesFromCdn
+	 */
+	protected void startHtml(final String testStatus, final PrintWriter out, final String type, final boolean resourcesFromCdn) {
 		try {
 			VelocityEngine ve = initVelocityEngine();
 
@@ -416,7 +474,7 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 			context.put("staticPathPrefix", "complete".equals(type) ? "": "../");
 			
 			// optimize reports means that resources are get from internet
-			context.put("localResources", !SeleniumTestsContextManager.getGlobalContext().getOptimizeReports());
+			context.put("localResources", !resourcesFromCdn);
 			context.put("currentDate", new Date().toString());
 
 			DriverMode mode = SeleniumTestsContextManager.getGlobalContext().getRunMode();
@@ -550,6 +608,7 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 			
 			generatePanel(ve, testResult);
 			generateExecutionLogs(ve, testResult);
+			generatePreviousExecutionLinks(ve);
 			
 			
 			

@@ -15,10 +15,10 @@
 	
 	 #if ($report.equals("complete"))
 	<link rel="stylesheet" type="text/css" href="${staticPathPrefix}resources/templates/seleniumRobot.css">
-	#else
-	<link rel="stylesheet" type="text/css" href="${staticPathPrefix}resources/templates/seleniumRobot_solo.css">
-	#end
 	<script src="${staticPathPrefix}resources/templates/seleniumRobot.js"></script>
+	#else
+	<link rel="stylesheet" type="text/css" href="resources/seleniumRobot_solo.css">
+	#end
 
 </head>
 

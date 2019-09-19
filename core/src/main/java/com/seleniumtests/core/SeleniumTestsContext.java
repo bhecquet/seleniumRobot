@@ -161,6 +161,7 @@ public class SeleniumTestsContext {
     public static final String CUSTOM_SUMMARY_REPORTS = "customSummaryReports";
     public static final String ARCHIVE_TO_FILE = "archiveToFile";				// path to the file where archive will be done.
     public static final String ARCHIVE = "archive";								// whether archiving is done. DEfault is false, other values are 'true', 'onSuccess', 'onError'
+    public static final String KEEP_ALL_RESULTS = "keepAllResults";				// if true, will keep all result even if test is retried, allowing to analyze them
     
     public static final String WEB_DRIVER_LISTENER = "webDriverListener";
     public static final String OPTIMIZE_REPORTS = "optimizeReports";
@@ -245,6 +246,7 @@ public class SeleniumTestsContext {
 	public static final ProxyType DEFAULT_WEB_PROXY_TYPE = ProxyType.AUTODETECT;
 	public static final boolean DEFAULT_OPTIMIZE_REPORTS = false;
 	public static final String DEFAULT_ARCHIVE= "false";
+	public static final String DEFAULT_KEEP_ALL_RESULTS = "false";
 	public static final String DEFAULT_NODE_TAGS = "";
 	public static final String DEFAULT_DEBUG = "none";
 	public static final ElementInfo.Mode DEFAULT_ADVANCED_ELEMENT_SEARCH = ElementInfo.Mode.FALSE;
@@ -402,6 +404,7 @@ public class SeleniumTestsContext {
         setArchiveToFile(getValueForTest(ARCHIVE_TO_FILE, System.getProperty(ARCHIVE_TO_FILE)));
         setArchive(getValueForTest(ARCHIVE, System.getProperty(ARCHIVE)));
         setOptimizeReports(getBoolValueForTest(OPTIMIZE_REPORTS, System.getProperty(OPTIMIZE_REPORTS)));
+        setKeepAllResults(getBoolValueForTest(KEEP_ALL_RESULTS, System.getProperty(KEEP_ALL_RESULTS)));
         
         setViewPortWidth(getIntValueForTest(VIEWPORT_WIDTH, System.getProperty(VIEWPORT_WIDTH)));
         setViewPortHeight(getIntValueForTest(VIEWPORT_HEIGHT, System.getProperty(VIEWPORT_HEIGHT)));
@@ -1193,6 +1196,10 @@ public class SeleniumTestsContext {
     
     public boolean getOptimizeReports() {
         return (Boolean) getAttribute(OPTIMIZE_REPORTS);
+    }
+    
+    public boolean getKeepAllResults() {
+    	return (Boolean) getAttribute(KEEP_ALL_RESULTS);
     }
     
     public String getArchiveToFile() {
@@ -2138,6 +2145,14 @@ public class SeleniumTestsContext {
     		setAttribute(OPTIMIZE_REPORTS, optimize);
     	} else {
     		setAttribute(OPTIMIZE_REPORTS, DEFAULT_OPTIMIZE_REPORTS);
+    	}
+    }
+    
+    public void setKeepAllResults(Boolean keepAll) {
+    	if (keepAll != null) {
+    		setAttribute(KEEP_ALL_RESULTS, keepAll);
+    	} else {
+    		setAttribute(KEEP_ALL_RESULTS, DEFAULT_KEEP_ALL_RESULTS);
     	}
     }
     

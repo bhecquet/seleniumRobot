@@ -20,11 +20,12 @@ package com.seleniumtests.core.testretry;
 import org.testng.IRetryAnalyzer;
 import org.testng.ITestResult;
 
+import com.seleniumtests.core.runner.SeleniumRobotTestListener;
 import com.seleniumtests.reporter.logger.TestLogging;
 
 public class TestRetryAnalyzer implements IRetryAnalyzer {
 
-    private int count = 1;
+    private Integer count = 0;
     private int maxCount = 2;
 
     public TestRetryAnalyzer(int maxRetryCount) {
@@ -43,45 +44,47 @@ public class TestRetryAnalyzer implements IRetryAnalyzer {
         return this.maxCount;
     }
 
-    @Override
-    public synchronized boolean retry(final ITestResult result) {
-        return retry(result, true);
-    }
-
     /**
      * Retry logic. We retry a test if
      * - it has not reached the maximum retry number
      * - the error of the test is not an AssertionError. These are functional errors and so should not be retried
-     * @param result
-     * @param logRetry
-     * @return
      */
-    private boolean retry(final ITestResult result, boolean logRetry) {
+    @Override
+    public synchronized boolean retry(final ITestResult result) {
     	String testClassName = String.format("%s.%s", result.getMethod().getRealClass().toString(),
                 result.getMethod().getMethodName());
+    	result.setAttribute(SeleniumRobotTestListener.RETRY, count);
 
-        if (count <= maxCount) {
+        if (count < maxCount) {
         	
+        	count++;
         	if (result.getThrowable() instanceof AssertionError) {
         		TestLogging.log("[NOT RETRYING] due to failed Assertion");
         		return false;
         	}
         	
-        	if (logRetry) {
-	            result.setAttribute("RETRY", new Integer(count));
-	            TestLogging.log("[RETRYING] " + testClassName + " FAILED, " + "Retrying " + count + " time");
-	            count += 1;
-        	} else {
-        		TestLogging.log("Test will be retried");
-        	}
+	        TestLogging.log("[RETRYING] " + testClassName + " FAILED, " + "Retrying " + count + " time");
             return true;
-        }
+        } 
+        count++;
+        
         TestLogging.log(String.format("[NOT RETRYING] max retry count (%d) reached", maxCount));
 
         return false;
     }
+
     
+  
+    
+    /**
+     * check whether the test will be retried / is retrying by comparing the count indiactor stored in test result with the max allowed retry count
+     */
     public boolean retryPeek(final ITestResult result) {
-    	return retry(result, false);
+    	Integer currentRetry = (Integer) result.getAttribute(SeleniumRobotTestListener.RETRY);
+    	if (currentRetry == null) {
+    		return false;
+    	}
+    	
+    	return currentRetry < maxCount;
     }
 }

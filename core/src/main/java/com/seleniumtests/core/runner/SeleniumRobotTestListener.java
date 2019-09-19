@@ -31,6 +31,7 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
+import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.apache.log4j.Logger;
 import org.testng.IConfigurationListener;
 import org.testng.IExecutionListener;
@@ -71,6 +72,7 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 	protected static final Logger logger = SeleniumRobotLogger.getLogger(SeleniumRobotTestListener.class);
 	
 	public static final String TEST_CONTEXT = "testContext";
+	public static final String RETRY = "retry";
 	private static List<ISuite> suiteList = Collections.synchronizedList(new ArrayList<>());
 	private Date start;
 
@@ -101,7 +103,7 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 				Reporter.setCurrentTestResult(null);
 			} 
 
-			logger.info(testResult.getMethod() + " Failed in " + testRetryAnalyzer.getCount() + " times");
+			logger.info(testResult.getMethod() + " Failed in " + (testRetryAnalyzer.getCount()) + " times");
 		}		
 		
 		generateTempReport(testResult);
@@ -121,9 +123,31 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 		
 	}
 	
-	private void generateTempReport(ITestResult result) {
+	/**
+	 * Generate the current test report as soon as test is executed
+	 * If requested, all test data will be copied into a zip file
+	 */
+	private void generateTempReport(ITestResult testResult) {
 		try {
-			new SeleniumTestsReporter2().generateSingleTestReport(result);
+			new SeleniumTestsReporter2().generateSingleTestReport(testResult, true);
+			
+			if (SeleniumTestsContextManager.getThreadContext().getKeepAllResults() && testResult.getMethod().getRetryAnalyzer() != null) {
+				TestRetryAnalyzer testRetryAnalyzer = (TestRetryAnalyzer) testResult.getMethod().getRetryAnalyzer();
+				
+				// test will be retried, store the result before it is removed
+				if (testRetryAnalyzer.retryPeek(testResult)) {
+				
+					// save result to zip, for future use
+					String zipFileName = String.format("retry-%s-%d.zip", 
+								CommonReporter.getTestName(testResult), 
+								testRetryAnalyzer.getCount());
+					FileUtility.zipFolder(new File(SeleniumTestsContextManager.getThreadContext().getOutputDirectory()), 
+							Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), zipFileName).toFile(),
+							FileFilterUtils.notFileFilter(FileFilterUtils.and(FileFilterUtils.prefixFileFilter("retry-", null), FileFilterUtils.suffixFileFilter(".zip"))),
+							true);
+				}
+			}
+			
 		} catch (Throwable e) {
 			// do not crash for a temp report
 		}
