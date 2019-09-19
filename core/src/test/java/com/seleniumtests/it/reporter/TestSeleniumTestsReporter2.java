@@ -34,6 +34,7 @@ import org.testng.ITestContext;
 import org.testng.ITestResult;
 import org.testng.annotations.Test;
 import org.testng.xml.XmlSuite.ParallelMode;
+import org.zeroturnaround.zip.ZipUtil;
 
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
@@ -260,10 +261,10 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	public void testReportWithResourcesFromCDN() throws Exception {
 		
 		try {
-			System.setProperty("optimizeReports", "true");
+			System.setProperty(SeleniumTestsContext.OPTIMIZE_REPORTS, "true");
 			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions", "testInError", "testWithException"});
 		} finally {
-			System.clearProperty("optimizeReports");
+			System.clearProperty(SeleniumTestsContext.OPTIMIZE_REPORTS);
 		}
 		
 		// check content of summary report file
@@ -284,10 +285,10 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	public void testReportWithResourcesFromLocal() throws Exception {
 		
 		try {
-			System.setProperty("optimizeReports", "false");
+			System.setProperty(SeleniumTestsContext.OPTIMIZE_REPORTS, "false");
 			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions", "testInError", "testWithException"});
 		} finally {
-			System.clearProperty("optimizeReports");
+			System.clearProperty(SeleniumTestsContext.OPTIMIZE_REPORTS);
 		}
 		
 		// check content of summary report file
@@ -298,6 +299,77 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		Assert.assertTrue(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "resources", "templates", "AdminLTE.min.css").toFile().exists());
 		Assert.assertTrue(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "resources", "templates", "bootstrap.min.css").toFile().exists());
 		Assert.assertTrue(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "resources", "templates", "fonts").toFile().exists());
+	}
+	
+	@Test(groups={"it"})
+	public void testKeepAllResults(ITestContext testContext) throws Exception {
+		
+		try {
+			System.setProperty(SeleniumTestsContext.TEST_RETRY_COUNT, "1");
+			System.setProperty(SeleniumTestsContext.KEEP_ALL_RESULTS, "true");
+			
+			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testWithException"});
+			
+			String detailedReportContent = readTestMethodResultFile("testWithException");
+
+			// check the message and that no previous execution result is visible
+			Assert.assertTrue(detailedReportContent.contains("Previous execution results"));
+			Assert.assertTrue(detailedReportContent.contains("<a href=\"retry-testWithException-1.zip\">retry-testWithException-1.zip</a>"));
+			
+	
+		} finally {
+			System.clearProperty(SeleniumTestsContext.TEST_RETRY_COUNT);
+			System.clearProperty(SeleniumTestsContext.KEEP_ALL_RESULTS);
+		}
+	}
+	
+	/**
+	 * Previous execution results cannot be generated without retry / or test OK
+	 * Check the line in report is not present
+	 */
+	@Test(groups={"it"})
+	public void testKeepAllResultsWithoutRetry(ITestContext testContext) throws Exception {
+		
+		try {
+			System.setProperty(SeleniumTestsContext.TEST_RETRY_COUNT, "1");
+			System.setProperty(SeleniumTestsContext.KEEP_ALL_RESULTS, "true");
+			
+			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions"});
+			
+			String detailedReportContent = readTestMethodResultFile("testAndSubActions");
+			
+			// check the message and that no previous execution result is visible
+			Assert.assertFalse(detailedReportContent.contains("Previous execution results"));
+			Assert.assertFalse(detailedReportContent.contains("<a href=\"retry-testWithException-1.zip\">retry-testAndSubActions-1.zip</a>"));
+			
+			
+		} finally {
+			System.clearProperty(SeleniumTestsContext.TEST_RETRY_COUNT);
+			System.clearProperty(SeleniumTestsContext.KEEP_ALL_RESULTS);
+		}
+	}
+	
+	/**
+	 * Check that logs of a failed attempt are not kept in the result directory (KEEP_ALL_RESULTS=false)
+	 */
+	@Test(groups={"it"})
+	public void testDoNotKeepAllResults(ITestContext testContext) throws Exception {
+		
+		try {
+			System.setProperty(SeleniumTestsContext.TEST_RETRY_COUNT, "1");
+			System.setProperty(SeleniumTestsContext.KEEP_ALL_RESULTS, "false");
+			
+			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testWithException"});
+			
+			String detailedReportContent = readTestMethodResultFile("testWithException");
+			
+			// check the message and that no previous execution result is visible
+			Assert.assertTrue(detailedReportContent.contains("No previous execution results, you can enable it via parameter '-DkeepAllResults=true'"));
+			Assert.assertFalse(detailedReportContent.contains("<a href=\"retry-testWithException-1.zip\">retry-testWithException-1.zip</a>"));
+		} finally {
+			System.clearProperty(SeleniumTestsContext.TEST_RETRY_COUNT);
+			System.clearProperty(SeleniumTestsContext.KEEP_ALL_RESULTS);
+		}
 	}
 	
 	/**

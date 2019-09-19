@@ -22,6 +22,7 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -29,6 +30,7 @@ import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.jar.JarFile;
@@ -41,6 +43,7 @@ import javax.imageio.ImageIO;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.apache.log4j.Logger;
 import org.zeroturnaround.zip.ZipUtil;
 
@@ -227,11 +230,42 @@ public class FileUtility {
         return outputFolder;
     }
     
+    /**
+	 * Zip the folder and place resulting file into 'destZipFile'
+	 * @param folder			folder to zip
+	 * @param destZipFile 		location where resulting file will be copied
+     */
     public static void zipFolder(final File folder, final File destZipFile) {
+    	try {
+    		zipFolder(folder, destZipFile, null, false);
+    	} catch (IOException e) {
+    		logger.error("cannot zip folder: " + e.getMessage());
+    	}
+    }
+    
+    /**
+  	 * Zip the folder and place resulting file into 'destZipFile'
+  	 * @param folder				folder to zip
+  	 * @param destZipFile 			location where resulting file will be copied
+  	 * @param fileFilter			filter to use when inserting files into zip
+  	 * @param zipParentDirectory	whether the parent directory is the root of the zip (if we zip folder "result/..", zip may contain the 'result/file1' or just 'file1'
+     */
+    public static void zipFolder(final File folder, final File destZipFile, FileFilter fileFilter, boolean zipParentDirectory) throws IOException {
+    	
+    	Path rootDir = Files.createTempDirectory("res");
+    	Path tempDir = rootDir;
+    	
+    	if (zipParentDirectory) {
+    		tempDir = rootDir.resolve(folder.getName());
+    	}
+    	
+		// copy test results
+		FileUtils.copyDirectory(folder, tempDir.toFile(), fileFilter);
+    	
     	try {
 			File tempZip = File.createTempFile(destZipFile.getName(), ".zip");
 			tempZip.deleteOnExit();
-			ZipUtil.pack(folder, tempZip);
+			ZipUtil.pack(rootDir.toFile(), tempZip);
 			FileUtils.copyFile(tempZip, destZipFile);
 		} catch (IOException e) {
 			logger.error("cannot create zip file", e);

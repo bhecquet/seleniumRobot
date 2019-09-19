@@ -166,6 +166,7 @@ Params for mobile testing
 | customSummaryReports		| results::json::reporter/templates/report.summary.json.vm | With this option, you can specify which files will be generated for sumarizing test session. By default, it's a json report. Format is a comma seperated list of <prefix>::<extension>::<template_file located in resources>. resources can be those from test application. Template is in the Velocity format. See chap7_Howto.md, §11 |
 | archiveToFile				| null		| If not specified, no archiving will be done. Else, provide a zip file path and the whole content of `outputDirectory` will be zipped to this file in case archive is enabled |
 | archive					| false		| If `true`, always archive results to `archiveToFile` file. Other possible values are: `onSuccess` (archive when test is OK) and `onError` (archive when test is KO) |
+| keepAllResults			| false		| By default, when a test fails and is retried, the failed test data are overwritten. If true, will keep all result even if test is retried, allowing to analyze them |
 | tmsRun					| null		| Configuration string (JSON format) for identifying test that is run in test management system. E.g: {'type': 'hp', 'run': '3'} |
 | tmsConnect				| null		| Configuration string (JSON format) for test management system if you plan to use it. E.g: {'hpAlmServerUrl': 'http://myamlserver:8080', 'hpAlmProject': '12', 'hpAlmDomain': 'mydomain', 'hpAlmUser': 'user', 'hpAlmPassword': 'pass'}  |
 | optimizeReports			| false		| If true, compress HTML, get HTML resources from internet so that logs are smaller |

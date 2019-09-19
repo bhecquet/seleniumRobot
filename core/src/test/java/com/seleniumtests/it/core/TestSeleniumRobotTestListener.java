@@ -47,12 +47,14 @@ import org.testng.xml.XmlClass;
 import org.testng.xml.XmlSuite;
 import org.testng.xml.XmlSuite.ParallelMode;
 import org.testng.xml.XmlTest;
+import org.zeroturnaround.zip.ZipUtil;
 
 import com.seleniumtests.connectors.selenium.SeleniumGridConnectorFactory;
 import com.seleniumtests.connectors.selenium.SeleniumRobotVariableServerConnector;
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.it.reporter.ReporterTest;
+import com.seleniumtests.util.FileUtility;
 
 @PrepareForTest({SeleniumRobotVariableServerConnector.class, SeleniumGridConnectorFactory.class, SeleniumTestsContext.class})
 @PowerMockIgnore({"javax.net.ssl.*", "com.google.inject.*"})
@@ -112,6 +114,61 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE);
 			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL);
 			System.clearProperty(SeleniumTestsContext.TEST_RETRY_COUNT);
+		}
+	}
+	
+	/**
+	 * Check that logs of a failed attempt are kept in the result directory (KEEP_ALL_RESULTS=true)
+	 */
+	@Test(groups={"it"})
+	public void testKeepAllResults(ITestContext testContext) throws Exception {
+		
+		try {
+			System.setProperty(SeleniumTestsContext.TEST_RETRY_COUNT, "1");
+			System.setProperty(SeleniumTestsContext.KEEP_ALL_RESULTS, "true");
+			System.setProperty(SeleniumTestsContext.VIDEO_CAPTURE, "true");
+			
+			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriverShortKo"});
+			
+			// check that zip file is created of first execution, but not for the second one
+			File resultZip = Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriverShortKo", "retry-testDriverShortKo-1.zip").toFile();
+			Assert.assertTrue(resultZip.exists());
+			Assert.assertFalse(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriverShortKo", "retry-testDriverShortKo-2.zip").toFile().exists());
+			
+			// check the content of the zip file
+			ZipUtil.containsEntry(resultZip, "testDriverShortKo/TestReport.html");
+			ZipUtil.containsEntry(resultZip, "testDriverShortKo/videoCapture.avi");
+			ZipUtil.containsEntry(resultZip, "testDriverShortKo/resources/app.min.js");
+			ZipUtil.containsEntry(resultZip, "testDriverShortKo/resources/seleniumRobot_solo.css");
+			ZipUtil.containsEntry(resultZip, "testDriverShortKo/screenshots/testDriverShortKo_1-1_openPage_with_args._(file.D..png");
+			ZipUtil.containsEntry(resultZip, "testDriverShortKo/htmls/testDriverShortKo_1-1_openPage_with_args._(file.D..html");
+			
+		} finally {
+			System.clearProperty(SeleniumTestsContext.TEST_RETRY_COUNT);
+			System.clearProperty(SeleniumTestsContext.KEEP_ALL_RESULTS);
+			System.clearProperty(SeleniumTestsContext.VIDEO_CAPTURE);
+		}
+	}
+	
+	/**
+	 * Check that logs of a failed attempt are not kept in the result directory (KEEP_ALL_RESULTS=false)
+	 */
+	@Test(groups={"it"})
+	public void testDoNotKeepAllResults(ITestContext testContext) throws Exception {
+		
+		try {
+			System.setProperty(SeleniumTestsContext.TEST_RETRY_COUNT, "1");
+			System.setProperty(SeleniumTestsContext.KEEP_ALL_RESULTS, "false");
+			
+			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriverShortKo"});
+			
+			// check that zip file is created of first execution, but not for the second one
+			Assert.assertFalse(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriverShortKo", "retry-testDriverShortKo-1.zip").toFile().exists());
+			Assert.assertFalse(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriverShortKo", "retry-testDriverShortKo-2.zip").toFile().exists());
+			
+		} finally {
+			System.clearProperty(SeleniumTestsContext.TEST_RETRY_COUNT);
+			System.clearProperty(SeleniumTestsContext.KEEP_ALL_RESULTS);
 		}
 	}
 	
