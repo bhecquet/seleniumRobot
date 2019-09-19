@@ -246,7 +246,7 @@ public class SeleniumTestsContext {
 	public static final ProxyType DEFAULT_WEB_PROXY_TYPE = ProxyType.AUTODETECT;
 	public static final boolean DEFAULT_OPTIMIZE_REPORTS = false;
 	public static final String DEFAULT_ARCHIVE= "false";
-	public static final String DEFAULT_KEEP_ALL_RESULTS = "false";
+	public static final boolean DEFAULT_KEEP_ALL_RESULTS = false;
 	public static final String DEFAULT_NODE_TAGS = "";
 	public static final String DEFAULT_DEBUG = "none";
 	public static final ElementInfo.Mode DEFAULT_ADVANCED_ELEMENT_SEARCH = ElementInfo.Mode.FALSE;
