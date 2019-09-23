@@ -73,6 +73,7 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 	
 	public static final String TEST_CONTEXT = "testContext";
 	public static final String RETRY = "retry";
+	public static final String NO_MORE_RETRY = "noMoreRetry";
 	private static List<ISuite> suiteList = Collections.synchronizedList(new ArrayList<>());
 	private Date start;
 
