@@ -54,12 +54,14 @@ public class TestRetryAnalyzer implements IRetryAnalyzer {
     	String testClassName = String.format("%s.%s", result.getMethod().getRealClass().toString(),
                 result.getMethod().getMethodName());
     	result.setAttribute(SeleniumRobotTestListener.RETRY, count);
+    	result.setAttribute(SeleniumRobotTestListener.NO_MORE_RETRY, false);
 
         if (count < maxCount) {
         	
         	count++;
         	if (result.getThrowable() instanceof AssertionError) {
         		TestLogging.log("[NOT RETRYING] due to failed Assertion");
+            	result.setAttribute(SeleniumRobotTestListener.NO_MORE_RETRY, true);
         		return false;
         	}
         	
@@ -81,7 +83,8 @@ public class TestRetryAnalyzer implements IRetryAnalyzer {
      */
     public boolean retryPeek(final ITestResult result) {
     	Integer currentRetry = (Integer) result.getAttribute(SeleniumRobotTestListener.RETRY);
-    	if (currentRetry == null) {
+    	Boolean noMoreRetry = (Boolean) result.getAttribute(SeleniumRobotTestListener.NO_MORE_RETRY);
+    	if (currentRetry == null || (noMoreRetry != null && noMoreRetry)) {
     		return false;
     	}
     	
