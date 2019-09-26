@@ -22,10 +22,17 @@ import java.util.Arrays;
 
 import org.testng.ITestResult;
 
+import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.runner.CucumberScenarioWrapper;
 import com.seleniumtests.util.StringUtility;
 
 public class TestNGResultUtils {
+	
+
+	private static final String UNIQUE_METHOD_NAME = "uniqueMethodName"; // unique name of the test (in case several tests have the same name)
+	private static final String TEST_CONTEXT = "testContext";
+	private static final String RETRY = "retry";
+	private static final String NO_MORE_RETRY = "noMoreRetry";
 
 	private TestNGResultUtils() {
 		// nothing to do
@@ -87,5 +94,44 @@ public class TestNGResultUtils {
     	}
     	
     	return uniqueIdentifier;
+    }
+    
+    /**
+     * Returns the unique test name (it's the test name as returned by {@link TestNGResultUtils.getTestName()}) plus an index depending on the execution order of the method
+     * (This index is calculated in {@link SeleniumTestsContext.hashTest()}. Resulting name is the folder name and becomes the unique test name, put into testResult attributes
+     * @return
+     */
+    public static String getUniqueTestName(ITestResult testNGResult) {
+    	return (String) testNGResult.getAttribute(UNIQUE_METHOD_NAME);
+    }
+    
+    public static void setUniqueTestName(ITestResult testNGResult, String name) {
+    	testNGResult.setAttribute(UNIQUE_METHOD_NAME, name);
+    }
+    
+    public static SeleniumTestsContext getSeleniumRobotTestContext(ITestResult testNGResult) {
+    	return (SeleniumTestsContext) testNGResult.getAttribute(TEST_CONTEXT);
+    }
+    
+    public static void setSeleniumRobotTestContext(ITestResult testNGResult, SeleniumTestsContext context) {
+    	testNGResult.setAttribute(TEST_CONTEXT, context);
+    }
+    
+    // number of retry already done
+    public static Integer getRetry(ITestResult testNGResult) {
+    	return (Integer) testNGResult.getAttribute(RETRY);
+    }
+    
+    public static void setRetry(ITestResult testNGResult, Integer retry) {
+    	testNGResult.setAttribute(RETRY, retry);
+    }
+    
+    // whether retry will be allowed for this test
+    public static Boolean getNoMoreRetry(ITestResult testNGResult) {
+    	return (Boolean) testNGResult.getAttribute(NO_MORE_RETRY);
+    }
+    
+    public static void setNoMoreRetry(ITestResult testNGResult, Boolean noMoreRetry) {
+    	testNGResult.setAttribute(NO_MORE_RETRY, noMoreRetry);
     }
 }

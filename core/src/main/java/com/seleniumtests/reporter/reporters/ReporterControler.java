@@ -37,6 +37,7 @@ import org.testng.xml.XmlSuite;
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.runner.SeleniumRobotTestListener;
+import com.seleniumtests.core.utils.TestNGResultUtils;
 import com.seleniumtests.reporter.logger.TestLogging;
 import com.seleniumtests.reporter.logger.TestStep;
 
@@ -124,7 +125,7 @@ public class ReporterControler implements IReporter {
 				usedFiles.addAll(testStep.getAllAttachments());
 			}
 
-			SeleniumTestsContext testContext = (SeleniumTestsContext)testSteps.getKey().getAttribute(SeleniumRobotTestListener.TEST_CONTEXT);
+			SeleniumTestsContext testContext = TestNGResultUtils.getSeleniumRobotTestContext(testSteps.getKey());
 			
 			if (testContext == null) {
 				continue;

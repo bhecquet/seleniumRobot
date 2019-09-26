@@ -31,6 +31,7 @@ import org.apache.log4j.Logger;
 import org.apache.velocity.app.VelocityEngine;
 import org.testng.ITestResult;
 
+import com.seleniumtests.core.utils.TestNGResultUtils;
 import com.seleniumtests.util.StringUtility;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
@@ -134,18 +135,15 @@ public abstract class CommonReporter {
 			return "N-A";
 		}
 		
-		if (testResult.getAttribute(SeleniumRobotLogger.UNIQUE_METHOD_NAME) != null) {
-			return testResult.getAttribute(SeleniumRobotLogger.UNIQUE_METHOD_NAME).toString();
+		if (TestNGResultUtils.getUniqueTestName(testResult) != null) {
+			return TestNGResultUtils.getUniqueTestName(testResult);
 		}
 		
+		// when test is skipped, UNIQUE_METHOD_NAME may have not been generated
 		if (testResult.getStatus() == ITestResult.SKIP) {
 			return testResult.getName();
 		} else {
-			if (testResult.getAttribute(SeleniumRobotLogger.UNIQUE_METHOD_NAME) != null) {
-				return testResult.getAttribute(SeleniumRobotLogger.UNIQUE_METHOD_NAME).toString();
-			} else {
-				return "N-A";
-			}
+			return "N-A";
 		}
 	}
 	

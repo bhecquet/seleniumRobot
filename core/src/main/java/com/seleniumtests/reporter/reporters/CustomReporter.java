@@ -41,6 +41,7 @@ import org.testng.xml.XmlSuite;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.StatisticsStorage;
+import com.seleniumtests.core.utils.TestNGResultUtils;
 import com.seleniumtests.customexception.CustomSeleniumTestsException;
 import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.reporter.logger.TestLogging;
@@ -169,7 +170,7 @@ public class CustomReporter extends CommonReporter implements IReporter {
 			context.put("newline", "\n");
 			context.put("failures", errors);
 			context.put("hostname", testResult.getHost() == null ? "": testResult.getHost());
-			context.put("suiteName", testResult.getAttribute(SeleniumRobotLogger.UNIQUE_METHOD_NAME));
+			context.put("suiteName", TestNGResultUtils.getUniqueTestName(testResult));
 			context.put("className", testResult.getTestClass().getName());
 			context.put("tests", newTestSteps == null ? 0: newTestSteps.size());
 			context.put("duration", testDuration / 1000.0);
@@ -199,7 +200,7 @@ public class CustomReporter extends CommonReporter implements IReporter {
 			fileWriter.close();
 			generatedFiles.add(fileName);
 		} catch (Exception e) {
-			logger.error(String.format("Error generating test result %s: %s", testResult.getAttribute(SeleniumRobotLogger.UNIQUE_METHOD_NAME), e.getMessage()));
+			logger.error(String.format("Error generating test result %s: %s", TestNGResultUtils.getUniqueTestName(testResult), e.getMessage()));
 		}
 	}
 	

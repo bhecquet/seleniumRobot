@@ -21,7 +21,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -37,7 +36,6 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.FileFilterUtils;
-import org.apache.commons.io.filefilter.IOFileFilter;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.text.StringEscapeUtils;
 import org.apache.velocity.Template;
@@ -54,7 +52,7 @@ import org.testng.xml.XmlSuite;
 
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
-import com.seleniumtests.core.runner.SeleniumRobotTestListener;
+import com.seleniumtests.core.utils.TestNGResultUtils;
 import com.seleniumtests.driver.DriverMode;
 import com.seleniumtests.driver.TestType;
 import com.seleniumtests.reporter.logger.TestLogging;
@@ -381,7 +379,7 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 							.collect(Collectors.toList());
 				
 				for (ITestResult result: methodResults) {
-					SeleniumTestsContext testContext = (SeleniumTestsContext)result.getAttribute(SeleniumRobotTestListener.TEST_CONTEXT);
+					SeleniumTestsContext testContext = TestNGResultUtils.getSeleniumRobotTestContext(result);
 					
 					String fileName;
 					if (testContext != null) {
@@ -390,7 +388,7 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 						fileName = getTestName(result) + "/TestReport.html";
 					}
 					result.setAttribute(METHOD_RESULT_FILE_NAME, fileName);
-					result.setAttribute(SeleniumRobotLogger.UNIQUE_METHOD_NAME, getTestName(result));
+					TestNGResultUtils.setUniqueTestName(result, getTestName(result)); // be sure test name is initialized
 					
 				}
 				resultList.addAll(methodResults);

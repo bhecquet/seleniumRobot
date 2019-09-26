@@ -71,9 +71,6 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 	
 	protected static final Logger logger = SeleniumRobotLogger.getLogger(SeleniumRobotTestListener.class);
 	
-	public static final String TEST_CONTEXT = "testContext";
-	public static final String RETRY = "retry";
-	public static final String NO_MORE_RETRY = "noMoreRetry";
 	private static List<ISuite> suiteList = Collections.synchronizedList(new ArrayList<>());
 	private Date start;
 
@@ -551,7 +548,7 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 	 */
 	private void executeBeforeTestMethod(IInvokedMethod method, ITestResult testResult, ITestContext context) {
 		testResult.setAttribute(SeleniumRobotLogger.METHOD_NAME, TestNGResultUtils.getTestName(testResult));
-		testResult.setAttribute(SeleniumRobotLogger.UNIQUE_METHOD_NAME, TestNGResultUtils.getTestName(testResult)); // initialize it so that it's always set
+		TestNGResultUtils.setUniqueTestName(testResult, TestNGResultUtils.getTestName(testResult));// initialize it so that it's always set
 		
 		// when @BeforeMethod has been used, threadContext is already initialized and may have been updated. Do not overwrite options
 		// only reconfigure it
@@ -576,9 +573,9 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
     		testResult.getMethod().setRetryAnalyzer(new TestRetryAnalyzer(SeleniumTestsContextManager.getThreadContext().getTestRetryCount()));
 		}	
     	
-    	// unique method name is the test name plus an index
-    	testResult.setAttribute(SeleniumRobotLogger.UNIQUE_METHOD_NAME, SeleniumTestsContextManager.getThreadContext().getRelativeOutputDir());
-		logger.info(SeleniumRobotLogger.START_TEST_PATTERN + testResult.getAttribute(SeleniumRobotLogger.UNIQUE_METHOD_NAME));
+    	// unique method name is the test name plus an index in case DataProvider is used
+    	TestNGResultUtils.setUniqueTestName(testResult, SeleniumTestsContextManager.getThreadContext().getRelativeOutputDir());
+		logger.info(SeleniumRobotLogger.START_TEST_PATTERN + TestNGResultUtils.getUniqueTestName(testResult));
 	}
 	
 
@@ -593,7 +590,7 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 	 * @param context
 	 */
 	private void executeAfterTestMethod(IInvokedMethod method, ITestResult testResult, ITestContext context) {
-		logger.info(SeleniumRobotLogger.END_TEST_PATTERN + testResult.getAttribute(SeleniumRobotLogger.UNIQUE_METHOD_NAME));
+		logger.info(SeleniumRobotLogger.END_TEST_PATTERN + TestNGResultUtils.getUniqueTestName(testResult));
 
 		Reporter.setCurrentTestResult(testResult);
 
@@ -628,7 +625,7 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 		unreserveVariables();
 		
 		// store context in test result
-		testResult.setAttribute(TEST_CONTEXT, SeleniumTestsContextManager.getThreadContext());
+		TestNGResultUtils.setSeleniumRobotTestContext(testResult, SeleniumTestsContextManager.getThreadContext());
 		
 		// parse logs of this test method
 		try {

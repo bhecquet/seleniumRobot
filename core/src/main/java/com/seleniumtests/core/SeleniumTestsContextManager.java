@@ -38,6 +38,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import com.seleniumtests.core.runner.SeleniumRobotTestListener;
+import com.seleniumtests.core.utils.TestNGResultUtils;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.driver.TestType;
 import com.seleniumtests.util.TestConfigurationParser;
@@ -369,7 +370,7 @@ public class SeleniumTestsContextManager {
     		threadLocalContext.get().configureContext(testResult);
     		
     		// issue #283: store test context as soon as we have it
-    		testResult.setAttribute(SeleniumRobotTestListener.TEST_CONTEXT, getThreadContext());
+    		TestNGResultUtils.setSeleniumRobotTestContext(testResult, getThreadContext());
     	}
     }
 
@@ -392,12 +393,12 @@ public class SeleniumTestsContextManager {
     	if (testResult == null) {
     		throw new ConfigurationException("Cannot set context from testResult as it is null");
     	}
-    	if (testResult.getAttribute(SeleniumRobotTestListener.TEST_CONTEXT) != null) {
-    		setThreadContext((SeleniumTestsContext)testResult.getAttribute(SeleniumRobotTestListener.TEST_CONTEXT));
+    	if (TestNGResultUtils.getSeleniumRobotTestContext(testResult) != null) {
+    		setThreadContext((SeleniumTestsContext)TestNGResultUtils.getSeleniumRobotTestContext(testResult));
     	} else {
     		logger.error("Result did not contain thread context, initializing a new one");
     		initThreadContext(testNGCtx, testName, className, testResult);
-    		testResult.setAttribute(SeleniumRobotTestListener.TEST_CONTEXT, getThreadContext());
+    		TestNGResultUtils.setSeleniumRobotTestContext(testResult, getThreadContext());
     	}
     }
     

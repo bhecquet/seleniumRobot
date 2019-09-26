@@ -34,6 +34,7 @@ import org.testng.xml.XmlSuite;
 
 import com.seleniumtests.connectors.selenium.SeleniumRobotSnapshotServerConnector;
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.core.utils.TestNGResultUtils;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.SeleniumRobotServerException;
 import com.seleniumtests.reporter.logger.TestLogging;
@@ -57,7 +58,7 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 	public JSONObject generateExecutionLogs(final ITestResult testResult) {
 		
 		JSONObject executionLogs = new JSONObject();
-		executionLogs.put("logs", SeleniumRobotLogger.getTestLogs().get(testResult.getAttribute(SeleniumRobotLogger.UNIQUE_METHOD_NAME)));
+		executionLogs.put("logs", SeleniumRobotLogger.getTestLogs().get(TestNGResultUtils.getUniqueTestName(testResult)));
 		
 		// exception handling
 		StringBuilder stackString = new StringBuilder();
