@@ -21,6 +21,7 @@ import org.testng.IRetryAnalyzer;
 import org.testng.ITestResult;
 
 import com.seleniumtests.core.runner.SeleniumRobotTestListener;
+import com.seleniumtests.core.utils.TestNGResultUtils;
 import com.seleniumtests.reporter.logger.TestLogging;
 
 public class TestRetryAnalyzer implements IRetryAnalyzer {
@@ -53,15 +54,15 @@ public class TestRetryAnalyzer implements IRetryAnalyzer {
     public synchronized boolean retry(final ITestResult result) {
     	String testClassName = String.format("%s.%s", result.getMethod().getRealClass().toString(),
                 result.getMethod().getMethodName());
-    	result.setAttribute(SeleniumRobotTestListener.RETRY, count);
-    	result.setAttribute(SeleniumRobotTestListener.NO_MORE_RETRY, false);
+    	TestNGResultUtils.setRetry(result, count);
+    	TestNGResultUtils.setNoMoreRetry(result, false);
 
         if (count < maxCount) {
         	
         	count++;
         	if (result.getThrowable() instanceof AssertionError) {
         		TestLogging.log("[NOT RETRYING] due to failed Assertion");
-            	result.setAttribute(SeleniumRobotTestListener.NO_MORE_RETRY, true);
+            	TestNGResultUtils.setNoMoreRetry(result, true);
         		return false;
         	}
         	
@@ -82,8 +83,8 @@ public class TestRetryAnalyzer implements IRetryAnalyzer {
      * check whether the test will be retried / is retrying by comparing the count indiactor stored in test result with the max allowed retry count
      */
     public boolean retryPeek(final ITestResult result) {
-    	Integer currentRetry = (Integer) result.getAttribute(SeleniumRobotTestListener.RETRY);
-    	Boolean noMoreRetry = (Boolean) result.getAttribute(SeleniumRobotTestListener.NO_MORE_RETRY);
+    	Integer currentRetry = (Integer) TestNGResultUtils.getRetry(result);
+    	Boolean noMoreRetry = (Boolean) TestNGResultUtils.getNoMoreRetry(result);
     	if (currentRetry == null || (noMoreRetry != null && noMoreRetry)) {
     		return false;
     	}
