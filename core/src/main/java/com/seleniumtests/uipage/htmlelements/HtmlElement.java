@@ -38,6 +38,7 @@ import org.openqa.selenium.HasCapabilities;
 import org.openqa.selenium.InvalidElementStateException;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.NoSuchFrameException;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.Rectangle;
@@ -59,6 +60,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 import com.seleniumtests.browserfactory.FirefoxDriverFactory;
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.CustomSeleniumTestsException;
 import com.seleniumtests.customexception.DriverExceptions;
 import com.seleniumtests.customexception.ScenarioException;
@@ -620,7 +622,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 			try {
 				frameWebElement = driver.findElements(frameEl.getBy()).get(idx);
 			} catch (IndexOutOfBoundsException e) {
-				throw new ScenarioException(String.format("Frame %s with index %d has not been found", frameEl, idx));
+				throw new NoSuchFrameException(String.format("Frame %s with index %d has not been found", frameEl, idx));
 			}
 			((CustomEventFiringWebDriver)driver).scrollToElement(frameWebElement, -20);		
 			driver.switchTo().frame(frameWebElement);
@@ -1283,7 +1285,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     	
     	while (end.isAfter(clock.instant())) {
     		try {
-	    		new WebDriverWait(driver, 1).until(ExpectedConditionsC.presenceOfElementLocated(this));
+	    		new WebDriverWait(driver, 1).ignoring(ConfigurationException.class, ScenarioException.class).until(ExpectedConditionsC.presenceOfElementLocated(this));
 	    		return;
     		} catch (TimeoutException e) {
     		}

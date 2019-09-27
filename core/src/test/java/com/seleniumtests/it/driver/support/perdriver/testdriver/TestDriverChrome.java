@@ -286,6 +286,16 @@ public class TestDriverChrome extends TestDriver {
 	}
 	
 	@Test(groups={"it", "ut"})
+	public void testTextElementInsideHtmlElementIsNotPresent() {
+		super.testTextElementInsideHtmlElementIsNotPresent();
+	}
+
+	@Test(groups={"it", "ut"})
+	public void testElementWithIFrameAbsent() {
+		super.testElementWithIFrameAbsent();
+	}
+	
+	@Test(groups={"it", "ut"})
 	public void testFindTextElementInsideHtmlElement() {
 		super.testFindTextElementInsideHtmlElement();
 	}

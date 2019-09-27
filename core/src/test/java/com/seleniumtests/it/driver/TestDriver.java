@@ -611,10 +611,30 @@ public class TestDriver extends GenericMultiBrowserTest {
 		Assert.assertFalse(new HtmlElement("", By.id("divNotFound")).isElementPresent(2));
 	}
 	
+	/**
+	 * issue #286: check that element is seen as present
+	 */
 	@Test(groups={"it", "ut"})
 	public void testTextElementInsideHtmlElementIsPresent() {
 		Assert.assertEquals(DriverTestPage.optionOfSelectListIFrameByText.getText(), "option1 frame");
 		Assert.assertTrue(DriverTestPage.optionOfSelectListIFrameByText.isElementPresent(2));
+	}
+
+	/**
+	 * issue #286: check that element is not present
+	 */
+	@Test(groups={"it", "ut"})
+	public void testTextElementInsideHtmlElementIsNotPresent() {
+		Assert.assertFalse(DriverTestPage.wrongElementOfSelectListIFrameByText.isElementPresent(2));
+	}
+	
+
+	/**
+	 * issue #286: check that no error is raised if frame cannot be found
+	 */
+	@Test(groups={"it", "ut"})
+	public void testElementWithIFrameAbsent() {
+		Assert.assertFalse(DriverTestPage.elementNotPresentInIFrame.isElementPresent(2));
 	}
 	
 	@Test(groups={"it", "ut"})
