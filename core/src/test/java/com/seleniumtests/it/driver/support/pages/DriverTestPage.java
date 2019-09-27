@@ -114,6 +114,9 @@ public class DriverTestPage extends PageObject {
 	public static final SelectList selectList3 = new HtmlElement("", By.id("parentDiv")).findSelectList(By.name("select"), 0);
 	public static final Table table3 = new HtmlElement("", By.id("parentDiv")).findTable(By.tagName("table"), 0);
 	
+	// Element inside non existent frame
+	public static final FrameElement iframeNotPresent = new FrameElement("IFrame", By.id("noIFrame"));
+	public static final HtmlElement elementNotPresentInIFrame = new HtmlElement("", By.tagName("div"), iframeNotPresent);
 	
 	// Elements for IFrame
 	public static final FrameElement iframe = new FrameElement("IFrame", By.id("myIFrame"));
@@ -126,6 +129,7 @@ public class DriverTestPage extends PageObject {
 	public static final SelectList selectListIFrame = new SelectList("list", By.id("selectIFrame"), iframe);
 	public static final HtmlElement optionOfSelectListIFrame = selectListIFrame.findElement(By.tagName("option"));
 	public static final HtmlElement optionOfSelectListIFrameByText = selectListIFrame.findElement(ByC.text("option1 frame", "option"));
+	public static final HtmlElement wrongElementOfSelectListIFrameByText = selectListIFrame.findElement(By.tagName("div"));
 	public static final Table tableIFrame = new Table("table", By.id("tableIframe"), iframe);
 	public static final HtmlElement rows = new HtmlElement("", By.tagName("tr"), iframe);
 	public static final LabelElement labelIFrame = new LabelElement("label", By.id("labelIFrame"), iframe);

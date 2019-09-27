@@ -33,6 +33,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
+import org.openqa.selenium.NoSuchFrameException;
 import org.openqa.selenium.WebDriver.TargetLocator;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
@@ -46,7 +47,6 @@ import org.testng.annotations.Test;
 
 import com.seleniumtests.MockitoTest;
 import com.seleniumtests.core.SeleniumTestsContextManager;
-import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.uipage.htmlelements.ButtonElement;
@@ -148,7 +148,7 @@ public class TestFrameElement extends MockitoTest {
 	 * issue #276: Check a clear error is raised when an invalid index is given for finding a frame
 	 * @throws Exception
 	 */
-	@Test(groups={"ut"}, expectedExceptions=ScenarioException.class)
+	@Test(groups={"ut"}, expectedExceptions=NoSuchFrameException.class)
 	public void testUseElementInsideFrameWithWrongIndex() throws Exception {
 		FrameElement frame = new FrameElement("", By.tagName("iframe"), 2);
 		HtmlElement el = new HtmlElement("", By.id("el"), frame);
