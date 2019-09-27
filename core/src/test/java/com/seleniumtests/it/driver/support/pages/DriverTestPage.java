@@ -24,6 +24,7 @@ import org.openqa.selenium.interactions.Actions;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.driver.BrowserType;
+import com.seleniumtests.uipage.ByC;
 import com.seleniumtests.uipage.PageObject;
 import com.seleniumtests.uipage.htmlelements.ButtonElement;
 import com.seleniumtests.uipage.htmlelements.CheckBoxElement;
@@ -108,6 +109,7 @@ public class DriverTestPage extends PageObject {
 	public static final RadioButtonElement radioElement3 = new HtmlElement("", By.id("parentDiv")).findRadioButtonElement(By.name("radioClick"), 0);
 	public static final CheckBoxElement checkElement3 = new HtmlElement("", By.id("parentDiv")).findCheckBoxElement(By.name("checkboxClick"), 0);
 	public static final ButtonElement resetButton3 = new HtmlElement("", By.id("parentDiv")).findButtonElement(By.name("resetButton"), 0);
+	public static final ButtonElement resetButtonByTagName = new HtmlElement("", By.id("parentDiv")).findButtonElement(By.tagName("button"), 0);
 	public static final LinkElement linkElement3 = new HtmlElement("", By.id("parentDiv")).findLinkElement(By.name("googleLink"), 0);
 	public static final SelectList selectList3 = new HtmlElement("", By.id("parentDiv")).findSelectList(By.name("select"), 0);
 	public static final Table table3 = new HtmlElement("", By.id("parentDiv")).findTable(By.tagName("table"), 0);
@@ -123,6 +125,7 @@ public class DriverTestPage extends PageObject {
 	public static final LinkElement linkIFrame = new LinkElement("My link", By.id("linkIFrame"), iframe);
 	public static final SelectList selectListIFrame = new SelectList("list", By.id("selectIFrame"), iframe);
 	public static final HtmlElement optionOfSelectListIFrame = selectListIFrame.findElement(By.tagName("option"));
+	public static final HtmlElement optionOfSelectListIFrameByText = selectListIFrame.findElement(ByC.text("option1 frame", "option"));
 	public static final Table tableIFrame = new Table("table", By.id("tableIframe"), iframe);
 	public static final HtmlElement rows = new HtmlElement("", By.tagName("tr"), iframe);
 	public static final LabelElement labelIFrame = new LabelElement("label", By.id("labelIFrame"), iframe);

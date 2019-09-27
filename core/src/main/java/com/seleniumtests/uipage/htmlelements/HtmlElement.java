@@ -66,6 +66,7 @@ import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import com.seleniumtests.driver.TestType;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.reporter.logger.TestLogging;
+import com.seleniumtests.uipage.ExpectedConditionsC;
 import com.seleniumtests.uipage.PageObject;
 import com.seleniumtests.uipage.ReplayOnError;
 import com.seleniumtests.util.helper.WaitHelper;
@@ -1282,8 +1283,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     	
     	while (end.isAfter(clock.instant())) {
     		try {
-	    		enterFrame();
-	    		new WebDriverWait(driver, 1).until(ExpectedConditions.presenceOfElementLocated(by));
+	    		new WebDriverWait(driver, 1).until(ExpectedConditionsC.presenceOfElementLocated(this));
 	    		return;
     		} catch (TimeoutException e) {
     		}

@@ -278,6 +278,11 @@ public class TestDriverEdge extends TestDriver {
 	public void testIsElementNotPresent() {
 		super.testIsElementNotPresent();
 	}
+
+	@Test(groups={"it", "ut"})
+	public void testTextElementInsideHtmlElementIsPresent() {
+		super.testTextElementInsideHtmlElementIsPresent();
+	}
 	
 	@Test(groups={"it", "ut"})
 	public void testFindTextElementInsideHtmlElement() {
