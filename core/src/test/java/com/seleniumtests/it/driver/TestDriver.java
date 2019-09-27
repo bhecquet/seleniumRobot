@@ -612,6 +612,12 @@ public class TestDriver extends GenericMultiBrowserTest {
 	}
 	
 	@Test(groups={"it", "ut"})
+	public void testTextElementInsideHtmlElementIsPresent() {
+		Assert.assertEquals(DriverTestPage.optionOfSelectListIFrameByText.getText(), "option1 frame");
+		Assert.assertTrue(DriverTestPage.optionOfSelectListIFrameByText.isElementPresent(2));
+	}
+	
+	@Test(groups={"it", "ut"})
 	public void testFindTextElementInsideHtmlElement() {
 		Assert.assertEquals(DriverTestPage.textElement2.getValue(), "default");
 	}
