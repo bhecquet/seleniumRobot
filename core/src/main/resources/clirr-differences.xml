@@ -2,21 +2,9 @@
 
 
 	<difference>
-		<className>**/connectors/mails/EmailClient</className>
-		<differenceType>7012</differenceType>
-		<method>void sendMessage(java.util.List, java.lang.String, java.lang.String)</method>
-		<justification>internal use</justification>
-	</difference>
-	<difference>
-		<className>**/connectors/mails/EmailClient</className>
-		<differenceType>7012</differenceType>
-		<method>java.util.List checkMessagePresenceInLastMessages(java.lang.String, java.lang.String[], com.seleniumtests.connectors.mails.Email, int)</method>
-		<justification>internal use</justification>
-	</difference>
-	<difference>
-		<className>**/connectors/mails/EmailClient</className>
-		<differenceType>7012</differenceType>
-		<method>java.util.List checkMessagePresenceInLastMessages(java.lang.String, java.util.List, com.seleniumtests.connectors.mails.Email, int)</method>
+		<className>**/util/logging/SeleniumRobotLogger</className>
+		<differenceType>6011</differenceType>
+		<field>UNIQUE_METHOD_NAME</field>
 		<justification>internal use</justification>
 	</difference>
 </differences>
