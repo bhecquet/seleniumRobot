@@ -46,6 +46,7 @@ public class SeleniumGridConnector {
 	protected String nodeUrl;
 	
 	public static final String CONSOLE_SERVLET = "/grid/console/";
+	public static final String API_TEST_SESSSION = "/grid/api/testsession/";
 	protected static Logger logger = SeleniumRobotLogger.getLogger(SeleniumGridConnector.class);
 	
 	public SeleniumGridConnector(String url) {
@@ -189,7 +190,7 @@ public class SeleniumGridConnector {
 		
         // logging node ip address:
         try {
-        	JSONObject object = Unirest.get(String.format("http://%s:%d/grid/api/testsession/", hubUrl.getHost(), hubUrl.getPort()))
+        	JSONObject object = Unirest.get(String.format("http://%s:%d%s", hubUrl.getHost(), hubUrl.getPort(), API_TEST_SESSSION))
         		.queryString("session", driver.getSessionId().toString())
         		.asJson()
         		.getBody()

@@ -201,6 +201,37 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 		}
 	}
 	
+
+	/**
+	 * issue #287: check that test is retried even if a configuration error occurs
+	 * Also check test is KO and not skipped (won't be possible since: https://github.com/cbeust/testng/issues/2148)
+	 * , because error occured in AfterMethod
+	 * @throws Exception
+	 */
+	@Test(groups={"it"}, enabled=false)
+	public void testRetriedWithConfigurationErrorAndTestFailure() throws Exception {
+		
+		try {
+			System.setProperty(SeleniumTestsContext.TEST_RETRY_COUNT, "1");
+			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForConfigurationError2"}, ParallelMode.NONE, new String[] {"testInErrorWithAfterMethodError"});
+			
+			String mainReportContent = readSummaryFile();
+			
+			// check that test is marked as KO because it executed (https://github.com/cbeust/testng/issues/2148)
+			// TODO: Assert.assertTrue(mainReportContent.matches(".*<i class=\"fa fa-circle circleFailed\"></i><a href='testInErrorWithAfterMethodError/TestReport.html' .*?>testInErrorWithAfterMethodError</a>.*"));
+			
+			// check test is retried
+			String logs = readSeleniumRobotLogFile();
+			Assert.assertEquals(StringUtils.countMatches(logs, "Start method testInErrorWithAfterMethodError"), 2);
+			Assert.assertEquals(StringUtils.countMatches(logs, "info before error"), 2);
+			
+		} finally {
+			System.clearProperty(SeleniumTestsContext.TEST_RETRY_COUNT);
+		}
+		 
+
+	}
+	
 	/**
 	 * Checks that with a data provider, test context does not overlap between test methods and that displayed logs correspond to the method execution and not all method executions
 	 * @param testContext

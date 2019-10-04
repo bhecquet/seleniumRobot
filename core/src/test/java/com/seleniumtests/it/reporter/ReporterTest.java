@@ -80,7 +80,7 @@ public class ReporterTest extends MockitoTest {
 	 * @return
 	 * @throws IOException
 	 */
-	protected TestNG executeSubTest(int threadCount, String[] testClasses, XmlSuite.ParallelMode parallelMode, String[] methods) throws IOException {
+	public static TestNG executeSubTest(int threadCount, String[] testClasses, XmlSuite.ParallelMode parallelMode, String[] methods) throws IOException {
 //		TestListener testListener = new TestListener();
 		
 		XmlSuite suite = new XmlSuite();
