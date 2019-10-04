@@ -75,13 +75,6 @@ public class WebUIDriver {
             return;
         }
     	this.name = name;
-        config = new DriverConfig(SeleniumTestsContextManager.getThreadContext());
-        if (uxDriverSession.get() == null) {
-            uxDriverSession.set(new HashMap<>());
-        }
-        uxDriverSession.get().put(name, this);
-        
-        switchToDriver(name);
     }
 
     /**
@@ -505,7 +498,7 @@ public class WebUIDriver {
      */
     public static WebUIDriver getWebUIDriver(boolean create, String name) {
         if ((uxDriverSession.get() == null || uxDriverSession.get().get(name) == null) && create) {
-            new WebUIDriver(name);
+            WebUIDriverFactory.getInstance(name);
         }
         
         try {
@@ -637,6 +630,14 @@ public class WebUIDriver {
 
 	public DriverConfig getConfig() {
 		return config;
+	}
+
+	/**
+	 * Use only with tests
+	 * @param config
+	 */
+	public void setConfig(DriverConfig config) {
+		this.config = config;
 	}
 
 	public static ThreadLocal<VideoRecorder> getVideoRecorder() {

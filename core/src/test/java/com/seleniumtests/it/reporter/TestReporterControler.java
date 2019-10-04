@@ -160,7 +160,7 @@ public class TestReporterControler extends ReporterTest {
 	@Test(groups={"it"})
 	public void testReportDetailsWithAfterConfigurationError() throws Exception {
 		
-		executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForConfigurationError2"}); 
+		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForConfigurationError2"}, ParallelMode.NONE, new String[] {"testWithAfterMethodError"}); 
 		
 		String mainReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport.html"));
 		mainReportContent = mainReportContent.replace("\n", "").replace("\r",  "");

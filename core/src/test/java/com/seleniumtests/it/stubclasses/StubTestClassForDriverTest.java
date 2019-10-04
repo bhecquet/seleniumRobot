@@ -19,10 +19,12 @@ package com.seleniumtests.it.stubclasses;
 
 import java.lang.reflect.Method;
 
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.core.TestTasks;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.it.driver.support.pages.DriverTestPage;
 import com.seleniumtests.it.driver.support.pages.DriverTestPageNativeActions;
@@ -34,6 +36,15 @@ public class StubTestClassForDriverTest extends StubParentClass {
 		SeleniumTestsContextManager.getThreadContext().setBrowser("chrome");
 		SeleniumTestsContextManager.getThreadContext().setOverrideSeleniumNativeAction(true);
 		SeleniumTestsContextManager.getThreadContext().setTestRetryCount(1);
+	}
+	
+	/**
+	 * added for issue #287 where we need to fail on configuration method to reproduce the bug
+	 * @param method
+	 */
+	@AfterMethod(groups="stub") 
+	public void reset(Method method) {
+		TestTasks.killProcess("foobar");
 	}
 
 	@Test(groups="stub")

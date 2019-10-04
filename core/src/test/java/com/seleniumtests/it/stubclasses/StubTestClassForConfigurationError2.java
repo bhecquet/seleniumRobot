@@ -19,6 +19,7 @@ package com.seleniumtests.it.stubclasses;
 
 import java.lang.reflect.Method;
 
+import org.openqa.selenium.WebDriverException;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -44,6 +45,12 @@ public class StubTestClassForConfigurationError2 extends StubParentClass {
 	public void testWithAfterMethodError(XmlTest xmlTest) {
 		addStep("step 1");
 		TestLogging.info("some info");
+	}
+	
+	@Test
+	public void testInErrorWithAfterMethodError() {
+		TestLogging.info("info before error");
+		throw new WebDriverException("error");
 	}
 	
 	@AfterMethod
