@@ -42,6 +42,7 @@ import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import com.seleniumtests.driver.DriverMode;
 import com.seleniumtests.driver.WebUIDriver;
+import com.seleniumtests.driver.WebUIDriverFactory;
 import com.seleniumtests.driver.screenshots.VideoRecorder;
 import com.seleniumtests.reporter.logger.TestLogging;
 
@@ -135,7 +136,7 @@ public class TestWebUIDriver extends MockitoTest {
 	
 	@Test(groups={"ut"})
 	public void testConstructor() {
-		WebUIDriver uiDriver = new WebUIDriver("foo");
+		WebUIDriver uiDriver = WebUIDriverFactory.getInstance("foo");
 		Assert.assertEquals(WebUIDriver.getUxDriverSession().get().size(), 1);
 		Assert.assertEquals(WebUIDriver.getCurrentWebUiDriverName(), "foo");
 	}
@@ -145,8 +146,8 @@ public class TestWebUIDriver extends MockitoTest {
 	 */
 	@Test(groups={"ut"})
 	public void testMultipleConstructor() {
-		WebUIDriver uiDriver1 = new WebUIDriver("foo");
-		WebUIDriver uiDriver2 = new WebUIDriver("bar");
+		WebUIDriver uiDriver = WebUIDriverFactory.getInstance("foo");
+		WebUIDriver uiDriver2 = WebUIDriverFactory.getInstance("bar");
 		Assert.assertEquals(WebUIDriver.getUxDriverSession().get().size(), 2);
 
 		Assert.assertEquals(WebUIDriver.getCurrentWebUiDriverName(), "bar");
@@ -319,8 +320,8 @@ public class TestWebUIDriver extends MockitoTest {
 	public void testCleanUpMultipleBrowsers() {
 
 		SeleniumTestsContextManager.getThreadContext().setBrowser("htmlunit");
-		WebUIDriver uiDriver1 = new WebUIDriver("foo");
-		WebUIDriver uiDriver2 = new WebUIDriver("bar");
+		WebUIDriver uiDriver1 = WebUIDriverFactory.getInstance("foo");
+		WebUIDriver uiDriver2 = WebUIDriverFactory.getInstance("bar");
 		uiDriver1.createRemoteWebDriver();
 		uiDriver2.createRemoteWebDriver();
 
@@ -340,7 +341,7 @@ public class TestWebUIDriver extends MockitoTest {
 		
 		SeleniumTestsContextManager.getThreadContext().setCaptureNetwork(true);
 		SeleniumTestsContextManager.getThreadContext().setBrowser("htmlunit");
-		WebUIDriver uiDriver = new WebUIDriver("foo");
+		WebUIDriver uiDriver = WebUIDriverFactory.getInstance("foo");
 		uiDriver.setDriver(eventDriver);
 
 		WebUIDriver.cleanUp();
@@ -357,7 +358,7 @@ public class TestWebUIDriver extends MockitoTest {
 		
 		SeleniumTestsContextManager.getThreadContext().setCaptureNetwork(true);
 		SeleniumTestsContextManager.getThreadContext().setBrowser("htmlunit");
-		WebUIDriver uiDriver = new WebUIDriver("foo");
+		WebUIDriver uiDriver = WebUIDriverFactory.getInstance("foo");
 		uiDriver.setDriver(null);
 		
 		WebUIDriver.cleanUp();	
@@ -371,7 +372,7 @@ public class TestWebUIDriver extends MockitoTest {
 		
 		SeleniumTestsContextManager.getThreadContext().setCaptureNetwork(true);
 		SeleniumTestsContextManager.getThreadContext().setBrowser("htmlunit");
-		WebUIDriver uiDriver = new WebUIDriver("foo");
+		WebUIDriver uiDriver = WebUIDriverFactory.getInstance("foo");
 		uiDriver.setDriver(eventDriver);
 		doThrow(new WebDriverException("error")).when(eventDriver).quit();
 		
@@ -388,7 +389,7 @@ public class TestWebUIDriver extends MockitoTest {
 		
 		SeleniumTestsContextManager.getThreadContext().setCaptureNetwork(true);
 		SeleniumTestsContextManager.getThreadContext().setBrowser("htmlunit");
-		WebUIDriver uiDriver = new WebUIDriver("foo");
+		WebUIDriver uiDriver = WebUIDriverFactory.getInstance("foo");
 		uiDriver.createRemoteWebDriver();
 		Assert.assertNotNull(uiDriver.getConfig().getBrowserMobProxy());
 		
@@ -405,7 +406,7 @@ public class TestWebUIDriver extends MockitoTest {
 		
 		SeleniumTestsContextManager.getThreadContext().setCaptureNetwork(true);
 		SeleniumTestsContextManager.getThreadContext().setBrowser("htmlunit");
-		WebUIDriver uiDriver = new WebUIDriver("foo");
+		WebUIDriver uiDriver = WebUIDriverFactory.getInstance("foo");
 		uiDriver.createRemoteWebDriver();
 		Assert.assertNotNull(uiDriver.getConfig().getBrowserMobProxy());
 		
@@ -434,7 +435,7 @@ public class TestWebUIDriver extends MockitoTest {
 
 		SeleniumTestsContextManager.getThreadContext().setVideoCapture("true");
 		SeleniumTestsContextManager.getThreadContext().setBrowser("htmlunit");
-		WebUIDriver uiDriver = new WebUIDriver("foo");
+		WebUIDriver uiDriver = WebUIDriverFactory.getInstance("foo");
 		uiDriver.createRemoteWebDriver();
 		VideoRecorder vRecorder = WebUIDriver.getVideoRecorder().get();
 		
@@ -468,7 +469,7 @@ public class TestWebUIDriver extends MockitoTest {
 		
 		SeleniumTestsContextManager.getThreadContext().setVideoCapture("true");
 		SeleniumTestsContextManager.getThreadContext().setBrowser("htmlunit");
-		WebUIDriver uiDriver = new WebUIDriver("foo");
+		WebUIDriver uiDriver = WebUIDriverFactory.getInstance("foo");
 		uiDriver.createRemoteWebDriver();
 		VideoRecorder vRecorder = WebUIDriver.getVideoRecorder().get();
 		

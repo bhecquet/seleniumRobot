@@ -37,6 +37,7 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.openqa.selenium.support.ui.Select;
+import org.testng.annotations.AfterMethod;
 
 import com.neotys.selenium.proxies.NLWebDriver;
 import com.seleniumtests.core.SeleniumTestsContextManager;
@@ -482,11 +483,18 @@ public class LogAction {
 		}
 		
 		try {
-			reply = joinPoint.proceed(joinPoint.getArgs());
+			reply = joinPoint.proceed(joinPoint.getArgs());	
 		} catch (Throwable e) {
 			currentStep.setFailed(true);
 			currentStep.setActionException(e);
-			throw e;
+			
+			// issue #287 (https://github.com/cbeust/testng/issues/2148): is method an @AfterMethod. Then do not rethrow exception
+			MethodSignature methodSignature = (MethodSignature)joinPoint.getSignature();
+			if (methodSignature.getMethod().getAnnotation(AfterMethod.class) != null) {
+				TestLogging.error(String.format("Error in @AfterMethod %s: %s", methodSignature, e.getMessage()));
+			} else {
+				throw e;
+			}
 		} finally {
 			if (rootStep) {
 				TestLogging.getCurrentRootTestStep().updateDuration();

@@ -26,6 +26,7 @@ import static org.mockito.Mockito.times;
 
 import java.io.IOException;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.ClientProtocolException;
 import org.mockito.Mock;
 import org.openqa.selenium.WebDriver.Options;
@@ -76,7 +77,7 @@ public class TestSeleniumGridDriverFactory extends ConnectorsTest {
 	 * @param testContext
 	 * @throws Exception
 	 */
-	@Test(groups={"it"}, enabled=false)
+	@Test(groups={"it"})
 	public void testSessionNotGet(ITestContext testContext) throws Exception {
 		
 		try {
@@ -129,6 +130,10 @@ public class TestSeleniumGridDriverFactory extends ConnectorsTest {
 
 			// check that we tried to create the driver twice (the bug is based on the fact that we create it only once)
 			verify(uiDriver, times(2)).createWebDriver();
+			
+			String logs = ReporterTest.readSeleniumRobotLogFile();
+			Assert.assertEquals(StringUtils.countMatches(logs, "Start creating *chrome driver"), 2);
+			
 			
 		} finally {
 			System.clearProperty(SeleniumTestsContext.TEST_RETRY_COUNT);

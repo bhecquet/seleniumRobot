@@ -253,7 +253,7 @@ public class ReporterTest extends MockitoTest {
 		return detailedReportContent.replace("\n", "").replace("\r",  "").replaceAll(">\\s+<", "><");
 	}
 	
-	protected String readSeleniumRobotLogFile() throws IOException {
+	public static String readSeleniumRobotLogFile() throws IOException {
 		String logContent = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "seleniumRobot.log").toFile());
 		return logContent.replace("\n", "").replace("\r",  "");
 	}
