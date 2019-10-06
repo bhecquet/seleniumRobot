@@ -212,6 +212,7 @@ This class contains:
 
 Example of a shopping cart class:
 
+```java
 	public class ShoppingCart extends HeaderAndFooter {
 	
 		private static LinkElement proceed = new LinkElement("Checkout", By.linkText("Proceed to Checkout"));
@@ -244,6 +245,7 @@ Example of a shopping cart class:
 			return new PaymentDetails(); 
 		} 
 	}
+```
 	
 **WARN:** If you write your class combined with cucumber feature (methods annotated with @Given, @When, ...), only write methods returning `void`. Else, report will contain new page create step twice.
 

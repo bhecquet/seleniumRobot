@@ -208,7 +208,7 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 	 * , because error occured in AfterMethod
 	 * @throws Exception
 	 */
-	@Test(groups={"it"}, enabled=false)
+	@Test(groups={"it"})
 	public void testRetriedWithConfigurationErrorAndTestFailure() throws Exception {
 		
 		try {
@@ -218,7 +218,7 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 			String mainReportContent = readSummaryFile();
 			
 			// check that test is marked as KO because it executed (https://github.com/cbeust/testng/issues/2148)
-			// TODO: Assert.assertTrue(mainReportContent.matches(".*<i class=\"fa fa-circle circleFailed\"></i><a href='testInErrorWithAfterMethodError/TestReport.html' .*?>testInErrorWithAfterMethodError</a>.*"));
+			Assert.assertTrue(mainReportContent.matches(".*<i class=\"fa fa-circle circleFailed\"></i><a href='testInErrorWithAfterMethodError/TestReport.html' .*?>testInErrorWithAfterMethodError</a>.*"));
 			
 			// check test is retried
 			String logs = readSeleniumRobotLogFile();

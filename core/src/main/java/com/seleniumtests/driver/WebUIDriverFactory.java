@@ -10,7 +10,7 @@ public class WebUIDriverFactory {
 		// nothing
 	}
 
-	public static void getInstance(String name) {
+	public static WebUIDriver getInstance(String name) {
 		WebUIDriver uiDriver = new WebUIDriver(name);
 		uiDriver.setConfig(new DriverConfig(SeleniumTestsContextManager.getThreadContext()));
 		
@@ -20,5 +20,7 @@ public class WebUIDriverFactory {
 		WebUIDriver.getUxDriverSession().get().put(name, uiDriver);
         
 		WebUIDriver.switchToDriver(name);
+		
+		return uiDriver;
 	}
 }
