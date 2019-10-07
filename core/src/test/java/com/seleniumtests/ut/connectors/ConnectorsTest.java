@@ -26,9 +26,11 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.io.File;
+import java.util.Arrays;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.mockito.stubbing.OngoingStubbing;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 
 import com.mashape.unirest.http.HttpResponse;
@@ -103,7 +105,60 @@ public class ConnectorsTest extends MockitoTest {
 				return postRequest;
 			
 		}
-		return null;
+		return null;	
+	}
+
+	protected OngoingStubbing<JsonNode> createJsonServerMock(String requestType, String apiPath, int statusCode, String ... replyData) throws UnirestException {
 		
+		@SuppressWarnings("unchecked")
+		HttpResponse<JsonNode> jsonResponse = mock(HttpResponse.class);
+		HttpRequest request = mock(HttpRequest.class);
+		MultipartBody requestMultipartBody = mock(MultipartBody.class);
+		HttpRequestWithBody postRequest = mock(HttpRequestWithBody.class);
+		
+		when(request.getUrl()).thenReturn(SERVER_URL);
+		when(jsonResponse.getStatus()).thenReturn(statusCode);
+		
+		OngoingStubbing<JsonNode> stub = when(jsonResponse.getBody()).thenReturn(new JsonNode(replyData[0]));
+
+		for (String reply: Arrays.asList(replyData).subList(1, replyData.length)) {
+			stub = stub.thenReturn(new JsonNode(reply));
+		}
+
+		
+		switch(requestType) {
+		case "GET":
+			GetRequest getRequest = mock(GetRequest.class); 
+			
+			when(Unirest.get(SERVER_URL + apiPath)).thenReturn(getRequest);
+			
+			when(getRequest.header(anyString(), anyString())).thenReturn(getRequest);
+			when(getRequest.asJson()).thenReturn(jsonResponse);
+			when(getRequest.queryString(anyString(), anyString())).thenReturn(getRequest);
+			when(getRequest.queryString(anyString(), anyInt())).thenReturn(getRequest);
+			when(getRequest.queryString(anyString(), anyBoolean())).thenReturn(getRequest);
+			when(getRequest.getHttpRequest()).thenReturn(request);
+			return stub;
+		case "POST":
+			when(Unirest.post(SERVER_URL + apiPath)).thenReturn(postRequest);
+		case "PATCH":
+			when(Unirest.patch(SERVER_URL + apiPath)).thenReturn(postRequest);
+			when(postRequest.field(anyString(), anyString())).thenReturn(requestMultipartBody);
+			when(postRequest.field(anyString(), anyInt())).thenReturn(requestMultipartBody);
+			when(postRequest.field(anyString(), anyLong())).thenReturn(requestMultipartBody);
+			when(postRequest.field(anyString(), any(File.class))).thenReturn(requestMultipartBody);
+			when(postRequest.queryString(anyString(), anyString())).thenReturn(postRequest);
+			when(postRequest.queryString(anyString(), anyInt())).thenReturn(postRequest);
+			when(postRequest.queryString(anyString(), anyBoolean())).thenReturn(postRequest);
+			when(postRequest.header(anyString(), anyString())).thenReturn(postRequest);
+			when(requestMultipartBody.field(anyString(), anyInt())).thenReturn(requestMultipartBody);
+			when(requestMultipartBody.field(anyString(), anyBoolean())).thenReturn(requestMultipartBody);
+			when(requestMultipartBody.field(anyString(), anyString())).thenReturn(requestMultipartBody);
+			when(requestMultipartBody.field(anyString(), anyLong())).thenReturn(requestMultipartBody);
+			when(requestMultipartBody.field(anyString(), any(File.class))).thenReturn(requestMultipartBody);
+			return stub;
+			
+		}
+		return null;	
 	}
 }

@@ -25,6 +25,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.openqa.selenium.MutableCapabilities;
+import org.openqa.selenium.SessionNotCreatedException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.remote.CapabilityType;
@@ -135,27 +136,36 @@ public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implemen
         }
 
         // connection to grid is made here
-        long start = new Date().getTime();
-        driver = getDriver(capabilities);
-        long duration = new Date().getTime() - start;
-
-        setImplicitWaitTimeout(webDriverConfig.getImplicitWaitTimeout());
-        if (webDriverConfig.getPageLoadTimeout() >= 0 && SeleniumTestsContextManager.isWebTest()) {
-            setPageLoadTimeout(webDriverConfig.getPageLoadTimeout());
+        for (int i = 0; i < 3; i++) {
+	        long start = new Date().getTime();
+	        driver = getDriver(capabilities);
+	        long duration = new Date().getTime() - start;
+	
+	        setImplicitWaitTimeout(webDriverConfig.getImplicitWaitTimeout());
+	        if (webDriverConfig.getPageLoadTimeout() >= 0 && SeleniumTestsContextManager.isWebTest()) {
+	            setPageLoadTimeout(webDriverConfig.getPageLoadTimeout());
+	        }
+	
+	        this.setWebDriver(driver);
+	
+	        // if session has not been really created, we retry
+	        try {
+	        	activeGridConnector.getSessionInformationFromGrid((RemoteWebDriver) driver, duration);
+	        } catch (SessionNotCreatedException e) {
+	        	continue;
+	        }
+	
+	        // sets a file detector. This is only useful for remote drivers
+	        ((RemoteWebDriver)driver).setFileDetector(new LocalFileDetector());
+	        
+	        // create a BrowserInfo based on information get from grid hub
+	        selectedBrowserInfo = new BrowserInfo(BrowserType.getBrowserTypeFromSeleniumBrowserType(((RemoteWebDriver)driver).getCapabilities().getBrowserName()), 
+		        									((RemoteWebDriver)driver).getCapabilities().getVersion());
+	
+	        return driver;
         }
-
-        this.setWebDriver(driver);
-
-        runWebDriver(duration);
-
-        // sets a file detector. This is only useful for remote drivers
-        ((RemoteWebDriver)driver).setFileDetector(new LocalFileDetector());
         
-        // create a BrowserInfo based on information get from grid hub
-        selectedBrowserInfo = new BrowserInfo(BrowserType.getBrowserTypeFromSeleniumBrowserType(((RemoteWebDriver)driver).getCapabilities().getBrowserName()), 
-	        									((RemoteWebDriver)driver).getCapabilities().getVersion());
-
-        return driver;
+        throw new SessionNotCreatedException("Session not created on any grid hub, after 3 tries");
     }
     
     /**
@@ -227,10 +237,6 @@ public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implemen
 		}
     	
     	return driver;
-    }
-    
-    private void runWebDriver(long driverCreationDuration){
-    	activeGridConnector.getSessionInformationFromGrid((RemoteWebDriver) driver, driverCreationDuration);
     }
 
 	@Override
