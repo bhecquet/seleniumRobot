@@ -27,6 +27,8 @@ import org.apache.log4j.Logger;
 import org.json.JSONObject;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.MutableCapabilities;
+import org.openqa.selenium.SessionNotCreatedException;
+import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.SessionId;
 
@@ -196,7 +198,17 @@ public class SeleniumGridConnector {
         		.getBody()
         		.getObject();
         	
-            nodeUrl = (String) object.get("proxyId");
+        	// if we have an error (session not found), raise an exception
+        	try {
+        		nodeUrl = (String) object.get("proxyId");
+        	} catch(Exception e) {
+        		// {"msg": "Cannot find test slot running session 7ef50edc-ce51-40dd-98b6-0a369bff38b in the registry."," + 
+				//  "success": false"
+        		// }, 
+        		throw new SessionNotCreatedException(object.getString("msg"));
+        	}
+        	
+            
             String node = nodeUrl.split("//")[1].split(":")[0];
             String browserName = driver.getCapabilities().getBrowserName();
             String version = driver.getCapabilities().getVersion();
@@ -218,6 +230,7 @@ public class SeleniumGridConnector {
             
         } catch (Exception ex) {
         	logger.error(ex);
+        	throw new SessionNotCreatedException(ex.getMessage());
         } 
 	}
 
