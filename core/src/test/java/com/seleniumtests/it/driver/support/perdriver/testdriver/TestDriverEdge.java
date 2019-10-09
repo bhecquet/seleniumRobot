@@ -145,6 +145,21 @@ public class TestDriverEdge extends TestDriver {
 	}
 	
 	@Test(groups={"it", "ut"})
+	public void testHiddenElementByDisplay() { 
+		super.testHiddenElementByDisplay();
+	}
+	
+	@Test(groups={"it", "ut"})
+	public void testHiddenElementByOpacity() { 
+		super.testHiddenElementByOpacity();
+	}
+	
+	@Test(groups={"it", "ut"})
+	public void testHiddenElementByVisibility() { 
+		super.testHiddenElementByVisibility();
+	}
+	
+	@Test(groups={"it", "ut"})
 	public void testFindNthSubElement() {
 		super.testFindNthSubElement();
 	}

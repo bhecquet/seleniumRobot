@@ -64,6 +64,9 @@ public class DriverTestPage extends PageObject {
 	public static final TextFieldElement onBlurField = new TextFieldElement("On Blur", By.id("textOnBlur"));
 	public static final TextFieldElement onBlurFieldDest = new TextFieldElement("On Blur", By.id("textOnBlurDest"));
 	public static final CheckBoxElement hiddenCheckBox = new CheckBoxElement("check", By.id("hiddenCheckbox"));
+	public static final CheckBoxElement hiddenCheckboxByOpacity = new CheckBoxElement("check", By.id("hiddenCheckboxByOpacity"));
+	public static final CheckBoxElement hiddenCheckboxByDisplay = new CheckBoxElement("check", By.id("hiddenCheckboxByDisplay"));
+	public static final CheckBoxElement hiddenCheckboxByVisibility = new CheckBoxElement("check", By.id("hiddenCheckboxByVisibility"));
 	public static final SelectList selectList = new SelectList("list", By.id("select"));
 	public static final SelectList selectMultipleList = new SelectList("listMultiple", By.id("selectMultiple"));
 	public static final SelectList selectUlLiList = new SelectList("ulLiList", By.id("languages"));
