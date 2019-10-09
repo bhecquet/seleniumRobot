@@ -49,6 +49,7 @@ public class StubTestClass extends StubParentClass {
 	public void setCount() {
 		WaitHelper.waitForMilliSeconds(100);
 		count = 0;
+		failed = false;
 	}
 
 	@BeforeMethod(groups={"stub"})
@@ -185,6 +186,23 @@ public class StubTestClass extends StubParentClass {
 		if (!failed) {
 			failed = true;
 			throw new DriverExceptions("some exception");
+		}
+	}
+	
+	/**
+	 * Test which fails only on first execution
+	 */
+	@Test(groups="stub")
+	public void testWithSocketTimeoutOnFirstExec() {
+		
+		TestStep step1 = new TestStep("step 10", TestLogging.getCurrentTestResult(), new ArrayList<>());
+		step1.addAction(new TestAction(String.format("played %d times", count), false, new ArrayList<>()));
+		step1.addAction(new TestAction("click button", false, new ArrayList<>()));
+		TestLogging.logTestStep(step1);
+		
+		if (!failed) {
+			failed = true;
+			throw new WebDriverException("Session [6919ba25-53b6-4615-bd59-e97399bf1e12] was terminated due to SO_TIMEOUT");
 		}
 	}
 }

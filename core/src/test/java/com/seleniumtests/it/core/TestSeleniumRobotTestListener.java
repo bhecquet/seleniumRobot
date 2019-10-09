@@ -28,6 +28,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -49,6 +50,7 @@ import org.testng.xml.XmlSuite.ParallelMode;
 import org.testng.xml.XmlTest;
 import org.zeroturnaround.zip.ZipUtil;
 
+import com.seleniumtests.connectors.selenium.SeleniumGridConnector;
 import com.seleniumtests.connectors.selenium.SeleniumGridConnectorFactory;
 import com.seleniumtests.connectors.selenium.SeleniumRobotVariableServerConnector;
 import com.seleniumtests.core.SeleniumTestsContext;
@@ -64,6 +66,9 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 	
 	@Mock
 	private SeleniumRobotVariableServerConnector variableServer;
+	
+	@Mock
+	private SeleniumGridConnector gridConnector;
 	
 	/**
 	 * Test that 2 tests (1 cucumber and 1 TestNG) are correctly executed in parallel
@@ -638,5 +643,86 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 		
 		// All tests should be skipped because configuration method is skipped
 		Assert.assertEquals(jsonResult.getInt("pass"), 2);
+	}
+	
+	/**
+	 * issue #289: Check we increase retry count when SO_TIMEOUT is raised in non-local mode
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testRetriedWithSocketTimeoutError() throws Exception {
+		
+		try {
+			System.setProperty(SeleniumTestsContext.TEST_RETRY_COUNT, "0");
+			System.setProperty(SeleniumTestsContext.RUN_MODE, "grid");
+			System.setProperty(SeleniumTestsContext.WEB_DRIVER_GRID, "http://localhost:4444/wd/hub");
+			
+			PowerMockito.mockStatic(SeleniumGridConnectorFactory.class);
+			PowerMockito.when(SeleniumGridConnectorFactory.getInstances(Arrays.asList("http://localhost:4444/wd/hub"))).thenReturn(Arrays.asList(gridConnector));
+			
+			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.NONE, new String[] {"testWithSocketTimeoutOnFirstExec"});
+			
+			String logs = readSeleniumRobotLogFile();
+			
+			// check test is retried
+			Assert.assertEquals(StringUtils.countMatches(logs, "Start method testWithSocketTimeoutOnFirstExec"), 2);
+			
+		} finally {
+			System.clearProperty(SeleniumTestsContext.TEST_RETRY_COUNT);
+			System.clearProperty(SeleniumTestsContext.RUN_MODE);
+			System.clearProperty(SeleniumTestsContext.WEB_DRIVER_GRID);
+		}
+	}
+	/**
+	 * issue #289: Check do not increase retry count in case error in not a WebDriverException
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testNotRetriedWithAnyError() throws Exception {
+		
+		try {
+			System.setProperty(SeleniumTestsContext.TEST_RETRY_COUNT, "0");
+			System.setProperty(SeleniumTestsContext.RUN_MODE, "grid");
+			System.setProperty(SeleniumTestsContext.WEB_DRIVER_GRID, "http://localhost:4444/wd/hub");
+			
+			PowerMockito.mockStatic(SeleniumGridConnectorFactory.class);
+			PowerMockito.when(SeleniumGridConnectorFactory.getInstances(Arrays.asList("http://localhost:4444/wd/hub"))).thenReturn(Arrays.asList(gridConnector));
+			
+			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.NONE, new String[] {"testWithExceptionOnFirstExec"});
+			
+			String logs = readSeleniumRobotLogFile();
+			
+			// check test is not retried because exception do not match
+			Assert.assertEquals(StringUtils.countMatches(logs, "Start method testWithExceptionOnFirstExec"), 1);
+			
+		} finally {
+			System.clearProperty(SeleniumTestsContext.TEST_RETRY_COUNT);
+			System.clearProperty(SeleniumTestsContext.RUN_MODE);
+			System.clearProperty(SeleniumTestsContext.WEB_DRIVER_GRID);
+		}
+	}
+	
+	/**
+	 * issue #289: Check we allow a retry when SO_TIMEOUT is raised in local mode because we only want to avoid problem of communication in grid mode
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testNotRetriedWithSocketTimeoutErrorInLocalMode() throws Exception {
+		
+		try {
+			System.setProperty(SeleniumTestsContext.TEST_RETRY_COUNT, "0");
+			System.setProperty(SeleniumTestsContext.RUN_MODE, "local");
+			
+			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.NONE, new String[] {"testWithSocketTimeoutOnFirstExec"});
+			
+			String logs = readSeleniumRobotLogFile();
+			
+			// check test is not retried in local mode
+			Assert.assertEquals(StringUtils.countMatches(logs, "Start method testWithSocketTimeoutOnFirstExec"), 1);
+			
+		} finally {
+			System.clearProperty(SeleniumTestsContext.TEST_RETRY_COUNT);
+			System.clearProperty(SeleniumTestsContext.RUN_MODE);
+		}
 	}
 }
