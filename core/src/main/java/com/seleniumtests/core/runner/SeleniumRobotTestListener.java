@@ -33,6 +33,7 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.apache.log4j.Logger;
+import org.openqa.selenium.WebDriverException;
 import org.testng.IConfigurationListener;
 import org.testng.IExecutionListener;
 import org.testng.IInvokedMethod;
@@ -57,6 +58,7 @@ import com.seleniumtests.core.testretry.TestRetryAnalyzer;
 import com.seleniumtests.core.utils.TestNGResultUtils;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.ScenarioException;
+import com.seleniumtests.driver.DriverMode;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.driver.screenshots.VideoCaptureMode;
 import com.seleniumtests.reporter.logger.ArchiveMode;
@@ -358,6 +360,16 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 		if (testResult.isSuccess()) {
 			TestLogging.log("Test is OK");
 		} else if (testResult.getStatus() == ITestResult.FAILURE) {
+			
+			// issue #289: allow retry in case SO_TIMEOUT is raised
+			if (SeleniumTestsContextManager.getThreadContext().getRunMode() != DriverMode.LOCAL
+					&& testResult.getThrowable() != null 
+					&& testResult.getThrowable() instanceof WebDriverException 
+					&& testResult.getThrowable().getMessage().contains("SO_TIMEOUT")) {
+				logger.info("Test is retried due to SO_TIMEOUT");
+				increaseMaxRetry();
+			}
+				
 			String error = testResult.getThrowable() != null ? testResult.getThrowable().getMessage(): "no error found";
 			TestLogging.log("Test is KO with error: " + error);
 		} else {
@@ -632,6 +644,26 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 			SeleniumRobotLogger.parseLogFile();
 		} catch (Exception e) {
 			logger.error("log parsing failed: " + e.getMessage());
+		}
+	}
+	
+	/**
+     * Allow to increment the maxRetry in case an event occurs
+     * Increment will be allowed up to 2 times the total defined by configuration (default is 2)
+     */
+	public static void increaseMaxRetry() {
+		int maxAllowedRetry = Math.max(SeleniumTestsContextManager.getThreadContext().getTestRetryCount() * 2, SeleniumTestsContext.DEFAULT_TEST_RETRY_COUNT);
+    	
+    	try {
+    		TestRetryAnalyzer retryAnalyzer = (TestRetryAnalyzer)TestLogging.getCurrentTestResult().getMethod().getRetryAnalyzer();
+    		
+    		if (retryAnalyzer != null && retryAnalyzer.getMaxCount() < maxAllowedRetry) {
+        		retryAnalyzer.setMaxCount(retryAnalyzer.getMaxCount() + 1);
+        	} else {
+        		logger.info("cannot increase max retry, limit is reached");
+        	}
+	    } catch (ClassCastException | NullPointerException e) {
+			logger.error("Retry analyzer is not a TestRetryAnalyzer instance");
 		}
 	}
 }
