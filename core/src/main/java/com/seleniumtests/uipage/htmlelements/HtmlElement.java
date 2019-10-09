@@ -121,6 +121,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     		+ "		arguments[0].fireEvent('ondblclick');"
     		+ "}";
     
+    
     protected WebDriver driver;
     protected WebElement element = null;
     protected String label = null;
@@ -539,7 +540,11 @@ public class HtmlElement extends Element implements WebElement, Locatable {
         
         // wait for element to be really visible. should be done only for actions on element
         if (waitForVisibility && makeVisible) {
-        	new WebDriverWait(driver, 1).until(ExpectedConditions.visibilityOf(element));
+        	try {
+        		new WebDriverWait(driver, 1).until(ExpectedConditions.visibilityOf(element));
+        	} catch (TimeoutException e) {
+        		logger.error(String.format("Element %s has never been made visible", toString()));
+        	}
         }
         
         // If we are here, element has been found, update elementInformation
@@ -651,8 +656,14 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 					changeCssAttribute(element, "top", heightPosition + "px"); 
 					changeCssAttribute(element, "position", "inherit");
 				}
-				if (element.getAttribute("style").toLowerCase().replace(" ", "").contains("display:none")) {
+				if ((Boolean)((JavascriptExecutor) driver).executeScript("return getComputedStyle(arguments[0]).display === 'none'", element)) {
 					changeCssAttribute(element, "display", "block");
+				}
+				if ((Boolean)((JavascriptExecutor) driver).executeScript("return getComputedStyle(arguments[0]).visibility !== 'visible'", element)) {
+					changeCssAttribute(element, "visibility", "visible");
+				}
+				if ((Boolean)((JavascriptExecutor) driver).executeScript("return getComputedStyle(arguments[0]).opacity === '0'", element)) {
+					changeCssAttribute(element, "opacity", "1");
 				}
 //				changeCssAttribute(element, "clip", "auto");
 				changeCssAttribute(element, "zIndex", "100000");

@@ -408,6 +408,26 @@ public class TestDriver extends GenericMultiBrowserTest {
 		Assert.assertTrue(DriverTestPage.hiddenCheckBox.isSelected());
 		Assert.assertTrue(DriverTestPage.hiddenCheckBox.isDisplayed());
 	}
+	@Test(groups={"it", "ut"})
+	public void testHiddenElementByDisplay() { 
+		DriverTestPage.hiddenCheckboxByDisplay.click();
+		Assert.assertTrue(DriverTestPage.hiddenCheckboxByDisplay.isSelected());
+		Assert.assertTrue(DriverTestPage.hiddenCheckboxByDisplay.isDisplayed());
+	}
+	@Test(groups={"it", "ut"})
+	public void testHiddenElementByOpacity() { 
+		DriverTestPage.hiddenCheckboxByOpacity.click();
+		Assert.assertTrue(DriverTestPage.hiddenCheckboxByOpacity.isSelected());
+		Assert.assertTrue(DriverTestPage.hiddenCheckboxByOpacity.isDisplayed());
+	}
+	@Test(groups={"it", "ut"})
+	public void testHiddenElementByVisibility() { 
+		DriverTestPage.hiddenCheckboxByVisibility.click();
+		Assert.assertTrue(DriverTestPage.hiddenCheckboxByVisibility.isSelected());
+		Assert.assertTrue(DriverTestPage.hiddenCheckboxByVisibility.isDisplayed());
+	}
+
+	
 	
 	/**
 	 * issue #194: check that the WebDriverWait timeout is the one really applied
