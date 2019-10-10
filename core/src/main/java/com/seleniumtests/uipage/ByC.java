@@ -257,7 +257,7 @@ public class ByC extends By {
 
 		@Override
 		public String toString() {
-			return "By.label forward: " + label;
+			return String.format("By.label %s:'%s' forward on element %s", labelTagName, label, tagName);
 		}
 	}
 	
@@ -315,7 +315,7 @@ public class ByC extends By {
 		
 		@Override
 		public String toString() {
-			return "By.label backward: " + label;
+			return String.format("By.label %s:'%s' backward on element %s", labelTagName, label, tagName);
 		}
 	}
 	
@@ -377,7 +377,7 @@ public class ByC extends By {
 
 		@Override
 		public String toString() {
-			return "By.attribute: " + attributeName;
+			return String.format("By.attribute: %s='%s'", attributeName, attributeValue);
 		}
 	}
 	
@@ -430,7 +430,7 @@ public class ByC extends By {
 
 		@Override
 		public String toString() {
-			return String.format("%s By.text: %s", tagName, text);
+			return String.format("%s By.text: '%s'", tagName, text);
 		}
 	}
 	
