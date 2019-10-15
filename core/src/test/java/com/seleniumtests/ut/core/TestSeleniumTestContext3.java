@@ -41,6 +41,7 @@ import org.testng.ITestResult;
 import org.testng.annotations.Test;
 import org.testng.xml.XmlTest;
 
+import com.mashape.unirest.http.Unirest;
 import com.seleniumtests.GenericTest;
 import com.seleniumtests.MockitoTest;
 import com.seleniumtests.connectors.selenium.SeleniumGridConnector;
@@ -51,6 +52,8 @@ import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.TestVariable;
 import com.seleniumtests.core.runner.CucumberScenarioWrapper;
 import com.seleniumtests.customexception.ConfigurationException;
+import com.seleniumtests.driver.WebUIDriver;
+import com.seleniumtests.ut.connectors.ConnectorsTest;
 
 /**
  * - Test creation of seleniumrobot server connection inside SeleniumTestsContext
@@ -60,7 +63,7 @@ import com.seleniumtests.customexception.ConfigurationException;
  */
 @PrepareForTest({SeleniumRobotVariableServerConnector.class, SeleniumGridConnectorFactory.class, SeleniumTestsContext.class})
 @PowerMockIgnore("javax.net.ssl.*")
-public class TestSeleniumTestContext3 extends MockitoTest {
+public class TestSeleniumTestContext3 extends ConnectorsTest {
 	
 	@Mock
 	private SeleniumRobotVariableServerConnector variableServer;
@@ -437,6 +440,46 @@ public class TestSeleniumTestContext3 extends MockitoTest {
 		} finally {
 			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE);
 			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL);
+		}
+	}	
+	
+	/**
+	 * issue #291: Check that when copying context, grid connector is also copied so that it can be possible to re-use a driver created in \@BeforeMethod
+	 * @param testNGCtx
+	 * @param xmlTest
+	 * @throws Exception
+	 */
+	@Test(groups={"ut"})
+	public void testGridConnectorIsCopiedWithContextCopy(final ITestContext testNGCtx, final XmlTest xmlTest) throws Exception {
+		
+		Map<String, TestVariable> variables = new HashMap<>();
+		variables.put("key", new TestVariable("key", "val1"));
+		
+		try {
+			System.setProperty(SeleniumTestsContext.WEB_DRIVER_GRID, "http://localhost:4321/wd/hub");
+			System.setProperty(SeleniumTestsContext.RUN_MODE, "grid");
+			System.setProperty(SeleniumTestsContext.BROWSER, "chrome");
+			
+			PowerMockito.mockStatic(Unirest.class);
+			createGridHubMockWithNodeOK();
+			
+			ITestResult testResult = GenericTest.generateResult(testNGCtx, getClass());
+			initThreadContext(testNGCtx, "myTest", testResult);
+			
+			SeleniumTestsContext seleniumTestsCtx = SeleniumTestsContextManager.getThreadContext();
+			seleniumTestsCtx.configureContext(testResult);
+			WebUIDriver.getWebDriver(true);
+			
+			// do a parameter retrieving for copied context
+			SeleniumTestsContext seleniumTestsCtx2 = new SeleniumTestsContext(seleniumTestsCtx, false);
+			Assert.assertEquals(seleniumTestsCtx2.getSeleniumGridConnector(), seleniumTestsCtx.getSeleniumGridConnector());
+			
+			
+			
+		} finally {
+			System.clearProperty(SeleniumTestsContext.WEB_DRIVER_GRID);
+			System.clearProperty(SeleniumTestsContext.RUN_MODE);
+			System.clearProperty(SeleniumTestsContext.BROWSER);
 		}
 	}	
 	
