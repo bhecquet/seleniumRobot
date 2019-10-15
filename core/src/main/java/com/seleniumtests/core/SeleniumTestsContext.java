@@ -289,15 +289,28 @@ public class SeleniumTestsContext {
     	this(toCopy, true);
     }
     
-    public SeleniumTestsContext(SeleniumTestsContext toCopy, boolean allowRequestsToVariableServer) {
+    /**
+     * 
+     * @param toCopy							source context from which we copy data
+     * @param allowRequestsToDependencies		if true, we will request to variable server / grid hub for new session or data		
+     */
+    public SeleniumTestsContext(SeleniumTestsContext toCopy, boolean allowRequestsToDependencies) {
     	contextDataMap = new HashMap<>(toCopy.contextDataMap); 
     	testNGContext = toCopy.testNGContext;
-    	if (!allowRequestsToVariableServer && toCopy.variableAlreadyRequestedFromServer != null) {
+    	if (!allowRequestsToDependencies && toCopy.variableAlreadyRequestedFromServer != null) {
     		variableAlreadyRequestedFromServer = new HashMap<>(toCopy.variableAlreadyRequestedFromServer);
     	}
+    	
+    	// issue #291: also copy gridConnector and gridConnectors so that they can be re-used between BeforeMethod and Test Method
+    	if (!allowRequestsToDependencies && toCopy.seleniumGridConnector != null) {
+    		seleniumGridConnector = toCopy.seleniumGridConnector;
+    		seleniumGridConnectors = new ArrayList<>(toCopy.seleniumGridConnectors);
+    	}
+    	
     	testNGResult = toCopy.testNGResult;
     	baseOutputDirectory = toCopy.baseOutputDirectory;
     	verificationFailuresMap = new HashMap<>(toCopy.verificationFailuresMap);
+    	
     }
     
     public SeleniumTestsContext(final ITestContext context) {

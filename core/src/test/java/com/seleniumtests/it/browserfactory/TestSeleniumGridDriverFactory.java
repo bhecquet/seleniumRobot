@@ -68,25 +68,6 @@ import com.seleniumtests.ut.connectors.ConnectorsTest;
 @PrepareForTest({Unirest.class, WebUIDriverFactory.class, SeleniumGridDriverFactory.class})
 @PowerMockIgnore({"javax.net.ssl.*", "com.google.inject.*"})
 public class TestSeleniumGridDriverFactory extends ConnectorsTest {
-
-
-	@Mock
-	private RemoteWebDriver driver;
-	
-	@Mock
-	private Options options;
-	
-	@Mock
-	private Timeouts timeouts;
-	
-	@Mock
-	private Navigation navigation;
-	
-	@Mock
-	private TargetLocator targetLocator;
-	
-	@Mock
-	private RemoteWebElement element;
 	
 	@BeforeMethod(groups={"it"})
 	private void init() throws ClientProtocolException, IOException {
@@ -106,14 +87,8 @@ public class TestSeleniumGridDriverFactory extends ConnectorsTest {
 			System.setProperty(SeleniumTestsContext.TEST_RETRY_COUNT, "1");
 			System.setProperty(SeleniumTestsContext.RUN_MODE, "grid");
 			System.setProperty(SeleniumTestsContext.WEB_DRIVER_GRID, SERVER_URL + "/wd/hub");
-
-			WebUIDriver uiDriver = spy(new WebUIDriver("main"));
 			
-			PowerMockito.whenNew(WebUIDriver.class).withArguments(any()).thenReturn(uiDriver);
-			PowerMockito.whenNew(RemoteWebDriver.class).withAnyArguments().thenReturn(driver);
-			when(driver.manage()).thenReturn(options);
-			when(options.timeouts()).thenReturn(timeouts);
-			when(driver.getSessionId()).thenReturn(new SessionId("abcdef"));
+			WebUIDriver uiDriver = createMockedWebDriver();
 			
 			createServerMock("GET", SeleniumGridConnector.CONSOLE_SERVLET, 200, "Console");
 			createServerMock("GET", SeleniumRobotGridConnector.GUI_SERVLET, 200, "Gui");
@@ -177,61 +152,7 @@ public class TestSeleniumGridDriverFactory extends ConnectorsTest {
 			System.setProperty(SeleniumTestsContext.RUN_MODE, "grid");
 			System.setProperty(SeleniumTestsContext.WEB_DRIVER_GRID, SERVER_URL + "/wd/hub");
 			
-			WebUIDriver uiDriver = spy(new WebUIDriver("main"));
-			
-			PowerMockito.whenNew(WebUIDriver.class).withArguments(any()).thenReturn(uiDriver);
-			PowerMockito.whenNew(RemoteWebDriver.class).withAnyArguments().thenReturn(driver);
-			when(driver.manage()).thenReturn(options);
-			when(options.timeouts()).thenReturn(timeouts);
-			when(driver.getSessionId()).thenReturn(new SessionId("abcdef"));
-			when(driver.navigate()).thenReturn(navigation);
-			when(driver.switchTo()).thenReturn(targetLocator);
-			when(driver.getCapabilities()).thenReturn(new DesiredCapabilities("chrome", "75.0", Platform.WINDOWS));
-			when(driver.findElement(By.id("text2"))).thenReturn(element);
-			when(element.getAttribute(anyString())).thenReturn("attribute");
-			when(element.getSize()).thenReturn(new Dimension(10, 10));
-			when(element.getLocation()).thenReturn(new Point(5, 5));
-			when(element.getTagName()).thenReturn("h1");
-			when(element.getText()).thenReturn("text");
-			when(element.isDisplayed()).thenReturn(true);
-			when(element.isEnabled()).thenReturn(true);
-			
-			createServerMock("GET", SeleniumGridConnector.CONSOLE_SERVLET, 200, "Console");
-			createServerMock("GET", SeleniumRobotGridConnector.NODE_TASK_SERVLET, 200, "ABC");
-			createServerMock("POST", SeleniumRobotGridConnector.NODE_TASK_SERVLET, 200, "ABC");
-			createServerMock("GET", SeleniumRobotGridConnector.GUI_SERVLET, 200, "Gui");
-			createServerMock("GET", SeleniumRobotGridConnector.STATUS_SERVLET, 200, "{\"http://localhost:4321\": {" + 
-					"    \"busy\": false," + 
-					"    \"lastSessionStart\": \"never\"," + 
-					"    \"version\": \"4.6.0\"," + 
-					"    \"usedTestSlots\": 0,\n" + 
-					"    \"testSlots\": 1," + 
-					"    \"status\": \"ACTIVE\"" + 
-					"  }," + 
-					"  \"hub\": {" + 
-					"    \"version\": \"4.6.1\"," + 
-					"    \"status\": \"ACTIVE\"" + 
-					"  }," + 
-					"  \"success\": true" + 
-					"}");
-
-			
-			
-			createJsonServerMock("GET", SeleniumRobotGridConnector.API_TEST_SESSSION, 200, 
-					// session not found
-					"{" + 
-					"  \"msg\": \"Cannot find test slot running session 7ef50edc-ce51-40dd-98b6-0a369bff38b in the registry.\"," + 
-					"  \"success\": false" + 
-					"}", 
-					// session found
-					"{" + 
-					"  \"inactivityTime\": 409," + 
-					"  \"internalKey\": \"fef800fc-941d-4f76-9590-711da6443e00\"," + 
-					"  \"msg\": \"slot found !\"," + 
-					"  \"proxyId\": \"http://localhost:4321\"," + 
-					"  \"session\": \"7ef50edc-ce51-40dd-98b6-0a369bff38b1\"," + 
-					"  \"success\": true" + 
-					"}");
+			WebUIDriver uiDriver = createGridHubMockWithNodeOK();
 			
 			ReporterTest.executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriverShort"});
 			
