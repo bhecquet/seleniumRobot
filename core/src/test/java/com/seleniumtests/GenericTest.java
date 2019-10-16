@@ -83,7 +83,7 @@ public class GenericTest {
 		WebUIDriver.cleanUp();
 	}
 	
-	protected File createFileFromResource(String resource) throws IOException {
+	public static File createFileFromResource(String resource) throws IOException {
 		File tempFile = File.createTempFile("img", null);
 		tempFile.deleteOnExit();
 		FileUtils.copyInputStreamToFile(Thread.currentThread().getContextClassLoader().getResourceAsStream(resource), tempFile);
