@@ -17,6 +17,7 @@ for the remainder, we use a unique name for that new application `appName`<br/>
 - compile code with `mvn clean package`
 - **WARNING Oracle JDBC**: when compiling test application code, dependency ojdbc6.jar is searched. If your test application does not use Oracle DB connection, exclude oracle artifact from core using 
 
+```xml
 	<dependency>
 		<groupId>com.infotel.seleniumRobot</groupId>
 		<artifactId>core</artifactId>
@@ -28,11 +29,14 @@ for the remainder, we use a unique name for that new application `appName`<br/>
 			</exclusion>
 		</exclusions>
 	</dependency>
+```
+	
 - else, you should add Jenkins repository which exposes it: <br/>
 	> go to [https://repo.jenkins-ci.org/webapp/#/home](https://repo.jenkins-ci.org/webapp/#/home)<br/>
 	> click on 'Set me up' and generate maven settings<br/>
 	> important part is the mirror one
 	
+```xml
 	<mirrors>
     <mirror>
       <mirrorOf>*</mirrorOf>
@@ -41,12 +45,14 @@ for the remainder, we use a unique name for that new application `appName`<br/>
       <id>public</id>
     </mirror>
   </mirrors>
+```
 	
 - **WARNING ASPECTJ**: from seleniumRobot 3.14.0 version, aspectJ version has be changed (from 1.8.9 to 1.9.1) which introduces incompatibilities when building but not running tests. To use this seleniumRobot version, do the following
 
 inside aspectj-maven-plugin definition (in pom.xml)
 add:
 
+```xml
 	<dependencies>
 		<dependency>
 			<groupId>org.aspectj</groupId>
@@ -54,12 +60,14 @@ add:
 			<version>1.9.1</version>
 		</dependency>
 	</dependencies>
+```
 
 
 Also update aspectj-maven-plugin version to 1.11
 
 The resulting plugin definition should look like:
 
+```xml
 	<plugin>
 		<groupId>org.codehaus.mojo</groupId>
 		<artifactId>aspectj-maven-plugin</artifactId>
@@ -91,9 +99,11 @@ The resulting plugin definition should look like:
 			</execution>
 		</executions>
 	</plugin>
+```
 	
 Moreover, you MUST set the minimal version of core to 3.14.0 in application dependencies:
 
+```xml
 	<dependencies>
 		<dependency>
 			<groupId>com.infotel.seleniumRobot</groupId>
@@ -102,9 +112,11 @@ Moreover, you MUST set the minimal version of core to 3.14.0 in application depe
 			...
 		</dependency>
 	</dependencies>
+```
 
 - If your repo do not include neotys artifacts (mandatory for compilation), add the following
 
+```xml
 	<repository>
 		<id>neotys-public-releases</id>
 		<url>http://maven.neotys.com/content/repositories/releases/</url>
@@ -115,9 +127,11 @@ Moreover, you MUST set the minimal version of core to 3.14.0 in application depe
 			<enabled>false</enabled>
 		</snapshots>
 	</repository>
+```
 	
 to repository list in settings.xml, and 
 
+```xml
 	<pluginRepository>
 		<id>neotys-public-releases</id>
 		<url>http://maven.neotys.com/content/repositories/releases/</url>
@@ -128,6 +142,7 @@ to repository list in settings.xml, and
 			<enabled>false</enabled>
 		</snapshots>
 	</pluginRepository>
+```
 	
 to pluginRepository list in settings.xml
 
@@ -170,6 +185,7 @@ Therefore, do the following in pom.xml:
 `<outputDirectory>${project.build.directory}/data/${project.artifactId}/features</outputDirectory>` by `<outputDirectory>${project.build.directory}/data/${project.artifactId}_${application.version.short}/features</outputDirectory>` <br/> 
 - Add the plugin execution. It will be in charge of creating the `application.version.short` variable that we use above:
 
+```xml
 	<plugin>
 		<groupId>org.codehaus.mojo</groupId>
 		<artifactId>build-helper-maven-plugin</artifactId>
@@ -190,6 +206,7 @@ Therefore, do the following in pom.xml:
 			</execution>
 		</executions>
 	</plugin>
+```
 
 #### Post-installation ####
 
@@ -256,7 +273,9 @@ Example of a shopping cart class:
 
 SeleniumRobot supports standard search through `By` class
 
+```java
 	LinkElement proceed = new LinkElement("Checkout", By.linkText("Proceed to Checkout"));
+```
 	
 If you search an element by XPath (avoid this if possible), and your xpath should be relative to a parent element (`new HtmlElement("", By.id("parentDiv")).findElement(By.xpath("//option[@value=\"opt1\"]"));`), add a `.` in front of your xpath expression so that you search relatively to the parent element. Else, SeleniumRobot do this for you.
 
@@ -282,12 +301,16 @@ Most of them are here for readability so that when you read test code, you know 
 Using Selenium syntax, you would use: `driver.findElement(By.id("myId")).findElement(By.tagName("myTag"))`<br/>
 This obviously still works in seleniumRobot, but using seleniumRobot syntax, you have to ways:
  
+```java 
 	new HtmlElement("", By.id("myId")).findElement(By.tagName("myTag"))
+```
 	
 - or
 	
+```java
 	HtmlElement parent = new HtmlElement("", By.id("myId"));
 	HtmlElement myElement = new HtmlElement("", By.tagName("myTag"), parent)
+```
 
 ##### Search inside frame #####
 see: "5 Working with frames" chapter for details
@@ -325,12 +348,15 @@ For each step, a snapshot is done and step duration is computed
 
 If, inside a step, you need to mask a password, (see: "masking password" section), give the value (generally, the variable name) to the `addStep` method
 
+```java
 	addStep("my step name", myValueForPassword)
+```
 
 ### 3 Write a test ###
 A test is a suite of steps defined in several page objects. By convention, they are located in the `tests` folder
 Assuming that the right objects are created, a test looks like:
-    
+  
+ ```java  
     public class VmoeTests extends SeleniumTestPlan {
 	
 		@Test(
@@ -345,13 +371,16 @@ Assuming that the right objects are created, a test looks like:
 			Assert.assertEquals(productItem.getProductDetails().name, "Large Angelfish");
 		}
 	}
+```
 
 A typical PageObject method whould be
 
+```java
 	public FishList _goToFish() throws Exception {
     	fishMenu.click();
     	return new FishList();
     }
+```
 
 **WARN** DO NOT give the same test name in different test classes as it leads to wrong logging reporting
 
@@ -360,12 +389,14 @@ See part 6 ("env.ini configuration" and "seleniumRobot server") to see how to ge
 
 You may consider putting all test data access in the Test script, not in page object. This helps maintenance when we want to know which variables are used.
 
+```java
 	@Test(groups={"recevabilite"})
 	public void testSearch() throws Exception {
 		new MireRH(true)
 				._login(param("login"), param("password"))
 				._arrivee();
 	}
+```
 	
 Test data are get using `param(<key>)` or updated via `createOrUpdateParam`. The later is only available when seleniumRobot server is used.
 `createOrUpdateParam(<key>, <value>)` is used to store a variable with reference to environment, application
@@ -434,12 +465,15 @@ because method `_setPassword` signature is `public DriverTestPage _setPassword(S
 
 **WARN: ** With manual steps, you have to explicitly give the passwords to mask when creating test steps 
 
+```java
 	addStep("my step name", myValueForPassword)
 	addStep("my step name", myValueForPassword1, myValueForPassword2)
+```
 
 #### TestNG file ####
 For tests extending SeleniumTestPlan, the testNg XML looks like (minimal requirements):
 
+```xml
 	<suite name="Integration tests" parallel="false" verbose="1" thread-count="1">
 	    <test name="order">	    	
 	        <classes>
@@ -451,6 +485,7 @@ For tests extending SeleniumTestPlan, the testNg XML looks like (minimal require
 	        </classes>
 	    </test>
 	</suite>
+```
 	
 For more information on execution order of TestNG annotations, see [https://stackoverflow.com/questions/30587454/difference-between-beforeclass-and-beforetest-in-testng] (https://stackoverflow.com/questions/30587454/difference-between-beforeclass-and-beforetest-in-testng)
 
@@ -487,16 +522,20 @@ Cucumber styled tests rely on a `.feature` file where each test step is defined.
 
 Each line in the feature file must correspond to an implementation inside java code through annotation
 
+```java
 	@When("Cliquer sur le lien 'FISH'")
     public void goToFish() throws Exception {
     	fishMenu.click();
     }
+```
 
 **WARN:**You should write only void methods to avoid getting twice the page creation in report
 **WARN:**Java8 style (lambda expressions) is currently not supported by framework. Use only @Annotation style
 
 
 #### Feature file example ####
+
+```cucumber
 	Feature: Catalogue
 	
 		Scenario: Consulter la fiche Angel Fish
@@ -506,10 +545,12 @@ Each line in the feature file must correspond to an implementation inside java c
 			And Cliquer sur le produit 'Angel Fish'
 			And Cliquer sur le type 'EST-1'
 			Then Le nom du produit est 'Large Angelfish'
+```
 
 #### TestNG file ####
 XML testNg file looks like:
 
+```xml
 	<!DOCTYPE suite SYSTEM "http://beust.com/testng/testng-1.0.dtd" >
 	<suite name="Integration tests" parallel="false" verbose="1" thread-count="1">
 	
@@ -525,6 +566,7 @@ XML testNg file looks like:
 	    </test>
 	   
 	</suite>
+```
 
 `cucumberPackage` parameter is mandatory so that framework knows where implementation code resides. `cucumberTests` and `cucumberTags` help selecting the right scenario. See §4 for details
 
@@ -534,8 +576,10 @@ In case an HTML element has to be searched inside an iFrame there are 2 ways to 
 #### Selenium way ####
 Selenium offers the way to switch focus to an iframe using
 
+```java
 	driver.switchTo().frame(<frameElement>)  // => switch to the iframe previously searched. Each search after this call will be done inside frame
 	driver.switchTo().defautlContent()		 // => go back to the main page
+```
 	
 The drawback of this approach is that if iframe reloads after switching, each element search will fail
 Moreover, no retry is done when searching frame
@@ -543,6 +587,7 @@ Moreover, no retry is done when searching frame
 #### SeleniumRobot way ####
 SeleniumRobot adds a way to retry a search when an error occurs even using iframes
 
+```java
 	// declare your frame as any other element inside page.
 	FrameElement frame = new FrameElement("my frame", By.id("frameId"));
 	
@@ -551,7 +596,9 @@ SeleniumRobot adds a way to retry a search when an error occurs even using ifram
 	
 	// use the element
 	el.click();
+```
 	
+
 This way, each time an action is performed on the element, SeleniumRobot will:
 
 - search the frame and switch to it
@@ -685,30 +732,37 @@ To do so, you can request a PageObject to create a new driver. By default, it cr
 
 - Test is driven by Chrome, it's configured so in TestNG XML file. With the code below, we will create a chrome browser on URL "http://front-office.mycompany.com". Chrome will be referenced under the name `main` which is the default name for the first created driver
 
+```java
 	public FrontOfficePage() throws Exception {
     	super(myFOElementToCheck, "http://front-office.mycompany.com");
     }
+```
     
 - After having created the client, we will connect to the back-office using Internet Explorer. At this point, the default driver becomes the newly created one (Internet Explorer). It's referenced under the name `bo-browser`
 	
+```java
 	public BackOfficePage() throws Exception {
 		super(myBOElementToCheck, "http://back-office.mycompany.com", BrowserType.INTERNET_EXPLORER, "bo-browser", null);
 	}
+```
 
 - The test will look like this
 	
+```java
 	// create client on front-office
 	FrontOfficePage foPage = new FrontOfficePage()._createClient()
-																._doSomethingElse();
+		._doSomethingElse();
 								
 	// delete client on back-office
 	new BackOfficePage()._accessClient()
-								._deleteClient();
+		._deleteClient();
 								
 	// switch back to Chrome for any other operations. 'main' is the name of Chrome when it has been created
 	switchToDriver("main");
 	
 	foPage._recreateClient();
+```
+
 	
 ### 12 Attach an existing browser inside your scenario ###
 
@@ -719,15 +773,19 @@ This attaching can be done only from a page creation
 
 - For Internet Explorer, note the last parameter when creating the new page (any integer is valid):
 
+```java
 	public BackOfficePage() throws Exception {
 		super(myBOElementToCheck, "http://back-office.mycompany.com", BrowserType.INTERNET_EXPLORER, "bo-browser", 0);
 	}
+```
 	
 - For Chrome, start your browser with `--remote-debugging-port=xxxx`. In the example below, xxxx = 11111. Then, in your page creation (note the 11111 as last parameter which tells robot to connect to chrome on debugger port 11111)
 
+```java
 	public BackOfficePage() throws Exception {
 		super(myBOElementToCheck, "http://back-office.mycompany.com", BrowserType.CHROME, "bo-browser", 11111);
 	}
+```
 	
 **WARN**: for Internet explorer, a modified version of IEDriverServer is required. Provided in seleniumRobot-driver artifact
 
@@ -775,3 +833,16 @@ If the dependency needs other dependencues, we have to change configuration to (
 	</configuration>
 
 The key point is `excludeTransitive` which is set to false to allow sub-dependecies to be retrieved, and then we filter by groupdId and artifactId to avoid retrieving to many dependencies
+
+### 14 Customize Selenium IDE tests ###
+
+SeleniumRobot adds execution of Selenium IDE tests when they are exported to Java/JUnit file.
+Details about launching can be found in §4.8
+
+SeleniumRobot supports all features of Selenium IDE scenarios, it only does minimal rewrite to adapt JUnit code for TestNG.
+
+#### Add steps ####
+
+By default, your test will only contain 1 running step, which is the full scenario step. If you want more steps, you can use manual steps feature and add a step of type "echo" with target: `STEP:<step name>` 
+
+![](images/selenium_ide_step.png)

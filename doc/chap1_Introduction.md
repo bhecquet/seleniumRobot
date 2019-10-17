@@ -16,9 +16,10 @@ Main features are:
 	- Local (on current computer)
 	- Using SeleniumGrid
 	- SauceLabs environment
-	- Testdroid environment
+	- Browserstack environment
 - Snapshot on steps. It captures the whole page even if scrolling is necessary
 - HTML & xUnit report
 - Gherkin / Cucumber compatibility
 - Replay on failure
 - Selenium error recovery
+- Selenium IDE execution

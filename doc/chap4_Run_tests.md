@@ -212,6 +212,7 @@ This file is referenced in XML configuration with:
 
 Below is an example of this file extending TestNG configuration
 
+```xml
 	<parameters>
 	
 		<!-- common parameters -->
@@ -234,6 +235,7 @@ Below is an example of this file extending TestNG configuration
 		</service>
 		
 	<parameters>
+```
 	
 You can define:
  
@@ -261,6 +263,7 @@ The minimal parameters to pass to SeleniumRobot are:
 
 Test must be configured with `runMode` and `webDriverGrid` options (or use `-DrunMode=grid -DwebDriverGrid=http://127.0.0.1:4444/wd/hub`)
  
+```xml
 	<test name="MRH">
     	<parameter name="runMode" value="grid" />
     	<parameter name="webDriverGrid" value="http://127.0.0.1:4444/wd/hub" />
@@ -269,6 +272,7 @@ Test must be configured with `runMode` and `webDriverGrid` options (or use `-Dru
             <package name="com.seleniumtests.core.runner.*"/>
         </packages>
     </test>
+```
 
 #### Test with BrowserStack ####
 
@@ -295,6 +299,7 @@ For cloud test, these variables are not needed
 
 Define test as follows (minimal needed options)
 
+```xml
     <test name="tnr_appium_mobile_app" parallel="false">
     
     	<!-- cucumber part -->
@@ -310,6 +315,7 @@ Define test as follows (minimal needed options)
     		<package name="com.seleniumtests.core.runner.*"/>
     	</packages>
     </test>
+```
 
 
 `deviceName` reflects the local device used to automate the test
@@ -320,6 +326,7 @@ Define test as follows (minimal needed options)
 
 Define test as follows (minimal needed options)
 
+```xml
     <test name="tnr_appium_mobile_app" parallel="false">
     
     	<parameter name="browser" value="*safari" />
@@ -331,12 +338,14 @@ Define test as follows (minimal needed options)
     		<package name="com.seleniumtests.core.runner.*"/>
     	</packages>
     </test>
+```
 
 
 ### 4 Test with SauceLabs ###
 
 Define test as follows
 
+```xml
 	<test name="tnr_sauce_mobile_app" parallel="false">
     	<parameter name="cucumberTests" value="Configuration" />
 	    <parameter name="cucumberTags" value="" />
@@ -354,6 +363,7 @@ Define test as follows
             <package name="com.seleniumtests.core.runner.*"/>
         </packages>
     </test>
+```
     
 ### 5 Test with BrowserStack ####
 
@@ -378,6 +388,7 @@ For better features, prefer using seleniumRobot-grid which is based on standard 
 
 Test must be configured like the example below (or use `-DrunMode=grid -DwebDriverGrid=http://127.0.0.1:4444/wd/hub`)
  
+ ```xml
 	<test name="MRH">
     	<parameter name="runMode" value="grid" />
     	<parameter name="webDriverGrid" value="http://127.0.0.1:4444/wd/hub" />
@@ -386,6 +397,7 @@ Test must be configured like the example below (or use `-DrunMode=grid -DwebDriv
             <package name="com.seleniumtests.core.runner.*"/>
         </packages>
     </test>
+```
 
 #### Configure Grid hub ####
 
@@ -409,6 +421,7 @@ You should use JSON configuration for nodes, to make it simpler to start
 
 To add a browser / browser version, add following code (change info if necessary)
 
+```json
 	{
       "browserName": "firefox",
       "maxInstances": 5,
@@ -416,6 +429,7 @@ To add a browser / browser version, add following code (change info if necessary
 	  "version": "last",
 	  "firefox_binary": "C:/Program Files (x86)/Mozilla Firefox/firefox.exe"
     },
+```
 
 `version` may be any text string as soon as SeleniumRobot asks for it with the `browserVersion` parameter
 `firefox_binary` is only necessary if you need to specify a version different from the default one
@@ -434,6 +448,7 @@ Node configuration should use a timeout of 45 seconds
 To use mobile tests and SeleniumGrid, we use appium directly.<br/>
 Create a node.json configuration file for this node. (In the example below, We have 1 mobile device in Android 6.0 version, supporting either chrome or default android browser)
 
+```json
 		{
 	  	"capabilities":
 	      [
@@ -462,6 +477,7 @@ Create a node.json configuration file for this node. (In the example below, We h
 	    "hubHost": "172.22.2.2"
 	  }
 	}
+```
 
 From command line, use
 `appium --nodeconfig /path/to/nodeconfig.json`
@@ -475,6 +491,7 @@ When testing among several browsers or devices is requested, it's easier to run 
 Test NG is able to run tests in parallel using the XML configuration
 To do so, configure several tests, one for each browser / mobile device
 	
+```xml
 	<test name="tnr_chrome">
 	     <parameter name="browser" value="*chrome" />
 	     <classes>
@@ -488,11 +505,13 @@ To do so, configure several tests, one for each browser / mobile device
 	         <class name="com.infotel.seleniumTests.googleTest.tests.NextTest"/>
 	     </classes>
 	</test>
+```
     
 Then, in suite definition, in the XML, set parallel mode
 
+```xml
 	<suite name="My suite" parallel="tests" thread-count="5">
-    
+```
 
 #### Jenkins way ####
 
@@ -574,3 +593,27 @@ By default, TestNG produces its own reports
 they are located in the folder pointed by `-d` option, by default `test-ouput` where test is launched.
 
 If you do not want to generate these files, add `usedefaultlistener false` to your TestNG options
+
+### 8 Execute Selenium IDE Tests ###
+
+From version 4.10, it is possible to execute Selenium IDE tests.
+- Create your test / suite with selenium IDE
+- Export it with JUnit / Java as a .java file
+- Run the following command
+
+`java -cp seleniumRobot.jar -D<option1>=<value1> -D<option2>=<value2> -javaagent:/path/to/aspectjweaver.jar com.seleniumtests.util.ide -scripts test1.java,test2.java`
+
+aspectjweaver.jar is provided in seleniumRobot zip file
+
+Options are the same as for any other SeleniumRobot test
+
+Benefits to execute Selenium IDE tests this way are:
+
+- Use the same framework for all tests
+- Have full debug features (snapshot / video / network)
+- Retry when searching elements
+- ...
+
+For specifics about Selenium IDE writing, see §3.14
+
+

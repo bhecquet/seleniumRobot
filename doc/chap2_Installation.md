@@ -82,6 +82,7 @@ Following configurations should be placed in user `settings.xml` file:
 
 For GPG
 
+```xml
 	<profile>
 		<id>gpg</id>
 		<activation>
@@ -92,9 +93,11 @@ For GPG
         <gpg.passphrase><your key password></gpg.passphrase>
       </properties>
     </profile>
+```
 
 For Sonar analysis
 
+```xml
 	<profile>
 		<id>sonar</id>
 		<activation>
@@ -104,20 +107,24 @@ For Sonar analysis
 			<sonar.host.url>http://server:9000</sonar.host.url>
 		</properties>
 	</profile>
+```
 
 For publishing artifacts to OSS Sonatype server
 
+```xml
 	<server>
       <id>ossrh</id>
       <username><your_user></username>
       <password><your_password></password>
     </server>
+```
     
 #### Oracle library for core compile ####
 
 In order to compile core artifact, you must have the ojdb6.jar file 
 To have it, use the [https://repo.jenkins-ci.org](https://repo.jenkins-ci.org) repository (add the following in settings.xml)
 
+```xml
 	<mirrors>
 	    <mirror>
 	      <mirrorOf>*</mirrorOf>
@@ -126,6 +133,7 @@ To have it, use the [https://repo.jenkins-ci.org](https://repo.jenkins-ci.org) r
 	      <id>public</id>
 	    </mirror>
 	  </mirrors>
+```
 
 #### Download drivers ####
 From seleniumRobot 3.3.0, drivers are not provided anymore with source code, they are downloaded by a maven build (driver-download module)

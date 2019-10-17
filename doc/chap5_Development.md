@@ -52,3 +52,41 @@ When a SNAPSHOT version is ready to be released, use
     mvn release:prepare release:perform
 
 Check installation requirements to perform a release
+
+### 5 Aspect handling ###
+
+SeleniumRobot uses AspectJ extensively to avoid writing too many times the same code. Aspects allow
+- logging called methods
+- replay actions (for standard and composite actions)
+- display selenium actions and steps to report
+- transform standard selenium actions to seleniumRobot actions (with replay)
+
+This is directly handled by maven during build (and by your favourite IDE with appropriate plugins)
+
+#### aspect and dynamic compilation ####
+
+For Selenium IDE execution feature, the generated code had to be compiled and woven with seleniumRobot aspects so that no feature are lost. For this to work, 
+- java program MUST be launched with `-javaagent:/path/to/aspectjweaver.jar`
+- META-INF/aop.xml file MUST be created in resources, detailing aspects to weave. At least one aspect must be present, else, weaver is deactivated 
+- weaver tracing can be enabled with options `-Dorg.aspectj.weaving.messages=true -Dorg.aspectj.tracing.debug=true -Dorg.aspectj.tracing.enabled=true -Dorg.aspectj.tracing.messages=true -Djava.util.logging.config.file=/path/to/logging.properties`
+- logging.properties file contains (see https://www.eclipse.org/aspectj/doc/released/pdguide/trace.html)
+
+```properties
+	handlers= java.util.logging.FileHandler
+
+	.level= FINER
+	
+	java.util.logging.FileHandler.pattern = %h/java%u.log
+	java.util.logging.FileHandler.count = 1
+	java.util.logging.FileHandler.formatter = java.util.logging.SimpleFormatter
+	java.util.logging.FileHandler.level = FINER
+	
+	org.aspectj.weaver.loadtime.level = FINER
+```
+
+doc: 
+- https://stackoverflow.com/questions/21544446/how-do-you-dynamically-compile-and-load-external-java-classes
+- https://www.eclipse.org/aspectj/doc/released/pdguide/trace.html
+- https://stackoverflow.com/questions/10733247/aspectj-weaving-with-custom-classloader-at-runtime
+- https://stackoverflow.com/questions/16777015/can-weavingurlclassloader-only-weave-aspects-of-local-jars
+- https://www.baeldung.com/aspectj
