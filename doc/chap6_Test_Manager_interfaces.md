@@ -50,6 +50,7 @@ Launching of SeleniumRobot with pre-configured test applications expects some va
 Squash TM needs a list of .ta files to detect which test scripts are available.
 These .ta files can be written manually but, as they all use the same format, they can also be generated when building test application. To allow this generation, add the following in pom.xml of the test applications.
 
+```xml
     <plugin>
 		<groupId>org.codehaus.mojo</groupId>
 		<artifactId>exec-maven-plugin</artifactId>
@@ -72,6 +73,7 @@ These .ta files can be written manually but, as they all use the same format, th
 			</execution>
 		</executions>
 	</plugin>
+```
 
 Generation is done by copying a test file `resources/squash-ta/squash_generic.ta` where testNG file name and testNG name are replaced.
 pom.xml and java files used by Squash TA to launch the test are also copied to the destination directory.
@@ -103,7 +105,9 @@ Below is an example of what has been generated for cucumber scenarios.
  
 If some of the tests should not be available in Squash TA, add parameter inside test: 
 
+```xml
     <parameter name="EXCLUDE_FROM_SQUASH_TA" value="" />
+```
 
 ![](images/exclude_testng.png)
  

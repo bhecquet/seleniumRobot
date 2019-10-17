@@ -6,6 +6,7 @@ In this section, we will describe how to add some useful features to test applic
 
 This behaviour is caused by seleniumRobot when doing the following
 
+```java
 	testPage.link.click();
 	
 	// this is the PageObject corresponding to the new window
@@ -13,12 +14,14 @@ This behaviour is caused by seleniumRobot when doing the following
 	
 	// go to new opened window
 	mainHandle = testPage.selectNewWindow();
+```
 	
 The call to new PageObject is performing snapshot of the current window. But, driver did not already switched to this window so 
 snapshot is taken from the first one.
 
 To resolve, do instead
 
+```java
 	testPage.link.click();
 	
 	// go to new opened window
@@ -26,24 +29,29 @@ To resolve, do instead
 	
 	// this is the PageObject corresponding to the new window
 	DriverSubTestPage subTestPage = new DriverSubTestPage(false);
+```
 
 ### 1 Compare 2 XML files ###
 Use the XMLUnit api: https://github.com/xmlunit/user-guide/wiki
 
 Add dependency to pom.xml
 	
+```xml
 	<dependency>
 		<groupId>org.xmlunit</groupId>
 		<artifactId>xmlunit-core</artifactId>
 		<version>2.2.1</version>
 	</dependency>
+```
 	
 Use the following java code
 	
+```java
 	Source source = Input.fromStream(getClass().getResourceAsStream("/tu/xmlFileToTest.xml")).build();
     Source source2 = Input.fromStream(getClass().getResourceAsStream("/tu/xmlFileToTest2.xml")).build();
     Diff diff = DiffBuilder.compare(source).withTest(source2).build();
     System.out.println(diff);
+```
     
 ### 2 Write working unit tests ###
 By default, SeleniumTestsContext enables SoftAssertions, so any unit test with assertion failure will not really fail. To prevent this behaviour, subclass all Unit-Test class from 
@@ -61,11 +69,13 @@ If you need to reinit the SeleniumTestContext using `SeleniumTestsContextManager
 By default, actions in HtmlElements are done only once.<br/>
 For better reliability, all actions currently implemented in SeleniumRobot are made to retry on error
 
+```java
     @ReplayOnError
     public void click() {
         findElement(true);
         element.click();   
     }
+```
     
 /!\ *annotate only direct actions (where no other HtmlElement method, except `findElement` is called)
 
@@ -89,21 +99,25 @@ In this case, provide an other top level element.
 
 Search for picture in browser, without the need to scroll down and click on it. It will then search for the "body" element. If you search the picture inside a frame, and main document has no "body" tag, then you should specify an element inside frame, or the frame itself
 
+```java
 	PictureElement googlePicture = new PictureElement("picture", "tu/googleSearch.png", null);
 	googlePicture.click()
-	
+```
 	
 or search for picture (physically located inside src/test/resources/tu/images/logo_text_field.png) in browser, being placed after the table element and click on it
 
+```java
 	Table table = new Table("table", By.id("table"));
 	PictureElement picture = new PictureElement("picture", "tu/images/logo_text_field.png", table);
 	picture.click()
+```
 	
 or search for picture (physically located inside /data/<application>/images/googleSearch.png)  in browser and click on it. No scrolling will be performed
 
+```java
 	PictureElement googlePictureWithFile = new PictureElement("picture", Paths.get(SeleniumTestsContextManager.getApplicationDataPath(), "images", "googleSearch.png").toFile(), null);
 	googlePictureWithFile.click()
-
+```
 
 #### Using ScreenZone ####
 
@@ -111,22 +125,30 @@ ScreenZone represents the computer desktop
 
 Search for picture (physically located inside src/test/resources/tu/googleSearch.png) on desktop and click on it
 
+```java
 	ScreenZone googleForDesktop = new ScreenZone("picture", "tu/googleSearch.png");
 	googleForDesktop.click();
+```
 	
 or interract with desktop directly without specifying a picture. Thus, click coordinates will be absolute ones
 
+```java
 	new ScreenZone("image").clickAt(rectangle.x + 10, rectangle.y + 10);
+```
 	
 or send text
 
+```java
 	ScreenZone firefoxForDesktop = new ScreenZone("picture", "tu/images/logo_text_field.png");
 	firefoxForDesktop.sendKeys("hello", 0, 40);
+```
 	
 or send keys (will write "ab")
 
+```java
 	ScreenZone firefoxForDesktop = new ScreenZone("picture", "tu/images/logo_text_field.png");
 	firefoxForDesktop.sendKeys(0, 40, KeyEvent.VK_A, KeyEvent.VK_B);
+```
 	
 #### Check if image is matching ####
 
@@ -136,6 +158,7 @@ or send keys (will write "ab")
 
 Sometimes, it's useful to read PDF files and extract content. Formatting is lost but text remains using the following code
 
+```java
 	PDDocument document = PDDocument.load(fichierPdf);
 	if (document.isEncrypted()) {
 		document.decrypt("");
@@ -143,9 +166,11 @@ Sometimes, it's useful to read PDF files and extract content. Formatting is lost
 	document.setAllSecurityToBeRemoved(true);
 	PDFTextStripper s = new PDFTextStripper();
 	s.getText(document);
+```
 			
 PDDocument is available through maven dependencies
 
+```xml
 	<dependency>
         <groupId>org.apache.pdfbox</groupId>
         <artifactId>pdfbox</artifactId> 
@@ -161,30 +186,37 @@ PDDocument is available through maven dependencies
         <artifactId>bcprov-jdk15</artifactId> 
         <version>1.44</version>
     </dependency>
+```
     
 ### 6 Accessing remote computer through SSH or SCP ###
 
 To retrieve file from remote to local
 
+```java
 	Scp scp = new Scp(<sshHost>, <sshUser>, <sshPassword>, null, false);
 	scp.connect();  
 	scp.transfertFile(new File(<remote file>), new File(<local file>));
 	scp.disconnect();
+```
 	
 To execute command on remte
 
+```java
 	Ssh ssh = new Ssh(<sshHost>, <sshUser>, <sshPassword>, null, false);
 	ssh.connect();  
 	ssh.executeCommand(<my command>);
 	ssh.disconnect();
+```
 	
 ### 7 execute requests via SOAP UI ###
 
 When someone already created SOAP UI request to test a service, reuse can be time saving
 Either use directly the project file, or change content to adapt it to your data set or environment and execute project string
 
-		SoapUi soapUi = new SoapUi();
-		String reply = soapUi.executeWithProjectString(<project_content>, "myProject");
+```java
+	SoapUi soapUi = new SoapUi();
+	String reply = soapUi.executeWithProjectString(<project_content>, "myProject");
+```
 		
 ### 8 Using database ###
 
@@ -192,13 +224,17 @@ For now, only Oracle database is supported
 You must provide the ojdb6.jar file into src/lib folder so that it can be automatically installed in maven local repository when doing `mvn clean`
 connection and disconnection are done automatically
 
+```java
 	Oracle db = new Oracle(<dbName>, <dbHost>, <dbPort>, <dbUser>, <dbPassword>);
 	db.executeParamQuery("SELECT * FROM TAB1 WHERE id=?", id);
+```
 	
 or
 
+```java
 	Oracle db = new Oracle(<dbName>, <dbUser>, <dbPassword>, <tnsNamesPath>);
 	db.executeParamQuery("SELECT * FROM TAB1 WHERE id=?", id);
+```
 	
 ### 9 Using emails ###
 
@@ -206,23 +242,29 @@ or
 
 SeleniumRobot provides several email clients to allow reading email content and attachments
 
+```java
 	EmailAccount account = new EmailAccount(<email_address>, <login>, <password>, <emailServer>);
 	...
 	some actions that send an email
 	...
 	Email emailFound = account.checkEmailPresence(<email_title>, new String[] {"attachment1"});
+```
 	
 Email title and attachment names can be regular expression as String.matches() is used to search for the right emails
 **WARN** create your email server connection before email is sent so that `checkEmailPresence` can look at the last received emails (it keeps an index on already seen mails)
 	
 emailServer is an object created by 
 
+```java
 	EmailServer server = new EmailServer("<mail_server_urs>", EmailServerTypes.EXCHANGE_EWS, "<domain_for_user>");
+```
 	
 Using variables, it's also possible to write:
 
+```java
 	EmailAccount emailAccount = EmailAccount.fromJson(param("emailAccount"));
 	emailAccount.setEmailServer(EmailServer.fromJson(param("emailServer")));
+```
 	
 where `emailAccount` is `{'email': 'mymail@compmail.com', 'login': 'login', 'password': 'passwd'}` and `emailServer` is `	{'url': 'msg.compmail.com', 'type': 'EXCHANGE_EWS', 'domain': 'compmail.com'}`
 
@@ -230,9 +272,11 @@ where `emailAccount` is `{'email': 'mymail@compmail.com', 'login': 'login', 'pas
 
 To write an email for exchange server (the only one supported): 
 
+```java
 	EmailServer server = new EmailServer("<mail_server_urs>", EmailServerTypes.EXCHANGE_EWS, "<domain_for_user>");
 	EmailAccount account = new EmailAccount(<email_address>, <login>, <password>, <emailServer>);
 	account.sendMessage(Arrays.asList("myaddress@mydomain.com"), "hello", "hello");
+```
 	
 ### 10 upload file ###
 
@@ -245,7 +289,7 @@ Conditions are:
 - you have an `<input type="file" id="uploadFile" />` element
 - this element is visible (not hidden by an other one)
 
-Then, you can do either (the later is advised:
+Then, you can do either (the later is advised):
 - `driver.findElement(By.id("uploadFile")).sendKeys(<some file path>);`
 - `new FileUploadElement("upload", By.id("uploadFile")).sendKeys(<some file path);`
 
@@ -332,11 +376,13 @@ Then, an HAR file is recorded.
 
 **WARN**: If using manual steps with network capture, beware that test steps are only recorded once the driver is created. This means that with the code below, step "Write" will not be displayed in HAR capture. Traffic will still be recorded in the init step (named with the test name). Driver is created with the call to `new DriverTestPage(true)`.
 	
+```java
 	addStep("Write");
 	DriverTestPage page = new DriverTestPage(true)
 		._writeSomething();
 	addStep("Reset");
 	page._reset();
+```
 	  
 ### 16 Use Neoload tool to design and record End User Experience ###
 
