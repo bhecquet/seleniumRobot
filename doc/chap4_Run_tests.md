@@ -615,5 +615,5 @@ Benefits to execute Selenium IDE tests this way are:
 - ...
 
 For specifics about Selenium IDE writing, see §3.14
-
+- If you've added manual steps (as described in §3.14), add the option `-DmanualTestSteps=true`
 
