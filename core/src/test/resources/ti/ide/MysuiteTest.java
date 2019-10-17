@@ -41,9 +41,11 @@ public class MysuiteTest {
   @Test
   public void jcommander() {
     vars.put("toto", "coucou");
+    System.out.println(vars.get("foo"));
     driver.get("http://www.jcommander.org//");
     driver.manage().window().setSize(new Dimension(768, 683));
     driver.findElement(By.linkText("2.1. Boolean")).click();
+    System.out.println("STEP:Boolean link");
     driver.findElement(By.linkText("21. Parameter delegates")).click();
     seleniumhq();
   }

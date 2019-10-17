@@ -846,3 +846,4 @@ SeleniumRobot supports all features of Selenium IDE scenarios, it only does mini
 By default, your test will only contain 1 running step, which is the full scenario step. If you want more steps, you can use manual steps feature and add a step of type "echo" with target: `STEP:<step name>` 
 
 ![](images/selenium_ide_step.png)
+

@@ -76,27 +76,27 @@ public class SeleniumIdeLauncher {
 	}
 	
 	public void executeGeneratedClasses(Map<String, String> classCodes) throws ClassNotFoundException {
-		URLClassLoader sysLoader = (URLClassLoader) ClassLoader.getSystemClassLoader();
-	    URL urls[] = sysLoader.getURLs();
+//		URLClassLoader sysLoader = (URLClassLoader) ClassLoader.getSystemClassLoader();
+//	    URL urls[] = sysLoader.getURLs();
 		ClassLoader loader = Thread.currentThread().getContextClassLoader();
-        WeavingURLClassLoader weaver = null;
-		try {
-			weaver = new WeavingURLClassLoader(
-					sysLoader.getURLs(),
-					new URL[]{new File("./").toURI().toURL()},
-//        		sysLoader.getURLs(),
-			        loader
-			);
-		} catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+//        WeavingURLClassLoader weaver = null;
+//		try {
+//			weaver = new WeavingURLClassLoader(
+//					sysLoader.getURLs(),
+//					new URL[]{new File("./").toURI().toURL()},
+////        		sysLoader.getURLs(),
+//			        loader
+//			);
+//		} catch (MalformedURLException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
 		
 		// load web page classes
 		List<String> classes = new ArrayList<>();
 		for (Entry<String, String> entry: classCodes.entrySet()) {
 			if (entry.getKey().endsWith("Page")) {
-				Class aClass = CompilerUtils.CACHED_COMPILER.loadFromJava(weaver, entry.getKey(), entry.getValue());
+				Class aClass = CompilerUtils.CACHED_COMPILER.loadFromJava(loader, entry.getKey(), entry.getValue());
 				classes.add(aClass.getCanonicalName());
 			}
 		}
@@ -104,12 +104,12 @@ public class SeleniumIdeLauncher {
 		// now compile tests which use page classes
 		for (Entry<String, String> entry: classCodes.entrySet()) {
 			if (!entry.getKey().endsWith("Page")) {
-				Class aClass = CompilerUtils.CACHED_COMPILER.loadFromJava(weaver, entry.getKey(), entry.getValue());
+				Class aClass = CompilerUtils.CACHED_COMPILER.loadFromJava(loader, entry.getKey(), entry.getValue());
 				classes.add(aClass.getCanonicalName());
 			}
 		}
 		
-		Thread.currentThread().setContextClassLoader(weaver);
+		Thread.currentThread().setContextClassLoader(loader);
 		executeTest(1, classes.toArray(new String[] {}), ParallelMode.NONE, new String[] {});
 	}
 	

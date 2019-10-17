@@ -74,7 +74,6 @@ public class SeleniumNativeActions {
 			+ ")"			
 			)
 	public Object interceptFindHtmlElement(ProceedingJoinPoint joinPoint) throws Throwable {
-		System.out.println("coucou");
 		if (doOverride()) {
 			return new HtmlElement("", (By)(joinPoint.getArgs()[0]), getCurrentFrame());
 		} else {

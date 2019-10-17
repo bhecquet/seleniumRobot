@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 
@@ -13,6 +14,8 @@ import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.expr.AnnotationExpr;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
+import com.seleniumtests.core.SeleniumTestsContext;
+import com.seleniumtests.core.TestVariable;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
 public class SeleniumIdeParser {
@@ -24,7 +27,7 @@ public class SeleniumIdeParser {
 	private File javaFile;
 	private String className;
 	
-	private static final String PAGE_OBJECT_HEADER = "package com.infotel.selenium.ide;\n" + 
+	public static final String PAGE_OBJECT_HEADER = "package com.infotel.selenium.ide;\n" + 
 			"\n" + 
 			"import java.io.IOException;\n" + 
 			"\n" + 
@@ -43,6 +46,8 @@ public class SeleniumIdeParser {
 			"import org.openqa.selenium.JavascriptExecutor;\n" + 
 			"import org.openqa.selenium.Alert;\n" + 
 			"import org.openqa.selenium.Keys;\n" + 
+			"import com.seleniumtests.core.TestVariable;\n" +
+			"import java.util.Map.Entry;\n" +
 			"import java.util.*;\n" +  
 			"\n" + 
 			"public class %sPage extends PageObject {\n" + 
@@ -54,10 +59,13 @@ public class SeleniumIdeParser {
 			"		super();\n" + 
 			"		js = (JavascriptExecutor) driver;\n" + 
 			"		vars = new HashMap<String, Object>();\n" + 
+			"		for (Entry<String, TestVariable> entry: robotConfig().getConfiguration().entrySet()) {\n" + 
+			"			vars.put(entry.getKey(), entry.getValue().getValue());\n" + 
+			"		}\n"	+
 			"	}\n";
 	private static final String FOOTER = "}"; 
 	
-	private static final String TEST_HEADER = "package com.infotel.selenium.ide;\n" + 
+	public static final String TEST_HEADER = "package com.infotel.selenium.ide;\n" + 
 			"\n" + 
 			"import java.io.IOException;\n" + 
 			"import com.seleniumtests.core.runner.SeleniumTestPlan;\n" +  
@@ -115,7 +123,14 @@ public class SeleniumIdeParser {
 			
 			// code is always copied to PageObject
     		pageCode.append(n.getDeclarationAsString());
-    		pageCode.append(n.getBody().get().toString().replace("\r", ""));
+			String body = n.getBody().get().toString().replace("\r", "");
+			for (String line: body.split("\n")) {
+				if (line.contains("System.out.println(\"STEP:") && System.getProperty(SeleniumTestsContext.MANUAL_TEST_STEPS) == "true") {
+					pageCode.append(line.replace("System.out.println(\"STEP:", "addStep(\"") + "\n");
+				} else {
+		    		pageCode.append(line + "\n");
+				}
+			}
     		pageCode.append("\n\n");
 
     		// in case of a Test method, create a reference to PageObject method

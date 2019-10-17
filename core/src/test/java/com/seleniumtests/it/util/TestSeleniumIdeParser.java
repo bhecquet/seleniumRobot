@@ -10,6 +10,7 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import com.seleniumtests.GenericTest;
+import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.util.ide.SeleniumIdeParser;
 
 public class TestSeleniumIdeParser extends GenericTest {
@@ -21,7 +22,7 @@ public class TestSeleniumIdeParser extends GenericTest {
 	 * @throws IOException
 	 */
 	@Test(groups={"it"})
-	public void testCodeGeneration() throws IOException {
+	public void testCodeGenerationAutomaticSteps() throws IOException {
 		
 		String testClassCode = "package com.infotel.selenium.ide;\n" + 
 				"\n" + 
@@ -38,37 +39,7 @@ public class TestSeleniumIdeParser extends GenericTest {
 				"\n" + 
 				"}";
 		
-		String pageClassCode = "package com.infotel.selenium.ide;\n" + 
-				"\n" + 
-				"import java.io.IOException;\n" + 
-				"\n" + 
-				"import com.seleniumtests.uipage.PageObject;\n" + 
-				"import org.openqa.selenium.JavascriptExecutor;\n" + 
-				"import static org.testng.Assert.*;\n" + 
-				"import static org.hamcrest.MatcherAssert.*;\n" + 
-				"import static org.hamcrest.CoreMatchers.is;\n" + 
-				"import static org.hamcrest.core.IsNot.not;\n" + 
-				"import org.openqa.selenium.By;\n" + 
-				"import org.openqa.selenium.Dimension;\n" + 
-				"import org.openqa.selenium.WebElement;\n" + 
-				"import org.openqa.selenium.interactions.Actions;\n" + 
-				"import org.openqa.selenium.support.ui.ExpectedConditions;\n" + 
-				"import org.openqa.selenium.support.ui.WebDriverWait;\n" + 
-				"import org.openqa.selenium.JavascriptExecutor;\n" + 
-				"import org.openqa.selenium.Alert;\n" + 
-				"import org.openqa.selenium.Keys;\n" + 
-				"import java.util.*;\n" + 
-				"\n" + 
-				"public class MysuiteTestPage extends PageObject {\n" + 
-				"\n" + 
-				"	private Map<String, Object> vars;\n" + 
-				"	private JavascriptExecutor js;\n" + 
-				"\n" + 
-				"	public MysuiteTestPage() throws IOException {\n" + 
-				"		super();\n" + 
-				"		js = (JavascriptExecutor) driver;\n" + 
-				"		vars = new HashMap<String, Object>();\n" + 
-				"	}\n" + 
+		String pageClassCode = String.format(SeleniumIdeParser.PAGE_OBJECT_HEADER, "MysuiteTest", "MysuiteTest") + 
 				"public void seleniumhq(){\n" + 
 				"    driver.get(\"https://www.seleniumhq.org/\");\n" + 
 				"    driver.manage().window().setSize(new Dimension(768, 683));\n" + 
@@ -76,28 +47,101 @@ public class TestSeleniumIdeParser extends GenericTest {
 				"    driver.findElement(By.linkText(\"Blog\")).click();\n" + 
 				"}\n" + 
 				"\n" + 
+				"\n" + 
 				"public void jcommander(){\n" + 
 				"    vars.put(\"toto\", \"coucou\");\n" + 
+			    "    System.out.println(vars.get(\"foo\"));\n" +
 				"    driver.get(\"http://www.jcommander.org//\");\n" + 
 				"    driver.manage().window().setSize(new Dimension(768, 683));\n" + 
 				"    driver.findElement(By.linkText(\"2.1. Boolean\")).click();\n" + 
+				"    System.out.println(\"STEP:Boolean link\");\n" +
 				"    driver.findElement(By.linkText(\"21. Parameter delegates\")).click();\n" + 
 				"    seleniumhq();\n" + 
 				"}\n" + 
 				"\n" + 
+				"\n" + 
 				"}";
 		
+		try {
+			System.setProperty(SeleniumTestsContext.MANUAL_TEST_STEPS, "false");
+			
+			File tmpSuiteFile = createFileFromResource("ti/ide/MysuiteTest.java");
+			File suiteFile = Paths.get(tmpSuiteFile.getParentFile().getAbsolutePath(), "MysuiteTest.java").toFile();
+			FileUtils.copyFile(tmpSuiteFile, suiteFile);
+			
+			Map<String, String> classInfo = new SeleniumIdeParser(suiteFile.getAbsolutePath()).parseSeleniumIdeFile();
+	
+			Assert.assertTrue(classInfo.containsKey("com.infotel.selenium.ide.MysuiteTest"));
+			Assert.assertTrue(classInfo.containsKey("com.infotel.selenium.ide.MysuiteTestPage"));
+			
+			Assert.assertEquals(classInfo.get("com.infotel.selenium.ide.MysuiteTest"), testClassCode);
+			Assert.assertEquals(classInfo.get("com.infotel.selenium.ide.MysuiteTestPage"), pageClassCode);
+		} finally {
+			System.clearProperty(SeleniumTestsContext.MANUAL_TEST_STEPS);
+		}
+	}
+	
+	/**
+	 * Check echo "STEP:<step_name>" is replace is this case to generate manual step
+	 * @throws IOException
+	 */
+	@Test(groups={"it"})
+	public void testCodeGenerationManualSteps() throws IOException {
 		
-		File tmpSuiteFile = createFileFromResource("ti/ide/MysuiteTest.java");
-		File suiteFile = Paths.get(tmpSuiteFile.getParentFile().getAbsolutePath(), "MysuiteTest.java").toFile();
-		FileUtils.copyFile(tmpSuiteFile, suiteFile);
+		String testClassCode = "package com.infotel.selenium.ide;\n" + 
+				"\n" + 
+				"import java.io.IOException;\n" + 
+				"import com.seleniumtests.core.runner.SeleniumTestPlan;\n" + 
+				"import org.testng.annotations.Test;\n" + 
+				"\n" + 
+				"public class MysuiteTest extends SeleniumTestPlan {\n" + 
+				"\n" + 
+				"	@Test\n" + 
+				"	public void jcommander() throws IOException {\n" + 
+				"		new MysuiteTestPage().jcommander();\n" + 
+				"	}\n" + 
+				"\n" + 
+				"}";
 		
-		Map<String, String> classInfo = new SeleniumIdeParser(suiteFile.getAbsolutePath()).parseSeleniumIdeFile();
-
-		Assert.assertTrue(classInfo.containsKey("com.infotel.selenium.ide.MysuiteTest"));
-		Assert.assertTrue(classInfo.containsKey("com.infotel.selenium.ide.MysuiteTestPage"));
+		String pageClassCode = String.format(SeleniumIdeParser.PAGE_OBJECT_HEADER, "MysuiteTest", "MysuiteTest") + 
+				"public void seleniumhq(){\n" + 
+				"    driver.get(\"https://www.seleniumhq.org/\");\n" + 
+				"    driver.manage().window().setSize(new Dimension(768, 683));\n" + 
+				"    driver.findElement(By.cssSelector(\"td:nth-child(2) .icon\")).click();\n" + 
+				"    driver.findElement(By.linkText(\"Blog\")).click();\n" + 
+				"}\n" + 
+				"\n" + 
+				"\n" + 
+				"public void jcommander(){\n" + 
+				"    vars.put(\"toto\", \"coucou\");\n" + 
+			    "    System.out.println(vars.get(\"foo\"));\n" +
+				"    driver.get(\"http://www.jcommander.org//\");\n" + 
+				"    driver.manage().window().setSize(new Dimension(768, 683));\n" + 
+				"    driver.findElement(By.linkText(\"2.1. Boolean\")).click();\n" + 
+				"    addStep(\"Boolean link\");\n" +
+				"    driver.findElement(By.linkText(\"21. Parameter delegates\")).click();\n" + 
+				"    seleniumhq();\n" + 
+				"}\n" + 
+				"\n" + 
+				"\n" + 
+				"}";
 		
-		Assert.assertEquals(classInfo.get("com.infotel.selenium.ide.MysuiteTest"), testClassCode);
-		Assert.assertEquals(classInfo.get("com.infotel.selenium.ide.MysuiteTestPage"), pageClassCode);
+		try {
+			System.setProperty(SeleniumTestsContext.MANUAL_TEST_STEPS, "true");
+			
+			File tmpSuiteFile = createFileFromResource("ti/ide/MysuiteTest.java");
+			File suiteFile = Paths.get(tmpSuiteFile.getParentFile().getAbsolutePath(), "MysuiteTest.java").toFile();
+			FileUtils.copyFile(tmpSuiteFile, suiteFile);
+			
+			Map<String, String> classInfo = new SeleniumIdeParser(suiteFile.getAbsolutePath()).parseSeleniumIdeFile();
+			
+			Assert.assertTrue(classInfo.containsKey("com.infotel.selenium.ide.MysuiteTest"));
+			Assert.assertTrue(classInfo.containsKey("com.infotel.selenium.ide.MysuiteTestPage"));
+			
+			Assert.assertEquals(classInfo.get("com.infotel.selenium.ide.MysuiteTest"), testClassCode);
+			Assert.assertEquals(classInfo.get("com.infotel.selenium.ide.MysuiteTestPage"), pageClassCode);
+		} finally {
+			System.clearProperty(SeleniumTestsContext.MANUAL_TEST_STEPS);
+		}
 	}
 }
