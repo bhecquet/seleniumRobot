@@ -151,7 +151,6 @@ public class SeleniumIdeLauncher {
 		
 		TestNG tng = new TestNG(false);
 		tng.setXmlSuites(suites);
-		tng.setOutputDirectory(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory());
 		tng.run(); 
 		
 		return tng;

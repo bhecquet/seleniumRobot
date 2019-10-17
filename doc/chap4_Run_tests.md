@@ -601,7 +601,14 @@ From version 4.10, it is possible to execute Selenium IDE tests.
 - Export it with JUnit / Java as a .java file
 - Run the following command
 
-`java -cp seleniumRobot.jar -D<option1>=<value1> -D<option2>=<value2> -javaagent:/path/to/aspectjweaver.jar com.seleniumtests.util.ide -scripts test1.java,test2.java`
+`java -cp seleniumRobot.jar -D<option1>=<value1> -D<option2>=<value2> -javaagent:aspectjweaver.jar com.seleniumtests.util.ide.SeleniumIdeLauncher -scripts test1.java,test2.java`
+
+or, for local
+
+`java -cp seleniumRobot.jar;lib/drivers/* -D<option1>=<value1> -D<option2>=<value2> -javaagent:aspectjweaver.jar com.seleniumtests.util.ide.SeleniumIdeLauncher -scripts test1.java,test2.java`
+
+**/!\ AS we compile on the fly, a java JDK MUST be used, else you will get: java.lang.AssertionError: java.lang.ClassNotFoundException: com.sun.tools.javac.api.JavacTool**
+
 
 aspectjweaver.jar is provided in seleniumRobot zip file
 

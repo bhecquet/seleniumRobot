@@ -234,6 +234,7 @@
 				<executions>
 					<execution>
 						<phase>prepare-package</phase>
+						<id>copy-libs</id>
 						<goals>
 							<goal>copy-dependencies</goal>
 						</goals>
@@ -246,6 +247,22 @@
 							<excludeArtifactIds>seleniumRobot-linux-driver,seleniumRobot-mac-driver,seleniumRobot-windows-driver,opencv</excludeArtifactIds>
 						</configuration>
 					</execution>
+					<!-- <execution>
+						<phase>prepare-package</phase>
+						<id>copy aspectjweaver</id>
+						<goals>
+							<goal>copy-dependencies</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${project.build.directory}</outputDirectory>
+							<stripVersion>true</stripVersion>
+							<overWriteReleases>true</overWriteReleases>
+							<overWriteSnapshots>false</overWriteSnapshots>
+							<overWriteIfNewer>true</overWriteIfNewer>
+							<includeScope>compile</includeScope>
+							<includeArtifactIds>aspectjweaver</includeArtifactIds>
+						</configuration>
+					</execution>-->
 				</executions>
 		      </plugin>
 			<plugin>

@@ -56,6 +56,7 @@ public class TestSeleniumIdeParser extends GenericTest {
 				"    driver.findElement(By.linkText(\"2.1. Boolean\")).click();\n" + 
 				"    System.out.println(\"STEP:Boolean link\");\n" +
 				"    driver.findElement(By.linkText(\"21. Parameter delegates\")).click();\n" + 
+				"    assertThat(driver.findElement(By.linkText(\"2.1. Boolean\")).getText(), is(\"2.1. Boolean\"));\n" +
 				"    seleniumhq();\n" + 
 				"}\n" + 
 				"\n" + 
@@ -120,6 +121,7 @@ public class TestSeleniumIdeParser extends GenericTest {
 				"    driver.findElement(By.linkText(\"2.1. Boolean\")).click();\n" + 
 				"    addStep(\"Boolean link\");\n" +
 				"    driver.findElement(By.linkText(\"21. Parameter delegates\")).click();\n" + 
+				"    assertThat(driver.findElement(By.linkText(\"2.1. Boolean\")).getText(), is(\"2.1. Boolean\"));\n" +
 				"    seleniumhq();\n" + 
 				"}\n" + 
 				"\n" + 
