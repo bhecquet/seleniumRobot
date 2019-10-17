@@ -47,6 +47,7 @@ public class MysuiteTest {
     driver.findElement(By.linkText("2.1. Boolean")).click();
     System.out.println("STEP:Boolean link");
     driver.findElement(By.linkText("21. Parameter delegates")).click();
+    assertThat(driver.findElement(By.linkText("2.1. Boolean")).getText(), is("2.1. Boolean"));
     seleniumhq();
   }
 }
