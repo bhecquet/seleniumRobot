@@ -72,6 +72,7 @@ import com.seleniumtests.uipage.ExpectedConditionsC;
 import com.seleniumtests.uipage.PageObject;
 import com.seleniumtests.uipage.ReplayOnError;
 import com.seleniumtests.util.helper.WaitHelper;
+import com.seleniumtests.util.logging.DebugMode;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
 import io.appium.java_client.MobileElement;
@@ -198,6 +199,8 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     @ReplayOnError
     public void click() {
         findElement(true);
+        
+        outlineElement(element);
         element.click();   
     }
     
@@ -208,6 +211,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     public void clickAction() {
     	findElement(true);
 
+        outlineElement(element);
     	try {
             new Actions(driver).click(element).perform();
         } catch (InvalidElementStateException e) {
@@ -221,7 +225,8 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     @ReplayOnError
     public void doubleClickAction() {
     	findElement(true);
-    	
+
+        outlineElement(element);
     	try {
             new Actions(driver).doubleClick(element).perform();
         } catch (InvalidElementStateException e) {
@@ -243,7 +248,8 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     public void clickAt(int xOffset, int yOffset) {
     	findElement();
 		((CustomEventFiringWebDriver)driver).scrollToElement(element, yOffset);
-        
+
+        outlineElement(element);
         try {
             new Actions(driver).moveToElement(element, xOffset, yOffset).click()
                 .perform();
@@ -265,6 +271,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     	WebDriver realDriver = ((CustomEventFiringWebDriver)driver).getWebDriver();
     	
         findElement(true);
+        outlineElement(element);
 
         String mouseOverScript;
         if (realDriver instanceof FirefoxDriver && FirefoxDriverFactory.isMarionetteMode()
@@ -295,6 +302,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     @ReplayOnError
     public void simulateDoubleClick() {
         findElement(true);
+        outlineElement(element);
         
         WebDriver realDriver = ((CustomEventFiringWebDriver)driver).getWebDriver();
         
@@ -640,6 +648,20 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 	}
     
     /**
+     * outlines the element before acting on it
+     * Element must have been searched before
+     */
+    protected void outlineElement(WebElement element) {
+    	if (element == null || !SeleniumTestsContextManager.isWebTest() || !SeleniumTestsContextManager.getThreadContext().getDebug().contains(DebugMode.GUI)) {
+    		return;
+    	}
+    	
+    	changeCssAttribute(element, "outline", "2px solid red");
+    	WaitHelper.waitForMilliSeconds(250);
+    	changeCssAttribute(element, "outline", "");
+    }
+    
+    /**
 	 * Make element visible. Sometimes useful when real elements are backed by an image element
 	 */
 	protected void makeWebElementVisible(WebElement element) {
@@ -915,6 +937,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     @ReplayOnError
     public boolean isDisplayedRetry() {
     	findElement(false, false);
+        outlineElement(element);
         return element.isDisplayed();
     }
 
@@ -1296,7 +1319,8 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     	
     	while (end.isAfter(clock.instant())) {
     		try {
-	    		new WebDriverWait(driver, 1).ignoring(ConfigurationException.class, ScenarioException.class).until(ExpectedConditionsC.presenceOfElementLocated(this));
+	    		WebElement element = new WebDriverWait(driver, 1).ignoring(ConfigurationException.class, ScenarioException.class).until(ExpectedConditionsC.presenceOfElementLocated(this));
+	            outlineElement(element);
 	    		return;
     		} catch (TimeoutException e) {
     		}

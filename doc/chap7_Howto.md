@@ -441,4 +441,10 @@ For more complex reports (send errors to Jira, send results to Squash, ...), you
 This way, you can scan test results and do some actions based on results. Look at `CustomReporter.java` for example
 To enable this report, use parameter `-DreporterPluginClasses=my.reporter.CustomClass` 
 	  
-	  
+### 20 Debug running test ###
+
+For debugging a test, you can:
+- use your IDE to stop at breakpoints. For development purpose only
+- use -Ddebug=core: when test is executing outside of dev environment, you will get a log file with all details about which methods are running. It's very verbose
+- use -Ddebug=driver: when something wrong happens with browser / driver (crashing, errors, ...), it will log driver and browser behaviour
+- use -Ddebug=gui: it will outline an element before clicking on it or when searching if it's displayed or present. As it slows down the test (250 ms for each outline), use it only for demo.
