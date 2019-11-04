@@ -64,7 +64,9 @@ import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.CustomSeleniumTestsException;
 import com.seleniumtests.customexception.DriverExceptions;
 import com.seleniumtests.customexception.ScenarioException;
+import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.CustomEventFiringWebDriver;
+import com.seleniumtests.driver.DriverConfig;
 import com.seleniumtests.driver.TestType;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.reporter.logger.TestLogging;
@@ -268,14 +270,14 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     		((CustomEventFiringWebDriver)updateDriver()).updateWindowsHandles();
     	}
     	
-    	WebDriver realDriver = ((CustomEventFiringWebDriver)driver).getWebDriver();
-    	
         findElement(true);
         outlineElement(element);
+        DriverConfig driverConfig = WebUIDriver.getWebUIDriver(false).getConfig();
 
         String mouseOverScript;
-        if (realDriver instanceof FirefoxDriver && FirefoxDriverFactory.isMarionetteMode()
-            	|| realDriver instanceof ChromeDriver && WebUIDriver.getWebUIDriver(false).getConfig().getMajorBrowserVersion() >= 75) {
+        if ((driverConfig.getBrowserType() == BrowserType.FIREFOX && FirefoxDriverFactory.isMarionetteMode())
+            	|| (driverConfig.getBrowserType() == BrowserType.CHROME 
+	        			&& driverConfig.getMajorBrowserVersion() >= 75)) {
         		mouseOverScript = "var event = new MouseEvent('mouseover', {view: window, bubbles: true, cancelable: true}) ;"
                 			+ "arguments[0].dispatchEvent(event);";
             } else {
@@ -287,8 +289,9 @@ public class HtmlElement extends Element implements WebElement, Locatable {
         WaitHelper.waitForSeconds(2);
         
         String clickScript = "";
-        if (realDriver instanceof FirefoxDriver && FirefoxDriverFactory.isMarionetteMode()
-        	|| realDriver instanceof ChromeDriver && WebUIDriver.getWebUIDriver(false).getConfig().getMajorBrowserVersion() >= 75) {
+        if ((driverConfig.getBrowserType() == BrowserType.FIREFOX && FirefoxDriverFactory.isMarionetteMode())
+            	|| (driverConfig.getBrowserType() == BrowserType.CHROME 
+	        			&& driverConfig.getMajorBrowserVersion() >= 75)) {
         	clickScript = "var event = new MouseEvent('click', {view: window, bubbles: true, cancelable: true}) ;"
             			+ "arguments[0].dispatchEvent(event);";
         } else {
@@ -304,11 +307,12 @@ public class HtmlElement extends Element implements WebElement, Locatable {
         findElement(true);
         outlineElement(element);
         
-        WebDriver realDriver = ((CustomEventFiringWebDriver)driver).getWebDriver();
+        DriverConfig driverConfig = WebUIDriver.getWebUIDriver(false).getConfig();
         
         String doubleClickScript;
-        if (realDriver instanceof FirefoxDriver && FirefoxDriverFactory.isMarionetteMode()
-            	|| realDriver instanceof ChromeDriver && WebUIDriver.getWebUIDriver(false).getConfig().getMajorBrowserVersion() >= 75) {
+        if ((driverConfig.getBrowserType() == BrowserType.FIREFOX && FirefoxDriverFactory.isMarionetteMode())
+            	|| (driverConfig.getBrowserType() == BrowserType.CHROME 
+	        			&& driverConfig.getMajorBrowserVersion() >= 75)) {
         		doubleClickScript = "var event = new MouseEvent('dblclick', {view: window, bubbles: true, cancelable: true}) ;"
                 			+ "arguments[0].dispatchEvent(event);";
             } else {
@@ -329,13 +333,13 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     	JavascriptExecutor js = (JavascriptExecutor) driver;
         js.executeScript("arguments[0].focus();", element);
         
-        WebDriver realDriver = ((CustomEventFiringWebDriver)driver).getWebDriver();
+        DriverConfig driverConfig = WebUIDriver.getWebUIDriver(false).getConfig();
         
-        // handle org.openqa.selenium.UnsupportedCommandException: sendKeysToActiveElement which are not available for firefox and IE
-        if ((realDriver instanceof FirefoxDriver && FirefoxDriverFactory.isMarionetteMode())
-        		|| realDriver instanceof InternetExplorerDriver
-	        	|| (realDriver instanceof ChromeDriver 
-	        			&& WebUIDriver.getWebUIDriver(false).getConfig().getMajorBrowserVersion() >= 75)) {
+        // handlitee org.openqa.selenium.UnsupportedCommandException: sendKeysToActiveElement which are not available for firefox and IE
+        if ((driverConfig.getBrowserType() == BrowserType.FIREFOX && FirefoxDriverFactory.isMarionetteMode())
+        		|| driverConfig.getBrowserType() == BrowserType.INTERNET_EXPLORER
+	        	|| (driverConfig.getBrowserType() == BrowserType.CHROME 
+	        			&& driverConfig.getMajorBrowserVersion() >= 75)) {
         	logger.warn("using specific Marionette method");
         	js.executeScript(String.format("arguments[0].value='%s';", keysToSend[0].toString()), element);
         } else {
