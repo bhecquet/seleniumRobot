@@ -65,7 +65,9 @@ import org.testng.annotations.Test;
 import com.seleniumtests.MockitoTest;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.ScenarioException;
+import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.CustomEventFiringWebDriver;
+import com.seleniumtests.driver.DriverConfig;
 import com.seleniumtests.driver.DriverExceptionListener;
 import com.seleniumtests.driver.TestType;
 import com.seleniumtests.driver.WebUIDriver;
@@ -109,6 +111,12 @@ public class TestHtmlElement extends MockitoTest {
 	@Mock
 	private TargetLocator locator;
 	
+	@Mock
+	private WebUIDriver uiDriver;
+	
+	@Mock
+	private DriverConfig driverConfig;
+	
 	@Spy
 	private HtmlElement el = new HtmlElement("element", By.id("el"));
 	private HtmlElement el1 = new HtmlElement("element", By.id("el1"), el);
@@ -131,6 +139,7 @@ public class TestHtmlElement extends MockitoTest {
 		
 		PowerMockito.mockStatic(WebUIDriver.class);
 		when(WebUIDriver.getWebDriver(anyBoolean())).thenReturn(eventDriver);
+		when(WebUIDriver.getWebUIDriver(anyBoolean())).thenReturn(uiDriver);
 		when(driver.findElement(By.id("el"))).thenReturn(element);
 		when(driver.findElements(By.name("subEl"))).thenReturn(subElList);
 		when(driver.findElement(By.name("subEl"))).thenReturn(subElement1);
@@ -139,6 +148,10 @@ public class TestHtmlElement extends MockitoTest {
 		when(driver.getMouse()).thenReturn(mouse);
 		when(driver.switchTo()).thenReturn(locator);
 		when(driver.executeScript(anyString())).thenReturn(Arrays.asList(100, 100));
+		
+		when(uiDriver.getConfig()).thenReturn(driverConfig);
+		when(driverConfig.getBrowserType()).thenReturn(BrowserType.HTMLUNIT);
+		when(driverConfig.getMajorBrowserVersion()).thenReturn(1);
 
 		when(element.findElement(By.name("subEl"))).thenReturn(subElement1);
 		when(element.findElements(By.name("subEl"))).thenReturn(subElList);
