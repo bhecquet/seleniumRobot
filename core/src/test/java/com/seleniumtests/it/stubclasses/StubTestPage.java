@@ -21,6 +21,7 @@ import java.io.IOException;
 
 import org.testng.SkipException;
 
+import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.reporter.logger.TestLogging;
 import com.seleniumtests.uipage.PageObject;
 
@@ -28,6 +29,10 @@ public class StubTestPage extends PageObject {
 
 	public StubTestPage() throws IOException {
 		super();
+	}
+	
+	public StubTestPage(BrowserType browser) throws IOException {
+		super(null , null, browser, "app", 0);
 	}
 	
 	public StubTestPage doSomething() {

@@ -12,10 +12,12 @@ import static org.mockito.Mockito.when;
 import static org.powermock.api.mockito.PowerMockito.whenNew;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
@@ -44,11 +46,13 @@ import com.seleniumtests.driver.DriverMode;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.driver.WebUIDriverFactory;
 import com.seleniumtests.driver.screenshots.VideoRecorder;
+import com.seleniumtests.it.stubclasses.StubTestPage;
 import com.seleniumtests.reporter.logger.TestLogging;
+import com.seleniumtests.uipage.PageObject;
 
 import net.lightbody.bmp.BrowserMobProxy;
 
-@PrepareForTest({NLWebDriverFactory.class, CustomEventFiringWebDriver.class, SeleniumGridConnectorFactory.class, SeleniumGridDriverFactory.class, WebUIDriver.class})
+@PrepareForTest({NLWebDriverFactory.class, CustomEventFiringWebDriver.class, SeleniumGridConnectorFactory.class, SeleniumGridDriverFactory.class, WebUIDriver.class, PageObject.class})
 @PowerMockIgnore("javax.net.ssl.*")
 public class TestWebUIDriver extends MockitoTest {
 	
@@ -547,6 +551,34 @@ public class TestWebUIDriver extends MockitoTest {
 	public void testGetNoWebUiDriver2() {
 		WebUIDriver uiDriver = WebUIDriver.getWebUIDriver(true, "bar");
 		Assert.assertNull(WebUIDriver.getWebUIDriver(false, "foo"));
+	}
+	
+
+	/**
+	 * issue #297: check we get the current driver when creating a new page, instead of getting the default one
+	 * @throws Exception
+	 */
+	@Test(groups={"ut"})
+	public void testGetCurrentWebUiDriverFromPage() throws Exception {
+		PowerMockito.mockStatic(WebUIDriver.class, Mockito.CALLS_REAL_METHODS);
+		PowerMockito.doReturn(drv1).when(WebUIDriver.class, "getWebDriver", eq(true), any(BrowserType.class), eq("main"), eq(null));
+		PowerMockito.doReturn(drv2).when(WebUIDriver.class, "getWebDriver", eq(true), any(BrowserType.class), eq("app"), any());
+//		PowerMockito.doReturn(drv2).when(WebUIDriver.class, "getWebDriver", eq(true), any(BrowserType.class), eq("app"), eq(null));
+		
+		// create a first page. This creates the default driver
+		StubTestPage page1 = new StubTestPage();
+		WebUIDriver.setCurrentWebUrDriverName("main"); // as we mock driver creation, current driver name is never set
+		
+		// create a new page linked to a new driver. This creates a new driver names "app"
+		StubTestPage page2 = new StubTestPage(BrowserType.NONE);
+		WebUIDriver.setCurrentWebUrDriverName("app"); // as we mock driver creation, current driver name is never set
+		
+		// create an other page which sould use the last created driver
+		StubTestPage page3 = new StubTestPage();
+		
+		Assert.assertEquals(page1.getDriver(), drv1);
+		Assert.assertEquals(page2.getDriver(), drv2);
+		Assert.assertEquals(page3.getDriver(), drv2); // last page uses the driver created in the previous page
 	}
 
 	/**

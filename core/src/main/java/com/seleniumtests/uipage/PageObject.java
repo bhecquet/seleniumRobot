@@ -106,7 +106,11 @@ public class PageObject extends BasePage implements IPage {
     }
     
     public PageObject(final HtmlElement pageIdentifierElement, final String url) throws IOException {
-    	this(pageIdentifierElement, url, SeleniumTestsContextManager.getThreadContext().getBrowser(), WebUIDriver.DEFAULT_DRIVER_NAME, null);
+    	this(pageIdentifierElement, 
+    			url, 
+    			SeleniumTestsContextManager.getThreadContext().getBrowser(), 
+    			WebUIDriver.getCurrentWebUiDriverName(), 
+    			null);
     }
 
     /**
