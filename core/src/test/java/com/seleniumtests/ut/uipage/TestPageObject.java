@@ -29,4 +29,5 @@ public class TestPageObject extends GenericDriverTest {
 	public void testDriverNull() throws Exception {
 		new DriverTestPage(true, "http://foo.bar.com");
 	}
+
 }

@@ -468,7 +468,7 @@ public class WebUIDriver {
     	if (uxDriverSession.get() == null || !uxDriverSession.get().containsKey(driverName)) {
     		throw new ScenarioException(String.format("driver with name %s has not been created", driverName));
     	}
-    	currentWebUiDriverName.set(driverName);
+    	setCurrentWebUrDriverName(driverName);
     	
     	if (uxDriverSession.get().get(driverName).driver != null && ((CustomEventFiringWebDriver)(uxDriverSession.get().get(driverName).driver)).getSessionId() == null) {
     		throw new ScenarioException("Cannot switch to a closed driver");
@@ -643,10 +643,14 @@ public class WebUIDriver {
 	public static ThreadLocal<VideoRecorder> getVideoRecorder() {
 		return videoRecorder;
 	}
+	
+	public static void setCurrentWebUrDriverName(String name) {
+		currentWebUiDriverName.set(name);
+	}
 
 	public static String getCurrentWebUiDriverName() {
 		if (currentWebUiDriverName.get() == null) {
-			currentWebUiDriverName.set(DEFAULT_DRIVER_NAME);
+			setCurrentWebUrDriverName(DEFAULT_DRIVER_NAME);
 		}
 		return currentWebUiDriverName.get();
 	}
