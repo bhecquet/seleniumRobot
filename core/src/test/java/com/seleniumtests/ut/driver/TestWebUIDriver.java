@@ -560,7 +560,8 @@ public class TestWebUIDriver extends MockitoTest {
 	 */
 	@Test(groups={"ut"})
 	public void testGetCurrentWebUiDriverFromPage() throws Exception {
-		
+
+		SeleniumTestsContextManager.getThreadContext().setBrowser("none");
 		// this call is normally done on test start
 		WebUIDriver.resetCurrentWebUrDriverName();
 		
