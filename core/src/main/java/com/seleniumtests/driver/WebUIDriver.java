@@ -644,6 +644,10 @@ public class WebUIDriver {
 		return videoRecorder;
 	}
 	
+	public static void resetCurrentWebUrDriverName() {
+		setCurrentWebUrDriverName(DEFAULT_DRIVER_NAME);
+	}
+	
 	public static void setCurrentWebUrDriverName(String name) {
 		currentWebUiDriverName.set(name);
 	}
