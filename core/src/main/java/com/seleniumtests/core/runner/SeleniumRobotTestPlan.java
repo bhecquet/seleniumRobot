@@ -70,6 +70,9 @@ public class SeleniumRobotTestPlan {
 	@BeforeMethod(alwaysRun=true) 
 	public void startTestMethod(Method method) {
 		WebUIDriver.setWebDriver(null);
+		
+		// issue #297: be sure we reset the driver name before the test starts
+		WebUIDriver.resetCurrentWebUrDriverName();
 	}
 	
 	/**

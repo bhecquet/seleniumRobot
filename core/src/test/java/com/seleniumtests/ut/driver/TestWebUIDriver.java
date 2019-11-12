@@ -560,6 +560,10 @@ public class TestWebUIDriver extends MockitoTest {
 	 */
 	@Test(groups={"ut"})
 	public void testGetCurrentWebUiDriverFromPage() throws Exception {
+		
+		// this call is normally done on test start
+		WebUIDriver.resetCurrentWebUrDriverName();
+		
 		PowerMockito.mockStatic(WebUIDriver.class, Mockito.CALLS_REAL_METHODS);
 		PowerMockito.doReturn(drv1).when(WebUIDriver.class, "getWebDriver", eq(true), any(BrowserType.class), eq("main"), eq(null));
 		PowerMockito.doReturn(drv2).when(WebUIDriver.class, "getWebDriver", eq(true), any(BrowserType.class), eq("app"), any());
