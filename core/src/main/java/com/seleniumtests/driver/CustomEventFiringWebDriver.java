@@ -184,10 +184,137 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
     
 
     // returns the top pixel from which fixed positioned headers are not present
-    private static final String JS_GET_TOP_HEADER = "function getStyle( dom ) {" + 
+    private static final String JS_GET_TOP_HEADER = "function getStyle(dom) {" + 
+    		"  var style;" + 
+    		"  var returns = {};" + 
+    		"  /* FireFox and Chrome way */" + 
+    		"  if (window.getComputedStyle) {" + 
+    		"    style = window.getComputedStyle(dom, null);" + 
+    		"    for (var i = 0, l = style.length; i < l; i++) {" + 
+    		"      var prop = style[i];" + 
+    		"      var val = style.getPropertyValue(prop);" + 
+    		"      returns[prop] = val;" + 
+    		"    }" + 
+    		"    return returns;" + 
+    		"  }" + 
+    		"" + 
+    		"  /* IE and Opera way */" + 
+    		"  if (dom.currentStyle) {" + 
+    		"    style = dom.currentStyle;" + 
+    		"    for (var prop in style) {" + 
+    		"      returns[prop] = style[prop];" + 
+    		"    }" + 
+    		"    return returns;" + 
+    		"  }" + 
+    		"  /* Style from style attribute */" + 
+    		"  if ((style = dom.style)) {" + 
+    		"    for (var prop in style) {" + 
+    		"      if (typeof style[prop] != \"function\") {" + 
+    		"        returns[prop] = style[prop];" + 
+    		"      }" + 
+    		"    }" + 
+    		"    return returns;" + 
+    		"  }" + 
+    		"  return returns;" + 
+    		"}" + 
+    		"" + 
+    		"function isVisible(elem) {" + 
+    		"  var style = getStyle(elem);" + 
+    		"" + 
+    		"  if (style[\"display\"] === \"none\") return false;" + 
+    		"  if (style[\"visibility\"] !== \"visible\") return false;" + 
+    		"  if (style[\"opacity\"] === 0) return false;" + 
+    		"" + 
+    		"  if (" + 
+    		"    elem.offsetWidth +" + 
+    		"      elem.offsetHeight +" + 
+    		"      elem.getBoundingClientRect().height +" + 
+    		"      elem.getBoundingClientRect().width ===" + 
+    		"    0" + 
+    		"  )" + 
+    		"    return false;" + 
+    		"" + 
+    		"  var elementPoints = {" + 
+    		"    center: {" + 
+    		"      x: elem.getBoundingClientRect().left + elem.offsetWidth / 2," + 
+    		"      y: elem.getBoundingClientRect().top + elem.offsetHeight / 2" + 
+    		"    }," + 
+    		"    topLeft: {" + 
+    		"      x: elem.getBoundingClientRect().left," + 
+    		"      y: elem.getBoundingClientRect().top" + 
+    		"    }," + 
+    		"    topRight: {" + 
+    		"      x: elem.getBoundingClientRect().right," + 
+    		"      y: elem.getBoundingClientRect().top" + 
+    		"    }," + 
+    		"    bottomLeft: {" + 
+    		"      x: elem.getBoundingClientRect().left," + 
+    		"      y: elem.getBoundingClientRect().bottom" + 
+    		"    }," + 
+    		"    bottomRight: {" + 
+    		"      x: elem.getBoundingClientRect().right," + 
+    		"      y: elem.getBoundingClientRect().bottom" + 
+    		"    }" + 
+    		"  };" + 
+    		"" + 
+    		"  var docWidth = document.documentElement.clientWidth || window.innerWidth;" + 
+    		"  var docHeight = document.documentElement.clientHeight || window.innerHeight;" + 
+    		"" + 
+    		"  if (elementPoints.topLeft.x > docWidth) return false;" + 
+    		"  if (elementPoints.topLeft.y > docHeight) return false;" + 
+    		"  if (elementPoints.bottomRight.x < 0) return false;" + 
+    		"  if (elementPoints.bottomRight.y < 0) return false;" + 
+    		"" + 
+    		"  for (var index in elementPoints) {" + 
+    		"    var point = elementPoints[index];" + 
+    		"    var pointContainer = document.elementFromPoint(point.x, point.y);" + 
+    		"    if (pointContainer !== null) {" + 
+    		"      do {" + 
+    		"        if (pointContainer === elem) return true;" + 
+    		"      } while ((pointContainer = pointContainer.parentNode));" + 
+    		"    }" + 
+    		"  }" + 
+    		"  return false;" + 
+    		"}" + 
+    		"" + 
+    		"var headers;" + 
+    		"var nodes = document.querySelectorAll(\"div,header\");" + 
+    		"if (nodes && nodes.length > 0) {" + 
+    		"  var length = nodes.length;" + 
+    		"  headers = new Array();" + 
+    		"  for (var i = 0; i < length; i++) {" + 
+    		"    headers.push(nodes[i]);" + 
+    		"  }" + 
+    		"}" + 
+    		"" + 
+    		"var topPixel = 0;" + 
+    		"" + 
+    		"if (headers && headers.length > 0) {" + 
+    		"  headers = headers.filter(function(e) {" + 
+    		"    return getComputedStyle(e)[\"position\"] === \"fixed\" && isVisible(e);" + 
+    		"  });" + 
+    		"  headers = headers.sort(function(a, b) {" + 
+    		"    if (a == null || a.offsetTop == null) return 1;" + 
+    		"    if (b == null || b.offsetTop == null) return -1;" + 
+    		"    return a.offsetTop - b.offsetTop;" + 
+    		"  });" + 
+    		"" + 
+    		"  for (var i = 0; i < headers.length; i++) {" + 
+    		"    var header = headers[i];" + 
+    		"    if (header.offsetTop <= topPixel + 10) {" + 
+    		"      topPixel = header.offsetTop + header.scrollHeight;" + 
+    		"    } else {" + 
+    		"      break;" + 
+    		"    }" + 
+    		"  }" + 
+    		"}" + 
+    		"" + 
+    		"return topPixel;";
+    		
+    /*private static final String JS_GET_TOP_HEADER = "function getStyle( dom ) {" + 
     		"    var style;" + 
     		"    var returns = {};" + 
-    		"    /* FireFox and Chrome way */" + 
+    		"    // FireFox and Chrome way " + 
     		"    if(window.getComputedStyle){" + 
     		"        style = window.getComputedStyle(dom, null);" + 
     		"        for(var i = 0, l = style.length; i < l; i++){" + 
@@ -197,7 +324,7 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
     		"        }" + 
     		"        return returns;" + 
     		"    }" + 
-    		"    /* IE and Opera way */" + 
+    		"    // IE and Opera way " + 
     		"    if(dom.currentStyle){" + 
     		"        style = dom.currentStyle;" + 
     		"        for(var prop in style){" + 
@@ -205,7 +332,7 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
     		"        }" + 
     		"        return returns;" + 
     		"    }" + 
-    		"    /* Style from style attribute */" + 
+    		"    // Style from style attribute " + 
     		"    if(style = dom.style){" + 
     		"        for(var prop in style){" + 
     		"            if(typeof style[prop] != 'function'){" + 
@@ -285,6 +412,7 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
     		"	}" +
     		"}" +
     		"return topPixel;";
+    		*/
     
     public static final String NON_JS_UPLOAD_FILE_THROUGH_POPUP = 
     		"var action = 'upload_file_through_popup';";
