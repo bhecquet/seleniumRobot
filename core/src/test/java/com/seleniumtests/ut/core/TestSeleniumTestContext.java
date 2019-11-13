@@ -1104,6 +1104,7 @@ public class TestSeleniumTestContext extends GenericTest {
 	public void testArchiveToFile(final ITestContext testNGCtx, final XmlTest xmlTest) throws IOException {
 		initThreadContext(testNGCtx);
 		File archive = File.createTempFile("archive", ".zip");
+		archive.deleteOnExit();
 		SeleniumTestsContextManager.getThreadContext().setArchiveToFile(archive.getAbsolutePath());
 		Assert.assertTrue(SeleniumTestsContextManager.getThreadContext().getArchiveToFile().equals(archive.getAbsolutePath()));
 	}
@@ -1111,6 +1112,7 @@ public class TestSeleniumTestContext extends GenericTest {
 	public void testArchiveToTarFile(final ITestContext testNGCtx, final XmlTest xmlTest) throws IOException {
 		initThreadContext(testNGCtx);
 		File archive = File.createTempFile("archive", ".tar");
+		archive.deleteOnExit();
 		SeleniumTestsContextManager.getThreadContext().setArchiveToFile(archive.getAbsolutePath());
 	}
 	@Test(groups="ut context")

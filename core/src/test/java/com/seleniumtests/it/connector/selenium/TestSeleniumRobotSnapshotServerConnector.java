@@ -123,6 +123,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends GenericTest {
 		connector.createTestStep("Step 1");
 		connector.recordStepResult(true, "logs", 1);
 		File image = File.createTempFile("image-", ".png");
+		image.deleteOnExit();
 		FileUtils.copyInputStreamToFile(getClass().getClassLoader().getResourceAsStream("tu/images/ffLogoConcat.png"), image);
 		connector.createSnapshot(image);
 		

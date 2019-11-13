@@ -91,6 +91,9 @@ public class StubTestClass extends StubParentClass {
 		step2.setDuration(14030L);
 		TestLogging.logTestStep(step1);
 		TestLogging.logTestStep(step2);
+		
+		tmpImg.deleteOnExit();
+		tmpHtml.deleteOnExit();
 	}
 	
 	@Test(groups="stub")

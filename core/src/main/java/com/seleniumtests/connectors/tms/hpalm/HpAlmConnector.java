@@ -191,6 +191,7 @@ public class HpAlmConnector extends TestManager {
 
 		try {
 			File resultFile = File.createTempFile("result-", ".zip");
+			resultFile.deleteOnExit();
 			ZipUtil.pack(new File(SeleniumTestsContextManager.getThreadContext().getOutputDirectory()), resultFile);
 			
 			// Unirest does not allow sending result to ALM

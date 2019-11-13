@@ -86,6 +86,7 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 		
 		// prepare app file
 		File appFile = File.createTempFile("app", ".apk");
+		appFile.deleteOnExit();
 		capabilities.setCapability(MobileCapabilityType.APP, appFile.getAbsolutePath());
 		
 		// prepare response

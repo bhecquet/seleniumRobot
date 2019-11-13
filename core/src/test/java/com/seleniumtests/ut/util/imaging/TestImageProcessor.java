@@ -50,6 +50,7 @@ public class TestImageProcessor extends GenericTest {
 	@Test(groups={"ut"})
 	public void testConcatImages() throws IOException {
 		File tempFile = File.createTempFile("img", null);
+		tempFile.deleteOnExit();
 		File ffLogo = createFileFromResource("tu/ffLogo1.png");
 		ImageProcessor.concat(ffLogo, ffLogo, tempFile, 0, 70);
 		
@@ -62,6 +63,7 @@ public class TestImageProcessor extends GenericTest {
 	@Test(groups={"ut"}, expectedExceptions=IllegalArgumentException.class)
 	public void testConcatImagesErrorNegativeArgs() throws IOException {
 		File tempFile = File.createTempFile("img", null);
+		tempFile.deleteOnExit();
 		File ffLogo = createFileFromResource("tu/ffLogo1.png");
 		ImageProcessor.concat(ffLogo, ffLogo, tempFile, 0, -70);
 	}

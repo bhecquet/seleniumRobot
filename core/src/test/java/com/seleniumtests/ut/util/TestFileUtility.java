@@ -37,6 +37,8 @@ public class TestFileUtility extends GenericTest {
 	public void testZipUnzipFile() throws IOException {
 		File f1 = File.createTempFile("data", ".txt");
 		File f2 = File.createTempFile("data2", ".txt");
+		f1.deleteOnExit();
+		f2.deleteOnExit();
 		FileUtils.writeStringToFile(f1, "some data");
 		FileUtils.writeStringToFile(f2, "other data");
 		List<File> fileList = new ArrayList<>();
@@ -46,12 +48,22 @@ public class TestFileUtility extends GenericTest {
 		File zip = FileUtility.createZipArchiveFromFiles(fileList);
 		Assert.assertTrue(zip.exists());
 		
-		File outputDir = FileUtility.unzipFile(zip);
-		File outFile1 = Paths.get(outputDir.getAbsolutePath(), f1.getName()).toFile();
-		File outFile2 = Paths.get(outputDir.getAbsolutePath(), f2.getName()).toFile();
-		Assert.assertTrue(outFile1.exists());
-		Assert.assertTrue(outFile2.exists());
-		
-		Assert.assertEquals(FileUtils.readFileToString(outFile1), "some data");
+		File outputDir = null;
+		try {
+			outputDir = FileUtility.unzipFile(zip);
+			File outFile1 = Paths.get(outputDir.getAbsolutePath(), f1.getName()).toFile();
+			File outFile2 = Paths.get(outputDir.getAbsolutePath(), f2.getName()).toFile();
+			Assert.assertTrue(outFile1.exists());
+			Assert.assertTrue(outFile2.exists());
+			
+			Assert.assertEquals(FileUtils.readFileToString(outFile1), "some data");
+		} finally {
+			
+			try {
+				if (outputDir != null) {
+					FileUtils.deleteDirectory(outputDir);
+				}
+			} catch (IOException e) {}
+		}
 	}
 }
