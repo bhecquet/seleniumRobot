@@ -85,11 +85,61 @@ public class ScreenshotUtil {
     private class NamedBufferedImage {
     	public BufferedImage image;
     	public String prefix;
+    	public String url = "app";
+    	public String title = "app";
+    	public String pageSource = "";
     	
+    	/**
+    	 * Creates a NamedBufferedImage based on the provided image
+    	 * @param image
+    	 * @param prefix
+    	 */
     	public NamedBufferedImage(BufferedImage image, String prefix) {
     		this.prefix = prefix;
     		this.image = image;
+    		this.url = null;
+    		this.title = null;
+    		this.pageSource = null;
+    		
     	}
+    	
+
+        /**
+         * Add information (url, source, title) to the captured image
+         * Beware that these information use the current driver so driver state must reflect the provided image
+         * @param bufferedImage
+         */
+        public NamedBufferedImage addMetaDataToImage() {
+
+            if (SeleniumTestsContextManager.isWebTest()) {
+        		try {
+                    url = driver.getCurrentUrl();
+                } catch (org.openqa.selenium.UnhandledAlertException ex) {
+                    // ignore alert customexception
+                    logger.error(ex);
+                    url = driver.getCurrentUrl();
+                } catch (Throwable e) {
+                	// allow screenshot even if some problem occurs
+                	url = "http://no/url/available";
+                }
+
+        		try {
+        			title = driver.getTitle();
+        		} catch (Throwable e) {
+        			// allow screenshot even if some problem occurs
+        			title = "No Title";
+        		}
+        		title = prefix == null ? title: prefix + title;
+        		
+        		try {
+                	pageSource = driver.getPageSource();
+                } catch (Throwable e) {
+                	pageSource = "";
+                }
+        	}
+        	
+        	return this;
+        }
     }
     
     /**
@@ -177,7 +227,7 @@ public class ScreenshotUtil {
 		    	if (exportClass.equals(File.class)) {
 		    		out.add((T)exportToFile(capturedImage.image));
 		    	} else if (exportClass.equals(ScreenShot.class)) {
-		    		out.add((T)exportToScreenshot(capturedImage.image, capturedImage.prefix, Duration.between(start, LocalDateTime.now()).toMillis()));
+		    		out.add((T)exportToScreenshot(capturedImage, Duration.between(start, LocalDateTime.now()).toMillis()));
 		    	} else if (exportClass.equals(String.class)) {
 		    		try {
 						out.add((T)ImageProcessor.toBase64(capturedImage.image));
@@ -289,7 +339,7 @@ public class ScreenshotUtil {
 	        currentWindowHandle = driver.getWindowHandle();
         } catch (Exception e) {
         	try {
-        		images.add(new NamedBufferedImage(captureDesktop(), "Desktop"));
+        		images.add(new NamedBufferedImage(captureDesktop(), "Desktop")); // do not add metadata as driver may not be available
         	} catch (ScenarioException e1) {
         		logger.warn("could not capture desktop: " + e1.getMessage());
         	}
@@ -306,7 +356,7 @@ public class ScreenshotUtil {
 	        		}
 	        		driver.switchTo().window(windowHandle);
 	        		windowWithSeleniumfocus = windowHandle;
-	        		images.add(new NamedBufferedImage(captureWebPage(), ""));
+	        		images.add(new NamedBufferedImage(captureWebPage(), "").addMetaDataToImage());
 	        	}
 	        }
 	        
@@ -319,7 +369,7 @@ public class ScreenshotUtil {
         		}
         		
         		// capture current window
-        		images.add(new NamedBufferedImage(captureWebPage(), "Current Window: "));
+        		images.add(new NamedBufferedImage(captureWebPage(), "Current Window: ").addMetaDataToImage());
         		
         	} catch (Exception e) {
         		try {
@@ -438,48 +488,18 @@ public class ScreenshotUtil {
      * @param duration
      * @return
      */
-    private ScreenShot exportToScreenshot(BufferedImage image, String prefix, long duration) {
+    private ScreenShot exportToScreenshot(NamedBufferedImage namedImage, long duration) {
     	ScreenShot screenShot = new ScreenShot();
     	
-    	String url = "app";
-        String title = prefix + "app";
-        String pageSource = "";
     	
-    	if (SeleniumTestsContextManager.isWebTest()) {
-    		try {
-                url = driver.getCurrentUrl();
-            } catch (org.openqa.selenium.UnhandledAlertException ex) {
-                // ignore alert customexception
-                logger.error(ex);
-                url = driver.getCurrentUrl();
-            } catch (Throwable e) {
-            	// allow screenshot even if some problem occurs
-            	url = "http://no/url/available";
-            }
-
-    		try {
-    			title = driver.getTitle();
-    		} catch (Throwable e) {
-    			// allow screenshot even if some problem occurs
-    			title = "No Title";
-    		}
-    		title = prefix + title == null ? "": prefix + title;
-    		
-    		try {
-            	pageSource = driver.getPageSource();
-            } catch (Throwable e) {
-            	pageSource = "";
-            }
-    	}
+    	File screenshotFile = exportToFile(namedImage.image);
     	
-    	File screenshotFile = exportToFile(image);
-    	
-        screenShot.setLocation(url);
-        screenShot.setTitle(title);
+        screenShot.setLocation(namedImage.url);
+        screenShot.setTitle(namedImage.title);
         
         String outputSubDirectory = new File(outputDirectory).getName();
         try {
-            FileUtils.writeStringToFile(new File(outputDirectory + "/" + HTML_DIR + filename + ".html"), pageSource);
+            FileUtils.writeStringToFile(new File(outputDirectory + "/" + HTML_DIR + filename + ".html"), namedImage.pageSource);
             screenShot.setHtmlSourcePath(String.format("../%s/%s%s.html", outputSubDirectory, HTML_DIR, filename));
         } catch (IOException e) {
             logger.warn("Ex", e);
@@ -495,4 +515,5 @@ public class ScreenshotUtil {
     	}
 		return screenShot;
     }
+ 
 }

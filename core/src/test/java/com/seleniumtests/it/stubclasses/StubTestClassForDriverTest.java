@@ -74,6 +74,12 @@ public class StubTestClassForDriverTest extends StubParentClass {
 	}
 	
 	@Test(groups="stub")
+	public void testDriverMultipleSnapshot() throws Exception {
+		new DriverTestPage(true)
+			._goToNewPage();
+	}
+	
+	@Test(groups="stub")
 	public void testDriverShortKo() throws Exception {
 		SeleniumTestsContextManager.getThreadContext().setReplayTimeout(1);
 		
