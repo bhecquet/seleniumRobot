@@ -129,6 +129,9 @@ public class TestTestStep extends GenericTest {
 		
 		Assert.assertEquals(step.getSnapshots().get(0).getScreenshot().getImagePath(), "N-A_0-1_step1-" + tmpImgFile.getName());
 		Assert.assertEquals(step.getSnapshots().get(0).getScreenshot().getHtmlSourcePath(), "N-A_0-1_step1-" + tmpHtmlFile.getName());
+		
+		tmpImgFile.deleteOnExit();
+		tmpHtmlFile.deleteOnExit();
 	}
 	
 	/**
@@ -154,6 +157,9 @@ public class TestTestStep extends GenericTest {
 		
 		Assert.assertEquals(step.getSnapshots().get(0).getScreenshot().getImagePath(), "my_snapshot_-name-" + tmpImgFile.getName());
 		Assert.assertEquals(step.getSnapshots().get(0).getScreenshot().getHtmlSourcePath(), "my_snapshot_-name-" + tmpHtmlFile.getName());
+		
+		tmpImgFile.deleteOnExit();
+		tmpHtmlFile.deleteOnExit();
 	}
 	
 	@Test(groups={"ut"})
@@ -178,6 +184,9 @@ public class TestTestStep extends GenericTest {
 		
 		Assert.assertEquals(step.getSnapshots().get(0).getScreenshot().getImagePath(), "screenshots/N-A_0-1_step1-" + tmpImgFile2.getName());
 		Assert.assertEquals(step.getSnapshots().get(0).getScreenshot().getHtmlSourcePath(), "htmls/N-A_0-1_step1-" + tmpHtmlFile2.getName());
+		
+		tmpImgFile.deleteOnExit();
+		tmpHtmlFile.deleteOnExit();
 	}
 	
 	/**
@@ -197,6 +206,9 @@ public class TestTestStep extends GenericTest {
 		File tmpHtmlFile = File.createTempFile("html", ".html");
 		File tmpHtmlFile2 = Paths.get(tmpHtmlFile.getParent(), "htmls", tmpHtmlFile.getName()).toFile();
 		FileUtils.moveFile(tmpHtmlFile, tmpHtmlFile2);
+		
+		tmpImgFile.deleteOnExit();
+		tmpHtmlFile.deleteOnExit();
 		
 		screenshot1.setOutputDirectory(tmpImgFile.getParent());
 		screenshot1.setLocation("http://mysite.com");

@@ -253,6 +253,7 @@ public class FileUtility {
     public static void zipFolder(final File folder, final File destZipFile, FileFilter fileFilter, boolean zipParentDirectory) throws IOException {
     	
     	Path rootDir = Files.createTempDirectory("res");
+
     	Path tempDir = rootDir;
     	
     	if (zipParentDirectory) {
@@ -269,6 +270,12 @@ public class FileUtility {
 			FileUtils.copyFile(tempZip, destZipFile);
 		} catch (IOException e) {
 			logger.error("cannot create zip file", e);
+		}
+    	
+    	try {
+    		FileUtils.deleteDirectory(rootDir.toFile());
+    	}catch (IOException e) {
+			logger.error("cannot delete temp directory file", e);
 		}
     	
     }

@@ -656,6 +656,7 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	@Test(groups = {"ut"})
 	public void testCaptureDesktop() throws IOException {
 		File imageFile = File.createTempFile("image-", ".png");
+		imageFile.deleteOnExit();
 		FileUtils.copyInputStreamToFile(getClass().getClassLoader().getResourceAsStream("tu/images/ffLogoConcat.png"), imageFile);
 		BufferedImage bi = ImageIO.read(imageFile);
 

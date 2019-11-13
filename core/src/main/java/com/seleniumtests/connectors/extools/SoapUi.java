@@ -77,6 +77,7 @@ public class SoapUi {
 		File tmpFile;
 		try {
 			tmpFile = File.createTempFile("project-" + projectName, ".xml");
+			tmpFile.deleteOnExit();
 			FileUtils.writeStringToFile(tmpFile, projectString);
 		} catch (IOException e) {
 			throw new ScenarioException("Cannot write project file", e);

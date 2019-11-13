@@ -195,7 +195,10 @@ public class ImageDetector {
 		try {
 			Mat outImage = new Mat();
 			Features2d.drawKeypoints(objectImageMat, objectKeyPoints, outImage);
-			String tempFile = File.createTempFile("img", ".png").getAbsolutePath();
+			File tmpImg = File.createTempFile("img", ".png");
+			tmpImg.deleteOnExit();
+			String tempFile = tmpImg.getAbsolutePath();
+			
 			writeComparisonPictureToFile(tempFile, outImage);
 		} catch (IOException e) {
 			
@@ -635,7 +638,9 @@ public class ImageDetector {
 	}
 	
 	private void showResultingPicture(Mat img) throws IOException {
-		String tempFile = File.createTempFile("img", ".png").getAbsolutePath();
+		File imgFile = File.createTempFile("img", ".png");
+		imgFile.deleteOnExit();
+		String tempFile = imgFile.getAbsolutePath();
 		writeComparisonPictureToFile(tempFile, img);
 		showResultingImage(tempFile);
 	}

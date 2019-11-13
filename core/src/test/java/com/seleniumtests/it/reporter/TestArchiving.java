@@ -18,8 +18,10 @@
 package com.seleniumtests.it.reporter;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Paths;
 
+import org.apache.commons.io.FileUtils;
 import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.annotations.Test;
@@ -40,6 +42,7 @@ public class TestArchiving extends ReporterTest {
 	public void testArchivingEnabled(ITestContext testContext) throws Exception {
 		File tmpZip = File.createTempFile("archive", ".zip");
 		tmpZip.delete();
+		File outputFolder = null;
 		
 		try {
 			System.setProperty(SeleniumTestsContext.ARCHIVE_TO_FILE, tmpZip.getAbsolutePath());
@@ -48,7 +51,7 @@ public class TestArchiving extends ReporterTest {
 			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions"});
 		
 			Assert.assertTrue(tmpZip.exists());
-			File outputFolder = FileUtility.unzipFile(tmpZip);
+			outputFolder = FileUtility.unzipFile(tmpZip);
 			
 			Assert.assertTrue(Paths.get(outputFolder.getAbsolutePath(), "SeleniumTestReport.html").toFile().exists());
 			Assert.assertTrue(Paths.get(outputFolder.getAbsolutePath(), "results.json").toFile().exists());
@@ -56,6 +59,12 @@ public class TestArchiving extends ReporterTest {
 		} finally {
 			System.clearProperty(SeleniumTestsContext.ARCHIVE_TO_FILE);
 			System.clearProperty(SeleniumTestsContext.ARCHIVE);
+			
+			try {
+				if (outputFolder != null) {
+					FileUtils.deleteDirectory(outputFolder);
+				}
+			} catch (IOException e) {}
 		}
 	}
 	
@@ -67,6 +76,7 @@ public class TestArchiving extends ReporterTest {
 	@Test(groups={"it"})
 	public void testArchivingInOutputDirectory(ITestContext testContext) throws Exception {
 		String zipFilePath = SeleniumTestsContextManager.getGlobalContext().getOutputDirectory() + File.separator + "result.zip";
+		File outputFolder = null;
 		
 		try {
 			System.setProperty(SeleniumTestsContext.ARCHIVE_TO_FILE, zipFilePath);
@@ -75,7 +85,7 @@ public class TestArchiving extends ReporterTest {
 			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions"});
 			
 			Assert.assertTrue(new File(zipFilePath).exists());
-			File outputFolder = FileUtility.unzipFile(new File(zipFilePath));
+			outputFolder = FileUtility.unzipFile(new File(zipFilePath));
 			
 			Assert.assertTrue(Paths.get(outputFolder.getAbsolutePath(), "SeleniumTestReport.html").toFile().exists());
 			Assert.assertTrue(Paths.get(outputFolder.getAbsolutePath(), "results.json").toFile().exists());
@@ -83,6 +93,12 @@ public class TestArchiving extends ReporterTest {
 		} finally {
 			System.clearProperty(SeleniumTestsContext.ARCHIVE_TO_FILE);
 			System.clearProperty(SeleniumTestsContext.ARCHIVE);
+			
+			try {
+				if (outputFolder != null) {
+					FileUtils.deleteDirectory(outputFolder);
+				}
+			} catch (IOException e) {}
 		}
 	}
 	
