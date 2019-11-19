@@ -450,6 +450,8 @@ public class WebUIDriver {
         	}
         	
         	uiDriver.createWebDriver();
+        } else {
+        	setCurrentWebUiDriverName(driverName);
         }
 
         try {
@@ -468,11 +470,11 @@ public class WebUIDriver {
     	if (uxDriverSession.get() == null || !uxDriverSession.get().containsKey(driverName)) {
     		throw new ScenarioException(String.format("driver with name %s has not been created", driverName));
     	}
-    	setCurrentWebUrDriverName(driverName);
     	
     	if (uxDriverSession.get().get(driverName).driver != null && ((CustomEventFiringWebDriver)(uxDriverSession.get().get(driverName).driver)).getSessionId() == null) {
     		throw new ScenarioException("Cannot switch to a closed driver");
     	}
+    	setCurrentWebUiDriverName(driverName);
     	
     	TestLogging.info(String.format("Switching to driver named '%s'", driverName));
     }
@@ -644,17 +646,17 @@ public class WebUIDriver {
 		return videoRecorder;
 	}
 	
-	public static void resetCurrentWebUrDriverName() {
-		setCurrentWebUrDriverName(DEFAULT_DRIVER_NAME);
+	public static void resetCurrentWebUiDriverName() {
+		setCurrentWebUiDriverName(DEFAULT_DRIVER_NAME);
 	}
 	
-	public static void setCurrentWebUrDriverName(String name) {
+	public static void setCurrentWebUiDriverName(String name) {
 		currentWebUiDriverName.set(name);
 	}
 
 	public static String getCurrentWebUiDriverName() {
 		if (currentWebUiDriverName.get() == null) {
-			setCurrentWebUrDriverName(DEFAULT_DRIVER_NAME);
+			setCurrentWebUiDriverName(DEFAULT_DRIVER_NAME);
 		}
 		return currentWebUiDriverName.get();
 	}

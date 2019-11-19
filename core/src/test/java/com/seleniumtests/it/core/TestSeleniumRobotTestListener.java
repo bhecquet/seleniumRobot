@@ -742,7 +742,7 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.NONE, new String[] {"testAndSubActions"});
 
 		PowerMockito.verifyStatic(WebUIDriver.class, times(1));
-		WebUIDriver.resetCurrentWebUrDriverName();
+		WebUIDriver.resetCurrentWebUiDriverName();
 		
 	}
 }
