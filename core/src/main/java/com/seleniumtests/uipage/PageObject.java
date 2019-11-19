@@ -140,6 +140,9 @@ public class PageObject extends BasePage implements IPage {
         }
 
         this.pageIdentifierElement = pageIdentifierElement;
+        
+        // creates the driver and switch to it. It may be done twice as when the driver is created, we automatically switch to it, but in cas driver
+        // is already created, 
         driver = WebUIDriver.getWebDriver(true, browserType, driverName, attachExistingDriverPort);
         
         if (driver == null && url != null) {

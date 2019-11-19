@@ -35,6 +35,10 @@ public class StubTestPage extends PageObject {
 		super(null , null, browser, "app", 0);
 	}
 	
+	public StubTestPage(BrowserType browser, String driverName) throws IOException {
+		super(null , null, browser, driverName, 12);
+	}
+	
 	public StubTestPage doSomething() {
 		TestLogging.log("tell me why");
 		TestLogging.info("an info message");
