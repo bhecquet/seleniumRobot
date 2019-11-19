@@ -595,53 +595,26 @@ public class TestWebUIDriver extends MockitoTest {
 	}
 	
 	/**
-	 * issue #303: check that if we recreate a page using an existing driver, we automatically switch to it
+	 * issue #303: check that if we recreate an existing driver, we get the same driver as before and we switch to it
 	 * @throws Exception
 	 */
 	@Test(groups={"ut"})
 	public void testGetCurrentWebUiDriverFromPage2() throws Exception {
+
+		SeleniumTestsContextManager.getThreadContext().setBrowser("htmlunit");
+		WebDriver driver1 = WebUIDriver.getWebDriver(true, BrowserType.HTMLUNIT, "main", null);
+		Assert.assertEquals(WebUIDriver.getCurrentWebUiDriverName(), "main");
+		WebDriver driver2 = WebUIDriver.getWebDriver(true, BrowserType.HTMLUNIT, "other", null);
+		Assert.assertEquals(WebUIDriver.getCurrentWebUiDriverName(), "other");
 		
-		SeleniumTestsContextManager.getThreadContext().setBrowser("none");
-		// this call is normally done on test start
-		WebUIDriver.resetCurrentWebUiDriverName();
+		WebUIDriver.switchToDriver("main"); 
+		Assert.assertEquals(WebUIDriver.getWebDriver(false), driver1);
+
+		Assert.assertEquals(WebUIDriver.getCurrentWebUiDriverName(), "main");
+		WebDriver driver3 = WebUIDriver.getWebDriver(true, BrowserType.HTMLUNIT, "other", null);
+		Assert.assertEquals(WebUIDriver.getCurrentWebUiDriverName(), "other");
+		Assert.assertEquals(driver2, driver3);
 		
-		PowerMockito.mockStatic(WebUIDriver.class, Mockito.CALLS_REAL_METHODS);
-		PowerMockito.doAnswer(new org.mockito.stubbing.Answer<Object>() {
-			    @Override
-			    public Object answer(InvocationOnMock invocation) throws Throwable {
-			    	WebUIDriver.setCurrentWebUiDriverName("main"); // as we mock driver creation, current driver name is never set
-			        return drv1;
-			    }}).when(WebUIDriver.class, "getWebDriver", eq(true), any(BrowserType.class), eq("main"), eq(null));
-		PowerMockito.doAnswer(new org.mockito.stubbing.Answer<Object>() {
-		    @Override
-		    public Object answer(InvocationOnMock invocation) throws Throwable {
-		    	WebUIDriver.setCurrentWebUiDriverName("app"); // as we mock driver creation, current driver name is never set
-		        return drv2;
-		    }}).when(WebUIDriver.class, "getWebDriver", eq(true), any(BrowserType.class), eq("app"), any());
-		
-		// we override switching to skip controls
-		PowerMockito.doAnswer(new org.mockito.stubbing.Answer<Object>() {
-		    @Override
-		    public Object answer(InvocationOnMock invocation) throws Throwable {
-		    	WebUIDriver.setCurrentWebUiDriverName("main");
-		        return null;
-		    }}).when(WebUIDriver.class, "switchToDriver", eq("main"));
-		
-		// create a first page. This creates the default driver
-		StubTestPage page1 = new StubTestPage();
-		
-		// create a new page linked to a new driver. This creates a new driver names "app"
-		StubTestPage page2 = new StubTestPage(BrowserType.NONE);
-		
-		// back to main driver
-		WebUIDriver.switchToDriver("main");
-		
-		// create an other page which sould use the last created driver
-		StubTestPage page3 = new StubTestPage(BrowserType.NONE, "app");
-		
-		Assert.assertEquals(page1.getDriver(), drv1);
-		Assert.assertEquals(page2.getDriver(), drv2);
-		Assert.assertEquals(page3.getDriver(), drv2); // we requested the "app" driver
 	}
 
 	/**
