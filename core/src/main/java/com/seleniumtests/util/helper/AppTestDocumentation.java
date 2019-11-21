@@ -25,18 +25,30 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
+import org.apache.commons.collections.MapUtils;
 import org.apache.commons.io.FileUtils;
+import org.json.JSONObject;
 import org.testng.annotations.Test;
 
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.Modifier;
+import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
+import com.github.javaparser.ast.body.FieldDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.comments.Comment;
+import com.github.javaparser.ast.expr.MethodCallExpr;
+import com.github.javaparser.ast.expr.ObjectCreationExpr;
+import com.github.javaparser.ast.stmt.BlockStmt;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 import com.seleniumtests.customexception.ConfigurationException;
 
@@ -49,8 +61,15 @@ import com.seleniumtests.customexception.ConfigurationException;
 public class AppTestDocumentation {
 	
 	private static StringBuilder javadoc;
+	private static Map<String, List<String>> stepsUsedInTests;
+	private static List<String> steps;
+	private static Integer searchedElements;
 	
 	public static void main(String[] args) throws IOException {
+		stepsUsedInTests = new HashMap<>();
+		steps = new ArrayList<>();
+		searchedElements = 0;
+		
 		File srcDir = Paths.get(args[0].replace(File.separator,  "/"), "src", "test", "java").toFile();
 		
 		javadoc = new StringBuilder("Cette page référence l'ensemble des tests et des opération disponible pour l'application\n");
@@ -81,8 +100,41 @@ public class AppTestDocumentation {
 			throw new ConfigurationException("no 'webpage' sub-package found");
 		}
 
-		javadoc.append("${project.scmManager}\n");
+		javadoc.append("${project.scmManager}\n\n");		
+		
+		// store usage data
+		javadoc.append("h1. Statistics\n");
+		javadoc.append(String.format("Searched elements: %d\n", searchedElements));
+		System.out.println(String.format("Searched elements: %d", searchedElements));
+		javadoc.append(String.format("Test steps: %d\n", steps.size()));
+		System.out.println(String.format("Test steps: %d", steps.size()));
+		javadoc.append(String.format("Mean elements/steps: %.1f\n", searchedElements * 1.0 / steps.size()));
+		System.out.println(String.format("Mean elements/steps: %.1f\n", searchedElements * 1.0 / steps.size()));
+		
+		int usedSteps = 0;
+		Map<String, Integer> stepReuse = new HashMap<>();
+		for (List<String> stepsFromTest: stepsUsedInTests.values()) {
+			for (String step: stepsFromTest) {
+				if (steps.contains(step)) {
+					stepReuse.put(step, stepReuse.getOrDefault(step, 0) + 1);
+					usedSteps++;
+				}
+			}
+		}
+		javadoc.append(String.format("Steps reuse percentage: %.1f\n", usedSteps * 1.0 / stepReuse.size()));
+		System.out.println(String.format("Steps reuse percentage: %.2f", usedSteps * 1.0 / stepReuse.size()));
+		
+		/*for (String step :steps) {
+			if (!stepReuse.containsKey(step)) {
+				System.out.println(step);
+			}
+		}
+		System.out.println(new JSONObject(stepsUsedInTests).toString(2));*/
+		
+
 		FileUtils.write(Paths.get(args[0], "src/site/confluence/template.confluence").toFile(), javadoc, Charset.forName("UTF-8"));
+		
+		
 	}
 	
 	private static void exploreTests(File srcDir) throws IOException {
@@ -146,6 +198,30 @@ public class AppTestDocumentation {
 		
 	    public void visit(MethodDeclaration n, Void arg) {
 
+	    	// read all method calls so that we can correlate with webpages
+	    	try {
+	    		BlockStmt body = n.getBody().get();
+	    		String methodId = ((ClassOrInterfaceDeclaration)(n.getParentNode().get())).getNameAsString() + "." + n.getNameAsString();
+	    		stepsUsedInTests.put(methodId, new ArrayList<>());
+	    		
+	    		for (Node instruction: body.getChildNodes()) {
+	    			
+	    			for (MethodCallExpr methodCall: instruction.findAll(MethodCallExpr.class)) {
+	    				String methodName = methodCall.getNameAsString();
+	    				if (methodName.endsWith("param") 
+	    						|| methodName.equals("contains") 
+	    						|| methodName.startsWith("assert")) {
+	    					continue;
+	    				}
+	    				stepsUsedInTests.get(methodId).add(methodName);
+	    			}
+	    			
+	    		}
+	    	} catch (NoSuchElementException e) {
+	    		return;
+	    	}
+	    	
+	    	
 	    	// ignore non test methods
 	    	try {
 	    		n.getAnnotationByClass(Test.class).get();
@@ -169,7 +245,9 @@ public class AppTestDocumentation {
 			// only display public methods
 			if (!n.getModifiers().contains(Modifier.PUBLIC)) {
 				return;
-			}
+			}		
+			
+			steps.add(n.getNameAsString());
 
 			javadoc.append(String.format("\nh4. Operation: %s\n", n.getNameAsString()));
 			try {
@@ -189,6 +267,18 @@ public class AppTestDocumentation {
 			} catch (NoSuchElementException e) {
 				javadoc.append(String.format("{panel}%s de la classe %s{panel}\n", objectType, n.getNameAsString()));
 			}
+			
+			if ("Pages".equals(objectType)) {
+				
+				for (ObjectCreationExpr field: n.findAll(ObjectCreationExpr.class)) {
+					if (field.getType().getNameAsString().contains("Element")) {
+						searchedElements++;
+					}
+				}
+			
+				searchedElements += n.findAll(MethodCallExpr.class).stream().filter(m -> m.getNameAsString().startsWith("findElement")).collect(Collectors.toList()).size();
+			}
+			
 		}
 	}
 	
