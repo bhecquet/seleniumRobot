@@ -74,6 +74,16 @@ public class TestTable extends GenericTest {
 	}
 	
 	@Test(groups={"it"})
+	public void testGetRowFromContent() {
+		Assert.assertEquals(DriverTestPage.table.getRowFromContent(Pattern.compile("Jav.*"), 1).getText(), "1 Java");
+	}
+	
+	@Test(groups={"it"}, expectedExceptions=ScenarioException.class)
+	public void testGetRowFromWrongContent() {
+		DriverTestPage.table.getCellFromContent(Pattern.compile("Jai.*"), 1).getText();
+	}
+	
+	@Test(groups={"it"})
 	public void testRowCount() {
 		Assert.assertEquals(DriverTestPage.table.getRowCount(), 4);
 	}

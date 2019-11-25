@@ -46,6 +46,10 @@ public class Table extends HtmlElement {
     public Table(final String label, final By by, final HtmlElement parent) {
     	super(label, by, parent);
     }
+    
+    public Table(final String label, final By by, final Integer index) {
+    	super(label, by, null, index);
+    }
 
     public Table(final String label, final By by, final HtmlElement parent, final Integer index) {
     	super(label, by, parent, index);
@@ -148,6 +152,38 @@ public class Table extends HtmlElement {
 				if (matcher.matches()) {
 					return cell;
 				}
+    		}
+    		throw new ScenarioException(String.format("Pattern %s has not been found in table", content.pattern()));
+    		
+    	} else {
+    		throw new ScenarioException("There are no rows in this table");
+    	}
+    }
+    
+    /**
+     * issue #306
+     * Returns the row from table, searching for its content by pattern. Then you can search for a specific cell using 'getRowCells(row);'
+     * @param content	pattern to search for
+     * @param column	column where pattern should be searched
+     * @return
+     */
+    @ReplayOnError
+    public WebElement getRowFromContent(final Pattern content, final int column) {
+    	findTableElement();
+    	
+    	if (rows != null && !rows.isEmpty()) {
+    		for (WebElement row: rows) {
+    			List<WebElement> cols = getRowCells(row);
+    			
+    			if (cols.isEmpty()) {
+    				throw new ScenarioException("There are no columns in this row");
+    			}
+    			
+    			WebElement cell = cols.get(column);
+    			Matcher matcher = content.matcher(cell.getText());
+    			if (matcher.matches()) {
+    				return row;
+    			}
     		}
     		throw new ScenarioException(String.format("Pattern %s has not been found in table", content.pattern()));
     		
