@@ -63,11 +63,13 @@ public class AppTestDocumentation {
 	private static StringBuilder javadoc;
 	private static Map<String, List<String>> stepsUsedInTests;
 	private static List<String> steps;
+	private static List<String> tests;
 	private static Integer searchedElements;
 	
 	public static void main(String[] args) throws IOException {
 		stepsUsedInTests = new HashMap<>();
 		steps = new ArrayList<>();
+		tests = new ArrayList<>();
 		searchedElements = 0;
 		
 		File srcDir = Paths.get(args[0].replace(File.separator,  "/"), "src", "test", "java").toFile();
@@ -77,12 +79,16 @@ public class AppTestDocumentation {
 		javadoc.append("${project.summary}\n");
 		javadoc.append("h1. Tests\n");
 		try {
-			Path testsFolders = Files.walk(Paths.get(srcDir.getAbsolutePath()))
+			List<Path> testsFolders = Files.walk(Paths.get(srcDir.getAbsolutePath()))
 	        .filter(Files::isDirectory)
 	        .filter(p -> p.getFileName().toString().equals("tests"))
-	        .collect(Collectors.toList()).get(0);
+	        .collect(Collectors.toList());
 			
-			exploreTests(testsFolders.toFile());
+			for (Path testsFolder: testsFolders) {
+				exploreTests(testsFolder.toFile());
+			}
+			
+			
 		} catch (IndexOutOfBoundsException e) {
 			throw new ConfigurationException("no 'tests' sub-package found");
 		}
@@ -90,12 +96,15 @@ public class AppTestDocumentation {
 		javadoc.append("----");
 		javadoc.append("h1. Pages\n");
 		try {
-			Path pagesFolders = Files.walk(Paths.get(srcDir.getAbsolutePath()))
+			List<Path> pagesFolders = Files.walk(Paths.get(srcDir.getAbsolutePath()))
 					.filter(Files::isDirectory)
 					.filter(p -> p.getFileName().toString().equals("webpage"))
-					.collect(Collectors.toList()).get(0);
+					.collect(Collectors.toList());
+			
+			for (Path pagesFolder: pagesFolders) {
+				explorePages(pagesFolder.toFile());
+			}
 
-			explorePages(pagesFolders.toFile());
 		} catch (IndexOutOfBoundsException e) {
 			throw new ConfigurationException("no 'webpage' sub-package found");
 		}
@@ -104,6 +113,8 @@ public class AppTestDocumentation {
 		
 		// store usage data
 		javadoc.append("h1. Statistics\n");
+		javadoc.append(String.format("Number of tests: %d\n", tests.size()));
+		System.out.println(String.format("Number of tests: %d", tests.size()));
 		javadoc.append(String.format("Searched elements: %d\n", searchedElements));
 		System.out.println(String.format("Searched elements: %d", searchedElements));
 		javadoc.append(String.format("Test steps: %d\n", steps.size()));
@@ -199,9 +210,10 @@ public class AppTestDocumentation {
 	    public void visit(MethodDeclaration n, Void arg) {
 
 	    	// read all method calls so that we can correlate with webpages
+	    	String methodId;
 	    	try {
 	    		BlockStmt body = n.getBody().get();
-	    		String methodId = ((ClassOrInterfaceDeclaration)(n.getParentNode().get())).getNameAsString() + "." + n.getNameAsString();
+	    		methodId = ((ClassOrInterfaceDeclaration)(n.getParentNode().get())).getNameAsString() + "." + n.getNameAsString();
 	    		stepsUsedInTests.put(methodId, new ArrayList<>());
 	    		
 	    		for (Node instruction: body.getChildNodes()) {
@@ -228,6 +240,8 @@ public class AppTestDocumentation {
 	    	} catch (NoSuchElementException e) {
 	    		return;
 	    	}
+	    	
+	    	tests.add(methodId);
 
 	    	javadoc.append(String.format("\nh4. Test: %s\n", n.getNameAsString()));
     		try {
