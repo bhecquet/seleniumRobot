@@ -149,6 +149,14 @@ public class OSUtilityWindows extends OSUtility {
 		}
 	}
 	
+	private String getChromeBetaVersionFromRegistry() {
+		try {
+			return Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Wow6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Google Chrome Beta", "version");
+		} catch (Win32Exception e) {
+			return Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Google\\Chrome Beta\\BLBeacon", "version");
+		}
+	}
+	
 	/**
 	 * Search for a folder with version name where chrome.exe is located (e.g: 58.0.3029.81)
 	 * @param chromePath
@@ -214,10 +222,10 @@ public class OSUtilityWindows extends OSUtility {
 		
 		
 		// look for chrome
-		// TODO: handle multiple chrome versions
 		try {
 			browserList.put(BrowserType.CHROME, new ArrayList<>());
 			
+			// main chrome version
 			String chromePath = Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Classes\\ChromeHTML\\shell\\open\\command", "");
 			chromePath = chromePath.split(".exe\"")[0].replace("\"", "") + ".exe";
 			String version;
@@ -228,6 +236,20 @@ public class OSUtilityWindows extends OSUtility {
 			}
 			browserList.get(BrowserType.CHROME).add(new BrowserInfo(BrowserType.CHROME, extractChromeVersion("Google Chrome " + version), chromePath));
 		} catch (Win32Exception | ConfigurationException e) {}
+			
+		try {
+			// beta chrome version
+			String chromeBetaPath = Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Classes\\ChromeBHTML\\shell\\open\\command", "");
+			chromeBetaPath = chromeBetaPath.split(".exe\"")[0].replace("\"", "") + ".exe";
+			String versionBeta;
+			try {
+				versionBeta = getChromeBetaVersionFromRegistry();
+			} catch (Win32Exception e) {
+				versionBeta = getChromeVersionFromFolder(chromeBetaPath);
+			}
+			browserList.get(BrowserType.CHROME).add(new BrowserInfo(BrowserType.CHROME, extractChromeVersion("Google Chrome " + versionBeta), chromeBetaPath));
+
+		} catch (Win32Exception | ConfigurationException e) {}	
 		
 		// look for ie
 		try {
