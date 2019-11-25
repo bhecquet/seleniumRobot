@@ -35,7 +35,7 @@ public class AndroidCapabilitiesFactory extends IMobileCapabilityFactory {
 
 	@Override
 	protected String getAutomationName() {
-		if (!(webDriverConfig.getMobilePlatformVersion() == null) && Integer.parseInt(webDriverConfig.getMobilePlatformVersion().substring(0, 1)) < 4) {
+		if (!(webDriverConfig.getMobilePlatformVersion() == null) && Integer.parseInt(webDriverConfig.getMobilePlatformVersion().split("\\.")[0]) < 4) {
     		return "Selendroid";
     	} else {
     		return "Appium";
