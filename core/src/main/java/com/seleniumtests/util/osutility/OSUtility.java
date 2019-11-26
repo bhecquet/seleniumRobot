@@ -297,10 +297,26 @@ public abstract class OSUtility {
     
     public abstract String getProgramNameFromPid(Long pid);
     
+    /**
+     * Returns the full version of chrome browser
+     * String is like "Google Chrome X.Y.Z.T"
+     * @param chromePath
+     * @return
+     */
     public static String getChromeVersion(String chromePath) {
-    	return OSCommand.executeCommandAndWait(new String[] {chromePath, "--version"});
+    	OSUtility osUtility = OSUtilityFactory.getInstance();
+    	if (isWindows()) {
+    		return "Google Chrome " + ((OSUtilityWindows)osUtility).getChromeVersionFromFolder(chromePath);
+    	} else {
+    		return OSCommand.executeCommandAndWait(new String[] {chromePath, "--version"});
+    	}
     }
     
+    /**
+     * Returns the full version for firefox browser
+     * @param firefoxPath
+     * @return
+     */
     public static String getFirefoxVersion(String firefoxPath) {
     	return OSCommand.executeCommandAndWait(firefoxPath + " --version | more");
     }
@@ -321,7 +337,11 @@ public abstract class OSUtility {
      * For grid, we will be able to provide each installed browser to the runner
      * @return
      */
-    public abstract Map<BrowserType, List<BrowserInfo>> discoverInstalledBrowsersWithVersion();
+    public abstract Map<BrowserType, List<BrowserInfo>> discoverInstalledBrowsersWithVersion(boolean discoverBetaBrowsers);
+    
+    public Map<BrowserType, List<BrowserInfo>> discoverInstalledBrowsersWithVersion() {
+    	return discoverInstalledBrowsersWithVersion(false);
+    }
     
     /**
      * example: Mozilla Firefox 52.0
@@ -350,6 +370,19 @@ public abstract class OSUtility {
     		return versionMatcher.group(1);
     	} else {
     		return "";
+    	}
+    }
+    
+    /**
+     * Returns the version <major>.<minor> either with chrome or chromium
+     * @param versionString
+     * @return
+     */
+    public static String extractChromeOrChromiumVersion(String versionString) {
+    	if (versionString.contains("Chromium")) {
+    		return extractChromiumVersion(versionString);
+    	} else {
+    		return extractChromeVersion(versionString);
     	}
     }
     
@@ -386,9 +419,22 @@ public abstract class OSUtility {
     	return versionString.split("\\.")[0];
     }
 
-	public static Map<BrowserType, List<BrowserInfo>> getInstalledBrowsersWithVersion() {
+    /**
+     * Returns a map of browser, by type. It won't search for Beta browsers
+     * @return
+     */
+    public static Map<BrowserType, List<BrowserInfo>> getInstalledBrowsersWithVersion() {
+    	return getInstalledBrowsersWithVersion(false);
+    }
+    
+    /**
+     * Returns a map of browser, by type
+     * @param discoverBetaBrowsers		if true, also beta browsers will be searched (for now, chrome only)
+     * @return
+     */
+	public static Map<BrowserType, List<BrowserInfo>> getInstalledBrowsersWithVersion(boolean discoverBetaBrowsers) {
 		if (installedBrowsersWithVersion == null) {
-			refreshBrowserList();
+			refreshBrowserList(discoverBetaBrowsers);
 		}
 		return installedBrowsersWithVersion;
 	}
@@ -397,7 +443,11 @@ public abstract class OSUtility {
 	 * search browsers
 	 */
 	public static void refreshBrowserList() {
-		installedBrowsersWithVersion = OSUtilityFactory.getInstance().discoverInstalledBrowsersWithVersion();
+		refreshBrowserList(false);
+	}
+	
+	public static void refreshBrowserList(boolean discoverBetaBrowsers) {
+		installedBrowsersWithVersion = OSUtilityFactory.getInstance().discoverInstalledBrowsersWithVersion(discoverBetaBrowsers);
 	}
     
 }
