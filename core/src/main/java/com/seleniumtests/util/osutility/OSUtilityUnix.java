@@ -114,7 +114,7 @@ public class OSUtilityUnix extends OSUtility {
 	}
 	
 	@Override
-	public Map<BrowserType, List<BrowserInfo>> discoverInstalledBrowsersWithVersion() {
+	public Map<BrowserType, List<BrowserInfo>> discoverInstalledBrowsersWithVersion(boolean discoverBetaBrowsers) {
 		Map<BrowserType, List<BrowserInfo>> browserList = new EnumMap<>(BrowserType.class);
 		
 		browserList.put(BrowserType.HTMLUNIT, Arrays.asList(new BrowserInfo(BrowserType.HTMLUNIT, BrowserInfo.LATEST_VERSION, null)));

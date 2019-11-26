@@ -582,6 +582,19 @@ public class TestSeleniumTestContext extends GenericTest {
 	}
 	
 	@Test(groups="ut context")
+	public void testBetaBrowser(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setBetaBrowser(true);
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getBetaBrowser(), (Boolean)true);
+	}
+	@Test(groups="ut context")
+	public void testBetBrowserNull(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setBetaBrowser(null);
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getBetaBrowser(), (Boolean)SeleniumTestsContext.DEFAULT_BETA_BROWSER);
+	}
+	
+	@Test(groups="ut context")
 	public void testAcceptUntrustedCertificates(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setAcceptUntrustedCertificates(false);

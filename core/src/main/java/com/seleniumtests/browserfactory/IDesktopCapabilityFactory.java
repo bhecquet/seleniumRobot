@@ -54,7 +54,7 @@ public abstract class IDesktopCapabilityFactory extends ICapabilitiesFactory {
     private BrowserInfo prepareBinaryAndDriver(final BrowserType browserType, final String binPath, final String driverPath, final String version) throws UnsupportedEncodingException {
 
     	// automatic list from OS + binary added as launch option (see SeleniumTestsContext.updateInstalledBrowsers())
-    	List<BrowserInfo> browserInfos = OSUtility.getInstalledBrowsersWithVersion().get(browserType);
+    	List<BrowserInfo> browserInfos = OSUtility.getInstalledBrowsersWithVersion(webDriverConfig.getBetaBrowser()).get(browserType);
     	
     	if (version != null) { 
     		selectedBrowserInfo = BrowserInfo.getInfoFromVersion(version, browserInfos);
