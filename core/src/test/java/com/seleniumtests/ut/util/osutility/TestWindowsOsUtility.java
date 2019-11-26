@@ -314,13 +314,44 @@ public class TestWindowsOsUtility extends MockitoTest {
 		when(Advapi32Util.registryGetStringValue(WinReg.HKEY_CURRENT_USER, "Software\\Microsoft\\MicrosoftEdge\\Main", "EdgeSwitchingOSBuildNumber")).thenThrow(Win32Exception.class);
 		when(OSCommand.executeCommandAndWait(new String[] {"REG", "QUERY", "HKCR",  "/f", "FirefoxHTML", "/k", "/c"})).thenReturn("");
 		
-		OSUtility.refreshBrowserList();
+		OSUtility.refreshBrowserList(true); // force detecting beta browser
 		Map<BrowserType, List<BrowserInfo>> browsers = OSUtility.getInstalledBrowsersWithVersion();
 		Assert.assertTrue(browsers.keySet().contains(BrowserType.CHROME));
 		Assert.assertEquals(browsers.get(BrowserType.CHROME).size(), 2);
 		Assert.assertTrue(browsers.get(BrowserType.CHROME).get(0).getPath().contains("Application"));
 		Assert.assertEquals(browsers.get(BrowserType.CHROME).get(0).getVersion(), "76.0");
 		Assert.assertEquals(browsers.get(BrowserType.CHROME).get(1).getVersion(), "77.0");
+	}
+	/**
+	 * Issue #308: check we do not detect chrome beta on its location in registry when we only request mainstream browsers
+	 * Check also we get 1 chrome instances
+	 */
+	@Test(groups={"ut"})
+	public void testChromeBetaNotDiscoveredStandardWindowsInstallation() {
+		PowerMockito.mockStatic(OSCommand.class);
+		PowerMockito.mockStatic(Advapi32Util.class);
+		PowerMockito.mockStatic(Paths.class, Mockito.CALLS_REAL_METHODS);
+		
+		when(Paths.get("C:\\Program Files (x86)\\Google_\\Chrome\\Application\\chrome.exe")).thenReturn(path);
+		when(Paths.get("C:\\Program Files (x86)\\Google_\\Chrome Beta\\Application\\chrome.exe")).thenReturn(path);
+		when(path.toFile()).thenReturn(browserFile);
+		when(browserFile.exists()).thenReturn(true);
+		
+		when(Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Classes\\ChromeHTML\\shell\\open\\command", "")).thenReturn("\"C:\\Program Files (x86)\\Google_\\Chrome\\Application\\chrome.exe\" -- \"%1\"");
+		when(Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Classes\\ChromeBHTML\\shell\\open\\command", "")).thenReturn("\"C:\\Program Files (x86)\\Google_\\Chrome Beta\\Application\\chrome.exe\" -- \"%1\"");
+		when(Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Wow6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Google Chrome Beta", "version")).thenReturn("77.0.2987.110");
+		when(Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Wow6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Google Chrome", "version")).thenReturn("76.0.2987.110");
+		when(Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Google\\Chrome\\BLBeacon", "version")).thenReturn("57.0.2987.110");
+		when(Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Microsoft\\Windows\\CurrentVersion\\App Paths\\IEXPLORE.EXE", "")).thenThrow(Win32Exception.class);
+		when(Advapi32Util.registryGetStringValue(WinReg.HKEY_CURRENT_USER, "Software\\Microsoft\\MicrosoftEdge\\Main", "EdgeSwitchingOSBuildNumber")).thenThrow(Win32Exception.class);
+		when(OSCommand.executeCommandAndWait(new String[] {"REG", "QUERY", "HKCR",  "/f", "FirefoxHTML", "/k", "/c"})).thenReturn("");
+		
+		OSUtility.refreshBrowserList();
+		Map<BrowserType, List<BrowserInfo>> browsers = OSUtility.getInstalledBrowsersWithVersion();
+		Assert.assertTrue(browsers.keySet().contains(BrowserType.CHROME));
+		Assert.assertEquals(browsers.get(BrowserType.CHROME).size(), 1);
+		Assert.assertTrue(browsers.get(BrowserType.CHROME).get(0).getPath().contains("Application"));
+		Assert.assertEquals(browsers.get(BrowserType.CHROME).get(0).getVersion(), "76.0");
 	}
 	
 	/**

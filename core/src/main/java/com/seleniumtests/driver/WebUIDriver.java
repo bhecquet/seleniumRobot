@@ -556,7 +556,7 @@ public class WebUIDriver {
     
     private void checkBrowserRunnable() {
     	if (config.getMode() == DriverMode.LOCAL && !config.getTestType().isMobile()) {
-    		Map<BrowserType, List<BrowserInfo>> browsers = OSUtility.getInstalledBrowsersWithVersion();
+    		Map<BrowserType, List<BrowserInfo>> browsers = OSUtility.getInstalledBrowsersWithVersion(config.getBetaBrowser());
     		if (!browsers.containsKey(config.getBrowserType())) {
     			throw new ConfigurationException(String.format("Browser %s is not available. Available browsers are %s", 
     					config.getBrowserType(), browsers));

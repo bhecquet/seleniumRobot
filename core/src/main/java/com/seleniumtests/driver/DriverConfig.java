@@ -96,6 +96,10 @@ public class DriverConfig {
     public String getChromeBinPath() {
         return testContext.getChromeBinPath();
     }
+    
+    public Boolean getBetaBrowser() {
+    	return testContext.getBetaBrowser();
+    }
 
     public String getChromeDriverPath() {
         return testContext.getChromeDriverPath();
