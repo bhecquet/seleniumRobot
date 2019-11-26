@@ -162,7 +162,7 @@ public class OSUtilityWindows extends OSUtility {
 	 * @param chromePath
 	 * @return
 	 */
-	private String getChromeVersionFromFolder(String chromePath) {
+	public String getChromeVersionFromFolder(String chromePath) {
 		if (!new File(chromePath).exists()) {
 			throw new ConfigurationException("Chrome version could not be get from folder, chrome path does not exist");
 		}
@@ -199,7 +199,7 @@ public class OSUtilityWindows extends OSUtility {
 	}
 
 	@Override
-	public Map<BrowserType, List<BrowserInfo>> discoverInstalledBrowsersWithVersion() {
+	public Map<BrowserType, List<BrowserInfo>> discoverInstalledBrowsersWithVersion(boolean discoverBetaBrowsers) {
 			
 		Map<BrowserType, List<BrowserInfo>> browserList = new EnumMap<>(BrowserType.class);
 		
@@ -237,19 +237,21 @@ public class OSUtilityWindows extends OSUtility {
 			browserList.get(BrowserType.CHROME).add(new BrowserInfo(BrowserType.CHROME, extractChromeVersion("Google Chrome " + version), chromePath));
 		} catch (Win32Exception | ConfigurationException e) {}
 			
-		try {
-			// beta chrome version
-			String chromeBetaPath = Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Classes\\ChromeBHTML\\shell\\open\\command", "");
-			chromeBetaPath = chromeBetaPath.split(".exe\"")[0].replace("\"", "") + ".exe";
-			String versionBeta;
+		if (discoverBetaBrowsers) {
 			try {
-				versionBeta = getChromeBetaVersionFromRegistry();
-			} catch (Win32Exception e) {
-				versionBeta = getChromeVersionFromFolder(chromeBetaPath);
-			}
-			browserList.get(BrowserType.CHROME).add(new BrowserInfo(BrowserType.CHROME, extractChromeVersion("Google Chrome " + versionBeta), chromeBetaPath));
-
-		} catch (Win32Exception | ConfigurationException e) {}	
+				// beta chrome version
+				String chromeBetaPath = Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Classes\\ChromeBHTML\\shell\\open\\command", "");
+				chromeBetaPath = chromeBetaPath.split(".exe\"")[0].replace("\"", "") + ".exe";
+				String versionBeta;
+				try {
+					versionBeta = getChromeBetaVersionFromRegistry();
+				} catch (Win32Exception e) {
+					versionBeta = getChromeVersionFromFolder(chromeBetaPath);
+				}
+				browserList.get(BrowserType.CHROME).add(new BrowserInfo(BrowserType.CHROME, extractChromeVersion("Google Chrome " + versionBeta), chromeBetaPath));
+	
+			} catch (Win32Exception | ConfigurationException e) {}
+		}
 		
 		// look for ie
 		try {

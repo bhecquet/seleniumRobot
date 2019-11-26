@@ -107,6 +107,7 @@ public class SeleniumTestsContext {
     public static final String CHROME_BINARY_PATH = "chromeBinaryPath";			// chemin vers le binaire chrome lorsque celui-ci n'est pas installé de manière normale
     public static final String IE_DRIVER_PATH = "ieDriverPath";					// chemin vers le driver Internet Explorer
     public static final String USER_AGENT = "userAgent";						// user agent utilisé pour les tests. Permet d'écraser le user-agent par défaut du navigateur, sur firefox et chrome uniquement
+    public static final String BETA_BROWSER = "betaBrowser";					// enable usage of beta browsers	
 
     public static final String VIEWPORT_WIDTH = "viewPortWidth";					// width of viewport	
     public static final String VIEWPORT_HEIGHT = "viewPortHeight";					// height of viewport
@@ -224,6 +225,7 @@ public class SeleniumTestsContext {
 	public static final boolean DEFAULT_SET_ASSUME_UNTRUSTED_CERTIFICATE_ISSUER = true;
 	public static final boolean DEFAULT_USE_DEFAULT_FIREFOX_PROFILE = true;
 	public static final String DEFAULT_BROWSER = "none";
+	public static final boolean DEFAULT_BETA_BROWSER = false;
 	public static final boolean DEFAULT_MANUAL_TEST_STEPS = false;
 	public static final boolean DEFAULT_HEADLESS_BROWSER = false;
 	public static final boolean DEFAULT_MASK_PASSWORD = true;
@@ -355,6 +357,7 @@ public class SeleniumTestsContext {
         setEdgeDriverPath(getValueForTest(EDGE_DRIVER_PATH, System.getProperty(EDGE_DRIVER_PATH)));
         setIEDriverPath(getValueForTest(IE_DRIVER_PATH, System.getProperty(IE_DRIVER_PATH)));
         setUserAgent(getValueForTest(USER_AGENT, System.getProperty(USER_AGENT)));
+        setBetaBrowser(getBoolValueForTest(BETA_BROWSER, System.getProperty(BETA_BROWSER)));
         setAssumeUntrustedCertificateIssuer(getBoolValueForTest(SET_ASSUME_UNTRUSTED_CERTIFICATE_ISSUER, System.getProperty(SET_ASSUME_UNTRUSTED_CERTIFICATE_ISSUER)));
         setAcceptUntrustedCertificates(getBoolValueForTest(SET_ACCEPT_UNTRUSTED_CERTIFICATES, System.getProperty(SET_ACCEPT_UNTRUSTED_CERTIFICATES)));
         setJavascriptEnabled(getBoolValueForTest(ENABLE_JAVASCRIPT, System.getProperty(ENABLE_JAVASCRIPT)));
@@ -441,16 +444,16 @@ public class SeleniumTestsContext {
      * that it matches those really used
      */
     private void updateInstalledBrowsers() {
-    	Map<BrowserType, List<BrowserInfo>> installedBrowsers = OSUtility.getInstalledBrowsersWithVersion();
+    	Map<BrowserType, List<BrowserInfo>> installedBrowsers = OSUtility.getInstalledBrowsersWithVersion(getBetaBrowser());
     	
     	if (getFirefoxBinPath() != null) {
     		String version = OSUtility.getFirefoxVersion(getFirefoxBinPath());
-    		installedBrowsers.get(BrowserType.FIREFOX).add(new BrowserInfo(BrowserType.FIREFOX, version, getFirefoxBinPath()));
+    		installedBrowsers.get(BrowserType.FIREFOX).add(new BrowserInfo(BrowserType.FIREFOX, OSUtility.extractFirefoxVersion(version), getFirefoxBinPath()));
     	}
     	
     	if (getChromeBinPath() != null) {
     		String version = OSUtility.getChromeVersion(getChromeBinPath());
-    		installedBrowsers.get(BrowserType.CHROME).add(new BrowserInfo(BrowserType.CHROME, version, getChromeBinPath()));
+    		installedBrowsers.get(BrowserType.CHROME).add(new BrowserInfo(BrowserType.CHROME, OSUtility.extractChromeOrChromiumVersion(version), getChromeBinPath()));
     	}
     }
     
@@ -1033,6 +1036,10 @@ public class SeleniumTestsContext {
     
     public String getEdgeDriverPath() {
     	return (String) getAttribute(EDGE_DRIVER_PATH);
+    }
+    
+    public Boolean getBetaBrowser() {
+    	return (Boolean) getAttribute(BETA_BROWSER);
     }
 
     public String getDPTagsExclude() {
@@ -1869,6 +1876,14 @@ public class SeleniumTestsContext {
     
     public void setUserAgent(String path) {
     	setAttribute(USER_AGENT, path);
+    }
+    
+    public void setBetaBrowser(Boolean betaBrowser) {
+		if (betaBrowser != null) {
+			setAttribute(BETA_BROWSER, betaBrowser);
+		} else {
+			setAttribute(BETA_BROWSER, DEFAULT_BETA_BROWSER);
+    	}
     }
     
     public void setAssumeUntrustedCertificateIssuer(Boolean assume) {
