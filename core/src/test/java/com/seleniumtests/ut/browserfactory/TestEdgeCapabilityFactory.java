@@ -79,7 +79,7 @@ public class TestEdgeCapabilityFactory extends MockitoTest {
 		browserInfos.put(BrowserType.EDGE, Arrays.asList(new BrowserInfo(BrowserType.EDGE, "14393", "", false)));
 
 		PowerMockito.mockStatic(OSUtility.class);
-		PowerMockito.when(OSUtility.getInstalledBrowsersWithVersion()).thenReturn(browserInfos);
+		PowerMockito.when(OSUtility.getInstalledBrowsersWithVersion(false)).thenReturn(browserInfos);
 		PowerMockito.when(OSUtility.getCurrentPlatorm()).thenReturn(Platform.WINDOWS);
 		
 		PowerMockito.mockStatic(OSUtilityFactory.class);

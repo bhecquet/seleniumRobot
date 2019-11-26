@@ -76,7 +76,7 @@ public class TestSafariCapabilityFactory extends MockitoTest {
 		browserInfos.put(BrowserType.SAFARI, Arrays.asList(new BrowserInfo(BrowserType.SAFARI, "7.2", "", false)));
 
 		PowerMockito.mockStatic(OSUtility.class);
-		PowerMockito.when(OSUtility.getInstalledBrowsersWithVersion()).thenReturn(browserInfos);
+		PowerMockito.when(OSUtility.getInstalledBrowsersWithVersion(false)).thenReturn(browserInfos);
 		PowerMockito.when(OSUtility.getCurrentPlatorm()).thenReturn(Platform.MAC);
 		
 		PowerMockito.mockStatic(OSUtilityFactory.class);

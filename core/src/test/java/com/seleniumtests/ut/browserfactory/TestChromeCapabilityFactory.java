@@ -208,7 +208,7 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 		updatedBrowserInfos.put(BrowserType.CHROME, Arrays.asList(new BrowserInfo(BrowserType.CHROME, "72.0", "", false), 
 																	new BrowserInfo(BrowserType.CHROME, "73.0", "/opt/chrome/bin/chrome", false)));
 
-		PowerMockito.when(OSUtility.getInstalledBrowsersWithVersion()).thenReturn(updatedBrowserInfos);
+		PowerMockito.when(OSUtility.getInstalledBrowsersWithVersion(false)).thenReturn(updatedBrowserInfos);
 		
 		MutableCapabilities capa = new ChromeCapabilitiesFactory(config).createCapabilities();
 		

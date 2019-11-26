@@ -76,7 +76,7 @@ public class TestPhantomJSCapabilityFactory extends MockitoTest {
 		browserInfos.put(BrowserType.PHANTOMJS, Arrays.asList(new BrowserInfo(BrowserType.PHANTOMJS, "1", "", false)));
 
 		PowerMockito.mockStatic(OSUtility.class);
-		PowerMockito.when(OSUtility.getInstalledBrowsersWithVersion()).thenReturn(browserInfos);
+		PowerMockito.when(OSUtility.getInstalledBrowsersWithVersion(false)).thenReturn(browserInfos);
 		PowerMockito.when(OSUtility.getCurrentPlatorm()).thenReturn(Platform.WINDOWS);
 	}
 	
