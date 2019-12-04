@@ -348,7 +348,7 @@ public class PageObject extends BasePage implements IPage {
     }
 
     /**
-     * Close a PageObject. This method can be called when a web session opens several pages and one of them is closed after some action
+     * Close a PageObject. This method can be called when a web session opens several pages and one of them has to be closed
      * In case there are multiple windows opened, switch back to the previous window in the list
      * 
      * @throws NotCurrentPageException
@@ -359,8 +359,6 @@ public class PageObject extends BasePage implements IPage {
             return;
         }
 
-        TestLogging.info("close web page: " + getTitle());
-
         boolean isMultipleWindow = false;
         List<String> handles = new ArrayList<>(driver.getWindowHandles());
         if (handles.size() > 1) {
@@ -369,6 +367,7 @@ public class PageObject extends BasePage implements IPage {
         logger.debug("Current handles: " + handles);
         
         try {
+            TestLogging.info("close web page: " + getTitle());
             driver.close();
         } catch (WebDriverException ignore) { 
         	logger.info("Error closing driver: " + ignore.getMessage());

@@ -74,6 +74,21 @@ public class StubTestClassForDriverTest extends StubParentClass {
 	}
 	
 	@Test(groups="stub")
+	public void testDriverShort2() throws Exception {
+		new DriverTestPage(true);
+	}
+	
+	@Test(groups="stub")
+	public void testDriverShort3() throws Exception {
+		new DriverTestPage(true);
+	}
+	
+	@Test(groups="stub")
+	public void testDriverShort4() throws Exception {
+		new DriverTestPage(true);
+	}
+	
+	@Test(groups="stub")
 	public void testDriverMultipleSnapshot() throws Exception {
 		new DriverTestPage(true)
 			._goToNewPage();

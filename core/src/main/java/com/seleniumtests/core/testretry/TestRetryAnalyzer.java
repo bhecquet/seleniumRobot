@@ -22,6 +22,7 @@ import org.testng.ITestResult;
 
 import com.seleniumtests.core.runner.SeleniumRobotTestListener;
 import com.seleniumtests.core.utils.TestNGResultUtils;
+import com.seleniumtests.customexception.SeleniumGridNodeNotAvailable;
 import com.seleniumtests.reporter.logger.TestLogging;
 
 public class TestRetryAnalyzer implements IRetryAnalyzer {
@@ -62,6 +63,10 @@ public class TestRetryAnalyzer implements IRetryAnalyzer {
         	count++;
         	if (result.getThrowable() instanceof AssertionError) {
         		TestLogging.log("[NOT RETRYING] due to failed Assertion");
+            	TestNGResultUtils.setNoMoreRetry(result, true); 
+        		return false;
+        	} else if (result.getThrowable() instanceof SeleniumGridNodeNotAvailable) {
+        		TestLogging.log("[NOT RETRYING] due to grid node not available");
             	TestNGResultUtils.setNoMoreRetry(result, true);
         		return false;
         	}
