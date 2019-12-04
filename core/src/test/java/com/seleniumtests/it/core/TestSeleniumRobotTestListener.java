@@ -468,7 +468,7 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 	
 
 	/**
-	 * Test we cannot create a driver in '@BeforeMethod' methods
+	 * Test we can create a driver in '@BeforeMethod' methods
 	 * @param testContext
 	 * @throws Exception
 	 */

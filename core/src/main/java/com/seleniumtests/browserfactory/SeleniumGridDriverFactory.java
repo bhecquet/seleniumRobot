@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.SessionNotCreatedException;
@@ -32,12 +33,15 @@ import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.LocalFileDetector;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import org.testng.Assert;
+import org.testng.SkipException;
 
 import com.seleniumtests.connectors.selenium.SeleniumGridConnector;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.customexception.SeleniumGridException;
+import com.seleniumtests.customexception.SeleniumGridNodeNotAvailable;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.DriverConfig;
 import com.seleniumtests.util.helper.WaitHelper;
@@ -49,6 +53,7 @@ public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implemen
 	public static final int DEFAULT_RETRY_TIMEOUT = 1800; // timeout in seconds (wait 30 mins for connecting to grid)
 	private static int retryTimeout = DEFAULT_RETRY_TIMEOUT;
 	private int instanceRetryTimeout; 
+	private static AtomicInteger counter = new AtomicInteger(0); // a global counter counting times where we never get matching nodes
 
     public SeleniumGridDriverFactory(final DriverConfig cfg) {
         super(cfg);
@@ -185,6 +190,12 @@ public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implemen
 		if (webDriverConfig.getRunOnSameNode() != null && webDriverConfig.getSeleniumGridConnector() == null) {
 			throw new ScenarioException("Cannot create a driver on the same node as an other driver if no previous driver has been created through grid");
 		}
+		
+		// issue #311: stop after 3 consecutive failure getting nodes
+		int noDriverCount = counter.get();
+		if (noDriverCount > 2) {
+			throw new SkipException("Skipping as the 3 previous tests could not get any matching node. Check your test configuration and grid setup");
+		}
     	
 		while (end.isAfter(clock.instant())) {
 			
@@ -224,7 +235,7 @@ public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implemen
 				logger.warn("No grid available, wait 30 secs and retry");
 				
 				// for test only, reduce wiat
-				if (instanceRetryTimeout > 1) {
+				if (instanceRetryTimeout > 30) {
 					WaitHelper.waitForSeconds(30);
 				} else {
 					WaitHelper.waitForSeconds(1);
@@ -233,7 +244,11 @@ public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implemen
 		}
 		
 		if (driver == null) {
-			throw new SeleniumGridException("Cannot create driver on grid, it may be fully used", currentException);
+			noDriverCount = counter.getAndIncrement();
+			throw new SeleniumGridNodeNotAvailable(String.format("Cannot create driver on grid, it may be fully used [%d times]", noDriverCount), currentException);
+		} else {
+			// reset counter as we got a driver
+			counter.set(0); 
 		}
     	
     	return driver;
@@ -258,5 +273,9 @@ public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implemen
 
 	public int getInstanceRetryTimeout() {
 		return instanceRetryTimeout;
+	}
+
+	public static int getCounter() {
+		return counter.get();
 	}
 }
