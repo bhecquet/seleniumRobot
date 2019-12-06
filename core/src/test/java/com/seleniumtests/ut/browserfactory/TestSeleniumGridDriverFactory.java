@@ -36,7 +36,7 @@ import com.seleniumtests.connectors.selenium.SeleniumGridConnector;
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.ScenarioException;
-import com.seleniumtests.customexception.SeleniumGridException;
+import com.seleniumtests.customexception.SeleniumGridNodeNotAvailable;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.DriverConfig;
 import com.seleniumtests.driver.TestType;
@@ -131,7 +131,7 @@ public class TestSeleniumGridDriverFactory extends MockitoTest {
 	 * If grid is not active, driver is not created and exception is raised
 	 * @throws Exception
 	 */
-	@Test(groups={"ut"}, expectedExceptions=SeleniumGridException.class)
+	@Test(groups={"ut"}, expectedExceptions=SeleniumGridNodeNotAvailable.class)
 	public void testDriverNotCreatedIfGridNotActive() throws Exception {
 		
 		try {
@@ -158,7 +158,7 @@ public class TestSeleniumGridDriverFactory extends MockitoTest {
 	 * If exception is raised during driver creation, exception is raised
 	 * @throws Exception
 	 */
-	@Test(groups={"ut"}, expectedExceptions=SeleniumGridException.class)
+	@Test(groups={"ut"}, expectedExceptions=SeleniumGridNodeNotAvailable.class)
 	public void testDriverNotCreatedIfError() throws Exception {
 		
 		try {
