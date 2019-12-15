@@ -1071,7 +1071,7 @@ public class TestSeleniumTestContext extends GenericTest {
 	@Test(groups="ut context", expectedExceptions=ConfigurationException.class)
 	public void testBadPluginReporterClass(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		initThreadContext(testNGCtx);
-		SeleniumTestsContextManager.getThreadContext().setReporterPluginClasses("com.seleniumtests.reporter.reporters.CommonReporter");
+		SeleniumTestsContextManager.getThreadContext().setReporterPluginClasses("com.seleniumtests.core.Filter");
 	}
 	@Test(groups="ut context")
 	public void testNullPluginReporterClass(final ITestContext testNGCtx, final XmlTest xmlTest) {

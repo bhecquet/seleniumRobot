@@ -31,13 +31,12 @@ import org.testng.collections.Maps;
 import org.testng.collections.SetMultiMap;
 import org.testng.collections.Sets;
 import org.testng.internal.Utils;
-import org.testng.reporters.JUnitXMLReporter;
 import org.testng.reporters.XMLConstants;
 import org.testng.reporters.XMLStringBuffer;
 import org.testng.xml.XmlSuite;
 
 public class JUnitReporter implements IReporter {
-
+	
 	@Override
 	public void generateReport(List<XmlSuite> xmlSuites, List<ISuite> suites, String defaultOutputDirectory) {
 
@@ -306,4 +305,5 @@ public class JUnitReporter implements IReporter {
 			}
 		}
 	}
+
 }

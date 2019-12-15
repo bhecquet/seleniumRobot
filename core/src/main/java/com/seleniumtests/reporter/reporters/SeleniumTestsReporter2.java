@@ -30,6 +30,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
@@ -43,12 +44,9 @@ import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
 import org.testng.IReporter;
 import org.testng.IResultMap;
-import org.testng.ISuite;
-import org.testng.ISuiteResult;
 import org.testng.ITestContext;
 import org.testng.ITestNGMethod;
 import org.testng.ITestResult;
-import org.testng.xml.XmlSuite;
 
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
@@ -284,12 +282,8 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 		return testStatus;
 	}
 
-
-	/**
-	 * Generate all test reports
-	 */
 	@Override
-	public void generateReport(final List<XmlSuite> xml, final List<ISuite> suites, final String outdir) {
+	protected void generateReport(Map<ITestContext, Set<ITestResult>> resultSet, final String outdir) {
 		ITestContext testCtx = SeleniumTestsContextManager.getGlobalContext().getTestNGContext();
 		if (testCtx == null) {
 			logger.error("Looks like your class does not extend from SeleniumTestPlan!");
@@ -300,10 +294,11 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 		
 		// Generate general report
 		Map<ITestContext, List<ITestResult>> methodResultsMap = new HashMap<>(); 
+		
 		try {
 			mOut = createWriter(getOutputDirectory(), "SeleniumTestReport.html");
 			startHtml(null, mOut, "complete");
-			methodResultsMap = generateSuiteSummaryReport(suites);
+			methodResultsMap = generateSuiteSummaryReport(resultSet);
 			endHtml();
 			mOut.flush();
 			mOut.close();
@@ -358,43 +353,35 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 	 * @param map
 	 * @return	map containing test results
 	 */
-	public Map<ITestContext, List<ITestResult>> generateSuiteSummaryReport(final List<ISuite> suites) {
-		
+	public Map<ITestContext, List<ITestResult>> generateSuiteSummaryReport(Map<ITestContext, Set<ITestResult>> resultSet) {
+			
 		// build result list for each TestNG test
 		Map<ITestContext, List<ITestResult>> methodResultsMap = new LinkedHashMap<>();
 		
-		for (ISuite suite : suites) {
-			Map<String, ISuiteResult> tests = suite.getResults();
-			for (ISuiteResult r : tests.values()) {
-				ITestContext context = r.getTestContext();
-				List<ITestResult> resultList = new ArrayList<>();
-				
-				Collection<ITestResult> methodResults = new ArrayList<>();
-				methodResults.addAll(context.getFailedTests().getAllResults());
-				methodResults.addAll(context.getPassedTests().getAllResults());
-				methodResults.addAll(context.getSkippedTests().getAllResults());
 
-				methodResults = methodResults.stream()
-							.sorted((r1, r2) -> Long.compare(r1.getStartMillis(), r2.getStartMillis()))
-							.collect(Collectors.toList());
+		for (Entry<ITestContext, Set<ITestResult>> entry: resultSet.entrySet()) {
+			List<ITestResult> methodResults = new ArrayList<>();
+
+			methodResults = entry.getValue().stream()
+						.sorted((r1, r2) -> Long.compare(r1.getStartMillis(), r2.getStartMillis()))
+						.collect(Collectors.toList());
+			
+			for (ITestResult result: methodResults) {
+				SeleniumTestsContext testContext = TestNGResultUtils.getSeleniumRobotTestContext(result);
 				
-				for (ITestResult result: methodResults) {
-					SeleniumTestsContext testContext = TestNGResultUtils.getSeleniumRobotTestContext(result);
-					
-					String fileName;
-					if (testContext != null) {
-						fileName = testContext.getRelativeOutputDir() + "/TestReport.html";
-					} else {
-						fileName = getTestName(result) + "/TestReport.html";
-					}
-					result.setAttribute(METHOD_RESULT_FILE_NAME, fileName);
-					TestNGResultUtils.setUniqueTestName(result, getTestName(result)); // be sure test name is initialized
-					
+				String fileName;
+				if (testContext != null) {
+					fileName = testContext.getRelativeOutputDir() + "/TestReport.html";
+				} else {
+					fileName = getTestName(result) + "/TestReport.html";
 				}
-				resultList.addAll(methodResults);
+
+				result.setAttribute(METHOD_RESULT_FILE_NAME, fileName);
+				TestNGResultUtils.setUniqueTestName(result, getTestName(result)); // be sure test name is initialized
 				
-				methodResultsMap.put(context, resultList);
 			}
+			
+			methodResultsMap.put(entry.getKey(), methodResults);
 		}
 
 		try {

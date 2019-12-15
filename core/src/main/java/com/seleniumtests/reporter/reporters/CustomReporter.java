@@ -57,9 +57,10 @@ public class CustomReporter extends CommonReporter implements IReporter {
 	public List<String> getGeneratedFiles() {
 		return generatedFiles;
 	}
+	
 
 	@Override
-	public void generateReport(List<XmlSuite> xmlSuites, List<ISuite> suites, String outputDirectory) {
+	protected void generateReport(Map<ITestContext, Set<ITestResult>> resultSet, String outdir) {
 		generatedFiles = new ArrayList<>();
 		
 		Map<String, Integer> consolidatedResults = new HashMap<>();
@@ -68,33 +69,22 @@ public class CustomReporter extends CommonReporter implements IReporter {
 		consolidatedResults.put("skip", 0);
 		consolidatedResults.put("total", 0);
 		
-		for (ISuite suite: suites) {
-			for (String suiteString: suite.getResults().keySet()) {
-				ISuiteResult suiteResult = suite.getResults().get(suiteString);
+		for (Entry<ITestContext, Set<ITestResult>> entry: resultSet.entrySet()) {
+			for (ITestResult testResult: entry.getValue()) {
+				if (testResult.isSuccess()) {
+					consolidatedResults.put("pass", consolidatedResults.get("pass") + 1);
+				} else if (testResult.getStatus() == ITestResult.FAILURE) {
+					consolidatedResults.put("fail", consolidatedResults.get("fail") + 1);
+				} else if (testResult.getStatus() == ITestResult.SKIP) {
+					consolidatedResults.put("skip", consolidatedResults.get("skip") + 1);
+				}
+				consolidatedResults.put("total", consolidatedResults.get("total") + 1);
 				
-				ITestContext context = suiteResult.getTestContext();
+				// done in case it was null (issue #81)
+				SeleniumTestsContextManager.setThreadContextFromTestResult(entry.getKey(), getTestName(testResult), getClassName(testResult), testResult);
 				
-				Set<ITestResult> resultSet = new HashSet<>(); 
-				resultSet.addAll(suiteResult.getTestContext().getFailedTests().getAllResults());
-				resultSet.addAll(suiteResult.getTestContext().getPassedTests().getAllResults());
-				resultSet.addAll(suiteResult.getTestContext().getSkippedTests().getAllResults());
-				
-				
-				consolidatedResults.put("fail", consolidatedResults.get("fail") + context.getFailedTests().getAllResults().size());
-				consolidatedResults.put("pass", consolidatedResults.get("pass") + context.getPassedTests().getAllResults().size());
-				consolidatedResults.put("skip", consolidatedResults.get("skip") + context.getSkippedTests().getAllResults().size());
-				
-				Integer total = consolidatedResults.get("pass") + consolidatedResults.get("fail") + consolidatedResults.get("skip");
-				consolidatedResults.put("total", total);
-				
-				for (ITestResult testResult: resultSet) {
-					
-					// done in case it was null (issue #81)
-					SeleniumTestsContextManager.setThreadContextFromTestResult(context, getTestName(testResult), getClassName(testResult), testResult);
-					
-					for (ReportInfo reportInfo: SeleniumTestsContextManager.getThreadContext().getCustomTestReports()) {
-						generateTestReport(testResult, reportInfo);
-					}
+				for (ReportInfo reportInfo: SeleniumTestsContextManager.getThreadContext().getCustomTestReports()) {
+					generateTestReport(testResult, reportInfo);
 				}
 			}
 		}
@@ -102,6 +92,7 @@ public class CustomReporter extends CommonReporter implements IReporter {
 		for (ReportInfo reportInfo: SeleniumTestsContextManager.getThreadContext().getCustomSummaryReports()) {
 			generateSummaryReport(consolidatedResults, reportInfo);
 		}
+		
 	}
 	
 	/**
@@ -235,4 +226,5 @@ public class CustomReporter extends CommonReporter implements IReporter {
 			logger.error(String.format("Error generating test summary: %s", e.getMessage()));
 		}
 	}
+
 }

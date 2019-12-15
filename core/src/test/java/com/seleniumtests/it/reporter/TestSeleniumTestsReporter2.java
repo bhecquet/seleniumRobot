@@ -19,6 +19,7 @@ package com.seleniumtests.it.reporter;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
@@ -58,7 +59,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 
 		// check at least one generation occured for each part of the report
 		verify(reporter).generateReport(anyList(), anyList(), anyString()); // 1 time only
-		verify(reporter).generateSuiteSummaryReport(anyList());				// 1 call
+		verify(reporter).generateSuiteSummaryReport(anyMap());				// 1 call
 		verify(reporter, times(10)).generatePanel(any(VelocityEngine.class),any(ITestResult.class)); 	// 1 call per test method => 8 calls
 		verify(reporter, times(10)).generateExecutionReport(any(ITestResult.class));
 		verify(reporter).copyResources();

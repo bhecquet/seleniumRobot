@@ -26,16 +26,26 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.Writer;
 import java.util.GregorianCalendar;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.apache.velocity.app.VelocityEngine;
+import org.testng.IReporter;
+import org.testng.ISuite;
+import org.testng.ISuiteResult;
+import org.testng.ITestContext;
 import org.testng.ITestResult;
+import org.testng.xml.XmlSuite;
 
 import com.seleniumtests.core.utils.TestNGResultUtils;
 import com.seleniumtests.util.StringUtility;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
-public abstract class CommonReporter {
+public abstract class CommonReporter implements IReporter {
 	
 	private static final String RESOURCE_LOADER_PATH = "org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader";
 	private String uuid = new GregorianCalendar().getTime().toString();
@@ -46,6 +56,8 @@ public abstract class CommonReporter {
 	protected static final String PASSED_TEST = "passed";
 	protected static final String RESOURCES_DIR = "resources";
 
+	protected abstract void generateReport(Map<ITestContext, Set<ITestResult>> resultSet, final String outdir);
+	
 	/**
 	 * Initializes the VelocityEngine
 	 * @return
@@ -145,6 +157,37 @@ public abstract class CommonReporter {
 		} else {
 			return "N-A";
 		}
+	}
+	
+
+	@Override
+	public void generateReport(List<XmlSuite> xmlSuites, List<ISuite> suites, String outputDirectory) {
+		generateReport(getResultMapFromSuites(suites), outputDirectory);
+	}
+	
+	/**
+	 * Returns a Map from resultsSet (per testContext) from list of suites
+	 * @param suites
+	 * @return
+	 */
+	public Map<ITestContext, Set<ITestResult>> getResultMapFromSuites(List<ISuite> suites) {
+		Map<ITestContext, Set<ITestResult>> methodResultsMap = new LinkedHashMap<>();
+		
+		for (ISuite suite : suites) {
+			Map<String, ISuiteResult> tests = suite.getResults();
+			for (ISuiteResult r : tests.values()) {
+				ITestContext context = r.getTestContext();
+
+				Set<ITestResult> methodResults = new HashSet<>();
+				methodResults.addAll(context.getFailedTests().getAllResults());
+				methodResults.addAll(context.getPassedTests().getAllResults());
+				methodResults.addAll(context.getSkippedTests().getAllResults());
+				
+				methodResultsMap.put(context, methodResults);
+			}
+		}
+		
+		return methodResultsMap;
 	}
 	
 	public String getClassName(final ITestResult testResult) {

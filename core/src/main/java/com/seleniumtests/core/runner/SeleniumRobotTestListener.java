@@ -23,6 +23,7 @@ import java.lang.reflect.Method;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -65,6 +66,7 @@ import com.seleniumtests.reporter.logger.ArchiveMode;
 import com.seleniumtests.reporter.logger.TestLogging;
 import com.seleniumtests.reporter.logger.TestStep;
 import com.seleniumtests.reporter.reporters.CommonReporter;
+import com.seleniumtests.reporter.reporters.ReporterControler;
 import com.seleniumtests.reporter.reporters.SeleniumTestsReporter2;
 import com.seleniumtests.util.FileUtility;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
@@ -147,6 +149,12 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 							true);
 				}
 			}
+			
+			new ReporterControler().generateReport(
+					Arrays.asList(testResult.getTestContext().getCurrentXmlTest().getSuite()), 
+					Arrays.asList(testResult.getTestContext().getSuite()), 
+					SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(),
+					testResult);
 			
 		} catch (Throwable e) {
 			// do not crash for a temp report
