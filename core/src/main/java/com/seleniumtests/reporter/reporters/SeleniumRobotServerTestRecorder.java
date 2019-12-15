@@ -22,6 +22,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
 import org.json.JSONObject;
@@ -70,12 +72,10 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 
 		return executionLogs;
 	}
+	
 
-	/**
-	 * Generate all test reports
-	 */
 	@Override
-	public void generateReport(final List<XmlSuite> xml, final List<ISuite> suites, final String outdir) {
+	protected void generateReport(Map<ITestContext, Set<ITestResult>> resultSet, String outdir) {
 		ITestContext testCtx = SeleniumTestsContextManager.getGlobalContext().getTestNGContext();
 		
 		if (testCtx == null) {
@@ -108,37 +108,29 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 		}
 		
 		try {
-			for (ISuite suite : suites) {
-				Map<String, ISuiteResult> tests = suite.getResults();
-				
-				recordSuiteResults(serverConnector, tests);
-			}
+			recordResults(serverConnector, resultSet);
 		} catch (SeleniumRobotServerException | ConfigurationException e) {
 			logger.error("Error contacting selenium robot serveur", e);
 			return;
 		}
-	
 	}
+
+
 	
-	private void recordSuiteResults(SeleniumRobotSnapshotServerConnector serverConnector, Map<String, ISuiteResult> tests) {
-	
-		for (ISuiteResult r : tests.values()) {
-			ITestContext context = r.getTestContext();
-			
-			Collection<ITestResult> methodResults = new ArrayList<>();
-			methodResults.addAll(context.getFailedTests().getAllResults());
-			methodResults.addAll(context.getPassedTests().getAllResults());
-			methodResults.addAll(context.getSkippedTests().getAllResults());
-			
-			methodResults = methodResults.stream()
-					.sorted((r1, r2) -> Long.compare(r1.getStartMillis(), r2.getStartMillis()))
-					.collect(Collectors.toList());
+	private void recordResults(SeleniumRobotSnapshotServerConnector serverConnector, Map<ITestContext, Set<ITestResult>> resultSet) {
+		
+		for (Entry<ITestContext, Set<ITestResult>> entry: resultSet.entrySet()) {
+			List<ITestResult> methodResults = new ArrayList<>();
+
+			methodResults = entry.getValue().stream()
+						.sorted((r1, r2) -> Long.compare(r1.getStartMillis(), r2.getStartMillis()))
+						.collect(Collectors.toList());
 			
 			// test case in seleniumRobot naming
 			for (ITestResult testResult: methodResults) {
 				
 				// issue #81: recreate test context from this context (due to multithreading, this context may be null if parallel testing is used)
-				SeleniumTestsContextManager.setThreadContextFromTestResult(context, getTestName(testResult), getClassName(testResult), testResult);
+				SeleniumTestsContextManager.setThreadContextFromTestResult(entry.getKey(), getTestName(testResult), getClassName(testResult), testResult);
 				
 				// skipped tests has never been executed and so attribute (set in TestListener) has not been applied
 				String testName = getTestName(testResult);
@@ -163,8 +155,8 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 					
 					if (!testStep.getSnapshots().isEmpty()) {
 						serverConnector.createSnapshot(Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), 
-																testStep.getSnapshots().get(0).getScreenshot().getImagePath()
-																).toFile());
+								testStep.getSnapshots().get(0).getScreenshot().getImagePath()
+								).toFile());
 					}
 				}
 			}

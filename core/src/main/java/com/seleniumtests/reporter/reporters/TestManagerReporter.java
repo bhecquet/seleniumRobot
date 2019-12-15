@@ -17,11 +17,12 @@
  */
 package com.seleniumtests.reporter.reporters;
 
-import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.testng.IReporter;
-import org.testng.ISuite;
-import org.testng.xml.XmlSuite;
+import org.testng.ITestContext;
+import org.testng.ITestResult;
 
 import com.seleniumtests.connectors.tms.TestManager;
 import com.seleniumtests.core.SeleniumTestsContextManager;
@@ -31,11 +32,11 @@ import com.seleniumtests.core.SeleniumTestsContextManager;
  * @author behe
  *
  */
-public class TestManagerReporter implements IReporter {
+public class TestManagerReporter extends CommonReporter implements IReporter {
 
 	@Override
-	public void generateReport(List<XmlSuite> xmlSuites, List<ISuite> suites, String outputDirectory) {
-		
+	protected void generateReport(Map<ITestContext, Set<ITestResult>> resultSet, String outdir) {
+
 		// issue #81: use global context instead
 		TestManager testManager = SeleniumTestsContextManager.getGlobalContext().getTestManagerInstance();
 
