@@ -39,6 +39,7 @@ import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.driver.BrowserType;
+import com.seleniumtests.driver.DriverExceptionListener;
 import com.seleniumtests.driver.DriverMode;
 import com.seleniumtests.driver.screenshots.VideoCaptureMode;
 import com.seleniumtests.reporter.logger.ArchiveMode;
@@ -46,6 +47,8 @@ import com.seleniumtests.reporter.reporters.JUnitReporter;
 import com.seleniumtests.reporter.reporters.ReportInfo;
 import com.seleniumtests.reporter.reporters.TestManagerReporter;
 import com.seleniumtests.uipage.htmlelements.ElementInfo;
+import com.seleniumtests.ut.driver.WebDriverListener1;
+import com.seleniumtests.ut.driver.WebDriverListener2;
 import com.seleniumtests.util.logging.DebugMode;
 
 /**
@@ -1058,6 +1061,34 @@ public class TestSeleniumTestContext extends GenericTest {
 		Assert.assertEquals(reportInfos.get(0).getExtension(), ".xml");
 		Assert.assertEquals(reportInfos.get(0).getTemplatePath(), "reporter/templates/report.perf.vm");
 		Assert.assertEquals(reportInfos.get(0).getPrefix(), "PERF");
+	}
+	
+
+	@Test(groups="ut context")
+	public void testWebDriverListener(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setWebDriverListener("com.seleniumtests.ut.driver.WebDriverListener1,com.seleniumtests.ut.driver.WebDriverListener2");
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getWebDriverListener().size(), 3); // 3 classes, the first is the internal class
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getReporterPluginClasses().get(0), DriverExceptionListener.class);
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getReporterPluginClasses().get(1), WebDriverListener1.class);
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getReporterPluginClasses().get(2), WebDriverListener2.class);
+	}
+	
+	/**
+	 * We provide a class which is not a WebDriverEventListener
+	 * @param testNGCtx
+	 * @param xmlTest
+	 */
+	@Test(groups="ut context", expectedExceptions=ConfigurationException.class)
+	public void testBadWebDriverListenerClass(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setWebDriverListener("com.seleniumtests.core.Filter");
+	}
+	@Test(groups="ut context")
+	public void testNullWebDriverListener(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setReporterPluginClasses(null);
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getReporterPluginClasses().size(), 1); // the default listener
 	}
 	
 	@Test(groups="ut context")
