@@ -319,6 +319,32 @@ public class TestDriver extends GenericMultiBrowserTest {
 		List<WebElement> htmlElements = new HtmlElement("", By.id("parent")).findHtmlElements(By.className("myClass"));
 		Assert.assertEquals(htmlElements.size(), 2);
 		Assert.assertTrue(htmlElements.get(0) instanceof HtmlElement);
+		Assert.assertEquals(htmlElements.get(0).getText(), "first child");
+	}
+	
+	/**
+	 * issue #314: check that we search element effectively inside the parent
+	 */
+	@Test(groups={"it", "ut"})
+	public void testFindHtmlElementsByWithSimilarElements() {
+		List<WebElement> htmlElements = new HtmlElement("", By.id("parent")).findHtmlElements(By.tagName("div"));
+		Assert.assertEquals(htmlElements.size(), 2);
+		Assert.assertTrue(htmlElements.get(0) instanceof HtmlElement);
+		Assert.assertEquals(htmlElements.get(0).getText(), "first child");
+	}
+	
+	/**
+	 * Tests finding sub-elements of an HTMLElement inside frame
+	 * issue #314: search for an element into iframe. Search sub-elements of this element.
+	 * 				We search in the second table because the bug relies in the fact that findHtmlElements do return elements which do not correspond the the elements returned
+	 * 				by a simple driver.findElements(By.tagname('a'))
+	 */
+	@Test(groups={"it", "ut"})
+	public void testFindHtmlElementsByInsideFrame() {
+		List<WebElement> htmlElements = new HtmlElement("", By.id("tableIframe2"), DriverTestPage.iframe).findHtmlElements(By.tagName("td"));
+		Assert.assertEquals(htmlElements.size(), 2);
+		Assert.assertTrue(htmlElements.get(0) instanceof HtmlElement);
+		Assert.assertEquals(htmlElements.get(0).getText(), "Value 3");
 	}
 	
 	/**

@@ -145,6 +145,16 @@ public class TestDriverInternetExplorer extends TestDriver {
 	}
 
 	@Test(groups={"it", "ut"})
+	public void testFindHtmlElementsByInsideFrame() {
+		super.testFindHtmlElementsByInsideFrame();
+	}
+
+	@Test(groups={"it", "ut"})
+	public void testFindHtmlElementsByWithSimilarElements() {
+		super.testFindHtmlElementsByWithSimilarElements();
+	}
+
+	@Test(groups={"it", "ut"})
 	public void testFindSubElement() {
 		super.testFindSubElement();
 	}
