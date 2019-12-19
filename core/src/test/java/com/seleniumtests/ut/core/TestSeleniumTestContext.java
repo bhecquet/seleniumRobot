@@ -1069,9 +1069,9 @@ public class TestSeleniumTestContext extends GenericTest {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setWebDriverListener("com.seleniumtests.ut.driver.WebDriverListener1,com.seleniumtests.ut.driver.WebDriverListener2");
 		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getWebDriverListener().size(), 3); // 3 classes, the first is the internal class
-		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getReporterPluginClasses().get(0), DriverExceptionListener.class);
-		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getReporterPluginClasses().get(1), WebDriverListener1.class);
-		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getReporterPluginClasses().get(2), WebDriverListener2.class);
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getWebDriverListener().get(0), DriverExceptionListener.class.getName());
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getWebDriverListener().get(1), WebDriverListener1.class.getName());
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getWebDriverListener().get(2), WebDriverListener2.class.getName());
 	}
 	
 	/**
@@ -1088,7 +1088,7 @@ public class TestSeleniumTestContext extends GenericTest {
 	public void testNullWebDriverListener(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setReporterPluginClasses(null);
-		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getReporterPluginClasses().size(), 1); // the default listener
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getWebDriverListener().size(), 1); // the default listener
 	}
 	
 	@Test(groups="ut context")
