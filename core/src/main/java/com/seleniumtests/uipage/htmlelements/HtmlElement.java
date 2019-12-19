@@ -284,8 +284,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
             	mouseOverScript = "if(document.createEvent){var evObj = document.createEvent('MouseEvents');evObj.initEvent('mouseover', true, false); arguments[0].dispatchEvent(evObj);} else if(document.createEventObject) { arguments[0].fireEvent('onmouseover');}";
             }
         
-        JavascriptExecutor js = (JavascriptExecutor) driver;
-        js.executeScript(mouseOverScript, element);
+        executeScript(mouseOverScript, element);
         WaitHelper.waitForSeconds(2);
         
         String clickScript = "";
@@ -298,7 +297,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
         	clickScript = "if(document.createEvent){var evObj = document.createEvent('MouseEvents');evObj.initEvent('click', true, false); arguments[0].dispatchEvent(evObj);} else if(document.createEventObject) { arguments[0].fireEvent('onclick');}";
         }
 
-        js.executeScript(clickScript, element);
+        executeScript(clickScript, element);
         WaitHelper.waitForSeconds(2);
     }
     
@@ -319,8 +318,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
             	doubleClickScript = JS_CLICK_DOUBLE;
             }
         
-        JavascriptExecutor js = (JavascriptExecutor) driver;
-        js.executeScript(doubleClickScript, element);
+        executeScript(doubleClickScript, element);
 
     }
     
@@ -330,8 +328,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     		
     	// click on element before sending keys through keyboard
     	element.click();
-    	JavascriptExecutor js = (JavascriptExecutor) driver;
-        js.executeScript("arguments[0].focus();", element);
+        executeScript("arguments[0].focus();", element);
         
         DriverConfig driverConfig = WebUIDriver.getWebUIDriver(false).getConfig();
         
@@ -341,7 +338,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 	        	|| (driverConfig.getBrowserType() == BrowserType.CHROME 
 	        			&& driverConfig.getMajorBrowserVersion() >= 75)) {
         	logger.warn("using specific Marionette method");
-        	js.executeScript(String.format("arguments[0].value='%s';", keysToSend[0].toString()), element);
+        	executeScript(String.format("arguments[0].value='%s';", keysToSend[0].toString()), element);
         } else {
 			// use keyboard to type
 			((CustomEventFiringWebDriver)driver).getKeyboard().sendKeys(keysToSend);
@@ -351,10 +348,12 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     @ReplayOnError
     public void simulateMoveToElement(final int x, final int y) {
         findElement(true);
-        ((JavascriptExecutor) driver).executeScript(
+        executeScript(
             "function simulate(f,c,d,e){var b,a=null;for(b in eventMatchers)if(eventMatchers[b].test(c)){a=b;break}if(!a)return!1;document.createEvent?(b=document.createEvent(a),a==\"HTMLEvents\"?b.initEvent(c,!0,!0):b.initMouseEvent(c,!0,!0,document.defaultView,0,d,e,d,e,!1,!1,!1,!1,0,null),f.dispatchEvent(b)):(a=document.createEventObject(),a.detail=0,a.screenX=d,a.screenY=e,a.clientX=d,a.clientY=e,a.ctrlKey=!1,a.altKey=!1,a.shiftKey=!1,a.metaKey=!1,a.button=1,f.fireEvent(\"on\"+c,a));return!0} var eventMatchers={HTMLEvents:/^(?:load|unload|abort|errorLogger|select|change|submit|reset|focus|blur|resize|scroll)$/,MouseEvents:/^(?:click|dblclick|mouse(?:down|up|over|move|out))$/}; " +
             "simulate(arguments[0],\"mousemove\",arguments[1],arguments[2]);",
-            element, x, y);
+            element,
+            x, 
+            y);
 
     }
     
@@ -489,6 +488,50 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     
     protected void findElement(boolean waitForVisibility) {
     	findElement(waitForVisibility, true);
+    }
+    
+
+    /**
+     * Change CSS attribute of the element by setting if via javascript: arguments[0].style.<attribute>=<value>
+     * @param cssProperty
+     * @param cssPropertyValue
+     */
+    public void changeCssAttribute(String cssProperty, String cssPropertyValue) {
+    	findElement(false, false);
+    	
+		changeCssAttribute(element, cssProperty, cssPropertyValue);
+	}
+    
+    /**
+     * Execute arbitrary script on this element. Renaming of getEval
+     * @param script	the script to execute. It MUST contain 'arguments[0]' and may return something
+     * @return 		arbitrary value. You must cast it
+     */
+    @ReplayOnError
+    public Object executeScript(String javascript, Object... args) {
+    	findElement(false, false);
+    	
+    	return executeScript(javascript, element, args); 
+    }
+    
+
+    /**
+     * Execute arbitrary script on the provided element
+     * @param element	the WebElement on which we call the script
+     * @param script	the script to execute. It MUST contain 'arguments[0]' and may return something
+     * @param args		optional arguments to pass to the script. They should ba accessed using 'arguments[1]' ...
+     * @return 		arbitrary value. You must cast it
+     */
+    protected Object executeScript(String javascript, WebElement element, Object... args) {
+
+    	if (element instanceof HtmlElement) {
+    		throw new ScenarioException("Only real elements should be provided, not HtmlElement"); 
+    	}
+    	
+    	if (!javascript.contains("arguments[0]")) {
+    		throw new ScenarioException("JS script MUST contain 'arguments[0]' as reference");
+    	}
+    	return ((JavascriptExecutor) driver).executeScript(javascript, element, args); 
     }
     
 
@@ -649,7 +692,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     
     protected void changeCssAttribute(WebElement element, String cssProperty, String cssPropertyValue) {
 		String javascript = "arguments[0].style." + cssProperty + "='" + cssPropertyValue + "';";
-		((JavascriptExecutor) driver).executeScript(javascript, element); 
+		executeScript(javascript, element); 
 	}
     
     /**
@@ -683,13 +726,13 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 					changeCssAttribute(element, "top", heightPosition + "px"); 
 					changeCssAttribute(element, "position", "inherit");
 				}
-				if ((Boolean)((JavascriptExecutor) driver).executeScript("return getComputedStyle(arguments[0]).display === 'none'", element)) {
+				if ((Boolean)executeScript("return getComputedStyle(arguments[0]).display === 'none'", element)) {
 					changeCssAttribute(element, "display", "block");
 				}
-				if ((Boolean)((JavascriptExecutor) driver).executeScript("return getComputedStyle(arguments[0]).visibility !== 'visible'", element)) {
+				if ((Boolean)executeScript("return getComputedStyle(arguments[0]).visibility !== 'visible'", element)) {
 					changeCssAttribute(element, "visibility", "visible");
 				}
-				if ((Boolean)((JavascriptExecutor) driver).executeScript("return getComputedStyle(arguments[0]).opacity === '0'", element)) {
+				if ((Boolean)executeScript("return getComputedStyle(arguments[0]).opacity === '0'", element)) {
 					changeCssAttribute(element, "opacity", "1");
 				}
 //				changeCssAttribute(element, "clip", "auto");
@@ -814,6 +857,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
      * @return
      */
     @ReplayOnError
+    @Deprecated
     public String getEval(final String script) {
         findElement(false, false);
         
@@ -1025,12 +1069,11 @@ public class HtmlElement extends Element implements WebElement, Locatable {
      */
     @ReplayOnError
     public void simulateMouseOver() {
-        findElement(true);
+        findElement(true); // search element first because we want it to be visible
 
         String mouseOverScript =
             "if(document.createEvent){var evObj = document.createEvent('MouseEvents');evObj.initEvent('mouseover', true, false); arguments[0].dispatchEvent(evObj);} else if(document.createEventObject) { arguments[0].fireEvent('onmouseover');}";
-        JavascriptExecutor js = (JavascriptExecutor) driver;
-        js.executeScript(mouseOverScript, element);
+        executeScript(mouseOverScript, element);
     }
     
     @Override
@@ -1050,7 +1093,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     protected void blur() {
     	if (SeleniumTestsContextManager.isWebTest() && "input".equalsIgnoreCase(element.getTagName())) {
     		try {
-    			((JavascriptExecutor) driver).executeScript("arguments[0].blur();", element);
+    			executeScript("arguments[0].blur();");
     		} catch (Exception e) {	
     			logger.error(e);
     		}
