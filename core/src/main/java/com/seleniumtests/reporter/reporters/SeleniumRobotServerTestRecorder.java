@@ -75,7 +75,7 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 	
 
 	@Override
-	protected void generateReport(Map<ITestContext, Set<ITestResult>> resultSet, String outdir) {
+	protected void generateReport(Map<ITestContext, Set<ITestResult>> resultSet, String outdir, boolean optimizeReport) {
 		ITestContext testCtx = SeleniumTestsContextManager.getGlobalContext().getTestNGContext();
 		
 		if (testCtx == null) {

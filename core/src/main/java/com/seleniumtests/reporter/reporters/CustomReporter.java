@@ -60,7 +60,7 @@ public class CustomReporter extends CommonReporter implements IReporter {
 	
 
 	@Override
-	protected void generateReport(Map<ITestContext, Set<ITestResult>> resultSet, String outdir) {
+	protected void generateReport(Map<ITestContext, Set<ITestResult>> resultSet, String outdir, boolean optimizeReport) {
 		generatedFiles = new ArrayList<>();
 		
 		Map<String, Integer> consolidatedResults = new HashMap<>();

@@ -35,7 +35,7 @@ import com.seleniumtests.core.SeleniumTestsContextManager;
 public class TestManagerReporter extends CommonReporter implements IReporter {
 
 	@Override
-	protected void generateReport(Map<ITestContext, Set<ITestResult>> resultSet, String outdir) {
+	protected void generateReport(Map<ITestContext, Set<ITestResult>> resultSet, String outdir, boolean optimizeResult) {
 
 		// issue #81: use global context instead
 		TestManager testManager = SeleniumTestsContextManager.getGlobalContext().getTestManagerInstance();
