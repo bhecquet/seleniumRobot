@@ -328,7 +328,7 @@ public class TestDriver extends GenericMultiBrowserTest {
 	@Test(groups={"it", "ut"})
 	public void testFindHtmlElementsByWithSimilarElements() {
 		List<WebElement> htmlElements = new HtmlElement("", By.id("parent")).findHtmlElements(By.tagName("div"));
-		Assert.assertEquals(htmlElements.size(), 2);
+		Assert.assertEquals(htmlElements.size(), 3);
 		Assert.assertTrue(htmlElements.get(0) instanceof HtmlElement);
 		Assert.assertEquals(htmlElements.get(0).getText(), "first child");
 	}
