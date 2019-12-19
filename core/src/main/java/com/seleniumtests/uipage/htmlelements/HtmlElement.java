@@ -381,24 +381,25 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 
     /**
      * Find elements inside this element
-     * @param by
+     * @param childBy
      * @return	List of HtmlElement's based on real WebElement
      */
     @ReplayOnError
-    public List<WebElement> findHtmlElements(By by) {
+    public List<WebElement> findHtmlElements(By childBy) {
     	
     	// find the root element
     	findElement(false, false);
     	List<WebElement> htmlElements = new ArrayList<>();
-    	List<WebElement> elements = element.findElements(by);
+    	List<WebElement> elements = element.findElements(childBy);
     	
     	// throw exception so that behavior is the same as with 'findElements()' call which retries search
     	if (elements.isEmpty()) {
-    		throw new NoSuchElementException("No elements found for " + by.toString());
+    		throw new NoSuchElementException("No elements found for " + childBy.toString());
     	}
     	
     	for (int i = 0; i < elements.size(); i++) {
-    		htmlElements.add(new HtmlElement("", by, frameElement, this, i));
+    		// frame set to null as we expect the frames are searched in the parent element
+    		htmlElements.add(new HtmlElement("", childBy, null, this, i));
     	}
     	return htmlElements;
     }

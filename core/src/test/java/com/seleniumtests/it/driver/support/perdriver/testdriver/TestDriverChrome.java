@@ -134,6 +134,16 @@ public class TestDriverChrome extends TestDriver {
 	public void testFindHtmlElementsBy() {
 		super.testFindHtmlElementsBy();
 	}
+	
+	@Test(groups={"it", "ut"})
+	public void testFindHtmlElementsByInsideFrame() {
+		super.testFindHtmlElementsByInsideFrame();
+	}
+
+	@Test(groups={"it", "ut"})
+	public void testFindHtmlElementsByWithSimilarElements() {
+		super.testFindHtmlElementsByWithSimilarElements();
+	}
 
 	@Test(groups={"it", "ut"})
 	public void testFindHtmlElementsByNotExist() {
