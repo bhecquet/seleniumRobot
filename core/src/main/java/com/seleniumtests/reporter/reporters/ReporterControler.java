@@ -53,6 +53,9 @@ import com.seleniumtests.reporter.logger.TestStep;
  *
  */
 public class ReporterControler implements IReporter {
+	
+
+	private static Object reporterLock = new Object();
 
 	@Override
 	public void generateReport(List<XmlSuite> xmlSuites, List<ISuite> suites, String outputDirectory) {
@@ -60,38 +63,43 @@ public class ReporterControler implements IReporter {
 	}
 
 	public void generateReport(List<XmlSuite> xmlSuites, List<ISuite> suites, String outputDirectory, ITestResult currentTestResult) {
-
-		Map<ITestContext, Set<ITestResult>> resultSet = updateTestSteps(suites, currentTestResult);
-		try {
-			new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).mkdirs();
-		} catch (Exception e) {}
-		cleanAttachments(resultSet);
 		
-		// are we at the end of a suite (suite.getResults() is not empty
-		boolean suiteFinished = false;
-		for (ISuite suite: suites) {
-			if (suite.getResults().size() > 0) {
-				suiteFinished = true;
-				break;
+		synchronized (reporterLock) {
+			Map<ITestContext, Set<ITestResult>> resultSet = updateTestSteps(suites, currentTestResult);
+			try {
+				new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).mkdirs();
+			} catch (Exception e) {}
+			cleanAttachments(resultSet);
+			
+			// are we at the end of a suite (suite.getResults() is not empty
+			boolean suiteFinished = false;
+			for (ISuite suite: suites) {
+				if (suite.getResults().size() > 0) {
+					suiteFinished = true;
+					break;
+				}
+			}
+			
+			try {
+				new JUnitReporter().generateReport(xmlSuites, suites, SeleniumTestsContextManager.getGlobalContext().getOutputDirectory());
+			} catch (Exception e) {}
+			
+			for (Class<?> reporterClass: SeleniumTestsContextManager.getGlobalContext().getReporterPluginClasses()) {
+				try {
+					if (suiteFinished) {
+						IReporter reporter = (IReporter) reporterClass.getConstructor().newInstance();
+						reporter.generateReport(xmlSuites, suites, outputDirectory);
+						
+					// when the tests are currently running, do optimize reports (for example, html results will have their resources on CDN
+					} else {
+						CommonReporter reporter = (CommonReporter) reporterClass.getConstructor().newInstance();
+						reporter.generateReport(resultSet, outputDirectory, true);
+					}
+					
+				} catch (Exception e) {}
 			}
 		}
 		
-		try {
-			new JUnitReporter().generateReport(xmlSuites, suites, SeleniumTestsContextManager.getGlobalContext().getOutputDirectory());
-		} catch (Exception e) {}
-		
-		for (Class<?> reporterClass: SeleniumTestsContextManager.getGlobalContext().getReporterPluginClasses()) {
-			try {
-				if (suiteFinished) {
-					IReporter reporter = (IReporter) reporterClass.getConstructor().newInstance();
-					reporter.generateReport(xmlSuites, suites, outputDirectory);
-				} else {
-					CommonReporter reporter = (CommonReporter) reporterClass.getConstructor().newInstance();
-					reporter.generateReport(resultSet, outputDirectory);
-				}
-				
-			} catch (Exception e) {}
-		}
 	}
 	
 	/**

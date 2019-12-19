@@ -283,7 +283,7 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 	}
 
 	@Override
-	protected void generateReport(Map<ITestContext, Set<ITestResult>> resultSet, final String outdir) {
+	protected void generateReport(Map<ITestContext, Set<ITestResult>> resultSet, final String outdir, boolean optimizeReport) {
 		ITestContext testCtx = SeleniumTestsContextManager.getGlobalContext().getTestNGContext();
 		if (testCtx == null) {
 			logger.error("Looks like your class does not extend from SeleniumTestPlan!");
@@ -297,7 +297,7 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 		
 		try {
 			mOut = createWriter(getOutputDirectory(), "SeleniumTestReport.html");
-			startHtml(null, mOut, "complete");
+			startHtml(null, mOut, "complete", optimizeReport);
 			methodResultsMap = generateSuiteSummaryReport(resultSet);
 			endHtml();
 			mOut.flush();
@@ -312,7 +312,7 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 		// Generate test method reports
 		for (Map.Entry<ITestContext, List<ITestResult>> entry: methodResultsMap.entrySet()) {
 			for (ITestResult testResult: entry.getValue()) {
-				generateSingleTestReport(testResult);
+				generateSingleTestReport(testResult, optimizeReport);
 			}
 		}
 	}
@@ -320,10 +320,8 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 	/**
 	 * Generate HTML report for a single test
 	 * @param testResult
+	 * @param resourcesFromCdn		if true (optimizeReport), resources are linked from CDN
 	 */
-	public void generateSingleTestReport(ITestResult testResult) {
-		generateSingleTestReport(testResult, SeleniumTestsContextManager.getGlobalContext().getOptimizeReports());
-	}
 	public void generateSingleTestReport(ITestResult testResult, boolean resourcesFromCdn) {
 
 		// issue #81: recreate test context from this context (due to multithreading, this context may be null if parallel testing is done)
@@ -360,9 +358,7 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 		
 
 		for (Entry<ITestContext, Set<ITestResult>> entry: resultSet.entrySet()) {
-			List<ITestResult> methodResults = new ArrayList<>();
-
-			methodResults = entry.getValue().stream()
+			 List<ITestResult> methodResults = entry.getValue().stream()
 						.sorted((r1, r2) -> Long.compare(r1.getStartMillis(), r2.getStartMillis()))
 						.collect(Collectors.toList());
 			
@@ -428,16 +424,6 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 	
 	public String getOutputDirectory() {	
 		return outputDirectory;
-	}
-
-	/**
-	 * Begin HTML file
-	 * @param testPassed	true if test is OK, false if test is KO, null if test is skipped
-	 * @param out
-	 * @param type
-	 */
-	protected void startHtml(final String testStatus, final PrintWriter out, final String type) {
-		startHtml(testStatus, out, type, SeleniumTestsContextManager.getGlobalContext().getOptimizeReports());
 	}
 	
 	/**

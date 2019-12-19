@@ -41,6 +41,7 @@ import org.testng.ITestContext;
 import org.testng.ITestResult;
 import org.testng.xml.XmlSuite;
 
+import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.utils.TestNGResultUtils;
 import com.seleniumtests.util.StringUtility;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
@@ -56,7 +57,7 @@ public abstract class CommonReporter implements IReporter {
 	protected static final String PASSED_TEST = "passed";
 	protected static final String RESOURCES_DIR = "resources";
 
-	protected abstract void generateReport(Map<ITestContext, Set<ITestResult>> resultSet, final String outdir);
+	protected abstract void generateReport(Map<ITestContext, Set<ITestResult>> resultSet, String outdir, boolean optimizeReport);
 	
 	/**
 	 * Initializes the VelocityEngine
@@ -162,7 +163,7 @@ public abstract class CommonReporter implements IReporter {
 
 	@Override
 	public void generateReport(List<XmlSuite> xmlSuites, List<ISuite> suites, String outputDirectory) {
-		generateReport(getResultMapFromSuites(suites), outputDirectory);
+		generateReport(getResultMapFromSuites(suites), outputDirectory, SeleniumTestsContextManager.getGlobalContext().getOptimizeReports());
 	}
 	
 	/**

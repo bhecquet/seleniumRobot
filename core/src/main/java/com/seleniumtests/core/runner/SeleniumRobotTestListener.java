@@ -131,7 +131,12 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 	 */
 	private void generateTempReport(ITestResult testResult) {
 		try {
-			new SeleniumTestsReporter2().generateSingleTestReport(testResult, true);
+
+			new ReporterControler().generateReport(
+					Arrays.asList(testResult.getTestContext().getCurrentXmlTest().getSuite()), 
+					Arrays.asList(testResult.getTestContext().getSuite()), 
+					SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(),
+					testResult);
 			
 			if (SeleniumTestsContextManager.getThreadContext().getKeepAllResults() && testResult.getMethod().getRetryAnalyzer() != null) {
 				TestRetryAnalyzer testRetryAnalyzer = (TestRetryAnalyzer) testResult.getMethod().getRetryAnalyzer();
@@ -150,11 +155,6 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 				}
 			}
 			
-			new ReporterControler().generateReport(
-					Arrays.asList(testResult.getTestContext().getCurrentXmlTest().getSuite()), 
-					Arrays.asList(testResult.getTestContext().getSuite()), 
-					SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(),
-					testResult);
 			
 		} catch (Throwable e) {
 			// do not crash for a temp report
