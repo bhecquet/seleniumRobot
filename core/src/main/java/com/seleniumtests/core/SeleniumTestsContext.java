@@ -36,6 +36,7 @@ import org.json.JSONObject;
 import org.openqa.selenium.PageLoadStrategy;
 import org.openqa.selenium.Platform;
 import org.openqa.selenium.Proxy.ProxyType;
+import org.openqa.selenium.support.events.WebDriverEventListener;
 import org.openqa.selenium.WebDriverException;
 import org.testng.IReporter;
 import org.testng.ITestContext;
@@ -2056,7 +2057,20 @@ public class SeleniumTestsContext {
     	List<String> listeners = new ArrayList<>();
 		listeners.add(DriverExceptionListener.class.getName());
     	if (listener != null && !listener.isEmpty()) {
-    		listeners.addAll(Arrays.asList(listener.split(",")));
+
+    		for (String listenerClassName: listener.split(",")) {
+	    		// check we can access the class
+	    		try {
+	    			Class<WebDriverEventListener> listenerClass = (Class<WebDriverEventListener>) Class.forName(listenerClassName);
+	    			if (!WebDriverEventListener.class.isAssignableFrom(listenerClass)) {
+	    				throw new ConfigurationException(String.format("Class %s must implement WebDriverEventListener class", listenerClassName));
+	    			}
+	    			
+	        		listeners.add(listenerClassName);
+	    		} catch (ExceptionInInitializerError | ClassNotFoundException e) {
+	    			throw new ConfigurationException(String.format("Class %s cannot be loaded", listenerClassName), e);
+	    		}
+    		}
     	}
     		
 		setAttribute(WEB_DRIVER_LISTENER, listeners);

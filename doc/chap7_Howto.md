@@ -448,3 +448,58 @@ For debugging a test, you can:
 - use -Ddebug=core: when test is executing outside of dev environment, you will get a log file with all details about which methods are running. It's very verbose
 - use -Ddebug=driver: when something wrong happens with browser / driver (crashing, errors, ...), it will log driver and browser behaviour
 - use -Ddebug=gui: it will outline an element before clicking on it or when searching if it's displayed or present. As it slows down the test (250 ms for each outline), use it only for demo.
+
+### 21 Customize driver behaviour ###
+
+Selenium provides way to extend driver behaviour on some events (clicking, exception, ...) through implementation of WebDriverEventListener interface.
+If you want, for example, do something special when an element is not found (to handle unattended alerts for example), 
+- create a class implementing WebDriverEventListener. In the following example, we print "hello" if an unexpected alert occurs. Moreover, as actions are replayed by seleniumRobot, this will be harmless for the running scenario
+- add this listener to seleniumRobot through option `webDriverListener`. For example, on command line, it will give: `-DwebDriverListener=com.company.tests.PopupListener`
+
+```java
+package com.company.tests;
+
+import org.openqa.selenium.By;
+import org.openqa.selenium.UnhandledAlertException;
+import org.openqa.selenium.OutputType;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebDriverException;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.events.WebDriverEventListener;
+
+public class PopupListener implements WebDriverEventListener {
+
+	@Override
+	public void beforeAlertAccept(WebDriver driver) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void afterAlertAccept(WebDriver driver) {
+		// TODO Auto-generated method stub
+
+	}
+
+	[...]
+
+
+	@Override
+	public void onException(Throwable throwable, WebDriver driver) {
+		if (throwable instanceof UnhandledAlertException) {
+			System.out.println("hello");
+		}
+
+	}
+
+
+	
+
+}
+```
+
+
+
+To 
+
+
