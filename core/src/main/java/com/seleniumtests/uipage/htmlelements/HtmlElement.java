@@ -398,7 +398,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     	}
     	
     	for (int i = 0; i < elements.size(); i++) {
-    		htmlElements.add(new HtmlElement("", by, frameElement, parent, i));
+    		htmlElements.add(new HtmlElement("", by, frameElement, this, i));
     	}
     	return htmlElements;
     }
@@ -1406,10 +1406,14 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 	}
 	
 	/**
-	 * Returns the real web element or null if it has not been searched
+	 * Returns the real web element. 
+	 * issue #313: Search the element if it has not been searched before
 	 * @return
 	 */
 	public WebElement getRealElement() {
+		if (element == null) {
+			findElement();
+		}
 		return element;
 	}
 
