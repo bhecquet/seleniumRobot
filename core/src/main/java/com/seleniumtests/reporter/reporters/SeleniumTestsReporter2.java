@@ -356,7 +356,6 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 		// build result list for each TestNG test
 		Map<ITestContext, List<ITestResult>> methodResultsMap = new LinkedHashMap<>();
 		
-
 		for (Entry<ITestContext, Set<ITestResult>> entry: resultSet.entrySet()) {
 			 List<ITestResult> methodResults = entry.getValue().stream()
 						.sorted((r1, r2) -> Long.compare(r1.getStartMillis(), r2.getStartMillis()))
@@ -374,7 +373,6 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 
 				result.setAttribute(METHOD_RESULT_FILE_NAME, fileName);
 				TestNGResultUtils.setUniqueTestName(result, getTestName(result)); // be sure test name is initialized
-				
 			}
 			
 			methodResultsMap.put(entry.getKey(), methodResults);
@@ -385,13 +383,18 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 
 			Template t = ve.getTemplate("/reporter/templates/report.part.suiteSummary.vm");
 			VelocityContext context = new VelocityContext();
+			
+			Map<ITestResult, List<TestStep>> allSteps = TestLogging.getTestsSteps();
 
-			context.put("tests", methodResultsMap);
-			context.put("steps", TestLogging.getTestsSteps());
+			synchronized (allSteps) { // as we use a synchronizedMap and we iterate on it
+				context.put("tests", methodResultsMap);
+				context.put("steps", allSteps);
 
-			StringWriter writer = new StringWriter();
-			t.merge(context, writer);
-			mOut.write(writer.toString());
+				StringWriter writer = new StringWriter();
+				t.merge(context, writer);
+				mOut.write(writer.toString());
+			}
+			
 
 		} catch (Exception e) {
 			generationErrorMessage = "generateSuiteSummaryReport error:" + e.getMessage();

@@ -35,7 +35,6 @@ import org.testng.ITestContext;
 import org.testng.ITestResult;
 import org.testng.annotations.Test;
 import org.testng.xml.XmlSuite.ParallelMode;
-import org.zeroturnaround.zip.ZipUtil;
 
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
@@ -65,11 +64,11 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		verify(reporter).copyResources();
 
 		// check report is complete without error (issue #100)
-		Assert.assertEquals(reporter.getGenerationErrorMessage(), null, "error during generation: " + reporter.getGenerationErrorMessage());		
+		Assert.assertEquals(reporter.getGenerationErrorMessage(), null, "error during generation: " + reporter.getGenerationErrorMessage());	
 	}
 	
 	/**
-	 * Check summary format when tests have steps
+	 * Check summary format in multithread
 	 * @throws Exception
 	 */
 	@Test(groups={"it"})
@@ -83,6 +82,35 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		
 		Assert.assertTrue(mainReportContent.matches(".*<a href\\='testAndSubActions/TestReport\\.html'.*?>testAndSubActions</a>.*"));
 		Assert.assertTrue(mainReportContent.matches(".*<a href\\='testInError/TestReport\\.html'.*?>testInError</a>.*"));
+
+		// issue #312: check that result files have been generated at least twice (one during test run and one at the end)
+		String logs = readSeleniumRobotLogFile().replace("\\", "/");
+		Assert.assertTrue(StringUtils.countMatches(logs, "testInError/PERF-result.xml") > 1);
+		Assert.assertTrue(StringUtils.countMatches(logs, "testAndSubActions/PERF-result.xml") > 1);
+		Assert.assertTrue(StringUtils.countMatches(logs, "testWithException/PERF-result.xml") > 1);
+	}
+	
+	/**
+	 * Check summary format in monothread
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testMonothreadReport() throws Exception {
+		
+		SeleniumTestsContextManager.removeThreadContext();
+		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions", "testInError", "testWithException"});
+		
+		// check content of summary report file
+		String mainReportContent = readSummaryFile();
+		
+		Assert.assertTrue(mainReportContent.matches(".*<a href\\='testAndSubActions/TestReport\\.html'.*?>testAndSubActions</a>.*"));
+		Assert.assertTrue(mainReportContent.matches(".*<a href\\='testInError/TestReport\\.html'.*?>testInError</a>.*"));
+		
+		// issue #312: check that result files have been generated at least twice (one during test run and one at the end)
+		String logs = readSeleniumRobotLogFile().replace("\\", "/");
+		Assert.assertTrue(StringUtils.countMatches(logs, "testInError/PERF-result.xml") > 1);
+		Assert.assertTrue(StringUtils.countMatches(logs, "testAndSubActions/PERF-result.xml") > 1);
+		Assert.assertTrue(StringUtils.countMatches(logs, "testWithException/PERF-result.xml") > 1);
 	}
 	
 	/**
