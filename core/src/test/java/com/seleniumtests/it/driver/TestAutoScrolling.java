@@ -1,6 +1,5 @@
 package com.seleniumtests.it.driver;
 
-import org.openqa.selenium.By;
 import org.openqa.selenium.ie.InternetExplorerDriver;
 import org.openqa.selenium.interactions.Actions;
 import org.testng.Assert;

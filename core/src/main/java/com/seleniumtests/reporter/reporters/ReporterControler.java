@@ -30,8 +30,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 
+import org.apache.log4j.Logger;
 import org.testng.IReporter;
 import org.testng.ISuite;
 import org.testng.ISuiteResult;
@@ -43,9 +45,11 @@ import org.testng.xml.XmlSuite;
 
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.core.runner.SeleniumRobotTestListener;
 import com.seleniumtests.core.utils.TestNGResultUtils;
 import com.seleniumtests.reporter.logger.TestLogging;
 import com.seleniumtests.reporter.logger.TestStep;
+import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
 /**
  * This reporter controls the execution of all other reporter because TestNG
@@ -55,7 +59,8 @@ import com.seleniumtests.reporter.logger.TestStep;
 public class ReporterControler implements IReporter {
 	
 
-	private static Object reporterLock = new Object();
+	private static final Object reporterLock = new Object();
+	private static final Logger logger = SeleniumRobotLogger.getLogger(ReporterControler.class);
 
 	@Override
 	public void generateReport(List<XmlSuite> xmlSuites, List<ISuite> suites, String outputDirectory) {
@@ -71,15 +76,15 @@ public class ReporterControler implements IReporter {
 			} catch (Exception e) {}
 			cleanAttachments(resultSet);
 			
-			// are we at the end of a suite (suite.getResults() is not empty
+			// are we at the end of a suite (suite.getResults() has the same size as the returned result map)
 			boolean suiteFinished = false;
 			for (ISuite suite: suites) {
-				if (suite.getResults().size() > 0) {
+				if (suite.getResults().size() == resultSet.size()) {
 					suiteFinished = true;
 					break;
 				}
 			}
-			
+
 			try {
 				new JUnitReporter().generateReport(xmlSuites, suites, SeleniumTestsContextManager.getGlobalContext().getOutputDirectory());
 			} catch (Exception e) {}
@@ -96,8 +101,11 @@ public class ReporterControler implements IReporter {
 						reporter.generateReport(resultSet, outputDirectory, true);
 					}
 					
-				} catch (Exception e) {}
+				} catch (Exception e) {
+					logger.error("Error generating report", e);
+				}
 			}
+
 		}
 		
 	}
@@ -112,42 +120,38 @@ public class ReporterControler implements IReporter {
 		
 		for (ISuite suite: suites) {
 			
-			// case where suite is finished, we have a result (called directly from TestNG)
-			if (suite.getResults().size() > 0) {
-				for (String suiteString: suite.getResults().keySet()) {
-					ISuiteResult suiteResult = suite.getResults().get(suiteString);
-					
-					Set<ITestResult> resultSet = new HashSet<>(); 
-					resultSet.addAll(suiteResult.getTestContext().getFailedTests().getAllResults());
-					resultSet.addAll(suiteResult.getTestContext().getPassedTests().getAllResults());
-					resultSet.addAll(suiteResult.getTestContext().getSkippedTests().getAllResults());
-					allResultSet.put(suiteResult.getTestContext(), resultSet);
-				}
-				
-			// case where we generate temp results at the end of each test
-			} else {
-				
-				try {
-					Field testRunnersField;
-					try {
-						testRunnersField = SuiteRunner.class.getDeclaredField("testRunners");
-						testRunnersField.setAccessible(true);
-						List<TestRunner> testContexts = (List<TestRunner>) testRunnersField.get(suite);
-						
-						for (TestRunner testContext: testContexts) {
-							
-							Set<ITestResult> resultSet = removeUnecessaryResults(testContext, currentTestResult);
-
-							allResultSet.put(testContext, resultSet);
-						}
-					} catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e) {
-						throw new RuntimeException("TestNG may have change");
-					}
-
-				} catch (ClassCastException e) {}
-				
+			Field testRunnersField;
+			List<TestRunner> testContexts;
+			try {
+				testRunnersField = SuiteRunner.class.getDeclaredField("testRunners");
+				testRunnersField.setAccessible(true);
+				testContexts = (List<TestRunner>) testRunnersField.get(suite);
+			} catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException | ClassCastException e) {
+				throw new RuntimeException("TestNG may have change");
 			}
 			
+			// If at least one test (not a test method, but a TestNG test) is finished, suite contains its results
+			for (String suiteString: suite.getResults().keySet()) {
+				ISuiteResult suiteResult = suite.getResults().get(suiteString);
+				
+				Set<ITestResult> resultSet = new HashSet<>(); 
+				resultSet.addAll(suiteResult.getTestContext().getFailedTests().getAllResults());
+				resultSet.addAll(suiteResult.getTestContext().getPassedTests().getAllResults());
+				resultSet.addAll(suiteResult.getTestContext().getSkippedTests().getAllResults());
+				allResultSet.put(suiteResult.getTestContext(), resultSet);
+			}
+			
+			// complete the suite result with remaining, currently running tests
+			for (TestRunner testContext: testContexts) {
+				if (allResultSet.containsKey(testContext)) {
+					continue;
+				}
+				
+				Set<ITestResult> resultSet = removeUnecessaryResults(testContext, currentTestResult);
+
+				allResultSet.put(testContext, resultSet);
+			}
+
 			for (Set<ITestResult> resultSet: allResultSet.values()) {
 				for (ITestResult testResult: resultSet) {
 					List<TestStep> testSteps = getAllTestSteps(testResult);
@@ -174,16 +178,21 @@ public class ReporterControler implements IReporter {
 	 */
 	public Set<ITestResult> removeUnecessaryResults(ITestContext context, ITestResult currentTestResult) {
 		
-		// get an ordered list of test results so that we keep the last one of each test
+		// copy current results in context so that it does not change during processing when several threads are used
 		List<ITestResult> allResults = new ArrayList<>();
-		allResults.addAll(context.getFailedTests().getAllResults());
-		allResults.addAll(context.getSkippedTests().getAllResults());
-		allResults.addAll(context.getPassedTests().getAllResults());
+		Set<ITestResult> passedTests = new TreeSet<>(context.getPassedTests().getAllResults());
+		Set<ITestResult> failedTests = new TreeSet<>(context.getFailedTests().getAllResults());
+		Set<ITestResult> skippedTests = new TreeSet<>(context.getSkippedTests().getAllResults());
 		
-		if (currentTestResult != null) {
+		allResults.addAll(passedTests);
+		allResults.addAll(failedTests);
+		allResults.addAll(skippedTests);
+		
+		if (currentTestResult != null && currentTestResult.getTestContext().equals(context)) {
 			allResults.add(currentTestResult);
 		}
-		
+
+		// get an ordered list of test results so that we keep the last one of each test
 		allResults = allResults.stream()
 				.sorted((r1, r2) -> Long.compare(r1.getStartMillis(), r2.getStartMillis()))
 				.collect(Collectors.toList());
@@ -198,17 +207,17 @@ public class ReporterControler implements IReporter {
 		// remove results we do not want from context
 		List<ITestResult> resultsToKeep = new ArrayList<>(uniqueResults.values());
 		
-		for (ITestResult result: context.getFailedTests().getAllResults()) {
+		for (ITestResult result: failedTests) {
 			if (!resultsToKeep.contains(result)) {
 				context.getFailedTests().removeResult(result);
 			}
 		}
-		for (ITestResult result: context.getSkippedTests().getAllResults()) {
+		for (ITestResult result: skippedTests) {
 			if (!resultsToKeep.contains(result)) {
 				context.getSkippedTests().removeResult(result);
 			}
 		}
-		for (ITestResult result: context.getPassedTests().getAllResults()) {
+		for (ITestResult result: passedTests) {
 			if (!resultsToKeep.contains(result)) {
 				context.getPassedTests().removeResult(result);
 			}
@@ -219,8 +228,8 @@ public class ReporterControler implements IReporter {
 		resultSet.addAll(context.getPassedTests().getAllResults());
 		resultSet.addAll(context.getSkippedTests().getAllResults());
 		
-		// it's our current result, so we want it
-		if (currentTestResult != null) {
+		// it's our current result, so we want if context matches
+		if (currentTestResult != null && currentTestResult.getTestContext().equals(context)) {
 			resultSet.add(currentTestResult);
 		}
 		
@@ -242,44 +251,49 @@ public class ReporterControler implements IReporter {
 		}
 		
 		// retrieve list of all files used by test steps
-		for (Entry<ITestResult, List<TestStep>> testSteps: TestLogging.getTestsSteps().entrySet()) {
-			
-			// do not keep results of tests that has been retried
-			if (!allResultsSet.contains(testSteps.getKey())) {
-				continue;
-			}
-			
-			for (TestStep testStep: testSteps.getValue()) {
-				usedFiles.addAll(testStep.getAllAttachments());
-			}
+		Map<ITestResult, List<TestStep>> allSteps = TestLogging.getTestsSteps();
+		
+		synchronized (allSteps) { // as we use synchronizedMap
+			for (Entry<ITestResult, List<TestStep>> testSteps: allSteps.entrySet()) {
+				
+				// do not keep results of tests that has been retried
+				if (!allResultsSet.contains(testSteps.getKey())) {
+					continue;
+				}
+				
+				for (TestStep testStep: testSteps.getValue()) {
+					usedFiles.addAll(testStep.getAllAttachments());
+				}
 
-			SeleniumTestsContext testContext = TestNGResultUtils.getSeleniumRobotTestContext(testSteps.getKey());
-			
-			if (testContext == null) {
-				continue;
-			}
-			
-			String outputSubDirectory = new File(testContext.getOutputDirectory()).getName();
-			String outputDirectoryParent = new File(testContext.getOutputDirectory()).getParent();
-			File htmlDir = Paths.get(outputDirectoryParent, outputSubDirectory, "htmls").toFile();
-			File htmlBeforeDir = Paths.get(outputDirectoryParent, "before-" + outputSubDirectory, "htmls").toFile();
-			File screenshotDir = Paths.get(outputDirectoryParent, outputSubDirectory, "screenshots").toFile();
-			File screenshotBeforeDir = Paths.get(outputDirectoryParent, "before-" + outputSubDirectory, "screenshots").toFile();
-			
-			// get list of existing files
-			if (htmlDir.isDirectory()) {
-				allFiles.addAll(Arrays.asList(htmlDir.listFiles()));
-			}
-			if (screenshotDir.isDirectory()) {
-				allFiles.addAll(Arrays.asList(screenshotDir.listFiles()));
-			}
-			if (htmlBeforeDir.isDirectory()) {
-				allFiles.addAll(Arrays.asList(htmlBeforeDir.listFiles()));
-			}
-			if (screenshotBeforeDir.isDirectory()) {
-				allFiles.addAll(Arrays.asList(screenshotBeforeDir.listFiles()));
+				SeleniumTestsContext testContext = TestNGResultUtils.getSeleniumRobotTestContext(testSteps.getKey());
+				
+				if (testContext == null) {
+					continue;
+				}
+				
+				String outputSubDirectory = new File(testContext.getOutputDirectory()).getName();
+				String outputDirectoryParent = new File(testContext.getOutputDirectory()).getParent();
+				File htmlDir = Paths.get(outputDirectoryParent, outputSubDirectory, "htmls").toFile();
+				File htmlBeforeDir = Paths.get(outputDirectoryParent, "before-" + outputSubDirectory, "htmls").toFile();
+				File screenshotDir = Paths.get(outputDirectoryParent, outputSubDirectory, "screenshots").toFile();
+				File screenshotBeforeDir = Paths.get(outputDirectoryParent, "before-" + outputSubDirectory, "screenshots").toFile();
+				
+				// get list of existing files
+				if (htmlDir.isDirectory()) {
+					allFiles.addAll(Arrays.asList(htmlDir.listFiles()));
+				}
+				if (screenshotDir.isDirectory()) {
+					allFiles.addAll(Arrays.asList(screenshotDir.listFiles()));
+				}
+				if (htmlBeforeDir.isDirectory()) {
+					allFiles.addAll(Arrays.asList(htmlBeforeDir.listFiles()));
+				}
+				if (screenshotBeforeDir.isDirectory()) {
+					allFiles.addAll(Arrays.asList(screenshotBeforeDir.listFiles()));
+				}
 			}
 		}
+		
 		
 		for (File file: allFiles) {
 			if (!usedFiles.contains(file)) {

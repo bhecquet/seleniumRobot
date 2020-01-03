@@ -246,9 +246,8 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 	public void testContextWithDataProvider(ITestContext testContext) throws Exception {
 		
 		executeSubTest(5, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDataProvider.testMethod"}, "", "");
-		
-		String mainReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport.html"));
-		mainReportContent = mainReportContent.replace("\n", "").replace("\r",  "");
+
+		String mainReportContent = readSummaryFile();
 		
 		// check that all tests are OK and present into summary file. If test is KO (issue #115), the same context is taken for subsequent test method calls
 		Assert.assertTrue(mainReportContent.matches(".*<i class=\"fa fa-circle circleSuccess\"></i><a href='testMethod/TestReport.html' .*?>testMethod</a>.*"));
@@ -256,20 +255,17 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 		Assert.assertTrue(mainReportContent.matches(".*<i class=\"fa fa-circle circleSuccess\"></i><a href='testMethod-2/TestReport.html' .*?>testMethod-2</a>.*"));
 
 		// check each result file to see if it exists and if it only contains information about this method context (log of this method only)
-		String detailedReportContent1 = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testMethod", "TestReport.html").toFile());
-		detailedReportContent1 = detailedReportContent1.replace("\n", "").replace("\r",  "").replaceAll(">\\s+<", "><");
+		String detailedReportContent1 = readTestMethodResultFile("testMethod");
 		Assert.assertEquals(StringUtils.countMatches(detailedReportContent1, "data written"), 1);
 		Assert.assertTrue(detailedReportContent1.contains("data written: data1"));
 		Assert.assertTrue(detailedReportContent1.contains("Test Details - testMethod with params: (data1)"));
 		
-		String detailedReportContent2 = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testMethod-1", "TestReport.html").toFile());
-		detailedReportContent2 = detailedReportContent2.replace("\n", "").replace("\r",  "").replaceAll(">\\s+<", "><");
+		String detailedReportContent2 = readTestMethodResultFile("testMethod-1");
 		Assert.assertEquals(StringUtils.countMatches(detailedReportContent2, "data written"), 1);
 		Assert.assertTrue(detailedReportContent2.contains("data written: data2"));
 		Assert.assertTrue(detailedReportContent2.contains("Test Details - testMethod-1 with params: (data2)"));
 		
-		String detailedReportContent3 = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testMethod-2", "TestReport.html").toFile());
-		detailedReportContent3 = detailedReportContent3.replace("\n", "").replace("\r",  "").replaceAll(">\\s+<", "><");
+		String detailedReportContent3 = readTestMethodResultFile("testMethod-2");
 		Assert.assertEquals(StringUtils.countMatches(detailedReportContent3, "data written"), 1);
 		Assert.assertTrue(detailedReportContent3.contains("data written: data3"));
 		Assert.assertTrue(detailedReportContent3.contains("Test Details - testMethod-2 with params: (data3)"));
@@ -328,14 +324,26 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 		
 		executeSubTest2(ParallelMode.TESTS);
 		
-		String mainReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport.html"));
-		mainReportContent = mainReportContent.replace("\n", "").replace("\r",  "");
+		String mainReportContent = readSummaryFile();
 		Assert.assertEquals(StringUtils.countMatches(mainReportContent, "class=\"fa fa-circle circleSuccess\">"), 
 							StringUtils.countMatches(mainReportContent, "TestReport.html") - 1);
 		Assert.assertEquals(StringUtils.countMatches(mainReportContent, "TestReport.html"), 9);
 
 		// test1Listener4 fails as expected
 		Assert.assertTrue(mainReportContent.matches(".*<i class\\=\"fa fa-circle circleSkipped\"></i><a href\\='test1Listener4/TestReport\\.html'.*?>test1Listener4</a>.*"));
+
+		// issue #312: check that result files have been generated at least twice (one during test run and one at the end)
+		String logs = readSeleniumRobotLogFile().replace("\\", "/");
+		Assert.assertTrue(StringUtils.countMatches(logs, "test1Listener2/PERF-result.xml") > 1);
+		Assert.assertTrue(StringUtils.countMatches(logs, "test2Listener1/PERF-result.xml") > 1);
+		Assert.assertTrue(StringUtils.countMatches(logs, "test1Listener1/PERF-result.xml") > 1);
+		Assert.assertTrue(StringUtils.countMatches(logs, "test2Listener1-1/PERF-result.xml") > 1);
+		Assert.assertTrue(StringUtils.countMatches(logs, "test2Listener1-2/PERF-result.xml") > 1);
+		Assert.assertTrue(StringUtils.countMatches(logs, "test1Listener3/PERF-result.xml") > 1);
+		Assert.assertTrue(StringUtils.countMatches(logs, "test1Listener3-1/PERF-result.xml") > 1);
+		Assert.assertTrue(StringUtils.countMatches(logs, "test1Listener4/PERF-result.xml") > 1);
+		Assert.assertTrue(StringUtils.countMatches(logs, "test1Listener1-1/PERF-result.xml") > 1);
+		Assert.assertEquals(StringUtils.countMatches(logs, "test-output/SeleniumTestReport.html"), 10); // 1 per executed test + 1 for final generation
 	}
 	
 	@Test(groups={"it"})
@@ -343,14 +351,26 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 		
 		executeSubTest2(ParallelMode.CLASSES);
 		
-		String mainReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport.html"));
-		mainReportContent = mainReportContent.replace("\n", "").replace("\r",  "");
+		String mainReportContent = readSummaryFile();
 		Assert.assertEquals(StringUtils.countMatches(mainReportContent, "class=\"fa fa-circle circleSuccess\">"), 
 				StringUtils.countMatches(mainReportContent, "TestReport.html") - 1);
 		Assert.assertEquals(StringUtils.countMatches(mainReportContent, "TestReport.html"), 9);
 
 		// test1Listener4 fails as expected
 		Assert.assertTrue(mainReportContent.matches(".*<i class\\=\"fa fa-circle circleSkipped\"></i><a href\\='test1Listener4/TestReport\\.html'.*?>test1Listener4</a>.*"));
+		
+		// issue #312: check that result files have been generated at least twice (one during test run and one at the end)
+		String logs = readSeleniumRobotLogFile().replace("\\", "/");
+		Assert.assertTrue(StringUtils.countMatches(logs, "test1Listener2/PERF-result.xml") > 1);
+		Assert.assertTrue(StringUtils.countMatches(logs, "test2Listener1/PERF-result.xml") > 1);
+		Assert.assertTrue(StringUtils.countMatches(logs, "test1Listener1/PERF-result.xml") > 1);
+		Assert.assertTrue(StringUtils.countMatches(logs, "test2Listener1-1/PERF-result.xml") > 1);
+		Assert.assertTrue(StringUtils.countMatches(logs, "test2Listener1-2/PERF-result.xml") > 1);
+		Assert.assertTrue(StringUtils.countMatches(logs, "test1Listener3/PERF-result.xml") > 1);
+		Assert.assertTrue(StringUtils.countMatches(logs, "test1Listener3-1/PERF-result.xml") > 1);
+		Assert.assertTrue(StringUtils.countMatches(logs, "test1Listener4/PERF-result.xml") > 1);
+		Assert.assertTrue(StringUtils.countMatches(logs, "test1Listener1-1/PERF-result.xml") > 1);
+		Assert.assertEquals(StringUtils.countMatches(logs, "test-output/SeleniumTestReport.html"), 10); // 1 per executed test + 1 for final generation
 	}
 	
 	@Test(groups={"it"})
@@ -358,14 +378,26 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 		
 		executeSubTest2(ParallelMode.METHODS);
 		
-		String mainReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport.html"));
-		mainReportContent = mainReportContent.replace("\n", "").replace("\r",  "");
+		String mainReportContent = readSummaryFile();
 		Assert.assertEquals(StringUtils.countMatches(mainReportContent, "class=\"fa fa-circle circleSuccess\">"), 
 				StringUtils.countMatches(mainReportContent, "TestReport.html") - 1);
 		Assert.assertEquals(StringUtils.countMatches(mainReportContent, "TestReport.html"), 9);
 		
 		// test1Listener4 fails as expected
 		Assert.assertTrue(mainReportContent.matches(".*<i class\\=\"fa fa-circle circleSkipped\"></i><a href\\='test1Listener4/TestReport\\.html'.*?>test1Listener4</a>.*"));
+
+		// issue #312: check that result files have been generated at least twice (one during test run and one at the end)
+		String logs = readSeleniumRobotLogFile().replace("\\", "/");
+		Assert.assertTrue(StringUtils.countMatches(logs, "test1Listener2/PERF-result.xml") > 1);
+		Assert.assertTrue(StringUtils.countMatches(logs, "test2Listener1/PERF-result.xml") > 1);
+		Assert.assertTrue(StringUtils.countMatches(logs, "test1Listener1/PERF-result.xml") > 1);
+		Assert.assertTrue(StringUtils.countMatches(logs, "test2Listener1-1/PERF-result.xml") > 1);
+		Assert.assertTrue(StringUtils.countMatches(logs, "test2Listener1-2/PERF-result.xml") > 1);
+		Assert.assertTrue(StringUtils.countMatches(logs, "test1Listener3/PERF-result.xml") > 1);
+		Assert.assertTrue(StringUtils.countMatches(logs, "test1Listener3-1/PERF-result.xml") > 1);
+		Assert.assertTrue(StringUtils.countMatches(logs, "test1Listener4/PERF-result.xml") > 1);
+		Assert.assertTrue(StringUtils.countMatches(logs, "test1Listener1-1/PERF-result.xml") > 1);
+		Assert.assertEquals(StringUtils.countMatches(logs, "test-output/SeleniumTestReport.html"), 10); // 1 per executed test + 1 for final generation
 	}
 	
 	/**

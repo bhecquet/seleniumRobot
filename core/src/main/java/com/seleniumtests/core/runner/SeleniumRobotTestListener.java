@@ -67,7 +67,6 @@ import com.seleniumtests.reporter.logger.TestLogging;
 import com.seleniumtests.reporter.logger.TestStep;
 import com.seleniumtests.reporter.reporters.CommonReporter;
 import com.seleniumtests.reporter.reporters.ReporterControler;
-import com.seleniumtests.reporter.reporters.SeleniumTestsReporter2;
 import com.seleniumtests.util.FileUtility;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
@@ -157,7 +156,7 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 			
 			
 		} catch (Throwable e) {
-			// do not crash for a temp report
+			logger.error("Error generating temp report", e);
 		}
 	}
 
@@ -443,7 +442,7 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 			result.setThrowable(merged);
 		}
 
-		// move test for passedTests to failedTests if test is not already in failed tests
+		// move test from passedTests to failedTests if test is not already in failed tests
 		if (result.getTestContext().getPassedTests().getAllMethods().contains(result.getMethod())) {
 			result.getTestContext().getPassedTests().removeResult(result);
 			result.getTestContext().getFailedTests().addResult(result, result.getMethod());

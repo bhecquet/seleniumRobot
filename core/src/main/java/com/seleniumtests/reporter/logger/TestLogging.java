@@ -124,6 +124,10 @@ public class TestLogging {
     }
     
     // -------------------- Methods below should not be used directly inside test -----------------
+    /**
+     * /!\ When iterating over test steps, it MUST be put in a synchronized block!! 
+     * @return
+     */
     public static Map<ITestResult, List<TestStep>> getTestsSteps() {
 		return testsSteps;
 	}
