@@ -524,6 +524,10 @@ public class HtmlElement extends Element implements WebElement, Locatable {
      */
     protected Object executeScript(String javascript, WebElement element, Object... args) {
 
+    	if (element == null) {
+    		throw new ScenarioException("element should have been previously searched"); 
+    	}
+    	
     	if (element instanceof HtmlElement) {
     		throw new ScenarioException("Only real elements should be provided, not HtmlElement"); 
     	}
@@ -1093,7 +1097,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     protected void blur() {
     	if (SeleniumTestsContextManager.isWebTest() && "input".equalsIgnoreCase(element.getTagName())) {
     		try {
-    			executeScript("arguments[0].blur();");
+    			executeScript("arguments[0].blur();", element);
     		} catch (Exception e) {	
     			logger.error(e);
     		}
