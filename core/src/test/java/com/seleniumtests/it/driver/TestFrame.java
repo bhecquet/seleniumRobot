@@ -96,7 +96,7 @@ public class TestFrame extends GenericMultiBrowserTest {
 	
 	@Test(groups={"it"})
 	public void testFindElements() {
-		Assert.assertEquals(DriverTestPage.rows.findElements().size(), 2);
+		Assert.assertEquals(DriverTestPage.rows.findElements().size(), 4);
 	}
 	
 	@Test(groups={"it"})
