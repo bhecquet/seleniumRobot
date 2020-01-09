@@ -30,7 +30,6 @@ import org.testng.annotations.Test;
 
 import com.seleniumtests.GenericTest;
 import com.seleniumtests.core.SeleniumTestsContextManager;
-import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.driver.TestType;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.it.driver.support.pages.DriverTestPage;
@@ -149,6 +148,8 @@ public class TestByC extends GenericTest {
 		new TextFieldElement("", ByC.attribute("attr*", "ttribut")).sendKeys("element found by attribute");
 		Assert.assertEquals(DriverTestPage.textSelectedId.getValue(), "element found by attribute");
 	}
+	
+	
 	
 	@Test(groups={"it"})
 	public void testFindElemenstByPartialAttribute() {
@@ -306,5 +307,107 @@ public class TestByC extends GenericTest {
 	public void testFindElementsBySeveralCriteriaNothingFound2() { 
 		SeleniumTestsContextManager.getThreadContext().setReplayTimeout(7);
 		Assert.assertEquals(new TextFieldElement("", ByC.and(By.tagName("noElement"), By.name("textField"))).findElements().size(), 0);
+	}
+
+	@Test(groups={"it"})
+	public void testFindElementById() { 
+		Assert.assertEquals(new TextFieldElement("", ByC.xId("select")).getTagName(), "select");
+	}
+	@Test(groups={"it"})
+	public void testFindElementsById() { 
+		Assert.assertEquals(new TextFieldElement("", ByC.xId("buttonServerDelay")).findElements().size(), 1);
+	}
+	@Test(groups={"it"})
+	public void testFindElementRelativeById() {
+		Assert.assertEquals(new HtmlElement("", By.id("parentDiv")).findElement(ByC.xId("textSelectedTextParent")).getAttribute("name"), "textSelectedText");
+	}
+	@Test(groups={"it"})
+	public void testFindElementsRelativeById() {
+		Assert.assertEquals(new HtmlElement("", By.id("parentDiv")).findElement(ByC.xId("textSelectedTextParent")).findElements().size(), 1);
+	}
+	
+	@Test(groups={"it"})
+	public void testFindElementByName() { 
+		Assert.assertEquals(new TextFieldElement("", ByC.xName("divFindName")).getTagName(), "div");
+	}
+	@Test(groups={"it"})
+	public void testFindElementsByName() { 
+		Assert.assertEquals(new TextFieldElement("", ByC.xName("divFindName")).findElements().size(), 2);
+	}
+	@Test(groups={"it"})
+	public void testFindElementRelativeByName() {
+		Assert.assertEquals(new HtmlElement("", By.id("parentDiv")).findElement(ByC.xName("radioClick")).getAttribute("id"), "radioClickParent");
+	}
+	@Test(groups={"it"})
+	public void testFindElementsRelativeByName() {
+		Assert.assertEquals(new HtmlElement("", By.id("parentDiv")).findElement(ByC.xName("option")).findElements().size(), 2);
+	}
+
+	@Test(groups={"it"})
+	public void testFindElementByLinkText() { 
+		Assert.assertEquals(new TextFieldElement("", ByC.xLinkText("My link")).getTagName(), "a");
+	}
+	@Test(groups={"it"})
+	public void testFindElementsByLinkText() { 
+		Assert.assertEquals(new TextFieldElement("", ByC.xLinkText("My link")).findElements().size(), 2);
+	}
+	@Test(groups={"it"})
+	public void testFindElementRelativeByLinkText() {
+		Assert.assertEquals(new HtmlElement("", By.id("parentDiv")).findElement(ByC.xLinkText("My link Parent")).getAttribute("id"), "linkParent");
+	}
+	@Test(groups={"it"})
+	public void testFindElementsRelativeByLinkText() {
+		Assert.assertEquals(new HtmlElement("", By.id("parentDiv")).findElement(ByC.xLinkText("My link Parent")).findElements().size(), 1);
+	}
+	
+	@Test(groups={"it"})
+	public void testFindElementByPartialLinkText() { 
+		Assert.assertEquals(new TextFieldElement("", ByC.xPartialLinkText("My lin")).getTagName(), "a");
+	}
+	@Test(groups={"it"})
+	public void testFindElementsByPartialLinkText() { 
+		Assert.assertEquals(new TextFieldElement("", ByC.xPartialLinkText("My lin")).findElements().size(), 5);
+	}
+	@Test(groups={"it"})
+	public void testFindElementRelativeByPartialLinkText() {
+		Assert.assertEquals(new HtmlElement("", By.id("parentDiv")).findElement(ByC.xPartialLinkText("My link")).getAttribute("id"), "linkParent");
+	}
+	@Test(groups={"it"})
+	public void testFindElementsRelativeByPartialLinkText() {
+		Assert.assertEquals(new HtmlElement("", By.id("parentDiv")).findElement(ByC.xPartialLinkText("My link")).findElements().size(), 1);
+	}
+
+	@Test(groups={"it"})
+	public void testFindElementByTagName() { 
+		Assert.assertEquals(new TextFieldElement("", ByC.xTagName("div")).getTagName(), "div");
+	}
+	@Test(groups={"it"})
+	public void testFindElementsByTagName() { 
+		Assert.assertTrue(new TextFieldElement("", ByC.xTagName("h3")).findElements().size() > 18);
+	}
+	@Test(groups={"it"})
+	public void testFindElementRelativeByTagName() {
+		Assert.assertEquals(new HtmlElement("", By.id("parentDiv")).findElement(ByC.xTagName("button")).getAttribute("name"), "resetButton");
+	}
+	@Test(groups={"it"})
+	public void testFindElementsRelativeByTagName() {
+		Assert.assertEquals(new HtmlElement("", By.id("parentDiv")).findElement(ByC.xTagName("option")).findElements().size(), 2);
+	}
+	
+	@Test(groups={"it"})
+	public void testFindElementByClassName() { 
+		Assert.assertEquals(new TextFieldElement("", ByC.xClassName("language_selector")).getTagName(), "input");
+	}
+	@Test(groups={"it"})
+	public void testFindElementsByClassName() { 
+		Assert.assertEquals(new TextFieldElement("", ByC.xClassName("language_selector")).findElements().size(), 1);
+	}
+	@Test(groups={"it"})
+	public void testFindElementRelativeByClassName() {
+		Assert.assertEquals(new HtmlElement("", By.id("parentDiv")).findElement(ByC.xClassName("myTable")).getTagName(), "table");
+	}
+	@Test(groups={"it"})
+	public void testFindElementsRelativeByClassName() {
+		Assert.assertEquals(new HtmlElement("", By.id("parentDiv")).findElement(ByC.xClassName("myTable")).findElements().size(), 1);
 	}
 }

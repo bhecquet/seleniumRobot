@@ -19,7 +19,6 @@ package com.seleniumtests.uipage;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -206,6 +205,71 @@ public class ByC extends By {
 	public static ByC and(By ... bies) {
 		return new And(bies);
 	}
+
+	/**
+	 * Search an element by id using xpath
+	 * @param id
+	 *            The value of the "id" attribute to search for.
+	 * @return A By which locates elements by the value of the "id" attribute.
+	 */
+	public static By xId(String id) {
+		return new ByAttribute("id", id);
+	}
+
+	/**
+	 * Search an element by link text using xpath
+	 * @param linkText
+	 *            The exact text to match against.
+	 * @return A By which locates A elements by the exact text it displays.
+	 */
+	public static By xLinkText(String linkText) {
+		return new ByText(linkText, "*", false);
+	}
+
+	/**
+	 * Search an element by partial link text using xpath
+	 * @param partialLinkText
+	 *            The partial text to match against
+	 * @return a By which locates elements that contain the given link text.
+	 */
+	public static By xPartialLinkText(String partialLinkText) {
+		return new ByText(partialLinkText, "*", true);
+	}
+
+	/**
+	 * Search an element by name using xpath
+	 * @param name
+	 *            The value of the "name" attribute to search for.
+	 * @return A By which locates elements by the value of the "name" attribute.
+	 */
+	public static By xName(String name) {
+		return new ByAttribute("name", name);
+	}
+
+	/**
+	 * Search an element by tag name using xpath
+	 * @param tagName
+	 *            The element's tag name.
+	 * @return A By which locates elements by their tag name.
+	 */
+	public static By xTagName(String tagName) {
+		return new ByXTagName(tagName);
+	}
+
+	/**
+	 * Find elements based on the value of the "class" attribute. If an element has
+	 * multiple classes, then this will match against each of them. For example, if
+	 * the value is "one two onone", then the class names "one" and "two" will
+	 * match.
+	 *
+	 * @param className
+	 *            The value of the "class" attribute to search for.
+	 * @return A By which locates elements by the value of the "class" attribute.
+	 */
+	public static By xClassName(String className) {
+		return new ByXClassName(className);
+	}
+
 
 	public static class ByLabelForward extends ByC implements Serializable {
 
@@ -483,6 +547,81 @@ public class ByC extends By {
 			return String.join(" and ", biesString);
 		}
 	}
+
+	  public static class ByXTagName extends By implements Serializable {
+
+	    private static final long serialVersionUID = 4699295846984948351L;
+
+	    private final String tagName;
+
+	    public ByXTagName(String tagName) {
+	      if (tagName == null) {
+	        throw new IllegalArgumentException("Cannot find elements when the tag name is null.");
+	      }
+
+	      this.tagName = tagName;
+	    }
+
+	    @Override
+	    public List<WebElement> findElements(SearchContext context) {
+	      return ((FindsByXPath) context).findElementsByXPath(".//" + tagName);
+	    }
+
+	    @Override
+	    public WebElement findElement(SearchContext context) {
+	      return ((FindsByXPath) context).findElementByXPath(".//" + tagName);
+	    }
+
+	    @Override
+	    public String toString() {
+	      return "By.tagName: " + tagName;
+	    }
+	  }
+
+	  public static class ByXClassName extends By implements Serializable {
+
+	    private static final long serialVersionUID = -8737882849130394673L;
+
+	    private final String className;
+
+	    public ByXClassName(String className) {
+	      if (className == null) {
+	        throw new IllegalArgumentException(
+	            "Cannot find elements when the class name expression is null.");
+	      }
+
+	      this.className = className;
+	    }
+
+	    @Override
+	    public List<WebElement> findElements(SearchContext context) {
+	      return ((FindsByXPath) context).findElementsByXPath(".//*[" + containingWord("class", className) + "]");
+	    }
+
+	    @Override
+	    public WebElement findElement(SearchContext context) {
+	      return ((FindsByXPath) context).findElementByXPath(".//*[" + containingWord("class", className) + "]");
+	    }
+
+	    /**
+	     * Generate a partial XPath expression that matches an element whose specified attribute
+	     * contains the given CSS word. So to match &lt;div class='foo bar'&gt; you would say "//div[" +
+	     * containingWord("class", "foo") + "]".
+	     *
+	     * @param attribute name
+	     * @param word name
+	     * @return XPath fragment
+	     */
+	    private String containingWord(String attribute, String word) {
+	      return "contains(concat(' ',normalize-space(@" + attribute + "),' '),' " + word + " ')";
+	    }
+
+	    @Override
+	    public String toString() {
+	      return "By.className: " + className;
+	    }
+	  }
+
 	
 	protected String escapeQuotes(String aString) {
 		if (!aString.contains("'")) {
