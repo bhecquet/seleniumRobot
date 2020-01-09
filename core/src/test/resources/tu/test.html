@@ -57,9 +57,9 @@
 	
 	<h3>Test select</h3>
 	<select id="select" name="select" onChange="javascript:addText('textSelectedId', this.selectedIndex);javascript:addText('textSelectedValue', this.options[selectedIndex].value);javascript:addText('textSelectedText', this.options[selectedIndex].text);">
-		<option value="opt1">option1</option>
-		<option value="opt2">option2</option>
-		<option value="opt3">option numero 3</option>
+		<option value="opt1" name="option">option1</option>
+		<option value="opt2" name="option">option2</option>
+		<option value="opt3" name="option">option numero 3</option>
 	</select>
 	
 	<div id="labelTests">
@@ -182,14 +182,14 @@
 		<input type="image" name="image" src="images/bouton_enregistrer.png" width="90px" onclick="javascript:addText('textInParent', 'imageParent');">
 		<br/>
 		<select name="select" onChange="javascript:addText('textSelectedTextParent', this.options[selectedIndex].text);">
-			<option value="opt1">option1Parent</option>
-			<option value="opt2">option2Parent</option>
+			<option value="opt1" name="option">option1Parent</option>
+			<option value="opt2" name="option">option2Parent</option>
 		</select>
 		<input id="textSelectedTextParent" name="textSelectedText"/>
 		<br/>
-		<a href="http://www.googleFrance.fr" name="googleLink" target="_blank">My link Parent</a>
+		<a href="http://www.googleFrance.fr" name="googleLink" target="_blank" id="linkParent">My link Parent</a>
 		<br/>
-		<table id="table" border="1">
+		<table id="table" border="1" class="myTable">
 			<tr>
 				<th>Id</th>
 				<th>Name</th>
