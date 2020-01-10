@@ -17,9 +17,6 @@
  */
 package com.seleniumtests.it.driver;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-
 import org.openqa.selenium.NoSuchElementException;
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;

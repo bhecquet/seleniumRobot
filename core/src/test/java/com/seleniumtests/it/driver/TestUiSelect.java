@@ -27,6 +27,7 @@ import org.testng.annotations.Test;
 
 import com.seleniumtests.GenericTest;
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.it.driver.support.pages.DriverTestPage;
 
@@ -193,6 +194,44 @@ public class TestUiSelect extends GenericTest {
 		DriverTestPage.ulliListTrigger.click();
 		DriverTestPage.selectUlLiList.selectByText("English");
 		Assert.assertEquals(DriverTestPage.ulliListTrigger.getValue(), "English");
+	}
+	
+	@Test(groups={"it"})
+	public void testSelectUlListByValue() {
+		DriverTestPage.ulliListTrigger.click();
+		DriverTestPage.selectUlLiList.selectByValue("deu");
+		Assert.assertEquals(DriverTestPage.ulliListTrigger.getValue(), "Deutsch");
+	}
+	
+	@Test(groups={"it"})
+	public void testSelectUlListByIndex() {
+		DriverTestPage.ulliListTrigger.click();
+		DriverTestPage.selectUlLiList.selectByIndex(0);
+		Assert.assertEquals(DriverTestPage.ulliListTrigger.getValue(), "English");
+	}
+	
+	@Test(groups={"it"}, expectedExceptions=UnsupportedOperationException.class)
+	public void testDeSelectUlListByIndex() {
+		DriverTestPage.ulliListTrigger.click();
+		DriverTestPage.selectUlLiList.selectByIndex(0);
+		Assert.assertEquals(DriverTestPage.ulliListTrigger.getValue(), "English");
+		DriverTestPage.selectUlLiList.deselectByIndex(0);
+	}
+	
+	@Test(groups={"it"}, expectedExceptions=UnsupportedOperationException.class)
+	public void testDeSelectUlListByValue() {
+		DriverTestPage.ulliListTrigger.click();
+		DriverTestPage.selectUlLiList.selectByIndex(0);
+		Assert.assertEquals(DriverTestPage.ulliListTrigger.getValue(), "English");
+		DriverTestPage.selectUlLiList.deselectByValue("eng");
+	}
+	
+	@Test(groups={"it"}, expectedExceptions=UnsupportedOperationException.class)
+	public void testDeSelectUlListByText() {
+		DriverTestPage.ulliListTrigger.click();
+		DriverTestPage.selectUlLiList.selectByIndex(0);
+		Assert.assertEquals(DriverTestPage.ulliListTrigger.getValue(), "English");
+		DriverTestPage.selectUlLiList.deselectByText("English");
 	}
 	
 	@Test(groups={"it"})
