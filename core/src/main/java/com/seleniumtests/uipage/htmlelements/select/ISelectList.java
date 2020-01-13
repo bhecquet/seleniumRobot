@@ -13,6 +13,8 @@ public interface ISelectList {
     public void finalizeAction();
     
     public String getOptionValue(WebElement option);
+    
+    public String getOptionText(WebElement option);
 
     /**
      * @return All selected options belonging to this select tag

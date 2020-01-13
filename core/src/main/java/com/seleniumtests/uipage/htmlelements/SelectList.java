@@ -33,6 +33,7 @@ import com.seleniumtests.uipage.htmlelements.select.AngularMaterialSelect;
 import com.seleniumtests.uipage.htmlelements.select.ISelectList;
 import com.seleniumtests.uipage.htmlelements.select.ListSelect;
 import com.seleniumtests.uipage.htmlelements.select.NativeSelect;
+import com.seleniumtests.uipage.htmlelements.select.SalesforceLigntningSelect;
 
 import net.ricecode.similarity.JaroWinklerStrategy;
 import net.ricecode.similarity.SimilarityStrategy;
@@ -86,7 +87,7 @@ public class SelectList extends HtmlElement {
         super.findElement(true);
         
         // search the right select list handler
-        for (Class<? extends ISelectList> selectClass: Arrays.asList(NativeSelect.class, AngularMaterialSelect.class, ListSelect.class)) {
+        for (Class<? extends ISelectList> selectClass: Arrays.asList(NativeSelect.class, AngularMaterialSelect.class, ListSelect.class, SalesforceLigntningSelect.class)) {
         	try {
 				ISelectList selectInstance = selectClass.getConstructor(WebElement.class, FrameElement.class).newInstance(element, frameElement);
 				if (selectInstance.isApplicable()) {
@@ -181,7 +182,7 @@ public class SelectList extends HtmlElement {
     	List<String> textList = new ArrayList<>();
     	
         for (WebElement option : allSelectedOptions) {
-        	textList.add(option.getText());
+        	textList.add(selectImplementation.getOptionText(option));
         }
 
         String[] texts = new String[textList.size()];

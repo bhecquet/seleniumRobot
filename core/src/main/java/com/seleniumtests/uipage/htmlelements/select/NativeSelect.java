@@ -47,6 +47,11 @@ public class NativeSelect implements ISelectList {
 	}
 
 	@Override
+	public String getOptionText(WebElement option) {
+		return option.getText();
+	}
+
+	@Override
 	public List<WebElement> getAllSelectedOptions() {
 		List<WebElement> toReturn = new ArrayList<>();
 		
