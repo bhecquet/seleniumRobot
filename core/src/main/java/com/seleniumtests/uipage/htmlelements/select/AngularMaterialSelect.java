@@ -15,9 +15,9 @@ import com.seleniumtests.uipage.htmlelements.HtmlElement;
 
 public class AngularMaterialSelect implements ISelectList {
 
-	private List<WebElement> options;
-	private WebElement parentElement;
-	private FrameElement frameElement;
+	protected List<WebElement> options;
+	protected WebElement parentElement;
+	protected FrameElement frameElement;
 	
 
 	public AngularMaterialSelect(WebElement parentElement, FrameElement frameElement) {
@@ -56,6 +56,11 @@ public class AngularMaterialSelect implements ISelectList {
 	@Override
 	public String getOptionValue(WebElement option) {
 		return option.getAttribute("value");
+	}
+	
+	@Override
+	public String getOptionText(WebElement option) {
+		return option.getText();
 	}
 
 	@Override

@@ -2,9 +2,9 @@
 
 
 	<difference>
-		<className>**/util/logging/SeleniumRobotLogger</className>
-		<differenceType>6011</differenceType>
-		<field>UNIQUE_METHOD_NAME</field>
+		<className>**/uipage/htmlelements/SelectList</className>
+		<differenceType>6001</differenceType>
+		<field>select</field>
 		<justification>internal use</justification>
 	</difference>
 </differences>

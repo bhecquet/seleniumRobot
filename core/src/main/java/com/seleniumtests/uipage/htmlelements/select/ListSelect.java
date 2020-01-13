@@ -47,6 +47,11 @@ public class ListSelect implements ISelectList {
 	}
 
 	@Override
+	public String getOptionText(WebElement option) {
+		return option.getText();
+	}
+	
+	@Override
 	public List<WebElement> getAllSelectedOptions() {
 		return new ArrayList<>();
 	}
