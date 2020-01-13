@@ -304,7 +304,7 @@ public class TestFrameElement extends MockitoTest {
 		el.getSelectedText();
 		
 		verify(locator).frame(any(WebElement.class));
-		verify(locator, times(3)).defaultContent();
+		verify(locator, times(1)).defaultContent();
 	}
 	@Test(groups={"ut"})
 	public void testSelectListOutsideFrame() throws Exception {
