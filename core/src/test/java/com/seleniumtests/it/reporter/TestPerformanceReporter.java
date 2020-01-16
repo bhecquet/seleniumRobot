@@ -238,6 +238,7 @@ public class TestPerformanceReporter extends ReporterTest {
 		
 		// check info is present in PERF-result.xml
 		String detailedReportContent = readTestMethodPerfFile("testWithInfo1");
+		System.out.println(detailedReportContent);
 		Assert.assertTrue(detailedReportContent.contains("<infos>" + 
 				"<info key=\"bugé &lt;&quot;ID&quot;&gt;\" value=\"12\"></info>" + 
 				"</infos>"));
