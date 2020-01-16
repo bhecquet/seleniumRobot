@@ -19,6 +19,8 @@ package com.seleniumtests.core.utils;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.testng.ITestResult;
 
@@ -33,6 +35,7 @@ public class TestNGResultUtils {
 	private static final String TEST_CONTEXT = "testContext";
 	private static final String RETRY = "retry";
 	private static final String NO_MORE_RETRY = "noMoreRetry";
+	private static final String TEST_INFO = "testInfo";
 
 	private TestNGResultUtils() {
 		// nothing to do
@@ -133,5 +136,24 @@ public class TestNGResultUtils {
     
     public static void setNoMoreRetry(ITestResult testNGResult, Boolean noMoreRetry) {
     	testNGResult.setAttribute(NO_MORE_RETRY, noMoreRetry);
+    }
+    
+    // information about test
+    public static Map<String, String> getTestInfo(ITestResult testNGResult) {
+    	Map<String, String> testInfo = (Map<String, String>) testNGResult.getAttribute(TEST_INFO);
+    	if (testInfo != null) {
+    		return testInfo;
+    	} else {
+    		return new HashMap<>();
+    	}
+    }
+    
+    public static void setTestInfo(ITestResult testNGResult, String key, String value) {
+    	Map<String, String> testInfo = (Map<String, String>) testNGResult.getAttribute(TEST_INFO);
+    	if (testInfo == null) {
+    		testInfo = new HashMap<>();
+    	} 
+    	testInfo.put(key, value);
+    	testNGResult.setAttribute(TEST_INFO, testInfo);
     }
 }

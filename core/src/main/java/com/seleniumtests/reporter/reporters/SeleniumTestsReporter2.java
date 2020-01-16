@@ -27,6 +27,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -322,6 +323,9 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 	 * @param testResult
 	 * @param resourcesFromCdn		if true (optimizeReport), resources are linked from CDN
 	 */
+	public void generateSingleTestReport(ITestResult testResult) {
+		generateSingleTestReport(testResult, false);
+	}
 	public void generateSingleTestReport(ITestResult testResult, boolean resourcesFromCdn) {
 
 		// issue #81: recreate test context from this context (due to multithreading, this context may be null if parallel testing is done)
@@ -355,6 +359,8 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 			
 		// build result list for each TestNG test
 		Map<ITestContext, List<ITestResult>> methodResultsMap = new LinkedHashMap<>();
+		Map<ITestResult, Map<String, String>> testInfosMap = new HashMap<>();
+		Set<String> allInfoKeys = new HashSet<>();
 		
 		for (Entry<ITestContext, Set<ITestResult>> entry: resultSet.entrySet()) {
 			 List<ITestResult> methodResults = entry.getValue().stream()
@@ -373,6 +379,11 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 
 				result.setAttribute(METHOD_RESULT_FILE_NAME, fileName);
 				TestNGResultUtils.setUniqueTestName(result, getTestName(result)); // be sure test name is initialized
+				
+				// add test info
+				Map<String, String> testInfos = TestNGResultUtils.getTestInfo(result);
+				testInfosMap.put(result, testInfos);
+				allInfoKeys.addAll(testInfos.keySet());
 			}
 			
 			methodResultsMap.put(entry.getKey(), methodResults);
@@ -385,10 +396,14 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 			VelocityContext context = new VelocityContext();
 			
 			Map<ITestResult, List<TestStep>> allSteps = TestLogging.getTestsSteps();
+			List<String> allSortedInfoKeys = new ArrayList<>(allInfoKeys);
+			allSortedInfoKeys.sort(null);
 
 			synchronized (allSteps) { // as we use a synchronizedMap and we iterate on it
 				context.put("tests", methodResultsMap);
 				context.put("steps", allSteps);
+				context.put("infos", testInfosMap);
+				context.put("infoKeys", allSortedInfoKeys);
 
 				StringWriter writer = new StringWriter();
 				t.merge(context, writer);
@@ -515,16 +530,16 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 			
 			// Log URL for web test and app info for app test
 			} else if (testType.family().equals(TestType.WEB)) {
-				velocityContext.put(APPLICATION_TYPE, "Browser :");
+				velocityContext.put(APPLICATION_TYPE, "Browser");
 				velocityContext.put(APPLICATION, browser);
 			} else if (testType.family().equals(TestType.APP)) {
 				
 				// Either app Or app package and app activity is specified to run test on app
 				if (StringUtils.isNotBlank(appPackage)) {
-					velocityContext.put(APPLICATION_TYPE, "App Package :");
+					velocityContext.put(APPLICATION_TYPE, "App Package");
 					velocityContext.put(APPLICATION, appPackage);
 				} else  if (StringUtils.isNotBlank(app)) {
-					velocityContext.put(APPLICATION_TYPE, "App :");
+					velocityContext.put(APPLICATION_TYPE, "App");
 					velocityContext.put(APPLICATION, app);
 				} 
 			} else if (testType.family().equals(TestType.NON_GUI)) {
@@ -570,7 +585,7 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 			
 			velocityContext.put("testName", testName);
 			velocityContext.put("description", testResult.getMethod().getDescription());
-			
+			velocityContext.put("testInfos", TestNGResultUtils.getTestInfo(testResult));
 			
 			// Application information
 			fillContextWithTestParams(velocityContext);       

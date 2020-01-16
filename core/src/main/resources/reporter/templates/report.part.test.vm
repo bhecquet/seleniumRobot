@@ -2,8 +2,31 @@
   	<div class="row">
     	<div class="col-xs-12">
     		<h4> Test Details - $testName</h4>
-    		#if ($description)
-    			<pre>$description</pre>
-    		#end
-      		<p><b>$applicationType </b> $application<br/></p>
+    		<table class="table table-bordered table-condensed">
+	    		#if ($description)
+	    			<tr>
+	    				<th width="200px">Description</th>
+	    				<td>$description</td>
+	    			</tr>
+	    		#end
+	    		#if ($applicationType)
+	    			<tr>
+	    				<th>Application type</th>
+	    				<td>$applicationType</td>
+	    			</tr>
+	    			<tr>
+	    				<th>Application</th>
+	    				<td>$application</td>
+	    			</tr>
+	    		#end
+      		
+	      		#if ($testInfos)
+      				#foreach ($testInfo in $testInfos.entrySet())
+      					<tr>
+      						<th>$testInfo.key</th>
+      						<td>$testInfo.value</td>
+      					</tr>
+      				#end
+	      		#end
+	      	</table>
       		

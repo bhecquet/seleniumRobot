@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.testng.IRetryAnalyzer;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Listeners;
@@ -32,7 +31,7 @@ import org.testng.annotations.Listeners;
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.TestTasks;
-import com.seleniumtests.core.testretry.TestRetryAnalyzer;
+import com.seleniumtests.core.utils.TestNGResultUtils;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.reporter.logger.TestLogging;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
@@ -181,6 +180,12 @@ public class SeleniumRobotTestPlan {
      */
     public void increaseMaxRetry() {
     	SeleniumRobotTestListener.increaseMaxRetry();
-    	
+    }
+    
+    /**
+     * Add a information to the test, that will be available in report files at test level
+     */
+    public void addTestInfo(String key, String value) {
+    	TestLogging.logTestInfo(key, value);
     }
 }

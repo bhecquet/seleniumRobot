@@ -111,6 +111,9 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		Assert.assertTrue(StringUtils.countMatches(logs, "testInError/PERF-result.xml") > 1);
 		Assert.assertTrue(StringUtils.countMatches(logs, "testAndSubActions/PERF-result.xml") > 1);
 		Assert.assertTrue(StringUtils.countMatches(logs, "testWithException/PERF-result.xml") > 1);
+		
+		// issue #319: check that if no test info is recorded, columns are not there
+		Assert.assertFalse(mainReportContent.contains("<td class=\"info\">"));
 	}
 	
 	/**
@@ -420,7 +423,8 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		
 		// Check description is displayed if available
 		String detailedReportContent1 = readTestMethodResultFile("testAndSubActions");
-		Assert.assertTrue(detailedReportContent1.contains("<h4> Test Details - testAndSubActions</h4><pre>a test with steps</pre>"));
+		Assert.assertTrue(detailedReportContent1.contains("<h4> Test Details - testAndSubActions</h4>"));
+		Assert.assertTrue(detailedReportContent1.contains("<th width=\"200px\">Description</th><td>a test with steps</td>"));
 		
 		String detailedReportContent2 = readTestMethodResultFile("testInError");
 		Assert.assertFalse(detailedReportContent2.contains("<h4> Test Details - testInError</h4><pre>"));
@@ -1056,5 +1060,27 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		Assert.assertTrue(detailedReportContent.contains("<div>class com.seleniumtests.customexception.DriverExceptions: &amp; some exception &quot;with &quot; &lt;strong&gt;&lt;a href='http://someurl/link' style='background-color: red;'&gt;HTML to encode&lt;/a&gt;&lt;/strong&gt;</div>"));
 		Assert.assertTrue(detailedReportContent.contains("Caused by root &lt;error&gt;</div>"));
 		
+	}
+	
+
+	/**
+	 * Check that information recorded during test, by calling 'SeleniumRobotTestPlan.addTestInfo(key, value)' are added to summary and test report
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testWithTestInfo() throws Exception {
+		
+		SeleniumTestsContextManager.removeThreadContext();
+		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testWithInfo1", "testWithInfo2", "testAndSubActions"});
+		
+		// check content of summary report file
+		String mainReportContent = readSummaryFile();
+		Assert.assertTrue(mainReportContent.matches(".*<td class=\"info\"></td><td class=\"info\"></td>.*"));
+		Assert.assertTrue(mainReportContent.matches(".*<td class=\"info\">12</td><td class=\"info\"></td>.*"));
+		Assert.assertTrue(mainReportContent.matches(".*<td class=\"info\"></td><td class=\"info\">12345</td>.*"));
+		Assert.assertTrue(mainReportContent.matches(".*<th> bug ID </th><th> user ID </th>.*"));
+		
+		String detailedReportContent = readTestMethodResultFile("testWithInfo1");
+		Assert.assertTrue(detailedReportContent.contains("<th>bug ID</th><td>12</td>"));
 	}
 }
