@@ -1,6 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <testsuite errors="$errors" failures="$failures" hostname="$hostname" name="$suiteName" tests="$tests" time="$duration" timestamp="$time">
 	
+	<infos>
+		#foreach ($testInfo in $testInfos.entrySet())
+			<info key="$testInfo.key" value="$testInfo.value"></info>
+		#end
+	</infos>
+	
+	
 	#foreach ($testStep in $testSteps)
 		#set($stepDuration = $testStep.getDuration() / 1000.0)
 		<testcase classname="$className" name="Step $velocityCount: $testStep.getName()" time="$stepDuration">
