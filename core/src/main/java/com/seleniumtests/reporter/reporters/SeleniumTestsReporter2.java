@@ -381,7 +381,7 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 				TestNGResultUtils.setUniqueTestName(result, getTestName(result)); // be sure test name is initialized
 				
 				// add test info
-				Map<String, String> testInfos = TestNGResultUtils.getTestInfo(result);
+				Map<String, String> testInfos = TestNGResultUtils.getTestInfoEncoded(result, "html");
 				testInfosMap.put(result, testInfos);
 				allInfoKeys.addAll(testInfos.keySet());
 			}
@@ -585,7 +585,7 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 			
 			velocityContext.put("testName", testName);
 			velocityContext.put("description", testResult.getMethod().getDescription());
-			velocityContext.put("testInfos", TestNGResultUtils.getTestInfo(testResult));
+			velocityContext.put("testInfos", TestNGResultUtils.getTestInfoEncoded(testResult, "html"));
 			
 			// Application information
 			fillContextWithTestParams(velocityContext);       
