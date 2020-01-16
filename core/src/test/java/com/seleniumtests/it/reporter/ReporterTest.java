@@ -248,6 +248,11 @@ public class ReporterTest extends MockitoTest {
 		return detailedReportContent.replace("\n", "").replace("\r",  "").replaceAll(">\\s+<", "><");
 	}
 	
+	protected String readTestMethodPerfFile(String testName) throws IOException {
+		String detailedReportContent = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), testName, "PERF-result.xml").toFile());
+		return detailedReportContent.replace("\n", "").replace("\r",  "").replaceAll(">\\s+<", "><");
+	}
+	
 	protected String readSummaryFile() throws IOException {
 		String detailedReportContent = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "SeleniumTestReport.html").toFile());
 		return detailedReportContent.replace("\n", "").replace("\r",  "").replaceAll(">\\s+<", "><");

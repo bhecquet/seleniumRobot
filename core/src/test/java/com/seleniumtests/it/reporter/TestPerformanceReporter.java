@@ -17,14 +17,11 @@
  */
 package com.seleniumtests.it.reporter;
 
-import static org.mockito.Mockito.spy;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
 
 import org.apache.commons.io.FileUtils;
-import org.json.JSONObject;
 import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.annotations.BeforeMethod;
@@ -32,7 +29,6 @@ import org.testng.annotations.Test;
 import org.testng.xml.XmlSuite.ParallelMode;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
-import com.seleniumtests.reporter.reporters.CustomReporter;
 
 /**
  * Test that default reporting contains an XML file per test (CustomReporter.java) with default test reports defined in SeleniumTestsContext.DEFAULT_CUSTOM_TEST_REPORTS
@@ -227,5 +223,27 @@ public class TestPerformanceReporter extends ReporterTest {
 		
 		Assert.assertTrue(detailedReportContent.matches(".*<testcase classname=\"com.seleniumtests.it.stubclasses.StubTestClassForTestSteps\" name=\"Step 4: skipStep \" time=\"\\d+\\.\\d+\"><skipped/>.*"));
 		Assert.assertTrue(detailedReportContent.contains("failures=\"-1\""));
+	}
+	
+
+	/**
+	 * Check that information recorded during test, by calling 'SeleniumRobotTestPlan.addTestInfo(key, value)' are added to summary and test report
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testWithTestInfo() throws Exception {
+		
+		SeleniumTestsContextManager.removeThreadContext();
+		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testWithInfo1", "testWithInfo2", "testAndSubActions"});
+		
+		// check info is present in PERF-result.xml
+		String detailedReportContent = readTestMethodPerfFile("testWithInfo1");
+		Assert.assertTrue(detailedReportContent.contains("<infos>" + 
+				"<info key=\"bugé &lt;&quot;ID&quot;&gt;\" value=\"12\"></info>" + 
+				"</infos>"));
+
+		String detailedReportContent2 = readTestMethodPerfFile("testAndSubActions");
+		Assert.assertTrue(detailedReportContent2.contains("<infos>" +  
+				"</infos>"));
 	}
 }

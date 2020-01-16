@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -33,11 +32,8 @@ import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
 import org.testng.IReporter;
-import org.testng.ISuite;
-import org.testng.ISuiteResult;
 import org.testng.ITestContext;
 import org.testng.ITestResult;
-import org.testng.xml.XmlSuite;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.StatisticsStorage;
@@ -178,6 +174,8 @@ public class CustomReporter extends CommonReporter implements IReporter {
 			} catch (CustomSeleniumTestsException e) {
 				context.put("logs", logs);
 			}
+
+			context.put("testInfos", TestNGResultUtils.getTestInfoEncoded(testResult, reportFormat));
 			
 			StringWriter writer = new StringWriter();
 			t.merge( context, writer );
