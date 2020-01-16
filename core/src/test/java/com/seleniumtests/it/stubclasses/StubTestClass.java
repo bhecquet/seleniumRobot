@@ -217,7 +217,7 @@ public class StubTestClass extends StubParentClass {
 		step1.addAction(new TestAction("sendKeys to text field", true, new ArrayList<>()));
 		TestLogging.logTestStep(step1);
 
-		addTestInfo("bug ID", "12");
+		addTestInfo("bugé <\"ID\">", "12");
 	}
 	
 	@Test(groups="stub", description="a test with infos")

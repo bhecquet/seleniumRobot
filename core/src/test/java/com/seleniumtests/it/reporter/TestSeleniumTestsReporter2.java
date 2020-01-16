@@ -1078,9 +1078,9 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		Assert.assertTrue(mainReportContent.matches(".*<td class=\"info\"></td><td class=\"info\"></td>.*"));
 		Assert.assertTrue(mainReportContent.matches(".*<td class=\"info\">12</td><td class=\"info\"></td>.*"));
 		Assert.assertTrue(mainReportContent.matches(".*<td class=\"info\"></td><td class=\"info\">12345</td>.*"));
-		Assert.assertTrue(mainReportContent.matches(".*<th> bug ID </th><th> user ID </th>.*"));
+		Assert.assertTrue(mainReportContent.matches(".*<th> bug&eacute; &lt;&quot;ID&quot;&gt; </th><th> user ID </th>.*"));
 		
 		String detailedReportContent = readTestMethodResultFile("testWithInfo1");
-		Assert.assertTrue(detailedReportContent.contains("<th>bug ID</th><td>12</td>"));
+		Assert.assertTrue(detailedReportContent.contains("<th>bug&eacute; &lt;&quot;ID&quot;&gt;</th><td>12</td>"));
 	}
 }

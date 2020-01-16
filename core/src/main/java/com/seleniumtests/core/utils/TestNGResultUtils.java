@@ -21,6 +21,7 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.testng.ITestResult;
 
@@ -146,6 +147,30 @@ public class TestNGResultUtils {
     	} else {
     		return new HashMap<>();
     	}
+    }
+    
+    /**
+     * returns test information encoded in the requested format
+     * @param testNGResult
+     * @param format		either "xml", "json", "html", "csv"
+     * @return
+     */
+    public static Map<String, String> getTestInfoEncoded(ITestResult testNGResult, String format) {
+
+    	Map<String, String> encodedTestInfos = new HashMap<>();
+		for (Entry<String, String> infoEntry: getTestInfo(testNGResult).entrySet()) {
+			if ("xml".equalsIgnoreCase(format.toLowerCase()) 
+					|| "json".equalsIgnoreCase(format.toLowerCase())
+					|| "html".equalsIgnoreCase(format.toLowerCase())
+					|| "csv".equalsIgnoreCase(format.toLowerCase())
+					) {
+				encodedTestInfos.put(StringUtility.encodeString(infoEntry.getKey(), format.toLowerCase()), 
+									StringUtility.encodeString(infoEntry.getValue(), format.toLowerCase()));
+			} else {
+				encodedTestInfos.put(infoEntry.getKey(), infoEntry.getValue());
+			}
+		}
+		return encodedTestInfos;
     }
     
     public static void setTestInfo(ITestResult testNGResult, String key, String value) {
