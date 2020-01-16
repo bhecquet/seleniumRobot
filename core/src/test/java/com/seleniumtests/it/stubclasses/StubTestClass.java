@@ -208,4 +208,25 @@ public class StubTestClass extends StubParentClass {
 			throw new WebDriverException("Session [6919ba25-53b6-4615-bd59-e97399bf1e12] was terminated due to SO_TIMEOUT");
 		}
 	}
+	
+
+	@Test(groups="stub", description="a test with infos")
+	public void testWithInfo1() throws IOException {
+		TestStep step1 = new TestStep("step 1", TestLogging.getCurrentTestResult(), new ArrayList<>());
+		step1.addAction(new TestAction("click button", false, new ArrayList<>()));
+		step1.addAction(new TestAction("sendKeys to text field", true, new ArrayList<>()));
+		TestLogging.logTestStep(step1);
+
+		addTestInfo("bug ID", "12");
+	}
+	
+	@Test(groups="stub", description="a test with infos")
+	public void testWithInfo2() throws IOException {
+		TestStep step1 = new TestStep("step 1", TestLogging.getCurrentTestResult(), new ArrayList<>());
+		step1.addAction(new TestAction("click button", false, new ArrayList<>()));
+		step1.addAction(new TestAction("sendKeys to text field", true, new ArrayList<>()));
+		TestLogging.logTestStep(step1);
+		
+		addTestInfo("user ID", "12345");
+	}
 }

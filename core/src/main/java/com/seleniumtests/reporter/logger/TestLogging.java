@@ -29,6 +29,7 @@ import org.apache.log4j.Logger;
 import org.testng.ITestResult;
 import org.testng.Reporter;
 
+import com.seleniumtests.core.utils.TestNGResultUtils;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.driver.screenshots.ScreenShot;
 import com.seleniumtests.reporter.logger.TestMessage.MessageType;
@@ -124,6 +125,18 @@ public class TestLogging {
     }
     
     // -------------------- Methods below should not be used directly inside test -----------------
+    
+    
+    /**
+     * Store a key / value pair in test, so that it can be added to reports at test level. Contrary to 'logTestValue' which is stored at test step level
+     * @param key
+     * @param value
+     */
+    public static void logTestInfo(String key, String value) {
+    	TestNGResultUtils.setTestInfo(getCurrentTestResult(), key, value);
+    	logger.info(String.format("Storing into test result %s: %s", key, value ));
+    }
+    
     /**
      * /!\ When iterating over test steps, it MUST be put in a synchronized block!! 
      * @return

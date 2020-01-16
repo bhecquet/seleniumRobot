@@ -21,6 +21,9 @@
 					                 	<th> Failed Steps Count </th>
 					                 	<th> Steps Count </th>
 					                 	<th> Duration </th>
+					                 	#foreach ($infoKey in $infoKeys)
+					                 		<th> $infoKey </th>
+					                 	#end
 					                </tr>
 				                </thead>
 				                <tbody>
@@ -80,6 +83,16 @@
 				                  		#end
 				                  		<td name="stepsTotal-$testIdx">$totalTestSteps</td>
 				                  		<td>$stepsDuration sec.</td>
+				                  		
+				                  		
+			                			#set ($testInfos = $infos.get($testResult))
+				                  		#foreach ($infoKey in $infoKeys)
+				                  			#if (!$testInfos || !$testInfos.get($infoKey))
+				                  				<td class="info"></td>
+				                  			#else
+					                 			<td class="info">$testInfos.get($infoKey)</td>
+					                 		#end
+					                 	#end
 				                  		</tr>
 			                		
 			                		#end	
