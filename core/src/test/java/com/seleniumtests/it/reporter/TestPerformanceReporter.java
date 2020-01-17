@@ -233,14 +233,12 @@ public class TestPerformanceReporter extends ReporterTest {
 	@Test(groups={"it"})
 	public void testWithTestInfo() throws Exception {
 		
-		SeleniumTestsContextManager.removeThreadContext();
 		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testWithInfo1", "testWithInfo2", "testAndSubActions"});
 		
 		// check info is present in PERF-result.xml
-		String detailedReportContent = readTestMethodPerfFile("testWithInfo1");
-		System.out.println(detailedReportContent);
+		String detailedReportContent = readTestMethodPerfFile("testWithInfo2");
 		Assert.assertTrue(detailedReportContent.contains("<infos>" + 
-				"<info key=\"bugé &lt;&quot;ID&quot;&gt;\" value=\"12\"></info>" + 
+				"<info key=\"user ID\" value=\"12345\">" + 
 				"</infos>"));
 
 		String detailedReportContent2 = readTestMethodPerfFile("testAndSubActions");
