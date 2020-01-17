@@ -684,8 +684,8 @@ By default, inside a test, checks will be done using TestNG `Assert` class
 On assert failure, test will continue but error will be reported
 If this behaviour is not expected, then use the parameter `softAssertEnabled` and set it to false
 
-#### Log some information ####
-You can make seleniumrobot display some test information in logs
+#### Log some information inside a test step ####
+You can make seleniumRobot display some test information in logs and test steps
 
 - `TestLogging.info("my message")`: displays a message (green in HTML report)
 - `TestLogging.warning("my warn")`: displays a warning (orange in HTML report)
@@ -693,6 +693,10 @@ You can make seleniumrobot display some test information in logs
 - `TestLogging.log("my log")`: displays the message without style
 - `TestLogging.logTestValue("key", "my message", "my value")`: stores the key/value pair (displays a table in HTML report)
 
+#### Log some information at test level ####
+
+You can also add information to the test itself (e.g: the bug id you created, the login used, ...) so that they can be visible inside main HTML report
+For that, inside the test method, write `addTestInfo("<info_name>", "<info_value>");`
 
 ### 9 Write good tests and Page Objects ###
 
