@@ -500,6 +500,13 @@ public class PopupListener implements WebDriverEventListener {
 
 
 
-To 
+### 22 Automate Salesforce lightning UI ###
+
+Salesforce UI is a bit complicated to automate. Spring 20 version added more complexity so, to help you writing script you can:
+
+- use extensively `ByC.attribute()` selector which helps finding elements through any attribute because salesforce exposes generated id
+- for combobox, use `SelectList` by pointing to the `<lightning-base-combobox>` element. This will help to interract with them, selecting by text, partial text, ... in one action.
+- use `ByC.xTagname`, `ByC.xName` instead of `By.tagName` and `By.name` because, due to shadow DOM, selenium cannot directly sometimes access to child elements of shadowed ones. But going the xpath way (what xTagName and xName do) solves the problem.
+- use `new <whatever>Element("my element", By.tagName(""), HtmlElement.FIRST_VISIBLE)` instead of `new <whatever>Element("my element", By.tagName(""))`  because salesforce DOM sometimes contains a duplicate version of the visible page and getting the first element for a selector, as selenium does, may lead to an invisible element.  
 
 
