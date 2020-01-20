@@ -66,7 +66,7 @@ public class Table extends HtmlElement {
      */
     public void findTableElement() {
         super.findElement();
-        rows = element.findElements(By.tagName("tr"));
+        rows = findHtmlElements(By.tagName("tr"));
         columns = getColumnsInternal();
     }
 
@@ -109,6 +109,9 @@ public class Table extends HtmlElement {
     
     /**
      * Given a row WebElement (represents a <tr> html element), returns the list of elements (<tr> or <th>)
+     * 
+     * Tip: returned element is a list of HtmlElement, but you must cast it to use its specific methods
+     * 
      * @param row	the row to analyze
      * @return
      */
@@ -117,7 +120,13 @@ public class Table extends HtmlElement {
     	if (row == null) {
     		return new ArrayList<>();
     	}
-    	cells = row.findElements(By.xpath(".//descendant::*[name()=\"th\" or name()=\"td\"]"));
+    	
+    	By descendants = By.xpath(".//descendant::*[name()=\"th\" or name()=\"td\"]");
+    	if (row instanceof HtmlElement) {
+    		cells = ((HtmlElement)row).findHtmlElements(descendants);
+    	} else {
+    		cells = row.findElements(descendants);
+    	}
     	return cells;
     }
 
@@ -131,6 +140,9 @@ public class Table extends HtmlElement {
     
     /**
      * Returns the cell from table, searching for its content by pattern
+     * 
+     * Tip: returned element is a HtmlElement, but you must cast it to use its specific methods 
+     * 
      * @param content	pattern to search for
      * @param column	column where pattern should be searched
      * @return
@@ -163,6 +175,9 @@ public class Table extends HtmlElement {
     /**
      * issue #306
      * Returns the row from table, searching for its content by pattern. Then you can search for a specific cell using 'getRowCells(row);'
+     *  
+     * Tip: returned element is a HtmlElement, but you must cast it to use its specific methods
+     * 
      * @param content	pattern to search for
      * @param column	column where pattern should be searched
      * @return
@@ -194,6 +209,9 @@ public class Table extends HtmlElement {
     
     /**
      * Get a table cell at row,column coordinates
+     * 
+     * Tip: returned element is a HtmlElement, but you must cast it to use its specific methods
+     * 
      * @param row		the row index
      * @param column	the column index
      * @param focus		if true, scroll to this cell
@@ -209,7 +227,9 @@ public class Table extends HtmlElement {
     }
     
     /**
-     * Get table cell.
+     * Get table cell
+     * 
+     * Tip: returned element is a HtmlElement, but you must cast it to use its specific methods
      */
     @ReplayOnError
     public WebElement getCell(final int row, final int column) {
@@ -239,6 +259,8 @@ public class Table extends HtmlElement {
 
     /**
      * Returns list of rows
+     * 
+     * Tip: returned element is a list of HtmlElement, but you must cast it to use its specific methods
      * @return
      */
     @ReplayOnError
