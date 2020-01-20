@@ -25,6 +25,7 @@ import org.openqa.selenium.WebElement;
 import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.annotations.AfterClass;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -61,9 +62,33 @@ public class TestByC extends GenericTest {
 		WebUIDriver.cleanUp();
 	}
 	
+	@AfterMethod(groups={"it"})
+	public void reset() {
+		DriverTestPage.textSelectedId.clear();
+		DriverTestPage.textSelectedText.clear();
+	}
+	
 	@Test(groups={"it"})
 	public void testFindElementByLabelForward() {
 		new TextFieldElement("", ByC.labelForward("By id forward", "input")).sendKeys("element found by label");
+		Assert.assertEquals(DriverTestPage.textSelectedId.getValue(), "element found by label");
+	}
+
+	@Test(groups={"it"})
+	public void testFindElementByByLabelForwardContaining() { 
+		new TextFieldElement("", ByC.labelForward("y id for*", "input")).sendKeys("element found by label");
+		Assert.assertEquals(DriverTestPage.textSelectedId.getValue(), "element found by label");
+	}
+	
+	@Test(groups={"it"})
+	public void testFindElementByByLabelForwardStarting() { 
+		new TextFieldElement("", ByC.labelForward("By id for^", "input")).sendKeys("element found by label");
+		Assert.assertEquals(DriverTestPage.textSelectedId.getValue(), "element found by label");
+	}
+	
+	@Test(groups={"it"})
+	public void testFindElementByByLabelForwardEnding() { 
+		new TextFieldElement("", ByC.labelForward(" id forward$", "input")).sendKeys("element found by label");
 		Assert.assertEquals(DriverTestPage.textSelectedId.getValue(), "element found by label");
 	}
 	
@@ -100,6 +125,24 @@ public class TestByC extends GenericTest {
 	public void testFindElementByLabelBackward() {
 		new TextFieldElement("", ByC.labelBackward("By id backward", "input")).sendKeys("element found by label backward");
 		Assert.assertEquals(DriverTestPage.textSelectedText.getValue(), "element found by label backward");
+	}
+
+	@Test(groups={"it"})
+	public void testFindElementByByLabelBackwardContaining() { 
+		new TextFieldElement("", ByC.labelBackward("y id back*", "input")).sendKeys("element found by label backward*");
+		Assert.assertEquals(DriverTestPage.textSelectedText.getValue(), "element found by label backward*");
+	}
+	
+	@Test(groups={"it"})
+	public void testFindElementByByLabelBackwardStarting() { 
+		new TextFieldElement("", ByC.labelBackward("By id back^", "input")).sendKeys("element found by label backward^");
+		Assert.assertEquals(DriverTestPage.textSelectedText.getValue(), "element found by label backward^");
+	}
+	
+	@Test(groups={"it"})
+	public void testFindElementByByLabelBackwardEnding() { 
+		new TextFieldElement("", ByC.labelBackward(" id backward$", "input")).sendKeys("element found by label backward$");
+		Assert.assertEquals(DriverTestPage.textSelectedText.getValue(), "element found by label backward$");
 	}
 
 	@Test(groups={"it"})
@@ -208,6 +251,21 @@ public class TestByC extends GenericTest {
 	@Test(groups={"it"})
 	public void testFindElementsByPartialText() { 
 		Assert.assertTrue(new TextFieldElement("", ByC.partialText("Test select", "*")).findElements().size() >=  3);
+	}
+
+	@Test(groups={"it"})
+	public void testFindElementByTextContaining() { 
+		Assert.assertEquals(new TextFieldElement("", ByC.text("est IF*", "*")).getTagName(), "h3");
+	}
+	
+	@Test(groups={"it"})
+	public void testFindElementByTextStarting() { 
+		Assert.assertEquals(new TextFieldElement("", ByC.text("Test IF^", "*")).getTagName(), "h3");
+	}
+	
+	@Test(groups={"it"})
+	public void testFindElementByTextEnding() { 
+		Assert.assertEquals(new TextFieldElement("", ByC.text("st IFrame$", "*")).getTagName(), "h3");
 	}
 
 	@Test(groups={"it"}, expectedExceptions=IllegalArgumentException.class)
