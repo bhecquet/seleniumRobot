@@ -180,7 +180,12 @@ public class ByC extends By {
 	}
 	
 	/**
-	 * Search first element of <code>tagName</code> with text
+	 * Search first element of <code>tagName</code> with text. TagName may be '*' if you want to search text among all types of elements
+	 * text can have some value accepted for CSS selector: <a>https://developer.mozilla.org/en-US/docs/Web/CSS/Attribute_selectors</a>
+	 * 'text*' => text value contains the provided value
+	 * 'text^' => text value starts with the provided value
+	 * 'text$' => text value ends with the provided value
+	 * 'text' => text value equals the provided value
 	 * @param label
 	 * @param tagName
 	 * @return
@@ -269,16 +274,36 @@ public class ByC extends By {
 	public static By xClassName(String className) {
 		return new ByXClassName(className);
 	}
+	
+	protected static String buildSelectorForText(String text) {
+		String escapedText;
+		if (text.endsWith("*") || text.endsWith("^") || text.endsWith("$")) {
+			escapedText = escapeQuotes(text.substring(0, text.length() - 1));
+		} else {
+			escapedText = escapeQuotes(text);
+		}
+		
+		if (text.endsWith("*")) {
+			return String.format("[contains(text(),%s)]", escapedText);
+		} else if (text.endsWith("^")) {
+			return String.format("[starts-with(text(),%s)]", escapedText);
+		} else if (text.endsWith("$")) {
+//			return String.format("[ends-with(text(),%s)]", escapedText); //not valid for xpath 1.0
+			return String.format("[substring(text(), string-length(text()) - string-length(%s) +1) = %s]", escapedText, escapedText);
+		} else {
+			return String.format("[text() = %s]", escapedText);
+		}
+	}
 
 
 	public static class ByLabelForward extends ByC implements Serializable {
 
 		private static final long serialVersionUID = 5341968046120372161L;
 
-		private final String label;
-		private final String tagName;
-		private final String labelTagName; // tag of the label we are searching. default is label
-		private final boolean partial;
+		private String label;
+		private String tagName;
+		private String labelTagName; // tag of the label we are searching. default is label
+		private boolean partial;
 
 		/**
 		 * 
@@ -301,22 +326,18 @@ public class ByC extends By {
 
 		@Override
 		public List<WebElement> findElements(SearchContext context) {
-			String escapedLabel = escapeQuotes(label);
-			if (partial) {
-				return ((FindsByXPath) context).findElementsByXPath(String.format(".//%s[contains(text(),%s)]/following::%s", labelTagName, escapedLabel, tagName));
-			} else {
-				return ((FindsByXPath) context).findElementsByXPath(String.format(".//%s[text() = %s]/following::%s", labelTagName, escapedLabel, tagName));
+			if (partial && !label.endsWith("*")) {
+				label += "*";
 			}
+			return ((FindsByXPath) context).findElementsByXPath(String.format(".//%s%s/following::%s", labelTagName, buildSelectorForText(label), tagName));
 		}
 
 		@Override
 		public WebElement findElement(SearchContext context) {
-			String escapedLabel = escapeQuotes(label);
-			if (partial) {
-				return ((FindsByXPath) context).findElementByXPath(String.format(".//%s[contains(text(),%s)]/following::%s", labelTagName, escapedLabel, tagName));
-			} else {
-				return ((FindsByXPath) context).findElementByXPath(String.format(".//%s[text() = %s]/following::%s", labelTagName, escapedLabel, tagName));
+			if (partial && !label.endsWith("*")) {
+				label += "*";
 			}
+			return ((FindsByXPath) context).findElementByXPath(String.format(".//%s%s/following::%s", labelTagName, buildSelectorForText(label), tagName));
 		}
 
 		@Override
@@ -355,23 +376,19 @@ public class ByC extends By {
 		
 		@Override
 		public List<WebElement> findElements(SearchContext context) {
-			String escapedLabel = escapeQuotes(label);
-			if (partial) {
-				return ((FindsByXPath) context).findElementsByXPath(String.format(".//%s[contains(text(),%s)]/preceding::%s", labelTagName, escapedLabel, tagName));
-			} else {
-				return ((FindsByXPath) context).findElementsByXPath(String.format(".//%s[text() = %s]/preceding::%s", labelTagName, escapedLabel, tagName));
+			if (partial && !label.endsWith("*")) {
+				label += "*";
 			}
+			return ((FindsByXPath) context).findElementsByXPath(String.format(".//%s%s/preceding::%s", labelTagName, buildSelectorForText(label), tagName));
 		}
 		
 		@Override
 		public WebElement findElement(SearchContext context) {
-			String escapedLabel = escapeQuotes(label);
 			List<WebElement> elements;
-			if (partial) {
-				elements = ((FindsByXPath) context).findElementsByXPath(String.format(".//%s[contains(text(),%s)]/preceding::%s", labelTagName, escapedLabel, tagName));
-			} else {
-				elements = ((FindsByXPath) context).findElementsByXPath(String.format(".//%s[text() = %s]/preceding::%s", labelTagName, escapedLabel, tagName));
+			if (partial && !label.endsWith("*")) {
+				label += "*";
 			}
+			elements = ((FindsByXPath) context).findElementsByXPath(String.format(".//%s%s/preceding::%s", labelTagName, buildSelectorForText(label), tagName));
 			List<WebElement> elementsReverse = elements.subList(0, elements.size());
 			Collections.reverse(elementsReverse);
 			return elementsReverse.get(0);
@@ -454,9 +471,9 @@ public class ByC extends By {
 
 		private static final long serialVersionUID = 5341968046120372161L;
 
-		private final String text;
-		private final String tagName;
-		private final boolean partial;
+		private String text;
+		private String tagName;
+		private boolean partial;
 
 		public ByText(String text, String tagName, boolean partial) {
 			
@@ -474,23 +491,20 @@ public class ByC extends By {
 
 		@Override
 		public List<WebElement> findElements(SearchContext context) {
-			String escapedText = escapeQuotes(text);
-			if (partial) {
-				return ((FindsByXPath) context).findElementsByXPath(String.format(".//%s[contains(text(),%s)]", tagName, escapedText));
-			} else {
-				return ((FindsByXPath) context).findElementsByXPath(String.format(".//%s[text() = %s]", tagName, escapedText));
+			if (partial && !text.endsWith("*")) {
+				text += "*";
 			}
+			return ((FindsByXPath) context).findElementsByXPath(String.format(".//%s%s", tagName, buildSelectorForText(text)));
 		}
 
 		@Override
 		public WebElement findElement(SearchContext context) {
-			String escapedText = escapeQuotes(text);
-			if (partial) {
-				return ((FindsByXPath) context).findElementByXPath(String.format(".//%s[contains(text(),%s)]", tagName, escapedText));
-			} else {
-				return ((FindsByXPath) context).findElementByXPath(String.format(".//%s[text() = %s]", tagName, escapedText));
+			if (partial && !text.endsWith("*")) {
+				text += "*";
 			}
+			return ((FindsByXPath) context).findElementByXPath(String.format(".//%s%s", tagName, buildSelectorForText(text)));
 		}
+		
 
 		@Override
 		public String toString() {
@@ -623,7 +637,7 @@ public class ByC extends By {
 	  }
 
 	
-	protected String escapeQuotes(String aString) {
+	protected static String escapeQuotes(String aString) {
 		if (!aString.contains("'")) {
 			return "'" + aString + "'";
 		} else {
