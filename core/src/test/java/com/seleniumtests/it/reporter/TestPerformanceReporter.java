@@ -238,7 +238,7 @@ public class TestPerformanceReporter extends ReporterTest {
 		// check info is present in PERF-result.xml
 		String detailedReportContent = readTestMethodPerfFile("testWithInfo2");
 		Assert.assertTrue(detailedReportContent.contains("<infos>" + 
-				"<info key=\"user ID\" value=\"12345\">" + 
+				"<info key=\"user ID\" value=\"link http://foo/bar/12345;info 12345\"></info>" + 
 				"</infos>"));
 
 		String detailedReportContent2 = readTestMethodPerfFile("testAndSubActions");

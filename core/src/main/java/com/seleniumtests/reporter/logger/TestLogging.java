@@ -130,11 +130,11 @@ public class TestLogging {
     /**
      * Store a key / value pair in test, so that it can be added to reports at test level. Contrary to 'logTestValue' which is stored at test step level
      * @param key
-     * @param value
+     * @param value. A StringInfo object (either StringInfo or HyperlinkInfo)
      */
-    public static void logTestInfo(String key, String value) {
+    public static void logTestInfo(String key, StringInfo value) {
     	TestNGResultUtils.setTestInfo(getCurrentTestResult(), key, value);
-    	logger.info(String.format("Storing into test result %s: %s", key, value ));
+    	logger.info(String.format("Storing into test result %s: %s", key, value.getInfo() ));
     }
     
     /**

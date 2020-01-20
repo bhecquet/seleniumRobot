@@ -33,6 +33,7 @@ import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.TestTasks;
 import com.seleniumtests.core.utils.TestNGResultUtils;
 import com.seleniumtests.driver.WebUIDriver;
+import com.seleniumtests.reporter.logger.StringInfo;
 import com.seleniumtests.reporter.logger.TestLogging;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
@@ -184,8 +185,10 @@ public class SeleniumRobotTestPlan {
     
     /**
      * Add a information to the test, that will be available in report files at test level
+     * @param key	name of the information to display
+     * @param value	A StringInfo or HyperlinkInfo instance to display the value 
      */
-    public void addTestInfo(String key, String value) {
+    public void addTestInfo(String key, StringInfo value) {
     	TestLogging.logTestInfo(key, value);
     }
 }
