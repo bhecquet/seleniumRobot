@@ -32,7 +32,9 @@ import org.testng.annotations.Test;
 
 import com.seleniumtests.customexception.DriverExceptions;
 import com.seleniumtests.driver.screenshots.ScreenShot;
+import com.seleniumtests.reporter.logger.HyperlinkInfo;
 import com.seleniumtests.reporter.logger.Snapshot;
+import com.seleniumtests.reporter.logger.StringInfo;
 import com.seleniumtests.reporter.logger.TestAction;
 import com.seleniumtests.reporter.logger.TestLogging;
 import com.seleniumtests.reporter.logger.TestMessage;
@@ -217,7 +219,7 @@ public class StubTestClass extends StubParentClass {
 		step1.addAction(new TestAction("sendKeys to text field", true, new ArrayList<>()));
 		TestLogging.logTestStep(step1);
 
-		addTestInfo("bugé <\"ID\">", "12");
+		addTestInfo("bugé <\"ID\">", new StringInfo("12"));
 	}
 	
 	@Test(groups="stub", description="a test with infos")
@@ -227,6 +229,6 @@ public class StubTestClass extends StubParentClass {
 		step1.addAction(new TestAction("sendKeys to text field", true, new ArrayList<>()));
 		TestLogging.logTestStep(step1);
 		
-		addTestInfo("user ID", "12345");
+		addTestInfo("user ID", new HyperlinkInfo("12345", "http://foo/bar/12345"));
 	}
 }

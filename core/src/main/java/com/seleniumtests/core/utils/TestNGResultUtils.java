@@ -27,6 +27,7 @@ import org.testng.ITestResult;
 
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.runner.CucumberScenarioWrapper;
+import com.seleniumtests.reporter.logger.StringInfo;
 import com.seleniumtests.util.StringUtility;
 
 public class TestNGResultUtils {
@@ -140,8 +141,8 @@ public class TestNGResultUtils {
     }
     
     // information about test
-    public static Map<String, String> getTestInfo(ITestResult testNGResult) {
-    	Map<String, String> testInfo = (Map<String, String>) testNGResult.getAttribute(TEST_INFO);
+    public static Map<String, StringInfo> getTestInfo(ITestResult testNGResult) {
+    	Map<String, StringInfo> testInfo = (Map<String, StringInfo>) testNGResult.getAttribute(TEST_INFO);
     	if (testInfo != null) {
     		return testInfo;
     	} else {
@@ -158,23 +159,15 @@ public class TestNGResultUtils {
     public static Map<String, String> getTestInfoEncoded(ITestResult testNGResult, String format) {
 
     	Map<String, String> encodedTestInfos = new HashMap<>();
-		for (Entry<String, String> infoEntry: getTestInfo(testNGResult).entrySet()) {
-			if ("xml".equalsIgnoreCase(format.toLowerCase()) 
-					|| "json".equalsIgnoreCase(format.toLowerCase())
-					|| "html".equalsIgnoreCase(format.toLowerCase())
-					|| "csv".equalsIgnoreCase(format.toLowerCase())
-					) {
-				encodedTestInfos.put(StringUtility.encodeString(infoEntry.getKey(), format.toLowerCase()), 
-									StringUtility.encodeString(infoEntry.getValue(), format.toLowerCase()));
-			} else {
-				encodedTestInfos.put(infoEntry.getKey(), infoEntry.getValue());
-			}
+		for (Entry<String, StringInfo> infoEntry: getTestInfo(testNGResult).entrySet()) {
+			encodedTestInfos.put(StringUtility.encodeString(infoEntry.getKey(), format.toLowerCase()), 
+									infoEntry.getValue().encode(format.toLowerCase()));
 		}
 		return encodedTestInfos;
     }
     
-    public static void setTestInfo(ITestResult testNGResult, String key, String value) {
-    	Map<String, String> testInfo = (Map<String, String>) testNGResult.getAttribute(TEST_INFO);
+    public static void setTestInfo(ITestResult testNGResult, String key, StringInfo value) {
+    	Map<String, StringInfo> testInfo = (Map<String, StringInfo>) testNGResult.getAttribute(TEST_INFO);
     	if (testInfo == null) {
     		testInfo = new HashMap<>();
     	} 
