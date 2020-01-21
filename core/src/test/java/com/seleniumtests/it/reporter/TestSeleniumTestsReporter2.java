@@ -1083,4 +1083,20 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		String detailedReportContent = readTestMethodResultFile("testWithInfo1");
 		Assert.assertTrue(detailedReportContent.contains("<th>bug&eacute; &lt;&quot;ID&quot;&gt;</th><td>12</td>"));
 	}
+	
+	/**
+	 * issue #99: Check summary with multiple suites executing the same test. Both test should be presented
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testMultiSuitesdReport() throws Exception {
+		
+		executeMultiSuites(new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, new String[] {"testAndSubActions"});
+		
+		// check content of summary report file
+		String mainReportContent = readSummaryFile();
+		
+		Assert.assertTrue(mainReportContent.matches(".*<a href\\='testAndSubActions/TestReport\\.html'.*?>testAndSubActions</a>.*"));
+		Assert.assertTrue(mainReportContent.matches(".*<a href\\='testAndSubActions-1/TestReport\\.html'.*?>testAndSubActions-1</a>.*"));
+	}
 }
