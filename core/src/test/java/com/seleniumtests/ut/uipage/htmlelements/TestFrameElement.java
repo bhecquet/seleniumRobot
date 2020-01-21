@@ -329,7 +329,7 @@ public class TestFrameElement extends MockitoTest {
 		
 		// issue #320: as we return HtmlElement instead of WebElement, we need to search for root element (the table) each time we search for columns and cells
 		verify(locator, times(3)).frame(any(WebElement.class));
-		verify(locator).defaultContent();
+		verify(locator, times(3)).defaultContent();
 	}
 	@Test(groups={"ut"})
 	public void testTableOutsideFrame() throws Exception {
