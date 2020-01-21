@@ -79,6 +79,10 @@ public class TestFrameElement extends MockitoTest {
 	@Mock
 	private RemoteWebElement link;
 	@Mock
+	private RemoteWebElement row;
+	@Mock
+	private RemoteWebElement cell;
+	@Mock
 	private RemoteWebElement frameEl;
 	@Mock
 	private RemoteWebElement frameEl2;
@@ -100,6 +104,8 @@ public class TestFrameElement extends MockitoTest {
 		when(WebUIDriver.getWebDriver(anyBoolean())).thenReturn(eventDriver);
 		when(driver.findElement(By.id("el"))).thenReturn(element);
 		when(element.findElement(By.id("link"))).thenReturn(link);
+		when(element.findElements(By.tagName("tr"))).thenReturn(Arrays.asList(row));
+		when(row.findElements(any(By.class))).thenReturn(Arrays.asList(cell));
 		when(driver.findElements(By.id("frameId"))).thenReturn(Arrays.asList(frameEl));
 		when(driver.findElements(By.id("frameId2"))).thenReturn(Arrays.asList(subFrameEl));
 		when(driver.findElements(By.tagName("iframe"))).thenReturn(Arrays.asList(frameEl));
@@ -321,7 +327,8 @@ public class TestFrameElement extends MockitoTest {
 		Table el = new Table("", By.id("el"), frame);
 		el.getColumns();
 		
-		verify(locator).frame(any(WebElement.class));
+		// issue #320: as we return HtmlElement instead of WebElement, we need to search for root element (the table) each time we search for columns and cells
+		verify(locator, times(3)).frame(any(WebElement.class));
 		verify(locator).defaultContent();
 	}
 	@Test(groups={"ut"})

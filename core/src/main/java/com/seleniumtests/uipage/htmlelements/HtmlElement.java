@@ -47,9 +47,6 @@ import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.firefox.FirefoxDriver;
-import org.openqa.selenium.ie.InternetExplorerDriver;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.interactions.Coordinates;
 import org.openqa.selenium.interactions.Locatable;
@@ -1371,8 +1368,8 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     	
     	while (end.isAfter(clock.instant())) {
     		try {
-	    		WebElement element = new WebDriverWait(driver, 1).ignoring(ConfigurationException.class, ScenarioException.class).until(ExpectedConditionsC.presenceOfElementLocated(this));
-	            outlineElement(element);
+	    		WebElement elt = new WebDriverWait(driver, 1).ignoring(ConfigurationException.class, ScenarioException.class).until(ExpectedConditionsC.presenceOfElementLocated(this));
+	            outlineElement(elt);
 	    		return;
     		} catch (TimeoutException e) {
     		}
