@@ -125,6 +125,70 @@ public class ReporterTest extends MockitoTest {
 		return tng;
 	}
 	
+	public static TestNG executeMultiSuites(String[] testClasses, String[] methods) throws IOException {
+
+		List<XmlSuite> suites = new ArrayList<XmlSuite>();
+		
+		XmlSuite suite = new XmlSuite();
+		suite.setName("TmpSuite");
+		suite.setParallel(ParallelMode.NONE);
+		suite.setFileName("/home/test/seleniumRobot/data/core/testng/testLoggging.xml");
+		Map<String, String> suiteParameters = new HashMap<>();
+		suiteParameters.put("softAssertEnabled", "false");
+		suite.setParameters(suiteParameters);
+		suite.setConfigFailurePolicy(FailurePolicy.CONTINUE);
+		suites.add(suite);
+		
+		XmlSuite suite2 = new XmlSuite();
+		suite2.setName("TmpSuite2");
+		suite2.setParallel(ParallelMode.NONE);
+		suite2.setFileName("/home/test/seleniumRobot/data/core/testng/testLoggging2.xml");
+		Map<String, String> suiteParameters2 = new HashMap<>();
+		suiteParameters2.put("softAssertEnabled", "false");
+		suite2.setParameters(suiteParameters2);
+		suite2.setConfigFailurePolicy(FailurePolicy.CONTINUE);
+		suites.add(suite2);
+		
+		for (String testClass: testClasses) {
+			XmlTest test = new XmlTest(suite);
+			test.setName(String.format("%s_%d", testClass.substring(testClass.lastIndexOf(".") + 1), new Random().nextInt()));
+			test.addParameter(SeleniumTestsContext.BROWSER, "none");
+			List<XmlClass> classes = new ArrayList<XmlClass>();
+			XmlClass xmlClass = new XmlClass(testClass);
+			if (methods.length > 0) {
+				List<XmlInclude> includes = new ArrayList<>();
+				for (String method: methods) {
+					includes.add(new XmlInclude(method));
+				}
+				xmlClass.setIncludedMethods(includes);
+			}
+			classes.add(xmlClass);
+			test.setXmlClasses(classes) ;
+			
+			XmlTest test2 = new XmlTest(suite2);
+			test2.setName(String.format("%s_%d", testClass.substring(testClass.lastIndexOf(".") + 1), new Random().nextInt()));
+			test2.addParameter(SeleniumTestsContext.BROWSER, "none");
+			List<XmlClass> classes2 = new ArrayList<XmlClass>();
+			XmlClass xmlClass2 = new XmlClass(testClass);
+			if (methods.length > 0) {
+				List<XmlInclude> includes = new ArrayList<>();
+				for (String method: methods) {
+					includes.add(new XmlInclude(method));
+				}
+				xmlClass2.setIncludedMethods(includes);
+			}
+			classes2.add(xmlClass2);
+			test2.setXmlClasses(classes2) ;
+		}		
+		
+		TestNG tng = new TestNG(false);
+		tng.setXmlSuites(suites);
+		tng.setOutputDirectory(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory());
+		tng.run(); 
+		
+		return tng;
+	}
+	
 	/**
 	 * Execute SeleniumTestPlan and cucumber tests
 	 * Each test method is put in its own TestNG test
