@@ -19,7 +19,6 @@ package com.seleniumtests.reporter.logger;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -29,6 +28,9 @@ import org.apache.log4j.Logger;
 import org.testng.ITestResult;
 import org.testng.Reporter;
 
+import com.seleniumtests.core.SeleniumTestsContext;
+import com.seleniumtests.core.SeleniumTestsContext.TestStepManager;
+import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.utils.TestNGResultUtils;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.driver.screenshots.ScreenShot;
@@ -61,10 +63,7 @@ import net.lightbody.bmp.core.har.Har;
  * 'testSteps' records all root steps in the test being executed
  */
 public class TestLogging {
-
-	private static Map<ITestResult, List<TestStep>> testsSteps = Collections.synchronizedMap(new HashMap<>());
-	private static Map<Thread, TestStep> currentRootTestStep = Collections.synchronizedMap(new HashMap<>());
-	private static Map<Thread, TestStep> parentTestStep = Collections.synchronizedMap(new HashMap<>());
+	
 	private static Map<Thread, ITestResult> currentTestResult = Collections.synchronizedMap(new HashMap<>());
 	private static Logger logger = SeleniumRobotLogger.getLogger(TestLogging.class);
 	
@@ -119,8 +118,10 @@ public class TestLogging {
      * @param value		value of the message
      */
     public static void logTestValue(String id, String message, String value) {
-    	if (getParentTestStep() != null) {
-    		getParentTestStep().addValue(new TestValue(id, message, value));
+
+    	TestStep runningStep = SeleniumTestsContextManager.getContextForCurrentTestState().get(0).getTestStepManager().getRunningTestStep();
+    	if (runningStep != null) {
+    		runningStep.addValue(new TestValue(id, message, value));
     	}
     }
     
@@ -141,20 +142,25 @@ public class TestLogging {
      * /!\ When iterating over test steps, it MUST be put in a synchronized block!! 
      * @return
      */
-    public static Map<ITestResult, List<TestStep>> getTestsSteps() {
-		return testsSteps;
-	}
+    /*public static Map<ITestResult, List<TestStep>> getTestsSteps() {
+    	
+    	// issue #116
+    	return SeleniumTestsContextManager.getThreadContext().getTestStepManager().getTestSteps();
+	}*/
     
     private static void logMessage(final String message, final MessageType messageType) {
-    	if (getParentTestStep() != null) {
-    		getParentTestStep().addMessage(new TestMessage(message, messageType));
+    	TestStep runningStep = SeleniumTestsContextManager.getContextForCurrentTestState().get(0).getTestStepManager().getRunningTestStep();
+    	if (runningStep != null) {
+    		runningStep.addMessage(new TestMessage(message, messageType));
     	}
     }
 
     public static void logNetworkCapture(Har har, String name) {
-    	if (getParentTestStep() != null) {
+    	
+    	TestStep runningStep = SeleniumTestsContextManager.getContextForCurrentTestState().get(0).getTestStepManager().getRunningTestStep();
+    	if (runningStep != null) {
     		try {
-				getParentTestStep().addNetworkCapture(new HarCapture(har, name));
+    			runningStep.addNetworkCapture(new HarCapture(har, name));
 			} catch (IOException e) {
 				logger.error("cannot create network capture file: " + e.getMessage(), e);
 			} catch (NullPointerException e) {
@@ -165,8 +171,10 @@ public class TestLogging {
     }
     
     public static void logFile(File file, String description) {
-    	if (getParentTestStep() != null) {
-    		getParentTestStep().addFile(new GenericFile(file, description));
+
+    	TestStep runningStep = SeleniumTestsContextManager.getContextForCurrentTestState().get(0).getTestStepManager().getRunningTestStep();
+    	if (runningStep != null) {
+    		runningStep.addFile(new GenericFile(file, description));
     	}
     	
     }
@@ -189,9 +197,13 @@ public class TestLogging {
 	 * @param driverName		the name of the driver that did the screenshot
      */
     public static void logScreenshot(ScreenShot screenshot, String screenshotName, String driverName) {
-    	if (getParentTestStep() != null) {
+
+    	TestStep runningStep = SeleniumTestsContextManager.getContextForCurrentTestState().get(0).getTestStepManager().getRunningTestStep();
+    	if (runningStep != null) {
     		try {
-    			getParentTestStep().addSnapshot(new Snapshot(screenshot, driverName), testsSteps.get(getCurrentTestResult()).size(), screenshotName);
+    			runningStep.addSnapshot(new Snapshot(screenshot, driverName), 
+    					SeleniumTestsContextManager.getContextForCurrentTestState().get(0).getTestStepManager().getTestSteps().size(),
+    					screenshotName);
     		} catch (NullPointerException e) {
     			logger.error("screenshot is null");
     		}
@@ -226,32 +238,37 @@ public class TestLogging {
     	}
     	
     	if (storeStep) {
-    		TestLogging.testsSteps.get(getCurrentTestResult()).add(testStep);
-    		TestLogging.setCurrentRootTestStep(null);
-			TestLogging.setParentTestStep(null);
+    		
+    		// notify each TestStepManager about the new test step (useful for AfterClass / AfterTest configuration methods)
+    		for (SeleniumTestsContext testContext: SeleniumTestsContextManager.getContextForCurrentTestState()) {
+    			TestStepManager stepManager = testContext.getTestStepManager();
+    	    	stepManager.getTestSteps().add(testStep);
+    	    	stepManager.setRootTestStep(null);
+    	    	stepManager.setRunningTestStep(null);
+    		}
+	    	
     	}
+    	
     }
 
 	public static void setCurrentRootTestStep(TestStep testStep) {
-		TestLogging.currentRootTestStep.put(Thread.currentThread(), testStep);
-		TestLogging.setParentTestStep(TestLogging.getCurrentRootTestStep());
+		SeleniumTestsContextManager.getContextForCurrentTestState().get(0).getTestStepManager().setRootTestStep(testStep);
 	}
 	
 	public static TestStep getCurrentRootTestStep() {
-		return TestLogging.currentRootTestStep.get(Thread.currentThread());
+		return SeleniumTestsContextManager.getContextForCurrentTestState().get(0).getTestStepManager().getRootTestStep();		
 	}
 	
 	public static void setParentTestStep(TestStep testStep) {
-		TestLogging.parentTestStep.put(Thread.currentThread(), testStep);
+		SeleniumTestsContextManager.getContextForCurrentTestState().get(0).getTestStepManager().setRunningTestStep(testStep);
 	}
 	
 	public static TestStep getParentTestStep() {
-		return TestLogging.parentTestStep.get(Thread.currentThread());
+		return SeleniumTestsContextManager.getContextForCurrentTestState().get(0).getTestStepManager().getRunningTestStep();
 	}
 
 	public static void setCurrentTestResult(ITestResult testResult) {
 		TestLogging.currentTestResult.put(Thread.currentThread(), testResult);
-		TestLogging.testsSteps.put(testResult, new ArrayList<>());
 	}
 	
 	/**
@@ -259,8 +276,9 @@ public class TestLogging {
 	 * @return
 	 */
 	public static TestStep getPreviousStep() {
+
 		try {
-			List<TestStep> allSteps = TestLogging.testsSteps.get(getCurrentTestResult());
+			List<TestStep> allSteps = SeleniumTestsContextManager.getContextForCurrentTestState().get(0).getTestStepManager().getTestSteps();
 			return allSteps.get(allSteps.size() - 1);
 		} catch (Exception e) {
 			return null;
@@ -287,9 +305,6 @@ public class TestLogging {
 	 * For Integration tests only
 	 */
 	public static void reset() {
-		TestLogging.currentRootTestStep.clear();
-		TestLogging.testsSteps.clear();
-		TestLogging.parentTestStep.clear();
 		resetCurrentTestResult();
 		
 		try {

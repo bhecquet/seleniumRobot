@@ -19,7 +19,6 @@ package com.seleniumtests.reporter.reporters;
 
 import java.io.File;
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -28,7 +27,6 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
@@ -45,9 +43,7 @@ import org.testng.xml.XmlSuite;
 
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
-import com.seleniumtests.core.runner.SeleniumRobotTestListener;
 import com.seleniumtests.core.utils.TestNGResultUtils;
-import com.seleniumtests.reporter.logger.TestLogging;
 import com.seleniumtests.reporter.logger.TestStep;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
@@ -155,7 +151,6 @@ public class ReporterControler implements IReporter {
 			for (Set<ITestResult> resultSet: allResultSet.values()) {
 				for (ITestResult testResult: resultSet) {
 					List<TestStep> testSteps = getAllTestSteps(testResult);
-					TestLogging.getTestsSteps().put(testResult, testSteps);	
 					
 					Long testDuration = 0L;
 					for (TestStep step: testSteps) {
@@ -171,6 +166,8 @@ public class ReporterControler implements IReporter {
 	}
 	
 	/**
+	 * Remove duplicated results (when a test is reexecuted, we have several results for the same scenario)
+	 * 
 	 * TODO: see if we could remove the same method in SeleniumRobotTestListener
 	 * @param context
 	 * @param currentTestResult
@@ -250,50 +247,40 @@ public class ReporterControler implements IReporter {
 			allResultsSet.addAll(rs);
 		}
 		
-		// retrieve list of all files used by test steps
-		Map<ITestResult, List<TestStep>> allSteps = TestLogging.getTestsSteps();
-		
-		synchronized (allSteps) { // as we use synchronizedMap
-			for (Entry<ITestResult, List<TestStep>> testSteps: allSteps.entrySet()) {
-				
-				// do not keep results of tests that has been retried
-				if (!allResultsSet.contains(testSteps.getKey())) {
-					continue;
-				}
-				
-				for (TestStep testStep: testSteps.getValue()) {
-					usedFiles.addAll(testStep.getAllAttachments());
-				}
-
-				SeleniumTestsContext testContext = TestNGResultUtils.getSeleniumRobotTestContext(testSteps.getKey());
-				
-				if (testContext == null) {
-					continue;
-				}
-				
-				String outputSubDirectory = new File(testContext.getOutputDirectory()).getName();
-				String outputDirectoryParent = new File(testContext.getOutputDirectory()).getParent();
-				File htmlDir = Paths.get(outputDirectoryParent, outputSubDirectory, "htmls").toFile();
-				File htmlBeforeDir = Paths.get(outputDirectoryParent, "before-" + outputSubDirectory, "htmls").toFile();
-				File screenshotDir = Paths.get(outputDirectoryParent, outputSubDirectory, "screenshots").toFile();
-				File screenshotBeforeDir = Paths.get(outputDirectoryParent, "before-" + outputSubDirectory, "screenshots").toFile();
-				
-				// get list of existing files
-				if (htmlDir.isDirectory()) {
-					allFiles.addAll(Arrays.asList(htmlDir.listFiles()));
-				}
-				if (screenshotDir.isDirectory()) {
-					allFiles.addAll(Arrays.asList(screenshotDir.listFiles()));
-				}
-				if (htmlBeforeDir.isDirectory()) {
-					allFiles.addAll(Arrays.asList(htmlBeforeDir.listFiles()));
-				}
-				if (screenshotBeforeDir.isDirectory()) {
-					allFiles.addAll(Arrays.asList(screenshotBeforeDir.listFiles()));
-				}
+		for (ITestResult testResult: allResultsSet) {
+			
+			// without context, nothing can be done
+			SeleniumTestsContext testContext = TestNGResultUtils.getSeleniumRobotTestContext(testResult);
+			if (testContext == null) {
+				continue;
 			}
-		}
-		
+			
+			// get files referenced by the steps
+			for (TestStep testStep: testContext.getTestStepManager().getTestSteps()) {
+				usedFiles.addAll(testStep.getAllAttachments());
+			}
+			
+			String outputSubDirectory = new File(testContext.getOutputDirectory()).getName();
+			String outputDirectoryParent = new File(testContext.getOutputDirectory()).getParent();
+			File htmlDir = Paths.get(outputDirectoryParent, outputSubDirectory, "htmls").toFile();
+			File htmlBeforeDir = Paths.get(outputDirectoryParent, "before-" + outputSubDirectory, "htmls").toFile();
+			File screenshotDir = Paths.get(outputDirectoryParent, outputSubDirectory, "screenshots").toFile();
+			File screenshotBeforeDir = Paths.get(outputDirectoryParent, "before-" + outputSubDirectory, "screenshots").toFile();
+			
+			// get list of existing files
+			if (htmlDir.isDirectory()) {
+				allFiles.addAll(Arrays.asList(htmlDir.listFiles()));
+			}
+			if (screenshotDir.isDirectory()) {
+				allFiles.addAll(Arrays.asList(screenshotDir.listFiles()));
+			}
+			if (htmlBeforeDir.isDirectory()) {
+				allFiles.addAll(Arrays.asList(htmlBeforeDir.listFiles()));
+			}
+			if (screenshotBeforeDir.isDirectory()) {
+				allFiles.addAll(Arrays.asList(screenshotBeforeDir.listFiles()));
+			}
+		}		
 		
 		for (File file: allFiles) {
 			if (!usedFiles.contains(file)) {
@@ -322,96 +309,7 @@ public class ReporterControler implements IReporter {
 	 * Use TestStep creatd in LogAction.java
 	 */
 	protected List<TestStep> getAllTestSteps(final ITestResult testResult) {
-		
-		List<TestStep> testSteps = new ArrayList<>();
-		
-		// reorder all configuration methods
-		List<ITestResult> allConfigMethods = new ArrayList<>();
-		allConfigMethods.addAll(testResult.getTestContext().getFailedConfigurations().getAllResults());
-		allConfigMethods.addAll(testResult.getTestContext().getPassedConfigurations().getAllResults());
-		allConfigMethods.addAll(testResult.getTestContext().getSkippedConfigurations().getAllResults());
-		allConfigMethods = allConfigMethods.stream()
-				.sorted((r1, r2) -> Long.compare(r1.getStartMillis(), r2.getStartMillis()))
-				.collect(Collectors.toList());
-		
-		// add before configuration step
-		// select only configuration methods that match this method / class / test name as allConfigMethods contains all configuration methods of this test context
-		for (ITestResult config: allConfigMethods) {
-			if (config.getMethod().isBeforeClassConfiguration()) {
-				if (!config.getMethod().getTestClass().equals(testResult.getTestClass())) {
-					continue;
-				}
-			} else if (config.getMethod().isBeforeTestConfiguration()) {
-				if (!config.getTestContext().equals(testResult.getTestContext())) {
-					continue;
-				}
-			} else if (config.getMethod().isBeforeMethodConfiguration()) {
-				try {
-					String methodName = ((Method)(config.getParameters()[0])).getName();
-					if (!methodName.equals(testResult.getName())) {
-						continue;
-					}
-					
-					// if this step is already present for this test method, remove it as we want to take the last one
-					TestStep stepAlreadyPresent = getTestStepWithSameName(testSteps, TestLogging.getTestsSteps().get(config).get(0));
-					if (stepAlreadyPresent != null) {
-						testSteps.remove(stepAlreadyPresent);
-					}
-				} catch (Exception e) {}
-			} else {
-				continue;
-			}
-			
-			// matching, add step
-			try {
-				testSteps.addAll(TestLogging.getTestsSteps().get(config));
-			} catch (NullPointerException e) {}
-		}
-		
-		// add regular steps
-		try {
-			for (TestStep step: TestLogging.getTestsSteps().get(testResult)) {
-				if (step.getTestResult() != null && step.getTestResult().getMethod().isTest()) {
-					testSteps.add(step);
-				}
-			}
-			
-		} catch (NullPointerException e) {}
-		
-		// add after configuration step
-		for (ITestResult config: allConfigMethods) {
-			if (config.getMethod().isAfterClassConfiguration()) {
-				if (!config.getMethod().getTestClass().equals(testResult.getTestClass())) {
-					continue;
-				}
-			} else if (config.getMethod().isAfterTestConfiguration()) {
-				if (!config.getTestContext().equals(testResult.getTestContext())) {
-					continue;
-				}
-			} else if (config.getMethod().isAfterMethodConfiguration()) {
-				
-				try {
-					String methodName = ((Method)(config.getParameters()[0])).getName();
-					if (!methodName.equals(testResult.getName())) {
-						continue;
-					}
-					
-					// if this step is already present for this test method, remove it as we want to take the last one
-					TestStep stepAlreadyPresent = getTestStepWithSameName(testSteps, TestLogging.getTestsSteps().get(config).get(0));
-					if (stepAlreadyPresent != null) {
-						testSteps.remove(stepAlreadyPresent);
-					}
-				} catch (Exception e) {}
-			} else {
-				continue;
-			}
-			
-			// matching, add step
-			try {
-				testSteps.addAll(TestLogging.getTestsSteps().get(config));
-			} catch (NullPointerException e) {}
-		}
-		
-		return testSteps;
+		return TestNGResultUtils.getSeleniumRobotTestContext(testResult).getTestStepManager().getTestSteps();
+
 	}
 }

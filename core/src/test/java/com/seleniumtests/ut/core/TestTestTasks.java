@@ -505,8 +505,8 @@ public class TestTestTasks extends MockitoTest {
 			SeleniumTestsContextManager.getThreadContext().setManualTestSteps(true);
 			TestTasks.addStep("foo");
 			TestTasks.addStep(null); // add a final step so that previous step is written
-			Assert.assertEquals(TestLogging.getTestsSteps().get(TestLogging.getCurrentTestResult()).size(), 1);
-			Assert.assertEquals(TestLogging.getTestsSteps().get(TestLogging.getCurrentTestResult()).get(0).getName(), "foo");
+			Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getTestStepManager().getTestSteps().size(), 1);
+			Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getTestStepManager().getTestSteps().get(0).getName(), "foo");
 		} finally {
 			TestLogging.reset();
 		}

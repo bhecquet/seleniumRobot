@@ -18,31 +18,29 @@
 package com.seleniumtests.it.driver.screenshots;
 
 import java.io.File;
-import java.io.FileFilter;
 import java.io.FilenameFilter;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.testng.Assert;
+import org.testng.ISuite;
+import org.testng.ISuiteResult;
 import org.testng.ITestContext;
 import org.testng.ITestResult;
 import org.testng.annotations.Test;
 import org.testng.xml.XmlSuite.ParallelMode;
 
-import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.core.runner.SeleniumRobotTestListener;
+import com.seleniumtests.core.utils.TestNGResultUtils;
 import com.seleniumtests.driver.TestType;
 import com.seleniumtests.driver.screenshots.ScreenShot;
 import com.seleniumtests.driver.screenshots.ScreenshotUtil;
 import com.seleniumtests.driver.screenshots.ScreenshotUtil.Target;
 import com.seleniumtests.it.reporter.ReporterTest;
 import com.seleniumtests.reporter.logger.Snapshot;
-import com.seleniumtests.reporter.logger.TestLogging;
 import com.seleniumtests.reporter.logger.TestStep;
 
 public class TestScreenshotUtil extends ReporterTest {
@@ -56,21 +54,22 @@ public class TestScreenshotUtil extends ReporterTest {
 	public void testScreenshotDurationIsLogged(ITestContext testContext) throws Exception {
 
 		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriverShort"});
-
-		for (ITestResult testResult: TestLogging.getTestsSteps().keySet()) {
-			if (testResult.getMethod().isTest()) {
-				List<TestStep> steps = TestLogging.getTestsSteps().get(testResult);
-				
-				for (TestStep step: steps) {
-					List<Snapshot> snapshots = step.getSnapshots();
-					
-					if (!snapshots.isEmpty()) {
-						Assert.assertTrue(step.getDurationToExclude() > 0);
-						Assert.assertEquals(snapshots.get(0).getScreenshot().getDuration(), step.getDurationToExclude());
+		for (ISuite suite: SeleniumRobotTestListener.getSuiteList()) {
+			for (ISuiteResult suiteResult: suite.getResults().values()) {
+				for (ITestResult testResult: suiteResult.getTestContext().getPassedTests().getAllResults()) {
+					List<TestStep> steps = TestNGResultUtils.getSeleniumRobotTestContext(testResult).getTestStepManager().getTestSteps();
+					for (TestStep step: steps) {
+						List<Snapshot> snapshots = step.getSnapshots();
+						
+						if (!snapshots.isEmpty()) {
+							Assert.assertTrue(step.getDurationToExclude() > 0);
+							Assert.assertEquals(snapshots.get(0).getScreenshot().getDuration(), step.getDurationToExclude());
+						}
 					}
 				}
 			}
 		}
+
 	}
 	
 	/**

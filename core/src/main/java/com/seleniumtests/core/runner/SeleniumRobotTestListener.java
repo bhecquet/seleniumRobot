@@ -115,6 +115,18 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 		// nothing to do
 		System.out.println("skipped");
 		
+		// be sure that the result contains context. It can happen when the test is never executed
+		// initialize it from the method context as it's the closest for our test
+		if (TestNGResultUtils.getSeleniumRobotTestContext(result) == null) {
+			SeleniumTestsContext currentContext = new SeleniumTestsContext(SeleniumTestsContextManager.getMethodContext(result.getTestContext(), 
+					result.getMethod().getTestClass().getName(), 
+					TestNGResultUtils.getTestName(result), 
+					true), false);
+
+			SeleniumTestsContextManager.setThreadContext(currentContext);
+			SeleniumTestsContextManager.updateThreadContext(result);
+		}
+		
 		generateTempReport(result);
 	}
 
@@ -618,6 +630,9 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 			changeTestResult(testResult);
 		}
 		
+		// store context in test result
+		TestNGResultUtils.setSeleniumRobotTestContext(testResult, SeleniumTestsContextManager.getThreadContext());
+		
 		if (testResult.getThrowable() != null) {
 			logger.error(testResult.getThrowable().getMessage());
 			
@@ -627,7 +642,7 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 			if (lastStep == null) {
 				// when steps are automatic, they are closed (lastStep is null) once method is finished
 				try {
-					lastStep = Iterables.getLast(TestLogging.getTestsSteps().get(testResult));
+					lastStep = Iterables.getLast(SeleniumTestsContextManager.getThreadContext().getTestStepManager().getTestSteps());
 				} catch (NoSuchElementException e) {} 
 			}
 			
@@ -642,9 +657,6 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 		
 		// unreserve variables
 		unreserveVariables();
-		
-		// store context in test result
-		TestNGResultUtils.setSeleniumRobotTestContext(testResult, SeleniumTestsContextManager.getThreadContext());
 		
 		// parse logs of this test method
 		try {
@@ -672,5 +684,13 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 	    } catch (ClassCastException | NullPointerException e) {
 			logger.error("Retry analyzer is not a TestRetryAnalyzer instance");
 		}
+	}
+
+	/**
+	 * For test
+	 * @return
+	 */
+	public static List<ISuite> getSuiteList() {
+		return suiteList;
 	}
 }

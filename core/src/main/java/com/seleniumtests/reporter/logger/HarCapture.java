@@ -31,12 +31,20 @@ import net.lightbody.bmp.core.har.Har;
 public class HarCapture extends TestAction {
 
 	private Har har;
+	private File harFile;
 	private static final String HAR_FILE_NAME = "networkCapture.har";
 	
+	public HarCapture(Har har, String name, File harFile) {
+
+		super(name, false, new ArrayList<>());
+		this.har = har;
+		this.harFile = harFile;
+		
+	}
 	public HarCapture(Har har, String name) throws IOException {
 		super(name, false, new ArrayList<>());
 		this.har = har;
-		File harFile = Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), name + "-" + HAR_FILE_NAME).toFile();
+		harFile = Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), name + "-" + HAR_FILE_NAME).toFile();
 		
 		har.writeTo(harFile);
 
@@ -60,5 +68,9 @@ public class HarCapture extends TestAction {
 
 	public Har getHarFile() {
 		return har;
+	}
+	
+	public HarCapture encode() {
+		return new HarCapture(har, name, harFile);
 	}
 }

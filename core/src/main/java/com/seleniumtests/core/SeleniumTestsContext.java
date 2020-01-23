@@ -58,6 +58,8 @@ import com.seleniumtests.driver.DriverMode;
 import com.seleniumtests.driver.TestType;
 import com.seleniumtests.driver.screenshots.VideoCaptureMode;
 import com.seleniumtests.reporter.logger.ArchiveMode;
+import com.seleniumtests.reporter.logger.TestLogging;
+import com.seleniumtests.reporter.logger.TestStep;
 import com.seleniumtests.reporter.reporters.CustomReporter;
 import com.seleniumtests.reporter.reporters.ReportInfo;
 import com.seleniumtests.reporter.reporters.SeleniumRobotServerTestRecorder;
@@ -73,6 +75,60 @@ import com.seleniumtests.util.osutility.OSUtility;
  * Defines TestNG context used in STF.
  */
 public class SeleniumTestsContext {
+	
+	public class TestStepManager {
+		
+
+		List<TestStep> testSteps;
+		TestStep runningStep;
+		TestStep rootStep;
+		
+		public TestStepManager() {
+			runningStep = null;
+			rootStep = null;
+			testSteps = new ArrayList<>();
+		}
+		
+		/**
+		 * copy the test step manager
+		 * @param managerToCopy
+		 */
+		public TestStepManager(TestStepManager managerToCopy) {
+			testSteps = new ArrayList<>();
+			for (TestStep step: managerToCopy.testSteps) {
+				testSteps.add(step.deepCopy());
+			}
+			runningStep = managerToCopy.runningStep;
+			rootStep = managerToCopy.rootStep;
+		}
+		
+		/**
+		 * Returns the currently running step (root step or sub-step)
+		 * @return
+		 */
+		public TestStep getRunningTestStep() {
+			return runningStep;
+		}
+
+		public void setRunningTestStep(TestStep testStep) {
+			runningStep = testStep;
+		}
+		
+
+		public void setRootTestStep(TestStep testStep) {
+			rootStep = testStep;
+			runningStep = testStep;
+		}
+		
+		public TestStep getRootTestStep() {
+			return rootStep;
+		}
+
+		public List<TestStep> getTestSteps() {
+			return testSteps;
+		}
+		
+	}
 	
 	private static final Logger logger = SeleniumRobotLogger.getLogger(SeleniumTestsContext.class);
 	private static Map<String, String> outputFolderNames = Collections.synchronizedMap(new HashMap<>());
@@ -271,6 +327,7 @@ public class SeleniumTestsContext {
     private SeleniumGridConnector seleniumGridConnector;
     private List<SeleniumGridConnector> seleniumGridConnectors;
     private TestManager testManagerIntance;
+    private TestStepManager testStepManager; // handles logging of test steps in this context
     private boolean driverCreationBlocked = false;		// if true, inside this thread, driver creation will be forbidden
     
     // folder config
@@ -282,6 +339,7 @@ public class SeleniumTestsContext {
     	seleniumGridConnector = null;
     	seleniumGridConnectors = new ArrayList<>();
     	testManagerIntance = null;
+    	testStepManager = new TestStepManager();
     }
     
     /**
@@ -313,11 +371,14 @@ public class SeleniumTestsContext {
     	testNGResult = toCopy.testNGResult;
     	baseOutputDirectory = toCopy.baseOutputDirectory;
     	verificationFailuresMap = new HashMap<>(toCopy.verificationFailuresMap);
+    	testStepManager = new TestStepManager(toCopy.testStepManager);
     	
     }
     
     public SeleniumTestsContext(final ITestContext context) {
         testNGContext = context;
+
+    	testStepManager = new TestStepManager();
         buildContextFromConfig();
     }
     
@@ -908,8 +969,6 @@ public class SeleniumTestsContext {
 		return null;
 	}
 	
-	
-	
 	// ------------------------- accessors ------------------------------------------------------
 	
 	// getters from contextManager
@@ -1491,6 +1550,14 @@ public class SeleniumTestsContext {
     public Map<String, HashMap<String, String>> getIdMapping() {
     	return idMapping;
     }
+
+    /**
+     * Returns the TestStepManager which will steps
+     * @return
+     */
+	public TestStepManager getTestStepManager() {
+		return testStepManager;
+	}
 
 	//set
     public void setIdMapping(Map<String, HashMap<String,String>> conf){

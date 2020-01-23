@@ -57,7 +57,12 @@ public class TestMessage extends TestAction {
 	public TestMessage encode(String format) {
 		TestMessage msg = new TestMessage(encodeString(name, format), messageType);
 		msg.pwdToReplace = new ArrayList<>(pwdToReplace);
-		msg.encoded = true;
+		
+		if (format == null) {
+			msg.encoded = encoded;
+		} else {
+			msg.encoded = true;
+		}
 		msg.actionException = actionException;
 		if (actionException != null) {
 			msg.actionExceptionMessage = actionException.getClass().toString() + ": " + encodeString(actionException.getMessage(), format);

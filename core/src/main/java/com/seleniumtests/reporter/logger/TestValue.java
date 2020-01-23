@@ -67,7 +67,12 @@ public class TestValue extends TestAction {
 		TestValue val =  new TestValue(encodeString(name, format), 
 				encodeString(message, format),
 				encodeString(value, format));
-		val.encoded = true;
+		
+		if (format == null) {
+			val.encoded = encoded;
+		} else {
+			val.encoded = true;
+		}
 		return val;
 	}
 }

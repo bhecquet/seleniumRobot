@@ -127,7 +127,7 @@ public class TestTestLogging extends ReporterTest {
 		// equivalent of "SeleniumRobotTestListener.logLastStep()"
 		TestTasks.addStep(null);
 		
-		List<TestStep> steps = TestLogging.getTestsSteps().get(TestLogging.getCurrentTestResult());
+		List<TestStep> steps = SeleniumTestsContextManager.getThreadContext().getTestStepManager().getTestSteps();
 		Assert.assertEquals(steps.size(), 2);
 	}
 	

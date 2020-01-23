@@ -22,7 +22,6 @@ import java.util.List;
 
 import org.testng.Assert;
 import org.testng.ITestContext;
-import org.testng.Reporter;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
@@ -76,7 +75,7 @@ public class TestLogActions extends GenericTest {
 		new CalcPage()
 				.add(1, 1);
 
-		List<TestStep> steps = TestLogging.getTestsSteps().get(Reporter.getCurrentTestResult());
+		List<TestStep> steps = SeleniumTestsContextManager.getThreadContext().getTestStepManager().getTestSteps();
 		Assert.assertEquals(steps.size(), 2);
 		Assert.assertEquals(steps.get(0).getName(), "openPage with args: (null, )");
 		Assert.assertEquals(steps.get(1).getName(), "add with args: (1, 1, )");
@@ -97,8 +96,8 @@ public class TestLogActions extends GenericTest {
 	public void testSimpleNonCucumberStepLoggingWithStepDescription() throws IOException {
 		new CalcPage()
 		.addWithName(1);
-		
-		List<TestStep> steps = TestLogging.getTestsSteps().get(Reporter.getCurrentTestResult());
+
+		List<TestStep> steps = SeleniumTestsContextManager.getThreadContext().getTestStepManager().getTestSteps();
 		Assert.assertEquals(steps.size(), 2);
 		Assert.assertEquals(steps.get(0).getName(), "openPage with args: (null, )");
 		Assert.assertEquals(steps.get(1).getName(), "add something to total");
@@ -115,8 +114,8 @@ public class TestLogActions extends GenericTest {
 	public void testSimpleNonCucumberStepLoggingWithStepDescriptionAndArgs() throws IOException {
 		new CalcPage()
 		.addWithName2(1);
-		
-		List<TestStep> steps = TestLogging.getTestsSteps().get(Reporter.getCurrentTestResult());
+
+		List<TestStep> steps = SeleniumTestsContextManager.getThreadContext().getTestStepManager().getTestSteps();
 		Assert.assertEquals(steps.size(), 2);
 		Assert.assertEquals(steps.get(1).getName(), "add 1 to total");
 	}
@@ -131,8 +130,8 @@ public class TestLogActions extends GenericTest {
 		SeleniumTestsContextManager.getThreadContext().setMaskPassword(true);
 		new CalcPage()
 			.connectWithName("login", "somePassToConnect");
-		
-		List<TestStep> steps = TestLogging.getTestsSteps().get(Reporter.getCurrentTestResult());
+
+		List<TestStep> steps = SeleniumTestsContextManager.getThreadContext().getTestStepManager().getTestSteps();
 		Assert.assertEquals(steps.size(), 2);
 		Assert.assertEquals(steps.get(1).getName(), "Connect to calc with login/******");
 	}
@@ -147,8 +146,8 @@ public class TestLogActions extends GenericTest {
 		SeleniumTestsContextManager.getThreadContext().setMaskPassword(true);
 		new CalcPage()
 		.addWithName3(1, 2, 3);
-		
-		List<TestStep> steps = TestLogging.getTestsSteps().get(Reporter.getCurrentTestResult());
+
+		List<TestStep> steps = SeleniumTestsContextManager.getThreadContext().getTestStepManager().getTestSteps();
 		Assert.assertEquals(steps.size(), 2);
 		Assert.assertEquals(steps.get(1).getName(), "add 1 and [2,3,] to total");
 	}
@@ -166,8 +165,8 @@ public class TestLogActions extends GenericTest {
 		SeleniumRobotTestPlan.setCucumberTest(true);
 		new CalcPage()
 			.addC(1, 1);
-		
-		List<TestStep> steps = TestLogging.getTestsSteps().get(Reporter.getCurrentTestResult());
+
+		List<TestStep> steps = SeleniumTestsContextManager.getThreadContext().getTestStepManager().getTestSteps();
 		Assert.assertEquals(steps.size(), 2);
 		Assert.assertEquals(steps.get(0).getName(), "openPage with args: (null, )");
 		Assert.assertEquals(steps.get(1).getName(), "add '(\\d+)' to '(\\d+)' with args: (1, 1, )");
@@ -194,8 +193,8 @@ public class TestLogActions extends GenericTest {
 		} catch (DriverExceptions e) {
 			// continue;
 		}
-		
-		List<TestStep> steps = TestLogging.getTestsSteps().get(Reporter.getCurrentTestResult());
+
+		List<TestStep> steps = SeleniumTestsContextManager.getThreadContext().getTestStepManager().getTestSteps();
 		Assert.assertEquals(steps.size(), 2);
 		Assert.assertEquals(steps.get(0).getName(), "openPage with args: (null, )");
 		Assert.assertEquals(steps.get(1).getName(), "failAction ");
@@ -221,8 +220,8 @@ public class TestLogActions extends GenericTest {
 		} catch (AssertionError e) {
 			// continue;
 		}
-		
-		List<TestStep> steps = TestLogging.getTestsSteps().get(Reporter.getCurrentTestResult());
+
+		List<TestStep> steps = SeleniumTestsContextManager.getThreadContext().getTestStepManager().getTestSteps();
 		Assert.assertEquals(steps.size(), 2);
 		Assert.assertEquals(steps.get(0).getName(), "openPage with args: (null, )");
 		Assert.assertEquals(steps.get(1).getName(), "assertAction ");
@@ -250,8 +249,8 @@ public class TestLogActions extends GenericTest {
 		new CalcPage()
 					.add(1, 1)
 					.add(2);
-		
-		List<TestStep> steps = TestLogging.getTestsSteps().get(Reporter.getCurrentTestResult());
+
+		List<TestStep> steps = SeleniumTestsContextManager.getThreadContext().getTestStepManager().getTestSteps();
 		Assert.assertEquals(steps.size(), 3);
 		Assert.assertEquals(steps.get(0).getName(), "openPage with args: (null, )");
 		Assert.assertEquals(steps.get(1).getName(), "add with args: (1, 1, )");
@@ -282,7 +281,7 @@ public class TestLogActions extends GenericTest {
 		new CalcPage()
 				.connect("login", "somePassToConnect");
 
-		List<TestStep> steps = TestLogging.getTestsSteps().get(Reporter.getCurrentTestResult());
+		List<TestStep> steps = SeleniumTestsContextManager.getThreadContext().getTestStepManager().getTestSteps();
 		Assert.assertEquals(steps.size(), 2);
 		Assert.assertEquals(steps.get(0).getName(), "openPage with args: (null, )");
 		Assert.assertEquals(steps.get(1).getName(), "connect with args: (login, somePassToConnect, )");
@@ -297,8 +296,8 @@ public class TestLogActions extends GenericTest {
 		SeleniumTestsContextManager.getThreadContext().setMaskPassword(true);
 		new CalcPage()
 			.connect("login", "somePassToConnect");
-		
-		List<TestStep> steps = TestLogging.getTestsSteps().get(Reporter.getCurrentTestResult());
+
+		List<TestStep> steps = SeleniumTestsContextManager.getThreadContext().getTestStepManager().getTestSteps();
 		Assert.assertEquals(steps.size(), 2);
 		Assert.assertEquals(steps.get(0).getName(), "openPage with args: (null, )");
 		Assert.assertEquals(steps.get(1).getName(), "connect with args: (login, ******, )");
@@ -313,8 +312,8 @@ public class TestLogActions extends GenericTest {
 		SeleniumTestsContextManager.getThreadContext().setMaskPassword(true);
 		new CalcPage()
 		.connect("login", null);
-		
-		List<TestStep> steps = TestLogging.getTestsSteps().get(Reporter.getCurrentTestResult());
+
+		List<TestStep> steps = SeleniumTestsContextManager.getThreadContext().getTestStepManager().getTestSteps();
 		Assert.assertEquals(steps.size(), 2);
 		Assert.assertEquals(steps.get(0).getName(), "openPage with args: (null, )");
 		Assert.assertEquals(steps.get(1).getName(), "connect with args: (login, null, )");
