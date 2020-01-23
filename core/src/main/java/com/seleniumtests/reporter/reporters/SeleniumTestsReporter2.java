@@ -153,7 +153,7 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 			Template t = ve.getTemplate( "reporter/templates/report.part.test.step.vm" );
 			VelocityContext context = new VelocityContext();
 			
-			List<TestStep> testSteps = TestLogging.getTestsSteps().get(testResult);
+			List<TestStep> testSteps = TestNGResultUtils.getSeleniumRobotTestContext(testResult).getTestStepManager().getTestSteps();
 			if (testSteps == null) {
 				return;
 			}
@@ -235,7 +235,7 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 	 * If 'keepAllResults' is false, we place a message saying how to generate it
 	 * Else, display all zip files available (if any)
 	 */
-	public void generatePreviousExecutionLinks(final VelocityEngine ve) {
+	public void generatePreviousExecutionLinks(final VelocityEngine ve, ITestResult testResult) {
 		
 		try {
 			Template t = ve.getTemplate( "reporter/templates/report.part.test.previous.exec.vm" );
@@ -243,7 +243,7 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 			
 			// do we have previous execution results
 			if (SeleniumTestsContextManager.getGlobalContext().getKeepAllResults()) {
-				List<String> executionResults = FileUtils.listFiles(new File(SeleniumTestsContextManager.getThreadContext().getOutputDirectory()), 
+				List<String> executionResults = FileUtils.listFiles(new File(TestNGResultUtils.getSeleniumRobotTestContext(testResult).getOutputDirectory()), 
 															FileFilterUtils.suffixFileFilter(".zip"), null).stream()
 						.map(File::getName)
 						.collect(Collectors.toList());
@@ -329,16 +329,16 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 	public void generateSingleTestReport(ITestResult testResult, boolean resourcesFromCdn) {
 
 		// issue #81: recreate test context from this context (due to multithreading, this context may be null if parallel testing is done)
-		SeleniumTestsContextManager.setThreadContextFromTestResult(testResult.getTestContext(), getTestName(testResult), getClassName(testResult), testResult);
+		SeleniumTestsContext testContext = SeleniumTestsContextManager.setThreadContextFromTestResult(testResult.getTestContext(), getTestName(testResult), getClassName(testResult), testResult);
 		
 		try {
 			copyResources();
 			
 			// issue #284: copy resources specific to the single test report. They are moved here so that the file can be used without global resources
-			FileUtils.copyInputStreamToFile(Thread.currentThread().getContextClassLoader().getResourceAsStream("reporter/templates/seleniumRobot_solo.css"), Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), "resources", "seleniumRobot_solo.css").toFile());
-			FileUtils.copyInputStreamToFile(Thread.currentThread().getContextClassLoader().getResourceAsStream("reporter/templates/app.min.js"), Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), "resources", "app.min.js").toFile());
+			FileUtils.copyInputStreamToFile(Thread.currentThread().getContextClassLoader().getResourceAsStream("reporter/templates/seleniumRobot_solo.css"), Paths.get(testContext.getOutputDirectory(), "resources", "seleniumRobot_solo.css").toFile());
+			FileUtils.copyInputStreamToFile(Thread.currentThread().getContextClassLoader().getResourceAsStream("reporter/templates/app.min.js"), Paths.get(testContext.getOutputDirectory(), "resources", "app.min.js").toFile());
 			
-			mOut = createWriter(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), "TestReport.html");
+			mOut = createWriter(testContext.getOutputDirectory(), "TestReport.html");
 			startHtml(getTestStatus(testResult), mOut, "simple", resourcesFromCdn);
 			generateExecutionReport(testResult);
 			endHtml();
@@ -360,6 +360,7 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 		// build result list for each TestNG test
 		Map<ITestContext, List<ITestResult>> methodResultsMap = new LinkedHashMap<>();
 		Map<ITestResult, Map<String, String>> testInfosMap = new HashMap<>();
+		Map<ITestResult, List<TestStep>> allSteps = new HashMap<>();
 		Set<String> allInfoKeys = new HashSet<>();
 		
 		for (Entry<ITestContext, Set<ITestResult>> entry: resultSet.entrySet()) {
@@ -373,8 +374,10 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 				String fileName;
 				if (testContext != null) {
 					fileName = testContext.getRelativeOutputDir() + "/TestReport.html";
+					allSteps.put(result, testContext.getTestStepManager().getTestSteps());
 				} else {
 					fileName = getTestName(result) + "/TestReport.html";
+					allSteps.put(result, new ArrayList<>());
 				}
 
 				result.setAttribute(METHOD_RESULT_FILE_NAME, fileName);
@@ -384,6 +387,7 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 				Map<String, String> testInfos = TestNGResultUtils.getTestInfoEncoded(result, "html");
 				testInfosMap.put(result, testInfos);
 				allInfoKeys.addAll(testInfos.keySet());
+				
 			}
 			
 			methodResultsMap.put(entry.getKey(), methodResults);
@@ -395,7 +399,6 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 			Template t = ve.getTemplate("/reporter/templates/report.part.suiteSummary.vm");
 			VelocityContext context = new VelocityContext();
 			
-			Map<ITestResult, List<TestStep>> allSteps = TestLogging.getTestsSteps();
 			List<String> allSortedInfoKeys = new ArrayList<>(allInfoKeys);
 			allSortedInfoKeys.sort(null);
 
@@ -504,8 +507,8 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 	 * Fill velocity context with test context
 	 * @param velocityContext
 	 */
-	private void fillContextWithTestParams(VelocityContext velocityContext) {
-		SeleniumTestsContext selTestContext = SeleniumTestsContextManager.getThreadContext();
+	private void fillContextWithTestParams(VelocityContext velocityContext, ITestResult testResult) {
+		SeleniumTestsContext selTestContext = TestNGResultUtils.getSeleniumRobotTestContext(testResult);
 
 		if (selTestContext != null) {
 			String browser = selTestContext.getBrowser().getBrowserType();
@@ -588,7 +591,7 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 			velocityContext.put("testInfos", TestNGResultUtils.getTestInfoEncoded(testResult, "html"));
 			
 			// Application information
-			fillContextWithTestParams(velocityContext);       
+			fillContextWithTestParams(velocityContext, testResult);       
 			
 			// write file
 			StringWriter writer = new StringWriter();
@@ -597,7 +600,7 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 			
 			generatePanel(ve, testResult);
 			generateExecutionLogs(ve, testResult);
-			generatePreviousExecutionLinks(ve);
+			generatePreviousExecutionLinks(ve, testResult);
 			
 			
 			

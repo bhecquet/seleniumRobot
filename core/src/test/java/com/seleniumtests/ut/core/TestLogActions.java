@@ -56,7 +56,7 @@ public class TestLogActions extends GenericDriverTest {
 	public void testPassworkMasking() {
 
 		testPage._setPassword("someText");
-		TestStep step = TestLogging.getTestsSteps().get(TestLogging.getCurrentTestResult()).get(2);
+		TestStep step = SeleniumTestsContextManager.getThreadContext().getTestStepManager().getTestSteps().get(2);
 		
 		// all occurences of the password have been replaced
 		Assert.assertFalse(step.toString().contains("someText"));
@@ -70,7 +70,7 @@ public class TestLogActions extends GenericDriverTest {
 	public void testPassworkMasking2() {
 		
 		testPage._setPassword2("someText");
-		TestStep step = TestLogging.getTestsSteps().get(TestLogging.getCurrentTestResult()).get(2);
+		TestStep step = SeleniumTestsContextManager.getThreadContext().getTestStepManager().getTestSteps().get(2);
 		
 		// all occurences of the password have been replaced
 		Assert.assertFalse(step.toString().contains("someText"));
@@ -84,7 +84,7 @@ public class TestLogActions extends GenericDriverTest {
 	public void testMultiplePassworkMasking() {
 		
 		testPage._setPasswords("someText", "someOtherText");
-		TestStep step = TestLogging.getTestsSteps().get(TestLogging.getCurrentTestResult()).get(2);
+		TestStep step = SeleniumTestsContextManager.getThreadContext().getTestStepManager().getTestSteps().get(2);
 
 		// all occurences of the password have been replaced
 		Assert.assertFalse(step.toString().contains("someText"));
@@ -99,7 +99,7 @@ public class TestLogActions extends GenericDriverTest {
 	public void testMultiplePassworkMaskingWithList() {
 		
 		testPage._setPasswords(Arrays.asList("someText", "someOtherText"));
-		TestStep step = TestLogging.getTestsSteps().get(TestLogging.getCurrentTestResult()).get(2);
+		TestStep step = SeleniumTestsContextManager.getThreadContext().getTestStepManager().getTestSteps().get(2);
 	
 		// all occurences of the password have been replaced
 		Assert.assertFalse(step.toString().contains("someText"));

@@ -35,6 +35,7 @@ import org.testng.IReporter;
 import org.testng.ITestContext;
 import org.testng.ITestResult;
 
+import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.StatisticsStorage;
 import com.seleniumtests.core.utils.TestNGResultUtils;
@@ -77,15 +78,15 @@ public class CustomReporter extends CommonReporter implements IReporter {
 				consolidatedResults.put("total", consolidatedResults.get("total") + 1);
 				
 				// done in case it was null (issue #81)
-				SeleniumTestsContextManager.setThreadContextFromTestResult(entry.getKey(), getTestName(testResult), getClassName(testResult), testResult);
+				SeleniumTestsContext testContext = SeleniumTestsContextManager.setThreadContextFromTestResult(entry.getKey(), getTestName(testResult), getClassName(testResult), testResult);
 				
-				for (ReportInfo reportInfo: SeleniumTestsContextManager.getThreadContext().getCustomTestReports()) {
+				for (ReportInfo reportInfo: testContext.getCustomTestReports()) {
 					generateTestReport(testResult, reportInfo);
 				}
 			}
 		}
 		
-		for (ReportInfo reportInfo: SeleniumTestsContextManager.getThreadContext().getCustomSummaryReports()) {
+		for (ReportInfo reportInfo: SeleniumTestsContextManager.getGlobalContext().getCustomSummaryReports()) {
 			generateSummaryReport(consolidatedResults, reportInfo);
 		}
 		
@@ -112,7 +113,7 @@ public class CustomReporter extends CommonReporter implements IReporter {
 			String reportFormat = reportInfo.getExtension().substring(1);
 			Long testDuration = 0L;
 			Integer errors = 0;
-			List<TestStep> testSteps = TestLogging.getTestsSteps().get(testResult);
+			List<TestStep> testSteps = TestNGResultUtils.getSeleniumRobotTestContext(testResult).getTestStepManager().getTestSteps();
 			List<TestStep> newTestSteps = new ArrayList<>();
 			if (testSteps != null) {
 				for (TestStep step: testSteps) {
@@ -151,6 +152,8 @@ public class CustomReporter extends CommonReporter implements IReporter {
 				generateTheStackTrace(testResult.getThrowable(), testResult.getThrowable().getMessage(), stackString, reportFormat.toLowerCase());
 				stack = Arrays.asList(stackString.toString().split("\n"));
 			}
+			
+			SeleniumTestsContext seleniumTestsContext = TestNGResultUtils.getSeleniumRobotTestContext(testResult);
 	
 			// if adding some information, don't forget to add them to velocity model for integration tests
 			context.put("errors", 0);
@@ -164,9 +167,9 @@ public class CustomReporter extends CommonReporter implements IReporter {
 			context.put("time", testResult.getStartMillis());	
 			context.put("startDate", new Date(testResult.getStartMillis()));	
 			context.put("testSteps", newTestSteps);	
-			context.put("browser", SeleniumTestsContextManager.getThreadContext().getBrowser());	
+			context.put("browser", seleniumTestsContext.getBrowser());	
 			context.put("version", SeleniumTestsContextManager.getApplicationVersion());	
-			context.put("parameters", SeleniumTestsContextManager.getThreadContext().getContextDataMap());
+			context.put("parameters", seleniumTestsContext.getContextDataMap());
 			context.put("stacktrace", stack);
 			String logs = SeleniumRobotLogger.getTestLogs().get(getTestName(testResult));
 			try {
@@ -183,7 +186,7 @@ public class CustomReporter extends CommonReporter implements IReporter {
 			String fileName = reportInfo.prefix 
 								+ "-result" 
 								+ reportInfo.extension;
-			PrintWriter fileWriter = createWriter(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), fileName);
+			PrintWriter fileWriter = createWriter(seleniumTestsContext.getOutputDirectory(), fileName);
 			fileWriter.write(writer.toString());
 			fileWriter.flush();
 			fileWriter.close();

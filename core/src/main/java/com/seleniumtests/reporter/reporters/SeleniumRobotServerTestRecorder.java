@@ -35,6 +35,7 @@ import org.testng.ITestResult;
 import org.testng.xml.XmlSuite;
 
 import com.seleniumtests.connectors.selenium.SeleniumRobotSnapshotServerConnector;
+import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.utils.TestNGResultUtils;
 import com.seleniumtests.customexception.ConfigurationException;
@@ -130,7 +131,7 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 			for (ITestResult testResult: methodResults) {
 				
 				// issue #81: recreate test context from this context (due to multithreading, this context may be null if parallel testing is used)
-				SeleniumTestsContextManager.setThreadContextFromTestResult(entry.getKey(), getTestName(testResult), getClassName(testResult), testResult);
+				SeleniumTestsContext testContext = SeleniumTestsContextManager.setThreadContextFromTestResult(entry.getKey(), getTestName(testResult), getClassName(testResult), testResult);
 				
 				// skipped tests has never been executed and so attribute (set in TestListener) has not been applied
 				String testName = getTestName(testResult);
@@ -140,7 +141,7 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 				serverConnector.createTestCaseInSession();
 				serverConnector.addLogsToTestCaseInSession(generateExecutionLogs(testResult).toString());
 				
-				List<TestStep> testSteps = TestLogging.getTestsSteps().get(testResult);
+				List<TestStep> testSteps = TestNGResultUtils.getSeleniumRobotTestContext(testResult).getTestStepManager().getTestSteps();
 				if (testSteps == null) {
 					continue;
 				}
@@ -154,7 +155,7 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 					serverConnector.recordStepResult(!testStep.getFailed(), stepLogs, testStep.getDuration());
 					
 					if (!testStep.getSnapshots().isEmpty()) {
-						serverConnector.createSnapshot(Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), 
+						serverConnector.createSnapshot(Paths.get(testContext.getOutputDirectory(), 
 								testStep.getSnapshots().get(0).getScreenshot().getImagePath()
 								).toFile());
 					}

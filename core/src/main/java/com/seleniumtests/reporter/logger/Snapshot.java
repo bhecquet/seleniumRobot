@@ -153,5 +153,9 @@ public class Snapshot extends TestAction {
 	public ScreenShot getScreenshot() {
 		return screenshot;
 	}
+	
+	public Snapshot encode() {
+		return new Snapshot(screenshot, name);
+	}
 
 }

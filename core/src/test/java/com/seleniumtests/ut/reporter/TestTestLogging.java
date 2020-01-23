@@ -110,7 +110,7 @@ public class TestTestLogging extends GenericTest {
 		TestLogging.setCurrentTestResult(testResult);
 		TestLogging.setCurrentRootTestStep(testStep);
 		TestLogging.logTestStep(testStep);
-		Assert.assertEquals(TestLogging.getTestsSteps().get(testResult).size(), 1);
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getTestStepManager().getTestSteps().size(), 1);
 	}
 	
 	@Test(groups={"ut"})

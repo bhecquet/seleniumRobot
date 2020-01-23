@@ -17,16 +17,15 @@
  */
 package com.seleniumtests.reporter.logger;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.apache.commons.text.StringEscapeUtils;
 import org.apache.log4j.Logger;
 import org.json.JSONObject;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
-import com.seleniumtests.customexception.CustomSeleniumTestsException;
 import com.seleniumtests.util.StringUtility;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
@@ -36,7 +35,7 @@ import com.seleniumtests.util.logging.SeleniumRobotLogger;
  * @author behe
  *
  */
-public class TestAction {
+public class TestAction implements Serializable {
 	
 
 	protected static final Logger logger = SeleniumRobotLogger.getLogger(TestAction.class);
@@ -126,7 +125,7 @@ public class TestAction {
 	}
 	
 	protected String encodeString(String message, String format) {
-		if (encoded) {
+		if (encoded || format == null) {
 			return message;
 		}
 		
@@ -136,12 +135,21 @@ public class TestAction {
 	public TestAction encode(String format) {
 		TestAction encodedAction = new TestAction(encodeString(name, format), failed, new ArrayList<String>(pwdToReplace));
 		encodedAction.actionException = actionException;
-		encodedAction.encoded = true;
+		
+		if (format == null) {
+			encodedAction.encoded = encoded;
+		} else {
+			encodedAction.encoded = true;
+		}
 		encodedAction.durationToExclude = durationToExclude;
 		if (actionException != null) {
 			encodedAction.actionExceptionMessage = actionException.getClass().toString() + ": " + encodeString(actionException.getMessage(), format);
 		}
 		return encodedAction;
+	}
+	
+	public TestAction deepCopy() {
+		return encode(null);
 	}
 
 }

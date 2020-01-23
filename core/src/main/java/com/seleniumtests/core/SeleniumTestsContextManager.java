@@ -20,11 +20,16 @@ package com.seleniumtests.core;
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Method;
 import java.net.URLDecoder;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -32,12 +37,13 @@ import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.testng.ISuite;
 import org.testng.ITestContext;
+import org.testng.ITestNGMethod;
 import org.testng.ITestResult;
+import org.testng.Reporter;
 import org.testng.xml.XmlSuite;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import com.seleniumtests.core.runner.SeleniumRobotTestListener;
 import com.seleniumtests.core.utils.TestNGResultUtils;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.driver.TestType;
@@ -76,13 +82,16 @@ public class SeleniumTestsContextManager {
     private static ThreadLocal<SeleniumTestsContext> threadLocalContext = new ThreadLocal<>();
     
     // relationship between a SeleniumTestsContext and a TestNG test (<test> tag in XML)
-    private static Map<String, SeleniumTestsContext> testContext = Collections.synchronizedMap(new HashMap<String, SeleniumTestsContext>());
+    private static Map<String, SeleniumTestsContext> testContext = Collections.synchronizedMap(new HashMap<>());
     
     // relationship between a SeleniumTestsContext and a test class
-    private static Map<String, SeleniumTestsContext> classContext = Collections.synchronizedMap(new HashMap<String, SeleniumTestsContext>());
+    private static Map<String, SeleniumTestsContext> classContext = Collections.synchronizedMap(new HashMap<>());
     
     // relationship between a SeleniumTestsContext and a test method
-    private static Map<String, SeleniumTestsContext> methodContext = Collections.synchronizedMap(new HashMap<String, SeleniumTestsContext>());
+    private static Map<String, SeleniumTestsContext> methodContext = Collections.synchronizedMap(new HashMap<>());
+    
+    // relationship between a ITestResult and its context so that we have a location where to search
+    private static Map<ITestResult, SeleniumTestsContext> testResultContext = Collections.synchronizedMap(new LinkedHashMap<>());
 
     private SeleniumTestsContextManager() {
 		// As a utility class, it is not meant to be instantiated.
@@ -133,7 +142,15 @@ public class SeleniumTestsContextManager {
     }
     
     public static SeleniumTestsContext storeTestContext(ITestContext testNGCtx) {
-    	SeleniumTestsContext tstContext = new SeleniumTestsContext(getContextFromConfigFile(testNGCtx));
+    	SeleniumTestsContext tstContext;
+    	
+    	// if a SeleniumTestsContext for the TestNG context already exist, copy its properties
+    	if (testContext.get(testNGCtx.getName()) != null) {
+    		tstContext = new SeleniumTestsContext(testContext.get(testNGCtx.getName()));
+    	} else {
+    		tstContext = new SeleniumTestsContext(getContextFromConfigFile(testNGCtx));
+    	}
+    	
     	setTestContext(testNGCtx, tstContext);
     	return tstContext;
     }
@@ -371,6 +388,11 @@ public class SeleniumTestsContextManager {
     		
     		// issue #283: store test context as soon as we have it
     		TestNGResultUtils.setSeleniumRobotTestContext(testResult, getThreadContext());
+    		
+    		// issue #116: store each context related to a test method (through ITestResult object)
+    		if (testResult.getMethod().isTest()) {
+    			testResultContext.put(testResult, getThreadContext());
+    		}
     	}
     }
 
@@ -383,22 +405,68 @@ public class SeleniumTestsContextManager {
     }
     
     /**
+     * Returns the best context for the state of the current running result
+     * - if in BeforeMethod / TestMethod / AfterMethod => current Thread context
+     * - if in AfterClass => search for the last test result method that belongs to this class
+     * - if in AfterTest => search for the last test result method that belongs to this test
+     */
+    public static List<SeleniumTestsContext> getContextForCurrentTestState() {
+    	List<SeleniumTestsContext> matchingContexts = new ArrayList<>();
+    	
+    	ITestResult testResult = Reporter.getCurrentTestResult();
+    	ITestNGMethod method = testResult.getMethod();
+    	
+    	
+    	if (method.isBeforeTestConfiguration()) {
+    		matchingContexts.add(getTestContext(testResult.getTestContext()));
+		} else if (method.isBeforeClassConfiguration()) {
+			matchingContexts.add(getClassContext(testResult.getTestContext(), testResult.getTestClass().getName()));
+		} else if (method.isBeforeMethodConfiguration() || method.isTest() || method.isAfterMethodConfiguration()) {
+			matchingContexts.add(getThreadContext());
+		} else if (method.isAfterClassConfiguration()) {
+			synchronized (testResultContext) {
+				for (Entry<ITestResult, SeleniumTestsContext> entry: testResultContext.entrySet()) {
+					if (entry.getKey().getTestClass().getName().equals(testResult.getTestClass().getName())) {
+						matchingContexts.add(entry.getValue());
+					}
+				}
+			}
+			
+		} else if (method.isAfterTestConfiguration()) {
+			synchronized (testResultContext) {
+				for (Entry<ITestResult, SeleniumTestsContext> entry: testResultContext.entrySet()) {
+					if (entry.getKey().getTestContext().equals(testResult.getTestContext())) {
+						matchingContexts.add(entry.getValue());
+					}
+				}
+			}
+			
+		} 
+    	return matchingContexts;
+    }
+    
+    /**
      * get SR context stored in test result if it exists. Else, create a new one (happens when a test method has been skipped for example)
      * called from reporters only
      * @param testNGCtx
      * @param testName
      * @param testResult
      */
-    public static void setThreadContextFromTestResult(ITestContext testNGCtx, String testName, String className, ITestResult testResult) {
+    public static SeleniumTestsContext setThreadContextFromTestResult(ITestContext testNGCtx, String testName, String className, ITestResult testResult) {
     	if (testResult == null) {
     		throw new ConfigurationException("Cannot set context from testResult as it is null");
     	}
     	if (TestNGResultUtils.getSeleniumRobotTestContext(testResult) != null) {
-    		setThreadContext((SeleniumTestsContext)TestNGResultUtils.getSeleniumRobotTestContext(testResult));
+    		return TestNGResultUtils.getSeleniumRobotTestContext(testResult);
     	} else {
     		logger.error("Result did not contain thread context, initializing a new one");
-    		initThreadContext(testNGCtx, testName, className, testResult);
-    		TestNGResultUtils.setSeleniumRobotTestContext(testResult, getThreadContext());
+    		ITestContext newTestNGCtx = getContextFromConfigFile(testNGCtx);
+        	SeleniumTestsContext seleniumTestsCtx = new SeleniumTestsContext(newTestNGCtx);
+            if (testResult != null) {
+            	seleniumTestsCtx.configureContext(testResult);
+            }
+            TestNGResultUtils.setSeleniumRobotTestContext(testResult, seleniumTestsCtx);
+            return seleniumTestsCtx;
     	}
     }
     

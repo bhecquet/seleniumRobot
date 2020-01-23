@@ -270,6 +270,9 @@ public class TestStep extends TestAction {
 		return files;
 	}
 
+	/**
+	 * Creates an new TestStep, encoding text of sub-steps and elements.
+	 */
 	@Override
 	public TestStep encode(String format) {
 		TestStep step = new TestStep(encodeString(name, format), testResult, new ArrayList<>(pwdToReplace));
@@ -286,7 +289,12 @@ public class TestStep extends TestAction {
 			step.files.add(file.encode(format));
 		}
 		
-		step.encoded = true;
+		if (format == null) {
+			step.encoded = encoded;
+		} else {
+			step.encoded = true;
+		}
+		
 		step.duration = duration;
 		step.startDate = startDate;
 		step.harCaptures = new ArrayList<>();
@@ -298,6 +306,10 @@ public class TestStep extends TestAction {
 			step.actionExceptionMessage = actionException.getClass().toString() + ": " + encodeString(actionException.getMessage(), format);
 		}
 		return step;
+	}
+
+	public TestStep deepCopy() {
+		return encode(null);
 	}
 	
 }
