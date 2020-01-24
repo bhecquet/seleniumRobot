@@ -119,9 +119,13 @@ public class TestLogging {
      */
     public static void logTestValue(String id, String message, String value) {
 
-    	TestStep runningStep = SeleniumTestsContextManager.getContextForCurrentTestState().get(0).getTestStepManager().getRunningTestStep();
-    	if (runningStep != null) {
-    		runningStep.addValue(new TestValue(id, message, value));
+    	try {
+	    	TestStep runningStep = SeleniumTestsContextManager.getContextForCurrentTestState().get(0).getTestStepManager().getRunningTestStep();
+	    	if (runningStep != null) {
+	    		runningStep.addValue(new TestValue(id, message, value));
+	    	}
+    	} catch (IndexOutOfBoundsException e) {
+    		// do nothing, no context has been created which is the case if we try to log message in @BeforeSuite / @BeforeGroup
     	}
     }
     
@@ -137,46 +141,47 @@ public class TestLogging {
     	TestNGResultUtils.setTestInfo(getCurrentTestResult(), key, value);
     	logger.info(String.format("Storing into test result %s: %s", key, value.getInfo() ));
     }
-    
-    /**
-     * /!\ When iterating over test steps, it MUST be put in a synchronized block!! 
-     * @return
-     */
-    /*public static Map<ITestResult, List<TestStep>> getTestsSteps() {
-    	
-    	// issue #116
-    	return SeleniumTestsContextManager.getThreadContext().getTestStepManager().getTestSteps();
-	}*/
-    
+
     private static void logMessage(final String message, final MessageType messageType) {
-    	TestStep runningStep = SeleniumTestsContextManager.getContextForCurrentTestState().get(0).getTestStepManager().getRunningTestStep();
-    	if (runningStep != null) {
-    		runningStep.addMessage(new TestMessage(message, messageType));
+    	try {
+	    	TestStep runningStep = SeleniumTestsContextManager.getContextForCurrentTestState().get(0).getTestStepManager().getRunningTestStep();
+	    	if (runningStep != null) {
+	    		runningStep.addMessage(new TestMessage(message, messageType));
+	    	}
+    	} catch (IndexOutOfBoundsException e) {
+    		// do nothing, no context has been created which is the case if we try to log message in @BeforeSuite / @BeforeGroup
     	}
     }
 
     public static void logNetworkCapture(Har har, String name) {
     	
-    	TestStep runningStep = SeleniumTestsContextManager.getContextForCurrentTestState().get(0).getTestStepManager().getRunningTestStep();
-    	if (runningStep != null) {
-    		try {
-    			runningStep.addNetworkCapture(new HarCapture(har, name));
-			} catch (IOException e) {
-				logger.error("cannot create network capture file: " + e.getMessage(), e);
-			} catch (NullPointerException e) {
-				logger.error("HAR capture is null");
-			}
+    	try {
+	    	TestStep runningStep = SeleniumTestsContextManager.getContextForCurrentTestState().get(0).getTestStepManager().getRunningTestStep();
+	    	if (runningStep != null) {
+	    		try {
+	    			runningStep.addNetworkCapture(new HarCapture(har, name));
+				} catch (IOException e) {
+					logger.error("cannot create network capture file: " + e.getMessage(), e);
+				} catch (NullPointerException e) {
+					logger.error("HAR capture is null");
+				}
+	    	}
+    	} catch (IndexOutOfBoundsException e) {
+    		// do nothing, no context has been created which is the case if we try to log message in @BeforeSuite / @BeforeGroup
     	}
     	
     }
     
     public static void logFile(File file, String description) {
 
-    	TestStep runningStep = SeleniumTestsContextManager.getContextForCurrentTestState().get(0).getTestStepManager().getRunningTestStep();
-    	if (runningStep != null) {
-    		runningStep.addFile(new GenericFile(file, description));
+    	try {
+	    	TestStep runningStep = SeleniumTestsContextManager.getContextForCurrentTestState().get(0).getTestStepManager().getRunningTestStep();
+	    	if (runningStep != null) {
+	    		runningStep.addFile(new GenericFile(file, description));
+	    	}
+    	} catch (IndexOutOfBoundsException e) {
+    		// do nothing, no context has been created which is the case if we try to log message in @BeforeSuite / @BeforeGroup
     	}
-    	
     }
  
     /**
@@ -198,15 +203,19 @@ public class TestLogging {
      */
     public static void logScreenshot(ScreenShot screenshot, String screenshotName, String driverName) {
 
-    	TestStep runningStep = SeleniumTestsContextManager.getContextForCurrentTestState().get(0).getTestStepManager().getRunningTestStep();
-    	if (runningStep != null) {
-    		try {
-    			runningStep.addSnapshot(new Snapshot(screenshot, driverName), 
-    					SeleniumTestsContextManager.getContextForCurrentTestState().get(0).getTestStepManager().getTestSteps().size(),
-    					screenshotName);
-    		} catch (NullPointerException e) {
-    			logger.error("screenshot is null");
-    		}
+    	try {
+	    	TestStep runningStep = SeleniumTestsContextManager.getContextForCurrentTestState().get(0).getTestStepManager().getRunningTestStep();
+	    	if (runningStep != null) {
+	    		try {
+	    			runningStep.addSnapshot(new Snapshot(screenshot, driverName), 
+	    					SeleniumTestsContextManager.getContextForCurrentTestState().get(0).getTestStepManager().getTestSteps().size(),
+	    					screenshotName);
+	    		} catch (NullPointerException e) {
+	    			logger.error("screenshot is null");
+	    		}
+	    	}
+    	} catch (IndexOutOfBoundsException e) {
+    		// do nothing, no context has been created which is the case if we try to log message in @BeforeSuite / @BeforeGroup
     	}
     }
     
@@ -252,19 +261,37 @@ public class TestLogging {
     }
 
 	public static void setCurrentRootTestStep(TestStep testStep) {
-		SeleniumTestsContextManager.getContextForCurrentTestState().get(0).getTestStepManager().setRootTestStep(testStep);
+		try {
+			SeleniumTestsContextManager.getContextForCurrentTestState().get(0).getTestStepManager().setRootTestStep(testStep);
+    	} catch (IndexOutOfBoundsException e) {
+    		// do nothing, no context has been created which is the case if we try to log message in @BeforeSuite / @BeforeGroup
+    	}
 	}
 	
 	public static TestStep getCurrentRootTestStep() {
-		return SeleniumTestsContextManager.getContextForCurrentTestState().get(0).getTestStepManager().getRootTestStep();		
+		try {
+			return SeleniumTestsContextManager.getContextForCurrentTestState().get(0).getTestStepManager().getRootTestStep();
+    	} catch (IndexOutOfBoundsException e) {
+    		// null, no context has been created which is the case if we try to log message in @BeforeSuite / @BeforeGroup
+    		return null;
+    	}
 	}
 	
 	public static void setParentTestStep(TestStep testStep) {
-		SeleniumTestsContextManager.getContextForCurrentTestState().get(0).getTestStepManager().setRunningTestStep(testStep);
+		try {
+			SeleniumTestsContextManager.getContextForCurrentTestState().get(0).getTestStepManager().setRunningTestStep(testStep);
+    	} catch (IndexOutOfBoundsException e) {
+    		// do nothing, no context has been created which is the case if we try to log message in @BeforeSuite / @BeforeGroup
+    	}
 	}
 	
 	public static TestStep getParentTestStep() {
-		return SeleniumTestsContextManager.getContextForCurrentTestState().get(0).getTestStepManager().getRunningTestStep();
+		try {
+			return SeleniumTestsContextManager.getContextForCurrentTestState().get(0).getTestStepManager().getRunningTestStep();
+    	} catch (IndexOutOfBoundsException e) {
+    		// do nothing, no context has been created which is the case if we try to log message in @BeforeSuite / @BeforeGroup
+    		return null;
+    	}
 	}
 
 	public static void setCurrentTestResult(ITestResult testResult) {

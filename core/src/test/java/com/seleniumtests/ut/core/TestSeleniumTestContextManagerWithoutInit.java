@@ -25,11 +25,6 @@ import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.ConfigurationException;
 
-/**
- * The first 4 tests will fail when executed directly because they use the tu.xml specific configurations
- * @author behe
- *
- */
 public class TestSeleniumTestContextManagerWithoutInit {
 	
 	/**
