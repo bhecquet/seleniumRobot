@@ -168,11 +168,11 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		
 		String detailedReportContent1 = readTestMethodResultFile("testOk1");
 		Assert.assertEquals(StringUtils.countMatches(detailedReportContent1, "Post test step: reset2"), 1);
-		Assert.assertEquals(StringUtils.countMatches(detailedReportContent1, "Post test step: reset "), 2); // displayed twice because no Method parameter present
+		Assert.assertEquals(StringUtils.countMatches(detailedReportContent1, "Post test step: reset "), 1); 
 		
 		String detailedReportContent2 = readTestMethodResultFile("testOk2");
 		Assert.assertEquals(StringUtils.countMatches(detailedReportContent2, "Post test step: reset2"), 1);
-		Assert.assertEquals(StringUtils.countMatches(detailedReportContent2, "Post test step: reset "), 2); // displayed twice because no Method parameter present
+		Assert.assertEquals(StringUtils.countMatches(detailedReportContent2, "Post test step: reset "), 1); 
 		
 		String logs = readSeleniumRobotLogFile();
 		Assert.assertTrue(logs.contains("When using @AfterMethod in tests")); // check error message is shown
@@ -452,8 +452,8 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		// check all files are displayed
 		Assert.assertTrue(detailedReportContent1.contains("<a href='../before-test1Listener5/screenshots/N-A_2-1_Pre_test_step._beforeMethod-"));
 		Assert.assertTrue(detailedReportContent1.contains("<a href='../before-test1Listener5/htmls/N-A_2-1_Pre_test_step._beforeMethod-"));
-		Assert.assertTrue(detailedReportContent1.contains("<a href='../test1Listener5/screenshots/test1Listener5_0-1_Test_end"));
-		Assert.assertTrue(detailedReportContent1.contains("<a href='../test1Listener5/htmls/test1Listener5_0-1_Test_end"));
+		Assert.assertTrue(detailedReportContent1.contains("<a href='../test1Listener5/screenshots/test1Listener5_3-1_Test_end"));
+		Assert.assertTrue(detailedReportContent1.contains("<a href='../test1Listener5/htmls/test1Listener5_3-1_Test_end"));
 
 		
 	}

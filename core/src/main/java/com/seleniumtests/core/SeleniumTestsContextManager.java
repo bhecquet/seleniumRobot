@@ -426,7 +426,7 @@ public class SeleniumTestsContextManager {
 		} else if (method.isAfterClassConfiguration()) {
 			synchronized (testResultContext) {
 				for (Entry<ITestResult, SeleniumTestsContext> entry: testResultContext.entrySet()) {
-					if (entry.getKey().getTestClass().getName().equals(testResult.getTestClass().getName())) {
+					if (entry.getKey().getTestClass() != null && entry.getKey().getTestClass().getName().equals(testResult.getTestClass().getName())) {
 						matchingContexts.add(entry.getValue());
 					}
 				}
