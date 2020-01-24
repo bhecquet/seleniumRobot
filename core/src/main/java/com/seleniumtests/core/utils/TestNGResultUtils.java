@@ -38,6 +38,7 @@ public class TestNGResultUtils {
 	private static final String RETRY = "retry";
 	private static final String NO_MORE_RETRY = "noMoreRetry";
 	private static final String TEST_INFO = "testInfo";
+	private static final String METHOD_NAME = "methodName";				// name of the test method (or the cucumber scenario)
 
 	private TestNGResultUtils() {
 		// nothing to do
@@ -112,6 +113,14 @@ public class TestNGResultUtils {
     
     public static void setUniqueTestName(ITestResult testNGResult, String name) {
     	testNGResult.setAttribute(UNIQUE_METHOD_NAME, name);
+    }
+    
+    public static String getTestMethodName(ITestResult testNGResult) {
+    	return (String) testNGResult.getAttribute(METHOD_NAME);
+    }
+    
+    public static void setTestMethodName(ITestResult testNGResult, String name) {
+    	testNGResult.setAttribute(METHOD_NAME, name);
     }
     
     public static SeleniumTestsContext getSeleniumRobotTestContext(ITestResult testNGResult) {

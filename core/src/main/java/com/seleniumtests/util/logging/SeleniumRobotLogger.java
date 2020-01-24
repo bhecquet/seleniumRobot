@@ -55,7 +55,6 @@ public class SeleniumRobotLogger {
 	
 	public static final String START_TEST_PATTERN = "Start method ";
 	public static final String END_TEST_PATTERN = "Finish method ";
-	public static final String METHOD_NAME = "methodName";				// name of the test method (or the cucumber scenario)
 	public static final String LOG_FILE_NAME = "seleniumRobot.log";
 	public static final String INTERNAL_DEBUG = "internalDebug";
 	
