@@ -465,64 +465,8 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 	 * put in thread context the test / class / method context that may have already be defined in other \@BeforeXXX method
 	 */
 	private void configureThreadContextBeforeInvoke(IInvokedMethod method, ITestResult testResult, ITestContext context) {
-		SeleniumTestsContext currentBeforeContext = null;
 		ConfigurationMethod configMethod = (ConfigurationMethod)method.getTestMethod();
-		
-		// handle some before methods
-		if (configMethod.isBeforeTestConfiguration()) {
-			currentBeforeContext = SeleniumTestsContextManager.storeTestContext(context);
-		} else if (configMethod.isBeforeClassConfiguration()) {
-			currentBeforeContext = SeleniumTestsContextManager.storeClassContext(context, method.getTestMethod().getTestClass().getName());
-		} else if (configMethod.isBeforeMethodConfiguration()) {
-			try {
-				String className = ((Method)(testResult.getParameters()[0])).getDeclaringClass().getName();
-				String methodName = ((Method)(testResult.getParameters()[0])).getName();
-				currentBeforeContext = SeleniumTestsContextManager.storeMethodContext(context, className, methodName);
-				
-			} catch (Exception e) {
-				throw new ScenarioException("When using @BeforeMethod in tests, this method MUST have a 'java.lang.reflect.Method' object as first argument. Example: \n\n"
-						+ "@BeforeMethod\n" + 
-						"public void beforeMethod(Method method) {\n"
-						+ "    SeleniumTestsContextManager.getThreadContext().setAttribute(\"some attribute\", \"attribute value\");\n"
-						+ "}\n\n");
-			}
-			
-			// issue #137: be sure that driver created in beforeMethod has the same set of parameters as a driver created in Test method
-			// 			behavior is undefined if used inside a cucumber test
-			if (!configMethod.getConstructorOrMethod().getMethod().getDeclaringClass().equals(SeleniumRobotTestPlan.class)) {
-				SeleniumTestsContextManager.updateThreadContext(testResult);
-			}
-			
-			
-		// handle some after methods. No change in context in after method will be recorded
-		} else if (configMethod.isAfterMethodConfiguration()) {
-			// beforeMethod, testMethod and afterMethod run in the same thread, so it's safe to take the current context
-			currentBeforeContext = SeleniumTestsContextManager.getThreadContext();
-			
-			try {
-				((Method)(testResult.getParameters()[0])).getName();
-			} catch (Exception e) {
-				logger.error("\n\n\n---------------------------------------------------------------------------------------------------\n"
-						+ configMethod.getConstructorOrMethod().getMethod().toGenericString()
-						+ "\nWhen using @AfterMethod in tests, this method MUST have a 'java.lang.reflect.Method' object as first argument. Example: \n\n"
-						+ "@AfterMethod\n" + 
-						"public void afterMethod(Method method) {\n"
-						+ "    ... some code here ...\n"
-						+ "}\n\n"
-						+ "Else, this method will be displayed in each test result even if it does not belong to the test itself\n"
-						+ "---------------------------------------------------------------------------------------------------\n\n\n");
-			}
-			
-		} else if (configMethod.isAfterClassConfiguration()) {
-			currentBeforeContext = SeleniumTestsContextManager.getClassContext(context, method.getTestMethod().getTestClass().getName());
-		} else if (configMethod.isAfterTestConfiguration()) {
-			currentBeforeContext = SeleniumTestsContextManager.getTestContext(context);
-		}
-		if (currentBeforeContext != null) {
-			SeleniumTestsContextManager.setThreadContext(currentBeforeContext);
-		} else {
-			SeleniumTestsContextManager.initThreadContext();
-		}
+		SeleniumTestsContextManager.insertThreadContext(method, testResult, context);
 		
 		// issue #137: block driver creation outside of @BeforeMethod / @AfterMethod so that a driver may not remain open without being used
 		// other reason is that context for Class/Test/Group is shared among several test methods
@@ -542,29 +486,8 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 	 * @param context
 	 */
 	private void configureThreadContextAfterInvoke(IInvokedMethod method, ITestResult testResult, ITestContext context) {
-		
 		ConfigurationMethod configMethod = (ConfigurationMethod)method.getTestMethod();
-		
-		// store the current thread context back to test/class/method context as it may have been modified in "Before" methods
-		if (configMethod.isBeforeTestConfiguration()) {
-			SeleniumTestsContextManager.setTestContext(context, SeleniumTestsContextManager.getThreadContext());
-			
-		} else if (configMethod.isBeforeClassConfiguration()) {
-			SeleniumTestsContextManager.setClassContext(context, method.getTestMethod().getTestClass().getName(), SeleniumTestsContextManager.getThreadContext());
-			
-		} else if (configMethod.isBeforeMethodConfiguration()) {
-			try {
-				String className = ((Method)(testResult.getParameters()[0])).getDeclaringClass().getName();
-				String methodName = ((Method)(testResult.getParameters()[0])).getName();
-				SeleniumTestsContextManager.setMethodContext(context, className, methodName, SeleniumTestsContextManager.getThreadContext());
-			} catch (Exception e) {}
-		} else if (configMethod.isAfterMethodConfiguration()) {
-			// issue #254: forget the variables got from server once test method is finished so that, on retry, variable can be get
-
-			String className = ((Method)(testResult.getParameters()[0])).getDeclaringClass().getName();
-			String methodName = ((Method)(testResult.getParameters()[0])).getName();
-			SeleniumTestsContextManager.setMethodContext(context, className, methodName, null);
-		}
+		SeleniumTestsContextManager.saveThreadContext(method, testResult, context);
 		
 		// reparse logs in case some new logs have been written
 		if (configMethod.isAfterClassConfiguration()
@@ -578,28 +501,11 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 	 * Execute the actions before test method
 	 */
 	private void executeBeforeTestMethod(IInvokedMethod method, ITestResult testResult, ITestContext context) {
-		testResult.setAttribute(SeleniumRobotLogger.METHOD_NAME, TestNGResultUtils.getTestName(testResult));
+		TestNGResultUtils.setTestMethodName(testResult, TestNGResultUtils.getTestName(testResult));
 		TestNGResultUtils.setUniqueTestName(testResult, TestNGResultUtils.getTestName(testResult));// initialize it so that it's always set
 		
-		// when @BeforeMethod has been used, threadContext is already initialized and may have been updated. Do not overwrite options
-		// only reconfigure it
-		String className = method.getTestMethod().getTestClass().getName();
+		SeleniumTestsContextManager.insertThreadContext(method, testResult, context);
 		
-		// create a new context from the method context so that the same test method with different data do not share the context (issue #115)
-		SeleniumTestsContext currentContext = new SeleniumTestsContext(SeleniumTestsContextManager.getMethodContext(context, 
-				className, 
-				testResult.getAttribute(SeleniumRobotLogger.METHOD_NAME).toString(), 
-				true), false);
-		
-		// allow driver to be created		
-		currentContext.setDriverCreationBlocked(false);
-		
-		SeleniumTestsContextManager.setThreadContext(currentContext);
-
-		SeleniumTestsContextManager.updateThreadContext(testResult);
-		
-        SeleniumTestsContextManager.getThreadContext().setTestMethodSignature((String)testResult.getAttribute(SeleniumRobotLogger.METHOD_NAME));
-    	
     	if (testResult.getMethod().getRetryAnalyzer() == null) {
     		testResult.getMethod().setRetryAnalyzer(new TestRetryAnalyzer(SeleniumTestsContextManager.getThreadContext().getTestRetryCount()));
 		}	
