@@ -91,6 +91,8 @@ Behind the scene, PictureElement and ScreenZone take a screenshot, and then uses
 The `intoElement` (for PictureElement only) parameters helps scrolling in page. It must be an element right above the picture to search, or the element enclosing this picture. If not specified, no scrolling will be done and the `<body>` element will be used. This may cause problem if you are in a page where no body is present.
 In this case, provide an other top level element. 
 
+`PictureElement` and `ScreenZone` accept a `detectionThreshold` which defaults to 0.1. It represents the detector sensibility. A low value means detector will be quite strict when searching image.
+
 **/!\**: resource name is case-sensitive. It may not be obvious in IntelliJ, but with standart execution, if the resource name you provide and its name in src/test/resources is not exactly the same, you will get a `class java.lang.ExceptionInInitializerError: null` or `class java.lang.NoClassDefFoundError: Could not initialize class` when creating the PictureElement
 
 **/!\**: `OpenCV Error: Assertion failed (corrsize.height <= img.rows + templ.rows - 1 && corrsize.width <= img.cols + templ.cols - 1) in cv::crossCorr` is raised when wrong format is used for picture to detect (e.g: GIF instead of PNG, cf issue #269)
