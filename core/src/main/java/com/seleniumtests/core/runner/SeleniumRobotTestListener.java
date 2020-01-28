@@ -118,13 +118,11 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 		// be sure that the result contains context. It can happen when the test is never executed
 		// initialize it from the method context as it's the closest for our test
 		if (TestNGResultUtils.getSeleniumRobotTestContext(result) == null) {
-			SeleniumTestsContext currentContext = new SeleniumTestsContext(SeleniumTestsContextManager.getMethodContext(result.getTestContext(), 
-					result.getMethod().getTestClass().getName(), 
-					TestNGResultUtils.getTestName(result), 
-					true), false);
-
-			SeleniumTestsContextManager.setThreadContext(currentContext);
-			SeleniumTestsContextManager.updateThreadContext(result);
+			SeleniumTestsContextManager.insertThreadContext(
+					result.getMethod(),
+					result,
+					result.getTestContext()
+					);
 		}
 		
 		generateTempReport(result);
@@ -466,7 +464,7 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 	 */
 	private void configureThreadContextBeforeInvoke(IInvokedMethod method, ITestResult testResult, ITestContext context) {
 		ConfigurationMethod configMethod = (ConfigurationMethod)method.getTestMethod();
-		SeleniumTestsContextManager.insertThreadContext(method, testResult, context);
+		SeleniumTestsContextManager.insertThreadContext(method.getTestMethod(), testResult, context);
 		
 		// issue #137: block driver creation outside of @BeforeMethod / @AfterMethod so that a driver may not remain open without being used
 		// other reason is that context for Class/Test/Group is shared among several test methods
@@ -504,7 +502,7 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 		TestNGResultUtils.setTestMethodName(testResult, TestNGResultUtils.getTestName(testResult));
 		TestNGResultUtils.setUniqueTestName(testResult, TestNGResultUtils.getTestName(testResult));// initialize it so that it's always set
 		
-		SeleniumTestsContextManager.insertThreadContext(method, testResult, context);
+		SeleniumTestsContextManager.insertThreadContext(method.getTestMethod(), testResult, context);
 		
     	if (testResult.getMethod().getRetryAnalyzer() == null) {
     		testResult.getMethod().setRetryAnalyzer(new TestRetryAnalyzer(SeleniumTestsContextManager.getThreadContext().getTestRetryCount()));
