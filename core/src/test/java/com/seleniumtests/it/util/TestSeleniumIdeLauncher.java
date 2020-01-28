@@ -23,6 +23,7 @@ public class TestSeleniumIdeLauncher extends ReporterTest {
 		try {
 			System.setProperty(SeleniumTestsContext.BROWSER, "chrome");
 			System.setProperty(SeleniumTestsContext.MANUAL_TEST_STEPS, "false");
+			System.setProperty(SeleniumTestsContext.SOFT_ASSERT_ENABLED, "false");
 			System.setProperty("foo", "Hello Selenium IDE");
 			
 
@@ -47,7 +48,6 @@ public class TestSeleniumIdeLauncher extends ReporterTest {
 			Assert.assertTrue(detailedReportContent1.contains("<i class=\"fa fa-plus\"></i></button> openPage with args: (null, ) - "));
 			Assert.assertTrue(detailedReportContent1.contains("<li>click on HtmlElement , by={By.linkText: 2.1. Boolean} </li>")); // action
 			Assert.assertTrue(detailedReportContent1.contains("<li>seleniumhq </li>")); // auto sub-step
-			Assert.assertTrue(detailedReportContent1.contains("<li>click on HtmlElement , by={By.cssSelector: td:nth-child(2) .icon} </li>"));
 			Assert.assertTrue(detailedReportContent1.contains("<li>click on HtmlElement , by={By.linkText: Blog} </li>"));
 			
 			// test that user variable (set via command line in our test) is added to variabled available to script
@@ -58,6 +58,7 @@ public class TestSeleniumIdeLauncher extends ReporterTest {
 		} finally {
 			System.clearProperty(SeleniumTestsContext.BROWSER);
 			System.clearProperty(SeleniumTestsContext.MANUAL_TEST_STEPS);
+			System.clearProperty(SeleniumTestsContext.SOFT_ASSERT_ENABLED);
 			System.clearProperty("foo");
 		}
 	}
@@ -72,6 +73,7 @@ public class TestSeleniumIdeLauncher extends ReporterTest {
 		try {
 			System.setProperty(SeleniumTestsContext.BROWSER, "chrome");
 			System.setProperty(SeleniumTestsContext.MANUAL_TEST_STEPS, "true");
+			System.setProperty(SeleniumTestsContext.SOFT_ASSERT_ENABLED, "false");
 			
 			
 			File tmpSuiteFile = GenericTest.createFileFromResource("ti/ide/MysuiteTest.java");
@@ -92,7 +94,6 @@ public class TestSeleniumIdeLauncher extends ReporterTest {
 			Assert.assertFalse(detailedReportContent1.contains("<li>click on HtmlElement , by={By.linkText: 2.1. Boolean} </li>")); // not there because created before the first step
 			Assert.assertTrue(detailedReportContent1.contains("</button> Boolean link - "));
 			Assert.assertTrue(detailedReportContent1.contains("<li>click on HtmlElement , by={By.linkText: 21. Parameter delegates} </li>"));
-			Assert.assertTrue(detailedReportContent1.contains("<li>click on HtmlElement , by={By.cssSelector: td:nth-child(2) .icon} </li>"));
 			Assert.assertTrue(detailedReportContent1.contains("<li>click on HtmlElement , by={By.linkText: Blog} </li>"));
 			
 			// screenshot is present for the step (taken at the beginning of the step: see anchor)
@@ -101,6 +102,7 @@ public class TestSeleniumIdeLauncher extends ReporterTest {
 		} finally {
 			System.clearProperty(SeleniumTestsContext.BROWSER);
 			System.clearProperty(SeleniumTestsContext.MANUAL_TEST_STEPS);
+			System.clearProperty(SeleniumTestsContext.SOFT_ASSERT_ENABLED);
 		}
 	}
 	
