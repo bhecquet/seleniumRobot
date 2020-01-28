@@ -153,13 +153,13 @@ public class SeleniumTestsContextManager {
     	}
     }
     
-    public static SeleniumTestsContext storeTestContext(ITestContext testNGCtx) {
+    private static SeleniumTestsContext storeTestContext(ITestContext testNGCtx) {
     	SeleniumTestsContext tstContext = getOrCreateContext(testNGCtx, null, null, true);
     	setTestContext(testNGCtx, tstContext);
     	return tstContext;
     }
     
-    public static void setTestContext(ITestContext testNGCtx, SeleniumTestsContext tstContext) {
+    private static void setTestContext(ITestContext testNGCtx, SeleniumTestsContext tstContext) {
     	if (testNGCtx != null) {
     		testContext.put(testNGCtx.getName(), tstContext);
     	}
@@ -170,18 +170,18 @@ public class SeleniumTestsContextManager {
      * @param testNGCtx
      * @return
      */
-    public static SeleniumTestsContext getTestContext(ITestContext testNGCtx) {
+    private static SeleniumTestsContext getTestContext(ITestContext testNGCtx) {
     	return getOrCreateContext(testNGCtx, null, null, false);
     }
     
-    public static SeleniumTestsContext storeClassContext(ITestContext testNGCtx, String className) {
+    private static SeleniumTestsContext storeClassContext(ITestContext testNGCtx, String className) {
     	// unicity is on test + class because a class could be executed by 2 tests at the same time (e.g: ParallelMode.TESTS)
     	SeleniumTestsContext clsContext = getOrCreateContext(testNGCtx, className, null, true);
     	setClassContext(testNGCtx, className, clsContext);
     	return clsContext;
     }
     
-    public static void setClassContext(ITestContext testNGCtx, String className, SeleniumTestsContext clsContext) {
+    private static void setClassContext(ITestContext testNGCtx, String className, SeleniumTestsContext clsContext) {
     	classContext.put(getKeyForClass(testNGCtx, className), clsContext);
     }
     
@@ -191,20 +191,20 @@ public class SeleniumTestsContextManager {
      * @param className
      * @return
      */
-    public static SeleniumTestsContext getClassContext(ITestContext testNGCtx, String className) {
+    private static SeleniumTestsContext getClassContext(ITestContext testNGCtx, String className) {
     	return getOrCreateContext(testNGCtx, className, null, false);
     }
-    public static SeleniumTestsContext storeMethodContext(ITestContext testNGCtx, String className, String methodName) {
+    private static SeleniumTestsContext storeMethodContext(ITestContext testNGCtx, String className, String methodName) {
     	// unicity is on test + class + method because the same method name may exist in several classes or 2 testNG tests could execute the same test methods 
     	SeleniumTestsContext mtdContext = getMethodContext(testNGCtx, className, methodName, true);
     	setMethodContext(testNGCtx, className, methodName, mtdContext);
     	return mtdContext;
     }
-    public static void setMethodContext(ITestContext testNGCtx, String className, String methodName, SeleniumTestsContext mtdContext) {
+    private static void setMethodContext(ITestContext testNGCtx, String className, String methodName, SeleniumTestsContext mtdContext) {
     	methodContext.put(getKeyForMethod(testNGCtx, className, methodName), mtdContext);
     }
     
-    public static SeleniumTestsContext getMethodContext(ITestContext testNGCtx, String className, String methodName, boolean createCopy) {
+    private static SeleniumTestsContext getMethodContext(ITestContext testNGCtx, String className, String methodName, boolean createCopy) {
     	return getOrCreateContext(testNGCtx, className, methodName, createCopy);
     }
     
@@ -219,7 +219,7 @@ public class SeleniumTestsContextManager {
      * @param createCopy		if true and we find class or test context, returns a copy
      * @return
      */
-    public static SeleniumTestsContext getOrCreateContext(ITestContext testNGCtx, String className, String methodName, boolean createCopy) {
+    private static SeleniumTestsContext getOrCreateContext(ITestContext testNGCtx, String className, String methodName, boolean createCopy) {
     	
     	// unicity is on test + class + method because the same method name may exist in several classes or 2 testNG tests could execute the same test methods 
     	String keyMethod = getKeyForMethod(testNGCtx, className, methodName);
@@ -320,55 +320,52 @@ public class SeleniumTestsContextManager {
     /**
      * Selects the right context to insert into thread context for use in the subsequent methods
      */
-    public static void insertThreadContext(IInvokedMethod method, ITestResult testResult, ITestContext context) {
+    public static void insertThreadContext(ITestNGMethod method, ITestResult testResult, ITestContext context) {
     	SeleniumTestsContext currentContext = null;
 		boolean configureContext = false; // whether we should configure context (calling updateThreadContext) after inserting it
 		
 		// check if we already have a test context. Else, it will be created
-		if (method.isConfigurationMethod()) {
-			ConfigurationMethod configMethod = (ConfigurationMethod)method.getTestMethod();
 		
-			if (configMethod.isBeforeTestConfiguration()) {
-				currentContext = storeTestContext(context);
-				
-			// check if we already have a class context. Else, it will be copied from test context
-			} else if (configMethod.isBeforeClassConfiguration()) {
-				currentContext = storeClassContext(context, method.getTestMethod().getTestClass().getName());
-				
-			// check if we already have a method context. Else copy it from class or test context.
-			} else if (configMethod.isBeforeMethodConfiguration()) {
-				currentContext = storeMethodContext(context, 
-						getClassNameFromMethodConfiguration(testResult), 
-						getMethodNameFromMethodConfiguration(testResult));
-		
-				// issue #137: be sure that driver created in @BeforeMethod has the same set of parameters as a driver created in @Test method
-				// 			behavior is undefined if used inside a cucumber test
-				if (!configMethod.getConstructorOrMethod().getMethod().getDeclaringClass().equals(SeleniumRobotTestPlan.class)) {
-					configureContext = true;
-				}
-				
-			// handle some after methods. No change in context in after method will be recorded
-			} else if (configMethod.isAfterMethodConfiguration()) {
-				// beforeMethod, testMethod and afterMethod run in the same thread, so it's safe to take the current context
-				currentContext = getThreadContext();
-				
-				try {
-					getMethodNameFromMethodConfiguration(testResult);
-				} catch (Exception e) {
-					logger.error(e.getMessage());
-				}
-				
-			} else if (configMethod.isAfterClassConfiguration()) {
-				currentContext = getClassContext(context, method.getTestMethod().getTestClass().getName());
-				
-			} else if (configMethod.isAfterTestConfiguration()) {
-				currentContext = getTestContext(context);
+		if (method.isBeforeTestConfiguration()) {
+			currentContext = storeTestContext(context);
+			
+		// check if we already have a class context. Else, it will be copied from test context
+		} else if (method.isBeforeClassConfiguration()) {
+			currentContext = storeClassContext(context, method.getTestClass().getName());
+			
+		// check if we already have a method context. Else copy it from class or test context.
+		} else if (method.isBeforeMethodConfiguration()) {
+			currentContext = storeMethodContext(context, 
+					getClassNameFromMethodConfiguration(testResult), 
+					getMethodNameFromMethodConfiguration(testResult));
+	
+			// issue #137: be sure that driver created in @BeforeMethod has the same set of parameters as a driver created in @Test method
+			// 			behavior is undefined if used inside a cucumber test
+			if (!method.getConstructorOrMethod().getMethod().getDeclaringClass().equals(SeleniumRobotTestPlan.class)) {
+				configureContext = true;
 			}
 			
-		} else if (method.isTestMethod() && method.getTestMethod().isTest()) {
+		// handle some after methods. No change in context in after method will be recorded
+		} else if (method.isAfterMethodConfiguration()) {
+			// beforeMethod, testMethod and afterMethod run in the same thread, so it's safe to take the current context
+			currentContext = getThreadContext();
+			
+			try {
+				getMethodNameFromMethodConfiguration(testResult);
+			} catch (Exception e) {
+				logger.error(e.getMessage());
+			}
+			
+		} else if (method.isAfterClassConfiguration()) {
+			currentContext = getClassContext(context, method.getTestClass().getName());
+			
+		} else if (method.isAfterTestConfiguration()) {
+			currentContext = getTestContext(context);
+			
+		} else if (method.isTest()) {
 			// when @BeforeMethod has been used, threadContext is already initialized and may have been updated. Do not overwrite options
 			// only reconfigure it
-			String className = method.getTestMethod().getTestClass().getName();
+			String className = method.getTestClass().getName();
 			
 			// create a new context from the method context so that the same test method with different data do not share the context (issue #115)
 			currentContext = new SeleniumTestsContext(getMethodContext(context, 
@@ -567,6 +564,10 @@ public class SeleniumTestsContextManager {
     	List<SeleniumTestsContext> matchingContexts = new ArrayList<>();
     	
     	ITestResult testResult = Reporter.getCurrentTestResult();
+    	if (testResult == null) {
+    		return matchingContexts;
+    	}
+    	
     	ITestNGMethod method = testResult.getMethod();
 
     	// for all @BeforeXX configuration methods and test method, return the thread context as it will have been insterted before call to the configuration method (in SeleniumRobotTestListener)
@@ -623,7 +624,11 @@ public class SeleniumTestsContextManager {
     	threadLocalContext.remove();
     }
     
-    /**
+    public static Map<ITestResult, SeleniumTestsContext> getTestResultContext() {
+		return testResultContext;
+	}
+
+	/**
      * Build the root path of STF 
      * method for guessing it is different if we are inside a jar (built mode) or in development
      * @param clazz

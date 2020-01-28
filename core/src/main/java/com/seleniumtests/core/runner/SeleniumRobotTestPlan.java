@@ -31,7 +31,6 @@ import org.testng.annotations.Listeners;
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.TestTasks;
-import com.seleniumtests.core.utils.TestNGResultUtils;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.reporter.logger.StringInfo;
 import com.seleniumtests.reporter.logger.TestLogging;
