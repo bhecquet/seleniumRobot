@@ -175,8 +175,8 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		Assert.assertEquals(StringUtils.countMatches(detailedReportContent2, "Post test step: reset "), 1); 
 		
 		String logs = readSeleniumRobotLogFile();
-		Assert.assertTrue(logs.contains("When using @AfterMethod in tests")); // check error message is shown
-		Assert.assertTrue(logs.contains("public void com.seleniumtests.it.stubclasses.StubTestClassForIssue143.reset()")); // check method name is displayed
+		Assert.assertTrue(logs.contains("When using @BeforeMethod / @AfterMethod in tests")); // check error message is shown
+		Assert.assertTrue(logs.contains("public void com.seleniumtests.it.stubclasses.StubTestClassForIssue143.reset")); // check method name is displayed
 	}
 	
 	/**
