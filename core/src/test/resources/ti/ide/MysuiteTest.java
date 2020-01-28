@@ -34,8 +34,7 @@ public class MysuiteTest {
   }
   public void seleniumhq() {
     driver.get("https://www.seleniumhq.org/");
-    driver.manage().window().setSize(new Dimension(768, 683));
-    driver.findElement(By.cssSelector("td:nth-child(2) .icon")).click();
+    driver.manage().window().setSize(new Dimension(1000, 683));
     driver.findElement(By.linkText("Blog")).click();
   }
   @Test
