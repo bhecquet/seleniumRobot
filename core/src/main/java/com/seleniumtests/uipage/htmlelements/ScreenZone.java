@@ -47,6 +47,12 @@ public class ScreenZone extends GenericPictureElement {
 		this(label, resourcePath, 0.1);
 	}
 	
+	/**
+	 * 
+	 * @param label					any text
+	 * @param resourcePath			path (from resources folder) where to retrieve image to search
+	 * @param detectionThreshold	sensibility of detection between 0 and 1. 0 means very strict, 1 means it will find matching for everything. Default is 0.1
+	 */
 	public ScreenZone(String label, String resourcePath, double detectionThreshold) {
 		this(label, createFileFromResource(resourcePath), detectionThreshold);
 		this.resourcePath = resourcePath;
