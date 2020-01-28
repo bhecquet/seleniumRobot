@@ -23,6 +23,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.testng.ITestResult;
@@ -258,6 +259,21 @@ public class TestLogging {
 	    	
     	}
     	
+    }
+    
+    @Deprecated
+    public static Map<ITestResult, List<TestStep>> getTestsSteps() {
+    	Map<ITestResult, List<TestStep>> steps = new HashMap<>();
+
+		Map<ITestResult, SeleniumTestsContext> testResultContext = SeleniumTestsContextManager.getTestResultContext();
+		synchronized (testResultContext) {
+			for (Entry<ITestResult, SeleniumTestsContext> entry: testResultContext.entrySet()) {
+				steps.put(entry.getKey(), entry.getValue().getTestStepManager().getTestSteps());
+			}
+		}
+    	
+    	
+    	return steps;
     }
 
 	public static void setCurrentRootTestStep(TestStep testStep) {
