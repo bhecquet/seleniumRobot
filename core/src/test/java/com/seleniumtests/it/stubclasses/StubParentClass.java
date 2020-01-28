@@ -19,7 +19,6 @@ package com.seleniumtests.it.stubclasses;
 
 import java.lang.reflect.Method;
 
-import org.apache.log4j.Logger;
 import org.testng.ITestContext;
 import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeMethod;
@@ -28,12 +27,9 @@ import org.testng.annotations.BeforeSuite;
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.runner.SeleniumTestPlan;
 import com.seleniumtests.util.helper.WaitHelper;
-import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
 public class StubParentClass extends SeleniumTestPlan {
 	
-	protected static final Logger logger = SeleniumRobotLogger.getLogger(StubParentClass.class);
-
 	/**
 	 * Generate context to have logger correctly initialized
 	 * @param testContext
