@@ -34,7 +34,7 @@ public class TestMessage extends TestAction {
 	}
 	
 	public TestMessage(String name, MessageType type) {
-		super(name, type == MessageType.ERROR ? true: false, new ArrayList<>(), true);
+		super(name, type == MessageType.ERROR ? true: false, new ArrayList<>());
 		messageType = type;
 	}
 

@@ -64,7 +64,8 @@ public class TestStep extends TestAction {
 	 * @param pwdToReplace	list of string to replace when returning actions so that passwords are masked
 	 */
 	public TestStep(String name, ITestResult testResult, List<String> pwdToReplace, boolean maskPassword) {
-		super(name, false, pwdToReplace, maskPassword);
+		super(name, false, pwdToReplace);
+		this.maskPassword = maskPassword;
 		stepActions = new ArrayList<>();
 		files = new ArrayList<>();
 		harCaptures = new ArrayList<>();
@@ -143,12 +144,18 @@ public class TestStep extends TestAction {
 		
 		// add replacement of the parent to this action
 		action.pwdToReplace.addAll(pwdToReplace);
+		
+		// inherit password masking from step
+		action.maskPassword = maskPassword;
 	}
 	public void addMessage(TestMessage message) {
 		stepActions.add(message);
 
 		// add replacement of the parent to this message
 		message.pwdToReplace.addAll(pwdToReplace);
+
+		// inherit password masking from step
+		message.maskPassword = maskPassword;
 	}
 	public void addValue(TestValue value) {
 		stepActions.add(value);
@@ -158,6 +165,9 @@ public class TestStep extends TestAction {
 		
 		// add replacement of the parent step to this step
 		step.pwdToReplace.addAll(pwdToReplace);
+
+		// inherit password masking from step
+		step.maskPassword = maskPassword;
 	}
 	public void addNetworkCapture(HarCapture har) {
 		harCaptures.add(har);
