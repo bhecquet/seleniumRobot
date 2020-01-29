@@ -34,7 +34,7 @@ public class StubTestClassForEncoding extends StubParentClass {
 	@Test(groups="stub", description="a test with steps")
 	public void testAndSubActions() throws IOException {
 		TestStep step1 = new TestStep("step 1 <>\"'&/", TestLogging.getCurrentTestResult(), new ArrayList<>(), true);
-		step1.addAction(new TestAction("click button  <>\"'&", false, new ArrayList<>(), true));
+		step1.addAction(new TestAction("click button  <>\"'&", false, new ArrayList<>()));
 		step1.addMessage(new TestMessage("a message <>\"'&", MessageType.LOG));
 		TestLogging.logTestStep(step1);
 	}
@@ -42,7 +42,7 @@ public class StubTestClassForEncoding extends StubParentClass {
 	@Test(groups="stub")
 	public void testWithException() {
 		TestStep step1 = new TestStep("step 1", TestLogging.getCurrentTestResult(), new ArrayList<>(), true);
-		step1.addAction(new TestAction("click button", false, new ArrayList<>(), true));
+		step1.addAction(new TestAction("click button", false, new ArrayList<>()));
 		TestLogging.logTestStep(step1);
 		throw new DriverExceptions("& some exception \"with \" <strong><a href='http://someurl/link' style='background-color: red;'>HTML to encode</a></strong>");
 	}
@@ -50,7 +50,7 @@ public class StubTestClassForEncoding extends StubParentClass {
 	@Test(groups="stub")
 	public void testWithChainedException() {
 		TestStep step1 = new TestStep("step 1", TestLogging.getCurrentTestResult(), new ArrayList<>(), true);
-		step1.addAction(new TestAction("click button", false, new ArrayList<>(), true));
+		step1.addAction(new TestAction("click button", false, new ArrayList<>()));
 		TestLogging.logTestStep(step1);
 		throw new DriverExceptions("& some exception \"with \" <strong><a href='http://someurl/link' style='background-color: red;'>HTML to encode</a></strong>", new DriverExceptions("root <error>"));
 	}

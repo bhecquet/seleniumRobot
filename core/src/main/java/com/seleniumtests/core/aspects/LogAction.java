@@ -258,7 +258,7 @@ public class LogAction {
 
     	List<String> pwdToReplace = new ArrayList<>();
 		String actionName = String.format("%s %s", joinPoint.getSignature().getName(), buildArgString(joinPoint, pwdToReplace, new HashMap<>()));
-		TestAction currentAction = new TestAction(actionName, false, pwdToReplace, SeleniumTestsContextManager.getThreadContext().getMaskedPassword());
+		TestAction currentAction = new TestAction(actionName, false, pwdToReplace);
 		
 		if (TestLogging.getParentTestStep() != null) {
 			TestLogging.getParentTestStep().addAction(currentAction);
@@ -422,7 +422,7 @@ public class LogAction {
 		String actionName = String.format("%s on %s %s", joinPoint.getSignature().getName(), targetName, buildArgString(joinPoint, pwdToReplace, new HashMap<>()));
 		Object reply = null;
 		boolean actionFailed = false;
-		TestAction currentAction = new TestAction(actionName, false, pwdToReplace, SeleniumTestsContextManager.getThreadContext().getMaskedPassword());
+		TestAction currentAction = new TestAction(actionName, false, pwdToReplace);
 		
 		// log action before its started. By default, it's OK. Then result may be overwritten if step fails
 		// order of steps is the right one (first called is first displayed)	

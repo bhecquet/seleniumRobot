@@ -54,8 +54,8 @@ public class TestTestStep extends GenericTest {
 	@Test(groups={"ut"})
 	public void testGetFailedWithActionKo() {
 		TestStep step = new TestStep("step1", null, new ArrayList<>(), true);
-		step.addAction(new TestAction("action1", false, new ArrayList<>(), true));
-		step.addAction(new TestAction("action2", true, new ArrayList<>(), true));
+		step.addAction(new TestAction("action1", false, new ArrayList<>()));
+		step.addAction(new TestAction("action2", true, new ArrayList<>()));
 		Assert.assertTrue(step.getFailed());
 	}
 	
@@ -65,8 +65,8 @@ public class TestTestStep extends GenericTest {
 	@Test(groups={"ut"})
 	public void testGetFailedWithActionOk() {
 		TestStep step = new TestStep("step1", null, new ArrayList<>(), true);
-		step.addAction(new TestAction("action1", false, new ArrayList<>(), true));
-		step.addAction(new TestAction("action2", false, new ArrayList<>(), true));
+		step.addAction(new TestAction("action1", false, new ArrayList<>()));
+		step.addAction(new TestAction("action2", false, new ArrayList<>()));
 		Assert.assertFalse(step.getFailed());
 	}
 	
@@ -77,8 +77,8 @@ public class TestTestStep extends GenericTest {
 	public void testGetFailedWithStepKo() {
 		TestStep step = new TestStep("step1", null, new ArrayList<>(), true);
 		step.setFailed(true);
-		step.addAction(new TestAction("action1", false, new ArrayList<>(), true));
-		step.addAction(new TestAction("action2", false, new ArrayList<>(), true));
+		step.addAction(new TestAction("action1", false, new ArrayList<>()));
+		step.addAction(new TestAction("action2", false, new ArrayList<>()));
 		Assert.assertTrue(step.getFailed());
 	}
 	
@@ -89,8 +89,8 @@ public class TestTestStep extends GenericTest {
 	public void testGetFailedWithActionSubStepKo() {
 		TestStep step = new TestStep("step1", null, new ArrayList<>(), true);
 		TestStep subStep = new TestStep("subStep", null, new ArrayList<>(), true);
-		subStep.addAction(new TestAction("action1", true, new ArrayList<>(), true));
-		step.addAction(new TestAction("action2", false, new ArrayList<>(), true));
+		subStep.addAction(new TestAction("action1", true, new ArrayList<>()));
+		step.addAction(new TestAction("action2", false, new ArrayList<>()));
 		step.addAction(subStep);
 		Assert.assertTrue(step.getFailed());
 	}
@@ -102,8 +102,8 @@ public class TestTestStep extends GenericTest {
 	public void testGetFailedWithActionSubStepOk() {
 		TestStep step = new TestStep("step1", null, new ArrayList<>(), true);
 		TestStep subStep = new TestStep("subStep", null, new ArrayList<>(), true);
-		subStep.addAction(new TestAction("action1", false, new ArrayList<>(), true));
-		step.addAction(new TestAction("action2", false, new ArrayList<>(), true));
+		subStep.addAction(new TestAction("action1", false, new ArrayList<>()));
+		step.addAction(new TestAction("action2", false, new ArrayList<>()));
 		Assert.assertFalse(step.getFailed());
 	}
 	
@@ -232,8 +232,8 @@ public class TestTestStep extends GenericTest {
 		screenshot2.setImagePath("screenshots/" + tmpImgFile4.getName());
 		subStep.addSnapshot(new Snapshot(screenshot2, "main"), 0, null);
 		 
-		subStep.addAction(new TestAction("action1", true, new ArrayList<>(), true));
-		step.addAction(new TestAction("action2", false, new ArrayList<>(), true));
+		subStep.addAction(new TestAction("action1", true, new ArrayList<>()));
+		step.addAction(new TestAction("action2", false, new ArrayList<>()));
 		step.addAction(subStep);
 		
 		List<File> attachments = step.getAllAttachments();
@@ -344,28 +344,28 @@ public class TestTestStep extends GenericTest {
 	
 	@Test(groups={"ut"})
 	public void testTestActionEncodeXml() {
-		TestAction action = new TestAction("action2 \"'<>&", false, new ArrayList<>(), true);
+		TestAction action = new TestAction("action2 \"'<>&", false, new ArrayList<>());
 		TestAction encodedAction = action.encode("xml");
 		Assert.assertEquals("action2 &quot;&apos;&lt;&gt;&amp;", encodedAction.toString());
 	}
 	
 	@Test(groups={"ut"})
 	public void testTestActionEncodeXmlFailedStatus() {
-		TestAction action = new TestAction("action2 \"'<>&", true, new ArrayList<>(), true);
+		TestAction action = new TestAction("action2 \"'<>&", true, new ArrayList<>());
 		TestAction encodedAction = action.encode("xml");
 		Assert.assertTrue(encodedAction.getFailed());
 	}
 	
 	@Test(groups={"ut"})
 	public void testTestActionEncodeXmlPasswordKept() {
-		TestAction action = new TestAction("action2 \"'<>&", false, Arrays.asList("myPassword"), true);
+		TestAction action = new TestAction("action2 \"'<>&", false, Arrays.asList("myPassword"));
 		TestAction encodedAction = action.encode("xml");
 		Assert.assertTrue(encodedAction.getPwdToReplace().contains("myPassword"));
 	}
 	
 	@Test(groups={"ut"})
 	public void testTestActionEncodeXmlExceptionKept() {
-		TestAction action = new TestAction("action2 \"'<>&", false, new ArrayList<>(), true);
+		TestAction action = new TestAction("action2 \"'<>&", false, new ArrayList<>());
 		action.setActionException(new Throwable());
 		TestAction encodedAction = action.encode("xml");
 		Assert.assertNotNull(encodedAction.getActionException());
@@ -407,11 +407,11 @@ public class TestTestStep extends GenericTest {
 	public void testEncodeXml() {
 		TestStep step = new TestStep("step1 \"'<>&", null, new ArrayList<>(), true);
 		step.addMessage(new TestMessage("everything OK \"'<>&", MessageType.INFO));
-		step.addAction(new TestAction("action2 \"'<>&", false, new ArrayList<>(), true));
+		step.addAction(new TestAction("action2 \"'<>&", false, new ArrayList<>()));
 		
 		TestStep subStep = new TestStep("subStep", null, new ArrayList<>(), true);
 		subStep.addMessage(new TestMessage("everything in subStep almost OK", MessageType.WARNING));
-		subStep.addAction(new TestAction("action1 \"'<>&", false, new ArrayList<>(), true));
+		subStep.addAction(new TestAction("action1 \"'<>&", false, new ArrayList<>()));
 		step.addAction(subStep);
 		
 		TestStep encodedTestStep = step.encode("xml");
@@ -432,7 +432,7 @@ public class TestTestStep extends GenericTest {
 	public void testToJson() throws IOException {
 		TestStep step = new TestStep("step1", null, new ArrayList<>(), true);
 		step.addMessage(new TestMessage("everything OK", MessageType.INFO));
-		step.addAction(new TestAction("action2", false, new ArrayList<>(), true));
+		step.addAction(new TestAction("action2", false, new ArrayList<>()));
 		
 		Har har = new Har(new HarLog());
 		har.getLog().addPage(new HarPage("title", "a title"));
@@ -443,7 +443,7 @@ public class TestTestStep extends GenericTest {
 		
 		TestStep subStep = new TestStep("subStep", null, new ArrayList<>(), true);
 		subStep.addMessage(new TestMessage("everything in subStep almost OK", MessageType.WARNING));
-		subStep.addAction(new TestAction("action1", false, new ArrayList<>(), true));
+		subStep.addAction(new TestAction("action1", false, new ArrayList<>()));
 		step.addAction(subStep);
 		
 		JSONObject stepJson = step.toJson();
@@ -480,7 +480,7 @@ public class TestTestStep extends GenericTest {
 	@Test(groups={"ut"})
 	public void testPasswordMaskingMainStep() {
 		TestStep step = new TestStep("step1 with args: (bar, passwd)", null, Arrays.asList("passwd"), true);
-		TestAction action = new TestAction("action in step1 with args: (foo, passwd)", false, new ArrayList<>(), true);
+		TestAction action = new TestAction("action in step1 with args: (foo, passwd)", false, new ArrayList<>());
 		TestMessage message = new TestMessage("everything OK on passwd", MessageType.INFO);
 		TestStep substep = new TestStep("substep with args: (passwd)", null, new ArrayList<>(), true);
 		step.addAction(action);
@@ -500,7 +500,7 @@ public class TestTestStep extends GenericTest {
 	public void testPasswordMaskingSubStep() {
 		TestStep step = new TestStep("step1 with args: (bar, passwd)", null, new ArrayList<>(), true);
 		TestStep substep = new TestStep("substep with args: (passwd)", null, Arrays.asList("passwd"), true);
-		TestAction action = new TestAction("action in step1 with args: (foo, passwd)", false, new ArrayList<>(), true);
+		TestAction action = new TestAction("action in step1 with args: (foo, passwd)", false, new ArrayList<>());
 		TestMessage message = new TestMessage("everything OK on passwd", MessageType.INFO);
 		step.addAction(substep);
 		substep.addAction(action);
@@ -519,7 +519,7 @@ public class TestTestStep extends GenericTest {
 	public void testNoPasswordMasking() {
 		TestStep step = new TestStep("step1 with args: (bar, passwd)", null, new ArrayList<>(), false);
 		TestStep substep = new TestStep("substep with args: (passwd)", null, Arrays.asList("passwd"), false);
-		TestAction action = new TestAction("action in step1 with args: (foo, passwd)", false, new ArrayList<>(), false);
+		TestAction action = new TestAction("action in step1 with args: (foo, passwd)", false, new ArrayList<>());
 		TestMessage message = new TestMessage("everything OK on passwd", MessageType.INFO);
 		step.addAction(substep);
 		substep.addAction(action);
@@ -577,7 +577,7 @@ public class TestTestStep extends GenericTest {
 		TestStep step = new TestStep("step1", null, new ArrayList<>(), true);
 		step.setDuration(5000L);
 		step.setDurationToExclude(500L);
-		TestAction action = new TestAction("action2", false, new ArrayList<>(), true);
+		TestAction action = new TestAction("action2", false, new ArrayList<>());
 		action.setDurationToExclude(600L);
 		step.addAction(action);
 		Assert.assertEquals(step.getDuration(), (Long)3900L);
@@ -593,7 +593,7 @@ public class TestTestStep extends GenericTest {
 		step.setDurationToExclude(500L);
 		
 		TestStep subStep = new TestStep("subStep", null, new ArrayList<>(), true);
-		TestAction action = new TestAction("action2", false, new ArrayList<>(), true);
+		TestAction action = new TestAction("action2", false, new ArrayList<>());
 		action.setDurationToExclude(600L);
 		subStep.addAction(action);
 		step.addAction(subStep);

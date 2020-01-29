@@ -33,7 +33,7 @@ public class TestValue extends TestAction {
 	private String value;
 
 	public TestValue(String id, String humanReadableMessage, String value) {
-		super(id, false, new ArrayList<>(), true);
+		super(id, false, new ArrayList<>());
 		this.message = humanReadableMessage;
 		this.value = value;
 	}

@@ -46,7 +46,7 @@ public class TestAction implements Serializable {
 	protected String actionExceptionMessage;
 	protected long durationToExclude = 0L; 	// the duration to exclude from the action duration
 	protected List<String> pwdToReplace;
-	protected boolean maskPassword;
+	protected boolean maskPassword = true;
 	protected boolean encoded = false;		// true if we have encoded messages
 	
 	/**
@@ -55,13 +55,12 @@ public class TestAction implements Serializable {
 	 * @param failed		true if this action is failed
 	 * @param pwdToReplace	list of string to replace when returning actions so that passwords are masked. Only password longer that 5 characters are replaced to avoid replacing non password strings
 	 */
-	public TestAction(String name, Boolean failed, List<String> pwdToReplace, boolean maskPassword) {
+	public TestAction(String name, Boolean failed, List<String> pwdToReplace) {
 		this.name = name;
 		this.failed = failed;
 		this.pwdToReplace = pwdToReplace.stream()
 					.filter(s -> s.length() > 5)
 					.collect(Collectors.toList());
-		this.maskPassword = maskPassword;
 	}
 
 	/**
@@ -135,8 +134,9 @@ public class TestAction implements Serializable {
 	}
 
 	public TestAction encode(String format) {
-		TestAction encodedAction = new TestAction(encodeString(name, format), failed, new ArrayList<String>(pwdToReplace), maskPassword);
+		TestAction encodedAction = new TestAction(encodeString(name, format), failed, new ArrayList<String>(pwdToReplace));
 		encodedAction.actionException = actionException;
+		encodedAction.maskPassword = maskPassword;
 		
 		if (format == null) {
 			encodedAction.encoded = encoded;
