@@ -27,7 +27,7 @@ public class GenericFile extends TestAction {
 	private File file;
 	
 	public GenericFile(File file, String description) {
-		super(description, false, new ArrayList<>());
+		super(description, false, new ArrayList<>(), true);
 		this.file = file;
 
 	}

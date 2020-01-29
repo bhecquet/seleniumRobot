@@ -43,7 +43,7 @@ public class Snapshot extends TestAction {
 	public static final String OUTPUT_PATTERN = "Output '%s' browser: ";
 
 	public Snapshot(final ScreenShot screenshot, String driverName) {
-		super(driverName, false, new ArrayList<>());
+		super(driverName, false, new ArrayList<>(), true);
 		this.screenshot = screenshot;
 		durationToExclude = screenshot.getDuration();
 	}

@@ -33,13 +33,21 @@ public class ScenarioLogger extends Logger {
     }
     
     /**
+     * Kept for compatibility with TestLogging
+     * @param message
+     */
+    public void warning(String message) {
+        warn(message);
+    }
+    
+    /**
      * Write warning to logger and current test step
      *
      * @param  message
      */
-    public void warning(String message) {
-        logMessage("Warning: " + message, MessageType.WARNING);
-        super.warn(message);
+    public void warn(String message) {
+    	logMessage("Warning: " + message, MessageType.WARNING);
+    	super.warn(message);
     }
     
     /**

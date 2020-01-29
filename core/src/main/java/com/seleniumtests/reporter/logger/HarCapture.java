@@ -36,13 +36,13 @@ public class HarCapture extends TestAction {
 	
 	public HarCapture(Har har, String name, File harFile) {
 
-		super(name, false, new ArrayList<>());
+		super(name, false, new ArrayList<>(), true);
 		this.har = har;
 		this.harFile = harFile;
 		
 	}
 	public HarCapture(Har har, String name) throws IOException {
-		super(name, false, new ArrayList<>());
+		super(name, false, new ArrayList<>(), true);
 		this.har = har;
 		harFile = Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), name + "-" + HAR_FILE_NAME).toFile();
 		
