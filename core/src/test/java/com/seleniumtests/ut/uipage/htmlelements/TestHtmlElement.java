@@ -342,7 +342,7 @@ public class TestHtmlElement extends MockitoTest {
 	 */
 	@Test(groups={"ut"})
 	public void testIsPresentExceptionDoNotSetStepFailed() throws Exception {
-		TestStep step = new TestStep("step 1", null, new ArrayList<>());
+		TestStep step = new TestStep("step 1", null, new ArrayList<>(), true);
 		TestLogging.setParentTestStep(step);
 		
 		SeleniumTestsContextManager.getThreadContext().setReplayTimeout(1);
@@ -358,7 +358,7 @@ public class TestHtmlElement extends MockitoTest {
 	 */
 	@Test(groups={"ut"})
 	public void testIsDisplayedExceptionSetStepFailed() throws Exception {
-		TestStep step = new TestStep("step 1", null, new ArrayList<>());
+		TestStep step = new TestStep("step 1", null, new ArrayList<>(), true);
 		TestLogging.setParentTestStep(step);
 		
 		SeleniumTestsContextManager.getThreadContext().setReplayTimeout(1);

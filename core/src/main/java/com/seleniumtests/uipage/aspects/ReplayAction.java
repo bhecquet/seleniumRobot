@@ -102,7 +102,7 @@ public class ReplayAction {
     	if (methodName != "getCoordinates") {
     		List<String> pwdToReplace = new ArrayList<>();
     		String actionName = String.format("%s on %s %s", methodName, targetName, LogAction.buildArgString(joinPoint, pwdToReplace, new HashMap<>()));
-    		currentAction = new TestAction(actionName, false, pwdToReplace);
+    		currentAction = new TestAction(actionName, false, pwdToReplace, SeleniumTestsContextManager.getThreadContext().getMaskedPassword());
     	}
 
 		// log action before its started. By default, it's OK. Then result may be overwritten if step fails
@@ -212,7 +212,7 @@ public class ReplayAction {
 	    	String methodName = joinPoint.getSignature().getName();
 	    	List<String> pwdToReplace = new ArrayList<>();
 			String actionName = String.format("%s on %s %s", methodName, targetName, LogAction.buildArgString(joinPoint, pwdToReplace, new HashMap<>()));
-			currentAction = new TestAction(actionName, false, pwdToReplace);
+			currentAction = new TestAction(actionName, false, pwdToReplace, SeleniumTestsContextManager.getThreadContext().getMaskedPassword());
 	
 			// log action before its started. By default, it's OK. Then result may be overwritten if step fails
 			// order of steps is the right one (first called is first displayed)

@@ -63,8 +63,8 @@ public class TestStep extends TestAction {
 	 * @param testResult	associated TestNG result
 	 * @param pwdToReplace	list of string to replace when returning actions so that passwords are masked
 	 */
-	public TestStep(String name, ITestResult testResult, List<String> pwdToReplace) {
-		super(name, false, pwdToReplace);
+	public TestStep(String name, ITestResult testResult, List<String> pwdToReplace, boolean maskPassword) {
+		super(name, false, pwdToReplace, maskPassword);
 		stepActions = new ArrayList<>();
 		files = new ArrayList<>();
 		harCaptures = new ArrayList<>();
@@ -275,7 +275,7 @@ public class TestStep extends TestAction {
 	 */
 	@Override
 	public TestStep encode(String format) {
-		TestStep step = new TestStep(encodeString(name, format), testResult, new ArrayList<>(pwdToReplace));
+		TestStep step = new TestStep(encodeString(name, format), testResult, new ArrayList<>(pwdToReplace), maskPassword);
 		
 		step.stepActions = new ArrayList<>();
 		for (TestAction testAction: stepActions) {

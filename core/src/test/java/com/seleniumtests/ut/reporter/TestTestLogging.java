@@ -50,7 +50,7 @@ public class TestTestLogging extends GenericTest {
 	
 	@Test(groups={"ut"})
 	public void testInfo() {
-		TestLogging.setCurrentRootTestStep(new TestStep("step", null, new ArrayList<>()));
+		TestLogging.setCurrentRootTestStep(new TestStep("step", null, new ArrayList<>(), true));
 		TestLogging.info("message");
 		Assert.assertEquals(TestLogging.getParentTestStep().getStepActions().size(), 1);
 		Assert.assertTrue(TestLogging.getParentTestStep().getStepActions().get(0) instanceof TestMessage);
@@ -59,35 +59,35 @@ public class TestTestLogging extends GenericTest {
 	
 	@Test(groups={"ut"})
 	public void testWarning() {
-		TestLogging.setCurrentRootTestStep(new TestStep("step", null, new ArrayList<>()));
+		TestLogging.setCurrentRootTestStep(new TestStep("step", null, new ArrayList<>(), true));
 		TestLogging.warning("message");
 		Assert.assertEquals(((TestMessage)(TestLogging.getParentTestStep().getStepActions().get(0))).getMessageType(), MessageType.WARNING);
 	}
 	
 	@Test(groups={"ut"})
 	public void testError() {
-		TestLogging.setCurrentRootTestStep(new TestStep("step", null, new ArrayList<>()));
+		TestLogging.setCurrentRootTestStep(new TestStep("step", null, new ArrayList<>(), true));
 		TestLogging.error("message");
 		Assert.assertEquals(((TestMessage)(TestLogging.getParentTestStep().getStepActions().get(0))).getMessageType(), MessageType.ERROR);
 	}
 	
 	@Test(groups={"ut"})
 	public void testLog() {
-		TestLogging.setCurrentRootTestStep(new TestStep("step", null, new ArrayList<>()));
+		TestLogging.setCurrentRootTestStep(new TestStep("step", null, new ArrayList<>(), true));
 		TestLogging.log("message");
 		Assert.assertEquals(((TestMessage)(TestLogging.getParentTestStep().getStepActions().get(0))).getMessageType(), MessageType.LOG);
 	}
 	
 	@Test(groups={"ut"})
 	public void testLogScreenshotOk() {
-		TestLogging.setCurrentRootTestStep(new TestStep("step", null, new ArrayList<>()));
+		TestLogging.setCurrentRootTestStep(new TestStep("step", null, new ArrayList<>(), true));
 		TestLogging.logScreenshot(new ScreenShot());
 		Assert.assertEquals(TestLogging.getParentTestStep().getSnapshots().size(), 1);
 	}
 	
 	@Test(groups={"ut"})
 	public void testLogHarOk() {
-		TestLogging.setCurrentRootTestStep(new TestStep("step", null, new ArrayList<>()));
+		TestLogging.setCurrentRootTestStep(new TestStep("step", null, new ArrayList<>(), true));
 		Har har = new Har(new HarLog());
 		har.getLog().addPage(new HarPage("title", "a title"));
 		TestLogging.logNetworkCapture(har, "main");
@@ -97,14 +97,14 @@ public class TestTestLogging extends GenericTest {
 	
 	@Test(groups={"ut"})
 	public void testLogHarNull() {
-		TestLogging.setCurrentRootTestStep(new TestStep("step", null, new ArrayList<>()));
+		TestLogging.setCurrentRootTestStep(new TestStep("step", null, new ArrayList<>(), true));
 		TestLogging.logNetworkCapture(null, "main");
 		Assert.assertTrue(TestLogging.getParentTestStep().getHarCaptures().isEmpty());
 	}
 	
 	@Test(groups={"ut"})
 	public void testLogTestStep() {
-		TestStep testStep = new TestStep("step", null, new ArrayList<>());
+		TestStep testStep = new TestStep("step", null, new ArrayList<>(), true);
 		ITestResult testResult = new TestResult();
 		
 		TestLogging.setCurrentTestResult(testResult);
@@ -169,7 +169,7 @@ public class TestTestLogging extends GenericTest {
 
 	@Test(groups={"ut"})
 	public void testBuildHarLog() throws IOException {
-		TestLogging.setCurrentRootTestStep(new TestStep("step", null, new ArrayList<>()));
+		TestLogging.setCurrentRootTestStep(new TestStep("step", null, new ArrayList<>(), true));
 		Har har = new Har(new HarLog());
 		har.getLog().addPage(new HarPage("title", "a title"));
 		HarCapture capture = new HarCapture(har, "main");

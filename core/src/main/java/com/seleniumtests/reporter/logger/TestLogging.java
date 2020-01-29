@@ -107,7 +107,7 @@ public class TestLogging {
      * @param  message
      */
     public static void log(final String message) {
-        logger.info(message);
+        logger.log(message);
     }
     
     /**
