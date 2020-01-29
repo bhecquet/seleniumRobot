@@ -319,6 +319,7 @@ public class SeleniumTestsContextManager {
     
     /**
      * Selects the right context to insert into thread context for use in the subsequent methods
+     * This method shoul
      */
     public static void insertThreadContext(ITestNGMethod method, ITestResult testResult, ITestContext context) {
     	SeleniumTestsContext currentContext = null;
@@ -363,19 +364,23 @@ public class SeleniumTestsContextManager {
 			currentContext = getTestContext(context);
 			
 		} else if (method.isTest()) {
+			String className = method.getTestClass().getName();
+			String methodName = TestNGResultUtils.getTestMethodName(testResult);
+			if (methodName == null) { // happens when test is skipped (due to configuration error, we never start method execution)
+				methodName = TestNGResultUtils.getTestName(testResult);
+			}
+
 			// when @BeforeMethod has been used, threadContext is already initialized and may have been updated. Do not overwrite options
 			// only reconfigure it
-			String className = method.getTestClass().getName();
-			
 			// create a new context from the method context so that the same test method with different data do not share the context (issue #115)
 			currentContext = new SeleniumTestsContext(getMethodContext(context, 
 					className, 
-					TestNGResultUtils.getTestMethodName(testResult).toString(), 
+					methodName, 
 					true), false);
 			
 			// allow driver to be created		
 			currentContext.setDriverCreationBlocked(false);
-			currentContext.setTestMethodSignature(TestNGResultUtils.getTestMethodName(testResult).toString());
+			currentContext.setTestMethodSignature(methodName);
 			
 			// we will be in the test method, configure context, call variable server, ...
 			configureContext = true;

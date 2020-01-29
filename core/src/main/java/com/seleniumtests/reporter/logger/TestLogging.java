@@ -19,6 +19,7 @@ package com.seleniumtests.reporter.logger;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -36,6 +37,7 @@ import com.seleniumtests.core.utils.TestNGResultUtils;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.driver.screenshots.ScreenShot;
 import com.seleniumtests.reporter.logger.TestMessage.MessageType;
+import com.seleniumtests.util.logging.ScenarioLogger;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
 import net.lightbody.bmp.core.har.Har;
@@ -66,7 +68,7 @@ import net.lightbody.bmp.core.har.Har;
 public class TestLogging {
 	
 	private static Map<Thread, ITestResult> currentTestResult = Collections.synchronizedMap(new HashMap<>());
-	private static Logger logger = SeleniumRobotLogger.getLogger(TestLogging.class);
+	private static ScenarioLogger logger = SeleniumRobotLogger.getScenarioLogger(TestLogging.class);
 	
 	private TestLogging() {
 		// As a utility class, it is not meant to be instantiated.
@@ -78,7 +80,6 @@ public class TestLogging {
      * @param  message
      */
     public static void info(String message) {
-        logMessage(message, MessageType.INFO);
         logger.info(message);
     }
     
@@ -88,7 +89,6 @@ public class TestLogging {
      * @param  message
      */
     public static void warning(String message) {
-        logMessage("Warning: " + message, MessageType.WARNING);
         logger.warn(message);
     }
     
@@ -98,7 +98,6 @@ public class TestLogging {
      * @param  message
      */
     public static void error(String message) { 
-        logMessage(message, MessageType.ERROR);
         logger.error(message);
     } 
 
@@ -108,7 +107,6 @@ public class TestLogging {
      * @param  message
      */
     public static void log(final String message) {
-        logMessage(message, MessageType.LOG);
         logger.info(message);
     }
     
@@ -119,15 +117,7 @@ public class TestLogging {
      * @param value		value of the message
      */
     public static void logTestValue(String id, String message, String value) {
-
-    	try {
-	    	TestStep runningStep = SeleniumTestsContextManager.getContextForCurrentTestState().get(0).getTestStepManager().getRunningTestStep();
-	    	if (runningStep != null) {
-	    		runningStep.addValue(new TestValue(id, message, value));
-	    	}
-    	} catch (IndexOutOfBoundsException e) {
-    		// do nothing, no context has been created which is the case if we try to log message in @BeforeSuite / @BeforeGroup
-    	}
+    	logger.logTestValue(id, message, value);
     }
     
     // -------------------- Methods below should not be used directly inside test -----------------
@@ -139,50 +129,16 @@ public class TestLogging {
      * @param value. A StringInfo object (either StringInfo or HyperlinkInfo)
      */
     public static void logTestInfo(String key, StringInfo value) {
-    	TestNGResultUtils.setTestInfo(getCurrentTestResult(), key, value);
-    	logger.info(String.format("Storing into test result %s: %s", key, value.getInfo() ));
-    }
-
-    private static void logMessage(final String message, final MessageType messageType) {
-    	try {
-	    	TestStep runningStep = SeleniumTestsContextManager.getContextForCurrentTestState().get(0).getTestStepManager().getRunningTestStep();
-	    	if (runningStep != null) {
-	    		runningStep.addMessage(new TestMessage(message, messageType));
-	    	}
-    	} catch (IndexOutOfBoundsException e) {
-    		// do nothing, no context has been created which is the case if we try to log message in @BeforeSuite / @BeforeGroup
-    	}
+    	logger.logTestInfo(key, value);
     }
 
     public static void logNetworkCapture(Har har, String name) {
-    	
-    	try {
-	    	TestStep runningStep = SeleniumTestsContextManager.getContextForCurrentTestState().get(0).getTestStepManager().getRunningTestStep();
-	    	if (runningStep != null) {
-	    		try {
-	    			runningStep.addNetworkCapture(new HarCapture(har, name));
-				} catch (IOException e) {
-					logger.error("cannot create network capture file: " + e.getMessage(), e);
-				} catch (NullPointerException e) {
-					logger.error("HAR capture is null");
-				}
-	    	}
-    	} catch (IndexOutOfBoundsException e) {
-    		// do nothing, no context has been created which is the case if we try to log message in @BeforeSuite / @BeforeGroup
-    	}
+    	logger.logNetworkCapture(har, name);
     	
     }
     
     public static void logFile(File file, String description) {
-
-    	try {
-	    	TestStep runningStep = SeleniumTestsContextManager.getContextForCurrentTestState().get(0).getTestStepManager().getRunningTestStep();
-	    	if (runningStep != null) {
-	    		runningStep.addFile(new GenericFile(file, description));
-	    	}
-    	} catch (IndexOutOfBoundsException e) {
-    		// do nothing, no context has been created which is the case if we try to log message in @BeforeSuite / @BeforeGroup
-    	}
+    	logger.logFile(file, description);
     }
  
     /**
@@ -203,21 +159,7 @@ public class TestLogging {
 	 * @param driverName		the name of the driver that did the screenshot
      */
     public static void logScreenshot(ScreenShot screenshot, String screenshotName, String driverName) {
-
-    	try {
-	    	TestStep runningStep = SeleniumTestsContextManager.getContextForCurrentTestState().get(0).getTestStepManager().getRunningTestStep();
-	    	if (runningStep != null) {
-	    		try {
-	    			runningStep.addSnapshot(new Snapshot(screenshot, driverName), 
-	    					SeleniumTestsContextManager.getContextForCurrentTestState().get(0).getTestStepManager().getTestSteps().size(),
-	    					screenshotName);
-	    		} catch (NullPointerException e) {
-	    			logger.error("screenshot is null");
-	    		}
-	    	}
-    	} catch (IndexOutOfBoundsException e) {
-    		// do nothing, no context has been created which is the case if we try to log message in @BeforeSuite / @BeforeGroup
-    	}
+    	logger.logScreenshot(screenshot, screenshotName, driverName);
     }
     
     public static void logScreenshot(final ScreenShot screenshot) {
@@ -268,7 +210,7 @@ public class TestLogging {
 		Map<ITestResult, SeleniumTestsContext> testResultContext = SeleniumTestsContextManager.getTestResultContext();
 		synchronized (testResultContext) {
 			for (Entry<ITestResult, SeleniumTestsContext> entry: testResultContext.entrySet()) {
-				steps.put(entry.getKey(), entry.getValue().getTestStepManager().getTestSteps());
+				steps.put(entry.getKey(), new ArrayList<TestStep>(entry.getValue().getTestStepManager().getTestSteps())); // copy to avoid problems with concurrent access
 			}
 		}
     	

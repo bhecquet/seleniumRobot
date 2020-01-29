@@ -44,7 +44,10 @@ public class WebServer {
 	}
 
 	protected Server startServerForServlet() throws Exception {
-        Server server = new Server(0);
+		return startServerForServlet(0);
+	}
+	protected Server startServerForServlet(int port) throws Exception {
+        Server server = new Server(port);
 
         ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
         context.setContextPath("/");
@@ -59,7 +62,10 @@ public class WebServer {
     }
 	
 	public void expose() throws Exception {
-		fileServer = startServerForServlet();
+		expose(0);
+	}
+	public void expose(int port) throws Exception {
+		fileServer = startServerForServlet(port);
         serverHost = new HttpHost(hostIp, ((ServerConnector)fileServer.getConnectors()[0]).getLocalPort());
 	}
 	

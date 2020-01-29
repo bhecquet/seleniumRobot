@@ -42,7 +42,7 @@ import com.seleniumtests.util.logging.SeleniumRobotLogger;
 public class SeleniumRobotTestPlan {
 	
 	private static Map<Thread, Boolean> cucumberTest = Collections.synchronizedMap(new HashMap<>());
-	protected static final Logger logger = SeleniumRobotLogger.getLogger(SeleniumRobotTestPlan.class);
+	protected static final Logger logger = SeleniumRobotLogger.getScenarioLogger(SeleniumRobotTestPlan.class);
 	
 	public SeleniumRobotTestPlan() {
 		System.setProperty( "file.encoding", "UTF-8" );
@@ -69,7 +69,7 @@ public class SeleniumRobotTestPlan {
 	@BeforeMethod(alwaysRun=true) 
 	public void startTestMethod(Method method) {
 		WebUIDriver.setWebDriver(null);
-		
+
 		// issue #297: be sure we reset the driver name before the test starts
 		WebUIDriver.resetCurrentWebUiDriverName();
 	}

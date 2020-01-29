@@ -145,7 +145,7 @@ public class TestReporterControler extends ReporterTest {
 		Assert.assertTrue(detailedReportContent.matches(".*<div class=\"message-error\">\\s+class com.seleniumtests.customexception.ConfigurationException: Some error before method.*"));
 
 		// check that when test is skipped, a message on test status is displayed
-		Assert.assertTrue(detailedReportContent.contains("[main] TestLogging: Test has not started or has been skipped</div>"));
+		Assert.assertTrue(detailedReportContent.contains("[main] ScenarioLogger: Test has not started or has been skipped</div>"));
 				
 		
 	}
@@ -187,7 +187,7 @@ public class TestReporterControler extends ReporterTest {
 		Assert.assertTrue(detailedReportContent.contains("[main] TestLogging: some warning</div>"));
 		
 		// check that when test is OK, a message on test status is displayed
-		Assert.assertTrue(detailedReportContent.contains("[main] TestLogging: Test is OK"));
+		Assert.assertTrue(detailedReportContent.contains("[main] ScenarioLogger: Test is OK"));
 		
 	}
 	
@@ -243,7 +243,7 @@ public class TestReporterControler extends ReporterTest {
 		Assert.assertEquals(StringUtils.countMatches(detailedReportContent2, "</i></button> Pre test step: set -"), 1);
 		
 		// check that when test is KO, error cause is displayed
-		Assert.assertTrue(detailedReportContent2.contains("[main] TestLogging: Test is KO with error: error"));
+		Assert.assertTrue(detailedReportContent2.contains("[main] ScenarioLogger: Test is KO with error: error"));
 		
 		String detailedReportContent3 = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testWithException", "TestReport.html").toFile());
 		detailedReportContent3 = detailedReportContent3.replace("\n", "").replace("\r",  "").replaceAll(">\\s+<", "><");

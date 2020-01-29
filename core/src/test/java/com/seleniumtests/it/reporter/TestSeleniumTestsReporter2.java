@@ -175,8 +175,8 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		Assert.assertEquals(StringUtils.countMatches(detailedReportContent2, "Post test step: reset "), 1); 
 		
 		String logs = readSeleniumRobotLogFile();
-		Assert.assertTrue(logs.contains("When using @BeforeMethod / @AfterMethod in tests")); // check error message is shown
-		Assert.assertTrue(logs.contains("public void com.seleniumtests.it.stubclasses.StubTestClassForIssue143.reset")); // check method name is displayed
+		Assert.assertTrue(logs.contains("When using @BeforeMethod / @AfterMethod in tests")); // check error message is shown when parameter is not given to Before / AfterMethod
+		Assert.assertTrue(logs.contains("com.seleniumtests.it.stubclasses.StubTestClassForIssue143.reset")); // check method name is displayed
 	}
 	
 	/**
@@ -719,7 +719,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		Assert.assertTrue(detailedReportContent.contains("<div class=\"message-log\">Test is OK</div>"));
 		
 		// check logs are written only once 
-		Assert.assertEquals(StringUtils.countMatches(detailedReportContent, "[main] TestLogging: Test is OK</div>"), 1);
+		Assert.assertEquals(StringUtils.countMatches(detailedReportContent, "[main] ScenarioLogger: Test is OK</div>"), 1);
 		
 	}
 	
@@ -956,7 +956,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		Assert.assertTrue(detailedReportContent.matches(".*</ul><div class=\"message-error\">\\s+class java.lang.AssertionError: error\\s+</div></div>.*"));
 		
 		// check that when test is KO, error cause is displayed
-		Assert.assertTrue(detailedReportContent.contains("[main] TestLogging: Test is KO with error: "));
+		Assert.assertTrue(detailedReportContent.contains("[main] ScenarioLogger: Test is KO with error: "));
 	}	
 	
 	/**
@@ -1036,7 +1036,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		Assert.assertTrue(detailedReportContent.contains("<div class=\"message-log\">Test is KO with error: &amp; some exception &quot;with &quot; &lt;strong&gt;&lt;a href='http://someurl/link' style='background-color: red;'&gt;HTML to encode&lt;/a&gt;&lt;/strong&gt;"));
 		
 		// check logs are also encoded
-		Assert.assertTrue(detailedReportContent.contains("[main] TestLogging: Test is KO with error: &amp; some exception &quot;with &quot; &lt;strong&gt;&lt;a href='http://someurl/link' style='background-color: red;'&gt;HTML to encode&lt;/a&gt;&lt;/strong&gt;"));
+		Assert.assertTrue(detailedReportContent.contains("[main] ScenarioLogger: Test is KO with error: &amp; some exception &quot;with &quot; &lt;strong&gt;&lt;a href='http://someurl/link' style='background-color: red;'&gt;HTML to encode&lt;/a&gt;&lt;/strong&gt;"));
 		
 		// check exception stack trace is encoded
 		Assert.assertTrue(detailedReportContent.contains("class com.seleniumtests.customexception.DriverExceptions: &amp; some exception &quot;with &quot; &lt;strong&gt;&lt;a href='http://someurl/link' style='background-color: red;'&gt;HTML to encode&lt;/a&gt;&lt;/strong&gt;"));

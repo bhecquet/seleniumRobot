@@ -97,7 +97,7 @@ public class TestTestLogging extends ReporterTest {
 	public void checkTestStepHandling() throws Exception {
 		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForTestSteps"});
 		Assert.assertTrue(SeleniumRobotLogger.getTestLogs().get("testPage").contains("Start method testPage"));	
-		Assert.assertTrue(SeleniumRobotLogger.getTestLogs().get("testPage").contains("TestLogging: tell me why"));
+		Assert.assertTrue(SeleniumRobotLogger.getTestLogs().get("testPage").contains("ScenarioLogger: tell me why"));
 		
 		// check log level is present
 		Assert.assertTrue(SeleniumRobotLogger.getTestLogs().get("testPage").contains("INFO "));	

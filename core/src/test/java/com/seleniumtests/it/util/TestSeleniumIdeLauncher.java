@@ -2,22 +2,62 @@ package com.seleniumtests.it.util;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.Inet4Address;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.log4j.Logger;
 import org.testng.Assert;
+import org.testng.ITestContext;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.seleniumtests.GenericTest;
 import com.seleniumtests.core.SeleniumTestsContext;
+import com.seleniumtests.it.driver.support.server.WebServer;
 import com.seleniumtests.it.reporter.ReporterTest;
 import com.seleniumtests.util.ide.SeleniumIdeLauncher;
+import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
 public class TestSeleniumIdeLauncher extends ReporterTest {
+	
+	private static final Logger logger = SeleniumRobotLogger.getLogger(TestSeleniumIdeLauncher.class);
+	private WebServer server;
+	
+	private  Map<String, String> getPageMapping() {
+		Map<String, String> mapping = new HashMap<>();
+		mapping.put("/tu/testWithoutFixedPattern.html", "/testWithoutFixedPattern.html");
+		mapping.put("/tu/testIFrame.html", "/testIFrame.html");
+		mapping.put("/tu/ffLogo1.png", "/ffLogo1.png");
+		mapping.put("/tu/ffLogo2.png", "/ffLogo2.png"); 
+		mapping.put("/tu/googleSearch.png", "/googleSearch.png");
+		mapping.put("/tu/images/bouton_enregistrer.png", "/images/bouton_enregistrer.png");
+		mapping.put("/tu/jquery.min.js", "/jquery.min.js");
+		
+		return mapping;
+	}
+	
+	@BeforeClass(groups={"it", "ut"})
+	public void exposeTestPage(final ITestContext testNGCtx) throws Exception {
 
+		String localAddress = Inet4Address.getLocalHost().getHostAddress();
+		server = new WebServer(localAddress, getPageMapping());
+        server.expose(55555);
+        logger.info(String.format("exposing server on http://%s:%d", localAddress, server.getServerHost().getPort()));
+	}
+
+	@AfterClass(groups={"it", "ut"}, alwaysRun=true)
+	public void stop() throws Exception {
+		if (server != null) {
+			logger.info("stopping web server");
+			server.stop();
+		}
+	}
+	
 	@Test(groups={"it"})
 	public void testSeleniumExecution() throws IOException, ClassNotFoundException {
 		try {
@@ -27,8 +67,8 @@ public class TestSeleniumIdeLauncher extends ReporterTest {
 			System.setProperty("foo", "Hello Selenium IDE");
 			
 
-			File tmpSuiteFile = GenericTest.createFileFromResource("ti/ide/MysuiteTest.java");
-			File suiteFile = Paths.get(tmpSuiteFile.getParentFile().getAbsolutePath(), "MysuiteTest.java").toFile();
+			File tmpSuiteFile = GenericTest.createFileFromResource("ti/ide/MainPageTest.java");
+			File suiteFile = Paths.get(tmpSuiteFile.getParentFile().getAbsolutePath(), "MainPageTest.java").toFile();
 			FileUtils.copyFile(tmpSuiteFile, suiteFile);
 			
 			new SeleniumIdeLauncher().executeScripts(Arrays.asList(suiteFile.getAbsolutePath()));
@@ -36,19 +76,19 @@ public class TestSeleniumIdeLauncher extends ReporterTest {
 			String mainReportContent = readSummaryFile();
 			
 			// check that test is seen and OK
-			Assert.assertTrue(mainReportContent.matches(".*<i class=\"fa fa-circle circleSuccess\"></i><a href='jcommander/TestReport.html' .*?>jcommander</a>.*"));
+			Assert.assertTrue(mainReportContent.matches(".*<i class=\"fa fa-circle circleSuccess\"></i><a href='mainPage/TestReport.html' .*?>mainPage</a>.*"));
 			
 			// check that detailed result contains the "hello" written in test
-			String detailedReportContent1 = readTestMethodResultFile("jcommander");
-			Assert.assertTrue(detailedReportContent1.contains("Start method jcommander"));
+			String detailedReportContent1 = readTestMethodResultFile("mainPage");
+			Assert.assertTrue(detailedReportContent1.contains("Start method mainPage"));
 			
 			// check we have automatic steps corresponding to the single test method "jcommander"
-			Assert.assertFalse(detailedReportContent1.contains("</button> Boolean link - ")); // manual step is not there
-			Assert.assertTrue(detailedReportContent1.contains("><i class=\"fa fa-plus\"></i></button> jcommander  - ")); // auto step is there
+			Assert.assertFalse(detailedReportContent1.contains("</button> new window link - ")); // manual step is not there
+			Assert.assertTrue(detailedReportContent1.contains("><i class=\"fa fa-plus\"></i></button> mainPage  - ")); // auto step is there
 			Assert.assertTrue(detailedReportContent1.contains("<i class=\"fa fa-plus\"></i></button> openPage with args: (null, ) - "));
-			Assert.assertTrue(detailedReportContent1.contains("<li>click on HtmlElement , by={By.linkText: 2.1. Boolean} </li>")); // action
-			Assert.assertTrue(detailedReportContent1.contains("<li>seleniumhq </li>")); // auto sub-step
-			Assert.assertTrue(detailedReportContent1.contains("<li>click on HtmlElement , by={By.linkText: Blog} </li>"));
+			Assert.assertTrue(detailedReportContent1.contains("<li>click on HtmlElement , by={By.id: image} </li>")); // action
+			Assert.assertTrue(detailedReportContent1.contains("<li>frame </li>")); // auto sub-step
+			Assert.assertTrue(detailedReportContent1.contains("<li>click on HtmlElement , by={By.id: buttonIFrame} </li>"));
 			
 			// test that user variable (set via command line in our test) is added to variabled available to script
 			Assert.assertTrue(detailedReportContent1.contains("Sys$Out: Hello Selenium IDE"));
@@ -76,8 +116,8 @@ public class TestSeleniumIdeLauncher extends ReporterTest {
 			System.setProperty(SeleniumTestsContext.SOFT_ASSERT_ENABLED, "false");
 			
 			
-			File tmpSuiteFile = GenericTest.createFileFromResource("ti/ide/MysuiteTest.java");
-			File suiteFile = Paths.get(tmpSuiteFile.getParentFile().getAbsolutePath(), "MysuiteTest.java").toFile();
+			File tmpSuiteFile = GenericTest.createFileFromResource("ti/ide/MainPageTest.java");
+			File suiteFile = Paths.get(tmpSuiteFile.getParentFile().getAbsolutePath(), "MainPageTest.java").toFile();
 			FileUtils.copyFile(tmpSuiteFile, suiteFile);
 			
 			new SeleniumIdeLauncher().executeScripts(Arrays.asList(suiteFile.getAbsolutePath()));
@@ -85,19 +125,18 @@ public class TestSeleniumIdeLauncher extends ReporterTest {
 			String mainReportContent = readSummaryFile();
 			
 			// check that test is seen and OK
-			Assert.assertTrue(mainReportContent.matches(".*<i class=\"fa fa-circle circleSuccess\"></i><a href='jcommander/TestReport.html' .*?>jcommander</a>.*"));
+			Assert.assertTrue(mainReportContent.matches(".*<i class=\"fa fa-circle circleSuccess\"></i><a href='mainPage/TestReport.html' .*?>mainPage</a>.*"));
 			
 			// check that detailed result contains the "hello" written in test
-			String detailedReportContent1 = readTestMethodResultFile("jcommander");
+			String detailedReportContent1 = readTestMethodResultFile("mainPage");
 			
 			// manual step is present with details
-			Assert.assertFalse(detailedReportContent1.contains("<li>click on HtmlElement , by={By.linkText: 2.1. Boolean} </li>")); // not there because created before the first step
-			Assert.assertTrue(detailedReportContent1.contains("</button> Boolean link - "));
-			Assert.assertTrue(detailedReportContent1.contains("<li>click on HtmlElement , by={By.linkText: 21. Parameter delegates} </li>"));
-			Assert.assertTrue(detailedReportContent1.contains("<li>click on HtmlElement , by={By.linkText: Blog} </li>"));
+			Assert.assertFalse(detailedReportContent1.contains("<li>click on HtmlElement , by={By.id: image} </li>")); // not there because created before the first step
+			Assert.assertTrue(detailedReportContent1.contains("</button> new window link - "));
+			Assert.assertTrue(detailedReportContent1.contains("li>click on HtmlElement , by={By.id: buttonIFrame} </li>"));
 			
 			// screenshot is present for the step (taken at the beginning of the step: see anchor)
-			Assert.assertTrue(detailedReportContent1.contains("<div class=\"message-snapshot\">Output 'main' browser: Current Window: JCommander: <a href='http://www.jcommander.org//#_boolean'"));
+			Assert.assertTrue(detailedReportContent1.contains("<div class=\"message-snapshot\">Output 'main' browser: Current Window: : <a href='data:,'"));
 			
 		} finally {
 			System.clearProperty(SeleniumTestsContext.BROWSER);
