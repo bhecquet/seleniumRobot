@@ -97,7 +97,6 @@ public class SeleniumIdeLauncher {
 		for (Entry<String, String> entry: classCodes.entrySet()) {
 			if (entry.getKey().endsWith("Page")) {
 				Class aClass = CompilerUtils.CACHED_COMPILER.loadFromJava(loader, entry.getKey(), entry.getValue());
-				classes.add(aClass.getCanonicalName());
 			}
 		}
 		
