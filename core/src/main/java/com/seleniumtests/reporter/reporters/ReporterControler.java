@@ -153,8 +153,10 @@ public class ReporterControler implements IReporter {
 					List<TestStep> testSteps = getAllTestSteps(testResult);
 					
 					Long testDuration = 0L;
-					for (TestStep step: testSteps) {
-						testDuration += step.getDuration();
+					synchronized (testSteps) {
+						for (TestStep step: testSteps) {
+							testDuration += step.getDuration();
+						}
 					}
 					
 					testResult.setEndMillis(testResult.getStartMillis() + testDuration);
@@ -256,8 +258,11 @@ public class ReporterControler implements IReporter {
 			}
 			
 			// get files referenced by the steps
-			for (TestStep testStep: testContext.getTestStepManager().getTestSteps()) {
-				usedFiles.addAll(testStep.getAllAttachments());
+			List<TestStep> testSteps = testContext.getTestStepManager().getTestSteps();
+			synchronized (testSteps) {
+				for (TestStep testStep: testSteps) {
+					usedFiles.addAll(testStep.getAllAttachments());
+				}
 			}
 			
 			String outputSubDirectory = new File(testContext.getOutputDirectory()).getName();
@@ -306,7 +311,7 @@ public class ReporterControler implements IReporter {
 
 	/**
 	 * Returns the list of all test steps, including configuration method calls
-	 * Use TestStep creatd in LogAction.java
+	 * Use TestStep created in LogAction.java
 	 */
 	protected List<TestStep> getAllTestSteps(final ITestResult testResult) {
 		return TestNGResultUtils.getSeleniumRobotTestContext(testResult).getTestStepManager().getTestSteps();

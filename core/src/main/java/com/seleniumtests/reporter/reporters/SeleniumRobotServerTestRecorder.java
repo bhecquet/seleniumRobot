@@ -146,18 +146,20 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 					continue;
 				}
 				
-				for (TestStep testStep: testSteps) {
-					
-					// record test step
-					serverConnector.createTestStep(testStep.getName());
-					String stepLogs = testStep.toJson().toString();
-					
-					serverConnector.recordStepResult(!testStep.getFailed(), stepLogs, testStep.getDuration());
-					
-					if (!testStep.getSnapshots().isEmpty()) {
-						serverConnector.createSnapshot(Paths.get(testContext.getOutputDirectory(), 
-								testStep.getSnapshots().get(0).getScreenshot().getImagePath()
-								).toFile());
+				synchronized (testSteps) {
+					for (TestStep testStep: testSteps) {
+						
+						// record test step
+						serverConnector.createTestStep(testStep.getName());
+						String stepLogs = testStep.toJson().toString();
+						
+						serverConnector.recordStepResult(!testStep.getFailed(), stepLogs, testStep.getDuration());
+						
+						if (!testStep.getSnapshots().isEmpty()) {
+							serverConnector.createSnapshot(Paths.get(testContext.getOutputDirectory(), 
+									testStep.getSnapshots().get(0).getScreenshot().getImagePath()
+									).toFile());
+						}
 					}
 				}
 			}

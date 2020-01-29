@@ -86,7 +86,7 @@ public class SeleniumTestsContext {
 		public TestStepManager() {
 			runningStep = null;
 			rootStep = null;
-			testSteps = new ArrayList<>();
+			testSteps = Collections.synchronizedList(new ArrayList<>());
 		}
 		
 		/**
@@ -124,6 +124,10 @@ public class SeleniumTestsContext {
 			return rootStep;
 		}
 
+		/**
+		 * When iterating over the list, use a 'synchronized' block on the list
+		 * @return
+		 */
 		public List<TestStep> getTestSteps() {
 			return testSteps;
 		}

@@ -62,6 +62,11 @@ public class SeleniumRobotLogger {
 		// As a utility class, it is not meant to be instantiated.
 	}
 
+	public static ScenarioLogger getScenarioLogger(final Class<?> cls) {
+		getLogger(cls);
+		return (ScenarioLogger) Logger.getLogger("." + cls.getName(), new ScenarioLoggerFactory());
+	}
+	
 	public static Logger getLogger(final Class<?> cls) {
 	    boolean rootIsConfigured = Logger.getRootLogger().getAllAppenders().hasMoreElements();
 	    if (!rootIsConfigured) {

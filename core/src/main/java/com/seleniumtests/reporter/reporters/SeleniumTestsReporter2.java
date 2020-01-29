@@ -158,23 +158,25 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 				return;
 			}
 			
-			for (TestStep testStep: testSteps) {
-				
-				TestStep encodedTestStep = testStep.encode("html");
-				// step status
-				if (encodedTestStep.getFailed()) {
-					context.put(STATUS, FAILED_TEST);
-				} else {
-					context.put(STATUS, PASSED_TEST);
+			synchronized (testSteps) {
+				for (TestStep testStep: testSteps) {
+					
+					TestStep encodedTestStep = testStep.encode("html");
+					// step status
+					if (encodedTestStep.getFailed()) {
+						context.put(STATUS, FAILED_TEST);
+					} else {
+						context.put(STATUS, PASSED_TEST);
+					}
+					
+					context.put("stepName", encodedTestStep.getName());
+					context.put("stepDuration", encodedTestStep.getDuration() / (double)1000);
+					context.put("step", encodedTestStep);	
+					
+					StringWriter writer = new StringWriter();
+					t.merge( context, writer );
+					mOut.write(writer.toString());
 				}
-				
-				context.put("stepName", encodedTestStep.getName());
-				context.put("stepDuration", encodedTestStep.getDuration() / (double)1000);
-				context.put("step", encodedTestStep);	
-				
-				StringWriter writer = new StringWriter();
-				t.merge( context, writer );
-				mOut.write(writer.toString());
 			}
 			
 
@@ -402,7 +404,7 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 			List<String> allSortedInfoKeys = new ArrayList<>(allInfoKeys);
 			allSortedInfoKeys.sort(null);
 
-			synchronized (allSteps) { // as we use a synchronizedMap and we iterate on it
+			synchronized (allSteps) { // as we use a synchronizedList and we iterate on it
 				context.put("tests", methodResultsMap);
 				context.put("steps", allSteps);
 				context.put("infos", testInfosMap);

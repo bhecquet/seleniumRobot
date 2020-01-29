@@ -42,8 +42,7 @@ public class TestSeleniumIdeParser extends GenericTest {
 		String pageClassCode = String.format(SeleniumIdeParser.PAGE_OBJECT_HEADER, "MysuiteTest", "MysuiteTest") + 
 				"public void seleniumhq(){\n" + 
 				"    driver.get(\"https://www.seleniumhq.org/\");\n" + 
-				"    driver.manage().window().setSize(new Dimension(768, 683));\n" + 
-				"    driver.findElement(By.cssSelector(\"td:nth-child(2) .icon\")).click();\n" + 
+				"    driver.manage().window().setSize(new Dimension(1000, 683));\n" + 
 				"    driver.findElement(By.linkText(\"Blog\")).click();\n" + 
 				"}\n" + 
 				"\n" + 
@@ -107,8 +106,7 @@ public class TestSeleniumIdeParser extends GenericTest {
 		String pageClassCode = String.format(SeleniumIdeParser.PAGE_OBJECT_HEADER, "MysuiteTest", "MysuiteTest") + 
 				"public void seleniumhq(){\n" + 
 				"    driver.get(\"https://www.seleniumhq.org/\");\n" + 
-				"    driver.manage().window().setSize(new Dimension(768, 683));\n" + 
-				"    driver.findElement(By.cssSelector(\"td:nth-child(2) .icon\")).click();\n" + 
+				"    driver.manage().window().setSize(new Dimension(1000, 683));\n" + 
 				"    driver.findElement(By.linkText(\"Blog\")).click();\n" + 
 				"}\n" + 
 				"\n" + 
