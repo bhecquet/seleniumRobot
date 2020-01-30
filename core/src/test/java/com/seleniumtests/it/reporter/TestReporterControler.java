@@ -184,7 +184,7 @@ public class TestReporterControler extends ReporterTest {
 		Assert.assertTrue(detailedReportContent.contains("<div class=\"box collapsed-box failed\"><div class=\"box-header with-border\"><button type=\"button\" class=\"btn btn-box-tool\" data-widget=\"collapse\"><i class=\"fa fa-plus\"></i></button> Post test step: afterMethod"));
 		
 		// check logs written in @AfterXXX are present in execution logs
-		Assert.assertTrue(detailedReportContent.contains("[main] TestLogging: some warning</div>"));
+		Assert.assertTrue(detailedReportContent.contains("[main] ScenarioLogger: some warning</div>"));
 		
 		// check that when test is OK, a message on test status is displayed
 		Assert.assertTrue(detailedReportContent.contains("[main] ScenarioLogger: Test is OK"));

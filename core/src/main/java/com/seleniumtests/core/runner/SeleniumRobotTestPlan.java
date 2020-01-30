@@ -34,7 +34,7 @@ import com.seleniumtests.core.TestTasks;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.reporter.logger.StringInfo;
 import com.seleniumtests.reporter.logger.TestLogging;
-import com.seleniumtests.util.logging.SeleniumRobotLogger;
+import com.seleniumtests.util.logging.ScenarioLogger;
 
 @Listeners({com.seleniumtests.reporter.reporters.ReporterControler.class,
 	com.seleniumtests.core.runner.SeleniumRobotTestListener.class
@@ -42,7 +42,7 @@ import com.seleniumtests.util.logging.SeleniumRobotLogger;
 public class SeleniumRobotTestPlan {
 	
 	private static Map<Thread, Boolean> cucumberTest = Collections.synchronizedMap(new HashMap<>());
-	protected static final Logger logger = SeleniumRobotLogger.getScenarioLogger(SeleniumRobotTestPlan.class);
+	protected static final Logger logger = ScenarioLogger.getScenarioLogger(SeleniumRobotTestPlan.class);
 	
 	public SeleniumRobotTestPlan() {
 		System.setProperty( "file.encoding", "UTF-8" );
