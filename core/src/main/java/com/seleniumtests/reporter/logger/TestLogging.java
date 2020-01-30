@@ -75,7 +75,10 @@ public class TestLogging {
      * Write info to logger and current test step
      *
      * @param  message
+     * 
+     * @deprecated use logger.
      */
+	@Deprecated
     public static void info(String message) {
         logger.info(message);
     }
@@ -84,7 +87,9 @@ public class TestLogging {
      * Write warning to logger and current test step
      *
      * @param  message
+     * @deprecated use logger.
      */
+	@Deprecated
     public static void warning(String message) {
         logger.warn(message);
     }
@@ -93,7 +98,9 @@ public class TestLogging {
      * Write error to logger and current test step
      *
      * @param  message
+     * @deprecated use logger.
      */
+	@Deprecated
     public static void error(String message) { 
         logger.error(message);
     } 
@@ -101,8 +108,9 @@ public class TestLogging {
     /**
      * Write log message to logger and current test step
      *
-     * @param  message
+     * @deprecated use logger.
      */
+	@Deprecated
     public static void log(final String message) {
         logger.log(message);
     }
@@ -112,7 +120,9 @@ public class TestLogging {
      * @param id		an id referencing value
      * @param message	a human readable message
      * @param value		value of the message
+     * @deprecated use logger.
      */
+	@Deprecated
     public static void logTestValue(String id, String message, String value) {
     	logger.logTestValue(id, message, value);
     }
@@ -124,16 +134,32 @@ public class TestLogging {
      * Store a key / value pair in test, so that it can be added to reports at test level. Contrary to 'logTestValue' which is stored at test step level
      * @param key
      * @param value. A StringInfo object (either StringInfo or HyperlinkInfo)
+     * @deprecated use logger.
      */
+	@Deprecated
     public static void logTestInfo(String key, StringInfo value) {
     	logger.logTestInfo(key, value);
     }
 
+	/**
+	 * 
+	 * @param har
+	 * @param name
+	 * @deprecated use logger.
+     */
+	@Deprecated
     public static void logNetworkCapture(Har har, String name) {
     	logger.logNetworkCapture(har, name);
     	
     }
     
+	/**
+	 * 
+	 * @param file
+	 * @param description
+	 * @deprecated use logger.
+     */
+	@Deprecated
     public static void logFile(File file, String description) {
     	logger.logFile(file, description);
     }
@@ -143,7 +169,9 @@ public class TestLogging {
      *
      * @param screenshot		screenshot to log
 	 * @param screenshotName name of the snapshot, user wants to display
+     * @deprecated use logger.
      */
+	@Deprecated
     public static void logScreenshot(ScreenShot screenshot, String screenshotName) {
     	logScreenshot(screenshot, screenshotName, WebUIDriver.getCurrentWebUiDriverName());
     }
@@ -154,15 +182,29 @@ public class TestLogging {
      * @param screenshot		screenshot to log
 	 * @param screenshotName 	name of the snapshot, user wants to display
 	 * @param driverName		the name of the driver that did the screenshot
+     * @deprecated use logger.
      */
+	@Deprecated
     public static void logScreenshot(ScreenShot screenshot, String screenshotName, String driverName) {
     	logger.logScreenshot(screenshot, screenshotName, driverName);
     }
     
+	/**
+	 * 
+	 * @param screenshot
+	 * @deprecated use logger.
+     */
+	@Deprecated
     public static void logScreenshot(final ScreenShot screenshot) {
     	logScreenshot(screenshot, null, WebUIDriver.getCurrentWebUiDriverName());
     }
     
+	/**
+	 * 
+	 * @param testStep
+	 * @deprecated use logger.
+     */
+	@Deprecated
     public static void logTestStep(TestStep testStep) {
     	logTestStep(testStep, true);
     }
