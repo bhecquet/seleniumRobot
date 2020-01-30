@@ -19,6 +19,7 @@ package com.seleniumtests.uipage;
 
 import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -29,10 +30,12 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.Assert;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.core.runner.SeleniumRobotTestPlan;
 import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import com.seleniumtests.driver.TestType;
-import com.seleniumtests.driver.WebUIDriver;
+import com.seleniumtests.util.logging.ScenarioLogger;
+import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
 /**
  * Base html page abstraction. Used by PageObject and WebPageSection
@@ -41,6 +44,9 @@ public abstract class BasePage {
 
     protected WebDriver driver;
     private int explictWaitTimeout = SeleniumTestsContextManager.getThreadContext().getExplicitWaitTimeout();
+
+	protected static final Logger logger = ScenarioLogger.getScenarioLogger(SeleniumRobotTestPlan.class);
+	protected static final Logger internalLogger = SeleniumRobotLogger.getLogger(PageObject.class);
 
     public void acceptAlert() {
         Alert alert = getAlert();

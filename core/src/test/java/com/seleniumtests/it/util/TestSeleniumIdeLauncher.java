@@ -150,34 +150,34 @@ public class TestSeleniumIdeLauncher extends ReporterTest {
 	 * @throws ClassNotFoundException
 	 * @throws IOException
 	 */
-	@Test(groups={"it"})
-	public void testSimpleExecution() throws ClassNotFoundException, IOException {
-		String cls = "package covea.selenium.commons.tests;" + 
-				"" + 
-				"import com.seleniumtests.core.runner.SeleniumTestPlan;" + 
-				"import org.testng.annotations.Test;" + 
-				"" + 
-				"public class Default extends SeleniumTestPlan {" + 
-				"    " + 
-				"    @Test" + 
-				"    public void test() {" + 
-				"        System.out.println(\"hello\");" + 
-				"    }" + 
-				"}";
-		
-		Map<String, String> clss = new HashMap<String, String>();
-		clss.put("covea.selenium.commons.tests.Default", cls);
-		
-		new SeleniumIdeLauncher().executeGeneratedClasses(clss);
-		
-		String mainReportContent = readSummaryFile();
-		
-		// check that test is seen and OK
-		Assert.assertTrue(mainReportContent.matches(".*<i class=\"fa fa-circle circleSuccess\"></i><a href='test/TestReport.html' .*?>test</a>.*"));
-		
-		// check that detailed result contains the "hello" written in test
-		String detailedReportContent1 = readTestMethodResultFile("test");
-		Assert.assertTrue(detailedReportContent1.contains("hello"));
-		
-	}
+//	@Test(groups={"it"})
+//	public void testSimpleExecution() throws ClassNotFoundException, IOException {
+//		String cls = "package covea.selenium.commons.tests;" + 
+//				"" + 
+//				"import com.seleniumtests.core.runner.SeleniumTestPlan;" + 
+//				"import org.testng.annotations.Test;" + 
+//				"" + 
+//				"public class Default extends SeleniumTestPlan {" + 
+//				"    " + 
+//				"    @Test" + 
+//				"    public void test() {" + 
+//				"        System.out.println(\"hello\");" + 
+//				"    }" + 
+//				"}";
+//		
+//		Map<String, String> clss = new HashMap<String, String>();
+//		clss.put("covea.selenium.commons.tests.Default", cls);
+//		
+//		new SeleniumIdeLauncher().executeGeneratedClasses(clss);
+//		
+//		String mainReportContent = readSummaryFile();
+//		
+//		// check that test is seen and OK
+//		Assert.assertTrue(mainReportContent.matches(".*<i class=\"fa fa-circle circleSuccess\"></i><a href='test/TestReport.html' .*?>test</a>.*"));
+//		
+//		// check that detailed result contains the "hello" written in test
+//		String detailedReportContent1 = readTestMethodResultFile("test");
+//		Assert.assertTrue(detailedReportContent1.contains("hello"));
+//		
+//	}
 }

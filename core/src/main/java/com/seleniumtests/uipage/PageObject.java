@@ -31,7 +31,6 @@ import java.util.TreeSet;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FileUtils;
-import org.apache.log4j.Logger;
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
@@ -69,11 +68,9 @@ import com.seleniumtests.reporter.logger.TestLogging;
 import com.seleniumtests.uipage.htmlelements.HtmlElement;
 import com.seleniumtests.uipage.htmlelements.LinkElement;
 import com.seleniumtests.util.helper.WaitHelper;
-import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
 public class PageObject extends BasePage implements IPage {
 
-	private static final Logger logger = SeleniumRobotLogger.getLogger(PageObject.class);
     private boolean frameFlag = false;
     private HtmlElement pageIdentifierElement = null;
     private String windowHandle = null; // store the window / tab on which this page is loaded
@@ -364,13 +361,13 @@ public class PageObject extends BasePage implements IPage {
         if (handles.size() > 1) {
             isMultipleWindow = true;
         }
-        logger.debug("Current handles: " + handles);
+        internalLogger.debug("Current handles: " + handles);
         
         try {
             TestLogging.info("close web page: " + getTitle());
             driver.close();
         } catch (WebDriverException ignore) { 
-        	logger.info("Error closing driver: " + ignore.getMessage());
+        	internalLogger.info("Error closing driver: " + ignore.getMessage());
         }
 
         // wait a bit before going back to main window
@@ -538,7 +535,7 @@ public class PageObject extends BasePage implements IPage {
             TestLogging.log("got UnhandledAlertException, retry");
             driver.navigate().to(url);
         } catch (WebDriverException e) {
-        	logger.error(e);
+        	internalLogger.error(e);
             throw new CustomSeleniumTestsException(e);
         }
     }
@@ -580,7 +577,7 @@ public class PageObject extends BasePage implements IPage {
             }
             
         } catch (Exception ex) {
-        	logger.error(ex);
+        	internalLogger.error(ex);
         }
     }
 
@@ -646,7 +643,7 @@ public class PageObject extends BasePage implements IPage {
  		} catch (Exception e) {
  			mainWindowHandle = "";
  		}
- 		logger.debug("Current handle: " + mainWindowHandle);
+ 		internalLogger.debug("Current handle: " + mainWindowHandle);
 
  		// wait for window to be displayed
  		Instant end = systemClock.instant().plusMillis(waitMs + 250L);
@@ -656,7 +653,7 @@ public class PageObject extends BasePage implements IPage {
  		while (end.isAfter(systemClock.instant()) && !found) {
  			
  			handles = driver.getWindowHandles();
- 			logger.debug("All handles: " + handles.toString());
+ 			internalLogger.debug("All handles: " + handles.toString());
 
  			for (String handle: handles) {
  				
@@ -683,7 +680,7 @@ public class PageObject extends BasePage implements IPage {
 //					Mouse mouse = new DesktopMouse();
 //					mouse.click(new DesktopScreenRegion(Math.max(0, windowPosition.x) + driver.manage().window().getSize().width / 2, Math.max(0, windowPosition.y) + 5, 2, 2).getCenter());
 				} catch (Exception e) {
-					logger.warn("error while giving focus to window");
+					internalLogger.warn("error while giving focus to window");
 				}
 				
 				found = true;
@@ -727,7 +724,7 @@ public class PageObject extends BasePage implements IPage {
         try {
         	capturePageSnapshot();
         } catch (Exception ex) {
-        	logger.error(ex);
+        	internalLogger.error(ex);
             throw ex;
         }
     }
