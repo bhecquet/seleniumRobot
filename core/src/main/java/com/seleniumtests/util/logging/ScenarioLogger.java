@@ -26,6 +26,11 @@ public class ScenarioLogger extends Logger {
 	protected ScenarioLogger(String name) {
 		super(name);
 	}
+
+	public static ScenarioLogger getScenarioLogger(final Class<?> cls) {
+		SeleniumRobotLogger.getLogger(cls);
+		return (ScenarioLogger) Logger.getLogger("." + cls.getName(), new ScenarioLoggerFactory());
+	}
 	
 	public void info(String message) {
         logMessage(message, MessageType.INFO);

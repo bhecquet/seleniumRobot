@@ -26,17 +26,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.apache.log4j.Logger;
 import org.testng.ITestResult;
 import org.testng.Reporter;
 
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContext.TestStepManager;
 import com.seleniumtests.core.SeleniumTestsContextManager;
-import com.seleniumtests.core.utils.TestNGResultUtils;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.driver.screenshots.ScreenShot;
-import com.seleniumtests.reporter.logger.TestMessage.MessageType;
 import com.seleniumtests.util.logging.ScenarioLogger;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
@@ -68,7 +65,7 @@ import net.lightbody.bmp.core.har.Har;
 public class TestLogging {
 	
 	private static Map<Thread, ITestResult> currentTestResult = Collections.synchronizedMap(new HashMap<>());
-	private static ScenarioLogger logger = SeleniumRobotLogger.getScenarioLogger(TestLogging.class);
+	private static ScenarioLogger logger = ScenarioLogger.getScenarioLogger(TestLogging.class);
 	
 	private TestLogging() {
 		// As a utility class, it is not meant to be instantiated.
