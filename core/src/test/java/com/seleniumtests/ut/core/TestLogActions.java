@@ -26,10 +26,10 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import com.seleniumtests.GenericDriverTest;
+import com.seleniumtests.GenericTest;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.it.driver.support.pages.DriverTestPage;
-import com.seleniumtests.reporter.logger.TestLogging;
 import com.seleniumtests.reporter.logger.TestStep;
 
 public class TestLogActions extends GenericDriverTest {
@@ -40,7 +40,7 @@ public class TestLogActions extends GenericDriverTest {
 	@BeforeMethod(groups={"ut"})
 	public void initDriver(final ITestContext testNGCtx) throws Exception {
 
-		TestLogging.reset();
+		GenericTest.resetTestNGREsultAndLogger();
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setBrowser("htmlunit");
 		driver = WebUIDriver.getWebDriver(true);

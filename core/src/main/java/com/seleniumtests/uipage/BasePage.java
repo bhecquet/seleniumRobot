@@ -45,8 +45,8 @@ public abstract class BasePage {
     protected WebDriver driver;
     private int explictWaitTimeout = SeleniumTestsContextManager.getThreadContext().getExplicitWaitTimeout();
 
-	protected static final Logger logger = ScenarioLogger.getScenarioLogger(SeleniumRobotTestPlan.class);
-	protected static final Logger internalLogger = SeleniumRobotLogger.getLogger(PageObject.class);
+	protected static final Logger logger = ScenarioLogger.getScenarioLogger(BasePage.class);  // with this logger, information will be added in test step + logs
+	protected static final Logger internalLogger = SeleniumRobotLogger.getLogger(BasePage.class);
 
     public void acceptAlert() {
         Alert alert = getAlert();

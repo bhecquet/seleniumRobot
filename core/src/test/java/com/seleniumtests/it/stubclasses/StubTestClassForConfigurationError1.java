@@ -44,7 +44,7 @@ public class StubTestClassForConfigurationError1 extends StubParentClass {
 	@Test
 	public void testWithABeforeMethodError(XmlTest xmlTest) {
 		addStep("step 1");
-		TestLogging.info("some info");
+		logger.info("some info");
 	}
 	
 	

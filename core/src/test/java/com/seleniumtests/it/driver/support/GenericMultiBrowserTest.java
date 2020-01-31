@@ -32,6 +32,7 @@ import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 
+import com.seleniumtests.GenericTest;
 import com.seleniumtests.MockitoTest;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.driver.BrowserType;
@@ -197,7 +198,7 @@ public abstract class GenericMultiBrowserTest extends MockitoTest {
 
 	@AfterMethod(groups={"it", "ut"})
 	public void cleanAlert() {
-		TestLogging.reset();
+		GenericTest.resetTestNGREsultAndLogger();
 		if (driver == null) {
 			return;
 		}

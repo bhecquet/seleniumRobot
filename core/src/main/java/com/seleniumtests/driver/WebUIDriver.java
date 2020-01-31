@@ -17,26 +17,17 @@
  */
 package com.seleniumtests.driver;
 
-import com.neotys.selenium.proxies.NLWebDriver;
-import com.neotys.selenium.proxies.NLWebDriverFactory;
-import com.seleniumtests.browserfactory.*;
-import com.seleniumtests.core.SeleniumTestsContextManager;
-import com.seleniumtests.core.StatisticsStorage.DriverUsage;
-import com.seleniumtests.customexception.ConfigurationException;
-import com.seleniumtests.customexception.DriverExceptions;
-import com.seleniumtests.customexception.ScenarioException;
-import com.seleniumtests.driver.screenshots.ScreenShot;
-import com.seleniumtests.driver.screenshots.ScreenshotUtil;
-import com.seleniumtests.driver.screenshots.ScreenshotUtil.Target;
-import com.seleniumtests.driver.screenshots.VideoCaptureMode;
-import com.seleniumtests.driver.screenshots.VideoRecorder;
-import com.seleniumtests.reporter.logger.TestLogging;
-import com.seleniumtests.reporter.logger.TestStep;
-import com.seleniumtests.util.helper.WaitHelper;
-import com.seleniumtests.util.logging.SeleniumRobotLogger;
-import com.seleniumtests.util.osutility.OSUtility;
-import net.lightbody.bmp.BrowserMobProxy;
-import net.lightbody.bmp.core.har.Har;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.log4j.Logger;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.MutableCapabilities;
@@ -45,13 +36,40 @@ import org.openqa.selenium.logging.LogEntry;
 import org.openqa.selenium.support.events.EventFiringWebDriver;
 import org.openqa.selenium.support.events.WebDriverEventListener;
 
-import java.io.*;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import com.neotys.selenium.proxies.NLWebDriver;
+import com.neotys.selenium.proxies.NLWebDriverFactory;
+import com.seleniumtests.browserfactory.AppiumDriverFactory;
+import com.seleniumtests.browserfactory.BrowserInfo;
+import com.seleniumtests.browserfactory.BrowserStackDriverFactory;
+import com.seleniumtests.browserfactory.ChromeDriverFactory;
+import com.seleniumtests.browserfactory.EdgeDriverFactory;
+import com.seleniumtests.browserfactory.FirefoxDriverFactory;
+import com.seleniumtests.browserfactory.HtmlUnitDriverFactory;
+import com.seleniumtests.browserfactory.IEDriverFactory;
+import com.seleniumtests.browserfactory.IWebDriverFactory;
+import com.seleniumtests.browserfactory.SafariDriverFactory;
+import com.seleniumtests.browserfactory.SauceLabsDriverFactory;
+import com.seleniumtests.browserfactory.SeleniumGridDriverFactory;
+import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.core.StatisticsStorage.DriverUsage;
+import com.seleniumtests.core.TestStepManager;
+import com.seleniumtests.core.testretry.TestRetryAnalyzer;
+import com.seleniumtests.customexception.ConfigurationException;
+import com.seleniumtests.customexception.DriverExceptions;
+import com.seleniumtests.customexception.ScenarioException;
+import com.seleniumtests.driver.screenshots.ScreenShot;
+import com.seleniumtests.driver.screenshots.ScreenshotUtil;
+import com.seleniumtests.driver.screenshots.ScreenshotUtil.Target;
+import com.seleniumtests.driver.screenshots.VideoCaptureMode;
+import com.seleniumtests.driver.screenshots.VideoRecorder;
+import com.seleniumtests.reporter.logger.TestStep;
+import com.seleniumtests.util.helper.WaitHelper;
+import com.seleniumtests.util.logging.ScenarioLogger;
+import com.seleniumtests.util.logging.SeleniumRobotLogger;
+import com.seleniumtests.util.osutility.OSUtility;
+
+import net.lightbody.bmp.BrowserMobProxy;
+import net.lightbody.bmp.core.har.Har;
 
 /**
  * This class provides factory to create webDriver session.
@@ -60,6 +78,7 @@ public class WebUIDriver {
 
 	public static final String DEFAULT_DRIVER_NAME = "main";
 	private static final Logger logger = SeleniumRobotLogger.getLogger(WebUIDriver.class);
+	private static ScenarioLogger scenarioLogger = ScenarioLogger.getScenarioLogger(TestRetryAnalyzer.class);
 	
     private static ThreadLocal<Map<String, WebUIDriver>> uxDriverSession = new ThreadLocal<>();
     private static ThreadLocal<VideoRecorder> videoRecorder = new ThreadLocal<>();
@@ -133,7 +152,7 @@ public class WebUIDriver {
         		existingPids.addAll(browserInfo.getDriverAndBrowserPid(new ArrayList<>()));
         	}
         	
-    		TestStep cuurrentTestStep = TestLogging.getCurrentRootTestStep();
+    		TestStep cuurrentTestStep = TestStepManager.getCurrentRootTestStep();
     		long start = new Date().getTime();
     		long duration;
     		
@@ -146,7 +165,7 @@ public class WebUIDriver {
     			if (cuurrentTestStep != null) {
     				cuurrentTestStep.setDurationToExclude(duration);
     			}
-    			TestLogging.info(String.format("driver creation took: %.1f secs", duration / 1000.0));
+    			scenarioLogger.info(String.format("driver creation took: %.1f secs", duration / 1000.0));
     		}
  
             WaitHelper.waitForSeconds(2);
@@ -263,10 +282,10 @@ public class WebUIDriver {
 				
 				// force screenshotUtil to use the driver of this WebUiDriver, not the currently selected one
 				for (ScreenShot screenshot: new ScreenshotUtil(driver).capture(Target.PAGE, ScreenShot.class, true, true)) {
-					TestLogging.logScreenshot(screenshot, null, name);
+					scenarioLogger.logScreenshot(screenshot, null, name);
 				}
 			} catch (Exception e) {
-				TestLogging.log("Error while logging: " + e.getMessage());
+				scenarioLogger.log("Error while logging: " + e.getMessage());
 			}
 		}
 		
@@ -274,12 +293,12 @@ public class WebUIDriver {
 	    	// stop HAR capture
 			if (config.getBrowserMobProxy() != null) {
 				Har har = config.getBrowserMobProxy().endHar();
-				TestLogging.logNetworkCapture(har, name);
+				scenarioLogger.logNetworkCapture(har, name);
 			}
 			
 			
 		} catch (Exception e) {
-			TestLogging.log("Error while logging: " + e.getMessage());
+			scenarioLogger.log("Error while logging: " + e.getMessage());
 		} finally {
 			config.setBrowserMobProxy(null);
 		}
@@ -315,10 +334,10 @@ public class WebUIDriver {
     		
     		
     		try {
-	            TestLogging.log("quiting webdriver " + Thread.currentThread().getId());
+    			scenarioLogger.log("quiting webdriver " + Thread.currentThread().getId());
 	            driver.quit();
         	} catch (Exception ex) {
-        		TestLogging.error("Exception encountered when quiting driver:" + ex.getMessage());
+        		scenarioLogger.error("Exception encountered when quiting driver:" + ex.getMessage());
         	}
     		driver = null;
         }
@@ -476,7 +495,7 @@ public class WebUIDriver {
     	}
     	setCurrentWebUiDriverName(driverName);
     	
-    	TestLogging.info(String.format("Switching to driver named '%s'", driverName));
+    	scenarioLogger.info(String.format("Switching to driver named '%s'", driverName));
     }
 
     /**

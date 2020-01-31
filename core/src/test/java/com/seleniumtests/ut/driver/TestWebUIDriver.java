@@ -12,7 +12,6 @@ import static org.mockito.Mockito.when;
 import static org.powermock.api.mockito.PowerMockito.whenNew;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -32,6 +31,7 @@ import org.testng.annotations.Test;
 
 import com.neotys.selenium.proxies.NLWebDriver;
 import com.neotys.selenium.proxies.NLWebDriverFactory;
+import com.seleniumtests.GenericTest;
 import com.seleniumtests.MockitoTest;
 import com.seleniumtests.browserfactory.BrowserInfo;
 import com.seleniumtests.browserfactory.SeleniumGridDriverFactory;
@@ -48,7 +48,6 @@ import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.driver.WebUIDriverFactory;
 import com.seleniumtests.driver.screenshots.VideoRecorder;
 import com.seleniumtests.it.stubclasses.StubTestPage;
-import com.seleniumtests.reporter.logger.TestLogging;
 import com.seleniumtests.uipage.PageObject;
 
 import net.lightbody.bmp.BrowserMobProxy;
@@ -624,6 +623,6 @@ public class TestWebUIDriver extends MockitoTest {
 	public void destroyDriver() {
 		WebUIDriver.cleanUp();
 
-		TestLogging.reset();
+		GenericTest.resetTestNGREsultAndLogger();
 	}
 }

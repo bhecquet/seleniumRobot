@@ -20,12 +20,14 @@ package com.seleniumtests.core.testretry;
 import org.testng.IRetryAnalyzer;
 import org.testng.ITestResult;
 
-import com.seleniumtests.core.runner.SeleniumRobotTestListener;
 import com.seleniumtests.core.utils.TestNGResultUtils;
 import com.seleniumtests.customexception.SeleniumGridNodeNotAvailable;
 import com.seleniumtests.reporter.logger.TestLogging;
+import com.seleniumtests.util.logging.ScenarioLogger;
 
 public class TestRetryAnalyzer implements IRetryAnalyzer {
+	
+	private static ScenarioLogger logger = ScenarioLogger.getScenarioLogger(TestRetryAnalyzer.class);
 
     private Integer count = 0;
     private int maxCount = 2;
@@ -62,21 +64,21 @@ public class TestRetryAnalyzer implements IRetryAnalyzer {
         	
         	count++;
         	if (result.getThrowable() instanceof AssertionError) {
-        		TestLogging.log("[NOT RETRYING] due to failed Assertion");
+        		logger.log("[NOT RETRYING] due to failed Assertion");
             	TestNGResultUtils.setNoMoreRetry(result, true); 
         		return false;
         	} else if (result.getThrowable() instanceof SeleniumGridNodeNotAvailable) {
-        		TestLogging.log("[NOT RETRYING] due to grid node not available");
+        		logger.log("[NOT RETRYING] due to grid node not available");
             	TestNGResultUtils.setNoMoreRetry(result, true);
         		return false;
         	}
         	
-	        TestLogging.log("[RETRYING] " + testClassName + " FAILED, " + "Retrying " + count + " time");
+        	logger.log("[RETRYING] " + testClassName + " FAILED, " + "Retrying " + count + " time");
             return true;
         } 
         count++;
         
-        TestLogging.log(String.format("[NOT RETRYING] max retry count (%d) reached", maxCount));
+        logger.log(String.format("[NOT RETRYING] max retry count (%d) reached", maxCount));
 
         return false;
     }

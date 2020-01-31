@@ -27,7 +27,6 @@ import org.testng.xml.XmlTest;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.ConfigurationException;
-import com.seleniumtests.reporter.logger.TestLogging;
 
 /**
  *  Test class to product a AfterXXX configuration error and look for logs in report
@@ -44,18 +43,18 @@ public class StubTestClassForConfigurationError2 extends StubParentClass {
 	@Test
 	public void testWithAfterMethodError(XmlTest xmlTest) {
 		addStep("step 1");
-		TestLogging.info("some info");
+		logger.info("some info");
 	}
 	
 	@Test
 	public void testInErrorWithAfterMethodError() {
-		TestLogging.info("info before error");
+		logger.info("info before error");
 		throw new WebDriverException("error");
 	}
 	
 	@AfterMethod
 	public void afterMethod(Method method, XmlTest xmlTest) {
-		TestLogging.warning("some warning");
+		logger.warn("some warning");
 		throw new ConfigurationException("Some error after method");
 	}
 

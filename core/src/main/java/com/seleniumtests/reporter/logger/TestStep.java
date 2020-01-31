@@ -43,7 +43,7 @@ import com.seleniumtests.reporter.reporters.CommonReporter;
  *    +--- sub-action2
  * +--- action2
  * 
- * Each TestStep is then logged in {@link TestLogging TestLogging class} with TestLogging.logTestStep() method
+ * Each TestStep is then logged in {@link TestLogging TestLogging class} with ScenarioLogger.logTestStep() method
  * 
  * @author behe
  *

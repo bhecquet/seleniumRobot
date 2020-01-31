@@ -960,7 +960,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	}	
 	
 	/**
-	 * Check test values are displayed (call to TestLogging.logTestValue()) shown as a table
+	 * Check test values are displayed (call to logger.logTestValue()) shown as a table
 	 * @throws Exception
 	 */
 	@Test(groups={"it"})

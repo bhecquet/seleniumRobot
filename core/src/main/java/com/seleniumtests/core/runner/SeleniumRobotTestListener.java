@@ -54,25 +54,26 @@ import com.mashape.unirest.http.Unirest;
 import com.seleniumtests.connectors.selenium.SeleniumRobotVariableServerConnector;
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.core.TestStepManager;
 import com.seleniumtests.core.TestTasks;
 import com.seleniumtests.core.testretry.TestRetryAnalyzer;
 import com.seleniumtests.core.utils.TestNGResultUtils;
 import com.seleniumtests.customexception.ConfigurationException;
-import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.driver.DriverMode;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.driver.screenshots.VideoCaptureMode;
 import com.seleniumtests.reporter.logger.ArchiveMode;
-import com.seleniumtests.reporter.logger.TestLogging;
 import com.seleniumtests.reporter.logger.TestStep;
 import com.seleniumtests.reporter.reporters.CommonReporter;
 import com.seleniumtests.reporter.reporters.ReporterControler;
 import com.seleniumtests.util.FileUtility;
+import com.seleniumtests.util.logging.ScenarioLogger;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
 public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodListener2, ISuiteListener, IExecutionListener, IConfigurationListener {
 	
 	protected static final Logger logger = SeleniumRobotLogger.getLogger(SeleniumRobotTestListener.class);
+	private static ScenarioLogger scenarioLogger = ScenarioLogger.getScenarioLogger(SeleniumRobotTestListener.class);
 	
 	private static List<ISuite> suiteList = Collections.synchronizedList(new ArrayList<>());
 	private Date start;
@@ -235,7 +236,7 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 
 	@Override
 	public void beforeInvocation(IInvokedMethod method, ITestResult testResult, ITestContext context) {
-		TestLogging.setCurrentTestResult(testResult);
+		Reporter.setCurrentTestResult(testResult);
 		
 		// issue #94: add ability to request thread context from a method annotated with @BeforeMethod
 		// for each beforemethod, store the current context so that it can be edited by the configuration method
@@ -254,7 +255,6 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 	 */
 	@Override
 	public void afterInvocation(IInvokedMethod method, ITestResult testResult, ITestContext context) {
-
 		Reporter.setCurrentTestResult(testResult);
 		
 		try {
@@ -372,10 +372,10 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 		} catch (ConfigurationException e) {}
 		
 		TestStep tearDownStep = new TestStep("Test end", testResult, new ArrayList<>(), true);
-		TestLogging.setCurrentRootTestStep(tearDownStep);
+		TestStepManager.setCurrentRootTestStep(tearDownStep);
 		
 		if (testResult.isSuccess()) {
-			TestLogging.log("Test is OK");
+			scenarioLogger.log("Test is OK");
 		} else if (testResult.getStatus() == ITestResult.FAILURE) {
 			
 			// issue #289: allow retry in case SO_TIMEOUT is raised
@@ -388,9 +388,9 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 			}
 				
 			String error = testResult.getThrowable() != null ? testResult.getThrowable().getMessage(): "no error found";
-			TestLogging.log("Test is KO with error: " + error);
+			scenarioLogger.log("Test is KO with error: " + error);
 		} else {
-			TestLogging.log("Test has not started or has been skipped");
+			scenarioLogger.log("Test has not started or has been skipped");
 		}
 		
 		File videoFile = WebUIDriver.logFinalDriversState();
@@ -402,7 +402,7 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 	        if (SeleniumTestsContextManager.getThreadContext().getVideoCapture() == VideoCaptureMode.TRUE
 	        		|| (SeleniumTestsContextManager.getThreadContext().getVideoCapture() == VideoCaptureMode.ON_SUCCESS && testResult.isSuccess())
 	        		|| (SeleniumTestsContextManager.getThreadContext().getVideoCapture() == VideoCaptureMode.ON_ERROR && !testResult.isSuccess())) {
-	        	TestLogging.logFile(pathRelative.toFile(), "Video capture");
+	        	scenarioLogger.logFile(pathRelative.toFile(), "Video capture");
 	        	logger.info("Video file copied to " + pathAbsolute.toFile().getAbsolutePath());
 			} else {
 				pathAbsolute.toFile().delete();
@@ -410,7 +410,7 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 		}
 		
 		tearDownStep.updateDuration();
-		TestLogging.logTestStep(tearDownStep);
+		TestStepManager.logTestStep(tearDownStep);
 		
 	}
 	
@@ -542,7 +542,7 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 			
 			// when error occurs, exception raised is not added to the step if this error is outside of a PageObject
 			// we add it there as an exception always terminates the test (except for soft assert, but this case is handled in SoftAssertion.aj)
-			TestStep lastStep = TestLogging.getCurrentRootTestStep();
+			TestStep lastStep = TestStepManager.getCurrentRootTestStep();
 			if (lastStep == null) {
 				// when steps are automatic, they are closed (lastStep is null) once method is finished
 				try {
@@ -578,7 +578,7 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 		int maxAllowedRetry = Math.max(SeleniumTestsContextManager.getThreadContext().getTestRetryCount() * 2, SeleniumTestsContext.DEFAULT_TEST_RETRY_COUNT);
     	
     	try {
-    		TestRetryAnalyzer retryAnalyzer = (TestRetryAnalyzer)TestLogging.getCurrentTestResult().getMethod().getRetryAnalyzer();
+    		TestRetryAnalyzer retryAnalyzer = (TestRetryAnalyzer)Reporter.getCurrentTestResult().getMethod().getRetryAnalyzer();
     		
     		if (retryAnalyzer != null && retryAnalyzer.getMaxCount() < maxAllowedRetry) {
         		retryAnalyzer.setMaxCount(retryAnalyzer.getMaxCount() + 1);

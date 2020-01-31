@@ -22,7 +22,6 @@ import org.openqa.selenium.safari.SafariDriver;
 import org.openqa.selenium.safari.SafariOptions;
 
 import com.seleniumtests.driver.DriverConfig;
-import com.seleniumtests.reporter.logger.TestLogging;
 
 public class SafariDriverFactory extends AbstractWebDriverFactory implements IWebDriverFactory {
 
@@ -46,7 +45,7 @@ public class SafariDriverFactory extends AbstractWebDriverFactory implements IWe
         // Implicit Waits handles dynamic element.
         setImplicitWaitTimeout(webDriverConfig.getImplicitWaitTimeout());
         if (webDriverConfig.getPageLoadTimeout() >= 0) {
-            TestLogging.log("Safari doesn't support pageLoadTimeout");
+            logger.error("Safari doesn't support pageLoadTimeout");
         }
 
         return driver;

@@ -212,7 +212,7 @@ public class FirefoxCapabilitiesFactory extends IDesktopCapabilityFactory {
         } else {
         	realPath = path;
         	if (!new File(path).exists()) {
-        		TestLogging.log("Firefox profile path:" + path + " not found, use default");
+        		logger.info("Firefox profile path:" + path + " not found, use default");
         	}
         }
 

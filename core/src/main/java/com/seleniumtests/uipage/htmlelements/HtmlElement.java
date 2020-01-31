@@ -57,6 +57,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 import com.seleniumtests.browserfactory.FirefoxDriverFactory;
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.core.testretry.TestRetryAnalyzer;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.CustomSeleniumTestsException;
 import com.seleniumtests.customexception.DriverExceptions;
@@ -72,6 +73,7 @@ import com.seleniumtests.uipage.PageObject;
 import com.seleniumtests.uipage.ReplayOnError;
 import com.seleniumtests.util.helper.WaitHelper;
 import com.seleniumtests.util.logging.DebugMode;
+import com.seleniumtests.util.logging.ScenarioLogger;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
 import io.appium.java_client.MobileElement;
@@ -95,6 +97,8 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 	// so wait to this old interface to be really removed
 
     protected static final Logger logger = SeleniumRobotLogger.getLogger(HtmlElement.class);
+	private static ScenarioLogger scenarioLogger = ScenarioLogger.getScenarioLogger(TestRetryAnalyzer.class);
+	
     public static final Integer FIRST_VISIBLE = Integer.MAX_VALUE;
     public static final Integer OPTIMAL_SCROLLING = Integer.MAX_VALUE;
     
@@ -746,7 +750,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 			try {
 				new WebDriverWait(driver, 1).until(ExpectedConditions.visibilityOf(element));
 			} catch (ElementNotVisibleException e) {
-				TestLogging.info(String.format("element %s not visible", element));
+				scenarioLogger.info(String.format("element %s not visible", element));
 			} catch (Exception e) {
 				logger.warn("Could not make element visible", e);
 			}

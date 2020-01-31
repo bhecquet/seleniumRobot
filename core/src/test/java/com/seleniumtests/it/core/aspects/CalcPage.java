@@ -24,7 +24,6 @@ import org.testng.Assert;
 
 import com.seleniumtests.core.StepName;
 import com.seleniumtests.customexception.DriverExceptions;
-import com.seleniumtests.reporter.logger.TestLogging;
 import com.seleniumtests.uipage.PageObject;
 import com.seleniumtests.uipage.htmlelements.HtmlElement;
 
@@ -107,15 +106,15 @@ public class CalcPage extends PageObject {
 	}
 	
 	public CalcPage connect(String login, String password) {
-		TestLogging.info("login is " + login);
-		TestLogging.info("password is " + password);
+		logger.info("login is " + login);
+		logger.info("password is " + password);
 		return this;
 	}
 	
 	@StepName("Connect to calc with ${login}/${password}")
 	public CalcPage connectWithName(String login, String password) {
-		TestLogging.info("login is " + login);
-		TestLogging.info("password is " + password);
+		logger.info("login is " + login);
+		logger.info("password is " + password);
 		return this;
 	}
 	

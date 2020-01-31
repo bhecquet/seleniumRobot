@@ -27,7 +27,7 @@ import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
-import com.seleniumtests.reporter.logger.TestLogging;
+import com.seleniumtests.util.logging.ScenarioLogger;
 
 /* test class for showing the issue #115
  * TODO: how to create a map with parameters, which is accessible from BeforeMethod / AfterMethod
@@ -39,7 +39,7 @@ public class StubTestClassForDataProvider extends StubParentClass {
 		
 		Assert.assertNull(SeleniumTestsContextManager.getThreadContext().getAttribute("data"));
 		SeleniumTestsContextManager.getThreadContext().setAttribute("data", data);
-		TestLogging.log("data written: " + SeleniumTestsContextManager.getThreadContext().getAttribute("data"));
+		((ScenarioLogger)logger).log("data written: " + SeleniumTestsContextManager.getThreadContext().getAttribute("data"));
 	}
 	
 	@BeforeMethod(groups={"stub"})

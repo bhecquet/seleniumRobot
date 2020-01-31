@@ -87,7 +87,7 @@ public class MockitoTest  extends PowerMockTestCase {
 			afterPowerMockTestMethod();
 		}
 
-		TestLogging.reset();
+		GenericTest.resetTestNGREsultAndLogger();
 	}
 	
 	@AfterClass(groups={"ut", "it"}, alwaysRun=true)

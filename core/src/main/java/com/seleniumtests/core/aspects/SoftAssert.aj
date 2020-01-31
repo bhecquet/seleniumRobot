@@ -23,10 +23,12 @@ import org.aspectj.lang.annotation.Aspect;
 import org.testng.Reporter;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
-import com.seleniumtests.reporter.logger.TestLogging;
+import com.seleniumtests.util.logging.ScenarioLogger;
 
 @Aspect
 public class SoftAssert {
+
+	private static ScenarioLogger logger = ScenarioLogger.getScenarioLogger(SoftAssert.class);
 
 	@Around("(call(public * org.testng.Assert..* (..)) " +
 			"|| call(public * org.hamcrest.MatcherAssert..* (..))) " +
@@ -38,7 +40,7 @@ public class SoftAssert {
 		} catch (AssertionError e) {
 			if (SeleniumTestsContextManager.getThreadContext().isSoftAssertEnabled()) {
 				SeleniumTestsContextManager.getThreadContext().addVerificationFailures(Reporter.getCurrentTestResult(), e);
-		        TestLogging.error("!!!FAILURE ALERT!!! - Assertion Failure: " + e.getMessage());
+		        logger.error("!!!FAILURE ALERT!!! - Assertion Failure: " + e.getMessage());
 		        return null;
 			} else {
 				throw e;

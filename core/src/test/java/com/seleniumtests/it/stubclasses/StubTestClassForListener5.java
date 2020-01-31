@@ -40,7 +40,7 @@ import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.driver.screenshots.ScreenShot;
 import com.seleniumtests.driver.screenshots.ScreenshotUtil;
 import com.seleniumtests.driver.screenshots.ScreenshotUtil.Target;
-import com.seleniumtests.reporter.logger.TestLogging;
+import com.seleniumtests.util.logging.ScenarioLogger;
 
 /**
  * Stubclass for testing issue #136 and driver creation blocking
@@ -52,7 +52,7 @@ public class StubTestClassForListener5 extends StubTestClassForListenerParent {
 	private void startDriver() {
 		WebDriver driver = WebUIDriver.getWebDriver(true);
 		driver.get("file:///" + Thread.currentThread().getContextClassLoader().getResource("tu/test.html").getFile());
-		TestLogging.logScreenshot(new ScreenshotUtil(driver).capture(Target.PAGE, ScreenShot.class));
+		((ScenarioLogger)logger).logScreenshot(new ScreenshotUtil(driver).capture(Target.PAGE, ScreenShot.class));
 	}
 	
 	@BeforeSuite(groups={"stub1"})

@@ -64,10 +64,10 @@ import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.driver.screenshots.ScreenShot;
 import com.seleniumtests.driver.screenshots.ScreenshotUtil;
 import com.seleniumtests.driver.screenshots.ScreenshotUtil.Target;
-import com.seleniumtests.reporter.logger.TestLogging;
 import com.seleniumtests.uipage.htmlelements.HtmlElement;
 import com.seleniumtests.uipage.htmlelements.LinkElement;
 import com.seleniumtests.util.helper.WaitHelper;
+import com.seleniumtests.util.logging.ScenarioLogger;
 
 public class PageObject extends BasePage implements IPage {
 
@@ -157,7 +157,7 @@ public class PageObject extends BasePage implements IPage {
         long startTime = start.getTimeInMillis();
         long endTime = end.getTimeInMillis();
         if ((endTime - startTime) / 1000 > 0) {
-            TestLogging.log("Open web page in :" + (endTime - startTime) / 1000 + "seconds");
+            ((ScenarioLogger)logger).log("Open web page in :" + (endTime - startTime) / 1000 + "seconds");
         }
         
         
@@ -327,7 +327,7 @@ public class PageObject extends BasePage implements IPage {
         	screenShot.setTitle(snapshotName);
         }
 
-        TestLogging.logScreenshot(screenShot, snapshotName);
+        ((ScenarioLogger)logger).logScreenshot(screenShot, snapshotName);
         
         // store the window / tab on which this page is loaded
         windowHandle = driver.getWindowHandle();
@@ -364,7 +364,7 @@ public class PageObject extends BasePage implements IPage {
         internalLogger.debug("Current handles: " + handles);
         
         try {
-            TestLogging.info("close web page: " + getTitle());
+        	logger.info("close web page: " + getTitle());
             driver.close();
         } catch (WebDriverException ignore) { 
         	internalLogger.info("Error closing driver: " + ignore.getMessage());
@@ -481,7 +481,7 @@ public class PageObject extends BasePage implements IPage {
                 ((JavascriptExecutor) driver).executeScript(
                     "if (window.screen){window.moveTo(0, 0);window.resizeTo(window.screen.availWidth,window.screen.availHeight);}");
             } catch (Exception ignore) {
-                TestLogging.log("Unable to maximize browser window. Exception occured: " + ignore.getMessage());
+            	((ScenarioLogger)logger).log("Unable to maximize browser window. Exception occured: " + ignore.getMessage());
             }
         }
     }
@@ -522,7 +522,7 @@ public class PageObject extends BasePage implements IPage {
 	            driver.navigate().to(url);
             }
         } catch (UnsupportedCommandException e) {
-            TestLogging.log("get UnsupportedCommandException, retry");
+        	logger.error("get UnsupportedCommandException, retry");
             // recreate the driver without recreating the enclosing WebUiDriver
             driver = WebUIDriver.getWebUIDriver(false).createWebDriver();
             if (SeleniumTestsContextManager.isWebTest()) {
@@ -530,9 +530,9 @@ public class PageObject extends BasePage implements IPage {
 	            driver.navigate().to(url);
             }
         } catch (org.openqa.selenium.TimeoutException ex) {
-            TestLogging.log("got time out when loading " + url + ", ignored");
+        	logger.error("got time out when loading " + url + ", ignored");
         } catch (org.openqa.selenium.UnhandledAlertException ex) {
-            TestLogging.log("got UnhandledAlertException, retry");
+        	logger.error("got UnhandledAlertException, retry");
             driver.navigate().to(url);
         } catch (WebDriverException e) {
         	internalLogger.error(e);
@@ -544,7 +544,7 @@ public class PageObject extends BasePage implements IPage {
         try {
             driver.navigate().refresh();
         } catch (org.openqa.selenium.TimeoutException ex) {
-            TestLogging.log("got time out customexception, ignore");
+        	logger.error("got time out customexception, ignore");
         }
     }
 

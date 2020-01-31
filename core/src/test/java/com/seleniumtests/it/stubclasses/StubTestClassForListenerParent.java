@@ -27,11 +27,11 @@ public class StubTestClassForListenerParent extends StubParentClass {
 
 	@BeforeTest
 	public void beforeTestInParent(XmlTest xmlTest) {
-		TestLogging.info("beforeTest parent call");
+		logger.info("beforeTest parent call");
 	}
 	
 	@AfterClass
 	public void afterClassInParent(XmlTest xmlTest) {
-		TestLogging.info("afterClass parent call");
+		logger.info("afterClass parent call");
 	}
 }
