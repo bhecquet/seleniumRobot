@@ -65,6 +65,7 @@ public class MainPageTest {
     driver.findElement(By.id("image")).click();
     assertThat(driver.findElement(By.id("link")).getText(), is("My link"));
     vars.put("window_handles", driver.getWindowHandles());
+    System.out.println("STEP:new window link");
     driver.findElement(By.id("link")).click();
     vars.put("win841", waitForWindow(2000));
     driver.switchTo().window(vars.get("win841").toString());

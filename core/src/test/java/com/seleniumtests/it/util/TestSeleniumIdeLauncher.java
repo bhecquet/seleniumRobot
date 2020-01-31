@@ -23,6 +23,8 @@ import com.seleniumtests.it.reporter.ReporterTest;
 import com.seleniumtests.util.ide.SeleniumIdeLauncher;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
+import net.openhft.compiler.CompilerUtils;
+
 public class TestSeleniumIdeLauncher extends ReporterTest {
 	
 	private static final Logger logger = SeleniumRobotLogger.getLogger(TestSeleniumIdeLauncher.class);
@@ -61,6 +63,7 @@ public class TestSeleniumIdeLauncher extends ReporterTest {
 	@Test(groups={"it"})
 	public void testSeleniumExecution() throws IOException, ClassNotFoundException {
 		try {
+			CompilerUtils.addClassPath("target/test-classes");
 			System.setProperty(SeleniumTestsContext.BROWSER, "chrome");
 			System.setProperty(SeleniumTestsContext.MANUAL_TEST_STEPS, "false");
 			System.setProperty(SeleniumTestsContext.SOFT_ASSERT_ENABLED, "false");
@@ -111,13 +114,14 @@ public class TestSeleniumIdeLauncher extends ReporterTest {
 	@Test(groups={"it"})
 	public void testSeleniumExecutionWithManualSteps() throws IOException, ClassNotFoundException {
 		try {
+			CompilerUtils.addClassPath("target/test-classes");
 			System.setProperty(SeleniumTestsContext.BROWSER, "chrome");
 			System.setProperty(SeleniumTestsContext.MANUAL_TEST_STEPS, "true");
 			System.setProperty(SeleniumTestsContext.SOFT_ASSERT_ENABLED, "false");
 			
-			
-			File tmpSuiteFile = GenericTest.createFileFromResource("ti/ide/MainPageTest.java");
-			File suiteFile = Paths.get(tmpSuiteFile.getParentFile().getAbsolutePath(), "MainPageTest.java").toFile();
+			// use a different file from the previous test to avoid problems with compiler cache
+			File tmpSuiteFile = GenericTest.createFileFromResource("ti/ide/MainPageTest2.java");
+			File suiteFile = Paths.get(tmpSuiteFile.getParentFile().getAbsolutePath(), "MainPageTest2.java").toFile();
 			FileUtils.copyFile(tmpSuiteFile, suiteFile);
 			
 			new SeleniumIdeLauncher().executeScripts(Arrays.asList(suiteFile.getAbsolutePath()));
@@ -136,7 +140,7 @@ public class TestSeleniumIdeLauncher extends ReporterTest {
 			Assert.assertTrue(detailedReportContent1.contains("li>click on HtmlElement , by={By.id: buttonIFrame} </li>"));
 			
 			// screenshot is present for the step (taken at the beginning of the step: see anchor)
-			Assert.assertTrue(detailedReportContent1.contains("<div class=\"message-snapshot\">Output 'main' browser: Current Window: : <a href='data:,'"));
+			Assert.assertTrue(detailedReportContent1.contains("<div class=\"message-snapshot\">Output 'main' browser: Current Window: : <a href='http://localhost:55555/testWithoutFixedPattern.html'"));
 			
 		} finally {
 			System.clearProperty(SeleniumTestsContext.BROWSER);
@@ -150,34 +154,34 @@ public class TestSeleniumIdeLauncher extends ReporterTest {
 	 * @throws ClassNotFoundException
 	 * @throws IOException
 	 */
-//	@Test(groups={"it"})
-//	public void testSimpleExecution() throws ClassNotFoundException, IOException {
-//		String cls = "package covea.selenium.commons.tests;" + 
-//				"" + 
-//				"import com.seleniumtests.core.runner.SeleniumTestPlan;" + 
-//				"import org.testng.annotations.Test;" + 
-//				"" + 
-//				"public class Default extends SeleniumTestPlan {" + 
-//				"    " + 
-//				"    @Test" + 
-//				"    public void test() {" + 
-//				"        System.out.println(\"hello\");" + 
-//				"    }" + 
-//				"}";
-//		
-//		Map<String, String> clss = new HashMap<String, String>();
-//		clss.put("covea.selenium.commons.tests.Default", cls);
-//		
-//		new SeleniumIdeLauncher().executeGeneratedClasses(clss);
-//		
-//		String mainReportContent = readSummaryFile();
-//		
-//		// check that test is seen and OK
-//		Assert.assertTrue(mainReportContent.matches(".*<i class=\"fa fa-circle circleSuccess\"></i><a href='test/TestReport.html' .*?>test</a>.*"));
-//		
-//		// check that detailed result contains the "hello" written in test
-//		String detailedReportContent1 = readTestMethodResultFile("test");
-//		Assert.assertTrue(detailedReportContent1.contains("hello"));
-//		
-//	}
+	@Test(groups={"it"})
+	public void testSimpleExecution() throws ClassNotFoundException, IOException {
+		String cls = "package covea.selenium.commons.tests;" + 
+				"" + 
+				"import com.seleniumtests.core.runner.SeleniumTestPlan;" + 
+				"import org.testng.annotations.Test;" + 
+				"" + 
+				"public class Default extends SeleniumTestPlan {" + 
+				"    " + 
+				"    @Test" + 
+				"    public void test() {" + 
+				"        System.out.println(\"hello\");" + 
+				"    }" + 
+				"}";
+		
+		Map<String, String> clss = new HashMap<String, String>();
+		clss.put("covea.selenium.commons.tests.Default", cls);
+		
+		new SeleniumIdeLauncher().executeGeneratedClasses(clss);
+		
+		String mainReportContent = readSummaryFile();
+		
+		// check that test is seen and OK
+		Assert.assertTrue(mainReportContent.matches(".*<i class=\"fa fa-circle circleSuccess\"></i><a href='test/TestReport.html' .*?>test</a>.*"));
+		
+		// check that detailed result contains the "hello" written in test
+		String detailedReportContent1 = readTestMethodResultFile("test");
+		Assert.assertTrue(detailedReportContent1.contains("hello"));
+		
+	}
 }
