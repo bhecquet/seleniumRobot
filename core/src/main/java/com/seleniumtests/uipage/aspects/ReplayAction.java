@@ -21,7 +21,6 @@ import java.lang.reflect.Field;
 import java.time.Clock;
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -31,14 +30,12 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.DeclarePrecedence;
-import org.openqa.selenium.ElementNotInteractableException;
 import org.openqa.selenium.InvalidElementStateException;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.interactions.InputSource;
 import org.openqa.selenium.interactions.Interaction;
 import org.openqa.selenium.interactions.MoveTargetOutOfBoundsException;
@@ -48,6 +45,7 @@ import org.openqa.selenium.remote.RemoteWebElement;
 import org.openqa.selenium.remote.UnreachableBrowserException;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.core.TestStepManager;
 import com.seleniumtests.core.aspects.LogAction;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.DatasetException;
@@ -56,7 +54,6 @@ import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.reporter.logger.TestAction;
-import com.seleniumtests.reporter.logger.TestLogging;
 import com.seleniumtests.uipage.ReplayOnError;
 import com.seleniumtests.uipage.htmlelements.GenericPictureElement;
 import com.seleniumtests.uipage.htmlelements.HtmlElement;
@@ -107,8 +104,8 @@ public class ReplayAction {
 
 		// log action before its started. By default, it's OK. Then result may be overwritten if step fails
 		// order of steps is the right one (first called is first displayed)
-		if (currentAction != null && isHtmlElementDirectlyCalled(Thread.currentThread().getStackTrace()) && TestLogging.getParentTestStep() != null) {
-			TestLogging.getParentTestStep().addAction(currentAction);
+		if (currentAction != null && isHtmlElementDirectlyCalled(Thread.currentThread().getStackTrace()) && TestStepManager.getParentTestStep() != null) {
+			TestStepManager.getParentTestStep().addAction(currentAction);
 		}	
 		
 		boolean actionFailed = false;
@@ -181,7 +178,7 @@ public class ReplayAction {
 				throw e;
 			}
 		} finally {
-			if (currentAction != null && isHtmlElementDirectlyCalled(Thread.currentThread().getStackTrace()) && TestLogging.getParentTestStep() != null) {
+			if (currentAction != null && isHtmlElementDirectlyCalled(Thread.currentThread().getStackTrace()) && TestStepManager.getParentTestStep() != null) {
 				currentAction.setFailed(actionFailed);
 			}	
 			
@@ -216,8 +213,8 @@ public class ReplayAction {
 	
 			// log action before its started. By default, it's OK. Then result may be overwritten if step fails
 			// order of steps is the right one (first called is first displayed)
-			if (isHtmlElementDirectlyCalled(Thread.currentThread().getStackTrace()) && TestLogging.getParentTestStep() != null) {
-				TestLogging.getParentTestStep().addAction(currentAction);
+			if (isHtmlElementDirectlyCalled(Thread.currentThread().getStackTrace()) && TestStepManager.getParentTestStep() != null) {
+				TestStepManager.getParentTestStep().addAction(currentAction);
 			}
 		}
 		
@@ -257,7 +254,7 @@ public class ReplayAction {
 			actionFailed = true;
 			throw e;
 		} finally {
-			if (currentAction != null && isHtmlElementDirectlyCalled(Thread.currentThread().getStackTrace()) && TestLogging.getParentTestStep() != null) {
+			if (currentAction != null && isHtmlElementDirectlyCalled(Thread.currentThread().getStackTrace()) && TestStepManager.getParentTestStep() != null) {
 				currentAction.setFailed(actionFailed);
 				
 				if (joinPoint.getTarget() instanceof GenericPictureElement) {

@@ -40,18 +40,18 @@ import org.testng.xml.XmlSuite.FailurePolicy;
 import org.testng.xml.XmlSuite.ParallelMode;
 import org.testng.xml.XmlTest;
 
+import com.seleniumtests.GenericTest;
 import com.seleniumtests.MockitoTest;
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.StatisticsStorage;
-import com.seleniumtests.reporter.logger.TestLogging;
 
 public class ReporterTest extends MockitoTest {
 	
 
 	@BeforeMethod(groups={"it"})
 	public void setLogs(Method method, ITestContext context) throws IOException {
-		TestLogging.reset();
+		GenericTest.resetTestNGREsultAndLogger();
 	
 		SeleniumTestsContext.resetOutputFolderNames();
 		FileUtils.deleteQuietly(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()));

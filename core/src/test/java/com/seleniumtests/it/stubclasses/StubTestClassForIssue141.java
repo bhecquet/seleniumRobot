@@ -23,7 +23,6 @@ import org.testng.annotations.AfterMethod;
 import org.testng.annotations.Test;
 
 import com.seleniumtests.customexception.ScenarioException;
-import com.seleniumtests.reporter.logger.TestLogging;
 
 /**
  * Stub class for correction of issue #143: [HTML] All tests show the @AfterMethod of all tests
@@ -44,6 +43,6 @@ public class StubTestClassForIssue141 extends StubParentClass {
 	@AfterMethod(groups={"stub"})
 	public void reset(Method method) {
 		count++;
-		TestLogging.info("after method " + count);
+		logger.info("after method " + count);
 	}
 }

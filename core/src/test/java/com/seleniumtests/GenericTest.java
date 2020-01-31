@@ -22,9 +22,11 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.log4j.Logger;
 import org.testng.ITestContext;
 import org.testng.ITestNGMethod;
 import org.testng.ITestResult;
+import org.testng.Reporter;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
@@ -37,11 +39,16 @@ import org.testng.xml.XmlTest;
 
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.core.runner.SeleniumRobotTestPlan;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.driver.screenshots.VideoCaptureMode;
 import com.seleniumtests.reporter.logger.TestLogging;
+import com.seleniumtests.util.logging.ScenarioLogger;
+import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
 public class GenericTest {
+	
+	protected static final ScenarioLogger logger = ScenarioLogger.getScenarioLogger(SeleniumRobotTestPlan.class);
 
 	/**
 	 * Reinitializes context between tests so that it's clean before test starts
@@ -75,7 +82,7 @@ public class GenericTest {
 	
 	@AfterMethod(groups={"ut", "it"}, alwaysRun=true) 
 	public void reset() {
-		TestLogging.reset();
+		resetTestNGREsultAndLogger();
 	}
 	
 	@AfterClass(groups={"ut", "it"}, alwaysRun=true)
@@ -89,6 +96,21 @@ public class GenericTest {
 		FileUtils.copyInputStreamToFile(Thread.currentThread().getContextClassLoader().getResourceAsStream(resource), tempFile);
 		
 		return tempFile;
+	}
+	
+
+	public static void resetCurrentTestResult() {
+		Reporter.setCurrentTestResult(null);
+	}
+
+	public static void resetTestNGREsultAndLogger() {
+		resetCurrentTestResult();
+		
+		try {
+			SeleniumRobotLogger.reset();
+		} catch (IOException e) {
+			logger.error("Cannot delete log file", e);
+		}
 	}
 	
 

@@ -23,8 +23,6 @@ import java.lang.reflect.Method;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.Test;
 
-import com.seleniumtests.reporter.logger.TestLogging;
-
 /**
  * Stub class for correction of issue #143: [HTML] All tests show the @AfterMethod of all tests
  * @author s047432
@@ -36,21 +34,21 @@ public class StubTestClassForIssue143 extends StubParentClass {
 	
 	@Test(groups="stub")
 	public void testOk1() throws Exception {
-		TestLogging.info("test Ok 1");
+		logger.info("test Ok 1");
 	}
 	
 	@Test(groups="stub")
 	public void testOk2() throws IOException {
-		TestLogging.info("test Ok 2");
+		logger.info("test Ok 2");
 	}
 	
 	@AfterMethod(groups={"stub"})
 	public void reset() {
-		TestLogging.info("after method");
+		logger.info("after method");
 	}
 	
 	@AfterMethod(groups={"stub"})
 	public void reset2(Method method) {
-		TestLogging.info("after method with 'Method parameter'");
+		logger.info("after method with 'Method parameter'");
 	}
 }

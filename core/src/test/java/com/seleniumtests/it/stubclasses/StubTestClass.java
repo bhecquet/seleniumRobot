@@ -25,23 +25,25 @@ import java.util.ArrayList;
 import org.apache.commons.io.FileUtils;
 import org.openqa.selenium.WebDriverException;
 import org.testng.Assert;
+import org.testng.Reporter;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.core.TestStepManager;
 import com.seleniumtests.customexception.DriverExceptions;
 import com.seleniumtests.driver.screenshots.ScreenShot;
 import com.seleniumtests.reporter.logger.HyperlinkInfo;
 import com.seleniumtests.reporter.logger.Snapshot;
 import com.seleniumtests.reporter.logger.StringInfo;
 import com.seleniumtests.reporter.logger.TestAction;
-import com.seleniumtests.reporter.logger.TestLogging;
 import com.seleniumtests.reporter.logger.TestMessage;
 import com.seleniumtests.reporter.logger.TestMessage.MessageType;
 import com.seleniumtests.reporter.logger.TestStep;
 import com.seleniumtests.util.helper.WaitHelper;
+import com.seleniumtests.util.logging.ScenarioLogger;
 
 public class StubTestClass extends StubParentClass {
 	
@@ -59,18 +61,18 @@ public class StubTestClass extends StubParentClass {
 	@BeforeMethod(groups={"stub"})
 	public void set(Method method) {
 		WaitHelper.waitForMilliSeconds(100);
-		TestLogging.info("before count: " + count);
+		logger.info("before count: " + count);
 		maskPassword = SeleniumTestsContextManager.getThreadContext().getMaskedPassword();
 	}
 	
 	@AfterMethod(groups={"stub"})
 	public void reset(Method method) {
-		TestLogging.info("after count: " + count);
+		logger.info("after count: " + count);
 	}
 	
 	@Test(groups="stub", description="a test with steps")
 	public void testAndSubActions() throws IOException {
-		TestStep step1 = new TestStep("step 1", TestLogging.getCurrentTestResult(), new ArrayList<>(), maskPassword);
+		TestStep step1 = new TestStep("step 1", Reporter.getCurrentTestResult(), new ArrayList<>(), maskPassword);
 		step1.addAction(new TestAction("click button", false, new ArrayList<>()));
 		step1.addAction(new TestAction("sendKeys to text field", true, new ArrayList<>()));
 		
@@ -85,17 +87,17 @@ public class StubTestClass extends StubParentClass {
 		
 		step1.addSnapshot(new Snapshot(screenshot, "main"), 1, null);
 		step1.setActionException(new WebDriverException("driver exception"));
-		TestStep subStep1 = new TestStep("step 1.3: open page", TestLogging.getCurrentTestResult(), new ArrayList<>(), maskPassword);
+		TestStep subStep1 = new TestStep("step 1.3: open page", Reporter.getCurrentTestResult(), new ArrayList<>(), maskPassword);
 		subStep1.addAction(new TestAction("click link", false, new ArrayList<>()));
 		subStep1.addMessage(new TestMessage("a message", MessageType.LOG));
 		subStep1.addAction(new TestAction("sendKeys to password field", false, new ArrayList<>()));
 		step1.addAction(subStep1);
 		WaitHelper.waitForSeconds(3);
 		step1.setDuration(1230L);
-		TestStep step2 = new TestStep("step 2", TestLogging.getCurrentTestResult(), new ArrayList<>(), maskPassword);
+		TestStep step2 = new TestStep("step 2", Reporter.getCurrentTestResult(), new ArrayList<>(), maskPassword);
 		step2.setDuration(14030L);
-		TestLogging.logTestStep(step1);
-		TestLogging.logTestStep(step2);
+		TestStepManager.logTestStep(step1);
+		TestStepManager.logTestStep(step2);
 		
 		tmpImg.deleteOnExit();
 		tmpHtml.deleteOnExit();
@@ -103,28 +105,28 @@ public class StubTestClass extends StubParentClass {
 	
 	@Test(groups="stub")
 	public void testInError() {
-		TestStep step1 = new TestStep("step 1", TestLogging.getCurrentTestResult(), new ArrayList<>(), maskPassword);
-		TestLogging.setCurrentRootTestStep(step1);
-		TestLogging.getParentTestStep().addAction(new TestAction("click button", false, new ArrayList<>()));
-		TestLogging.getParentTestStep().addMessage(new TestMessage("click ok", MessageType.INFO));
-		TestLogging.warning("Some warning message");
-		TestLogging.info("Some Info message");
-		TestLogging.error("Some Error message");
-		TestLogging.log("Some log message");
-		TestLogging.logTestValue("key", "we found a value of", "10");
+		TestStep step1 = new TestStep("step 1", Reporter.getCurrentTestResult(), new ArrayList<>(), maskPassword);
+		TestStepManager.setCurrentRootTestStep(step1);
+		TestStepManager.getParentTestStep().addAction(new TestAction("click button", false, new ArrayList<>()));
+		TestStepManager.getParentTestStep().addMessage(new TestMessage("click ok", MessageType.INFO));
+		logger.warn("Some warning message");
+		logger.info("Some Info message");
+		logger.error("Some Error message");
+		((ScenarioLogger)logger).log("Some log message");
+		((ScenarioLogger)logger).logTestValue("key", "we found a value of", "10");
 		
-		TestLogging.getParentTestStep().addAction(new TestAction("send keyboard action", false, new ArrayList<>()));
-		TestLogging.logTestStep(TestLogging.getCurrentRootTestStep());
+		TestStepManager.getParentTestStep().addAction(new TestAction("send keyboard action", false, new ArrayList<>()));
+		TestStepManager.logTestStep(TestStepManager.getCurrentRootTestStep());
 		Assert.fail("error");
 	}
 	
 	@Test(groups="stub")
 	public void testWithException() {
 		count++;
-		TestStep step1 = new TestStep("step 1", TestLogging.getCurrentTestResult(), new ArrayList<>(), maskPassword);
+		TestStep step1 = new TestStep("step 1", Reporter.getCurrentTestResult(), new ArrayList<>(), maskPassword);
 		step1.addAction(new TestAction(String.format("played %d times", count), false, new ArrayList<>()));
 		step1.addAction(new TestAction("click button", false, new ArrayList<>()));
-		TestLogging.logTestStep(step1);
+		TestStepManager.logTestStep(step1);
 		throw new DriverExceptions("some exception");
 	}
 	
@@ -134,10 +136,10 @@ public class StubTestClass extends StubParentClass {
 	@Test(groups="stub")
 	public void testWithExceptionAndMaxRetryIncreased() {
 		count++;
-		TestStep step1 = new TestStep("step 1", TestLogging.getCurrentTestResult(), new ArrayList<>(), maskPassword);
+		TestStep step1 = new TestStep("step 1", Reporter.getCurrentTestResult(), new ArrayList<>(), maskPassword);
 		step1.addAction(new TestAction(String.format("played %d times", count), false, new ArrayList<>()));
 		step1.addAction(new TestAction("click button", false, new ArrayList<>()));
-		TestLogging.logTestStep(step1);
+		TestStepManager.logTestStep(step1);
 		
 		try {
 			throw new DriverExceptions("some exception");
@@ -154,10 +156,10 @@ public class StubTestClass extends StubParentClass {
 	@Test(groups="stub")
 	public void testWithExceptionAndMaxRetryIncreasedWithLimit() {
 		count++;
-		TestStep step1 = new TestStep("step 1", TestLogging.getCurrentTestResult(), new ArrayList<>(), maskPassword);
+		TestStep step1 = new TestStep("step 1", Reporter.getCurrentTestResult(), new ArrayList<>(), maskPassword);
 		step1.addAction(new TestAction(String.format("played %d times", count), false, new ArrayList<>()));
 		step1.addAction(new TestAction("click button", false, new ArrayList<>()));
-		TestLogging.logTestStep(step1);
+		TestStepManager.logTestStep(step1);
 		
 		try {
 			throw new DriverExceptions("some exception");
@@ -174,10 +176,10 @@ public class StubTestClass extends StubParentClass {
 	 */
 	@Test(groups="stub")
 	public void testOkWithOneStepFailed() {
-		TestStep step1 = new TestStep("step 1", TestLogging.getCurrentTestResult(), new ArrayList<>(), maskPassword);
+		TestStep step1 = new TestStep("step 1", Reporter.getCurrentTestResult(), new ArrayList<>(), maskPassword);
 		step1.addAction(new TestAction("first action failed", true, new ArrayList<>()));
 		step1.addAction(new TestAction("click button", false, new ArrayList<>()));
-		TestLogging.logTestStep(step1);
+		TestStepManager.logTestStep(step1);
 	}
 	
 	/**
@@ -186,10 +188,10 @@ public class StubTestClass extends StubParentClass {
 	@Test(groups="stub")
 	public void testWithExceptionOnFirstExec() {
 
-		TestStep step1 = new TestStep("step 10", TestLogging.getCurrentTestResult(), new ArrayList<>(), maskPassword);
+		TestStep step1 = new TestStep("step 10", Reporter.getCurrentTestResult(), new ArrayList<>(), maskPassword);
 		step1.addAction(new TestAction(String.format("played %d times", count), false, new ArrayList<>()));
 		step1.addAction(new TestAction("click button", false, new ArrayList<>()));
-		TestLogging.logTestStep(step1);
+		TestStepManager.logTestStep(step1);
 		
 		if (!failed) {
 			failed = true;
@@ -203,10 +205,10 @@ public class StubTestClass extends StubParentClass {
 	@Test(groups="stub")
 	public void testWithSocketTimeoutOnFirstExec() {
 		
-		TestStep step1 = new TestStep("step 10", TestLogging.getCurrentTestResult(), new ArrayList<>(), maskPassword);
+		TestStep step1 = new TestStep("step 10", Reporter.getCurrentTestResult(), new ArrayList<>(), maskPassword);
 		step1.addAction(new TestAction(String.format("played %d times", count), false, new ArrayList<>()));
 		step1.addAction(new TestAction("click button", false, new ArrayList<>()));
-		TestLogging.logTestStep(step1);
+		TestStepManager.logTestStep(step1);
 		
 		if (!failed) {
 			failed = true;
@@ -217,20 +219,20 @@ public class StubTestClass extends StubParentClass {
 
 	@Test(groups="stub", description="a test with infos")
 	public void testWithInfo1() throws IOException {
-		TestStep step1 = new TestStep("step 1", TestLogging.getCurrentTestResult(), new ArrayList<>(), maskPassword);
+		TestStep step1 = new TestStep("step 1", Reporter.getCurrentTestResult(), new ArrayList<>(), maskPassword);
 		step1.addAction(new TestAction("click button", false, new ArrayList<>()));
 		step1.addAction(new TestAction("sendKeys to text field", true, new ArrayList<>()));
-		TestLogging.logTestStep(step1);
+		TestStepManager.logTestStep(step1);
 
 		addTestInfo("bugé <\"ID\">", new StringInfo("12"));
 	}
 	
 	@Test(groups="stub", description="a test with infos")
 	public void testWithInfo2() throws IOException {
-		TestStep step1 = new TestStep("step 1", TestLogging.getCurrentTestResult(), new ArrayList<>(), maskPassword);
+		TestStep step1 = new TestStep("step 1", Reporter.getCurrentTestResult(), new ArrayList<>(), maskPassword);
 		step1.addAction(new TestAction("click button", false, new ArrayList<>()));
 		step1.addAction(new TestAction("sendKeys to text field", true, new ArrayList<>()));
-		TestLogging.logTestStep(step1);
+		TestStepManager.logTestStep(step1);
 		
 		addTestInfo("user ID", new HyperlinkInfo("12345", "http://foo/bar/12345"));
 	}

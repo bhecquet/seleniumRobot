@@ -22,8 +22,8 @@ import java.io.IOException;
 import org.testng.SkipException;
 
 import com.seleniumtests.driver.BrowserType;
-import com.seleniumtests.reporter.logger.TestLogging;
 import com.seleniumtests.uipage.PageObject;
+import com.seleniumtests.util.logging.ScenarioLogger;
 
 public class StubTestPage extends PageObject {
 
@@ -40,13 +40,13 @@ public class StubTestPage extends PageObject {
 	}
 	
 	public StubTestPage doSomething() {
-		TestLogging.log("tell me why");
-		TestLogging.info("an info message");
+		((ScenarioLogger)logger).log("tell me why");
+		logger.info("an info message");
 		return this;
 	}
 	
 	public StubTestPage doSomethingElse() {
-		TestLogging.log("Hello");
+		((ScenarioLogger)logger).log("Hello");
 		return this;
 	}
 	

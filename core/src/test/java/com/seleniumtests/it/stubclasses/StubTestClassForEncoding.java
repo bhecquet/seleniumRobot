@@ -20,11 +20,12 @@ package com.seleniumtests.it.stubclasses;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import org.testng.Reporter;
 import org.testng.annotations.Test;
 
+import com.seleniumtests.core.TestStepManager;
 import com.seleniumtests.customexception.DriverExceptions;
 import com.seleniumtests.reporter.logger.TestAction;
-import com.seleniumtests.reporter.logger.TestLogging;
 import com.seleniumtests.reporter.logger.TestMessage;
 import com.seleniumtests.reporter.logger.TestMessage.MessageType;
 import com.seleniumtests.reporter.logger.TestStep;
@@ -33,25 +34,25 @@ public class StubTestClassForEncoding extends StubParentClass {
 	
 	@Test(groups="stub", description="a test with steps")
 	public void testAndSubActions() throws IOException {
-		TestStep step1 = new TestStep("step 1 <>\"'&/", TestLogging.getCurrentTestResult(), new ArrayList<>(), true);
+		TestStep step1 = new TestStep("step 1 <>\"'&/", Reporter.getCurrentTestResult(), new ArrayList<>(), true);
 		step1.addAction(new TestAction("click button  <>\"'&", false, new ArrayList<>()));
 		step1.addMessage(new TestMessage("a message <>\"'&", MessageType.LOG));
-		TestLogging.logTestStep(step1);
+		TestStepManager.logTestStep(step1);
 	}
 	
 	@Test(groups="stub")
 	public void testWithException() {
-		TestStep step1 = new TestStep("step 1", TestLogging.getCurrentTestResult(), new ArrayList<>(), true);
+		TestStep step1 = new TestStep("step 1", Reporter.getCurrentTestResult(), new ArrayList<>(), true);
 		step1.addAction(new TestAction("click button", false, new ArrayList<>()));
-		TestLogging.logTestStep(step1);
+		TestStepManager.logTestStep(step1);
 		throw new DriverExceptions("& some exception \"with \" <strong><a href='http://someurl/link' style='background-color: red;'>HTML to encode</a></strong>");
 	}
 	
 	@Test(groups="stub")
 	public void testWithChainedException() {
-		TestStep step1 = new TestStep("step 1", TestLogging.getCurrentTestResult(), new ArrayList<>(), true);
+		TestStep step1 = new TestStep("step 1", Reporter.getCurrentTestResult(), new ArrayList<>(), true);
 		step1.addAction(new TestAction("click button", false, new ArrayList<>()));
-		TestLogging.logTestStep(step1);
+		TestStepManager.logTestStep(step1);
 		throw new DriverExceptions("& some exception \"with \" <strong><a href='http://someurl/link' style='background-color: red;'>HTML to encode</a></strong>", new DriverExceptions("root <error>"));
 	}
 

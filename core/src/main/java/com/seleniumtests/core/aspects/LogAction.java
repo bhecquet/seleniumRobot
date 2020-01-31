@@ -37,11 +37,13 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.openqa.selenium.support.ui.Select;
+import org.testng.Reporter;
 import org.testng.annotations.AfterMethod;
 
 import com.neotys.selenium.proxies.NLWebDriver;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.StepName;
+import com.seleniumtests.core.TestStepManager;
 import com.seleniumtests.core.runner.SeleniumRobotTestPlan;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.reporter.logger.TestAction;
@@ -49,6 +51,7 @@ import com.seleniumtests.reporter.logger.TestLogging;
 import com.seleniumtests.reporter.logger.TestStep;
 import com.seleniumtests.uipage.PageObject;
 import com.seleniumtests.uipage.htmlelements.GenericPictureElement;
+import com.seleniumtests.util.logging.ScenarioLogger;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
 import net.lightbody.bmp.BrowserMobProxy;
@@ -86,6 +89,7 @@ import net.lightbody.bmp.BrowserMobProxy;
 public class LogAction {
 	
 	private static final Logger logger = SeleniumRobotLogger.getLogger(LogAction.class);
+	private static final Logger scenarioLogger = ScenarioLogger.getLogger(LogAction.class);
 	private static Map<Thread, Integer> indent = Collections.synchronizedMap(new HashMap<>());
 
 	/**
@@ -260,8 +264,8 @@ public class LogAction {
 		String actionName = String.format("%s %s", joinPoint.getSignature().getName(), buildArgString(joinPoint, pwdToReplace, new HashMap<>()));
 		TestAction currentAction = new TestAction(actionName, false, pwdToReplace);
 		
-		if (TestLogging.getParentTestStep() != null) {
-			TestLogging.getParentTestStep().addAction(currentAction);
+		if (TestStepManager.getParentTestStep() != null) {
+			TestStepManager.getParentTestStep().addAction(currentAction);
 		}
 	}
 	
@@ -395,7 +399,7 @@ public class LogAction {
 				break;
 			}
 		}
-		return new TestStep(stepNamePrefix + stepName, TestLogging.getCurrentTestResult(), pwdToReplace, SeleniumTestsContextManager.getThreadContext().getMaskedPassword());
+		return new TestStep(stepNamePrefix + stepName, Reporter.getCurrentTestResult(), pwdToReplace, SeleniumTestsContextManager.getThreadContext().getMaskedPassword());
 	}
 	
 	/**
@@ -426,8 +430,8 @@ public class LogAction {
 		
 		// log action before its started. By default, it's OK. Then result may be overwritten if step fails
 		// order of steps is the right one (first called is first displayed)	
-		if (TestLogging.getParentTestStep() != null) {
-			TestLogging.getParentTestStep().addAction(currentAction);
+		if (TestStepManager.getParentTestStep() != null) {
+			TestStepManager.getParentTestStep().addAction(currentAction);
 		}
 		
 		try {
@@ -436,7 +440,7 @@ public class LogAction {
 			actionFailed = true;
 			throw e;
 		} finally {
-			if (TestLogging.getParentTestStep() != null) {
+			if (TestStepManager.getParentTestStep() != null) {
 				currentAction.setFailed(actionFailed);
 			}
 		}
@@ -465,8 +469,8 @@ public class LogAction {
 		// ex: Given (url "www.somesite.com") calls "open(url)"
 		// In this case, open becomes a child of Given
 		// if rootStep is null, parent step is also null
-		if (TestLogging.getCurrentRootTestStep() == null) {
-			TestLogging.setCurrentRootTestStep(currentStep); // will also set parent step
+		if (TestStepManager.getCurrentRootTestStep() == null) {
+			TestStepManager.setCurrentRootTestStep(currentStep); // will also set parent step
 			rootStep = true;
 			
 			if (mobProxy != null) {
@@ -477,9 +481,9 @@ public class LogAction {
 			}
 			
 		} else {
-			TestLogging.getParentTestStep().addStep(currentStep);
-			previousParent = TestLogging.getParentTestStep();
-			TestLogging.setParentTestStep(currentStep);
+			TestStepManager.getParentTestStep().addStep(currentStep);
+			previousParent = TestStepManager.getParentTestStep();
+			TestStepManager.setParentTestStep(currentStep);
 		}
 		
 		try {
@@ -491,20 +495,20 @@ public class LogAction {
 			// issue #287 (https://github.com/cbeust/testng/issues/2148): is method an @AfterMethod. Then do not rethrow exception
 			MethodSignature methodSignature = (MethodSignature)joinPoint.getSignature();
 			if (methodSignature.getMethod().getAnnotation(AfterMethod.class) != null) {
-				TestLogging.error(String.format("Error in @AfterMethod %s: %s", methodSignature, e.getMessage()));
+				scenarioLogger.error(String.format("Error in @AfterMethod %s: %s", methodSignature, e.getMessage()));
 			} else {
 				throw e;
 			}
 		} finally {
 			if (rootStep) {
-				TestLogging.getCurrentRootTestStep().updateDuration();
-				TestLogging.logTestStep(TestLogging.getCurrentRootTestStep());
+				TestStepManager.getCurrentRootTestStep().updateDuration();
+				TestStepManager.logTestStep(TestStepManager.getCurrentRootTestStep());
 				
 				if (neoloadDriver != null) {
 					neoloadDriver.stopTransaction();
 				}
 			} else {
-				TestLogging.setParentTestStep(previousParent);
+				TestStepManager.setParentTestStep(previousParent);
 			}
 		}
 		return reply;

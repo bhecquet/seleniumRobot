@@ -25,6 +25,7 @@ import org.testng.ITestContext;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import com.seleniumtests.GenericTest;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.TestTasks;
 import com.seleniumtests.it.core.aspects.CalcPage;
@@ -36,7 +37,7 @@ public class TestTestLogging extends ReporterTest {
 
 	@BeforeMethod(groups={"ut"})
 	public void reset() {
-		TestLogging.reset();
+		GenericTest.resetTestNGREsultAndLogger();
 	}
 	
 	/**
@@ -114,7 +115,7 @@ public class TestTestLogging extends ReporterTest {
 		
 		SeleniumTestsContextManager.getThreadContext().setManualTestSteps(true);
 		SeleniumTestsContextManager.getThreadContext().setBrowser("htmlunit");
-		TestLogging.reset();
+		GenericTest.resetTestNGREsultAndLogger();
 		
 		try {
 			TestTasks.addStep("Tests start");

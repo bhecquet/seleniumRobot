@@ -27,8 +27,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.stream.Collectors;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
 import org.json.JSONException;
@@ -36,8 +36,8 @@ import org.json.JSONObject;
 import org.openqa.selenium.PageLoadStrategy;
 import org.openqa.selenium.Platform;
 import org.openqa.selenium.Proxy.ProxyType;
-import org.openqa.selenium.support.events.WebDriverEventListener;
 import org.openqa.selenium.WebDriverException;
+import org.openqa.selenium.support.events.WebDriverEventListener;
 import org.testng.IReporter;
 import org.testng.ITestContext;
 import org.testng.ITestResult;
@@ -58,8 +58,6 @@ import com.seleniumtests.driver.DriverMode;
 import com.seleniumtests.driver.TestType;
 import com.seleniumtests.driver.screenshots.VideoCaptureMode;
 import com.seleniumtests.reporter.logger.ArchiveMode;
-import com.seleniumtests.reporter.logger.TestLogging;
-import com.seleniumtests.reporter.logger.TestStep;
 import com.seleniumtests.reporter.reporters.CustomReporter;
 import com.seleniumtests.reporter.reporters.ReportInfo;
 import com.seleniumtests.reporter.reporters.SeleniumRobotServerTestRecorder;
@@ -75,64 +73,6 @@ import com.seleniumtests.util.osutility.OSUtility;
  * Defines TestNG context used in STF.
  */
 public class SeleniumTestsContext {
-	
-	public class TestStepManager {
-		
-
-		List<TestStep> testSteps;
-		TestStep runningStep;
-		TestStep rootStep;
-		
-		public TestStepManager() {
-			runningStep = null;
-			rootStep = null;
-			testSteps = Collections.synchronizedList(new ArrayList<>());
-		}
-		
-		/**
-		 * copy the test step manager
-		 * @param managerToCopy
-		 */
-		public TestStepManager(TestStepManager managerToCopy) {
-			testSteps = new ArrayList<>();
-			for (TestStep step: managerToCopy.testSteps) {
-				testSteps.add(step.deepCopy());
-			}
-			runningStep = managerToCopy.runningStep;
-			rootStep = managerToCopy.rootStep;
-		}
-		
-		/**
-		 * Returns the currently running step (root step or sub-step)
-		 * @return
-		 */
-		public TestStep getRunningTestStep() {
-			return runningStep;
-		}
-
-		public void setRunningTestStep(TestStep testStep) {
-			runningStep = testStep;
-		}
-		
-
-		public void setRootTestStep(TestStep testStep) {
-			rootStep = testStep;
-			runningStep = testStep;
-		}
-		
-		public TestStep getRootTestStep() {
-			return rootStep;
-		}
-
-		/**
-		 * When iterating over the list, use a 'synchronized' block on the list
-		 * @return
-		 */
-		public List<TestStep> getTestSteps() {
-			return testSteps;
-		}
-		
-	}
 	
 	private static final Logger logger = SeleniumRobotLogger.getLogger(SeleniumTestsContext.class);
 	private static Map<String, String> outputFolderNames = Collections.synchronizedMap(new HashMap<>());

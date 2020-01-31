@@ -34,7 +34,6 @@ import com.seleniumtests.core.runner.SeleniumRobotTestPlan;
 import com.seleniumtests.customexception.DriverExceptions;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.reporter.logger.TestAction;
-import com.seleniumtests.reporter.logger.TestLogging;
 import com.seleniumtests.reporter.logger.TestStep;
 
 public class TestLogActions extends GenericTest {
@@ -59,7 +58,7 @@ public class TestLogActions extends GenericTest {
 	
 	@AfterMethod(groups={"it"})
 	public void reset() {
-		TestLogging.resetCurrentTestResult();
+		resetCurrentTestResult();
 	}
 
 	

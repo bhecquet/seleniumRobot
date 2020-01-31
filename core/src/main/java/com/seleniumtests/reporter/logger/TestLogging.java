@@ -30,8 +30,8 @@ import org.testng.ITestResult;
 import org.testng.Reporter;
 
 import com.seleniumtests.core.SeleniumTestsContext;
-import com.seleniumtests.core.SeleniumTestsContext.TestStepManager;
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.core.TestStepManager;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.driver.screenshots.ScreenShot;
 import com.seleniumtests.util.logging.ScenarioLogger;
@@ -206,41 +206,9 @@ public class TestLogging {
      */
 	@Deprecated
     public static void logTestStep(TestStep testStep) {
-    	logTestStep(testStep, true);
+    	TestStepManager.logTestStep(testStep, true);
     }
     
-    
-    
-    /**
-     * Logs the testStep for this test
-     * Once logging is done, parentTestStep and currentRootTestStep are reset to avoid storing new data in them
-     * @param testStep
-     * @param storeStep
-     */
-    public static void logTestStep(TestStep testStep, boolean storeStep) {
-    	List<TestAction> actionList = testStep.getStepActions();
-    	
-    	if (!actionList.isEmpty()) {
-    		for (TestAction action: actionList) {
-	    		if (action instanceof TestStep) {	
-					logTestStep((TestStep)action, false);	
-				} 
-			}
-    	}
-    	
-    	if (storeStep) {
-    		
-    		// notify each TestStepManager about the new test step (useful for AfterClass / AfterTest configuration methods)
-    		for (SeleniumTestsContext testContext: SeleniumTestsContextManager.getContextForCurrentTestState()) {
-    			TestStepManager stepManager = testContext.getTestStepManager();
-    	    	stepManager.getTestSteps().add(testStep);
-    	    	stepManager.setRootTestStep(null);
-    	    	stepManager.setRunningTestStep(null);
-    		}
-	    	
-    	}
-    	
-    }
     
     @Deprecated
     public static Map<ITestResult, List<TestStep>> getTestsSteps() {
@@ -256,86 +224,5 @@ public class TestLogging {
     	
     	return steps;
     }
-
-	public static void setCurrentRootTestStep(TestStep testStep) {
-		try {
-			SeleniumTestsContextManager.getContextForCurrentTestState().get(0).getTestStepManager().setRootTestStep(testStep);
-    	} catch (IndexOutOfBoundsException e) {
-    		// do nothing, no context has been created which is the case if we try to log message in @BeforeSuite / @BeforeGroup
-    	}
-	}
-	
-	public static TestStep getCurrentRootTestStep() {
-		try {
-			return SeleniumTestsContextManager.getContextForCurrentTestState().get(0).getTestStepManager().getRootTestStep();
-    	} catch (IndexOutOfBoundsException e) {
-    		// null, no context has been created which is the case if we try to log message in @BeforeSuite / @BeforeGroup
-    		return null;
-    	}
-	}
-	
-	public static void setParentTestStep(TestStep testStep) {
-		try {
-			SeleniumTestsContextManager.getContextForCurrentTestState().get(0).getTestStepManager().setRunningTestStep(testStep);
-    	} catch (IndexOutOfBoundsException e) {
-    		// do nothing, no context has been created which is the case if we try to log message in @BeforeSuite / @BeforeGroup
-    	}
-	}
-	
-	public static TestStep getParentTestStep() {
-		try {
-			return SeleniumTestsContextManager.getContextForCurrentTestState().get(0).getTestStepManager().getRunningTestStep();
-    	} catch (IndexOutOfBoundsException e) {
-    		// do nothing, no context has been created which is the case if we try to log message in @BeforeSuite / @BeforeGroup
-    		return null;
-    	}
-	}
-
-	public static void setCurrentTestResult(ITestResult testResult) {
-		TestLogging.currentTestResult.put(Thread.currentThread(), testResult);
-	}
-	
-	/**
-	 * Returns the previous TestStep in the list or null if no step exists for this test
-	 * @return
-	 */
-	public static TestStep getPreviousStep() {
-
-		try {
-			List<TestStep> allSteps = SeleniumTestsContextManager.getContextForCurrentTestState().get(0).getTestStepManager().getTestSteps();
-			return allSteps.get(allSteps.size() - 1);
-		} catch (Exception e) {
-			return null;
-		}
-	}
-	
-	/**
-	 * For Integration tests only
-	 */
-	public static void resetCurrentTestResult() {
-		TestLogging.currentTestResult.remove(Thread.currentThread());
-	}
-	
-	public static ITestResult getCurrentTestResult() {
-		if (TestLogging.currentTestResult.get(Thread.currentThread()) == null) {
-			logger.warn("Reporter did not inform about the current test result, creating one");
-			setCurrentTestResult(Reporter.getCurrentTestResult());
-		} 
-		
-		return TestLogging.currentTestResult.get(Thread.currentThread());
-	}
-	
-	/**
-	 * For Integration tests only
-	 */
-	public static void reset() {
-		resetCurrentTestResult();
-		
-		try {
-			SeleniumRobotLogger.reset();
-		} catch (IOException e) {
-			logger.error("Cannot delete log file", e);
-		}
-	}
 	
 }

@@ -21,6 +21,7 @@ import org.apache.log4j.Logger;
 import org.openqa.selenium.MutableCapabilities;
 
 import com.seleniumtests.driver.DriverConfig;
+import com.seleniumtests.util.logging.ScenarioLogger;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
 public abstract class ICapabilitiesFactory {

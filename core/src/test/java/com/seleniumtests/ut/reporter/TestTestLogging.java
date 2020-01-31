@@ -23,16 +23,17 @@ import java.util.ArrayList;
 
 import org.testng.Assert;
 import org.testng.ITestResult;
+import org.testng.Reporter;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import org.testng.internal.TestResult;
 
 import com.seleniumtests.GenericTest;
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.core.TestStepManager;
 import com.seleniumtests.driver.screenshots.ScreenShot;
 import com.seleniumtests.reporter.logger.HarCapture;
 import com.seleniumtests.reporter.logger.Snapshot;
-import com.seleniumtests.reporter.logger.TestLogging;
 import com.seleniumtests.reporter.logger.TestMessage;
 import com.seleniumtests.reporter.logger.TestMessage.MessageType;
 import com.seleniumtests.reporter.logger.TestStep;
@@ -45,61 +46,62 @@ public class TestTestLogging extends GenericTest {
 
 	@BeforeMethod(groups={"ut"})
 	public void reset() {
-		TestLogging.reset();
+
+		resetTestNGREsultAndLogger();
 	}
 	
 	@Test(groups={"ut"})
 	public void testInfo() {
-		TestLogging.setCurrentRootTestStep(new TestStep("step", null, new ArrayList<>(), true));
-		TestLogging.info("message");
-		Assert.assertEquals(TestLogging.getParentTestStep().getStepActions().size(), 1);
-		Assert.assertTrue(TestLogging.getParentTestStep().getStepActions().get(0) instanceof TestMessage);
-		Assert.assertEquals(((TestMessage)(TestLogging.getParentTestStep().getStepActions().get(0))).getMessageType(), MessageType.INFO);
+		TestStepManager.setCurrentRootTestStep(new TestStep("step", null, new ArrayList<>(), true));
+		logger.info("message");
+		Assert.assertEquals(TestStepManager.getParentTestStep().getStepActions().size(), 1);
+		Assert.assertTrue(TestStepManager.getParentTestStep().getStepActions().get(0) instanceof TestMessage);
+		Assert.assertEquals(((TestMessage)(TestStepManager.getParentTestStep().getStepActions().get(0))).getMessageType(), MessageType.INFO);
 	}
 	
 	@Test(groups={"ut"})
 	public void testWarning() {
-		TestLogging.setCurrentRootTestStep(new TestStep("step", null, new ArrayList<>(), true));
-		TestLogging.warning("message");
-		Assert.assertEquals(((TestMessage)(TestLogging.getParentTestStep().getStepActions().get(0))).getMessageType(), MessageType.WARNING);
+		TestStepManager.setCurrentRootTestStep(new TestStep("step", null, new ArrayList<>(), true));
+		logger.warning("message");
+		Assert.assertEquals(((TestMessage)(TestStepManager.getParentTestStep().getStepActions().get(0))).getMessageType(), MessageType.WARNING);
 	}
 	
 	@Test(groups={"ut"})
 	public void testError() {
-		TestLogging.setCurrentRootTestStep(new TestStep("step", null, new ArrayList<>(), true));
-		TestLogging.error("message");
-		Assert.assertEquals(((TestMessage)(TestLogging.getParentTestStep().getStepActions().get(0))).getMessageType(), MessageType.ERROR);
+		TestStepManager.setCurrentRootTestStep(new TestStep("step", null, new ArrayList<>(), true));
+		logger.error("message");
+		Assert.assertEquals(((TestMessage)(TestStepManager.getParentTestStep().getStepActions().get(0))).getMessageType(), MessageType.ERROR);
 	}
 	
 	@Test(groups={"ut"})
 	public void testLog() {
-		TestLogging.setCurrentRootTestStep(new TestStep("step", null, new ArrayList<>(), true));
-		TestLogging.log("message");
-		Assert.assertEquals(((TestMessage)(TestLogging.getParentTestStep().getStepActions().get(0))).getMessageType(), MessageType.LOG);
+		TestStepManager.setCurrentRootTestStep(new TestStep("step", null, new ArrayList<>(), true));
+		logger.log("message");
+		Assert.assertEquals(((TestMessage)(TestStepManager.getParentTestStep().getStepActions().get(0))).getMessageType(), MessageType.LOG);
 	}
 	
 	@Test(groups={"ut"})
 	public void testLogScreenshotOk() {
-		TestLogging.setCurrentRootTestStep(new TestStep("step", null, new ArrayList<>(), true));
-		TestLogging.logScreenshot(new ScreenShot());
-		Assert.assertEquals(TestLogging.getParentTestStep().getSnapshots().size(), 1);
+		TestStepManager.setCurrentRootTestStep(new TestStep("step", null, new ArrayList<>(), true));
+		logger.logScreenshot(new ScreenShot());
+		Assert.assertEquals(TestStepManager.getParentTestStep().getSnapshots().size(), 1);
 	}
 	
 	@Test(groups={"ut"})
 	public void testLogHarOk() {
-		TestLogging.setCurrentRootTestStep(new TestStep("step", null, new ArrayList<>(), true));
+		TestStepManager.setCurrentRootTestStep(new TestStep("step", null, new ArrayList<>(), true));
 		Har har = new Har(new HarLog());
 		har.getLog().addPage(new HarPage("title", "a title"));
-		TestLogging.logNetworkCapture(har, "main");
-		Assert.assertFalse(TestLogging.getParentTestStep().getHarCaptures().isEmpty());
+		logger.logNetworkCapture(har, "main");
+		Assert.assertFalse(TestStepManager.getParentTestStep().getHarCaptures().isEmpty());
 		Assert.assertTrue(Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), "main-networkCapture.har").toFile().exists());
 	}
 	
 	@Test(groups={"ut"})
 	public void testLogHarNull() {
-		TestLogging.setCurrentRootTestStep(new TestStep("step", null, new ArrayList<>(), true));
-		TestLogging.logNetworkCapture(null, "main");
-		Assert.assertTrue(TestLogging.getParentTestStep().getHarCaptures().isEmpty());
+		TestStepManager.setCurrentRootTestStep(new TestStep("step", null, new ArrayList<>(), true));
+		logger.logNetworkCapture(null, "main");
+		Assert.assertTrue(TestStepManager.getParentTestStep().getHarCaptures().isEmpty());
 	}
 	
 	@Test(groups={"ut"})
@@ -107,9 +109,9 @@ public class TestTestLogging extends GenericTest {
 		TestStep testStep = new TestStep("step", null, new ArrayList<>(), true);
 		ITestResult testResult = new TestResult();
 		
-		TestLogging.setCurrentTestResult(testResult);
-		TestLogging.setCurrentRootTestStep(testStep);
-		TestLogging.logTestStep(testStep);
+		Reporter.setCurrentTestResult(testResult);
+		TestStepManager.setCurrentRootTestStep(testStep);
+		TestStepManager.logTestStep(testStep);
 		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getTestStepManager().getTestSteps().size(), 1);
 	}
 	
@@ -169,7 +171,7 @@ public class TestTestLogging extends GenericTest {
 
 	@Test(groups={"ut"})
 	public void testBuildHarLog() throws IOException {
-		TestLogging.setCurrentRootTestStep(new TestStep("step", null, new ArrayList<>(), true));
+		TestStepManager.setCurrentRootTestStep(new TestStep("step", null, new ArrayList<>(), true));
 		Har har = new Har(new HarLog());
 		har.getLog().addPage(new HarPage("title", "a title"));
 		HarCapture capture = new HarCapture(har, "main");

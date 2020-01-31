@@ -33,7 +33,6 @@ import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.TestTasks;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.reporter.logger.StringInfo;
-import com.seleniumtests.reporter.logger.TestLogging;
 import com.seleniumtests.util.logging.ScenarioLogger;
 
 @Listeners({com.seleniumtests.reporter.reporters.ReporterControler.class,
@@ -188,6 +187,6 @@ public class SeleniumRobotTestPlan {
      * @param value	A StringInfo or HyperlinkInfo instance to display the value 
      */
     public void addTestInfo(String key, StringInfo value) {
-    	TestLogging.logTestInfo(key, value);
+    	((ScenarioLogger)logger).logTestInfo(key, value);
     }
 }

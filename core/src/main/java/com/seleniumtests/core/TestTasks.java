@@ -21,12 +21,11 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.apache.log4j.Logger;
+import org.testng.Reporter;
 
 import com.neotys.selenium.proxies.NLWebDriver;
 import com.seleniumtests.connectors.selenium.SeleniumGridConnector;
 import com.seleniumtests.connectors.selenium.SeleniumRobotVariableServerConnector;
-import com.seleniumtests.core.runner.SeleniumRobotTestPlan;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.driver.DriverMode;
@@ -34,9 +33,8 @@ import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.driver.screenshots.ScreenShot;
 import com.seleniumtests.driver.screenshots.ScreenshotUtil;
 import com.seleniumtests.driver.screenshots.ScreenshotUtil.Target;
-import com.seleniumtests.reporter.logger.TestLogging;
 import com.seleniumtests.reporter.logger.TestStep;
-import com.seleniumtests.util.logging.SeleniumRobotLogger;
+import com.seleniumtests.util.logging.ScenarioLogger;
 import com.seleniumtests.util.osutility.OSUtilityFactory;
 import com.seleniumtests.util.osutility.ProcessInfo;
 
@@ -49,7 +47,7 @@ import net.lightbody.bmp.BrowserMobProxy;
  */
 public class TestTasks {
 	
-	private static final Logger logger = SeleniumRobotLogger.getLogger(SeleniumRobotTestPlan.class);
+	private static final ScenarioLogger logger = ScenarioLogger.getScenarioLogger(TestTasks.class); 
 	
 	private TestTasks() {
 		// nothing to do
@@ -177,7 +175,7 @@ public class TestTasks {
     private static String getParam(SeleniumTestsContext context, String key) {
     	TestVariable value = context.getConfiguration().get(key);
     	if (value == null) {
-    		TestLogging.warning(String.format("Variable %s is not defined", key));
+    		logger.warning(String.format("Variable %s is not defined", key));
     		return "";
     	}
     	return value.getValue();
@@ -201,10 +199,10 @@ public class TestTasks {
     	NLWebDriver neoloadDriver = WebUIDriver.getNeoloadDriver();
     	
     	// log the previous step if it exists and create the new one
-    	TestStep previousStep = TestLogging.getCurrentRootTestStep();
+    	TestStep previousStep = TestStepManager.getCurrentRootTestStep();
     	if (previousStep != null) {
     		previousStep.updateDuration();
-    		TestLogging.logTestStep(previousStep);
+    		TestStepManager.logTestStep(previousStep);
     		
     		if (neoloadDriver != null) {
 				neoloadDriver.stopTransaction();
@@ -213,8 +211,8 @@ public class TestTasks {
     	
     	// stepName is null when test is terminating. We don't create a new step
     	if (stepName != null) {
-	    	TestStep step = new TestStep(stepName, TestLogging.getCurrentTestResult(), Arrays.asList(passwordsToMask), SeleniumTestsContextManager.getThreadContext().getMaskedPassword());
-	    	TestLogging.setCurrentRootTestStep(step);
+	    	TestStep step = new TestStep(stepName, Reporter.getCurrentTestResult(), Arrays.asList(passwordsToMask), SeleniumTestsContextManager.getThreadContext().getMaskedPassword());
+	    	TestStepManager.setCurrentRootTestStep(step);
 	    	capturePageSnapshot();
 	    	
 	    	// start a new page when using BrowserMobProxy (network capture)
@@ -232,7 +230,7 @@ public class TestTasks {
     
     public static void capturePageSnapshot() {
     	if (WebUIDriver.getWebDriver(false) != null) {
-    		TestLogging.logScreenshot(new ScreenshotUtil().capture(Target.PAGE, ScreenShot.class));
+    		logger.logScreenshot(new ScreenshotUtil().capture(Target.PAGE, ScreenShot.class));
     	}
 
     }

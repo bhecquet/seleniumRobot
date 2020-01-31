@@ -508,7 +508,7 @@ public class TestTestTasks extends MockitoTest {
 			Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getTestStepManager().getTestSteps().size(), 1);
 			Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getTestStepManager().getTestSteps().get(0).getName(), "foo");
 		} finally {
-			TestLogging.reset();
+			GenericTest.resetTestNGREsultAndLogger();
 		}
 	}
 	
@@ -533,7 +533,7 @@ public class TestTestTasks extends MockitoTest {
 			verify(mobProxy).newPage("foo");
 			
 		} finally {
-			TestLogging.reset();
+			GenericTest.resetTestNGREsultAndLogger();
 		}
 	}
 	
@@ -559,7 +559,7 @@ public class TestTestTasks extends MockitoTest {
 			verify(neoloadDriver).stopTransaction();
 			
 		} finally {
-			TestLogging.reset();
+			GenericTest.resetTestNGREsultAndLogger();
 		}
 	}
 	

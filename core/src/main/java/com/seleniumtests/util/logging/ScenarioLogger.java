@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
+import org.testng.Reporter;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.utils.TestNGResultUtils;
@@ -98,7 +99,7 @@ public class ScenarioLogger extends Logger {
      * @param value. A StringInfo object (either StringInfo or HyperlinkInfo)
      */
     public void logTestInfo(String key, StringInfo value) {
-    	TestNGResultUtils.setTestInfo(TestLogging.getCurrentTestResult(), key, value);
+    	TestNGResultUtils.setTestInfo(Reporter.getCurrentTestResult(), key, value);
     	super.info(String.format("Storing into test result %s: %s", key, value.getInfo() ));
     }
 
