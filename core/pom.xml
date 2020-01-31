@@ -371,10 +371,10 @@
 					<systemPropertyVariables>
                         <jacoco-agent.destfile>${project.build.directory}/coverage-reports/jacoco-it.exec</jacoco-agent.destfile>
 					</systemPropertyVariables>
-					<argLine>-Ddebug=${seleniumRobot.debug}</argLine>
+					<argLine>-Ddebug=${seleniumRobot.debug} -javaagent:"${settings.localRepository}/org/aspectj/aspectjweaver/${aspectj.version}/aspectjweaver-${aspectj.version}.jar"</argLine>
 				<!-- /comment -->
 				<!-- uncomment for online instrumentation -->
-					<!-- <argLine>${failsafeArgLine} -Ddebug=${seleniumRobot.debug}</argLine> -->
+					<!-- <argLine>${failsafeArgLine} -Ddebug=${seleniumRobot.debug} -javaagent:"${settings.localRepository}/org/aspectj/aspectjweaver/${aspectj.version}/aspectjweaver-${aspectj.version}.jar"</argLine> -->
 				<!-- /uncomment -->
 				
 				</configuration>
