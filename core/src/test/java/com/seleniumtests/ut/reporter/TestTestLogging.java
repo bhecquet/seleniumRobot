@@ -22,6 +22,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 
 import org.testng.Assert;
+import org.testng.ITestContext;
 import org.testng.ITestResult;
 import org.testng.Reporter;
 import org.testng.annotations.BeforeMethod;
@@ -105,9 +106,9 @@ public class TestTestLogging extends GenericTest {
 	}
 	
 	@Test(groups={"ut"})
-	public void testLogTestStep() {
+	public void testLogTestStep(ITestContext context) {
 		TestStep testStep = new TestStep("step", null, new ArrayList<>(), true);
-		ITestResult testResult = new TestResult();
+		ITestResult testResult = Reporter.getCurrentTestResult();
 		
 		Reporter.setCurrentTestResult(testResult);
 		TestStepManager.setCurrentRootTestStep(testStep);
