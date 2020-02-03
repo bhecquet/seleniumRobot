@@ -100,7 +100,7 @@ public class GenericTest {
 	
 
 	public static void resetCurrentTestResult() {
-		Reporter.setCurrentTestResult(null);
+		//Reporter.setCurrentTestResult(null); // do not reset, TestNG do this for us
 	}
 
 	public static void resetTestNGREsultAndLogger() {
