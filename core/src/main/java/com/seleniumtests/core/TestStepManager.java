@@ -1,8 +1,8 @@
 package com.seleniumtests.core;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import com.seleniumtests.reporter.logger.TestAction;
 import com.seleniumtests.reporter.logger.TestStep;
@@ -17,7 +17,7 @@ public class TestStepManager {
 	public TestStepManager() {
 		runningStep = null;
 		rootStep = null;
-		testSteps = Collections.synchronizedList(new ArrayList<>());
+		testSteps = new CopyOnWriteArrayList<>();
 	}
 	
 	/**
