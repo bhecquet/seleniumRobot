@@ -44,9 +44,14 @@ public class TestCustomAssertion extends GenericTest {
 	 */
 	@Test(groups={"ut"})
 	public void testSoftAssertionEnabled(final ITestContext testNGCtx) {
-		initThreadContext(testNGCtx);
-		SeleniumTestsContextManager.getThreadContext().setSoftAssertEnabled(true);
-		Assert.assertTrue(false, "error should not be raised");
+		try {
+			initThreadContext(testNGCtx);
+			SeleniumTestsContextManager.getThreadContext().setSoftAssertEnabled(true);
+			Assert.assertTrue(false, "error should not be raised");
+		} finally {
+			SeleniumTestsContextManager.getThreadContext().setSoftAssertEnabled(false); // be sure it's false
+		}
+		
 	}
 	
 	/**
@@ -61,9 +66,13 @@ public class TestCustomAssertion extends GenericTest {
 	
 	@Test(groups={"ut"})
 	public void testSoftAssertionEnabledWithChangedResult(final ITestContext testNGCtx) {
-		initThreadContext(testNGCtx);
-		SeleniumTestsContextManager.getThreadContext().setSoftAssertEnabled(true);
-		Assert.assertTrue(false, "error should not be raised");
+		try {
+			initThreadContext(testNGCtx);
+			SeleniumTestsContextManager.getThreadContext().setSoftAssertEnabled(true);
+			Assert.assertTrue(false, "error should not be raised");
+		} finally {
+			SeleniumTestsContextManager.getThreadContext().setSoftAssertEnabled(false); // be sure it's false
+		}
 	}
 	
 	@AfterMethod(groups={"ut"})
