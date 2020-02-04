@@ -21,11 +21,8 @@ import java.io.File;
 import java.nio.file.Paths;
 import java.util.Arrays;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.json.JSONObject;
 import org.testng.Assert;
-import org.testng.ITestContext;
 import org.testng.annotations.Test;
 import org.testng.xml.XmlSuite.ParallelMode;
 
@@ -123,14 +120,12 @@ public class TestReporterControler extends ReporterTest {
 		
 		executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForConfigurationError1"}); 
 		
-		String mainReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport.html"));
-		mainReportContent = mainReportContent.replace("\n", "").replace("\r",  "");
+		String mainReportContent = readSummaryFile();
 		
 		// check main result is skipped with step failed in red
 		Assert.assertTrue(mainReportContent.contains("<td name=\"failed-1\" class=\"failedSteps\">1</td>"));
 		
-		String detailedReportContent = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testWithABeforeMethodError", "TestReport.html").toFile());
-		detailedReportContent = detailedReportContent.replace("\n", "").replace("\r",  "").replaceAll(">\\s+<", "><");
+		String detailedReportContent = readTestMethodResultFile("testWithABeforeMethodError");
 
 		// check test is skipped as before method failed
 		Assert.assertTrue(detailedReportContent.contains("<header class='main-header header-skipped'>"));
@@ -162,14 +157,12 @@ public class TestReporterControler extends ReporterTest {
 		
 		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForConfigurationError2"}, ParallelMode.NONE, new String[] {"testWithAfterMethodError"}); 
 		
-		String mainReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport.html"));
-		mainReportContent = mainReportContent.replace("\n", "").replace("\r",  "");
+		String mainReportContent = readSummaryFile();
 		
 		// check main result is skipped with step failed in red
 		Assert.assertTrue(mainReportContent.contains("<td name=\"failed-1\" class=\"failedSteps\">1</td>"));
 		
-		String detailedReportContent = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testWithAfterMethodError", "TestReport.html").toFile());
-		detailedReportContent = detailedReportContent.replace("\n", "").replace("\r",  "").replaceAll(">\\s+<", "><");
+		String detailedReportContent = readTestMethodResultFile("testWithAfterMethodError");
 		
 		// Check details of the configuration error is displayed in report
 		Assert.assertTrue(detailedReportContent.matches(".*<div class=\"message-error\">\\s+class com.seleniumtests.customexception.ConfigurationException: Some error after method.*"));
@@ -201,8 +194,7 @@ public class TestReporterControler extends ReporterTest {
 		
 		executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForListener1"}); 
 		
-		String detailedReportContent = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "test1Listener1", "TestReport.html").toFile());
-		detailedReportContent = detailedReportContent.replace("\n", "").replace("\r",  "").replaceAll(">\\s+<", "><");
+		String detailedReportContent = readTestMethodResultFile("test1Listener1");
 		
 		Assert.assertTrue(detailedReportContent.contains("</i></button> Pre test step: beforeMethod -"));
 		Assert.assertTrue(detailedReportContent.contains("</i></button> Pre test step: beforeTest -"));
@@ -212,8 +204,7 @@ public class TestReporterControler extends ReporterTest {
 		Assert.assertTrue(detailedReportContent.contains("</i></button> Post test step: afterTest -"));
 		
 		// check reference to configuration methods for class / test / method are in both results (some are common)
-		String detailedReportContent2 = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "test2Listener1", "TestReport.html").toFile());
-		detailedReportContent2 = detailedReportContent2.replace("\n", "").replace("\r",  "").replaceAll(">\\s+<", "><");
+		String detailedReportContent2 = readTestMethodResultFile("test2Listener1");
 		
 		Assert.assertTrue(detailedReportContent2.contains("</i></button> Pre test step: beforeMethod -"));
 		Assert.assertTrue(detailedReportContent2.contains("</i></button> Pre test step: beforeTest -"));
@@ -232,22 +223,16 @@ public class TestReporterControler extends ReporterTest {
 	public void testReportDetailsOnlyTestConfigurationSteps() throws Exception {
 		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions", "testInError", "testWithException"});
 		
-		String detailedReportContent = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testAndSubActions", "TestReport.html").toFile());
-		detailedReportContent = detailedReportContent.replace("\n", "").replace("\r",  "").replaceAll(">\\s+<", "><");
-		
+		String detailedReportContent = readTestMethodResultFile("testAndSubActions");
 		Assert.assertEquals(StringUtils.countMatches(detailedReportContent, "</i></button> Pre test step: set -"), 1);
 		
-		String detailedReportContent2 = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testInError", "TestReport.html").toFile());
-		detailedReportContent2 = detailedReportContent2.replace("\n", "").replace("\r",  "").replaceAll(">\\s+<", "><");
-		
+		String detailedReportContent2 = readTestMethodResultFile("testInError");
 		Assert.assertEquals(StringUtils.countMatches(detailedReportContent2, "</i></button> Pre test step: set -"), 1);
 		
 		// check that when test is KO, error cause is displayed
 		Assert.assertTrue(detailedReportContent2.contains("[main] ScenarioLogger: Test is KO with error: error"));
 		
-		String detailedReportContent3 = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testWithException", "TestReport.html").toFile());
-		detailedReportContent3 = detailedReportContent3.replace("\n", "").replace("\r",  "").replaceAll(">\\s+<", "><");
-		
+		String detailedReportContent3 = readTestMethodResultFile("testWithException");
 		Assert.assertEquals(StringUtils.countMatches(detailedReportContent3, "</i></button> Pre test step: set -"), 1);
 		Assert.assertEquals(StringUtils.countMatches(detailedReportContent3, "</i></button> Post test step: reset -"), 1);
 		
