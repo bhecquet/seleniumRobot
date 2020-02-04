@@ -19,8 +19,12 @@ package com.seleniumtests;
 
 import org.apache.log4j.Logger;
 import org.aspectj.lang.JoinPoint;
+import org.aspectj.lang.annotation.After;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
+
+import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.customexception.ConfigurationException;
 
 @Aspect
 public class LogUnitTest {
@@ -29,6 +33,21 @@ public class LogUnitTest {
 
 	@Before("execution(@org.testng.annotations.Test public * com.seleniumtests..* (..))")
 	public void logTestStart(JoinPoint joinPoint)  { 
-		logger.info("executing " + joinPoint.getSignature());
+		logger.info("executing " + joinPoint.getSignature()); 
+	}
+	
+	@After("execution(@org.testng.annotations.Test public * com.seleniumtests..* (..)) && !execution(@org.testng.annotations.Test public * com.seleniumtests.it.stubclasses..* (..))")
+	public void checkTestEnd(JoinPoint joinPoint)  { 
+		
+		// handle case where thread context is not defined (we get a ConfigurationException)
+		try {
+			SeleniumTestsContextManager.getThreadContext(); 
+		} catch (ConfigurationException e) {
+			return;
+		}
+		
+		if (SeleniumTestsContextManager.getThreadContext() != null && SeleniumTestsContextManager.getThreadContext().isSoftAssertEnabled()) {
+			throw new ConfigurationException("Soft assert is enabled. In case this is wanted by the test itself, then add a finally block which restores it to 'false'");
+		}
 	}
 }

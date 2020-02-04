@@ -794,9 +794,13 @@ public class TestSeleniumTestContext extends GenericTest {
 	}
 	@Test(groups="ut context")
 	public void testSoftAssertEnabledNull(final ITestContext testNGCtx, final XmlTest xmlTest) {
-		initThreadContext(testNGCtx);
-		SeleniumTestsContextManager.getThreadContext().setSoftAssertEnabled(null);
-		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().isSoftAssertEnabled(), SeleniumTestsContext.DEFAULT_SOFT_ASSERT_ENABLED);
+		try {
+			initThreadContext(testNGCtx);
+			SeleniumTestsContextManager.getThreadContext().setSoftAssertEnabled(null);
+			Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().isSoftAssertEnabled(), SeleniumTestsContext.DEFAULT_SOFT_ASSERT_ENABLED);
+		} finally {
+			SeleniumTestsContextManager.getThreadContext().setSoftAssertEnabled(false);
+		}
 	}
 	
 	@Test(groups="ut context")
