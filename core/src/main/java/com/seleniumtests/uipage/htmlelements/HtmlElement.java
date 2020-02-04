@@ -998,7 +998,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     /**
      * Searches for the element using the BY locator, and indicates whether or not it exists in the page. This can be
      * used to look for hidden objects, whereas isDisplayed() only looks for things that are visible to the user
-     * @param timeout timeout in seconds
+     * @param timeout 	timeout in seconds
      * @return
      */
     public boolean isElementPresent(int timeout) {        
@@ -1012,6 +1012,24 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     public boolean isElementPresent() { 
     	return isElementPresent(SeleniumTestsContextManager.getThreadContext().getExplicitWaitTimeout());
     }
+    
+    /**
+     * Search for an element to be present AND displayed
+     * @param timeout	timeout in seconds
+     * @return false if the element is not present or present but not displayed
+     */
+    public boolean isElementPresentAndDisplayed(int timeout) {        
+        try {
+    		waitForPresent(timeout);
+    		return isDisplayed();
+    	} catch (TimeoutException e) {
+    		return false;
+    	}
+    }
+    public boolean isElementPresentAndDisplayed() { 
+    	return isElementPresentAndDisplayed(SeleniumTestsContextManager.getThreadContext().getExplicitWaitTimeout());
+    }
+    
 
     /**
      * Indicates whether or not the element is enabled in the browser.
