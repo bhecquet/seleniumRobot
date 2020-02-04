@@ -652,6 +652,30 @@ public class TestDriver extends GenericMultiBrowserTest {
 		Assert.assertTrue(DriverTestPage.textElement.isElementPresent(2));
 	}
 	
+	/**
+	 * Element is present and displayed => returns true
+	 */
+	@Test(groups={"it", "ut"})
+	public void testIsElementPresentAndDisplayed() {
+		Assert.assertTrue(DriverTestPage.textElement.isElementPresentAndDisplayed(2));
+	}
+	
+	/**
+	 * Element is not present => returns false
+	 */
+	@Test(groups={"it", "ut"})
+	public void testIsElementNotPresentAndNotDisplayed() {
+		Assert.assertFalse(new HtmlElement("", By.id("divNotFound")).isElementPresentAndDisplayed(2));
+	}
+	
+	/**
+	 * Element is not present => returns false
+	 */
+	@Test(groups={"it", "ut"})
+	public void testIsElementPresentAndNotDisplayed() {
+		Assert.assertFalse(new HtmlElement("", By.id("deu")).isElementPresentAndDisplayed(2));
+	}
+	
 	@Test(groups={"it", "ut"})
 	public void testIsElementNotPresent() {
 		Assert.assertFalse(new HtmlElement("", By.id("divNotFound")).isElementPresent(2));

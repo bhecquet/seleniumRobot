@@ -300,6 +300,21 @@ public class TestDriverFirefox extends TestDriver {
 	}
 	
 	@Test(groups={"it", "ut"})
+	public void testIsElementPresentAndDisplayed() {
+		super.testIsElementPresentAndDisplayed();
+	}
+
+	@Test(groups={"it", "ut"})
+	public void testIsElementNotPresentAndNotDisplayed() {
+		super.testIsElementNotPresentAndNotDisplayed();
+	}
+	
+	@Test(groups={"it", "ut"})
+	public void testIsElementPresentAndNotDisplayed() {
+		super.testIsElementPresentAndNotDisplayed();
+	}
+	
+	@Test(groups={"it", "ut"})
 	public void testIsElementNotPresent() {
 		super.testIsElementNotPresent();
 	}
