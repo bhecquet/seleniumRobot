@@ -19,11 +19,15 @@ package com.seleniumtests.it.driver.support.perdriver.testdriver;
 
 import java.awt.AWTException;
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.UnhandledAlertException;
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.it.driver.TestDriver;
+import com.seleniumtests.it.driver.support.pages.DriverTestPage;
+import com.seleniumtests.uipage.htmlelements.HtmlElement;
 
 public class TestDriverChrome extends TestDriver {
 
@@ -298,6 +302,21 @@ public class TestDriverChrome extends TestDriver {
 	@Test(groups={"it", "ut"})
 	public void testIsElementPresent() {
 		super.testIsElementPresent();
+	}
+
+	@Test(groups={"it", "ut"})
+	public void testIsElementPresentAndDisplayed() {
+		super.testIsElementPresentAndDisplayed();
+	}
+
+	@Test(groups={"it", "ut"})
+	public void testIsElementNotPresentAndNotDisplayed() {
+		super.testIsElementNotPresentAndNotDisplayed();
+	}
+	
+	@Test(groups={"it", "ut"})
+	public void testIsElementPresentAndNotDisplayed() {
+		super.testIsElementPresentAndNotDisplayed();
 	}
 	
 	@Test(groups={"it", "ut"})
