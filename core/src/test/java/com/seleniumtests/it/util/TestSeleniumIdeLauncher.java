@@ -18,6 +18,7 @@ import org.testng.annotations.Test;
 
 import com.seleniumtests.GenericTest;
 import com.seleniumtests.core.SeleniumTestsContext;
+import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.it.driver.support.server.WebServer;
 import com.seleniumtests.it.reporter.ReporterTest;
 import com.seleniumtests.util.ide.SeleniumIdeLauncher;
@@ -108,6 +109,8 @@ public class TestSeleniumIdeLauncher extends ReporterTest {
 			System.clearProperty(SeleniumTestsContext.MANUAL_TEST_STEPS);
 			System.clearProperty(SeleniumTestsContext.SOFT_ASSERT_ENABLED);
 			System.clearProperty("foo");
+			
+			SeleniumTestsContextManager.getThreadContext().setSoftAssertEnabled(false);
 		}
 	}
 	
@@ -151,6 +154,8 @@ public class TestSeleniumIdeLauncher extends ReporterTest {
 			System.clearProperty(SeleniumTestsContext.BROWSER);
 			System.clearProperty(SeleniumTestsContext.MANUAL_TEST_STEPS);
 			System.clearProperty(SeleniumTestsContext.SOFT_ASSERT_ENABLED);
+			
+			SeleniumTestsContextManager.getThreadContext().setSoftAssertEnabled(false);
 		}
 	}
 	
