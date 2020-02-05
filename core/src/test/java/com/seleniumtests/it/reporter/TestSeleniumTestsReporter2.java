@@ -340,15 +340,37 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			System.setProperty(SeleniumTestsContext.TEST_RETRY_COUNT, "1");
 			System.setProperty(SeleniumTestsContext.KEEP_ALL_RESULTS, "true");
 			
-			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testWithException"});
+			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions", "testWithException2"});
 			
-			String detailedReportContent = readTestMethodResultFile("testWithException");
+			String detailedReportContent = readTestMethodResultFile("testWithException2");
 
 			// check the message and that no previous execution result is visible
 			Assert.assertTrue(detailedReportContent.contains("Previous execution results"));
-			Assert.assertTrue(detailedReportContent.contains("<a href=\"retry-testWithException-1.zip\">retry-testWithException-1.zip</a>"));
+			Assert.assertTrue(detailedReportContent.contains("<a href=\"retry-testWithException2-1.zip\">retry-testWithException2-1.zip</a>"));
 			
 	
+		} finally {
+			System.clearProperty(SeleniumTestsContext.TEST_RETRY_COUNT);
+			System.clearProperty(SeleniumTestsContext.KEEP_ALL_RESULTS);
+		}
+	}
+	
+	@Test(groups={"it"})
+	public void testKeepAllResultsNoParallel(ITestContext testContext) throws Exception {
+		
+		try {
+			System.setProperty(SeleniumTestsContext.TEST_RETRY_COUNT, "1");
+			System.setProperty(SeleniumTestsContext.KEEP_ALL_RESULTS, "true");
+			
+			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.NONE, new String[] {"testAndSubActions", "testWithException2"});
+			
+			String detailedReportContent = readTestMethodResultFile("testWithException2");
+			
+			// check the message and that no previous execution result is visible
+			Assert.assertTrue(detailedReportContent.contains("Previous execution results"));
+			Assert.assertTrue(detailedReportContent.contains("<a href=\"retry-testWithException2-1.zip\">retry-testWithException2-1.zip</a>"));
+			
+			
 		} finally {
 			System.clearProperty(SeleniumTestsContext.TEST_RETRY_COUNT);
 			System.clearProperty(SeleniumTestsContext.KEEP_ALL_RESULTS);

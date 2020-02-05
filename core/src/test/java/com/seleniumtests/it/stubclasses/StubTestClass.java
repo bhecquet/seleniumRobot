@@ -102,6 +102,18 @@ public class StubTestClass extends StubParentClass {
 		tmpImg.deleteOnExit();
 		tmpHtml.deleteOnExit();
 	}
+
+	/**
+	 * An other test that throws exception
+	 */
+	@Test(groups="stub", dependsOnMethods="testAndSubActions")
+	public void testWithException2() {
+		TestStep step1 = new TestStep("step 1", Reporter.getCurrentTestResult(), new ArrayList<>(), maskPassword);
+		step1.addAction(new TestAction(String.format("played %d times", count), false, new ArrayList<>()));
+		step1.addAction(new TestAction("click button", false, new ArrayList<>()));
+		TestStepManager.logTestStep(step1);
+		throw new DriverExceptions("some exception");
+	}
 	
 	@Test(groups="stub")
 	public void testInError() {
