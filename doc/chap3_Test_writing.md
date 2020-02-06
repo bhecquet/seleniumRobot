@@ -697,7 +697,17 @@ You can make seleniumRobot display some test information in logs and test steps
 #### Log some information at test level ####
 
 You can also add information to the test itself (e.g: the bug id you created, the login used, ...) so that they can be visible inside main HTML report
-For that, inside the test method, write `addTestInfo("<info_name>", "<info_value>");`
+For that, inside the test method, write 
+
+```java
+	addTestInfo("<info_name>", new StringInfo("<info_value>"));
+```
+
+If you want to display an hyperlink in HTMl report, write instead
+
+```java
+	addTestInfo("<info_name>", new HyperlinkInfo("<link_name>", "<url>"));
+```
 
 ### 9 Write good tests and Page Objects ###
 
