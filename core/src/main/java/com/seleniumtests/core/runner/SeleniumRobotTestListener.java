@@ -332,9 +332,9 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
         }
         
         // archive results
-        if ((SeleniumTestsContextManager.getThreadContext().getArchive() == ArchiveMode.TRUE
-        		|| (SeleniumTestsContextManager.getThreadContext().getArchive() == ArchiveMode.ON_SUCCESS && !failed)
-        		|| (SeleniumTestsContextManager.getThreadContext().getArchive() == ArchiveMode.ON_ERROR && failed)) 
+        if ((SeleniumTestsContextManager.getGlobalContext().getArchive() == ArchiveMode.TRUE
+        		|| (SeleniumTestsContextManager.getGlobalContext().getArchive() == ArchiveMode.ON_SUCCESS && !failed)
+        		|| (SeleniumTestsContextManager.getGlobalContext().getArchive() == ArchiveMode.ON_ERROR && failed)) 
         		&& SeleniumTestsContextManager.getGlobalContext().getArchiveToFile() != null) {
         	try {
 				FileUtility.zipFolder(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()), 
