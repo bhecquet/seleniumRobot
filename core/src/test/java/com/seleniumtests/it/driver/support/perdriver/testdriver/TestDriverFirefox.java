@@ -229,12 +229,12 @@ public class TestDriverFirefox extends TestDriver {
 		super.testAutoScrolling();
 	}
 	
-	@Test(groups= {"it", "ut"})
+	@Test(groups= {"it", "ut", "upload"})
 	public void testUploadFileWithRobot() throws AWTException, InterruptedException {
 		super.testUploadFileWithRobot();
 	}
 	
-	@Test(groups= {"it", "ut"})
+	@Test(groups= {"it", "ut", "upload"})
 	public void testUploadFileWithRobotKeyboard() throws AWTException, InterruptedException {
 		super.testUploadFileWithRobotKeyboard();
 	}

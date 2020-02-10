@@ -746,7 +746,7 @@ public class PageObject extends BasePage implements IPage {
     
     /**
      * Method to handle file upload through robot class
-     * /!\ This should only be used as the last option when uploading file cannot be done an other way
+     * /!\ This should only be used as the last option when uploading file cannot be done an other way as explained below
      * https://saucelabs.com/resources/articles/best-practices-tips-selenium-file-upload
      * <code>
      * driver.setFileDetector(new LocalFileDetector());
@@ -754,6 +754,13 @@ public class PageObject extends BasePage implements IPage {
      *   WebElement upload = driver.findElement(By.id("myfile"));
      *   upload.sendKeys("/Users/sso/the/local/path/to/darkbulb.jpg");
      *   </code> 
+     *   
+     *   
+     * To use this method, first click on the upload file button / link, then call this method.
+     * 
+     * /!\ on firefox, clicking MUST be done through 'clickAction'. 'click()' is not supported by browser. 
+     * /!\ on firefox, using the uploadFile method several times without other actions between usage may lead to error. Firefox will never click to the button the second time, probably due to focus problems
+     * 
      * @param filePath
      */
 	public void uploadFile(String filePath) {

@@ -108,7 +108,7 @@ public abstract class GenericMultiBrowserTest extends MockitoTest {
 		return mapping;
 	}
 	
-	@BeforeMethod(groups={"ut", "it"})  
+	@BeforeMethod(groups={"ut", "it", "upload"})  
 	public void initBeforeMethod() {
 		if (browserType == null || !installedBrowsers.contains(browserType)) {
 			return;
@@ -126,7 +126,7 @@ public abstract class GenericMultiBrowserTest extends MockitoTest {
 	}
 	
 	
-	@BeforeClass(groups={"it", "ut"})
+	@BeforeClass(groups={"it", "ut", "upload"})
 	public void exposeTestPage(final ITestContext testNGCtx) throws Exception {
 
         // skip following if driver is already defined from an other test
@@ -175,7 +175,7 @@ public abstract class GenericMultiBrowserTest extends MockitoTest {
 	}
 	
 
-	@AfterClass(groups={"it", "ut"}, alwaysRun=true)
+	@AfterClass(groups={"it", "ut", "upload"}, alwaysRun=true)
 	public void stop() throws Exception {
 		if (server != null) {
 			logger.info("stopping web server");
@@ -188,7 +188,7 @@ public abstract class GenericMultiBrowserTest extends MockitoTest {
 		driver = null;
 	}
 	
-	@BeforeMethod(groups={"it", "ut"}) 
+	@BeforeMethod(groups={"it", "ut", "upload"}) 
 	public void skipIfDriverNull() {
 		if (driver == null) {
 			throw new SkipException("skipped, browser not installed: " + browserType);
@@ -196,7 +196,7 @@ public abstract class GenericMultiBrowserTest extends MockitoTest {
 	}
 	
 
-	@AfterMethod(groups={"it", "ut"})
+	@AfterMethod(groups={"it", "ut", "upload"})
 	public void cleanAlert() {
 		GenericTest.resetTestNGREsultAndLogger();
 		if (driver == null) {

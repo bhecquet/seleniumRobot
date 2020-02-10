@@ -526,6 +526,7 @@ public class TestDriver extends GenericMultiBrowserTest {
 	public void testUploadFileWithRobot() throws AWTException, InterruptedException {
 		String path = SeleniumTestsContextManager.getConfigPath() + File.separator + "envSpecific.ini";
 //		DriverTestPage.upload.click();
+		DriverTestPage.uploadedFile.click(); // when executing both testUploadFileWithRobotXX tests, the second one fails on firefox because focus is on '<input type="file">' element
 		DriverTestPage.upload.clickAction(); // due to restrictions clicking a <input type="file"> element with firefox, use clickAction instead
 		testPage.uploadFile(path);
 		
@@ -541,6 +542,7 @@ public class TestDriver extends GenericMultiBrowserTest {
 	public void testUploadFileWithRobotKeyboard() throws AWTException, InterruptedException {
 		String path = SeleniumTestsContextManager.getConfigPath() + File.separator + "objectMapping.ini";
 //		DriverTestPage.upload.click();
+		DriverTestPage.uploadedFile.click(); // when executing both testUploadFileWithRobotXX tests, the second one fails on firefox because focus is on '<input type="file">' element
 		DriverTestPage.upload.clickAction(); // due to restrictions clicking a <input type="file"> element with firefox, use clickAction instead
 		CustomEventFiringWebDriver.uploadFileUsingKeyboardTyping(new File(path));
 		WaitHelper.waitForSeconds(1);
