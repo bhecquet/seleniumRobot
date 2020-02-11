@@ -83,7 +83,7 @@ public class TestJsonReporter extends ReporterTest {
 		Assert.assertEquals(jsonResult.getInt("pass"), 8);
 		Assert.assertEquals(jsonResult.getInt("fail"), 7);
 		Assert.assertEquals(jsonResult.getInt("skip"), 2);
-		Assert.assertEquals(jsonResult.getInt("total"), 16);
+		Assert.assertEquals(jsonResult.getInt("total"), 17);
 		
 	}
 
