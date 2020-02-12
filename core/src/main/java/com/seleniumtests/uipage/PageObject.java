@@ -42,6 +42,7 @@ import org.openqa.selenium.Point;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.UnsupportedCommandException;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
@@ -288,6 +289,15 @@ public class PageObject extends BasePage implements IPage {
      */
     public void createOrUpdateParam(String key, String value, boolean specificToVersion, int timeToLive, boolean reservable) {
     	TestTasks.createOrUpdateParam(key, value, specificToVersion, timeToLive, reservable);
+    }
+    
+    /**
+     * In case the scenario uses several drivers, switch to one or another using this method, so that any new calls will go through this driver
+     * @param driverName
+     */
+    public WebDriver switchToDriver(String driverName) {
+    	driver = TestTasks.switchToDriver(driverName);
+    	return driver;
     }
 
     public void assertHtmlSource(final String text) {

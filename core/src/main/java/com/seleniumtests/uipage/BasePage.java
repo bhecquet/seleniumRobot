@@ -30,6 +30,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.Assert;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.core.TestTasks;
 import com.seleniumtests.core.runner.SeleniumRobotTestPlan;
 import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.driver.CustomEventFiringWebDriver;
@@ -140,6 +141,8 @@ public abstract class BasePage {
 	public Set<String> getCurrentHandles() {
 		return ((CustomEventFiringWebDriver)driver).getCurrentHandles();
 	}
+	
+
 
 
 }

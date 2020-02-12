@@ -21,6 +21,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.openqa.selenium.WebDriver;
 import org.testng.Reporter;
 
 import com.neotys.selenium.proxies.NLWebDriver;
@@ -233,5 +234,15 @@ public class TestTasks {
     		logger.logScreenshot(new ScreenshotUtil().capture(Target.PAGE, ScreenShot.class));
     	}
 
+    }
+    
+
+    /**
+     * In case the scenario uses several drivers, switch to one or another using this method, so that any new calls will go through this driver
+     * @param driverName
+     */
+    public static WebDriver switchToDriver(String driverName) {
+    	WebUIDriver.switchToDriver(driverName);
+    	return WebUIDriver.getWebDriver(false);
     }
 }
