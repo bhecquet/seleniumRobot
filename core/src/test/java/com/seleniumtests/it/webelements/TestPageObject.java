@@ -17,15 +17,24 @@
  */
 package com.seleniumtests.it.webelements;
 
+import java.util.List;
+import java.util.Map;
+
 import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import com.seleniumtests.GenericDriverTest;
 import com.seleniumtests.GenericTest;
+import com.seleniumtests.browserfactory.BrowserInfo;
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.driver.BrowserType;
+import com.seleniumtests.driver.TestType;
 import com.seleniumtests.it.driver.support.pages.DriverSubTestPage;
 import com.seleniumtests.it.driver.support.pages.DriverTestPage;
+import com.seleniumtests.util.osutility.OSCommand;
+import com.seleniumtests.util.osutility.OSUtility;
 
 /**
  * Test PageObject
@@ -87,5 +96,31 @@ public class TestPageObject extends GenericTest {
 	public void testCloseFirstTabAndCheck() throws Exception {
 		testPage._goToNewPage();
 		testPage.getFocus().close(DriverSubTestPage.class);
+	}
+	
+	/**
+	 * issue #324: check handles are not null. We cannot directly reproduce problem because we should have a test site which creates a second window when opened
+	 * @throws Exception
+	 */
+	@Test(groups= {"it", "pageobject"})
+	public void testPageObjectForExternalDriver() throws Exception {
+		try {
+			SeleniumTestsContextManager.getThreadContext().setTestType(TestType.WEB);
+			
+			Map<BrowserType, List<BrowserInfo>> browsers = OSUtility.getInstalledBrowsersWithVersion();
+			String path = browsers.get(BrowserType.CHROME).get(0).getPath();
+			int port = GenericDriverTest.findFreePort();
+			
+			// create chrome browser with the right option
+			OSCommand.executeCommand(new String[] {path, "--remote-debugging-port=" + port, "about:blank"});
+			
+			DriverTestPage secondPage = new DriverTestPage(BrowserType.CHROME, port);
+			Assert.assertNotNull(secondPage.getCurrentHandles());
+		} finally {
+			
+			// switch back to main driver to avoid annoying other tests
+			testPage.switchToDriver("main");
+		}
+		
 	}
 }

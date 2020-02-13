@@ -149,6 +149,11 @@ public class PageObject extends BasePage implements IPage {
         
         // open page
         openPage(url);
+        
+        // in case browser has been created outside of selenium and we attach to it, get initial window handles
+        if (driver != null && attachExistingDriverPort != null && url == null) {
+        	((CustomEventFiringWebDriver)driver).updateWindowsHandles();
+        }
 
         assertCurrentPage(false);
 

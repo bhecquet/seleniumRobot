@@ -17,6 +17,9 @@
  */
 package com.seleniumtests;
 
+import java.io.IOException;
+import java.net.ServerSocket;
+
 import org.openqa.selenium.WebDriver;
 import org.testng.ITestContext;
 import org.testng.ITestResult;
@@ -69,6 +72,26 @@ public class GenericDriverTest {
 		}
 
 		GenericTest.resetTestNGREsultAndLogger();
+	}
+	
+	public static int findFreePort() {
+		ServerSocket socket = null;
+		try {
+			socket = new ServerSocket(0);
+			socket.setReuseAddress(true);
+			int port = socket.getLocalPort();
+			
+			return port;
+		} catch (IOException e) { 
+		} finally {
+			if (socket != null) {
+				try {
+					socket.close();
+				} catch (IOException e) {
+				}
+			}
+		}
+		throw new IllegalStateException("Could not find a free TCP/IP port ");
 	}
 	
 	public void myTest() {
