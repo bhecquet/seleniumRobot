@@ -38,6 +38,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.TreeSet;
 
 import javax.imageio.ImageIO;
 
@@ -793,4 +794,22 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 		verify(videoRecorder, never()).start();
 		verify(gridConnector).stopVideoCapture(anyString());
 	}
+	
+	/**
+	 * Check we never get null, we update if not initialized
+	 * @throws IOException
+	 */
+	@Test(groups = {"ut"})
+	public void testGetCurrentHandlesUpdated() throws IOException {
+		when(driver.getWindowHandles()).thenReturn(new TreeSet<>(Arrays.asList("12345", "67890")));
+		Assert.assertEquals(((CustomEventFiringWebDriver)eventDriver).getCurrentHandles(), new TreeSet<>(Arrays.asList("12345", "67890")));
+		verify((CustomEventFiringWebDriver)eventDriver, times(1)).updateWindowsHandles();
+	}
+	@Test(groups = {"ut"})
+	public void testGetCurrentHandlesNotUpdated() throws IOException {
+		((CustomEventFiringWebDriver)eventDriver).setCurrentHandles(new TreeSet<>(Arrays.asList("12345", "67890")));
+		Assert.assertEquals(((CustomEventFiringWebDriver)eventDriver).getCurrentHandles(), new TreeSet<>(Arrays.asList("12345", "67890")));
+		verify((CustomEventFiringWebDriver)eventDriver, never()).updateWindowsHandles();
+	}
+	
 }

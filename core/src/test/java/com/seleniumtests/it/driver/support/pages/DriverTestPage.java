@@ -161,6 +161,10 @@ public class DriverTestPage extends PageObject {
     	super(textElement, getPageUrl(browserType), browserType, "second", null);
     }
     
+    public DriverTestPage(BrowserType browserType, Integer attachExistingDriverPort) throws Exception {
+    	super(textElement, getPageUrl(browserType), browserType, "second", attachExistingDriverPort);
+    }
+    
     public DriverTestPage(boolean openPageURL, String url) throws Exception {
     	super(textElement, openPageURL ? url : null);
     	openedPageUrl = url;

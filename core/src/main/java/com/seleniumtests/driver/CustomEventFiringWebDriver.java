@@ -462,7 +462,11 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
     	}
     }
     
-    @Override
+    public void setCurrentHandles(Set<String> currentHandles) {
+		this.currentHandles = currentHandles;
+	}
+
+	@Override
     public Set<String> getWindowHandles() {
     	
     	if (!isWebTest) {
@@ -591,6 +595,9 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
     }
     
     public Set<String> getCurrentHandles() {
+    	if (currentHandles == null) {
+    		updateWindowsHandles();
+    	}
 		return currentHandles;
 	}
     
