@@ -22,28 +22,41 @@ import org.openqa.selenium.By;
 import com.seleniumtests.uipage.ReplayOnError;
 
 public class FileUploadElement extends HtmlElement {
-    public FileUploadElement(final String label, final By by) {
+    
+	public FileUploadElement(final String label, final By by) {
         super(label, by);
+    }
+
+    public FileUploadElement(final String label, final By by, final Integer index) {
+    	super(label, by, index);
+    }
+    
+    public FileUploadElement(final String label, final By by, final Integer index, Integer replayTimeout) {
+    	super(label, by, index, replayTimeout);
     }
     
     public FileUploadElement(final String label, final By by, final HtmlElement parent) {
     	super(label, by, parent);
     }
     
-    public FileUploadElement(final String label, final By by, final Integer index) {
-    	super(label, by, index);
-    }
-    
     public FileUploadElement(final String label, final By by, final HtmlElement parent, final Integer index) {
     	super(label, by, parent, index);
     }
     
+    public FileUploadElement(final String label, final By by, final HtmlElement parent, final Integer index, Integer replayTimeout) {
+    	super(label, by, parent, index, replayTimeout);
+    }
+     
     public FileUploadElement(final String label, final By by, final FrameElement frame) {
     	super(label, by, frame);
     }
     
     public FileUploadElement(final String label, final By by, final FrameElement frame, final Integer index) {
     	super(label, by, frame, index);
+    }
+    
+    public FileUploadElement(final String label, final By by, final FrameElement frame, final Integer index, Integer replayTimeout) {
+    	super(label, by, frame, index, replayTimeout);
     }
     
     /**

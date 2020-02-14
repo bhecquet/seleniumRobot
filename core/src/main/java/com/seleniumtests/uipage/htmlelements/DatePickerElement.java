@@ -35,31 +35,39 @@ import com.seleniumtests.uipage.ReplayOnError;
 public class DatePickerElement extends HtmlElement {
 
 	public DatePickerElement(final String label, final By by) {
-        this(label, by, null, null, null);
+        super(label, by);
+    }
+
+    public DatePickerElement(final String label, final By by, final Integer index) {
+    	super(label, by, index);
+    }
+    
+    public DatePickerElement(final String label, final By by, final Integer index, Integer replayTimeout) {
+    	super(label, by, index, replayTimeout);
     }
     
     public DatePickerElement(final String label, final By by, final HtmlElement parent) {
-    	this(label, by, null, parent, null);
-    }
-    
-    public DatePickerElement(final String label, final By by, final Integer index) {
-    	this(label, by, null, null, index);
+    	super(label, by, parent);
     }
     
     public DatePickerElement(final String label, final By by, final HtmlElement parent, final Integer index) {
-    	this(label, by, null, parent, index);
+    	super(label, by, parent, index);
     }
     
+    public DatePickerElement(final String label, final By by, final HtmlElement parent, final Integer index, Integer replayTimeout) {
+    	super(label, by, parent, index, replayTimeout);
+    }
+     
     public DatePickerElement(final String label, final By by, final FrameElement frame) {
-    	this(label, by, frame, null, null);
+    	super(label, by, frame);
     }
     
     public DatePickerElement(final String label, final By by, final FrameElement frame, final Integer index) {
-    	this(label, by, frame, null, index);
+    	super(label, by, frame, index);
     }
     
-    public DatePickerElement(final String label, final By by, final FrameElement frame, final HtmlElement parent, final Integer index) {
-    	super(label, by, frame, parent, index);
+    public DatePickerElement(final String label, final By by, final FrameElement frame, final Integer index, Integer replayTimeout) {
+    	super(label, by, frame, index, replayTimeout);
     }
 
     

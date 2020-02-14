@@ -22,28 +22,41 @@ import org.openqa.selenium.By;
 import com.seleniumtests.uipage.ReplayOnError;
 
 public class TextFieldElement extends HtmlElement {
-    public TextFieldElement(final String label, final By by) {
+	
+	public TextFieldElement(final String label, final By by) {
         super(label, by);
+    }
+
+    public TextFieldElement(final String label, final By by, final Integer index) {
+    	super(label, by, index);
+    }
+    
+    public TextFieldElement(final String label, final By by, final Integer index, Integer replayTimeout) {
+    	super(label, by, index, replayTimeout);
     }
     
     public TextFieldElement(final String label, final By by, final HtmlElement parent) {
     	super(label, by, parent);
     }
     
-    public TextFieldElement(final String label, final By by, final Integer index) {
-    	super(label, by, index);
-    }
-    
     public TextFieldElement(final String label, final By by, final HtmlElement parent, final Integer index) {
     	super(label, by, parent, index);
     }
     
+    public TextFieldElement(final String label, final By by, final HtmlElement parent, final Integer index, Integer replayTimeout) {
+    	super(label, by, parent, index, replayTimeout);
+    }
+     
     public TextFieldElement(final String label, final By by, final FrameElement frame) {
     	super(label, by, frame);
     }
     
     public TextFieldElement(final String label, final By by, final FrameElement frame, final Integer index) {
     	super(label, by, frame, index);
+    }
+    
+    public TextFieldElement(final String label, final By by, final FrameElement frame, final Integer index, Integer replayTimeout) {
+    	super(label, by, frame, index, replayTimeout);
     }
 
     @Override

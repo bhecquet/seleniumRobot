@@ -42,21 +42,37 @@ public class Table extends HtmlElement {
     public Table(final String label, final By by) {
         super(label, by);
     }
+
+    public Table(final String label, final By by, final Integer index) {
+    	super(label, by, index);
+    }
+    
+    public Table(final String label, final By by, final Integer index, Integer replayTimeout) {
+    	super(label, by, index, replayTimeout);
+    }
     
     public Table(final String label, final By by, final HtmlElement parent) {
     	super(label, by, parent);
     }
     
-    public Table(final String label, final By by, final Integer index) {
-    	super(label, by, null, index);
-    }
-
     public Table(final String label, final By by, final HtmlElement parent, final Integer index) {
     	super(label, by, parent, index);
     }
     
+    public Table(final String label, final By by, final HtmlElement parent, final Integer index, Integer replayTimeout) {
+    	super(label, by, parent, index, replayTimeout);
+    }
+     
     public Table(final String label, final By by, final FrameElement frame) {
     	super(label, by, frame);
+    }
+    
+    public Table(final String label, final By by, final FrameElement frame, final Integer index) {
+    	super(label, by, frame, index);
+    }
+    
+    public Table(final String label, final By by, final FrameElement frame, final Integer index, Integer replayTimeout) {
+    	super(label, by, frame, index, replayTimeout);
     }
 
     /**
