@@ -96,11 +96,11 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 	// unit test TestPicutreElement.testClick() fails if the new interface is used
 	// so wait to this old interface to be really removed
 
-    protected static final Logger logger = SeleniumRobotLogger.getLogger(HtmlElement.class);
+    protected static Logger logger = SeleniumRobotLogger.getLogger(HtmlElement.class);
 	private static ScenarioLogger scenarioLogger = ScenarioLogger.getScenarioLogger(TestRetryAnalyzer.class);
 	
-    public static final Integer FIRST_VISIBLE = Integer.MAX_VALUE;
-    public static final Integer OPTIMAL_SCROLLING = Integer.MAX_VALUE;
+    public static Integer FIRST_VISIBLE = Integer.MAX_VALUE;
+    public static Integer OPTIMAL_SCROLLING = Integer.MAX_VALUE;
     
     String JS_CLICK_TRIPLE = 
     		  "var target = arguments[0];" +
@@ -149,7 +149,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
      * @sample  {@code new HtmlElement("UserId", By.id(userid))}
      */
     
-    public HtmlElement(final String label, final By by) {
+    public HtmlElement(String label, By by) {
     	this(label, by, (Integer)null);
     }
     
@@ -166,32 +166,112 @@ public class HtmlElement extends Element implements WebElement, Locatable {
      *
      * @sample  {@code new HtmlElement("UserId", By.id(userid), 2)}
      */
-    public HtmlElement(final String label, final By by, final Integer index) {
-    	this(label, by, null, index);
+    public HtmlElement(String label, By by, Integer index) {
+    	this(label, by, (FrameElement)null, index);
+    }
+    public HtmlElement(String label, By by, Integer index, Integer replayTimeout) {
+    	this(label, by, null, index, replayTimeout);
     }
     
-    public HtmlElement(final String label, final By by, final FrameElement frame) {
+
+    /**
+     * Find element using BY locator into a frame
+     *
+     * @param   label  - element name for logging
+     * @param   by     - By type
+     * @param	frame  - frame element into which we must switch before searching the element
+     */
+    public HtmlElement(String label, By by, FrameElement frame) {
     	this(label, by, frame, null);
     }
     
-    public HtmlElement(final String label, final By by, final FrameElement frame, final Integer index) {
-    	this(label, by, frame, null, index);
+
+    /**
+     * Find the nth element using BY locator into a frame
+     *
+     * @param   label  - element name for logging
+     * @param   by     - By type
+     * @param	frame  - frame element into which we must switch before searching the element
+     * @param	index  - index of the element to find. In this case, robot will search the Nth element corresponding to
+     * 					 the By parameter. Equivalent to new HtmlElement(label, by).findElements().get(N)
+     * 					 If index is null, use <code>driver.findElement(By)</code> intenally
+     *  				 If index is negative, search from the last one (-1)
+     *  			     If index is HtmlElement.FIRST_VISIBLE, search the first visible element
+     */
+    public HtmlElement(String label, By by, FrameElement frame, Integer index) {
+    	this(label, by, frame, null, index, null);
+    }
+    public HtmlElement(String label, By by, FrameElement frame, Integer index, Integer replayTimeout) {
+    	this(label, by, frame, null, index, replayTimeout);
     }
     
-    public HtmlElement(final String label, final By by, final HtmlElement parent) {
+
+    /**
+     * Find element using BY locator into an other element.This help focusing on a page zone for searching an element
+     *
+     * @param   label  - element name for logging
+     * @param   by     - By type
+     * @param	parent - Parent element to search before searching this element
+     */
+    public HtmlElement(String label, By by, HtmlElement parent) {
     	this(label, by, parent, null);
     }
     
-    public HtmlElement(final String label, final By by, final HtmlElement parent, final Integer index) {
-    	this(label, by, null, parent, index);
+
+    /**
+     * Find the nth element using BY locator into an other element.This help focusing on a page zone for searching an element
+     *
+     * @param   label  - element name for logging
+     * @param   by     - By type
+     * @param	parent - Parent element to search before searching this element
+     * @param	index  - index of the element to find. In this case, robot will search the Nth element corresponding to
+     * 					 the By parameter. Equivalent to new HtmlElement(label, by).findElements().get(N)
+     * 					 If index is null, use <code>driver.findElement(By)</code> intenally
+     *  				 If index is negative, search from the last one (-1)
+     *  			     If index is HtmlElement.FIRST_VISIBLE, search the first visible element
+     */
+    public HtmlElement(String label, By by, HtmlElement parent, Integer index) {
+    	this(label, by, null, parent, index, null);
+    }
+    public HtmlElement(String label, By by, HtmlElement parent, Integer index, Integer replayTimeout) {
+    	this(label, by, null, parent, index, replayTimeout);
     }
     
-    public HtmlElement(final String label, final By by, final FrameElement frame, final HtmlElement parent, final Integer index) {
+    /**
+     * @deprecated Should not be used as the element is either directly search in a frame or in a parent element which itself is in a frame, not both
+     */
+    @Deprecated
+    public HtmlElement(String label, By by, FrameElement frame, HtmlElement parent, Integer index) {
+    	this(label, by, frame, parent, index, null);	
+    }
+    
+    /**
+     * Find the nth element using BY locator into an other element or a frame.This help focusing on a page zone for searching an element
+     * Frame and parent element are mutually exclusive
+     *
+     * @param   label  - element name for logging
+     * @param   by     - By type
+     * @param	frame  - frame element into which we must switch before searching the element
+     * @param	parent - Parent element to search before searching this element
+     * @param	index  - index of the element to find. In this case, robot will search the Nth element corresponding to
+     * 					 the By parameter. Equivalent to new HtmlElement(label, by).findElements().get(N)
+     * 					 If index is null, use <code>driver.findElement(By)</code> intenally
+     *  				 If index is negative, search from the last one (-1)
+     *  			     If index is HtmlElement.FIRST_VISIBLE, search the first visible element
+     * @param	replayTimeout - how much time we must wait for the element to be present for playing with it
+     */
+    protected HtmlElement(String label, By by, FrameElement frame, HtmlElement parent, Integer index, Integer replayTimeout) {
     	this.label = label;
     	this.by = by;
     	this.elementIndex = index;
-    	this.frameElement = frame;
     	this.parent = parent;
+
+    	if (parent != null && frame != null) {
+    		scenarioLogger.error("parent element and frame cannot be set together. If you want to search a element with parent in a frame, define a frame for this parent");
+    	} else {
+    		this.frameElement = frame;
+    	}
+    	this.replayTimeout = replayTimeout;
     	
     	origin = PageObject.getCallingPage(Thread.currentThread().getStackTrace());
     }
@@ -347,7 +427,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     }
 
     @ReplayOnError
-    public void simulateMoveToElement(final int x, final int y) {
+    public void simulateMoveToElement(int x, int y) {
         findElement(true);
         executeScript(
             "function simulate(f,c,d,e){var b,a=null;for(b in eventMatchers)if(eventMatchers[b].test(c)){a=b;break}if(!a)return!1;document.createEvent?(b=document.createEvent(a),a==\"HTMLEvents\"?b.initEvent(c,!0,!0):b.initMouseEvent(c,!0,!0,document.defaultView,0,d,e,d,e,!1,!1,!1,!1,0,null),f.dispatchEvent(b)):(a=document.createEventObject(),a.detail=0,a.screenX=d,a.screenY=e,a.clientX=d,a.clientY=e,a.ctrlKey=!1,a.altKey=!1,a.shiftKey=!1,a.metaKey=!1,a.button=1,f.fireEvent(\"on\"+c,a));return!0} var eventMatchers={HTMLEvents:/^(?:load|unload|abort|errorLogger|select|change|submit|reset|focus|blur|resize|scroll)$/,MouseEvents:/^(?:click|dblclick|mouse(?:down|up|over|move|out))$/}; " +
@@ -399,7 +479,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     	
     	for (int i = 0; i < elements.size(); i++) {
     		// frame set to null as we expect the frames are searched in the parent element
-    		htmlElements.add(new HtmlElement("", childBy, null, this, i));
+    		htmlElements.add(new HtmlElement("", childBy, this, i));
     	}
     	return htmlElements;
     }
@@ -794,7 +874,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
      * @return
      */
 	@ReplayOnError
-    public String getAttribute(final String name) {
+    public String getAttribute(String name) {
         findElement(false, false);
 
         return element.getAttribute(name);
@@ -818,7 +898,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
      */
     @Override
     @ReplayOnError
-    public String getCssValue(final String propertyName) {
+    public String getCssValue(String propertyName) {
         findElement(false, false);
 
         return element.getCssValue(propertyName);
@@ -863,7 +943,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
      */
     @ReplayOnError
     @Deprecated
-    public String getEval(final String script) {
+    public String getEval(String script) {
         findElement(false, false);
         
         return (String) ((JavascriptExecutor) driver).executeScript(script, element);
@@ -1064,7 +1144,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
      *
      * @return
      */
-    public boolean isTextPresent(final String pattern) {
+    public boolean isTextPresent(String pattern) {
         String text = getText();
         return text != null && (text.contains(pattern) || text.matches(pattern));
     }
@@ -1104,7 +1184,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     	sendKeys(true, keysToSend);
     }
     
-    public void sendKeys(final boolean blurAfter, CharSequence... keysToSend) {
+    public void sendKeys(boolean blurAfter, CharSequence... keysToSend) {
     	// Appium seems to clear field before writing
     	if (SeleniumTestsContextManager.getThreadContext().getTestType().family() == TestType.APP) {
     		sendKeys(false, blurAfter, keysToSend);
@@ -1143,7 +1223,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
      * @param   keysToSend	write this text
      */
     @ReplayOnError
-    public void sendKeys(final boolean clear, final boolean blurAfter, CharSequence... keysToSend) {
+    public void sendKeys(boolean clear, boolean blurAfter, CharSequence... keysToSend) {
         findElement(true);
         
         if (clear) {
@@ -1166,7 +1246,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     /**
      * Method, which should never be used.
      */
-    protected void sleep(final int waitTime) throws InterruptedException {
+    protected void sleep(int waitTime) throws InterruptedException {
         Thread.sleep(waitTime);
     }
     
@@ -1380,7 +1460,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
      * @param timeout	timeout in seconds
      */
     @ReplayOnError
-    public void waitForPresent(final int timeout) {
+    public void waitForPresent(int timeout) {
     	
     	// refresh driver
     	driver = updateDriver();

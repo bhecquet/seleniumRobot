@@ -44,6 +44,6 @@ import java.lang.annotation.Target;
 @Retention(java.lang.annotation.RetentionPolicy.RUNTIME)
 @Target(METHOD)
 public @interface ReplayOnError {
-	public int replayDelayMs() default 100;
+	public int replayDelayMs() default 300;
 	public int replayTimes() default -1;
 }

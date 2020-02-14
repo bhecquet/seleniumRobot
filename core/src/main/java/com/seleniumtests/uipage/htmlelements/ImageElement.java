@@ -21,28 +21,40 @@ import org.openqa.selenium.By;
 
 public class ImageElement extends HtmlElement {
 
-    public ImageElement(final String label, final By by) {
+	public ImageElement(final String label, final By by) {
         super(label, by);
+    }
+
+    public ImageElement(final String label, final By by, final Integer index) {
+    	super(label, by, index);
+    }
+    
+    public ImageElement(final String label, final By by, final Integer index, Integer replayTimeout) {
+    	super(label, by, index, replayTimeout);
     }
     
     public ImageElement(final String label, final By by, final HtmlElement parent) {
     	super(label, by, parent);
     }
-
+    
     public ImageElement(final String label, final By by, final HtmlElement parent, final Integer index) {
     	super(label, by, parent, index);
     }
     
-    public ImageElement(final String label, final By by, final Integer index) {
-    	super(label, by, index);
+    public ImageElement(final String label, final By by, final HtmlElement parent, final Integer index, Integer replayTimeout) {
+    	super(label, by, parent, index, replayTimeout);
     }
-    
+     
     public ImageElement(final String label, final By by, final FrameElement frame) {
     	super(label, by, frame);
     }
     
     public ImageElement(final String label, final By by, final FrameElement frame, final Integer index) {
     	super(label, by, frame, index);
+    }
+    
+    public ImageElement(final String label, final By by, final FrameElement frame, final Integer index, Integer replayTimeout) {
+    	super(label, by, frame, index, replayTimeout);
     }
 
     public String getUrl() {

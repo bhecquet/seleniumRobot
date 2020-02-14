@@ -36,7 +36,11 @@ import io.appium.java_client.ios.IOSTouchAction;
  */
 public abstract class Element {
 
+
+	protected Integer replayTimeout = 30;
+	
 	protected abstract void findElement(boolean waitForVisibility);
+	
 	
 	/**
 	 * Creates a TouchAction depending on mobile platform. Due to appium 6.0.0 changes
@@ -77,4 +81,19 @@ public abstract class Element {
     	
     	return (PerformsTouchActions) driver.getWebDriver();    	
     }
+
+
+	public int getReplayTimeout() {
+
+    	if (replayTimeout != null) {
+    		return replayTimeout;
+    	} else {
+    		return SeleniumTestsContextManager.getThreadContext().getReplayTimeout();
+    	}
+	}
+
+
+	public void setReplayTimeout(int replayTimeout) {
+		this.replayTimeout = replayTimeout;
+	}
 }

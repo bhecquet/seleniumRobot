@@ -23,28 +23,40 @@ import com.seleniumtests.uipage.ReplayOnError;
 
 public class CheckBoxElement extends HtmlElement {
 
-    public CheckBoxElement(final String label, final By by) {
+	public CheckBoxElement(final String label, final By by) {
         super(label, by);
-    }
-    
-    public CheckBoxElement(final String label, final By by, final HtmlElement parent) {
-    	super(label, by, parent);
-    }
-
-    public CheckBoxElement(final String label, final By by, final HtmlElement parent, final Integer index) {
-    	super(label, by, parent, index);
     }
 
     public CheckBoxElement(final String label, final By by, final Integer index) {
     	super(label, by, index);
     }
     
+    public CheckBoxElement(final String label, final By by, final Integer index, Integer replayTimeout) {
+    	super(label, by, index, replayTimeout);
+    }
+    
+    public CheckBoxElement(final String label, final By by, final HtmlElement parent) {
+    	super(label, by, parent);
+    }
+    
+    public CheckBoxElement(final String label, final By by, final HtmlElement parent, final Integer index) {
+    	super(label, by, parent, index);
+    }
+    
+    public CheckBoxElement(final String label, final By by, final HtmlElement parent, final Integer index, Integer replayTimeout) {
+    	super(label, by, parent, index, replayTimeout);
+    }
+     
     public CheckBoxElement(final String label, final By by, final FrameElement frame) {
     	super(label, by, frame);
     }
     
     public CheckBoxElement(final String label, final By by, final FrameElement frame, final Integer index) {
     	super(label, by, frame, index);
+    }
+    
+    public CheckBoxElement(final String label, final By by, final FrameElement frame, final Integer index, Integer replayTimeout) {
+    	super(label, by, frame, index, replayTimeout);
     }
 
     public void check() {

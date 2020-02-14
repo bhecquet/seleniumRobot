@@ -83,7 +83,6 @@ public class ReplayAction {
 			+ "&& execution(@com.seleniumtests.uipage.ReplayOnError public * * (..)) && @annotation(replay)")
     public Object replayHtmlElement(ProceedingJoinPoint joinPoint, ReplayOnError replay) throws Throwable {
 
-		Instant end = systemClock.instant().plusSeconds(SeleniumTestsContextManager.getThreadContext().getReplayTimeout());
     	Object reply = null;
 
     	
@@ -93,10 +92,12 @@ public class ReplayAction {
     	HtmlElement element = (HtmlElement)joinPoint.getTarget();
     	element.setDriver(WebUIDriver.getWebDriver(false));
 		String targetName = joinPoint.getTarget().toString();
+		
+		Instant end = systemClock.instant().plusSeconds(element.getReplayTimeout());
     	
 		TestAction currentAction = null;
     	String methodName = joinPoint.getSignature().getName();
-    	if (methodName != "getCoordinates") {
+    	if (!methodName.equals("getCoordinates")) {
     		List<String> pwdToReplace = new ArrayList<>();
     		String actionName = String.format("%s on %s %s", methodName, targetName, LogAction.buildArgString(joinPoint, pwdToReplace, new HashMap<>()));
     		currentAction = new TestAction(actionName, false, pwdToReplace);

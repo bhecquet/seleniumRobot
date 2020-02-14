@@ -24,6 +24,14 @@ public class ButtonElement extends HtmlElement {
     public ButtonElement(final String label, final By by) {
         super(label, by);
     }
+
+    public ButtonElement(final String label, final By by, final Integer index) {
+    	super(label, by, index);
+    }
+    
+    public ButtonElement(final String label, final By by, final Integer index, Integer replayTimeout) {
+    	super(label, by, index, replayTimeout);
+    }
     
     public ButtonElement(final String label, final By by, final HtmlElement parent) {
     	super(label, by, parent);
@@ -33,16 +41,20 @@ public class ButtonElement extends HtmlElement {
     	super(label, by, parent, index);
     }
     
-    public ButtonElement(final String label, final By by, final Integer index) {
-    	super(label, by, index);
+    public ButtonElement(final String label, final By by, final HtmlElement parent, final Integer index, Integer replayTimeout) {
+    	super(label, by, parent, index, replayTimeout);
     }
-    
+     
     public ButtonElement(final String label, final By by, final FrameElement frame) {
     	super(label, by, frame);
     }
     
     public ButtonElement(final String label, final By by, final FrameElement frame, final Integer index) {
     	super(label, by, frame, index);
+    }
+    
+    public ButtonElement(final String label, final By by, final FrameElement frame, final Integer index, Integer replayTimeout) {
+    	super(label, by, frame, index, replayTimeout);
     }
 
     @Override

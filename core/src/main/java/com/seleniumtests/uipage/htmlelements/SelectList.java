@@ -58,28 +58,40 @@ public class SelectList extends HtmlElement {
 	 * @param text
 	 * @param by
 	 */
-    public SelectList(final String text, final By by) {
-        super(text, by);
+	public SelectList(final String label, final By by) {
+        super(label, by);
+    }
+
+    public SelectList(final String label, final By by, final Integer index) {
+    	super(label, by, index);
+    }
+    
+    public SelectList(final String label, final By by, final Integer index, Integer replayTimeout) {
+    	super(label, by, index, replayTimeout);
     }
     
     public SelectList(final String label, final By by, final HtmlElement parent) {
     	super(label, by, parent);
     }
-
+    
     public SelectList(final String label, final By by, final HtmlElement parent, final Integer index) {
     	super(label, by, parent, index);
     }
-     
-    public SelectList(final String label, final By by, final Integer index) {
-    	super(label, by, index);
-    }
     
+    public SelectList(final String label, final By by, final HtmlElement parent, final Integer index, Integer replayTimeout) {
+    	super(label, by, parent, index, replayTimeout);
+    }
+     
     public SelectList(final String label, final By by, final FrameElement frame) {
     	super(label, by, frame);
     }
     
     public SelectList(final String label, final By by, final FrameElement frame, final Integer index) {
     	super(label, by, frame, index);
+    }
+    
+    public SelectList(final String label, final By by, final FrameElement frame, final Integer index, Integer replayTimeout) {
+    	super(label, by, frame, index, replayTimeout);
     }
 
     @Override

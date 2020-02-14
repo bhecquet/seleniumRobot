@@ -2,9 +2,9 @@
 
 
 	<difference>
-		<className>**/uipage/htmlelements/SelectList</className>
-		<differenceType>6001</differenceType>
-		<field>select</field>
+		<className>**/uipage/htmlelements/DatePickerElement</className>
+		<differenceType>7005</differenceType>
+		<method>DatePickerElement(java.lang.String, org.openqa.selenium.By, com.seleniumtests.uipage.htmlelements.FrameElement, com.seleniumtests.uipage.htmlelements.HtmlElement, java.lang.Integer)</method>
 		<justification>internal use</justification>
 	</difference>
 </differences>
