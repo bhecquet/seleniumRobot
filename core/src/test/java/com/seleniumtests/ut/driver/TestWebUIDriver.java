@@ -69,7 +69,10 @@ public class TestWebUIDriver extends MockitoTest {
 	private VideoRecorder videoRecorder;
 	
 	@Mock
-	private CustomEventFiringWebDriver eventDriver;
+	private CustomEventFiringWebDriver eventDriver1;
+	
+	@Mock
+	private CustomEventFiringWebDriver eventDriver2;
 	
 	@Mock
 	private SeleniumGridConnector gridConnector;
@@ -346,10 +349,10 @@ public class TestWebUIDriver extends MockitoTest {
 		SeleniumTestsContextManager.getThreadContext().setCaptureNetwork(true);
 		SeleniumTestsContextManager.getThreadContext().setBrowser("htmlunit");
 		WebUIDriver uiDriver = WebUIDriverFactory.getInstance("foo");
-		uiDriver.setDriver(eventDriver);
+		uiDriver.setDriver(eventDriver1);
 
 		WebUIDriver.cleanUp();
-		verify(eventDriver).quit();
+		verify(eventDriver1).quit();
 		Assert.assertNull(uiDriver.getDriver());	
 	}
 	
@@ -377,11 +380,11 @@ public class TestWebUIDriver extends MockitoTest {
 		SeleniumTestsContextManager.getThreadContext().setCaptureNetwork(true);
 		SeleniumTestsContextManager.getThreadContext().setBrowser("htmlunit");
 		WebUIDriver uiDriver = WebUIDriverFactory.getInstance("foo");
-		uiDriver.setDriver(eventDriver);
-		doThrow(new WebDriverException("error")).when(eventDriver).quit();
+		uiDriver.setDriver(eventDriver1);
+		doThrow(new WebDriverException("error")).when(eventDriver1).quit();
 		
 		WebUIDriver.cleanUp();
-		verify(eventDriver).quit();
+		verify(eventDriver1).quit();
 		Assert.assertNull(uiDriver.getDriver());	
 	}
 	
@@ -570,13 +573,13 @@ public class TestWebUIDriver extends MockitoTest {
 		    @Override
 		    public Object answer(InvocationOnMock invocation) throws Throwable {
 		    	WebUIDriver.setCurrentWebUiDriverName("main"); // as we mock driver creation, current driver name is never set
-		        return drv1;
+		        return eventDriver1;
 		    }}).when(WebUIDriver.class, "getWebDriver", eq(true), any(BrowserType.class), eq("main"), eq(null));
 		PowerMockito.doAnswer(new org.mockito.stubbing.Answer<Object>() {
 		    @Override
 		    public Object answer(InvocationOnMock invocation) throws Throwable {
 		    	WebUIDriver.setCurrentWebUiDriverName("app"); // as we mock driver creation, current driver name is never set
-		        return drv2;
+		        return eventDriver2;
 		    }}).when(WebUIDriver.class, "getWebDriver", eq(true), any(BrowserType.class), eq("app"), any());
 		
 		// create a first page. This creates the default driver
@@ -588,9 +591,9 @@ public class TestWebUIDriver extends MockitoTest {
 		// create an other page which sould use the last created driver
 		StubTestPage page3 = new StubTestPage();
 		
-		Assert.assertEquals(page1.getDriver(), drv1);
-		Assert.assertEquals(page2.getDriver(), drv2);
-		Assert.assertEquals(page3.getDriver(), drv2); // last page uses the driver created in the previous page
+		Assert.assertEquals(page1.getDriver(), eventDriver1);
+		Assert.assertEquals(page2.getDriver(), eventDriver2);
+		Assert.assertEquals(page3.getDriver(), eventDriver2); // last page uses the driver created in the previous page
 	}
 	
 	/**
