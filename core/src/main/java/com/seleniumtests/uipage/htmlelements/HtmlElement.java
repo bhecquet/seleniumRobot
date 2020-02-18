@@ -712,7 +712,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     	
 		WebElement seleniumElement;
     	try {
-	    	if (elementIndex == null || elementIndex == 0) {
+	    	if (elementIndex == null) {
 	    		seleniumElement = context.findElement(by);
 	    	} else {
 	    		seleniumElement = getElementByIndex(context.findElements(by));
