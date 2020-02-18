@@ -1430,6 +1430,7 @@ public class TestSeleniumTestContext extends GenericTest {
 	@Test(groups="ut context")
 	public void testTestTypeDesktopWeb(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setApp(null); // to override parameter from exampleConfigGenericParams
 		SeleniumTestsContextManager.getThreadContext().setPlatform("Windows 10");
 		SeleniumTestsContextManager.getThreadContext().setBrowser("firefox");
 		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getTestType(), TestType.WEB);
@@ -1438,6 +1439,7 @@ public class TestSeleniumTestContext extends GenericTest {
 	@Test(groups="ut context")
 	public void testTestTypeAndroidWebFirefox(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setApp(null); // to override parameter from exampleConfigGenericParams
 		SeleniumTestsContextManager.getThreadContext().setPlatform("Android 10.0");
 		SeleniumTestsContextManager.getThreadContext().setBrowser("chrome");
 		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getTestType(), TestType.APPIUM_WEB_ANDROID);
@@ -1446,6 +1448,8 @@ public class TestSeleniumTestContext extends GenericTest {
 	@Test(groups="ut context")
 	public void testTestTypeAndroidWebBrowser(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		initThreadContext(testNGCtx);
+
+		SeleniumTestsContextManager.getThreadContext().setApp(null); // to override parameter from exampleConfigGenericParams
 		SeleniumTestsContextManager.getThreadContext().setPlatform("Android 10.0");
 		SeleniumTestsContextManager.getThreadContext().setBrowser("browser");
 		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getTestType(), TestType.APPIUM_WEB_ANDROID);
@@ -1475,6 +1479,7 @@ public class TestSeleniumTestContext extends GenericTest {
 	@Test(groups="ut context")
 	public void testTestTypeAndroidInstalledApp(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setApp(null); // to override parameter from exampleConfigGenericParams
 		SeleniumTestsContextManager.getThreadContext().setPlatform("Android 10.0");
 		SeleniumTestsContextManager.getThreadContext().setAppPackage("com.foo.bar.app");
 		SeleniumTestsContextManager.getThreadContext().setAppActivity("activity");
@@ -1485,6 +1490,7 @@ public class TestSeleniumTestContext extends GenericTest {
 	@Test(groups="ut context")
 	public void testTestTypeIOSWebSafari(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setApp(null); // to override parameter from exampleConfigGenericParams
 		SeleniumTestsContextManager.getThreadContext().setPlatform("iOS 12.0");
 		SeleniumTestsContextManager.getThreadContext().setBrowser("safari");
 		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getTestType(), TestType.APPIUM_WEB_IOS);
@@ -1512,6 +1518,7 @@ public class TestSeleniumTestContext extends GenericTest {
 	@Test(groups="ut context")
 	public void testTestTypeIOSInstalledApp(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setApp(null); // to override parameter from exampleConfigGenericParams
 		SeleniumTestsContextManager.getThreadContext().setPlatform("iOS 12.0");
 		SeleniumTestsContextManager.getThreadContext().updateTestAndMobile(SeleniumTestsContextManager.getThreadContext().getPlatform());
 		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getTestType(), TestType.APPIUM_APP_IOS);
