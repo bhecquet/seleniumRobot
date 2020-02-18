@@ -19,6 +19,7 @@ package com.seleniumtests.it.driver;
 
 import java.awt.AWTException;
 import java.io.File;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -492,6 +493,17 @@ public class TestDriver extends GenericMultiBrowserTest {
 			Assert.assertTrue(new HtmlElement("", By.id("newEl")).isElementPresent(4));
 		} finally {
 			DriverTestPage.delayButtonReset.click();
+		}
+	}
+	
+	@Test(groups={"it", "ut"}, expectedExceptions = NoSuchElementException.class)
+	public void testElementNotPresent() {	
+		LocalDateTime start = LocalDateTime.now();
+		try {
+			new HtmlElement("element", By.id("notPresent"), (Integer)null, 5).getValue();
+		} finally {
+			Assert.assertTrue(LocalDateTime.now().minusSeconds(7).isBefore(start));
+			Assert.assertTrue(LocalDateTime.now().minusSeconds(4).isAfter(start));
 		}
 	}
 

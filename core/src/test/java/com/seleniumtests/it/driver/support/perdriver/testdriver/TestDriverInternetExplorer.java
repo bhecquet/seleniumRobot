@@ -21,6 +21,7 @@ import java.awt.AWTException;
 import java.awt.event.KeyEvent;
 import java.util.Arrays;
 
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.UnhandledAlertException;
 import org.testng.annotations.Test;
 
@@ -118,6 +119,11 @@ public class TestDriverInternetExplorer extends TestDriver {
 	@Test(groups={"it", "ut"})
 	public void testFindElements() {
 		super.testFindElements();
+	}
+	
+	@Test(groups={"it", "ut"}, expectedExceptions = NoSuchElementException.class)
+	public void testElementNotPresent() {
+		super.testElementNotPresent();
 	}
 
 	@Test(groups={"it", "ut"})
