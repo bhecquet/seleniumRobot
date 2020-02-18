@@ -278,7 +278,7 @@
 	              </dependency>
 				</dependencies>
 		        <configuration>
-		        	<failOnError>false</failOnError>
+		        	<skip>true</skip>
         			<ignoredDifferencesFile>${project.build.directory}/classes/clirr-differences.xml</ignoredDifferencesFile>
         			<includes>
         				<include>com/seleniumtests/connectors/db/**</include>
