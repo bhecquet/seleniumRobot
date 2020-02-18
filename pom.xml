@@ -85,7 +85,7 @@
 		<sonar.jacoco.itReportPath>${project.build.directory}/coverage-reports/jacoco-it.exec</sonar.jacoco.itReportPath>
 		<surefireArgLine>-javaagent:${settings.localRepository}/org/jacoco/org.jacoco.agent/${jacoco.version}/org.jacoco.agent-${jacoco.version}-runtime.jar=destfile=${project.build.directory}/coverage-reports/jacoco-ut.exec</surefireArgLine>
 		<failsafeArgLine>-javaagent:${settings.localRepository}/org/jacoco/org.jacoco.agent/${jacoco.version}/org.jacoco.agent-${jacoco.version}-runtime.jar=destfile=${project.build.directory}/coverage-reports/jacoco-it.exec</failsafeArgLine>
-		<powermock.version>1.7.4</powermock.version>
+		<powermock.version>2.0.5</powermock.version>
 	</properties>
 
 	<dependencyManagement>
