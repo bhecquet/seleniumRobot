@@ -44,6 +44,7 @@ import org.mockito.Spy;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.NotFoundException;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.WebDriver.TargetLocator;
 import org.openqa.selenium.WebDriverException;
@@ -123,12 +124,8 @@ public class TestHtmlElement extends MockitoTest {
 	@Spy
 	private HtmlElement el = new HtmlElement("element", By.id("el"));
 	private HtmlElement el1 = new HtmlElement("element", By.id("el1"), el);
-	private HtmlElement elNotPresent = new HtmlElement("element", By.id("notPresent"));
-	private HtmlElement elNotPresent2 = new HtmlElement("element", By.id("notPresent"), (Integer)null, 5);
 	
 	// issue #325
-	private HtmlElement elNotPresent3 = new HtmlElement("element", By.id("notPresent"), 0, 3);
-	private HtmlElement elNotPresent4 = new HtmlElement("element", By.id("notPresent"), 1, 3);
 
 	private EventFiringWebDriver eventDriver;
 
@@ -153,7 +150,6 @@ public class TestHtmlElement extends MockitoTest {
 		
 		// TODO: We should throw NoSuchElementException but for some odd reason, the exception is not caught by 'catch (WebDriverException e) {}' block in
 		//	ReplayAction.java even if NoSuchElementException is a sub-class of WebDriverException. However, this works well when error is raised by a real driver.
-		when(driver.findElement(By.id("notPresent"))).thenThrow(new WebDriverException("Unable to locate element with ID: 'notPresent'"));
 		when(driver.findElements(By.name("subEl"))).thenReturn(subElList);
 		when(driver.findElement(By.name("subEl"))).thenReturn(subElement1);
 		when(driver.findElements(By.id("el"))).thenReturn(elList);
@@ -518,10 +514,12 @@ public class TestHtmlElement extends MockitoTest {
 
 	@Test(groups = { "ut" })
 	public void testElementNotFoundDefaultTimeout() throws Exception {
+		HtmlElement elNotPresent = new HtmlElement("element", By.id("notPresent"));
+		when(driver.findElement(By.id("notPresent"))).thenThrow(new NoSuchElementException("Unable to locate element with ID: 'notPresent'"));
 		LocalDateTime start = LocalDateTime.now();
 		try {
 			elNotPresent.getValue();
-		} catch (WebDriverException e) {
+		} catch (NoSuchElementException e) {
 
 		}
 		Assert.assertTrue(LocalDateTime.now().minusSeconds(29).isAfter(start));
@@ -529,6 +527,8 @@ public class TestHtmlElement extends MockitoTest {
 	
 	@Test(groups = { "ut" })
 	public void testElementNotFoundLowTimeout() throws Exception {
+		HtmlElement elNotPresent2 = new HtmlElement("element", By.id("notPresent"), (Integer)null, 5);
+		when(driver.findElement(By.id("notPresent"))).thenThrow(new NoSuchElementException("Unable to locate element with ID: 'notPresent'"));
 		LocalDateTime start = LocalDateTime.now();
 		try {
 			elNotPresent2.getValue();
@@ -539,22 +539,14 @@ public class TestHtmlElement extends MockitoTest {
 		Assert.assertTrue(LocalDateTime.now().minusSeconds(4).isAfter(start));
 	}
 
-	/**
-	 * issue #325: check NoSuchElementException exception is raised with index 0
-	 * @throws Exception
-	 */
-	@Test(groups = { "ut" }, expectedExceptions = NoSuchElementException.class)
-	public void testElementNotFoundWithIndex() throws Exception {
-		elNotPresent3.getValue();
-	}
 	
-	/**
-	 * issue #325: check NoSuchElementException exception is raised with index > 0
-	 * @throws Exception
-	 */
-	@Test(groups = { "ut" }, expectedExceptions = NoSuchElementException.class)
-	public void testElementNotFoundWithIndex1() throws Exception {
-		elNotPresent4.getValue();
-	}
-
+	
+	
+	
+	
+	
+	
+	
+	
 }
+	
