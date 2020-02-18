@@ -522,13 +522,13 @@ public class SeleniumTestsContext {
      */
     private void configureTestType() {
     	if (getPlatform().toLowerCase().startsWith("android")) {
-        	if (getApp().isEmpty()) { // a browser name should be defined
+        	if (getApp().isEmpty() && getAppActivity() == null) { // a browser name should be defined
         		setTestType(TestType.APPIUM_WEB_ANDROID);
         	} else {
         		setTestType(TestType.APPIUM_APP_ANDROID);
         	}
         } else if (getPlatform().toLowerCase().startsWith("ios")) {
-        	if (getApp().isEmpty()) { // a browser name should be defined
+        	if (getApp().isEmpty() && getBrowser() != BrowserType.NONE) { // a browser name should be defined
         		setTestType(TestType.APPIUM_WEB_IOS);
         	} else {
         		setTestType(TestType.APPIUM_APP_IOS);

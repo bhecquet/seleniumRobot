@@ -41,6 +41,7 @@ import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.DriverExceptionListener;
 import com.seleniumtests.driver.DriverMode;
+import com.seleniumtests.driver.TestType;
 import com.seleniumtests.driver.screenshots.VideoCaptureMode;
 import com.seleniumtests.reporter.logger.ArchiveMode;
 import com.seleniumtests.reporter.reporters.JUnitReporter;
@@ -1424,6 +1425,104 @@ public class TestSeleniumTestContext extends GenericTest {
 		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), 
 				Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "myTest-1").toString().replace(File.separator, "/"));
 		
+	}
+	
+	@Test(groups="ut context")
+	public void testTestTypeDesktopWeb(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setPlatform("Windows 10");
+		SeleniumTestsContextManager.getThreadContext().setBrowser("firefox");
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getTestType(), TestType.WEB);
+	}
+	
+	@Test(groups="ut context")
+	public void testTestTypeAndroidWebFirefox(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setPlatform("Android 10.0");
+		SeleniumTestsContextManager.getThreadContext().setBrowser("chrome");
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getTestType(), TestType.APPIUM_WEB_ANDROID);
+	}
+	
+	@Test(groups="ut context")
+	public void testTestTypeAndroidWebBrowser(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setPlatform("Android 10.0");
+		SeleniumTestsContextManager.getThreadContext().setBrowser("browser");
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getTestType(), TestType.APPIUM_WEB_ANDROID);
+	}
+	
+	/**
+	 * APK path is given so that it can be installed
+	 * @param testNGCtx
+	 * @param xmlTest
+	 */
+	@Test(groups="ut context")
+	public void testTestTypeAndroidAppFromApk(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setPlatform("Android 10.0");
+		SeleniumTestsContextManager.getThreadContext().setApp("myapp.apk");
+		SeleniumTestsContextManager.getThreadContext().setAppPackage("com.foo.bar.app");
+		SeleniumTestsContextManager.getThreadContext().setAppActivity("activity");
+		SeleniumTestsContextManager.getThreadContext().updateTestAndMobile(SeleniumTestsContextManager.getThreadContext().getPlatform());
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getTestType(), TestType.APPIUM_APP_ANDROID);
+	}
+	
+	/**
+	 * issue #326: APK path is not given, we want to use an already installed application. Only package is defined
+	 * @param testNGCtx
+	 * @param xmlTest
+	 */
+	@Test(groups="ut context")
+	public void testTestTypeAndroidInstalledApp(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setPlatform("Android 10.0");
+		SeleniumTestsContextManager.getThreadContext().setAppPackage("com.foo.bar.app");
+		SeleniumTestsContextManager.getThreadContext().setAppActivity("activity");
+		SeleniumTestsContextManager.getThreadContext().updateTestAndMobile(SeleniumTestsContextManager.getThreadContext().getPlatform());
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getTestType(), TestType.APPIUM_APP_ANDROID);
+	}
+
+	@Test(groups="ut context")
+	public void testTestTypeIOSWebSafari(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setPlatform("iOS 12.0");
+		SeleniumTestsContextManager.getThreadContext().setBrowser("safari");
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getTestType(), TestType.APPIUM_WEB_IOS);
+	}
+	
+	/**
+	 * Application path is given so that it can be installed
+	 * @param testNGCtx
+	 * @param xmlTest
+	 */
+	@Test(groups="ut context")
+	public void testTestTypeIOSAppFromIpa(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setPlatform("iOS 12.0");
+		SeleniumTestsContextManager.getThreadContext().setApp("myapp.ipa");
+		SeleniumTestsContextManager.getThreadContext().updateTestAndMobile(SeleniumTestsContextManager.getThreadContext().getPlatform());
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getTestType(), TestType.APPIUM_APP_IOS);
+	}
+	
+	/**
+	 * APP path is not given, we want to use an already installed application
+	 * @param testNGCtx
+	 * @param xmlTest
+	 */
+	@Test(groups="ut context")
+	public void testTestTypeIOSInstalledApp(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setPlatform("iOS 12.0");
+		SeleniumTestsContextManager.getThreadContext().updateTestAndMobile(SeleniumTestsContextManager.getThreadContext().getPlatform());
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getTestType(), TestType.APPIUM_APP_IOS);
+	}
+	
+	@Test(groups="ut context")
+	public void testTestTypeDesktopNonGui(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setPlatform("Linux");
+		SeleniumTestsContextManager.getThreadContext().setBrowser("none");
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getTestType(), TestType.NON_GUI);
 	}
 	
 	public void myTest() {}
