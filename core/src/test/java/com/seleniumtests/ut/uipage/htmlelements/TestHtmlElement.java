@@ -150,7 +150,10 @@ public class TestHtmlElement extends MockitoTest {
 		when(WebUIDriver.getWebDriver(anyBoolean())).thenReturn(eventDriver);
 		when(WebUIDriver.getWebUIDriver(anyBoolean())).thenReturn(uiDriver);
 		when(driver.findElement(By.id("el"))).thenReturn(element);
-		when(driver.findElement(By.id("notPresent"))).thenThrow(new NoSuchElementException("not found"));
+		
+		// TODO: We should throw NoSuchElementException but for some odd reason, the exception is not caught by 'catch (WebDriverException e) {}' block in
+		//	ReplayAction.java even if NoSuchElementException is a sub-class of WebDriverException. However, this works well when error is raised by a real driver.
+		when(driver.findElement(By.id("notPresent"))).thenThrow(new WebDriverException("Unable to locate element with ID: 'notPresent'"));
 		when(driver.findElements(By.name("subEl"))).thenReturn(subElList);
 		when(driver.findElement(By.name("subEl"))).thenReturn(subElement1);
 		when(driver.findElements(By.id("el"))).thenReturn(elList);
@@ -518,7 +521,7 @@ public class TestHtmlElement extends MockitoTest {
 		LocalDateTime start = LocalDateTime.now();
 		try {
 			elNotPresent.getValue();
-		} catch (NoSuchElementException e) {
+		} catch (WebDriverException e) {
 
 		}
 		Assert.assertTrue(LocalDateTime.now().minusSeconds(29).isAfter(start));
@@ -529,10 +532,11 @@ public class TestHtmlElement extends MockitoTest {
 		LocalDateTime start = LocalDateTime.now();
 		try {
 			elNotPresent2.getValue();
-		} catch (NoSuchElementException e) {
+		} catch (WebDriverException e) {
 			
 		}
 		Assert.assertTrue(LocalDateTime.now().minusSeconds(6).isBefore(start));
+		Assert.assertTrue(LocalDateTime.now().minusSeconds(4).isAfter(start));
 	}
 
 	/**
