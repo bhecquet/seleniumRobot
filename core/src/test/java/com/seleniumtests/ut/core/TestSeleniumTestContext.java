@@ -1510,20 +1510,6 @@ public class TestSeleniumTestContext extends GenericTest {
 		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getTestType(), TestType.APPIUM_APP_IOS);
 	}
 	
-	/**
-	 * APP path is not given, we want to use an already installed application
-	 * @param testNGCtx
-	 * @param xmlTest
-	 */
-	@Test(groups="ut context")
-	public void testTestTypeIOSInstalledApp(final ITestContext testNGCtx, final XmlTest xmlTest) {
-		initThreadContext(testNGCtx);
-		SeleniumTestsContextManager.getThreadContext().setApp(null); // to override parameter from exampleConfigGenericParams
-		SeleniumTestsContextManager.getThreadContext().setPlatform("iOS 12.0");
-		SeleniumTestsContextManager.getThreadContext().updateTestAndMobile(SeleniumTestsContextManager.getThreadContext().getPlatform());
-		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getTestType(), TestType.APPIUM_APP_IOS);
-	}
-	
 	@Test(groups="ut context")
 	public void testTestTypeDesktopNonGui(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		initThreadContext(testNGCtx);
