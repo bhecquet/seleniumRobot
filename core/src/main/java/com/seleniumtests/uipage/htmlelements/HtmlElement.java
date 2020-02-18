@@ -712,7 +712,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     	
 		WebElement seleniumElement;
     	try {
-	    	if (elementIndex == null) {
+	    	if (elementIndex == null || elementIndex == 0) {
 	    		seleniumElement = context.findElement(by);
 	    	} else {
 	    		seleniumElement = getElementByIndex(context.findElements(by));
@@ -744,7 +744,11 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 			if (elementIndex == null) {
 				elementIndex = 0;
 			}
-			return allElements.get(elementIndex);
+			try {
+				return allElements.get(elementIndex);
+			} catch (IndexOutOfBoundsException e) {
+				throw new NoSuchElementException(String.format("No element found for locator %s with index %d", by.toString(), elementIndex));
+			}
 		}
     }
     

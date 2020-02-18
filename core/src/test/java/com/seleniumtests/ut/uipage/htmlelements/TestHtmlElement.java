@@ -125,6 +125,10 @@ public class TestHtmlElement extends MockitoTest {
 	private HtmlElement el1 = new HtmlElement("element", By.id("el1"), el);
 	private HtmlElement elNotPresent = new HtmlElement("element", By.id("notPresent"));
 	private HtmlElement elNotPresent2 = new HtmlElement("element", By.id("notPresent"), (Integer)null, 5);
+	
+	// issue #325
+	private HtmlElement elNotPresent3 = new HtmlElement("element", By.id("notPresent"), 0, 3);
+	private HtmlElement elNotPresent4 = new HtmlElement("element", By.id("notPresent"), 1, 3);
 
 	private EventFiringWebDriver eventDriver;
 
@@ -529,6 +533,24 @@ public class TestHtmlElement extends MockitoTest {
 			
 		}
 		Assert.assertTrue(LocalDateTime.now().minusSeconds(6).isBefore(start));
+	}
+
+	/**
+	 * issue #325: check NoSuchElementException exception is raised with index 0
+	 * @throws Exception
+	 */
+	@Test(groups = { "ut" }, expectedExceptions = NoSuchElementException.class)
+	public void testElementNotFoundWithIndex() throws Exception {
+		elNotPresent3.getValue();
+	}
+	
+	/**
+	 * issue #325: check NoSuchElementException exception is raised with index > 0
+	 * @throws Exception
+	 */
+	@Test(groups = { "ut" }, expectedExceptions = NoSuchElementException.class)
+	public void testElementNotFoundWithIndex1() throws Exception {
+		elNotPresent4.getValue();
 	}
 
 }
