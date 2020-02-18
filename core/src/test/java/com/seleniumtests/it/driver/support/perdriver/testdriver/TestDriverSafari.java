@@ -19,6 +19,7 @@ package com.seleniumtests.it.driver.support.perdriver.testdriver;
 
 import java.awt.AWTException;
 
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.UnhandledAlertException;
 import org.testng.annotations.Test;
 
@@ -108,6 +109,11 @@ public class TestDriverSafari extends TestDriver {
 	@Test(groups={"it", "ut"})
 	public void testOnBlur() {
 		super.testOnBlur();
+	}
+
+	@Test(groups={"it", "ut"}, expectedExceptions = NoSuchElementException.class)
+	public void testElementNotPresent() {
+		super.testElementNotPresent();
 	}
 	
 	@Test(groups={"it", "ut"})
