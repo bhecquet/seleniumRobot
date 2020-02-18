@@ -63,6 +63,8 @@ SeleniumRobot uses AspectJ extensively to avoid writing too many times the same 
 
 This is directly handled by maven during build (and by your favourite IDE with appropriate plugins)
 
+for debugging aspects inside eclipse, go to 'Window' -> 'Preferences' -> 'AspectJ compiler' and tick 'no inline'
+
 #### aspect and dynamic compilation ####
 
 For Selenium IDE execution feature, the generated code had to be compiled and woven with seleniumRobot aspects so that no feature are lost. For this to work, 
