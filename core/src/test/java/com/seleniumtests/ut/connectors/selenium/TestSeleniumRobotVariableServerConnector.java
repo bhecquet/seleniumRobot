@@ -219,7 +219,7 @@ public class TestSeleniumRobotVariableServerConnector extends ConnectorsTest {
 		TestVariable existingVariable = new TestVariable(12, "key", "value", false, TestVariable.TEST_VARIABLE_PREFIX + "key");
 		TestVariable variable = connector.upsertVariable(existingVariable, true);
 		
-		PowerMockito.verifyStatic();
+		PowerMockito.verifyStatic(Unirest.class);
 		Unirest.patch(ArgumentMatchers.contains(SeleniumRobotVariableServerConnector.VARIABLE_API_URL));
 		
 		Assert.assertEquals(variable.getValue(), "value");
@@ -249,7 +249,7 @@ public class TestSeleniumRobotVariableServerConnector extends ConnectorsTest {
 		TestVariable existingVariable = new TestVariable(12, "key", "value", false, "key");
 		TestVariable variable = connector.upsertVariable(existingVariable, true);
 		
-		PowerMockito.verifyStatic();
+		PowerMockito.verifyStatic(Unirest.class);
 		Unirest.post(ArgumentMatchers.contains(SeleniumRobotVariableServerConnector.VARIABLE_API_URL));
 		
 		Assert.assertEquals(variable.getValue(), "value");
@@ -263,7 +263,7 @@ public class TestSeleniumRobotVariableServerConnector extends ConnectorsTest {
 		TestVariable existingVariable = new TestVariable("key", "value");
 		TestVariable variable = connector.upsertVariable(existingVariable, true);
 		
-		PowerMockito.verifyStatic();
+		PowerMockito.verifyStatic(Unirest.class);
 		Unirest.post(ArgumentMatchers.contains(SeleniumRobotVariableServerConnector.VARIABLE_API_URL));
 		
 		Assert.assertEquals(variable.getValue(), "value");
@@ -291,7 +291,7 @@ public class TestSeleniumRobotVariableServerConnector extends ConnectorsTest {
 		connector.unreserveVariables(variables);
 		
 		// only one dereservation should be called
-		PowerMockito.verifyStatic();
+		PowerMockito.verifyStatic(Unirest.class);
 		Unirest.patch(ArgumentMatchers.contains(String.format(SeleniumRobotVariableServerConnector.EXISTING_VARIABLE_API_URL, 2)));
 	}
 	
@@ -304,7 +304,7 @@ public class TestSeleniumRobotVariableServerConnector extends ConnectorsTest {
 		connector.unreserveVariables(variables);
 		
 		// only one dereservation should be called
-		PowerMockito.verifyStatic(times(0));
+		PowerMockito.verifyStatic(Unirest.class, times(0));
 		Unirest.patch(ArgumentMatchers.contains(String.format(SeleniumRobotVariableServerConnector.EXISTING_VARIABLE_API_URL, 2)));
 	}
 	
