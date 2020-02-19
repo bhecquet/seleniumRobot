@@ -137,7 +137,6 @@ public class ReplayAction {
 		    			element.setScrollToElementBeforeAction(true);
 		    		}
 		    	} catch (WebDriverException e) { 
-		    		
 		    		// don't prevent TimeoutException to be thrown when coming from waitForPresent
 		    		// only check that cause is the not found element and not an other error (NoSucheSessionError for example)
 		    		if ((e instanceof TimeoutException 
@@ -152,9 +151,8 @@ public class ReplayAction {
 	    				throw e;
 		    		}
 	
-		    		if (end.minusMillis(200).isAfter(systemClock.instant())) {
+		    		if (end.minusMillis(replay.replayDelayMs() + 100).isAfter(systemClock.instant())) {
 		    			WaitHelper.waitForMilliSeconds(replay.replayDelayMs());
-						continue;
 					} else {
 						if (e instanceof NoSuchElementException) {
 							throw new NoSuchElementException("Searched element could not be found");
@@ -168,7 +166,6 @@ public class ReplayAction {
 	    	}
 	    	return reply;
 		} catch (Throwable e) {
-
 			if (e instanceof NoSuchElementException 
 					&& joinPoint.getTarget() instanceof HtmlElement
 					&& (joinPoint.getSignature().getName().equals("findElements")
