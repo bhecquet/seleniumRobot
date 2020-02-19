@@ -17,8 +17,6 @@
  */
 package com.seleniumtests.ut.browserfactory;
 
-import static org.mockito.ArgumentMatchers.anyString;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -39,7 +37,6 @@ import org.testng.annotations.Test;
 
 import com.seleniumtests.MockitoTest;
 import com.seleniumtests.browserfactory.BrowserInfo;
-import com.seleniumtests.browserfactory.ChromeCapabilitiesFactory;
 import com.seleniumtests.browserfactory.PhantomJSCapabilitiesFactory;
 import com.seleniumtests.browserfactory.SeleniumRobotCapabilityType;
 import com.seleniumtests.driver.BrowserType;
@@ -65,11 +62,6 @@ public class TestPhantomJSCapabilityFactory extends MockitoTest {
 	
 	@BeforeMethod(groups= {"ut"})
 	public void init() {
-		PowerMockito.mockStatic(System.class);
-		PowerMockito.when(System.getProperty(anyString())).thenCallRealMethod();
-		PowerMockito.when(System.setProperty(anyString(), anyString())).thenCallRealMethod();
-		PowerMockito.when(System.clearProperty(anyString())).thenCallRealMethod();
-		PowerMockito.when(System.getProperty("os.name")).thenReturn("Linux");
 		Mockito.when(config.getDebug()).thenReturn(Arrays.asList(DebugMode.NONE));
 		
 		Map<BrowserType, List<BrowserInfo>> browserInfos = new HashMap<>();

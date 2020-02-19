@@ -17,6 +17,7 @@
  */
 package com.seleniumtests.driver;
 
+import java.awt.AWTError;
 import java.awt.AWTException;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
@@ -796,10 +797,11 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
 	 */
 	private static BufferedImage captureDesktopToBuffer() {
 		
-		Rectangle screenRect = getScreensRectangle();
+		
 		try {
+			Rectangle screenRect = getScreensRectangle();
 			return new Robot().createScreenCapture(screenRect);
-		} catch (AWTException e) {
+		} catch (HeadlessException | AWTError | AWTException e) {
 			throw new ScenarioException("Cannot capture image", e);
 		}
 		

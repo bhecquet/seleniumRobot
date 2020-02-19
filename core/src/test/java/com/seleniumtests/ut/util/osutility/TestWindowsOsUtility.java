@@ -110,7 +110,7 @@ public class TestWindowsOsUtility extends MockitoTest {
 	public void testFirefoxStandardWindowsInstallation() {
 		PowerMockito.mockStatic(OSCommand.class);
 		PowerMockito.mockStatic(Advapi32Util.class);
-		PowerMockito.mockStatic(Paths.class, Mockito.CALLS_REAL_METHODS);
+		PowerMockito.mockStatic(Paths.class);
 		
 		when(Paths.get("C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe")).thenReturn(path);
 		when(path.toFile()).thenReturn(browserFile);
@@ -138,7 +138,7 @@ public class TestWindowsOsUtility extends MockitoTest {
 	public void testFirefoxServerWindowsInstallation() {
 		PowerMockito.mockStatic(OSCommand.class);
 		PowerMockito.mockStatic(Advapi32Util.class);
-		PowerMockito.mockStatic(Paths.class, Mockito.CALLS_REAL_METHODS);
+		PowerMockito.mockStatic(Paths.class);
 		
 		when(Paths.get("C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe")).thenReturn(path);
 		when(path.toFile()).thenReturn(browserFile);
@@ -168,7 +168,7 @@ public class TestWindowsOsUtility extends MockitoTest {
 	public void testSeveralFirefoxInstallations() {
 		PowerMockito.mockStatic(OSCommand.class);
 		PowerMockito.mockStatic(Advapi32Util.class);
-		PowerMockito.mockStatic(Paths.class, Mockito.CALLS_REAL_METHODS);
+		PowerMockito.mockStatic(Paths.class);
 		
 		when(Paths.get("C:\\Program Files (x86)\\Mozilla2 Firefox\\firefox.exe")).thenReturn(path);
 		when(Paths.get("C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe")).thenReturn(path);
@@ -202,7 +202,7 @@ public class TestWindowsOsUtility extends MockitoTest {
 	public void testSeveralFirefoxInstallationsMissingBrowser() {
 		PowerMockito.mockStatic(OSCommand.class);
 		PowerMockito.mockStatic(Advapi32Util.class);
-		PowerMockito.mockStatic(Paths.class, Mockito.CALLS_REAL_METHODS);
+		PowerMockito.mockStatic(Paths.class);
 		
 		when(Paths.get("C:\\Program Files (x86)\\Mozilla2 Firefox\\firefox.exe")).thenReturn(path2);
 		when(Paths.get("C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe")).thenReturn(path);
@@ -238,7 +238,7 @@ public class TestWindowsOsUtility extends MockitoTest {
 	public void testChromeStandardWindowsInstallation() {
 		PowerMockito.mockStatic(OSCommand.class);
 		PowerMockito.mockStatic(Advapi32Util.class);
-		PowerMockito.mockStatic(Paths.class, Mockito.CALLS_REAL_METHODS);
+		PowerMockito.mockStatic(Paths.class);
 
 		when(Paths.get("C:\\Program Files (x86)\\Google_\\Chrome\\Application\\chrome.exe")).thenReturn(path);
 		when(path.toFile()).thenReturn(browserFile);
@@ -293,15 +293,16 @@ public class TestWindowsOsUtility extends MockitoTest {
 	/**
 	 * Issue #308: check we detect chrome beta on its location in registry
 	 * Check also we get 2 chrome instances
+	 * @throws Exception 
 	 */
 	@Test(groups={"ut"})
-	public void testChromeBetaAndStandardWindowsInstallation() {
+	public void testChromeBetaAndStandardWindowsInstallation() throws Exception {
 		PowerMockito.mockStatic(OSCommand.class);
 		PowerMockito.mockStatic(Advapi32Util.class);
-		PowerMockito.mockStatic(Paths.class, Mockito.CALLS_REAL_METHODS);
+		PowerMockito.mockStatic(Paths.class);
 		
-		when(Paths.get("C:\\Program Files (x86)\\Google_\\Chrome\\Application\\chrome.exe")).thenReturn(path);
-		when(Paths.get("C:\\Program Files (x86)\\Google_\\Chrome Beta\\Application\\chrome.exe")).thenReturn(path);
+		PowerMockito.when(Paths.get("C:\\Program Files (x86)\\Google_\\Chrome\\Application\\chrome.exe")).thenReturn(path);
+		PowerMockito.when(Paths.get("C:\\Program Files (x86)\\Google_\\Chrome Beta\\Application\\chrome.exe")).thenReturn(path);
 		when(path.toFile()).thenReturn(browserFile);
 		when(browserFile.exists()).thenReturn(true);
 		
@@ -330,7 +331,7 @@ public class TestWindowsOsUtility extends MockitoTest {
 	public void testChromeBetaNotDiscoveredStandardWindowsInstallation() {
 		PowerMockito.mockStatic(OSCommand.class);
 		PowerMockito.mockStatic(Advapi32Util.class);
-		PowerMockito.mockStatic(Paths.class, Mockito.CALLS_REAL_METHODS);
+		PowerMockito.mockStatic(Paths.class);
 		
 		when(Paths.get("C:\\Program Files (x86)\\Google_\\Chrome\\Application\\chrome.exe")).thenReturn(path);
 		when(Paths.get("C:\\Program Files (x86)\\Google_\\Chrome Beta\\Application\\chrome.exe")).thenReturn(path);
@@ -361,7 +362,7 @@ public class TestWindowsOsUtility extends MockitoTest {
 	public void testChromeNotReallyInstalled() {
 		PowerMockito.mockStatic(OSCommand.class);
 		PowerMockito.mockStatic(Advapi32Util.class);
-		PowerMockito.mockStatic(Paths.class, Mockito.CALLS_REAL_METHODS);
+		PowerMockito.mockStatic(Paths.class);
 		
 		when(Paths.get("C:\\Program Files (x86)\\Google_\\Chrome\\Application\\chrome.exe")).thenReturn(path);
 		when(path.toFile()).thenReturn(browserFile);
@@ -388,7 +389,7 @@ public class TestWindowsOsUtility extends MockitoTest {
 	public void testIEStandardWindowsInstallation() {
 		PowerMockito.mockStatic(OSCommand.class);
 		PowerMockito.mockStatic(Advapi32Util.class);
-		PowerMockito.mockStatic(Paths.class, Mockito.CALLS_REAL_METHODS);
+		PowerMockito.mockStatic(Paths.class);
 		
 		when(Paths.get("C:\\Program Files\\Internet_Explorer\\IEXPLORE.EXE")).thenReturn(path);
 		when(path.toFile()).thenReturn(browserFile);

@@ -66,11 +66,6 @@ public class TestSafariCapabilityFactory extends MockitoTest {
 	
 	@BeforeMethod(groups= {"ut"})
 	public void init() {
-		PowerMockito.mockStatic(System.class);
-		PowerMockito.when(System.getProperty(anyString())).thenCallRealMethod();
-		PowerMockito.when(System.setProperty(anyString(), anyString())).thenCallRealMethod();
-		PowerMockito.when(System.clearProperty(anyString())).thenCallRealMethod();
-		PowerMockito.when(System.getProperty("os.name")).thenReturn("Mac OS X");	
 		
 		Map<BrowserType, List<BrowserInfo>> browserInfos = new HashMap<>();
 		browserInfos.put(BrowserType.SAFARI, Arrays.asList(new BrowserInfo(BrowserType.SAFARI, "7.2", "", false)));

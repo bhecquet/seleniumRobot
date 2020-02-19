@@ -1440,6 +1440,7 @@ public class TestSeleniumTestContext extends GenericTest {
 	public void testTestTypeAndroidWebFirefox(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setApp(null); // to override parameter from exampleConfigGenericParams
+		SeleniumTestsContextManager.getThreadContext().setAppActivity(null); // to override parameter from exampleConfigGenericParams
 		SeleniumTestsContextManager.getThreadContext().setPlatform("Android 10.0");
 		SeleniumTestsContextManager.getThreadContext().setBrowser("chrome");
 		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getTestType(), TestType.APPIUM_WEB_ANDROID);
@@ -1450,6 +1451,7 @@ public class TestSeleniumTestContext extends GenericTest {
 		initThreadContext(testNGCtx);
 
 		SeleniumTestsContextManager.getThreadContext().setApp(null); // to override parameter from exampleConfigGenericParams
+		SeleniumTestsContextManager.getThreadContext().setAppActivity(null); // to override parameter from exampleConfigGenericParams
 		SeleniumTestsContextManager.getThreadContext().setPlatform("Android 10.0");
 		SeleniumTestsContextManager.getThreadContext().setBrowser("browser");
 		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getTestType(), TestType.APPIUM_WEB_ANDROID);

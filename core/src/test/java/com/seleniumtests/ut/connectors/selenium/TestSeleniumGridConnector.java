@@ -51,6 +51,7 @@ import org.testng.annotations.Test;
 
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
+import com.mashape.unirest.request.GetRequest;
 import com.seleniumtests.connectors.selenium.SeleniumGridConnector;
 import com.seleniumtests.reporter.logger.TestLogging;
 import com.seleniumtests.ut.connectors.ConnectorsTest;
@@ -65,6 +66,9 @@ public class TestSeleniumGridConnector extends ConnectorsTest {
 	
 	@Mock
 	private CloseableHttpResponse response;
+	
+	@Mock
+	private GetRequest getRequest;
 	
 	@Mock
 	private HttpEntity entity;
@@ -175,10 +179,11 @@ public class TestSeleniumGridConnector extends ConnectorsTest {
 	}
 	
 	@Test(groups={"ut"})
-	public void testIsGridActiveWithGridNotPresent() throws ClientProtocolException, IOException {
+	public void testIsGridActiveWithGridNotPresent() throws ClientProtocolException, IOException, UnirestException {
 		
 		SeleniumGridConnector connector = new SeleniumGridConnector(SERVER_URL);
-		when(Unirest.get(SERVER_URL + SeleniumGridConnector.CONSOLE_SERVLET)).thenThrow(UnirestException.class);
+		when(Unirest.get(SERVER_URL + SeleniumGridConnector.CONSOLE_SERVLET)).thenReturn(getRequest);
+		when(getRequest.asString()).thenThrow(UnirestException.class);
 		
 		Assert.assertFalse(connector.isGridActive());
 	}
