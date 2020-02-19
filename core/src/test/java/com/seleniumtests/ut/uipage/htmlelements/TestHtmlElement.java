@@ -147,9 +147,6 @@ public class TestHtmlElement extends MockitoTest {
 		when(WebUIDriver.getWebDriver(anyBoolean())).thenReturn(eventDriver);
 		when(WebUIDriver.getWebUIDriver(anyBoolean())).thenReturn(uiDriver);
 		when(driver.findElement(By.id("el"))).thenReturn(element);
-		
-		// TODO: We should throw NoSuchElementException but for some odd reason, the exception is not caught by 'catch (WebDriverException e) {}' block in
-		//	ReplayAction.java even if NoSuchElementException is a sub-class of WebDriverException. However, this works well when error is raised by a real driver.
 		when(driver.findElements(By.name("subEl"))).thenReturn(subElList);
 		when(driver.findElement(By.name("subEl"))).thenReturn(subElement1);
 		when(driver.findElements(By.id("el"))).thenReturn(elList);
@@ -539,6 +536,22 @@ public class TestHtmlElement extends MockitoTest {
 		Assert.assertTrue(LocalDateTime.now().minusSeconds(4).isAfter(start));
 	}
 
+	/**
+	 * issue #325: check NoSuchElementException exception is raised with index 0
+	 * @throws Exception
+	 */
+	@Test(groups = { "ut" })
+	public void testElementNotFoundWithIndex() throws Exception {
+		HtmlElement elNotPresent3 = new HtmlElement("element", By.id("notPresent"), 1, 3);
+		when(driver.findElement(By.id("notPresent"))).thenThrow(new NoSuchElementException("Unable to locate element with ID: 'notPresent'"));
+		when(driver.findElements(By.id("notPresent"))).thenThrow(new NoSuchElementException("Unable to locate element with ID: 'notPresent'"));
+		try {
+			elNotPresent3.getValue();
+			throw new Exception("we should not be there");
+		} catch (NoSuchElementException e) {
+			// we expect not to have an IndexOutOfBoundsException
+		}
+	}
 	
 	
 	
