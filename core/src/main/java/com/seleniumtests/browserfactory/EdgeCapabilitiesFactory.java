@@ -17,7 +17,6 @@
  */
 package com.seleniumtests.browserfactory;
 
-import org.apache.commons.lang3.SystemUtils;
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.edge.EdgeDriverService;
 import org.openqa.selenium.edge.EdgeOptions;
@@ -26,6 +25,7 @@ import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.DriverConfig;
 import com.seleniumtests.driver.DriverMode;
+import com.seleniumtests.util.osutility.OSUtility;
 
 public class EdgeCapabilitiesFactory extends IDesktopCapabilityFactory {
 
@@ -35,7 +35,7 @@ public class EdgeCapabilitiesFactory extends IDesktopCapabilityFactory {
 
 	@Override
 	protected MutableCapabilities getDriverOptions() {
-        if (!SystemUtils.IS_OS_WINDOWS_10 && webDriverConfig.getMode() == DriverMode.LOCAL) {
+        if (!OSUtility.isWindows10() && webDriverConfig.getMode() == DriverMode.LOCAL) {
         	throw new ConfigurationException("Edge browser is only available on Windows 10");
         }
         

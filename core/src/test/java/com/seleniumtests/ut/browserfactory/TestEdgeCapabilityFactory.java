@@ -44,7 +44,6 @@ import org.testng.annotations.Test;
 
 import com.seleniumtests.MockitoTest;
 import com.seleniumtests.browserfactory.BrowserInfo;
-import com.seleniumtests.browserfactory.ChromeCapabilitiesFactory;
 import com.seleniumtests.browserfactory.EdgeCapabilitiesFactory;
 import com.seleniumtests.browserfactory.SeleniumRobotCapabilityType;
 import com.seleniumtests.driver.BrowserType;
@@ -55,7 +54,7 @@ import com.seleniumtests.util.osutility.OSUtility;
 import com.seleniumtests.util.osutility.OSUtilityFactory;
 import com.seleniumtests.util.osutility.OSUtilityWindows;
 
-@PrepareForTest({OSUtility.class, OSUtilityFactory.class, SystemUtils.class, EdgeCapabilitiesFactory.class})
+@PrepareForTest({OSUtility.class, OSUtilityFactory.class, EdgeCapabilitiesFactory.class})
 public class TestEdgeCapabilityFactory extends MockitoTest {
 
 	@Mock
@@ -69,11 +68,6 @@ public class TestEdgeCapabilityFactory extends MockitoTest {
 	
 	@BeforeMethod(groups= {"ut"})
 	public void init() {
-		PowerMockito.mockStatic(System.class);
-		PowerMockito.when(System.getProperty(anyString())).thenCallRealMethod();
-		PowerMockito.when(System.setProperty(anyString(), anyString())).thenCallRealMethod();
-		PowerMockito.when(System.clearProperty(anyString())).thenCallRealMethod();
-		PowerMockito.when(System.getProperty("os.name")).thenReturn("Windows 10");	
 		
 		Map<BrowserType, List<BrowserInfo>> browserInfos = new HashMap<>();
 		browserInfos.put(BrowserType.EDGE, Arrays.asList(new BrowserInfo(BrowserType.EDGE, "14393", "", false)));
@@ -81,6 +75,7 @@ public class TestEdgeCapabilityFactory extends MockitoTest {
 		PowerMockito.mockStatic(OSUtility.class);
 		PowerMockito.when(OSUtility.getInstalledBrowsersWithVersion(false)).thenReturn(browserInfos);
 		PowerMockito.when(OSUtility.getCurrentPlatorm()).thenReturn(Platform.WINDOWS);
+		PowerMockito.when(OSUtility.isWindows10()).thenReturn(true);
 		
 		PowerMockito.mockStatic(OSUtilityFactory.class);
 		PowerMockito.when(OSUtilityFactory.getInstance()).thenReturn(osUtility);
@@ -90,17 +85,6 @@ public class TestEdgeCapabilityFactory extends MockitoTest {
 		
 		when(osUtility.getProgramExtension()).thenReturn(".exe");
 	}
-//	
-//	@BeforeClass(groups= {"ut"})
-//	public void initClass() {
-//		
-//		PowerMockito.mockStatic(System.class);
-//		PowerMockito.when(System.getProperty(anyString())).thenCallRealMethod();
-//		PowerMockito.when(System.setProperty(anyString(), anyString())).thenCallRealMethod();
-//		PowerMockito.when(System.clearProperty(anyString())).thenCallRealMethod();
-//		PowerMockito.when(System.getProperty("os.name")).thenReturn("Windows 10");
-//		
-//	}
 	
 	/**
 	 * Check default behaviour

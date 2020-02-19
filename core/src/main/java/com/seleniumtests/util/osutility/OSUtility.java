@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang3.SystemUtils;
 import org.apache.log4j.Logger;
 import org.openqa.selenium.Platform;
 
@@ -75,6 +76,14 @@ public abstract class OSUtility {
      */
     public static boolean isWindows() {
         return getOSName().startsWith("Win");
+    }
+    
+    /**
+     * Used to simplify mocking
+     * @return
+     */
+    public static boolean isWindows10() {
+    	return SystemUtils.IS_OS_WINDOWS_10;
     }
     
 

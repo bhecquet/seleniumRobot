@@ -27,6 +27,7 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.awt.AWTError;
 import java.awt.AWTException;
 import java.awt.HeadlessException;
 import java.awt.Rectangle;
@@ -675,7 +676,7 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	@Test(groups = {"ut"}, expectedExceptions=ScenarioException.class)
 	public void testCaptureDesktopWithoutDesktop() throws IOException {
 
-		when(robot.createScreenCapture(any(Rectangle.class))).thenThrow(AWTException.class);
+		when(robot.createScreenCapture(any(Rectangle.class))).thenThrow(AWTError.class);
 		
 		CustomEventFiringWebDriver.captureDesktopToBase64String(DriverMode.LOCAL, gridConnector);
 	}

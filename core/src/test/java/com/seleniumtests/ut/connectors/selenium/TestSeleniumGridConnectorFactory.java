@@ -25,6 +25,7 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 
+import org.mockito.Mock;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
@@ -34,6 +35,7 @@ import org.testng.annotations.Test;
 
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
+import com.mashape.unirest.request.GetRequest;
 import com.seleniumtests.connectors.selenium.BrowserStackGridConnector;
 import com.seleniumtests.connectors.selenium.SeleniumGridConnector;
 import com.seleniumtests.connectors.selenium.SeleniumGridConnectorFactory;
@@ -43,6 +45,9 @@ import com.seleniumtests.ut.connectors.ConnectorsTest;
 
 @PrepareForTest({Unirest.class})
 public class TestSeleniumGridConnectorFactory extends ConnectorsTest {
+	
+	@Mock
+	private GetRequest gRequest;
 
 	private final String guiServletContent = "<html>\r\n" + 
 			"	<head>\r\n" + 
@@ -194,7 +199,8 @@ public class TestSeleniumGridConnectorFactory extends ConnectorsTest {
 	@Test(groups={"ut"}, expectedExceptions=ConfigurationException.class)
 	public void testWithError() throws UnsupportedOperationException, IOException, UnirestException {
 		
-		when(Unirest.get(SERVER_URL + SeleniumGridConnector.CONSOLE_SERVLET)).thenThrow(UnirestException.class);
+		when(Unirest.get(SERVER_URL + SeleniumGridConnector.CONSOLE_SERVLET)).thenReturn(gRequest);
+		when(gRequest.asString()).thenThrow(UnirestException.class);
 
 		LocalDateTime start = LocalDateTime.now();
 		try {

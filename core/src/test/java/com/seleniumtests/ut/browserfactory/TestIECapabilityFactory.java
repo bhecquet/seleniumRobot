@@ -44,7 +44,6 @@ import org.testng.annotations.Test;
 
 import com.seleniumtests.MockitoTest;
 import com.seleniumtests.browserfactory.BrowserInfo;
-import com.seleniumtests.browserfactory.ChromeCapabilitiesFactory;
 import com.seleniumtests.browserfactory.IECapabilitiesFactory;
 import com.seleniumtests.browserfactory.SeleniumRobotCapabilityType;
 import com.seleniumtests.core.SeleniumTestsContext;
@@ -76,11 +75,6 @@ public class TestIECapabilityFactory extends MockitoTest {
 	
 	@BeforeMethod(groups= {"ut"})
 	public void init() {
-		PowerMockito.mockStatic(System.class);
-		PowerMockito.when(System.getProperty(anyString())).thenCallRealMethod();
-		PowerMockito.when(System.setProperty(anyString(), anyString())).thenCallRealMethod();
-		PowerMockito.when(System.clearProperty(anyString())).thenCallRealMethod();
-		PowerMockito.when(System.getProperty("os.name")).thenReturn("Windows 10");	
 		
 		Map<BrowserType, List<BrowserInfo>> browserInfos = new HashMap<>();
 		browserInfos.put(BrowserType.INTERNET_EXPLORER, Arrays.asList(new BrowserInfo(BrowserType.INTERNET_EXPLORER, "11", "", false)));
