@@ -24,6 +24,7 @@ import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
 import org.openqa.selenium.ElementClickInterceptedException;
 import org.openqa.selenium.InvalidElementStateException;
+import org.openqa.selenium.NoSuchSessionException;
 import org.openqa.selenium.NoSuchWindowException;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.UnsupportedCommandException;
@@ -164,6 +165,8 @@ public class DriverExceptionListener implements WebDriverEventListener {
             return;
         } else if (ex instanceof org.openqa.selenium.remote.UnreachableBrowserException) {
             return;
+        } else if (ex instanceof NoSuchSessionException) {
+        	throw new WebSessionEndedException(ex);
         } else if (ex instanceof org.openqa.selenium.UnsupportedCommandException) {
             return;
         } else if (ex instanceof NoSuchWindowException) {

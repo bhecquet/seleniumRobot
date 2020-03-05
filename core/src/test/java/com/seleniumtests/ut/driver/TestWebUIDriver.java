@@ -259,6 +259,33 @@ public class TestWebUIDriver extends MockitoTest {
 		Assert.assertEquals(driver1, driver2);
 	}
 	
+
+	/**
+	 * issue #304: Check that if we close all driver windows, recreating the same driver do not raise exception
+	 */
+	@Test(groups={"ut"})
+	public void testDriverCreationWhenAlreadyExistingThenClosed() {
+		SeleniumTestsContextManager.getThreadContext().setBrowser("htmlunit");
+		WebDriver driver1 = WebUIDriver.getWebDriver(true, BrowserType.HTMLUNIT, "main", null);
+		driver1.close();
+		WebDriver driver2 = WebUIDriver.getWebDriver(true, BrowserType.HTMLUNIT, "main", null);
+
+		Assert.assertNotEquals(driver1, driver2);
+	}
+	
+	/**
+	 * issue #304: Check error is raised if we try to switch to a closed driver
+	 */
+	@Test(groups={"ut"}, expectedExceptions = ScenarioException.class)
+	public void testSwitchToClosedDriver() {
+		SeleniumTestsContextManager.getThreadContext().setBrowser("htmlunit");
+		WebDriver driver1 = WebUIDriver.getWebDriver(true, BrowserType.HTMLUNIT, "main", null);
+		WebDriver driver2 = WebUIDriver.getWebDriver(true, BrowserType.HTMLUNIT, "second", null);
+		Assert.assertEquals(WebUIDriver.getWebDriver(false), driver2);
+		driver1.close();
+		WebUIDriver.switchToDriver("main");
+	}
+	
 	/**
 	 * Exception raised when driver name is not given
 	 */

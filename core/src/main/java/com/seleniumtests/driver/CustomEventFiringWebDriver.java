@@ -54,6 +54,7 @@ import org.openqa.selenium.HasCapabilities;
 import org.openqa.selenium.JavascriptException;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.MutableCapabilities;
+import org.openqa.selenium.NoSuchSessionException;
 import org.openqa.selenium.NoSuchWindowException;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.UnhandledAlertException;
@@ -568,6 +569,21 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
         return driver;
     }
     
+    /**
+     * Returns true if all browser windows are closed and so, no actions can be performed
+     * @return
+     */
+    public boolean isBrowserClosed() {
+    	try {
+    		getSessionId();
+    		getCapabilities();
+    		return driver.getWindowHandles().isEmpty();
+    	} catch (NoSuchSessionException e) {
+    		return true;
+    	}
+    	
+    }
+    
     public String getSessionId() {
     	try {
     		return ((RemoteWebDriver)driver).getSessionId().toString();
@@ -828,7 +844,13 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
 		if (browserInfo != null && driverMode == DriverMode.LOCAL) {
 			pidsToKill.addAll(browserInfo.getAllBrowserSubprocessPids(driverPids));
 		}
-		Capabilities caps = getCapabilities();
+		
+		Capabilities caps;
+		try {
+			caps = getCapabilities();
+		} catch (WebDriverException e) {
+			caps = new MutableCapabilities();
+		}
 		
 		// close windows before quitting (this is the only way to close chrome attached browser when it's not started by selenium)
 		try {
@@ -859,6 +881,9 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
 		
 		try {
 			driver.quit();
+		} catch (WebDriverException e) {
+			caps = new MutableCapabilities();
+			logger.error("Error while quitting driver: " + e.getMessage());
 		} finally {
 			
 			// wait for browser processes to stop
