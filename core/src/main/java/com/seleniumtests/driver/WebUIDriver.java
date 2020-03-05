@@ -451,8 +451,23 @@ public class WebUIDriver {
     		throw new ScenarioException("A name must be given to the driver");
     	}
     	
-        if ((uxDriverSession.get() == null || uxDriverSession.get().get(driverName) == null || uxDriverSession.get().get(driverName).driver == null) && isCreate && !SeleniumTestsContextManager.isNonGuiTest()) {
-        	
+    	boolean createDriver = false;
+    	
+    	// issue #304: should we try to create the driver
+    	if (isCreate && !SeleniumTestsContextManager.isNonGuiTest()) {
+	    	if (uxDriverSession.get() == null 
+	        		|| uxDriverSession.get().get(driverName) == null 
+	        		|| uxDriverSession.get().get(driverName).driver == null) {
+	    		createDriver = true;
+	    	
+	    	// we have a driver referenced for this name, is it still available (not closed)
+	    	} else if (((CustomEventFiringWebDriver) uxDriverSession.get().get(driverName).driver).isBrowserClosed()) {
+    			uxDriverSession.get().remove(driverName);
+    			createDriver = true;
+	    	}
+    	} 
+    	
+        if (createDriver) {
         	
         	WebUIDriver uiDriver = getWebUIDriver(true, driverName);
         	uiDriver.config.setAttachExistingDriverPort(attachExistingDriverPort);
@@ -490,7 +505,7 @@ public class WebUIDriver {
     		throw new ScenarioException(String.format("driver with name %s has not been created", driverName));
     	}
     	
-    	if (uxDriverSession.get().get(driverName).driver != null && ((CustomEventFiringWebDriver)(uxDriverSession.get().get(driverName).driver)).getSessionId() == null) {
+    	if (uxDriverSession.get().get(driverName).driver != null && ((CustomEventFiringWebDriver)(uxDriverSession.get().get(driverName).driver)).isBrowserClosed()) {
     		throw new ScenarioException("Cannot switch to a closed driver");
     	}
     	setCurrentWebUiDriverName(driverName);
