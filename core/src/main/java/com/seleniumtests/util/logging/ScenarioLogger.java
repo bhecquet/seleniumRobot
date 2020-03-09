@@ -14,11 +14,10 @@ import com.seleniumtests.reporter.logger.GenericFile;
 import com.seleniumtests.reporter.logger.HarCapture;
 import com.seleniumtests.reporter.logger.Snapshot;
 import com.seleniumtests.reporter.logger.StringInfo;
-import com.seleniumtests.reporter.logger.TestLogging;
 import com.seleniumtests.reporter.logger.TestMessage;
+import com.seleniumtests.reporter.logger.TestMessage.MessageType;
 import com.seleniumtests.reporter.logger.TestStep;
 import com.seleniumtests.reporter.logger.TestValue;
-import com.seleniumtests.reporter.logger.TestMessage.MessageType;
 
 import net.lightbody.bmp.core.har.Har;
 
