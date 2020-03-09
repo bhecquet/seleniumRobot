@@ -30,8 +30,6 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.Assert;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
-import com.seleniumtests.core.TestTasks;
-import com.seleniumtests.core.runner.SeleniumRobotTestPlan;
 import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import com.seleniumtests.driver.TestType;
@@ -46,7 +44,7 @@ public abstract class BasePage {
     protected WebDriver driver;
     private int explictWaitTimeout = SeleniumTestsContextManager.getThreadContext().getExplicitWaitTimeout();
 
-	protected static final Logger logger = ScenarioLogger.getScenarioLogger(BasePage.class);  // with this logger, information will be added in test step + logs
+	protected static final ScenarioLogger logger = ScenarioLogger.getScenarioLogger(BasePage.class);  // with this logger, information will be added in test step + logs
 	protected static final Logger internalLogger = SeleniumRobotLogger.getLogger(BasePage.class);
 
     public void acceptAlert() {
