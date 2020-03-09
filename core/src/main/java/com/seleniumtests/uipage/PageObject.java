@@ -68,7 +68,6 @@ import com.seleniumtests.driver.screenshots.ScreenshotUtil.Target;
 import com.seleniumtests.uipage.htmlelements.HtmlElement;
 import com.seleniumtests.uipage.htmlelements.LinkElement;
 import com.seleniumtests.util.helper.WaitHelper;
-import com.seleniumtests.util.logging.ScenarioLogger;
 
 public class PageObject extends BasePage implements IPage {
 
@@ -163,7 +162,7 @@ public class PageObject extends BasePage implements IPage {
         long startTime = start.getTimeInMillis();
         long endTime = end.getTimeInMillis();
         if ((endTime - startTime) / 1000 > 0) {
-            ((ScenarioLogger)logger).log("Open web page in :" + (endTime - startTime) / 1000 + "seconds");
+            logger.log("Open web page in :" + (endTime - startTime) / 1000 + "seconds");
         }
         
         
@@ -342,7 +341,7 @@ public class PageObject extends BasePage implements IPage {
         	screenShot.setTitle(snapshotName);
         }
 
-        ((ScenarioLogger)logger).logScreenshot(screenShot, snapshotName);
+        logger.logScreenshot(screenShot, snapshotName);
         
         // store the window / tab on which this page is loaded
         windowHandle = driver.getWindowHandle();
@@ -496,7 +495,7 @@ public class PageObject extends BasePage implements IPage {
                 ((JavascriptExecutor) driver).executeScript(
                     "if (window.screen){window.moveTo(0, 0);window.resizeTo(window.screen.availWidth,window.screen.availHeight);}");
             } catch (Exception ignore) {
-            	((ScenarioLogger)logger).log("Unable to maximize browser window. Exception occured: " + ignore.getMessage());
+            	logger.log("Unable to maximize browser window. Exception occured: " + ignore.getMessage());
             }
         }
     }
