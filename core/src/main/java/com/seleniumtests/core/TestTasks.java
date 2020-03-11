@@ -54,6 +54,10 @@ public class TestTasks {
 		// nothing to do
 	}
 
+	 /**
+     * Kills the named process, locally or remotely
+     * @param processName		name of the process (do not provide .exe extension on windows)
+     */
 	public static void killProcess(String processName) {
     	if (SeleniumTestsContextManager.getThreadContext().getRunMode() == DriverMode.LOCAL) {
     		OSUtilityFactory.getInstance().killProcessByName(processName, true);

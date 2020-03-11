@@ -143,7 +143,7 @@ public class SeleniumRobotTestPlan {
     
     /**
      * Kills the named process, locally or remotely
-     * @param processName
+     * @param processName		name of the process (do not provide .exe extension on windows)
      */
     public void killProcess(String processName) {
     	TestTasks.killProcess(processName);
