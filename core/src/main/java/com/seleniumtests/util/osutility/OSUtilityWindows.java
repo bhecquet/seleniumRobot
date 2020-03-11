@@ -118,7 +118,11 @@ public class OSUtilityWindows extends OSUtility {
 	@Override
 	public String killProcessByName(String programName, boolean force) {
 		if (force) {
-    		return OSCommand.executeCommandAndWait("taskkill /F /IM " + programName + getProgramExtension());
+			try {
+    			String out = OSCommand.executeCommandAndWait(String.format("wmic process where \"name='%s'\" delete", programName + getProgramExtension()));
+    		} catch (Throwable e) {
+    		}
+			return OSCommand.executeCommandAndWait("taskkill /F /IM " + programName + getProgramExtension());
     	} else {
     		return OSCommand.executeCommandAndWait("taskkill /IM " + programName + getProgramExtension());
     	}
