@@ -90,20 +90,20 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 	@Override
 	public void onTestSuccess(ITestResult result) {
 		System.out.println("success");
-		// nothing to do
+		
+		// test is success, so it will not be retried
+		TestNGResultUtils.setNoMoreRetry(result, true);
+		
 		generateTempReport(result);
 	}
 
+	/**
+	 * Called when test really failed
+	 */
 	@Override
 	public synchronized void onTestFailure(ITestResult testResult) {
 		if (testResult.getMethod().getRetryAnalyzer() != null) {
 			TestRetryAnalyzer testRetryAnalyzer = (TestRetryAnalyzer) testResult.getMethod().getRetryAnalyzer();
-
-			// test will be retried
-			if (testRetryAnalyzer.retryPeek(testResult)) {
-				testResult.setStatus(ITestResult.SKIP);
-				Reporter.setCurrentTestResult(null);
-			} 
 
 			logger.info(testResult.getMethod() + " Failed in " + (testRetryAnalyzer.getCount()) + " times");
 		}		
@@ -111,22 +111,25 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 		generateTempReport(testResult);
 	}
 
+	/**
+	 * Called when test is explicitly skipped or when a test is failed but will be retried
+	 */
 	@Override
-	public void onTestSkipped(ITestResult result) {
+	public void onTestSkipped(ITestResult testResult) {
 		// nothing to do
 		System.out.println("skipped");
 		
 		// be sure that the result contains context. It can happen when the test is never executed
 		// initialize it from the method context as it's the closest for our test
-		if (TestNGResultUtils.getSeleniumRobotTestContext(result) == null) {
+		if (TestNGResultUtils.getSeleniumRobotTestContext(testResult) == null) {
 			SeleniumTestsContextManager.insertThreadContext(
-					result.getMethod(),
-					result,
-					result.getTestContext()
+					testResult.getMethod(),
+					testResult,
+					testResult.getTestContext()
 					);
 		}
 		
-		generateTempReport(result);
+		generateTempReport(testResult);
 	}
 
 	@Override
@@ -151,8 +154,8 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 			if (SeleniumTestsContextManager.getThreadContext().getKeepAllResults() && testResult.getMethod().getRetryAnalyzer() != null) {
 				TestRetryAnalyzer testRetryAnalyzer = (TestRetryAnalyzer) testResult.getMethod().getRetryAnalyzer();
 				
-				// test will be retried, store the result before it is removed
-				if (testRetryAnalyzer.retryPeek(testResult)) {
+				// test will be retried, store the result before it is replaced
+				if (testRetryAnalyzer.willBeRetried(testResult)) {
 				
 					// save result to zip, for future use
 					String zipFileName = String.format("retry-%s-%d.zip", 

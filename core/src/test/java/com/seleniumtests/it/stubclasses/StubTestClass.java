@@ -26,6 +26,7 @@ import org.apache.commons.io.FileUtils;
 import org.openqa.selenium.WebDriverException;
 import org.testng.Assert;
 import org.testng.Reporter;
+import org.testng.SkipException;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
@@ -130,6 +131,11 @@ public class StubTestClass extends StubParentClass {
 		TestStepManager.getParentTestStep().addAction(new TestAction("send keyboard action", false, new ArrayList<>()));
 		TestStepManager.logTestStep(TestStepManager.getCurrentRootTestStep());
 		Assert.fail("error");
+	}
+	
+	@Test(groups="stub")
+	public void testSkipped() {
+		throw new SkipException("skip this test");
 	}
 	
 	@Test(groups="stub")

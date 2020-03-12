@@ -35,9 +35,10 @@ public class TestNGResultUtils {
 
 	private static final String UNIQUE_METHOD_NAME = "uniqueMethodName"; // unique name of the test (in case several tests have the same name)
 	private static final String TEST_CONTEXT = "testContext";
-	private static final String RETRY = "retry";
-	private static final String NO_MORE_RETRY = "noMoreRetry";
+	private static final String RETRY = "retry";						// index of the retry
+	private static final String NO_MORE_RETRY = "noMoreRetry";			// set to true when is not going to be retried
 	private static final String TEST_INFO = "testInfo";
+	private static final String RECORDED_TO_SERVER = "recordedToServer";// true if the result has already been recorded to the seleniumRobot server
 	private static final String METHOD_NAME = "methodName";				// name of the test method (or the cucumber scenario)
 
 	private TestNGResultUtils() {
@@ -140,7 +141,27 @@ public class TestNGResultUtils {
     	testNGResult.setAttribute(RETRY, retry);
     }
     
-    // whether retry will be allowed for this test
+    // did we already recorded this result to the server
+    public static boolean isRecordedToServer(ITestResult testNGResult) {
+    	Boolean alreadyRecorded = (Boolean) testNGResult.getAttribute(RECORDED_TO_SERVER);
+    	if (alreadyRecorded == null) {
+    		return false;
+    	} else {
+    		return alreadyRecorded;
+    	}
+    }
+    
+    public static void setRecordedToServer(ITestResult testNGResult, Boolean recordedToServer) {
+    	testNGResult.setAttribute(RECORDED_TO_SERVER, recordedToServer);
+    }
+
+    /**
+     * whether retry will be allowed for this test
+     * @param testNGResult
+     * @return	true if no more retry is planned (test is finally failed) or when test is sucessful
+     * 			false if test has failed and will be retried (current status is then skipped)
+     * 			null if we never ask for a retry for this test
+     */
     public static Boolean getNoMoreRetry(ITestResult testNGResult) {
     	return (Boolean) testNGResult.getAttribute(NO_MORE_RETRY);
     }

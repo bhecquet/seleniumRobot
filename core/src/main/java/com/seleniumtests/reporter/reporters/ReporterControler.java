@@ -88,12 +88,13 @@ public class ReporterControler implements IReporter {
 			for (Class<?> reporterClass: SeleniumTestsContextManager.getGlobalContext().getReporterPluginClasses()) {
 				try {
 					if (suiteFinished) {
-						IReporter reporter = (IReporter) reporterClass.getConstructor().newInstance();
+						CommonReporter reporter = CommonReporter.getInstance(reporterClass);
 						reporter.generateReport(xmlSuites, suites, outputDirectory);
 						
-					// when the tests are currently running, do optimize reports (for example, html results will have their resources on CDN
+					// when the tests are currently running, do optimize reports (for example, html results will have their resources on CDN)
 					} else {
-						CommonReporter reporter = (CommonReporter) reporterClass.getConstructor().newInstance();
+						
+						CommonReporter reporter = CommonReporter.getInstance(reporterClass);
 						reporter.generateReport(resultSet, outputDirectory, true);
 					}
 					

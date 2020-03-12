@@ -19,20 +19,16 @@ package com.seleniumtests.reporter.reporters;
 
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.json.JSONObject;
 import org.testng.IReporter;
-import org.testng.ISuite;
-import org.testng.ISuiteResult;
 import org.testng.ITestContext;
 import org.testng.ITestResult;
-import org.testng.xml.XmlSuite;
 
 import com.seleniumtests.connectors.selenium.SeleniumRobotSnapshotServerConnector;
 import com.seleniumtests.core.SeleniumTestsContext;
@@ -40,7 +36,6 @@ import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.utils.TestNGResultUtils;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.SeleniumRobotServerException;
-import com.seleniumtests.reporter.logger.TestLogging;
 import com.seleniumtests.reporter.logger.TestStep;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
@@ -98,9 +93,7 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 			return;
 		} else {
 			try {
-				serverConnector.createApplication();
-				serverConnector.createVersion();
-				serverConnector.createEnvironment();
+				// do not create application / version / environment from script, they should already be present or created by user to avoid fill database with wrong data
 				serverConnector.createSession();
 			} catch (SeleniumRobotServerException | ConfigurationException e) {
 				logger.error("Error contacting selenium robot serveur", e);
@@ -129,6 +122,15 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 			
 			// test case in seleniumRobot naming
 			for (ITestResult testResult: methodResults) {
+				
+				// do not record this result twice if it's already recorded
+				if (TestNGResultUtils.isRecordedToServer(testResult) 
+					// NoMoreRetry is set to false when test is being retried
+					|| (TestNGResultUtils.getNoMoreRetry(testResult) != null && TestNGResultUtils.getNoMoreRetry(testResult) == false)) {
+					continue;
+				}
+				
+		
 				
 				// issue #81: recreate test context from this context (due to multithreading, this context may be null if parallel testing is used)
 				SeleniumTestsContext testContext = SeleniumTestsContextManager.setThreadContextFromTestResult(entry.getKey(), getTestName(testResult), getClassName(testResult), testResult);
@@ -162,6 +164,8 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 						}
 					}
 				}
+				
+				TestNGResultUtils.setRecordedToServer(testResult, true);
 			}
 		}
 	}

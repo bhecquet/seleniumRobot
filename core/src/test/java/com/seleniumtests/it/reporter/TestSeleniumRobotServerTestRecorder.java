@@ -21,7 +21,9 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.contains;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
@@ -32,21 +34,31 @@ import static org.mockito.Mockito.when;
 import java.io.File;
 
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.annotations.Test;
+import org.testng.xml.XmlSuite.ParallelMode;
 
 import com.seleniumtests.connectors.selenium.SeleniumRobotSnapshotServerConnector;
+import com.seleniumtests.connectors.selenium.SeleniumRobotVariableServerConnector;
+import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.customexception.SeleniumRobotServerException;
+import com.seleniumtests.reporter.reporters.CommonReporter;
 import com.seleniumtests.reporter.reporters.SeleniumRobotServerTestRecorder;
 
-@PrepareForTest({SeleniumRobotSnapshotServerConnector.class, SeleniumRobotServerTestRecorder.class})
+@PrepareForTest({SeleniumRobotSnapshotServerConnector.class, CommonReporter.class, SeleniumRobotVariableServerConnector.class, SeleniumTestsContext.class})
+@PowerMockIgnore({"javax.net.ssl.*", "com.google.inject.*"})
 public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 	
 	private SeleniumRobotServerTestRecorder reporter;
 	
 	@Mock
 	SeleniumRobotSnapshotServerConnector serverConnector;
+	
+	@Mock
+	SeleniumRobotVariableServerConnector variableServer;
 	
 	/**
 	 * In this test, everything is fine with seleniumrobot server
@@ -55,96 +67,91 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 	// TODO: re-enable these tests. For now, powermockito does not mock "new" call
 	// TODO: check that record is not done when compareSnapshot & resultRecord are false
 	// TODO: check that record is not done when seleniumRobotServer is not active (by params)
-	@Test(groups={"it"}, enabled=false)
+	@Test(groups={"it"})
 	public void testReportGeneration() throws Exception {
 		
-		reporter = spy(new SeleniumRobotServerTestRecorder());
-		PowerMockito.whenNew(SeleniumRobotSnapshotServerConnector.class).withNoArguments().thenReturn(serverConnector);
-//		PowerMockito.mockStatic(SeleniumRobotServerTestRecorder.class);
-//		when(SeleniumRobotServerTestRecorder.class.newInstance()).thenReturn(reporter);
-//		
-//		when(reporter.getServerConnector()).thenReturn(serverConnector);
-		when(serverConnector.getActive()).thenReturn(true);
+		try {
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE, "true");
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT, "true");
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_RECORD_RESULTS, "true");
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL, "http://localhost:1234");
+			
+			PowerMockito.whenNew(SeleniumRobotVariableServerConnector.class).withArguments(eq(true), eq("http://localhost:1234"), anyString(), eq(null)).thenReturn(variableServer);
+			when(variableServer.isAlive()).thenReturn(true);
 
-		executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClass", "com.seleniumtests.it.stubclasses.StubTestClass2"});
-		
+			reporter = spy(new SeleniumRobotServerTestRecorder());
+			PowerMockito.mockStatic(CommonReporter.class, Mockito.CALLS_REAL_METHODS);
+			PowerMockito.when(CommonReporter.getInstance(SeleniumRobotServerTestRecorder.class)).thenReturn(reporter);
 
-		// check server has been called for all aspects of test (app, version, ...)
-		verify(serverConnector).createApplication();
-		verify(serverConnector).createVersion();
-		verify(serverConnector).createEnvironment();
-		verify(serverConnector).createSession();
-		
-		// check all test cases are created, in both test classes
-		verify(serverConnector).createTestCase("testAndSubActions");
-		verify(serverConnector).createTestCase("testInError");
-		verify(serverConnector).createTestCase("testWithException");
-		verify(serverConnector).createTestCase("test1");
-		verify(serverConnector).createTestCase("test2");
-		verify(serverConnector).createTestCase("test3");
-		verify(serverConnector).createTestCase("test4");
-		verify(serverConnector).createTestCase("test5");
-		verify(serverConnector).createTestCase("test6");
-		verify(serverConnector, times(10)).addLogsToTestCaseInSession(anyString());
-		verify(serverConnector, times(10)).createTestCaseInSession(); 
-		verify(serverConnector, times(3)).createTestStep("step 1");
-		verify(serverConnector).createTestStep("step 2");
-		verify(serverConnector).createSnapshot(any(File.class));
-		
-		// check that screenshot information are removed from logs (the pattern "Output: ...")
-		verify(serverConnector).recordStepResult(eq(false), eq("Step step 1\nclick button\nsendKeys to text field\nStep step 1.3: open page\nclick link\na message\nsendKeys to password field"), anyLong());
+			when(reporter.getServerConnector()).thenReturn(serverConnector);
+			when(serverConnector.getActive()).thenReturn(true);
+	
+			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions", "testInError", "testWithException", "testSkipped"});
+			
+			// check server has been called for all aspects of test (app, version, ...)
+			// they may be called for each test but server is responsible for uniqueness of the value
+			verify(serverConnector, atLeastOnce()).createSession();
+			
+			// check all test cases are created, call MUST be done only once to avoid result to be recorded several times
+			verify(serverConnector).createTestCase("testAndSubActions");
+			verify(serverConnector).createTestCase("testInError");
+			verify(serverConnector).createTestCase("testWithException");
+			verify(serverConnector).createTestCase("testSkipped");
+			verify(serverConnector, times(4)).addLogsToTestCaseInSession(anyString());
+			verify(serverConnector, times(4)).createTestCaseInSession(); 
+			verify(serverConnector, times(3)).createTestStep("step 1");
+			verify(serverConnector).createTestStep("step 2");
+			verify(serverConnector).createSnapshot(any(File.class)); // one snapshot
+			
+			// check that screenshot information are removed from logs (the pattern "Output: ...")
+			verify(serverConnector).recordStepResult(eq(false), contains("step 1.3: open page"), eq(1230L));
+		} finally {
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE);
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL);
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT);
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_RECORD_RESULTS);
+		}
 	}
 	
 	/**
 	 * Test when no seleniumrobot server is present
 	 */
-	@Test(groups={"it"}, enabled=false)
+	@Test(groups={"it"})
 	public void testNoReportWhenServerIsOffline() throws Exception {
 		
-		reporter = spy(new SeleniumRobotServerTestRecorder());
-		when(reporter.getServerConnector()).thenReturn(serverConnector);
-		when(serverConnector.getActive()).thenReturn(false);
+		try {
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE, "true");
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT, "true");
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_RECORD_RESULTS, "true");
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL, "http://localhost:1234");
+			
+			PowerMockito.whenNew(SeleniumRobotVariableServerConnector.class).withArguments(eq(true), eq("http://localhost:1234"), anyString(), eq(null)).thenReturn(variableServer);
+			when(variableServer.isAlive()).thenReturn(false);
 
-		executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClass", "com.seleniumtests.it.stubclasses.StubTestClass2"});
-		
+			reporter = spy(new SeleniumRobotServerTestRecorder());
+			PowerMockito.mockStatic(CommonReporter.class, Mockito.CALLS_REAL_METHODS);
+			PowerMockito.when(CommonReporter.getInstance(SeleniumRobotServerTestRecorder.class)).thenReturn(reporter);
 
-		// check server has been called for all aspects of test (app, version, ...)
-		verify(serverConnector, never()).createApplication();
-		verify(serverConnector, never()).createVersion();
-		verify(serverConnector, never()).createEnvironment();
-		verify(serverConnector, never()).createSession();
-		
-		// check all test cases are created, in both test classes
-		verify(serverConnector, never()).createTestCase(anyString());
-		verify(serverConnector, never()).createTestCaseInSession(); 
-		verify(serverConnector, never()).createTestStep(anyString());
-	}
+			when(reporter.getServerConnector()).thenReturn(serverConnector);
+			when(serverConnector.getActive()).thenReturn(false);
+
+			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions"});
+			
 	
-	
-	/**
-	 * Test when seleniumRobot server raises an error when registring app
-	 */
-	@Test(groups={"it"}, enabled=false)
-	public void testErrorHandlingWhenRecordingApp() throws Exception {
-		
-		reporter = spy(new SeleniumRobotServerTestRecorder());
-		when(reporter.getServerConnector()).thenReturn(serverConnector);
-		when(serverConnector.getActive()).thenReturn(true);
-		doThrow(SeleniumRobotServerException.class).when(serverConnector).createApplication();
-
-		executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClass", "com.seleniumtests.it.stubclasses.StubTestClass2"});
-		
-
-		// check that process is interrupted
-		verify(serverConnector).createApplication();
-		verify(serverConnector, never()).createVersion();
-		verify(serverConnector, never()).createEnvironment();
-		verify(serverConnector, never()).createSession();
-		
-		// check no recording has been performed
-		verify(serverConnector, never()).createTestCase(anyString());
-		verify(serverConnector, never()).createTestCaseInSession(); 
-		verify(serverConnector, never()).createTestStep(anyString());
+			// check server has been called for all aspects of test (app, version, ...)
+			verify(serverConnector, never()).createSession();
+			
+			// check all test cases are created, in both test classes
+			verify(serverConnector, never()).createTestCase(anyString());
+			verify(serverConnector, never()).createTestCaseInSession(); 
+			verify(serverConnector, never()).createTestStep(anyString());
+			
+		} finally {
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE);
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL);
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT);
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_RECORD_RESULTS);
+		}
 	}
 	
 
@@ -152,27 +159,39 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 	 * Test when seleniumRobot server raises an error when recording test result
 	 * Recording stops as soon as an error is raised to avoid inconsistencies in data
 	 */
-	@Test(groups={"it"}, enabled=false)
+	@Test(groups={"it"})
 	public void testErrorHandlingWhenRecordingTestResult() throws Exception {
 		
-		reporter = spy(new SeleniumRobotServerTestRecorder());
-		when(reporter.getServerConnector()).thenReturn(serverConnector);
-		when(serverConnector.getActive()).thenReturn(true);
-		doThrow(SeleniumRobotServerException.class).when(serverConnector).recordStepResult(anyBoolean(), anyString(), anyLong());
+		try {
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE, "true");
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT, "true");
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_RECORD_RESULTS, "true");
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL, "http://localhost:1234");
+			
+			PowerMockito.whenNew(SeleniumRobotVariableServerConnector.class).withArguments(eq(true), eq("http://localhost:1234"), anyString(), eq(null)).thenReturn(variableServer);
+			when(variableServer.isAlive()).thenReturn(true);
 
-		executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClass", "com.seleniumtests.it.stubclasses.StubTestClass2"});
-		
+			reporter = spy(new SeleniumRobotServerTestRecorder());
+			PowerMockito.mockStatic(CommonReporter.class, Mockito.CALLS_REAL_METHODS);
+			PowerMockito.when(CommonReporter.getInstance(SeleniumRobotServerTestRecorder.class)).thenReturn(reporter);
 
-		// check server has been called for all aspects of test (app, version, ...)
-		verify(serverConnector).createApplication();
-		verify(serverConnector).createVersion();
-		verify(serverConnector).createEnvironment();
-		verify(serverConnector).createSession();
-		
-		// only one test should be created because process is interrupted
-		verify(serverConnector).createTestCase(anyString());
-		verify(serverConnector).createTestCaseInSession(); 
-		verify(serverConnector).createTestStep(anyString());
-		verify(serverConnector).recordStepResult(anyBoolean(), anyString(), anyLong());
+			when(reporter.getServerConnector()).thenReturn(serverConnector);
+			when(serverConnector.getActive()).thenReturn(true);
+			
+			doThrow(SeleniumRobotServerException.class).when(serverConnector).recordStepResult(anyBoolean(), anyString(), anyLong());
+	
+			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions", "testInError"});
+			
+			// check server has been called for session
+			verify(serverConnector, times(3)).createSession(); // once for each test, and once after execution finishes
+			verify(serverConnector, times(3)).recordStepResult(anyBoolean(), anyString(), anyLong()); // once for each test execution + the final logging which is done only once as it fails
+																							// it shows that when result has not been recorded, it's retried
+			
+		} finally {
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE);
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL);
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT);
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_RECORD_RESULTS);
+		}
 	}
 }
