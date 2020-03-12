@@ -25,6 +25,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.Writer;
+import java.lang.reflect.InvocationTargetException;
 import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -57,6 +58,10 @@ public abstract class CommonReporter implements IReporter {
 	protected static final String PASSED_TEST = "passed";
 	protected static final String RESOURCES_DIR = "resources";
 
+	public static CommonReporter getInstance(Class<?> reporterClass) throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException {
+		return (CommonReporter) reporterClass.getConstructor().newInstance();
+	}
+	
 	protected abstract void generateReport(Map<ITestContext, Set<ITestResult>> resultSet, String outdir, boolean optimizeReport);
 	
 	/**

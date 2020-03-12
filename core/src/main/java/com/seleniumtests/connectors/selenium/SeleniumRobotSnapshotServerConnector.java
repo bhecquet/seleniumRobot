@@ -18,7 +18,7 @@
 package com.seleniumtests.connectors.selenium;
 
 import java.io.File;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -56,7 +56,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 	public SeleniumRobotSnapshotServerConnector(final boolean useRequested, final String url, String authToken) {
 		super(useRequested, url, authToken);
 		if (!active) {
-			return;
+			return; 
 		}
 		active = isAlive();
 		if (active) {
@@ -73,24 +73,27 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 		if (!active) {
 			return;
 		}
+		if (applicationId == null) {
+			throw new SeleniumRobotServerException(String.format("Application %s has not been created", SeleniumTestsContextManager.getApplicationName()));
+		}
 		if (environmentId == null) {
-			createEnvironment();
+			throw new SeleniumRobotServerException(String.format("Environment %s has not been created", SeleniumTestsContextManager.getGlobalContext().getTestEnv()));
 		}
 		if (versionId == null) {
 			createVersion();
 		}
 		try {
-			BrowserType browser = SeleniumTestsContextManager.getThreadContext().getBrowser();
+			BrowserType browser = SeleniumTestsContextManager.getGlobalContext().getBrowser();
 			browser = browser == null ? BrowserType.NONE : browser;
 			sessionUUID = UUID.randomUUID().toString();
 			
 			JSONObject sessionJson = getJSonResponse(buildPostRequest(url + SESSION_API_URL)
 					.field("sessionId", sessionUUID)
-					.field("date", LocalDate.now().format(DateTimeFormatter.ISO_DATE))
+					.field("date", LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME))
 					.field("browser", browser.getBrowserType())
-					.field("environment", SeleniumTestsContextManager.getThreadContext().getTestEnv())
+					.field("environment", SeleniumTestsContextManager.getGlobalContext().getTestEnv())
 					.field("version", versionId)
-					.field("compareSnapshot", SeleniumTestsContextManager.getThreadContext().getSeleniumRobotServerCompareSnapshot()));
+					.field("compareSnapshot", SeleniumTestsContextManager.getGlobalContext().getSeleniumRobotServerCompareSnapshot()));
 			sessionId = sessionJson.getInt("id");
 		} catch (UnirestException | JSONException e) {
 			throw new SeleniumRobotServerException("cannot create session", e);

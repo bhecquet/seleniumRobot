@@ -143,11 +143,11 @@ public abstract class SeleniumRobotServerConnector {
 		}
 		try {
 			JSONObject response = getJSonResponse(buildGetRequest(url + NAMED_ENVIRONMENT_API_URL)
-					.queryString("name", SeleniumTestsContextManager.getThreadContext().getTestEnv()));
+					.queryString("name", SeleniumTestsContextManager.getGlobalContext().getTestEnv()));
 			environmentId = response.getInt("id");
 			return environmentId;
 		} catch (UnirestException e) {
-			throw new ConfigurationException(String.format("Environment %s does not exist in variable server, please create it or use an other one", SeleniumTestsContextManager.getThreadContext().getTestEnv()));
+			throw new ConfigurationException(String.format("Environment %s does not exist in variable server, please create it or use an other one", SeleniumTestsContextManager.getGlobalContext().getTestEnv()));
 		}
 	}
 	
@@ -230,7 +230,7 @@ public abstract class SeleniumRobotServerConnector {
 		}
 		try {
 			JSONObject envJson = getJSonResponse(buildPostRequest(url + ENVIRONMENT_API_URL)
-					.field("name", SeleniumTestsContextManager.getThreadContext().getTestEnv()));
+					.field("name", SeleniumTestsContextManager.getGlobalContext().getTestEnv()));
 			environmentId = envJson.getInt("id");
 		} catch (UnirestException | JSONException e) {
 			throw new SeleniumRobotServerException("cannot create environment", e);

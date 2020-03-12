@@ -22,7 +22,6 @@ import org.testng.ITestResult;
 
 import com.seleniumtests.core.utils.TestNGResultUtils;
 import com.seleniumtests.customexception.SeleniumGridNodeNotAvailable;
-import com.seleniumtests.reporter.logger.TestLogging;
 import com.seleniumtests.util.logging.ScenarioLogger;
 
 public class TestRetryAnalyzer implements IRetryAnalyzer {
@@ -80,6 +79,8 @@ public class TestRetryAnalyzer implements IRetryAnalyzer {
         
         logger.log(String.format("[NOT RETRYING] max retry count (%d) reached", maxCount));
 
+
+    	TestNGResultUtils.setNoMoreRetry(result, true);
         return false;
     }
 
@@ -88,8 +89,10 @@ public class TestRetryAnalyzer implements IRetryAnalyzer {
     
     /**
      * check whether the test will be retried / is retrying by comparing the count indiactor stored in test result with the max allowed retry count
+     * Retry count is set only when retry method has been called
+     * @return	true if the test is going to be retried
      */
-    public boolean retryPeek(final ITestResult result) {
+    public boolean willBeRetried(final ITestResult result) {
     	Integer currentRetry = (Integer) TestNGResultUtils.getRetry(result);
     	Boolean noMoreRetry = (Boolean) TestNGResultUtils.getNoMoreRetry(result);
     	if (currentRetry == null || (noMoreRetry != null && noMoreRetry)) {
