@@ -36,6 +36,7 @@ import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.TestStepManager;
 import com.seleniumtests.customexception.DriverExceptions;
 import com.seleniumtests.driver.screenshots.ScreenShot;
+import com.seleniumtests.driver.screenshots.SnapshotCheckType;
 import com.seleniumtests.reporter.logger.HyperlinkInfo;
 import com.seleniumtests.reporter.logger.Snapshot;
 import com.seleniumtests.reporter.logger.StringInfo;
@@ -86,7 +87,7 @@ public class StubTestClass extends StubParentClass {
 		FileUtils.moveFile(tmpImg, new File(screenshot.getFullImagePath()));
 		FileUtils.moveFile(tmpHtml, new File(screenshot.getFullHtmlPath()));
 		
-		step1.addSnapshot(new Snapshot(screenshot, "main"), 1, null);
+		step1.addSnapshot(new Snapshot(screenshot, "main", SnapshotCheckType.TRUE), 1, null);
 		step1.setActionException(new WebDriverException("driver exception"));
 		TestStep subStep1 = new TestStep("step 1.3: open page", Reporter.getCurrentTestResult(), new ArrayList<>(), maskPassword);
 		subStep1.addAction(new TestAction("click link", false, new ArrayList<>()));

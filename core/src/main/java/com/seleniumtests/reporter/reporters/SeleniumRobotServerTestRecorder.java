@@ -36,6 +36,8 @@ import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.utils.TestNGResultUtils;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.SeleniumRobotServerException;
+import com.seleniumtests.driver.screenshots.SnapshotCheckType;
+import com.seleniumtests.reporter.logger.Snapshot;
 import com.seleniumtests.reporter.logger.TestStep;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
@@ -157,10 +159,13 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 						
 						serverConnector.recordStepResult(!testStep.getFailed(), stepLogs, testStep.getDuration());
 						
-						if (!testStep.getSnapshots().isEmpty()) {
-							serverConnector.createSnapshot(Paths.get(testContext.getOutputDirectory(), 
-									testStep.getSnapshots().get(0).getScreenshot().getImagePath()
-									).toFile());
+						// sends all snapshots that are flagged as comparable
+						for (Snapshot snapshot: testStep.getSnapshots()) {
+							if (snapshot.isCheckSnapshot() == SnapshotCheckType.TRUE) {
+								serverConnector.createSnapshot(Paths.get(testContext.getOutputDirectory(), 
+										snapshot.getScreenshot().getImagePath()
+										).toFile());
+							}
 						}
 					}
 				}

@@ -33,7 +33,7 @@ import com.seleniumtests.driver.DriverMode;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.driver.screenshots.ScreenShot;
 import com.seleniumtests.driver.screenshots.ScreenshotUtil;
-import com.seleniumtests.driver.screenshots.ScreenshotUtil.Target;
+import com.seleniumtests.driver.screenshots.SnapshotTarget;
 import com.seleniumtests.reporter.logger.TestStep;
 import com.seleniumtests.util.logging.ScenarioLogger;
 import com.seleniumtests.util.osutility.OSUtilityFactory;
@@ -235,12 +235,10 @@ public class TestTasks {
     
     public static void capturePageSnapshot() {
     	if (WebUIDriver.getWebDriver(false) != null) {
-    		logger.logScreenshot(new ScreenshotUtil().capture(Target.PAGE, ScreenShot.class));
+    		logger.logScreenshot(new ScreenshotUtil().capture(SnapshotTarget.PAGE, ScreenShot.class));
     	}
-
     }
     
-
     /**
      * In case the scenario uses several drivers, switch to one or another using this method, so that any new calls will go through this driver
      * @param driverName

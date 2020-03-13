@@ -10,6 +10,7 @@ import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.utils.TestNGResultUtils;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.driver.screenshots.ScreenShot;
+import com.seleniumtests.driver.screenshots.SnapshotCheckType;
 import com.seleniumtests.reporter.logger.GenericFile;
 import com.seleniumtests.reporter.logger.HarCapture;
 import com.seleniumtests.reporter.logger.Snapshot;
@@ -158,6 +159,17 @@ public class ScenarioLogger extends Logger {
     }
     
     /**
+     * Log screenshot by requesting check
+     *
+     * @param screenshot		screenshot to log
+	 * @param screenshotName name of the snapshot, user wants to display
+	 * @param checkSnapshot		If true, check if we should compare snapshot on selenium server
+     */
+    public void logScreenshot(ScreenShot screenshot, String screenshotName, SnapshotCheckType checkSnapshot) {
+    	logScreenshot(screenshot, screenshotName, WebUIDriver.getCurrentWebUiDriverName(), checkSnapshot);
+    }
+    
+    /**
      * Log screenshot. Should not be directly used inside tests
      *
      * @param screenshot		screenshot to log
@@ -165,12 +177,24 @@ public class ScenarioLogger extends Logger {
 	 * @param driverName		the name of the driver that did the screenshot
      */
     public void logScreenshot(ScreenShot screenshot, String screenshotName, String driverName) {
+    	logScreenshot(screenshot, screenshotName, driverName, SnapshotCheckType.FALSE);
+    }
+    
+    /**
+     * Log screenshot. Should not be directly used inside tests
+     *
+     * @param screenshot		screenshot to log
+	 * @param screenshotName 	name of the snapshot, user wants to display
+	 * @param driverName		the name of the driver that did the screenshot
+	 * @param checkSnapshot		If true, check if we should compare snapshot on selenium server
+     */
+    public void logScreenshot(ScreenShot screenshot, String screenshotName, String driverName, SnapshotCheckType checkSnapshot) {
 
     	try {
 	    	TestStep runningStep = SeleniumTestsContextManager.getContextForCurrentTestState().get(0).getTestStepManager().getRunningTestStep();
 	    	if (runningStep != null) {
 	    		try {
-	    			runningStep.addSnapshot(new Snapshot(screenshot, driverName), 
+	    			runningStep.addSnapshot(new Snapshot(screenshot, driverName, checkSnapshot), 
 	    					SeleniumTestsContextManager.getContextForCurrentTestState().get(0).getTestStepManager().getTestSteps().size(),
 	    					screenshotName);
 	    		} catch (NullPointerException e) {

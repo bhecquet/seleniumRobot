@@ -32,7 +32,7 @@ import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.driver.screenshots.ScreenshotUtil;
-import com.seleniumtests.driver.screenshots.ScreenshotUtil.Target;
+import com.seleniumtests.driver.screenshots.SnapshotTarget;
 import com.seleniumtests.uipage.ReplayOnError;
 
 import io.appium.java_client.touch.TapOptions;
@@ -107,7 +107,7 @@ public class PictureElement extends GenericPictureElement {
 	public File getScreenshotFile() {
 		screenshotUtil = getScreenshotUtil(); // update driver
 		
-		return screenshotUtil.capture(Target.PAGE, File.class, true);		
+		return screenshotUtil.capture(SnapshotTarget.PAGE, File.class, true);		
 	}
 	
 	protected void doAfterPictureSearch() {

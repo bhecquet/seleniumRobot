@@ -38,7 +38,7 @@ import com.seleniumtests.core.utils.TestNGResultUtils;
 import com.seleniumtests.driver.TestType;
 import com.seleniumtests.driver.screenshots.ScreenShot;
 import com.seleniumtests.driver.screenshots.ScreenshotUtil;
-import com.seleniumtests.driver.screenshots.ScreenshotUtil.Target;
+import com.seleniumtests.driver.screenshots.SnapshotTarget;
 import com.seleniumtests.it.reporter.ReporterTest;
 import com.seleniumtests.reporter.logger.Snapshot;
 import com.seleniumtests.reporter.logger.TestStep;
@@ -116,7 +116,7 @@ public class TestScreenshotUtil extends ReporterTest {
 	@Test(groups={"it"})
 	public void testDesktopScreenshots(ITestContext testContext) throws Exception {
 		SeleniumTestsContextManager.getThreadContext().setTestType(TestType.WEB);
-		ScreenShot screenshot = new ScreenshotUtil(null).capture(Target.SCREEN, ScreenShot.class);
+		ScreenShot screenshot = new ScreenshotUtil(null).capture(SnapshotTarget.SCREEN, ScreenShot.class);
 		Assert.assertTrue(new File(screenshot.getFullImagePath()).exists());
 		
 	}

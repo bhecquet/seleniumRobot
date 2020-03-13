@@ -54,7 +54,7 @@ import com.seleniumtests.driver.DriverConfig;
 import com.seleniumtests.driver.TestType;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.driver.screenshots.ScreenshotUtil;
-import com.seleniumtests.driver.screenshots.ScreenshotUtil.Target;
+import com.seleniumtests.driver.screenshots.SnapshotTarget;
 import com.seleniumtests.uipage.htmlelements.HtmlElement;
 import com.seleniumtests.uipage.htmlelements.PictureElement;
 import com.seleniumtests.util.imaging.ImageDetector;
@@ -114,7 +114,7 @@ public class TestPictureElement extends MockitoTest {
 		when(driver.getKeyboard()).thenReturn(keyboard);
 		when(driver.getBrowserInfo()).thenReturn(browserInfo);
 		when(browserInfo.getBrowser()).thenReturn(BrowserType.FIREFOX);
-		when(screenshotUtil.capture(Target.PAGE, File.class, true)).thenReturn(new File(""));
+		when(screenshotUtil.capture(SnapshotTarget.PAGE, File.class, true)).thenReturn(new File(""));
 		when(imageDetector.getDetectedRectangle()).thenReturn(new Rectangle(10, 10, 100, 50));
 		when(imageDetector.getSizeRatio()).thenReturn(1.0);
 		when(coordinates.inViewPort()).thenReturn(new Point(100, 120));
@@ -133,7 +133,7 @@ public class TestPictureElement extends MockitoTest {
 	public void testPictureNotVisible() throws AWTException {
 		PictureElement picElement = spy(pictureElement);
 		picElement.setObjectPictureFile(new File(""));
-		when(screenshotUtil.capture(Target.PAGE, File.class, true)).thenReturn(new File(""));
+		when(screenshotUtil.capture(SnapshotTarget.PAGE, File.class, true)).thenReturn(new File(""));
 		doReturn(screenshotUtil).when(picElement).getScreenshotUtil();
 		doThrow(ImageSearchException.class).when(imageDetector).detectExactZoneWithScale();
 		
@@ -148,7 +148,7 @@ public class TestPictureElement extends MockitoTest {
 		PictureElement picElement = spy(pictureElement);
 		picElement.setObjectPictureFile(new File(""));
 		doReturn(screenshotUtil).when(picElement).getScreenshotUtil();
-		when(screenshotUtil.capture(Target.PAGE, File.class, true)).thenReturn(new File(""));
+		when(screenshotUtil.capture(SnapshotTarget.PAGE, File.class, true)).thenReturn(new File(""));
 		doThrow(ImageSearchException.class).when(imageDetector).detectExactZoneWithScale();
 		
 		Assert.assertFalse(picElement.isElementPresent(350));
@@ -162,7 +162,7 @@ public class TestPictureElement extends MockitoTest {
 		PictureElement picElement = spy(pictureElement);
 		picElement.setObjectPictureFile(new File(""));
 		doReturn(screenshotUtil).when(picElement).getScreenshotUtil();
-		when(screenshotUtil.capture(Target.PAGE, File.class, true)).thenReturn(new File(""));
+		when(screenshotUtil.capture(SnapshotTarget.PAGE, File.class, true)).thenReturn(new File(""));
 		when(imageDetector.getDetectedRectangle()).thenReturn(new Rectangle(10, 10, 100, 50));
 		when(imageDetector.getSizeRatio()).thenReturn(1.0);
 		

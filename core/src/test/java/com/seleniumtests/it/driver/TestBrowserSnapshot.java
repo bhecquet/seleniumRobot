@@ -50,7 +50,7 @@ import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.driver.screenshots.ScreenShot;
 import com.seleniumtests.driver.screenshots.ScreenshotUtil;
-import com.seleniumtests.driver.screenshots.ScreenshotUtil.Target;
+import com.seleniumtests.driver.screenshots.SnapshotTarget;
 import com.seleniumtests.it.driver.support.GenericMultiBrowserTest;
 import com.seleniumtests.it.driver.support.pages.DriverSubTestPage;
 import com.seleniumtests.it.driver.support.pages.DriverTestPage;
@@ -153,7 +153,7 @@ public class TestBrowserSnapshot extends GenericMultiBrowserTest {
 	}
 	
 	private void captureSnapshot(String filePath) {
-		String b64Img = new ScreenshotUtil(driver).capture(Target.PAGE, String.class);
+		String b64Img = new ScreenshotUtil(driver).capture(SnapshotTarget.PAGE, String.class);
 		byte[] byteArray = b64Img.getBytes();
 		FileUtility.writeImage(filePath, byteArray);
 	}
@@ -173,7 +173,7 @@ public class TestBrowserSnapshot extends GenericMultiBrowserTest {
 		Dimension screenshotDim = getViewPortDimension(new File(origFilePath));
 		
 		// get cropped picture
-		BufferedImage image = new ScreenshotUtil(driver).capture(Target.PAGE, BufferedImage.class);
+		BufferedImage image = new ScreenshotUtil(driver).capture(SnapshotTarget.PAGE, BufferedImage.class);
 		
 		// check all scrollbars were already removed from screenshot
 		Assert.assertEquals(image.getWidth(), screenshotDim.width);
@@ -195,7 +195,7 @@ public class TestBrowserSnapshot extends GenericMultiBrowserTest {
 		Dimension screenshotDim = getViewPortDimension(new File(origFilePath));
 		
 		// get cropped picture
-		BufferedImage image = new ScreenshotUtil(driver).capture(Target.PAGE, BufferedImage.class);
+		BufferedImage image = new ScreenshotUtil(driver).capture(SnapshotTarget.PAGE, BufferedImage.class);
 		
 		// check all scrollbars where already removed from screenshot
 		Assert.assertEquals(image.getWidth(), screenshotDim.width);
@@ -222,7 +222,7 @@ public class TestBrowserSnapshot extends GenericMultiBrowserTest {
 		doThrow(JavascriptException.class).when(mockedDriver).scrollTop();
 		doThrow(JavascriptException.class).when(mockedDriver).scrollTo(anyInt(), anyInt());
 		
-		ScreenShot screenshot = screenshotUtil.capture(Target.PAGE, ScreenShot.class);
+		ScreenShot screenshot = screenshotUtil.capture(SnapshotTarget.PAGE, ScreenShot.class);
 		Assert.assertNotNull(screenshot.getHtmlSourcePath());
 		Assert.assertNotNull(screenshot.getFullImagePath());
 	}
@@ -246,7 +246,7 @@ public class TestBrowserSnapshot extends GenericMultiBrowserTest {
 		doThrow(WebDriverException.class).when(mockedDriver).scrollTop();
 		doThrow(JavascriptException.class).when(mockedDriver).scrollTo(anyInt(), anyInt());
 		
-		ScreenShot screenshot = screenshotUtil.capture(Target.PAGE, ScreenShot.class);
+		ScreenShot screenshot = screenshotUtil.capture(SnapshotTarget.PAGE, ScreenShot.class);
 		Assert.assertNotNull(screenshot.getHtmlSourcePath());
 		Assert.assertNotNull(screenshot.getFullImagePath());
 	}
@@ -271,6 +271,24 @@ public class TestBrowserSnapshot extends GenericMultiBrowserTest {
 		Assert.assertEquals(0, headerFooter[0]);
 		Assert.assertEquals(5, headerFooter[1]);
 		Assert.assertEquals(2, headerFooter[2]); 
+	}
+	
+	/**
+	 * Test if we succeed in capturing a single element
+	 * @throws IOException
+	 */
+	@Test(groups={"it"})
+	public void testCaptureElement() throws IOException {
+		driver.manage().window().maximize();
+		WaitHelper.waitForSeconds(1);
+		
+		// get cropped picture
+		String filePath = generateCaptureFilePath();
+		BufferedImage image = new ScreenshotUtil(driver).capture(new SnapshotTarget(DriverTestPage.table), BufferedImage.class, false, false).get(0);
+		FileUtility.writeImage(filePath, image);
+		
+		Assert.assertTrue(image.getHeight() < 105 && image.getHeight() > 95); // should be 100 be may depend on browser / version
+		Assert.assertTrue(image.getWidth() < 75 && image.getWidth() > 70); // should be 72 be may depend on browser / version
 	}
 	
 	/**
@@ -332,7 +350,7 @@ public class TestBrowserSnapshot extends GenericMultiBrowserTest {
 		FileUtility.writeImage(topFilePath, new ScreenshotUtil(driver).capturePage(0, 0));
 		
 		// get full picture
-		File image = new ScreenshotUtil(driver).capture(Target.PAGE, File.class);
+		File image = new ScreenshotUtil(driver).capture(SnapshotTarget.PAGE, File.class);
 		
 		String bottomFilePath = generateCaptureFilePath();
 		FileUtility.writeImage(bottomFilePath, new ScreenshotUtil(driver).capturePage(0, 0));
@@ -352,13 +370,13 @@ public class TestBrowserSnapshot extends GenericMultiBrowserTest {
 		WaitHelper.waitForSeconds(1);
 		
 		// get full picture without cropping
-		File imageFull = new ScreenshotUtil(driver).capture(Target.PAGE, File.class);
+		File imageFull = new ScreenshotUtil(driver).capture(SnapshotTarget.PAGE, File.class);
 		
 		SeleniumTestsContextManager.getThreadContext().setSnapshotBottomCropping(5);
 		SeleniumTestsContextManager.getThreadContext().setSnapshotTopCropping(6);
 		
 		// get picture with header and footer cropped
-		File image = new ScreenshotUtil(driver).capture(Target.PAGE, File.class);
+		File image = new ScreenshotUtil(driver).capture(SnapshotTarget.PAGE, File.class);
 		
 		int[] headerFooter = getHeaderAndFooterPixels(image);
 		int[] headerFooterFull = getHeaderAndFooterPixels(imageFull);
@@ -379,7 +397,7 @@ public class TestBrowserSnapshot extends GenericMultiBrowserTest {
 	public void testMultipleWindowsCapture() {
 		String currentWindowHandle = driver.getWindowHandle();
 		DriverTestPage.link.click();
-		List<ScreenShot> screenshots = new ScreenshotUtil().capture(Target.PAGE, ScreenShot.class, true, false);
+		List<ScreenShot> screenshots = new ScreenshotUtil().capture(SnapshotTarget.PAGE, ScreenShot.class, true, false);
 		
 		Assert.assertEquals(screenshots.size(), 2);
 		Assert.assertEquals(currentWindowHandle, driver.getWindowHandle());
@@ -398,7 +416,7 @@ public class TestBrowserSnapshot extends GenericMultiBrowserTest {
 		
 		when(mockedDriver.getWindowHandles()).thenThrow(WebDriverException.class);
 		
-		List<ScreenShot> screenshots = screenshotUtil.capture(Target.PAGE, ScreenShot.class, true, false);
+		List<ScreenShot> screenshots = screenshotUtil.capture(SnapshotTarget.PAGE, ScreenShot.class, true, false);
 		
 		Assert.assertEquals(screenshots.size(), 1);
 		verify(screenshotUtil).captureDesktop();
@@ -410,7 +428,7 @@ public class TestBrowserSnapshot extends GenericMultiBrowserTest {
 	 */
 	@Test(groups= {"it"})
 	public void testDesktopSnapshot() {
-		File output = new ScreenshotUtil(driver).capture(Target.SCREEN, File.class);
+		File output = new ScreenshotUtil(driver).capture(SnapshotTarget.SCREEN, File.class);
 		Assert.assertTrue(FileUtils.sizeOf(output) > 0);
 	}
 	
@@ -421,7 +439,7 @@ public class TestBrowserSnapshot extends GenericMultiBrowserTest {
 	public void testCurrentWindowsCapture() {
 		String currentWindowHandle = driver.getWindowHandle();
 		DriverTestPage.link.click();
-		List<ScreenShot> screenshots = new ScreenshotUtil(driver).capture(Target.PAGE, ScreenShot.class, false, false);
+		List<ScreenShot> screenshots = new ScreenshotUtil(driver).capture(SnapshotTarget.PAGE, ScreenShot.class, false, false);
 		
 		Assert.assertEquals(screenshots.size(), 1);
 		Assert.assertEquals(currentWindowHandle, driver.getWindowHandle());
@@ -433,7 +451,7 @@ public class TestBrowserSnapshot extends GenericMultiBrowserTest {
 	@Test(groups= {"it"})
 	public void testCurrentWindowsCapture2() {
 		DriverTestPage.link.click();
-		ScreenShot screenshot = new ScreenshotUtil(driver).capture(Target.PAGE, ScreenShot.class);
+		ScreenShot screenshot = new ScreenshotUtil(driver).capture(SnapshotTarget.PAGE, ScreenShot.class);
 		
 		Assert.assertNotNull(screenshot.getImagePath());
 	}
