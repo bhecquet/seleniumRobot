@@ -24,7 +24,7 @@ import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import com.seleniumtests.driver.screenshots.ScreenshotUtil;
-import com.seleniumtests.driver.screenshots.ScreenshotUtil.Target;
+import com.seleniumtests.driver.screenshots.SnapshotTarget;
 import com.seleniumtests.uipage.ReplayOnError;
 
 /**
@@ -78,7 +78,7 @@ public class ScreenZone extends GenericPictureElement {
 		screenshotUtil = getScreenshotUtil(); // keep this for unit tests
 
 		// issue #136: we don't need driver when checking desktop
-		return screenshotUtil.capture(Target.SCREEN, File.class, true);
+		return screenshotUtil.capture(SnapshotTarget.SCREEN, File.class, true);
 	}
 	
 	protected void doAfterPictureSearch() {

@@ -18,7 +18,6 @@
 package com.seleniumtests.reporter.logger;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -27,15 +26,14 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.testng.ITestResult;
-import org.testng.Reporter;
 
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.TestStepManager;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.driver.screenshots.ScreenShot;
+import com.seleniumtests.driver.screenshots.SnapshotCheckType;
 import com.seleniumtests.util.logging.ScenarioLogger;
-import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
 import net.lightbody.bmp.core.har.Har;
 
@@ -186,7 +184,7 @@ public class TestLogging {
      */
 	@Deprecated
     public static void logScreenshot(ScreenShot screenshot, String screenshotName, String driverName) {
-    	logger.logScreenshot(screenshot, screenshotName, driverName);
+    	logger.logScreenshot(screenshot, screenshotName, driverName, SnapshotCheckType.FALSE);
     }
     
 	/**

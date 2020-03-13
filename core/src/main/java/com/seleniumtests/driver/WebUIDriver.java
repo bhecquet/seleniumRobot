@@ -59,7 +59,8 @@ import com.seleniumtests.customexception.DriverExceptions;
 import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.driver.screenshots.ScreenShot;
 import com.seleniumtests.driver.screenshots.ScreenshotUtil;
-import com.seleniumtests.driver.screenshots.ScreenshotUtil.Target;
+import com.seleniumtests.driver.screenshots.SnapshotCheckType;
+import com.seleniumtests.driver.screenshots.SnapshotTarget;
 import com.seleniumtests.driver.screenshots.VideoCaptureMode;
 import com.seleniumtests.driver.screenshots.VideoRecorder;
 import com.seleniumtests.reporter.logger.TestStep;
@@ -281,8 +282,8 @@ public class WebUIDriver {
 			try {
 				
 				// force screenshotUtil to use the driver of this WebUiDriver, not the currently selected one
-				for (ScreenShot screenshot: new ScreenshotUtil(driver).capture(Target.PAGE, ScreenShot.class, true, true)) {
-					scenarioLogger.logScreenshot(screenshot, null, name);
+				for (ScreenShot screenshot: new ScreenshotUtil(driver).capture(SnapshotTarget.PAGE, ScreenShot.class, true, true)) {
+					scenarioLogger.logScreenshot(screenshot, null, name, SnapshotCheckType.FALSE);
 				}
 			} catch (Exception e) {
 				scenarioLogger.log("Error while logging: " + e.getMessage());

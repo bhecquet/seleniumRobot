@@ -33,6 +33,7 @@ import com.seleniumtests.GenericTest;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.CustomSeleniumTestsException;
 import com.seleniumtests.driver.screenshots.ScreenShot;
+import com.seleniumtests.driver.screenshots.SnapshotCheckType;
 import com.seleniumtests.reporter.logger.GenericFile;
 import com.seleniumtests.reporter.logger.HarCapture;
 import com.seleniumtests.reporter.logger.Snapshot;
@@ -125,7 +126,7 @@ public class TestTestStep extends GenericTest {
 		screenshot.setImagePath(tmpImgFile.getName());
 		screenshot.setHtmlSourcePath(tmpHtmlFile.getName());
 		
-		step.addSnapshot(new Snapshot(screenshot, "main"), 0, null);
+		step.addSnapshot(new Snapshot(screenshot, "main", SnapshotCheckType.TRUE), 0, null);
 		
 		Assert.assertEquals(step.getSnapshots().get(0).getScreenshot().getImagePath(), "N-A_0-1_step1-" + tmpImgFile.getName());
 		Assert.assertEquals(step.getSnapshots().get(0).getScreenshot().getHtmlSourcePath(), "N-A_0-1_step1-" + tmpHtmlFile.getName());
@@ -153,7 +154,7 @@ public class TestTestStep extends GenericTest {
 		screenshot.setImagePath(tmpImgFile.getName());
 		screenshot.setHtmlSourcePath(tmpHtmlFile.getName());
 		
-		step.addSnapshot(new Snapshot(screenshot, "main"), 0, "my snapshot <name>");
+		step.addSnapshot(new Snapshot(screenshot, "main", SnapshotCheckType.FALSE), 0, "my snapshot <name>");
 		
 		Assert.assertEquals(step.getSnapshots().get(0).getScreenshot().getImagePath(), "my_snapshot_-name-" + tmpImgFile.getName());
 		Assert.assertEquals(step.getSnapshots().get(0).getScreenshot().getHtmlSourcePath(), "my_snapshot_-name-" + tmpHtmlFile.getName());
@@ -180,7 +181,7 @@ public class TestTestStep extends GenericTest {
 		screenshot.setImagePath("screenshots/" + tmpImgFile2.getName());
 		screenshot.setHtmlSourcePath("htmls/" + tmpHtmlFile2.getName());
 		
-		step.addSnapshot(new Snapshot(screenshot, "main"), 0, null);
+		step.addSnapshot(new Snapshot(screenshot, "main", SnapshotCheckType.TRUE), 0, null);
 		
 		Assert.assertEquals(step.getSnapshots().get(0).getScreenshot().getImagePath(), "screenshots/N-A_0-1_step1-" + tmpImgFile2.getName());
 		Assert.assertEquals(step.getSnapshots().get(0).getScreenshot().getHtmlSourcePath(), "htmls/N-A_0-1_step1-" + tmpHtmlFile2.getName());
@@ -215,7 +216,7 @@ public class TestTestStep extends GenericTest {
 		screenshot1.setTitle("mysite");
 		screenshot1.setImagePath("screenshots/" + tmpImgFile2.getName());
 		screenshot1.setHtmlSourcePath("htmls/" + tmpHtmlFile2.getName());
-		step.addSnapshot(new Snapshot(screenshot1, "main"), 0, null);
+		step.addSnapshot(new Snapshot(screenshot1, "main", SnapshotCheckType.FALSE), 0, null);
 		
 		TestStep subStep = new TestStep("subStep", null, new ArrayList<>(), true);
 		
@@ -230,7 +231,7 @@ public class TestTestStep extends GenericTest {
 		screenshot2.setLocation("http://mysite.com");
 		screenshot2.setTitle("mysite");
 		screenshot2.setImagePath("screenshots/" + tmpImgFile4.getName());
-		subStep.addSnapshot(new Snapshot(screenshot2, "main"), 0, null);
+		subStep.addSnapshot(new Snapshot(screenshot2, "main", SnapshotCheckType.TRUE), 0, null);
 		 
 		subStep.addAction(new TestAction("action1", true, new ArrayList<>()));
 		step.addAction(new TestAction("action2", false, new ArrayList<>()));
@@ -608,7 +609,7 @@ public class TestTestStep extends GenericTest {
 		
 		ScreenShot screenshot = new ScreenShot();
 		screenshot.setDuration(200);
-		Snapshot snapshot = new Snapshot(screenshot, "main");
+		Snapshot snapshot = new Snapshot(screenshot, "main", SnapshotCheckType.TRUE);
 		step.addSnapshot(snapshot, 0, "name");
 		Assert.assertEquals(step.getDuration(), (Long)4300L);
 	}

@@ -34,6 +34,7 @@ import org.openqa.selenium.Alert;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.JavascriptException;
 import org.openqa.selenium.OutputType;
+import org.openqa.selenium.Rectangle;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
@@ -80,7 +81,7 @@ public class ScreenshotUtil {
         return SeleniumTestsContextManager.getThreadContext().getOutputDirectory();
     }
     
-    public enum Target {SCREEN, PAGE}
+    
     
     private class NamedBufferedImage {
     	public BufferedImage image;
@@ -101,6 +102,21 @@ public class ScreenshotUtil {
     		this.title = null;
     		this.pageSource = null;
     		
+    	}
+    	
+    	/**
+    	 * Copy the current image to an other one, changing underlying image
+    	 * @return
+    	 */
+    	public NamedBufferedImage copy(BufferedImage image) {
+    		NamedBufferedImage img = new NamedBufferedImage(image, this.prefix);
+    		img.prefix = prefix;
+    		img.image = image;
+    		img.url = url;
+    		img.title = title;
+    		img.pageSource = pageSource;
+    		
+    		return img;
     	}
     	
 
@@ -140,6 +156,42 @@ public class ScreenshotUtil {
         	
         	return this;
         }
+        
+        /**
+         * When target is an element, add information relative to element
+         * @return
+         */
+        public NamedBufferedImage addElementMetaDataToImage(WebElement element) {
+        	
+        	if (SeleniumTestsContextManager.isWebTest()) {
+        		try {
+        			url = driver.getCurrentUrl();
+        		} catch (org.openqa.selenium.UnhandledAlertException ex) {
+        			// ignore alert customexception
+        			logger.error(ex);
+        			url = driver.getCurrentUrl();
+        		} catch (Throwable e) {
+        			// allow screenshot even if some problem occurs
+        			url = "http://no/url/available";
+        		}
+        		
+        		try {
+        			title = element.toString();
+        		} catch (Throwable e) {
+        			// allow screenshot even if some problem occurs
+        			title = "No Title";
+        		}
+        		title = prefix == null ? title: prefix + title;
+        		
+        		try {
+        			pageSource = element.getAttribute("outerHTML");
+        		} catch (Throwable e) {
+        			pageSource = "";
+        		}
+        	}
+        	
+        	return this;
+        }
     }
     
     /**
@@ -148,7 +200,7 @@ public class ScreenshotUtil {
      * @param exportClass	The type of export to perform (File, ScreenShot, String, BufferedImage)
      * @return
      */
-    public <T extends Object> T capture(Target target, Class<T> exportClass) {
+    public <T extends Object> T capture(SnapshotTarget target, Class<T> exportClass) {
     	return capture(target, exportClass, false);
     }
     
@@ -159,7 +211,7 @@ public class ScreenshotUtil {
      * @param force			force capture even if set to false in SeleniumTestContext. This allows PictureElement and ScreenZone to work
      * @return
      */
-    public <T extends Object> T capture(Target target, Class<T> exportClass, boolean force) {
+    public <T extends Object> T capture(SnapshotTarget target, Class<T> exportClass, boolean force) {
     	try {
 			return capture(target, exportClass, false, force).get(0);
 		} catch (IndexOutOfBoundsException e) {
@@ -186,7 +238,7 @@ public class ScreenshotUtil {
      * @param force			force capture even if set to false in SeleniumTestContext. This allows PictureElement and ScreenZone to work
      * @return
      */
-    public <T extends Object> List<T> capture(Target target, Class<T> exportClass, boolean allWindows, boolean force) {
+    public <T extends Object> List<T> capture(SnapshotTarget target, Class<T> exportClass, boolean allWindows, boolean force) {
     	
     	if (!force && (SeleniumTestsContextManager.getThreadContext() == null 
         		|| getOutputDirectory() == null 
@@ -197,22 +249,39 @@ public class ScreenshotUtil {
     	List<NamedBufferedImage> capturedImages = new ArrayList<>();
     	LocalDateTime start = LocalDateTime.now();
     	
-    	if (target == Target.SCREEN && SeleniumTestsContextManager.isDesktopWebTest()) {
-    		// capture desktop
+    	// capture desktop
+    	if (target.isScreenTarget() && SeleniumTestsContextManager.isDesktopWebTest()) {
     		capturedImages.add(new NamedBufferedImage(captureDesktop(), ""));
-    	} else if (target == Target.PAGE && SeleniumTestsContextManager.isWebTest()) {
-    		// capture web with scrolling
+    		
+    	// capture web with scrolling
+    	} else if (target.isPageTarget() && SeleniumTestsContextManager.isWebTest()) {
     		removeAlert();
     		capturedImages.addAll(captureWebPages(allWindows));
-	    } else if (target == Target.PAGE && SeleniumTestsContextManager.isAppTest()){
+    		
+    	// capture web with scrolling on the main window
+    	} else if (target.isElementTarget() && SeleniumTestsContextManager.isWebTest()) {
+    		removeAlert();
+    		capturedImages.addAll(captureWebPages(false));
+    		
+	    } else if ((target.isPageTarget() || target.isElementTarget()) && SeleniumTestsContextManager.isAppTest()){
     		capturedImages.add(new NamedBufferedImage(capturePage(-1, -1), ""));
     	} else {
     		throw new ScenarioException("Capturing page is only possible for web and application tests. Capturing desktop possible for desktop web tests only");
     	}
     	
+    	// if we want to capture an element only, crop the previous capture
+    	if (target.isElementTarget() && target.getElement() != null && capturedImages.size() > 0) {
+    		Rectangle elementPosition = target.getElement().getRect();
+    		NamedBufferedImage wholeImage = capturedImages.remove(0);
+    		BufferedImage elementImage = ImageProcessor.cropImage(wholeImage.image, elementPosition.x, elementPosition.y, elementPosition.width, elementPosition.height);
+    		NamedBufferedImage namedElementImage = new NamedBufferedImage(elementImage, "");
+    		namedElementImage.addElementMetaDataToImage(target.getElement());
+    		capturedImages.add(0, namedElementImage);
+    	}
+    	
     	// back to page top
     	try {
-    		if (target == Target.PAGE) {
+    		if (target.isPageTarget()) {
     			((CustomEventFiringWebDriver)driver).scrollTop();
     		}
     	} catch (WebDriverException e) {

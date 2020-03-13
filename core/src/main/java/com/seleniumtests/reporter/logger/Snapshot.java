@@ -31,6 +31,7 @@ import org.apache.commons.lang3.StringEscapeUtils;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.driver.screenshots.ScreenShot;
+import com.seleniumtests.driver.screenshots.SnapshotCheckType;
 import com.seleniumtests.reporter.reporters.CommonReporter;
 import com.seleniumtests.util.FileUtility;
 import com.seleniumtests.util.StringUtility;
@@ -38,13 +39,15 @@ import com.seleniumtests.util.StringUtility;
 public class Snapshot extends TestAction {
 	
 	private ScreenShot screenshot;
+	private SnapshotCheckType checkSnapshot; // whether this snapshot will be sent to Snapshot server to check if it conforms to baseline
 
 	public static final String SNAPSHOT_PATTERN = "Application Snapshot";
 	public static final String OUTPUT_PATTERN = "Output '%s' browser: ";
 
-	public Snapshot(final ScreenShot screenshot, String driverName) {
+	public Snapshot(final ScreenShot screenshot, String driverName, SnapshotCheckType checkSnapshot) {
 		super(driverName, false, new ArrayList<>());
 		this.screenshot = screenshot;
+		this.checkSnapshot = checkSnapshot;
 		durationToExclude = screenshot.getDuration();
 	}
 	
@@ -155,7 +158,11 @@ public class Snapshot extends TestAction {
 	}
 	
 	public Snapshot encode() {
-		return new Snapshot(screenshot, name);
+		return new Snapshot(screenshot, name, checkSnapshot);
+	}
+
+	public SnapshotCheckType isCheckSnapshot() {
+		return checkSnapshot;
 	}
 
 }

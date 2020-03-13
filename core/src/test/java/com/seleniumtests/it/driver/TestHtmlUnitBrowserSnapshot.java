@@ -28,7 +28,7 @@ import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.driver.screenshots.ScreenShot;
 import com.seleniumtests.driver.screenshots.ScreenshotUtil;
-import com.seleniumtests.driver.screenshots.ScreenshotUtil.Target;
+import com.seleniumtests.driver.screenshots.SnapshotTarget;
 import com.seleniumtests.it.driver.support.pages.DriverTestPage;
 
 
@@ -56,7 +56,7 @@ public class TestHtmlUnitBrowserSnapshot extends MockitoTest {
 	@Test(groups= {"it"})
 	public void testHtmlUnitCapture() {
 		ScreenshotUtil screenshotUtil = new ScreenshotUtil();
-		ScreenShot screenshot = screenshotUtil.capture(Target.PAGE, ScreenShot.class);
+		ScreenShot screenshot = screenshotUtil.capture(SnapshotTarget.PAGE, ScreenShot.class);
 		Assert.assertNull(screenshot.getImagePath());
 
 	}

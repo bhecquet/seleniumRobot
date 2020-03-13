@@ -33,6 +33,7 @@ import com.seleniumtests.GenericTest;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.TestStepManager;
 import com.seleniumtests.driver.screenshots.ScreenShot;
+import com.seleniumtests.driver.screenshots.SnapshotCheckType;
 import com.seleniumtests.reporter.logger.HarCapture;
 import com.seleniumtests.reporter.logger.Snapshot;
 import com.seleniumtests.reporter.logger.TestMessage;
@@ -123,7 +124,7 @@ public class TestTestLogging extends GenericTest {
 		screenshot.setLocation("http://location");
 		screenshot.setHtmlSourcePath("file.html");
 		screenshot.setImagePath("file.png");
-		Snapshot snapshotLogger = new Snapshot(screenshot, "main");
+		Snapshot snapshotLogger = new Snapshot(screenshot, "main", SnapshotCheckType.TRUE);
 		String screenshotStr = snapshotLogger.buildScreenshotLog();
 		Assert.assertEquals(screenshotStr, "Output 'main' browser: title: <a href='http://location' target=url>Application URL</a> | <a href='file.html' target=html>Application HTML Source</a> | <a href='file.png' class='lightbox'>Application Snapshot</a>");
 	}
@@ -131,7 +132,7 @@ public class TestTestLogging extends GenericTest {
 	@Test(groups={"ut"})
 	public void testBuildScreenshotStringWithoutInfo() {
 		ScreenShot screenshot = new ScreenShot();
-		Snapshot snapshotLogger = new Snapshot(screenshot, "main");
+		Snapshot snapshotLogger = new Snapshot(screenshot, "main", SnapshotCheckType.FALSE);
 		String screenshotStr = snapshotLogger.buildScreenshotLog();
 		Assert.assertEquals(screenshotStr, "Output 'main' browser: null: ");
 	}
@@ -142,7 +143,7 @@ public class TestTestLogging extends GenericTest {
 		screenshot.setTitle("title");
 		screenshot.setLocation("http://location");
 		screenshot.setHtmlSourcePath("file.html");
-		Snapshot snapshotLogger = new Snapshot(screenshot, "main");
+		Snapshot snapshotLogger = new Snapshot(screenshot, "main", SnapshotCheckType.TRUE);
 		String screenshotStr = snapshotLogger.buildScreenshotLog();
 		Assert.assertEquals(screenshotStr, "Output 'main' browser: title: <a href='http://location' target=url>Application URL</a> | <a href='file.html' target=html>Application HTML Source</a>");
 	}
@@ -153,7 +154,7 @@ public class TestTestLogging extends GenericTest {
 		screenshot.setTitle("title");
 		screenshot.setLocation("http://location");
 		screenshot.setImagePath("file.png");
-		Snapshot snapshotLogger = new Snapshot(screenshot, "main");
+		Snapshot snapshotLogger = new Snapshot(screenshot, "main", SnapshotCheckType.FALSE);
 		String screenshotStr = snapshotLogger.buildScreenshotLog();
 		Assert.assertEquals(screenshotStr, "Output 'main' browser: title: <a href='http://location' target=url>Application URL</a> | <a href='file.png' class='lightbox'>Application Snapshot</a>");
 	}
@@ -164,7 +165,7 @@ public class TestTestLogging extends GenericTest {
 		screenshot.setTitle("title");
 		screenshot.setHtmlSourcePath("file.html");
 		screenshot.setImagePath("file.png");
-		Snapshot snapshotLogger = new Snapshot(screenshot, "main");
+		Snapshot snapshotLogger = new Snapshot(screenshot, "main", SnapshotCheckType.TRUE);
 		String screenshotStr = snapshotLogger.buildScreenshotLog();
 		Assert.assertEquals(screenshotStr, "Output 'main' browser: title:  | <a href='file.html' target=html>Application HTML Source</a> | <a href='file.png' class='lightbox'>Application Snapshot</a>");
 	}
