@@ -108,8 +108,6 @@ public class TestSeleniumRobotSnapshotServerConnector extends MockitoTest {
 		SeleniumRobotSnapshotServerConnector connector = new SeleniumRobotSnapshotServerConnector(true, SERVER_URL);
 		
 		// reset default value to force creation
-		connector.setApplicationId(null);
-		connector.setEnvironmentId(null);
 		connector.setVersionId(null);
 		connector.setTestCaseId(null);
 		return connector;
@@ -192,6 +190,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends MockitoTest {
 	@Test(groups= {"ut"})
 	public void testCreateApplication() throws UnirestException {		
 		SeleniumRobotSnapshotServerConnector connector = configureAliveConnection();
+		connector.setApplicationId(null); // reset to be sure it's recreated
 		
 		connector.createApplication();
 		Assert.assertEquals((int)connector.getApplicationId(), 9);
@@ -201,6 +200,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends MockitoTest {
 	@Test(groups= {"ut"}, expectedExceptions=SeleniumRobotServerException.class)
 	public void testCreateApplicationInError() throws UnirestException {
 		SeleniumRobotSnapshotServerConnector connector = configureAliveConnection();
+		connector.setApplicationId(null); // reset to be sure it's recreated
 
 		BaseRequest req = createSnapshotServerMock("POST", SeleniumRobotSnapshotServerConnector.APPLICATION_API_URL, 200, "{'id': '9'}");	
 		when(req.asString()).thenThrow(UnirestException.class);
@@ -212,6 +212,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends MockitoTest {
 	@Test(groups= {"ut"})
 	public void testCreateApplicationServerInactive() throws UnirestException {
 		SeleniumRobotSnapshotServerConnector connector = configureNotAliveConnection();
+		connector.setApplicationId(null); // reset to be sure it's recreated
 		
 		connector.createApplication();
 		PowerMockito.verifyStatic(Unirest.class, never());
@@ -222,6 +223,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends MockitoTest {
 	@Test(groups= {"ut"})
 	public void testCreateVersionApplicationNull() throws UnirestException {
 		SeleniumRobotSnapshotServerConnector connector = spy(configureAliveConnection());
+		connector.setApplicationId(null); // reset to be sure it's recreated
 		
 		connector.createVersion();
 		
@@ -235,29 +237,29 @@ public class TestSeleniumRobotSnapshotServerConnector extends MockitoTest {
 	@Test(groups= {"ut"})
 	public void testCreateVersion() throws UnirestException {
 		SeleniumRobotSnapshotServerConnector connector = spy(configureAliveConnection());
-		
-		connector.createApplication();
+		connector.setVersionId(null); // reset to be sure it's recreated
+
 		connector.createVersion();
 		
 		Assert.assertNotNull(connector.getVersionId());
 		Assert.assertEquals((int)connector.getVersionId(), 11);
-		verify(connector).createApplication();
 	}
 	
 	@Test(groups= {"ut"}, expectedExceptions=SeleniumRobotServerException.class)
 	public void testCreateVersionInError() throws UnirestException {
 		SeleniumRobotSnapshotServerConnector connector = configureAliveConnection();
+		connector.setVersionId(null); // reset to be sure it's recreated
 		
 		BaseRequest req = createSnapshotServerMock("POST", SeleniumRobotSnapshotServerConnector.VERSION_API_URL, 200, "{'id': '9'}");	
 		when(req.asString()).thenThrow(UnirestException.class);
 		
-		connector.createApplication();
 		connector.createVersion();
 	}
 	
 	@Test(groups= {"ut"})
 	public void testCreateVersionServerInactive() throws UnirestException {
 		SeleniumRobotSnapshotServerConnector connector = configureNotAliveConnection();
+		connector.setVersionId(null); // reset to be sure it's recreated
 		
 		connector.createVersion();
 		PowerMockito.verifyStatic(Unirest.class, never());
@@ -268,6 +270,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends MockitoTest {
 	@Test(groups= {"ut"})
 	public void testCreateEnvironment() throws UnirestException {		
 		SeleniumRobotSnapshotServerConnector connector = configureAliveConnection();
+		connector.setEnvironmentId(null); // reset to be sure it's recreated
 		
 		connector.createEnvironment();
 		Assert.assertEquals((int)connector.getEnvironmentId(), 10);
@@ -277,6 +280,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends MockitoTest {
 	@Test(groups= {"ut"}, expectedExceptions=SeleniumRobotServerException.class)
 	public void testCreateEnvironmentInError() throws UnirestException {
 		SeleniumRobotSnapshotServerConnector connector = configureAliveConnection();
+		connector.setEnvironmentId(null); // reset to be sure it's recreated
 		
 		BaseRequest req = createSnapshotServerMock("POST", SeleniumRobotSnapshotServerConnector.ENVIRONMENT_API_URL, 200, "{'id': '9'}");	
 		when(req.asString()).thenThrow(UnirestException.class);
@@ -288,37 +292,27 @@ public class TestSeleniumRobotSnapshotServerConnector extends MockitoTest {
 	@Test(groups= {"ut"})
 	public void testCreateEnvironmentServerInactive() throws UnirestException {
 		SeleniumRobotSnapshotServerConnector connector = configureNotAliveConnection();
+		connector.setEnvironmentId(null); // reset to be sure it's recreated
 		
 		connector.createEnvironment();
 		PowerMockito.verifyStatic(Unirest.class, never());
 		Unirest.post(ArgumentMatchers.contains(SeleniumRobotSnapshotServerConnector.ENVIRONMENT_API_URL));
 	}
 	
-	// session creation
-	@Test(groups= {"ut"})
+	// session creation => as environment is not defined, error raised
+	@Test(groups= {"ut"}, expectedExceptions=SeleniumRobotServerException.class)
 	public void testCreateSessionEnvironmentNull() throws UnirestException {
 		SeleniumRobotSnapshotServerConnector connector = spy(configureAliveConnection());
+		connector.setEnvironmentId(null); // reset to be sure it's recreated
 		
 		connector.createSession();
-		
-		Assert.assertEquals((int)connector.getSessionId(), 13);
-		
-		// check application, environment and version have also been created
-		Assert.assertEquals((int)connector.getApplicationId(), 9);
-		Assert.assertEquals((int)connector.getEnvironmentId(), 10);
-		Assert.assertEquals((int)connector.getVersionId(), 11);
-		verify(connector).createEnvironment();
-		verify(connector).createVersion();
-		verify(connector).createApplication();
 	}
 	
 	@Test(groups= {"ut"})
 	public void testCreateSession() throws UnirestException {
 		SeleniumRobotSnapshotServerConnector connector = spy(configureAliveConnection());
 		
-		connector.createApplication();
 		connector.createVersion();
-		connector.createEnvironment();
 		connector.createSession();
 		
 		Assert.assertEquals((int)connector.getSessionId(), 13);
@@ -348,15 +342,12 @@ public class TestSeleniumRobotSnapshotServerConnector extends MockitoTest {
 	@Test(groups= {"ut"})
 	public void testCreateTestCasePrerequisiteNull() throws UnirestException {
 		SeleniumRobotSnapshotServerConnector connector = spy(configureAliveConnection());
+		connector.setTestCaseId(null);
 		
 		connector.createSession();
 		connector.createTestCase("Test 1");
 		
 		Assert.assertEquals((int)connector.getTestCaseId("Test 1"), 12);
-		
-		// check application has also been created
-		Assert.assertEquals((int)connector.getApplicationId(), 9);
-		verify(connector).createApplication();
 	}
 	
 	@Test(groups= {"ut"})
