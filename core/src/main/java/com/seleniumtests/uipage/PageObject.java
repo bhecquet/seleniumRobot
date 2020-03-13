@@ -368,24 +368,24 @@ public class PageObject extends BasePage implements IPage {
      * @param checkSnapshot		if true, will send snapshot to server (when seleniumRobot is configured for this) for comparison 
      */
     public void captureElementSnapshot(String snapshotName, WebElement element, SnapshotCheckType checkSnapshot) {
-    	// TODO
-//    	ScreenShot screenShot = new ScreenshotUtil().capture(Target.PAGE, ScreenShot.class);
-//    	
-//    	if (screenShot.getHtmlSourcePath() != null) {
-//    		htmlFilePath = screenShot.getHtmlSourcePath().replace(suiteName, outputDirectory);
-//    	}
-//    	
-//    	if (screenShot.getImagePath() != null) {
-//    		imageFilePath = screenShot.getImagePath().replace(suiteName, outputDirectory);
-//    	}
-//    	if (snapshotName != null) {
-//    		screenShot.setTitle(snapshotName);
-//    	}
-//    	
-//    	logger.logScreenshot(screenShot, snapshotName, checkSnapshot);
-//    	
-//    	// store the window / tab on which this page is loaded
-//    	windowHandle = driver.getWindowHandle();
+
+    	ScreenShot screenShot = new ScreenshotUtil().capture(new SnapshotTarget(element), ScreenShot.class);
+    	
+    	if (screenShot.getHtmlSourcePath() != null) {
+    		htmlFilePath = screenShot.getHtmlSourcePath().replace(suiteName, outputDirectory);
+    	}
+    	
+    	if (screenShot.getImagePath() != null) {
+    		imageFilePath = screenShot.getImagePath().replace(suiteName, outputDirectory);
+    	}
+    	if (snapshotName != null) {
+    		screenShot.setTitle(snapshotName);
+    	}
+    	
+    	logger.logScreenshot(screenShot, snapshotName, checkSnapshot);
+    	
+    	// store the window / tab on which this page is loaded
+    	windowHandle = driver.getWindowHandle();
     }
     
     /**
