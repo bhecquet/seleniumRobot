@@ -311,10 +311,12 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 			logger.error("Error writing summary report", e);
 		}  
 		
-		// Generate test method reports
+		// Generate test method reports for each result which has not already been generated
 		for (Map.Entry<ITestContext, List<ITestResult>> entry: methodResultsMap.entrySet()) {
 			for (ITestResult testResult: entry.getValue()) {
-				generateSingleTestReport(testResult, optimizeReport);
+				if (!TestNGResultUtils.isHtmlReportCreated(testResult)) {
+					generateSingleTestReport(testResult, optimizeReport);
+				}
 			}
 		}
 	}
@@ -344,6 +346,9 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 			generateExecutionReport(testResult);
 			endHtml();
 			logger.info("Completed Report Generation.");
+			
+			// do not recreate this report anymore
+			TestNGResultUtils.setHtmlReportCreated(testResult, true);
 		} catch (IOException e) {
 			logger.error("Error writing test report: " + getTestName(testResult), e);
 		}  

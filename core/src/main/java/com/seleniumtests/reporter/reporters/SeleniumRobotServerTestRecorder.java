@@ -124,7 +124,7 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 			for (ITestResult testResult: methodResults) {
 				
 				// do not record this result twice if it's already recorded
-				if (TestNGResultUtils.isRecordedToServer(testResult) 
+				if (TestNGResultUtils.isSeleniumServerReportCreated(testResult) 
 					// NoMoreRetry is set to false when test is being retried
 					|| (TestNGResultUtils.getNoMoreRetry(testResult) != null && TestNGResultUtils.getNoMoreRetry(testResult) == false)) {
 					continue;
@@ -165,7 +165,7 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 					}
 				}
 				
-				TestNGResultUtils.setRecordedToServer(testResult, true);
+				TestNGResultUtils.setSeleniumServerReportCreated(testResult, true);
 			}
 		}
 	}

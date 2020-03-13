@@ -38,7 +38,9 @@ public class TestNGResultUtils {
 	private static final String RETRY = "retry";						// index of the retry
 	private static final String NO_MORE_RETRY = "noMoreRetry";			// set to true when is not going to be retried
 	private static final String TEST_INFO = "testInfo";
-	private static final String RECORDED_TO_SERVER = "recordedToServer";// true if the result has already been recorded to the seleniumRobot server
+	private static final String SELENIUM_SERVER_REPORT = "seleniumServerReport";// true if the result has already been recorded to the seleniumRobot server
+	private static final String HTML_REPORT = "htmlReport";				// true if the HTML result has already been generated
+	private static final String CUSTOM_REPORT = "customReport";			// true if the custom result has already been generated
 	private static final String METHOD_NAME = "methodName";				// name of the test method (or the cucumber scenario)
 
 	private TestNGResultUtils() {
@@ -142,8 +144,8 @@ public class TestNGResultUtils {
     }
     
     // did we already recorded this result to the server
-    public static boolean isRecordedToServer(ITestResult testNGResult) {
-    	Boolean alreadyRecorded = (Boolean) testNGResult.getAttribute(RECORDED_TO_SERVER);
+    public static boolean isSeleniumServerReportCreated(ITestResult testNGResult) {
+    	Boolean alreadyRecorded = (Boolean) testNGResult.getAttribute(SELENIUM_SERVER_REPORT);
     	if (alreadyRecorded == null) {
     		return false;
     	} else {
@@ -151,8 +153,44 @@ public class TestNGResultUtils {
     	}
     }
     
-    public static void setRecordedToServer(ITestResult testNGResult, Boolean recordedToServer) {
-    	testNGResult.setAttribute(RECORDED_TO_SERVER, recordedToServer);
+    public static void setSeleniumServerReportCreated(ITestResult testNGResult, Boolean recordedToServer) {
+    	testNGResult.setAttribute(SELENIUM_SERVER_REPORT, recordedToServer);
+    }
+    
+    /**
+     * 
+     * @param testNGResult
+     * @return true if the HTML result has already been created for this result
+     */
+    public static boolean isHtmlReportCreated(ITestResult testNGResult) {
+    	Boolean alreadyCreated = (Boolean) testNGResult.getAttribute(HTML_REPORT);
+    	if (alreadyCreated == null) {
+    		return false;
+    	} else {
+    		return alreadyCreated;
+    	}
+    }
+    
+    public static void setHtmlReportCreated(ITestResult testNGResult, Boolean recordedToServer) {
+    	testNGResult.setAttribute(HTML_REPORT, recordedToServer);
+    }
+    
+    /**
+     * 
+     * @param testNGResult
+     * @return true if the Custom result has already been created for this result
+     */
+    public static boolean isCustomReportCreated(ITestResult testNGResult) {
+    	Boolean alreadyCreated = (Boolean) testNGResult.getAttribute(CUSTOM_REPORT);
+    	if (alreadyCreated == null) {
+    		return false;
+    	} else {
+    		return alreadyCreated;
+    	}
+    }
+    
+    public static void setCustomReportCreated(ITestResult testNGResult, Boolean recordedToServer) {
+    	testNGResult.setAttribute(CUSTOM_REPORT, recordedToServer);
     }
 
     /**
