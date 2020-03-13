@@ -80,8 +80,11 @@ public class CustomReporter extends CommonReporter implements IReporter {
 				// done in case it was null (issue #81)
 				SeleniumTestsContext testContext = SeleniumTestsContextManager.setThreadContextFromTestResult(entry.getKey(), getTestName(testResult), getClassName(testResult), testResult);
 				
-				for (ReportInfo reportInfo: testContext.getCustomTestReports()) {
-					generateTestReport(testResult, reportInfo);
+
+				if (!TestNGResultUtils.isCustomReportCreated(testResult)) {
+					for (ReportInfo reportInfo: testContext.getCustomTestReports()) {
+						generateTestReport(testResult, reportInfo);
+					}
 				}
 			}
 		}
@@ -193,6 +196,7 @@ public class CustomReporter extends CommonReporter implements IReporter {
 			fileWriter.flush();
 			fileWriter.close();
 			generatedFiles.add(fileName);
+			TestNGResultUtils.setCustomReportCreated(testResult, true);
 		} catch (Exception e) {
 			logger.error(String.format("Error generating test result %s: %s", TestNGResultUtils.getUniqueTestName(testResult), e.getMessage()));
 		}

@@ -64,7 +64,6 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 	 * In this test, everything is fine with seleniumrobot server
 	 * @throws Exception
 	 */
-	// TODO: re-enable these tests. For now, powermockito does not mock "new" call
 	// TODO: check that record is not done when compareSnapshot & resultRecord are false
 	// TODO: check that record is not done when seleniumRobotServer is not active (by params)
 	@Test(groups={"it"})
