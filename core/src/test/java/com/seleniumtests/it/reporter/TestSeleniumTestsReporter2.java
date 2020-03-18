@@ -83,11 +83,16 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		Assert.assertTrue(mainReportContent.matches(".*<a href\\='testAndSubActions/TestReport\\.html'.*?>testAndSubActions</a>.*"));
 		Assert.assertTrue(mainReportContent.matches(".*<a href\\='testInError/TestReport\\.html'.*?>testInError</a>.*"));
 
-		// issue #312: check that result files have been generated at least twice (one during test run and one at the end)
+		// issue #331: check that result files have been generated only once
 		String logs = readSeleniumRobotLogFile().replace("\\", "/");
-		Assert.assertTrue(StringUtils.countMatches(logs, "testInError/PERF-result.xml") > 1);
-		Assert.assertTrue(StringUtils.countMatches(logs, "testAndSubActions/PERF-result.xml") > 1);
-		Assert.assertTrue(StringUtils.countMatches(logs, "testWithException/PERF-result.xml") > 1);
+		Assert.assertTrue(StringUtils.countMatches(logs, "testInError/PERF-result.xml") == 1);
+		Assert.assertTrue(StringUtils.countMatches(logs, "testAndSubActions/PERF-result.xml") == 1);
+		Assert.assertTrue(StringUtils.countMatches(logs, "testWithException/PERF-result.xml") == 3); // once per retry
+		
+		// issue  #312: check that result files have been generated before test end
+		Assert.assertTrue(StringUtils.indexOf(logs, "testInError/PERF-result.xml") < StringUtils.indexOf(logs, "==============================================="));
+		Assert.assertTrue(StringUtils.indexOf(logs, "testAndSubActions/PERF-result.xml") < StringUtils.indexOf(logs, "==============================================="));
+		Assert.assertTrue(StringUtils.indexOf(logs, "testWithException/PERF-result.xml") < StringUtils.indexOf(logs, "==============================================="));
 	}
 	
 	/**
@@ -106,11 +111,16 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		Assert.assertTrue(mainReportContent.matches(".*<a href\\='testAndSubActions/TestReport\\.html'.*?>testAndSubActions</a>.*"));
 		Assert.assertTrue(mainReportContent.matches(".*<a href\\='testInError/TestReport\\.html'.*?>testInError</a>.*"));
 		
-		// issue #312: check that result files have been generated at least twice (one during test run and one at the end)
+		// issue #331: check that result files have been generated at least twice (one during test run and one at the end)
 		String logs = readSeleniumRobotLogFile().replace("\\", "/");
-		Assert.assertTrue(StringUtils.countMatches(logs, "testInError/PERF-result.xml") > 1);
-		Assert.assertTrue(StringUtils.countMatches(logs, "testAndSubActions/PERF-result.xml") > 1);
-		Assert.assertTrue(StringUtils.countMatches(logs, "testWithException/PERF-result.xml") > 1);
+		Assert.assertTrue(StringUtils.countMatches(logs, "testInError/PERF-result.xml") == 1);
+		Assert.assertTrue(StringUtils.countMatches(logs, "testAndSubActions/PERF-result.xml") == 1);
+		Assert.assertTrue(StringUtils.countMatches(logs, "testWithException/PERF-result.xml") == 3); // once per retry
+
+		// issue  #312: check that result files have been generated before test end (meaning they are generated after the test execution
+		Assert.assertTrue(StringUtils.indexOf(logs, "testInError/PERF-result.xml") < StringUtils.indexOf(logs, "==============================================="));
+		Assert.assertTrue(StringUtils.indexOf(logs, "testAndSubActions/PERF-result.xml") < StringUtils.indexOf(logs, "==============================================="));
+		Assert.assertTrue(StringUtils.indexOf(logs, "testWithException/PERF-result.xml") < StringUtils.indexOf(logs, "==============================================="));
 		
 		// issue #319: check that if no test info is recorded, columns are not there
 		Assert.assertFalse(mainReportContent.contains("<td class=\"info\">"));
