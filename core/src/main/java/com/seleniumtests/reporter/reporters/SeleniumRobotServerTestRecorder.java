@@ -132,8 +132,6 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 					continue;
 				}
 				
-		
-				
 				// issue #81: recreate test context from this context (due to multithreading, this context may be null if parallel testing is used)
 				SeleniumTestsContext testContext = SeleniumTestsContextManager.setThreadContextFromTestResult(entry.getKey(), getTestName(testResult), getClassName(testResult), testResult);
 				

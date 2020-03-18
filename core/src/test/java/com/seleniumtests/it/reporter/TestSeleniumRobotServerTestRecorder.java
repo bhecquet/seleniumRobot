@@ -91,7 +91,7 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 			// they may be called for each test but server is responsible for uniqueness of the value
 			verify(serverConnector, atLeastOnce()).createSession();
 			
-			// check all test cases are created, call MUST be done only once to avoid result to be recorded several times
+			// issue #331: check all test cases are created, call MUST be done only once to avoid result to be recorded several times
 			verify(serverConnector).createTestCase("testAndSubActions");
 			verify(serverConnector).createTestCase("testInError");
 			verify(serverConnector).createTestCase("testWithException");
