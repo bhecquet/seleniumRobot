@@ -88,6 +88,7 @@ public class StubTestClass extends StubParentClass {
 		FileUtils.moveFile(tmpHtml, new File(screenshot.getFullHtmlPath()));
 		
 		step1.addSnapshot(new Snapshot(screenshot, "main", SnapshotCheckType.TRUE), 1, null);
+		step1.addSnapshot(new Snapshot(screenshot, null, SnapshotCheckType.TRUE), 1, null);
 		step1.setActionException(new WebDriverException("driver exception"));
 		TestStep subStep1 = new TestStep("step 1.3: open page", Reporter.getCurrentTestResult(), new ArrayList<>(), maskPassword);
 		subStep1.addAction(new TestAction("click link", false, new ArrayList<>()));

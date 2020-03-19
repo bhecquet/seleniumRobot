@@ -159,7 +159,13 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 						
 						// sends all snapshots that are flagged as comparable
 						for (Snapshot snapshot: testStep.getSnapshots()) {
+							
 							if (snapshot.isCheckSnapshot() == SnapshotCheckType.TRUE) {
+								if (snapshot.getName() == null || snapshot.getName().isEmpty()) {
+									logger.warn("Snapshot hasn't any name, it won't be sent to server");
+									continue;
+								}
+								
 								serverConnector.createSnapshot(Paths.get(testContext.getOutputDirectory(), 
 										snapshot.getScreenshot().getImagePath()
 										).toFile());

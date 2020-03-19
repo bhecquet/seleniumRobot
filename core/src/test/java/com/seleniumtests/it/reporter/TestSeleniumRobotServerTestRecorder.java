@@ -38,6 +38,7 @@ import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.testng.Assert;
 import org.testng.annotations.Test;
 import org.testng.xml.XmlSuite.ParallelMode;
 
@@ -100,7 +101,10 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 			verify(serverConnector, times(4)).createTestCaseInSession(); 
 			verify(serverConnector, times(3)).createTestStep("step 1");
 			verify(serverConnector).createTestStep("step 2");
-			verify(serverConnector).createSnapshot(any(File.class)); // one snapshot
+			verify(serverConnector).createSnapshot(any(File.class)); // two snapshots but only once is sent because the other has no name
+			
+			String logs = readSeleniumRobotLogFile();
+			Assert.assertTrue(logs.contains("Snapshot hasn't any name, it won't be sent to server")); // one snapshot has no name, error message is displayed
 			
 			// check that screenshot information are removed from logs (the pattern "Output: ...")
 			verify(serverConnector).recordStepResult(eq(false), contains("step 1.3: open page"), eq(1230L));
