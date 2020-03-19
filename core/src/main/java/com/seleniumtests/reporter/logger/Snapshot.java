@@ -165,4 +165,8 @@ public class Snapshot extends TestAction {
 		return checkSnapshot;
 	}
 
+	public SnapshotCheckType getCheckSnapshot() {
+		return checkSnapshot;
+	}
+
 }

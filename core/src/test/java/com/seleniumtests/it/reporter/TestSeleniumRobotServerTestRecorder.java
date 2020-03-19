@@ -46,6 +46,7 @@ import com.seleniumtests.connectors.selenium.SeleniumRobotSnapshotServerConnecto
 import com.seleniumtests.connectors.selenium.SeleniumRobotVariableServerConnector;
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.customexception.SeleniumRobotServerException;
+import com.seleniumtests.reporter.logger.Snapshot;
 import com.seleniumtests.reporter.reporters.CommonReporter;
 import com.seleniumtests.reporter.reporters.SeleniumRobotServerTestRecorder;
 
@@ -101,7 +102,7 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 			verify(serverConnector, times(4)).createTestCaseInSession(); 
 			verify(serverConnector, times(3)).createTestStep("step 1");
 			verify(serverConnector).createTestStep("step 2");
-			verify(serverConnector).createSnapshot(any(File.class)); // two snapshots but only once is sent because the other has no name
+			verify(serverConnector).createSnapshot(any(Snapshot.class)); // two snapshots but only once is sent because the other has no name
 			
 			String logs = readSeleniumRobotLogFile();
 			Assert.assertTrue(logs.contains("Snapshot hasn't any name, it won't be sent to server")); // one snapshot has no name, error message is displayed

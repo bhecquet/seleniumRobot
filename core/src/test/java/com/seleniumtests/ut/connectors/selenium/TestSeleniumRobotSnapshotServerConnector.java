@@ -54,6 +54,8 @@ import com.seleniumtests.connectors.selenium.SeleniumRobotSnapshotServerConnecto
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.SeleniumRobotServerException;
+import com.seleniumtests.driver.screenshots.ScreenShot;
+import com.seleniumtests.reporter.logger.Snapshot;
 
 @PrepareForTest({Unirest.class})
 public class TestSeleniumRobotSnapshotServerConnector extends MockitoTest {
@@ -68,11 +70,20 @@ public class TestSeleniumRobotSnapshotServerConnector extends MockitoTest {
 	
 	@Mock
 	private HttpResponse<String> responseAliveString;
+	
+	@Mock
+	private Snapshot snapshot;
+	
+	@Mock
+	private ScreenShot screenshot;
 
 	@BeforeMethod(groups= {"ut"})
 	public void init(final ITestContext testNGCtx) {
 		initThreadContext(testNGCtx);
 		PowerMockito.mockStatic(Unirest.class);
+		
+		when(snapshot.getScreenshot()).thenReturn(screenshot);
+		when(screenshot.getImagePath()).thenReturn("img.png");
 	}
 	
 	/**
@@ -561,7 +572,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends MockitoTest {
 	public void testCreateSnapshotNoStepResult() throws UnirestException {
 		SeleniumRobotSnapshotServerConnector connector = spy(configureAliveConnection());
 		
-		connector.createSnapshot(new File(""));
+		connector.createSnapshot(snapshot);
 	}
 	
 	
@@ -574,7 +585,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends MockitoTest {
 		connector.createTestCaseInSession();
 		connector.createTestStep("Step 1");
 		connector.recordStepResult(true, "", 1);
-		connector.createSnapshot(new File(""));
+		connector.createSnapshot(snapshot);
 		
 		// check prerequisites has been created
 		Assert.assertEquals((int)connector.getSessionId(), 13);
@@ -593,7 +604,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends MockitoTest {
 		connector.createTestCaseInSession();
 		connector.createTestStep("Step 1");
 		connector.recordStepResult(true, "", 1);
-		connector.createSnapshot(new File(""));
+		connector.createSnapshot(snapshot);
 		Assert.assertNull(connector.getSnapshotId());
 	}
 	
@@ -604,7 +615,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends MockitoTest {
 		connector.createTestCase("Test 1");
 		connector.createTestCaseInSession();
 		connector.createTestStep("Step 1");
-		connector.createSnapshot(new File(""));
+		connector.createSnapshot(snapshot);
 		PowerMockito.verifyStatic(Unirest.class, never());
 		Unirest.post(ArgumentMatchers.contains(SeleniumRobotSnapshotServerConnector.SNAPSHOT_API_URL));
 	}
