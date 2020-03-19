@@ -166,9 +166,7 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 									continue;
 								}
 								
-								serverConnector.createSnapshot(Paths.get(testContext.getOutputDirectory(), 
-										snapshot.getScreenshot().getImagePath()
-										).toFile());
+								serverConnector.createSnapshot(snapshot);
 							}
 						}
 					}

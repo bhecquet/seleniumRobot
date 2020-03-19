@@ -19,6 +19,7 @@ package com.seleniumtests.it.connector.selenium;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
@@ -30,6 +31,10 @@ import org.testng.annotations.Test;
 
 import com.seleniumtests.GenericTest;
 import com.seleniumtests.connectors.selenium.SeleniumRobotSnapshotServerConnector;
+import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.driver.screenshots.ScreenShot;
+import com.seleniumtests.driver.screenshots.SnapshotCheckType;
+import com.seleniumtests.reporter.logger.Snapshot;
 
 public class TestSeleniumRobotSnapshotServerConnector extends GenericTest {
 
@@ -122,10 +127,13 @@ public class TestSeleniumRobotSnapshotServerConnector extends GenericTest {
 		connector.createTestCaseInSession();
 		connector.createTestStep("Step 1");
 		connector.recordStepResult(true, "logs", 1);
-		File image = File.createTempFile("image-", ".png");
+		File image = Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "img.png").toFile();
 		image.deleteOnExit();
 		FileUtils.copyInputStreamToFile(getClass().getClassLoader().getResourceAsStream("tu/images/ffLogoConcat.png"), image);
-		connector.createSnapshot(image);
+		ScreenShot screenshot = new ScreenShot();
+		screenshot.setImagePath(image.getName());
+		Snapshot snapshot = new Snapshot(screenshot, "img", SnapshotCheckType.TRUE);
+		connector.createSnapshot(snapshot);
 		
 		Assert.assertNotNull(connector.getSnapshotId());
 	}

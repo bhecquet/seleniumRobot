@@ -194,7 +194,7 @@ public class ScenarioLogger extends Logger {
 	    	TestStep runningStep = SeleniumTestsContextManager.getContextForCurrentTestState().get(0).getTestStepManager().getRunningTestStep();
 	    	if (runningStep != null) {
 	    		try {
-	    			runningStep.addSnapshot(new Snapshot(screenshot, driverName, checkSnapshot), 
+	    			runningStep.addSnapshot(new Snapshot(screenshot, String.format("drv:%s-%s", driverName, screenshotName), checkSnapshot), 
 	    					SeleniumTestsContextManager.getContextForCurrentTestState().get(0).getTestStepManager().getTestSteps().size(),
 	    					screenshotName);
 	    		} catch (NullPointerException e) {

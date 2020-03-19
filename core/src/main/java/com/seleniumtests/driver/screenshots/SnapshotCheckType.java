@@ -18,6 +18,14 @@ public class SnapshotCheckType {
 	private SnapshotCheckType(boolean sendToServer) {
 		this.sendToServer = sendToServer;
 	}
+	
+	public String getName() {
+		if (!sendToServer) {
+			return "false";
+		} else {
+			return "true";
+		}
+	}
 		
 	// TODO: check without colors, check only part of the picture (exclusion zones defined directly in test)
 }

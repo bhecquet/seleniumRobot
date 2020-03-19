@@ -18,6 +18,7 @@
 package com.seleniumtests.connectors.selenium;
 
 import java.io.File;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -34,6 +35,7 @@ import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.SeleniumRobotServerException;
 import com.seleniumtests.driver.BrowserType;
+import com.seleniumtests.reporter.logger.Snapshot;
 
 public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerConnector {
 	
@@ -144,7 +146,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 	/**
 	 * Create snapshot
 	 */
-	public void createSnapshot(File pictureFile) {
+	public void createSnapshot(Snapshot snapshot) {
 		if (!active) {
 			return;
 		}
@@ -158,12 +160,17 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 			throw new ConfigurationException("Step result must be previously recorded");
 		}
 		try {
+			File pictureFile = new File(snapshot.getScreenshot().getFullImagePath());
+			
+			
 			snapshotId = null;
 			getJSonResponse(buildPostRequest(url + SNAPSHOT_API_URL)
 					.field("stepResult", stepResultId)
 					.field("sessionId", sessionUUID)
 					.field("testCase", testCaseInSessionId)
 					.field("image", pictureFile)
+					.field("name", snapshot.getName())
+					.field("compare", snapshot.getCheckSnapshot().getName())
 					);
 			snapshotId = 0; // for test only
 		} catch (UnirestException | JSONException e) {
