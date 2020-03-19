@@ -355,6 +355,32 @@ If, inside a step, you need to mask a password, (see: "masking password" section
 	addStep("my step name", myValueForPassword)
 ```
 
+#### Add snapshots ####
+
+Each new page takes automatically a snapshot. If you want more snapshots (be careful, each snapshot takes 2 - 5 seconds), in your PageObject, call
+
+```java
+capturePageSnapshot();
+```
+or
+
+```java
+captureElementSnapshot(<myWebElement>);
+```
+
+If you want to compare these pictures with previous execution through seleniumRobot server (assuming option `seleniumRobotServerCompareSnapshots` is set to true), call instead.
+
+```java
+capturePageSnapshot(<pic_name>, SnapshotCheckType.TRUE);
+```
+or
+
+```java
+captureElementSnapshot(<pic_name>, <myWebElement>, SnapshotCheckType.TRUE);
+```
+
+
+
 ### 3 Write a test ###
 A test is a suite of steps defined in several page objects. By convention, they are located in the `tests` folder
 Assuming that the right objects are created, a test looks like:

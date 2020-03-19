@@ -80,6 +80,7 @@ public class PageObject extends BasePage implements IPage {
     private String outputDirectory = null;
     private String htmlFilePath = null;
     private String imageFilePath = null;
+    private ScreenshotUtil screenshotUtil;
     private Clock systemClock;
 
     /**
@@ -146,6 +147,8 @@ public class PageObject extends BasePage implements IPage {
         if (driver == null && url != null) {
         	throw new ConfigurationException("driver is null, 'browser' configuration may be empty");
         }
+
+        screenshotUtil = new ScreenshotUtil(driver);
         
         // open page
         openPage(url);
@@ -342,23 +345,27 @@ public class PageObject extends BasePage implements IPage {
      * @param checkSnapshot		if true, will send snapshot to server (when seleniumRobot is configured for this) for comparison 
      */
     public void capturePageSnapshot(String snapshotName, SnapshotCheckType checkSnapshot) {
-    	ScreenShot screenShot = new ScreenshotUtil().capture(SnapshotTarget.PAGE, ScreenShot.class);
+    	
+    	ScreenShot screenShot = screenshotUtil.capture(SnapshotTarget.PAGE, ScreenShot.class);
 
-        if (screenShot.getHtmlSourcePath() != null) {
-            htmlFilePath = screenShot.getHtmlSourcePath().replace(suiteName, outputDirectory);
-        }
-
-        if (screenShot.getImagePath() != null) {
-            imageFilePath = screenShot.getImagePath().replace(suiteName, outputDirectory);
-        }
-        if (snapshotName != null) {
-        	screenShot.setTitle(snapshotName);
-        }
-
-        logger.logScreenshot(screenShot, snapshotName, checkSnapshot);
-        
-        // store the window / tab on which this page is loaded
-        windowHandle = driver.getWindowHandle();
+    	storeSnapshot(snapshotName, screenShot, checkSnapshot);
+    }
+    
+    /**
+     * Capture a portion of the page by giving the element to capture
+     * @param element			the element to capture
+     */
+    public void captureElementSnapshot(WebElement element) {
+    	captureElementSnapshot(null, element);
+    }
+    
+    /**
+     * Capture a portion of the page by giving the element to capture
+     * @param snapshotName		the snapshot name
+     * @param element			the element to capture
+     */
+    public void captureElementSnapshot(String snapshotName, WebElement element) {
+    	captureElementSnapshot(snapshotName, element, SnapshotCheckType.FALSE);
     }
     
     /**
@@ -369,7 +376,23 @@ public class PageObject extends BasePage implements IPage {
      */
     public void captureElementSnapshot(String snapshotName, WebElement element, SnapshotCheckType checkSnapshot) {
 
-    	ScreenShot screenShot = new ScreenshotUtil().capture(new SnapshotTarget(element), ScreenShot.class);
+    	ScreenShot screenShot = screenshotUtil.capture(new SnapshotTarget(element), ScreenShot.class);
+    	
+    	storeSnapshot(snapshotName, screenShot, checkSnapshot);
+    }
+    
+    /**
+     * Store the snapshot to test step
+     * Check if name is provided, in case we need to compare it to a baseline on server
+     * @param snapshotName
+     * @param screenShot
+     * @param checkSnapshot
+     */
+    private void storeSnapshot(String snapshotName, ScreenShot screenShot, SnapshotCheckType checkSnapshot) {
+    	
+    	if ((snapshotName == null || snapshotName.isEmpty()) && !checkSnapshot.equals(SnapshotCheckType.FALSE)) {
+    		throw new ScenarioException("Cannot check snapshot if no name is provided");
+    	}
     	
     	if (screenShot.getHtmlSourcePath() != null) {
     		htmlFilePath = screenShot.getHtmlSourcePath().replace(suiteName, outputDirectory);
@@ -860,5 +883,13 @@ public class PageObject extends BasePage implements IPage {
 			}
 		}
 		return page;
+	}
+
+	public ScreenshotUtil getScreenshotUtil() {
+		return screenshotUtil;
+	}
+
+	public void setScreenshotUtil(ScreenshotUtil screenshotUtil) {
+		this.screenshotUtil = screenshotUtil;
 	}
 }
