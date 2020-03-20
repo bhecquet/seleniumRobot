@@ -33,6 +33,7 @@ import org.testng.ITestResult;
 import com.seleniumtests.connectors.selenium.SeleniumRobotSnapshotServerConnector;
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.core.utils.TestNGContextUtils;
 import com.seleniumtests.core.utils.TestNGResultUtils;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.SeleniumRobotServerException;
@@ -96,7 +97,13 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 		} else {
 			try {
 				// do not create application / version / environment from script, they should already be present or created by user to avoid fill database with wrong data
-				serverConnector.createSession();
+				// create session only if it has not been before
+				for (ITestContext testContext: resultSet.keySet()) {
+					if (TestNGContextUtils.getTestSessionCreated(testContext) == null) {
+						Integer sessionId = serverConnector.createSession();
+						TestNGContextUtils.setTestSessionCreated(testContext, sessionId);
+					}
+				}
 			} catch (SeleniumRobotServerException | ConfigurationException e) {
 				logger.error("Error contacting selenium robot serveur", e);
 				return;
@@ -137,11 +144,12 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 				
 				// skipped tests has never been executed and so attribute (set in TestListener) has not been applied
 				String testName = getTestName(testResult);
+				Integer sessionId = TestNGContextUtils.getTestSessionCreated(entry.getKey());
 				
 				// record test case
-				serverConnector.createTestCase(testName);
-				serverConnector.createTestCaseInSession();
-				serverConnector.addLogsToTestCaseInSession(generateExecutionLogs(testResult).toString());
+				Integer testCaseId = serverConnector.createTestCase(testName);
+				Integer testCaseInSessionId = serverConnector.createTestCaseInSession(sessionId, testCaseId);
+				serverConnector.addLogsToTestCaseInSession(testCaseInSessionId, generateExecutionLogs(testResult).toString());
 				
 				List<TestStep> testSteps = TestNGResultUtils.getSeleniumRobotTestContext(testResult).getTestStepManager().getTestSteps();
 				if (testSteps == null) {
@@ -152,10 +160,10 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 					for (TestStep testStep: testSteps) {
 						
 						// record test step
-						serverConnector.createTestStep(testStep.getName());
+						Integer testStepId = serverConnector.createTestStep(testStep.getName(), testCaseInSessionId);
 						String stepLogs = testStep.toJson().toString();
 						
-						serverConnector.recordStepResult(!testStep.getFailed(), stepLogs, testStep.getDuration());
+						Integer stepResultId = serverConnector.recordStepResult(!testStep.getFailed(), stepLogs, testStep.getDuration(), sessionId, testCaseInSessionId, testStepId);
 						
 						// sends all snapshots that are flagged as comparable
 						for (Snapshot snapshot: testStep.getSnapshots()) {
@@ -166,7 +174,7 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 									continue;
 								}
 								
-								serverConnector.createSnapshot(snapshot);
+								serverConnector.createSnapshot(snapshot, sessionId, testCaseInSessionId, stepResultId);
 							}
 						}
 					}

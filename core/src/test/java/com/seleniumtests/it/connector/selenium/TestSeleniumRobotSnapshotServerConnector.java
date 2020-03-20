@@ -71,9 +71,8 @@ public class TestSeleniumRobotSnapshotServerConnector extends GenericTest {
 	
 	@Test(groups={"it"})
 	public void testCreateSession() {
-		connector.createSession();
 		Assert.assertNotNull(connector.getEnvironmentId());
-		Assert.assertNotNull(connector.getSessionId());
+		Assert.assertNotNull(connector.createSession());
 		Assert.assertNotNull(connector.getVersionId());
 	}
 	
@@ -83,8 +82,8 @@ public class TestSeleniumRobotSnapshotServerConnector extends GenericTest {
 	@Test(groups={"it"})
 	public void testCreateTestCase() {
 		connector.createSession();
-		connector.createTestCase("Test 1");
-		Assert.assertNotNull(connector.getTestCaseId("Test 1"));
+		Integer testCaseId = connector.createTestCase("Test 1");
+		Assert.assertNotNull(testCaseId);
 		Assert.assertNotNull(connector.getApplicationId());
 	}
 	
@@ -93,10 +92,11 @@ public class TestSeleniumRobotSnapshotServerConnector extends GenericTest {
 	 */
 	@Test(groups={"it"})
 	public void testCreateTestCaseInSession() {
-		connector.createTestCase("Test 1");
-		connector.createTestCaseInSession();
-		Assert.assertNotNull(connector.getSessionId());
-		Assert.assertNotNull(connector.getTestCaseInSessionId());
+		Integer sessionId = connector.createSession();
+		Integer testCaseId = connector.createTestCase("Test 1");
+		Integer testCaseInSessionId = connector.createTestCaseInSession(sessionId, testCaseId);
+		Assert.assertNotNull(sessionId);
+		Assert.assertNotNull(testCaseInSessionId);
 		Assert.assertNotNull(connector.getApplicationId());
 	}
 	
@@ -105,15 +105,15 @@ public class TestSeleniumRobotSnapshotServerConnector extends GenericTest {
 	 */
 	@Test(groups={"it"})
 	public void testCreateTestStep() {
-		connector.createSession();
-		connector.createTestCase("Test 1");
-		connector.createTestCaseInSession();
-		connector.createTestStep("Step 1");
-		Assert.assertNotNull(connector.getTestStepId());
+		Integer sessionId = connector.createSession();
+		Integer testCaseId = connector.createTestCase("Test 1");
+		Integer testCaseInSessionId = connector.createTestCaseInSession(sessionId, testCaseId);
+		Integer testStepId = connector.createTestStep("Step 1", testCaseInSessionId);
+		Assert.assertNotNull(testStepId);
 		
-		List<String> testSteps = connector.getStepListFromTestCase();
+		List<String> testSteps = connector.getStepListFromTestCase(testCaseInSessionId);
 		Assert.assertEquals(testSteps.size(), 1);
-		Assert.assertEquals(testSteps.get(0), connector.getTestStepId().toString());
+		Assert.assertEquals(testSteps.get(0), testStepId.toString());
 	}
 	
 	/**
@@ -122,20 +122,21 @@ public class TestSeleniumRobotSnapshotServerConnector extends GenericTest {
 	 */
 	@Test(groups={"it"})
 	public void testCreateSnapshot() throws IOException {
-		connector.createSession();
-		connector.createTestCase("Test 2");
-		connector.createTestCaseInSession();
-		connector.createTestStep("Step 1");
-		connector.recordStepResult(true, "logs", 1);
-		File image = Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "img.png").toFile();
+
+		Integer sessionId = connector.createSession();
+		Integer testCaseId = connector.createTestCase("Test 2");
+		Integer testCaseInSessionId = connector.createTestCaseInSession(sessionId, testCaseId);
+		Integer testStepId = connector.createTestStep("Step 1", testCaseInSessionId);
+		Integer stepResultId = connector.recordStepResult(true, "logs", 1, sessionId, testCaseInSessionId, testStepId);
+		File image = Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), "img.png").toFile();
 		image.deleteOnExit();
 		FileUtils.copyInputStreamToFile(getClass().getClassLoader().getResourceAsStream("tu/images/ffLogoConcat.png"), image);
 		ScreenShot screenshot = new ScreenShot();
 		screenshot.setImagePath(image.getName());
 		Snapshot snapshot = new Snapshot(screenshot, "img", SnapshotCheckType.TRUE);
-		connector.createSnapshot(snapshot);
+		Integer snapshotId = connector.createSnapshot(snapshot, sessionId, testCaseInSessionId, stepResultId);
 		
-		Assert.assertNotNull(connector.getSnapshotId());
+		Assert.assertNotNull(snapshotId);
 	}
 	
 	/**
@@ -144,13 +145,13 @@ public class TestSeleniumRobotSnapshotServerConnector extends GenericTest {
 	 */
 	@Test(groups={"it"})
 	public void testRecordTestResult() throws IOException {
-		connector.createSession();
-		connector.createTestCase("Test 2");
-		connector.createTestCaseInSession();
-		connector.createTestStep("Step 1");
-		connector.recordStepResult(true, "some logs", 1);
+		Integer sessionId = connector.createSession();
+		Integer testCaseId = connector.createTestCase("Test 2");
+		Integer testCaseInSessionId = connector.createTestCaseInSession(sessionId, testCaseId);
+		Integer testStepId = connector.createTestStep("Step 1", testCaseInSessionId);
+		Integer stepResultId = connector.recordStepResult(true, "some logs", 1, sessionId, testCaseInSessionId, testStepId);
 		
-		Assert.assertNotNull(connector.getStepResultId());
+		Assert.assertNotNull(stepResultId);
 	}
 	
 	

@@ -20,6 +20,7 @@ package com.seleniumtests.it.reporter;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.contains;
 import static org.mockito.ArgumentMatchers.eq;
@@ -98,17 +99,17 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 			verify(serverConnector).createTestCase("testInError");
 			verify(serverConnector).createTestCase("testWithException");
 			verify(serverConnector).createTestCase("testSkipped");
-			verify(serverConnector, times(4)).addLogsToTestCaseInSession(anyString());
-			verify(serverConnector, times(4)).createTestCaseInSession(); 
-			verify(serverConnector, times(3)).createTestStep("step 1");
-			verify(serverConnector).createTestStep("step 2");
-			verify(serverConnector).createSnapshot(any(Snapshot.class)); // two snapshots but only once is sent because the other has no name
+			verify(serverConnector, times(4)).addLogsToTestCaseInSession(anyInt(), anyString());
+			verify(serverConnector, times(4)).createTestCaseInSession(anyInt(), anyInt()); 
+			verify(serverConnector, times(3)).createTestStep("step 1", anyInt());
+			verify(serverConnector).createTestStep("step 2", anyInt());
+			verify(serverConnector).createSnapshot(any(Snapshot.class), anyInt(), anyInt(), anyInt()); // two snapshots but only once is sent because the other has no name
 			
 			String logs = readSeleniumRobotLogFile();
 			Assert.assertTrue(logs.contains("Snapshot hasn't any name, it won't be sent to server")); // one snapshot has no name, error message is displayed
 			
 			// check that screenshot information are removed from logs (the pattern "Output: ...")
-			verify(serverConnector).recordStepResult(eq(false), contains("step 1.3: open page"), eq(1230L));
+			verify(serverConnector).recordStepResult(eq(false), contains("step 1.3: open page"), eq(1230L), anyInt(), anyInt(), anyInt());
 		} finally {
 			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE);
 			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL);
@@ -147,8 +148,8 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 			
 			// check all test cases are created, in both test classes
 			verify(serverConnector, never()).createTestCase(anyString());
-			verify(serverConnector, never()).createTestCaseInSession(); 
-			verify(serverConnector, never()).createTestStep(anyString());
+			verify(serverConnector, never()).createTestCaseInSession(anyInt(), anyInt()); 
+			verify(serverConnector, never()).createTestStep(anyString(), anyInt());
 			
 		} finally {
 			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE);
@@ -182,13 +183,13 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 			when(reporter.getServerConnector()).thenReturn(serverConnector);
 			when(serverConnector.getActive()).thenReturn(true);
 			
-			doThrow(SeleniumRobotServerException.class).when(serverConnector).recordStepResult(anyBoolean(), anyString(), anyLong());
+			doThrow(SeleniumRobotServerException.class).when(serverConnector).recordStepResult(anyBoolean(), anyString(), anyLong(), anyInt(), anyInt(), anyInt());
 	
 			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions", "testInError"});
 			
 			// check server has been called for session
 			verify(serverConnector, times(3)).createSession(); // once for each test, and once after execution finishes
-			verify(serverConnector, times(3)).recordStepResult(anyBoolean(), anyString(), anyLong()); // once for each test execution + the final logging which is done only once as it fails
+			verify(serverConnector, times(3)).recordStepResult(anyBoolean(), anyString(), anyLong(), anyInt(), anyInt(), anyInt()); // once for each test execution + the final logging which is done only once as it fails
 																							// it shows that when result has not been recorded, it's retried
 			
 		} finally {
