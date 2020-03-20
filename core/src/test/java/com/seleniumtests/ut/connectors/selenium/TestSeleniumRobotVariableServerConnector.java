@@ -143,7 +143,7 @@ public class TestSeleniumRobotVariableServerConnector extends ConnectorsTest {
 		Assert.assertTrue(connector.getActive());
 		Assert.assertEquals(connector.getApplicationId(), 1);
 		Assert.assertEquals(connector.getEnvironmentId(), 2);
-		Assert.assertEquals(connector.getTestCaseId("Test1"), 3);
+		Assert.assertEquals((int)connector.createTestCase("Test1"), 3);
 		Assert.assertEquals(connector.getVersionId(), 4);
 	}
 	
@@ -352,7 +352,7 @@ public class TestSeleniumRobotVariableServerConnector extends ConnectorsTest {
 	public void testGetTestCaseIdWithoutToken() throws UnirestException {
 		configureAliveConnection();
 		SeleniumRobotVariableServerConnector connector= new SeleniumRobotVariableServerConnector(true, SERVER_URL, "Test1", null);
-		Assert.assertEquals(connector.getTestCaseId("foo"), 3);
+		Assert.assertEquals((int)connector.createTestCase("foo"), 3);
 		verify(namedTestCaseRequest, never()).header(eq("Authorization"), anyString());
 	}
 	

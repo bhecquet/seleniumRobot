@@ -55,7 +55,6 @@ public abstract class SeleniumRobotServerConnector {
 	protected Integer applicationId;
 	protected Integer versionId;
 	protected Integer environmentId;
-	protected Integer testCaseId;
 	
 	public SeleniumRobotServerConnector(boolean useRequested, String url) {
 		this(useRequested, url, null);
@@ -107,10 +106,6 @@ public abstract class SeleniumRobotServerConnector {
 		applicationId = getApplicationId();
 		versionId = getVersionId();
 		environmentId = getEnvironmentId();
-		
-		if (testName != null) {
-			testCaseId = getTestCaseId(testName);
-		}
 	}
 	
 	/**
@@ -164,26 +159,13 @@ public abstract class SeleniumRobotServerConnector {
 		return versionId;
 	}
 	
-	
-	/**
-	 * Returns the testcase id in variable server or create it if it does not exist
-	 * @return
-	 */
-	public int getTestCaseId(String testName) {
-		if (testCaseId != null) {
-			return testCaseId;
-		}
-		createTestCase(testName);
-		return testCaseId;
-	}
-	
 
 	/**
 	 * Create test case and add it to the current session
 	 */
-	public void createTestCase(String testName) {
+	public Integer createTestCase(String testName) {
 		if (!active) {
-			return;
+			return null;
 		}
 		if (testName == null || testName.isEmpty()) {
 			throw new ConfigurationException("testName must not be null or empty");
@@ -197,7 +179,7 @@ public abstract class SeleniumRobotServerConnector {
 			JSONObject testJson = getJSonResponse(buildPostRequest(url + TESTCASE_API_URL)
 					.field("name", testName)
 					.field("application", applicationId));
-			testCaseId = testJson.getInt("id");
+			return testJson.getInt("id");
 		} catch (UnirestException | JSONException e) {
 			throw new SeleniumRobotServerException("cannot create test case", e);
 		}
@@ -342,9 +324,5 @@ public abstract class SeleniumRobotServerConnector {
 
 	public void setEnvironmentId(Integer environmentId) {
 		this.environmentId = environmentId;
-	}
-
-	public void setTestCaseId(Integer testCaseId) {
-		this.testCaseId = testCaseId;
 	}
 }

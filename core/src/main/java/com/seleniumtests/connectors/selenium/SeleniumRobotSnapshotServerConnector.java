@@ -44,12 +44,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 	public static final String TESTSTEP_API_URL = "/snapshot/api/teststep/";
 	public static final String STEPRESULT_API_URL = "/snapshot/api/stepresult/";
 	public static final String SNAPSHOT_API_URL = "/snapshot/upload/image";
-	private Integer sessionId;
 	private String sessionUUID;
-	private Integer testCaseInSessionId;
-	private Integer testStepId;
-	private Integer stepResultId;
-	private Integer snapshotId;
 
 	public SeleniumRobotSnapshotServerConnector(final boolean useRequested, final String url) {
 		this(useRequested, url, null);
@@ -71,9 +66,13 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 		return isAlive("/snapshot/");
 	}
 	
-	public void createSession() {
+	/**
+	 * Create a test session
+	 * @return
+	 */
+	public Integer createSession() {
 		if (!active) {
-			return;
+			return null;
 		}
 		if (applicationId == null) {
 			throw new SeleniumRobotServerException(String.format("Application %s has not been created", SeleniumTestsContextManager.getApplicationName()));
@@ -87,7 +86,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 		try {
 			BrowserType browser = SeleniumTestsContextManager.getGlobalContext().getBrowser();
 			browser = browser == null ? BrowserType.NONE : browser;
-			sessionUUID = UUID.randomUUID().toString();
+			sessionUUID = UUID.randomUUID().toString(); // for uniqueness of the session
 			
 			JSONObject sessionJson = getJSonResponse(buildPostRequest(url + SESSION_API_URL)
 					.field("sessionId", sessionUUID)
@@ -96,7 +95,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 					.field("environment", SeleniumTestsContextManager.getGlobalContext().getTestEnv())
 					.field("version", versionId)
 					.field("compareSnapshot", SeleniumTestsContextManager.getGlobalContext().getSeleniumRobotServerCompareSnapshot()));
-			sessionId = sessionJson.getInt("id");
+			return sessionJson.getInt("id");
 		} catch (UnirestException | JSONException e) {
 			throw new SeleniumRobotServerException("cannot create session", e);
 		}
@@ -104,13 +103,16 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 	
 	/**
 	 * Create link between test case and session
+	 * @param sessionId		the sessionId which should have been created before
+	 * @param testCaseId	the test case Id to link to this session
+	 * @return	the id of the created testCaseInSession
 	 */
-	public void createTestCaseInSession() {
+	public Integer createTestCaseInSession(Integer sessionId, Integer testCaseId) {
 		if (!active) {
-			return;
+			return null;
 		}
 		if (sessionId == null) {
-			createSession();
+			throw new ConfigurationException("testcaseInSessionId should not be null");
 		}
 		if (testCaseId == null) {
 			throw new ConfigurationException("Test case must be previously defined");
@@ -119,7 +121,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 			JSONObject testInSessionJson = getJSonResponse(buildPostRequest(url + TESTCASEINSESSION_API_URL)
 					.field("testCase", testCaseId)
 					.field("session", sessionId));
-			testCaseInSessionId = testInSessionJson.getInt("id");
+			return testInSessionJson.getInt("id");
 		} catch (UnirestException | JSONException e) {
 			throw new SeleniumRobotServerException("cannot create test case", e);
 		}
@@ -128,16 +130,20 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 
 	/**
 	 * Create test step and add it to the current test case
+	 * @param testStep				name of the test step
+	 * @param testCaseInSessionId	id of the test case in session, so that we can add this step to the test case
+	 * @return	id of the created teststep
 	 */
-	public void createTestStep(String testStep) {
+	public Integer createTestStep(String testStep, Integer testCaseInSessionId) {
 		if (!active) {
-			return;
+			return null;
 		}
 		try {
 			JSONObject stepJson = getJSonResponse(buildPostRequest(url + TESTSTEP_API_URL)
 					.field("name", testStep));
-			testStepId = stepJson.getInt("id");
-			addCurrentTestStepToTestCase();
+			Integer testStepId = stepJson.getInt("id");
+			addCurrentTestStepToTestCase(testStepId, testCaseInSessionId);
+			return testStepId;
 		} catch (UnirestException | JSONException e) {
 			throw new SeleniumRobotServerException("cannot create test step", e);
 		}
@@ -146,15 +152,15 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 	/**
 	 * Create snapshot
 	 */
-	public void createSnapshot(Snapshot snapshot) {
+	public Integer createSnapshot(Snapshot snapshot, Integer sessionId, Integer testCaseInSessionId, Integer stepResultId) {
 		if (!active) {
-			return;
+			return null;
 		}
 		if (sessionId == null) {
-			createSession();
+			throw new ConfigurationException("Session must be previously recorded");
 		}
 		if (testCaseInSessionId == null) {
-			createTestCaseInSession();
+			throw new ConfigurationException("TestCaseInSession must be previously recorded");
 		}
 		if (stepResultId == null) {
 			throw new ConfigurationException("Step result must be previously recorded");
@@ -162,9 +168,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 		try {
 			File pictureFile = new File(snapshot.getScreenshot().getFullImagePath());
 			
-			
-			snapshotId = null;
-			getJSonResponse(buildPostRequest(url + SNAPSHOT_API_URL)
+			JSONObject snapshotJson = getJSonResponse(buildPostRequest(url + SNAPSHOT_API_URL)
 					.field("stepResult", stepResultId)
 					.field("sessionId", sessionUUID)
 					.field("testCase", testCaseInSessionId)
@@ -172,7 +176,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 					.field("name", snapshot.getName())
 					.field("compare", snapshot.getCheckSnapshot().getName())
 					);
-			snapshotId = 0; // for test only
+			return snapshotJson.getInt("id");
 		} catch (UnirestException | JSONException e) {
 			throw new SeleniumRobotServerException("cannot create test snapshot", e);
 		}
@@ -183,22 +187,22 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 	 * @param result	step result (true of false)
 	 * @param logs		step details
 	 * @param duration	step duration in milliseconds
+	 * @return the stepResult id stored on server
 	 */
-	public void recordStepResult(Boolean result, String logs, long duration) {
+	public Integer recordStepResult(Boolean result, String logs, long duration, Integer sessionId, Integer testCaseInSessionId, Integer testStepId) {
 		if (!active) {
-			return;
+			return null;
 		}
 		if (sessionId == null) {
-			createSession();
+			throw new ConfigurationException("Test session must be previously defined");
 		}
 		if (testCaseInSessionId == null) {
-			createTestCaseInSession();
+			throw new ConfigurationException("TestCaseInSession must be previously defined");
 		}
 		if (testStepId == null) {
 			throw new ConfigurationException("Test step and test case in session must be previously defined");
 		}
 		try {
-			stepResultId = null;
 			JSONObject resultJson = getJSonResponse(buildPostRequest(url + STEPRESULT_API_URL)
 					.field("step", testStepId)
 					.field("testCase", testCaseInSessionId)
@@ -206,7 +210,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 					.field("duration", duration)
 					.field("stacktrace", logs)
 					);
-			stepResultId = resultJson.getInt("id");
+			return resultJson.getInt("id");
 		} catch (UnirestException | JSONException e) {
 			throw new SeleniumRobotServerException("cannot create test snapshot", e);
 		}
@@ -216,7 +220,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 	 * Returns list of test steps in a test case
 	 * @return
 	 */
-	public List<String> getStepListFromTestCase() {
+	public List<String> getStepListFromTestCase(Integer testCaseInSessionId) {
 		if (testCaseInSessionId == null) {
 			return new ArrayList<>();
 		}
@@ -238,25 +242,25 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 	/**
 	 * Add the current test case (should have been previously created) to this test session
 	 */
-	public void addCurrentTestStepToTestCase() {
+	public void addCurrentTestStepToTestCase(Integer testStepId, Integer testCaseInSessionId) {
 		if (testStepId == null || testCaseInSessionId == null) {
 			throw new ConfigurationException("Test step and Test case in session must be previously created");
 		}
 		
 		try {
 			// get list of tests associated to this session
-			List<String> testSteps = getStepListFromTestCase();
+			List<String> testSteps = getStepListFromTestCase(testCaseInSessionId);
 			if (!testSteps.contains(testStepId.toString())) {
 				testSteps.add(testStepId.toString());
 			}
-			addTestStepsToTestCases(testSteps);
+			addTestStepsToTestCases(testSteps, testCaseInSessionId);
 			
 		} catch (UnirestException | JSONException e) {
 			throw new SeleniumRobotServerException("cannot add test step to test case", e);
 		}
 	}
 	
-	public JSONObject addTestStepsToTestCases(List<String> testSteps) throws UnirestException {
+	public JSONObject addTestStepsToTestCases(List<String> testSteps, Integer testCaseInSessionId) throws UnirestException {
 		if (testSteps.isEmpty()) {
 			return new JSONObject();
 		}
@@ -268,9 +272,9 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 		return getJSonResponse(request);
 	}
 	
-	public void addLogsToTestCaseInSession(String logs) {
+	public void addLogsToTestCaseInSession(Integer testCaseInSessionId, String logs) {
 		if (testCaseInSessionId == null) {
-			createTestCaseInSession();
+			throw new ConfigurationException("testcaseInSessionId should not be null");
 		}
 		
 		try {
@@ -279,27 +283,9 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 			throw new SeleniumRobotServerException("cannot add logs to test case", e);
 		}
 	}
-	public Integer getSessionId() {
-		return sessionId;
-	}
-
-	public Integer getTestStepId() {
-		return testStepId;
-	}
-
-	public Integer getSnapshotId() {
-		return snapshotId;
-	}
-
+	
 	public String getSessionUUID() {
 		return sessionUUID;
 	}
 
-	public Integer getTestCaseInSessionId() {
-		return testCaseInSessionId;
-	}
-
-	public Integer getStepResultId() {
-		return stepResultId;
-	}
 }
