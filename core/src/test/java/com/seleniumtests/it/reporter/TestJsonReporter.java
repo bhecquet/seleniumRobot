@@ -82,8 +82,8 @@ public class TestJsonReporter extends ReporterTest {
 		// Check content of result file
 		Assert.assertEquals(jsonResult.getInt("pass"), 8);
 		Assert.assertEquals(jsonResult.getInt("fail"), 7);
-		Assert.assertEquals(jsonResult.getInt("skip"), 2);
-		Assert.assertEquals(jsonResult.getInt("total"), 17);
+		Assert.assertEquals(jsonResult.getInt("skip"), 3);
+		Assert.assertEquals(jsonResult.getInt("total"), 18);
 		
 	}
 

@@ -53,10 +53,10 @@ public class CustomReporter extends CommonReporter implements IReporter {
 	public List<String> getGeneratedFiles() {
 		return generatedFiles;
 	}
-	
+
 
 	@Override
-	protected void generateReport(Map<ITestContext, Set<ITestResult>> resultSet, String outdir, boolean optimizeReport) {
+	protected void generateReport(Map<ITestContext, Set<ITestResult>> resultSet, String outdir, boolean optimizeReport,	boolean finalGeneration) {
 		generatedFiles = new ArrayList<>();
 		
 		Map<String, Integer> consolidatedResults = new HashMap<>();
@@ -232,5 +232,7 @@ public class CustomReporter extends CommonReporter implements IReporter {
 			logger.error(String.format("Error generating test summary: %s", e.getMessage()));
 		}
 	}
+
+
 
 }

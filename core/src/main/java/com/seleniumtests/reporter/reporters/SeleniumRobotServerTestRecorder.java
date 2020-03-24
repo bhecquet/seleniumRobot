@@ -17,7 +17,6 @@
  */
 package com.seleniumtests.reporter.reporters;
 
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -74,7 +73,7 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 	
 
 	@Override
-	protected void generateReport(Map<ITestContext, Set<ITestResult>> resultSet, String outdir, boolean optimizeReport) {
+	protected void generateReport(Map<ITestContext, Set<ITestResult>> resultSet, String outdir, boolean optimizeReport, boolean finalGeneration) {
 		ITestContext testCtx = SeleniumTestsContextManager.getGlobalContext().getTestNGContext();
 		
 		if (testCtx == null) {
@@ -100,7 +99,7 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 				// create session only if it has not been before
 				for (ITestContext testContext: resultSet.keySet()) {
 					if (TestNGContextUtils.getTestSessionCreated(testContext) == null) {
-						Integer sessionId = serverConnector.createSession();
+						Integer sessionId = serverConnector.createSession(testContext.getName());
 						TestNGContextUtils.setTestSessionCreated(testContext, sessionId);
 					}
 				}
@@ -144,6 +143,8 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 				
 				// skipped tests has never been executed and so attribute (set in TestListener) has not been applied
 				String testName = getTestName(testResult);
+				
+				// get sessionId from context
 				Integer sessionId = TestNGContextUtils.getTestSessionCreated(entry.getKey());
 				
 				// record test case

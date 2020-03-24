@@ -144,7 +144,6 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 	 */
 	private void generateTempReport(ITestResult testResult) {
 		try {
-
 			new ReporterControler().generateReport(
 					Arrays.asList(testResult.getTestContext().getCurrentXmlTest().getSuite()), 
 					Arrays.asList(testResult.getTestContext().getSuite()), 
@@ -489,13 +488,6 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 	private void configureThreadContextAfterInvoke(IInvokedMethod method, ITestResult testResult, ITestContext context) {
 		ConfigurationMethod configMethod = (ConfigurationMethod)method.getTestMethod();
 		SeleniumTestsContextManager.saveThreadContext(method, testResult, context);
-		
-		// reparse logs in case some new logs have been written
-		if (configMethod.isAfterClassConfiguration()
-				|| configMethod.isAfterTestConfiguration()
-				|| configMethod.isAfterMethodConfiguration()) {
-			SeleniumRobotLogger.parseLogFile();
-		}
 	}
 	
 	/**
@@ -564,13 +556,6 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 		
 		// unreserve variables
 		unreserveVariables();
-		
-		// parse logs of this test method
-		try {
-			SeleniumRobotLogger.parseLogFile();
-		} catch (Exception e) {
-			logger.error("log parsing failed: " + e.getMessage());
-		}
 	}
 	
 	/**
