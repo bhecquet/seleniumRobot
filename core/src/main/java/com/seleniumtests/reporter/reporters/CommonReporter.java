@@ -62,7 +62,26 @@ public abstract class CommonReporter implements IReporter {
 		return (CommonReporter) reporterClass.getConstructor().newInstance();
 	}
 	
-	protected abstract void generateReport(Map<ITestContext, Set<ITestResult>> resultSet, String outdir, boolean optimizeReport);
+	protected void generateReport(Map<ITestContext, Set<ITestResult>> resultSet, String outdir, boolean optimizeReport) {
+		generateReport(resultSet, outdir, optimizeReport, false);
+	}
+
+	/**
+	 * This method is called only when all test suite has been executed
+	 */
+	@Override
+	public void generateReport(List<XmlSuite> xmlSuites, List<ISuite> suites, String outputDirectory) {
+		generateReport(getResultMapFromSuites(suites), outputDirectory, SeleniumTestsContextManager.getGlobalContext().getOptimizeReports(), true);
+	}
+	
+	/**
+	 * Generate report on this reporter
+	 * @param resultSet			the map of results
+	 * @param outdir			where to write results
+	 * @param optimizeReport	should we optimize reports. For HTML reporter, it means that size would be reduced if 'true' 
+	 * @param finalGeneration	'true' if this report generation is done at the very end of all test suite execution
+	 */
+	protected abstract void generateReport(Map<ITestContext, Set<ITestResult>> resultSet, String outdir, boolean optimizeReport, boolean finalGeneration);
 	
 	/**
 	 * Initializes the VelocityEngine
@@ -163,12 +182,6 @@ public abstract class CommonReporter implements IReporter {
 		} else {
 			return "N-A";
 		}
-	}
-	
-
-	@Override
-	public void generateReport(List<XmlSuite> xmlSuites, List<ISuite> suites, String outputDirectory) {
-		generateReport(getResultMapFromSuites(suites), outputDirectory, SeleniumTestsContextManager.getGlobalContext().getOptimizeReports());
 	}
 	
 	/**

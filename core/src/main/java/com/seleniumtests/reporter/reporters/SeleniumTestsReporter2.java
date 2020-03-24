@@ -285,7 +285,7 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 	}
 
 	@Override
-	protected void generateReport(Map<ITestContext, Set<ITestResult>> resultSet, final String outdir, boolean optimizeReport) {
+	protected void generateReport(Map<ITestContext, Set<ITestResult>> resultSet, final String outdir, boolean optimizeReport, boolean finalGeneration) {
 		ITestContext testCtx = SeleniumTestsContextManager.getGlobalContext().getTestNGContext();
 		if (testCtx == null) {
 			logger.error("Looks like your class does not extend from SeleniumTestPlan!");
@@ -314,7 +314,11 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 		// Generate test method reports for each result which has not already been generated
 		for (Map.Entry<ITestContext, List<ITestResult>> entry: methodResultsMap.entrySet()) {
 			for (ITestResult testResult: entry.getValue()) {
-				if (!TestNGResultUtils.isHtmlReportCreated(testResult)) {
+				
+				// do not generate twice the same file, except at the end of test suites execution so that final results contains all information
+				// HTML report created after each test method cannot contain @AfterClass post steps because they have not already been executed
+				// so we need to regenerate after all tests have executed
+				if (!TestNGResultUtils.isHtmlReportCreated(testResult) || finalGeneration) {
 					generateSingleTestReport(testResult, optimizeReport);
 				}
 			}

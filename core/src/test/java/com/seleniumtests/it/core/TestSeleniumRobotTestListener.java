@@ -334,15 +334,15 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 
 		// issue #312: check that result files have been generated at least twice (one during test run and one at the end)
 		String logs = readSeleniumRobotLogFile().replace("\\", "/");
-		Assert.assertTrue(StringUtils.countMatches(logs, "test1Listener2/PERF-result.xml") > 1);
-		Assert.assertTrue(StringUtils.countMatches(logs, "test2Listener1/PERF-result.xml") > 1);
-		Assert.assertTrue(StringUtils.countMatches(logs, "test1Listener1/PERF-result.xml") > 1);
-		Assert.assertTrue(StringUtils.countMatches(logs, "test2Listener1-1/PERF-result.xml") > 1);
-		Assert.assertTrue(StringUtils.countMatches(logs, "test2Listener1-2/PERF-result.xml") > 1);
-		Assert.assertTrue(StringUtils.countMatches(logs, "test1Listener3/PERF-result.xml") > 1);
-		Assert.assertTrue(StringUtils.countMatches(logs, "test1Listener3-1/PERF-result.xml") > 1);
-		Assert.assertTrue(StringUtils.countMatches(logs, "test1Listener4/PERF-result.xml") > 1);
-		Assert.assertTrue(StringUtils.countMatches(logs, "test1Listener1-1/PERF-result.xml") > 1);
+		Assert.assertEquals(StringUtils.countMatches(logs, "test1Listener2/PERF-result.xml"), 1);
+		Assert.assertEquals(StringUtils.countMatches(logs, "test2Listener1/PERF-result.xml"), 1);
+		Assert.assertEquals(StringUtils.countMatches(logs, "test1Listener1/PERF-result.xml"), 1);
+		Assert.assertEquals(StringUtils.countMatches(logs, "test2Listener1-1/PERF-result.xml"), 1);
+		Assert.assertEquals(StringUtils.countMatches(logs, "test2Listener1-2/PERF-result.xml"), 1);
+		Assert.assertEquals(StringUtils.countMatches(logs, "test1Listener3/PERF-result.xml"), 1);
+		Assert.assertEquals(StringUtils.countMatches(logs, "test1Listener3-1/PERF-result.xml"), 1);
+		Assert.assertEquals(StringUtils.countMatches(logs, "test1Listener4/PERF-result.xml"), 1);
+		Assert.assertEquals(StringUtils.countMatches(logs, "test1Listener1-1/PERF-result.xml"), 1);
 		Assert.assertEquals(StringUtils.countMatches(logs, "SeleniumTestReport.html"), 10); // 1 per executed test + 1 for final generation
 	}
 	
@@ -359,17 +359,17 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 		// test1Listener4 fails as expected
 		Assert.assertTrue(mainReportContent.matches(".*<i class\\=\"fa fa-circle circleSkipped\"></i><a href\\='test1Listener4/TestReport\\.html'.*?>test1Listener4</a>.*"));
 		
-		// issue #312: check that result files have been generated at least twice (one during test run and one at the end)
+		// issue #312: check that result files have been generated once
 		String logs = readSeleniumRobotLogFile().replace("\\", "/");
-		Assert.assertTrue(StringUtils.countMatches(logs, "test1Listener2/PERF-result.xml") > 1);
-		Assert.assertTrue(StringUtils.countMatches(logs, "test2Listener1/PERF-result.xml") > 1);
-		Assert.assertTrue(StringUtils.countMatches(logs, "test1Listener1/PERF-result.xml") > 1);
-		Assert.assertTrue(StringUtils.countMatches(logs, "test2Listener1-1/PERF-result.xml") > 1);
-		Assert.assertTrue(StringUtils.countMatches(logs, "test2Listener1-2/PERF-result.xml") > 1);
-		Assert.assertTrue(StringUtils.countMatches(logs, "test1Listener3/PERF-result.xml") > 1);
-		Assert.assertTrue(StringUtils.countMatches(logs, "test1Listener3-1/PERF-result.xml") > 1);
-		Assert.assertTrue(StringUtils.countMatches(logs, "test1Listener4/PERF-result.xml") > 1);
-		Assert.assertTrue(StringUtils.countMatches(logs, "test1Listener1-1/PERF-result.xml") > 1);
+		Assert.assertEquals(StringUtils.countMatches(logs, "test1Listener2/PERF-result.xml"), 1);
+		Assert.assertEquals(StringUtils.countMatches(logs, "test2Listener1/PERF-result.xml"), 1);
+		Assert.assertEquals(StringUtils.countMatches(logs, "test1Listener1/PERF-result.xml"), 1);
+		Assert.assertEquals(StringUtils.countMatches(logs, "test2Listener1-1/PERF-result.xml"), 1);
+		Assert.assertEquals(StringUtils.countMatches(logs, "test2Listener1-2/PERF-result.xml"), 1);
+		Assert.assertEquals(StringUtils.countMatches(logs, "test1Listener3/PERF-result.xml"), 1);
+		Assert.assertEquals(StringUtils.countMatches(logs, "test1Listener3-1/PERF-result.xml"), 1);
+		Assert.assertEquals(StringUtils.countMatches(logs, "test1Listener4/PERF-result.xml"), 1);
+		Assert.assertEquals(StringUtils.countMatches(logs, "test1Listener1-1/PERF-result.xml"), 1);
 		Assert.assertEquals(StringUtils.countMatches(logs, "SeleniumTestReport.html"), 10); // 1 per executed test + 1 for final generation
 	}
 	
@@ -388,15 +388,15 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 
 		// issue #312: check that result files have been generated at least twice (one during test run and one at the end)
 		String logs = readSeleniumRobotLogFile().replace("\\", "/");
-		Assert.assertTrue(StringUtils.countMatches(logs, "test1Listener2/PERF-result.xml") > 1);
-		Assert.assertTrue(StringUtils.countMatches(logs, "test2Listener1/PERF-result.xml") > 1);
-		Assert.assertTrue(StringUtils.countMatches(logs, "test1Listener1/PERF-result.xml") > 1);
-		Assert.assertTrue(StringUtils.countMatches(logs, "test2Listener1-1/PERF-result.xml") > 1);
-		Assert.assertTrue(StringUtils.countMatches(logs, "test2Listener1-2/PERF-result.xml") > 1);
-		Assert.assertTrue(StringUtils.countMatches(logs, "test1Listener3/PERF-result.xml") > 1);
-		Assert.assertTrue(StringUtils.countMatches(logs, "test1Listener3-1/PERF-result.xml") > 1);
-		Assert.assertTrue(StringUtils.countMatches(logs, "test1Listener4/PERF-result.xml") > 1);
-		Assert.assertTrue(StringUtils.countMatches(logs, "test1Listener1-1/PERF-result.xml") > 1);
+		Assert.assertEquals(StringUtils.countMatches(logs, "test1Listener2/PERF-result.xml"), 1);
+		Assert.assertEquals(StringUtils.countMatches(logs, "test2Listener1/PERF-result.xml"), 1);
+		Assert.assertEquals(StringUtils.countMatches(logs, "test1Listener1/PERF-result.xml"), 1);
+		Assert.assertEquals(StringUtils.countMatches(logs, "test2Listener1-1/PERF-result.xml"), 1);
+		Assert.assertEquals(StringUtils.countMatches(logs, "test2Listener1-2/PERF-result.xml"), 1);
+		Assert.assertEquals(StringUtils.countMatches(logs, "test1Listener3/PERF-result.xml"), 1);
+		Assert.assertEquals(StringUtils.countMatches(logs, "test1Listener3-1/PERF-result.xml"), 1);
+		Assert.assertEquals(StringUtils.countMatches(logs, "test1Listener4/PERF-result.xml"), 1);
+		Assert.assertEquals(StringUtils.countMatches(logs, "test1Listener1-1/PERF-result.xml"), 1);
 		Assert.assertEquals(StringUtils.countMatches(logs, "SeleniumTestReport.html"), 10); // 1 per executed test + 1 for final generation
 	}
 	

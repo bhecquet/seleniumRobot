@@ -66,17 +66,19 @@ public class ReporterControler implements IReporter {
 	public void generateReport(List<XmlSuite> xmlSuites, List<ISuite> suites, String outputDirectory, ITestResult currentTestResult) {
 		
 		synchronized (reporterLock) {
+
+			SeleniumRobotLogger.parseLogFile();
 			Map<ITestContext, Set<ITestResult>> resultSet = updateTestSteps(suites, currentTestResult);
 			try {
 				new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).mkdirs();
 			} catch (Exception e) {}
 			cleanAttachments(resultSet);
 			
-			// are we at the end of a suite (suite.getResults() has the same size as the returned result map)
-			boolean suiteFinished = false;
+			// are we at the end of all suites (suite.getResults() has the same size as the returned result map)
+			boolean suiteFinished = true;
 			for (ISuite suite: suites) {
-				if (suite.getResults().size() == resultSet.size()) {
-					suiteFinished = true;
+				if (suite.getResults().size() != resultSet.size()) {
+					suiteFinished = false;
 					break;
 				}
 			}

@@ -17,13 +17,9 @@
  */
 package com.seleniumtests.it.reporter;
 
-import static org.mockito.Mockito.spy;
-
 import java.io.File;
 import java.nio.file.Paths;
 
-import org.apache.commons.io.FileUtils;
-import org.json.JSONObject;
 import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.annotations.AfterMethod;
@@ -32,7 +28,6 @@ import org.testng.xml.XmlSuite.ParallelMode;
 
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
-import com.seleniumtests.reporter.reporters.CustomReporter;
 
 /**
  * Test that reporter plugins are used

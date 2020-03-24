@@ -438,10 +438,42 @@ and then, in command line
 ### 19 Create a custom reporter ###
 
 For textual reports, you can look at §11 which uses Velocity template engine to generate summary and per test reports
-For more complex reports (send errors to Jira, send results to Squash, ...), you can write a custom reporter which implements the `IReporter` interface.
+For more complex reports (send errors to Jira, send results to Squash, ...), you can write a custom reporter which extends the `CommonReporter` class.
 
 This way, you can scan test results and do some actions based on results. Look at `CustomReporter.java` for example
 To enable this report, use parameter `-DreporterPluginClasses=my.reporter.CustomClass` 
+
+example:
+
+```java
+public class CustomReportPlugin extends CommonReporter {
+
+	/**
+	* This method is called only once at the end of all test suites generation
+	*/
+	@Override
+	public void generateReport(List<XmlSuite> xmlSuites, List<ISuite> suites, String outputDirectory) {
+		try {
+			FileUtils.writeStringToFile(Paths.get(outputDirectory, "customReport.txt").toFile(), "foo");
+		} catch (IOException e) {
+		}
+	}
+
+	/**
+	* This method is called each time a test has been executed
+	* @param resultSet			the map of results
+	* @param outdir			where to write results
+	* @param optimizeReport	should we optimize reports. For HTML reporter, it means that size would be reduced if 'true' 
+	* @param finalGeneration	'true' if this report generation is done at the very end of all test suite execution
+	*/
+	@Override
+	protected void generateReport(Map<ITestContext, Set<ITestResult>> resultSet, String outdir, boolean optimizeReport,
+			boolean finalGeneration) {
+
+	}
+
+}
+```
 	  
 ### 20 Debug running test ###
 

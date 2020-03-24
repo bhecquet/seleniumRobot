@@ -32,33 +32,39 @@ import com.seleniumtests.it.reporter.ReporterTest;
 public class TestRetry extends ReporterTest {
 
 	@Test(groups={"it"})
-	public void testRetryOnException() throws Exception {
+	public void testNotRetriedOnAssertion() throws Exception {
 		
-		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions", "testInError", "testWithException"});
+		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testInError"});
 
-		String mainReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport.html"));
-		mainReportContent = mainReportContent.replace("\n", "").replace("\r",  "");
+		String mainReportContent = readSummaryFile();
 		Assert.assertTrue(mainReportContent.matches(".*<a href\\='testInError/TestReport\\.html'.*?>testInError</a>.*"));
-		Assert.assertTrue(mainReportContent.matches(".*<a href\\='testWithException/TestReport\\.html'.*?>testWithException</a>.*"));
 	
 		// check failed test is not retried (AssertionError) based on log. No more direct way found
-		String detailedReportContent2 = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testInError", "TestReport.html").toFile());
-		detailedReportContent2 = detailedReportContent2.replace("\n", "").replace("\r",  "").replaceAll(">\\s+<", "><");
-		Assert.assertTrue(detailedReportContent2.contains("Failed in 1 times"));
-		Assert.assertFalse(detailedReportContent2.contains("[RETRYING] class com.seleniumtests.it.stubclasses.StubTestClass.testInError"));
+		String detailedReportContent = readTestMethodResultFile("testInError");
+		Assert.assertTrue(detailedReportContent.contains("Failed in 1 times"));
+		Assert.assertFalse(detailedReportContent.contains("[RETRYING] class com.seleniumtests.it.stubclasses.StubTestClass.testInError"));
+		
+	}
+	
+	@Test(groups={"it"})
+	public void testRetryOnException() throws Exception {
+		
+		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testWithException"});
+		
+		String mainReportContent = readSummaryFile();
+		Assert.assertTrue(mainReportContent.matches(".*<a href\\='testWithException/TestReport\\.html'.*?>testWithException</a>.*"));
 		
 		// check test with exception is retried based on log. No more direct way found
-		String detailedReportContent3 = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testWithException", "TestReport.html").toFile());
-		detailedReportContent3 = detailedReportContent3.replace("\n", "").replace("\r",  "").replaceAll(">\\s+<", "><");
-		Assert.assertTrue(detailedReportContent3.contains("Failed in 3 times"));
-		Assert.assertTrue(detailedReportContent3.contains("[RETRYING] class com.seleniumtests.it.stubclasses.StubTestClass.testWithException"));
+		String detailedReportContent = readTestMethodResultFile("testWithException");
+		Assert.assertTrue(detailedReportContent.contains("Failed in 3 times"));
+		Assert.assertTrue(detailedReportContent.contains("[RETRYING] class com.seleniumtests.it.stubclasses.StubTestClass.testWithException"));
 		
 		// check that in case of retry, steps are not logged twice
-		Assert.assertTrue(detailedReportContent3.contains("step 1"));
-		Assert.assertTrue(detailedReportContent3.contains("<li>played 3 times")); // only the last step is retained
-		Assert.assertFalse(detailedReportContent3.contains("<li>played 2 times")); // only the last step is retained
-		Assert.assertEquals(StringUtils.countOccurrencesOf(detailedReportContent3, "step 1"), 1); 
-
+		Assert.assertTrue(detailedReportContent.contains("step 1"));
+		Assert.assertTrue(detailedReportContent.contains("<li>played 3 times")); // only the last step is retained
+		Assert.assertFalse(detailedReportContent.contains("<li>played 2 times")); // only the last step is retained
+		Assert.assertEquals(StringUtils.countOccurrencesOf(detailedReportContent, "step 1"), 1); 
+		
 	}
 	
 	/**
@@ -71,8 +77,7 @@ public class TestRetry extends ReporterTest {
 		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testWithExceptionAndMaxRetryIncreased"});
 
 		// check test with exception is retried based on log. No more direct way found
-		String detailedReportContent = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testWithExceptionAndMaxRetryIncreased", "TestReport.html").toFile());
-		detailedReportContent = detailedReportContent.replace("\n", "").replace("\r",  "").replaceAll(">\\s+<", "><");
+		String detailedReportContent = readTestMethodResultFile("testWithExceptionAndMaxRetryIncreased");
 		Assert.assertTrue(detailedReportContent.contains("Failed in 5 times"));
 		Assert.assertTrue(detailedReportContent.contains("[RETRYING] class com.seleniumtests.it.stubclasses.StubTestClass.testWithExceptionAndMaxRetryIncreased"));
 		
@@ -93,8 +98,7 @@ public class TestRetry extends ReporterTest {
 		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testWithExceptionAndMaxRetryIncreasedWithLimit"});
 		
 		// check test with exception is retried based on log. No more direct way found
-		String detailedReportContent = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testWithExceptionAndMaxRetryIncreasedWithLimit", "TestReport.html").toFile());
-		detailedReportContent = detailedReportContent.replace("\n", "").replace("\r",  "").replaceAll(">\\s+<", "><");
+		String detailedReportContent = readTestMethodResultFile("testWithExceptionAndMaxRetryIncreasedWithLimit");
 		Assert.assertTrue(detailedReportContent.contains("Failed in 5 times"));
 		Assert.assertTrue(detailedReportContent.contains("[RETRYING] class com.seleniumtests.it.stubclasses.StubTestClass.testWithExceptionAndMaxRetryIncreasedWithLimit"));
 		
@@ -114,8 +118,7 @@ public class TestRetry extends ReporterTest {
 		Assert.assertTrue(mainReportContent.matches(".*<a href\\='error_scenario/TestReport\\.html'.*?>error_scenario</a>.*"));
 		
 		// check failed test is not retried (AssertionError) based on log. No more direct way found
-		String detailedReportContent = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "error_scenario", "TestReport.html").toFile());
-		detailedReportContent = detailedReportContent.replace("\n", "").replace("\r",  "").replaceAll(">\\s+<", "><");
+		String detailedReportContent = readTestMethodResultFile("error_scenario");
 		Assert.assertTrue(detailedReportContent.contains("Failed in 3 times"));
 		Assert.assertTrue(detailedReportContent.contains("[RETRYING] class com.seleniumtests.core.runner.CucumberTestPlan.feature"));
 
