@@ -70,7 +70,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 	 * Create a test session
 	 * @return
 	 */
-	public Integer createSession() {
+	public Integer createSession(String sessionName) {
 		if (!active) {
 			return null;
 		}
@@ -94,6 +94,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 					.field("browser", browser.getBrowserType())
 					.field("environment", SeleniumTestsContextManager.getGlobalContext().getTestEnv())
 					.field("version", versionId)
+					.field("name", sessionName)
 					.field("compareSnapshot", SeleniumTestsContextManager.getGlobalContext().getSeleniumRobotServerCompareSnapshot()));
 			return sessionJson.getInt("id");
 		} catch (UnirestException | JSONException e) {

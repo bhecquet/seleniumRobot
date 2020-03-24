@@ -19,8 +19,8 @@ package com.seleniumtests.it.reporter;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.contains;
 import static org.mockito.ArgumentMatchers.eq;
@@ -31,8 +31,6 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
-import java.io.File;
 
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -92,7 +90,7 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 			
 			// check server has been called for all aspects of test (app, version, ...)
 			// they may be called for each test but server is responsible for uniqueness of the value
-			verify(serverConnector, atLeastOnce()).createSession();
+			verify(serverConnector, atLeastOnce()).createSession(anyString());
 			
 			// issue #331: check all test cases are created, call MUST be done only once to avoid result to be recorded several times
 			verify(serverConnector).createTestCase("testAndSubActions");
@@ -101,8 +99,8 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 			verify(serverConnector).createTestCase("testSkipped");
 			verify(serverConnector, times(4)).addLogsToTestCaseInSession(anyInt(), anyString());
 			verify(serverConnector, times(4)).createTestCaseInSession(anyInt(), anyInt()); 
-			verify(serverConnector, times(3)).createTestStep("step 1", anyInt());
-			verify(serverConnector).createTestStep("step 2", anyInt());
+			verify(serverConnector, times(3)).createTestStep(eq("step 1"), anyInt());
+			verify(serverConnector).createTestStep(eq("step 2"), anyInt());
 			verify(serverConnector).createSnapshot(any(Snapshot.class), anyInt(), anyInt(), anyInt()); // two snapshots but only once is sent because the other has no name
 			
 			String logs = readSeleniumRobotLogFile();
@@ -144,7 +142,7 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 			
 	
 			// check server has been called for all aspects of test (app, version, ...)
-			verify(serverConnector, never()).createSession();
+			verify(serverConnector, never()).createSession(anyString());
 			
 			// check all test cases are created, in both test classes
 			verify(serverConnector, never()).createTestCase(anyString());
@@ -188,7 +186,7 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions", "testInError"});
 			
 			// check server has been called for session
-			verify(serverConnector, times(3)).createSession(); // once for each test, and once after execution finishes
+			verify(serverConnector).createSession(anyString()); // once per TestNG context (so 1 time here)
 			verify(serverConnector, times(3)).recordStepResult(anyBoolean(), anyString(), anyLong(), anyInt(), anyInt(), anyInt()); // once for each test execution + the final logging which is done only once as it fails
 																							// it shows that when result has not been recorded, it's retried
 			

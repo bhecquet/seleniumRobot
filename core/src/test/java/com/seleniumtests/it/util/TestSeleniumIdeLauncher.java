@@ -148,7 +148,7 @@ public class TestSeleniumIdeLauncher extends ReporterTest {
 			Assert.assertTrue(detailedReportContent1.contains("li>click on HtmlElement , by={By.id: buttonIFrame} </li>"));
 			
 			// screenshot is present for the step (taken at the beginning of the step: see anchor)
-			Assert.assertTrue(detailedReportContent1.contains("<div class=\"message-snapshot\">Output 'main' browser: Current Window: : <a href='http://localhost:55555/testWithoutFixedPattern.html'"));
+			Assert.assertTrue(detailedReportContent1.contains("<div class=\"message-snapshot\">Output 'drv:main' browser: Current Window: : <a href='http://localhost:55555/testWithoutFixedPattern.html'"));
 			
 		} finally {
 			System.clearProperty(SeleniumTestsContext.BROWSER);
