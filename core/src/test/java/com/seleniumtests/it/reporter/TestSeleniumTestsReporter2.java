@@ -710,6 +710,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 						+ "<li>sendKeys to password field</li>"			// action in sub step
 					+ "</ul>" 
 					+ "<div class=\"message-snapshot\">Output 'main' browser: null:  | <a href='htmls/testAndSubActions_1-1_step_1-html_with_very_very_v.html' target=html>Application HTML Source</a> | <a href='screenshot/testAndSubActions_1-1_step_1-img_with_very_very_ve.png' class='lightbox'>Application Snapshot</a></div>"
+					+ "<div class=\"message-snapshot\">Output 'null' browser: null:  | <a href='htmls/testAndSubActions_1-2_step_1-html_with_very_very_v.html' target=html>Application HTML Source</a> | <a href='screenshot/testAndSubActions_1-2_step_1-img_with_very_very_ve.png' class='lightbox'>Application Snapshot</a></div>"
 				+ "</ul>"));
 		
 	}
@@ -765,7 +766,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		
 		Assert.assertTrue(detailedReportContent1.contains("<a href='../testDriverCustomSnapshot/screenshots/my_snapshot"));	
 		Assert.assertTrue(detailedReportContent1.contains("<a href='../testDriverCustomSnapshot/htmls/my_snapshot"));	
-		Assert.assertTrue(detailedReportContent1.contains("<div class=\"message-snapshot\">Output 'main' browser: my snapshot:"));	
+		Assert.assertTrue(detailedReportContent1.contains("<div class=\"message-snapshot\">Output 'drv:main-my snapshot' browser: my snapshot:"));	
 	}
 	
 	
@@ -918,7 +919,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		 
 		Assert.assertTrue(detailedReportContent1.contains("<li>sendKeys on TextFieldElement Text, by={By.id: text2} with args: (true, true, [a text,], )</li>"));
 		Assert.assertTrue(detailedReportContent1.contains("<li>click on ButtonElement Reset, by={By.id: button2} </li>"));
-		Assert.assertTrue(detailedReportContent1.contains("<div class=\"message-snapshot\">Output 'main' browser: Current Window: Test page: <a href="));
+		Assert.assertTrue(detailedReportContent1.contains("<div class=\"message-snapshot\">Output 'drv:main' browser: Current Window: Test page: <a href="));
 		
 		// check that only on reference to 'click' is present for this buttonelement. This means that only the replayed action has been logged, not the ButtonElement.click() one
 		Assert.assertEquals(StringUtils.countMatches(detailedReportContent1, "click on"), 1);

@@ -78,17 +78,24 @@ public class StubTestClass extends StubParentClass {
 		step1.addAction(new TestAction("click button", false, new ArrayList<>()));
 		step1.addAction(new TestAction("sendKeys to text field", true, new ArrayList<>()));
 		
-		ScreenShot screenshot = new ScreenShot();
+		
 		File tmpImg = File.createTempFile("img_with_very_very_very_long_name_to_be_shortened", ".png");
 		File tmpHtml = File.createTempFile("html_with_very_very_very_long_name_to_be_shortened", ".html");
-
+		
+		ScreenShot screenshot = new ScreenShot();
 		screenshot.setImagePath("screenshot/" + tmpImg.getName());
 		screenshot.setHtmlSourcePath("htmls/" + tmpHtml.getName());
-		FileUtils.moveFile(tmpImg, new File(screenshot.getFullImagePath()));
-		FileUtils.moveFile(tmpHtml, new File(screenshot.getFullHtmlPath()));
-		
+		FileUtils.copyFile(tmpImg, new File(screenshot.getFullImagePath()));
+		FileUtils.copyFile(tmpHtml, new File(screenshot.getFullHtmlPath()));
 		step1.addSnapshot(new Snapshot(screenshot, "main", SnapshotCheckType.TRUE), 1, null);
-		step1.addSnapshot(new Snapshot(screenshot, null, SnapshotCheckType.TRUE), 1, null);
+		
+		ScreenShot screenshot2 = new ScreenShot();
+		screenshot2.setImagePath("screenshot/" + tmpImg.getName());
+		screenshot2.setHtmlSourcePath("htmls/" + tmpHtml.getName());
+		FileUtils.moveFile(tmpImg, new File(screenshot2.getFullImagePath()));
+		FileUtils.moveFile(tmpHtml, new File(screenshot2.getFullHtmlPath()));
+		step1.addSnapshot(new Snapshot(screenshot2, null, SnapshotCheckType.TRUE), 1, null);
+		
 		step1.setActionException(new WebDriverException("driver exception"));
 		TestStep subStep1 = new TestStep("step 1.3: open page", Reporter.getCurrentTestResult(), new ArrayList<>(), maskPassword);
 		subStep1.addAction(new TestAction("click link", false, new ArrayList<>()));
