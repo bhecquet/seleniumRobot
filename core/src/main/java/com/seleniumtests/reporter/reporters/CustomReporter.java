@@ -118,23 +118,21 @@ public class CustomReporter extends CommonReporter implements IReporter {
 			List<TestStep> testSteps = TestNGResultUtils.getSeleniumRobotTestContext(testResult).getTestStepManager().getTestSteps();
 			List<TestStep> newTestSteps = new ArrayList<>();
 			if (testSteps != null) {
-				synchronized (testSteps) {
-					for (TestStep step: testSteps) {
-						testDuration += step.getDuration();
-						if (step.getFailed()) {
-							errors++;
-						}
-						
-						// encode each step
-						if ("xml".equalsIgnoreCase(reportFormat.toLowerCase()) 
-								|| "json".equalsIgnoreCase(reportFormat.toLowerCase())
-								|| "html".equalsIgnoreCase(reportFormat.toLowerCase())
-								|| "csv".equalsIgnoreCase(reportFormat.toLowerCase())
-								) {
-							newTestSteps.add(step.encode(reportFormat.toLowerCase()));
-						} else {
-							newTestSteps.add(step);
-						}
+				for (TestStep step: testSteps) {
+					testDuration += step.getDuration();
+					if (step.getFailed()) {
+						errors++;
+					}
+					
+					// encode each step
+					if ("xml".equalsIgnoreCase(reportFormat.toLowerCase()) 
+							|| "json".equalsIgnoreCase(reportFormat.toLowerCase())
+							|| "html".equalsIgnoreCase(reportFormat.toLowerCase())
+							|| "csv".equalsIgnoreCase(reportFormat.toLowerCase())
+							) {
+						newTestSteps.add(step.encode(reportFormat.toLowerCase()));
+					} else {
+						newTestSteps.add(step);
 					}
 				}
 			}

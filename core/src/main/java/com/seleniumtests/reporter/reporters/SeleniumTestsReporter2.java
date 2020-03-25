@@ -157,25 +157,23 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 				return;
 			}
 			
-			synchronized (testSteps) {
-				for (TestStep testStep: testSteps) {
-					
-					TestStep encodedTestStep = testStep.encode("html");
-					// step status
-					if (encodedTestStep.getFailed()) {
-						context.put(STATUS, FAILED_TEST);
-					} else {
-						context.put(STATUS, PASSED_TEST);
-					}
-					
-					context.put("stepName", encodedTestStep.getName());
-					context.put("stepDuration", encodedTestStep.getDuration() / (double)1000);
-					context.put("step", encodedTestStep);	
-					
-					StringWriter writer = new StringWriter();
-					t.merge( context, writer );
-					mOut.write(writer.toString());
+			for (TestStep testStep: testSteps) {
+				
+				TestStep encodedTestStep = testStep.encode("html");
+				// step status
+				if (encodedTestStep.getFailed()) {
+					context.put(STATUS, FAILED_TEST);
+				} else {
+					context.put(STATUS, PASSED_TEST);
 				}
+				
+				context.put("stepName", encodedTestStep.getName());
+				context.put("stepDuration", encodedTestStep.getDuration() / (double)1000);
+				context.put("step", encodedTestStep);	
+				
+				StringWriter writer = new StringWriter();
+				t.merge( context, writer );
+				mOut.write(writer.toString());
 			}
 			
 

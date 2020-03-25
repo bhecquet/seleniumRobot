@@ -157,26 +157,24 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 					continue;
 				}
 				
-				synchronized (testSteps) {
-					for (TestStep testStep: testSteps) {
+				for (TestStep testStep: testSteps) {
+					
+					// record test step
+					Integer testStepId = serverConnector.createTestStep(testStep.getName(), testCaseInSessionId);
+					String stepLogs = testStep.toJson().toString();
+					
+					Integer stepResultId = serverConnector.recordStepResult(!testStep.getFailed(), stepLogs, testStep.getDuration(), sessionId, testCaseInSessionId, testStepId);
+					
+					// sends all snapshots that are flagged as comparable
+					for (Snapshot snapshot: testStep.getSnapshots()) {
 						
-						// record test step
-						Integer testStepId = serverConnector.createTestStep(testStep.getName(), testCaseInSessionId);
-						String stepLogs = testStep.toJson().toString();
-						
-						Integer stepResultId = serverConnector.recordStepResult(!testStep.getFailed(), stepLogs, testStep.getDuration(), sessionId, testCaseInSessionId, testStepId);
-						
-						// sends all snapshots that are flagged as comparable
-						for (Snapshot snapshot: testStep.getSnapshots()) {
-							
-							if (snapshot.isCheckSnapshot() == SnapshotCheckType.TRUE) {
-								if (snapshot.getName() == null || snapshot.getName().isEmpty()) {
-									logger.warn("Snapshot hasn't any name, it won't be sent to server");
-									continue;
-								}
-								
-								serverConnector.createSnapshot(snapshot, sessionId, testCaseInSessionId, stepResultId);
+						if (snapshot.isCheckSnapshot() == SnapshotCheckType.TRUE) {
+							if (snapshot.getName() == null || snapshot.getName().isEmpty()) {
+								logger.warn("Snapshot hasn't any name, it won't be sent to server");
+								continue;
 							}
+							
+							serverConnector.createSnapshot(snapshot, sessionId, testCaseInSessionId, stepResultId);
 						}
 					}
 				}
