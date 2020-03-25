@@ -261,11 +261,8 @@ public class ReporterControler implements IReporter {
 			}
 			
 			// get files referenced by the steps
-			List<TestStep> testSteps = testContext.getTestStepManager().getTestSteps();
-			synchronized (testSteps) {
-				for (TestStep testStep: testSteps) {
-					usedFiles.addAll(testStep.getAllAttachments());
-				}
+			for (TestStep testStep: testContext.getTestStepManager().getTestSteps()) {
+				usedFiles.addAll(testStep.getAllAttachments());
 			}
 			
 			String outputSubDirectory = new File(testContext.getOutputDirectory()).getName();

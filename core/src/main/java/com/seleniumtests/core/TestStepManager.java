@@ -25,7 +25,7 @@ public class TestStepManager {
 	 * @param managerToCopy
 	 */
 	public TestStepManager(TestStepManager managerToCopy) {
-		testSteps = new ArrayList<>();
+		testSteps = new CopyOnWriteArrayList<>();
 		for (TestStep step: managerToCopy.testSteps) {
 			testSteps.add(step.deepCopy());
 		}
