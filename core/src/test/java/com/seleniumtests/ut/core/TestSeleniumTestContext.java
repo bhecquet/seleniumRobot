@@ -1038,11 +1038,11 @@ public class TestSeleniumTestContext extends GenericTest {
 	@Test(groups="ut context")
 	public void testCustomTestsReports(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		initThreadContext(testNGCtx);
-		SeleniumTestsContextManager.getThreadContext().setCustomTestReports("PERF::xml::reporter/templates/report.part.test.vm,SUPERVISION::xml::reporter/templates/report.part.test.step.vm");
+		SeleniumTestsContextManager.getThreadContext().setCustomTestReports("PERF::xml::reporter/templates/report.test.vm,SUPERVISION::xml::reporter/templates/report.perf.vm");
 		List<ReportInfo> reportInfos = SeleniumTestsContextManager.getThreadContext().getCustomTestReports();
 		Assert.assertEquals(reportInfos.size(), 2);
 		Assert.assertEquals(reportInfos.get(0).getExtension(), ".xml");
-		Assert.assertEquals(reportInfos.get(0).getTemplatePath(), "reporter/templates/report.part.test.vm");
+		Assert.assertEquals(reportInfos.get(0).getTemplatePath(), "reporter/templates/report.test.vm");
 		Assert.assertEquals(reportInfos.get(0).getPrefix(), "PERF");
 	}
 	@Test(groups="ut context", expectedExceptions=ConfigurationException.class)
@@ -1119,11 +1119,11 @@ public class TestSeleniumTestContext extends GenericTest {
 	@Test(groups="ut context")
 	public void testCustomSummaryReports(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		initThreadContext(testNGCtx);
-		SeleniumTestsContextManager.getThreadContext().setCustomSummaryReports("PERF::xml::reporter/templates/report.part.test.vm,SUPERVISION::xml::reporter/templates/report.part.test.step.vm");
+		SeleniumTestsContextManager.getThreadContext().setCustomSummaryReports("PERF::xml::reporter/templates/report.test.vm,SUPERVISION::xml::reporter/templates/report.perf.vm");
 		List<ReportInfo> reportInfos = SeleniumTestsContextManager.getThreadContext().getCustomSummaryReports();
 		Assert.assertEquals(reportInfos.size(), 2);
 		Assert.assertEquals(reportInfos.get(0).getExtension(), ".xml");
-		Assert.assertEquals(reportInfos.get(0).getTemplatePath(), "reporter/templates/report.part.test.vm");
+		Assert.assertEquals(reportInfos.get(0).getTemplatePath(), "reporter/templates/report.test.vm");
 		Assert.assertEquals(reportInfos.get(0).getPrefix(), "PERF");
 	}
 	@Test(groups="ut context", expectedExceptions=ConfigurationException.class)
