@@ -1,113 +1,145 @@
-<div class="pieChart">
-	<canvas id="pieChart" style="height:250px"></canvas>
-	<!--<div id="pieChartLegend" class="chart-legend"></div>-->
-</div>
-
-<section class="content-header">
-	<h1> Integration tests <span>(<a href="seleniumRobot.log" style="font-size: 15px;">full logs</a>)</span></h1>
-</section>
-
-<section class="content">
-	      	<div class="row">
-	        	<div class="col-xs-12">
-	          		<div class="box box-black">
-	            		<div class="box-body">
-	              			<table class="table">
-	                			<thead>
-	                				<tr>
-	                					<th class="alignleft"> Tests </th>
-					                  	<th class="alignleft"> Methods </th>
-					                  	<th> Passed Steps Count </th>
-					                 	<th> Failed Steps Count </th>
-					                 	<th> Steps Count </th>
-					                 	<th> Duration </th>
-					                 	#foreach ($infoKey in $infoKeys)
-					                 		<th> $infoKey </th>
-					                 	#end
-					                </tr>
-				                </thead>
-				                <tbody>
-				                #set ($totalPassed = 0)
-	                			#set ($totalFailed = 0)
-	                			#set ($totalSteps = 0)
-	                			#set ($testIdx = 0)
-				                
-			                	#foreach ($testContext in $tests.entrySet())
-			                		#foreach ($testResult in $testContext.value)
-			                			#set ($testIdx = $testIdx + 1)
-			                			#**
-			                			Compute step state for each test
-			                			*#
-			                			#set ($passedSteps = 0)
-			                			#set ($failedSteps = 0)
-			                			#set ($totalTestSteps = 0)
-			                			#set ($stepsDuration = 0)
-			                			#set ($testDuration = ($testResult.getEndMillis() - $testResult.getStartMillis()) / 1000)
-			                			#foreach ($testStep in $steps.get($testResult))
-			                				#if ($testStep.getFailed())
-			                					#set ($failedSteps = $failedSteps + 1)
-			                				#else
-			                					#set ($passedSteps = $passedSteps + 1)
-			                				#end
-			                				#set ($totalTestSteps = $totalTestSteps + 1)
-			                				#set ($stepsDuration = $stepsDuration + $testStep.getDuration() / 1000)
-			                			#end
-			                			#set ($totalPassed = $totalPassed + $passedSteps)
-			                			#set ($totalFailed = $totalFailed + $failedSteps)
-			                			#set ($totalSteps = $totalSteps + $totalTestSteps)
-			                			#if ($testResult.getMethod().getDescription())
-			                				#set ($description = $testResult.getMethod().getDescription())
-			                			#else
-			                				#set ($description = "no description available")
-			                			#end
-			                			
-			                			#if ($testResult.getStatus() == 1)
-			                				<tr class="testSuccess">
-			                				<td>$testContext.key.getName()</td>
-			                				<td class="alignleft"><i class="fa fa-circle circleSuccess"></i><a href='$testResult.getAttribute("methodResultFileName")' data-toggle="tooltip" title="$description">$testResult.getAttribute("uniqueMethodName")</a></td>
-			                			#elseif ($testResult.getStatus() == 2)
-			                				<tr class="testFailed">
-			                				<td>$testContext.key.getName()</td>
-			                				<td class="alignleft"><i class="fa fa-circle circleFailed"></i><a href='$testResult.getAttribute("methodResultFileName")' data-toggle="tooltip" title="$description">$testResult.getAttribute("uniqueMethodName")</a></td>
-			                			#else 
-			                				<tr class="testSkipped">
-			                				<td>$testContext.key.getName()</td>
-			                				<td class="alignleft"><i class="fa fa-circle circleSkipped"></i><a href='$testResult.getAttribute("methodResultFileName")' data-toggle="tooltip" title="$description">$testResult.getAttribute("uniqueMethodName")</a></td>
-			                			#end 
-
-				                		<td name="passed-$testIdx">$passedSteps</td>
-				                		#if ($failedSteps == 0)
-				                  			<td name="failed-$testIdx">$failedSteps</td>
-				                  		#else
-				                  			<td name="failed-$testIdx" class="failedSteps">$failedSteps</td>
-				                  		#end
-				                  		<td name="stepsTotal-$testIdx">$totalTestSteps</td>
-				                  		<td>$stepsDuration sec.</td>
-				                  		
-				                  		
-			                			#set ($testInfos = $infos.get($testResult))
-				                  		#foreach ($infoKey in $infoKeys)
-				                  			#if (!$testInfos || !$testInfos.get($infoKey))
-				                  				<td class="info"></td>
-				                  			#else
-					                 			<td class="info">$testInfos.get($infoKey)</td>
-					                 		#end
-					                 	#end
-				                  		</tr>
-			                		
-			                		#end	
-				                #end
-				           		</tbody>
-				           		<tfoot>
-	                				<tr>
-					                  	<th class="alignleft"> Total </th>
-					                  	<th> </th>
-					                  	<th name="totalPassed"> $totalPassed </th>
-					                 	<th name="totalFailed"> $totalFailed </th>
-					                 	<th name="totalSteps"> $totalSteps </th>
-					                 	<th></th>
-					                </tr>
-				                </tfoot>
-				           	</table>
-				        </div>
-				    </div>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+	    <meta http-equiv="Content-Type" content="text/html" charset="utf-8" />
+	
+	    <title>SeleniumRobot</title>
+	
+		#if ($localResources)
+			#parse("reporter/templates/html.head.local.vm")
+		#else
+			#parse("reporter/templates/html.head.remote.vm")
+		#end
+		
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/1.0.2/Chart.min.js"></script>
+		<link rel="stylesheet" type="text/css" href="${staticPathPrefix}resources/templates/seleniumRobot.css">
+		<script src="${staticPathPrefix}resources/templates/seleniumRobot.js"></script>
+	
+	</head>
+	
+	<body>
+		<div class="wrapper">
+			<header class='main-header'>
+			    <a href='https://github.com/bhecquet/seleniumRobot'>SeleniumRobot</a><br/>
+			</header>
+		</div>
+		<div class="container">
+			<div class="pieChart">
+				<canvas id="pieChart" style="height:250px"></canvas>
+				<!--<div id="pieChartLegend" class="chart-legend"></div>-->
+			</div>
+	
+			<section class="content-header">
+				<h1> Integration tests <span>(<a href="seleniumRobot.log" style="font-size: 15px;">full logs</a>)</span></h1>
+			</section>
+			
+			<section class="content">
+		      	<div class="row">
+		        	<div class="col-xs-12">
+		          		<div class="box box-black">
+		            		<div class="box-body">
+		              			<table class="table">
+		                			<thead>
+		                				<tr>
+		                					<th class="alignleft"> Tests </th>
+						                  	<th class="alignleft"> Methods </th>
+						                  	<th> Passed Steps Count </th>
+						                 	<th> Failed Steps Count </th>
+						                 	<th> Steps Count </th>
+						                 	<th> Duration </th>
+						                 	#foreach ($infoKey in $infoKeys)
+						                 		<th> $infoKey </th>
+						                 	#end
+						                </tr>
+					                </thead>
+					                <tbody>
+					                #set ($totalPassed = 0)
+		                			#set ($totalFailed = 0)
+		                			#set ($totalSteps = 0)
+		                			#set ($testIdx = 0)
+					                
+				                	#foreach ($testContext in $tests.entrySet())
+				                		#foreach ($testResult in $testContext.value)
+				                			#set ($testIdx = $testIdx + 1)
+				                			#**
+				                			Compute step state for each test
+				                			*#
+				                			#set ($passedSteps = 0)
+				                			#set ($failedSteps = 0)
+				                			#set ($totalTestSteps = 0)
+				                			#set ($stepsDuration = 0)
+				                			#set ($testDuration = ($testResult.getEndMillis() - $testResult.getStartMillis()) / 1000)
+				                			#foreach ($testStep in $steps.get($testResult))
+				                				#if ($testStep.getFailed())
+				                					#set ($failedSteps = $failedSteps + 1)
+				                				#else
+				                					#set ($passedSteps = $passedSteps + 1)
+				                				#end
+				                				#set ($totalTestSteps = $totalTestSteps + 1)
+				                				#set ($stepsDuration = $stepsDuration + $testStep.getDuration() / 1000)
+				                			#end
+				                			#set ($totalPassed = $totalPassed + $passedSteps)
+				                			#set ($totalFailed = $totalFailed + $failedSteps)
+				                			#set ($totalSteps = $totalSteps + $totalTestSteps)
+				                			#if ($testResult.getMethod().getDescription())
+				                				#set ($description = $testResult.getMethod().getDescription())
+				                			#else
+				                				#set ($description = "no description available")
+				                			#end
+				                			
+				                			#if ($testResult.getStatus() == 1)
+				                				<tr class="testSuccess">
+				                				<td>$testContext.key.getName()</td>
+				                				<td class="alignleft"><i class="fa fa-circle circleSuccess"></i><a href='$testResult.getAttribute("methodResultFileName")' data-toggle="tooltip" title="$description">$testResult.getAttribute("uniqueMethodName")</a></td>
+				                			#elseif ($testResult.getStatus() == 2)
+				                				<tr class="testFailed">
+				                				<td>$testContext.key.getName()</td>
+				                				<td class="alignleft"><i class="fa fa-circle circleFailed"></i><a href='$testResult.getAttribute("methodResultFileName")' data-toggle="tooltip" title="$description">$testResult.getAttribute("uniqueMethodName")</a></td>
+				                			#else 
+				                				<tr class="testSkipped">
+				                				<td>$testContext.key.getName()</td>
+				                				<td class="alignleft"><i class="fa fa-circle circleSkipped"></i><a href='$testResult.getAttribute("methodResultFileName")' data-toggle="tooltip" title="$description">$testResult.getAttribute("uniqueMethodName")</a></td>
+				                			#end 
+	
+					                		<td name="passed-$testIdx">$passedSteps</td>
+					                		#if ($failedSteps == 0)
+					                  			<td name="failed-$testIdx">$failedSteps</td>
+					                  		#else
+					                  			<td name="failed-$testIdx" class="failedSteps">$failedSteps</td>
+					                  		#end
+					                  		<td name="stepsTotal-$testIdx">$totalTestSteps</td>
+					                  		<td>$stepsDuration sec.</td>
+					                  		
+					                  		
+				                			#set ($testInfos = $infos.get($testResult))
+					                  		#foreach ($infoKey in $infoKeys)
+					                  			#if (!$testInfos || !$testInfos.get($infoKey))
+					                  				<td class="info"></td>
+					                  			#else
+						                 			<td class="info">$testInfos.get($infoKey)</td>
+						                 		#end
+						                 	#end
+					                  		</tr>
+				                		
+				                		#end	
+					                #end
+					           		</tbody>
+					           		<tfoot>
+		                				<tr>
+						                  	<th class="alignleft"> Total </th>
+						                  	<th> </th>
+						                  	<th name="totalPassed"> $totalPassed </th>
+						                 	<th name="totalFailed"> $totalFailed </th>
+						                 	<th name="totalSteps"> $totalSteps </th>
+						                 	<th></th>
+						                </tr>
+					                </tfoot>
+					           	</table>
+					        </div>
+					    </div>
+					</div>
+				</div>
+			</section>
+		</div>		
+	</body>
+</html>

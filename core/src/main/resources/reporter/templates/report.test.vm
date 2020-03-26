@@ -1,0 +1,207 @@
+#macro( stepActions $localStep $directCall)
+
+	#if (!$directCall)
+		#set ($localStepException = $localStep.getActionExceptionMessage())
+		#if ($localStep.getFailed() && $localStepException)
+			<li class="header-failed">$localStep.getName()<br/>$localStep.getActionExceptionMessage()</li>
+		#else
+			<li>$localStep.getName()</li>
+		#end
+	#end
+	<ul>
+	#foreach( $action in $localStep.getStepActions() )
+		#if (${action.class.name.equals("com.seleniumtests.reporter.logger.TestStep")})
+			#stepActions($action false)
+		#elseif (${action.class.name.equals("com.seleniumtests.reporter.logger.TestMessage")})
+			#set ($messageType = $action.getMessageType().toString().toLowerCase())
+			#set ($messageType = "message-" + $messageType)
+			<div class="$messageType">$action.getName()</div>
+			#set ($messageType = "")
+		#elseif (${action.class.name.equals("com.seleniumtests.reporter.logger.TestValue")})
+			<table class="table table-bordered table-condensed">
+				<tr>
+					<th width="15%">Key</th>
+					<th width="60%">Message</th>
+					<th width="25%">Value</th>
+				</tr>
+				<tr>
+					<td>$action.getName()</td>
+					<td>$action.getMessage()</td>
+					<td>$action.getValue()</td>
+				</tr>
+			</table>
+		#else
+			#set ($actionException = $action.getActionExceptionMessage())
+			#if ($action.getFailed() && $actionException)
+				<li class="header-failed">$action.getName()<br/>$action.getActionExceptionMessage()</li>
+			#else
+				<li>$action.getName()</li>
+			#end
+	    #end
+	#end
+	#foreach( $snapshot in $localStep.getSnapshots() )
+		#set($snapshotLog = $snapshot.buildScreenshotLog())
+		<div class="message-snapshot">$snapshotLog</div>
+	#end
+	#foreach( $file in $localStep.getFiles() )
+		#set($log = $file.buildLog())
+		<div class="message-snapshot">$log</div>
+	#end
+	#foreach( $har in $localStep.getHarCaptures() )
+		#set($harLog = $har.buildHarLog())
+		<div class="message-snapshot">$harLog</div>
+	#end
+	</ul>
+#end
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html" charset="utf-8" />
+
+		<title>SeleniumRobot</title>
+
+		#if ($localResources)
+			#parse("reporter/templates/html.head.local.vm")
+		#else
+			#parse("reporter/templates/html.head.remote.vm")
+		#end
+			
+		<script src="resources/app.min.js"></script>
+		<link rel="stylesheet" type="text/css" href="resources/seleniumRobot_solo.css">
+
+	</head>
+
+	<body>
+		#if ($header == "passed")
+			<div class="wrapper">
+				<header class='main-header header-success'>
+					<a href='https://github.com/bhecquet/seleniumRobot'>SeleniumRobot</a><br/>
+				</header>
+			</div>
+		#elseif ($header == "failed")
+			<div class="wrapper">
+				<header class='main-header header-failed'>
+					<a href='https://github.com/bhecquet/seleniumRobot'>SeleniumRobot</a><br/>
+				</header>
+			</div>
+		#else
+			<div class="wrapper">
+				<header class='main-header header-skipped'>
+					<a href='https://github.com/bhecquet/seleniumRobot'>SeleniumRobot</a><br/>
+				</header>
+			</div>
+		#end
+		<div class="container">
+			<section class="content">
+				<div class="row">
+					<div class="col-xs-12">
+						<h4> Test Details - $testName</h4>
+						<table class="table table-bordered table-condensed">
+							#if ($description)
+								<tr>
+									<th width="200px">Description</th>
+									<td>$description</td>
+								</tr>
+							#end
+							#if ($applicationType)
+								<tr>
+									<th>Application type</th>
+									<td>$applicationType</td>
+								</tr>
+								<tr>
+									<th>Application</th>
+									<td>$application</td>
+								</tr>
+							#end
+						
+							#if ($testInfos)
+								#foreach ($testInfo in $testInfos.entrySet())
+									<tr>
+										<th>$testInfo.key</th>
+										<td>$testInfo.value</td>
+									</tr>
+								#end
+							#end
+						</table>
+				
+	<!-- All test steps -->
+						#foreach ($step in $steps)
+							#set ($stepName = $step.get(0))
+							#set ($stepStatus = $step.get(1))
+							#set ($stepDuration = $step.get(2))
+							#set ($stepObject = $step.get(3))
+							
+							#if ($stepStatus.toString().equals("passed"))
+								<div class="box collapsed-box success">
+							#elseif ($stepStatus.toString().equals("failed"))
+								<div class="box collapsed-box failed">
+							#else
+								<div class="box collapsed-box skipped">
+							#end
+								<div class="box-header with-border">
+									<button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-plus"></i></button> $stepName - $stepDuration secs
+								</div>
+								<div class="box-body">
+									#stepActions($stepObject true)
+									
+									#if($stepObject.getActionException())
+									<div class="message-error">
+										#set($exceptionMessage = $stepObject.getActionExceptionMessage())
+										$exceptionMessage
+									</div>
+									#end
+								</div>
+							</div>
+						#end
+						
+	<!-- logs -->
+						#if ($status.toString().equals("passed"))
+							<div class="box collapsed-box success">
+						#elseif ($status.toString().equals("failed"))
+							<div class="box collapsed-box failed">
+						#else
+							<div class="box collapsed-box skipped">
+						#end
+							<div class="box-header with-border">
+								<button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-plus"></i></button> Execution logs
+							</div>
+							<div class="box-body logs">
+								#if ($stacktrace)
+									<div class="message-error">
+									#set ($lineIdx = 0)
+									#foreach($line in $stacktrace)
+										#if ($lineIdx == 0)
+											<div>$line</div>
+										#else
+											<div class="stack-element">$line</div>
+										#end
+										#set ($lineIdx = $lineIdx + 1)
+									#end
+									</div>
+								#end
+								<br/>
+								#foreach($line in $logs)
+									<div>$line</div>
+								#end	
+							</div>
+						</div>
+						
+	<!-- previous execution logs -->
+						<div class="box collapsed-box success">
+							<div class="box-header with-border">
+								<button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-plus"></i></button> $title
+							</div>
+							<div class="box-body">
+								#foreach($line in $files)
+									<div><a href="$line">$line</a></div>
+								#end	
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+		</div>		
+	</body>
+</html>

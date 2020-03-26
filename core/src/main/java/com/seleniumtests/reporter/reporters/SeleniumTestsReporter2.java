@@ -116,156 +116,6 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 					destFile);
 		}
 	}
-
-	/**
-	 * Completes HTML stream.
-	 *
-	 * @param  out
-	 */
-	protected void endHtml() {
-		//Add footer
-		
-		try {
-			VelocityEngine ve = initVelocityEngine();
-
-			Template t = ve.getTemplate( "reporter/templates/report.part.test.footer.vm");
-			StringWriter writer = new StringWriter();
-			VelocityContext context = new VelocityContext();
-			t.merge( context, writer );
-
-			mOut.write(writer.toString());
-			mOut.flush();
-			mOut.close();
-		} catch (Exception e) {
-			logger.error("error writing result file end: " + e.getMessage());
-		}
-	}
-
-	/**
-	 * Generate result for a single test method
-	 * @param ve			velocity engine used to generate file
-	 * @param testResult	result for this test method
-	 */
-	public void generatePanel(final VelocityEngine ve, final ITestResult testResult) {
-
-		try {
-			Template t = ve.getTemplate( "reporter/templates/report.part.test.step.vm" );
-			VelocityContext context = new VelocityContext();
-			
-			List<TestStep> testSteps = TestNGResultUtils.getSeleniumRobotTestContext(testResult).getTestStepManager().getTestSteps();
-			if (testSteps == null) {
-				return;
-			}
-			
-			for (TestStep testStep: testSteps) {
-				
-				TestStep encodedTestStep = testStep.encode("html");
-				// step status
-				if (encodedTestStep.getFailed()) {
-					context.put(STATUS, FAILED_TEST);
-				} else {
-					context.put(STATUS, PASSED_TEST);
-				}
-				
-				context.put("stepName", encodedTestStep.getName());
-				context.put("stepDuration", encodedTestStep.getDuration() / (double)1000);
-				context.put("step", encodedTestStep);	
-				
-				StringWriter writer = new StringWriter();
-				t.merge( context, writer );
-				mOut.write(writer.toString());
-			}
-			
-
-		} catch (Exception e) {
-			generationErrorMessage = "generatePanel, Exception creating a singleTest:" + e.getMessage();
-			logger.error("Exception creating a singleTest.", e);
-		}
-	}
-	
-	/**
-	 * Generate result for a single test method
-	 * @param ve			velocity engine used to generate file
-	 * @param testResult	result for this test method
-	 */
-	public void generateExecutionLogs(final VelocityEngine ve, final ITestResult testResult) {
-		
-		try {
-			Template t = ve.getTemplate( "reporter/templates/report.part.test.logs.vm" );
-			VelocityContext context = new VelocityContext();
-			
-			// add logs
-			String logs = SeleniumRobotLogger.getTestLogs().get(getTestName(testResult));
-			if (logs == null) {
-				logs = "";
-			}
-			
-			
-			// exception handling
-			String[] stack = null;
-			if (testResult.getThrowable() != null) {
-				StringBuilder stackString = new StringBuilder();
-				generateTheStackTrace(testResult.getThrowable(), testResult.getThrowable().getMessage(), stackString, "html");
-				stack = stackString.toString().split("\n");
-			}
-			
-			// encode logs
-			List<String> logLines = new ArrayList<>();
-			for (String line: logs.split("\n")) {
-				logLines.add(StringEscapeUtils.escapeHtml4(line));
-			}
-			context.put(STATUS, getTestStatus(testResult));
-			context.put("stacktrace", stack);
-			context.put("logs", logLines);
-			
-			StringWriter writer = new StringWriter();
-			t.merge( context, writer );
-			mOut.write(writer.toString());
-			
-			
-		} catch (Exception e) {
-			generationErrorMessage = "generateExecutionLogs, Exception creating execution logs:" + e.getMessage();
-			logger.error("Exception creating execution logs.", e);
-		}
-	}
-	
-	/**
-	 * Generate HTML part for the previous execution results
-	 * If 'keepAllResults' is false, we place a message saying how to generate it
-	 * Else, display all zip files available (if any)
-	 */
-	public void generatePreviousExecutionLinks(final VelocityEngine ve, ITestResult testResult) {
-		
-		try {
-			Template t = ve.getTemplate( "reporter/templates/report.part.test.previous.exec.vm" );
-			VelocityContext context = new VelocityContext();
-			
-			// do we have previous execution results
-			if (SeleniumTestsContextManager.getGlobalContext().getKeepAllResults()) {
-				List<String> executionResults = FileUtils.listFiles(new File(TestNGResultUtils.getSeleniumRobotTestContext(testResult).getOutputDirectory()), 
-															FileFilterUtils.suffixFileFilter(".zip"), null).stream()
-						.map(File::getName)
-						.collect(Collectors.toList());
-				if (executionResults.isEmpty()) {
-					return;
-				} else {
-					context.put("files", executionResults);
-					context.put("title", "Previous execution results");
-				}
-			} else {
-				context.put("title", "No previous execution results, you can enable it via parameter '-DkeepAllResults=true'");
-			}
-
-			StringWriter writer = new StringWriter();
-			t.merge( context, writer );
-			mOut.write(writer.toString());
-			
-			
-		} catch (Exception e) {
-			generationErrorMessage = "generateExecutionLogs, Exception creating execution logs:" + e.getMessage();
-			logger.error("Exception creating execution logs.", e);
-		}
-	}
 	
 	/**
 	 * Returns the test status as a string
@@ -296,12 +146,7 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 		Map<ITestContext, List<ITestResult>> methodResultsMap = new HashMap<>(); 
 		
 		try {
-			mOut = createWriter(getOutputDirectory(), "SeleniumTestReport.html");
-			startHtml(null, mOut, "complete", optimizeReport);
-			methodResultsMap = generateSuiteSummaryReport(resultSet);
-			endHtml();
-			mOut.flush();
-			mOut.close();
+			methodResultsMap = generateSuiteSummaryReport(resultSet, optimizeReport);
 			copyResources();
 			logger.info("Completed Report Generation.");
 
@@ -343,17 +188,148 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 			FileUtils.copyInputStreamToFile(Thread.currentThread().getContextClassLoader().getResourceAsStream("reporter/templates/seleniumRobot_solo.css"), Paths.get(testContext.getOutputDirectory(), "resources", "seleniumRobot_solo.css").toFile());
 			FileUtils.copyInputStreamToFile(Thread.currentThread().getContextClassLoader().getResourceAsStream("reporter/templates/app.min.js"), Paths.get(testContext.getOutputDirectory(), "resources", "app.min.js").toFile());
 			
-			mOut = createWriter(testContext.getOutputDirectory(), "TestReport.html");
-			startHtml(getTestStatus(testResult), mOut, "simple", resourcesFromCdn);
-			generateExecutionReport(testResult);
-			endHtml();
+			generateExecutionReport(testContext, testResult, getTestStatus(testResult), resourcesFromCdn);
+
 			logger.info("Completed Report Generation.");
 			
 			// do not recreate this report anymore
 			TestNGResultUtils.setHtmlReportCreated(testResult, true);
-		} catch (IOException e) {
+		} catch (Exception e) {
 			logger.error("Error writing test report: " + getTestName(testResult), e);
 		}  
+	}
+	
+	public void generateExecutionReport(SeleniumTestsContext testContext, ITestResult testResult, String testStatus, boolean resourcesFromCdn) throws Exception {
+		
+		try (
+				PrintWriter out = createWriter(testContext.getOutputDirectory(), "TestReport.html");
+		) {
+			VelocityEngine ve = initVelocityEngine();
+	
+			Template t = ve.getTemplate("/reporter/templates/report.test.vm");
+			VelocityContext context = new VelocityContext();
+	
+			String userName = System.getProperty("user.name");
+			context.put("userName", userName);
+			context.put("staticPathPrefix", "../");
+			
+			// optimize reports means that resources are get from internet
+			context.put("localResources", !resourcesFromCdn);
+			context.put("currentDate", new Date().toString());
+	
+			DriverMode mode = SeleniumTestsContextManager.getGlobalContext().getRunMode();
+			List<String> hubUrls = SeleniumTestsContextManager.getGlobalContext().getWebDriverGrid();
+			String hubLink = "";
+			for (String hubUrl: hubUrls) {
+				hubLink += "<a href='" + hubUrl + "' target=hub>" + hubUrl + "</a>";
+			}
+			context.put("gridHub", hubLink);
+			context.put("mode", mode.toString());
+	
+			StringBuilder sbGroups = new StringBuilder();
+			sbGroups.append("envt,test");
+	
+			context.put("groups", sbGroups.toString());
+			context.put("report", "simple");
+			context.put(HEADER, testStatus);
+			
+			// test header
+			Object[] testParameters = testResult.getParameters();
+			StringBuilder testName = new StringBuilder(getTestName(testResult));
+			
+			// issue #163: add test parameter to test name
+			if (testParameters.length > 0) {
+				testName.append(" with params: (");
+				
+				int i = 0;
+				
+				for (Object param: testParameters) {
+					testName.append(param.toString());
+					if (i < testParameters.length - 1) {
+						testName.append(",");
+					}
+					i++;
+				}
+				testName.append(")");
+			}
+			
+			context.put("testName", testName);
+			context.put("description", testResult.getMethod().getDescription());
+			context.put("testInfos", TestNGResultUtils.getTestInfoEncoded(testResult, "html"));
+			
+			// Application information
+			fillContextWithTestParams(context, testResult);      
+			
+			// test steps
+			List<TestStep> testSteps = TestNGResultUtils.getSeleniumRobotTestContext(testResult).getTestStepManager().getTestSteps();
+			if (testSteps == null) {
+				return;
+			}
+			
+			List<List<Object>> steps = new ArrayList<>();
+			for (TestStep testStep: testSteps) {
+				
+				List<Object> stepInfo = new ArrayList<>();
+				TestStep encodedTestStep = testStep.encode("html");
+				
+				stepInfo.add(encodedTestStep.getName());
+				
+				// step status
+				if (encodedTestStep.getFailed()) {
+					stepInfo.add(FAILED_TEST);
+				} else {
+					stepInfo.add(PASSED_TEST);
+				}
+				stepInfo.add(encodedTestStep.getDuration() / (double)1000);
+				stepInfo.add(encodedTestStep);	
+				steps.add(stepInfo);
+			}
+			context.put("steps", steps);
+			
+			// logs
+			String logs = SeleniumRobotLogger.getTestLogs().get(getTestName(testResult));
+			if (logs == null) {
+				logs = "";
+			}
+			
+			// exception handling
+			String[] stack = null;
+			if (testResult.getThrowable() != null) {
+				StringBuilder stackString = new StringBuilder();
+				generateTheStackTrace(testResult.getThrowable(), testResult.getThrowable().getMessage(), stackString, "html");
+				stack = stackString.toString().split("\n");
+			}
+			
+			// encode logs
+			List<String> logLines = new ArrayList<>();
+			for (String line: logs.split("\n")) {
+				logLines.add(StringEscapeUtils.escapeHtml4(line));
+			}
+			context.put(STATUS, getTestStatus(testResult));
+			context.put("stacktrace", stack);
+			context.put("logs", logLines);
+			
+			// previous execution logs
+			if (SeleniumTestsContextManager.getGlobalContext().getKeepAllResults()) {
+				List<String> executionResults = FileUtils.listFiles(new File(TestNGResultUtils.getSeleniumRobotTestContext(testResult).getOutputDirectory()), 
+															FileFilterUtils.suffixFileFilter(".zip"), null).stream()
+						.map(File::getName)
+						.collect(Collectors.toList());
+				if (executionResults.isEmpty()) {
+					return;
+				} else {
+					context.put("files", executionResults);
+					context.put("title", "Previous execution results");
+				}
+			} else {
+				context.put("title", "No previous execution results, you can enable it via parameter '-DkeepAllResults=true'");
+			}
+	
+			StringWriter writer = new StringWriter();
+			t.merge(context, writer);
+			out.write(writer.toString());
+			out.flush();
+		}
 	}
 
 	/**
@@ -363,7 +339,7 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 	 * @param map
 	 * @return	map containing test results
 	 */
-	public Map<ITestContext, List<ITestResult>> generateSuiteSummaryReport(Map<ITestContext, Set<ITestResult>> resultSet) {
+	public Map<ITestContext, List<ITestResult>> generateSuiteSummaryReport(Map<ITestContext, Set<ITestResult>> resultSet, boolean resourcesFromCdn) {
 			
 		// build result list for each TestNG test
 		Map<ITestContext, List<ITestResult>> methodResultsMap = new LinkedHashMap<>();
@@ -401,7 +377,9 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 			methodResultsMap.put(entry.getKey(), methodResults);
 		}
 
-		try {
+		try (
+				PrintWriter out = createWriter(getOutputDirectory(), "SeleniumTestReport.html");
+		) {
 			VelocityEngine ve = initVelocityEngine();
 
 			Template t = ve.getTemplate("/reporter/templates/report.part.suiteSummary.vm");
@@ -409,6 +387,20 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 			
 			List<String> allSortedInfoKeys = new ArrayList<>(allInfoKeys);
 			allSortedInfoKeys.sort(null);
+			
+			String userName = System.getProperty("user.name");
+			context.put("userName", userName);
+			context.put("staticPathPrefix", "");
+			
+			// optimize reports means that resources are get from internet
+			context.put("localResources", !resourcesFromCdn);
+
+			List<String> hubUrls = SeleniumTestsContextManager.getGlobalContext().getWebDriverGrid();
+			String hubLink = "";
+			for (String hubUrl: hubUrls) {
+				hubLink += "<a href='" + hubUrl + "' target=hub>" + hubUrl + "</a>";
+			}
+			context.put("gridHub", hubLink);
 
 			synchronized (allSteps) { // as we use a synchronizedList and we iterate on it
 				context.put("tests", methodResultsMap);
@@ -416,10 +408,12 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 				context.put("infos", testInfosMap);
 				context.put("infoKeys", allSortedInfoKeys);
 
-				StringWriter writer = new StringWriter();
-				t.merge(context, writer);
-				mOut.write(writer.toString());
+				
 			}
+			StringWriter writer = new StringWriter();
+			t.merge(context, writer);
+			out.write(writer.toString());
+			out.flush();
 			
 
 		} catch (Exception e) {
@@ -562,59 +556,5 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 		}  
 	}
 
-	/**
-	 * Method for generating a report for test method
-	 * @param suite			suite this test belongs to
-	 * @param testContext
-	 */
-	public void generateExecutionReport(ITestResult testResult) {
-		try {
-			VelocityEngine ve = initVelocityEngine();
-			Template t = ve.getTemplate( "reporter/templates/report.part.test.vm" );
-			
-			// create a context and add data
-			VelocityContext velocityContext = new VelocityContext();
-			
-			Object[] testParameters = testResult.getParameters();
-			StringBuilder testName = new StringBuilder(getTestName(testResult));
-			
-			// issue #163: add test parameter to test name
-			if (testParameters.length > 0) {
-				testName.append(" with params: (");
-				
-				int i = 0;
-				
-				for (Object param: testParameters) {
-					testName.append(param.toString());
-					if (i < testParameters.length - 1) {
-						testName.append(",");
-					}
-					i++;
-				}
-				testName.append(")");
-			}
-			
-			velocityContext.put("testName", testName);
-			velocityContext.put("description", testResult.getMethod().getDescription());
-			velocityContext.put("testInfos", TestNGResultUtils.getTestInfoEncoded(testResult, "html"));
-			
-			// Application information
-			fillContextWithTestParams(velocityContext, testResult);       
-			
-			// write file
-			StringWriter writer = new StringWriter();
-			t.merge( velocityContext, writer );
-			mOut.write(writer.toString());
-			
-			generatePanel(ve, testResult);
-			generateExecutionLogs(ve, testResult);
-			generatePreviousExecutionLinks(ve, testResult);
-			
-			
-			
-		} catch (Exception e) {
-			logger.error("Error generating execution report: " + e.getMessage());
-		}
-	}
 }
 

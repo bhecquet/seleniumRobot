@@ -44,29 +44,7 @@ import com.seleniumtests.reporter.reporters.SeleniumTestsReporter2;
 public class TestSeleniumTestsReporter2 extends ReporterTest {
 	
 	private SeleniumTestsReporter2 reporter;
-	
-	/**
-	 * Disabled because now, it's not easy to get the SeleniumRobotReporterInstance created by testNg
-	 * @throws Exception
-	 */
-	@Test(groups={"it"}, enabled=false)
-	public void testReportGeneration() throws Exception {
-		
-		reporter = spy(new SeleniumTestsReporter2());
 
-		executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClass", "com.seleniumtests.it.stubclasses.StubTestClass2"});
-
-		// check at least one generation occured for each part of the report
-		verify(reporter).generateReport(anyList(), anyList(), anyString()); // 1 time only
-		verify(reporter).generateSuiteSummaryReport(anyMap());				// 1 call
-		verify(reporter, times(10)).generatePanel(any(VelocityEngine.class),any(ITestResult.class)); 	// 1 call per test method => 8 calls
-		verify(reporter, times(10)).generateExecutionReport(any(ITestResult.class));
-		verify(reporter).copyResources();
-
-		// check report is complete without error (issue #100)
-		Assert.assertEquals(reporter.getGenerationErrorMessage(), null, "error during generation: " + reporter.getGenerationErrorMessage());	
-	}
-	
 	/**
 	 * Check summary format in multithread
 	 * @throws Exception
