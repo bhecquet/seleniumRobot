@@ -7,11 +7,12 @@
 	
 		#if ($localResources)
 			#parse("reporter/templates/html.head.local.vm")
+			<script src="${staticPathPrefix}resources/templates/Chart.min.js"></script>
 		#else
 			#parse("reporter/templates/html.head.remote.vm")
+			<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/1.0.2/Chart.min.js"></script>
 		#end
 		
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/1.0.2/Chart.min.js"></script>
 		<link rel="stylesheet" type="text/css" href="${staticPathPrefix}resources/templates/seleniumRobot.css">
 		<script src="${staticPathPrefix}resources/templates/seleniumRobot.js"></script>
 	

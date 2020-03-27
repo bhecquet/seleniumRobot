@@ -3,10 +3,6 @@
 <link rel="stylesheet" type="text/css" href="${staticPathPrefix}resources/templates/lobsterTwo.css"> 
 <link rel="stylesheet" type="text/css" href="${staticPathPrefix}resources/templates/css/font-awesome.min.css">
 
-<script src="${staticPathPrefix}resources/templates/jQuery-2.2.0.min.js"></script>
+<script src="${staticPathPrefix}resources/templates/jquery-3.4.1.min.js"></script>
 <script src="${staticPathPrefix}resources/templates/bootstrap.min.js"></script>
-#if ($report.equals("complete"))
-<script src="${staticPathPrefix}resources/templates/Chart.min.js"></script>
-#else
-<script src="resources/app.min.js"></script>
-#end
+<script src="${staticPathPrefix}resources/templates/popper.min.js"></script>

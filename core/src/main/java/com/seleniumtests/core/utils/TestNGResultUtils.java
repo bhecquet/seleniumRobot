@@ -39,6 +39,7 @@ public class TestNGResultUtils {
 	private static final String NO_MORE_RETRY = "noMoreRetry";			// set to true when is not going to be retried
 	private static final String TEST_INFO = "testInfo";
 	private static final String SELENIUM_SERVER_REPORT = "seleniumServerReport";// true if the result has already been recorded to the seleniumRobot server
+	private static final String SELENIUM_SERVER_REPORT_TEST_CASE_SESSION_ID = "seleniumServerReportTcsId"; // ID of the TestCaseInSession when snapshot comparison has been done
 	private static final String HTML_REPORT = "htmlReport";				// true if the HTML result has already been generated
 	private static final String CUSTOM_REPORT = "customReport";			// true if the custom result has already been generated
 	private static final String METHOD_NAME = "methodName";				// name of the test method (or the cucumber scenario)
@@ -141,6 +142,15 @@ public class TestNGResultUtils {
     
     public static void setRetry(ITestResult testNGResult, Integer retry) {
     	testNGResult.setAttribute(RETRY, retry);
+    }
+    
+    // TestCaseInSession id as stored in snapshot server
+    public static Integer getSnapshotTestCaseInSessionId(ITestResult testNGResult) {
+    	return (Integer) testNGResult.getAttribute(SELENIUM_SERVER_REPORT_TEST_CASE_SESSION_ID);
+    }
+    
+    public static void setSnapshotTestCaseInSessionId(ITestResult testNGResult, Integer sessionId) {
+    	testNGResult.setAttribute(SELENIUM_SERVER_REPORT_TEST_CASE_SESSION_ID, sessionId);
     }
     
     // did we already recorded this result to the server
