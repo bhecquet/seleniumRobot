@@ -179,6 +179,8 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 					}
 				}
 				
+				logger.info(String.format("Snapshots has been recorded with TestCaseSessionId: %d", testCaseInSessionId));
+				TestNGResultUtils.setSnapshotTestCaseInSessionId(testResult, testCaseInSessionId);
 				TestNGResultUtils.setSeleniumServerReportCreated(testResult, true);
 			}
 		}

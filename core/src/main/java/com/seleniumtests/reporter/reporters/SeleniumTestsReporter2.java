@@ -92,8 +92,9 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 		if (!SeleniumTestsContextManager.getGlobalContext().getOptimizeReports()) {
 			styleFiles.add("bootstrap.min.css");
 			styleFiles.add("bootstrap.min.js");
+			styleFiles.add("popper.min.js");
 			styleFiles.add("Chart.min.js");
-			styleFiles.add("jQuery-2.2.0.min.js");
+			styleFiles.add("jquery-3.4.1.min.js");
 			styleFiles.add("AdminLTE.min.css");
 			styleFiles.add("lobsterTwo.css");
 			styleFiles.add("css/font-awesome.min.css");
@@ -187,6 +188,9 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 			// issue #284: copy resources specific to the single test report. They are moved here so that the file can be used without global resources
 			FileUtils.copyInputStreamToFile(Thread.currentThread().getContextClassLoader().getResourceAsStream("reporter/templates/seleniumRobot_solo.css"), Paths.get(testContext.getOutputDirectory(), "resources", "seleniumRobot_solo.css").toFile());
 			FileUtils.copyInputStreamToFile(Thread.currentThread().getContextClassLoader().getResourceAsStream("reporter/templates/app.min.js"), Paths.get(testContext.getOutputDirectory(), "resources", "app.min.js").toFile());
+			if (!SeleniumTestsContextManager.getGlobalContext().getOptimizeReports()) {
+				FileUtils.copyInputStreamToFile(Thread.currentThread().getContextClassLoader().getResourceAsStream("reporter/templates/iframeResizer.min.js"), Paths.get(testContext.getOutputDirectory(), "resources", "iframeResizer.min.js").toFile());
+			}
 			
 			generateExecutionReport(testContext, testResult, getTestStatus(testResult), resourcesFromCdn);
 
@@ -209,28 +213,13 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 			Template t = ve.getTemplate("/reporter/templates/report.test.vm");
 			VelocityContext context = new VelocityContext();
 	
-			String userName = System.getProperty("user.name");
-			context.put("userName", userName);
 			context.put("staticPathPrefix", "../");
+			context.put("snapshots", testContext.getSeleniumRobotServerCompareSnapshot());
+			context.put("snapshotServer", testContext.getSeleniumRobotServerUrl());
+			context.put("snapshotSessionId", TestNGResultUtils.getSnapshotTestCaseInSessionId(testResult));
 			
 			// optimize reports means that resources are get from internet
 			context.put("localResources", !resourcesFromCdn);
-			context.put("currentDate", new Date().toString());
-	
-			DriverMode mode = SeleniumTestsContextManager.getGlobalContext().getRunMode();
-			List<String> hubUrls = SeleniumTestsContextManager.getGlobalContext().getWebDriverGrid();
-			String hubLink = "";
-			for (String hubUrl: hubUrls) {
-				hubLink += "<a href='" + hubUrl + "' target=hub>" + hubUrl + "</a>";
-			}
-			context.put("gridHub", hubLink);
-			context.put("mode", mode.toString());
-	
-			StringBuilder sbGroups = new StringBuilder();
-			sbGroups.append("envt,test");
-	
-			context.put("groups", sbGroups.toString());
-			context.put("report", "simple");
 			context.put(HEADER, testStatus);
 			
 			// test header
@@ -387,20 +376,11 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 			
 			List<String> allSortedInfoKeys = new ArrayList<>(allInfoKeys);
 			allSortedInfoKeys.sort(null);
-			
-			String userName = System.getProperty("user.name");
-			context.put("userName", userName);
+
 			context.put("staticPathPrefix", "");
 			
 			// optimize reports means that resources are get from internet
 			context.put("localResources", !resourcesFromCdn);
-
-			List<String> hubUrls = SeleniumTestsContextManager.getGlobalContext().getWebDriverGrid();
-			String hubLink = "";
-			for (String hubUrl: hubUrls) {
-				hubLink += "<a href='" + hubUrl + "' target=hub>" + hubUrl + "</a>";
-			}
-			context.put("gridHub", hubLink);
 
 			synchronized (allSteps) { // as we use a synchronizedList and we iterate on it
 				context.put("tests", methodResultsMap);
