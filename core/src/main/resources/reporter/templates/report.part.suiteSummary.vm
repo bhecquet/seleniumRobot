@@ -24,7 +24,7 @@
 			    <a href='https://github.com/bhecquet/seleniumRobot'>SeleniumRobot</a><br/>
 			</header>
 		</div>
-		<div class="container">
+		<div class="container-fluid">
 			<div class="pieChart">
 				<canvas id="pieChart" style="height:250px"></canvas>
 				<!--<div id="pieChartLegend" class="chart-legend"></div>-->
@@ -36,7 +36,7 @@
 			
 			<section class="content">
 		      	<div class="row">
-		        	<div class="col-xs-12">
+		        	<div class="col-xl-12">
 		          		<div class="box box-black">
 		            		<div class="box-body">
 		              			<table class="table">
