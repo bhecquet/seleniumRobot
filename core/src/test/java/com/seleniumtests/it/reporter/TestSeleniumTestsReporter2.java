@@ -290,7 +290,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		// check content of summary report file
 		String mainReportContent = readSummaryFile();
 		
-		Assert.assertTrue(mainReportContent.contains("<link rel=\"stylesheet\" href=\"https://maxcdn.bootstrapcdn.com"));
+		Assert.assertTrue(mainReportContent.contains("<link rel=\"stylesheet\" href=\"https://stackpath.bootstrapcdn.com/bootstrap"));
 		
 		Assert.assertFalse(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "resources", "templates", "AdminLTE.min.css").toFile().exists());
 		Assert.assertFalse(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "resources", "templates", "bootstrap.min.css").toFile().exists());
