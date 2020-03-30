@@ -4,5 +4,4 @@
 <link rel="stylesheet" type="text/css" href="${staticPathPrefix}resources/templates/css/font-awesome.min.css">
 
 <script src="${staticPathPrefix}resources/templates/jquery-3.4.1.min.js"></script>
-<script src="${staticPathPrefix}resources/templates/bootstrap.min.js"></script>
-<script src="${staticPathPrefix}resources/templates/popper.min.js"></script>
+<script src="${staticPathPrefix}resources/templates/bootstrap.bundle.min.js"></script>

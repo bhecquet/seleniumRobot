@@ -5,7 +5,7 @@ body{
 
 @media (min-width:1600px) {
 	.container,.container-fluid {
-		width:1400px
+		width:85%
 	}
 } 
 

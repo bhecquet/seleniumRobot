@@ -91,8 +91,9 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 		
 		if (!SeleniumTestsContextManager.getGlobalContext().getOptimizeReports()) {
 			styleFiles.add("bootstrap.min.css");
-			styleFiles.add("bootstrap.min.js");
-			styleFiles.add("popper.min.js");
+			styleFiles.add("bootstrap.min.css.map");
+			styleFiles.add("bootstrap.bundle.min.js");
+			styleFiles.add("bootstrap.bundle.min.js.map");
 			styleFiles.add("Chart.min.js");
 			styleFiles.add("jquery-3.4.1.min.js");
 			styleFiles.add("AdminLTE.min.css");

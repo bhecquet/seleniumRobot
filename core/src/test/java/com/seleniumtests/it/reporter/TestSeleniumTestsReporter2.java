@@ -74,6 +74,20 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	}
 	
 	/**
+	 * Check that test report do not display tabs when no snapshot comparison is requested
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testNoSnapshotComparison() throws Exception {
+		
+		SeleniumTestsContextManager.removeThreadContext();
+		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions"});
+		
+		String detailedReportContent = readTestMethodResultFile("testAndSubActions");
+		Assert.assertTrue(detailedReportContent.contains("<div id=\"tabs\"  style=\"display: none;\" >"));
+		
+	}
+	/**
 	 * Check summary format in monothread
 	 * @throws Exception
 	 */
@@ -105,7 +119,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	}
 	
 	/**
-	 * Check summary format when tests have steps
+	 * Check single test report format when tests have steps
 	 * @throws Exception
 	 */
 	@Test(groups={"it"})
@@ -295,6 +309,10 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		Assert.assertFalse(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "resources", "templates", "AdminLTE.min.css").toFile().exists());
 		Assert.assertFalse(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "resources", "templates", "bootstrap.min.css").toFile().exists());
 		Assert.assertFalse(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "resources", "templates", "fonts").toFile().exists());
+		
+		String detailedReportContent = readTestMethodResultFile("testAndSubActions");
+		Assert.assertTrue(detailedReportContent.contains("<script src=\"https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js\""));
+		Assert.assertTrue(detailedReportContent.contains("<script src=\"https://cdn.jsdelivr.net/npm/iframe-resizer@4.2.10/js/iframeResizer.min.js\">"));
 	}
 	
 	/**
@@ -314,11 +332,14 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		// check content of summary report file
 		String mainReportContent = readSummaryFile();
 		
-		Assert.assertTrue(mainReportContent.contains("<script src=\"resources/templates/bootstrap.min.js\"></script>"));
+		Assert.assertTrue(mainReportContent.contains("<script src=\"resources/templates/bootstrap.bundle.min.js\"></script>"));
 		
 		Assert.assertTrue(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "resources", "templates", "AdminLTE.min.css").toFile().exists());
 		Assert.assertTrue(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "resources", "templates", "bootstrap.min.css").toFile().exists());
 		Assert.assertTrue(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "resources", "templates", "fonts").toFile().exists());
+
+		String detailedReportContent = readTestMethodResultFile("testAndSubActions");
+		Assert.assertTrue(detailedReportContent.contains("<script src=\"resources/iframeResizer.min.js\"></script>"));
 	}
 	
 	@Test(groups={"it"})
