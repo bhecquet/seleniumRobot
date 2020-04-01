@@ -141,6 +141,7 @@ Settings for customizing timeouts
 | seleniumRobotServerCompareSnapshots	| false		| whether we should use the snapshots created by robot to compare them to a previous execution. This option only operates when SeleniumRobot server is connected. See chap6 documentation for details on connecting to server |
 | seleniumRobotServerRecordResults		| false		| whether we should record test results to seleniumrobot server. This option only operates when SeleniumRobot server is connected. See chap6 documentation for details on connecting to server |
 | seleniumRobotServerVariablesOlderThan | 0			| whether we should get from server variables which were created at least X days ago |
+| seleniumRobotServerSnapshotsTtl |		| 30		| Number of days, snapshot comparison will be kept before being deleted. Only valid when `seleniumRobotServerCompareSnapshots` is set to `true` |
 
 #### Mobile params ####
 
