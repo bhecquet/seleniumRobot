@@ -100,3 +100,15 @@ body{
 .stack-element {
 	padding-left: 30px;
 }
+
+table.table-bordered {
+    border:1px solid #aaa;
+}
+
+table.table-bordered > tbody > tr > th {
+    border:1px solid #aaa;
+}
+
+table.table-bordered > tbody > tr > td {
+    border:1px solid #aaa;
+}
