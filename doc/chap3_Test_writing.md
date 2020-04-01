@@ -368,7 +368,7 @@ or
 captureElementSnapshot(<myWebElement>);
 ```
 
-If you want to compare these pictures with previous execution through seleniumRobot server (assuming option `seleniumRobotServerCompareSnapshots` is set to true), call instead.
+If you want to compare these pictures with previous execution through seleniumRobot server (assuming option `seleniumRobotServerCompareSnapshots` is set to true), call instead. Difference is that you give a snapshot name to ease comparison
 
 ```java
 capturePageSnapshot(<pic_name>, SnapshotCheckType.TRUE);
