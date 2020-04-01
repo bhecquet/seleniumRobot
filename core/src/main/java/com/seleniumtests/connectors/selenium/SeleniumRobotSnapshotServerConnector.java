@@ -95,7 +95,8 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 					.field("environment", SeleniumTestsContextManager.getGlobalContext().getTestEnv())
 					.field("version", versionId)
 					.field("name", sessionName)
-					.field("compareSnapshot", SeleniumTestsContextManager.getGlobalContext().getSeleniumRobotServerCompareSnapshot()));
+					.field("compareSnapshot", SeleniumTestsContextManager.getGlobalContext().getSeleniumRobotServerCompareSnapshot())
+					.field("ttl", SeleniumTestsContextManager.getGlobalContext().getSeleniumRobotServerCompareSnapshotTtl()));
 			return sessionJson.getInt("id");
 		} catch (UnirestException | JSONException e) {
 			throw new SeleniumRobotServerException("cannot create session", e);

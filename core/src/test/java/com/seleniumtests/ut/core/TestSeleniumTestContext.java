@@ -749,6 +749,19 @@ public class TestSeleniumTestContext extends GenericTest {
 	}
 	
 	@Test(groups="ut context")
+	public void testSeleniumRobotSnapshotTtl(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setSeleniumRobotServerCompareSnapshotTtl(5);
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getSeleniumRobotServerCompareSnapshotTtl(), (Integer)5);
+	}
+	@Test(groups="ut context")
+	public void testSeleniumRobotSnapshotTtlNull(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setSeleniumRobotServerCompareSnapshotTtl(null);
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getSeleniumRobotServerCompareSnapshotTtl(), (Integer)SeleniumTestsContext.DEFAULT_SELENIUMROBOTSERVER_COMPARE_SNAPSHOT_TTL);
+	}
+	
+	@Test(groups="ut context")
 	public void testCompareSnapshot(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setSeleniumRobotServerCompareSnapshot(true);

@@ -121,6 +121,7 @@ public class SeleniumTestsContext {
     public static final String SELENIUMROBOTSERVER_ACTIVE = "seleniumRobotServerActive";
     public static final String SELENIUMROBOTSERVER_TOKEN = "seleniumRobotServerToken";
     public static final String SELENIUMROBOTSERVER_COMPARE_SNAPSHOT = "seleniumRobotServerCompareSnapshots";			// whether we should use the snapshots created by robot to compare them to a previous execution. This option only operates when SeleniumRobot server is connected
+    public static final String SELENIUMROBOTSERVER_COMPARE_SNAPSHOT_TTL = "seleniumRobotServerSnapshotsTtl";			// Time to live of the test session on seleniumRobot server
     public static final String SELENIUMROBOTSERVER_RECORD_RESULTS = "seleniumRobotServerRecordResults";				// whether we should record test results to server. This option only operates when SeleniumRobot server is connected
     public static final String SELENIUMROBOTSERVER_VARIABLES_OLDER_THAN = "seleniumRobotServerVariablesOlderThan";	// whether we should get from server variables which were created at least X days ago
     
@@ -234,6 +235,7 @@ public class SeleniumTestsContext {
 	public static final boolean DEFAULT_OVERRIDE_SELENIUM_NATIVE_ACTION = false;
 	public static final boolean DEFAULT_SELENIUMROBOTSERVER_RECORD_RESULTS = false;
 	public static final boolean DEFAULT_SELENIUMROBOTSERVER_COMPARE_SNAPSHOT = false;
+	public static final int DEFAULT_SELENIUMROBOTSERVER_COMPARE_SNAPSHOT_TTL = 30;
 	public static final boolean DEFAULT_SELENIUMROBOTSERVER_ACTIVE = false;
 	public static final String DEFAULT_SELENIUMROBOTSERVER_TOKEN = null;
 	public static final int DEFAULT_SELENIUMROBOTSERVER_VARIABLES_OLDER_THAN = 0;
@@ -335,6 +337,7 @@ public class SeleniumTestsContext {
         setSeleniumRobotServerCompareSnapshot(getBoolValueForTest(SELENIUMROBOTSERVER_COMPARE_SNAPSHOT, System.getProperty(SELENIUMROBOTSERVER_COMPARE_SNAPSHOT)));
         setSeleniumRobotServerRecordResults(getBoolValueForTest(SELENIUMROBOTSERVER_RECORD_RESULTS, System.getProperty(SELENIUMROBOTSERVER_RECORD_RESULTS)));
         setSeleniumRobotServerVariableOlderThan(getIntValueForTest(SELENIUMROBOTSERVER_VARIABLES_OLDER_THAN, System.getProperty(SELENIUMROBOTSERVER_VARIABLES_OLDER_THAN)));
+        setSeleniumRobotServerCompareSnapshotTtl(getIntValueForTest(SELENIUMROBOTSERVER_COMPARE_SNAPSHOT_TTL, System.getProperty(SELENIUMROBOTSERVER_COMPARE_SNAPSHOT_TTL)));
         
         setWebDriverGrid(getValueForTest(WEB_DRIVER_GRID, System.getProperty(WEB_DRIVER_GRID)));
         setRunMode(getValueForTest(RUN_MODE, System.getProperty(RUN_MODE)));   
@@ -1120,6 +1123,10 @@ public class SeleniumTestsContext {
     	return (Integer) getAttribute(SELENIUMROBOTSERVER_VARIABLES_OLDER_THAN);
     }
     
+    public Integer getSeleniumRobotServerCompareSnapshotTtl() {
+    	return (Integer) getAttribute(SELENIUMROBOTSERVER_COMPARE_SNAPSHOT_TTL);
+    }
+    
     public boolean getSeleniumRobotServerRecordResults() {
     	return (Boolean) getAttribute(SELENIUMROBOTSERVER_RECORD_RESULTS);
     }
@@ -1690,6 +1697,18 @@ public class SeleniumTestsContext {
     		setAttribute(SELENIUMROBOTSERVER_VARIABLES_OLDER_THAN, olderThan);
     	} else {
     		setAttribute(SELENIUMROBOTSERVER_VARIABLES_OLDER_THAN, DEFAULT_SELENIUMROBOTSERVER_VARIABLES_OLDER_THAN);
+    	}
+    }
+    
+    /**
+     * set time to live for snapshot comparison session
+     * @param timeToLive
+     */
+    public void setSeleniumRobotServerCompareSnapshotTtl(Integer timeToLive) {
+    	if (timeToLive != null) {
+    		setAttribute(SELENIUMROBOTSERVER_COMPARE_SNAPSHOT_TTL, timeToLive);
+    	} else {
+    		setAttribute(SELENIUMROBOTSERVER_COMPARE_SNAPSHOT_TTL, DEFAULT_SELENIUMROBOTSERVER_COMPARE_SNAPSHOT_TTL);
     	}
     }
     
