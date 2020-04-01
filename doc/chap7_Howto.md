@@ -543,4 +543,31 @@ Salesforce UI is a bit complicated to automate. Spring 20 version added more com
 - use `ByC.xTagname`, `ByC.xName` instead of `By.tagName` and `By.name` because, due to shadow DOM, selenium cannot directly sometimes access to child elements of shadowed ones. But going the xpath way (what xTagName and xName do) solves the problem.
 - use `new <whatever>Element("my element", By.tagName(""), HtmlElement.FIRST_VISIBLE)` instead of `new <whatever>Element("my element", By.tagName(""))`  because salesforce DOM sometimes contains a duplicate version of the visible page and getting the first element for a selector, as selenium does, may lead to an invisible element.  
 
+### 23 Compare snapshots ###
+
+Through seleniumRobot server, you can compare UI with a reference snapshot. 
+![](images/compare-snapshot.png)
+
+To enable this feature you must:
+
+- set `seleniumRobotServerActive` to `true`
+- set `seleniumRobotServerUrl` to the URL of the seleniumRobot server
+- set `seleniumRobotServerCompareSnapshots` to `true`
+
+Then, inside your test scripts, you must add snapshots with
+
+```java
+capturePageSnapshot(<pic_name>, SnapshotCheckType.TRUE);
+```
+or
+
+```java
+captureElementSnapshot(<pic_name>, <myWebElement>, SnapshotCheckType.TRUE);
+```
+Only the snapshots taken this way will be sent to server.
+
+This, way, a new tab will be added in HTML report, showing the comparison. 
+By default, snapshot taken this way are kept 30 days. If you want a different duration, set the parameter `seleniumRobotServerSnapshotsTtl` to another value.
+
+
 
