@@ -42,6 +42,7 @@ import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.DriverExceptionListener;
 import com.seleniumtests.driver.DriverMode;
 import com.seleniumtests.driver.TestType;
+import com.seleniumtests.driver.screenshots.SnapshotComparisonBehaviour;
 import com.seleniumtests.driver.screenshots.VideoCaptureMode;
 import com.seleniumtests.reporter.logger.ArchiveMode;
 import com.seleniumtests.reporter.reporters.JUnitReporter;
@@ -759,6 +760,19 @@ public class TestSeleniumTestContext extends GenericTest {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setSeleniumRobotServerCompareSnapshotTtl(null);
 		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getSeleniumRobotServerCompareSnapshotTtl(), (Integer)SeleniumTestsContext.DEFAULT_SELENIUMROBOTSERVER_COMPARE_SNAPSHOT_TTL);
+	}
+	
+	@Test(groups="ut context")
+	public void testCompareSnapshotBehaviour(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setSeleniumRobotServerCompareSnapshotBehaviour("addTestResult");
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getSeleniumRobotServerCompareSnapshotBehaviour(), SnapshotComparisonBehaviour.ADD_TEST_RESULT);
+	}
+	@Test(groups="ut context")
+	public void testCompareSnapshotBehaviourNull(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setSeleniumRobotServerCompareSnapshotBehaviour(null);
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getSeleniumRobotServerCompareSnapshotBehaviour(), SeleniumTestsContext.DEFAULT_SELENIUMROBOTSERVER_COMPARE_SNAPSHOT_BEHAVIOUR);
 	}
 	
 	@Test(groups="ut context")

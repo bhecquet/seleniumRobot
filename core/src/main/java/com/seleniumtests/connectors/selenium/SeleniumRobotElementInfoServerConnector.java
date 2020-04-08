@@ -31,7 +31,7 @@ import org.json.JSONObject;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import com.mashape.unirest.request.HttpRequest;
 import com.mashape.unirest.request.body.MultipartBody;
-import com.seleniumtests.core.TestVariable;
+import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.SeleniumRobotServerException;
 import com.seleniumtests.uipage.htmlelements.ElementInfo;
 
@@ -40,6 +40,23 @@ public class SeleniumRobotElementInfoServerConnector extends SeleniumRobotServer
 	public static final String LIST_ELEMENT_INFO_API_URL = "/elementinfo/api/elementinfos/";
 	public static final String ELEMENT_INFO_API_URL = "/elementinfo/api/elementinfo/";
 
+	private static SeleniumRobotElementInfoServerConnector infoServerConnector;
+
+	/**
+	 * Get instance of server
+	 * @return
+	 */
+	public static SeleniumRobotElementInfoServerConnector getInstance() {
+		if (infoServerConnector == null) {
+			infoServerConnector = new SeleniumRobotElementInfoServerConnector(
+					SeleniumTestsContextManager.getGlobalContext().getSeleniumRobotServerActive(),
+					SeleniumTestsContextManager.getGlobalContext().getSeleniumRobotServerUrl(),
+					SeleniumTestsContextManager.getGlobalContext().getSeleniumRobotServerToken()
+					);
+		} 
+		return infoServerConnector;
+	}
+	
 	public SeleniumRobotElementInfoServerConnector(boolean useRequested, String url, String testName) {
 		this(useRequested, url, testName, null);
 	}
