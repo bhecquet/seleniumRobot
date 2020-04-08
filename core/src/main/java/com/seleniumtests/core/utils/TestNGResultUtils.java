@@ -43,6 +43,7 @@ public class TestNGResultUtils {
 	private static final String HTML_REPORT = "htmlReport";				// true if the HTML result has already been generated
 	private static final String CUSTOM_REPORT = "customReport";			// true if the custom result has already been generated
 	private static final String METHOD_NAME = "methodName";				// name of the test method (or the cucumber scenario)
+	private static final String SNAPSHOT_COMPARISON_RESULT = "snapshotComparisonResult";	// the result of snapshot comparison, when enabled
 
 	private TestNGResultUtils() {
 		// nothing to do
@@ -151,6 +152,15 @@ public class TestNGResultUtils {
     
     public static void setSnapshotTestCaseInSessionId(ITestResult testNGResult, Integer sessionId) {
     	testNGResult.setAttribute(SELENIUM_SERVER_REPORT_TEST_CASE_SESSION_ID, sessionId);
+    }
+    
+    // the snapshot comparison result
+    public static Boolean getSnapshotComparisonResult(ITestResult testNGResult) {
+    	return (Boolean) testNGResult.getAttribute(SNAPSHOT_COMPARISON_RESULT);
+    }
+    
+    public static void setSnapshotComparisonResult(ITestResult testNGResult, Boolean result) {
+    	testNGResult.setAttribute(SNAPSHOT_COMPARISON_RESULT, result);
     }
     
     // did we already recorded this result to the server

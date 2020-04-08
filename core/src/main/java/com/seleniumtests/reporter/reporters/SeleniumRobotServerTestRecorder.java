@@ -44,10 +44,7 @@ import com.seleniumtests.util.logging.SeleniumRobotLogger;
 public class SeleniumRobotServerTestRecorder extends CommonReporter implements IReporter {
 
 	public SeleniumRobotSnapshotServerConnector getServerConnector() {
-		return new SeleniumRobotSnapshotServerConnector(
-				SeleniumTestsContextManager.getGlobalContext().getSeleniumRobotServerActive(),
-				SeleniumTestsContextManager.getGlobalContext().getSeleniumRobotServerUrl()
-				);
+		return SeleniumRobotSnapshotServerConnector.getInstance();
 	}
 	
 	/**

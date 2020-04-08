@@ -36,6 +36,7 @@ import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.SeleniumRobotServerException;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.reporter.logger.Snapshot;
+import com.seleniumtests.util.helper.WaitHelper;
 
 public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerConnector {
 	
@@ -45,6 +46,18 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 	public static final String STEPRESULT_API_URL = "/snapshot/api/stepresult/";
 	public static final String SNAPSHOT_API_URL = "/snapshot/upload/image";
 	private String sessionUUID;
+	private static SeleniumRobotSnapshotServerConnector snapshotConnector;
+	
+	public static SeleniumRobotSnapshotServerConnector getInstance() {
+		if (snapshotConnector == null) {
+			snapshotConnector = new SeleniumRobotSnapshotServerConnector(
+					SeleniumTestsContextManager.getGlobalContext().getSeleniumRobotServerActive(),
+					SeleniumTestsContextManager.getGlobalContext().getSeleniumRobotServerUrl(),
+					SeleniumTestsContextManager.getGlobalContext().getSeleniumRobotServerToken()
+					);
+		} 
+		return snapshotConnector;
+	}
 
 	public SeleniumRobotSnapshotServerConnector(final boolean useRequested, final String url) {
 		this(useRequested, url, null);
@@ -288,6 +301,32 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 	
 	public String getSessionUUID() {
 		return sessionUUID;
+	}
+	
+	/**
+	 * Get the comparison result of snapshots. If we cannot get the information, return true
+	 * @param testCaseInSessionId		id of the test case in this test sessions.
+	 * @return							true if snapshot comparison is OK
+	 */
+	public boolean getTestCaseInSessionComparisonResult(Integer testCaseInSessionId) {
+		
+		try {
+			JSONObject response = null;
+			for (int i = 0; i < 3; i++) {
+				response = getJSonResponse(buildGetRequest(url + TESTCASEINSESSION_API_URL + testCaseInSessionId + "/"));
+				if (response.optBoolean("computed", false) && response.has("isOkWithSnapshots")) {
+					return response.getBoolean("isOkWithSnapshots");
+				} else {
+					WaitHelper.waitForSeconds(1);
+				}
+			}
+			return response.optBoolean("isOkWithSnapshots", true);
+			
+		} catch (UnirestException e) {
+			logger.error("Cannot get comparison result for this test case. So result is expected to be OK", e);
+			return true;
+		}
+		
 	}
 
 }

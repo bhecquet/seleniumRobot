@@ -41,6 +41,7 @@ import org.testng.SuiteRunner;
 import org.testng.TestRunner;
 import org.testng.xml.XmlSuite;
 
+import com.seleniumtests.connectors.selenium.SeleniumRobotSnapshotServerConnector;
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.utils.TestNGResultUtils;
@@ -106,7 +107,43 @@ public class ReporterControler implements IReporter {
 			}
 
 		}
+	}
+	
+	/**
+	 * If snapshot comparison has been enabled, request snapshot server for each test result to know if comparison was successful
+	 * /!\ This method is aimed to be called only once all test suites have been completed 
+	 * @param suites	test suites
+	 */
+	private void changeTestResultWithSnapshotComparison(List<ISuite> suites) {
 		
+		if (!(SeleniumTestsContextManager.getGlobalContext().getSeleniumRobotServerActive()
+				&& SeleniumTestsContextManager.getGlobalContext().getSeleniumRobotServerCompareSnapshot())) {
+			return;
+		}
+		
+		SeleniumRobotSnapshotServerConnector snapshotServer = SeleniumRobotSnapshotServerConnector.getInstance();
+		
+		for (ISuite suite: suites) {
+			for (String suiteString: suite.getResults().keySet()) {
+				ISuiteResult suiteResult = suite.getResults().get(suiteString);
+				
+				Set<ITestResult> resultSet = new HashSet<>(); 
+				resultSet.addAll(suiteResult.getTestContext().getFailedTests().getAllResults());
+				resultSet.addAll(suiteResult.getTestContext().getPassedTests().getAllResults());
+				resultSet.addAll(suiteResult.getTestContext().getSkippedTests().getAllResults());
+				
+				for (ITestResult testResult: resultSet) {
+					
+					// check if we have an id from snapshot server
+					Integer testCaseInSessionId = TestNGResultUtils.getSnapshotTestCaseInSessionId(testResult);
+					if (testCaseInSessionId == null) {
+						continue;
+					}
+					boolean snapshotComparisonResult = snapshotServer.getTestCaseInSessionComparisonResult(testCaseInSessionId);
+					TestNGResultUtils.setSnapshotComparisonResult(testResult, snapshotComparisonResult);
+				}
+			}
+		}
 	}
 	
 	/**
@@ -114,7 +151,7 @@ public class ReporterControler implements IReporter {
 	 * @param suites				List of test suite to parse
 	 * @param currentTestResult		When we generate temp results, we get a current test result so that we do not wait test2 to be executed to get test1 displayed in report
 	 */
-	private Map<ITestContext, Set<ITestResult>> updateTestSteps(final List<ISuite> suites, ITestResult currentTestResult) {
+	private Map<ITestContext, Set<ITestResult>> updateTestSteps(List<ISuite> suites, ITestResult currentTestResult) {
 		Map<ITestContext, Set<ITestResult>> allResultSet = new LinkedHashMap<>();
 		
 		for (ISuite suite: suites) {
@@ -126,7 +163,7 @@ public class ReporterControler implements IReporter {
 				testRunnersField.setAccessible(true);
 				testContexts = (List<TestRunner>) testRunnersField.get(suite);
 			} catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException | ClassCastException e) {
-				throw new RuntimeException("TestNG may have change");
+				throw new RuntimeException("TestNG may have changed");
 			}
 			
 			// If at least one test (not a test method, but a TestNG test) is finished, suite contains its results

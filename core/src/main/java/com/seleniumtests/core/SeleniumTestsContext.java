@@ -56,6 +56,7 @@ import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.DriverExceptionListener;
 import com.seleniumtests.driver.DriverMode;
 import com.seleniumtests.driver.TestType;
+import com.seleniumtests.driver.screenshots.SnapshotComparisonBehaviour;
 import com.seleniumtests.driver.screenshots.VideoCaptureMode;
 import com.seleniumtests.reporter.logger.ArchiveMode;
 import com.seleniumtests.reporter.reporters.CustomReporter;
@@ -124,6 +125,7 @@ public class SeleniumTestsContext {
     public static final String SELENIUMROBOTSERVER_COMPARE_SNAPSHOT_TTL = "seleniumRobotServerSnapshotsTtl";			// Time to live of the test session on seleniumRobot server
     public static final String SELENIUMROBOTSERVER_RECORD_RESULTS = "seleniumRobotServerRecordResults";				// whether we should record test results to server. This option only operates when SeleniumRobot server is connected
     public static final String SELENIUMROBOTSERVER_VARIABLES_OLDER_THAN = "seleniumRobotServerVariablesOlderThan";	// whether we should get from server variables which were created at least X days ago
+    public static final String SELENIUMROBOTSERVER_COMPARE_SNAPSHOT_BEHAVIOUR = "snapshotComparisonResult";
     
     public static final String SET_ASSUME_UNTRUSTED_CERTIFICATE_ISSUER = "setAssumeUntrustedCertificateIssuer"; // Firefox uniquement pour qu'il ne prenne pas en compte les certificats invalides 
     public static final String SET_ACCEPT_UNTRUSTED_CERTIFICATES = "setAcceptUntrustedCertificates"; // Firefox uniquement pour qu'il ne prenne pas en compte les certificats invalides
@@ -236,6 +238,7 @@ public class SeleniumTestsContext {
 	public static final boolean DEFAULT_SELENIUMROBOTSERVER_RECORD_RESULTS = false;
 	public static final boolean DEFAULT_SELENIUMROBOTSERVER_COMPARE_SNAPSHOT = false;
 	public static final int DEFAULT_SELENIUMROBOTSERVER_COMPARE_SNAPSHOT_TTL = 30;
+	public static final SnapshotComparisonBehaviour DEFAULT_SELENIUMROBOTSERVER_COMPARE_SNAPSHOT_BEHAVIOUR = SnapshotComparisonBehaviour.DISPLAY_ONLY;
 	public static final boolean DEFAULT_SELENIUMROBOTSERVER_ACTIVE = false;
 	public static final String DEFAULT_SELENIUMROBOTSERVER_TOKEN = null;
 	public static final int DEFAULT_SELENIUMROBOTSERVER_VARIABLES_OLDER_THAN = 0;
@@ -335,9 +338,10 @@ public class SeleniumTestsContext {
         setSeleniumRobotServerActive(getBoolValueForTest(SELENIUMROBOTSERVER_ACTIVE, System.getProperty(SELENIUMROBOTSERVER_ACTIVE)));
         setSeleniumRobotServerToken(getValueForTest(SELENIUMROBOTSERVER_TOKEN, System.getProperty(SELENIUMROBOTSERVER_TOKEN)));
         setSeleniumRobotServerCompareSnapshot(getBoolValueForTest(SELENIUMROBOTSERVER_COMPARE_SNAPSHOT, System.getProperty(SELENIUMROBOTSERVER_COMPARE_SNAPSHOT)));
+        setSeleniumRobotServerCompareSnapshotTtl(getIntValueForTest(SELENIUMROBOTSERVER_COMPARE_SNAPSHOT_TTL, System.getProperty(SELENIUMROBOTSERVER_COMPARE_SNAPSHOT_TTL)));
+        setSeleniumRobotServerCompareSnapshotBehaviour(getValueForTest(SELENIUMROBOTSERVER_COMPARE_SNAPSHOT_BEHAVIOUR, System.getProperty(SELENIUMROBOTSERVER_COMPARE_SNAPSHOT_BEHAVIOUR)));
         setSeleniumRobotServerRecordResults(getBoolValueForTest(SELENIUMROBOTSERVER_RECORD_RESULTS, System.getProperty(SELENIUMROBOTSERVER_RECORD_RESULTS)));
         setSeleniumRobotServerVariableOlderThan(getIntValueForTest(SELENIUMROBOTSERVER_VARIABLES_OLDER_THAN, System.getProperty(SELENIUMROBOTSERVER_VARIABLES_OLDER_THAN)));
-        setSeleniumRobotServerCompareSnapshotTtl(getIntValueForTest(SELENIUMROBOTSERVER_COMPARE_SNAPSHOT_TTL, System.getProperty(SELENIUMROBOTSERVER_COMPARE_SNAPSHOT_TTL)));
         
         setWebDriverGrid(getValueForTest(WEB_DRIVER_GRID, System.getProperty(WEB_DRIVER_GRID)));
         setRunMode(getValueForTest(RUN_MODE, System.getProperty(RUN_MODE)));   
@@ -1119,6 +1123,10 @@ public class SeleniumTestsContext {
     	return (Boolean) getAttribute(SELENIUMROBOTSERVER_COMPARE_SNAPSHOT);
     }
     
+    public SnapshotComparisonBehaviour getSeleniumRobotServerCompareSnapshotBehaviour() {
+    	return (SnapshotComparisonBehaviour) getAttribute(SELENIUMROBOTSERVER_COMPARE_SNAPSHOT_BEHAVIOUR);
+    }
+    
     public Integer getSeleniumRobotServerVariableOlderThan() {
     	return (Integer) getAttribute(SELENIUMROBOTSERVER_VARIABLES_OLDER_THAN);
     }
@@ -1689,6 +1697,14 @@ public class SeleniumTestsContext {
     		setAttribute(SELENIUMROBOTSERVER_COMPARE_SNAPSHOT, capture);
     	} else {
     		setAttribute(SELENIUMROBOTSERVER_COMPARE_SNAPSHOT, DEFAULT_SELENIUMROBOTSERVER_COMPARE_SNAPSHOT);
+    	}
+    }
+    
+    public void setSeleniumRobotServerCompareSnapshotBehaviour(String compareSnapshotBehaviour) {
+    	if (compareSnapshotBehaviour != null) {
+    		setAttribute(SELENIUMROBOTSERVER_COMPARE_SNAPSHOT_BEHAVIOUR, SnapshotComparisonBehaviour.fromString(compareSnapshotBehaviour));
+    	} else {
+    		setAttribute(SELENIUMROBOTSERVER_COMPARE_SNAPSHOT_BEHAVIOUR, DEFAULT_SELENIUMROBOTSERVER_COMPARE_SNAPSHOT_BEHAVIOUR);
     	}
     }
     
