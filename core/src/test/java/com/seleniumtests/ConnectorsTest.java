@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.seleniumtests.ut.connectors;
+package com.seleniumtests;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
@@ -25,6 +25,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.doReturn;
 
 import java.io.File;
 import java.util.Arrays;
@@ -47,19 +48,26 @@ import org.openqa.selenium.remote.RemoteWebElement;
 import org.openqa.selenium.remote.SessionId;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.testng.ITestContext;
+import org.testng.annotations.BeforeMethod;
 
+import com.mashape.unirest.http.HttpMethod;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
+import com.mashape.unirest.request.BaseRequest;
 import com.mashape.unirest.request.GetRequest;
 import com.mashape.unirest.request.HttpRequest;
 import com.mashape.unirest.request.HttpRequestWithBody;
 import com.mashape.unirest.request.body.MultipartBody;
-import com.seleniumtests.MockitoTest;
 import com.seleniumtests.browserfactory.SeleniumGridDriverFactory;
 import com.seleniumtests.connectors.selenium.SeleniumGridConnector;
 import com.seleniumtests.connectors.selenium.SeleniumRobotGridConnector;
+import com.seleniumtests.connectors.selenium.SeleniumRobotServerConnector;
+import com.seleniumtests.connectors.selenium.SeleniumRobotSnapshotServerConnector;
+import com.seleniumtests.connectors.selenium.SeleniumRobotVariableServerConnector;
+import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.driver.WebUIDriverFactory;
 
@@ -84,11 +92,53 @@ public class ConnectorsTest extends MockitoTest {
 	@Mock
 	private RemoteWebElement element;
 
+	@Mock
+	public GetRequest getAliveRequest;
+	
+	@Mock
+	public HttpRequestWithBody postRequest;
+	
+	@Mock
+	public HttpResponse<String> responseAliveString;	
+	
+	protected GetRequest namedApplicationRequest;
+	protected GetRequest namedEnvironmentRequest;
+	protected GetRequest namedTestCaseRequest;
+	protected GetRequest namedVersionRequest;
+	protected GetRequest variablesRequest;
+	protected HttpRequestWithBody createApplicationRequest;
+	protected HttpRequestWithBody createEnvironmentRequest;
+	protected HttpRequestWithBody createVersionRequest;
+	protected HttpRequestWithBody createTestCaseRequest;
+	protected HttpRequestWithBody createVariableRequest;
+	protected HttpRequestWithBody updateVariableRequest;
+	protected HttpRequestWithBody updateVariableRequest2;
+
+
+	@BeforeMethod(groups= {"it"})
+	public void init(final ITestContext testNGCtx) {
+		PowerMockito.mockStatic(Unirest.class);
+	}
+	
 	/**
 	 * Method for creating server reply mock
 	 * @throws UnirestException 
 	 */
-	protected HttpRequest createServerMock(String requestType, String apiPath, int statusCode, String replyData) throws UnirestException {
+	protected BaseRequest createServerMock(String requestType, String apiPath, int statusCode, String replyData) throws UnirestException {
+		return createServerMock(requestType, apiPath, statusCode, replyData, "request");
+	}
+	
+	/**
+	 * 
+	 * @param requestType
+	 * @param apiPath
+	 * @param statusCode
+	 * @param replyData
+	 * @param responseType		if "request", replies with the POST request object (HttpRequestWithBody.class). If "body", replies with the body (MultipartBody.class)
+	 * @return
+	 * @throws UnirestException
+	 */
+	protected BaseRequest createServerMock(String requestType, String apiPath, int statusCode, String replyData, String responseType) throws UnirestException {
 		
 		@SuppressWarnings("unchecked")
 		HttpResponse<String> response = mock(HttpResponse.class);
@@ -96,7 +146,7 @@ public class ConnectorsTest extends MockitoTest {
 		HttpRequest request = mock(HttpRequest.class);
 		JsonNode json = mock(JsonNode.class);
 		MultipartBody requestMultipartBody = mock(MultipartBody.class);
-		HttpRequestWithBody postRequest = mock(HttpRequestWithBody.class);
+		HttpRequestWithBody postRequest = spy(new HttpRequestWithBody(HttpMethod.POST, SERVER_URL + apiPath));
 		
 		when(request.getUrl()).thenReturn(SERVER_URL);
 		when(response.getStatus()).thenReturn(statusCode);
@@ -113,7 +163,7 @@ public class ConnectorsTest extends MockitoTest {
 				GetRequest getRequest = mock(GetRequest.class); 
 				
 				when(Unirest.get(SERVER_URL + apiPath)).thenReturn(getRequest);
-
+				
 				when(getRequest.header(anyString(), anyString())).thenReturn(getRequest);
 				when(getRequest.asString()).thenReturn(response);
 				when(getRequest.asJson()).thenReturn(jsonResponse);
@@ -140,8 +190,13 @@ public class ConnectorsTest extends MockitoTest {
 				when(requestMultipartBody.field(anyString(), anyLong())).thenReturn(requestMultipartBody);
 				when(requestMultipartBody.field(anyString(), any(File.class))).thenReturn(requestMultipartBody);
 				when(requestMultipartBody.asString()).thenReturn(response);
-				return postRequest;
-			
+				
+				if ("request".equals(responseType)) {
+					return postRequest;
+				} else {
+					return requestMultipartBody;
+				}
+
 		}
 		return null;	
 	}
@@ -272,5 +327,76 @@ public class ConnectorsTest extends MockitoTest {
 				"}");
 		
 		return uiDriver;
+	}
+	
+
+	/**
+	 * simulate an alive snapshot sever responding to all requests
+	 * @throws UnirestException 
+	 */
+	protected SeleniumRobotSnapshotServerConnector configureMockedSnapshotServerConnection() throws UnirestException {
+		
+		// snapshot server comes with variable server
+		configureMockedVariableServerConnection();
+		
+		when(getAliveRequest.asString()).thenReturn(responseAliveString);
+		when(responseAliveString.getStatus()).thenReturn(200);
+		when(Unirest.get(SERVER_URL + "/snapshot/")).thenReturn(getAliveRequest);
+		
+		SeleniumTestsContextManager.getThreadContext().setSeleniumRobotServerUrl(SERVER_URL);
+		SeleniumTestsContextManager.getThreadContext().setSeleniumRobotServerActive(true);
+		
+		// set default reply from server. To override this behaviour, redefine some steps in test after connector creation
+		createServerMock("POST", SeleniumRobotSnapshotServerConnector.APPLICATION_API_URL, 200, "{'id': '9'}");	
+		createServerMock("POST", SeleniumRobotSnapshotServerConnector.ENVIRONMENT_API_URL, 200, "{'id': '10'}");	
+		createServerMock("POST", SeleniumRobotSnapshotServerConnector.VERSION_API_URL, 200, "{'id': '11'}");	
+		createServerMock("POST", SeleniumRobotSnapshotServerConnector.TESTCASE_API_URL, 200, "{'id': '12'}");
+		createServerMock("POST", SeleniumRobotSnapshotServerConnector.TESTCASEINSESSION_API_URL, 200, "{'id': '15'}");
+		createServerMock("POST", SeleniumRobotSnapshotServerConnector.SNAPSHOT_API_URL, 200, "{'id': '16'}");
+		createServerMock("POST", SeleniumRobotSnapshotServerConnector.STEPRESULT_API_URL, 200, "{'id': '17'}");
+		createServerMock("POST", SeleniumRobotSnapshotServerConnector.SESSION_API_URL, 200, "{'id': '13'}");	
+		createServerMock("PATCH", SeleniumRobotSnapshotServerConnector.SESSION_API_URL + "13/", 200, "{\"id\":13,\"sessionId\":\"4b2e32f4-69dc-4f05-9644-4287acc2c9ac\",\"date\":\"2017-07-24\",\"browser\":\"*none\",\"environment\":\"DEV\",\"version\":2}");		
+		createServerMock("GET", SeleniumRobotSnapshotServerConnector.TESTCASEINSESSION_API_URL + "15", 200, "{'testSteps': [], 'completed': true, 'isOkWithSnapshots': true}");		
+		createServerMock("PATCH", SeleniumRobotSnapshotServerConnector.TESTCASEINSESSION_API_URL + "15/", 200, "{\"id\":12,\"name\":\"Test 1\",\"version\":11,\"testSteps\":[14]}");		
+		createServerMock("POST", SeleniumRobotSnapshotServerConnector.TESTSTEP_API_URL, 200, "{'id': '14'}");
+		createServerMock("GET", SeleniumRobotServerConnector.NAMED_APPLICATION_API_URL, 200, "{'id': 9}");		
+		createServerMock("GET", SeleniumRobotServerConnector.NAMED_ENVIRONMENT_API_URL, 200, "{'id': 10}");		
+		createServerMock("GET", SeleniumRobotServerConnector.NAMED_TESTCASE_API_URL, 200, "{'id': 12}");		
+		createServerMock("GET", SeleniumRobotServerConnector.NAMED_VERSION_API_URL, 200, "{'id': 11}");	
+		
+		SeleniumRobotSnapshotServerConnector connector = new SeleniumRobotSnapshotServerConnector(true, SERVER_URL);
+		
+		// reset default value to force creation
+		connector.setVersionId(null);
+		return connector;
+	}
+	
+	/**
+	 * simulate an alive variable sever responding to all requests
+	 * @throws UnirestException 
+	 */
+	protected void configureMockedVariableServerConnection() throws UnirestException {
+		when(getAliveRequest.asString()).thenReturn(responseAliveString);
+		when(getAliveRequest.header(anyString(), anyString())).thenReturn(getAliveRequest);
+		when(responseAliveString.getStatus()).thenReturn(200);
+		when(Unirest.get(SERVER_URL + SeleniumRobotServerConnector.PING_API_URL)).thenReturn(getAliveRequest);
+		
+		SeleniumTestsContextManager.getThreadContext().setSeleniumRobotServerUrl(SERVER_URL);
+		SeleniumTestsContextManager.getThreadContext().setSeleniumRobotServerActive(true);
+		
+		// set default reply from server. To override this behaviour, redefine some steps in test after connector creation
+		namedApplicationRequest = (GetRequest) createServerMock("GET", SeleniumRobotVariableServerConnector.NAMED_APPLICATION_API_URL, 200, "{'id': 1}");		
+		namedEnvironmentRequest = (GetRequest) createServerMock("GET", SeleniumRobotVariableServerConnector.NAMED_ENVIRONMENT_API_URL, 200, "{'id': 2}");		
+		namedTestCaseRequest = (GetRequest) createServerMock("GET", SeleniumRobotVariableServerConnector.NAMED_TESTCASE_API_URL, 200, "{'id': 3}");		
+		namedVersionRequest = (GetRequest) createServerMock("GET", SeleniumRobotVariableServerConnector.NAMED_VERSION_API_URL, 200, "{'id': 4}");	
+		createApplicationRequest = (HttpRequestWithBody) createServerMock("POST", SeleniumRobotSnapshotServerConnector.APPLICATION_API_URL, 200, "{'id': '1'}");	
+		createEnvironmentRequest = (HttpRequestWithBody) createServerMock("POST", SeleniumRobotSnapshotServerConnector.ENVIRONMENT_API_URL, 200, "{'id': '2'}");	
+		createVersionRequest = (HttpRequestWithBody) createServerMock("POST", SeleniumRobotSnapshotServerConnector.VERSION_API_URL, 200, "{'id': '4'}");	
+		createTestCaseRequest = (HttpRequestWithBody) createServerMock("POST", SeleniumRobotSnapshotServerConnector.TESTCASE_API_URL, 200, "{'id': '3'}");
+		createVariableRequest = (HttpRequestWithBody) createServerMock("POST", SeleniumRobotVariableServerConnector.VARIABLE_API_URL, 200, "{'id': 13, 'name': 'custom.test.variable.key', 'value': 'value', 'reservable': false}");
+		updateVariableRequest = (HttpRequestWithBody) createServerMock("PATCH", String.format(SeleniumRobotVariableServerConnector.EXISTING_VARIABLE_API_URL, 12), 200, "{'id': 12, 'name': 'custom.test.variable.key', 'value': 'value', 'reservable': false}");
+		updateVariableRequest2 = (HttpRequestWithBody) createServerMock("PATCH", String.format(SeleniumRobotVariableServerConnector.EXISTING_VARIABLE_API_URL, 2), 200, "{}");
+		variablesRequest = (GetRequest) createServerMock("GET", SeleniumRobotVariableServerConnector.VARIABLE_API_URL, 200, "[{'id': 1, 'name': 'key1', 'value': 'value1', 'reservable': false}, {'id': 2, 'name': 'key2', 'value': 'value2', 'reservable': true}]");	
+
 	}
 }

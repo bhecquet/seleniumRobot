@@ -17,13 +17,17 @@
  */
 package com.seleniumtests.core.utils;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.testng.ITestNGMethod;
 import org.testng.ITestResult;
+import org.testng.internal.BaseTestMethod;
+import org.testng.internal.TestResult;
 
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.runner.CucumberScenarioWrapper;
@@ -47,6 +51,54 @@ public class TestNGResultUtils {
 
 	private TestNGResultUtils() {
 		// nothing to do
+	}
+	
+	/**
+	 * Copy a TestResult into an other one
+	 * @param toCopy
+	 * @return
+	 * @throws SecurityException 
+	 * @throws NoSuchFieldException 
+	 * @throws IllegalAccessException 
+	 * @throws IllegalArgumentException 
+	 */
+	public static ITestResult copy(ITestResult toCopy, String name, String description) throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
+		
+		
+		Field methodNameField = BaseTestMethod.class.getDeclaredField("m_methodName");
+		methodNameField.setAccessible(true);
+		ITestNGMethod newMethod = toCopy.getMethod().clone();
+		methodNameField.set(newMethod, name);	
+		newMethod.setDescription(description);
+		
+		ITestResult newTestResult = new TestResult(toCopy.getTestClass(), 
+				toCopy.getInstance(), 
+				newMethod, 
+				toCopy.getThrowable(), 
+				toCopy.getStartMillis(), 
+				toCopy.getEndMillis(), 
+				toCopy.getTestContext());
+
+		newTestResult.setParameters(toCopy.getParameters());
+		for (String attributeName: toCopy.getAttributeNames()) {
+			newTestResult.setAttribute(attributeName, toCopy.getAttribute(attributeName));
+		}
+		
+		// reset flags of generated results
+		setHtmlReportCreated(newTestResult, false);
+		setCustomReportCreated(newTestResult, false);
+		setSnapshotComparisonResult(newTestResult, false);
+		
+		// create testResult own context
+		SeleniumTestsContext newTestContext = new SeleniumTestsContext(getSeleniumRobotTestContext(toCopy), false);
+		newTestContext.createTestSpecificOutputDirectory(newTestResult);
+		setSeleniumRobotTestContext(newTestResult, newTestContext);
+		
+		// change name
+		setTestMethodName(newTestResult, getTestName(newTestResult));
+		setUniqueTestName(newTestResult, newTestContext.getRelativeOutputDir());
+		
+		return newTestResult;
 	}
 	
 	public static String getTestName(ITestResult testNGResult) {

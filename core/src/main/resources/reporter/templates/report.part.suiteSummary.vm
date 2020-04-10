@@ -88,18 +88,26 @@
 				                				#set ($description = "no description available")
 				                			#end
 				                			
+				                			#if ("$!testResult.getAttribute('snapshotComparisonResult')" == "")
+				                				#set ($circle = "")
+				                			#elseif ($testResult.getAttribute("snapshotComparisonResult") == true)
+				                				#set ($circle = "<i class=""fa fa-circle circleSuccess"" data-toggle=""tooltip"" title=""snapshot comparison successfull""></i>")
+				                			#else
+				                				#set ($circle = "<i class=""fa fa-circle circleFailed"" data-toggle=""tooltip"" title=""snapshot comparison failed""></i>")
+				                			#end
+				                			
 				                			#if ($testResult.getStatus() == 1)
 				                				<tr class="testSuccess">
 				                				<td>$testContext.key.getName()</td>
-				                				<td class="alignleft"><i class="fa fa-circle circleSuccess"></i><a href='$testResult.getAttribute("methodResultFileName")' data-toggle="tooltip" title="$description">$testResult.getAttribute("uniqueMethodName")</a></td>
+				                				<td class="alignleft">$circle<a href='$testResult.getAttribute("methodResultFileName")' info="ok" data-toggle="tooltip" title="$description">$testResult.getAttribute("uniqueMethodName")</a></td>
 				                			#elseif ($testResult.getStatus() == 2)
 				                				<tr class="testFailed">
 				                				<td>$testContext.key.getName()</td>
-				                				<td class="alignleft"><i class="fa fa-circle circleFailed"></i><a href='$testResult.getAttribute("methodResultFileName")' data-toggle="tooltip" title="$description">$testResult.getAttribute("uniqueMethodName")</a></td>
+				                				<td class="alignleft">$circle<a href='$testResult.getAttribute("methodResultFileName")' info="ko" data-toggle="tooltip" title="$description">$testResult.getAttribute("uniqueMethodName")</a></td>
 				                			#else 
 				                				<tr class="testSkipped">
 				                				<td>$testContext.key.getName()</td>
-				                				<td class="alignleft"><i class="fa fa-circle circleSkipped"></i><a href='$testResult.getAttribute("methodResultFileName")' data-toggle="tooltip" title="$description">$testResult.getAttribute("uniqueMethodName")</a></td>
+				                				<td class="alignleft">$circle<a href='$testResult.getAttribute("methodResultFileName")' info="skipped" data-toggle="tooltip" title="$description">$testResult.getAttribute("uniqueMethodName")</a></td>
 				                			#end 
 	
 					                		<td name="passed-$testIdx">$passedSteps</td>

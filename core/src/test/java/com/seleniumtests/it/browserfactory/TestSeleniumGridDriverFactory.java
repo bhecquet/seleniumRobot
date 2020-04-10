@@ -17,34 +17,13 @@
  */
 package com.seleniumtests.it.browserfactory;
 
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 import java.io.IOException;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.ClientProtocolException;
-import org.mockito.Mock;
-import org.openqa.selenium.By;
-import org.openqa.selenium.Capabilities;
-import org.openqa.selenium.Dimension;
-import org.openqa.selenium.MutableCapabilities;
-import org.openqa.selenium.Platform;
-import org.openqa.selenium.Point;
-import org.openqa.selenium.WebDriver.Navigation;
-import org.openqa.selenium.WebDriver.Options;
-import org.openqa.selenium.WebDriver.TargetLocator;
-import org.openqa.selenium.WebDriver.Timeouts;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.remote.DesiredCapabilities;
-import org.openqa.selenium.remote.RemoteWebDriver;
-import org.openqa.selenium.remote.RemoteWebElement;
-import org.openqa.selenium.remote.SessionId;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -54,8 +33,8 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import org.testng.xml.XmlSuite.ParallelMode;
 
-import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
+import com.seleniumtests.ConnectorsTest;
 import com.seleniumtests.browserfactory.SeleniumGridDriverFactory;
 import com.seleniumtests.connectors.selenium.SeleniumGridConnector;
 import com.seleniumtests.connectors.selenium.SeleniumRobotGridConnector;
@@ -63,7 +42,6 @@ import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.driver.WebUIDriverFactory;
 import com.seleniumtests.it.reporter.ReporterTest;
-import com.seleniumtests.ut.connectors.ConnectorsTest;
 
 @PrepareForTest({Unirest.class, WebUIDriverFactory.class, SeleniumGridDriverFactory.class})
 @PowerMockIgnore({"javax.net.ssl.*", "com.google.inject.*"})

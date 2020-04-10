@@ -40,13 +40,13 @@ import org.testng.xml.XmlSuite.FailurePolicy;
 import org.testng.xml.XmlSuite.ParallelMode;
 import org.testng.xml.XmlTest;
 
+import com.seleniumtests.ConnectorsTest;
 import com.seleniumtests.GenericTest;
-import com.seleniumtests.MockitoTest;
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.StatisticsStorage;
 
-public class ReporterTest extends MockitoTest {
+public class ReporterTest extends ConnectorsTest {
 	
 
 	@BeforeMethod(groups={"it"})

@@ -39,12 +39,18 @@ import org.testng.ITestContext;
 import org.testng.ITestResult;
 import org.testng.SuiteRunner;
 import org.testng.TestRunner;
+import org.testng.internal.TestResult;
 import org.testng.xml.XmlSuite;
 
 import com.seleniumtests.connectors.selenium.SeleniumRobotSnapshotServerConnector;
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.utils.TestNGResultUtils;
+import com.seleniumtests.customexception.ScenarioException;
+import com.seleniumtests.driver.screenshots.SnapshotComparisonBehaviour;
+import com.seleniumtests.driver.screenshots.SnapshotTarget;
+import com.seleniumtests.reporter.logger.TestMessage;
+import com.seleniumtests.reporter.logger.TestMessage.MessageType;
 import com.seleniumtests.reporter.logger.TestStep;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
@@ -84,9 +90,15 @@ public class ReporterControler implements IReporter {
 				}
 			}
 
+			// change / add test result according to snapshot comparison results
+			if (suiteFinished) {
+				changeTestResultWithSnapshotComparison(suites);
+			}
+
 			try {
 				new JUnitReporter().generateReport(xmlSuites, suites, SeleniumTestsContextManager.getGlobalContext().getOutputDirectory());
 			} catch (Exception e) {}
+			
 			
 			for (Class<?> reporterClass: SeleniumTestsContextManager.getGlobalContext().getReporterPluginClasses()) {
 				try {
@@ -141,6 +153,35 @@ public class ReporterControler implements IReporter {
 					}
 					boolean snapshotComparisonResult = snapshotServer.getTestCaseInSessionComparisonResult(testCaseInSessionId);
 					TestNGResultUtils.setSnapshotComparisonResult(testResult, snapshotComparisonResult);
+					
+					// create a step for snapshot comparison
+					TestStep testStep = new TestStep("Snapshot comparison", testResult, new ArrayList<>(), false);
+					testStep.setFailed(!snapshotComparisonResult);
+					testStep.addMessage(new TestMessage("Comparison " + (snapshotComparisonResult ? "successful": "failed"), snapshotComparisonResult ? MessageType.INFO: MessageType.ERROR));
+					getAllTestSteps(testResult).add(testStep);
+					
+					// based on snapshot comparison flag, change test result or add an other one
+					if (SeleniumTestsContextManager.getGlobalContext().getSeleniumRobotServerCompareSnapshotBehaviour() == SnapshotComparisonBehaviour.CHANGE_TEST_RESULT && !snapshotComparisonResult) {
+						testResult.setStatus(ITestResult.FAILURE);
+						testResult.setThrowable(new ScenarioException("Snapshot comparison failed"));
+					} else if (SeleniumTestsContextManager.getGlobalContext().getSeleniumRobotServerCompareSnapshotBehaviour() == SnapshotComparisonBehaviour.ADD_TEST_RESULT) {
+						
+						ITestResult newTestResult;
+						try {
+							newTestResult = TestNGResultUtils.copy(testResult, "snapshots-" +testResult.getName(), testResult.getMethod().getDescription() + " FOR SNAPSHOT COMPARISON");
+						} catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e) {
+							throw new ScenarioException(e.getMessage(), e);
+						}
+						
+						if (snapshotComparisonResult) {
+							newTestResult.setStatus(ITestResult.SUCCESS);
+							suiteResult.getTestContext().getPassedTests().addResult(newTestResult, newTestResult.getMethod());
+						} else {
+							newTestResult.setStatus(ITestResult.FAILURE);
+							newTestResult.setThrowable(new ScenarioException("Snapshot comparison failed"));
+							suiteResult.getTestContext().getFailedTests().addResult(newTestResult, newTestResult.getMethod());
+						}
+					}
 				}
 			}
 		}
@@ -351,6 +392,9 @@ public class ReporterControler implements IReporter {
 	 * Use TestStep created in LogAction.java
 	 */
 	protected List<TestStep> getAllTestSteps(final ITestResult testResult) {
+		if (TestNGResultUtils.getSeleniumRobotTestContext(testResult) == null) {
+			return new ArrayList<>();
+		}
 		return TestNGResultUtils.getSeleniumRobotTestContext(testResult).getTestStepManager().getTestSteps();
 
 	}

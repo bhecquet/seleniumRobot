@@ -313,7 +313,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 		try {
 			JSONObject response = null;
 			for (int i = 0; i < 3; i++) {
-				response = getJSonResponse(buildGetRequest(url + TESTCASEINSESSION_API_URL + testCaseInSessionId + "/"));
+				response = getJSonResponse(buildGetRequest(url + TESTCASEINSESSION_API_URL + testCaseInSessionId));
 				if (response.optBoolean("computed", false) && response.has("isOkWithSnapshots")) {
 					return response.getBoolean("isOkWithSnapshots");
 				} else {
