@@ -217,6 +217,7 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 			context.put("staticPathPrefix", "../");
 			context.put("snapshots", testContext.getSeleniumRobotServerCompareSnapshot());
 			context.put("snapshotServer", testContext.getSeleniumRobotServerUrl());
+			context.put("snapshotComparisonResult", TestNGResultUtils.getSnapshotComparisonResult(testResult));
 			context.put("snapshotSessionId", TestNGResultUtils.getSnapshotTestCaseInSessionId(testResult));
 			
 			// optimize reports means that resources are get from internet
@@ -428,58 +429,6 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 	
 	public String getOutputDirectory() {	
 		return outputDirectory;
-	}
-	
-	/**
-	 * Begin HTML file
-	 * @param testPassed	true if test is OK, false if test is KO, null if test is skipped
-	 * @param out
-	 * @param type
-	 * @param resourcesFromCdn
-	 */
-	protected void startHtml(final String testStatus, final PrintWriter out, final String type, final boolean resourcesFromCdn) {
-		try {
-			VelocityEngine ve = initVelocityEngine();
-
-			Template t = ve.getTemplate("/reporter/templates/report.part.header.vm");
-			VelocityContext context = new VelocityContext();
-
-			String userName = System.getProperty("user.name");
-			context.put("userName", userName);
-			context.put("staticPathPrefix", "complete".equals(type) ? "": "../");
-			
-			// optimize reports means that resources are get from internet
-			context.put("localResources", !resourcesFromCdn);
-			context.put("currentDate", new Date().toString());
-
-			DriverMode mode = SeleniumTestsContextManager.getGlobalContext().getRunMode();
-			List<String> hubUrls = SeleniumTestsContextManager.getGlobalContext().getWebDriverGrid();
-			String hubLink = "";
-			for (String hubUrl: hubUrls) {
-				hubLink += "<a href='" + hubUrl + "' target=hub>" + hubUrl + "</a>";
-			}
-			context.put("gridHub", hubLink);
-
-			context.put("mode", mode.toString());
-
-			StringBuilder sbGroups = new StringBuilder();
-			sbGroups.append("envt,test");
-
-			context.put("groups", sbGroups.toString());
-			context.put("report", type);
-
-			if (type == "simple"){
-				context.put(HEADER, testStatus);
-			}
-			StringWriter writer = new StringWriter();
-			t.merge(context, writer);
-			out.write(writer.toString());
-
-		} catch (Exception e) {
-			generationErrorMessage = "startHtml error:" + e.getMessage();
-			logger.error("startHtml error:", e);
-		}
-
 	}
 
 	public String getGenerationErrorMessage() {

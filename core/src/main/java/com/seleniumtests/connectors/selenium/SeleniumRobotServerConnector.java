@@ -42,6 +42,8 @@ public abstract class SeleniumRobotServerConnector {
 	public static final String NAMED_APPLICATION_API_URL = "/commons/api/gapplication/";
 	public static final String NAMED_ENVIRONMENT_API_URL = "/commons/api/genvironment/";
 	public static final String NAMED_TESTCASE_API_URL = "/commons/api/gtestcase/";
+
+	public static final String PING_API_URL = "/variable/api/";
 	
 	public static final String VERSION_API_URL = "/commons/api/version/";
 	public static final String APPLICATION_API_URL = "/commons/api/application/";

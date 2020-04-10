@@ -45,14 +45,17 @@ tbody tr td, thead tr th, tfoot tr th{
 
 .circleSuccess{
 	color: #2BC400;
+	margin-right: 3px;
 }
 
 .circleFailed{
 	color: #FF6666;
+	margin-right: 3px;
 }
 
 .circleSkipped{
 	color: #00CCFF;
+	margin-right: 3px;
 }
 
 .failedSteps {

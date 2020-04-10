@@ -617,9 +617,8 @@ public class SeleniumTestsContextManager {
     		logger.error("Result did not contain thread context, initializing a new one");
     		ITestContext newTestNGCtx = getContextFromConfigFile(testNGCtx);
         	SeleniumTestsContext seleniumTestsCtx = new SeleniumTestsContext(newTestNGCtx);
-            if (testResult != null) {
-            	seleniumTestsCtx.configureContext(testResult);
-            }
+            seleniumTestsCtx.configureContext(testResult);
+
             TestNGResultUtils.setSeleniumRobotTestContext(testResult, seleniumTestsCtx);
             return seleniumTestsCtx;
     	}

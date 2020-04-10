@@ -38,6 +38,7 @@ import org.apache.tools.ant.filters.StringInputStream;
 import org.mockito.Mock;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
@@ -46,15 +47,16 @@ import org.testng.annotations.Test;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import com.mashape.unirest.request.GetRequest;
+import com.seleniumtests.ConnectorsTest;
 import com.seleniumtests.connectors.selenium.SeleniumGridConnector;
 import com.seleniumtests.connectors.selenium.SeleniumRobotGridConnector;
 import com.seleniumtests.customexception.ScenarioException;
-import com.seleniumtests.ut.connectors.ConnectorsTest;
 
 import io.appium.java_client.remote.MobileCapabilityType;
 
 
 @PrepareForTest({HttpClients.class, Unirest.class})
+@PowerMockIgnore({"javax.net.ssl.*", "com.google.inject.*"})
 public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 
 	@Mock

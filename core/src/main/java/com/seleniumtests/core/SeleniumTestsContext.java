@@ -769,7 +769,7 @@ public class SeleniumTestsContext {
      * Created the directory specific to this test. It must be unique even if the same test is executed twice
      * So the created directory is 'test-ouput/<test_name>-<index>'
      */
-    private void createTestSpecificOutputDirectory(ITestResult testNGResult) {
+    public void createTestSpecificOutputDirectory(ITestResult testNGResult) {
     	String testOutputFolderName = hashTest(testNGResult);
     	
     	// use base directory as it's fixed along the life of the test
