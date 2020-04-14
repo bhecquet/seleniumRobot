@@ -190,8 +190,10 @@ public class WebUIDriver {
 
                 // testName is added here, once driver has been created, even if this capability has already been added in IDestkopCapabilitiesFactory. Reason is that 
                 // capability from IDestkopCapabilitiesFactory is not available when we request capabilities from driver.
-                String testName = TestNGResultUtils.getTestName(config.getTestContext().getTestNGResult());
-                caps.setCapability(DriverUsage.TEST_NAME, testName);
+                if (config.getTestContext() != null && config.getTestContext().getTestNGResult() != null) {
+	                String testName = TestNGResultUtils.getTestName(config.getTestContext().getTestNGResult());
+	                caps.setCapability(DriverUsage.TEST_NAME, testName);
+                }
 			}
     	
 
