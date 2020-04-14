@@ -115,6 +115,7 @@ public class TestWebUIDriver extends MockitoTest {
 		Assert.assertNull(driverUsages.get(0).getGridHub());
 		Assert.assertNull(driverUsages.get(0).getGridNode());
 		Assert.assertTrue(driverUsages.get(0).getStartTime() > 0);
+		Assert.assertEquals(driverUsages.get(0).getTestName(), "testCapsOnDriverQuit");
 	}
 	
 	/**

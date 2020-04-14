@@ -1195,6 +1195,10 @@ public class SeleniumTestsContext {
 	public Boolean getMaskedPassword() {
 		return (Boolean) getAttribute(MASK_PASSWORD);
 	}
+	
+	public ITestResult getTestNGResult() {
+		return testNGResult;
+	}
     
     public String getLoadIni() {
         return (String) getAttribute(LOAD_INI);
