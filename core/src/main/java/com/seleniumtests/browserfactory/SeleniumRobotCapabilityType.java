@@ -30,4 +30,9 @@ public interface SeleniumRobotCapabilityType {
 	 * parameter to route browser creation on a specific node on grid even if maxSession is reached
 	 */
 	String ATTACH_SESSION_ON_NODE = "attachSessionOnNode"; 
+	
+	/**
+	 * name of the running test
+	 */
+	String TEST_NAME = "testName";
 }

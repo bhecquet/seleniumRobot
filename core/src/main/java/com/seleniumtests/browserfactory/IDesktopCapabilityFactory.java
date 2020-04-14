@@ -29,6 +29,8 @@ import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
 import com.neotys.selenium.proxies.NLWebDriverFactory;
+import com.seleniumtests.core.StatisticsStorage.DriverUsage;
+import com.seleniumtests.core.utils.TestNGResultUtils;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.DriverConfig;
@@ -104,6 +106,10 @@ public abstract class IDesktopCapabilityFactory extends ICapabilitiesFactory {
         // add node tags
         if (webDriverConfig.getNodeTags().size() > 0 && webDriverConfig.getMode() == DriverMode.GRID) {
         	options.setCapability(SeleniumRobotCapabilityType.NODE_TAGS, webDriverConfig.getNodeTags());
+        }
+        if (webDriverConfig.getTestContext() != null && webDriverConfig.getTestContext().getTestNGResult() != null) {
+        	String testName = TestNGResultUtils.getTestName(webDriverConfig.getTestContext().getTestNGResult());
+            options.setCapability(DriverUsage.TEST_NAME, testName);
         }
      
         return options;

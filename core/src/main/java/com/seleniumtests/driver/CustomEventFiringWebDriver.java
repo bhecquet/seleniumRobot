@@ -876,7 +876,7 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
 				sessionId, 
 				caps.getBrowserName(), 
 				(Long) internalCapabilities.getCapability(DriverUsage.STARTUP_DURATION), 
-				"");
+				(String) internalCapabilities.getCapability(DriverUsage.TEST_NAME));
 		StatisticsStorage.addDriverUsage(usage);
 		
 		try {
