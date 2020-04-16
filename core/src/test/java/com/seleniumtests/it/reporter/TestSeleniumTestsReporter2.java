@@ -17,26 +17,19 @@
  */
 package com.seleniumtests.it.reporter;
 
-import static org.mockito.Mockito.spy;
-
 import java.io.File;
 import java.nio.file.Paths;
 
 import org.apache.commons.lang3.StringUtils;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
 import org.testng.ITestContext;
-import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import org.testng.xml.XmlSuite.ParallelMode;
 
-import com.mashape.unirest.http.Unirest;
 import com.seleniumtests.connectors.selenium.SeleniumRobotSnapshotServerConnector;
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.it.stubclasses.StubTestClass;
-import com.seleniumtests.reporter.reporters.SeleniumTestsReporter2;
 
 public class TestSeleniumTestsReporter2 extends ReporterTest {
 

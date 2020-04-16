@@ -553,6 +553,7 @@ To enable this feature you must:
 - set `seleniumRobotServerActive` to `true`
 - set `seleniumRobotServerUrl` to the URL of the seleniumRobot server
 - set `seleniumRobotServerCompareSnapshots` to `true`
+- (optional) set `snapshotComparisonResult` to `displayOnly`, `changeTestResult` or `addTestResult`
 
 Then, inside your test scripts, you must add snapshots with
 
@@ -569,5 +570,11 @@ Only the snapshots taken this way will be sent to server.
 This, way, a new tab will be added in HTML report, showing the comparison. 
 By default, snapshot taken this way are kept 30 days. If you want a different duration, set the parameter `seleniumRobotServerSnapshotsTtl` to another value.
 
+Parameter `snapshotComparisonResult` allow to control the way snapshot comparison influences test result
 
+- `displayOnly` will add a `red` or `green` bullet (and color snapshot comparison tab) in HTML result. This is only an information
+- `changeTestResult` will do same as `displayOnly` but also set test result to 'KO' if functional test is 'OK' but snapshot comparison is 'KO'
+- `addTestResult` will add a new test result (in all reports, not only HTML) for storing snapshot comparison result. This result will be named 'snapshot-<test_name>'
+
+![](images/snapshot-result.png)
 

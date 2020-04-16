@@ -140,6 +140,7 @@ Settings for customizing timeouts
 | seleniumRobotServerUrl	| 			| URL of the seleniumRobot server. Can be specified as an environment variable |
 | seleniumRobotServerCompareSnapshots	| false		| whether we should use the snapshots created by robot to compare them to a previous execution. This option only operates when SeleniumRobot server is connected. See chap6 documentation for details on connecting to server |
 | seleniumRobotServerRecordResults		| false		| whether we should record test results to seleniumrobot server. This option only operates when SeleniumRobot server is connected. See chap6 documentation for details on connecting to server |
+| snapshotComparisonResult	| displayOnly | What to do when comparing snapshots with option 'seleniumRobotServerCompareSnapshots' activated. 'displayOnly' will display the comparison result in HTML result but not change test result. 'changeTestResult' will set test result to KO if snapshot comparison failed. 'addTestResult' will add a new test result for each snapshot comparison. Functional test result will not be impacted. This last option helps separate functional tests and UX tests. |
 | seleniumRobotServerVariablesOlderThan | 0			| whether we should get from server variables which were created at least X days ago |
 | seleniumRobotServerSnapshotsTtl |		| 30		| Number of days, snapshot comparison will be kept before being deleted. Only valid when `seleniumRobotServerCompareSnapshots` is set to `true` |
 
