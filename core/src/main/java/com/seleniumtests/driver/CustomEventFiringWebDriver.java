@@ -184,9 +184,8 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
     		"}" +
     		"return getScrollParent(arguments[0], false, arguments[1]);";
     
-
-    // returns the top pixel from which fixed positioned headers are not present
-    private static final String JS_GET_TOP_HEADER = "function getStyle(dom) {" + 
+    
+    private static final String JS_GET_ELEMENT_STYLE = "function getStyle(dom) {" + 
     		"  var style;" + 
     		"  var returns = {};" + 
     		"  /* FireFox and Chrome way */" + 
@@ -218,9 +217,9 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
     		"    return returns;" + 
     		"  }" + 
     		"  return returns;" + 
-    		"}" + 
-    		"" + 
-    		"function isVisible(elem) {" + 
+    		"}";
+
+    private static final String JS_IS_ELEMENT_VISIBLE = "function isVisible(elem) {" + 
     		"  var style = getStyle(elem);" + 
     		"" + 
     		"  if (style[\"display\"] === \"none\") return false;" + 
@@ -277,7 +276,12 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
     		"    }" + 
     		"  }" + 
     		"  return false;" + 
-    		"}" + 
+    		"}";
+    
+    // returns the top pixel from which fixed positioned headers are not present
+    private static final String JS_GET_TOP_HEADER = JS_GET_ELEMENT_STYLE +
+    		"" + 
+    		JS_IS_ELEMENT_VISIBLE + 
     		"" + 
     		"var headers;" + 
     		"var nodes = document.querySelectorAll(\"div,header\");" + 
@@ -312,6 +316,44 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
     		"}" + 
     		"" + 
     		"return topPixel;";
+    
+    private static final String JS_GET_BOTTOM_FOOTER = JS_GET_ELEMENT_STYLE +
+    		"" + 
+    		JS_IS_ELEMENT_VISIBLE + 
+    		"" + 
+    		"var footers;" + 
+    		"var nodes = document.querySelectorAll(\"div,footer\");" + 
+    		"if (nodes && nodes.length > 0) {" + 
+    		"  var length = nodes.length;" + 
+    		"  footers = new Array();" + 
+    		"  for (var i = 0; i < length; i++) {" + 
+    		"    footers.push(nodes[i]);" + 
+    		"  }" + 
+    		"}" + 
+    		"" + 
+    		"var bottomPixel = document.documentElement.clientHeight;" + // count from bottom
+    		"" + 
+    		"if (footers && footers.length > 0) {" + 
+    		"  footers = footers.filter(function(e) {" + 
+    		"    return getComputedStyle(e)[\"position\"] === \"fixed\" && isVisible(e);" + 
+    		"  });" + 
+    		"  footers = footers.sort(function(a, b) {" + 
+    		"    if (a == null || a.offsetBottom == null) return -1;" + 
+    		"    if (b == null || b.offsetBottom == null) return 1;" + 
+    		"    return b.offsetBottom - a.offsetBottom;" + 
+    		"  });" + 
+    		"" + 
+    		"  for (var i = 0; i < footers.length; i++) {" + 
+    		"    var footer = footers[i];" + 
+    		"    if (footer.offsetTop + footer.scrollHeight >= bottomPixel - 10) {" + 
+    		"      bottomPixel = footer.offsetTop;" + 
+    		"    } else {" + 
+    		"      break;" + 
+    		"    }" + 
+    		"  }" + 
+    		"}" + 
+    		"" + 
+    		"return document.documentElement.clientHeight - bottomPixel;";
     		
     /*private static final String JS_GET_TOP_HEADER = "function getStyle( dom ) {" + 
     		"    var style;" + 
@@ -712,6 +754,31 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
 				i++;
 			} while (i < 10);
 		} 
+	}
+	
+	/**
+	 * Return the size of top header when it is 'fixed' positionned
+	 * @return
+	 */
+	public Long getTopFixedHeaderSize() {
+		if (isWebTest) {
+			return (Long) ((JavascriptExecutor) driver).executeScript(JS_GET_TOP_HEADER);
+		} else { 
+			return 0L;
+		}
+	}
+	
+	
+	/**
+	 * Return the size of bottom footer when it is 'fixed' positionned
+	 * @return
+	 */
+	public Long getBottomFixedFooterSize() {
+		if (isWebTest) {
+			return (Long) ((JavascriptExecutor) driver).executeScript(JS_GET_BOTTOM_FOOTER);
+		} else { 
+			return 0L;
+		}
 	}
 	
 	/**
