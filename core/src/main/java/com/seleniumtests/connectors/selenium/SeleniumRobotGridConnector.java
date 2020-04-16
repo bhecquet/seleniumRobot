@@ -48,6 +48,7 @@ import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
+import com.mashape.unirest.request.HttpRequestWithBody;
 import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.customexception.SeleniumGridException;
 import com.seleniumtests.util.FileUtility;
@@ -319,6 +320,34 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 				.queryString("process", processName).asString();
 		} catch (UnirestException e) {
 			logger.warn(String.format("Could not kill process %s: %s", processName, e.getMessage()));
+		}
+	}
+	
+
+	/**
+	 * Execute command
+	 * @param program	name of the program
+	 * @param args		arguments of the program
+	 */
+	public String executeCommand(String program, String ... args) {
+		if (nodeUrl == null) {
+			throw new ScenarioException("You cannot execute a remote process before driver has been created and corresponding node instanciated");
+		}
+		
+		logger.info("execute program: " + program);
+		try {
+			HttpRequestWithBody req = Unirest.post(String.format("%s%s", nodeUrl, NODE_TASK_SERVLET))
+				.queryString("action", "command");
+			
+			int i = 0;
+			for (String arg: args) {
+				req = req.queryString("arg" + i, arg);
+			}
+			HttpResponse<String> response = req.asString();
+			return response.getBody();
+		} catch (UnirestException e) {
+			logger.warn(String.format("Could not execute process %s: %s", program, e.getMessage()));
+			return "";
 		}
 	}
 	
