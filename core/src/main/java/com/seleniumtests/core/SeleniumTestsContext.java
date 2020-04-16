@@ -222,8 +222,8 @@ public class SeleniumTestsContext {
 	public static final boolean DEFAULT_CAPTURE_SNAPSHOT = true;
 	public static final boolean DEFAULT_CAPTURE_NETWORK = false;
 	public static final String DEFAULT_VIDEO_CAPTURE = "onError";
-	public static final int DEFAULT_SNAPSHOT_TOP_CROPPING = 0;
-	public static final int DEFAULT_SNAPSHOT_BOTTOM_CROPPING = 0;
+	public static final Integer DEFAULT_SNAPSHOT_TOP_CROPPING = null;
+	public static final Integer DEFAULT_SNAPSHOT_BOTTOM_CROPPING = null;
 	public static final boolean DEFAULT_ENABLE_JAVASCRIPT = true;
 	public static final boolean DEFAULT_SET_ACCEPT_UNTRUSTED_CERTIFICATES = true;
 	public static final boolean DEFAULT_SET_ASSUME_UNTRUSTED_CERTIFICATE_ISSUER = true;
@@ -998,11 +998,11 @@ public class SeleniumTestsContext {
         }
     }
     
-    public int getSnapshotBottomCropping() {
+    public Integer getSnapshotBottomCropping() {
     	return (Integer) getAttribute(SNAPSHOT_BOTTOM_CROPPING);
     }
     
-    public int getSnapshotTopCropping() {
+    public Integer getSnapshotTopCropping() {
     	return (Integer) getAttribute(SNAPSHOT_TOP_CROPPING);
     }
 

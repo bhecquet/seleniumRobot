@@ -77,8 +77,8 @@ public class TestBrowserSnapshot extends GenericMultiBrowserTest {
 		initThreadContext(testNGCtx, null, testResult);
 		SeleniumTestsContextManager.getThreadContext().setExplicitWaitTimeout(2);
 		SeleniumTestsContextManager.getThreadContext().setBrowser(browserName);
-		SeleniumTestsContextManager.getThreadContext().setSnapshotBottomCropping(0);
-		SeleniumTestsContextManager.getThreadContext().setSnapshotTopCropping(0);
+		SeleniumTestsContextManager.getThreadContext().setSnapshotBottomCropping(0); // no cropping at all
+		SeleniumTestsContextManager.getThreadContext().setSnapshotTopCropping(0); // no cropping at all
 //		SeleniumTestsContextManager.getThreadContext().setWebDriverGrid("http://127.0.0.1:4444/wd/hub");
 //		SeleniumTestsContextManager.getThreadContext().setRunMode("grid");
 //		SeleniumTestsContextManager.getThreadContext().setBrowser("firefox");
@@ -122,7 +122,7 @@ public class TestBrowserSnapshot extends GenericMultiBrowserTest {
 	/**
 	 * Test page contains fixed header (yellow) and footer (orange) of 5 pixels height. Detect how many
 	 * pixels of these colors are present in picture
-	 * Also count red pixels which is a line not to remove when cropping
+	 * Also count red/green pixels which is a line not to remove when cropping
 	 * @param picture
 	 * @return
 	 * @throws IOException 
@@ -361,11 +361,11 @@ public class TestBrowserSnapshot extends GenericMultiBrowserTest {
 	}
 	
 	/**
-	 * Check we are able to get all the content whereas we crop the header and footer
+	 * Check we are able to get all the content whereas we crop the header and footer manually (top and bottom pixels set automatically)
 	 * @throws IOException
 	 */
 	@Test(groups={"it"})
-	public void testFixedHeaderFooterCropping() throws IOException {
+	public void testFixedHeaderFooterManualCropping() throws IOException {
 		driver.manage().window().setSize(new Dimension(400, 300));
 		WaitHelper.waitForSeconds(1);
 		
@@ -385,6 +385,34 @@ public class TestBrowserSnapshot extends GenericMultiBrowserTest {
 		Assert.assertEquals(6, headerFooter[0]);
 		Assert.assertEquals(5, headerFooter[1]);
 		Assert.assertTrue(headerFooter[2] >= headerFooterFull[2]); // depending on browser window size (depends on OS) image is split in more or less sections
+		Assert.assertEquals(ImageIO.read(image).getHeight(), ImageIO.read(imageFull).getHeight());
+	}
+	
+	/**
+	 * Check we are able to get all the content whereas we crop the header and footer automatically
+	 * @throws IOException
+	 */
+	@Test(groups={"it"})
+	public void testFixedHeaderFooterAutomaticCropping() throws IOException {
+		driver.manage().window().setSize(new Dimension(400, 300));
+		WaitHelper.waitForSeconds(1);
+		
+		// get full picture without cropping
+		File imageFull = new ScreenshotUtil(driver).capture(SnapshotTarget.PAGE, File.class);
+		
+		SeleniumTestsContextManager.getThreadContext().setSnapshotBottomCropping(null);
+		SeleniumTestsContextManager.getThreadContext().setSnapshotTopCropping(null);
+		
+		// get picture with header and footer cropped
+		File image = new ScreenshotUtil(driver).capture(SnapshotTarget.PAGE, File.class);
+		
+		int[] headerFooter = getHeaderAndFooterPixels(image);
+		int[] headerFooterFull = getHeaderAndFooterPixels(imageFull);
+		
+		// header and footer should have been removed
+		Assert.assertEquals(6, headerFooter[0]);
+		Assert.assertEquals(5, headerFooter[1]);
+		Assert.assertEquals(headerFooter[2], 2); // with automatic cropping, all fixed lines are removed, even green and red ones. Only remains the first top and last bottom one
 		Assert.assertEquals(ImageIO.read(image).getHeight(), ImageIO.read(imageFull).getHeight());
 	}
 	

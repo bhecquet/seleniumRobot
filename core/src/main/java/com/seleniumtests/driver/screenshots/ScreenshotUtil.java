@@ -460,14 +460,22 @@ public class ScreenshotUtil {
 
     	Dimension contentDimension = ((CustomEventFiringWebDriver)driver).getContentDimension();
     	Dimension viewDimensions = ((CustomEventFiringWebDriver)driver).getViewPortDimensionWithoutScrollbar();
-    	int topPixelsToCrop = SeleniumTestsContextManager.getThreadContext().getSnapshotTopCropping();
-    	int bottomPixelsToCrop = SeleniumTestsContextManager.getThreadContext().getSnapshotBottomCropping();
+    	Integer topPixelsToCrop = SeleniumTestsContextManager.getThreadContext().getSnapshotTopCropping();
+    	Integer bottomPixelsToCrop = SeleniumTestsContextManager.getThreadContext().getSnapshotBottomCropping();
 
     	
     	// issue #34: prevent getting image from HTMLUnit driver
     	if (uiDriver != null && uiDriver.getConfig().getBrowserType() == BrowserType.HTMLUNIT) {
             return null;
         }
+    	
+    	// if cropping is automatic, get fixed header size to configure cropping
+    	if (topPixelsToCrop == null) {
+    		topPixelsToCrop = ((CustomEventFiringWebDriver)driver).getTopFixedHeaderSize().intValue();
+    	}
+    	if (bottomPixelsToCrop == null) {
+    		bottomPixelsToCrop = ((CustomEventFiringWebDriver)driver).getBottomFixedFooterSize().intValue();
+    	}
     	
     	int scrollY = 0;
     	int scrollX = 0;

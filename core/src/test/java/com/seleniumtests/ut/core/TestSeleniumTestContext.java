@@ -668,26 +668,26 @@ public class TestSeleniumTestContext extends GenericTest {
 	public void testSnapshotTopCropping(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setSnapshotTopCropping(5);
-		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getSnapshotTopCropping(), 5);
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getSnapshotTopCropping(), (Integer)5);
 	}
 	@Test(groups="ut context")
 	public void testSnapshotTopCroppingNull(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setSnapshotTopCropping(null);
-		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getSnapshotTopCropping(), SeleniumTestsContext.DEFAULT_SNAPSHOT_TOP_CROPPING);
+		Assert.assertEquals((Integer)SeleniumTestsContextManager.getThreadContext().getSnapshotTopCropping(), SeleniumTestsContext.DEFAULT_SNAPSHOT_TOP_CROPPING);
 	}
 	
 	@Test(groups="ut context")
 	public void testSnapshotBottomCropping(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setSnapshotBottomCropping(5);
-		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getSnapshotBottomCropping(), 5);
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getSnapshotBottomCropping(), (Integer)5);
 	}
 	@Test(groups="ut context")
 	public void testSnapshotBottomCroppingNull(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setSnapshotBottomCropping(null);
-		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getSnapshotBottomCropping(), SeleniumTestsContext.DEFAULT_SNAPSHOT_BOTTOM_CROPPING);
+		Assert.assertEquals((Integer)SeleniumTestsContextManager.getThreadContext().getSnapshotBottomCropping(), SeleniumTestsContext.DEFAULT_SNAPSHOT_BOTTOM_CROPPING);
 	}
 	
 	@Test(groups="ut context", expectedExceptions=ConfigurationException.class)
