@@ -17,12 +17,12 @@
  */
 package com.seleniumtests.ut.connectors.selenium;
 
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.verify;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -46,9 +46,7 @@ import com.mashape.unirest.http.exceptions.UnirestException;
 import com.mashape.unirest.request.GetRequest;
 import com.mashape.unirest.request.HttpRequestWithBody;
 import com.seleniumtests.ConnectorsTest;
-import com.seleniumtests.connectors.selenium.SeleniumRobotSnapshotServerConnector;
 import com.seleniumtests.connectors.selenium.SeleniumRobotVariableServerConnector;
-import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.TestVariable;
 import com.seleniumtests.customexception.ConfigurationException;
 
@@ -56,15 +54,6 @@ import com.seleniumtests.customexception.ConfigurationException;
 @PowerMockIgnore({"javax.net.ssl.*", "com.google.inject.*"})
 public class TestSeleniumRobotVariableServerConnector extends ConnectorsTest {
 	
-	
-	@Mock
-	private GetRequest getAliveRequest;
-	
-	@Mock
-	private HttpRequestWithBody postRequest;
-	
-	@Mock
-	private HttpResponse<String> responseAliveString;
 
 	@BeforeMethod(groups= {"ut"})
 	public void init(final ITestContext testNGCtx) {
