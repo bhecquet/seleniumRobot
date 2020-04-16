@@ -191,8 +191,8 @@ Snapshots
 | Param name       			| Default 	| Description  |
 | -------------------------	| ------- 	| ------------ |
 | captureSnapshot 			| true 		| Capture page snapshots. Captures are done only when a new page is opened |
-| snapshotTopCropping		| 0			| number of pixel that will be cropped from the top when capturing snapshot. This only applies to snapshots done with several captures (like from chrome) when a portion of the GUI is fixed when scrolling |
-| snapshotBottomCropping	| 0			| same as snapshotTopCropping for bottom cropping |
+| snapshotTopCropping		| null			| number of pixel that will be cropped from the top when capturing snapshot. This only applies to snapshots done with several captures (like from chrome) when a portion of the GUI is fixed when scrolling. Default value 'null' means 'automatic'. SeleniumRobot will detect fixed headers and footers and crop them. If an integer value is given, we crop the requested pixels. '0' will crop nothing |
+| snapshotBottomCropping	| null			| same as snapshotTopCropping for bottom cropping |
 
 #### Deprecated ####
 
