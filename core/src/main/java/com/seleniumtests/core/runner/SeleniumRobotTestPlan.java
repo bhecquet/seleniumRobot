@@ -167,6 +167,15 @@ public class SeleniumRobotTestPlan {
     }
     
     /**
+     * execute command
+     * @param program			name of the program
+     * @param args				array of arguments to give to program
+     */
+    public String executeCommand(String program, String ... args) {
+    	return TestTasks.executeCommand(program, args);
+    }
+    
+    /**
      * returns the robot configuration
      * @return
      */
