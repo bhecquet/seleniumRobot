@@ -117,7 +117,7 @@ public class ConnectorsTest extends MockitoTest {
 	protected HttpRequestWithBody updateVariableRequest2;
 
 	@BeforeMethod(groups={"ut", "it"})  
-	public void beforeMethod(final Method method, final ITestContext testNGCtx, final ITestResult testResult) throws Exception {
+	public void initMocks(final Method method, final ITestContext testNGCtx, final ITestResult testResult) throws Exception {
 		PowerMockito.mockStatic(Unirest.class);
 	}
 	
