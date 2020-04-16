@@ -18,8 +18,8 @@
 package com.seleniumtests.ut.core;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
@@ -30,6 +30,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
 
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.openqa.selenium.remote.SessionId;
 import org.powermock.api.mockito.PowerMockito;
@@ -55,13 +56,13 @@ import com.seleniumtests.core.TestVariable;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.driver.WebUIDriver;
-import com.seleniumtests.reporter.logger.TestLogging;
+import com.seleniumtests.util.osutility.OSCommand;
 import com.seleniumtests.util.osutility.OSUtilityFactory;
 import com.seleniumtests.util.osutility.OSUtilityWindows;
 
 import net.lightbody.bmp.BrowserMobProxy;
 
-@PrepareForTest({SeleniumRobotVariableServerConnector.class, SeleniumTestsContext.class, OSUtilityFactory.class, SeleniumGridConnectorFactory.class, WebUIDriver.class})
+@PrepareForTest({SeleniumRobotVariableServerConnector.class, OSCommand.class, SeleniumTestsContext.class, OSUtilityFactory.class, SeleniumGridConnectorFactory.class, WebUIDriver.class})
 public class TestTestTasks extends MockitoTest {
 
 	@Mock
@@ -80,6 +81,7 @@ public class TestTestTasks extends MockitoTest {
 	public void init() {
 
 		PowerMockito.mockStatic(OSUtilityFactory.class);
+		PowerMockito.mockStatic(OSCommand.class);
 		PowerMockito.when(OSUtilityFactory.getInstance()).thenReturn(osUtility);
 		
 		when(osUtility.getProgramExtension()).thenReturn(".exe");
@@ -473,6 +475,100 @@ public class TestTestTasks extends MockitoTest {
 			System.setProperty(SeleniumTestsContext.WEB_DRIVER_GRID, "http://saucelabs:4444/hub/wd");
 			initThreadContext(testNGCtx);
 			TestTasks.getProcessList("some_process");
+			
+		} finally {
+			System.clearProperty(SeleniumTestsContext.RUN_MODE);
+			System.clearProperty(SeleniumTestsContext.PLATFORM);
+			System.clearProperty(SeleniumTestsContext.WEB_DRIVER_GRID);
+		}
+	}
+	
+	
+	@Test(groups= {"ut"})
+	public void testExecuteCommandLocal(final ITestContext testNGCtx) {
+		try {
+			System.setProperty(SeleniumTestsContext.RUN_MODE, "local");
+			PowerMockito.when(OSCommand.executeCommandAndWait(ArgumentMatchers.any(String[].class))).thenReturn("hello guys");
+			initThreadContext(testNGCtx);
+			String response = TestTasks.executeCommand("echo", "hello");
+			Assert.assertEquals(response, "hello guys");
+			
+			
+		} finally {
+			System.clearProperty(SeleniumTestsContext.RUN_MODE);
+		}
+	}
+	
+	@Test(groups= {"ut"})
+	public void testExecuteCommandGrid(final ITestContext testNGCtx) {
+		SeleniumGridConnector gridConnector = spy(new SeleniumRobotGridConnector("http://localhost:4444/hub/wd"));
+		doReturn("hello guys").when(gridConnector).executeCommand("echo", "hello");
+		
+		// grid connector is in use only if session Id exists
+		doReturn(new SessionId("1234")).when(gridConnector).getSessionId();
+		
+		PowerMockito.mockStatic(SeleniumGridConnectorFactory.class);
+		PowerMockito.when(SeleniumGridConnectorFactory.getInstances(Arrays.asList("http://localhost:4444/hub/wd"))).thenReturn(Arrays.asList(gridConnector));
+		
+		try {
+			System.setProperty(SeleniumTestsContext.RUN_MODE, "grid");
+			System.setProperty(SeleniumTestsContext.WEB_DRIVER_GRID, "http://localhost:4444/hub/wd");
+			initThreadContext(testNGCtx);
+			
+			SeleniumTestsContextManager.getThreadContext().getSeleniumGridConnectors();
+			String response = TestTasks.executeCommand("echo", "hello");
+			Assert.assertEquals(response, "hello guys");
+			
+		} finally {
+			System.clearProperty(SeleniumTestsContext.RUN_MODE);
+			System.clearProperty(SeleniumTestsContext.WEB_DRIVER_GRID);
+		}
+	}
+	
+	/**
+	 * Test when the grid connector is not initialized
+	 * When grid connector does not return any sessionId, it's not active
+	 * @param testNGCtx
+	 */
+	@Test(groups= {"ut"}, expectedExceptions=ScenarioException.class)
+	public void testExecuteCommandNotUsed(final ITestContext testNGCtx) {
+		SeleniumGridConnector gridConnector = spy(new SeleniumRobotGridConnector("http://localhost:4444/hub/wd"));
+		doReturn("hello guys").when(gridConnector).executeCommand("echo", "hello");
+		
+		PowerMockito.mockStatic(SeleniumGridConnectorFactory.class);
+		PowerMockito.when(SeleniumGridConnectorFactory.getInstances(Arrays.asList("http://localhost:4444/hub/wd"))).thenReturn(Arrays.asList(gridConnector));
+		
+		try {
+			System.setProperty(SeleniumTestsContext.RUN_MODE, "grid");
+			System.setProperty(SeleniumTestsContext.WEB_DRIVER_GRID, "http://localhost:4444/hub/wd");
+			initThreadContext(testNGCtx);
+			
+			SeleniumTestsContextManager.getThreadContext().getSeleniumGridConnectors();
+			TestTasks.executeCommand("echo", "hello");
+			
+		} finally {
+			System.clearProperty(SeleniumTestsContext.RUN_MODE);
+			System.clearProperty(SeleniumTestsContext.WEB_DRIVER_GRID);
+		}
+	}
+	
+	/**
+	 * Test kill process is not called when not using local or grid mode
+	 * @param testNGCtx
+	 */
+	@Test(groups= {"ut"}, expectedExceptions=ScenarioException.class)
+	public void testExecuteCommandOtherRunMode(final ITestContext testNGCtx) {
+		SeleniumGridConnector gridConnector = spy(new SeleniumRobotGridConnector("http://saucelabs:4444/hub/wd"));
+		
+		PowerMockito.mockStatic(SeleniumGridConnectorFactory.class);
+		PowerMockito.when(SeleniumGridConnectorFactory.getInstances(Arrays.asList("http://saucelabs:4444/hub/wd"))).thenReturn(Arrays.asList(gridConnector));
+		
+		try {
+			System.setProperty(SeleniumTestsContext.RUN_MODE, "saucelabs");
+			System.setProperty(SeleniumTestsContext.PLATFORM, "windows");
+			System.setProperty(SeleniumTestsContext.WEB_DRIVER_GRID, "http://saucelabs:4444/hub/wd");
+			initThreadContext(testNGCtx);
+			TestTasks.executeCommand("echo", "hello");
 			
 		} finally {
 			System.clearProperty(SeleniumTestsContext.RUN_MODE);

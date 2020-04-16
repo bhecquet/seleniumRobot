@@ -86,6 +86,16 @@ public class SeleniumGridConnector {
 	public void killProcess(String processName) {
 		logger.warn("kill is only available with seleniumRobot grid");
 	}
+	
+	/**
+	 * Execute command
+	 * @param program	name of the program
+	 * @param args		arguments of the program
+	 */
+	public String executeCommand(String program, String ... args) {
+		logger.warn("executeCommand is only available with seleniumRobot grid");
+		return "";
+	}
 
 	/**
 	 * Upload a file to a browser uplpoad window

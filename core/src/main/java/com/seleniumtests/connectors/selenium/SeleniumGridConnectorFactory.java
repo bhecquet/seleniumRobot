@@ -40,22 +40,14 @@ import com.seleniumtests.util.logging.SeleniumRobotLogger;
  */
 public class SeleniumGridConnectorFactory {
 	
-	private static ThreadLocal<SeleniumGridConnector> seleniumGridConnector = new ThreadLocal<>();
 	public static final int DEFAULT_RETRY_TIMEOUT = 180; // timeout in seconds. 3 minutes to wait for grid hub to be there
 	private static int retryTimeout = DEFAULT_RETRY_TIMEOUT;
 	
-	protected static final Logger logger = SeleniumRobotLogger.getLogger(SeleniumGridConnector.class);
+	protected static final Logger logger = SeleniumRobotLogger.getLogger(SeleniumGridConnectorFactory.class);
 	
 	private SeleniumGridConnectorFactory() {
 		// nothing to do
 	}
-	
-//	public static SeleniumGridConnector getInstance() {
-//		if (seleniumGridConnector.get() == null) {
-//			throw new ConfigurationException("getInstance() should be called after getInstance(String url) has been called once");
-//		}
-//		return seleniumGridConnector.get();
-//	}
 
 	/**
 	 * Returns the list of available grid connectors
@@ -65,7 +57,7 @@ public class SeleniumGridConnectorFactory {
 	 * @param urls
 	 * @return
 	 */
-	public synchronized static List<SeleniumGridConnector> getInstances(List<String> urls) {
+	public static synchronized List<SeleniumGridConnector> getInstances(List<String> urls) {
 		
 		if (urls.isEmpty()) {
 			throw new ConfigurationException("cannot create grid, no address provided");
@@ -114,7 +106,6 @@ public class SeleniumGridConnectorFactory {
 				} catch (Exception ex) {
 					WaitHelper.waitForMilliSeconds(500);
 					currentException = ex;
-					continue;
 				}
 			}
 			

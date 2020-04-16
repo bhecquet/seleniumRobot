@@ -21,6 +21,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.openqa.selenium.WebDriver;
 import org.testng.Reporter;
 
@@ -36,6 +37,7 @@ import com.seleniumtests.driver.screenshots.ScreenshotUtil;
 import com.seleniumtests.driver.screenshots.SnapshotTarget;
 import com.seleniumtests.reporter.logger.TestStep;
 import com.seleniumtests.util.logging.ScenarioLogger;
+import com.seleniumtests.util.osutility.OSCommand;
 import com.seleniumtests.util.osutility.OSUtilityFactory;
 import com.seleniumtests.util.osutility.ProcessInfo;
 
@@ -61,6 +63,7 @@ public class TestTasks {
 	public static void killProcess(String processName) {
     	if (SeleniumTestsContextManager.getThreadContext().getRunMode() == DriverMode.LOCAL) {
     		OSUtilityFactory.getInstance().killProcessByName(processName, true);
+    		
     	} else if (SeleniumTestsContextManager.getThreadContext().getRunMode() == DriverMode.GRID) {
     		SeleniumGridConnector gridConnector = SeleniumTestsContextManager.getThreadContext().getSeleniumGridConnector();
     		if (gridConnector != null) {
@@ -68,6 +71,7 @@ public class TestTasks {
     		} else {
 				throw new ScenarioException("No grid connector active");
 			}
+    		
     	} else {
     		logger.error("killing a process is only supported in local and grid mode");
     	}
@@ -86,6 +90,7 @@ public class TestTasks {
 				.map(ProcessInfo::getPid)
 				.map(Integer::valueOf)
 				.collect(Collectors.toList());
+			
 		} else if (SeleniumTestsContextManager.getThreadContext().getRunMode() == DriverMode.GRID) {
 			SeleniumGridConnector gridConnector = SeleniumTestsContextManager.getThreadContext().getSeleniumGridConnector();
 			if (gridConnector != null) {
@@ -97,6 +102,32 @@ public class TestTasks {
 			throw new ScenarioException("killing a process is only supported in local and grid mode");
 		}
 	}
+
+    /**
+     * Execute a command
+     * If test is run locally, you can execute any command, limit is the rights given to the user
+     * If test is run through seleniumRobot grid, only commands allowed by grid will be allowed
+     * @param program
+     * @param args
+     */
+    public static String executeCommand(String program, String ... args) {
+    	if (SeleniumTestsContextManager.getThreadContext().getRunMode() == DriverMode.LOCAL) {
+    		String[] cmd = new String[] {program};
+    		ArrayUtils.addAll(cmd, args);
+    		return OSCommand.executeCommandAndWait(cmd);
+    		
+    	} else if (SeleniumTestsContextManager.getThreadContext().getRunMode() == DriverMode.GRID) {
+    		SeleniumGridConnector gridConnector = SeleniumTestsContextManager.getThreadContext().getSeleniumGridConnector();
+    		if (gridConnector != null) {
+    			return gridConnector.executeCommand(program, args);
+    		} else {
+				throw new ScenarioException("No grid connector active");
+			}
+    		
+    	} else {
+    		throw new ScenarioException("command execution only supported in local and grid mode");
+    	}
+    }
 	
 	/**
      * Method for creating or updating a variable on the seleniumRobot server ONLY. This will raise a ScenarioException if variables are get from
@@ -185,8 +216,6 @@ public class TestTasks {
     	}
     	return value.getValue();
     }
-    
-    
    
     
     /**
