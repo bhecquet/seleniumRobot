@@ -28,6 +28,7 @@ import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.doReturn;
 
 import java.io.File;
+import java.lang.reflect.Method;
 import java.util.Arrays;
 
 import org.json.JSONException;
@@ -49,6 +50,7 @@ import org.openqa.selenium.remote.SessionId;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.ITestContext;
+import org.testng.ITestResult;
 import org.testng.annotations.BeforeMethod;
 
 import com.mashape.unirest.http.HttpMethod;
@@ -114,9 +116,8 @@ public class ConnectorsTest extends MockitoTest {
 	protected HttpRequestWithBody updateVariableRequest;
 	protected HttpRequestWithBody updateVariableRequest2;
 
-
-	@BeforeMethod(groups= {"it"})
-	public void init(final ITestContext testNGCtx) {
+	@BeforeMethod(groups={"ut", "it"})  
+	public void beforeMethod(final Method method, final ITestContext testNGCtx, final ITestResult testResult) throws Exception {
 		PowerMockito.mockStatic(Unirest.class);
 	}
 	
