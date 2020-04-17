@@ -382,7 +382,7 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 		Assert.assertEquals(StringUtils.countMatches(mainReportContent, "TestReport.html"), 9);
 		
 		// test1Listener4 fails as expected
-		Assert.assertTrue(mainReportContent.matches(".*</i><a href\\='test1Listener4/TestReport\\.html' info=\"skipped\".*?>test1Listener4</a>.*"));
+		Assert.assertTrue(mainReportContent.matches(".*<a href\\='test1Listener4/TestReport\\.html' info=\"skipped\".*?>test1Listener4</a>.*"));
 
 		// issue #312: check that result files have been generated at least twice (one during test run and one at the end)
 		String logs = readSeleniumRobotLogFile().replace("\\", "/");
