@@ -26,7 +26,6 @@ import static org.powermock.api.mockito.PowerMockito.whenNew;
 import java.net.URL;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -37,8 +36,6 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.mockito.Mock;
 import org.openqa.selenium.By;
-import org.openqa.selenium.Capabilities;
-import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriver.Options;
 import org.openqa.selenium.WebDriver.Timeouts;
@@ -47,7 +44,6 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
 import org.testng.SkipException;
@@ -55,7 +51,6 @@ import org.testng.annotations.AfterMethod;
 import org.testng.annotations.Test;
 import org.testng.xml.XmlSuite.ParallelMode;
 
-import com.google.common.collect.Maps;
 import com.seleniumtests.GenericDriverTest;
 import com.seleniumtests.browserfactory.AppiumDriverFactory;
 import com.seleniumtests.browserfactory.AppiumLauncherFactory;
@@ -81,7 +76,6 @@ import com.seleniumtests.util.osutility.OSUtility;
 
 import io.appium.java_client.android.AndroidDriver;
 
-@PowerMockIgnore("javax.net.ssl.*")
 @PrepareForTest({AdbWrapper.class, AndroidDriver.class, MobileDeviceSelector.class, AppiumDriverFactory.class, AppiumLauncherFactory.class})
 public class TestWebUiDriver extends ReporterTest {
 	

@@ -23,7 +23,6 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.htmlunit.HtmlUnitDriver;
 import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
@@ -53,7 +52,6 @@ import com.seleniumtests.uipage.PageObject;
 import net.lightbody.bmp.BrowserMobProxy;
 
 @PrepareForTest({NLWebDriverFactory.class, CustomEventFiringWebDriver.class, SeleniumGridConnectorFactory.class, SeleniumGridDriverFactory.class, WebUIDriver.class, PageObject.class})
-@PowerMockIgnore("javax.net.ssl.*")
 public class TestWebUIDriver extends MockitoTest {
 	
 	@Mock

@@ -25,7 +25,6 @@ import java.io.IOException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.ClientProtocolException;
 import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
 import org.testng.ITestContext;
@@ -44,7 +43,6 @@ import com.seleniumtests.driver.WebUIDriverFactory;
 import com.seleniumtests.it.reporter.ReporterTest;
 
 @PrepareForTest({Unirest.class, WebUIDriverFactory.class, SeleniumGridDriverFactory.class})
-@PowerMockIgnore({"javax.net.ssl.*", "com.google.inject.*"})
 public class TestSeleniumGridDriverFactory extends ConnectorsTest {
 	
 	@BeforeMethod(groups={"it"})

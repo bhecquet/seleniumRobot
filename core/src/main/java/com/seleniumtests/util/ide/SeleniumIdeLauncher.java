@@ -1,10 +1,6 @@
 package com.seleniumtests.util.ide;
 
-import java.io.File;
 import java.io.FileNotFoundException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -13,7 +9,6 @@ import java.util.Map.Entry;
 import java.util.Random;
 
 import org.apache.log4j.Logger;
-import org.aspectj.weaver.loadtime.WeavingURLClassLoader;
 import org.testng.TestNG;
 import org.testng.xml.XmlClass;
 import org.testng.xml.XmlInclude;
@@ -25,7 +20,6 @@ import org.testng.xml.XmlTest;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import com.seleniumtests.core.SeleniumTestsContext;
-import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
 import net.openhft.compiler.CompilerUtils;

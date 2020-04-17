@@ -31,27 +31,21 @@ import java.util.List;
 import java.util.Map;
 
 import org.mockito.ArgumentMatchers;
-import org.mockito.Mock;
 import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
-import com.mashape.unirest.request.GetRequest;
-import com.mashape.unirest.request.HttpRequestWithBody;
 import com.seleniumtests.ConnectorsTest;
 import com.seleniumtests.connectors.selenium.SeleniumRobotVariableServerConnector;
 import com.seleniumtests.core.TestVariable;
 import com.seleniumtests.customexception.ConfigurationException;
 
 @PrepareForTest({Unirest.class})
-@PowerMockIgnore({"javax.net.ssl.*", "com.google.inject.*"})
 public class TestSeleniumRobotVariableServerConnector extends ConnectorsTest {
 	
 

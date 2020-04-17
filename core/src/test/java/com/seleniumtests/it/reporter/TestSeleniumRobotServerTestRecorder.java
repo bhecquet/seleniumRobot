@@ -35,7 +35,6 @@ import static org.mockito.Mockito.when;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -50,7 +49,6 @@ import com.seleniumtests.reporter.reporters.CommonReporter;
 import com.seleniumtests.reporter.reporters.SeleniumRobotServerTestRecorder;
 
 @PrepareForTest({SeleniumRobotSnapshotServerConnector.class, CommonReporter.class, SeleniumRobotVariableServerConnector.class, SeleniumTestsContext.class})
-@PowerMockIgnore({"javax.net.ssl.*", "com.google.inject.*"})
 public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 	
 	private SeleniumRobotServerTestRecorder reporter;

@@ -31,7 +31,7 @@ import net.openhft.compiler.CompilerUtils;
  * 
  *
  */
-public class TestSeleniumIdeLauncher extends ReporterTest {
+public class TestSeleniumIdeLauncher {
 	
 	private static final Logger logger = SeleniumRobotLogger.getLogger(TestSeleniumIdeLauncher.class);
 	private WebServer server;
@@ -82,13 +82,13 @@ public class TestSeleniumIdeLauncher extends ReporterTest {
 			
 			new SeleniumIdeLauncher().executeScripts(Arrays.asList(suiteFile.getAbsolutePath()));
 			
-			String mainReportContent = readSummaryFile();
+			String mainReportContent = ReporterTest.readSummaryFile();
 			
 			// check that test is seen and OK
-			Assert.assertTrue(mainReportContent.matches(".*<i class=\"fa fa-circle circleSuccess\"></i><a href='mainPage/TestReport.html' .*?>mainPage</a>.*"));
+			Assert.assertTrue(mainReportContent.matches(".*<a href='mainPage/TestReport.html' info=\"ok\" .*?>mainPage</a>.*"));
 			
 			// check that detailed result contains the "hello" written in test
-			String detailedReportContent1 = readTestMethodResultFile("mainPage");
+			String detailedReportContent1 = ReporterTest.readTestMethodResultFile("mainPage");
 			Assert.assertTrue(detailedReportContent1.contains("Start method mainPage"));
 			
 			// check we have automatic steps corresponding to the single test method "jcommander"
@@ -134,13 +134,13 @@ public class TestSeleniumIdeLauncher extends ReporterTest {
 			
 			new SeleniumIdeLauncher().executeScripts(Arrays.asList(suiteFile.getAbsolutePath()));
 			
-			String mainReportContent = readSummaryFile();
+			String mainReportContent = ReporterTest.readSummaryFile();
 			
 			// check that test is seen and OK
-			Assert.assertTrue(mainReportContent.matches(".*<i class=\"fa fa-circle circleSuccess\"></i><a href='mainPage/TestReport.html' .*?>mainPage</a>.*"));
+			Assert.assertTrue(mainReportContent.matches(".*<a href='mainPage/TestReport.html' info=\"ok\" .*?>mainPage</a>.*"));
 			
 			// check that detailed result contains the "hello" written in test
-			String detailedReportContent1 = readTestMethodResultFile("mainPage");
+			String detailedReportContent1 = ReporterTest.readTestMethodResultFile("mainPage");
 			
 			// manual step is present with details
 			Assert.assertFalse(detailedReportContent1.contains("<li>click on HtmlElement , by={By.id: image} </li>")); // not there because created before the first step
@@ -185,13 +185,13 @@ public class TestSeleniumIdeLauncher extends ReporterTest {
 			
 			new SeleniumIdeLauncher().executeGeneratedClasses(clss);
 			
-			String mainReportContent = readSummaryFile();
+			String mainReportContent = ReporterTest.readSummaryFile();
 			
 			// check that test is seen and OK
-			Assert.assertTrue(mainReportContent.matches(".*<i class=\"fa fa-circle circleSuccess\"></i><a href='test/TestReport.html' .*?>test</a>.*"));
+			Assert.assertTrue(mainReportContent.matches(".*<a href='test/TestReport.html' info=\"ok\" .*?>test</a>.*"));
 			
 			// check that detailed result contains the "hello" written in test
-			String detailedReportContent1 = readTestMethodResultFile("test");
+			String detailedReportContent1 = ReporterTest.readTestMethodResultFile("test");
 			Assert.assertTrue(detailedReportContent1.contains("hello"));
 		} finally {
 			SeleniumTestsContextManager.getThreadContext().setSoftAssertEnabled(false);

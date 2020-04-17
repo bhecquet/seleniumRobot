@@ -23,7 +23,6 @@ import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
@@ -42,7 +41,6 @@ import com.seleniumtests.driver.DriverConfig;
 import com.seleniumtests.driver.TestType;
 import com.seleniumtests.util.logging.DebugMode;
 
-@PowerMockIgnore("javax.net.ssl.*")
 @PrepareForTest({SeleniumGridDriverFactory.class})
 public class TestSeleniumGridDriverFactory extends MockitoTest {
 

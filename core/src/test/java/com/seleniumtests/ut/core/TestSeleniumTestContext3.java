@@ -22,9 +22,9 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.times;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -33,7 +33,6 @@ import java.util.Map;
 import org.mockito.Mock;
 import org.openqa.selenium.remote.SessionId;
 import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
 import org.testng.ITestContext;
@@ -44,7 +43,6 @@ import org.testng.xml.XmlTest;
 import com.mashape.unirest.http.Unirest;
 import com.seleniumtests.ConnectorsTest;
 import com.seleniumtests.GenericTest;
-import com.seleniumtests.MockitoTest;
 import com.seleniumtests.connectors.selenium.SeleniumGridConnector;
 import com.seleniumtests.connectors.selenium.SeleniumGridConnectorFactory;
 import com.seleniumtests.connectors.selenium.SeleniumRobotVariableServerConnector;
@@ -62,7 +60,6 @@ import com.seleniumtests.driver.WebUIDriver;
  *
  */
 @PrepareForTest({SeleniumRobotVariableServerConnector.class, SeleniumGridConnectorFactory.class, SeleniumTestsContext.class})
-@PowerMockIgnore("javax.net.ssl.*")
 public class TestSeleniumTestContext3 extends ConnectorsTest {
 	
 	@Mock
