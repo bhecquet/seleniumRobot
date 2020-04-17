@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.mockito.MockitoAnnotations;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.modules.testng.PowerMockTestCase;
 import org.testng.ITestContext;
 import org.testng.ITestResult;
@@ -42,6 +43,7 @@ import com.seleniumtests.reporter.logger.TestLogging;
  *
  */
 
+@PowerMockIgnore({"javax.net.ssl.*", "com.google.inject.*", "javax.imageio.*"})
 public class MockitoTest  extends PowerMockTestCase {
 
 	protected static final String SERVER_URL = "http://localhost:4321";

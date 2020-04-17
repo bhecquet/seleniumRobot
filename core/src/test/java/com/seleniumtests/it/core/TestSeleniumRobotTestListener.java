@@ -38,7 +38,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.json.JSONObject;
 import org.mockito.Mock;
 import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
 import org.testng.ITestContext;
@@ -59,7 +58,6 @@ import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.it.reporter.ReporterTest;
 
 @PrepareForTest({SeleniumRobotVariableServerConnector.class, SeleniumGridConnectorFactory.class, SeleniumTestsContext.class, WebUIDriver.class})
-@PowerMockIgnore({"javax.net.ssl.*", "com.google.inject.*"})
 public class TestSeleniumRobotTestListener extends ReporterTest {
 
 	private static final String DRIVER_BLOCKED_MSG = "Driver creation forbidden before @BeforeMethod and after @AfterMethod execution";
@@ -89,7 +87,7 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 		Assert.assertTrue(mainReportContent.contains(">testAndSubActions</a>"));
 		
 		// all 3 methods are OK
-		Assert.assertEquals(StringUtils.countMatches(mainReportContent, "<i class=\"fa fa-circle circleSuccess\">"), 3);
+		Assert.assertEquals(StringUtils.countMatches(mainReportContent, "info=\"ok\""), 3);
 	}
 	
 	/**
@@ -223,7 +221,7 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 			String mainReportContent = readSummaryFile();
 			
 			// check that test is marked as KO because it executed (https://github.com/cbeust/testng/issues/2148)
-			Assert.assertTrue(mainReportContent.matches(".*<i class=\"fa fa-circle circleFailed\"></i><a href='testInErrorWithAfterMethodError/TestReport.html' .*?>testInErrorWithAfterMethodError</a>.*"));
+			Assert.assertTrue(mainReportContent.matches(".*<a href='testInErrorWithAfterMethodError/TestReport.html' info=\"ko\" .*?>testInErrorWithAfterMethodError</a>.*"));
 			
 			// check test is retried
 			String logs = readSeleniumRobotLogFile();
@@ -250,9 +248,9 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 		String mainReportContent = readSummaryFile();
 		
 		// check that all tests are OK and present into summary file. If test is KO (issue #115), the same context is taken for subsequent test method calls
-		Assert.assertTrue(mainReportContent.matches(".*<i class=\"fa fa-circle circleSuccess\"></i><a href='testMethod/TestReport.html' .*?>testMethod</a>.*"));
-		Assert.assertTrue(mainReportContent.matches(".*<i class=\"fa fa-circle circleSuccess\"></i><a href='testMethod-1/TestReport.html' .*?>testMethod-1</a>.*"));
-		Assert.assertTrue(mainReportContent.matches(".*<i class=\"fa fa-circle circleSuccess\"></i><a href='testMethod-2/TestReport.html' .*?>testMethod-2</a>.*"));
+		Assert.assertTrue(mainReportContent.matches(".*<a href='testMethod/TestReport.html' info=\"ok\" .*?>testMethod</a>.*"));
+		Assert.assertTrue(mainReportContent.matches(".*<a href='testMethod-1/TestReport.html' info=\"ok\" .*?>testMethod-1</a>.*"));
+		Assert.assertTrue(mainReportContent.matches(".*<a href='testMethod-2/TestReport.html' info=\"ok\" .*?>testMethod-2</a>.*"));
 
 		// check each result file to see if it exists and if it only contains information about this method context (log of this method only)
 		String detailedReportContent1 = readTestMethodResultFile("testMethod");
@@ -325,12 +323,12 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 		executeSubTest2(ParallelMode.TESTS);
 		
 		String mainReportContent = readSummaryFile();
-		Assert.assertEquals(StringUtils.countMatches(mainReportContent, "class=\"fa fa-circle circleSuccess\">"), 
+		Assert.assertEquals(StringUtils.countMatches(mainReportContent, "info=\"ok\""), 
 							StringUtils.countMatches(mainReportContent, "TestReport.html") - 1);
 		Assert.assertEquals(StringUtils.countMatches(mainReportContent, "TestReport.html"), 9);
 
 		// test1Listener4 fails as expected
-		Assert.assertTrue(mainReportContent.matches(".*<i class\\=\"fa fa-circle circleSkipped\"></i><a href\\='test1Listener4/TestReport\\.html'.*?>test1Listener4</a>.*"));
+		Assert.assertTrue(mainReportContent.matches(".*<a href\\='test1Listener4/TestReport\\.html' info=\"skipped\".*?>test1Listener4</a>.*"));
 
 		// issue #312: check that result files have been generated at least twice (one during test run and one at the end)
 		String logs = readSeleniumRobotLogFile().replace("\\", "/");
@@ -352,12 +350,12 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 		executeSubTest2(ParallelMode.CLASSES);
 		
 		String mainReportContent = readSummaryFile();
-		Assert.assertEquals(StringUtils.countMatches(mainReportContent, "class=\"fa fa-circle circleSuccess\">"), 
+		Assert.assertEquals(StringUtils.countMatches(mainReportContent, "info=\"ok\""), 
 				StringUtils.countMatches(mainReportContent, "TestReport.html") - 1);
 		Assert.assertEquals(StringUtils.countMatches(mainReportContent, "TestReport.html"), 9);
 
 		// test1Listener4 fails as expected
-		Assert.assertTrue(mainReportContent.matches(".*<i class\\=\"fa fa-circle circleSkipped\"></i><a href\\='test1Listener4/TestReport\\.html'.*?>test1Listener4</a>.*"));
+		Assert.assertTrue(mainReportContent.matches(".*<a href\\='test1Listener4/TestReport\\.html' info=\"skipped\".*?>test1Listener4</a>.*"));
 		
 		// issue #312: check that result files have been generated once
 		String logs = readSeleniumRobotLogFile().replace("\\", "/");
@@ -379,12 +377,12 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 		executeSubTest2(ParallelMode.METHODS);
 		
 		String mainReportContent = readSummaryFile();
-		Assert.assertEquals(StringUtils.countMatches(mainReportContent, "class=\"fa fa-circle circleSuccess\">"), 
+		Assert.assertEquals(StringUtils.countMatches(mainReportContent, "info=\"ok\""), 
 				StringUtils.countMatches(mainReportContent, "TestReport.html") - 1);
 		Assert.assertEquals(StringUtils.countMatches(mainReportContent, "TestReport.html"), 9);
 		
 		// test1Listener4 fails as expected
-		Assert.assertTrue(mainReportContent.matches(".*<i class\\=\"fa fa-circle circleSkipped\"></i><a href\\='test1Listener4/TestReport\\.html'.*?>test1Listener4</a>.*"));
+		Assert.assertTrue(mainReportContent.matches(".*</i><a href\\='test1Listener4/TestReport\\.html' info=\"skipped\".*?>test1Listener4</a>.*"));
 
 		// issue #312: check that result files have been generated at least twice (one during test run and one at the end)
 		String logs = readSeleniumRobotLogFile().replace("\\", "/");

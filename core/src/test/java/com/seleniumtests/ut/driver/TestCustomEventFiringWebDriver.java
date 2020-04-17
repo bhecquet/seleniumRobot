@@ -22,8 +22,8 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -56,7 +56,6 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.SessionId;
 import org.openqa.selenium.support.events.EventFiringWebDriver;
 import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
@@ -75,7 +74,6 @@ import com.seleniumtests.util.osutility.OSUtility;
 import com.seleniumtests.util.osutility.OSUtilityFactory;
 
 @PrepareForTest({OSUtilityFactory.class, CustomEventFiringWebDriver.class})
-@PowerMockIgnore("javax.imageio.*")
 public class TestCustomEventFiringWebDriver extends MockitoTest {
 
 
