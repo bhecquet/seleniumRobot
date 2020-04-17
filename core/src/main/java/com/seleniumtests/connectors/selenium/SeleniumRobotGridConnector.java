@@ -337,7 +337,8 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 		logger.info("execute program: " + program);
 		try {
 			HttpRequestWithBody req = Unirest.post(String.format("%s%s", nodeUrl, NODE_TASK_SERVLET))
-				.queryString("action", "command");
+				.queryString("action", "command")
+				.queryString("name", program);
 			
 			int i = 0;
 			for (String arg: args) {

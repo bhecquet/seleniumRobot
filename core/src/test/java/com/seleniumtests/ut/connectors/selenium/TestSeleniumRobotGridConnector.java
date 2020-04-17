@@ -45,7 +45,9 @@ import org.testng.annotations.Test;
 
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
+import com.mashape.unirest.request.BaseRequest;
 import com.mashape.unirest.request.GetRequest;
+import com.mashape.unirest.request.HttpRequestWithBody;
 import com.seleniumtests.ConnectorsTest;
 import com.seleniumtests.connectors.selenium.SeleniumGridConnector;
 import com.seleniumtests.connectors.selenium.SeleniumRobotGridConnector;
@@ -195,6 +197,34 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 		connector.getProcessList("myProcess");
 	}
 	
+
+	@Test(groups={"ut"})
+	public void testExecuteCommand() throws UnsupportedOperationException, IOException, UnirestException {
+		
+		HttpRequestWithBody req = (HttpRequestWithBody)createServerMock("POST", SeleniumRobotGridConnector.NODE_TASK_SERVLET, 200, "foo");	
+		
+		SeleniumGridConnector connector = new SeleniumRobotGridConnector("http://localhost:4444/wd/hub");
+		connector.setNodeUrl("http://localhost:4321");
+		Assert.assertEquals(connector.executeCommand("myProcess", "arg1"), "foo");
+		verify(req).queryString("arg0", "arg1");
+		verify(req).queryString("name", "myProcess");
+		verify(req).queryString("action", "command");
+	}
+	/**
+	 * Test executing command when node is still unknown (driver not initialized). In this case, ScenarioException must be thrown
+	 * @throws UnsupportedOperationException
+	 * @throws IOException
+	 * @throws UnirestException
+	 */
+	@Test(groups={"ut"}, expectedExceptions=ScenarioException.class)
+	public void testExecuteCommandWithoutNodeUrl() throws UnsupportedOperationException, IOException, UnirestException {
+		
+		createServerMock("POST", SeleniumRobotGridConnector.NODE_TASK_SERVLET, 200, "foo");	
+		
+		SeleniumGridConnector connector = new SeleniumRobotGridConnector("http://localhost:4444/wd/hub");
+		connector.executeCommand("myProcess", "arg1");
+	}
+	
 	@Test(groups={"ut"})
 	public void testIsGridActiveWithGridNotPresent() throws ClientProtocolException, IOException, UnirestException {
 		
@@ -213,6 +243,7 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 		
 		Assert.assertFalse(connector.isGridActive());
 	}
+	
 	
 	/**
 	 * Check that we get true if the grid is ACTIVE and at least one node is present
