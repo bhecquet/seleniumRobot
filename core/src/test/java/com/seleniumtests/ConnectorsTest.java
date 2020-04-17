@@ -25,6 +25,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.doReturn;
 
 import java.io.File;
 import java.lang.reflect.Method;
@@ -190,6 +191,7 @@ public class ConnectorsTest extends MockitoTest {
 				when(requestMultipartBody.field(anyString(), anyLong())).thenReturn(requestMultipartBody);
 				when(requestMultipartBody.field(anyString(), any(File.class))).thenReturn(requestMultipartBody);
 				when(requestMultipartBody.asString()).thenReturn(response);
+				doReturn(response).when(postRequest).asString();
 				
 				if ("request".equals(responseType)) {
 					return postRequest;
