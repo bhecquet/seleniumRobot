@@ -347,7 +347,10 @@ public class PageObject extends BasePage implements IPage {
     public void capturePageSnapshot(String snapshotName, SnapshotCheckType checkSnapshot) {
     	
     	ScreenShot screenShot = screenshotUtil.capture(SnapshotTarget.PAGE, ScreenShot.class);
-
+    	
+    	// check SnapshotCheckType configuration is compatible with the snapshot
+    	checkSnapshot.check(SnapshotTarget.PAGE);
+    	
     	storeSnapshot(snapshotName, screenShot, checkSnapshot);
     }
     
@@ -376,7 +379,11 @@ public class PageObject extends BasePage implements IPage {
      */
     public void captureElementSnapshot(String snapshotName, WebElement element, SnapshotCheckType checkSnapshot) {
 
-    	ScreenShot screenShot = screenshotUtil.capture(new SnapshotTarget(element), ScreenShot.class);
+    	SnapshotTarget snapshotTarget = new SnapshotTarget(element);
+    	ScreenShot screenShot = screenshotUtil.capture(snapshotTarget, ScreenShot.class);
+
+    	// check SnapshotCheckType configuration is compatible with the snapshot
+    	checkSnapshot.check(snapshotTarget);
     	
     	storeSnapshot(snapshotName, screenShot, checkSnapshot);
     }
@@ -404,6 +411,7 @@ public class PageObject extends BasePage implements IPage {
     	if (snapshotName != null) {
     		screenShot.setTitle(snapshotName);
     	}
+    	
     	
     	logger.logScreenshot(screenShot, snapshotName, checkSnapshot);
     	
