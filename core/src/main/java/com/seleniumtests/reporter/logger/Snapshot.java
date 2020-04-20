@@ -160,11 +160,7 @@ public class Snapshot extends TestAction {
 	public Snapshot encode() {
 		return new Snapshot(screenshot, name, checkSnapshot);
 	}
-
-	public SnapshotCheckType isCheckSnapshot() {
-		return checkSnapshot;
-	}
-
+	
 	public SnapshotCheckType getCheckSnapshot() {
 		return checkSnapshot;
 	}

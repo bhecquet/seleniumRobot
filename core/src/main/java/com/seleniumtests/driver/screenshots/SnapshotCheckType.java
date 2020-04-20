@@ -19,6 +19,8 @@ import com.seleniumtests.util.logging.SeleniumRobotLogger;
  *
  */
 public class SnapshotCheckType {
+
+	// TODO: check without colors, check only part of the picture (exclusion zones defined directly in test)
 	protected static final Logger logger = SeleniumRobotLogger.getLogger(BasePage.class);
 	
 	private Control control;
@@ -46,11 +48,23 @@ public class SnapshotCheckType {
 	}
 	
 	public String getName() {
+		return control.name();
+	}
+	
+	/**
+	 * Says whether snasphots will be sent to seleniumRobot server or not.
+	 * @return
+	 */
+	public boolean recordSnapshotOnServer() {
 		if (control == Control.NONE) {
-			return "false";
+			return false;
 		} else {
-			return "true";
+			return true;
 		}
+	}
+	
+	private String rectangleToString(Rectangle rect) {
+		return String.format("Rectangle(%d, %d, %d, %d)", rect.x, rect.y, rect.width, rect.height);
 	}
 	
 	/**
@@ -86,7 +100,7 @@ public class SnapshotCheckType {
 							|| elementRectangle.y < targetRectangle.y
 							|| elementRectangle.x + elementRectangle.width > targetRectangle.x + targetRectangle.width
 							|| elementRectangle.y + elementRectangle.height > targetRectangle.y + targetRectangle.height) {
-						logger.warn(String.format("Element %s is not inside %s and won't be excluded", elementRectangle, targetRectangle));
+						logger.warn(String.format("Element %s is not inside %s and won't be excluded", rectangleToString(elementRectangle), rectangleToString(targetRectangle)));
 					
 					} else {
 						excludeElementsRect.add(elementRectangle);
@@ -116,6 +130,9 @@ public class SnapshotCheckType {
 		
 		return newCheck;
 	}
+
+	public List<Rectangle> getExcludeElementsRect() {
+		return excludeElementsRect;
+	}
 		
-	// TODO: check without colors, check only part of the picture (exclusion zones defined directly in test)
 }

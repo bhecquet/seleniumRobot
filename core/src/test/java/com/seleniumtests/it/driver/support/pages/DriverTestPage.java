@@ -24,6 +24,7 @@ import org.openqa.selenium.interactions.Actions;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.driver.BrowserType;
+import com.seleniumtests.driver.screenshots.SnapshotCheckType;
 import com.seleniumtests.uipage.ByC;
 import com.seleniumtests.uipage.PageObject;
 import com.seleniumtests.uipage.htmlelements.ButtonElement;
@@ -191,7 +192,7 @@ public class DriverTestPage extends PageObject {
     }
     
     public DriverTestPage _captureSnapshot(String snapshotName) {
-    	capturePageSnapshot(snapshotName);
+    	capturePageSnapshot(snapshotName, SnapshotCheckType.FULL.exclude(textElement));
     	return this;
     	
     }

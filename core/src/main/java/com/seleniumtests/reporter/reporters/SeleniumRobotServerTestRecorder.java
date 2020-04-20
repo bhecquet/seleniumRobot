@@ -25,6 +25,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.json.JSONObject;
+import org.openqa.selenium.Rectangle;
 import org.testng.IReporter;
 import org.testng.ITestContext;
 import org.testng.ITestResult;
@@ -165,13 +166,16 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 					// sends all snapshots that are flagged as comparable
 					for (Snapshot snapshot: testStep.getSnapshots()) {
 						
-						if (snapshot.isCheckSnapshot() == SnapshotCheckType.TRUE) {
+						if (snapshot.getCheckSnapshot().recordSnapshotOnServer()) {
 							if (snapshot.getName() == null || snapshot.getName().isEmpty()) {
 								logger.warn("Snapshot hasn't any name, it won't be sent to server");
 								continue;
 							}
 							
-							serverConnector.createSnapshot(snapshot, sessionId, testCaseInSessionId, stepResultId);
+							Integer snapshotId = serverConnector.createSnapshot(snapshot, sessionId, testCaseInSessionId, stepResultId);
+							for (Rectangle excludeZone: snapshot.getCheckSnapshot().getExcludeElementsRect()) {
+								serverConnector.createExcludeZones(excludeZone, snapshotId);
+							}
 						}
 					}
 				}

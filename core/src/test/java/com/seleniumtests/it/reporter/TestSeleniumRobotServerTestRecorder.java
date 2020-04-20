@@ -34,6 +34,7 @@ import static org.mockito.Mockito.when;
 
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.openqa.selenium.Rectangle;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
@@ -100,12 +101,58 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 			verify(serverConnector, times(3)).createTestStep(eq("step 1"), anyInt());
 			verify(serverConnector).createTestStep(eq("step 2"), anyInt());
 			verify(serverConnector).createSnapshot(any(Snapshot.class), anyInt(), anyInt(), anyInt()); // two snapshots but only once is sent because the other has no name
+			verify(serverConnector, never()).createExcludeZones(any(Rectangle.class), anyInt());
 			
 			String logs = readSeleniumRobotLogFile();
 			Assert.assertTrue(logs.contains("Snapshot hasn't any name, it won't be sent to server")); // one snapshot has no name, error message is displayed
 			
 			// check that screenshot information are removed from logs (the pattern "Output: ...")
 			verify(serverConnector).recordStepResult(eq(false), contains("step 1.3: open page"), eq(1230L), anyInt(), anyInt(), anyInt());
+		} finally {
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE);
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL);
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT);
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_RECORD_RESULTS);
+		}
+	}
+	
+	/**
+	 * Test that focuses on snapshots: it's sent to server, exclusion zones are also sent
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testReportGenerationWithSnapshots() throws Exception {
+		
+		try {
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE, "true");
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT, "true");
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_RECORD_RESULTS, "true");
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL, "http://localhost:1234");
+			
+			PowerMockito.whenNew(SeleniumRobotVariableServerConnector.class).withArguments(eq(true), eq("http://localhost:1234"), anyString(), eq(null)).thenReturn(variableServer);
+			when(variableServer.isAlive()).thenReturn(true);
+			
+			reporter = spy(new SeleniumRobotServerTestRecorder());
+			PowerMockito.mockStatic(CommonReporter.class, Mockito.CALLS_REAL_METHODS);
+			PowerMockito.when(CommonReporter.getInstance(SeleniumRobotServerTestRecorder.class)).thenReturn(reporter);
+			
+			when(reporter.getServerConnector()).thenReturn(serverConnector);
+			when(serverConnector.getActive()).thenReturn(true);
+			
+			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriverCustomSnapshot"});
+			
+			// check server has been called for all aspects of test (app, version, ...)
+			// they may be called for each test but server is responsible for uniqueness of the value
+			verify(serverConnector, atLeastOnce()).createSession(anyString());
+			
+			// issue #331: check all test cases are created, call MUST be done only once to avoid result to be recorded several times
+			verify(serverConnector).createTestCase("testDriverCustomSnapshot");
+			verify(serverConnector).addLogsToTestCaseInSession(anyInt(), anyString());
+			verify(serverConnector).createTestCaseInSession(anyInt(), anyInt()); 
+			verify(serverConnector).createTestStep(eq("_captureSnapshot with args: (my snapshot, )"), anyInt());
+			verify(serverConnector).createSnapshot(any(Snapshot.class), anyInt(), anyInt(), anyInt()); // 1 custom snapshot taken with name
+			verify(serverConnector).createExcludeZones(any(Rectangle.class), anyInt()); // one exclude zone created with that snapshot
+			
 		} finally {
 			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE);
 			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL);
