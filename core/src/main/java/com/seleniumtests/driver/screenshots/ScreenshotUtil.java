@@ -61,6 +61,9 @@ public class ScreenshotUtil {
     private String filename;
     private static final String SCREENSHOT_DIR = "screenshots/";
     private static final String HTML_DIR = "htmls/";
+    
+    @Deprecated
+    public enum Target {SCREEN, PAGE}
 	
 	public ScreenshotUtil() {
 		uiDriver = WebUIDriver.getWebUIDriver(false);
@@ -194,6 +197,15 @@ public class ScreenshotUtil {
         }
     }
     
+
+    private SnapshotTarget targetToSnapshotTarget(Target target) {
+    	if (target == Target.PAGE) {
+    		return SnapshotTarget.PAGE;
+    	} else {
+    		return SnapshotTarget.SCREEN;
+    	}
+    }
+    
     /**
      * Capture a picture only if SeleniumTestsContext.getCaptureSnapshot() allows it
      * @param target		which picture to take, screen or page.
@@ -202,6 +214,18 @@ public class ScreenshotUtil {
      */
     public <T extends Object> T capture(SnapshotTarget target, Class<T> exportClass) {
     	return capture(target, exportClass, false);
+    } 
+    
+    /**
+     * @deprecated use method with SnapshotTarget signature instead
+     * @param <T>
+     * @param target
+     * @param exportClass
+     * @return
+     */
+    @Deprecated
+    public <T extends Object> T capture(Target target, Class<T> exportClass) {
+    	return capture(targetToSnapshotTarget(target), exportClass);
     }
     
     /**
@@ -211,6 +235,7 @@ public class ScreenshotUtil {
      * @param force			force capture even if set to false in SeleniumTestContext. This allows PictureElement and ScreenZone to work
      * @return
      */
+    
     public <T extends Object> T capture(SnapshotTarget target, Class<T> exportClass, boolean force) {
     	try {
 			return capture(target, exportClass, false, force).get(0);
@@ -223,11 +248,32 @@ public class ScreenshotUtil {
 		}
     }
     
+    /**
+     * @deprecated use method with SnapshotTarget signature instead
+     * @param <T>
+     * @param target
+     * @param exportClass
+     * @param force
+     * @return
+     */
+    @Deprecated
+    public <T extends Object> T capture(Target target, Class<T> exportClass, boolean force) {
+    	return capture(targetToSnapshotTarget(target), exportClass, force);
+    }
+    
     private void removeAlert() {
     	try {
 	    	Alert alert = driver.switchTo().alert();
 			alert.dismiss();
     	} catch (Exception e) {}
+    }
+    
+    /**
+     * @deprecated use method with SnapshotTarget signature instead
+     */
+    @Deprecated
+    public <T extends Object> List<T> capture(Target target, Class<T> exportClass, boolean allWindows, boolean force) {
+    	return capture(targetToSnapshotTarget(target), exportClass, allWindows, force);
     }
     
     /**
@@ -238,6 +284,7 @@ public class ScreenshotUtil {
      * @param force			force capture even if set to false in SeleniumTestContext. This allows PictureElement and ScreenZone to work
      * @return
      */
+    
     public <T extends Object> List<T> capture(SnapshotTarget target, Class<T> exportClass, boolean allWindows, boolean force) {
     	
     	if (!force && (SeleniumTestsContextManager.getThreadContext() == null 
