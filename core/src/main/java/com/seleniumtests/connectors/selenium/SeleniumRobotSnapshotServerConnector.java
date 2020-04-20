@@ -28,6 +28,7 @@ import java.util.stream.Collectors;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.openqa.selenium.Rectangle;
 
 import com.mashape.unirest.http.exceptions.UnirestException;
 import com.mashape.unirest.request.body.MultipartBody;
@@ -44,6 +45,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 	public static final String TESTCASEINSESSION_API_URL = "/snapshot/api/testcaseinsession/";
 	public static final String TESTSTEP_API_URL = "/snapshot/api/teststep/";
 	public static final String STEPRESULT_API_URL = "/snapshot/api/stepresult/";
+	public static final String EXCLUDE_API_URL = "/snapshot/api/exclude/";
 	public static final String SNAPSHOT_API_URL = "/snapshot/upload/image";
 	private String sessionUUID;
 	private static SeleniumRobotSnapshotServerConnector snapshotConnector;
@@ -191,9 +193,37 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 					.field("name", snapshot.getName())
 					.field("compare", snapshot.getCheckSnapshot().getName())
 					);
-			return snapshotJson.getInt("id");
+			Integer snapshotId = snapshotJson.getInt("id");
+			
+			
+			return snapshotId;
 		} catch (UnirestException | JSONException e) {
 			throw new SeleniumRobotServerException("cannot create test snapshot", e);
+		}
+	}
+	/**
+	 * Send exclude zones, stored in snapshot to the server
+	 */
+	public Integer createExcludeZones(Rectangle excludeZone, Integer snapshotId) {
+		if (!active) {
+			return null;
+		}
+		if (snapshotId == null) {
+			throw new ConfigurationException("snapshotId must be provided");
+		}
+
+		try {
+			JSONObject excludeJson = getJSonResponse(buildPostRequest(url + EXCLUDE_API_URL)
+					.field("snapshot", snapshotId)
+					.field("x", excludeZone.x)
+					.field("y", excludeZone.y)
+					.field("width", excludeZone.width)
+					.field("height", excludeZone.height)
+					);
+			return excludeJson.getInt("id");
+			
+		} catch (UnirestException | JSONException e) {
+			throw new SeleniumRobotServerException("cannot create exclude zone", e);
 		}
 	}
 	

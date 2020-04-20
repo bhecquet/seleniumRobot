@@ -27,6 +27,8 @@ import java.util.Arrays;
 
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
+import org.openqa.selenium.Rectangle;
+import org.openqa.selenium.WebElement;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
@@ -44,6 +46,7 @@ import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.SeleniumRobotServerException;
 import com.seleniumtests.driver.screenshots.ScreenShot;
 import com.seleniumtests.driver.screenshots.SnapshotCheckType;
+import com.seleniumtests.driver.screenshots.SnapshotTarget;
 import com.seleniumtests.reporter.logger.Snapshot;
 
 @PrepareForTest({Unirest.class})
@@ -56,15 +59,22 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 	
 	@Mock
 	private ScreenShot screenshot;
+	
+	@Mock
+	private WebElement element;
 
 	@BeforeMethod(groups= {"ut"})
 	public void init(final ITestContext testNGCtx) {
 		initThreadContext(testNGCtx);
 		PowerMockito.mockStatic(Unirest.class);
 		
+		when(element.getRect()).thenReturn(new Rectangle(10,  11, 12, 13));
+		SnapshotCheckType snapshotCheckType = SnapshotCheckType.FULL.exclude(element);
+		snapshotCheckType.check(SnapshotTarget.PAGE);
+		
 		when(snapshot.getScreenshot()).thenReturn(screenshot);
 		when(snapshot.getName()).thenReturn("snapshot");
-		when(snapshot.getCheckSnapshot()).thenReturn(SnapshotCheckType.TRUE);
+		when(snapshot.getCheckSnapshot()).thenReturn(snapshotCheckType);
 		when(screenshot.getImagePath()).thenReturn("img.png");
 		when(screenshot.getFullImagePath()).thenReturn("/home/img.png");
 	}
@@ -522,6 +532,58 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 		Unirest.post(ArgumentMatchers.contains(SeleniumRobotSnapshotServerConnector.SNAPSHOT_API_URL));
 		
 		Assert.assertNull(snapshotId);
+	}
+	
+	@Test(groups= {"ut"})
+	public void testCreateExcludeZone() throws UnirestException {
+		SeleniumRobotSnapshotServerConnector connector = spy(configureMockedSnapshotServerConnection());
+		
+		Integer sessionId = connector.createSession("Session1");
+		Integer testCaseId = connector.createTestCase("Test 1");
+		Integer testCaseInSessionId = connector.createTestCaseInSession(sessionId, testCaseId);
+		Integer testStepId = connector.createTestStep("Step 1", testCaseInSessionId);
+		Integer stepResultId = connector.recordStepResult(true, "", 1, sessionId, testCaseInSessionId, testStepId);
+		Integer snapshotId = connector.createSnapshot(snapshot, sessionId, testCaseInSessionId, stepResultId);
+		int excludeZoneId = connector.createExcludeZones(new Rectangle(1, 1, 1, 1), snapshotId);
+		
+		// check prerequisites has been created
+		Assert.assertEquals(excludeZoneId, 18);
+	}
+	
+	
+	@Test(groups= {"ut"}, expectedExceptions=SeleniumRobotServerException.class)
+	public void testCreateExcludeZoneInError() throws UnirestException {
+		
+		SeleniumRobotSnapshotServerConnector connector = configureMockedSnapshotServerConnection();
+		BaseRequest req = createServerMock("POST", SeleniumRobotSnapshotServerConnector.EXCLUDE_API_URL, 200, "{'id': '18'}", "body");	
+		when(req.asString()).thenThrow(UnirestException.class);
+		
+		Integer sessionId = connector.createSession("Session1");
+		Integer testCaseId = connector.createTestCase("Test 1");
+		Integer testCaseInSessionId = connector.createTestCaseInSession(sessionId, testCaseId);
+		Integer testStepId = connector.createTestStep("Step 1", testCaseInSessionId);
+		Integer stepResultId = connector.recordStepResult(true, "", 1, sessionId, testCaseInSessionId, testStepId);
+		Integer snapshotId = connector.createSnapshot(snapshot, sessionId, testCaseInSessionId, stepResultId);
+		connector.createExcludeZones(new Rectangle(1, 1, 1, 1), snapshotId);
+	}
+	
+	@Test(groups= {"ut"}, expectedExceptions=ConfigurationException.class)
+	public void testCreateExcludeZoneNoSnapshotId() throws UnirestException {
+		
+		SeleniumRobotSnapshotServerConnector connector = configureMockedSnapshotServerConnection();
+
+		connector.createExcludeZones(new Rectangle(1, 1, 1, 1), null);
+	}
+	
+	@Test(groups= {"ut"})
+	public void testCreateExcludeZoneServerInactive() throws UnirestException {
+		SeleniumRobotSnapshotServerConnector connector = configureNotAliveConnection();
+		
+		Integer excludeZoneId = connector.createExcludeZones(new Rectangle(1, 1, 1, 1), 0);
+		PowerMockito.verifyStatic(Unirest.class, never());
+		Unirest.post(ArgumentMatchers.contains(SeleniumRobotSnapshotServerConnector.SNAPSHOT_API_URL));
+		
+		Assert.assertNull(excludeZoneId);
 	}
 	
 	// step result creation

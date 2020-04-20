@@ -87,14 +87,14 @@ public class StubTestClass extends StubParentClass {
 		screenshot.setHtmlSourcePath("htmls/" + tmpHtml.getName());
 		FileUtils.copyFile(tmpImg, new File(screenshot.getFullImagePath()));
 		FileUtils.copyFile(tmpHtml, new File(screenshot.getFullHtmlPath()));
-		step1.addSnapshot(new Snapshot(screenshot, "main", SnapshotCheckType.TRUE), 1, null);
+		step1.addSnapshot(new Snapshot(screenshot, "main", SnapshotCheckType.FULL), 1, null);
 		
 		ScreenShot screenshot2 = new ScreenShot();
 		screenshot2.setImagePath("screenshot/" + tmpImg.getName());
 		screenshot2.setHtmlSourcePath("htmls/" + tmpHtml.getName());
 		FileUtils.moveFile(tmpImg, new File(screenshot2.getFullImagePath()));
 		FileUtils.moveFile(tmpHtml, new File(screenshot2.getFullHtmlPath()));
-		step1.addSnapshot(new Snapshot(screenshot2, null, SnapshotCheckType.TRUE), 1, null);
+		step1.addSnapshot(new Snapshot(screenshot2, null, SnapshotCheckType.FULL), 1, null);
 		
 		step1.setActionException(new WebDriverException("driver exception"));
 		TestStep subStep1 = new TestStep("step 1.3: open page", Reporter.getCurrentTestResult(), new ArrayList<>(), maskPassword);
