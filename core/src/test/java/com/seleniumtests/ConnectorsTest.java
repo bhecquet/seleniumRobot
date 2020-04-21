@@ -22,6 +22,7 @@ import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.anyDouble;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
@@ -180,6 +181,7 @@ public class ConnectorsTest extends MockitoTest {
 				when(postRequest.field(anyString(), anyString())).thenReturn(requestMultipartBody);
 				when(postRequest.field(anyString(), anyInt())).thenReturn(requestMultipartBody);
 				when(postRequest.field(anyString(), anyLong())).thenReturn(requestMultipartBody);
+				when(postRequest.field(anyString(), anyDouble())).thenReturn(requestMultipartBody);
 				when(postRequest.field(anyString(), any(File.class))).thenReturn(requestMultipartBody);
 				when(postRequest.queryString(anyString(), anyString())).thenReturn(postRequest);
 				when(postRequest.queryString(anyString(), anyInt())).thenReturn(postRequest);
@@ -189,6 +191,7 @@ public class ConnectorsTest extends MockitoTest {
 				when(requestMultipartBody.field(anyString(), anyBoolean())).thenReturn(requestMultipartBody);
 				when(requestMultipartBody.field(anyString(), anyString())).thenReturn(requestMultipartBody);
 				when(requestMultipartBody.field(anyString(), anyLong())).thenReturn(requestMultipartBody);
+				when(requestMultipartBody.field(anyString(), anyDouble())).thenReturn(requestMultipartBody);
 				when(requestMultipartBody.field(anyString(), any(File.class))).thenReturn(requestMultipartBody);
 				when(requestMultipartBody.asString()).thenReturn(response);
 				doReturn(response).when(postRequest).asString();
