@@ -26,6 +26,7 @@ public class SnapshotCheckType {
 	private Control control;
 	private List<Rectangle> excludeElementsRect = new ArrayList<>();
 	private List<WebElement> excludeElements = new ArrayList<>();
+	private double errorThreshold = 0.0;
 	
 	public enum Control {
 		NONE,
@@ -113,9 +114,29 @@ public class SnapshotCheckType {
 		}
 	}
 	
-	public SnapshotCheckType withThreshold(int errorThreshold) {
-		// to be implemented
-		return new SnapshotCheckType(control);
+	/**
+	 * Percentage of pixels that can be different when comparing this snapshot to its reference.
+	 * ex: setting 2.3 means that with 2% of different pixels, 
+	 * @param errorThreshold
+	 * @return
+	 */
+	public SnapshotCheckType withThreshold(double errorThreshold) {
+		SnapshotCheckType newCheck = new SnapshotCheckType(control);
+		newCheck.errorThreshold = errorThreshold;
+		return newCheck;
+	}
+	
+	/**
+	 * Exclude the elements from comparison
+	 * @param element	list of WebElements
+	 * @return
+	 */
+	public SnapshotCheckType exclude(List<WebElement> elements) {
+		SnapshotCheckType newCheck = this;
+		for (WebElement element: elements) {
+			newCheck = newCheck.exclude(element);
+		}
+		return newCheck;
 	}
 	
 	/**
@@ -133,6 +154,10 @@ public class SnapshotCheckType {
 
 	public List<Rectangle> getExcludeElementsRect() {
 		return excludeElementsRect;
+	}
+
+	public double getErrorThreshold() {
+		return errorThreshold;
 	}
 		
 }
