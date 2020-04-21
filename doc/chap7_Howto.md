@@ -578,3 +578,17 @@ Parameter `snapshotComparisonResult` allow to control the way snapshot compariso
 
 ![](images/snapshot-result.png)
 
+Page and element snapshot can be customized to:
+
+- exclude some elements from the comparison, for example, when part of the page changes for every test (a date, a picture, ...)
+
+```java
+HtmlElement news = new HtmlElement("news", By.className("v4_news_block"));
+capturePageSnapshot("search", SnapshotCheckType.FULL.exclude(news.findElements()));
+```
+- allow tolerance in comparison if you cannot get stable results with full pixel comparison. You can ask for a comparison with at most x% of error
+
+```java
+captureElementSnapshot("result",  result, SnapshotCheckType.FULL.withThreshold(1.5));
+```
+
