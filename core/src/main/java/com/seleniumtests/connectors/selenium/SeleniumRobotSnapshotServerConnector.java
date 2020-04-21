@@ -192,6 +192,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 					.field("image", pictureFile)
 					.field("name", snapshot.getName())
 					.field("compare", snapshot.getCheckSnapshot().getName())
+					.field("diffTolerance", snapshot.getCheckSnapshot().getErrorThreshold())
 					);
 			Integer snapshotId = snapshotJson.getInt("id");
 			
