@@ -150,7 +150,7 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 		try {
 			methodResultsMap = generateSuiteSummaryReport(resultSet, optimizeReport);
 			copyResources();
-			logger.info("Completed Report Generation.");
+			logger.info("Completed Summary Report generation.");
 
 		} catch (IOException e) {
 			logger.error("Error writing summary report", e);
@@ -195,7 +195,7 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 			
 			generateExecutionReport(testContext, testResult, getTestStatus(testResult), resourcesFromCdn);
 
-			logger.info("Completed Report Generation.");
+			logger.info("Completed Test Report Generation.");
 			
 			// do not recreate this report anymore
 			TestNGResultUtils.setHtmlReportCreated(testResult, true);
@@ -254,7 +254,7 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 			// test steps
 			List<TestStep> testSteps = TestNGResultUtils.getSeleniumRobotTestContext(testResult).getTestStepManager().getTestSteps();
 			if (testSteps == null) {
-				return;
+				testSteps = new ArrayList<>();
 			}
 			
 			List<List<Object>> steps = new ArrayList<>();
@@ -306,9 +306,7 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 															FileFilterUtils.suffixFileFilter(".zip"), null).stream()
 						.map(File::getName)
 						.collect(Collectors.toList());
-				if (executionResults.isEmpty()) {
-					return;
-				} else {
+				if (!executionResults.isEmpty()) {
 					context.put("files", executionResults);
 					context.put("title", "Previous execution results");
 				}

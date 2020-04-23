@@ -543,11 +543,17 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			
 			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions", "testWithException2"});
 			
-			String detailedReportContent = readTestMethodResultFile("testWithException2");
+			
+			// issue #346: check all reports are generated
+			String detailedReportContent = readTestMethodResultFile("testAndSubActions");
+			Assert.assertTrue(detailedReportContent.contains("<h4> Test Details"));
+			
+			String detailedReportContent2 = readTestMethodResultFile("testWithException2");
 
 			// check the message and that no previous execution result is visible
-			Assert.assertTrue(detailedReportContent.contains("Previous execution results"));
-			Assert.assertTrue(detailedReportContent.contains("<a href=\"retry-testWithException2-1.zip\">retry-testWithException2-1.zip</a>"));
+			Assert.assertTrue(detailedReportContent2.contains("Previous execution results"));
+			Assert.assertTrue(detailedReportContent2.contains("<h4> Test Details"));
+			Assert.assertTrue(detailedReportContent2.contains("<a href=\"retry-testWithException2-1.zip\">retry-testWithException2-1.zip</a>"));
 			
 	
 		} finally {
