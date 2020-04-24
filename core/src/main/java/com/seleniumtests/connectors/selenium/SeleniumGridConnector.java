@@ -262,4 +262,8 @@ public class SeleniumGridConnector {
 	public void setNodeUrl(String nodeUrl) {
 		this.nodeUrl = nodeUrl;
 	}
+
+	public static Logger getLogger() {
+		return logger;
+	}
 }
