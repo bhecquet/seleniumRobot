@@ -313,6 +313,33 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 	public void onExecutionStart() {
 		suiteList = Collections.synchronizedList(new ArrayList<>());
 	}
+	
+
+	/**
+	 * Do we archive test results
+	 * if never is set, whatever else is set, no archiving will be done
+	 * if always is set, and not never, archiving will always be done
+	 * @param testSkipped
+	 * @param testFailed
+	 * @return
+	 */
+	private boolean doArchive(boolean testSkipped, boolean testFailed) {
+		List<ArchiveMode> archiveModes = SeleniumTestsContextManager.getGlobalContext().getArchive();
+		
+		if (archiveModes.contains(ArchiveMode.NEVER)) {
+			return false;
+		}
+		
+		else if (testSkipped && archiveModes.contains(ArchiveMode.ON_SKIP)
+				|| testFailed && archiveModes.contains(ArchiveMode.ON_ERROR)
+				|| (!(testFailed || testSkipped) && archiveModes.contains(ArchiveMode.ON_SUCCESS))
+				|| archiveModes.contains(ArchiveMode.ALWAYS)
+				) {
+			return true;
+		}
+		return false;
+		
+	}
 
 	@Override
 	public void onExecutionFinish() {
@@ -323,20 +350,21 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 		}
         
         boolean failed = false;
+        boolean skipped = false;
         for (ISuite suite : suiteList) {
 			Map<String, ISuiteResult> tests = suite.getResults();
 			for (ISuiteResult r : tests.values()) {
 				if (!r.getTestContext().getFailedTests().getAllResults().isEmpty()) {
 					failed = true;
-					break;
+				}
+				else if (!r.getTestContext().getSkippedTests().getAllResults().isEmpty()) {
+					skipped = true;
 				}
 			}
         }
         
         // archive results
-        if ((SeleniumTestsContextManager.getGlobalContext().getArchive() == ArchiveMode.TRUE
-        		|| (SeleniumTestsContextManager.getGlobalContext().getArchive() == ArchiveMode.ON_SUCCESS && !failed)
-        		|| (SeleniumTestsContextManager.getGlobalContext().getArchive() == ArchiveMode.ON_ERROR && failed)) 
+        if (doArchive(skipped, failed) 
         		&& SeleniumTestsContextManager.getGlobalContext().getArchiveToFile() != null) {
         	try {
 				FileUtility.zipFolder(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()), 

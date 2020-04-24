@@ -17,11 +17,21 @@
  */
 package com.seleniumtests.reporter.logger;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public enum ArchiveMode {
-	TRUE ("true"),
-    FALSE ("false"),
+	
+    ALWAYS("always", "true"),
+    NEVER("never", "false"),
     ON_SUCCESS ("onSuccess"),
-    ON_ERROR ("onError");
+    ON_ERROR ("onError"),
+	ON_SKIP ("onSkip"),
+	@Deprecated
+	TRUE (""),
+	@Deprecated
+	FALSE ("");
+	
 	
 	String[] mode;
 	
@@ -29,18 +39,28 @@ public enum ArchiveMode {
         this.mode = archiveMode;
     }
 	
-	public static ArchiveMode fromString(String mode) {
-		try {
-			return ArchiveMode.valueOf(mode);
-		} catch (IllegalArgumentException ex) {
-			for (ArchiveMode archiveMode : ArchiveMode.values()) {
-		        for (String matcher : archiveMode.mode) {
-		          if (mode.equalsIgnoreCase(matcher)) {
-		            return archiveMode;
-		          }
-		        }
-		      }
-		      throw new IllegalArgumentException("Unrecognized archive mode: " + mode);
+	public static List<ArchiveMode> fromString(String modes) {
+		List<ArchiveMode> archiveModes = new ArrayList<>();
+		for (String mode : modes.split(",")) {
+			try {
+				archiveModes.add(ArchiveMode.valueOf(modes));
+			} catch (IllegalArgumentException ex) {
+				ArchiveMode foundMode = null;
+				for (ArchiveMode archiveMode : ArchiveMode.values()) {
+					for (String matcher : archiveMode.mode) {
+						if (mode.equalsIgnoreCase(matcher)) {
+							foundMode = archiveMode;
+						}
+					}
+				}
+				if (foundMode != null) {
+					archiveModes.add(foundMode);
+				} else {
+					throw new IllegalArgumentException("Unrecognized archive mode: " + mode);
+				}
+			}
 		}
-	}	
+		return archiveModes;
+	}
+	
 }

@@ -253,7 +253,7 @@ public class SeleniumTestsContext {
 	public static final JSONObject DEFAULT_TMS_CONNECT = new JSONObject();
 	public static final ProxyType DEFAULT_WEB_PROXY_TYPE = ProxyType.AUTODETECT;
 	public static final boolean DEFAULT_OPTIMIZE_REPORTS = false;
-	public static final String DEFAULT_ARCHIVE= "false";
+	public static final ArchiveMode DEFAULT_ARCHIVE= ArchiveMode.NEVER;
 	public static final boolean DEFAULT_KEEP_ALL_RESULTS = false;
 	public static final String DEFAULT_NODE_TAGS = "";
 	public static final String DEFAULT_DEBUG = "none";
@@ -1249,8 +1249,8 @@ public class SeleniumTestsContext {
     	return (String) getAttribute(ARCHIVE_TO_FILE);
     }
     
-    public ArchiveMode getArchive() {
-    	return (ArchiveMode) getAttribute(ARCHIVE);
+    public List<ArchiveMode> getArchive() {
+    	return (List<ArchiveMode>) getAttribute(ARCHIVE);
     }
     
     public ElementInfo.Mode getAdvancedElementSearch() {
@@ -1645,7 +1645,7 @@ public class SeleniumTestsContext {
     
     public void setArchive(String archive) {
     	if (archive == null) {
-    		setAttribute(ARCHIVE, ArchiveMode.FALSE);
+    		setAttribute(ARCHIVE, Arrays.asList(DEFAULT_ARCHIVE));
     	} else {
     		try {
     			setAttribute(ARCHIVE, ArchiveMode.fromString(archive));
