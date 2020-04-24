@@ -156,11 +156,14 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 		
 		logger.info(String.format("click left: %d,%d", x, y));
 		try {
-			Unirest.post(String.format("%s%s", nodeUrl, NODE_TASK_SERVLET))
+			HttpResponse<String> response = Unirest.post(String.format("%s%s", nodeUrl, NODE_TASK_SERVLET))
 				.queryString("action", "leftClic")
 				.queryString("x", x)
 				.queryString("y", y)
 				.asString();
+			if (response.getStatus() != 200) {
+				logger.error(String.format("Left click error: %s", response.getBody()));
+			}
 		} catch (UnirestException e) {
 			logger.warn(String.format("Could not click left: %s", e.getMessage()));
 		}
@@ -179,11 +182,14 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 		
 		logger.info(String.format("double click: %d,%d", x, y));
 		try {
-			Unirest.post(String.format("%s%s", nodeUrl, NODE_TASK_SERVLET))
+			HttpResponse<String> response = Unirest.post(String.format("%s%s", nodeUrl, NODE_TASK_SERVLET))
 			.queryString("action", "doubleClick")
 			.queryString("x", x)
 			.queryString("y", y)
 			.asString();
+			if (response.getStatus() != 200) {
+				logger.error(String.format("Double click error: %s", response.getBody()));
+			}
 		} catch (UnirestException e) {
 			logger.warn(String.format("Could not double click: %s", e.getMessage()));
 		}
@@ -202,11 +208,14 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 		
 		logger.info(String.format("clic right: %d,%d", x, y));
 		try {
-			Unirest.post(String.format("%s%s", nodeUrl, NODE_TASK_SERVLET))
+			HttpResponse<String> response = Unirest.post(String.format("%s%s", nodeUrl, NODE_TASK_SERVLET))
 				.queryString("action", "rightClic")
 				.queryString("x", x)
 				.queryString("y", y)
 				.asString();
+			if (response.getStatus() != 200) {
+				logger.error(String.format("Right click error: %s", response.getBody()));
+			}
 		} catch (UnirestException e) {
 			logger.warn(String.format("Could not click right: %s", e.getMessage()));
 		}
@@ -259,7 +268,7 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 	
 	/**
 	 * Send keys to desktop
-	 * @param keys
+	 * @param keys		List of KeyEvent 
 	 */
 	@Override
 	public void sendKeysWithKeyboard(List<Integer> keyCodes) {
@@ -274,9 +283,13 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 		
 		logger.info("sending keys: " + keyCodes);
 		try {
-			Unirest.post(String.format("%s%s", nodeUrl, NODE_TASK_SERVLET))
+			HttpResponse<String> response = Unirest.post(String.format("%s%s", nodeUrl, NODE_TASK_SERVLET))
 				.queryString("action", "sendKeys")
 				.queryString("keycodes", keyCodeString).asString();
+			
+			if (response.getStatus() != 200) {
+				logger.error(String.format("Send keys error: %s", response.getBody()));
+			}
 		} catch (UnirestException e) {
 			logger.warn(String.format("Could send keys: %s", e.getMessage()));
 		}
@@ -294,9 +307,13 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 		
 		logger.info("writing text: " + text);
 		try {
-			Unirest.post(String.format("%s%s", nodeUrl, NODE_TASK_SERVLET))
+			HttpResponse<String> response = Unirest.post(String.format("%s%s", nodeUrl, NODE_TASK_SERVLET))
 				.queryString("action", "writeText")
 				.queryString("text", text).asString();
+		
+			if (response.getStatus() != 200) {
+				logger.error(String.format("Write text error: %s", response.getBody()));
+			}
 		} catch (UnirestException e) {
 			logger.warn(String.format("Could not write text: %s", e.getMessage()));
 		}
@@ -315,9 +332,13 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 		
 		logger.info("killing process: " + processName);
 		try {
-			Unirest.post(String.format("%s%s", nodeUrl, NODE_TASK_SERVLET))
+			HttpResponse<String> response = Unirest.post(String.format("%s%s", nodeUrl, NODE_TASK_SERVLET))
 				.queryString("action", "kill")
 				.queryString("process", processName).asString();
+			
+			if (response.getStatus() != 200) {
+				logger.error(String.format("kill process error: %s", response.getBody()));
+			}
 		} catch (UnirestException e) {
 			logger.warn(String.format("Could not kill process %s: %s", processName, e.getMessage()));
 		}

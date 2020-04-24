@@ -1157,7 +1157,7 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
 	/**
 	 * send keys to desktop
 	 * This is useful for typing special keys like ENTER
-	 * @param keys
+	 * @param keys	List of KeyEvent 
 	 */
 	public static void sendKeysToDesktop(List<Integer> keyCodes, DriverMode driverMode, SeleniumGridConnector gridConnector) {
 		if (driverMode == DriverMode.LOCAL) {
