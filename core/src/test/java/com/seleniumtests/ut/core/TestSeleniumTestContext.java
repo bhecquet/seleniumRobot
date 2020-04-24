@@ -439,13 +439,41 @@ public class TestSeleniumTestContext extends GenericTest {
 	public void testArchiveMode(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setArchive("onSuccess");
-		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getArchive(),ArchiveMode.ON_SUCCESS);
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getArchive().get(0), ArchiveMode.ON_SUCCESS);
+	}
+	/**
+	 * Test compatibility
+	 * @param testNGCtx
+	 * @param xmlTest
+	 */
+	@Test(groups="ut context")
+	public void testArchiveModeTrue(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setArchive("true");
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getArchive().get(0), ArchiveMode.ALWAYS);
+	}
+	/**
+	 * Test compatibility
+	 * @param testNGCtx
+	 * @param xmlTest
+	 */
+	@Test(groups="ut context")
+	public void testArchiveModeFalse(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setArchive("false");
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getArchive().get(0), ArchiveMode.NEVER);
+	}
+	@Test(groups="ut context")
+	public void testMultipleArchiveMode(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setArchive("onSuccess,onSkip");
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getArchive(), Arrays.asList(ArchiveMode.ON_SUCCESS, ArchiveMode.ON_SKIP));
 	}
 	@Test(groups="ut context")
 	public void testArchiveModeNull(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setArchive(null);
-		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getArchive(), ArchiveMode.FALSE);
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getArchive().get(0), ArchiveMode.NEVER);
 	}
 	@Test(groups="ut context", expectedExceptions=ConfigurationException.class)
 	public void testArchiveModeKo(final ITestContext testNGCtx, final XmlTest xmlTest) {
