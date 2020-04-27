@@ -233,9 +233,15 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 		
 		logger.info("capturing desktop");
 		try {
-			return Unirest.get(String.format("%s%s", nodeUrl, NODE_TASK_SERVLET))
+			HttpResponse<String> response =  Unirest.get(String.format("%s%s", nodeUrl, NODE_TASK_SERVLET))
 				.queryString("action", "screenshot")
-				.asString().getBody();
+				.asString();
+			
+			if (response.getStatus() != 200) {
+				logger.error(String.format("capture desktop error: %s", response.getBody()));
+			} else {
+				return response.getBody();
+			}
 			
 		} catch (UnirestException e) {
 			logger.warn(String.format("Could not capture desktop: %s", e.getMessage()));
@@ -256,13 +262,17 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 
 		logger.info("uploading file to browser: " + fileName);
 		try {
-			Unirest.post(String.format("%s%s", nodeUrl, NODE_TASK_SERVLET))
+			HttpResponse<String> response = Unirest.post(String.format("%s%s", nodeUrl, NODE_TASK_SERVLET))
 				.queryString("action", "uploadFile")
 				.queryString("name", fileName)
 				.field("content", base64Content)
 				.asString();
+			
+			if (response.getStatus() != 200) {
+				logger.error(String.format("Error uploading file: %s", response.getBody()));
+			}
 		} catch (UnirestException e) {
-			logger.warn(String.format("Could send keys: %s", e.getMessage()));
+			logger.warn(String.format("Cannot upload file: %s", e.getMessage()));
 		}
 	}
 	
@@ -386,13 +396,19 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 		
 		logger.info("getting process list for: " + processName);
 		try {
-			List<String> pidListStr = Arrays.asList(Unirest.get(String.format("%s%s", nodeUrl, NODE_TASK_SERVLET))
+			HttpResponse<String> response =  Unirest.get(String.format("%s%s", nodeUrl, NODE_TASK_SERVLET))
 				.queryString("action", "processList")
 				.queryString("name", processName)
-				.asString()
-				.getBody()
-				.split(","));
-			return pidListStr.stream().map(Integer::valueOf).collect(Collectors.toList());
+				.asString();
+			
+			if (response.getStatus() != 200) {
+				logger.error(String.format("get process list error: %s", response.getBody()));
+			} else {
+				List<String> pidListStr = Arrays.asList(
+					response.getBody()
+					.split(","));
+				return pidListStr.stream().map(Integer::valueOf).collect(Collectors.toList());
+			}
 		} catch (UnirestException e) {
 			logger.warn(String.format("Could not get process list of %s: %s", processName, e.getMessage()));
 		}
@@ -408,9 +424,14 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 		
 		logger.info("starting capture");
 		try {
-			Unirest.get(String.format("%s%s", nodeUrl, NODE_TASK_SERVLET))
+			HttpResponse<String> response = Unirest.get(String.format("%s%s", nodeUrl, NODE_TASK_SERVLET))
 				.queryString("action", "startVideoCapture")
 				.queryString("session", sessionId).asString();
+			
+			if (response.getStatus() != 200) {
+				logger.error(String.format("start video capture error: %s", response.getBody()));
+			}
+			
 		} catch (UnirestException e) {
 			logger.warn(String.format("Could start video capture: %s", e.getMessage()));
 		}
@@ -427,14 +448,21 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 			HttpResponse<InputStream> videoResponse = Unirest.get(String.format("%s%s", nodeUrl, NODE_TASK_SERVLET))
 				.queryString("action", "stopVideoCapture")
 				.queryString("session", sessionId).asBinary();
-			InputStream videoI = videoResponse.getBody();
 			
-			File videoFile = new File(outputFile);
-			FileOutputStream os = new FileOutputStream(videoFile);
-			IOUtils.copy(videoI, os);
-			os.close();
+			if (videoResponse.getStatus() != 200) {
+				logger.error(String.format("stop video capture error: %s", videoResponse.getBody()));
+				return null;
+			} else {
 			
-			return videoFile;
+				InputStream videoI = videoResponse.getBody();
+				
+				File videoFile = new File(outputFile);
+				FileOutputStream os = new FileOutputStream(videoFile);
+				IOUtils.copy(videoI, os);
+				os.close();
+				
+				return videoFile;
+			}
 			
 		} catch (UnirestException | IOException e) {
 			logger.warn(String.format("Could not stop video capture: %s", e.getMessage()));

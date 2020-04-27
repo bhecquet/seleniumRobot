@@ -266,4 +266,8 @@ public class SeleniumGridConnector {
 	public static Logger getLogger() {
 		return logger;
 	}
+
+	public static void setLogger(Logger logger) {
+		SeleniumGridConnector.logger = logger;
+	}
 }

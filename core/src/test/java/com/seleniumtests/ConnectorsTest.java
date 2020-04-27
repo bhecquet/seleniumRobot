@@ -29,6 +29,7 @@ import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.doReturn;
 
 import java.io.File;
+import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 
@@ -129,6 +130,9 @@ public class ConnectorsTest extends MockitoTest {
 	protected BaseRequest createServerMock(String requestType, String apiPath, int statusCode, String replyData) throws UnirestException {
 		return createServerMock(requestType, apiPath, statusCode, replyData, "request");
 	}
+	protected BaseRequest createServerMock(String requestType, String apiPath, int statusCode, InputStream replyData) throws UnirestException {
+		return createServerMock(requestType, apiPath, statusCode, replyData, "request");
+	}
 	
 	/**
 	 * 
@@ -140,25 +144,39 @@ public class ConnectorsTest extends MockitoTest {
 	 * @return
 	 * @throws UnirestException
 	 */
+	protected BaseRequest createServerMock(String requestType, String apiPath, int statusCode, InputStream replyData, String responseType) throws UnirestException {
+		return createServerMock(requestType, apiPath, statusCode, (Object)replyData, responseType);
+	}
 	protected BaseRequest createServerMock(String requestType, String apiPath, int statusCode, String replyData, String responseType) throws UnirestException {
+		return createServerMock(requestType, apiPath, statusCode, (Object)replyData, responseType);
+	}
+	
+	private BaseRequest createServerMock(String requestType, String apiPath, int statusCode, Object replyData, String responseType) throws UnirestException {
 		
 		@SuppressWarnings("unchecked")
 		HttpResponse<String> response = mock(HttpResponse.class);
 		HttpResponse<JsonNode> jsonResponse = mock(HttpResponse.class);
+		HttpResponse<InputStream> streamResponse = mock(HttpResponse.class);
 		HttpRequest request = mock(HttpRequest.class);
 		JsonNode json = mock(JsonNode.class);
 		MultipartBody requestMultipartBody = mock(MultipartBody.class);
 		HttpRequestWithBody postRequest = spy(new HttpRequestWithBody(HttpMethod.POST, SERVER_URL + apiPath));
-		
+
 		when(request.getUrl()).thenReturn(SERVER_URL);
-		when(response.getStatus()).thenReturn(statusCode);
-		when(response.getBody()).thenReturn(replyData);
-		when(jsonResponse.getStatus()).thenReturn(statusCode);
-		when(jsonResponse.getBody()).thenReturn(json);
-		try {
-			JSONObject jsonReply = new JSONObject(replyData);
-			when(json.getObject()).thenReturn(jsonReply);
-		} catch (JSONException e) {}
+		if (replyData instanceof String) {
+			when(response.getStatus()).thenReturn(statusCode);
+			when(response.getBody()).thenReturn((String)replyData);
+			
+			when(jsonResponse.getStatus()).thenReturn(statusCode);
+			when(jsonResponse.getBody()).thenReturn(json);
+			try {
+				JSONObject jsonReply = new JSONObject((String)replyData);
+				when(json.getObject()).thenReturn(jsonReply);
+			} catch (JSONException e) {}
+		} else if (replyData instanceof InputStream) {
+			when(streamResponse.getStatus()).thenReturn(statusCode);
+			when(streamResponse.getBody()).thenReturn((InputStream)replyData);
+		}
 		
 		switch(requestType) {
 			case "GET":
@@ -169,9 +187,11 @@ public class ConnectorsTest extends MockitoTest {
 				when(getRequest.header(anyString(), anyString())).thenReturn(getRequest);
 				when(getRequest.asString()).thenReturn(response);
 				when(getRequest.asJson()).thenReturn(jsonResponse);
+				when(getRequest.asBinary()).thenReturn(streamResponse);
 				when(getRequest.queryString(anyString(), anyString())).thenReturn(getRequest);
 				when(getRequest.queryString(anyString(), anyInt())).thenReturn(getRequest);
 				when(getRequest.queryString(anyString(), anyBoolean())).thenReturn(getRequest);
+				when(getRequest.queryString(anyString(), any(SessionId.class))).thenReturn(getRequest);
 				when(getRequest.getHttpRequest()).thenReturn(request);
 				return getRequest;
 			case "POST":
