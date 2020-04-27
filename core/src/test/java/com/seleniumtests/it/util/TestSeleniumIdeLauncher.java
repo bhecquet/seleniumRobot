@@ -31,7 +31,7 @@ import net.openhft.compiler.CompilerUtils;
  * 
  *
  */
-public class TestSeleniumIdeLauncher {
+public class TestSeleniumIdeLauncher extends GenericTest {
 	
 	private static final Logger logger = SeleniumRobotLogger.getLogger(TestSeleniumIdeLauncher.class);
 	private WebServer server;
