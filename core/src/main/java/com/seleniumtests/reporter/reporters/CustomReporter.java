@@ -115,12 +115,14 @@ public class CustomReporter extends CommonReporter implements IReporter {
 			String reportFormat = reportInfo.getExtension().substring(1);
 			Long testDuration = 0L;
 			Integer errors = 0;
+			String failedStep = "";
 			List<TestStep> testSteps = TestNGResultUtils.getSeleniumRobotTestContext(testResult).getTestStepManager().getTestSteps();
 			List<TestStep> newTestSteps = new ArrayList<>();
 			if (testSteps != null) {
 				for (TestStep step: testSteps) {
 					testDuration += step.getDuration();
 					if (step.getFailed()) {
+						failedStep = step.getName();
 						errors++;
 					}
 					
@@ -169,10 +171,21 @@ public class CustomReporter extends CommonReporter implements IReporter {
 			context.put("time", testResult.getStartMillis());	
 			context.put("startDate", new Date(testResult.getStartMillis()));	
 			context.put("testSteps", newTestSteps);	
+			context.put("retries", TestNGResultUtils.getRetry(testResult) == null ? 0: TestNGResultUtils.getRetry(testResult));	
 			context.put("browser", seleniumTestsContext.getBrowser());	
+			context.put("mobileApp", StringUtility.encodeString(seleniumTestsContext.getApp(), reportFormat.toLowerCase()));	
+			context.put("device", StringUtility.encodeString(seleniumTestsContext.getDeviceName() == null ? "": seleniumTestsContext.getDeviceName(), reportFormat.toLowerCase()));
+			
+			if (seleniumTestsContext.getTestType().isMobile()) {
+				context.put("platform", seleniumTestsContext.getPlatform() + " " + seleniumTestsContext.getMobilePlatformVersion());
+			} else {
+				context.put("platform", seleniumTestsContext.getPlatform());
+			}
 			context.put("version", SeleniumTestsContextManager.getApplicationVersion());	
+			context.put("coreVersion", SeleniumTestsContextManager.getCoreVersion());	
 			context.put("parameters", seleniumTestsContext.getContextDataMap());
 			context.put("stacktrace", stack);
+			context.put("failedStep", StringUtility.encodeString(failedStep, reportFormat.toLowerCase()));
 			String logs = SeleniumRobotLogger.getTestLogs().get(getTestName(testResult));
 			try {
 				context.put("logs", logs == null ? "Test skipped": StringUtility.encodeString(logs, reportFormat.toLowerCase()));

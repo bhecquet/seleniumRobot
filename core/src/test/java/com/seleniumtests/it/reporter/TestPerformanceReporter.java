@@ -31,6 +31,7 @@ import org.testng.xml.XmlSuite.ParallelMode;
 import com.seleniumtests.connectors.selenium.SeleniumRobotSnapshotServerConnector;
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.util.osutility.OSUtility;
 
 /**
  * Test that default reporting contains an XML file per test (CustomReporter.java) with default test reports defined in SeleniumTestsContext.DEFAULT_CUSTOM_TEST_REPORTS
@@ -69,14 +70,39 @@ public class TestPerformanceReporter extends ReporterTest {
 		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions"});
 		
 		// check content of summary report file
-		String jmeterReport = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testAndSubActions", "PERF-result.xml").toFile());
+		String jmeterReport = readTestMethodPerfFile("testAndSubActions");
 		
 		Assert.assertTrue(jmeterReport.contains("<testsuite errors=\"0\" failures=\"0\" hostname=\"\" name=\"testAndSubActions\" tests=\"6\" time=\"15"));
+		Assert.assertTrue(jmeterReport.contains("browser=\"NONE\""));
+		Assert.assertTrue(jmeterReport.contains("appVersion=\"" + SeleniumTestsContextManager.getApplicationVersion()));
+		Assert.assertTrue(jmeterReport.contains("coreVersion=\"" + SeleniumTestsContextManager.getCoreVersion()));
+		Assert.assertTrue(jmeterReport.contains("retries=\"0\"")); 
+		Assert.assertTrue(jmeterReport.contains("mobileApp=\"\""));
+		Assert.assertTrue(jmeterReport.contains("device=\"\"")); 
+		Assert.assertTrue(jmeterReport.contains("failedStep=\"step 1\"")); 
+		Assert.assertTrue(jmeterReport.contains("platform=\"" + OSUtility.getCurrentPlatorm().toString()));
 		Assert.assertTrue(jmeterReport.contains("<testcase classname=\"com.seleniumtests.it.stubclasses.StubTestClass\" name=\"Step 4: step 1\" time=\"1.23\">"));
 		Assert.assertTrue(jmeterReport.contains("<testcase classname=\"com.seleniumtests.it.stubclasses.StubTestClass\" name=\"Step 5: step 2\" time=\"14.03\">"));
 		
 		// check report contains configuration steps and not internal configuration steps (call to configure() method should not be the first step)
 		Assert.assertTrue(jmeterReport.contains("<testcase classname=\"com.seleniumtests.it.stubclasses.StubTestClass\" name=\"Step 3: Pre test step: set\" time="));
+	}
+	
+	/**
+	 * Check number of retries is correctly logged
+	 * @param testContext
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testReportWithRetry(ITestContext testContext) throws Exception {
+		
+		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testWithException"});
+		
+		// check content of summary report file
+		String jmeterReport = readTestMethodPerfFile("testWithException");
+
+		Assert.assertTrue(jmeterReport.contains("retries=\"2\"")); 
+		Assert.assertTrue(jmeterReport.contains("failedStep=\"step 1\"")); 
 	}
 	
 	/**
@@ -106,7 +132,7 @@ public class TestPerformanceReporter extends ReporterTest {
 		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions"});
 		
 		// check content of summary report file
-		String jmeterReport = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testAndSubActions", "PERF-result.xml").toFile());
+		String jmeterReport = readTestMethodPerfFile("testAndSubActions");
 		
 		Assert.assertTrue(jmeterReport.contains("<error message=\"class org.openqa.selenium.WebDriverException: driver exception"));
 		Assert.assertTrue(jmeterReport.contains("<![CDATA[class org.openqa.selenium.WebDriverException: driver exception"));
@@ -144,7 +170,7 @@ public class TestPerformanceReporter extends ReporterTest {
 	public void testXmlCharacterEscape(ITestContext testContext) throws Exception {
 		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForEncoding"}, ParallelMode.METHODS, new String[] {"testAndSubActions"});
 		
-		String detailedReportContent = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testAndSubActions", "PERF-result.xml").toFile());
+		String detailedReportContent = readTestMethodPerfFile("testAndSubActions");
 		
 		// check step 1 has been encoded
 		Assert.assertTrue(detailedReportContent.contains("name=\"Step 2: step 1 &lt;&gt;&quot;&apos;&amp;/\""));
@@ -159,8 +185,8 @@ public class TestPerformanceReporter extends ReporterTest {
 	@Test(groups={"it"})
 	public void testXmlErrorMessageEscape(ITestContext testContext) throws Exception {
 		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForEncoding"}, ParallelMode.METHODS, new String[] {"testWithException"});
-		
-		String detailedReportContent = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testWithException", "PERF-result.xml").toFile());
+
+		String detailedReportContent = readTestMethodPerfFile("testWithException");
 		
 		// check error message is correctly XML encoded
 		Assert.assertTrue(detailedReportContent.contains("<error message=\"class com.seleniumtests.customexception.DriverExceptions: &amp; some exception &quot;with &quot; &lt;strong&gt;&lt;a href=&apos;http://someurl/link&apos; style=&apos;background-color: red;&apos;&gt;HTML to encode&lt;/a&gt;&lt;/strong&gt;\" type=\"\">"));
@@ -178,8 +204,8 @@ public class TestPerformanceReporter extends ReporterTest {
 	public void testXmlErrorMessageEscapeDoubleException(ITestContext testContext) throws Exception {
 		executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForEncoding"});
 //		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForEncoding"}, ParallelMode.METHODS, new String[] {"testWithChainedException"});
-		
-		String detailedReportContent = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testWithChainedException", "PERF-result.xml").toFile());
+
+		String detailedReportContent = readTestMethodPerfFile("testWithChainedException");
 		
 		// check error message is correctly XML encoded
 		Assert.assertTrue(detailedReportContent.contains("<error message=\"class com.seleniumtests.customexception.DriverExceptions: &amp; some exception &quot;with &quot; &lt;strong&gt;&lt;a href=&apos;http://someurl/link&apos; style=&apos;background-color: red;&apos;&gt;HTML to encode&lt;/a&gt;&lt;/strong&gt;\" type=\"\">"));
@@ -200,12 +226,12 @@ public class TestPerformanceReporter extends ReporterTest {
 		executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClass2"});
 
 		// check that files are present and that they contain no step
-		String detailedReportContent = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "test2", "PERF-result.xml").toFile());
+		String detailedReportContent = readTestMethodPerfFile("test2");
 		Assert.assertTrue(detailedReportContent.contains("<system-out><![CDATA[Test skipped]]></system-out>"));
 		Assert.assertFalse(detailedReportContent.contains("<testcase classname"));
 		
 		// check other file contains steps
-		String detailedReportContent2 = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "test1", "PERF-result.xml").toFile());
+		String detailedReportContent2 = readTestMethodPerfFile("test1");
 		Assert.assertTrue(detailedReportContent2.contains("<testcase classname=\"com.seleniumtests.it.stubclasses.StubTestClass2\" name=\"Step 1: Pre test step: slow\""));
 		Assert.assertTrue(detailedReportContent2.contains("<testcase classname=\"com.seleniumtests.it.stubclasses.StubTestClass2\" name=\"Step 2: Pre test step: set\""));
 	}
@@ -219,9 +245,8 @@ public class TestPerformanceReporter extends ReporterTest {
 	public void testSkippedStepInTest(ITestContext testContext) throws Exception {
 		
 		executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForTestSteps"});
-		
-		String detailedReportContent = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testSkippedStep", "PERF-result.xml").toFile());
-		detailedReportContent = detailedReportContent.replace("\n", "").replace("\r",  "").replaceAll(">\\s+<", "><");
+
+		String detailedReportContent = readTestMethodPerfFile("testSkippedStep");
 		
 		Assert.assertTrue(detailedReportContent.matches(".*<testcase classname=\"com.seleniumtests.it.stubclasses.StubTestClassForTestSteps\" name=\"Step 4: skipStep \" time=\"\\d+\\.\\d+\"><skipped/>.*"));
 		Assert.assertTrue(detailedReportContent.contains("failures=\"-1\""));
