@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<testsuite errors="$errors" failures="$failures" hostname="$hostname" name="$suiteName" tests="$tests" time="$duration" timestamp="$time">
+<testsuite errors="$errors" failures="$failures" hostname="$hostname" name="$suiteName" tests="$tests" time="$duration" timestamp="$time" browser="$browser" appVersion="$version" coreVersion="$coreVersion" retries="$retries" mobileApp="$mobileApp" device="$device" platform="$platform" failedStep="$failedStep" >
 	
 	<infos>
 		#foreach ($testInfo in $testInfos.entrySet())
 			<info key="$testInfo.key" value="$testInfo.value"></info>
 		#end
-	</infos>
-	
+	</infos>	
 	
 	#foreach ($testStep in $testSteps)
 		#set($stepDuration = $testStep.getDuration() / 1000.0)
