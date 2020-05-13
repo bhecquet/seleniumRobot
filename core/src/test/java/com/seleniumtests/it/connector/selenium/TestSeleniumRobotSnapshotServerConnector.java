@@ -43,8 +43,9 @@ public class TestSeleniumRobotSnapshotServerConnector extends GenericTest {
 	@BeforeMethod(groups={"it"})
 	public void init(ITestContext ctx) {
 		initThreadContext(ctx);
-
-		connector = new SeleniumRobotSnapshotServerConnector(true, "http://localhost:8002");
+		
+		// pass the token via  -DseleniumRobotServerToken=xxxxxx
+		connector = new SeleniumRobotSnapshotServerConnector(true, "http://localhost:8002", SeleniumTestsContextManager.getThreadContext().getSeleniumRobotServerToken());
 		if (!connector.getActive()) {
 			throw new SkipException("no seleniumrobot server available");
 		}
@@ -71,6 +72,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends GenericTest {
 	
 	@Test(groups={"it"})
 	public void testCreateSession() {
+		connector.createApplication();
 		Assert.assertNotNull(connector.getEnvironmentId());
 		Assert.assertNotNull(connector.createSession("Session1"));
 		Assert.assertNotNull(connector.getVersionId());

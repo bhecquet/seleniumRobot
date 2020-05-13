@@ -268,12 +268,18 @@ public abstract class SeleniumRobotServerConnector {
 		}
 		
 		if (response.getStatus() >= 400) {
+			String error = "unknown";
 			try {
-				String error = new JSONObject(response.getBody()).getString("detail");
-				throw new SeleniumRobotServerException(String.format("request to %s failed: %s", request.getHttpRequest().getUrl(), error));
+				error = new JSONObject(response.getBody()).getString("detail");
 			} catch (Exception e) {
 				throw new UnirestException(String.format("request to %s failed: %s", request.getHttpRequest().getUrl(), response.getStatusText()));
 			}
+			
+			if (response.getStatus() == 401) {
+				error += "You need to provide the API token through 'seleniumRobotServerToken' parameter";
+			}
+
+			throw new SeleniumRobotServerException(String.format("request to %s failed: %s", request.getHttpRequest().getUrl(), error));
 		}
 		
 		if (response.getStatus() == 204) {
