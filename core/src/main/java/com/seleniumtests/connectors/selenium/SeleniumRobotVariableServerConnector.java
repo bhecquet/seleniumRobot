@@ -137,7 +137,7 @@ public class SeleniumRobotVariableServerConnector extends SeleniumRobotServerCon
 			}
 			return variables;
 			
-		} catch (UnirestException | JSONException e) {
+		} catch (UnirestException | JSONException | SeleniumRobotServerException e) {
 			throw new SeleniumRobotServerException("cannot get variables", e);
 		} 
 	}
@@ -209,7 +209,7 @@ public class SeleniumRobotVariableServerConnector extends SeleniumRobotServerCon
 				
 				return TestVariable.fromJsonObject(variableJson);
 				
-			} catch (UnirestException | JSONException e) {
+			} catch (UnirestException | JSONException | SeleniumRobotServerException e) {
 				throw new SeleniumRobotServerException("cannot upsert variables", e);
 			} 
 		} else {
@@ -221,7 +221,7 @@ public class SeleniumRobotVariableServerConnector extends SeleniumRobotServerCon
 				
 				return TestVariable.fromJsonObject(variableJson);
 				
-			} catch (UnirestException | JSONException e) {
+			} catch (UnirestException | JSONException | SeleniumRobotServerException e) {
 				throw new SeleniumRobotServerException("cannot upsert variables", e);
 			} 
 		}
