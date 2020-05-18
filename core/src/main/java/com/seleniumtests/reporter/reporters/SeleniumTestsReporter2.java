@@ -215,7 +215,9 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 			VelocityContext context = new VelocityContext();
 	
 			context.put("staticPathPrefix", "../");
-			context.put("snapshots", testContext.getSeleniumRobotServerCompareSnapshot());
+			
+			boolean displaySnapshots = testContext.getSeleniumRobotServerCompareSnapshot() && TestNGResultUtils.getSnapshotTestCaseInSessionId(testResult) != null && TestNGResultUtils.getSnapshotComparisonResult(testResult) != null;
+			context.put("snapshots", displaySnapshots);
 			context.put("snapshotServer", testContext.getSeleniumRobotServerUrl());
 			context.put("snapshotComparisonResult", TestNGResultUtils.getSnapshotComparisonResult(testResult));
 			context.put("snapshotSessionId", TestNGResultUtils.getSnapshotTestCaseInSessionId(testResult));

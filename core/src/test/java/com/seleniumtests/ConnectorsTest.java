@@ -166,15 +166,18 @@ public class ConnectorsTest extends MockitoTest {
 		if (replyData instanceof String) {
 			when(response.getStatus()).thenReturn(statusCode);
 			when(response.getBody()).thenReturn((String)replyData);
+			when(response.getStatusText()).thenReturn("TEXT");
 			
 			when(jsonResponse.getStatus()).thenReturn(statusCode);
 			when(jsonResponse.getBody()).thenReturn(json);
+			when(jsonResponse.getStatusText()).thenReturn("TEXT");
 			try {
 				JSONObject jsonReply = new JSONObject((String)replyData);
 				when(json.getObject()).thenReturn(jsonReply);
 			} catch (JSONException e) {}
 		} else if (replyData instanceof InputStream) {
 			when(streamResponse.getStatus()).thenReturn(statusCode);
+			when(streamResponse.getStatusText()).thenReturn("TEXT");
 			when(streamResponse.getBody()).thenReturn((InputStream)replyData);
 		}
 		
@@ -197,6 +200,7 @@ public class ConnectorsTest extends MockitoTest {
 			case "POST":
 				when(Unirest.post(SERVER_URL + apiPath)).thenReturn(postRequest);
 			case "PATCH":
+				when(postRequest.getHttpRequest()).thenReturn(request);
 				when(Unirest.patch(SERVER_URL + apiPath)).thenReturn(postRequest);
 				when(postRequest.field(anyString(), anyString())).thenReturn(requestMultipartBody);
 				when(postRequest.field(anyString(), anyInt())).thenReturn(requestMultipartBody);
@@ -214,6 +218,7 @@ public class ConnectorsTest extends MockitoTest {
 				when(requestMultipartBody.field(anyString(), anyDouble())).thenReturn(requestMultipartBody);
 				when(requestMultipartBody.field(anyString(), any(File.class))).thenReturn(requestMultipartBody);
 				when(requestMultipartBody.asString()).thenReturn(response);
+				when(requestMultipartBody.getHttpRequest()).thenReturn(request);
 				doReturn(response).when(postRequest).asString();
 				
 				if ("request".equals(responseType)) {
