@@ -113,7 +113,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 					.field("compareSnapshot", SeleniumTestsContextManager.getGlobalContext().getSeleniumRobotServerCompareSnapshot())
 					.field("ttl", String.format("%d days", SeleniumTestsContextManager.getGlobalContext().getSeleniumRobotServerCompareSnapshotTtl()))); // format is 'x days' as this is the way Django expect a duration in days
 			return sessionJson.getInt("id");
-		} catch (UnirestException | JSONException e) {
+		} catch (UnirestException | JSONException | SeleniumRobotServerException e) {
 			throw new SeleniumRobotServerException("cannot create session", e);
 		}
 	}
@@ -139,7 +139,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 					.field("testCase", testCaseId)
 					.field("session", sessionId));
 			return testInSessionJson.getInt("id");
-		} catch (UnirestException | JSONException e) {
+		} catch (UnirestException | JSONException | SeleniumRobotServerException e) {
 			throw new SeleniumRobotServerException("cannot create test case", e);
 		}
 	}
@@ -161,7 +161,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 			Integer testStepId = stepJson.getInt("id");
 			addCurrentTestStepToTestCase(testStepId, testCaseInSessionId);
 			return testStepId;
-		} catch (UnirestException | JSONException e) {
+		} catch (UnirestException | JSONException | SeleniumRobotServerException e) {
 			throw new SeleniumRobotServerException("cannot create test step", e);
 		}
 	}
@@ -198,7 +198,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 			
 			
 			return snapshotId;
-		} catch (UnirestException | JSONException e) {
+		} catch (UnirestException | JSONException | SeleniumRobotServerException e) {
 			throw new SeleniumRobotServerException("cannot create test snapshot", e);
 		}
 	}
@@ -223,7 +223,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 					);
 			return excludeJson.getInt("id");
 			
-		} catch (UnirestException | JSONException e) {
+		} catch (UnirestException | JSONException | SeleniumRobotServerException e) {
 			throw new SeleniumRobotServerException("cannot create exclude zone", e);
 		}
 	}
@@ -257,7 +257,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 					.field("stacktrace", logs)
 					);
 			return resultJson.getInt("id");
-		} catch (UnirestException | JSONException e) {
+		} catch (UnirestException | JSONException | SeleniumRobotServerException e) {
 			throw new SeleniumRobotServerException("cannot create test snapshot", e);
 		}
 	}
@@ -280,7 +280,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 					.map(Object::toString)
 					.collect(Collectors.toList());
 
-		} catch (UnirestException | JSONException e) {
+		} catch (UnirestException | JSONException | SeleniumRobotServerException e) {
 			throw new SeleniumRobotServerException("cannot get test step list", e);
 		}
 	}
@@ -301,7 +301,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 			}
 			addTestStepsToTestCases(testSteps, testCaseInSessionId);
 			
-		} catch (UnirestException | JSONException e) {
+		} catch (UnirestException | JSONException | SeleniumRobotServerException e) {
 			throw new SeleniumRobotServerException("cannot add test step to test case", e);
 		}
 	}

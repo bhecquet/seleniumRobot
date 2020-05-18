@@ -271,6 +271,8 @@ public abstract class SeleniumRobotServerConnector {
 			String error = "unknown";
 			try {
 				error = new JSONObject(response.getBody()).getString("detail");
+			} catch (JSONException e) {
+				throw new SeleniumRobotServerException(String.format("request to %s failed: %s", request.getHttpRequest().getUrl(), response.getBody()));
 			} catch (Exception e) {
 				throw new UnirestException(String.format("request to %s failed: %s", request.getHttpRequest().getUrl(), response.getStatusText()));
 			}

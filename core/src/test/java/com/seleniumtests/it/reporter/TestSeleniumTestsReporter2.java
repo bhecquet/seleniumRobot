@@ -17,6 +17,8 @@
  */
 package com.seleniumtests.it.reporter;
 
+import static org.mockito.Mockito.when;
+
 import java.io.File;
 import java.nio.file.Paths;
 
@@ -26,6 +28,8 @@ import org.testng.ITestContext;
 import org.testng.annotations.Test;
 import org.testng.xml.XmlSuite.ParallelMode;
 
+import com.mashape.unirest.http.exceptions.UnirestException;
+import com.mashape.unirest.request.BaseRequest;
 import com.seleniumtests.connectors.selenium.SeleniumRobotSnapshotServerConnector;
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
@@ -79,6 +83,48 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		Assert.assertTrue(detailedReportContent.contains("<div id=\"tabs\"  style=\"display: none;\" >"));
 		Assert.assertFalse(detailedReportContent.contains("</button> Snapshot comparison"));
 		
+	}
+	
+	/**
+	 * issue #351: Check that when snapshot server is used, but a problem occurs posting information
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testSnapshotComparisonErrorDuringTransfer() throws Exception {
+		try {
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE, "true");
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT, "true");
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT_BEHAVIOUR, "displayOnly");
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_RECORD_RESULTS, "true");
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL, "http://localhost:4321");
+			
+			SeleniumRobotSnapshotServerConnector server = configureMockedSnapshotServerConnection();
+			createServerMock("POST", SeleniumRobotSnapshotServerConnector.SESSION_API_URL, 500, "Internal Server Error", "body");	
+			
+			SeleniumTestsContextManager.removeThreadContext();
+			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions"});
+			
+			// check result is ok and comparison result is shown through green bullet
+			String summaryReport = readSummaryFile();
+			Assert.assertFalse(summaryReport.contains("<i class=\"fa fa-circle circle")); // no snapshot comparison has been performed
+			Assert.assertTrue(summaryReport.contains("info=\"ok\" data-toggle=\"tooltip\""));
+			
+			String detailedReportContent = readTestMethodResultFile("testAndSubActions");
+			
+			// no snapshot tab displayed
+			Assert.assertTrue(detailedReportContent.contains("<div id=\"tabs\"  style=\"display: none;\" >"));
+			
+			// message saying that error occured when contacting snapshot server
+			String logs = readSeleniumRobotLogFile();
+			Assert.assertTrue(logs.contains("request to http://localhost:4321 failed: Internal Server Error"));
+			
+		} finally {
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE);
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL);
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT);
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT_BEHAVIOUR);
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_RECORD_RESULTS);
+		}
 	}
 	
 	/**

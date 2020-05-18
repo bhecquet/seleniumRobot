@@ -102,7 +102,7 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 					}
 				}
 			} catch (SeleniumRobotServerException | ConfigurationException e) {
-				logger.error("Error contacting selenium robot serveur", e);
+				logger.error("Error contacting selenium robot server", e);
 				return;
 			}
 		}
@@ -110,7 +110,7 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 		try {
 			recordResults(serverConnector, resultSet);
 		} catch (SeleniumRobotServerException | ConfigurationException e) {
-			logger.error("Error contacting selenium robot serveur", e);
+			logger.error("Error contacting selenium robot server", e);
 			return;
 		}
 	}
