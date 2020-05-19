@@ -29,6 +29,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
+import java.util.regex.Pattern;
 
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
@@ -698,4 +699,115 @@ public class TestTestTasks extends MockitoTest {
 		SeleniumTestsContextManager.setGlobalContext(null);
 		TestTasks.param("foo");
 	}
+	
+	/**
+	 * Check we get parameters with pattern on key from the thread context
+	 */
+	@Test(groups= {"ut"})
+	public void testParamKeyPattern() {
+		SeleniumTestsContextManager.getThreadContext().getConfiguration().put("foofoo", new TestVariable("foofoo", "bar"));
+		SeleniumTestsContextManager.getGlobalContext().getConfiguration().put("foofoo", new TestVariable("foofoo", "bar_global"));
+		Assert.assertEquals(TestTasks.param(Pattern.compile("ofo")), "bar");
+	}
+	
+	/**
+	 * Check empty string is returned if parameter is not known
+	 */
+	@Test(groups= {"ut"})
+	public void testParamKeyPatternDoesNotExist() {
+		SeleniumTestsContextManager.getThreadContext().getConfiguration().put("foofoo", new TestVariable("foofoo", "bar"));
+		SeleniumTestsContextManager.getGlobalContext().getConfiguration().put("foofoo", new TestVariable("foofoo", "bar_global"));
+		Assert.assertEquals(TestTasks.param(Pattern.compile("offo")), "");
+	}
+	
+	/**
+	 * Check we look at global context if thread context is not initialized
+	 */
+	@Test(groups= {"ut"})
+	public void testParamKeyPatternThreadContextNotInitialized() {
+		SeleniumTestsContextManager.setThreadContext(null);
+		SeleniumTestsContextManager.getGlobalContext().getConfiguration().put("foofoo", new TestVariable("foofoo", "bar2"));
+		Assert.assertEquals(TestTasks.param(Pattern.compile("ofo")), "bar2");
+	}
+	
+	/**
+	 * Check error is raised if thread and global context are not initialized
+	 */
+	@Test(groups= {"ut"}, expectedExceptions=ConfigurationException.class)
+	public void testParamKeyPatternGlobalContextNotInitialized() {
+		SeleniumTestsContextManager.setThreadContext(null);
+		SeleniumTestsContextManager.setGlobalContext(null);
+		TestTasks.param(Pattern.compile("ofo"));
+	}
+	
+	/**
+	 * Check we get parameters with pattern on value from the thread context
+	 */
+	@Test(groups= {"ut"})
+	public void testParamValuePattern() {
+		SeleniumTestsContextManager.getThreadContext().getConfiguration().put("foofoo", new TestVariable("foofoo", "barbar"));
+		SeleniumTestsContextManager.getGlobalContext().getConfiguration().put("foobar", new TestVariable("foobar", "barbar2"));
+		Assert.assertEquals(TestTasks.param(null, Pattern.compile("rba")), "barbar");
+	}
+	
+	/**
+	 * Check empty string is returned if parameter is not known
+	 */
+	@Test(groups= {"ut"})
+	public void testParamValuePatternDoesNotExist() {
+		SeleniumTestsContextManager.getThreadContext().getConfiguration().put("foofoo", new TestVariable("foofoo", "barbar"));
+		SeleniumTestsContextManager.getGlobalContext().getConfiguration().put("foobar", new TestVariable("foobar", "barbar2"));
+		Assert.assertEquals(TestTasks.param(null, Pattern.compile("rbba")), "");
+	}
+	
+	/**
+	 * Check we look at global context if thread context is not initialized
+	 */
+	@Test(groups= {"ut"})
+	public void testParamValuePatternThreadContextNotInitialized() {
+		SeleniumTestsContextManager.setThreadContext(null);
+		SeleniumTestsContextManager.getGlobalContext().getConfiguration().put("foobar", new TestVariable("foobar", "barbar2"));
+		Assert.assertEquals(TestTasks.param(null, Pattern.compile("rba")), "barbar2");
+	}
+	
+	/**
+	 * Check error is raised if thread and global context are not initialized
+	 */
+	@Test(groups= {"ut"}, expectedExceptions=ConfigurationException.class)
+	public void testParamValuePatternGlobalContextNotInitialized() {
+		SeleniumTestsContextManager.setThreadContext(null);
+		SeleniumTestsContextManager.setGlobalContext(null);
+		TestTasks.param(null, Pattern.compile("rba"));
+	}
+
+	/**
+	 * Check we get parameters with pattern on value and key from the thread context
+	 */
+	@Test(groups= {"ut"})
+	public void testParamKeyAndValuePattern() {
+		SeleniumTestsContextManager.getThreadContext().getConfiguration().put("foofoo", new TestVariable("foofoo", "barbar"));
+		SeleniumTestsContextManager.getGlobalContext().getConfiguration().put("foobar", new TestVariable("foobar", "barbar2"));
+		Assert.assertEquals(TestTasks.param(Pattern.compile("foo"), Pattern.compile("rba")), "barbar");
+	}
+	
+	/**
+	 * Check no variable matches because of non matching key
+	 */
+	@Test(groups= {"ut"})
+	public void testParamKeyAndValuePatternNoKeyMatching() {
+		SeleniumTestsContextManager.getThreadContext().getConfiguration().put("foofoo", new TestVariable("foofoo", "barbar"));
+		SeleniumTestsContextManager.getGlobalContext().getConfiguration().put("foobar", new TestVariable("foobar", "barbar2"));
+		Assert.assertEquals(TestTasks.param(Pattern.compile("ffo"), Pattern.compile("rba")), "");
+	}
+	
+	/**
+	 * Check no variable matches because of non matching key
+	 */
+	@Test(groups= {"ut"})
+	public void testParamKeyAndValuePatternNoValueMatching() {
+		SeleniumTestsContextManager.getThreadContext().getConfiguration().put("foofoo", new TestVariable("foofoo", "barbar"));
+		SeleniumTestsContextManager.getGlobalContext().getConfiguration().put("foobar", new TestVariable("foobar", "barbar2"));
+		Assert.assertEquals(TestTasks.param(Pattern.compile("foo"), Pattern.compile("rbba")), "");
+	}
+
 }
