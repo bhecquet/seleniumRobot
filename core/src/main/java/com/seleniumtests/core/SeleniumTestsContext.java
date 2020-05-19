@@ -75,6 +75,7 @@ import com.seleniumtests.util.osutility.OSUtility;
  */
 public class SeleniumTestsContext {
 	
+	private static final Object lock = new Object();
 	private static final Logger logger = SeleniumRobotLogger.getLogger(SeleniumTestsContext.class);
 	private static Map<String, String> outputFolderNames = Collections.synchronizedMap(new HashMap<>());
 
@@ -787,23 +788,26 @@ public class SeleniumTestsContext {
      * @return
      */
     private String hashTest(ITestResult testNGResult) {
-    	String uniqueIdentifier = TestNGResultUtils.getHashForTest(testNGResult);
-    	String testNameModified = StringUtility.replaceOddCharsFromFileName(TestNGResultUtils.getTestName(testNGResult));
     	
-    	if (!outputFolderNames.containsKey(uniqueIdentifier)) {
-    		if (!outputFolderNames.values().contains(testNameModified)) {
-    			outputFolderNames.put(uniqueIdentifier, testNameModified);
-    		} else {
-	    		int i = 0;
-	    		while (i++ < 1000) {
-	    			if (!outputFolderNames.values().contains(testNameModified + "-" + i)) {
-	        			outputFolderNames.put(uniqueIdentifier, testNameModified + "-" + i);
-	        			break;
-	    			}
-	    		}
-    		}
-    	}
-    	return outputFolderNames.get(uniqueIdentifier);
+    	synchronized (lock) { // issue #352: be sure we create the unique folder name once at a time
+    		String uniqueIdentifier = TestNGResultUtils.getHashForTest(testNGResult);
+        	String testNameModified = StringUtility.replaceOddCharsFromFileName(TestNGResultUtils.getTestName(testNGResult));
+        	
+        	if (!outputFolderNames.containsKey(uniqueIdentifier)) {
+        		if (!outputFolderNames.values().contains(testNameModified)) {
+        			outputFolderNames.put(uniqueIdentifier, testNameModified);
+        		} else {
+    	    		int i = 0;
+    	    		while (i++ < 1000) {
+    	    			if (!outputFolderNames.values().contains(testNameModified + "-" + i)) {
+    	        			outputFolderNames.put(uniqueIdentifier, testNameModified + "-" + i);
+    	        			break;
+    	    			}
+    	    		}
+        		}
+        	}
+        	return outputFolderNames.get(uniqueIdentifier);
+		}
     }
     
     /**
