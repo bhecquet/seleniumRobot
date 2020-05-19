@@ -18,7 +18,9 @@
 package com.seleniumtests.core;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.ArrayUtils;
@@ -206,6 +208,36 @@ public class TestTasks {
     		return getParam(SeleniumTestsContextManager.getGlobalContext(), key);
     	}
     }
+    
+    /**
+     * Get parameter from configuration
+     * If multiple variables match the pattern, only one is returned
+     * @param keyPattern	Pattern for searching key. If null, no filtering will be done on key
+     * @return
+     */
+    public static String param(Pattern keyPattern) {
+    	try {
+    		return getParamWithPattern(SeleniumTestsContextManager.getThreadContext(), keyPattern, null);
+    	} catch (ConfigurationException e) {
+    		return getParamWithPattern(SeleniumTestsContextManager.getGlobalContext(), keyPattern, null);
+    	}
+    }
+    
+
+    /**
+     * Get parameter from configuration
+     * If multiple variables match the pattern, only one is returned
+     * @param keyPattern	Pattern for searching key. If null, no filtering will be done on key
+     * @param valuePattern	Pattern for searching value. If null, no filtering will be done on value
+     * @return
+     */
+    public static String param(Pattern keyPattern, Pattern valuePattern) {
+    	try {
+    		return getParamWithPattern(SeleniumTestsContextManager.getThreadContext(), keyPattern, valuePattern);
+    	} catch (ConfigurationException e) {
+    		return getParamWithPattern(SeleniumTestsContextManager.getGlobalContext(), keyPattern, valuePattern);
+    	}
+    }
   
     
     private static String getParam(SeleniumTestsContext context, String key) {
@@ -215,6 +247,24 @@ public class TestTasks {
     		return "";
     	}
     	return value.getValue();
+    }
+    
+    private static String getParamWithPattern(SeleniumTestsContext context, Pattern keyPattern, Pattern valuePattern) {
+    	List<TestVariable> matchingVariables = context.getConfiguration()
+				.values()
+				.stream()
+				.filter(v -> keyPattern == null ? true: keyPattern.matcher(v.getName()).find())
+				.filter(v -> valuePattern == null ? true : valuePattern.matcher(v.getValue()).find())
+				.collect(Collectors.toList());
+    	Collections.shuffle(matchingVariables);
+    	
+    	if (matchingVariables.isEmpty()) {
+    		logger.warning(String.format("Variable %s [%s] is not defined", 
+    				keyPattern == null ? "null": keyPattern.pattern(), 
+    				valuePattern == null ? "null": valuePattern.pattern()));
+    		return "";
+    	}
+    	return matchingVariables.get(0).getValue();
     }
    
     

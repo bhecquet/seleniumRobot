@@ -28,6 +28,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.regex.Pattern;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FileUtils;
@@ -240,6 +241,27 @@ public class PageObject extends BasePage implements IPage {
      */
     public static String param(String key) {
     	return TestTasks.param(key);
+    }
+
+    /**
+     * Get parameter from configuration using pattern
+     * If multiple variables match the pattern, only one is returned
+     * @param keyPattern	Pattern for searching key. If null, no filtering will be done on key
+     * @return
+     */
+    public static String param(Pattern keyPattern) {
+    	return TestTasks.param(keyPattern);
+    }
+    
+    /**
+     * Get parameter from configuration using pattern
+     * If multiple variables match the pattern, only one is returned
+     * @param keyPattern	Pattern for searching key. If null, no filtering will be done on key
+     * @param valuePattern	Pattern for searching value. If null, no filtering will be done on value
+     * @return
+     */
+    public static String param(Pattern keyPattern, Pattern valuePattern) {
+    	return TestTasks.param(keyPattern, valuePattern);
     }
     
     /**
