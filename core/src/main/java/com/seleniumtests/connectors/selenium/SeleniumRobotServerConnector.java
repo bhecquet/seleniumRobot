@@ -125,7 +125,7 @@ public abstract class SeleniumRobotServerConnector {
 			applicationId = response.getInt("id");
 			return applicationId;
 		} catch (UnirestException | SeleniumRobotServerException e) {
-			throw new ConfigurationException(String.format("Application %s does not exist in variable server, please create it", SeleniumTestsContextManager.getApplicationName()));
+			throw new ConfigurationException(String.format("Application %s not get from variable server: %s", SeleniumTestsContextManager.getApplicationName(), e.getMessage()));
 		}
 	}
 	
@@ -144,7 +144,7 @@ public abstract class SeleniumRobotServerConnector {
 			environmentId = response.getInt("id");
 			return environmentId;
 		} catch (UnirestException | SeleniumRobotServerException e) {
-			throw new ConfigurationException(String.format("Environment %s does not exist in variable server, please create it or use an other one", SeleniumTestsContextManager.getGlobalContext().getTestEnv()));
+			throw new ConfigurationException(String.format("Environment %s not get from variable server: %s", SeleniumTestsContextManager.getGlobalContext().getTestEnv(), e.getMessage()));
 		}
 	}
 	
