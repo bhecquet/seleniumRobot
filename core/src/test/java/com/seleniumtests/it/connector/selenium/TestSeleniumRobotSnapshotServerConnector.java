@@ -96,7 +96,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends GenericTest {
 	public void testCreateTestCaseInSession() {
 		Integer sessionId = connector.createSession("Session1");
 		Integer testCaseId = connector.createTestCase("Test 1");
-		Integer testCaseInSessionId = connector.createTestCaseInSession(sessionId, testCaseId);
+		Integer testCaseInSessionId = connector.createTestCaseInSession(sessionId, testCaseId, "Test 1");
 		Assert.assertNotNull(sessionId);
 		Assert.assertNotNull(testCaseInSessionId);
 		Assert.assertNotNull(connector.getApplicationId());
@@ -109,7 +109,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends GenericTest {
 	public void testCreateTestStep() {
 		Integer sessionId = connector.createSession("Session1");
 		Integer testCaseId = connector.createTestCase("Test 1");
-		Integer testCaseInSessionId = connector.createTestCaseInSession(sessionId, testCaseId);
+		Integer testCaseInSessionId = connector.createTestCaseInSession(sessionId, testCaseId, "Test 1");
 		Integer testStepId = connector.createTestStep("Step 1", testCaseInSessionId);
 		Assert.assertNotNull(testStepId);
 		
@@ -127,7 +127,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends GenericTest {
 
 		Integer sessionId = connector.createSession("Session1");
 		Integer testCaseId = connector.createTestCase("Test 2");
-		Integer testCaseInSessionId = connector.createTestCaseInSession(sessionId, testCaseId);
+		Integer testCaseInSessionId = connector.createTestCaseInSession(sessionId, testCaseId, "Test 2");
 		Integer testStepId = connector.createTestStep("Step 1", testCaseInSessionId);
 		Integer stepResultId = connector.recordStepResult(true, "logs", 1, sessionId, testCaseInSessionId, testStepId);
 		File image = Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), "img.png").toFile();
@@ -149,7 +149,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends GenericTest {
 	public void testRecordTestResult() throws IOException {
 		Integer sessionId = connector.createSession("Session1");
 		Integer testCaseId = connector.createTestCase("Test 2");
-		Integer testCaseInSessionId = connector.createTestCaseInSession(sessionId, testCaseId);
+		Integer testCaseInSessionId = connector.createTestCaseInSession(sessionId, testCaseId, "Test 2");
 		Integer testStepId = connector.createTestStep("Step 1", testCaseInSessionId);
 		Integer stepResultId = connector.recordStepResult(true, "some logs", 1, sessionId, testCaseInSessionId, testStepId);
 		

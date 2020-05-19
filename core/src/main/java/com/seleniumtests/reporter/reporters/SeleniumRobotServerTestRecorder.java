@@ -140,14 +140,14 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 				SeleniumTestsContext testContext = SeleniumTestsContextManager.setThreadContextFromTestResult(entry.getKey(), getTestName(testResult), getClassName(testResult), testResult);
 				
 				// skipped tests has never been executed and so attribute (set in TestListener) has not been applied
-				String testName = getTestName(testResult);
+				String testName = getTestCaseName(testResult);
 				
 				// get sessionId from context
 				Integer sessionId = TestNGContextUtils.getTestSessionCreated(entry.getKey());
 				
 				// record test case
 				Integer testCaseId = serverConnector.createTestCase(testName);
-				Integer testCaseInSessionId = serverConnector.createTestCaseInSession(sessionId, testCaseId);
+				Integer testCaseInSessionId = serverConnector.createTestCaseInSession(sessionId, testCaseId, getTestName(testResult));
 				serverConnector.addLogsToTestCaseInSession(testCaseInSessionId, generateExecutionLogs(testResult).toString());
 				
 				List<TestStep> testSteps = TestNGResultUtils.getSeleniumRobotTestContext(testResult).getTestStepManager().getTestSteps();

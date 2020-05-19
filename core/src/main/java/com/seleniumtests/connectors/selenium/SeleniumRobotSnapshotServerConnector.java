@@ -123,8 +123,21 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 	 * @param sessionId		the sessionId which should have been created before
 	 * @param testCaseId	the test case Id to link to this session
 	 * @return	the id of the created testCaseInSession
+	 * @deprecated use the same method with name parameter
 	 */
+	@Deprecated
 	public Integer createTestCaseInSession(Integer sessionId, Integer testCaseId) {
+		return createTestCaseInSession(sessionId, testCaseId, "");
+	}
+	
+	/**
+	 * Create link between test case and session
+	 * @param sessionId		the sessionId which should have been created before
+	 * @param testCaseId	the test case Id to link to this session
+	 * @param name			name of the test case in this session. This is to distinguish the test case (e.g: 'test1') and its full name (e.g: 'test1-1'), when executed with dataprovider
+	 * @return	the id of the created testCaseInSession
+	 */
+	public Integer createTestCaseInSession(Integer sessionId, Integer testCaseId, String name) {
 		if (!active) {
 			return null;
 		}
@@ -137,7 +150,8 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 		try {
 			JSONObject testInSessionJson = getJSonResponse(buildPostRequest(url + TESTCASEINSESSION_API_URL)
 					.field("testCase", testCaseId)
-					.field("session", sessionId));
+					.field("session", sessionId)
+					.field("name", name));
 			return testInSessionJson.getInt("id");
 		} catch (UnirestException | JSONException | SeleniumRobotServerException e) {
 			throw new SeleniumRobotServerException("cannot create test case", e);

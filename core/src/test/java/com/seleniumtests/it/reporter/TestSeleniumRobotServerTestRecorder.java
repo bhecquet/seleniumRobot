@@ -97,7 +97,10 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 			verify(serverConnector).createTestCase("testWithException");
 			verify(serverConnector).createTestCase("testSkipped");
 			verify(serverConnector, times(4)).addLogsToTestCaseInSession(anyInt(), anyString());
-			verify(serverConnector, times(4)).createTestCaseInSession(anyInt(), anyInt()); 
+			verify(serverConnector).createTestCaseInSession(anyInt(), anyInt(), eq("testAndSubActions")); 
+			verify(serverConnector).createTestCaseInSession(anyInt(), anyInt(), eq("testInError")); 
+			verify(serverConnector).createTestCaseInSession(anyInt(), anyInt(), eq("testWithException")); 
+			verify(serverConnector).createTestCaseInSession(anyInt(), anyInt(), eq("testSkipped")); 
 			verify(serverConnector, times(3)).createTestStep(eq("step 1"), anyInt());
 			verify(serverConnector).createTestStep(eq("step 2"), anyInt());
 			verify(serverConnector).createSnapshot(any(Snapshot.class), anyInt(), anyInt(), anyInt()); // two snapshots but only once is sent because the other has no name
@@ -148,7 +151,7 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 			// issue #331: check all test cases are created, call MUST be done only once to avoid result to be recorded several times
 			verify(serverConnector).createTestCase("testDriverCustomSnapshot");
 			verify(serverConnector).addLogsToTestCaseInSession(anyInt(), anyString());
-			verify(serverConnector).createTestCaseInSession(anyInt(), anyInt()); 
+			verify(serverConnector).createTestCaseInSession(anyInt(), anyInt(), eq("testDriverCustomSnapshot")); 
 			verify(serverConnector).createTestStep(eq("_captureSnapshot with args: (my snapshot, )"), anyInt());
 			verify(serverConnector).createSnapshot(any(Snapshot.class), anyInt(), anyInt(), anyInt()); // 1 custom snapshot taken with name
 			verify(serverConnector).createExcludeZones(any(Rectangle.class), anyInt()); // one exclude zone created with that snapshot
@@ -191,7 +194,7 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 			
 			// check all test cases are created, in both test classes
 			verify(serverConnector, never()).createTestCase(anyString());
-			verify(serverConnector, never()).createTestCaseInSession(anyInt(), anyInt()); 
+			verify(serverConnector, never()).createTestCaseInSession(anyInt(), anyInt(), anyString()); 
 			verify(serverConnector, never()).createTestStep(anyString(), anyInt());
 			
 		} finally {

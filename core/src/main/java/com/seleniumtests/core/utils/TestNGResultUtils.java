@@ -101,6 +101,11 @@ public class TestNGResultUtils {
 		return newTestResult;
 	}
 	
+	/**
+	 * Returns the test name (will be method name for SeleniumTestPlan test and scenario name for cucumber test)
+	 * @param testNGResult
+	 * @return
+	 */
 	public static String getTestName(ITestResult testNGResult) {
 		if (testNGResult == null) {
 			return null;
