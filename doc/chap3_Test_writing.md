@@ -427,10 +427,16 @@ You may consider putting all test data access in the Test script, not in page ob
 	}
 ```
 	
-Test data are get using `param(<key>)` or updated via `createOrUpdateParam`. The later is only available when seleniumRobot server is used.
-`createOrUpdateParam(<key>, <value>)` is used to store a variable with reference to environment, application
-`createOrUpdateParam(<key>, <value>, <attach_to_version>)` is used to store a variable with reference to environment, application. Reference to application version is optional
-`createOrUpdateParam(<key>, <value>, <attach_to_version>, <time_to_live>, <reservable>)` is used to store a variable with reference to environment, application. Reference to application version is optional. In this case, we can specify that server will destroy variable after X days (the time to live) and that this variable can be reserved. 
+Test data are get using 
+- `param(<key>)` is used to get a variable by its full name
+- `param(Pattern.compile(<key_pattern>))` is used to get a variable by pattern on the name. For example `param(Pattern.compile("var.*Name"))` for searching all variables whose name matches "var<something>Name". Only one value will be get if multiple variables match.
+- `param(Pattern.compile(<key_pattern>), Pattern.compile(<value_pattern>))` is used to get a variable by pattern on the name / value. For example `param(Pattern.compile("var.*Name"), Pattern.compile("var.*Value"))` for searching all variables whose name matches "var<something>Name" and value matches "var<someThing>Value". Only one value will be get if multiple variables match.
+- `param(null, Pattern.compile(<value_pattern>))`is used to get a variable by pattern on the value.
+
+Test data are updated via `createOrUpdateParam`. The later is only available when seleniumRobot server is used.
+- `createOrUpdateParam(<key>, <value>)` is used to store a variable with reference to environment, application
+- `createOrUpdateParam(<key>, <value>, <attach_to_version>)` is used to store a variable with reference to environment, application. Reference to application version is optional
+- `createOrUpdateParam(<key>, <value>, <attach_to_version>, <time_to_live>, <reservable>)` is used to store a variable with reference to environment, application. Reference to application version is optional. In this case, we can specify that server will destroy variable after X days (the time to live) and that this variable can be reserved. 
 
 #### Use variable server to hold variables during some days ####
 
