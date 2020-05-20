@@ -20,7 +20,8 @@ package com.seleniumtests.core;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-import org.json.JSONObject;
+import kong.unirest.json.JSONObject;
+
 
 public class TestVariable {
 

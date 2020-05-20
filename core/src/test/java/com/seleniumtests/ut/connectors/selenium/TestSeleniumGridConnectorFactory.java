@@ -33,15 +33,16 @@ import org.testng.ITestContext;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import com.mashape.unirest.http.Unirest;
-import com.mashape.unirest.http.exceptions.UnirestException;
-import com.mashape.unirest.request.GetRequest;
 import com.seleniumtests.ConnectorsTest;
 import com.seleniumtests.connectors.selenium.BrowserStackGridConnector;
 import com.seleniumtests.connectors.selenium.SeleniumGridConnector;
 import com.seleniumtests.connectors.selenium.SeleniumGridConnectorFactory;
 import com.seleniumtests.connectors.selenium.SeleniumRobotGridConnector;
 import com.seleniumtests.customexception.ConfigurationException;
+
+import kong.unirest.GetRequest;
+import kong.unirest.Unirest;
+import kong.unirest.UnirestException;
 
 @PrepareForTest({Unirest.class})
 public class TestSeleniumGridConnectorFactory extends ConnectorsTest {

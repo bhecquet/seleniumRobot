@@ -17,8 +17,6 @@
  */
 package com.seleniumtests.it.reporter;
 
-import static org.mockito.Mockito.when;
-
 import java.io.File;
 import java.nio.file.Paths;
 
@@ -28,8 +26,6 @@ import org.testng.ITestContext;
 import org.testng.annotations.Test;
 import org.testng.xml.XmlSuite.ParallelMode;
 
-import com.mashape.unirest.http.exceptions.UnirestException;
-import com.mashape.unirest.request.BaseRequest;
 import com.seleniumtests.connectors.selenium.SeleniumRobotSnapshotServerConnector;
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;

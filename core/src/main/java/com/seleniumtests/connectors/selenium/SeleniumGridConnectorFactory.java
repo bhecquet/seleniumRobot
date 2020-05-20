@@ -26,11 +26,12 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
-import com.mashape.unirest.http.HttpResponse;
-import com.mashape.unirest.http.Unirest;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.util.helper.WaitHelper;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
+
+import kong.unirest.HttpResponse;
+import kong.unirest.Unirest;
 
 /**
  * Class for getting an instance of grid connector

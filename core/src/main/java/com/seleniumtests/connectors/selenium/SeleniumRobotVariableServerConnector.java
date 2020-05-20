@@ -23,15 +23,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import com.mashape.unirest.http.exceptions.UnirestException;
-import com.mashape.unirest.request.HttpRequest;
-import com.mashape.unirest.request.body.MultipartBody;
 import com.seleniumtests.core.TestVariable;
 import com.seleniumtests.customexception.SeleniumRobotServerException;
+
+import kong.unirest.HttpRequest;
+import kong.unirest.MultipartBody;
+import kong.unirest.UnirestException;
+import kong.unirest.json.JSONArray;
+import kong.unirest.json.JSONException;
+import kong.unirest.json.JSONObject;
 
 public class SeleniumRobotVariableServerConnector extends SeleniumRobotServerConnector {
 	
@@ -195,14 +195,14 @@ public class SeleniumRobotVariableServerConnector extends SeleniumRobotServerCon
 				MultipartBody request = buildPostRequest(url + VARIABLE_API_URL)
 						.field("name", TestVariable.TEST_VARIABLE_PREFIX + variable.getName())
 						.field("value", variable.getValue())
-						.field("reservable", variable.isReservable())
-						.field("environment", environmentId)
-						.field("application", applicationId)
-						.field("internal", true)
-						.field("timeToLive", variable.getTimeToLive());
+						.field("reservable", String.valueOf(variable.isReservable()))
+						.field("environment", environmentId.toString())
+						.field("application", applicationId.toString())
+						.field("internal", String.valueOf(true))
+						.field("timeToLive", String.valueOf(variable.getTimeToLive()));
 				
 				if (specificToVersion) {
-					request = request.field("version", versionId);
+					request = request.field("version", versionId.toString());
 				}
 				
 				JSONObject variableJson = getJSonResponse(request);
@@ -216,8 +216,8 @@ public class SeleniumRobotVariableServerConnector extends SeleniumRobotServerCon
 			try {
 				JSONObject variableJson = getJSonResponse(buildPatchRequest(String.format(url + EXISTING_VARIABLE_API_URL, variable.getId()))
 						.field("value", variable.getValue())
-						.field("reservable", variable.isReservable())
-						.field("timeToLive", variable.getTimeToLive()));
+						.field("reservable", String.valueOf(variable.isReservable()))
+						.field("timeToLive", String.valueOf(variable.getTimeToLive())));
 				
 				return TestVariable.fromJsonObject(variableJson);
 				

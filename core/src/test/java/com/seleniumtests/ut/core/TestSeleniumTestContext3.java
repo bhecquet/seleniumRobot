@@ -40,7 +40,6 @@ import org.testng.ITestResult;
 import org.testng.annotations.Test;
 import org.testng.xml.XmlTest;
 
-import com.mashape.unirest.http.Unirest;
 import com.seleniumtests.ConnectorsTest;
 import com.seleniumtests.GenericTest;
 import com.seleniumtests.connectors.selenium.SeleniumGridConnector;
@@ -52,6 +51,8 @@ import com.seleniumtests.core.TestVariable;
 import com.seleniumtests.core.runner.CucumberScenarioWrapper;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.driver.WebUIDriver;
+
+import kong.unirest.Unirest;
 
 /**
  * - Test creation of seleniumrobot server connection inside SeleniumTestsContext

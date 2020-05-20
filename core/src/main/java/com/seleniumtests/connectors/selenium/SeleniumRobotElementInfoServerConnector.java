@@ -24,16 +24,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import com.mashape.unirest.http.exceptions.UnirestException;
-import com.mashape.unirest.request.HttpRequest;
-import com.mashape.unirest.request.body.MultipartBody;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.SeleniumRobotServerException;
 import com.seleniumtests.uipage.htmlelements.ElementInfo;
+
+import kong.unirest.HttpRequest;
+import kong.unirest.MultipartBody;
+import kong.unirest.UnirestException;
+import kong.unirest.json.JSONArray;
+import kong.unirest.json.JSONException;
+import kong.unirest.json.JSONObject;
 
 public class SeleniumRobotElementInfoServerConnector extends SeleniumRobotServerConnector {
 	
@@ -146,16 +146,16 @@ public class SeleniumRobotElementInfoServerConnector extends SeleniumRobotServer
 							.field("name", currentElementInfo.getName());
 					
 					if (currentElementInfo.getCoordX() != referenceElementInfo.getCoordX()) {
-						request = request.field("coordX", currentElementInfo.getCoordX());
+						request = request.field("coordX", currentElementInfo.getCoordX().toString());
 					}
 					if (currentElementInfo.getCoordY() != referenceElementInfo.getCoordY()) {
-						request = request.field("coordY", currentElementInfo.getCoordY());
+						request = request.field("coordY", currentElementInfo.getCoordY().toString());
 					}
 					if (currentElementInfo.getWidth() != referenceElementInfo.getWidth()) {
-						request = request.field("width", currentElementInfo.getWidth());
+						request = request.field("width", currentElementInfo.getWidth().toString());
 					}
 					if (currentElementInfo.getHeight() != referenceElementInfo.getHeight()) {
-						request = request.field("height", currentElementInfo.getHeight());
+						request = request.field("height", currentElementInfo.getHeight().toString());
 					}
 					if (currentElementInfo.getLocator() != referenceElementInfo.getLocator()) {
 						request = request.field("locator", currentElementInfo.getLocator());
@@ -188,7 +188,7 @@ public class SeleniumRobotElementInfoServerConnector extends SeleniumRobotServer
 						request = request.field("b64ImageStability", "+" + Integer.toString(currentElementInfo.getB64ImageStability() - referenceElementInfo.getB64ImageStability()));
 					}
 					if (currentElementInfo.getAttributesStability() != referenceElementInfo.getAttributesStability()) {
-						Map<String, String> attributeStabilityDiff = new HashMap<>();
+						Map<String, Object> attributeStabilityDiff = new HashMap<>();
 						for (String attribute: currentElementInfo.getAttributesStability().keySet()) {
 							attributeStabilityDiff.put(attribute, "+" + Integer.toString(currentElementInfo.getAttributesStability().get(attribute) - referenceElementInfo.getAttributesStability().getOrDefault(attribute, 0)));
 						}
