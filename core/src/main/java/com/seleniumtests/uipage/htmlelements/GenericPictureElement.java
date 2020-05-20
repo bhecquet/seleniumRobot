@@ -28,6 +28,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.openqa.selenium.Rectangle;
 import org.openqa.selenium.WebDriverException;
+import org.openqa.selenium.remote.ScreenshotException;
 
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.ImageSearchException;
@@ -111,7 +112,7 @@ public abstract class GenericPictureElement extends Element {
 		File screenshotFile = getScreenshotFile();
 		
 		if (screenshotFile == null) {
-			throw new WebDriverException("Screenshot does not exist");
+			throw new ScreenshotException("Screenshot does not exist");
 		}
 		
 		// for desktop search, without reference image, do not search

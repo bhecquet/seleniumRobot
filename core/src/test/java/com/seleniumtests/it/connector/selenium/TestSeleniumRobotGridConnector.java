@@ -1,10 +1,9 @@
 package com.seleniumtests.it.connector.selenium;
 
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verify;
-import static org.testng.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
 
 import java.awt.event.KeyEvent;
 import java.io.File;
@@ -15,8 +14,6 @@ import java.util.List;
 import org.apache.commons.io.FileUtils;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.log4j.Logger;
-import org.openqa.selenium.Capabilities;
-import org.openqa.selenium.Keys;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.SessionId;
 import org.testng.Assert;
@@ -25,8 +22,6 @@ import org.testng.SkipException;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import com.mashape.unirest.http.Unirest;
-import com.mashape.unirest.http.exceptions.UnirestException;
 import com.seleniumtests.GenericTest;
 import com.seleniumtests.MockitoTest;
 import com.seleniumtests.connectors.selenium.SeleniumGridConnector;
@@ -36,7 +31,8 @@ import com.seleniumtests.util.helper.WaitHelper;
 import com.seleniumtests.util.imaging.ImageProcessor;
 
 import io.appium.java_client.remote.MobileCapabilityType;
-import net.sourceforge.htmlunit.corejs.javascript.ScriptableObject.KeyComparator;
+import kong.unirest.Unirest;
+import kong.unirest.UnirestException;
 
 /**
  * All these tests need to be executed with a selenium robot grid started on localhost, port 4444

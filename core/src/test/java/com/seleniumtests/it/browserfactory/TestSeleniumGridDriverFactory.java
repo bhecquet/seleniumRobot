@@ -32,7 +32,6 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import org.testng.xml.XmlSuite.ParallelMode;
 
-import com.mashape.unirest.http.Unirest;
 import com.seleniumtests.ConnectorsTest;
 import com.seleniumtests.browserfactory.SeleniumGridDriverFactory;
 import com.seleniumtests.connectors.selenium.SeleniumGridConnector;
@@ -41,6 +40,8 @@ import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.driver.WebUIDriverFactory;
 import com.seleniumtests.it.reporter.ReporterTest;
+
+import kong.unirest.Unirest;
 
 @PrepareForTest({Unirest.class, WebUIDriverFactory.class, SeleniumGridDriverFactory.class})
 public class TestSeleniumGridDriverFactory extends ConnectorsTest {

@@ -19,12 +19,13 @@ package com.seleniumtests.ut.core;
 
 import java.time.LocalDateTime;
 
-import org.json.JSONObject;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import com.seleniumtests.GenericTest;
 import com.seleniumtests.core.TestVariable;
+
+import kong.unirest.json.JSONObject;
 
 public class TestTestVariable extends GenericTest {
 	

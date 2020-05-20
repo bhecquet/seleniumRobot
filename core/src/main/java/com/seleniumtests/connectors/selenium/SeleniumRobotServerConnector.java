@@ -18,20 +18,21 @@
 package com.seleniumtests.connectors.selenium;
 
 import org.apache.log4j.Logger;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
-import com.mashape.unirest.http.HttpResponse;
-import com.mashape.unirest.http.Unirest;
-import com.mashape.unirest.http.exceptions.UnirestException;
-import com.mashape.unirest.request.BaseRequest;
-import com.mashape.unirest.request.GetRequest;
-import com.mashape.unirest.request.HttpRequestWithBody;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.SeleniumRobotServerException;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
+
+import kong.unirest.GetRequest;
+import kong.unirest.HttpRequest;
+import kong.unirest.HttpRequestWithBody;
+import kong.unirest.HttpResponse;
+import kong.unirest.Unirest;
+import kong.unirest.UnirestException;
+import kong.unirest.json.JSONArray;
+import kong.unirest.json.JSONException;
+import kong.unirest.json.JSONObject;
 
 public abstract class SeleniumRobotServerConnector {
 	
@@ -180,7 +181,7 @@ public abstract class SeleniumRobotServerConnector {
 		try {
 			JSONObject testJson = getJSonResponse(buildPostRequest(url + TESTCASE_API_URL)
 					.field("name", testName)
-					.field("application", applicationId));
+					.field("application", applicationId.toString()));
 			return testJson.getInt("id");
 		} catch (UnirestException | JSONException | SeleniumRobotServerException e) {
 			throw new SeleniumRobotServerException("cannot create test case", e);
@@ -201,7 +202,7 @@ public abstract class SeleniumRobotServerConnector {
 		try {
 			JSONObject versionJson = getJSonResponse(buildPostRequest(url + VERSION_API_URL)
 					.field("name", SeleniumTestsContextManager.getApplicationVersion())
-					.field("application", applicationId));
+					.field("application", applicationId.toString()));
 			versionId = versionJson.getInt("id");
 		} catch (UnirestException | JSONException | SeleniumRobotServerException e) {
 			throw new SeleniumRobotServerException("cannot create version", e);
@@ -258,7 +259,7 @@ public abstract class SeleniumRobotServerConnector {
 		}
 	}
 	
-	protected JSONObject getJSonResponse(BaseRequest request) throws UnirestException {
+	protected JSONObject getJSonResponse(HttpRequest request) {
 
 		HttpResponse<String> response = request.asString();
 
@@ -272,16 +273,16 @@ public abstract class SeleniumRobotServerConnector {
 			try {
 				error = new JSONObject(response.getBody()).getString("detail");
 			} catch (JSONException e) {
-				throw new SeleniumRobotServerException(String.format("request to %s failed: %s", request.getHttpRequest().getUrl(), response.getBody()));
+				throw new SeleniumRobotServerException(String.format("request to %s failed: %s", request.getUrl(), response.getBody()));
 			} catch (Exception e) {
-				throw new UnirestException(String.format("request to %s failed: %s", request.getHttpRequest().getUrl(), response.getStatusText()));
+				throw new UnirestException(String.format("request to %s failed: %s", request.getUrl(), response.getStatusText()));
 			}
 			
 			if (response.getStatus() == 401) {
 				error += "You need to provide the API token through 'seleniumRobotServerToken' parameter";
 			}
 
-			throw new SeleniumRobotServerException(String.format("request to %s failed: %s", request.getHttpRequest().getUrl(), error));
+			throw new SeleniumRobotServerException(String.format("request to %s failed: %s", request.getUrl(), error));
 		}
 		
 		if (response.getStatus() == 204) {
@@ -291,7 +292,7 @@ public abstract class SeleniumRobotServerConnector {
 		return new JSONObject(response.getBody());
 	}
 	
-	protected JSONArray getJSonArray(BaseRequest request) throws UnirestException {
+	protected JSONArray getJSonArray(HttpRequest request)  {
 		HttpResponse<String> response = request.asString();
 		
 
@@ -303,9 +304,9 @@ public abstract class SeleniumRobotServerConnector {
 		if (response.getStatus() >= 400) {
 			try {
 				String error = new JSONObject(response.getBody()).getString("detail");
-				throw new SeleniumRobotServerException(String.format("request to %s failed: %s", request.getHttpRequest().getUrl(), error));
+				throw new SeleniumRobotServerException(String.format("request to %s failed: %s", request.getUrl(), error));
 			} catch (Exception e) {
-				throw new UnirestException(String.format("request to %s failed: %s", request.getHttpRequest().getUrl(), response.getStatusText()));
+				throw new UnirestException(String.format("request to %s failed: %s", request.getUrl(), response.getStatusText()));
 			}
 			
 		}

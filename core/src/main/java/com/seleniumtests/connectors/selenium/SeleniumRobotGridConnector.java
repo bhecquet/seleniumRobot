@@ -19,9 +19,7 @@ package com.seleniumtests.connectors.selenium;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -38,22 +36,22 @@ import org.apache.http.entity.InputStreamEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.json.JSONException;
-import org.json.JSONObject;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
 import com.google.common.net.HttpHeaders;
 import com.google.common.net.MediaType;
-import com.mashape.unirest.http.HttpResponse;
-import com.mashape.unirest.http.JsonNode;
-import com.mashape.unirest.http.Unirest;
-import com.mashape.unirest.http.exceptions.UnirestException;
-import com.mashape.unirest.request.HttpRequestWithBody;
 import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.customexception.SeleniumGridException;
 import com.seleniumtests.util.FileUtility;
 
 import io.appium.java_client.remote.MobileCapabilityType;
+import kong.unirest.HttpRequestWithBody;
+import kong.unirest.HttpResponse;
+import kong.unirest.JsonNode;
+import kong.unirest.Unirest;
+import kong.unirest.UnirestException;
+import kong.unirest.json.JSONObject;
 
 public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 
@@ -445,26 +443,18 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 		
 		logger.info("stopping capture");
 		try {
-			HttpResponse<InputStream> videoResponse = Unirest.get(String.format("%s%s", nodeUrl, NODE_TASK_SERVLET))
+			HttpResponse<File> videoResponse = Unirest.get(String.format("%s%s", nodeUrl, NODE_TASK_SERVLET))
 				.queryString("action", "stopVideoCapture")
-				.queryString("session", sessionId).asBinary();
+				.queryString("session", sessionId).asFile(outputFile);
 			
 			if (videoResponse.getStatus() != 200) {
 				logger.error(String.format("stop video capture error: %s", videoResponse.getBody()));
 				return null;
-			} else {
-			
-				InputStream videoI = videoResponse.getBody();
-				
-				File videoFile = new File(outputFile);
-				FileOutputStream os = new FileOutputStream(videoFile);
-				IOUtils.copy(videoI, os);
-				os.close();
-				
-				return videoFile;
+			} else {				
+				return videoResponse.getBody();
 			}
 			
-		} catch (UnirestException | IOException e) {
+		} catch (UnirestException e) {
 			logger.warn(String.format("Could not stop video capture: %s", e.getMessage()));
 			return null;
 		}

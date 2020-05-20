@@ -18,7 +18,6 @@
 package com.seleniumtests.core.runner;
 
 import java.io.File;
-import java.io.IOException;
 import java.lang.reflect.Method;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -50,7 +49,6 @@ import org.testng.internal.ConfigurationMethod;
 import org.testng.internal.TestResult;
 
 import com.google.common.collect.Iterables;
-import com.mashape.unirest.http.Unirest;
 import com.seleniumtests.connectors.selenium.SeleniumRobotVariableServerConnector;
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
@@ -69,6 +67,8 @@ import com.seleniumtests.reporter.reporters.ReporterControler;
 import com.seleniumtests.util.FileUtility;
 import com.seleniumtests.util.logging.ScenarioLogger;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
+
+import kong.unirest.Unirest;
 
 public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodListener2, ISuiteListener, IExecutionListener, IConfigurationListener {
 	
@@ -344,8 +344,8 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 	@Override
 	public void onExecutionFinish() {
         try {
-			Unirest.shutdown();
-		} catch (IOException e) {
+			Unirest.shutDown();
+		} catch (Exception e) {
 			logger.error("Cannot stop unirest", e);
 		}
         

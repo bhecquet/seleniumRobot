@@ -38,12 +38,13 @@ import org.testng.ITestContext;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import com.mashape.unirest.http.Unirest;
-import com.mashape.unirest.http.exceptions.UnirestException;
 import com.seleniumtests.ConnectorsTest;
 import com.seleniumtests.connectors.selenium.SeleniumRobotVariableServerConnector;
 import com.seleniumtests.core.TestVariable;
 import com.seleniumtests.customexception.ConfigurationException;
+
+import kong.unirest.Unirest;
+import kong.unirest.UnirestException;
 
 @PrepareForTest({Unirest.class})
 public class TestSeleniumRobotVariableServerConnector extends ConnectorsTest {

@@ -30,12 +30,13 @@ import org.json.JSONObject;
 import org.zeroturnaround.zip.ZipUtil;
 
 import com.google.common.primitives.Bytes;
-import com.mashape.unirest.http.HttpResponse;
-import com.mashape.unirest.http.Unirest;
-import com.mashape.unirest.http.exceptions.UnirestException;
 import com.seleniumtests.connectors.tms.TestManager;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.ConfigurationException;
+
+import kong.unirest.HttpResponse;
+import kong.unirest.Unirest;
+import kong.unirest.UnirestException;
 
 /**
  * Class to connect to HP ALM using  API

@@ -12,10 +12,11 @@ import java.util.Map.Entry;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 
-import com.mashape.unirest.http.Unirest;
-import com.mashape.unirest.http.exceptions.UnirestException;
 import com.seleniumtests.core.TestVariable;
 import com.seleniumtests.customexception.ConfigurationException;
+
+import kong.unirest.Unirest;
+import kong.unirest.UnirestException;
 
 public class BrowserExtension {
 	
@@ -68,7 +69,7 @@ public class BrowserExtension {
 			try {
 				extensionPath = File.createTempFile("extension", "." + FilenameUtils.getExtension(new URL(path).getPath()));
 				extensionPath.deleteOnExit();
-				FileUtils.copyInputStreamToFile(Unirest.get(path).asBinary().getBody(), extensionPath);
+				Unirest.get(path).asFile(extensionPath.getAbsolutePath());
 			} catch (IOException | UnirestException e) {
 				throw new ConfigurationException(String.format("Cannot download extenion at %s: %s", path, e.getMessage()));
 			}

@@ -18,7 +18,6 @@
 package com.seleniumtests.connectors.selenium;
 
 import java.io.File;
-import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -27,17 +26,18 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.json.JSONException;
-import org.json.JSONObject;
 import org.openqa.selenium.Rectangle;
 
-import com.mashape.unirest.http.exceptions.UnirestException;
-import com.mashape.unirest.request.body.MultipartBody;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.SeleniumRobotServerException;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.reporter.logger.Snapshot;
 import com.seleniumtests.util.helper.WaitHelper;
+
+import kong.unirest.MultipartBody;
+import kong.unirest.UnirestException;
+import kong.unirest.json.JSONObject;
 
 public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerConnector {
 	
@@ -108,9 +108,9 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 					.field("date", LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME))
 					.field("browser", browser.getBrowserType())
 					.field("environment", SeleniumTestsContextManager.getGlobalContext().getTestEnv())
-					.field("version", versionId)
+					.field("version", versionId.toString())
 					.field("name", sessionName)
-					.field("compareSnapshot", SeleniumTestsContextManager.getGlobalContext().getSeleniumRobotServerCompareSnapshot())
+					.field("compareSnapshot", String.valueOf(SeleniumTestsContextManager.getGlobalContext().getSeleniumRobotServerCompareSnapshot()))
 					.field("ttl", String.format("%d days", SeleniumTestsContextManager.getGlobalContext().getSeleniumRobotServerCompareSnapshotTtl()))); // format is 'x days' as this is the way Django expect a duration in days
 			return sessionJson.getInt("id");
 		} catch (UnirestException | JSONException | SeleniumRobotServerException e) {
@@ -150,7 +150,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 		try {
 			JSONObject testInSessionJson = getJSonResponse(buildPostRequest(url + TESTCASEINSESSION_API_URL)
 					.field("testCase", testCaseId)
-					.field("session", sessionId)
+					.field("session", sessionId.toString())
 					.field("name", name));
 			return testInSessionJson.getInt("id");
 		} catch (UnirestException | JSONException | SeleniumRobotServerException e) {
@@ -202,11 +202,11 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 			JSONObject snapshotJson = getJSonResponse(buildPostRequest(url + SNAPSHOT_API_URL)
 					.field("stepResult", stepResultId)
 					.field("sessionId", sessionUUID)
-					.field("testCase", testCaseInSessionId)
+					.field("testCase", testCaseInSessionId.toString())
 					.field("image", pictureFile)
 					.field("name", snapshot.getName())
 					.field("compare", snapshot.getCheckSnapshot().getName())
-					.field("diffTolerance", snapshot.getCheckSnapshot().getErrorThreshold())
+					.field("diffTolerance", String.valueOf(snapshot.getCheckSnapshot().getErrorThreshold()))
 					);
 			Integer snapshotId = snapshotJson.getInt("id");
 			
@@ -230,10 +230,10 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 		try {
 			JSONObject excludeJson = getJSonResponse(buildPostRequest(url + EXCLUDE_API_URL)
 					.field("snapshot", snapshotId)
-					.field("x", excludeZone.x)
-					.field("y", excludeZone.y)
-					.field("width", excludeZone.width)
-					.field("height", excludeZone.height)
+					.field("x", String.valueOf(excludeZone.x))
+					.field("y", String.valueOf(excludeZone.y))
+					.field("width", String.valueOf(excludeZone.width))
+					.field("height", String.valueOf(excludeZone.height))
 					);
 			return excludeJson.getInt("id");
 			
@@ -265,9 +265,9 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 		try {
 			JSONObject resultJson = getJSonResponse(buildPostRequest(url + STEPRESULT_API_URL)
 					.field("step", testStepId)
-					.field("testCase", testCaseInSessionId)
-					.field("result", result)
-					.field("duration", duration)
+					.field("testCase", testCaseInSessionId.toString())
+					.field("result", result.toString())
+					.field("duration", String.valueOf(duration))
 					.field("stacktrace", logs)
 					);
 			return resultJson.getInt("id");
@@ -280,6 +280,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 	 * Returns list of test steps in a test case
 	 * @return
 	 */
+	@SuppressWarnings("unchecked")
 	public List<String> getStepListFromTestCase(Integer testCaseInSessionId) {
 		if (testCaseInSessionId == null) {
 			return new ArrayList<>();
@@ -288,7 +289,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 		try {
 
 			JSONObject sessionJson = getJSonResponse(buildGetRequest(url + TESTCASEINSESSION_API_URL + testCaseInSessionId));
-			return sessionJson.getJSONArray("testSteps")
+			return (List<String>) sessionJson.getJSONArray("testSteps")
 					.toList()
 					.stream()
 					.map(Object::toString)

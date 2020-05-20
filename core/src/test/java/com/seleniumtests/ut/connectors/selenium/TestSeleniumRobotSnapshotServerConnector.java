@@ -36,9 +36,6 @@ import org.testng.ITestContext;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import com.mashape.unirest.http.Unirest;
-import com.mashape.unirest.http.exceptions.UnirestException;
-import com.mashape.unirest.request.BaseRequest;
 import com.seleniumtests.ConnectorsTest;
 import com.seleniumtests.connectors.selenium.SeleniumRobotSnapshotServerConnector;
 import com.seleniumtests.core.SeleniumTestsContextManager;
@@ -48,6 +45,10 @@ import com.seleniumtests.driver.screenshots.ScreenShot;
 import com.seleniumtests.driver.screenshots.SnapshotCheckType;
 import com.seleniumtests.driver.screenshots.SnapshotTarget;
 import com.seleniumtests.reporter.logger.Snapshot;
+
+import kong.unirest.HttpRequest;
+import kong.unirest.Unirest;
+import kong.unirest.UnirestException;
 
 @PrepareForTest({Unirest.class})
 public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
@@ -127,7 +128,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 		SeleniumRobotSnapshotServerConnector connector = configureMockedSnapshotServerConnection();
 		connector.setApplicationId(null); // reset to be sure it's recreated
 
-		BaseRequest req = createServerMock("POST", SeleniumRobotSnapshotServerConnector.APPLICATION_API_URL, 200, "{'id': '9'}", "body");	
+		HttpRequest<HttpRequest> req = createServerMock("POST", SeleniumRobotSnapshotServerConnector.APPLICATION_API_URL, 200, "{'id': '9'}", "body");	
 		when(req.asString()).thenThrow(UnirestException.class);
 		
 		connector.createApplication();
@@ -175,7 +176,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 		SeleniumRobotSnapshotServerConnector connector = configureMockedSnapshotServerConnection();
 		connector.setVersionId(null); // reset to be sure it's recreated
 		
-		BaseRequest req = createServerMock("POST", SeleniumRobotSnapshotServerConnector.VERSION_API_URL, 200, "{'id': '9'}", "body");	
+		HttpRequest<HttpRequest> req = createServerMock("POST", SeleniumRobotSnapshotServerConnector.VERSION_API_URL, 200, "{'id': '9'}", "body");	
 		when(req.asString()).thenThrow(UnirestException.class);
 		
 		connector.createVersion();
@@ -207,7 +208,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 		SeleniumRobotSnapshotServerConnector connector = configureMockedSnapshotServerConnection();
 		connector.setEnvironmentId(null); // reset to be sure it's recreated
 		
-		BaseRequest req = createServerMock("POST", SeleniumRobotSnapshotServerConnector.ENVIRONMENT_API_URL, 200, "{'id': '9'}", "body");	
+		HttpRequest<HttpRequest> req = createServerMock("POST", SeleniumRobotSnapshotServerConnector.ENVIRONMENT_API_URL, 200, "{'id': '9'}", "body");	
 		when(req.asString()).thenThrow(UnirestException.class);
 		
 		connector.createEnvironment();
@@ -247,7 +248,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 	public void testCreateSessionInError() throws UnirestException {
 
 		SeleniumRobotSnapshotServerConnector connector = configureMockedSnapshotServerConnection();
-		BaseRequest req = createServerMock("POST", SeleniumRobotSnapshotServerConnector.SESSION_API_URL, 200, "{'id': '9'}", "body");	
+		HttpRequest<HttpRequest> req = createServerMock("POST", SeleniumRobotSnapshotServerConnector.SESSION_API_URL, 200, "{'id': '9'}", "body");	
 		when(req.asString()).thenThrow(UnirestException.class);
 		
 		Integer sessionId = connector.createSession("Session1");
@@ -304,7 +305,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 	public void testCreateTestCaseInError() throws UnirestException {
 		
 		SeleniumRobotSnapshotServerConnector connector = configureMockedSnapshotServerConnection();
-		BaseRequest req = createServerMock("POST", SeleniumRobotSnapshotServerConnector.TESTCASE_API_URL, 200, "{'id': '9'}", "body");	
+		HttpRequest<HttpRequest> req = createServerMock("POST", SeleniumRobotSnapshotServerConnector.TESTCASE_API_URL, 200, "{'id': '9'}", "body");	
 		when(req.asString()).thenThrow(UnirestException.class);
 		
 		connector.createApplication();
@@ -352,7 +353,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 	public void testCreateTestCaseInSessionInError() throws UnirestException {
 		
 		SeleniumRobotSnapshotServerConnector connector = configureMockedSnapshotServerConnection();
-		BaseRequest req = createServerMock("POST", SeleniumRobotSnapshotServerConnector.TESTCASEINSESSION_API_URL, 200, "{'id': '9'}", "body");	
+		HttpRequest<HttpRequest> req = createServerMock("POST", SeleniumRobotSnapshotServerConnector.TESTCASEINSESSION_API_URL, 200, "{'id': '9'}", "body");	
 		when(req.asString()).thenThrow(UnirestException.class);
 		
 		Integer sessionId = connector.createSession("Session1");
@@ -387,7 +388,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 	public void testCreateTestStepInError() throws UnirestException {	
 		
 		SeleniumRobotSnapshotServerConnector connector = configureMockedSnapshotServerConnection();
-		BaseRequest req = createServerMock("POST", SeleniumRobotSnapshotServerConnector.TESTSTEP_API_URL, 200, "{'id': '9'}", "body");	
+		HttpRequest<HttpRequest> req = createServerMock("POST", SeleniumRobotSnapshotServerConnector.TESTSTEP_API_URL, 200, "{'id': '9'}", "body");	
 		when(req.asString()).thenThrow(UnirestException.class);
 		
 		Integer sessionId = connector.createSession("Session1");
@@ -421,7 +422,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 		Integer testCaseId = connector.createTestCase("Test 1");
 		Integer testCaseInSessionId = connector.createTestCaseInSession(sessionId, testCaseId, "Test 1");
 
-		BaseRequest req = createServerMock("POST", SeleniumRobotSnapshotServerConnector.TESTCASEINSESSION_API_URL + "15", 200, "{'id': '9'}", "body");	
+		HttpRequest<HttpRequest> req = createServerMock("POST", SeleniumRobotSnapshotServerConnector.TESTCASEINSESSION_API_URL + "15", 200, "{'id': '9'}", "body");	
 		when(req.asString()).thenThrow(UnirestException.class);
 
 		Assert.assertEquals(connector.getStepListFromTestCase(testCaseInSessionId).size(), 0);
@@ -510,7 +511,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 	public void testCreateSnapshotInError() throws UnirestException {
 		
 		SeleniumRobotSnapshotServerConnector connector = configureMockedSnapshotServerConnection();
-		BaseRequest req = createServerMock("POST", SeleniumRobotSnapshotServerConnector.SNAPSHOT_API_URL, 200, "{'id': '9'}", "body");	
+		HttpRequest<HttpRequest> req = createServerMock("POST", SeleniumRobotSnapshotServerConnector.SNAPSHOT_API_URL, 200, "{'id': '9'}", "body");	
 		when(req.asString()).thenThrow(UnirestException.class);
 
 		Integer sessionId = connector.createSession("Session1");
@@ -555,7 +556,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 	public void testCreateExcludeZoneInError() throws UnirestException {
 		
 		SeleniumRobotSnapshotServerConnector connector = configureMockedSnapshotServerConnection();
-		BaseRequest req = createServerMock("POST", SeleniumRobotSnapshotServerConnector.EXCLUDE_API_URL, 200, "{'id': '18'}", "body");	
+		HttpRequest<HttpRequest> req = createServerMock("POST", SeleniumRobotSnapshotServerConnector.EXCLUDE_API_URL, 200, "{'id': '18'}", "body");	
 		when(req.asString()).thenThrow(UnirestException.class);
 		
 		Integer sessionId = connector.createSession("Session1");
@@ -615,7 +616,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 	public void testCreateStepResultInError() throws UnirestException {
 		
 		SeleniumRobotSnapshotServerConnector connector = configureMockedSnapshotServerConnection();
-		BaseRequest req = createServerMock("POST", SeleniumRobotSnapshotServerConnector.STEPRESULT_API_URL, 200, "{'id': '9'}", "body");	
+		HttpRequest<HttpRequest> req = createServerMock("POST", SeleniumRobotSnapshotServerConnector.STEPRESULT_API_URL, 200, "{'id': '9'}", "body");	
 		when(req.asString()).thenThrow(UnirestException.class);
 
 		Integer sessionId = connector.createSession("Session1");
@@ -661,7 +662,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 	public void testRecordTestLogsInError() throws UnirestException {
 		
 		SeleniumRobotSnapshotServerConnector connector = configureMockedSnapshotServerConnection();
-		BaseRequest req = createServerMock("PATCH", SeleniumRobotSnapshotServerConnector.TESTCASEINSESSION_API_URL + "15/", 200, "{'id': '9'}", "body");	
+		HttpRequest<HttpRequest> req = createServerMock("PATCH", SeleniumRobotSnapshotServerConnector.TESTCASEINSESSION_API_URL + "15/", 200, "{'id': '9'}", "body");	
 		when(req.asString()).thenThrow(UnirestException.class);
 		
 		Integer sessionId = connector.createSession("Session1");
@@ -732,7 +733,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 	@Test(groups= {"ut"})
 	public void testGetComparisonResultInError() throws UnirestException {
 		SeleniumRobotSnapshotServerConnector connector = spy(configureMockedSnapshotServerConnection());
-		BaseRequest req = createServerMock("GET", SeleniumRobotSnapshotServerConnector.TESTCASEINSESSION_API_URL + "15", 200, "{'testSteps': [], 'completed': true}");		
+		HttpRequest<HttpRequest> req = createServerMock("GET", SeleniumRobotSnapshotServerConnector.TESTCASEINSESSION_API_URL + "15", 200, "{'testSteps': [], 'completed': true}");		
 		when(req.asString()).thenThrow(UnirestException.class);
 		
 		Integer sessionId = connector.createSession("Session1");

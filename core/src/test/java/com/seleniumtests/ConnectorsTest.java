@@ -19,22 +19,19 @@ package com.seleniumtests;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyDouble;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.anyDouble;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.doReturn;
 
 import java.io.File;
-import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.mockito.Mock;
 import org.mockito.stubbing.OngoingStubbing;
 import org.openqa.selenium.By;
@@ -55,16 +52,6 @@ import org.testng.ITestContext;
 import org.testng.ITestResult;
 import org.testng.annotations.BeforeMethod;
 
-import com.mashape.unirest.http.HttpMethod;
-import com.mashape.unirest.http.HttpResponse;
-import com.mashape.unirest.http.JsonNode;
-import com.mashape.unirest.http.Unirest;
-import com.mashape.unirest.http.exceptions.UnirestException;
-import com.mashape.unirest.request.BaseRequest;
-import com.mashape.unirest.request.GetRequest;
-import com.mashape.unirest.request.HttpRequest;
-import com.mashape.unirest.request.HttpRequestWithBody;
-import com.mashape.unirest.request.body.MultipartBody;
 import com.seleniumtests.browserfactory.SeleniumGridDriverFactory;
 import com.seleniumtests.connectors.selenium.SeleniumGridConnector;
 import com.seleniumtests.connectors.selenium.SeleniumRobotGridConnector;
@@ -74,6 +61,17 @@ import com.seleniumtests.connectors.selenium.SeleniumRobotVariableServerConnecto
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.driver.WebUIDriverFactory;
+
+import kong.unirest.GetRequest;
+import kong.unirest.HttpRequest;
+import kong.unirest.HttpRequestWithBody;
+import kong.unirest.HttpResponse;
+import kong.unirest.JsonNode;
+import kong.unirest.MultipartBody;
+import kong.unirest.Unirest;
+import kong.unirest.UnirestException;
+import kong.unirest.json.JSONException;
+import kong.unirest.json.JSONObject;
 
 @PrepareForTest({Unirest.class, WebUIDriverFactory.class, SeleniumGridDriverFactory.class})
 public class ConnectorsTest extends MockitoTest {
@@ -127,10 +125,10 @@ public class ConnectorsTest extends MockitoTest {
 	 * Method for creating server reply mock
 	 * @throws UnirestException 
 	 */
-	protected BaseRequest createServerMock(String requestType, String apiPath, int statusCode, String replyData) throws UnirestException {
+	protected HttpRequest createServerMock(String requestType, String apiPath, int statusCode, String replyData) throws UnirestException {
 		return createServerMock(requestType, apiPath, statusCode, replyData, "request");
 	}
-	protected BaseRequest createServerMock(String requestType, String apiPath, int statusCode, InputStream replyData) throws UnirestException {
+	protected HttpRequest createServerMock(String requestType, String apiPath, int statusCode, File replyData) throws UnirestException {
 		return createServerMock(requestType, apiPath, statusCode, replyData, "request");
 	}
 	
@@ -144,23 +142,23 @@ public class ConnectorsTest extends MockitoTest {
 	 * @return
 	 * @throws UnirestException
 	 */
-	protected BaseRequest createServerMock(String requestType, String apiPath, int statusCode, InputStream replyData, String responseType) throws UnirestException {
+	protected HttpRequest createServerMock(String requestType, String apiPath, int statusCode, File replyData, String responseType) throws UnirestException {
 		return createServerMock(requestType, apiPath, statusCode, (Object)replyData, responseType);
 	}
-	protected BaseRequest createServerMock(String requestType, String apiPath, int statusCode, String replyData, String responseType) throws UnirestException {
+	protected HttpRequest createServerMock(String requestType, String apiPath, int statusCode, String replyData, String responseType) throws UnirestException {
 		return createServerMock(requestType, apiPath, statusCode, (Object)replyData, responseType);
 	}
 	
-	private BaseRequest createServerMock(String requestType, String apiPath, int statusCode, Object replyData, String responseType) throws UnirestException {
+	private HttpRequest createServerMock(String requestType, String apiPath, int statusCode, Object replyData, String responseType) throws UnirestException {
 		
 		@SuppressWarnings("unchecked")
 		HttpResponse<String> response = mock(HttpResponse.class);
 		HttpResponse<JsonNode> jsonResponse = mock(HttpResponse.class);
-		HttpResponse<InputStream> streamResponse = mock(HttpResponse.class);
+		HttpResponse<File> streamResponse = mock(HttpResponse.class);
 		HttpRequest request = mock(HttpRequest.class);
 		JsonNode json = mock(JsonNode.class);
 		MultipartBody requestMultipartBody = mock(MultipartBody.class);
-		HttpRequestWithBody postRequest = spy(new HttpRequestWithBody(HttpMethod.POST, SERVER_URL + apiPath));
+		HttpRequestWithBody postRequest = spy(HttpRequestWithBody.class);
 
 		when(request.getUrl()).thenReturn(SERVER_URL);
 		if (replyData instanceof String) {
@@ -172,13 +170,16 @@ public class ConnectorsTest extends MockitoTest {
 			when(jsonResponse.getBody()).thenReturn(json);
 			when(jsonResponse.getStatusText()).thenReturn("TEXT");
 			try {
+				if (((String) replyData).isEmpty()) {
+					replyData = "{}";
+				}
 				JSONObject jsonReply = new JSONObject((String)replyData);
 				when(json.getObject()).thenReturn(jsonReply);
 			} catch (JSONException e) {}
-		} else if (replyData instanceof InputStream) {
+		} else if (replyData instanceof File) {
 			when(streamResponse.getStatus()).thenReturn(statusCode);
 			when(streamResponse.getStatusText()).thenReturn("TEXT");
-			when(streamResponse.getBody()).thenReturn((InputStream)replyData);
+			when(streamResponse.getBody()).thenReturn((File)replyData);
 		}
 		
 		switch(requestType) {
@@ -190,17 +191,15 @@ public class ConnectorsTest extends MockitoTest {
 				when(getRequest.header(anyString(), anyString())).thenReturn(getRequest);
 				when(getRequest.asString()).thenReturn(response);
 				when(getRequest.asJson()).thenReturn(jsonResponse);
-				when(getRequest.asBinary()).thenReturn(streamResponse);
+				when(getRequest.asFile(anyString())).thenReturn(streamResponse);
 				when(getRequest.queryString(anyString(), anyString())).thenReturn(getRequest);
 				when(getRequest.queryString(anyString(), anyInt())).thenReturn(getRequest);
 				when(getRequest.queryString(anyString(), anyBoolean())).thenReturn(getRequest);
 				when(getRequest.queryString(anyString(), any(SessionId.class))).thenReturn(getRequest);
-				when(getRequest.getHttpRequest()).thenReturn(request);
 				return getRequest;
 			case "POST":
 				when(Unirest.post(SERVER_URL + apiPath)).thenReturn(postRequest);
 			case "PATCH":
-				when(postRequest.getHttpRequest()).thenReturn(request);
 				when(Unirest.patch(SERVER_URL + apiPath)).thenReturn(postRequest);
 				when(postRequest.field(anyString(), anyString())).thenReturn(requestMultipartBody);
 				when(postRequest.field(anyString(), anyInt())).thenReturn(requestMultipartBody);
@@ -211,14 +210,9 @@ public class ConnectorsTest extends MockitoTest {
 				when(postRequest.queryString(anyString(), anyInt())).thenReturn(postRequest);
 				when(postRequest.queryString(anyString(), anyBoolean())).thenReturn(postRequest);
 				when(postRequest.header(anyString(), anyString())).thenReturn(postRequest);
-				when(requestMultipartBody.field(anyString(), anyInt())).thenReturn(requestMultipartBody);
-				when(requestMultipartBody.field(anyString(), anyBoolean())).thenReturn(requestMultipartBody);
 				when(requestMultipartBody.field(anyString(), anyString())).thenReturn(requestMultipartBody);
-				when(requestMultipartBody.field(anyString(), anyLong())).thenReturn(requestMultipartBody);
-				when(requestMultipartBody.field(anyString(), anyDouble())).thenReturn(requestMultipartBody);
 				when(requestMultipartBody.field(anyString(), any(File.class))).thenReturn(requestMultipartBody);
 				when(requestMultipartBody.asString()).thenReturn(response);
-				when(requestMultipartBody.getHttpRequest()).thenReturn(request);
 				doReturn(response).when(postRequest).asString();
 				
 				if ("request".equals(responseType)) {
@@ -260,7 +254,6 @@ public class ConnectorsTest extends MockitoTest {
 			when(getRequest.queryString(anyString(), anyString())).thenReturn(getRequest);
 			when(getRequest.queryString(anyString(), anyInt())).thenReturn(getRequest);
 			when(getRequest.queryString(anyString(), anyBoolean())).thenReturn(getRequest);
-			when(getRequest.getHttpRequest()).thenReturn(request);
 			return stub;
 		case "POST":
 			when(Unirest.post(SERVER_URL + apiPath)).thenReturn(postRequest);
@@ -274,10 +267,7 @@ public class ConnectorsTest extends MockitoTest {
 			when(postRequest.queryString(anyString(), anyInt())).thenReturn(postRequest);
 			when(postRequest.queryString(anyString(), anyBoolean())).thenReturn(postRequest);
 			when(postRequest.header(anyString(), anyString())).thenReturn(postRequest);
-			when(requestMultipartBody.field(anyString(), anyInt())).thenReturn(requestMultipartBody);
-			when(requestMultipartBody.field(anyString(), anyBoolean())).thenReturn(requestMultipartBody);
 			when(requestMultipartBody.field(anyString(), anyString())).thenReturn(requestMultipartBody);
-			when(requestMultipartBody.field(anyString(), anyLong())).thenReturn(requestMultipartBody);
 			when(requestMultipartBody.field(anyString(), any(File.class))).thenReturn(requestMultipartBody);
 			return stub;
 			
