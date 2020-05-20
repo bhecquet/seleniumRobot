@@ -39,6 +39,7 @@ import org.openqa.selenium.InvalidElementStateException;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.NoSuchFrameException;
+import org.openqa.selenium.NotFoundException;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.Rectangle;
@@ -731,14 +732,14 @@ public class HtmlElement extends Element implements WebElement, Locatable {
      * @param allElements
      */
     private WebElement getElementByIndex(List<WebElement> allElements) {
-    	if (elementIndex == FIRST_VISIBLE) {
+    	if (elementIndex != null && elementIndex.equals(FIRST_VISIBLE)) {
 			for (WebElement el: allElements) {
 				if (el.isDisplayed()) {
 					return el;
 				}
 			}
-			throw new WebDriverException("no visible element has been found for " + by.toString());
-    	} else if (elementIndex < 0) {
+			throw new NoSuchElementException("no visible element has been found for " + by.toString());
+    	} else if (elementIndex != null && elementIndex < 0) {
     		return allElements.get(allElements.size() + elementIndex);
 		} else {
 			if (elementIndex == null) {
@@ -1082,6 +1083,9 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     /**
      * Searches for the element using the BY locator, and indicates whether or not it exists in the page. This can be
      * used to look for hidden objects, whereas isDisplayed() only looks for things that are visible to the user
+     * 
+     * Note that when requested element has "HtmlElement.FIRST_VISIBLE" index, isElementPresent acts as isElementPresentAndDisplayed
+     * 
      * @param timeout 	timeout in seconds
      * @return
      */
