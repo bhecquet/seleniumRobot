@@ -843,14 +843,13 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 		File stream = mock(File.class);
 		GetRequest req = (GetRequest) createServerMock("GET", SeleniumRobotGridConnector.NODE_TASK_SERVLET, 200, stream);	
 		
-		new File("out.mp4").delete();
-		
 		File out = connector.stopVideoCapture("out.mp4");
 		
 		// no error encountered
 		verify(req).queryString("action", "stopVideoCapture");
 		verify(req).queryString("session", new SessionId("1234"));
-		Assert.assertTrue(new File("out.mp4").exists());
+		Assert.assertNotNull(out);
+		Assert.assertEquals(out, stream);
 		verify(gridLogger, never()).warn(anyString());
 		verify(gridLogger, never()).error(anyString());
 	}
@@ -867,11 +866,9 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 		File stream = mock(File.class);
 		createServerMock("GET", SeleniumRobotGridConnector.NODE_TASK_SERVLET, 500, stream);	
 		
-		new File("out.mp4").delete();
-		connector.stopVideoCapture("out.mp4");
+		File out = connector.stopVideoCapture("out.mp4");
 		
-		// error clicking
-		Assert.assertFalse(new File("out.mp4").exists());
+		Assert.assertNull(out);
 		verify(gridLogger, never()).warn(anyString());
 		verify(gridLogger).error(anyString());
 	}
@@ -889,10 +886,10 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 		when(req.asFile(anyString())).thenThrow(new UnirestException("connection error"));
 
 		new File("out.mp4").delete();
-		connector.stopVideoCapture("out.mp4");
+		File out = connector.stopVideoCapture("out.mp4");
 		
 		// error connecting to node
-		Assert.assertFalse(new File("out.mp4").exists());
+		Assert.assertNull(out);
 		verify(gridLogger).warn(anyString());
 		verify(gridLogger, never()).error(anyString());
 	}
