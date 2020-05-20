@@ -483,6 +483,9 @@ public class TestDriver extends GenericMultiBrowserTest {
 		Assert.assertTrue(new Date().getTime() - start > 6500);
 	}
 	
+	/**
+	 * Test element present timing
+	 */
 	@Test(groups={"it", "ut"})
 	public void testIsElementPresent1() {		
 		
@@ -496,6 +499,9 @@ public class TestDriver extends GenericMultiBrowserTest {
 		}
 	}
 	
+	/**
+	 * Test element detection timing
+	 */
 	@Test(groups={"it", "ut"}, expectedExceptions = NoSuchElementException.class)
 	public void testElementNotPresent() {	
 		LocalDateTime start = LocalDateTime.now();
@@ -664,6 +670,22 @@ public class TestDriver extends GenericMultiBrowserTest {
 	@Test(groups={"it", "ut"})
 	public void testIsElementPresent() {
 		Assert.assertTrue(DriverTestPage.textElement.isElementPresent(2));
+	}
+	
+	/**
+	 * issue #355: check that we get "false" when element is not present and index is given 
+	 */
+	@Test(groups={"it", "ut"})
+	public void testIsElementNotPresentWithIndex() {
+		Assert.assertFalse(DriverTestPage.textElementNotPresentFirstVisible.isElementPresent(2));
+	}
+
+	/**
+	 * issue #355: Element is present but not displayed => returns false
+	 */
+	@Test(groups={"it", "ut"})
+	public void testIsElementPresentAndNotDisplayedWithIndex() {
+		Assert.assertFalse(new HtmlElement("", By.id("deu"), HtmlElement.FIRST_VISIBLE).isElementPresent(2));
 	}
 	
 	/**

@@ -304,6 +304,16 @@ public class TestDriverEdge extends TestDriver {
 	public void testIsElementPresent() {
 		super.testIsElementPresent();
 	}
+
+	@Test(groups={"it", "ut"})
+	public void testIsElementNotPresentWithIndex() {
+		super.testIsElementNotPresentWithIndex();
+	}
+	
+	@Test(groups={"it", "ut"})
+	public void testIsElementPresentAndNotDisplayedWithIndex() {
+		super.testIsElementPresentAndNotDisplayedWithIndex();
+	}
 	
 	@Test(groups={"it", "ut"})
 	public void testIsElementPresentAndDisplayed() {
