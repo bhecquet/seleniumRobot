@@ -82,7 +82,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	}
 	
 	/**
-	 * issue #351: Check that when snapshot server is used, but a problem occurs posting information
+	 * issue #351: Check that when snapshot server is used, but a problem occurs posting information, snapshot tab is not displayed
 	 * @throws Exception
 	 */
 	@Test(groups={"it"})
