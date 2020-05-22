@@ -30,6 +30,7 @@ import kong.unirest.HttpRequestWithBody;
 import kong.unirest.HttpResponse;
 import kong.unirest.Unirest;
 import kong.unirest.UnirestException;
+import kong.unirest.UnirestInstance;
 import kong.unirest.json.JSONArray;
 import kong.unirest.json.JSONException;
 import kong.unirest.json.JSONObject;
@@ -75,9 +76,33 @@ public abstract class SeleniumRobotServerConnector {
 	
 	public abstract boolean isAlive();
 	
+	/**
+	 * Test if the server is alive
+	 * @param testUrl	the URL to test for "alive". It MUST begin with "/" as root url only contains http://<host>:<port>
+	 * @return
+	 */
 	protected boolean isAlive(String testUrl) {
-		try {
-			int status = buildGetRequest(url + testUrl).asString().getStatus();
+		
+		try (
+			UnirestInstance unirest = Unirest.spawnInstance();
+			) {
+			
+			HttpResponse<String> reply;
+			if (authToken != null) {
+				reply = unirest.get(url + testUrl).header("Authorization", authToken).asString();
+			} else {
+				reply = unirest.get(url + testUrl).asString();
+			}
+			int status = reply.getStatus();
+	
+			// server may be in HTTPS whereas we call it in HTTP
+			// change base url and try again
+			if (status == 308 && !url.toLowerCase().startsWith("https")) {
+				String newLocation = reply.getHeaders().getFirst("Location");
+				url = newLocation.replace(testUrl, "");
+				status = buildGetRequest(url + testUrl).asString().getStatus();
+			}
+			
 			if (status == 401) {
 				logger.error("-------------------------------------------------------------------------------------");
 				logger.error("Access to seleniumRobot server unauthorized, access token must be provided");
@@ -85,6 +110,7 @@ public abstract class SeleniumRobotServerConnector {
 				logger.error(String.format("Access token can be generated using your browser at %s/api-token-auth/?username=<user>&password=<password>", url));
 				logger.error("-------------------------------------------------------------------------------------");
 				throw new ConfigurationException("Access to seleniumRobot server unauthorized, access token must be provided by adding '-DseleniumRobotServerToken=<token>' to test command line");
+			
 			} else {
 				return status == 200;
 			}
