@@ -19,6 +19,7 @@ package com.seleniumtests.ut.connectors.selenium;
 
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -31,6 +32,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.mockito.ArgumentMatchers;
+import org.mockito.Mock;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
@@ -43,12 +45,23 @@ import com.seleniumtests.connectors.selenium.SeleniumRobotVariableServerConnecto
 import com.seleniumtests.core.TestVariable;
 import com.seleniumtests.customexception.ConfigurationException;
 
+import kong.unirest.GetRequest;
+import kong.unirest.Headers;
+import kong.unirest.HttpResponse;
 import kong.unirest.Unirest;
 import kong.unirest.UnirestException;
 
 @PrepareForTest({Unirest.class})
 public class TestSeleniumRobotVariableServerConnector extends ConnectorsTest {
 	
+	@Mock
+	private Headers headers;
+
+	@Mock
+	public GetRequest getAliveRequestHttps;
+	
+	@Mock
+	public HttpResponse responseHttps;
 
 	@BeforeMethod(groups= {"ut"})
 	public void init(final ITestContext testNGCtx) {
@@ -62,7 +75,7 @@ public class TestSeleniumRobotVariableServerConnector extends ConnectorsTest {
 	 */
 	private SeleniumRobotVariableServerConnector configureNotAliveConnection() throws UnirestException {
 		when(getAliveRequest.asString()).thenThrow(UnirestException.class);
-		when(Unirest.get(SERVER_URL + "/variable/api/")).thenReturn(getAliveRequest);
+		when(unirestInstance.get(SERVER_URL + "/variable/api/")).thenReturn(getAliveRequest);
 		
 		return new SeleniumRobotVariableServerConnector(true, SERVER_URL, "Test1", null);
 	}
@@ -71,6 +84,58 @@ public class TestSeleniumRobotVariableServerConnector extends ConnectorsTest {
 	public void testServerNotActive() {
 		SeleniumRobotVariableServerConnector connector = new SeleniumRobotVariableServerConnector(false, SERVER_URL, "Test1", null);
 		Assert.assertFalse(connector.getActive());
+	}
+	
+	/**
+	 * Issue #356: check we change URL if redirect 308 is encountered
+	 */
+	@Test(groups= {"ut"})
+	public void testServerWithRedirect308() {
+		configureMockedVariableServerConnection(); // connection for HTTP
+		configureMockedVariableServerConnection("https://localhost:2345"); // connection for HTTPS
+		HttpResponse<String> response = mock(HttpResponse.class);
+		
+		when(response.getBody()).thenReturn("Moved Permanently");
+		when(response.getHeaders()).thenReturn(headers);
+		when(response.getStatus()).thenReturn(308);
+		
+		when(responseHttps.getBody()).thenReturn("OK");
+		when(responseHttps.getStatus()).thenReturn(200);
+		
+		when(headers.getFirst("Location")).thenReturn("https://localhost:2345");
+		when(getAliveRequest.asString()).thenReturn(response);
+		when(getAliveRequestHttps.asString()).thenReturn(responseHttps);
+		when(unirestInstance.get(SERVER_URL + "/variable/api/")).thenReturn(getAliveRequest);
+		when(Unirest.get("https://localhost:2345/variable/api/")).thenReturn(getAliveRequestHttps);
+		
+		SeleniumRobotVariableServerConnector connector = new SeleniumRobotVariableServerConnector(true, SERVER_URL, "Test1", null);
+		Assert.assertEquals(connector.getUrl(), "https://localhost:2345");
+	}
+	
+	/**
+	 * Issue #356: check we change URL if redirect 301 is encountered
+	 */
+	@Test(groups= {"ut"})
+	public void testServerWithRedirect301() {
+		configureMockedVariableServerConnection(); // connection for HTTP
+		configureMockedVariableServerConnection("https://localhost:2345"); // connection for HTTPS
+		HttpResponse<String> response = mock(HttpResponse.class);
+		
+		when(response.getBody()).thenReturn("Moved Permanently");
+		when(response.getHeaders()).thenReturn(headers);
+		when(response.getStatus()).thenReturn(301);
+		
+		when(responseHttps.getBody()).thenReturn("OK");
+		when(responseHttps.getStatus()).thenReturn(200);
+		
+		when(headers.getFirst("Location")).thenReturn("https://localhost:2345");
+		when(getAliveRequest.asString()).thenReturn(response);
+		when(getAliveRequestHttps.asString()).thenReturn(responseHttps);
+		when(unirestInstance.get(SERVER_URL + "/variable/api/")).thenReturn(getAliveRequest);
+		when(Unirest.get("https://localhost:2345/variable/api/")).thenReturn(getAliveRequestHttps);
+		
+		SeleniumRobotVariableServerConnector connector = new SeleniumRobotVariableServerConnector(true, SERVER_URL, "Test1", null);
+		Assert.assertEquals(connector.getUrl(), "https://localhost:2345");
 	}
 	
 	@Test(groups= {"ut"})

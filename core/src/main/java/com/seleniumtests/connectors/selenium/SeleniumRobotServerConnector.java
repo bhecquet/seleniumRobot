@@ -97,7 +97,7 @@ public abstract class SeleniumRobotServerConnector {
 	
 			// server may be in HTTPS whereas we call it in HTTP
 			// change base url and try again
-			if (status == 308 && !url.toLowerCase().startsWith("https")) {
+			if ((status == 308 || status == 301) && !url.toLowerCase().startsWith("https")) {
 				String newLocation = reply.getHeaders().getFirst("Location");
 				url = newLocation.replace(testUrl, "");
 				status = buildGetRequest(url + testUrl).asString().getStatus();
@@ -361,5 +361,8 @@ public abstract class SeleniumRobotServerConnector {
 
 	public void setEnvironmentId(Integer environmentId) {
 		this.environmentId = environmentId;
+	}
+	public String getUrl() {
+		return url;
 	}
 }

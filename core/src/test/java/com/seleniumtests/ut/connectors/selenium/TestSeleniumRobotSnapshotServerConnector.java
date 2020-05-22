@@ -53,8 +53,6 @@ import kong.unirest.UnirestException;
 @PrepareForTest({Unirest.class})
 public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 	
-	private static final String SERVER_URL = "http://localhost:4321";
-
 	@Mock
 	private Snapshot snapshot;
 	
@@ -66,9 +64,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 
 	@BeforeMethod(groups= {"ut"})
 	public void init(final ITestContext testNGCtx) {
-		initThreadContext(testNGCtx);
-		PowerMockito.mockStatic(Unirest.class);
-		
+
 		when(element.getRect()).thenReturn(new Rectangle(10,  11, 12, 13));
 		SnapshotCheckType snapshotCheckType = SnapshotCheckType.FULL.exclude(element);
 		snapshotCheckType.check(SnapshotTarget.PAGE);
@@ -86,7 +82,7 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 	 */
 	private SeleniumRobotSnapshotServerConnector configureNotAliveConnection() throws UnirestException {
 		when(getAliveRequest.asString()).thenThrow(UnirestException.class);
-		when(Unirest.get(SERVER_URL + "/snapshot/")).thenReturn(getAliveRequest);
+		when(unirestInstance.get(SERVER_URL + "/snapshot/")).thenReturn(getAliveRequest);
 		
 		SeleniumTestsContextManager.getThreadContext().setSeleniumRobotServerUrl(SERVER_URL);
 		SeleniumTestsContextManager.getThreadContext().setSeleniumRobotServerActive(true);
