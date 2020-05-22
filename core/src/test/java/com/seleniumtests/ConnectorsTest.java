@@ -62,6 +62,7 @@ import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.driver.WebUIDriverFactory;
 
+import kong.unirest.Config;
 import kong.unirest.GetRequest;
 import kong.unirest.HttpRequest;
 import kong.unirest.HttpRequestWithBody;
@@ -99,6 +100,9 @@ public class ConnectorsTest extends MockitoTest {
 	public GetRequest getAliveRequest;
 	
 	@Mock
+	public Config unirestConfig;
+	
+	@Mock
 	public HttpRequestWithBody postRequest;
 	
 	@Mock
@@ -124,6 +128,7 @@ public class ConnectorsTest extends MockitoTest {
 	public void initMocks(final Method method, final ITestContext testNGCtx, final ITestResult testResult) throws Exception {
 		PowerMockito.mockStatic(Unirest.class);
 		when(Unirest.spawnInstance()).thenReturn(unirestInstance);
+		when(Unirest.config()).thenReturn(unirestConfig);
 	}
 	
 	/**
