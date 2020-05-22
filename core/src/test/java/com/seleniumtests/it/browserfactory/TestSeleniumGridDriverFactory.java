@@ -46,11 +46,6 @@ import kong.unirest.Unirest;
 @PrepareForTest({Unirest.class, WebUIDriverFactory.class, SeleniumGridDriverFactory.class})
 public class TestSeleniumGridDriverFactory extends ConnectorsTest {
 	
-	@BeforeMethod(groups={"it"})
-	private void init() throws ClientProtocolException, IOException {
-		PowerMockito.mockStatic(Unirest.class);
-	}
-	
 	/**
 	 * issue #287: check the real behavior of the bug (for now, this cannot be corrected because of https://github.com/cbeust/testng/issues/2148)
 	 * When the AfterMethod fails, test is not retried and this is a bug in testNG

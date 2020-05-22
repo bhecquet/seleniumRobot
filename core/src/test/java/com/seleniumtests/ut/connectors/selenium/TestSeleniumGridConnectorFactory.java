@@ -96,12 +96,6 @@ public class TestSeleniumGridConnectorFactory extends ConnectorsTest {
 			+ "		</div>"
 			+ "</body>"
 			+ "</html>";
-
-	@BeforeMethod(groups= {"ut"})
-	public void init(final ITestContext testNGCtx) {
-		initThreadContext(testNGCtx);
-		PowerMockito.mockStatic(Unirest.class);
-	}
 	
 	/**
 	 * If servlet GuiServlet is available, we get a SeleniumRobotGridConnector

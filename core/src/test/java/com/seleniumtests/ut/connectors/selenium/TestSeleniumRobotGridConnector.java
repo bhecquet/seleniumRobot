@@ -93,9 +93,6 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 		when(response.getEntity()).thenReturn(entity);
 		when(response.getStatusLine()).thenReturn(statusLine);
 		when(client.execute((HttpHost)any(), any())).thenReturn(response);
-		
-		PowerMockito.mockStatic(Unirest.class);
-		
 
 		connector = new SeleniumRobotGridConnector(SERVER_URL + "/wd/hub");
 		connector.setNodeUrl("http://localhost:4321");
