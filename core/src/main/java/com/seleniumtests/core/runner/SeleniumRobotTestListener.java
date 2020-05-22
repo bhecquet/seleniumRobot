@@ -312,6 +312,7 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 	@Override
 	public void onExecutionStart() {
 		suiteList = Collections.synchronizedList(new ArrayList<>());
+		Unirest.config().reset();
 		Unirest.config().followRedirects(true);
 	}
 	
