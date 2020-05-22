@@ -196,6 +196,7 @@ public class ConnectorsTest extends MockitoTest {
 				when(getRequest.queryString(anyString(), anyInt())).thenReturn(getRequest);
 				when(getRequest.queryString(anyString(), anyBoolean())).thenReturn(getRequest);
 				when(getRequest.queryString(anyString(), any(SessionId.class))).thenReturn(getRequest);
+				when(getRequest.getUrl()).thenReturn(SERVER_URL);
 				return getRequest;
 			case "POST":
 				when(Unirest.post(SERVER_URL + apiPath)).thenReturn(postRequest);
@@ -214,6 +215,8 @@ public class ConnectorsTest extends MockitoTest {
 				when(requestMultipartBody.field(anyString(), any(File.class))).thenReturn(requestMultipartBody);
 				when(requestMultipartBody.asString()).thenReturn(response);
 				doReturn(response).when(postRequest).asString();
+				when(postRequest.getUrl()).thenReturn(SERVER_URL);
+				when(requestMultipartBody.getUrl()).thenReturn(SERVER_URL);
 				
 				if ("request".equals(responseType)) {
 					return postRequest;
