@@ -458,7 +458,6 @@ public class TestSeleniumTestContext3 extends ConnectorsTest {
 			System.setProperty(SeleniumTestsContext.RUN_MODE, "grid");
 			System.setProperty(SeleniumTestsContext.BROWSER, "chrome");
 			
-			PowerMockito.mockStatic(Unirest.class);
 			createGridHubMockWithNodeOK();
 			
 			ITestResult testResult = GenericTest.generateResult(testNGCtx, getClass());

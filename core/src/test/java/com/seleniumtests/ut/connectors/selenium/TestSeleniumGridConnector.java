@@ -89,7 +89,6 @@ public class TestSeleniumGridConnector extends ConnectorsTest {
 	private void init() throws ClientProtocolException, IOException {
 		PowerMockito.mockStatic(HttpClients.class);
 		PowerMockito.mockStatic(TestLogging.class);
-		PowerMockito.mockStatic(Unirest.class);
 		
 		when(HttpClients.createDefault()).thenReturn(client);
 		when(response.getEntity()).thenReturn(entity);
