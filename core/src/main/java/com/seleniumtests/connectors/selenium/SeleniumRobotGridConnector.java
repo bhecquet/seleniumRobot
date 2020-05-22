@@ -443,6 +443,9 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 		
 		logger.info("stopping capture");
 		try {
+			
+			// delete file if it exists as '.asFile()' will not overwrite it
+			new File(outputFile).delete();
 			HttpResponse<File> videoResponse = Unirest.get(String.format("%s%s", nodeUrl, NODE_TASK_SERVLET))
 				.queryString("action", "stopVideoCapture")
 				.queryString("session", sessionId).asFile(outputFile);
