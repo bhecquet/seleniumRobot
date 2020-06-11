@@ -43,6 +43,7 @@ import com.seleniumtests.it.driver.support.pages.DriverSubAngularTestPage;
 import com.seleniumtests.it.driver.support.pages.DriverTestAngularFrame;
 import com.seleniumtests.it.driver.support.pages.DriverTestPage;
 import com.seleniumtests.it.driver.support.pages.DriverTestPageNativeActions;
+import com.seleniumtests.it.driver.support.pages.DriverTestPageObjectFatory;
 import com.seleniumtests.it.driver.support.pages.DriverTestPageWithoutFixedPattern;
 import com.seleniumtests.it.driver.support.server.WebServer;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
@@ -56,6 +57,7 @@ public abstract class GenericMultiBrowserTest extends MockitoTest {
 	protected WebDriver driver;
 	protected DriverTestPage testPage;
 	protected DriverTestPageNativeActions testPageNativeActions;
+	protected DriverTestPageObjectFatory testPageObjectFactory;
 	protected DriverTestPageWithoutFixedPattern testPageWithoutPattern;
 	protected DriverSubAngularTestPage angularPage;
 	protected DriverTestAngularFrame angularFramePage;
@@ -156,6 +158,10 @@ public abstract class GenericMultiBrowserTest extends MockitoTest {
 		case "DriverTestPageNativeActions":
 			testPageUrl = String.format("http://%s:%d/test.html", localAddress, server.getServerHost().getPort());
 			testPageNativeActions = new DriverTestPageNativeActions(true, testPageUrl);
+			break;
+		case "DriverTestPageObjectFactory":
+			testPageUrl = String.format("http://%s:%d/test.html", localAddress, server.getServerHost().getPort());
+			testPageObjectFactory = new DriverTestPageObjectFatory(true, testPageUrl);
 			break;
 		case "DriverTestAngularFrame":
 			testPageUrl = String.format("http://%s:%d/testAngularIFrame.html", localAddress, server.getServerHost().getPort());
