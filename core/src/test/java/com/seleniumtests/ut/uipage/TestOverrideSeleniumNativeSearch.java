@@ -17,18 +17,13 @@
  */
 package com.seleniumtests.ut.uipage;
 
-import org.mockito.Mock;
-import org.mockito.Spy;
+import java.time.LocalDateTime;
+
 import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebDriver.TargetLocator;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.interactions.Keyboard;
-import org.openqa.selenium.interactions.Mouse;
-import org.openqa.selenium.remote.RemoteWebDriver;
-import org.openqa.selenium.remote.RemoteWebElement;
 import org.openqa.selenium.support.ui.Select;
-import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.annotations.AfterMethod;
@@ -43,49 +38,21 @@ import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.it.driver.support.pages.DriverTestPageNativeActions;
 import com.seleniumtests.uipage.htmlelements.HtmlElement;
 
-import io.appium.java_client.AppiumDriver;
-import io.appium.java_client.MobileElement;
-
 /**
  * Test class for checking seleniumNativeAction override
  * When this option is true, we should have the selenium standard behavior + replay and logging (checked elsewhere) 
  * @author behe
  *
  */
-@PrepareForTest({WebUIDriver.class, AppiumDriver.class, RemoteWebDriver.class})
-public class TestWebElement extends MockitoTest {
+public class TestOverrideSeleniumNativeSearch extends MockitoTest {
 	
-	@Mock
-	private RemoteWebDriver driver;
-	
-	@Mock
-	private MobileElement mobileElement;
-	@Mock
-	private RemoteWebElement element;
-	@Mock
-	private RemoteWebElement subElement1;
-	@Mock
-	private RemoteWebElement subElement2;
-	
-	@Mock
-	private Mouse mouse;
-	
-	@Mock
-	private Keyboard keyboard;
-	
-	@Mock
-	private TargetLocator locator;
-	
-	@Spy
-	private HtmlElement el = new HtmlElement("element", By.id("el"));
 
-	private static DriverTestPageNativeActions testPage;
-	private static WebDriver realDriver;
+	protected static DriverTestPageNativeActions testPage;
+	protected static WebDriver realDriver;
 	
 	@BeforeClass(groups={"ut"})
 	public void initDriver(final ITestContext testNGCtx) throws Exception {
 		initThreadContext(testNGCtx);
-		SeleniumTestsContextManager.getThreadContext().setReplayTimeout(1);
 		SeleniumTestsContextManager.getThreadContext().setBrowser("htmlunit");
 		
 		testPage = new DriverTestPageNativeActions(true);
@@ -94,6 +61,7 @@ public class TestWebElement extends MockitoTest {
 	
 	@BeforeMethod(groups={"ut"})
 	public void overrideNativeActions() {
+		SeleniumTestsContextManager.getThreadContext().setReplayTimeout(10);
 		SeleniumTestsContextManager.getThreadContext().setOverrideSeleniumNativeAction(true);
 		SeleniumTestsContextManager.getThreadContext().setTestType(TestType.WEB);
 	}
@@ -120,6 +88,20 @@ public class TestWebElement extends MockitoTest {
 			Assert.assertEquals(realDriver.findElement(By.id("text2")).getAttribute("value"), "some text");
 		} finally {
 			testPage.reset();
+		}
+	}
+
+	/**
+	 * Test replay is done, we should be over 5 seconds which is the search time of driver
+	 */
+	@Test(groups={"ut"}, expectedExceptions = NoSuchElementException.class)
+	public void testSendKeysElementAbsent() {
+		LocalDateTime start = LocalDateTime.now();
+		try {
+			testPage.sendKeysFailed();
+		} catch (NoSuchElementException e) {
+			Assert.assertTrue(LocalDateTime.now().minusSeconds(8).isAfter(start));
+			throw e;
 		}
 	}
 

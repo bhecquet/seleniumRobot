@@ -1465,7 +1465,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
      * Wait element to present using Explicit Waits with timeout in seconds. This method is used for special element
      * which needs long time to present.
      * This method is replayed because it may fail if frame is not present at start. The replay is not done if TimeOutException raises (see ReplayAction class)
-     * @param timeout	timeout in seconds
+     * @param timeout	timeout in seconds. Set a minimal value of 1 sec to avoid not searching for element
      */
     @ReplayOnError
     public void waitForPresent(int timeout) {

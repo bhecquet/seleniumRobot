@@ -74,7 +74,6 @@ import com.seleniumtests.util.helper.WaitHelper;
 public class PageObject extends BasePage implements IPage {
 
     private boolean frameFlag = false;
-    private HtmlElement pageIdentifierElement = null;
     private String windowHandle = null; // store the window / tab on which this page is loaded
     private String url = null;
     private String suiteName = null;
@@ -138,8 +137,6 @@ public class PageObject extends BasePage implements IPage {
             suiteName = SeleniumTestsContextManager.getGlobalContext().getTestNGContext().getSuite().getName();
             outputDirectory = SeleniumTestsContextManager.getGlobalContext().getTestNGContext().getOutputDirectory();
         }
-
-        this.pageIdentifierElement = pageIdentifierElement;
         
         // creates the driver and switch to it. It may be done twice as when the driver is created, we automatically switch to it, but in cas driver
         // is already created, 
@@ -159,7 +156,7 @@ public class PageObject extends BasePage implements IPage {
         	((CustomEventFiringWebDriver)driver).updateWindowsHandles();
         }
 
-        assertCurrentPage(false);
+        assertCurrentPage(false, pageIdentifierElement);
 
         Calendar end = Calendar.getInstance();
         start.setTime(new Date());
@@ -222,7 +219,7 @@ public class PageObject extends BasePage implements IPage {
     }
 
     @Override
-    protected void assertCurrentPage(final boolean log) {
+    protected void assertCurrentPage(boolean log, HtmlElement pageIdentifierElement) {
 
         if (pageIdentifierElement != null && !pageIdentifierElement.isElementPresent()) {
 

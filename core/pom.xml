@@ -527,6 +527,10 @@
 			              <groupId>org.seleniumhq.selenium</groupId>
 			              <artifactId>selenium-remote-driver</artifactId>
 			            </weaveDependency>
+			            <weaveDependency>
+			              <groupId>org.seleniumhq.selenium</groupId>
+			              <artifactId>selenium-support</artifactId>
+			            </weaveDependency>
 		            </weaveDependencies>
 				</configuration>
 				<executions>

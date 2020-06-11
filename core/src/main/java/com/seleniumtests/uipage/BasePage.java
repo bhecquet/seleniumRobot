@@ -33,6 +33,7 @@ import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import com.seleniumtests.driver.TestType;
+import com.seleniumtests.uipage.htmlelements.HtmlElement;
 import com.seleniumtests.util.logging.ScenarioLogger;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
@@ -72,6 +73,7 @@ public abstract class BasePage {
     }
  
     protected void assertCurrentPage(final boolean log) { }
+    protected void assertCurrentPage(boolean log, HtmlElement pageIdentifierElement) { }
 
     
     public void assertHTML(final boolean condition, final String message) {
