@@ -26,11 +26,13 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
 import org.testng.Assert;
 import org.testng.ITestContext;
+import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import com.seleniumtests.GenericTest;
 import com.seleniumtests.MockitoTest;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.driver.TestType;
@@ -57,6 +59,15 @@ public class TestOverrideSeleniumNativeSearch extends MockitoTest {
 		
 		testPage = new DriverTestPageNativeActions(true);
 		realDriver = WebUIDriver.getWebDriver(true);
+	}
+	
+	@AfterClass(groups={"ut"}, alwaysRun=true)
+	public void destroyDriver() {
+		if (WebUIDriver.getWebDriver(false) != null) {
+			WebUIDriver.cleanUp();
+		}
+
+		GenericTest.resetTestNGREsultAndLogger();
 	}
 	
 	@BeforeMethod(groups={"ut"})

@@ -553,7 +553,7 @@ Test will be retried at most `2 * testRetryCount`
 
 
 ### 4 Write a cucumber test ###
-Cucumber styled tests rely on a `.feature` file where each test step is defined. Look at [https://cucumber.io/docs/reference](https://cucumber.io/docs/reference) for more information about writing a feature file.
+Cucumber styled tests rely on a `.feature` file where each test step is defined. Look at [https://cucumber.io/docs/gherkin/reference/](https://cucumber.io/docs/gherkin/reference/) for more information about writing a feature file.
 
 Each line in the feature file must correspond to an implementation inside java code through annotation
 
