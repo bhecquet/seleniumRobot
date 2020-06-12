@@ -219,6 +219,9 @@ public class PageObject extends BasePage implements IPage {
     }
 
     @Override
+    protected void assertCurrentPage(boolean log) {}
+    
+    @Override
     protected void assertCurrentPage(boolean log, HtmlElement pageIdentifierElement) {
 
         if (pageIdentifierElement != null && !pageIdentifierElement.isElementPresent()) {
