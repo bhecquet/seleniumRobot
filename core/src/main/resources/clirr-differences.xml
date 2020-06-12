@@ -7,4 +7,10 @@
 		<method>DatePickerElement(java.lang.String, org.openqa.selenium.By, com.seleniumtests.uipage.htmlelements.FrameElement, com.seleniumtests.uipage.htmlelements.HtmlElement, java.lang.Integer)</method>
 		<justification>internal use</justification>
 	</difference>
+	<difference>
+		<className>**/uipage/PageObject</className>
+		<differenceType>7004</differenceType>
+		<method>void assertCurrentPage(boolean)</method>
+		<justification>internal use</justification>
+	</difference>
 </differences>
