@@ -48,7 +48,7 @@ public class TestNoOverridePageObjectFactory extends TestOverridePageObjectFacto
 	 */
 	@Test(groups={"ut"})
 	public void testFindElementOverride() {
-		Assert.assertTrue(testPage.textElement.toString().contains("-> id: text2]"));
+		Assert.assertNotEquals(testPage.textElement.toString(), "HtmlElement , by={By.id: text2}");
 	}
 	
 
