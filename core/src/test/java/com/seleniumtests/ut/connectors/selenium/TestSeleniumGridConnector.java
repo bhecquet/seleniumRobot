@@ -107,7 +107,7 @@ public class TestSeleniumGridConnector extends ConnectorsTest {
 		
 		// prepare app file
 		((DesiredCapabilities)capabilities).setCapability(CapabilityType.BROWSER_NAME, "firefox");
-		((DesiredCapabilities)capabilities).setCapability(CapabilityType.VERSION, "50.0");
+		((DesiredCapabilities)capabilities).setCapability(CapabilityType.BROWSER_VERSION, "50.0");
 		
 		// prepare response
 		InputStream is = new StringInputStream("{'proxyId':'proxy//node:0'}");
@@ -146,7 +146,7 @@ public class TestSeleniumGridConnector extends ConnectorsTest {
 		
 		// prepare app file
 		((DesiredCapabilities)capabilities).setCapability(CapabilityType.BROWSER_NAME, "firefox");
-		((DesiredCapabilities)capabilities).setCapability(CapabilityType.VERSION, "50.0");
+		((DesiredCapabilities)capabilities).setCapability(CapabilityType.BROWSER_VERSION, "50.0");
 		
 		// prepare response
 		InputStream is = new StringInputStream("{'proxyId':'proxy//node:0'}");
