@@ -141,7 +141,8 @@ public abstract class IDesktopCapabilityFactory extends ICapabilitiesFactory {
         capability.setCapability(CapabilityType.ACCEPT_SSL_CERTS, true);
 
         if (webDriverConfig.getBrowserVersion() != null) {
-            capability.setVersion(webDriverConfig.getBrowserVersion());
+//            capability.setVersion(webDriverConfig.getBrowserVersion());
+            capability.setCapability(CapabilityType.BROWSER_VERSION, webDriverConfig.getBrowserVersion());
         }
 
         if (webDriverConfig.getWebPlatform() != null) {

@@ -83,7 +83,7 @@ public class TestSeleniumGridDriverFactory extends MockitoTest {
 		// configure driver
 		Map<String, String> capsMap = new HashMap<>();
 		capsMap.put(CapabilityType.BROWSER_NAME, "htmlunit");
-		capsMap.put(CapabilityType.VERSION, "70.0.1.2.3");
+		capsMap.put(CapabilityType.BROWSER_VERSION, "70.0.1.2.3");
 		Capabilities caps = new MutableCapabilities(capsMap);
 		
 		when(driver.manage()).thenReturn(options);
