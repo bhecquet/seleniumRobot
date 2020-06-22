@@ -87,7 +87,7 @@ Cucumber options
 
 | Param name       			| Default 	| Description  |
 | -------------------------	| ------- 	| ------------ |
-| cucumberTests 			|  			| Comma seperated list of tests to execute when using cucumber mode. Test name can be the feature name, the feature file name or the scenario name. You can also give regex that will match String in java. e.g: scenario .* | 
+| cucumberTests 			|  			| Comma seperated list of tests to execute when using cucumber mode. Test name can be the feature name, the feature file name (without extension) or the scenario name. You can also give regex that will match String in java. e.g: scenario .* | 
 | cucumberTags 				|  			| List of cucumber tags that will allow determining tests to execute. Format can be:<br/>`@new4 AND @new5` for filtering scenario containing tag new4 AND new5<br/>`@new,@new2` for filtering scenarios containing new OR new2<br/>`@new` for filtering scenario containing new tag | 
 | cucumberPackage 			| 			| **Mandatory for cucumberTests:** name of the package where cucumber implementation class reside | 
 
