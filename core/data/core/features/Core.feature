@@ -30,3 +30,6 @@ Feature: Core
 		
 	Scenario: error_scenario
 		When write_error error 
+		
+	Scenario: my beautiful scenario ?? ok ??
+		When write tatu

@@ -1270,13 +1270,36 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 
 		String mainReportContent = readSummaryFile();
 		Assert.assertTrue(mainReportContent.matches(".*<a href\\='core_3/TestReport\\.html'.*?>core_3</a>.*"));
-	
+		
 		String detailedReportContent = readTestMethodResultFile("core_3");
 		
 		// Check each step is recorded in file: 2 test steps + test end + logs
 		Assert.assertTrue(detailedReportContent.contains("<div class=\"box collapsed-box success\"><div class=\"box-header with-border\"><button type=\"button\" class=\"btn btn-box-tool\" data-widget=\"collapse\"><i class=\"fa fa-plus\"></i></button> write (\\w+) with args: (tutu, )"));
 		Assert.assertTrue(detailedReportContent.contains("<div class=\"message-log\">Test is OK</div>"));
 	}
+	
+	/**
+	 * Check all steps are present in detailed report file. For cucumber, check that method name is the Scenario name, not the "feature" generic method
+	 * Test OK
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testCucumberScenarioWithSpecialName() throws Exception {
+		
+		executeSubCucumberTests("my beautiful scenario ?? ok ??", 1);
+		
+		String mainReportContent = readSummaryFile();
+		Assert.assertTrue(mainReportContent.matches(".*<a href\\='my_beautiful_scenario_.._ok_..-/TestReport\\.html'.*?>my_beautiful_scenario_.._ok_..-</a>.*"));
+	
+		String detailedReportContent = readTestMethodResultFile("my_beautiful_scenario_.._ok_..-");
+		
+		// Check each step is recorded in file: 2 test steps + test end + logs
+		Assert.assertTrue(detailedReportContent.contains("<div class=\"box collapsed-box success\"><div class=\"box-header with-border\"><button type=\"button\" class=\"btn btn-box-tool\" data-widget=\"collapse\"><i class=\"fa fa-plus\"></i></button> write (\\w+) with args: (tatu, )"));
+		Assert.assertTrue(detailedReportContent.contains("<div class=\"message-log\">Test is OK</div>"));
+		
+		
+	}
+	
 	/**
 	 * Check that test name is correctly reported in cucumber mode when threads are used
 	 * Test OK

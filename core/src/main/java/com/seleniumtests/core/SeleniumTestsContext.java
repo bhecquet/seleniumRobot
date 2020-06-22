@@ -793,6 +793,11 @@ public class SeleniumTestsContext {
     		String uniqueIdentifier = TestNGResultUtils.getHashForTest(testNGResult);
         	String testNameModified = StringUtility.replaceOddCharsFromFileName(TestNGResultUtils.getTestName(testNGResult));
         	
+        	// issue #361: handle names that end with '..'
+        	if (testNameModified.endsWith("..")) {
+        		testNameModified += "-";
+        	}
+        	
         	if (!outputFolderNames.containsKey(uniqueIdentifier)) {
         		if (!outputFolderNames.values().contains(testNameModified)) {
         			outputFolderNames.put(uniqueIdentifier, testNameModified);
