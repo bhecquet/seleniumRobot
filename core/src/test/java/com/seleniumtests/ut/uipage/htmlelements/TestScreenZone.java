@@ -41,6 +41,7 @@ import org.testng.annotations.Test;
 
 import com.seleniumtests.MockitoTest;
 import com.seleniumtests.browserfactory.BrowserInfo;
+import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.ImageSearchException;
 import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.driver.BrowserType;
@@ -89,6 +90,22 @@ public class TestScreenZone extends MockitoTest {
 		
 		picElement.click();
 		verify(picElement).moveAndLeftClick(35, 60);
+	}
+	
+	/**
+	 * issue #359: return a specific message when resource is not found
+	 */
+	@Test(groups= {"ut"}, expectedExceptions = ConfigurationException.class, expectedExceptionsMessageRegExp = "Resource 'invalidPath' cannot be found")
+	public void testInvalidResource() {
+		new ScreenZone("", "invalidPath");
+	}
+	
+	/**
+	 * issue #359: return a specific message when file is not found
+	 */
+	@Test(groups= {"ut"}, expectedExceptions = ConfigurationException.class, expectedExceptionsMessageRegExp = "File for scene to detect object at path 'invalidPath' does not exist")
+	public void testInvalidFile() {
+		new ScreenZone("", new File("invalidPath"));
 	}
 	
 	@Test(groups={"ut"})

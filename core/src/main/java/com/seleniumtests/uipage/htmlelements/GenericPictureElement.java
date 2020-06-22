@@ -89,8 +89,8 @@ public abstract class GenericPictureElement extends Element {
 			FileUtils.copyInputStreamToFile(Thread.currentThread().getContextClassLoader().getResourceAsStream(resource), tempFile);
 			
 			return tempFile;
-		} catch (IOException e) {
-			throw new ConfigurationException("Resource cannot be found", e);
+		} catch (IOException | NullPointerException e) {
+			throw new ConfigurationException(String.format("Resource '%s' cannot be found", resource), e);
 		}
 	}
 	
@@ -220,7 +220,12 @@ public abstract class GenericPictureElement extends Element {
 
 	public void setObjectPictureFile(File objectPictureFile) {
 		this.objectPictureFile = objectPictureFile;
-		detector.setObjectImage(objectPictureFile);
+		try {
+			detector.setObjectImage(objectPictureFile);
+		} catch (ImageSearchException e) {
+			throw new ConfigurationException(e.getMessage());
+		}
+		
 	}
 
 	public Rectangle getDetectedObjectRectangle() {
