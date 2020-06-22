@@ -31,5 +31,6 @@ Feature: Core
 	Scenario: error_scenario
 		When write_error error 
 		
+	@EXCLUDE_FROM_SQUASH_TA
 	Scenario: my beautiful scenario ?? ok ??
 		When write tatu
