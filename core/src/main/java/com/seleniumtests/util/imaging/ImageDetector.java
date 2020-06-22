@@ -721,7 +721,7 @@ public class ImageDetector {
 			throw new ImageSearchException("Object image file is null");
 		}
 		if (!objectImage.exists()) {
-			throw new ImageSearchException(String.format("File for scene to detect object in %s does not exist", objectImage));
+			throw new ImageSearchException(String.format("File for scene to detect object at path '%s' does not exist", objectImage));
 		}
 		this.objectImage = objectImage;
 	}
