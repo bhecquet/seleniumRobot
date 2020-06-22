@@ -80,8 +80,10 @@ public class PageObject extends BasePage implements IPage {
     private String outputDirectory = null;
     private String htmlFilePath = null;
     private String imageFilePath = null;
+    private boolean captureSnapshot = true;
     private ScreenshotUtil screenshotUtil;
     private Clock systemClock;
+    private PageLoadStrategy pageLoadStrategy;
 
     /**
      * Constructor for non-entry point page. The control is supposed to have reached the page from other API call.
@@ -111,7 +113,53 @@ public class PageObject extends BasePage implements IPage {
     			WebUIDriver.getCurrentWebUiDriverName(), 
     			null);
     }
-
+    
+    /**
+     * Base Constructor.
+     * Represents a page on our web site or mobile application.
+     *
+     * @param	pageIdentifierElement	The element to search for so that we check we are on the right page. 
+     * 									May be null if we do not want to check we are on the page
+     * @param   url						the URL to which we should connect. May be null if we do not want to go to a specific URL
+     * @param	waitPageLoad			whether to wait for the page to load or not (this is complementary to Selenium driver strategy. If not null, it will override selenium
+     * @throws IOException 
+     *
+     * @throws  Exception
+     */
+    public PageObject(final HtmlElement pageIdentifierElement, final String url, PageLoadStrategy pageLoadStrategy) throws IOException {
+    	this(pageIdentifierElement, 
+    			url, 
+    			SeleniumTestsContextManager.getThreadContext().getBrowser(), 
+    			WebUIDriver.getCurrentWebUiDriverName(), 
+    			null,
+    			pageLoadStrategy,
+    			true);
+    }
+    
+    
+    /**
+     * Base Constructor.
+     * Represents a page on our web site or mobile application.
+     *
+     * @param	pageIdentifierElement	The element to search for so that we check we are on the right page. 
+     * 									May be null if we do not want to check we are on the page
+     * @param   url						the URL to which we should connect. May be null if we do not want to go to a specific URL
+     * @param	waitPageLoad			whether to wait for the page to load or not (this is complementary to Selenium driver strategy. If not null, it will override selenium
+     * @param	captureSnapshot			if true, snapshot will be captured after page loading. 'false' should only be used when capturing snapshot interfere with a popup alert
+     * @throws IOException 
+     *
+     * @throws  Exception
+     */
+    public PageObject(final HtmlElement pageIdentifierElement, final String url, PageLoadStrategy pageLoadStrategy, boolean captureSnapshot) throws IOException {
+    	this(pageIdentifierElement, 
+    			url, 
+    			SeleniumTestsContextManager.getThreadContext().getBrowser(), 
+    			WebUIDriver.getCurrentWebUiDriverName(), 
+    			null,
+    			pageLoadStrategy,
+    			captureSnapshot);
+    }
+    
     /**
      * Base Constructor.
      * Represents a page on our web site or mobile application.
@@ -127,8 +175,39 @@ public class PageObject extends BasePage implements IPage {
      * @throws  Exception
      */
     public PageObject(HtmlElement pageIdentifierElement, String url, BrowserType browserType, String driverName, Integer attachExistingDriverPort) throws IOException {
+    	this(pageIdentifierElement, url, browserType, driverName, attachExistingDriverPort, null, true);
+    }
+    public PageObject(HtmlElement pageIdentifierElement, String url, BrowserType browserType, String driverName, Integer attachExistingDriverPort, boolean captureSnapshot) throws IOException {
+    	this(pageIdentifierElement, url, browserType, driverName, attachExistingDriverPort, null, captureSnapshot);
+    }
+
+    /**
+     * Base Constructor.
+     * Represents a page on our web site or mobile application.
+     *
+     * @param	pageIdentifierElement	The element to search for so that we check we are on the right page. 
+     * 									May be null if we do not want to check we are on the page
+     * @param   url						the URL to which we should connect. May be null if we do not want to go to a specific URL
+     * @param	browserType				the new browser type to create
+     * @param	driverName				a logical name to give to the created driver
+     * @param	attachExistingDriverPort 	 if we need to attach to an existing browser instead of creating one, then specify the port here
+     * @param	waitPageLoad			whether to wait for the page to load or not (this is complementary to Selenium driver strategy. If not null, it will override selenium
+     * @param	captureSnapshot			if true, snapshot will be captured after page loading. 'false' should only be used when capturing snapshot interfere with a popup alert
+     * @throws IOException 
+     *
+     * @throws  Exception
+     */
+    public PageObject(HtmlElement pageIdentifierElement, String url, BrowserType browserType, String driverName, Integer attachExistingDriverPort, PageLoadStrategy pageLoadStrategy, boolean captureSnapshot) throws IOException {
 
     	systemClock = Clock.systemUTC();
+    	this.captureSnapshot = captureSnapshot;
+    	
+    	if (pageLoadStrategy == null) {
+    		this.pageLoadStrategy = robotConfig().getPageLoadStrategy();
+    	} else {
+    		this.pageLoadStrategy = pageLoadStrategy;
+    	}
+    	
         Calendar start = Calendar.getInstance();
         start.setTime(new Date());
 
@@ -210,7 +289,9 @@ public class PageObject extends BasePage implements IPage {
         if (SeleniumTestsContextManager.isWebTest()) {
             waitForPageToLoad();
         } else if (SeleniumTestsContextManager.isAppTest()) {
-        	capturePageSnapshot();
+        	if (captureSnapshot) {
+        		capturePageSnapshot();
+        	}
         }
     }
 
@@ -818,9 +899,11 @@ public class PageObject extends BasePage implements IPage {
 
     private void waitForPageToLoad() {
     	try {
-    		if (robotConfig().getPageLoadStrategy() == PageLoadStrategy.NORMAL) {
+    		
+    		
+    		if (pageLoadStrategy == PageLoadStrategy.NORMAL) {
     			new WebDriverWait(driver, 5).until(ExpectedConditions.jsReturnsValue("if (document.readyState === \"complete\") { return \"ok\"; }"));
-    		} else if (robotConfig().getPageLoadStrategy() == PageLoadStrategy.EAGER) {
+    		} else if (pageLoadStrategy == PageLoadStrategy.EAGER) {
     			new WebDriverWait(driver, 5).until(ExpectedConditions.jsReturnsValue("if (document.readyState === \"interactive\") { return \"ok\"; }"));
     		}
     	} catch (TimeoutException e) {
@@ -829,12 +912,14 @@ public class PageObject extends BasePage implements IPage {
     	
 
         // populate page info
-        try {
-        	capturePageSnapshot();
-        } catch (Exception ex) {
-        	internalLogger.error(ex);
-            throw ex;
-        }
+    	if (captureSnapshot) {
+	        try {
+	        	capturePageSnapshot();
+	        } catch (Exception ex) {
+	        	internalLogger.error(ex);
+	            throw ex;
+	        }
+    	}
     }
     
 	public Alert waitForAlert(int waitInSeconds) {
