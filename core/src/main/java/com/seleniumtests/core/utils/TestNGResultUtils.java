@@ -115,7 +115,8 @@ public class TestNGResultUtils {
     			&& testNGResult.getParameters()[0] instanceof CucumberScenarioWrapper 
 //    			&& "com.seleniumtests.core.runner.CucumberTestPlan".equals(testNGResult.getMethod().getTestClass().getName()) // prevents from doing unit tests
     			) {
-    		return testNGResult.getParameters()[0].toString();
+			return testNGResult.getParameters()[0].toString();
+    		
     	} else {
     		// issue #137: in case we are in a BeforeMethod, take class name and method name from TestMethod
     		if (testNGResult.getMethod().isBeforeMethodConfiguration()) {

@@ -1279,6 +1279,37 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	}
 	
 	/**
+	 * issue #362: check that with scenario outline, we have the 2 results
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testCucumberScenarioOutline() throws Exception {
+		
+		executeSubCucumberTests("core_ .*", 1);
+		
+		String mainReportContent = readSummaryFile();
+		Assert.assertTrue(mainReportContent.matches(".*<a href\\='core__tata/TestReport\\.html'.*?>core__tata</a>.*"));
+		Assert.assertTrue(mainReportContent.matches(".*<a href\\='core__titi/TestReport\\.html'.*?>core__titi</a>.*"));
+		
+	}
+	
+	/**
+	 * issue #362: check that with scenario outline, we have the 2 results even if name is the same
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testCucumberScenarioOutlineUniqueName() throws Exception {
+		
+		executeSubCucumberTests("core_unique_name", 1);
+		
+		String mainReportContent = readSummaryFile();
+
+		Assert.assertTrue(mainReportContent.matches(".*<a href\\='core_unique_name-_tata_/TestReport\\.html'.*?>core_unique_name-_tata_</a>.*"));
+		Assert.assertTrue(mainReportContent.matches(".*<a href\\='core_unique_name-_titi_/TestReport\\.html'.*?>core_unique_name-_titi_</a>.*"));
+		
+	}
+	
+	/**
 	 * Check all steps are present in detailed report file. For cucumber, check that method name is the Scenario name, not the "feature" generic method
 	 * Test OK
 	 * @throws Exception
