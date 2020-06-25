@@ -65,6 +65,10 @@
 		    <artifactId>unirest-java</artifactId>
 		</dependency>
 		<dependency>
+		    <groupId>com.mashape.unirest</groupId>
+		    <artifactId>unirest-java</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>com.infotel.seleniumRobot</groupId>
 			<artifactId>seleniumRobot-windows-driver</artifactId>
 		</dependency>
