@@ -269,7 +269,7 @@ public class CustomTestNGCucumberRunner {
 		if (cucumberTagStatement instanceof CucumberScenarioOutline) {
 			for (CucumberExamples cucumberExamples : ((CucumberScenarioOutline)cucumberTagStatement).getCucumberExamplesList()) {
 	            for (CucumberScenario exampleScenario : cucumberExamples.createExampleScenarios()) {
-        			CucumberScenarioWrapper scenarioWrapper = new CucumberScenarioWrapper(exampleScenario);
+        			CucumberScenarioWrapper scenarioWrapper = new CucumberScenarioWrapper(exampleScenario, cucumberTagStatement.getGherkinModel().getName());
 	            	scenarioList.add(scenarioWrapper);
 	            }
 	        }

@@ -10,6 +10,16 @@ Feature: Core
 		| tata |
 		| titi |
 		
+	
+	Scenario Outline: core_unique_name
+		
+		When write <text>
+		
+		Examples:
+		| text |
+		| tata |
+		| titi |
+		
 	@new
 	Scenario: core_3
 		When write tutu

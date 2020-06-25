@@ -17,6 +17,8 @@
  */
 package com.seleniumtests.core.runner;
 
+import java.util.regex.Pattern;
+
 import cucumber.api.testng.AbstractTestNGCucumberTests;
 import cucumber.runtime.model.CucumberScenario;
 
@@ -30,9 +32,14 @@ public class CucumberScenarioWrapper {
 
 	
     private final CucumberScenario cucumberScenario;
+    private String scenarioOutlineName;
 
     public CucumberScenarioWrapper(CucumberScenario cucumberScenario) {
+    	this(cucumberScenario, null);
+    }
+    public CucumberScenarioWrapper(CucumberScenario cucumberScenario, String scenarioOutlineName) {
         this.cucumberScenario = cucumberScenario;
+        this.scenarioOutlineName = scenarioOutlineName;
     }
 
     public CucumberScenario getCucumberScenario() {
@@ -41,8 +48,15 @@ public class CucumberScenarioWrapper {
 
     @Override
     public String toString() {
-        return cucumberScenario.getGherkinModel().getName();
+    	// in case of examples (Scenario Outline), search if scenario description contains placeholders. 
+    	// If true, only resturns description, else, return description and visualName (which contains data) so that all execution can be distinguished in report
+    	if (scenarioOutlineName != null && !Pattern.compile("<.*?>").matcher(scenarioOutlineName).find()) { 
+    		return cucumberScenario.getGherkinModel().getName() + "-" + cucumberScenario.getVisualName();
+    	} else {
+    		return cucumberScenario.getGherkinModel().getName();
+    	}
     }
+    
     
     @Override
     public boolean equals(Object obj) {
