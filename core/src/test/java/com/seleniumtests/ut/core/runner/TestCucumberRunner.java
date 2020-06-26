@@ -121,7 +121,7 @@ public class TestCucumberRunner extends GenericTest {
 			System.setProperty("cucumberTests", "Co.*");
 			initThreadContext(testNGCtx);
 			CustomTestNGCucumberRunner runner = new CustomTestNGCucumberRunner(this.getClass());
-			Assert.assertEquals(runner.provideScenarios().length, 10);
+			Assert.assertEquals(runner.provideScenarios().length, 12);
 		} finally {
 			System.clearProperty("cucumberTests");
 		}
