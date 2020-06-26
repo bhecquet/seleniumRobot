@@ -1310,6 +1310,22 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	}
 	
 	/**
+	 * issue #362: check that with scenario outline, we have the 2 results even if name is the same
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testCucumberScenarioOutlineUniqueLongName() throws Exception {
+		
+		executeSubCucumberTests("a very long scenario outline name which should not have been created but is there but we should not strip it only display a message saying its much too long", 1);
+		
+		String mainReportContent = readSummaryFile();
+		
+		Assert.assertTrue(mainReportContent.matches(".*<a href\\='a_very_long_scenario_outline_name_which_should_not_have_been_created_but_is_there_but_we_should_not_strip_it_only_displa/TestReport\\.html'.*?>a_very_long_scenario_outline_name_which_should_not_have_been_created_but_is_there_but_we_should_not_strip_it_only_displa</a>.*"));
+		
+		readTestMethodResultFile("a_very_long_scenario_outline_name_which_should_not_have_been_created_but_is_there_but_we_should_not_strip_it_only_displa");
+	}
+	
+	/**
 	 * Check all steps are present in detailed report file. For cucumber, check that method name is the Scenario name, not the "feature" generic method
 	 * Test OK
 	 * @throws Exception

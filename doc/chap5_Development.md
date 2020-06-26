@@ -39,6 +39,9 @@ The integration tests can be customized with several maven-failsafe-plugin optio
 - debug maven integration tests: use `-Dmaven.failsafe.debug=true`. Refer to failsafe plugin documentation for details
 - display / do not display driver logs (they can be quite big). This corresponds to the d option of seleniumRobot: `-DseleniumRobot.debug=driver` or `-DseleniumRobot.debug=none`
 
+**Test in Internet Explorer**: Beware to unckeck "Display intranet sites in compatibility mode". Else, integration tests with Internet Explorer will fail
+
+
 ### 4 Deploy ###
 Unzip this file to any folder.
 

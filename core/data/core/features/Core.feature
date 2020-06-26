@@ -20,6 +20,15 @@ Feature: Core
 		| tata |
 		| titi |
 		
+	Scenario Outline: a very long scenario outline name which should not have been created but is there but we should not strip it only display a message saying its much too long
+		
+		When write <text>
+		
+		Examples:
+		| text |
+		| tata |
+		| titi |
+		
 	@new
 	Scenario: core_3
 		When write tutu
