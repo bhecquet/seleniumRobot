@@ -19,6 +19,11 @@ package com.seleniumtests.core.runner;
 
 import java.util.regex.Pattern;
 
+import org.apache.log4j.Logger;
+
+import com.seleniumtests.core.SeleniumTestsContext;
+import com.seleniumtests.util.logging.SeleniumRobotLogger;
+
 import cucumber.api.testng.AbstractTestNGCucumberTests;
 import cucumber.runtime.model.CucumberScenario;
 
@@ -30,7 +35,8 @@ import cucumber.runtime.model.CucumberScenario;
  */
 public class CucumberScenarioWrapper {
 
-	
+
+	private static final Logger logger = SeleniumRobotLogger.getLogger(CucumberScenarioWrapper.class);
     private final CucumberScenario cucumberScenario;
     private String scenarioOutlineName;
 
@@ -48,13 +54,31 @@ public class CucumberScenarioWrapper {
 
     @Override
     public String toString() {
+    	return toString(120);
+    }
+    
+    public String toString(int strip) {
+    	
+    	String name;
+    	
     	// in case of examples (Scenario Outline), search if scenario description contains placeholders. 
     	// If true, only resturns description, else, return description and visualName (which contains data) so that all execution can be distinguished in report
     	if (scenarioOutlineName != null && !Pattern.compile("<.*?>").matcher(scenarioOutlineName).find()) { 
-    		return cucumberScenario.getGherkinModel().getName() + "-" + cucumberScenario.getVisualName();
+    		name = cucumberScenario.getGherkinModel().getName() + "-" + cucumberScenario.getVisualName();
+    		
     	} else {
-    		return cucumberScenario.getGherkinModel().getName();
+    		name = cucumberScenario.getGherkinModel().getName();
     	}
+    	
+    	if (strip > 50 && name.length() > strip) {
+    		logger.warn("-------------------------------------------------------------------------------------");
+			logger.warn(String.format("Cucumber scenario name [%s] is too long. This may cause problems in reporters and accessing reports on Windows", name));
+			logger.warn("Reduce size, and if it's a 'Scenario Outline' whose name does not contain placeholders, add some. Ex: 'My long name' => 'My long name <col1>, <col2>'");
+			logger.warn("-------------------------------------------------------------------------------------");
+			name = name.substring(0, strip);
+		}
+
+		return name;
     }
     
     
@@ -73,7 +97,7 @@ public class CucumberScenarioWrapper {
         	return false;
         }
 
-        return this.toString() !=null ? this.toString().equals(other.toString()) : this.toString() == other.toString();
+        return this.toString(-1) !=null ? this.toString(-1).equals(other.toString(-1)) : this.toString(-1) == other.toString(-1);
     }
 
     @Override
