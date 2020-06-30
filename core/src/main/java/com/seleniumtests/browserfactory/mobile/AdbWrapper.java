@@ -50,14 +50,25 @@ public class AdbWrapper {
 
 	/**
 	 * Checks that ADB is installed
-	 * Search for an environment variable ANDROID_HOME
+	 * Search for an environment variable ANDROID_HOME / ANDROID_SDK_ROOT
 	 * If found, use the adb inside that directory
 	 * Else, try to run ADB directly
 	 * @throws ConfigurationException when ADB is not found
 	 * @return
 	 */
 	private void checkInstallation() {
-		String androidHome = System.getenv("ANDROID_HOME");
+		
+		try {
+			checkInstallation("ANDROID_SDK_ROOT");
+		} catch (ConfigurationException e) {
+			logger.warn(e.getMessage());
+			checkInstallation("ANDROID_HOME");
+		}
+		logger.info("ADB found");
+		
+	}
+	private void checkInstallation(String androidEnvVarName) {
+		String androidHome = System.getenv(androidEnvVarName);
 		if (androidHome != null) {
 			adbCommand = Paths.get(androidHome, "platform-tools", "adb").toString();
 		} else {
@@ -69,7 +80,7 @@ public class AdbWrapper {
 		adbVersion = reply.split("\n")[0].trim().replace("Android Debug Bridge version", "").trim();
 		
 		if (!adbVersion.matches(".*\\d\\.\\d.*")) {
-			throw new ConfigurationException("ADB does not seem to be installed, is environment variable ANDROID_HOME set ?");
+			throw new ConfigurationException(String.format("ADB does not seem to be installed, is environment variable %s set ?", androidEnvVarName));
 		}
 	}
 	
