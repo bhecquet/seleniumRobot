@@ -1320,9 +1320,9 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		
 		String mainReportContent = readSummaryFile();
 		
-		Assert.assertTrue(mainReportContent.matches(".*<a href\\='a_very_long_scenario_outline_name_which_should_not_have_been_created_but_is_there_but_we_should_not_strip_it_only_displa/TestReport\\.html'.*?>a_very_long_scenario_outline_name_which_should_not_have_been_created_but_is_there_but_we_should_not_strip_it_only_displa</a>.*"));
+		Assert.assertTrue(mainReportContent.matches(".*<a href\\='a_very_long_scenario_outline_name_which_should_not_have_been_created_but_is_there_but_we_should/TestReport\\.html'.*?>a_very_long_scenario_outline_name_which_should_not_have_been_created_but_is_there_but_we_should</a>.*"));
 		
-		readTestMethodResultFile("a_very_long_scenario_outline_name_which_should_not_have_been_created_but_is_there_but_we_should_not_strip_it_only_displa");
+		readTestMethodResultFile("a_very_long_scenario_outline_name_which_should_not_have_been_created_but_is_there_but_we_should");
 	}
 	
 	/**
