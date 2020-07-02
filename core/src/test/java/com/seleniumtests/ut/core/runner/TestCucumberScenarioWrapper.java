@@ -80,6 +80,13 @@ public class TestCucumberScenarioWrapper extends MockitoTest {
 		Assert.assertEquals(new CucumberScenarioWrapper(cucumberScenario).toString(150), "a very long scenario outline name with some special characters like @ and |. But we should not strip it, only display a message saying its much too lo");
 	}
 	
+	@Test(groups={"ut"})
+	public void testScenarioToStringStripDefaultLong(ITestContext testNGCtx) {
+		when(gherkinModel.getName()).thenReturn("a very long scenario outline name with some special characters like @ and |. But we should not strip it, only display a message saying its much too long.");
+		
+		Assert.assertEquals(new CucumberScenarioWrapper(cucumberScenario).toString(), "a very long scenario outline name with some special characters like @ and |. But we should not ");
+	}
+	
 	/**
 	 * With placeholder on scenario outline, we use the cucumber scenario name as placeholders have been replaced
 	 * @param testNGCtx
