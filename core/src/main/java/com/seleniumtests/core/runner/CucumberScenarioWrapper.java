@@ -21,7 +21,6 @@ import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 
-import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
 import cucumber.api.testng.AbstractTestNGCucumberTests;
@@ -54,7 +53,7 @@ public class CucumberScenarioWrapper {
 
     @Override
     public String toString() {
-    	return toString(120);
+    	return toString(95);
     }
     
     public String toString(int strip) {
