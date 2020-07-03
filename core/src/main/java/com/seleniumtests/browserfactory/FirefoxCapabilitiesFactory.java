@@ -33,7 +33,7 @@ import org.openqa.selenium.firefox.GeckoDriverService;
 import com.seleniumtests.browserfactory.customprofile.FireFoxProfileMarker;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.DriverConfig;
-import com.seleniumtests.reporter.logger.TestLogging;
+import com.seleniumtests.driver.DriverMode;
 import com.seleniumtests.util.FileUtility;
 import com.seleniumtests.util.logging.DebugMode;
 
@@ -131,7 +131,7 @@ public class FirefoxCapabilitiesFactory extends IDesktopCapabilityFactory {
             profile.setPreference("network.automatic-ntlm-auth.trusted-uris", webDriverConfig.getNtlmAuthTrustedUris());
         }
 
-        if (webDriverConfig.getBrowserDownloadDir() != null) {
+        if (webDriverConfig.getBrowserDownloadDir() != null && webDriverConfig.getMode() == DriverMode.LOCAL) {
             profile.setPreference("browser.download.dir", webDriverConfig.getBrowserDownloadDir());
             profile.setPreference("browser.download.folderList", 2);
             profile.setPreference("browser.download.manager.showWhenStarting", false);
@@ -183,14 +183,15 @@ public class FirefoxCapabilitiesFactory extends IDesktopCapabilityFactory {
     protected synchronized FirefoxProfile getFirefoxProfile(final DriverConfig webDriverConfig) {
         String path = webDriverConfig.getFirefoxProfilePath();
         FirefoxProfile profile;
-        String realPath;
-        if (webDriverConfig.isUseFirefoxDefaultProfile()) {
-            realPath = getFirefoxProfilePath(path);
-        } else {
-            realPath = null;
-        }
+// disable default profile
+//        String realPath;
+//        if (webDriverConfig.isUseFirefoxDefaultProfile()) {
+//            realPath = getFirefoxProfilePath(path);
+//        } else {
+//            realPath = null;
+//        }
 
-        profile = createFirefoxProfile(realPath);
+        profile = createFirefoxProfile(path);
         return profile;
     }
 
