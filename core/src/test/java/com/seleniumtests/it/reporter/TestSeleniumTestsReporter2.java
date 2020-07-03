@@ -1311,12 +1311,13 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	
 	/**
 	 * issue #362: check that with scenario outline, we have the 2 results even if name is the same
+	 * issue #366: also check with an accent so that we can verify it's removed
 	 * @throws Exception
 	 */
 	@Test(groups={"it"})
 	public void testCucumberScenarioOutlineUniqueLongName() throws Exception {
 		
-		executeSubCucumberTests("a very long scenario outline name which should not have been created but is there but we should not strip it only display a message saying its much too long", 1);
+		executeSubCucumberTests("a very long scenàrio outline name which should not have been created but is there but we should not strip it only display a message saying its much too long", 1);
 		
 		String mainReportContent = readSummaryFile();
 		

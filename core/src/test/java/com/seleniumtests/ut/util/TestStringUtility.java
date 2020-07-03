@@ -84,4 +84,9 @@ public class TestStringUtility extends GenericTest {
 	public void testOddCharRemovalDoubleQuote() {
 		Assert.assertEquals(StringUtility.replaceOddCharsFromFileName("\""), "");
 	}
+	
+	@Test(groups={"ut"})
+	public void testOddCharRemovalAccents() {
+		Assert.assertEquals(StringUtility.replaceOddCharsFromFileName("aàéç"), "aaec");
+	}
 }
