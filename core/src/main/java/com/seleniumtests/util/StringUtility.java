@@ -21,7 +21,9 @@ import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Method;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.text.Normalizer;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringEscapeUtils;
 import org.apache.log4j.Logger;
 
@@ -123,7 +125,8 @@ public class StringUtility {
 		if (inString == null) {
 			return "null";
 		}
-		return inString.replace(" ",  "_")
+
+		return StringUtils.stripAccents(inString).replace(" ",  "_")
 				.replaceAll("['\"/|%]", "")
 				.replaceAll("[:*?]", ".")
 				.replaceAll("[<>]", "-")
