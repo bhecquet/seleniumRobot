@@ -245,6 +245,7 @@ public class TestMarionetteCapabilitiesFactory extends MockitoTest {
 	public void testCreateMarionetteCapabilitiesOverrideDownloadDir() {
 		
 		Mockito.when(config.getBrowserDownloadDir()).thenReturn("/home/download");
+		Mockito.when(config.getMode()).thenReturn(DriverMode.LOCAL);
 		
 		MutableCapabilities capa = new FirefoxCapabilitiesFactory(config).createCapabilities();
 		
@@ -255,6 +256,25 @@ public class TestMarionetteCapabilitiesFactory extends MockitoTest {
 		Assert.assertEquals(profile.getIntegerPreference("browser.download.folderList", 0), 2);
 		Assert.assertEquals(profile.getBooleanPreference("browser.download.manager.showWhenStarting", true), false);
 		Assert.assertEquals(profile.getStringPreference("browser.helperApps.neverAsk.saveToDisk", ""), "application/octet-stream,text/plain,application/pdf,application/zip,text/csv,text/html");
+	}
+	
+	/**
+	 * issue #365: Check DownloadDir is not set in remote
+	 */
+	@Test(groups={"ut"})
+	public void testCreateMarionetteCapabilitiesNoOverrideDownloadDirRemote() {
+		
+		Mockito.when(config.getBrowserDownloadDir()).thenReturn("/home/download");
+		Mockito.when(config.getMode()).thenReturn(DriverMode.GRID);
+		
+		MutableCapabilities capa = new FirefoxCapabilitiesFactory(config).createCapabilities();
+		
+		FirefoxProfile profile = (FirefoxProfile)capa.getCapability(FirefoxDriver.PROFILE);
+		
+		// check profile
+		Assert.assertEquals(profile.getStringPreference("browser.download.dir", ""), "");
+		Assert.assertEquals(profile.getIntegerPreference("browser.download.folderList", 0), 0);
+		Assert.assertEquals(profile.getStringPreference("browser.helperApps.neverAsk.saveToDisk", ""), "");
 	}
 	
 	@Test(groups={"ut"})
