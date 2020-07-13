@@ -52,6 +52,9 @@ public class PageServlet extends HttpServlet {
 			if (this.resourceFile.endsWith(".css")) {
 				resp.addHeader("Content-Type", "text/css ");
 			}
+			if (this.resourceFile.endsWith(".js")) {
+				resp.addHeader("Content-Type", "text/javascript");
+			}
 			IOUtils.copy(getClass().getResourceAsStream(this.resourceFile), resp.getOutputStream());
 		} catch (IOException e) {
         	resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Error while handling request: " + e.getMessage());
