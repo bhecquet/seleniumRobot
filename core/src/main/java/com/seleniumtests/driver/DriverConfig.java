@@ -100,6 +100,10 @@ public class DriverConfig {
     public Boolean getBetaBrowser() {
     	return testContext.getBetaBrowser();
     }
+    
+    public String getAutomationName() {
+    	return testContext.getAutomationName();
+    }
 
     public String getChromeDriverPath() {
         return testContext.getChromeDriverPath();

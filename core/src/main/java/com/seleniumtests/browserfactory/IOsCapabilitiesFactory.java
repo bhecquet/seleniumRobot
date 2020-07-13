@@ -32,7 +32,11 @@ public class IOsCapabilitiesFactory extends IMobileCapabilityFactory {
 
 	@Override
 	protected String getAutomationName() {
-		return "XCUITest"; // for iOS 10+
+		if (webDriverConfig.getAutomationName() == null) {
+			return "XCUITest"; // for iOS 10+
+		} else {
+			return webDriverConfig.getAutomationName();
+		}
 	}
 
 	@Override

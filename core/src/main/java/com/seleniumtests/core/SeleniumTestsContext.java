@@ -189,6 +189,7 @@ public class SeleniumTestsContext {
     public static final String MOBILE_PLATFORM_VERSION = "mobilePlatformVersion";// Mobile OS version. It's deduced from platform name and not read directly from parameters
     public static final String DEVICE_NAME = "deviceName";						// Nom du terminal utilisé pour le test
     public static final String FULL_RESET = "fullReset";						// whether we should do a full reset (default is true)
+    public static final String AUTOMATION_NAME = "automationName";				// Default is "Appium". The automationName to use. See http://appium.io/docs/en/writing-running-appium/caps/index.html
 
     public static final String APP_PACKAGE = "appPackage";						// package de l'application
     public static final String APP_ACTIVITY = "appActivity";					// activité à démarrer (Android)
@@ -258,6 +259,7 @@ public class SeleniumTestsContext {
 	public static final boolean DEFAULT_KEEP_ALL_RESULTS = false;
 	public static final String DEFAULT_NODE_TAGS = "";
 	public static final String DEFAULT_DEBUG = "none";
+	public static final String DEFAULT_AUTOMATION_NAME = "Appium";
 	public static final ElementInfo.Mode DEFAULT_ADVANCED_ELEMENT_SEARCH = ElementInfo.Mode.FALSE;
     
     public static final int DEFAULT_REPLAY_TIME_OUT = 30;
@@ -420,6 +422,7 @@ public class SeleniumTestsContext {
         setTestEnv(getValueForTest(TEST_ENV, System.getProperty(TEST_ENV)));
 
         // By default test is assumed to be executed on default browser on android emulator
+        setAutomationName(getValueForTest(AUTOMATION_NAME, System.getProperty(AUTOMATION_NAME)));
         setAppPackage(getValueForTest(APP_PACKAGE, System.getProperty(APP_PACKAGE)));
         setAppActivity(getValueForTest(APP_ACTIVITY, System.getProperty(APP_ACTIVITY)));
         setAppWaitActivity(getValueForTest(APP_WAIT_ACTIVITY, System.getProperty(APP_WAIT_ACTIVITY)));
@@ -1432,6 +1435,10 @@ public class SeleniumTestsContext {
     public String getAppPackage() {
         return (String) getAttribute(APP_PACKAGE);
     }
+    
+    public String getAutomationName() {
+    	return (String) getAttribute(AUTOMATION_NAME);
+    }
 
     public String getAppActivity() {
         return (String) getAttribute(APP_ACTIVITY);
@@ -2188,6 +2195,11 @@ public class SeleniumTestsContext {
     
     public void setLoadIni(String iniFiles) {
     	setAttribute(LOAD_INI, iniFiles);
+    }
+    
+
+    public void setAutomationName(String automationName) {
+    	setAttribute(AUTOMATION_NAME, automationName);
     }
 
     public void setAppPackage(String pkg) {
