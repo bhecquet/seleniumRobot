@@ -957,6 +957,19 @@ public class TestSeleniumTestContext extends GenericTest {
 		SeleniumTestsContextManager.getThreadContext().setTestEnv(null);
 		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getTestEnv(), SeleniumTestsContext.DEFAULT_TEST_ENV);
 	}
+	
+	@Test(groups="ut context")
+	public void testAutomationName(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setAutomationName("UIAutomator2");
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getAutomationName(), "UIAutomator2");
+	}
+	@Test(groups="ut context")
+	public void testAutomationNameNull(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setAutomationName(null);
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getAutomationName(), null);
+	}
 
 	@Test(groups="ut context")
 	public void testFullReset(final ITestContext testNGCtx, final XmlTest xmlTest) {

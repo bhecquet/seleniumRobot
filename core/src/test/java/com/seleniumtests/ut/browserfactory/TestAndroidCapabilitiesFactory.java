@@ -68,6 +68,30 @@ public class TestAndroidCapabilitiesFactory extends GenericTest {
 	}
 	
 	/**
+	 * issue #367: check automationName is set in capabilities when overriden
+	 */
+	@Test(groups={"ut"})
+	public void testCreateDefaultCapabilitiesWithAutomationName() {
+		SeleniumTestsContext context = new SeleniumTestsContext(SeleniumTestsContextManager.getThreadContext());
+		context.setBrowser(BrowserType.CHROME.toString());
+		context.setMobilePlatformVersion("8.0");
+		context.setPlatform("android");
+		context.setDeviceName("Samsung Galasy S8");
+		context.setAutomationName("UIAutomator2");
+		context.setApp("");
+		
+		DriverConfig config = new DriverConfig(context);
+		
+		
+		AndroidCapabilitiesFactory capaFactory = new AndroidCapabilitiesFactory(config);
+		MutableCapabilities capa = capaFactory.createCapabilities();
+		
+		Assert.assertEquals(capa.getCapability(CapabilityType.BROWSER_NAME), BrowserType.CHROME.toString().toLowerCase());
+		Assert.assertEquals(capa.getCapability(MobileCapabilityType.AUTOMATION_NAME), "UIAutomator2");
+		Assert.assertNull(capa.getCapability(MobileCapabilityType.FULL_RESET));
+	}
+	
+	/**
 	 * Check default behaviour when node tags are defined in grid mode
 	 * tags are transferred to driver 
 	 */
