@@ -30,6 +30,7 @@ import org.openqa.selenium.support.ui.Select;
 import com.seleniumtests.customexception.CustomSeleniumTestsException;
 import com.seleniumtests.uipage.ReplayOnError;
 import com.seleniumtests.uipage.htmlelements.select.AngularMaterialSelect;
+import com.seleniumtests.uipage.htmlelements.select.AngularSelect;
 import com.seleniumtests.uipage.htmlelements.select.ISelectList;
 import com.seleniumtests.uipage.htmlelements.select.ListSelect;
 import com.seleniumtests.uipage.htmlelements.select.NativeSelect;
@@ -99,7 +100,7 @@ public class SelectList extends HtmlElement {
         super.findElement(true);
         
         // search the right select list handler
-        for (Class<? extends ISelectList> selectClass: Arrays.asList(NativeSelect.class, AngularMaterialSelect.class, ListSelect.class, SalesforceLigntningSelect.class)) {
+        for (Class<? extends ISelectList> selectClass: Arrays.asList(NativeSelect.class, AngularMaterialSelect.class, ListSelect.class, SalesforceLigntningSelect.class, AngularSelect.class)) {
         	try {
 				ISelectList selectInstance = selectClass.getConstructor(WebElement.class, FrameElement.class).newInstance(element, frameElement);
 				if (selectInstance.isApplicable()) {

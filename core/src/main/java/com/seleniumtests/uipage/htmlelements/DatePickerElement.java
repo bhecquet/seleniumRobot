@@ -25,6 +25,7 @@ import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.uipage.ReplayOnError;
+import com.seleniumtests.util.helper.WaitHelper;
 
 /**
  * Class representing a date picker object
@@ -88,16 +89,20 @@ public class DatePickerElement extends HtmlElement {
     		throw new ScenarioException("Element should not be null");
     	}
     	
-    	BrowserType browser = WebUIDriver.getWebUIDriver(false).getConfig().getBrowserType();
-    	if (browser == BrowserType.INTERNET_EXPLORER) {
+//    	BrowserType browser = WebUIDriver.getWebUIDriver(false).getConfig().getBrowserType();
+//    	if (browser == BrowserType.INTERNET_EXPLORER) {
 	    	new Actions(driver)
 	    		.doubleClick(element)
 		    	.sendKeys(Keys.DELETE, Keys.DELETE, Keys.DELETE, Keys.DELETE, Keys.DELETE, Keys.DELETE, Keys.DELETE, Keys.DELETE, Keys.DELETE, Keys.DELETE)
 		    	.sendKeys(Keys.BACK_SPACE, Keys.BACK_SPACE, Keys.BACK_SPACE, Keys.BACK_SPACE, Keys.BACK_SPACE, Keys.BACK_SPACE, Keys.BACK_SPACE, Keys.BACK_SPACE, Keys.BACK_SPACE, Keys.BACK_SPACE)
 		    	.perform();
-    	} else {
-    		super.clear();
-    	}
+//    	} else {
+//    		super.clear();
+//    		if (!getValue().isEmpty()) {
+//    			WaitHelper.waitForMilliSeconds(100);
+//    			super.clear();
+//    		}
+//    	}
     }
     
     @Override

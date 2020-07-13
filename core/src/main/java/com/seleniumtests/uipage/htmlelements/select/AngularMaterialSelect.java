@@ -8,6 +8,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.pagefactory.ByAll;
 
 import com.seleniumtests.uipage.htmlelements.CachedHtmlElement;
 import com.seleniumtests.uipage.htmlelements.FrameElement;
@@ -18,6 +19,7 @@ public class AngularMaterialSelect implements ISelectList {
 	protected List<WebElement> options;
 	protected WebElement parentElement;
 	protected FrameElement frameElement;
+	private String optionsHolderClassName = null;
 	
 
 	public AngularMaterialSelect(WebElement parentElement, FrameElement frameElement) {
@@ -37,7 +39,17 @@ public class AngularMaterialSelect implements ISelectList {
 	@Override
 	public List<WebElement> getOptions() {
 		parentElement.findElement(By.className("mat-select-arrow")).click();
-		options = new HtmlElement("options", By.className("mat-select-content"), frameElement)
+		
+		if (optionsHolderClassName == null) {
+			String classes = new HtmlElement("", new ByAll(By.className("mat-select-panel"), By.className("mat-select-content")), frameElement).getAttribute("class");
+			if (classes.contains("mat-select-content")) {
+				optionsHolderClassName = "mat-select-content";
+			} else {
+				optionsHolderClassName = "mat-select-panel";
+			}
+		}
+		
+		options = new HtmlElement("options", By.className(optionsHolderClassName), frameElement)
 				.findHtmlElements(By.tagName("mat-option"))
 				.stream()
 				.map(CachedHtmlElement::new)
@@ -47,7 +59,7 @@ public class AngularMaterialSelect implements ISelectList {
 
 	@Override
 	public void finalizeAction() {
-		HtmlElement selectContent = new HtmlElement("options", By.className("mat-select-content"), frameElement);
+		HtmlElement selectContent = new HtmlElement("options", By.className(optionsHolderClassName), frameElement);
 		if (selectContent.isElementPresent()) {
 			parentElement.sendKeys(Keys.ESCAPE);
 		}
@@ -171,7 +183,8 @@ public class AngularMaterialSelect implements ISelectList {
 
 	@Override
 	public void setSelected(WebElement option) {
-		if ("false".equals(((HtmlElement)((CachedHtmlElement)option).getRealElement()).getAttribute("aria-selected"))) {
+		String selected = ((HtmlElement)((CachedHtmlElement)option).getRealElement()).getAttribute("aria-selected");
+		if (selected == null || "false".equals(selected)) {
 			// here list should still be visible
 			HtmlElement checkbox = ((HtmlElement)((CachedHtmlElement)option).getRealElement()).findElement(By.tagName("mat-pseudo-checkbox"));
 			if (checkbox.isElementPresent(0)) {

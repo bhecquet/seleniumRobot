@@ -99,12 +99,19 @@ public abstract class GenericMultiBrowserTest extends MockitoTest {
 		mapping.put("/tu/images/bouton_enregistrer.png", "/images/bouton_enregistrer.png");
 		mapping.put("/tu/jquery.min.js", "/jquery.min.js");
 		
-		// angular app
-		mapping.put("/tu/angularApp/index.html", "/angularApp/index.html");
-		mapping.put("/tu/angularApp/inline.bundle.js", "/angularApp/inline.bundle.js");
-		mapping.put("/tu/angularApp/main.bundle.js", "/angularApp/main.bundle.js");
-		mapping.put("/tu/angularApp/polyfills.bundle.js", "/angularApp/polyfills.bundle.js");
-		mapping.put("/tu/angularApp/styles.bundle.css", "/angularApp/styles.bundle.css");
+//		// angular app
+//		mapping.put("/tu/angularApp/index.html", "/angularApp/index.html");
+//		mapping.put("/tu/angularApp/inline.bundle.js", "/angularApp/inline.bundle.js");
+//		mapping.put("/tu/angularApp/main.bundle.js", "/angularApp/main.bundle.js");
+//		mapping.put("/tu/angularApp/polyfills.bundle.js", "/angularApp/polyfills.bundle.js");
+//		mapping.put("/tu/angularApp/styles.bundle.css", "/angularApp/styles.bundle.css");
+//		
+		// angular app v9
+		mapping.put("/tu/angularAppv9/index.html", "/angularApp/index.html");
+		mapping.put("/tu/angularAppv9/runtime-es2015.js", "/angularApp/runtime-es2015.js");
+		mapping.put("/tu/angularAppv9/main-es2015.js", "/angularApp/main-es2015.js");
+		mapping.put("/tu/angularAppv9/polyfills-es2015.js", "/angularApp/polyfills-es2015.js");
+		mapping.put("/tu/angularAppv9/styles.css", "/angularApp/styles.css");
 		
 		return mapping;
 	}

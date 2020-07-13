@@ -27,6 +27,7 @@ import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.it.driver.support.GenericMultiBrowserTest;
 import com.seleniumtests.it.driver.support.pages.DriverSubAngularTestPage;
+import com.seleniumtests.util.helper.WaitHelper;
 
 public class TestAngularControls extends GenericMultiBrowserTest {
 
