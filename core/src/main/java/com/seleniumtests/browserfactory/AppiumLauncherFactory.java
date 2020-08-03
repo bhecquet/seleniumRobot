@@ -38,7 +38,7 @@ public class AppiumLauncherFactory {
 		}
 		
 		if (SeleniumTestsContextManager.getThreadContext().getRunMode() == DriverMode.LOCAL) {
-			return new LocalAppiumLauncher(Paths.get(SeleniumTestsContextManager.getRootPath(), "logs", "appium").toString());
+			return new LocalAppiumLauncher(Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), "logs", "appium").toString());
 		} else if (SeleniumTestsContextManager.getThreadContext().getRunMode() == DriverMode.GRID) {
 			return new GridAppiumLauncher();
 		} else {
