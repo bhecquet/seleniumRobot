@@ -970,6 +970,24 @@ public class TestSeleniumTestContext extends GenericTest {
 		SeleniumTestsContextManager.getThreadContext().setAutomationName(null);
 		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getAutomationName(), null);
 	}
+	
+	@Test(groups="ut context")
+	public void testAppiumServerUrl(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setAppiumServerUrl("http://appium:4123/wd/hub/");
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getAppiumServerUrl(), "http://appium:4123/wd/hub/");
+	}
+	@Test(groups="ut context", expectedExceptions = ConfigurationException.class)
+	public void testWrongAppiumServerUrl(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setAppiumServerUrl("http://appium:4123");
+	}
+	@Test(groups="ut context")
+	public void testAppiumServerUrlNull(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setAppiumServerUrl(null);
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getAppiumServerUrl(), null);
+	}
 
 	@Test(groups="ut context")
 	public void testFullReset(final ITestContext testNGCtx, final XmlTest xmlTest) {

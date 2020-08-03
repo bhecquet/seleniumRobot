@@ -190,7 +190,8 @@ public class SeleniumTestsContext {
     public static final String DEVICE_NAME = "deviceName";						// Nom du terminal utilisé pour le test
     public static final String FULL_RESET = "fullReset";						// whether we should do a full reset (default is true)
     public static final String AUTOMATION_NAME = "automationName";				// Default is "Appium". The automationName to use. See http://appium.io/docs/en/writing-running-appium/caps/index.html
-
+    public static final String APPIUM_SERVER_URL = "appiumServerUrl";			// URL of an already started appium server. I set, this appium server will be used instead of starting a new one
+    
     public static final String APP_PACKAGE = "appPackage";						// package de l'application
     public static final String APP_ACTIVITY = "appActivity";					// activité à démarrer (Android)
     public static final String APP_WAIT_ACTIVITY = "appWaitActivity";			// dans certains cas, l'activité qui démarre l'application n'est pas l'activité principale. C'est celle-ci qu'on attend
@@ -410,6 +411,7 @@ public class SeleniumTestsContext {
         setTmsRun(getValueForTest(TMS_RUN, System.getProperty(TMS_RUN)));
         setTmsConnect(getValueForTest(TMS_CONNECT, System.getProperty(TMS_CONNECT)));
 
+        setAppiumServerUrl(getValueForTest(APPIUM_SERVER_URL, System.getProperty(APPIUM_SERVER_URL)));
         setDeviceName(getValueForTest(DEVICE_NAME, System.getProperty(DEVICE_NAME)));
         setDeviceList(getValueForTest(DEVICE_LIST, null));
         setFullReset(getBoolValueForTest(FULL_RESET, System.getProperty(FULL_RESET)));
@@ -1439,6 +1441,10 @@ public class SeleniumTestsContext {
     public String getAutomationName() {
     	return (String) getAttribute(AUTOMATION_NAME);
     }
+    
+    public String getAppiumServerUrl() {
+    	return (String) getAttribute(APPIUM_SERVER_URL);
+    }
 
     public String getAppActivity() {
         return (String) getAttribute(APP_ACTIVITY);
@@ -2200,6 +2206,14 @@ public class SeleniumTestsContext {
 
     public void setAutomationName(String automationName) {
     	setAttribute(AUTOMATION_NAME, automationName);
+    }
+    
+    public void setAppiumServerUrl(String appiumServerUrl) {
+    	if ((appiumServerUrl != null && appiumServerUrl.endsWith("/wd/hub/")) || appiumServerUrl == null) {
+    		setAttribute(APPIUM_SERVER_URL, appiumServerUrl);
+    	} else {
+    		throw new ConfigurationException("appiumServerUrl must be 'http://<host>:<port>/wd/hub/");
+    	}
     }
 
     public void setAppPackage(String pkg) {
