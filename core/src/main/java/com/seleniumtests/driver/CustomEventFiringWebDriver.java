@@ -834,7 +834,11 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
 				if (yOffset == Integer.MAX_VALUE) {
 					yOffset = -200;
 				}
-				scrollWindowToElement(element, yOffset);
+				try {
+					scrollWindowToElement(element, yOffset);
+				} catch (Exception e1) {
+					logger.info(String.format("Cannot scroll to element %s: %s", element.toString(), e1.getMessage()));
+				}
 			}
 		}
 	}
