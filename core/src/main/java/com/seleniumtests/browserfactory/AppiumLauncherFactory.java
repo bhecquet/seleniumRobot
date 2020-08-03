@@ -20,6 +20,7 @@ package com.seleniumtests.browserfactory;
 import java.nio.file.Paths;
 
 import com.seleniumtests.browserfactory.mobile.AppiumLauncher;
+import com.seleniumtests.browserfactory.mobile.ExistingAppiumLauncher;
 import com.seleniumtests.browserfactory.mobile.GridAppiumLauncher;
 import com.seleniumtests.browserfactory.mobile.LocalAppiumLauncher;
 import com.seleniumtests.core.SeleniumTestsContextManager;
@@ -38,7 +39,11 @@ public class AppiumLauncherFactory {
 		}
 		
 		if (SeleniumTestsContextManager.getThreadContext().getRunMode() == DriverMode.LOCAL) {
-			return new LocalAppiumLauncher(Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), "logs", "appium").toString());
+			if (SeleniumTestsContextManager.getThreadContext().getAppiumServerUrl() == null) {
+				return new LocalAppiumLauncher(Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), "logs", "appium").toString());
+			} else {
+				return new ExistingAppiumLauncher(SeleniumTestsContextManager.getThreadContext().getAppiumServerUrl());
+			}
 		} else if (SeleniumTestsContextManager.getThreadContext().getRunMode() == DriverMode.GRID) {
 			return new GridAppiumLauncher();
 		} else {
