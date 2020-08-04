@@ -157,7 +157,7 @@ Params for mobile testing
 | appPackage 				| 			| Package name of application (android only) | 
 | appActivity 				| 			| Activity started by mobile application (Android) | 
 | appWaitActivity 			| 			| In some cases, the first started activity is not the main app activity | 
-| newCommandTimeout 		| 120		| Max wait between 2 appium commands in seconds | 
+| newCommandTimeout 		| 120		| Max wait (in seconds) between 2 appium commands in seconds. Increase this time when debugging | 
 | version 					| 			| Platform version | 
 | platform 					| 			| platform on which test should execute. Ex: Windows 7, Android 5.0, iOS 9.1, Linux, OS X 10.10. Defaults to the current platform |
 | automationName			| Appium / XCUITest | Default is "Appium" for Android and "XCUITest" for iOS. The automationName to use. See http://appium.io/docs/en/writing-running-appium/caps/index.html 

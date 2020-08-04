@@ -22,4 +22,6 @@ public interface AppiumLauncher {
 	public void startAppium();
 	
 	public void stopAppium();
+	
+	public String getAppiumServerUrl();
 }
