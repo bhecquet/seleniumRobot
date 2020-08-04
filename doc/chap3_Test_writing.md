@@ -896,3 +896,18 @@ By default, your test will only contain 1 running step, which is the full scenar
 
 ![](images/selenium_ide_step.png)
 
+### 15 Write mobile tests ###
+
+SeleniumRobot supports appium (see chap4_Run_tests, §3 to configure execution) out of the box. Be default, seleniumRobot will start the appium server itself for running the test locally, and stop it at the end of the test.
+For writing test, this is easier to use Appium desktop which provides an inspector.
+From version 4.15.0, seleniumRobot allows to use an existing appium server. To use it:
+
+- start Appium desktop and click on "Start server"
+- Configure seleniumRobot with options: `-DappiumServerUrl=http://localhost:4723/wd/hub/ -DnewCommandTimeout=1200 -DfullReset=false`
+- Add a breakpoint into your code 
+- Start your test. When test stop on breakpoint, click "start inspector session" inside appium console
+- In capabilities, set at least "platformName" to "android" or "ios"
+![](images/appium-desktop-inspector.png)
+- Click "Start Session"
+
+You should get the inspector running

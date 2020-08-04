@@ -35,10 +35,12 @@ public class AndroidCapabilitiesFactory extends IMobileCapabilityFactory {
 
 	@Override
 	protected String getAutomationName() {
-		if (!(webDriverConfig.getMobilePlatformVersion() == null) && Integer.parseInt(webDriverConfig.getMobilePlatformVersion().split("\\.")[0]) < 4) {
+		if (webDriverConfig.getMobilePlatformVersion() != null && Integer.parseInt(webDriverConfig.getMobilePlatformVersion().split("\\.")[0]) < 4) {
     		return "Selendroid";
+		} else if (webDriverConfig.getMobilePlatformVersion() != null && Integer.parseInt(webDriverConfig.getMobilePlatformVersion().split("\\.")[0]) < 6) {
+    		return "UiAutomator1";
     	} else if (webDriverConfig.getAutomationName() == null) {
-    		return "Appium";
+    		return "UiAutomator2";
     	} else {
     		return webDriverConfig.getAutomationName();
     	}

@@ -31,5 +31,7 @@ public class GridAppiumLauncher implements AppiumLauncher {
 		
 	}
 
-	
+	public String getAppiumServerUrl() {
+		return "";
+	}
 }

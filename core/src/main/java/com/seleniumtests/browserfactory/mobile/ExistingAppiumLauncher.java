@@ -33,10 +33,17 @@ public class ExistingAppiumLauncher implements AppiumLauncher {
 
 	@Override
 	public void stopAppium() {
-		// TODO Auto-generated method stub
-
+		// nothing to do
 	}
 	
+
+	/**
+	 * Returns the local appium URL
+	 * @return
+	 */
+	public String getAppiumServerUrl() {
+		return appiumServerUrl;
+	}
 	
 
 	/**

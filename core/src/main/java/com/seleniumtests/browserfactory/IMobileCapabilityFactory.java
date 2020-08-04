@@ -17,6 +17,8 @@
  */
 package com.seleniumtests.browserfactory;
 
+import java.io.File;
+
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
@@ -64,6 +66,11 @@ public abstract class IMobileCapabilityFactory extends ICapabilitiesFactory {
     	
     	// in case app has not been specified for cloud provider
         if (capabilities.getCapability(MobileCapabilityType.APP) == null && app != null && !app.isEmpty()) {
+        	
+        	// in case of local file, give absolute path to file. For remote files (e.g: http://myapp.apk), it will be transmitted as is
+        	if (new File(app).isFile()) {
+        		app = new File(app).getAbsolutePath();
+        	}
         	capabilities.setCapability(MobileCapabilityType.APP, app.replace("\\", "/"));
         }
     	
