@@ -41,6 +41,11 @@ public abstract class Element {
 	
 	protected abstract void findElement(boolean waitForVisibility);
 	
+	public abstract void click();
+	
+	public abstract void sendKeys(CharSequence ... text);
+	
+	public abstract boolean isElementPresent();
 	
 	/**
 	 * Creates a TouchAction depending on mobile platform. Due to appium 6.0.0 changes

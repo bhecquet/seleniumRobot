@@ -32,6 +32,7 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.DeclarePrecedence;
 import org.openqa.selenium.InvalidElementStateException;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.NotFoundException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.WebDriverException;
@@ -142,7 +143,7 @@ public class ReplayAction {
 		    		if ((e instanceof TimeoutException 
 		    				&& joinPoint.getSignature().getName().equals("waitForPresent") 
 		    				&& e.getCause() instanceof NoSuchElementException) // issue #104: do not log error when waitForPresent raises TimeoutException
-		    			|| (e instanceof NoSuchElementException
+		    			|| (e instanceof NotFoundException
 		    				&& isFromExpectedConditions(Thread.currentThread().getStackTrace())) // issue #194: return immediately if the action has been performed from ExpectedConditions class
 		    																					 //   This way, we let the FluentWait process to retry or re-raise the exception
 		    			) 

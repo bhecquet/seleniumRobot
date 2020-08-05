@@ -177,8 +177,12 @@ public abstract class GenericPictureElement extends Element {
 		doubleClickAt(0, 0);
 	}
 	
-	public void sendKeys(final CharSequence text) {
+	public void sendKeys(CharSequence text) {
 		sendKeys(text, 0, 0);
+	}
+	
+	public void sendKeys(CharSequence ... text) {
+		sendKeys(text[0], 0, 0);
 	}
 	
 	public boolean isElementPresent() {

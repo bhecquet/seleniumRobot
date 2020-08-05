@@ -27,6 +27,7 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -44,8 +45,8 @@ import org.mockito.Spy;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.NotFoundException;
 import org.openqa.selenium.Point;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver.TargetLocator;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
@@ -75,6 +76,7 @@ import com.seleniumtests.driver.DriverExceptionListener;
 import com.seleniumtests.driver.TestType;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.reporter.logger.TestStep;
+import com.seleniumtests.uipage.htmlelements.FrameElement;
 import com.seleniumtests.uipage.htmlelements.HtmlElement;
 
 import io.appium.java_client.AppiumDriver;
@@ -105,6 +107,8 @@ public class TestHtmlElement extends MockitoTest {
 	private RemoteWebElement subElement1;
 	@Mock
 	private RemoteWebElement subElement2;
+	@Mock
+	private RemoteWebElement frameElement;
 
 	@Mock
 	private Mouse mouse;
@@ -124,6 +128,9 @@ public class TestHtmlElement extends MockitoTest {
 	@Spy
 	private HtmlElement el = new HtmlElement("element", By.id("el"));
 	private HtmlElement el1 = new HtmlElement("element", By.id("el1"), el);
+	
+	@Spy
+	private FrameElement frame = new FrameElement("frame", By.id("frame"));
 	
 	// issue #325
 
@@ -147,6 +154,8 @@ public class TestHtmlElement extends MockitoTest {
 		when(WebUIDriver.getWebDriver(anyBoolean())).thenReturn(eventDriver);
 		when(WebUIDriver.getWebUIDriver(anyBoolean())).thenReturn(uiDriver);
 		when(driver.findElement(By.id("el"))).thenReturn(element);
+		when(driver.findElement(By.id("frame"))).thenReturn(frameElement);
+		when(driver.findElements(By.id("frame"))).thenReturn(Arrays.asList(frameElement));
 		when(driver.findElements(By.name("subEl"))).thenReturn(subElList);
 		when(driver.findElement(By.name("subEl"))).thenReturn(subElement1);
 		when(driver.findElements(By.id("el"))).thenReturn(elList);
@@ -164,6 +173,7 @@ public class TestHtmlElement extends MockitoTest {
 		when(element.getAttribute(anyString())).thenReturn("attribute");
 		when(element.getSize()).thenReturn(new Dimension(10, 10));
 		when(element.getLocation()).thenReturn(new Point(5, 5));
+		when(frame.getLocation()).thenReturn(new Point(5, 5));
 		when(element.getTagName()).thenReturn("h1");
 		when(element.getText()).thenReturn("text");
 		when(element.isDisplayed()).thenReturn(true);
@@ -551,6 +561,106 @@ public class TestHtmlElement extends MockitoTest {
 		} catch (NoSuchElementException e) {
 			// we expect not to have an IndexOutOfBoundsException
 		}
+	}
+	
+
+	@Test(groups = { "ut" })
+	public void testIsElementPresentNotFound() throws Exception {
+		HtmlElement elNotPresent = new HtmlElement("element", By.id("notPresent"));
+		when(driver.findElement(By.id("notPresent"))).thenThrow(new NoSuchElementException("Unable to locate element with ID: 'notPresent'"));
+		LocalDateTime start = LocalDateTime.now();
+		
+		boolean exceptionRaised = false;
+		try {
+			elNotPresent.waitForPresent(5);
+		} catch (TimeoutException e) {
+			exceptionRaised = true;
+		}
+		Assert.assertTrue(exceptionRaised);
+		Assert.assertTrue(LocalDateTime.now().minusSeconds(5).isAfter(start));
+	}
+	
+	@Test(groups = { "ut" })
+	public void testIsElementPresentFound() throws Exception {
+		HtmlElement present = new HtmlElement("element", By.id("present"));
+		when(driver.findElement(By.id("present"))).thenReturn(el);
+		LocalDateTime start = LocalDateTime.now();
+		
+		boolean exceptionRaised = false;
+		try {
+			present.waitForPresent(5);
+		} catch (TimeoutException e) {
+			exceptionRaised = true;
+		}
+		Assert.assertFalse(exceptionRaised);
+		Assert.assertTrue(LocalDateTime.now().minusSeconds(5).isBefore(start));
+	}
+	
+	/**
+	 * Check that element is found with frame
+	 * @throws Exception
+	 */
+	@Test(groups = { "ut" })
+	public void testIsElementPresentFoundWithFrame() throws Exception {
+		HtmlElement present = new HtmlElement("element", By.id("present"), frame);
+		when(driver.findElement(By.id("present"))).thenReturn(el);
+		LocalDateTime start = LocalDateTime.now();
+		
+		boolean exceptionRaised = false;
+		try {
+			present.waitForPresent(5);
+		} catch (TimeoutException e) {
+			exceptionRaised = true;
+		}
+		verify(driver.switchTo()).frame(any(WebElement.class));
+		Assert.assertFalse(exceptionRaised);
+		Assert.assertTrue(LocalDateTime.now().minusSeconds(5).isBefore(start));
+	}
+	
+	/**
+	 * Check that element is not found if frame is not found
+	 * @throws Exception
+	 */
+	@Test(groups = { "ut" })
+	public void testIsElementPresentNotFoundWithFrame() throws Exception {
+		HtmlElement present = new HtmlElement("element", By.id("present"), frame);
+		when(driver.findElement(By.id("present"))).thenReturn(el);
+		when(driver.findElement(By.id("frame"))).thenThrow(NoSuchElementException.class);
+		when(driver.findElements(By.id("frame"))).thenReturn(new ArrayList<>());
+		LocalDateTime start = LocalDateTime.now();
+	
+		boolean exceptionRaised = false;
+		try {
+			present.waitForPresent(1);
+		} catch (TimeoutException e) {
+			exceptionRaised = true;
+		}
+		verify(driver.switchTo(), never()).frame(any(WebElement.class));
+		Assert.assertTrue(exceptionRaised);
+		Assert.assertTrue(LocalDateTime.now().minusSeconds(1).isAfter(start));
+	}
+	
+	/**
+	 * Check that element is found if frame is not found on first search
+	 * @throws Exception
+	 */
+	@Test(groups = { "ut" })
+	public void testIsElementPresentFoundWithFrameNotFoundOnFirstTry() throws Exception {
+		HtmlElement present = new HtmlElement("element", By.id("present"), frame);
+		when(driver.findElement(By.id("present"))).thenReturn(el);
+		when(driver.findElement(By.id("frame"))).thenThrow(NoSuchElementException.class).thenReturn(frameElement);
+		when(driver.findElements(By.id("frame"))).thenReturn(new ArrayList<>()).thenReturn(Arrays.asList(frameElement));
+		LocalDateTime start = LocalDateTime.now();
+		
+		boolean exceptionRaised = false;
+		try {
+			present.waitForPresent(3);
+		} catch (TimeoutException e) {
+			exceptionRaised = true;
+		}
+		verify(driver.switchTo()).frame(any(WebElement.class));
+		Assert.assertFalse(exceptionRaised);
+		Assert.assertTrue(LocalDateTime.now().minusSeconds(3).isBefore(start));
 	}
 	
 	
