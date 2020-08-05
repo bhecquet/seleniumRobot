@@ -67,7 +67,7 @@ public class CustomTestNGCucumberRunner {
     }
     
     private List<CucumberFeature> initCucumberOptions(Class<?> clazz) {
-    	String cucumberPkg = SeleniumTestsContextManager.getThreadContext().getCucmberPkg();
+    	String cucumberPkg = SeleniumTestsContextManager.getGlobalContext().getCucmberPkg();
     	if (cucumberPkg == null) {
     		throw new CustomSeleniumTestsException("'cucumberPackage' parameter is not set in test NG XML file (inside <suite> tag), "
     				+ "set it to the root package where cucumber implementation resides");
@@ -92,6 +92,9 @@ public class CustomTestNGCucumberRunner {
         
         // add cucumber implementation classes
         cucumberOptions += " --glue classpath:" + cucumberPkg;
+        if (!cucumberPkg.startsWith("com.seleniumtests")) {
+        	cucumberOptions += " --glue classpath:com.seleniumtests.core.runner.cucumber";
+        }
         
         // add feature path
         cucumberOptions += " '" + SeleniumTestsContextManager.getFeaturePath() + "'";

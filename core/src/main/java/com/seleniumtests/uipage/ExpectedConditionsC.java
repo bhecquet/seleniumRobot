@@ -32,5 +32,27 @@ public class ExpectedConditionsC {
 	      }
 	    };
 	  }
+	  
+	  public static ExpectedCondition<Boolean> absenceOfElementLocated(final HtmlElement element) {
+		  return new ExpectedCondition<Boolean>() {
+			  @Override
+			  public Boolean apply(WebDriver driver) {
+				  try {
+					  element.findElement(false,  false);
+					  element.getRealElement();
+					  
+					  // element is there, this is not what we want
+					  return null;
+				  } catch (Exception e) {
+					  return true;
+				  }
+			  }
+			  
+			  @Override
+			  public String toString() {
+				  return "absence of element: " + element;
+			  }
+		  };
+	  }
 	
 }

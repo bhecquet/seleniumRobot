@@ -198,7 +198,7 @@ public class ReporterTest extends ConnectorsTest {
 	 * @return
 	 * @throws IOException
 	 */
-	protected TestNG executeSubTest(int threadCount, String[] testMethods, String cucumberTests, String group) throws IOException {
+	public TestNG executeSubTest(int threadCount, String[] testMethods, String cucumberTests, String group) throws IOException {
 
 		XmlSuite suite = new XmlSuite();
 		suite.setName("TmpSuite");
@@ -265,7 +265,7 @@ public class ReporterTest extends ConnectorsTest {
 	 * @return
 	 * @throws IOException 
 	 */
-	protected XmlSuite executeSubCucumberTests(String cucumberTests, int threadCount) throws IOException {
+	public static XmlSuite executeSubCucumberTests(String cucumberTests, int threadCount) throws IOException {
 
 		XmlSuite suite = new XmlSuite();
 		suite.setName("TmpSuite");

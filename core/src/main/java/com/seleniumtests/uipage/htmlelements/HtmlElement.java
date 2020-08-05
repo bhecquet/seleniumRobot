@@ -53,6 +53,7 @@ import org.openqa.selenium.interactions.Coordinates;
 import org.openqa.selenium.interactions.Locatable;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.RemoteWebElement;
+import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
@@ -1460,31 +1461,55 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     public void waitForPresent() {
         waitForPresent(SeleniumTestsContextManager.getThreadContext().getExplicitWaitTimeout());
     }
-
+    
     /**
-     * Wait element to present using Explicit Waits with timeout in seconds. This method is used for special element
-     * which needs long time to present.
-     * This method is replayed because it may fail if frame is not present at start. The replay is not done if TimeOutException raises (see ReplayAction class)
-     * @param timeout	timeout in seconds. Set a minimal value of 1 sec to avoid not searching for element
+     * Wait element not to be present using Explicit Waits with default EXPLICIT_WAIT_TIME_OUT = 15 seconds.
      */
-    @ReplayOnError
+    public void waitForNotPresent() {
+    	waitForNotPresent(SeleniumTestsContextManager.getThreadContext().getExplicitWaitTimeout());
+    }
+    
+    /**
+     * Wait element to be visible using Explicit Waits with default EXPLICIT_WAIT_TIME_OUT = 15 seconds.
+     */
+    public void waitForVisibility() {
+    	waitForVisibility(SeleniumTestsContextManager.getThreadContext().getExplicitWaitTimeout());
+    }
+    
+    /**
+     * Wait element not to be visible using Explicit Waits with default EXPLICIT_WAIT_TIME_OUT = 15 seconds.
+     */
+    public void waitForInvisibility() {
+    	waitForInvisibility(SeleniumTestsContextManager.getThreadContext().getExplicitWaitTimeout());
+    }
+
     public void waitForPresent(int timeout) {
     	
     	// refresh driver
     	driver = updateDriver();
+		WebElement elt = new WebDriverWait(driver, timeout).ignoring(ConfigurationException.class, ScenarioException.class).until(ExpectedConditionsC.presenceOfElementLocated(this));
+        outlineElement(elt);
+    }
+    
+
+    public void waitFor(int timeout, ExpectedCondition<?> condition) {
     	
-    	Clock clock = Clock.systemUTC();
-    	Instant end = clock.instant().plusSeconds(timeout);
-    	
-    	while (end.isAfter(clock.instant())) {
-    		try {
-	    		WebElement elt = new WebDriverWait(driver, 1).ignoring(ConfigurationException.class, ScenarioException.class).until(ExpectedConditionsC.presenceOfElementLocated(this));
-	            outlineElement(elt);
-	    		return;
-    		} catch (TimeoutException e) {
-    		}
-    	}
-    	throw new TimeoutException("Element is not present", new NoSuchElementException(toString()));
+    	// refresh driver
+    	driver = updateDriver();
+    	new WebDriverWait(driver, timeout).ignoring(ConfigurationException.class, ScenarioException.class).until(condition);
+
+    }
+    
+    public void waitForNotPresent(int timeout) {
+    	waitFor(timeout, ExpectedConditionsC.absenceOfElementLocated(this));
+    }
+    
+    public void waitForVisibility(int timeout) {
+    	waitFor(timeout, ExpectedConditions.visibilityOf(this));	
+    }
+    
+    public void waitForInvisibility(int timeout) {
+    	waitFor(timeout, ExpectedConditions.invisibilityOf(this));
     }
 
 	public FrameElement getFrameElement() {
