@@ -2,14 +2,21 @@ package com.seleniumtests.ut.core.runner.cucumber;
 
 import java.io.IOException;
 
+import org.mockito.Mockito;
 import org.openqa.selenium.By;
 
 import com.seleniumtests.uipage.PageObject;
+import com.seleniumtests.uipage.htmlelements.ScreenZone;
+import com.seleniumtests.uipage.htmlelements.SelectList;
+import com.seleniumtests.uipage.htmlelements.Table;
 import com.seleniumtests.uipage.htmlelements.TextFieldElement;
 
 public class PageForActions extends PageObject {
 	
-	private static TextFieldElement textField = new TextFieldElement("text", By.id("text"));
+	public static TextFieldElement textField = new TextFieldElement("text", By.id("text"));
+	public static ScreenZone screenZone = Mockito.spy(new ScreenZone());
+	public static SelectList select = new SelectList("select", By.id("select"));
+	public static Table table = new Table("table", By.id("table"));
 
 	public PageForActions() throws IOException {
 		super();
