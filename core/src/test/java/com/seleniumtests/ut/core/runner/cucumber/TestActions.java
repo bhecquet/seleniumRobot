@@ -123,37 +123,9 @@ public class TestActions extends MockitoTest {
 		when(WebUIDriver.getWebDriver(anyBoolean(), any(BrowserType.class), isNull(), isNull())).thenReturn(eventDriver);
 		when(WebUIDriver.getWebUIDriver(anyBoolean())).thenReturn(uiDriver);
 		when(driver.navigate()).thenReturn(navigation);
-//		when(driver.findElement(By.id("el"))).thenReturn(element);
-//		when(driver.findElement(By.id("frame"))).thenReturn(frameElement);
-//		when(driver.findElements(By.id("frame"))).thenReturn(Arrays.asList(frameElement));
-//		when(driver.findElements(By.name("subEl"))).thenReturn(subElList);
-//		when(driver.findElement(By.name("subEl"))).thenReturn(subElement1);
-//		when(driver.findElements(By.id("el"))).thenReturn(elList);
-//		when(driver.getKeyboard()).thenReturn(keyboard);
-//		when(driver.getMouse()).thenReturn(mouse);
 		when(driver.switchTo()).thenReturn(locator);
 		when(eventDriver.switchTo()).thenReturn(locator);
-//		when(driver.executeScript(anyString())).thenReturn(Arrays.asList(100, 100));
-//
-//		when(uiDriver.getConfig()).thenReturn(driverConfig);
-//		when(driverConfig.getBrowserType()).thenReturn(BrowserType.HTMLUNIT);
-//		when(driverConfig.getMajorBrowserVersion()).thenReturn(1);
-//
-//		when(element.findElement(By.name("subEl"))).thenReturn(subElement1);
-//		when(element.findElements(By.name("subEl"))).thenReturn(subElList);
-//		when(element.getAttribute(anyString())).thenReturn("attribute");
-//		when(element.getSize()).thenReturn(new Dimension(10, 10));
-//		when(element.getLocation()).thenReturn(new Point(5, 5));
-//		when(frame.getLocation()).thenReturn(new Point(5, 5));
-//		when(element.getTagName()).thenReturn("h1");
-//		when(element.getText()).thenReturn("text");
-//		when(element.isDisplayed()).thenReturn(true);
-//		when(element.isEnabled()).thenReturn(true);
-//
-//		when(subElement1.isDisplayed()).thenReturn(true);
-//		when(subElement2.isDisplayed()).thenReturn(true);
-//		when(subElement1.getLocation()).thenReturn(new Point(5, 5));
-//		when(subElement2.getLocation()).thenReturn(new Point(5, 5));
+
 
 		SeleniumTestsContextManager.getThreadContext().setTestType(TestType.WEB);
 		SeleniumTestsContextManager.getThreadContext().setBrowser("htmlunit");

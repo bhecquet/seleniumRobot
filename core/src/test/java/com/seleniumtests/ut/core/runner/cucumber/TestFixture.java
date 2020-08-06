@@ -1,5 +1,6 @@
 package com.seleniumtests.ut.core.runner.cucumber;
 
+import java.lang.reflect.Field;
 import java.util.Map;
 
 import org.testng.Assert;
@@ -12,23 +13,25 @@ import com.seleniumtests.core.TestVariable;
 import com.seleniumtests.core.runner.cucumber.Fixture;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.ScenarioException;
+import com.seleniumtests.it.driver.support.pages.DriverTestPage;
 import com.seleniumtests.uipage.htmlelements.Element;
 import com.seleniumtests.uipage.htmlelements.TextFieldElement;
 
 public class TestFixture extends GenericTest {
 
 	@Test(groups={"ut"})
-	public void testScanner() {
+	public void testScanner() throws IllegalArgumentException, IllegalAccessException {
 
 		SeleniumTestsContextManager.getGlobalContext().setCucumberImplementationPackage("com.seleniumtests.it.driver.support.pages");
 		
-		Map<String, Element> allElements = Fixture.scanForElements("com.seleniumtests.it.driver.support.pages");
+		Map<String, Field> allElements = Fixture.scanForElements("com.seleniumtests.it.driver.support.pages");
 		
 		// check that elements are found, with and without page name
 		Assert.assertTrue(allElements.containsKey("textElementNotPresentFirstVisible"));
 		Assert.assertTrue(allElements.containsKey("DriverTestPage.textElementNotPresentFirstVisible"));
 		
-		Assert.assertTrue(allElements.get("textElementNotPresentFirstVisible") instanceof TextFieldElement);
+		allElements.get("textElementNotPresentFirstVisible").setAccessible(true);
+		Assert.assertTrue(allElements.get("textElementNotPresentFirstVisible").get(null) instanceof TextFieldElement);
 
 	}
 	
@@ -46,7 +49,7 @@ public class TestFixture extends GenericTest {
 		
 		SeleniumTestsContextManager.getGlobalContext().setCucumberImplementationPackage("com.seleniumtests.it.driver.support.pages");
 		
-		Map<String, Element> allElements = Fixture.scanForElements("com.seleniumtests.it.driver.support.foo");
+		Map<String, Field> allElements = Fixture.scanForElements("com.seleniumtests.it.driver.support.foo");
 		Assert.assertTrue(allElements.isEmpty());
 		
 	}
@@ -57,7 +60,15 @@ public class TestFixture extends GenericTest {
 	@Test(groups={"ut"})
 	public void testGetElement() {
 		SeleniumTestsContextManager.getGlobalContext().setCucumberImplementationPackage("com.seleniumtests.it.driver.support.pages");
-		Assert.assertTrue(new Fixture().getElement("textElementNotPresentFirstVisible") instanceof TextFieldElement);
+		Assert.assertTrue(new Fixture().getElement("textElementNotPresentFirstVisible").equals("textElementNotPresentFirstVisible"));
+		Assert.assertTrue(Fixture.getCurrentPage() instanceof DriverTestPage);
+	}
+	
+	@Test(groups={"ut"})
+	public void testGetElementWithClassName() {
+		SeleniumTestsContextManager.getGlobalContext().setCucumberImplementationPackage("com.seleniumtests.it.driver.support.pages");
+		Assert.assertTrue(new Fixture().getElement("DriverTestPage.textElementNotPresentFirstVisible").equals("textElementNotPresentFirstVisible"));
+		Assert.assertTrue(Fixture.getCurrentPage() instanceof DriverTestPage);
 	}
 	
 	/**
@@ -66,7 +77,7 @@ public class TestFixture extends GenericTest {
 	@Test(groups={"ut"}, expectedExceptions = ScenarioException.class)
 	public void testGetElementNotPresent() {
 		SeleniumTestsContextManager.getGlobalContext().setCucumberImplementationPackage("com.seleniumtests.it.driver.support.pages");
-		Assert.assertTrue(new Fixture().getElement("textFoo") instanceof TextFieldElement);
+		new Fixture().getElement("textFoo");
 	}
 	
 	@Test(groups={"ut"})

@@ -67,43 +67,15 @@ public class TestBasePage extends MockitoTest {
 		page = Mockito.mock(BasePage.class, Mockito.CALLS_REAL_METHODS);
 		page.setDriver(driver);
 		
-		Mockito.when(driver.switchTo()).thenReturn(targetLocator);
 		Mockito.when(driver.findElement(Mockito.any())).thenReturn(element);
-		Mockito.when(targetLocator.alert()).thenReturn(alert);
-		Mockito.when(alert.getText()).thenReturn("alert text");
 		Mockito.when(element.getText()).thenReturn("element text");
 
 	}
 
-	/**
-	 * check we return to default content
-	 */
-	@Test(groups={"ut"})
-	public void testAcceptAlert() {
-		page.acceptAlert();
-		Mockito.verify(alert).accept();
-		Mockito.verify(targetLocator).defaultContent();
-	}
-	
-	@Test(groups={"ut"})
-	public void testDismissAlert() {
-		page.cancelConfirmation();
-		Mockito.verify(alert).dismiss();
-		Mockito.verify(targetLocator).defaultContent();
-	}
 	
 	@Test(groups={"ut"})
 	public void testAlertText() {
 		Assert.assertEquals(page.getAlertText(), "alert text");
-	}
-	
-	@Test(groups={"ut"}, expectedExceptions=AssertionError.class)
-	public void testAssertHTML() throws Exception {
-		try {
-			page.assertHTML(false, "error");
-		} finally {
-			PowerMockito.verifyPrivate(page).invoke("capturePageSnapshot");
-		}
 	}
 	
 	@Test(groups={"ut"})

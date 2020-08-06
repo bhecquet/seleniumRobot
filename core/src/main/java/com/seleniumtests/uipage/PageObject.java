@@ -19,6 +19,7 @@ package com.seleniumtests.uipage;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.time.Clock;
 import java.time.Instant;
@@ -49,6 +50,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.remote.UnreachableBrowserException;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.Assert;
 
@@ -67,9 +69,16 @@ import com.seleniumtests.driver.screenshots.ScreenShot;
 import com.seleniumtests.driver.screenshots.ScreenshotUtil;
 import com.seleniumtests.driver.screenshots.SnapshotCheckType;
 import com.seleniumtests.driver.screenshots.SnapshotTarget;
+import com.seleniumtests.uipage.htmlelements.CheckBoxElement;
+import com.seleniumtests.uipage.htmlelements.Element;
+import com.seleniumtests.uipage.htmlelements.GenericPictureElement;
 import com.seleniumtests.uipage.htmlelements.HtmlElement;
 import com.seleniumtests.uipage.htmlelements.LinkElement;
+import com.seleniumtests.uipage.htmlelements.SelectList;
+import com.seleniumtests.uipage.htmlelements.Table;
 import com.seleniumtests.util.helper.WaitHelper;
+
+import net.bytebuddy.utility.RandomString;
 
 public class PageObject extends BasePage implements IPage {
 
@@ -295,10 +304,6 @@ public class PageObject extends BasePage implements IPage {
         }
     }
 
-    public void assertCookiePresent(final String name) {
-        assertHTML(getCookieByName(name) != null, "Cookie: {" + name + "} not found.");
-    }
-
     @Override
     protected void assertCurrentPage(boolean log) {}
     
@@ -411,27 +416,9 @@ public class PageObject extends BasePage implements IPage {
     	return driver;
     }
 
-    public void assertHtmlSource(final String text) {
-        assertHTML(getHtmlSource().contains(text), "Text: {" + text + "} not found on page source.");
-    }
-
-    public void assertKeywordNotPresent(final String text) {
-        Assert.assertFalse(getHtmlSource().contains(text), "Text: {" + text + "} not found on page source.");
-    }
-
-    public void assertLocation(final String urlPattern) {
-        assertHTML(getLocation().contains(urlPattern), "Pattern: {" + urlPattern + "} not found on page location.");
-    }
-
-    public void assertTitle(final String text) {
-        assertHTML(getTitle().contains(text), "Text: {" + text + "} not found on page title.");
-
-    }
-
-    @Override
-    public void capturePageSnapshot() {
+    public <T extends PageObject> T capturePageSnapshot() {
         capturePageSnapshot(null);
-
+        return (T)this;
     }
     
     /**
@@ -604,21 +591,13 @@ public class PageObject extends BasePage implements IPage {
         new Actions(driver).dragAndDropBy((WebElement) element.getElement(), offsetX, offsetY).perform();
     }
 
-    public final String getCookieByName(final String name) {
-        if (driver.manage().getCookieNamed(name) == null) {
-            return null;
-        }
-
-        return driver.manage().getCookieNamed(name).getValue();
-    }
-
+    /**
+     * Get the number of elements in page
+     * @param element
+     * @return
+     */
     public final int getElementCount(final HtmlElement element) {
-        return driver.findElements(element.getBy()).size();
-    }
-
-    public String getEval(final String expression) {
-        Assert.assertTrue(false, "focus not implemented yet for " + expression);
-        return null;
+        return element.findElements().size();
     }
 
     public int getTimeout() {
@@ -638,59 +617,26 @@ public class PageObject extends BasePage implements IPage {
         return new LinkElement("Canonical URL", By.cssSelector("link[rel=canonical]")).getAttribute("href");
     }
 
-    public final void goBack() {
-        driver.navigate().back();
-        frameFlag = false;
-    }
-
-    public final void goForward() {
-        driver.navigate().forward();
-        frameFlag = false;
-    }
-
-    public final boolean isCookiePresent(final String name) {
-        return getCookieByName(name) != null;
-    }
-
-    public boolean isFrame() {
-        return frameFlag;
-    }
-
-    public final void maximizeWindow() {
-        try {
-        	// app test are not compatible with window
-        	if (SeleniumTestsContextManager.getThreadContext().getTestType().family() == TestType.APP || SeleniumTestsContextManager.getThreadContext().getBrowser() == BrowserType.BROWSER) {
-                return;
-            }
-
-            driver.manage().window().maximize();
-        } catch (Exception ex) {
-
-            try {
-                ((JavascriptExecutor) driver).executeScript(
-                    "if (window.screen){window.moveTo(0, 0);window.resizeTo(window.screen.availWidth,window.screen.availHeight);}");
-            } catch (Exception ignore) {
-            	logger.log("Unable to maximize browser window. Exception occured: " + ignore.getMessage());
-            }
+    /**
+     * Returns the value of the named cookie
+     * @param name	name of the cookie
+     * @return
+     */
+    public final String getCookieByName(final String name) {
+        if (driver.manage().getCookieNamed(name) == null) {
+            return null;
         }
+
+        return driver.manage().getCookieNamed(name).getValue();
     }
     
     /**
-     * On init set window to size requested by user. Window is maximized if no size is set
+     * Check if named cookie is present
+     * @param name	name of the cookie
+     * @return
      */
-    public final void setWindowToRequestedSize() {
-    	if (!SeleniumTestsContextManager.isWebTest()) {
-    		return;
-    	}
-    	
-    	Integer width = SeleniumTestsContextManager.getThreadContext().getViewPortWidth();
-    	Integer height = SeleniumTestsContextManager.getThreadContext().getViewPortHeight();
-    	
-    	if (width == null || height == null) {
-    		maximizeWindow();
-    	} else {
-    		resizeTo(width, height);
-    	}
+    public boolean isCookiePresent(final String name) {
+        return getCookieByName(name) != null;
     }
 
     private void open(final String url) {
@@ -729,12 +675,41 @@ public class PageObject extends BasePage implements IPage {
         }
     }
 
-    public final void refresh()  {
+    public final void maximizeWindow() {
         try {
-            driver.navigate().refresh();
-        } catch (org.openqa.selenium.TimeoutException ex) {
-        	logger.error("got time out customexception, ignore");
+        	// app test are not compatible with window
+        	if (SeleniumTestsContextManager.getThreadContext().getTestType().family() == TestType.APP || SeleniumTestsContextManager.getThreadContext().getBrowser() == BrowserType.BROWSER) {
+                return;
+            }
+
+            driver.manage().window().maximize();
+        } catch (Exception ex) {
+
+            try {
+                ((JavascriptExecutor) driver).executeScript(
+                    "if (window.screen){window.moveTo(0, 0);window.resizeTo(window.screen.availWidth,window.screen.availHeight);}");
+            } catch (Exception ignore) {
+            	logger.log("Unable to maximize browser window. Exception occured: " + ignore.getMessage());
+            }
         }
+    }
+
+    /**
+     * On init set window to size requested by user. Window is maximized if no size is set
+     */
+    public final void setWindowToRequestedSize() {
+    	if (!SeleniumTestsContextManager.isWebTest()) {
+    		return;
+    	}
+    	
+    	Integer width = SeleniumTestsContextManager.getThreadContext().getViewPortWidth();
+    	Integer height = SeleniumTestsContextManager.getThreadContext().getViewPortHeight();
+    	
+    	if (width == null || height == null) {
+    		maximizeWindow();
+    	} else {
+    		resizeTo(width, height);
+    	}
     }
 
     /**
@@ -745,7 +720,7 @@ public class PageObject extends BasePage implements IPage {
      */
     public final void resizeTo(final int width, final int height) {
     	// app test are not compatible with window
-    	if (SeleniumTestsContextManager.getThreadContext().getTestType().family() == TestType.APP) {
+    	if (SeleniumTestsContextManager.isAppTest()) {
             return;
         }
     	
@@ -770,34 +745,51 @@ public class PageObject extends BasePage implements IPage {
         }
     }
 
+    @Deprecated
+    public boolean isFrame() {
+        return frameFlag;
+    }
+
+    @Deprecated
     public final void selectFrame(final Integer index) {
         driver.switchTo().frame(index);
         frameFlag = true;
     }
 
+    @Deprecated
     public final void selectFrame(final By by) {
     	WebElement element = driver.findElement(by);
         driver.switchTo().frame(element);
         frameFlag = true;
     }
 
+    @Deprecated
     public final void selectFrame(final String locator) {
         driver.switchTo().frame(locator);
         frameFlag = true;
     }
-    
+
+    @Deprecated
     public final void exitFrame() {
     	driver.switchTo().defaultContent();
     	frameFlag = false;
     }
 
+    /**
+     * Switch to first window in the list
+     */
     public final void selectMainWindow() {
     	selectWindow(0);
     }
 
+    /**
+     * Switch to nth window in the list
+     * It may not reflect the order of tabs in browser if some windows have been closed before
+     * @param index		index of the window
+     */
     public final void selectWindow(final int index) {
     	// app test are not compatible with window
-    	if (SeleniumTestsContextManager.getThreadContext().getTestType().family() == TestType.APP) {
+    	if (SeleniumTestsContextManager.isAppTest()) {
             throw new ScenarioException("Application are not compatible with Windows");
         }
     	    
@@ -814,7 +806,9 @@ public class PageObject extends BasePage implements IPage {
     }
     
     /**
-     * Selects the first unknown window. To use we an action creates a new window or tab
+     * Selects the first unknown window. To use immediately after an action creates a new window or tab
+     * Each time we do a click, but just before it (selenium click, JS click or action click), we record the list of windows.
+     * I a new window or tab is displayed, we select it.
      * @param waitMs	wait for N milliseconds before raising error
      * @return
      */
@@ -935,46 +929,7 @@ public class PageObject extends BasePage implements IPage {
 			}
 		}
 		return null;
-	}
-    
-    /**
-     * Method to handle file upload through robot class
-     * /!\ This should only be used as the last option when uploading file cannot be done an other way as explained below
-     * https://saucelabs.com/resources/articles/best-practices-tips-selenium-file-upload
-     * <code>
-     * driver.setFileDetector(new LocalFileDetector());
-     * driver.get("http://sso.dev.saucelabs.com/test/guinea-file-upload");
-     *   WebElement upload = driver.findElement(By.id("myfile"));
-     *   upload.sendKeys("/Users/sso/the/local/path/to/darkbulb.jpg");
-     *   </code> 
-     *   
-     *   
-     * To use this method, first click on the upload file button / link, then call this method.
-     * 
-     * /!\ on firefox, clicking MUST be done through 'clickAction'. 'click()' is not supported by browser. 
-     * /!\ on firefox, using the uploadFile method several times without other actions between usage may lead to error. Firefox will never click to the button the second time, probably due to focus problems
-     * 
-     * @param filePath
-     */
-	public void uploadFile(String filePath) {
-		try {
-			byte[] encoded = Base64.encodeBase64(FileUtils.readFileToByteArray(new File(filePath)));
-			CustomEventFiringWebDriver.uploadFile(new File(filePath).getName(), 
-					new String(encoded), 
-					SeleniumTestsContextManager.getThreadContext().getRunMode(), 
-					SeleniumTestsContextManager.getThreadContext().getSeleniumGridConnector());
-//			((JavascriptExecutor) driver).executeScript(CustomEventFiringWebDriver.NON_JS_UPLOAD_FILE_THROUGH_POPUP, new File(filePath).getName(), new String(encoded));
-			
-			Alert alert = waitForAlert(5);
-			if (alert != null) {
-				alert.accept();
-			}
-			
-		} catch (IOException e) {
-			throw new ScenarioException(String.format("could not read file to upload %s: %s", filePath, e.getMessage()));
-		}
-	}
-	
+	}	
 	 
 	/**
 	 * get the name of the PageObject that made the call
@@ -999,6 +954,461 @@ public class PageObject extends BasePage implements IPage {
 		}
 		return page;
 	}
+
+    public String cancelConfirmation() {
+    	Alert alert = getAlert();
+        String seenText = alert.getText();
+        alert.dismiss();
+        driver.switchTo().defaultContent();
+        return seenText;
+    }
+	
+	/**
+	 * Returns an Element object based on field name
+	 * @return
+	 */
+	private Element getElement(String fieldName) {
+		
+		try {
+			Field field = getClass().getDeclaredField(fieldName);
+			field.setAccessible(true);
+			return (Element)field.get(this);
+		} catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e) {
+			throw new ScenarioException(String.format("Field %s does not exist in class %s", fieldName, getClass().getSimpleName()));
+		}
+	}
+	
+    // --------------------- Actions --------------------------
+
+    public <T extends PageObject> T goBack() {
+        driver.navigate().back();
+        return (T)this;
+    }
+
+    public <T extends PageObject> T goForward() {
+        driver.navigate().forward();
+        return (T)this;
+    }
+	
+	public <T extends PageObject> T sendKeysToField(String fieldName, String value) {
+		Element element = getElement(fieldName);
+		element.sendKeys(value);
+		return (T)this;
+	}
+
+	public <T extends PageObject> T sendRandomKeysToField(Integer charNumber, String fieldName) {
+		Element element = getElement(fieldName);
+		element.sendKeys(RandomString.make(charNumber));
+		return (T)this;
+	}
+	
+	public <T extends PageObject> T clear(String fieldName) {
+		Element element = getElement(fieldName);
+		if (element instanceof HtmlElement) {
+			((HtmlElement) element).clear();
+		} else {
+			throw new ScenarioException(String.format("Element %s is not an HtmlElement subclass", fieldName));
+		}
+		return (T)this;
+	}
+
+    public <T extends PageObject> T selectOption(String fieldName, String value) {
+		Element element = getElement(fieldName);
+		if (element instanceof SelectList) {
+			((SelectList)element).selectByText(value);
+		} else {
+			throw new ScenarioException(String.format("Element %s is not an SelectList", fieldName));
+		}
+		return (T)this;
+    }
+
+	public <T extends PageObject> T click(String fieldName) {
+		Element element = getElement(fieldName);
+		element.click();
+		return (T)this;
+	}
+
+	public <T extends PageObject> T doubleClick(String fieldName) {
+		Element element = getElement(fieldName);
+		if (element instanceof HtmlElement) {
+			((HtmlElement) element).doubleClickAction();
+		} else {
+			((GenericPictureElement)element).doubleClick();
+		}
+		return (T)this;
+	}
+
+	public <T extends PageObject> T wait(Integer waitMs) {
+		WaitHelper.waitForMilliSeconds(waitMs);
+		return (T)this;
+	}
+
+    public <T extends PageObject> T clickTableCell(Integer row, Integer column, String fieldName) {
+		Element element = getElement(fieldName);
+		if (element instanceof Table) {
+			((Table)element).getCell(row, column).click();
+		} else {
+			throw new ScenarioException(String.format("Element %s is not an Table element", fieldName));
+		}
+		return (T)this;
+    }
+
+    /**
+     * Switch to the newly created window
+     * @return
+     */
+    public <T extends PageObject> T switchToNewWindow() {
+    	selectNewWindow();
+    	return (T)this;
+    }
+    
+    /**
+     * Switch to the newly created window with wait
+     * @return
+     */
+    public <T extends PageObject> T switchToNewWindow(int waitMs) {
+    	selectNewWindow(waitMs);
+    	return (T)this;
+    }
+    
+    /**
+     * Select first window in the list
+     * @return
+     */
+    public <T extends PageObject> T switchToMainWindow() {
+    	selectMainWindow();
+    	return (T)this;
+    }
+    
+    /**
+     * Selects the nth window in list
+     * @param index
+     * @return
+     */
+    public <T extends PageObject> T switchToWindow(int index) {
+    	selectWindow(index);
+    	return (T)this;
+    }
+
+    /**
+     * Refresh browser window
+     * @return
+     */
+    public <T extends PageObject> T refresh()  {
+    	if (SeleniumTestsContextManager.isWebTest()) {
+	        try {
+	            driver.navigate().refresh();
+	        } catch (org.openqa.selenium.TimeoutException ex) {
+	        	logger.error("got time out customexception, ignore");
+	        }
+    	}
+        return (T)this;
+    }
+    
+    public <T extends PageObject> T acceptAlert() {
+        Alert alert = getAlert();
+        alert.accept();
+        driver.switchTo().defaultContent();
+        return (T)this;
+    }
+    
+    public <T extends PageObject> T cancelAlert() {
+    	cancelConfirmation();
+    	return (T)this;
+    }
+
+    /**
+     * Method to handle file upload through robot class
+     * /!\ This should only be used as the last option when uploading file cannot be done an other way as explained below
+     * https://saucelabs.com/resources/articles/best-practices-tips-selenium-file-upload
+     * <code>
+     * driver.setFileDetector(new LocalFileDetector());
+     * driver.get("http://sso.dev.saucelabs.com/test/guinea-file-upload");
+     *   WebElement upload = driver.findElement(By.id("myfile"));
+     *   upload.sendKeys("/Users/sso/the/local/path/to/darkbulb.jpg");
+     *   </code> 
+     *   
+     *   
+     * To use this method, first click on the upload file button / link, then call this method.
+     * 
+     * /!\ on firefox, clicking MUST be done through 'clickAction'. 'click()' is not supported by browser. 
+     * /!\ on firefox, using the uploadFile method several times without other actions between usage may lead to error. Firefox will never click to the button the second time, probably due to focus problems
+     * 
+     * @param filePath
+     */
+	public <T extends PageObject> T uploadFile(String filePath) {
+		try {
+			byte[] encoded = Base64.encodeBase64(FileUtils.readFileToByteArray(new File(filePath)));
+			CustomEventFiringWebDriver.uploadFile(new File(filePath).getName(), 
+					new String(encoded), 
+					SeleniumTestsContextManager.getThreadContext().getRunMode(), 
+					SeleniumTestsContextManager.getThreadContext().getSeleniumGridConnector());
+//			((JavascriptExecutor) driver).executeScript(CustomEventFiringWebDriver.NON_JS_UPLOAD_FILE_THROUGH_POPUP, new File(filePath).getName(), new String(encoded));
+			
+			Alert alert = waitForAlert(5);
+			if (alert != null) {
+				alert.accept();
+			}
+			
+		} catch (IOException e) {
+			throw new ScenarioException(String.format("could not read file to upload %s: %s", filePath, e.getMessage()));
+		}
+		return (T)this;
+	}
+	
+    // --------------------- Waits --------------------------
+	public <T extends PageObject> T waitForPresent(String fieldName) {
+		Element element = getElement(fieldName);
+		if (element instanceof HtmlElement) {
+			((HtmlElement) element).waitForPresent();
+		} else {
+			boolean present = ((GenericPictureElement)element).isElementPresent(SeleniumTestsContextManager.getThreadContext().getExplicitWaitTimeout() * 1000);
+			if (!present) {
+				throw new TimeoutException(String.format("Element %s is not present", fieldName));
+			}
+		}
+		return (T)this;
+	}
+	
+	public <T extends PageObject> T waitForVisible(String fieldName) {
+		Element element = getElement(fieldName);
+		if (element instanceof HtmlElement) {
+			((HtmlElement) element).waitForVisibility();
+		} else {
+			boolean present = ((GenericPictureElement)element).isElementPresent(SeleniumTestsContextManager.getThreadContext().getExplicitWaitTimeout() * 1000);
+			if (!present) {
+				throw new TimeoutException(String.format("Element %s is not present", fieldName));
+			}
+		}
+		return (T)this;
+	}
+	
+	public <T extends PageObject> T waitForNotPresent(String fieldName) {
+		Element element = getElement(fieldName);
+		if (element instanceof HtmlElement) {
+			((HtmlElement) element).waitForNotPresent();
+		} else {
+			boolean present = ((GenericPictureElement)element).isElementPresent(SeleniumTestsContextManager.getThreadContext().getExplicitWaitTimeout() * 1000);
+			if (present) {
+				throw new TimeoutException(String.format("Element %s is present", fieldName));
+			}
+		}
+		return (T)this;
+	}
+
+	public <T extends PageObject> T waitForInvisible(String fieldName) {
+		Element element = getElement(fieldName);
+		if (element instanceof HtmlElement) {
+			((HtmlElement) element).waitForInvisibility();
+		} else {
+			boolean present = ((GenericPictureElement)element).isElementPresent(SeleniumTestsContextManager.getThreadContext().getExplicitWaitTimeout() * 1000);
+			if (present) {
+				throw new TimeoutException(String.format("Element %s is present", fieldName));
+			}
+		}
+		return (T)this;
+	}
+	
+	public <T extends PageObject> T waitForValue(String fieldName, String value) {
+		Element element = getElement(fieldName);
+		if (element instanceof HtmlElement) {
+			((HtmlElement) element).waitFor(SeleniumTestsContextManager.getThreadContext().getExplicitWaitTimeout(), 
+					ExpectedConditions.or(
+							ExpectedConditions.attributeToBe((HtmlElement)element, "value", value),
+							ExpectedConditions.textToBePresentInElement((HtmlElement)element, value)
+							));
+		} else {
+			throw new ScenarioException(String.format("Element %s is not an HtmlElement subclass", fieldName));
+		}
+		return (T)this;
+	}
+	
+    public <T extends PageObject> T waitTableCellValue(Integer row, Integer column, String fieldName, String value) {
+		Element element = getElement(fieldName);
+		if (element instanceof Table) {
+			((HtmlElement) element).waitFor(SeleniumTestsContextManager.getThreadContext().getExplicitWaitTimeout(), 
+					ExpectedConditions.textToBePresentInElement(((Table)element).getCell(row, column), value));
+			;
+		} else {
+			throw new ScenarioException(String.format("Element %s is not an Table element", fieldName));
+		}
+		return (T)this;
+    }
+	
+    // --------------------- Assertions --------------------------
+	public <T extends PageObject> T assertForInvisible(String fieldName) {
+		Element element = getElement(fieldName);
+		if (element instanceof HtmlElement) {
+			Assert.assertFalse(((HtmlElement) element).isDisplayed());
+		} else {
+			Assert.assertFalse(((GenericPictureElement)element).isElementPresent());
+		}
+		return (T)this;
+	}
+	
+	public <T extends PageObject> T assertForVisible(String fieldName) {
+		Element element = getElement(fieldName);
+		if (element instanceof HtmlElement) {
+			Assert.assertTrue(((HtmlElement) element).isDisplayed());
+		} else {
+			Assert.assertTrue(((GenericPictureElement)element).isElementPresent());
+		}
+		return (T)this;
+	}
+	
+	public <T extends PageObject> T assertForDisabled(String fieldName) {
+		Element element = getElement(fieldName);
+		if (element instanceof HtmlElement) {
+			Assert.assertFalse(((HtmlElement) element).isEnabled());
+		} else {
+			throw new ScenarioException(String.format("Element %s is not an HtmlElement subclass", fieldName));
+		}
+		return (T)this;
+	}
+	
+	public <T extends PageObject> T assertForEnabled(String fieldName) {
+		Element element = getElement(fieldName);
+		if (element instanceof HtmlElement) {
+			Assert.assertTrue(((HtmlElement) element).isEnabled());
+		} else {
+			throw new ScenarioException(String.format("Element %s is not an HtmlElement subclass", fieldName));
+		}
+		return (T)this;
+	}
+
+	public <T extends PageObject> T assertForValue(String fieldName, String value) {
+		Element element = getElement(fieldName);
+		if (element instanceof HtmlElement) {
+			Assert.assertTrue(((HtmlElement) element).getText().equals(value) || ((HtmlElement) element).getValue().equals(value));
+		} else {
+			throw new ScenarioException(String.format("Element %s is not an HtmlElement subclass", fieldName));
+		}
+		return (T)this;
+	}
+	
+	public <T extends PageObject> T assertForEmptyValue(String fieldName) {
+		Element element = getElement(fieldName);
+		if (element instanceof HtmlElement) {
+			Assert.assertTrue(((HtmlElement) element).getValue().isEmpty());
+		} else {
+			throw new ScenarioException(String.format("Element %s is not an HtmlElement subclass", fieldName));
+		}
+		return (T)this;
+	}
+	
+	public <T extends PageObject> T assertForNonEmptyValue(String fieldName) {
+		Element element = getElement(fieldName);
+		if (element instanceof HtmlElement) {
+			Assert.assertFalse(((HtmlElement) element).getValue().isEmpty());
+		} else {
+			throw new ScenarioException(String.format("Element %s is not an HtmlElement subclass", fieldName));
+		}
+		return (T)this;
+	}
+	
+	public <T extends PageObject> T assertForMatchingValue(String fieldName, String regex) {
+		Element element = getElement(fieldName);
+		if (element instanceof HtmlElement) {
+			Assert.assertTrue(Pattern.matches(regex, ((HtmlElement) element).getText()) 
+					|| Pattern.matches(regex, ((HtmlElement) element).getValue()));
+		} else {
+			throw new ScenarioException(String.format("Element %s is not an HtmlElement subclass", fieldName));
+		}
+		return (T)this;
+	}
+
+    public <T extends PageObject> T assertSelectedOption(String fieldName, String value) {
+		Element element = getElement(fieldName);
+		if (element instanceof HtmlElement) {
+			Assert.assertEquals(new Select((HtmlElement)element).getFirstSelectedOption().getText(), value);
+		} else {
+			throw new ScenarioException(String.format("Element %s is not an HtmlElement subclass", fieldName));
+		}
+		return (T)this;
+    }
+	
+	public <T extends PageObject> T assertChecked(String fieldName) {
+		Element element = getElement(fieldName);
+		if (element instanceof CheckBoxElement) {
+			Assert.assertTrue(((CheckBoxElement)element).isSelected());
+		} else {
+			throw new ScenarioException(String.format("Element %s is not an CheckBoxElement", fieldName));
+		}
+		return (T)this;
+	}
+	
+	public <T extends PageObject> T assertNotChecked(String fieldName) {
+		Element element = getElement(fieldName);
+		if (element instanceof CheckBoxElement) {
+			Assert.assertFalse(((CheckBoxElement)element).isSelected());
+		} else {
+			throw new ScenarioException(String.format("Element %s is not an CheckBoxElement", fieldName));
+		}
+		return (T)this;
+	}
+	
+    public <T extends PageObject> T assertTableCellValue(Integer row, Integer column, String fieldName, String value) {
+		Element element = getElement(fieldName);
+		if (element instanceof Table) {
+			Assert.assertEquals(((Table)element).getCell(row, column).getText(), value);
+		} else {
+			throw new ScenarioException(String.format("Element %s is not an Table element", fieldName));
+		}
+		return (T)this;
+    }
+    
+    public <T extends PageObject> T assertTextPresentInPage(String text) {
+    	Assert.assertTrue(isTextPresent(text));
+    	return (T)this;
+    }
+    
+    public <T extends PageObject> T assertTextNotPresentInPage(String text) {
+    	Assert.assertFalse(isTextPresent(text));
+    	return (T)this;
+    }
+    
+    public <T extends PageObject> T assertCookiePresent(String name) {
+    	Assert.assertTrue(isCookiePresent(name), "Cookie: {" + name + "} not found.");
+    	return (T)this;
+    }
+    
+    public <T extends PageObject> T assertElementCount(String fieldName, int elementCount) {
+    	Element element = getElement(fieldName);
+    	if (element instanceof HtmlElement) {
+			Assert.assertEquals(((HtmlElement)element).findElements().size(), elementCount);
+		} else {
+			throw new ScenarioException(String.format("Element %s is not an CheckBoxElement", fieldName));
+		}
+		return (T)this;
+    }
+    
+    /**
+     * Check page title matches parameter
+     * @param regexTitle
+     * @return
+     */
+    public <T extends PageObject> T assertPageTitleMatches(String regexTitle) {
+    	Assert.assertTrue(getTitle().matches(regexTitle));
+    	return (T)this;
+    }
+
+    public void assertHtmlSource(String text) {
+        Assert.assertTrue(getHtmlSource().contains(text), "Text: {" + text + "} not found on page source.");
+    }
+
+    public void assertKeywordNotPresent(String text) {
+        Assert.assertFalse(getHtmlSource().contains(text), "Text: {" + text + "} not found on page source.");
+    }
+
+    public void assertLocation(String urlPattern) {
+        Assert.assertTrue(getLocation().contains(urlPattern), "Pattern: {" + urlPattern + "} not found on page location.");
+    }
+
+    @Deprecated
+    public void assertTitle(final String text) {
+        Assert.assertTrue(getTitle().contains(text), "Text: {" + text + "} not found on page title.");
+    }
+	
 
 	public ScreenshotUtil getScreenshotUtil() {
 		return screenshotUtil;

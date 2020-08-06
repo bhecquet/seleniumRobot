@@ -14,21 +14,25 @@ import com.google.common.reflect.ClassPath.ClassInfo;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.TestTasks;
 import com.seleniumtests.customexception.ConfigurationException;
-import com.seleniumtests.customexception.CustomSeleniumTestsException;
 import com.seleniumtests.customexception.ScenarioException;
+import com.seleniumtests.uipage.PageObject;
 import com.seleniumtests.uipage.htmlelements.Element;
+import com.seleniumtests.util.logging.ScenarioLogger;
 
 public class Fixture {
 
 
 	private static final Pattern PARAM_PATTERN = Pattern.compile("\\{\\{(.*?)\\}\\}");
-	private static final Map<String, Element> allElements = scanForElements(SeleniumTestsContextManager.getGlobalContext().getCucmberPkg());
+	private static final Map<String, Field> allElements = scanForElements(SeleniumTestsContextManager.getGlobalContext().getCucmberPkg());
+	protected static ThreadLocal<PageObject> currentPage = new ThreadLocal<>();
+	protected static final ScenarioLogger logger = ScenarioLogger.getScenarioLogger(Fixture.class);  // with this logger, information will be added in test step + logs
+	
 	
 	/**
 	 * Search for all Elements in test code
 	 * @return
 	 */
-	public static Map<String, Element> scanForElements(String cucumberPkg) {
+	public static Map<String, Field> scanForElements(String cucumberPkg) {
 	
 		try {
 	    	if (cucumberPkg == null) {
@@ -36,7 +40,7 @@ public class Fixture {
 	    				+ "set it to the root package where cucumber implementation resides");
 	    	}
 			
-			Map<String, Element> allFields = new HashMap<>();
+			Map<String, Field> allFields = new HashMap<>();
 			ImmutableSet<ClassInfo> infos = ClassPath.from(Fixture.class.getClassLoader()).getTopLevelClassesRecursive(cucumberPkg);
 			
 			for (ClassInfo info: infos) {
@@ -45,8 +49,8 @@ public class Fixture {
 				for (Field field: Class.forName(info.getName()).getDeclaredFields()) {
 					if (Element.class.isAssignableFrom(field.getType()) && Modifier.isStatic(field.getModifiers())) {
 						field.setAccessible(true);
-						allFields.put(String.format("%s.%s", info.getSimpleName(), field.getName()), (Element)field.get(null));
-						allFields.put(field.getName(), (Element)field.get(null));
+						allFields.put(String.format("%s.%s", info.getSimpleName(), field.getName()), field);
+						allFields.put(field.getName(), field);
 //						System.out.println(field.getName());
 						
 			
@@ -56,7 +60,7 @@ public class Fixture {
 			
 			return allFields;
 			
-		} catch (IOException | SecurityException | ClassNotFoundException | IllegalArgumentException | IllegalAccessException e) {
+		} catch (IOException | SecurityException | ClassNotFoundException | IllegalArgumentException e) {
 			throw new ConfigurationException(String.format("Cannot search elements in %s", cucumberPkg), e);
 		}
 		
@@ -68,13 +72,30 @@ public class Fixture {
 	 * @return	the found element
 	 * @throws ScenarioException when element is not found
 	 */
-	public Element getElement(String name) {
+	public String getElement(String name) {
 		
-		Element element = allElements.get(name);
-		if (element == null) {
+		Field elementField = allElements.get(name);
+		if (elementField == null) {
 			throw new ScenarioException(String.format("Element '%s' cannot be found among all classes. It may not have been defined", name));
 		}
-		return element;
+		
+		Class<?> pageClass = elementField.getDeclaringClass(); 
+		
+		// create new page if we are not on it
+		if (pageClass != currentPage.get().getClass()) {
+			try {
+				currentPage.set((PageObject)pageClass.newInstance());
+			} catch (InstantiationException | IllegalAccessException e) {
+				throw new ScenarioException(String.format("Page '%s' don't have default constructor, add it to avoid this error", pageClass.getSimpleName()));
+			}
+			logger.info("switching to page " + pageClass.getSimpleName());
+		}
+		
+		if (name.split(".").length == 1) {
+			return name;
+		} else {
+			return name.split(".")[1];
+		}
 	}
 	
 	/**
@@ -90,6 +111,10 @@ public class Fixture {
 		} else {
 			return parameterValue;
 		}
+	}
+
+	public static PageObject getCurrentPage() {
+		return currentPage.get();
 	}
 	
 }

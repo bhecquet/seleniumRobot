@@ -47,20 +47,6 @@ public abstract class BasePage {
 
 	protected static final ScenarioLogger logger = ScenarioLogger.getScenarioLogger(BasePage.class);  // with this logger, information will be added in test step + logs
 	protected static final Logger internalLogger = SeleniumRobotLogger.getLogger(BasePage.class);
-
-    public void acceptAlert() {
-        Alert alert = getAlert();
-        alert.accept();
-        driver.switchTo().defaultContent();
-    }
-    
-    public String cancelConfirmation() {
-    	Alert alert = getAlert();
-        String seenText = alert.getText();
-        alert.dismiss();
-        driver.switchTo().defaultContent();
-        return seenText;
-    }
     
     public Alert getAlert() {
     	new WebDriverWait(driver, 2).until(ExpectedConditions.alertIsPresent());
@@ -74,16 +60,6 @@ public abstract class BasePage {
  
     protected void assertCurrentPage(final boolean log) { }
     protected void assertCurrentPage(boolean log, HtmlElement pageIdentifierElement) { }
-
-    
-    public void assertHTML(final boolean condition, final String message) {
-        if (!condition) {
-            capturePageSnapshot();
-            Assert.assertTrue(condition, message);
-        }
-    }
-
-    protected abstract void capturePageSnapshot();
 
     public WebDriver getDriver() {
         return driver;
