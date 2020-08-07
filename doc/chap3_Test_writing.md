@@ -625,6 +625,15 @@ Test would then be:
 ```
 As you can see on line 4, we cast `click` method return type with `<ShoppingCart>`
 		
+#### Use WebDriverWait ####
+
+Selenium offers a simple way to wait dynamically for an element to reach some state (present, selected, ...)
+
+```java
+	new WebDriverWait(driver, 5).until(ExpectedConditions. ...);
+```
+Be careful to use only ExpectedConditions that accept a WebElement (e.g: `ExpectedConditions.visibilityOf(WebElement element)`) as you will be able to pass an HtmlElement which will be search correctly.
+It you use ExpectedConditions that takes a locator (e.g: `ExpectedConditions.visibilityOfElementLocated(By by)`), you may encounter problem if frames are used, or defined for this element, or if you want to specify index.
 
 ### 4 Write a cucumber test ###
 Cucumber styled tests rely on a `.feature` file where each test step is defined. Look at [https://cucumber.io/docs/gherkin/reference/](https://cucumber.io/docs/gherkin/reference/) for more information about writing a feature file.
