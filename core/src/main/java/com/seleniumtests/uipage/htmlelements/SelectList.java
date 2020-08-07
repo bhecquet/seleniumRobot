@@ -28,6 +28,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
 
 import com.seleniumtests.customexception.CustomSeleniumTestsException;
+import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.uipage.ReplayOnError;
 import com.seleniumtests.uipage.htmlelements.select.AngularMaterialSelect;
 import com.seleniumtests.uipage.htmlelements.select.AngularSelect;
@@ -35,6 +36,7 @@ import com.seleniumtests.uipage.htmlelements.select.ISelectList;
 import com.seleniumtests.uipage.htmlelements.select.ListSelect;
 import com.seleniumtests.uipage.htmlelements.select.NativeSelect;
 import com.seleniumtests.uipage.htmlelements.select.SalesforceLigntningSelect;
+import com.seleniumtests.uipage.htmlelements.select.StubSelect;
 
 import net.ricecode.similarity.JaroWinklerStrategy;
 import net.ricecode.similarity.SimilarityStrategy;
@@ -97,6 +99,10 @@ public class SelectList extends HtmlElement {
 
     @Override
     protected void findElement() {
+
+    	// set a default type so that use of selectImplementation can be done
+    	selectImplementation = new StubSelect();
+    	
         super.findElement(true);
         
         // search the right select list handler
@@ -112,8 +118,8 @@ public class SelectList extends HtmlElement {
 			}
         }
         
-        if (selectImplementation == null) {
-        	throw new CustomSeleniumTestsException("Cannot find type of select " + element.getTagName());
+        if (selectImplementation instanceof StubSelect) {
+        	throw new ScenarioException("Cannot find type of select " + element.getTagName());
         }
         
         options = selectImplementation.getOptions();
@@ -143,7 +149,7 @@ public class SelectList extends HtmlElement {
     /**
      * @return The first selected option in this select tag (or the currently selected option in a
      *         normal select)
-     * @throws NoSuchElementException If no option is selected
+     *         or null If no option is selected
      */
     @ReplayOnError
     public WebElement getFirstSelectedOption() {
@@ -309,17 +315,18 @@ public class SelectList extends HtmlElement {
     }
 
     @ReplayOnError
-    public void selectByIndex(final int[] indexs) {
-        try {
-	    	findElement();
-	    	
-	    	for (int i = 0; i < indexs.length; i++) {
-	    		selectImplementation.selectByIndex(indexs[i]);
-	    	}
-    	} finally {
-    		selectImplementation.finalizeAction();
-    	}
+    public void selectByIndex(int ... indexs) {
+    	 try {
+ 	    	findElement();
+ 	    	
+ 	    	for (int i = 0; i < indexs.length; i++) {
+ 	    		selectImplementation.selectByIndex(indexs[i]);
+ 	    	}
+     	} finally {
+     		selectImplementation.finalizeAction();
+     	}
     }
+
   
     /**
      * Select standard select by attribute text, and select fake select with ul and li by attribute title.
@@ -338,7 +345,7 @@ public class SelectList extends HtmlElement {
     }
 
     @ReplayOnError
-    public void selectByText(final String[] texts) {
+    public void selectByText(String ... texts) {
     	try {
 	        findElement();
 	        
@@ -369,11 +376,12 @@ public class SelectList extends HtmlElement {
     
     /**
      * Multiple select by attribute text, similar select
+     * For each text, only one option will be selected
      * 
      * @param text
      */
     @ReplayOnError
-    public void selectByCorrespondingText(String[] text) {
+    public void selectByCorrespondingText(String ... text) {
     	try {
 	    	findElement();
 	    	for (int i = 0; i < text.length; i++) {
@@ -441,7 +449,7 @@ public class SelectList extends HtmlElement {
     }
 
     @ReplayOnError
-    public void selectByValue(final String[] values) {
+    public void selectByValue(final String ... values) {
     	try {
 	        findElement();
 	        for (int i = 0; i < values.length; i++) {
@@ -451,5 +459,9 @@ public class SelectList extends HtmlElement {
     		selectImplementation.finalizeAction();
     	}
     }
+
+	public ISelectList getSelectImplementation() {
+		return selectImplementation;
+	}
     
 }
