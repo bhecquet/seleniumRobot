@@ -196,7 +196,7 @@ public class TestAndroidCapabilitiesFactory extends GenericTest {
 	}
 	
 	/**
-	 * Check mobile test with app relative path => check absolute path is set in capabilities
+	 * Check mobile test with app relative path => check absolute path is set in capabilities 
 	 */
 	@Test(groups={"ut"})
 	public void testCreateCapabilitiesWithRelativeApplicationPath() {
@@ -213,7 +213,7 @@ public class TestAndroidCapabilitiesFactory extends GenericTest {
 		MutableCapabilities capa = capaFactory.createCapabilities();
 		
 		Assert.assertEquals(capa.getCapability(CapabilityType.BROWSER_NAME), "");
-		Assert.assertTrue(capa.getCapability("app").toString().contains("core/data/core/app.apk"));
+		Assert.assertTrue(capa.getCapability("app").toString().contains("/data/core/app.apk"));
 	}
 	
 	/**
