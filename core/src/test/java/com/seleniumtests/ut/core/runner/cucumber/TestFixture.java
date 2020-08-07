@@ -7,14 +7,12 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import com.seleniumtests.GenericTest;
-import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.TestVariable;
 import com.seleniumtests.core.runner.cucumber.Fixture;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.it.driver.support.pages.DriverTestPage;
-import com.seleniumtests.uipage.htmlelements.Element;
 import com.seleniumtests.uipage.htmlelements.TextFieldElement;
 
 public class TestFixture extends GenericTest {
@@ -59,16 +57,16 @@ public class TestFixture extends GenericTest {
 	 */
 	@Test(groups={"ut"})
 	public void testGetElement() {
-		SeleniumTestsContextManager.getGlobalContext().setCucumberImplementationPackage("com.seleniumtests.it.driver.support.pages");
-		Assert.assertTrue(new Fixture().getElement("textElementNotPresentFirstVisible").equals("textElementNotPresentFirstVisible"));
-		Assert.assertTrue(Fixture.getCurrentPage() instanceof DriverTestPage);
+		SeleniumTestsContextManager.getGlobalContext().setCucumberImplementationPackage("com.seleniumtests.ut.core.runner.cucumber");
+		Assert.assertTrue(new Fixture().getElement("textField").equals("textField"));
+		Assert.assertTrue(Fixture.getCurrentPage() instanceof PageForActions);
 	}
 	
 	@Test(groups={"ut"})
 	public void testGetElementWithClassName() {
-		SeleniumTestsContextManager.getGlobalContext().setCucumberImplementationPackage("com.seleniumtests.it.driver.support.pages");
-		Assert.assertTrue(new Fixture().getElement("DriverTestPage.textElementNotPresentFirstVisible").equals("textElementNotPresentFirstVisible"));
-		Assert.assertTrue(Fixture.getCurrentPage() instanceof DriverTestPage);
+		SeleniumTestsContextManager.getGlobalContext().setCucumberImplementationPackage("com.seleniumtests.ut.core.runner.cucumber");
+		Assert.assertTrue(new Fixture().getElement("PageForActions.textField").equals("textField"));
+		Assert.assertTrue(Fixture.getCurrentPage() instanceof PageForActions);
 	}
 	
 	/**
@@ -76,25 +74,25 @@ public class TestFixture extends GenericTest {
 	 */
 	@Test(groups={"ut"}, expectedExceptions = ScenarioException.class)
 	public void testGetElementNotPresent() {
-		SeleniumTestsContextManager.getGlobalContext().setCucumberImplementationPackage("com.seleniumtests.it.driver.support.pages");
+		SeleniumTestsContextManager.getGlobalContext().setCucumberImplementationPackage("com.seleniumtests.ut.core.runner.cucumber");
 		new Fixture().getElement("textFoo");
 	}
 	
 	@Test(groups={"ut"})
 	public void testGetValue() {
-		SeleniumTestsContextManager.getGlobalContext().setCucumberImplementationPackage("com.seleniumtests.it.driver.support.pages");
+		SeleniumTestsContextManager.getGlobalContext().setCucumberImplementationPackage("com.seleniumtests.ut.core.runner.cucumber");
 		Assert.assertEquals(new Fixture().getValue("foo"), "foo");
 	}
 	
 	@Test(groups={"ut"})
 	public void testGetValueWithUnknownParam() {
-		SeleniumTestsContextManager.getGlobalContext().setCucumberImplementationPackage("com.seleniumtests.it.driver.support.pages");
+		SeleniumTestsContextManager.getGlobalContext().setCucumberImplementationPackage("com.seleniumtests.ut.core.runner.cucumber");
 		Assert.assertEquals(new Fixture().getValue("{{ foo }}"), "");
 	}
 	
 	@Test(groups={"ut"})
 	public void testGetValueWithKnownParam() {
-		SeleniumTestsContextManager.getGlobalContext().setCucumberImplementationPackage("com.seleniumtests.it.driver.support.pages");
+		SeleniumTestsContextManager.getGlobalContext().setCucumberImplementationPackage("com.seleniumtests.ut.core.runner.cucumber");
 		SeleniumTestsContextManager.getThreadContext().getConfiguration().put("foo", new TestVariable("foo", "bar"));
 		Assert.assertEquals(new Fixture().getValue("{{ foo }}"), "bar");
 	}

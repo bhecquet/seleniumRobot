@@ -82,7 +82,7 @@ public class Fixture {
 		Class<?> pageClass = elementField.getDeclaringClass(); 
 		
 		// create new page if we are not on it
-		if (pageClass != currentPage.get().getClass()) {
+		if (currentPage.get() == null || pageClass != currentPage.get().getClass()) {
 			try {
 				currentPage.set((PageObject)pageClass.newInstance());
 			} catch (InstantiationException | IllegalAccessException e) {
@@ -91,10 +91,10 @@ public class Fixture {
 			logger.info("switching to page " + pageClass.getSimpleName());
 		}
 		
-		if (name.split(".").length == 1) {
+		if (name.split("\\.").length == 1) {
 			return name;
 		} else {
-			return name.split(".")[1];
+			return name.split("\\.")[1];
 		}
 	}
 	

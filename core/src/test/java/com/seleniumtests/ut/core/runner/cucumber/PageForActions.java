@@ -6,6 +6,7 @@ import org.mockito.Mockito;
 import org.openqa.selenium.By;
 
 import com.seleniumtests.uipage.PageObject;
+import com.seleniumtests.uipage.htmlelements.CheckBoxElement;
 import com.seleniumtests.uipage.htmlelements.ScreenZone;
 import com.seleniumtests.uipage.htmlelements.SelectList;
 import com.seleniumtests.uipage.htmlelements.Table;
@@ -17,6 +18,7 @@ public class PageForActions extends PageObject {
 	public static ScreenZone screenZone = Mockito.spy(new ScreenZone());
 	public static SelectList select = new SelectList("select", By.id("select"));
 	public static Table table = new Table("table", By.id("table"));
+	public static CheckBoxElement checkbox = new CheckBoxElement("checkbox", By.id("checkbox"));
 
 	public PageForActions() throws IOException {
 		super();

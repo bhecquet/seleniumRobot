@@ -10,6 +10,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 
@@ -19,11 +21,13 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
+import org.openqa.selenium.Cookie;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver.Navigation;
+import org.openqa.selenium.WebDriver.Options;
 import org.openqa.selenium.WebDriver.TargetLocator;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Interactive;
@@ -85,6 +89,9 @@ public class TestPageObject2 extends MockitoTest {
 	private Navigation navigation;
 
 	@Mock
+	private Options driverOptions;
+	
+	@Mock
 	private Alert alert;
 
 	private CustomEventFiringWebDriver eventDriver;
@@ -97,6 +104,7 @@ public class TestPageObject2 extends MockitoTest {
 		SeleniumTestsContextManager.getThreadContext().setBrowser("firefox");
 		SeleniumTestsContextManager.getThreadContext().setExplicitWaitTimeout(1);
 		SeleniumTestsContextManager.getThreadContext().setImplicitWaitTimeout(1);
+		SeleniumTestsContextManager.getThreadContext().setReplayTimeout(2);
 		
 		eventDriver = spy(new CustomEventFiringWebDriver(driver));
 		
@@ -105,6 +113,7 @@ public class TestPageObject2 extends MockitoTest {
 		when(driver.findElement(By.id("el"))).thenReturn(element);
 		when(driver.navigate()).thenReturn(navigation);
 		when(driver.getCurrentUrl()).thenReturn("http://foo");
+		when(driver.manage()).thenReturn(driverOptions);
 		when(element.getSize()).thenReturn(new Dimension(10, 10));
 		when(element.getLocation()).thenReturn(new Point(5, 5));
 
@@ -189,7 +198,18 @@ public class TestPageObject2 extends MockitoTest {
 		
 		page.setScreenshotUtil(screenshotUtil);
 		page.captureElementSnapshot("", new HtmlElement("", By.id("el")), SnapshotCheckType.TRUE);
-		
+	}
+	
+	@Test(groups={"ut"})
+	public void testGetCookieByName() {
+		when(driverOptions.getCookieNamed("foo")).thenReturn(new Cookie("foo", "barfoobar"));
+		Assert.assertEquals(page.getCookieByName("foo"), "barfoobar");
+	}
+	
+	@Test(groups={"ut"})
+	public void testGetCookieByNameNoCookie() {
+		when(driverOptions.getCookieNamed("foo")).thenReturn(null);
+		Assert.assertNull(page.getCookieByName("foo"));
 	}
 
 	/**
@@ -275,12 +295,27 @@ public class TestPageObject2 extends MockitoTest {
 	public void testSelectOptionNoSelectList() throws IOException {
 		page.selectOption("textField", "foo");
 	}
+	
+	@Test(groups={"ut"})
+	public void testClickTo() throws IOException {
+		when(driver.findElement(By.id("text"))).thenReturn(element);
+		PageObject nextPage = page.clickAndChangeToPage("textField", PageForActions.class);
+		verify(element).click();
+		Assert.assertNotEquals(page, nextPage);
+	}
+	
+	@Test(groups={"ut"})
+	public void testChangePage() throws IOException {
+		PageObject nextPage = page.changeToPage(PageForActions.class);
+		Assert.assertNotEquals(page, nextPage);
+	}
 
 	@Test(groups={"ut"})
 	public void testClick() throws IOException {
 		when(driver.findElement(By.id("text"))).thenReturn(element);
-		page.click("textField");
+		PageObject nextPage = page.click("textField");
 		verify(element).click();
+		Assert.assertEquals(page, nextPage);
 	}
 	
 	@Test(groups={"ut"})
@@ -382,26 +417,26 @@ public class TestPageObject2 extends MockitoTest {
 	
 
 	@Test(groups={"ut"})
-	public void waitForPresent() {
+	public void testWaitForPresent() {
 		when(driver.findElement(By.id("text"))).thenReturn(element);
 		page.waitForPresent("textField");
 		verify(driver).findElement(By.id("text"));
 	}
 	
 	@Test(groups={"ut"}, expectedExceptions = TimeoutException.class)
-	public void waitForPresentNotPresent() {
+	public void testWaitForPresentNotPresent() {
 		when(driver.findElement(By.id("text"))).thenThrow(new NoSuchElementException("not found"));
 		page.waitForPresent("textField");
 	}
 	
 	@Test(groups={"ut"})
-	public void waitForPresentScreenZone() {
+	public void testWaitForPresentScreenZone() {
 		page.waitForPresent("screenZone");
 		verify(PageForActions.screenZone).isElementPresent(1000);
 	}
 	
 	@Test(groups={"ut"})
-	public void waitForVisible() {
+	public void testWaitForVisible() {
 		when(driver.findElement(By.id("text"))).thenReturn(element);
 		when(element.isDisplayed()).thenReturn(true);
 		page.waitForVisible("textField");
@@ -409,7 +444,7 @@ public class TestPageObject2 extends MockitoTest {
 	}
 	
 	@Test(groups={"ut"}, expectedExceptions = TimeoutException.class)
-	public void waitForVisibleNotVisible() {
+	public void testWaitForVisibleNotVisible() {
 		when(driver.findElement(By.id("text"))).thenReturn(element);
 		when(element.isDisplayed()).thenReturn(false);
 		page.waitForVisible("textField");
@@ -417,26 +452,26 @@ public class TestPageObject2 extends MockitoTest {
 	}
 	
 	@Test(groups={"ut"})
-	public void waitForVisibleScreenZone() {
+	public void testWaitForVisibleScreenZone() {
 		page.waitForPresent("screenZone");
 		verify(PageForActions.screenZone).isElementPresent(1000);
 	}
 
 	@Test(groups={"ut"})
-	public void waitForNotPresent() {
+	public void testWaitForNotPresent() {
 		when(driver.findElement(By.id("text"))).thenThrow(new NoSuchElementException("not found"));
 		page.waitForNotPresent("textField");
 	}
 	
 	@Test(groups={"ut"}, expectedExceptions = TimeoutException.class)
-	public void waitForNotPresentPresent() {
+	public void testWaitForNotPresentPresent() {
 		when(driver.findElement(By.id("text"))).thenReturn(element);
 		page.waitForNotPresent("textField");
 		verify(driver).findElement(By.id("text"));
 	}
 
 	@Test(groups={"ut"})
-	public void waitForNotVisible() {
+	public void testWaitForNotVisible() {
 		when(driver.findElement(By.id("text"))).thenReturn(element);
 		when(element.isDisplayed()).thenReturn(false);
 		page.waitForInvisible("textField");
@@ -444,7 +479,7 @@ public class TestPageObject2 extends MockitoTest {
 	}
 	
 	@Test(groups={"ut"}, expectedExceptions = TimeoutException.class)
-	public void waitForNotVisibleVisible() {
+	public void testWaitForNotVisibleVisible() {
 		when(driver.findElement(By.id("text"))).thenReturn(element);
 		when(element.isDisplayed()).thenReturn(true);
 		page.waitForInvisible("textField");
@@ -452,21 +487,21 @@ public class TestPageObject2 extends MockitoTest {
 	}
 	
 	@Test(groups={"ut"})
-	public void waitForValueViaValueAttribute() {
+	public void testWaitForValueViaValueAttribute() {
 		when(driver.findElement(By.id("text"))).thenReturn(element);
 		when(element.getAttribute("value")).thenReturn("foo");
 		page.waitForValue("textField", "foo");
 	}
 	
 	@Test(groups={"ut"})
-	public void waitForValueViaText() {
+	public void testWaitForValueViaText() {
 		when(driver.findElement(By.id("text"))).thenReturn(element);
 		when(element.getText()).thenReturn("foo");
 		page.waitForValue("textField", "foo");
 	}
 	
 	@Test(groups={"ut"}, expectedExceptions = TimeoutException.class)
-	public void waitForWrongValue() {
+	public void testWaitForWrongValue() {
 		when(driver.findElement(By.id("text"))).thenReturn(element);
 		when(element.getText()).thenReturn("bar");
 		when(element.getAttribute("value")).thenReturn("bar2");
@@ -474,7 +509,7 @@ public class TestPageObject2 extends MockitoTest {
 	}
 
 	@Test(groups={"ut"}, expectedExceptions = ScenarioException.class)
-	public void waitForValueScreenZone() {
+	public void testWaitForValueScreenZone() {
 		page.waitForValue("screenZone", "foo");
 	}
 
@@ -507,6 +542,468 @@ public class TestPageObject2 extends MockitoTest {
 	public void testWaitForTableCellValueNoTable() {
 		page.waitTableCellValue(0, 0, "textField", "bar");
 	}
+	
+	@Test(groups={"ut"})
+	public void testAssertVisible() {
+		when(driver.findElement(By.id("text"))).thenReturn(element);
+		when(element.isDisplayed()).thenReturn(true);
+		page.assertForVisible("textField");
+		verify(driver).findElement(By.id("text"));
+	}
+	
+	@Test(groups={"ut"}, expectedExceptions = AssertionError.class)
+	public void testAssertVisibleNotPresent() {
+		when(driver.findElement(By.id("text"))).thenThrow(new NoSuchElementException("not found"));
+		when(element.isDisplayed()).thenReturn(true);
+		page.assertForVisible("textField");
+		verify(driver).findElement(By.id("text"));
+	}
+	
+	@Test(groups={"ut"}, expectedExceptions = AssertionError.class)
+	public void testAssertVisibleNotVisible() {
+		when(driver.findElement(By.id("text"))).thenReturn(element);
+		when(element.isDisplayed()).thenReturn(false);
+		page.assertForVisible("textField");
+		verify(driver).findElement(By.id("text"));
+	}
+	
+	@Test(groups={"ut"})
+	public void testAssertVisibleScreenZone() {
+		page.assertForVisible("screenZone");
+		verify(PageForActions.screenZone).isElementPresent();
+	}
 
+
+	@Test(groups={"ut"})
+	public void testAssertNotVisible() {
+		when(driver.findElement(By.id("text"))).thenReturn(element);
+		when(element.isDisplayed()).thenReturn(false);
+		page.assertForInvisible("textField");
+		verify(driver).findElement(By.id("text"));
+	}
+	
+	@Test(groups={"ut"}, expectedExceptions = AssertionError.class)
+	public void testAssertNotVisibleNotPresent() {
+		when(driver.findElement(By.id("text"))).thenThrow(new NoSuchElementException("not found"));
+		when(element.isDisplayed()).thenReturn(false);
+		page.assertForInvisible("textField");
+		verify(driver).findElement(By.id("text"));
+	}
+	
+	@Test(groups={"ut"}, expectedExceptions = AssertionError.class)
+	public void testAssertNotVisibleVisible() {
+		when(driver.findElement(By.id("text"))).thenReturn(element);
+		when(element.isDisplayed()).thenReturn(true);
+		page.assertForInvisible("textField");
+		verify(driver).findElement(By.id("text"));
+	}
+
+	@Test(groups={"ut"})
+	public void testAssertEnabled() {
+		when(driver.findElement(By.id("text"))).thenReturn(element);
+		when(element.isEnabled()).thenReturn(true);
+		page.assertForEnabled("textField");
+		verify(driver).findElement(By.id("text"));
+	}
+	
+	@Test(groups={"ut"}, expectedExceptions = AssertionError.class)
+	public void testAssertEnabledNotEnabled() {
+		when(driver.findElement(By.id("text"))).thenReturn(element);
+		when(element.isEnabled()).thenReturn(false);
+		page.assertForEnabled("textField");
+		verify(driver).findElement(By.id("text"));
+	}
+	
+	@Test(groups={"ut"}, expectedExceptions = AssertionError.class)
+	public void testAssertEnabledNotPresent() {
+		when(driver.findElement(By.id("text"))).thenThrow(new NoSuchElementException("not found"));
+		when(element.isEnabled()).thenReturn(false);
+		page.assertForEnabled("textField");
+		verify(driver).findElement(By.id("text"));
+	}
+	
+	@Test(groups={"ut"}, expectedExceptions = ScenarioException.class)
+	public void testAssertEnabledScreenZone() {
+		page.assertForEnabled("screenZone");
+		verify(PageForActions.screenZone).isElementPresent();
+	}
+	
+	@Test(groups={"ut"})
+	public void testAssertDisabled() {
+		when(driver.findElement(By.id("text"))).thenReturn(element);
+		when(element.isEnabled()).thenReturn(true);
+		page.assertForEnabled("textField");
+		verify(driver).findElement(By.id("text"));
+	}
+	
+	@Test(groups={"ut"}, expectedExceptions = AssertionError.class)
+	public void testAssertDisabledNotPresent() {
+		when(driver.findElement(By.id("text"))).thenThrow(new NoSuchElementException("not found"));
+		when(element.isEnabled()).thenReturn(true);
+		page.assertForEnabled("textField");
+		verify(driver).findElement(By.id("text"));
+	}
+	
+	@Test(groups={"ut"}, expectedExceptions = AssertionError.class)
+	public void testAssertDisabledNotDisabled() {
+		when(driver.findElement(By.id("text"))).thenReturn(element);
+		when(element.isEnabled()).thenReturn(false);
+		page.assertForEnabled("textField");
+		verify(driver).findElement(By.id("text"));
+	}
+	
+	@Test(groups={"ut"}, expectedExceptions = ScenarioException.class)
+	public void testAssertDisabledScreenZone() {
+		page.assertForEnabled("screenZone");
+		verify(PageForActions.screenZone).isElementPresent();
+	}
+
+	@Test(groups={"ut"})
+	public void testAssertForValueViaValueAttribute() {
+		when(driver.findElement(By.id("text"))).thenReturn(element);
+		when(element.getText()).thenReturn("");
+		when(element.getAttribute("value")).thenReturn("foo");
+		page.assertForValue("textField", "foo");
+	}
+
+	@Test(groups={"ut"}, expectedExceptions = AssertionError.class)
+	public void testAssertForValueViaValueAttributeNotPresent() {
+		when(driver.findElement(By.id("text"))).thenThrow(new NoSuchElementException("not found"));
+		when(element.getText()).thenReturn("");
+		when(element.getAttribute("value")).thenReturn("foo");
+		page.assertForValue("textField", "foo");
+	}
+	
+	@Test(groups={"ut"})
+	public void testAssertForValueViaText() {
+		when(driver.findElement(By.id("text"))).thenReturn(element);
+		when(element.getText()).thenReturn("foo");
+		when(element.getAttribute("value")).thenReturn("");
+		page.assertForValue("textField", "foo");
+	}
+	
+	@Test(groups={"ut"}, expectedExceptions = AssertionError.class)
+	public void testAssertForWrongValue() {
+		when(driver.findElement(By.id("text"))).thenReturn(element);
+		when(element.getText()).thenReturn("bar");
+		when(element.getAttribute("value")).thenReturn("bar2");
+		page.assertForValue("textField", "foo");
+	}
+
+	@Test(groups={"ut"}, expectedExceptions = ScenarioException.class)
+	public void testAssertForValueScreenZone() {
+		page.assertForValue("screenZone", "foo");
+	}
+
+	@Test(groups={"ut"})
+	public void testAssertForEmptyValueViaValueAttribute() {
+		when(driver.findElement(By.id("text"))).thenReturn(element);
+		when(element.getAttribute("value")).thenReturn("");
+		page.assertForEmptyValue("textField");
+	}
+
+	@Test(groups={"ut"}, expectedExceptions = AssertionError.class)
+	public void testAssertForEmptyValueViaValueAttributeNotPresent() {
+		when(driver.findElement(By.id("text"))).thenThrow(new NoSuchElementException("not found"));
+		when(element.getAttribute("value")).thenReturn("");
+		page.assertForEmptyValue("textField");
+	}
+	
+	@Test(groups={"ut"}, expectedExceptions = AssertionError.class)
+	public void testAssertForEmptyValueViaValueAttributeNotEmpty() {
+		when(driver.findElement(By.id("text"))).thenReturn(element);
+		when(element.getAttribute("value")).thenReturn("foo");
+		page.assertForEmptyValue("textField");
+	}
+
+	@Test(groups={"ut"}, expectedExceptions = ScenarioException.class)
+	public void testAssertForEmptyValueScreenZone() {
+		page.assertForEmptyValue("screenZone");
+	}
+	
+	@Test(groups={"ut"})
+	public void testAssertForNonEmptyValueViaValueAttribute() {
+		when(driver.findElement(By.id("text"))).thenReturn(element);
+		when(element.getAttribute("value")).thenReturn("bar");
+		page.assertForNonEmptyValue("textField");
+	}
+
+	@Test(groups={"ut"}, expectedExceptions = AssertionError.class)
+	public void testAssertForNonEmptyValueViaValueAttributeNotPresent() {
+		when(driver.findElement(By.id("text"))).thenThrow(new NoSuchElementException("not found"));
+		when(element.getAttribute("value")).thenReturn("bar");
+		page.assertForNonEmptyValue("textField");
+	}
+	
+	@Test(groups={"ut"}, expectedExceptions = AssertionError.class)
+	public void testAssertForNonEmptyValueViaValueAttributeNotEmpty() {
+		when(driver.findElement(By.id("text"))).thenReturn(element);
+		when(element.getAttribute("value")).thenReturn("");
+		page.assertForNonEmptyValue("textField");
+	}
+	
+	@Test(groups={"ut"}, expectedExceptions = ScenarioException.class)
+	public void testAssertForNonEmptyValueScreenZone() {
+		page.assertForNonEmptyValue("screenZone");
+	}
+
+	@Test(groups={"ut"})
+	public void testAssertForMatchingValueViaValueAttribute() {
+		when(driver.findElement(By.id("text"))).thenReturn(element);
+		when(element.getText()).thenReturn("");
+		when(element.getAttribute("value")).thenReturn("barfoobar");
+		page.assertForMatchingValue("textField", "foo");
+	}
+
+	@Test(groups={"ut"}, expectedExceptions = AssertionError.class)
+	public void testAssertForMatchingValueViaValueAttributeNotPresent() {
+		when(driver.findElement(By.id("text"))).thenThrow(new NoSuchElementException("not found"));
+		when(element.getText()).thenReturn("");
+		when(element.getAttribute("value")).thenReturn("barfoobar");
+		page.assertForMatchingValue("textField", "foo");
+	}
+	
+	@Test(groups={"ut"})
+	public void testAssertForMatchingValueViaText() {
+		when(driver.findElement(By.id("text"))).thenReturn(element);
+		when(element.getText()).thenReturn("barfoobar");
+		when(element.getAttribute("value")).thenReturn("");
+		page.assertForMatchingValue("textField", "foo");
+	}
+	
+	@Test(groups={"ut"}, expectedExceptions = AssertionError.class)
+	public void testAssertForWrongMatchingValue() {
+		when(driver.findElement(By.id("text"))).thenReturn(element);
+		when(element.getText()).thenReturn("bar");
+		when(element.getAttribute("value")).thenReturn("bar2");
+		page.assertForMatchingValue("textField", "foo");
+	}
+
+	@Test(groups={"ut"}, expectedExceptions = ScenarioException.class)
+	public void testAssertForMatchingValueScreenZone() {
+		page.assertForMatchingValue("screenZone", "foo");
+	}
+	
+
+	@Test(groups={"ut"})
+	public void testAssertSelectedOption() throws IOException {
+		when(driver.findElement(By.id("select"))).thenReturn(element);
+		when(element.getTagName()).thenReturn("select");
+		when(element.isDisplayed()).thenReturn(true);
+		when(element.findElements(By.tagName("option"))).thenReturn(Arrays.asList(option1));
+		when(element.findElements(By.xpath(".//option[normalize-space(.) = \"foo\"]"))).thenReturn(Arrays.asList(option1));
+		when(option1.isSelected()).thenReturn(true);
+		when(option1.getText()).thenReturn("foo");
+		page.assertSelectedOption("select", "foo");
+	}
+
+	@Test(groups={"ut"}, expectedExceptions = AssertionError.class)
+	public void testAssertSelectedOptionNotPresent() throws IOException {
+		when(driver.findElement(By.id("select"))).thenThrow(new NoSuchElementException("not found"));
+		
+		page.assertSelectedOption("select", "foo");
+	}
+
+	@Test(groups={"ut"}, expectedExceptions = AssertionError.class)
+	public void testAssertSelectedOptionNoOption() throws IOException {
+		when(driver.findElement(By.id("select"))).thenReturn(element);
+		when(element.getTagName()).thenReturn("select");
+		when(element.isDisplayed()).thenReturn(true);
+		when(element.findElements(By.tagName("option"))).thenReturn(new ArrayList<>());
+		page.assertSelectedOption("select", "foo");
+	}
+	
+	
+	@Test(groups={"ut"}, expectedExceptions = AssertionError.class)
+	public void testAssertSelectedOptionNotSelected() throws IOException {
+		when(driver.findElement(By.id("select"))).thenReturn(element);
+		when(element.getTagName()).thenReturn("select");
+		when(element.isDisplayed()).thenReturn(true);
+		when(element.findElements(By.tagName("option"))).thenReturn(Arrays.asList(option1));
+		when(element.findElements(By.xpath(".//option[normalize-space(.) = \"foo\"]"))).thenReturn(Arrays.asList(option1));
+		when(option1.isSelected()).thenReturn(false);
+		when(option1.getText()).thenReturn("foo");
+		page.assertSelectedOption("select", "foo");
+	}
+
+	/**
+	 * Only SelectList is supported
+	 * @throws IOException
+	 */
+	@Test(groups={"ut"}, expectedExceptions = ScenarioException.class)
+	public void testAssertSelectedOptionNoSelect() throws IOException {
+		page.assertSelectedOption("textField", "foo");
+	}
+
+	@Test(groups={"ut"})
+	public void testAssertChecked() {
+		when(driver.findElement(By.id("checkbox"))).thenReturn(element);
+		when(element.getTagName()).thenReturn("input");
+		when(element.isSelected()).thenReturn(true);
+		page.assertChecked("checkbox");
+	}
+	
+	@Test(groups={"ut"}, expectedExceptions = AssertionError.class)
+	public void testAssertCheckedNotChecked() {
+		when(driver.findElement(By.id("checkbox"))).thenReturn(element);
+		when(element.getTagName()).thenReturn("input");
+		when(element.isSelected()).thenReturn(false);
+		page.assertChecked("checkbox");
+	}
+
+	@Test(groups={"ut"}, expectedExceptions = AssertionError.class)
+	public void testAssertCheckedNotPresent() {
+		when(driver.findElement(By.id("checkbox"))).thenThrow(new NoSuchElementException("not found"));
+		page.assertChecked("checkbox");
+	}
+	
+	@Test(groups={"ut"}, expectedExceptions = ScenarioException.class)
+	public void testAssertCheckedNotcheckbox() throws IOException {
+		page.assertChecked("textField");
+	}
+	
+	@Test(groups={"ut"})
+	public void testAssertNotChecked() {
+		when(driver.findElement(By.id("checkbox"))).thenReturn(element);
+		when(element.getTagName()).thenReturn("input");
+		when(element.isSelected()).thenReturn(false);
+		page.assertNotChecked("checkbox");
+	}
+	
+	@Test(groups={"ut"}, expectedExceptions = AssertionError.class)
+	public void testAssertNotCheckedChecked() {
+		when(driver.findElement(By.id("checkbox"))).thenReturn(element);
+		when(element.getTagName()).thenReturn("input");
+		when(element.isSelected()).thenReturn(true);
+		page.assertNotChecked("checkbox");
+	}
+	
+	@Test(groups={"ut"}, expectedExceptions = AssertionError.class)
+	public void testAssertNotCheckedNotPresent() {
+		when(driver.findElement(By.id("checkbox"))).thenThrow(new NoSuchElementException("not found"));
+		page.assertNotChecked("checkbox");
+	}
+	
+	@Test(groups={"ut"}, expectedExceptions = ScenarioException.class)
+	public void testAssertNotCheckedNotcheckbox() throws IOException {
+		page.assertNotChecked("textField");
+	}
+
+	@Test(groups={"ut"})
+	public void testAssertForTableCellValue() throws IOException {
+		when(driver.findElement(By.id("table"))).thenReturn(element);
+		when(element.findElements(By.tagName("tr"))).thenReturn(Arrays.asList(row1));
+		when(row1.findElements(By.xpath(".//descendant::*[name()=\"th\" or name()=\"td\"]"))).thenReturn(Arrays.asList(column1));
+		when(column1.getText()).thenReturn("foo");
+		
+		page.assertTableCellValue(0, 0, "table", "foo");
+	}
+
+	@Test(groups={"ut"}, expectedExceptions = AssertionError.class)
+	public void testAssertForTableCellValueNotPresent() throws IOException {
+		when(driver.findElement(By.id("table"))).thenThrow(new NoSuchElementException("not found"));
+
+		page.assertTableCellValue(0, 0, "table", "foo");
+	}
+	
+	@Test(groups={"ut"}, expectedExceptions = AssertionError.class)
+	public void testAssertForTableCellWrongValue() throws IOException {
+		when(driver.findElement(By.id("table"))).thenReturn(element);
+		when(element.findElements(By.tagName("tr"))).thenReturn(Arrays.asList(row1));
+		when(row1.findElements(By.xpath(".//descendant::*[name()=\"th\" or name()=\"td\"]"))).thenReturn(Arrays.asList(column1));
+		when(column1.getText()).thenReturn("bar");
+		
+		page.assertTableCellValue(0, 0, "table", "foo");
+	}
+
+	@Test(groups={"ut"}, expectedExceptions = ScenarioException.class)
+	public void testAssertForTableCellNotTable() throws IOException {
+		page.assertTableCellValue(0, 0, "textField", "foo");
+	}
+
+	@Test(groups={"ut"})
+	public void testAssertTextPresentInPage() {
+		when(driver.findElement(By.tagName("body"))).thenReturn(element);
+		when(element.getText()).thenReturn("<html>foo</html>");
+		page.assertTextPresentInPage("foo");
+	}
+
+	@Test(groups={"ut"}, expectedExceptions = AssertionError.class)
+	public void testAssertTextPresentNotInPage() {
+		when(driver.findElement(By.tagName("body"))).thenReturn(element);
+		when(element.getText()).thenReturn("<html>bar</html>");
+		page.assertTextPresentInPage("foo");
+	}
+	
+	@Test(groups={"ut"}, expectedExceptions = AssertionError.class)
+	public void testAssertTextPresentInPageNoBody() {
+		when(driver.findElement(By.tagName("body"))).thenThrow(new NoSuchElementException("not found"));
+		page.assertTextPresentInPage("foo");
+	}
+	
+	@Test(groups={"ut"})
+	public void testAssertTextNotPresentInPage() {
+		when(driver.findElement(By.tagName("body"))).thenReturn(element);
+		when(element.getText()).thenReturn("<html>bar</html>");
+		page.assertTextNotPresentInPage("foo");
+	}
+	
+	@Test(groups={"ut"}, expectedExceptions = AssertionError.class)
+	public void testAssertTextNotPresentNotInPage() {
+		when(driver.findElement(By.tagName("body"))).thenReturn(element);
+		when(element.getText()).thenReturn("<html>foo</html>");
+		page.assertTextNotPresentInPage("foo");
+	}
+	
+	@Test(groups={"ut"})
+	public void testAssertTextNotPresentInPageNoBody() {
+		when(driver.findElement(By.tagName("body"))).thenThrow(new NoSuchElementException("not found"));
+		page.assertTextNotPresentInPage("foo");
+	}
+
+	@Test(groups={"ut"})
+	public void testAssertCookiePresent() {
+		when(driverOptions.getCookieNamed("foo")).thenReturn(new Cookie("foo", "barfoobar"));
+		page.assertCookiePresent("foo");
+	}
+
+	@Test(groups={"ut"}, expectedExceptions = AssertionError.class)
+	public void testAssertCookieNotPresent() {
+		when(driverOptions.getCookieNamed("foo")).thenReturn(null);
+		page.assertCookiePresent("foo");
+	}
+
+	@Test(groups={"ut"})
+	public void testAssertElementCount() {
+		when(driver.findElement(By.id("text"))).thenReturn(element);
+		when(driver.findElements(By.id("text"))).thenReturn(Arrays.asList(element));
+		page.assertElementCount("textField", 1);
+	}
+
+	@Test(groups={"ut"}, expectedExceptions = AssertionError.class)
+	public void testAssertElementWrongCount() {
+		when(driver.findElement(By.id("text"))).thenReturn(element);
+		when(driver.findElements(By.id("text"))).thenReturn(Arrays.asList(element));
+		page.assertElementCount("textField", 2);
+	}
+	
+	@Test(groups={"ut"}, expectedExceptions = AssertionError.class)
+	public void testAssertElementCountNotPresent() {
+		when(driver.findElement(By.id("text"))).thenThrow(new NoSuchElementException("not found"));
+		when(driver.findElements(By.id("text"))).thenReturn(Arrays.asList());
+		page.assertElementCount("textField", 1);
+	}
+
+	@Test(groups={"ut"})
+	public void testAssertTextPresentInHtml() {
+		when(driver.getPageSource()).thenReturn("<html>foo</html>");
+		page.assertHtmlSource("foo");
+	}
+
+	@Test(groups={"ut"}, expectedExceptions = AssertionError.class)
+	public void testAssertTextPresentNotInHtml() {
+		when(driver.getPageSource()).thenReturn("<html>bar</html>");
+		page.assertHtmlSource("foo");
+	}
 	
 }

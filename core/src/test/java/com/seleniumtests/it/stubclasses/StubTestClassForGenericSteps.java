@@ -19,15 +19,11 @@ package com.seleniumtests.it.stubclasses;
 
 import java.lang.reflect.Method;
 
-import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
-import com.seleniumtests.core.TestTasks;
-import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.it.driver.support.pages.DriverTestPage;
-import com.seleniumtests.it.driver.support.pages.DriverTestPageNativeActions;
 
 public class StubTestClassForGenericSteps extends StubParentClass {
 	
@@ -37,137 +33,17 @@ public class StubTestClassForGenericSteps extends StubParentClass {
 		SeleniumTestsContextManager.getThreadContext().setOverrideSeleniumNativeAction(true);
 		SeleniumTestsContextManager.getThreadContext().setTestRetryCount(1);
 	}
-	
-	/**
-	 * added for issue #287 where we need to fail on configuration method to reproduce the bug
-	 * @param method
-	 */
-	@AfterMethod(groups="stub") 
-	public void reset(Method method) {
-		TestTasks.killProcess("foobar");
-	}
+
 
 	@Test(groups="stub")
 	public void testDriver() throws Exception {
 
 		new DriverTestPage(true)
-			._writeSomething()
-			._reset()
-			._sendKeysComposite()
-			._clickPicture();
+			.sendKeysToField("textElement", "foo")
+			.assertForValue("textElement", "foo")
+			.click("checkElement")
+			.<DriverTestPage>assertChecked("checkElement")
+			._reset();
 	}
 	
-	@Test(groups="stub")
-	public void testMultipleDriver() throws Exception {
-		
-		new DriverTestPage(true)
-		._writeSomething()
-		._reset();
-		new DriverTestPage(true, BrowserType.FIREFOX)
-		._writeSomething()
-		._reset();
-	}
-	
-	@Test(groups="stub")
-	public void testDriverShort() throws Exception {
-		new DriverTestPage(true);
-	}
-	
-	@Test(groups="stub")
-	public void testDriverShort2() throws Exception {
-		new DriverTestPage(true);
-	}
-	
-	@Test(groups="stub")
-	public void testDriverShort3() throws Exception {
-		new DriverTestPage(true);
-	}
-	
-	@Test(groups="stub")
-	public void testDriverShort4() throws Exception {
-		new DriverTestPage(true);
-	}
-	
-	@Test(groups="stub")
-	public void testDriverMultipleSnapshot() throws Exception {
-		new DriverTestPage(true)
-			._goToNewPage();
-	}
-	
-	@Test(groups="stub")
-	public void testDriverShortKo() throws Exception {
-		SeleniumTestsContextManager.getThreadContext().setReplayTimeout(1);
-		
-		new DriverTestPage(true)
-			._writeSomethingOnNonExistentElement();
-	}
-	
-	@Test(groups="stub")
-	public void testDriverCustomSnapshot() throws Exception {
-		
-		new DriverTestPage(true)
-		._writeSomething()
-		._captureSnapshot("my snapshot")
-		._reset();
-	}
-	
-	@Test(groups="stub")
-	public void testDriverWithFailure() throws Exception {
-		SeleniumTestsContextManager.getThreadContext().setReplayTimeout(1);
-		
-		new DriverTestPage(true)
-		._writeSomething()
-		._writeSomethingOnNonExistentElement();
-	}
-	
-	@Test(groups="stub")
-	public void testDriverManualSteps() throws Exception {
-
-		SeleniumTestsContextManager.getThreadContext().setManualTestSteps(true);
-
-		addStep("Write");
-		DriverTestPage page = new DriverTestPage(true)
-			._writeSomething();
-		addStep("Reset");
-		page._reset();
-	}
-	
-	/**
-	 * check that with selenium override, logging is done
-	 * @throws Exception
-	 */
-	@Test(groups="stub")
-	public void testDriverNativeActions() throws Exception {
-		new DriverTestPageNativeActions(true)
-		.sendKeys()
-		.reset()
-		.select();
-	}
-	
-	/**
-	 * check that without selenium override, logging is not done
-	 * @throws Exception
-	 */
-	@Test(groups="stub")
-	public void testDriverNativeActionsWithoutOverride() throws Exception {
-		SeleniumTestsContextManager.getThreadContext().setOverrideSeleniumNativeAction(false);
-		SeleniumTestsContextManager.getThreadContext().setReplayTimeout(1);
-		SeleniumTestsContextManager.getThreadContext().setImplicitWaitTimeout(1); 
-		
-		new DriverTestPageNativeActions(true)
-		.sendKeys()
-		.reset()
-		.select();
-	}
-	
-	@Test(groups="stub")
-	public void testDriverWithHtmlElementWithoutOverride() throws Exception {
-		SeleniumTestsContextManager.getThreadContext().setOverrideSeleniumNativeAction(false);
-		
-		new DriverTestPage(true)
-			._writeSomething()
-			._reset()
-			._clickPicture()
-			._sendKeysComposite();
-	}
 }

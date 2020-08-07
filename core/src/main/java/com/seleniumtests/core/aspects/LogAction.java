@@ -93,7 +93,7 @@ public class LogAction {
 	private static Map<Thread, Integer> indent = Collections.synchronizedMap(new HashMap<>());
 
 	/**
-	 * Intercept actions
+	 * Intercept actions and log them only if a step is already defined
 	 * @param joinPoint
 	 * @throws Throwable 
 	 */
@@ -159,9 +159,13 @@ public class LogAction {
 	 * @param joinPoint
 	 * @throws Throwable 
 	 */
-	@Around("this(com.seleniumtests.uipage.PageObject) && " +					// caller is a PageObject
-			"(call(public * com.seleniumtests.uipage.PageObject+.* (..))"
-			+ "&& !call(public * com.seleniumtests.uipage.PageObject.* (..)))"			
+	@Around("this(com.seleniumtests.uipage.PageObject) && " // caller is a PageObject
+			+ "(" 
+			+ 		"(call(public * com.seleniumtests.uipage.PageObject+.* (..))"
+			+ 		"&& !call(public * com.seleniumtests.uipage.PageObject.* (..))" // do not log PageObject internal methods		
+			+ 		")"
+			+ "|| execution(@com.seleniumtests.uipage.GenericStep public * * (..))"	// log PageObject methods annotated with GenericStep
+			+ ")"	
 			)
 	public Object logSubTestStep(ProceedingJoinPoint joinPoint) throws Throwable {
 		if (SeleniumTestsContextManager.getThreadContext().isManualTestSteps()) {
@@ -179,7 +183,11 @@ public class LogAction {
 	 * @return
 	 * @throws Throwable
 	 */
-	@Pointcut("(execution(@cucumber.api.java.en.When public * * (..)) || execution(@cucumber.api.java.en.Given public * * (..))) && if()")
+	@Pointcut("(execution(@cucumber.api.java.en.When public * * (..)) "
+				+ "|| execution(@cucumber.api.java.en.Given public * * (..))"
+				+ "|| execution(@cucumber.api.java.fr.Soit public * * (..))"
+				+ "|| execution(@cucumber.api.java.fr.Lorsque public * * (..))) "
+			+ "&& if()")
 	public static boolean isCucumberTest(ProceedingJoinPoint joinPoint) {
 		return SeleniumRobotTestPlan.isCucumberTest();
 	}
@@ -243,7 +251,9 @@ public class LogAction {
 		// do not skip configuration step logging so that debugging remains easy
 		if ((SeleniumTestsContextManager.getThreadContext().isManualTestSteps() && !configStep)
 				// skip internal configuration steps
-				|| joinPoint.getSignature().getDeclaringTypeName().startsWith("com.seleniumtests.core")
+				|| (joinPoint.getSignature().getDeclaringTypeName().startsWith("com.seleniumtests.core") 
+						// do not skip generic cucumber steps
+						&& !joinPoint.getSignature().getDeclaringTypeName().startsWith("com.seleniumtests.core.runner.cucumber"))
 				) {
 			return joinPoint.proceed(joinPoint.getArgs());
 		}
@@ -385,7 +395,7 @@ public class LogAction {
 		Method method = ((MethodSignature)joinPoint.getSignature()).getMethod();
 		
 		for (Annotation annotation: method.getAnnotations()) {
-			if (annotation.annotationType().getCanonicalName().contains("cucumber.api.java.en") && SeleniumRobotTestPlan.isCucumberTest()) {
+			if ((annotation.annotationType().getCanonicalName().contains("cucumber.api.java.en") || annotation.annotationType().getCanonicalName().contains("cucumber.api.java.fr")) && SeleniumRobotTestPlan.isCucumberTest()) {
 				stepName = getAnnotationValue(annotation);
 				stepName += " " + argumentString;
 				break;

@@ -80,13 +80,54 @@ public class TestCucumberRunner extends GenericMultiBrowserTest {
 			System.setProperty("url", testPageUrl);
 			ReporterTest.executeSubCucumberTests("scenario1", 1);
 			
-			String mainReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport.html"));
+			String mainReportContent = ReporterTest.readSummaryFile();
 			Assert.assertTrue(mainReportContent.contains(">scenario1</a>"));
 			
 			// all methods are OK
 			Assert.assertEquals(StringUtils.countMatches(mainReportContent, "info=\"ok\""), 1);
 		} finally {
 
+			System.clearProperty(SeleniumTestsContext.BROWSER);
+			System.clearProperty(SeleniumTestsContext.TEST_RETRY_COUNT);
+		}
+	}
+	
+	/**
+	 * Check both pages are detected and report contains screenshots
+	 * @param testContext
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testGenericStepsWithMultiplePages(ITestContext testContext) throws Exception {
+		
+		try {
+			System.setProperty(SeleniumTestsContext.TEST_RETRY_COUNT, "0");
+			System.setProperty(SeleniumTestsContext.BROWSER, "chrome");
+			
+			// add a user defined variable
+			System.setProperty("url", testPageUrl);
+			ReporterTest.executeSubCucumberTests("scenario2", 1);
+
+			String mainReportContent = ReporterTest.readSummaryFile();
+			Assert.assertTrue(mainReportContent.contains(">scenario2</a>"));
+			
+			// all methods are OK
+			Assert.assertEquals(StringUtils.countMatches(mainReportContent, "info=\"ok\""), 1);
+			
+			// check steps
+			String testReport = ReporterTest.readTestMethodResultFile("scenario2");
+			Assert.assertTrue(testReport.contains("</button> ^Open page '(.+)' with args: ({{ url }}"));
+			Assert.assertTrue(testReport.contains("</button> ^Write into '([\\w.]+?)' with (.*) with args: (DriverTestPage.textElement, hello, )"));
+			Assert.assertTrue(testReport.contains("</button> ^Click on '([\\w.]+?)' with args: (link, )"));
+			Assert.assertTrue(testReport.contains("</button> ^Switch to new window"));
+			
+			// test password is masked
+			Assert.assertTrue(testReport.contains("</button> ^Write password into '([\\w.]+?)' with (.*) with args: (DriverSubTestPage.textElement, ******, )"));
+			
+			
+			
+		} finally {
+			
 			System.clearProperty(SeleniumTestsContext.BROWSER);
 			System.clearProperty(SeleniumTestsContext.TEST_RETRY_COUNT);
 		}

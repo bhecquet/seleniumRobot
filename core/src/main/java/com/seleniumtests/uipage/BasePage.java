@@ -23,6 +23,7 @@ import org.apache.log4j.Logger;
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -76,8 +77,13 @@ public abstract class BasePage {
     public boolean isTextPresent(final String text) {
     	if (SeleniumTestsContextManager.isWebTest()) {
 	        Assert.assertNotNull(text, "isTextPresent: text should not be null!");
-	
-	        WebElement body = driver.findElement(By.tagName("body"));
+	        
+	        WebElement body;
+	        try {
+	        	body = driver.findElement(By.tagName("body"));
+	        } catch (WebDriverException e) {
+	        	return false;
+	        }
 	
 	        return body.getText().contains(text);
     	}

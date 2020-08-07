@@ -227,10 +227,10 @@ This class contains:
 	- fill form
 	- access an other page
 
-Example of a shopping cart class:
+Example of a shopping cart class. All must inherit of PageObject class:
 
 ```java
-	public class ShoppingCart extends HeaderAndFooter {
+	public class ShoppingCart extends PageObject {
 	
 		private static LinkElement proceed = new LinkElement("Checkout", By.linkText("Proceed to Checkout"));
 		private static LinkElement updateCart = new LinkElement("updateCart", By.name("updateCartQuantities"));
@@ -266,6 +266,9 @@ Example of a shopping cart class:
 	
 **WARN:** If you write your class combined with cucumber feature (methods annotated with @Given, @When, ...), only write methods returning `void`. Else, report will contain new page create step twice.
 
+#### PageObject inheritance ####
+
+Most of the time, Page classes will inherit from PageObject classes. But, if for some reason, you need to have the same features in several pages (e.g: headers and footer are often common among all the web site), then, you can create a class that handled these common features (which extends PageObject), and then inherit it.
 
 #### Search elements ####
 
@@ -484,7 +487,7 @@ Be careful when using selenium grid, if driver is closed in this method, the dri
 Most of tests needs to write password to application to authenticate, open some view, ...
 By default, reports produced by SeleniumRobot display all actions, steps containing method calls with arguments. Then all password may be visible to anyone.
 To avoid this potential security risk, name your method arguments containing a password with one of this 3 ways: `password`, `pwd`, `passwd`.
-Any argument name containing one of these words will be masked.
+Any argument name containing one of these words will be masked ONLY IF LONGER THAN 5 CHARACTERS.
 e.g: `myPassWordLong` will also be masked as containing `password`
 
 	Step _setPassword with args: (myPass, )
@@ -551,6 +554,77 @@ This is useful, if, for example, you have detected that your dataset is not avai
 
 Test will be retried at most `2 * testRetryCount`
 
+#### Use generic steps ####
+
+A test scenario is a suite of actions on test Page. Previous documentation showed how to write a PageObject (§2) subclass that contains elements to locate and actions on them.
+But most of the time, these actions are very simple: click on element, writing some text, ...
+To avoid writing Page methods without added value, PageObject class embeds generic steps:
+
+- actions: click, switch to new window, ...
+- waits: wait for element to be displayed, value, ...
+- checks: check value of element, ...
+
+##### Example #####
+
+A typical test would look like this
+
+```java
+	new ShoppingCart()
+			.sendKeysToField("amount", "foo")
+			.assertForValue("textElement", "foo")
+			.click("validate");
+```
+
+The class would be
+
+```java
+	public class ShoppingCart extends PageObject {
+	
+		private static TextFieldElement amount = new TextFieldElement("Amount", By.id("cart_amount"));
+		private static CheckBoxElement validate = new CheckBoxElement("Validate cart", By.name("valid"));
+		
+		
+		public ShoppingCart() throws IOException {
+			super();
+		}
+	}
+```
+
+Each generic step takes the element name as a first argument. Element name is the name of the variable in class (e.g: 'amount', 'validate' in above example)
+
+##### Use Generic steps with user defined steps #####
+
+For more complex actions, generic steps may not be suitable and you will need to write custom steps
+
+```java
+	public class ShoppingCart extends PageObject {
+	
+		private static TextFieldElement amount = new TextFieldElement("Amount", By.id("cart_amount"));
+		private static CheckBoxElement validate = new CheckBoxElement("Validate cart", By.name("valid"));
+		private static LinkElement proceed = new LinkElement("Checkout", By.linkText("Proceed to Checkout"));
+		
+		public ShoppingCart() throws IOException {
+			super();
+		}
+		
+		public PaymentDetails _checkoutSignedIn() throws Exception {
+			proceed.click();
+			return new PaymentDetails(); 
+		} 
+	}
+```
+
+Test would then be:
+
+```java
+	new ShoppingCart()
+			.sendKeysToField("amount", "foo")
+			.assertForValue("textElement", "foo")
+			.<ShoppingCart>click("validate")
+			._checkoutSignedIn();
+```
+As you can see on line 4, we cast `click` method return type with `<ShoppingCart>`
+		
 
 ### 4 Write a cucumber test ###
 Cucumber styled tests rely on a `.feature` file where each test step is defined. Look at [https://cucumber.io/docs/gherkin/reference/](https://cucumber.io/docs/gherkin/reference/) for more information about writing a feature file.
@@ -604,6 +678,37 @@ XML testNg file looks like:
 ```
 
 `cucumberPackage` parameter is mandatory so that framework knows where implementation code resides. `cucumberTests` and `cucumberTags` help selecting the right scenario. See §4 for details
+
+#### Use Generic Cucumber Steps ####
+
+SeleniumRobot defines many generic steps so that you do not have to rewrite them.
+They are all defined in `com.seleniumtests.core.runner.cucumber.Actions.java class`
+
+This is to be used in conjonction with a PageObject subclass, as for standard cucumber tests, but you only have to define elements
+
+```java
+	public class ShoppingCart extends PageObject {
+	
+		private static TextFieldElement amount = new TextFieldElement("Amount", By.id("cart_amount"));
+		private static CheckBoxElement validate = new CheckBoxElement("Validate cart", By.name("valid"));
+		
+		
+		public ShoppingCart() throws IOException {
+			super();
+		}
+	}
+```
+
+It would the be possible to write 
+
+```cucumber
+	Scenario: scenario2
+   		Given Open page '{{ url }}'
+			When Write into 'amount' with 123
+			When Click on 'validate'
+```
+Scenario above is parameterized for URL. Each value containing with format `{{ value }}` will be treated as a parameter, like if you wrote `param("value")`.
+
 
 ### 5 Working with frames ###
 In case an HTML element has to be searched inside an iFrame there are 2 ways to handle this
