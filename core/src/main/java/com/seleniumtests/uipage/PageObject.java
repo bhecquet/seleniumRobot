@@ -980,28 +980,33 @@ public class PageObject extends BasePage implements IPage {
 	
     // --------------------- Actions --------------------------
 
+	@GenericStep
     public <T extends PageObject> T goBack() {
         driver.navigate().back();
         return (T)this;
     }
-
+	
+	@GenericStep
     public <T extends PageObject> T goForward() {
         driver.navigate().forward();
         return (T)this;
     }
-	
+
+	@GenericStep
 	public <T extends PageObject> T sendKeysToField(String fieldName, String value) {
 		Element element = getElement(fieldName);
 		element.sendKeys(value);
 		return (T)this;
 	}
 
+	@GenericStep
 	public <T extends PageObject> T sendRandomKeysToField(Integer charNumber, String fieldName) {
 		Element element = getElement(fieldName);
 		element.sendKeys(RandomString.make(charNumber));
 		return (T)this;
 	}
-	
+
+	@GenericStep
 	public <T extends PageObject> T clear(String fieldName) {
 		Element element = getElement(fieldName);
 		if (element instanceof HtmlElement) {
@@ -1012,6 +1017,7 @@ public class PageObject extends BasePage implements IPage {
 		return (T)this;
 	}
 
+	@GenericStep
     public <T extends PageObject> T selectOption(String fieldName, String value) {
 		Element element = getElement(fieldName);
 		if (element instanceof SelectList) {
@@ -1022,12 +1028,54 @@ public class PageObject extends BasePage implements IPage {
 		return (T)this;
     }
 
+	@GenericStep
 	public <T extends PageObject> T click(String fieldName) {
 		Element element = getElement(fieldName);
 		element.click();
 		return (T)this;
 	}
+	
+	/**
+	 * Click on element and creates a new PageObject of the type of following page
+	 * @param fieldName
+	 * @param nextPage		Class of the next page
+	 * @return
+	 * @throws SecurityException 
+	 * @throws NoSuchMethodException 
+	 * @throws InvocationTargetException 
+	 * @throws IllegalArgumentException 
+	 * @throws IllegalAccessException 
+	 * @throws InstantiationException 
+	 */
+	@GenericStep
+	public <T extends PageObject> T clickAndChangeToPage(String fieldName, Class<T> nextPage) {
+		Element element = getElement(fieldName);
+		element.click();
+		try {
+			return (T)nextPage.getConstructor().newInstance();
+		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
+				| NoSuchMethodException | SecurityException e) {
+			throw new ScenarioException(String.format("Cannot switch to next page %s, maybe default constructor does not exist", nextPage.getSimpleName()), e);
+		}
+	}
+	
+	/**
+	 * Return the next page
+	 * @param <T>
+	 * @param nextPage
+	 * @return
+	 */
+	@GenericStep
+	public <T extends PageObject> T changeToPage(Class<T> nextPage) {
+		try {
+			return (T)nextPage.getConstructor().newInstance();
+		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
+				| NoSuchMethodException | SecurityException e) {
+			throw new ScenarioException(String.format("Cannot switch to next page %s, maybe default constructor does not exist", nextPage.getSimpleName()), e);
+		}
+	}
 
+	@GenericStep
 	public <T extends PageObject> T doubleClick(String fieldName) {
 		Element element = getElement(fieldName);
 		if (element instanceof HtmlElement) {
@@ -1038,11 +1086,13 @@ public class PageObject extends BasePage implements IPage {
 		return (T)this;
 	}
 
+	@GenericStep
 	public <T extends PageObject> T wait(Integer waitMs) {
 		WaitHelper.waitForMilliSeconds(waitMs);
 		return (T)this;
 	}
 
+	@GenericStep
     public <T extends PageObject> T clickTableCell(Integer row, Integer column, String fieldName) {
 		Element element = getElement(fieldName);
 		if (element instanceof Table) {
@@ -1057,6 +1107,7 @@ public class PageObject extends BasePage implements IPage {
      * Switch to the newly created window
      * @return
      */
+	@GenericStep
     public <T extends PageObject> T switchToNewWindow() {
     	selectNewWindow();
     	return (T)this;
@@ -1066,6 +1117,7 @@ public class PageObject extends BasePage implements IPage {
      * Switch to the newly created window with wait
      * @return
      */
+	@GenericStep
     public <T extends PageObject> T switchToNewWindow(int waitMs) {
     	selectNewWindow(waitMs);
     	return (T)this;
@@ -1075,6 +1127,7 @@ public class PageObject extends BasePage implements IPage {
      * Select first window in the list
      * @return
      */
+	@GenericStep
     public <T extends PageObject> T switchToMainWindow() {
     	selectMainWindow();
     	return (T)this;
@@ -1085,6 +1138,7 @@ public class PageObject extends BasePage implements IPage {
      * @param index
      * @return
      */
+	@GenericStep
     public <T extends PageObject> T switchToWindow(int index) {
     	selectWindow(index);
     	return (T)this;
@@ -1094,6 +1148,7 @@ public class PageObject extends BasePage implements IPage {
      * Refresh browser window
      * @return
      */
+	@GenericStep
     public <T extends PageObject> T refresh()  {
     	if (SeleniumTestsContextManager.isWebTest()) {
 	        try {
@@ -1104,14 +1159,16 @@ public class PageObject extends BasePage implements IPage {
     	}
         return (T)this;
     }
-    
+
+	@GenericStep
     public <T extends PageObject> T acceptAlert() {
         Alert alert = getAlert();
         alert.accept();
         driver.switchTo().defaultContent();
         return (T)this;
     }
-    
+
+	@GenericStep
     public <T extends PageObject> T cancelAlert() {
     	cancelConfirmation();
     	return (T)this;
@@ -1136,6 +1193,7 @@ public class PageObject extends BasePage implements IPage {
      * 
      * @param filePath
      */
+	@GenericStep
 	public <T extends PageObject> T uploadFile(String filePath) {
 		try {
 			byte[] encoded = Base64.encodeBase64(FileUtils.readFileToByteArray(new File(filePath)));
@@ -1157,6 +1215,7 @@ public class PageObject extends BasePage implements IPage {
 	}
 	
     // --------------------- Waits --------------------------
+	@GenericStep
 	public <T extends PageObject> T waitForPresent(String fieldName) {
 		Element element = getElement(fieldName);
 		if (element instanceof HtmlElement) {
@@ -1169,7 +1228,8 @@ public class PageObject extends BasePage implements IPage {
 		}
 		return (T)this;
 	}
-	
+
+	@GenericStep
 	public <T extends PageObject> T waitForVisible(String fieldName) {
 		Element element = getElement(fieldName);
 		if (element instanceof HtmlElement) {
@@ -1182,7 +1242,8 @@ public class PageObject extends BasePage implements IPage {
 		}
 		return (T)this;
 	}
-	
+
+	@GenericStep
 	public <T extends PageObject> T waitForNotPresent(String fieldName) {
 		Element element = getElement(fieldName);
 		if (element instanceof HtmlElement) {
@@ -1196,6 +1257,7 @@ public class PageObject extends BasePage implements IPage {
 		return (T)this;
 	}
 
+	@GenericStep
 	public <T extends PageObject> T waitForInvisible(String fieldName) {
 		Element element = getElement(fieldName);
 		if (element instanceof HtmlElement) {
@@ -1208,7 +1270,8 @@ public class PageObject extends BasePage implements IPage {
 		}
 		return (T)this;
 	}
-	
+
+	@GenericStep
 	public <T extends PageObject> T waitForValue(String fieldName, String value) {
 		Element element = getElement(fieldName);
 		if (element instanceof HtmlElement) {
@@ -1222,7 +1285,8 @@ public class PageObject extends BasePage implements IPage {
 		}
 		return (T)this;
 	}
-	
+
+	@GenericStep
     public <T extends PageObject> T waitTableCellValue(Integer row, Integer column, String fieldName, String value) {
 		Element element = getElement(fieldName);
 		if (element instanceof Table) {
@@ -1236,142 +1300,178 @@ public class PageObject extends BasePage implements IPage {
     }
 	
     // --------------------- Assertions --------------------------
+	@GenericStep
 	public <T extends PageObject> T assertForInvisible(String fieldName) {
 		Element element = getElement(fieldName);
 		if (element instanceof HtmlElement) {
-			Assert.assertFalse(((HtmlElement) element).isDisplayed());
+			Assert.assertFalse(((HtmlElement) element).isElementPresent(0) && ((HtmlElement) element).isDisplayed(), String.format("Element %s is visible", fieldName));
 		} else {
-			Assert.assertFalse(((GenericPictureElement)element).isElementPresent());
+			Assert.assertFalse(((GenericPictureElement)element).isElementPresent(), String.format("Element %s is visible", fieldName));
 		}
 		return (T)this;
 	}
-	
+
+	@GenericStep
 	public <T extends PageObject> T assertForVisible(String fieldName) {
 		Element element = getElement(fieldName);
 		if (element instanceof HtmlElement) {
-			Assert.assertTrue(((HtmlElement) element).isDisplayed());
+			Assert.assertTrue(((HtmlElement) element).isElementPresent(0), String.format("Element %s is not present", fieldName));
+			Assert.assertTrue(((HtmlElement) element).isDisplayed(), String.format("Element %s is not visible", fieldName));
 		} else {
-			Assert.assertTrue(((GenericPictureElement)element).isElementPresent());
+			Assert.assertTrue(((GenericPictureElement)element).isElementPresent(), String.format("Element %s is not visible", fieldName));
 		}
 		return (T)this;
 	}
-	
+
+	@GenericStep
 	public <T extends PageObject> T assertForDisabled(String fieldName) {
 		Element element = getElement(fieldName);
 		if (element instanceof HtmlElement) {
-			Assert.assertFalse(((HtmlElement) element).isEnabled());
+			Assert.assertTrue(((HtmlElement) element).isElementPresent(0), String.format("Element %s is not present", fieldName));
+			Assert.assertFalse(((HtmlElement) element).isEnabled(), String.format("Element %s is enabled", fieldName));
 		} else {
 			throw new ScenarioException(String.format("Element %s is not an HtmlElement subclass", fieldName));
 		}
 		return (T)this;
 	}
-	
+
+	@GenericStep
 	public <T extends PageObject> T assertForEnabled(String fieldName) {
 		Element element = getElement(fieldName);
 		if (element instanceof HtmlElement) {
-			Assert.assertTrue(((HtmlElement) element).isEnabled());
+			Assert.assertTrue(((HtmlElement) element).isElementPresent(0), String.format("Element %s is not present", fieldName));
+			Assert.assertTrue(((HtmlElement) element).isEnabled(), String.format("Element %s is disabled", fieldName));
 		} else {
 			throw new ScenarioException(String.format("Element %s is not an HtmlElement subclass", fieldName));
 		}
 		return (T)this;
 	}
 
+	@GenericStep
 	public <T extends PageObject> T assertForValue(String fieldName, String value) {
 		Element element = getElement(fieldName);
 		if (element instanceof HtmlElement) {
-			Assert.assertTrue(((HtmlElement) element).getText().equals(value) || ((HtmlElement) element).getValue().equals(value));
-		} else {
-			throw new ScenarioException(String.format("Element %s is not an HtmlElement subclass", fieldName));
-		}
-		return (T)this;
-	}
-	
-	public <T extends PageObject> T assertForEmptyValue(String fieldName) {
-		Element element = getElement(fieldName);
-		if (element instanceof HtmlElement) {
-			Assert.assertTrue(((HtmlElement) element).getValue().isEmpty());
-		} else {
-			throw new ScenarioException(String.format("Element %s is not an HtmlElement subclass", fieldName));
-		}
-		return (T)this;
-	}
-	
-	public <T extends PageObject> T assertForNonEmptyValue(String fieldName) {
-		Element element = getElement(fieldName);
-		if (element instanceof HtmlElement) {
-			Assert.assertFalse(((HtmlElement) element).getValue().isEmpty());
-		} else {
-			throw new ScenarioException(String.format("Element %s is not an HtmlElement subclass", fieldName));
-		}
-		return (T)this;
-	}
-	
-	public <T extends PageObject> T assertForMatchingValue(String fieldName, String regex) {
-		Element element = getElement(fieldName);
-		if (element instanceof HtmlElement) {
-			Assert.assertTrue(Pattern.matches(regex, ((HtmlElement) element).getText()) 
-					|| Pattern.matches(regex, ((HtmlElement) element).getValue()));
+			Assert.assertTrue(((HtmlElement) element).isElementPresent(0), String.format("Element %s is not present", fieldName));
+			Assert.assertTrue(((HtmlElement) element).getText().equals(value) || ((HtmlElement) element).getValue().equals(value), String.format("Value of element %s is not %s", fieldName, value));
 		} else {
 			throw new ScenarioException(String.format("Element %s is not an HtmlElement subclass", fieldName));
 		}
 		return (T)this;
 	}
 
-    public <T extends PageObject> T assertSelectedOption(String fieldName, String value) {
+	@GenericStep
+	public <T extends PageObject> T assertForEmptyValue(String fieldName) {
 		Element element = getElement(fieldName);
 		if (element instanceof HtmlElement) {
-			Assert.assertEquals(new Select((HtmlElement)element).getFirstSelectedOption().getText(), value);
+			Assert.assertTrue(((HtmlElement) element).isElementPresent(0), String.format("Element %s is not present", fieldName));
+			Assert.assertTrue(((HtmlElement) element).getValue().isEmpty(), String.format("Value or Element %s is not empty", fieldName));
 		} else {
 			throw new ScenarioException(String.format("Element %s is not an HtmlElement subclass", fieldName));
 		}
 		return (T)this;
+	}
+
+	@GenericStep
+	public <T extends PageObject> T assertForNonEmptyValue(String fieldName) {
+		Element element = getElement(fieldName);
+		if (element instanceof HtmlElement) {
+			Assert.assertTrue(((HtmlElement) element).isElementPresent(0), String.format("Element %s is not present", fieldName));
+			Assert.assertFalse(((HtmlElement) element).getValue().isEmpty(), String.format("Element %s is empty", fieldName));
+		} else {
+			throw new ScenarioException(String.format("Element %s is not an HtmlElement subclass", fieldName));
+		}
+		return (T)this;
+	}
+
+	@GenericStep
+	public <T extends PageObject> T assertForMatchingValue(String fieldName, String regex) {
+		Element element = getElement(fieldName);
+		if (element instanceof HtmlElement) {
+			Assert.assertTrue(((HtmlElement) element).isElementPresent(0), String.format("Element %s is not present", fieldName));
+			Assert.assertTrue(Pattern.compile(regex).matcher(((HtmlElement) element).getText()).find()
+					|| Pattern.compile(regex).matcher(((HtmlElement) element).getValue()).find(),
+					String.format("Value of Element %s does not match %s ", fieldName, regex));
+		} else {
+			throw new ScenarioException(String.format("Element %s is not an HtmlElement subclass", fieldName));
+		}
+		return (T)this;
+	}
+
+	@GenericStep
+    public <T extends PageObject> T assertSelectedOption(String fieldName, String value) {
+		Element element = getElement(fieldName);
+		if (element instanceof SelectList) {
+			try {
+				WebElement selectedOption = ((SelectList)element).getFirstSelectedOption();
+				Assert.assertNotNull(selectedOption, "No selected option found");
+				Assert.assertEquals(selectedOption.getText(), value, "Selected option is not the expected one");
+			} catch (WebDriverException e) {
+				Assert.assertTrue(false, String.format("Element %s is not present", fieldName));
+			}
+		} else {
+			throw new ScenarioException(String.format("Element %s is not an SelectList subclass", fieldName));
+		}
+		return (T)this;
     }
-	
+
+	@GenericStep
 	public <T extends PageObject> T assertChecked(String fieldName) {
 		Element element = getElement(fieldName);
 		if (element instanceof CheckBoxElement) {
-			Assert.assertTrue(((CheckBoxElement)element).isSelected());
+			Assert.assertTrue(((HtmlElement) element).isElementPresent(0), String.format("Element %s is not present", fieldName));
+			Assert.assertTrue(((CheckBoxElement)element).isSelected(), String.format("Element %s is unchecked", fieldName));
 		} else {
 			throw new ScenarioException(String.format("Element %s is not an CheckBoxElement", fieldName));
 		}
 		return (T)this;
 	}
-	
+
+	@GenericStep
 	public <T extends PageObject> T assertNotChecked(String fieldName) {
 		Element element = getElement(fieldName);
 		if (element instanceof CheckBoxElement) {
-			Assert.assertFalse(((CheckBoxElement)element).isSelected());
+			Assert.assertTrue(((HtmlElement) element).isElementPresent(0), String.format("Element %s is not present", fieldName));
+			Assert.assertFalse(((CheckBoxElement)element).isSelected(), String.format("Element %s is checked", fieldName));
 		} else {
 			throw new ScenarioException(String.format("Element %s is not an CheckBoxElement", fieldName));
 		}
 		return (T)this;
 	}
-	
+
+	@GenericStep
     public <T extends PageObject> T assertTableCellValue(Integer row, Integer column, String fieldName, String value) {
 		Element element = getElement(fieldName);
 		if (element instanceof Table) {
-			Assert.assertEquals(((Table)element).getCell(row, column).getText(), value);
+			try {
+				Assert.assertEquals(((Table)element).getCell(row, column).getText(), value, String.format("Value of cell [%d,%d] in table %s is not %s", row, column, fieldName, value));
+			} catch (WebDriverException e) {
+				Assert.assertTrue(false, "Table or cell not found");
+			}
 		} else {
 			throw new ScenarioException(String.format("Element %s is not an Table element", fieldName));
 		}
 		return (T)this;
     }
-    
+
+	@GenericStep
     public <T extends PageObject> T assertTextPresentInPage(String text) {
     	Assert.assertTrue(isTextPresent(text));
     	return (T)this;
     }
-    
+
+	@GenericStep
     public <T extends PageObject> T assertTextNotPresentInPage(String text) {
     	Assert.assertFalse(isTextPresent(text));
     	return (T)this;
     }
-    
+
+	@GenericStep
     public <T extends PageObject> T assertCookiePresent(String name) {
     	Assert.assertTrue(isCookiePresent(name), "Cookie: {" + name + "} not found.");
     	return (T)this;
     }
-    
+
+	@GenericStep
     public <T extends PageObject> T assertElementCount(String fieldName, int elementCount) {
     	Element element = getElement(fieldName);
     	if (element instanceof HtmlElement) {
@@ -1387,19 +1487,23 @@ public class PageObject extends BasePage implements IPage {
      * @param regexTitle
      * @return
      */
+	@GenericStep
     public <T extends PageObject> T assertPageTitleMatches(String regexTitle) {
     	Assert.assertTrue(getTitle().matches(regexTitle));
     	return (T)this;
     }
 
+	@GenericStep
     public void assertHtmlSource(String text) {
         Assert.assertTrue(getHtmlSource().contains(text), "Text: {" + text + "} not found on page source.");
     }
 
+    @Deprecated
     public void assertKeywordNotPresent(String text) {
         Assert.assertFalse(getHtmlSource().contains(text), "Text: {" + text + "} not found on page source.");
     }
 
+	@GenericStep
     public void assertLocation(String urlPattern) {
         Assert.assertTrue(getLocation().contains(urlPattern), "Pattern: {" + urlPattern + "} not found on page location.");
     }

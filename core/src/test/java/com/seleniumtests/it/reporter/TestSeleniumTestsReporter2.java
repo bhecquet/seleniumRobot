@@ -353,6 +353,28 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	}
 	
 	/**
+	 * Check generic steps are logged
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testGenericSteps() throws Exception {
+		
+		SeleniumTestsContextManager.removeThreadContext();
+		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForGenericSteps"}, ParallelMode.METHODS, new String[] {"testDriver"});
+		
+		// check content of summary report file
+		String mainReportContent = readSummaryFile();
+		
+		Assert.assertTrue(mainReportContent.matches(".*<a href\\='testDriver/TestReport\\.html' info=\"ok\".*?>testDriver</a>.*"));
+
+		String detailedReportContent1 = readTestMethodResultFile("testDriver");
+		
+		// check generic steps are logged
+		Assert.assertTrue(detailedReportContent1.contains("</button> sendKeysToField with args: (textElement, foo, )"));
+		Assert.assertTrue(detailedReportContent1.contains("</button> _reset"));
+	}
+	
+	/**
 	 * Check single test report format when tests have steps
 	 * @throws Exception
 	 */

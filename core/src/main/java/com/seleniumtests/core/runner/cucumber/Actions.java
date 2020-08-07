@@ -2,8 +2,6 @@ package com.seleniumtests.core.runner.cucumber;
 
 import java.io.IOException;
 
-import org.testng.Assert;
-
 import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.uipage.PageObject;
 import com.seleniumtests.util.helper.WaitHelper;
@@ -33,40 +31,53 @@ public class Actions extends Fixture {
 		}
 	}
 	
-	@When("^Write into '(\\w+?)' with (.*)")
-	@Lorsque("^Saisir le champ '(\\w+?)' avec (.*)")
+	@When("^Write into '([\\w.]+?)' with (.*)")
+	@Lorsque("^Saisir le champ '([\\w.]+?)' avec (.*)")
 	public void sendKeysToField(String fieldName, String value) {
-		currentPage.get().sendKeysToField(getElement(fieldName), getValue(value));
+		String element = getElement(fieldName);
+		currentPage.get().sendKeysToField(element, getValue(value));
 	}
 	
-	@When("^Write (\\d+) random characters into '(\\w+?)'")
-	@Lorsque("^Saisir (\\d+) caractères aléatoires dans le champ '(\\w+?)'")
+	@When("^Write password into '([\\w.]+?)' with (.*)")
+	@Lorsque("^Saisir le mot de passe dans le champ '([\\w.]+?)' avec (.*)")
+	public void sendPasswordToField(String fieldName, String password) {
+		String element = getElement(fieldName);
+		currentPage.get().sendKeysToField(element, getValue(password));
+	}
+	
+	@When("^Write (\\d+) random characters into '([\\w.]+?)'")
+	@Lorsque("^Saisir (\\d+) caractères aléatoires dans le champ '([\\w.]+?)'")
 	public void sendRandomKeysToField(Integer charNumber, String fieldName) {
-		currentPage.get().sendRandomKeysToField(charNumber, getElement(fieldName));
+		String element = getElement(fieldName);
+		currentPage.get().sendRandomKeysToField(charNumber, element);
 	}
 	
-	@When("^Clear field '(\\w+?)'")
-	@Lorsque("^Vider le champ '(\\w+?)'")
+	@When("^Clear field '([\\w.]+?)'")
+	@Lorsque("^Vider le champ '([\\w.]+?)'")
 	public void clear(String fieldName) {
-		currentPage.get().clear(getElement(fieldName));
+		String element = getElement(fieldName);
+		currentPage.get().clear(element);
 	}
 
-	@When("^Select in list '(\\w+?)' option (.*)")
-    @Lorsque("^Sélectionner dans la liste '(\\w+?)' l'option : (.*)")
+	@When("^Select in list '([\\w.]+?)' option (.*)")
+    @Lorsque("^Sélectionner dans la liste '([\\w.]+?)' l'option : (.*)")
     public void selectOption(String fieldName, String value) {
-		currentPage.get().selectOption(getElement(fieldName), getValue(value));
+		String element = getElement(fieldName);
+		currentPage.get().selectOption(element, getValue(value));
     }
 
-	@When("^Click on '(\\w+?)'")
-	@Lorsque("^Cliquer sur '(\\w+?)'")
+	@When("^Click on '([\\w.]+?)'")
+	@Lorsque("^Cliquer sur '([\\w.]+?)'")
 	public void click(String fieldName) {
-		currentPage.get().click(getElement(fieldName));
+		String element = getElement(fieldName);
+		currentPage.get().click(element);
 	}
 
-	@When("^Double click on '(\\w+?)'")
-	@Lorsque("^Double cliquer sur '(\\w+?)'")
+	@When("^Double click on '([\\w.]+?)'")
+	@Lorsque("^Double cliquer sur '([\\w.]+?)'")
 	public void doubleClick(String fieldName) {
-		currentPage.get().doubleClick(getElement(fieldName));
+		String element = getElement(fieldName);
+		currentPage.get().doubleClick(element);
 	}
 
 	@When("^Wait (\\d+) ms")
@@ -75,10 +86,11 @@ public class Actions extends Fixture {
 		WaitHelper.waitForMilliSeconds(waitMs);
 	}
 
-	@When("^Click on cell ([0-9]+)x([0-9]+) of table '(\\w+?)'")
-    @Lorsque("^Cliquer sur la cellule ([0-9]+)x([0-9]+) du tableau '(\\w+?)'")
+	@When("^Click on cell ([0-9]+)x([0-9]+) of table '([\\w.]+?)'")
+    @Lorsque("^Cliquer sur la cellule ([0-9]+)x([0-9]+) du tableau '([\\w.]+?)'")
     public void clickTableCell(Integer row, Integer column, String fieldName) {
-		currentPage.get().clickTableCell(row, column, getElement(fieldName));
+		String element = getElement(fieldName);
+		currentPage.get().clickTableCell(row, column, element);
     }
 	
 	@When("^Accept alert")
@@ -93,40 +105,46 @@ public class Actions extends Fixture {
 		currentPage.get().cancelAlert();
 	}
 	
-	@When("^Wait field '(\\w+?)' to be present")
-	@Lorsque("^Attendre que le champ '(\\w+?)' soit présent")
+	@When("^Wait field '([\\w.]+?)' to be present")
+	@Lorsque("^Attendre que le champ '([\\w.]+?)' soit présent")
 	public void waitForPresent(String fieldName) {
-		currentPage.get().waitForPresent(getElement(fieldName));
+		String element = getElement(fieldName);
+		currentPage.get().waitForPresent(element);
 	}
 	
-	@When("^Wait field '(\\w+?)' to be visible")
-	@Lorsque("^Attendre que le champ '(\\w+?)' soit visible")
+	@When("^Wait field '([\\w.]+?)' to be visible")
+	@Lorsque("^Attendre que le champ '([\\w.]+?)' soit visible")
 	public void waitForVisible(String fieldName) {
-		currentPage.get().waitForVisible(getElement(fieldName));
+		String element = getElement(fieldName);
+		currentPage.get().waitForVisible(element);
 	}
 	
-	@When("^Wait field '(\\w+?)' not to be present")
-	@Lorsque("^Attendre que le champ '(\\w+?)' ne soit pas présent")
+	@When("^Wait field '([\\w.]+?)' not to be present")
+	@Lorsque("^Attendre que le champ '([\\w.]+?)' ne soit pas présent")
 	public void waitForNotPresent(String fieldName) {
-		currentPage.get().waitForNotPresent(getElement(fieldName));
+		String element = getElement(fieldName);
+		currentPage.get().waitForNotPresent(element);
 	}
 
-	@When("^Wait field '(\\w+?)' to be invisible")
-	@Lorsque("^Attendre que le champ '(\\w+?)' soit invisible")
+	@When("^Wait field '([\\w.]+?)' to be invisible")
+	@Lorsque("^Attendre que le champ '([\\w.]+?)' soit invisible")
 	public void waitForInvisible(String fieldName) {
-		currentPage.get().waitForInvisible(getElement(fieldName));
+		String element = getElement(fieldName);
+		currentPage.get().waitForInvisible(element);
 	}
 	
-	@When("^Wait field value '(\\w+?)' to be (.*)")
-	@Lorsque("^Attendre que la valeur du champ '(\\w+?)' soit (.*)")
+	@When("^Wait field value '([\\w.]+?)' to be (.*)")
+	@Lorsque("^Attendre que la valeur du champ '([\\w.]+?)' soit (.*)")
 	public void waitForValue(String fieldName, String value) {
-		currentPage.get().waitForValue(getElement(fieldName), getValue(value));
+		String element = getElement(fieldName);
+		currentPage.get().waitForValue(element, getValue(value));
 	}
 	
-	@When("^Wait for cell ([0-9]+)x([0-9]+) of table '(\\w+?)' to be (\\w+)")
-    @Lorsque("^Attendre que la cellule ([0-9]+)x([0-9]+) du tableau '(\\w+?)' contienne (\\w+)")
+	@When("^Wait for cell ([0-9]+)x([0-9]+) of table '([\\w.]+?)' to be (\\w+)")
+    @Lorsque("^Attendre que la cellule ([0-9]+)x([0-9]+) du tableau '([\\w.]+?)' contienne (\\w+)")
     public void waitTableCellValue(Integer row, Integer column, String fieldName, String value) {
-		currentPage.get().waitTableCellValue(row, column, getElement(fieldName), getValue(value));
+		String element = getElement(fieldName);
+		currentPage.get().waitTableCellValue(row, column, element, getValue(value));
     }
 
 	@When("^Switch to new window")
@@ -147,76 +165,88 @@ public class Actions extends Fixture {
     	currentPage.get().switchToWindow(index);
     }
 	
-	@Then("^Assert field '(\\w+?)' to be invisible")
-	@Alors("^Vérifier que le champ '(\\w+?)' soit invisible")
+	@Then("^Assert field '([\\w.]+?)' to be invisible")
+	@Alors("^Vérifier que le champ '([\\w.]+?)' soit invisible")
 	public void assertForInvisible(String fieldName) {
-		currentPage.get().assertForInvisible(getElement(fieldName));
+		String element = getElement(fieldName);
+		currentPage.get().assertForInvisible(element);
 	}
 	
-	@Then("^Assert field '(\\w+?)' to be visible")
-	@Alors("^Vérifier que le champ '(\\w+?)' soit visible")
+	@Then("^Assert field '([\\w.]+?)' to be visible")
+	@Alors("^Vérifier que le champ '([\\w.]+?)' soit visible")
 	public void assertForVisible(String fieldName) {
-		currentPage.get().assertForVisible(getElement(fieldName));
+		String element = getElement(fieldName);
+		currentPage.get().assertForVisible(element);
 	}
 	
-	@Then("^Assert field '(\\w+?)' to be disabled")
-	@Alors("^Vérifier que le champ '(\\w+?)' soit inactif")
+	@Then("^Assert field '([\\w.]+?)' to be disabled")
+	@Alors("^Vérifier que le champ '([\\w.]+?)' soit inactif")
 	public void assertForDisabled(String fieldName) {
-		currentPage.get().assertForDisabled(getElement(fieldName));
+		String element = getElement(fieldName);
+		currentPage.get().assertForDisabled(element);
 	}
 	
-	@Then("^Assert field '(\\w+?)' to be enabled")
-	@Alors("^Vérifier que le champ '(\\w+?)' soit actif")
+	@Then("^Assert field '([\\w.]+?)' to be enabled")
+	@Alors("^Vérifier que le champ '([\\w.]+?)' soit actif")
 	public void assertForEnabled(String fieldName) {
-		currentPage.get().assertForEnabled(getElement(fieldName));
+		String element = getElement(fieldName);
+		currentPage.get().assertForEnabled(element);
 	}
 
-	@Then("^Assert field value '(\\w+?)' to be (.*)")
-	@Alors("^Vérifier que la valeur du champ '(\\w+?)' soit (.*)")
+	@Then("^Assert field value '([\\w.]+?)' to be (.*)")
+	@Alors("^Vérifier que la valeur du champ '([\\w.]+?)' soit (.*)")
 	public void assertForValue(String fieldName, String value) {
-		currentPage.get().assertForValue(getElement(fieldName), getValue(value));
+		String element = getElement(fieldName);
+		currentPage.get().assertForValue(element, getValue(value));
 	}
 	
-	@Then("^Assert field value '(\\w+?)' to be empty")
-	@Alors("^Vérifier que la valeur du champ '(\\w+?)' soit vide")
+	@Then("^Assert field value '([\\w.]+?)' to be empty")
+	@Alors("^Vérifier que la valeur du champ '([\\w.]+?)' soit vide")
 	public void assertForEmptyValue(String fieldName) {
-		currentPage.get().assertForEmptyValue(getElement(fieldName));
+		String element = getElement(fieldName);
+		currentPage.get().assertForEmptyValue(element);
 	}
 	
-	@Then("^Assert field value '(\\w+?)' not to be empty")
-	@Alors("^Vérifier que la valeur du champ '(\\w+?)' soit non vide")
+	@Then("^Assert field value '([\\w.]+?)' not to be empty")
+	@Alors("^Vérifier que la valeur du champ '([\\w.]+?)' soit non vide")
 	public void assertForNonEmptyValue(String fieldName) {
-		currentPage.get().assertForNonEmptyValue(getElement(fieldName));
+		String element = getElement(fieldName);
+		currentPage.get().assertForNonEmptyValue(element);
 	}
 	
-	@Then("^Assert field value '(\\w+?)' matches regex (.*)")
-	@Alors("^Vérifier que la valeur du champ '(\\w+?)' corresponde à la regex (.*)")
+	@Then("^Assert field value '([\\w.]+?)' matches regex (.*)")
+	@Alors("^Vérifier que la valeur du champ '([\\w.]+?)' corresponde à la regex (.*)")
 	public void assertForMatchingValue(String fieldName, String regex) {
-		currentPage.get().assertForMatchingValue(getElement(fieldName), getValue(regex));
+		String element = getElement(fieldName);
+		currentPage.get().assertForMatchingValue(element, getValue(regex));
 	}
 
-	@Then("^Assert selected option in list '(\\w+?)' is (.*)")
-	@Alors("^Vérifier que l'option sélectionnée dans la liste '(\\w+?)' est (.*)")
+	@Then("^Assert selected option in list '([\\w.]+?)' is (.*)")
+	@Alors("^Vérifier que l'option sélectionnée dans la liste '([\\w.]+?)' est (.*)")
     public void assertSelectedOption(String fieldName, String value) {
-		currentPage.get().assertSelectedOption(getElement(fieldName), getValue(value));
+		String element = getElement(fieldName);
+		currentPage.get().assertSelectedOption(element, getValue(value));
     }
 	
-	@Then("^Assert checkbox '(\\w+?)' is checked")
-	@Alors("^Vérifier que la case '(\\w+?)' est cochée")
+	@Then("^Assert checkbox '([\\w.]+?)' is checked")
+	@Alors("^Vérifier que la case '([\\w.]+?)' est cochée")
 	public void assertChecked(String fieldName) {
-		currentPage.get().assertChecked(getElement(fieldName));
+		String element = getElement(fieldName);
+		currentPage.get().assertChecked(element);
 	}
 	
-	@Then("^Assert checkbox '(\\w+?)' is not checked")
-	@Alors("^Vérifier que la case '(\\w+?)' n'est pas cochée")
+	@Then("^Assert checkbox '([\\w.]+?)' is not checked")
+	@Alors("^Vérifier que la case '([\\w.]+?)' n'est pas cochée")
 	public void assertNotChecked(String fieldName) {
-		currentPage.get().assertNotChecked(getElement(fieldName));
+		String element = getElement(fieldName);
+		currentPage.get().assertNotChecked(element);
 	}
 	
-	@Then("^Assert for cell ([0-9]+)x([0-9]+) of table '(\\w+?)' to be (\\w+)")
-	@Alors("^Vérifier que la cellule ([0-9]+)x([0-9]+) du tableau '(\\w+?)' contient (\\w+)")
+	@Then("^Assert for cell ([0-9]+)x([0-9]+) of table '([\\w.]+?)' to be (\\w+)")
+	@Alors("^Vérifier que la cellule ([0-9]+)x([0-9]+) du tableau '([\\w.]+?)' contient (\\w+)")
     public void assertTableCellValue(Integer row, Integer column, String fieldName, String value) {
-		currentPage.get().assertTableCellValue(row, column, getElement(fieldName), getValue(value));
+		String element = getElement(fieldName);
+		currentPage.get().assertTableCellValue(row, column, element, getValue(value));
     }
 
 	@Then("^Assert text present in page (\\w+)")

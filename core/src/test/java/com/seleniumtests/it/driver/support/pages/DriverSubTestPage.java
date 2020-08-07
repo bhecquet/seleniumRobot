@@ -37,6 +37,7 @@ public class DriverSubTestPage extends PageObject {
 
 	public static final FrameElement subIframe = new FrameElement("IFrame", By.name("mySecondIFrame"));
 	public static final TextFieldElement textElement = new TextFieldElement("Text", By.id("textInIFrameWithValue"));
+	public static final TextFieldElement textElementSubPage = new TextFieldElement("Text", By.id("textInIFrameWithValue"));
 	public static final RadioButtonElement radioElement = new RadioButtonElement("Radio", By.id("radioClickIFrame"));
 	public static final CheckBoxElement checkElement = new CheckBoxElement("Check", By.id("checkboxClickIFrame"));
 	public static final ButtonElement button = new ButtonElement("Button", By.id("buttonIFrame"));
