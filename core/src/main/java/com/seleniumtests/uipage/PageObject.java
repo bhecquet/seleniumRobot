@@ -33,6 +33,7 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
@@ -50,7 +51,6 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.remote.UnreachableBrowserException;
 import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.Assert;
 
@@ -77,8 +77,6 @@ import com.seleniumtests.uipage.htmlelements.LinkElement;
 import com.seleniumtests.uipage.htmlelements.SelectList;
 import com.seleniumtests.uipage.htmlelements.Table;
 import com.seleniumtests.util.helper.WaitHelper;
-
-import net.bytebuddy.utility.RandomString;
 
 public class PageObject extends BasePage implements IPage {
 
@@ -1002,7 +1000,7 @@ public class PageObject extends BasePage implements IPage {
 	@GenericStep
 	public <T extends PageObject> T sendRandomKeysToField(Integer charNumber, String fieldName) {
 		Element element = getElement(fieldName);
-		element.sendKeys(RandomString.make(charNumber));
+		element.sendKeys(RandomStringUtils.random(charNumber, true, false));
 		return (T)this;
 	}
 
