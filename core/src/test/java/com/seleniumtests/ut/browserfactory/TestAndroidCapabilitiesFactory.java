@@ -213,6 +213,7 @@ public class TestAndroidCapabilitiesFactory extends GenericTest {
 		MutableCapabilities capa = capaFactory.createCapabilities();
 		
 		Assert.assertEquals(capa.getCapability(CapabilityType.BROWSER_NAME), "");
+		logger.info("app path: " + capa.getCapability("app"));
 		Assert.assertTrue(capa.getCapability("app").toString().contains("/data/core/app.apk"));
 	}
 	

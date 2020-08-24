@@ -710,6 +710,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
      * @return
      */
     private WebElement findSeleniumElement(SearchContext context, ElementInfo elementInfo) {
+    	
     	enterFrame();
     	
 		WebElement seleniumElement;
@@ -1482,22 +1483,46 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     public void waitForInvisibility() {
     	waitForInvisibility(SeleniumTestsContextManager.getThreadContext().getExplicitWaitTimeout());
     }
-
+    
+    /**
+     * Wait element to present using Explicit Waits with timeout in seconds. This method is used for special element
+     * which needs long time to present.
+     * This method is replayed because it may fail if frame is not present at start. The replay is not done if TimeOutException raises (see ReplayAction class)
+     * @param timeout	timeout in seconds. Set a minimal value of 1 sec to avoid not searching for element
+     */
+    @ReplayOnError
     public void waitForPresent(int timeout) {
     	
     	// refresh driver
     	driver = updateDriver();
-		WebElement elt = new WebDriverWait(driver, timeout).ignoring(ConfigurationException.class, ScenarioException.class).until(ExpectedConditionsC.presenceOfElementLocated(this));
-        outlineElement(elt);
+    	
+    	Clock clock = Clock.systemUTC();
+    	Instant end = clock.instant().plusSeconds(Math.max(1, timeout));
+    	
+    	while (end.isAfter(clock.instant())) {
+    		try {
+	    		WebElement elt = new WebDriverWait(driver, 1).ignoring(ConfigurationException.class, ScenarioException.class).until(ExpectedConditionsC.presenceOfElementLocated(this));
+	            outlineElement(elt);
+	    		return;
+    		} catch (TimeoutException e) {
+    		}
+    	}
+    	throw new TimeoutException("Element is not present", new NoSuchElementException(toString()));
     }
     
-
     public void waitFor(int timeout, ExpectedCondition<?> condition) {
     	
-    	// refresh driver
-    	driver = updateDriver();
-    	new WebDriverWait(driver, timeout).ignoring(ConfigurationException.class, ScenarioException.class).until(condition);
-
+    	Clock clock = Clock.systemUTC();
+    	Instant end = clock.instant().plusSeconds(Math.max(1, timeout));
+    	
+    	while (end.isAfter(clock.instant())) {
+    		try {
+    			new WebDriverWait(driver, timeout).ignoring(ConfigurationException.class, ScenarioException.class).until(condition);
+	    		return;
+    		} catch (TimeoutException e) {
+    		}
+    	}
+    	throw new TimeoutException("Element is not present", new NoSuchElementException(toString()));
     }
     
     public void waitForNotPresent(int timeout) {
