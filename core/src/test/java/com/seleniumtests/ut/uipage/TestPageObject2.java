@@ -8,6 +8,7 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.atLeastOnce;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -358,7 +359,7 @@ public class TestPageObject2 extends MockitoTest {
 	public void testSwitchToNewWindow() {
 		when(eventDriver.getWindowHandles()).thenReturn(new HashSet<>(Arrays.asList("123"))).thenReturn(new HashSet<>(Arrays.asList("123", "456")));
 		eventDriver.getCurrentHandles();
-		when(eventDriver.getWindowHandle()).thenReturn("123");
+		when(eventDriver.getWindowHandle()).thenReturn("123").thenReturn("456");
 		page.switchToNewWindow(1);
 		verify(targetLocator).window("456");
 	}
@@ -454,7 +455,7 @@ public class TestPageObject2 extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testWaitForVisibleScreenZone() {
 		page.waitForPresent("screenZone");
-		verify(PageForActions.screenZone).isElementPresent(1000);
+		verify(PageForActions.screenZone, atLeastOnce()).isElementPresent(1000);
 	}
 
 	@Test(groups={"ut"})
@@ -548,7 +549,7 @@ public class TestPageObject2 extends MockitoTest {
 		when(driver.findElement(By.id("text"))).thenReturn(element);
 		when(element.isDisplayed()).thenReturn(true);
 		page.assertForVisible("textField");
-		verify(driver).findElement(By.id("text"));
+		verify(driver, atLeastOnce()).findElement(By.id("text"));
 	}
 	
 	@Test(groups={"ut"}, expectedExceptions = AssertionError.class)
@@ -579,7 +580,7 @@ public class TestPageObject2 extends MockitoTest {
 		when(driver.findElement(By.id("text"))).thenReturn(element);
 		when(element.isDisplayed()).thenReturn(false);
 		page.assertForInvisible("textField");
-		verify(driver).findElement(By.id("text"));
+		verify(driver, atLeastOnce()).findElement(By.id("text"));
 	}
 	
 	@Test(groups={"ut"}, expectedExceptions = AssertionError.class)
@@ -603,7 +604,7 @@ public class TestPageObject2 extends MockitoTest {
 		when(driver.findElement(By.id("text"))).thenReturn(element);
 		when(element.isEnabled()).thenReturn(true);
 		page.assertForEnabled("textField");
-		verify(driver).findElement(By.id("text"));
+		verify(driver, atLeastOnce()).findElement(By.id("text"));
 	}
 	
 	@Test(groups={"ut"}, expectedExceptions = AssertionError.class)
@@ -633,7 +634,9 @@ public class TestPageObject2 extends MockitoTest {
 		when(driver.findElement(By.id("text"))).thenReturn(element);
 		when(element.isEnabled()).thenReturn(true);
 		page.assertForEnabled("textField");
-		verify(driver).findElement(By.id("text"));
+		
+		// check element is searched
+		verify(driver, atLeastOnce()).findElement(By.id("text"));
 	}
 	
 	@Test(groups={"ut"}, expectedExceptions = AssertionError.class)
@@ -641,6 +644,8 @@ public class TestPageObject2 extends MockitoTest {
 		when(driver.findElement(By.id("text"))).thenThrow(new NoSuchElementException("not found"));
 		when(element.isEnabled()).thenReturn(true);
 		page.assertForEnabled("textField");
+		
+		// check element is searched
 		verify(driver).findElement(By.id("text"));
 	}
 	

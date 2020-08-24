@@ -17,6 +17,9 @@
  */
 package com.seleniumtests.ut.uipage;
 
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.mock;
+
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import static org.mockito.ArgumentMatchers.anyBoolean;
@@ -60,15 +63,19 @@ public class TestBasePage extends MockitoTest {
 		SeleniumTestsContextManager.getThreadContext().setBrowser("firefox");
 		
 		PowerMockito.mockStatic(WebUIDriver.class);
-		Mockito.when(WebUIDriver.getWebDriver(anyBoolean())).thenReturn(driver);
-		Mockito.when(WebUIDriver.getWebUIDriver(anyBoolean())).thenReturn(webUiDriver);
+		when(WebUIDriver.getWebDriver(anyBoolean())).thenReturn(driver);
+		when(WebUIDriver.getWebUIDriver(anyBoolean())).thenReturn(webUiDriver);
 		
 		// use this to test abstract class
-		page = Mockito.mock(BasePage.class, Mockito.CALLS_REAL_METHODS);
+		page = mock(BasePage.class, Mockito.CALLS_REAL_METHODS);
 		page.setDriver(driver);
 		
-		Mockito.when(driver.findElement(Mockito.any())).thenReturn(element);
-		Mockito.when(element.getText()).thenReturn("element text");
+		when(driver.findElement(Mockito.any())).thenReturn(element);
+		when(driver.switchTo()).thenReturn(targetLocator);
+		when(targetLocator.alert()).thenReturn(alert);
+		when(alert.getText()).thenReturn("alert text");
+		
+		when(element.getText()).thenReturn("element text");
 
 	}
 
