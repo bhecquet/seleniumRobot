@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.openqa.selenium.By;
-import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 
@@ -33,6 +32,11 @@ public class AngularSelect implements ISelectList {
 			return false;
 		}
 	}
+	
+	@Override
+	public boolean isMultipleWithoutFind() {
+        return parentElement.getAttribute("class").contains("ng-select-multiple");
+    }
 	
 	@Override
 	public List<WebElement> getOptions() {
@@ -75,7 +79,7 @@ public class AngularSelect implements ISelectList {
 		
 		return toReturn;
 	}
-
+	
 	@Override
 	public void deselectByIndex(Integer index) {
 		try {
@@ -190,6 +194,11 @@ public class AngularSelect implements ISelectList {
 			}
 		}
 
+	}
+
+	@Override
+	public WebElement getParentElement() {
+		return parentElement;
 	}
 
 }

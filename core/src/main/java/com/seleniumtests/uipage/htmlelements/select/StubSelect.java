@@ -69,4 +69,9 @@ public class StubSelect implements ISelectList {
 	public void setDeselected(WebElement option) {
 	}
 
+	@Override
+	public WebElement getParentElement() {
+		return null;
+	}
+
 }

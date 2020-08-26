@@ -209,4 +209,9 @@ public class AngularMaterialSelect implements ISelectList {
 
 	}
 
+	@Override
+	public WebElement getParentElement() {
+		return parentElement;
+	}
+
 }
