@@ -70,14 +70,10 @@ public class TestNGResultUtils {
 		ITestNGMethod newMethod = toCopy.getMethod().clone();
 		methodNameField.set(newMethod, name);	
 		newMethod.setDescription(description);
-		
-		ITestResult newTestResult = new TestResult(toCopy.getTestClass(), 
-				toCopy.getInstance(), 
-				newMethod, 
-				toCopy.getThrowable(), 
-				toCopy.getStartMillis(), 
-				toCopy.getEndMillis(), 
-				toCopy.getTestContext());
+
+		ITestResult newTestResult = TestResult.newTestResultFrom((TestResult) toCopy, newMethod, toCopy.getTestContext(), toCopy.getStartMillis());
+		newTestResult.setEndMillis(toCopy.getEndMillis());
+		newTestResult.setThrowable(toCopy.getThrowable());
 
 		newTestResult.setParameters(toCopy.getParameters());
 		for (String attributeName: toCopy.getAttributeNames()) {

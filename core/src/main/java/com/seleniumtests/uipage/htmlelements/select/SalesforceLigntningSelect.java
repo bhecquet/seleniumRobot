@@ -148,4 +148,9 @@ public class SalesforceLigntningSelect implements ISelectList {
 		}
 
 	}
+
+	@Override
+	public WebElement getParentElement() {
+		return parentElement;
+	}
 }

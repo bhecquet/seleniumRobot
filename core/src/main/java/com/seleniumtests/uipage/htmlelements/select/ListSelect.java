@@ -131,4 +131,8 @@ public class ListSelect implements ISelectList {
 		throw new ScenarioException("Cannot deselect for list based select");
 	}
 
+	@Override
+	public WebElement getParentElement() {
+		return parentElement;
+	}
 }

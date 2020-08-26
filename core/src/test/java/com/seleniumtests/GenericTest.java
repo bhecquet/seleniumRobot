@@ -122,7 +122,7 @@ public class GenericTest {
 	 * @throws IllegalAccessException
 	 */
 	public static ITestResult generateResult(final ITestContext testNGCtx, final Class<?> clazz) throws NoSuchMethodException, SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
-		ITestResult testResult = new TestResult();
+		ITestResult testResult = TestResult.newEmptyTestResult();
 		testResult.setParameters(new String[] {"foo", "bar"});
 		
 		XmlSuite suite = new XmlSuite();

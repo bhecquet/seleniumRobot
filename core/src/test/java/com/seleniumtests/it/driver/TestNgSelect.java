@@ -77,7 +77,7 @@ public class TestNgSelect extends GenericMultiBrowserTest {
 	
 	@Test(groups={"it"})
 	public void testSelectByCorrespondingText() {
-		DriverSubAngularTestPage.ngSelectList.selectByCorrespondingText("e Js");
+		DriverSubAngularTestPage.ngSelectList.selectByCorrespondingText("de_Js");
 		Assert.assertEquals(DriverSubAngularTestPage.ngSelectList.getSelectedText(), "Node Js");
 	}
 	
@@ -110,7 +110,7 @@ public class TestNgSelect extends GenericMultiBrowserTest {
 	
 	@Test(groups={"it"})
 	public void testSelectMultipleByCorrespondingText() {
-		DriverSubAngularTestPage.ngSelectMultipleList.selectByValue(new String[] {"Java", "Angular"});
+		DriverSubAngularTestPage.ngSelectMultipleList.selectByCorrespondingText(new String[] {"ava", "gular"});
 		String[] selectedTexts = DriverSubAngularTestPage.ngSelectMultipleList.getSelectedTexts();
 		Assert.assertEquals(selectedTexts.length, 2);
 		Assert.assertEquals(selectedTexts[0], "Java");
@@ -146,7 +146,7 @@ public class TestNgSelect extends GenericMultiBrowserTest {
 	
 	@Test(groups={"it"})
 	public void testDeselectByCorrespondingText() {
-		DriverSubAngularTestPage.ngSelectMultipleList.selectByCorrespondingText(new String[] {"ava", "ular"});
+		DriverSubAngularTestPage.ngSelectMultipleList.selectByCorrespondingText(new String[] {"ava", "gular"});
 		DriverSubAngularTestPage.ngSelectMultipleList.deselectByCorrespondingText("ava");
 		String[] selectedTexts = DriverSubAngularTestPage.ngSelectMultipleList.getSelectedTexts();
 		Assert.assertEquals(selectedTexts.length, 1);

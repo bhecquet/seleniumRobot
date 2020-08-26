@@ -112,4 +112,9 @@ public class NativeSelect implements ISelectList {
 
 	}
 
+	@Override
+	public WebElement getParentElement() {
+		return parentElement;
+	}
+
 }

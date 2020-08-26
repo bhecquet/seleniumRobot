@@ -52,6 +52,7 @@ public class SelectList extends HtmlElement {
 	private SimilarityStrategy strategy = new JaroWinklerStrategy();
 	private StringSimilarityService service = new StringSimilarityServiceImpl(strategy);
 	private ISelectList selectImplementation;
+	protected boolean multiple;
 
 	/**
 	 * Creates a SelectList element which represents either
@@ -123,7 +124,7 @@ public class SelectList extends HtmlElement {
         }
         
         options = selectImplementation.getOptions();
-       
+        multiple = selectImplementation.isMultipleWithoutFind();
     }
 
     /**
@@ -236,11 +237,14 @@ public class SelectList extends HtmlElement {
     	try {
 	        findElement();
 	
-	        String value = element.getAttribute("multiple");
-	        return value != null && !"false".equals(value);
+	        return selectImplementation.isMultipleWithoutFind();
     	} finally {
     		selectImplementation.finalizeAction();
     	}
+    }
+    
+    protected boolean isMultipleSelect() {
+    	return multiple;
     }
     
     /**
@@ -248,11 +252,13 @@ public class SelectList extends HtmlElement {
      */
     @ReplayOnError
     public void deselectAll() {
-    	if (!isMultiple()) {
+    	
+    	List<WebElement> allSelectedOptions = _getAllSelectedOptions();
+    	
+    	if (!isMultipleSelect()) {
             throw new UnsupportedOperationException("You may only deselect all options of a multi-select");
         }
     	
-    	List<WebElement> allSelectedOptions = _getAllSelectedOptions();
         for (WebElement option : allSelectedOptions) {
         	selectImplementation.setDeselected(option);
         }
@@ -260,12 +266,14 @@ public class SelectList extends HtmlElement {
 
     @ReplayOnError
     public void deselectByIndex(final Integer index) {
-    	if (!isMultiple()) {
-            throw new UnsupportedOperationException("You may only deselect options of a multi-select");
-        }
+    	
     	
     	try {
 	    	findElement();
+	    	
+	    	if (!isMultipleSelect()) {
+	            throw new UnsupportedOperationException("You may only deselect options of a multi-select");
+	        }
 	    	selectImplementation.deselectByIndex(index);
     	} finally {
     		selectImplementation.finalizeAction();
@@ -274,12 +282,14 @@ public class SelectList extends HtmlElement {
 
     @ReplayOnError
     public void deselectByText(final String text) {
-    	if (!isMultiple()) {
-            throw new UnsupportedOperationException("You may only deselect all options of a multi-select");
-        }
-    	
+    
     	try {
 	    	findElement();
+	    	
+	    	if (!isMultipleSelect()) {
+	            throw new UnsupportedOperationException("You may only deselect all options of a multi-select");
+	        }
+	    	
 	    	selectImplementation.deselectByText(text);
 			
     	} finally {
@@ -289,12 +299,13 @@ public class SelectList extends HtmlElement {
 
     @ReplayOnError
     public void deselectByValue(final String value) {
-    	if (!isMultiple()) {
-            throw new UnsupportedOperationException("You may only deselect all options of a multi-select");
-        }
-    	
+
     	try {
 	    	findElement();
+	    	
+	    	if (!isMultipleSelect()) {
+	            throw new UnsupportedOperationException("You may only deselect all options of a multi-select");
+	        }
 	    	
 	    	selectImplementation.deselectByValue(value);
 			
@@ -411,12 +422,14 @@ public class SelectList extends HtmlElement {
     
     @ReplayOnError
     public void deselectByCorrespondingText(final String text) {
-    	if (!isMultiple()) {
-            throw new UnsupportedOperationException("You may only deselect all options of a multi-select");
-        }
     	
     	try {
     		findElement();
+    		
+        	if (!isMultipleSelect()) {
+                throw new UnsupportedOperationException("You may only deselect all options of a multi-select");
+            }
+
 	    	double score = 0;
 	    	WebElement optionToSelect = null;
 	    	for (WebElement option : options) {

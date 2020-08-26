@@ -37,7 +37,7 @@ import org.openqa.selenium.WebDriverException;
 import org.testng.IConfigurationListener;
 import org.testng.IExecutionListener;
 import org.testng.IInvokedMethod;
-import org.testng.IInvokedMethodListener2;
+import org.testng.IInvokedMethodListener;
 import org.testng.ISuite;
 import org.testng.ISuiteListener;
 import org.testng.ISuiteResult;
@@ -70,7 +70,7 @@ import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
 import kong.unirest.Unirest;
 
-public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodListener2, ISuiteListener, IExecutionListener, IConfigurationListener {
+public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodListener, ISuiteListener, IExecutionListener, IConfigurationListener {
 	
 	protected static final Logger logger = SeleniumRobotLogger.getLogger(SeleniumRobotTestListener.class);
 	private static ScenarioLogger scenarioLogger = ScenarioLogger.getScenarioLogger(SeleniumRobotTestListener.class);
