@@ -8,16 +8,12 @@ import org.openqa.selenium.support.ui.Select;
 
 import com.seleniumtests.uipage.htmlelements.FrameElement;
 
-public class NativeSelect implements ISelectList {
+public class NativeSelect extends CommonSelectList implements ISelectList {
 
 	private Select select;
-	private List<WebElement> options;
-	private WebElement parentElement;
-	private FrameElement frameElement;
 
 	public NativeSelect(WebElement parentElement, FrameElement frameElement) {
-		this.parentElement = parentElement;
-		this.frameElement = frameElement;
+		super(parentElement, frameElement);
 	}
 	
 	@Override
@@ -110,11 +106,6 @@ public class NativeSelect implements ISelectList {
 	public void setDeselected(WebElement option) {
 		select.deselectByVisibleText(option.getText());
 
-	}
-
-	@Override
-	public WebElement getParentElement() {
-		return parentElement;
 	}
 
 }

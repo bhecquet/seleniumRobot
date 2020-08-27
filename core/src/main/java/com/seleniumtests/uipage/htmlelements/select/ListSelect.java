@@ -10,15 +10,10 @@ import org.openqa.selenium.WebElement;
 import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.uipage.htmlelements.FrameElement;
 
-public class ListSelect implements ISelectList {
-
-	private List<WebElement> options;
-	private WebElement parentElement;
-	private FrameElement frameElement;
+public class ListSelect extends CommonSelectList implements ISelectList {
 
 	public ListSelect(WebElement parentElement, FrameElement frameElement) {
-		this.parentElement = parentElement;
-		this.frameElement = frameElement;
+		super(parentElement, frameElement);
 	}
 
 	@Override
@@ -129,10 +124,5 @@ public class ListSelect implements ISelectList {
 	@Override
 	public void setDeselected(WebElement option) {
 		throw new ScenarioException("Cannot deselect for list based select");
-	}
-
-	@Override
-	public WebElement getParentElement() {
-		return parentElement;
 	}
 }

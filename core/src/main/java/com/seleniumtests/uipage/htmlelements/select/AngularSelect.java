@@ -12,16 +12,12 @@ import com.seleniumtests.uipage.htmlelements.CachedHtmlElement;
 import com.seleniumtests.uipage.htmlelements.FrameElement;
 import com.seleniumtests.uipage.htmlelements.HtmlElement;
 
-public class AngularSelect implements ISelectList {
+public class AngularSelect extends CommonSelectList implements ISelectList {
 
-	protected List<WebElement> options;
-	protected WebElement parentElement;
-	protected FrameElement frameElement;
 	
 
 	public AngularSelect(WebElement parentElement, FrameElement frameElement) {
-		this.parentElement = parentElement;
-		this.frameElement = frameElement;
+		super(parentElement, frameElement);
 	}
 
 	@Override
@@ -194,11 +190,6 @@ public class AngularSelect implements ISelectList {
 			}
 		}
 
-	}
-
-	@Override
-	public WebElement getParentElement() {
-		return parentElement;
 	}
 
 }

@@ -17,6 +17,9 @@
  */
 package com.seleniumtests.it.driver.support.perdriver.testngselect;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+
 import org.openqa.selenium.NoSuchElementException;
 import org.testng.annotations.Test;
 
@@ -66,7 +69,16 @@ public class TestNgSelectChrome extends TestNgSelect {
 	
 	@Test(groups={"it"})
 	public void testSelectMultipleByValue() {
-		super.testSelectMultipleByValue();
+//		super.testSelectMultipleByValue();
+		String s = "http://foo.bar/some/thing.collection?foo=bar";
+		try {
+			new URI("http://foo.bar/some/thing.collection?foo=bar").getPath();
+		} catch (URISyntaxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		s.substring(s.lastIndexOf("/") + 1);
 	}
 	
 	@Test(groups={"it"})

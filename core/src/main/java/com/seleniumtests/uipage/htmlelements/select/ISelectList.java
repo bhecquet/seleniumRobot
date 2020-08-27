@@ -37,10 +37,5 @@ public interface ISelectList {
     
     public void setDeselected(WebElement option);
     
-    public WebElement getParentElement();
-
-	default public boolean isMultipleWithoutFind() {
-		String value = getParentElement().getAttribute("multiple");
-        return value != null && !"false".equals(value);
-	}
+    public boolean isMultipleWithoutFind();
 }
