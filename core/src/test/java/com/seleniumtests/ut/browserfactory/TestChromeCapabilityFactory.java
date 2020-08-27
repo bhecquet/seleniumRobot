@@ -205,8 +205,8 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 
 		// SeleniumTestsContext class adds a browserInfo when binary path is set
 		Map<BrowserType, List<BrowserInfo>> updatedBrowserInfos = new HashMap<>();
-		updatedBrowserInfos.put(BrowserType.CHROME, Arrays.asList(new BrowserInfo(BrowserType.CHROME, "72.0", "", false), 
-																	new BrowserInfo(BrowserType.CHROME, "73.0", "/opt/chrome/bin/chrome", false)));
+		updatedBrowserInfos.put(BrowserType.CHROME, Arrays.asList(new BrowserInfo(BrowserType.CHROME, "84.0", "", false), 
+																	new BrowserInfo(BrowserType.CHROME, "85.0", "/opt/chrome/bin/chrome", false)));
 
 		PowerMockito.when(OSUtility.getInstalledBrowsersWithVersion(false)).thenReturn(updatedBrowserInfos);
 		
