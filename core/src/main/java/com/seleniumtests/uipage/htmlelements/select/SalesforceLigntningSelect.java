@@ -3,26 +3,18 @@ package com.seleniumtests.uipage.htmlelements.select;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.openqa.selenium.By;
-import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 
 import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.uipage.ByC;
 import com.seleniumtests.uipage.htmlelements.FrameElement;
-import com.seleniumtests.uipage.htmlelements.HtmlElement;
 
-public class SalesforceLigntningSelect implements ISelectList {
+public class SalesforceLigntningSelect extends CommonSelectList implements ISelectList {
 	
 
-	protected List<WebElement> options;
-	protected WebElement parentElement;
-	protected FrameElement frameElement;
-
 	public SalesforceLigntningSelect(WebElement parentElement, FrameElement frameElement) {
-		this.parentElement = parentElement;
-		this.frameElement = frameElement;
+		super(parentElement, frameElement);
 	}
 	
 	@Override

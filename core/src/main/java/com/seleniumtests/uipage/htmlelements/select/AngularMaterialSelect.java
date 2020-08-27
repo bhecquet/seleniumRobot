@@ -14,17 +14,13 @@ import com.seleniumtests.uipage.htmlelements.CachedHtmlElement;
 import com.seleniumtests.uipage.htmlelements.FrameElement;
 import com.seleniumtests.uipage.htmlelements.HtmlElement;
 
-public class AngularMaterialSelect implements ISelectList {
+public class AngularMaterialSelect extends CommonSelectList implements ISelectList {
 
-	protected List<WebElement> options;
-	protected WebElement parentElement;
-	protected FrameElement frameElement;
 	private String optionsHolderClassName = null;
 	
 
 	public AngularMaterialSelect(WebElement parentElement, FrameElement frameElement) {
-		this.parentElement = parentElement;
-		this.frameElement = frameElement;
+		super(parentElement, frameElement);
 	}
 
 	@Override
@@ -209,9 +205,5 @@ public class AngularMaterialSelect implements ISelectList {
 
 	}
 
-	@Override
-	public WebElement getParentElement() {
-		return parentElement;
-	}
 
 }

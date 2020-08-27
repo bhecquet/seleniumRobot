@@ -101,9 +101,30 @@
 		<method>void sendKeys(java.lang.CharSequence[])</method>
 		<justification>for #372</justification>
 	</difference>
-
 	
-	
-
+	<difference>
+		<className>**/uipage/htmlelements/select/ISelectList</className>
+		<differenceType>7012</differenceType>
+		<method>boolean isMultipleWithoutFind()</method>
+		<justification>for #368</justification>
+	</difference>
+	<difference>
+		<className>**/uipage/htmlelements/select/*</className>
+		<differenceType>6001</differenceType>
+		<field>frameElement</field>
+		<justification>for #368</justification>
+	</difference>
+	<difference>
+		<className>**/uipage/htmlelements/select/*</className>
+		<differenceType>6001</differenceType>
+		<field>options</field>
+		<justification>for #368</justification>
+	</difference>
+	<difference>
+		<className>**/uipage/htmlelements/select/*</className>
+		<differenceType>6001</differenceType>
+		<field>parentElement</field>
+		<justification>for #368</justification>
+	</difference> 
 	
 </differences>

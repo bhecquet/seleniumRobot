@@ -5,7 +5,17 @@ import java.util.List;
 
 import org.openqa.selenium.WebElement;
 
-public class StubSelect implements ISelectList {
+import com.seleniumtests.uipage.htmlelements.FrameElement;
+
+public class StubSelect extends CommonSelectList implements ISelectList {
+
+	public StubSelect(WebElement parentElement, FrameElement frameElement) {
+		super(parentElement, frameElement);
+	}
+	
+	public StubSelect() {
+		super(null, null);
+	}
 
 	@Override
 	public boolean isApplicable() {
@@ -68,10 +78,4 @@ public class StubSelect implements ISelectList {
 	@Override
 	public void setDeselected(WebElement option) {
 	}
-
-	@Override
-	public WebElement getParentElement() {
-		return null;
-	}
-
 }
