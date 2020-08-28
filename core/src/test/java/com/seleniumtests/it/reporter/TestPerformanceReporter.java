@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.nio.file.Paths;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.annotations.BeforeMethod;
@@ -227,8 +228,8 @@ public class TestPerformanceReporter extends ReporterTest {
 
 		// check that files are present and that they contain no step
 		String detailedReportContent = readTestMethodPerfFile("test2");
-		Assert.assertTrue(detailedReportContent.contains("<system-out><![CDATA[Test skipped]]></system-out>"));
-		Assert.assertFalse(detailedReportContent.contains("<testcase classname"));
+		Assert.assertTrue(detailedReportContent.contains("Test has not started or has been skipped"));
+		Assert.assertEquals(StringUtils.countMatches(detailedReportContent, "<testcase classname"), 1); // only Test end step
 		
 		// check other file contains steps
 		String detailedReportContent2 = readTestMethodPerfFile("test1");

@@ -701,7 +701,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	 * Check if test description made available by TestNG annotation is displayed in summary and detailed report
 	 */
 	@Test(groups={"it"})
-	public void testTestDescription() throws Exception {
+	public void testTestDescription() throws Exception { 
 		
 		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions", "testInError", "testWithException"});
 		
@@ -1242,6 +1242,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		Assert.assertTrue(detailedReportContent.matches(".*<div class=\"message-error\"><div>class java.lang.AssertionError: error</div>"
 								+ "<div class=\"stack-element\"></div>"
 								+ "<div class=\"stack-element\">at com.seleniumtests.it.stubclasses.StubTestClass.testInError\\(StubTestClass.java:\\d+\\)</div>"
+								+ "<div class=\"stack-element\">at java.util.ArrayList.forEach\\(Unknown Source\\)</div>"
 								+ "<div class=\"stack-element\">at com.seleniumtests.it.reporter.ReporterTest.executeSubTest\\(ReporterTest.java:\\d+\\)</div>"
 								+ "<div class=\"stack-element\">at com.seleniumtests.it.reporter.TestSeleniumTestsReporter2.testReportDetailsWithErrors\\(TestSeleniumTestsReporter2.java:\\d+\\)</div>.*"));
 		
