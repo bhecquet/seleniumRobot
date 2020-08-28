@@ -31,6 +31,11 @@ public class TestRetryAnalyzer implements IRetryAnalyzer {
     private Integer count = 0;
     private int maxCount = 2;
 
+
+    public TestRetryAnalyzer() {
+    	maxCount = 2;
+    }
+    
     public TestRetryAnalyzer(int maxRetryCount) {
     	maxCount = maxRetryCount;
     }
