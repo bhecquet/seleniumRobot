@@ -33,7 +33,7 @@ import com.seleniumtests.util.helper.WaitHelper;
 public class StubTestClassForListener2 extends StubTestClassForListenerParent {
 	
 	@BeforeTest
-	public void beforeTest(XmlTest xmlTest) {
+	public void beforeTest2(XmlTest xmlTest) {
 		SeleniumTestsContextManager.getThreadContext().setAttribute("test", xmlTest.getName());
 	}
 	

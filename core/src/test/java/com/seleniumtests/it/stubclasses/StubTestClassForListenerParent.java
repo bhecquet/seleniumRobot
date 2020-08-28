@@ -21,8 +21,6 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeTest;
 import org.testng.xml.XmlTest;
 
-import com.seleniumtests.reporter.logger.TestLogging;
-
 public class StubTestClassForListenerParent extends StubParentClass {
 
 	@BeforeTest

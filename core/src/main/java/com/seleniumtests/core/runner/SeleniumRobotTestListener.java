@@ -47,6 +47,7 @@ import org.testng.ITestResult;
 import org.testng.Reporter;
 import org.testng.internal.ConfigurationMethod;
 import org.testng.internal.TestResult;
+import org.testng.internal.annotations.DisabledRetryAnalyzer;
 
 import com.google.common.collect.Iterables;
 import com.seleniumtests.connectors.selenium.SeleniumRobotVariableServerConnector;
@@ -102,8 +103,8 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 	 */
 	@Override
 	public synchronized void onTestFailure(ITestResult testResult) {
-		if (testResult.getMethod().getRetryAnalyzer() != null) {
-			TestRetryAnalyzer testRetryAnalyzer = (TestRetryAnalyzer) testResult.getMethod().getRetryAnalyzer();
+		if (testResult.getMethod().getRetryAnalyzer(testResult) != null || !(testResult.getMethod().getRetryAnalyzer(testResult) instanceof DisabledRetryAnalyzer)) {
+			TestRetryAnalyzer testRetryAnalyzer = (TestRetryAnalyzer) testResult.getMethod().getRetryAnalyzer(testResult);
 
 			logger.info(testResult.getMethod() + " Failed in " + (testRetryAnalyzer.getCount()) + " times");
 		}		
@@ -529,8 +530,9 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 		
 		SeleniumTestsContextManager.insertThreadContext(method.getTestMethod(), testResult, context);
 		
-    	if (testResult.getMethod().getRetryAnalyzer() == null) {
-    		testResult.getMethod().setRetryAnalyzer(new TestRetryAnalyzer(SeleniumTestsContextManager.getThreadContext().getTestRetryCount()));
+    	if (testResult.getMethod().getRetryAnalyzer(testResult) == null || testResult.getMethod().getRetryAnalyzer(testResult) instanceof DisabledRetryAnalyzer) {
+    		testResult.getMethod().setRetryAnalyzerClass(TestRetryAnalyzer.class);
+    		((TestRetryAnalyzer)testResult.getMethod().getRetryAnalyzer(testResult)).setMaxCount(SeleniumTestsContextManager.getThreadContext().getTestRetryCount());
 		}	
     	
     	// unique method name is the test name plus an index in case DataProvider is used

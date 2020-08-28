@@ -629,3 +629,8 @@ Benefits to execute Selenium IDE tests this way are:
 For specifics about Selenium IDE writing, see §3.14
 - If you've added manual steps (as described in §3.14), add the option `-DmanualTestSteps=true`
 
+## Troubleshooting ##
+
+### Cyclic dependency when executing TestNG Test ###
+
+This may be due to the fact that 2 test configuration methods (seen with @BeforeTest) have the same name when executed in the same TestNG <test> 
