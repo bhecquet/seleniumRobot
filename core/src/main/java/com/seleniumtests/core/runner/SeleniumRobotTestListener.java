@@ -103,7 +103,7 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 	 */
 	@Override
 	public synchronized void onTestFailure(ITestResult testResult) {
-		if (testResult.getMethod().getRetryAnalyzer(testResult) != null || !(testResult.getMethod().getRetryAnalyzer(testResult) instanceof DisabledRetryAnalyzer)) {
+		if (testResult.getMethod().getRetryAnalyzer(testResult) != null && !(testResult.getMethod().getRetryAnalyzer(testResult) instanceof DisabledRetryAnalyzer)) {
 			TestRetryAnalyzer testRetryAnalyzer = (TestRetryAnalyzer) testResult.getMethod().getRetryAnalyzer(testResult);
 
 			logger.info(testResult.getMethod() + " Failed in " + (testRetryAnalyzer.getCount()) + " times");
