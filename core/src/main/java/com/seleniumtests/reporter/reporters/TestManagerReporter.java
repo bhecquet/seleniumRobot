@@ -17,6 +17,7 @@
  */
 package com.seleniumtests.reporter.reporters;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -26,6 +27,7 @@ import org.testng.ITestResult;
 
 import com.seleniumtests.connectors.tms.TestManager;
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.core.utils.TestNGResultUtils;
 
 /**
  * Class for sending test reports to test managers
@@ -42,12 +44,25 @@ public class TestManagerReporter extends CommonReporter implements IReporter {
 
 		if (testManager == null) {
 			return;
-		} else {
-			testManager.login();
-			testManager.recordResult();
-			testManager.recordResultFiles();
-			testManager.logout();
+		} 
+		
+		testManager.login();
+		
+		// Record test method reports for each result which has not already been recorded
+		for (Map.Entry<ITestContext, Set<ITestResult>> entry: resultSet.entrySet()) {
+			for (ITestResult testResult: entry.getValue()) {
+				
+				// do not record twice the same result
+				if (!TestNGResultUtils.isTestManagerReportCreated(testResult)) {
+
+					testManager.recordResult(testResult);
+					testManager.recordResultFiles(testResult);
+				}
+			}
 		}
+
+		testManager.logout();
+
 	}
 
 

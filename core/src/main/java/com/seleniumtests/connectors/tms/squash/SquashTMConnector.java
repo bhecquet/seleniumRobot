@@ -1,8 +1,14 @@
 package com.seleniumtests.connectors.tms.squash;
 
 import org.json.JSONObject;
+import org.testng.ITestResult;
 
 import com.seleniumtests.connectors.tms.TestManager;
+import com.seleniumtests.connectors.tms.squash.entities.Campaign;
+import com.seleniumtests.connectors.tms.squash.entities.Iteration;
+import com.seleniumtests.connectors.tms.squash.entities.IterationTestPlanItem;
+import com.seleniumtests.connectors.tms.squash.entities.TestPlanItemExecution.ExecutionStatus;
+import com.seleniumtests.core.utils.TestNGResultUtils;
 import com.seleniumtests.customexception.ConfigurationException;
 
 public class SquashTMConnector extends TestManager {
@@ -34,20 +40,19 @@ public class SquashTMConnector extends TestManager {
 
 	@Override
 	public void recordResult() {
-		// TODO Auto-generated method stub
+		// Nothing to do
 
 	}
 
 	@Override
 	public void recordResultFiles() {
-		// TODO Auto-generated method stub
+		// Nothing to do
 
 	}
 
 	@Override
 	public void login() {
-		// TODO Auto-generated method stub
-
+		// no login
 	}
 
 	@Override
@@ -75,12 +80,45 @@ public class SquashTMConnector extends TestManager {
 
 	@Override
 	public void logout() {
-		// TODO Auto-generated method stub
+		// no logout
 
 	}
 
 	public SquashTMApi getApi() {
 		return api;
+	}
+
+	@Override
+	public void recordResult(ITestResult testResult) {
+		
+		try {
+			Integer testId = TestNGResultUtils.getTestCaseId(testResult);
+			if (testId == null) {
+				return;
+			}
+	
+			Campaign campaign = api.createCampaign("Selenium " + testResult.getTestName(), "");
+			Iteration iteration = api.createIteration(campaign, TestNGResultUtils.getSeleniumRobotTestContext(testResult).getApplicationVersion());
+			
+			IterationTestPlanItem tpi = api.addTestCaseInIteration(iteration, testId);
+			
+			if (testResult.isSuccess()) {
+				api.setExecutionResult(tpi, ExecutionStatus.SUCCESS);
+			} else if (testResult.getStatus() == 2){ // failed
+				api.setExecutionResult(tpi, ExecutionStatus.FAILURE);
+			} else { // skipped or other reason
+				api.setExecutionResult(tpi, ExecutionStatus.BLOCKED);
+			}
+
+		} catch (Exception e) {
+			logger.error(String.format("Could not record result for test method %s", TestNGResultUtils.getTestName(testResult)), e);
+		}
+	}
+
+	@Override
+	public void recordResultFiles(ITestResult testResult) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

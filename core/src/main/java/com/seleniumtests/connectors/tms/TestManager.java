@@ -20,6 +20,7 @@ package com.seleniumtests.connectors.tms;
 import org.apache.log4j.Logger;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.testng.ITestResult;
 
 import com.seleniumtests.connectors.tms.hpalm.HpAlmConnector;
 import com.seleniumtests.customexception.ConfigurationException;
@@ -37,7 +38,11 @@ public abstract class TestManager {
 	
 	public abstract void recordResult();
 	
+	public abstract void recordResult(ITestResult testResult);
+
 	public abstract void recordResultFiles();
+	
+	public abstract void recordResultFiles(ITestResult testResult);
 	
 	public abstract void login();
 

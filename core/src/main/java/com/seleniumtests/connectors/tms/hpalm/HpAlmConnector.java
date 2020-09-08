@@ -27,6 +27,7 @@ import java.util.Map.Entry;
 import org.apache.commons.io.FileUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.testng.ITestResult;
 import org.zeroturnaround.zip.ZipUtil;
 
 import com.google.common.primitives.Bytes;
@@ -308,6 +309,18 @@ public class HpAlmConnector extends TestManager {
 
 	public String getCurrentRunId() {
 		return currentRunId;
+	}
+
+	@Override
+	public void recordResult(ITestResult testResult) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void recordResultFiles(ITestResult testResult) {
+		// TODO Auto-generated method stub
+		
 	}
 
 	
