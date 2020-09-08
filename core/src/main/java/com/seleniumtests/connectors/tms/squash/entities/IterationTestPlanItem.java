@@ -8,6 +8,7 @@ import kong.unirest.json.JSONObject;
 public class IterationTestPlanItem extends Entity {
 
 	public static final String TEST_PLAN_ITEM_URL = "iterations/%d/test-plan";
+	public static final String TEST_PLAN_ITEM_EXECUTION_URL = "iteration-test-plan-items/%d/executions";
 	
 	public TestCase testCase;
 
@@ -21,6 +22,14 @@ public class IterationTestPlanItem extends Entity {
 		json.put("_type", "iteration-test-plan-item");
 		json.put("id", id);
 		return json;
+	}
+	
+	/**
+	 * Create an execution for this item
+	 * @return
+	 */
+	public TestPlanItemExecution createExecution() {
+		return TestPlanItemExecution.fromJson(getJSonResponse(buildPostRequest(apiRootUrl + String.format(TEST_PLAN_ITEM_EXECUTION_URL, id))));
 	}
 
 	public static IterationTestPlanItem fromJson(JSONObject json) {

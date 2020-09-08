@@ -7,6 +7,8 @@ import com.seleniumtests.connectors.tms.squash.entities.Iteration;
 import com.seleniumtests.connectors.tms.squash.entities.IterationTestPlanItem;
 import com.seleniumtests.connectors.tms.squash.entities.Project;
 import com.seleniumtests.connectors.tms.squash.entities.TestCase;
+import com.seleniumtests.connectors.tms.squash.entities.TestPlanItemExecution;
+import com.seleniumtests.connectors.tms.squash.entities.TestPlanItemExecution.ExecutionStatus;
 import com.seleniumtests.customexception.ConfigurationException;
 
 import kong.unirest.HttpResponse;
@@ -106,6 +108,12 @@ public class SquashTMApi {
 		return Iteration.create(campaign, iterationName);
 	}
 	
+	/**
+	 * Add a test case in the selected iteration if it's not already there. Dataset are not handled
+	 * @param iteration		iteration in which test case will be added
+	 * @param testCaseId	id of the test case (can be found in Squash TM interface)
+	 * @return
+	 */
 	public IterationTestPlanItem addTestCaseInIteration(Iteration iteration, int testCaseId) {
 		
 		for (IterationTestPlanItem testPlanItem: iteration.getAllTestCases()) {
@@ -117,12 +125,13 @@ public class SquashTMApi {
 		return iteration.addTestCase(new TestCase(testCaseId));
 	}
 	
-	public void addResultToExecution(String result, String executionId) {
-		/*http://localhost:8080/squash/api/rest/latest/executions/84
-		
-		{
-			  "_type" : "execution",
-			  "execution_status" : "SUCCESS"
-			}*/
+	/**
+	 * Add an execution result to the test case
+	 * @param testPlanItem	the IterationTestPlanItem which has been executed
+	 * @param result		Execution status of the test
+	 */
+	public void setExecutionResult(IterationTestPlanItem testPlanItem, ExecutionStatus result) {
+		TestPlanItemExecution execution = testPlanItem.createExecution();
+		execution.setResult(result);
 	}
 }
