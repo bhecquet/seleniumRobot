@@ -24,18 +24,24 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.apache.log4j.Logger;
 import org.testng.ITestNGMethod;
 import org.testng.ITestResult;
+import org.testng.annotations.CustomAttribute;
+import org.testng.annotations.Test;
 import org.testng.internal.BaseTestMethod;
 import org.testng.internal.TestResult;
 
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.runner.CucumberScenarioWrapper;
 import com.seleniumtests.reporter.logger.StringInfo;
+import com.seleniumtests.reporter.reporters.CommonReporter;
 import com.seleniumtests.util.StringUtility;
+import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
 public class TestNGResultUtils {
-	
+
+	protected static Logger logger = SeleniumRobotLogger.getLogger(TestNGResultUtils.class);
 
 	private static final String UNIQUE_METHOD_NAME = "uniqueMethodName"; // unique name of the test (in case several tests have the same name)
 	private static final String TEST_CONTEXT = "testContext";
@@ -45,6 +51,7 @@ public class TestNGResultUtils {
 	private static final String SELENIUM_SERVER_REPORT = "seleniumServerReport";// true if the result has already been recorded to the seleniumRobot server
 	private static final String SELENIUM_SERVER_REPORT_TEST_CASE_SESSION_ID = "seleniumServerReportTcsId"; // ID of the TestCaseInSession when snapshot comparison has been done
 	private static final String HTML_REPORT = "htmlReport";				// true if the HTML result has already been generated
+	private static final String TEST_MANAGER_REPORT = "testManagerReport";// true if the result has already been recorded on test manager
 	private static final String CUSTOM_REPORT = "customReport";			// true if the custom result has already been generated
 	private static final String METHOD_NAME = "methodName";				// name of the test method (or the cucumber scenario)
 	private static final String SNAPSHOT_COMPARISON_RESULT = "snapshotComparisonResult";	// the result of snapshot comparison, when enabled
@@ -234,6 +241,25 @@ public class TestNGResultUtils {
     /**
      * 
      * @param testNGResult
+     * @return true if the result has already been recorded to test manager
+     */
+    public static boolean isTestManagerReportCreated(ITestResult testNGResult) {
+    	Boolean alreadyCreated = (Boolean) testNGResult.getAttribute(TEST_MANAGER_REPORT);
+    	if (alreadyCreated == null) {
+    		return false;
+    	} else {
+    		return alreadyCreated;
+    	}
+    }
+    
+    public static void setTestManagereportCreated(ITestResult testNGResult, Boolean recordedToServer) {
+    	testNGResult.setAttribute(TEST_MANAGER_REPORT, recordedToServer);
+    }
+    
+    
+    /**
+     * 
+     * @param testNGResult
      * @return true if the HTML result has already been created for this result
      */
     public static boolean isHtmlReportCreated(ITestResult testNGResult) {
@@ -315,5 +341,23 @@ public class TestNGResultUtils {
     	} 
     	testInfo.put(key, value);
     	testNGResult.setAttribute(TEST_INFO, testInfo);
+    }
+    
+    /**
+     * Returns the ID of the test case for this test result or null if it's not defined
+     * It assumes that test method has been annotated with 'testId' custom attribute {@code @Test(attributes = {@CustomAttribute(name = "testId", values = "12")})} 
+     */
+    public static Integer getTestCaseId(ITestResult testNGResult) {
+    	for (CustomAttribute customAttribute: testNGResult.getMethod().getAttributes()) {
+    		if ("testId".equals(customAttribute.name()) && customAttribute.values().length > 0) {
+    			try {
+    				return Integer.parseInt(customAttribute.values()[0]);
+    			} catch (NumberFormatException e) {
+    				logger.error(String.format("Could not parse %s as int for getting testId of test method %s", customAttribute.values()[0], testNGResult.getMethod().getMethodName()));
+    			}
+    		}
+    	}
+    	return null;
+    	
     }
 }
