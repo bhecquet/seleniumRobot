@@ -172,9 +172,6 @@ public class TestTasks {
 		
 		SeleniumRobotVariableServerConnector variableServer = SeleniumTestsContextManager.getThreadContext().getVariableServer();
 		
-		if (variableServer == null) {
-			throw new ScenarioException("Cannot create or update variable if seleniumRobot server is not connected");
-		}
 		if (reservable && timeToLive <= 0) {
 			throw new ScenarioException("When creating a variable as reservable, a positive timeToLive value MUST be provided");
 		}
@@ -188,9 +185,11 @@ public class TestTasks {
 		}
 		variable.setReservable(reservable);
 		variable.setTimeToLive(timeToLive);
+		if (variableServer != null) {
+			variable = variableServer.upsertVariable(variable, specificToVersion);
+		}
 		
-		TestVariable newVariable = variableServer.upsertVariable(variable, specificToVersion);
-		SeleniumTestsContextManager.getThreadContext().getConfiguration().put(newVariable.getName(), newVariable);
+		SeleniumTestsContextManager.getThreadContext().getConfiguration().put(variable.getName(), variable);
 	}
 	
 	 /**

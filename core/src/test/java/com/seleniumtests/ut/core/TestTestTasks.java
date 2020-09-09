@@ -88,12 +88,16 @@ public class TestTestTasks extends MockitoTest {
 		when(osUtility.getProgramExtension()).thenReturn(".exe");
 	}
 	
-	@Test(groups= {"ut"}, expectedExceptions=ScenarioException.class)
+	/*
+	 * Issue #374: Now, it's allowed to updateParam without server, check param is then available
+	 */
+	@Test(groups= {"ut"})
 	public void testUpdateVariableWithoutServer(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		try {
 			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE, "false");
 			initThreadContext(testNGCtx);
 			TestTasks.createOrUpdateParam("key", "value");
+			Assert.assertEquals(TestTasks.param("key"), "value");
 		} finally {
 			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE);
 		}
