@@ -12,7 +12,12 @@ import com.seleniumtests.uipage.htmlelements.FrameElement;
 
 public class SalesforceLigntningSelect extends CommonSelectList implements ISelectList {
 	
-
+	
+	// for SPI
+	public SalesforceLigntningSelect() {
+		super(null, null);
+	}
+	
 	public SalesforceLigntningSelect(WebElement parentElement, FrameElement frameElement) {
 		super(parentElement, frameElement);
 	}

@@ -1,0 +1,5 @@
+com.seleniumtests.uipage.htmlelements.select.AngularMaterialSelect
+com.seleniumtests.uipage.htmlelements.select.AngularSelect
+com.seleniumtests.uipage.htmlelements.select.ListSelect
+com.seleniumtests.uipage.htmlelements.select.NativeSelect
+com.seleniumtests.uipage.htmlelements.select.SalesforceLigntningSelect

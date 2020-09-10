@@ -14,7 +14,11 @@ import com.seleniumtests.uipage.htmlelements.HtmlElement;
 
 public class AngularSelect extends CommonSelectList implements ISelectList {
 
-	
+
+	// for SPI
+	public AngularSelect() {
+		super(null, null);
+	}
 
 	public AngularSelect(WebElement parentElement, FrameElement frameElement) {
 		super(parentElement, frameElement);
