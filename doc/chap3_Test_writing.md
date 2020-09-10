@@ -293,7 +293,7 @@ The available elements are:
 - LinkElement
 - ImageElement: to handle `<img src=...>` elements
 - RadioButtonElement
-- SelectList: handle `<select>` elements, `<ul>` select styled lists,  `<mat-select>` (from angular-materials) select list and salesforce lightning combobox `<lightning-base-combobox>`
+- SelectList: handle `<select>` elements, `<ul>` select styled lists,  `<mat-select>` (from angular-materials) select list and salesforce lightning combobox `<lightning-base-combobox>`. Other types of selects may be implemented and loaded through SPI, see §16
 - Table
 - TextFieldElement
 
@@ -1025,3 +1025,20 @@ From version 4.15.0, seleniumRobot allows to use an existing appium server. To u
 - Click "Start Session"
 
 You should get the inspector running
+
+### 16 Implement custom SelectList ###
+
+It's possible to implement new SelectList that adapt to your web interface. The purpose of this custom select list is to give seleniumRobot the way to search
+
+- the parent element (e.g: the select main tag)
+- the options elements
+- if the select is a multiple select or not
+- a specific option through text, value, ...
+
+In your test application, create a class that implements `ISelectList`
+The `isApplicable()` method is responsible for saying if, with the given parent, it's the right select type or not.
+For loading to be done, class MUST have an empty constructor
+
+Look at existing selectList in  [https://github.com/bhecquet/seleniumRobot/tree/master/core/src/main/java/com/seleniumtests/uipage/htmlelements/select](https://github.com/bhecquet/seleniumRobot/tree/master/core/src/main/java/com/seleniumtests/uipage/htmlelements/select)
+
+Once class is ready, add a file named `com.seleniumtests.uipage.htmlelements.select.ISelectList` in src/test/resources/META-INF/services/ folder (create if if necessary). In this file, write the fully qualified named of your class. e.g: foo.bar.MySelectList
