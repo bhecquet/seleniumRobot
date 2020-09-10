@@ -18,6 +18,10 @@ public class AngularMaterialSelect extends CommonSelectList implements ISelectLi
 
 	private String optionsHolderClassName = null;
 	
+	// for SPI
+	public AngularMaterialSelect() {
+		super(null, null);
+	}
 
 	public AngularMaterialSelect(WebElement parentElement, FrameElement frameElement) {
 		super(parentElement, frameElement);

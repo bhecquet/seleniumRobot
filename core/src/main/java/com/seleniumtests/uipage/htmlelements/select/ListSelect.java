@@ -12,6 +12,12 @@ import com.seleniumtests.uipage.htmlelements.FrameElement;
 
 public class ListSelect extends CommonSelectList implements ISelectList {
 
+	
+	// for SPI
+	public ListSelect() {
+		super(null, null);
+	}
+	
 	public ListSelect(WebElement parentElement, FrameElement frameElement) {
 		super(parentElement, frameElement);
 	}

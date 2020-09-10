@@ -12,6 +12,12 @@ public class NativeSelect extends CommonSelectList implements ISelectList {
 
 	private Select select;
 
+	
+	// for SPI
+	public NativeSelect() {
+		super(null, null);
+	}
+	
 	public NativeSelect(WebElement parentElement, FrameElement frameElement) {
 		super(parentElement, frameElement);
 	}

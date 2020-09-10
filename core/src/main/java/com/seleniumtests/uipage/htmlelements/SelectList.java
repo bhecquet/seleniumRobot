@@ -17,16 +17,25 @@
  */
 package com.seleniumtests.uipage.htmlelements;
 
+import java.io.IOException;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
+import java.util.ServiceLoader;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
 
+import com.google.common.collect.ImmutableSet;
+import com.google.common.reflect.ClassPath;
+import com.google.common.reflect.ClassPath.ClassInfo;
+import com.seleniumtests.core.runner.cucumber.Fixture;
 import com.seleniumtests.customexception.CustomSeleniumTestsException;
 import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.uipage.ReplayOnError;
@@ -52,6 +61,8 @@ public class SelectList extends HtmlElement {
 	private SimilarityStrategy strategy = new JaroWinklerStrategy();
 	private StringSimilarityService service = new StringSimilarityServiceImpl(strategy);
 	private ISelectList selectImplementation;
+	private static Object lock = new Object();
+	private static List<Class<? extends ISelectList>> selectImplementations;
 	protected boolean multiple;
 
 	/**
@@ -97,9 +108,34 @@ public class SelectList extends HtmlElement {
     public SelectList(final String label, final By by, final FrameElement frame, final Integer index, Integer replayTimeout) {
     	super(label, by, frame, index, replayTimeout);
     }
+    
+    private static List<Class<? extends ISelectList>> searchRelevantImplementation() {
+
+    	List<Class<? extends ISelectList>> selectImplementations = new ArrayList<>();
+		
+		// load via SPI other Select implementations
+		ServiceLoader<ISelectList> selectLoader = ServiceLoader.load(ISelectList.class);
+		Iterator<ISelectList> selectsIterator = selectLoader.iterator();
+		while (selectsIterator.hasNext())
+		{
+			ISelectList selectClass = selectsIterator.next();
+			selectImplementations.add(0, selectClass.getClass());
+		}
+		
+		if (selectImplementations.isEmpty()) {
+			throw new CustomSeleniumTestsException("Could not get list of Select classes");
+		}
+		
+		return selectImplementations;
+    }
 
     @Override
     protected void findElement() {
+    	synchronized (lock) {
+    		if (selectImplementations == null) {
+        		selectImplementations = searchRelevantImplementation();
+        	}
+		}
 
     	// set a default type so that use of selectImplementation can be done
     	selectImplementation = new StubSelect();
@@ -107,7 +143,7 @@ public class SelectList extends HtmlElement {
         super.findElement(true);
         
         // search the right select list handler
-        for (Class<? extends ISelectList> selectClass: Arrays.asList(NativeSelect.class, AngularMaterialSelect.class, ListSelect.class, SalesforceLigntningSelect.class, AngularSelect.class)) {
+        for (Class<? extends ISelectList> selectClass: selectImplementations) {
         	try {
 				ISelectList selectInstance = selectClass.getConstructor(WebElement.class, FrameElement.class).newInstance(element, frameElement);
 				if (selectInstance.isApplicable()) {
