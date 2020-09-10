@@ -153,15 +153,18 @@ SeleniumRobot uses external fonts and javascript so Jenkins must be configured t
 
 e.g: `"default-src 'self' fonts.googleapis.com cdnjs.cloudflare.com fonts.gstatic.com 'unsafe-inline' 'unsafe-eval'"`
 
+### 3 Squash TM through API ###
+
+As of Squash TM 1.21, API is complete enough to allow to create campaigns, iteration, test results directly from it. So it's possible to execute a test from Jenkins and have the results directly sent to Squash TM
   
-### 3 HP ALM ###
+### 4 HP ALM ###
  
 From ALM v11 HP ALM can run seleniumRobot tests using VBScript connector
 
 **WARNING**: This connector is not currently fully fonctional as launch_SeleniumRobot.bat script does not exist anymore
 VBS script should be updated, for example, using a direct java call with JVM options and TestNG parameters clearly identified
 
-#### 3.0 Configure environment to access HP ALM ####
+#### Configure environment to access HP ALM ####
 
 Put connection information into `tmsConnect` parameter : `{'hpAlmServerUrl': 'http://myamlserver:8080', 'hpAlmProject': '12', 'hpAlmDomain': 'mydomain', 'hpAlmUser': 'user', 'hpAlmPassword': 'pass'}`
 This paramater is common to all tests and can be written in TestNG XML file or in a common configuration file loaded by TestNG XML file (param `testConfig`) 
@@ -169,11 +172,11 @@ This paramater is common to all tests and can be written in TestNG XML file or i
 Run information (specific to test running) must be put in `tmsRun` variable. E.g: `{'type': 'hp', 'run': '3'}`
 
  
-#### 3.1 Configure test runner computer ####
+#### Configure test runner computer ####
  
 Create `SELENIUMROBOT_HOME` environment variable, pointing to the path where robot is available (unzipped, presence of launch.bat file)
  
-#### 3.2 Create test on ALM ####
+#### Create test on ALM ####
  
 In ALM, create a VAPI-XP test
 
@@ -189,7 +192,7 @@ Keep 'VBSCript' and click 'Next'
 
 Choose 'Console application' and click 'Finish'
 
-#### 3.3 Test script ####
+#### Test script ####
 
 In Test plan, go to newly created test, "Test script" tab and paste the following content
  	
@@ -234,13 +237,13 @@ In Test plan, go to newly created test, "Test script" tab and paste the followin
 	  End If
 	End Sub
 	
-#### 3.4 test parameters ####
+#### test parameters ####
 	
 In 'parameters' tab, add specific test parameters 
 
 ![](images/alm_parameters.png)
 
-#### 3.5 Run test ####
+#### Run test ####
 
 In test lab, create a test set with this automated test. Double click test instance and configure "execution settings"
 
