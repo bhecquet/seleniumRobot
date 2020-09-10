@@ -119,7 +119,7 @@ public class SelectList extends HtmlElement {
 		while (selectsIterator.hasNext())
 		{
 			ISelectList selectClass = selectsIterator.next();
-			selectImplementations.add(0, selectClass.getClass());
+			selectImplementations.add(selectClass.getClass());
 		}
 		
 		if (selectImplementations.isEmpty()) {
