@@ -31,6 +31,7 @@ import static org.mockito.Mockito.when;
 import java.io.File;
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.function.Function;
 
 import org.mockito.Mock;
 import org.mockito.stubbing.OngoingStubbing;
@@ -68,7 +69,10 @@ import kong.unirest.HttpRequest;
 import kong.unirest.HttpRequestWithBody;
 import kong.unirest.HttpResponse;
 import kong.unirest.JsonNode;
+import kong.unirest.JsonResponse;
 import kong.unirest.MultipartBody;
+import kong.unirest.PagedList;
+import kong.unirest.RequestBodyEntity;
 import kong.unirest.Unirest;
 import kong.unirest.UnirestException;
 import kong.unirest.UnirestInstance;
@@ -182,6 +186,9 @@ public class ConnectorsTest extends MockitoTest {
 		JsonNode json = mock(JsonNode.class);
 		MultipartBody requestMultipartBody = mock(MultipartBody.class);
 		HttpRequestWithBody postRequest = spy(HttpRequestWithBody.class);
+		RequestBodyEntity requestBodyEntity = mock(RequestBodyEntity.class);
+
+		PagedList<JsonNode> pageList = new PagedList<>(); // for asPaged method
 
 		when(request.getUrl()).thenReturn(serverUrl);
 		if (replyData instanceof String) {
@@ -198,12 +205,18 @@ public class ConnectorsTest extends MockitoTest {
 				}
 				JSONObject jsonReply = new JSONObject((String)replyData);
 				when(json.getObject()).thenReturn(jsonReply);
+				
+				pageList = new PagedList<>();
+				pageList.add(jsonResponse);
+				
 			} catch (JSONException e) {}
 		} else if (replyData instanceof File) {
 			when(streamResponse.getStatus()).thenReturn(statusCode);
 			when(streamResponse.getStatusText()).thenReturn("TEXT");
 			when(streamResponse.getBody()).thenReturn((File)replyData);
 		}
+		
+		
 		
 		switch(requestType) {
 			case "GET":
@@ -221,6 +234,9 @@ public class ConnectorsTest extends MockitoTest {
 				when(getRequest.queryString(anyString(), anyBoolean())).thenReturn(getRequest);
 				when(getRequest.queryString(anyString(), any(SessionId.class))).thenReturn(getRequest);
 				when(getRequest.getUrl()).thenReturn(serverUrl);
+				when(getRequest.basicAuth(anyString(), anyString())).thenReturn(getRequest);
+				when(getRequest.headerReplace(anyString(), anyString())).thenReturn(getRequest);
+				when(getRequest.asPaged(any(), (Function<HttpResponse<JsonNode>, String>) any(Function.class))).thenReturn(pageList);
 				return getRequest;
 			case "POST":
 				when(Unirest.post(serverUrl + apiPath)).thenReturn(postRequest);
@@ -233,6 +249,8 @@ public class ConnectorsTest extends MockitoTest {
 				when(postRequest.field(anyString(), anyLong())).thenReturn(requestMultipartBody);
 				when(postRequest.field(anyString(), anyDouble())).thenReturn(requestMultipartBody);
 				when(postRequest.field(anyString(), any(File.class))).thenReturn(requestMultipartBody);
+				when(postRequest.basicAuth(anyString(), anyString())).thenReturn(postRequest);
+				when(postRequest.headerReplace(anyString(), anyString())).thenReturn(postRequest);
 				when(postRequest.queryString(anyString(), anyString())).thenReturn(postRequest);
 				when(postRequest.queryString(anyString(), anyInt())).thenReturn(postRequest);
 				when(postRequest.queryString(anyString(), anyBoolean())).thenReturn(postRequest);
@@ -242,12 +260,16 @@ public class ConnectorsTest extends MockitoTest {
 				when(requestMultipartBody.asString()).thenReturn(response);
 				doReturn(response).when(postRequest).asString();
 				when(postRequest.getUrl()).thenReturn(serverUrl);
+				when(postRequest.body(any(JSONObject.class))).thenReturn(requestBodyEntity);
+				when(requestBodyEntity.asJson()).thenReturn(jsonResponse);
 				when(requestMultipartBody.getUrl()).thenReturn(serverUrl);
 				
 				if ("request".equals(responseType)) {
 					return postRequest;
-				} else {
+				} else if ("body".equals(responseType)) {
 					return requestMultipartBody;
+				} else if ("requestBodyEntity".equals(responseType)) {
+					return requestBodyEntity;
 				}
 
 		}

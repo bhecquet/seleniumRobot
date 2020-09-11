@@ -12,7 +12,7 @@ public class IterationTestPlanItem extends Entity {
 	
 	public TestCase testCase;
 
-	public IterationTestPlanItem(int id, String url, TestCase testCase) {
+	public IterationTestPlanItem(String url, int id, TestCase testCase) {
 		super(url, id, null);
 		this.testCase = testCase;
 	}
@@ -35,8 +35,8 @@ public class IterationTestPlanItem extends Entity {
 	public static IterationTestPlanItem fromJson(JSONObject json) {
 
 		return new IterationTestPlanItem(
-				json.getInt("id"), 
 				json.getJSONObject("_links").getJSONObject("self").getString("href"),
+				json.getInt("id"), 
 				TestCase.fromJson(json.getJSONObject("referenced_test_case"))
 				);
 	}

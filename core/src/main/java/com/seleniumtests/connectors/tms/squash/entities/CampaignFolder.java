@@ -15,22 +15,26 @@ public class CampaignFolder extends Entity {
 	public Project project;
 	public Entity parent;
 
-	public CampaignFolder(String name, int id, String url, Project project, Entity parent) {
+	public CampaignFolder(String url, int id, String name, Project project, Entity parent) {
 		super(url, id, name);
 		this.project = project;
 		this.parent = parent;
 	}
 	
 	public static List<CampaignFolder> getAll() {
-		JSONObject json = getPagedJSonResponse(buildGetRequest(apiRootUrl + CAMPAIGN_FOLDER_URL));
-		
-		List<CampaignFolder> campaignFolders = new ArrayList<>();
-		if (json.has("_embedded")) {
-			for (JSONObject folderJson: (List<JSONObject>)json.getJSONObject("_embedded").getJSONArray("campaign-folders").toList()) {
-				campaignFolders.add(CampaignFolder.fromJson(folderJson));
+		try {
+			JSONObject json = getPagedJSonResponse(buildGetRequest(apiRootUrl + CAMPAIGN_FOLDER_URL));
+			
+			List<CampaignFolder> campaignFolders = new ArrayList<>();
+			if (json.has("_embedded")) {
+				for (JSONObject folderJson: (List<JSONObject>)json.getJSONObject("_embedded").getJSONArray("campaign-folders").toList()) {
+					campaignFolders.add(CampaignFolder.fromJson(folderJson));
+				}
 			}
+			return campaignFolders;
+		} catch (UnirestException e) {
+			throw new ScenarioException("Cannot get all campaign folders", e);
 		}
-		return campaignFolders;
 	}
 
 	public JSONObject asJson() {
@@ -61,9 +65,9 @@ public class CampaignFolder extends Entity {
 			project = Project.fromJson(json.getJSONObject("project"));
 		}
 		
-		return new CampaignFolder(json.getString("name"), 
+		return new CampaignFolder(json.getJSONObject("_links").getJSONObject("self").getString("href"), 
 				json.getInt("id"), 
-				json.getJSONObject("_links").getJSONObject("self").getString("href"),
+				json.getString("name"),
 				project,
 				parent
 				);
@@ -74,20 +78,9 @@ public class CampaignFolder extends Entity {
 	public static CampaignFolder create(Project project, CampaignFolder parent, String campaignFolderName) {
 		try {
 			
-			for (CampaignFolder existingFolder: getAll()) {
-				if (existingFolder.getName().equals(campaignFolderName) 
-						&& (existingFolder.project == null || existingFolder.project != null && existingFolder.project.id == project.id)
-						&& (existingFolder.parent == null 
-							|| parent == null && existingFolder.parent != null && existingFolder.parent instanceof Project
-							|| (parent != null && existingFolder.parent != null && existingFolder.parent instanceof CampaignFolder && existingFolder.parent.id == parent.id))) {
-					return existingFolder;
-				}
-			}
-			
 			JSONObject body = new JSONObject();
 			body.put("_type", "campaign-folder");
 			body.put("name", campaignFolderName);
-//			body.put("project", project.asJson());
 			if (parent != null) {
 				body.put("parent", parent.asJson());
 			} else {
@@ -103,5 +96,17 @@ public class CampaignFolder extends Entity {
 			throw new ScenarioException(String.format("Cannot create campaign %s", campaignFolderName), e);
 		}
 				
+	}
+
+	public static String getCampaignFolderUrl() {
+		return CAMPAIGN_FOLDER_URL;
+	}
+
+	public Project getProject() {
+		return project;
+	}
+
+	public Entity getParent() {
+		return parent;
 	}
 }

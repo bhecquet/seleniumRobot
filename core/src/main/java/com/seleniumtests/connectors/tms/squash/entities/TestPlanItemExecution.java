@@ -17,7 +17,7 @@ public class TestPlanItemExecution extends Entity {
 		BLOCKED
 	}
 	
-	public TestPlanItemExecution(int id, String name, String url) {
+	public TestPlanItemExecution(String url, int id, String name) {
 		super(url, id, name);
 	}
 	
@@ -25,9 +25,9 @@ public class TestPlanItemExecution extends Entity {
 	public static TestPlanItemExecution fromJson(JSONObject json) {
 
 		return new TestPlanItemExecution (
+				json.getJSONObject("_links").getJSONObject("self").getString("href"),
 				json.getInt("id"), 
-				json.getString("name"), 
-				json.getJSONObject("_links").getJSONObject("self").getString("href")
+				json.getString("name")
 				);
 	}
 	
