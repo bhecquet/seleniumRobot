@@ -23,15 +23,19 @@ public class Campaign extends Entity {
 	 * @return
 	 */
 	public static List<Campaign> getAll() {
-		JSONObject json = getPagedJSonResponse(buildGetRequest(apiRootUrl + CAMPAIGNS_URL));
-		
-		List<Campaign> campaigns = new ArrayList<>();
-		if (json.has("_embedded")) {
-			for (JSONObject folderJson: (List<JSONObject>)json.getJSONObject("_embedded").getJSONArray("campaigns").toList()) {
-				campaigns.add(Campaign.fromJson(folderJson));
+		try {
+			JSONObject json = getPagedJSonResponse(buildGetRequest(apiRootUrl + CAMPAIGNS_URL));
+			
+			List<Campaign> campaigns = new ArrayList<>();
+			if (json.has("_embedded")) {
+				for (JSONObject folderJson: (List<JSONObject>)json.getJSONObject("_embedded").getJSONArray("campaigns").toList()) {
+					campaigns.add(Campaign.fromJson(folderJson));
+				}
 			}
+			return campaigns;
+		} catch (UnirestException e) {
+			throw new ScenarioException("Cannot get all campaigns", e);
 		}
-		return campaigns;
 	}
 	
 	/**

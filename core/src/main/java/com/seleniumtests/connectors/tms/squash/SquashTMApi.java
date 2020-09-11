@@ -1,5 +1,7 @@
 package com.seleniumtests.connectors.tms.squash;
 
+import java.util.List;
+
 import com.seleniumtests.connectors.tms.squash.entities.Campaign;
 import com.seleniumtests.connectors.tms.squash.entities.CampaignFolder;
 import com.seleniumtests.connectors.tms.squash.entities.Entity;
@@ -77,11 +79,26 @@ public class SquashTMApi {
 	 */
 	public Campaign createCampaign(String campaignName, String folder) {
 		
-
+		List<CampaignFolder> campaignFolders = CampaignFolder.getAll();
+		
 		// create folder where campaign will be located
 		CampaignFolder parentFolder = null;
 		for (String folderName: folder.split("/")) {
-			parentFolder = CampaignFolder.create(currentProject, parentFolder, folderName);
+			
+			boolean folderExists = false;
+			for (CampaignFolder existingFolder: campaignFolders) {
+				if (existingFolder.getName().equals(folderName) 
+						&& (existingFolder.project == null || existingFolder.project != null && existingFolder.project.getId() == currentProject.getId())
+						&& (existingFolder.parent == null 
+							|| parentFolder == null && existingFolder.parent != null && existingFolder.parent instanceof Project
+							|| (parentFolder != null && existingFolder.parent != null && existingFolder.parent instanceof CampaignFolder && existingFolder.parent.getId() == parentFolder.getId()))) {
+					folderExists = true;
+				}
+			}
+			
+			if (!folderExists) {
+				parentFolder = CampaignFolder.create(currentProject, parentFolder, folderName);
+			}
 		}
 
 		// do not create campaign if it exists

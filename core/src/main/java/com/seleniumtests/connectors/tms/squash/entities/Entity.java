@@ -1,10 +1,8 @@
 package com.seleniumtests.connectors.tms.squash.entities;
 
-import java.util.Iterator;
 import java.util.List;
 
 import com.seleniumtests.customexception.ScenarioException;
-import com.seleniumtests.customexception.SeleniumRobotServerException;
 
 import kong.unirest.GetRequest;
 import kong.unirest.HttpRequest;
@@ -14,8 +12,6 @@ import kong.unirest.JsonNode;
 import kong.unirest.JsonResponse;
 import kong.unirest.PagedList;
 import kong.unirest.Unirest;
-import kong.unirest.UnirestException;
-import kong.unirest.json.JSONException;
 import kong.unirest.json.JSONObject;
 
 public class Entity {
@@ -74,7 +70,7 @@ public class Entity {
 	protected static JSONObject getPagedJSonResponse(HttpRequest<?> request) {
 		JSONObject finalJson = null;
 		
-		PagedList<JsonResponse> result =  request
+		PagedList<JsonNode> result =  request
 				.queryString("size", 20).asPaged(
                         r -> ((HttpRequest) r).asJson(),
                         r -> {
@@ -89,10 +85,10 @@ public class Entity {
 
 		for (Object json: result.toArray()) {
 			if (finalJson == null) {
-				finalJson = ((JsonResponse)json).getBody().getObject();
+				finalJson = ((HttpResponse<JsonNode>)json).getBody().getObject();
 			} else {
-				for (String key: ((JsonResponse)json).getBody().getObject().getJSONObject("_embedded").keySet()) {
-					for (JSONObject entity: (List<JSONObject>)((JsonResponse)json).getBody().getObject().getJSONObject("_embedded").getJSONArray(key).toList()) {
+				for (String key: ((HttpResponse<JsonNode>)json).getBody().getObject().getJSONObject("_embedded").keySet()) {
+					for (JSONObject entity: (List<JSONObject>)((HttpResponse<JsonNode>)json).getBody().getObject().getJSONObject("_embedded").getJSONArray(key).toList()) {
 						finalJson.getJSONObject("_embedded").accumulate(key, entity);
 					}
 				}

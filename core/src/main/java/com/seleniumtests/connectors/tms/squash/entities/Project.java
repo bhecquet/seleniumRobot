@@ -12,7 +12,7 @@ public class Project extends Entity {
 
 	public static final String PROJECTS_URL = "projects";
 
-	public Project(String name, int id, String url) {
+	public Project(String url, int id, String name) {
 		super(url, id, name);
 	}
 
@@ -41,9 +41,10 @@ public class Project extends Entity {
 	}
 
 	public static Project fromJson(JSONObject json) {
-		return new Project(json.getString("name"), 
+		return new Project(
+				json.getJSONObject("_links").getJSONObject("self").getString("href"),
 				json.getInt("id"), 
-				json.getJSONObject("_links").getJSONObject("self").getString("href"));
+				json.getString("name"));
 	}
 	
 	public List<Campaign> getCampaigns() {
