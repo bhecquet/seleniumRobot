@@ -139,7 +139,13 @@ public abstract class IDesktopCapabilityFactory extends ICapabilitiesFactory {
 
         capability.setCapability(CapabilityType.TAKES_SCREENSHOT, true);
         capability.setCapability(CapabilityType.ACCEPT_SSL_CERTS, true);
-        capability.setCapability(CapabilityType.ACCEPT_INSECURE_CERTS, webDriverConfig.isSetAcceptUntrustedCertificates());
+        
+        // ACCEPT_INSECURE_CERTS is not permitted for IE
+        if (webDriverConfig.getBrowserType() != BrowserType.INTERNET_EXPLORER) {
+        	capability.setCapability(CapabilityType.ACCEPT_INSECURE_CERTS, webDriverConfig.isSetAcceptUntrustedCertificates());
+        } else {
+        	capability.setCapability(CapabilityType.ACCEPT_INSECURE_CERTS, false);
+        }
 
         if (webDriverConfig.getBrowserVersion() != null) {
 //            capability.setVersion(webDriverConfig.getBrowserVersion());
