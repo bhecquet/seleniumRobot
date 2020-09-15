@@ -468,7 +468,7 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 	@Test(groups={"ut"})
 	public void testUploadFileNoConnection() throws UnsupportedOperationException, IOException {
 		
-		HttpRequest<HttpRequest> req = createServerMock("POST", SeleniumRobotGridConnector.NODE_TASK_SERVLET, 500, "", "bodyMultipart");
+		HttpRequest<HttpRequest> req = createServerMock("POST", SeleniumRobotGridConnector.NODE_TASK_SERVLET, 500, "", "body");
 		when(req.asString()).thenThrow(new UnirestException("connection error"));
 
 		connector.uploadFileToBrowser("foo", "ABCDE");		
