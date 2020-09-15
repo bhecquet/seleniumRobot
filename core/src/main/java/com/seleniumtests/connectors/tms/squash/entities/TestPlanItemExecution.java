@@ -1,5 +1,8 @@
 package com.seleniumtests.connectors.tms.squash.entities;
 
+import com.seleniumtests.customexception.ScenarioException;
+
+import kong.unirest.UnirestException;
 import kong.unirest.json.JSONObject;
 
 /**
@@ -35,6 +38,10 @@ public class TestPlanItemExecution extends Entity {
 		JSONObject body = new JSONObject();
 		body.put("_type", "execution");
 		body.put("execution_status", result.toString());
-		getJSonResponse(buildPatchRequest(url).body(body));
+		try {
+			getJSonResponse(buildPatchRequest(url).body(body));
+		} catch (UnirestException e) {
+			throw new ScenarioException(String.format("Cannot set result for execution %d", id));
+		}
 	}
 }

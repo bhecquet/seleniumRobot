@@ -11,6 +11,7 @@ import kong.unirest.json.JSONObject;
 public class Project extends Entity {
 
 	public static final String PROJECTS_URL = "projects";
+	public static final String CAMPAIGNS_URL = "/campaigns";
 
 	public Project(String url, int id, String name) {
 		super(url, id, name);
@@ -21,15 +22,19 @@ public class Project extends Entity {
 	 * @return
 	 */
 	public static List<Project> getAll() {
-		JSONObject json = getPagedJSonResponse(buildGetRequest(apiRootUrl + PROJECTS_URL));
-
-		List<Project> projects = new ArrayList<>();
-		if (json.has("_embedded")) {
-			for (JSONObject projectJson: (List<JSONObject>)json.getJSONObject("_embedded").getJSONArray("projects").toList()) {
-				projects.add(Project.fromJson(projectJson));
+		try {
+			JSONObject json = getPagedJSonResponse(buildGetRequest(apiRootUrl + PROJECTS_URL));
+	
+			List<Project> projects = new ArrayList<>();
+			if (json.has("_embedded")) {
+				for (JSONObject projectJson: (List<JSONObject>)json.getJSONObject("_embedded").getJSONArray("projects").toList()) {
+					projects.add(Project.fromJson(projectJson));
+				}
 			}
+			return projects;
+		} catch (UnirestException e) {
+			throw new ScenarioException("Cannot get all projects", e);
 		}
-		return projects;
 	}
 
 	public JSONObject asJson() {
@@ -49,7 +54,15 @@ public class Project extends Entity {
 	
 	public List<Campaign> getCampaigns() {
 		try {
-			return Campaign.getAll();
+			JSONObject json = getPagedJSonResponse(buildGetRequest(url + CAMPAIGNS_URL));
+			
+			List<Campaign> campaigns = new ArrayList<>();
+			if (json.has("_embedded")) {
+				for (JSONObject folderJson: (List<JSONObject>)json.getJSONObject("_embedded").getJSONArray("campaigns").toList()) {
+					campaigns.add(Campaign.fromJson(folderJson));
+				}
+			}
+			return campaigns;
 		} catch (UnirestException e) {
 			throw new ScenarioException(String.format("Cannot get list of campaigns for project %s", name));
 		}
