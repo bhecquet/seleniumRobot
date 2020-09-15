@@ -21,15 +21,19 @@ public class Iteration extends Entity {
 	}
 	
 	public List<IterationTestPlanItem> getAllTestCases() {
-		JSONObject json = getPagedJSonResponse(buildGetRequest(apiRootUrl + String.format(IterationTestPlanItem.TEST_PLAN_ITEM_URL, id)));
-		
-		List<IterationTestPlanItem> testPlanItems = new ArrayList<>();
-		if (json.has("_embedded")) {
-			for (JSONObject tpiJson: (List<JSONObject>)json.getJSONObject("_embedded").getJSONArray("test-plan").toList()) {
-				testPlanItems.add(IterationTestPlanItem.fromJson(tpiJson));
+		try {
+			JSONObject json = getPagedJSonResponse(buildGetRequest(apiRootUrl + String.format(IterationTestPlanItem.TEST_PLAN_ITEM_URL, id)));
+			
+			List<IterationTestPlanItem> testPlanItems = new ArrayList<>();
+			if (json.has("_embedded")) {
+				for (JSONObject tpiJson: (List<JSONObject>)json.getJSONObject("_embedded").getJSONArray("test-plan").toList()) {
+					testPlanItems.add(IterationTestPlanItem.fromJson(tpiJson));
+				}
 			}
+			return testPlanItems;
+		} catch (UnirestException e) {
+			throw new ScenarioException("Cannot get all test cases", e);
 		}
-		return testPlanItems;
 	}
 
 

@@ -29,7 +29,11 @@ public class IterationTestPlanItem extends Entity {
 	 * @return
 	 */
 	public TestPlanItemExecution createExecution() {
-		return TestPlanItemExecution.fromJson(getJSonResponse(buildPostRequest(apiRootUrl + String.format(TEST_PLAN_ITEM_EXECUTION_URL, id))));
+		try {
+			return TestPlanItemExecution.fromJson(getJSonResponse(buildPostRequest(apiRootUrl + String.format(TEST_PLAN_ITEM_EXECUTION_URL, id))));
+		} catch (UnirestException e) {
+			throw new ScenarioException("Cannot create execution", e);
+		}
 	}
 
 	public static IterationTestPlanItem fromJson(JSONObject json) {
