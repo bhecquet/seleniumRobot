@@ -532,7 +532,7 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 		
     	if (testResult.getMethod().getRetryAnalyzer(testResult) == null || testResult.getMethod().getRetryAnalyzer(testResult) instanceof DisabledRetryAnalyzer) {
     		testResult.getMethod().setRetryAnalyzerClass(TestRetryAnalyzer.class);
-    		((TestRetryAnalyzer)testResult.getMethod().getRetryAnalyzer(testResult)).setMaxCount(SeleniumTestsContextManager.getThreadContext().getTestRetryCount());
+    		((TestRetryAnalyzer)testResult.getMethod().getRetryAnalyzer()).setMaxCount(SeleniumTestsContextManager.getThreadContext().getTestRetryCount());
 		}	
     	
     	// unique method name is the test name plus an index in case DataProvider is used
