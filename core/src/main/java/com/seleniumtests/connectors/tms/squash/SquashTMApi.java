@@ -28,7 +28,7 @@ public class SquashTMApi {
 	
 	public SquashTMApi(String url, String user, String password, String projectName) {
 		this.url = url + "/api/rest/latest/";
-		this.url.replace("//", "/"); // in case of double '/' in URL
+		this.url = this.url.replace("//", "/").replace(":/", "://"); // in case of double '/' in URL
 		this.user = user;
 		this.password = password;
 		
@@ -66,11 +66,6 @@ public class SquashTMApi {
 		throw new ConfigurationException(String.format("Cannot find project %s on SquashTM. Maybe user %s has not rights to see it", projectName, user));
 	}
 
-	
-	public void getIterations() {
-		
-	}
-	
 	/**
 	 * Creates a campaign if it does not exist
 	 * @param project		project in which this campaign will be created
@@ -150,5 +145,9 @@ public class SquashTMApi {
 	public void setExecutionResult(IterationTestPlanItem testPlanItem, ExecutionStatus result) {
 		TestPlanItemExecution execution = testPlanItem.createExecution();
 		execution.setResult(result);
+	}
+
+	public Project getCurrentProject() {
+		return currentProject;
 	}
 }

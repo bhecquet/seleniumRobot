@@ -14,11 +14,9 @@ import org.testng.annotations.Test;
 
 import com.seleniumtests.ConnectorsTest;
 import com.seleniumtests.connectors.tms.squash.entities.Campaign;
-import com.seleniumtests.connectors.tms.squash.entities.CampaignFolder;
 import com.seleniumtests.connectors.tms.squash.entities.Iteration;
 import com.seleniumtests.connectors.tms.squash.entities.IterationTestPlanItem;
 import com.seleniumtests.connectors.tms.squash.entities.Project;
-import com.seleniumtests.connectors.tms.squash.entities.TestCase;
 import com.seleniumtests.customexception.ScenarioException;
 
 import kong.unirest.GetRequest;
