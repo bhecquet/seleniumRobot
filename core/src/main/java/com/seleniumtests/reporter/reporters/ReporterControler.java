@@ -39,7 +39,6 @@ import org.testng.ITestContext;
 import org.testng.ITestResult;
 import org.testng.SuiteRunner;
 import org.testng.TestRunner;
-import org.testng.internal.TestResult;
 import org.testng.xml.XmlSuite;
 
 import com.seleniumtests.connectors.selenium.SeleniumRobotSnapshotServerConnector;
@@ -48,7 +47,6 @@ import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.utils.TestNGResultUtils;
 import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.driver.screenshots.SnapshotComparisonBehaviour;
-import com.seleniumtests.driver.screenshots.SnapshotTarget;
 import com.seleniumtests.reporter.logger.TestMessage;
 import com.seleniumtests.reporter.logger.TestMessage.MessageType;
 import com.seleniumtests.reporter.logger.TestStep;
@@ -89,7 +87,7 @@ public class ReporterControler implements IReporter {
 					break;
 				}
 			}
-
+			
 			// change / add test result according to snapshot comparison results
 			if (suiteFinished) {
 				changeTestResultWithSnapshotComparison(suites);
