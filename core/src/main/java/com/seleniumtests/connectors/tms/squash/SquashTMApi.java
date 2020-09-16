@@ -74,11 +74,19 @@ public class SquashTMApi {
 	 */
 	public Campaign createCampaign(String campaignName, String folder) {
 		
+		if (folder == null) {
+			folder = "";
+		}
+		
 		List<CampaignFolder> campaignFolders = CampaignFolder.getAll();
 		
 		// create folder where campaign will be located
 		CampaignFolder parentFolder = null;
 		for (String folderName: folder.split("/")) {
+			
+			if (folderName.isEmpty()) {
+				continue;
+			}
 			
 			boolean folderExists = false;
 			for (CampaignFolder existingFolder: campaignFolders) {
@@ -88,6 +96,8 @@ public class SquashTMApi {
 							|| parentFolder == null && existingFolder.parent != null && existingFolder.parent instanceof Project
 							|| (parentFolder != null && existingFolder.parent != null && existingFolder.parent instanceof CampaignFolder && existingFolder.parent.getId() == parentFolder.getId()))) {
 					folderExists = true;
+					parentFolder = existingFolder;
+					break;
 				}
 			}
 			

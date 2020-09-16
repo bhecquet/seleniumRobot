@@ -13,10 +13,10 @@ import com.seleniumtests.customexception.ConfigurationException;
 
 public class SquashTMConnector extends TestManager {
 	
-	public static final String SQUASH_TM_SERVER_URL = "hpAlmServerUrl";
-	public static final String SQUASH_TM_PASSWORD = "hpAlmPassword";
-	public static final String SQUASH_TM_USER = "hpAlmUser";
-	public static final String SQUASH_TM_PROJECT = "hpAlmProject";
+	public static final String SQUASH_TM_SERVER_URL = "squashServerUrl";
+	public static final String SQUASH_TM_PASSWORD = "squashPassword";
+	public static final String SQUASH_TM_USER = "squashUser";
+	public static final String SQUASH_TM_PROJECT = "squashProject";
 	private String user;
 	private String password;
 	private String serverUrl;
@@ -75,7 +75,7 @@ public class SquashTMConnector extends TestManager {
 		
 		initialized = true;
 
-		api = new SquashTMApi(serverUrl, user, password, project);
+		
 	}
 
 	@Override
@@ -85,6 +85,9 @@ public class SquashTMConnector extends TestManager {
 	}
 
 	public SquashTMApi getApi() {
+		if (api == null) {
+			api = new SquashTMApi(serverUrl, user, password, project);
+		}
 		return api;
 	}
 
@@ -92,22 +95,23 @@ public class SquashTMConnector extends TestManager {
 	public void recordResult(ITestResult testResult) {
 		
 		try {
+			SquashTMApi sapi = getApi();
 			Integer testId = TestNGResultUtils.getTestCaseId(testResult);
 			if (testId == null) {
 				return;
 			}
 	
-			Campaign campaign = api.createCampaign("Selenium " + testResult.getTestName(), "");
-			Iteration iteration = api.createIteration(campaign, TestNGResultUtils.getSeleniumRobotTestContext(testResult).getApplicationVersion());
+			Campaign campaign = sapi.createCampaign("Selenium " + testResult.getTestContext().getName(), "");
+			Iteration iteration = sapi.createIteration(campaign, TestNGResultUtils.getSeleniumRobotTestContext(testResult).getApplicationVersion());
 			
-			IterationTestPlanItem tpi = api.addTestCaseInIteration(iteration, testId);
+			IterationTestPlanItem tpi = sapi.addTestCaseInIteration(iteration, testId);
 			
 			if (testResult.isSuccess()) {
-				api.setExecutionResult(tpi, ExecutionStatus.SUCCESS);
+				sapi.setExecutionResult(tpi, ExecutionStatus.SUCCESS);
 			} else if (testResult.getStatus() == 2){ // failed
-				api.setExecutionResult(tpi, ExecutionStatus.FAILURE);
+				sapi.setExecutionResult(tpi, ExecutionStatus.FAILURE);
 			} else { // skipped or other reason
-				api.setExecutionResult(tpi, ExecutionStatus.BLOCKED);
+				sapi.setExecutionResult(tpi, ExecutionStatus.BLOCKED);
 			}
 
 		} catch (Exception e) {
