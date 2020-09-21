@@ -23,6 +23,7 @@ import org.json.JSONObject;
 import org.testng.ITestResult;
 
 import com.seleniumtests.connectors.tms.hpalm.HpAlmConnector;
+import com.seleniumtests.connectors.tms.squash.SquashTMConnector;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
@@ -51,6 +52,7 @@ public abstract class TestManager {
 	public abstract void logout();
 	
 	public static TestManager getInstance(JSONObject configString) {
+
 		String type;
 		try {
 			type = configString.getString("type");
@@ -60,8 +62,10 @@ public abstract class TestManager {
 		
 		if ("hp".equals(type)) {
 			return new HpAlmConnector(configString);
+		} else if ("squash".equals(type)) {
+			return new SquashTMConnector();
 		} else {
-			throw new ConfigurationException(String.format("TestManager type [%s] is unknown, valid values are: ['hp']", type));
+			throw new ConfigurationException(String.format("TestManager type [%s] is unknown, valid values are: ['hp', 'squash']", type));
 		}
 	}
 
