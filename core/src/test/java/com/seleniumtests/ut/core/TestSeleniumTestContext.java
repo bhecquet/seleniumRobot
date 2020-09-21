@@ -1003,54 +1003,66 @@ public class TestSeleniumTestContext extends GenericTest {
 	}
 	
 	@Test(groups="ut context")
-	public void testTms(final ITestContext testNGCtx, final XmlTest xmlTest) {
+	public void testTmsType(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		initThreadContext(testNGCtx);
-		SeleniumTestsContextManager.getThreadContext().setTmsRun("{'type':'hp', 'run':1}");
-		Assert.assertNotNull(SeleniumTestsContextManager.getThreadContext().getTmsRun());
-		Assert.assertTrue(SeleniumTestsContextManager.getThreadContext().getTmsRun() instanceof JSONObject);
-		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getTmsRun().length(), 2);
-	}
-	@Test(groups="ut context", expectedExceptions=ConfigurationException.class)
-	public void testWrongType(final ITestContext testNGCtx, final XmlTest xmlTest) throws NoSuchMethodException, SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
-		initThreadContext(testNGCtx);
-		SeleniumTestsContextManager.getThreadContext().setTmsRun("{'type':'sonar'}");
-		SeleniumTestsContextManager.getThreadContext().configureContext(GenericTest.generateResult(testNGCtx, getClass()));
-	}
-	@Test(groups="ut context", expectedExceptions=ConfigurationException.class)
-	public void testWrongFormat(final ITestContext testNGCtx, final XmlTest xmlTest) {
-		initThreadContext(testNGCtx);
-		SeleniumTestsContextManager.getThreadContext().setTmsRun("hp");
+		SeleniumTestsContextManager.getThreadContext().setTmsType("squash");
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getTmsType(), "squash");
 	}
 	@Test(groups="ut context")
-	public void testTmsNull(final ITestContext testNGCtx, final XmlTest xmlTest) {
+	public void testTmsTypeNull(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		initThreadContext(testNGCtx);
-		SeleniumTestsContextManager.getThreadContext().setTmsRun(null);
-		Assert.assertNotNull(SeleniumTestsContextManager.getThreadContext().getTmsRun());
-		Assert.assertTrue(SeleniumTestsContextManager.getThreadContext().getTmsRun() instanceof JSONObject);
-		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getTmsRun().length(), 0);
+		SeleniumTestsContextManager.getThreadContext().setTmsType(null);
+		Assert.assertNull(SeleniumTestsContextManager.getThreadContext().getTmsType());
+	}
+	@Test(groups="ut context")
+	public void testTmsUrl(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setTmsUrl("http://foo.bar");
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getTmsUrl(), "http://foo.bar");
+	}
+	@Test(groups="ut context")
+	public void testTmsUrlNull(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setTmsUrl(null);
+		Assert.assertNull(SeleniumTestsContextManager.getThreadContext().getTmsUrl());
+	}
+	@Test(groups="ut context")
+	public void testTmsUser(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setTmsUser("user");
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getTmsUser(), "user");
+	}
+	@Test(groups="ut context")
+	public void testTmsUserNull(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setTmsUser(null);
+		Assert.assertNull(SeleniumTestsContextManager.getThreadContext().getTmsUser());
+	}
+	@Test(groups="ut context")
+	public void testTmsPassword(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setTmsPassword("pwd");
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getTmsPassword(), "pwd");
+	}
+	@Test(groups="ut context")
+	public void testTmsPasswordNull(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setTmsPassword(null);
+		Assert.assertNull(SeleniumTestsContextManager.getThreadContext().getTmsPassword());
+	}
+	@Test(groups="ut context")
+	public void testTmsProject(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setTmsProject("project");
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getTmsProject(), "project");
+	}
+	@Test(groups="ut context")
+	public void testTmsProjectNull(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setTmsProject(null);
+		Assert.assertNull(SeleniumTestsContextManager.getThreadContext().getTmsProject());
 	}
 	
-	@Test(groups="ut context")
-	public void testTmsConnect(final ITestContext testNGCtx, final XmlTest xmlTest) {
-		initThreadContext(testNGCtx);
-		SeleniumTestsContextManager.getThreadContext().setTmsConnect("{'user':'hp', password': 'hp'}");
-		Assert.assertNotNull(SeleniumTestsContextManager.getThreadContext().getTmsConnect());
-		Assert.assertTrue(SeleniumTestsContextManager.getThreadContext().getTmsConnect() instanceof JSONObject);
-		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getTmsConnect().length(), 2);
-	}
-	@Test(groups="ut context", expectedExceptions=ConfigurationException.class)
-	public void testWrongFormatConnect(final ITestContext testNGCtx, final XmlTest xmlTest) {
-		initThreadContext(testNGCtx);
-		SeleniumTestsContextManager.getThreadContext().setTmsConnect("hp");
-	}
-	@Test(groups="ut context")
-	public void testTmsConnectNull(final ITestContext testNGCtx, final XmlTest xmlTest) {
-		initThreadContext(testNGCtx);
-		SeleniumTestsContextManager.getThreadContext().setTmsRun(null);
-		Assert.assertNotNull(SeleniumTestsContextManager.getThreadContext().getTmsConnect());
-		Assert.assertTrue(SeleniumTestsContextManager.getThreadContext().getTmsConnect() instanceof JSONObject);
-		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getTmsConnect().length(), 0);
-	}
 	
 	@Test(groups="ut context")
 	public void testNewCommandTimeout(final ITestContext testNGCtx, final XmlTest xmlTest) {

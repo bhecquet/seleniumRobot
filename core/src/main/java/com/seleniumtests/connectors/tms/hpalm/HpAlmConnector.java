@@ -76,7 +76,7 @@ public class HpAlmConnector extends TestManager {
 		
 		// check configuration
 		try {
-			currentRunId = Integer.toString(configString.getInt("run"));
+			currentRunId = Integer.toString(configString.getInt("tmsRun"));
 		} catch (JSONException e) {
 			throw new ConfigurationException("Test manager configuration does not contain 'run' parameter");
 		}

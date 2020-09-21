@@ -173,8 +173,11 @@ Params for mobile testing
 | archiveToFile				| null		| If not specified, no archiving will be done. Else, provide a zip file path and the whole content of `outputDirectory` will be zipped to this file in case archive is enabled |
 | archive					| never		| If `always` / `true`, always archive results to `archiveToFile` file. Other possible values are: `onSuccess` (archive when all tests are OK) and `onError` (archive when at least 1 test is KO) and `onSkip` (archive when at least 1 test is skipped). Multiple values can be specified if separated by comma. |
 | keepAllResults			| false		| By default, when a test fails and is retried, the failed test data are overwritten. If true, will keep all result even if test is retried, allowing to analyze them |
-| tmsRun					| null		| Configuration string (JSON format) for identifying test that is run in test management system. E.g: {'type': 'hp', 'run': '3'} |
-| tmsConnect				| null		| Configuration string (JSON format) for test management system if you plan to use it. E.g: {'hpAlmServerUrl': 'http://myamlserver:8080', 'hpAlmProject': '12', 'hpAlmDomain': 'mydomain', 'hpAlmUser': 'user', 'hpAlmPassword': 'pass'}  |
+| tmsUrl					| null		| URL of the test manager  (e.g: Squash TM http://<squash_host>:<squash_port>) |
+| tmsUser				| null		| User which will access Test manager  |
+| tmsPassword			| null		| password of the user which will access Test Manager  |
+| tmsType				| null		| Type of the Test Manager ('squash' or 'hp')  |
+| tmsProject				| null		| The project to which this test application is linked in Test manager   |
 | optimizeReports			| false		| If true, compress HTML, get HTML resources from internet so that logs are smaller |
 | manualTestSteps			| false		| If true, it's possible to add test steps in Test and Page Object (`addTest("my step name")`). An error will be raised if manual steps are added when automatic steps are enabled |
 | maskPassword 				| true		| Whether seleniumRobot should detect passwords in method calls and mask them in reports | 

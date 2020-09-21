@@ -31,7 +31,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
-import org.json.JSONException;
 import org.json.JSONObject;
 import org.openqa.selenium.PageLoadStrategy;
 import org.openqa.selenium.Platform;
@@ -148,6 +147,12 @@ public class SeleniumTestsContext {
 
     public static final String TEST_ENTITY = "testEntity";						// Jamais utilisé
 
+    public static final String TMS_URL = "tmsUrl";								// URL of the test manager  (e.g: Squash TM http://<squash_host>:<squash_port>)
+    public static final String TMS_USER = "tmsUser";							// User which will access Test manager
+    public static final String TMS_PASSWORD = "tmsPassword";					// password of the user which will access Test Manager
+    public static final String TMS_PROJECT = "tmsProject";						// The project to which this test application is linked in Test manager    
+    public static final String TMS_TYPE = "tmsType";							// Type of the Test Manager ('squash' or 'hp')
+    
     public static final String CAPTURE_SNAPSHOT = "captureSnapshot";
     public static final String CAPTURE_NETWORK = "captureNetwork";
     public static final String VIDEO_CAPTURE = "captureVideo";
@@ -176,9 +181,7 @@ public class SeleniumTestsContext {
     public static final String REPORTER_PLUGIN_CLASSES = "reporterPluginClasses";	// comma-seperated list of classes to call when a custom reporter needs to be added
 
     public static final String TEST_TYPE = "testType";							// configured automatically
-    public static final String TMS_RUN = "tmsRun";									// option for configuring test (from test management system point of view) currently running, like HP ALM or Squash TM
-    public static final String TMS_CONNECT = "tmsConnect";						// option for configuring test management system, like HP ALM or Squash TM (url, user, password, ...)
-    
+
     public static final String CUCUMBER_TESTS = "cucumberTests";				// liste des tests en mode cucumber
     public static final String CUCUMBER_TAGS = "cucumberTags";					// liste des tags cucumber
     public static final String TEST_ENV = "env";								// environnement de test pour le SUT. Permet d'accéder aux configurations spécifiques du fichier env.ini
@@ -252,8 +255,6 @@ public class SeleniumTestsContext {
 	public static final int DEFAULT_WEB_SESSION_TIMEOUT = 90000;
 	public static final int DEFAULT_TEST_RETRY_COUNT = 2;
 	public static final String DEFAULT_SELENIUMROBOTSERVER_URL = null;
-	public static final JSONObject DEFAULT_TMS_RUN = new JSONObject();
-	public static final JSONObject DEFAULT_TMS_CONNECT = new JSONObject();
 	public static final ProxyType DEFAULT_WEB_PROXY_TYPE = ProxyType.AUTODETECT;
 	public static final boolean DEFAULT_OPTIMIZE_REPORTS = false;
 	public static final ArchiveMode DEFAULT_ARCHIVE= ArchiveMode.NEVER;
@@ -261,6 +262,8 @@ public class SeleniumTestsContext {
 	public static final String DEFAULT_NODE_TAGS = "";
 	public static final String DEFAULT_DEBUG = "none";
 	public static final String DEFAULT_AUTOMATION_NAME = "Appium";
+	public static final String DEFAULT_TMS_URL = null;
+	public static final String DEFAULT_TMS_TYPE = null;
 	public static final ElementInfo.Mode DEFAULT_ADVANCED_ELEMENT_SEARCH = ElementInfo.Mode.FALSE;
     
     public static final int DEFAULT_REPLAY_TIME_OUT = 30;
@@ -347,6 +350,12 @@ public class SeleniumTestsContext {
         setSeleniumRobotServerRecordResults(getBoolValueForTest(SELENIUMROBOTSERVER_RECORD_RESULTS, System.getProperty(SELENIUMROBOTSERVER_RECORD_RESULTS)));
         setSeleniumRobotServerVariableOlderThan(getIntValueForTest(SELENIUMROBOTSERVER_VARIABLES_OLDER_THAN, System.getProperty(SELENIUMROBOTSERVER_VARIABLES_OLDER_THAN)));
         
+        setTmsType(getValueForTest(TMS_TYPE, System.getProperty(TMS_TYPE)));
+        setTmsUrl(getValueForTest(TMS_URL, System.getProperty(TMS_URL)));
+        setTmsUser(getValueForTest(TMS_USER, System.getProperty(TMS_USER)));
+        setTmsPassword(getValueForTest(TMS_PASSWORD, System.getProperty(TMS_PASSWORD)));
+        setTmsProject(getValueForTest(TMS_PROJECT, System.getProperty(TMS_PROJECT)));
+        
         setWebDriverGrid(getValueForTest(WEB_DRIVER_GRID, System.getProperty(WEB_DRIVER_GRID)));
         setRunMode(getValueForTest(RUN_MODE, System.getProperty(RUN_MODE)));   
         setNodeTags(getValueForTest(NODE_TAGS, System.getProperty(NODE_TAGS)));   
@@ -408,8 +417,6 @@ public class SeleniumTestsContext {
         setTestRetryCount(getIntValueForTest(TEST_RETRY_COUNT, System.getProperty(TEST_RETRY_COUNT)));
 
         setWebDriverListener(getValueForTest(WEB_DRIVER_LISTENER, System.getProperty(WEB_DRIVER_LISTENER)));
-        setTmsRun(getValueForTest(TMS_RUN, System.getProperty(TMS_RUN)));
-        setTmsConnect(getValueForTest(TMS_CONNECT, System.getProperty(TMS_CONNECT)));
 
         setAppiumServerUrl(getValueForTest(APPIUM_SERVER_URL, System.getProperty(APPIUM_SERVER_URL)));
         setDeviceName(getValueForTest(DEVICE_NAME, System.getProperty(DEVICE_NAME)));
@@ -923,12 +930,26 @@ public class SeleniumTestsContext {
     }
 	
 	public TestManager initTestManager() {
-		if (getTmsRun() != null && getTmsRun().length() > 0) {
-			TestManager tms = TestManager.getInstance(getTmsRun());
+		if (getTmsType() != null && getTmsUrl() != null) {
 			
-			if (getTmsConnect() != null) {
-				tms.init(getTmsConnect());
+			// build configuration
+			JSONObject jsonConfig = new JSONObject();
+			jsonConfig.put(TMS_TYPE, getTmsType());
+			jsonConfig.put(TMS_URL, getTmsUrl());
+			jsonConfig.put(TMS_USER, getTmsUser());
+			jsonConfig.put(TMS_PASSWORD, getTmsPassword());
+			jsonConfig.put(TMS_PROJECT, getTmsProject());
+			
+			// add non standard configurations
+			for (String key: getConfiguration().keySet()) {
+				if (key.startsWith("tms")) {
+					jsonConfig.put(key, getConfiguration().get(key).getValue());
+				}
 			}
+			
+			TestManager tms = TestManager.getInstance(jsonConfig);
+			
+			tms.init(jsonConfig);
 			return tms;
 		}
 		return null;
@@ -1073,6 +1094,26 @@ public class SeleniumTestsContext {
 
     public String getDPTagsInclude() {
         return (String) getAttribute(DP_TAGS_INCLUDE);
+    }
+    
+    public String getTmsType() {
+    	return (String) getAttribute(TMS_TYPE);
+    }
+    
+    public String getTmsUrl() {
+    	return (String) getAttribute(TMS_URL);
+    }
+    
+    public String getTmsUser() {
+    	return (String) getAttribute(TMS_USER);
+    }
+    
+    public String getTmsPassword() {
+    	return (String) getAttribute(TMS_PASSWORD);
+    }
+    
+    public String getTmsProject() {
+    	return (String) getAttribute(TMS_PROJECT);
     }
     
     @SuppressWarnings("unchecked")
@@ -1330,14 +1371,6 @@ public class SeleniumTestsContext {
 
     public String getWebBrowserVersion() {
         return (String) getAttribute(BROWSER_VERSION);
-    }
-    
-    public JSONObject getTmsRun() {
-    	return (JSONObject) getAttribute(TMS_RUN);
-    }
-    
-    public JSONObject getTmsConnect() {
-    	return (JSONObject) getAttribute(TMS_CONNECT);
     }
 
     public List<String> getWebDriverGrid() {
@@ -1804,30 +1837,32 @@ public class SeleniumTestsContext {
     	setAttribute(TEST_VARIABLES, variables);
     }
     
-    public void setTmsRun(final String tms) {
-    	if (tms == null) {
-    		setAttribute(TMS_RUN, DEFAULT_TMS_RUN);
+    public void setTmsUrl(String url) {
+    	if (url != null) {
+    		setAttribute(TMS_URL, url);
     	} else {
-	    	try {
-	    		JSONObject tmsJson = new JSONObject(tms);
-	    		setAttribute(TMS_RUN, tmsJson);
-	    	} catch (JSONException e) {
-	    		throw new ConfigurationException("tms option must have the JSON format like {'type': 'hp', 'run': '3'}");
-	    	}
+    		setAttribute(TMS_URL, DEFAULT_TMS_URL);
     	}
     }
     
-    public void setTmsConnect(final String tms) {
-    	if (tms == null) {
-    		setAttribute(TMS_CONNECT, DEFAULT_TMS_CONNECT);
+    public void setTmsType(String type) {
+    	if (type != null) {
+    		setAttribute(TMS_TYPE, type);
     	} else {
-    		try {
-    			JSONObject tmsJson = new JSONObject(tms);
-    			setAttribute(TMS_CONNECT, tmsJson);
-    		} catch (JSONException e) {
-    			throw new ConfigurationException("tms option must have the JSON format like {'hpAlmServerUrl': 'http://myamlserver:8080', 'hpAlmProject': '12', 'hpAlmDomain': 'mydomain', 'hpAlmUser': 'user', 'hpAlmPassword': 'pass'}");
-    		}
+    		setAttribute(TMS_TYPE, DEFAULT_TMS_TYPE);
     	}
+    }
+    
+    public void setTmsUser(String user){
+    	setAttribute(TMS_USER, user);
+    }
+    
+    public void setTmsPassword(String password){
+    	setAttribute(TMS_PASSWORD, password);
+    }
+    
+    public void setTmsProject(String project){
+    	setAttribute(TMS_PROJECT, project);
     }
     
     public void setRunMode(String runMode) {

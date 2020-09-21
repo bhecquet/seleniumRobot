@@ -156,6 +156,17 @@ e.g: `"default-src 'self' fonts.googleapis.com cdnjs.cloudflare.com fonts.gstati
 ### 3 Squash TM through API ###
 
 As of Squash TM 1.21, API is complete enough to allow to create campaigns, iteration, test results directly from it. So it's possible to execute a test from Jenkins and have the results directly sent to Squash TM
+
+#### Enable Squash TM usage ####
+
+Use parameters:
+
+- `tmsType` => 'squash'
+- `tmsUrl` => url of squash server. (e.g: http://localhost:8080/squash)
+- `tmsUser` => user to connect 
+- `tmsPassword` => password used to connect
+- `tmsProject`=> project to which these tests belong
+
   
 ### 4 HP ALM ###
  
@@ -166,10 +177,18 @@ VBS script should be updated, for example, using a direct java call with JVM opt
 
 #### Configure environment to access HP ALM ####
 
-Put connection information into `tmsConnect` parameter : `{'hpAlmServerUrl': 'http://myamlserver:8080', 'hpAlmProject': '12', 'hpAlmDomain': 'mydomain', 'hpAlmUser': 'user', 'hpAlmPassword': 'pass'}`
+- `tmsType` => 'hp'
+- `tmsUrl` => url of ALM server. (e.g: http://myamlserver:8080)
+- `tmsUser` => user to connect 
+- `tmsPassword` => password used to connect
+- `tmsProject`=> project to which these tests belong
+- `tmsDomain` => Domain of the project
+- `tmsRun` => id of the current run
+
+
 This paramater is common to all tests and can be written in TestNG XML file or in a common configuration file loaded by TestNG XML file (param `testConfig`) 
 
-Run information (specific to test running) must be put in `tmsRun` variable. E.g: `{'type': 'hp', 'run': '3'}`
+Run information (specific to test running) must be put in `tmsRun`
 
  
 #### Configure test runner computer ####
