@@ -36,7 +36,7 @@ public class TestHpAlmConnector extends GenericTest {
 
 	@Test(groups={"ut"})
 	public void checkConfiguration() {
-		String config = "{'type': 'hp', 'run': '3'}";
+		String config = "{'type': 'hp', 'tmsRun': '3'}";
 		HpAlmConnector hp = new HpAlmConnector(new JSONObject(config));
 		Assert.assertEquals(hp.getCurrentRunId(), "3");
 	}
@@ -56,7 +56,7 @@ public class TestHpAlmConnector extends GenericTest {
 		connect.put(HpAlmConnector.HP_ALM_USER, "user");
 		connect.put(HpAlmConnector.HP_ALM_PASSWORD, "password");
 		
-		String config = "{'type': 'hp', 'run': '3'}";
+		String config = "{'type': 'hp', 'tmsRun': '3'}";
 		HpAlmConnector hp = new HpAlmConnector(new JSONObject(config));
 		hp.init(connect);
 		Assert.assertTrue(hp.getInitialized());
@@ -70,7 +70,7 @@ public class TestHpAlmConnector extends GenericTest {
 		connect.put(HpAlmConnector.HP_ALM_USER, "user");
 		connect.put(HpAlmConnector.HP_ALM_PASSWORD, "password");
 		
-		String config = "{'type': 'hp', 'run': '3'}";
+		String config = "{'type': 'hp', 'tmsRun': '3'}";
 		HpAlmConnector hp = new HpAlmConnector(new JSONObject(config));
 		hp.init(connect);
 	}
@@ -83,7 +83,7 @@ public class TestHpAlmConnector extends GenericTest {
 		connect.put(HpAlmConnector.HP_ALM_USER, "user");
 		connect.put(HpAlmConnector.HP_ALM_PASSWORD, "password");
 		
-		String config = "{'type': 'hp', 'run': '3'}";
+		String config = "{'type': 'hp', 'tmsRun': '3'}";
 		HpAlmConnector hp = new HpAlmConnector(new JSONObject(config));
 		hp.init(connect);
 	}
@@ -96,7 +96,7 @@ public class TestHpAlmConnector extends GenericTest {
 		connect.put(HpAlmConnector.HP_ALM_USER, "user");
 		connect.put(HpAlmConnector.HP_ALM_PASSWORD, "password");
 		
-		String config = "{'type': 'hp', 'run': '3'}";
+		String config = "{'type': 'hp', 'tmsRun': '3'}";
 		HpAlmConnector hp = new HpAlmConnector(new JSONObject(config));
 		hp.init(connect);
 	}
@@ -109,7 +109,7 @@ public class TestHpAlmConnector extends GenericTest {
 		connect.put(HpAlmConnector.HP_ALM_PROJECT, "project");
 		connect.put(HpAlmConnector.HP_ALM_PASSWORD, "password");
 		
-		String config = "{'type': 'hp', 'run': '3'}";
+		String config = "{'type': 'hp', 'tmsRun': '3'}";
 		HpAlmConnector hp = new HpAlmConnector(new JSONObject(config));
 		hp.init(connect);
 	}
@@ -122,7 +122,7 @@ public class TestHpAlmConnector extends GenericTest {
 		connect.put(HpAlmConnector.HP_ALM_PROJECT, "project");
 		connect.put(HpAlmConnector.HP_ALM_USER, "user");
 		
-		String config = "{'type': 'hp', 'run': '3'}";
+		String config = "{'type': 'hp', 'tmsRun': '3'}";
 		HpAlmConnector hp = new HpAlmConnector(new JSONObject(config));
 		hp.init(connect);
 	}
