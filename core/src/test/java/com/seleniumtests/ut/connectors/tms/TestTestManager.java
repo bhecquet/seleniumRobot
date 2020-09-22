@@ -24,6 +24,7 @@ import org.testng.annotations.Test;
 import com.seleniumtests.GenericTest;
 import com.seleniumtests.connectors.tms.TestManager;
 import com.seleniumtests.connectors.tms.hpalm.HpAlmConnector;
+import com.seleniumtests.connectors.tms.squash.SquashTMConnector;
 import com.seleniumtests.customexception.ConfigurationException;
 
 
@@ -31,14 +32,21 @@ public class TestTestManager extends GenericTest {
 
 	@Test(groups={"ut"})
 	public void testTmsSelectionHpAlm() {
-		String config = "{'type': 'hp', 'run': '3'}";
+		String config = "{'type': 'hp', 'tmsRun': '3'}";
 		TestManager manager = TestManager.getInstance(new JSONObject(config));
 		Assert.assertTrue(manager instanceof HpAlmConnector);
 	}
 	
+	@Test(groups={"ut"})
+	public void testTmsSelectionSquashTm() {
+		String config = "{'type': 'squash'}";
+		TestManager manager = TestManager.getInstance(new JSONObject(config));
+		Assert.assertTrue(manager instanceof SquashTMConnector);
+	}
+	
 	@Test(groups={"ut"}, expectedExceptions=ConfigurationException.class)
 	public void testTmsSelectionWrongType() {
-		String config = "{'type': 'spira', 'run': '3'}";
+		String config = "{'type': 'spira', 'tmsRun': '3'}";
 		TestManager.getInstance(new JSONObject(config));
 	}
 	
