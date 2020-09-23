@@ -640,6 +640,9 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			// check the message and that no previous execution result is visible
 			Assert.assertTrue(detailedReportContent.contains("Previous execution results"));
 			Assert.assertTrue(detailedReportContent.contains("<a href=\"retry-testWithException2-1.zip\">retry-testWithException2-1.zip</a>"));
+
+			// issue #379: we souhld have Previous result box
+			Assert.assertEquals(StringUtils.countMatches(detailedReportContent, "<div class=\"box collapsed-box"), 8);
 			
 			
 		} finally {
@@ -666,6 +669,9 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			// check the message and that no previous execution result is visible
 			Assert.assertFalse(detailedReportContent.contains("Previous execution results"));
 			Assert.assertFalse(detailedReportContent.contains("<a href=\"retry-testWithException-1.zip\">retry-testAndSubActions-1.zip</a>"));
+			
+			// issue #379: we souhld have not Previous result box
+			Assert.assertEquals(StringUtils.countMatches(detailedReportContent, "<div class=\"box collapsed-box"), 8);
 			
 			
 		} finally {
