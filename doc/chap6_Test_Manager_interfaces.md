@@ -167,6 +167,22 @@ Use parameters:
 - `tmsPassword` => password used to connect
 - `tmsProject`=> project to which these tests belong
 
+#### Configure Test to be linked with Squash TM ####
+
+By default, test result won't be sent to Squash TM even if it's properly configured.
+For this link to be active, we MUST give seleniumRobot the 'id' of the test in Squash
+
+Test id can be found when clicking on any test, and hovering mouse on test title in the right pane => a link is displayed at the bottom left of the screen, giving the id of the test.
+
+When you have this id, configure your java test
+
+```java
+@Test(attributes = {@CustomAttribute(name = "testId", values = "12")})
+public void testMyFeature() {
+	...
+}
+```
+
   
 ### 4 HP ALM ###
  

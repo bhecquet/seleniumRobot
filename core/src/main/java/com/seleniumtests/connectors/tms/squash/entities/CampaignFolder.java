@@ -6,6 +6,7 @@ import java.util.List;
 import com.seleniumtests.customexception.ScenarioException;
 
 import kong.unirest.UnirestException;
+import kong.unirest.json.JSONException;
 import kong.unirest.json.JSONObject;
 
 public class CampaignFolder extends Entity {
@@ -47,31 +48,34 @@ public class CampaignFolder extends Entity {
 
 	public static CampaignFolder fromJson(JSONObject json) {
 		
-		Entity parent;
-		if (json.has("parent")) {
-			if ("project".equals(json.getJSONObject("parent").getString("_type"))) {
-				parent = Project.fromJson(json.getJSONObject("parent"));
-			} else if ("campaign-folder".equals(json.getJSONObject("parent").getString("_type"))) {
-				parent = CampaignFolder.fromJson(json.getJSONObject("parent"));
+		try {
+			Entity parent;
+			if (json.has("parent")) {
+				if ("project".equals(json.getJSONObject("parent").getString("_type"))) {
+					parent = Project.fromJson(json.getJSONObject("parent"));
+				} else if ("campaign-folder".equals(json.getJSONObject("parent").getString("_type"))) {
+					parent = CampaignFolder.fromJson(json.getJSONObject("parent"));
+				} else {
+					parent = null;
+				}
 			} else {
 				parent = null;
 			}
-		} else {
-			parent = null;
+			
+			Project project = null;
+			if (json.has("project")) {
+				project = Project.fromJson(json.getJSONObject("project"));
+			}
+			
+			return new CampaignFolder(json.getJSONObject("_links").getJSONObject("self").getString("href"), 
+					json.getInt("id"), 
+					json.getString("name"),
+					project,
+					parent
+					);
+		} catch (JSONException e) {
+			throw new ScenarioException(String.format("Cannot create CampaignFolder from JSON [%s] data: %s", json.toString(), e.getMessage()));
 		}
-		
-		Project project = null;
-		if (json.has("project")) {
-			project = Project.fromJson(json.getJSONObject("project"));
-		}
-		
-		return new CampaignFolder(json.getJSONObject("_links").getJSONObject("self").getString("href"), 
-				json.getInt("id"), 
-				json.getString("name"),
-				project,
-				parent
-				);
-		
 		
 	}
 	

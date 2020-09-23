@@ -36,27 +36,27 @@ public class TestHpAlmConnector extends GenericTest {
 
 	@Test(groups={"ut"})
 	public void checkConfiguration() {
-		String config = "{'type': 'hp', 'tmsRun': '3'}";
+		String config = "{'tmsType': 'hp', 'tmsRun': '3'}";
 		HpAlmConnector hp = new HpAlmConnector(new JSONObject(config));
 		Assert.assertEquals(hp.getCurrentRunId(), "3");
 	}
 	
 	@Test(groups={"ut"}, expectedExceptions=ConfigurationException.class)
 	public void checkErrorWhenNoRunId() {
-		String config = "{'type': 'hp'}";
+		String config = "{'tmsType': 'hp'}";
 		new HpAlmConnector(new JSONObject(config));
 	}
 	
 	@Test(groups={"ut"})
 	public void testInitWithAllParameters() {
 		JSONObject connect = new JSONObject();
-		connect.put(HpAlmConnector.HP_ALM_SERVER_URL, "http://myServer");
-		connect.put(HpAlmConnector.HP_ALM_DOMAIN, "domain");
-		connect.put(HpAlmConnector.HP_ALM_PROJECT, "project");
-		connect.put(HpAlmConnector.HP_ALM_USER, "user");
-		connect.put(HpAlmConnector.HP_ALM_PASSWORD, "password");
+		connect.put(HpAlmConnector.TMS_SERVER_URL, "http://myServer");
+		connect.put(HpAlmConnector.TMS_DOMAIN, "domain");
+		connect.put(HpAlmConnector.TMS_PROJECT, "project");
+		connect.put(HpAlmConnector.TMS_USER, "user");
+		connect.put(HpAlmConnector.TMS_PASSWORD, "password");
 		
-		String config = "{'type': 'hp', 'tmsRun': '3'}";
+		String config = "{'tmsType': 'hp', 'tmsRun': '3'}";
 		HpAlmConnector hp = new HpAlmConnector(new JSONObject(config));
 		hp.init(connect);
 		Assert.assertTrue(hp.getInitialized());
@@ -65,12 +65,12 @@ public class TestHpAlmConnector extends GenericTest {
 	@Test(groups={"ut"}, expectedExceptions=ConfigurationException.class)
 	public void testInitWithoutUrlParameter() {
 		JSONObject connect = new JSONObject();
-		connect.put(HpAlmConnector.HP_ALM_DOMAIN, "domain");
-		connect.put(HpAlmConnector.HP_ALM_PROJECT, "project");
-		connect.put(HpAlmConnector.HP_ALM_USER, "user");
-		connect.put(HpAlmConnector.HP_ALM_PASSWORD, "password");
+		connect.put(HpAlmConnector.TMS_DOMAIN, "domain");
+		connect.put(HpAlmConnector.TMS_PROJECT, "project");
+		connect.put(HpAlmConnector.TMS_USER, "user");
+		connect.put(HpAlmConnector.TMS_PASSWORD, "password");
 		
-		String config = "{'type': 'hp', 'tmsRun': '3'}";
+		String config = "{'tmsType': 'hp', 'tmsRun': '3'}";
 		HpAlmConnector hp = new HpAlmConnector(new JSONObject(config));
 		hp.init(connect);
 	}
@@ -78,12 +78,12 @@ public class TestHpAlmConnector extends GenericTest {
 	@Test(groups={"ut"}, expectedExceptions=ConfigurationException.class)
 	public void testInitWithoutDomainParameter() {
 		JSONObject connect = new JSONObject();
-		connect.put(HpAlmConnector.HP_ALM_SERVER_URL, "http://myServer");
-		connect.put(HpAlmConnector.HP_ALM_PROJECT, "project");
-		connect.put(HpAlmConnector.HP_ALM_USER, "user");
-		connect.put(HpAlmConnector.HP_ALM_PASSWORD, "password");
+		connect.put(HpAlmConnector.TMS_SERVER_URL, "http://myServer");
+		connect.put(HpAlmConnector.TMS_PROJECT, "project");
+		connect.put(HpAlmConnector.TMS_USER, "user");
+		connect.put(HpAlmConnector.TMS_PASSWORD, "password");
 		
-		String config = "{'type': 'hp', 'tmsRun': '3'}";
+		String config = "{'tmsType': 'hp', 'tmsRun': '3'}";
 		HpAlmConnector hp = new HpAlmConnector(new JSONObject(config));
 		hp.init(connect);
 	}
@@ -91,12 +91,12 @@ public class TestHpAlmConnector extends GenericTest {
 	@Test(groups={"ut"}, expectedExceptions=ConfigurationException.class)
 	public void testInitWithoutProjectParameter() {
 		JSONObject connect = new JSONObject();
-		connect.put(HpAlmConnector.HP_ALM_SERVER_URL, "http://myServer");
-		connect.put(HpAlmConnector.HP_ALM_DOMAIN, "domain");
-		connect.put(HpAlmConnector.HP_ALM_USER, "user");
-		connect.put(HpAlmConnector.HP_ALM_PASSWORD, "password");
+		connect.put(HpAlmConnector.TMS_SERVER_URL, "http://myServer");
+		connect.put(HpAlmConnector.TMS_DOMAIN, "domain");
+		connect.put(HpAlmConnector.TMS_USER, "user");
+		connect.put(HpAlmConnector.TMS_PASSWORD, "password");
 		
-		String config = "{'type': 'hp', 'tmsRun': '3'}";
+		String config = "{'tmsType': 'hp', 'tmsRun': '3'}";
 		HpAlmConnector hp = new HpAlmConnector(new JSONObject(config));
 		hp.init(connect);
 	}
@@ -104,12 +104,12 @@ public class TestHpAlmConnector extends GenericTest {
 	@Test(groups={"ut"}, expectedExceptions=ConfigurationException.class)
 	public void testInitWithoutUserParameter() {
 		JSONObject connect = new JSONObject();
-		connect.put(HpAlmConnector.HP_ALM_SERVER_URL, "http://myServer");
-		connect.put(HpAlmConnector.HP_ALM_DOMAIN, "domain");
-		connect.put(HpAlmConnector.HP_ALM_PROJECT, "project");
-		connect.put(HpAlmConnector.HP_ALM_PASSWORD, "password");
+		connect.put(HpAlmConnector.TMS_SERVER_URL, "http://myServer");
+		connect.put(HpAlmConnector.TMS_DOMAIN, "domain");
+		connect.put(HpAlmConnector.TMS_PROJECT, "project");
+		connect.put(HpAlmConnector.TMS_PASSWORD, "password");
 		
-		String config = "{'type': 'hp', 'tmsRun': '3'}";
+		String config = "{'tmsType': 'hp', 'tmsRun': '3'}";
 		HpAlmConnector hp = new HpAlmConnector(new JSONObject(config));
 		hp.init(connect);
 	}
@@ -117,12 +117,12 @@ public class TestHpAlmConnector extends GenericTest {
 	@Test(groups={"ut"}, expectedExceptions=ConfigurationException.class)
 	public void testInitWithoutPasswordParameter() {
 		JSONObject connect = new JSONObject();
-		connect.put(HpAlmConnector.HP_ALM_SERVER_URL, "http://myServer");
-		connect.put(HpAlmConnector.HP_ALM_DOMAIN, "domain");
-		connect.put(HpAlmConnector.HP_ALM_PROJECT, "project");
-		connect.put(HpAlmConnector.HP_ALM_USER, "user");
+		connect.put(HpAlmConnector.TMS_SERVER_URL, "http://myServer");
+		connect.put(HpAlmConnector.TMS_DOMAIN, "domain");
+		connect.put(HpAlmConnector.TMS_PROJECT, "project");
+		connect.put(HpAlmConnector.TMS_USER, "user");
 		
-		String config = "{'type': 'hp', 'tmsRun': '3'}";
+		String config = "{'tmsType': 'hp', 'tmsRun': '3'}";
 		HpAlmConnector hp = new HpAlmConnector(new JSONObject(config));
 		hp.init(connect);
 	}

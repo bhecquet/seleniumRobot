@@ -46,11 +46,6 @@ import kong.unirest.UnirestException;
  */
 public class HpAlmConnector extends TestManager {
 	
-	public static final String HP_ALM_SERVER_URL = "hpAlmServerUrl";
-	public static final String HP_ALM_PASSWORD = "hpAlmPassword";
-	public static final String HP_ALM_USER = "hpAlmUser";
-	public static final String HP_ALM_DOMAIN = "hpAlmDomain";
-	public static final String HP_ALM_PROJECT = "hpAlmProject";
 	private static final String DOMAIN_NAME = "domain";
 	private static final String PROJECT_NAME = "project";
 	private static final String ENTITY_ID = "entityId";
@@ -86,15 +81,15 @@ public class HpAlmConnector extends TestManager {
 	@Override
 	public void init(JSONObject connectParams) {
 		
-		String serverUrlVar = connectParams.optString(HP_ALM_SERVER_URL, null);
-		String projectVar = connectParams.optString(HP_ALM_PROJECT, null);
-		String domainVar = connectParams.optString(HP_ALM_DOMAIN, null);
-		String userVar = connectParams.optString(HP_ALM_USER, null);
-		String passwordVar = connectParams.optString(HP_ALM_PASSWORD, null);
+		String serverUrlVar = connectParams.optString(TMS_SERVER_URL, null);
+		String projectVar = connectParams.optString(TMS_PROJECT, null);
+		String domainVar = connectParams.optString(TMS_DOMAIN, null);
+		String userVar = connectParams.optString(TMS_USER, null);
+		String passwordVar = connectParams.optString(TMS_PASSWORD, null);
 
 		if (serverUrlVar == null || projectVar == null || domainVar == null || userVar == null || passwordVar == null) {
 			throw new ConfigurationException(String.format("HP ALM access not correctly configured. Environment configuration must contain variables"
-					+ "%s, %s, %s, %s, %s", HP_ALM_SERVER_URL, HP_ALM_PASSWORD, HP_ALM_USER, HP_ALM_DOMAIN, HP_ALM_PROJECT));
+					+ "%s, %s, %s, %s, %s", TMS_SERVER_URL, TMS_PASSWORD, TMS_USER, TMS_DOMAIN, TMS_PROJECT));
 		}
 		
 		serverUrl = serverUrlVar;

@@ -17,7 +17,6 @@
  */
 package com.seleniumtests.reporter.reporters;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -26,6 +25,7 @@ import org.testng.ITestContext;
 import org.testng.ITestResult;
 
 import com.seleniumtests.connectors.tms.TestManager;
+import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.utils.TestNGResultUtils;
 
@@ -39,29 +39,36 @@ public class TestManagerReporter extends CommonReporter implements IReporter {
 	@Override
 	protected void generateReport(Map<ITestContext, Set<ITestResult>> resultSet, String outdir, boolean optimizeResult, boolean finalGeneration) {
 
-		// issue #81: use global context instead
-		TestManager testManager = SeleniumTestsContextManager.getGlobalContext().getTestManagerInstance();
-
-		if (testManager == null) {
+		// record only when all tests are executed so that intermediate results (a failed test which has been retried) are not present in list
+		if (!finalGeneration) {
 			return;
-		} 
-		
-		testManager.login();
+		}
 		
 		// Record test method reports for each result which has not already been recorded
 		for (Map.Entry<ITestContext, Set<ITestResult>> entry: resultSet.entrySet()) {
 			for (ITestResult testResult: entry.getValue()) {
+				
+				SeleniumTestsContext testContext = SeleniumTestsContextManager.setThreadContextFromTestResult(testResult.getTestContext(), getTestName(testResult), getClassName(testResult), testResult);
+				TestManager testManager = testContext.getTestManagerInstance();
+
+				if (testManager == null) {
+					return;
+				} 
+
+				testManager.login();
 				
 				// do not record twice the same result
 				if (!TestNGResultUtils.isTestManagerReportCreated(testResult)) {
 
 					testManager.recordResult(testResult);
 					testManager.recordResultFiles(testResult);
+					TestNGResultUtils.setTestManagereportCreated(testResult, true);
 				}
+
+				testManager.logout();
 			}
 		}
 
-		testManager.logout();
 
 	}
 

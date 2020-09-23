@@ -1,5 +1,9 @@
 package com.seleniumtests.connectors.tms.squash.entities;
 
+import com.seleniumtests.customexception.ScenarioException;
+
+import kong.unirest.UnirestException;
+import kong.unirest.json.JSONException;
 import kong.unirest.json.JSONObject;
 
 /**
@@ -8,6 +12,8 @@ import kong.unirest.json.JSONObject;
  *
  */
 public class TestCase extends Entity {
+	
+	private static final String TEST_CASE_URL = "test-cases/%s";
 
 	public TestCase(int id) {
 		super("", id, null);
@@ -19,10 +25,21 @@ public class TestCase extends Entity {
 	
 
 	public static TestCase fromJson(JSONObject json) {
-
-		return new TestCase (
-				json.getInt("id"), 
-				json.getJSONObject("_links").getJSONObject("self").getString("href")
-				);
+		try {
+			return new TestCase (
+					json.getInt("id"), 
+					json.getJSONObject("_links").getJSONObject("self").getString("href")
+					);
+		} catch (JSONException e) {
+			throw new ScenarioException(String.format("Cannot create TestCase from JSON [%s] data: %s", json.toString(), e.getMessage()));
+		}
+	}
+	
+	public static TestCase get(int id) {
+		try {
+			return fromJson(getJSonResponse(buildGetRequest(apiRootUrl + String.format(TEST_CASE_URL, id))));
+		} catch (UnirestException e) {
+			throw new ScenarioException(String.format("Test Case %d does not exist", id));
+		}	
 	}
 }

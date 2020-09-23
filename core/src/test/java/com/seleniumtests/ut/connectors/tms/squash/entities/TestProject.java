@@ -1,7 +1,6 @@
 package com.seleniumtests.ut.connectors.tms.squash.entities;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
@@ -14,18 +13,12 @@ import org.testng.annotations.Test;
 
 import com.seleniumtests.ConnectorsTest;
 import com.seleniumtests.connectors.tms.squash.entities.Campaign;
-import com.seleniumtests.connectors.tms.squash.entities.CampaignFolder;
-import com.seleniumtests.connectors.tms.squash.entities.Iteration;
-import com.seleniumtests.connectors.tms.squash.entities.IterationTestPlanItem;
 import com.seleniumtests.connectors.tms.squash.entities.Project;
-import com.seleniumtests.connectors.tms.squash.entities.TestCase;
 import com.seleniumtests.customexception.ScenarioException;
 
 import kong.unirest.GetRequest;
-import kong.unirest.HttpRequestWithBody;
 import kong.unirest.HttpResponse;
 import kong.unirest.JsonNode;
-import kong.unirest.RequestBodyEntity;
 import kong.unirest.Unirest;
 import kong.unirest.UnirestException;
 import kong.unirest.json.JSONObject;
@@ -125,6 +118,19 @@ public class TestProject extends ConnectorsTest {
 		Assert.assertEquals(project.getId(), 1);
 		Assert.assertEquals(project.getName(), "foo");
 		Assert.assertEquals(project.getUrl(), "http://localhost:8080/api/rest/latest/projects/1");
+	}
+	
+	@Test(groups={"ut"}, expectedExceptions = ScenarioException.class)
+	public void testFromJsonWrongFormat() {
+		
+		JSONObject json = new JSONObject();
+		json.put("_type", "project");
+		json.put("name", "foo");
+		json.put("_links", new JSONObject("{\"self\" : {" + 
+				"          \"href\" : \"http://localhost:8080/api/rest/latest/projects/1\"" + 
+				"        }}"));
+		
+		Project.fromJson(json);
 	}
 	
 	@Test(groups={"ut"})

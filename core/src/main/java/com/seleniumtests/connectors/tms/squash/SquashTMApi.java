@@ -12,6 +12,7 @@ import com.seleniumtests.connectors.tms.squash.entities.TestCase;
 import com.seleniumtests.connectors.tms.squash.entities.TestPlanItemExecution;
 import com.seleniumtests.connectors.tms.squash.entities.TestPlanItemExecution.ExecutionStatus;
 import com.seleniumtests.customexception.ConfigurationException;
+import com.seleniumtests.customexception.ScenarioException;
 
 import kong.unirest.HttpResponse;
 import kong.unirest.JsonNode;
@@ -132,6 +133,7 @@ public class SquashTMApi {
 	
 	/**
 	 * Add a test case in the selected iteration if it's not already there. Dataset are not handled
+	 * Also check that the test case exists
 	 * @param iteration		iteration in which test case will be added
 	 * @param testCaseId	id of the test case (can be found in Squash TM interface)
 	 * @return
@@ -144,7 +146,15 @@ public class SquashTMApi {
 			}
 		}
 		
-		return iteration.addTestCase(new TestCase(testCaseId));
+		// check that TestCase is valid
+		TestCase testCase;
+		try {
+			testCase = TestCase.get(testCaseId);
+		} catch (ScenarioException e) {
+			throw new ConfigurationException(String.format("Test case with id %d does not exist in Squash", testCaseId));
+		}
+		
+		return iteration.addTestCase(testCase);
 	}
 	
 	/**

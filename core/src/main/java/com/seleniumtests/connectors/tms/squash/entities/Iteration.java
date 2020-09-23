@@ -6,6 +6,7 @@ import java.util.List;
 import com.seleniumtests.customexception.ScenarioException;
 
 import kong.unirest.UnirestException;
+import kong.unirest.json.JSONException;
 import kong.unirest.json.JSONObject;
 
 public class Iteration extends Entity {
@@ -38,9 +39,13 @@ public class Iteration extends Entity {
 
 
 	public static Iteration fromJson(JSONObject json) {
-		return new Iteration(json.getJSONObject("_links").getJSONObject("self").getString("href"),
-				json.getInt("id"),
-				json.getString("name"));
+		try {
+			return new Iteration(json.getJSONObject("_links").getJSONObject("self").getString("href"),
+					json.getInt("id"),
+					json.getString("name"));
+		} catch (JSONException e) {
+			throw new ScenarioException(String.format("Cannot create Iteration from JSON [%s] data: %s", json.toString(), e.getMessage()));
+		}
 	}
 	
 

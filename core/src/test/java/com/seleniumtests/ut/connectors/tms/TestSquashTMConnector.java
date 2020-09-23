@@ -78,10 +78,10 @@ public class TestSquashTMConnector extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testInitWithAllParameters() {
 		JSONObject connect = new JSONObject();
-		connect.put(SquashTMConnector.SQUASH_TM_SERVER_URL, "http://myServer");
-		connect.put(SquashTMConnector.SQUASH_TM_PROJECT, "project");
-		connect.put(SquashTMConnector.SQUASH_TM_USER, "user");
-		connect.put(SquashTMConnector.SQUASH_TM_PASSWORD, "password");
+		connect.put(SquashTMConnector.TMS_SERVER_URL, "http://myServer");
+		connect.put(SquashTMConnector.TMS_PROJECT, "project");
+		connect.put(SquashTMConnector.TMS_USER, "user");
+		connect.put(SquashTMConnector.TMS_PASSWORD, "password");
 		
 		SquashTMConnector squash = new SquashTMConnector();
 		squash.init(connect);
@@ -91,9 +91,9 @@ public class TestSquashTMConnector extends MockitoTest {
 	@Test(groups={"ut"}, expectedExceptions=ConfigurationException.class)
 	public void testInitWithoutUrlParameter() {
 		JSONObject connect = new JSONObject();
-		connect.put(SquashTMConnector.SQUASH_TM_PROJECT, "project");
-		connect.put(SquashTMConnector.SQUASH_TM_USER, "user");
-		connect.put(SquashTMConnector.SQUASH_TM_PASSWORD, "password");
+		connect.put(SquashTMConnector.TMS_PROJECT, "project");
+		connect.put(SquashTMConnector.TMS_USER, "user");
+		connect.put(SquashTMConnector.TMS_PASSWORD, "password");
 		
 		SquashTMConnector squash = new SquashTMConnector();
 		squash.init(connect);
@@ -102,9 +102,9 @@ public class TestSquashTMConnector extends MockitoTest {
 	@Test(groups={"ut"}, expectedExceptions=ConfigurationException.class)
 	public void testInitWithoutProjectParameter() {
 		JSONObject connect = new JSONObject();
-		connect.put(SquashTMConnector.SQUASH_TM_SERVER_URL, "http://myServer");
-		connect.put(SquashTMConnector.SQUASH_TM_USER, "user");
-		connect.put(SquashTMConnector.SQUASH_TM_PASSWORD, "password");
+		connect.put(SquashTMConnector.TMS_SERVER_URL, "http://myServer");
+		connect.put(SquashTMConnector.TMS_USER, "user");
+		connect.put(SquashTMConnector.TMS_PASSWORD, "password");
 		
 		SquashTMConnector squash = new SquashTMConnector();
 		squash.init(connect);
@@ -113,9 +113,9 @@ public class TestSquashTMConnector extends MockitoTest {
 	@Test(groups={"ut"}, expectedExceptions=ConfigurationException.class)
 	public void testInitWithoutUserParameter() {
 		JSONObject connect = new JSONObject();
-		connect.put(SquashTMConnector.SQUASH_TM_SERVER_URL, "http://myServer");
-		connect.put(SquashTMConnector.SQUASH_TM_PROJECT, "project");
-		connect.put(SquashTMConnector.SQUASH_TM_PASSWORD, "password");
+		connect.put(SquashTMConnector.TMS_SERVER_URL, "http://myServer");
+		connect.put(SquashTMConnector.TMS_PROJECT, "project");
+		connect.put(SquashTMConnector.TMS_PASSWORD, "password");
 		
 		SquashTMConnector squash = new SquashTMConnector();
 		squash.init(connect);
@@ -124,9 +124,9 @@ public class TestSquashTMConnector extends MockitoTest {
 	@Test(groups={"ut"}, expectedExceptions=ConfigurationException.class)
 	public void testInitWithoutPasswordParameter() {
 		JSONObject connect = new JSONObject();
-		connect.put(SquashTMConnector.SQUASH_TM_SERVER_URL, "http://myServer");
-		connect.put(SquashTMConnector.SQUASH_TM_PROJECT, "project");
-		connect.put(SquashTMConnector.SQUASH_TM_USER, "user");
+		connect.put(SquashTMConnector.TMS_SERVER_URL, "http://myServer");
+		connect.put(SquashTMConnector.TMS_PROJECT, "project");
+		connect.put(SquashTMConnector.TMS_USER, "user");
 		
 		SquashTMConnector squash = new SquashTMConnector();
 		squash.init(connect);
@@ -136,11 +136,65 @@ public class TestSquashTMConnector extends MockitoTest {
 	public void testRecordResultTestInSuccess(ITestContext testContext) {
 
 		JSONObject connect = new JSONObject();
-		connect.put(SquashTMConnector.SQUASH_TM_SERVER_URL, "http://myServer");
-		connect.put(SquashTMConnector.SQUASH_TM_PROJECT, "project");
-		connect.put(SquashTMConnector.SQUASH_TM_USER, "user");
-		connect.put(SquashTMConnector.SQUASH_TM_PASSWORD, "password");
+		connect.put(SquashTMConnector.TMS_SERVER_URL, "http://myServer");
+		connect.put(SquashTMConnector.TMS_PROJECT, "project");
+		connect.put(SquashTMConnector.TMS_USER, "user");
+		connect.put(SquashTMConnector.TMS_PASSWORD, "password");
 
+		SquashTMConnector squash = spy(new SquashTMConnector());
+		squash.init(connect);
+		doReturn(api).when(squash).getApi();
+		
+		CustomAttribute testIdAttr = new CustomAttribute() {
+			@Override
+			public Class<? extends Annotation> annotationType() {
+				return null;
+			}
+			
+			@Override
+			public String[] values() {
+				return new String[] {"1"};
+			}
+			
+			@Override
+			public String name() {
+				return "testId";
+			}
+		};
+		// customize test result so that it has attributes
+		when(testResult.getMethod()).thenReturn(testMethod);
+		when(testResult.isSuccess()).thenReturn(true);
+		when(testResult.getName()).thenReturn("MyTest");
+		when(testResult.getTestContext()).thenReturn(testContext);
+		when(testResult.getParameters()).thenReturn(new Object[] {});
+		when(testResult.getAttribute("testContext")).thenReturn(SeleniumTestsContextManager.getThreadContext());
+		when(testMethod.getAttributes()).thenReturn(new CustomAttribute[] {testIdAttr});
+		when(api.createCampaign(anyString(), anyString())).thenReturn(campaign);
+		when(api.createIteration(any(Campaign.class), anyString())).thenReturn(iteration);
+		when(api.addTestCaseInIteration(iteration, 1)).thenReturn(iterationTestPlanItem);
+		
+		squash.recordResult(testResult);
+		
+		// check we call all necessary API methods to record the result
+		verify(api).createCampaign("Selenium " + testContext.getName(), "");
+		verify(api).createIteration(eq(campaign), eq(SeleniumTestsContextManager.getThreadContext().getApplicationVersion()));
+		verify(api).addTestCaseInIteration(iteration, 1);
+		verify(api).setExecutionResult(iterationTestPlanItem, ExecutionStatus.SUCCESS);
+	}
+	
+	/**
+	 * Check that if the testID is not valid, we raise an error
+	 * @param testContext
+	 */
+	@Test(groups={"ut"})
+	public void testRecordResultTestWrongTestId(ITestContext testContext) {
+		
+		JSONObject connect = new JSONObject();
+		connect.put(SquashTMConnector.TMS_SERVER_URL, "http://myServer");
+		connect.put(SquashTMConnector.TMS_PROJECT, "project");
+		connect.put(SquashTMConnector.TMS_USER, "user");
+		connect.put(SquashTMConnector.TMS_PASSWORD, "password");
+		
 		SquashTMConnector squash = spy(new SquashTMConnector());
 		squash.init(connect);
 		doReturn(api).when(squash).getApi();
@@ -186,10 +240,10 @@ public class TestSquashTMConnector extends MockitoTest {
 	public void testRecordResultTestInError(ITestContext testContext) {
 		
 		JSONObject connect = new JSONObject();
-		connect.put(SquashTMConnector.SQUASH_TM_SERVER_URL, "http://myServer");
-		connect.put(SquashTMConnector.SQUASH_TM_PROJECT, "project");
-		connect.put(SquashTMConnector.SQUASH_TM_USER, "user");
-		connect.put(SquashTMConnector.SQUASH_TM_PASSWORD, "password");
+		connect.put(SquashTMConnector.TMS_SERVER_URL, "http://myServer");
+		connect.put(SquashTMConnector.TMS_PROJECT, "project");
+		connect.put(SquashTMConnector.TMS_USER, "user");
+		connect.put(SquashTMConnector.TMS_PASSWORD, "password");
 		
 		SquashTMConnector squash = spy(new SquashTMConnector());
 		squash.init(connect);
@@ -237,10 +291,10 @@ public class TestSquashTMConnector extends MockitoTest {
 	public void testRecordResultTestSkipped(ITestContext testContext) {
 		
 		JSONObject connect = new JSONObject();
-		connect.put(SquashTMConnector.SQUASH_TM_SERVER_URL, "http://myServer");
-		connect.put(SquashTMConnector.SQUASH_TM_PROJECT, "project");
-		connect.put(SquashTMConnector.SQUASH_TM_USER, "user");
-		connect.put(SquashTMConnector.SQUASH_TM_PASSWORD, "password");
+		connect.put(SquashTMConnector.TMS_SERVER_URL, "http://myServer");
+		connect.put(SquashTMConnector.TMS_PROJECT, "project");
+		connect.put(SquashTMConnector.TMS_USER, "user");
+		connect.put(SquashTMConnector.TMS_PASSWORD, "password");
 		
 		SquashTMConnector squash = spy(new SquashTMConnector());
 		squash.init(connect);
@@ -292,10 +346,10 @@ public class TestSquashTMConnector extends MockitoTest {
 	public void testDoNotRecordResult(ITestContext testContext) {
 		
 		JSONObject connect = new JSONObject();
-		connect.put(SquashTMConnector.SQUASH_TM_SERVER_URL, "http://myServer");
-		connect.put(SquashTMConnector.SQUASH_TM_PROJECT, "project");
-		connect.put(SquashTMConnector.SQUASH_TM_USER, "user");
-		connect.put(SquashTMConnector.SQUASH_TM_PASSWORD, "password");
+		connect.put(SquashTMConnector.TMS_SERVER_URL, "http://myServer");
+		connect.put(SquashTMConnector.TMS_PROJECT, "project");
+		connect.put(SquashTMConnector.TMS_USER, "user");
+		connect.put(SquashTMConnector.TMS_PASSWORD, "password");
 		
 		SquashTMConnector squash = spy(new SquashTMConnector());
 		squash.init(connect);
@@ -330,10 +384,10 @@ public class TestSquashTMConnector extends MockitoTest {
 	public void testNoExceptionWhenErrorInRecording(ITestContext testContext) {
 		
 		JSONObject connect = new JSONObject();
-		connect.put(SquashTMConnector.SQUASH_TM_SERVER_URL, "http://myServer");
-		connect.put(SquashTMConnector.SQUASH_TM_PROJECT, "project");
-		connect.put(SquashTMConnector.SQUASH_TM_USER, "user");
-		connect.put(SquashTMConnector.SQUASH_TM_PASSWORD, "password");
+		connect.put(SquashTMConnector.TMS_SERVER_URL, "http://myServer");
+		connect.put(SquashTMConnector.TMS_PROJECT, "project");
+		connect.put(SquashTMConnector.TMS_USER, "user");
+		connect.put(SquashTMConnector.TMS_PASSWORD, "password");
 		
 		SquashTMConnector squash = spy(new SquashTMConnector());
 		squash.init(connect);

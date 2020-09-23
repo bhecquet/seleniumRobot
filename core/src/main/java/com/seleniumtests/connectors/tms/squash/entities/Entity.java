@@ -113,6 +113,10 @@ public class Entity {
 			return new JSONObject();
 		}
 		
+		if (response.getBody() == null) {
+			return new JSONObject();
+		}
+		
 		return response.getBody().getObject();
 	}
 }

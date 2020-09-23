@@ -6,6 +6,7 @@ import java.util.List;
 import com.seleniumtests.customexception.ScenarioException;
 
 import kong.unirest.UnirestException;
+import kong.unirest.json.JSONException;
 import kong.unirest.json.JSONObject;
 
 public class Campaign extends Entity {
@@ -58,9 +59,13 @@ public class Campaign extends Entity {
 	}
 
 	public static Campaign fromJson(JSONObject json) {
-		return new Campaign(json.getJSONObject("_links").getJSONObject("self").getString("href"),
-				json.getInt("id"),
-				json.getString("name"));
+		try {
+			return new Campaign(json.getJSONObject("_links").getJSONObject("self").getString("href"),
+					json.getInt("id"),
+					json.getString("name"));
+		} catch (JSONException e) {
+			throw new ScenarioException(String.format("Cannot create Campaign from JSON [%s] data: %s", json.toString(), e.getMessage()));
+		}
 	}
 	
 	public static Campaign create(Project project, String campaignName, CampaignFolder parentFolder) {

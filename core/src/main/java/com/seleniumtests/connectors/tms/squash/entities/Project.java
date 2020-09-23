@@ -6,6 +6,7 @@ import java.util.List;
 import com.seleniumtests.customexception.ScenarioException;
 
 import kong.unirest.UnirestException;
+import kong.unirest.json.JSONException;
 import kong.unirest.json.JSONObject;
 
 public class Project extends Entity {
@@ -46,10 +47,14 @@ public class Project extends Entity {
 	}
 
 	public static Project fromJson(JSONObject json) {
-		return new Project(
-				json.getJSONObject("_links").getJSONObject("self").getString("href"),
-				json.getInt("id"), 
-				json.getString("name"));
+		try {
+			return new Project(
+					json.getJSONObject("_links").getJSONObject("self").getString("href"),
+					json.getInt("id"), 
+					json.getString("name"));
+		} catch (JSONException e) {
+			throw new ScenarioException(String.format("Cannot create Project from JSON [%s] data: %s", json.toString(), e.getMessage()));
+		}
 	}
 	
 	public List<Campaign> getCampaigns() {
