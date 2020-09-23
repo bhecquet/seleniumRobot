@@ -274,6 +274,19 @@ public class TestIteration extends ConnectorsTest {
 		Assert.assertEquals(iteration.getUrl(), "http://localhost:8080/api/rest/latest/iterations/1");
 	}
 	
+	@Test(groups={"ut"}, expectedExceptions = ScenarioException.class)
+	public void testFromJsonWrongFormat() {
+		
+		JSONObject json = new JSONObject();
+		json.put("_type", "iteration");
+		json.put("name", "foo");
+		json.put("_links", new JSONObject("{\"self\" : {" + 
+				"          \"href\" : \"http://localhost:8080/api/rest/latest/iterations/1\"" + 
+				"        }}"));
+		
+		Iteration.fromJson(json);
+	}
+	
 	@Test(groups={"ut"})
 	public void testCreateIteration() {
 		HttpRequestWithBody postRequest = (HttpRequestWithBody) createServerMock("POST", "/campaigns/2/iterations", 200, "{" + 

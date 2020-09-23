@@ -10,7 +10,6 @@ import org.testng.annotations.Test;
 
 import com.seleniumtests.ConnectorsTest;
 import com.seleniumtests.connectors.tms.squash.entities.Campaign;
-import com.seleniumtests.connectors.tms.squash.entities.Iteration;
 import com.seleniumtests.connectors.tms.squash.entities.Project;
 import com.seleniumtests.connectors.tms.squash.entities.TestPlanItemExecution;
 import com.seleniumtests.connectors.tms.squash.entities.TestPlanItemExecution.ExecutionStatus;
@@ -48,6 +47,17 @@ public class TestTestPlanItemExecution extends ConnectorsTest {
 		Assert.assertEquals(iteration.getId(), 83);
 		Assert.assertEquals(iteration.getName(), "foo");
 		Assert.assertEquals(iteration.getUrl(), "http://localhost:8080/api/rest/latest/executions/83");
+	}
+	
+	@Test(groups={"ut"}, expectedExceptions = ScenarioException.class)
+	public void testFromJsonWrongformat() {
+		
+		JSONObject json = new JSONObject();
+		json.put("_type", "execution");
+		json.put("id", 83);
+		json.put("name", "foo");
+		
+		TestPlanItemExecution.fromJson(json);
 	}
 	
 	@Test(groups={"ut"})

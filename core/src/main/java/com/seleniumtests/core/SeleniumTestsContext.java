@@ -147,11 +147,11 @@ public class SeleniumTestsContext {
 
     public static final String TEST_ENTITY = "testEntity";						// Jamais utilisé
 
-    public static final String TMS_URL = "tmsUrl";								// URL of the test manager  (e.g: Squash TM http://<squash_host>:<squash_port>)
-    public static final String TMS_USER = "tmsUser";							// User which will access Test manager
-    public static final String TMS_PASSWORD = "tmsPassword";					// password of the user which will access Test Manager
-    public static final String TMS_PROJECT = "tmsProject";						// The project to which this test application is linked in Test manager    
-    public static final String TMS_TYPE = "tmsType";							// Type of the Test Manager ('squash' or 'hp')
+    public static final String TMS_URL = TestManager.TMS_SERVER_URL;								// URL of the test manager  (e.g: Squash TM http://<squash_host>:<squash_port>)
+    public static final String TMS_USER = TestManager.TMS_USER;							// User which will access Test manager
+    public static final String TMS_PASSWORD = TestManager.TMS_PASSWORD;					// password of the user which will access Test Manager
+    public static final String TMS_PROJECT = TestManager.TMS_PROJECT;						// The project to which this test application is linked in Test manager    
+    public static final String TMS_TYPE = TestManager.TMS_TYPE;							// Type of the Test Manager ('squash' or 'hp')
     
     public static final String CAPTURE_SNAPSHOT = "captureSnapshot";
     public static final String CAPTURE_NETWORK = "captureNetwork";
@@ -282,7 +282,7 @@ public class SeleniumTestsContext {
     private Map<String, TestVariable> variableAlreadyRequestedFromServer;
     private SeleniumGridConnector seleniumGridConnector;
     private List<SeleniumGridConnector> seleniumGridConnectors;
-    private TestManager testManagerIntance;
+    private TestManager testManagerInstance;
     private TestStepManager testStepManager; // handles logging of test steps in this context
     private boolean driverCreationBlocked = false;		// if true, inside this thread, driver creation will be forbidden
     
@@ -294,7 +294,7 @@ public class SeleniumTestsContext {
     	variableServer = null;
     	seleniumGridConnector = null;
     	seleniumGridConnectors = new ArrayList<>();
-    	testManagerIntance = null;
+    	testManagerInstance = null;
     	testStepManager = new TestStepManager();
     }
     
@@ -322,6 +322,10 @@ public class SeleniumTestsContext {
     	if (!allowRequestsToDependencies && toCopy.seleniumGridConnector != null) {
     		seleniumGridConnector = toCopy.seleniumGridConnector;
     		seleniumGridConnectors = new ArrayList<>(toCopy.seleniumGridConnectors);
+    	}
+    	
+    	if (!allowRequestsToDependencies) {
+    		testManagerInstance = toCopy.testManagerInstance;
     	}
     	
     	testNGResult = toCopy.testNGResult;
@@ -775,7 +779,7 @@ public class SeleniumTestsContext {
         getSeleniumGridConnectors();
         
         // create Test Manager connector
-    	testManagerIntance = initTestManager();
+    	testManagerInstance = initTestManager();
     }
     
     /**
@@ -1555,7 +1559,7 @@ public class SeleniumTestsContext {
     }
     
     public TestManager getTestManagerInstance() {
-    	return testManagerIntance;
+    	return testManagerInstance;
     }
     
 

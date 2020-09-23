@@ -1,11 +1,7 @@
 package com.seleniumtests.ut.connectors.tms.squash.entities;
 
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
-import java.util.List;
-import java.util.function.Function;
 
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
@@ -14,7 +10,6 @@ import org.testng.annotations.Test;
 
 import com.seleniumtests.ConnectorsTest;
 import com.seleniumtests.connectors.tms.squash.entities.Campaign;
-import com.seleniumtests.connectors.tms.squash.entities.CampaignFolder;
 import com.seleniumtests.connectors.tms.squash.entities.Iteration;
 import com.seleniumtests.connectors.tms.squash.entities.IterationTestPlanItem;
 import com.seleniumtests.connectors.tms.squash.entities.Project;
@@ -22,10 +17,7 @@ import com.seleniumtests.connectors.tms.squash.entities.TestCase;
 import com.seleniumtests.connectors.tms.squash.entities.TestPlanItemExecution;
 import com.seleniumtests.customexception.ScenarioException;
 
-import kong.unirest.GetRequest;
 import kong.unirest.HttpRequestWithBody;
-import kong.unirest.HttpResponse;
-import kong.unirest.JsonNode;
 import kong.unirest.RequestBodyEntity;
 import kong.unirest.Unirest;
 import kong.unirest.UnirestException;
@@ -140,11 +132,30 @@ public class TestIterationTestPlanItem extends ConnectorsTest {
 		json.put("_links", new JSONObject("{\"self\" : {" + 
 				"          \"href\" : \"http://localhost:8080/api/rest/latest/iteration-test-plan-items/6\"" + 
 				"        }}"));
+		json.put("referenced_test_case", new JSONObject("{" + 
+			"    \"_type\" : \"test-case\"," + 
+			"    \"id\" : 25," + 
+			"    \"_links\" : {" + 
+			"      \"self\" : {" + 
+			"        \"href\" : \"http://localhost:8080/api/rest/latest/test-cases/25\"" + 
+			"      }" + 
+			"    }" + 
+			"  }"));
 	
-		Iteration iteration = Iteration.fromJson(json);
+		IterationTestPlanItem iteration = IterationTestPlanItem.fromJson(json);
 		Assert.assertEquals(iteration.getId(), 6);
-		Assert.assertEquals(iteration.getName(), "foo");
+		Assert.assertEquals(iteration.getTestCase().getId(), 25);
 		Assert.assertEquals(iteration.getUrl(), "http://localhost:8080/api/rest/latest/iteration-test-plan-items/6");
+	}
+	
+	@Test(groups={"ut"}, expectedExceptions = ScenarioException.class)
+	public void testFromJsonWrongFormat() {
+		
+		JSONObject json = new JSONObject();
+		json.put("_type", "iteration-test-plan-item");
+		json.put("id", 6);
+		
+		IterationTestPlanItem.fromJson(json);
 	}
 	
 	@Test(groups={"ut"})

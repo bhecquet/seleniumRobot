@@ -3,6 +3,7 @@ package com.seleniumtests.connectors.tms.squash.entities;
 import com.seleniumtests.customexception.ScenarioException;
 
 import kong.unirest.UnirestException;
+import kong.unirest.json.JSONException;
 import kong.unirest.json.JSONObject;
 
 public class IterationTestPlanItem extends Entity {
@@ -38,11 +39,15 @@ public class IterationTestPlanItem extends Entity {
 
 	public static IterationTestPlanItem fromJson(JSONObject json) {
 
-		return new IterationTestPlanItem(
-				json.getJSONObject("_links").getJSONObject("self").getString("href"),
-				json.getInt("id"), 
-				TestCase.fromJson(json.getJSONObject("referenced_test_case"))
-				);
+		try {
+			return new IterationTestPlanItem(
+					json.getJSONObject("_links").getJSONObject("self").getString("href"),
+					json.getInt("id"), 
+					TestCase.fromJson(json.getJSONObject("referenced_test_case"))
+					);
+		} catch (JSONException e) {
+			throw new ScenarioException(String.format("Cannot create IterationTestPlanItem from JSON [%s] data: %s", json.toString(), e.getMessage()));
+		}
 	}
 	
 	public static IterationTestPlanItem create(Iteration iteration, TestCase testCase) {

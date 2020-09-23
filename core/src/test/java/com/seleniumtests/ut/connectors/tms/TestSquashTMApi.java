@@ -26,12 +26,13 @@ import com.seleniumtests.connectors.tms.squash.entities.IterationTestPlanItem;
 import com.seleniumtests.connectors.tms.squash.entities.Project;
 import com.seleniumtests.connectors.tms.squash.entities.TestCase;
 import com.seleniumtests.customexception.ConfigurationException;
+import com.seleniumtests.customexception.ScenarioException;
 
 import kong.unirest.GetRequest;
 import kong.unirest.Unirest;
 import kong.unirest.UnirestException;
 
-@PrepareForTest({Project.class, CampaignFolder.class, Campaign.class, Iteration.class, Unirest.class})
+@PrepareForTest({Project.class, CampaignFolder.class, Campaign.class, Iteration.class, Unirest.class, TestCase.class})
 public class TestSquashTMApi extends ConnectorsTest {
 	
 	private Project project1;
@@ -53,6 +54,7 @@ public class TestSquashTMApi extends ConnectorsTest {
 		PowerMockito.mockStatic(Campaign.class);
 		PowerMockito.mockStatic(CampaignFolder.class);
 		PowerMockito.mockStatic(Iteration.class);
+		PowerMockito.mockStatic(TestCase.class);
 		
 		// server is present by default
 		createServerMock("GET", "/api/rest/latest/projects", 200, "{}");
@@ -237,13 +239,31 @@ public class TestSquashTMApi extends ConnectorsTest {
 		PowerMockito.when(Project.getAll()).thenReturn(Arrays.asList(project1, project2));
 		SquashTMApi api = new SquashTMApi("http://localhost:4321", "user", "password", "project1");
 		doReturn(Arrays.asList(testPlanItem1, testPlanItem2)).when(iteration1).getAllTestCases();
-		doReturn(testPlanItem1).when(iteration1).addTestCase(any(TestCase.class));
+		PowerMockito.when(TestCase.get(3)).thenReturn(testCase1);
+		doReturn(testPlanItem1).when(iteration1).addTestCase(testCase1);
 		
 		IterationTestPlanItem itpi = api.addTestCaseInIteration(iteration1, 3);
 		Assert.assertEquals(itpi, testPlanItem1);
 		
 		// check test case has been added
 		verify(iteration1).addTestCase(any(TestCase.class));
+		
+	}
+	
+	/**
+	 * Check exception is raised if test case does not exist
+	 */
+	@Test(groups={"ut"}, expectedExceptions = ConfigurationException.class)
+	public void testCannotAddTestCaseDoesNotExist() {
+		PowerMockito.when(Project.getAll()).thenReturn(Arrays.asList(project1, project2));
+		SquashTMApi api = new SquashTMApi("http://localhost:4321", "user", "password", "project1");
+		doReturn(Arrays.asList(testPlanItem1, testPlanItem2)).when(iteration1).getAllTestCases();
+		PowerMockito.doThrow(new ScenarioException("")).when(TestCase.class);
+		TestCase.get(3);
+		doReturn(testPlanItem1).when(iteration1).addTestCase(any(TestCase.class));
+		
+		IterationTestPlanItem itpi = api.addTestCaseInIteration(iteration1, 3);
+
 		
 	}
 	
@@ -255,6 +275,8 @@ public class TestSquashTMApi extends ConnectorsTest {
 		PowerMockito.when(Project.getAll()).thenReturn(Arrays.asList(project1, project2));
 		SquashTMApi api = new SquashTMApi("http://localhost:4321", "user", "password", "project1");
 		doReturn(Arrays.asList(testPlanItem1, testPlanItem2)).when(iteration1).getAllTestCases();
+		PowerMockito.when(TestCase.get(3)).thenReturn(testCase1);
+		doReturn(testPlanItem1).when(iteration1).addTestCase(testCase1);
 
 		IterationTestPlanItem itpi = api.addTestCaseInIteration(iteration1, 2);
 		Assert.assertEquals(itpi, testPlanItem2);

@@ -32,27 +32,27 @@ public class TestTestManager extends GenericTest {
 
 	@Test(groups={"ut"})
 	public void testTmsSelectionHpAlm() {
-		String config = "{'type': 'hp', 'tmsRun': '3'}";
+		String config = "{'tmsType': 'hp', 'tmsRun': '3'}";
 		TestManager manager = TestManager.getInstance(new JSONObject(config));
 		Assert.assertTrue(manager instanceof HpAlmConnector);
 	}
 	
 	@Test(groups={"ut"})
 	public void testTmsSelectionSquashTm() {
-		String config = "{'type': 'squash'}";
+		String config = "{'tmsType': 'squash'}";
 		TestManager manager = TestManager.getInstance(new JSONObject(config));
 		Assert.assertTrue(manager instanceof SquashTMConnector);
 	}
 	
 	@Test(groups={"ut"}, expectedExceptions=ConfigurationException.class)
 	public void testTmsSelectionWrongType() {
-		String config = "{'type': 'spira', 'tmsRun': '3'}";
+		String config = "{'tmsType': 'spira', 'tmsRun': '3'}";
 		TestManager.getInstance(new JSONObject(config));
 	}
 	
 	@Test(groups={"ut"}, expectedExceptions=ConfigurationException.class)
 	public void testTmsSelectionNoType() {
-		String config = "{'run': '3'}";
+		String config = "{'tmsType': '3'}";
 		TestManager.getInstance(new JSONObject(config));
 	}
 }

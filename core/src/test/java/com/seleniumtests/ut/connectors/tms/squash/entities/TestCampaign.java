@@ -275,6 +275,17 @@ public class TestCampaign extends ConnectorsTest {
 		Assert.assertEquals(campaign.getUrl(), "http://localhost:8080/api/rest/latest/campaigns/41");
 	}
 	
+	@Test(groups={"ut"}, expectedExceptions = ScenarioException.class)
+	public void testFromJsonWrongFormat() {
+		
+		JSONObject json = new JSONObject();
+		json.put("_type", "campaign");
+		json.put("id", 1);
+		json.put("name", "foo");
+		
+		Campaign.fromJson(json);
+	}
+	
 	@Test(groups={"ut"})
 	public void testCreateCampaignNoFolder() {
 		HttpRequestWithBody postRequest = (HttpRequestWithBody) createServerMock("POST", "/campaigns", 200, "{" + 

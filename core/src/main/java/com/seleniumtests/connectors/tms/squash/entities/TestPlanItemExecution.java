@@ -3,6 +3,7 @@ package com.seleniumtests.connectors.tms.squash.entities;
 import com.seleniumtests.customexception.ScenarioException;
 
 import kong.unirest.UnirestException;
+import kong.unirest.json.JSONException;
 import kong.unirest.json.JSONObject;
 
 /**
@@ -27,11 +28,15 @@ public class TestPlanItemExecution extends Entity {
 
 	public static TestPlanItemExecution fromJson(JSONObject json) {
 
-		return new TestPlanItemExecution (
-				json.getJSONObject("_links").getJSONObject("self").getString("href"),
-				json.getInt("id"), 
-				json.getString("name")
-				);
+		try {
+			return new TestPlanItemExecution (
+					json.getJSONObject("_links").getJSONObject("self").getString("href"),
+					json.getInt("id"), 
+					json.getString("name")
+					);
+		} catch (JSONException e) {
+			throw new ScenarioException(String.format("Cannot create TestPlanItemException from JSON [%s] data: %s", json.toString(), e.getMessage()));
+		}
 	}
 	
 	public void setResult(ExecutionStatus result) {

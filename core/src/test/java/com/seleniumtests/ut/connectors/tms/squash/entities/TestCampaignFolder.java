@@ -161,6 +161,19 @@ public class TestCampaignFolder extends ConnectorsTest {
 		Assert.assertNull(campaignFolder.getProject());
 	}
 	
+	@Test(groups={"ut"}, expectedExceptions = ScenarioException.class)
+	public void testFromJsonWrongFormat() {
+		
+		JSONObject json = new JSONObject();
+		json.put("_type", "campaign-folder");
+		json.put("id", 1);
+		json.put("_links", new JSONObject("{\"self\" : {" + 
+				"          \"href\" : \"http://localhost:8080/api/rest/latest/campaign-folder/1\"" + 
+				"        }}"));
+		
+		CampaignFolder.fromJson(json);
+	}
+	
 	@Test(groups={"ut"})
 	public void testFromJsonWithProject() {
 		

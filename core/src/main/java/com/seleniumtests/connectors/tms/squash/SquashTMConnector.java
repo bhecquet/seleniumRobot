@@ -12,11 +12,7 @@ import com.seleniumtests.core.utils.TestNGResultUtils;
 import com.seleniumtests.customexception.ConfigurationException;
 
 public class SquashTMConnector extends TestManager {
-	
-	public static final String SQUASH_TM_SERVER_URL = "squashServerUrl";
-	public static final String SQUASH_TM_PASSWORD = "squashPassword";
-	public static final String SQUASH_TM_USER = "squashUser";
-	public static final String SQUASH_TM_PROJECT = "squashProject";
+
 	private String user;
 	private String password;
 	private String serverUrl;
@@ -30,10 +26,10 @@ public class SquashTMConnector extends TestManager {
 	public SquashTMConnector(String url, String user, String password, String project) {
 		this();
 		JSONObject config = new JSONObject();
-		config.put(SQUASH_TM_SERVER_URL, url);
-		config.put(SQUASH_TM_USER, user);
-		config.put(SQUASH_TM_PASSWORD, password);
-		config.put(SQUASH_TM_PROJECT, project);
+		config.put(TMS_SERVER_URL, url);
+		config.put(TMS_USER, user);
+		config.put(TMS_PASSWORD, password);
+		config.put(TMS_PROJECT, project);
 		init(config);
 	}
 	
@@ -57,15 +53,15 @@ public class SquashTMConnector extends TestManager {
 
 	@Override
 	public void init(JSONObject connectParams) {
-		String serverUrlVar = connectParams.optString(SQUASH_TM_SERVER_URL, null);
-		String projectVar = connectParams.optString(SQUASH_TM_PROJECT, null);
-		String userVar = connectParams.optString(SQUASH_TM_USER, null);
-		String passwordVar = connectParams.optString(SQUASH_TM_PASSWORD, null);
+		String serverUrlVar = connectParams.optString(TMS_SERVER_URL, null);
+		String projectVar = connectParams.optString(TMS_PROJECT, null);
+		String userVar = connectParams.optString(TMS_USER, null);
+		String passwordVar = connectParams.optString(TMS_PASSWORD, null);
 		
 
 		if (serverUrlVar == null || projectVar == null || userVar == null || passwordVar == null) {
 			throw new ConfigurationException(String.format("SquashTM access not correctly configured. Environment configuration must contain variables"
-					+ "%s, %s, %s, %s", SQUASH_TM_SERVER_URL, SQUASH_TM_PASSWORD, SQUASH_TM_USER, SQUASH_TM_PROJECT));
+					+ "%s, %s, %s, %s", TMS_SERVER_URL, TMS_PASSWORD, TMS_USER, TMS_PROJECT));
 		}
 		
 		serverUrl = serverUrlVar;
@@ -115,7 +111,7 @@ public class SquashTMConnector extends TestManager {
 			}
 
 		} catch (Exception e) {
-			logger.error(String.format("Could not record result for test method %s", TestNGResultUtils.getTestName(testResult)), e);
+			logger.error(String.format("Could not record result for test method %s: %s", TestNGResultUtils.getTestName(testResult), e.getMessage()));
 		}
 	}
 

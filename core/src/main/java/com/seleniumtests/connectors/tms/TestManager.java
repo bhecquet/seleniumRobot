@@ -31,6 +31,14 @@ public abstract class TestManager {
 	
 
 	protected static final Logger logger = SeleniumRobotLogger.getLogger(TestManager.class);
+	
+	public static final String TMS_TYPE = "tmsType"; 
+	public static final String TMS_SERVER_URL = "tmsUrl";
+	public static final String TMS_PASSWORD = "tmsPassword";
+	public static final String TMS_USER = "tmsUser";
+	public static final String TMS_PROJECT = "tmsProject";
+	public static final String TMS_DOMAIN = "tmsDomain";
+	
 	protected Boolean initialized;
 	
 	public TestManager() {
@@ -55,9 +63,9 @@ public abstract class TestManager {
 
 		String type;
 		try {
-			type = configString.getString("type");
+			type = configString.getString(TMS_TYPE);
 		} catch (JSONException e) {
-			throw new ConfigurationException("Test manager type must be provided. ex: {'type': 'hp', 'run': '3'}");
+			throw new ConfigurationException("Test manager type must be provided. ex: {'tmsType': 'hp', 'run': '3'}");
 		}
 		
 		if ("hp".equals(type)) {
