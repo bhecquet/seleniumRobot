@@ -848,6 +848,14 @@ public class TestPageObject2 extends MockitoTest {
 		page.assertChecked("checkbox");
 	}
 	
+	@Test(groups={"ut"})
+	public void testAssertRadioChecked() {
+		when(driver.findElement(By.id("radio"))).thenReturn(element);
+		when(element.getTagName()).thenReturn("input");
+		when(element.isSelected()).thenReturn(true);
+		page.assertChecked("radio");
+	}
+	
 	@Test(groups={"ut"}, expectedExceptions = AssertionError.class)
 	public void testAssertCheckedNotChecked() {
 		when(driver.findElement(By.id("checkbox"))).thenReturn(element);
@@ -873,6 +881,14 @@ public class TestPageObject2 extends MockitoTest {
 		when(element.getTagName()).thenReturn("input");
 		when(element.isSelected()).thenReturn(false);
 		page.assertNotChecked("checkbox");
+	}
+	
+	@Test(groups={"ut"})
+	public void testAssertRadioNotChecked() {
+		when(driver.findElement(By.id("radio"))).thenReturn(element);
+		when(element.getTagName()).thenReturn("input");
+		when(element.isSelected()).thenReturn(false);
+		page.assertNotChecked("radio");
 	}
 	
 	@Test(groups={"ut"}, expectedExceptions = AssertionError.class)
