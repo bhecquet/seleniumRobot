@@ -404,7 +404,7 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 			TestTasks.addStep(null);
 		} catch (ConfigurationException e) {}
 		
-		TestStep tearDownStep = new TestStep("Test end", testResult, new ArrayList<>(), true);
+		TestStep tearDownStep = new TestStep(TestStepManager.LAST_STEP_NAME, testResult, new ArrayList<>(), true);
 		TestStepManager.setCurrentRootTestStep(tearDownStep);
 		
 		if (testResult.isSuccess()) {
@@ -426,22 +426,7 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 			scenarioLogger.log("Test has not started or has been skipped");
 		}
 		
-		File videoFile = WebUIDriver.logFinalDriversState();
-		if (videoFile != null) {
-			Path pathAbsolute = Paths.get(videoFile.getAbsolutePath());
-	        Path pathBase = Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory());
-	        Path pathRelative = pathBase.relativize(pathAbsolute);
-	        
-	        if (SeleniumTestsContextManager.getThreadContext().getVideoCapture() == VideoCaptureMode.TRUE
-	        		|| (SeleniumTestsContextManager.getThreadContext().getVideoCapture() == VideoCaptureMode.ON_SUCCESS && testResult.isSuccess())
-	        		|| (SeleniumTestsContextManager.getThreadContext().getVideoCapture() == VideoCaptureMode.ON_ERROR && !testResult.isSuccess())) {
-	        	scenarioLogger.logFile(pathRelative.toFile(), "Video capture");
-	        	logger.info("Video file copied to " + pathAbsolute.toFile().getAbsolutePath());
-			} else {
-				pathAbsolute.toFile().delete();
-			}
-		}
-		
+		WebUIDriver.logFinalDriversState();
 		tearDownStep.updateDuration();
 		TestStepManager.logTestStep(tearDownStep);
 		

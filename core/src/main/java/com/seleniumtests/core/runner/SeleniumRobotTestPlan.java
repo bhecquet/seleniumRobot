@@ -17,7 +17,10 @@
  */
 package com.seleniumtests.core.runner;
 
+import java.io.File;
 import java.lang.reflect.Method;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -26,6 +29,7 @@ import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 import org.openqa.selenium.WebDriver;
+import org.testng.ITestResult;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Listeners;
@@ -34,6 +38,7 @@ import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.TestTasks;
 import com.seleniumtests.driver.WebUIDriver;
+import com.seleniumtests.driver.screenshots.VideoCaptureMode;
 import com.seleniumtests.reporter.logger.StringInfo;
 import com.seleniumtests.util.logging.ScenarioLogger;
 
@@ -80,7 +85,24 @@ public class SeleniumRobotTestPlan {
 	 * #issue 136: This will close any remaining browser for this thread and forbid user to create a new driver in other \@AfterXXX
 	 */
 	@AfterMethod(alwaysRun=true)
-	public void finishTestMethod(Method method) {
+	public void finishTestMethod(Method method, ITestResult testResult) {
+		
+		// stop video capture and log file
+		File videoFile = WebUIDriver.stopVideoCapture();
+		if (videoFile != null) {
+			Path pathAbsolute = Paths.get(videoFile.getAbsolutePath());
+	        Path pathBase = Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory());
+	        Path pathRelative = pathBase.relativize(pathAbsolute);
+	        
+	        if (SeleniumTestsContextManager.getThreadContext().getVideoCapture() == VideoCaptureMode.TRUE
+	        		|| (SeleniumTestsContextManager.getThreadContext().getVideoCapture() == VideoCaptureMode.ON_SUCCESS && testResult.isSuccess())
+	        		|| (SeleniumTestsContextManager.getThreadContext().getVideoCapture() == VideoCaptureMode.ON_ERROR && !testResult.isSuccess())) {
+	        	((ScenarioLogger)logger).logFileToTestEnd(pathRelative.toFile(), "Video capture");
+	        	logger.info("Video file copied to " + pathAbsolute.toFile().getAbsolutePath());
+			} else {
+				pathAbsolute.toFile().delete();
+			}
+		}
 
 		WebUIDriver.cleanUp();
 		SeleniumTestsContextManager.getThreadContext().setDriverCreationBlocked(true);

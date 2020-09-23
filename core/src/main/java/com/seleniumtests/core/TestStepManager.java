@@ -9,7 +9,7 @@ import com.seleniumtests.reporter.logger.TestStep;
 
 public class TestStepManager {
 	
-
+	public static final String LAST_STEP_NAME = "Test end";
 	List<TestStep> testSteps;
 	TestStep runningStep;
 	TestStep rootStep;
@@ -39,6 +39,20 @@ public class TestStepManager {
 	 */
 	public TestStep getRunningTestStep() {
 		return runningStep;
+	}
+	
+	/**
+	 * Get the last test step (the one names "Test end") or null if not found
+	 * @return
+	 */
+	public TestStep getLastTestStep() {
+		for (TestStep testStep: testSteps) {
+			if (LAST_STEP_NAME.equals(testStep.getName())) {
+				return testStep;
+			}
+		}
+		return null;
+		
 	}
 
 	public void setRunningTestStep(TestStep testStep) {

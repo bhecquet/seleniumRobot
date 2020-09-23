@@ -52,6 +52,10 @@ public abstract class OSUtility {
 	 *********** OS information ***************
 	 ******************************************/
 	
+	/**
+	 * Platform on which this test executes
+	 * @return
+	 */
 	public static Platform getCurrentPlatorm() {
 		if (isWindows()) {
 			return Platform.WINDOWS;
