@@ -74,6 +74,7 @@ import com.seleniumtests.uipage.htmlelements.Element;
 import com.seleniumtests.uipage.htmlelements.GenericPictureElement;
 import com.seleniumtests.uipage.htmlelements.HtmlElement;
 import com.seleniumtests.uipage.htmlelements.LinkElement;
+import com.seleniumtests.uipage.htmlelements.RadioButtonElement;
 import com.seleniumtests.uipage.htmlelements.SelectList;
 import com.seleniumtests.uipage.htmlelements.Table;
 import com.seleniumtests.util.helper.WaitHelper;
@@ -1415,11 +1416,11 @@ public class PageObject extends BasePage implements IPage {
 	@GenericStep
 	public <T extends PageObject> T assertChecked(String fieldName) {
 		Element element = getElement(fieldName);
-		if (element instanceof CheckBoxElement) {
+		if (element instanceof CheckBoxElement || element instanceof RadioButtonElement) {
 			Assert.assertTrue(((HtmlElement) element).isElementPresent(0), String.format("Element %s is not present", fieldName));
-			Assert.assertTrue(((CheckBoxElement)element).isSelected(), String.format("Element %s is unchecked", fieldName));
+			Assert.assertTrue(((HtmlElement)element).isSelected(), String.format("Element %s is unchecked", fieldName));
 		} else {
-			throw new ScenarioException(String.format("Element %s is not an CheckBoxElement", fieldName));
+			throw new ScenarioException(String.format("Element %s is not an CheckBoxElement/RadioButtonElement", fieldName));
 		}
 		return (T)this;
 	}
@@ -1427,11 +1428,11 @@ public class PageObject extends BasePage implements IPage {
 	@GenericStep
 	public <T extends PageObject> T assertNotChecked(String fieldName) {
 		Element element = getElement(fieldName);
-		if (element instanceof CheckBoxElement) {
+		if (element instanceof CheckBoxElement || element instanceof RadioButtonElement) {
 			Assert.assertTrue(((HtmlElement) element).isElementPresent(0), String.format("Element %s is not present", fieldName));
-			Assert.assertFalse(((CheckBoxElement)element).isSelected(), String.format("Element %s is checked", fieldName));
+			Assert.assertFalse(((HtmlElement)element).isSelected(), String.format("Element %s is checked", fieldName));
 		} else {
-			throw new ScenarioException(String.format("Element %s is not an CheckBoxElement", fieldName));
+			throw new ScenarioException(String.format("Element %s is not an CheckBoxElement/RadioButtonElement", fieldName));
 		}
 		return (T)this;
 	}
@@ -1475,7 +1476,7 @@ public class PageObject extends BasePage implements IPage {
     	if (element instanceof HtmlElement) {
 			Assert.assertEquals(((HtmlElement)element).findElements().size(), elementCount);
 		} else {
-			throw new ScenarioException(String.format("Element %s is not an CheckBoxElement", fieldName));
+			throw new ScenarioException(String.format("Element %s is not an HtmlElement", fieldName));
 		}
 		return (T)this;
     }
