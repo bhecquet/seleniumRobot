@@ -147,6 +147,23 @@ public class ScenarioLogger extends Logger {
     		// do nothing, no context has been created which is the case if we try to log message in @BeforeSuite / @BeforeGroup
     	}
     }
+    
+    /**
+     * Log the file into the "Test end" step
+     * @param file
+     * @param description
+     */
+    public void logFileToTestEnd(File file, String description) {
+    	
+    	try {
+    		TestStep runningStep = SeleniumTestsContextManager.getContextForCurrentTestState().get(0).getTestStepManager().getLastTestStep();
+    		if (runningStep != null) {
+    			runningStep.addFile(new GenericFile(file, description));
+    		}
+    	} catch (IndexOutOfBoundsException e) {
+    		// do nothing, no context has been created which is the case if we try to log message in @BeforeSuite / @BeforeGroup
+    	}
+    }
  
     /**
      * Log screenshot. Should not be directly used inside tests

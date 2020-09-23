@@ -254,15 +254,15 @@ public class WebUIDriver {
     		}
     	}
     	
-    	File videoFile = stopVideoCapture();
+//    	File videoFile = stopVideoCapture();
 		
-		return videoFile;
+		return null;
     }
     
     /**
      * Stop video capture
      */
-    private static File stopVideoCapture() {
+    public static File stopVideoCapture() {
     	if (videoRecorder.get() != null) {
 			
 			try {
