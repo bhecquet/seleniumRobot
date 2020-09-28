@@ -163,19 +163,31 @@ On Linux/Mac systems, you can add `export APPIUM_HOME=<path to appium>` to the `
 When running seleniumRobot from eclipse, it may not inherit the user environment variables, so set it in Run Configuration
 
 #### Configuring Android for tests ####
-- Install android SDK (the zip/command line tools version is enough) : [https://developer.android.com/studio/index.html#downloads](https://developer.android.com/studio/index.html#downloads)
-- Install Intel HAXM driver to allow Virtual machine speedup. This can also be installed through Android SDK Manager
-- Open SDK Manager and select the android images corresponding to the versions you wish to use (select only x86 Atom 64 bits). Install the components
-- In AVD Manager, create a virtual machine (activate graphic acceleration) and start it. You should be able to use your Android virtual device.
-- Add `ANDROID_HOME` environment variable pointing to root of android tools. This is the directory where AVDManager is copied
+- Install android SDK (the zip/command line tools version is enough) into `<ANDROID_SDK_ROOT>/cmdline-tools` : [https://developer.android.com/studio/index.html#downloads](https://developer.android.com/studio/index.html#downloads)
+- Install additional components (This can be done through Android Studio)
+
+```
+	sdkmanager.bat --install extras;intel;Hardware_Accelerated_Execution_Manager
+	sdkmanager.bat --install platform-tools
+```
+
+- Install new images (This can be done through Android Studio)
+
+```
+	sdkmanager.bat --install system-images;android-30;google_apis_playstore;x86 
+	sdkmanager.bat --install build-tools;30.0.2
+	sdkmanager.bat --install platforms;android-30
+```
+
+- Create a virtual machine (activate graphic acceleration) and start it. You should be able to use your Android virtual device: `avdmanager create avd -n <avd_name> -k system-images;android-30;google_apis;x86 -c 200M -p D:\tmp\avd`
+- Add `ANDROID_HOME` / `ANDROID_SDK_ROOT` environment variable pointing to root of android tools. This is the directory where all android tools are (This is the root folder containing 'platform-tools', 'system-images', ... folders)
+- Start emulator (from Android Studio or command line): `emulator -avd <avd_name> -netdelay none -netspeed full -port 5560 -no-snapshot-load`
 
 #### Configuring iOS for tests ####
 Follow appium instruction here [http://appium.io/slate/en/master/?ruby#running-appium-on-mac-os-x] (http://appium.io/slate/en/master/?ruby#running-appium-on-mac-os-x)
 As of June 2017, it asks for (simulator and real device):
 - install xcode
 - install xcode-select
-- `npm install -g authorize-ios`
-- `sudo authorize-ios`
 - install homebrew (see homebrew website)
 - `brew install carthage`
 
