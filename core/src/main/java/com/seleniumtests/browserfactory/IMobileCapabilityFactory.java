@@ -51,9 +51,9 @@ public abstract class IMobileCapabilityFactory extends ICapabilitiesFactory {
     
     	if (app != null && !"".equals(app.trim())) {
 	    	if (webDriverConfig.isFullReset()) {
-	    		capabilities.setCapability(MobileCapabilityType.FULL_RESET, "true");
+	    		capabilities.setCapability(MobileCapabilityType.FULL_RESET, true);
 	    	} else {
-	    		capabilities.setCapability(MobileCapabilityType.FULL_RESET, "false");
+	    		capabilities.setCapability(MobileCapabilityType.FULL_RESET, false);
 	    	}
     	}
     	
