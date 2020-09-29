@@ -190,7 +190,7 @@ public class TestAndroidCapabilitiesFactory extends GenericTest {
 		Assert.assertEquals(capa.getCapability(MobileCapabilityType.PLATFORM_NAME), "android");
 		Assert.assertEquals(capa.getCapability(MobileCapabilityType.PLATFORM_VERSION), "8.0");
 		Assert.assertEquals(capa.getCapability(MobileCapabilityType.DEVICE_NAME), "Samsung Galasy S8");
-		Assert.assertEquals(capa.getCapability(MobileCapabilityType.FULL_RESET), "true");
+		Assert.assertEquals(capa.getCapability(MobileCapabilityType.FULL_RESET), true);
 		Assert.assertEquals(capa.getCapability(AndroidMobileCapabilityType.APP_PACKAGE), "appPackage");
 		Assert.assertEquals(capa.getCapability(AndroidMobileCapabilityType.APP_ACTIVITY), "appActivity");
 	}
@@ -257,7 +257,7 @@ public class TestAndroidCapabilitiesFactory extends GenericTest {
 		AndroidCapabilitiesFactory capaFactory = new AndroidCapabilitiesFactory(config);
 		MutableCapabilities capa = capaFactory.createCapabilities();
 		
-		Assert.assertEquals(capa.getCapability(MobileCapabilityType.FULL_RESET), "false");
+		Assert.assertEquals(capa.getCapability(MobileCapabilityType.FULL_RESET), false);
 	}
 	
 	/**
