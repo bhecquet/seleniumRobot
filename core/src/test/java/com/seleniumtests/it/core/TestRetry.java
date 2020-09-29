@@ -23,6 +23,7 @@ import java.nio.file.Paths;
 import org.apache.commons.io.FileUtils;
 import org.springframework.util.StringUtils;
 import org.testng.Assert;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 import org.testng.xml.XmlSuite.ParallelMode;
 
@@ -58,6 +59,27 @@ public class TestRetry extends ReporterTest {
 		String detailedReportContent = readTestMethodResultFile("testWithException");
 		Assert.assertTrue(detailedReportContent.contains("Failed in 3 times"));
 		Assert.assertTrue(detailedReportContent.contains("[RETRYING] class com.seleniumtests.it.stubclasses.StubTestClass.testWithException"));
+		
+		// check that in case of retry, steps are not logged twice
+		Assert.assertTrue(detailedReportContent.contains("step 1"));
+		Assert.assertTrue(detailedReportContent.contains("<li>played 3 times")); // only the last step is retained
+		Assert.assertFalse(detailedReportContent.contains("<li>played 2 times")); // only the last step is retained
+		Assert.assertEquals(StringUtils.countOccurrencesOf(detailedReportContent, "step 1"), 1); 
+		
+	}
+	
+	@Test(groups={"it"})
+	public void testRetryOnExceptionWithParameter() throws Exception {
+		
+		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testWithExceptionAndDataProvider"});
+		
+		String mainReportContent = readSummaryFile();
+		Assert.assertTrue(mainReportContent.matches(".*<a href\\='testWithExceptionAndDataProvider/TestReport\\.html'.*?>testWithExceptionAndDataProvider</a>.*"));
+		
+		// check test with exception is retried based on log. No more direct way found
+		String detailedReportContent = readTestMethodResultFile("testWithExceptionAndDataProvider");
+		Assert.assertTrue(detailedReportContent.contains("FAILED, Retrying 2 time"));
+		Assert.assertTrue(detailedReportContent.contains("[RETRYING] class com.seleniumtests.it.stubclasses.StubTestClass.testWithExceptionAndDataProvider"));
 		
 		// check that in case of retry, steps are not logged twice
 		Assert.assertTrue(detailedReportContent.contains("step 1"));

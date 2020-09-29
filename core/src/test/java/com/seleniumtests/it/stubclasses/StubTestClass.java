@@ -30,6 +30,7 @@ import org.testng.SkipException;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
@@ -149,6 +150,22 @@ public class StubTestClass extends StubParentClass {
 	
 	@Test(groups="stub")
 	public void testWithException() {
+		count++;
+		TestStep step1 = new TestStep("step 1", Reporter.getCurrentTestResult(), new ArrayList<>(), maskPassword);
+		step1.addAction(new TestAction(String.format("played %d times", count), false, new ArrayList<>()));
+		step1.addAction(new TestAction("click button", false, new ArrayList<>()));
+		TestStepManager.logTestStep(step1);
+		throw new DriverExceptions("some exception");
+	}
+	
+
+	@DataProvider(name = "data")
+	 public Object[][] data() {
+		return new String[][] {new String[] {"data2"}};
+    }
+	
+	@Test(groups="stub", dataProvider = "data")
+	public void testWithExceptionAndDataProvider(String data) {
 		count++;
 		TestStep step1 = new TestStep("step 1", Reporter.getCurrentTestResult(), new ArrayList<>(), maskPassword);
 		step1.addAction(new TestAction(String.format("played %d times", count), false, new ArrayList<>()));

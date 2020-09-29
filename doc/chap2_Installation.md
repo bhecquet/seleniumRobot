@@ -154,7 +154,7 @@ Depending on your tests, you should consider install:
 #### Installing Appium ####
 Either install it with .dmg on Mac or .exe on Windows or through npm `npm install -g appium`
 Set `APPIUM_HOME` environment variable to point to path where appium has been installed:
-- On Windows, using .exe, it's the root path where Appium.exe is located
+- On Windows, using .exe, it's `<root path where Appium.exe is located>/resources/app`
 - On Mac, using .dmg, it will be `/Applications/Appium.app/Contents/Resources/app`
 - On any platform using npm installation, it will be the path where root `node_modules` folder has been created. This folder should contain an `appium` subfolder
 
