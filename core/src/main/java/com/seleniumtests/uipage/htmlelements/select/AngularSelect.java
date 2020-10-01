@@ -52,7 +52,7 @@ public class AngularSelect extends CommonSelectList implements ISelectList {
 	@Override
 	public void finalizeAction() {
 		HtmlElement selectContent = new HtmlElement("options", By.tagName("ng-dropdown-panel"), frameElement);
-		if (selectContent.isElementPresent()) {
+		if (selectContent.isElementPresent(0)) {
 			parentElement.findElement(By.className("ng-arrow-wrapper")).click();
 		}
 	}

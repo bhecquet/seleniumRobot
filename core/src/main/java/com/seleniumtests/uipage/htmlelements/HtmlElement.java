@@ -26,6 +26,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -1484,6 +1485,18 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     	waitForInvisibility(SeleniumTestsContextManager.getThreadContext().getExplicitWaitTimeout());
     }
     
+	public void setImplicitWaitTimeout(final double timeout) {
+        if (timeout < 1) {
+            driver.manage().timeouts().implicitlyWait((long) (timeout * 1000), TimeUnit.MILLISECONDS);
+        } else {
+            try {
+                driver.manage().timeouts().implicitlyWait((int)timeout, TimeUnit.SECONDS);
+            } catch (Exception ex) {
+            	logger.error(ex);
+            }
+        }
+    }
+    
     /**
      * Wait element to present using Explicit Waits with timeout in seconds. This method is used for special element
      * which needs long time to present.
@@ -1496,33 +1509,45 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     	// refresh driver
     	driver = updateDriver();
     	
-    	Clock clock = Clock.systemUTC();
-    	Instant end = clock.instant().plusSeconds(Math.max(1, timeout));
+    	try {
+    		setImplicitWaitTimeout(0);
     	
-    	while (end.isAfter(clock.instant())) {
-    		try {
-	    		WebElement elt = new WebDriverWait(driver, 1).ignoring(ConfigurationException.class, ScenarioException.class).until(ExpectedConditionsC.presenceOfElementLocated(this));
-	            outlineElement(elt);
-	    		return;
-    		} catch (TimeoutException e) {
-    		}
+	    	Clock clock = Clock.systemUTC();
+	    	Instant end = clock.instant().plusSeconds(Math.max(1, timeout));
+	    	
+	    	while (end.isAfter(clock.instant())) {
+	    		try {
+		    		WebElement elt = new WebDriverWait(driver, 0).ignoring(ConfigurationException.class, ScenarioException.class).until(ExpectedConditionsC.presenceOfElementLocated(this));
+		            outlineElement(elt);
+		    		return;
+	    		} catch (TimeoutException e) {
+	    		} 
+	    	}
+	    	throw new TimeoutException("Element is not present", new NoSuchElementException(toString()));
+    	} finally {
+    		setImplicitWaitTimeout(SeleniumTestsContextManager.getThreadContext().getImplicitWaitTimeout());
     	}
-    	throw new TimeoutException("Element is not present", new NoSuchElementException(toString()));
     }
     
     public void waitFor(int timeout, ExpectedCondition<?> condition) {
     	
-    	Clock clock = Clock.systemUTC();
-    	Instant end = clock.instant().plusSeconds(Math.max(1, timeout));
-    	
-    	while (end.isAfter(clock.instant())) {
-    		try {
-    			new WebDriverWait(driver, timeout).ignoring(ConfigurationException.class, ScenarioException.class).until(condition);
-	    		return;
-    		} catch (TimeoutException e) {
-    		}
+    	try {
+    		setImplicitWaitTimeout(0);
+	    	Clock clock = Clock.systemUTC();
+	    	Instant end = clock.instant().plusSeconds(Math.max(1, timeout));
+	    	
+	    	while (end.isAfter(clock.instant())) {
+	    		try {
+	    			new WebDriverWait(driver, timeout).ignoring(ConfigurationException.class, ScenarioException.class).until(condition);
+		    		return;
+	    		} catch (TimeoutException e) {
+	    		}
+	    	}
+	    	throw new TimeoutException("Element is not present", new NoSuchElementException(toString()));
+	    
+    	} finally {
+    		setImplicitWaitTimeout(SeleniumTestsContextManager.getThreadContext().getImplicitWaitTimeout());
     	}
-    	throw new TimeoutException("Element is not present", new NoSuchElementException(toString()));
     }
     
     public void waitForNotPresent(int timeout) {
