@@ -56,17 +56,20 @@ public class CachedHtmlElement implements WebElement {
 	}
 	
 	public CachedHtmlElement(WebElement elementToCache) {
-		try {
-			rectangle = elementToCache.getRect();
-			location = new Point(rectangle.x, rectangle.y);
-			size = new Dimension(rectangle.width, rectangle.height);
-		} catch (WebDriverException e) {
-			location = elementToCache.getLocation();
-			size = elementToCache.getSize();
-			rectangle = new Rectangle(location, size);
-		}
+//		try {
+//			rectangle = elementToCache.getRect();
+//			location = new Point(rectangle.x, rectangle.y);
+//			size = new Dimension(rectangle.width, rectangle.height);
+//		} catch (WebDriverException e) {
+//			location = elementToCache.getLocation();
+//			size = elementToCache.getSize();
+//			rectangle = new Rectangle(location, size);
+//		}
+		// position and size take some time for methods that are never used 
+		location = new Point(0, 0);
+		size = new Dimension(0, 0);
+		rectangle = new Rectangle(location, size);
 		
-			
 		cachedElement = Jsoup.parseBodyFragment(elementToCache.getAttribute("outerHTML")).body().child(0);	
 		if ("option".equals(cachedElement.tagName())
 				|| ("input".equals(cachedElement.tagName()) && "checkbox".equals(cachedElement.attributes().getIgnoreCase("type")))
