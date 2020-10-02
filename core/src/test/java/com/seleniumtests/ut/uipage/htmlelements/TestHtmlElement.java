@@ -47,7 +47,9 @@ import org.openqa.selenium.Dimension;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.TimeoutException;
+import org.openqa.selenium.WebDriver.Options;
 import org.openqa.selenium.WebDriver.TargetLocator;
+import org.openqa.selenium.WebDriver.Timeouts;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Keyboard;
@@ -121,6 +123,12 @@ public class TestHtmlElement extends MockitoTest {
 
 	@Mock
 	private WebUIDriver uiDriver;
+	
+	@Mock
+	private Options options;
+	
+	@Mock
+	private Timeouts timeouts;
 
 	@Mock
 	private DriverConfig driverConfig;
@@ -162,6 +170,8 @@ public class TestHtmlElement extends MockitoTest {
 		when(driver.getKeyboard()).thenReturn(keyboard);
 		when(driver.getMouse()).thenReturn(mouse);
 		when(driver.switchTo()).thenReturn(locator);
+		when(driver.manage()).thenReturn(options);
+		when(options.timeouts()).thenReturn(timeouts);
 		when(driver.executeScript(anyString())).thenReturn(Arrays.asList(100, 100));
 
 		when(uiDriver.getConfig()).thenReturn(driverConfig);
