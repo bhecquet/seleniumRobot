@@ -18,6 +18,8 @@
 package com.seleniumtests.ut.uipage;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.Dimension;
+import org.openqa.selenium.Point;
 import org.openqa.selenium.Rectangle;
 import org.openqa.selenium.WebDriverException;
 import org.testng.Assert;
@@ -173,28 +175,28 @@ public class TestCachedHtmlElement extends GenericTest {
 	}
 	
 	/**
-	 * Check cached location is the same as the real element location
+	 * Check cached location, size and rectangle are set to 0 (for speed: issue #382)
 	 */
 	@Test(groups={"ut"})
 	public void testGetLocation() {
-		Assert.assertEquals(new CachedHtmlElement(DriverTestPage.selectList.getElement()).getLocation(), DriverTestPage.selectList.getElement().getLocation());
+		Assert.assertEquals(new CachedHtmlElement(DriverTestPage.selectList.getElement()).getLocation(), new Point(0, 0));
 	}
 	
 	@Test(groups={"ut"})
 	public void testGetSize() {
-		Assert.assertEquals(new CachedHtmlElement(DriverTestPage.selectList.getElement()).getSize(), DriverTestPage.selectList.getElement().getSize());
+		Assert.assertEquals(new CachedHtmlElement(DriverTestPage.selectList.getElement()).getSize(), new Dimension(0, 0));
 	}
 	
 	@Test(groups={"ut"})
 	public void testGetRectangle() {
 		// depends on where we execute the test, rectangle may throw an exception
-		Rectangle rect;
-		try {
-			rect = DriverTestPage.selectList.getElement().getRect();
-		} catch (WebDriverException e) {
-			rect = new Rectangle(DriverTestPage.selectList.getElement().getLocation(), DriverTestPage.selectList.getElement().getSize());
-		}
-		Assert.assertEquals(new CachedHtmlElement(DriverTestPage.selectList.getElement()).getRect(), rect);
+//		Rectangle rect;
+//		try {
+//			rect = DriverTestPage.selectList.getElement().getRect();
+//		} catch (WebDriverException e) {
+//			rect = new Rectangle(DriverTestPage.selectList.getElement().getLocation(), DriverTestPage.selectList.getElement().getSize());
+//		}
+		Assert.assertEquals(new CachedHtmlElement(DriverTestPage.selectList.getElement()).getRect(), new Rectangle(0, 0, 0, 0));
 	}
 	
 	

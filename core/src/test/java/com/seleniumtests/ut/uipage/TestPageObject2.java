@@ -30,6 +30,7 @@ import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver.Navigation;
 import org.openqa.selenium.WebDriver.Options;
 import org.openqa.selenium.WebDriver.TargetLocator;
+import org.openqa.selenium.WebDriver.Timeouts;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Interactive;
 import org.openqa.selenium.remote.RemoteWebDriver;
@@ -93,6 +94,9 @@ public class TestPageObject2 extends MockitoTest {
 	private Options driverOptions;
 	
 	@Mock
+	private Timeouts timeouts;
+	
+	@Mock
 	private Alert alert;
 
 	private CustomEventFiringWebDriver eventDriver;
@@ -115,6 +119,7 @@ public class TestPageObject2 extends MockitoTest {
 		when(driver.navigate()).thenReturn(navigation);
 		when(driver.getCurrentUrl()).thenReturn("http://foo");
 		when(driver.manage()).thenReturn(driverOptions);
+		when(driverOptions.timeouts()).thenReturn(timeouts);
 		when(element.getSize()).thenReturn(new Dimension(10, 10));
 		when(element.getLocation()).thenReturn(new Point(5, 5));
 
