@@ -34,6 +34,7 @@ import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Listeners;
 
+import com.seleniumtests.connectors.tms.reportportal.ReportPortalTestListener;
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.TestTasks;
@@ -43,7 +44,8 @@ import com.seleniumtests.reporter.logger.StringInfo;
 import com.seleniumtests.util.logging.ScenarioLogger;
 
 @Listeners({com.seleniumtests.reporter.reporters.ReporterControler.class,
-	com.seleniumtests.core.runner.SeleniumRobotTestListener.class
+	com.seleniumtests.core.runner.SeleniumRobotTestListener.class//,
+//	ReportPortalTestListener.class
 	})
 public class SeleniumRobotTestPlan {
 	
