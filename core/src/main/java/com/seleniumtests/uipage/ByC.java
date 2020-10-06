@@ -17,6 +17,9 @@
  */
 package com.seleniumtests.uipage;
 
+import static com.seleniumtests.uipage.ByC.android;
+import static com.seleniumtests.uipage.ByC.ios;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -29,7 +32,9 @@ import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.internal.FindsByXPath;
 
+import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.ScenarioException;
+import com.seleniumtests.uipage.htmlelements.TextFieldElement;
 
 public class ByC extends By {
 
@@ -209,6 +214,37 @@ public class ByC extends By {
 	 */
 	public static ByC and(By ... bies) {
 		return new And(bies);
+	}
+	
+	/**
+	 * method for searching an element by a locator or an other.
+	 * It also checks if the locator is relevant to the tested platform (in case of mobile), which allow to write
+	 * 
+	 * <code>ByC.or(android(By.tagName("input")), ios(By.xpath("")))</code>
+	
+	 * @author S047432
+	 *
+	 */
+	public static ByC or(By ... bies) {
+		return new Or(bies);
+	}
+	
+	/**
+	 * Says that the locator in parameter is for android only. It doesn't do anything else and should be used with ByC.or() to have an effect
+	 * @param by
+	 * @return
+	 */
+	public static ByC android(By by) {
+		return new Android(by);
+	}
+	
+	/**
+	 * Says that the locator in parameter is for iOS only. It doesn't do anything else and should be used with ByC.or() to have an effect
+	 * @param by
+	 * @return
+	 */
+	public static ByC ios(By by) {
+		return new Ios(by);
 	}
 
 	/**
@@ -561,8 +597,149 @@ public class ByC extends By {
 			return String.join(" and ", biesString);
 		}
 	}
+	
+	/**
+	 * Class for searching an element by a locator or an other.
+	 * It also checks if the locator is relevant to the tested platform (in case of mobile), which allow to write
+	 * 
+	 * <code>ByC.or(android(By.tagName("input")), ios(By.xpath("")))</code>
+	
+	 * @author S047432
+	 *
+	 */
+	public static class Or extends ByC implements Serializable {
+		
+		private By[] bies;
+		
+		public Or(By ... bies) {
+			if (bies.length == 0) {
+				throw new ScenarioException("At least on locator must be provided");
+			}
+			this.bies = bies;
+		}
+		
+		
+		@Override
+		public List<WebElement> findElements(SearchContext context) {
+			
+			String platform = SeleniumTestsContextManager.getThreadContext().getPlatform();
+			List<WebElement> elements = new ArrayList<>();
+			
+			
+			for (By by: bies) {
+				// check this 'by' applies to the platform
+				if ((by instanceof Android && !platform.equalsIgnoreCase("android"))
+					|| (by instanceof Ios && !platform.equalsIgnoreCase("ios"))
+					) {
+					continue;
+				} else if (by instanceof ByPlatformSpecific) {
+					by = ((ByPlatformSpecific) by).getBy();
+				}
+				elements = by.findElements(context);
+				
+				// stop once at least an element is found
+				if (!elements.isEmpty()) {
+					break;
+				}
+			}
+			return elements;
+			
+		}
+		
+		@Override
+		public WebElement findElement(SearchContext context) {
+			try {
+				return findElements(context).get(0);
+			} catch (IndexOutOfBoundsException e) {
+				throw new NoSuchElementException("Cannot find element with such criteria " + toString());
+			}
+		}
+		
+		
+		@Override
+		public String toString() {
+			
+			List<String> biesString = new ArrayList<>();
+			for (By by: bies) {
+				biesString.add(by.toString());
+			}
+			
+			return String.join(" or ", biesString);
+		}
+	}
+	
+	/**
+	 * 
+	 *
+	 */
+	public static class Android extends ByC implements Serializable, ByPlatformSpecific {
 
-	  public static class ByXTagName extends By implements Serializable {
+		private By by;
+		
+		public Android(By by) {
+			this.by = by;
+		}
+		
+		@Override
+		public List<WebElement> findElements(SearchContext context) {
+			throw new UnsupportedOperationException("You cannot use ByC.android directly");
+			
+		}
+		
+		@Override
+		public WebElement findElement(SearchContext context) {
+			throw new UnsupportedOperationException("You cannot use ByC.android directly");
+		}
+		
+		
+		@Override
+		public String toString() {
+			return String.format("android[%s]", by.toString());
+		}
+
+		@Override
+		public By getBy() {
+			return by;
+		}
+	}
+	
+	/**
+	 * 
+	 *
+	 */
+	public static class Ios extends ByC implements Serializable, ByPlatformSpecific {
+		
+
+		private By by;
+		
+		public Ios(By by) {
+			this.by = by;
+		}
+		
+		@Override
+		public List<WebElement> findElements(SearchContext context) {
+			throw new UnsupportedOperationException("You cannot use ByC.ios directly");
+			
+		}
+		
+		@Override
+		public WebElement findElement(SearchContext context) {
+			throw new UnsupportedOperationException("You cannot use ByC.ios directly");
+		}
+		
+		
+		@Override
+		public String toString() {
+			return String.format("ios[%s]", by.toString());
+		}
+
+		@Override
+		public By getBy() {
+			return by;
+		}
+	}
+
+	public static class ByXTagName extends By implements Serializable {
 
 	    private static final long serialVersionUID = 4699295846984948351L;
 
@@ -634,7 +811,7 @@ public class ByC extends By {
 	    public String toString() {
 	      return "By.className: " + className;
 	    }
-	  }
+	}
 
 	
 	protected static String escapeQuotes(String aString) {
