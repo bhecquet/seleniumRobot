@@ -19,6 +19,9 @@ package com.seleniumtests.it.util;
 
 import java.util.List;
 
+import static com.seleniumtests.uipage.ByC.android;
+import static com.seleniumtests.uipage.ByC.ios;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
@@ -468,4 +471,53 @@ public class TestByC extends GenericTest {
 	public void testFindElementsRelativeByClassName() {
 		Assert.assertEquals(new HtmlElement("", By.id("parentDiv")).findElement(ByC.xClassName("myTable")).findElements().size(), 1);
 	}
+	
+	@Test(groups={"it"})
+	public void testByOrWithAllLocatorsValid() {
+		Assert.assertEquals(new HtmlElement("or", ByC.or(By.id("text2"), By.name("textField"))).findElements().size(), 1);
+		
+	}
+	
+	/**
+	 * When first locator do not allow to find element, go to the next one
+	 */
+	@Test(groups={"it"})
+	public void testByOrWithOneIvalidLocator() {
+		Assert.assertEquals(new HtmlElement("or", ByC.or(By.id("text2Invalid"), By.name("textField"))).getTagName(), "input");
+		
+	}
+	
+	/**
+	 * Test specific locator with non mobile platform. No element should be found
+	 */
+	@Test(groups={"it"}, expectedExceptions = NoSuchElementException.class)
+	public void testByOrWithPlatformSpecificLocator() {
+		SeleniumTestsContextManager.getThreadContext().setReplayTimeout(3);
+		new HtmlElement("or", ByC.or(android(By.id("text2")))).getTagName();
+		
+	}
+	
+	/**
+	 * Test specific locator with mobile platform. Element should be found
+	 */
+	@Test(groups={"it"})
+	public void testByOrWithPlatformSpecificLocatorAndAndroidPlatform() {
+		SeleniumTestsContextManager.getThreadContext().setPlatform("ANDROID");
+		SeleniumTestsContextManager.getThreadContext().setReplayTimeout(3);
+		Assert.assertEquals(new HtmlElement("or", ByC.or(ios(By.name("textField")), android(By.id("text2")))).getTagName(), "input");
+		
+	}
+	/**
+	 * Test specific locator with mobile platform. Element should be found
+	 */
+	@Test(groups={"it"})
+	public void testByOrWithPlatformSpecificLocatorAndIoslatform() {
+		SeleniumTestsContextManager.getThreadContext().setPlatform("IOS");
+		SeleniumTestsContextManager.getThreadContext().setReplayTimeout(3);
+		Assert.assertEquals(new HtmlElement("or", ByC.or(ios(By.id("text2")), android(By.id("textField")))).getTagName(), "input");
+		
+	}
+	
+	
+	
 }

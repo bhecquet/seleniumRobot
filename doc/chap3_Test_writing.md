@@ -801,29 +801,7 @@ The business configuration are read in the following order (the last overwrites 
 - parameter defined in env.ini
 - parameter defined in seleniumrobot server (if used)
 
-### 7 Test script configuration mapping ###
-#### Mapping files utility ####
-
-Mapping file give possibility to call an element in a web page with a more accessible and understandable word. This way your code gain clarity for a non technical user.
-Every element can be redefined for any platform and version, you just have to create a hierarchical architecture of files :
-example :
-
-![](images/mapping_architecture.png)
-
-#### objectMapping.ini configuration ####
-
-Each file can define new elements, and it inherits parents files.
-The structure of an objectMapping.ini file looks like that :
-
-![](images/objectMapping_example.png)
-
-between [ ] you define the web page where to use the following definitions. Next, there is the word definitions : caller_word:technical_word
-
-#### Mapping data use ####
-
-In the corresponding pageObject you can use mapping words to search elements using : `locateBy(map:caller_word)` or `By.id(map:caller_word)`. It will search the element in the page which is defined by the technical word. 
-
-### 8 Optional features ###
+### 7 Optional features ###
 Here will be described features that may be used to improve test
 
 #### Soft assertions ####
@@ -855,7 +833,7 @@ If you want to display an hyperlink in HTMl report, write instead
 	addTestInfo("<info_name>", new HyperlinkInfo("<link_name>", "<url>"));
 ```
 
-### 9 Write good tests and Page Objects ###
+### 8 Write good tests and Page Objects ###
 
 According to `http://www.slideshare.net/saucelabs/how-to-grade-your-selenium-tests-by-dave-haeffner-sauce-labs-webinar?mkt_tok=eyJpIjoiTlRFeVpUTXdNbVpoTlRNMiIsInQiOiI2UzdLYnBraTczaHU0cUM0Z1FcL2pxOWZEVFhPdWxRa2h0QjJXZFwvK1B2NXRXRnhpWVk4MlFmcGE5eE5Ub3lkUG40UXNES1JENzhHMmExREg4aG9wRTFMZHBSTGdFaWIyeWEzcXpXb1BvTHRVPSJ9`
 you should follow these rules:
@@ -866,7 +844,7 @@ you should follow these rules:
 - A Page Object contains locators (see example) and actions (the methods). They are seperated to simplify readability
 - the locator use order is: id, name, className, cssPath, xPath, linkText because the first are most of time unique and do not change each time the DOM changes
 
-### 10 Use Selenium code style inside SeleniumRobot ###
+### 9 Use Selenium code style inside SeleniumRobot ###
 
 As PageObject exposes the `driver` object, it's possible to write standard Selenium code
 	
@@ -888,7 +866,7 @@ The handled methods are the most used in selenium writing:
 - switchTo().defaultContent()
 - switchTo().parentFrame()
 
-### 11 Use several browsers inside on test scenario ###
+### 10 Use several browsers inside on test scenario ###
 
 Some rare tests require to start several browsers (one for each application which should be tested at the same time). For example, you have to create a client account on front-office with Chrome, then delete this client onto the back-office with Internet Explorer.
 To do so, you can request a PageObject to create a new driver. By default, it creates it only if none already exists.
@@ -927,7 +905,7 @@ To do so, you can request a PageObject to create a new driver. By default, it cr
 ```
 
 	
-### 12 Attach an existing browser inside your scenario ###
+### 11 Attach an existing browser inside your scenario ###
 
 Sometimes, a scenario needs a browser launched by an other application (web or not)
 By default, selenium does not permit this easily but with seleniumRobot, you can do this (only for Internet Explorer and Chrome for now)
@@ -954,7 +932,7 @@ This attaching can be done only from a page creation
 
 **LIMIT**: This approach is limited to one Internet Explorer started programmatically. It will not work with IE started manually as IE must be started the same way IEDriverServer starts it.
 
-### 13 Use external dependencies ###
+### 12 Use external dependencies ###
 
 If for some reason, you need to include dependencies to your test application, add them as dependencies in your pom.xml without any scope, so that they can be included automatically in the generated zip file.
 
@@ -997,7 +975,7 @@ If the dependency needs other dependencues, we have to change configuration to (
 
 The key point is `excludeTransitive` which is set to false to allow sub-dependecies to be retrieved, and then we filter by groupdId and artifactId to avoid retrieving to many dependencies
 
-### 14 Customize Selenium IDE tests ###
+### 13 Customize Selenium IDE tests ###
 
 SeleniumRobot adds execution of Selenium IDE tests when they are exported to Java/JUnit file.
 Details about launching can be found in §4.8
@@ -1010,7 +988,7 @@ By default, your test will only contain 1 running step, which is the full scenar
 
 ![](images/selenium_ide_step.png)
 
-### 15 Write mobile tests ###
+### 14 Write mobile tests ###
 
 SeleniumRobot supports appium (see chap4_Run_tests, §3 to configure execution) out of the box. Be default, seleniumRobot will start the appium server itself for running the test locally, and stop it at the end of the test.
 For writing test, this is easier to use Appium desktop which provides an inspector.
@@ -1026,7 +1004,7 @@ From version 4.15.0, seleniumRobot allows to use an existing appium server. To u
 
 You should get the inspector running
 
-### 16 Implement custom SelectList ###
+### 15 Implement custom SelectList ###
 
 It's possible to implement new SelectList that adapt to your web interface. The purpose of this custom select list is to give seleniumRobot the way to search
 
