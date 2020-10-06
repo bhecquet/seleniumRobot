@@ -97,14 +97,10 @@ public abstract class AbstractWebDriverFactory {
     }
 
     public void setImplicitWaitTimeout(final double timeout) {
-        if (timeout < 1) {
-            driver.manage().timeouts().implicitlyWait((long) (timeout * 1000), TimeUnit.MILLISECONDS);
-        } else {
-            try {
-                driver.manage().timeouts().implicitlyWait((int)timeout, TimeUnit.SECONDS);
-            } catch (Exception ex) {
-            	logger.error(ex);
-            }
+        try {
+            driver.manage().timeouts().implicitlyWait((int)timeout, TimeUnit.SECONDS);
+        } catch (Exception ex) {
+        	logger.error(ex);
         }
     }
 

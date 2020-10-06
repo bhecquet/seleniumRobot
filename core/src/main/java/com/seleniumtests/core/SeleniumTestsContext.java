@@ -1206,7 +1206,7 @@ public class SeleniumTestsContext {
         try {
             return (Integer) getAttribute(IMPLICIT_WAIT_TIME_OUT);
         } catch (Exception e) {
-            return 5;
+            return DEFAULT_IMPLICIT_WAIT_TIME_OUT;
         }
     }
     
