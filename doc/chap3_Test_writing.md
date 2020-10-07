@@ -328,6 +328,7 @@ Additional search using the `ByC` class are
 - search by first visible element: `new HtmlElement("", By.className("otherClass"), HtmlElement.FIRST_VISIBLE).getText()`
 - search in reverse order (get the last element): `new TextFieldElement("", By.className("someClass"), -1);` get the last element on the list
 - search with several criteria: `new TextFieldElement("", ByC.and(By.tagName("input"), By.name("textField")))`
+- search element with one criteria or an other. Specifically usefull to handle multiple mobile OS: `new HtmlElement("or", ByC.or(ByC.ios(By.name("textField")), ByC.android(By.id("text2")))`
 
 `ByC` selectors ('xId', 'xName', 'xTagName', 'xLinkText' and 'xPartialLinkText') replicate the behavior of standard Selenium selectors but using xpath method. This is needed for salesforce UI automation where shadow DOM prevents selenium to discover sub-elements of a custom element created with shadow DOM.
 
