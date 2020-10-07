@@ -46,6 +46,11 @@ public class Fixture {
 			for (ClassInfo info: infos) {
 //				System.out.println("--" + info.getName());
 				
+				// ReportPortalService try to initialize something which prevent cucumber from analyzing properly
+				if ("com.seleniumtests.connectors.tms.reportportal.ReportPortalService".equals(info.getName())) {
+					continue;
+				}
+				
 				for (Field field: Class.forName(info.getName()).getDeclaredFields()) {
 					if (Element.class.isAssignableFrom(field.getType()) && Modifier.isStatic(field.getModifiers())) {
 						field.setAccessible(true);
