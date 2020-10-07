@@ -340,6 +340,10 @@ public class DriverConfig {
     public String getDeviceName() {
         return testContext.getDeviceName();
     }
+    
+    public String getDeviceId() {
+    	return testContext.getDeviceId();
+    }
 
     public String getApp() {
         return testContext.getApp();

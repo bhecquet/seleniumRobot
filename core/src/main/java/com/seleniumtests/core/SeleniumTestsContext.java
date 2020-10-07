@@ -191,6 +191,7 @@ public class SeleniumTestsContext {
     public static final String APP = "app";										// Chemin de l'application mobile (local ou distant)
     public static final String MOBILE_PLATFORM_VERSION = "mobilePlatformVersion";// Mobile OS version. It's deduced from platform name and not read directly from parameters
     public static final String DEVICE_NAME = "deviceName";						// Nom du terminal utilisé pour le test
+    public static final String DEVICE_ID = "deviceId";							// Id of the device on which test session will be started. This only mandatory when using a remote appium server with 'appiumServerUrl' parameter. In all other cases, deviceId is set automatically through discovery 
     public static final String FULL_RESET = "fullReset";						// whether we should do a full reset (default is true)
     public static final String AUTOMATION_NAME = "automationName";				// Default is "Appium". The automationName to use. See http://appium.io/docs/en/writing-running-appium/caps/index.html
     public static final String APPIUM_SERVER_URL = "appiumServerUrl";			// URL of an already started appium server. I set, this appium server will be used instead of starting a new one
@@ -424,6 +425,7 @@ public class SeleniumTestsContext {
 
         setAppiumServerUrl(getValueForTest(APPIUM_SERVER_URL, System.getProperty(APPIUM_SERVER_URL)));
         setDeviceName(getValueForTest(DEVICE_NAME, System.getProperty(DEVICE_NAME)));
+        setDeviceId(getValueForTest(DEVICE_ID, System.getProperty(DEVICE_ID)));
         setDeviceList(getValueForTest(DEVICE_LIST, null));
         setFullReset(getBoolValueForTest(FULL_RESET, System.getProperty(FULL_RESET)));
 
@@ -1466,6 +1468,10 @@ public class SeleniumTestsContext {
     public String getDeviceName() {
         return (String) getAttribute(DEVICE_NAME);
     }
+    
+    public String getDeviceId() {
+    	return (String) getAttribute(DEVICE_ID);
+    }
 
     public String getApp() {
         return (String) getAttribute(APP);
@@ -2189,6 +2195,10 @@ public class SeleniumTestsContext {
     
     public void setDeviceName(String name) {
     	setAttribute(DEVICE_NAME, name);
+    }
+    
+    public void setDeviceId(String name) {
+    	setAttribute(DEVICE_ID, name);
     }
 
     public void setDeviceList(String list) {
