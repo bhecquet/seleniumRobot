@@ -996,14 +996,18 @@ For writing test, this is easier to use Appium desktop which provides an inspect
 From version 4.15.0, seleniumRobot allows to use an existing appium server. To use it:
 
 - start Appium desktop and click on "Start server"
-- Configure seleniumRobot with options: `-DappiumServerUrl=http://localhost:4723/wd/hub/ -DnewCommandTimeout=1200 -DfullReset=false`
+- Configure seleniumRobot with options: `-DappiumServerUrl=http://localhost:4723/wd/hub/ -DnewCommandTimeout=120 -DfullReset=false`
 - Add a breakpoint into your code 
 - Start your test. When test stop on breakpoint, click "start inspector session" inside appium console
-- In capabilities, set at least "platformName" to "android" or "ios"
+- In the new window, go to "attach existing session tab"
 ![](images/appium-desktop-inspector.png)
 - Click "Start Session"
 
 You should get the inspector running
+
+It's also possible to attach to a remote appium server the same way (change URL). In this case, you MUST
+- provide the device id (`-DdeviceId=<UDID or android ID`) to the test. iOS UDID can be found with command `instruments -s devices`. Android Id can be found with `adb devices` command.
+- provide a local path (local the the remote machine) to the application. An HTTP path may also be provided but you may have trouble with android
 
 ### 15 Implement custom SelectList ###
 
