@@ -24,9 +24,10 @@ import java.net.URL;
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.remote.CapabilityType;
 
 import com.seleniumtests.browserfactory.mobile.AppiumLauncher;
-import com.seleniumtests.browserfactory.mobile.LocalAppiumLauncher;
+import com.seleniumtests.browserfactory.mobile.ExistingAppiumLauncher;
 import com.seleniumtests.browserfactory.mobile.MobileDeviceSelector;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.DriverExceptions;
@@ -37,6 +38,8 @@ import com.seleniumtests.util.FileUtility;
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.ios.IOSDriver;
 import io.appium.java_client.remote.AndroidMobileCapabilityType;
+import io.appium.java_client.remote.IOSMobileCapabilityType;
+import io.appium.java_client.remote.MobileCapabilityType;
 
 public class AppiumDriverFactory extends AbstractWebDriverFactory implements IWebDriverFactory {
 
@@ -69,9 +72,32 @@ public class AppiumDriverFactory extends AbstractWebDriverFactory implements IWe
     	appiumLauncher.startAppium();
     	
     	try {
-    		MutableCapabilities capabilities = new MobileDeviceSelector().initialize().updateCapabilitiesWithSelectedDevice(driverOptions, webDriverConfig.getMode());
+    		MutableCapabilities capabilities;
+    		try {
+    			capabilities = new MobileDeviceSelector().initialize().updateCapabilitiesWithSelectedDevice(driverOptions, webDriverConfig.getMode());
+    		} catch (ConfigurationException e) {
+    			// when connecting to an existing appium server that may be a remote appium, we cannot know which devices are starter / connected
+    			// driverOptions shoud contain every capabilities needed to start the test
+    			if (appiumLauncher instanceof ExistingAppiumLauncher) {
+    				capabilities = new MutableCapabilities(driverOptions);
+    				
+    				if (webDriverConfig.getDeviceId() == null) {
+    					throw new ConfigurationException("'deviceId' option MUST be set as we are using a remote appium server");
+    				}
+    				
+    				if (capabilities.getCapability(CapabilityType.PLATFORM_NAME).toString().equalsIgnoreCase("android")) {
+    					capabilities.setCapability(MobileCapabilityType.DEVICE_NAME, webDriverConfig.getDeviceId());
+    				} else { // iOS
+    					capabilities.setCapability(IOSMobileCapabilityType.XCODE_CONFIG_FILE, (String)null); // remove this capability as it may not be accurate
+    					capabilities.setCapability(MobileCapabilityType.UDID, webDriverConfig.getDeviceId());
+    				}
+    			} else {
+    				throw e;
+    			}
+    		}
 	        if("android".equalsIgnoreCase(webDriverConfig.getPlatform())) {
 	        	extractAndroidDriver(capabilities);
+
 	            return new AndroidDriver<WebElement>(new URL(appiumLauncher.getAppiumServerUrl()), capabilities);
 	            
 	        } else if ("ios".equalsIgnoreCase(webDriverConfig.getPlatform())){

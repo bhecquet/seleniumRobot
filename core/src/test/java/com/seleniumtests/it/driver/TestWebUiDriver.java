@@ -36,6 +36,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.mockito.Mock;
 import org.openqa.selenium.By;
+import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriver.Options;
 import org.openqa.selenium.WebDriver.Timeouts;
@@ -56,6 +57,8 @@ import com.seleniumtests.browserfactory.AppiumDriverFactory;
 import com.seleniumtests.browserfactory.AppiumLauncherFactory;
 import com.seleniumtests.browserfactory.BrowserInfo;
 import com.seleniumtests.browserfactory.mobile.AdbWrapper;
+import com.seleniumtests.browserfactory.mobile.ExistingAppiumLauncher;
+import com.seleniumtests.browserfactory.mobile.InstrumentsWrapper;
 import com.seleniumtests.browserfactory.mobile.LocalAppiumLauncher;
 import com.seleniumtests.browserfactory.mobile.MobileDevice;
 import com.seleniumtests.browserfactory.mobile.MobileDeviceSelector;
@@ -75,8 +78,10 @@ import com.seleniumtests.util.osutility.OSCommand;
 import com.seleniumtests.util.osutility.OSUtility;
 
 import io.appium.java_client.android.AndroidDriver;
+import io.appium.java_client.ios.IOSDriver;
+import kong.unirest.Unirest;
 
-@PrepareForTest({AdbWrapper.class, AndroidDriver.class, MobileDeviceSelector.class, AppiumDriverFactory.class, AppiumLauncherFactory.class})
+@PrepareForTest({AdbWrapper.class, AndroidDriver.class, MobileDeviceSelector.class, AppiumDriverFactory.class, AppiumLauncherFactory.class, Unirest.class, InstrumentsWrapper.class})
 public class TestWebUiDriver extends ReporterTest {
 	
 	private static final Logger logger = SeleniumRobotLogger.getLogger(TestWebUiDriver.class);
@@ -85,7 +90,13 @@ public class TestWebUiDriver extends ReporterTest {
 	private AdbWrapper adbWrapper;
 	
 	@Mock
+	private InstrumentsWrapper instrumentsWrapper;
+	
+	@Mock
 	private AndroidDriver<?> androidDriver;
+	
+	@Mock
+	private IOSDriver<?> iosDriver;
 	
 	@Mock
 	private Options driverOptions;
@@ -126,10 +137,123 @@ public class TestWebUiDriver extends ReporterTest {
 			throw new SkipException("Test skipped, appium not correctly configured", e);
 		}
 		
-		PowerMockito.verifyNew(AndroidDriver.class).withArguments(any(URL.class), any(DesiredCapabilities.class));
+		PowerMockito.verifyNew(AndroidDriver.class).withArguments(any(URL.class), any(Capabilities.class));
 				
 		WebUIDriver.cleanUp();
 		verify(appiumLauncher).stopAppium();
+	}
+	
+	/**
+	 * Test we can connect to a remote appium server (no local devices)
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testLocalAndroidDriverWithRemoteAppiumServer() throws Exception {
+		whenNew(AdbWrapper.class).withNoArguments().thenReturn(adbWrapper);
+		
+		List<MobileDevice> deviceList = new ArrayList<>();
+		when(adbWrapper.getDeviceList()).thenReturn(deviceList);
+		
+		whenNew(AndroidDriver.class).withAnyArguments().thenReturn(androidDriver);
+		when(androidDriver.manage()).thenReturn(driverOptions);
+		when(androidDriver.getCapabilities()).thenReturn(DesiredCapabilities.chrome());
+		when(driverOptions.timeouts()).thenReturn(timeouts);
+		
+		SeleniumTestsContextManager.getThreadContext().setRunMode("local");
+		SeleniumTestsContextManager.getThreadContext().setAppiumServerUrl("http://localhost:4321/wd/hub/");
+		SeleniumTestsContextManager.getThreadContext().setDeviceId("emulator-5556");
+		SeleniumTestsContextManager.getThreadContext().setPlatform("android");
+		SeleniumTestsContextManager.getThreadContext().setMobilePlatformVersion("5.0");
+		SeleniumTestsContextManager.getThreadContext().setTestType(TestType.APPIUM_APP_ANDROID);
+		
+		createServerMock("GET", "/wd/hub/sessions", 200, "{}");
+		
+		PowerMockito.mockStatic(AppiumLauncherFactory.class);
+		ExistingAppiumLauncher appiumLauncher;
+
+		appiumLauncher = spy(new ExistingAppiumLauncher("http://localhost:4321/wd/hub/"));
+		when(AppiumLauncherFactory.getInstance()).thenReturn(appiumLauncher);	
+		
+		WebUIDriver.getWebDriver(true);
+		
+		PowerMockito.verifyNew(AndroidDriver.class).withArguments(any(URL.class), any(Capabilities.class));
+		
+		WebUIDriver.cleanUp();
+		verify(appiumLauncher).stopAppium();
+	}
+	
+	@Test(groups={"it"})
+	public void testLocaliOSDriverWithRemoteAppiumServer() throws Exception {
+		whenNew(InstrumentsWrapper.class).withNoArguments().thenReturn(instrumentsWrapper);
+		
+		List<MobileDevice> deviceList = new ArrayList<>();
+		when(instrumentsWrapper.parseIosDevices()).thenReturn(deviceList);
+		
+		whenNew(IOSDriver.class).withAnyArguments().thenReturn(iosDriver);
+		when(iosDriver.manage()).thenReturn(driverOptions);
+		when(iosDriver.getCapabilities()).thenReturn(DesiredCapabilities.chrome());
+		when(driverOptions.timeouts()).thenReturn(timeouts);
+		
+		SeleniumTestsContextManager.getThreadContext().setRunMode("local");
+		SeleniumTestsContextManager.getThreadContext().setAppiumServerUrl("http://localhost:4321/wd/hub/");
+		SeleniumTestsContextManager.getThreadContext().setDeviceId("123456");
+		SeleniumTestsContextManager.getThreadContext().setPlatform("ios");
+		SeleniumTestsContextManager.getThreadContext().setMobilePlatformVersion("13.0");
+		SeleniumTestsContextManager.getThreadContext().setTestType(TestType.APPIUM_APP_IOS);
+		
+		createServerMock("GET", "/wd/hub/sessions", 200, "{}");
+		
+		PowerMockito.mockStatic(AppiumLauncherFactory.class);
+		ExistingAppiumLauncher appiumLauncher;
+		
+		appiumLauncher = spy(new ExistingAppiumLauncher("http://localhost:4321/wd/hub/"));
+		when(AppiumLauncherFactory.getInstance()).thenReturn(appiumLauncher);	
+		
+		WebUIDriver.getWebDriver(true);
+		
+		PowerMockito.verifyNew(IOSDriver.class).withArguments(any(URL.class), any(Capabilities.class));
+		
+		WebUIDriver.cleanUp();
+		verify(appiumLauncher).stopAppium();
+	}
+	
+	/**
+	 * Test we get an error when using remote appium and no deviceId is provided
+	 * @throws Exception
+	 */
+	@Test(groups={"it"}, expectedExceptions = ConfigurationException.class)
+	public void testLocalAndroidDriverWithRemoteAppiumServerAndNoDeviceId() throws Exception {
+		try {
+			whenNew(AdbWrapper.class).withNoArguments().thenReturn(adbWrapper);
+			
+			List<MobileDevice> deviceList = new ArrayList<>();
+			when(adbWrapper.getDeviceList()).thenReturn(deviceList);
+			
+			whenNew(AndroidDriver.class).withAnyArguments().thenReturn(androidDriver);
+			when(androidDriver.manage()).thenReturn(driverOptions);
+			when(androidDriver.getCapabilities()).thenReturn(DesiredCapabilities.chrome());
+			when(driverOptions.timeouts()).thenReturn(timeouts);
+			
+			SeleniumTestsContextManager.getThreadContext().setRunMode("local");
+			SeleniumTestsContextManager.getThreadContext().setAppiumServerUrl("http://localhost:4321/wd/hub/");
+			SeleniumTestsContextManager.getThreadContext().setPlatform("android");
+			SeleniumTestsContextManager.getThreadContext().setMobilePlatformVersion("5.0");
+			SeleniumTestsContextManager.getThreadContext().setTestType(TestType.APPIUM_APP_ANDROID);
+			
+			createServerMock("GET", "/wd/hub/sessions", 200, "{}");
+			
+			PowerMockito.mockStatic(AppiumLauncherFactory.class);
+			ExistingAppiumLauncher appiumLauncher;
+			
+	
+			appiumLauncher = spy(new ExistingAppiumLauncher("http://localhost:4321/wd/hub/"));
+			when(AppiumLauncherFactory.getInstance()).thenReturn(appiumLauncher);	
+			
+			WebUIDriver.getWebDriver(true);
+		} finally {
+			WebUIDriver.cleanUp();
+		}
+
 	}
 	
 	/**

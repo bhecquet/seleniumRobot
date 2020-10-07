@@ -296,6 +296,33 @@ public class TestSeleniumTestContext extends GenericTest {
 		}
 	}
 	
+
+	@Test(groups="ut context")
+	public void testDeviceName(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setDeviceName("myDevice");
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getDeviceName(), "myDevice");
+	}
+	@Test(groups="ut context")
+	public void testDeviceNameNull(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setDeviceName(null);
+		Assert.assertNull(SeleniumTestsContextManager.getThreadContext().getDeviceName());
+	}
+	
+	@Test(groups="ut context")
+	public void testDeviceId(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setDeviceId("myDevice");
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getDeviceId(), "myDevice");
+	}
+	@Test(groups="ut context")
+	public void testDeviceNameId(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setDeviceId(null);
+		Assert.assertNull(SeleniumTestsContextManager.getThreadContext().getDeviceId());
+	}
+	
 	@Test(groups="ut context")
 	public void testWebSessionTimeout(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		initThreadContext(testNGCtx);
