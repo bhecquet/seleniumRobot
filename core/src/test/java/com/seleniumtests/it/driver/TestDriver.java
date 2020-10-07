@@ -19,6 +19,7 @@ package com.seleniumtests.it.driver;
 
 import java.awt.AWTException;
 import java.io.File;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
@@ -558,13 +559,13 @@ public class TestDriver extends GenericMultiBrowserTest {
 	 */
 	@Test(groups= {"it", "ut"})
 	public void testUploadFileWithRobotKeyboard() throws AWTException, InterruptedException {
-		String path = SeleniumTestsContextManager.getConfigPath() + File.separator + "objectMapping.ini";
+		String path = Paths.get(SeleniumTestsContextManager.getConfigPath(), "spec", "envSpecific2.ini").toString();
 //		DriverTestPage.upload.click();
 		DriverTestPage.uploadedFile.click(); // when executing both testUploadFileWithRobotXX tests, the second one fails on firefox because focus is on '<input type="file">' element
 		DriverTestPage.upload.clickAction(); // due to restrictions clicking a <input type="file"> element with firefox, use clickAction instead
 		CustomEventFiringWebDriver.uploadFileUsingKeyboardTyping(new File(path));
 		WaitHelper.waitForSeconds(1);
-		Assert.assertEquals(DriverTestPage.uploadedFile.getAttribute("value"), "objectMapping.ini");
+		Assert.assertEquals(DriverTestPage.uploadedFile.getAttribute("value"), "envSpecific2.ini");
 	}
 	
 	/**
