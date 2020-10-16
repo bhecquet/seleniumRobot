@@ -2,6 +2,7 @@ package com.seleniumtests.connectors.bugtracker.jira;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -15,8 +16,8 @@ public class JiraBean extends IssueBean {
 	private String issueType;
     List<String> components = new ArrayList<>();
 	
-	public JiraBean(String id, String summary, String description) {
-		super(id, summary, description);
+	public JiraBean(String id, String summary, String description, String issueType) {
+		this(summary, description, null, issueType, null, null, null, null, null, null, null, null);
 	}
 	
 	/**
@@ -83,8 +84,9 @@ public class JiraBean extends IssueBean {
     	this.issueType = issueType;
     	
         if (components != null) {
-            this.components = components;
+        	this.components = components;
         }
+        
 
     	if (getIssueType() == null) {
     		throw new ConfigurationException("Issue type must be provided through 'bugtracker.issueType' variable");
