@@ -1,3 +1,29 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**
+
+- [0 SeleniumRobot Server](#0-seleniumrobot-server)
+- [1 Squash TM/TA](#1-squash-tmta)
+  - [Execution of test framework](#execution-of-test-framework)
+  - [Squash TM configuration](#squash-tm-configuration)
+  - [TA files generation](#ta-files-generation)
+    - [Cucumber mode](#cucumber-mode)
+    - [TestNG mode](#testng-mode)
+  - [Squash TA job configuration](#squash-ta-job-configuration)
+- [2 Jenkins](#2-jenkins)
+- [3 Squash TM through API](#3-squash-tm-through-api)
+  - [Enable Squash TM usage](#enable-squash-tm-usage)
+  - [Configure Test to be linked with Squash TM](#configure-test-to-be-linked-with-squash-tm)
+- [4 HP ALM](#4-hp-alm)
+  - [Configure environment to access HP ALM](#configure-environment-to-access-hp-alm)
+  - [Configure test runner computer](#configure-test-runner-computer)
+  - [Create test on ALM](#create-test-on-alm)
+  - [Test script](#test-script)
+  - [test parameters](#test-parameters)
+  - [Run test](#run-test)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 ### 0 SeleniumRobot Server ###
 SeleniumRobot server [https://github.com/bhecquet/seleniumRobot-server](https://github.com/bhecquet/seleniumRobot-server) is a server which aims to be used with SeleniumRobot, giving the following features:
 - handle test variables: instead of setting test data into env.ini file, they can be set in server, which offers more features when sharing values among test projects

@@ -1,3 +1,18 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**
+
+- [1 Import project](#1-import-project)
+  - [Install requirements for angular test application](#install-requirements-for-angular-test-application)
+- [2 Build](#2-build)
+- [3 Test](#3-test)
+- [4 Deploy](#4-deploy)
+- [5 Release code](#5-release-code)
+- [5 Aspect handling](#5-aspect-handling)
+  - [aspect and dynamic compilation](#aspect-and-dynamic-compilation)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 ### 1 Import project ###
 eclipse project file is provided to avoid eclipse project configuration
 Import this project into eclipse.

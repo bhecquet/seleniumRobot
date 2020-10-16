@@ -1,3 +1,18 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**
+
+- [SeleniumRobot documentation](#seleniumrobot-documentation)
+  - [1. Introduction](#1-introduction)
+  - [2. Installation](#2-installation)
+  - [3. Test writing](#3-test-writing)
+  - [4. Run tests](#4-run-tests)
+  - [5. Development](#5-development)
+  - [6. Interfacing with tests managers](#6-interfacing-with-tests-managers)
+  - [7. How To](#7-how-to)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # SeleniumRobot documentation #
 
 ## 1. Introduction ##
