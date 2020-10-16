@@ -44,6 +44,7 @@ import org.testng.TestRunner;
 import org.testng.internal.TestResult;
 
 import com.seleniumtests.browserfactory.BrowserInfo;
+import com.seleniumtests.connectors.bugtracker.BugTracker;
 import com.seleniumtests.connectors.selenium.SeleniumGridConnector;
 import com.seleniumtests.connectors.selenium.SeleniumGridConnectorFactory;
 import com.seleniumtests.connectors.selenium.SeleniumRobotVariableServerConnector;
@@ -58,6 +59,7 @@ import com.seleniumtests.driver.TestType;
 import com.seleniumtests.driver.screenshots.SnapshotComparisonBehaviour;
 import com.seleniumtests.driver.screenshots.VideoCaptureMode;
 import com.seleniumtests.reporter.logger.ArchiveMode;
+import com.seleniumtests.reporter.reporters.BugTrackerReporter;
 import com.seleniumtests.reporter.reporters.CustomReporter;
 import com.seleniumtests.reporter.reporters.ReportInfo;
 import com.seleniumtests.reporter.reporters.SeleniumRobotServerTestRecorder;
@@ -152,6 +154,12 @@ public class SeleniumTestsContext {
     public static final String TMS_PASSWORD = TestManager.TMS_PASSWORD;					// password of the user which will access Test Manager
     public static final String TMS_PROJECT = TestManager.TMS_PROJECT;						// The project to which this test application is linked in Test manager    
     public static final String TMS_TYPE = TestManager.TMS_TYPE;							// Type of the Test Manager ('squash' or 'hp')
+    
+	public static final String BUGTRACKER_TYPE = "bugtrackerType";
+	public static final String BUGTRACKER_URL = "bugtrackerUrl";
+	public static final String BUGTRACKER_PROJECT = "bugtrackerProject";
+	public static final String BUGTRACKER_USER = "bugtrackerUser";
+	public static final String BUGTRACKER_PASSWORD = "bugtrackerPassword";
     
     public static final String CAPTURE_SNAPSHOT = "captureSnapshot";
     public static final String CAPTURE_NETWORK = "captureNetwork";
@@ -265,6 +273,8 @@ public class SeleniumTestsContext {
 	public static final String DEFAULT_AUTOMATION_NAME = "Appium";
 	public static final String DEFAULT_TMS_URL = null;
 	public static final String DEFAULT_TMS_TYPE = null;
+	public static final String DEFAULT_BUGTRACKER_URL = null;
+	public static final String DEFAULT_BUGTRACKER_TYPE = null;
 	public static final ElementInfo.Mode DEFAULT_ADVANCED_ELEMENT_SEARCH = ElementInfo.Mode.FALSE;
     
     public static final int DEFAULT_REPLAY_TIME_OUT = 30;
@@ -284,6 +294,7 @@ public class SeleniumTestsContext {
     private SeleniumGridConnector seleniumGridConnector;
     private List<SeleniumGridConnector> seleniumGridConnectors;
     private TestManager testManagerInstance;
+    private BugTracker	bugtrackerInstance;
     private TestStepManager testStepManager; // handles logging of test steps in this context
     private boolean driverCreationBlocked = false;		// if true, inside this thread, driver creation will be forbidden
     
@@ -296,6 +307,7 @@ public class SeleniumTestsContext {
     	seleniumGridConnector = null;
     	seleniumGridConnectors = new ArrayList<>();
     	testManagerInstance = null;
+    	bugtrackerInstance = null;
     	testStepManager = new TestStepManager();
     }
     
@@ -327,6 +339,7 @@ public class SeleniumTestsContext {
     	
     	if (!allowRequestsToDependencies) {
     		testManagerInstance = toCopy.testManagerInstance;
+    		bugtrackerInstance = toCopy.bugtrackerInstance;
     	}
     	
     	testNGResult = toCopy.testNGResult;
@@ -360,6 +373,12 @@ public class SeleniumTestsContext {
         setTmsUser(getValueForTest(TMS_USER, System.getProperty(TMS_USER)));
         setTmsPassword(getValueForTest(TMS_PASSWORD, System.getProperty(TMS_PASSWORD)));
         setTmsProject(getValueForTest(TMS_PROJECT, System.getProperty(TMS_PROJECT)));
+        
+        setBugtrackerType(getValueForTest(BUGTRACKER_TYPE, System.getProperty(BUGTRACKER_TYPE)));
+        setBugtrackerUrl(getValueForTest(BUGTRACKER_URL, System.getProperty(BUGTRACKER_URL)));
+        setBugtrackerUser(getValueForTest(BUGTRACKER_USER, System.getProperty(BUGTRACKER_USER)));
+        setBugtrackerPassword(getValueForTest(BUGTRACKER_PASSWORD, System.getProperty(BUGTRACKER_PASSWORD)));
+        setBugtrackerProject(getValueForTest(BUGTRACKER_PROJECT, System.getProperty(BUGTRACKER_PROJECT)));
         
         setWebDriverGrid(getValueForTest(WEB_DRIVER_GRID, System.getProperty(WEB_DRIVER_GRID)));
         setRunMode(getValueForTest(RUN_MODE, System.getProperty(RUN_MODE)));   
@@ -782,6 +801,8 @@ public class SeleniumTestsContext {
         
         // create Test Manager connector
     	testManagerInstance = initTestManager();
+    	
+    	bugtrackerInstance = initBugtracker();
     }
     
     /**
@@ -961,6 +982,14 @@ public class SeleniumTestsContext {
 		return null;
 	}
 	
+	public BugTracker initBugtracker() {
+		if (getBugtrackerType() != null && getBugtrackerUrl() != null) {
+			
+			return BugTracker.getInstance(getBugtrackerType(), getBugtrackerUrl(), getBugtrackerProject(), getBugtrackerUser(), getBugtrackerPassword());
+		}
+		return null;
+	}
+	
 	// ------------------------- accessors ------------------------------------------------------
 	
 	// getters from contextManager
@@ -1122,6 +1151,26 @@ public class SeleniumTestsContext {
     	return (String) getAttribute(TMS_PROJECT);
     }
     
+    public String getBugtrackerType() {
+    	return (String) getAttribute(BUGTRACKER_TYPE);
+    }
+    
+    public String getBugtrackerUrl() {
+    	return (String) getAttribute(BUGTRACKER_URL);
+    }
+    
+    public String getBugtrackerUser() {
+    	return (String) getAttribute(BUGTRACKER_USER);
+    }
+    
+    public String getBugtrackerPassword() {
+    	return (String) getAttribute(BUGTRACKER_PASSWORD);
+    }
+    
+    public String getBugtrackerProject() {
+    	return (String) getAttribute(BUGTRACKER_PROJECT);
+    }
+    
     @SuppressWarnings("unchecked")
 	public List<Class<?>> getReporterPluginClasses() {
     	List<Class<?>> userDefinedClasses = new ArrayList<>();
@@ -1131,6 +1180,7 @@ public class SeleniumTestsContext {
     	userDefinedClasses.add(TestManagerReporter.class);
 		userDefinedClasses.add(SeleniumRobotServerTestRecorder.class);
 		userDefinedClasses.add(CustomReporter.class);
+		userDefinedClasses.add(BugTrackerReporter.class);
     	
 		userDefinedClasses.addAll((List<Class<?>>) getAttribute(REPORTER_PLUGIN_CLASSES));
     	
@@ -1568,6 +1618,10 @@ public class SeleniumTestsContext {
     	return testManagerInstance;
     }
     
+    public BugTracker getBugTrackerInstance() {
+    	return bugtrackerInstance;
+    }
+    
 
 	public Map<String, Object> getContextDataMap() {
 		return contextDataMap;
@@ -1873,6 +1927,34 @@ public class SeleniumTestsContext {
     
     public void setTmsProject(String project){
     	setAttribute(TMS_PROJECT, project);
+    }
+    
+    public void setBugtrackerUrl(String url) {
+    	if (url != null) {
+    		setAttribute(BUGTRACKER_URL, url);
+    	} else {
+    		setAttribute(BUGTRACKER_URL, DEFAULT_BUGTRACKER_URL);
+    	}
+    }
+    
+    public void setBugtrackerType(String type) {
+    	if (type != null) {
+    		setAttribute(BUGTRACKER_TYPE, type);
+    	} else {
+    		setAttribute(BUGTRACKER_TYPE, DEFAULT_BUGTRACKER_TYPE);
+    	}
+    }
+    
+    public void setBugtrackerUser(String user){
+    	setAttribute(BUGTRACKER_USER, user);
+    }
+    
+    public void setBugtrackerPassword(String password){
+    	setAttribute(BUGTRACKER_PASSWORD, password);
+    }
+    
+    public void setBugtrackerProject(String project){
+    	setAttribute(BUGTRACKER_PROJECT, project);
     }
     
     public void setRunMode(String runMode) {

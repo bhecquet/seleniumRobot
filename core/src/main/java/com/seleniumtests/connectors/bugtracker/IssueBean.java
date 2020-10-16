@@ -23,6 +23,7 @@ public class IssueBean {
     private String id;
     private String reporter;
     private String testName;
+    private String issueType;
     private TestStep testStep;
     private String summary;
     private ZonedDateTime date;
@@ -30,12 +31,24 @@ public class IssueBean {
     private String description;
     private String priority;
     Map<String, String> fields = new HashMap<>();
-    List<String> components = new ArrayList<>();
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mmZ");
 
 
     private File detailedResult;
 
+    /**
+     * For test only!
+     * @param summary
+     * @param description
+     */
+    public IssueBean(
+    		String id,
+    		String summary,
+    		String description
+    		) {
+    	this(id, summary, description, "", "", null, "", "", new ArrayList<>(), null, new HashMap<>());
+    }
+    
     /**
      * 
      * @param summary
@@ -48,7 +61,6 @@ public class IssueBean {
      * @param screenshots
      * @param detailedResultFile
      * @param fields				All custom fields that should be filled
-     * @param components			All components this issue belongs to
      */
     public IssueBean(
     		String summary,
@@ -60,12 +72,12 @@ public class IssueBean {
     		String reporter,
     		List<ScreenShot> screenshots,
     		File detailedResultFile,
-    		Map<String, String> fields,
-    		List<String> components) {
-    	this(null, summary, description, priority, testName, testStep, assignee, reporter, screenshots, detailedResultFile, fields, components);
+    		Map<String, String> fields) {
+    	this(null, summary, description, priority, testName, testStep, assignee, reporter, screenshots, detailedResultFile, fields);
     }
     
-    /**
+
+	/**
      * @param id					id of the issue on bugtracker. May ben null if the issue has not been created
      * @param summary
      * @param description
@@ -77,7 +89,6 @@ public class IssueBean {
      * @param screenshots
      * @param detailedResultFile
      * @param fields				All custom fields that should be filled
-     * @param components			All components this issue belongs to
      */
     public IssueBean(String id,
     				String summary,
@@ -89,8 +100,7 @@ public class IssueBean {
                     String reporter,
                     List<ScreenShot> screenshots,
                     File detailedResultFile,
-                    Map<String, String> fields,
-                    List<String> components) {
+                    Map<String, String> fields) {
         setSummary(summary);
         this.id = id; // unknown on creation but may be updated later
         this.description = description;
@@ -104,9 +114,6 @@ public class IssueBean {
 
         if (fields != null) {
             this.fields = fields;
-        }
-        if (components != null) {
-            this.components = components;
         }
 
         date = ZonedDateTime.now().plusHours(3);
@@ -201,10 +208,6 @@ public class IssueBean {
         return fields;
     }
 
-    public List<String> getComponents() {
-        return components;
-    }
-
 	public String getId() {
 		return id;
 	}
@@ -212,5 +215,6 @@ public class IssueBean {
 	public void setId(String id) {
 		this.id = id;
 	}
+
 
 }

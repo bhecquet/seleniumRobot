@@ -52,6 +52,7 @@ public class TestNGResultUtils {
 	private static final String SELENIUM_SERVER_REPORT_TEST_CASE_SESSION_ID = "seleniumServerReportTcsId"; // ID of the TestCaseInSession when snapshot comparison has been done
 	private static final String HTML_REPORT = "htmlReport";				// true if the HTML result has already been generated
 	private static final String TEST_MANAGER_REPORT = "testManagerReport";// true if the result has already been recorded on test manager
+	private static final String BUGTRACKER_REPORT = "bugtrackerReport";// true if the failure has already been recorded on bugtracker
 	private static final String CUSTOM_REPORT = "customReport";			// true if the custom result has already been generated
 	private static final String METHOD_NAME = "methodName";				// name of the test method (or the cucumber scenario)
 	private static final String SNAPSHOT_COMPARISON_RESULT = "snapshotComparisonResult";	// the result of snapshot comparison, when enabled
@@ -251,11 +252,23 @@ public class TestNGResultUtils {
     		return alreadyCreated;
     	}
     }
-    
+   
     public static void setTestManagereportCreated(ITestResult testNGResult, Boolean recordedToServer) {
     	testNGResult.setAttribute(TEST_MANAGER_REPORT, recordedToServer);
     }
     
+    public static boolean isBugtrackerReportCreated(ITestResult testNGResult) {
+    	Boolean alreadyCreated = (Boolean) testNGResult.getAttribute(BUGTRACKER_REPORT);
+    	if (alreadyCreated == null) {
+    		return false;
+    	} else {
+    		return alreadyCreated;
+    	}
+    }
+
+    public static void setBugtrackerReportCreated(ITestResult testNGResult, Boolean recordedToServer) {
+    	testNGResult.setAttribute(BUGTRACKER_REPORT, recordedToServer);
+    }
     
     /**
      * 
