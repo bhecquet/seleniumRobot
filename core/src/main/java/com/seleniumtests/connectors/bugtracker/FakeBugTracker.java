@@ -8,20 +8,23 @@ public class FakeBugTracker extends BugTracker {
 
 	@Override
 	public IssueBean issueAlreadyExists(IssueBean issue) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public void updateIssue(String issueId, String messageUpdate, List<ScreenShot> screenShots) {
-		// TODO Auto-generated method stub
-
+		logger.info("issue updated");
 	}
 
 	@Override
 	public void createIssue(IssueBean issueBean) {
-		// TODO Auto-generated method stub
+		logger.info("issue created");
+	}
 
+	@Override
+	public void closeIssue(String issueId, String closingMessage) {
+		logger.info("issue closed");
+		
 	}
 
 }

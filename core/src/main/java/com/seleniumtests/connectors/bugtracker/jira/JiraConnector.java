@@ -13,6 +13,7 @@ import org.apache.log4j.Logger;
 
 import com.atlassian.jira.rest.client.api.IssueRestClient;
 import com.atlassian.jira.rest.client.api.JiraRestClient;
+import com.atlassian.jira.rest.client.api.RestClientException;
 import com.atlassian.jira.rest.client.api.SearchRestClient;
 import com.atlassian.jira.rest.client.api.domain.BasicComponent;
 import com.atlassian.jira.rest.client.api.domain.BasicIssue;
@@ -22,6 +23,7 @@ import com.atlassian.jira.rest.client.api.domain.Field;
 import com.atlassian.jira.rest.client.api.domain.Issue;
 import com.atlassian.jira.rest.client.api.domain.IssueType;
 import com.atlassian.jira.rest.client.api.domain.Priority;
+import com.atlassian.jira.rest.client.api.domain.Project;
 import com.atlassian.jira.rest.client.api.domain.Transition;
 import com.atlassian.jira.rest.client.api.domain.User;
 import com.atlassian.jira.rest.client.api.domain.Version;
@@ -46,6 +48,7 @@ public class JiraConnector extends BugTracker {
     private Map<String, Field> fields;
     private Map<String, Version> versions;
     private JiraRestClient restClient;
+    private Project project;
 
     /**
      *
@@ -55,14 +58,19 @@ public class JiraConnector extends BugTracker {
      */
     public JiraConnector(String server, String projectKey, String user, String password) {
         this.projectKey = projectKey;
-
-
-
+        
         try {
             restClient = new AsynchronousJiraRestClientFactory().createWithBasicHttpAuthentication(new URI(server), user, password);
         } catch (URISyntaxException e) {
             throw new ConfigurationException(String.format("L'URL de Jira n'est pas correcte", server));
         }
+        
+        try {
+        	project = restClient.getProjectClient().getProject(projectKey).claim();
+        } catch (RestClientException e) {
+        	throw new ConfigurationException(String.format("Project with key '%s' cannot be found on jira server %s", projectKey, server));
+        }
+        
         components = getComponents();
         issueTypes = getIssueTypes();
         priorities = getPriorities();
@@ -73,34 +81,34 @@ public class JiraConnector extends BugTracker {
     }
 
     private Map<String, BasicComponent> getComponents() {
-        Map<String, BasicComponent> components = new HashMap<>();
-        restClient.getProjectClient().getProject(projectKey).claim().getComponents().forEach(basicComponent -> components.put(basicComponent.getName(), basicComponent));
-        return components;
+        Map<String, BasicComponent> jiraComponents = new HashMap<>();
+        project.getComponents().forEach(basicComponent -> jiraComponents.put(basicComponent.getName(), basicComponent));
+        return jiraComponents;
     }
 
     private Map<String, IssueType> getIssueTypes() {
-        Map<String, IssueType> issueTypes = new HashMap<>();
-        restClient.getProjectClient().getProject(projectKey).claim().getIssueTypes().forEach(issueType -> issueTypes.put(issueType.getName(), issueType));
-        return issueTypes;
+        Map<String, IssueType> jiraIssueTypes = new HashMap<>();
+        restClient.getProjectClient().getProject(projectKey).claim().getIssueTypes().forEach(issueType -> jiraIssueTypes.put(issueType.getName(), issueType));
+        return jiraIssueTypes;
     }
 
     private Map<String, Version> getVersions() {
-        Map<String, Version> versions = new HashMap<>();
-        restClient.getProjectClient().getProject(projectKey).claim().getVersions().forEach(version -> versions.put(version.getName(), version));
-        return versions;
+        Map<String, Version> jiraVersions = new HashMap<>();
+        restClient.getProjectClient().getProject(projectKey).claim().getVersions().forEach(version -> jiraVersions.put(version.getName(), version));
+        return jiraVersions;
     }
 
     private Map<String, Priority> getPriorities() {
-        Map<String, Priority> priorities = new HashMap<>();
-        restClient.getMetadataClient().getPriorities().claim().forEach(priority -> priorities.put(priority.getName(), priority));
-        return priorities;
+        Map<String, Priority> jiraPriorities = new HashMap<>();
+        restClient.getMetadataClient().getPriorities().claim().forEach(priority -> jiraPriorities.put(priority.getName(), priority));
+        return jiraPriorities;
     }
 
     private Map<String, Field> getCustomFields() {
-        Map<String, Field> fields = new HashMap<>();
-        restClient.getMetadataClient().getFields().claim().forEach(field -> fields.put(field.getName(), field));
+        Map<String, Field> jiraFields = new HashMap<>();
+        restClient.getMetadataClient().getFields().claim().forEach(field -> jiraFields.put(field.getName(), field));
 
-        return fields;
+        return jiraFields;
     }
 
     private User getUser(String email) {
@@ -113,12 +121,18 @@ public class JiraConnector extends BugTracker {
 
     /**
      * Check if issue already exists, and if so, returns an updated IssueBean
+     * @param issueBean		a JiraBean instance
      *
      * @return
      */
     @Override
-    public IssueBean issueAlreadyExists(IssueBean jiraBean) {
+    public IssueBean issueAlreadyExists(IssueBean issueBean) {
 
+    	if (!(issueBean instanceof JiraBean)) {
+    		throw new ClassCastException("JiraConnector needs JiraBean instances");
+    	}
+    	JiraBean jiraBean = (JiraBean)issueBean;
+    	
         String jql = String.format("project=%s and summary ~ \"%s\" and status = Open", projectKey, jiraBean.getSummary()
                 .replace("[", "\\\\[")
                 .replace("]", "\\\\]")
@@ -128,7 +142,7 @@ public class JiraConnector extends BugTracker {
         List<Issue> issues = ImmutableList.copyOf(searchClient.searchJql(jql).claim().getIssues());
         if (issues.size() > 0) {
         	Issue issue = issues.get(0);
-            return new IssueBean(issue.getKey(),
+            return new JiraBean(issue.getKey(),
             		jiraBean.getSummary(), 
             		issue.getDescription(), 
             		jiraBean.getPriority(), 
@@ -148,21 +162,39 @@ public class JiraConnector extends BugTracker {
     /**
      * Create issue
      */
-    public void createIssue(IssueBean jiraBean) {
+    public void createIssue(IssueBean issueBean) {
 
+    	if (!(issueBean instanceof JiraBean)) {
+    		throw new ClassCastException("JiraConnector needs JiraBean instances");
+    	}
+    	JiraBean jiraBean = (JiraBean)issueBean;
+    	
         try {
+        	
+        	IssueType issueType = issueTypes.get(jiraBean.getIssueType());
+        	if (issueType == null) {
+        		throw new ConfigurationException(String.format("Issue type %s cannot be found among valid issue types %s", jiraBean.getIssueType(), issueTypes.keySet()));
+        	}
 
             IssueRestClient issueClient = restClient.getIssueClient();
-            IssueInputBuilder issueBuilder = new IssueInputBuilder(projectKey, 1L, jiraBean.getSummary())
+            IssueInputBuilder issueBuilder = new IssueInputBuilder(project, issueType, jiraBean.getSummary())
                     .setDueDate(jiraBean.getJodaDateTime())
                     .setDescription(jiraBean.getDescription())
                     ;
 
-            if (jiraBean.getAssignee() != null) {
-                issueBuilder.setAssignee(getUser(jiraBean.getAssignee()));
+            if (jiraBean.getAssignee() != null && !jiraBean.getAssignee().isEmpty()) {
+            	User user = getUser(jiraBean.getAssignee());
+            	if (user == null) {
+            		throw new ConfigurationException(String.format("Assignee %s cannot be found among jira users", jiraBean.getAssignee()));
+            	}
+                issueBuilder.setAssignee(user);
             }
-            if (jiraBean.getPriority() != null) {
-                issueBuilder.setPriority(priorities.get(jiraBean.getPriority()));
+            if (jiraBean.getPriority() != null && !jiraBean.getPriority().isEmpty()) {
+            	Priority priority = priorities.get(jiraBean.getPriority());
+            	if (priority == null) {
+            		throw new ConfigurationException(String.format("Priority %s cannot be found on this jira project, valid priorities are %s", jiraBean.getPriority(), priorities.keySet()));
+            	}
+                issueBuilder.setPriority(priority);
             }
             if (jiraBean.getReporter() != null && !jiraBean.getReporter().isEmpty()) {
                 issueBuilder.setReporterName(jiraBean.getReporter());
@@ -209,15 +241,15 @@ public class JiraConnector extends BugTracker {
     }
 
     /**
-     * Ferme la Jira donnée en paramètre
-     * @param jiraId            ID of the issue
+     * Close issue
+     * @param issueId           ID of the issue
      * @param closingMessage    Message of closing
      */
-    public void closeJira(String jiraId, String closingMessage){
+    public void closeIssue(String issueId, String closingMessage){
 
         try{
             IssueRestClient issueClient = restClient.getIssueClient();
-            Issue issue = issueClient.getIssue(jiraId).claim();
+            Issue issue = issueClient.getIssue(issueId).claim();
 
             List<Transition> transitions = new ArrayList<>();
             issueClient.getTransitions(issue).claim().forEach(transition -> transitions.add(transition));

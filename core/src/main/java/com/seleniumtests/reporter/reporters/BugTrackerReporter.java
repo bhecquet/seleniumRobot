@@ -16,7 +16,6 @@ import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.TestVariable;
 import com.seleniumtests.core.utils.TestNGResultUtils;
-import com.seleniumtests.driver.screenshots.ScreenShot;
 import com.seleniumtests.reporter.logger.TestStep;
 
 public class BugTrackerReporter extends CommonReporter implements IReporter {
@@ -56,7 +55,9 @@ public class BugTrackerReporter extends CommonReporter implements IReporter {
 						}
 					}
 					TestVariable assignee = testContext.getConfiguration().get("bugtracker.assignee");
+					TestVariable reporter = testContext.getConfiguration().get("bugtracker.reporter");
 					TestVariable priority = testContext.getConfiguration().get("bugtracker.priority");
+					TestVariable issueType = testContext.getConfiguration().get("bugtracker.issueType");
 					TestVariable components = testContext.getConfiguration().get("bugtracker.components");
 					
 					// application data
@@ -66,7 +67,6 @@ public class BugTrackerReporter extends CommonReporter implements IReporter {
 					String testName = TestNGResultUtils.getUniqueTestName(testResult);
 
 					String description = String.format("Test %s failed\n", testName);
-					List<ScreenShot> screenShots = new ArrayList<>();
 
 					if (testResult.getMethod().getDescription() != null) {
 						description += "Test goal: " + testResult.getMethod().getDescription();
@@ -78,9 +78,11 @@ public class BugTrackerReporter extends CommonReporter implements IReporter {
 						return;
 					}
 					
-					bugtrackerServer.createIssue(testResult, 
+					bugtrackerServer.createIssue(
 							assignee == null ? null: assignee.getValue(), 
 							priority == null ? null: priority.getValue(), 
+							issueType == null ? null: issueType.getValue(), 
+							reporter == null ? null: reporter.getValue(), 							
 							customFields, 
 							components == null ? new ArrayList<>(): Arrays.asList(components.getValue().split(",")),
 							application,
@@ -88,7 +90,6 @@ public class BugTrackerReporter extends CommonReporter implements IReporter {
 							testNgName,
 							testName,
 							description,
-							screenShots,
 							testSteps
 							);
 					
