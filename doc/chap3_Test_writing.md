@@ -1,3 +1,7 @@
+<!-- START doctoc -->
+<!-- END doctoc -->
+
+
 ### 1 Create a new test application ###
 A "test application" is the code specific to the Web or Mobile application under test. It consists of testNG files, Cucumber feature files, configurations and Java implementation files.
 
