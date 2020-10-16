@@ -126,6 +126,7 @@ public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implemen
     	return capabilities;
     }
     
+   
     @Override
     public WebDriver createWebDriver() {
 
@@ -175,6 +176,13 @@ public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implemen
     /**
      * Connect to grid using RemoteWebDriver
      * As we may have several grid available, takes the first one where driver is created
+     * 
+     * Several waits are defined
+     * By default, we wait 30 mins for a node to be found. For this, we loop through all available hubs
+     * In case we do not find any node after 30 mins, we fail and increment a fail counter
+     * This fail counter is reset every time we find a node
+     * If this counter reaches 3, then we don't even try to get a driver
+     * 
      * @param url
      * @param capability
      * @return
