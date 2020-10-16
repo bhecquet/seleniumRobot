@@ -19,17 +19,17 @@ import java.util.Map;
  */
 public class IssueBean {
 
-    private List<ScreenShot> screenShots;
-    private String id;
-    private String reporter;
-    private String testName;
-    private String issueType;
-    private TestStep testStep;
-    private String summary;
-    private ZonedDateTime date;
-    private String assignee;
-    private String description;
-    private String priority;
+    protected List<ScreenShot> screenShots = new ArrayList<>();
+    protected String id;
+    protected String reporter;
+    protected String testName;
+    protected String issueType;
+    protected TestStep testStep;
+    protected String summary;
+    protected ZonedDateTime date;
+    protected String assignee;
+    protected String description;
+    protected String priority;
     Map<String, String> fields = new HashMap<>();
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mmZ");
 
@@ -108,12 +108,15 @@ public class IssueBean {
         this.reporter = reporter;
         this.priority = priority;
         this.testName = testName;
-        this.screenShots = screenshots;
         this.testStep = testStep;
         this.detailedResult = detailedResultFile;
 
         if (fields != null) {
             this.fields = fields;
+        }
+
+        if (screenshots != null) {
+            this.screenShots = screenshots;
         }
 
         date = ZonedDateTime.now().plusHours(3);

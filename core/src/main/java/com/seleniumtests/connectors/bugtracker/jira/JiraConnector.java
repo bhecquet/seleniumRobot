@@ -35,6 +35,7 @@ import com.google.common.collect.ImmutableList;
 import com.seleniumtests.connectors.bugtracker.BugTracker;
 import com.seleniumtests.connectors.bugtracker.IssueBean;
 import com.seleniumtests.customexception.ConfigurationException;
+import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.driver.screenshots.ScreenShot;
 
 public class JiraConnector extends BugTracker {
@@ -58,6 +59,13 @@ public class JiraConnector extends BugTracker {
      */
     public JiraConnector(String server, String projectKey, String user, String password) {
         this.projectKey = projectKey;
+        
+        if (server == null || server.isEmpty() 
+        		|| projectKey == null || projectKey.isEmpty()
+        		|| user == null || user.isEmpty()
+        		|| password == null || password.isEmpty()) {
+        	throw new ConfigurationException("Missing configuration for Jira, please provide 'bugtrackerUrl', 'bugtrackerProject', 'bugtrackerUser' and bugtrackerPassword' parameters");
+        }
         
         try {
             restClient = new AsynchronousJiraRestClientFactory().createWithBasicHttpAuthentication(new URI(server), user, password);
@@ -88,13 +96,13 @@ public class JiraConnector extends BugTracker {
 
     private Map<String, IssueType> getIssueTypes() {
         Map<String, IssueType> jiraIssueTypes = new HashMap<>();
-        restClient.getProjectClient().getProject(projectKey).claim().getIssueTypes().forEach(issueType -> jiraIssueTypes.put(issueType.getName(), issueType));
+        project.getIssueTypes().forEach(issueType -> jiraIssueTypes.put(issueType.getName(), issueType));
         return jiraIssueTypes;
     }
 
     private Map<String, Version> getVersions() {
         Map<String, Version> jiraVersions = new HashMap<>();
-        restClient.getProjectClient().getProject(projectKey).claim().getVersions().forEach(version -> jiraVersions.put(version.getName(), version));
+        project.getVersions().forEach(version -> jiraVersions.put(version.getName(), version));
         return jiraVersions;
     }
 
@@ -114,8 +122,8 @@ public class JiraConnector extends BugTracker {
     private User getUser(String email) {
         try {
            return ImmutableList.copyOf(restClient.getUserClient().findUsers(email).claim()).get(0);
-        } catch (IndexOutOfBoundsException e) {
-            throw new ConfigurationException(String.format("L'email %s est inconnu de jira", email));
+        } catch (IndexOutOfBoundsException | RestClientException e) {
+            return null;
         }
     }
 
@@ -146,6 +154,7 @@ public class JiraConnector extends BugTracker {
             		jiraBean.getSummary(), 
             		issue.getDescription(), 
             		jiraBean.getPriority(), 
+            		jiraBean.getIssueType(),
             		jiraBean.getTestName(), 
             		jiraBean.getTestStep(),
             		jiraBean.getAssignee(), 
@@ -169,75 +178,73 @@ public class JiraConnector extends BugTracker {
     	}
     	JiraBean jiraBean = (JiraBean)issueBean;
     	
-        try {
         	
-        	IssueType issueType = issueTypes.get(jiraBean.getIssueType());
-        	if (issueType == null) {
-        		throw new ConfigurationException(String.format("Issue type %s cannot be found among valid issue types %s", jiraBean.getIssueType(), issueTypes.keySet()));
+    	IssueType issueType = issueTypes.get(jiraBean.getIssueType());
+    	if (issueType == null) {
+    		throw new ConfigurationException(String.format("Issue type %s cannot be found among valid issue types %s", jiraBean.getIssueType(), issueTypes.keySet()));
+    	}
+
+        IssueRestClient issueClient = restClient.getIssueClient();
+        IssueInputBuilder issueBuilder = new IssueInputBuilder(project, issueType, jiraBean.getSummary())
+                .setDueDate(jiraBean.getJodaDateTime())
+                .setDescription(jiraBean.getDescription())
+                ;
+
+        if (jiraBean.getAssignee() != null && !jiraBean.getAssignee().isEmpty()) {
+        	User user = getUser(jiraBean.getAssignee());
+        	if (user == null) {
+        		throw new ConfigurationException(String.format("Assignee %s cannot be found among jira users", jiraBean.getAssignee()));
         	}
+            issueBuilder.setAssignee(user);
+        }
+        if (jiraBean.getPriority() != null && !jiraBean.getPriority().isEmpty()) {
+        	Priority priority = priorities.get(jiraBean.getPriority());
+        	if (priority == null) {
+        		throw new ConfigurationException(String.format("Priority %s cannot be found on this jira project, valid priorities are %s", jiraBean.getPriority(), priorities.keySet()));
+        	}
+            issueBuilder.setPriority(priority);
+        }
+        if (jiraBean.getReporter() != null && !jiraBean.getReporter().isEmpty()) {
+            issueBuilder.setReporterName(jiraBean.getReporter());
+        }
 
-            IssueRestClient issueClient = restClient.getIssueClient();
-            IssueInputBuilder issueBuilder = new IssueInputBuilder(project, issueType, jiraBean.getSummary())
-                    .setDueDate(jiraBean.getJodaDateTime())
-                    .setDescription(jiraBean.getDescription())
-                    ;
-
-            if (jiraBean.getAssignee() != null && !jiraBean.getAssignee().isEmpty()) {
-            	User user = getUser(jiraBean.getAssignee());
-            	if (user == null) {
-            		throw new ConfigurationException(String.format("Assignee %s cannot be found among jira users", jiraBean.getAssignee()));
-            	}
-                issueBuilder.setAssignee(user);
+        // set fields
+        jiraBean.getFields().forEach((fieldName, fieldValue) -> {
+            if (fields.get(fieldName) != null) {
+                issueBuilder.setFieldValue(fields.get(fieldName).getId(), fieldValue);
+            } else {
+                logger.warn(String.format("Field %s does not exist", fieldName));
             }
-            if (jiraBean.getPriority() != null && !jiraBean.getPriority().isEmpty()) {
-            	Priority priority = priorities.get(jiraBean.getPriority());
-            	if (priority == null) {
-            		throw new ConfigurationException(String.format("Priority %s cannot be found on this jira project, valid priorities are %s", jiraBean.getPriority(), priorities.keySet()));
-            	}
-                issueBuilder.setPriority(priority);
-            }
-            if (jiraBean.getReporter() != null && !jiraBean.getReporter().isEmpty()) {
-                issueBuilder.setReporterName(jiraBean.getReporter());
-            }
+        });
 
-            // set fields
-            jiraBean.getFields().forEach((fieldName, fieldValue) -> {
-                if (fields.get(fieldName) != null) {
-                    issueBuilder.setFieldValue(fields.get(fieldName).getId(), fieldValue);
-                } else {
-                    logger.warn(String.format("Field %s does not exist", fieldName));
-                }
-            });
+        // set components
+        issueBuilder.setComponents(jiraBean.getComponents()
+                .stream()
+                .filter(component -> components.get(component) != null)
+                .map(component -> components.get(component))
+                .collect(Collectors.toList())
+                .toArray(new BasicComponent[] {}));
 
-            // set components
-            issueBuilder.setComponents(jiraBean.getComponents()
-                    .stream()
-                    .filter(component -> components.get(component) != null)
-                    .map(component -> components.get(component))
-                    .collect(Collectors.toList())
-                    .toArray(new Component[] {}));
+        // add issue
+        IssueInput newIssue = issueBuilder.build();
+        BasicIssue basicIssue = issueClient.createIssue(newIssue).claim();
+        Issue issue = issueClient.getIssue(basicIssue.getKey()).claim();
 
-            // add issue
-            IssueInput newIssue = issueBuilder.build();
-            BasicIssue basicIssue = issueClient.createIssue(newIssue).claim();
-            Issue issue = issueClient.getIssue(basicIssue.getKey()).claim();
-
+        if (!jiraBean.getScreenShots().isEmpty()) {
             issueClient.addAttachments(issue.getAttachmentsUri(), jiraBean.getScreenShots()
                     .stream()
-                    .peek(s -> logger.info("file ->" + s.getFullImagePath()))
+                    .peek(s -> logger.info("file -> " + s.getFullImagePath()))
                     .map(s -> new File(s.getFullImagePath()))
                     .collect(Collectors.toList())
                     .toArray(new File[] {})
             );
-
-            if (jiraBean.getDetailedResult() != null) {
-                issueClient.addAttachments(issue.getAttachmentsUri(),  jiraBean.getDetailedResult());
-            }
-
-            jiraBean.setId(issue.getKey());
-        }  catch (Exception e) {
-            logger.error("Failed creating Jira: " + e.getMessage());
         }
+
+        if (jiraBean.getDetailedResult() != null) {
+            issueClient.addAttachments(issue.getAttachmentsUri(),  jiraBean.getDetailedResult());
+        }
+
+        jiraBean.setId(issue.getKey());
     }
 
     /**
@@ -247,18 +254,19 @@ public class JiraConnector extends BugTracker {
      */
     public void closeIssue(String issueId, String closingMessage){
 
-        try{
-            IssueRestClient issueClient = restClient.getIssueClient();
-            Issue issue = issueClient.getIssue(issueId).claim();
-
-            List<Transition> transitions = new ArrayList<>();
-            issueClient.getTransitions(issue).claim().forEach(transition -> transitions.add(transition));
-
-            issueClient.transition(issue, new TransitionInput(transitions.get(1).getId(), new ArrayList<>()));
-
-        } catch (Exception e) {
-            logger.info(e);
+        IssueRestClient issueClient = restClient.getIssueClient();
+        Issue issue;
+        try {
+        	issue = issueClient.getIssue(issueId).claim();
+        } catch (RestClientException e) {
+        	throw new ScenarioException(String.format("Jira issue %s does not exist, cannot close it", issueId));
         }
+
+        List<Transition> transitions = new ArrayList<>();
+        issueClient.getTransitions(issue).claim().forEach(transition -> transitions.add(transition));
+
+        issueClient.transition(issue, new TransitionInput(transitions.get(1).getId(), new ArrayList<>()));
+
     }
 
 
@@ -272,11 +280,15 @@ public class JiraConnector extends BugTracker {
 	@Override
 	public void updateIssue(String issueId, String messageUpdate, List<ScreenShot> screenShots) {
 
-		
+		IssueRestClient issueClient = restClient.getIssueClient();
+		Issue issue;
 		try{
-            IssueRestClient issueClient = restClient.getIssueClient();
-            Issue issue = issueClient.getIssue(issueId).claim();
-
+            issue = issueClient.getIssue(issueId).claim();
+		} catch (RestClientException e) {
+	        throw new ScenarioException(String.format("Jira issue %s does not exist, cannot update it", issueId));
+	    }
+	
+		try {
             // add comment
             issueClient.addComment(issue.getCommentsUri(), Comment.valueOf(messageUpdate));
             
@@ -291,6 +303,7 @@ public class JiraConnector extends BugTracker {
             
         } catch (Exception e) {
         	logger.error(String.format("Jira %s not modified: %s", issueId, e.getMessage()));
+        	throw e;
         }
     }
 
