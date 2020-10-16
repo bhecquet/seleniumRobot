@@ -57,7 +57,7 @@ public class JiraConnector extends BugTracker {
      * @param user
      * @param password
      */
-    public JiraConnector(String server, String projectKey, String user, String password) {
+    public JiraConnector(String server, String projectKey, String user, String password, Map<String, String> jiraOptions) {
         this.projectKey = projectKey;
         
         if (server == null || server.isEmpty() 
@@ -186,7 +186,7 @@ public class JiraConnector extends BugTracker {
 
         IssueRestClient issueClient = restClient.getIssueClient();
         IssueInputBuilder issueBuilder = new IssueInputBuilder(project, issueType, jiraBean.getSummary())
-                .setDueDate(jiraBean.getJodaDateTime())
+                //.setDueDate(jiraBean.getJodaDateTime())
                 .setDescription(jiraBean.getDescription())
                 ;
 
@@ -292,13 +292,15 @@ public class JiraConnector extends BugTracker {
             // add comment
             issueClient.addComment(issue.getCommentsUri(), Comment.valueOf(messageUpdate));
             
-            issueClient.addAttachments(issue.getAttachmentsUri(), screenShots
-                    .stream()
-                    .peek(s -> logger.info("file ->" + s.getFullImagePath()))
-                    .map(s -> new File(s.getFullImagePath()))
-                    .collect(Collectors.toList())
-                    .toArray(new File[] {})
-            );
+            if (!screenShots.isEmpty()) {
+	            issueClient.addAttachments(issue.getAttachmentsUri(), screenShots
+	                    .stream()
+	                    .peek(s -> logger.info("file ->" + s.getFullImagePath()))
+	                    .map(s -> new File(s.getFullImagePath()))
+	                    .collect(Collectors.toList())
+	                    .toArray(new File[] {})
+	            );
+            }
             logger.info(String.format("Jira %s updated", issueId));
             
         } catch (Exception e) {

@@ -3,17 +3,16 @@ package com.seleniumtests.ut.connectors.bugtracker.jira;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.never;
 
 import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -156,6 +155,7 @@ public class TestJiraConnector extends MockitoTest {
 	private File detailedResult;
 	
 	private static final String PROJECT_KEY = "CORE";
+	Map<String, String> jiraOptions = new HashMap<>();
 
 	@BeforeMethod(groups={"ut"})
 	public void initJira() throws Exception {
@@ -216,6 +216,9 @@ public class TestJiraConnector extends MockitoTest {
 		screenshot.setImagePath("screenshot/" + tmpImg.getName());
 		detailedResult = File.createTempFile("detailed", ".zip");
 		detailedResult.deleteOnExit();
+		
+		jiraOptions.put("openStatus", "Open,To Do");
+		jiraOptions.put("closeTransition", "Close");
 	}
 	
 	/**
@@ -223,35 +226,40 @@ public class TestJiraConnector extends MockitoTest {
 	 */
 	@Test(groups= {"ut"}, expectedExceptions = ConfigurationException.class)
 	public void testMissingServer() {
-		new JiraConnector(null, PROJECT_KEY, "user", "password");	
+		new JiraConnector(null, PROJECT_KEY, "user", "password", jiraOptions);	
 	}
 	@Test(groups= {"ut"}, expectedExceptions = ConfigurationException.class)
 	public void testEmptyServer() {
-		new JiraConnector("", PROJECT_KEY, "user", "password");	
+		new JiraConnector("", PROJECT_KEY, "user", "password", jiraOptions);	
+	}
+	@Test(groups= {"ut"}, expectedExceptions = ConfigurationException.class)
+	public void testUnkownProject() {
+		when(promiseProject.claim()).thenThrow(RestClientException.class);
+		new JiraConnector("http://foo/bar", "PRO", "user", "password", jiraOptions);	
 	}
 	@Test(groups= {"ut"}, expectedExceptions = ConfigurationException.class)
 	public void testMissingProject() {
-		new JiraConnector("http://foo/bar", null, "user", "password");	
+		new JiraConnector("http://foo/bar", null, "user", "password", jiraOptions);	
 	}
 	@Test(groups= {"ut"}, expectedExceptions = ConfigurationException.class)
 	public void testEmptyProject() {
-		new JiraConnector("http://foo/bar", "", "user", "password");	
+		new JiraConnector("http://foo/bar", "", "user", "password", jiraOptions);	
 	}
 	@Test(groups= {"ut"}, expectedExceptions = ConfigurationException.class)
 	public void testMissingUser() {
-		new JiraConnector("http://foo/bar", PROJECT_KEY, null, "password");	
+		new JiraConnector("http://foo/bar", PROJECT_KEY, null, "password", jiraOptions);	
 	}
 	@Test(groups= {"ut"}, expectedExceptions = ConfigurationException.class)
 	public void testEmptyUser() {
-		new JiraConnector("http://foo/bar", PROJECT_KEY, "", "password");	
+		new JiraConnector("http://foo/bar", PROJECT_KEY, "", "password", jiraOptions);	
 	}
 	@Test(groups= {"ut"}, expectedExceptions = ConfigurationException.class)
 	public void testMissingPassword() {
-		new JiraConnector("http://foo/bar", PROJECT_KEY, "user", null);	
+		new JiraConnector("http://foo/bar", PROJECT_KEY, "user", null, jiraOptions);	
 	}
 	@Test(groups= {"ut"}, expectedExceptions = ConfigurationException.class)
 	public void testEmptyPassword() {
-		new JiraConnector("http://foo/bar", PROJECT_KEY, "user", "");	
+		new JiraConnector("http://foo/bar", PROJECT_KEY, "user", "", jiraOptions);	
 	}
 	
 	
@@ -264,7 +272,7 @@ public class TestJiraConnector extends MockitoTest {
 		when(promiseSearch.claim()).thenReturn(new SearchResult(0, 2, 2, Arrays.asList(issue1, issue2)));
 		JiraBean jiraBean = new JiraBean(null, "issue 1", "issue 1", "Bug");
 		
-		JiraConnector jiraConnector = new JiraConnector("http://foo/bar", PROJECT_KEY, "user", "password");
+		JiraConnector jiraConnector = new JiraConnector("http://foo/bar", PROJECT_KEY, "user", "password", jiraOptions);
 		IssueBean newJiraBean = jiraConnector.issueAlreadyExists(jiraBean);
 		
 		// check issue exists and has been updated with the first found issue
@@ -283,7 +291,7 @@ public class TestJiraConnector extends MockitoTest {
 		when(promiseSearch.claim()).thenReturn(new SearchResult(0, 2, 2, Arrays.asList(issue1, issue2)));
 		IssueBean jiraBean = new IssueBean(null, "issue 1", "issue 1");
 		
-		JiraConnector jiraConnector = new JiraConnector("http://foo/bar", PROJECT_KEY, "user", "password");
+		JiraConnector jiraConnector = new JiraConnector("http://foo/bar", PROJECT_KEY, "user", "password", jiraOptions);
 		jiraConnector.issueAlreadyExists(jiraBean);
 		
 	}
@@ -297,7 +305,7 @@ public class TestJiraConnector extends MockitoTest {
 		when(promiseSearch.claim()).thenReturn(new SearchResult(0, 2, 2, Arrays.asList()));
 		JiraBean jiraBean = new JiraBean(null, "issue 1", "issue 1", "Bug");
 		
-		JiraConnector jiraConnector = new JiraConnector("http://foo/bar", PROJECT_KEY, "user", "password");
+		JiraConnector jiraConnector = new JiraConnector("http://foo/bar", PROJECT_KEY, "user", "password", jiraOptions);
 		IssueBean newJiraBean = jiraConnector.issueAlreadyExists(jiraBean);
 		
 		// check issue has not been found
@@ -313,7 +321,7 @@ public class TestJiraConnector extends MockitoTest {
 		ArgumentCaptor<IssueInput> issueArgument = ArgumentCaptor.forClass(IssueInput.class);
 		ArgumentCaptor<File> screenshotCaptor = ArgumentCaptor.forClass(File.class);
 		
-		JiraConnector jiraConnector = new JiraConnector("http://foo/bar", PROJECT_KEY, "user", "password");
+		JiraConnector jiraConnector = new JiraConnector("http://foo/bar", PROJECT_KEY, "user", "password", jiraOptions);
 		
 		Map<String, String> fields = new HashMap<>();
 		fields.put("application", "myApp"); // field allowed by jira
@@ -330,7 +338,7 @@ public class TestJiraConnector extends MockitoTest {
 		Assert.assertEquals(((ComplexIssueInputFieldValue)(issueInput.getField("issuetype").getValue())).getValuesMap().get("id"), "1");
 		Assert.assertEquals(ImmutableList.copyOf(((Iterable<ComplexIssueInputFieldValue>)(issueInput.getField("components").getValue()))).size(), 1);
 		Assert.assertEquals(ImmutableList.copyOf(((Iterable<ComplexIssueInputFieldValue>)(issueInput.getField("components").getValue()))).get(0).getValuesMap().get("name"), "comp1");
-		Assert.assertEquals(issueInput.getField("duedate").getValue().toString().split("-")[0], Integer.toString(LocalDateTime.now().getYear()));
+//		Assert.assertEquals(issueInput.getField("duedate").getValue().toString().split("-")[0], Integer.toString(LocalDateTime.now().getYear()));
 		Assert.assertEquals(((ComplexIssueInputFieldValue)(issueInput.getField("project").getValue())).getValuesMap().get("key"), PROJECT_KEY);
 		Assert.assertEquals(issueInput.getField("description").getValue(), "issue 1 descr");
 		Assert.assertEquals(((ComplexIssueInputFieldValue)(issueInput.getField("reporter").getValue())).getValuesMap().get("name"), "you");
@@ -352,7 +360,7 @@ public class TestJiraConnector extends MockitoTest {
 	public void testCreateIssueWithMinimalFields() throws URISyntaxException {
 		ArgumentCaptor<IssueInput> issueArgument = ArgumentCaptor.forClass(IssueInput.class);
 		
-		JiraConnector jiraConnector = new JiraConnector("http://foo/bar", PROJECT_KEY, "user", "password");
+		JiraConnector jiraConnector = new JiraConnector("http://foo/bar", PROJECT_KEY, "user", "password", jiraOptions);
 		
 		JiraBean jiraBean = new JiraBean(null, "issue 1", "issue 1 descr", null, "Bug", null, null, null, null, new ArrayList<>(), null, new HashMap<>(), new ArrayList<>());
 		jiraConnector.createIssue(jiraBean);		
@@ -365,7 +373,6 @@ public class TestJiraConnector extends MockitoTest {
 		Assert.assertEquals(issueInput.getField("description").getValue(), "issue 1 descr");
 		Assert.assertEquals(((ComplexIssueInputFieldValue)(issueInput.getField("issuetype").getValue())).getValuesMap().get("id"), "1");
 		Assert.assertEquals(ImmutableList.copyOf(((Iterable<ComplexIssueInputFieldValue>)(issueInput.getField("components").getValue()))).size(), 0);
-		Assert.assertEquals(issueInput.getField("duedate").getValue(), "2020-10-16");
 		Assert.assertEquals(((ComplexIssueInputFieldValue)(issueInput.getField("project").getValue())).getValuesMap().get("key"), PROJECT_KEY);
 		
 		Assert.assertNull(issueInput.getField("reporter"));
@@ -384,7 +391,7 @@ public class TestJiraConnector extends MockitoTest {
 	public void testCreateIssueWithMinimalFieldsOtherEmpty() throws URISyntaxException {
 		ArgumentCaptor<IssueInput> issueArgument = ArgumentCaptor.forClass(IssueInput.class);
 		
-		JiraConnector jiraConnector = new JiraConnector("http://foo/bar", PROJECT_KEY, "user", "password");
+		JiraConnector jiraConnector = new JiraConnector("http://foo/bar", PROJECT_KEY, "user", "password", jiraOptions);
 		
 		JiraBean jiraBean = new JiraBean(null, "issue 1", "issue 1 descr", "", "Bug", "", null, "", "", new ArrayList<>(), null, new HashMap<>(), new ArrayList<>());
 		jiraConnector.createIssue(jiraBean);
@@ -398,7 +405,6 @@ public class TestJiraConnector extends MockitoTest {
 		Assert.assertEquals(issueInput.getField("description").getValue(), "issue 1 descr");
 		Assert.assertEquals(((ComplexIssueInputFieldValue)(issueInput.getField("issuetype").getValue())).getValuesMap().get("id"), "1");
 		Assert.assertEquals(ImmutableList.copyOf(((Iterable<ComplexIssueInputFieldValue>)(issueInput.getField("components").getValue()))).size(), 0);
-		Assert.assertEquals(issueInput.getField("duedate").getValue(), "2020-10-16");
 		Assert.assertEquals(((ComplexIssueInputFieldValue)(issueInput.getField("project").getValue())).getValuesMap().get("key"), PROJECT_KEY);
 		
 		Assert.assertNull(issueInput.getField("reporter"));
@@ -410,13 +416,35 @@ public class TestJiraConnector extends MockitoTest {
 	}
 	
 	/**
+	 * Test issue creation with bad component name. No error raised
+	 * @throws URISyntaxException
+	 */
+	@Test(groups= {"ut"})
+	public void testCreateIssueWithWrongComponent() throws URISyntaxException {
+		ArgumentCaptor<IssueInput> issueArgument = ArgumentCaptor.forClass(IssueInput.class);
+		
+		JiraConnector jiraConnector = new JiraConnector("http://foo/bar", PROJECT_KEY, "user", "password", jiraOptions);
+		
+		JiraBean jiraBean = new JiraBean(null, "issue 1", "issue 1 descr", "", "Bug", "", null, "", "", new ArrayList<>(), null, new HashMap<>(), Arrays.asList("unknown"));
+		jiraConnector.createIssue(jiraBean);
+		
+		
+		verify(issueRestClient).createIssue(issueArgument.capture());
+		
+		// check unknown component has not been added, but no error
+		IssueInput issueInput = ((IssueInput)issueArgument.getValue());
+		Assert.assertEquals(ImmutableList.copyOf(((Iterable<ComplexIssueInputFieldValue>)(issueInput.getField("components").getValue()))).size(), 0);
+		
+	}
+	
+	/**
 	 * Test issue creation with wrong user
 	 * @throws URISyntaxException
 	 */
 	@Test(groups= {"ut"}, expectedExceptions = ConfigurationException.class)
 	public void testCreateIssueWrongUser() {
 		
-		JiraConnector jiraConnector = new JiraConnector("http://foo/bar", PROJECT_KEY, "user", "password");
+		JiraConnector jiraConnector = new JiraConnector("http://foo/bar", PROJECT_KEY, "user", "password", jiraOptions);
 		
 		JiraBean jiraBean = new JiraBean(null, "issue 1", "issue 1 descr", null, "Bug", null, null, "notme", null, new ArrayList<>(), null, new HashMap<>(), new ArrayList<>());
 		jiraConnector.createIssue(jiraBean);
@@ -430,7 +458,7 @@ public class TestJiraConnector extends MockitoTest {
 	@Test(groups= {"ut"}, expectedExceptions = ConfigurationException.class)
 	public void testCreateIssueWrongIssueType() {
 		
-		JiraConnector jiraConnector = new JiraConnector("http://foo/bar", PROJECT_KEY, "user", "password");
+		JiraConnector jiraConnector = new JiraConnector("http://foo/bar", PROJECT_KEY, "user", "password", jiraOptions);
 		
 		JiraBean jiraBean = new JiraBean(null, "issue 1", "issue 1 descr", null, "BigBug", null, null, "", null, new ArrayList<>(), null, new HashMap<>(), new ArrayList<>());
 		jiraConnector.createIssue(jiraBean);
@@ -444,7 +472,7 @@ public class TestJiraConnector extends MockitoTest {
 	@Test(groups= {"ut"}, expectedExceptions = ConfigurationException.class)
 	public void testCreateIssueNoIssueType() {
 		
-		JiraConnector jiraConnector = new JiraConnector("http://foo/bar", PROJECT_KEY, "user", "password");
+		JiraConnector jiraConnector = new JiraConnector("http://foo/bar", PROJECT_KEY, "user", "password", jiraOptions);
 		
 		JiraBean jiraBean = new JiraBean(null, "issue 1", "issue 1 descr", null, null, null, null, "", null, new ArrayList<>(), null, new HashMap<>(), new ArrayList<>());
 		jiraConnector.createIssue(jiraBean);
@@ -458,7 +486,7 @@ public class TestJiraConnector extends MockitoTest {
 	@Test(groups= {"ut"}, expectedExceptions = ConfigurationException.class)
 	public void testCreateIssueWrongPriority() {
 		
-		JiraConnector jiraConnector = new JiraConnector("http://foo/bar", PROJECT_KEY, "user", "password");
+		JiraConnector jiraConnector = new JiraConnector("http://foo/bar", PROJECT_KEY, "user", "password", jiraOptions);
 		
 		JiraBean jiraBean = new JiraBean(null, "issue 1", "issue 1 descr", "P10", "Bug", null, null, null, null, new ArrayList<>(), null, new HashMap<>(), new ArrayList<>());
 		jiraConnector.createIssue(jiraBean);
@@ -472,7 +500,7 @@ public class TestJiraConnector extends MockitoTest {
 	@Test(groups= {"ut"})
 	public void testCreateIssueUnknownField() {
 		
-		JiraConnector jiraConnector = new JiraConnector("http://foo/bar", PROJECT_KEY, "user", "password");
+		JiraConnector jiraConnector = new JiraConnector("http://foo/bar", PROJECT_KEY, "user", "password", jiraOptions);
 		
 		Map<String, String> fields = new HashMap<>();
 		fields.put("myfield", "myApp"); // field allowed by jira
@@ -485,7 +513,7 @@ public class TestJiraConnector extends MockitoTest {
 	public void testCloseIssue() {
 		ArgumentCaptor<TransitionInput> transitionArgument = ArgumentCaptor.forClass(TransitionInput.class);
 		
-		JiraConnector jiraConnector = new JiraConnector("http://foo/bar", PROJECT_KEY, "user", "password");
+		JiraConnector jiraConnector = new JiraConnector("http://foo/bar", PROJECT_KEY, "user", "password", jiraOptions);
 		jiraConnector.closeIssue("ISSUE-1", "closed");
 		
 		verify(issueRestClient).transition(eq(issue1), transitionArgument.capture());
@@ -498,7 +526,7 @@ public class TestJiraConnector extends MockitoTest {
 	 */
 	@Test(groups= {"ut"}, expectedExceptions = ScenarioException.class)
 	public void testCloseUnknownIssue() {
-		JiraConnector jiraConnector = new JiraConnector("http://foo/bar", PROJECT_KEY, "user", "password");
+		JiraConnector jiraConnector = new JiraConnector("http://foo/bar", PROJECT_KEY, "user", "password", jiraOptions);
 		jiraConnector.closeIssue("ISSUE-2", "closed");
 	}
 	
@@ -508,7 +536,7 @@ public class TestJiraConnector extends MockitoTest {
 		ArgumentCaptor<Comment> commentArgument = ArgumentCaptor.forClass(Comment.class);
 		ArgumentCaptor<File> screenshotCaptor = ArgumentCaptor.forClass(File.class);
 		
-		JiraConnector jiraConnector = new JiraConnector("http://foo/bar", PROJECT_KEY, "user", "password");
+		JiraConnector jiraConnector = new JiraConnector("http://foo/bar", PROJECT_KEY, "user", "password", jiraOptions);
 		jiraConnector.updateIssue("ISSUE-1", "update", Arrays.asList(screenshot));
 		
 		verify(issueRestClient).addComment(any(URI.class), commentArgument.capture());
@@ -521,7 +549,7 @@ public class TestJiraConnector extends MockitoTest {
 	
 	@Test(groups= {"ut"}, expectedExceptions = ScenarioException.class)
 	public void testUpdateUnknownIssue() throws URISyntaxException {
-		JiraConnector jiraConnector = new JiraConnector("http://foo/bar", PROJECT_KEY, "user", "password");
+		JiraConnector jiraConnector = new JiraConnector("http://foo/bar", PROJECT_KEY, "user", "password", jiraOptions);
 		jiraConnector.updateIssue("ISSUE-2", "update", Arrays.asList(screenshot));
 	
 	}

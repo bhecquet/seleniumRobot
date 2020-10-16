@@ -42,6 +42,7 @@ import org.testng.xml.XmlSuite.ParallelMode;
 import com.seleniumtests.connectors.bugtracker.BugTracker;
 import com.seleniumtests.connectors.bugtracker.jira.JiraConnector;
 import com.seleniumtests.core.SeleniumTestsContext;
+import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.reporter.logger.TestStep;
 
 @PrepareForTest({BugTracker.class})
@@ -88,7 +89,7 @@ public class TestBugTrackerReporter extends ReporterTest {
 	}
 	
 	/**
-	 * With test OK, no issue is recorded
+	 * With test OK, no issue is recorded but we try to close a matching issue
 	 * @throws Exception
 	 */
 	@Test(groups={"it"})
@@ -104,7 +105,7 @@ public class TestBugTrackerReporter extends ReporterTest {
 			
 			// check we have only one result recording for each test method
 			verify(jiraConnector, never()).createIssue(any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any());
-
+			verify(jiraConnector).closeIssue(eq("core"), eq("DEV"), anyString(), eq("testAndSubActions"));
 			
 		} finally {
 			System.clearProperty(SeleniumTestsContext.BUGTRACKER_TYPE);
@@ -196,6 +197,8 @@ public class TestBugTrackerReporter extends ReporterTest {
 			System.clearProperty(SeleniumTestsContext.BUGTRACKER_URL);
 			System.clearProperty(SeleniumTestsContext.BUGTRACKER_USER);
 			System.clearProperty(SeleniumTestsContext.BUGTRACKER_PASSWORD);
+			System.clearProperty("bugtracker.field.foo");
+			System.clearProperty("bugtracker.field.foo2");
 		}
 	}
 	
@@ -227,6 +230,11 @@ public class TestBugTrackerReporter extends ReporterTest {
 			System.clearProperty(SeleniumTestsContext.BUGTRACKER_URL);
 			System.clearProperty(SeleniumTestsContext.BUGTRACKER_USER);
 			System.clearProperty(SeleniumTestsContext.BUGTRACKER_PASSWORD);
+			System.clearProperty("bugtracker.assignee");
+			System.clearProperty("bugtracker.reporter");
+			System.clearProperty("bugtracker.priority");
+			System.clearProperty("bugtracker.issueType");
+			System.clearProperty("bugtracker.components");
 		}
 	}
 	
@@ -238,7 +246,7 @@ public class TestBugTrackerReporter extends ReporterTest {
 			System.setProperty(SeleniumTestsContext.BUGTRACKER_USER, "jira");
 			System.setProperty(SeleniumTestsContext.BUGTRACKER_PASSWORD, "jira");
 
-			ArgumentCaptor<List<TestStep>> testStepsArgument = ArgumentCaptor.forClass(List.class);
+			PowerMockito.whenNew(JiraConnector.class).withAnyArguments().thenThrow(new ConfigurationException(""));
 			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForTestManager"}, ParallelMode.METHODS, new String[] {"testInError"});
 			
 			verify(jiraConnector, never()).createIssue(any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any());
@@ -249,77 +257,5 @@ public class TestBugTrackerReporter extends ReporterTest {
 			System.clearProperty(SeleniumTestsContext.BUGTRACKER_USER);
 			System.clearProperty(SeleniumTestsContext.BUGTRACKER_PASSWORD);
 		}
-	}
-	
-	/*@Test(groups={"it"})
-	public void testResultIsNotRecordedServerUnavailable() throws Exception {
-		try {
-			System.setProperty(SeleniumTestsContext.BUGTRACKER_TYPE, "jira");
-			System.setProperty(SeleniumTestsContext.BUGTRACKER_URL, "http://localhost:1234");
-			System.setProperty(SeleniumTestsContext.BUGTRACKER_PROJECT, "Project");
-			System.setProperty(SeleniumTestsContext.BUGTRACKER_USER, "jira");
-			System.setProperty(SeleniumTestsContext.BUGTRACKER_PASSWORD, "jira");
-			doThrow(new ConfigurationException("Cannot contact Squash TM server API")).when(squash).getApi();
-			
-			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForTestManager"}, ParallelMode.METHODS, new String[] {"testAndSubActions"});
-			
-			// check no result has been recorded
-			verify(api, never()).setExecutionResult(eq(iterationTestPlanItem), any());
-			
-		} finally {
-			System.clearProperty(SeleniumTestsContext.BUGTRACKER_TYPE);
-			System.clearProperty(SeleniumTestsContext.BUGTRACKER_PROJECT);
-			System.clearProperty(SeleniumTestsContext.BUGTRACKER_URL);
-			System.clearProperty(SeleniumTestsContext.BUGTRACKER_USER);
-			System.clearProperty(SeleniumTestsContext.BUGTRACKER_PASSWORD);
-		}
-	}
-	
-	@Test(groups={"it"})
-	public void testResultIsNotRecordedServerNotConfigured() throws Exception {
-		try {
-			System.setProperty(SeleniumTestsContext.BUGTRACKER_URL, "http://localhost:1234");
-			System.setProperty(SeleniumTestsContext.BUGTRACKER_PROJECT, "Project");
-			System.setProperty(SeleniumTestsContext.BUGTRACKER_USER, "jira");
-			System.setProperty(SeleniumTestsContext.BUGTRACKER_PASSWORD, "jira");
-			
-			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForTestManager"}, ParallelMode.METHODS, new String[] {"testAndSubActions"});
-			
-			// check we do not try to access squash
-			verify(squash, never()).getApi();
-			
-		} finally {
-			System.clearProperty(SeleniumTestsContext.BUGTRACKER_TYPE);
-			System.clearProperty(SeleniumTestsContext.BUGTRACKER_PROJECT);
-			System.clearProperty(SeleniumTestsContext.BUGTRACKER_URL);
-			System.clearProperty(SeleniumTestsContext.BUGTRACKER_USER);
-			System.clearProperty(SeleniumTestsContext.BUGTRACKER_PASSWORD);
-		}
-	}
-	
-	@Test(groups={"it"})
-	public void testResultIsNotRecordedWrongTestId() throws Exception {
-		try {
-			System.setProperty(SeleniumTestsContext.BUGTRACKER_TYPE, "jira");
-			System.setProperty(SeleniumTestsContext.BUGTRACKER_URL, "http://localhost:1234");
-			System.setProperty(SeleniumTestsContext.BUGTRACKER_PROJECT, "Project");
-			System.setProperty(SeleniumTestsContext.BUGTRACKER_USER, "jira");
-			System.setProperty(SeleniumTestsContext.BUGTRACKER_PASSWORD, "jira");
-			
-			doThrow(new ConfigurationException("Wrong Test ID")).when(api).addTestCaseInIteration(eq(iteration), anyInt());
-			
-			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForTestManager"}, ParallelMode.METHODS, new String[] {"testAndSubActions"});
-			
-			// check no result has been recorded
-			verify(api, never()).setExecutionResult(eq(iterationTestPlanItem), any());
-			
-		} finally {
-			System.clearProperty(SeleniumTestsContext.BUGTRACKER_TYPE);
-			System.clearProperty(SeleniumTestsContext.BUGTRACKER_PROJECT);
-			System.clearProperty(SeleniumTestsContext.BUGTRACKER_URL);
-			System.clearProperty(SeleniumTestsContext.BUGTRACKER_USER);
-			System.clearProperty(SeleniumTestsContext.BUGTRACKER_PASSWORD);
-		}
-	}*/
-	
+	}	
 }
