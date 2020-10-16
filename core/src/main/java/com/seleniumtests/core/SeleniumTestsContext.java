@@ -985,7 +985,15 @@ public class SeleniumTestsContext {
 	public BugTracker initBugtracker() {
 		if (getBugtrackerType() != null && getBugtrackerUrl() != null) {
 			
-			return BugTracker.getInstance(getBugtrackerType(), getBugtrackerUrl(), getBugtrackerProject(), getBugtrackerUser(), getBugtrackerPassword());
+			// any options specific to this bugtracker may be given in the form 'bugtracker.xxx'
+			Map<String, String> bugtrackerOptions = new HashMap<>();
+			for (TestVariable variable: getConfiguration().values()) {
+				if (variable.getName().startsWith("bugtracker.")) {
+					bugtrackerOptions.put(variable.getName().replace("bugtracker.", ""), variable.getValue());
+				}
+			}
+			
+			return BugTracker.getInstance(getBugtrackerType(), getBugtrackerUrl(), getBugtrackerProject(), getBugtrackerUser(), getBugtrackerPassword(), bugtrackerOptions);
 		}
 		return null;
 	}

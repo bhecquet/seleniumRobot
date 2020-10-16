@@ -42,42 +42,41 @@ public class BugTrackerReporter extends CommonReporter implements IReporter {
 				if (bugtrackerServer == null) {
 					return;
 				} 
+				
+				// search all bugtracker parameters bugtracker.field.<key>=<value>
+				Map<String, String> customFields = new HashMap<>();
+				for (TestVariable variable: testContext.getConfiguration().values()) {
+					if (variable.getName().startsWith("bugtracker.field.")) {
+						customFields.put(variable.getName().replace("bugtracker.field.", ""), variable.getValue());
+					}
+				}
+				TestVariable assignee = testContext.getConfiguration().get("bugtracker.assignee");
+				TestVariable reporter = testContext.getConfiguration().get("bugtracker.reporter");
+				TestVariable priority = testContext.getConfiguration().get("bugtracker.priority");
+				TestVariable issueType = testContext.getConfiguration().get("bugtracker.issueType");
+				TestVariable components = testContext.getConfiguration().get("bugtracker.components");
+				
+				// application data
+				String application = testContext.getApplicationName();
+				String environment = testContext.getTestEnv();
+				String testNgName = testResult.getTestContext().getCurrentXmlTest().getName();
+				String testName = TestNGResultUtils.getUniqueTestName(testResult);
+
+				String description = String.format("Test %s failed\n", testName);
+
+				if (testResult.getMethod().getDescription() != null) {
+					description += "Test goal: " + testResult.getMethod().getDescription();
+				}
+
+				// search the last step to get screenshots and failure reason
+				List<TestStep> testSteps = TestNGResultUtils.getSeleniumRobotTestContext(testResult).getTestStepManager().getTestSteps();
+				if (testSteps == null) {
+					return;
+				}
 
 				// create issue only for failed tests and if it has not been created before
 				if (testResult.getStatus() == ITestResult.FAILURE && !TestNGResultUtils.isBugtrackerReportCreated(testResult)) {
-					
-
-					// search all bugtracker parameters bugtracker.field.<key>=<value>
-					Map<String, String> customFields = new HashMap<>();
-					for (TestVariable variable: testContext.getConfiguration().values()) {
-						if (variable.getName().startsWith("bugtracker.field.")) {
-							customFields.put(variable.getName().replace("bugtracker.field.", ""), variable.getValue());
-						}
-					}
-					TestVariable assignee = testContext.getConfiguration().get("bugtracker.assignee");
-					TestVariable reporter = testContext.getConfiguration().get("bugtracker.reporter");
-					TestVariable priority = testContext.getConfiguration().get("bugtracker.priority");
-					TestVariable issueType = testContext.getConfiguration().get("bugtracker.issueType");
-					TestVariable components = testContext.getConfiguration().get("bugtracker.components");
-					
-					// application data
-					String application = testContext.getApplicationName();
-					String environment = testContext.getTestEnv();
-					String testNgName = testResult.getTestContext().getCurrentXmlTest().getName();
-					String testName = TestNGResultUtils.getUniqueTestName(testResult);
-
-					String description = String.format("Test %s failed\n", testName);
-
-					if (testResult.getMethod().getDescription() != null) {
-						description += "Test goal: " + testResult.getMethod().getDescription();
-					}
-
-					// search the last step to get screenshots and failure reason
-					List<TestStep> testSteps = TestNGResultUtils.getSeleniumRobotTestContext(testResult).getTestStepManager().getTestSteps();
-					if (testSteps == null) {
-						return;
-					}
-					
+	
 					bugtrackerServer.createIssue(
 							assignee == null ? null: assignee.getValue(), 
 							priority == null ? null: priority.getValue(), 
@@ -92,6 +91,15 @@ public class BugTrackerReporter extends CommonReporter implements IReporter {
 							description,
 							testSteps
 							);
+					
+					TestNGResultUtils.setBugtrackerReportCreated(testResult, true);
+				} else if (testResult.getStatus() == ITestResult.SUCCESS && !TestNGResultUtils.isBugtrackerReportCreated(testResult)) {
+					
+					bugtrackerServer.closeIssue( 
+							application,
+							environment,
+							testNgName,
+							testName);
 					
 					TestNGResultUtils.setBugtrackerReportCreated(testResult, true);
 				}
