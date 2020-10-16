@@ -1,3 +1,26 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**
+
+- [1 Development environment](#1-development-environment)
+  - [eclipse](#eclipse)
+    - [Test application project configuration](#test-application-project-configuration)
+  - [intelliJ](#intellij)
+    - [AspectJ activation](#aspectj-activation)
+    - [Test Application Project configuration](#test-application-project-configuration)
+    - [Version control](#version-control)
+  - [Sign artifact for deploy phase](#sign-artifact-for-deploy-phase)
+  - [Git key for release](#git-key-for-release)
+  - [Maven configuration](#maven-configuration)
+  - [Oracle library for core compile](#oracle-library-for-core-compile)
+  - [Download drivers](#download-drivers)
+- [2 Execution environment](#2-execution-environment)
+  - [Installing Appium](#installing-appium)
+  - [Configuring Android for tests](#configuring-android-for-tests)
+  - [Configuring iOS for tests](#configuring-ios-for-tests)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 ### 1 Development environment ###
 
 #### eclipse ####

@@ -1,3 +1,56 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**
+
+  - [0 preparation](#0-preparation)
+    - [Install](#install)
+    - [Run](#run)
+  - [1 Configurations](#1-configurations)
+    - [Common params](#common-params)
+    - [Proxy settings](#proxy-settings)
+    - [Test execution settings](#test-execution-settings)
+    - [Browser specific settings](#browser-specific-settings)
+    - [Selenium server params](#selenium-server-params)
+    - [Mobile params](#mobile-params)
+    - [Reporting](#reporting)
+    - [Deprecated](#deprecated)
+    - [Minimal Configuration](#minimal-configuration)
+    - [Centralized XML configuration](#centralized-xml-configuration)
+  - [2 Test WebApp with desktop browser](#2-test-webapp-with-desktop-browser)
+    - [Test locally](#test-locally)
+    - [Test with SeleniumRobot Grid](#test-with-seleniumrobot-grid)
+    - [Test with BrowserStack](#test-with-browserstack)
+  - [3 Test with Appium locally](#3-test-with-appium-locally)
+    - [Application test on android](#application-test-on-android)
+    - [Application test on iOS](#application-test-on-ios)
+  - [4 Test with SauceLabs](#4-test-with-saucelabs)
+  - [5 Test with BrowserStack](#5-test-with-browserstack)
+  - [6 Test with SeleniumGrid](#6-test-with-seleniumgrid)
+    - [Configure SeleniumRobot](#configure-seleniumrobot)
+    - [Configure Grid hub](#configure-grid-hub)
+    - [Configure Grid node](#configure-grid-node)
+      - [Desktop node](#desktop-node)
+      - [Appium nodes](#appium-nodes)
+  - [6 Running tests in parallel](#6-running-tests-in-parallel)
+    - [Test NG way](#test-ng-way)
+    - [Jenkins way](#jenkins-way)
+      - [Matrix Job](#matrix-job)
+      - [Selenium Capability Axis](#selenium-capability-axis)
+  - [7 The test results](#7-the-test-results)
+    - [HTML result](#html-result)
+    - [JUnit XML global result](#junit-xml-global-result)
+    - [JUnit XML per test result](#junit-xml-per-test-result)
+    - [JSON global result](#json-global-result)
+    - [Custom result](#custom-result)
+      - [Custom Test report](#custom-test-report)
+      - [Custom Summary report](#custom-summary-report)
+    - [Default TestNG reports](#default-testng-reports)
+  - [8 Execute Selenium IDE Tests](#8-execute-selenium-ide-tests)
+- [Troubleshooting](#troubleshooting)
+  - [Cyclic dependency when executing TestNG Test](#cyclic-dependency-when-executing-testng-test)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 
 ### 0 preparation ###
 

@@ -1,3 +1,8 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+undefined
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 SeleniumRobot is a test framework based on Selenium & Appium API to ease Web and Mobile testing. It's based on the seleniumtestsframework open-source project [https://github.com/tarun3kumar/seleniumtestsframework](https://github.com/tarun3kumar/seleniumtestsframework)
 
 Main features are:

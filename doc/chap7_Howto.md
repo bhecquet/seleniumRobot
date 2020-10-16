@@ -1,3 +1,47 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**
+
+- [0 Troubleshooting](#0-troubleshooting)
+  - [Clicking on an element makes a new window display but browser returns to previous one](#clicking-on-an-element-makes-a-new-window-display-but-browser-returns-to-previous-one)
+- [1 Compare 2 XML files](#1-compare-2-xml-files)
+- [2 Write working unit tests](#2-write-working-unit-tests)
+- [3 Core: making an action on an HTMLElement replay on error](#3-core-making-an-action-on-an-htmlelement-replay-on-error)
+- [4 Working with images](#4-working-with-images)
+  - [Using PictureElement](#using-pictureelement)
+  - [Using ScreenZone](#using-screenzone)
+  - [Check if image is matching](#check-if-image-is-matching)
+- [5 Working with PDF files](#5-working-with-pdf-files)
+- [6 Accessing remote computer through SSH or SCP](#6-accessing-remote-computer-through-ssh-or-scp)
+- [7 execute requests via SOAP UI](#7-execute-requests-via-soap-ui)
+- [8 Using database](#8-using-database)
+- [9 Using emails](#9-using-emails)
+  - [9.1 Getting email](#91-getting-email)
+  - [9.2 Writing email](#92-writing-email)
+- [10 upload file](#10-upload-file)
+  - [The selenium way (preferred)](#the-selenium-way-preferred)
+  - [The selenium robot way (if previous method is not possible)](#the-selenium-robot-way-if-previous-method-is-not-possible)
+- [11 Write custom reports](#11-write-custom-reports)
+  - [available data in test report](#available-data-in-test-report)
+  - [available data in summary report](#available-data-in-summary-report)
+- [12 Monitor error level](#12-monitor-error-level)
+- [13 Access remote servers through HTTPS](#13-access-remote-servers-through-https)
+- [14 Inheritance between test applications](#14-inheritance-between-test-applications)
+- [15 Record network traffic](#15-record-network-traffic)
+- [16 Use Neoload tool to design and record End User Experience](#16-use-neoload-tool-to-design-and-record-end-user-experience)
+  - [Design mode](#design-mode)
+  - [End User Experience](#end-user-experience)
+- [17 Add extension to the browser](#17-add-extension-to-the-browser)
+- [18 Add current date in test-output folder](#18-add-current-date-in-test-output-folder)
+  - [for windows](#for-windows)
+- [19 Create a custom reporter](#19-create-a-custom-reporter)
+- [20 Debug running test](#20-debug-running-test)
+- [21 Customize driver behaviour](#21-customize-driver-behaviour)
+- [22 Automate Salesforce lightning UI](#22-automate-salesforce-lightning-ui)
+- [23 Compare snapshots](#23-compare-snapshots)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 In this section, we will describe how to add some useful features to test applications (file comparison, log reading, ...)
 
 ### 0 Troubleshooting ###
