@@ -23,7 +23,6 @@ public class IssueBean {
     protected String id;
     protected String reporter;
     protected String testName;
-    protected String issueType;
     protected TestStep testStep;
     protected String summary;
     protected ZonedDateTime date;
@@ -46,34 +45,30 @@ public class IssueBean {
     		String summary,
     		String description
     		) {
-    	this(id, summary, description, "", "", null, "", "", new ArrayList<>(), null, new HashMap<>());
+    	this(id, summary, description, "", null, "", "", new ArrayList<>(), null);
     }
     
     /**
      * 
      * @param summary
      * @param description
-     * @param priority
      * @param testName
      * @param testStep
      * @param assignee
      * @param reporter
      * @param screenshots
      * @param detailedResultFile
-     * @param fields				All custom fields that should be filled
      */
     public IssueBean(
     		String summary,
     		String description,
-    		String priority,
     		String testName,
     		TestStep testStep,
     		String assignee,
     		String reporter,
     		List<ScreenShot> screenshots,
-    		File detailedResultFile,
-    		Map<String, String> fields) {
-    	this(null, summary, description, priority, testName, testStep, assignee, reporter, screenshots, detailedResultFile, fields);
+    		File detailedResultFile) {
+    	this(null, summary, description, testName, testStep, assignee, reporter, screenshots, detailedResultFile);
     }
     
 
@@ -93,27 +88,20 @@ public class IssueBean {
     public IssueBean(String id,
     				String summary,
                     String description,
-                    String priority,
                     String testName,
                     TestStep testStep,
                     String assignee,
                     String reporter,
                     List<ScreenShot> screenshots,
-                    File detailedResultFile,
-                    Map<String, String> fields) {
+                    File detailedResultFile) {
         setSummary(summary);
         this.id = id; // unknown on creation but may be updated later
         this.description = description;
         this.assignee = assignee;
         this.reporter = reporter;
-        this.priority = priority;
         this.testName = testName;
         this.testStep = testStep;
         this.detailedResult = detailedResultFile;
-
-        if (fields != null) {
-            this.fields = fields;
-        }
 
         if (screenshots != null) {
             this.screenShots = screenshots;
@@ -137,14 +125,6 @@ public class IssueBean {
 
     public void setReporter(String reporter) {
         this.reporter = reporter;
-    }
-
-    public String getPriority() {
-        return priority;
-    }
-
-    public void setPriority(String priority) {
-        this.priority = priority;
     }
 
     public List<ScreenShot> getScreenShots() {
@@ -205,10 +185,6 @@ public class IssueBean {
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public Map<String, String> getFields() {
-        return fields;
     }
 
 	public String getId() {

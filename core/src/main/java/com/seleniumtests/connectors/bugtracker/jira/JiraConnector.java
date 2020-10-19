@@ -4,11 +4,14 @@ import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.apache.commons.collections.ListUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
 import com.atlassian.jira.rest.client.api.IssueRestClient;
@@ -34,6 +37,7 @@ import com.atlassian.jira.rest.client.internal.async.AsynchronousJiraRestClientF
 import com.google.common.collect.ImmutableList;
 import com.seleniumtests.connectors.bugtracker.BugTracker;
 import com.seleniumtests.connectors.bugtracker.IssueBean;
+import com.seleniumtests.core.TestVariable;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.driver.screenshots.ScreenShot;
@@ -51,6 +55,13 @@ public class JiraConnector extends BugTracker {
     private JiraRestClient restClient;
     private Project project;
 
+    String priorityToSet;
+    String issueTypeToSet;
+    List<String> componentsToSet = new ArrayList<>();
+    List<String> openStates;
+    String closeTransition;
+    Map<String, String> customFieldsValues;
+    
     /**
      *
      * @param server        exemple: http://jira.covea.priv
@@ -66,6 +77,16 @@ public class JiraConnector extends BugTracker {
         		|| password == null || password.isEmpty()) {
         	throw new ConfigurationException("Missing configuration for Jira, please provide 'bugtrackerUrl', 'bugtrackerProject', 'bugtrackerUser' and bugtrackerPassword' parameters");
         }
+        
+		
+		// search all bugtracker parameters bugtracker.field.<key>=<value>
+		customFieldsValues = new HashMap<>();
+		for (String variable: jiraOptions.keySet()) {
+			if (variable.startsWith("field.")) {
+				customFieldsValues.put(variable.replace("field.", ""), jiraOptions.get(variable));
+			}
+		}
+
         
         try {
             restClient = new AsynchronousJiraRestClientFactory().createWithBasicHttpAuthentication(new URI(server), user, password);
@@ -84,6 +105,31 @@ public class JiraConnector extends BugTracker {
         priorities = getPriorities();
         fields = getCustomFields();
         versions = getVersions();
+        
+        // check jira options
+		priorityToSet = jiraOptions.get("priority");
+		issueTypeToSet = jiraOptions.get("jira.issueType");
+		closeTransition = jiraOptions.get("jira.closeTransition");
+		
+		if (jiraOptions.get("jira.components") != null) {
+			componentsToSet = Arrays.asList(jiraOptions.get("jira.components").split(","));
+		}
+		
+		if (priorityToSet == null) {
+			priorityToSet = new ArrayList<>(priorities.keySet()).get(priorities.size() - 1);
+			logger.warn(String.format("'bugtracker.priority' parameter not set, we will use a default priority %s", priorityToSet));
+		}
+		if (issueTypeToSet == null) {
+			throw new ConfigurationException("'bugtracker.jira.issueType' parameter has not been set, it's mandatory (type of the issue that will be created. E.g: 'Bug'");
+		}
+		if (jiraOptions.get("jira.openStates") == null) {
+			throw new ConfigurationException("'bugtracker.jira.openStates' MUST be set. It's the state of an issue when it has juste been create. Used to search for open issues");
+		} else {
+			openStates = Arrays.asList(jiraOptions.get("jira.openStates").split(","));
+		}
+		if (closeTransition == null) {
+			throw new ConfigurationException("'bugtracker.jira.closeTransition' MUST be set. It's the name of the transition that will close an issue");
+		}
 
         logger.info(String.format("Connection à l'API du serveur Jira[%s], sur le projet [%s] avec le user [%s]", server, projectKey, user));
     }
@@ -141,9 +187,11 @@ public class JiraConnector extends BugTracker {
     	}
     	JiraBean jiraBean = (JiraBean)issueBean;
     	
-        String jql = String.format("project=%s and summary ~ \"%s\" and status = Open", projectKey, jiraBean.getSummary()
-                .replace("[", "\\\\[")
+        String jql = String.format("project=%s and summary ~ \"%s\" and status in (\"%s\")", projectKey, jiraBean.getSummary()
+        		.replace("[", "\\\\[")
                 .replace("]", "\\\\]")
+        		, StringUtils.join(openStates, "\",\"")
+                
         );
 
         SearchRestClient searchClient = restClient.getSearchClient();
@@ -152,8 +200,8 @@ public class JiraConnector extends BugTracker {
         	Issue issue = issues.get(0);
             return new JiraBean(issue.getKey(),
             		jiraBean.getSummary(), 
-            		issue.getDescription(), 
-            		jiraBean.getPriority(), 
+            		issue.getDescription(),
+            		jiraBean.getPriority(),
             		jiraBean.getIssueType(),
             		jiraBean.getTestName(), 
             		jiraBean.getTestStep(),
@@ -161,7 +209,7 @@ public class JiraConnector extends BugTracker {
             		jiraBean.getReporter(), 
             		jiraBean.getScreenShots(), 
             		jiraBean.getDetailedResult(),
-            		jiraBean.getFields(), 
+            		jiraBean.getCustomFields(),
             		jiraBean.getComponents());
         } else {
             return null;
@@ -209,7 +257,7 @@ public class JiraConnector extends BugTracker {
         }
 
         // set fields
-        jiraBean.getFields().forEach((fieldName, fieldValue) -> {
+        jiraBean.getCustomFields().forEach((fieldName, fieldValue) -> {
             if (fields.get(fieldName) != null) {
                 issueBuilder.setFieldValue(fields.get(fieldName).getId(), fieldValue);
             } else {
@@ -248,7 +296,7 @@ public class JiraConnector extends BugTracker {
     }
 
     /**
-     * Close issue
+     * Close issue, applying all necessary transitions
      * @param issueId           ID of the issue
      * @param closingMessage    Message of closing
      */
@@ -262,11 +310,28 @@ public class JiraConnector extends BugTracker {
         	throw new ScenarioException(String.format("Jira issue %s does not exist, cannot close it", issueId));
         }
 
-        List<Transition> transitions = new ArrayList<>();
-        issueClient.getTransitions(issue).claim().forEach(transition -> transitions.add(transition));
-
-        issueClient.transition(issue, new TransitionInput(transitions.get(1).getId(), new ArrayList<>()));
-
+        Map<String, Transition> transitions = new HashMap<>();
+        issueClient.getTransitions(issue).claim().forEach(transition -> transitions.put(transition.getName(), transition));
+        List<String> closeWorkflow = Arrays.asList(closeTransition.split("/"));
+        
+        int workflowPosition = -1;
+        for (String transitionName: transitions.keySet()) {
+        	workflowPosition = closeWorkflow.indexOf(transitionName);
+        	if (workflowPosition != -1) {
+        		break;
+        	}
+        }
+        if (workflowPosition == -1) {
+        	throw new ConfigurationException(String.format("'bugtracker.jira.closeTransition' values [%s] are unknown for this issue, allowed transitions are %s", closeTransition, transitions.keySet()));
+        } else {
+        	for (String transitionName: closeWorkflow.subList(workflowPosition, closeWorkflow.size())) {
+        		issueClient.transition(issue, new TransitionInput(transitions.get(transitionName).getId(), new ArrayList<>()));
+        		
+        		// update available transitions
+        		transitions.clear();
+        		issueClient.getTransitions(issue).claim().forEach(transition -> transitions.put(transition.getName(), transition));
+        	}
+        }
     }
 
 
@@ -308,6 +373,26 @@ public class JiraConnector extends BugTracker {
         	throw e;
         }
     }
+
+	public String getPriorityToSet() {
+		return priorityToSet;
+	}
+
+	public String getIssueTypeToSet() {
+		return issueTypeToSet;
+	}
+
+	public List<String> getComponentsToSet() {
+		return componentsToSet;
+	}
+
+	public Map<String, String> getCustomFieldsValues() {
+		return customFieldsValues;
+	}
+
+	public List<String> getOpenStates() {
+		return openStates;
+	}
 
 }
 

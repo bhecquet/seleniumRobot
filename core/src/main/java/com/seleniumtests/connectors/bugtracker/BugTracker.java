@@ -55,11 +55,7 @@ public abstract class BugTracker {
 	 * @return
 	 */
 	public IssueBean createIssueBean(String assignee, 
-			String priority, 
-			String issueType,
 			String reporter,
-			Map<String, String> customFields, 
-			List<String> components,
 			String summary,
 			String testName,
 			String description,
@@ -134,27 +130,25 @@ public abstract class BugTracker {
 		if (this instanceof JiraConnector) {
 			return new JiraBean(summary,
 					fullDescription.toString(),
-					priority,
-					issueType,
+					((JiraConnector)this).getPriorityToSet(),
+					((JiraConnector)this).getIssueTypeToSet(),
 					testName,
 					testSteps.get(stepIdx),
 					assignee,
 					reporter,
 					screenShots,
 					zipFile,
-					customFields,
-					components);
+					((JiraConnector)this).getCustomFieldsValues(),
+					((JiraConnector)this).getComponentsToSet());
 		} else {
 			return new IssueBean(summary,
 				fullDescription.toString(),
-				priority,
 				testName,
 				testSteps.get(stepIdx),
 				assignee,
 				reporter,
 				screenShots,
-				zipFile,
-				customFields);
+				zipFile);
 		}
 	}
 	
@@ -163,11 +157,7 @@ public abstract class BugTracker {
 	 * First we search for a similar open issue (same summary)
 	 * If it exists, then we check the step where we failed. If it's the same, we do nothing, else, we update the issue, saying we failed on an other step.
 	 * @param assignee		assignee to which this issue will be sent. May be null
-	 * @param priority		priority of the new issue. May be null
-	 * @param issueType		Type of the issue to create. May be null
 	 * @param reporter		person who reported the issue. May be null
-	 * @param customFields	custom information to add to issue. They must be supported by bugtracker
-	 * @param components	components to which this issue belong. Depends on bugtracker
 	 * @param application	the tested application
 	 * @param environment	the environment where we tested
 	 * @param testNgName	name of the TestNG test. Helps to build the summary
@@ -177,11 +167,7 @@ public abstract class BugTracker {
 	 */
 	public void createIssue(
 			String assignee, 
-			String priority,
-			String issueType,
 			String reporter,
-			Map<String, String> customFields, 
-			List<String> components,
 			String application,
 			String environment,
 			String testNgName,
@@ -191,7 +177,7 @@ public abstract class BugTracker {
 
 
 		String summary = createIssueSummary(application, environment, testNgName, testName);
-		IssueBean issueBean = createIssueBean(assignee, priority, issueType, reporter, customFields, components, summary, testName, description, testSteps);
+		IssueBean issueBean = createIssueBean(assignee, reporter, summary, testName, description, testSteps);
 		if (issueBean == null) {
 			return;
 		}
@@ -232,7 +218,7 @@ public abstract class BugTracker {
 			String testName) {
 		
 		String summary = createIssueSummary(application, environment, testNgName, testName);
-		IssueBean issueBean = new IssueBean(summary, "", "", "", null, null, null, null, null, null);
+		IssueBean issueBean = new IssueBean(summary, "", "", null, null, null, null, null);
 		
 		// Close issue if it exists
 		IssueBean currentIssue = issueAlreadyExists(issueBean);

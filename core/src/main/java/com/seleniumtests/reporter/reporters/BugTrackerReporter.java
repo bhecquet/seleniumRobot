@@ -43,18 +43,9 @@ public class BugTrackerReporter extends CommonReporter implements IReporter {
 					return;
 				} 
 				
-				// search all bugtracker parameters bugtracker.field.<key>=<value>
-				Map<String, String> customFields = new HashMap<>();
-				for (TestVariable variable: testContext.getConfiguration().values()) {
-					if (variable.getName().startsWith("bugtracker.field.")) {
-						customFields.put(variable.getName().replace("bugtracker.field.", ""), variable.getValue());
-					}
-				}
+
 				TestVariable assignee = testContext.getConfiguration().get("bugtracker.assignee");
 				TestVariable reporter = testContext.getConfiguration().get("bugtracker.reporter");
-				TestVariable priority = testContext.getConfiguration().get("bugtracker.priority");
-				TestVariable issueType = testContext.getConfiguration().get("bugtracker.issueType");
-				TestVariable components = testContext.getConfiguration().get("bugtracker.components");
 				
 				// application data
 				String application = testContext.getApplicationName();
@@ -79,11 +70,7 @@ public class BugTrackerReporter extends CommonReporter implements IReporter {
 	
 					bugtrackerServer.createIssue(
 							assignee == null ? null: assignee.getValue(), 
-							priority == null ? null: priority.getValue(), 
-							issueType == null ? null: issueType.getValue(), 
 							reporter == null ? null: reporter.getValue(), 							
-							customFields, 
-							components == null ? new ArrayList<>(): Arrays.asList(components.getValue().split(",")),
 							application,
 							environment,
 							testNgName,

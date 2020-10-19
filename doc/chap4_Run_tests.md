@@ -226,25 +226,61 @@ Params for mobile testing
 | archiveToFile				| null		| If not specified, no archiving will be done. Else, provide a zip file path and the whole content of `outputDirectory` will be zipped to this file in case archive is enabled |
 | archive					| never		| If `always` / `true`, always archive results to `archiveToFile` file. Other possible values are: `onSuccess` (archive when all tests are OK) and `onError` (archive when at least 1 test is KO) and `onSkip` (archive when at least 1 test is skipped). Multiple values can be specified if separated by comma. |
 | keepAllResults			| false		| By default, when a test fails and is retried, the failed test data are overwritten. If true, will keep all result even if test is retried, allowing to analyze them |
-| tmsUrl					| null		| URL of the test manager  (e.g: Squash TM http://<squash_host>:<squash_port>) |
-| tmsUser				| null		| User which will access Test manager  |
-| tmsPassword			| null		| password of the user which will access Test Manager  |
-| tmsType				| null		| Type of the Test Manager ('squash' or 'hp')  |
-| tmsProject				| null		| The project to which this test application is linked in Test manager   |
 | optimizeReports			| false		| If true, compress HTML, get HTML resources from internet so that logs are smaller |
 | manualTestSteps			| false		| If true, it's possible to add test steps in Test and Page Object (`addTest("my step name")`). An error will be raised if manual steps are added when automatic steps are enabled |
 | maskPassword 				| true		| Whether seleniumRobot should detect passwords in method calls and mask them in reports | 
 | reporterPluginClasses     | null		| comma-seperated list of classes to call when a custom reporter needs to be added. See chap7_Howto.md, §19 |
 
+##### Test managers #####
 
-Performance reporting
+| Param name       			| Default 	| Description  |
+| -------------------------	| ------- 	| ------------ |
+| tmsUrl					| null		| URL of the test manager  (e.g: Squash TM http://<squash_host>:<squash_port>) |
+| tmsUser					| null		| User which will access Test manager  |
+| tmsPassword				| null		| password of the user which will access Test Manager  |
+| tmsType					| null		| Type of the Test Manager ('squash' or 'hp')  |
+| tmsProject				| null		| The project to which this test application is linked in Test manager   |
+
+##### Bugtrackers #####
+
+Below are the common parameters to all parameters. When using Jira, look below for the mandatory jira parameters
+
+| Param name       			| Default 	| Description  |
+| -------------------------	| ------- 	| ------------ |
+| bugtrackerUrl				| null		| URL of the bugtracker  (e.g: Jira http://<jira_host>:<jira_port>/jira) |
+| bugtrackerUser			| null		| User which will access Bug tracker  |
+| bugtrackerPassword		| null		| password of the user which will access Bug tracker  |
+| bugtrackerType			| null		| Type of the Bug tracker ('jira')  |
+| bugtrackerProject			| null		| The project to which this test application is linked in Bug tracker. For jira, it's the project key   |
+
+Additional optional paramters may be added
+
+| Param name       			| Default 	| Description  |
+| -------------------------	| ------- 	| ------------ |
+| bugtracker.assignee		| (optional)| Person who will be notified of the new issue |
+| bugtracker.reporter		| (optional)| Person which has reported |
+
+###### Jira ######
+
+Jira needs more parameters
+
+| Param name       				| Default 		| Description  |
+| -------------------------		| -------------	| ------------ |
+| bugtracker.priority			| first found 	| The priority set for the issue. It's the priority string available on jira server |
+| bugtracker.jira.issueType		|				| Type of the issue that will be added. May depend on project. It MUST be set |
+| bugtracker.jira.components	| <empty>		| Comma seperated list of components that will be added to the issue. |
+| bugtracker.jira.openStates	|				| Comma seperated list of states (or status) that says that an issue is still open. It helps searching for existing issues. e.g: 'Open,Todo'. It MUST be set |
+| bugtracker.jira.closeTransition|				| '/' separated list of transition names that will be applied to an issue when closing it. It may depend on projects. MUST be set. These transitions are localized and must lead to "closed" or "done" state. e.g: 'Start review/Finished review/Done' |
+| bugtracker.jira.field.<fieldName>|			| Set 'bugtracker.jira.field.application=myApp' to set the field 'application' to 'myApp' when creating the issue. It's useful when some custom fields are mandatory to issue creation|				
+
+##### Performance reporting #####
 
 | Param name       			| Default 	| Description  |
 | -------------------------	| ------- 	| ------------ |
 | neoloadUserPath 			| null		| a name to give to your Neoload recordings. See chap7 for details on how to use Neoload with SeleniumRobot |
 | nl.selenium.proxy.mode    | null		| 'Design' or 'EndUserExperience'. It's the mode in which test will be run. See How to §16 |
 
-Snapshots
+##### Snapshots #####
 
 | Param name       			| Default 	| Description  |
 | -------------------------	| ------- 	| ------------ |

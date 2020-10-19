@@ -14,7 +14,9 @@ import com.seleniumtests.reporter.logger.TestStep;
 public class JiraBean extends IssueBean {
 
 	private String issueType;
+	private String priority;
     List<String> components = new ArrayList<>();
+    Map<String, String> customFields = new HashMap<>();
 	
 	public JiraBean(String id, String summary, String description, String issueType) {
 		this(summary, description, null, issueType, null, null, null, null, null, null, null, null);
@@ -80,16 +82,20 @@ public class JiraBean extends IssueBean {
             File detailedResultFile,
             Map<String, String> fields,
             List<String> components) {
-		super(id, summary, description, priority, testName, testStep, assignee, reporter, screenshots, detailedResultFile, fields);
+		super(id, summary, description, testName, testStep, assignee, reporter, screenshots, detailedResultFile);
     	this.issueType = issueType;
     	
         if (components != null) {
         	this.components = components;
         }
+        this.priority = priority;
         
+        if (fields != null) {
+        	this.customFields = fields;
+        }
 
     	if (getIssueType() == null) {
-    		throw new ConfigurationException("Issue type must be provided through 'bugtracker.issueType' variable");
+    		throw new ConfigurationException("Issue type must be provided through 'bugtracker.jira.issueType' variable");
     	}
 	}
 	
@@ -104,6 +110,14 @@ public class JiraBean extends IssueBean {
 
 	public void setIssueType(String issueType) {
 		this.issueType = issueType;
+	}
+
+	public String getPriority() {
+		return priority;
+	}
+
+	public Map<String, String> getCustomFields() {
+		return customFields;
 	}
 
 }

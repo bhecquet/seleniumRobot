@@ -998,7 +998,7 @@ This attaching can be done only from a page creation
 
 ### 12 Use external dependencies ###
 
-If for some reason, you need to include dependencies to your test application, add them as dependencies in your pom.xml without any scope, so that they can be included automatically in the generated zip file.
+If for some reason, you need to include dependencies to your test application, add them as dependencies in your pom.xml **without any scope**, so that they can be included automatically in the generated zip file.
 
 Moreover, the maven-dependency-plugin must be configured. By default, We have the following, which allows adding new artifacts
 
