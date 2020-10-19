@@ -55,12 +55,8 @@ public class JiraConnector extends BugTracker {
     private JiraRestClient restClient;
     private Project project;
 
-    String priorityToSet;
-    String issueTypeToSet;
-    List<String> componentsToSet = new ArrayList<>();
     List<String> openStates;
     String closeTransition;
-    Map<String, String> customFieldsValues;
     
     /**
      *
@@ -77,16 +73,6 @@ public class JiraConnector extends BugTracker {
         		|| password == null || password.isEmpty()) {
         	throw new ConfigurationException("Missing configuration for Jira, please provide 'bugtrackerUrl', 'bugtrackerProject', 'bugtrackerUser' and bugtrackerPassword' parameters");
         }
-        
-		
-		// search all bugtracker parameters bugtracker.field.<key>=<value>
-		customFieldsValues = new HashMap<>();
-		for (String variable: jiraOptions.keySet()) {
-			if (variable.startsWith("field.")) {
-				customFieldsValues.put(variable.replace("field.", ""), jiraOptions.get(variable));
-			}
-		}
-
         
         try {
             restClient = new AsynchronousJiraRestClientFactory().createWithBasicHttpAuthentication(new URI(server), user, password);
@@ -107,21 +93,8 @@ public class JiraConnector extends BugTracker {
         versions = getVersions();
         
         // check jira options
-		priorityToSet = jiraOptions.get("priority");
-		issueTypeToSet = jiraOptions.get("jira.issueType");
 		closeTransition = jiraOptions.get("jira.closeTransition");
 		
-		if (jiraOptions.get("jira.components") != null) {
-			componentsToSet = Arrays.asList(jiraOptions.get("jira.components").split(","));
-		}
-		
-		if (priorityToSet == null) {
-			priorityToSet = new ArrayList<>(priorities.keySet()).get(priorities.size() - 1);
-			logger.warn(String.format("'bugtracker.priority' parameter not set, we will use a default priority %s", priorityToSet));
-		}
-		if (issueTypeToSet == null) {
-			throw new ConfigurationException("'bugtracker.jira.issueType' parameter has not been set, it's mandatory (type of the issue that will be created. E.g: 'Bug'");
-		}
 		if (jiraOptions.get("jira.openStates") == null) {
 			throw new ConfigurationException("'bugtracker.jira.openStates' MUST be set. It's the state of an issue when it has juste been create. Used to search for open issues");
 		} else {
@@ -373,22 +346,6 @@ public class JiraConnector extends BugTracker {
         	throw e;
         }
     }
-
-	public String getPriorityToSet() {
-		return priorityToSet;
-	}
-
-	public String getIssueTypeToSet() {
-		return issueTypeToSet;
-	}
-
-	public List<String> getComponentsToSet() {
-		return componentsToSet;
-	}
-
-	public Map<String, String> getCustomFieldsValues() {
-		return customFieldsValues;
-	}
 
 	public List<String> getOpenStates() {
 		return openStates;

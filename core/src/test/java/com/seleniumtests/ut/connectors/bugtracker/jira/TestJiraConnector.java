@@ -13,11 +13,13 @@ import static org.mockito.Mockito.when;
 import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.io.FileUtils;
 import org.joda.time.DateTime;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
@@ -55,12 +57,16 @@ import com.atlassian.jira.rest.client.api.domain.input.TransitionInput;
 import com.atlassian.jira.rest.client.internal.async.AsynchronousJiraRestClientFactory;
 import com.google.common.collect.ImmutableList;
 import com.seleniumtests.MockitoTest;
+import com.seleniumtests.connectors.bugtracker.BugTracker;
 import com.seleniumtests.connectors.bugtracker.IssueBean;
 import com.seleniumtests.connectors.bugtracker.jira.JiraBean;
 import com.seleniumtests.connectors.bugtracker.jira.JiraConnector;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.driver.screenshots.ScreenShot;
+import com.seleniumtests.driver.screenshots.SnapshotCheckType;
+import com.seleniumtests.reporter.logger.Snapshot;
+import com.seleniumtests.reporter.logger.TestStep;
 
 import io.atlassian.util.concurrent.Promise;
 
@@ -158,12 +164,35 @@ public class TestJiraConnector extends MockitoTest {
 	private static final String PROJECT_KEY = "CORE";
 	Map<String, String> jiraOptions = new HashMap<>();
 
+	private TestStep step1;
+	private TestStep stepEnd;
+
 	@BeforeMethod(groups={"ut"})
 	public void initJira() throws Exception {
 		Map<String, URI> avatars = new HashMap<>();
 		avatars.put("48x48", new URI("http://foo/bar/a"));
 		user = new User(new URI("http://foo/bar/u"), "user1", "user 1", "1", "user1@company.com", true, null, avatars, "UTC");
 		
+		// create test steps
+		File tmpImg = File.createTempFile("img", ".png");
+		tmpImg.deleteOnExit();
+		File tmpHtml = File.createTempFile("html", ".html");
+		tmpHtml.deleteOnExit();
+		
+		screenshot = new ScreenShot();
+		screenshot.setImagePath("screenshot/" + tmpImg.getName());
+		screenshot.setHtmlSourcePath("htmls/" + tmpHtml.getName());
+		FileUtils.copyFile(tmpImg, new File(screenshot.getFullImagePath()));
+		FileUtils.copyFile(tmpHtml, new File(screenshot.getFullHtmlPath()));
+		
+		step1 = new TestStep("step 1", null, new ArrayList<>(), false);
+		step1.addSnapshot(new Snapshot(screenshot, "main", SnapshotCheckType.FULL), 1, null);
+		
+		stepEnd = new TestStep("Test end", null, new ArrayList<>(), false);
+		stepEnd.addSnapshot(new Snapshot(screenshot, "end", SnapshotCheckType.FULL), 1, null);
+		stepEnd.addSnapshot(new Snapshot(screenshot, "end2", SnapshotCheckType.FULL), 1, null);
+		
+		// mock all clients
 		PowerMockito.whenNew(AsynchronousJiraRestClientFactory.class).withNoArguments().thenReturn(restClientFactory);
 		when(restClientFactory.createWithBasicHttpAuthentication(any(URI.class), eq("user"), eq("password"))).thenReturn(restClient);
 		
@@ -211,28 +240,13 @@ public class TestJiraConnector extends MockitoTest {
 		when(issue2.getCommentsUri()).thenReturn(new URI("http://foo/bar/i/2/comments"));
 		
 		
-		File tmpImg = File.createTempFile("img", ".png");
-		tmpImg.deleteOnExit();
-		screenshot = new ScreenShot();
-		screenshot.setImagePath("screenshot/" + tmpImg.getName());
 		detailedResult = File.createTempFile("detailed", ".zip");
 		detailedResult.deleteOnExit();
 		
 		jiraOptions.put("jira.openStates", "Open,To Do");
 		jiraOptions.put("jira.closeTransition", "close");
-		jiraOptions.put("priority", "P1");
-		jiraOptions.put("jira.issueType", "Bug");
-		jiraOptions.put("jira.components", "comp1,comp2");
 	}
-	
-	/**
-	 * Test JiraConnector only accepts JiraBean instances
-	 */
-	@Test(groups= {"ut"}, expectedExceptions = ConfigurationException.class)
-	public void testMissingIssueType() {
-		jiraOptions.remove("jira.issueType");
-		new JiraConnector("http://foo/bar", PROJECT_KEY, "user", "password", jiraOptions);	
-	}
+
 	@Test(groups= {"ut"}, expectedExceptions = ConfigurationException.class)
 	public void testMissingCloseTransition() {
 		jiraOptions.remove("jira.closeTransition");
@@ -249,23 +263,7 @@ public class TestJiraConnector extends MockitoTest {
 		Assert.assertEquals(jiraConnector.getOpenStates().size(), 2);
 		Assert.assertEquals(jiraConnector.getOpenStates().get(0), "Open");
 	}
-	/**
-	 * No error when components is not set
-	 */
-	@Test(groups= {"ut"})
-	public void testMissingComponents() {
-		jiraOptions.remove("jira.components");
-		JiraConnector jiraConnector = new JiraConnector("http://foo/bar", PROJECT_KEY, "user", "password", jiraOptions);
-		Assert.assertTrue(jiraConnector.getComponentsToSet().isEmpty());
-	}
-	/**
-	 * No error when priority is not set
-	 */
-	@Test(groups= {"ut"})
-	public void testMissingPriority() {
-		jiraOptions.remove("priority");
-		new JiraConnector("http://foo/bar", PROJECT_KEY, "user", "password", jiraOptions);	
-	}
+	
 	@Test(groups= {"ut"}, expectedExceptions = ConfigurationException.class)
 	public void testMissingServer() {
 		new JiraConnector(null, PROJECT_KEY, "user", "password", jiraOptions);	
@@ -312,7 +310,7 @@ public class TestJiraConnector extends MockitoTest {
 	public void testIssueAlreadyExists() {
 		
 		when(promiseSearch.claim()).thenReturn(new SearchResult(0, 2, 2, Arrays.asList(issue1, issue2)));
-		JiraBean jiraBean = new JiraBean(null, "issue 1", "issue 1", "Bug");
+		JiraBean jiraBean = new JiraBean(null, "issue 1", "issue 1", "Bug", "P1");
 		
 		JiraConnector jiraConnector = new JiraConnector("http://foo/bar", PROJECT_KEY, "user", "password", jiraOptions);
 		IssueBean newJiraBean = jiraConnector.issueAlreadyExists(jiraBean);
@@ -345,7 +343,7 @@ public class TestJiraConnector extends MockitoTest {
 	public void testIssueDoesNotExist() {
 		
 		when(promiseSearch.claim()).thenReturn(new SearchResult(0, 2, 2, Arrays.asList()));
-		JiraBean jiraBean = new JiraBean(null, "issue 1", "issue 1", "Bug");
+		JiraBean jiraBean = new JiraBean(null, "issue 1", "issue 1", "Bug", "P1");
 		
 		JiraConnector jiraConnector = new JiraConnector("http://foo/bar", PROJECT_KEY, "user", "password", jiraOptions);
 		IssueBean newJiraBean = jiraConnector.issueAlreadyExists(jiraBean);
@@ -404,7 +402,7 @@ public class TestJiraConnector extends MockitoTest {
 		
 		JiraConnector jiraConnector = new JiraConnector("http://foo/bar", PROJECT_KEY, "user", "password", jiraOptions);
 		
-		JiraBean jiraBean = new JiraBean(null, "issue 1", "issue 1 descr", null, "Bug", null, null, null, null, new ArrayList<>(), null, new HashMap<>(), new ArrayList<>());
+		JiraBean jiraBean = new JiraBean(null, "issue 1", "issue 1 descr", "P1", "Bug", null, null, null, null, new ArrayList<>(), null, new HashMap<>(), new ArrayList<>());
 		jiraConnector.createIssue(jiraBean);		
 		
 		verify(issueRestClient).createIssue(issueArgument.capture());
@@ -419,7 +417,6 @@ public class TestJiraConnector extends MockitoTest {
 		
 		Assert.assertNull(issueInput.getField("reporter"));
 		Assert.assertNull(issueInput.getField("assignee"));
-		Assert.assertNull(issueInput.getField("priority"));
 		
 		// check attachments have been added (screenshot + detailed results)
 		verify(issueRestClient, never()).addAttachments(eq(new URI("http://foo/bar/i/1/attachments")), any(File.class));
@@ -546,7 +543,7 @@ public class TestJiraConnector extends MockitoTest {
 		
 		Map<String, String> fields = new HashMap<>();
 		fields.put("myfield", "myApp"); // field allowed by jira
-		JiraBean jiraBean = new JiraBean(null, "issue 1", "issue 1 descr", null, "Bug", null, null, null, null, new ArrayList<>(), null, fields, new ArrayList<>());
+		JiraBean jiraBean = new JiraBean(null, "issue 1", "issue 1 descr", "P1", "Bug", null, null, null, null, new ArrayList<>(), null, fields, new ArrayList<>());
 		jiraConnector.createIssue(jiraBean);
 		
 	}
@@ -623,5 +620,45 @@ public class TestJiraConnector extends MockitoTest {
 		JiraConnector jiraConnector = new JiraConnector("http://foo/bar", PROJECT_KEY, "user", "password", jiraOptions);
 		jiraConnector.updateIssue("ISSUE-2", "update", Arrays.asList(screenshot));
 	
+	}
+	
+
+	/**
+	 * Create a new jira bean with all parameters
+	 * @throws Exception
+	 */
+	@Test(groups={"ut"})
+	public void testCreateJiraBean() throws Exception {
+		
+		jiraOptions.put("priority", "P1");
+		jiraOptions.put("assignee", "me");
+		jiraOptions.put("reporter", "you");
+		jiraOptions.put("jira.issueType", "Bug");
+		jiraOptions.put("jira.components", "comp1,comp2");
+		jiraOptions.put("jira.field.foo", "bar");
+		
+		JiraConnector jiraConnector = new JiraConnector("http://foo/bar", PROJECT_KEY, "user", "password", jiraOptions);
+	
+		IssueBean issueBean = jiraConnector.createIssueBean("[Selenium][selenium][DEV][ngName] test myTest KO", "testCreateJiraBean", "some description", 
+				Arrays.asList(step1, stepEnd), jiraOptions);
+		
+		Assert.assertTrue(issueBean instanceof JiraBean);
+		JiraBean jiraBean = (JiraBean)issueBean;
+		
+		Assert.assertEquals(jiraBean.getAssignee(), "me");
+		Assert.assertEquals(jiraBean.getDescription(), "some descriptionStep 1 KO\n\nStep 'step 1' in error\n\nStep Test end\n\nFor more details, see attached .zip file");
+		Assert.assertEquals(jiraBean.getSummary(), "[Selenium][selenium][DEV][ngName] test myTest KO");
+		Assert.assertEquals(jiraBean.getReporter(), "you");
+		Assert.assertEquals(jiraBean.getTestName(), "testCreateJiraBean");
+		Assert.assertEquals(jiraBean.getScreenShots(), Arrays.asList(screenshot, screenshot)); // screenshots from the last step
+		Assert.assertEquals(jiraBean.getTestStep(), stepEnd); 
+		Assert.assertEquals(jiraBean.getDateTime().getDayOfMonth(),  ZonedDateTime.now().plusHours(3).getDayOfMonth()); 
+		Assert.assertEquals(jiraBean.getComponents(), Arrays.asList("comp1", "comp2")); 
+		Assert.assertEquals(jiraBean.getIssueType(), "Bug"); 
+		Assert.assertEquals(jiraBean.getPriority(), "P1"); 
+		Assert.assertEquals(jiraBean.getCustomFields().get("foo"), "bar"); 
+		Assert.assertTrue(jiraBean.getDetailedResult().isFile());
+		Assert.assertTrue(jiraBean.getDetailedResult().length() > 1000);
+		Assert.assertNull(jiraBean.getId()); // not inistialized by default
 	}
 }
