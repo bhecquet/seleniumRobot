@@ -104,6 +104,37 @@ public class TestTestTasks extends MockitoTest {
 	}
 	
 	/**
+	 * Check upsert of a new variable locally
+	 * Verify server is not called and configuration is updated according to the new value
+	 * @param testNGCtx
+	 * @param xmlTest
+	 * @throws Exception
+	 */
+	@Test(groups= {"ut"})
+	public void testUpdateNewVariableLocally(final ITestContext testNGCtx, final XmlTest xmlTest) throws Exception {
+		try {
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE, "true");
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL, "http://localhost:1234");
+			
+			PowerMockito.whenNew(SeleniumRobotVariableServerConnector.class).withArguments(eq(true), eq("http://localhost:1234"), anyString(), eq(null)).thenReturn(variableServer);
+			when(variableServer.isAlive()).thenReturn(true);
+			
+			ITestResult testResult = GenericTest.generateResult(testNGCtx, getClass());
+			initThreadContext(testNGCtx, "myTest", testResult);
+			TestTasks.createOrUpdateLocalParam("key", "value");
+			
+			// check upsert has been NOT called
+			verify(variableServer, never()).upsertVariable(eq(new TestVariable("key", "value")), eq(true));
+			
+			// check configuration is updated
+			Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getConfiguration().get("key").getValue(), "value");
+		} finally {
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE);
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL);
+		}
+	}
+	
+	/**
 	 * Check upsert of a new variable
 	 * Verify server is called and configuration is updated according to the new value
 	 * @param testNGCtx
