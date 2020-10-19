@@ -6,6 +6,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -18,6 +20,7 @@ import org.apache.log4j.Logger;
 import com.seleniumtests.connectors.bugtracker.jira.JiraBean;
 import com.seleniumtests.connectors.bugtracker.jira.JiraConnector;
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.core.TestVariable;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.driver.screenshots.ScreenShot;
 import com.seleniumtests.reporter.logger.TestStep;
@@ -29,7 +32,6 @@ public abstract class BugTracker {
 	public static final String STEP_KO_PATTERN = "Step %d KO\n\n";
 	protected static Logger logger = SeleniumRobotLogger.getLogger(BugTracker.class);
 
-	
 	private String createIssueSummary(
 			String application,
 			String environment,
@@ -40,27 +42,18 @@ public abstract class BugTracker {
 	
 	/**
 	 * Create an issue object
-	 * @param assignee		assignee to which this issue will be sent. May be null
-	 * @param priority		priority of the new issue. May be null
-	 * @param issueType		Type of the issue to create. May be null
-	 * @param reporter		person who reported the issue. May be null
-	 * @param customFields	custom information to add to issue. They must be supported by bugtracker
-	 * @param components	components to which this issue belong. Depends on bugtracker
-	 * @param application	the tested application
-	 * @param environment	the environment where we tested
-	 * @param testNgName	name of the TestNG test. Helps to build the summary
-	 * @param testName		method name (name of scenario)
-	 * @param description	Description of the test. May be null
-	 * @param testSteps		Test steps of the scenario
+	 * @param testName			method name (name of scenario)
+	 * @param description		Description of the test. May be null
+	 * @param testSteps			Test steps of the scenario
+	 * @param issueOptions		options for the new issue 
 	 * @return
 	 */
-	public IssueBean createIssueBean(String assignee, 
-			String reporter,
+	public IssueBean createIssueBean(
 			String summary,
 			String testName,
 			String description,
-			List<TestStep> testSteps) {
-		
+			List<TestStep> testSteps, 
+			Map<String, String> issueOptions) {
 
 		List<ScreenShot> screenShots = new ArrayList<>();
 		StringBuilder fullDescription = new StringBuilder(description);
@@ -126,20 +119,40 @@ public abstract class BugTracker {
 				} catch (IOException e) {}
 			}
 		}
+		
+
+		String assignee = issueOptions.get("assignee");
+		String reporter = issueOptions.get("reporter");
 
 		if (this instanceof JiraConnector) {
+
+			String priority = issueOptions.get("priority");
+			String issueType = issueOptions.get("jira.issueType");
+			Map<String, String> customFieldsValues = new HashMap<>();
+			for (String variable: issueOptions.keySet()) {
+				if (variable.startsWith("jira.field.")) {
+					customFieldsValues.put(variable.replace("jira.field.", ""), issueOptions.get(variable));
+				}
+			}
+
+			List<String> components = new ArrayList<>();
+			if (issueOptions.get("jira.components") != null) {
+				components = Arrays.asList(issueOptions.get("jira.components").split(","));
+			}
+			
+			
 			return new JiraBean(summary,
 					fullDescription.toString(),
-					((JiraConnector)this).getPriorityToSet(),
-					((JiraConnector)this).getIssueTypeToSet(),
+					priority,
+					issueType,
 					testName,
 					testSteps.get(stepIdx),
 					assignee,
 					reporter,
 					screenShots,
 					zipFile,
-					((JiraConnector)this).getCustomFieldsValues(),
-					((JiraConnector)this).getComponentsToSet());
+					customFieldsValues,
+					components);
 		} else {
 			return new IssueBean(summary,
 				fullDescription.toString(),
@@ -156,28 +169,26 @@ public abstract class BugTracker {
 	 * Creates an issue if it does not already exist
 	 * First we search for a similar open issue (same summary)
 	 * If it exists, then we check the step where we failed. If it's the same, we do nothing, else, we update the issue, saying we failed on an other step.
-	 * @param assignee		assignee to which this issue will be sent. May be null
-	 * @param reporter		person who reported the issue. May be null
 	 * @param application	the tested application
 	 * @param environment	the environment where we tested
 	 * @param testNgName	name of the TestNG test. Helps to build the summary
 	 * @param testName		method name (name of scenario)
 	 * @param description	Description of the test. May be null
 	 * @param testSteps		Test steps of the scenario
+	 * @param issueOptions		options for the new issue 
 	 */
 	public void createIssue(
-			String assignee, 
-			String reporter,
 			String application,
 			String environment,
 			String testNgName,
 			String testName,
 			String description,
-			List<TestStep> testSteps) {
+			List<TestStep> testSteps,
+			Map<String, String> issueOptions) {
 
 
 		String summary = createIssueSummary(application, environment, testNgName, testName);
-		IssueBean issueBean = createIssueBean(assignee, reporter, summary, testName, description, testSteps);
+		IssueBean issueBean = createIssueBean(summary, testName, description, testSteps, issueOptions);
 		if (issueBean == null) {
 			return;
 		}
@@ -250,6 +261,7 @@ public abstract class BugTracker {
 	 */
 	public abstract void createIssue(IssueBean issueBean);
 	
+
 	/**
      * Close issue
      * @param issueId           ID of the issue

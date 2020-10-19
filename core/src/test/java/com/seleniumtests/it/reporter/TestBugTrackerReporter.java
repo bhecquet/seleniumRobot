@@ -71,13 +71,22 @@ public class TestBugTrackerReporter extends ReporterTest {
 			System.setProperty(SeleniumTestsContext.BUGTRACKER_PROJECT, "Project");
 			System.setProperty(SeleniumTestsContext.BUGTRACKER_USER, "jira");
 			System.setProperty(SeleniumTestsContext.BUGTRACKER_PASSWORD, "jira");
+			System.setProperty("bugtracker.reporter", "me");
+			System.setProperty("bugtracker.assignee", "you");
+			System.setProperty("bugtracker.jira.field.application", "app");
 
 			ArgumentCaptor<List<TestStep>> testStepsArgument = ArgumentCaptor.forClass(List.class);
+			ArgumentCaptor<Map<String, String>> issueOptionsArgument = ArgumentCaptor.forClass(Map.class);
 			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForTestManager"}, ParallelMode.METHODS, new String[] {"testInError"});
 			
 			// check we have only one result recording for each test method
-			verify(jiraConnector).createIssue(isNull(), isNull(), eq("core"), eq("DEV"), anyString(), eq("testInError"), contains("Test testInError failed"), testStepsArgument.capture());
+			verify(jiraConnector).createIssue(eq("core"), eq("DEV"), anyString(), eq("testInError"), contains("Test testInError failed"), testStepsArgument.capture(), issueOptionsArgument.capture());
 			Assert.assertEquals(testStepsArgument.getValue().size(), 3);
+			
+			Assert.assertEquals(issueOptionsArgument.getValue().size(), 3);
+			Assert.assertEquals(issueOptionsArgument.getValue().get("reporter"), "me");
+			Assert.assertEquals(issueOptionsArgument.getValue().get("assignee"), "you");
+			Assert.assertEquals(issueOptionsArgument.getValue().get("jira.field.application"), "app");
 			
 		} finally {
 			System.clearProperty(SeleniumTestsContext.BUGTRACKER_TYPE);
@@ -85,6 +94,9 @@ public class TestBugTrackerReporter extends ReporterTest {
 			System.clearProperty(SeleniumTestsContext.BUGTRACKER_URL);
 			System.clearProperty(SeleniumTestsContext.BUGTRACKER_USER);
 			System.clearProperty(SeleniumTestsContext.BUGTRACKER_PASSWORD);
+			System.clearProperty("bugtracker.reporter");
+			System.clearProperty("bugtracker.assignee");
+			System.clearProperty("bugtracker.jira.field.application");
 		}
 	}
 	
@@ -104,7 +116,7 @@ public class TestBugTrackerReporter extends ReporterTest {
 			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForTestManager"}, ParallelMode.METHODS, new String[] {"testAndSubActions"});
 			
 			// check we have only one result recording for each test method
-			verify(jiraConnector, never()).createIssue(any(), any(), any(), any(), any(), any(), any(), any());
+			verify(jiraConnector, never()).createIssue(any(), any(), any(), any(), any(), any(), any());
 			verify(jiraConnector).closeIssue(eq("core"), eq("DEV"), anyString(), eq("testAndSubActions"));
 			
 		} finally {
@@ -132,7 +144,7 @@ public class TestBugTrackerReporter extends ReporterTest {
 			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForTestManager"}, ParallelMode.METHODS, new String[] {"testSkipped"});
 			
 			// check we have only one result recording for each test method
-			verify(jiraConnector, never()).createIssue(any(), any(), any(), any(), any(), any(), any(), any());
+			verify(jiraConnector, never()).createIssue(any(), any(), any(), any(), any(), any(), any());
 			
 			
 		} finally {
@@ -160,7 +172,7 @@ public class TestBugTrackerReporter extends ReporterTest {
 			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForTestManager"}, ParallelMode.METHODS, new String[] {"testInError"});
 			
 			// check we have only one result recording for each test method
-			verify(jiraConnector, never()).createIssue(any(), any(), any(), any(), any(), any(), any(), any());
+			verify(jiraConnector, never()).createIssue(any(), any(), any(), any(), any(), any(), any());
 			
 			
 		} finally {
@@ -183,7 +195,7 @@ public class TestBugTrackerReporter extends ReporterTest {
 			PowerMockito.whenNew(JiraConnector.class).withAnyArguments().thenThrow(new ConfigurationException(""));
 			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForTestManager"}, ParallelMode.METHODS, new String[] {"testInError"});
 			
-			verify(jiraConnector, never()).createIssue(any(), any(), any(), any(), any(), any(), any(), any());
+			verify(jiraConnector, never()).createIssue(any(), any(), any(), any(), any(), any(), any());
 			
 		} finally {
 			System.clearProperty(SeleniumTestsContext.BUGTRACKER_TYPE);

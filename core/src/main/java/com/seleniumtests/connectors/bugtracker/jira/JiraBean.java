@@ -18,8 +18,8 @@ public class JiraBean extends IssueBean {
     List<String> components = new ArrayList<>();
     Map<String, String> customFields = new HashMap<>();
 	
-	public JiraBean(String id, String summary, String description, String issueType) {
-		this(summary, description, null, issueType, null, null, null, null, null, null, null, null);
+	public JiraBean(String id, String summary, String description, String issueType, String priority) {
+		this(summary, description, priority, issueType, null, null, null, null, null, null, null, null);
 	}
 	
 	/**
@@ -93,10 +93,14 @@ public class JiraBean extends IssueBean {
         if (fields != null) {
         	this.customFields = fields;
         }
+        
 
-    	if (getIssueType() == null) {
-    		throw new ConfigurationException("Issue type must be provided through 'bugtracker.jira.issueType' variable");
-    	}
+		if (priority == null) {
+			throw new ConfigurationException(String.format("'bugtracker.priority' parameter not set"));
+		}
+		if (issueType == null) {
+			throw new ConfigurationException("'bugtracker.jira.issueType' parameter has not been set, it's mandatory (type of the issue that will be created. E.g: 'Bug'");
+		}
 	}
 	
 

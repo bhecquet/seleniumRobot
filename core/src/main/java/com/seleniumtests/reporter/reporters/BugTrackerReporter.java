@@ -43,9 +43,13 @@ public class BugTrackerReporter extends CommonReporter implements IReporter {
 					return;
 				} 
 				
-
-				TestVariable assignee = testContext.getConfiguration().get("bugtracker.assignee");
-				TestVariable reporter = testContext.getConfiguration().get("bugtracker.reporter");
+				// get all bugtracker options
+				Map<String, String> issueOptions = new HashMap<>();
+				for (TestVariable variable: testContext.getConfiguration().values()) {
+					if (variable.getName().startsWith("bugtracker.")) {
+						issueOptions.put(variable.getName().replace("bugtracker.", ""), variable.getValue());
+					}
+				}
 				
 				// application data
 				String application = testContext.getApplicationName();
@@ -69,14 +73,13 @@ public class BugTrackerReporter extends CommonReporter implements IReporter {
 				if (testResult.getStatus() == ITestResult.FAILURE && !TestNGResultUtils.isBugtrackerReportCreated(testResult)) {
 	
 					bugtrackerServer.createIssue(
-							assignee == null ? null: assignee.getValue(), 
-							reporter == null ? null: reporter.getValue(), 							
 							application,
 							environment,
 							testNgName,
 							testName,
 							description,
-							testSteps
+							testSteps,
+							issueOptions
 							);
 					
 					TestNGResultUtils.setBugtrackerReportCreated(testResult, true);
