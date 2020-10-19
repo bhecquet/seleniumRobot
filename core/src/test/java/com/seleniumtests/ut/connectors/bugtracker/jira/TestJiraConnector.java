@@ -147,7 +147,8 @@ public class TestJiraConnector extends MockitoTest {
 	private Version version2 = new Version(new URI("http://foo/bar/v"), 2L, "v2", "v2", false, true, DateTime.now());
 	
 	private Transition transition1 = new Transition("close", 1, new ArrayList<>());
-	private Transition transition2 = new Transition("reopen", 1, new ArrayList<>());
+	private Transition transition2 = new Transition("reopen", 2, new ArrayList<>());
+	private Transition transition3 = new Transition("review", 3, new ArrayList<>());
 	
 	private User user;
 	
@@ -217,13 +218,54 @@ public class TestJiraConnector extends MockitoTest {
 		detailedResult = File.createTempFile("detailed", ".zip");
 		detailedResult.deleteOnExit();
 		
-		jiraOptions.put("openStatus", "Open,To Do");
-		jiraOptions.put("closeTransition", "Close");
+		jiraOptions.put("jira.openStates", "Open,To Do");
+		jiraOptions.put("jira.closeTransition", "close");
+		jiraOptions.put("priority", "P1");
+		jiraOptions.put("jira.issueType", "Bug");
+		jiraOptions.put("jira.components", "comp1,comp2");
 	}
 	
 	/**
 	 * Test JiraConnector only accepts JiraBean instances
 	 */
+	@Test(groups= {"ut"}, expectedExceptions = ConfigurationException.class)
+	public void testMissingIssueType() {
+		jiraOptions.remove("jira.issueType");
+		new JiraConnector("http://foo/bar", PROJECT_KEY, "user", "password", jiraOptions);	
+	}
+	@Test(groups= {"ut"}, expectedExceptions = ConfigurationException.class)
+	public void testMissingCloseTransition() {
+		jiraOptions.remove("jira.closeTransition");
+		new JiraConnector("http://foo/bar", PROJECT_KEY, "user", "password", jiraOptions);	
+	}
+	@Test(groups= {"ut"}, expectedExceptions = ConfigurationException.class)
+	public void testMissingOpenStates() {
+		jiraOptions.remove("jira.openStates");
+		new JiraConnector("http://foo/bar", PROJECT_KEY, "user", "password", jiraOptions);	
+	}
+	@Test(groups= {"ut"})
+	public void testOpenStates() {
+		JiraConnector jiraConnector = new JiraConnector("http://foo/bar", PROJECT_KEY, "user", "password", jiraOptions);
+		Assert.assertEquals(jiraConnector.getOpenStates().size(), 2);
+		Assert.assertEquals(jiraConnector.getOpenStates().get(0), "Open");
+	}
+	/**
+	 * No error when components is not set
+	 */
+	@Test(groups= {"ut"})
+	public void testMissingComponents() {
+		jiraOptions.remove("jira.components");
+		JiraConnector jiraConnector = new JiraConnector("http://foo/bar", PROJECT_KEY, "user", "password", jiraOptions);
+		Assert.assertTrue(jiraConnector.getComponentsToSet().isEmpty());
+	}
+	/**
+	 * No error when priority is not set
+	 */
+	@Test(groups= {"ut"})
+	public void testMissingPriority() {
+		jiraOptions.remove("priority");
+		new JiraConnector("http://foo/bar", PROJECT_KEY, "user", "password", jiraOptions);	
+	}
 	@Test(groups= {"ut"}, expectedExceptions = ConfigurationException.class)
 	public void testMissingServer() {
 		new JiraConnector(null, PROJECT_KEY, "user", "password", jiraOptions);	
@@ -313,7 +355,7 @@ public class TestJiraConnector extends MockitoTest {
 	}
 	
 	/**
-	 * Test issue creation will all fields
+	 * Test issue creation with all fields
 	 * @throws URISyntaxException
 	 */
 	@Test(groups= {"ut"})
@@ -511,6 +553,35 @@ public class TestJiraConnector extends MockitoTest {
 	
 	@Test(groups= {"ut"})
 	public void testCloseIssue() {
+		ArgumentCaptor<TransitionInput> transitionArgument = ArgumentCaptor.forClass(TransitionInput.class);
+		
+		JiraConnector jiraConnector = new JiraConnector("http://foo/bar", PROJECT_KEY, "user", "password", jiraOptions);
+		jiraConnector.closeIssue("ISSUE-1", "closed");
+		
+		verify(issueRestClient).transition(eq(issue1), transitionArgument.capture());
+		Assert.assertEquals(transitionArgument.getValue().getId(), 1);
+	}
+	
+	@Test(groups= {"ut"})
+	public void testCloseIssueMultipleTransitions() {
+
+		when(promiseTransitions.claim()).thenReturn(Arrays.asList(transition3)).thenReturn(Arrays.asList(transition1, transition2));
+		jiraOptions.put("jira.closeTransition", "review/close");
+		
+		ArgumentCaptor<TransitionInput> transitionArgument = ArgumentCaptor.forClass(TransitionInput.class);
+		
+		JiraConnector jiraConnector = new JiraConnector("http://foo/bar", PROJECT_KEY, "user", "password", jiraOptions);
+		jiraConnector.closeIssue("ISSUE-1", "closed");
+		
+		verify(issueRestClient, times(2)).transition(eq(issue1), transitionArgument.capture());
+		Assert.assertEquals(transitionArgument.getAllValues().get(0).getId(), 3); // transition to review state
+		Assert.assertEquals(transitionArgument.getAllValues().get(1).getId(), 1); // transition to closed state
+	}
+	
+	@Test(groups= {"ut"}, expectedExceptions = ConfigurationException.class)
+	public void testCloseIssueInvalidTransition() {
+
+		jiraOptions.put("jira.closeTransition", "closed");
 		ArgumentCaptor<TransitionInput> transitionArgument = ArgumentCaptor.forClass(TransitionInput.class);
 		
 		JiraConnector jiraConnector = new JiraConnector("http://foo/bar", PROJECT_KEY, "user", "password", jiraOptions);

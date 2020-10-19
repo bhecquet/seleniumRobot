@@ -3,6 +3,7 @@ package com.seleniumtests.it.connector.bugtracker;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -46,13 +47,15 @@ public class TestJiraConnector extends GenericTest {
 	public void testJira() {
 
 		Map<String, String> jiraOptions = new HashMap<>();
-		jiraOptions.put("openStatus", "Open,To Do");
-		jiraOptions.put("closeTransition", "Close");
+		jiraOptions.put("jira.openStates", "Open,To Do");
+		jiraOptions.put("jira.closeTransition", "Start Progress/Start Review/Done");
+		jiraOptions.put("jira.issueType", "Bogue");
+		jiraOptions.put("priority", "Important");
 		
 		JiraConnector jiraConnector = new JiraConnector(System.getProperty("server"), "FFC", System.getProperty("user"), System.getProperty("password"), jiraOptions);
-//		jiraConnector.createIssue(null, "Important", "Bogue", null, null, null, "core", "DEV", "testng", "myTest", "descr", Arrays.asList(step1, stepEnd));
-//		jiraConnector.issueAlreadyExists(new JiraBean(null, "[Selenium][core][DEV][testng] test myTest KO", "", ""));
+//		jiraConnector.createIssue(null, null, "core", "DEV", "testng", "myTest", "descr", Arrays.asList(step1, stepEnd));
+//		jiraConnector.issueAlreadyExists(new JiraBean(null, "[Selenium][core][DEV][testng] test myTest KO", "", "Bogue"));
 //		jiraConnector.updateIssue("FFC-573", "commentaire", Arrays.asList(screenshot));
-		jiraConnector.closeIssue("FFC-573", "Terminé");
+		jiraConnector.closeIssue("FFC-574", "Terminé");
 	}
 }
