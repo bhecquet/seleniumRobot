@@ -56,9 +56,9 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		Assert.assertTrue(StringUtils.countMatches(logs, "testWithException/PERF-result.xml") == 3); // once per retry
 		
 		// issue  #312: check that result files have been generated before test end
-		Assert.assertTrue(StringUtils.indexOf(logs, "testInError/PERF-result.xml") < StringUtils.indexOf(logs, "==============================================="));
-		Assert.assertTrue(StringUtils.indexOf(logs, "testAndSubActions/PERF-result.xml") < StringUtils.indexOf(logs, "==============================================="));
-		Assert.assertTrue(StringUtils.indexOf(logs, "testWithException/PERF-result.xml") < StringUtils.indexOf(logs, "==============================================="));
+		Assert.assertTrue(StringUtils.indexOf(logs, "testInError/PERF-result.xml") < StringUtils.indexOf(logs, "SeleniumRobotTestListener: Test Suite Execution Time"));
+		Assert.assertTrue(StringUtils.indexOf(logs, "testAndSubActions/PERF-result.xml") < StringUtils.indexOf(logs, "SeleniumRobotTestListener: Test Suite Execution Time"));
+		Assert.assertTrue(StringUtils.indexOf(logs, "testWithException/PERF-result.xml") < StringUtils.indexOf(logs, "SeleniumRobotTestListener: Test Suite Execution Time"));
 	}
 	
 	/**
@@ -344,9 +344,9 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		Assert.assertTrue(StringUtils.countMatches(logs, "testWithException/PERF-result.xml") == 3); // once per retry
 
 		// issue  #312: check that result files have been generated before test end (meaning they are generated after the test execution
-		Assert.assertTrue(StringUtils.indexOf(logs, "testInError/PERF-result.xml") < StringUtils.indexOf(logs, "==============================================="));
-		Assert.assertTrue(StringUtils.indexOf(logs, "testAndSubActions/PERF-result.xml") < StringUtils.indexOf(logs, "==============================================="));
-		Assert.assertTrue(StringUtils.indexOf(logs, "testWithException/PERF-result.xml") < StringUtils.indexOf(logs, "==============================================="));
+		Assert.assertTrue(StringUtils.indexOf(logs, "testInError/PERF-result.xml") < StringUtils.indexOf(logs, "SeleniumRobotTestListener: Test Suite Execution Time"));
+		Assert.assertTrue(StringUtils.indexOf(logs, "testAndSubActions/PERF-result.xml") < StringUtils.indexOf(logs, "SeleniumRobotTestListener: Test Suite Execution Time"));
+		Assert.assertTrue(StringUtils.indexOf(logs, "testWithException/PERF-result.xml") < StringUtils.indexOf(logs, "SeleniumRobotTestListener: Test Suite Execution Time"));
 		
 		// issue #319: check that if no test info is recorded, columns are not there
 		Assert.assertFalse(mainReportContent.contains("<td class=\"info\">"));
