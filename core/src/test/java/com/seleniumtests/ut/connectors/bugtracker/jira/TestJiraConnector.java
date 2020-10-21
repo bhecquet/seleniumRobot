@@ -17,6 +17,7 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
@@ -39,12 +40,15 @@ import com.atlassian.jira.rest.client.api.SearchRestClient;
 import com.atlassian.jira.rest.client.api.UserRestClient;
 import com.atlassian.jira.rest.client.api.domain.BasicComponent;
 import com.atlassian.jira.rest.client.api.domain.BasicIssue;
+import com.atlassian.jira.rest.client.api.domain.CimFieldInfo;
 import com.atlassian.jira.rest.client.api.domain.Comment;
+import com.atlassian.jira.rest.client.api.domain.CustomFieldOption;
 import com.atlassian.jira.rest.client.api.domain.Field;
 import com.atlassian.jira.rest.client.api.domain.FieldSchema;
 import com.atlassian.jira.rest.client.api.domain.FieldType;
 import com.atlassian.jira.rest.client.api.domain.Issue;
 import com.atlassian.jira.rest.client.api.domain.IssueType;
+import com.atlassian.jira.rest.client.api.domain.Page;
 import com.atlassian.jira.rest.client.api.domain.Priority;
 import com.atlassian.jira.rest.client.api.domain.Project;
 import com.atlassian.jira.rest.client.api.domain.SearchResult;
@@ -57,7 +61,6 @@ import com.atlassian.jira.rest.client.api.domain.input.TransitionInput;
 import com.atlassian.jira.rest.client.internal.async.AsynchronousJiraRestClientFactory;
 import com.google.common.collect.ImmutableList;
 import com.seleniumtests.MockitoTest;
-import com.seleniumtests.connectors.bugtracker.BugTracker;
 import com.seleniumtests.connectors.bugtracker.IssueBean;
 import com.seleniumtests.connectors.bugtracker.jira.JiraBean;
 import com.seleniumtests.connectors.bugtracker.jira.JiraConnector;
@@ -126,6 +129,12 @@ public class TestJiraConnector extends MockitoTest {
 	private Promise<Iterable<Transition>> promiseTransitions;
 	
 	@Mock
+	private Promise<Page<CimFieldInfo>> promiseFieldInfo;
+	
+	@Mock
+	private Page<CimFieldInfo> fieldInfos;
+	
+	@Mock
 	private Promise<SearchResult> promiseSearch;
 	
 	@Mock
@@ -137,11 +146,16 @@ public class TestJiraConnector extends MockitoTest {
 	@Mock
 	private Promise<Issue> promiseIssueEmpty;
 	
+
+	private FieldSchema stringSchema = new FieldSchema("string", "", null, null, null);
+	private FieldSchema optionSchema = new FieldSchema("option", "", null, null, null);
+	
 	private Priority priority1 = new Priority(new URI("http://foo/bar/p"), 1L, "P1", "1", "1", new URI("http://foo/bar/i"));
 	private Priority priority2 = new Priority(new URI("http://foo/bar/p"), 2L, "P2", "2", "2", new URI("http://foo/bar/i"));
 	
-	private Field fieldApplication = new Field("13", "application", FieldType.CUSTOM, false, false, true, fieldSchema);
-	private Field fieldEnvironment = new Field("23", "environment", FieldType.CUSTOM, false, false, true, fieldSchema);
+	private Field fieldApplication = new Field("13", "application", FieldType.CUSTOM, false, false, true, stringSchema);
+	private Field fieldEnvironment = new Field("23", "environment", FieldType.CUSTOM, false, false, true, stringSchema);
+	private Field fieldStep = new Field("33", "step", FieldType.CUSTOM, false, false, true, optionSchema);
 	
 	private BasicComponent component1 = new BasicComponent(new URI("http://foo/bar/c"), 1L, "comp1", "comp1");
 	private BasicComponent component2 = new BasicComponent(new URI("http://foo/bar/c"), 2L, "comp2", "comp2");
@@ -155,6 +169,13 @@ public class TestJiraConnector extends MockitoTest {
 	private Transition transition1 = new Transition("close", 1, new ArrayList<>());
 	private Transition transition2 = new Transition("reopen", 2, new ArrayList<>());
 	private Transition transition3 = new Transition("review", 3, new ArrayList<>());
+
+	private CustomFieldOption optionStep1 = new CustomFieldOption(1L, new URI("http://foo/bar/o"), "step1", null, null);
+	private CustomFieldOption optionStep2 = new CustomFieldOption(2L, new URI("http://foo/bar/o"), "step2", null, null);
+	
+	private CimFieldInfo fieldInfo1 = new CimFieldInfo("13", false, "application", stringSchema, new HashSet<>(), Arrays.asList(), null);
+	private CimFieldInfo fieldInfo2 = new CimFieldInfo("23", false, "environment", stringSchema, new HashSet<>(), Arrays.asList(), null);
+	private CimFieldInfo fieldInfo3 = new CimFieldInfo("33", false, "step", optionSchema, new HashSet<>(), Arrays.asList(optionStep1, optionStep2), null);
 	
 	private User user;
 	
@@ -208,7 +229,7 @@ public class TestJiraConnector extends MockitoTest {
 		when(metadataRestClient.getPriorities()).thenReturn(promisePriorities);
 		when(promisePriorities.claim()).thenReturn(Arrays.asList(priority1, priority2));
 		when(metadataRestClient.getFields()).thenReturn(promiseFields);	
-		when(promiseFields.claim()).thenReturn(Arrays.asList(fieldApplication, fieldEnvironment));
+		when(promiseFields.claim()).thenReturn(Arrays.asList(fieldApplication, fieldEnvironment, fieldStep));
 		
 		when(restClient.getSearchClient()).thenReturn(searchRestClient);
 		when(searchRestClient.searchJql(anyString())).thenReturn(promiseSearch);
@@ -226,6 +247,10 @@ public class TestJiraConnector extends MockitoTest {
 		when(issueRestClient.getIssue(eq("ISSUE-1"))).thenReturn(promiseIssue);
 		when(promiseIssue.claim()).thenReturn(issue1);
 		when(promiseIssueEmpty.claim()).thenThrow(RestClientException.class);
+		
+		when(issueRestClient.getCreateIssueMetaFields(anyString(), anyString(), any(), any())).thenReturn(promiseFieldInfo);
+		when(promiseFieldInfo.claim()).thenReturn(fieldInfos);
+		when(fieldInfos.getValues()).thenReturn(Arrays.asList(fieldInfo1, fieldInfo2, fieldInfo3));
 		
 		when(issueRestClient.getTransitions(issue1)).thenReturn(promiseTransitions);
 		when(promiseTransitions.claim()).thenReturn(Arrays.asList(transition1, transition2));
@@ -365,6 +390,7 @@ public class TestJiraConnector extends MockitoTest {
 		
 		Map<String, String> fields = new HashMap<>();
 		fields.put("application", "myApp"); // field allowed by jira
+		fields.put("step", "step2"); // field allowed by jira
 		JiraBean jiraBean = new JiraBean(null, "issue 1", "issue 1 descr", "P1", "Bug", "myTest", null, "me", "you", Arrays.asList(screenshot), detailedResult, fields, Arrays.asList("comp1"));
 		jiraConnector.createIssue(jiraBean);
 
@@ -385,6 +411,7 @@ public class TestJiraConnector extends MockitoTest {
 		Assert.assertEquals(((ComplexIssueInputFieldValue)(issueInput.getField("assignee").getValue())).getValuesMap().get("name"), "user1");
 		Assert.assertEquals(((ComplexIssueInputFieldValue)(issueInput.getField("priority").getValue())).getValuesMap().get("id"), "1");
 		Assert.assertEquals(issueInput.getField("13").getValue(), "myApp"); // custom field
+		Assert.assertEquals(((ComplexIssueInputFieldValue)(issueInput.getField("33").getValue())).getValuesMap().get("value"), "step2"); // custom field
 
 		// check attachments have been added (screenshot + detailed results)
 		verify(issueRestClient, times(2)).addAttachments(eq(new URI("http://foo/bar/i/1/attachments")), screenshotCaptor.capture());
@@ -542,7 +569,22 @@ public class TestJiraConnector extends MockitoTest {
 		JiraConnector jiraConnector = new JiraConnector("http://foo/bar", PROJECT_KEY, "user", "password", jiraOptions);
 		
 		Map<String, String> fields = new HashMap<>();
-		fields.put("myfield", "myApp"); // field allowed by jira
+		fields.put("myfield", "myApp"); // field not allowed by jira
+		JiraBean jiraBean = new JiraBean(null, "issue 1", "issue 1 descr", "P1", "Bug", null, null, null, null, new ArrayList<>(), null, fields, new ArrayList<>());
+		jiraConnector.createIssue(jiraBean);
+		
+	}
+	/**
+	 * Test issue creation with field value. No error should be raised (but issue may not be created if field is mandatory)
+	 * @throws URISyntaxException
+	 */
+	@Test(groups= {"ut"})
+	public void testCreateIssueUnknownFieldValue() {
+		
+		JiraConnector jiraConnector = new JiraConnector("http://foo/bar", PROJECT_KEY, "user", "password", jiraOptions);
+		
+		Map<String, String> fields = new HashMap<>();
+		fields.put("step", "step3"); // field allowed by jira
 		JiraBean jiraBean = new JiraBean(null, "issue 1", "issue 1 descr", "P1", "Bug", null, null, null, null, new ArrayList<>(), null, fields, new ArrayList<>());
 		jiraConnector.createIssue(jiraBean);
 		

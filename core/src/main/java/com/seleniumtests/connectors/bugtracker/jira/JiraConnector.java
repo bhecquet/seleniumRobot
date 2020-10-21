@@ -8,9 +8,9 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
-import org.apache.commons.collections.ListUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
@@ -20,8 +20,10 @@ import com.atlassian.jira.rest.client.api.RestClientException;
 import com.atlassian.jira.rest.client.api.SearchRestClient;
 import com.atlassian.jira.rest.client.api.domain.BasicComponent;
 import com.atlassian.jira.rest.client.api.domain.BasicIssue;
+import com.atlassian.jira.rest.client.api.domain.BasicPriority;
+import com.atlassian.jira.rest.client.api.domain.CimFieldInfo;
 import com.atlassian.jira.rest.client.api.domain.Comment;
-import com.atlassian.jira.rest.client.api.domain.Component;
+import com.atlassian.jira.rest.client.api.domain.CustomFieldOption;
 import com.atlassian.jira.rest.client.api.domain.Field;
 import com.atlassian.jira.rest.client.api.domain.Issue;
 import com.atlassian.jira.rest.client.api.domain.IssueType;
@@ -37,7 +39,6 @@ import com.atlassian.jira.rest.client.internal.async.AsynchronousJiraRestClientF
 import com.google.common.collect.ImmutableList;
 import com.seleniumtests.connectors.bugtracker.BugTracker;
 import com.seleniumtests.connectors.bugtracker.IssueBean;
-import com.seleniumtests.core.TestVariable;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.driver.screenshots.ScreenShot;
@@ -59,13 +60,13 @@ public class JiraConnector extends BugTracker {
     String closeTransition;
     
     /**
-     *
+     * Constructor only there to allow getting information about a project
      * @param server        exemple: http://jira.covea.priv
      * @param user
      * @param password
      */
-    public JiraConnector(String server, String projectKey, String user, String password, Map<String, String> jiraOptions) {
-        this.projectKey = projectKey;
+    public JiraConnector(String server, String projectKey, String user, String password) {
+    	this.projectKey = projectKey;
         
         if (server == null || server.isEmpty() 
         		|| projectKey == null || projectKey.isEmpty()
@@ -91,6 +92,17 @@ public class JiraConnector extends BugTracker {
         priorities = getPriorities();
         fields = getCustomFields();
         versions = getVersions();
+    }
+    
+
+    /**
+     * constructor to call for creating new issues
+     * @param server        exemple: http://jira.covea.priv
+     * @param user
+     * @param password
+     */
+    public JiraConnector(String server, String projectKey, String user, String password, Map<String, String> jiraOptions) {
+        this(server, projectKey, user, password);
         
         // check jira options
 		closeTransition = jiraOptions.get("jira.closeTransition");
@@ -136,6 +148,17 @@ public class JiraConnector extends BugTracker {
         restClient.getMetadataClient().getFields().claim().forEach(field -> jiraFields.put(field.getName(), field));
 
         return jiraFields;
+    }
+    
+    private Map<String, CimFieldInfo> getCustomFieldInfos(Project project, IssueType issueType) {
+    	Map<String, CimFieldInfo> jiraFieldValues = new HashMap<>();
+    	restClient.getIssueClient().getCreateIssueMetaFields(project.getKey(), issueType.getId().toString(), null, null)
+    		.claim()
+    		.getValues()
+    		.forEach(fieldInfo -> jiraFieldValues.put(fieldInfo.getName(), fieldInfo));
+    	
+    	
+    	return jiraFieldValues;
     }
 
     private User getUser(String email) {
@@ -205,11 +228,18 @@ public class JiraConnector extends BugTracker {
     		throw new ConfigurationException(String.format("Issue type %s cannot be found among valid issue types %s", jiraBean.getIssueType(), issueTypes.keySet()));
     	}
 
+
+    	Map<String, CimFieldInfo> fieldInfos = getCustomFieldInfos(project, issueType);
+    	
         IssueRestClient issueClient = restClient.getIssueClient();
         IssueInputBuilder issueBuilder = new IssueInputBuilder(project, issueType, jiraBean.getSummary())
-                //.setDueDate(jiraBean.getJodaDateTime())
                 .setDescription(jiraBean.getDescription())
                 ;
+        
+        if (isDueDateRequired(fieldInfos)) {
+        	issueBuilder.setDueDate(jiraBean.getJodaDateTime());
+        }
+        
 
         if (jiraBean.getAssignee() != null && !jiraBean.getAssignee().isEmpty()) {
         	User user = getUser(jiraBean.getAssignee());
@@ -228,11 +258,28 @@ public class JiraConnector extends BugTracker {
         if (jiraBean.getReporter() != null && !jiraBean.getReporter().isEmpty()) {
             issueBuilder.setReporterName(jiraBean.getReporter());
         }
-
+        
         // set fields
         jiraBean.getCustomFields().forEach((fieldName, fieldValue) -> {
-            if (fields.get(fieldName) != null) {
-                issueBuilder.setFieldValue(fields.get(fieldName).getId(), fieldValue);
+            if (fieldInfos.get(fieldName) != null && fields.get(fieldName) != null) {
+            	if ("option".equals(fields.get(fieldName).getSchema().getType())) {
+        			CustomFieldOption option = getOptionForField(fieldInfos, fieldName, fieldValue);
+        			if (option == null) {
+        				logger.warn(String.format("Value %s for field %s does not exist", fieldValue, fieldName));
+        			} else {
+        				issueBuilder.setFieldValue(fields.get(fieldName).getId(), option);
+        			}
+            				
+            	} else if ("string".equals(fields.get(fieldName).getSchema().getType())) {
+            		issueBuilder.setFieldValue(fields.get(fieldName).getId(), fieldValue);
+            	} else {
+            		logger.warn(String.format("Field %s type cannot be handled", fieldName));
+            	}
+            	
+                
+                
+//                new CustomFieldOption()
+//                issueBuilder.setFieldValue(fields.get(fieldName).getId(), fieldValue);
             } else {
                 logger.warn(String.format("Field %s does not exist", fieldName));
             }
@@ -267,6 +314,71 @@ public class JiraConnector extends BugTracker {
 
         jiraBean.setId(issue.getKey());
     }
+
+    /**
+     * Search the right field option among all allowed values or return null if value is not valid or field cannot be found
+     * @param fieldInfos
+     * @param fieldName
+     * @param fieldValue
+     * @return
+     */
+	private CustomFieldOption getOptionForField(Map<String, CimFieldInfo> fieldInfos, String fieldName, String fieldValue) {
+		CimFieldInfo fieldInfo = fieldInfos.get(fieldName);
+		if (fieldInfo == null) {
+			return null;
+		} else {
+			for (Object obj: fieldInfo.getAllowedValues()) {
+				if (obj instanceof CustomFieldOption && ((CustomFieldOption)obj).getValue().equals(fieldValue)) {
+					return (CustomFieldOption)obj;
+				}
+			}
+		}
+			
+		return null;
+	}
+	
+	private boolean isDueDateRequired(Map<String, CimFieldInfo> fieldInfos) {
+		for (CimFieldInfo fieldInfo: fieldInfos.values()) {
+			if ("duedate".equals(fieldInfo.getSchema().getSystem()) && fieldInfo.isRequired()) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	private Map<String, List<String>> getRequiredFieldsAndValues(Map<String, CimFieldInfo> fieldInfos) {
+		
+		Map<String, List<String>> requiredFields = new HashMap<>();
+		
+		for (Entry<String, CimFieldInfo> entry: fieldInfos.entrySet()) {
+			
+			// exclude some "mandatory" fields from list as they are always provided
+			if (Arrays.asList("project", "summary", "description", "issuetype").contains(entry.getValue().getSchema().getSystem())) {
+				continue;
+			}
+			
+			if (entry.getValue().isRequired() 
+					&& ("option".equals(entry.getValue().getSchema().getType())
+						|| "array".equals(entry.getValue().getSchema().getType())
+						)
+					) {
+				List<String> allowedValues = new ArrayList<>();
+				entry.getValue().getAllowedValues().forEach(v -> {
+					if (v instanceof CustomFieldOption) {
+						allowedValues.add(((CustomFieldOption)v).getValue());
+					} else if (v instanceof BasicComponent) {
+						allowedValues.add(((BasicComponent)v).getName());
+					} else if (v instanceof BasicPriority) {
+						allowedValues.add(((BasicPriority)v).getName());
+					}
+				});
+				requiredFields.put(entry.getKey(), allowedValues);
+			} else if (entry.getValue().isRequired()) {
+				requiredFields.put(entry.getKey(), new ArrayList<>());
+			}
+		}
+		return requiredFields;
+	}
 
     /**
      * Close issue, applying all necessary transitions
@@ -349,6 +461,45 @@ public class JiraConnector extends BugTracker {
 
 	public List<String> getOpenStates() {
 		return openStates;
+	}
+	
+	/**
+	 * Method for getting required fields and allowed values for creating an issue on a project
+	 * 
+	 * @param args
+	 * 		server => url of jira server
+	 * 		user => user to connect to jira
+	 * 		password => password to connect to jira
+	 * 		project => projectkey
+	 * 		issueType => type of the issue that will be created
+	 * 		
+	 */
+	public static void main(String[] args) {
+		
+		if (args.length != 5) {
+			System.out.println("Usage: JiraConnector <server> <projectKey> <user> <password> <issueType>");
+			System.exit(1);
+		}
+		
+		JiraConnector jiraConnector = new JiraConnector(args[0], args[1], args[2], args[3]);
+		
+		
+    	IssueType issueType = jiraConnector.issueTypes.get(args[4]);
+    	if (issueType == null) {
+    		throw new ConfigurationException(String.format("Issue type %s cannot be found among valid issue types %s", args[4], jiraConnector.issueTypes.keySet()));
+    	}
+
+    	System.out.println(String.format("Listing required fields and allowed values (if any) for issue '%s'", args[4]));
+
+    	Map<String, CimFieldInfo> fieldInfos = jiraConnector.getCustomFieldInfos(jiraConnector.project, issueType);
+		
+    	for (Entry<String, List<String>> entry: jiraConnector.getRequiredFieldsAndValues(fieldInfos).entrySet()) {
+    		System.out.println(String.format("Field '%s':", entry.getKey()));
+    		
+    		for (String value: entry.getValue()) {
+    			System.out.println(String.format("    - %s", value));
+    		}
+    	}
 	}
 
 }
