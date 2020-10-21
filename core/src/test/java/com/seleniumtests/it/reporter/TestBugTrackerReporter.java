@@ -85,7 +85,7 @@ public class TestBugTrackerReporter extends ReporterTest {
 			
 			Assert.assertEquals(issueOptionsArgument.getValue().size(), 3);
 			Assert.assertEquals(issueOptionsArgument.getValue().get("reporter"), "me");
-			Assert.assertEquals(issueOptionsArgument.getValue().get("assignee"), "you");
+			Assert.assertEquals(issueOptionsArgument.getValue().get("assignee"), "you2"); // check we get the updated value
 			Assert.assertEquals(issueOptionsArgument.getValue().get("jira.field.application"), "app");
 			
 		} finally {

@@ -44,6 +44,7 @@ public class StubTestClassForTestManager extends StubParentClass {
 	
 	@Test(groups="stub", attributes = {@CustomAttribute(name = "testId", values = "13")})
 	public void testInError() {
+		createOrUpdateLocalParam("bugtracker.assignee", "you2"); // change value for bugtracker assignee so that w check it's updated
 		throw new WebDriverException();
 	}
 	
