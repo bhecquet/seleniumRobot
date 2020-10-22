@@ -206,12 +206,13 @@ public abstract class BugTracker {
 		IssueBean currentIssue = issueAlreadyExists(issueBean);
 		if (currentIssue != null) {
 			if (currentIssue.getDescription().contains(String.format(STEP_KO_PATTERN, stepIdx))) {
-				logger.info(String.format("Jira %s already exists", currentIssue.getId()));
+				logger.info(String.format("Issue %s already exists", currentIssue.getId()));
 			} else {
 				updateIssue(currentIssue.getId(), "Scenario fails on another step " + issueBean.getTestStep().getName(), issueBean.getScreenShots());
 			}
 		} else {
 			createIssue(issueBean);
+			logger.info(String.format("Issue %s created", issueBean.getId()));
 		}
 	}
 	
