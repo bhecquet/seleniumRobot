@@ -19,6 +19,7 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.TimeZone;
 
+import org.apache.log4j.Logger;
 import org.testng.IReporter;
 import org.testng.ISuite;
 import org.testng.ISuiteResult;
@@ -35,7 +36,11 @@ import org.testng.reporters.XMLConstants;
 import org.testng.reporters.XMLStringBuffer;
 import org.testng.xml.XmlSuite;
 
+import com.seleniumtests.util.logging.SeleniumRobotLogger;
+
 public class JUnitReporter implements IReporter {
+	
+	private static Logger logger = SeleniumRobotLogger.getLogger(JUnitReporter.class);
 	
 	@Override
 	public void generateReport(List<XmlSuite> xmlSuites, List<ISuite> suites, String defaultOutputDirectory) {
@@ -146,6 +151,7 @@ public class JUnitReporter implements IReporter {
 			xsb.pop(XMLConstants.TESTSUITE);
 
 			String outputDirectory = defaultOutputDirectory + File.separator + "junitreports";
+			logger.info(String.format("generating report: %s/%s", outputDirectory, getFileName(cls)));
 			Utils.writeUtf8File(outputDirectory, getFileName(cls), xsb.toXML());
 		}
 

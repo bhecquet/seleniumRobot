@@ -21,6 +21,7 @@ import java.io.File;
 import java.nio.file.Paths;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.annotations.AfterMethod;
@@ -49,6 +50,24 @@ public class TestJUnitReporter extends ReporterTest {
 			}
 		}
 		
+	}
+	
+
+	/**
+	 * Check single test report format when tests have steps
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testMultithreadTestReport() throws Exception {
+		
+		SeleniumTestsContextManager.removeThreadContext();
+		executeSubTest(3, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass", "com.seleniumtests.it.stubclasses.StubTestClassForDataProvider", "com.seleniumtests.it.stubclasses.StubTestClass2", "com.seleniumtests.it.stubclasses.StubTestClass3"}, ParallelMode.TESTS, new String[] {});
+		
+		String outDir = new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath();
+		Assert.assertTrue(Paths.get(outDir, "junitreports", "TEST-com.seleniumtests.it.stubclasses.StubTestClass.xml").toFile().exists());
+		Assert.assertTrue(Paths.get(outDir, "junitreports", "TEST-com.seleniumtests.it.stubclasses.StubTestClass2.xml").toFile().exists());
+		Assert.assertTrue(Paths.get(outDir, "junitreports", "TEST-com.seleniumtests.it.stubclasses.StubTestClass3.xml").toFile().exists());
+		Assert.assertTrue(Paths.get(outDir, "junitreports", "TEST-com.seleniumtests.it.stubclasses.StubTestClassForDataProvider.xml").toFile().exists());
 	}
 	
 	@Test(groups={"it"})

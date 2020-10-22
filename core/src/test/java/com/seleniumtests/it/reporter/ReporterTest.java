@@ -97,7 +97,7 @@ public class ReporterTest extends ConnectorsTest {
 		
 		if (threadCount > 1) {
 			suite.setThreadCount(threadCount);
-			suite.setParallel(XmlSuite.ParallelMode.METHODS);
+			suite.setParallel(parallelMode);
 		}
 		
 		for (String testClass: testClasses) {
