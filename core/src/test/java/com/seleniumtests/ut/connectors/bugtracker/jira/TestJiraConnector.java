@@ -55,6 +55,7 @@ import com.atlassian.jira.rest.client.api.domain.SearchResult;
 import com.atlassian.jira.rest.client.api.domain.Transition;
 import com.atlassian.jira.rest.client.api.domain.User;
 import com.atlassian.jira.rest.client.api.domain.Version;
+import com.atlassian.jira.rest.client.api.domain.input.AttachmentInput;
 import com.atlassian.jira.rest.client.api.domain.input.ComplexIssueInputFieldValue;
 import com.atlassian.jira.rest.client.api.domain.input.IssueInput;
 import com.atlassian.jira.rest.client.api.domain.input.TransitionInput;
@@ -142,6 +143,9 @@ public class TestJiraConnector extends MockitoTest {
 	
 	@Mock
 	private Promise<Issue> promiseIssue;
+	
+	@Mock
+	private Promise<Void> promiseVoid;
 	
 	@Mock
 	private Promise<Issue> promiseIssueEmpty;
@@ -254,6 +258,8 @@ public class TestJiraConnector extends MockitoTest {
 		
 		when(issueRestClient.getTransitions(issue1)).thenReturn(promiseTransitions);
 		when(promiseTransitions.claim()).thenReturn(Arrays.asList(transition1, transition2));
+		
+		when(issueRestClient.addAttachments(any(), any(File.class))).thenReturn(promiseVoid);
 		
 		when(issue1.getKey()).thenReturn("ISSUE-1");
 		when(issue1.getDescription()).thenReturn("jira issue 1");

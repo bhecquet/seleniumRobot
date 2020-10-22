@@ -299,13 +299,13 @@ public class JiraConnector extends BugTracker {
         Issue issue = issueClient.getIssue(basicIssue.getKey()).claim();
 
         if (!jiraBean.getScreenShots().isEmpty()) {
-            issueClient.addAttachments(issue.getAttachmentsUri(), jiraBean.getScreenShots()
+        	File[] files = jiraBean.getScreenShots()
                     .stream()
                     .peek(s -> logger.info("file -> " + s.getFullImagePath()))
                     .map(s -> new File(s.getFullImagePath()))
                     .collect(Collectors.toList())
-                    .toArray(new File[] {})
-            ).claim();
+                    .toArray(new File[] {});
+            issueClient.addAttachments(issue.getAttachmentsUri(), files).claim();
         }
 
         if (jiraBean.getDetailedResult() != null) {
