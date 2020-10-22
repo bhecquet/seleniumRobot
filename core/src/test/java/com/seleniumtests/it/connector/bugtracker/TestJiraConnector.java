@@ -43,7 +43,7 @@ public class TestJiraConnector extends GenericTest {
 		stepEnd.addSnapshot(new Snapshot(screenshot, "end2", SnapshotCheckType.FULL), 1, null);
 	}
 	
-	@Test(groups="no-ti", enabled = true)
+	@Test(groups="no-ti", enabled = false)
 	public void testJira() {
 
 		Map<String, String> jiraOptions = new HashMap<>();
