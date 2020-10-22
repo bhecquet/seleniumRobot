@@ -271,7 +271,7 @@ Jira needs more parameters
 
 | Param name       				| Default 		| Description  |
 | -------------------------		| -------------	| ------------ |
-| bugtracker.priority			| first found 	| The priority set for the issue. It's the priority string available on jira server |
+| bugtracker.priority			| 			 	| The priority set for the issue. |
 | bugtracker.jira.issueType		|				| Type of the issue that will be added. May depend on project. It MUST be set |
 | bugtracker.jira.components	| <empty>		| Comma seperated list of components that will be added to the issue. |
 | bugtracker.jira.openStates	|				| Comma seperated list of states (or status) that says that an issue is still open. It helps searching for existing issues. e.g: 'Open,Todo'. It MUST be set |
