@@ -24,7 +24,7 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-### 0 SeleniumRobot Server ###
+## 0 SeleniumRobot Server ##
 SeleniumRobot server [https://github.com/bhecquet/seleniumRobot-server](https://github.com/bhecquet/seleniumRobot-server) is a server which aims to be used with SeleniumRobot, giving the following features:
 - handle test variables: instead of setting test data into env.ini file, they can be set in server, which offers more features when sharing values among test projects
 - compare snapshots: as Seleniumrobot takes snapshots, it's able to send them to server which can compare with the same step of the same test executed previously
@@ -40,6 +40,10 @@ To use this server,
 - parameter `seleniumRobotServerCompareSnapshots` can be set to true for tests where snapshot comparison is required (defaults to false)
 - parameter `seleniumRobotServerRecordResults` can be set to true when results should be recorded on server (defaults to false)
 - run your tests. SeleniumRobot will automatically connect to server and send data
+
+## Test managers ##
+
+Test manager are softwares that help managing test campaigns, requirements and tests results. For selenium test, the aim is to execute selenium test instead of manual tests and record results
 
 ### 1 Squash TM/TA ###
 SeleniumRobot can work with Squash TA by using an intermediate .java file. This file handles execution of test framework using a command line.
@@ -314,4 +318,48 @@ Test run is possible when actual values are configured. You can use "copy defaul
 
 ![](images/alm_result.png)
 
+## Bugtrackers ##
 
+Bugtrackers will store issues when a selenium test fails.
+If the issue already exists for this failing test, it's not recreated.
+If the issue exists and the test becomes sucessful, then issue is closed
+
+### 1 Jira ###
+
+#### Configuration ####
+
+Many parameters drive the use of jira because this software is highly configurable
+
+typical / minimal configuration would be
+
+```
+	# common bugtracker options
+	-DbugtrackerUrl=https://my.jira.server/jira
+	-DbugtrackerUser=myUser
+	-DbugtrackerPassword=myPassword
+	-DbugtrackerProject=PROJECTKEY
+	-DbugtrackerType=jira
+	
+	# specific jira options
+	-Dbugtracker.priority=Important				# name of the priority to set to issue
+	-Dbugtracker.jira.issueType=Bug				# name of the issue type, as stated in GUI
+	-Dbugtracker.jira.openStates=Open,Todo	# name of states that say the issue is not closed. It depends on the workflow
+	-Dbugtracker.jira.closeTransition=Done	# name of the transition to go to "closed" state. 
+```
+Many transitions may be defined so that several steps of the workflow can be run through.
+for example: `To Analyze/To resolve/Resolve`
+SeleniumRobot will look for the current available transition of the issue and then run through all the remaining ones
+
+
+Depending on jira project, you may need to specify additional options if the fields (components and custom fields) are mandatory
+
+```
+	-Dbugtracker.jira.components=Component1
+	-Dbugtracker.jira.field.myFieldName1=myFieldValue1		# myFieldName is the name of the custom field as defined in GUI
+	-Dbugtracker.jira.field.myFieldName1=myFieldValue1
+```
+
+#### Find required fields and allowed values ####
+
+As it's not always easy to find which values to set to the issue, you can execute the class com.seleniumtests.connectors.bugtracker.jira.JiraConnector with the following arguments: `java -cp ... com.seleniumtests.connectors.bugtracker.jira.JiraConnector <jiraUrl> <projectKey> <user> <password> <issueType>`
+It will print all required fields with allowed values if applicable

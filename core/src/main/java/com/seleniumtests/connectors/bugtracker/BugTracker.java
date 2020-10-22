@@ -229,7 +229,13 @@ public abstract class BugTracker {
 			String testName) {
 		
 		String summary = createIssueSummary(application, environment, testNgName, testName);
-		IssueBean issueBean = new IssueBean(summary, "", "", null, null, null, null, null);
+		IssueBean issueBean;
+		
+		if (this instanceof JiraConnector) {
+			issueBean = new JiraBean("", summary, "", "", "");
+		} else {
+			issueBean = new IssueBean(summary, "", "", null, null, null, null, null);
+		}
 		
 		// Close issue if it exists
 		IssueBean currentIssue = issueAlreadyExists(issueBean);
