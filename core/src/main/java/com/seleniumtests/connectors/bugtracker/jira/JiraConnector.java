@@ -305,11 +305,11 @@ public class JiraConnector extends BugTracker {
                     .map(s -> new File(s.getFullImagePath()))
                     .collect(Collectors.toList())
                     .toArray(new File[] {})
-            );
+            ).claim();
         }
 
         if (jiraBean.getDetailedResult() != null) {
-            issueClient.addAttachments(issue.getAttachmentsUri(),  jiraBean.getDetailedResult());
+            issueClient.addAttachments(issue.getAttachmentsUri(),  jiraBean.getDetailedResult()).claim();
         }
 
         jiraBean.setId(issue.getKey());
