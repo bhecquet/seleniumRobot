@@ -798,9 +798,6 @@ public class SeleniumTestsContext {
     
     private void createContextConnectors() {
     	
-    	// create seleniumRobot server instance
-    	variableServer = connectSeleniumRobotServer();
-    	
     	// create selenium grid connectors. They will be created if it's null
     	// in this phase, we chek that grid is alive
     	getSeleniumGridConnectors();
