@@ -790,16 +790,22 @@ public class SeleniumTestsContext {
     /**
      * Connect all servers (grid, seleniumRobot server) to this context
      */
-    private void createContextConnectors() {
+    private void createVariableServerConnectors() {
 
         // create seleniumRobot server instance
         variableServer = connectSeleniumRobotServer();
-
-        // create selenium grid connectors. They will be created if it's null
-        // in this phase, we chek that grid is alive
-        getSeleniumGridConnectors();
-        
-        // create Test Manager connector
+    }
+    
+    private void createContextConnectors() {
+    	
+    	// create seleniumRobot server instance
+    	variableServer = connectSeleniumRobotServer();
+    	
+    	// create selenium grid connectors. They will be created if it's null
+    	// in this phase, we chek that grid is alive
+    	getSeleniumGridConnectors();
+    	
+    	// create Test Manager connector
     	testManagerInstance = initTestManager();
     	
     	bugtrackerInstance = initBugtracker();
@@ -876,11 +882,14 @@ public class SeleniumTestsContext {
         // update ouput directory
         createTestSpecificOutputDirectory(testNGResult);
 
-    	createContextConnectors();
+        createVariableServerConnectors();
     	
         // read and set test configuration from env.ini file and from seleniumRobot server
     	setTestConfiguration();
     	updateProxyConfig();
+    	
+    	// create other connectors that may use variables
+    	createContextConnectors();
     }
     
     /**
@@ -1063,8 +1072,26 @@ public class SeleniumTestsContext {
         return (Boolean) getAttribute(FULL_RESET);
     }
 
+
     public Object getAttribute(final String name) {
+    	return getAttribute(name, false);
+    }
+    
+    /**
+     * Returns attribute value searched in context
+     * If no value is found, search in variables
+     * @param name
+     * @param searchInVariables		if true, will search in variables if attribute cannot be found in configuration. Beware that configuration only contains strings
+     * 								so casting may fail
+     * @return
+     */
+    public Object getAttribute(final String name, boolean searchInVariables) {
         Object obj = contextDataMap.get(name);
+        
+        if (searchInVariables && obj == null && getConfiguration().get(name) != null) {
+        	obj = getConfiguration().get(name).getValue();
+        }
+        
         return obj == null ? null : obj;
     }
 
@@ -1164,19 +1191,19 @@ public class SeleniumTestsContext {
     }
     
     public String getBugtrackerUrl() {
-    	return (String) getAttribute(BUGTRACKER_URL);
+    	return (String) getAttribute(BUGTRACKER_URL, true);
     }
     
     public String getBugtrackerUser() {
-    	return (String) getAttribute(BUGTRACKER_USER);
+    	return (String) getAttribute(BUGTRACKER_USER, true);
     }
     
     public String getBugtrackerPassword() {
-    	return (String) getAttribute(BUGTRACKER_PASSWORD);
+    	return (String) getAttribute(BUGTRACKER_PASSWORD, true);
     }
     
     public String getBugtrackerProject() {
-    	return (String) getAttribute(BUGTRACKER_PROJECT);
+    	return (String) getAttribute(BUGTRACKER_PROJECT, true);
     }
     
     @SuppressWarnings("unchecked")
