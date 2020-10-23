@@ -57,15 +57,16 @@ public class SeleniumRobotLogger {
 	public static final String END_TEST_PATTERN = "Finish method ";
 	public static final String LOG_FILE_NAME = "seleniumRobot.log";
 	public static final String INTERNAL_DEBUG = "internalDebug";
+	public static boolean rootIsConfigured = false;
 	
 	private SeleniumRobotLogger() {
 		// As a utility class, it is not meant to be instantiated.
 	}
 	
 	public static Logger getLogger(final Class<?> cls) {
-	    boolean rootIsConfigured = Logger.getRootLogger().getAllAppenders().hasMoreElements();
+	    
 	    if (!rootIsConfigured) {
-	    	
+	    	Logger.getRootLogger().removeAllAppenders();
 	        BasicConfigurator.configure();
 	        Logger rootLogger = Logger.getRootLogger();
 
@@ -75,6 +76,8 @@ public class SeleniumRobotLogger {
 	        // redirect standard output and error to logger so that all logs are written to log file
 	        System.setErr(new PrintStream(new Sys.Error(rootLogger), true));
 	        System.setOut(new PrintStream(new Sys.Out(rootLogger), true));
+	        
+	        rootIsConfigured = true;
 	    }
 	    
         // use System property instead of SeleniumTestsContext class as SeleniumrobotLogger class is used for grid extension package and 
