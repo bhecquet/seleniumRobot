@@ -37,6 +37,7 @@ import org.testng.xml.XmlTest;
 import com.seleniumtests.GenericTest;
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.core.TestVariable;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.DriverExceptionListener;
@@ -1110,6 +1111,12 @@ public class TestSeleniumTestContext extends GenericTest {
 		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getBugtrackerUrl(), "http://foo.bar");
 	}
 	@Test(groups="ut context")
+	public void testBugtrackerUrlFromVariable(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().getConfiguration().put("bugtrackerUrl", new TestVariable("bugtrackerUrl", "http://foo.bar2"));
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getBugtrackerUrl(), "http://foo.bar2");
+	}
+	@Test(groups="ut context")
 	public void testBugtrackerUrlNull(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setBugtrackerUrl(null);
@@ -1128,6 +1135,12 @@ public class TestSeleniumTestContext extends GenericTest {
 		Assert.assertNull(SeleniumTestsContextManager.getThreadContext().getBugtrackerUser());
 	}
 	@Test(groups="ut context")
+	public void testBugtrackerUserFromVariable(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().getConfiguration().put("bugtrackerUser", new TestVariable("bugtrackerUser", "user"));
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getBugtrackerUser(), "user");
+	}
+	@Test(groups="ut context")
 	public void testBugtrackerPassword(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setBugtrackerPassword("pwd");
@@ -1140,6 +1153,12 @@ public class TestSeleniumTestContext extends GenericTest {
 		Assert.assertNull(SeleniumTestsContextManager.getThreadContext().getBugtrackerPassword());
 	}
 	@Test(groups="ut context")
+	public void testBugtrackerPasswordFromVariable(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().getConfiguration().put("bugtrackerPassword", new TestVariable("bugtrackerPassword", "pwd"));
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getBugtrackerPassword(), "pwd");
+	}
+	@Test(groups="ut context")
 	public void testBugtrackerProject(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setBugtrackerProject("project");
@@ -1150,6 +1169,12 @@ public class TestSeleniumTestContext extends GenericTest {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setBugtrackerProject(null);
 		Assert.assertNull(SeleniumTestsContextManager.getThreadContext().getBugtrackerProject());
+	}
+	@Test(groups="ut context")
+	public void testBugtrackerProjectFromVariable(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().getConfiguration().put("bugtrackerProject", new TestVariable("bugtrackerProject", "project"));
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getBugtrackerProject(), "project");
 	}
 	
 	
@@ -1708,4 +1733,38 @@ public class TestSeleniumTestContext extends GenericTest {
 	}
 	
 	public void myTest() {}
+	
+	@Test(groups="ut context")
+	public void testAttribute(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setAttribute("foo", "bar");
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getAttribute("foo"), "bar");
+	}
+	@Test(groups="ut context")
+	public void testAttributeNotFound(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setAttribute("foo", "bar");
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getAttribute("foo2"), null);
+	}
+	@Test(groups="ut context")
+	public void testAttributeFoundInVariableButNotRequested(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().getConfiguration().put("foo2", new TestVariable("foo2", "bar2"));
+		SeleniumTestsContextManager.getThreadContext().setAttribute("foo", "bar");
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getAttribute("foo2"), null);
+	}
+	@Test(groups="ut context")
+	public void testAttributeFoundInVariablePriority(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().getConfiguration().put("foo", new TestVariable("foo", "bar2"));
+		SeleniumTestsContextManager.getThreadContext().setAttribute("foo", "bar");
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getAttribute("foo", true), "bar");
+	}
+	@Test(groups="ut context")
+	public void testAttributeFoundInVariableAndRequested(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().getConfiguration().put("foo2", new TestVariable("foo2", "bar2"));
+		SeleniumTestsContextManager.getThreadContext().setAttribute("foo", "bar");
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getAttribute("foo2", true), "bar2");
+	}
 }
