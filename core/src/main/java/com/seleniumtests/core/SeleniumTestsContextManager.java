@@ -292,11 +292,16 @@ public class SeleniumTestsContextManager {
     	try {
     		return ((Method)(testResult.getParameters()[0])).getName();
     	} catch (Exception e) {
-			throw new ScenarioException("When using @BeforeMethod / @AfterMethod in tests, this method MUST have a 'java.lang.reflect.Method' object as first argument. Example: \n\n"
-					+ "@BeforeMethod\n" + 
-					"public void beforeMethod(Method method) {\n"
-					+ "    SeleniumTestsContextManager.getThreadContext().setAttribute(\"some attribute\", \"attribute value\");\n"
-					+ "}\n\n");
+    		if (testResult.getMethod().getConstructorOrMethod().getMethod().getParameterCount() == 0 
+    				|| !testResult.getMethod().getConstructorOrMethod().getMethod().getParameterTypes()[0].isAssignableFrom(Method.class) ) {
+				throw new ScenarioException("When using @BeforeMethod / @AfterMethod in tests, this method MUST have a 'java.lang.reflect.Method' object as first argument. Example: \n\n"
+						+ "@BeforeMethod\n" + 
+						"public void beforeMethod(Method method) {\n"
+						+ "    SeleniumTestsContextManager.getThreadContext().setAttribute(\"some attribute\", \"attribute value\");\n"
+						+ "}\n\n");
+    		} else {
+    			throw e;
+    		}
 		}
     }
     
@@ -308,12 +313,18 @@ public class SeleniumTestsContextManager {
     private static String getClassNameFromMethodConfiguration(ITestResult testResult) {
     	try {
     		return ((Method)(testResult.getParameters()[0])).getDeclaringClass().getName();
+    		
     	} catch (Exception e) {
-			throw new ScenarioException("When using @BeforeMethod / @AfterMethod in tests, this method MUST have a 'java.lang.reflect.Method' object as first argument. Example: \n\n"
-					+ "@BeforeMethod\n" + 
-					"public void beforeMethod(Method method) {\n"
-					+ "    SeleniumTestsContextManager.getThreadContext().setAttribute(\"some attribute\", \"attribute value\");\n"
-					+ "}\n\n");
+    		if (testResult.getMethod().getConstructorOrMethod().getMethod().getParameterCount() == 0 
+    				|| !testResult.getMethod().getConstructorOrMethod().getMethod().getParameterTypes()[0].isAssignableFrom(Method.class) ) {
+				throw new ScenarioException("When using @BeforeMethod / @AfterMethod in tests, this method MUST have a 'java.lang.reflect.Method' object as first argument. Example: \n\n"
+						+ "@BeforeMethod\n" + 
+						"public void beforeMethod(Method method) {\n"
+						+ "    SeleniumTestsContextManager.getThreadContext().setAttribute(\"some attribute\", \"attribute value\");\n"
+						+ "}\n\n");
+    		} else {
+    			throw e;
+    		}
 		}
     }
     

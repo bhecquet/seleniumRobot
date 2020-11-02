@@ -771,4 +771,31 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 		WebUIDriver.resetCurrentWebUiDriverName();
 		
 	}
+	
+	/**
+	 * issue #389: check that error raised on startup is the configurationException, and not ScenarioException  "ScenarioException: When using @BeforeMethod / @AfterMethod in tests, this method MUST have a 'java.lang.reflect.Method' "
+	 * This issue can only happen if ConfigFailurePolicy is set to "skip" which is the default behaviour
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testConfigurationExceptionIsRendered() throws Exception {
+		
+		executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForIssue389"});
+		
+		String logs = readSeleniumRobotLogFile();
+		Assert.assertFalse(logs.contains("When using @BeforeMethod / @AfterMethod in tests")); // check error message is shown when parameter is not given to Before / AfterMethod
+	}
+	
+	/**
+	 * Check we get an error message when configuration method do not have a java.lang.reflect.Method as their first parameter
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testErrorRaisedIfConfigurationMethodHasNotMethodReference() throws Exception {
+		
+		executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForIssue382e2"});
+		
+		String logs = readSeleniumRobotLogFile();
+		Assert.assertTrue(logs.contains("When using @BeforeMethod / @AfterMethod in tests")); // check error message is shown when parameter is not given to Before / AfterMethod
+	}
 }
