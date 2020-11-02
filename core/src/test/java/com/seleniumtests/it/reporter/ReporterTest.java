@@ -90,7 +90,7 @@ public class ReporterTest extends ConnectorsTest {
 		Map<String, String> suiteParameters = new HashMap<>();
 		suiteParameters.put("softAssertEnabled", "false");
 		suite.setParameters(suiteParameters);
-		suite.setConfigFailurePolicy(FailurePolicy.CONTINUE);
+//		suite.setConfigFailurePolicy(FailurePolicy.CONTINUE);
 		List<XmlSuite> suites = new ArrayList<XmlSuite>();
 		suites.add(suite);
 		
@@ -136,7 +136,6 @@ public class ReporterTest extends ConnectorsTest {
 		Map<String, String> suiteParameters = new HashMap<>();
 		suiteParameters.put("softAssertEnabled", "false");
 		suite.setParameters(suiteParameters);
-		suite.setConfigFailurePolicy(FailurePolicy.CONTINUE);
 		suites.add(suite);
 		
 		XmlSuite suite2 = new XmlSuite();
@@ -146,7 +145,6 @@ public class ReporterTest extends ConnectorsTest {
 		Map<String, String> suiteParameters2 = new HashMap<>();
 		suiteParameters2.put("softAssertEnabled", "false");
 		suite2.setParameters(suiteParameters2);
-		suite2.setConfigFailurePolicy(FailurePolicy.CONTINUE);
 		suites.add(suite2);
 		
 		for (String testClass: testClasses) {
