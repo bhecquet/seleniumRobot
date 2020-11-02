@@ -110,7 +110,7 @@ public class JiraConnector extends BugTracker {
 		if (jiraOptions.get("jira.openStates") == null) {
 			throw new ConfigurationException("'bugtracker.jira.openStates' MUST be set. It's the state of an issue when it has juste been create. Used to search for open issues");
 		} else {
-			openStates = Arrays.asList(jiraOptions.get("jira.openStates").split(","));
+			openStates = Arrays.asList(jiraOptions.get("jira.openStates").split(",")).stream().map(String::trim).collect(Collectors.toList());
 		}
 		if (closeTransition == null) {
 			throw new ConfigurationException("'bugtracker.jira.closeTransition' MUST be set. It's the name of the transition that will close an issue");
