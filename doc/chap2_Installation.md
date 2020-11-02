@@ -7,7 +7,7 @@
     - [Test application project configuration](#test-application-project-configuration)
   - [intelliJ](#intellij)
     - [AspectJ activation](#aspectj-activation)
-    - [Test Application Project configuration](#test-application-project-configuration)
+    - [Test Application Project configuration](#test-application-project-configuration-1)
     - [Version control](#version-control)
   - [Sign artifact for deploy phase](#sign-artifact-for-deploy-phase)
   - [Git key for release](#git-key-for-release)
