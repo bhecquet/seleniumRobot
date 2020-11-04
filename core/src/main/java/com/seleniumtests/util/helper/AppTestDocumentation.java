@@ -74,12 +74,28 @@ public class AppTestDocumentation {
 		
 		File srcDir = Paths.get(args[0].replace(File.separator,  "/"), "src", "test", "java").toFile();
 		
+		// find the root source path (folder where "tests" and "webpage" can be found
+		List<Path> rootFolders = Files.walk(Paths.get(srcDir.getAbsolutePath()))
+		        .filter(Files::isDirectory)
+		        .filter(p -> p.toAbsolutePath().resolve("tests").toFile().exists() && p.toAbsolutePath().resolve("webpage").toFile().exists())
+		        .collect(Collectors.toList());
+
 		javadoc = new StringBuilder("Cette page référence l'ensemble des tests et des opération disponible pour l'application\n");
+		
+		Path rootFolder = null;
+		if (rootFolders.isEmpty()) {
+			System.out.println("Cannot find a folder which contains 'tests' and 'webpage' subfolder. The project does not follow conventions");
+			javadoc.append("Cannot find a folder which contains 'tests' and 'webpage' subfolder. The project does not follow conventions");
+			System.exit(0);
+		} else {
+			rootFolder = rootFolders.get(0);
+		}
+		
 		javadoc.append("\n{toc}\n\n");
 		javadoc.append("${project.summary}\n");
 		javadoc.append("h1. Tests\n");
 		try {
-			List<Path> testsFolders = Files.walk(Paths.get(srcDir.getAbsolutePath()))
+			List<Path> testsFolders = Files.walk(rootFolder)
 	        .filter(Files::isDirectory)
 	        .filter(p -> p.getFileName().toString().equals("tests"))
 	        .collect(Collectors.toList());
@@ -96,7 +112,7 @@ public class AppTestDocumentation {
 		javadoc.append("----");
 		javadoc.append("h1. Pages\n");
 		try {
-			List<Path> pagesFolders = Files.walk(Paths.get(srcDir.getAbsolutePath()))
+			List<Path> pagesFolders = Files.walk(rootFolder)
 					.filter(Files::isDirectory)
 					.filter(p -> p.getFileName().toString().equals("webpage"))
 					.collect(Collectors.toList());
@@ -213,7 +229,10 @@ public class AppTestDocumentation {
 	    	String methodId;
 	    	try {
 	    		BlockStmt body = n.getBody().get();
+	    		
+
 	    		methodId = ((ClassOrInterfaceDeclaration)(n.getParentNode().get())).getNameAsString() + "." + n.getNameAsString();
+	  
 	    		stepsUsedInTests.put(methodId, new ArrayList<>());
 	    		
 	    		for (Node instruction: body.getChildNodes()) {
@@ -229,7 +248,8 @@ public class AppTestDocumentation {
 	    			}
 	    			
 	    		}
-	    	} catch (NoSuchElementException e) {
+	    	} catch (NoSuchElementException | ClassCastException e) {
+	    		// we expect that 'n' is a method, and its parent is the class itself. We do not support, for example enumeration
 	    		return;
 	    	}
 	    	
