@@ -230,7 +230,6 @@ public class AppTestDocumentation {
 	    	try {
 	    		BlockStmt body = n.getBody().get();
 	    		
-
 	    		methodId = ((ClassOrInterfaceDeclaration)(n.getParentNode().get())).getNameAsString() + "." + n.getNameAsString();
 	  
 	    		stepsUsedInTests.put(methodId, new ArrayList<>());
