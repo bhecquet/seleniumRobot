@@ -45,6 +45,8 @@ public class JUnitReporter implements IReporter {
 	@Override
 	public void generateReport(List<XmlSuite> xmlSuites, List<ISuite> suites, String defaultOutputDirectory) {
 
+		logger.info("generating JUnit report");
+		
 		Map<Class<?>, Set<ITestResult>> results = Maps.newHashMap();
 		ListMultiMap<Object, ITestResult> befores = Maps.newListMultiMap();
 		ListMultiMap<Object, ITestResult> afters = Maps.newListMultiMap();
@@ -151,7 +153,7 @@ public class JUnitReporter implements IReporter {
 			xsb.pop(XMLConstants.TESTSUITE);
 
 			String outputDirectory = defaultOutputDirectory + File.separator + "junitreports";
-			logger.info(String.format("generating report: %s/%s", outputDirectory, getFileName(cls)));
+			logger.info(String.format("generated report: %s/%s", outputDirectory, getFileName(cls)));
 			Utils.writeUtf8File(outputDirectory, getFileName(cls), xsb.toXML());
 		}
 
