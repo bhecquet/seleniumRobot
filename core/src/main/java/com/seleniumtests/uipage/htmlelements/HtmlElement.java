@@ -1492,6 +1492,14 @@ public class HtmlElement extends Element implements WebElement, Locatable {
         	logger.error(ex);
         }
     }
+	
+	public void setImplicitWaitTimeout(int timeout, TimeUnit unit) {
+		try {
+			driver.manage().timeouts().implicitlyWait(timeout, unit);
+		} catch (Exception ex) {
+			logger.error(ex);
+		}
+	}
     
     /**
      * Wait element to present using Explicit Waits with timeout in seconds. This method is used for special element
@@ -1506,7 +1514,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     	driver = updateDriver();
     	
     	try {
-    		setImplicitWaitTimeout(0);
+    		setImplicitWaitTimeout(510, TimeUnit.MILLISECONDS);
     	
 	    	Clock clock = Clock.systemUTC();
 	    	Instant end = clock.instant().plusSeconds(Math.max(1, timeout));
@@ -1528,7 +1536,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     public void waitFor(int timeout, ExpectedCondition<?> condition) {
     	
     	try {
-    		setImplicitWaitTimeout(0);
+    		setImplicitWaitTimeout(510, TimeUnit.MILLISECONDS);
 	    	Clock clock = Clock.systemUTC();
 	    	Instant end = clock.instant().plusSeconds(Math.max(1, timeout));
 	    	
