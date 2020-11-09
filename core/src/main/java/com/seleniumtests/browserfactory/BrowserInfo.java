@@ -20,6 +20,8 @@ package com.seleniumtests.browserfactory;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -32,6 +34,7 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
+import org.openqa.selenium.Platform;
 
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.driver.BrowserType;
@@ -50,12 +53,14 @@ public class BrowserInfo {
 	private static final Pattern REG_ANDROID_VERSION = Pattern.compile(".*android-(\\d+\\.\\d+).*");
 	public static final String LATEST_VERSION = "999.9";
 	public static final String GRID_BROWSER = "grid-browser";
+	public static final String DEFAULT_BROWSER_PRODFILE = "default";
 	private static List<String> driverList;
 	
 	private String version;
 	private String path;
 	private String driverFileName;
 	private String os;
+	private String defaultProfilePath;
 	private BrowserType browser;
 	private boolean driverFileSearched = false;
 	
@@ -105,6 +110,20 @@ public class BrowserInfo {
 		}
 		
 		os = OSUtility.getCurrentPlatorm().toString().toLowerCase();
+		addDefaultUserProfilePath();
+	}
+	
+	private void addDefaultUserProfilePath() {
+		switch (browser) {
+			case CHROME:
+				addChromeDefaultProfilePath();
+				break;
+			case FIREFOX:
+				addFirefoxDefaultProfilePath();
+				break;
+			default:
+				driverFileName = null;
+		}
 	}
 	
 	public BrowserInfo getEmptyBrowserInfo() {
@@ -289,6 +308,43 @@ public class BrowserInfo {
 	private void addFirefoxDriverFile() {
 		if (!useLegacyFirefoxVersion(version)) {
 			driverFileName = "geckodriver";
+		}
+	}
+	
+	private void addChromeDefaultProfilePath() {
+		Platform platform = OSUtility.getCurrentPlatorm();
+		if (platform == Platform.WINDOWS) {
+			defaultProfilePath = String.format("C:\\Users\\%s\\AppData\\Local\\Google\\Chrome\\User Data", System.getProperty("user.name"));
+		} else if (platform == Platform.LINUX) {
+			defaultProfilePath = String.format("/home/%s/.config/google-chrome/default", System.getProperty("user.name"));
+		} else if (platform == Platform.MAC) {
+			defaultProfilePath = String.format("/Users/%s/Library/Application Support/Google/Chrome", System.getProperty("user.name"));
+		}
+	}
+	
+	private void addFirefoxDefaultProfilePath() {
+		Platform platform = OSUtility.getCurrentPlatorm();
+		if (platform == Platform.WINDOWS) {
+			defaultProfilePath = String.format("C:\\Users\\%s\\AppData\\Roaming\\Mozilla\\Firefox\\Profiles\\", System.getProperty("user.name"));
+		} else if (platform == Platform.LINUX) {
+			defaultProfilePath = String.format("/home/%s/.mozilla/firefox", System.getProperty("user.name"));
+		} else if (platform == Platform.MAC) {
+			defaultProfilePath = String.format("/Users/%s/Library/Application Support/Firefox/Profiles/", System.getProperty("user.name"));
+		}
+		// search "default" profile
+		try {
+			List<Path> profilePaths = Files.list(Paths.get(defaultProfilePath))
+			    .filter(Files::isDirectory)
+			    .filter(p -> p.toString().endsWith(".default"))
+			    .collect(Collectors.toList());
+			if (profilePaths.isEmpty()) {
+				defaultProfilePath = null;
+			} else {
+				defaultProfilePath = profilePaths.get(0).toString();
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 	
@@ -512,5 +568,9 @@ public class BrowserInfo {
 			}
 		}
 		throw new ConfigurationException(String.format("Browser is not present at %s", binPath));
+	}
+
+	public String getDefaultProfilePath() {
+		return defaultProfilePath;
 	}
 }

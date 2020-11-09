@@ -193,6 +193,42 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 		
 		Assert.assertEquals(((Map<?,?>)(((ChromeOptions)capa).asMap().get(ChromeOptions.CAPABILITY))).get("args").toString(), "[--disable-translate, --disable-web-security, --no-sandbox, --disable-site-isolation-trials, --disable-features=IsolateOrigins,site-per-process, --headless, --window-size=1280,1024, --disable-gpu]");
 	}
+
+	@Test(groups={"ut"})
+	public void testCreateChromeCapabilitiesUserDefinedProfile() {
+		
+		Mockito.when(config.getChromeProfilePath()).thenReturn("/home/foo/chrome");
+		Mockito.when(config.getMode()).thenReturn(DriverMode.LOCAL);
+		
+		MutableCapabilities capa = new ChromeCapabilitiesFactory(config).createCapabilities();
+		
+		Assert.assertEquals(((Map<?,?>)(((ChromeOptions)capa).asMap().get(ChromeOptions.CAPABILITY))).get("args").toString(), "[--disable-translate, --disable-web-security, --no-sandbox, --disable-site-isolation-trials, --disable-features=IsolateOrigins,site-per-process, --user-data-dir=/home/foo/chrome]");
+	}
+	
+	@Test(groups={"ut"})
+	public void testCreateChromeCapabilitiesDefaultProfile() {
+		
+		Mockito.when(config.getChromeProfilePath()).thenReturn("default");
+		Mockito.when(config.getMode()).thenReturn(DriverMode.LOCAL);
+		
+		MutableCapabilities capa = new ChromeCapabilitiesFactory(config).createCapabilities();
+		
+		// a user data dir is configured
+		Assert.assertNotEquals(((Map<?,?>)(((ChromeOptions)capa).asMap().get(ChromeOptions.CAPABILITY))).get("args").toString(), "[--disable-translate, --disable-web-security, --no-sandbox, --disable-site-isolation-trials, --disable-features=IsolateOrigins,site-per-process, --user-data-dir=/home/foo/chrome]");
+		Assert.assertTrue(((Map<?,?>)(((ChromeOptions)capa).asMap().get(ChromeOptions.CAPABILITY))).get("args").toString().startsWith("[--disable-translate, --disable-web-security, --no-sandbox, --disable-site-isolation-trials, --disable-features=IsolateOrigins,site-per-process, --user-data-dir="));
+	}
+	
+	@Test(groups={"ut"})
+	public void testCreateChromeCapabilitiesWrongProfile() {
+		
+		Mockito.when(config.getChromeProfilePath()).thenReturn("wrongName");
+		Mockito.when(config.getMode()).thenReturn(DriverMode.LOCAL);
+		
+		MutableCapabilities capa = new ChromeCapabilitiesFactory(config).createCapabilities();
+		
+		// a user data dir is configured
+		Assert.assertEquals(((Map<?,?>)(((ChromeOptions)capa).asMap().get(ChromeOptions.CAPABILITY))).get("args").toString(), "[--disable-translate, --disable-web-security, --no-sandbox, --disable-site-isolation-trials, --disable-features=IsolateOrigins,site-per-process]");
+	}
 	
 	/**
 	 * 

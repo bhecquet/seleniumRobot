@@ -101,9 +101,9 @@ public class SeleniumTestsContext {
     public static final String INTERNAL_DEBUG = "internalDebug";
     public static final String BROWSER = "browser";								// navigateur utilisé. Sur Android, le navigateur par défaut est "Browser"
     public static final String BROWSER_VERSION = "browserVersion";				// version de navigateur utilisé
-    public static final String FIREFOX_USER_PROFILE_PATH = "firefoxUserProfilePath";	// profile utilisateur firefox
-    public static final String USE_DEFAULT_FIREFOX_PROFILE = "useFirefoxDefaultProfile";// utilisation du profile firefox par défaut
+    public static final String FIREFOX_USER_PROFILE_PATH = "firefoxUserProfilePath";	// firefox user profile
     public static final String OPERA_USER_PROFILE_PATH = "operaUserProfilePath";	// profile utilisateur opéra
+    public static final String CHROME_USER_PROFILE_PATH = "chromeUserProfilePath";	// chrome user profile
     public static final String FIREFOX_BINARY_PATH = "firefoxBinaryPath";		// chemin vers le binaire firefox (firefox portable ou pour utiliser une version spécifique
     public static final String CHROME_DRIVER_PATH = "chromeDriverPath";			// chemin vers chromeDriver si on souhaite utiliser une version différente
     public static final String GECKO_DRIVER_PATH = "geckoDriverPath";			// chemin vers chromeDriver si on souhaite utiliser une version différente
@@ -242,7 +242,6 @@ public class SeleniumTestsContext {
 	public static final boolean DEFAULT_ENABLE_JAVASCRIPT = true;
 	public static final boolean DEFAULT_SET_ACCEPT_UNTRUSTED_CERTIFICATES = true;
 	public static final boolean DEFAULT_SET_ASSUME_UNTRUSTED_CERTIFICATE_ISSUER = true;
-	public static final boolean DEFAULT_USE_DEFAULT_FIREFOX_PROFILE = true;
 	public static final String DEFAULT_BROWSER = "none";
 	public static final boolean DEFAULT_BETA_BROWSER = false;
 	public static final boolean DEFAULT_MANUAL_TEST_STEPS = false;
@@ -398,8 +397,8 @@ public class SeleniumTestsContext {
         setHeadlessBrowser(getBoolValueForTest(HEADLESS_BROWSER, System.getProperty(HEADLESS_BROWSER)));
         setBrowserVersion(getValueForTest(BROWSER_VERSION, System.getProperty(BROWSER_VERSION)));
         setFirefoxUserProfilePath(getValueForTest(FIREFOX_USER_PROFILE_PATH, System.getProperty(FIREFOX_USER_PROFILE_PATH)));
-        setUseDefaultFirefoxProfile(getBoolValueForTest(USE_DEFAULT_FIREFOX_PROFILE, System.getProperty(USE_DEFAULT_FIREFOX_PROFILE)));
         setOperaUserProfilePath(getValueForTest(OPERA_USER_PROFILE_PATH, System.getProperty(OPERA_USER_PROFILE_PATH)));
+        setChromeUserProfilePath(getValueForTest(CHROME_USER_PROFILE_PATH, System.getProperty(CHROME_USER_PROFILE_PATH)));
         setFirefoxBinary(getValueForTest(FIREFOX_BINARY_PATH, System.getProperty(FIREFOX_BINARY_PATH)));
         setChromeBinary(getValueForTest(CHROME_BINARY_PATH, System.getProperty(CHROME_BINARY_PATH)));
         setChromeDriverPath(getValueForTest(CHROME_DRIVER_PATH, System.getProperty(CHROME_DRIVER_PATH)));
@@ -1326,6 +1325,10 @@ public class SeleniumTestsContext {
     public String getOperaUserProfilePath() {
         return (String) getAttribute(OPERA_USER_PROFILE_PATH);
     }
+    
+    public String getChromeUserProfilePath() {
+    	return (String) getAttribute(CHROME_USER_PROFILE_PATH);
+    }
 
     public String getOutputDirectory() {
         return (String) getAttribute(OUTPUT_DIRECTORY);
@@ -1677,15 +1680,6 @@ public class SeleniumTestsContext {
     public void setIdMapping(Map<String, HashMap<String,String>> conf){
     	idMapping = conf;
     }    
-    
-    public boolean isUseFirefoxDefaultProfile() {
-        try {
-            return (Boolean) getAttribute(USE_DEFAULT_FIREFOX_PROFILE);
-        } catch (Exception e) {
-            return true; // Default
-        }
-
-    }
 
     public boolean isSoftAssertEnabled() {
         try {
@@ -2060,20 +2054,29 @@ public class SeleniumTestsContext {
     	setAttribute(BROWSER_VERSION, browserVersion);
     }
     
-    public void setFirefoxUserProfilePath(String ffPath) {
-    	setAttribute(FIREFOX_USER_PROFILE_PATH, ffPath);
-    }
-    
-    public void setUseDefaultFirefoxProfile(Boolean useDefaultffProfile) {
-		if (useDefaultffProfile != null) {
-			setAttribute(USE_DEFAULT_FIREFOX_PROFILE, useDefaultffProfile);
-		} else {
-			setAttribute(USE_DEFAULT_FIREFOX_PROFILE, DEFAULT_USE_DEFAULT_FIREFOX_PROFILE);
+    public void setFirefoxUserProfilePath(String path) {
+    	if (path != null && getBrowser() == BrowserType.FIREFOX) {
+    		if (new File(path).exists() || BrowserInfo.DEFAULT_BROWSER_PRODFILE.equals(path)) {
+    			setAttribute(FIREFOX_USER_PROFILE_PATH, path);
+    		} else {
+    			throw new ConfigurationException(String.format("Firefox user profile does not exist at %s", path));
+    		}
     	}
+   
     }
     
     public void setOperaUserProfilePath(String path) {
     	setAttribute(OPERA_USER_PROFILE_PATH, path);
+    }
+    
+    public void setChromeUserProfilePath(String path) {
+    	if (path != null && getBrowser() == BrowserType.CHROME) {
+    		if (new File(path).exists() || BrowserInfo.DEFAULT_BROWSER_PRODFILE.equals(path)) {
+    			setAttribute(CHROME_USER_PROFILE_PATH, path);
+    		} else {
+    			throw new ConfigurationException(String.format("Chrome user profile does not exist at %s", path));
+    		}
+    	}  		
     }
     
     public void setFirefoxBinary(String path) {

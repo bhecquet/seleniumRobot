@@ -149,6 +149,10 @@ public class DriverConfig {
             return testContext.getFirefoxUserProfilePath();
 //        }
     }
+    
+    public String getChromeProfilePath() {
+    	return testContext.getChromeUserProfilePath();
+    }
 
     public List<String> getHubUrl() {
         return testContext.getWebDriverGrid();
@@ -311,10 +315,6 @@ public class DriverConfig {
 
     public int getWebSessionTimeout() {
         return testContext.getWebSessionTimeout();
-    }
-
-    public boolean isUseFirefoxDefaultProfile() {
-        return testContext.isUseFirefoxDefaultProfile();
     }
 
     public boolean isEnableJavascript() {

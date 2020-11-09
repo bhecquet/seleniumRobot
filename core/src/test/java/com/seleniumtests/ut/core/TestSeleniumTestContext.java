@@ -680,19 +680,7 @@ public class TestSeleniumTestContext extends GenericTest {
 		SeleniumTestsContextManager.getThreadContext().setJavascriptEnabled(null);
 		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getJavascriptEnabled(), (Boolean)SeleniumTestsContext.DEFAULT_ENABLE_JAVASCRIPT);
 	}
-	
-	@Test(groups="ut context")
-	public void testUseDefaultFirefoxProfile(final ITestContext testNGCtx, final XmlTest xmlTest) {
-		initThreadContext(testNGCtx);
-		SeleniumTestsContextManager.getThreadContext().setUseDefaultFirefoxProfile(true);
-		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().isUseFirefoxDefaultProfile(), true);
-	}
-	@Test(groups="ut context")
-	public void testUseDefaultFirefoxProfileNull(final ITestContext testNGCtx, final XmlTest xmlTest) {
-		initThreadContext(testNGCtx);
-		SeleniumTestsContextManager.getThreadContext().setUseDefaultFirefoxProfile(null);
-		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().isUseFirefoxDefaultProfile(), SeleniumTestsContext.DEFAULT_USE_DEFAULT_FIREFOX_PROFILE);
-	}
+
 	
 	@Test(groups="ut context")
 	public void testCaptureSnapshot(final ITestContext testNGCtx, final XmlTest xmlTest) {

@@ -41,13 +41,13 @@ public abstract class AbstractWebDriverFactory {
         this.webDriverConfig = cfg;
         
         capsFactory = getCapabilitiesFactory();
-        driverOptions = capsFactory.createCapabilities();
         
         if (capsFactory instanceof IDesktopCapabilityFactory) {
         	selectedBrowserInfo = ((IDesktopCapabilityFactory)capsFactory).getSelectedBrowserInfo();
         } else {
         	selectedBrowserInfo = new BrowserInfo(BrowserType.NONE, "0.0");
         }
+        driverOptions = capsFactory.createCapabilities();
     }
 
     public void cleanUp() {
