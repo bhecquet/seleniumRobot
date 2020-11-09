@@ -159,7 +159,8 @@ Settings for customizing the default seleniumRobot driver features. By default, 
 | browserVersion 			|  			| Browser version to use. By default, it's the last one, or the installed one in local mode. This option has sense when using sauceLabs where browser version can be choosen | 
 | betaBrowser				| false		| If true, we search for installed beta version of browsers  |
 | headless					| false		| If true, start browser in headless mode. This is supported by chrome >= 60 and firefox >= 56  |
-| firefoxUserProfilePath 	|  			| Firefox user profile if a specific one is defined | 
+| firefoxUserProfilePath 	|  			| Firefox user profile if a specific one is defined. This path MUST exist. It can also take 'default' value. In this case, the current user profile is used. If not set, an empty temp profile is created | 
+| chromeUserProfilePath 	|  			| Chrome user profile if a specific one is defined. This path MUST exist. It can also take 'default' value. In this case, the current user profile is used. If not set, an empty temp profile is created | 
 | useFirefoxDefaultProfile	| true		| Use default firefox profile | 
 | operaUserProfilePath 		| 			| Opera user profile if a specific one is defined | 
 | firefoxBinaryPath 		| 			| Path to firefox binary if a specific one should be used (for example when using portable versions. Else, the default firefox installation is choosen | 
