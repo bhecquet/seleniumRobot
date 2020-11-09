@@ -29,6 +29,7 @@ import org.openqa.selenium.firefox.FirefoxDriverLogLevel;
 import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.firefox.FirefoxProfile;
 import org.openqa.selenium.firefox.GeckoDriverService;
+import org.openqa.selenium.firefox.ProfilesIni;
 
 import com.seleniumtests.browserfactory.customprofile.FireFoxProfileMarker;
 import com.seleniumtests.driver.BrowserType;
@@ -59,27 +60,11 @@ public class FirefoxCapabilitiesFactory extends IDesktopCapabilityFactory {
 	        options.addArguments("--height=1024");
         }
 
-        FirefoxProfile profile = getFirefoxProfile(webDriverConfig);
-        configProfile(profile, webDriverConfig);
-        options.setCapability(FirefoxDriver.PROFILE, profile);
         options.setLogLevel(FirefoxDriverLogLevel.ERROR);
         options.setPageLoadStrategy(webDriverConfig.getPageLoadStrategy());
         
         if (webDriverConfig.getDebug().contains(DebugMode.DRIVER)) {
         	options.setLogLevel(FirefoxDriverLogLevel.TRACE);
-        }
-        
-
-        // extensions
-        List<BrowserExtension> extensions = BrowserExtension.getExtensions(webDriverConfig.getTestContext().getConfiguration());
-        if (!extensions.isEmpty()) {
-        	for (BrowserExtension ext: extensions) {
-        		profile.addExtension(ext.getExtensionPath());
-        		for (Entry<String, String> entry: ext.getOptions().entrySet()) {
-        			profile.setPreference(entry.getKey(), entry.getValue());
-        		}
-        	}
-        	
         }
         
         // handle https://bugzilla.mozilla.org/show_bug.cgi?id=1429338#c4 and https://github.com/mozilla/geckodriver/issues/789
@@ -116,6 +101,22 @@ public class FirefoxCapabilitiesFactory extends IDesktopCapabilityFactory {
 		}
 		
 		((FirefoxOptions)options).setBinary(selectedBrowserInfo.getPath());
+		
+        FirefoxProfile profile = getFirefoxProfile();
+        configProfile(profile, webDriverConfig);
+        options.setCapability(FirefoxDriver.PROFILE, profile);
+        
+        // extensions
+        List<BrowserExtension> extensions = BrowserExtension.getExtensions(webDriverConfig.getTestContext().getConfiguration());
+        if (!extensions.isEmpty()) {
+        	for (BrowserExtension ext: extensions) {
+        		profile.addExtension(ext.getExtensionPath());
+        		for (Entry<String, String> entry: ext.getOptions().entrySet()) {
+        			profile.setPreference(entry.getKey(), entry.getValue());
+        		}
+        	}
+        	
+        }
 	}
 	
 
@@ -148,14 +149,6 @@ public class FirefoxCapabilitiesFactory extends IDesktopCapabilityFactory {
         profile.setPreference("dom.max_script_run_time", 0);
     }
 
-    protected FirefoxProfile createFirefoxProfile(final String path) {
-        if (path != null) {
-            return new FirefoxProfile(new File(path));
-        } else {
-            return new FirefoxProfile();
-        }
-    }
-
     /**
      * extractDefaultProfile to a folder.
      *
@@ -180,44 +173,19 @@ public class FirefoxCapabilitiesFactory extends IDesktopCapabilityFactory {
         
     }
 
-    protected synchronized FirefoxProfile getFirefoxProfile(final DriverConfig webDriverConfig) {
-        String path = webDriverConfig.getFirefoxProfilePath();
-        FirefoxProfile profile;
-// disable default profile
-//        String realPath;
-//        if (webDriverConfig.isUseFirefoxDefaultProfile()) {
-//            realPath = getFirefoxProfilePath(path);
-//        } else {
-//            realPath = null;
-//        }
+    protected synchronized FirefoxProfile getFirefoxProfile() {
 
-        profile = createFirefoxProfile(path);
-        return profile;
-    }
-
-    protected String getFirefoxProfilePath(String path) {
-        String realPath;
-        
-        if (path == null) {
-        	try {
-                String profilePath = this.getClass().getResource("/").getPath() + "ffprofile";
-                profilePath = FileUtility.decodePath(profilePath);
-
-                extractDefaultProfile(profilePath);
-                realPath = profilePath +  "/profiles/customProfileDirCUSTFF";
-
-            } catch (Exception e) {
-            	logger.error(e);
-                realPath = null;
-            }
-        } else {
-        	realPath = path;
-        	if (!new File(path).exists()) {
-        		logger.info("Firefox profile path:" + path + " not found, use default");
+        if (webDriverConfig.getFirefoxProfilePath() != null) {
+        	if (!BrowserInfo.DEFAULT_BROWSER_PRODFILE.equals(webDriverConfig.getFirefoxProfilePath()) && (webDriverConfig.getFirefoxProfilePath().contains("/") || webDriverConfig.getFirefoxProfilePath().contains("\\"))) {
+        		return new FirefoxProfile(new File(webDriverConfig.getFirefoxProfilePath()));
+        	} else if (selectedBrowserInfo.getDefaultProfilePath() != null) {
+        		ProfilesIni init=new ProfilesIni();
+        		return init.getProfile("default");
+        	} else {
+        		logger.warn(String.format("Firefox profile %s could not be set", webDriverConfig.getFirefoxProfilePath()));
         	}
         }
-
-        logger.info("Firefox Profile: " + realPath);
-        return realPath;
+        return new FirefoxProfile();
     }
+
 }

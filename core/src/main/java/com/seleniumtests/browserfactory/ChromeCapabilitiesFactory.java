@@ -17,6 +17,7 @@
  */
 package com.seleniumtests.browserfactory;
 
+import java.io.File;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -145,6 +146,16 @@ public class ChromeCapabilitiesFactory extends IDesktopCapabilityFactory {
 	@Override
 	protected void updateOptionsWithSelectedBrowserInfo(MutableCapabilities options) {
 		((ChromeOptions)options).setBinary(selectedBrowserInfo.getPath());
+		
+        if (webDriverConfig.getChromeProfilePath() != null) {
+        	if (!BrowserInfo.DEFAULT_BROWSER_PRODFILE.equals(webDriverConfig.getChromeProfilePath()) && (webDriverConfig.getChromeProfilePath().contains("/") || webDriverConfig.getChromeProfilePath().contains("\\"))) {
+        		((ChromeOptions)options).addArguments("--user-data-dir=" + webDriverConfig.getChromeProfilePath()); // e.g: C:\\Users\\MyUser\\AppData\\Local\\Google\\Chrome\\User Data
+        	} else if (BrowserInfo.DEFAULT_BROWSER_PRODFILE.equals(webDriverConfig.getChromeProfilePath())) {
+        		((ChromeOptions)options).addArguments("--user-data-dir=" + selectedBrowserInfo.getDefaultProfilePath()); 
+        	} else {
+        		logger.warn(String.format("Chrome profile %s could not be set", webDriverConfig.getChromeProfilePath()));
+        	}
+        }
 	}
 
 	@Override

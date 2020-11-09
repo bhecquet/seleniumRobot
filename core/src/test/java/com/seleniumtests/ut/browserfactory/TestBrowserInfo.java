@@ -373,5 +373,59 @@ public class TestBrowserInfo extends MockitoTest {
 		
 		BrowserInfo.getInfoFromBinary("/home/tu/chrome3", Arrays.asList(bi1, bi2));
 	}
+	
+	@Test(groups={"ut"})
+	public void testGetDefaultChromeWindowsProfile() throws Exception {
+		PowerMockito.mockStatic(OSUtility.class);
+		when(OSUtility.getCurrentPlatorm()).thenReturn(Platform.WINDOWS);
+		
+		BrowserInfo bi = new BrowserInfo(BrowserType.CHROME, "58.0", null);
+		Assert.assertTrue(bi.getDefaultProfilePath().replace("\\",  "/").matches("C:/Users/.*?/AppData/Local/Google/Chrome/User Data"));
+	}
+	
+	@Test(groups={"ut"})
+	public void testGetDefaultChromeLinuxsProfile() throws Exception {
+		PowerMockito.mockStatic(OSUtility.class);
+		when(OSUtility.getCurrentPlatorm()).thenReturn(Platform.LINUX);
+		
+		BrowserInfo bi = new BrowserInfo(BrowserType.CHROME, "58.0", null);
+		Assert.assertTrue(bi.getDefaultProfilePath().matches("/home/.*?/.config/google-chrome/default"));
+	}
+	
+	@Test(groups={"ut"})
+	public void testGetDefaultChromeMacProfile() throws Exception {
+		PowerMockito.mockStatic(OSUtility.class);
+		when(OSUtility.getCurrentPlatorm()).thenReturn(Platform.MAC);
+		
+		BrowserInfo bi = new BrowserInfo(BrowserType.CHROME, "58.0", null);
+		Assert.assertTrue(bi.getDefaultProfilePath().matches("/Users/.*?/Library/Application Support/Google/Chrome"));
+	}
+	
+	@Test(groups={"ut"})
+	public void testGetDefaultFirefoxWindowsProfile() throws Exception {
+		PowerMockito.mockStatic(OSUtility.class);
+		when(OSUtility.getCurrentPlatorm()).thenReturn(Platform.WINDOWS);
+		
+		BrowserInfo bi = new BrowserInfo(BrowserType.FIREFOX, "58.0", null);
+		Assert.assertTrue(bi.getDefaultProfilePath().replace("\\",  "/").matches("C:/Users/.*?/AppData/Roaming/Mozilla/Firefox/Profiles/.*\\.default"));
+	}
+	
+	@Test(groups={"ut"})
+	public void testGetDefaultFirefoxLinuxsProfile() throws Exception {
+		PowerMockito.mockStatic(OSUtility.class);
+		when(OSUtility.getCurrentPlatorm()).thenReturn(Platform.LINUX);
+		
+		BrowserInfo bi = new BrowserInfo(BrowserType.FIREFOX, "58.0", null);
+		Assert.assertTrue(bi.getDefaultProfilePath().matches("/home/.*?/.mozilla/firefox"));
+	}
+	
+	@Test(groups={"ut"})
+	public void testGetDefaultFirefoxMacProfile() throws Exception {
+		PowerMockito.mockStatic(OSUtility.class);
+		when(OSUtility.getCurrentPlatorm()).thenReturn(Platform.MAC);
+		
+		BrowserInfo bi = new BrowserInfo(BrowserType.FIREFOX, "58.0", null);
+		Assert.assertTrue(bi.getDefaultProfilePath().matches("/Users/.*?/Library/Application Support/Firefox/Profiles/"));
+	}
 
 }
