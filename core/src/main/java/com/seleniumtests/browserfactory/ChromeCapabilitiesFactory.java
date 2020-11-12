@@ -162,4 +162,17 @@ public class ChromeCapabilitiesFactory extends IDesktopCapabilityFactory {
 	protected BrowserType getBrowserType() {
 		return BrowserType.CHROME;
 	}
+
+	@Override
+	protected void updateGridOptionsWithSelectedBrowserInfo(MutableCapabilities options) {
+		if (webDriverConfig.getChromeProfilePath() != null) {
+        	if (!BrowserInfo.DEFAULT_BROWSER_PRODFILE.equals(webDriverConfig.getChromeProfilePath()) && (webDriverConfig.getChromeProfilePath().contains("/") || webDriverConfig.getChromeProfilePath().contains("\\"))) {
+        		((ChromeOptions)options).addArguments("--user-data-dir=" + webDriverConfig.getChromeProfilePath()); // e.g: C:\\Users\\MyUser\\AppData\\Local\\Google\\Chrome\\User Data
+        	} else if (BrowserInfo.DEFAULT_BROWSER_PRODFILE.equals(webDriverConfig.getChromeProfilePath())) {
+        		options.setCapability("chromeProfile", BrowserInfo.DEFAULT_BROWSER_PRODFILE);
+        	} else {
+        		logger.warn(String.format("Chrome profile %s could not be set", webDriverConfig.getChromeProfilePath()));
+        	}
+        }
+	}
 }

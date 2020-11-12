@@ -101,12 +101,14 @@ public abstract class IDesktopCapabilityFactory extends ICapabilitiesFactory {
 				updateOptionsWithSelectedBrowserInfo(options);
 			} catch (UnsupportedEncodingException e) {
 			}
+        } else if (webDriverConfig.getMode() == DriverMode.GRID) {
+        	// add node tags
+            if (webDriverConfig.getNodeTags().size() > 0) {
+            	options.setCapability(SeleniumRobotCapabilityType.NODE_TAGS, webDriverConfig.getNodeTags());
+            }
+            updateGridOptionsWithSelectedBrowserInfo(options);
         }
 
-        // add node tags
-        if (webDriverConfig.getNodeTags().size() > 0 && webDriverConfig.getMode() == DriverMode.GRID) {
-        	options.setCapability(SeleniumRobotCapabilityType.NODE_TAGS, webDriverConfig.getNodeTags());
-        }
         if (webDriverConfig.getTestContext() != null && webDriverConfig.getTestContext().getTestNGResult() != null) {
         	String testName = TestNGResultUtils.getTestName(webDriverConfig.getTestContext().getTestNGResult());
             options.setCapability(DriverUsage.TEST_NAME, testName);
@@ -126,6 +128,8 @@ public abstract class IDesktopCapabilityFactory extends ICapabilitiesFactory {
     protected abstract String getBrowserBinaryPath();
     
     protected abstract void updateOptionsWithSelectedBrowserInfo(MutableCapabilities options);
+    
+    protected abstract void updateGridOptionsWithSelectedBrowserInfo(MutableCapabilities options);
  
     private MutableCapabilities updateDefaultCapabilities() {
 
