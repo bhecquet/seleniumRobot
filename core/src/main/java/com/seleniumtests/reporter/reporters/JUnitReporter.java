@@ -9,6 +9,7 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
@@ -18,6 +19,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.TimeZone;
+import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.testng.IReporter;
@@ -36,127 +38,109 @@ import org.testng.reporters.XMLConstants;
 import org.testng.reporters.XMLStringBuffer;
 import org.testng.xml.XmlSuite;
 
+import com.seleniumtests.customexception.CustomSeleniumTestsException;
+import com.seleniumtests.util.StringUtility;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
-public class JUnitReporter implements IReporter {
+public class JUnitReporter extends CommonReporter {
 	
 	private static Logger logger = SeleniumRobotLogger.getLogger(JUnitReporter.class);
 	
 	@Override
-	public void generateReport(List<XmlSuite> xmlSuites, List<ISuite> suites, String defaultOutputDirectory) {
+	protected void generateReport(Map<ITestContext, Set<ITestResult>> resultSet, final String outdir, boolean optimizeReport, boolean finalGeneration) {
+		for (Entry<ITestContext, Set<ITestResult>> entry: resultSet.entrySet()) {
+			generateTestReport(entry.getKey(), entry.getValue(), outdir);
+		}
+	}
+	
+	private void generateTestReport(ITestContext testContext, Set<ITestResult> testResults, String outdir) {
 
-		logger.info("generating JUnit report");
-		
-		Map<Class<?>, Set<ITestResult>> results = Maps.newHashMap();
-		ListMultiMap<Object, ITestResult> befores = Maps.newListMultiMap();
-		ListMultiMap<Object, ITestResult> afters = Maps.newListMultiMap();
-		SetMultiMap<Class<?>, ITestNGMethod> mapping = new SetMultiMap(false);
-		for (ISuite suite : suites) {
-			Map<String, ISuiteResult> suiteResults = suite.getResults();
-			addMapping(mapping, suite.getExcludedMethods());
-			for (ISuiteResult sr : suiteResults.values()) {
-				ITestContext tc = sr.getTestContext();
-				addResults(tc.getPassedTests().getAllResults(), results);
-				addResults(tc.getFailedTests().getAllResults(), results);
-				addResults(tc.getSkippedTests().getAllResults(), results);
-				addResults(tc.getFailedConfigurations().getAllResults(), results);
-				for (ITestResult tr : tc.getPassedConfigurations().getAllResults()) {
-					if (tr.getMethod().isBeforeMethodConfiguration()) {
-						befores.put(tr.getInstance(), tr);
-					}
-					if (tr.getMethod().isAfterMethodConfiguration()) {
-						afters.put(tr.getInstance(), tr);
-					}
+		Properties p1 = new Properties();
+		p1.setProperty(XMLConstants.ATTR_NAME, testContext.getName());
+		p1.setProperty(XMLConstants.ATTR_TIMESTAMP, timeAsGmt());
+
+		List<TestTag> testCases = Lists.newArrayList();
+		int failures = 0;
+		int errors = 0;
+		int skipped = 0;
+		int testCount = 0;
+		float totalTime = 0;
+
+		Collection<ITestResult> iTestResults = sort(testResults);
+
+		for (ITestResult tr : iTestResults) {
+
+			long time = tr.getEndMillis() - tr.getStartMillis();
+
+			Throwable t = tr.getThrowable();
+			switch (tr.getStatus()) {
+			case ITestResult.SKIP:
+			case ITestResult.SUCCESS_PERCENTAGE_FAILURE:
+				skipped++;
+				break;
+
+			case ITestResult.FAILURE:
+				if (t instanceof AssertionError) {
+					failures++;
+				} else {
+					errors++;
 				}
+				break;
 			}
+
+			totalTime += time;
+			testCount++;
+			TestTag testTag = createTestTagFor(tr, tr.getMethod().getTestClass().getName());
+			testTag.properties.setProperty(XMLConstants.ATTR_TIME, "" + formatTime(time));
+			testCases.add(testTag);
+		}
+		int ignored = getDisabledTestCount(testContext.getExcludedMethods());
+
+		for (ITestNGMethod eachMethod : testContext.getExcludedMethods()) {
+			testCases.add(createIgnoredTestTagFor(eachMethod));
 		}
 
-		for (Map.Entry<Class<?>, Set<ITestResult>> entry : results.entrySet()) {
-			Class<?> cls = entry.getKey();
-			Properties p1 = new Properties();
-			p1.setProperty(XMLConstants.ATTR_NAME, cls.getName());
-			p1.setProperty(XMLConstants.ATTR_TIMESTAMP, timeAsGmt());
-
-			List<TestTag> testCases = Lists.newArrayList();
-			int failures = 0;
-			int errors = 0;
-			int skipped = 0;
-			int testCount = 0;
-			float totalTime = 0;
-
-			Collection<ITestResult> iTestResults = sort(entry.getValue());
-
-			for (ITestResult tr : iTestResults) {
-
-				long time = tr.getEndMillis() - tr.getStartMillis();
-
-				Throwable t = tr.getThrowable();
-				switch (tr.getStatus()) {
-				case ITestResult.SKIP:
-				case ITestResult.SUCCESS_PERCENTAGE_FAILURE:
-					skipped++;
-					break;
-
-				case ITestResult.FAILURE:
-					if (t instanceof AssertionError) {
-						failures++;
-					} else {
-						errors++;
-					}
-					break;
-				}
-
-				totalTime += time;
-				testCount++;
-				TestTag testTag = createTestTagFor(tr, cls);
-				testTag.properties.setProperty(XMLConstants.ATTR_TIME, "" + formatTime(time));
-				testCases.add(testTag);
-			}
-			int ignored = getDisabledTestCount(mapping.get(entry.getKey()));
-
-			for (ITestNGMethod eachMethod : mapping.get(entry.getKey())) {
-				testCases.add(createIgnoredTestTagFor(eachMethod));
-			}
-
-			p1.setProperty(XMLConstants.ATTR_FAILURES, Integer.toString(failures));
-			p1.setProperty(XMLConstants.ATTR_ERRORS, Integer.toString(errors));
-			p1.setProperty(XMLConstants.SKIPPED, Integer.toString(skipped + ignored));
-			p1.setProperty(XMLConstants.ATTR_NAME, cls.getName());
-			p1.setProperty(XMLConstants.ATTR_TESTS, Integer.toString(testCount + ignored));
-			p1.setProperty(XMLConstants.ATTR_TIME, "" + formatTime(totalTime));
-			try {
-				p1.setProperty(XMLConstants.ATTR_HOSTNAME, InetAddress.getLocalHost().getHostName());
-			} catch (UnknownHostException e) {
-				// ignore
-			}
-
-			//
-			// Now that we have all the information we need, generate the file
-			//
-			XMLStringBuffer xsb = new XMLStringBuffer();
-			xsb.addComment("Generated by " + getClass().getName());
-
-			xsb.push(XMLConstants.TESTSUITE, p1);
-			for (TestTag testTag : testCases) {
-				if (putElement(xsb, XMLConstants.TESTCASE, testTag.properties, testTag.childTag != null)) {
-					Properties p = new Properties();
-					safeSetProperty(p, XMLConstants.ATTR_MESSAGE, testTag.message);
-					safeSetProperty(p, XMLConstants.ATTR_TYPE, testTag.type);
-
-					if (putElement(xsb, testTag.childTag, p, testTag.stackTrace != null)) {
-						xsb.addCDATA(testTag.stackTrace);
-						xsb.pop(testTag.childTag);
-					}
-					xsb.pop(XMLConstants.TESTCASE);
-				}
-			}
-			xsb.pop(XMLConstants.TESTSUITE);
-
-			String outputDirectory = defaultOutputDirectory + File.separator + "junitreports";
-			logger.info(String.format("generated report: %s/%s", outputDirectory, getFileName(cls)));
-			Utils.writeUtf8File(outputDirectory, getFileName(cls), xsb.toXML());
+		p1.setProperty(XMLConstants.ATTR_FAILURES, Integer.toString(failures));
+		p1.setProperty(XMLConstants.ATTR_ERRORS, Integer.toString(errors));
+		p1.setProperty(XMLConstants.SKIPPED, Integer.toString(skipped + ignored));
+		p1.setProperty(XMLConstants.ATTR_NAME, testContext.getName());
+		p1.setProperty(XMLConstants.ATTR_TESTS, Integer.toString(testCount + ignored));
+		p1.setProperty(XMLConstants.ATTR_TIME, "" + formatTime(totalTime));
+		try {
+			p1.setProperty(XMLConstants.ATTR_HOSTNAME, InetAddress.getLocalHost().getHostName());
+		} catch (UnknownHostException e) {
+			// ignore
 		}
 
+		//
+		// Now that we have all the information we need, generate the file
+		//
+		XMLStringBuffer xsb = new XMLStringBuffer();
+		xsb.addComment("Generated by " + getClass().getName());
+
+		xsb.push(XMLConstants.TESTSUITE, p1);
+		for (TestTag testTag : testCases) {
+			if (putElement(xsb, XMLConstants.TESTCASE, testTag.properties, testTag.childTag != null)) {
+				Properties p = new Properties();
+				safeSetProperty(p, XMLConstants.ATTR_MESSAGE, testTag.message);
+				safeSetProperty(p, XMLConstants.ATTR_TYPE, testTag.type);
+
+				if (putElement(xsb, testTag.childTag, p, testTag.stackTrace != null)) {
+					xsb.addCDATA(testTag.stackTrace);
+					xsb.pop(testTag.childTag);
+				}
+				if (putElement(xsb, testTag.logTag, p, testTag.logs != null)) {
+					xsb.addCDATA(testTag.logs);
+					xsb.pop(testTag.logTag);
+				}
+				xsb.pop(XMLConstants.TESTCASE);
+			}
+		}
+		xsb.pop(XMLConstants.TESTSUITE);
+
+		String outputDirectory = outdir + File.separator + "junitreports";
+		logger.info(String.format("generated report: %s/%s", outputDirectory, getFileName(testContext.getName())));
+		Utils.writeUtf8File(outputDirectory, getFileName(testContext.getName()), xsb.toXML());
 	}
 	
 	private String timeAsGmt() {
@@ -178,7 +162,7 @@ public class JUnitReporter implements IReporter {
 		return sortedResults;
 	}
 
-	private static int getDisabledTestCount(Set<ITestNGMethod> methods) {
+	private static int getDisabledTestCount(Collection<ITestNGMethod> methods) {
 		int count = 0;
 		for (ITestNGMethod method : methods) {
 			if (!method.getEnabled()) {
@@ -198,31 +182,44 @@ public class JUnitReporter implements IReporter {
 		return testTag;
 	}
 
-	private TestTag createTestTagFor(ITestResult tr, Class<?> cls) {
+	private TestTag createTestTagFor(ITestResult tr, String className) {
 		TestTag testTag = new TestTag();
 
 		Properties p2 = new Properties();
-		p2.setProperty(XMLConstants.ATTR_CLASSNAME, cls.getName());
+		p2.setProperty(XMLConstants.ATTR_CLASSNAME, className);
 		p2.setProperty(XMLConstants.ATTR_NAME, getTestName(tr));
 		int status = tr.getStatus();
 		if (status == ITestResult.SKIP || status == ITestResult.SUCCESS_PERCENTAGE_FAILURE) {
 			testTag.childTag = XMLConstants.SKIPPED;
 		} else if (status == ITestResult.FAILURE) {
-			handleFailure(testTag, tr.getThrowable());
+			handleFailure(testTag, tr);
 		}
+		handleLogs(testTag, tr);
+		
 		testTag.properties = p2;
 		return testTag;
 	}
+	
+	private static void handleLogs(TestTag testTag, ITestResult testResult) {
+		String logs = SeleniumRobotLogger.getTestLogs().get(getTestName(testResult));
+		try {
+			testTag.logs = logs == null ? "Test skipped": StringUtility.encodeString(logs, "xml");
+		} catch (CustomSeleniumTestsException e) {
+			testTag.logs = logs;
+		}
+	}
 
-	private static void handleFailure(TestTag testTag, Throwable t) {
-		testTag.childTag = t instanceof AssertionError ? XMLConstants.FAILURE : XMLConstants.ERROR;
-		if (t != null) {
-			StringWriter sw = new StringWriter();
-			PrintWriter pw = new PrintWriter(sw);
-			t.printStackTrace(pw);
-			testTag.message = t.getMessage();
-			testTag.type = t.getClass().getName();
-			testTag.stackTrace = sw.toString();
+	private static void handleFailure(TestTag testTag, ITestResult testResult) {
+		testTag.childTag = testResult.getThrowable() instanceof AssertionError ? XMLConstants.FAILURE : XMLConstants.ERROR;
+		if (testResult.getThrowable() != null) {
+			
+
+			StringBuilder stackString = new StringBuilder();
+			generateTheStackTrace(testResult.getThrowable(), testResult.getThrowable().getMessage(), stackString, "xml");
+
+			testTag.message = testResult.getThrowable().getMessage();
+			testTag.type = testResult.getThrowable().getClass().getName();
+			testTag.stackTrace = stackString.toString();
 		}
 	}
 
@@ -246,35 +243,8 @@ public class JUnitReporter implements IReporter {
 		}
 	}
 
-	/**
-	 * Add the time of the configuration method to this test method.
-	 *
-	 * The only problem with this method is that the timing of a test method might
-	 * not be added to the time of the same configuration method that ran before it
-	 * but since they should all be equivalent, this should never be an issue.
-	 */
-	private long getNextConfiguration(ListMultiMap<Object, ITestResult> configurations, ITestResult tr) {
-		long result = 0;
-
-		List<ITestResult> confResults = configurations.get(tr.getInstance());
-		Map<ITestNGMethod, ITestResult> seen = Maps.newHashMap();
-		for (ITestResult r : confResults) {
-			if (!seen.containsKey(r.getMethod())) {
-				result += r.getEndMillis() - r.getStartMillis();
-				seen.put(r.getMethod(), r);
-			}
-		}
-		confResults.removeAll(seen.values());
-
-		return result;
-	}
-
-	protected String getFileName(Class cls) {
-		return "TEST-" + cls.getName() + ".xml";
-	}
-
-	protected String getTestName(ITestResult tr) {
-		return tr.getMethod().getMethodName();
+	protected String getFileName(String name) {
+		return "TEST-" + name + ".xml";
 	}
 
 	private String formatTime(float time) {
@@ -290,8 +260,10 @@ public class JUnitReporter implements IReporter {
 		public Properties properties;
 		public String message;
 		public String type;
+		public String logs = "";
 		public String stackTrace;
 		String childTag;
+		String logTag = XMLConstants.SYSTEM_OUT;
 	}
 
 	private void addResults(Set<ITestResult> allResults, Map<Class<?>, Set<ITestResult>> out) {

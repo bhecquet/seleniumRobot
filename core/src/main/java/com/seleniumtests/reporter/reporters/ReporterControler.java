@@ -94,7 +94,11 @@ public class ReporterControler implements IReporter {
 			}
 
 			try {
-				new JUnitReporter().generateReport(xmlSuites, suites, SeleniumTestsContextManager.getGlobalContext().getOutputDirectory());
+				if (suiteFinished) {
+					new JUnitReporter().generateReport(xmlSuites, suites, SeleniumTestsContextManager.getGlobalContext().getOutputDirectory());
+				} else {
+					new JUnitReporter().generateReport(resultSet, SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), true);
+				}
 			} catch (Exception e) {
 				logger.error("Error generating JUnit report", e);
 			}
