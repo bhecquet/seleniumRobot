@@ -58,7 +58,7 @@ public class ReporterTest extends ConnectorsTest {
 		StatisticsStorage.reset();
 	}
 	
-	protected TestNG executeSubTest(String[] testClasses) throws IOException {
+	protected List<String> executeSubTest(String[] testClasses) throws IOException {
 		return executeSubTest(1, testClasses);
 	}
 	
@@ -67,7 +67,7 @@ public class ReporterTest extends ConnectorsTest {
 	 * a report is generated
 	 * @throws IOException 
 	 */
-	protected TestNG executeSubTest(int threadCount, String[] testClasses) throws IOException {
+	protected List<String> executeSubTest(int threadCount, String[] testClasses) throws IOException {
 		return executeSubTest(threadCount, testClasses, XmlSuite.ParallelMode.METHODS, new String[] {});
 	}
 	
@@ -80,8 +80,10 @@ public class ReporterTest extends ConnectorsTest {
 	 * @return
 	 * @throws IOException
 	 */
-	public static TestNG executeSubTest(int threadCount, String[] testClasses, XmlSuite.ParallelMode parallelMode, String[] methods) throws IOException {
+	public static List<String> executeSubTest(int threadCount, String[] testClasses, XmlSuite.ParallelMode parallelMode, String[] methods) throws IOException {
 //		TestListener testListener = new TestListener();
+		
+		List<String> testList = new ArrayList<>();
 		
 		XmlSuite suite = new XmlSuite();
 		suite.setName("TmpSuite");
@@ -103,6 +105,7 @@ public class ReporterTest extends ConnectorsTest {
 		for (String testClass: testClasses) {
 			XmlTest test = new XmlTest(suite);
 			test.setName(String.format("%s_%d", testClass.substring(testClass.lastIndexOf(".") + 1), new Random().nextInt()));
+			testList.add(test.getName());
 			test.addParameter(SeleniumTestsContext.BROWSER, "none");
 			List<XmlClass> classes = new ArrayList<XmlClass>();
 			XmlClass xmlClass = new XmlClass(testClass);
@@ -122,7 +125,7 @@ public class ReporterTest extends ConnectorsTest {
 		tng.setOutputDirectory(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory());
 		tng.run(); 
 		
-		return tng;
+		return testList;
 	}
 	
 	public static TestNG executeMultiSuites(String[] testClasses, String[] methods) throws IOException {

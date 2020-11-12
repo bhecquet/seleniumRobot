@@ -19,11 +19,12 @@ package com.seleniumtests.it.reporter;
 
 import java.io.File;
 import java.nio.file.Paths;
+import java.util.List;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.testng.Assert;
 import org.testng.ITestContext;
+import org.testng.TestNG;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.Test;
 import org.testng.xml.XmlSuite.ParallelMode;
@@ -31,7 +32,6 @@ import org.testng.xml.XmlSuite.ParallelMode;
 import com.seleniumtests.connectors.selenium.SeleniumRobotSnapshotServerConnector;
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
-import com.seleniumtests.reporter.reporters.CustomReporter;
 
 /**
  * Test that default reporting contains results.json file (CustomReporter.java) with default summary reports defined in SeleniumTestsContext.DEFAULT_CUSTOM_SUMMARY_REPORTS
@@ -61,40 +61,41 @@ public class TestJUnitReporter extends ReporterTest {
 	public void testMultithreadTestReport() throws Exception {
 		
 		SeleniumTestsContextManager.removeThreadContext();
-		executeSubTest(3, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass", "com.seleniumtests.it.stubclasses.StubTestClassForDataProvider", "com.seleniumtests.it.stubclasses.StubTestClass2", "com.seleniumtests.it.stubclasses.StubTestClass3"}, ParallelMode.TESTS, new String[] {});
+		List<String> testList = executeSubTest(3, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass", "com.seleniumtests.it.stubclasses.StubTestClassForDataProvider", "com.seleniumtests.it.stubclasses.StubTestClass2", "com.seleniumtests.it.stubclasses.StubTestClass3"}, ParallelMode.TESTS, new String[] {});
 		
 		String outDir = new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath();
-		Assert.assertTrue(Paths.get(outDir, "junitreports", "TEST-com.seleniumtests.it.stubclasses.StubTestClass.xml").toFile().exists());
-		Assert.assertTrue(Paths.get(outDir, "junitreports", "TEST-com.seleniumtests.it.stubclasses.StubTestClass2.xml").toFile().exists());
-		Assert.assertTrue(Paths.get(outDir, "junitreports", "TEST-com.seleniumtests.it.stubclasses.StubTestClass3.xml").toFile().exists());
-		Assert.assertTrue(Paths.get(outDir, "junitreports", "TEST-com.seleniumtests.it.stubclasses.StubTestClassForDataProvider.xml").toFile().exists());
+		for (String testName: testList) {
+			Assert.assertTrue(Paths.get(outDir, "junitreports", String.format("TEST-%s.xml", testName)).toFile().exists());
+		}
+		Assert.assertEquals(testList.size(), 4);
 	}
 	
 	@Test(groups={"it"})
 	public void testReportGeneration(ITestContext testContext) throws Exception {
 
-		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions", "testInError", "testWithException"});
+		List<String> testList = executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions", "testInError", "testWithException"});
+		
 		String outDir = new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath();
 
 		// check all files are generated with the right name
-		Assert.assertTrue(Paths.get(outDir, "junitreports", "TEST-com.seleniumtests.it.stubclasses.StubTestClass.xml").toFile().exists());
+		for (String testName: testList) {
+			Assert.assertTrue(Paths.get(outDir, "junitreports", String.format("TEST-%s.xml", testName)).toFile().exists());
+		}
 	}
 	
 	@Test(groups={"it"})
 	public void testReportContent(ITestContext testContext) throws Exception {
 
-		executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClass", "com.seleniumtests.it.stubclasses.StubTestClass2"});
+		List<String> testList = executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"});
 		String outDir = new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath();
 		
-		String result = FileUtils.readFileToString(Paths.get(outDir, "junitreports", "TEST-com.seleniumtests.it.stubclasses.StubTestClass.xml").toFile());
+		String result = FileUtils.readFileToString(Paths.get(outDir, "junitreports", String.format("TEST-%s.xml", testList.get(0))).toFile());
 		Assert.assertTrue(result.contains("<failure type=\"java.lang.AssertionError\" message=\"error\">"));
 		Assert.assertTrue(result.contains("<error type=\"com.seleniumtests.customexception.DriverExceptions\" message=\"some exception\">"));
 		Assert.assertTrue(result.contains("name=\"testAndSubActions\""));
 		Assert.assertTrue(result.contains("name=\"testWithException\""));
 		Assert.assertTrue(result.contains("name=\"testInError\""));
-		
-		Assert.assertTrue(Paths.get(outDir, "junitreports", "TEST-com.seleniumtests.it.stubclasses.StubTestClass2.xml").toFile().exists());
-		
+	
 	}
 	
 
@@ -116,11 +117,11 @@ public class TestJUnitReporter extends ReporterTest {
 			createServerMock("GET", SeleniumRobotSnapshotServerConnector.TESTCASEINSESSION_API_URL + "15", 200, "{'testSteps': [], 'computed': true, 'isOkWithSnapshots': false}");		
 			
 			SeleniumTestsContextManager.removeThreadContext();
-			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions"});
+			List<String> testList = executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions"});
 			
 			// check there are 2 results. first one is the selenium test (OK) and second one is the snapshot comparison (KO)
 			String outDir = new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath();
-			String result = FileUtils.readFileToString(Paths.get(outDir, "junitreports", "TEST-com.seleniumtests.it.stubclasses.StubTestClass.xml").toFile());
+			String result = FileUtils.readFileToString(Paths.get(outDir, "junitreports", String.format("TEST-%s.xml", testList.get(0))).toFile());
 			Assert.assertTrue(result.contains("tests=\"2\""));
 			Assert.assertTrue(result.contains("errors=\"1\""));
 			Assert.assertTrue(result.contains("<error type=\"com.seleniumtests.customexception.ScenarioException\" message=\"Snapshot comparison failed\">"));
@@ -152,11 +153,11 @@ public class TestJUnitReporter extends ReporterTest {
 			createServerMock("GET", SeleniumRobotSnapshotServerConnector.TESTCASEINSESSION_API_URL + "15", 200, "{'testSteps': [], 'computed': true, 'isOkWithSnapshots': false}");		
 			
 			SeleniumTestsContextManager.removeThreadContext();
-			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions"});
+			List<String> testList = executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions"});
 			
 			// check there are 2 results. first one is the selenium test (OK) and second one is the snapshot comparison (KO)
 			String outDir = new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath();
-			String result = FileUtils.readFileToString(Paths.get(outDir, "junitreports", "TEST-com.seleniumtests.it.stubclasses.StubTestClass.xml").toFile());
+			String result = FileUtils.readFileToString(Paths.get(outDir, "junitreports", String.format("TEST-%s.xml", testList.get(0))).toFile());
 			Assert.assertTrue(result.contains("tests=\"1\""));
 			Assert.assertTrue(result.contains("errors=\"1\""));
 			Assert.assertTrue(result.contains("<error type=\"com.seleniumtests.customexception.ScenarioException\" message=\"Snapshot comparison failed\">"));
