@@ -265,9 +265,15 @@ public class OSUtilityWindows extends OSUtility {
 			browserList.put(BrowserType.INTERNET_EXPLORER, Arrays.asList(new BrowserInfo(BrowserType.INTERNET_EXPLORER, extractIEVersion(version), null)));
 		} catch (Win32Exception | ConfigurationException e) {}
 		
-		// look for edge
+		// look for edge legacy
 		try {
 			String version = Advapi32Util.registryGetStringValue(WinReg.HKEY_CURRENT_USER, "Software\\Microsoft\\MicrosoftEdge\\Main", "EdgeSwitchingOSBuildNumber");
+			browserList.put(BrowserType.EDGE, Arrays.asList(new BrowserInfo(BrowserType.EDGE, extractEdgeVersion(version), null)));
+		} catch (Win32Exception | ConfigurationException e) {}
+		
+		// look for edge chromium
+		try {
+			String version = OSCommand.executeCommandAndWait("powershell.exe \"(Get-AppxPackage Microsoft.MicrosoftEdge).Version\"");
 			browserList.put(BrowserType.EDGE, Arrays.asList(new BrowserInfo(BrowserType.EDGE, extractEdgeVersion(version), null)));
 		} catch (Win32Exception | ConfigurationException e) {}
 		
