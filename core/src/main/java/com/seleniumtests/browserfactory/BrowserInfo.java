@@ -333,6 +333,7 @@ public class BrowserInfo {
 		}
 		// search "default" profile
 		try {
+
 			List<Path> profilePaths = Files.list(Paths.get(defaultProfilePath))
 			    .filter(Files::isDirectory)
 			    .filter(p -> p.toString().endsWith(".default"))

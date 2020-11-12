@@ -42,6 +42,7 @@ import org.testng.annotations.Test;
 import com.seleniumtests.MockitoTest;
 import com.seleniumtests.browserfactory.BrowserInfo;
 import com.seleniumtests.browserfactory.ChromeCapabilitiesFactory;
+import com.seleniumtests.browserfactory.FirefoxCapabilitiesFactory;
 import com.seleniumtests.browserfactory.SeleniumRobotCapabilityType;
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.driver.BrowserType;
@@ -311,5 +312,56 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 		MutableCapabilities capa = new ChromeCapabilitiesFactory(config).createCapabilities();
 		
 		Assert.assertEquals(((Map<?,?>)(((ChromeOptions)capa).asMap().get(ChromeOptions.CAPABILITY))).get("args").toString(), "[--user-agent=CHROME 55, --disable-translate, --disable-web-security, --no-sandbox, --disable-site-isolation-trials, --disable-features=IsolateOrigins,site-per-process]");
+	}
+	
+
+	@Test(groups={"ut"})
+	public void testCreateChromeCapabilitiesWithDefaultProfileGrid() {
+		
+		Mockito.when(config.getMode()).thenReturn(DriverMode.GRID);
+		Mockito.when(config.getChromeProfilePath()).thenReturn(BrowserInfo.DEFAULT_BROWSER_PRODFILE);
+		
+		MutableCapabilities capa = new ChromeCapabilitiesFactory(config).createCapabilities();
+		
+		// check 'chromeProfile' is set to 'default'
+		Assert.assertEquals(capa.getCapability("chromeProfile"), BrowserInfo.DEFAULT_BROWSER_PRODFILE);
+	}
+	
+	@Test(groups={"ut"})
+	public void testCreateChromeCapabilitiesWithUserProfileGrid() {
+		
+		Mockito.when(config.getMode()).thenReturn(DriverMode.GRID);
+		Mockito.when(config.getChromeProfilePath()).thenReturn("/home/user/profile");
+		
+		MutableCapabilities capa = new ChromeCapabilitiesFactory(config).createCapabilities();
+		
+		// check option is added with user profile
+		Assert.assertNull(capa.getCapability("chromeProfile"));
+		Assert.assertTrue(((Map<String, List<String>>)(((ChromeOptions)capa).asMap().get(ChromeOptions.CAPABILITY))).get("args").contains("--user-data-dir=/home/user/profile"));
+	}
+	
+	@Test(groups={"ut"})
+	public void testCreateChromeCapabilitiesWithoutDefaultProfileGrid() {
+		
+		Mockito.when(config.getMode()).thenReturn(DriverMode.GRID);
+		
+		MutableCapabilities capa = new ChromeCapabilitiesFactory(config).createCapabilities();
+		
+		// check 'chromeProfile' is not set as not requested, and no option added
+		Assert.assertNull(capa.getCapability("chromeProfile"));
+		Assert.assertFalse(((Map<String, List<String>>)(((ChromeOptions)capa).asMap().get(ChromeOptions.CAPABILITY))).get("args").toString().contains("--user-data-dir=/home/user/profile"));
+	}
+	
+	@Test(groups={"ut"})
+	public void testCreateChromeCapabilitiesWrongProfileGrid() {
+		
+		Mockito.when(config.getMode()).thenReturn(DriverMode.GRID);
+		Mockito.when(config.getChromeProfilePath()).thenReturn("foo");
+		
+		MutableCapabilities capa = new ChromeCapabilitiesFactory(config).createCapabilities();
+
+		// check 'chromeProfile' is not set as it's wrong profile path, and no option added
+		Assert.assertNull(capa.getCapability("chromeProfile"));
+		Assert.assertFalse(((Map<String, List<String>>)(((ChromeOptions)capa).asMap().get(ChromeOptions.CAPABILITY))).get("args").toString().contains("--user-data-dir=/home/user/profile"));
 	}
 }
