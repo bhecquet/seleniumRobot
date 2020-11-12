@@ -35,6 +35,7 @@ import org.testng.annotations.Test;
 import org.testng.xml.XmlTest;
 
 import com.seleniumtests.GenericTest;
+import com.seleniumtests.browserfactory.BrowserInfo;
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.TestVariable;
@@ -627,6 +628,82 @@ public class TestSeleniumTestContext extends GenericTest {
 	public void testBrowserKo(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setBrowser("unknown");
+	}
+	
+	@Test(groups="ut context")
+	public void testChromeProfilePath(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setBrowser("chrome");
+		SeleniumTestsContextManager.getThreadContext().setChromeUserProfilePath("default");
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getChromeUserProfilePath(), BrowserInfo.DEFAULT_BROWSER_PRODFILE);
+	}
+	@Test(groups="ut context")
+	public void testChromeProfilePathForGrid(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setRunMode("grid");
+		SeleniumTestsContextManager.getThreadContext().setBrowser("chrome");
+		SeleniumTestsContextManager.getThreadContext().setChromeUserProfilePath("/home/user/chrome");
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getChromeUserProfilePath(), "/home/user/chrome");
+	}
+	@Test(groups="ut context", expectedExceptions = ConfigurationException.class)
+	public void testWrongChromeProfilePathForLocal(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setRunMode("local");
+		SeleniumTestsContextManager.getThreadContext().setBrowser("chrome");
+		SeleniumTestsContextManager.getThreadContext().setChromeUserProfilePath("/home/user/chrome");
+	}
+	@Test(groups="ut context")
+	public void testChromeProfilePathForLocal(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setRunMode("local");
+		SeleniumTestsContextManager.getThreadContext().setBrowser("chrome");
+		SeleniumTestsContextManager.getThreadContext().setChromeUserProfilePath(SeleniumTestsContextManager.getApplicationDataPath());
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getChromeUserProfilePath(), SeleniumTestsContextManager.getApplicationDataPath());
+	}
+	@Test(groups="ut context")
+	public void testChromeProfilePathWithOtherBrowser(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setBrowser("firefox");
+		SeleniumTestsContextManager.getThreadContext().setChromeUserProfilePath("default");
+		Assert.assertNull(SeleniumTestsContextManager.getThreadContext().getChromeUserProfilePath());
+	}
+	
+	@Test(groups="ut context")
+	public void testFirefoxProfilePath(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setBrowser("firefox");
+		SeleniumTestsContextManager.getThreadContext().setFirefoxUserProfilePath("default");
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getFirefoxUserProfilePath(), BrowserInfo.DEFAULT_BROWSER_PRODFILE);
+	}
+	@Test(groups="ut context")
+	public void testFirefoxProfilePathForGrid(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setRunMode("grid");
+		SeleniumTestsContextManager.getThreadContext().setBrowser("firefox");
+		SeleniumTestsContextManager.getThreadContext().setFirefoxUserProfilePath("/home/user/chrome");
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getFirefoxUserProfilePath(), "/home/user/chrome");
+	}
+	@Test(groups="ut context", expectedExceptions = ConfigurationException.class)
+	public void testWrongFirefoxProfilePathForLocal(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setRunMode("local");
+		SeleniumTestsContextManager.getThreadContext().setBrowser("firefox");
+		SeleniumTestsContextManager.getThreadContext().setFirefoxUserProfilePath("/home/user/chrome");
+	}
+	@Test(groups="ut context")
+	public void testFirefoxProfilePathForLocal(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setRunMode("local");
+		SeleniumTestsContextManager.getThreadContext().setBrowser("firefox");
+		SeleniumTestsContextManager.getThreadContext().setFirefoxUserProfilePath(SeleniumTestsContextManager.getApplicationDataPath());
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getFirefoxUserProfilePath(), SeleniumTestsContextManager.getApplicationDataPath());
+	}
+	@Test(groups="ut context")
+	public void testFirefoxProfilePathWithOtherBrowser(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setBrowser("chrome");
+		SeleniumTestsContextManager.getThreadContext().setFirefoxUserProfilePath("default");
+		Assert.assertNull(SeleniumTestsContextManager.getThreadContext().getFirefoxUserProfilePath());
 	}
 
 	@Test(groups="ut context")
