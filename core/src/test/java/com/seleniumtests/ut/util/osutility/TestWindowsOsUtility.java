@@ -18,12 +18,16 @@
 package com.seleniumtests.ut.util.osutility;
 
 import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.contains;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import org.apache.commons.lang3.SystemUtils;
 import org.mockito.Mock;
@@ -37,6 +41,7 @@ import org.testng.annotations.Test;
 
 import com.seleniumtests.MockitoTest;
 import com.seleniumtests.browserfactory.BrowserInfo;
+import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.util.osutility.OSCommand;
 import com.seleniumtests.util.osutility.OSUtility;
@@ -105,14 +110,22 @@ public class TestWindowsOsUtility extends MockitoTest {
 	
 	/**
 	 * Search Firefox in registry at HKEY_CLASSES_ROOT\\FirefoxHTML\\shell\\open\\command
+	 * @throws IOException 
 	 */
 	@Test(groups={"ut"})
-	public void testFirefoxStandardWindowsInstallation() {
+	public void testFirefoxStandardWindowsInstallation() throws IOException {
+		
+		Path profilePath = Paths.get(SeleniumTestsContextManager.getApplicationDataPath(), "ffprofile");
+		Stream<Path> profiles = Files.list(Paths.get(SeleniumTestsContextManager.getApplicationDataPath(), "ffprofile"));
+		
 		PowerMockito.mockStatic(OSCommand.class);
 		PowerMockito.mockStatic(Advapi32Util.class);
 		PowerMockito.mockStatic(Paths.class);
+		PowerMockito.mockStatic(Files.class);
 		
 		when(Paths.get("C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe")).thenReturn(path);
+		when(Paths.get(contains("Profiles"))).thenReturn(profilePath);
+		when(Files.list(profilePath)).thenReturn(profiles);
 		when(path.toFile()).thenReturn(browserFile);
 		when(browserFile.exists()).thenReturn(true);
 
@@ -133,12 +146,18 @@ public class TestWindowsOsUtility extends MockitoTest {
 	
 	/**
 	 * Search Firefox in registry at HKEY_CLASSES_ROOT\\FirefoxHTML-308046\\shell\\open\\command
+	 * @throws IOException 
 	 */
 	@Test(groups={"ut"})
-	public void testFirefoxServerWindowsInstallation() {
+	public void testFirefoxServerWindowsInstallation() throws IOException {
+
+		Path profilePath = Paths.get(SeleniumTestsContextManager.getApplicationDataPath(), "ffprofile");
+		Stream<Path> profiles = Files.list(Paths.get(SeleniumTestsContextManager.getApplicationDataPath(), "ffprofile"));
+		
 		PowerMockito.mockStatic(OSCommand.class);
 		PowerMockito.mockStatic(Advapi32Util.class);
 		PowerMockito.mockStatic(Paths.class);
+		PowerMockito.mockStatic(Files.class);
 		
 		when(Paths.get("C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe")).thenReturn(path);
 		when(path.toFile()).thenReturn(browserFile);
@@ -163,12 +182,18 @@ public class TestWindowsOsUtility extends MockitoTest {
 	
 	/**
 	 * Search Firefox in registry at HKEY_CLASSES_ROOT\\FirefoxHTML-308046\\shell\\open\\command
+	 * @throws IOException 
 	 */
 	@Test(groups={"ut"})
-	public void testSeveralFirefoxInstallations() {
+	public void testSeveralFirefoxInstallations() throws IOException {
+
+		Path profilePath = Paths.get(SeleniumTestsContextManager.getApplicationDataPath(), "ffprofile");
+		Stream<Path> profiles = Files.list(Paths.get(SeleniumTestsContextManager.getApplicationDataPath(), "ffprofile"));
+		
 		PowerMockito.mockStatic(OSCommand.class);
 		PowerMockito.mockStatic(Advapi32Util.class);
 		PowerMockito.mockStatic(Paths.class);
+		PowerMockito.mockStatic(Files.class);
 		
 		when(Paths.get("C:\\Program Files (x86)\\Mozilla2 Firefox\\firefox.exe")).thenReturn(path);
 		when(Paths.get("C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe")).thenReturn(path);
@@ -197,12 +222,19 @@ public class TestWindowsOsUtility extends MockitoTest {
 	
 	/**
 	 * check that only valid installations are returned
+	 * @throws IOException 
 	 */
 	@Test(groups={"ut"})
-	public void testSeveralFirefoxInstallationsMissingBrowser() {
+	public void testSeveralFirefoxInstallationsMissingBrowser() throws IOException {
+		
+
+		Path profilePath = Paths.get(SeleniumTestsContextManager.getApplicationDataPath(), "ffprofile");
+		Stream<Path> profiles = Files.list(Paths.get(SeleniumTestsContextManager.getApplicationDataPath(), "ffprofile"));
+		
 		PowerMockito.mockStatic(OSCommand.class);
 		PowerMockito.mockStatic(Advapi32Util.class);
 		PowerMockito.mockStatic(Paths.class);
+		PowerMockito.mockStatic(Files.class);
 		
 		when(Paths.get("C:\\Program Files (x86)\\Mozilla2 Firefox\\firefox.exe")).thenReturn(path2);
 		when(Paths.get("C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe")).thenReturn(path);
