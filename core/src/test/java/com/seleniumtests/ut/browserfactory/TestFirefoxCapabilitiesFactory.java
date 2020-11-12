@@ -210,6 +210,7 @@ public class TestFirefoxCapabilitiesFactory extends MockitoTest {
 	public void testCreateFirefoxCapabilitiesOverrideUserAgent() {
 		
 		Mockito.when(config.getUserAgentOverride()).thenReturn("FIREFOX 55");
+		Mockito.when(config.getMode()).thenReturn(DriverMode.LOCAL);
 		
 		MutableCapabilities capa = new FirefoxCapabilitiesFactory(config).createCapabilities();
 		
@@ -248,6 +249,7 @@ public class TestFirefoxCapabilitiesFactory extends MockitoTest {
 	public void testCreateFirefoxCapabilitiesOverrideNtlmAuth() {
 		
 		Mockito.when(config.getNtlmAuthTrustedUris()).thenReturn("uri://uri.ntlm");
+		Mockito.when(config.getMode()).thenReturn(DriverMode.LOCAL);
 		
 		MutableCapabilities capa = new FirefoxCapabilitiesFactory(config).createCapabilities();
 		
@@ -258,7 +260,7 @@ public class TestFirefoxCapabilitiesFactory extends MockitoTest {
 	}
 	
 	@Test(groups={"ut"})
-	public void testCreateMarionetteCapabilitiesOverrideDownloadDir() {
+	public void testCreateFirefoxCapabilitiesOverrideDownloadDir() {
 		
 		Mockito.when(config.getBrowserDownloadDir()).thenReturn("/home/download");
 		Mockito.when(config.getMode()).thenReturn(DriverMode.LOCAL);
@@ -278,7 +280,7 @@ public class TestFirefoxCapabilitiesFactory extends MockitoTest {
 	 * issue #365: Check DownloadDir is not set in remote
 	 */
 	@Test(groups={"ut"})
-	public void testCreateMarionetteCapabilitiesNoOverrideDownloadDirRemote() {
+	public void testCreateFirefoxCapabilitiesNoOverrideDownloadDirRemote() {
 		
 		Mockito.when(config.getBrowserDownloadDir()).thenReturn("/home/download");
 		Mockito.when(config.getMode()).thenReturn(DriverMode.GRID);
@@ -291,6 +293,53 @@ public class TestFirefoxCapabilitiesFactory extends MockitoTest {
 		Assert.assertEquals(profile.getStringPreference("browser.download.dir", ""), "");
 		Assert.assertEquals(profile.getIntegerPreference("browser.download.folderList", 0), 0);
 		Assert.assertEquals(profile.getStringPreference("browser.helperApps.neverAsk.saveToDisk", ""), "");
+	}
+	
+	@Test(groups={"ut"})
+	public void testCreateFirefoxCapabilitiesWithDefaultProfile() {
+		
+		Mockito.when(config.getMode()).thenReturn(DriverMode.GRID);
+		Mockito.when(config.getFirefoxProfilePath()).thenReturn(BrowserInfo.DEFAULT_BROWSER_PRODFILE);
+		
+		MutableCapabilities capa = new FirefoxCapabilitiesFactory(config).createCapabilities();
+		
+		// check 'firefoxProfile' is set to 'default'
+		Assert.assertEquals(capa.getCapability("firefoxProfile"), BrowserInfo.DEFAULT_BROWSER_PRODFILE);
+	}
+	
+	@Test(groups={"ut"})
+	public void testCreateFirefoxCapabilitiesWithUserProfile() {
+		
+		Mockito.when(config.getMode()).thenReturn(DriverMode.GRID);
+		Mockito.when(config.getFirefoxProfilePath()).thenReturn("/home/user/profile");
+		
+		MutableCapabilities capa = new FirefoxCapabilitiesFactory(config).createCapabilities();
+		
+		// check 'firefoxProfile' is set to 'default'
+		Assert.assertEquals(capa.getCapability("firefoxProfile"), "/home/user/profile");
+	}
+	
+	@Test(groups={"ut"})
+	public void testCreateFirefoxCapabilitiesWithoutDefaultProfile() {
+		
+		Mockito.when(config.getMode()).thenReturn(DriverMode.GRID);
+		
+		MutableCapabilities capa = new FirefoxCapabilitiesFactory(config).createCapabilities();
+		
+		// check 'firefoxProfile' is set to 'default'
+		Assert.assertNull(capa.getCapability("firefoxProfile"));
+	}
+	
+	@Test(groups={"ut"})
+	public void testCreateFirefoxCapabilitiesWrongProfile() {
+		
+		Mockito.when(config.getMode()).thenReturn(DriverMode.GRID);
+		Mockito.when(config.getFirefoxProfilePath()).thenReturn("foo");
+		
+		MutableCapabilities capa = new FirefoxCapabilitiesFactory(config).createCapabilities();
+		
+		// check 'firefoxProfile' is set to 'default'
+		Assert.assertNull(capa.getCapability("firefoxProfile"));
 	}
 	
 }

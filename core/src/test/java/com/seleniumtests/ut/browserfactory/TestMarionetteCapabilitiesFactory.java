@@ -194,6 +194,7 @@ public class TestMarionetteCapabilitiesFactory extends MockitoTest {
 	public void testCreateMarionetteCapabilitiesOverrideUserAgent() {
 		
 		Mockito.when(config.getUserAgentOverride()).thenReturn("FIREFOX 55");
+		Mockito.when(config.getMode()).thenReturn(DriverMode.LOCAL);
 		
 		MutableCapabilities capa = new FirefoxCapabilitiesFactory(config).createCapabilities();
 		
@@ -232,6 +233,7 @@ public class TestMarionetteCapabilitiesFactory extends MockitoTest {
 	public void testCreateMarionetteCapabilitiesOverrideNtlmAuth() {
 		
 		Mockito.when(config.getNtlmAuthTrustedUris()).thenReturn("uri://uri.ntlm");
+		Mockito.when(config.getMode()).thenReturn(DriverMode.LOCAL);
 		
 		MutableCapabilities capa = new FirefoxCapabilitiesFactory(config).createCapabilities();
 		
@@ -314,6 +316,53 @@ public class TestMarionetteCapabilitiesFactory extends MockitoTest {
 		new FirefoxCapabilitiesFactory(config).createCapabilities();
 		
 		Assert.assertNull(System.getProperty(GeckoDriverService.GECKO_DRIVER_EXE_PROPERTY));
+	}
+
+	@Test(groups={"ut"})
+	public void testCreateFirefoxCapabilitiesWithDefaultProfile() {
+		
+		Mockito.when(config.getMode()).thenReturn(DriverMode.GRID);
+		Mockito.when(config.getFirefoxProfilePath()).thenReturn(BrowserInfo.DEFAULT_BROWSER_PRODFILE);
+		
+		MutableCapabilities capa = new FirefoxCapabilitiesFactory(config).createCapabilities();
+		
+		// check 'firefoxProfile' is set to 'default'
+		Assert.assertEquals(capa.getCapability("firefoxProfile"), BrowserInfo.DEFAULT_BROWSER_PRODFILE);
+	}
+	
+	@Test(groups={"ut"})
+	public void testCreateFirefoxCapabilitiesWithUserProfile() {
+		
+		Mockito.when(config.getMode()).thenReturn(DriverMode.GRID);
+		Mockito.when(config.getFirefoxProfilePath()).thenReturn("/home/user/profile");
+		
+		MutableCapabilities capa = new FirefoxCapabilitiesFactory(config).createCapabilities();
+		
+		// check 'firefoxProfile' is set to user profile
+		Assert.assertEquals(capa.getCapability("firefoxProfile"), "/home/user/profile");
+	}
+	
+	@Test(groups={"ut"})
+	public void testCreateFirefoxCapabilitiesWithoutDefaultProfile() {
+		
+		Mockito.when(config.getMode()).thenReturn(DriverMode.GRID);
+		
+		MutableCapabilities capa = new FirefoxCapabilitiesFactory(config).createCapabilities();
+		
+		// check 'firefoxProfile' is no set when not requested
+		Assert.assertNull(capa.getCapability("firefoxProfile"));
+	}
+	
+	@Test(groups={"ut"})
+	public void testCreateFirefoxCapabilitiesWrongProfile() {
+		
+		Mockito.when(config.getMode()).thenReturn(DriverMode.GRID);
+		Mockito.when(config.getFirefoxProfilePath()).thenReturn("foo");
+		
+		MutableCapabilities capa = new FirefoxCapabilitiesFactory(config).createCapabilities();
+		
+		// check 'firefoxProfile' is not set if name is not valid
+		Assert.assertNull(capa.getCapability("firefoxProfile"));
 	}
 	
 }
