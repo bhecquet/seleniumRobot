@@ -84,4 +84,10 @@ public class IECapabilitiesFactory extends IDesktopCapabilityFactory {
 	protected void updateOptionsWithSelectedBrowserInfo(MutableCapabilities options) {
 		// nothing to do
 	}
+
+	@Override
+	protected void updateGridOptionsWithSelectedBrowserInfo(MutableCapabilities options) {
+		// TODO Auto-generated method stub
+		
+	}
 }

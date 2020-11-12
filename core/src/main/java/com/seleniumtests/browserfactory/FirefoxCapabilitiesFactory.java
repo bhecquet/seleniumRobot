@@ -178,7 +178,7 @@ public class FirefoxCapabilitiesFactory extends IDesktopCapabilityFactory {
         if (webDriverConfig.getFirefoxProfilePath() != null) {
         	if (!BrowserInfo.DEFAULT_BROWSER_PRODFILE.equals(webDriverConfig.getFirefoxProfilePath()) && (webDriverConfig.getFirefoxProfilePath().contains("/") || webDriverConfig.getFirefoxProfilePath().contains("\\"))) {
         		return new FirefoxProfile(new File(webDriverConfig.getFirefoxProfilePath()));
-        	} else if (selectedBrowserInfo.getDefaultProfilePath() != null) {
+        	} else if (BrowserInfo.DEFAULT_BROWSER_PRODFILE.equals(webDriverConfig.getFirefoxProfilePath())) {
         		ProfilesIni init=new ProfilesIni();
         		return init.getProfile("default");
         	} else {
@@ -187,5 +187,24 @@ public class FirefoxCapabilitiesFactory extends IDesktopCapabilityFactory {
         }
         return new FirefoxProfile();
     }
+
+    /**
+     * Creates a default profile that may be overriden on selenium grid side if we specify a path or "default"
+     */
+	@Override
+	protected void updateGridOptionsWithSelectedBrowserInfo(MutableCapabilities options) {
+		FirefoxProfile profile = new FirefoxProfile();
+		if (webDriverConfig.getFirefoxProfilePath() != null) {
+        	if (BrowserInfo.DEFAULT_BROWSER_PRODFILE.equals(webDriverConfig.getFirefoxProfilePath()) || webDriverConfig.getFirefoxProfilePath().contains("/") || webDriverConfig.getFirefoxProfilePath().contains("\\")) {
+        		options.setCapability("firefoxProfile", webDriverConfig.getFirefoxProfilePath());
+        	} else {
+        		logger.warn(String.format("Firefox profile %s could not be set", webDriverConfig.getFirefoxProfilePath()));
+        	}
+        } 		
+		
+        configProfile(profile, webDriverConfig);
+        options.setCapability(FirefoxDriver.PROFILE, profile);
+		
+	}
 
 }

@@ -68,5 +68,11 @@ public class EdgeCapabilitiesFactory extends IDesktopCapabilityFactory {
 	@Override
 	protected BrowserType getBrowserType() {
 		return BrowserType.EDGE;
+	}
+
+	@Override
+	protected void updateGridOptionsWithSelectedBrowserInfo(MutableCapabilities options) {
+		// TODO Auto-generated method stub
+		
 	} 
 }

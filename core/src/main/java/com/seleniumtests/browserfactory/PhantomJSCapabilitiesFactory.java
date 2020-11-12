@@ -59,4 +59,10 @@ public class PhantomJSCapabilitiesFactory extends IDesktopCapabilityFactory {
 		// nothing to do
 	}
 
+	@Override
+	protected void updateGridOptionsWithSelectedBrowserInfo(MutableCapabilities options) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }
