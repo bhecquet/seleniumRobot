@@ -2056,7 +2056,7 @@ public class SeleniumTestsContext {
     
     public void setFirefoxUserProfilePath(String path) {
     	if (path != null && getBrowser() == BrowserType.FIREFOX) {
-    		if (new File(path).exists() || BrowserInfo.DEFAULT_BROWSER_PRODFILE.equals(path)) {
+    		if ((new File(path).exists() && getRunMode() == DriverMode.LOCAL) || getRunMode() != DriverMode.LOCAL || BrowserInfo.DEFAULT_BROWSER_PRODFILE.equals(path)) {
     			setAttribute(FIREFOX_USER_PROFILE_PATH, path);
     		} else {
     			throw new ConfigurationException(String.format("Firefox user profile does not exist at %s", path));
@@ -2071,7 +2071,7 @@ public class SeleniumTestsContext {
     
     public void setChromeUserProfilePath(String path) {
     	if (path != null && getBrowser() == BrowserType.CHROME) {
-    		if (new File(path).exists() || BrowserInfo.DEFAULT_BROWSER_PRODFILE.equals(path)) {
+    		if ((new File(path).exists() && getRunMode() == DriverMode.LOCAL) || getRunMode() != DriverMode.LOCAL || BrowserInfo.DEFAULT_BROWSER_PRODFILE.equals(path)) {
     			setAttribute(CHROME_USER_PROFILE_PATH, path);
     		} else {
     			throw new ConfigurationException(String.format("Chrome user profile does not exist at %s", path));
