@@ -274,7 +274,9 @@ public class OSUtilityWindows extends OSUtility {
 		// look for edge chromium
 		try {
 			String version = OSCommand.executeCommandAndWait("powershell.exe \"(Get-AppxPackage Microsoft.MicrosoftEdge).Version\"");
-			browserList.put(BrowserType.EDGE, Arrays.asList(new BrowserInfo(BrowserType.EDGE, extractEdgeVersion(version), null)));
+			if (version != null && !version.isEmpty()) {
+				browserList.put(BrowserType.EDGE, Arrays.asList(new BrowserInfo(BrowserType.EDGE, extractEdgeVersion(version), null)));
+			}
 		} catch (Win32Exception | ConfigurationException e) {}
 		
 		return browserList;

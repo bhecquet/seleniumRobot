@@ -441,4 +441,28 @@ public class TestWindowsOsUtility extends MockitoTest {
 		Assert.assertNull(browsers.get(BrowserType.INTERNET_EXPLORER).get(0).getPath());
 		Assert.assertEquals(browsers.get(BrowserType.INTERNET_EXPLORER).get(0).getVersion(), "11");
 	}
+	
+	/**
+	 * Search IE
+	 */
+	@Test(groups={"ut"})
+	public void testEdgeChromiumStandardWindowsInstallation() {
+		PowerMockito.mockStatic(OSCommand.class);
+		PowerMockito.mockStatic(Advapi32Util.class);
+		PowerMockito.mockStatic(Paths.class);
+		
+		when(Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Classes\\ChromeHTML\\shell\\open\\command", "")).thenThrow(Win32Exception.class);
+		when(Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Classes\\ChromeBHTML\\shell\\open\\command", "")).thenThrow(Win32Exception.class); // chrome beta not installed
+		when(Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Microsoft\\Windows\\CurrentVersion\\App Paths\\IEXPLORE.EXE", "")).thenThrow(Win32Exception.class);
+		when(Advapi32Util.registryGetStringValue(WinReg.HKEY_CURRENT_USER, "Software\\Microsoft\\MicrosoftEdge\\Main", "EdgeSwitchingOSBuildNumber")).thenThrow(Win32Exception.class);
+		when(OSCommand.executeCommandAndWait(new String[] {"REG", "QUERY", "HKCR",  "/f", "FirefoxHTML", "/k", "/c"})).thenReturn("");
+		when(OSCommand.executeCommandAndWait("powershell.exe \"(Get-AppxPackage Microsoft.MicrosoftEdge).Version\"")).thenReturn("44.18362.449.0");
+		
+		OSUtility.refreshBrowserList();
+		Map<BrowserType, List<BrowserInfo>> browsers = OSUtility.getInstalledBrowsersWithVersion();
+		Assert.assertTrue(browsers.keySet().contains(BrowserType.EDGE));
+		Assert.assertEquals(browsers.get(BrowserType.EDGE).size(), 1);
+		Assert.assertNull(browsers.get(BrowserType.EDGE).get(0).getPath());
+		Assert.assertEquals(browsers.get(BrowserType.EDGE).get(0).getVersion(), "44");
+	}
 }
