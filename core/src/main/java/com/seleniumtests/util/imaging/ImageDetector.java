@@ -150,7 +150,7 @@ public class ImageDetector {
 		
 		detector.detectExactZoneWithScale();
 		Rectangle detectedObjectRectangle = detector.getDetectedRectangle();
-		System.out.println("Detected Zone: " + detectedObjectRectangle.toString());
+		System.out.println(String.format("Detected Zone (Top, Left, Width, Height): (%d, %d, %d, %d)", detectedObjectRectangle.y, detectedObjectRectangle.x, detectedObjectRectangle.width, detectedObjectRectangle.height));
 		double pictureSizeRatio = detector.getSizeRatio();
 		System.out.println("Aspect ratio: " + pictureSizeRatio);
 	}
@@ -361,9 +361,9 @@ public class ImageDetector {
         List<TemplateMatchProperties> matches = Collections.synchronizedList(new ArrayList<>());
         
         Map<Integer, Double> scaleSteps = new LinkedHashMap<>();
-        scaleSteps.put(100, 0.6);
-        scaleSteps.put(50, 0.7);
-        scaleSteps.put(25, 0.8);
+        scaleSteps.put(100, Math.max(0.1, 0.6 - detectionThreshold));
+        scaleSteps.put(50, Math.max(0.1, 0.7 - detectionThreshold));
+        scaleSteps.put(25, Math.max(0.1, 0.8 - detectionThreshold));
         
         int currentStep = 100;
         
