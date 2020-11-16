@@ -144,7 +144,7 @@ public class LocalAppiumLauncher implements AppiumLauncher {
 		}
 		
 		if (OSUtility.getCurrentPlatorm() == Platform.WINDOWS) {
-			nodeCommand = "cmd /c start cmd /C " + nodeCommand;
+			nodeCommand = "cmd /c start /MIN cmd /C " + nodeCommand;
 		}
 	}
 	
