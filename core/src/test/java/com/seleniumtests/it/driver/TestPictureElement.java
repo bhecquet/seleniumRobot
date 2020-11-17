@@ -17,6 +17,7 @@
  */
 package com.seleniumtests.it.driver;
 
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.testng.Assert;
 import org.testng.SkipException;
@@ -47,8 +48,14 @@ public class TestPictureElement extends GenericMultiBrowserTest {
 	@AfterMethod(groups={"it"}, alwaysRun=true)
 	public void reset() {
 		if (driver != null) {
-			DriverTestPageWithoutFixedPattern.logoText.clear();
-			DriverTestPageWithoutFixedPattern.textElement.clear();
+			try {
+				DriverTestPageWithoutFixedPattern.logoText.clear();
+				DriverTestPageWithoutFixedPattern.textElement.clear();
+			} catch (NoSuchElementException e) {
+				logger.error("Cannot reset");
+				logger.error(driver.getPageSource());
+				throw e;
+			}
 		}
 	}
 	
