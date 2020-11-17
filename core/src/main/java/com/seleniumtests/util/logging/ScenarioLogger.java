@@ -17,6 +17,7 @@ import com.seleniumtests.reporter.logger.Snapshot;
 import com.seleniumtests.reporter.logger.StringInfo;
 import com.seleniumtests.reporter.logger.TestMessage;
 import com.seleniumtests.reporter.logger.TestMessage.MessageType;
+import com.seleniumtests.uipage.PageObject;
 import com.seleniumtests.reporter.logger.TestStep;
 import com.seleniumtests.reporter.logger.TestValue;
 
@@ -227,5 +228,33 @@ public class ScenarioLogger extends Logger {
     public void logScreenshot(final ScreenShot screenshot) {
     	logScreenshot(screenshot, null, WebUIDriver.getCurrentWebUiDriverName());
     }
+    
+    /**
+     * 
+     */
+
+	/**
+	 * Method for logging error on actions (e.g: a click fails)
+	 * It logs some lines of the stack to know where problem occured more precisely
+	 * even if the error is then catched. 
+	 * @param throwable
+	 */
+	public void logActionError(Throwable throwable) {
+		if (throwable != null) {
+			StackTraceElement[] s1 = throwable.getStackTrace();
+			
+			StringBuilder string = new StringBuilder(throwable.getMessage());
+			for (int x = 0; x < s1.length; x++) {
+				try {
+					if (PageObject.class.isAssignableFrom(Class.forName(s1[x].getClassName()))) {
+						string.append("\nat " + s1[x].toString());
+					}
+				} catch (ClassNotFoundException e) {
+				}
+			}
+			warn(string);
+		}
+	}
+	
 
 }

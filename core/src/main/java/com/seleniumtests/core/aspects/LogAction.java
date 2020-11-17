@@ -21,7 +21,6 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -47,10 +46,8 @@ import com.seleniumtests.core.TestStepManager;
 import com.seleniumtests.core.runner.SeleniumRobotTestPlan;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.reporter.logger.TestAction;
-import com.seleniumtests.reporter.logger.TestLogging;
 import com.seleniumtests.reporter.logger.TestStep;
 import com.seleniumtests.uipage.PageObject;
-import com.seleniumtests.uipage.htmlelements.GenericPictureElement;
 import com.seleniumtests.util.logging.ScenarioLogger;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
@@ -89,7 +86,7 @@ import net.lightbody.bmp.BrowserMobProxy;
 public class LogAction {
 	
 	private static final Logger logger = SeleniumRobotLogger.getLogger(LogAction.class);
-	private static final Logger scenarioLogger = ScenarioLogger.getLogger(LogAction.class);
+	private static final ScenarioLogger scenarioLogger = ScenarioLogger.getScenarioLogger(LogAction.class);
 	private static Map<Thread, Integer> indent = Collections.synchronizedMap(new HashMap<>());
 
 	/**
@@ -437,6 +434,7 @@ public class LogAction {
 		Object reply = null;
 		boolean actionFailed = false;
 		TestAction currentAction = new TestAction(actionName, false, pwdToReplace);
+		Throwable currentException = null;
 		
 		// log action before its started. By default, it's OK. Then result may be overwritten if step fails
 		// order of steps is the right one (first called is first displayed)	
@@ -448,10 +446,12 @@ public class LogAction {
 			reply = joinPoint.proceed(joinPoint.getArgs());
 		} catch (Throwable e) {
 			actionFailed = true;
+			currentException = e;
 			throw e;
 		} finally {
 			if (TestStepManager.getParentTestStep() != null) {
 				currentAction.setFailed(actionFailed);
+				scenarioLogger.logActionError(currentException);
 			}
 		}
 		return reply;
