@@ -25,6 +25,7 @@ import java.util.stream.Collectors;
 import org.apache.log4j.Logger;
 import org.json.JSONObject;
 
+import com.seleniumtests.uipage.PageObject;
 import com.seleniumtests.util.StringUtility;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 

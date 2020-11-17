@@ -26,6 +26,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -59,6 +60,7 @@ import com.seleniumtests.uipage.ReplayOnError;
 import com.seleniumtests.uipage.htmlelements.GenericPictureElement;
 import com.seleniumtests.uipage.htmlelements.HtmlElement;
 import com.seleniumtests.util.helper.WaitHelper;
+import com.seleniumtests.util.logging.ScenarioLogger;
 
 /**
  * Aspect to intercept calls to methods of HtmlElement. It allows to retry discovery and action 
@@ -72,6 +74,7 @@ import com.seleniumtests.util.helper.WaitHelper;
 public class ReplayAction {
 
 	private static Clock systemClock = Clock.systemUTC();
+	private static final ScenarioLogger scenarioLogger = ScenarioLogger.getScenarioLogger(ReplayAction.class);
 	
 	/**
 	 * Replay all HtmlElement actions annotated by ReplayOnError.
@@ -112,6 +115,7 @@ public class ReplayAction {
 		
 		boolean actionFailed = false;
 		boolean ignoreFailure = false;
+		Throwable currentException = null;
 		
 		try {
 	    	while (end.isAfter(systemClock.instant())) {
@@ -173,12 +177,16 @@ public class ReplayAction {
 							|| joinPoint.getSignature().getName().equals("findHtmlElements"))) {
 				return new ArrayList<WebElement>();
 			} else {
-				actionFailed = true && !ignoreFailure;
+				if (!ignoreFailure) {
+					actionFailed = true;
+					currentException = e;
+				}
 				throw e;
 			}
 		} finally {
 			if (currentAction != null && isHtmlElementDirectlyCalled(Thread.currentThread().getStackTrace()) && TestStepManager.getParentTestStep() != null) {
 				currentAction.setFailed(actionFailed);
+				scenarioLogger.logActionError(currentException);
 			}	
 			
 			// restore element scrolling flag for further uses
@@ -218,6 +226,7 @@ public class ReplayAction {
 		}
 		
 		boolean actionFailed = false;
+		Throwable currentException = null;
 		
 		try {
 			while (end.isAfter(systemClock.instant())) {
@@ -251,10 +260,12 @@ public class ReplayAction {
 			return reply;
 		} catch (Throwable e) {
 			actionFailed = true;
+			currentException = e;
 			throw e;
 		} finally {
 			if (currentAction != null && isHtmlElementDirectlyCalled(Thread.currentThread().getStackTrace()) && TestStepManager.getParentTestStep() != null) {
 				currentAction.setFailed(actionFailed);
+				scenarioLogger.logActionError(currentException);
 				
 				if (joinPoint.getTarget() instanceof GenericPictureElement) {
 					currentAction.setDurationToExclude(((GenericPictureElement)joinPoint.getTarget()).getActionDuration());
