@@ -275,7 +275,11 @@ public class OSUtilityWindows extends OSUtility {
 		try {
 			String version = OSCommand.executeCommandAndWait("powershell.exe \"(Get-AppxPackage Microsoft.MicrosoftEdge).Version\"");
 			if (version != null && !version.isEmpty()) {
-				browserList.put(BrowserType.EDGE, Arrays.asList(new BrowserInfo(BrowserType.EDGE, extractEdgeVersion(version), null)));
+				try {
+					Integer.parseInt(extractEdgeVersion(version));
+					browserList.put(BrowserType.EDGE, Arrays.asList(new BrowserInfo(BrowserType.EDGE, extractEdgeVersion(version), null)));
+				} catch (NumberFormatException e) {}
+				
 			}
 		} catch (Win32Exception | ConfigurationException e) {}
 		

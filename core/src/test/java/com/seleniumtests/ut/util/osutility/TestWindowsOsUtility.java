@@ -443,7 +443,7 @@ public class TestWindowsOsUtility extends MockitoTest {
 	}
 	
 	/**
-	 * Search IE
+	 * Search Edge chromium
 	 */
 	@Test(groups={"ut"})
 	public void testEdgeChromiumStandardWindowsInstallation() {
@@ -464,5 +464,27 @@ public class TestWindowsOsUtility extends MockitoTest {
 		Assert.assertEquals(browsers.get(BrowserType.EDGE).size(), 1);
 		Assert.assertNull(browsers.get(BrowserType.EDGE).get(0).getPath());
 		Assert.assertEquals(browsers.get(BrowserType.EDGE).get(0).getVersion(), "44");
+	}
+	
+	/**
+	 * Error message is thrown on some old windows not supporting Get-AppxPackage.
+	 * Moreover, we should not get Edge browser if it's not installed
+	 */
+	@Test(groups={"ut"})
+	public void testEdgeChromiumOnOldWindows() {
+		PowerMockito.mockStatic(OSCommand.class);
+		PowerMockito.mockStatic(Advapi32Util.class);
+		PowerMockito.mockStatic(Paths.class);
+		
+		when(Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Classes\\ChromeHTML\\shell\\open\\command", "")).thenThrow(Win32Exception.class);
+		when(Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Classes\\ChromeBHTML\\shell\\open\\command", "")).thenThrow(Win32Exception.class); // chrome beta not installed
+		when(Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Microsoft\\Windows\\CurrentVersion\\App Paths\\IEXPLORE.EXE", "")).thenThrow(Win32Exception.class);
+		when(Advapi32Util.registryGetStringValue(WinReg.HKEY_CURRENT_USER, "Software\\Microsoft\\MicrosoftEdge\\Main", "EdgeSwitchingOSBuildNumber")).thenThrow(Win32Exception.class);
+		when(OSCommand.executeCommandAndWait(new String[] {"REG", "QUERY", "HKCR",  "/f", "FirefoxHTML", "/k", "/c"})).thenReturn("");
+		when(OSCommand.executeCommandAndWait("powershell.exe \"(Get-AppxPackage Microsoft.MicrosoftEdge).Version\"")).thenReturn("Get-AppxPackage : The term 'Get-AppxPackage' is not recognized as the name of");
+		
+		OSUtility.refreshBrowserList();
+		Map<BrowserType, List<BrowserInfo>> browsers = OSUtility.getInstalledBrowsersWithVersion();
+		Assert.assertFalse(browsers.keySet().contains(BrowserType.EDGE));
 	}
 }
