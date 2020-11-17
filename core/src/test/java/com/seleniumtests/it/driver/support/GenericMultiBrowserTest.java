@@ -154,36 +154,41 @@ public abstract class GenericMultiBrowserTest extends MockitoTest {
 		initThreadContext(testNGCtx);
 		initBeforeMethod();
 		
-		switch (testPageName) {
-		case "DriverTestPageWithoutFixedPattern":
-			testPageUrl = String.format("http://%s:%d/testWithoutFixedPattern.html", localAddress, server.getServerHost().getPort());
-			testPageWithoutPattern = new DriverTestPageWithoutFixedPattern(true, testPageUrl);
-			break;
-		case "DriverTestPage":
-			testPageUrl = String.format("http://%s:%d/test.html", localAddress, server.getServerHost().getPort());
-			testPage = new DriverTestPage(true, testPageUrl);
-			break;
-		case "DriverTestPageNativeActions":
-			testPageUrl = String.format("http://%s:%d/test.html", localAddress, server.getServerHost().getPort());
-			testPageNativeActions = new DriverTestPageNativeActions(true, testPageUrl);
-			break;
-		case "DriverTestPageObjectFactory":
-			testPageUrl = String.format("http://%s:%d/test.html", localAddress, server.getServerHost().getPort());
-			testPageObjectFactory = new DriverTestPageObjectFatory(true, testPageUrl);
-			break;
-		case "DriverTestAngularFrame":
-			testPageUrl = String.format("http://%s:%d/testAngularIFrame.html", localAddress, server.getServerHost().getPort());
-			angularFramePage = new DriverTestAngularFrame(true, testPageUrl);
-			break;
-		case "DriverSubAngularTestPage":
-			testPageUrl = String.format("http://%s:%d/angularApp/index.html", localAddress, server.getServerHost().getPort());
-			angularPage = new DriverSubAngularTestPage(true, testPageUrl);
-			break;
-		case "DriverScrollingTestPage":
-			testPageUrl = String.format("http://%s:%d/testScrolling.html", localAddress, server.getServerHost().getPort());
-			scrollingTestPage = new DriverScrollingTestPage(true, testPageUrl);
+		try {
+			switch (testPageName) {
+				case "DriverTestPageWithoutFixedPattern":
+					testPageUrl = String.format("http://%s:%d/testWithoutFixedPattern.html", localAddress, server.getServerHost().getPort());
+					testPageWithoutPattern = new DriverTestPageWithoutFixedPattern(true, testPageUrl);
+					break;
+				case "DriverTestPage":
+					testPageUrl = String.format("http://%s:%d/test.html", localAddress, server.getServerHost().getPort());
+					testPage = new DriverTestPage(true, testPageUrl);
+					break;
+				case "DriverTestPageNativeActions":
+					testPageUrl = String.format("http://%s:%d/test.html", localAddress, server.getServerHost().getPort());
+					testPageNativeActions = new DriverTestPageNativeActions(true, testPageUrl);
+					break;
+				case "DriverTestPageObjectFactory":
+					testPageUrl = String.format("http://%s:%d/test.html", localAddress, server.getServerHost().getPort());
+					testPageObjectFactory = new DriverTestPageObjectFatory(true, testPageUrl);
+					break;
+				case "DriverTestAngularFrame":
+					testPageUrl = String.format("http://%s:%d/testAngularIFrame.html", localAddress, server.getServerHost().getPort());
+					angularFramePage = new DriverTestAngularFrame(true, testPageUrl);
+					break;
+				case "DriverSubAngularTestPage":
+					testPageUrl = String.format("http://%s:%d/angularApp/index.html", localAddress, server.getServerHost().getPort());
+					angularPage = new DriverSubAngularTestPage(true, testPageUrl);
+					break;
+				case "DriverScrollingTestPage":
+					testPageUrl = String.format("http://%s:%d/testScrolling.html", localAddress, server.getServerHost().getPort());
+					scrollingTestPage = new DriverScrollingTestPage(true, testPageUrl);
+			}
+		} catch (Exception e) {
+			logger.error("Error opening page");
+			logger.error(WebUIDriver.getWebDriver(true).getPageSource());
+			throw e;
 		}
-		
 		driver = WebUIDriver.getWebDriver(true);
 	}
 	
