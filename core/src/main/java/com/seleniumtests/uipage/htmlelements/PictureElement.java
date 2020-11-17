@@ -34,6 +34,7 @@ import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.driver.screenshots.ScreenshotUtil;
 import com.seleniumtests.driver.screenshots.SnapshotTarget;
 import com.seleniumtests.uipage.ReplayOnError;
+import com.seleniumtests.util.helper.WaitHelper;
 
 import io.appium.java_client.touch.TapOptions;
 import io.appium.java_client.touch.WaitOptions;
@@ -114,6 +115,7 @@ public class PictureElement extends GenericPictureElement {
 		// scroll to element where our picture is so that we will be able to act on it
 		// scrolling will display, on top of window, the top of the element
 		intoElement.scrollToElement(0);
+		WaitHelper.waitForMilliSeconds(500);
 	}
 
 	
@@ -169,7 +171,7 @@ public class PictureElement extends GenericPictureElement {
 	}
 	
 	public void moveAndClick(WebElement element, int coordX, int coordY) {
-		move(element, coordX, coordY).click().build().perform();
+		move(element, coordX, coordY).pause(200).click().build().perform();
 	}
 	
 	private WebUIDriver isDriverCreated() {
