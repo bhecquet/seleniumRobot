@@ -89,4 +89,9 @@ public class TestStringUtility extends GenericTest {
 	public void testOddCharRemovalAccents() {
 		Assert.assertEquals(StringUtility.replaceOddCharsFromFileName("aàéç"), "aaec");
 	}
+	
+	@Test(groups={"ut"})
+	public void testKeepNewLineInHtml() {
+		Assert.assertEquals(StringUtility.encodeString("foo\nbar", "html"), "foo<br/>\nbar");
+	}
 }

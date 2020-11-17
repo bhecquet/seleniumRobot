@@ -150,7 +150,7 @@ public class StringUtility {
 			newMessage = StringEscapeUtils.escapeCsv(message);
 			break;
 		case "html":
-			newMessage = StringEscapeUtils.escapeHtml4(message);
+			newMessage = StringEscapeUtils.escapeHtml4(message.replace("\n", "__BR__")).replace("__BR__", "<br/>\n");
 			break;
 		case "json":
 			newMessage = StringEscapeUtils.escapeJson(message);
