@@ -1470,4 +1470,31 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		Assert.assertTrue(mainReportContent.matches(".*<a href\\='testAndSubActions/TestReport\\.html'.*?>testAndSubActions</a>.*"));
 		Assert.assertTrue(mainReportContent.matches(".*<a href\\='testAndSubActions-1/TestReport\\.html'.*?>testAndSubActions-1</a>.*"));
 	}
+	
+
+	/**
+	 * Check that when an action fails, a warning is displayed in step and logs
+	 * This helps in the case the action error is catched
+	 */
+	@Test(groups={"it"})
+	public void testLogActionErrorsAsWarning(ITestContext testContext) throws Exception {
+		
+		try {
+			System.setProperty(SeleniumTestsContext.TEST_RETRY_COUNT, "0");
+			
+			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriverShortKoWithCatchException"});
+			String detailedReportContent = readTestMethodResultFile("testDriverShortKoWithCatchException");
+			
+			// test all error log is displayed in execution logs
+			Assert.assertTrue(detailedReportContent.contains("[main] ScenarioLogger: Searched element could not be found</div>"));
+			Assert.assertTrue(detailedReportContent.contains("<div>at com.seleniumtests.it.driver.support.pages.DriverTestPage._writeSomethingOnNonExistentElementWithCatch"));
+			Assert.assertTrue(detailedReportContent.contains("<div>For documentation on this error, please visit: https://www.seleniumhq.org/exceptions/no_such_element.html</div>")); // checks that line not showing thread name are in logs
+			
+			Assert.assertTrue(detailedReportContent.contains("<div class=\"message-warning\">Warning: Searched element could not be found<br/>" + 
+					"For documentation on this error, please visit: https://www.seleniumhq.org/exceptions/no_such_element.html<br/>")); // warning displayed in step
+		} finally {
+			System.clearProperty(SeleniumTestsContext.TEST_RETRY_COUNT);
+		}
+	}
+	
 }
