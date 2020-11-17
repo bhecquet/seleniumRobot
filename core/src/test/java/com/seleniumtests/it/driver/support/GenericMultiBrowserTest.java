@@ -127,6 +127,7 @@ public abstract class GenericMultiBrowserTest extends MockitoTest {
 		SeleniumTestsContextManager.getThreadContext().setBrowser(browserType.getBrowserType());
 		SeleniumTestsContextManager.getThreadContext().setCaptureSnapshot(false);
 		SeleniumTestsContextManager.getThreadContext().setTestType(TestType.WEB);
+		SeleniumTestsContextManager.getThreadContext().setReplayTimeout(15);
 
 		// grid support
 //		SeleniumTestsContextManager.getThreadContext().setWebDriverGrid("http://127.0.0.1:4444/wd/hub");
