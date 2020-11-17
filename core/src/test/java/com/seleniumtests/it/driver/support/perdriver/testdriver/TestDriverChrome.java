@@ -45,6 +45,11 @@ public class TestDriverChrome extends TestDriver {
 	public void testClickDiv() {
 		super.testClickDiv();
 	}
+	
+	@Test(groups={"it", "ut"}, expectedExceptions = NoSuchElementException.class)
+	public void testSendKeysElementNotFound() {
+		super.testSendKeysElementNotFound(); 
+	}
    
 	@Test(groups={"it", "ut"})
 	public void testClickRadio() {
