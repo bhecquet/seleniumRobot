@@ -204,12 +204,14 @@ public class SeleniumRobotLogger {
 			
 		//store the name of the thread for each test
 		Map<String, String> testPerThread = new HashMap<>();
+		String previousThread = null; // will store the thread associated to the previously read line
 		
 		for (String line: logLines) {
 			Matcher matcher = SeleniumRobotLogger.LOG_FILE_PATTERN.matcher(line);
 			if (matcher.matches()) {
 				String thread = matcher.group(1);
 				String content = matcher.group(2);
+				previousThread = thread;
 				
 				if (content.contains(SeleniumRobotLogger.START_TEST_PATTERN)) {
 					String testName = content.split(SeleniumRobotLogger.START_TEST_PATTERN)[1].trim();
@@ -224,6 +226,9 @@ public class SeleniumRobotLogger {
 					String testName = testPerThread.get(thread);
 					SeleniumRobotLogger.testLogs.put(testName, SeleniumRobotLogger.testLogs.get(testName).concat(line + "\n"));
 				}
+			} else if (previousThread != null && testPerThread.get(previousThread) != null) {
+				String testName = testPerThread.get(previousThread);
+				SeleniumRobotLogger.testLogs.put(testName, SeleniumRobotLogger.testLogs.get(testName).concat(line + "\n"));
 			}
 		}
 	}
