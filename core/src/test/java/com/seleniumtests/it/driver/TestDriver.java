@@ -133,6 +133,11 @@ public class TestDriver extends GenericMultiBrowserTest {
 		}
 	}
 
+	@Test(groups={"it", "ut"}, expectedExceptions = NoSuchElementException.class)
+	public void testSendKeysElementNotFound() {
+		testPage._writeSomethingOnNonExistentElement();
+	}
+
 	@Test(groups={"it", "ut"})
 	public void testDoubleClickDiv() {
 		try {
