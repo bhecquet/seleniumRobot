@@ -187,6 +187,19 @@ public class DriverTestPage extends PageObject {
     	return this;
     }
     
+    /**
+     * Test catching exception to show that report displays the error
+     * @return
+     */
+    public DriverTestPage _writeSomethingOnNonExistentElementWithCatch() {
+    	
+    	try {
+    		textElementNotPresent.sendKeys("a text");
+    	} catch (Exception e) {}
+    	textElement.sendKeys("a text");
+    	return this;
+    }
+    
     public DriverTestPage _reset() {
     	resetButton.click();
     	return this;
