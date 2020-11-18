@@ -22,6 +22,7 @@ import org.testng.annotations.Test;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.it.driver.TestFrame;
 
+@Test(groups= {"ie"})
 public class TestFrameInternetExplorer extends TestFrame {
 
 	public TestFrameInternetExplorer() throws Exception {

@@ -23,6 +23,7 @@ import org.testng.annotations.Test;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.it.driver.TestAngularControls;
 
+@Test(groups= {"ie"})
 public class TestAngularControlsInternetExplorer extends TestAngularControls {
 
 	public TestAngularControlsInternetExplorer() throws Exception {

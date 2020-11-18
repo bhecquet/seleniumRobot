@@ -23,6 +23,7 @@ import org.testng.annotations.Test;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.it.driver.TestNgSelect;
 
+@Test(groups= {"ie"})
 public class TestNgSelectInternetExplorer extends TestNgSelect {
 
 	public TestNgSelectInternetExplorer() throws Exception {
