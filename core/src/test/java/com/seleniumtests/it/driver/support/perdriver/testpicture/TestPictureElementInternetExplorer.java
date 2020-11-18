@@ -22,6 +22,7 @@ import org.testng.annotations.Test;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.it.driver.TestPictureElement;
 
+@Test(groups= {"ie"})
 public class TestPictureElementInternetExplorer extends TestPictureElement {
 
 	public TestPictureElementInternetExplorer() throws Exception {

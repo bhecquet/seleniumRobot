@@ -30,6 +30,7 @@ import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import com.seleniumtests.driver.DriverMode;
 import com.seleniumtests.it.driver.TestDriver;
 
+@Test(groups= {"ie"})
 public class TestDriverInternetExplorer extends TestDriver {
 
 	public TestDriverInternetExplorer() throws Exception {
