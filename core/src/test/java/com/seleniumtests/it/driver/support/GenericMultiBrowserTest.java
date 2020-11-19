@@ -109,14 +109,17 @@ public abstract class GenericMultiBrowserTest extends MockitoTest {
 		// angular app v9
 		mapping.put("/tu/angularAppv9/index.html", "/angularApp/index.html");
 		mapping.put("/tu/angularAppv9/runtime-es2015.js", "/angularApp/runtime-es2015.js");
+		mapping.put("/tu/angularAppv9/runtime-es5.js", "/angularApp/runtime-es5.js");
+		mapping.put("/tu/angularAppv9/main-es5.js", "/angularApp/main-es5.js");
 		mapping.put("/tu/angularAppv9/main-es2015.js", "/angularApp/main-es2015.js");
 		mapping.put("/tu/angularAppv9/polyfills-es2015.js", "/angularApp/polyfills-es2015.js");
+		mapping.put("/tu/angularAppv9/polyfills-es5.js", "/angularApp/polyfills-es5.js");
 		mapping.put("/tu/angularAppv9/styles.css", "/angularApp/styles.css");
 		
 		return mapping;
 	}
 	
-	@BeforeMethod(groups={"ut", "it", "upload"})  
+	@BeforeMethod(groups={"ut", "it", "upload", "ie"})  
 	public void initBeforeMethod() {
 		if (browserType == null || !installedBrowsers.contains(browserType)) {
 			return;
@@ -135,7 +138,7 @@ public abstract class GenericMultiBrowserTest extends MockitoTest {
 	}
 	
 	
-	@BeforeClass(groups={"it", "ut", "upload"})
+	@BeforeClass(groups={"it", "ut", "upload", "ie"})
 	public void exposeTestPage(final ITestContext testNGCtx) throws Exception {
 
         // skip following if driver is already defined from an other test
@@ -194,7 +197,7 @@ public abstract class GenericMultiBrowserTest extends MockitoTest {
 	}
 	
 
-	@AfterClass(groups={"it", "ut", "upload"}, alwaysRun=true)
+	@AfterClass(groups={"it", "ut", "upload", "ie"}, alwaysRun=true)
 	public void stop() throws Exception {
 		if (server != null) {
 			logger.info("stopping web server");
@@ -207,7 +210,7 @@ public abstract class GenericMultiBrowserTest extends MockitoTest {
 		driver = null;
 	}
 	
-	@BeforeMethod(groups={"it", "ut", "upload"}) 
+	@BeforeMethod(groups={"it", "ut", "upload", "ie"}) 
 	public void skipIfDriverNull() {
 		if (driver == null) {
 			throw new SkipException("skipped, browser not installed: " + browserType);
@@ -215,7 +218,7 @@ public abstract class GenericMultiBrowserTest extends MockitoTest {
 	}
 	
 
-	@AfterMethod(groups={"it", "ut", "upload"})
+	@AfterMethod(groups={"it", "ut", "upload", "ie"})
 	public void cleanAlert() {
 		GenericTest.resetTestNGREsultAndLogger();
 		if (driver == null) {

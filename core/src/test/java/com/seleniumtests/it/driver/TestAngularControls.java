@@ -27,7 +27,6 @@ import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.it.driver.support.GenericMultiBrowserTest;
 import com.seleniumtests.it.driver.support.pages.DriverSubAngularTestPage;
-import com.seleniumtests.util.helper.WaitHelper;
 
 public class TestAngularControls extends GenericMultiBrowserTest {
 
@@ -39,12 +38,12 @@ public class TestAngularControls extends GenericMultiBrowserTest {
 		super(browserType, "DriverSubAngularTestPage"); 
 	}
 	
-	@BeforeMethod(groups= {"it"})
+	@BeforeMethod(groups= {"it", "ie"})
 	public void init() {
 		SeleniumTestsContextManager.getThreadContext().setReplayTimeout(1);
 	}
 	
-	@AfterMethod(groups={"it"}, alwaysRun=true)
+	@AfterMethod(groups={"it", "ie"}, alwaysRun=true)
 	public void reset() {
 		if (driver != null) {
 			driver.navigate().refresh();

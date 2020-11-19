@@ -34,7 +34,6 @@ import org.testng.annotations.BeforeMethod;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.driver.screenshots.VideoCaptureMode;
-import com.seleniumtests.reporter.logger.TestLogging;
 
 /**
  * Redefine calls to PowerMockTestCase methods as they are not called when using TestNG groups
@@ -49,7 +48,7 @@ public class MockitoTest  extends PowerMockTestCase {
 	protected static final String SERVER_URL = "http://localhost:4321";
 	private static Map<Method, Boolean> beforeMethodDone = Collections.synchronizedMap(new HashMap<>());
 
-	@BeforeMethod(groups={"ut", "it"})  
+	@BeforeMethod(groups={"ut", "it", "ie"})  
 	public void beforeMethod(final Method method, final ITestContext testNGCtx, final ITestResult testResult) throws Exception {
 		doBeforeMethod(method);
 		beforePowerMockTestMethod();
@@ -78,12 +77,12 @@ public class MockitoTest  extends PowerMockTestCase {
 		SeleniumTestsContextManager.getGlobalContext().setVideoCapture(VideoCaptureMode.FALSE.toString());
 	}
 	
-	@BeforeClass(groups={"ut", "it"})  
+	@BeforeClass(groups={"ut", "it", "ie"})  
 	public void beforeClass() throws Exception {
 		beforePowerMockTestClass();
 	}
 	
-	@AfterMethod(groups={"ut", "it"}, alwaysRun=true)
+	@AfterMethod(groups={"ut", "it", "ie"}, alwaysRun=true)
 	public void afterMethod(final Method method) throws Exception {
 		if (beforeMethodDone.getOrDefault(method, false) == true) {
 			afterPowerMockTestMethod();
@@ -92,7 +91,7 @@ public class MockitoTest  extends PowerMockTestCase {
 		GenericTest.resetTestNGREsultAndLogger();
 	}
 	
-	@AfterClass(groups={"ut", "it"}, alwaysRun=true)
+	@AfterClass(groups={"ut", "it", "ie"}, alwaysRun=true)
 	public void afterClass() throws Exception {
 		afterPowerMockTestClass();
 	}
