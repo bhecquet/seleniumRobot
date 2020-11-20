@@ -14,6 +14,7 @@
 	    <skipTests>false</skipTests>
 	    <skipITs>${skipTests}</skipITs>
 	    <skipUTs>${skipTests}</skipUTs>
+	    <testng.testnames>IExplorer,IntegrationTests,PageObject</testng.testnames>
 	    <seleniumRobot.debug>none</seleniumRobot.debug>
 	</properties>
 
@@ -435,6 +436,10 @@
 								<property>
 									<name>usedefaultlisteners</name>
 									<value>false</value>
+								</property>
+								<property>
+									<name>testnames</name>
+									<value>${testng.testnames}</value>
 								</property>
 							</properties>
 						</configuration>
