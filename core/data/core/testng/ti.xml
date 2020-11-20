@@ -27,7 +27,7 @@
         </packages>
     </test>
     
-    <test name="Integration tests" parallel="false">
+    <test name="IntegrationTests" parallel="false">
     	<parameter name="EXCLUDE_FROM_SQUASH_TA" value="" />
  		<parameter name="variable1" value="value1" />
  
@@ -47,7 +47,7 @@
         </packages>
     </test>
     
-    <test name="Page Object" parallel="false">
+    <test name="PageObject" parallel="false">
     	<parameter name="EXCLUDE_FROM_SQUASH_TA" value="" />
  		<parameter name="variable1" value="value3" />
 
