@@ -46,6 +46,12 @@
 			<groupId>com.atlassian.jira</groupId>
 			<artifactId>jira-rest-java-client-app</artifactId>
 			<version>5.2.1</version>
+			<exclusions>
+				<exclusion>
+          			<groupId>org.springframework</groupId>
+          			<artifactId>spring-beans</artifactId>
+        		</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>com.atlassian.fugue</groupId>
