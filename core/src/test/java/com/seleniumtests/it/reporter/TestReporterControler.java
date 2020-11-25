@@ -74,7 +74,7 @@ public class TestReporterControler extends ReporterTest {
 	}
 	
 	/**
-	 * Check that with driver starting and operations in BeforeMethod method, screenshots are correctyl handled
+	 * Check that with driver starting and operations in BeforeMethod method, screenshots are correctly handled
 	 * - copied in the relevant folder
 	 * - always present at the end of the test 
 	 */
@@ -105,8 +105,7 @@ public class TestReporterControler extends ReporterTest {
 		
 		// check that a 'test1Listener5' has been created and contains html capture
 		Assert.assertEquals(Paths.get(outDir, "test1Listener5", "htmls").toFile().list().length, 1);
-	}
-	
+	}	
 
 	/**
 	 * Check BeforeXXX configuration error is recorded in detailed file
