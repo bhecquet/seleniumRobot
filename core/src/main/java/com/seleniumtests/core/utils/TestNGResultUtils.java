@@ -30,6 +30,7 @@ import org.testng.ITestResult;
 import org.testng.annotations.CustomAttribute;
 import org.testng.annotations.Test;
 import org.testng.internal.BaseTestMethod;
+import org.testng.internal.TestNGMethod;
 import org.testng.internal.TestResult;
 
 import com.seleniumtests.core.SeleniumTestsContext;
@@ -45,6 +46,7 @@ public class TestNGResultUtils {
 
 	private static final String UNIQUE_METHOD_NAME = "uniqueMethodName"; // unique name of the test (in case several tests have the same name)
 	private static final String TEST_CONTEXT = "testContext";
+	private static final String LINKED_TEST_METHOD = "linkedTestMethod"; // the test method associated to this configuration method. Obviously, this is null for all test methods 
 	private static final String RETRY = "retry";						// index of the retry
 	private static final String NO_MORE_RETRY = "noMoreRetry";			// set to true when is not going to be retried
 	private static final String TEST_INFO = "testInfo";
@@ -188,6 +190,14 @@ public class TestNGResultUtils {
     
     public static void setTestMethodName(ITestResult testNGResult, String name) {
     	testNGResult.setAttribute(METHOD_NAME, name);
+    }
+    
+    public static ITestNGMethod getLinkedTestMethod(ITestResult testNGResult) {
+    	return (ITestNGMethod) testNGResult.getAttribute(LINKED_TEST_METHOD);
+    }
+    
+    public static void setLinkedTestMethod(ITestResult testNGResult, ITestNGMethod testMethod) {
+    	testNGResult.setAttribute(LINKED_TEST_METHOD, testMethod);
     }
     
     public static SeleniumTestsContext getSeleniumRobotTestContext(ITestResult testNGResult) {

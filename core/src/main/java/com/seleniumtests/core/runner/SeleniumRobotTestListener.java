@@ -43,6 +43,7 @@ import org.testng.ISuiteListener;
 import org.testng.ISuiteResult;
 import org.testng.ITestContext;
 import org.testng.ITestListener;
+import org.testng.ITestNGMethod;
 import org.testng.ITestResult;
 import org.testng.Reporter;
 import org.testng.internal.ConfigurationMethod;
@@ -378,6 +379,14 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
         		logger.error(String.format("Archiving KO [%s] => %s", e.getMessage(), SeleniumTestsContextManager.getGlobalContext().getArchiveToFile()));
         	}
 		}
+	}
+	
+	/**
+	 * associates the test method to the configuration method when configuration starts
+	 */
+	@Override
+	public void beforeConfiguration(ITestResult tr, ITestNGMethod tm) {
+		TestNGResultUtils.setLinkedTestMethod(tr, tm);
 	}
 	
 	@Override
