@@ -41,6 +41,7 @@ import org.testng.IReporter;
 import org.testng.ITestContext;
 import org.testng.ITestResult;
 import org.testng.TestRunner;
+import org.testng.internal.ConfigurationMethod;
 import org.testng.internal.TestResult;
 
 import com.seleniumtests.browserfactory.BrowserInfo;

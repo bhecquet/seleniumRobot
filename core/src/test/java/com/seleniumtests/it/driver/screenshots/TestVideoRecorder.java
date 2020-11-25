@@ -20,6 +20,7 @@ package com.seleniumtests.it.driver.screenshots;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.util.Arrays;
 
 import org.testng.Assert;
 import org.testng.ITestContext;
@@ -181,4 +182,57 @@ public class TestVideoRecorder extends ReporterTest {
 			System.clearProperty(SeleniumTestsContext.VIDEO_CAPTURE);
 		}
 	}
+	
+
+	/**
+	 * Check video is created and content is correct
+	 * @param testContext
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testVideoCaptureStartsInBeforeMethod(ITestContext testContext) throws Exception {
+
+		try {
+			System.setProperty(SeleniumTestsContext.VIDEO_CAPTURE, "true");
+
+			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest.testDriverShortWithDataProvider"}, "", "video");
+
+			// check video file has been moved to 'testDriverShortWithDataProvider' folder
+			Assert.assertTrue(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriverShortWithDataProvider", "videoCapture.avi").toFile().exists());			
+			Assert.assertFalse(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "before-testDriverShortWithDataProvider", "videoCapture.avi").toFile().exists());			
+			Assert.assertTrue(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriverShortWithDataProvider-1", "videoCapture.avi").toFile().exists());			
+
+			String detailedReportContent = readTestMethodResultFile("testDriverShortWithDataProvider");
+			Assert.assertTrue(detailedReportContent.contains("Video capture: <a href='videoCapture.avi'>file</a></div>"));
+		} finally {
+			System.clearProperty(SeleniumTestsContext.VIDEO_CAPTURE);
+		}
+	}
+	
+	/**
+	 * Check video is created and content is correct
+	 * @param testContext
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testVideoCaptureStartsInTestMethod(ITestContext testContext) throws Exception {
+		
+		try {
+			System.setProperty(SeleniumTestsContext.VIDEO_CAPTURE, "true");
+			
+			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest.testDriverShortWithDataProvider"}, "", "stub");
+			
+			// check video file has been moved to 'testDriverShortWithDataProvider' folder
+			Assert.assertTrue(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriverShortWithDataProvider", "videoCapture.avi").toFile().exists());			
+			Assert.assertFalse(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "before-testDriverShortWithDataProvider", "videoCapture.avi").toFile().exists());			
+			Assert.assertTrue(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriverShortWithDataProvider-1", "videoCapture.avi").toFile().exists());			
+			
+			String detailedReportContent = readTestMethodResultFile("testDriverShortWithDataProvider");
+			Assert.assertTrue(detailedReportContent.contains("Video capture: <a href='videoCapture.avi'>file</a></div>"));
+		} finally {
+			System.clearProperty(SeleniumTestsContext.VIDEO_CAPTURE);
+		}
+	}
+	
+
 }

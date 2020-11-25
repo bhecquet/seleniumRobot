@@ -19,8 +19,11 @@ package com.seleniumtests.it.stubclasses;
 
 import java.lang.reflect.Method;
 
+import org.openqa.selenium.WebDriverException;
+import org.testng.ITestContext;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
@@ -66,6 +69,11 @@ public class StubTestClassForDriverTest extends StubParentClass {
 		new DriverTestPage(true, BrowserType.FIREFOX)
 		._writeSomething()
 		._reset();
+	}
+	
+	@Test(groups="stub")
+	public void testDriverIsDisplayedRetry() throws Exception {
+		new DriverTestPage(true)._isElementNotPresentDisplayed();
 	}
 	
 	@Test(groups="stub")
@@ -179,5 +187,24 @@ public class StubTestClassForDriverTest extends StubParentClass {
 			._reset()
 			._clickPicture()
 			._sendKeysComposite();
+	}
+
+	@DataProvider(name = "data")
+	public Object[][] data(ITestContext testContext) {
+		return new String[][] {new String[] {"data1"}, new String[] {"data2"}};
+	}
+	
+
+	@BeforeMethod(groups="video")
+	public void initVideo(Method method) throws Exception {
+		SeleniumTestsContextManager.getThreadContext().setBrowser("chrome");
+		SeleniumTestsContextManager.getThreadContext().setOverrideSeleniumNativeAction(true);
+		SeleniumTestsContextManager.getThreadContext().setTestRetryCount(1);
+		new DriverTestPage(true); // starts driver in Before Method
+	}
+
+	@Test(groups={"video", "stub"}, dataProvider = "data")
+	public void testDriverShortWithDataProvider(String data) throws Exception {
+		new DriverTestPage(true);
 	}
 }

@@ -18,6 +18,7 @@
 package com.seleniumtests.core.runner;
 
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -27,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.openqa.selenium.WebDriver;
 import org.testng.ITestResult;
@@ -94,14 +96,27 @@ public class SeleniumRobotTestPlan {
 		File videoFile = WebUIDriver.stopVideoCapture();
 		if (videoFile != null) {
 			Path pathAbsolute = Paths.get(videoFile.getAbsolutePath());
-	        Path pathBase = Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory());
-	        Path pathRelative = pathBase.relativize(pathAbsolute);
 	        
 	        if (SeleniumTestsContextManager.getThreadContext().getVideoCapture() == VideoCaptureMode.TRUE
 	        		|| (SeleniumTestsContextManager.getThreadContext().getVideoCapture() == VideoCaptureMode.ON_SUCCESS && testResult.isSuccess())
 	        		|| (SeleniumTestsContextManager.getThreadContext().getVideoCapture() == VideoCaptureMode.ON_ERROR && !testResult.isSuccess())) {
+	        	// move video file to the main result folder (if driver starts in a before method, video is recorded in "before-xxx" folder
+	        	File newVideoPath;
+	        	try {
+	        		newVideoPath = Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), videoFile.getName()).toFile();
+					if (!newVideoPath.equals(videoFile)) {
+						FileUtils.moveFile(videoFile, newVideoPath);
+					}
+					logger.info("Video file copied to " + newVideoPath.getAbsolutePath());
+				} catch (IOException e) {
+					logger.error("error copying video file: " + e.getMessage());
+					newVideoPath = videoFile;
+				}
+	        	Path pathBase = Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory());
+		        Path pathRelative = pathBase.relativize(Paths.get(newVideoPath.getAbsolutePath()));
+	        	
 	        	((ScenarioLogger)logger).logFileToTestEnd(pathRelative.toFile(), "Video capture");
-	        	logger.info("Video file copied to " + pathAbsolute.toFile().getAbsolutePath());
+	        	
 			} else {
 				pathAbsolute.toFile().delete();
 			}
