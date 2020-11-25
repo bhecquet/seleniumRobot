@@ -1071,8 +1071,12 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     public boolean isDisplayed() {
         try {
             return isDisplayedRetry();
-        } catch (Exception e) {
+        } catch (WebDriverException e) {
+        	scenarioLogger.warn("Element not displayed / not found. For searching if element is present and/or displayed, use isElementPresentAndDisplayed() instead");
             return false;
+        } catch (Exception e) {
+        	return false;
+
         }
     }
     
