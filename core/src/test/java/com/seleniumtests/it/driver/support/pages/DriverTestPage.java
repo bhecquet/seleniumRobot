@@ -211,6 +211,13 @@ public class DriverTestPage extends PageObject {
     	
     }
     
+    public DriverTestPage _isElementNotPresentDisplayed() {
+    	if (textElementNotPresent.isDisplayed()) {
+    		logger.info("displayed");
+    	}
+    	return this;
+    }
+    
     public DriverTestPage _setPassword(String passWordShort) {
     	textElement.sendKeys(passWordShort);
     	return this;

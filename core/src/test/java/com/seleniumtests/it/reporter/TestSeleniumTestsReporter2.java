@@ -1497,4 +1497,25 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		}
 	}
 	
+	/**
+	 * Check call to 'isDisplayedRetry' when element is not present should create a failed step with warning, but no exception displayed
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testNoFailedStepForIsDisplayedRetry() throws Exception {
+		
+		try {
+			System.setProperty(SeleniumTestsContext.REPLAY_TIME_OUT, "3");
+			
+			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriverIsDisplayedRetry"});
+			
+			// read 'testDriver' report. This contains calls to HtmlElement actions
+			String detailedReportContent1 = readTestMethodResultFile("testDriverIsDisplayedRetry");
+			Assert.assertTrue(detailedReportContent1.contains("<div class=\"message-warning\">Warning: Searched element could not be found")); // warning
+			Assert.assertFalse(detailedReportContent1.contains("<div class=\"message-error\">class org.openqa.selenium.NoSuchElementException: Searched element could not be found<br/>"));
+		} finally {
+			System.clearProperty(SeleniumTestsContext.REPLAY_TIME_OUT);
+		}
+	}
+	
 }
