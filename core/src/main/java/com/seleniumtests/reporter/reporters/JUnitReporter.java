@@ -95,11 +95,7 @@ public class JUnitReporter extends CommonReporter {
 			testCases.add(testTag);
 		}
 		int ignored = getDisabledTestCount(testContext.getExcludedMethods());
-
-		for (ITestNGMethod eachMethod : testContext.getExcludedMethods()) {
-			testCases.add(createIgnoredTestTagFor(eachMethod));
-		}
-
+		
 		p1.setProperty(XMLConstants.ATTR_FAILURES, Integer.toString(failures));
 		p1.setProperty(XMLConstants.ATTR_ERRORS, Integer.toString(errors));
 		p1.setProperty(XMLConstants.SKIPPED, Integer.toString(skipped + ignored));

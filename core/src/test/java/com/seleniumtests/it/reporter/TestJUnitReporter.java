@@ -68,6 +68,7 @@ public class TestJUnitReporter extends ReporterTest {
 			Assert.assertTrue(Paths.get(outDir, "junitreports", String.format("TEST-%s.xml", testName)).toFile().exists());
 		}
 		Assert.assertEquals(testList.size(), 4);
+		
 	}
 	
 	@Test(groups={"it"})
@@ -81,20 +82,29 @@ public class TestJUnitReporter extends ReporterTest {
 		for (String testName: testList) {
 			Assert.assertTrue(Paths.get(outDir, "junitreports", String.format("TEST-%s.xml", testName)).toFile().exists());
 		}
+
 	}
 	
 	@Test(groups={"it"})
 	public void testReportContent(ITestContext testContext) throws Exception {
 
-		List<String> testList = executeSubTest(new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"});
+		List<String> testList = executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions", "testInError", "testWithException", "testSkipped"});
 		String outDir = new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath();
+		
 		
 		String result = FileUtils.readFileToString(Paths.get(outDir, "junitreports", String.format("TEST-%s.xml", testList.get(0))).toFile());
 		Assert.assertTrue(result.contains("<failure type=\"java.lang.AssertionError\" message=\"error\">"));
-		Assert.assertTrue(result.contains("<error type=\"com.seleniumtests.customexception.DriverExceptions\" message=\"some exception\">"));
-		Assert.assertTrue(result.contains("name=\"testAndSubActions\""));
-		Assert.assertTrue(result.contains("name=\"testWithException\""));
-		Assert.assertTrue(result.contains("name=\"testInError\""));
+		Assert.assertTrue(result.contains("<error type=\"com.seleniumtests.customexception.DriverExceptions\" message=\"some exception\">")); // errors
+		Assert.assertTrue(result.contains("[main] SeleniumRobotTestListener: Finish method testSkipped")); // some logs
+		
+		// issue #397: test we get only the executed tests 
+		Assert.assertTrue(result.contains("<testcase name=\"testInError\""));
+		Assert.assertTrue(result.contains("<testcase name=\"testAndSubActions\""));
+		Assert.assertTrue(result.contains("<testcase name=\"testWithException\""));
+		Assert.assertTrue(result.contains("<testcase name=\"testSkipped\""));
+		Assert.assertFalse(result.contains("<testcase name=\"testWithExceptionAndDataProvider\""));
+		Assert.assertFalse(result.contains("<testcase name=\"testWithExceptionAndMaxRetryIncreased\""));
+		Assert.assertFalse(result.contains("<testcase name=\"testWithExceptionAndMaxRetryIncreasedWithLimit\""));
 	
 	}
 	
