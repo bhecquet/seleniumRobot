@@ -51,37 +51,37 @@ public class TestNgSelect extends GenericMultiBrowserTest {
 	}
    
 
-	@Test(groups={"it"})
+	
 	public void testSelectByText() {
 		DriverSubAngularTestPage.ngSelectList.selectByText("Python");
 		Assert.assertEquals(DriverSubAngularTestPage.ngSelectList.getSelectedText(), "Python");
 	}
 	
-	@Test(groups={"it"})
+	
 	public void testSelectByTextAtBottomOfList() {
 		DriverSubAngularTestPage.ngSelectList.selectByText("ReactJs");
 		Assert.assertEquals(DriverSubAngularTestPage.ngSelectList.getSelectedText(), "ReactJs");
 	}
 	
-	@Test(groups={"it"})
+	
 	public void testSelectByIndex() {
 		DriverSubAngularTestPage.ngSelectList.selectByIndex(2);
 		Assert.assertEquals(DriverSubAngularTestPage.ngSelectList.getSelectedText(), "Java");
 	}
 	
-	@Test(groups={"it"})
+	
 	public void testSelectByValue() {
 		DriverSubAngularTestPage.ngSelectList.selectByValue("Node Js");
 		Assert.assertEquals(DriverSubAngularTestPage.ngSelectList.getSelectedText(), "Node Js");
 	}
 	
-	@Test(groups={"it"})
+	
 	public void testSelectByCorrespondingText() {
 		DriverSubAngularTestPage.ngSelectList.selectByCorrespondingText("de_Js");
 		Assert.assertEquals(DriverSubAngularTestPage.ngSelectList.getSelectedText(), "Node Js");
 	}
 	
-	@Test(groups={"it"})
+	
 	public void testSelectMultipleByText() {
 		DriverSubAngularTestPage.ngSelectMultipleList.selectByText(new String[] {"Python", "Java"});
 		String[] selectedTexts = DriverSubAngularTestPage.ngSelectMultipleList.getSelectedTexts();
@@ -90,7 +90,7 @@ public class TestNgSelect extends GenericMultiBrowserTest {
 		Assert.assertEquals(selectedTexts[1], "Java");
 	}
 	
-	@Test(groups={"it"})
+	
 	public void testSelectMultipleByIndex() {
 		DriverSubAngularTestPage.ngSelectMultipleList.selectByIndex(new int[] {0, 2});
 		String[] selectedTexts = DriverSubAngularTestPage.ngSelectMultipleList.getSelectedTexts();
@@ -99,7 +99,7 @@ public class TestNgSelect extends GenericMultiBrowserTest {
 		Assert.assertEquals(selectedTexts[1], "Java");
 	}
 	
-	@Test(groups={"it"})
+	
 	public void testSelectMultipleByValue() {
 		DriverSubAngularTestPage.ngSelectMultipleList.selectByValue(new String[] {"Java", "Angular"});
 		String[] selectedTexts = DriverSubAngularTestPage.ngSelectMultipleList.getSelectedTexts();
@@ -108,7 +108,7 @@ public class TestNgSelect extends GenericMultiBrowserTest {
 		Assert.assertEquals(selectedTexts[1], "Angular");
 	}
 	
-	@Test(groups={"it"})
+	
 	public void testSelectMultipleByCorrespondingText() {
 		DriverSubAngularTestPage.ngSelectMultipleList.selectByCorrespondingText(new String[] {"ava", "gular"});
 		String[] selectedTexts = DriverSubAngularTestPage.ngSelectMultipleList.getSelectedTexts();
@@ -117,7 +117,7 @@ public class TestNgSelect extends GenericMultiBrowserTest {
 		Assert.assertEquals(selectedTexts[1], "Angular");
 	}
 	
-	@Test(groups={"it"})
+	
 	public void testDeselectByText() {
 		DriverSubAngularTestPage.ngSelectMultipleList.selectByText(new String[] {"Python", "Java"});
 		DriverSubAngularTestPage.ngSelectMultipleList.deselectByText("Python");
@@ -126,7 +126,7 @@ public class TestNgSelect extends GenericMultiBrowserTest {
 		Assert.assertEquals(selectedTexts.length, 1);
 	}
 	
-	@Test(groups={"it"})
+	
 	public void testDeselectByIndex() {
 		DriverSubAngularTestPage.ngSelectMultipleList.selectByIndex(new int[] {0, 2});
 		DriverSubAngularTestPage.ngSelectMultipleList.deselectByIndex(2);
@@ -135,7 +135,7 @@ public class TestNgSelect extends GenericMultiBrowserTest {
 		Assert.assertEquals(selectedTexts[0], "Python");
 	}
 	
-	@Test(groups={"it"})
+	
 	public void testDeselectByValue() {
 		DriverSubAngularTestPage.ngSelectMultipleList.selectByValue(new String[] {"Java", "Angular"});
 		DriverSubAngularTestPage.ngSelectMultipleList.deselectByValue("Java");
@@ -144,7 +144,7 @@ public class TestNgSelect extends GenericMultiBrowserTest {
 		Assert.assertEquals(selectedTexts[0], "Angular");
 	}
 	
-	@Test(groups={"it"})
+	
 	public void testDeselectByCorrespondingText() {
 		DriverSubAngularTestPage.ngSelectMultipleList.selectByCorrespondingText(new String[] {"ava", "gular"});
 		DriverSubAngularTestPage.ngSelectMultipleList.deselectByCorrespondingText("ava");
@@ -156,22 +156,22 @@ public class TestNgSelect extends GenericMultiBrowserTest {
 	/**
 	 * Check deselecting a non multiple element raises an error
 	 */
-	@Test(groups={"it"}, expectedExceptions=UnsupportedOperationException.class)
+	
 	public void testDeselectByTextNonMultipleSelect() {
 		DriverSubAngularTestPage.ngSelectList.deselectByText("Java");
 	}
 	
-	@Test(groups={"it"}, expectedExceptions=UnsupportedOperationException.class)
+	
 	public void testDeselectByIndexNonMultipleSelect() {
 		DriverSubAngularTestPage.ngSelectList.deselectByIndex(2);
 	}
 	
-	@Test(groups={"it"}, expectedExceptions=UnsupportedOperationException.class)
+	
 	public void testDeselectByValueNonMultipleSelect() {
 		DriverSubAngularTestPage.ngSelectList.deselectByValue("Angular");
 	}
 	
-	@Test(groups={"it"}, expectedExceptions=UnsupportedOperationException.class)
+	
 	public void testDeselectByCorrespondingTextNonMultipleSelect() {
 		DriverSubAngularTestPage.ngSelectList.deselectByCorrespondingText("ython");
 	}
@@ -179,28 +179,28 @@ public class TestNgSelect extends GenericMultiBrowserTest {
 	/**
 	 * Check deselecting a not selected element does not raise error
 	 */
-	@Test(groups={"it"})
+	
 	public void testDeselectByTextNotSelected() {
 		DriverSubAngularTestPage.ngSelectMultipleList.deselectByText("Python");
 		String[] selectedTexts = DriverSubAngularTestPage.ngSelectMultipleList.getSelectedTexts();
 		Assert.assertEquals(selectedTexts.length, 0);
 	}
 	
-	@Test(groups={"it"})
+	
 	public void testDeselectByIndexNotSelected() {
 		DriverSubAngularTestPage.ngSelectMultipleList.deselectByIndex(2);
 		String[] selectedTexts = DriverSubAngularTestPage.ngSelectMultipleList.getSelectedTexts();
 		Assert.assertEquals(selectedTexts.length, 0);
 	}
 	
-	@Test(groups={"it"})
+	
 	public void testDeselectByValueNotSelected() {
 		DriverSubAngularTestPage.ngSelectMultipleList.deselectByValue("Java");
 		String[] selectedTexts = DriverSubAngularTestPage.ngSelectMultipleList.getSelectedTexts();
 		Assert.assertEquals(selectedTexts.length, 0);
 	}
 	
-	@Test(groups={"it"})
+	
 	public void testDeselectByCorrespondingTextNotSelected() {
 		DriverSubAngularTestPage.ngSelectMultipleList.deselectByCorrespondingText("ular");
 		String[] selectedTexts = DriverSubAngularTestPage.ngSelectMultipleList.getSelectedTexts();
@@ -210,27 +210,27 @@ public class TestNgSelect extends GenericMultiBrowserTest {
 	/**
 	 * Check deselecting an invalid value raises an error
 	 */
-	@Test(groups={"it"}, expectedExceptions=NoSuchElementException.class)
+	
 	public void testDeselectByInvalidText() {
 		DriverSubAngularTestPage.ngSelectMultipleList.deselectByText("Multiple Option 10");
 	}
 	
-	@Test(groups={"it"}, expectedExceptions=NoSuchElementException.class)
+	
 	public void testDeselectByInvalidIndex() {
 		DriverSubAngularTestPage.ngSelectMultipleList.deselectByIndex(20);
 	}
 	
-	@Test(groups={"it"}, expectedExceptions=NoSuchElementException.class)
+	
 	public void testDeselectByInvalidValue() {
 		DriverSubAngularTestPage.ngSelectMultipleList.deselectByValue("option10");
 	}
 	
-	@Test(groups={"it"})
+	
 	public void testSelectNotMultiple() {
 		Assert.assertFalse(DriverSubAngularTestPage.ngSelectList.isMultiple());
 	}
 	 
-	@Test(groups={"it"})
+	
 	public void testSelectMultiple() { 
 		Assert.assertTrue(DriverSubAngularTestPage.ngSelectMultipleList.isMultiple());
 	}
@@ -238,7 +238,7 @@ public class TestNgSelect extends GenericMultiBrowserTest {
 	/**
 	 * Check that if we specify the same option 2 times, it's not deselected
 	 */
-	@Test(groups={"it"})
+	
 	public void testSelectSameTextMultipleTimes() {
 		DriverSubAngularTestPage.ngSelectMultipleList.selectByText(new String[] {"Java", "Java"});
 		String[] selectedTexts = DriverSubAngularTestPage.ngSelectMultipleList.getSelectedTexts();
@@ -249,32 +249,32 @@ public class TestNgSelect extends GenericMultiBrowserTest {
 	/**
 	 * Check trying to select an element which does not exist raises an error
 	 */
-	@Test(groups={"it"}, expectedExceptions=NoSuchElementException.class)
+	
 	public void testSelectByInvalidText() {
 		DriverSubAngularTestPage.ngSelectList.selectByText("Option 12");
 	}
 	
-	@Test(groups={"it"}, expectedExceptions=NoSuchElementException.class)
+	
 	public void testSelectByInvalidTexts() {
 		DriverSubAngularTestPage.ngSelectList.selectByText(new String[] {"Option 12"});
 	}
 	
-	@Test(groups={"it"}, expectedExceptions=NoSuchElementException.class)
+	
 	public void testSelectInvalidIndex() {
 		DriverSubAngularTestPage.ngSelectList.selectByIndex(20);
 	}
 	
-	@Test(groups={"it"}, expectedExceptions=NoSuchElementException.class)
+	
 	public void testSelectInvalidIndexes() {
 		DriverSubAngularTestPage.ngSelectList.selectByIndex(new int[] {10, 20});
 	}
 	
-	@Test(groups={"it"}, expectedExceptions=NoSuchElementException.class)
+	
 	public void testSelectByInvalidValue() {
 		DriverSubAngularTestPage.ngSelectList.selectByValue("option30");
 	}
 	
-	@Test(groups={"it"}, expectedExceptions=NoSuchElementException.class)
+	
 	public void testSelectByInvalidValues() {
 		DriverSubAngularTestPage.ngSelectList.selectByValue(new String[] {"option30"});
 	}

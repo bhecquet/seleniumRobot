@@ -43,68 +43,68 @@ public class TestFrame extends GenericMultiBrowserTest {
 	
 	
 
-	@Test(groups={"it"})
+	
 	public void testFrameText() {
 		Assert.assertEquals(DriverTestPage.textElementIFrame.getValue(), "a value");
 	}
 	
-	@Test(groups={"it"})
+	
 	public void testFrameRadio() {
 		Assert.assertEquals(DriverTestPage.radioElementIFrame.getAttribute("name"), "radio");
 	}
 	
-	@Test(groups={"it"})
+	
 	public void testFrameCheckbox() {
 		Assert.assertEquals(DriverTestPage.checkElementIFrame.getAttribute("type"), "checkbox");
 	}
 	
-	@Test(groups={"it"})
+	
 	public void testFrameButton() {
 		DriverTestPage.buttonIFrame.click();
 		Assert.assertEquals(DriverTestPage.buttonIFrame.getText(), "A button");
 	}
 	
-	@Test(groups={"it"})
+	
 	public void testFrameLabel() {
 		Assert.assertEquals(DriverTestPage.labelIFrame.getText(), "A label");
 	}
 	
-	@Test(groups={"it"})
+	
 	public void testFrameLink() {
 		Assert.assertTrue(DriverTestPage.linkIFrame.getUrl().startsWith("http://www.google.fr"));
 	}
 	
-	@Test(groups={"it"})
+	
 	public void testFrameSelect() {
 		Assert.assertEquals(DriverTestPage.selectListIFrame.getOptions().size(), 1);
 	}
 	
-	@Test(groups={"it"})
+	
 	public void testElementInsideOtherElementWithFrame() {
 		Assert.assertEquals(DriverTestPage.optionOfSelectListIFrame.getText(), "option1 frame");
 	}
 	
-	@Test(groups={"it"})
+	
 	public void testFrameTable() {
 		Assert.assertEquals(DriverTestPage.tableIFrame.getRowCount(), 2);
 	}
 	
-	@Test(groups={"it"})
+	
 	public void testIsElementPresentInFrame() {
 		Assert.assertTrue(DriverTestPage.tableIFrame.isElementPresent());
 	}
 	
-	@Test(groups={"it"})
+	
 	public void testFindElements() {
 		Assert.assertEquals(DriverTestPage.rows.findElements().size(), 4);
 	}
 	
-	@Test(groups={"it"})
+	
 	public void testFindElementsBy() {
 		Assert.assertEquals(DriverTestPage.tableIFrame.findElements(By.tagName("tr")).size(), 2);
 	}
 	
-	@Test(groups={"it"})
+	
 	public void testFrameInFrameText() {
 		Assert.assertEquals(DriverTestPage.textElementSubIFrame.getValue(), "an other value in iframe");
 	}
@@ -112,7 +112,7 @@ public class TestFrame extends GenericMultiBrowserTest {
 	/**
 	 * issue #276: check we can get an element inside second iframe (searching by index)
 	 */
-	@Test(groups={"it"})
+	
 	public void testFrameInSecondFrameText() {
 		Assert.assertEquals(DriverTestPage.textElementSecondIFrame.getValue(), "an other value in iframe");
 	}
@@ -120,7 +120,7 @@ public class TestFrame extends GenericMultiBrowserTest {
 	/**
 	 * test that when working with an element inside frame, we automatically go back to default content before next element action
 	 */
-	@Test(groups={"it"})
+	
 	public void testBackToMainFrame() {
 		System.out.println(DriverTestPage.labelIFrame.getText());
 		try {

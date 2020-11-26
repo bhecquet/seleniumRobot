@@ -33,7 +33,7 @@ public class TestAutoScrolling extends GenericMultiBrowserTest {
 	/**
 	 * Scroll into div
 	 */
-	@Test(groups={"it", "ut"})
+	
 	public void testScrollToMiddleDiv1() {
 		DriverScrollingTestPage.greenBox.click();
 		Assert.assertEquals(DriverScrollingTestPage.textElement.getValue(), "greenbox");
@@ -42,7 +42,7 @@ public class TestAutoScrolling extends GenericMultiBrowserTest {
 	/**
 	 * Scroll into div
 	 */
-	@Test(groups={"it", "ut"})
+	
 	public void testScrollToMiddleDiv2() {
 		DriverScrollingTestPage.blueBox.click();
 		Assert.assertEquals(DriverScrollingTestPage.textElement.getValue(), "bluebox");
@@ -51,7 +51,7 @@ public class TestAutoScrolling extends GenericMultiBrowserTest {
 	/**
 	 * Scroll into top of div. Check that header do not hide the button
 	 */
-	@Test(groups={"it", "ut"})
+	
 	public void testScrollToDivTop() {
 		DriverScrollingTestPage.buttonScrollTop.click();
 		Assert.assertEquals(DriverScrollingTestPage.textElement.getValue(), "scroll top");
@@ -60,7 +60,7 @@ public class TestAutoScrolling extends GenericMultiBrowserTest {
 	/**
 	 * Scroll into bottom of div. Check that footer do not hide the button
 	 */
-	@Test(groups={"it", "ut"})
+	
 	public void testScrollToDivBottom() {
 		DriverScrollingTestPage.buttonScrollBottom.click();
 		Assert.assertEquals(DriverScrollingTestPage.textElement.getValue(), "scroll bottom");
@@ -69,7 +69,7 @@ public class TestAutoScrolling extends GenericMultiBrowserTest {
 	/**
 	 * Scroll into bottom of div. Check that composite action is done
 	 */
-	@Test(groups={"it", "ut"})
+	
 	public void testScrollToDivBottomWithCompositeAction() {
 		new Actions(driver).click(DriverScrollingTestPage.buttonScrollBottom).perform();
 		Assert.assertEquals(DriverScrollingTestPage.textElement.getValue(), "scroll bottom");
@@ -78,7 +78,7 @@ public class TestAutoScrolling extends GenericMultiBrowserTest {
 	/**
 	 * Scroll to page bottom and check that element is not hidden by footer
 	 */
-	@Test(groups={"it", "ut"})
+	
 	public void testScrollToBottom() {
 			DriverScrollingTestPage.setButton.click();
 			Assert.assertEquals(DriverScrollingTestPage.textElement.getValue(), "bottom button");
@@ -87,7 +87,7 @@ public class TestAutoScrolling extends GenericMultiBrowserTest {
 	/**
 	 * Scroll to page bottom without headers
 	 */
-	@Test(groups={"it", "ut"})
+	
 	public void testScrollToBottomNoHeader() {
 		
 		DriverScrollingTestPage.hideButton.click();
@@ -100,7 +100,7 @@ public class TestAutoScrolling extends GenericMultiBrowserTest {
 	/**
 	 * Scroll into div
 	 */
-	@Test(groups={"it", "ut"})
+	
 	public void testAutoScrollToMiddleDiv1() {
 		try {
 			DriverScrollingTestPage.greenBox.setScrollToElementBeforeAction(true);
@@ -114,7 +114,7 @@ public class TestAutoScrolling extends GenericMultiBrowserTest {
 	/**
 	 * Scroll into div
 	 */
-	@Test(groups={"it", "ut"})
+	
 	public void testAutoScrollToMiddleDiv2() {
 		try {
 			DriverScrollingTestPage.blueBox.setScrollToElementBeforeAction(true);
@@ -128,7 +128,7 @@ public class TestAutoScrolling extends GenericMultiBrowserTest {
 	/**
 	 * Scroll into top of div. Check that header do not hide the button
 	 */
-	@Test(groups={"it", "ut"})
+	
 	public void testAutoScrollToDivTop() {
 		try {
 			DriverScrollingTestPage.buttonScrollTop.setScrollToElementBeforeAction(true);
@@ -142,7 +142,7 @@ public class TestAutoScrolling extends GenericMultiBrowserTest {
 	/**
 	 * Scroll into bottom of div. Check that footer do not hide the button
 	 */
-	@Test(groups={"it", "ut"})
+	
 	public void testAutoScrollToDivBottom() {
 		try {
 			DriverScrollingTestPage.buttonScrollBottom.setScrollToElementBeforeAction(true);
@@ -156,7 +156,7 @@ public class TestAutoScrolling extends GenericMultiBrowserTest {
 	/**
 	 * Scroll to page bottom and check that element is not hidden by footer
 	 */
-	@Test(groups={"it", "ut"})
+	
 	public void testAutoScrollToBottom() {
 		try {
 			DriverScrollingTestPage.setButton.setScrollToElementBeforeAction(true);
@@ -171,7 +171,7 @@ public class TestAutoScrolling extends GenericMultiBrowserTest {
 	/**
 	 * Check behaviour with menu
 	 */
-	@Test(groups={"it", "ut"})
+	
 	public void testAutoScrollToMenu() {
 		// test is known not to work with IE because menu disappears immediately after the first 'moveToElement'
 		// this bheavior is pure Selenium

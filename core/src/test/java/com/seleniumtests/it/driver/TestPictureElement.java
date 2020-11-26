@@ -60,7 +60,7 @@ public class TestPictureElement extends GenericMultiBrowserTest {
 		}
 	}
 	
-	@Test(groups={"it"})
+	
 	public void testClickOnPicture() {
 		try {
 			DriverTestPageWithoutFixedPattern.picture.clickAt(0, -20);
@@ -71,7 +71,7 @@ public class TestPictureElement extends GenericMultiBrowserTest {
 		Assert.assertEquals(DriverTestPageWithoutFixedPattern.logoText.getValue(), "ff logo");
 	}
 	
-	@Test(groups={"it"})
+	
 	public void testDoubleClickOnPicture() {
 		try {
 			DriverTestPageWithoutFixedPattern.picture.doubleClickAt(0, -20);
@@ -85,7 +85,7 @@ public class TestPictureElement extends GenericMultiBrowserTest {
 	/**
 	 * test correction of issue #131 by clicking on element which does not have a "intoElement" parameter
 	 */
-	@Test(groups={"it"})
+	
 	public void testClickOnGooglePicture() {
 		try {
 			DriverTestPageWithoutFixedPattern.googlePicture.click();
@@ -99,7 +99,7 @@ public class TestPictureElement extends GenericMultiBrowserTest {
 	/**
 	 * test that an action changed actionDuration value
 	 */
-	@Test(groups={"it"})
+	
 	public void testActionDurationIsLogged() {
 		// be sure action duration has been reset
 		DriverTestPageWithoutFixedPattern.googlePicture.setActionDuration(0);
@@ -114,7 +114,7 @@ public class TestPictureElement extends GenericMultiBrowserTest {
 	/**
 	 * test correction of issue #134 by clicking on element defined by a File object
 	 */
-	@Test(groups={"it"})
+	
 	public void testClickOnGooglePictureFromFile() {
 		try {
 			DriverTestPageWithoutFixedPattern.googlePictureWithFile.click();
@@ -125,7 +125,7 @@ public class TestPictureElement extends GenericMultiBrowserTest {
 		Assert.assertEquals(DriverTestPageWithoutFixedPattern.textElement.getValue(), "image");
 	}
 	
-	@Test(groups={"it"})
+	
 	public void testSendKeysOnPicture() {
 		try {
 			DriverTestPageWithoutFixedPattern.logoText.clear();
@@ -137,12 +137,12 @@ public class TestPictureElement extends GenericMultiBrowserTest {
 		Assert.assertEquals(DriverTestPageWithoutFixedPattern.logoText.getValue(), "hello");
 	}
 
-	@Test(groups={"it"})
+	
 	public void testIsVisible() { 
 		Assert.assertTrue(DriverTestPageWithoutFixedPattern.picture.isElementPresent());
 	}
 	
-	@Test(groups={"it"})
+	
 	public void testIsNotVisible() {
 		Assert.assertFalse(DriverTestPageWithoutFixedPattern.pictureNotPresent.isElementPresent());
 	}
