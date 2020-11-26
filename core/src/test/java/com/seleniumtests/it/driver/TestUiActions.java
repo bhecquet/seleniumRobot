@@ -18,10 +18,8 @@
 package com.seleniumtests.it.driver;
 
 import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.interactions.Actions;
 import org.testng.Assert;
-import org.testng.annotations.Test;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.driver.BrowserType;
@@ -42,7 +40,7 @@ public class TestUiActions extends GenericMultiBrowserTest {
 	/**
 	 * Test composite action with standard selenium syntax and native driver
 	 */
-	@Test(groups={"it"})
+	
 	public void testNewAction() {
 		try {
 			new Actions(((CustomEventFiringWebDriver)driver).getWebDriver()).moveToElement(driver.findElement(By.id("carre2"))).click().build().perform();
@@ -57,7 +55,7 @@ public class TestUiActions extends GenericMultiBrowserTest {
 	 * Test composite action with seleniumRobot syntax (HtmlElement) and native driver
 	 * @throws Exception
 	 */
-	@Test(groups={"it"})
+	
 	public void testNewActionWithHtmlElement() throws Exception {
 		try {
 			new Actions(((CustomEventFiringWebDriver)driver).getWebDriver()).moveToElement(DriverTestPage.redSquare).click().build().perform();
@@ -71,7 +69,7 @@ public class TestUiActions extends GenericMultiBrowserTest {
 	/**
 	 * Test composite action with standard selenium syntax and custom driver
 	 */
-	@Test(groups={"it"})
+	
 	public void testMoveClick() {
 		try {
 			new Actions(driver).moveToElement(driver.findElement(By.id("carre2"))).click().build().perform();
@@ -82,7 +80,7 @@ public class TestUiActions extends GenericMultiBrowserTest {
 		}
 	}
 	
-	@Test(groups={"it"}) 
+	
 	public void testSendKeys() {
 		try {
 			new Actions(driver).moveToElement(driver.findElement(By.id("text2"))).click().sendKeys("youpi").build().perform();
@@ -92,7 +90,7 @@ public class TestUiActions extends GenericMultiBrowserTest {
 		}
 	}
 	
-	@Test(groups={"it"}) 
+	
 	public void testSendKeysWithHtmlElement() throws Exception {
 		try {
 			new Actions(driver).moveToElement(DriverTestPage.textElement).click().sendKeys("youpi2").build().perform();
@@ -102,7 +100,7 @@ public class TestUiActions extends GenericMultiBrowserTest {
 		}
 	}
 	
-	@Test(groups={"it"}, expectedExceptions=WebDriverException.class) 
+	
 	public void testSendKeysWithHtmlElementNotPresent() throws Exception {
 		SeleniumTestsContextManager.getThreadContext().setReplayTimeout(1);
 		try {

@@ -22,7 +22,7 @@ import org.testng.annotations.Test;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.it.driver.TestPictureElement;
 
-@Test(groups= {"ie"})
+
 public class TestPictureElementInternetExplorer extends TestPictureElement {
 
 	public TestPictureElementInternetExplorer() throws Exception {
@@ -30,42 +30,42 @@ public class TestPictureElementInternetExplorer extends TestPictureElement {
 	}
 	
 	//copy all tests so that they can be played individually for debug
-	@Test(groups={"it"})
+	@Test(groups= {"ie"})
 	public void testClickOnPicture() {
 		super.testClickOnPicture();
 	}
 
-	@Test(groups={"it"})
+	@Test(groups= {"ie"})
 	public void testDoubleClickOnPicture() {
 		super.testDoubleClickOnPicture();
 	}
 	
-	@Test(groups={"it"})
+	@Test(groups= {"ie"})
 	public void testClickOnGooglePicture() {	
 		super.testClickOnGooglePicture();
 	}
 
-	@Test(groups={"it"})
+	@Test(groups= {"ie"})
 	public void testActionDurationIsLogged() {
 		super.testActionDurationIsLogged();
 	}
 
-	@Test(groups={"it"})
+	@Test(groups= {"ie"})
 	public void testClickOnGooglePictureFromFile() {
 		super.testClickOnGooglePictureFromFile();
 	}
 	
-	@Test(groups={"it"})
+	@Test(groups= {"ie"})
 	public void testSendKeysOnPicture() {
 		super.testSendKeysOnPicture();
 	}
 
-	@Test(groups={"it"})
+	@Test(groups= {"ie"})
 	public void testIsVisible() { 
 		super.testIsVisible();
 	}
 	
-	@Test(groups={"it"})
+	@Test(groups= {"ie"})
 	public void testIsNotVisible() {
 		super.testIsNotVisible();
 	}

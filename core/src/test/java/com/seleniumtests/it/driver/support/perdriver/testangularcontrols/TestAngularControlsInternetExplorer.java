@@ -29,197 +29,197 @@ public class TestAngularControlsInternetExplorer extends TestAngularControls {
 		super(BrowserType.INTERNET_EXPLORER);
 	}
 
-	@Test(groups={"it"})
+	@Test(groups= {"ie"})
 	public void testSelectByText() {
 		super.testSelectByText();
 	}
 
-	@Test(groups={"it"})
+	@Test(groups= {"ie"})
 	public void testSelectByTextAtBottomOfList() {
 		super.testSelectByTextAtBottomOfList();
 	}
 	
-	@Test(groups={"it"})
+	@Test(groups= {"ie"})
 	public void testSelectByIndex() {
 		super.testSelectByIndex();
 	}
 	
-	@Test(groups={"it"})
+	@Test(groups= {"ie"})
 	public void testSelectByValue() {
 		super.testSelectByValue();
 	}
 	
-	@Test(groups={"it"})
+	@Test(groups= {"ie"})
 	public void testSelectByCorrespondingText() {
 		super.testSelectByCorrespondingText();
 	}
 	
-	@Test(groups={"it"})
+	@Test(groups= {"ie"})
 	public void testSelectMultipleByText() {
 		super.testSelectMultipleByText();
 	}
 	
-	@Test(groups={"it"})
+	@Test(groups= {"ie"})
 	public void testSelectMultipleByIndex() {
 		super.testSelectMultipleByIndex();
 	}
 	
-	@Test(groups={"it"})
+	@Test(groups= {"ie"})
 	public void testSelectMultipleByValue() {
 		super.testSelectMultipleByValue();
 	}
 	
-	@Test(groups={"it"})
+	@Test(groups= {"ie"})
 	public void testSelectMultipleByCorrespondingText() {
 		super.testSelectMultipleByCorrespondingText();
 	}
 	
-	@Test(groups={"it"})
+	@Test(groups= {"ie"})
 	public void testDeselectByText() {
 		super.testDeselectByText();
 	}
 	
-	@Test(groups={"it"})
+	@Test(groups= {"ie"})
 	public void testDeselectByIndex() {
 		super.testDeselectByIndex();
 	}
 	
-	@Test(groups={"it"})
+	@Test(groups= {"ie"})
 	public void testDeselectByValue() {
 		super.testDeselectByValue();
 	}
 	
-	@Test(groups={"it"})
+	@Test(groups= {"ie"})
 	public void testDeselectByCorrespondingText() {
 		super.testDeselectByCorrespondingText();
 	}
 	
-	@Test(groups={"it"}, expectedExceptions=UnsupportedOperationException.class)
+	@Test(groups= {"ie"}, expectedExceptions=UnsupportedOperationException.class)
 	public void testDeselectByTextNonMultipleSelect() {
 		super.testDeselectByTextNonMultipleSelect();
 	}
 	
-	@Test(groups={"it"}, expectedExceptions=UnsupportedOperationException.class)
+	@Test(groups= {"ie"}, expectedExceptions=UnsupportedOperationException.class)
 	public void testDeselectByIndexNonMultipleSelect() {
 		super.testDeselectByIndexNonMultipleSelect();
 	}
 	
-	@Test(groups={"it"}, expectedExceptions=UnsupportedOperationException.class)
+	@Test(groups= {"ie"}, expectedExceptions=UnsupportedOperationException.class)
 	public void testDeselectByValueNonMultipleSelect() {
 		super.testDeselectByValueNonMultipleSelect();
 	}
 	
-	@Test(groups={"it"}, expectedExceptions=UnsupportedOperationException.class)
+	@Test(groups= {"ie"}, expectedExceptions=UnsupportedOperationException.class)
 	public void testDeselectByCorrespondingTextNonMultipleSelect() {
 		super.testDeselectByCorrespondingTextNonMultipleSelect();
 	}
 	
-	@Test(groups={"it"})
+	@Test(groups= {"ie"})
 	public void testDeselectByTextNotSelected() {
 		super.testDeselectByTextNotSelected();
 	}
 	
-	@Test(groups={"it"})
+	@Test(groups= {"ie"})
 	public void testDeselectByIndexNotSelected() {
 		super.testDeselectByIndexNotSelected();
 	}
 	
-	@Test(groups={"it"})
+	@Test(groups= {"ie"})
 	public void testDeselectByValueNotSelected() {
 		super.testDeselectByValueNotSelected();
 	}
 	
-	@Test(groups={"it"})
+	@Test(groups= {"ie"})
 	public void testDeselectByCorrespondingTextNotSelected() {
 		super.testDeselectByCorrespondingTextNotSelected();
 	}
 	
-	@Test(groups={"it"}, expectedExceptions=NoSuchElementException.class)
+	@Test(groups= {"ie"}, expectedExceptions=NoSuchElementException.class)
 	public void testDeselectByInvalidText() {
 		super.testDeselectByInvalidText();
 	}
 	
-	@Test(groups={"it"}, expectedExceptions=NoSuchElementException.class)
+	@Test(groups= {"ie"}, expectedExceptions=NoSuchElementException.class)
 	public void testDeselectByInvalidIndex() {
 		super.testDeselectByInvalidIndex();
 	}
 	
-	@Test(groups={"it"}, expectedExceptions=NoSuchElementException.class)
+	@Test(groups= {"ie"}, expectedExceptions=NoSuchElementException.class)
 	public void testDeselectByInvalidValue() {
 		super.testDeselectByInvalidValue();
 	}
 	
-	@Test(groups={"it"})
+	@Test(groups= {"ie"})
 	public void testSelectNotMultiple() {
 		super.testSelectNotMultiple();
 	}
 	 
-	@Test(groups={"it"})
+	@Test(groups= {"ie"})
 	public void testSelectMultiple() {
 		super.testSelectMultiple(); 
 	}
 	
-	@Test(groups={"it"})
+	@Test(groups= {"ie"})
 	public void testSelectSameTextMultipleTimes() {
 		super.testSelectSameTextMultipleTimes();
 	}
 	
-	@Test(groups={"it"}, expectedExceptions=NoSuchElementException.class)
+	@Test(groups= {"ie"}, expectedExceptions=NoSuchElementException.class)
 	public void testSelectByInvalidText() {
 		super.testSelectByInvalidText();
 	}
 	
-	@Test(groups={"it"}, expectedExceptions=NoSuchElementException.class)
+	@Test(groups= {"ie"}, expectedExceptions=NoSuchElementException.class)
 	public void testSelectByInvalidTexts() {
 		super.testSelectByInvalidTexts();
 	}
 	
-	@Test(groups={"it"}, expectedExceptions=NoSuchElementException.class)
+	@Test(groups= {"ie"}, expectedExceptions=NoSuchElementException.class)
 	public void testSelectInvalidIndex() {
 		super.testSelectInvalidIndex();
 	}
 	
-	@Test(groups={"it"}, expectedExceptions=NoSuchElementException.class)
+	@Test(groups= {"ie"}, expectedExceptions=NoSuchElementException.class)
 	public void testSelectInvalidIndexes() {
 		super.testSelectInvalidIndexes();
 	}
 	
-	@Test(groups={"it"}, expectedExceptions=NoSuchElementException.class)
+	@Test(groups= {"ie"}, expectedExceptions=NoSuchElementException.class)
 	public void testSelectByInvalidValue() {
 		super.testSelectByInvalidValue();
 	}
 	
-	@Test(groups={"it"}, expectedExceptions=NoSuchElementException.class)
+	@Test(groups= {"ie"}, expectedExceptions=NoSuchElementException.class)
 	public void testSelectByInvalidValues() {
 		super.testSelectByInvalidValues();
 	}
 	
-	@Test(groups= {"it"})
+	@Test(groups= {"ie"})
 	public void testCheckBox() {
 		super.testCheckBox();
 	}
 	
-	@Test(groups= {"it"})
+	@Test(groups= {"ie"})
 	public void testUncheckCheckBox() {
 		super.testUncheckCheckBox();
 	}
 
-	@Test(groups= {"it"})
+	@Test(groups= {"ie"})
 	public void testRadio() {
 		super.testRadio();
 	}
 
-	@Test(groups= {"it"})
+	@Test(groups= {"ie"})
 	public void testTextField() {
 		super.testTextField();
 	}
 
-	@Test(groups= {"it"})
+	@Test(groups= {"ie"})
 	public void testClearDatePicker() {
 		super.testClearDatePicker();
 	}
 
-	@Test(groups= {"it"})
+	@Test(groups= {"ie"})
 	public void testSendKeysDatePicker() {
 		super.testSendKeysDatePicker();
 	}

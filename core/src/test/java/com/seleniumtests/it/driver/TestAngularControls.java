@@ -17,11 +17,9 @@
  */
 package com.seleniumtests.it.driver;
 
-import org.openqa.selenium.NoSuchElementException;
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.driver.BrowserType;
@@ -51,37 +49,37 @@ public class TestAngularControls extends GenericMultiBrowserTest {
 	}
    
 
-	@Test(groups={"it"})
+	
 	public void testSelectByText() {
 		DriverSubAngularTestPage.selectList.selectByText("Option 1");
 		Assert.assertEquals(DriverSubAngularTestPage.selectList.getSelectedText(), "Option 1");
 	}
 	
-	@Test(groups={"it"})
+	
 	public void testSelectByTextAtBottomOfList() {
 		DriverSubAngularTestPage.selectList.selectByText("Option 9");
 		Assert.assertEquals(DriverSubAngularTestPage.selectList.getSelectedText(), "Option 9");
 	}
 	
-	@Test(groups={"it"})
+	
 	public void testSelectByIndex() {
 		DriverSubAngularTestPage.selectList.selectByIndex(2);
 		Assert.assertEquals(DriverSubAngularTestPage.selectList.getSelectedText(), "Option 2");
 	}
 	
-	@Test(groups={"it"})
+	
 	public void testSelectByValue() {
 		DriverSubAngularTestPage.selectList.selectByValue("option3");
 		Assert.assertEquals(DriverSubAngularTestPage.selectList.getSelectedText(), "Option 3");
 	}
 	
-	@Test(groups={"it"})
+	
 	public void testSelectByCorrespondingText() {
 		DriverSubAngularTestPage.selectList.selectByCorrespondingText("ption 1");
 		Assert.assertEquals(DriverSubAngularTestPage.selectList.getSelectedText(), "Option 1");
 	}
 	
-	@Test(groups={"it"})
+	
 	public void testSelectMultipleByText() {
 		DriverSubAngularTestPage.selectMultipleList.selectByText(new String[] {"Multiple Option 1", "Multiple Option 2"});
 		String[] selectedTexts = DriverSubAngularTestPage.selectMultipleList.getSelectedTexts();
@@ -90,7 +88,7 @@ public class TestAngularControls extends GenericMultiBrowserTest {
 		Assert.assertEquals(selectedTexts[1], "Multiple Option 2");
 	}
 	
-	@Test(groups={"it"})
+	
 	public void testSelectMultipleByIndex() {
 		DriverSubAngularTestPage.selectMultipleList.selectByIndex(new int[] {0, 2});
 		String[] selectedTexts = DriverSubAngularTestPage.selectMultipleList.getSelectedTexts();
@@ -99,7 +97,7 @@ public class TestAngularControls extends GenericMultiBrowserTest {
 		Assert.assertEquals(selectedTexts[1], "Multiple Option 2");
 	}
 	
-	@Test(groups={"it"})
+	
 	public void testSelectMultipleByValue() {
 		DriverSubAngularTestPage.selectMultipleList.selectByValue(new String[] {"option1", "option2"});
 		String[] selectedTexts = DriverSubAngularTestPage.selectMultipleList.getSelectedTexts();
@@ -108,7 +106,7 @@ public class TestAngularControls extends GenericMultiBrowserTest {
 		Assert.assertEquals(selectedTexts[1], "Multiple Option 2");
 	}
 	
-	@Test(groups={"it"})
+	
 	public void testSelectMultipleByCorrespondingText() {
 		DriverSubAngularTestPage.selectMultipleList.selectByCorrespondingText(new String[] {"ple Option 1", "ple Option 2"});
 		String[] selectedTexts = DriverSubAngularTestPage.selectMultipleList.getSelectedTexts();
@@ -117,7 +115,7 @@ public class TestAngularControls extends GenericMultiBrowserTest {
 		Assert.assertEquals(selectedTexts[1], "Multiple Option 2");
 	}
 	
-	@Test(groups={"it"})
+	
 	public void testDeselectByText() {
 		DriverSubAngularTestPage.selectMultipleList.selectByText(new String[] {"Multiple Option 1", "Multiple Option 2"});
 		DriverSubAngularTestPage.selectMultipleList.deselectByText("Multiple Option 1");
@@ -126,7 +124,7 @@ public class TestAngularControls extends GenericMultiBrowserTest {
 		Assert.assertEquals(selectedTexts.length, 1);
 	}
 	
-	@Test(groups={"it"})
+	
 	public void testDeselectByIndex() {
 		DriverSubAngularTestPage.selectMultipleList.selectByIndex(new int[] {0, 2});
 		DriverSubAngularTestPage.selectMultipleList.deselectByIndex(2);
@@ -135,7 +133,7 @@ public class TestAngularControls extends GenericMultiBrowserTest {
 		Assert.assertEquals(selectedTexts[0], "None");
 	}
 	
-	@Test(groups={"it"})
+	
 	public void testDeselectByValue() {
 		DriverSubAngularTestPage.selectMultipleList.selectByValue(new String[] {"option1", "option2"});
 		DriverSubAngularTestPage.selectMultipleList.deselectByValue("option1");
@@ -144,7 +142,7 @@ public class TestAngularControls extends GenericMultiBrowserTest {
 		Assert.assertEquals(selectedTexts[0], "Multiple Option 2");
 	}
 	
-	@Test(groups={"it"})
+	
 	public void testDeselectByCorrespondingText() {
 		DriverSubAngularTestPage.selectMultipleList.selectByCorrespondingText(new String[] {"ple Option 1", "ple Option 2"});
 		DriverSubAngularTestPage.selectMultipleList.deselectByCorrespondingText("ple Option 1");
@@ -156,22 +154,22 @@ public class TestAngularControls extends GenericMultiBrowserTest {
 	/**
 	 * Check deselecting a non multiple element raises an error
 	 */
-	@Test(groups={"it"}, expectedExceptions=UnsupportedOperationException.class)
+	
 	public void testDeselectByTextNonMultipleSelect() {
 		DriverSubAngularTestPage.selectList.deselectByText("Multiple Option 1");
 	}
 	
-	@Test(groups={"it"}, expectedExceptions=UnsupportedOperationException.class)
+	
 	public void testDeselectByIndexNonMultipleSelect() {
 		DriverSubAngularTestPage.selectList.deselectByIndex(2);
 	}
 	
-	@Test(groups={"it"}, expectedExceptions=UnsupportedOperationException.class)
+	
 	public void testDeselectByValueNonMultipleSelect() {
 		DriverSubAngularTestPage.selectList.deselectByValue("option1");
 	}
 	
-	@Test(groups={"it"}, expectedExceptions=UnsupportedOperationException.class)
+	
 	public void testDeselectByCorrespondingTextNonMultipleSelect() {
 		DriverSubAngularTestPage.selectList.deselectByCorrespondingText("ple Option 1");
 	}
@@ -179,28 +177,28 @@ public class TestAngularControls extends GenericMultiBrowserTest {
 	/**
 	 * Check deselecting a not selected element does not raise error
 	 */
-	@Test(groups={"it"})
+	
 	public void testDeselectByTextNotSelected() {
 		DriverSubAngularTestPage.selectMultipleList.deselectByText("Multiple Option 1");
 		String[] selectedTexts = DriverSubAngularTestPage.selectMultipleList.getSelectedTexts();
 		Assert.assertEquals(selectedTexts.length, 0);
 	}
 	
-	@Test(groups={"it"})
+	
 	public void testDeselectByIndexNotSelected() {
 		DriverSubAngularTestPage.selectMultipleList.deselectByIndex(2);
 		String[] selectedTexts = DriverSubAngularTestPage.selectMultipleList.getSelectedTexts();
 		Assert.assertEquals(selectedTexts.length, 0);
 	}
 	
-	@Test(groups={"it"})
+	
 	public void testDeselectByValueNotSelected() {
 		DriverSubAngularTestPage.selectMultipleList.deselectByValue("option1");
 		String[] selectedTexts = DriverSubAngularTestPage.selectMultipleList.getSelectedTexts();
 		Assert.assertEquals(selectedTexts.length, 0);
 	}
 	
-	@Test(groups={"it"})
+	
 	public void testDeselectByCorrespondingTextNotSelected() {
 		DriverSubAngularTestPage.selectMultipleList.deselectByCorrespondingText("ple Option 1");
 		String[] selectedTexts = DriverSubAngularTestPage.selectMultipleList.getSelectedTexts();
@@ -210,27 +208,27 @@ public class TestAngularControls extends GenericMultiBrowserTest {
 	/**
 	 * Check deselecting an invalid value raises an error
 	 */
-	@Test(groups={"it"}, expectedExceptions=NoSuchElementException.class)
+	
 	public void testDeselectByInvalidText() {
 		DriverSubAngularTestPage.selectMultipleList.deselectByText("Multiple Option 10");
 	}
 	
-	@Test(groups={"it"}, expectedExceptions=NoSuchElementException.class)
+	
 	public void testDeselectByInvalidIndex() {
 		DriverSubAngularTestPage.selectMultipleList.deselectByIndex(20);
 	}
 	
-	@Test(groups={"it"}, expectedExceptions=NoSuchElementException.class)
+	
 	public void testDeselectByInvalidValue() {
 		DriverSubAngularTestPage.selectMultipleList.deselectByValue("option10");
 	}
 	
-	@Test(groups={"it"})
+	
 	public void testSelectNotMultiple() {
 		Assert.assertFalse(DriverSubAngularTestPage.selectList.isMultiple());
 	}
 	 
-	@Test(groups={"it"})
+	
 	public void testSelectMultiple() { 
 		Assert.assertTrue(DriverSubAngularTestPage.selectMultipleList.isMultiple());
 	}
@@ -238,7 +236,7 @@ public class TestAngularControls extends GenericMultiBrowserTest {
 	/**
 	 * Check that if we specify the same option 2 times, it's not deselected
 	 */
-	@Test(groups={"it"})
+	
 	public void testSelectSameTextMultipleTimes() {
 		DriverSubAngularTestPage.selectMultipleList.selectByText(new String[] {"Multiple Option 1", "Multiple Option 1"});
 		String[] selectedTexts = DriverSubAngularTestPage.selectMultipleList.getSelectedTexts();
@@ -249,56 +247,56 @@ public class TestAngularControls extends GenericMultiBrowserTest {
 	/**
 	 * Check trying to select an element which does not exist raises an error
 	 */
-	@Test(groups={"it"}, expectedExceptions=NoSuchElementException.class)
+	
 	public void testSelectByInvalidText() {
 		DriverSubAngularTestPage.selectList.selectByText("Option 12");
 	}
 	
-	@Test(groups={"it"}, expectedExceptions=NoSuchElementException.class)
+	
 	public void testSelectByInvalidTexts() {
 		DriverSubAngularTestPage.selectList.selectByText(new String[] {"Option 12"});
 	}
 	
-	@Test(groups={"it"}, expectedExceptions=NoSuchElementException.class)
+	
 	public void testSelectInvalidIndex() {
 		DriverSubAngularTestPage.selectList.selectByIndex(20);
 	}
 	
-	@Test(groups={"it"}, expectedExceptions=NoSuchElementException.class)
+	
 	public void testSelectInvalidIndexes() {
 		DriverSubAngularTestPage.selectList.selectByIndex(new int[] {10, 20});
 	}
 	
-	@Test(groups={"it"}, expectedExceptions=NoSuchElementException.class)
+	
 	public void testSelectByInvalidValue() {
 		DriverSubAngularTestPage.selectList.selectByValue("option30");
 	}
 	
-	@Test(groups={"it"}, expectedExceptions=NoSuchElementException.class)
+	
 	public void testSelectByInvalidValues() {
 		DriverSubAngularTestPage.selectList.selectByValue(new String[] {"option30"});
 	}
 	
-	@Test(groups= {"it"})
+	
 	public void testCheckBox() {
 		DriverSubAngularTestPage.checkbox.check();
 		Assert.assertTrue(DriverSubAngularTestPage.checkbox.isSelected());
 	}
 	
-	@Test(groups= {"it"})
+	
 	public void testUncheckCheckBox() {
 		DriverSubAngularTestPage.checkbox.check();
 		DriverSubAngularTestPage.checkbox.uncheck();
 		Assert.assertFalse(DriverSubAngularTestPage.checkbox.isSelected());
 	}
 
-	@Test(groups= {"it"})
+	
 	public void testRadio() {
 		DriverSubAngularTestPage.radio.check();
 		Assert.assertTrue(DriverSubAngularTestPage.radio.isSelected());
 	}
 	
-	@Test(groups= {"it"})
+	
 	public void testTextField() {
 		DriverSubAngularTestPage.textField.sendKeys("my text");
 		Assert.assertEquals(DriverSubAngularTestPage.textField.getValue(), "my text");
@@ -307,7 +305,7 @@ public class TestAngularControls extends GenericMultiBrowserTest {
 	/**
 	 * Clear a pre-filled date field
 	 */
-	@Test(groups= {"it"})
+	
 	public void testClearDatePicker() {
 		DriverSubAngularTestPage.textFieldDate.clear();
 		Assert.assertEquals(DriverSubAngularTestPage.textFieldDate.getValue(), "");
@@ -316,7 +314,7 @@ public class TestAngularControls extends GenericMultiBrowserTest {
 	/**
 	 * Send keys to a pre-filled date field
 	 */
-	@Test(groups= {"it"})
+	
 	public void testSendKeysDatePicker() {
 		DriverSubAngularTestPage.textFieldDate.sendKeys("1/1/2000");
 		Assert.assertEquals(DriverSubAngularTestPage.textFieldDate.getValue(), "1/1/2000");

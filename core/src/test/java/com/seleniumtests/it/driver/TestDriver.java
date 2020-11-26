@@ -81,7 +81,7 @@ public class TestDriver extends GenericMultiBrowserTest {
 //	 * Is browser able to clic on moving elements
 //	 * @throws Exception
 //	 */
-//	@Test(groups={"it", "ut"})
+//	
 //	public void testMovingElement() throws Exception {
 //		DriverTestPage.startButton.click();
 //		DriverTestPage.greenSquare.click();
@@ -92,7 +92,7 @@ public class TestDriver extends GenericMultiBrowserTest {
 	/**
 	 * Check for issue #47 where ReplayAction aspect raised an error when switching to default context after click with alert present
 	 */
-	@Test(groups={"it", "ut"})
+	
 	public void testAlertDisplay() {
 		try {
 			DriverTestPage.greenSquare.click();
@@ -106,7 +106,7 @@ public class TestDriver extends GenericMultiBrowserTest {
 	/**
 	 * deactivated as it depends on browser
 	 */
-	@Test(groups={"it", "ut"}, expectedExceptions=UnhandledAlertException.class, enabled=false)
+	
 	public void testFindWithAlert() {
 		DriverTestPage.startButton.click();
 		DriverTestPage.greenSquare.click();
@@ -122,7 +122,7 @@ public class TestDriver extends GenericMultiBrowserTest {
 	 * Test native click
 	 */
    
-	@Test(groups={"it", "ut"})
+	
 	public void testClickDiv() {
 		try {
 			DriverTestPage.redSquare.click();
@@ -133,12 +133,12 @@ public class TestDriver extends GenericMultiBrowserTest {
 		}
 	}
 
-	@Test(groups={"it", "ut"}, expectedExceptions = NoSuchElementException.class)
+	
 	public void testSendKeysElementNotFound() {
 		testPage._writeSomethingOnNonExistentElement();
 	}
 
-	@Test(groups={"it", "ut"})
+	
 	public void testDoubleClickDiv() {
 		try {
 			DriverTestPage.redSquare.simulateDoubleClick();
@@ -149,7 +149,7 @@ public class TestDriver extends GenericMultiBrowserTest {
 		}
 	}
    
-	@Test(groups={"it", "ut"})
+	
 	public void testClickRadio() {
 		try {
 			DriverTestPage.radioElement.click();
@@ -159,7 +159,7 @@ public class TestDriver extends GenericMultiBrowserTest {
 		}
 	}
    
-	@Test(groups={"it", "ut"})
+	
 	public void testClickCheckBox() {
 		try {
 			DriverTestPage.checkElement.click();
@@ -172,7 +172,7 @@ public class TestDriver extends GenericMultiBrowserTest {
 	/**
 	 * Test javascript actions
 	 */
-	@Test(groups={"it", "ut"})
+	
 	public void testClickJsDiv() {
 		try {
 			DriverTestPage.redSquare.simulateClick();
@@ -183,7 +183,7 @@ public class TestDriver extends GenericMultiBrowserTest {
 		}
 	}
    
-	@Test(groups={"it", "ut"})
+	
 	public void testClickJsRadio() {
 		try {
 			DriverTestPage.radioElement.simulateClick();
@@ -193,7 +193,7 @@ public class TestDriver extends GenericMultiBrowserTest {
 		}
 	}
    
-	@Test(groups={"it", "ut"})
+	
 	public void testClickJsCheckbox() {
 		try {
 			DriverTestPage.checkElement.simulateClick();
@@ -206,7 +206,7 @@ public class TestDriver extends GenericMultiBrowserTest {
 	/**
 	 * Test composite actions
 	 */
-	@Test(groups={"it", "ut"})
+	
 	public void testClickActionDiv() {
 		try {
 			DriverTestPage.redSquare.clickAction();
@@ -217,7 +217,7 @@ public class TestDriver extends GenericMultiBrowserTest {
 		}
 	}
 	
-	@Test(groups={"it", "ut"})
+	
 	public void testDoubleClickActionDiv() {
 		try {
 			DriverTestPage.redSquare.doubleClickAction();
@@ -228,7 +228,7 @@ public class TestDriver extends GenericMultiBrowserTest {
 		}
 	}
 	
-	@Test(groups={"it", "ut"})
+	
 	public void testClickActionRadio() {
 		try {
 			DriverTestPage.radioElement.clickAction();
@@ -238,7 +238,7 @@ public class TestDriver extends GenericMultiBrowserTest {
 		}
 	}
 	
-	@Test(groups={"it", "ut"})
+	
 	public void testClickActionCheckbox() {
 		try {
 			DriverTestPage.checkElement.clickAction();
@@ -248,7 +248,7 @@ public class TestDriver extends GenericMultiBrowserTest {
 		}
 	}
    
-	@Test(groups={"it", "ut"})
+	
 	public void testSendKeys() {
 		try {
 			DriverTestPage.textElement.sendKeys("youpi@[]é");
@@ -258,7 +258,7 @@ public class TestDriver extends GenericMultiBrowserTest {
 		}
 	}
    
-	@Test(groups={"it", "ut"})
+	
 	public void testSendKeysJs() {
 		try {
 			DriverTestPage.textElement.simulateSendKeys("youpi@[]é");
@@ -272,13 +272,13 @@ public class TestDriver extends GenericMultiBrowserTest {
 	/**
 	 * Changing data in an input field should throw onBlur event
 	 */  
-	@Test(groups={"it", "ut"})
+	
 	public void testOnBlur() {
 		DriverTestPage.onBlurField.sendKeys("onBlur done");
 		Assert.assertEquals(DriverTestPage.onBlurFieldDest.getValue(), "onBlur done");
 	}
 	
-	@Test(groups={"it", "ut"})
+	
 	public void testFindElements() {
 		// 2 elements to find
 		Assert.assertEquals(new HtmlElement("", By.name("divFindName")).findElements().size(), 2);
@@ -290,7 +290,7 @@ public class TestDriver extends GenericMultiBrowserTest {
 	/**
 	 * Check that if no element is returned, no error is raised but we should have searched several times
 	 */
-	@Test(groups={"it", "ut"})
+	
 	public void testFindElementsNotExist() {
 		SeleniumTestsContextManager.getThreadContext().setReplayTimeout(7);
 		long start = new Date().getTime();
@@ -301,7 +301,7 @@ public class TestDriver extends GenericMultiBrowserTest {
 	/**
 	 * Tests finding sub-elements of an HTMLElement
 	 */
-	@Test(groups={"it", "ut"})
+	
 	public void testFindElementsBy() {
 		Assert.assertEquals(new HtmlElement("", By.id("parent")).findElements(By.className("myClass")).size(), 2);
 	}
@@ -310,7 +310,7 @@ public class TestDriver extends GenericMultiBrowserTest {
 	 * Tests NOT finding sub-elements of an HTMLElement
 	 * No exception should be raised but search should be done several times
 	 */
-	@Test(groups={"it", "ut"})
+	
 	public void testFindElementsByNotExist() {
 		SeleniumTestsContextManager.getThreadContext().setReplayTimeout(7);
 		long start = new Date().getTime();
@@ -321,7 +321,7 @@ public class TestDriver extends GenericMultiBrowserTest {
 	/**
 	 * Tests finding sub-elements of an HTMLElement
 	 */
-	@Test(groups={"it", "ut"})
+	
 	public void testFindHtmlElementsBy() {
 		List<WebElement> htmlElements = new HtmlElement("", By.id("parent")).findHtmlElements(By.className("myClass"));
 		Assert.assertEquals(htmlElements.size(), 2);
@@ -332,7 +332,7 @@ public class TestDriver extends GenericMultiBrowserTest {
 	/**
 	 * issue #314: check that we search element effectively inside the parent
 	 */
-	@Test(groups={"it", "ut"})
+	
 	public void testFindHtmlElementsByWithSimilarElements() {
 		List<WebElement> htmlElements = new HtmlElement("", By.id("parent")).findHtmlElements(By.tagName("div"));
 		Assert.assertEquals(htmlElements.size(), 3);
@@ -346,7 +346,7 @@ public class TestDriver extends GenericMultiBrowserTest {
 	 * 				We search in the second table because the bug relies in the fact that findHtmlElements do return elements which do not correspond the the elements returned
 	 * 				by a simple driver.findElements(By.tagname('a'))
 	 */
-	@Test(groups={"it", "ut"})
+	
 	public void testFindHtmlElementsByInsideFrame() {
 		List<WebElement> htmlElements = new HtmlElement("", By.id("tableIframe2"), DriverTestPage.iframe).findHtmlElements(By.tagName("td"));
 		Assert.assertEquals(htmlElements.size(), 2);
@@ -358,7 +358,7 @@ public class TestDriver extends GenericMultiBrowserTest {
 	 * Tests NOT finding sub-elements of an HTMLElement
 	 * No exception should be raised but search should be done several times
 	 */
-	@Test(groups={"it", "ut"})
+	
 	public void testFindHtmlElementsByNotExist() {
 		SeleniumTestsContextManager.getThreadContext().setReplayTimeout(7);
 		long start = new Date().getTime();
@@ -370,7 +370,7 @@ public class TestDriver extends GenericMultiBrowserTest {
 	/**
 	 * Search an element inside an other one
 	 */
-	@Test(groups={"it", "ut"})
+	
 	public void testFindSubElement() {
 		Assert.assertEquals(DriverTestPage.parent.findElement(By.className("myClass")).getText(), "first child");
 	}
@@ -378,7 +378,7 @@ public class TestDriver extends GenericMultiBrowserTest {
 	/**
 	 * Search the n th element inside an other one
 	 */
-	@Test(groups={"it", "ut"})
+	
 	public void testFindNthSubElement() {
 		Assert.assertEquals(DriverTestPage.parent.findElement(By.className("myClass"), 1).getText(), "fourth child");
 		Assert.assertEquals(DriverTestPage.child.getText(), "fourth child");
@@ -387,7 +387,7 @@ public class TestDriver extends GenericMultiBrowserTest {
 	/**
 	 * Search the n th element corresponding to locator
 	 */
-	@Test(groups={"it", "ut"})
+	
 	public void testFindNthElement() {
 		Assert.assertEquals(DriverTestPage.divFindName.getText(), "an other text");
 	}
@@ -395,17 +395,17 @@ public class TestDriver extends GenericMultiBrowserTest {
 	/**
 	 * test specific HtmlElements actions
 	 */
-	@Test(groups={"it", "ut"})
+	
 	public void testFindPattern1() {
 		Assert.assertTrue(DriverTestPage.link2.findLink("href").startsWith("http://www.google.fr"));
 	}
 	
-	@Test(groups={"it", "ut"})
+	
 	public void testFindPattern2() {
 		Assert.assertTrue(DriverTestPage.linkPopup.findLink("onclick").startsWith("http://www.google.fr"));
 	}
 	
-	@Test(groups={"it", "ut"}) 
+	
 	public void testFindPattern3() {
 		Assert.assertTrue(DriverTestPage.linkPopup2.findLink("onclick").startsWith("http://www.google.fr"));
 	}
@@ -413,7 +413,7 @@ public class TestDriver extends GenericMultiBrowserTest {
 	/**
 	 * text search
 	 */
-	@Test(groups={"it", "ut"})
+	
 	public void testFindPattern4() {
 		Assert.assertEquals(new HtmlElement("", By.id("divFind2")).findPattern(Pattern.compile("an (\\w+) text"), "text"), "other");
 	}
@@ -421,7 +421,7 @@ public class TestDriver extends GenericMultiBrowserTest {
 	/**
 	 * Check we wait enough for element to be displayed
 	 */
-	@Test(groups={"it", "ut"}) 
+	
 	public void testDelay() {
 		try {
 			DriverTestPage.delayButton.click();
@@ -435,25 +435,25 @@ public class TestDriver extends GenericMultiBrowserTest {
 	/**
 	 * Test that it's possible to use an hidden element. Make it appear before using it
 	 */
-	@Test(groups={"it", "ut"})
+	
 	public void testHiddenElement() { 
 		DriverTestPage.hiddenCheckBox.click();
 		Assert.assertTrue(DriverTestPage.hiddenCheckBox.isSelected());
 		Assert.assertTrue(DriverTestPage.hiddenCheckBox.isDisplayed());
 	}
-	@Test(groups={"it", "ut"})
+	
 	public void testHiddenElementByDisplay() { 
 		DriverTestPage.hiddenCheckboxByDisplay.click();
 		Assert.assertTrue(DriverTestPage.hiddenCheckboxByDisplay.isSelected());
 		Assert.assertTrue(DriverTestPage.hiddenCheckboxByDisplay.isDisplayed());
 	}
-	@Test(groups={"it", "ut"})
+	
 	public void testHiddenElementByOpacity() { 
 		DriverTestPage.hiddenCheckboxByOpacity.click();
 		Assert.assertTrue(DriverTestPage.hiddenCheckboxByOpacity.isSelected());
 		Assert.assertTrue(DriverTestPage.hiddenCheckboxByOpacity.isDisplayed());
 	}
-	@Test(groups={"it", "ut"})
+	
 	public void testHiddenElementByVisibility() { 
 		DriverTestPage.hiddenCheckboxByVisibility.click();
 		Assert.assertTrue(DriverTestPage.hiddenCheckboxByVisibility.isSelected());
@@ -465,7 +465,7 @@ public class TestDriver extends GenericMultiBrowserTest {
 	/**
 	 * issue #194: check that the WebDriverWait timeout is the one really applied
 	 */
-	@Test(groups={"it", "ut"})
+	
 	public void testWebDriverWaitWithLowTimeout() {
 		long start = new Date().getTime();
 		try {
@@ -476,7 +476,7 @@ public class TestDriver extends GenericMultiBrowserTest {
 		Assert.assertTrue(new Date().getTime() - start < 10000);
 	}
 	
-	@Test(groups={"it", "ut"})
+	
 	public void testSearchDoneSeveralTimes() {
 
 		SeleniumTestsContextManager.getThreadContext().setReplayTimeout(7);
@@ -492,7 +492,7 @@ public class TestDriver extends GenericMultiBrowserTest {
 	/**
 	 * Test element present timing
 	 */
-	@Test(groups={"it", "ut"})
+	
 	public void testIsElementPresent1() {		
 		
 		try {
@@ -508,7 +508,7 @@ public class TestDriver extends GenericMultiBrowserTest {
 	/**
 	 * Test element detection timing
 	 */
-	@Test(groups={"it", "ut"}, expectedExceptions = NoSuchElementException.class)
+	
 	public void testElementNotPresent() {	
 		LocalDateTime start = LocalDateTime.now();
 		try {
@@ -519,7 +519,7 @@ public class TestDriver extends GenericMultiBrowserTest {
 		}
 	}
 
-//	@Test(groups={"it", "ut"})
+//	
 //	public void testFindImageElement() {
 //		
 //		try {
@@ -534,7 +534,7 @@ public class TestDriver extends GenericMultiBrowserTest {
 	/**
 	 * Vérifie qu'avant d'agir sur un élément, on positionne la fenêtre du navigateur pour qu'il soit visible
 	 */
-	@Test(groups={"it", "ut"})
+	
 	public void testAutoScrolling() {
 		((JavascriptExecutor) driver).executeScript("window.scrollTo(0, 0);");
 		DriverTestPage.scrollButton.click();
@@ -546,7 +546,7 @@ public class TestDriver extends GenericMultiBrowserTest {
 	 * @throws AWTException
 	 * @throws InterruptedException
 	 */
-	@Test(groups= {"it", "ut"})
+	
 	public void testUploadFileWithRobot() throws AWTException, InterruptedException {
 		String path = SeleniumTestsContextManager.getConfigPath() + File.separator + "envSpecific.ini";
 //		DriverTestPage.upload.click();
@@ -562,7 +562,7 @@ public class TestDriver extends GenericMultiBrowserTest {
 	 * @throws AWTException
 	 * @throws InterruptedException
 	 */
-	@Test(groups= {"it", "ut"})
+	
 	public void testUploadFileWithRobotKeyboard() throws AWTException, InterruptedException {
 		String path = Paths.get(SeleniumTestsContextManager.getConfigPath(), "spec", "envSpecific2.ini").toString();
 //		DriverTestPage.upload.click();
@@ -578,7 +578,7 @@ public class TestDriver extends GenericMultiBrowserTest {
 	 * @throws AWTException
 	 * @throws InterruptedException
 	 */
-	@Test(groups= {"it", "ut"})
+	
 	public void testUploadFile() throws AWTException, InterruptedException {
 		String path = SeleniumTestsContextManager.getConfigPath() + File.separator + "config.ini";
 		DriverTestPage.upload.sendKeys(path);
@@ -589,7 +589,7 @@ public class TestDriver extends GenericMultiBrowserTest {
 	/**
 	 * Check that if no index is specified, first element is get
 	 */
-	@Test(groups={"it", "ut"})
+	
 	public void testFindFirstElement() {
 		Assert.assertEquals(DriverTestPage.multiElementFirstText.getValue(), "0 text field");
 	}
@@ -598,7 +598,7 @@ public class TestDriver extends GenericMultiBrowserTest {
 	 * Check that if FIRST_VISIBLE is specified, first visible element is returned
 	 * refresh page to be sure element has not been made visible
 	 */
-	@Test(groups={"it", "ut"})
+	
 	public void testFindFirstVisibleElement() {
 		driver.navigate().refresh();
 		Assert.assertEquals(DriverTestPage.multiElementFirstVisibleText.getValue(), "second text field");
@@ -607,7 +607,7 @@ public class TestDriver extends GenericMultiBrowserTest {
 	/**
 	 * Check that if no index is specified, first element is get
 	 */
-	@Test(groups={"it", "ut"})
+	
 	public void testFindFirstElementWithParent() {
 		Assert.assertEquals(DriverTestPage.multiElementFirstTextWithParent.getValue(), "0 text field");
 	}
@@ -616,7 +616,7 @@ public class TestDriver extends GenericMultiBrowserTest {
 	 * Check that if FIRST_VISIBLE is specified, first visible element is returned. In this case, FIRST_VISIBLE has only been applied to the parent element
 	 * refresh page to be sure element has not been made visible
 	 */
-	@Test(groups={"it", "ut"})
+	
 	public void testFindFirstVisibleElementWithParent() {
 		driver.navigate().refresh();
 		Assert.assertEquals(DriverTestPage.multiElementFirstVisibleTextWithParent.getValue(), "first text field");
@@ -625,7 +625,7 @@ public class TestDriver extends GenericMultiBrowserTest {
 	/**
 	 * get findElements inside an other one using findElements(By) method
 	 */
-	@Test(groups={"it", "ut"})
+	
 	public void testFindElementsUnderAnOtherElement() {
 		Assert.assertEquals(DriverTestPage.divByClass.findElements(By.className("someClass")).size(), 4);
 	}
@@ -633,7 +633,7 @@ public class TestDriver extends GenericMultiBrowserTest {
 	/**
 	 * get findElements inside an other one using findElements() method
 	 */
-	@Test(groups={"it", "ut"})
+	
 	public void testFindElementsInsideParent() {
 		Assert.assertEquals(DriverTestPage.parent.findElement(By.className("myClass")).findElements().size(), 2);
 	}
@@ -641,7 +641,7 @@ public class TestDriver extends GenericMultiBrowserTest {
 	/**
 	 * Check that if no index is specified, first element is get
 	 */
-	@Test(groups={"it", "ut"})
+	
 	public void testFindLastElement() {
 		Assert.assertEquals(DriverTestPage.multiElementLastText.getValue(), "last text field");
 	}
@@ -650,7 +650,7 @@ public class TestDriver extends GenericMultiBrowserTest {
 	 * issue #166: Check that when searching an element by XPath, and this element is specified as being located in an other element, 
 	 * we still get the element with an xpath relative to the parent element
 	 */
-	@Test(groups={"it", "ut"})
+	
 	public void testFindSubElementByXpath() {
 		Assert.assertEquals(DriverTestPage.optionByXpath.getText(), "option1Parent");
 	}
@@ -660,7 +660,7 @@ public class TestDriver extends GenericMultiBrowserTest {
 	 * we still get the element with an xpath relative to the parent element. In this case, the xpath is already specified as relative. No modification should
 	 * be done by robot
 	 */
-	@Test(groups={"it", "ut"})
+	
 	public void testFindSubElementByRelativeXpath() {
 		Assert.assertEquals(DriverTestPage.optionByRelativeXpath.getText(), "option1Parent");
 	}
@@ -668,12 +668,12 @@ public class TestDriver extends GenericMultiBrowserTest {
 	/**
 	 * Check search by XPath without parent is correctly performed (no change due to correction of issue #166)
 	 */
-	@Test(groups={"it", "ut"})
+	
 	public void testFindElementByXpath() {
 		Assert.assertEquals(DriverTestPage.searchByXpath.getText(), "option1");
 	}
 	
-	@Test(groups={"it", "ut"})
+	
 	public void testIsElementPresent() {
 		Assert.assertTrue(DriverTestPage.textElement.isElementPresent(2));
 	}
@@ -681,7 +681,7 @@ public class TestDriver extends GenericMultiBrowserTest {
 	/**
 	 * issue #355: check that we get "false" when element is not present and index is given 
 	 */
-	@Test(groups={"it", "ut"})
+	
 	public void testIsElementNotPresentWithIndex() {
 		Assert.assertFalse(DriverTestPage.textElementNotPresentFirstVisible.isElementPresent(2));
 	}
@@ -689,7 +689,7 @@ public class TestDriver extends GenericMultiBrowserTest {
 	/**
 	 * issue #355: Element is present but not displayed => returns false
 	 */
-	@Test(groups={"it", "ut"})
+	
 	public void testIsElementPresentAndNotDisplayedWithIndex() {
 		Assert.assertFalse(new HtmlElement("", By.id("deu"), HtmlElement.FIRST_VISIBLE).isElementPresent(2));
 	}
@@ -697,7 +697,7 @@ public class TestDriver extends GenericMultiBrowserTest {
 	/**
 	 * Element is present and displayed => returns true
 	 */
-	@Test(groups={"it", "ut"})
+	
 	public void testIsElementPresentAndDisplayed() {
 		Assert.assertTrue(DriverTestPage.textElement.isElementPresentAndDisplayed(2));
 	}
@@ -705,7 +705,7 @@ public class TestDriver extends GenericMultiBrowserTest {
 	/**
 	 * Element is not present => returns false
 	 */
-	@Test(groups={"it", "ut"})
+	
 	public void testIsElementNotPresentAndNotDisplayed() {
 		Assert.assertFalse(new HtmlElement("", By.id("divNotFound")).isElementPresentAndDisplayed(2));
 	}
@@ -713,12 +713,12 @@ public class TestDriver extends GenericMultiBrowserTest {
 	/**
 	 * Element is not present => returns false
 	 */
-	@Test(groups={"it", "ut"})
+	
 	public void testIsElementPresentAndNotDisplayed() {
 		Assert.assertFalse(new HtmlElement("", By.id("deu")).isElementPresentAndDisplayed(2));
 	}
 	
-	@Test(groups={"it", "ut"})
+	
 	public void testIsElementNotPresent() {
 		Assert.assertFalse(new HtmlElement("", By.id("divNotFound")).isElementPresent(2));
 	}
@@ -726,7 +726,7 @@ public class TestDriver extends GenericMultiBrowserTest {
 	/**
 	 * issue #286: check that element is seen as present
 	 */
-	@Test(groups={"it", "ut"})
+	
 	public void testTextElementInsideHtmlElementIsPresent() {
 		Assert.assertEquals(DriverTestPage.optionOfSelectListIFrameByText.getText(), "option1 frame");
 		Assert.assertTrue(DriverTestPage.optionOfSelectListIFrameByText.isElementPresent(2));
@@ -735,7 +735,7 @@ public class TestDriver extends GenericMultiBrowserTest {
 	/**
 	 * issue #286: check that element is not present
 	 */
-	@Test(groups={"it", "ut"})
+	
 	public void testTextElementInsideHtmlElementIsNotPresent() {
 		Assert.assertFalse(DriverTestPage.wrongElementOfSelectListIFrameByText.isElementPresent(2));
 	}
@@ -744,17 +744,17 @@ public class TestDriver extends GenericMultiBrowserTest {
 	/**
 	 * issue #286: check that no error is raised if frame cannot be found
 	 */
-	@Test(groups={"it", "ut"})
+	
 	public void testElementWithIFrameAbsent() {
 		Assert.assertFalse(DriverTestPage.elementNotPresentInIFrame.isElementPresent(2));
 	}
 	
-	@Test(groups={"it", "ut"})
+	
 	public void testFindTextElementInsideHtmlElement() {
 		Assert.assertEquals(DriverTestPage.textElement2.getValue(), "default");
 	}
 	
-	@Test(groups={"it", "ut"})
+	
 	public void testFindRadioElementInsideHtmlElement() {
 		try {
 			DriverTestPage.radioElement2.click();
@@ -764,7 +764,7 @@ public class TestDriver extends GenericMultiBrowserTest {
 		}
 	}
 	
-	@Test(groups={"it", "ut"})
+	
 	public void testFindCheckElementInsideHtmlElement() {
 		try {
 			DriverTestPage.checkElement2.click();
@@ -774,22 +774,22 @@ public class TestDriver extends GenericMultiBrowserTest {
 		}
 	}
 	
-	@Test(groups={"it", "ut"})
+	
 	public void testFindButtonElementInsideHtmlElement() {
 		Assert.assertEquals(DriverTestPage.resetButton2.getText(), "reset button");
 	}
 	
-	@Test(groups={"it", "ut"})
+	
 	public void testFindLinkElementInsideHtmlElement() {
 		Assert.assertTrue(DriverTestPage.linkElement2.getUrl().toLowerCase().contains("http://www.googlefrance.fr"));
 	}
 	
-	@Test(groups={"it", "ut"})
+	
 	public void testFindSelectElementInsideHtmlElement() {
 		Assert.assertEquals(DriverTestPage.selectList2.getOptions().size(), 2);
 	}
 	
-	@Test(groups={"it", "ut"})
+	
 	public void testFindTableInsideHtmlElement() {
 		Assert.assertEquals(DriverTestPage.table2.getRowCount(), 2);
 	}
@@ -798,12 +798,12 @@ public class TestDriver extends GenericMultiBrowserTest {
 	 * Use elements searched by index inside other elements 
 	 */
 	
-	@Test(groups={"it", "ut"})
+	
 	public void testFindTextElementsInsideHtmlElement() {
 		Assert.assertEquals(DriverTestPage.textElement3.getValue(), "default");
 	}
 	
-	@Test(groups={"it", "ut"})
+	
 	public void testFindRadioElementsInsideHtmlElement() {
 		try {
 			DriverTestPage.radioElement3.click();
@@ -813,7 +813,7 @@ public class TestDriver extends GenericMultiBrowserTest {
 		}
 	}
 	
-	@Test(groups={"it", "ut"})
+	
 	public void testFindCheckElementsInsideHtmlElement() {
 		try {
 			DriverTestPage.checkElement3.click();
@@ -823,22 +823,22 @@ public class TestDriver extends GenericMultiBrowserTest {
 		}
 	}
 	
-	@Test(groups={"it", "ut"})
+	
 	public void testFindButtonElementsInsideHtmlElement() {
 		Assert.assertEquals(DriverTestPage.resetButton3.getText(), "reset button");
 	}
 	
-	@Test(groups={"it", "ut"})
+	
 	public void testFindLinkElementsInsideHtmlElement() {
 		Assert.assertTrue(DriverTestPage.linkElement3.getUrl().toLowerCase().contains("http://www.googlefrance.fr"));
 	}
 	
-	@Test(groups={"it", "ut"})
+	
 	public void testFindSelectElementsInsideHtmlElement() {
 		Assert.assertEquals(DriverTestPage.selectList3.getOptions().size(), 2);
 	}
 	
-	@Test(groups={"it", "ut"})
+	
 	public void testFindTablesInsideHtmlElement() {
 		Assert.assertEquals(DriverTestPage.table3.getRowCount(), 2);
 	}
@@ -846,7 +846,7 @@ public class TestDriver extends GenericMultiBrowserTest {
 	/**
 	 * issue #262: check we can scroll and click to an element inside div
 	 */
-	@Test(groups={"it", "ut"})
+	
 	public void testScrollIntoDiv() {
 		try {
 			DriverTestPage.greenBox.click();
@@ -860,7 +860,7 @@ public class TestDriver extends GenericMultiBrowserTest {
 	/**
 	 * issue #274: check that scrolling is correct and we can click on an element at the bottom of the page
 	 */
-	@Test(groups={"it", "ut"})
+	
 	public void testScrollToBottom() {
 		try {
 			DriverTestPage.bigFooterButton.click();
@@ -876,7 +876,7 @@ public class TestDriver extends GenericMultiBrowserTest {
 	 * 
 	 * @throws Exception
 	 */
-	@Test(groups= {"it", "ut"})
+	
 	public void testCaptureWhenWindowIsClosed() throws Exception {
 		DriverTestPage page = new DriverTestPage();
 		page._goToNewPage();
