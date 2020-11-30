@@ -44,8 +44,10 @@
 		                				<tr>
 		                					<th class="alignleft"> Tests </th>
 						                  	<th class="alignleft"> Methods </th>
+						                  	<!--
 						                  	<th> Passed Steps Count </th>
 						                 	<th> Failed Steps Count </th>
+						                 	-->
 						                 	<th> Steps Count </th>
 						                 	<th> Duration </th>
 						                 	#foreach ($infoKey in $infoKeys)
@@ -110,13 +112,22 @@
 				                				<td class="alignleft">$circle<a href='$testResult.getAttribute("methodResultFileName")' info="skipped" data-toggle="tooltip" title="$description">$testResult.getAttribute("uniqueMethodName")</a></td>
 				                			#end 
 	
+											<!--
 					                		<td name="passed-$testIdx">$passedSteps</td>
 					                		#if ($failedSteps == 0)
 					                  			<td name="failed-$testIdx">$failedSteps</td>
 					                  		#else
 					                  			<td name="failed-$testIdx" class="failedSteps">$failedSteps</td>
 					                  		#end
-					                  		<td name="stepsTotal-$testIdx">$totalTestSteps</td>
+					                  		-->
+					                  		#if ($failedSteps == 0)
+					                  			<td name="stepsTotal-$testIdx">$totalTestSteps</td>
+					                  		#else
+					                  			<td name="stepsTotal-$testIdx">$totalTestSteps<sup>
+													<a href="#" data-toggle="tooltip" class="failedStepsTooltip" title="$failedSteps step(s) failed">*</a>
+												  </sup>
+					                  			</td>
+					                  		#end
 					                  		<td>$stepsDuration sec.</td>
 					                  		
 					                  		
@@ -137,8 +148,10 @@
 		                				<tr>
 						                  	<th class="alignleft"> Total </th>
 						                  	<th> </th>
+						                  	<!--
 						                  	<th name="totalPassed"> $totalPassed </th>
 						                 	<th name="totalFailed"> $totalFailed </th>
+						                 	-->
 						                 	<th name="totalSteps"> $totalSteps </th>
 						                 	<th></th>
 						                </tr>

@@ -64,6 +64,13 @@ tbody tr td, thead tr th, tfoot tr th{
 	background-color: rgba(255,102,102,0.3);
 }
 
+
+a.failedStepsTooltip {
+	text-decoration: none;
+	font-weight: bold;
+	color: black;
+}
+
 .testSuccess{
 	border-bottom: 2px solid #2BC400;
 	background-color: rgba(151,208,134,0.2);

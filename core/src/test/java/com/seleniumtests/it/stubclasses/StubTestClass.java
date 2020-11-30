@@ -261,6 +261,15 @@ public class StubTestClass extends StubParentClass {
 	}
 	
 
+	@Test(groups="stub")
+	public void testOk() throws IOException {
+		TestStep step1 = new TestStep("step 1", Reporter.getCurrentTestResult(), new ArrayList<>(), maskPassword);
+		step1.addAction(new TestAction("click button", false, new ArrayList<>()));
+		step1.addAction(new TestAction("sendKeys to text field", false, new ArrayList<>()));
+		TestStepManager.logTestStep(step1);
+	}
+	
+
 	@Test(groups="stub", description="a test with infos")
 	public void testWithInfo1() throws IOException {
 		TestStep step1 = new TestStep("step 1", Reporter.getCurrentTestResult(), new ArrayList<>(), maskPassword);

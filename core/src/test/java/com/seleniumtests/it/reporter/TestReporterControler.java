@@ -121,8 +121,9 @@ public class TestReporterControler extends ReporterTest {
 		
 		String mainReportContent = readSummaryFile();
 		
-		// check main result is skipped with step failed in red
-		Assert.assertTrue(mainReportContent.contains("<td name=\"failed-1\" class=\"failedSteps\">1</td>"));
+		// check main result is skipped with step failed indicated as a link
+		Assert.assertTrue(mainReportContent.contains("<td name=\"stepsTotal-1\">3<sup><a href=\"#\" data-toggle=\"tooltip\" class=\"failedStepsTooltip\" title=\"1 step(s) failed\">*</a></sup></td>"));
+		
 		
 		String detailedReportContent = readTestMethodResultFile("testWithABeforeMethodError");
 
@@ -159,7 +160,7 @@ public class TestReporterControler extends ReporterTest {
 		String mainReportContent = readSummaryFile();
 		
 		// check main result is skipped with step failed in red
-		Assert.assertTrue(mainReportContent.contains("<td name=\"failed-1\" class=\"failedSteps\">1</td>"));
+		Assert.assertTrue(mainReportContent.contains("<td name=\"stepsTotal-1\">5<sup><a href=\"#\" data-toggle=\"tooltip\" class=\"failedStepsTooltip\" title=\"1 step(s) failed\">*</a></sup></td>"));
 		
 		String detailedReportContent = readTestMethodResultFile("testWithAfterMethodError");
 		
