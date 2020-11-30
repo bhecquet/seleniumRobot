@@ -330,4 +330,19 @@ public class OSUtilityWindows extends OSUtility {
 		String processName = processNames[processNames.length - 1];
 		return processName.endsWith(".exe") ? processName: "";
 	}
+	
+	@Override
+	public Integer getProcessIdByListeningPort(int port) {
+		// example: TCP    127.0.0.1:51239        0.0.0.0:0              LISTENING       22492
+		String lines = OSCommand.executeCommandAndWait("netstat -aon").trim();
+		Pattern pattern = Pattern.compile(String.format(".*\\:%d\\s+.*\\:.*LISTENING\\s+(\\d+).*", port));
+		for (String line: lines.split("\n")) {
+			Matcher matcher = pattern.matcher(line.trim());
+
+			if (matcher.matches()) {
+				return Integer.parseInt(matcher.group(1));
+			}
+		} 
+		return null;
+	}
 }

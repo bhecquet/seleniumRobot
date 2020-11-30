@@ -111,6 +111,7 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	private Capabilities capabilities;
 	
 	private EventFiringWebDriver eventDriver;
+	private EventFiringWebDriver attachedEventDriver;
 
 	@BeforeMethod(groups={"ut"})
 	private void init() throws Exception {
@@ -120,6 +121,7 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 		
 		// add DriverExceptionListener to reproduce driver behavior
 		eventDriver = spy(new CustomEventFiringWebDriver(driver, null, browserInfo, true, DriverMode.LOCAL, null, null).register(new DriverExceptionListener()));
+		attachedEventDriver = spy(new CustomEventFiringWebDriver(driver, null, browserInfo, true, DriverMode.LOCAL, null, null, 12345).register(new DriverExceptionListener()));
 		
 		when(driver.manage()).thenReturn(options);
 		when(driver.getCapabilities()).thenReturn(capabilities);
@@ -405,6 +407,19 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 		
 		((CustomEventFiringWebDriver)eventDriver).quit();
 		verify(osUtility).killProcess(eq("1000"), eq(true));
+	}
+	
+	/**
+	 * issue #401: When we attach a chrome browser, check we get it's process PID
+	 */
+	@Test(groups = {"ut"})
+	public void testQuitWithAttachedChromeBrowser() {
+		when(browserInfo.getAllBrowserSubprocessPids(new ArrayList<>())).thenReturn(Arrays.asList(1000L));
+		when(osUtility.getProcessIdByListeningPort(12345)).thenReturn(1001);
+		
+		((CustomEventFiringWebDriver)attachedEventDriver).quit();
+		verify(osUtility).killProcess(eq("1000"), eq(true));
+		verify(osUtility).killProcess(eq("1001"), eq(true));
 	}
 	
 	/**
