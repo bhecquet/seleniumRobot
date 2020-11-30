@@ -91,8 +91,69 @@ public class TestWindowsOsUtility extends MockitoTest {
 	}
 	
 	@Test(groups={"ut"})
-	public void testGetProcessList() {
+	public void testGetProcessPidByListenPort() {
 
+		PowerMockito.mockStatic(OSCommand.class);
+		when(OSCommand.executeCommandAndWait("netstat -aon")).thenReturn("Proto  Adresse locale         Adresse distante       État\r\n"
+				+ "TCP    0.0.0.0:64360          0.0.0.0:0              LISTENING       39320\r\n" + 
+				"  TCP    0.0.0.0:64362          0.0.0.0:0              LISTENING       26660\r\n" + 
+				"  TCP    0.0.0.0:51239          0.0.0.0:0              LISTENING       22492\r\n" + 
+				"  TCP    10.165.131.105:139     0.0.0.0:0              LISTENING       4\r\n" + 
+				"  TCP    10.165.131.105:49244   192.168.62.10:8080     TIME_WAIT       0\r\n" + 
+				"  TCP    10.165.131.105:49320   10.204.88.85:443       TIME_WAIT       0");
+		
+		Integer processPid = OSUtilityFactory.getInstance().getProcessIdByListeningPort(51239);
+		Assert.assertEquals((Integer)processPid, (Integer)22492);
+	}
+	
+	/**
+	 * Check we don't match if port is remote
+	 */
+	@Test(groups={"ut"})
+	public void testGetProcessPidByListenPort2() {
+		
+		PowerMockito.mockStatic(OSCommand.class);
+		when(OSCommand.executeCommandAndWait("netstat -aon")).thenReturn("Proto  Adresse locale         Adresse distante       État\r\n"
+				+ "TCP    0.0.0.0:64360          0.0.0.0:0              LISTENING       39320\r\n" + 
+				"  TCP    0.0.0.0:64362          0.0.0.0:0              LISTENING       26660\r\n" + 
+				"  TCP    0.0.0.0:123          0.0.0.0:51239             LISTENING       22492\r\n" + 
+				"  TCP    10.165.131.105:139     0.0.0.0:0              LISTENING       4\r\n" + 
+				"  TCP    10.165.131.105:49244   192.168.62.10:8080     TIME_WAIT       0\r\n" + 
+				"  TCP    10.165.131.105:49320   10.204.88.85:443       TIME_WAIT       0");
+		
+		Assert.assertNull(OSUtilityFactory.getInstance().getProcessIdByListeningPort(51239));
+	}
+	
+	/**
+	 * Check we don't match if is not listening
+	 */
+	@Test(groups={"ut"})
+	public void testGetProcessPidByListenPort3() {
+		
+		PowerMockito.mockStatic(OSCommand.class);
+		when(OSCommand.executeCommandAndWait("netstat -aon")).thenReturn("Proto  Adresse locale         Adresse distante       État\r\n"
+				+ "TCP    0.0.0.0:64360          0.0.0.0:0              LISTENING       39320\r\n" + 
+				"  TCP    0.0.0.0:64362          0.0.0.0:0              LISTENING       26660\r\n" + 
+				"  TCP    0.0.0.0:123          0.0.0.0:0             LISTENING       22492\r\n" + 
+				"  TCP    10.165.131.105:139     0.0.0.0:0              LISTENING       4\r\n" + 
+				"  TCP    10.165.131.105:51239   192.168.62.10:8080     TIME_WAIT       0\r\n" + 
+				"  TCP    10.165.131.105:49320   10.204.88.85:443       TIME_WAIT       0");
+		
+		Assert.assertNull(OSUtilityFactory.getInstance().getProcessIdByListeningPort(51239));
+	}
+	
+	@Test(groups={"ut"})
+	public void testGetProcessPidByListenPortNotFound() {
+		
+		PowerMockito.mockStatic(OSCommand.class);
+		when(OSCommand.executeCommandAndWait("netstat -aon")).thenReturn("");
+
+		Assert.assertNull(OSUtilityFactory.getInstance().getProcessIdByListeningPort(51239));
+	}
+	
+	@Test(groups={"ut"})
+	public void testGetProcessList() {
+		
 		PowerMockito.mockStatic(OSCommand.class);
 		when(OSCommand.executeCommandAndWait("C:\\windows\\system32\\tasklist.exe /NH /SVC")).thenReturn("eclipse.exe                   6480 N/A\r\n" + 
 				"javaw.exe                     7280 N/A\r\n" + 

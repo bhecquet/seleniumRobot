@@ -23,6 +23,8 @@ import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import com.seleniumtests.browserfactory.BrowserInfo;
 import com.seleniumtests.driver.BrowserType;
@@ -177,4 +179,21 @@ public class OSUtilityUnix extends OSUtility {
 	public String getProgramNameFromPid(Long pid) {
 		return OSCommand.executeCommandAndWait(String.format("ps -p %d -o comm=", pid));
 	}
+
+
+	@Override
+	public Integer getProcessIdByListeningPort(int port) {
+		// example: TCP    127.0.0.1:51239        0.0.0.0:0              LISTENING       22492
+		String lines = OSCommand.executeCommandAndWait("netstat -anp").trim();
+		Pattern pattern = Pattern.compile(String.format(".*\\:%d\\s+.*\\:.*LISTEN\\s+(\\d+).*", port));
+		for (String line: lines.split("\n")) {
+			Matcher matcher = pattern.matcher(line.trim());
+
+			if (matcher.matches()) {
+				return Integer.parseInt(matcher.group(1));
+			}
+		} 
+		return null;
+	}
+	
 }

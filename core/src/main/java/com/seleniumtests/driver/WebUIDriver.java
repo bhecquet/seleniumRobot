@@ -585,7 +585,8 @@ public class WebUIDriver {
     																			SeleniumTestsContextManager.isWebTest(), 
     																			SeleniumTestsContextManager.getThreadContext().getRunMode(),
     																			config.getBrowserMobProxy(),
-    																			SeleniumTestsContextManager.getThreadContext().getSeleniumGridConnector());
+    																			SeleniumTestsContextManager.getThreadContext().getSeleniumGridConnector(),
+    																			config.getAttachExistingDriverPort());
     	
         List<WebDriverEventListener> listeners = config.getWebDriverListeners();
         if (listeners != null && !listeners.isEmpty()) {

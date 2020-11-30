@@ -257,6 +257,11 @@ public abstract class OSUtility {
      */
 	public abstract String getProgramExtension();
 	
+	/**
+	 * Returns the process that listens for the given port, or null if none is found
+	 * @param port
+	 */
+	public abstract Integer getProcessIdByListeningPort(int port);
 
     /**
      * Ask system to terminate all the known web browser processes.
