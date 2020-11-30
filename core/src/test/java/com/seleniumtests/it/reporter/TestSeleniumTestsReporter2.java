@@ -495,7 +495,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	@Test(groups={"it"})
 	public void testReportSummaryContentWithSteps() throws Exception {
 
-		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions", "testInError", "testWithException"});
+		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions", "testInError", "testWithException", "testOk"});
 		
 		// check content of summary report file
 		String mainReportContent = readSummaryFile();
@@ -504,15 +504,15 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		Assert.assertTrue(mainReportContent.matches(".*<a href\\='testInError/TestReport\\.html'.*?>testInError</a>.*"));
 		
 		// check number of steps is correctly computed. "test1" has 2 main steps, "testInError" has 1 step
-		Assert.assertTrue(mainReportContent.contains("<td name=\"passed-1\">6</td>"));
-		Assert.assertTrue(mainReportContent.contains("<td name=\"failed-1\" class=\"failedSteps\">1</td>"));
-		Assert.assertTrue(mainReportContent.contains("<td name=\"stepsTotal-1\">7</td>"));
+		Assert.assertTrue(mainReportContent.contains("<td name=\"stepsTotal-1\">7<sup><a href=\"#\" data-toggle=\"tooltip\" class=\"failedStepsTooltip\" title=\"1 step(s) failed\">*</a></sup></td>"));
 		
 		// for second test, test is reported KO whereas all steps are OK because we do not use LogAction.aj
 		// which handles assertion errors and report them in test steps
-		Assert.assertTrue(mainReportContent.contains("<td name=\"passed-2\">5</td>"));
-		Assert.assertTrue(mainReportContent.contains("<td name=\"failed-2\" class=\"failedSteps\">1</td>"));
-		Assert.assertTrue(mainReportContent.contains("<td name=\"stepsTotal-2\">6</td>"));
+		Assert.assertTrue(mainReportContent.contains("<td name=\"stepsTotal-2\">6<sup><a href=\"#\" data-toggle=\"tooltip\" class=\"failedStepsTooltip\" title=\"1 step(s) failed\">*</a></sup></td>"));
+		
+		// 'testOk' has no failed steps, no additional information is present 
+		Assert.assertTrue(mainReportContent.contains("<td name=\"stepsTotal-3\">6</td>"));
+		
 		
 		// check full log file is there
 		Assert.assertTrue(mainReportContent.contains("<a href=\"seleniumRobot.log\""));
