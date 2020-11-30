@@ -107,6 +107,7 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
 	private final BrowserInfo browserInfo;
 	private final BrowserMobProxy mobProxy;
 	private final SeleniumGridConnector gridConnector;
+	private final Integer attachExistingDriverPort;
 	private MutableCapabilities internalCapabilities = new MutableCapabilities();
     
     private static final String JS_GET_VIEWPORT_SIZE = String.format(
@@ -467,7 +468,10 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
     	this(driver, null, null, true, DriverMode.LOCAL, null, null);
     }
 
-	public CustomEventFiringWebDriver(final WebDriver driver, List<Long> driverPids, BrowserInfo browserInfo, Boolean isWebTest, DriverMode localDriver, BrowserMobProxy mobProxy, SeleniumGridConnector gridConnector) {
+    public CustomEventFiringWebDriver(final WebDriver driver, List<Long> driverPids, BrowserInfo browserInfo, Boolean isWebTest, DriverMode localDriver, BrowserMobProxy mobProxy, SeleniumGridConnector gridConnector) {
+    	this(driver, driverPids, browserInfo, isWebTest, localDriver, mobProxy, gridConnector, null);
+    }
+	public CustomEventFiringWebDriver(final WebDriver driver, List<Long> driverPids, BrowserInfo browserInfo, Boolean isWebTest, DriverMode localDriver, BrowserMobProxy mobProxy, SeleniumGridConnector gridConnector, Integer attachExistingDriverPort) {
         super(driver);
         this.driverPids = driverPids == null ? new ArrayList<>(): driverPids;
 		this.driver = driver;
@@ -476,6 +480,7 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
 		this.driverMode = localDriver;
 		this.mobProxy = mobProxy;
 		this.gridConnector = gridConnector;
+		this.attachExistingDriverPort = attachExistingDriverPort;
 		
 		// NEOLOAD //
 		if (driver instanceof NLWebDriver) {
@@ -914,6 +919,14 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
 		List<Long> pidsToKill = new ArrayList<>();
 		if (browserInfo != null && driverMode == DriverMode.LOCAL) {
 			pidsToKill.addAll(browserInfo.getAllBrowserSubprocessPids(driverPids));
+			
+			// issue #401: also get the browser process in case of attached browser (chrome only)
+			if (attachExistingDriverPort != null && attachExistingDriverPort > 1000) {
+				Integer browserProcess = OSUtilityFactory.getInstance().getProcessIdByListeningPort(attachExistingDriverPort);
+				if (browserProcess != null) {
+					pidsToKill.add(browserProcess.longValue());
+				}
+			}
 		}
 		
 		Capabilities caps;
