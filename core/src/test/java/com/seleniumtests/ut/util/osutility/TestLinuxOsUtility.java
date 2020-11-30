@@ -18,6 +18,8 @@
 package com.seleniumtests.ut.util.osutility;
 
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.ArgumentMatchers.anyString;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -153,7 +155,7 @@ public class TestLinuxOsUtility extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testNoBrowserInstalled() {
 		PowerMockito.mockStatic(OSCommand.class);
-		PowerMockito.mockStatic(Paths.class, Mockito.CALLS_REAL_METHODS);
+		PowerMockito.mockStatic(Paths.class);
 		
 
 		when(Paths.get("/usr/local/bin/firefox")).thenReturn(path);
@@ -173,7 +175,7 @@ public class TestLinuxOsUtility extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testFirefoxStandardInstallation() {
 		PowerMockito.mockStatic(OSCommand.class);
-		PowerMockito.mockStatic(Paths.class, Mockito.CALLS_REAL_METHODS);
+		PowerMockito.mockStatic(Paths.class);
 		
 
 		when(Paths.get("/usr/local/bin/firefox")).thenReturn(path);
@@ -195,7 +197,7 @@ public class TestLinuxOsUtility extends MockitoTest {
 	@Test(groups={"ut"})
 	public void testChromeStandardInstallation() {
 		PowerMockito.mockStatic(OSCommand.class);
-		PowerMockito.mockStatic(Paths.class, Mockito.CALLS_REAL_METHODS);
+		PowerMockito.mockStatic(Paths.class);
 		
 		
 		when(Paths.get("/usr/local/bin/google-chrome")).thenReturn(path);

@@ -343,8 +343,8 @@ public class BrowserInfo {
 			} else {
 				defaultProfilePath = profilePaths.get(0).toString();
 			}
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
+		} catch (IOException | NullPointerException e) {
+			defaultProfilePath = null;
 			e.printStackTrace();
 		}
 	}
