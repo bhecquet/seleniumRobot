@@ -104,7 +104,7 @@ public class BrowserInfo {
 		try {
 			Float.parseFloat(version);
 			this.version = version;
-		} catch (NumberFormatException e) {
+		} catch (NumberFormatException | NullPointerException e) {
 			logger.warn(String.format("Cannot parse browser version %s for browser", version, browser));
 			this.version = "0.0";
 		}
