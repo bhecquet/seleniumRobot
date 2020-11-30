@@ -17,13 +17,21 @@
  */
 package com.seleniumtests.ut.browserfactory;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.contains;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 import org.apache.commons.lang3.SystemUtils;
+import org.mockito.Mock;
 import org.openqa.selenium.Platform;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -39,6 +47,8 @@ import com.seleniumtests.util.osutility.OSUtility;
 @PrepareForTest({BrowserInfo.class, OSUtility.class})
 public class TestBrowserInfo extends MockitoTest {
 	
+	@Mock
+	private Stream<Path> streamPaths;
 
 	@Test(groups={"ut"})
 	public void getDriverFiles() throws IOException {
@@ -411,21 +421,32 @@ public class TestBrowserInfo extends MockitoTest {
 	}
 	
 	@Test(groups={"ut"})
-	public void testGetDefaultFirefoxLinuxsProfile() throws Exception {
+	public void testGetDefaultFirefoxLinuxProfile() throws Exception {
+		PowerMockito.mockStatic(Files.class);
 		PowerMockito.mockStatic(OSUtility.class);
 		when(OSUtility.getCurrentPlatorm()).thenReturn(Platform.LINUX);
+		when(Files.list(any(Path.class))).thenReturn(streamPaths);
+		when(streamPaths.filter(any(Predicate.class))).thenReturn(streamPaths);
+		when(streamPaths.collect(any())).thenReturn(Arrays.asList(Paths.get("/home/user/.mozilla/firefox")));
 		
 		BrowserInfo bi = new BrowserInfo(BrowserType.FIREFOX, "58.0", null);
-		Assert.assertTrue(bi.getDefaultProfilePath().matches("/home/.*?/.mozilla/firefox"));
+		
+		Assert.assertEquals(bi.getDefaultProfilePath().replace("\\",  "/"), "/home/user/.mozilla/firefox");
 	}
 	
 	@Test(groups={"ut"})
 	public void testGetDefaultFirefoxMacProfile() throws Exception {
+
+		PowerMockito.mockStatic(Files.class);
 		PowerMockito.mockStatic(OSUtility.class);
 		when(OSUtility.getCurrentPlatorm()).thenReturn(Platform.MAC);
+		when(Files.list(any(Path.class))).thenReturn(streamPaths);
+		when(streamPaths.filter(any(Predicate.class))).thenReturn(streamPaths);
+		when(streamPaths.collect(any())).thenReturn(Arrays.asList(Paths.get("/Users/user/Library/Application Support/Firefox/Profiles/")));
 		
 		BrowserInfo bi = new BrowserInfo(BrowserType.FIREFOX, "58.0", null);
-		Assert.assertTrue(bi.getDefaultProfilePath().matches("/Users/.*?/Library/Application Support/Firefox/Profiles/"));
+		
+		Assert.assertEquals(bi.getDefaultProfilePath().replace("\\",  "/"), "/Users/user/Library/Application Support/Firefox/Profiles");
 	}
 
 }

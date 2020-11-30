@@ -31,6 +31,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
@@ -333,7 +334,7 @@ public class BrowserInfo {
 		}
 		// search "default" profile
 		try {
-
+	
 			List<Path> profilePaths = Files.list(Paths.get(defaultProfilePath))
 			    .filter(Files::isDirectory)
 			    .filter(p -> p.toString().endsWith(".default"))
