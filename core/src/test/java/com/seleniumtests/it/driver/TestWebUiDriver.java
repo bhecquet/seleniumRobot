@@ -457,7 +457,7 @@ public class TestWebUiDriver extends ReporterTest {
 		String path = browsers.get(BrowserType.CHROME).get(0).getPath();
 		int port = GenericDriverTest.findFreePort();
 		
-		logger.info("will start browser in 30 secs");
+		logger.info("will start browser in 15 secs");
 		new BrowserLauncher(BrowserType.CHROME, port, path, 30).run();
 
 		logger.info("Waiting for driver");

@@ -189,22 +189,4 @@ public class StubTestClassForDriverTest extends StubParentClass {
 			._sendKeysComposite();
 	}
 
-	@DataProvider(name = "data")
-	public Object[][] data(ITestContext testContext) {
-		return new String[][] {new String[] {"data1"}, new String[] {"data2"}};
-	}
-	
-
-	@BeforeMethod(groups="video")
-	public void initVideo(Method method) throws Exception {
-		SeleniumTestsContextManager.getThreadContext().setBrowser("chrome");
-		SeleniumTestsContextManager.getThreadContext().setOverrideSeleniumNativeAction(true);
-		SeleniumTestsContextManager.getThreadContext().setTestRetryCount(1);
-		new DriverTestPage(true); // starts driver in Before Method
-	}
-
-	@Test(groups={"video", "stub"}, dataProvider = "data")
-	public void testDriverShortWithDataProvider(String data) throws Exception {
-		new DriverTestPage(true);
-	}
 }
