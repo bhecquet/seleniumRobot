@@ -94,4 +94,12 @@ public class TestStringUtility extends GenericTest {
 	public void testKeepNewLineInHtml() {
 		Assert.assertEquals(StringUtility.encodeString("foo\nbar", "html"), "foo<br/>\nbar");
 	}
+	
+	/**
+	 * Issue #402: check we have no NPE if message is null
+	 */
+	@Test(groups={"ut"})
+	public void testKeepNewLineInHtmlWithNullMessage() {
+		Assert.assertNull(StringUtility.encodeString(null, "html"));
+	}
 }
