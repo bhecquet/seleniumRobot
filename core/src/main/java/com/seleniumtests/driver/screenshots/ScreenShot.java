@@ -19,7 +19,11 @@ package com.seleniumtests.driver.screenshots;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
+import org.apache.commons.io.FileExistsException;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 
@@ -116,16 +120,16 @@ public class ScreenShot {
     }
 
     public String getFullImagePath() {
-        if (this.imagePath != null) {
-            return outputDirectory + "/" + this.imagePath;
+        if (imagePath != null) {
+            return outputDirectory + "/" + imagePath;
         } else {
             return null;
         }
     }
 
     public String getFullHtmlPath() {
-        if (this.htmlSourcePath != null) {
-            return outputDirectory + "/" + this.htmlSourcePath;
+        if (htmlSourcePath != null) {
+            return outputDirectory + "/" + htmlSourcePath;
         } else {
             return null;
         }
@@ -143,5 +147,35 @@ public class ScreenShot {
 
 	public void setDuration(long duration) {
 		this.duration = duration;
+	}
+	
+	public void relocate(String destOutputDirectory) throws IOException {
+
+		new File(destOutputDirectory).mkdirs();
+		
+		if (htmlSourcePath != null) {
+			File htmlSrc = Paths.get(outputDirectory, htmlSourcePath).toFile().getCanonicalFile();
+			File newHtmlSrc = new File(htmlSrc.getAbsolutePath().replace("\\",  "/").replace(outputDirectory, destOutputDirectory));
+			try {
+				FileUtils.moveFile(htmlSrc, newHtmlSrc);
+			} catch (FileExistsException e) {
+				// nothing to do, file is there
+			}
+			htmlSourcePath = Paths.get(destOutputDirectory).relativize(Paths.get(newHtmlSrc.getAbsolutePath())).toString();
+		}
+		
+		if (imagePath != null) { 
+			File imgSrc = Paths.get(outputDirectory, imagePath).toFile().getCanonicalFile();
+			File newImgSrc = new File(imgSrc.getAbsolutePath().replace("\\",  "/").replace(outputDirectory, destOutputDirectory));
+			try {
+				FileUtils.moveFile(imgSrc, newImgSrc);
+			} catch (FileExistsException e) {
+				// nothing to do, file is there
+			}
+			imagePath = Paths.get(destOutputDirectory).relativize(Paths.get(newImgSrc.getAbsolutePath())).toString();
+		}
+		
+		outputDirectory = destOutputDirectory;
+		
 	}
 }

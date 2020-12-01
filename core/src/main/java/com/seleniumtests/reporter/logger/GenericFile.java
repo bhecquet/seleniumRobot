@@ -18,23 +18,73 @@
 package com.seleniumtests.reporter.logger;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 
+import org.apache.commons.io.FileUtils;
 import org.json.JSONObject;
+
+import com.seleniumtests.core.SeleniumTestsContextManager;
 
 public class GenericFile extends TestAction {
 
 	private File file;
 	
-	public GenericFile(File file, String description) {
+
+	public GenericFile(File file, String description) throws IOException {
+		this(file, description, true);
+	}
+	
+	/**
+	 * Store a file in log folder
+	 * @param file
+	 * @param description
+	 * @param move			if true, move the file to log folder
+	 * @throws IOException
+	 */
+	private GenericFile(File file, String description, boolean move) throws IOException {
 		super(description, false, new ArrayList<>());
-		this.file = file;
+		
+		if (file == null || !file.exists()) {
+			throw new FileNotFoundException("GenericFile needs a file");
+		}
+		
+		if (move) {
+			File loggedFile = Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), file.getName()).toFile();
+			if (!file.equals(loggedFile)) {
+				FileUtils.moveFile(file, loggedFile);
+			}
+			
+			this.file = loggedFile;
+		} else {
+			this.file = file;
+		}
 
 	}
 	
 	public String buildLog() {
-		return String.format("%s: <a href='%s'>file</a>", name, file.getPath());
+		return String.format("%s: <a href='%s'>file</a>", name, file.getName());
     }
+	
+
+	/**
+	 * Change path of the file
+	 * @param outputDirectory
+	 * @throws IOException
+	 */
+	public void relocate(String outputDirectory) throws IOException {
+		if (outputDirectory == null) {
+			return;
+		}
+		new File(outputDirectory).mkdirs();
+		Path newPath = Paths.get(outputDirectory, file.getName());
+		Files.move(Paths.get(file.toString()), newPath);
+		file = newPath.toFile();
+	}
 	
 
 	@Override
@@ -50,7 +100,12 @@ public class GenericFile extends TestAction {
 	
 	@Override
 	public GenericFile encode(String format) {
-		return new GenericFile(file, encodeString(name, format));
+		try {
+			return new GenericFile(file, encodeString(name, format), false);
+		} catch (IOException e) {
+			logger.error("Cannot encode file: " + e.getMessage());
+			return this;
+		}
 	}
 
 	public File getFile() {

@@ -19,6 +19,8 @@ package com.seleniumtests.reporter.logger;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 
@@ -55,6 +57,15 @@ public class HarCapture extends TestAction {
 		return String.format("Network capture '%s' browser: <a href='%s-%s'>HAR file</a>", name, name, HAR_FILE_NAME);
     }
 	
+	public void relocate(String outputDirectory) throws IOException {
+		if (outputDirectory == null) {
+			return;
+		}
+		new File(outputDirectory).mkdirs();
+		Path newPath = Paths.get(outputDirectory, harFile.getName());
+		Files.move(Paths.get(harFile.toString()), newPath);
+		harFile = newPath.toFile();
+	}
 
 	@Override
 	public JSONObject toJson() {
@@ -68,6 +79,10 @@ public class HarCapture extends TestAction {
 
 	public Har getHarFile() {
 		return har;
+	}
+	
+	public File getFile() {
+		return harFile;
 	}
 	
 	public HarCapture encode() {

@@ -59,8 +59,8 @@ public class ScreenshotUtil {
     private WebDriver driver;
     private WebUIDriver uiDriver;
     private String filename;
-    private static final String SCREENSHOT_DIR = "screenshots/";
-    private static final String HTML_DIR = "htmls/";
+    public static final String SCREENSHOT_DIR = "screenshots/";
+    public static final String HTML_DIR = "htmls/";
     
     @Deprecated
     public enum Target {SCREEN, PAGE}
@@ -634,7 +634,7 @@ public class ScreenshotUtil {
     	if (screenshotFile.exists()) {
     		Path pathAbsolute = Paths.get(screenshotFile.getAbsolutePath());
 	        Path pathBase = Paths.get(getOutputDirectory());
-    		screenShot.setImagePath(pathBase.relativize(pathAbsolute).toString());
+
     		screenShot.setImagePath(String.format("../%s/%s", outputSubDirectory, pathBase.relativize(pathAbsolute).toString()));
     	}
 		return screenShot;

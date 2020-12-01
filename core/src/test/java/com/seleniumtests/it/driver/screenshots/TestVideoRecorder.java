@@ -195,7 +195,7 @@ public class TestVideoRecorder extends ReporterTest {
 		try {
 			System.setProperty(SeleniumTestsContext.VIDEO_CAPTURE, "true");
 
-			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest.testDriverShortWithDataProvider"}, "", "video");
+			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForVideoTest.testDriverShortWithDataProvider"}, "", "video");
 
 			// check video file has been moved to 'testDriverShortWithDataProvider' folder
 			Assert.assertTrue(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriverShortWithDataProvider", "videoCapture.avi").toFile().exists());			
@@ -220,7 +220,7 @@ public class TestVideoRecorder extends ReporterTest {
 		try {
 			System.setProperty(SeleniumTestsContext.VIDEO_CAPTURE, "true");
 			
-			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest.testDriverShortWithDataProvider"}, "", "stub");
+			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForVideoTest.testDriverShortWithDataProvider"}, "", "stub");
 			
 			// check video file has been moved to 'testDriverShortWithDataProvider' folder
 			Assert.assertTrue(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriverShortWithDataProvider", "videoCapture.avi").toFile().exists());			

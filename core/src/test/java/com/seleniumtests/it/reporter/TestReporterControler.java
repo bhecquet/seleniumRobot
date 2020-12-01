@@ -82,7 +82,7 @@ public class TestReporterControler extends ReporterTest {
 	public void testBeforeMethodCapturesArePresent() throws Exception {
 		
 		try {
-			System.setProperty(SeleniumTestsContext.BROWSER, "htmlunit");
+			System.setProperty(SeleniumTestsContext.BROWSER, "chrome");
 			System.setProperty("startLocation", "beforeMethod");
 			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForListener5.test1Listener5"}, "", "stub1");
 		} finally {
@@ -99,12 +99,12 @@ public class TestReporterControler extends ReporterTest {
 			}
 		}
 		
-		// check that a 'before-test1Listener5' has been created and contains html capture
+		// check that a 'before-test1Listener5' has been created and (iisue #399) does not contain html capture
 		Assert.assertTrue(Arrays.asList(new File(outDir).list()).contains("before-test1Listener5"));
-		Assert.assertEquals(Paths.get(outDir, "before-test1Listener5", "htmls").toFile().list().length, 1);
+		Assert.assertEquals(Paths.get(outDir, "before-test1Listener5", "htmls").toFile().list().length, 0);
 		
-		// check that a 'test1Listener5' has been created and contains html capture
-		Assert.assertEquals(Paths.get(outDir, "test1Listener5", "htmls").toFile().list().length, 1);
+		// check that a 'test1Listener5' has been created and contains html capture from "before" step and test step
+		Assert.assertEquals(Paths.get(outDir, "test1Listener5", "htmls").toFile().list().length, 2);
 	}	
 
 	/**
