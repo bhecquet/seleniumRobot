@@ -104,9 +104,9 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 	 */
 	@Override
 	public synchronized void onTestFailure(ITestResult testResult) {
-		// TODO: use testResult.getMethod(testResult).getRetryAnalyzer() when in TestNG 7.3.0 (https://github.com/cbeust/testng/issues/2267)
-		if (testResult.getMethod().getRetryAnalyzer() != null && !(testResult.getMethod().getRetryAnalyzer() instanceof DisabledRetryAnalyzer)) {
-			TestRetryAnalyzer testRetryAnalyzer = (TestRetryAnalyzer) testResult.getMethod().getRetryAnalyzer();
+
+		if (testResult.getMethod().getRetryAnalyzer(testResult) != null && !(testResult.getMethod().getRetryAnalyzer(testResult) instanceof DisabledRetryAnalyzer)) {
+			TestRetryAnalyzer testRetryAnalyzer = (TestRetryAnalyzer) testResult.getMethod().getRetryAnalyzer(testResult);
 
 			logger.info(testResult.getMethod() + " Failed in " + (testRetryAnalyzer.getCount()) + " times");
 		}		
@@ -525,12 +525,9 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 		
 		SeleniumTestsContextManager.insertThreadContext(method.getTestMethod(), testResult, context);
 
-		// TODO: use testResult.getMethod(testResult).getRetryAnalyzer() when in TestNG 7.3.0
-    	if (testResult.getMethod().getRetryAnalyzer() == null || testResult.getMethod().getRetryAnalyzer() instanceof DisabledRetryAnalyzer) {
-//    		testResult.getMethod().setRetryAnalyzerClass(TestRetryAnalyzer.class);
-    		testResult.getMethod().setRetryAnalyzer(new TestRetryAnalyzer(SeleniumTestsContextManager.getThreadContext().getTestRetryCount()));
-    		
-    		((TestRetryAnalyzer)testResult.getMethod().getRetryAnalyzer()).setMaxCount(SeleniumTestsContextManager.getThreadContext().getTestRetryCount());
+    	if (method.getTestMethod().getRetryAnalyzer(testResult) == null || method.getTestMethod().getRetryAnalyzer(testResult) instanceof DisabledRetryAnalyzer) {
+    		testResult.getMethod().setRetryAnalyzerClass(TestRetryAnalyzer.class);
+    		((TestRetryAnalyzer)method.getTestMethod().getRetryAnalyzer(testResult)).setMaxCount(SeleniumTestsContextManager.getThreadContext().getTestRetryCount());
 		}	
     	
     	// unique method name is the test name plus an index in case DataProvider is used
