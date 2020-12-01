@@ -18,6 +18,7 @@
 package com.seleniumtests.reporter.reporters;
 
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -344,7 +345,13 @@ public class ReporterControler implements IReporter {
 			
 			// get files referenced by the steps
 			for (TestStep testStep: testContext.getTestStepManager().getTestSteps()) {
+				try {
+					testStep.moveAttachments(testContext.getOutputDirectory());
+				} catch (IOException e) {
+					logger.error("Cannot move attachment " + e.getMessage());
+				}
 				usedFiles.addAll(testStep.getAllAttachments());
+				
 			}
 			
 			String outputSubDirectory = new File(testContext.getOutputDirectory()).getName();

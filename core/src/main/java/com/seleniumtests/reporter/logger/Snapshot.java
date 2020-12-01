@@ -157,6 +157,12 @@ public class Snapshot extends TestAction {
 		return screenshot;
 	}
 	
+	public void relocate(String outputDirectory) throws IOException {
+		if (screenshot != null) {
+			screenshot.relocate(outputDirectory);
+		}
+	}
+	
 	public Snapshot encode() {
 		return new Snapshot(screenshot, name, checkSnapshot);
 	}

@@ -146,6 +146,8 @@ public class ScenarioLogger extends Logger {
 	    	}
     	} catch (IndexOutOfBoundsException e) {
     		// do nothing, no context has been created which is the case if we try to log message in @BeforeSuite / @BeforeGroup
+    	} catch (IOException e) {
+			error(e.getMessage());
     	}
     }
     
@@ -163,7 +165,9 @@ public class ScenarioLogger extends Logger {
     		}
     	} catch (IndexOutOfBoundsException e) {
     		// do nothing, no context has been created which is the case if we try to log message in @BeforeSuite / @BeforeGroup
-    	}
+    	} catch (IOException e) {
+			error(e.getMessage());
+		}
     }
  
     /**

@@ -1,8 +1,14 @@
 package com.seleniumtests.core;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+
+import org.apache.commons.io.FileUtils;
 
 import com.seleniumtests.reporter.logger.TestAction;
 import com.seleniumtests.reporter.logger.TestStep;
@@ -160,6 +166,21 @@ public class TestStepManager {
 			return allSteps.get(allSteps.size() - 1);
 		} catch (Exception e) {
 			return null;
+		}
+	}
+	
+	/**
+	 * For all steps of the test
+	 * - look for files in attachments folder and remove all of them which do not belong to any test step (except .zip)
+	 * - move all attachments in the "before-xxx" folder to the main attachment folder
+	 * @throws IOException 
+	 */
+	public void cleanAttachments(String outputDirectory) throws IOException {
+		
+		String outputSubDirectory = new File(outputDirectory).getName();		
+		
+		for (TestStep testStep: getTestSteps()) {
+			testStep.moveAttachments(outputSubDirectory);
 		}
 	}
 }

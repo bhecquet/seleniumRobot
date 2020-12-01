@@ -19,15 +19,20 @@ package com.seleniumtests.reporter.logger;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.apache.commons.io.FileUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.testng.ITestResult;
 
+import com.seleniumtests.driver.screenshots.ScreenshotUtil;
 import com.seleniumtests.reporter.reporters.CommonReporter;
 
 /**
@@ -260,11 +265,52 @@ public class TestStep extends TestAction {
 			}
 		}
 		
+		// add attachments declared in sub-steps
 		for (TestAction subStep: stepActions.stream().filter(a -> a instanceof TestStep).collect(Collectors.toList())) {
 			usedFiles.addAll(((TestStep)subStep).getAllAttachments());
 		}
 		
+		usedFiles.addAll(getFiles().stream().map(GenericFile::getFile).collect(Collectors.toList()));
+		usedFiles.addAll(getHarCaptures().stream().map(HarCapture::getFile).collect(Collectors.toList()));
+		
 		return usedFiles;
+	}
+	
+	/**
+	 * move attachments from "before-" folder to outputDirectory folder
+	 * @param outputDirectory
+	 * @throws IOException 
+	 */
+	public void moveAttachments(String outputDirectory) throws IOException {
+
+		for (Snapshot snapshot: snapshots) {
+			if (snapshot == null || snapshot.getScreenshot() == null || !snapshot.getScreenshot().getFullHtmlPath().contains("before-") ) {
+				continue;
+			}
+			try {
+				snapshot.getScreenshot().relocate(outputDirectory);
+			} catch (IOException e) {
+				logger.error("Cannot relocate snapshot: " + e.getMessage());
+			}
+			
+		}
+	
+		// move attachments in sub-steps
+		for (TestAction subStep: stepActions.stream().filter(a -> a instanceof TestStep).collect(Collectors.toList())) {
+			((TestStep)subStep).moveAttachments(outputDirectory);
+		}
+	
+		for (HarCapture harCapture: harCaptures) {
+			if (harCapture.getFile().toString().contains("before-")) {
+				harCapture.relocate(outputDirectory);
+			}
+		}
+		
+		for (GenericFile genericFile: files) {
+			if (genericFile.getFile().toString().contains("before-")) {
+				genericFile.relocate(outputDirectory);
+			}
+		}
 	}
 
 	public List<HarCapture> getHarCaptures() {
