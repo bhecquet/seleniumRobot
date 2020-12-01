@@ -1243,7 +1243,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		
 		// Check error is present is Last test step
 		Assert.assertTrue(detailedReportContent.contains("<div class=\"box-body\"><ul><div class=\"message-log\">Test is KO with error: error</div>"));
-		
+		System.out.println(detailedReportContent);
 		// Check exception is logged and filtered
 		Assert.assertTrue(detailedReportContent.matches(".*<div class=\"message-error\"><div>class java.lang.AssertionError: error</div>"
 								+ "<div class=\"stack-element\"></div>"
