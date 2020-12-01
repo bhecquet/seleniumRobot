@@ -27,6 +27,7 @@ import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 import org.testng.xml.XmlSuite.ParallelMode;
 
+import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.it.reporter.ReporterTest;
 
@@ -65,6 +66,37 @@ public class TestRetry extends ReporterTest {
 		Assert.assertTrue(detailedReportContent.contains("<li>played 3 times")); // only the last step is retained
 		Assert.assertFalse(detailedReportContent.contains("<li>played 2 times")); // only the last step is retained
 		Assert.assertEquals(StringUtils.countOccurrencesOf(detailedReportContent, "step 1"), 1); 
+		
+	}
+	
+	/**
+	 * Check that with DataProvider, number of retries is correctly taken into account
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testRetryOnExceptionWithDataProvider() throws Exception {
+		
+		try {
+			System.setProperty(SeleniumTestsContext.TEST_RETRY_COUNT, "1");
+		
+			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testWithExceptionAndDataProvider"});
+			
+			String mainReportContent = readSummaryFile();
+			Assert.assertTrue(mainReportContent.matches(".*<a href\\='testWithExceptionAndDataProvider/TestReport\\.html'.*?>testWithExceptionAndDataProvider</a>.*"));
+			
+			// check test with exception is retried based on log. No more direct way found
+			String detailedReportContent = readTestMethodResultFile("testWithExceptionAndDataProvider");
+			Assert.assertTrue(detailedReportContent.contains("FAILED, Retrying 1 time"));
+			Assert.assertTrue(detailedReportContent.contains("[RETRYING] class com.seleniumtests.it.stubclasses.StubTestClass.testWithExceptionAndDataProvider"));
+			
+			// check that in case of retry, steps are not logged twice
+			Assert.assertTrue(detailedReportContent.contains("step 1"));
+			Assert.assertTrue(detailedReportContent.contains("<li>played 2 times")); // only the last step is retained
+			Assert.assertFalse(detailedReportContent.contains("<li>played 1 times")); // only the last step is retained
+			Assert.assertEquals(StringUtils.countOccurrencesOf(detailedReportContent, "step 1"), 1); 
+		} finally {
+			System.clearProperty(SeleniumTestsContext.TEST_RETRY_COUNT);
+		}
 		
 	}
 	
