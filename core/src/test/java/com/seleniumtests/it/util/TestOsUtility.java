@@ -25,6 +25,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.seleniumtests.GenericTest;
+import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.util.helper.WaitHelper;
 import com.seleniumtests.util.osutility.OSCommand;
 import com.seleniumtests.util.osutility.OSUtility;
@@ -99,7 +100,14 @@ public class TestOsUtility extends GenericTest {
 		if (OSUtility.isWindows()) {
 			OSCommand.executeCommand("calc");
 			WaitHelper.waitForSeconds(2);
-			osUtil.killProcess(osUtil.getRunningProcess("calc").getPid(), true);
+			ProcessInfo pi = osUtil.getRunningProcess("calc");
+			if (pi == null) {
+				pi = osUtil.getRunningProcess("calculator");
+			}
+			if (pi == null) {
+				throw new ConfigurationException("Cannot find process 'calc' or 'calculator'");
+			}
+			osUtil.killProcess(pi.getPid(), true);
 			Assert.assertNull(osUtil.getRunningProcess("calc"));
 		}
 	}
