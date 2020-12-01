@@ -80,10 +80,10 @@ public class TestJsonReporter extends ReporterTest {
 		JSONObject jsonResult = new JSONObject(FileUtils.readFileToString(Paths.get(outDir, "results.json").toFile()));
 		
 		// Check content of result file
-		Assert.assertEquals(jsonResult.getInt("pass"), 8);
+		Assert.assertEquals(jsonResult.getInt("pass"), 9);
 		Assert.assertEquals(jsonResult.getInt("fail"), 8);
 		Assert.assertEquals(jsonResult.getInt("skip"), 3);
-		Assert.assertEquals(jsonResult.getInt("total"), 19);
+		Assert.assertEquals(jsonResult.getInt("total"), 20);
 		
 	}
 
