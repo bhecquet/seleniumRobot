@@ -278,7 +278,7 @@ public class SeleniumTestsContext {
 	public static final ElementInfo.Mode DEFAULT_ADVANCED_ELEMENT_SEARCH = ElementInfo.Mode.FALSE;
     
     public static final int DEFAULT_REPLAY_TIME_OUT = 30;
-
+    
 	
 
 	// group of fields below must be copied in SeleniumTestsContext constructor because they are not rediscovered with 'configureContext' method
@@ -606,10 +606,12 @@ public class SeleniumTestsContext {
     	
     	// in case we find the url of variable server and it's marked as active, use it
 		if (getSeleniumRobotServerActive() != null && getSeleniumRobotServerActive() && getSeleniumRobotServerUrl() != null) {
-			logger.info(String.format("%s key found, and set to true, trying to get variable from variable server %s [%s]", 
-						SELENIUMROBOTSERVER_ACTIVE, 
-						getSeleniumRobotServerUrl(),
-						SELENIUMROBOTSERVER_URL));
+			if (System.getProperty(SeleniumRobotLogger.MAVEN_EXECUTION) == null || System.getProperty(SeleniumRobotLogger.MAVEN_EXECUTION).equals("false")) {
+				logger.info(String.format("%s key found, and set to true, trying to get variable from variable server %s [%s]", 
+							SELENIUMROBOTSERVER_ACTIVE, 
+							getSeleniumRobotServerUrl(),
+							SELENIUMROBOTSERVER_URL));
+			}
 			SeleniumRobotVariableServerConnector vServer = new SeleniumRobotVariableServerConnector(getSeleniumRobotServerActive(), getSeleniumRobotServerUrl(), TestNGResultUtils.getTestName(testNGResult).replaceAll("^before-", ""), getSeleniumRobotServerToken());
 			
 			if (!vServer.isAlive()) {
@@ -619,9 +621,12 @@ public class SeleniumTestsContext {
 			return vServer;
 			
 		} else {
-			logger.info(String.format("%s key not found or set to false, or url key %s has not been set", SELENIUMROBOTSERVER_ACTIVE, SELENIUMROBOTSERVER_URL));
+			if (System.getProperty(SeleniumRobotLogger.MAVEN_EXECUTION) == null || System.getProperty(SeleniumRobotLogger.MAVEN_EXECUTION).equals("false")) {
+				logger.info(String.format("%s key not found or set to false, or url key %s has not been set", SELENIUMROBOTSERVER_ACTIVE, SELENIUMROBOTSERVER_URL));
+			}
 			return null;
 		}
+		
     }
     
     /**
