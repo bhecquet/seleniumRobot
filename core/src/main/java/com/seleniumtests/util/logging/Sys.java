@@ -24,7 +24,7 @@ public class Sys {
 	
 	public static class Error extends LoggingOutputStream {
 		public Error(final Logger log) {
-			super(log, Level.INFO);
+			super(log, Level.ERROR);
 		}
 
 		@Override

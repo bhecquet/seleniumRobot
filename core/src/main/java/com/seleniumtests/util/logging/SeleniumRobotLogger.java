@@ -18,8 +18,13 @@
 package com.seleniumtests.util.logging;
 
 import java.io.File;
+import java.io.FilterOutputStream;
+import java.io.FilterWriter;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.PrintStream;
+import java.io.Writer;
+import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -40,7 +45,10 @@ import org.apache.log4j.FileAppender;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
+import org.apache.log4j.WriterAppender;
+import org.apache.log4j.helpers.QuietWriter;
 
+import com.seleniumtests.customexception.CustomSeleniumTestsException;
 import com.seleniumtests.util.helper.WaitHelper;
 
 public class SeleniumRobotLogger {
@@ -57,6 +65,7 @@ public class SeleniumRobotLogger {
 	public static final String END_TEST_PATTERN = "Finish method ";
 	public static final String LOG_FILE_NAME = "seleniumRobot.log";
 	public static final String INTERNAL_DEBUG = "internalDebug";
+	public static final String MAVEN_EXECUTION = "mavenExecution";
 	public static boolean rootIsConfigured = false;
 	
 	private SeleniumRobotLogger() {
@@ -64,6 +73,8 @@ public class SeleniumRobotLogger {
 	}
 	
 	public static Logger getLogger(final Class<?> cls) {
+		
+		
 	    
 	    if (!rootIsConfigured) {
 	    	Logger.getRootLogger().removeAllAppenders();
@@ -72,11 +83,15 @@ public class SeleniumRobotLogger {
 
 	        Appender appender = (Appender) rootLogger.getAllAppenders().nextElement();
 	        appender.setLayout(new PatternLayout(SeleniumRobotLogger.LOG_PATTERN));
-	        	
-	        // redirect standard output and error to logger so that all logs are written to log file
-	        System.setErr(new PrintStream(new Sys.Error(rootLogger), true));
-	        System.setOut(new PrintStream(new Sys.Out(rootLogger), true));
 	        
+			
+			if (System.getProperty(MAVEN_EXECUTION) == null || System.getProperty(MAVEN_EXECUTION).equals("false")) {
+				System.out.println("streams redirected to logger");
+		        // redirect standard output and error to logger so that all logs are written to log file
+		        System.setErr(new PrintStream(new Sys.Error(rootLogger), true));
+		        System.setOut(new PrintStream(new Sys.Out(rootLogger), true));
+			}
+	
 	        rootIsConfigured = true;
 	    }
 	    

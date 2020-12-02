@@ -421,10 +421,14 @@
 				<!-- comment for online instrumentation -->
 					<systemPropertyVariables>
                         <jacoco-agent.destfile>${project.build.directory}/coverage-reports/jacoco-ut.exec</jacoco-agent.destfile>
+                        <mavenExecution>true</mavenExecution>
 					</systemPropertyVariables>
 				<!-- /comment -->
 				<!-- uncomment for online instrumentation -->
 					<!-- <argLine>${surefireArgLine}</argLine> -->
+					<!-- <systemPropertyVariables>
+                        <mavenExecution>true</mavenExecution>
+					</systemPropertyVariables> -->
 				<!-- /uncomment -->
 					<threadCount>1</threadCount>
 				</configuration>
@@ -439,11 +443,15 @@
                 	<!-- comment for online instrumentation -->
 					<systemPropertyVariables>
                         <jacoco-agent.destfile>${project.build.directory}/coverage-reports/jacoco-it.exec</jacoco-agent.destfile>
+                        <mavenExecution>true</mavenExecution>
 					</systemPropertyVariables>
 					<argLine>-Ddebug=${seleniumRobot.debug} -javaagent:"${settings.localRepository}/org/aspectj/aspectjweaver/${aspectj.version}/aspectjweaver-${aspectj.version}.jar"</argLine>
 				<!-- /comment -->
 				<!-- uncomment for online instrumentation -->
 					<!-- <argLine>${failsafeArgLine} -Ddebug=${seleniumRobot.debug} -javaagent:"${settings.localRepository}/org/aspectj/aspectjweaver/${aspectj.version}/aspectjweaver-${aspectj.version}.jar"</argLine> -->
+					<!-- <systemPropertyVariables>
+                        <mavenExecution>true</mavenExecution>
+					</systemPropertyVariables> -->
 				<!-- /uncomment -->
 				
 				</configuration>
