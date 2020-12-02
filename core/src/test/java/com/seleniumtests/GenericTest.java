@@ -52,7 +52,7 @@ public class GenericTest {
 	 * Beware that this reset does not affect the set context
 	 * @param testNGCtx
 	 */
-	@BeforeMethod(groups={"ut", "it"})  
+	@BeforeMethod(groups={"ut", "it", "ut context2"})  
 	public void initTest(final ITestContext testNGCtx, final ITestResult testResult) {
 		SeleniumTestsContextManager.initGlobalContext(testNGCtx);
 		SeleniumTestsContextManager.initThreadContext(testNGCtx, null, null, testResult);
@@ -77,12 +77,12 @@ public class GenericTest {
 		SeleniumTestsContext.resetOutputFolderNames();
 	}
 	
-	@AfterMethod(groups={"ut", "it"}, alwaysRun=true) 
+	@AfterMethod(groups={"ut", "it", "ut context2"}, alwaysRun=true) 
 	public void reset() {
 		resetTestNGREsultAndLogger();
 	}
 	
-	@AfterClass(groups={"ut", "it"}, alwaysRun=true)
+	@AfterClass(groups={"ut", "it", "ut context2"}, alwaysRun=true)
 	public void closeBrowser() {
 		WebUIDriver.cleanUp();
 	}

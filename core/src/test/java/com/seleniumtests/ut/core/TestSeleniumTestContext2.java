@@ -17,7 +17,6 @@
  */
 package com.seleniumtests.ut.core;
 
-import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.annotations.AfterTest;
@@ -25,8 +24,7 @@ import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 import org.testng.xml.XmlTest;
 
-import com.seleniumtests.MockitoTest;
-import com.seleniumtests.connectors.selenium.SeleniumRobotVariableServerConnector;
+import com.seleniumtests.GenericTest;
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 
@@ -35,17 +33,17 @@ import com.seleniumtests.core.SeleniumTestsContextManager;
  * When setting output directory before some TestNG init occured, context is not a testrunner, so ClassCastException was raised
  *
  */
-@PrepareForTest({SeleniumRobotVariableServerConnector.class, SeleniumTestsContext.class})
-public class TestSeleniumTestContext2 extends MockitoTest {
+//@PrepareForTest({SeleniumRobotVariableServerConnector.class, SeleniumTestsContext.class})
+public class TestSeleniumTestContext2 extends GenericTest {
 
-	@BeforeTest(groups="ut context")
+	@BeforeTest(groups="ut context2")
 	public void init() {
 	
 		// init of properties is done there so that it's taken into account when creating global context 
 		System.setProperty(SeleniumTestsContext.OUTPUT_DIRECTORY, System.getProperty("java.io.tmpdir") + "/home/user/test-output");
 	}
 	
-	@AfterTest(groups="ut context")
+	@AfterTest(groups="ut context2")
 	public void reset() {
 		System.clearProperty(SeleniumTestsContext.OUTPUT_DIRECTORY);
 	}
@@ -55,9 +53,9 @@ public class TestSeleniumTestContext2 extends MockitoTest {
 	 * @param testNGCtx
 	 * @param xmlTest
 	 */
-	@Test(groups="ut context")
+	@Test(groups="ut context2")
 	public void testOutputDirectoryFromSystem(final ITestContext testNGCtx, final XmlTest xmlTest) {
-		Assert.assertTrue(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory().endsWith("/home/user/test-output"));
+		Assert.assertTrue(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory().replace("\\", "/").endsWith("/home/user/test-output"));
 	}
 
 	
