@@ -41,7 +41,8 @@
  
         
         <classes>
-        	<class name="com.seleniumtests.ut.reporter.TestTestLogging"></class>
+        	<class name="com.seleniumtests.ut.connectors.bugtracker.jira.TestJiraBean"></class>
+        	<class name="com.seleniumtests.ut.uipage.htmlelements.TestCompositeActions"></class>
         	
         </classes>
 
@@ -57,6 +58,23 @@
         <groups>
             <run>
                 <include name="ut context"/>
+            </run>
+        </groups>
+
+        <packages>
+            <package name="com.seleniumtests.ut.core.*" />
+        </packages>
+    </test>
+    <test name="UnitTestsWithContext2" parallel="false">
+    	<parameter name="variable1" value="value1" />
+    	<parameter name="app" value="https://www.google.fr" />
+    	<parameter name="dpTagsInclude" value="aTag" />
+		<parameter name="anOtherParam" value="value3" />
+		
+        
+        <groups>
+            <run>
+                <include name="ut context2"/>
             </run>
         </groups>
 
