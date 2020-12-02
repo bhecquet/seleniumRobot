@@ -120,6 +120,10 @@ public class TestTestLogging extends GenericTest {
 			for (String f: new File(SeleniumTestsContextManager.getThreadContext().getOutputDirectory() + "_moved/htmls").list()) {
 				System.out.println(f);
 			}
+			System.out.println("Fichiers dans :" + SeleniumTestsContextManager.getThreadContext().getOutputDirectory());
+			for (String f: new File(SeleniumTestsContextManager.getThreadContext().getOutputDirectory() + "_moved/htmls").list()) {
+				System.out.println(f);
+			}
 			Assert.assertTrue(movedFile.exists());
 			Assert.assertFalse(initialFile.exists());
 			Assert.assertEquals(new File(TestStepManager.getParentTestStep().getSnapshots().get(0).getScreenshot().getFullHtmlPath()), movedFile);
