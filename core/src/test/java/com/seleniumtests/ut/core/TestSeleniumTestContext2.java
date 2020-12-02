@@ -38,14 +38,14 @@ import com.seleniumtests.core.SeleniumTestsContextManager;
 @PrepareForTest({SeleniumRobotVariableServerConnector.class, SeleniumTestsContext.class})
 public class TestSeleniumTestContext2 extends MockitoTest {
 
-	@BeforeTest(groups="ut")
+	@BeforeTest(groups="ut context")
 	public void init() {
 	
 		// init of properties is done there so that it's taken into account when creating global context 
 		System.setProperty(SeleniumTestsContext.OUTPUT_DIRECTORY, System.getProperty("java.io.tmpdir") + "/home/user/test-output");
 	}
 	
-	@AfterTest(groups="ut")
+	@AfterTest(groups="ut context")
 	public void reset() {
 		System.clearProperty(SeleniumTestsContext.OUTPUT_DIRECTORY);
 	}
@@ -55,7 +55,7 @@ public class TestSeleniumTestContext2 extends MockitoTest {
 	 * @param testNGCtx
 	 * @param xmlTest
 	 */
-	@Test(groups="ut")
+	@Test(groups="ut context")
 	public void testOutputDirectoryFromSystem(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		Assert.assertTrue(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory().endsWith("/home/user/test-output"));
 	}
