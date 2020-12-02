@@ -68,7 +68,7 @@ public class TestTaScriptGenerator extends GenericTest {
 		Assert.assertTrue(testList.contains(new SquashTaTestDef(null, "SquashTa_cucumber_generic", true, "")));
 		Assert.assertTrue(testList.contains(new SquashTaTestDef(null, "SquashTa_testPlan", false, "")));
 		Assert.assertFalse(testList.contains(new SquashTaTestDef(null, "SquashTa_excluded", true, "")));
-		Assert.assertTrue(testList.contains(new SquashTaTestDef(null, "Unit tests with context", false, "")));
+		Assert.assertTrue(testList.contains(new SquashTaTestDef(null, "UnitTestsWithContext", false, "")));
 	}
 	
 	/**
@@ -109,7 +109,7 @@ public class TestTaScriptGenerator extends GenericTest {
 			Assert.assertTrue(Paths.get(generationFolder.getPath(), "src", "squashTA", "tests", "g__squashta.xml_SquashTa_cucumber_tags.ta").toFile().isFile());
 			Assert.assertTrue(Paths.get(generationFolder.getPath(), "src", "squashTA", "tests", "g__squashta.xml_SquashTa_cucumber_test.ta").toFile().isFile());
 			Assert.assertTrue(Paths.get(generationFolder.getPath(), "src", "squashTA", "tests", "g__squashta.xml_SquashTa_testPlan.ta").toFile().isFile());
-			Assert.assertTrue(Paths.get(generationFolder.getPath(), "src", "squashTA", "tests", "g__tu.xml_Unit tests with context.ta").toFile().isFile());
+			Assert.assertTrue(Paths.get(generationFolder.getPath(), "src", "squashTA", "tests", "g__tu.xml_UnitTestsWithContext.ta").toFile().isFile());
 			Assert.assertTrue(Paths.get(generationFolder.getPath(), "src", "squashTA", "tests", "g__squashta.xml_SquashTa_cucumber_generic_core__text.ta").toFile().isFile());
 			Assert.assertTrue(Paths.get(generationFolder.getPath(), "src", "squashTA", "tests", "core_generic.ta").toFile().isFile());
 		} finally {
