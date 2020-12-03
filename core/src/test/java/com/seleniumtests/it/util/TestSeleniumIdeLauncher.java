@@ -28,7 +28,7 @@ import net.openhft.compiler.CompilerUtils;
 
 /**
  * /!\ to make these tests work from your IDE, you MUST add a VM argument: "-javaagent:<path_to_maven_repo>\org\aspectj\aspectjweaver\1.9.1\aspectjweaver-1.9.1.jar" 
- * 
+ * Test and compilation MUST also be executed by a JDK
  *
  */
 public class TestSeleniumIdeLauncher extends GenericTest {
