@@ -161,7 +161,7 @@ public class ScreenShot {
 			} catch (FileExistsException e) {
 				// nothing to do, file is there
 			}
-			htmlSourcePath = Paths.get(destOutputDirectory).relativize(Paths.get(newHtmlSrc.getAbsolutePath())).toString();
+			htmlSourcePath = Paths.get(destOutputDirectory).relativize(Paths.get(newHtmlSrc.getAbsolutePath())).toString().replace("\\",  "/");
 		}
 		
 		if (imagePath != null) { 
@@ -172,7 +172,7 @@ public class ScreenShot {
 			} catch (FileExistsException e) {
 				// nothing to do, file is there
 			}
-			imagePath = Paths.get(destOutputDirectory).relativize(Paths.get(newImgSrc.getAbsolutePath())).toString();
+			imagePath = Paths.get(destOutputDirectory).relativize(Paths.get(newImgSrc.getAbsolutePath())).toString().replace("\\",  "/");
 		}
 		
 		outputDirectory = destOutputDirectory;
