@@ -288,7 +288,7 @@ public class TestStep extends TestAction {
 				continue;
 			}
 			try {
-				snapshot.getScreenshot().relocate(outputDirectory);
+				snapshot.relocate(outputDirectory);
 			} catch (IOException e) {
 				logger.error("Cannot relocate snapshot: " + e.getMessage());
 			}
