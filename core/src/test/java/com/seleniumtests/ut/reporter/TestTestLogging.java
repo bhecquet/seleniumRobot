@@ -116,14 +116,6 @@ public class TestTestLogging extends GenericTest {
 			TestStepManager.getParentTestStep().getSnapshots().get(0).relocate(SeleniumTestsContextManager.getThreadContext().getOutputDirectory() + "_moved");
 			File movedFile = Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory() + "_moved", ScreenshotUtil.HTML_DIR, "N-A_0-1_step-capture.html").toFile();
 	
-			System.out.println("Fichiers dans :" + SeleniumTestsContextManager.getThreadContext().getOutputDirectory() + "_moved");
-			for (String f: new File(SeleniumTestsContextManager.getThreadContext().getOutputDirectory() + "_moved/htmls").list()) {
-				System.out.println(f);
-			}
-			System.out.println("Fichiers dans :" + SeleniumTestsContextManager.getThreadContext().getOutputDirectory());
-			for (String f: new File(SeleniumTestsContextManager.getThreadContext().getOutputDirectory() + "_moved/htmls").list()) {
-				System.out.println(f);
-			}
 			Assert.assertTrue(movedFile.exists());
 			Assert.assertFalse(initialFile.exists());
 			Assert.assertEquals(new File(TestStepManager.getParentTestStep().getSnapshots().get(0).getScreenshot().getFullHtmlPath()), movedFile);
@@ -156,13 +148,7 @@ public class TestTestLogging extends GenericTest {
 			// relocate
 			TestStepManager.getParentTestStep().getSnapshots().get(0).relocate(SeleniumTestsContextManager.getThreadContext().getOutputDirectory() + "_moved");
 			File movedFile = Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory() + "_moved", ScreenshotUtil.SCREENSHOT_DIR, "N-A_0-1_step-capture.png").toFile();
-			
 
-			System.out.println("Fichiers dans :" + SeleniumTestsContextManager.getThreadContext().getOutputDirectory() + "_moved");
-			for (String f: new File(SeleniumTestsContextManager.getThreadContext().getOutputDirectory() + "_moved/screenshots").list()) {
-				System.out.println(f);
-			}
-			
 			Assert.assertTrue(movedFile.exists());
 			Assert.assertFalse(initialFile.exists());
 			Assert.assertEquals(new File(TestStepManager.getParentTestStep().getSnapshots().get(0).getScreenshot().getFullImagePath()), movedFile);

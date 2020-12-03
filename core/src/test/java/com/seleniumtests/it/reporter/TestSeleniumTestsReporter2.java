@@ -749,8 +749,8 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		String detailedReportContent1 = readTestMethodResultFile("test1Listener5");
 		
 		// check all files are displayed
-		Assert.assertTrue(detailedReportContent1.contains("<a href='../before-test1Listener5/screenshots/N-A_2-1_Pre_test_step._beforeMethod-"));
-		Assert.assertTrue(detailedReportContent1.contains("<a href='../before-test1Listener5/htmls/N-A_2-1_Pre_test_step._beforeMethod-"));
+		Assert.assertTrue(detailedReportContent1.contains("<a href='screenshots/N-A_2-1_Pre_test_step._beforeMethod-"));
+		Assert.assertTrue(detailedReportContent1.contains("<a href='htmls/N-A_2-1_Pre_test_step._beforeMethod-"));
 		Assert.assertTrue(detailedReportContent1.contains("<a href='../test1Listener5/screenshots/test1Listener5_3-1_Test_end"));
 		Assert.assertTrue(detailedReportContent1.contains("<a href='../test1Listener5/htmls/test1Listener5_3-1_Test_end"));
 
@@ -1248,7 +1248,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		Assert.assertTrue(detailedReportContent.matches(".*<div class=\"message-error\"><div>class java.lang.AssertionError: error</div>"
 								+ "<div class=\"stack-element\"></div>"
 								+ "<div class=\"stack-element\">at com.seleniumtests.it.stubclasses.StubTestClass.testInError\\(StubTestClass.java:\\d+\\)</div>"
-								+ "<div class=\"stack-element\">at java.util.ArrayList.forEach\\(Unknown Source\\)</div>"
+								+ "<div class=\"stack-element\">at java.util.ArrayList.forEach.*?</div>"
 								+ "<div class=\"stack-element\">at com.seleniumtests.it.reporter.ReporterTest.executeSubTest\\(ReporterTest.java:\\d+\\)</div>"
 								+ "<div class=\"stack-element\">at com.seleniumtests.it.reporter.TestSeleniumTestsReporter2.testReportDetailsWithErrors\\(TestSeleniumTestsReporter2.java:\\d+\\)</div>.*"));
 		
