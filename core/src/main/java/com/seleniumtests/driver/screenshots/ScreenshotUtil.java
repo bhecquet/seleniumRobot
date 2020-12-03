@@ -526,7 +526,10 @@ public class ScreenshotUtil {
     	
     	int scrollY = 0;
     	int scrollX = 0;
-    	int maxLoops = ((contentDimension.height / (viewDimensions.height - topPixelsToCrop - bottomPixelsToCrop)) + 1) * ((contentDimension.width / viewDimensions.width) + 1) + 3;
+    	
+    	// when cropping, we do not crop the first header and last footer => loops computing must take it into account (contentDimension.height - topPixelsToCrop - bottomPixelsToCrop)
+    	int maxLoops = (((contentDimension.height - topPixelsToCrop - bottomPixelsToCrop) / 
+    			(viewDimensions.height - topPixelsToCrop - bottomPixelsToCrop)) + 1) * ((contentDimension.width / viewDimensions.width) + 1) + 3;
     	int loops = 0;
     	int currentImageHeight = 0;
     	
@@ -541,7 +544,7 @@ public class ScreenshotUtil {
 			// do not crop top for the first vertical capture
 			// do not crop bottom for the last vertical capture
 			int cropTop = currentImageHeight != 0 ? topPixelsToCrop : 0;
-			int cropBottom = currentImageHeight + viewDimensions.height < contentDimension.height ? bottomPixelsToCrop : 0;
+			int cropBottom = currentImageHeight + (viewDimensions.height - cropTop) < contentDimension.height ? bottomPixelsToCrop : 0;
 			
 			// do not scroll to much so that we can crop fixed header without loosing content
 			scrollY = currentImageHeight - cropTop;
