@@ -552,6 +552,7 @@ public class TestDriver extends GenericMultiBrowserTest {
 //		DriverTestPage.upload.click();
 		DriverTestPage.uploadedFile.click(); // when executing both testUploadFileWithRobotXX tests, the second one fails on firefox because focus is on '<input type="file">' element
 		DriverTestPage.upload.clickAction(); // due to restrictions clicking a <input type="file"> element with firefox, use clickAction instead
+		WaitHelper.waitForSeconds(10); // sometimes, upload popup needs time to display
 		testPage.uploadFile(path);
 		
 		Assert.assertEquals(DriverTestPage.uploadedFile.getAttribute("value"), "envSpecific.ini");
@@ -568,6 +569,7 @@ public class TestDriver extends GenericMultiBrowserTest {
 //		DriverTestPage.upload.click();
 		DriverTestPage.uploadedFile.click(); // when executing both testUploadFileWithRobotXX tests, the second one fails on firefox because focus is on '<input type="file">' element
 		DriverTestPage.upload.clickAction(); // due to restrictions clicking a <input type="file"> element with firefox, use clickAction instead
+		WaitHelper.waitForSeconds(10); // sometimes, upload popup needs time to display
 		CustomEventFiringWebDriver.uploadFileUsingKeyboardTyping(new File(path));
 		WaitHelper.waitForSeconds(1);
 		Assert.assertEquals(DriverTestPage.uploadedFile.getAttribute("value"), "envSpecific2.ini");
