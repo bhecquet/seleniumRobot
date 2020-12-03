@@ -102,13 +102,18 @@ public class TestOsUtility extends GenericTest {
 			WaitHelper.waitForSeconds(2);
 			ProcessInfo pi = osUtil.getRunningProcess("calc");
 			if (pi == null) {
-				pi = osUtil.getRunningProcess("calculator");
+				pi = osUtil.getRunningProcess("calculator"); // Windows 10
 			}
 			if (pi == null) {
-				throw new ConfigurationException("Cannot find process 'calc' or 'calculator'");
+				pi = osUtil.getRunningProcess("win32calc"); // Windows 2016
+			}
+			if (pi == null) {
+				throw new ConfigurationException("Cannot find process 'calc', 'win32calc' or 'calculator'");
 			}
 			osUtil.killProcess(pi.getPid(), true);
 			Assert.assertNull(osUtil.getRunningProcess("calc"));
+			Assert.assertNull(osUtil.getRunningProcess("calculator"));
+			Assert.assertNull(osUtil.getRunningProcess("win32calc"));
 		}
 	}
 	
