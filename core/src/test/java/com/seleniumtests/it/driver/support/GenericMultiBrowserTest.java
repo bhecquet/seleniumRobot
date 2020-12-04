@@ -17,15 +17,28 @@
  */
 package com.seleniumtests.it.driver.support;
 
+import java.awt.AWTException;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
+import java.awt.Rectangle;
+import java.awt.Robot;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.net.Inet4Address;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.imageio.ImageIO;
+
+import org.apache.commons.codec.binary.Base64OutputStream;
 import org.apache.log4j.Logger;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.testng.ITestContext;
+import org.testng.ITestResult;
 import org.testng.SkipException;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
@@ -149,8 +162,8 @@ public abstract class GenericMultiBrowserTest extends MockitoTest {
 			return;
 		}
 		
-		localAddress = Inet4Address.getLocalHost().getHostAddress();
-//		localAddress = Inet4Address.getByName("localhost").getHostAddress();
+//		localAddress = Inet4Address.getLocalHost().getHostAddress();
+		localAddress = Inet4Address.getByName("localhost").getHostAddress();
         server = new WebServer(localAddress, getPageMapping());
         server.expose();
         logger.info(String.format("exposing server on http://%s:%d", localAddress, server.getServerHost().getPort()));
@@ -230,5 +243,31 @@ public abstract class GenericMultiBrowserTest extends MockitoTest {
 			
 		}
 
+	}
+
+	/**
+	 * Takes a screenshot and write it to logs as base64 string
+	 * @throws AWTException
+	 * @throws IOException
+	 */
+	@AfterMethod(groups={"it", "ut", "upload", "ie"}, alwaysRun = true)
+	protected void takeScreenshot(ITestResult testResult) throws AWTException, IOException {
+		
+		if (testResult.getStatus() == ITestResult.FAILURE) {
+			GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+			
+		    Rectangle screenRect = new Rectangle(0, 0, 0, 0);
+		    for (GraphicsDevice gd : ge.getScreenDevices()) {
+		      screenRect = screenRect.union(gd.getDefaultConfiguration().getBounds());
+		    }
+		    
+		    BufferedImage bi = new Robot().createScreenCapture(screenRect);
+		    
+		    ByteArrayOutputStream os = new ByteArrayOutputStream();
+		    OutputStream b64 = new Base64OutputStream(os);
+		    
+		    ImageIO.write(bi, "png", b64);
+		    logger.error(os.toString("UTF-8"));
+		}
 	}
 }
