@@ -17,12 +17,8 @@
  */
 package com.seleniumtests.uipage.htmlelements;
 
-import java.io.IOException;
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Modifier;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ServiceLoader;
@@ -32,19 +28,10 @@ import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
 
-import com.google.common.collect.ImmutableSet;
-import com.google.common.reflect.ClassPath;
-import com.google.common.reflect.ClassPath.ClassInfo;
-import com.seleniumtests.core.runner.cucumber.Fixture;
 import com.seleniumtests.customexception.CustomSeleniumTestsException;
 import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.uipage.ReplayOnError;
-import com.seleniumtests.uipage.htmlelements.select.AngularMaterialSelect;
-import com.seleniumtests.uipage.htmlelements.select.AngularSelect;
 import com.seleniumtests.uipage.htmlelements.select.ISelectList;
-import com.seleniumtests.uipage.htmlelements.select.ListSelect;
-import com.seleniumtests.uipage.htmlelements.select.NativeSelect;
-import com.seleniumtests.uipage.htmlelements.select.SalesforceLigntningSelect;
 import com.seleniumtests.uipage.htmlelements.select.StubSelect;
 
 import net.ricecode.similarity.JaroWinklerStrategy;
@@ -443,7 +430,7 @@ public class SelectList extends HtmlElement {
     	double score = 0;
     	WebElement optionToSelect = null;
     	for (WebElement option : options) {
-    		String source = option.getText();
+    		String source = option.getText().trim();
     		if (service.score(source, text) > score) {
     			score = service.score(source, text);
     			optionToSelect = option;
@@ -469,7 +456,7 @@ public class SelectList extends HtmlElement {
 	    	double score = 0;
 	    	WebElement optionToSelect = null;
 	    	for (WebElement option : options) {
-	    		String source = option.getText();
+	    		String source = option.getText().trim();
 	    		if (service.score(source, text) > score) {
 	    			score = service.score(source, text);
 	    			optionToSelect = option;
