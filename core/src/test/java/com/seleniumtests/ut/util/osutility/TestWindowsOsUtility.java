@@ -19,6 +19,7 @@ package com.seleniumtests.ut.util.osutility;
 
 import static org.mockito.Mockito.when;
 import static org.mockito.ArgumentMatchers.contains;
+import static org.mockito.ArgumentMatchers.contains;
 
 import java.io.File;
 import java.io.IOException;
@@ -155,7 +156,7 @@ public class TestWindowsOsUtility extends MockitoTest {
 	public void testGetProcessList() {
 		
 		PowerMockito.mockStatic(OSCommand.class);
-		when(OSCommand.executeCommandAndWait("C:\\windows\\system32\\tasklist.exe /NH /SVC")).thenReturn("eclipse.exe                   6480 N/A\r\n" + 
+		when(OSCommand.executeCommandAndWait(contains("system32\\tasklist.exe /NH /SVC"))).thenReturn("eclipse.exe                   6480 N/A\r\n" + 
 				"javaw.exe                     7280 N/A\r\n" + 
 				"chromedriver_2.45_chrome-    11252 N/A\r\n"
 				+ "svchost.exe                   1784 CryptSvc, Dnscache, LanmanWorkstation,\r\n" + 
