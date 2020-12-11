@@ -56,6 +56,9 @@ public class GenericFile extends TestAction {
 		if (move) {
 			File loggedFile = Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), file.getName()).toFile();
 			if (!file.equals(loggedFile)) {
+				if (loggedFile.exists()) {
+					loggedFile.delete();
+				}
 				FileUtils.moveFile(file, loggedFile);
 			}
 			
