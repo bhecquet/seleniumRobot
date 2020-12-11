@@ -1061,6 +1061,57 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	}
 	
 	/**
+	 * issue #406
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testReportContainsVideoCaptureOnRetry() throws Exception {
+		
+		try {
+			System.setProperty(SeleniumTestsContext.VIDEO_CAPTURE, "true");
+			System.setProperty(SeleniumTestsContext.TEST_RETRY_COUNT, "1");
+			
+			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriverShortKo"});
+			
+			// read 'testDriver' report. This contains calls to HtmlElement actions
+			String detailedReportContent1 = readTestMethodResultFile("testDriverShortKo");
+			
+			Assert.assertTrue(detailedReportContent1.contains("Video capture: <a href='videoCapture.avi'>file</a>"));	
+			
+		} finally {
+			System.clearProperty(SeleniumTestsContext.VIDEO_CAPTURE);
+			System.clearProperty(SeleniumTestsContext.TEST_RETRY_COUNT);
+		}
+		
+	}
+	
+	/**
+	 * Check that when driver starts in beforeMethod, it's possible to have video
+	 * issue #406
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testReportContainsVideoCaptureStartedOnBeforeMethodOnRetry() throws Exception {
+		
+		try {
+			System.setProperty(SeleniumTestsContext.VIDEO_CAPTURE, "true");
+			System.setProperty(SeleniumTestsContext.TEST_RETRY_COUNT, "1");
+			
+			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForVideoTest"}, ParallelMode.METHODS, new String[] {"testDriverShortKo"});
+			
+			// read 'testDriver' report. This contains calls to HtmlElement actions
+			String detailedReportContent1 = readTestMethodResultFile("testDriverShortKo");
+			
+			Assert.assertTrue(detailedReportContent1.contains("Video capture: <a href='videoCapture.avi'>file</a>"));	
+			
+		} finally {
+			System.clearProperty(SeleniumTestsContext.VIDEO_CAPTURE);
+			System.clearProperty(SeleniumTestsContext.TEST_RETRY_COUNT);
+		}
+		
+	}
+	
+	/**
 	 * Check that only one video capture file is present in result even if several drivers are used
 	 * 
 	 * @throws Exception
