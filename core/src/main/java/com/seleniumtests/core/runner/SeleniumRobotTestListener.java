@@ -50,8 +50,10 @@ import org.testng.internal.ConfigurationMethod;
 import org.testng.internal.TestResult;
 import org.testng.internal.annotations.DisabledRetryAnalyzer;
 
+import com.epam.reportportal.testng.BaseTestNGListener;
 import com.google.common.collect.Iterables;
 import com.seleniumtests.connectors.selenium.SeleniumRobotVariableServerConnector;
+import com.seleniumtests.connectors.tms.reportportal.ReportPortalService;
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.TestStepManager;
@@ -72,21 +74,62 @@ import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
 import kong.unirest.Unirest;
 
-public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodListener, ISuiteListener, IExecutionListener, IConfigurationListener {
+public class SeleniumRobotTestListener extends BaseTestNGListener implements ITestListener, IInvokedMethodListener, ISuiteListener, IExecutionListener, IConfigurationListener {
 	
 	protected static final Logger logger = SeleniumRobotLogger.getLogger(SeleniumRobotTestListener.class);
 	private static ScenarioLogger scenarioLogger = ScenarioLogger.getScenarioLogger(SeleniumRobotTestListener.class);
 	
 	private static List<ISuite> suiteList = Collections.synchronizedList(new ArrayList<>());
+	private static ReportPortalService reportPortalService = null;
 	private Date start;
+	
+	private static SeleniumRobotTestListener currentListener;
 
 	protected String buildMethodSignature(final Method method) {
         return method.getDeclaringClass().getCanonicalName() + "." + method.getName() + "()";
     }
+	
+
+	public SeleniumRobotTestListener() {
+		super(initializeReportPortalListener());
+		currentListener = this;
+	}
+	
+	private static ReportPortalService initializeReportPortalListener() {
+		try {
+			if (SeleniumTestsContext.getReportPortalActive()) {
+				reportPortalService = new ReportPortalService();
+				return reportPortalService;
+			} 
+		} catch (Exception e) {
+			logger.error("Report portal has not been initialized: " + e.getMessage());
+		}
+		return null;
+	}
+	
+	/**
+	 * Method to be called when the test has been terminated and all AfterMethod methods has been called
+	 * @param result
+	 */
+	public void onTestFullyFinished(ITestResult testResult) {
+		generateTempReport(testResult);
+		
+		if (reportPortalService != null) {
+			if (testResult.getStatus() == ITestResult.SUCCESS) {
+				super.onTestSuccess(testResult);
+			} else if (testResult.getStatus() == ITestResult.FAILURE) {
+				super.onTestFailure(testResult);
+			} else if (testResult.getStatus() == ITestResult.SKIP) {
+				super.onTestSkipped(testResult);
+			}
+		}
+	}
 
 	@Override
 	public void onTestStart(ITestResult result) {
-		// nothing to do
+		if (reportPortalService != null) {
+			super.onTestStart(result);
+		}
 	}
 
 	@Override
@@ -95,8 +138,6 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 		
 		// test is success, so it will not be retried
 		TestNGResultUtils.setNoMoreRetry(result, true);
-		
-		generateTempReport(result);
 	}
 
 	/**
@@ -110,8 +151,6 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 
 			logger.info(testResult.getMethod() + " Failed in " + (testRetryAnalyzer.getCount()) + " times");
 		}		
-		
-		generateTempReport(testResult);
 	}
 
 	/**
@@ -131,14 +170,6 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 					testResult.getTestContext()
 					);
 		}
-		
-		generateTempReport(testResult);
-	}
-
-	@Override
-	public void onTestFailedButWithinSuccessPercentage(ITestResult result) {
-		// nothing to do
-		
 	}
 	
 	/**
@@ -147,7 +178,7 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 	 */
 	private void generateTempReport(ITestResult testResult) {
 		try {
-			new ReporterControler().generateReport(
+			new ReporterControler(reportPortalService).generateReport(
 					Arrays.asList(testResult.getTestContext().getCurrentXmlTest().getSuite()), 
 					Arrays.asList(testResult.getTestContext().getSuite()), 
 					SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(),
@@ -181,7 +212,11 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
         start = new Date();
         
         // global context of the test
-        SeleniumTestsContextManager.initGlobalContext(context);		
+        SeleniumTestsContextManager.initGlobalContext(context);	
+        
+        if (reportPortalService != null) {
+			super.onStart(context);
+		}
 	}
 
 	/**
@@ -226,6 +261,10 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 			if (!resultsToKeep.contains(result)) {
 				context.getPassedTests().removeResult(result);
 			}
+		}
+		
+		if (reportPortalService != null) {
+			super.onFinish(context);
 		}
 	}
 
@@ -299,7 +338,9 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
     									SeleniumTestsContextManager.getApplicationFullVersion()));
     	logger.info(String.format("Core version: %s (%s)", SeleniumTestsContextManager.getCoreVersion(), SeleniumTestsContextManager.getCoreFullVersion()));
 
-		
+    	if (reportPortalService != null) {
+			super.onStart(suite);
+		}
 	}
 
 	@Override
@@ -310,6 +351,10 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 			logger.warn("No test executed");
 		}	
 		suiteList.add(suite);
+		
+		if (reportPortalService != null) {
+			super.onFinish(suite);
+		}
 	}
 	
 	@Override
@@ -317,6 +362,10 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 		suiteList = Collections.synchronizedList(new ArrayList<>());
 		Unirest.config().reset();
 		Unirest.config().followRedirects(true);
+		
+		if (reportPortalService != null) {
+			super.onExecutionStart();
+		}
 	}
 	
 
@@ -379,6 +428,10 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
         		logger.error(String.format("Archiving KO [%s] => %s", e.getMessage(), SeleniumTestsContextManager.getGlobalContext().getArchiveToFile()));
         	}
 		}
+        
+        if (reportPortalService != null) {
+			super.onExecutionFinish();
+		}
 	}
 	
 	/**
@@ -390,17 +443,20 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 	}
 	
 	@Override
-	public void onConfigurationSuccess(ITestResult itr) {
+	public void onConfigurationSuccess(ITestResult testResult) {
+
 	}
 
 	@Override
-	public void onConfigurationFailure(ITestResult itr) {
-		logger.error(String.format("Error on configuration method %s.%s: %s", itr.getMethod().getTestClass().getName(), itr.getMethod().getMethodName(), itr.getThrowable().getMessage()));
+	public void onConfigurationFailure(ITestResult testResult) {
+		logger.error(String.format("Error on configuration method %s.%s: %s", testResult.getMethod().getTestClass().getName(), testResult.getMethod().getMethodName(), testResult.getThrowable().getMessage()));
+
 	}
 
 	@Override
-	public void onConfigurationSkip(ITestResult itr) {
-		logger.error(String.format("Skip on method %s.%s", itr.getMethod().getTestClass().getName(), itr.getMethod().getMethodName()));
+	public void onConfigurationSkip(ITestResult testResult) {
+		logger.error(String.format("Skip on method %s.%s", testResult.getMethod().getTestClass().getName(), testResult.getMethod().getMethodName()));
+
 	}
 	
 
@@ -611,5 +667,24 @@ public class SeleniumRobotTestListener implements ITestListener, IInvokedMethodL
 	 */
 	public static List<ISuite> getSuiteList() {
 		return suiteList;
+	}
+
+	@Override
+	public void beforeConfiguration(ITestResult testResult) {
+
+	}
+
+
+	// this action temporary doesn't supported by report portal
+	@Override
+	public void onTestFailedButWithinSuccessPercentage(ITestResult result) {
+		if (reportPortalService != null) {
+			super.onTestFailedButWithinSuccessPercentage(result);
+		}
+	}
+
+
+	public static SeleniumRobotTestListener getCurrentListener() {
+		return currentListener;
 	}
 }

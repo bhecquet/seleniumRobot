@@ -18,17 +18,13 @@
 package com.seleniumtests.core.runner;
 
 import java.io.File;
-import java.io.IOException;
 import java.lang.reflect.Method;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.openqa.selenium.WebDriver;
 import org.testng.ITestResult;
@@ -46,7 +42,7 @@ import com.seleniumtests.util.logging.ScenarioLogger;
 
 @Listeners({com.seleniumtests.reporter.reporters.ReporterControler.class,
 	com.seleniumtests.core.runner.SeleniumRobotTestListener.class//,
-//	ReportPortalTestListener.class
+	//ReportPortalTestListener.class
 	})
 public class SeleniumRobotTestPlan {
 	
@@ -108,6 +104,8 @@ public class SeleniumRobotTestPlan {
 
 		WebUIDriver.cleanUp();
 		SeleniumTestsContextManager.getThreadContext().setDriverCreationBlocked(true);
+		
+		SeleniumRobotTestListener.getCurrentListener().onTestFullyFinished(testResult);
 	}
 
 	/**
