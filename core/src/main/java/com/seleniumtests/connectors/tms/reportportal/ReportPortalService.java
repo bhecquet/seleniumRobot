@@ -14,19 +14,30 @@ import com.epam.ta.reportportal.ws.model.launch.StartLaunchRQ;
 
 public class ReportPortalService extends TestNGService {
 
+	private static Launch rpLaunch;
+
 	public ReportPortalService() {
 		super(getLaunchOverriddenProperties());
 	}
+	
+	public Launch getLaunch() {
+		return ReportPortalService.rpLaunch;
+	}
+
 
 	private static Supplier<Launch> getLaunchOverriddenProperties() {
 		ListenerParameters parameters = new ListenerParameters(PropertiesLoader.load());
-//		parameters.setApiKey("my crazy uuid");
+		parameters.setCallbackReportingEnabled(true);
 		ReportPortal reportPortal = ReportPortal.builder().withParameters(parameters).build();
 		StartLaunchRQ rq = buildStartLaunch(reportPortal.getParameters());
+		
+		rpLaunch = reportPortal.newLaunch(rq);
+		
+		
 		return new Supplier<Launch>() {
 			@Override
 			public Launch get() {
-				return reportPortal.newLaunch(rq);
+				return rpLaunch;
 			}
 		};
 	}

@@ -43,6 +43,7 @@ import org.testng.TestRunner;
 import org.testng.xml.XmlSuite;
 
 import com.seleniumtests.connectors.selenium.SeleniumRobotSnapshotServerConnector;
+import com.seleniumtests.connectors.tms.reportportal.ReportPortalService;
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.utils.TestNGResultUtils;
@@ -63,7 +64,20 @@ public class ReporterControler implements IReporter {
 
 	private static final Object reporterLock = new Object();
 	private static final Logger logger = SeleniumRobotLogger.getLogger(ReporterControler.class);
+	private JUnitReporter junitReporter;
+	private ReportPortalReporter reportPortalReporter;
 
+	public ReporterControler() {
+		this(null);
+	}
+	
+	public ReporterControler(ReportPortalService reportPortalService) {
+		junitReporter = new JUnitReporter();
+		if (reportPortalService != null) {
+			reportPortalReporter = new ReportPortalReporter(reportPortalService);
+		}
+	}
+	
 	@Override
 	public void generateReport(List<XmlSuite> xmlSuites, List<ISuite> suites, String outputDirectory) {
 		generateReport(xmlSuites, suites, outputDirectory, null);
@@ -93,12 +107,17 @@ public class ReporterControler implements IReporter {
 			if (suiteFinished) {
 				changeTestResultWithSnapshotComparison(suites);
 			}
+			
+			// test steps to Report Portal
+			if (reportPortalReporter != null && currentTestResult != null) {
+				reportPortalReporter.generateReport(currentTestResult);
+			}
 
 			try {
 				if (suiteFinished) {
-					new JUnitReporter().generateReport(xmlSuites, suites, SeleniumTestsContextManager.getGlobalContext().getOutputDirectory());
+					junitReporter.generateReport(xmlSuites, suites, SeleniumTestsContextManager.getGlobalContext().getOutputDirectory());
 				} else {
-					new JUnitReporter().generateReport(resultSet, SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), true);
+					junitReporter.generateReport(resultSet, SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), true);
 				}
 			} catch (Exception e) {
 				logger.error("Error generating JUnit report", e);

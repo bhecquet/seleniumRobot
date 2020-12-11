@@ -48,4 +48,12 @@ public class StubTestClassForVideoTest extends StubParentClass {
 	public void testDriverShortWithDataProvider(String data) throws Exception {
 		new DriverTestPage(true);
 	}
+	
+	@Test(groups={"video"})
+	public void testDriverShortKo() throws Exception {
+		SeleniumTestsContextManager.getThreadContext().setReplayTimeout(1);
+		
+		new DriverTestPage(true)
+			._writeSomethingOnNonExistentElement();
+	}
 }

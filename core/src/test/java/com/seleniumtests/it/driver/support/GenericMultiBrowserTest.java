@@ -250,7 +250,7 @@ public abstract class GenericMultiBrowserTest extends MockitoTest {
 	 * @throws AWTException
 	 * @throws IOException
 	 */
-	@AfterMethod(groups={"it", "ut", "upload", "ie"}, alwaysRun = true)
+	//@AfterMethod(groups={"it", "ut", "upload", "ie"}, alwaysRun = true)
 	protected void takeScreenshot(ITestResult testResult) throws AWTException, IOException {
 		
 		if (testResult.getStatus() == ITestResult.FAILURE) {

@@ -245,13 +245,16 @@ public class TestStep extends TestAction {
 	 * @return
 	 */
 	public List<File> getAllAttachments() {
+		return getAllAttachments(false);
+	}
+	public List<File> getAllAttachments(boolean onlyPictureOfSnapshots) {
 		List<File> usedFiles = new ArrayList<>();
 		for (Snapshot snapshot: snapshots) {
 			if (snapshot == null || snapshot.getScreenshot() == null ) {
 				continue;
 			}
 			
-			if (snapshot.getScreenshot().getFullHtmlPath() != null) {
+			if (snapshot.getScreenshot().getFullHtmlPath() != null && !onlyPictureOfSnapshots) {
 				try {
 					usedFiles.add(new File(snapshot.getScreenshot().getFullHtmlPath()).getCanonicalFile());
 				} catch (IOException e) {
