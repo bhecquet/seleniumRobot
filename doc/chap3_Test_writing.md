@@ -392,8 +392,9 @@ Additional search using the `ByC` class are
 - search in reverse order (get the last element): `new TextFieldElement("", By.className("someClass"), -1);` get the last element on the list
 - search with several criteria: `new TextFieldElement("", ByC.and(By.tagName("input"), By.name("textField")))`
 - search element with one criteria or an other. Specifically usefull to handle multiple mobile OS: `new HtmlElement("or", ByC.or(ByC.ios(By.name("textField")), ByC.android(By.id("text2")))`
+- search element inside shadow-root: `HtmlElement parent = new HtmlElement("", ByC.shadow(By.id("shadow5"), By.id("shadow6")));`. This way, you have a parent which allow you to search inside as any other parent. ByC.shadow() can take any number of locator, which replicate the shadow-root tree.
 
-`ByC` selectors ('xId', 'xName', 'xTagName', 'xLinkText' and 'xPartialLinkText') replicate the behavior of standard Selenium selectors but using xpath method. This is needed for salesforce UI automation where shadow DOM prevents selenium to discover sub-elements of a custom element created with shadow DOM.
+`ByC` selectors ('xId', 'xName', 'xTagName', 'xLinkText' and 'xPartialLinkText') replicate the behavior of standard Selenium selectors but using xpath method. This is needed for salesforce UI automation where lightning UI prevents selenium to discover sub-elements of a custom element.
 
 #### Document your tests ####
 
