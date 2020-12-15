@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+		<title>Level Access Inc. ShadowDOM Examples from https://not.webaccessibility.com/shadowdom.html</title>
+</head>
+	<script>
+		function setup(){
+			//Test1
+			document.getElementById("shadow").attachShadow({mode: "open"}).innerHTML='<label for="fail1">This is a label</label>';
+			
+			//Test2
+			document.getElementById("shadow2").attachShadow({mode: "open"}).innerHTML='<div id="pass1Shadow">This is a div with an ID of pass1Shadow</div>';
+			
+			//Test3
+			document.getElementById("shadow3").attachShadow({mode: "open"}).innerHTML='<div class="dave"><img id="fail2" src="images/goat-4.jpg" width="200"></div>';
+
+			//Test4
+			document.getElementById("shadow4").attachShadow({mode: "open"}).innerHTML='<label for="fail3Shadow">Panda Unicorn</label><slot name="fillme"></slot>';
+
+			//Test5
+			var o=document.getElementById("shadow5").attachShadow({mode: "open"});o.innerHTML='<div id="pass3Shadow">This is a DIV with the ID of pass3Shadow</div><div id="shadow6"></div>';
+			var p=o.getElementById("shadow6").attachShadow({mode: "open"});
+			p.innerHTML='<div id="pass3Shadow">This is a DIV with the ID of pass3Shadow</div>';
+
+			//Test6
+			var s7 = document.getElementById("shadow7").attachShadow({mode: "open"});
+			s7.innerHTML='<div id="pass7Shadow">This is a div with an ID of pass7Shadow</div><div id="shadow71" name="doubleSubShadow"></div>';
+			var s71=s7.getElementById("shadow71").attachShadow({mode: "open"});
+			s71.innerHTML='<div id="pass71Shadow">This is a DIV with the ID of pass71Shadow</div>';
+			
+			var s8 = document.getElementById("shadow8").attachShadow({mode: "open"});
+			s8.innerHTML='<div id="pass8Shadow">This is a div with an ID of pass8Shadow</div><div id="shadow81" name="doubleSubShadow"></div>';
+			var s81=s8.getElementById("shadow81").attachShadow({mode: "open"});
+			s81.innerHTML='<div id="pass81Shadow">This is a DIV with the ID of pass81Shadow</div>';
+			
+			//Test7
+			var o=document.getElementById("shadow9").attachShadow({mode: "open"});o.innerHTML='<div id="sam">This is a DIV with the ID of sam</div><div id="shadow10"></div>';
+			var p=o.getElementById("shadow10").attachShadow({mode: "open"});
+			p.innerHTML='<div id="sam">This is a DIV with the ID of sam - Fail</div><div id="sam">This is a DIV with the ID of sam - Fail</div>';
+
+			//Test8
+			customElements.define('component-element',
+                class extends HTMLElement {
+                constructor() {
+                    super();
+                    var template = document.createElement("template");
+                    template.innerHTML = "<slot name='stuff'><p>Default</p></slot>";
+                    const shadowRoot = this.attachShadow({mode: 'open'}).appendChild(template.content.cloneNode(true));
+                }
+            });			
+
+		}
+	</script>
+</head>
+<body onload="setup()">
+<h1>Shadow DOM Example</h1>
+<h2>Test 1</h2>
+	<p>This form fails because it has a label in the shadowDOM.</p>
+	<p>Light DOM:</p>
+
+	<input id="fail1" type="text" />
+	
+	<p>Shadow DOM containing a label for the input:</p>
+	<div id="shadow"></div>
+
+<hr>
+
+<h2>Test 2</h2>
+
+	<p>There are two DIVs, both with an ID of "pass1". One is in the ShadowDOM while the other is in the Light DOM. Should pass because the nodes are in separate contexts.</p>
+	
+	<p>Light DOM:</p>
+	
+	<div id="pass1">This is a DIV with the id of pass1</div>
+	
+	<p>Shadow DOM:</p>
+	
+	<div id="shadow2"></div>
+	
+<hr>
+<h2>Test 3</h2>
+
+	<p>There are two DIVs with a class of "dave" that contain an image without alt text. One is in the ShadowDOM while the other is in the Light DOM. The Light DOM one has css to apply display:none to the dave class. The Shadow DOM DIV also has the dave class but no CSS. The light DOM image should not be flagged because it is hidden. The Light DOM CSS should not bleed through to the shadowDOM so the image in there should not be hidden and should be flagged for missing alt text.</p>
+	
+	<p>Light DOM:</p>
+	
+	<style>.dave {display:none;}</style>
+	<div id="pass2" class="dave"><img src="images/goat-4.jpg"></div>
+	
+	<p>Shadow DOM with the same image and no CSS:</p>
+	
+	<div id="shadow3"></div>
+	
+<hr>
+<h2>Test 4</h2>
+
+	<p>This shadow DOM contains a label and a slot. The slot is populated by a lightDOM form input with an ID matching the label. The label is in the shadowDOM but IDs shouldn't bleed through so the input should be flagged for lack of a label.</p>
+
+	<div id="shadow4">
+			<input slot="fillme" id="fail3" type="text" />
+	</div>
+
+<hr>
+
+<h2>Test 5</h2>
+	
+	<p>There are three DIVs, all with an ID of "pass3". One is in the lightDOM, the second is in a shadowDOM and the third is inside a shadowDOM nested within the previous shadowDOM. This should not be flagged.</p>
+
+	<div id="pass3">This is a DIV with the ID of pass3</div>
+	<div id="shadow5"></div>
+
+<hr>
+
+<h2>Test 6</h2>
+
+	<p>2 shadow elements with the same locator / sub-locator</p>
+			
+	<div id="shadow7" name="doubleShadow"></div>
+	<div id="shadow8" name="doubleShadow"></div>
+			
+<hr>
+
+<h2>Test 7</h2>
+		
+	<p>There are four DIVs, all with an ID of "sam". First is in the lightDOM, the second is in a shadowDOM while the third and fourth are inside a shadowDOM nested within the previous shadowDOM. Only the two inside the nested shadowDOM should be flagged.</p>
+	
+	<div id="sam">This is a DIV with the ID of sam</div>
+	<div id="shadow9"></div>
+	
+<hr>
+
+<h2>Test 8</h2>
+	
+	<p>This is a web component. The content to be slotted into the template is an img with missing alt text.</p>
+
+	<component-element>
+		<div slot="stuff"><img id="fail4" src="images/goat-4.jpg" width="200"></div>
+	</component-element>
+	
+<h2>Test 9</h2>
+
+	<p>This is a shadowDOM located inside an iFrame:</p>
+	<iframe src="shadowframe.html" width="400px" height="400px"></iframe>
+
+</body>
+</html>
