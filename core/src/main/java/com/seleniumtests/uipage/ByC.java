@@ -17,9 +17,6 @@
  */
 package com.seleniumtests.uipage;
 
-import static com.seleniumtests.uipage.ByC.android;
-import static com.seleniumtests.uipage.ByC.ios;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -27,6 +24,7 @@ import java.util.List;
 
 import org.apache.commons.collections.ListUtils;
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
@@ -34,7 +32,7 @@ import org.openqa.selenium.internal.FindsByXPath;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.ScenarioException;
-import com.seleniumtests.uipage.htmlelements.TextFieldElement;
+import com.seleniumtests.driver.WebUIDriver;
 
 public class ByC extends By {
 
@@ -214,6 +212,32 @@ public class ByC extends By {
 	 */
 	public static ByC and(By ... bies) {
 		return new And(bies);
+	}
+	
+	/**
+	 * Search a shadow-root element, when web site uses shadow DOM. You may specify multiple locators to walk through the tree until the last searched shadow-root
+	 * <pre>{@code
+	 * <host1>
+	 * 		#shadow-root
+	 * 		<host2>
+	 * 			#shadow-root
+	 * 			<div id="el" />
+	 * 		</host2>	
+	 * </host1>
+	 * </code>}
+	 * </pre>
+	 * 
+	 * You would write
+	 * <pre>{@code
+	 * HtmlElement shadowRoot = new HtmlElement("", ByC.shadow(By.tagName("host1"), By.tagName("host2")));
+	 * HtmlElement myElement = new HtmlElement("", By.id("el"), shadowRoot);
+	 * }</pre>
+	 * 
+	 * @param bies
+	 * @return
+	 */
+	public static ByC shadow(By ... bies) {
+		return new Shadow(bies);
 	}
 	
 	/**
@@ -595,6 +619,73 @@ public class ByC extends By {
 			}
 			
 			return String.join(" and ", biesString);
+		}
+	}
+	
+	public static class Shadow extends ByC implements Serializable {
+		
+		private By[] bies;
+		
+		public Shadow(By ... bies) {
+			if (bies.length == 0) {
+				throw new ScenarioException("At least on locator must be provided");
+			}
+			this.bies = bies;
+		}
+		
+		
+		/**
+		 * If multiple "By" are pro
+		 */
+		@Override
+		public List<WebElement> findElements(SearchContext context) {
+			
+			List<WebElement> elements = new ArrayList<>();
+			
+			
+			for (By by: bies) {
+				
+				List<WebElement> hosts;
+				if (elements.isEmpty()) { // first iteration
+					hosts = by.findElements(context);
+				} else {
+					hosts = elements.get(0).findElements(by);
+					elements = new ArrayList<>(); // reset list because we don't care parent elements
+				}
+				JavascriptExecutor js = (JavascriptExecutor)WebUIDriver.getWebDriver(false);
+				
+				for (WebElement host: hosts) {
+					elements.add((WebElement)(js.executeScript("return arguments[0].shadowRoot", host)));
+				}	
+				
+				// stop if no element is found
+				if (elements.isEmpty()) {
+					return new ArrayList<>();
+				}
+			}
+			return elements;
+			
+		}
+		
+		@Override
+		public WebElement findElement(SearchContext context) {
+			try {
+				return findElements(context).get(0);
+			} catch (IndexOutOfBoundsException e) {
+				throw new NoSuchElementException("Cannot find element with such criteria " + toString());
+			}
+		}
+		
+		
+		@Override
+		public String toString() {
+			
+			List<String> biesString = new ArrayList<>();
+			for (By by: bies) {
+				biesString.add(by.toString());
+			}
+			
+			return String.join("/", biesString);
 		}
 	}
 	
