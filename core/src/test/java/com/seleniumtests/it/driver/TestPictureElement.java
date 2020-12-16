@@ -22,7 +22,6 @@ import org.openqa.selenium.WebDriver;
 import org.testng.Assert;
 import org.testng.SkipException;
 import org.testng.annotations.AfterMethod;
-import org.testng.annotations.Test;
 
 import com.seleniumtests.customexception.ImageSearchException;
 import com.seleniumtests.driver.BrowserType;
@@ -52,6 +51,7 @@ public class TestPictureElement extends GenericMultiBrowserTest {
 			try {
 				DriverTestPageWithoutFixedPattern.logoText.clear();
 				DriverTestPageWithoutFixedPattern.textElement.clear();
+				DriverTestPageWithoutFixedPattern.textElement.click(); // issue #408: this click is not necessary but it seems that it "resets" firefox javascript state
 			} catch (NoSuchElementException e) {
 				logger.error("Cannot reset");
 				logger.error(driver.getPageSource());
