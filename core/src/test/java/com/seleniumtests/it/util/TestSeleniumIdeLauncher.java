@@ -100,7 +100,7 @@ public class TestSeleniumIdeLauncher extends GenericTest {
 			Assert.assertTrue(detailedReportContent1.contains("<li>click on HtmlElement , by={By.id: buttonIFrame} </li>"));
 			
 			// test that user variable (set via command line in our test) is added to variabled available to script
-			Assert.assertTrue(detailedReportContent1.contains("Sys$Out: Hello Selenium IDE"));
+			Assert.assertTrue(detailedReportContent1.contains("Hello Selenium IDE"));
 			
 			
 			
