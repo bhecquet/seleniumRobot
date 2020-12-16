@@ -49,11 +49,11 @@ public class TestSeleniumIdeParser extends GenericTest {
 				"\n" + 
 				"public void jcommander(){\n" + 
 				"    vars.put(\"toto\", \"coucou\");\n" + 
-			    "    System.out.println(vars.get(\"foo\"));\n" +
+			    "    logger.info(vars.get(\"foo\"));\n" +
 				"    driver.get(\"http://www.jcommander.org//\");\n" + 
 				"    driver.manage().window().setSize(new Dimension(768, 683));\n" + 
 				"    driver.findElement(By.linkText(\"2.1. Boolean\")).click();\n" + 
-				"    System.out.println(\"STEP:Boolean link\");\n" +
+				"    logger.info(\"STEP:Boolean link\");\n" +
 				"    driver.findElement(By.linkText(\"21. Parameter delegates\")).click();\n" + 
 				"    assertThat(driver.findElement(By.linkText(\"2.1. Boolean\")).getText(), is(\"2.1. Boolean\"));\n" +
 				"    seleniumhq();\n" + 
@@ -113,7 +113,7 @@ public class TestSeleniumIdeParser extends GenericTest {
 				"\n" + 
 				"public void jcommander(){\n" + 
 				"    vars.put(\"toto\", \"coucou\");\n" + 
-			    "    System.out.println(vars.get(\"foo\"));\n" +
+			    "    logger.info(vars.get(\"foo\"));\n" +
 				"    driver.get(\"http://www.jcommander.org//\");\n" + 
 				"    driver.manage().window().setSize(new Dimension(768, 683));\n" + 
 				"    driver.findElement(By.linkText(\"2.1. Boolean\")).click();\n" + 
