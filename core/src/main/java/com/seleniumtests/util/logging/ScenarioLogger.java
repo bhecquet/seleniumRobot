@@ -34,9 +34,17 @@ public class ScenarioLogger extends Logger {
 		return (ScenarioLogger) Logger.getLogger("." + cls.getName(), new ScenarioLoggerFactory());
 	}
 	
+	private String cleanMessage(Object message) {
+		if (message == null) {
+			return "null";
+		} else {
+			return message.toString();
+		}
+	}
+	
 	@Override
 	public void info(Object message) {
-        logMessage(message.toString(), MessageType.INFO);
+        logMessage(cleanMessage(message), MessageType.INFO);
         super.info(message);
     }
     
@@ -55,7 +63,7 @@ public class ScenarioLogger extends Logger {
      */
     @Override
     public void warn(Object message) {
-    	logMessage("Warning: " + message.toString(), MessageType.WARNING);
+    	logMessage("Warning: " + cleanMessage(message), MessageType.WARNING);
     	super.warn(message);
     }
     
@@ -66,7 +74,7 @@ public class ScenarioLogger extends Logger {
      */
     @Override
     public void error(Object message) { 
-        logMessage(message.toString(), MessageType.ERROR);
+        logMessage(cleanMessage(message), MessageType.ERROR);
         super.error(message);
     } 
 
