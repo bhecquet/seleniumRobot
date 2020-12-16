@@ -73,7 +73,7 @@ public class TestPerformanceReporter extends ReporterTest {
 		// check content of summary report file
 		String jmeterReport = readTestMethodPerfFile("testAndSubActions");
 		
-		Assert.assertTrue(jmeterReport.contains("<testsuite errors=\"0\" failures=\"0\" hostname=\"\" name=\"testAndSubActions\" tests=\"6\" time=\"15"));
+		Assert.assertTrue(jmeterReport.contains("<testsuite errors=\"0\" failures=\"0\" hostname=\"\" name=\"testAndSubActions\" tests=\"7\" time=\"15"));
 		Assert.assertTrue(jmeterReport.contains("browser=\"NONE\""));
 		Assert.assertTrue(jmeterReport.contains("appVersion=\"" + SeleniumTestsContextManager.getApplicationVersion()));
 		Assert.assertTrue(jmeterReport.contains("coreVersion=\"" + SeleniumTestsContextManager.getCoreVersion()));
@@ -119,7 +119,13 @@ public class TestPerformanceReporter extends ReporterTest {
 		// check content of summary report file
 		String jmeterReport = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testOkWithOneStepFailed", "PERF-result.xml").toFile());
 		
-		Assert.assertTrue(jmeterReport.contains("<testsuite errors=\"0\" failures=\"0\" hostname=\"\" name=\"testOkWithOneStepFailed\" tests=\"5\""));
+		Assert.assertTrue(jmeterReport.contains("<testsuite errors=\"0\" failures=\"0\" hostname=\"\" name=\"testOkWithOneStepFailed\" tests=\"6\""));
+		Assert.assertTrue(jmeterReport.contains("name=\"Step 1: Pre test step: setCount\""));
+		Assert.assertTrue(jmeterReport.contains("name=\"Step 2: Pre test step: slow\""));
+		Assert.assertTrue(jmeterReport.contains("name=\"Step 3: Pre test step: set\""));
+		Assert.assertTrue(jmeterReport.contains("name=\"Step 4: step 1\""));
+		Assert.assertTrue(jmeterReport.contains("name=\"Step 5: Test end\""));
+		Assert.assertTrue(jmeterReport.contains("name=\"Step 6: Post test step: reset\""));
 	}
 	
 	/**
@@ -155,7 +161,7 @@ public class TestPerformanceReporter extends ReporterTest {
 			String jmeterReport1 = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testAndSubActions", "PERF-result.xml").toFile());
 			String jmeterReport2 = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testAndSubActions", "PERF2-result.json").toFile());
 			
-			Assert.assertTrue(jmeterReport1.contains("<testsuite errors=\"0\" failures=\"0\" hostname=\"\" name=\"testAndSubActions\" tests=\"6\" time=\"15"));
+			Assert.assertTrue(jmeterReport1.contains("<testsuite errors=\"0\" failures=\"0\" hostname=\"\" name=\"testAndSubActions\" tests=\"7\" time=\"15"));
 			Assert.assertTrue(jmeterReport2.contains("\"suiteName\": \"testAndSubActions\""));
 		} finally {
 			System.clearProperty("customTestReports");

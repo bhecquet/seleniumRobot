@@ -292,7 +292,7 @@ public class ReporterControler implements IReporter {
 		allResults.addAll(failedTests);
 		allResults.addAll(skippedTests);
 		
-		if (currentTestResult != null && currentTestResult.getTestContext().equals(context)) {
+		if (currentTestResult != null && currentTestResult.getTestContext() != null && currentTestResult.getTestContext().equals(context)) {
 			allResults.add(currentTestResult);
 		}
 
@@ -333,7 +333,7 @@ public class ReporterControler implements IReporter {
 		resultSet.addAll(context.getSkippedTests().getAllResults());
 		
 		// it's our current result, so we want if context matches
-		if (currentTestResult != null && currentTestResult.getTestContext().equals(context)) {
+		if (currentTestResult != null && currentTestResult.getTestContext() != null && currentTestResult.getTestContext().equals(context)) {
 			resultSet.add(currentTestResult);
 		}
 		
