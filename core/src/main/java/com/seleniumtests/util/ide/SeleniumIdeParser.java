@@ -127,6 +127,8 @@ public class SeleniumIdeParser {
 			for (String line: body.split("\n")) {
 				if (line.contains("System.out.println(\"STEP:") && System.getProperty(SeleniumTestsContext.MANUAL_TEST_STEPS) == "true") {
 					pageCode.append(line.replace("System.out.println(\"STEP:", "addStep(\"") + "\n");
+				} else if (line.contains("System.out.println(")) {
+					pageCode.append(line.replace("System.out.println(", "logger.info(") + "\n");
 				} else {
 		    		pageCode.append(line + "\n");
 				}
