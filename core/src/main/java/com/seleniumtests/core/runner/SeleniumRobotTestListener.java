@@ -112,6 +112,7 @@ public class SeleniumRobotTestListener extends BaseTestNGListener implements ITe
 	 * @param result
 	 */
 	public void onTestFullyFinished(ITestResult testResult) {
+
 		generateTempReport(testResult);
 		
 		if (reportPortalService != null) {
@@ -178,9 +179,14 @@ public class SeleniumRobotTestListener extends BaseTestNGListener implements ITe
 	 */
 	private void generateTempReport(ITestResult testResult) {
 		try {
+			ITestContext testContext = testResult.getTestContext();
+			if (testContext == null) { // in case of SKIPPED tests due to configuration error
+				testContext = SeleniumTestsContextManager.getThreadContext().getTestNGContext();
+			}
+			
 			new ReporterControler(reportPortalService).generateReport(
-					Arrays.asList(testResult.getTestContext().getCurrentXmlTest().getSuite()), 
-					Arrays.asList(testResult.getTestContext().getSuite()), 
+					Arrays.asList(testContext.getCurrentXmlTest().getSuite()), 
+					Arrays.asList(testContext.getSuite()), 
 					SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(),
 					testResult);
 			
