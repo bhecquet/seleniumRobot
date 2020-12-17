@@ -145,7 +145,9 @@ public class TestStep extends TestAction {
 	}
 
 	public void addAction(TestAction action) {
+		action.setPosition(stepActions.size());
 		stepActions.add(action);
+		action.setParent(this);
 		
 		// add replacement of the parent to this action
 		action.pwdToReplace.addAll(pwdToReplace);
@@ -154,7 +156,9 @@ public class TestStep extends TestAction {
 		action.maskPassword = maskPassword;
 	}
 	public void addMessage(TestMessage message) {
+		message.setPosition(stepActions.size());
 		stepActions.add(message);
+		message.setParent(this);
 
 		// add replacement of the parent to this message
 		message.pwdToReplace.addAll(pwdToReplace);
@@ -163,10 +167,14 @@ public class TestStep extends TestAction {
 		message.maskPassword = maskPassword;
 	}
 	public void addValue(TestValue value) {
+		value.setPosition(stepActions.size());
 		stepActions.add(value);
+		value.setParent(this);
 	}
 	public void addStep(TestStep step) {
+		step.setPosition(stepActions.size());
 		stepActions.add(step);
+		step.setParent(this);
 		
 		// add replacement of the parent step to this step
 		step.pwdToReplace.addAll(pwdToReplace);
@@ -175,10 +183,14 @@ public class TestStep extends TestAction {
 		step.maskPassword = maskPassword;
 	}
 	public void addNetworkCapture(HarCapture har) {
+		har.setPosition(stepActions.size());
 		harCaptures.add(har);
+		har.setParent(this);
 	}
 	public void addFile(GenericFile file) {
+		file.setPosition(stepActions.size());
 		files.add(file);
+		file.setParent(this);
 	}
 	
 	/**
@@ -188,10 +200,24 @@ public class TestStep extends TestAction {
 	 * @param userGivenName name of the snapshot, user wants to display
 	 */
 	public void addSnapshot(Snapshot snapshot, int stepIdx, String userGivenName) {
+		snapshot.setPosition(snapshots.size());
+		
 		// rename file so that user can easily consult it
-		snapshot.rename(this, stepIdx, snapshots.size() + 1, userGivenName);
+		snapshot.rename(this, position, snapshot.position + getSnapshotIndex(), userGivenName);
 		
 		snapshots.add(snapshot);
+		snapshot.setParent(this);
+	}
+	
+	private int getSnapshotIndex() {
+		return getSnapshotIndex(1) - position;
+	}
+	private int getSnapshotIndex(int multiplier) {
+		int idx = (position + 1) * multiplier;
+		if (getParent() instanceof TestStep) {
+			idx += ((TestStep)getParent()).getSnapshotIndex(multiplier * 10);
+		} 
+		return idx;
 	}
 	
 	@Override

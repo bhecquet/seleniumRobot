@@ -25,7 +25,6 @@ import java.util.stream.Collectors;
 import org.apache.log4j.Logger;
 import org.json.JSONObject;
 
-import com.seleniumtests.uipage.PageObject;
 import com.seleniumtests.util.StringUtility;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
@@ -41,6 +40,8 @@ public class TestAction implements Serializable {
 	protected static final Logger logger = SeleniumRobotLogger.getLogger(TestAction.class);
 	
 	protected String name;
+	protected TestAction parent = null;
+	protected int position = 0;
 	protected Boolean failed;
 	protected Throwable actionException;
 	protected String actionExceptionMessage;
@@ -152,6 +153,22 @@ public class TestAction implements Serializable {
 	
 	public TestAction deepCopy() {
 		return encode(null);
+	}
+
+	public TestAction getParent() {
+		return parent;
+	}
+
+	public void setParent(TestAction parent) {
+		this.parent = parent;
+	}
+
+	public int getPosition() {
+		return position;
+	}
+
+	public void setPosition(int position) {
+		this.position = position;
 	}
 
 }
