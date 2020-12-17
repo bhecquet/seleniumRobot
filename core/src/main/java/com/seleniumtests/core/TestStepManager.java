@@ -16,7 +16,7 @@ import com.seleniumtests.reporter.logger.TestStep;
 public class TestStepManager {
 	
 	public static final String LAST_STEP_NAME = "Test end";
-	List<TestStep> testSteps;
+	List<TestStep> testSteps;  // list of root steps
 	TestStep runningStep;
 	TestStep rootStep;
 	
@@ -69,6 +69,9 @@ public class TestStepManager {
 	public void setRootTestStep(TestStep testStep) {
 		rootStep = testStep;
 		runningStep = testStep;
+		if (testStep != null) {
+			testStep.setPosition(testSteps.size());
+		}
 	}
 	
 	public TestStep getRootTestStep() {

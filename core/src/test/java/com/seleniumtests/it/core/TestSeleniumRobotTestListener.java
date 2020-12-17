@@ -139,12 +139,12 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 			Assert.assertFalse(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriverShortKo", "retry-testDriverShortKo-2.zip").toFile().exists());
 			
 			// check the content of the zip file
-			ZipUtil.containsEntry(resultZip, "testDriverShortKo/TestReport.html");
-			ZipUtil.containsEntry(resultZip, "testDriverShortKo/videoCapture.avi");
-			ZipUtil.containsEntry(resultZip, "testDriverShortKo/resources/app.min.js");
-			ZipUtil.containsEntry(resultZip, "testDriverShortKo/resources/seleniumRobot_solo.css");
-			ZipUtil.containsEntry(resultZip, "testDriverShortKo/screenshots/testDriverShortKo_1-1_openPage_with_args._(file.D..png");
-			ZipUtil.containsEntry(resultZip, "testDriverShortKo/htmls/testDriverShortKo_1-1_openPage_with_args._(file.D..html");
+			Assert.assertTrue(ZipUtil.containsEntry(resultZip, "testDriverShortKo/TestReport.html"));
+			Assert.assertTrue(ZipUtil.containsEntry(resultZip, "testDriverShortKo/videoCapture.avi"));
+			Assert.assertTrue(ZipUtil.containsEntry(resultZip, "testDriverShortKo/resources/app.min.js"));
+			Assert.assertTrue(ZipUtil.containsEntry(resultZip, "testDriverShortKo/resources/seleniumRobot_solo.css"));
+			Assert.assertTrue(ZipUtil.containsEntry(resultZip, "testDriverShortKo/screenshots/testDriverShortKo_3-1_openPage_with_args._(file.D..png"));
+			Assert.assertTrue(ZipUtil.containsEntry(resultZip, "testDriverShortKo/htmls/testDriverShortKo_3-1_openPage_with_args._(file.D..html"));
 			
 		} finally {
 			System.clearProperty(SeleniumTestsContext.TEST_RETRY_COUNT);
