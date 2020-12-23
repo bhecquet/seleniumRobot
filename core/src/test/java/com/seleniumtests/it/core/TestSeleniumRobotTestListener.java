@@ -26,12 +26,14 @@ import static org.mockito.Mockito.when;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.zip.ZipEntry;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -47,6 +49,7 @@ import org.testng.xml.XmlClass;
 import org.testng.xml.XmlSuite;
 import org.testng.xml.XmlSuite.ParallelMode;
 import org.testng.xml.XmlTest;
+import org.zeroturnaround.zip.ZipEntryCallback;
 import org.zeroturnaround.zip.ZipUtil;
 
 import com.seleniumtests.connectors.selenium.SeleniumGridConnector;
@@ -138,13 +141,23 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 			Assert.assertTrue(resultZip.exists());
 			Assert.assertFalse(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriverShortKo", "retry-testDriverShortKo-2.zip").toFile().exists());
 			
+			List<String> entries = new ArrayList<>();
+	
+			ZipUtil.iterate(resultZip, new ZipEntryCallback() {
+		      public void process(InputStream in, ZipEntry zipEntry) throws IOException {
+		        String entryName = zipEntry.getName();
+		        entries.add(entryName.split("\\(file")[0]);
+		        
+		      }
+		    });
+			
 			// check the content of the zip file
-			Assert.assertTrue(ZipUtil.containsEntry(resultZip, "testDriverShortKo/TestReport.html"));
-			Assert.assertTrue(ZipUtil.containsEntry(resultZip, "testDriverShortKo/videoCapture.avi"));
-			Assert.assertTrue(ZipUtil.containsEntry(resultZip, "testDriverShortKo/resources/app.min.js"));
-			Assert.assertTrue(ZipUtil.containsEntry(resultZip, "testDriverShortKo/resources/seleniumRobot_solo.css"));
-			Assert.assertTrue(ZipUtil.containsEntry(resultZip, "testDriverShortKo/screenshots/testDriverShortKo_3-1_openPage_with_args._(file.D..png"));
-			Assert.assertTrue(ZipUtil.containsEntry(resultZip, "testDriverShortKo/htmls/testDriverShortKo_3-1_openPage_with_args._(file.D..html"));
+			Assert.assertTrue(entries.contains("testDriverShortKo/TestReport.html"));
+			Assert.assertTrue(entries.contains("testDriverShortKo/videoCapture.avi"));
+			Assert.assertTrue(entries.contains("testDriverShortKo/resources/app.min.js"));
+			Assert.assertTrue(entries.contains("testDriverShortKo/resources/seleniumRobot_solo.css"));
+			Assert.assertTrue(entries.contains("testDriverShortKo/screenshots/testDriverShortKo_3-1_openPage_with_args._"));
+			Assert.assertTrue(entries.contains("testDriverShortKo/htmls/testDriverShortKo_3-1_openPage_with_args._"));
 			
 		} finally {
 			System.clearProperty(SeleniumTestsContext.TEST_RETRY_COUNT);
