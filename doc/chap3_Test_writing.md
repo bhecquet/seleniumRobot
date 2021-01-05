@@ -392,9 +392,20 @@ Additional search using the `ByC` class are
 - search in reverse order (get the last element): `new TextFieldElement("", By.className("someClass"), -1);` get the last element on the list
 - search with several criteria: `new TextFieldElement("", ByC.and(By.tagName("input"), By.name("textField")))`
 - search element with one criteria or an other. Specifically usefull to handle multiple mobile OS: `new HtmlElement("or", ByC.or(ByC.ios(By.name("textField")), ByC.android(By.id("text2")))`
-- search element inside shadow-root: `HtmlElement parent = new HtmlElement("", ByC.shadow(By.id("shadow5"), By.id("shadow6")));`. This way, you have a parent which allow you to search inside as any other parent. ByC.shadow() can take any number of locator, which replicate the shadow-root tree.
+- search element inside shadow-root: see below
 
 `ByC` selectors ('xId', 'xName', 'xTagName', 'xLinkText' and 'xPartialLinkText') replicate the behavior of standard Selenium selectors but using xpath method. This is needed for salesforce UI automation where lightning UI prevents selenium to discover sub-elements of a custom element.
+
+###### Shadow DOM ######
+
+To search inside a shadow-root element: `HtmlElement parent = new HtmlElement("", ByC.shadow(By.id("shadow5"), By.id("shadow6")));`. 
+This way, you have a parent which allow you to search inside as any other parent. ByC.shadow() can take any number of locator, which replicate the shadow-root tree.
+
+If you need to take the n-th shadow-root element, there are 2 cases
+ - the n-th element is the child shadow-root (last in the list). Then you can write `HtmlElement parent = new HtmlElement("", ByC.shadow(By.id("shadow5"), By.id("shadow6")), 3);`. This will take the third "shadow6" inside "shadow5"
+ - the n-th element is NOT the child shadow-root. Then you MUST write search in two lines: 
+ `HtmlElement parent1 = new HtmlElement("", ByC.shadow(By.id("shadow5")), 3);`
+ `HtmlElement parent2 = new HtmlElement("", ByC.shadow(By.id("shadow6")), parent1);`
 
 #### Document your tests ####
 
