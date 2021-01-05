@@ -360,9 +360,13 @@ Depending on jira project, you may need to specify additional options if the fie
 
 ```
 	-Dbugtracker.jira.components=Component1
+	-Dbugtracker.reporter=<reporter>
+	-Dbugtracker.assignee=<assignee>
 	-Dbugtracker.jira.field.myFieldName1=myFieldValue1		# myFieldName is the name of the custom field as defined in GUI
 	-Dbugtracker.jira.field.myFieldName1=myFieldValue1
 ```
+
+**All these options can also be set in XML file / ini file / seleniumRobot server
 
 #### Find required fields and allowed values ####
 
