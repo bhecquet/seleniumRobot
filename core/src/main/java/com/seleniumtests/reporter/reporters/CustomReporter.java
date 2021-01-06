@@ -96,7 +96,6 @@ public class CustomReporter extends CommonReporter implements IReporter {
 	
 	/**
 	 * Generates report for a single test
-	 * @param ve
 	 * @param testResult
 	 */
 	private void generateTestReport(ITestResult testResult, ReportInfo reportInfo) {

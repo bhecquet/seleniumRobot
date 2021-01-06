@@ -154,6 +154,8 @@
 										<div class="box collapsed-box success">
 									#elseif ($stepStatus.toString().equals("failed"))
 										<div class="box collapsed-box failed">
+									#elseif ($stepStatus.toString().equals("warning"))
+										<div class="box collapsed-box warning">
 									#else
 										<div class="box collapsed-box skipped">
 									#end

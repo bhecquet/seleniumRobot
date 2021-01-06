@@ -54,6 +54,7 @@ public abstract class CommonReporter implements IReporter {
 	protected static Logger logger = SeleniumRobotLogger.getLogger(CommonReporter.class);
 	
 	protected static final String FAILED_TEST = "failed";
+	protected static final String WARN_TEST = "warning";
 	protected static final String SKIPPED_TEST = "skipped";
 	protected static final String PASSED_TEST = "passed";
 	protected static final String RESOURCES_DIR = "resources";
