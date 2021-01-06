@@ -177,7 +177,7 @@ public abstract class BugTracker {
 	 * @param testSteps		Test steps of the scenario
 	 * @param issueOptions		options for the new issue 
 	 */
-	public void createIssue(
+	public IssueBean createIssue(
 			String application,
 			String environment,
 			String testNgName,
@@ -190,7 +190,7 @@ public abstract class BugTracker {
 		String summary = createIssueSummary(application, environment, testNgName, testName);
 		IssueBean issueBean = createIssueBean(summary, testName, description, testSteps, issueOptions);
 		if (issueBean == null) {
-			return;
+			return null;
 		}
 		
 		// get index of the last step to know where we failed
@@ -214,6 +214,8 @@ public abstract class BugTracker {
 			createIssue(issueBean);
 			logger.info(String.format("Issue %s created", issueBean.getId()));
 		}
+		
+		return issueBean;
 	}
 	
 	/**
@@ -262,7 +264,8 @@ public abstract class BugTracker {
 	public abstract void updateIssue(String issueId, String messageUpdate, List<ScreenShot> screenShots);
 	
 	/**
-	 * Create an issue
+	 * Create an issue. 
+	 * This method should set the id and the accessUrl of the issue inside bean
 	 * @param issueBean
 	 * @return
 	 */

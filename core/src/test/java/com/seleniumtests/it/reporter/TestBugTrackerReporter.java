@@ -21,12 +21,10 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.contains;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -40,6 +38,7 @@ import org.testng.annotations.Test;
 import org.testng.xml.XmlSuite.ParallelMode;
 
 import com.seleniumtests.connectors.bugtracker.BugTracker;
+import com.seleniumtests.connectors.bugtracker.jira.JiraBean;
 import com.seleniumtests.connectors.bugtracker.jira.JiraConnector;
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.customexception.ConfigurationException;
@@ -87,6 +86,95 @@ public class TestBugTrackerReporter extends ReporterTest {
 			Assert.assertEquals(issueOptionsArgument.getValue().get("reporter"), "me");
 			Assert.assertEquals(issueOptionsArgument.getValue().get("assignee"), "you2"); // check we get the updated value
 			Assert.assertEquals(issueOptionsArgument.getValue().get("jira.field.application"), "app");
+			
+		} finally {
+			System.clearProperty(SeleniumTestsContext.BUGTRACKER_TYPE);
+			System.clearProperty(SeleniumTestsContext.BUGTRACKER_PROJECT);
+			System.clearProperty(SeleniumTestsContext.BUGTRACKER_URL);
+			System.clearProperty(SeleniumTestsContext.BUGTRACKER_USER);
+			System.clearProperty(SeleniumTestsContext.BUGTRACKER_PASSWORD);
+			System.clearProperty("bugtracker.reporter");
+			System.clearProperty("bugtracker.assignee");
+			System.clearProperty("bugtracker.jira.field.application");
+		}
+	}
+	
+	/**
+	 * Check that when Jira is created / present, a link is available in report
+	 * We check in HTML report, but, it is the same for XML report (Here, we do not check that Perfreport works correctly)
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testIssueIsRecordedInReports() throws Exception {
+		try {
+			System.setProperty(SeleniumTestsContext.BUGTRACKER_TYPE, "jira");
+			System.setProperty(SeleniumTestsContext.BUGTRACKER_URL, "http://localhost:1234");
+			System.setProperty(SeleniumTestsContext.BUGTRACKER_PROJECT, "Project");
+			System.setProperty(SeleniumTestsContext.BUGTRACKER_USER, "jira");
+			System.setProperty(SeleniumTestsContext.BUGTRACKER_PASSWORD, "jira");
+			System.setProperty("bugtracker.reporter", "me");
+			System.setProperty("bugtracker.assignee", "you");
+			System.setProperty("bugtracker.jira.field.application", "app");
+			
+			JiraBean jiraBean = new JiraBean("JIRA-1234", "summary", "description", "Bug", "P1");
+			jiraBean.setAccessUrl("http://jira.server.com/browse/JIRA-1234");
+			jiraBean.setDate("2021-01-06T15:18+0100");
+			
+			when(jiraConnector.createIssue(eq("core"), eq("DEV"), anyString(), eq("testInError"), contains("Test testInError failed"), any(), any())).thenReturn(jiraBean);
+			
+			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForTestManager"}, ParallelMode.METHODS, new String[] {"testInError"});
+			
+			// check content of summary report file
+			String mainReportContent = readSummaryFile();
+			Assert.assertTrue(mainReportContent.matches(".*<td class=\"info\"><a href=\"http://jira.server.com/browse/JIRA-1234\">JIRA-1234</a></td><td class=\"info\">2021-01-06T15:18\\+0100</td>.*"));
+
+			String detailedReportContent = readTestMethodResultFile("testInError");
+			Assert.assertTrue(detailedReportContent.contains("<th>Issue</th><td><a href=\"http://jira.server.com/browse/JIRA-1234\">JIRA-1234</a></td>"));
+			Assert.assertTrue(detailedReportContent.contains("<th>Issue date</th><td>2021-01-06T15:18+0100</td>"));
+			
+		} finally {
+			System.clearProperty(SeleniumTestsContext.BUGTRACKER_TYPE);
+			System.clearProperty(SeleniumTestsContext.BUGTRACKER_PROJECT);
+			System.clearProperty(SeleniumTestsContext.BUGTRACKER_URL);
+			System.clearProperty(SeleniumTestsContext.BUGTRACKER_USER);
+			System.clearProperty(SeleniumTestsContext.BUGTRACKER_PASSWORD);
+			System.clearProperty("bugtracker.reporter");
+			System.clearProperty("bugtracker.assignee");
+			System.clearProperty("bugtracker.jira.field.application");
+		}
+	}
+	
+	
+	/**
+	 * Check that when Jira is created / present, without hyperlink, the issue name is present
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testIssueIsRecordedInReportsNoURL() throws Exception {
+		try {
+			System.setProperty(SeleniumTestsContext.BUGTRACKER_TYPE, "jira");
+			System.setProperty(SeleniumTestsContext.BUGTRACKER_URL, "http://localhost:1234");
+			System.setProperty(SeleniumTestsContext.BUGTRACKER_PROJECT, "Project");
+			System.setProperty(SeleniumTestsContext.BUGTRACKER_USER, "jira");
+			System.setProperty(SeleniumTestsContext.BUGTRACKER_PASSWORD, "jira");
+			System.setProperty("bugtracker.reporter", "me");
+			System.setProperty("bugtracker.assignee", "you");
+			System.setProperty("bugtracker.jira.field.application", "app");
+			
+			JiraBean jiraBean = new JiraBean("JIRA-1234", "summary", "description", "Bug", "P1");
+			jiraBean.setDate("2021-01-06T15:18+0100");
+			
+			when(jiraConnector.createIssue(eq("core"), eq("DEV"), anyString(), eq("testInError"), contains("Test testInError failed"), any(), any())).thenReturn(jiraBean);
+			
+			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForTestManager"}, ParallelMode.METHODS, new String[] {"testInError"});
+			
+			// check content of summary report file
+			String mainReportContent = readSummaryFile();
+			Assert.assertTrue(mainReportContent.matches(".*<td class=\"info\">JIRA-1234</td><td class=\"info\">2021-01-06T15:18\\+0100</td>.*"));
+			
+			String detailedReportContent = readTestMethodResultFile("testInError");
+			Assert.assertTrue(detailedReportContent.contains("<th>Issue</th><td>JIRA-1234</td>"));
+			Assert.assertTrue(detailedReportContent.contains("<th>Issue date</th><td>2021-01-06T15:18+0100</td>"));
 			
 		} finally {
 			System.clearProperty(SeleniumTestsContext.BUGTRACKER_TYPE);

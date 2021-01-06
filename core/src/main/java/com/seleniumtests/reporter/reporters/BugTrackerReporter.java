@@ -1,24 +1,30 @@
 package com.seleniumtests.reporter.reporters;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.testng.IReporter;
 import org.testng.ITestContext;
 import org.testng.ITestResult;
+import org.testng.Reporter;
 
 import com.seleniumtests.connectors.bugtracker.BugTracker;
+import com.seleniumtests.connectors.bugtracker.IssueBean;
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.TestVariable;
 import com.seleniumtests.core.utils.TestNGResultUtils;
+import com.seleniumtests.reporter.logger.HyperlinkInfo;
+import com.seleniumtests.reporter.logger.StringInfo;
 import com.seleniumtests.reporter.logger.TestStep;
+import com.seleniumtests.util.logging.ScenarioLogger;
 
 public class BugTrackerReporter extends CommonReporter implements IReporter {
+
+	private static final ScenarioLogger logger = ScenarioLogger.getScenarioLogger(BugTrackerReporter.class);
 
 	protected void generateReport(Map<ITestContext, Set<ITestResult>> resultSet, String outdir, boolean optimizeReport) {
 		generateReport(resultSet, outdir, optimizeReport, false);
@@ -72,7 +78,7 @@ public class BugTrackerReporter extends CommonReporter implements IReporter {
 				// create issue only for failed tests and if it has not been created before
 				if (testResult.getStatus() == ITestResult.FAILURE && !TestNGResultUtils.isBugtrackerReportCreated(testResult)) {
 	
-					bugtrackerServer.createIssue(
+					IssueBean issueBean = bugtrackerServer.createIssue(
 							application,
 							environment,
 							testNgName,
@@ -81,6 +87,16 @@ public class BugTrackerReporter extends CommonReporter implements IReporter {
 							testSteps,
 							issueOptions
 							);
+					
+					// log information on issue
+					if (issueBean != null) {
+						if (issueBean.getId() != null && issueBean.getAccessUrl() != null) {
+							TestNGResultUtils.setTestInfo(testResult, "Issue", new HyperlinkInfo(issueBean.getId(), issueBean.getAccessUrl()));
+						} else if (issueBean.getId() != null) {
+							TestNGResultUtils.setTestInfo(testResult, "Issue", new StringInfo(issueBean.getId()));
+						}
+						TestNGResultUtils.setTestInfo(testResult, "Issue date", new StringInfo(issueBean.getDate()));
+					}
 					
 					TestNGResultUtils.setBugtrackerReportCreated(testResult, true);
 				} else if (testResult.getStatus() == ITestResult.SUCCESS && !TestNGResultUtils.isBugtrackerReportCreated(testResult)) {

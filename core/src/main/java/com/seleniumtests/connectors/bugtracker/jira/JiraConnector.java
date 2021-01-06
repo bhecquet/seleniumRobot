@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
+import org.joda.time.format.DateTimeFormatter;
 
 import com.atlassian.jira.rest.client.api.IssueRestClient;
 import com.atlassian.jira.rest.client.api.JiraRestClient;
@@ -29,11 +30,13 @@ import com.atlassian.jira.rest.client.api.domain.Issue;
 import com.atlassian.jira.rest.client.api.domain.IssueType;
 import com.atlassian.jira.rest.client.api.domain.Priority;
 import com.atlassian.jira.rest.client.api.domain.Project;
+import com.atlassian.jira.rest.client.api.domain.Status;
 import com.atlassian.jira.rest.client.api.domain.Transition;
 import com.atlassian.jira.rest.client.api.domain.User;
 import com.atlassian.jira.rest.client.api.domain.Version;
 import com.atlassian.jira.rest.client.api.domain.input.IssueInput;
 import com.atlassian.jira.rest.client.api.domain.input.IssueInputBuilder;
+import com.atlassian.jira.rest.client.api.domain.input.MyPermissionsInput;
 import com.atlassian.jira.rest.client.api.domain.input.TransitionInput;
 import com.atlassian.jira.rest.client.internal.async.AsynchronousJiraRestClientFactory;
 import com.google.common.collect.ImmutableList;
@@ -48,6 +51,7 @@ public class JiraConnector extends BugTracker {
 
     private static Logger logger = Logger.getLogger(JiraConnector.class);
     private String projectKey;
+    private String browseUrl;
     private Map<String, BasicComponent> components;
     private Map<String, IssueType> issueTypes;
     private Map<String, Priority> priorities;
@@ -67,6 +71,7 @@ public class JiraConnector extends BugTracker {
      */
     public JiraConnector(String server, String projectKey, String user, String password) {
     	this.projectKey = projectKey;
+    	
         
         if (server == null || server.isEmpty() 
         		|| projectKey == null || projectKey.isEmpty()
@@ -86,6 +91,8 @@ public class JiraConnector extends BugTracker {
         } catch (RestClientException e) {
         	throw new ConfigurationException(String.format("Project with key '%s' cannot be found on jira server %s", projectKey, server));
         }
+        
+        browseUrl = server + "/browse/";
         
         components = getComponents();
         issueTypes = getIssueTypes();
@@ -142,12 +149,11 @@ public class JiraConnector extends BugTracker {
         restClient.getMetadataClient().getPriorities().claim().forEach(priority -> jiraPriorities.put(priority.getName(), priority));
         return jiraPriorities;
     }
-
+    
     private Map<String, Field> getCustomFields() {
-        Map<String, Field> jiraFields = new HashMap<>();
-        restClient.getMetadataClient().getFields().claim().forEach(field -> jiraFields.put(field.getName(), field));
-
-        return jiraFields;
+    	Map<String, Field> jiraFields = new HashMap<>();
+    	restClient.getMetadataClient().getFields().claim().forEach(field -> jiraFields.put(field.getName(), field));
+    	return jiraFields;
     }
     
     private Map<String, CimFieldInfo> getCustomFieldInfos(Project project, IssueType issueType) {
@@ -192,9 +198,9 @@ public class JiraConnector extends BugTracker {
 
         SearchRestClient searchClient = restClient.getSearchClient();
         List<Issue> issues = ImmutableList.copyOf(searchClient.searchJql(jql).claim().getIssues());
-        if (issues.size() > 0) {
+        if (!issues.isEmpty()) {
         	Issue issue = issues.get(0);
-            return new JiraBean(issue.getKey(),
+            JiraBean updatedJiraBean = new JiraBean(issue.getKey(),
             		jiraBean.getSummary(), 
             		issue.getDescription(),
             		jiraBean.getPriority(),
@@ -207,6 +213,8 @@ public class JiraConnector extends BugTracker {
             		jiraBean.getDetailedResult(),
             		jiraBean.getCustomFields(),
             		jiraBean.getComponents());
+            updatedJiraBean.setDate(issue.getCreationDate().toString("yyyy-MM-dd'T'HH:mmZZ"));
+            return updatedJiraBean;
         } else {
             return null;
         }
@@ -313,6 +321,7 @@ public class JiraConnector extends BugTracker {
         }
 
         jiraBean.setId(issue.getKey());
+        jiraBean.setAccessUrl(browseUrl + issue.getKey());
     }
 
     /**
@@ -488,8 +497,18 @@ public class JiraConnector extends BugTracker {
     	if (issueType == null) {
     		throw new ConfigurationException(String.format("Issue type %s cannot be found among valid issue types %s", args[4], jiraConnector.issueTypes.keySet()));
     	}
+    	
+    	System.out.println("Proprities:");
+    	for (String priority: jiraConnector.priorities.keySet()) {
+    		System.out.println(String.format("    - %s", priority));
+    	}
 
-    	System.out.println(String.format("Listing required fields and allowed values (if any) for issue '%s'", args[4]));
+    	System.out.println("\nComponents:");
+    	for (String component: jiraConnector.components.keySet()) {
+    		System.out.println(String.format("    - %s", component));
+    	}
+
+    	System.out.println(String.format("\nListing required fields and allowed values (if any) for issue '%s'", args[4]));
 
     	Map<String, CimFieldInfo> fieldInfos = jiraConnector.getCustomFieldInfos(jiraConnector.project, issueType);
 		
@@ -500,6 +519,8 @@ public class JiraConnector extends BugTracker {
     			System.out.println(String.format("    - %s", value));
     		}
     	}
+    	
+    	
 	}
 
 }

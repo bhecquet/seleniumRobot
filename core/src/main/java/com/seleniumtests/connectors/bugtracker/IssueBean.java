@@ -21,6 +21,7 @@ public class IssueBean {
 
     protected List<ScreenShot> screenShots = new ArrayList<>();
     protected String id;
+    protected String accessUrl; // the HTTP URL to access the issue directly
     protected String reporter;
     protected String testName;
     protected TestStep testStep;
@@ -30,7 +31,7 @@ public class IssueBean {
     protected String description;
     protected String priority;
     Map<String, String> fields = new HashMap<>();
-    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mmZ");
+    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mmZZZZZ");
 
 
     private File detailedResult;
@@ -193,6 +194,14 @@ public class IssueBean {
 
 	public void setId(String id) {
 		this.id = id;
+	}
+
+	public String getAccessUrl() {
+		return accessUrl;
+	}
+
+	public void setAccessUrl(String accessUrl) {
+		this.accessUrl = accessUrl;
 	}
 
 
