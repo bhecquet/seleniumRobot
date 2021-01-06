@@ -81,6 +81,10 @@ body{
 	border-top: 3px solid #F9727B;
 }
 
+.warning{
+	border-top: 3px solid #FFBF80;
+}
+
 .success .fa-plus, .success .fa-minus, .success a, .success a:hover{
 	color: #97D086;
 }
@@ -91,6 +95,13 @@ body{
 
 .failed .fa-plus, .failed .fa-minus, .failed a, .failed a:hover{
 	color: #F9727B;
+}
+
+.warning .fa-plus, .warning .fa-minus{
+	color: #FFBF80;
+}
+.warning a, .warning a:hover {
+	color: #F29131;
 }
 
 .main-header a, .main-header a:hover{

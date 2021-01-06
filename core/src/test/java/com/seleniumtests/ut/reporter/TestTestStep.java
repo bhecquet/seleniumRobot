@@ -39,6 +39,7 @@ import com.seleniumtests.reporter.logger.Snapshot;
 import com.seleniumtests.reporter.logger.TestAction;
 import com.seleniumtests.reporter.logger.TestMessage;
 import com.seleniumtests.reporter.logger.TestMessage.MessageType;
+import com.seleniumtests.reporter.logger.TestStep.StepStatus;
 import com.seleniumtests.reporter.logger.TestStep;
 import com.seleniumtests.reporter.logger.TestValue;
 
@@ -49,18 +50,20 @@ import net.lightbody.bmp.core.har.HarPage;
 public class TestTestStep extends GenericTest {
 
 	/**
-	 * Checks getFailed correctly compute test step status if action is failed
+	 * Checks getStepStatus correctly compute test step status if action is failed
+	 * Step is OK
 	 */
 	@Test(groups={"ut"})
 	public void testGetFailedWithActionKo() {
 		TestStep step = new TestStep("step1", null, new ArrayList<>(), true);
 		step.addAction(new TestAction("action1", false, new ArrayList<>()));
 		step.addAction(new TestAction("action2", true, new ArrayList<>()));
-		Assert.assertTrue(step.getFailed());
+		Assert.assertFalse(step.getFailed());
+		Assert.assertEquals(step.getStepStatus(), StepStatus.WARNING);
 	}
 	
 	/**
-	 * Checks getFailed correctly compute test step status if action is not failed
+	 * Checks getStepStatus correctly compute test step status if action is not failed
 	 */
 	@Test(groups={"ut"})
 	public void testGetFailedWithActionOk() {
@@ -68,10 +71,12 @@ public class TestTestStep extends GenericTest {
 		step.addAction(new TestAction("action1", false, new ArrayList<>()));
 		step.addAction(new TestAction("action2", false, new ArrayList<>()));
 		Assert.assertFalse(step.getFailed());
+		Assert.assertEquals(step.getStepStatus(), StepStatus.SUCCESS);
 	}
 	
+	
 	/**
-	 * Checks getFailed correctly compute test step status if action is not failed but test step is KO
+	 * Checks getStepStatus correctly compute test step status if action is not failed but test step is KO
 	 */
 	@Test(groups={"ut"})
 	public void testGetFailedWithStepKo() {
@@ -80,10 +85,12 @@ public class TestTestStep extends GenericTest {
 		step.addAction(new TestAction("action1", false, new ArrayList<>()));
 		step.addAction(new TestAction("action2", false, new ArrayList<>()));
 		Assert.assertTrue(step.getFailed());
+		Assert.assertEquals(step.getStepStatus(), StepStatus.FAILED);
 	}
+
 	
 	/**
-	 * Checks getFailed correctly compute test step status if sub step is  failed
+	 * Checks getStepStatus correctly compute test step status if sub step is  failed
 	 */
 	@Test(groups={"ut"})
 	public void testGetFailedWithActionSubStepKo() {
@@ -92,8 +99,10 @@ public class TestTestStep extends GenericTest {
 		subStep.addAction(new TestAction("action1", true, new ArrayList<>()));
 		step.addAction(new TestAction("action2", false, new ArrayList<>()));
 		step.addAction(subStep);
-		Assert.assertTrue(step.getFailed());
+		Assert.assertFalse(step.getFailed());
+		Assert.assertEquals(step.getStepStatus(), StepStatus.WARNING);
 	}
+
 	
 	/**
 	 * Checks getFailed correctly compute test step status if sub step is not failed
@@ -105,6 +114,7 @@ public class TestTestStep extends GenericTest {
 		subStep.addAction(new TestAction("action1", false, new ArrayList<>()));
 		step.addAction(new TestAction("action2", false, new ArrayList<>()));
 		Assert.assertFalse(step.getFailed());
+		Assert.assertEquals(step.getStepStatus(), StepStatus.SUCCESS);
 	}
 	
 	/**

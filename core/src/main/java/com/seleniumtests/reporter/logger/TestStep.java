@@ -62,6 +62,12 @@ public class TestStep extends TestAction {
 	private List<Snapshot> snapshots;
 	private ITestResult testResult;
 	
+	public enum StepStatus {
+		SUCCESS,
+		FAILED,
+		WARNING
+	}
+	
 	/**
 	 * 
 	 * @param name			action name
@@ -120,19 +126,23 @@ public class TestStep extends TestAction {
 	}
 
 	/**
-	 * Return true if this step or one of its actions / sub-step is failed
+	 * Return 
+	 * StepStatus.FAILED if and only if the step is marked as failed
+	 * StepStatus.WARNIG if any of the sub actions (or steps) are failed, but not the step itself
+	 * StepStatus.SUCESS in any other cases
 	 */
-	@Override
-	public Boolean getFailed() {
-		if (super.getFailed()) {
-			return true;
+	public StepStatus getStepStatus() {
+		if (Boolean.TRUE.equals(getFailed())) {
+			return StepStatus.FAILED;
 		} 
 		for (TestAction action: stepActions) {
-			if (action.getFailed()) {
-				return true;
+			if ((action instanceof TestStep && ((TestStep) action).getStepStatus() != StepStatus.SUCCESS)
+					|| Boolean.TRUE.equals(action.getFailed())) {
+				return StepStatus.WARNING;
 			}
+			
 		}
-		return false;
+		return StepStatus.SUCCESS;
 	}
 	
 	public String getExceptionMessage(String format) {

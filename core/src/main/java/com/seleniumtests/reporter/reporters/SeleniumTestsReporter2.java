@@ -53,6 +53,7 @@ import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.utils.TestNGResultUtils;
 import com.seleniumtests.driver.TestType;
 import com.seleniumtests.reporter.logger.TestStep;
+import com.seleniumtests.reporter.logger.TestStep.StepStatus;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
 /**
@@ -266,8 +267,11 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 				stepInfo.add(encodedTestStep.getName());
 				
 				// step status
-				if (encodedTestStep.getFailed()) {
+				StepStatus stepStatus = encodedTestStep.getStepStatus();
+				if (stepStatus == StepStatus.FAILED) {
 					stepInfo.add(FAILED_TEST);
+				} else if (stepStatus == StepStatus.WARNING) {
+					stepInfo.add(WARN_TEST);
 				} else {
 					stepInfo.add(PASSED_TEST);
 				}
