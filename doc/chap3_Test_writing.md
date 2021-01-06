@@ -13,6 +13,7 @@
     - [Search inside an other element](#search-inside-an-other-element)
     - [Search inside frame](#search-inside-frame)
     - [Additional search capabilities](#additional-search-capabilities)
+      - [Shadow DOM](#shadow-dom)
   - [Document your tests](#document-your-tests)
   - [Add user defined test steps](#add-user-defined-test-steps)
   - [Add snapshots](#add-snapshots)
