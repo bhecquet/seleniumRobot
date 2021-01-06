@@ -341,6 +341,8 @@ public class TestJiraConnector extends MockitoTest {
 	public void testIssueAlreadyExists() {
 		
 		when(promiseSearch.claim()).thenReturn(new SearchResult(0, 2, 2, Arrays.asList(issue1, issue2)));
+		DateTime issueDate = DateTime.now().minusDays(1);
+		when(issue1.getCreationDate()).thenReturn(issueDate);
 		JiraBean jiraBean = new JiraBean(null, "issue 1", "issue 1", "Bug", "P1");
 		
 		JiraConnector jiraConnector = new JiraConnector("http://foo/bar", PROJECT_KEY, "user", "password", jiraOptions);
@@ -351,6 +353,7 @@ public class TestJiraConnector extends MockitoTest {
 		Assert.assertEquals(newJiraBean.getId(), "ISSUE-1");
 		Assert.assertEquals(newJiraBean.getSummary(), jiraBean.getSummary());
 		Assert.assertEquals(newJiraBean.getDescription(), "jira issue 1");
+		Assert.assertEquals(newJiraBean.getDate(), issueDate.toString("yyyy-MM-dd'T'HH:mmZZ"));
 	}
 	
 	/**

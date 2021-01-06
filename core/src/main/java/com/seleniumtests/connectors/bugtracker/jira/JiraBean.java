@@ -20,6 +20,7 @@ public class JiraBean extends IssueBean {
 	
 	public JiraBean(String id, String summary, String description, String issueType, String priority) {
 		this(summary, description, priority, issueType, null, null, null, null, null, null, null, null);
+		this.id = id;
 	}
 	
 	/**
