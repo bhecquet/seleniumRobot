@@ -70,6 +70,7 @@ import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.driver.screenshots.ScreenShot;
 import com.seleniumtests.driver.screenshots.SnapshotCheckType;
 import com.seleniumtests.reporter.logger.Snapshot;
+import com.seleniumtests.reporter.logger.TestAction;
 import com.seleniumtests.reporter.logger.TestStep;
 
 import io.atlassian.util.concurrent.Promise;
@@ -190,6 +191,7 @@ public class TestJiraConnector extends MockitoTest {
 	Map<String, String> jiraOptions = new HashMap<>();
 
 	private TestStep step1;
+	private TestStep step2;
 	private TestStep stepEnd;
 
 	@BeforeMethod(groups={"ut"})
@@ -211,6 +213,12 @@ public class TestJiraConnector extends MockitoTest {
 		FileUtils.copyFile(tmpHtml, new File(screenshot.getFullHtmlPath()));
 		
 		step1 = new TestStep("step 1", null, new ArrayList<>(), false);
+		step1.addSnapshot(new Snapshot(screenshot, "main", SnapshotCheckType.FULL), 1, null);
+		
+		step2 = new TestStep("step 2", null, new ArrayList<>(), false);
+		step2.setFailed(true);
+		step2.addAction(new TestAction("action1", false, new ArrayList<>()));
+		step2.addAction(new TestAction("action2", false, new ArrayList<>()));
 		step1.addSnapshot(new Snapshot(screenshot, "main", SnapshotCheckType.FULL), 1, null);
 		
 		stepEnd = new TestStep("Test end", null, new ArrayList<>(), false);
@@ -691,13 +699,25 @@ public class TestJiraConnector extends MockitoTest {
 		JiraConnector jiraConnector = new JiraConnector("http://foo/bar", PROJECT_KEY, "user", "password", jiraOptions);
 	
 		IssueBean issueBean = jiraConnector.createIssueBean("[Selenium][selenium][DEV][ngName] test myTest KO", "testCreateJiraBean", "some description", 
-				Arrays.asList(step1, stepEnd), jiraOptions);
+				Arrays.asList(step1, step2, stepEnd), jiraOptions);
 		
 		Assert.assertTrue(issueBean instanceof JiraBean);
 		JiraBean jiraBean = (JiraBean)issueBean;
 		
 		Assert.assertEquals(jiraBean.getAssignee(), "me");
-		Assert.assertEquals(jiraBean.getDescription(), "some descriptionStep 1 KO\n\nStep 'step 1' in error\n\nStep Test end\n\nFor more details, see attached .zip file");
+		
+		// check only step2 is seen as a failed step
+		Assert.assertEquals(jiraBean.getDescription(), "*Test:* testCreateJiraBean\n" + 
+				"*Description:* some description\n" +
+				"h2. Steps in error\n" + 
+				"* *step 2*{code:java}Step step 2\n" + 
+				"action1\n" + 
+				"action2{code}\n" + 
+				"\n" + 
+				"h2. Last logs\n" + 
+				"{code:java}Step Test end{code}\n" + 
+				"\n" + 
+				"For more details, see attached .zip file");
 		Assert.assertEquals(jiraBean.getSummary(), "[Selenium][selenium][DEV][ngName] test myTest KO");
 		Assert.assertEquals(jiraBean.getReporter(), "you");
 		Assert.assertEquals(jiraBean.getTestName(), "testCreateJiraBean");

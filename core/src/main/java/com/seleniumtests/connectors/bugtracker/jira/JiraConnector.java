@@ -45,6 +45,7 @@ import com.seleniumtests.connectors.bugtracker.IssueBean;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.driver.screenshots.ScreenShot;
+import com.seleniumtests.reporter.logger.TestStep;
 
 public class JiraConnector extends BugTracker {
 
@@ -219,6 +220,71 @@ public class JiraConnector extends BugTracker {
             return null;
         }
     }
+    
+    /**
+     * Creates the bean effectively
+     */
+    @Override
+	protected IssueBean createIssueBean(
+			String summary,
+			String fullDescription,
+			String testName,
+			TestStep lastStep, 
+			String assignee,
+			String reporter,
+			List<ScreenShot> screenShots,
+			File zipFile,
+			Map<String, String> issueOptions) {
+		
+		String priority = issueOptions.get("priority");
+		String issueType = issueOptions.get("jira.issueType");
+		Map<String, String> customFieldsValues = new HashMap<>();
+		for (String variable: issueOptions.keySet()) {
+			if (variable.startsWith("jira.field.")) {
+				customFieldsValues.put(variable.replace("jira.field.", ""), issueOptions.get(variable));
+			}
+		}
+
+		List<String> components = new ArrayList<>();
+		if (issueOptions.get("jira.components") != null) {
+			components = Arrays.asList(issueOptions.get("jira.components").split(","));
+		}
+		
+		
+		return new JiraBean(summary,
+				fullDescription,
+				priority,
+				issueType,
+				testName,
+				lastStep,
+				assignee,
+				reporter,
+				screenShots,
+				zipFile,
+				customFieldsValues,
+				components);
+	}
+    
+    protected void formatDescription(String testName, List<TestStep> failedSteps, TestStep lastTestStep, String description, StringBuilder fullDescription) {
+
+    	fullDescription.append(String.format("*Test:* %s\n", testName));
+    	if (description != null) {
+    		fullDescription.append(String.format("*Description:* %s\n", description));
+    	}
+		
+    	if (!failedSteps.isEmpty()) {
+			fullDescription.append("h2. Steps in error\n");
+			for (TestStep failedStep: failedSteps) {
+				fullDescription.append(String.format("* *%s*", failedStep.getName()));
+				fullDescription.append(String.format("{code:java}%s{code}\n\n", failedStep.toString()));
+			}
+    	}
+	
+		fullDescription.append("h2. Last logs\n");
+		fullDescription.append(String.format("{code:java}%s{code}\n\n", lastTestStep.toString()));
+	}
+    
+
 
     /**
      * Create issue

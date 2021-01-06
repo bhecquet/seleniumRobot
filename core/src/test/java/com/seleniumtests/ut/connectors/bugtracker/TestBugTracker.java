@@ -35,6 +35,7 @@ import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.driver.screenshots.ScreenShot;
 import com.seleniumtests.driver.screenshots.SnapshotCheckType;
 import com.seleniumtests.reporter.logger.Snapshot;
+import com.seleniumtests.reporter.logger.TestAction;
 import com.seleniumtests.reporter.logger.TestStep;
 
 @PrepareForTest({BugTracker.class})
@@ -45,6 +46,7 @@ public class TestBugTracker extends MockitoTest {
 	
 	private ScreenShot screenshot;
 	private TestStep step1;
+	private TestStep step2;
 	private TestStep stepEnd;
 	
 	Map<String, String> issueOptions = new HashMap<>();
@@ -64,6 +66,12 @@ public class TestBugTracker extends MockitoTest {
 		
 		step1 = new TestStep("step 1", null, new ArrayList<>(), false);
 		step1.addSnapshot(new Snapshot(screenshot, "main", SnapshotCheckType.FULL), 1, null);
+
+		step2 = new TestStep("step 2", null, new ArrayList<>(), false);
+		step2.setFailed(true);
+		step2.addAction(new TestAction("action1", false, new ArrayList<>()));
+		step2.addAction(new TestAction("action2", false, new ArrayList<>()));
+		step2.addSnapshot(new Snapshot(screenshot, "main", SnapshotCheckType.FULL), 1, null);
 		
 		stepEnd = new TestStep("Test end", null, new ArrayList<>(), false);
 		stepEnd.addSnapshot(new Snapshot(screenshot, "end", SnapshotCheckType.FULL), 1, null);
@@ -168,10 +176,23 @@ public class TestBugTracker extends MockitoTest {
 			
 		
 		IssueBean issueBean = bugtracker.createIssueBean("[Selenium][selenium][DEV][ngName] test myTest KO", "testCreateIssueBean", "some description", 
-				Arrays.asList(step1, stepEnd), issueOptions);
+				Arrays.asList(step1, step2, stepEnd), issueOptions);
 		
 		Assert.assertEquals(issueBean.getAssignee(), "me");
-		Assert.assertEquals(issueBean.getDescription(), "some descriptionStep 1 KO\n\nStep 'step 1' in error\n\nStep Test end\n\nFor more details, see attached .zip file");
+		Assert.assertEquals(issueBean.getDescription(), "Test: testCreateIssueBean\n" + 
+				"Description: some description\n" + 
+				"\n" + 
+				"Steps in error\n" + 
+				"Step KO: step 2\n" + 
+				"------------------------------------\n" + 
+				"Step step 2\n" + 
+				"action1\n" + 
+				"action2\n" + 
+				"\n" + 
+				"Last logs\n" + 
+				"Step Test end\n" + 
+				"\n" + 
+				"For more details, see attached .zip file");
 		Assert.assertEquals(issueBean.getSummary(), "[Selenium][selenium][DEV][ngName] test myTest KO");
 		Assert.assertEquals(issueBean.getReporter(), "you");
 		Assert.assertEquals(issueBean.getTestName(), "testCreateIssueBean");
