@@ -56,6 +56,9 @@ public abstract class BugTracker {
 		if (description != null) {
 			fullDescription.append(String.format("Description: %s\n", description));
 		}
+		if (SeleniumTestsContextManager.getThreadContext().getStartedBy() != null) {
+			fullDescription.append(String.format("Started by: %s\n", SeleniumTestsContextManager.getThreadContext().getStartedBy()));
+		}
 		fullDescription.append("\n");
 		
 		if (!failedSteps.isEmpty()) {
@@ -139,7 +142,9 @@ public abstract class BugTracker {
 			} catch (IOException e) {}
 
 			// create zip
-			zipFile = File.createTempFile("result", ".zip");
+			Path zipOutRoot = Files.createTempDirectory("detailedResult");
+			zipOutRoot.toFile().deleteOnExit();
+			zipFile = Paths.get(zipOutRoot.toString(), "detailedResult.zip").toFile();
 			zipFile.deleteOnExit();
 			FileUtility.zipFolder(outRoot.toFile(), zipFile);
 		} catch (IOException e) {

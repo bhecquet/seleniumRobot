@@ -366,7 +366,11 @@ Depending on jira project, you may need to specify additional options if the fie
 	-Dbugtracker.jira.field.myFieldName1=myFieldValue1
 ```
 
-**All these options can also be set in XML file / ini file / seleniumRobot server
+**All these options can also be set in XML file / ini file / seleniumRobot server**
+You'd better set
+- in XML  (because they depend on project and will never change): `bugtrackerProject`, `bugtracker.priority`, `bugtracker.jira.<any>`, `bugtracker.reporter`, `bugtracker.assignee`
+- in seleniumRobot server (because they are common to all projects): `bugtrackerUrl`, `bugtrackerUser`, `bugtrackerPassword`
+- in command line (because you can decide on each test launch whether to use Jira): `bugtrackerType`
 
 #### Find required fields and allowed values ####
 

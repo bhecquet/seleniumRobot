@@ -42,6 +42,7 @@ import com.atlassian.jira.rest.client.internal.async.AsynchronousJiraRestClientF
 import com.google.common.collect.ImmutableList;
 import com.seleniumtests.connectors.bugtracker.BugTracker;
 import com.seleniumtests.connectors.bugtracker.IssueBean;
+import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.driver.screenshots.ScreenShot;
@@ -271,6 +272,9 @@ public class JiraConnector extends BugTracker {
     	if (description != null) {
     		fullDescription.append(String.format("*Description:* %s\n", description));
     	}
+    	if (SeleniumTestsContextManager.getThreadContext().getStartedBy() != null) {
+			fullDescription.append(String.format("*Started by:* %s\n", SeleniumTestsContextManager.getThreadContext().getStartedBy()));
+		}
 		
     	if (!failedSteps.isEmpty()) {
 			fullDescription.append("h2. Steps in error\n");
@@ -281,7 +285,7 @@ public class JiraConnector extends BugTracker {
     	}
 	
 		fullDescription.append("h2. Last logs\n");
-		fullDescription.append(String.format("{code:java}%s{code}\n\n", lastTestStep.toString()));
+		fullDescription.append(String.format("{code:java}%s{code}", lastTestStep.toString()));
 	}
     
 
