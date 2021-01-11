@@ -65,6 +65,7 @@ import com.seleniumtests.MockitoTest;
 import com.seleniumtests.connectors.bugtracker.IssueBean;
 import com.seleniumtests.connectors.bugtracker.jira.JiraBean;
 import com.seleniumtests.connectors.bugtracker.jira.JiraConnector;
+import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.driver.screenshots.ScreenShot;
@@ -709,6 +710,59 @@ public class TestJiraConnector extends MockitoTest {
 		// check only step2 is seen as a failed step
 		Assert.assertEquals(jiraBean.getDescription(), "*Test:* testCreateJiraBean\n" + 
 				"*Description:* some description\n" +
+				"h2. Steps in error\n" + 
+				"* *step 2*{code:java}Step step 2\n" + 
+				"action1\n" + 
+				"action2{code}\n" + 
+				"\n" + 
+				"h2. Last logs\n" + 
+				"{code:java}Step Test end{code}\n" + 
+				"\n" + 
+				"For more details, see attached .zip file");
+		Assert.assertEquals(jiraBean.getSummary(), "[Selenium][selenium][DEV][ngName] test myTest KO");
+		Assert.assertEquals(jiraBean.getReporter(), "you");
+		Assert.assertEquals(jiraBean.getTestName(), "testCreateJiraBean");
+		Assert.assertEquals(jiraBean.getScreenShots(), Arrays.asList(screenshot, screenshot)); // screenshots from the last step
+		Assert.assertEquals(jiraBean.getTestStep(), stepEnd); 
+		Assert.assertEquals(jiraBean.getDateTime().getDayOfMonth(),  ZonedDateTime.now().plusHours(3).getDayOfMonth()); 
+		Assert.assertEquals(jiraBean.getComponents(), Arrays.asList("comp1", "comp2")); 
+		Assert.assertEquals(jiraBean.getIssueType(), "Bug"); 
+		Assert.assertEquals(jiraBean.getPriority(), "P1"); 
+		Assert.assertEquals(jiraBean.getCustomFields().get("foo"), "bar"); 
+		Assert.assertTrue(jiraBean.getDetailedResult().isFile());
+		Assert.assertTrue(jiraBean.getDetailedResult().length() > 1000);
+		Assert.assertNull(jiraBean.getId()); // not inistialized by default
+	}
+	
+	/**
+	 * Create a new jira bean with all parameters
+	 * @throws Exception
+	 */
+	@Test(groups={"ut"})
+	public void testCreateJiraBeanWithOrigin() throws Exception {
+		
+		jiraOptions.put("priority", "P1");
+		jiraOptions.put("assignee", "me");
+		jiraOptions.put("reporter", "you");
+		jiraOptions.put("jira.issueType", "Bug");
+		jiraOptions.put("jira.components", "comp1,comp2");
+		jiraOptions.put("jira.field.foo", "bar");
+		SeleniumTestsContextManager.getThreadContext().setStartedBy("http://foo/bar/job/1");
+		
+		JiraConnector jiraConnector = new JiraConnector("http://foo/bar", PROJECT_KEY, "user", "password", jiraOptions);
+		
+		IssueBean issueBean = jiraConnector.createIssueBean("[Selenium][selenium][DEV][ngName] test myTest KO", "testCreateJiraBean", "some description", 
+				Arrays.asList(step1, step2, stepEnd), jiraOptions);
+		
+		Assert.assertTrue(issueBean instanceof JiraBean);
+		JiraBean jiraBean = (JiraBean)issueBean;
+		
+		Assert.assertEquals(jiraBean.getAssignee(), "me");
+		
+		// check only step2 is seen as a failed step
+		Assert.assertEquals(jiraBean.getDescription(), "*Test:* testCreateJiraBean\n" + 
+				"*Description:* some description\n" + 
+				"*Started by:* http://foo/bar/job/1\n" +
 				"h2. Steps in error\n" + 
 				"* *step 2*{code:java}Step step 2\n" + 
 				"action1\n" + 

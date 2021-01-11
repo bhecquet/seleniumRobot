@@ -243,7 +243,7 @@ public class FileUtility {
     }
     
     /**
-  	 * Zip the folder and place resulting file into 'destZipFile'
+  	 * Zip the folder and place resulting file into 'destZipFile'. If the destination file already exists, it's overwritten
   	 * @param folder				folder to zip
   	 * @param destZipFile 			location where resulting file will be copied
   	 * @param fileFilter			filter to use when inserting files into zip

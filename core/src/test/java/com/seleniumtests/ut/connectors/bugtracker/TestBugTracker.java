@@ -200,8 +200,9 @@ public class TestBugTracker extends MockitoTest {
 		Assert.assertEquals(issueBean.getTestStep(), stepEnd); 
 		Assert.assertEquals(issueBean.getDateTime().getDayOfMonth(),  ZonedDateTime.now().plusHours(3).getDayOfMonth()); 
 		Assert.assertTrue(issueBean.getDetailedResult().isFile());
+		Assert.assertEquals(issueBean.getDetailedResult().getName(), "detailedResult.zip");
 		Assert.assertTrue(issueBean.getDetailedResult().length() > 1000);
-		Assert.assertNull(issueBean.getId()); // not inistialized by default
+		Assert.assertNull(issueBean.getId()); // not initialized by default
 	}
 	
 	/**
