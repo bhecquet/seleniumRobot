@@ -84,6 +84,7 @@ public class SeleniumTestsContext {
     /* configuration defined in testng.xml */
     public static final String TEST_CONFIGURATION = "testConfig"; 				// parameter name for additional configuration to load (should only be used in XML)
     public static final String LOAD_INI = "loadIni";							// comma separated list of files to load. They are searched in data/<app>/config folder. They will append to env.ini file with variable overwriting. Last file will overwrite previous ones
+    public static final String STARTED_BY = "startedBy";						// any string saying who started the test. It may be a URL where to find result, for reports in bugtrackers
     
     public static final String DEVICE_LIST = "deviceList"; 						// List of known devices in json format (internal use only)
     public static final String WEB_SESSION_TIME_OUT = "webSessionTimeOut";		// timeout de la session du navigateur
@@ -277,6 +278,7 @@ public class SeleniumTestsContext {
 	public static final String DEFAULT_TMS_TYPE = null;
 	public static final String DEFAULT_BUGTRACKER_URL = null;
 	public static final String DEFAULT_BUGTRACKER_TYPE = null;
+	public static final String DEFAULT_STARTED_BY = null;
 	public static final boolean DEFAULT_REPORTPORTAL_ACTIVE = false;
 	public static final ElementInfo.Mode DEFAULT_ADVANCED_ELEMENT_SEARCH = ElementInfo.Mode.FALSE;
     
@@ -1133,6 +1135,10 @@ public class SeleniumTestsContext {
         return (Boolean) getAttribute(CAPTURE_SNAPSHOT);
     }
     
+    public String getStartedBy() {    	
+    	return (String) getAttribute(STARTED_BY);
+    }
+    
     public boolean getCaptureNetwork() {    	
     	return (Boolean) getAttribute(CAPTURE_NETWORK);
     }
@@ -1811,6 +1817,15 @@ public class SeleniumTestsContext {
     		setAttribute(REPLAY_TIME_OUT, timeout);
     	} else {
     		setAttribute(REPLAY_TIME_OUT, DEFAULT_REPLAY_TIME_OUT);
+    	}
+    }
+    
+
+    public void setStartedBy(String startedBy) {
+    	if (startedBy != null) {
+    		setAttribute(STARTED_BY, startedBy);
+    	} else {
+    		setAttribute(STARTED_BY, DEFAULT_STARTED_BY);
     	}
     }
     
