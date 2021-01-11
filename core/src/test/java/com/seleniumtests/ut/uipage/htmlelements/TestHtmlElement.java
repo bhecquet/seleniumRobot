@@ -78,6 +78,7 @@ import com.seleniumtests.driver.DriverExceptionListener;
 import com.seleniumtests.driver.TestType;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.reporter.logger.TestStep;
+import com.seleniumtests.reporter.logger.TestStep.StepStatus;
 import com.seleniumtests.uipage.htmlelements.FrameElement;
 import com.seleniumtests.uipage.htmlelements.HtmlElement;
 
@@ -379,7 +380,7 @@ public class TestHtmlElement extends MockitoTest {
 		when(driver.findElement(By.id("el"))).thenThrow(new NoSuchElementException(""));
 		Assert.assertEquals(el.isElementPresent(1), false);
 
-		Assert.assertFalse(step.getFailed());
+		Assert.assertEquals(step.getStepStatus(), StepStatus.SUCCESS);
 	}
 
 	/**
@@ -397,7 +398,7 @@ public class TestHtmlElement extends MockitoTest {
 		when(element.isDisplayed()).thenThrow(new WebDriverException("error"));
 		Assert.assertFalse(el.isDisplayed());
 
-		Assert.assertTrue(step.getFailed());
+		Assert.assertEquals(step.getStepStatus(), StepStatus.WARNING);
 	}
 
 	@Test(groups = { "ut" })
