@@ -407,6 +407,19 @@ public class TestSeleniumTestContext extends GenericTest {
 		SeleniumTestsContextManager.getThreadContext().setPageLoadTimeout(null);
 		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getPageLoadTimeout(), SeleniumTestsContext.DEFAULT_PAGE_LOAD_TIME_OUT);
 	}
+
+	@Test(groups="ut context")
+	public void testStartedBy(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setStartedBy("http://foo.bar/job/1");
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getStartedBy(), "http://foo.bar/job/1");
+	}
+	@Test(groups="ut context")
+	public void testStartedByNull(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setStartedBy(null);
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getStartedBy(), SeleniumTestsContext.DEFAULT_STARTED_BY);
+	}
 	
 	@Test(groups="ut context")
 	public void testRunMode(final ITestContext testNGCtx, final XmlTest xmlTest) {
