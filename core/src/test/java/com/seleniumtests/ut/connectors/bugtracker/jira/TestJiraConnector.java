@@ -215,16 +215,20 @@ public class TestJiraConnector extends MockitoTest {
 		
 		step1 = new TestStep("step 1", null, new ArrayList<>(), false);
 		step1.addSnapshot(new Snapshot(screenshot, "main", SnapshotCheckType.FULL), 1, null);
+		step1.setPosition(0);
 		
 		step2 = new TestStep("step 2", null, new ArrayList<>(), false);
 		step2.setFailed(true);
+		step2.setActionException(new NullPointerException("Error clicking"));
 		step2.addAction(new TestAction("action1", false, new ArrayList<>()));
 		step2.addAction(new TestAction("action2", false, new ArrayList<>()));
-		step1.addSnapshot(new Snapshot(screenshot, "main", SnapshotCheckType.FULL), 1, null);
+		step2.addSnapshot(new Snapshot(screenshot, "main", SnapshotCheckType.FULL), 1, null);
+		step2.setPosition(1);
 		
 		stepEnd = new TestStep("Test end", null, new ArrayList<>(), false);
 		stepEnd.addSnapshot(new Snapshot(screenshot, "end", SnapshotCheckType.FULL), 1, null);
 		stepEnd.addSnapshot(new Snapshot(screenshot, "end2", SnapshotCheckType.FULL), 1, null);
+		stepEnd.setPosition(2);
 		
 		// mock all clients
 		PowerMockito.whenNew(AsynchronousJiraRestClientFactory.class).withNoArguments().thenReturn(restClientFactory);
@@ -710,10 +714,12 @@ public class TestJiraConnector extends MockitoTest {
 		// check only step2 is seen as a failed step
 		Assert.assertEquals(jiraBean.getDescription(), "*Test:* testCreateJiraBean\n" + 
 				"*Description:* some description\n" +
+				"*Error step 1 (step 2):* *{color:#de350b}java.lang.NullPointerException: Error clicking{color}*\n" +
 				"h2. Steps in error\n" + 
-				"* *step 2*{code:java}Step step 2\n" + 
-				"action1\n" + 
-				"action2{code}\n" + 
+				"* *Step 1: step 2*\n" +
+				"{code:java}Step step 2\n" +
+				"  - action1\n" +
+				"  - action2{code}\n" +
 				"\n" + 
 				"h2. Last logs\n" + 
 				"{code:java}Step Test end{code}\n" + 
@@ -731,7 +737,7 @@ public class TestJiraConnector extends MockitoTest {
 		Assert.assertEquals(jiraBean.getCustomFields().get("foo"), "bar"); 
 		Assert.assertTrue(jiraBean.getDetailedResult().isFile());
 		Assert.assertTrue(jiraBean.getDetailedResult().length() > 1000);
-		Assert.assertNull(jiraBean.getId()); // not inistialized by default
+		Assert.assertNull(jiraBean.getId()); // not initialized by default
 	}
 	
 	/**
@@ -763,10 +769,12 @@ public class TestJiraConnector extends MockitoTest {
 		Assert.assertEquals(jiraBean.getDescription(), "*Test:* testCreateJiraBean\n" + 
 				"*Description:* some description\n" + 
 				"*Started by:* http://foo/bar/job/1\n" +
+				"*Error step 1 (step 2):* *{color:#de350b}java.lang.NullPointerException: Error clicking{color}*\n" +
 				"h2. Steps in error\n" + 
-				"* *step 2*{code:java}Step step 2\n" + 
-				"action1\n" + 
-				"action2{code}\n" + 
+				"* *Step 1: step 2*\n" +
+				"{code:java}Step step 2\n" +
+				"  - action1\n" +
+				"  - action2{code}\n" +
 				"\n" + 
 				"h2. Last logs\n" + 
 				"{code:java}Step Test end{code}\n" + 

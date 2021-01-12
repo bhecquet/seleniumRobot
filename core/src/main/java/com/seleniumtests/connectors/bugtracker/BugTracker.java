@@ -30,7 +30,7 @@ import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
 public abstract class BugTracker {
 
-	public static final String STEP_KO_PATTERN = "Step KO: %s\n";
+	public static final String STEP_KO_PATTERN = "Step %d: ";
 	protected static Logger logger = SeleniumRobotLogger.getLogger(BugTracker.class);
 
 	private String createIssueSummary(
@@ -44,6 +44,7 @@ public abstract class BugTracker {
 	/**
 	 * Format description
 	 * For any bugtracker, description is quite simple but it can be improved depending on bug tracker 
+	 * /!\ any method overriding this one MUST provide "STEP_KO_PATTERN" in the description because it's used to know if the failed step is the same 
 	 * 
 	 * @param testSteps
 	 * @param fullDescription
@@ -59,12 +60,15 @@ public abstract class BugTracker {
 		if (SeleniumTestsContextManager.getThreadContext().getStartedBy() != null) {
 			fullDescription.append(String.format("Started by: %s\n", SeleniumTestsContextManager.getThreadContext().getStartedBy()));
 		}
+		for (TestStep failedStep: failedSteps) {
+			fullDescription.append(String.format("Error step %d (%s): %s\n", failedStep.getPosition(), failedStep.getName(), failedStep.getActionException()));
+		}
 		fullDescription.append("\n");
 		
 		if (!failedSteps.isEmpty()) {
 			fullDescription.append("Steps in error\n");
 			for (TestStep failedStep: failedSteps) {
-				fullDescription.append(String.format(STEP_KO_PATTERN, failedStep.getName()));
+				fullDescription.append(String.format(STEP_KO_PATTERN + "%s\n", failedStep.getPosition(), failedStep.getName()));
 				fullDescription.append("------------------------------------\n");
 				fullDescription.append(failedStep.toString() + "\n\n");
 			}
@@ -220,7 +224,7 @@ public abstract class BugTracker {
 			stepIdx += 1;
 		}
 		
-		// check that a Jira does not already exist for the same test / appication / version. Else, complete it if the step is error is not the same
+		// check that an issue does not already exist for the same test / appication / version. Else, complete it if the step is error is not the same
 		IssueBean currentIssue = issueAlreadyExists(issueBean);
 		if (currentIssue != null) {
 			if (currentIssue.getDescription().contains(String.format(STEP_KO_PATTERN, stepIdx))) {

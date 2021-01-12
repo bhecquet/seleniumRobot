@@ -19,6 +19,7 @@ import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
 import org.mockito.Mock;
+import org.openqa.selenium.WebDriverException;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
@@ -66,16 +67,20 @@ public class TestBugTracker extends MockitoTest {
 		
 		step1 = new TestStep("step 1", null, new ArrayList<>(), false);
 		step1.addSnapshot(new Snapshot(screenshot, "main", SnapshotCheckType.FULL), 1, null);
+		step1.setPosition(0);
 
 		step2 = new TestStep("step 2", null, new ArrayList<>(), false);
 		step2.setFailed(true);
+		step2.setActionException(new NullPointerException("Error clicking"));
 		step2.addAction(new TestAction("action1", false, new ArrayList<>()));
 		step2.addAction(new TestAction("action2", false, new ArrayList<>()));
 		step2.addSnapshot(new Snapshot(screenshot, "main", SnapshotCheckType.FULL), 1, null);
+		step2.setPosition(1);
 		
 		stepEnd = new TestStep("Test end", null, new ArrayList<>(), false);
 		stepEnd.addSnapshot(new Snapshot(screenshot, "end", SnapshotCheckType.FULL), 1, null);
 		stepEnd.addSnapshot(new Snapshot(screenshot, "end2", SnapshotCheckType.FULL), 1, null);
+		stepEnd.setPosition(2);
 		
 		issueOptions.put("reporter", "you");
 		issueOptions.put("assignee", "me");
@@ -180,14 +185,15 @@ public class TestBugTracker extends MockitoTest {
 		
 		Assert.assertEquals(issueBean.getAssignee(), "me");
 		Assert.assertEquals(issueBean.getDescription(), "Test: testCreateIssueBean\n" + 
-				"Description: some description\n" + 
+				"Description: some description\n" +
+				"Error step 1 (step 2): java.lang.NullPointerException: Error clicking\n" + 
 				"\n" + 
-				"Steps in error\n" + 
-				"Step KO: step 2\n" + 
+				"Steps in error\n" +
+				"Step 1: step 2\n" + 
 				"------------------------------------\n" + 
 				"Step step 2\n" + 
-				"action1\n" + 
-				"action2\n" + 
+				"  - action1\n" + 
+				"  - action2\n" + 
 				"\n" + 
 				"Last logs\n" + 
 				"Step Test end\n" + 

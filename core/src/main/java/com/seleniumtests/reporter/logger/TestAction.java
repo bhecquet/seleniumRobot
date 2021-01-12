@@ -22,9 +22,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.json.JSONObject;
 
+import com.seleniumtests.core.aspects.LogAction;
 import com.seleniumtests.util.StringUtility;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
@@ -112,6 +114,10 @@ public class TestAction implements Serializable {
 	
 	@Override
 	public String toString() {
+		return toString(0);
+	}
+	
+	public String toString(int spaces) {
 		return getName();
 	}
 	

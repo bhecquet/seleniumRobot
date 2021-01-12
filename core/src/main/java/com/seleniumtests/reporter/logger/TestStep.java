@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.testng.ITestResult;
@@ -232,9 +233,13 @@ public class TestStep extends TestAction {
 	
 	@Override
 	public String toString() {
+		return toString(0);
+	}
+	public String toString(int spaces) {
+		String currentIndent = StringUtils.repeat(" ", spaces);
 		StringBuilder testStepRepr = new StringBuilder(String.format("Step %s\n", getName()));
 		for (TestAction testAction: getStepActions()) {
-			testStepRepr.append(testAction.toString() + "\n");
+			testStepRepr.append(currentIndent + "  - " + testAction.toString(spaces + 2) + "\n");
 		}
 		
 		return testStepRepr.toString().trim();
@@ -306,7 +311,7 @@ public class TestStep extends TestAction {
 		
 		// add attachments declared in sub-steps
 		for (TestAction subStep: stepActions.stream().filter(a -> a instanceof TestStep).collect(Collectors.toList())) {
-			usedFiles.addAll(((TestStep)subStep).getAllAttachments());
+			usedFiles.addAll(((TestStep)subStep).getAllAttachments(onlyPictureOfSnapshots));
 		}
 		
 		usedFiles.addAll(getFiles().stream().map(GenericFile::getFile).collect(Collectors.toList()));

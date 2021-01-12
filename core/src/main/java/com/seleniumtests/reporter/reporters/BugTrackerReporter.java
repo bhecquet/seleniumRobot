@@ -63,9 +63,9 @@ public class BugTrackerReporter extends CommonReporter implements IReporter {
 				String testNgName = testResult.getTestContext().getCurrentXmlTest().getName();
 				String testName = TestNGResultUtils.getUniqueTestName(testResult);
 
-				String description = String.format("Test %s failed\n", testName);
+				String description = String.format("Test '%s' failed\n", testName);
 
-				if (testResult.getMethod().getDescription() != null) {
+				if (testResult.getMethod().getDescription() != null && !testResult.getMethod().getDescription().trim().isEmpty()) {
 					description += "Test goal: " + testResult.getMethod().getDescription();
 				}
 
@@ -95,10 +95,12 @@ public class BugTrackerReporter extends CommonReporter implements IReporter {
 						} else if (issueBean.getId() != null) {
 							TestNGResultUtils.setTestInfo(testResult, "Issue", new StringInfo(issueBean.getId()));
 						}
-						TestNGResultUtils.setTestInfo(testResult, "Issue date", new StringInfo(issueBean.getDate()));
+						TestNGResultUtils.setTestInfo(testResult, "Issue date", new StringInfo(issueBean.getCreationDate()));
 					}
 					
 					TestNGResultUtils.setBugtrackerReportCreated(testResult, true);
+					
+				// close issue if test is now OK and a previous issue has been created
 				} else if (testResult.getStatus() == ITestResult.SUCCESS && !TestNGResultUtils.isBugtrackerReportCreated(testResult)) {
 					
 					bugtrackerServer.closeIssue( 

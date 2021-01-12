@@ -27,6 +27,7 @@ public class IssueBean {
     protected TestStep testStep;
     protected String summary;
     protected ZonedDateTime date;
+    protected ZonedDateTime creationDate;
     protected String assignee;
     protected String description;
     protected String priority;
@@ -109,6 +110,7 @@ public class IssueBean {
         }
 
         date = ZonedDateTime.now().plusHours(3);
+        creationDate = ZonedDateTime.now().plusHours(3);
         setDescription(StringUtils.stripAccents(description));
     }
 
@@ -160,7 +162,11 @@ public class IssueBean {
         return date;
     }
 
-    public DateTime getJodaDateTime() {
+    public String getCreationDate() {
+		return creationDate.format(formatter);
+	}
+
+	public DateTime getJodaDateTime() {
         return new DateTime(date.getYear(), date.getMonthValue(), date.getDayOfMonth(), date.getHour(), date.getMinute(), date.getSecond(), DateTimeZone.forID(date.getZone().getId()));
     }
 

@@ -585,6 +585,34 @@ public class TestTestStep extends GenericTest {
 		
 		
 	}
+	@Test(groups={"ut"})
+	public void testToString() throws IOException {
+		TestStep step = new TestStep("step1", null, new ArrayList<>(), true);
+		step.addMessage(new TestMessage("everything OK", MessageType.INFO));
+		step.addAction(new TestAction("action2", false, new ArrayList<>()));
+		
+		Har har = new Har(new HarLog());
+		har.getLog().addPage(new HarPage("title", "a title"));
+		step.addNetworkCapture(new HarCapture(har, "main"));
+		
+		GenericFile file = new GenericFile(File.createTempFile("video", ".avi"), "video file");
+		step.addFile(file);
+		
+		TestStep subStep = new TestStep("subStep", null, new ArrayList<>(), true);
+		subStep.addMessage(new TestMessage("everything in subStep almost OK", MessageType.WARNING));
+		subStep.addAction(new TestAction("action1", false, new ArrayList<>()));
+		step.addAction(subStep);
+		step.addAction(new TestAction("action3", false, new ArrayList<>()));
+		
+		Assert.assertEquals(step.toString(), "Step step1\n" + 
+				"  - everything OK\n" + 
+				"  - action2\n" + 
+				"  - Step subStep\n" + 
+				"    - everything in subStep almost OK\n" + 
+				"    - action1\n" + 
+				"  - action3");
+
+	}
 	
 	/**
 	 * Check that if main step contains masking, they are reported in messages / action / step below

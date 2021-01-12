@@ -203,7 +203,7 @@ public class TestCustomReporter extends ReporterTest {
 			String detailedReportContent = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testAndSubActions", "SUP-result.json").toFile());
 			
 			// check step 1 has been encoded
-			Assert.assertTrue(detailedReportContent.contains("Step step 1 <>\\\\\"'&\\\\/\\\\nclick button  <>\\\\\"'&\\\\na message <>\\\\\"'&"));
+			Assert.assertTrue(detailedReportContent.contains("Step step 1 <>\\\\\"'&\\\\/\\\\n  - click button  <>\\\\\"'&\\\\n  - a message <>\\\\\"'&"));
 			
 		} finally {
 			System.clearProperty("customTestReports");
