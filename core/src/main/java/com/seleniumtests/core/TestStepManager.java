@@ -157,6 +157,20 @@ public class TestStepManager {
     	}
 	}
 	
+	/**
+	 * Get the current TestStepManager for this Test
+	 * Return null if none can be found
+	 * @return
+	 */
+	public static TestStepManager getInstance() {
+		try {
+			return SeleniumTestsContextManager.getContextForCurrentTestState().get(0).getTestStepManager();
+    	} catch (IndexOutOfBoundsException e) {
+    		// do nothing, no context has been created which is the case if we try to log message in @BeforeSuite / @BeforeGroup
+    		return null;
+    	}
+	}
+	
 
 	/**
 	 * Returns the previous TestStep in the list or null if no step exists for this test

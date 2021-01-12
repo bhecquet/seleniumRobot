@@ -270,16 +270,20 @@ public class JiraConnector extends BugTracker {
 
     	fullDescription.append(String.format("*Test:* %s\n", testName));
     	if (description != null) {
-    		fullDescription.append(String.format("*Description:* %s\n", description));
+    		fullDescription.append(String.format("*Description:* %s\n", description.replace("Test goal:", "*Test goal:*")));
+    		
     	}
     	if (SeleniumTestsContextManager.getThreadContext().getStartedBy() != null) {
 			fullDescription.append(String.format("*Started by:* %s\n", SeleniumTestsContextManager.getThreadContext().getStartedBy()));
 		}
-		
+    	for (TestStep failedStep: failedSteps) {
+			fullDescription.append(String.format("*Error step %d (%s):* *{color:#de350b}%s{color}*\n", failedStep.getPosition(), failedStep.getName(), failedStep.getActionException()));
+		}
+
     	if (!failedSteps.isEmpty()) {
 			fullDescription.append("h2. Steps in error\n");
 			for (TestStep failedStep: failedSteps) {
-				fullDescription.append(String.format("* *%s*", failedStep.getName()));
+				fullDescription.append(String.format("* *" + STEP_KO_PATTERN + "%s*\n", failedStep.getPosition(), failedStep.getName().trim()));
 				fullDescription.append(String.format("{code:java}%s{code}\n\n", failedStep.toString()));
 			}
     	}
