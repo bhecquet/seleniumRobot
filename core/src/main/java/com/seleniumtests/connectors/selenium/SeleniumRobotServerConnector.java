@@ -51,6 +51,8 @@ public abstract class SeleniumRobotServerConnector {
 	public static final String APPLICATION_API_URL = "/commons/api/application/";
 	public static final String ENVIRONMENT_API_URL = "/commons/api/environment/";
 	public static final String TESTCASE_API_URL = "/commons/api/testcase/";
+	
+	protected static final int MAX_TESTCASE_NAME_LENGHT = 150;
 
 	protected String url;
 	protected String authToken;
@@ -203,11 +205,13 @@ public abstract class SeleniumRobotServerConnector {
 		if (applicationId == null) {
 			createApplication();
 		}
+		
+		String strippedTestName = testName.length() > MAX_TESTCASE_NAME_LENGHT ? testName.substring(0, MAX_TESTCASE_NAME_LENGHT): testName;
 
 		try {
 			JSONObject testJson = getJSonResponse(buildPostRequest(url + TESTCASE_API_URL)
-					.field("name", testName)
-					.field("application", applicationId.toString()));
+					.field("application", applicationId.toString())
+					.field("name", strippedTestName));
 			return testJson.getInt("id");
 		} catch (UnirestException | JSONException | SeleniumRobotServerException e) {
 			throw new SeleniumRobotServerException("cannot create test case", e);

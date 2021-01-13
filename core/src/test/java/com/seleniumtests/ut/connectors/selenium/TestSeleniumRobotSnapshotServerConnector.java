@@ -25,6 +25,7 @@ import static org.mockito.Mockito.when;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import org.apache.commons.lang3.StringUtils;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.openqa.selenium.Rectangle;
@@ -47,6 +48,7 @@ import com.seleniumtests.driver.screenshots.SnapshotTarget;
 import com.seleniumtests.reporter.logger.Snapshot;
 
 import kong.unirest.HttpRequest;
+import kong.unirest.MultipartBody;
 import kong.unirest.Unirest;
 import kong.unirest.UnirestException;
 
@@ -240,6 +242,23 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 		Assert.assertEquals((int)sessionId, 13);
 	}
 	
+	/**
+	 * Session name is limited to 100 chars by server, check we strip it
+	 * @throws UnirestException
+	 */
+	@Test(groups= {"ut"})
+	public void testCreateSessionLongName() throws UnirestException {
+		SeleniumRobotSnapshotServerConnector connector = spy(configureMockedSnapshotServerConnection());
+
+		MultipartBody request = (MultipartBody) createServerMock("POST", SeleniumRobotSnapshotServerConnector.SESSION_API_URL, 200, "{'id': '14'}", "body");	
+		
+		connector.createVersion();
+		Integer sessionId = connector.createSession("Session1" + StringUtils.repeat("-", 93));
+		
+		verify(request).field("name", ("Session1" + StringUtils.repeat("-", 92)));
+		Assert.assertEquals((int)sessionId, 14);
+	}
+	
 	@Test(groups= {"ut"}, expectedExceptions=SeleniumRobotServerException.class)
 	public void testCreateSessionInError() throws UnirestException {
 
@@ -280,6 +299,23 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 		
 		Assert.assertEquals((int)testCaseId, 12);
 	}
+	
+	/**
+	 * Test case name is limited to 150 chars by server, check we strip it
+	 * @throws UnirestException
+	 */
+	@Test(groups= {"ut"})
+	public void testCreateTestCaseLongName() throws UnirestException {	
+		SeleniumRobotSnapshotServerConnector connector = spy(configureMockedSnapshotServerConnection());
+		MultipartBody request = (MultipartBody) createServerMock("POST", SeleniumRobotSnapshotServerConnector.TESTCASE_API_URL, 200, "{'id': '14'}", "body");	
+		
+		connector.createApplication();
+		Integer testCaseId = connector.createTestCase("Test 1" + StringUtils.repeat("-", 145));
+		
+		verify(request).field("name", ("Test 1" + StringUtils.repeat("-", 144)));
+		Assert.assertEquals((int)testCaseId, 14);
+	}
+
 	
 	@Test(groups= {"ut"}, expectedExceptions=ConfigurationException.class)
 	public void testCreateTestCaseEmptyName() throws UnirestException {	
@@ -343,6 +379,23 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 		Integer testCaseInSessionId = connector.createTestCaseInSession(sessionId, testCaseId, "Test 1");
 
 		Assert.assertEquals((int)testCaseInSessionId, 15);
+	}
+	
+	/**
+	 * Test case in session name is limited to 100 chars by server, check we strip it
+	 * @throws UnirestException
+	 */
+	@Test(groups= {"ut"})
+	public void testCreateTestCaseInSessionLongName() throws UnirestException {	
+		SeleniumRobotSnapshotServerConnector connector = spy(configureMockedSnapshotServerConnection());
+		MultipartBody request = (MultipartBody) createServerMock("POST", SeleniumRobotSnapshotServerConnector.TESTCASEINSESSION_API_URL, 200, "{'id': '14'}", "body");
+		
+		Integer sessionId = connector.createSession("Session1");
+		Integer testCaseId = connector.createTestCase("Test 1");
+		Integer testCaseInSessionId = connector.createTestCaseInSession(sessionId, testCaseId, "Test 1" + StringUtils.repeat("-", 95));
+		
+		verify(request).field("name", ("Test 1" + StringUtils.repeat("-", 94)));
+		Assert.assertEquals((int)testCaseInSessionId, 14);
 	}
 	
 	@Test(groups= {"ut"}, expectedExceptions=SeleniumRobotServerException.class)
@@ -501,6 +554,32 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 		Assert.assertEquals((int)sessionId, 13);
 		Assert.assertEquals((int)snapshotId, 16);
 	}
+	
+	/**
+	 * snapshot name is limited to 100 chars by server, check we strip it
+	 * @throws UnirestException
+	 */
+	@Test(groups= {"ut"})
+	public void testCreateSnapshotLongName() throws UnirestException {
+		SeleniumRobotSnapshotServerConnector connector = spy(configureMockedSnapshotServerConnection());
+		MultipartBody request = (MultipartBody) createServerMock("POST", SeleniumRobotSnapshotServerConnector.SNAPSHOT_API_URL, 200, "{'id': '14'}", "body");
+		when(snapshot.getName()).thenReturn("snapshot" + StringUtils.repeat("-", 93));
+		
+		Integer sessionId = connector.createSession("Session1");
+		Integer testCaseId = connector.createTestCase("Test 1");
+		Integer testCaseInSessionId = connector.createTestCaseInSession(sessionId, testCaseId, "Test 1");
+		Integer testStepId = connector.createTestStep("Step 1", testCaseInSessionId);
+		Integer stepResultId = connector.recordStepResult(true, "", 1, sessionId, testCaseInSessionId, testStepId);
+		Integer snapshotId = connector.createSnapshot(snapshot, sessionId, testCaseInSessionId, stepResultId);
+		
+		
+		verify(request).field("name", ("snapshot" + StringUtils.repeat("-", 92)));
+		
+		// check prerequisites has been created
+		Assert.assertEquals((int)sessionId, 13);
+		Assert.assertEquals((int)snapshotId, 14);
+	}
+	
 	
 	
 	@Test(groups= {"ut"}, expectedExceptions=SeleniumRobotServerException.class)

@@ -110,7 +110,7 @@ public class TestSeleniumRobotServerTestRecorder extends ReporterTest {
 			Assert.assertTrue(logs.contains("Snapshot hasn't any name, it won't be sent to server")); // one snapshot has no name, error message is displayed
 			
 			// check that screenshot information are removed from logs (the pattern "Output: ...")
-			verify(serverConnector).recordStepResult(eq(false), contains("step 1.3: open page"), eq(1230L), anyInt(), anyInt(), anyInt());
+			verify(serverConnector).recordStepResult(eq(true), contains("step 1.3: open page"), eq(1230L), anyInt(), anyInt(), anyInt());
 		} finally {
 			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE);
 			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL);

@@ -49,6 +49,10 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 	public static final String SNAPSHOT_API_URL = "/snapshot/upload/image";
 	private String sessionUUID;
 	private static SeleniumRobotSnapshotServerConnector snapshotConnector;
+
+	protected static final int MAX_TESTSESSION_NAME_LENGHT = 100;
+	protected static final int MAX_TESTCASEINSESSION_NAME_LENGHT = 100;
+	protected static final int MAX_SNAPSHOT_NAME_LENGHT = 100;
 	
 	public static SeleniumRobotSnapshotServerConnector getInstance() {
 		if (snapshotConnector == null) {
@@ -98,6 +102,9 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 		if (versionId == null) {
 			createVersion();
 		}
+		
+		String strippedSessionName = sessionName.length() > MAX_TESTSESSION_NAME_LENGHT ? sessionName.substring(0, MAX_TESTSESSION_NAME_LENGHT): sessionName;
+		
 		try {
 			BrowserType browser = SeleniumTestsContextManager.getGlobalContext().getBrowser();
 			browser = browser == null ? BrowserType.NONE : browser;
@@ -109,7 +116,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 					.field("browser", browser.getBrowserType())
 					.field("environment", SeleniumTestsContextManager.getGlobalContext().getTestEnv())
 					.field("version", versionId.toString())
-					.field("name", sessionName)
+					.field("name", strippedSessionName)
 					.field("compareSnapshot", String.valueOf(SeleniumTestsContextManager.getGlobalContext().getSeleniumRobotServerCompareSnapshot()))
 					.field("ttl", String.format("%d days", SeleniumTestsContextManager.getGlobalContext().getSeleniumRobotServerCompareSnapshotTtl()))); // format is 'x days' as this is the way Django expect a duration in days
 			return sessionJson.getInt("id");
@@ -147,11 +154,14 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 		if (testCaseId == null) {
 			throw new ConfigurationException("Test case must be previously defined");
 		}
+		
+		String strippedName = name.length() > MAX_TESTCASEINSESSION_NAME_LENGHT ? name.substring(0, MAX_TESTCASEINSESSION_NAME_LENGHT): name;
+		
 		try {
 			JSONObject testInSessionJson = getJSonResponse(buildPostRequest(url + TESTCASEINSESSION_API_URL)
 					.field("testCase", testCaseId)
 					.field("session", sessionId.toString())
-					.field("name", name));
+					.field("name", strippedName));
 			return testInSessionJson.getInt("id");
 		} catch (UnirestException | JSONException | SeleniumRobotServerException e) {
 			throw new SeleniumRobotServerException("cannot create test case", e);
@@ -169,6 +179,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 		if (!active) {
 			return null;
 		}
+		
 		try {
 			JSONObject stepJson = getJSonResponse(buildPostRequest(url + TESTSTEP_API_URL)
 					.field("name", testStep));
@@ -196,6 +207,9 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 		if (stepResultId == null) {
 			throw new ConfigurationException("Step result must be previously recorded");
 		}
+		
+		String snapshotName = snapshot.getName().length() > MAX_SNAPSHOT_NAME_LENGHT ? snapshot.getName().substring(0, MAX_SNAPSHOT_NAME_LENGHT): snapshot.getName(); 
+		
 		try {
 			File pictureFile = new File(snapshot.getScreenshot().getFullImagePath());
 			
@@ -204,7 +218,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 					.field("sessionId", sessionUUID)
 					.field("testCase", testCaseInSessionId.toString())
 					.field("image", pictureFile)
-					.field("name", snapshot.getName())
+					.field("name", snapshotName)
 					.field("compare", snapshot.getCheckSnapshot().getName())
 					.field("diffTolerance", String.valueOf(snapshot.getCheckSnapshot().getErrorThreshold()))
 					);
