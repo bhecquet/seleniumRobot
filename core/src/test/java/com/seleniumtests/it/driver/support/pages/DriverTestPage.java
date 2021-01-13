@@ -127,6 +127,7 @@ public class DriverTestPage extends PageObject {
 	public static final FrameElement iframe = new FrameElement("IFrame", By.id("myIFrame"));
 	public static final FrameElement subIframe = new FrameElement("IFrame", By.name("mySecondIFrame"), iframe);
 	public static final TextFieldElement textElementIFrame = new TextFieldElement("Text", By.id("textInIFrameWithValue"), iframe);
+	public static final TextFieldElement notPresentTextElementIFrame = new TextFieldElement("Text", By.id("textNotInIFrameWithValue"), iframe);
 	public static final RadioButtonElement radioElementIFrame = new RadioButtonElement("Radio", By.id("radioClickIFrame"), iframe);
 	public static final CheckBoxElement checkElementIFrame = new CheckBoxElement("Check", By.id("checkboxClickIFrame"), iframe);
 	public static final ButtonElement buttonIFrame = new ButtonElement("Button", By.id("buttonIFrame"), iframe);
@@ -258,6 +259,12 @@ public class DriverTestPage extends PageObject {
     public DriverTestPage _switchAngularWindow() {
     	linkAngular.click();
     	selectNewWindow();
+    	return this;
+    }
+    
+    public DriverTestPage _goToFrame() {
+    	textElementIFrame.getText();
+    	notPresentTextElementIFrame.getTagName();
     	return this;
     }
     
