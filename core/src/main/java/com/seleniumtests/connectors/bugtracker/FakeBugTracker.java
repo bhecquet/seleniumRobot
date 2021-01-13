@@ -18,6 +18,7 @@ public class FakeBugTracker extends BugTracker {
 
 	@Override
 	public void createIssue(IssueBean issueBean) {
+		issueBean.setId("1234");
 		logger.info("issue created");
 	}
 
