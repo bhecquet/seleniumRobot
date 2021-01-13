@@ -110,7 +110,7 @@ public class IssueBean {
         }
 
         date = ZonedDateTime.now().plusHours(3);
-        creationDate = ZonedDateTime.now().plusHours(3);
+        creationDate = ZonedDateTime.now();
         setDescription(StringUtils.stripAccents(description));
     }
 
@@ -164,6 +164,10 @@ public class IssueBean {
 
     public String getCreationDate() {
 		return creationDate.format(formatter);
+	}
+
+	public void setCreationDate(ZonedDateTime creationDate) {
+		this.creationDate = creationDate;
 	}
 
 	public DateTime getJodaDateTime() {
