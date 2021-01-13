@@ -24,6 +24,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -34,6 +35,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.zip.ZipEntry;
+
+import javax.imageio.ImageIO;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -810,5 +813,31 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 		
 		String logs = readSeleniumRobotLogFile();
 		Assert.assertTrue(logs.contains("When using @BeforeMethod / @AfterMethod in tests")); // check error message is shown when parameter is not given to Before / AfterMethod
+	}
+	
+	/**
+	 * issue #414: when we capture the last step whereas we have entered a frame, we should capture the whole browser, not only the frame
+	 * @param testContext
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testCaptureTakenOnLastStep(ITestContext testContext) throws Exception {
+		try {
+			System.setProperty(SeleniumTestsContext.REPLAY_TIME_OUT, "1");
+			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.NONE, new String[] {"testDriverWithFailureAfterSwitchToFrame"});
+			
+			// check image dimensions are high enough to know if all the page has been captured
+			File imageFile = Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriverWithFailureAfterSwitchToFrame", "screenshots", "testDriverWithFailureAfterSwitchToFrame_5-1_Test_e.png").toFile();
+			BufferedImage image = ImageIO.read(imageFile);
+			Assert.assertTrue(image.getHeight() > 2500);
+			Assert.assertTrue(image.getWidth() > 700);
+			
+			
+		} finally {
+
+			System.clearProperty(SeleniumTestsContext.REPLAY_TIME_OUT);
+		}
+		
+	
 	}
 }

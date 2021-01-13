@@ -19,11 +19,8 @@ package com.seleniumtests.it.stubclasses;
 
 import java.lang.reflect.Method;
 
-import org.openqa.selenium.WebDriverException;
-import org.testng.ITestContext;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
@@ -58,6 +55,17 @@ public class StubTestClassForDriverTest extends StubParentClass {
 			._reset()
 			._sendKeysComposite()
 			._clickPicture();
+	}
+	
+	/**
+	 * issue #414
+	 * @throws Exception
+	 */
+	@Test(groups="stub")
+	public void testDriverWithFailureAfterSwitchToFrame() throws Exception {
+		
+		new DriverTestPage(true)
+		._goToFrame();
 	}
 	
 	@Test(groups="stub")
