@@ -68,25 +68,26 @@ public class TestPerformanceReporter extends ReporterTest {
 	@Test(groups={"it"})
 	public void testReportWithSteps(ITestContext testContext) throws Exception {
 
-		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions"});
+		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testWithException"});
 		
 		// check content of summary report file
-		String jmeterReport = readTestMethodPerfFile("testAndSubActions");
+		String jmeterReport = readTestMethodPerfFile("testWithException");
 		
-		Assert.assertTrue(jmeterReport.contains("<testsuite errors=\"0\" failures=\"0\" hostname=\"\" name=\"testAndSubActions\" tests=\"7\" time=\"15"));
+		Assert.assertTrue(jmeterReport.contains("<testsuite errors=\"0\" failures=\"1\" hostname=\"\" name=\"testWithException\" tests=\"6\" time=\""));
 		Assert.assertTrue(jmeterReport.contains("browser=\"NONE\""));
 		Assert.assertTrue(jmeterReport.contains("appVersion=\"" + SeleniumTestsContextManager.getApplicationVersion()));
 		Assert.assertTrue(jmeterReport.contains("coreVersion=\"" + SeleniumTestsContextManager.getCoreVersion()));
-		Assert.assertTrue(jmeterReport.contains("retries=\"0\"")); 
+		Assert.assertTrue(jmeterReport.contains("retries=\"2\"")); 
 		Assert.assertTrue(jmeterReport.contains("mobileApp=\"\""));
 		Assert.assertTrue(jmeterReport.contains("device=\"\"")); 
 		Assert.assertTrue(jmeterReport.contains("failedStep=\"step 1\"")); 
 		Assert.assertTrue(jmeterReport.contains("platform=\"" + OSUtility.getCurrentPlatorm().toString()));
-		Assert.assertTrue(jmeterReport.contains("<testcase classname=\"com.seleniumtests.it.stubclasses.StubTestClass\" name=\"Step 4: step 1\" time=\"1.23\">"));
-		Assert.assertTrue(jmeterReport.contains("<testcase classname=\"com.seleniumtests.it.stubclasses.StubTestClass\" name=\"Step 5: step 2\" time=\"14.03\">"));
+		Assert.assertTrue(jmeterReport.contains("<testcase classname=\"com.seleniumtests.it.stubclasses.StubTestClass\" name=\"Step 4: step 1\" time=\""));
 		
 		// check report contains configuration steps and not internal configuration steps (call to configure() method should not be the first step)
 		Assert.assertTrue(jmeterReport.contains("<testcase classname=\"com.seleniumtests.it.stubclasses.StubTestClass\" name=\"Step 3: Pre test step: set\" time="));
+		Assert.assertTrue(jmeterReport.contains("<testcase classname=\"com.seleniumtests.it.stubclasses.StubTestClass\" name=\"Step 5: Test end\" time="));
+		Assert.assertTrue(jmeterReport.contains("<testcase classname=\"com.seleniumtests.it.stubclasses.StubTestClass\" name=\"Step 6: Post test step: reset\" time="));
 	}
 	
 	/**
@@ -129,21 +130,21 @@ public class TestPerformanceReporter extends ReporterTest {
 	}
 	
 	/**
-	 * Check that when a step contains an exception, this one is written in file
+	 * Check that when a step contains an exception and is failed, this one is written in file
 	 * @param testContext
 	 * @throws Exception
 	 */
 	@Test(groups={"it"})
 	public void testErrorWithException(ITestContext testContext) throws Exception {
 
-		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions"});
+		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testWithException"});
 		
 		// check content of summary report file
-		String jmeterReport = readTestMethodPerfFile("testAndSubActions");
+		String jmeterReport = readTestMethodPerfFile("testWithException");
 		
-		Assert.assertTrue(jmeterReport.contains("<error message=\"class org.openqa.selenium.WebDriverException: driver exception"));
-		Assert.assertTrue(jmeterReport.contains("<![CDATA[class org.openqa.selenium.WebDriverException: driver exception"));
-		Assert.assertTrue(jmeterReport.contains("at com.seleniumtests.it.stubclasses.StubTestClass.testAndSubActions(StubTestClass.java"));
+		Assert.assertTrue(jmeterReport.contains("<error message=\"class com.seleniumtests.customexception.DriverExceptions: some exception\" type=\"\">"));
+		Assert.assertTrue(jmeterReport.contains("<![CDATA[class com.seleniumtests.customexception.DriverExceptions: some exception"));
+		Assert.assertTrue(jmeterReport.contains("at com.seleniumtests.it.stubclasses.StubTestClass.testWithException(StubTestClass.java"));
 	}	
 
 	/**

@@ -503,8 +503,8 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		Assert.assertTrue(mainReportContent.matches(".*<a href\\='testAndSubActions/TestReport\\.html'.*?>testAndSubActions</a>.*"));
 		Assert.assertTrue(mainReportContent.matches(".*<a href\\='testInError/TestReport\\.html'.*?>testInError</a>.*"));
 		
-		// check number of steps is correctly computed. "test1" has 2 main steps, "testInError" has 1 step
-		Assert.assertTrue(mainReportContent.contains("<td name=\"stepsTotal-1\">7<sup><a href=\"#\" data-toggle=\"tooltip\" class=\"failedStepsTooltip\" title=\"1 step(s) failed\">*</a></sup></td>"));
+		// check number of steps is correctly computed. "test1" has 2 main steps and no failed step, "testInError" has 1 step
+		Assert.assertTrue(mainReportContent.contains("<td name=\"stepsTotal-1\">7</td>"));
 		
 		// for second test, test is reported KO whereas all steps are OK because we do not use LogAction.aj
 		// which handles assertion errors and report them in test steps
