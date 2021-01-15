@@ -28,6 +28,14 @@
 	        <name>bintray</name>
 	        <url>http://dl.bintray.com/epam/reportportal</url>
 	     </repository>
+	 	<repository>
+			<snapshots>
+			  	<enabled>false</enabled>
+			</snapshots>
+			<id>atlassian</id>
+			<name>atlassian</name>
+			<url>https://packages.atlassian.com/repository/public</url>
+	     	</repository>
 	</repositories>
 	
 
@@ -154,9 +162,9 @@
 			<version>1.11.3</version>
 		</dependency>
 		<dependency>
-			<groupId>com.oracle</groupId>
-            <artifactId>ojdbc6</artifactId>
-            <version>11.2.0.3</version>
+		  	<groupId>com.oracle.database.jdbc</groupId>
+		  	<artifactId>ojdbc6</artifactId>
+		  	<version>11.2.0.4</version>
 		</dependency>
 		<dependency>
 			<groupId>org.testng</groupId>
@@ -213,7 +221,7 @@
 		<dependency>
 		    <groupId>com.github.javaparser</groupId>
 		    <artifactId>javaparser-core</artifactId>
-		    <version>3.6.21</version>
+		    <version>3.6.22</version>
 		</dependency>
 		<dependency>
 		    <groupId>net.openhft</groupId>
