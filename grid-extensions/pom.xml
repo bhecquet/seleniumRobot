@@ -9,6 +9,10 @@
 
   	<artifactId>grid-extensions</artifactId>
   	<packaging>jar</packaging>
+	
+	<properties>
+		<sonar.projectKey>bhecquet_seleniumRobot-grid-extension</sonar.projectKey>
+	</properties>
 
 	<dependencies>
 		<dependency>
