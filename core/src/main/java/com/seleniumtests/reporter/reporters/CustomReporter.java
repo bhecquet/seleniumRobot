@@ -200,10 +200,12 @@ public class CustomReporter extends CommonReporter implements IReporter {
 			String fileName = reportInfo.prefix 
 								+ "-result" 
 								+ reportInfo.extension;
-			PrintWriter fileWriter = createWriter(seleniumTestsContext.getOutputDirectory(), fileName);
-			fileWriter.write(writer.toString());
-			fileWriter.flush();
-			fileWriter.close();
+			
+			try (PrintWriter fileWriter = createWriter(seleniumTestsContext.getOutputDirectory(), fileName)) {
+			
+				fileWriter.write(writer.toString());
+				fileWriter.flush();
+			}
 			generatedFiles.add(fileName);
 			TestNGResultUtils.setCustomReportCreated(testResult, true);
 		} catch (Exception e) {
@@ -234,10 +236,11 @@ public class CustomReporter extends CommonReporter implements IReporter {
 			t.merge( context, writer );
 			
 			String fileName = reportInfo.prefix + reportInfo.getExtension();
-			PrintWriter fileWriter = createWriter(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), fileName);
-			fileWriter.write(writer.toString());
-			fileWriter.flush();
-			fileWriter.close();
+			
+			try (PrintWriter fileWriter = createWriter(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), fileName)) {
+				fileWriter.write(writer.toString());
+				fileWriter.flush();
+			}
 		} catch (Exception e) {
 			logger.error(String.format("Error generating test summary: %s", e.getMessage()));
 		}

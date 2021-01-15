@@ -31,7 +31,7 @@ public class SafariDriverFactory extends AbstractWebDriverFactory implements IWe
     
     @Override
     protected WebDriver createNativeDriver() {
-    	synchronized (this.getClass()) {
+    	synchronized (SafariDriverFactory.class) {
     		return new SafariDriver((SafariOptions)driverOptions);
     	}
     }

@@ -480,7 +480,7 @@ public class ScreenshotUtil {
         } finally {
         	try {
         		// issue #228: only switch to window if we went out of it
-        		if (windowWithSeleniumfocus != currentWindowHandle) {
+        		if (windowWithSeleniumfocus.equals(currentWindowHandle)) {
         			driver.switchTo().window(currentWindowHandle);
         		}
         		

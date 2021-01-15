@@ -29,13 +29,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-import org.apache.commons.collections.MapUtils;
 import org.apache.commons.io.FileUtils;
-import org.json.JSONObject;
 import org.testng.annotations.Test;
 
 import com.github.javaparser.JavaParser;
@@ -43,9 +42,9 @@ import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.Modifier;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
-import com.github.javaparser.ast.body.FieldDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.comments.Comment;
+import com.github.javaparser.ast.expr.AnnotationExpr;
 import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.expr.ObjectCreationExpr;
 import com.github.javaparser.ast.stmt.BlockStmt;
@@ -75,10 +74,13 @@ public class AppTestDocumentation {
 		File srcDir = Paths.get(args[0].replace(File.separator,  "/"), "src", "test", "java").toFile();
 		
 		// find the root source path (folder where "tests" and "webpage" can be found
-		List<Path> rootFolders = Files.walk(Paths.get(srcDir.getAbsolutePath()))
-		        .filter(Files::isDirectory)
-		        .filter(p -> p.toAbsolutePath().resolve("tests").toFile().exists() && p.toAbsolutePath().resolve("webpage").toFile().exists())
-		        .collect(Collectors.toList());
+		List<Path> rootFolders;
+		try (Stream<Path> files = Files.walk(Paths.get(srcDir.getAbsolutePath()))) {
+			rootFolders = files
+			        .filter(Files::isDirectory)
+			        .filter(p -> p.toAbsolutePath().resolve("tests").toFile().exists() && p.toAbsolutePath().resolve("webpage").toFile().exists())
+			        .collect(Collectors.toList());
+		}
 
 		javadoc = new StringBuilder("Cette page référence l'ensemble des tests et des opération disponible pour l'application\n");
 		
@@ -94,11 +96,11 @@ public class AppTestDocumentation {
 		javadoc.append("\n{toc}\n\n");
 		javadoc.append("${project.summary}\n");
 		javadoc.append("h1. Tests\n");
-		try {
-			List<Path> testsFolders = Files.walk(rootFolder)
-	        .filter(Files::isDirectory)
-	        .filter(p -> p.getFileName().toString().equals("tests"))
-	        .collect(Collectors.toList());
+		try (Stream<Path> files = Files.walk(rootFolder)) {
+			List<Path> testsFolders = files
+		        .filter(Files::isDirectory)
+		        .filter(p -> p.getFileName().toString().equals("tests"))
+		        .collect(Collectors.toList());
 			
 			for (Path testsFolder: testsFolders) {
 				exploreTests(testsFolder.toFile());
@@ -111,8 +113,8 @@ public class AppTestDocumentation {
 		
 		javadoc.append("----");
 		javadoc.append("h1. Pages\n");
-		try {
-			List<Path> pagesFolders = Files.walk(rootFolder)
+		try (Stream<Path> files = Files.walk(rootFolder)) {
+			List<Path> pagesFolders = files
 					.filter(Files::isDirectory)
 					.filter(p -> p.getFileName().toString().equals("webpage"))
 					.collect(Collectors.toList());
@@ -165,8 +167,8 @@ public class AppTestDocumentation {
 	}
 	
 	private static void exploreTests(File srcDir) throws IOException {
-		Files.walk(Paths.get(srcDir.getAbsolutePath()))
-	        .filter(Files::isRegularFile)
+		try (Stream<Path> files = Files.walk(Paths.get(srcDir.getAbsolutePath()))){
+		files.filter(Files::isRegularFile)
 	        .filter(p -> p.getFileName().toString().endsWith(".java"))
 	        .forEach(t -> {
 				try {
@@ -176,6 +178,7 @@ public class AppTestDocumentation {
 					e.printStackTrace();
 				}
 			});
+		}
 		
 		
 	}
@@ -194,17 +197,18 @@ public class AppTestDocumentation {
 	}
 	
 	private static void explorePages(File srcDir) throws IOException {
-		Files.walk(Paths.get(srcDir.getAbsolutePath()))
-        .filter(Files::isRegularFile)
-        .filter(p -> p.getFileName().toString().endsWith(".java"))
-        .forEach(t -> {
-			try {
-				parseWebPage(t);
-			} catch (FileNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-        });
+		try (Stream<Path> files = Files.walk(Paths.get(srcDir.getAbsolutePath()))) {
+			files.filter(Files::isRegularFile)
+	        .filter(p -> p.getFileName().toString().endsWith(".java"))
+	        .forEach(t -> {
+				try {
+					parseWebPage(t);
+				} catch (FileNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+	        });
+		}
 	}
 	
 
@@ -228,24 +232,31 @@ public class AppTestDocumentation {
 	    	// read all method calls so that we can correlate with webpages
 	    	String methodId;
 	    	try {
-	    		BlockStmt body = n.getBody().get();
+	    		Optional<BlockStmt> optBody = n.getBody();
+	    		Optional<Node> optParentNode = n.getParentNode();
 	    		
-	    		methodId = ((ClassOrInterfaceDeclaration)(n.getParentNode().get())).getNameAsString() + "." + n.getNameAsString();
-	  
-	    		stepsUsedInTests.put(methodId, new ArrayList<>());
-	    		
-	    		for (Node instruction: body.getChildNodes()) {
-	    			
-	    			for (MethodCallExpr methodCall: instruction.findAll(MethodCallExpr.class)) {
-	    				String methodName = methodCall.getNameAsString();
-	    				if (methodName.endsWith("param") 
-	    						|| methodName.equals("contains") 
-	    						|| methodName.startsWith("assert")) {
-	    					continue;
-	    				}
-	    				stepsUsedInTests.get(methodId).add(methodName);
-	    			}
-	    			
+	    		if (optBody.isPresent() && optParentNode.isPresent()) {
+		    		BlockStmt body = optBody.get();
+		    		
+		    		methodId = ((ClassOrInterfaceDeclaration)(optParentNode.get())).getNameAsString() + "." + n.getNameAsString();
+		  
+		    		stepsUsedInTests.put(methodId, new ArrayList<>());
+		    		
+		    		for (Node instruction: body.getChildNodes()) {
+		    			
+		    			for (MethodCallExpr methodCall: instruction.findAll(MethodCallExpr.class)) {
+		    				String methodName = methodCall.getNameAsString();
+		    				if (methodName.endsWith("param") 
+		    						|| methodName.equals("contains") 
+		    						|| methodName.startsWith("assert")) {
+		    					continue;
+		    				}
+		    				stepsUsedInTests.get(methodId).add(methodName);
+		    			}
+		    		}
+		    		
+	    		} else {
+	    			return;
 	    		}
 	    	} catch (NoSuchElementException | ClassCastException e) {
 	    		// we expect that 'n' is a method, and its parent is the class itself. We do not support, for example enumeration
@@ -254,20 +265,20 @@ public class AppTestDocumentation {
 	    	
 	    	
 	    	// ignore non test methods
-	    	try {
-	    		n.getAnnotationByClass(Test.class).get();
-	    	} catch (NoSuchElementException e) {
+	    	Optional<AnnotationExpr> optAnnotation = n.getAnnotationByClass(Test.class);
+	    	if (!optAnnotation.isPresent()) {
 	    		return;
 	    	}
 	    	
 	    	tests.add(methodId);
 
 	    	javadoc.append(String.format("\nh4. Test: %s\n", n.getNameAsString()));
-    		try {
-    			Comment comment = n.getComment().get();
+    		
+	    	Optional<Comment> optComment = n.getComment();
+	    	if (optComment.isPresent()) {
+    			Comment comment = optComment.get();
 				javadoc.append(formatJavadoc(comment.getContent()));
-    		} catch (NoSuchElementException e) {
-    		}
+    		} 
 	    }
 	}
 	
@@ -283,11 +294,12 @@ public class AppTestDocumentation {
 			steps.add(n.getNameAsString());
 
 			javadoc.append(String.format("\nh4. Operation: %s\n", n.getNameAsString()));
-			try {
-				Comment comment = n.getComment().get();
+			
+			Optional<Comment> optComment = n.getComment();
+	    	if (optComment.isPresent()) {
+				Comment comment = optComment.get();
 				javadoc.append(formatJavadoc(comment.getContent()));
-			} catch (NoSuchElementException e) {
-			}
+			} 
 		}
 	}
 	

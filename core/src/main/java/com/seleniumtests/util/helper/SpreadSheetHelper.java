@@ -448,8 +448,8 @@ public class SpreadSheetHelper {
         // Return null when field is atomic and value is null or blank
         if ((tempValue == null || tempValue.length() == 0)
                 && (fieldClz.isEnum() 
-                		|| "java.util.Calendar".equals(fieldClz.getName())
-                		|| "java.math.BigDecimal".equals(fieldClz.getName()) 
+                		|| fieldClz.isAssignableFrom(Calendar.class)
+                		|| fieldClz.isAssignableFrom(BigDecimal.class) 
                 		|| isPrimitive(fieldClz))) {
             return null;
         }
@@ -460,7 +460,7 @@ public class SpreadSheetHelper {
             } catch (Exception e) {
                 logger.warn("Ex", e);
             }
-        } else if ("java.util.Calendar".equals(fieldClz.getName())) {
+        } else if (fieldClz.isAssignableFrom(Calendar.class)) {
             Calendar calendar = Calendar.getInstance();
             try {
                 calendar.setTime(new SimpleDateFormat("MM/dd/yyyy").parse(tempValue));
@@ -475,12 +475,12 @@ public class SpreadSheetHelper {
             }
 
             fieldValue = calendar;
-        } else if ("java.math.BigDecimal".equals(fieldClz.getName())) {
+        } else if (fieldClz.isAssignableFrom(BigDecimal.class)) {
             fieldValue = new BigDecimal(tempValue);
         } else if (isPrimitive(fieldClz)) {
             Constructor<?> constructor;
             try {
-                if ("java.lang.String".equals(fieldClz.getName())) {
+                if (fieldClz.isAssignableFrom(String.class)) {
                     fieldValue = tempValue;
                 } else {
                     if (PRIMITIVE_TYPE_MAP.containsKey(fieldClz)) {

@@ -333,9 +333,9 @@ public class BrowserInfo {
 			defaultProfilePath = String.format("/Users/%s/Library/Application Support/Firefox/Profiles/", System.getProperty("user.name"));
 		}
 		// search "default" profile
-		try {
-	
-			List<Path> profilePaths = Files.list(Paths.get(defaultProfilePath))
+		try (Stream<Path> files = Files.list(Paths.get(defaultProfilePath))) {
+
+			List<Path> profilePaths = files
 			    .filter(Files::isDirectory)
 			    .filter(p -> p.toString().endsWith(".default"))
 			    .collect(Collectors.toList());

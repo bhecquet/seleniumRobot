@@ -380,7 +380,11 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 					WaitHelper.waitForSeconds(1);
 				}
 			}
-			return response.optBoolean("isOkWithSnapshots", true);
+			if (response != null) {
+				return response.optBoolean("isOkWithSnapshots", true);
+			} else {
+				return true;
+			}
 			
 		} catch (UnirestException e) {
 			logger.error("Cannot get comparison result for this test case. So result is expected to be OK", e);

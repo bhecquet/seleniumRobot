@@ -218,11 +218,12 @@ public class FileUtility {
                 } else {
                     //noinspection ResultOfMethodCallIgnored
                     entryDestination.getParentFile().mkdirs();
-                    final InputStream in = zipFile.getInputStream(entry);
-                    final OutputStream out = new FileOutputStream(entryDestination);
-                    IOUtils.copy(in, out);
-                    IOUtils.closeQuietly(in);
-                    out.close();
+                    try (final InputStream in = zipFile.getInputStream(entry);
+                    	 final OutputStream out = new FileOutputStream(entryDestination)) {
+                    
+	                    IOUtils.copy(in, out);
+	                    IOUtils.closeQuietly(in);
+                    }
                 }
             }
         }

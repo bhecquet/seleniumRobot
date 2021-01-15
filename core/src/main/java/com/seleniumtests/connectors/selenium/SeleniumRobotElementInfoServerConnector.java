@@ -145,31 +145,31 @@ public class SeleniumRobotElementInfoServerConnector extends SeleniumRobotServer
 							.field("uuid", currentElementInfo.getId())
 							.field("name", currentElementInfo.getName());
 					
-					if (currentElementInfo.getCoordX() != referenceElementInfo.getCoordX()) {
+					if (currentElementInfo.getCoordX().equals(referenceElementInfo.getCoordX())) {
 						request = request.field("coordX", currentElementInfo.getCoordX().toString());
 					}
-					if (currentElementInfo.getCoordY() != referenceElementInfo.getCoordY()) {
+					if (currentElementInfo.getCoordY().equals(referenceElementInfo.getCoordY())) {
 						request = request.field("coordY", currentElementInfo.getCoordY().toString());
 					}
-					if (currentElementInfo.getWidth() != referenceElementInfo.getWidth()) {
+					if (currentElementInfo.getWidth().equals(referenceElementInfo.getWidth())) {
 						request = request.field("width", currentElementInfo.getWidth().toString());
 					}
-					if (currentElementInfo.getHeight() != referenceElementInfo.getHeight()) {
+					if (currentElementInfo.getHeight().equals(referenceElementInfo.getHeight())) {
 						request = request.field("height", currentElementInfo.getHeight().toString());
 					}
-					if (currentElementInfo.getLocator() != referenceElementInfo.getLocator()) {
+					if (currentElementInfo.getLocator().equals(referenceElementInfo.getLocator())) {
 						request = request.field("locator", currentElementInfo.getLocator());
 					}
-					if (currentElementInfo.getTagName() != referenceElementInfo.getTagName()) {
+					if (currentElementInfo.getTagName().equals(referenceElementInfo.getTagName())) {
 						request = request.field("tagName", currentElementInfo.getTagName());
 					}
-					if (currentElementInfo.getText() != referenceElementInfo.getText()) {
+					if (currentElementInfo.getText().equals(referenceElementInfo.getText())) {
 						request = request.field("text", currentElementInfo.getText());
 					}
-					if (currentElementInfo.getB64Image() != referenceElementInfo.getB64Image()) {
+					if (currentElementInfo.getB64Image().equals(referenceElementInfo.getB64Image())) {
 						request = request.field("b64Image", currentElementInfo.getB64Image());
 					}
-					if (currentElementInfo.getAttributes() != referenceElementInfo.getAttributes()) {
+					if (currentElementInfo.getAttributes().equals(referenceElementInfo.getAttributes())) {
 						request = request.field("attributes", new JSONObject(currentElementInfo.getAttributes()).toString());
 					}
 					if (currentElementInfo.getTotalSearch() != referenceElementInfo.getTotalSearch()) {

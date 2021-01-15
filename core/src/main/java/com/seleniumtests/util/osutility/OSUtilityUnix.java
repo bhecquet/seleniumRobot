@@ -92,11 +92,7 @@ public class OSUtilityUnix extends OSUtility {
      */
 	@Override
 	public String killProcessByName(String programName, boolean force) {
-		if (force) {
-    		return OSCommand.executeCommandAndWait("killall -I " + programName);
-    	} else {
-    		return OSCommand.executeCommandAndWait("killall -I " + programName);
-    	}
+    	return OSCommand.executeCommandAndWait("killall -I " + programName);
 	}
 
 	@Override
