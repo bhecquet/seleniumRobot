@@ -346,7 +346,6 @@ public class BrowserInfo {
 			}
 		} catch (IOException | NullPointerException e) {
 			defaultProfilePath = null;
-			e.printStackTrace();
 		}
 	}
 	

@@ -308,7 +308,7 @@ public class AppTestDocumentation {
 		public void visit(ClassOrInterfaceDeclaration n, String objectType) {
 			Optional<Comment> optComment = n.getComment();
 			if (optComment.isPresent()) {
-				Comment comment = n.getComment().get();
+				Comment comment = optComment.get();
 				javadoc.append(String.format("{panel}%s{panel}\n", formatJavadoc(comment.getContent())));
 			} else {
 				javadoc.append(String.format("{panel}%s de la classe %s{panel}\n", objectType, n.getNameAsString()));
