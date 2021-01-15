@@ -1254,7 +1254,7 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
 	public static File stopVideoCapture(DriverMode driverMode, SeleniumGridConnector gridConnector, VideoRecorder recorder) throws IOException {
 		if (driverMode == DriverMode.LOCAL && recorder != null) {
 			return recorder.stop();
-		} else if (driverMode == DriverMode.GRID && gridConnector != null) {
+		} else if (driverMode == DriverMode.GRID && gridConnector != null && recorder != null) {
 			return gridConnector.stopVideoCapture(Paths.get(recorder.getFolderPath().getAbsolutePath(), recorder.getFileName()).toString());
 			
 		} else {

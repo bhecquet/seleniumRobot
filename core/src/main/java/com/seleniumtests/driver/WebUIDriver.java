@@ -388,6 +388,7 @@ public class WebUIDriver {
      */
     private static void cleanUpWebUIDriver() {
         uxDriverSession.remove();
+        currentWebUiDriverName.remove();
     }
 
 	/**
@@ -396,7 +397,12 @@ public class WebUIDriver {
      * @return  webDriver
      */
     public static WebDriver getNativeWebDriver() {
-        return ((CustomEventFiringWebDriver) getWebDriver(true)).getWebDriver();
+    	CustomEventFiringWebDriver eventFiringWebDriver = (CustomEventFiringWebDriver) getWebDriver(true);
+    	if (eventFiringWebDriver != null) {
+    		return eventFiringWebDriver.getWebDriver();
+    	} else {
+    		return null;
+    	}
     }
 
 	public static BrowserMobProxy getBrowserMobProxy() {
@@ -482,20 +488,22 @@ public class WebUIDriver {
         if (createDriver) {
         	
         	WebUIDriver uiDriver = getWebUIDriver(true, driverName);
-        	uiDriver.config.setAttachExistingDriverPort(attachExistingDriverPort);
-        	
-        	if (browserType == null) {
-        		uiDriver.config.setBrowserType(SeleniumTestsContextManager.getThreadContext().getBrowser());
-        	} else {
-        		uiDriver.config.setBrowserType(browserType);
+        	if (uiDriver != null) {
+	        	uiDriver.config.setAttachExistingDriverPort(attachExistingDriverPort);
+	        	
+	        	if (browserType == null) {
+	        		uiDriver.config.setBrowserType(SeleniumTestsContextManager.getThreadContext().getBrowser());
+	        	} else {
+	        		uiDriver.config.setBrowserType(browserType);
+	        	}
+	        	
+	        	// expect the new driver to run on same node as the previous ones
+	        	if (uxDriverSession.get() != null && uxDriverSession.get().size() > 1 && uiDriver.config.getSeleniumGridConnector() != null) {
+	        		uiDriver.config.setRunOnSameNode(SeleniumTestsContextManager.getThreadContext().getSeleniumGridConnector().getNodeUrl());
+	        	}
+	        	
+	        	uiDriver.createWebDriver();
         	}
-        	
-        	// expect the new driver to run on same node as the previous ones
-        	if (uxDriverSession.get() != null && uxDriverSession.get().size() > 1 && uiDriver.config.getSeleniumGridConnector() != null) {
-        		uiDriver.config.setRunOnSameNode(SeleniumTestsContextManager.getThreadContext().getSeleniumGridConnector().getNodeUrl());
-        	}
-        	
-        	uiDriver.createWebDriver();
         } else {
         	setCurrentWebUiDriverName(driverName);
         }

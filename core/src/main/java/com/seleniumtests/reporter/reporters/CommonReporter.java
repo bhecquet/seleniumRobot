@@ -112,9 +112,11 @@ public abstract class CommonReporter implements IReporter {
 		File f = new File(outDir, fileName);
 		logger.info("generating report " + f.getAbsolutePath());
 
-		OutputStream out = new FileOutputStream(f);
-		Writer writer = new BufferedWriter(new OutputStreamWriter(out, "utf-8"));
-		return new PrintWriter(writer);
+		try (OutputStream out = new FileOutputStream(f)) {
+			Writer writer = new BufferedWriter(new OutputStreamWriter(out, "utf-8"));
+			return new PrintWriter(writer); 
+		}
+		
 	}
 	
 	/**

@@ -13,6 +13,7 @@ import com.github.javaparser.JavaParser;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.expr.AnnotationExpr;
+import com.github.javaparser.ast.stmt.BlockStmt;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.TestVariable;
@@ -123,26 +124,30 @@ public class SeleniumIdeParser {
 			
 			// code is always copied to PageObject
     		pageCode.append(n.getDeclarationAsString());
-			String body = n.getBody().get().toString().replace("\r", "");
-			for (String line: body.split("\n")) {
-				if (line.contains("System.out.println(\"STEP:") && System.getProperty(SeleniumTestsContext.MANUAL_TEST_STEPS) == "true") {
-					pageCode.append(line.replace("System.out.println(\"STEP:", "addStep(\"") + "\n");
-				} else if (line.contains("System.out.println(")) {
-					pageCode.append(line.replace("System.out.println(", "logger.info(") + "\n");
-				} else {
-		    		pageCode.append(line + "\n");
+    		
+    		Optional<BlockStmt> optBody = n.getBody();
+    		if (optBody.isPresent()) {
+				String body = optBody.get().toString().replace("\r", "");
+				for (String line: body.split("\n")) {
+					if (line.contains("System.out.println(\"STEP:") && "true".equals(System.getProperty(SeleniumTestsContext.MANUAL_TEST_STEPS))) {
+						pageCode.append(line.replace("System.out.println(\"STEP:", "addStep(\"") + "\n");
+					} else if (line.contains("System.out.println(")) {
+						pageCode.append(line.replace("System.out.println(", "logger.info(") + "\n");
+					} else {
+			    		pageCode.append(line + "\n");
+					}
 				}
-			}
-    		pageCode.append("\n\n");
-
-    		// in case of a Test method, create a reference to PageObject method
-	    	Optional<AnnotationExpr> testAnnotation = n.getAnnotationByName("Test");
-	    	if (testAnnotation.isPresent()) {
-	    		tCode.append("	@Test\n");
-	    		tCode.append(String.format("	%s throws IOException {\n", n.getDeclarationAsString()));
-	    		tCode.append(String.format("		new WebPage().%s();\n", n.getNameAsString()));
-	    		tCode.append("	}\n\n");
-	    	} 
+	    		pageCode.append("\n\n");
+	
+	    		// in case of a Test method, create a reference to PageObject method
+		    	Optional<AnnotationExpr> testAnnotation = n.getAnnotationByName("Test");
+		    	if (testAnnotation.isPresent()) {
+		    		tCode.append("	@Test\n");
+		    		tCode.append(String.format("	%s throws IOException {\n", n.getDeclarationAsString()));
+		    		tCode.append(String.format("		new WebPage().%s();\n", n.getNameAsString()));
+		    		tCode.append("	}\n\n");
+		    	} 
+    		}
 	    	
 	    	// TODO: steps
 	    }

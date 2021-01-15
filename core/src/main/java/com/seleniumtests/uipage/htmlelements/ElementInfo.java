@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
@@ -338,15 +339,16 @@ public class ElementInfo {
 	 */
 	public static Map<String, ElementInfo> getAllStoredElementInfos(boolean reference) {
 		Map<String, ElementInfo> elementInfos = new HashMap<>();
-		try {
-			for (Path jsonFile: Files.walk(reference ? ELEMENT_INFO_REFERENCE_LOCATION: ELEMENT_INFO_LOCATION)
+		try (Stream<Path> files = Files.walk(reference ? ELEMENT_INFO_REFERENCE_LOCATION: ELEMENT_INFO_LOCATION)) {
+			
+			for (Path jsonFile: files
 			        .filter(Files::isRegularFile)
 			        .collect(Collectors.toList())) {
 				
 				ElementInfo elementInfo = ElementInfo.readFromJsonFile(jsonFile.toFile());
-				try {
+				if (elementInfo != null) {
 					elementInfos.put(elementInfo.getId(), elementInfo);
-				} catch (NullPointerException e) {}
+				}
 			}
 		} catch (IOException e) {
 		}
@@ -363,15 +365,15 @@ public class ElementInfo {
 	}
 	private static void purgeElementInfo(int delay) {
 
-		try {
-			Files.walk(ELEMENT_INFO_LOCATION)
-			        .filter(Files::isRegularFile)
-			        .filter(p -> p.toFile().lastModified() < LocalDateTime.now().minusDays(delay).toEpochSecond(ZoneOffset.UTC) * 1000)
-			        .forEach(t -> {
-						try {
-							Files.delete(t);
-						} catch (IOException e) {}
-					});
+		try (Stream<Path> files = Files.walk(ELEMENT_INFO_LOCATION)) {
+			
+	        files.filter(Files::isRegularFile)
+		        .filter(p -> p.toFile().lastModified() < LocalDateTime.now().minusDays(delay).toEpochSecond(ZoneOffset.UTC) * 1000)
+		        .forEach(t -> {
+					try {
+						Files.delete(t);
+					} catch (IOException e) {}
+				});
 			
 		} catch (IOException e) {
 		}

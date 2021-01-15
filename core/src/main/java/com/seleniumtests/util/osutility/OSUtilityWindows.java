@@ -69,7 +69,7 @@ public class OSUtilityWindows extends OSUtility {
     	 */
     	String command = System.getenv("windir") + "\\system32\\" + "tasklist.exe /NH /SVC";
     	List<String> strProcessList = Arrays.asList(OSCommand.executeCommandAndWait(command).split("\n"));
-    	Pattern pTasklist = Pattern.compile("(system|.*?)\\s+(\\d+)\\s+.*");
+    	Pattern pTasklist = Pattern.compile("(.*?)\\s+(\\d+)\\s+.*");
     	
     	List<ProcessInfo> processInfoList = new ArrayList<>();
     	for (String sentence : strProcessList) {
