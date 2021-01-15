@@ -222,7 +222,9 @@ public class TaScriptGenerator {
 		for (File file: taFiles) {
 			if (!taFileNames.contains(file.getName()) && file.getName().startsWith("g__")) {
 				logger.info("deleting " + file);
-				file.delete();
+				if(!file.delete()) {
+					logger.warn(String.format("File %s not deleted", file.getAbsolutePath()));
+				}
 			}
 		}
 	}

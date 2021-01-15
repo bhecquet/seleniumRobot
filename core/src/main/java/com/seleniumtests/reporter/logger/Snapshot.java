@@ -125,7 +125,9 @@ public class Snapshot extends TestAction {
     			}
     			
 				FileUtils.copyFile(oldFile, new File(screenshot.getFullHtmlPath()));
-				new File(oldFullPath).delete();
+				if (!new File(oldFullPath).delete()) {
+					logger.warn(String.format("Could not delete %s", oldFullPath));
+				}
 				
 			} catch (IOException e) {
 				screenshot.setHtmlSourcePath(oldPath);

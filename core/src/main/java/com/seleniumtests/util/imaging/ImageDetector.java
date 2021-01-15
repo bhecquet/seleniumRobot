@@ -430,7 +430,8 @@ public class ImageDetector {
     		
         	// shortcut if we find a very good match
     		double cleanThreshold = currentThreshold;
-    		matches.sort((TemplateMatchProperties t1, TemplateMatchProperties t2) -> -(t1.getMatchValue().compareTo(t2.getMatchValue())));
+    		matches.sort((TemplateMatchProperties t1, TemplateMatchProperties t2) -> t1.getMatchValue().compareTo(t2.getMatchValue()));
+    		Collections.reverse(matches); // reverse the list as we want the first element to be the best match
     		if (!matches.isEmpty() && matches.get(0).getMatchValue() > 0.9) {
     			cleanThreshold = 0.9;
     			currentStep = Math.min(currentStep, 50);
@@ -447,8 +448,8 @@ public class ImageDetector {
         }
 		
 		// get the best match
-		matches.sort((TemplateMatchProperties t1, TemplateMatchProperties t2) -> -(t1.getMatchValue().compareTo(t2.getMatchValue())));
-		
+		matches.sort((TemplateMatchProperties t1, TemplateMatchProperties t2) -> t1.getMatchValue().compareTo(t2.getMatchValue()));
+		Collections.reverse(matches); // reverse the list as we want the first element to be the best match
 		if (!matches.isEmpty()) {
 			TemplateMatchProperties bestMatch = matches.get(0);
 			if (bestMatch.getMatchValue() < 1 - detectionThreshold) {

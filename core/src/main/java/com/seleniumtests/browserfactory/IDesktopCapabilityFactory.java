@@ -76,7 +76,9 @@ public abstract class IDesktopCapabilityFactory extends ICapabilitiesFactory {
     		System.setProperty(getDriverExeProperty(), newDriverPath);
     		
     		if (!OSUtility.isWindows()) {
-                new File(newDriverPath).setExecutable(true);
+                if (!new File(newDriverPath).setExecutable(true)) {
+                	logger.error(String.format("Error setting executable on driver %s", newDriverPath));
+                }
             }
     	}
 		

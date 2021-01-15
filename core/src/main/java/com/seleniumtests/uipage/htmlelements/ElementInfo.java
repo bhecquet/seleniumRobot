@@ -306,9 +306,8 @@ public class ElementInfo {
 	
 	private void delete() {
 		if (new File(path).exists()) {
-			try {
-				new File(path).delete();
-			} catch (Exception e) {
+
+			if (!new File(path).delete()) {
 				logger.error("Failed to delete elementInfo file for: " + name);
 			}
 		}

@@ -127,7 +127,9 @@ public class VideoRecorder {
 				
 				// remove temp files
 				for (File f: createdFiles) {
-					f.delete();
+					if (!f.delete()) {
+						logger.info("could not delete video temp file");
+					}
 				}
 				
 				return videoFile;
