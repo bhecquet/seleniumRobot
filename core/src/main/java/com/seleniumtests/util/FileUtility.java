@@ -99,10 +99,14 @@ public class FileUtility {
         }
 
         FileUtils.deleteDirectory(new File(storeLocation + "\\META-INF"));
+        File classFile;
         if (OSUtility.isWindows()) {
-            new File(storeLocation + "\\" + clz.getCanonicalName().replaceAll("\\.", "\\\\") + ".class").delete();
+            classFile = new File(storeLocation + "\\" + clz.getCanonicalName().replaceAll("\\.", "\\\\") + ".class");
         } else {
-            new File(storeLocation + "/" + clz.getCanonicalName().replaceAll("\\.", "/") + ".class").delete();
+        	classFile = new File(storeLocation + "/" + clz.getCanonicalName().replaceAll("\\.", "/") + ".class");
+        }
+        if (!classFile.delete()) {
+        	logger.warn("Cannot delete class file");
         }
     }
 

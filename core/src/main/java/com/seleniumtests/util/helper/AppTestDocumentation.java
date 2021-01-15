@@ -306,10 +306,11 @@ public class AppTestDocumentation {
 	private static class ClassVisitor extends VoidVisitorAdapter<String> {
 		
 		public void visit(ClassOrInterfaceDeclaration n, String objectType) {
-			try {
+			Optional<Comment> optComment = n.getComment();
+			if (optComment.isPresent()) {
 				Comment comment = n.getComment().get();
 				javadoc.append(String.format("{panel}%s{panel}\n", formatJavadoc(comment.getContent())));
-			} catch (NoSuchElementException e) {
+			} else {
 				javadoc.append(String.format("{panel}%s de la classe %s{panel}\n", objectType, n.getNameAsString()));
 			}
 			

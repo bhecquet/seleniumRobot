@@ -98,7 +98,9 @@ public class SeleniumRobotTestPlan {
 	        	logger.info("Video file copied to " + videoFile.getAbsolutePath());
 	        	
 			} else {
-				videoFile.delete();
+				if (!videoFile.delete()) {
+					logger.warn(String.format("Video file %s not deleted", videoFile.getAbsoluteFile()));
+				}
 			}
 		}
 

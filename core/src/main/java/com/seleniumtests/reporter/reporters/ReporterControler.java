@@ -397,7 +397,9 @@ public class ReporterControler implements IReporter {
 		
 		for (File file: allFiles) {
 			if (!usedFiles.contains(file)) {
-				file.delete();
+				if (!file.delete()) {
+					logger.info(String.format("File %s not deleted", file.getAbsolutePath()));
+				}
 			}
 		}
 	}

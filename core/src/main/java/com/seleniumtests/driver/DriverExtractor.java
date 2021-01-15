@@ -125,7 +125,9 @@ public class DriverExtractor {
 		
 		try {
 			Files.copy(driver, driverPath, StandardCopyOption.REPLACE_EXISTING);
-			driverPath.toFile().setExecutable(true);
+			if (!driverPath.toFile().setExecutable(true)) {
+				logger.warn(String.format("Driver %s could not be set to executable", driverPath));
+			}
 			logger.info(String.format("Driver %s copied to %s", driverName, driverPath));
 		} catch (IOException e) {
 			logger.info(String.format("Driver not copied: %s - it may be in use", driverName));

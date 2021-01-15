@@ -445,7 +445,9 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 		try {
 			
 			// delete file if it exists as '.asFile()' will not overwrite it
-			new File(outputFile).delete();
+			if (new File(outputFile).exists() && !new File(outputFile).delete()) {
+				logger.warn("Error deleting previous video file, there may be a problem getting the new one");
+			}
 			HttpResponse<File> videoResponse = Unirest.get(String.format("%s%s", nodeUrl, NODE_TASK_SERVLET))
 				.queryString("action", "stopVideoCapture")
 				.queryString("session", sessionId).asFile(outputFile);

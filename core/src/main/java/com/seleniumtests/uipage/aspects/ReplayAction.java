@@ -156,7 +156,7 @@ public class ReplayAction {
 	    				throw e;
 		    		}
 	
-		    		if (end.minusMillis(replay.replayDelayMs() + 100).isAfter(systemClock.instant())) {
+		    		if (end.minusMillis(replay.replayDelayMs() + 100L).isAfter(systemClock.instant())) {
 		    			WaitHelper.waitForMilliSeconds(replay.replayDelayMs());
 					} else {
 						if (e instanceof NoSuchElementException) {
