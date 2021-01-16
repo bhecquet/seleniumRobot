@@ -40,7 +40,6 @@ import org.openqa.selenium.InvalidElementStateException;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.NoSuchFrameException;
-import org.openqa.selenium.NotFoundException;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.Rectangle;
@@ -70,7 +69,6 @@ import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import com.seleniumtests.driver.DriverConfig;
 import com.seleniumtests.driver.TestType;
 import com.seleniumtests.driver.WebUIDriver;
-import com.seleniumtests.reporter.logger.TestLogging;
 import com.seleniumtests.uipage.ExpectedConditionsC;
 import com.seleniumtests.uipage.PageObject;
 import com.seleniumtests.uipage.ReplayOnError;
@@ -102,10 +100,10 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     protected static Logger logger = SeleniumRobotLogger.getLogger(HtmlElement.class);
 	private static ScenarioLogger scenarioLogger = ScenarioLogger.getScenarioLogger(TestRetryAnalyzer.class);
 	
-    public static Integer FIRST_VISIBLE = Integer.MAX_VALUE;
-    public static Integer OPTIMAL_SCROLLING = Integer.MAX_VALUE;
+    public static final Integer FIRST_VISIBLE = Integer.MAX_VALUE;
+    public static final Integer OPTIMAL_SCROLLING = Integer.MAX_VALUE;
     
-    String JS_CLICK_TRIPLE = 
+    private static final String JS_CLICK_TRIPLE = 
     		  "var target = arguments[0];" +
     		  "emit('mousedown', {buttons: 1}); " +
     		  "emit('mouseup',   {});" +
@@ -119,13 +117,13 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     		    "target.dispatchEvent(new MouseEvent(name, init));" +
     		  "}" ;
 
-    String JS_CLICK_DOUBLE = 
+    private static final String JS_CLICK_DOUBLE = 
     		"if(document.createEvent){"
-    		+ "		var evObj = document.createEvent('MouseEvents');"
-    		+ "		evObj.initEvent('dblclick', true, false); "
-    		+ "		arguments[0].dispatchEvent(evObj);"
+    		+ "   var evObj = document.createEvent('MouseEvents');"
+    		+ "   evObj.initEvent('dblclick', true, false); "
+    		+ "   arguments[0].dispatchEvent(evObj);"
     		+ "} else if(document.createEventObject) { "
-    		+ "		arguments[0].fireEvent('ondblclick');"
+    		+ "   arguments[0].fireEvent('ondblclick');"
     		+ "}";
     
     
@@ -642,7 +640,9 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     	if (SeleniumTestsContextManager.getThreadContext().getAdvancedElementSearch() != ElementInfo.Mode.FALSE) {
     		try {
     			elementInfo = ElementInfo.getInstance(this);
-    		} catch (Throwable e) {}
+    		} catch (Exception e) {
+    			logger.infor("Error getting element info");
+    		}
     	}
     	
     	// if a parent is defined, search for it before getting the sub element
@@ -696,7 +696,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
         	try {
 	        	elementInfo.updateInfo(this);
 	        	elementInfo.exportToJsonFile(false, this);
-        	} catch (Throwable e) {
+        	} catch (Exception e) {
         		logger.warn("Error storing element information: " + e.getMessage());
         	}
         }
@@ -819,16 +819,16 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 					changeCssAttribute(element, "top", heightPosition + "px"); 
 					changeCssAttribute(element, "position", "inherit");
 				}
-				if ((Boolean)executeScript("return getComputedStyle(arguments[0]).display === 'none'", element)) {
+				if (Boolean.TRUE.equals((Boolean)executeScript("return getComputedStyle(arguments[0]).display === 'none'", element))) {
 					changeCssAttribute(element, "display", "block");
 				}
-				if ((Boolean)executeScript("return getComputedStyle(arguments[0]).visibility !== 'visible'", element)) {
+				if (Boolean.TRUE.equals((Boolean)executeScript("return getComputedStyle(arguments[0]).visibility !== 'visible'", element))) {
 					changeCssAttribute(element, "visibility", "visible");
 				}
-				if ((Boolean)executeScript("return getComputedStyle(arguments[0]).opacity === '0'", element)) {
+				if (Boolean.TRUE.equals((Boolean)executeScript("return getComputedStyle(arguments[0]).opacity === '0'", element))) {
 					changeCssAttribute(element, "opacity", "1");
 				}
-//				changeCssAttribute(element, "clip", "auto");
+
 				changeCssAttribute(element, "zIndex", "100000");
 			} catch (Exception e) {
 				return;
@@ -946,6 +946,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
      * Executes the given JavaScript against the underlying WebElement.
      *
      * @param   script
+     * @deprecated ...
      *
      * @return
      */
@@ -1529,6 +1530,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 		            outlineElement(elt);
 		    		return;
 	    		} catch (TimeoutException e) {
+	    			// nothing to do
 	    		} 
 	    	}
 	    	throw new TimeoutException("Element is not present", new NoSuchElementException(toString()));
@@ -1549,6 +1551,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 	    			new WebDriverWait(driver, timeout).ignoring(ConfigurationException.class, ScenarioException.class).until(condition);
 		    		return;
 	    		} catch (TimeoutException e) {
+	    			// nothing to do
 	    		}
 	    	}
 	    	throw new TimeoutException("Element is not present", new NoSuchElementException(toString()));
