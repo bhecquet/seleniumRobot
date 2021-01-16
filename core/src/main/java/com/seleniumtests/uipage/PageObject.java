@@ -81,7 +81,9 @@ import com.seleniumtests.util.helper.WaitHelper;
 
 public class PageObject extends BasePage implements IPage {
 
-    private boolean frameFlag = false;
+    private static final String ELEMENT_S_IS_NOT_AN_HTML_ELEMENT_SUBCLASS = "Element %s is not an HtmlElement subclass";
+	private static final String ERROR_ELEMENT_IS_PRESENT = "Element %s is present";
+	private boolean frameFlag = false;
     private String windowHandle = null; // store the window / tab on which this page is loaded
     private String url = null;
     private String suiteName = null;
@@ -92,6 +94,8 @@ public class PageObject extends BasePage implements IPage {
     private ScreenshotUtil screenshotUtil;
     private Clock systemClock;
     private PageLoadStrategy pageLoadStrategy;
+    
+    private static final String ERROR_ELEMENT_NOT_PRESENT = "Element %s is not present";
 
     /**
      * Constructor for non-entry point page. The control is supposed to have reached the page from other API call.
@@ -285,7 +289,7 @@ public class PageObject extends BasePage implements IPage {
      * @param url
      * @throws IOException
      */
-    private void openPage(String url) throws IOException {
+    private void openPage(String url) {
     	if (url != null) {
             open(url);
             ((CustomEventFiringWebDriver)driver).updateWindowsHandles();
@@ -296,15 +300,16 @@ public class PageObject extends BasePage implements IPage {
         // in case of mobile application, only capture screenshot
         if (SeleniumTestsContextManager.isWebTest()) {
             waitForPageToLoad();
-        } else if (SeleniumTestsContextManager.isAppTest()) {
-        	if (captureSnapshot) {
-        		capturePageSnapshot();
-        	}
+        } else if (SeleniumTestsContextManager.isAppTest() && captureSnapshot) {
+        	capturePageSnapshot();
+        
         }
     }
 
     @Override
-    protected void assertCurrentPage(boolean log) {}
+    protected void assertCurrentPage(boolean log) {
+    	// not used
+    }
     
     @Override
     protected void assertCurrentPage(boolean log, HtmlElement pageIdentifierElement) {
@@ -600,7 +605,7 @@ public class PageObject extends BasePage implements IPage {
      * @param  offsetY  in pixels from the current location to which the element should be moved, e.g., -300
      */
     public void dragAndDrop(final HtmlElement element, final int offsetX, final int offsetY) {
-        new Actions(driver).dragAndDropBy((WebElement) element.getElement(), offsetX, offsetY).perform();
+        new Actions(driver).dragAndDropBy( element.getElement(), offsetX, offsetY).perform();
     }
 
     /**
@@ -757,17 +762,29 @@ public class PageObject extends BasePage implements IPage {
         }
     }
 
+    /**
+     * @deprecated useless
+     * @return
+     */
     @Deprecated
     public boolean isFrame() {
         return frameFlag;
     }
 
+    /**
+     * @deprecated useless
+     * @return
+     */
     @Deprecated
     public final void selectFrame(final Integer index) {
         driver.switchTo().frame(index);
         frameFlag = true;
     }
 
+    /**
+     * @deprecated useless
+     * @return
+     */
     @Deprecated
     public final void selectFrame(final By by) {
     	WebElement element = driver.findElement(by);
@@ -775,12 +792,20 @@ public class PageObject extends BasePage implements IPage {
         frameFlag = true;
     }
 
+    /**
+     * @deprecated useless
+     * @return
+     */
     @Deprecated
     public final void selectFrame(final String locator) {
         driver.switchTo().frame(locator);
         frameFlag = true;
     }
 
+    /**
+     * @deprecated useless
+     * @return
+     */
     @Deprecated
     public final void exitFrame() {
     	driver.switchTo().defaultContent();
@@ -1024,7 +1049,7 @@ public class PageObject extends BasePage implements IPage {
 		if (element instanceof HtmlElement) {
 			((HtmlElement) element).clear();
 		} else {
-			throw new ScenarioException(String.format("Element %s is not an HtmlElement subclass", fieldName));
+			throw new ScenarioException(String.format(ELEMENT_S_IS_NOT_AN_HTML_ELEMENT_SUBCLASS, fieldName));
 		}
 		return (T)this;
 	}
@@ -1064,7 +1089,7 @@ public class PageObject extends BasePage implements IPage {
 		Element element = getElement(fieldName);
 		element.click();
 		try {
-			return (T)nextPage.getConstructor().newInstance();
+			return nextPage.getConstructor().newInstance();
 		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
 				| NoSuchMethodException | SecurityException e) {
 			throw new ScenarioException(String.format("Cannot switch to next page %s, maybe default constructor does not exist", nextPage.getSimpleName()), e);
@@ -1080,12 +1105,12 @@ public class PageObject extends BasePage implements IPage {
 	@GenericStep
 	public <T extends PageObject> T changeToPage(Class<T> nextPage) {
 		try {
-			return (T)nextPage.getConstructor().newInstance();
+			return nextPage.getConstructor().newInstance();
 		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
 				| NoSuchMethodException | SecurityException e) {
 			throw new ScenarioException(String.format("Cannot switch to next page %s, maybe default constructor does not exist", nextPage.getSimpleName()), e);
 		}
-	}
+	} 
 
 	@GenericStep
 	public <T extends PageObject> T doubleClick(String fieldName) {
@@ -1235,7 +1260,7 @@ public class PageObject extends BasePage implements IPage {
 		} else {
 			boolean present = ((GenericPictureElement)element).isElementPresent(SeleniumTestsContextManager.getThreadContext().getExplicitWaitTimeout() * 1000);
 			if (!present) {
-				throw new TimeoutException(String.format("Element %s is not present", fieldName));
+				throw new TimeoutException(String.format(ERROR_ELEMENT_NOT_PRESENT, fieldName));
 			}
 		}
 		return (T)this;
@@ -1249,7 +1274,7 @@ public class PageObject extends BasePage implements IPage {
 		} else {
 			boolean present = ((GenericPictureElement)element).isElementPresent(SeleniumTestsContextManager.getThreadContext().getExplicitWaitTimeout() * 1000);
 			if (!present) {
-				throw new TimeoutException(String.format("Element %s is not present", fieldName));
+				throw new TimeoutException(String.format(ERROR_ELEMENT_NOT_PRESENT, fieldName));
 			}
 		}
 		return (T)this;
@@ -1263,7 +1288,7 @@ public class PageObject extends BasePage implements IPage {
 		} else {
 			boolean present = ((GenericPictureElement)element).isElementPresent(SeleniumTestsContextManager.getThreadContext().getExplicitWaitTimeout() * 1000);
 			if (present) {
-				throw new TimeoutException(String.format("Element %s is present", fieldName));
+				throw new TimeoutException(String.format(ERROR_ELEMENT_IS_PRESENT, fieldName));
 			}
 		}
 		return (T)this;
@@ -1277,7 +1302,7 @@ public class PageObject extends BasePage implements IPage {
 		} else {
 			boolean present = ((GenericPictureElement)element).isElementPresent(SeleniumTestsContextManager.getThreadContext().getExplicitWaitTimeout() * 1000);
 			if (present) {
-				throw new TimeoutException(String.format("Element %s is present", fieldName));
+				throw new TimeoutException(String.format(ERROR_ELEMENT_IS_PRESENT, fieldName));
 			}
 		}
 		return (T)this;
@@ -1293,7 +1318,7 @@ public class PageObject extends BasePage implements IPage {
 							ExpectedConditions.textToBePresentInElement((HtmlElement)element, value)
 							));
 		} else {
-			throw new ScenarioException(String.format("Element %s is not an HtmlElement subclass", fieldName));
+			throw new ScenarioException(String.format(ELEMENT_S_IS_NOT_AN_HTML_ELEMENT_SUBCLASS, fieldName));
 		}
 		return (T)this;
 	}
@@ -1304,7 +1329,7 @@ public class PageObject extends BasePage implements IPage {
 		if (element instanceof Table) {
 			((HtmlElement) element).waitFor(SeleniumTestsContextManager.getThreadContext().getExplicitWaitTimeout(), 
 					ExpectedConditions.textToBePresentInElement(((Table)element).getCell(row, column), value));
-			;
+			
 		} else {
 			throw new ScenarioException(String.format("Element %s is not an Table element", fieldName));
 		}
@@ -1327,7 +1352,7 @@ public class PageObject extends BasePage implements IPage {
 	public <T extends PageObject> T assertForVisible(String fieldName) {
 		Element element = getElement(fieldName);
 		if (element instanceof HtmlElement) {
-			Assert.assertTrue(((HtmlElement) element).isElementPresent(0), String.format("Element %s is not present", fieldName));
+			Assert.assertTrue(((HtmlElement) element).isElementPresent(0), String.format(ERROR_ELEMENT_NOT_PRESENT, fieldName));
 			Assert.assertTrue(((HtmlElement) element).isDisplayed(), String.format("Element %s is not visible", fieldName));
 		} else {
 			Assert.assertTrue(((GenericPictureElement)element).isElementPresent(), String.format("Element %s is not visible", fieldName));
@@ -1339,10 +1364,10 @@ public class PageObject extends BasePage implements IPage {
 	public <T extends PageObject> T assertForDisabled(String fieldName) {
 		Element element = getElement(fieldName);
 		if (element instanceof HtmlElement) {
-			Assert.assertTrue(((HtmlElement) element).isElementPresent(0), String.format("Element %s is not present", fieldName));
+			Assert.assertTrue(((HtmlElement) element).isElementPresent(0), String.format(ERROR_ELEMENT_NOT_PRESENT, fieldName));
 			Assert.assertFalse(((HtmlElement) element).isEnabled(), String.format("Element %s is enabled", fieldName));
 		} else {
-			throw new ScenarioException(String.format("Element %s is not an HtmlElement subclass", fieldName));
+			throw new ScenarioException(String.format(ELEMENT_S_IS_NOT_AN_HTML_ELEMENT_SUBCLASS, fieldName));
 		}
 		return (T)this;
 	}
@@ -1351,10 +1376,10 @@ public class PageObject extends BasePage implements IPage {
 	public <T extends PageObject> T assertForEnabled(String fieldName) {
 		Element element = getElement(fieldName);
 		if (element instanceof HtmlElement) {
-			Assert.assertTrue(((HtmlElement) element).isElementPresent(0), String.format("Element %s is not present", fieldName));
+			Assert.assertTrue(((HtmlElement) element).isElementPresent(0), String.format(ERROR_ELEMENT_NOT_PRESENT, fieldName));
 			Assert.assertTrue(((HtmlElement) element).isEnabled(), String.format("Element %s is disabled", fieldName));
 		} else {
-			throw new ScenarioException(String.format("Element %s is not an HtmlElement subclass", fieldName));
+			throw new ScenarioException(String.format(ELEMENT_S_IS_NOT_AN_HTML_ELEMENT_SUBCLASS, fieldName));
 		}
 		return (T)this;
 	}
@@ -1363,10 +1388,10 @@ public class PageObject extends BasePage implements IPage {
 	public <T extends PageObject> T assertForValue(String fieldName, String value) {
 		Element element = getElement(fieldName);
 		if (element instanceof HtmlElement) {
-			Assert.assertTrue(((HtmlElement) element).isElementPresent(0), String.format("Element %s is not present", fieldName));
+			Assert.assertTrue(((HtmlElement) element).isElementPresent(0), String.format(ERROR_ELEMENT_NOT_PRESENT, fieldName));
 			Assert.assertTrue(((HtmlElement) element).getText().equals(value) || ((HtmlElement) element).getValue().equals(value), String.format("Value of element %s is not %s", fieldName, value));
 		} else {
-			throw new ScenarioException(String.format("Element %s is not an HtmlElement subclass", fieldName));
+			throw new ScenarioException(String.format(ELEMENT_S_IS_NOT_AN_HTML_ELEMENT_SUBCLASS, fieldName));
 		}
 		return (T)this;
 	}
@@ -1375,10 +1400,10 @@ public class PageObject extends BasePage implements IPage {
 	public <T extends PageObject> T assertForEmptyValue(String fieldName) {
 		Element element = getElement(fieldName);
 		if (element instanceof HtmlElement) {
-			Assert.assertTrue(((HtmlElement) element).isElementPresent(0), String.format("Element %s is not present", fieldName));
+			Assert.assertTrue(((HtmlElement) element).isElementPresent(0), String.format(ERROR_ELEMENT_NOT_PRESENT, fieldName));
 			Assert.assertTrue(((HtmlElement) element).getValue().isEmpty(), String.format("Value or Element %s is not empty", fieldName));
 		} else {
-			throw new ScenarioException(String.format("Element %s is not an HtmlElement subclass", fieldName));
+			throw new ScenarioException(String.format(ELEMENT_S_IS_NOT_AN_HTML_ELEMENT_SUBCLASS, fieldName));
 		}
 		return (T)this;
 	}
@@ -1387,10 +1412,10 @@ public class PageObject extends BasePage implements IPage {
 	public <T extends PageObject> T assertForNonEmptyValue(String fieldName) {
 		Element element = getElement(fieldName);
 		if (element instanceof HtmlElement) {
-			Assert.assertTrue(((HtmlElement) element).isElementPresent(0), String.format("Element %s is not present", fieldName));
+			Assert.assertTrue(((HtmlElement) element).isElementPresent(0), String.format(ERROR_ELEMENT_NOT_PRESENT, fieldName));
 			Assert.assertFalse(((HtmlElement) element).getValue().isEmpty(), String.format("Element %s is empty", fieldName));
 		} else {
-			throw new ScenarioException(String.format("Element %s is not an HtmlElement subclass", fieldName));
+			throw new ScenarioException(String.format(ELEMENT_S_IS_NOT_AN_HTML_ELEMENT_SUBCLASS, fieldName));
 		}
 		return (T)this;
 	}
@@ -1399,12 +1424,12 @@ public class PageObject extends BasePage implements IPage {
 	public <T extends PageObject> T assertForMatchingValue(String fieldName, String regex) {
 		Element element = getElement(fieldName);
 		if (element instanceof HtmlElement) {
-			Assert.assertTrue(((HtmlElement) element).isElementPresent(0), String.format("Element %s is not present", fieldName));
+			Assert.assertTrue(((HtmlElement) element).isElementPresent(0), String.format(ERROR_ELEMENT_NOT_PRESENT, fieldName));
 			Assert.assertTrue(Pattern.compile(regex).matcher(((HtmlElement) element).getText()).find()
 					|| Pattern.compile(regex).matcher(((HtmlElement) element).getValue()).find(),
 					String.format("Value of Element %s does not match %s ", fieldName, regex));
 		} else {
-			throw new ScenarioException(String.format("Element %s is not an HtmlElement subclass", fieldName));
+			throw new ScenarioException(String.format(ELEMENT_S_IS_NOT_AN_HTML_ELEMENT_SUBCLASS, fieldName));
 		}
 		return (T)this;
 	}
@@ -1418,7 +1443,7 @@ public class PageObject extends BasePage implements IPage {
 				Assert.assertNotNull(selectedOption, "No selected option found");
 				Assert.assertEquals(selectedOption.getText(), value, "Selected option is not the expected one");
 			} catch (WebDriverException e) {
-				Assert.assertTrue(false, String.format("Element %s is not present", fieldName));
+				Assert.assertTrue(false, String.format(ERROR_ELEMENT_NOT_PRESENT, fieldName));
 			}
 		} else {
 			throw new ScenarioException(String.format("Element %s is not an SelectList subclass", fieldName));
@@ -1430,7 +1455,7 @@ public class PageObject extends BasePage implements IPage {
 	public <T extends PageObject> T assertChecked(String fieldName) {
 		Element element = getElement(fieldName);
 		if (element instanceof CheckBoxElement || element instanceof RadioButtonElement) {
-			Assert.assertTrue(((HtmlElement) element).isElementPresent(0), String.format("Element %s is not present", fieldName));
+			Assert.assertTrue(((HtmlElement) element).isElementPresent(0), String.format(ERROR_ELEMENT_NOT_PRESENT, fieldName));
 			Assert.assertTrue(((HtmlElement)element).isSelected(), String.format("Element %s is unchecked", fieldName));
 		} else {
 			throw new ScenarioException(String.format("Element %s is not an CheckBoxElement/RadioButtonElement", fieldName));
@@ -1442,7 +1467,7 @@ public class PageObject extends BasePage implements IPage {
 	public <T extends PageObject> T assertNotChecked(String fieldName) {
 		Element element = getElement(fieldName);
 		if (element instanceof CheckBoxElement || element instanceof RadioButtonElement) {
-			Assert.assertTrue(((HtmlElement) element).isElementPresent(0), String.format("Element %s is not present", fieldName));
+			Assert.assertTrue(((HtmlElement) element).isElementPresent(0), String.format(ERROR_ELEMENT_NOT_PRESENT, fieldName));
 			Assert.assertFalse(((HtmlElement)element).isSelected(), String.format("Element %s is checked", fieldName));
 		} else {
 			throw new ScenarioException(String.format("Element %s is not an CheckBoxElement/RadioButtonElement", fieldName));
@@ -1510,6 +1535,11 @@ public class PageObject extends BasePage implements IPage {
         Assert.assertTrue(getHtmlSource().contains(text), "Text: {" + text + "} not found on page source.");
     }
 
+	
+	/**
+	 * @deprecated useless
+	 * @param text
+	 */
     @Deprecated
     public void assertKeywordNotPresent(String text) {
         Assert.assertFalse(getHtmlSource().contains(text), "Text: {" + text + "} not found on page source.");
@@ -1520,6 +1550,10 @@ public class PageObject extends BasePage implements IPage {
         Assert.assertTrue(getLocation().contains(urlPattern), "Pattern: {" + urlPattern + "} not found on page location.");
     }
 
+	/**
+	 * @deprecated useless
+	 * @param text
+	 */
     @Deprecated
     public void assertTitle(final String text) {
         Assert.assertTrue(getTitle().contains(text), "Text: {" + text + "} not found on page title.");

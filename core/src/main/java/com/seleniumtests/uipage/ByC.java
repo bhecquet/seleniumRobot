@@ -38,7 +38,7 @@ public class ByC extends By {
 
 	@Override
 	public List<WebElement> findElements(SearchContext context) {
-		return null;
+		return new ArrayList<>();
 	}
 	
 	/**
@@ -580,11 +580,15 @@ public class ByC extends By {
 	 */
 	public static class And extends ByC implements Serializable {
 		
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 6341968046120372161L;
 		private By[] bies;
 		
 		public And(By ... bies) {
 			if (bies.length == 0) {
-				throw new ScenarioException("At least on locator must be provided");
+				throw new ScenarioException("At least on locator must be provided for And");
 			}
 			this.bies = bies;
 		}
@@ -624,11 +628,14 @@ public class ByC extends By {
 	
 	public static class Shadow extends ByC implements Serializable {
 		
+
+		private static final long serialVersionUID = 6341668046120372161L;
+		
 		private By[] bies;
 		
 		public Shadow(By ... bies) {
 			if (bies.length == 0) {
-				throw new ScenarioException("At least on locator must be provided");
+				throw new ScenarioException("At least on locator must be provided for shadow ");
 			}
 			this.bies = bies;
 		}
@@ -701,6 +708,8 @@ public class ByC extends By {
 	public static class Or extends ByC implements Serializable {
 		
 		private By[] bies;
+
+		private static final long serialVersionUID = 6341968046167372161L;
 		
 		public Or(By ... bies) {
 			if (bies.length == 0) {
@@ -765,6 +774,8 @@ public class ByC extends By {
 	 */
 	public static class Android extends ByC implements Serializable, ByPlatformSpecific {
 
+		private static final long serialVersionUID = 6341968046120092161L;
+
 		private By by;
 		
 		public Android(By by) {
@@ -801,6 +812,7 @@ public class ByC extends By {
 	public static class Ios extends ByC implements Serializable, ByPlatformSpecific {
 		
 
+		private static final long serialVersionUID = 6341468046120372161L;
 		private By by;
 		
 		public Ios(By by) {
@@ -909,9 +921,9 @@ public class ByC extends By {
 		if (!aString.contains("'")) {
 			return "'" + aString + "'";
 		} else {
-			String newString = "concat(";
+			StringBuilder newString = new StringBuilder("concat(");
 			for (String part: aString.split("'")) {
-				newString += "'" + part + "',\"'\",";
+				newString.append("'" + part + "',\"'\",");
 			}
 			return newString.substring(0, newString.length() - 5) + ")";
 		}
