@@ -444,7 +444,9 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
     	try {
 	    	Alert alert = driver.switchTo().alert();
 			alert.dismiss();
-    	} catch (Exception e) {}
+    	} catch (Exception e) {
+    		// do nothing in case of error
+    	}
     }
     
     @Override
@@ -720,8 +722,8 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
 							Integer scrollOffset = (int) (yOffset == Integer.MAX_VALUE ? topHeaderSize: topHeaderSize - yOffset);
 							((JavascriptExecutor) driver).executeScript(
 									"if((arguments[0].scrollHeight - arguments[0].scrollTop - arguments[0].clientHeight) > 0) {" +
-									"	var rootElement = arguments[1] === \"safari\" ? document.body: document.documentElement;" +
-									"	rootElement.scrollTop -= " + scrollOffset + ";" +
+									"   var rootElement = arguments[1] === \"safari\" ? document.body: document.documentElement;" +
+									"   rootElement.scrollTop -= " + scrollOffset + ";" +
 									"}", parentScrollableElement, (driver instanceof SafariDriver) ? "safari": "other");
 						}
 						
@@ -794,16 +796,6 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
 		} catch (HeadlessException | AWTError | AWTException e) {
 			throw new ScenarioException("Cannot capture image", e);
 		}
-		
-//		Integer screenWidth = defaultGraphicDevice.getDisplayMode().getWidth();
-//		Integer screenHeight = defaultGraphicDevice.getDisplayMode().getHeight();
-//		
-//		// Capture the screen shot of the area of the screen defined by the rectangle
-//		try {
-//			return new Robot().createScreenCapture(new Rectangle(screenWidth, screenHeight));
-//		} catch (AWTException e) {
-//			throw new ScenarioException("Cannot capture image", e);
-//		}
 	}
 
 	/**
@@ -840,13 +832,17 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
 				driver.switchTo().window(handle);
 				driver.close();
 			}
-		} catch (Throwable e) {}
+		} catch (Throwable e) {
+			// nothing to do
+		}
 		
 		
 		Long duration = 0L;
 		try {
 			duration = new Date().getTime() - (Long)internalCapabilities.getCapability(DriverUsage.START_TIME);
-		} catch (Exception e) {}
+		} catch (Exception e) {
+			// catch error
+		}
 		String gridHub = caps.getCapability(DriverUsage.GRID_HUB) != null ? caps.getCapability(DriverUsage.GRID_HUB).toString(): null;
 		String sessionId = caps.getCapability(DriverUsage.SESSION_ID) != null ? caps.getCapability(DriverUsage.SESSION_ID).toString(): null;
 		
@@ -1065,7 +1061,7 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
 		} else if (driverMode == DriverMode.GRID && gridConnector != null) {
 			gridConnector.writeText(textToWrite);
 		} else {
-			throw new ScenarioException("driver supports sendKeysToDesktop only in local and grid mode");
+			throw new ScenarioException("driver supports writeToDesktop only in local and grid mode");
 		}
 	}
 	
@@ -1165,6 +1161,7 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
 	 * 
 	 * @deprecated: should be removed (kept here for compatibility with old robots)
 	 */
+	@Deprecated
 	@Override
 	public Object executeScript(String script, Object... args) {
 		

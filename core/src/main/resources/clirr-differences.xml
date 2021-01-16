@@ -1,130 +1,17 @@
 <differences>
 
-
 	<difference>
-		<className>**/uipage/PageObject</className>
-		<differenceType>7004</differenceType>
-		<method>void assertCurrentPage(boolean)</method>
-		<justification>internal use</justification>
+		<className>**/uipage/htmlelements.HtmlElement</className>
+		<differenceType>6006</differenceType>
+		<field>OPTIMAL_SCROLLING</field>
+		<justification>code smell correction</justification>
 	</difference>
 	<difference>
-		<className>**/uipage/BasePage</className>
-		<differenceType>7002</differenceType>
-		<method>void acceptAlert()</method>
-		<justification>moved</justification>
-	</difference>
-	<difference>
-		<className>**/uipage/BasePage</className>
-		<differenceType>7002</differenceType>
-		<method>void assertHTML(boolean, java.lang.String)</method>
-		<justification>not used</justification>
-	</difference>
-	<difference>
-		<className>**/uipage/BasePage</className>
-		<differenceType>7002</differenceType>
-		<method>java.lang.String cancelConfirmation()</method>
-		<justification>moved</justification>
-	</difference>
-	<difference>
-		<className>**/uipage/BasePage</className>
-		<differenceType>7002</differenceType>
-		<method>void capturePageSnapshot()</method>
-		<justification>moved</justification>
-	</difference>
-	
-
-	<difference>
-		<className>**/uipage/PageObject</className>
-		<differenceType>7006</differenceType>
-		<method>void assertCookiePresent(java.lang.String)</method>
-		<justification>removed</justification>
-		<to>com.seleniumtests.uipage.PageObject</to>
-	</difference>
-	<difference>
-		<className>**/uipage/PageObject</className>
-		<differenceType>7006</differenceType>
-		<method>void capturePageSnapshot()</method>
-		<justification>removed</justification>
-		<to>com.seleniumtests.uipage.PageObject</to>
-	</difference>
-	<difference>
-		<className>**/uipage/PageObject</className>
-		<differenceType>7002</differenceType>
-		<method>java.lang.String getEval(java.lang.String)</method>
-		<justification>removed</justification>
-		<to>com.seleniumtests.uipage.PageObject</to>
-	</difference>
-	<difference>
-		<className>**/uipage/PageObject</className>
-		<differenceType>7006</differenceType>
-		<method>void goBack()</method>
-		<justification>for #372</justification>
-		<to>com.seleniumtests.uipage.PageObject</to>
-	</difference>
-	<difference>
-		<className>**/uipage/PageObject</className>
-		<differenceType>7006</differenceType>
-		<method>void goForward()</method>
-		<justification>for #372</justification>
-		<to>com.seleniumtests.uipage.PageObject</to>
-	</difference>
-	<difference>
-		<className>**/uipage/PageObject</className>
-		<differenceType>7006</differenceType>
-		<method>void refresh()</method>
-		<justification>for #372</justification>
-		<to>com.seleniumtests.uipage.PageObject</to>
-	</difference>
-	<difference>
-		<className>**/uipage/PageObject</className>
-		<differenceType>7006</differenceType>
-		<method>void uploadFile(java.lang.String)</method>
-		<justification>for #372</justification>
-		<to>com.seleniumtests.uipage.PageObject</to>
+		<className>**/uipage/htmlelements.HtmlElement</className>
+		<differenceType>6006</differenceType>
+		<field>FIRST_VISIBLE</field>
+		<justification>code smell correction</justification>
 	</difference>
 
-	<difference>
-		<className>**/uipage/htmlelements/Element</className>
-		<differenceType>7013</differenceType>
-		<method>void click()</method>
-		<justification>for #372</justification>
-	</difference>
-	<difference>
-		<className>**/uipage/htmlelements/Element</className>
-		<differenceType>7013</differenceType>
-		<method>boolean isElementPresent()</method>
-		<justification>for #372</justification>
-	</difference>
-	<difference>
-		<className>**/uipage/htmlelements/Element</className>
-		<differenceType>7013</differenceType>
-		<method>void sendKeys(java.lang.CharSequence[])</method>
-		<justification>for #372</justification>
-	</difference>
-	
-	<difference>
-		<className>**/uipage/htmlelements/select/ISelectList</className>
-		<differenceType>7012</differenceType>
-		<method>boolean isMultipleWithoutFind()</method>
-		<justification>for #368</justification>
-	</difference>
-	<difference>
-		<className>**/uipage/htmlelements/select/*</className>
-		<differenceType>6001</differenceType>
-		<field>frameElement</field>
-		<justification>for #368</justification>
-	</difference>
-	<difference>
-		<className>**/uipage/htmlelements/select/*</className>
-		<differenceType>6001</differenceType>
-		<field>options</field>
-		<justification>for #368</justification>
-	</difference>
-	<difference>
-		<className>**/uipage/htmlelements/select/*</className>
-		<differenceType>6001</differenceType>
-		<field>parentElement</field>
-		<justification>for #368</justification>
-	</difference> 
 	
 </differences>
