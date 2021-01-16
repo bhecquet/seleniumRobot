@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -48,8 +49,12 @@ public class TestConfigurationParser {
 		
 		File xmlFile = new File(xmlFileName);
 		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-		factory.setFeature(XMLConstants.ACCESS_EXTERNAL_DTD, "");
-		factory.setFeature(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
+		try {
+			dbFactory.setFeature(XMLConstants.ACCESS_EXTERNAL_DTD, false);
+			dbFactory.setFeature(XMLConstants.ACCESS_EXTERNAL_SCHEMA, false);
+		} catch (ParserConfigurationException e1) {
+			// nothing
+		}
         DocumentBuilder dBuilder;
 		try {
 			dBuilder = dbFactory.newDocumentBuilder();

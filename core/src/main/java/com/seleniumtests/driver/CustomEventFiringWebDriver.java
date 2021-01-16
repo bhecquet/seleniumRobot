@@ -115,27 +115,27 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
     	    "try{pixelRatio = devicePixelRatio} catch(err){pixelRatio=1}" +
             "var height = %d;"
                 + "var width = %d;"
-                + " if (window.innerHeight) {"
-                + "		height = Math.min(window.innerHeight, height);"
-                + " }"
-                + " if (document.documentElement && document.documentElement.clientHeight) {"
-                + "		height = Math.min(document.documentElement.clientHeight, height);"
-                + " }"
-                + "	var b = document.getElementsByTagName('html')[0]; "
-                + "	if (b.clientHeight) {"
-                + "		height = Math.min(b.clientHeight, height);"
-                + "	}"
-                + " if (window.innerWidth) {"
-                + "		width = Math.min(window.innerWidth, width);"
-                + " } "
-                + " if (document.documentElement && document.documentElement.clientWidth) {"
-                + "		width = Math.min(document.documentElement.clientWidth, width);"
-                + " } "
-                + "	var b = document.getElementsByTagName('html')[0]; "
-                + "	if (b.clientWidth) {"
-                + "		width = Math.min(b.clientWidth, width);"
-                + "	}"
-                + "	return [width * pixelRatio, height * pixelRatio];", MAX_DIMENSION, MAX_DIMENSION);
+                + "if (window.innerHeight) {"
+                + "    height = Math.min(window.innerHeight, height);"
+                + "}"
+                + "if (document.documentElement && document.documentElement.clientHeight) {"
+                + "    height = Math.min(document.documentElement.clientHeight, height);"
+                + "}"
+                + "var b = document.getElementsByTagName('html')[0]; "
+                + "if (b.clientHeight) {"
+                + "    height = Math.min(b.clientHeight, height);"
+                + "}"
+                + "if (window.innerWidth) {"
+                + "   width = Math.min(window.innerWidth, width);"
+                + "} "
+                + "if (document.documentElement && document.documentElement.clientWidth) {"
+                + "   width = Math.min(document.documentElement.clientWidth, width);"
+                + "} "
+                + "var b = document.getElementsByTagName('html')[0]; "
+                + "if (b.clientWidth) {"
+                + "   width = Math.min(b.clientWidth, width);"
+                + "}"
+                + "return [width * pixelRatio, height * pixelRatio];", MAX_DIMENSION, MAX_DIMENSION);
 
     private static final String JS_GET_CURRENT_SCROLL_POSITION =
             "var doc = document.documentElement; "
@@ -356,108 +356,6 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
     		"" + 
     		"return document.documentElement.clientHeight - bottomPixel;";
     		
-    /*private static final String JS_GET_TOP_HEADER = "function getStyle( dom ) {" + 
-    		"    var style;" + 
-    		"    var returns = {};" + 
-    		"    // FireFox and Chrome way " + 
-    		"    if(window.getComputedStyle){" + 
-    		"        style = window.getComputedStyle(dom, null);" + 
-    		"        for(var i = 0, l = style.length; i < l; i++){" + 
-    		"            var prop = style[i];" + 
-    		"            var val = style.getPropertyValue(prop);" + 
-    		"            returns[prop] = val;" + 
-    		"        }" + 
-    		"        return returns;" + 
-    		"    }" + 
-    		"    // IE and Opera way " + 
-    		"    if(dom.currentStyle){" + 
-    		"        style = dom.currentStyle;" + 
-    		"        for(var prop in style){" + 
-    		"            returns[prop] = style[prop];" + 
-    		"        }" + 
-    		"        return returns;" + 
-    		"    }" + 
-    		"    // Style from style attribute " + 
-    		"    if(style = dom.style){" + 
-    		"        for(var prop in style){" + 
-    		"            if(typeof style[prop] != 'function'){" + 
-    		"                returns[prop] = style[prop];" + 
-    		"            }" + 
-    		"        }" + 
-    		"        return returns;" + 
-    		"    }" + 
-    		"    return returns;" + 
-    		"}" + 
-    		"" + 
-    		"function isVisible(elem) {" + 
-    		"    const style = getStyle(elem);" + 
-    		"" + 
-    		"    if (style['display'] === 'none') return false;" + 
-    		"    if (style['visibility'] !== 'visible') return false;" + 
-    		"    if (style['opacity'] === 0) return false;" + 
-    		"" + 
-    		"    if (" + 
-    		"        elem.offsetWidth +" + 
-    		"        elem.offsetHeight +" + 
-    		"        elem.getBoundingClientRect().height +" + 
-    		"        elem.getBoundingClientRect().width === 0" + 
-    		"    ) return false;" + 
-    		"" + 
-    		"    const elementPoints = {" + 
-    		"        center: {" + 
-    		"            x: elem.getBoundingClientRect().left + elem.offsetWidth / 2," + 
-    		"            y: elem.getBoundingClientRect().top + elem.offsetHeight / 2," + 
-    		"        }," + 
-    		"        topLeft: {" + 
-    		"            x: elem.getBoundingClientRect().left," + 
-    		"            y: elem.getBoundingClientRect().top," + 
-    		"        }," + 
-    		"        topRight: {" + 
-    		"            x: elem.getBoundingClientRect().right," + 
-    		"            y: elem.getBoundingClientRect().top," + 
-    		"        }," + 
-    		"        bottomLeft: {" + 
-    		"            x: elem.getBoundingClientRect().left," + 
-    		"            y: elem.getBoundingClientRect().bottom," + 
-    		"        }," + 
-    		"        bottomRight: {" + 
-    		"            x: elem.getBoundingClientRect().right," + 
-    		"            y: elem.getBoundingClientRect().bottom," + 
-    		"        }," + 
-    		"    };" + 
-    		"" + 
-    		"    const docWidth = document.documentElement.clientWidth || window.innerWidth;" + 
-    		"    const docHeight = document.documentElement.clientHeight || window.innerHeight;" + 
-    		"" + 
-    		"    if (elementPoints.topLeft.x > docWidth) return false;" + 
-    		"    if (elementPoints.topLeft.y > docHeight) return false;" + 
-    		"    if (elementPoints.bottomRight.x < 0) return false;" + 
-    		"    if (elementPoints.bottomRight.y < 0) return false;" + 
-    		"" + 
-    		"    for (let index in elementPoints) {" + 
-    		"        const point = elementPoints[index];" + 
-    		"        let pointContainer = document.elementFromPoint(point.x, point.y);" + 
-    		"        if (pointContainer !== null) {" + 
-    		"            do {" + 
-    		"                if (pointContainer === elem) return true;" + 
-    		"            } while (pointContainer = pointContainer.parentNode);" + 
-    		"        }" + 
-    		"    }" + 
-    		"    return false;" + 
-    		"}" +
-    		"var headers = Array.from(document.querySelectorAll('div,header'))" + 
-    		"		.filter(e => getComputedStyle(e)['position'] === 'fixed' && isVisible(e))" + 
-    		"		.sort((a, b) => a.offsetTop - b.offsetTop);" + 
-    		"var topPixel = 0;" + 
-    		"for (var h of headers) {" +
-    		"	if(h.offsetTop <= topPixel + 10) {" +
-    		"		topPixel = h.offsetTop + h.scrollHeight" +
-    		"	} else {" +
-    		"		break;" +
-    		"	}" +
-    		"}" +
-    		"return topPixel;";
-    		*/
     
     public static final String NON_JS_UPLOAD_FILE_THROUGH_POPUP = 
     		"var action = 'upload_file_through_popup';";

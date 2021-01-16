@@ -25,6 +25,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Properties;
 
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathConstants;
@@ -57,8 +58,8 @@ public class PackageUtility {
 		// issue #113: corrects the error when executing integration tests
 		Thread.currentThread().setContextClassLoader(PackageUtility.class.getClassLoader());
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-		factory.setFeature(XMLConstants.ACCESS_EXTERNAL_DTD, "");
-		factory.setFeature(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
+		factory.setFeature(XMLConstants.ACCESS_EXTERNAL_DTD, false);
+		factory.setFeature(XMLConstants.ACCESS_EXTERNAL_SCHEMA, false);
 		Document doc = factory.newDocumentBuilder().parse(pomStream);
 		doc.getDocumentElement().normalize();
 		String version = (String) XPathFactory.newInstance()
