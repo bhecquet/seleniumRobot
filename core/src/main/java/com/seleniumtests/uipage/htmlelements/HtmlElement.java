@@ -641,7 +641,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     		try {
     			elementInfo = ElementInfo.getInstance(this);
     		} catch (Exception e) {
-    			logger.infor("Error getting element info");
+    			logger.info("Error getting element info");
     		}
     	}
     	

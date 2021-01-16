@@ -26,6 +26,8 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.xml.XMLConstants;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.jdom2.Document;
@@ -181,8 +183,8 @@ public class TaScriptGenerator {
     		Document doc;
     		SAXBuilder sxb = new SAXBuilder();
 
-    		sxb.setFeature(XMLConstants.ACCESS_EXTERNAL_DTD, "");
-    		sxb.setFeature(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
+    		sxb.setFeature(XMLConstants.ACCESS_EXTERNAL_DTD, false);
+    		sxb.setFeature(XMLConstants.ACCESS_EXTERNAL_SCHEMA, false);
     		sxb.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
     	    try {
     	        
