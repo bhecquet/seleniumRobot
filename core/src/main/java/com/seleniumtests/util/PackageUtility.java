@@ -56,7 +56,10 @@ public class PackageUtility {
 		
 		// issue #113: corrects the error when executing integration tests
 		Thread.currentThread().setContextClassLoader(PackageUtility.class.getClassLoader());
-		Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(pomStream);
+		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+		factory.setFeature(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+		factory.setFeature(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
+		Document doc = factory.newDocumentBuilder().parse(pomStream);
 		doc.getDocumentElement().normalize();
 		String version = (String) XPathFactory.newInstance()
 											.newXPath()
