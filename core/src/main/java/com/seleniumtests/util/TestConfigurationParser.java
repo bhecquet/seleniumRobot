@@ -47,7 +47,9 @@ public class TestConfigurationParser {
 		Thread.currentThread().setContextClassLoader(TestConfigurationParser.class.getClassLoader());
 		
 		File xmlFile = new File(xmlFileName);
-        DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+		factory.setFeature(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+		factory.setFeature(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
         DocumentBuilder dBuilder;
 		try {
 			dBuilder = dbFactory.newDocumentBuilder();

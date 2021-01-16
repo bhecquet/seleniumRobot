@@ -180,6 +180,9 @@ public class TaScriptGenerator {
     		
     		Document doc;
     		SAXBuilder sxb = new SAXBuilder();
+
+    		sxb.setFeature(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+    		sxb.setFeature(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
     		sxb.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
     	    try {
     	        
