@@ -1,17 +1,16 @@
 <differences>
 
 	<difference>
-		<className>**/uipage/htmlelements.HtmlElement</className>
+		<className>**/uipage/htmlelements/HtmlElement</className>
 		<differenceType>6006</differenceType>
 		<field>OPTIMAL_SCROLLING</field>
 		<justification>code smell correction</justification>
 	</difference>
 	<difference>
-		<className>**/uipage/htmlelements.HtmlElement</className>
+		<className>**/uipage/htmlelements/HtmlElement</className>
 		<differenceType>6006</differenceType>
 		<field>FIRST_VISIBLE</field>
 		<justification>code smell correction</justification>
 	</difference>
 
-	
 </differences>
