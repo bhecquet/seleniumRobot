@@ -62,6 +62,11 @@ public class ScreenshotUtil {
     public static final String SCREENSHOT_DIR = "screenshots/";
     public static final String HTML_DIR = "htmls/";
     
+    /**
+     * @deprecated  use {@link SnapshotTarget} instead
+     * @author worm
+     *
+     */
     @Deprecated
     public enum Target {SCREEN, PAGE}
 	
@@ -87,11 +92,11 @@ public class ScreenshotUtil {
     
     
     private class NamedBufferedImage {
-    	public BufferedImage image;
-    	public String prefix;
-    	public String url = "app";
-    	public String title = "app";
-    	public String pageSource = "";
+    	private BufferedImage image;
+    	private String prefix;
+    	private String url = "app";
+    	private String title = "app";
+    	private String pageSource = "";
     	
     	/**
     	 * Creates a NamedBufferedImage based on the provided image
@@ -137,14 +142,14 @@ public class ScreenshotUtil {
                     // ignore alert customexception
                     logger.error(ex);
                     url = driver.getCurrentUrl();
-                } catch (Throwable e) {
+                } catch (Exception e) {
                 	// allow screenshot even if some problem occurs
                 	url = "http://no/url/available";
                 }
 
         		try {
         			title = driver.getTitle();
-        		} catch (Throwable e) {
+        		} catch (Exception e) {
         			// allow screenshot even if some problem occurs
         			title = "No Title";
         		}
@@ -152,7 +157,7 @@ public class ScreenshotUtil {
         		
         		try {
                 	pageSource = driver.getPageSource();
-                } catch (Throwable e) {
+                } catch (Exception e) {
                 	pageSource = "";
                 }
         	}
@@ -173,14 +178,14 @@ public class ScreenshotUtil {
         			// ignore alert customexception
         			logger.error(ex);
         			url = driver.getCurrentUrl();
-        		} catch (Throwable e) {
+        		} catch (Exception e) {
         			// allow screenshot even if some problem occurs
         			url = "http://no/url/available";
         		}
         		
         		try {
         			title = element.toString();
-        		} catch (Throwable e) {
+        		} catch (Exception e) {
         			// allow screenshot even if some problem occurs
         			title = "No Title";
         		}
@@ -188,7 +193,7 @@ public class ScreenshotUtil {
         		
         		try {
         			pageSource = element.getAttribute("outerHTML");
-        		} catch (Throwable e) {
+        		} catch (Exception e) {
         			pageSource = "";
         		}
         	}
@@ -241,7 +246,7 @@ public class ScreenshotUtil {
 			return capture(target, exportClass, false, force).get(0);
 		} catch (IndexOutOfBoundsException e) {
 			try {
-				return (T)exportClass.getConstructor().newInstance();
+				return exportClass.getConstructor().newInstance();
 			} catch (Exception e1) {
 				return null;
 			}
@@ -265,7 +270,9 @@ public class ScreenshotUtil {
     	try {
 	    	Alert alert = driver.switchTo().alert();
 			alert.dismiss();
-    	} catch (Exception e) {}
+    	} catch (Exception e) {
+    		// nothing to do
+    	}
     }
     
     /**
@@ -317,7 +324,7 @@ public class ScreenshotUtil {
     	}
     	
     	// if we want to capture an element only, crop the previous capture
-    	if (target.isElementTarget() && target.getElement() != null && capturedImages.size() > 0) {
+    	if (target.isElementTarget() && target.getElement() != null && !capturedImages.isEmpty()) {
     		Rectangle elementPosition = target.getElement().getRect();
     		NamedBufferedImage wholeImage = capturedImages.remove(0);
     		BufferedImage elementImage = ImageProcessor.cropImage(wholeImage.image, elementPosition.x, elementPosition.y, elementPosition.width, elementPosition.height);
@@ -551,7 +558,9 @@ public class ScreenshotUtil {
 			
 			try {
 				((CustomEventFiringWebDriver)driver).scrollTo(scrollX, scrollY);
-			} catch (JavascriptException e) {}
+			} catch (JavascriptException e) {
+				// ignore javascript errors
+			}
 			
 			BufferedImage image = capturePage(cropTop, cropBottom);
 			if (image == null) {
@@ -626,7 +635,7 @@ public class ScreenshotUtil {
         
         String outputSubDirectory = new File(outputDirectory).getName();
         try {
-            FileUtils.writeStringToFile(new File(outputDirectory + "/" + HTML_DIR + filename + ".html"), namedImage.pageSource);
+            FileUtils.writeStringToFile(Paths.get(outputDirectory, HTML_DIR + filename + ".html").toFile(), namedImage.pageSource);
             screenShot.setHtmlSourcePath(String.format("../%s/%s%s.html", outputSubDirectory, HTML_DIR, filename));
         } catch (IOException e) {
             logger.warn("Ex", e);
