@@ -22,6 +22,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -161,7 +162,7 @@ public class AppTestDocumentation {
 		System.out.println(new JSONObject(stepsUsedInTests).toString(2));*/
 		
 
-		FileUtils.write(Paths.get(args[0], "src/site/confluence/template.confluence").toFile(), javadoc, Charset.forName("UTF-8"));
+		FileUtils.write(Paths.get(args[0], "src/site/confluence/template.confluence").toFile(), javadoc, StandardCharsets.UTF_8);
 		
 		
 	}
@@ -227,6 +228,7 @@ public class AppTestDocumentation {
 	
 	private static class TestMethodVisitor extends VoidVisitorAdapter<Void> {
 		
+		@Override
 	    public void visit(MethodDeclaration n, Void arg) {
 
 	    	// read all method calls so that we can correlate with webpages
@@ -284,6 +286,7 @@ public class AppTestDocumentation {
 	
 	private static class WebPageMethodVisitor extends VoidVisitorAdapter<Void> {
 		
+		@Override
 		public void visit(MethodDeclaration n, Void arg) {
 			
 			// only display public methods
@@ -305,6 +308,7 @@ public class AppTestDocumentation {
 	
 	private static class ClassVisitor extends VoidVisitorAdapter<String> {
 		
+		@Override
 		public void visit(ClassOrInterfaceDeclaration n, String objectType) {
 			Optional<Comment> optComment = n.getComment();
 			if (optComment.isPresent()) {
@@ -338,7 +342,8 @@ public class AppTestDocumentation {
 			line = line.trim();
 			if (line.startsWith("*")) {
 				line = line.substring(1).trim();
-			} if (line.startsWith("@")) {
+			} 
+			if (line.startsWith("@")) {
 				line = String.format("{{%s}}", line); 
 			}
 			out.append(line + "\n");
