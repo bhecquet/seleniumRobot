@@ -406,7 +406,7 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 		when(browserInfo.getAllBrowserSubprocessPids(new ArrayList<>())).thenReturn(Arrays.asList(1000L));
 		
 		((CustomEventFiringWebDriver)eventDriver).quit();
-		verify(osUtility).killProcess(eq("1000"), eq(true));
+		verify(osUtility).killProcess("1000", true);
 	}
 	
 	/**
@@ -418,8 +418,8 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 		when(osUtility.getProcessIdByListeningPort(12345)).thenReturn(1001);
 		
 		((CustomEventFiringWebDriver)attachedEventDriver).quit();
-		verify(osUtility).killProcess(eq("1000"), eq(true));
-		verify(osUtility).killProcess(eq("1001"), eq(true));
+		verify(osUtility).killProcess("1000", true);
+		verify(osUtility).killProcess("1001", true);
 	}
 	
 	/**
@@ -433,7 +433,7 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 		try {
 			((CustomEventFiringWebDriver)eventDriver).quit();
 		} catch (WebDriverException e) {}
-		verify(osUtility).killProcess(eq("1000"), eq(true));
+		verify(osUtility).killProcess("1000", true);
 	}
 	
 	/**
@@ -443,10 +443,10 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	public void testLeftClickOnDesktop() {
 		CustomEventFiringWebDriver.leftClicOnDesktopAt(0, 0, DriverMode.LOCAL, gridConnector);
 		
-		verify(robot).mousePress(eq(InputEvent.BUTTON1_DOWN_MASK));
-		verify(robot).mouseRelease(eq(InputEvent.BUTTON1_DOWN_MASK));
-		verify(robot).mouseMove(eq(0), eq(0));
-		verify(gridConnector, never()).leftClic(eq(0), eq(0));
+		verify(robot).mousePress(InputEvent.BUTTON1_DOWN_MASK);
+		verify(robot).mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
+		verify(robot).mouseMove(0, 0);
+		verify(gridConnector, never()).leftClic(0, 0);
 	}
 	
 	/**
@@ -476,10 +476,10 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	public void testLeftClickOnDesktopWithGrid() {
 		CustomEventFiringWebDriver.leftClicOnDesktopAt(0, 0, DriverMode.GRID, gridConnector);
 		
-		verify(robot, never()).mousePress(eq(InputEvent.BUTTON1_DOWN_MASK));
-		verify(robot, never()).mouseRelease(eq(InputEvent.BUTTON1_DOWN_MASK));
-		verify(robot, never()).mouseMove(eq(0), eq(0));
-		verify(gridConnector).leftClic(eq(0), eq(0));
+		verify(robot, never()).mousePress(InputEvent.BUTTON1_DOWN_MASK);
+		verify(robot, never()).mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
+		verify(robot, never()).mouseMove(0, 0);
+		verify(gridConnector).leftClic(0, 0);
 	}
 	
 	/**
@@ -489,10 +489,10 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	public void testDoubleClickOnDesktop() {
 		CustomEventFiringWebDriver.doubleClickOnDesktopAt(0, 0, DriverMode.LOCAL, gridConnector);
 		
-		verify(robot, times(2)).mousePress(eq(InputEvent.BUTTON1_DOWN_MASK));
-		verify(robot, times(2)).mouseRelease(eq(InputEvent.BUTTON1_DOWN_MASK));
-		verify(robot).mouseMove(eq(0), eq(0));
-		verify(gridConnector, never()).doubleClick(eq(0), eq(0));
+		verify(robot, times(2)).mousePress(InputEvent.BUTTON1_DOWN_MASK);
+		verify(robot, times(2)).mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
+		verify(robot).mouseMove(0, 0);
+		verify(gridConnector, never()).doubleClick(0, 0);
 	}
 	
 	/**
@@ -522,10 +522,10 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	public void testDoubleClickOnDesktopWithGrid() {
 		CustomEventFiringWebDriver.doubleClickOnDesktopAt(0, 0, DriverMode.GRID, gridConnector);
 		
-		verify(robot, never()).mousePress(eq(InputEvent.BUTTON1_DOWN_MASK));
-		verify(robot, never()).mouseRelease(eq(InputEvent.BUTTON1_DOWN_MASK));
-		verify(robot, never()).mouseMove(eq(0), eq(0));
-		verify(gridConnector).doubleClick(eq(0), eq(0));
+		verify(robot, never()).mousePress(InputEvent.BUTTON1_DOWN_MASK);
+		verify(robot, never()).mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
+		verify(robot, never()).mouseMove(0, 0);
+		verify(gridConnector).doubleClick(0, 0);
 	}
 	
 	/**
@@ -535,10 +535,10 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	public void testRightClickOnDesktop() {
 		CustomEventFiringWebDriver.rightClicOnDesktopAt(0, 0, DriverMode.LOCAL, gridConnector);
 		
-		verify(robot).mousePress(eq(InputEvent.BUTTON2_DOWN_MASK));
-		verify(robot).mouseRelease(eq(InputEvent.BUTTON2_DOWN_MASK));
-		verify(robot).mouseMove(eq(0), eq(0));
-		verify(gridConnector, never()).rightClic(eq(0), eq(0));
+		verify(robot).mousePress(InputEvent.BUTTON2_DOWN_MASK);
+		verify(robot).mouseRelease(InputEvent.BUTTON2_DOWN_MASK);
+		verify(robot).mouseMove(0, 0);
+		verify(gridConnector, never()).rightClic(0, 0);
 	}
 	
 	/**
@@ -568,10 +568,10 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	public void testRightClickOnDesktopWithGrid() {
 		CustomEventFiringWebDriver.rightClicOnDesktopAt(0, 0, DriverMode.GRID, gridConnector);
 		
-		verify(robot, never()).mousePress(eq(InputEvent.BUTTON2_DOWN_MASK));
-		verify(robot, never()).mouseRelease(eq(InputEvent.BUTTON2_DOWN_MASK));
-		verify(robot, never()).mouseMove(eq(0), eq(0));
-		verify(gridConnector).rightClic(eq(0), eq(0));
+		verify(robot, never()).mousePress(InputEvent.BUTTON2_DOWN_MASK);
+		verify(robot, never()).mouseRelease(InputEvent.BUTTON2_DOWN_MASK);
+		verify(robot, never()).mouseMove(0, 0);
+		verify(gridConnector).rightClic(0, 0);
 	}
 	
 	/**
@@ -581,7 +581,7 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	public void testWriteToDesktop() {
 		CustomEventFiringWebDriver.writeToDesktop("text", DriverMode.LOCAL, gridConnector);
 		
-		verify(keyboard).typeKeys(eq("text"));
+		verify(keyboard).typeKeys("text");
 		verify(gridConnector, never()).writeText(anyString());
 	}
 
@@ -623,10 +623,10 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	public void testSendKeysToDesktop() {
 		CustomEventFiringWebDriver.sendKeysToDesktop(Arrays.asList(10, 20), DriverMode.LOCAL, gridConnector);
 		
-		verify(robot).keyPress(eq(10));
-		verify(robot).keyPress(eq(20));
-		verify(robot).keyRelease(eq(10));
-		verify(robot).keyRelease(eq(20));
+		verify(robot).keyPress(10);
+		verify(robot).keyPress(20);
+		verify(robot).keyRelease(10);
+		verify(robot).keyRelease(20);
 		verify(gridConnector, never()).sendKeysWithKeyboard(any(List.class));
 	}
 
@@ -657,10 +657,10 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	public void testSendKeysToDesktopWithGrid() {
 		CustomEventFiringWebDriver.sendKeysToDesktop(Arrays.asList(10, 20), DriverMode.GRID, gridConnector);
 
-		verify(robot, never()).keyPress(eq(10));
-		verify(robot, never()).keyPress(eq(20));
-		verify(robot, never()).keyRelease(eq(10));
-		verify(robot, never()).keyRelease(eq(20));
+		verify(robot, never()).keyPress(10);
+		verify(robot, never()).keyPress(20);
+		verify(robot, never()).keyRelease(10);
+		verify(robot, never()).keyRelease(20);
 		verify(gridConnector).sendKeysWithKeyboard(any(List.class));
 	}
 	
