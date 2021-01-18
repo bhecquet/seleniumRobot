@@ -93,7 +93,7 @@ public class TestSeleniumTestContextManager extends GenericTest {
 	/**
 	 * Check that version is shorten: 3.0.0 => 3.0
 	 * 
-	 * /!\ This test can anly be successful once a 'mvn package' has been performed so that the ant task generates the right file
+	 * /!\ This test can only be successful once a 'mvn package' has been performed so that the ant task generates the right file
 	 * @param iTestContext
 	 */
 	@Test(groups={"ut"})
