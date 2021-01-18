@@ -37,6 +37,11 @@ import kong.unirest.json.JSONObject;
 
 public abstract class SeleniumRobotServerConnector {
 	
+	protected static final String FIELD_NAME = "name";
+	private static final String REQUEST_FAILED_ERROR = "request to %s failed: %s";
+	private static final String RESPONSE_DETAIL = "detail";
+	protected static final String AUTHORIZATION_HEADER = "Authorization";
+
 	protected static final Logger logger = SeleniumRobotLogger.getLogger(SeleniumRobotServerConnector.class);
 
 	// api to get items from name
@@ -91,7 +96,7 @@ public abstract class SeleniumRobotServerConnector {
 			
 			HttpResponse<String> reply;
 			if (authToken != null) {
-				reply = unirest.get(url + testUrl).header("Authorization", authToken).asString();
+				reply = unirest.get(url + testUrl).header(AUTHORIZATION_HEADER, authToken).asString();
 			} else {
 				reply = unirest.get(url + testUrl).asString();
 			}
@@ -150,7 +155,7 @@ public abstract class SeleniumRobotServerConnector {
 		}
 		try {
 			JSONObject response = getJSonResponse(buildGetRequest(url + NAMED_APPLICATION_API_URL)
-					.queryString("name", SeleniumTestsContextManager.getApplicationName()));
+					.queryString(FIELD_NAME, SeleniumTestsContextManager.getApplicationName()));
 			applicationId = response.getInt("id");
 			return applicationId;
 		} catch (UnirestException | SeleniumRobotServerException e) {
@@ -169,7 +174,7 @@ public abstract class SeleniumRobotServerConnector {
 		}
 		try {
 			JSONObject response = getJSonResponse(buildGetRequest(url + NAMED_ENVIRONMENT_API_URL)
-					.queryString("name", SeleniumTestsContextManager.getGlobalContext().getTestEnv()));
+					.queryString(FIELD_NAME, SeleniumTestsContextManager.getGlobalContext().getTestEnv()));
 			environmentId = response.getInt("id");
 			return environmentId;
 		} catch (UnirestException | SeleniumRobotServerException e) {
@@ -211,7 +216,7 @@ public abstract class SeleniumRobotServerConnector {
 		try {
 			JSONObject testJson = getJSonResponse(buildPostRequest(url + TESTCASE_API_URL)
 					.field("application", applicationId.toString())
-					.field("name", strippedTestName));
+					.field(FIELD_NAME, strippedTestName));
 			return testJson.getInt("id");
 		} catch (UnirestException | JSONException | SeleniumRobotServerException e) {
 			throw new SeleniumRobotServerException("cannot create test case", e);
@@ -231,7 +236,7 @@ public abstract class SeleniumRobotServerConnector {
 		}
 		try {
 			JSONObject versionJson = getJSonResponse(buildPostRequest(url + VERSION_API_URL)
-					.field("name", SeleniumTestsContextManager.getApplicationVersion())
+					.field(FIELD_NAME, SeleniumTestsContextManager.getApplicationVersion())
 					.field("application", applicationId.toString()));
 			versionId = versionJson.getInt("id");
 		} catch (UnirestException | JSONException | SeleniumRobotServerException e) {
@@ -245,7 +250,7 @@ public abstract class SeleniumRobotServerConnector {
 		}
 		try {
 			JSONObject envJson = getJSonResponse(buildPostRequest(url + ENVIRONMENT_API_URL)
-					.field("name", SeleniumTestsContextManager.getGlobalContext().getTestEnv()));
+					.field(FIELD_NAME, SeleniumTestsContextManager.getGlobalContext().getTestEnv()));
 			environmentId = envJson.getInt("id");
 		} catch (UnirestException | JSONException | SeleniumRobotServerException e) {
 			throw new SeleniumRobotServerException("cannot create environment", e);
@@ -258,7 +263,7 @@ public abstract class SeleniumRobotServerConnector {
 		}
 		try {
 			JSONObject applicationJson = getJSonResponse(buildPostRequest(url + APPLICATION_API_URL)
-					.field("name", SeleniumTestsContextManager.getApplicationName()));
+					.field(FIELD_NAME, SeleniumTestsContextManager.getApplicationName()));
 			applicationId = applicationJson.getInt("id");
 		} catch (UnirestException | JSONException | SeleniumRobotServerException e) {
 			throw new SeleniumRobotServerException("cannot create application", e);
@@ -267,7 +272,7 @@ public abstract class SeleniumRobotServerConnector {
 	
 	protected GetRequest buildGetRequest(String url) {
 		if (authToken != null) {
-			return Unirest.get(url).header("Authorization", authToken);
+			return Unirest.get(url).header(AUTHORIZATION_HEADER, authToken);
 		} else {
 			return Unirest.get(url);
 		}
@@ -275,7 +280,7 @@ public abstract class SeleniumRobotServerConnector {
 	
 	protected HttpRequestWithBody buildPostRequest(String url) {
 		if (authToken != null) {
-			return Unirest.post(url).header("Authorization", authToken);
+			return Unirest.post(url).header(AUTHORIZATION_HEADER, authToken);
 		} else {
 			return Unirest.post(url);
 		}
@@ -283,7 +288,7 @@ public abstract class SeleniumRobotServerConnector {
 	
 	protected HttpRequestWithBody buildPatchRequest(String url) {
 		if (authToken != null) {
-			return Unirest.patch(url).header("Authorization", authToken);
+			return Unirest.patch(url).header(AUTHORIZATION_HEADER, authToken);
 		} else {
 			return Unirest.patch(url);
 		}
@@ -294,25 +299,25 @@ public abstract class SeleniumRobotServerConnector {
 		HttpResponse<String> response = request.asString();
 
 		if (response.getStatus() == 423) {
-			String error = new JSONObject(response.getBody()).getString("detail");
+			String error = new JSONObject(response.getBody()).getString(RESPONSE_DETAIL);
 			throw new SeleniumRobotServerException(error);
 		}
 		
 		if (response.getStatus() >= 400) {
 			String error = "unknown";
 			try {
-				error = new JSONObject(response.getBody()).getString("detail");
+				error = new JSONObject(response.getBody()).getString(RESPONSE_DETAIL);
 			} catch (JSONException e) {
-				throw new SeleniumRobotServerException(String.format("request to %s failed: %s", request.getUrl(), response.getBody()));
+				throw new SeleniumRobotServerException(String.format(REQUEST_FAILED_ERROR, request.getUrl(), response.getBody()));
 			} catch (Exception e) {
-				throw new UnirestException(String.format("request to %s failed: %s", request.getUrl(), response.getStatusText()));
+				throw new UnirestException(String.format(REQUEST_FAILED_ERROR, request.getUrl(), response.getStatusText()));
 			}
 			
 			if (response.getStatus() == 401) {
 				error += "You need to provide the API token through 'seleniumRobotServerToken' parameter";
 			}
 
-			throw new SeleniumRobotServerException(String.format("request to %s failed: %s", request.getUrl(), error));
+			throw new SeleniumRobotServerException(String.format(REQUEST_FAILED_ERROR, request.getUrl(), error));
 		}
 		
 		if (response.getStatus() == 204) {
@@ -327,16 +332,16 @@ public abstract class SeleniumRobotServerConnector {
 		
 
 		if (response.getStatus() == 423) {
-			String error = new JSONObject(response.getBody()).getString("detail");
+			String error = new JSONObject(response.getBody()).getString(RESPONSE_DETAIL);
 			throw new SeleniumRobotServerException(error);
 		}
 		
 		if (response.getStatus() >= 400) {
 			try {
-				String error = new JSONObject(response.getBody()).getString("detail");
-				throw new SeleniumRobotServerException(String.format("request to %s failed: %s", request.getUrl(), error));
+				String error = new JSONObject(response.getBody()).getString(RESPONSE_DETAIL);
+				throw new SeleniumRobotServerException(String.format(REQUEST_FAILED_ERROR, request.getUrl(), error));
 			} catch (Exception e) {
-				throw new UnirestException(String.format("request to %s failed: %s", request.getUrl(), response.getStatusText()));
+				throw new UnirestException(String.format(REQUEST_FAILED_ERROR, request.getUrl(), response.getStatusText()));
 			}
 			
 		}

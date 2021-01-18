@@ -11,6 +11,7 @@ import kong.unirest.json.JSONObject;
 
 public class Campaign extends Entity {
 
+
 	public static final String CAMPAIGNS_URL = "campaigns";
 	public static final String ITERATIONS_URL = "/iterations";
 
@@ -23,13 +24,14 @@ public class Campaign extends Entity {
 	 * Get list of all campaigns
 	 * @return
 	 */
+	@SuppressWarnings("unchecked")
 	public static List<Campaign> getAll() {
 		try {
 			JSONObject json = getPagedJSonResponse(buildGetRequest(apiRootUrl + CAMPAIGNS_URL));
 			
 			List<Campaign> campaigns = new ArrayList<>();
-			if (json.has("_embedded")) {
-				for (JSONObject folderJson: (List<JSONObject>)json.getJSONObject("_embedded").getJSONArray("campaigns").toList()) {
+			if (json.has(FIELD_EMBEDDED)) {
+				for (JSONObject folderJson: (List<JSONObject>)json.getJSONObject(FIELD_EMBEDDED).getJSONArray(TYPE_CAMPAIGN).toList()) {
 					campaigns.add(Campaign.fromJson(folderJson));
 				}
 			}
@@ -42,13 +44,14 @@ public class Campaign extends Entity {
 	/**
 	 * get iterations for the current campaign
 	 */
+	@SuppressWarnings("unchecked")
 	public List<Iteration> getIterations() {
 		try {
 			JSONObject json = getPagedJSonResponse(buildGetRequest(url + String.format(ITERATIONS_URL, id)));
 			
 			List<Iteration> iterations = new ArrayList<>();
-			if (json.has("_embedded")) {
-				for (JSONObject iterationJson: (List<JSONObject>)json.getJSONObject("_embedded").getJSONArray("iterations").toList()) {
+			if (json.has(FIELD_EMBEDDED)) {
+				for (JSONObject iterationJson: (List<JSONObject>)json.getJSONObject(FIELD_EMBEDDED).getJSONArray("iterations").toList()) {
 					iterations.add(Iteration.fromJson(iterationJson));
 				}
 			}
@@ -61,8 +64,8 @@ public class Campaign extends Entity {
 	public static Campaign fromJson(JSONObject json) {
 		try {
 			return new Campaign(json.getJSONObject("_links").getJSONObject("self").getString("href"),
-					json.getInt("id"),
-					json.getString("name"));
+					json.getInt(FIELD_ID),
+					json.getString(FIELD_NAME));
 		} catch (JSONException e) {
 			throw new ScenarioException(String.format("Cannot create Campaign from JSON [%s] data: %s", json.toString(), e.getMessage()));
 		}
@@ -73,17 +76,17 @@ public class Campaign extends Entity {
 			
 			
 			JSONObject body = new JSONObject();
-			body.put("_type", "campaign");
-			body.put("name", campaignName);
+			body.put(FIELD_TYPE, TYPE_CAMPAIGN);
+			body.put(FIELD_NAME, campaignName);
 			body.put("status", "PLANNED");
 			
 			JSONObject parent = new JSONObject();
 			if (parentFolder == null) {
-				parent.put("id", project.id);
-				parent.put("_type", "project");	
+				parent.put(FIELD_ID, project.id);
+				parent.put(FIELD_TYPE, "project");	
 			} else {
-				parent.put("id", parentFolder.id);
-				parent.put("_type", "campaign-folder");	
+				parent.put(FIELD_ID, parentFolder.id);
+				parent.put(FIELD_TYPE, "campaign-folder");	
 			}
 			body.put("parent", parent);
 			

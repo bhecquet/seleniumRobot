@@ -36,6 +36,8 @@ import io.appium.java_client.remote.AndroidMobileCapabilityType;
 
 public class ChromeCapabilitiesFactory extends IDesktopCapabilityFactory {
 
+	private static final String USER_DATA_DIR_OPTION = "--user-data-dir=";
+
 	public ChromeCapabilitiesFactory(DriverConfig webDriverConfig) {
 		super(webDriverConfig);
 	}
@@ -149,9 +151,9 @@ public class ChromeCapabilitiesFactory extends IDesktopCapabilityFactory {
 		
         if (webDriverConfig.getChromeProfilePath() != null) {
         	if (!BrowserInfo.DEFAULT_BROWSER_PRODFILE.equals(webDriverConfig.getChromeProfilePath()) && (webDriverConfig.getChromeProfilePath().contains("/") || webDriverConfig.getChromeProfilePath().contains("\\"))) {
-        		((ChromeOptions)options).addArguments("--user-data-dir=" + webDriverConfig.getChromeProfilePath()); // e.g: C:\\Users\\MyUser\\AppData\\Local\\Google\\Chrome\\User Data
+        		((ChromeOptions)options).addArguments(USER_DATA_DIR_OPTION + webDriverConfig.getChromeProfilePath()); // e.g: C:\\Users\\MyUser\\AppData\\Local\\Google\\Chrome\\User Data
         	} else if (BrowserInfo.DEFAULT_BROWSER_PRODFILE.equals(webDriverConfig.getChromeProfilePath())) {
-        		((ChromeOptions)options).addArguments("--user-data-dir=" + selectedBrowserInfo.getDefaultProfilePath()); 
+        		((ChromeOptions)options).addArguments(USER_DATA_DIR_OPTION + selectedBrowserInfo.getDefaultProfilePath()); 
         	} else {
         		logger.warn(String.format("Chrome profile %s could not be set", webDriverConfig.getChromeProfilePath()));
         	}
@@ -167,7 +169,7 @@ public class ChromeCapabilitiesFactory extends IDesktopCapabilityFactory {
 	protected void updateGridOptionsWithSelectedBrowserInfo(MutableCapabilities options) {
 		if (webDriverConfig.getChromeProfilePath() != null) {
         	if (!BrowserInfo.DEFAULT_BROWSER_PRODFILE.equals(webDriverConfig.getChromeProfilePath()) && (webDriverConfig.getChromeProfilePath().contains("/") || webDriverConfig.getChromeProfilePath().contains("\\"))) {
-        		((ChromeOptions)options).addArguments("--user-data-dir=" + webDriverConfig.getChromeProfilePath()); // e.g: C:\\Users\\MyUser\\AppData\\Local\\Google\\Chrome\\User Data
+        		((ChromeOptions)options).addArguments(USER_DATA_DIR_OPTION + webDriverConfig.getChromeProfilePath()); // e.g: C:\\Users\\MyUser\\AppData\\Local\\Google\\Chrome\\User Data
         	} else if (BrowserInfo.DEFAULT_BROWSER_PRODFILE.equals(webDriverConfig.getChromeProfilePath())) {
         		options.setCapability("chromeProfile", BrowserInfo.DEFAULT_BROWSER_PRODFILE);
         	} else {

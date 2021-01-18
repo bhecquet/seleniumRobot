@@ -27,7 +27,7 @@ public class TestCase extends Entity {
 	public static TestCase fromJson(JSONObject json) {
 		try {
 			return new TestCase (
-					json.getInt("id"), 
+					json.getInt(FIELD_ID), 
 					json.getJSONObject("_links").getJSONObject("self").getString("href")
 					);
 		} catch (JSONException e) {

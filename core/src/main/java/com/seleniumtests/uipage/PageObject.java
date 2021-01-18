@@ -81,7 +81,8 @@ import com.seleniumtests.util.helper.WaitHelper;
 
 public class PageObject extends BasePage implements IPage {
 
-    private static final String ELEMENT_S_IS_NOT_AN_HTML_ELEMENT_SUBCLASS = "Element %s is not an HtmlElement subclass";
+    private static final String ERROR_ELEMENT_S_IS_NOT_AN_TABLE_ELEMENT = "Element %s is not an Table element";
+	private static final String ELEMENT_S_IS_NOT_AN_HTML_ELEMENT_SUBCLASS = "Element %s is not an HtmlElement subclass";
 	private static final String ERROR_ELEMENT_IS_PRESENT = "Element %s is present";
 	private boolean frameFlag = false;
     private String windowHandle = null; // store the window / tab on which this page is loaded
@@ -102,7 +103,7 @@ public class PageObject extends BasePage implements IPage {
      *
      * @throws  Exception
      */
-    public PageObject() throws IOException {
+    public PageObject() {
         this(null, null);
     }
 
@@ -114,11 +115,11 @@ public class PageObject extends BasePage implements IPage {
      *
      * @throws  Exception
      */
-    public PageObject(final HtmlElement pageIdentifierElement) throws IOException  {
+    public PageObject(final HtmlElement pageIdentifierElement)   {
         this(pageIdentifierElement, null);
     }
     
-    public PageObject(final HtmlElement pageIdentifierElement, final String url) throws IOException {
+    public PageObject(final HtmlElement pageIdentifierElement, final String url) {
     	this(pageIdentifierElement, 
     			url, 
     			SeleniumTestsContextManager.getThreadContext().getBrowser(), 
@@ -138,7 +139,7 @@ public class PageObject extends BasePage implements IPage {
      *
      * @throws  Exception
      */
-    public PageObject(final HtmlElement pageIdentifierElement, final String url, PageLoadStrategy pageLoadStrategy) throws IOException {
+    public PageObject(final HtmlElement pageIdentifierElement, final String url, PageLoadStrategy pageLoadStrategy) {
     	this(pageIdentifierElement, 
     			url, 
     			SeleniumTestsContextManager.getThreadContext().getBrowser(), 
@@ -162,7 +163,7 @@ public class PageObject extends BasePage implements IPage {
      *
      * @throws  Exception
      */
-    public PageObject(final HtmlElement pageIdentifierElement, final String url, PageLoadStrategy pageLoadStrategy, boolean captureSnapshot) throws IOException {
+    public PageObject(final HtmlElement pageIdentifierElement, final String url, PageLoadStrategy pageLoadStrategy, boolean captureSnapshot) {
     	this(pageIdentifierElement, 
     			url, 
     			SeleniumTestsContextManager.getThreadContext().getBrowser(), 
@@ -186,10 +187,10 @@ public class PageObject extends BasePage implements IPage {
      *
      * @throws  Exception
      */
-    public PageObject(HtmlElement pageIdentifierElement, String url, BrowserType browserType, String driverName, Integer attachExistingDriverPort) throws IOException {
+    public PageObject(HtmlElement pageIdentifierElement, String url, BrowserType browserType, String driverName, Integer attachExistingDriverPort) {
     	this(pageIdentifierElement, url, browserType, driverName, attachExistingDriverPort, null, true);
     }
-    public PageObject(HtmlElement pageIdentifierElement, String url, BrowserType browserType, String driverName, Integer attachExistingDriverPort, boolean captureSnapshot) throws IOException {
+    public PageObject(HtmlElement pageIdentifierElement, String url, BrowserType browserType, String driverName, Integer attachExistingDriverPort, boolean captureSnapshot) {
     	this(pageIdentifierElement, url, browserType, driverName, attachExistingDriverPort, null, captureSnapshot);
     }
 
@@ -209,7 +210,7 @@ public class PageObject extends BasePage implements IPage {
      *
      * @throws  Exception
      */
-    public PageObject(HtmlElement pageIdentifierElement, String url, BrowserType browserType, String driverName, Integer attachExistingDriverPort, PageLoadStrategy pageLoadStrategy, boolean captureSnapshot) throws IOException {
+    public PageObject(HtmlElement pageIdentifierElement, String url, BrowserType browserType, String driverName, Integer attachExistingDriverPort, PageLoadStrategy pageLoadStrategy, boolean captureSnapshot)  {
 
     	systemClock = Clock.systemUTC();
     	this.captureSnapshot = captureSnapshot;
@@ -1135,7 +1136,7 @@ public class PageObject extends BasePage implements IPage {
 		if (element instanceof Table) {
 			((Table)element).getCell(row, column).click();
 		} else {
-			throw new ScenarioException(String.format("Element %s is not an Table element", fieldName));
+			throw new ScenarioException(String.format(ERROR_ELEMENT_S_IS_NOT_AN_TABLE_ELEMENT, fieldName));
 		}
 		return (T)this;
     }
@@ -1331,7 +1332,7 @@ public class PageObject extends BasePage implements IPage {
 					ExpectedConditions.textToBePresentInElement(((Table)element).getCell(row, column), value));
 			
 		} else {
-			throw new ScenarioException(String.format("Element %s is not an Table element", fieldName));
+			throw new ScenarioException(String.format(ERROR_ELEMENT_S_IS_NOT_AN_TABLE_ELEMENT, fieldName));
 		}
 		return (T)this;
     }
@@ -1485,7 +1486,7 @@ public class PageObject extends BasePage implements IPage {
 				Assert.assertTrue(false, "Table or cell not found");
 			}
 		} else {
-			throw new ScenarioException(String.format("Element %s is not an Table element", fieldName));
+			throw new ScenarioException(String.format(ERROR_ELEMENT_S_IS_NOT_AN_TABLE_ELEMENT, fieldName));
 		}
 		return (T)this;
     }

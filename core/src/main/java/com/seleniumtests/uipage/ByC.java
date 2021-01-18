@@ -580,11 +580,12 @@ public class ByC extends By {
 	 */
 	public static class And extends ByC implements Serializable {
 		
+		private static final String ERROR_CANNOT_FIND_ELEMENT_WITH_SUCH_CRITERIA = "Cannot find element with such criteria ";
 		/**
 		 * 
 		 */
 		private static final long serialVersionUID = 6341968046120372161L;
-		private By[] bies;
+		private transient By[] bies;
 		
 		public And(By ... bies) {
 			if (bies.length == 0) {
@@ -609,7 +610,7 @@ public class ByC extends By {
 			try {
 				return findElements(context).get(0);
 			} catch (IndexOutOfBoundsException e) {
-				throw new NoSuchElementException("Cannot find element with such criteria " + toString());
+				throw new NoSuchElementException(ERROR_CANNOT_FIND_ELEMENT_WITH_SUCH_CRITERIA + toString());
 			}
 		}
 		
@@ -631,7 +632,7 @@ public class ByC extends By {
 
 		private static final long serialVersionUID = 6341668046120372161L;
 		
-		private By[] bies;
+		private transient By[] bies;
 		
 		public Shadow(By ... bies) {
 			if (bies.length == 0) {
@@ -707,7 +708,7 @@ public class ByC extends By {
 	 */
 	public static class Or extends ByC implements Serializable {
 		
-		private By[] bies;
+		private transient By[] bies;
 
 		private static final long serialVersionUID = 6341968046167372161L;
 		
@@ -776,7 +777,7 @@ public class ByC extends By {
 
 		private static final long serialVersionUID = 6341968046120092161L;
 
-		private By by;
+		private transient By by;
 		
 		public Android(By by) {
 			this.by = by;
@@ -813,7 +814,7 @@ public class ByC extends By {
 		
 
 		private static final long serialVersionUID = 6341468046120372161L;
-		private By by;
+		private transient By by;
 		
 		public Ios(By by) {
 			this.by = by;

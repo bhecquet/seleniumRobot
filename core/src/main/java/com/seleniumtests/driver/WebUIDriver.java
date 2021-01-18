@@ -243,9 +243,9 @@ public class WebUIDriver {
      * Used when terminating test, before closing browser
      * extract the video file recorded by test
      */
-    public static File logFinalDriversState() {
+    public static void logFinalDriversState() {
     	if (uxDriverSession.get() == null) {
-    		return null;
+    		return;
     	}
     	
     	for (WebUIDriver webuiDriver: uxDriverSession.get().values()) {
@@ -253,10 +253,7 @@ public class WebUIDriver {
     			webuiDriver.logFinalDriverState();
     		}
     	}
-    	
-//    	File videoFile = stopVideoCapture();
-		
-		return null;
+
     }
     
     /**

@@ -51,7 +51,8 @@ import com.seleniumtests.reporter.logger.TestStep;
 public class JiraConnector extends BugTracker {
 
 
-    private static Logger logger = Logger.getLogger(JiraConnector.class);
+    private static final String ITEM = "    - %s";
+	private static Logger logger = Logger.getLogger(JiraConnector.class);
     private String projectKey;
     private String browseUrl;
     private Map<String, BasicComponent> components;
@@ -240,15 +241,15 @@ public class JiraConnector extends BugTracker {
 		String priority = issueOptions.get("priority");
 		String issueType = issueOptions.get("jira.issueType");
 		Map<String, String> customFieldsValues = new HashMap<>();
-		for (String variable: issueOptions.keySet()) {
-			if (variable.startsWith("jira.field.")) {
-				customFieldsValues.put(variable.replace("jira.field.", ""), issueOptions.get(variable));
+		for (Entry<String, String> variable: issueOptions.entrySet()) {
+			if (variable.getKey().startsWith("jira.field.")) {
+				customFieldsValues.put(variable.getKey().replace("jira.field.", ""), variable.getValue());
 			}
 		}
 
-		List<String> components = new ArrayList<>();
+		List<String> comps = new ArrayList<>();
 		if (issueOptions.get("jira.components") != null) {
-			components = Arrays.asList(issueOptions.get("jira.components").split(","));
+			comps = Arrays.asList(issueOptions.get("jira.components").split(","));
 		}
 		
 		
@@ -263,9 +264,10 @@ public class JiraConnector extends BugTracker {
 				screenShots,
 				zipFile,
 				customFieldsValues,
-				components);
+				comps);
 	}
     
+    @Override
     protected void formatDescription(String testName, List<TestStep> failedSteps, TestStep lastTestStep, String description, StringBuilder fullDescription) {
 
     	fullDescription.append(String.format("*Test:* %s\n", testName));
@@ -574,12 +576,12 @@ public class JiraConnector extends BugTracker {
     	
     	System.out.println("Proprities:");
     	for (String priority: jiraConnector.priorities.keySet()) {
-    		System.out.println(String.format("    - %s", priority));
+    		System.out.println(String.format(ITEM, priority));
     	}
 
     	System.out.println("\nComponents:");
     	for (String component: jiraConnector.components.keySet()) {
-    		System.out.println(String.format("    - %s", component));
+    		System.out.println(String.format(ITEM, component));
     	}
 
     	System.out.println(String.format("\nListing required fields and allowed values (if any) for issue '%s'", args[4]));
@@ -590,7 +592,7 @@ public class JiraConnector extends BugTracker {
     		System.out.println(String.format("Field '%s':", entry.getKey()));
     		
     		for (String value: entry.getValue()) {
-    			System.out.println(String.format("    - %s", value));
+    			System.out.println(String.format(ITEM, value));
     		}
     	}
     	

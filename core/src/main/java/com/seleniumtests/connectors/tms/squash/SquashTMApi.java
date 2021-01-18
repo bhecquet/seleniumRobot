@@ -92,10 +92,10 @@ public class SquashTMApi {
 			boolean folderExists = false;
 			for (CampaignFolder existingFolder: campaignFolders) {
 				if (existingFolder.getName().equals(folderName) 
-						&& (existingFolder.project == null || existingFolder.project != null && existingFolder.project.getId() == currentProject.getId())
-						&& (existingFolder.parent == null 
-							|| parentFolder == null && existingFolder.parent != null && existingFolder.parent instanceof Project
-							|| (parentFolder != null && existingFolder.parent != null && existingFolder.parent instanceof CampaignFolder && existingFolder.parent.getId() == parentFolder.getId()))) {
+						&& (existingFolder.getProject() == null || existingFolder.getProject() != null && existingFolder.getProject().getId() == currentProject.getId())
+						&& (existingFolder.getParent() == null 
+							|| parentFolder == null && existingFolder.getParent() != null && existingFolder.getParent() instanceof Project
+							|| (parentFolder != null && existingFolder.getParent() != null && existingFolder.getParent() instanceof CampaignFolder && existingFolder.getParent().getId() == parentFolder.getId()))) {
 					folderExists = true;
 					parentFolder = existingFolder;
 					break;

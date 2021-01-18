@@ -38,6 +38,8 @@ import com.sun.jna.platform.win32.WinReg;
 
 public class OSUtilityWindows extends OSUtility {
 	
+	private static final String EXE_EXT_QUOTE = ".exe\"";
+	private static final String KEY_VERSION = "version";
 	Pattern versionPattern = Pattern.compile(".*?(\\d+\\.\\d+\\.\\d+).*?");
 		
 	@Override
@@ -102,7 +104,9 @@ public class OSUtilityWindows extends OSUtility {
     	if (force) {
     		try {
     			OSCommand.executeCommandAndWait(String.format("wmic process where \"processid='%s'\" delete", pid));
-    		} catch (Throwable e) {}
+    		} catch (Exception e) {
+    			// use an other mean if wmic fails
+    		}
     		return OSCommand.executeCommandAndWait("taskkill /F /PID " + pid);
     	} else {
     		return OSCommand.executeCommandAndWait("taskkill /PID " + pid);
@@ -119,8 +123,9 @@ public class OSUtilityWindows extends OSUtility {
 	public String killProcessByName(String programName, boolean force) {
 		if (force) {
 			try {
-    			String out = OSCommand.executeCommandAndWait(String.format("wmic process where \"name='%s'\" delete", programName + getProgramExtension()));
-    		} catch (Throwable e) {
+    			OSCommand.executeCommandAndWait(String.format("wmic process where \"name='%s'\" delete", programName + getProgramExtension()));
+    		} catch (Exception e) {
+    			// use an other mean if wmic fails
     		}
 			return OSCommand.executeCommandAndWait("taskkill /F /IM " + programName + getProgramExtension());
     	} else {
@@ -147,17 +152,17 @@ public class OSUtilityWindows extends OSUtility {
 	
 	private String getChromeVersionFromRegistry() {
 		try {
-			return Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Wow6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Google Chrome", "version");
+			return Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Wow6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Google Chrome", KEY_VERSION);
 		} catch (Win32Exception e) {
-			return Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Google\\Chrome\\BLBeacon", "version");
+			return Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Google\\Chrome\\BLBeacon", KEY_VERSION);
 		}
 	}
 	
 	private String getChromeBetaVersionFromRegistry() {
 		try {
-			return Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Wow6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Google Chrome Beta", "version");
+			return Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Wow6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Google Chrome Beta", KEY_VERSION);
 		} catch (Win32Exception e) {
-			return Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Google\\Chrome Beta\\BLBeacon", "version");
+			return Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Google\\Chrome Beta\\BLBeacon", KEY_VERSION);
 		}
 	}
 	
@@ -182,7 +187,7 @@ public class OSUtilityWindows extends OSUtility {
 		try {
 			return Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Microsoft\\Internet Explorer", "svcVersion");
 		} catch (Win32Exception e) {
-			return Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Microsoft\\Internet Explorer", "version");
+			return Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Microsoft\\Internet Explorer", KEY_VERSION);
 		}
 	}
 	
@@ -194,9 +199,11 @@ public class OSUtilityWindows extends OSUtility {
 				String keyPath = line.replace("HKEY_CLASSES_ROOT\\", "").trim();
 				try {
 					String firefoxPath = Advapi32Util.registryGetStringValue(WinReg.HKEY_CLASSES_ROOT, keyPath + "\\shell\\open\\command", "");
-					firefoxPath = firefoxPath.split(".exe\"")[0].replace("\"", "") + ".exe";
+					firefoxPath = firefoxPath.split(EXE_EXT_QUOTE)[0].replace("\"", "") + ".exe";
 					firefoxInstallations.add(firefoxPath);
-				} catch (Win32Exception e) {}
+				} catch (Win32Exception e) {
+					// do not crash
+				}
 			}
 		}
 		return firefoxInstallations;
@@ -231,7 +238,7 @@ public class OSUtilityWindows extends OSUtility {
 			
 			// main chrome version
 			String chromePath = Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Classes\\ChromeHTML\\shell\\open\\command", "");
-			chromePath = chromePath.split(".exe\"")[0].replace("\"", "") + ".exe";
+			chromePath = chromePath.split(EXE_EXT_QUOTE)[0].replace("\"", "") + ".exe";
 			String version;
 			try {
 				version = getChromeVersionFromRegistry();
@@ -245,7 +252,7 @@ public class OSUtilityWindows extends OSUtility {
 			try {
 				// beta chrome version
 				String chromeBetaPath = Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Classes\\ChromeBHTML\\shell\\open\\command", "");
-				chromeBetaPath = chromeBetaPath.split(".exe\"")[0].replace("\"", "") + ".exe";
+				chromeBetaPath = chromeBetaPath.split(EXE_EXT_QUOTE)[0].replace("\"", "") + ".exe";
 				String versionBeta;
 				try {
 					versionBeta = getChromeBetaVersionFromRegistry();

@@ -31,8 +31,8 @@ public class TestPlanItemExecution extends Entity {
 		try {
 			return new TestPlanItemExecution (
 					json.getJSONObject("_links").getJSONObject("self").getString("href"),
-					json.getInt("id"), 
-					json.getString("name")
+					json.getInt(FIELD_ID), 
+					json.getString(FIELD_NAME)
 					);
 		} catch (JSONException e) {
 			throw new ScenarioException(String.format("Cannot create TestPlanItemException from JSON [%s] data: %s", json.toString(), e.getMessage()));

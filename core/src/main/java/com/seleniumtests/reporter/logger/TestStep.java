@@ -55,6 +55,7 @@ import com.seleniumtests.reporter.reporters.CommonReporter;
  *
  */
 public class TestStep extends TestAction {
+	private static final String BEFORE_STEP_PREFIX = "before-";
 	private List<TestAction> stepActions;
 	private Long duration;
 	private Date startDate;
@@ -299,12 +300,14 @@ public class TestStep extends TestAction {
 				try {
 					usedFiles.add(new File(snapshot.getScreenshot().getFullHtmlPath()).getCanonicalFile());
 				} catch (IOException e) {
+					// error while getting HtmlPath
 				}
 			}
 			if (snapshot.getScreenshot().getFullImagePath() != null) {
 				try {
 					usedFiles.add(new File(snapshot.getScreenshot().getFullImagePath()).getCanonicalFile());
 				} catch (IOException e) {
+					// error getting image path
 				}
 			}
 		}
@@ -328,7 +331,7 @@ public class TestStep extends TestAction {
 	public void moveAttachments(String outputDirectory) throws IOException {
 
 		for (Snapshot snapshot: snapshots) {
-			if (snapshot == null || snapshot.getScreenshot() == null || !snapshot.getScreenshot().getFullHtmlPath().contains("before-") ) {
+			if (snapshot == null || snapshot.getScreenshot() == null || !snapshot.getScreenshot().getFullHtmlPath().contains(BEFORE_STEP_PREFIX) ) {
 				continue;
 			}
 			try {
@@ -345,13 +348,13 @@ public class TestStep extends TestAction {
 		}
 	
 		for (HarCapture harCapture: harCaptures) {
-			if (harCapture.getFile().toString().contains("before-")) {
+			if (harCapture.getFile().toString().contains(BEFORE_STEP_PREFIX)) {
 				harCapture.relocate(outputDirectory);
 			}
 		}
 		
 		for (GenericFile genericFile: files) {
-			if (genericFile.getFile().toString().contains("before-")) {
+			if (genericFile.getFile().toString().contains(BEFORE_STEP_PREFIX)) {
 				genericFile.relocate(outputDirectory);
 			}
 		}
@@ -408,6 +411,7 @@ public class TestStep extends TestAction {
 		return step;
 	}
 
+	@Override
 	public TestStep deepCopy() {
 		return encode(null);
 	}

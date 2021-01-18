@@ -26,11 +26,7 @@ public class AngularSelect extends CommonSelectList implements ISelectList {
 
 	@Override
 	public boolean isApplicable() {
-		if ("ng-select".equalsIgnoreCase(parentElement.getTagName())) {
-			return true;
-		} else {
-			return false;
-		}
+		return "ng-select".equalsIgnoreCase(parentElement.getTagName());
 	}
 	
 	@Override
@@ -72,7 +68,7 @@ public class AngularSelect extends CommonSelectList implements ISelectList {
 		List<WebElement> toReturn = new ArrayList<>();
 		
 		for (WebElement option : options) {
-			if (option.getAttribute("aria-selected").contains("true")) {
+			if (option.getAttribute(ATTR_ARIA_SELECTED).contains("true")) {
 				toReturn.add(option);
 			}
 		}
@@ -170,7 +166,7 @@ public class AngularSelect extends CommonSelectList implements ISelectList {
 
 	@Override
 	public void setSelected(WebElement option) {
-		String selected = ((HtmlElement)((CachedHtmlElement)option).getRealElement()).getAttribute("aria-selected");
+		String selected = ((HtmlElement)((CachedHtmlElement)option).getRealElement()).getAttribute(ATTR_ARIA_SELECTED);
 		if (selected == null || "false".equals(selected)) {
 			// here list should still be visible
 			HtmlElement checkbox = ((HtmlElement)((CachedHtmlElement)option).getRealElement()).findElement(By.tagName("input"));
@@ -185,7 +181,7 @@ public class AngularSelect extends CommonSelectList implements ISelectList {
 
 	@Override
 	public void setDeselected(WebElement option) {
-		if ("true".equals(option.getAttribute("aria-selected"))) {
+		if ("true".equals(option.getAttribute(ATTR_ARIA_SELECTED))) {
 			HtmlElement checkbox = ((HtmlElement)((CachedHtmlElement)option).getRealElement()).findElement(By.tagName("input"));
 			if (checkbox.isElementPresent(0)) {
 				checkbox.click();

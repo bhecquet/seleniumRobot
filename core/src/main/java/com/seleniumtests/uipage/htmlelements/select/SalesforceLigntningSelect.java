@@ -24,11 +24,7 @@ public class SalesforceLigntningSelect extends CommonSelectList implements ISele
 	
 	@Override
 	public boolean isApplicable() {
-		if ("lightning-base-combobox".equalsIgnoreCase(parentElement.getTagName())) {
-			return true;
-		} else {
-			return false;
-		}
+		return "lightning-base-combobox".equalsIgnoreCase(parentElement.getTagName());
 	}
 
 	@Override
@@ -77,13 +73,13 @@ public class SalesforceLigntningSelect extends CommonSelectList implements ISele
 	@Override
 	public List<WebElement> getAllSelectedOptions() {
 		return options.stream()
-			.filter(el -> "true".equalsIgnoreCase(el.getAttribute("aria-selected")))
+			.filter(el -> "true".equalsIgnoreCase(el.getAttribute(ATTR_ARIA_SELECTED)))
 			.collect(Collectors.toList());
 	}
 
 	@Override
 	public void setSelected(WebElement option) {
-		if ("false".equals(option.getAttribute("aria-selected"))) {
+		if ("false".equals(option.getAttribute(ATTR_ARIA_SELECTED))) {
 			option.click();
 		}
 
@@ -140,7 +136,7 @@ public class SalesforceLigntningSelect extends CommonSelectList implements ISele
 
 	@Override
 	public void setDeselected(WebElement option) {
-		if ("true".equals(option.getAttribute("aria-selected"))) {
+		if ("true".equals(option.getAttribute(ATTR_ARIA_SELECTED))) {
 			option.click();
 		}
 

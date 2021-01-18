@@ -41,6 +41,7 @@ public class NativeSelect extends CommonSelectList implements ISelectList {
 	
 	@Override
 	public void finalizeAction() {
+		// nothing to finalize
 	}
 
 	@Override

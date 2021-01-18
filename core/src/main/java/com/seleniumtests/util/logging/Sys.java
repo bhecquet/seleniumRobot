@@ -10,6 +10,9 @@ import org.apache.log4j.Logger;
  */
 public class Sys {
 
+	private Sys() {
+		// nothing to do
+	}
 	
 	public static class Out extends LoggingOutputStream {
 		public Out(final Logger log) {
@@ -18,7 +21,7 @@ public class Sys {
 
 		@Override
 		protected void log(String str) {
-			log.log(level, str);
+			logger.log(level, str);
 		}
 	}
 	
@@ -29,7 +32,7 @@ public class Sys {
 
 		@Override
 		protected void log(String str) {
-			log.log(level, str);
+			logger.log(level, str);
 		}
 	}
 }

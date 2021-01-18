@@ -52,6 +52,7 @@ import net.lightbody.bmp.BrowserMobProxy;
  */
 public class TestTasks {
 	
+	private static final String ERROR_NO_GRID_CONNECTOR_ACTIVE = "No grid connector active";
 	private static final ScenarioLogger logger = ScenarioLogger.getScenarioLogger(TestTasks.class); 
 	
 	private TestTasks() {
@@ -71,7 +72,7 @@ public class TestTasks {
     		if (gridConnector != null) {
     			gridConnector.killProcess(processName);
     		} else {
-				throw new ScenarioException("No grid connector active");
+				throw new ScenarioException(ERROR_NO_GRID_CONNECTOR_ACTIVE);
 			}
     		
     	} else {
@@ -98,7 +99,7 @@ public class TestTasks {
 			if (gridConnector != null) {
 				return gridConnector.getProcessList(processName);
 			} else {
-				throw new ScenarioException("No grid connector active");
+				throw new ScenarioException(ERROR_NO_GRID_CONNECTOR_ACTIVE);
 			}
 		} else {
 			throw new ScenarioException("killing a process is only supported in local and grid mode");
@@ -123,7 +124,7 @@ public class TestTasks {
     		if (gridConnector != null) {
     			return gridConnector.executeCommand(program, args);
     		} else {
-				throw new ScenarioException("No grid connector active");
+				throw new ScenarioException(ERROR_NO_GRID_CONNECTOR_ACTIVE);
 			}
     		
     	} else {

@@ -27,8 +27,8 @@ public class Project extends Entity {
 			JSONObject json = getPagedJSonResponse(buildGetRequest(apiRootUrl + PROJECTS_URL));
 	
 			List<Project> projects = new ArrayList<>();
-			if (json.has("_embedded")) {
-				for (JSONObject projectJson: (List<JSONObject>)json.getJSONObject("_embedded").getJSONArray("projects").toList()) {
+			if (json.has(FIELD_EMBEDDED)) {
+				for (JSONObject projectJson: (List<JSONObject>)json.getJSONObject(FIELD_EMBEDDED).getJSONArray(FIELD_PROJECTS).toList()) {
 					projects.add(Project.fromJson(projectJson));
 				}
 			}
@@ -40,9 +40,9 @@ public class Project extends Entity {
 
 	public JSONObject asJson() {
 		JSONObject json = new JSONObject();
-		json.put("_type", "project");
-		json.put("id", id);
-		json.put("name", name);
+		json.put(FIELD_TYPE, TYPE_PROJECT);
+		json.put(FIELD_ID, id);
+		json.put(FIELD_NAME, name);
 		return json;
 	}
 
@@ -50,8 +50,8 @@ public class Project extends Entity {
 		try {
 			return new Project(
 					json.getJSONObject("_links").getJSONObject("self").getString("href"),
-					json.getInt("id"), 
-					json.getString("name"));
+					json.getInt(FIELD_ID), 
+					json.getString(FIELD_NAME));
 		} catch (JSONException e) {
 			throw new ScenarioException(String.format("Cannot create Project from JSON [%s] data: %s", json.toString(), e.getMessage()));
 		}
@@ -62,8 +62,8 @@ public class Project extends Entity {
 			JSONObject json = getPagedJSonResponse(buildGetRequest(url + CAMPAIGNS_URL));
 			
 			List<Campaign> campaigns = new ArrayList<>();
-			if (json.has("_embedded")) {
-				for (JSONObject folderJson: (List<JSONObject>)json.getJSONObject("_embedded").getJSONArray("campaigns").toList()) {
+			if (json.has(FIELD_EMBEDDED)) {
+				for (JSONObject folderJson: (List<JSONObject>)json.getJSONObject(FIELD_EMBEDDED).getJSONArray(FIELD_CAMPAIGNS).toList()) {
 					campaigns.add(Campaign.fromJson(folderJson));
 				}
 			}

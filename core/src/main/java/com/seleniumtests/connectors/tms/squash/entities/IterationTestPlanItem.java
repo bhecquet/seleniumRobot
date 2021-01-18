@@ -20,8 +20,8 @@ public class IterationTestPlanItem extends Entity {
 
 	public JSONObject asJson() {
 		JSONObject json = new JSONObject();
-		json.put("_type", "iteration-test-plan-item");
-		json.put("id", id);
+		json.put(FIELD_TYPE, "iteration-test-plan-item");
+		json.put(FIELD_ID, id);
 		return json;
 	}
 	
@@ -42,7 +42,7 @@ public class IterationTestPlanItem extends Entity {
 		try {
 			return new IterationTestPlanItem(
 					json.getJSONObject("_links").getJSONObject("self").getString("href"),
-					json.getInt("id"), 
+					json.getInt(FIELD_ID), 
 					TestCase.fromJson(json.getJSONObject("referenced_test_case"))
 					);
 		} catch (JSONException e) {
@@ -55,10 +55,10 @@ public class IterationTestPlanItem extends Entity {
 			
 			
 			JSONObject body = new JSONObject();
-			body.put("_type", "iteration-test-plan-item");
+			body.put(FIELD_TYPE, "iteration-test-plan-item");
 			JSONObject testCaseJson = new JSONObject();
-			testCaseJson.put("id", testCase.id);
-			testCaseJson.put("_type", "test-case");
+			testCaseJson.put(FIELD_ID, testCase.id);
+			testCaseJson.put(FIELD_TYPE, "test-case");
 			body.put("test_case", testCaseJson);
 			
 			JSONObject json = getJSonResponse(buildPostRequest(apiRootUrl + String.format(TEST_PLAN_ITEM_URL, iteration.id)).body(body));

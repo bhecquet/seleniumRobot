@@ -13,8 +13,8 @@ public class CampaignFolder extends Entity {
 
 	public static final String CAMPAIGN_FOLDER_URL = "campaign-folders";
 	
-	public Project project;
-	public Entity parent;
+	private Project project;
+	private Entity parent;
 
 	public CampaignFolder(String url, int id, String name, Project project, Entity parent) {
 		super(url, id, name);
@@ -28,7 +28,7 @@ public class CampaignFolder extends Entity {
 			
 			List<CampaignFolder> campaignFolders = new ArrayList<>();
 			if (json.has("_embedded")) {
-				for (JSONObject folderJson: (List<JSONObject>)json.getJSONObject("_embedded").getJSONArray("campaign-folders").toList()) {
+				for (JSONObject folderJson: (List<JSONObject>)json.getJSONObject(FIELD_EMBEDDED).getJSONArray(TYPE_CAMPAIGN_FOLDER).toList()) {
 					campaignFolders.add(CampaignFolder.fromJson(folderJson));
 				}
 			}
@@ -40,9 +40,9 @@ public class CampaignFolder extends Entity {
 
 	public JSONObject asJson() {
 		JSONObject json = new JSONObject();
-		json.put("_type", "campaign-folder");
-		json.put("id", id);
-		json.put("name", name);
+		json.put(FIELD_TYPE, TYPE_CAMPAIGN_FOLDER);
+		json.put(FIELD_ID, id);
+		json.put(FIELD_NAME, name);
 		return json;
 	}
 
@@ -50,11 +50,11 @@ public class CampaignFolder extends Entity {
 		
 		try {
 			Entity parent;
-			if (json.has("parent")) {
-				if ("project".equals(json.getJSONObject("parent").getString("_type"))) {
-					parent = Project.fromJson(json.getJSONObject("parent"));
-				} else if ("campaign-folder".equals(json.getJSONObject("parent").getString("_type"))) {
-					parent = CampaignFolder.fromJson(json.getJSONObject("parent"));
+			if (json.has(FIELD_PARENT)) {
+				if (TYPE_PROJECT.equals(json.getJSONObject(FIELD_PARENT).getString(FIELD_TYPE))) {
+					parent = Project.fromJson(json.getJSONObject(FIELD_PARENT));
+				} else if (TYPE_CAMPAIGN_FOLDER.equals(json.getJSONObject(FIELD_PARENT).getString(FIELD_TYPE))) {
+					parent = CampaignFolder.fromJson(json.getJSONObject(FIELD_PARENT));
 				} else {
 					parent = null;
 				}
@@ -63,13 +63,13 @@ public class CampaignFolder extends Entity {
 			}
 			
 			Project project = null;
-			if (json.has("project")) {
-				project = Project.fromJson(json.getJSONObject("project"));
+			if (json.has(TYPE_PROJECT)) {
+				project = Project.fromJson(json.getJSONObject(TYPE_PROJECT));
 			}
 			
 			return new CampaignFolder(json.getJSONObject("_links").getJSONObject("self").getString("href"), 
-					json.getInt("id"), 
-					json.getString("name"),
+					json.getInt(FIELD_ID), 
+					json.getString(FIELD_NAME),
 					project,
 					parent
 					);
@@ -83,12 +83,12 @@ public class CampaignFolder extends Entity {
 		try {
 			
 			JSONObject body = new JSONObject();
-			body.put("_type", "campaign-folder");
-			body.put("name", campaignFolderName);
+			body.put(FIELD_TYPE, TYPE_CAMPAIGN_FOLDER);
+			body.put(FIELD_NAME, campaignFolderName);
 			if (parent != null) {
-				body.put("parent", parent.asJson());
+				body.put(FIELD_PARENT, parent.asJson());
 			} else {
-				body.put("parent", project.asJson());
+				body.put(FIELD_PARENT, project.asJson());
 			}
 			
 			JSONObject json = getJSonResponse(buildPostRequest(apiRootUrl + CAMPAIGN_FOLDER_URL).body(body));

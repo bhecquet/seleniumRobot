@@ -41,6 +41,11 @@ import kong.unirest.json.JSONObject;
 
 public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerConnector {
 	
+	private static final String FIELD_IS_OK_WITH_SNAPSHOTS = "isOkWithSnapshots";
+	private static final String FIELD_STEP = "step";
+	private static final String FIELD_TEST_STEPS = "testSteps";
+	private static final String FIELD_SESSION = "session";
+	private static final String FIELD_TEST_CASE = "testCase";
 	public static final String SESSION_API_URL = "/snapshot/api/session/";
 	public static final String TESTCASEINSESSION_API_URL = "/snapshot/api/testcaseinsession/";
 	public static final String TESTSTEP_API_URL = "/snapshot/api/teststep/";
@@ -116,7 +121,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 					.field("browser", browser.getBrowserType())
 					.field("environment", SeleniumTestsContextManager.getGlobalContext().getTestEnv())
 					.field("version", versionId.toString())
-					.field("name", strippedSessionName)
+					.field(FIELD_NAME, strippedSessionName)
 					.field("compareSnapshot", String.valueOf(SeleniumTestsContextManager.getGlobalContext().getSeleniumRobotServerCompareSnapshot()))
 					.field("ttl", String.format("%d days", SeleniumTestsContextManager.getGlobalContext().getSeleniumRobotServerCompareSnapshotTtl()))); // format is 'x days' as this is the way Django expect a duration in days
 			return sessionJson.getInt("id");
@@ -159,9 +164,9 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 		
 		try {
 			JSONObject testInSessionJson = getJSonResponse(buildPostRequest(url + TESTCASEINSESSION_API_URL)
-					.field("testCase", testCaseId)
-					.field("session", sessionId.toString())
-					.field("name", strippedName));
+					.field(FIELD_TEST_CASE, testCaseId)
+					.field(FIELD_SESSION, sessionId.toString())
+					.field(FIELD_NAME, strippedName));
 			return testInSessionJson.getInt("id");
 		} catch (UnirestException | JSONException | SeleniumRobotServerException e) {
 			throw new SeleniumRobotServerException("cannot create test case", e);
@@ -182,7 +187,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 		
 		try {
 			JSONObject stepJson = getJSonResponse(buildPostRequest(url + TESTSTEP_API_URL)
-					.field("name", testStep));
+					.field(FIELD_NAME, testStep));
 			Integer testStepId = stepJson.getInt("id");
 			addCurrentTestStepToTestCase(testStepId, testCaseInSessionId);
 			return testStepId;
@@ -216,16 +221,14 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 			JSONObject snapshotJson = getJSonResponse(buildPostRequest(url + SNAPSHOT_API_URL)
 					.field("stepResult", stepResultId)
 					.field("sessionId", sessionUUID)
-					.field("testCase", testCaseInSessionId.toString())
+					.field(FIELD_TEST_CASE, testCaseInSessionId.toString())
 					.field("image", pictureFile)
-					.field("name", snapshotName)
+					.field(FIELD_NAME, snapshotName)
 					.field("compare", snapshot.getCheckSnapshot().getName())
 					.field("diffTolerance", String.valueOf(snapshot.getCheckSnapshot().getErrorThreshold()))
 					);
-			Integer snapshotId = snapshotJson.getInt("id");
+			return snapshotJson.getInt("id");
 			
-			
-			return snapshotId;
 		} catch (UnirestException | JSONException | SeleniumRobotServerException e) {
 			throw new SeleniumRobotServerException("cannot create test snapshot", e);
 		}
@@ -278,8 +281,8 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 		}
 		try {
 			JSONObject resultJson = getJSonResponse(buildPostRequest(url + STEPRESULT_API_URL)
-					.field("step", testStepId)
-					.field("testCase", testCaseInSessionId.toString())
+					.field(FIELD_STEP, testStepId)
+					.field(FIELD_TEST_CASE, testCaseInSessionId.toString())
 					.field("result", result.toString())
 					.field("duration", String.valueOf(duration))
 					.field("stacktrace", logs)
@@ -303,7 +306,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 		try {
 
 			JSONObject sessionJson = getJSonResponse(buildGetRequest(url + TESTCASEINSESSION_API_URL + testCaseInSessionId));
-			return (List<String>) sessionJson.getJSONArray("testSteps")
+			return (List<String>) sessionJson.getJSONArray(FIELD_TEST_STEPS)
 					.toList()
 					.stream()
 					.map(Object::toString)
@@ -335,14 +338,14 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 		}
 	}
 	
-	public JSONObject addTestStepsToTestCases(List<String> testSteps, Integer testCaseInSessionId) throws UnirestException {
+	public JSONObject addTestStepsToTestCases(List<String> testSteps, Integer testCaseInSessionId)  {
 		if (testSteps.isEmpty()) {
 			return new JSONObject();
 		}
 		
-		MultipartBody request = buildPatchRequest(url + TESTCASEINSESSION_API_URL + testCaseInSessionId + "/").field("testSteps", testSteps.get(0));
+		MultipartBody request = buildPatchRequest(url + TESTCASEINSESSION_API_URL + testCaseInSessionId + "/").field(FIELD_TEST_STEPS, testSteps.get(0));
 		for (String tc: testSteps.subList(1, testSteps.size())) {
-			request = request.field("testSteps", tc);
+			request = request.field(FIELD_TEST_STEPS, tc);
 		}
 		return getJSonResponse(request);
 	}
@@ -374,14 +377,14 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 			JSONObject response = null;
 			for (int i = 0; i < 3; i++) {
 				response = getJSonResponse(buildGetRequest(url + TESTCASEINSESSION_API_URL + testCaseInSessionId));
-				if (response.optBoolean("computed", false) && response.has("isOkWithSnapshots")) {
-					return response.getBoolean("isOkWithSnapshots");
+				if (response.optBoolean("computed", false) && response.has(FIELD_IS_OK_WITH_SNAPSHOTS)) {
+					return response.getBoolean(FIELD_IS_OK_WITH_SNAPSHOTS);
 				} else {
 					WaitHelper.waitForSeconds(1);
 				}
 			}
 			if (response != null) {
-				return response.optBoolean("isOkWithSnapshots", true);
+				return response.optBoolean(FIELD_IS_OK_WITH_SNAPSHOTS, true);
 			} else {
 				return true;
 			}

@@ -49,33 +49,41 @@ public class StubSelect extends CommonSelectList implements ISelectList {
 
 	@Override
 	public void deselectByIndex(Integer index) {
+		// stub
 	}
 
 	@Override
 	public void deselectByText(String text) {
+		// stub
 	}
 
 	@Override
 	public void deselectByValue(String value) {
+		// stub
 	}
 
 	@Override
 	public void selectByIndex(int index) {
+		// stub
 	}
 
 	@Override
 	public void selectByText(String text) {
+		// stub
 	}
 
 	@Override
 	public void selectByValue(String value) {
+		// stub
 	}
 
 	@Override
 	public void setSelected(WebElement option) {
+		// stub
 	}
 
 	@Override
 	public void setDeselected(WebElement option) {
+		// stub
 	}
 }

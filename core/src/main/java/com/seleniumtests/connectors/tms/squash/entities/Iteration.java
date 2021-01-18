@@ -26,8 +26,8 @@ public class Iteration extends Entity {
 			JSONObject json = getPagedJSonResponse(buildGetRequest(apiRootUrl + String.format(IterationTestPlanItem.TEST_PLAN_ITEM_URL, id)));
 			
 			List<IterationTestPlanItem> testPlanItems = new ArrayList<>();
-			if (json.has("_embedded")) {
-				for (JSONObject tpiJson: (List<JSONObject>)json.getJSONObject("_embedded").getJSONArray("test-plan").toList()) {
+			if (json.has(FIELD_EMBEDDED)) {
+				for (JSONObject tpiJson: (List<JSONObject>)json.getJSONObject(FIELD_EMBEDDED).getJSONArray("test-plan").toList()) {
 					testPlanItems.add(IterationTestPlanItem.fromJson(tpiJson));
 				}
 			}
@@ -41,8 +41,8 @@ public class Iteration extends Entity {
 	public static Iteration fromJson(JSONObject json) {
 		try {
 			return new Iteration(json.getJSONObject("_links").getJSONObject("self").getString("href"),
-					json.getInt("id"),
-					json.getString("name"));
+					json.getInt(FIELD_ID),
+					json.getString(FIELD_NAME));
 		} catch (JSONException e) {
 			throw new ScenarioException(String.format("Cannot create Iteration from JSON [%s] data: %s", json.toString(), e.getMessage()));
 		}
@@ -53,13 +53,13 @@ public class Iteration extends Entity {
 		try {
 			
 			JSONObject body = new JSONObject();
-			body.put("_type", "iteration");
-			body.put("name", iterationName);
+			body.put(FIELD_TYPE, TYPE_ITERATION);
+			body.put(FIELD_NAME, iterationName);
 			
 			JSONObject parent = new JSONObject();
-			parent.put("id", campaign.id);
-			parent.put("_type", "campaign");	
-			body.put("parent", parent);
+			parent.put(FIELD_ID, campaign.id);
+			parent.put(FIELD_TYPE, TYPE_CAMPAIGN);	
+			body.put(FIELD_PARENT, parent);
 			
 			JSONObject json = getJSonResponse(buildPostRequest(String.format(apiRootUrl + ITERATIONS_URL, campaign.id)).body(body));
 

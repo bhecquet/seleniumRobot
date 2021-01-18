@@ -41,7 +41,7 @@ public abstract class LoggingOutputStream extends OutputStream {
     /**
      * The logger to write to.
      */
-    protected Logger log;
+    protected Logger logger;
 
     /**
      * The log level.
@@ -51,18 +51,18 @@ public abstract class LoggingOutputStream extends OutputStream {
     /**
      * Creates the Logging instance to flush to the given logger.
      *
-     * @param log         the Logger to write to
+     * @param logger         the Logger to write to
      * @param level       the log level
      * @throws IllegalArgumentException in case if one of arguments is  null.
      */
-    public LoggingOutputStream(final Logger log,
+    public LoggingOutputStream(final Logger logger,
                                final Level level)
             throws IllegalArgumentException {
-        if (log == null || level == null) {
+        if (logger == null || level == null) {
             throw new IllegalArgumentException(
                     "Logger or log level must be not null");
         }
-        this.log = log;
+        this.logger = logger;
         this.level = level;
         curBufLength = DEFAULT_BUFFER_LENGTH;
         buf = new byte[curBufLength];
@@ -102,6 +102,7 @@ public abstract class LoggingOutputStream extends OutputStream {
      * Flushes this output stream and forces any buffered output
      * bytes to be written out.
      */
+    @Override
     public void flush() {
         if (count == 0) {
             return;
@@ -122,6 +123,7 @@ public abstract class LoggingOutputStream extends OutputStream {
      * Closes this output stream and releases any system resources
      * associated with this stream.
      */
+    @Override
     public void close() {
         flush();
         hasBeenClosed = true;

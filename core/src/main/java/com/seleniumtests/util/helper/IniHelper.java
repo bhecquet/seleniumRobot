@@ -19,14 +19,16 @@ package com.seleniumtests.util.helper;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.ini4j.Config;
 import org.ini4j.Ini;
 import org.ini4j.InvalidFileFormatException;
+import org.ini4j.Profile.Section;
 
 import com.seleniumtests.customexception.ConfigurationException;
 
@@ -49,18 +51,18 @@ public class IniHelper {
 			Ini ini = new Ini();
 			Config conf = ini.getConfig();
 			conf.setGlobalSection(true);
-			conf.setFileEncoding(Charset.forName("UTF-8"));
+			conf.setFileEncoding(StandardCharsets.UTF_8);
 			ini.setConfig(conf);
 			ini.load(fileToRead);
-			Set<Ini.Entry<String, Ini.Section>> sections = ini.entrySet();
+			Set<Entry<String, Section>> sections = ini.entrySet();
 
-			for (Ini.Entry<String, Ini.Section> section : sections) {
+			for (Entry<String, Section> section : sections) {
 				HashMap<String, String> inter = new HashMap<>(); 
 				String actualSection = section.getKey();
 				if (hashMapToComplete.containsKey(actualSection)) {
 					inter.putAll(hashMapToComplete.get(actualSection)); // recup datas already read
 				}
-				for (Ini.Entry<String, String> sectionOption : section.getValue().entrySet()) {
+				for (Entry<String, String> sectionOption : section.getValue().entrySet()) {
 					inter.put(sectionOption.getKey(), sectionOption.getValue());
 				}
 				hashMapToComplete.put(actualSection, inter);

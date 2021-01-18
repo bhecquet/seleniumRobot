@@ -20,6 +20,7 @@ package com.seleniumtests.util.squashta;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
@@ -84,7 +85,7 @@ public class TaScriptGenerator {
     	for (File featureFile: featureFiles) {
     		try {
     			boolean exclude = false;
-				for (String line: FileUtils.readLines(featureFile, "UTF-8")) {
+				for (String line: FileUtils.readLines(featureFile, StandardCharsets.UTF_8)) {
 					
 					// exclude scenarios using tag @EXCLUDE_FROM_SQUASH_TA 
 					if (line.contains(FEATURE_EXCLUDE)) {
@@ -280,7 +281,7 @@ public class TaScriptGenerator {
 																			.replace(" ", "_")
 																			.replace("<", "")
 																			.replace(">",  ""));
-					FileUtils.writeStringToFile(new File(taScriptDir + File.separator + fileName), newContent, "UTF-8");
+					FileUtils.writeStringToFile(new File(taScriptDir + File.separator + fileName), newContent, StandardCharsets.UTF_8);
 					taFileList.add(fileName);
 					logger.info("generating " + taScriptDir + File.separator + fileName);
 				}
@@ -293,7 +294,7 @@ public class TaScriptGenerator {
 						.replace("$testngName$", testDef.name)
 						.replace("$app$", application);;
 				String fileName = String.format("g__%s_%s.ta", testDef.file.getName(), testDef.name);
-				FileUtils.writeStringToFile(new File(taScriptDir + File.separator + fileName), newContent, "UTF-8");
+				FileUtils.writeStringToFile(new File(taScriptDir + File.separator + fileName), newContent, StandardCharsets.UTF_8);
 				taFileList.add(fileName);
 				logger.info("generating " + taScriptDir + File.separator + fileName);
 			}
