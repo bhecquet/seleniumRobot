@@ -25,19 +25,21 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Properties;
 
-import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
+import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
+import com.seleniumtests.util.logging.SeleniumRobotLogger;
 import com.seleniumtests.util.osutility.OSUtility;
 
 public class PackageUtility {
+	private static final Logger logger = SeleniumRobotLogger.getLogger(PackageUtility.class);
 	
 	private PackageUtility() {
 		// nothing
@@ -58,8 +60,12 @@ public class PackageUtility {
 		// issue #113: corrects the error when executing integration tests
 		Thread.currentThread().setContextClassLoader(PackageUtility.class.getClassLoader());
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-		factory.setFeature(XMLConstants.ACCESS_EXTERNAL_DTD, false);
-		factory.setFeature(XMLConstants.ACCESS_EXTERNAL_SCHEMA, false);
+		try {
+
+    		factory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+		} catch (ParserConfigurationException e) {
+			logger.warn(e.getMessage());
+		}
 		Document doc = factory.newDocumentBuilder().parse(pomStream);
 		doc.getDocumentElement().normalize();
 		String version = (String) XPathFactory.newInstance()
