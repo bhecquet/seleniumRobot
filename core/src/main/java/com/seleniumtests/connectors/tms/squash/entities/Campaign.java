@@ -31,7 +31,7 @@ public class Campaign extends Entity {
 			
 			List<Campaign> campaigns = new ArrayList<>();
 			if (json.has(FIELD_EMBEDDED)) {
-				for (JSONObject folderJson: (List<JSONObject>)json.getJSONObject(FIELD_EMBEDDED).getJSONArray(TYPE_CAMPAIGN).toList()) {
+				for (JSONObject folderJson: (List<JSONObject>)json.getJSONObject(FIELD_EMBEDDED).getJSONArray(FIELD_CAMPAIGNS).toList()) {
 					campaigns.add(Campaign.fromJson(folderJson));
 				}
 			}
