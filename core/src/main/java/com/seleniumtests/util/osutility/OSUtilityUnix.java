@@ -31,6 +31,9 @@ import com.seleniumtests.driver.BrowserType;
 
 public class OSUtilityUnix extends OSUtility {
 	
+	private static final String WHICH_ERROR = "which:";
+
+
 	/**
      * Ask console for every running process.
      * @return list of output command lines
@@ -126,19 +129,19 @@ public class OSUtilityUnix extends OSUtility {
 		String chromeLocation = OSCommand.executeCommandAndWait("which google-chrome").trim();
 		String chromiumLocation = OSCommand.executeCommandAndWait("which chromium-browser").trim();
 		
-		if (!firefoxLocation.isEmpty() && !firefoxLocation.contains("which:")) {
+		if (!firefoxLocation.isEmpty() && !firefoxLocation.contains(WHICH_ERROR)) {
 			String version = getFirefoxVersion("firefox");
 			browserList.put(BrowserType.FIREFOX, Arrays.asList(new BrowserInfo(BrowserType.FIREFOX, extractFirefoxVersion(version), firefoxLocation)));
 			
-		} else if (!iceweaselLocation.isEmpty() && !iceweaselLocation.contains("which:")) {
+		} else if (!iceweaselLocation.isEmpty() && !iceweaselLocation.contains(WHICH_ERROR)) {
 			String version = getFirefoxVersion("iceweasel");
 			browserList.put(BrowserType.FIREFOX, Arrays.asList(new BrowserInfo(BrowserType.FIREFOX, extractFirefoxVersion(version), iceweaselLocation)));
 		}
-		if (!chromiumLocation.isEmpty() && !chromiumLocation.contains("which:")) {
+		if (!chromiumLocation.isEmpty() && !chromiumLocation.contains(WHICH_ERROR)) {
 			String version = getChromeVersion("chromium-browser");
 			browserList.put(BrowserType.CHROME, Arrays.asList(new BrowserInfo(BrowserType.CHROME, extractChromiumVersion(version), chromiumLocation)));
 			
-		} else if (!chromeLocation.isEmpty() && !chromeLocation.contains("which:")) {
+		} else if (!chromeLocation.isEmpty() && !chromeLocation.contains(WHICH_ERROR)) {
 			String version = getChromeVersion("google-chrome");
 			browserList.put(BrowserType.CHROME, Arrays.asList(new BrowserInfo(BrowserType.CHROME, extractChromeVersion(version), chromeLocation)));
 		} 

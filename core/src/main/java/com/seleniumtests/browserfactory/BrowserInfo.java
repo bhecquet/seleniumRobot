@@ -20,6 +20,7 @@ package com.seleniumtests.browserfactory;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -48,6 +49,8 @@ import com.sun.jna.platform.win32.WinReg;
 
 public class BrowserInfo {
 	
+	private static final String USER_NAME = "user.name";
+
 	private static final Logger logger = SeleniumRobotLogger.getLogger(BrowserInfo.class);
 
 	private static final Pattern REG_CHROME_VERSION = Pattern.compile(".*chrome-(\\d+)-(\\d+).*");
@@ -106,7 +109,7 @@ public class BrowserInfo {
 			Float.parseFloat(version);
 			this.version = version;
 		} catch (NumberFormatException | NullPointerException e) {
-			logger.warn(String.format("Cannot parse browser version %s for browser", version, browser));
+			logger.warn(String.format("Cannot parse browser version %s for browser %s", version, browser));
 			this.version = "0.0";
 		}
 		
@@ -172,7 +175,7 @@ public class BrowserInfo {
 	 * @throws IOException 
 	 */
 	public String[] getDriverListFromJarResources(String driverListFileName) throws IOException {
-		return IOUtils.readLines(BrowserInfo.class.getClassLoader().getResourceAsStream(driverListFileName), Charset.forName("UTF-8")).get(0).split(",");
+		return IOUtils.readLines(BrowserInfo.class.getClassLoader().getResourceAsStream(driverListFileName), StandardCharsets.UTF_8).get(0).split(",");
 	}
 	
 	public List<String> getDriverFiles() throws IOException {
@@ -315,22 +318,22 @@ public class BrowserInfo {
 	private void addChromeDefaultProfilePath() {
 		Platform platform = OSUtility.getCurrentPlatorm();
 		if (platform == Platform.WINDOWS) {
-			defaultProfilePath = String.format("C:\\Users\\%s\\AppData\\Local\\Google\\Chrome\\User Data", System.getProperty("user.name"));
+			defaultProfilePath = String.format("C:\\Users\\%s\\AppData\\Local\\Google\\Chrome\\User Data", System.getProperty(USER_NAME));
 		} else if (platform == Platform.LINUX) {
-			defaultProfilePath = String.format("/home/%s/.config/google-chrome/default", System.getProperty("user.name"));
+			defaultProfilePath = String.format("/home/%s/.config/google-chrome/default", System.getProperty(USER_NAME));
 		} else if (platform == Platform.MAC) {
-			defaultProfilePath = String.format("/Users/%s/Library/Application Support/Google/Chrome", System.getProperty("user.name"));
+			defaultProfilePath = String.format("/Users/%s/Library/Application Support/Google/Chrome", System.getProperty(USER_NAME));
 		}
 	}
 	
 	private void addFirefoxDefaultProfilePath() {
 		Platform platform = OSUtility.getCurrentPlatorm();
 		if (platform == Platform.WINDOWS) {
-			defaultProfilePath = String.format("C:\\Users\\%s\\AppData\\Roaming\\Mozilla\\Firefox\\Profiles\\", System.getProperty("user.name"));
+			defaultProfilePath = String.format("C:\\Users\\%s\\AppData\\Roaming\\Mozilla\\Firefox\\Profiles\\", System.getProperty(USER_NAME));
 		} else if (platform == Platform.LINUX) {
-			defaultProfilePath = String.format("/home/%s/.mozilla/firefox", System.getProperty("user.name"));
+			defaultProfilePath = String.format("/home/%s/.mozilla/firefox", System.getProperty(USER_NAME));
 		} else if (platform == Platform.MAC) {
-			defaultProfilePath = String.format("/Users/%s/Library/Application Support/Firefox/Profiles/", System.getProperty("user.name"));
+			defaultProfilePath = String.format("/Users/%s/Library/Application Support/Firefox/Profiles/", System.getProperty(USER_NAME));
 		}
 		// search "default" profile
 		try (Stream<Path> files = Files.list(Paths.get(defaultProfilePath))) {
@@ -446,8 +449,7 @@ public class BrowserInfo {
         }
         try {
             String processId = Long.toString(Long.parseLong(jvmName.substring(0, index)));
-            List<Long> driverProcesses = osUtility.getChildProcessPid(Long.parseLong(processId), programName + osUtility.getProgramExtension(), existingPids);
-            return driverProcesses;
+            return osUtility.getChildProcessPid(Long.parseLong(processId), programName + osUtility.getProgramExtension(), existingPids);
         } catch (Exception e) {
         	logger.warn("could not get driver pid", e);
         	return new ArrayList<>();

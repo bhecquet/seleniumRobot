@@ -56,11 +56,9 @@ public abstract class Element {
     	PerformsTouchActions performTouchActions = checkForMobile();
 
     	if (platform.toLowerCase().startsWith("android")) {
-    		TouchAction<AndroidTouchAction> touchAction = new TouchAction<>(performTouchActions);
-    		return touchAction;
+    		return new TouchAction<>(performTouchActions);
     	} else if (platform.toLowerCase().startsWith("ios")) {
-    		TouchAction<IOSTouchAction> touchAction = new TouchAction<>(performTouchActions);
-    		return touchAction;
+    		return new TouchAction<>(performTouchActions);
     	} else {
     		throw new ConfigurationException(String.format("%s platform is not supported", platform));
     	}

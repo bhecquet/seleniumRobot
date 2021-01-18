@@ -26,7 +26,7 @@ import java.io.InputStreamReader;
 
 import java.net.URL;
 import java.net.URLConnection;
-
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -45,7 +45,6 @@ public class CSVHelper {
 
     public static final String DOUBLE_QUOTE = "\"";
     public static final String DELIM_CHAR = ",";
-    public static final String TAB_CHAR = "	";
 
     private CSVHelper() {}
     
@@ -84,13 +83,8 @@ public class CSVHelper {
             final boolean readHeaders, final String delimiter, final boolean supportDPFilter) {
 
     	Filter newFilter = filter;
-        InputStream is = null;
-        try {
-            if (clazz != null) {
-                is = clazz.getResourceAsStream(filename);
-            } else {
-                is = new FileInputStream(filename);
-            }
+        try (InputStream is = (clazz != null) ?  clazz.getResourceAsStream(filename) : new FileInputStream(filename) ){
+            
 
             if (is == null) {
                 return new ArrayList<Object[]>().iterator();
@@ -174,15 +168,7 @@ public class CSVHelper {
             return sheetData.iterator();
         } catch (Exception e) {
             throw new DatasetException(e.getMessage());
-        } finally {
-            if (is != null) {
-                try {
-                    is.close();
-                } catch (Exception e) {
-                    logger.warn(e);
-                }
-            }
-        }
+        } 
     }
 
     /**
@@ -197,13 +183,7 @@ public class CSVHelper {
     public static List<String> getHeaderFromCSVFile(final Class<?> clazz, final String filename, String delimiter) {
         String newDelimiter = delimiter == null ? ",": delimiter;
     	
-        InputStream is = null;
-        try {
-            if (clazz != null) {
-                is = clazz.getResourceAsStream(filename);
-            } else {
-                is = new FileInputStream(filename);
-            }
+        try (InputStream is = clazz != null ?  clazz.getResourceAsStream(filename): new FileInputStream(filename)) {
 
             if (is == null) {
                 return new ArrayList<>();
@@ -224,15 +204,7 @@ public class CSVHelper {
             return rowData;
         } catch (Exception e) {
             throw new DatasetException(e.getMessage());
-        } finally {
-            if (is != null) {
-                try {
-                    is.close();
-                } catch (Exception e) {
-                    logger.warn(e);
-                }
-            }
-        }
+        } 
 
     }
 
@@ -319,7 +291,7 @@ public class CSVHelper {
         List<String[]> list = new ArrayList<>();
         String inputLine;
 
-        BufferedReader reader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
+        BufferedReader reader = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
         while ((inputLine = reader.readLine()) != null) {
             try {
                 String[] item;

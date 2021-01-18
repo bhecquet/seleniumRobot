@@ -36,7 +36,8 @@ import com.seleniumtests.uipage.ReplayOnError;
  *
  */
 public class Table extends HtmlElement {
-    private List<WebElement> rows = null;
+    private static final String ERROR_NO_ROWS = "There are no rows in this table";
+	private List<WebElement> rows = null;
     private List<WebElement> columns = null;
 
     public Table(final String label, final By by) {
@@ -184,7 +185,7 @@ public class Table extends HtmlElement {
     		throw new ScenarioException(String.format("Pattern %s has not been found in table", content.pattern()));
     		
     	} else {
-    		throw new ScenarioException("There are no rows in this table");
+    		throw new ScenarioException(ERROR_NO_ROWS);
     	}
     }
     
@@ -219,7 +220,7 @@ public class Table extends HtmlElement {
     		throw new ScenarioException(String.format("Pattern %s has not been found in table", content.pattern()));
     		
     	} else {
-    		throw new ScenarioException("There are no rows in this table");
+    		throw new ScenarioException(ERROR_NO_ROWS);
     	}
     }
     
@@ -261,7 +262,7 @@ public class Table extends HtmlElement {
     		return cols.get(column);
     	}
     	
-    	throw new ScenarioException("There are no rows in this table");
+    	throw new ScenarioException(ERROR_NO_ROWS);
     }
 
     /**

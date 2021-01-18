@@ -44,7 +44,8 @@ import net.ricecode.similarity.StringSimilarityServiceImpl;
  */
 public class SelectList extends HtmlElement {
 
-    protected List<WebElement> options = null;
+    private static final String ERROR_MULTI_SELECT = "You may only deselect all options of a multi-select";
+	protected List<WebElement> options = null;
 	private SimilarityStrategy strategy = new JaroWinklerStrategy();
 	private StringSimilarityService service = new StringSimilarityServiceImpl(strategy);
 	private ISelectList selectImplementation;
@@ -279,7 +280,7 @@ public class SelectList extends HtmlElement {
     	List<WebElement> allSelectedOptions = _getAllSelectedOptions();
     	
     	if (!isMultipleSelect()) {
-            throw new UnsupportedOperationException("You may only deselect all options of a multi-select");
+            throw new UnsupportedOperationException(ERROR_MULTI_SELECT);
         }
     	
         for (WebElement option : allSelectedOptions) {
@@ -310,7 +311,7 @@ public class SelectList extends HtmlElement {
 	    	findElement();
 	    	
 	    	if (!isMultipleSelect()) {
-	            throw new UnsupportedOperationException("You may only deselect all options of a multi-select");
+	            throw new UnsupportedOperationException(ERROR_MULTI_SELECT);
 	        }
 	    	
 	    	selectImplementation.deselectByText(text);
@@ -327,7 +328,7 @@ public class SelectList extends HtmlElement {
 	    	findElement();
 	    	
 	    	if (!isMultipleSelect()) {
-	            throw new UnsupportedOperationException("You may only deselect all options of a multi-select");
+	            throw new UnsupportedOperationException(ERROR_MULTI_SELECT);
 	        }
 	    	
 	    	selectImplementation.deselectByValue(value);
@@ -450,7 +451,7 @@ public class SelectList extends HtmlElement {
     		findElement();
     		
         	if (!isMultipleSelect()) {
-                throw new UnsupportedOperationException("You may only deselect all options of a multi-select");
+                throw new UnsupportedOperationException(ERROR_MULTI_SELECT);
             }
 
 	    	double score = 0;

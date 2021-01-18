@@ -14,7 +14,7 @@ import com.seleniumtests.reporter.logger.TestStep;
 public class JiraBean extends IssueBean {
 
 	private String issueType;
-	private String priority;
+    protected String priority;
     List<String> components = new ArrayList<>();
     Map<String, String> customFields = new HashMap<>();
 	

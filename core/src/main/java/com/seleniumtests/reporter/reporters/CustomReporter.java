@@ -47,6 +47,10 @@ import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
 public class CustomReporter extends CommonReporter implements IReporter {
 	
+	private static final String FIELD_TOTAL = "total";
+	private static final String FIELD_SKIP = "skip";
+	private static final String FIELD_FAIL = "fail";
+	private static final String FIELD_PASS = "pass";
 	private List<String> generatedFiles;
 
 
@@ -60,21 +64,21 @@ public class CustomReporter extends CommonReporter implements IReporter {
 		generatedFiles = new ArrayList<>();
 		
 		Map<String, Integer> consolidatedResults = new HashMap<>();
-		consolidatedResults.put("pass", 0);
-		consolidatedResults.put("fail", 0);
-		consolidatedResults.put("skip", 0);
-		consolidatedResults.put("total", 0);
+		consolidatedResults.put(FIELD_PASS, 0);
+		consolidatedResults.put(FIELD_FAIL, 0);
+		consolidatedResults.put(FIELD_SKIP, 0);
+		consolidatedResults.put(FIELD_TOTAL, 0);
 		
 		for (Entry<ITestContext, Set<ITestResult>> entry: resultSet.entrySet()) {
 			for (ITestResult testResult: entry.getValue()) {
 				if (testResult.isSuccess()) {
-					consolidatedResults.put("pass", consolidatedResults.get("pass") + 1);
+					consolidatedResults.put(FIELD_PASS, consolidatedResults.get(FIELD_PASS) + 1);
 				} else if (testResult.getStatus() == ITestResult.FAILURE) {
-					consolidatedResults.put("fail", consolidatedResults.get("fail") + 1);
+					consolidatedResults.put(FIELD_FAIL, consolidatedResults.get(FIELD_FAIL) + 1);
 				} else if (testResult.getStatus() == ITestResult.SKIP) {
-					consolidatedResults.put("skip", consolidatedResults.get("skip") + 1);
+					consolidatedResults.put(FIELD_SKIP, consolidatedResults.get(FIELD_SKIP) + 1);
 				}
-				consolidatedResults.put("total", consolidatedResults.get("total") + 1);
+				consolidatedResults.put(FIELD_TOTAL, consolidatedResults.get(FIELD_TOTAL) + 1);
 				
 				// done in case it was null (issue #81)
 				SeleniumTestsContext testContext = SeleniumTestsContextManager.setThreadContextFromTestResult(entry.getKey(), getTestName(testResult), getClassName(testResult), testResult);
@@ -120,7 +124,7 @@ public class CustomReporter extends CommonReporter implements IReporter {
 			if (testSteps != null) {
 				for (TestStep step: testSteps) {
 					testDuration += step.getDuration();
-					if (step.getFailed()) {
+					if (Boolean.TRUE.equals(step.getFailed())) {
 						failedStep = step.getName();
 						errors++;
 					}

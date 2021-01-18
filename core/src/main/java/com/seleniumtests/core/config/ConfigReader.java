@@ -20,10 +20,11 @@ package com.seleniumtests.core.config;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
@@ -31,6 +32,7 @@ import org.apache.log4j.Logger;
 import org.ini4j.Config;
 import org.ini4j.Ini;
 import org.ini4j.InvalidFileFormatException;
+import org.ini4j.Profile.Section;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.TestVariable;
@@ -131,11 +133,11 @@ public class ConfigReader {
 			Config conf = ini.getConfig();
 			conf.setGlobalSection(true);
 			conf.setGlobalSectionName(GLOBAL_SECTION_NAME);
-			conf.setFileEncoding(Charset.forName("UTF-8"));
+			conf.setFileEncoding(StandardCharsets.UTF_8);
 			ini.setConfig(conf);
 			ini.load(iniFileStream);
 			
-			Set<Ini.Entry<String, Ini.Section>> sections = ini.entrySet();
+			Set<Entry<String, Section>> sections = ini.entrySet();
 			
 			// first get global options
 			testConfig = getGlobalOptions(testConfig, sections);
@@ -159,12 +161,12 @@ public class ConfigReader {
 	 * @return configuration with global options
 	 */
 	private Map<String, TestVariable> getGlobalOptions(Map<String, TestVariable> testConfig, 
-													Set<Ini.Entry<String, Ini.Section>> sections){
+													Set<Entry<String, Section>> sections){
 		
-		for (Ini.Entry<String, Ini.Section> section: sections) {
+		for (Entry<String, Section> section: sections) {
 			
 			if (section.getKey().equals(GLOBAL_SECTION_NAME)) {
-				for (Ini.Entry<String, String> sectionOption: section.getValue().entrySet()) {
+				for (Entry<String, String> sectionOption: section.getValue().entrySet()) {
 					testConfig.put(sectionOption.getKey(), new TestVariable(sectionOption.getKey(), sectionOption.getValue()));
 				}
 			}
@@ -180,13 +182,13 @@ public class ConfigReader {
 	 * @return configuration with local options overriding previous options
 	 */
 	private Map<String, TestVariable> getLocalOptions(Map<String, TestVariable> testConfig, 
-												Set<Ini.Entry<String, Ini.Section>> sections, String environment) {
+												Set<Entry<String, Section>> sections, String environment) {
 		boolean envFound = false;
-		for (Ini.Entry<String, Ini.Section> section: sections) {
+		for (Entry<String, Section> section: sections) {
 			
 			if (section.getKey().equals(environment)) {
 				envFound = true;
-				for (Ini.Entry<String, String> sectionOption: section.getValue().entrySet()) {
+				for (Entry<String, String> sectionOption: section.getValue().entrySet()) {
 					testConfig.put(sectionOption.getKey(), new TestVariable(sectionOption.getKey(), sectionOption.getValue()));
 				}
 			}

@@ -30,7 +30,6 @@ public class IssueBean {
     protected ZonedDateTime creationDate;
     protected String assignee;
     protected String description;
-    protected String priority;
     Map<String, String> fields = new HashMap<>();
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mmZZZZZ");
 

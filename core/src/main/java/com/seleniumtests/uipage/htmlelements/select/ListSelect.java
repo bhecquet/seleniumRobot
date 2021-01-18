@@ -13,6 +13,8 @@ import com.seleniumtests.uipage.htmlelements.FrameElement;
 public class ListSelect extends CommonSelectList implements ISelectList {
 
 	
+	private static final String ERROR_CANNOT_DESELECT = "Cannot deselect for list based select";
+
 	// for SPI
 	public ListSelect() {
 		super(null, null);
@@ -59,17 +61,17 @@ public class ListSelect extends CommonSelectList implements ISelectList {
 
 	@Override
 	public void deselectByIndex(Integer index) {
-		throw new ScenarioException("Cannot deselect for list based select");
+		throw new ScenarioException(ERROR_CANNOT_DESELECT);
 	}
 
 	@Override
 	public void deselectByText(String text) {
-		throw new ScenarioException("Cannot deselect for list based select");
+		throw new ScenarioException(ERROR_CANNOT_DESELECT);
 	}
 
 	@Override
 	public void deselectByValue(String value) {
-		throw new ScenarioException("Cannot deselect for list based select");
+		throw new ScenarioException(ERROR_CANNOT_DESELECT);
 	}
 
 	@Override
@@ -129,6 +131,6 @@ public class ListSelect extends CommonSelectList implements ISelectList {
 
 	@Override
 	public void setDeselected(WebElement option) {
-		throw new ScenarioException("Cannot deselect for list based select");
+		throw new ScenarioException(ERROR_CANNOT_DESELECT);
 	}
 }

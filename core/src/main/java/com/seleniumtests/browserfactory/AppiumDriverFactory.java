@@ -43,6 +43,7 @@ import io.appium.java_client.remote.MobileCapabilityType;
 
 public class AppiumDriverFactory extends AbstractWebDriverFactory implements IWebDriverFactory {
 
+	private static final String ANDROID_PLATORM = "android";
 	private AppiumLauncher appiumLauncher;
 
     public AppiumDriverFactory(final DriverConfig cfg) {
@@ -67,7 +68,6 @@ public class AppiumDriverFactory extends AbstractWebDriverFactory implements IWe
     protected WebDriver createNativeDriver() {
     	
     	// start appium
-    	// TODO: may be useful to connect to an existing appium server
     	appiumLauncher = AppiumLauncherFactory.getInstance();
     	appiumLauncher.startAppium();
     	
@@ -85,7 +85,7 @@ public class AppiumDriverFactory extends AbstractWebDriverFactory implements IWe
     					throw new ConfigurationException("'deviceId' option MUST be set as we are using a remote appium server");
     				}
     				
-    				if (capabilities.getCapability(CapabilityType.PLATFORM_NAME).toString().equalsIgnoreCase("android")) {
+    				if (capabilities.getCapability(CapabilityType.PLATFORM_NAME).toString().equalsIgnoreCase(ANDROID_PLATORM)) {
     					capabilities.setCapability(MobileCapabilityType.DEVICE_NAME, webDriverConfig.getDeviceId());
     				} else { // iOS
     					capabilities.setCapability(IOSMobileCapabilityType.XCODE_CONFIG_FILE, (String)null); // remove this capability as it may not be accurate
@@ -95,7 +95,7 @@ public class AppiumDriverFactory extends AbstractWebDriverFactory implements IWe
     				throw e;
     			}
     		}
-	        if("android".equalsIgnoreCase(webDriverConfig.getPlatform())) {
+	        if(ANDROID_PLATORM.equalsIgnoreCase(webDriverConfig.getPlatform())) {
 	        	extractAndroidDriver(capabilities);
 
 	            return new AndroidDriver<WebElement>(new URL(appiumLauncher.getAppiumServerUrl()), capabilities);
@@ -117,7 +117,7 @@ public class AppiumDriverFactory extends AbstractWebDriverFactory implements IWe
 
 	@Override
 	protected ICapabilitiesFactory getCapabilitiesFactory() {
-		if("android".equalsIgnoreCase(webDriverConfig.getPlatform())){
+		if(ANDROID_PLATORM.equalsIgnoreCase(webDriverConfig.getPlatform())){
         	return new AndroidCapabilitiesFactory(webDriverConfig);
             
         } else if ("ios".equalsIgnoreCase(webDriverConfig.getPlatform())){

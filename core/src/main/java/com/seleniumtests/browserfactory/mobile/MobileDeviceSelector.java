@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.openqa.selenium.MutableCapabilities;
+import org.openqa.selenium.remote.CapabilityType;
 
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.driver.BrowserType;
@@ -91,7 +92,7 @@ public class MobileDeviceSelector {
 	public MobileDevice getRelevantMobileDevice(MutableCapabilities capabilities) {
 		isInitialized();
 		Object deviceName = capabilities.getCapability(MobileCapabilityType.DEVICE_NAME);
-		Object platformName = capabilities.getCapability(MobileCapabilityType.PLATFORM_NAME);
+		Object platformName = capabilities.getCapability(CapabilityType.PLATFORM_NAME);
 		Object platformVersion = capabilities.getCapability(MobileCapabilityType.PLATFORM_VERSION);
 		
 		if (deviceName == null
@@ -103,11 +104,11 @@ public class MobileDeviceSelector {
 		
 		List<MobileDevice> deviceList = new ArrayList<>();
 		
-		if (androidReady) {
+		if (Boolean.TRUE.equals(androidReady)) {
 			deviceList.addAll(adbWrapper.getDeviceList());
 		}
 		
-		if (iosReady) {
+		if (Boolean.TRUE.equals(iosReady)) {
 			deviceList.addAll(instrumentsWrapper.parseIosDevices());
 		}
 		
@@ -161,7 +162,7 @@ public class MobileDeviceSelector {
 			capabilities.setCapability(MobileCapabilityType.DEVICE_NAME, selectedDevice.getName());
 			capabilities.setCapability(IOSMobileCapabilityType.XCODE_CONFIG_FILE, System.getenv("APPIUM_HOME") + "/node_modules/appium/node_modules/appium-xcuitest-driver/WebDriverAgent/xcodeConfigFile.xcconfig");
 		}
-		capabilities.setCapability(MobileCapabilityType.PLATFORM_NAME, selectedDevice.getPlatform());
+		capabilities.setCapability(CapabilityType.PLATFORM_NAME, selectedDevice.getPlatform());
 		capabilities.setCapability(MobileCapabilityType.PLATFORM_VERSION, selectedDevice.getVersion());
 		
 		return capabilities;

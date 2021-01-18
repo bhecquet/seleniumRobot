@@ -49,6 +49,7 @@ import io.appium.java_client.ios.IOSDriver;
 
 public class SauceLabsDriverFactory extends AbstractWebDriverFactory implements IWebDriverFactory {
 
+	private static final String ANDROID_PLATFORM = "android";
 	private static final String SAUCE_UPLOAD_URL = "https://saucelabs.com/rest/v1/storage/%s/%s?overwrite=true";
 	private static final Pattern REG_USER_PASSWORD = Pattern.compile("http://(.*?):(.*?)@ondemand.saucelabs.com:80/wd/hub");
 
@@ -59,7 +60,7 @@ public class SauceLabsDriverFactory extends AbstractWebDriverFactory implements 
     private DesiredCapabilities cloudSpecificCapabilities() {
     	DesiredCapabilities capabilities = new DesiredCapabilities();
     	
-    	if ("android".equalsIgnoreCase(webDriverConfig.getPlatform())) {
+    	if (ANDROID_PLATFORM.equalsIgnoreCase(webDriverConfig.getPlatform())) {
 	    	capabilities.setCapability("app-package", webDriverConfig.getAppPackage());
 	        capabilities.setCapability("app-activity", webDriverConfig.getAppActivity());
 	        capabilities.setCapability("app-wait-activity", webDriverConfig.getAppWaitActivity());
@@ -135,7 +136,7 @@ public class SauceLabsDriverFactory extends AbstractWebDriverFactory implements 
     	capabilities.merge(driverOptions);
 
     	try {
-	        if("android".equalsIgnoreCase(webDriverConfig.getPlatform())){
+	        if(ANDROID_PLATFORM.equalsIgnoreCase(webDriverConfig.getPlatform())){
 	            return new AndroidDriver<WebElement>(new URL(webDriverConfig.getHubUrl().get(0)), capabilities);
 	            
 	        } else if ("ios".equalsIgnoreCase(webDriverConfig.getPlatform())){
@@ -152,7 +153,7 @@ public class SauceLabsDriverFactory extends AbstractWebDriverFactory implements 
 
 	@Override
 	protected ICapabilitiesFactory getCapabilitiesFactory() {
-		if("android".equalsIgnoreCase(webDriverConfig.getPlatform())){
+		if(ANDROID_PLATFORM.equalsIgnoreCase(webDriverConfig.getPlatform())){
         	return new AndroidCapabilitiesFactory(webDriverConfig);
             
         } else if ("ios".equalsIgnoreCase(webDriverConfig.getPlatform())){

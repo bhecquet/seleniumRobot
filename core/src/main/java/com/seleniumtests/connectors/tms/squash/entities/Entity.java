@@ -15,7 +15,21 @@ import kong.unirest.json.JSONObject;
 
 public class Entity {
 	
-
+	private static final String HEADER_CONTENT_TYPE = "Content-Type";
+	private static final String MIMETYPE_APPLICATION_JSON = "application/json";
+	protected static final String FIELD_NAME = "name";
+	protected static final String FIELD_ID = "id";
+	protected static final String FIELD_TYPE = "_type";
+	protected static final String FIELD_EMBEDDED = "_embedded";
+	protected static final String FIELD_PARENT = "parent";
+	protected static final String FIELD_CAMPAIGNS = "campaigns";
+	protected static final String FIELD_PROJECTS = "projects";
+	
+	protected static final String TYPE_PROJECT = "project";
+	protected static final String TYPE_CAMPAIGN_FOLDER = "campaign-folders";
+	protected static final String TYPE_CAMPAIGN = "campaign";
+	protected static final String TYPE_ITERATION = "iteration";
+	
 	private static String user;
 	private static String password;
 	
@@ -49,15 +63,15 @@ public class Entity {
 	}
 
 	protected static GetRequest buildGetRequest(String url) {
-		return Unirest.get(url).basicAuth(user, password).headerReplace("Content-Type", "application/json");
+		return Unirest.get(url).basicAuth(user, password).headerReplace(HEADER_CONTENT_TYPE, MIMETYPE_APPLICATION_JSON);
 	}
 	
 	protected static HttpRequestWithBody buildPostRequest(String url) {
-		return Unirest.post(url).basicAuth(user, password).headerReplace("Content-Type", "application/json");
+		return Unirest.post(url).basicAuth(user, password).headerReplace(HEADER_CONTENT_TYPE, MIMETYPE_APPLICATION_JSON);
 	}
 	
 	protected static HttpRequestWithBody buildPatchRequest(String url) {
-		return Unirest.patch(url).basicAuth(user, password).headerReplace("Content-Type", "application/json");
+		return Unirest.patch(url).basicAuth(user, password).headerReplace(HEADER_CONTENT_TYPE, MIMETYPE_APPLICATION_JSON);
 	}
 	
 	/**
@@ -86,9 +100,9 @@ public class Entity {
 			if (finalJson == null) {
 				finalJson = ((HttpResponse<JsonNode>)json).getBody().getObject();
 			} else {
-				for (String key: ((HttpResponse<JsonNode>)json).getBody().getObject().getJSONObject("_embedded").keySet()) {
-					for (JSONObject entity: (List<JSONObject>)((HttpResponse<JsonNode>)json).getBody().getObject().getJSONObject("_embedded").getJSONArray(key).toList()) {
-						finalJson.getJSONObject("_embedded").accumulate(key, entity);
+				for (String key: ((HttpResponse<JsonNode>)json).getBody().getObject().getJSONObject(FIELD_EMBEDDED).keySet()) {
+					for (JSONObject entity: (List<JSONObject>)((HttpResponse<JsonNode>)json).getBody().getObject().getJSONObject(FIELD_EMBEDDED).getJSONArray(key).toList()) {
+						finalJson.getJSONObject(FIELD_EMBEDDED).accumulate(key, entity);
 					}
 				}
 			}

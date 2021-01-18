@@ -26,6 +26,7 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.Writer;
 import java.lang.reflect.InvocationTargetException;
+import java.nio.charset.StandardCharsets;
 import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -59,7 +60,7 @@ public abstract class CommonReporter implements IReporter {
 	protected static final String PASSED_TEST = "passed";
 	protected static final String RESOURCES_DIR = "resources";
 
-	public static CommonReporter getInstance(Class<?> reporterClass) throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException {
+	public static CommonReporter getInstance(Class<?> reporterClass) throws InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
 		return (CommonReporter) reporterClass.getConstructor().newInstance();
 	}
 	
@@ -89,7 +90,7 @@ public abstract class CommonReporter implements IReporter {
 	 * @return
 	 * @throws Exception
 	 */
-	protected VelocityEngine initVelocityEngine() throws Exception {
+	protected VelocityEngine initVelocityEngine() {
 		VelocityEngine ve = new VelocityEngine();
 		ve.setProperty("resource.loader", "class");
 		ve.setProperty("class.resource.loader.class", RESOURCE_LOADER_PATH);
@@ -107,13 +108,13 @@ public abstract class CommonReporter implements IReporter {
 	 */
 	protected PrintWriter createWriter(final String outDir, final String fileName) throws IOException {
 		System.setProperty("file.encoding", "UTF8");
-		uuid = uuid.replaceAll(" ", "-").replaceAll(":", "-");
+		uuid = uuid.replace(" ", "-").replace(":", "-");
 
 		File f = new File(outDir, fileName);
 		logger.info("generating report " + f.getAbsolutePath());
 
 		try (OutputStream out = new FileOutputStream(f)) {
-			Writer writer = new BufferedWriter(new OutputStreamWriter(out, "utf-8"));
+			Writer writer = new BufferedWriter(new OutputStreamWriter(out, StandardCharsets.UTF_8));
 			return new PrintWriter(writer); 
 		}
 		

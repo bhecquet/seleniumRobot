@@ -35,6 +35,14 @@ import kong.unirest.json.JSONObject;
 
 public class SeleniumRobotVariableServerConnector extends SeleniumRobotServerConnector {
 	
+	private static final String FIELD_APPLICATION = "application";
+	private static final String FIELD_OLDER_THAN = "olderThan";
+	private static final String FIELD_TEST = "test";
+	private static final String FIELD_ENVIRONMENT = "environment";
+	private static final String FIELD_RESERVABLE = "reservable";
+	private static final String FIELD_TIME_TO_LIVE = "timeToLive";
+	private static final String FIELD_VERSION = "version";
+	private static final String FIELD_VALUE = "value";
 	public static final String VARIABLE_API_URL = "/variable/api/variable/";
 	public static final String EXISTING_VARIABLE_API_URL = "/variable/api/variable/%d/";
 	
@@ -108,18 +116,18 @@ public class SeleniumRobotVariableServerConnector extends SeleniumRobotServerCon
 			List<String> varNames = new ArrayList<>();
 			
 			HttpRequest request = buildGetRequest(url + VARIABLE_API_URL)
-					.queryString("version", versionId)
-					.queryString("environment", environmentId)
-					.queryString("test", testCaseId)
-					.queryString("olderThan", variablesOlderThanDays)
+					.queryString(FIELD_VERSION, versionId)
+					.queryString(FIELD_ENVIRONMENT, environmentId)
+					.queryString(FIELD_TEST, testCaseId)
+					.queryString(FIELD_OLDER_THAN, variablesOlderThanDays)
 					.queryString("reserve", reserve)
 					.queryString("format", "json");
 			
 			if (name != null) {
-				request = request.queryString("name", name);
+				request = request.queryString(FIELD_NAME, name);
 			}
 			if (value != null) {
-				request = request.queryString("value", value);
+				request = request.queryString(FIELD_VALUE, value);
 			}
 			
 			JSONArray variablesJson = getJSonArray(request);
@@ -193,16 +201,16 @@ public class SeleniumRobotVariableServerConnector extends SeleniumRobotServerCon
 		if (variable.getId() == null || !variable.getInternalName().startsWith(TestVariable.TEST_VARIABLE_PREFIX)) {
 			try {
 				MultipartBody request = buildPostRequest(url + VARIABLE_API_URL)
-						.field("name", TestVariable.TEST_VARIABLE_PREFIX + variable.getName())
-						.field("value", variable.getValue())
-						.field("reservable", String.valueOf(variable.isReservable()))
-						.field("environment", environmentId.toString())
-						.field("application", applicationId.toString())
+						.field(FIELD_NAME, TestVariable.TEST_VARIABLE_PREFIX + variable.getName())
+						.field(FIELD_VALUE, variable.getValue())
+						.field(FIELD_RESERVABLE, String.valueOf(variable.isReservable()))
+						.field(FIELD_ENVIRONMENT, environmentId.toString())
+						.field(FIELD_APPLICATION, applicationId.toString())
 						.field("internal", String.valueOf(true))
-						.field("timeToLive", String.valueOf(variable.getTimeToLive()));
+						.field(FIELD_TIME_TO_LIVE, String.valueOf(variable.getTimeToLive()));
 				
 				if (specificToVersion) {
-					request = request.field("version", versionId.toString());
+					request = request.field(FIELD_VERSION, versionId.toString());
 				}
 				
 				JSONObject variableJson = getJSonResponse(request);
@@ -215,9 +223,9 @@ public class SeleniumRobotVariableServerConnector extends SeleniumRobotServerCon
 		} else {
 			try {
 				JSONObject variableJson = getJSonResponse(buildPatchRequest(String.format(url + EXISTING_VARIABLE_API_URL, variable.getId()))
-						.field("value", variable.getValue())
-						.field("reservable", String.valueOf(variable.isReservable()))
-						.field("timeToLive", String.valueOf(variable.getTimeToLive())));
+						.field(FIELD_VALUE, variable.getValue())
+						.field(FIELD_RESERVABLE, String.valueOf(variable.isReservable()))
+						.field(FIELD_TIME_TO_LIVE, String.valueOf(variable.getTimeToLive())));
 				
 				return TestVariable.fromJsonObject(variableJson);
 				

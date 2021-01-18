@@ -16,6 +16,9 @@ import com.seleniumtests.uipage.htmlelements.HtmlElement;
 
 public class AngularMaterialSelect extends CommonSelectList implements ISelectList {
 
+	private static final String CLASS_MAT_SELECT_PANEL = "mat-select-panel";
+	private static final String CLASS_MAT_SELECT_CONTENT = "mat-select-content";
+	private static final String TAG_MAT_PSEUDO_CHECKBOX = "mat-pseudo-checkbox";
 	private String optionsHolderClassName = null;
 	
 	// for SPI
@@ -29,11 +32,7 @@ public class AngularMaterialSelect extends CommonSelectList implements ISelectLi
 
 	@Override
 	public boolean isApplicable() {
-		if ("mat-select".equalsIgnoreCase(parentElement.getTagName())) {
-			return true;
-		} else {
-			return false;
-		}
+		return "mat-select".equalsIgnoreCase(parentElement.getTagName());
 	}
 	
 	@Override
@@ -41,11 +40,11 @@ public class AngularMaterialSelect extends CommonSelectList implements ISelectLi
 		parentElement.findElement(By.className("mat-select-arrow")).click();
 		
 		if (optionsHolderClassName == null) {
-			String classes = new HtmlElement("", new ByAll(By.className("mat-select-panel"), By.className("mat-select-content")), frameElement).getAttribute("class");
-			if (classes.contains("mat-select-content")) {
-				optionsHolderClassName = "mat-select-content";
+			String classes = new HtmlElement("", new ByAll(By.className(CLASS_MAT_SELECT_PANEL), By.className(CLASS_MAT_SELECT_CONTENT)), frameElement).getAttribute("class");
+			if (classes.contains(CLASS_MAT_SELECT_CONTENT)) {
+				optionsHolderClassName = CLASS_MAT_SELECT_CONTENT;
 			} else {
-				optionsHolderClassName = "mat-select-panel";
+				optionsHolderClassName = CLASS_MAT_SELECT_PANEL;
 			}
 		}
 		
@@ -183,10 +182,10 @@ public class AngularMaterialSelect extends CommonSelectList implements ISelectLi
 
 	@Override
 	public void setSelected(WebElement option) {
-		String selected = ((HtmlElement)((CachedHtmlElement)option).getRealElement()).getAttribute("aria-selected");
+		String selected = ((HtmlElement)((CachedHtmlElement)option).getRealElement()).getAttribute(ATTR_ARIA_SELECTED);
 		if (selected == null || "false".equals(selected)) {
 			// here list should still be visible
-			HtmlElement checkbox = ((HtmlElement)((CachedHtmlElement)option).getRealElement()).findElement(By.tagName("mat-pseudo-checkbox"));
+			HtmlElement checkbox = ((HtmlElement)((CachedHtmlElement)option).getRealElement()).findElement(By.tagName(TAG_MAT_PSEUDO_CHECKBOX));
 			if (checkbox.isElementPresent(0)) {
 				checkbox.click();
 			} else {
@@ -198,8 +197,8 @@ public class AngularMaterialSelect extends CommonSelectList implements ISelectLi
 
 	@Override
 	public void setDeselected(WebElement option) {
-		if ("true".equals(option.getAttribute("aria-selected"))) {
-			HtmlElement checkbox = ((HtmlElement)((CachedHtmlElement)option).getRealElement()).findElement(By.tagName("mat-pseudo-checkbox"));
+		if ("true".equals(option.getAttribute(ATTR_ARIA_SELECTED))) {
+			HtmlElement checkbox = ((HtmlElement)((CachedHtmlElement)option).getRealElement()).findElement(By.tagName(TAG_MAT_PSEUDO_CHECKBOX));
 			if (checkbox.isElementPresent(0)) {
 				checkbox.click();
 			} else {

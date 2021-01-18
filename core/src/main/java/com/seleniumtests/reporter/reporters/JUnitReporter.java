@@ -1,42 +1,33 @@
 package com.seleniumtests.reporter.reporters;
 
 import java.io.File;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
 import java.util.TimeZone;
-import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
-import org.testng.IReporter;
-import org.testng.ISuite;
-import org.testng.ISuiteResult;
 import org.testng.ITestContext;
 import org.testng.ITestNGMethod;
 import org.testng.ITestResult;
-import org.testng.collections.ListMultiMap;
 import org.testng.collections.Lists;
-import org.testng.collections.Maps;
 import org.testng.collections.SetMultiMap;
 import org.testng.collections.Sets;
 import org.testng.internal.Utils;
 import org.testng.reporters.XMLConstants;
 import org.testng.reporters.XMLStringBuffer;
-import org.testng.xml.XmlSuite;
 
 import com.seleniumtests.customexception.CustomSeleniumTestsException;
 import com.seleniumtests.util.StringUtility;
@@ -74,18 +65,20 @@ public class JUnitReporter extends CommonReporter {
 
 			Throwable t = tr.getThrowable();
 			switch (tr.getStatus()) {
-			case ITestResult.SKIP:
-			case ITestResult.SUCCESS_PERCENTAGE_FAILURE:
-				skipped++;
-				break;
-
-			case ITestResult.FAILURE:
-				if (t instanceof AssertionError) {
-					failures++;
-				} else {
-					errors++;
-				}
-				break;
+				case ITestResult.SKIP:
+				case ITestResult.SUCCESS_PERCENTAGE_FAILURE:
+					skipped++;
+					break;
+	
+				case ITestResult.FAILURE:
+					if (t instanceof AssertionError) {
+						failures++;
+					} else {
+						errors++;
+					}
+					break;
+				default:
+					// nothing to do
 			}
 
 			totalTime += time;
@@ -148,13 +141,9 @@ public class JUnitReporter extends CommonReporter {
 
 	private static Collection<ITestResult> sort(Set<ITestResult> results) {
 		List<ITestResult> sortedResults = new ArrayList<>(results);
-		Collections.sort(sortedResults, new Comparator<ITestResult>() {
-
-			@Override
-			public int compare(ITestResult o1, ITestResult o2) {
-				return Integer.compare(o1.getMethod().getPriority(), o2.getMethod().getPriority());
-			}
-		});
+		Collections.sort(sortedResults, (ITestResult o1, ITestResult o2) ->
+				Integer.compare(o1.getMethod().getPriority(), o2.getMethod().getPriority())
+		);
 		return sortedResults;
 	}
 
@@ -253,13 +242,14 @@ public class JUnitReporter extends CommonReporter {
 	}
 
 	private static class TestTag {
-		public Properties properties;
-		public String message;
-		public String type;
-		public String logs = "";
-		public String stackTrace;
+		private Properties properties;
+		private String message;
+		private String type;
+		private String logs = "";
+		private String stackTrace;
 		String childTag;
 		String logTag = XMLConstants.SYSTEM_OUT;
+		
 	}
 
 	private void addResults(Set<ITestResult> allResults, Map<Class<?>, Set<ITestResult>> out) {

@@ -59,7 +59,7 @@ public abstract class IMobileCapabilityFactory extends ICapabilitiesFactory {
     	
     	// Set up version and device name else appium server would pick the only available emulator/device
         // Both of these are ignored for android for now
-    	capabilities.setCapability(MobileCapabilityType.PLATFORM_NAME, webDriverConfig.getPlatform());
+    	capabilities.setCapability(CapabilityType.PLATFORM_NAME, webDriverConfig.getPlatform());
     	capabilities.setCapability(MobileCapabilityType.PLATFORM_VERSION, webDriverConfig.getMobilePlatformVersion());
     	capabilities.setCapability(MobileCapabilityType.DEVICE_NAME, webDriverConfig.getDeviceName());
     	capabilities.setCapability(MobileCapabilityType.NEW_COMMAND_TIMEOUT, webDriverConfig.getNewCommandTimeout());

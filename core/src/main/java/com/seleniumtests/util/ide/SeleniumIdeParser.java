@@ -53,17 +53,17 @@ public class SeleniumIdeParser {
 			"\n" + 
 			"public class %sPage extends PageObject {\n" + 
 			"\n" + 
-			"	private Map<String, Object> vars;\n" + 	
-			"	private JavascriptExecutor js;\n" + 	
+			"   private Map<String, Object> vars;\n" + 	
+			"   private JavascriptExecutor js;\n" + 	
 			"\n" + 	
-			"	public %sPage() throws IOException {\n" + 
-			"		super();\n" + 
-			"		js = (JavascriptExecutor) driver;\n" + 
-			"		vars = new HashMap<String, Object>();\n" + 
-			"		for (Entry<String, TestVariable> entry: robotConfig().getConfiguration().entrySet()) {\n" + 
-			"			vars.put(entry.getKey(), entry.getValue().getValue());\n" + 
-			"		}\n"	+
-			"	}\n";
+			"   public %sPage() throws IOException {\n" + 
+			"       super();\n" + 
+			"       js = (JavascriptExecutor) driver;\n" + 
+			"       vars = new HashMap<String, Object>();\n" + 
+			"       for (Entry<String, TestVariable> entry: robotConfig().getConfiguration().entrySet()) {\n" + 
+			"           vars.put(entry.getKey(), entry.getValue().getValue());\n" + 
+			"       }\n"	+
+			"   }\n";
 	private static final String FOOTER = "}"; 
 	
 	public static final String TEST_HEADER = "package com.infotel.selenium.ide;\n" + 
@@ -74,7 +74,7 @@ public class SeleniumIdeParser {
 			"\n" + 
 			"public class %s extends SeleniumTestPlan {\n\n";
 	
-	public SeleniumIdeParser(String filePath) throws FileNotFoundException {
+	public SeleniumIdeParser(String filePath) {
 		
 		javaFile = new File(filePath);
 		className = javaFile.getName().replace(".java", "");
@@ -142,10 +142,10 @@ public class SeleniumIdeParser {
 	    		// in case of a Test method, create a reference to PageObject method
 		    	Optional<AnnotationExpr> testAnnotation = n.getAnnotationByName("Test");
 		    	if (testAnnotation.isPresent()) {
-		    		tCode.append("	@Test\n");
-		    		tCode.append(String.format("	%s throws IOException {\n", n.getDeclarationAsString()));
-		    		tCode.append(String.format("		new WebPage().%s();\n", n.getNameAsString()));
-		    		tCode.append("	}\n\n");
+		    		tCode.append("  @Test\n");
+		    		tCode.append(String.format("    %s throws IOException {\n", n.getDeclarationAsString()));
+		    		tCode.append(String.format("        new WebPage().%s();\n", n.getNameAsString()));
+		    		tCode.append("  }\n\n");
 		    	} 
     		}
 	    	

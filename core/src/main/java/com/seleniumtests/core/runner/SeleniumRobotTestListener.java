@@ -19,7 +19,6 @@ package com.seleniumtests.core.runner;
 
 import java.io.File;
 import java.lang.reflect.Method;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -63,7 +62,6 @@ import com.seleniumtests.core.utils.TestNGResultUtils;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.driver.DriverMode;
 import com.seleniumtests.driver.WebUIDriver;
-import com.seleniumtests.driver.screenshots.VideoCaptureMode;
 import com.seleniumtests.reporter.logger.ArchiveMode;
 import com.seleniumtests.reporter.logger.TestStep;
 import com.seleniumtests.reporter.reporters.CommonReporter;
@@ -92,7 +90,7 @@ public class SeleniumRobotTestListener extends BaseTestNGListener implements ITe
 
 	public SeleniumRobotTestListener() {
 		super(initializeReportPortalListener());
-		currentListener = this;
+		setCurrentListener(this);
 	}
 	
 	private static ReportPortalService initializeReportPortalListener() {
@@ -208,7 +206,7 @@ public class SeleniumRobotTestListener extends BaseTestNGListener implements ITe
 			}
 			
 			
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			logger.error("Error generating temp report", e);
 		}
 	}
@@ -365,7 +363,7 @@ public class SeleniumRobotTestListener extends BaseTestNGListener implements ITe
 	
 	@Override
 	public void onExecutionStart() {
-		suiteList = Collections.synchronizedList(new ArrayList<>());
+		setSuiteList( Collections.synchronizedList(new ArrayList<>()));
 		Unirest.config().reset();
 		Unirest.config().followRedirects(true);
 		
@@ -450,7 +448,7 @@ public class SeleniumRobotTestListener extends BaseTestNGListener implements ITe
 	
 	@Override
 	public void onConfigurationSuccess(ITestResult testResult) {
-
+		// nothing to do
 	}
 
 	@Override
@@ -474,7 +472,9 @@ public class SeleniumRobotTestListener extends BaseTestNGListener implements ITe
 		// finalize manual steps if we use this mode
 		try {
 			TestTasks.addStep(null);
-		} catch (ConfigurationException e) {}
+		} catch (ConfigurationException e) {
+			logger.error("Error adding last step");
+		}
 		
 		TestStep tearDownStep = new TestStep(TestStepManager.LAST_STEP_NAME, testResult, new ArrayList<>(), true);
 		TestStepManager.setCurrentRootTestStep(tearDownStep);
@@ -515,11 +515,11 @@ public class SeleniumRobotTestListener extends BaseTestNGListener implements ITe
 		List<Throwable> verificationFailures = SeleniumTestsContextManager.getThreadContext().getVerificationFailures(Reporter.getCurrentTestResult());
 
 		int size = verificationFailures.size();
-		if (size == 0 || result.getStatus() == TestResult.FAILURE) {
+		if (size == 0 || result.getStatus() == ITestResult.FAILURE) {
 			return;
 		}
 
-		result.setStatus(TestResult.FAILURE);
+		result.setStatus(ITestResult.FAILURE);
 
 		if (size == 1) {
 			result.setThrowable(verificationFailures.get(0));
@@ -631,7 +631,9 @@ public class SeleniumRobotTestListener extends BaseTestNGListener implements ITe
 				// when steps are automatic, they are closed (lastStep is null) once method is finished
 				try {
 					lastStep = Iterables.getLast(SeleniumTestsContextManager.getThreadContext().getTestStepManager().getTestSteps());
-				} catch (NoSuchElementException e) {} 
+				} catch (NoSuchElementException e) {
+					// if last step does not exist, do not crash
+				} 
 			}
 			
 			if (lastStep != null) {
@@ -692,5 +694,15 @@ public class SeleniumRobotTestListener extends BaseTestNGListener implements ITe
 
 	public static SeleniumRobotTestListener getCurrentListener() {
 		return currentListener;
+	}
+
+
+	public static void setCurrentListener(SeleniumRobotTestListener currentListener) {
+		SeleniumRobotTestListener.currentListener = currentListener;
+	}
+
+
+	public static void setSuiteList(List<ISuite> suiteList) {
+		SeleniumRobotTestListener.suiteList = suiteList;
 	}
 }

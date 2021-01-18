@@ -42,7 +42,7 @@ public class ExpectedConditionsC {
 					  element.getRealElement();
 					  
 					  // element is there, this is not what we want
-					  return null;
+					  return false;
 				  } catch (Exception e) {
 					  return true;
 				  }

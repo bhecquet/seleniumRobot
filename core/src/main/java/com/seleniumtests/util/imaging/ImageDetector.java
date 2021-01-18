@@ -34,6 +34,7 @@ import java.util.concurrent.TimeUnit;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.SwingConstants;
 import javax.swing.WindowConstants;
 
 import org.apache.log4j.Logger;
@@ -279,10 +280,10 @@ public class ImageDetector {
 		Mat objectCorners = new Mat(4,1,CvType.CV_32FC2);
 		Mat sceneCorners = new Mat(4,1,CvType.CV_32FC2);
 
-		objectCorners.put(0, 0, new double[] {0,0});
-		objectCorners.put(1, 0, new double[] {objectImageMat.cols(),0});
-		objectCorners.put(2, 0, new double[] {objectImageMat.cols(),objectImageMat.rows()});
-		objectCorners.put(3, 0, new double[] {0,objectImageMat.rows()});
+		objectCorners.put(0, 0, 0, 0);
+		objectCorners.put(1, 0, objectImageMat.cols(), 0);
+		objectCorners.put(2, 0, objectImageMat.cols(), objectImageMat.rows());
+		objectCorners.put(3, 0, 0, objectImageMat.rows());
 		
 		Core.perspectiveTransform(objectCorners, sceneCorners, hg);
 		
@@ -415,6 +416,7 @@ public class ImageDetector {
     		        	TemplateMatchProperties match = detectExactZone2(resizeSceneImageMat, objectImageMat, localScale, currentThreshold);
     		        	matches.add(match);
     		      	} catch (ImageSearchException e) {
+    		      		// no match found
     				}
     		        
     		      });
@@ -674,7 +676,7 @@ public class ImageDetector {
 		ImageIcon image = new ImageIcon(filePath);
 		frame.setSize(image.getIconWidth()+10,image.getIconHeight()+35);
 		// Draw the Image data into the BufferedImage
-		JLabel label1 = new JLabel(" ", image, JLabel.CENTER);
+		JLabel label1 = new JLabel(" ", image, SwingConstants.CENTER);
 		frame.getContentPane().add(label1);
 	
 		frame.validate();
