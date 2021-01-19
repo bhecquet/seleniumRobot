@@ -472,6 +472,46 @@ public class TestJiraConnector extends MockitoTest {
 	}
 	
 	/**
+	 * Test the case where the attachment file (file of snapshot is not present)
+	 * @throws URISyntaxException
+	 */
+	@Test(groups= {"ut"})
+	public void testCreateIssueMissingScreenshotFile() throws URISyntaxException {
+
+		JiraConnector jiraConnector = new JiraConnector("http://foo/bar", PROJECT_KEY, "user", "password", jiraOptions);
+		
+		// simulate screenshot file not present
+		new File(screenshot.getFullImagePath()).delete();
+		
+		JiraBean jiraBean = new JiraBean(null, "issue 1", "issue 1 descr", "P1", "Bug", null, null, null, null, Arrays.asList(screenshot), null, new HashMap<>(), new ArrayList<>());
+		jiraConnector.createIssue(jiraBean);		
+		
+		// check attachments (screenshots) have not been added  because screenshot file was not available
+		verify(issueRestClient, never()).addAttachments(eq(new URI("http://foo/bar/i/1/attachments")), any(File.class));
+	}
+	
+	/**
+	 * Test the case where the detailed result file (.zip) is not present
+	 * @throws URISyntaxException
+	 */
+	@Test(groups= {"ut"})
+	public void testCreateIssueMissingDetailedResultFile() throws URISyntaxException {
+
+		JiraConnector jiraConnector = new JiraConnector("http://foo/bar", PROJECT_KEY, "user", "password", jiraOptions);
+		
+		// simulate screenshot file not present
+		detailedResult.delete();
+		
+		JiraBean jiraBean = new JiraBean(null, "issue 1", "issue 1 descr", "P1", "Bug", null, null, null, null, Arrays.asList(), detailedResult, new HashMap<>(), new ArrayList<>());
+		
+		
+		jiraConnector.createIssue(jiraBean);		
+		
+		// check attachments (screenshots) have not been added  because screenshot file was not available
+		verify(issueRestClient, never()).addAttachments(eq(new URI("http://foo/bar/i/1/attachments")), any(File.class));
+	}
+	
+	/**
 	 * Test issue creation without fields, components, screenshots, ...
 	 * @throws URISyntaxException
 	 */
