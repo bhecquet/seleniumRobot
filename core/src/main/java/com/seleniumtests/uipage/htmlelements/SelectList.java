@@ -18,16 +18,22 @@
 package com.seleniumtests.uipage.htmlelements;
 
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.ServiceLoader;
 
+import org.apache.commons.collections.ListUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
 
+import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.CustomSeleniumTestsException;
 import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.uipage.ReplayOnError;
@@ -44,13 +50,45 @@ import net.ricecode.similarity.StringSimilarityServiceImpl;
  */
 public class SelectList extends HtmlElement {
 
+	private static List<Class<? extends ISelectList>> selectImplementations;
+	private static Map<String, Class<? extends ISelectList>> uiLibraries = Collections.synchronizedMap(new HashMap<>());
+	
+	// register all UiLibraries
+	static {
+		if (selectImplementations == null) {
+    		selectImplementations = searchRelevantImplementation();
+    		
+    		// register UI library
+    		for (Class<? extends ISelectList> selectClass: selectImplementations) {
+    			try {
+					Method getUiLibraryMethod = selectClass.getDeclaredMethod("getUiLibrary");
+
+					String uiLibrary = (String) getUiLibraryMethod.invoke(null);
+					uiLibraries.put(uiLibrary, selectClass);
+					UiLibraryRegistry.register(uiLibrary);
+				
+    			} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+    				throw new ConfigurationException(String.format("Error calling 'getUiLibrary' on %s: %s", selectClass.getCanonicalName(), e.getMessage()));
+    			} catch (ClassCastException e) {
+    				throw new ConfigurationException("Method 'getUiLibrary' must return an object of type String");
+				} catch (NoSuchMethodException e) {
+					throw new ConfigurationException(String.format("Class %s does not declare the static method 'public static String getUiLibrary(){return \"myLib\";}'", selectClass.getCanonicalName()));
+					
+				} catch (SecurityException e) {
+					// nothing to do
+				}
+    			
+    		}
+    	}
+	}
+
     private static final String ERROR_MULTI_SELECT = "You may only deselect all options of a multi-select";
 	protected List<WebElement> options = null;
 	private SimilarityStrategy strategy = new JaroWinklerStrategy();
 	private StringSimilarityService service = new StringSimilarityServiceImpl(strategy);
 	private ISelectList selectImplementation;
+	private List<Class<? extends ISelectList>> implementationList;
 	private static Object lock = new Object();
-	private static List<Class<? extends ISelectList>> selectImplementations;
 	protected boolean multiple;
 
 	/**
@@ -116,22 +154,34 @@ public class SelectList extends HtmlElement {
 		
 		return selectImplementations;
     }
+    
+    /**
+     * Reorder SelectList implementation depending on prefered libraries
+     * @param libraries
+     * @return
+     */
+    private List<Class<? extends ISelectList>> orderImplementations(List<String> libraries) {
+    	List<Class<? extends ISelectList>> reorderedSelectImplementations = new ArrayList<>(selectImplementations);
+    	for (String uiLibrary: libraries) {
+    		if (uiLibraries.containsKey(uiLibrary) && reorderedSelectImplementations.remove(uiLibraries.get(uiLibrary))) {
+    			reorderedSelectImplementations.add(0, uiLibraries.get(uiLibrary));
+    		}
+    	}
+    	return reorderedSelectImplementations;
+    }
 
     @Override
     protected void findElement() {
-    	synchronized (lock) {
-    		if (selectImplementations == null) {
-        		selectImplementations = searchRelevantImplementation();
-        	}
-		}
 
     	// set a default type so that use of selectImplementation can be done
     	selectImplementation = new StubSelect();
     	
         super.findElement(true);
         
+        // if we have a prefered implementation, use it
         // search the right select list handler
-        for (Class<? extends ISelectList> selectClass: selectImplementations) {
+        implementationList = orderImplementations(getPreferedUiLibraries());
+        for (Class<? extends ISelectList> selectClass: implementationList) {
         	try {
 				ISelectList selectInstance = selectClass.getConstructor(WebElement.class, FrameElement.class).newInstance(element, frameElement);
 				if (selectInstance.isApplicable()) {
@@ -499,6 +549,10 @@ public class SelectList extends HtmlElement {
 
 	public ISelectList getSelectImplementation() {
 		return selectImplementation;
+	}
+
+	public List<Class<? extends ISelectList>> getImplementationList() {
+		return implementationList;
 	}
     
 }

@@ -1,12 +1,9 @@
 package com.seleniumtests.uipage.htmlelements.select;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.openqa.selenium.By;
-import org.openqa.selenium.Keys;
-import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.pagefactory.ByAll;
 
@@ -14,20 +11,32 @@ import com.seleniumtests.uipage.htmlelements.CachedHtmlElement;
 import com.seleniumtests.uipage.htmlelements.FrameElement;
 import com.seleniumtests.uipage.htmlelements.HtmlElement;
 
-public class AngularMaterialSelect extends CommonSelectList implements ISelectList {
+public class AngularMaterialSelect extends AngularSelect implements ISelectList {
 
 	private static final String CLASS_MAT_SELECT_PANEL = "mat-select-panel";
 	private static final String CLASS_MAT_SELECT_CONTENT = "mat-select-content";
-	private static final String TAG_MAT_PSEUDO_CHECKBOX = "mat-pseudo-checkbox";
-	private String optionsHolderClassName = null;
 	
 	// for SPI
 	public AngularMaterialSelect() {
-		super(null, null);
+		this(null, null);
 	}
 
 	public AngularMaterialSelect(WebElement parentElement, FrameElement frameElement) {
 		super(parentElement, frameElement);
+		
+		locatorClickToOpen = By.className("mat-select-arrow");
+		locatorClickToclose = null;
+		locatorParentOfDropdown = null; // is present in DOM only when options are displayed
+		locatorOption = By.tagName("mat-option");
+		locatorCheckboxInOption = By.tagName("mat-pseudo-checkbox");
+		
+		selectedOptionAttributeName = ATTR_ARIA_SELECTED;
+		selectedOptionAttributeValue = "true";
+		deselectedOptionAttributeValue = "false";
+	}
+	
+	public static String getUiLibrary() {
+		return "AngularMaterial";
 	}
 
 	@Override
@@ -37,31 +46,23 @@ public class AngularMaterialSelect extends CommonSelectList implements ISelectLi
 	
 	@Override
 	public List<WebElement> getOptions() {
-		parentElement.findElement(By.className("mat-select-arrow")).click();
+		parentElement.findElement(locatorClickToOpen).click();
 		
-		if (optionsHolderClassName == null) {
+		if (locatorParentOfDropdown == null) {
 			String classes = new HtmlElement("", new ByAll(By.className(CLASS_MAT_SELECT_PANEL), By.className(CLASS_MAT_SELECT_CONTENT)), frameElement).getAttribute("class");
 			if (classes.contains(CLASS_MAT_SELECT_CONTENT)) {
-				optionsHolderClassName = CLASS_MAT_SELECT_CONTENT;
+				locatorParentOfDropdown = By.className(CLASS_MAT_SELECT_CONTENT);
 			} else {
-				optionsHolderClassName = CLASS_MAT_SELECT_PANEL;
+				locatorParentOfDropdown = By.className(CLASS_MAT_SELECT_PANEL);
 			}
 		}
 		
-		options = new HtmlElement("options", By.className(optionsHolderClassName), frameElement)
-				.findHtmlElements(By.tagName("mat-option"))
+		options = new HtmlElement("options", locatorParentOfDropdown, frameElement)
+				.findHtmlElements(locatorOption)
 				.stream()
 				.map(CachedHtmlElement::new)
 				.collect(Collectors.toList());
 		return options;
-	}
-
-	@Override
-	public void finalizeAction() {
-		HtmlElement selectContent = new HtmlElement("options", By.className(optionsHolderClassName), frameElement);
-		if (selectContent.isElementPresent()) {
-			parentElement.sendKeys(Keys.ESCAPE);
-		}
 	}
 
 	@Override
@@ -71,142 +72,10 @@ public class AngularMaterialSelect extends CommonSelectList implements ISelectLi
 	
 	@Override
 	public String getOptionText(WebElement option) {
-		return option.getText();
-	}
-
-	@Override
-	public List<WebElement> getAllSelectedOptions() {
-		List<WebElement> toReturn = new ArrayList<>();
-		
-		for (WebElement option : options) {
-			if (option.getAttribute("class").contains("mat-selected")) {
-				toReturn.add(option);
-			}
-		}
-		
-		return toReturn;
-	}
-
-	@Override
-	public void deselectByIndex(Integer index) {
-		try {
-			WebElement option = options.get(index);
-	        setDeselected(option);
-		} catch (IndexOutOfBoundsException e) {
-			throw new NoSuchElementException("Cannot locate element with index: " + index);
-		}
-
-	}
-
-	@Override
-	public void deselectByText(String text) {
-		boolean matched = false;
-		for (WebElement option : options) {
-            if (option.getText().equals(text)) {
-            	setDeselected(option);
-            	matched = true;
-                break;
-            }
-        }
-		if (!matched) {
-	      throw new NoSuchElementException("Cannot locate element with text: " + text);
-	    }
-
-	}
-
-	@Override
-	public void deselectByValue(String value) {
-		boolean matched = false;
-		for (WebElement option : options) {
-            if (getOptionValue(option).equals(value)) {
-            	setDeselected(option);
-            	matched = true;
-                break;
-            }
-        }
-		if (!matched) {
-	      throw new NoSuchElementException("Cannot locate element with value: " + value);
-	    }
-
-	}
-
-	@Override
-	public void selectByIndex(int index) {
-		try {
-			WebElement option = options.get(index);
-			setSelected(option);
-		} catch (IndexOutOfBoundsException e) {
-			throw new NoSuchElementException("Cannot locate option with index: " + index);
+		if (!option.getAttribute("title").isEmpty()) {
+			return option.getAttribute("title");
+		} else {
+			return option.getText();
 		}
 	}
-
-	@Override
-	public void selectByText(String text) {
-		boolean matched = false;
-		for (WebElement option : options) {
-            String selectedText;
-            if (!option.getAttribute("title").isEmpty()) {
-                selectedText = option.getAttribute("title");
-            } else {
-                selectedText = option.getText();
-            }
-
-            if (selectedText.equals(text)) {
-                setSelected(option);
-                matched = true;
-                break;
-            }
-        }
-		
-		if (!matched) {
-	      throw new NoSuchElementException("Cannot locate element with text: " + text);
-	    }
-
-	}
-
-	@Override
-	public void selectByValue(String value) {
-		boolean matched = false;
-		for (WebElement option : options) {
-            if (getOptionValue(option).equals(value)) {
-                setSelected(option);
-                matched =true;
-                break;
-            }
-        }
-		if (!matched) {
-			throw new NoSuchElementException("Cannot locate option with value: " + value);
-	    }
-
-	}
-
-	@Override
-	public void setSelected(WebElement option) {
-		String selected = ((HtmlElement)((CachedHtmlElement)option).getRealElement()).getAttribute(ATTR_ARIA_SELECTED);
-		if (selected == null || "false".equals(selected)) {
-			// here list should still be visible
-			HtmlElement checkbox = ((HtmlElement)((CachedHtmlElement)option).getRealElement()).findElement(By.tagName(TAG_MAT_PSEUDO_CHECKBOX));
-			if (checkbox.isElementPresent(0)) {
-				checkbox.click();
-			} else {
-				((CachedHtmlElement)option).getRealElement().click();
-			}
-		}
-
-	}
-
-	@Override
-	public void setDeselected(WebElement option) {
-		if ("true".equals(option.getAttribute(ATTR_ARIA_SELECTED))) {
-			HtmlElement checkbox = ((HtmlElement)((CachedHtmlElement)option).getRealElement()).findElement(By.tagName(TAG_MAT_PSEUDO_CHECKBOX));
-			if (checkbox.isElementPresent(0)) {
-				checkbox.click();
-			} else {
-				((CachedHtmlElement)option).getRealElement().click();
-			}
-		}
-
-	}
-
-
 }

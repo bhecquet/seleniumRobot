@@ -1101,3 +1101,91 @@ For loading to be done, class MUST have an empty constructor
 Look at existing selectList in  [https://github.com/bhecquet/seleniumRobot/tree/master/core/src/main/java/com/seleniumtests/uipage/htmlelements/select](https://github.com/bhecquet/seleniumRobot/tree/master/core/src/main/java/com/seleniumtests/uipage/htmlelements/select)
 
 Once class is ready, add a file named `com.seleniumtests.uipage.htmlelements.select.ISelectList` in src/test/resources/META-INF/services/ folder (create if if necessary). In this file, write the fully qualified named of your class. e.g: foo.bar.MySelectList
+
+To ease the implementation, if your custom SelectList is an Angular one, you can extend AngularSelect and redefine some of the variables
+
+```java
+
+	public class LightningSelect extends AngularSelect implements ISelectList {
+	
+	
+		// for SPI
+		public LightningSelect() {
+			this(null, null);
+		}
+		
+		public LightningSelect(WebElement parentElement, FrameElement frameElement) {
+			super(parentElement, frameElement, false);
+			
+			locatorClickToOpen = By.className("slds-combobox__input");
+			locatorClickToclose = By.className("slds-combobox__input"); // le même car ESC bloque
+			locatorParentOfDropdown = By.className("cdk-overlay-connected-position-bounding-box"); 
+			locatorOption = By.className("slds-listbox__option_plain");
+			locatorCheckboxInOption = null;
+			
+			selectedOptionAttributeName = ATTR_ARIA_SELECTED;
+			selectedOptionAttributeValue = "true";
+			deselectedOptionAttributeValue = "false";
+		}
+	
+		public static String getUiLibrary() {
+			return "Lightning"; // mimic salesforce lightning for angular applications
+		}
+		
+		@Override
+		public String getOptionText(WebElement option) {
+			return option.findElement(By.className("slds-truncate")).getAttribute("title");
+		}
+	
+		@Override
+		public boolean isApplicable() {
+			return parentElement.getAttribute("class").contains("slds-combobox_container");
+		}
+		
+		@Override
+		public boolean isMultipleWithoutFind() {
+	        return false;
+	    }
+
+	}
+```
+
+### 16 Using custom UI libraries ###
+
+Most of the web sites use JS development frameworks like Angular or react and associated GUI elements (angular material, ...)
+For SelectList especialy (see above), handling elements change from one framework to another.
+By default, seleniumRobot will search for all available UI components (le selectlists it knows) to find a proper way to handle it transparently.
+You can help it by specifying, when declaring your Page object, which GUI components are used
+
+Assuming you have a page 
+
+```java
+	public class MyPage extends PageObject {
+		
+		public static SelectList select = new SelectList("select", By.id("select"));
+	
+		public MyPage() {
+			super();
+		}
+	}
+```
+If you let seleniumRobot do its job, it will search if the select element is in "AngularMaterial", "Angular", "native HTML", ... and then find the proper implementation
+
+
+If you change to (note the "Angular" in constructor)
+
+```java
+	```java
+	public class MyPage extends PageObject {
+		
+		public static SelectList select = new SelectList("select", By.id("select"));
+	
+		public MyPage() {
+			super("Angular");
+		}
+	}
+```
+Then, it will first search for Angular handling, falling back to other implementations if needed
+
+The list of implementations is provided by UI components themselves and if you set the wrong one, PageObject constructor will raise an error and give you the right list.
+
