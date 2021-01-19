@@ -9,7 +9,6 @@ import org.openqa.selenium.WebElement;
 import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.uipage.ByC;
 import com.seleniumtests.uipage.htmlelements.FrameElement;
-import com.seleniumtests.uipage.htmlelements.HtmlElement;
 
 public class SalesforceLigntningSelect extends AngularSelect implements ISelectList {
 	
@@ -27,7 +26,7 @@ public class SalesforceLigntningSelect extends AngularSelect implements ISelectL
 		locatorClickToclose = By.className("ng-arrow-wrapper");
 		locatorParentOfDropdown = By.tagName("ng-dropdown-panel"); // is present in DOM only when options are displayed
 		locatorOption = ByC.xTagName("lightning-base-combobox-item");
-		locatorCheckboxInOption = By.tagName("input");
+		locatorCheckboxInOption = null;
 		
 		selectedOptionAttributeName = ATTR_ARIA_SELECTED;
 		selectedOptionAttributeValue = "true";
@@ -47,7 +46,7 @@ public class SalesforceLigntningSelect extends AngularSelect implements ISelectL
 	@Override
 	public List<WebElement> getOptions() {
 		parentElement.findElement(locatorClickToOpen).click();
-		options = ((HtmlElement) parentElement).findHtmlElements(locatorOption)
+		options = parentElement.findElements(locatorOption)
 				.stream()
 				.collect(Collectors.toList());
 		return options;
@@ -58,6 +57,7 @@ public class SalesforceLigntningSelect extends AngularSelect implements ISelectL
 	 */
 	@Override
 	public void finalizeAction() {
+		handleAlert();
 		if ("true".equalsIgnoreCase(parentElement.findElement(ByC.attribute("role", "combobox")).getAttribute("aria-expanded"))) {
 			parentElement.findElement(ByC.xTagName("input")).click();
 		}
@@ -94,24 +94,39 @@ public class SalesforceLigntningSelect extends AngularSelect implements ISelectL
 			
 	}
 	
+
+	@Override
+	public void setDeselected(WebElement option) {
+		if (isSelected(option)) {
+			option.click();
+		}
+	}
+	
+	@Override
+	public void setSelected(WebElement option) {
+		if (!isSelected(option)) {
+			option.click();
+		}
+	}
+	
 	@Override
 	public void selectByValue(String value) {
-		throw new ScenarioException("Cannot select by value for LWC select");
+		throw new UnsupportedOperationException("Cannot select by value for LWC select");
 	}
 	
 	@Override
 	public void deselectByIndex(Integer index) {
-		throw new ScenarioException("Cannot deselect by index for LWC select");
+		throw new UnsupportedOperationException("Cannot deselect by index for LWC select");
 	}
 
 	@Override
 	public void deselectByText(String text) {
-		throw new ScenarioException("Cannot deselect by text for LWC select");
+		throw new UnsupportedOperationException("Cannot deselect by text for LWC select");
 	}
 
 	@Override
 	public void deselectByValue(String value) {
-		throw new ScenarioException("Cannot deselect for by value LWC select");
+		throw new UnsupportedOperationException("Cannot deselect for by value LWC select");
 	}
 
 }

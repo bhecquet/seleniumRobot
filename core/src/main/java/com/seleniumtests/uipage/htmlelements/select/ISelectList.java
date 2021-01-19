@@ -2,11 +2,13 @@ package com.seleniumtests.uipage.htmlelements.select;
 
 import java.util.List;
 
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 public interface ISelectList {
 	
-	
+
+	public void setDriver(WebDriver driver);
 
 	public boolean isApplicable();
  
