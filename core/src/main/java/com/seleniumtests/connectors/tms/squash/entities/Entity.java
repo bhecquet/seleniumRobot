@@ -23,10 +23,11 @@ public class Entity {
 	protected static final String FIELD_EMBEDDED = "_embedded";
 	protected static final String FIELD_PARENT = "parent";
 	protected static final String FIELD_CAMPAIGNS = "campaigns";
+	protected static final String FIELD_CAMPAIGN_FOLDERS = "campaign-folders";
 	protected static final String FIELD_PROJECTS = "projects";
 	
 	protected static final String TYPE_PROJECT = "project";
-	protected static final String TYPE_CAMPAIGN_FOLDER = "campaign-folders";
+	protected static final String TYPE_CAMPAIGN_FOLDER = "campaign-folder";
 	protected static final String TYPE_CAMPAIGN = "campaign";
 	protected static final String TYPE_ITERATION = "iteration";
 	
