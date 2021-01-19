@@ -1,6 +1,7 @@
 package com.seleniumtests.ut.core.runner.cucumber;
 
 import java.io.IOException;
+import java.util.List;
 
 import org.mockito.Mockito;
 import org.openqa.selenium.By;
@@ -22,8 +23,13 @@ public class PageForActions extends PageObject {
 	public static CheckBoxElement checkbox = new CheckBoxElement("checkbox", By.id("checkbox"));
 	public static RadioButtonElement radio = new RadioButtonElement("radio", By.id("radio"));
 
-	public PageForActions() throws IOException {
+	public PageForActions() {
 		super();
+	}
+	
+	public PageForActions(List<String> uiLibraries) {
+		super(uiLibraries);
+		
 	}
 
 }

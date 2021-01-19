@@ -5,6 +5,8 @@ import java.util.List;
 import org.openqa.selenium.WebElement;
 
 public interface ISelectList {
+	
+	
 
 	public boolean isApplicable();
  

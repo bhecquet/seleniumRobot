@@ -243,6 +243,11 @@ public class CachedHtmlElement implements WebElement {
 	public WebElement getRealElement() {
 		return realElement;
 	}
+	
+	@Override
+	public String toString() {
+		return realElement.toString() + "HTML: " + cachedElement.outerHtml();
+	}
 
 
 }

@@ -22,10 +22,7 @@ import org.openqa.selenium.Keys;
 import org.openqa.selenium.interactions.Actions;
 
 import com.seleniumtests.customexception.ScenarioException;
-import com.seleniumtests.driver.BrowserType;
-import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.uipage.ReplayOnError;
-import com.seleniumtests.util.helper.WaitHelper;
 
 /**
  * Class representing a date picker object

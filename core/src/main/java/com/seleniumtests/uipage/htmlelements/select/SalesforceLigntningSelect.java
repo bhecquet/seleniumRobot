@@ -3,23 +3,40 @@ package com.seleniumtests.uipage.htmlelements.select;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
 import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.uipage.ByC;
 import com.seleniumtests.uipage.htmlelements.FrameElement;
+import com.seleniumtests.uipage.htmlelements.HtmlElement;
 
-public class SalesforceLigntningSelect extends CommonSelectList implements ISelectList {
+public class SalesforceLigntningSelect extends AngularSelect implements ISelectList {
 	
 	
 	// for SPI
 	public SalesforceLigntningSelect() {
-		super(null, null);
+		this(null, null);
 	}
 	
 	public SalesforceLigntningSelect(WebElement parentElement, FrameElement frameElement) {
 		super(parentElement, frameElement);
+		
+
+		locatorClickToOpen = ByC.xTagName("input");
+		locatorClickToclose = By.className("ng-arrow-wrapper");
+		locatorParentOfDropdown = By.tagName("ng-dropdown-panel"); // is present in DOM only when options are displayed
+		locatorOption = ByC.xTagName("lightning-base-combobox-item");
+		locatorCheckboxInOption = By.tagName("input");
+		
+		selectedOptionAttributeName = ATTR_ARIA_SELECTED;
+		selectedOptionAttributeValue = "true";
+		deselectedOptionAttributeValue = "false";
+	}
+	
+
+	public static String getUiLibrary() {
+		return "SalesforceLightning";
 	}
 	
 	@Override
@@ -29,8 +46,8 @@ public class SalesforceLigntningSelect extends CommonSelectList implements ISele
 
 	@Override
 	public List<WebElement> getOptions() {
-		parentElement.findElement(ByC.xTagName("input")).click();
-		options = parentElement.findElements(ByC.xTagName("lightning-base-combobox-item"))
+		parentElement.findElement(locatorClickToOpen).click();
+		options = ((HtmlElement) parentElement).findHtmlElements(locatorOption)
 				.stream()
 				.collect(Collectors.toList());
 		return options;
@@ -69,50 +86,13 @@ public class SalesforceLigntningSelect extends CommonSelectList implements ISele
 	public String getOptionText(WebElement option) {
 		return option.findElements(ByC.xTagName("span")).get(1).findElement(ByC.xTagName("span")).getAttribute("title");
 	}
-
+	
 	@Override
-	public List<WebElement> getAllSelectedOptions() {
-		return options.stream()
-			.filter(el -> "true".equalsIgnoreCase(el.getAttribute(ATTR_ARIA_SELECTED)))
-			.collect(Collectors.toList());
+	public boolean isSelected(WebElement option) {
+		String selectedAttribute = option.getAttribute(ATTR_ARIA_SELECTED).toLowerCase();
+		return selectedAttribute != null && selectedAttribute.contains("true");
+			
 	}
-
-	@Override
-	public void setSelected(WebElement option) {
-		if ("false".equals(option.getAttribute(ATTR_ARIA_SELECTED))) {
-			option.click();
-		}
-
-	}
-
-	@Override
-	public void selectByIndex(int index) {
-		try {
-			WebElement option = options.get(index);
-			setSelected(option);
-		} catch (IndexOutOfBoundsException e) {
-			throw new NoSuchElementException("Cannot locate option with index: " + index);
-		}
-	}
-
-	@Override
-	public void selectByText(String text) {
-		boolean matched = false;
-		for (WebElement option : options) { // lightning-base-combobox-item element
-
-            if (getOptionText(option).equals(text)) {
-                setSelected(option);
-                matched = true;
-                break;
-            }
-        }
-		
-		if (!matched) {
-	      throw new NoSuchElementException("Cannot locate element with text: " + text);
-	    }
-
-	}
-
 	
 	@Override
 	public void selectByValue(String value) {
@@ -134,16 +114,4 @@ public class SalesforceLigntningSelect extends CommonSelectList implements ISele
 		throw new ScenarioException("Cannot deselect for by value LWC select");
 	}
 
-	@Override
-	public void setDeselected(WebElement option) {
-		if ("true".equals(option.getAttribute(ATTR_ARIA_SELECTED))) {
-			option.click();
-		}
-
-	}
-
-	@Override
-	public WebElement getParentElement() {
-		return parentElement;
-	}
 }

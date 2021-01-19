@@ -6,6 +6,7 @@ import java.util.List;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
 
+import com.seleniumtests.uipage.PageObject;
 import com.seleniumtests.uipage.htmlelements.FrameElement;
 
 public class NativeSelect extends CommonSelectList implements ISelectList {
@@ -20,6 +21,10 @@ public class NativeSelect extends CommonSelectList implements ISelectList {
 	
 	public NativeSelect(WebElement parentElement, FrameElement frameElement) {
 		super(parentElement, frameElement);
+	}
+
+	public static String getUiLibrary() {
+		return PageObject.HTML_UI_LIBRARY;
 	}
 	
 	@Override
