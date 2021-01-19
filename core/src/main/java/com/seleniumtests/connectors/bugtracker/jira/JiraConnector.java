@@ -387,12 +387,15 @@ public class JiraConnector extends BugTracker {
                     .stream()
                     .peek(s -> logger.info("file -> " + s.getFullImagePath()))
                     .map(s -> new File(s.getFullImagePath()))
+                    .filter(File::exists)
                     .collect(Collectors.toList())
                     .toArray(new File[] {});
-            issueClient.addAttachments(issue.getAttachmentsUri(), files).claim();
+        	if (files.length > 0) {
+        		issueClient.addAttachments(issue.getAttachmentsUri(), files).claim();
+        	}
         }
 
-        if (jiraBean.getDetailedResult() != null) {
+        if (jiraBean.getDetailedResult() != null && jiraBean.getDetailedResult().exists()) {
             issueClient.addAttachments(issue.getAttachmentsUri(),  jiraBean.getDetailedResult()).claim();
         }
 
