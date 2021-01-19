@@ -43,7 +43,12 @@ public class LightningSelect extends AngularSelect implements ISelectList {
 
 	@Override
 	public boolean isApplicable() {
-		return parentElement.getAttribute("class").contains("slds-combobox_container");
+		String parentClass = parentElement.getAttribute("class");
+		if (parentClass != null) {
+			return parentClass.contains("slds-combobox_container");
+		} else {
+			return false;
+		}
 	}
 	
 	@Override
