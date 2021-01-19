@@ -1403,7 +1403,9 @@ public class PageObject extends BasePage implements IPage {
 	@GenericStep
     public <T extends PageObject> T acceptAlert() {
         Alert alert = getAlert();
-        alert.accept();
+        if (alert != null) {
+        	alert.accept();
+        }
         driver.switchTo().defaultContent();
         return (T)this;
     }

@@ -127,7 +127,7 @@ public abstract class AngularSelect extends CommonSelectList {
 	 */
 	@Override
 	public void finalizeAction() {
-		
+		handleAlert();
 		HtmlElement selectContent = new HtmlElement("options", locatorParentOfDropdown, frameElement);
 
 		if (selectContent.isElementPresent(0)) {
@@ -275,8 +275,10 @@ public abstract class AngularSelect extends CommonSelectList {
 	private HtmlElement getRealOptionElement(WebElement option) {
 		if (option instanceof CachedHtmlElement) {
 			return ((HtmlElement)((CachedHtmlElement)option).getRealElement());
-		} else {
+		} else if (option instanceof HtmlElement) {
 			return (HtmlElement) option;
+		} else {
+			throw new ClassCastException("getRealOptionElement() can only handle HtmlElement options");
 		}
 	}
 

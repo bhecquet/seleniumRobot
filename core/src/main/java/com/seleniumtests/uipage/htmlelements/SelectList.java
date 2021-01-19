@@ -186,6 +186,7 @@ public class SelectList extends HtmlElement {
 				ISelectList selectInstance = selectClass.getConstructor(WebElement.class, FrameElement.class).newInstance(element, frameElement);
 				if (selectInstance.isApplicable()) {
 					selectImplementation = selectInstance;
+					selectInstance.setDriver(driver);
 					break;
 				}
 			} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
