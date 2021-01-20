@@ -12,5 +12,22 @@
 		<field>FIRST_VISIBLE</field>
 		<justification>code smell correction</justification>
 	</difference>
+	<difference>
+		<className>**/uipage/htmlelements/select/AngularSelect</className>
+		<differenceType>7004</differenceType>
+		<method>AngularSelect()</method>
+		<justification>internal class renamed</justification>
+	</difference>
+	<difference>
+		<className>**/uipage/htmlelements/select/ISelectList</className>
+		<differenceType>7012</differenceType>
+		<method>void setDriver(org.openqa.selenium.WebDriver)</method>
+		<justification>added driver. No external use for now</justification>
+	</difference>
+	<difference>
+		<className>**/uipage/htmlelements/select/AngularSelect</className>
+		<differenceType>3005</differenceType>
+		<justification>added driver. No external use for now</justification>
+	</difference>
 
 </differences>
