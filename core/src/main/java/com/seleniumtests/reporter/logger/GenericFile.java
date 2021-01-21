@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 
 import org.apache.commons.io.FileUtils;
@@ -55,14 +56,15 @@ public class GenericFile extends TestAction {
 		
 		if (move) {
 			File loggedFile = Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), file.getName()).toFile();
-			if (!file.equals(loggedFile)) {
-				if (loggedFile.exists() && !loggedFile.delete()) {
-					logger.warn(String.format("Could not delete existing destination file %s", loggedFile));
-				}
-				FileUtils.moveFile(file, loggedFile);
-			}
 			
-			this.file = loggedFile;
+			try {
+				Files.move(file.toPath(), loggedFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+				this.file = loggedFile;
+			} catch (Exception e) {
+				logger.error(String.format("Failed to move file %s to %s: %s", file.getAbsolutePath(), loggedFile.getAbsolutePath(), e.getMessage()));
+				this.file = file;
+			}
+		
 		} else {
 			this.file = file;
 		}
@@ -85,8 +87,13 @@ public class GenericFile extends TestAction {
 		}
 		new File(outputDirectory).mkdirs();
 		Path newPath = Paths.get(outputDirectory, file.getName());
-		Files.move(Paths.get(file.toString()), newPath);
-		file = newPath.toFile();
+		
+		try {
+			Files.move(file.toPath(), newPath, StandardCopyOption.REPLACE_EXISTING);
+			file = newPath.toFile();
+		} catch (Exception e) {
+			logger.error(String.format("Failed to relocate file %s to %s: %s", file.getAbsolutePath(), newPath.toString(), e.getMessage()));
+		}
 	}
 	
 

@@ -21,6 +21,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -446,9 +448,8 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 		try {
 			
 			// delete file if it exists as '.asFile()' will not overwrite it
-			if (new File(outputFile).exists() && !new File(outputFile).delete()) {
-				logger.warn("Error deleting previous video file, there may be a problem getting the new one");
-			}
+			deleteExistingVideo(outputFile);
+				
 			HttpResponse<File> videoResponse = Unirest.get(String.format("%s%s", nodeUrl, NODE_TASK_SERVLET))
 				.queryString(ACTION_FIELD, "stopVideoCapture")
 				.queryString("session", sessionId).asFile(outputFile);
@@ -463,6 +464,17 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 		} catch (UnirestException e) {
 			logger.warn(String.format("Could not stop video capture: %s", e.getMessage()));
 			return null;
+		}
+	}
+	
+	private void deleteExistingVideo(String outputFile) {
+		if (new File(outputFile).exists()) {
+			try {
+				Files.delete(Paths.get(outputFile));
+					
+			} catch (Exception e) {
+				logger.warn("Error deleting previous video file, there may be a problem getting the new one: " + e.getMessage());
+			}
 		}
 	}
 	

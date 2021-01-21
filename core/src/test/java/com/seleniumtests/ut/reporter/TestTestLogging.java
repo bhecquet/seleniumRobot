@@ -240,6 +240,7 @@ public class TestTestLogging extends GenericTest {
 		}
 	}
 	
+	// GenericFile
 	@Test(groups={"ut"})
 	public void testLogFile() throws IOException {
 
