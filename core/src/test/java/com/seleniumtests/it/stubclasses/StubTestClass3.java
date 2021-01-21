@@ -20,6 +20,7 @@ package com.seleniumtests.it.stubclasses;
 import java.io.IOException;
 import java.lang.reflect.Method;
 
+import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -110,6 +111,34 @@ public class StubTestClass3 extends StubParentClass {
 			.assertAction()
 			.assertAction2()
 			.add(1);
+	}
+	
+
+	/**
+	 * Check an assertion raised directly inside scenario is correctly displayed in report
+	 * @throws IOException
+	 */
+	@Test(groups="stub")
+	public void testWithAssertInTest() throws IOException {
+		
+		
+		CalcPage page = new CalcPage()
+				.add(1, 1);
+		Assert.assertEquals(page.getResult(), 1, "Error in result");
+		page.add(2)
+			.assertAction();
+		page.add(3);
+	}
+	
+	@Test(groups="stub")
+	public void testWithAssertInSubStep() throws IOException {
+		
+		
+		CalcPage page = new CalcPage()
+				.add(1, 1)
+				.assertWithSubStep()
+				.add(2)
+				.add(3);
 	}
 
 }

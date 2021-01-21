@@ -21,6 +21,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -205,125 +206,121 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 	}
 	
 	public void generateExecutionReport(SeleniumTestsContext testContext, ITestResult testResult, String testStatus, boolean resourcesFromCdn) throws IOException  {
+	
+		VelocityEngine ve = initVelocityEngine();
+
+		Template t = ve.getTemplate("/reporter/templates/report.test.vm");
+		VelocityContext context = new VelocityContext();
+
+		context.put("staticPathPrefix", "../");
 		
-		try (
-				PrintWriter out = createWriter(testContext.getOutputDirectory(), "TestReport.html");
-		) {
-			VelocityEngine ve = initVelocityEngine();
-	
-			Template t = ve.getTemplate("/reporter/templates/report.test.vm");
-			VelocityContext context = new VelocityContext();
-	
-			context.put("staticPathPrefix", "../");
+		boolean displaySnapshots = testContext.getSeleniumRobotServerCompareSnapshot() && TestNGResultUtils.getSnapshotTestCaseInSessionId(testResult) != null && TestNGResultUtils.getSnapshotComparisonResult(testResult) != null;
+		context.put("snapshots", displaySnapshots);
+		context.put("snapshotServer", testContext.getSeleniumRobotServerUrl());
+		context.put("snapshotComparisonResult", TestNGResultUtils.getSnapshotComparisonResult(testResult));
+		context.put("snapshotSessionId", TestNGResultUtils.getSnapshotTestCaseInSessionId(testResult));
+		
+		// optimize reports means that resources are get from internet
+		context.put("localResources", !resourcesFromCdn);
+		context.put(HEADER, testStatus);
+		
+		// test header
+		Object[] testParameters = testResult.getParameters();
+		StringBuilder testName = new StringBuilder(getTestName(testResult));
+		
+		// issue #163: add test parameter to test name
+		if (testParameters.length > 0) {
+			testName.append(" with params: (");
 			
-			boolean displaySnapshots = testContext.getSeleniumRobotServerCompareSnapshot() && TestNGResultUtils.getSnapshotTestCaseInSessionId(testResult) != null && TestNGResultUtils.getSnapshotComparisonResult(testResult) != null;
-			context.put("snapshots", displaySnapshots);
-			context.put("snapshotServer", testContext.getSeleniumRobotServerUrl());
-			context.put("snapshotComparisonResult", TestNGResultUtils.getSnapshotComparisonResult(testResult));
-			context.put("snapshotSessionId", TestNGResultUtils.getSnapshotTestCaseInSessionId(testResult));
+			int i = 0;
 			
-			// optimize reports means that resources are get from internet
-			context.put("localResources", !resourcesFromCdn);
-			context.put(HEADER, testStatus);
-			
-			// test header
-			Object[] testParameters = testResult.getParameters();
-			StringBuilder testName = new StringBuilder(getTestName(testResult));
-			
-			// issue #163: add test parameter to test name
-			if (testParameters.length > 0) {
-				testName.append(" with params: (");
-				
-				int i = 0;
-				
-				for (Object param: testParameters) {
-					testName.append(param.toString());
-					if (i < testParameters.length - 1) {
-						testName.append(",");
-					}
-					i++;
+			for (Object param: testParameters) {
+				testName.append(param.toString());
+				if (i < testParameters.length - 1) {
+					testName.append(",");
 				}
-				testName.append(")");
+				i++;
 			}
-			
-			context.put("testName", testName);
-			context.put("description", testResult.getMethod().getDescription());
-			context.put("testInfos", TestNGResultUtils.getTestInfoEncoded(testResult, "html"));
-			
-			// Application information
-			fillContextWithTestParams(context, testResult);      
-			
-			// test steps
-			List<TestStep> testSteps = TestNGResultUtils.getSeleniumRobotTestContext(testResult).getTestStepManager().getTestSteps();
-			if (testSteps == null) {
-				testSteps = new ArrayList<>();
-			}
-			
-			List<List<Object>> steps = new ArrayList<>();
-			for (TestStep testStep: testSteps) {
-				
-				List<Object> stepInfo = new ArrayList<>();
-				TestStep encodedTestStep = testStep.encode("html");
-				
-				stepInfo.add(encodedTestStep.getName());
-				
-				// step status
-				StepStatus stepStatus = encodedTestStep.getStepStatus();
-				if (stepStatus == StepStatus.FAILED) {
-					stepInfo.add(FAILED_TEST);
-				} else if (stepStatus == StepStatus.WARNING) {
-					stepInfo.add(WARN_TEST);
-				} else {
-					stepInfo.add(PASSED_TEST);
-				}
-				stepInfo.add(encodedTestStep.getDuration() / (double)1000);
-				stepInfo.add(encodedTestStep);	
-				steps.add(stepInfo);
-			}
-			context.put("steps", steps);
-			
-			// logs
-			String logs = SeleniumRobotLogger.getTestLogs().get(getTestName(testResult));
-			if (logs == null) {
-				logs = "";
-			}
-			
-			// exception handling
-			String[] stack = null;
-			if (testResult.getThrowable() != null) {
-				StringBuilder stackString = new StringBuilder();
-				generateTheStackTrace(testResult.getThrowable(), testResult.getThrowable().getMessage(), stackString, "html");
-				stack = stackString.toString().split("\n");
-			}
-			
-			// encode logs
-			List<String> logLines = new ArrayList<>();
-			for (String line: logs.split("\n")) {
-				logLines.add(StringEscapeUtils.escapeHtml4(line));
-			}
-			context.put(STATUS, getTestStatus(testResult));
-			context.put("stacktrace", stack);
-			context.put("logs", logLines);
-			
-			// previous execution logs
-			if (SeleniumTestsContextManager.getGlobalContext().getKeepAllResults()) {
-				List<String> executionResults = FileUtils.listFiles(new File(TestNGResultUtils.getSeleniumRobotTestContext(testResult).getOutputDirectory()), 
-															FileFilterUtils.suffixFileFilter(".zip"), null).stream()
-						.map(File::getName)
-						.collect(Collectors.toList());
-				if (!executionResults.isEmpty()) {
-					context.put("files", executionResults);
-					context.put("title", "Previous execution results");
-				}
-			} else {
-				context.put("title", "No previous execution results, you can enable it via parameter '-DkeepAllResults=true'");
-			}
-	
-			StringWriter writer = new StringWriter();
-			t.merge(context, writer);
-			out.write(writer.toString());
-			out.flush();
+			testName.append(")");
 		}
+		
+		context.put("testName", testName);
+		context.put("description", testResult.getMethod().getDescription());
+		context.put("testInfos", TestNGResultUtils.getTestInfoEncoded(testResult, "html"));
+		
+		// Application information
+		fillContextWithTestParams(context, testResult);      
+		
+		// test steps
+		List<TestStep> testSteps = TestNGResultUtils.getSeleniumRobotTestContext(testResult).getTestStepManager().getTestSteps();
+		if (testSteps == null) {
+			testSteps = new ArrayList<>();
+		}
+		
+		List<List<Object>> steps = new ArrayList<>();
+		for (TestStep testStep: testSteps) {
+			
+			List<Object> stepInfo = new ArrayList<>();
+			TestStep encodedTestStep = testStep.encode("html");
+			
+			stepInfo.add(encodedTestStep.getName());
+			
+			// step status
+			StepStatus stepStatus = encodedTestStep.getStepStatus();
+			if (stepStatus == StepStatus.FAILED) {
+				stepInfo.add(FAILED_TEST);
+			} else if (stepStatus == StepStatus.WARNING) {
+				stepInfo.add(WARN_TEST);
+			} else {
+				stepInfo.add(PASSED_TEST);
+			}
+			stepInfo.add(encodedTestStep.getDuration() / (double)1000);
+			stepInfo.add(encodedTestStep);	
+			steps.add(stepInfo);
+		}
+		context.put("steps", steps);
+		
+		// logs
+		String logs = SeleniumRobotLogger.getTestLogs().get(getTestName(testResult));
+		if (logs == null) {
+			logs = "";
+		}
+		
+		// exception handling
+		String[] stack = null;
+		if (testResult.getThrowable() != null) {
+			StringBuilder stackString = new StringBuilder();
+			generateTheStackTrace(testResult.getThrowable(), testResult.getThrowable().getMessage(), stackString, "html");
+			stack = stackString.toString().split("\n");
+		}
+		
+		// encode logs
+		List<String> logLines = new ArrayList<>();
+		for (String line: logs.split("\n")) {
+			logLines.add(StringEscapeUtils.escapeHtml4(line));
+		}
+		context.put(STATUS, getTestStatus(testResult));
+		context.put("stacktrace", stack);
+		context.put("logs", logLines);
+		
+		// previous execution logs
+		if (SeleniumTestsContextManager.getGlobalContext().getKeepAllResults()) {
+			List<String> executionResults = FileUtils.listFiles(new File(TestNGResultUtils.getSeleniumRobotTestContext(testResult).getOutputDirectory()), 
+														FileFilterUtils.suffixFileFilter(".zip"), null).stream()
+					.map(File::getName)
+					.collect(Collectors.toList());
+			if (!executionResults.isEmpty()) {
+				context.put("files", executionResults);
+				context.put("title", "Previous execution results");
+			}
+		} else {
+			context.put("title", "No previous execution results, you can enable it via parameter '-DkeepAllResults=true'");
+		}
+
+		StringWriter writer = new StringWriter();
+		t.merge(context, writer);
+		
+		FileUtils.write(Paths.get(testContext.getOutputDirectory(), "TestReport.html").toFile(), writer.toString(), StandardCharsets.UTF_8);
 	}
 
 	/**
@@ -371,9 +368,7 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 			methodResultsMap.put(entry.getKey(), methodResults);
 		}
 
-		try (
-				PrintWriter out = createWriter(getOutputDirectory(), "SeleniumTestReport.html");
-		) {
+		try {
 			VelocityEngine ve = initVelocityEngine();
 
 			Template t = ve.getTemplate("/reporter/templates/report.part.suiteSummary.vm");
@@ -396,11 +391,11 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 				
 			}
 			StringWriter writer = new StringWriter();
-			t.merge(context, writer);
-			out.write(writer.toString());
-			out.flush();
-			
 
+			t.merge(context, writer);
+			FileUtils.write(Paths.get(getOutputDirectory(), "SeleniumTestReport.html").toFile(), writer.toString(), StandardCharsets.UTF_8);
+
+			
 		} catch (Exception e) {
 			generationErrorMessage = "generateSuiteSummaryReport error:" + e.getMessage();
 			logger.error("generateSuiteSummaryReport error: ", e);

@@ -473,7 +473,7 @@ public class SeleniumRobotTestListener extends BaseTestNGListener implements ITe
 		try {
 			TestTasks.addStep(null);
 		} catch (ConfigurationException e) {
-			logger.error("Error adding last step");
+			// no problem as it's to close the previous manual step
 		}
 		
 		TestStep tearDownStep = new TestStep(TestStepManager.LAST_STEP_NAME, testResult, new ArrayList<>(), true);
@@ -498,10 +498,34 @@ public class SeleniumRobotTestListener extends BaseTestNGListener implements ITe
 			scenarioLogger.log("Test has not started or has been skipped");
 		}
 		
+		logThrowableToTestEndStep(testResult);
 		WebUIDriver.logFinalDriversState();
 		tearDownStep.updateDuration();
 		TestStepManager.logTestStep(tearDownStep);
 		
+	}
+	
+	private void logThrowableToTestEndStep(ITestResult testResult) {
+		if (testResult.getThrowable() != null) {
+			logger.error(testResult.getThrowable().getMessage());
+			
+			// when error occurs, exception raised is not added to the step if this error is outside of a PageObject
+			// we add it there as an exception always terminates the test (except for soft assert, but this case is handled in SoftAssertion.aj)
+			TestStep lastStep = TestStepManager.getCurrentRootTestStep();
+			if (lastStep == null) {
+				// when steps are automatic, they are closed (lastStep is null) once method is finished
+				try {
+					lastStep = Iterables.getLast(SeleniumTestsContextManager.getThreadContext().getTestStepManager().getTestSteps());
+				} catch (NoSuchElementException e) {
+					// if last step does not exist, do not crash
+				} 
+			}
+			
+			if (lastStep != null) {
+				lastStep.setFailed(true);
+				lastStep.setActionException(testResult.getThrowable());
+			}
+		}
 	}
 	
 
@@ -620,27 +644,6 @@ public class SeleniumRobotTestListener extends BaseTestNGListener implements ITe
 		
 		// store context in test result
 		TestNGResultUtils.setSeleniumRobotTestContext(testResult, SeleniumTestsContextManager.getThreadContext());
-		
-		if (testResult.getThrowable() != null) {
-			logger.error(testResult.getThrowable().getMessage());
-			
-			// when error occurs, exception raised is not added to the step if this error is outside of a PageObject
-			// we add it there as an exception always terminates the test (except for soft assert, but this case is handled in SoftAssertion.aj)
-			TestStep lastStep = TestStepManager.getCurrentRootTestStep();
-			if (lastStep == null) {
-				// when steps are automatic, they are closed (lastStep is null) once method is finished
-				try {
-					lastStep = Iterables.getLast(SeleniumTestsContextManager.getThreadContext().getTestStepManager().getTestSteps());
-				} catch (NoSuchElementException e) {
-					// if last step does not exist, do not crash
-				} 
-			}
-			
-			if (lastStep != null) {
-				lastStep.setFailed(true);
-				lastStep.setActionException(testResult.getThrowable());
-			}
-		}
 		
 		// capture snap shot at the end of the test
 		logLastStep(testResult);

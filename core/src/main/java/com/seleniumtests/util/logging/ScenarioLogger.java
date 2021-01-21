@@ -7,6 +7,7 @@ import org.apache.log4j.Logger;
 import org.testng.Reporter;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.core.TestStepManager;
 import com.seleniumtests.core.utils.TestNGResultUtils;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.driver.screenshots.ScreenShot;
@@ -96,14 +97,12 @@ public class ScenarioLogger extends Logger {
      */
     public void logTestValue(String id, String message, String value) {
 
-    	try {
-	    	TestStep runningStep = SeleniumTestsContextManager.getContextForCurrentTestState().get(0).getTestStepManager().getRunningTestStep();
-	    	if (runningStep != null) {
-	    		runningStep.addValue(new TestValue(id, message, value));
-	    	}
-    	} catch (IndexOutOfBoundsException e) {
-    		// do nothing, no context has been created which is the case if we try to log message in @BeforeSuite / @BeforeGroup
+
+    	TestStep runningStep = TestStepManager.getParentTestStep();
+    	if (runningStep != null) {
+    		runningStep.addValue(new TestValue(id, message, value));
     	}
+
     }
     /**
      * Store a key / value pair in test, so that it can be added to reports at test level. Contrary to 'logTestValue' which is stored at test step level
@@ -115,32 +114,38 @@ public class ScenarioLogger extends Logger {
     	super.info(String.format("Storing into test result %s: %s", key, value.getInfo() ));
     }
 
+    /**
+     * Log to current step (root or sub-step)
+     * if none found, get the current root step or the previous root step
+     * @param message
+     * @param messageType
+     */
     private void logMessage(final String message, final MessageType messageType) {
-    	try {
-	    	TestStep runningStep = SeleniumTestsContextManager.getContextForCurrentTestState().get(0).getTestStepManager().getRunningTestStep();
-	    	if (runningStep != null) {
-	    		runningStep.addMessage(new TestMessage(message, messageType));
-	    	}
-    	} catch (IndexOutOfBoundsException e) {
-    		// do nothing, no context has been created which is the case if we try to log message in @BeforeSuite / @BeforeGroup
+
+    	TestStep runningStep = TestStepManager.getParentTestStep();
+    	if (runningStep == null) {
+    		runningStep = TestStepManager.getCurrentOrPreviousStep();
     	}
+    	
+    	if (runningStep != null) {
+    		runningStep.addMessage(new TestMessage(message, messageType));
+    	} 
+
     }
+
 
     public void logNetworkCapture(Har har, String name) {
     	
-    	try {
-	    	TestStep runningStep = SeleniumTestsContextManager.getContextForCurrentTestState().get(0).getTestStepManager().getRunningTestStep();
-	    	if (runningStep != null) {
-	    		try {
-	    			runningStep.addNetworkCapture(new HarCapture(har, name));
-				} catch (IOException e) {
-					super.error("cannot create network capture file: " + e.getMessage(), e);
-				} catch (NullPointerException e) {
-					super.error("HAR capture is null");
-				}
-	    	}
-    	} catch (IndexOutOfBoundsException e) {
-    		// do nothing, no context has been created which is the case if we try to log message in @BeforeSuite / @BeforeGroup
+
+    	TestStep runningStep = TestStepManager.getParentTestStep();
+    	if (runningStep != null) {
+    		try {
+    			runningStep.addNetworkCapture(new HarCapture(har, name));
+			} catch (IOException e) {
+				super.error("cannot create network capture file: " + e.getMessage(), e);
+			} catch (NullPointerException e) {
+				super.error("HAR capture is null");
+			}
     	}
     	
     }
@@ -148,7 +153,7 @@ public class ScenarioLogger extends Logger {
     public void logFile(File file, String description) {
 
     	try {
-	    	TestStep runningStep = SeleniumTestsContextManager.getContextForCurrentTestState().get(0).getTestStepManager().getRunningTestStep();
+	    	TestStep runningStep = TestStepManager.getParentTestStep();
 	    	if (runningStep != null) {
 	    		runningStep.addFile(new GenericFile(file, description));
 	    	}

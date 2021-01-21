@@ -171,6 +171,19 @@ public class TestStepManager {
     	}
 	}
 	
+	/**
+	 * Returns the current running test step (not already recorded)
+	 * If not current step exits, returns the previously recorded one, or null if none available
+	 * @return
+	 */
+	public static TestStep getCurrentOrPreviousStep() {
+		TestStep testStep = getCurrentRootTestStep();
+		if (testStep == null) {
+			return getPreviousStep();
+		} else {
+			return testStep;
+		}
+	}
 
 	/**
 	 * Returns the previous TestStep in the list or null if no step exists for this test
