@@ -105,7 +105,9 @@ public abstract class CommonReporter implements IReporter {
 	 * @param fileName
 	 * @return 
 	 * @throws IOException
+	 * @deprecated  using FileUtils instead
 	 */
+	@Deprecated
 	protected PrintWriter createWriter(final String outDir, final String fileName) throws IOException {
 		System.setProperty("file.encoding", "UTF8");
 		uuid = uuid.replace(" ", "-").replace(":", "-");

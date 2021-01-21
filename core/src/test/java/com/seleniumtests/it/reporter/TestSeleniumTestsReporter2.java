@@ -20,6 +20,7 @@ package com.seleniumtests.it.reporter;
 import java.io.File;
 import java.nio.file.Paths;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.testng.Assert;
 import org.testng.ITestContext;
@@ -464,7 +465,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		
 		// check content of summary report file
 		String detailedReportContent = readTestMethodResultFile("testOkWithOneStepFailed");
-		detailedReportContent.contains("<li class=\"header-failed\">failAction bt<br/>class com.seleniumtests.customexception.DriverExceptions: fail</li>");
+		Assert.assertTrue(detailedReportContent.contains("<li class=\"header-failed\">failAction bt<br/>class com.seleniumtests.customexception.DriverExceptions: fail</li>"));
 		
 	}
 	
@@ -474,18 +475,123 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	 */
 	@Test(groups={"it"})
 	public void testDetailedReportWithOneSubStepFailed() throws Exception {
-		
 		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass3"}, ParallelMode.METHODS, new String[] {"testOkWithOneSubStepFailed"});
 		
 		// check content of summary report file
 		String detailedReportContent = readTestMethodResultFile("testOkWithOneSubStepFailed");
 		
 		// failed action is visible as failed
-		detailedReportContent.contains("<li class=\"header-failed\">failAction bt<br/>class com.seleniumtests.customexception.DriverExceptions: fail</li>");
+		Assert.assertTrue(detailedReportContent.contains("<li class=\"header-failed\">failAction bt<br/>class com.seleniumtests.customexception.DriverExceptions: fail</li>"));
 		
 		// parent action is OK, so it should not be marked as failed
-		detailedReportContent.contains("<li>addWithCatchedError with args: (1, )</li>");
+		Assert.assertTrue(detailedReportContent.contains("<li>addWithCatchedError with args: (1, )</li>"));
 		
+	}
+	
+	/**
+	 * Check behaviour when Assert is used in test scenario (not in webpage)
+	 * Assertion in scenario should be attached to the previous step which will be marked as failed
+	 * Test end will also be in red
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testDetailedReportWithSoftAssertInScenario() throws Exception {
+
+		try {
+			System.setProperty(SeleniumTestsContext.SOFT_ASSERT_ENABLED, "true");
+			
+			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass3"}, ParallelMode.METHODS, new String[] {"testWithAssertInTest"});
+			
+			// check content of summary report file
+			String detailedReportContent = readTestMethodResultFile("testWithAssertInTest");
+			
+			// check step with assertion inside is failed
+			Assert.assertTrue(detailedReportContent.contains("<div class=\"box collapsed-box failed\"><div class=\"box-header with-border\">"
+					+ "<button type=\"button\" class=\"btn btn-box-tool\" data-widget=\"collapse\"><i class=\"fa fa-plus\"></i></button> assertAction"));
+			Assert.assertTrue(detailedReportContent.contains("</div><div class=\"box-body\"><ul><div class=\"message-error\">!!!FAILURE ALERT!!! - Assertion Failure: false error expected [true] but found [false]</div>"));
+			
+			// that assertion raised in test scenario is attached to previous step
+			Assert.assertTrue(detailedReportContent.matches(".*<div class\\=\"box collapsed-box failed\"><div class\\=\"box-header with-border\">"
+					+ "<button type\\=\"button\" class\\=\"btn btn-box-tool\" data-widget\\=\"collapse\"><i class\\=\"fa fa-plus\"></i></button> getResult  - \\d+\\.\\d+ secs\\s*</div><div class\\=\"box-body\">"
+					+ "<ul><div class\\=\"message-error\">!!!FAILURE ALERT!!! - Assertion Failure: Error in result expected \\[1\\] but found \\[2\\]</div>.*"));
+			
+			// check last step shows the assertion					
+			Assert.assertTrue(detailedReportContent.matches(".*<div class\\=\"box collapsed-box failed\">.*?<i class\\=\"fa fa-plus\"></i>"
+					+ "</button> Test end - \\d+\\.\\d+ secs\\s*</div><div class\\=\"box-body\"><ul><div class\\=\"message-log\">Test is KO with error: !!! Many Test Failures \\(2\\)<br/>"
+					+ "<br/>class java.lang.AssertionError: <br/>\\.<br/>Failure 1 of 2.*Failure 2 of 2.*"
+					+ "<div class\\=\"message-error\">\\s+class java.lang.AssertionError: !!! Many Test Failures \\(2\\)<br/>.*"));
+			
+			// check last step before test end is OK because no error occurs in it
+			Assert.assertTrue(detailedReportContent.matches(".*<div class\\=\"box collapsed-box success\">.*?<i class\\=\"fa fa-plus\"></i></button> add with args: \\(3, \\).*"));
+			
+		} finally {
+			SeleniumTestsContextManager.getThreadContext().setSoftAssertEnabled(false);
+			System.clearProperty(SeleniumTestsContext.SOFT_ASSERT_ENABLED);
+		}
+	}
+	
+	/**
+	 * Check that when an assert is raised in sub step, the root step is marked as failed
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testDetailedReportWithSoftAssertInSubStep() throws Exception {
+		
+		try {
+			System.setProperty(SeleniumTestsContext.SOFT_ASSERT_ENABLED, "true");
+			
+			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass3"}, ParallelMode.METHODS, new String[] {"testWithAssertInSubStep"});
+			
+			// check content of summary report file
+			String detailedReportContent = readTestMethodResultFile("testWithAssertInSubStep");
+			
+			// check that sub step failure (with assertion) caused the step to fail itself				
+			Assert.assertTrue(detailedReportContent.matches(".*<div class\\=\"box collapsed-box failed\">.*?<i class\\=\"fa fa-plus\"></i>" // => step failed
+					+ "</button> assertWithSubStep  - \\d+\\.\\d+ secs\\s*</div><div class\\=\"box-body\"><ul><li>doNothing </li>"
+					+ "<ul><li>doNothing on HtmlElement none, by=\\{By\\.id: none\\} </li></ul>"
+					+ "<li>assertAction </li><ul>" // => sub step with error
+					+ "<div class\\=\"message-error\">!!!FAILURE ALERT!!! - Assertion Failure: false error expected \\[true\\] but found \\[false\\].*")); // error displayed
+			
+		} finally {
+			SeleniumTestsContextManager.getThreadContext().setSoftAssertEnabled(false);
+			System.clearProperty(SeleniumTestsContext.SOFT_ASSERT_ENABLED);
+		}
+	}
+	
+	/**
+	 * Check behaviur when hard Assert is used in test scenario (not in webpage)
+	 * Test stops on first assertion and step is failed
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testDetailedReportWithHardAssertInScenario() throws Exception {
+		
+		try {
+			System.setProperty(SeleniumTestsContext.SOFT_ASSERT_ENABLED, "false");
+			
+			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass3"}, ParallelMode.METHODS, new String[] {"testWithAssertInTest"});
+			
+			// check content of summary report file
+			String detailedReportContent = readTestMethodResultFile("testWithAssertInTest");
+			
+			// check step with assertion inside is failed
+			Assert.assertTrue(detailedReportContent.matches(".*<div class\\=\"box collapsed-box failed\">.*?<i class\\=\"fa fa-plus\"></i>"
+					+ "</button> getResult  - \\d+\\.\\d+ secs\\s*</div><div class\\=\"box-body\">.*?"
+					+ "<div class\\=\"message-error\">\\s*Assertion Failure: Error in result expected \\[1\\] but found \\[2\\].*"));
+
+			// Test end step also displays the error
+			Assert.assertTrue(detailedReportContent.matches(".*<div class\\=\"box collapsed-box failed\">.*?<i class\\=\"fa fa-plus\"></i>"
+					+ "</button> Test end - \\d+\\.\\d+ secs\\s*</div><div class\\=\"box-body\"><ul><div class\\=\"message-log\">Test is KO with error: Error in result expected \\[1\\] but found \\[2\\]</div>"
+					+ "<div class\\=\"message-log\">\\[NOT RETRYING\\] due to failed Assertion</div>.*?"
+					+ "<div class\\=\"message-error\">\\s+class java.lang.AssertionError: Error in result expected \\[1\\] but found \\[2\\].*"
+					));
+			
+			// test is stopped after assertion raised in test. AssertAction which would be executed later is never reached
+			Assert.assertFalse(detailedReportContent.contains("</button> assertAction"));
+			
+		} finally {
+			System.clearProperty(SeleniumTestsContext.SOFT_ASSERT_ENABLED);
+		}
 	}
 	
 	/**

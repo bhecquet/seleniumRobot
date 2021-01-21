@@ -23,6 +23,8 @@ import org.aspectj.lang.annotation.Aspect;
 import org.testng.Reporter;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.core.TestStepManager;
+import com.seleniumtests.reporter.logger.TestStep;
 import com.seleniumtests.util.logging.ScenarioLogger;
 
 @Aspect
@@ -38,12 +40,28 @@ public class SoftAssert {
 		try {
 			return joinPoint.proceed(joinPoint.getArgs());
 		} catch (AssertionError e) {
+			return logAssertion(e);
+		}
+	}
+	
+	private Object logAssertion(Throwable e) throws Throwable {
+		// we need a root step to log, the current one if it exists, or the previous one
+		TestStep currentTestStep = TestStepManager.getCurrentOrPreviousStep();
+		
+		try {
+			
 			if (SeleniumTestsContextManager.getThreadContext().isSoftAssertEnabled()) {
 				SeleniumTestsContextManager.getThreadContext().addVerificationFailures(Reporter.getCurrentTestResult(), e);
-		        logger.error("!!!FAILURE ALERT!!! - Assertion Failure: " + e.getMessage());
+				logger.error("!!!FAILURE ALERT!!! - Assertion Failure: " + e.getMessage());
 		        return null;
 			} else {
+				logger.error("Assertion Failure: " + e.getMessage());
 				throw e;
+			}
+		} finally {
+			if (currentTestStep != null) {
+				// assertion should be clearly seen in report
+				currentTestStep.setFailed(true);
 			}
 		}
 	}

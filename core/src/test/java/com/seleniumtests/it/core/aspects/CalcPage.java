@@ -136,5 +136,14 @@ public class CalcPage extends PageObject {
 	public ResultPage displayResult() throws IOException {
 		return new ResultPage(result);
 	}
+	
+	public CalcPage assertWithSubStep() {
+		doNothing();
+		return assertAction();
+	}
+
+	public int getResult() {
+		return result;
+	}
 
 }

@@ -19,6 +19,8 @@ package com.seleniumtests.reporter.reporters;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -28,6 +30,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
@@ -205,11 +208,8 @@ public class CustomReporter extends CommonReporter implements IReporter {
 								+ "-result" 
 								+ reportInfo.extension;
 			
-			try (PrintWriter fileWriter = createWriter(seleniumTestsContext.getOutputDirectory(), fileName)) {
+			FileUtils.write(Paths.get(seleniumTestsContext.getOutputDirectory(), fileName).toFile(), writer.toString(), StandardCharsets.UTF_8);
 			
-				fileWriter.write(writer.toString());
-				fileWriter.flush();
-			}
 			generatedFiles.add(fileName);
 			TestNGResultUtils.setCustomReportCreated(testResult, true);
 		} catch (Exception e) {
@@ -240,11 +240,8 @@ public class CustomReporter extends CommonReporter implements IReporter {
 			t.merge( context, writer );
 			
 			String fileName = reportInfo.prefix + reportInfo.getExtension();
-			
-			try (PrintWriter fileWriter = createWriter(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), fileName)) {
-				fileWriter.write(writer.toString());
-				fileWriter.flush();
-			}
+		
+			FileUtils.write(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), fileName).toFile(), writer.toString(), StandardCharsets.UTF_8);
 		} catch (Exception e) {
 			logger.error(String.format("Error generating test summary: %s", e.getMessage()));
 		}
