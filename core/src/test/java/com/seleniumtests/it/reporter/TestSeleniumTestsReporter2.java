@@ -465,7 +465,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		
 		// check content of summary report file
 		String detailedReportContent = readTestMethodResultFile("testOkWithOneStepFailed");
-		Assert.assertTrue(detailedReportContent.contains("<li class=\"header-failed\">failAction bt<br/>class com.seleniumtests.customexception.DriverExceptions: fail</li>"));
+		Assert.assertTrue(detailedReportContent.contains("<li class=\"header-failed\">failAction <br/>class com.seleniumtests.customexception.DriverExceptions: fail</li>"));
 		
 	}
 	
@@ -481,7 +481,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		String detailedReportContent = readTestMethodResultFile("testOkWithOneSubStepFailed");
 		
 		// failed action is visible as failed
-		Assert.assertTrue(detailedReportContent.contains("<li class=\"header-failed\">failAction bt<br/>class com.seleniumtests.customexception.DriverExceptions: fail</li>"));
+		Assert.assertTrue(detailedReportContent.contains("<li class=\"header-failed\">failAction <br/>class com.seleniumtests.customexception.DriverExceptions: fail</li>"));
 		
 		// parent action is OK, so it should not be marked as failed
 		Assert.assertTrue(detailedReportContent.contains("<li>addWithCatchedError with args: (1, )</li>"));
