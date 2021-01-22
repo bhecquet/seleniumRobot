@@ -32,10 +32,10 @@ public class TestSeleniumIdeParser extends GenericTest {
 				"\n" + 
 				"public class MysuiteTest extends SeleniumTestPlan {\n" + 
 				"\n" + 
-				"	@Test\n" + 
-				"	public void jcommander() throws IOException {\n" + 
-				"		new MysuiteTestPage().jcommander();\n" + 
-				"	}\n" + 
+				"    @Test\n" + 
+				"    public void jcommander() throws IOException {\n" + 
+				"        new MysuiteTestPage().jcommander();\n" + 
+				"    }\n" + 
 				"\n" + 
 				"}";
 		
@@ -96,10 +96,10 @@ public class TestSeleniumIdeParser extends GenericTest {
 				"\n" + 
 				"public class MysuiteTest extends SeleniumTestPlan {\n" + 
 				"\n" + 
-				"	@Test\n" + 
-				"	public void jcommander() throws IOException {\n" + 
-				"		new MysuiteTestPage().jcommander();\n" + 
-				"	}\n" + 
+				"    @Test\n" + 
+				"    public void jcommander() throws IOException {\n" + 
+				"        new MysuiteTestPage().jcommander();\n" + 
+				"    }\n" + 
 				"\n" + 
 				"}";
 		
