@@ -27,6 +27,7 @@ import java.io.PrintWriter;
 import java.io.Writer;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Paths;
 import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -34,6 +35,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.apache.velocity.app.VelocityEngine;
 import org.testng.IReporter;
@@ -121,6 +123,14 @@ public abstract class CommonReporter implements IReporter {
 		}
 		
 	}
+	
+	protected void generateReport(File f, String content) throws IOException {
+
+		logger.info("generating report " + f.getAbsolutePath());
+		FileUtils.write(f, content, StandardCharsets.UTF_8);
+	}
+	
+	
 	
 	/**
 	 * Remove useless stacktrace elements (e.g: sun.reflect)

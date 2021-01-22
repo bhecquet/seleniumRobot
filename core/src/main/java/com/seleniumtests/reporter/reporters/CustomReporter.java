@@ -208,7 +208,7 @@ public class CustomReporter extends CommonReporter implements IReporter {
 								+ "-result" 
 								+ reportInfo.extension;
 			
-			FileUtils.write(Paths.get(seleniumTestsContext.getOutputDirectory(), fileName).toFile(), writer.toString(), StandardCharsets.UTF_8);
+			generateReport(Paths.get(seleniumTestsContext.getOutputDirectory(), fileName).toFile(), writer.toString());
 			
 			generatedFiles.add(fileName);
 			TestNGResultUtils.setCustomReportCreated(testResult, true);
@@ -241,7 +241,7 @@ public class CustomReporter extends CommonReporter implements IReporter {
 			
 			String fileName = reportInfo.prefix + reportInfo.getExtension();
 		
-			FileUtils.write(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), fileName).toFile(), writer.toString(), StandardCharsets.UTF_8);
+			generateReport(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), fileName).toFile(), writer.toString());
 		} catch (Exception e) {
 			logger.error(String.format("Error generating test summary: %s", e.getMessage()));
 		}

@@ -319,8 +319,7 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 
 		StringWriter writer = new StringWriter();
 		t.merge(context, writer);
-		
-		FileUtils.write(Paths.get(testContext.getOutputDirectory(), "TestReport.html").toFile(), writer.toString(), StandardCharsets.UTF_8);
+		generateReport(Paths.get(testContext.getOutputDirectory(), "TestReport.html").toFile(), writer.toString());
 	}
 
 	/**
@@ -393,7 +392,7 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 			StringWriter writer = new StringWriter();
 
 			t.merge(context, writer);
-			FileUtils.write(Paths.get(getOutputDirectory(), "SeleniumTestReport.html").toFile(), writer.toString(), StandardCharsets.UTF_8);
+			generateReport(Paths.get(getOutputDirectory(), "SeleniumTestReport.html").toFile(), writer.toString());
 
 			
 		} catch (Exception e) {
