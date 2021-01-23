@@ -446,17 +446,15 @@ public class PageObject extends BasePage implements IPage {
     }
     
     /**
-     * Set the uiLibrary to use as a prefered library.
+     * Set the uiLibrary to use as a preferred library.
      * For example, by default, for SelectList, all UILibraries are tested before searching the element. With this setting, it's possible to make one of them preferred for this page
      * @param uiLibrary
      */
     private synchronized void addUiLibrary(String uiLibrary) {
     	String className = getClass().getCanonicalName();
-    	if (!uiLibraries.containsKey(className)) {
-    		uiLibraries.put(className, new ArrayList<>());
-    	}
-    	
-  
+    	uiLibraries.computeIfAbsent(className, k -> new ArrayList<>());
+
+ 
     	if (UiLibraryRegistry.getUiLibraries().contains(uiLibrary) && !uiLibraries.get(className).contains(uiLibrary)) {
     		uiLibraries.get(className).add(uiLibrary);
     	} else {
@@ -771,11 +769,7 @@ public class PageObject extends BasePage implements IPage {
 
         try {
             if (isMultipleWindow) {
-            	try { 
-            		selectWindow(handles.get(handles.indexOf(windowHandle) - 1));
-            	} catch (IndexOutOfBoundsException | NoSuchWindowException e) {
-            		selectMainWindow();
-            	}
+            	selectPreviousOrMainWindow(handles);
             } else {
                 WebUIDriver.setWebDriver(null);
             }
@@ -784,6 +778,13 @@ public class PageObject extends BasePage implements IPage {
 
         }
     }
+	private void selectPreviousOrMainWindow(List<String> handles) {
+		try { 
+			selectWindow(handles.get(handles.indexOf(windowHandle) - 1));
+		} catch (IndexOutOfBoundsException | NoSuchWindowException e) {
+			selectMainWindow();
+		}
+	}
     
     /**
      * Close the current tab / window which leads to the previous window / tab in the list.
@@ -1443,8 +1444,7 @@ public class PageObject extends BasePage implements IPage {
 					new String(encoded), 
 					SeleniumTestsContextManager.getThreadContext().getRunMode(), 
 					SeleniumTestsContextManager.getThreadContext().getSeleniumGridConnector());
-//			((JavascriptExecutor) driver).executeScript(CustomEventFiringWebDriver.NON_JS_UPLOAD_FILE_THROUGH_POPUP, new File(filePath).getName(), new String(encoded));
-			
+
 			Alert alert = waitForAlert(5);
 			if (alert != null) {
 				alert.accept();

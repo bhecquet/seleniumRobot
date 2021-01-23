@@ -236,6 +236,8 @@ public class TestStep extends TestAction {
 	public String toString() {
 		return toString(0);
 	}
+	
+	@Override
 	public String toString(int spaces) {
 		String currentIndent = StringUtils.repeat(" ", spaces);
 		StringBuilder testStepRepr = new StringBuilder(String.format("Step %s\n", getName()));

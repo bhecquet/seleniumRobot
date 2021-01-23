@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -23,8 +22,6 @@ import org.testng.ITestContext;
 import org.testng.ITestNGMethod;
 import org.testng.ITestResult;
 import org.testng.collections.Lists;
-import org.testng.collections.SetMultiMap;
-import org.testng.collections.Sets;
 import org.testng.internal.Utils;
 import org.testng.reporters.XMLConstants;
 import org.testng.reporters.XMLStringBuffer;
@@ -157,16 +154,6 @@ public class JUnitReporter extends CommonReporter {
 		return count;
 	}
 
-	private TestTag createIgnoredTestTagFor(ITestNGMethod method) {
-		TestTag testTag = new TestTag();
-		Properties p2 = new Properties();
-		p2.setProperty(XMLConstants.ATTR_CLASSNAME, method.getRealClass().getName());
-		p2.setProperty(XMLConstants.ATTR_NAME, method.getMethodName());
-		testTag.childTag = XMLConstants.SKIPPED;
-		testTag.properties = p2;
-		return testTag;
-	}
-
 	private TestTag createTestTagFor(ITestResult tr, String className) {
 		TestTag testTag = new TestTag();
 
@@ -250,26 +237,6 @@ public class JUnitReporter extends CommonReporter {
 		String childTag;
 		String logTag = XMLConstants.SYSTEM_OUT;
 		
-	}
-
-	private void addResults(Set<ITestResult> allResults, Map<Class<?>, Set<ITestResult>> out) {
-		for (ITestResult tr : allResults) {
-			Class<?> cls = tr.getMethod().getTestClass().getRealClass();
-			Set<ITestResult> l = out.get(cls);
-			if (l == null) {
-				l = Sets.newHashSet();
-				out.put(cls, l);
-			}
-			l.add(tr);
-		}
-	}
-
-	private void addMapping(SetMultiMap<Class<?>, ITestNGMethod> mapping, Collection<ITestNGMethod> methods) {
-		for (ITestNGMethod method : methods) {
-			if (!method.getEnabled()) {
-				mapping.put(method.getRealClass(), method);
-			}
-		}
 	}
 
 }

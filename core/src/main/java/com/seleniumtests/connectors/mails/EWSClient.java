@@ -20,6 +20,7 @@ package com.seleniumtests.connectors.mails;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -133,9 +134,9 @@ public class EWSClient extends EmailClientImpl {
 	 * @param password			password for server
 	 * @param email				email address we would like to read messages on
 	 * @param domain			email associated to email address
-	 * @throws Exception 
+	 * @throws URISyntaxException 
 	 */
-	private void connect(String host, String username, String password, String email, String domain, ExchangeVersion version) throws Exception {
+	private void connect(String host, String username, String password, String email, String domain, ExchangeVersion version) throws URISyntaxException  {
 		
 		service = new ExchangeService(version);
 		ExchangeCredentials credentials = new WebCredentials(username, password, domain);

@@ -53,49 +53,6 @@ public class FirefoxDriverFactory extends AbstractWebDriverFactory implements IW
 	protected ICapabilitiesFactory getCapabilitiesFactory() {
 		return new FirefoxCapabilitiesFactory(webDriverConfig);
 	}
-//
-//    @Override
-//    public WebDriver createWebDriver() {
-//        DriverConfig cfg = this.getWebDriverConfig();
-//        driver = createWebDriverWithTimeout();
-//
-//        // Implicit Waits to handle dynamic element. The default value is 5
-//        // seconds.
-//        setImplicitWaitTimeout(cfg.getImplicitWaitTimeout());
-//        if (cfg.getPageLoadTimeout() >= 0) {
-//            setPageLoadTimeout(cfg.getPageLoadTimeout());
-//        }
-//
-//        this.setWebDriver(driver);
-//        return driver;
-//    }
-//
-//    /**
-//     * Create webDriver, capture socket customexception and retry with timeout.
-//     *
-//     * @return  WebDriver
-//     */
-//    protected WebDriver createWebDriverWithTimeout() {
-//        long time = 0;
-//        while (time < getTimeout()) {
-//            try {
-//                driver = createNativeDriver();
-//                return driver;
-//            } catch (WebDriverException ex) {
-//                if (ex.getMessage().contains("SocketException")
-//                        || ex.getMessage().contains("Failed to connect to binary FirefoxBinary")
-//                        || ex.getMessage().contains("Unable to bind to locking port 7054 within 45000 ms")) {
-//                    WaitHelper.waitForSeconds(1);
-//
-//                    time++;
-//                } else {
-//                    throw new DriverExceptions(ex.getMessage());
-//                }
-//            }
-//        }
-//
-//        throw new DriverExceptions("Got customexception when creating webDriver with socket timeout 1 minute");
-//    }
 
 	public static boolean isMarionetteMode() {
 		return marionetteMode;

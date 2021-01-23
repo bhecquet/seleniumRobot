@@ -20,6 +20,7 @@ package com.seleniumtests.reporter.reporters;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -47,6 +48,7 @@ import com.seleniumtests.connectors.tms.reportportal.ReportPortalService;
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.utils.TestNGResultUtils;
+import com.seleniumtests.customexception.CustomSeleniumTestsException;
 import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.driver.screenshots.SnapshotComparisonBehaviour;
 import com.seleniumtests.reporter.logger.TestMessage;
@@ -91,7 +93,9 @@ public class ReporterControler implements IReporter {
 			Map<ITestContext, Set<ITestResult>> resultSet = updateTestSteps(suites, currentTestResult);
 			try {
 				new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).mkdirs();
-			} catch (Exception e) {}
+			} catch (Exception e) {
+				logger.warn(String.format("Problem creating output directory %s: %s", SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), e.getMessage()));
+			}
 			cleanAttachments(resultSet);
 			
 			// are we at the end of all suites (suite.getResults() has the same size as the returned result map)
@@ -228,7 +232,7 @@ public class ReporterControler implements IReporter {
 				testRunnersField.setAccessible(true);
 				testContexts = (List<TestRunner>) testRunnersField.get(suite);
 			} catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException | ClassCastException e) {
-				throw new RuntimeException("TestNG may have changed");
+				throw new CustomSeleniumTestsException("TestNG may have changed");
 			}
 			
 			// If at least one test (not a test method, but a TestNG test) is finished, suite contains its results
@@ -397,26 +401,13 @@ public class ReporterControler implements IReporter {
 		
 		for (File file: allFiles) {
 			if (!usedFiles.contains(file)) {
-				if (!file.delete()) {
-					logger.info(String.format("File %s not deleted", file.getAbsolutePath()));
+				try {
+					Files.deleteIfExists(file.toPath());
+				} catch (IOException e)  {
+					logger.info(String.format("File %s not deleted: %s", file.getAbsolutePath(), e.getMessage()));
 				}
 			}
 		}
-	}
-		
-	/**
-	 * Returns the first TestStep which has the same name
-	 * @param testSteps
-	 * @param thisStep
-	 * @return
-	 */
-	private TestStep getTestStepWithSameName(List<TestStep> testSteps, TestStep thisStep) {
-		for (TestStep step: testSteps) {
-			if (thisStep.getName().equals(step.getName())) {
-				return step;
-			}
-		}
-		return null;
 	}
 
 	/**
