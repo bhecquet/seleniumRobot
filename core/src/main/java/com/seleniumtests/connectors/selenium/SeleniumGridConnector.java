@@ -37,6 +37,7 @@ import com.seleniumtests.util.logging.SeleniumRobotLogger;
 import kong.unirest.HttpResponse;
 import kong.unirest.Unirest;
 import kong.unirest.UnirestException;
+import kong.unirest.json.JSONException;
 import kong.unirest.json.JSONObject;
 
 public class SeleniumGridConnector {
@@ -201,24 +202,28 @@ public class SeleniumGridConnector {
 	public void getSessionInformationFromGrid(RemoteWebDriver driver, long driverCreationDuration) {
 		
         // logging node ip address:
+		JSONObject object;
         try {
-        	JSONObject object = Unirest.get(String.format("http://%s:%d%s", hubUrl.getHost(), hubUrl.getPort(), API_TEST_SESSSION))
+        	object = Unirest.get(String.format("http://%s:%d%s", hubUrl.getHost(), hubUrl.getPort(), API_TEST_SESSSION))
         		.queryString("session", driver.getSessionId().toString())
         		.asJson()
         		.getBody()
         		.getObject();
+        } catch (Exception e) {
+        	throw new SessionNotCreatedException(String.format("Could not get session information from grid: %s", e.getMessage()));
+        }
         	
-        	// if we have an error (session not found), raise an exception
-        	try {
-        		nodeUrl = (String) object.get("proxyId");
-        	} catch(Exception e) {
-        		// {"msg": "Cannot find test slot running session 7ef50edc-ce51-40dd-98b6-0a369bff38b in the registry."," + 
-				//  "success": false"
-        		// }, 
-        		throw new SessionNotCreatedException(object.getString("msg"));
-        	}
+    	// if we have an error (session not found), raise an exception
+    	try {
+    		nodeUrl = (String) object.get("proxyId");
+    	} catch(JSONException e) {
+    		// {"msg": "Cannot find test slot running session 7ef50edc-ce51-40dd-98b6-0a369bff38b in the registry."," + 
+			//  "success": false"
+    		// }, 
+    		throw new SessionNotCreatedException(object.getString("msg"));
+    	}
         	
-            
+        try {
             String node = nodeUrl.split("//")[1].split(":")[0];
             String browserName = driver.getCapabilities().getBrowserName();
             String version = driver.getCapabilities().getVersion();

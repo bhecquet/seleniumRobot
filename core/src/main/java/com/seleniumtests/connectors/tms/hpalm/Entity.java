@@ -67,7 +67,7 @@ public class Entity {
 	 * @param entity
 	 */
 	public Entity(Entity entity) {
-		type = new String(entity.getType());
+		type = entity.getType();
 		fields = new Entity.Fields(entity.getFields());
 	}
 

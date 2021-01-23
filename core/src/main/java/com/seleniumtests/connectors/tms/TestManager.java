@@ -41,7 +41,7 @@ public abstract class TestManager {
 	
 	protected Boolean initialized;
 	
-	public TestManager() {
+	protected TestManager() {
 		initialized = false;
 	}
 	

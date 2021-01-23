@@ -31,7 +31,7 @@ import io.appium.java_client.remote.MobileCapabilityType;
 
 public abstract class IMobileCapabilityFactory extends ICapabilitiesFactory {
 
-	public IMobileCapabilityFactory(DriverConfig webDriverConfig) {
+	protected IMobileCapabilityFactory(DriverConfig webDriverConfig) {
 		super(webDriverConfig);
 	}
 	

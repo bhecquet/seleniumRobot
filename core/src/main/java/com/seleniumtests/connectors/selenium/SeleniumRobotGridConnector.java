@@ -135,7 +135,6 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 	        if (response.getStatusLine().getStatusCode() != 200) {
 	        	throw new SeleniumGridException("could not upload file: " + response.getStatusLine().getReasonPhrase());
 	        } else {
-	        	// TODO call remote API
 	        	throw new NotImplementedException("call remote Robot to really upload file");
 	        }
 	        
@@ -361,6 +360,7 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 	 * @param program	name of the program
 	 * @param args		arguments of the program
 	 */
+	@Override
 	public String executeCommand(String program, String ... args) {
 		if (nodeUrl == null) {
 			throw new ScenarioException("You cannot execute a remote process before driver has been created and corresponding node instanciated");

@@ -62,7 +62,6 @@ import net.lightbody.bmp.core.har.Har;
  */
 public class TestLogging {
 	
-	private static Map<Thread, ITestResult> currentTestResult = Collections.synchronizedMap(new HashMap<>());
 	private static ScenarioLogger logger = ScenarioLogger.getScenarioLogger(TestLogging.class);
 	
 	private TestLogging() {
@@ -207,7 +206,11 @@ public class TestLogging {
     	TestStepManager.logTestStep(testStep, true);
     }
     
-    
+    /**
+     * Get test steps
+     * @deprecated use TestStepManager instead
+     * @return
+     */
     @Deprecated
     public static Map<ITestResult, List<TestStep>> getTestsSteps() {
     	Map<ITestResult, List<TestStep>> steps = new HashMap<>();

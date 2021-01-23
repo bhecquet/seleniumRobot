@@ -5,11 +5,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
 import org.testng.IReporter;
 import org.testng.ITestContext;
 import org.testng.ITestResult;
-import org.testng.Reporter;
 
 import com.seleniumtests.connectors.bugtracker.BugTracker;
 import com.seleniumtests.connectors.bugtracker.IssueBean;
@@ -20,15 +18,15 @@ import com.seleniumtests.core.utils.TestNGResultUtils;
 import com.seleniumtests.reporter.logger.HyperlinkInfo;
 import com.seleniumtests.reporter.logger.StringInfo;
 import com.seleniumtests.reporter.logger.TestStep;
-import com.seleniumtests.util.logging.ScenarioLogger;
 
 public class BugTrackerReporter extends CommonReporter implements IReporter {
 
-	private static final ScenarioLogger logger = ScenarioLogger.getScenarioLogger(BugTrackerReporter.class);
-
+	@Override
 	protected void generateReport(Map<ITestContext, Set<ITestResult>> resultSet, String outdir, boolean optimizeReport) {
 		generateReport(resultSet, outdir, optimizeReport, false);
 	}
+	
+	@Override
 	protected void generateReport(Map<ITestContext, Set<ITestResult>> resultSet, String outdir, boolean optimizeReport, boolean finalGeneration) {
 
 		// record only when all tests are executed so that intermediate results (a failed test which has been retried) are not present in list

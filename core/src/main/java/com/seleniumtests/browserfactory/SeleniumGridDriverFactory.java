@@ -112,7 +112,6 @@ public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implemen
     	} else {
     		capabilities.setCapability(CapabilityType.PLATFORM, webDriverConfig.getPlatform().toLowerCase());
     		if (webDriverConfig.getBrowserVersion() != null && capabilities.getCapability(CapabilityType.BROWSER_VERSION) == null) {
-//    			capabilities.setCapability(CapabilityType.VERSION, webDriverConfig.getBrowserVersion());
     			capabilities.setCapability(CapabilityType.BROWSER_VERSION, webDriverConfig.getBrowserVersion());
     		}
     	}

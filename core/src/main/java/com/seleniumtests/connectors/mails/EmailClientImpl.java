@@ -51,7 +51,7 @@ public abstract class EmailClientImpl implements EmailClient {
 	protected String folder;
 	protected boolean testMode = false;
 	
-	public EmailClientImpl() {
+	protected EmailClientImpl() {
 		searchMode = SearchMode.BY_INDEX;
 		lastMessageIndex = 0;
 		

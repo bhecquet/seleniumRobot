@@ -80,7 +80,7 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 		}
 		
 		// issue #81: use global context because these parameters are known from there (thread context is too narrow)
-		if (!SeleniumTestsContextManager.getGlobalContext().getSeleniumRobotServerActive() 
+		if (!Boolean.TRUE.equals(SeleniumTestsContextManager.getGlobalContext().getSeleniumRobotServerActive())
 				|| !SeleniumTestsContextManager.getGlobalContext().getSeleniumRobotServerRecordResults() 
 				&& !SeleniumTestsContextManager.getGlobalContext().getSeleniumRobotServerCompareSnapshot()) {
 			return;
@@ -120,9 +120,8 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 	private void recordResults(SeleniumRobotSnapshotServerConnector serverConnector, Map<ITestContext, Set<ITestResult>> resultSet) {
 		
 		for (Entry<ITestContext, Set<ITestResult>> entry: resultSet.entrySet()) {
-			List<ITestResult> methodResults = new ArrayList<>();
 
-			methodResults = entry.getValue().stream()
+			List<ITestResult> methodResults = entry.getValue().stream()
 						.sorted((r1, r2) -> Long.compare(r1.getStartMillis(), r2.getStartMillis()))
 						.collect(Collectors.toList());
 			
@@ -132,12 +131,12 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 				// do not record this result twice if it's already recorded
 				if (TestNGResultUtils.isSeleniumServerReportCreated(testResult) 
 					// NoMoreRetry is set to false when test is being retried
-					|| (TestNGResultUtils.getNoMoreRetry(testResult) != null && TestNGResultUtils.getNoMoreRetry(testResult) == false)) {
+					|| (TestNGResultUtils.getNoMoreRetry(testResult) != null && !TestNGResultUtils.getNoMoreRetry(testResult))) {
 					continue;
 				}
 				
 				// issue #81: recreate test context from this context (due to multithreading, this context may be null if parallel testing is used)
-				SeleniumTestsContext testContext = SeleniumTestsContextManager.setThreadContextFromTestResult(entry.getKey(), getTestName(testResult), getClassName(testResult), testResult);
+				SeleniumTestsContextManager.setThreadContextFromTestResult(entry.getKey(), getTestName(testResult), getClassName(testResult), testResult);
 				
 				// skipped tests has never been executed and so attribute (set in TestListener) has not been applied
 				String testName = getTestCaseName(testResult);
