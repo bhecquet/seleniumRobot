@@ -29,5 +29,11 @@
 		<differenceType>3005</differenceType>
 		<justification>added driver. No external use for now</justification>
 	</difference>
+	<difference>
+		<className>**/connectors/mails/EmailClientImpl</className>
+		<differenceType>7009</differenceType>
+		<method>EmailClientImpl()</method>
+		<justification>abstract class</justification>
+	</difference>
 
 </differences>
