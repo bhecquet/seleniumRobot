@@ -29,16 +29,17 @@ public class BugTrackerReporter extends CommonReporter implements IReporter {
 	@Override
 	protected void generateReport(Map<ITestContext, Set<ITestResult>> resultSet, String outdir, boolean optimizeReport, boolean finalGeneration) {
 
-		// record only when all tests are executed so that intermediate results (a failed test which has been retried) are not present in list
-		if (!finalGeneration) {
-			return;
-		}
-
 		for (Map.Entry<ITestContext, Set<ITestResult>> entry: resultSet.entrySet()) {
 
 			ITestContext context = entry.getKey();
 
 			for (ITestResult testResult : entry.getValue()) {
+				
+				// record only when all executions of a test method are done so that intermediate results (a failed test which has been retried) are not present in list
+				if (!Boolean.TRUE.equals(TestNGResultUtils.getNoMoreRetry(testResult)) || TestNGResultUtils.isBugtrackerReportCreated(testResult)) {
+					continue;
+				}
+				
 				// done in case it was null (issue #81)
 				SeleniumTestsContext testContext = SeleniumTestsContextManager.setThreadContextFromTestResult(context, getTestName(testResult), getClassName(testResult), testResult);
 
@@ -74,7 +75,7 @@ public class BugTrackerReporter extends CommonReporter implements IReporter {
 				}
 
 				// create issue only for failed tests and if it has not been created before
-				if (testResult.getStatus() == ITestResult.FAILURE && !TestNGResultUtils.isBugtrackerReportCreated(testResult)) {
+				if (testResult.getStatus() == ITestResult.FAILURE) {
 	
 					IssueBean issueBean = bugtrackerServer.createIssue(
 							application,
@@ -99,7 +100,7 @@ public class BugTrackerReporter extends CommonReporter implements IReporter {
 					TestNGResultUtils.setBugtrackerReportCreated(testResult, true);
 					
 				// close issue if test is now OK and a previous issue has been created
-				} else if (testResult.getStatus() == ITestResult.SUCCESS && !TestNGResultUtils.isBugtrackerReportCreated(testResult)) {
+				} else if (testResult.getStatus() == ITestResult.SUCCESS) {
 					
 					bugtrackerServer.closeIssue( 
 							application,
