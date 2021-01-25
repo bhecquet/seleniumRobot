@@ -86,7 +86,7 @@ public class JiraConnector extends BugTracker {
         try {
             restClient = new AsynchronousJiraRestClientFactory().createWithBasicHttpAuthentication(new URI(server), user, password);
         } catch (URISyntaxException e) {
-            throw new ConfigurationException(String.format("L'URL de Jira n'est pas correcte", server));
+            throw new ConfigurationException(String.format("Jira URL %s is incorrect", server));
         }
         
         try {
@@ -360,10 +360,6 @@ public class JiraConnector extends BugTracker {
             		logger.warn(String.format("Field %s type cannot be handled", fieldName));
             	}
             	
-                
-                
-//                new CustomFieldOption()
-//                issueBuilder.setFieldValue(fields.get(fieldName).getId(), fieldValue);
             } else {
                 logger.warn(String.format("Field %s does not exist", fieldName));
             }

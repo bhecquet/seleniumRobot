@@ -67,10 +67,10 @@ public abstract class SeleniumRobotServerConnector {
 	protected Integer versionId;
 	protected Integer environmentId;
 	
-	public SeleniumRobotServerConnector(boolean useRequested, String url) {
+	protected SeleniumRobotServerConnector(boolean useRequested, String url) {
 		this(useRequested, url, null);
 	}
-	public SeleniumRobotServerConnector(boolean useRequested, String url, String authToken) {
+	protected SeleniumRobotServerConnector(boolean useRequested, String url, String authToken) {
 		this.useRequested = useRequested;
 		this.url = url;
 		this.authToken = authToken;
@@ -138,7 +138,7 @@ public abstract class SeleniumRobotServerConnector {
 	/**
 	 * Returns the versionId, environmentId and testCaseId from server
 	 */
-	protected void getInfoFromServer(String testName) {
+	protected void getInfoFromServer() {
 		applicationId = getApplicationId();
 		versionId = getVersionId();
 		environmentId = getEnvironmentId();
@@ -294,7 +294,7 @@ public abstract class SeleniumRobotServerConnector {
 		}
 	}
 	
-	protected JSONObject getJSonResponse(HttpRequest request) {
+	protected JSONObject getJSonResponse(HttpRequest<?> request) {
 
 		HttpResponse<String> response = request.asString();
 
@@ -327,7 +327,7 @@ public abstract class SeleniumRobotServerConnector {
 		return new JSONObject(response.getBody());
 	}
 	
-	protected JSONArray getJSonArray(HttpRequest request)  {
+	protected JSONArray getJSonArray(HttpRequest<?> request)  {
 		HttpResponse<String> response = request.asString();
 		
 

@@ -26,7 +26,7 @@ import java.util.Map.Entry;
 import com.seleniumtests.core.TestVariable;
 import com.seleniumtests.customexception.SeleniumRobotServerException;
 
-import kong.unirest.HttpRequest;
+import kong.unirest.GetRequest;
 import kong.unirest.MultipartBody;
 import kong.unirest.UnirestException;
 import kong.unirest.json.JSONArray;
@@ -60,7 +60,7 @@ public class SeleniumRobotVariableServerConnector extends SeleniumRobotServerCon
 		active = isAlive();
 		
 		if (active) {
-			getInfoFromServer(testName);
+			getInfoFromServer();
 			testCaseId = createTestCase(testName);
 		}
 	}
@@ -115,7 +115,7 @@ public class SeleniumRobotVariableServerConnector extends SeleniumRobotServerCon
 			
 			List<String> varNames = new ArrayList<>();
 			
-			HttpRequest request = buildGetRequest(url + VARIABLE_API_URL)
+			GetRequest request = buildGetRequest(url + VARIABLE_API_URL)
 					.queryString(FIELD_VERSION, versionId)
 					.queryString(FIELD_ENVIRONMENT, environmentId)
 					.queryString(FIELD_TEST, testCaseId)

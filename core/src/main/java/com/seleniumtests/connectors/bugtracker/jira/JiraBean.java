@@ -97,7 +97,7 @@ public class JiraBean extends IssueBean {
         
 
 		if (priority == null) {
-			throw new ConfigurationException(String.format("'bugtracker.priority' parameter not set"));
+			throw new ConfigurationException("'bugtracker.priority' parameter not set");
 		}
 		if (issueType == null) {
 			throw new ConfigurationException("'bugtracker.jira.issueType' parameter has not been set, it's mandatory (type of the issue that will be created. E.g: 'Bug'");

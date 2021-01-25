@@ -51,7 +51,7 @@ public class ExistingAppiumLauncher implements AppiumLauncher {
 		
 		for (int i=0; i< 60; i++) {
 			try {
-				HttpResponse response = Unirest.get(appiumServerUrl + "sessions").asString();
+				HttpResponse<String> response = Unirest.get(appiumServerUrl + "sessions").asString();
 				if (response.getStatus() == 200) {
 					logger.info("appium has started");
 		        	break;
