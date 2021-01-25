@@ -28,15 +28,12 @@ import org.apache.log4j.Logger;
 import org.testng.ITestNGMethod;
 import org.testng.ITestResult;
 import org.testng.annotations.CustomAttribute;
-import org.testng.annotations.Test;
 import org.testng.internal.BaseTestMethod;
-import org.testng.internal.TestNGMethod;
 import org.testng.internal.TestResult;
 
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.runner.CucumberScenarioWrapper;
 import com.seleniumtests.reporter.logger.StringInfo;
-import com.seleniumtests.reporter.reporters.CommonReporter;
 import com.seleniumtests.util.StringUtility;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
