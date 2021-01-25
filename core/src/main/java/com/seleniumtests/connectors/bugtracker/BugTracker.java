@@ -140,8 +140,12 @@ public abstract class BugTracker {
 			// copy test results
 			FileUtils.copyDirectory(testResultFolder, tempResultFolder.toFile(), aviFiles);
 
-			// copy resources
-			FileUtils.copyDirectory(resourcesFolder, tempResourcesFolder.toFile(), aviFiles);
+			// copy resources (in some IT, it may not have been created
+			if (resourcesFolder.exists()) {
+				FileUtils.copyDirectory(resourcesFolder, tempResourcesFolder.toFile(), aviFiles);
+			} else {
+				logger.warn(String.format("Resource folder does not exist %s", resourcesFolder));
+			}
 
 			// create zip
 			Path zipOutRoot = Files.createTempDirectory("detailedResult");
