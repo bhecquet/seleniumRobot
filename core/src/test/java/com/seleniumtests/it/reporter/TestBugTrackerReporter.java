@@ -30,6 +30,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.powermock.api.mockito.PowerMockito;
@@ -40,7 +41,6 @@ import org.testng.annotations.Test;
 import org.testng.xml.XmlSuite.ParallelMode;
 
 import com.seleniumtests.connectors.bugtracker.BugTracker;
-import com.seleniumtests.connectors.bugtracker.IssueBean;
 import com.seleniumtests.connectors.bugtracker.jira.JiraBean;
 import com.seleniumtests.connectors.bugtracker.jira.JiraConnector;
 import com.seleniumtests.core.SeleniumTestsContext;
@@ -132,6 +132,47 @@ public class TestBugTrackerReporter extends ReporterTest {
 			String detailedReportContent = readTestMethodResultFile("testInError");
 			Assert.assertTrue(detailedReportContent.contains("<th>Issue</th><td>1234</td>"));
 			Assert.assertTrue(detailedReportContent.contains(String.format("<th>Issue date</th><td>%s", creationDate)));
+			
+		} finally {
+			System.clearProperty(SeleniumTestsContext.BUGTRACKER_TYPE);
+			System.clearProperty(SeleniumTestsContext.BUGTRACKER_PROJECT);
+			System.clearProperty(SeleniumTestsContext.BUGTRACKER_URL);
+			System.clearProperty(SeleniumTestsContext.BUGTRACKER_USER);
+			System.clearProperty(SeleniumTestsContext.BUGTRACKER_PASSWORD);
+			System.clearProperty("bugtracker.reporter");
+			System.clearProperty("bugtracker.assignee");
+			System.clearProperty("bugtracker.jira.field.application");
+		}
+	}
+	
+	/**
+	 * Check that issue is recorded after all execution of a test method (including retries) have been performed, but before other test executions
+	 */
+	@Test(groups={"it"})
+	public void testIssueRecordedOnceAllRetriesDoneAfterTestMethod() throws Exception {
+		try {
+			System.setProperty(SeleniumTestsContext.BUGTRACKER_TYPE, "fake");
+			System.setProperty(SeleniumTestsContext.BUGTRACKER_URL, "http://localhost:1234");
+			System.setProperty(SeleniumTestsContext.BUGTRACKER_PROJECT, "Project");
+			System.setProperty(SeleniumTestsContext.BUGTRACKER_USER, "fake");
+			System.setProperty(SeleniumTestsContext.BUGTRACKER_PASSWORD, "fake");
+			System.setProperty("bugtracker.reporter", "me");
+			System.setProperty("bugtracker.assignee", "you");
+			System.setProperty("bugtracker.jira.field.application", "app");
+			
+			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForTestManager"}, ParallelMode.METHODS, new String[] {"testInError", "testSkipped"});
+			
+			// check content of summary report file
+			String logs = readSeleniumRobotLogFile();
+			
+			// check issue is created before the next test is started
+			Assert.assertTrue(logs.matches(".*Issue 1234 created.*Start method testSkipped.*"));
+			
+			// check issue is created after all retries
+			Assert.assertTrue(logs.matches(".*\\[NOT RETRYING\\] max retry count \\(2\\) reached.*Issue 1234 created.*"));
+			
+			// check issue has been recorded only once
+			Assert.assertEquals(StringUtils.countMatches(logs, "Issue 1234 created"), 1);
 			
 		} finally {
 			System.clearProperty(SeleniumTestsContext.BUGTRACKER_TYPE);
