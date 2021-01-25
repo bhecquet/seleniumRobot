@@ -109,7 +109,7 @@ public class ReplayAction {
 
 		// log action before its started. By default, it's OK. Then result may be overwritten if step fails
 		// order of steps is the right one (first called is first displayed)
-		if (currentAction != null && isHtmlElementDirectlyCalled(Thread.currentThread().getStackTrace()) && TestStepManager.getParentTestStep() != null) {
+		if (currentAction != null && TestStepManager.getParentTestStep() != null) {
 			TestStepManager.getParentTestStep().addAction(currentAction);
 		}	
 		
@@ -184,7 +184,7 @@ public class ReplayAction {
 				throw e;
 			}
 		} finally {
-			if (currentAction != null && isHtmlElementDirectlyCalled(Thread.currentThread().getStackTrace()) && TestStepManager.getParentTestStep() != null) {
+			if (currentAction != null && TestStepManager.getParentTestStep() != null) {
 				currentAction.setFailed(actionFailed);
 				scenarioLogger.logActionError(currentException);
 			}	
@@ -220,7 +220,7 @@ public class ReplayAction {
 	
 			// log action before its started. By default, it's OK. Then result may be overwritten if step fails
 			// order of steps is the right one (first called is first displayed)
-			if (isHtmlElementDirectlyCalled(Thread.currentThread().getStackTrace()) && TestStepManager.getParentTestStep() != null) {
+			if (TestStepManager.getParentTestStep() != null) {
 				TestStepManager.getParentTestStep().addAction(currentAction);
 			}
 		}
@@ -263,7 +263,7 @@ public class ReplayAction {
 			currentException = e;
 			throw e;
 		} finally {
-			if (currentAction != null && isHtmlElementDirectlyCalled(Thread.currentThread().getStackTrace()) && TestStepManager.getParentTestStep() != null) {
+			if (currentAction != null && TestStepManager.getParentTestStep() != null) {
 				currentAction.setFailed(actionFailed);
 				scenarioLogger.logActionError(currentException);
 				
@@ -333,44 +333,12 @@ public class ReplayAction {
 						} else if (origin.asArg() instanceof RemoteWebElement && parentException != null) {
 							throw parentException;
 						}
-					} catch (ClassCastException e1) {}
+					} catch (ClassCastException e1) {
+						// nothing
+					}
 				}
 			}
 		}
-	}
-	
-	/**
-	 * Check whether this action has directly been performed on the HtmlElement (e.g: click)
-	 * or through an other type of element (e.g: clic on LinkElement, redirected to HtmlElement)
-	 * In this last case, do not log action as it has already been logged by the specific type of 
-	 * element
-	 * @param stack
-	 * @return
-	 */
-	private boolean isHtmlElementDirectlyCalled(StackTraceElement[] stack) {
-		// disabled as action logging is now done only on @ReplayAction annotations. So there will not be 2 calls to the same action (effect of issue #62)
-		// TODO: should be removed
-		
-		return true;
-//		String stackClass = null;
-//		boolean specificElementFound = false;
-//		boolean htmlElementFound = false;
-//		
-//		for(int i=0; i < stack.length; i++) {
-//			
-//			// when using aspects, class name may contain a "$", remove everything after that symbol
-//			stackClass = stack[i].getClassName().split("\\$")[0];
-//			if (stackClass.equals("com.seleniumtests.uipage.htmlelements.HtmlElement")) {
-//				htmlElementFound = true;
-//			} else if (stackClass.startsWith("com.seleniumtests.uipage.htmlelements.")) {
-//				specificElementFound = true;
-//			}
-//		}
-//		if (htmlElementFound && specificElementFound) {
-//			return false;
-//		} else {
-//			return true;
-//		}
 	}
 	
 	/**

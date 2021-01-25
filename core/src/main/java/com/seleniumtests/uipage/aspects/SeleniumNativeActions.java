@@ -76,7 +76,7 @@ public class SeleniumNativeActions {
 	 */
 	@Around("this(com.seleniumtests.uipage.PageObject) && call(public * org.openqa.selenium.WebDriver+.findElement (..))")
 	public Object interceptFindHtmlElement(ProceedingJoinPoint joinPoint) throws Throwable {
-		if (doOverride()) {
+		if (Boolean.TRUE.equals(doOverride())) {
 			return new HtmlElement("", (By)(joinPoint.getArgs()[0]), getCurrentFrame());
 		} else {
 			return joinPoint.proceed(joinPoint.getArgs());			
@@ -88,7 +88,7 @@ public class SeleniumNativeActions {
 			+ ")"			
 			)
 	public Object interceptFindsHtmlElement(ProceedingJoinPoint joinPoint) throws Throwable {
-		if (doOverride()) {
+		if (Boolean.TRUE.equals(doOverride())) {
 			return new HtmlElement("", (By)(joinPoint.getArgs()[0]), getCurrentFrame()).findElements();
 		} else {
 			return joinPoint.proceed(joinPoint.getArgs());
@@ -105,7 +105,7 @@ public class SeleniumNativeActions {
 	@Around(" this(org.openqa.selenium.support.pagefactory.internal.LocatingElementHandler) && call(public *  org.openqa.selenium.support.pagefactory.ElementLocator+.findElement (..))"			
 			)
 	public Object interceptPageFactoryElementLocation(ProceedingJoinPoint joinPoint) throws Throwable {
-		if (doOverride()) {
+		if (Boolean.TRUE.equals(doOverride())) {
 			DefaultElementLocator locator = ((DefaultElementLocator)joinPoint.getTarget());
 			Field byField = DefaultElementLocator.class.getDeclaredField("by");
 			byField.setAccessible(true);
@@ -147,7 +147,7 @@ public class SeleniumNativeActions {
 			+ ")"			
 			)
 	public Object recordFrameSwitch(ProceedingJoinPoint joinPoint) throws Throwable {
-		if (doOverride()) {
+		if (Boolean.TRUE.equals(doOverride())) {
 			Object frameArg = joinPoint.getArgs()[0];
 			FrameElement frameEl = getFrameElement(frameArg);
 			
@@ -195,7 +195,7 @@ public class SeleniumNativeActions {
 			+ ")"			
 			)
 	public Object recordSwitchToFramCalls(ProceedingJoinPoint joinPoint) throws Throwable {
-		if (doOverride()) {
+		if (Boolean.TRUE.equals(doOverride())) {
 			Object frameArg = joinPoint.getArgs()[0];
 			FrameElement frameEl = getFrameElement(frameArg);
 			
@@ -230,7 +230,7 @@ public class SeleniumNativeActions {
 		if (frameArg instanceof HtmlElement) {
 			frameEl = new FrameElement("", ((HtmlElement)frameArg).getBy());
 		} else if (frameArg instanceof WebElement && frameArg.getClass().getName().contains("Proxy")) {
-			LocatingElementHandler locatingEh = (LocatingElementHandler)((Proxy)frameArg).getInvocationHandler(frameArg);
+			LocatingElementHandler locatingEh = (LocatingElementHandler)Proxy.getInvocationHandler(frameArg);
 			Field locatorField = LocatingElementHandler.class.getDeclaredField("locator");
 			locatorField.setAccessible(true);
 			DefaultElementLocator locator = ((DefaultElementLocator)locatorField.get(locatingEh));

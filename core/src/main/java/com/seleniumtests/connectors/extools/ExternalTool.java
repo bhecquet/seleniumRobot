@@ -24,14 +24,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.apache.log4j.Logger;
+
+import com.seleniumtests.connectors.bugtracker.BugTracker;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.util.FileUtility;
+import com.seleniumtests.util.logging.SeleniumRobotLogger;
 import com.seleniumtests.util.osutility.OSCommand;
 
 public class ExternalTool {
 	
 	public static final String SELENIUM_TOOL_PREFIX = "SELENIUM_TOOL_";
+	protected static Logger logger = SeleniumRobotLogger.getLogger(ExternalTool.class);
 	
 	private Map<String, String> declaredTools;
 	private String name;
@@ -124,7 +129,9 @@ public class ExternalTool {
 		// kill
 		try {
 			process.destroyForcibly();
-		} catch (Exception e) {}
+		} catch (Exception e) {
+			logger.warn("Program could not be killed: " + e.getMessage());
+		}
 		
 		// mark program as stopped
 		started = false;

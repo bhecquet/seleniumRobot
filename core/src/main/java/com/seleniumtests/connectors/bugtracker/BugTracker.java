@@ -141,9 +141,7 @@ public abstract class BugTracker {
 			FileUtils.copyDirectory(testResultFolder, tempResultFolder.toFile(), aviFiles);
 
 			// copy resources
-			try {
-				FileUtils.copyDirectory(resourcesFolder, tempResourcesFolder.toFile(), aviFiles);
-			} catch (IOException e) {}
+			FileUtils.copyDirectory(resourcesFolder, tempResourcesFolder.toFile(), aviFiles);
 
 			// create zip
 			Path zipOutRoot = Files.createTempDirectory("detailedResult");
@@ -152,11 +150,14 @@ public abstract class BugTracker {
 			zipFile.deleteOnExit();
 			FileUtility.zipFolder(outRoot.toFile(), zipFile);
 		} catch (IOException e) {
+			logger.error("Error while creating detailedResult.zip file", e);
 		} finally {
 			if (outRoot != null) {
 				try {
 					FileUtils.deleteDirectory(outRoot.toFile());
-				} catch (IOException e) {}
+				} catch (IOException e) {
+					logger.error(String.format("Error deleting temp %s", outRoot));
+				}
 			}
 		}
 		

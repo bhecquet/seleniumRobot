@@ -28,7 +28,7 @@ import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.SeleniumRobotServerException;
 import com.seleniumtests.uipage.htmlelements.ElementInfo;
 
-import kong.unirest.HttpRequest;
+import kong.unirest.GetRequest;
 import kong.unirest.MultipartBody;
 import kong.unirest.UnirestException;
 import kong.unirest.json.JSONArray;
@@ -69,7 +69,7 @@ public class SeleniumRobotElementInfoServerConnector extends SeleniumRobotServer
 		active = isAlive();
 		
 		if (active) {
-			getInfoFromServer(testName);
+			getInfoFromServer();
 		}
 	}
 	
@@ -88,7 +88,7 @@ public class SeleniumRobotElementInfoServerConnector extends SeleniumRobotServer
 		}
 		try {
 		
-			HttpRequest request = buildGetRequest(url + LIST_ELEMENT_INFO_API_URL)
+			GetRequest request = buildGetRequest(url + LIST_ELEMENT_INFO_API_URL) 
 					.queryString("application", applicationId)
 					.queryString("version", versionId)
 					.queryString("format", "json");
@@ -135,7 +135,7 @@ public class SeleniumRobotElementInfoServerConnector extends SeleniumRobotServer
 			
 			// if no reference exists, create it on server
 			if (referenceElementInfo == null) {
-				
+				// TODO
 			} else if (currentElementInfo.getLastUpdate().equals(referenceElementInfo.getLastUpdate())) {
 				continue;
 			} else {

@@ -17,9 +17,7 @@
  */
 package com.seleniumtests.reporter.reporters;
 
-import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -30,7 +28,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
@@ -108,12 +105,7 @@ public class CustomReporter extends CommonReporter implements IReporter {
 	private void generateTestReport(ITestResult testResult, ReportInfo reportInfo) {
 		try {
 
-			VelocityEngine ve;
-			try {
-				ve = initVelocityEngine();
-			} catch (Exception e) {
-				throw new ScenarioException("Error generating test results");
-			}
+			VelocityEngine ve = createVelocityEngine();
 			
 			Template t = ve.getTemplate(reportInfo.getTemplatePath());
 			VelocityContext context = new VelocityContext();
@@ -193,11 +185,7 @@ public class CustomReporter extends CommonReporter implements IReporter {
 			context.put("stacktrace", stack);
 			context.put("failedStep", StringUtility.encodeString(failedStep, reportFormat.toLowerCase()));
 			String logs = SeleniumRobotLogger.getTestLogs().get(getTestName(testResult));
-			try {
-				context.put("logs", logs == null ? "Test skipped": StringUtility.encodeString(logs, reportFormat.toLowerCase()));
-			} catch (CustomSeleniumTestsException e) {
-				context.put("logs", logs);
-			}
+			getTestLogs(context, reportFormat, logs);
 
 			context.put("testInfos", TestNGResultUtils.getTestInfoEncoded(testResult, reportFormat));
 			
@@ -216,16 +204,31 @@ public class CustomReporter extends CommonReporter implements IReporter {
 			logger.error(String.format("Error generating test result %s: %s", TestNGResultUtils.getUniqueTestName(testResult), e.getMessage()));
 		}
 	}
+
+
+	private void getTestLogs(VelocityContext context, String reportFormat, String logs) {
+		try {
+			context.put("logs", logs == null ? "Test skipped": StringUtility.encodeString(logs, reportFormat.toLowerCase()));
+		} catch (CustomSeleniumTestsException e) {
+			context.put("logs", logs);
+		}
+	}
+
+
+	private VelocityEngine createVelocityEngine() {
+		VelocityEngine ve;
+		try {
+			ve = initVelocityEngine();
+		} catch (Exception e) {
+			throw new ScenarioException("Error generating test results");
+		}
+		return ve;
+	}
 	
 	private void generateSummaryReport(Map<String, Integer> consolidatedResults, ReportInfo reportInfo) {
 		
 		try {
-			VelocityEngine ve;
-			try {
-				ve = initVelocityEngine();
-			} catch (Exception e) {
-				throw new ScenarioException("Error generating test results");
-			}
+			VelocityEngine ve = createVelocityEngine();
 			
 			Template t = ve.getTemplate(reportInfo.templatePath);
 			VelocityContext context = new VelocityContext();

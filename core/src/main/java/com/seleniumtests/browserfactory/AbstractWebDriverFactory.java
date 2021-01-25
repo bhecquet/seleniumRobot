@@ -37,7 +37,7 @@ public abstract class AbstractWebDriverFactory {
     protected MutableCapabilities driverOptions;
     protected WebDriver driver;
 
-    public AbstractWebDriverFactory(final DriverConfig cfg) {
+    protected AbstractWebDriverFactory(final DriverConfig cfg) {
         this.webDriverConfig = cfg;
         
         capsFactory = getCapabilitiesFactory();

@@ -84,6 +84,7 @@ public class Oracle extends SqlDatabase {
      * @param dbName
      * @param user
      * @param password
+     * @deprecated use constructor to provide TNS path
      */
     @Deprecated
     public Oracle(String dbName, String user, String password) {
