@@ -662,7 +662,9 @@ public class SeleniumRobotTestListener extends BaseTestNGListener implements ITe
     	try {
     		TestRetryAnalyzer retryAnalyzer = (TestRetryAnalyzer)Reporter.getCurrentTestResult().getMethod().getRetryAnalyzer();
     		
-    		if (retryAnalyzer != null && retryAnalyzer.getMaxCount() < maxAllowedRetry) {
+    		if (retryAnalyzer == null) {
+    			logger.info("RetryAnalyzer is null, 'increaseMaxRetry' can be called only inside test methods");
+    		} else if (retryAnalyzer.getMaxCount() < maxAllowedRetry) {
         		retryAnalyzer.setMaxCount(retryAnalyzer.getMaxCount() + 1);
         	} else {
         		logger.info("cannot increase max retry, limit is reached");
@@ -682,7 +684,7 @@ public class SeleniumRobotTestListener extends BaseTestNGListener implements ITe
 
 	@Override
 	public void beforeConfiguration(ITestResult testResult) {
-
+		// nothing to do for now
 	}
 
 

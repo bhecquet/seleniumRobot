@@ -837,7 +837,41 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 
 			System.clearProperty(SeleniumTestsContext.REPLAY_TIME_OUT);
 		}
-		
+	}
 	
+	/**
+	 * Check increaseMaxRetry is performed when called from test method
+	 * @param testContext
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testIncreaseMaxRetryInTest(ITestContext testContext) throws Exception {
+
+		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForListener6.testIncreaseMaxRetryInTestMethod"}, "", "stub1");
+
+		String logs = readSeleniumRobotLogFile();
+		
+		// assert 5 execution (nominal + 4 retries) has been performed (2* default retry count (2))
+		Assert.assertEquals(StringUtils.countMatches(logs, "SeleniumRobotTestListener: Start method testIncreaseMaxRetryInTestMethod"), 5);
+		
+	}
+	
+	/**
+	 * Check we cannot increase max retry outside a test method
+	 * @param testContext
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testIncreaseMaxRetryInAfterConfig(ITestContext testContext) throws Exception {
+		
+		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForListener6.testIncreaseMaxRetryInAfterTestMethod"}, "", "stub1");
+		
+		String logs = readSeleniumRobotLogFile();
+		
+		// assert 5 execution (nominal + 4 retries) has been performed (2* default retry count (2))
+		Assert.assertEquals(StringUtils.countMatches(logs, "SeleniumRobotTestListener: Start method testIncreaseMaxRetryInAfterTestMethod"), 3);
+		
+		// check "increaseMaxRetry" cannot be called outside test method
+		Assert.assertTrue(logs.contains("SeleniumRobotTestListener: RetryAnalyzer is null, 'increaseMaxRetry' can be called only inside test methods"));
 	}
 }
