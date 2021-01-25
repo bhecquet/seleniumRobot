@@ -370,7 +370,7 @@ Depending on jira project, you may need to specify additional options if the fie
 You'd better set
 - in XML  (because they depend on project and will never change): `bugtrackerProject`, `bugtracker.priority`, `bugtracker.jira.<any>`, `bugtracker.reporter`, `bugtracker.assignee`
 - in seleniumRobot server (because they are common to all projects): `bugtrackerUrl`, `bugtrackerUser`, `bugtrackerPassword`
-- in command line (because you can decide on each test launch whether to use Jira): `bugtrackerType`
+- in command line (because you can decide on each test launch whether to use Jira, and **it will not be searched in .ini or seleniumRobot server**): `bugtrackerType`
 
 #### Find required fields and allowed values ####
 
