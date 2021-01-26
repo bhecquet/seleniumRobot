@@ -156,6 +156,7 @@ public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implemen
 	        try {
 	        	activeGridConnector.getSessionInformationFromGrid((RemoteWebDriver) driver, duration);
 	        } catch (SessionNotCreatedException e) {
+	        	logger.error(e.getMessage());
 	        	continue;
 	        }
 	
