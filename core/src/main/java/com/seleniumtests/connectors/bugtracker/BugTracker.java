@@ -43,6 +43,13 @@ public abstract class BugTracker {
 		return String.format("[Selenium][%s][%s][%s] test %s KO", application, environment, testNgName, testName);
 	}
 	
+	/*
+	 * for tests only
+	 */
+	public static void resetBugTrackerInstances() {
+		bugtrackerInstances = Collections.synchronizedMap(new HashMap<>());
+	}
+	
 	/**
 	 * Format description
 	 * For any bugtracker, description is quite simple but it can be improved depending on bug tracker 

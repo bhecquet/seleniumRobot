@@ -85,6 +85,8 @@ public class TestBugTracker extends MockitoTest {
 		issueOptions.put("reporter", "you");
 		issueOptions.put("assignee", "me");
 		
+		BugTracker.resetBugTrackerInstances();
+		
 	}
 
 	@Test(groups={"ut"})
