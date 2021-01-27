@@ -164,6 +164,13 @@ public class ImageDetector {
 		this(sceneImage, objectImage, 0.05);
 	}
 	
+	/**
+	 * Contructor
+	 * @param sceneImage			the image in which we want to detect an object
+	 * @param objectImage			the object we want to detect
+	 * @param detectionThreshold	default: 0.05. A double between 0 and 1. The higher the value is, less precise the detector will be. e.g: with 0.5, it can find matching that do not fully correspond to the searched object.
+	 * 								increase this value only if the detector cannot find matching
+	 */
 	public ImageDetector(File sceneImage, File objectImage, double detectionThreshold) {
 		setSceneImage(sceneImage);
 		setObjectImage(objectImage);
