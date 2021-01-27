@@ -125,6 +125,29 @@ public class TestBugTracker extends MockitoTest {
 	}
 	
 	/**
+	 * Check that if we request the same bugtracker N times (for same URL), it's always the same instance returned
+	 * This is to avoid staled connections
+	 * @throws Exception
+	 */
+	@Test(groups={"ut"})
+	public void testOnlyOneInstanceIsCreatedForSameUrl() throws Exception {
+		BugTracker bugtracker1 = BugTracker.getInstance("fake", "http://foo/bar", "selenium", "user", "password", new HashMap<>());
+		BugTracker bugtracker2 = BugTracker.getInstance("fake", "http://foo/bar", "selenium", "user", "password", new HashMap<>());
+	
+	
+		Assert.assertEquals(bugtracker1, bugtracker2);
+	}
+	
+	@Test(groups={"ut"})
+	public void testOneInstanceIsCreatedForEachUrl() throws Exception {
+		BugTracker bugtracker1 = BugTracker.getInstance("fake", "http://foo/bar2", "selenium", "user", "password", new HashMap<>());
+		BugTracker bugtracker2 = BugTracker.getInstance("fake", "http://foo/bar", "selenium", "user", "password", new HashMap<>());
+		
+		
+		Assert.assertNotEquals(bugtracker1, bugtracker2);
+	}
+	
+	/**
 	 * Update an existing issue as we fail on an other step
 	 * @throws Exception
 	 */

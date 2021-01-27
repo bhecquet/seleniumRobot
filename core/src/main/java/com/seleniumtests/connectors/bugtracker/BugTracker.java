@@ -7,6 +7,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -32,6 +33,7 @@ public abstract class BugTracker {
 
 	public static final String STEP_KO_PATTERN = "Step %d: ";
 	protected static Logger logger = SeleniumRobotLogger.getLogger(BugTracker.class);
+	protected static Map<String, BugTracker> bugtrackerInstances = Collections.synchronizedMap(new HashMap<>());
 
 	private String createIssueSummary(
 			String application,
@@ -306,14 +308,18 @@ public abstract class BugTracker {
      */
     public abstract void closeIssue(String issueId, String closingMessage);
 
-	public static BugTracker getInstance(String type, String url, String project, String user, String password, Map<String, String> bugtrackerOptions) {
+	public static synchronized BugTracker getInstance(String type, String url, String project, String user, String password, Map<String, String> bugtrackerOptions) {
 
-		if ("jira".equals(type)) {
-			return new JiraConnector(url, project, user, password, bugtrackerOptions);
-		} else if ("fake".equals(type)) {
-			return new FakeBugTracker();
-		} else {
-			throw new ConfigurationException(String.format("BugTracker type [%s] is unknown, valid values are: ['jira']", type));
+		if (!bugtrackerInstances.containsKey(url) || bugtrackerInstances.get(url) == null) {
+		
+			if ("jira".equals(type)) {
+				bugtrackerInstances.put(url, new JiraConnector(url, project, user, password, bugtrackerOptions));
+			} else if ("fake".equals(type)) {
+				bugtrackerInstances.put(url,  new FakeBugTracker());
+			} else {
+				throw new ConfigurationException(String.format("BugTracker type [%s] is unknown, valid values are: ['jira']", type));
+			}
 		}
+		return bugtrackerInstances.get(url);
 	}
 }
