@@ -126,7 +126,7 @@ public class JiraConnector extends BugTracker {
 			throw new ConfigurationException("'bugtracker.jira.closeTransition' MUST be set. It's the name of the transition that will close an issue");
 		}
 
-        logger.info(String.format("Connection à l'API du serveur Jira[%s], sur le projet [%s] avec le user [%s]", server, projectKey, user));
+        logger.info(String.format("Connecting to Jira API [%s], on project [%s] with user [%s]", server, projectKey, user));
     }
 
     private Map<String, BasicComponent> getComponents() {
