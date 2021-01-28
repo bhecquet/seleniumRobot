@@ -57,7 +57,8 @@ public class TestBugTrackerReporter extends ReporterTest {
 	public void initTestManager() throws Exception {
 
 		PowerMockito.whenNew(JiraConnector.class).withAnyArguments().thenReturn(jiraConnector);
-		
+
+		BugTracker.resetBugTrackerInstances();
 		
 	}
 	
