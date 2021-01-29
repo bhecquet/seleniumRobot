@@ -259,7 +259,7 @@ public class CSVHelper {
     }
 
     /**
-     * Parses file and returns a String[][] object.
+     * Parses CSV file which has no header and returns a String[][] object.
      *
      * @param   file
      *
@@ -271,9 +271,42 @@ public class CSVHelper {
         FileInputStream fis = new FileInputStream(file);
         return read(fis);
     }
+    
+    public static String[][] read(final File file, final String delim) throws IOException {
+    	FileInputStream fis = new FileInputStream(file);
+    	return read(fis, delim);
+    }
 
+
+    /**
+     * Parses CSV file which has no header and returns a String[][] object.
+     *
+     * @param   file
+     *
+     * @return
+     *
+     * @throws  IOException
+     */
     public static String[][] read(final InputStream is) throws IOException {
         return read(is, null);
+    }
+    
+    /**
+     * Parses CSV file which has header on first line and returns a String[][] object.
+     *
+     * @param   file
+     *
+     * @return
+     *
+     * @throws  IOException
+     */
+    public static String[][] readWithHeader(final File file) throws IOException {
+    	return readWithHeader(file, null);
+    }
+    
+    public static String[][] readWithHeader(final File file, final String delim) throws IOException {
+    	FileInputStream fis = new FileInputStream(file);
+    	return read(fis, delim, true);
     }
 
     /**
@@ -285,14 +318,26 @@ public class CSVHelper {
      *
      * @throws  IOException
      */
+    
+  
     public static String[][] read(final InputStream is, final String delim) throws IOException {
+    	return read(is, delim, false);
+    }
+    public static String[][] read(final InputStream is, final String delim, final boolean skipHeader) throws IOException {
 
         String[][] result = null;
         List<String[]> list = new ArrayList<>();
         String inputLine;
 
         BufferedReader reader = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
+        int i = 0;
         while ((inputLine = reader.readLine()) != null) {
+
+        	i++;
+        	if (i == 1 && skipHeader) {
+        		continue;
+        	}
+        	
             try {
                 String[] item;
                 if (delim == null) {

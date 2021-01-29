@@ -289,4 +289,26 @@ public class StubTestClass extends StubParentClass {
 		
 		addTestInfo("user ID", new HyperlinkInfo("12345", "http://foo/bar/12345"));
 	}
+	
+	@Test(groups="stub", dataProvider = "dataset")
+	public void testStandardDataProvider(String col1, String col2) {
+		logger.info(String.format("%s,%s", col1, col2));
+	}
+	@Test(groups="stub", dataProvider = "datasetSemicolon")
+	public void testStandardDataProviderSemicolon(String col1, String col2) {
+		logger.info(String.format("%s,%s", col1, col2));
+	}
+	@Test(groups="stub", dataProvider = "datasetWithHeader")
+	public void testStandardDataProviderWithHeader(String col1, String col2) {
+		logger.info(String.format("%s,%s", col1, col2));
+	}
+	@Test(groups="stub", dataProvider = "datasetSemicolonWithHeader")
+	public void testStandardDataProviderSemicolonWithHeader(String col1, String col2) {
+		logger.info(String.format("%s,%s", col1, col2));
+	}
+	
+	@Test(groups="stub", dataProvider = "dataset")
+	public void testStandardDataProviderNoFile(String col1, String col2) {
+		logger.info(String.format("%s,%s", col1, col2));
+	}
 }

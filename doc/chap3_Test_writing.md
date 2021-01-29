@@ -713,6 +713,28 @@ Selenium offers a simple way to wait dynamically for an element to reach some st
 Be careful to use only ExpectedConditions that accept a WebElement (e.g: `ExpectedConditions.visibilityOf(WebElement element)`) as you will be able to pass an HtmlElement which will be search correctly.
 It you use ExpectedConditions that takes a locator (e.g: `ExpectedConditions.visibilityOfElementLocated(By by)`), you may encounter problem if frames are used, or defined for this element, or if you want to specify index.
 
+
+#### Use Dataprovider ####
+
+Data provider is a standard TestNG [https://testng.org/doc/documentation-main.html#parameters-dataproviders](https://testng.org/doc/documentation-main.html#parameters-dataproviders) feature that allows executing the same test with several dataset.
+
+SeleniumRobot provides standard Dataprovider for common use cases which will search CSV file depending on test method name in `<root>/data/<app>/dataset/<environment>/<testMethodName>.csv`
+
+```java
+	@Test(groups="stub", dataProvider = "dataset")
+	public void testStandardDataProvider(String col1, String col2) {
+		logger.info(String.format("%s,%s", col1, col2));
+	}
+```
+Assuming the DEV environment, file will be searched in `<root>/data/<app>/dataset/DEV/testStandardDataProvider.csv`
+
+4 dataproviders are defined
+
+- 'dataset' => CSV file with "," as separator and no header
+- 'datasetWithHeader' => CSV file with "," as separator and with header
+- 'datasetSemicolon' => CSV file with ";" as separator and no header
+- 'datasetSemicolonWithHeader' => CSV file with ";" as separator and with header
+
 ### 4 Write a cucumber test ###
 Cucumber styled tests rely on a `.feature` file where each test step is defined. Look at [https://cucumber.io/docs/gherkin/reference/](https://cucumber.io/docs/gherkin/reference/) for more information about writing a feature file.
 
