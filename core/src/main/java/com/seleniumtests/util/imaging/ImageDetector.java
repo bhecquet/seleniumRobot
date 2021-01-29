@@ -60,6 +60,7 @@ import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 import org.openqa.selenium.Rectangle;
 
+import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.ImageSearchException;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
@@ -174,6 +175,11 @@ public class ImageDetector {
 	public ImageDetector(File sceneImage, File objectImage, double detectionThreshold) {
 		setSceneImage(sceneImage);
 		setObjectImage(objectImage);
+		
+		if (detectionThreshold < 0 || detectionThreshold > 1) {
+			throw new ConfigurationException("Image detector threshold MUST be between 0 (very stric in search) and 1 (not stric at all)");
+		}
+		
 		this.detectionThreshold = detectionThreshold;
 	}
 	

@@ -26,11 +26,34 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import com.seleniumtests.GenericTest;
+import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.ImageSearchException;
 import com.seleniumtests.util.imaging.ImageDetector;
 
 public class TestImageDetector extends GenericTest {
 
+	@Test(groups={"ut"})
+	public void testMinThreshold() throws IOException {
+		new ImageDetector(createFileFromResource("tu/images/infolidays.png"), 
+				createFileFromResource("tu/images/bouton_enregistrer.png"), 0);
+	}
+	@Test(groups={"ut"}, expectedExceptions = ConfigurationException.class)
+	public void testBelowMinThreshold() throws IOException {
+		new ImageDetector(createFileFromResource("tu/images/infolidays.png"), 
+				createFileFromResource("tu/images/bouton_enregistrer.png"), -0.0001);
+	}
+	
+	@Test(groups={"ut"})
+	public void testMaxThreshold() throws IOException {
+		new ImageDetector(createFileFromResource("tu/images/infolidays.png"), 
+				createFileFromResource("tu/images/bouton_enregistrer.png"), 1);
+	}
+	@Test(groups={"ut"}, expectedExceptions = ConfigurationException.class)
+	public void testAboveMaxThreshold() throws IOException {
+		new ImageDetector(createFileFromResource("tu/images/infolidays.png"), 
+				createFileFromResource("tu/images/bouton_enregistrer.png"), 1.0001);
+	}
+	
 	/**
 	 * Search an image inside an other with templace matching
 	 * @throws IOException 
