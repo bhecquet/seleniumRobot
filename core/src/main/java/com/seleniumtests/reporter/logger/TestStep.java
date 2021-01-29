@@ -333,7 +333,10 @@ public class TestStep extends TestAction {
 	public void moveAttachments(String outputDirectory) throws IOException {
 
 		for (Snapshot snapshot: snapshots) {
-			if (snapshot == null || snapshot.getScreenshot() == null || !snapshot.getScreenshot().getFullHtmlPath().contains(BEFORE_STEP_PREFIX) ) {
+			if (snapshot == null 
+					|| snapshot.getScreenshot() == null 
+					|| snapshot.getScreenshot().getFullHtmlPath() == null 
+					|| !snapshot.getScreenshot().getFullHtmlPath().contains(BEFORE_STEP_PREFIX) ) {
 				continue;
 			}
 			try {
