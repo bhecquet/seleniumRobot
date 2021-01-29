@@ -17,7 +17,16 @@
  */
 package com.seleniumtests.core.runner;
 
+import java.io.File;
+import java.io.IOException;
+import java.lang.reflect.Method;
+import java.nio.file.Paths;
+
 import org.testng.annotations.BeforeClass;
+import org.testng.annotations.DataProvider;
+
+import com.seleniumtests.customexception.ConfigurationException;
+import com.seleniumtests.util.helper.CSVHelper;
 
 /**
  * This class initializes context, sets up and tears down and clean up drivers An STF test should extend this class.
@@ -29,4 +38,47 @@ public  class SeleniumTestPlan extends SeleniumRobotTestPlan {
 	public void configure() {
 		setCucumberTest(false);
 	}
+	
+
+	private File getDatasetFile(Method testMethod) {
+		File datasetFile = Paths.get(robotConfig().getApplicationDataPath(), "dataset", robotConfig().getTestEnv(), testMethod.getName() + ".csv").toFile();
+    	if (!datasetFile.exists()) {
+    		throw new ConfigurationException(String.format("Dataset file %s does not exist", datasetFile));
+    	}
+    	return datasetFile;
+	}
+	
+	/**
+	 * This data provider can be used to read data from a CSV file (NO HEADER) in /data/<app>/dataset/<environment>/<testmethodname>.csv folder
+	 * CSV file MUST use ',' as separator. For (semicolon) ';', use datasetSemicolon
+	 * @param testMethod
+	 * @return
+	 * @throws IOException
+	 */
+    @DataProvider(name = "dataset")
+    public Object[][] dataset(Method testMethod) throws IOException {	
+        return CSVHelper.read(getDatasetFile(testMethod), ",");
+    }
+    
+    /**
+	 * This data provider can be used to read data from a CSV file (WITH HEADER) in /data/<app>/dataset/<environment>/<testmethodname>.csv folder
+	 * CSV file MUST use ',' as separator. For (semicolon) ';', use datasetSemicolonWithHeader
+	 * @param testMethod
+	 * @return
+	 * @throws IOException
+	 */
+    @DataProvider(name = "datasetWithHeader")
+    public Object[][] datasetWithHeader(Method testMethod) throws IOException {
+    	return CSVHelper.readWithHeader(getDatasetFile(testMethod), ",");
+    }
+    
+    @DataProvider(name = "datasetSemicolon")
+    public Object[][] datasetSemicolon(Method testMethod) throws IOException {	
+    	return CSVHelper.read(getDatasetFile(testMethod), ";");
+    }
+    
+    @DataProvider(name = "datasetSemicolonWithHeader")
+    public Object[][] datasetSemicolonWithHeader(Method testMethod) throws IOException {
+    	return CSVHelper.readWithHeader(getDatasetFile(testMethod), ";");
+    }
 }

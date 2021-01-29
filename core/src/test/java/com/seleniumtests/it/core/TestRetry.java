@@ -18,12 +18,10 @@
 package com.seleniumtests.it.core;
 
 import java.io.File;
-import java.nio.file.Paths;
 
 import org.apache.commons.io.FileUtils;
 import org.springframework.util.StringUtils;
 import org.testng.Assert;
-import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 import org.testng.xml.XmlSuite.ParallelMode;
 

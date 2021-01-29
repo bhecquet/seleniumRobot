@@ -88,7 +88,7 @@ public class ReporterTest extends ConnectorsTest {
 		XmlSuite suite = new XmlSuite();
 		suite.setName("TmpSuite");
 		suite.setParallel(ParallelMode.NONE);
-		suite.setFileName("/home/test/seleniumRobot/data/core/testng/testLoggging.xml");
+		suite.setFileName(SeleniumTestsContextManager.getRootPath() + "/data/core/testng/testLoggging.xml");
 		Map<String, String> suiteParameters = new HashMap<>();
 		suiteParameters.put("softAssertEnabled", "false");
 		suite.setParameters(suiteParameters);

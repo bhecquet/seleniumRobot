@@ -17,6 +17,7 @@
  */
 package com.seleniumtests.ut.util.helper;
 
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -36,7 +37,6 @@ public class testSpreadSheetHelper extends GenericTest {
 	Map<String, Object> classMap = new LinkedHashMap<String, Object>();
 	String test = "violet";
 
-
 	/**
 	 * Test Exception for a non .csv file
 	 */
@@ -53,6 +53,36 @@ public class testSpreadSheetHelper extends GenericTest {
 		List<String> data = CSVHelper.getHeaderFromCSVFile(null, "src/test/resources/ti/excel/test.csv", null);
 		Assert.assertTrue(data.get(0).equals("test;test2"));
 		Assert.assertEquals(data.size(), 1);
+	}
+	
+	@Test(groups={"ut"})
+	public void testReadCSV() throws IOException{
+		Object[][] data = CSVHelper.read(createFileFromResource("ti/excel/test.csv"), ";");
+		Assert.assertTrue(data[0][0].equals("test"));
+		Assert.assertEquals(data.length, 3);
+	}
+	@Test(groups={"ut"})
+	public void testReadCSVComma() throws IOException{
+		Object[][] data = CSVHelper.read(createFileFromResource("ti/excel/test2.csv"));
+		Assert.assertTrue(data[0][0].equals("test"));
+		Assert.assertEquals(data.length, 3);
+	}
+	
+	/**
+	 * Check header line is skipped
+	 * @throws IOException
+	 */
+	@Test(groups={"ut"})
+	public void testReadCSVSkipHeader() throws IOException{
+		Object[][] data = CSVHelper.readWithHeader(createFileFromResource("ti/excel/test.csv"), ";");
+		Assert.assertTrue(data[0][0].equals("jaune"));
+		Assert.assertEquals(data.length, 2);
+	}
+	@Test(groups={"ut"})
+	public void testReadCSVSkipHeaderComma() throws IOException{
+		Object[][] data = CSVHelper.readWithHeader(createFileFromResource("ti/excel/test2.csv"));
+		Assert.assertTrue(data[0][0].equals("jaune"));
+		Assert.assertEquals(data.length, 2);
 	}
 	
 	/**
