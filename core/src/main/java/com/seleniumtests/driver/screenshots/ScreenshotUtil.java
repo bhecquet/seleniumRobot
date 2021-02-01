@@ -215,7 +215,7 @@ public class ScreenshotUtil {
      * Capture a picture only if SeleniumTestsContext.getCaptureSnapshot() allows it
      * @param target		which picture to take, screen or page.
      * @param exportClass	The type of export to perform (File, ScreenShot, String, BufferedImage)
-     * @return
+     * @return	the screenshot or null if user requested not to take screenshots
      */
     public <T extends Object> T capture(SnapshotTarget target, Class<T> exportClass) {
     	return capture(target, exportClass, false);
@@ -238,18 +238,14 @@ public class ScreenshotUtil {
      * @param target		which picture to take, screen or page.
      * @param exportClass	The type of export to perform (File, ScreenShot, String, BufferedImage)
      * @param force			force capture even if set to false in SeleniumTestContext. This allows PictureElement and ScreenZone to work
-     * @return
+     * @return the screenshot or null if user requested not to take screenshots and force is "false"
      */
     
     public <T extends Object> T capture(SnapshotTarget target, Class<T> exportClass, boolean force) {
     	try {
 			return capture(target, exportClass, false, force).get(0);
 		} catch (IndexOutOfBoundsException e) {
-			try {
-				return exportClass.getConstructor().newInstance();
-			} catch (Exception e1) {
-				return null;
-			}
+			return null;
 		}
     }
     

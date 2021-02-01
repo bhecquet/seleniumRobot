@@ -24,6 +24,7 @@ import java.nio.file.Paths;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
+import org.openqa.selenium.WebDriver;
 import org.testng.Assert;
 import org.testng.ISuite;
 import org.testng.ISuiteResult;
@@ -36,6 +37,7 @@ import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.runner.SeleniumRobotTestListener;
 import com.seleniumtests.core.utils.TestNGResultUtils;
 import com.seleniumtests.driver.TestType;
+import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.driver.screenshots.ScreenShot;
 import com.seleniumtests.driver.screenshots.ScreenshotUtil;
 import com.seleniumtests.driver.screenshots.SnapshotTarget;
@@ -119,5 +121,39 @@ public class TestScreenshotUtil extends ReporterTest {
 		ScreenShot screenshot = new ScreenshotUtil(null).capture(SnapshotTarget.SCREEN, ScreenShot.class);
 		Assert.assertTrue(new File(screenshot.getFullImagePath()).exists());
 		
+	}
+	
+	/**
+	 * issue #422: check we return null instead of an empty ScreenShot / File when captureSnapshot is set to false
+	 * @param testContext
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testScreenshotIsNull(ITestContext testContext) throws Exception {
+
+		SeleniumTestsContextManager.getThreadContext().setTestType(TestType.WEB);
+		SeleniumTestsContextManager.getThreadContext().setCaptureSnapshot(false);
+		Assert.assertNull(new ScreenshotUtil(null).capture(SnapshotTarget.PAGE, ScreenShot.class));
+
+	}
+	@Test(groups={"it"})
+	public void testScreenshotIsNotNullWhenForced(ITestContext testContext) throws Exception {
+		
+		SeleniumTestsContextManager.getThreadContext().setTestType(TestType.WEB);
+		SeleniumTestsContextManager.getThreadContext().setCaptureSnapshot(false);
+		SeleniumTestsContextManager.getThreadContext().setBrowser("chrome");
+		
+		WebDriver localDriver = null;
+		try {
+			localDriver = WebUIDriver.getWebDriver(true);
+			ScreenShot screenshot = new ScreenshotUtil(localDriver).capture(SnapshotTarget.PAGE, ScreenShot.class, true);
+			Assert.assertNotNull(screenshot);
+			Assert.assertTrue(new File(screenshot.getFullImagePath()).exists());
+		} finally {
+			if (localDriver != null) {
+				localDriver.close();
+				WebUIDriver.cleanUp();
+			}
+		}
 	}
 }
