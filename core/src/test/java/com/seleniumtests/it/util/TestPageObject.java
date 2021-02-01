@@ -23,6 +23,7 @@ import org.testng.annotations.Test;
 
 import com.seleniumtests.GenericDriverTest;
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.core.TestStepManager;
 import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.it.driver.support.pages.DriverTestPage;
@@ -38,6 +39,34 @@ public class TestPageObject extends GenericDriverTest {
 		Dimension viewPortSize = ((CustomEventFiringWebDriver)driver).getViewPortDimensionWithoutScrollbar();
 		Assert.assertEquals(viewPortSize.width, 600);
 		Assert.assertEquals(viewPortSize.height, 400);
+	}
+	
+	/**
+	 * issue #421: check snapshot is not done when user set captureSnapshot=false
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testSnapshotNotLogged() throws Exception {
+		SeleniumTestsContextManager.getThreadContext().setBrowser("*firefox");
+		SeleniumTestsContextManager.getThreadContext().setCaptureSnapshot(false);
+		driver = WebUIDriver.getWebDriver(true);
+		new DriverTestPage(true);
+		
+		// 0 capture because capture snapshot is set to false
+		Assert.assertTrue(TestStepManager.getCurrentOrPreviousStep().getAllAttachments(true).isEmpty());
+
+	}
+	@Test(groups={"it"})
+	public void testSnapshotLogged() throws Exception {
+		SeleniumTestsContextManager.getThreadContext().setBrowser("*firefox");
+		SeleniumTestsContextManager.getThreadContext().setCaptureSnapshot(true);
+		driver = WebUIDriver.getWebDriver(true);
+		new DriverTestPage(true);
+		
+		// one capture, due to opening page
+		Assert.assertFalse(TestStepManager.getCurrentOrPreviousStep().getAllAttachments(true).isEmpty());
+		Assert.assertEquals(TestStepManager.getCurrentOrPreviousStep().getAllAttachments(true).size(), 1);
+		
 	}
 	
 	@Test(groups={"it"})

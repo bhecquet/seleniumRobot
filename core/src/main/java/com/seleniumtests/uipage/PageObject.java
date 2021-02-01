@@ -709,19 +709,21 @@ public class PageObject extends BasePage implements IPage {
     		throw new ScenarioException("Cannot check snapshot if no name is provided");
     	}
     	
-    	if (screenShot.getHtmlSourcePath() != null) {
-    		htmlFilePath = screenShot.getHtmlSourcePath().replace(suiteName, outputDirectory);
+    	if (screenShot != null) { // may be null if user request not to take snapshots
+	    	if (screenShot.getHtmlSourcePath() != null) {
+	    		htmlFilePath = screenShot.getHtmlSourcePath().replace(suiteName, outputDirectory);
+	    	}
+	    	
+	    	if (screenShot.getImagePath() != null) {
+	    		imageFilePath = screenShot.getImagePath().replace(suiteName, outputDirectory);
+	    	}
+	    	if (snapshotName != null) {
+	    		screenShot.setTitle(snapshotName);
+	    	}
+	    	
+	    	
+	    	logger.logScreenshot(screenShot, snapshotName, checkSnapshot);
     	}
-    	
-    	if (screenShot.getImagePath() != null) {
-    		imageFilePath = screenShot.getImagePath().replace(suiteName, outputDirectory);
-    	}
-    	if (snapshotName != null) {
-    		screenShot.setTitle(snapshotName);
-    	}
-    	
-    	
-    	logger.logScreenshot(screenShot, snapshotName, checkSnapshot);
     	
     	// store the window / tab on which this page is loaded
     	windowHandle = driver.getWindowHandle();

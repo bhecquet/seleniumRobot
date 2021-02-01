@@ -340,7 +340,11 @@ public class TestTasks {
     
     public static void capturePageSnapshot() {
     	if (WebUIDriver.getWebDriver(false) != null) {
-    		logger.logScreenshot(new ScreenshotUtil().capture(SnapshotTarget.PAGE, ScreenShot.class));
+    		ScreenShot screenshot = new ScreenshotUtil().capture(SnapshotTarget.PAGE, ScreenShot.class);
+    		
+    		if (screenshot != null) {
+    			logger.logScreenshot(screenshot);
+    		}
     	}
     }
     

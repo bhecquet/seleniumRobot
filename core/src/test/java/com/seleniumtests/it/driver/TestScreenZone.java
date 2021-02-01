@@ -26,6 +26,8 @@ import org.testng.SkipException;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.Test;
 
+import com.seleniumtests.core.SeleniumTestsContext;
+import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.ImageSearchException;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.CustomEventFiringWebDriver;
@@ -59,6 +61,23 @@ public class TestScreenZone extends GenericMultiBrowserTest {
 			DriverTestPageWithoutFixedPattern.googleForDesktop.click();
 		} catch (ImageSearchException e) {
 			throw new SkipException("Image not found, we may be on screenless slave", e);
+		}
+		Assert.assertEquals(DriverTestPageWithoutFixedPattern.textElement.getValue(), "image");
+	}
+	
+	/**
+	 * Check that "captureSnapshot=false" do not prevent to use ScreenZone
+	 */
+	@Test(groups={"it"})
+	public void testClickOnGooglePictureWithCaptureSnapshotFalse() {
+		
+		try {
+			SeleniumTestsContextManager.getThreadContext().setCaptureSnapshot(false);
+			DriverTestPageWithoutFixedPattern.googleForDesktop.click();
+		} catch (ImageSearchException e) {
+			throw new SkipException("Image not found, we may be on screenless slave", e);
+		} finally {
+			SeleniumTestsContextManager.getThreadContext().setCaptureSnapshot(SeleniumTestsContext.DEFAULT_CAPTURE_SNAPSHOT);
 		}
 		Assert.assertEquals(DriverTestPageWithoutFixedPattern.textElement.getValue(), "image");
 	}
