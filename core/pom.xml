@@ -525,6 +525,7 @@
                         		<exclude>org/openqa/**/*</exclude>
                         	</excludes>
                             <dataFile>${project.build.directory}/coverage-reports/jacoco-ut.exec</dataFile>
+                            <outputDirectory>${project.build.directory}/jacoco-ut</outputDirectory>
                         </configuration>
 					</execution>
                     <execution>
@@ -538,6 +539,7 @@
                         		<exclude>org/openqa/**/*</exclude>
                         	</excludes>
                             <dataFile>${project.build.directory}/coverage-reports/jacoco-it.exec</dataFile>
+                            <outputDirectory>${project.build.directory}/jacoco-it</outputDirectory>
                         </configuration>
 					</execution>
 				<!-- /comment -->
