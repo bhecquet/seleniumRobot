@@ -83,7 +83,7 @@
 
 	<build>
 		<finalName>grid-extensions</finalName>
-		<sourceDirectory>../core/src/main/java</sourceDirectory>
+		<sourceDirectory>${project.basedir}/../core/src/main/java</sourceDirectory>
 		
 		<plugins>
 			<plugin>
