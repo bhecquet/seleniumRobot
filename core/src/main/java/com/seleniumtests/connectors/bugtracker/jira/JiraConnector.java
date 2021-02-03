@@ -267,6 +267,9 @@ public class JiraConnector extends BugTracker {
 				comps);
 	}
     
+    /**
+     * Format description of the issue
+     */
     @Override
     protected void formatDescription(String testName, List<TestStep> failedSteps, TestStep lastTestStep, String description, StringBuilder fullDescription) {
 
@@ -513,6 +516,11 @@ public class JiraConnector extends BugTracker {
 	 */
 	@Override
 	public void updateIssue(String issueId, String messageUpdate, List<ScreenShot> screenShots) {
+		updateIssue(issueId, messageUpdate, screenShots, null);
+	}
+	
+	@Override
+	public void updateIssue(String issueId, String messageUpdate, List<ScreenShot> screenShots, TestStep lastFailedStep) {
 
 		IssueRestClient issueClient = restClient.getIssueClient();
 		Issue issue;
@@ -523,9 +531,17 @@ public class JiraConnector extends BugTracker {
 	    }
 	
 		try {
-            // add comment
-            issueClient.addComment(issue.getCommentsUri(), Comment.valueOf(messageUpdate));
-            
+			StringBuilder fullDescription = new StringBuilder(messageUpdate + "\n");
+			if (SeleniumTestsContextManager.getThreadContext().getStartedBy() != null) {
+				fullDescription.append(String.format("*Started by:* %s\n", SeleniumTestsContextManager.getThreadContext().getStartedBy()));
+			}
+	
+	    	if (lastFailedStep != null) {
+				fullDescription.append(String.format("*" + STEP_KO_PATTERN + "%s*\n", lastFailedStep.getPosition(), lastFailedStep.getName().trim()));
+				fullDescription.append(String.format("{code:java}%s{code}\n\n", lastFailedStep.toString()));
+	    	}
+			
+			
             if (!screenShots.isEmpty()) {
 	            issueClient.addAttachments(issue.getAttachmentsUri(), screenShots
 	                    .stream()
@@ -535,6 +551,16 @@ public class JiraConnector extends BugTracker {
 	                    .toArray(new File[] {})
 	            );
             }
+            
+            // add snapshots to comment
+            for (ScreenShot screenshot: screenShots) {
+            	fullDescription.append(String.format("!%s|thumbnail!\n", new File(screenshot.getFullImagePath()).getName()));
+            }
+            
+            // add comment
+            issueClient.addComment(issue.getCommentsUri(), Comment.valueOf(fullDescription.toString()));
+            
+            
             logger.info(String.format("Jira %s updated", issueId));
             
         } catch (Exception e) {

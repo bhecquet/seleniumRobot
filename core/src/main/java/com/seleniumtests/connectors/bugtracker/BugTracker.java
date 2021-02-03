@@ -22,6 +22,7 @@ import org.apache.log4j.Logger;
 import com.seleniumtests.connectors.bugtracker.jira.JiraBean;
 import com.seleniumtests.connectors.bugtracker.jira.JiraConnector;
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.core.TestStepManager;
 import com.seleniumtests.core.TestVariable;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.driver.screenshots.ScreenShot;
@@ -105,10 +106,12 @@ public abstract class BugTracker {
 		TestStep lastTestStep = null;
 		List<TestStep> failedSteps = new ArrayList<>();
 		for (TestStep testStep: testSteps) {
-			if (Boolean.TRUE.equals(testStep.getFailed())) {
+			
+			// "Test end" step should never be considered as failed, because it reflects the overall test result
+			if (Boolean.TRUE.equals(testStep.getFailed()) && !testStep.getName().startsWith(TestStepManager.LAST_STEP_NAME)) {
 				failedSteps.add(testStep);
 			}
-			if (testStep.getName().startsWith("Test end")) {
+			if (testStep.getName().startsWith(TestStepManager.LAST_STEP_NAME)) {
 				lastTestStep = testStep;		
 				break;
 			}
@@ -121,7 +124,7 @@ public abstract class BugTracker {
 
 		List<ScreenShot> screenShots = lastTestStep.getSnapshots().stream()
 				.map(s -> s.getScreenshot())
-				.collect(Collectors.toList());;
+				.collect(Collectors.toList());
 		StringBuilder fullDescription = new StringBuilder();
 		
 		formatDescription(testName, failedSteps, lastTestStep, description, fullDescription);
@@ -178,7 +181,14 @@ public abstract class BugTracker {
 		String assignee = issueOptions.get("assignee");
 		String reporter = issueOptions.get("reporter");
 		
-		return createIssueBean(summary, fullDescription.toString(), testName, lastTestStep, assignee, reporter, screenShots, zipFile, issueOptions);
+		return createIssueBean(summary, fullDescription.toString(), 
+				testName, 
+				failedSteps.isEmpty() ? lastTestStep: failedSteps.get(failedSteps.size() - 1), // take the last failed step as step we will show as failed even if there are several
+				assignee, 
+				reporter, 
+				screenShots, 
+				zipFile, 
+				issueOptions);
 	}
 	
 	protected IssueBean createIssueBean(
@@ -244,14 +254,15 @@ public abstract class BugTracker {
 			if (currentIssue.getDescription().contains(String.format(STEP_KO_PATTERN, stepIdx))) {
 				logger.info(String.format("Issue %s already exists", currentIssue.getId()));
 			} else {
-				updateIssue(currentIssue.getId(), "Scenario fails on another step " + issueBean.getTestStep().getName(), issueBean.getScreenShots());
+				updateIssue(currentIssue.getId(), "Scenario fails on another step " + issueBean.getTestStep().getName(), issueBean.getScreenShots(), issueBean.getTestStep());
 			}
+			return currentIssue;
 		} else {
 			createIssue(issueBean);
 			logger.info(String.format("Issue %s created", issueBean.getId()));
+			return issueBean;
 		}
 		
-		return issueBean;
 	}
 	
 	/**
@@ -298,6 +309,8 @@ public abstract class BugTracker {
 	 * @param screenShots		New screenshots
 	 */
 	public abstract void updateIssue(String issueId, String messageUpdate, List<ScreenShot> screenShots);
+	
+	public abstract void updateIssue(String issueId, String messageUpdate, List<ScreenShot> screenShots, TestStep lastFailedStep);
 	
 	/**
 	 * Create an issue. 

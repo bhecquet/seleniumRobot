@@ -3,6 +3,7 @@ package com.seleniumtests.connectors.bugtracker;
 import java.util.List;
 
 import com.seleniumtests.driver.screenshots.ScreenShot;
+import com.seleniumtests.reporter.logger.TestStep;
 
 public class FakeBugTracker extends BugTracker {
 
@@ -25,6 +26,13 @@ public class FakeBugTracker extends BugTracker {
 	@Override
 	public void closeIssue(String issueId, String closingMessage) {
 		logger.info("issue closed");
+		
+	}
+
+	@Override
+	public void updateIssue(String issueId, String messageUpdate, List<ScreenShot> screenShots,
+			TestStep lastFailedStep) {
+		logger.info("issue updated with Step " + lastFailedStep.getName());
 		
 	}
 
