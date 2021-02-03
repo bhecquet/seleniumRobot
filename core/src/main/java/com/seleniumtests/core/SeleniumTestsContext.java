@@ -454,6 +454,7 @@ public class SeleniumTestsContext {
         setFullReset(getBoolValueForTest(FULL_RESET, System.getProperty(FULL_RESET)));
 
         setApp(getValueForTest(APP, System.getProperty(APP)));
+        setStartedBy(getValueForTest(STARTED_BY, System.getProperty(STARTED_BY)));
        
         setCucumberTags(getValueForTest(CUCUMBER_TAGS, System.getProperty(CUCUMBER_TAGS)));
         setCucumberTests(getValueForTest(CUCUMBER_TESTS, System.getProperty(CUCUMBER_TESTS)));
