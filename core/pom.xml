@@ -413,6 +413,7 @@
 				<artifactId>maven-surefire-plugin</artifactId>
 				<version>3.0.0-M5</version>
 				<configuration>
+					<forkCount>0</forkCount> <!-- mandatory for test to be executed in a JDK 11 -->
 					<suiteXmlFiles>
 						<suiteXmlFile>data/core/testng/tu.xml</suiteXmlFile>
 					</suiteXmlFiles>
@@ -447,6 +448,7 @@
 				<artifactId>maven-failsafe-plugin</artifactId>
 				<version>3.0.0-M5</version>
 				<configuration>
+					<forkCount>0</forkCount> <!-- mandatory for test to be executed in a JDK 11 -->
 					<skipTests>${skipTests}</skipTests>
                 	<skipITs>${skipITs}</skipITs>
                 	<!-- comment for online instrumentation -->
