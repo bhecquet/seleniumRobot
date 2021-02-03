@@ -56,6 +56,7 @@ The integration tests can be customized with several maven-failsafe-plugin optio
 
 **Test in Internet Explorer**: Beware to unckeck "Display intranet sites in compatibility mode". Else, integration tests with Internet Explorer will fail
 
+In case surefire plugin crashes without information, add `<forkCount>0</forkCount>` to its configuration which will help showing the real problem
 
 ### 4 Deploy ###
 Unzip this file to any folder.
