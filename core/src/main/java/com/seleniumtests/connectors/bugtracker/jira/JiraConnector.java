@@ -217,6 +217,7 @@ public class JiraConnector extends BugTracker {
             		jiraBean.getCustomFields(),
             		jiraBean.getComponents());
             updatedJiraBean.setDate(issue.getCreationDate().toString("yyyy-MM-dd'T'HH:mmZZ"));
+            updatedJiraBean.setAccessUrl(browseUrl + issue.getKey());
             return updatedJiraBean;
         } else {
             return null;
