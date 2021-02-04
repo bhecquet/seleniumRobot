@@ -296,6 +296,19 @@ public class JiraConnector extends BugTracker {
 	
 		fullDescription.append("h2. Last logs\n");
 		fullDescription.append(String.format("{code:java}%s{code}", lastTestStep.toString()));
+		
+		if (lastTestStep != null) {
+			fullDescription.append("\n\nh2. Associated screenshots\n");
+			
+    		List<ScreenShot> screenshots = lastTestStep.getSnapshots().stream()
+    				.map(s -> s.getScreenshot())
+    				.collect(Collectors.toList());
+    		for (ScreenShot screenshot: screenshots) {
+    			if (screenshot.getFullImagePath() != null && new File(screenshot.getFullImagePath()).exists()) {
+    				fullDescription.append(String.format("!%s|thumbnail!\n", new File(screenshot.getFullImagePath()).getName()));
+    			}
+    		}
+    	}
 	}
     
 

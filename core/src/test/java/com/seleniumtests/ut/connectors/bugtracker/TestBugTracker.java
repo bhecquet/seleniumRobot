@@ -168,7 +168,7 @@ public class TestBugTracker extends MockitoTest {
 		
 		// check that issue is not created
 		verify(fbt, never()).createIssue(any(IssueBean.class));
-		verify(fbt).updateIssue(eq("ISSUE-1"), anyString(), anyList());
+		verify(fbt).updateIssue(eq("ISSUE-1"), anyString(), anyList(), eq(stepEnd));
 	}
 	
 	/**
@@ -190,7 +190,7 @@ public class TestBugTracker extends MockitoTest {
 		
 		// check that issue is not created
 		verify(fbt, never()).createIssue(any(IssueBean.class));
-		verify(fbt, never()).updateIssue(eq("ISSUE-1"), anyString(), anyList());
+		verify(fbt, never()).updateIssue(eq("ISSUE-1"), anyString(), anyList(), eq(stepEnd));
 	}
 	
 
@@ -228,7 +228,7 @@ public class TestBugTracker extends MockitoTest {
 		Assert.assertEquals(issueBean.getReporter(), "you");
 		Assert.assertEquals(issueBean.getTestName(), "testCreateIssueBean");
 		Assert.assertEquals(issueBean.getScreenShots(), Arrays.asList(screenshot, screenshot)); // screenshots from the last step
-		Assert.assertEquals(issueBean.getTestStep(), stepEnd); 
+		Assert.assertEquals(issueBean.getTestStep(), step2); // we take the last failing step (not Test end)
 		Assert.assertEquals(issueBean.getDateTime().getDayOfMonth(),  ZonedDateTime.now().plusHours(3).getDayOfMonth()); 
 		Assert.assertTrue(issueBean.getDetailedResult().isFile());
 		Assert.assertEquals(issueBean.getDetailedResult().getName(), "detailedResult.zip");
