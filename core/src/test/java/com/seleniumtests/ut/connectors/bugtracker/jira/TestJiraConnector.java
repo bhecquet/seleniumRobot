@@ -712,7 +712,8 @@ public class TestJiraConnector extends MockitoTest {
 		jiraConnector.updateIssue("ISSUE-1", "update", Arrays.asList(screenshot));
 		
 		verify(issueRestClient).addComment(any(URI.class), commentArgument.capture());
-		Assert.assertEquals(commentArgument.getValue().getBody(), "update");
+		Assert.assertEquals(commentArgument.getValue().getBody(), "update\n" + 
+				"!N-A_0-2_Test_end-N-A_0-1_Test_end-N-A_0-1_step_2-N.png|thumbnail!\n");
 		
 		// check attachments have been added (screenshot)
 		verify(issueRestClient).addAttachments(eq(new URI("http://foo/bar/i/1/attachments")), screenshotCaptor.capture());
@@ -764,12 +765,17 @@ public class TestJiraConnector extends MockitoTest {
 				"h2. Last logs\n" + 
 				"{code:java}Step Test end{code}\n" + 
 				"\n" + 
+				"h2. Associated screenshots\n" + 
+				"!N-A_0-2_Test_end-N-A_0-1_Test_end-N-A_0-1_step_2-N.png|thumbnail!\n" + 
+				"!N-A_0-2_Test_end-N-A_0-1_Test_end-N-A_0-1_step_2-N.png|thumbnail!\n" + 
+				"\n" + 
+				"\n" + 
 				"For more details, see attached .zip file");
 		Assert.assertEquals(jiraBean.getSummary(), "[Selenium][selenium][DEV][ngName] test myTest KO");
 		Assert.assertEquals(jiraBean.getReporter(), "you");
 		Assert.assertEquals(jiraBean.getTestName(), "testCreateJiraBean");
 		Assert.assertEquals(jiraBean.getScreenShots(), Arrays.asList(screenshot, screenshot)); // screenshots from the last step
-		Assert.assertEquals(jiraBean.getTestStep(), stepEnd); 
+		Assert.assertEquals(jiraBean.getTestStep(), step2); 
 		Assert.assertEquals(jiraBean.getDateTime().getDayOfMonth(),  ZonedDateTime.now().plusHours(3).getDayOfMonth()); 
 		Assert.assertEquals(jiraBean.getComponents(), Arrays.asList("comp1", "comp2")); 
 		Assert.assertEquals(jiraBean.getIssueType(), "Bug"); 
@@ -807,7 +813,7 @@ public class TestJiraConnector extends MockitoTest {
 		
 		// check only step2 is seen as a failed step
 		Assert.assertEquals(jiraBean.getDescription(), "*Test:* testCreateJiraBean\n" + 
-				"*Description:* some description\n" + 
+				"*Description:* some description\n" +
 				"*Started by:* http://foo/bar/job/1\n" +
 				"*Error step 1 (step 2):* *{color:#de350b}java.lang.NullPointerException: Error clicking{color}*\n" +
 				"h2. Steps in error\n" + 
@@ -819,12 +825,17 @@ public class TestJiraConnector extends MockitoTest {
 				"h2. Last logs\n" + 
 				"{code:java}Step Test end{code}\n" + 
 				"\n" + 
+				"h2. Associated screenshots\n" + 
+				"!N-A_0-2_Test_end-N-A_0-1_Test_end-N-A_0-1_step_2-N.png|thumbnail!\n" + 
+				"!N-A_0-2_Test_end-N-A_0-1_Test_end-N-A_0-1_step_2-N.png|thumbnail!\n" + 
+				"\n" + 
+				"\n" + 
 				"For more details, see attached .zip file");
 		Assert.assertEquals(jiraBean.getSummary(), "[Selenium][selenium][DEV][ngName] test myTest KO");
 		Assert.assertEquals(jiraBean.getReporter(), "you");
 		Assert.assertEquals(jiraBean.getTestName(), "testCreateJiraBean");
 		Assert.assertEquals(jiraBean.getScreenShots(), Arrays.asList(screenshot, screenshot)); // screenshots from the last step
-		Assert.assertEquals(jiraBean.getTestStep(), stepEnd); 
+		Assert.assertEquals(jiraBean.getTestStep(), step2); 
 		Assert.assertEquals(jiraBean.getDateTime().getDayOfMonth(),  ZonedDateTime.now().plusHours(3).getDayOfMonth()); 
 		Assert.assertEquals(jiraBean.getComponents(), Arrays.asList("comp1", "comp2")); 
 		Assert.assertEquals(jiraBean.getIssueType(), "Bug"); 
@@ -833,5 +844,57 @@ public class TestJiraConnector extends MockitoTest {
 		Assert.assertTrue(jiraBean.getDetailedResult().isFile());
 		Assert.assertTrue(jiraBean.getDetailedResult().length() > 1000);
 		Assert.assertNull(jiraBean.getId()); // not inistialized by default
+	}
+	
+	@Test(groups={"ut"})
+	public void testCreateJiraBeanNoFailedSteps() throws Exception {
+		
+		jiraOptions.put("priority", "P1");
+		jiraOptions.put("assignee", "me");
+		jiraOptions.put("reporter", "you");
+		jiraOptions.put("jira.issueType", "Bug");
+		jiraOptions.put("jira.components", "comp1,comp2");
+		jiraOptions.put("jira.field.foo", "bar");
+		
+		JiraConnector jiraConnector = new JiraConnector("http://foo/bar", PROJECT_KEY, "user", "password", jiraOptions);
+	
+		IssueBean issueBean = jiraConnector.createIssueBean("[Selenium][selenium][DEV][ngName] test myTest KO", "testCreateJiraBean", "some description", 
+				Arrays.asList(step1, stepEnd), jiraOptions);
+		
+		JiraBean jiraBean = (JiraBean)issueBean;
+
+		// that when no failed step exist, (this should not happen), this is not a problem for connector
+		Assert.assertEquals(jiraBean.getDescription(), "*Test:* testCreateJiraBean\n" + 
+				"*Description:* some description\n" + 
+				"h2. Last logs\n" + 
+				"{code:java}Step Test end{code}\n" + 
+				"\n" + 
+				"h2. Associated screenshots\n" + 
+				"!N-A_0-2_Test_end-N-A_0-1_Test_end-N-A_0-1_step_2-N.png|thumbnail!\n" + 
+				"!N-A_0-2_Test_end-N-A_0-1_Test_end-N-A_0-1_step_2-N.png|thumbnail!\n" + 
+				"\n" + 
+				"\n" + 
+				"For more details, see attached .zip file");
+		
+	}
+	
+	@Test(groups={"ut"})
+	public void testCreateJiraBeanNoFinalStep() throws Exception {
+		
+		jiraOptions.put("priority", "P1");
+		jiraOptions.put("assignee", "me");
+		jiraOptions.put("reporter", "you");
+		jiraOptions.put("jira.issueType", "Bug");
+		jiraOptions.put("jira.components", "comp1,comp2");
+		jiraOptions.put("jira.field.foo", "bar");
+		
+		JiraConnector jiraConnector = new JiraConnector("http://foo/bar", PROJECT_KEY, "user", "password", jiraOptions);
+		
+		IssueBean issueBean = jiraConnector.createIssueBean("[Selenium][selenium][DEV][ngName] test myTest KO", "testCreateJiraBean", "some description", 
+				Arrays.asList(step1), jiraOptions);
+		
+		// issue bean is not created when "Test end" is not present
+		Assert.assertNull(issueBean);
+		
 	}
 }
