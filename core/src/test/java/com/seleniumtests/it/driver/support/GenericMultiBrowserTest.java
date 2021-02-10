@@ -57,6 +57,7 @@ import com.seleniumtests.it.driver.support.pages.DriverTestAngularFrame;
 import com.seleniumtests.it.driver.support.pages.DriverTestPage;
 import com.seleniumtests.it.driver.support.pages.DriverTestPageNativeActions;
 import com.seleniumtests.it.driver.support.pages.DriverTestPageObjectFatory;
+import com.seleniumtests.it.driver.support.pages.DriverTestPageSalesforceLightning;
 import com.seleniumtests.it.driver.support.pages.DriverTestPageWithoutFixedPattern;
 import com.seleniumtests.it.driver.support.server.WebServer;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
@@ -75,6 +76,7 @@ public abstract class GenericMultiBrowserTest extends MockitoTest {
 	protected DriverSubAngularTestPage angularPage;
 	protected DriverTestAngularFrame angularFramePage;
 	protected DriverScrollingTestPage scrollingTestPage;
+	protected DriverTestPageSalesforceLightning lightningPage;
 	protected ITestContext testNGCtx;
 	private String testPageName;
 	protected String testPageUrl;
@@ -200,6 +202,8 @@ public abstract class GenericMultiBrowserTest extends MockitoTest {
 				case "DriverScrollingTestPage":
 					testPageUrl = String.format("http://%s:%d/testScrolling.html", localAddress, server.getServerHost().getPort());
 					scrollingTestPage = new DriverScrollingTestPage(true, testPageUrl);
+				case "DriverTestPageSalesforceLightning":
+					lightningPage = new DriverTestPageSalesforceLightning();
 			}
 		} catch (Exception e) {
 			logger.error("Error opening page");
