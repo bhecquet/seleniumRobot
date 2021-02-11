@@ -236,7 +236,7 @@ Params for mobile testing
 | manualTestSteps			| false		| If true, it's possible to add test steps in Test and Page Object (`addTest("my step name")`). An error will be raised if manual steps are added when automatic steps are enabled |
 | maskPassword 				| true		| Whether seleniumRobot should detect passwords in method calls and mask them in reports | 
 | reporterPluginClasses     | null		| comma-seperated list of classes to call when a custom reporter needs to be added. See chap7_Howto.md, §19 |
-| startedBy 				| null		| allow to tell who called seleniumRobot. May be any string but can be used to display the result URL when using bugtracker |
+| startedBy 				| null		| allow to tell who called seleniumRobot. May be any string but can be used to display the result URL when using bugtracker. In case this is set, BugTracker won't receive the detailed result as a zip file, to avoid sending too big files |
 
 ##### Test managers #####
 
