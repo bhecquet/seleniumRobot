@@ -13,7 +13,6 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
-import org.joda.time.format.DateTimeFormatter;
 
 import com.atlassian.jira.rest.client.api.IssueRestClient;
 import com.atlassian.jira.rest.client.api.JiraRestClient;
@@ -30,13 +29,11 @@ import com.atlassian.jira.rest.client.api.domain.Issue;
 import com.atlassian.jira.rest.client.api.domain.IssueType;
 import com.atlassian.jira.rest.client.api.domain.Priority;
 import com.atlassian.jira.rest.client.api.domain.Project;
-import com.atlassian.jira.rest.client.api.domain.Status;
 import com.atlassian.jira.rest.client.api.domain.Transition;
 import com.atlassian.jira.rest.client.api.domain.User;
 import com.atlassian.jira.rest.client.api.domain.Version;
 import com.atlassian.jira.rest.client.api.domain.input.IssueInput;
 import com.atlassian.jira.rest.client.api.domain.input.IssueInputBuilder;
-import com.atlassian.jira.rest.client.api.domain.input.MyPermissionsInput;
 import com.atlassian.jira.rest.client.api.domain.input.TransitionInput;
 import com.atlassian.jira.rest.client.internal.async.AsynchronousJiraRestClientFactory;
 import com.google.common.collect.ImmutableList;
@@ -520,6 +517,31 @@ public class JiraConnector extends BugTracker {
         }
     }
 
+    /**
+     * Create description for issue update
+     * @param messageUpdate
+     * @param screenShots
+     * @param lastFailedStep
+     * @return
+     */
+    private StringBuilder formatUpdateDescription(String messageUpdate, List<ScreenShot> screenShots, TestStep lastFailedStep) {
+    	StringBuilder fullDescription = new StringBuilder(messageUpdate + "\n");
+		if (SeleniumTestsContextManager.getThreadContext().getStartedBy() != null) {
+			fullDescription.append(String.format("*Started by:* %s\n", SeleniumTestsContextManager.getThreadContext().getStartedBy()));
+		}
+
+    	if (lastFailedStep != null) {
+			fullDescription.append(String.format("*" + STEP_KO_PATTERN + "%s*\n", lastFailedStep.getPosition(), lastFailedStep.getName().trim()));
+			fullDescription.append(String.format("{code:java}%s{code}\n\n", lastFailedStep.toString()));
+    	}
+		
+        // add snapshots to comment
+        for (ScreenShot screenshot: screenShots) {
+        	fullDescription.append(String.format("!%s|thumbnail!\n", new File(screenshot.getFullImagePath()).getName()));
+        }
+        
+        return fullDescription;
+    }
 
     /**
 	 * Update an existing jira issue with a new message and new screenshots.
@@ -545,18 +567,9 @@ public class JiraConnector extends BugTracker {
 	    }
 	
 		try {
-			StringBuilder fullDescription = new StringBuilder(messageUpdate + "\n");
-			if (SeleniumTestsContextManager.getThreadContext().getStartedBy() != null) {
-				fullDescription.append(String.format("*Started by:* %s\n", SeleniumTestsContextManager.getThreadContext().getStartedBy()));
-			}
-	
-	    	if (lastFailedStep != null) {
-				fullDescription.append(String.format("*" + STEP_KO_PATTERN + "%s*\n", lastFailedStep.getPosition(), lastFailedStep.getName().trim()));
-				fullDescription.append(String.format("{code:java}%s{code}\n\n", lastFailedStep.toString()));
-	    	}
 			
-			
-            if (!screenShots.isEmpty()) {
+
+	        if (!screenShots.isEmpty()) {
 	            issueClient.addAttachments(issue.getAttachmentsUri(), screenShots
 	                    .stream()
 	                    .peek(s -> logger.info("file ->" + s.getFullImagePath()))
@@ -564,15 +577,10 @@ public class JiraConnector extends BugTracker {
 	                    .collect(Collectors.toList())
 	                    .toArray(new File[] {})
 	            );
-            }
-            
-            // add snapshots to comment
-            for (ScreenShot screenshot: screenShots) {
-            	fullDescription.append(String.format("!%s|thumbnail!\n", new File(screenshot.getFullImagePath()).getName()));
-            }
-            
+	        }
+			
             // add comment
-            issueClient.addComment(issue.getCommentsUri(), Comment.valueOf(fullDescription.toString()));
+            issueClient.addComment(issue.getCommentsUri(), Comment.valueOf(formatUpdateDescription(messageUpdate, screenShots, lastFailedStep).toString()));
             
             
             logger.info(String.format("Jira %s updated", issueId));

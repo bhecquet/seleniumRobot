@@ -19,7 +19,6 @@ import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
 import org.mockito.Mock;
-import org.openqa.selenium.WebDriverException;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
@@ -30,7 +29,6 @@ import com.seleniumtests.MockitoTest;
 import com.seleniumtests.connectors.bugtracker.BugTracker;
 import com.seleniumtests.connectors.bugtracker.FakeBugTracker;
 import com.seleniumtests.connectors.bugtracker.IssueBean;
-import com.seleniumtests.connectors.bugtracker.jira.JiraBean;
 import com.seleniumtests.connectors.bugtracker.jira.JiraConnector;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.driver.screenshots.ScreenShot;
