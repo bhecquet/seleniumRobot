@@ -55,7 +55,6 @@ import com.atlassian.jira.rest.client.api.domain.SearchResult;
 import com.atlassian.jira.rest.client.api.domain.Transition;
 import com.atlassian.jira.rest.client.api.domain.User;
 import com.atlassian.jira.rest.client.api.domain.Version;
-import com.atlassian.jira.rest.client.api.domain.input.AttachmentInput;
 import com.atlassian.jira.rest.client.api.domain.input.ComplexIssueInputFieldValue;
 import com.atlassian.jira.rest.client.api.domain.input.IssueInput;
 import com.atlassian.jira.rest.client.api.domain.input.TransitionInput;
@@ -812,6 +811,7 @@ public class TestJiraConnector extends MockitoTest {
 		Assert.assertEquals(jiraBean.getAssignee(), "me");
 		
 		// check only step2 is seen as a failed step
+		// detailed result is not provided because 'startedBy' is set
 		Assert.assertEquals(jiraBean.getDescription(), "*Test:* testCreateJiraBean\n" + 
 				"*Description:* some description\n" +
 				"*Started by:* http://foo/bar/job/1\n" +
@@ -827,10 +827,8 @@ public class TestJiraConnector extends MockitoTest {
 				"\n" + 
 				"h2. Associated screenshots\n" + 
 				"!N-A_0-2_Test_end-N-A_0-1_Test_end-N-A_0-1_step_2-N.png|thumbnail!\n" + 
-				"!N-A_0-2_Test_end-N-A_0-1_Test_end-N-A_0-1_step_2-N.png|thumbnail!\n" + 
-				"\n" + 
-				"\n" + 
-				"For more details, see attached .zip file");
+				"!N-A_0-2_Test_end-N-A_0-1_Test_end-N-A_0-1_step_2-N.png|thumbnail!\n"
+				);
 		Assert.assertEquals(jiraBean.getSummary(), "[Selenium][selenium][DEV][ngName] test myTest KO");
 		Assert.assertEquals(jiraBean.getReporter(), "you");
 		Assert.assertEquals(jiraBean.getTestName(), "testCreateJiraBean");
@@ -841,8 +839,7 @@ public class TestJiraConnector extends MockitoTest {
 		Assert.assertEquals(jiraBean.getIssueType(), "Bug"); 
 		Assert.assertEquals(jiraBean.getPriority(), "P1"); 
 		Assert.assertEquals(jiraBean.getCustomFields().get("foo"), "bar"); 
-		Assert.assertTrue(jiraBean.getDetailedResult().isFile());
-		Assert.assertTrue(jiraBean.getDetailedResult().length() > 1000);
+		Assert.assertNull(jiraBean.getDetailedResult()); // detailed result is not provided because 'startedBy' is set
 		Assert.assertNull(jiraBean.getId()); // not inistialized by default
 	}
 	
