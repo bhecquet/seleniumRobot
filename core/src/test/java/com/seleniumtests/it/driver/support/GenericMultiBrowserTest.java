@@ -202,8 +202,10 @@ public abstract class GenericMultiBrowserTest extends MockitoTest {
 				case "DriverScrollingTestPage":
 					testPageUrl = String.format("http://%s:%d/testScrolling.html", localAddress, server.getServerHost().getPort());
 					scrollingTestPage = new DriverScrollingTestPage(true, testPageUrl);
+					break;
 				case "DriverTestPageSalesforceLightning":
 					lightningPage = new DriverTestPageSalesforceLightning();
+					break;
 			}
 		} catch (Exception e) {
 			logger.error("Error opening page");
