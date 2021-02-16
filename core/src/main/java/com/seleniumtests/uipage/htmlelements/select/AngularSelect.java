@@ -58,11 +58,11 @@ public abstract class AngularSelect extends CommonSelectList {
 	
 	protected boolean debug = false;
 	
-	public AngularSelect(WebElement parentElement, FrameElement frameElement) {
+	protected AngularSelect(WebElement parentElement, FrameElement frameElement) {
 		super(parentElement, frameElement);
 	}
 	
-	public AngularSelect(WebElement parentElement, FrameElement frameElement, boolean debug) {
+	protected AngularSelect(WebElement parentElement, FrameElement frameElement, boolean debug) {
 		super(parentElement, frameElement);
 		this.debug = debug;
 	}

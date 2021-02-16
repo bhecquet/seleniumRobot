@@ -150,7 +150,8 @@ public class ScreenZone extends GenericPictureElement {
 	}
 	
 	/**
-	 * Replaced by sendKeys(int xOffset, int yOffset, final CharSequence text)
+	 * @deprecated Replaced by sendKeys(int xOffset, int yOffset, final CharSequence text)
+	 * 
 	 */
 	@Deprecated
 	public void sendKeys(final CharSequence text, int xOffset, int yOffset) {

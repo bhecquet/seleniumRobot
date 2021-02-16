@@ -112,7 +112,7 @@ public class Entity {
 		return finalJson;
 	}
 	
-	protected static JSONObject getJSonResponse(HttpRequest request) {
+	protected static JSONObject getJSonResponse(HttpRequest<?> request) {
 
 		HttpResponse<JsonNode> response = request.asJson();
 		

@@ -138,16 +138,7 @@ public class DriverConfig {
     }
 
     public String getFirefoxProfilePath() {
-//        if (testContext.getFirefoxUserProfilePath() == null && getClass().getResource("/profiles/customProfileDirCUSTFF") != null) {
-//
-//            try {
-//                return getClass().getResource("/profiles/customProfileDirCUSTFF").toURI().getPath();
-//            } catch (URISyntaxException e) {
-//                throw new DriverExceptions(e.getMessage());
-//            }
-//        } else {
-            return testContext.getFirefoxUserProfilePath();
-//        }
+        return testContext.getFirefoxUserProfilePath();
     }
     
     public String getChromeProfilePath() {

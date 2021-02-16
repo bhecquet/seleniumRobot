@@ -28,7 +28,7 @@ public abstract class ICapabilitiesFactory {
 	protected static final Logger logger = SeleniumRobotLogger.getLogger(AbstractWebDriverFactory.class);
 	protected DriverConfig webDriverConfig;
     
-    public ICapabilitiesFactory(DriverConfig webDriverConfig) {
+    protected ICapabilitiesFactory(DriverConfig webDriverConfig) {
     	this.webDriverConfig = webDriverConfig;
     }
 

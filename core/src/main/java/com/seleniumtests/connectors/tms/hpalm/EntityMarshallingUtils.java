@@ -64,9 +64,10 @@ public class EntityMarshallingUtils {
 	 * @param o
 	 *            the instance containing the data to serialize
 	 * @return a string representation of the data.
+	 * @throws JAXBException 
 	 * @throws Exception
 	 */
-	public static <T> String unmarshal(Class<T> c, Object o) throws Exception {
+	public static <T> String unmarshal(Class<T> c, Object o) throws JAXBException {
 		JAXBContext ctx = JAXBContext.newInstance(c);
 		Marshaller marshaller = ctx.createMarshaller();
 		StringWriter entityXml = new StringWriter();

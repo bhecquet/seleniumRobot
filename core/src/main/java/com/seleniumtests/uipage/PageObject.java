@@ -1249,6 +1249,7 @@ public class PageObject extends BasePage implements IPage {
 		return (T)this;
 	}
 
+	@SuppressWarnings("unchecked")
 	@GenericStep
 	public <T extends PageObject> T clear(String fieldName) {
 		Element element = getElement(fieldName);
@@ -1260,6 +1261,7 @@ public class PageObject extends BasePage implements IPage {
 		return (T)this;
 	}
 
+	@SuppressWarnings("unchecked")
 	@GenericStep
     public <T extends PageObject> T selectOption(String fieldName, String value) {
 		Element element = getElement(fieldName);
@@ -1271,6 +1273,7 @@ public class PageObject extends BasePage implements IPage {
 		return (T)this;
     }
 
+	@SuppressWarnings("unchecked")
 	@GenericStep
 	public <T extends PageObject> T click(String fieldName) {
 		Element element = getElement(fieldName);
@@ -1739,7 +1742,7 @@ public class PageObject extends BasePage implements IPage {
 
 	@GenericStep
     public void assertHtmlSource(String text) {
-        Assert.assertTrue(getHtmlSource().contains(text), "Text: {" + text + "} not found on page source.");
+        Assert.assertTrue(getHtmlSource().contains(text), String.format("Text: {%s} not found on page source.", text));
     }
 
 	
@@ -1749,7 +1752,7 @@ public class PageObject extends BasePage implements IPage {
 	 */
     @Deprecated
     public void assertKeywordNotPresent(String text) {
-        Assert.assertFalse(getHtmlSource().contains(text), "Text: {" + text + "} not found on page source.");
+        Assert.assertFalse(getHtmlSource().contains(text), String.format("Text: {%s} not found on page source.", text));
     }
 
 	@GenericStep
@@ -1763,7 +1766,7 @@ public class PageObject extends BasePage implements IPage {
 	 */
     @Deprecated
     public void assertTitle(final String text) {
-        Assert.assertTrue(getTitle().contains(text), "Text: {" + text + "} not found on page title.");
+        Assert.assertTrue(getTitle().contains(text), String.format("Text: {%s} not found on page title.", text));
     }
 	
 

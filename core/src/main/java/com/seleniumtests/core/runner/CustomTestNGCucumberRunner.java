@@ -82,12 +82,12 @@ public class CustomTestNGCucumberRunner {
         String cucumberOptions = "";
         String tagList = SeleniumTestsContextManager.getThreadContext().getCucumberTags();
         if (tagList != null && !"".equals(tagList)) {
-        	String tagsOptions = " ";
+        	StringBuilder tagsOptions = new StringBuilder(" ");
         	for (String tags: tagList.split("AND")) {
-        		tagsOptions += String.format("--tags %s ", tags.trim());
+        		tagsOptions.append(String.format("--tags %s ", tags.trim()));
         	}
         	
-        	cucumberOptions += tagsOptions;    	
+        	cucumberOptions += tagsOptions.toString();    	
         }
         
         // add cucumber implementation classes
@@ -132,7 +132,7 @@ public class CustomTestNGCucumberRunner {
         // filter features requested for execution
         List<String> testList = SeleniumTestsContextManager.getThreadContext().getCucumberTests();
         
-        selectedFeatures = selectFeatures(allFeatures, selectedFeatures, testList);
+        selectFeatures(allFeatures, selectedFeatures, testList);
         
         
         if (selectedFeatures.isEmpty()) {
@@ -143,7 +143,7 @@ public class CustomTestNGCucumberRunner {
         		
         		List<CucumberTagStatement> selectedScenarios = new ArrayList<>();
         		
-        		selectedScenarios = selectSenario(feature, testList, selectedScenarios);
+        		selectSenario(feature, testList, selectedScenarios);
             				
         		feature.getFeatureElements().removeAll(feature.getFeatureElements());
         		feature.getFeatureElements().addAll(selectedScenarios);
@@ -249,7 +249,7 @@ public class CustomTestNGCucumberRunner {
         	// get scenario / scenario outline
         	for (CucumberTagStatement cucumberTagStatement : feature.getFeatureElements()) {
                 
-        		scenarioList = getScenarioWrapper(cucumberTagStatement, scenarioList);
+        		getScenarioWrapper(cucumberTagStatement, scenarioList);
             }
        }
         

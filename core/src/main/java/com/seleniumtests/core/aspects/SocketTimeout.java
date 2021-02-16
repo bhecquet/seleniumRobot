@@ -52,7 +52,7 @@ public class SocketTimeout {
 	 * @throws IllegalAccessException
 	 */
 	@After("initialization(org.openqa.selenium.remote.HttpCommandExecutor.new (..))")
-	public void changeTimeout2(JoinPoint joinPoint) throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
+	public void changeTimeout2(JoinPoint joinPoint) throws NoSuchFieldException, IllegalAccessException {
 
 		HttpCommandExecutor commandExecutor = (HttpCommandExecutor)joinPoint.getThis();
 		
@@ -73,7 +73,7 @@ public class SocketTimeout {
 		
 		logger.info("Socket timeout for driver communication updated");
 		
-		socketTimeoutUpdated = true;
+		SocketTimeout.socketTimeoutUpdated = true;
 	}
 
 	public static boolean isSocketTimeoutUpdated() {

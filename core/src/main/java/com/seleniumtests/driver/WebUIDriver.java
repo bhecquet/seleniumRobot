@@ -89,7 +89,7 @@ public class WebUIDriver {
     private DriverConfig config;
     private WebDriver driver;
     private IWebDriverFactory webDriverBuilder;
-    private final static Object createDriverLock = new Object();
+    private static final Object createDriverLock = new Object();
 
     public WebUIDriver(String name) {
     	if (SeleniumTestsContextManager.getThreadContext() == null) {
@@ -109,37 +109,7 @@ public class WebUIDriver {
      */
 	public WebDriver createRemoteWebDriver()  {
         
-        if (config.getMode() == DriverMode.GRID) {
-            webDriverBuilder = new SeleniumGridDriverFactory(this.config);
-        } else if (config.getMode() == DriverMode.SAUCELABS) {
-        	webDriverBuilder = new SauceLabsDriverFactory(this.config);
-        } else if (config.getMode() == DriverMode.BROWSERSTACK) {
-        	webDriverBuilder = new BrowserStackDriverFactory(this.config);
-        
-        	
-        // local mode
-        } else {
-        	if (config.getTestType().isMobile()) {
-        		webDriverBuilder = new AppiumDriverFactory(this.config);
-        	} else {
-        		
-	            if (config.getBrowserType() == BrowserType.FIREFOX) {
-	                webDriverBuilder = new FirefoxDriverFactory(this.config);
-	            } else if (config.getBrowserType() == BrowserType.INTERNET_EXPLORER) {
-	                webDriverBuilder = new IEDriverFactory(this.config);
-	            } else if (config.getBrowserType() == BrowserType.EDGE) {
-	            	webDriverBuilder = new EdgeDriverFactory(this.config);
-	            } else if (config.getBrowserType() == BrowserType.CHROME) {
-	                webDriverBuilder = new ChromeDriverFactory(this.config);
-	            } else if (config.getBrowserType() == BrowserType.HTMLUNIT) {
-	                webDriverBuilder = new HtmlUnitDriverFactory(this.config);
-	            } else if (config.getBrowserType() == BrowserType.SAFARI) {
-	                webDriverBuilder = new SafariDriverFactory(this.config);
-	            } else {
-	                throw new DriverExceptions("Unsupported browser: " + config.getBrowserType().toString());
-	            }
-        	}
-        }
+		webDriverBuilder = getWebDriverBuilderFactory();
         
         logger.info("driver mode: "+ config.getMode());
 
@@ -219,6 +189,43 @@ public class WebUIDriver {
         return driver;
     }
 
+	/**
+	 * Get the driver factory according to run mode and driver
+	 */
+	private IWebDriverFactory getWebDriverBuilderFactory() {
+		if (config.getMode() == DriverMode.GRID) {
+            return new SeleniumGridDriverFactory(this.config);
+        } else if (config.getMode() == DriverMode.SAUCELABS) {
+        	return new SauceLabsDriverFactory(this.config);
+        } else if (config.getMode() == DriverMode.BROWSERSTACK) {
+        	return new BrowserStackDriverFactory(this.config);
+        
+        	
+        // local mode
+        } else {
+        	if (config.getTestType().isMobile()) {
+        		return new AppiumDriverFactory(this.config);
+        	} else {
+        		
+	            if (config.getBrowserType() == BrowserType.FIREFOX) {
+	                return new FirefoxDriverFactory(this.config);
+	            } else if (config.getBrowserType() == BrowserType.INTERNET_EXPLORER) {
+	                return new IEDriverFactory(this.config);
+	            } else if (config.getBrowserType() == BrowserType.EDGE) {
+	            	return new EdgeDriverFactory(this.config);
+	            } else if (config.getBrowserType() == BrowserType.CHROME) {
+	                return new ChromeDriverFactory(this.config);
+	            } else if (config.getBrowserType() == BrowserType.HTMLUNIT) {
+	                return new HtmlUnitDriverFactory(this.config);
+	            } else if (config.getBrowserType() == BrowserType.SAFARI) {
+	                return new SafariDriverFactory(this.config);
+	            } else {
+	                throw new DriverExceptions("Unsupported browser: " + config.getBrowserType().toString());
+	            }
+        	}
+        }
+	}
+
     /**
      * Clean all WebUIDriver for this thread
      */
@@ -245,15 +252,15 @@ public class WebUIDriver {
      */
  
     public static File logFinalDriversState() {
-    	if (uxDriverSession.get() == null) {
-    		return null;
+    	if (uxDriverSession.get() != null) {
+    		for (WebUIDriver webuiDriver: uxDriverSession.get().values()) {
+        		if (webuiDriver != null) {
+        			webuiDriver.logFinalDriverState();
+        		}
+        	}
     	}
     	
-    	for (WebUIDriver webuiDriver: uxDriverSession.get().values()) {
-    		if (webuiDriver != null) {
-    			webuiDriver.logFinalDriverState();
-    		}
-    	}
+    	// kept for compatibility
     	return null;
 
     }
@@ -271,7 +278,7 @@ public class WebUIDriver {
 
 			} catch (IOException e) {
 				logger.error("cannot attach video capture", e);
-			} catch (Throwable e) {
+			} catch (Exception e) {
 				logger.error("Error stopping video capture: " + e.getMessage());
 			} finally {
 				videoRecorder.remove();
@@ -329,18 +336,10 @@ public class WebUIDriver {
     		// write logs
     		try {
         		for (String logType: driver.manage().logs().getAvailableLogTypes()) {
-
-        			PrintWriter writer;
-					try {
-						writer = new PrintWriter(Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), String.format("driver-log-%s.txt", logType)).toFile().getAbsolutePath(), "UTF-8");
-						for (LogEntry line: driver.manage().logs().get(logType).getAll()) {
-	        				writer.println(line.toString());
-	        			}
-	        			writer.close();
-					} catch (FileNotFoundException | UnsupportedEncodingException e) {
-					}
+					retrieveLogs(logType);
         		}
             } catch (Exception e) {
+            	// ignore error when driver is down
             }
     		
     		
@@ -371,7 +370,7 @@ public class WebUIDriver {
 	        if (config.getBrowserMobProxy() != null) {
 	        	config.getBrowserMobProxy().endHar();
 			}
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			logger.error("Error stopping browsermob proxy: " + e.getMessage());
 		} finally {
 			config.setBrowserMobProxy(null);
@@ -381,6 +380,22 @@ public class WebUIDriver {
 		stopVideoCapture();
 		
     }
+
+	/**
+	 * @param logType
+	 */
+	private void retrieveLogs(String logType) {
+		try (PrintWriter writer = new PrintWriter(Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory(), 
+																		String.format("driver-log-%s.txt", logType)).toFile().getAbsolutePath(),
+												"UTF-8")) {
+			
+			for (LogEntry line: driver.manage().logs().get(logType).getAll()) {
+				writer.println(line.toString());
+			}
+		} catch (FileNotFoundException | UnsupportedEncodingException e) {
+			// ignore errors
+		}
+	}
     
     /**
      * dereference this WebUIDriver from the thread

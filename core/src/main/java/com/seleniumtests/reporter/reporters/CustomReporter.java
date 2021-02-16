@@ -81,7 +81,7 @@ public class CustomReporter extends CommonReporter implements IReporter {
 				consolidatedResults.put(FIELD_TOTAL, consolidatedResults.get(FIELD_TOTAL) + 1);
 				
 				// done in case it was null (issue #81)
-				SeleniumTestsContext testContext = SeleniumTestsContextManager.setThreadContextFromTestResult(entry.getKey(), getTestName(testResult), getClassName(testResult), testResult);
+				SeleniumTestsContext testContext = SeleniumTestsContextManager.setThreadContextFromTestResult(entry.getKey(), testResult);
 				
 
 				if (!TestNGResultUtils.isCustomReportCreated(testResult)) {

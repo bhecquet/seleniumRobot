@@ -299,7 +299,9 @@ public class LogAction {
 		} else if (targetName.contains("->")) {
 			try {
 				targetName = "Element located by" + targetName.split("->")[1].replace("]", "");
-			} catch (IndexOutOfBoundsException e) {}
+			} catch (IndexOutOfBoundsException e) {
+				// we should never go here
+			}
 		}
 		
 		return logAction(joinPoint, targetName);
@@ -393,15 +395,14 @@ public class LogAction {
 		
 		for (Annotation annotation: method.getAnnotations()) {
 			if ((annotation.annotationType().getCanonicalName().contains("cucumber.api.java.en") || annotation.annotationType().getCanonicalName().contains("cucumber.api.java.fr")) && SeleniumRobotTestPlan.isCucumberTest()) {
-				stepName = getAnnotationValue(annotation);
-				stepName += " " + argumentString;
+				stepName = getAnnotationValue(annotation) + " " + argumentString;
 				break;
 			} else if (annotation instanceof StepName) {
 				stepName = ((StepName)annotation).value();
 				
 				// replaces argument placeholders with values
 				for (Entry<String, String> entry: arguments.entrySet()) {
-					stepName = stepName.replaceAll(stepName.format("\\$\\{%s\\}",  entry.getKey()), entry.getValue().toString());
+					stepName = stepName.replaceAll(String.format("\\$\\{%s\\}",  entry.getKey()), entry.getValue());
 				}
 				break;
 			}

@@ -56,16 +56,4 @@ public class ButtonElement extends HtmlElement {
     public ButtonElement(final String label, final By by, final FrameElement frame, final Integer index, Integer replayTimeout) {
     	super(label, by, frame, index, replayTimeout);
     }
-
-    @Override
-    public void click() {
-
-        //BrowserType browser = WebUIDriver.getWebUIDriver(false).getConfig().getBrowserType();
-        // TODO: check if for some web site, send keys solve clicking problems
-//        if (browser == BrowserType.INTERNET_EXPLORER) {
-//            super.sendKeys(Keys.ENTER);
-//        } else {
-            super.click();
-//        }
-    }
 }

@@ -832,7 +832,7 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
 				driver.switchTo().window(handle);
 				driver.close();
 			}
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			// nothing to do
 		}
 		
