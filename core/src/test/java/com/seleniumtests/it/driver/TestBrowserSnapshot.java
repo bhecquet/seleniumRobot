@@ -213,8 +213,7 @@ public class TestBrowserSnapshot extends GenericMultiBrowserTest {
 		driver.switchTo().frame(DriverTestPage.iframe.getElement());
 		
 		// get real capture
-		String origFilePath = generateCaptureFilePath();
-		
+		generateCaptureFilePath();
 
 		CustomEventFiringWebDriver mockedDriver = (CustomEventFiringWebDriver) spy(driver);
 		ScreenshotUtil screenshotUtil = spy(new ScreenshotUtil(mockedDriver));
@@ -237,8 +236,7 @@ public class TestBrowserSnapshot extends GenericMultiBrowserTest {
 		driver.switchTo().frame(DriverTestPage.iframe.getElement());
 		
 		// get real capture
-		String origFilePath = generateCaptureFilePath();
-		
+		generateCaptureFilePath();
 		
 		CustomEventFiringWebDriver mockedDriver = (CustomEventFiringWebDriver) spy(driver);
 		ScreenshotUtil screenshotUtil = spy(new ScreenshotUtil(mockedDriver));
@@ -268,9 +266,9 @@ public class TestBrowserSnapshot extends GenericMultiBrowserTest {
 		int[] headerFooter = getHeaderAndFooterPixels(new File(filePath));
 		
 		// header should have been removed, not footer
-		Assert.assertEquals(0, headerFooter[0]);
-		Assert.assertEquals(5, headerFooter[1]);
-		Assert.assertEquals(2, headerFooter[2]); 
+		Assert.assertEquals(headerFooter[0], 0);
+		Assert.assertEquals(headerFooter[1], 5);
+		Assert.assertEquals(headerFooter[2], 2); 
 	}
 	
 	/**
@@ -308,9 +306,9 @@ public class TestBrowserSnapshot extends GenericMultiBrowserTest {
 		int[] headerFooter = getHeaderAndFooterPixels(new File(filePath));
 		
 		// header should have been removed, not footer
-		Assert.assertEquals(6, headerFooter[0]);
-		Assert.assertEquals(0, headerFooter[1]);
-		Assert.assertEquals(2, headerFooter[2]); 
+		Assert.assertEquals(headerFooter[0], 6);
+		Assert.assertEquals(headerFooter[1], 0);
+		Assert.assertEquals(headerFooter[2], 2); 
 	}
 	
 	/**
@@ -330,9 +328,9 @@ public class TestBrowserSnapshot extends GenericMultiBrowserTest {
 		int[] headerFooter = getHeaderAndFooterPixels(new File(filePath));
 		
 		// header should have been removed, not footer
-		Assert.assertEquals(0, headerFooter[0]);
-		Assert.assertEquals(0, headerFooter[1]);
-		Assert.assertEquals(2, headerFooter[2]); 
+		Assert.assertEquals(headerFooter[0], 0);
+		Assert.assertEquals(headerFooter[1], 0);
+		Assert.assertEquals(headerFooter[2], 2); 
 	}
 	
 	/**
@@ -382,8 +380,8 @@ public class TestBrowserSnapshot extends GenericMultiBrowserTest {
 		int[] headerFooterFull = getHeaderAndFooterPixels(imageFull);
 		
 		// header and footer should have been removed
-		Assert.assertEquals(6, headerFooter[0]);
-		Assert.assertEquals(5, headerFooter[1]);
+		Assert.assertEquals(headerFooter[0], 6);
+		Assert.assertEquals(headerFooter[1], 5);
 		Assert.assertTrue(headerFooter[2] >= headerFooterFull[2]); // depending on browser window size (depends on OS) image is split in more or less sections
 		Assert.assertEquals(ImageIO.read(image).getHeight(), ImageIO.read(imageFull).getHeight());
 	}
@@ -407,11 +405,10 @@ public class TestBrowserSnapshot extends GenericMultiBrowserTest {
 		File image = new ScreenshotUtil(driver).capture(SnapshotTarget.PAGE, File.class);
 		
 		int[] headerFooter = getHeaderAndFooterPixels(image);
-		int[] headerFooterFull = getHeaderAndFooterPixels(imageFull);
 		
 		// header and footer should have been removed
-		Assert.assertEquals(6, headerFooter[0]);
-		Assert.assertEquals(5, headerFooter[1]);
+		Assert.assertEquals(headerFooter[0], 6);
+		Assert.assertEquals(headerFooter[1], 5);
 		Assert.assertEquals(headerFooter[2], 2); // with automatic cropping, all fixed lines are removed, even green and red ones. Only remains the first top and last bottom one
 		Assert.assertEquals(ImageIO.read(image).getHeight(), ImageIO.read(imageFull).getHeight());
 	}

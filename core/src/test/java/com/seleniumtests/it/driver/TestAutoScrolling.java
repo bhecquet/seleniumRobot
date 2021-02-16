@@ -26,7 +26,7 @@ public class TestAutoScrolling extends GenericMultiBrowserTest {
 			return;
 		}
 		DriverScrollingTestPage.resetButton.click();
-		Assert.assertEquals("", DriverScrollingTestPage.textElement.getValue());
+		Assert.assertEquals(DriverScrollingTestPage.textElement.getValue(), "");
 	}
 	
 	/**

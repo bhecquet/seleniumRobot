@@ -270,21 +270,27 @@ public class TestLogActions extends GenericTest {
 		Assert.assertEquals(subSubStep.getName(), "doNothing ");
 	}
 	
+
+	private void testPassword(boolean maskPassword, String password, String expectedPass) throws IOException {
+		SeleniumTestsContextManager.getThreadContext().setMaskPassword(maskPassword);
+		new CalcPage()
+		.connect("login", password);
+		
+		List<TestStep> steps = SeleniumTestsContextManager.getThreadContext().getTestStepManager().getTestSteps();
+		Assert.assertEquals(steps.size(), 2);
+		Assert.assertEquals(steps.get(0).getName(), "openPage with args: (null, )");
+		Assert.assertEquals(steps.get(1).getName(), String.format("connect with args: (login, %s, )", expectedPass));
+	}
+	
 	/**
 	 * Check password replacement not done when not requested
 	 * @throws IOException
 	 */
 	@Test(groups={"it"})
 	public void testPasswordNoReplacement() throws IOException {
-		SeleniumTestsContextManager.getThreadContext().setMaskPassword(false);
-		new CalcPage()
-				.connect("login", "somePassToConnect");
-
-		List<TestStep> steps = SeleniumTestsContextManager.getThreadContext().getTestStepManager().getTestSteps();
-		Assert.assertEquals(steps.size(), 2);
-		Assert.assertEquals(steps.get(0).getName(), "openPage with args: (null, )");
-		Assert.assertEquals(steps.get(1).getName(), "connect with args: (login, somePassToConnect, )");
+		testPassword(false, "somePassToConnect", "somePassToConnect");
 	}
+	
 	
 	/**
 	 * Check password replacement done when requested by start option
@@ -292,14 +298,7 @@ public class TestLogActions extends GenericTest {
 	 */
 	@Test(groups={"it"})
 	public void testPasswordReplacement() throws IOException {
-		SeleniumTestsContextManager.getThreadContext().setMaskPassword(true);
-		new CalcPage()
-			.connect("login", "somePassToConnect");
-
-		List<TestStep> steps = SeleniumTestsContextManager.getThreadContext().getTestStepManager().getTestSteps();
-		Assert.assertEquals(steps.size(), 2);
-		Assert.assertEquals(steps.get(0).getName(), "openPage with args: (null, )");
-		Assert.assertEquals(steps.get(1).getName(), "connect with args: (login, ******, )");
+		testPassword(true, "somePassToConnect", "******");
 	}
 	
 	/**
@@ -308,13 +307,6 @@ public class TestLogActions extends GenericTest {
 	 */
 	@Test(groups={"it"})
 	public void testNullPasswordReplacement() throws IOException {
-		SeleniumTestsContextManager.getThreadContext().setMaskPassword(true);
-		new CalcPage()
-		.connect("login", null);
-
-		List<TestStep> steps = SeleniumTestsContextManager.getThreadContext().getTestStepManager().getTestSteps();
-		Assert.assertEquals(steps.size(), 2);
-		Assert.assertEquals(steps.get(0).getName(), "openPage with args: (null, )");
-		Assert.assertEquals(steps.get(1).getName(), "connect with args: (login, null, )");
+		testPassword(true, null, "null");
 	}
 }

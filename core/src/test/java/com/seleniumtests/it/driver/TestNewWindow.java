@@ -50,7 +50,7 @@ public class TestNewWindow  extends GenericMultiBrowserTest {
 		
 			// go to new opened window
 			mainHandle = testPage.selectNewWindow();
-			Assert.assertEquals("a value", driver.findElement(By.id("textInIFrameWithValue")).getAttribute("value"));
+			Assert.assertEquals(driver.findElement(By.id("textInIFrameWithValue")).getAttribute("value"), "a value");
 		} finally {
 			// go back to main window
 			if (driver.getWindowHandles().size() > 1) {
