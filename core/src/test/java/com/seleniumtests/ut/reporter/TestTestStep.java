@@ -386,21 +386,21 @@ public class TestTestStep extends GenericTest {
 	public void testTestStepEncodeHtml() {
 		TestStep step = new TestStep("step1 \"'<>&\u0192", null, new ArrayList<>(), true);
 		TestStep encodedTestStep = step.encode("html");
-		Assert.assertEquals("Step step1 &quot;'&lt;&gt;&amp;&fnof;", encodedTestStep.toString());
+		Assert.assertEquals(encodedTestStep.toString(), "Step step1 &quot;'&lt;&gt;&amp;&fnof;");
 	}
 
 	@Test(groups = { "ut" })
 	public void testTestStepEncodeJson() {
 		TestStep step = new TestStep("step1 \"/\\", null, new ArrayList<>(), true);
 		TestStep encodedTestStep = step.encode("json");
-		Assert.assertEquals("Step step1 \\\"\\/\\\\", encodedTestStep.toString());
+		Assert.assertEquals(encodedTestStep.toString(), "Step step1 \\\"\\/\\\\");
 	}
 
 	@Test(groups = { "ut" })
 	public void testTestStepEncodeXml() {
 		TestStep step = new TestStep("step1 \"'<>&", null, new ArrayList<>(), true);
 		TestStep encodedTestStep = step.encode("xml");
-		Assert.assertEquals("Step step1 &quot;&apos;&lt;&gt;&amp;", encodedTestStep.toString());
+		Assert.assertEquals(encodedTestStep.toString(), "Step step1 &quot;&apos;&lt;&gt;&amp;");
 	}
 
 	/**
@@ -456,7 +456,7 @@ public class TestTestStep extends GenericTest {
 	public void testTestMessageEncodeXml() {
 		TestMessage msg = new TestMessage("everything OK \"'<>&", MessageType.INFO);
 		TestMessage encodedMsg = msg.encode("xml");
-		Assert.assertEquals("everything OK &quot;&apos;&lt;&gt;&amp;", encodedMsg.toString());
+		Assert.assertEquals(encodedMsg.toString(), "everything OK &quot;&apos;&lt;&gt;&amp;");
 	}
 
 	@Test(groups = { "ut" })
@@ -478,7 +478,7 @@ public class TestTestStep extends GenericTest {
 	public void testTestActionEncodeXml() {
 		TestAction action = new TestAction("action2 \"'<>&", false, new ArrayList<>());
 		TestAction encodedAction = action.encode("xml");
-		Assert.assertEquals("action2 &quot;&apos;&lt;&gt;&amp;", encodedAction.toString());
+		Assert.assertEquals(encodedAction.toString(), "action2 &quot;&apos;&lt;&gt;&amp;");
 	}
 
 	@Test(groups = { "ut" })
@@ -507,9 +507,9 @@ public class TestTestStep extends GenericTest {
 	public void testTestValueEncodeXml() {
 		TestValue value = new TestValue("id &", "key <>", "value \"'");
 		TestValue encodedValue = value.encode("xml");
-		Assert.assertEquals("id &amp;", encodedValue.toString());
-		Assert.assertEquals("key &lt;&gt;", encodedValue.getMessage());
-		Assert.assertEquals("value &quot;&apos;", encodedValue.getValue());
+		Assert.assertEquals(encodedValue.toString(), "id &amp;");
+		Assert.assertEquals(encodedValue.getMessage(), "key &lt;&gt;");
+		Assert.assertEquals(encodedValue.getValue(), "value &quot;&apos;");
 	}
 
 	/**
@@ -521,14 +521,14 @@ public class TestTestStep extends GenericTest {
 		TestStep step = new TestStep("step1 \"'<>&", null, new ArrayList<>(), true);
 		TestStep encodedTestStep = step.encode("xml");
 		TestStep encodedTestStep2 = encodedTestStep.encode("xml");
-		Assert.assertEquals("Step step1 &quot;&apos;&lt;&gt;&amp;", encodedTestStep2.toString());
+		Assert.assertEquals(encodedTestStep2.toString(), "Step step1 &quot;&apos;&lt;&gt;&amp;");
 	}
 
 	@Test(groups = { "ut" })
 	public void testTestStepNoReEncodeJson() {
 		TestStep step = new TestStep("step1 \"/\\", null, new ArrayList<>(), true);
 		TestStep encodedTestStep = step.encode("json");
-		Assert.assertEquals("step1 \\\"\\/\\\\", encodedTestStep.toJson().getString("name"));
+		Assert.assertEquals(encodedTestStep.toJson().getString("name"), "step1 \\\"\\/\\\\");
 	}
 
 	/**
@@ -694,7 +694,7 @@ public class TestTestStep extends GenericTest {
 		Assert.assertEquals(message.getName(), "everything OK on passwd");
 		Assert.assertEquals(substep.getName(), "substep with args: (passwd)");
 	}
-
+	
 	/**
 	 * Check that password masking does not work with empty strings
 	 */

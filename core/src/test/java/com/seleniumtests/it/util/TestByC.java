@@ -71,28 +71,29 @@ public class TestByC extends GenericTest {
 		DriverTestPage.textSelectedText.clear();
 	}
 	
-	@Test(groups={"it"})
-	public void testFindElementByLabelForward() {
-		new TextFieldElement("", ByC.labelForward("By id forward", "input")).sendKeys("element found by label");
+	public void testFindElementByLabelForward(String labelToSearch) {
+		new TextFieldElement("", ByC.labelForward(labelToSearch, "input")).sendKeys("element found by label");
 		Assert.assertEquals(DriverTestPage.textSelectedId.getValue(), "element found by label");
+	}
+	
+	@Test(groups={"it"})
+	public void testFindElementByLabelForwardTotal() {
+		testFindElementByLabelForward("By id forward");
 	}
 
 	@Test(groups={"it"})
 	public void testFindElementByByLabelForwardContaining() { 
-		new TextFieldElement("", ByC.labelForward("y id for*", "input")).sendKeys("element found by label");
-		Assert.assertEquals(DriverTestPage.textSelectedId.getValue(), "element found by label");
+		testFindElementByLabelForward("y id for*");
 	}
 	
 	@Test(groups={"it"})
-	public void testFindElementByByLabelForwardStarting() { 
-		new TextFieldElement("", ByC.labelForward("By id for^", "input")).sendKeys("element found by label");
-		Assert.assertEquals(DriverTestPage.textSelectedId.getValue(), "element found by label");
+	public void testFindElementByByLabelForwardStarting() {
+		testFindElementByLabelForward("By id for^");
 	}
 	
 	@Test(groups={"it"})
 	public void testFindElementByByLabelForwardEnding() { 
-		new TextFieldElement("", ByC.labelForward(" id forward$", "input")).sendKeys("element found by label");
-		Assert.assertEquals(DriverTestPage.textSelectedId.getValue(), "element found by label");
+		testFindElementByLabelForward(" id forward$");
 	}
 	
 	@Test(groups={"it"})

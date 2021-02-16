@@ -99,7 +99,7 @@ public class TestDriver extends GenericMultiBrowserTest {
 			driver.switchTo().alert().accept();
 		} finally {
 			DriverTestPage.resetButton.click();
-			Assert.assertEquals("", DriverTestPage.textElement.getValue());
+			Assert.assertEquals(DriverTestPage.textElement.getValue(), "");
 		}
 	}
 	
@@ -126,10 +126,10 @@ public class TestDriver extends GenericMultiBrowserTest {
 	public void testClickDiv() {
 		try {
 			DriverTestPage.redSquare.click();
-			Assert.assertEquals("coucou", DriverTestPage.textElement.getValue());
+			Assert.assertEquals(DriverTestPage.textElement.getValue(), "coucou");
 		} finally {
 			DriverTestPage.resetButton.click();
-			Assert.assertEquals("", DriverTestPage.textElement.getValue());
+			Assert.assertEquals(DriverTestPage.textElement.getValue(), "");
 		}
 	}
 
@@ -145,7 +145,7 @@ public class TestDriver extends GenericMultiBrowserTest {
 			Assert.assertEquals(DriverTestPage.textElement.getValue(), "double coucou");
 		} finally {
 			DriverTestPage.resetButton.click();
-			Assert.assertEquals("", DriverTestPage.textElement.getValue());
+			Assert.assertEquals( DriverTestPage.textElement.getValue(), "");
 		}
 	}
    
@@ -176,10 +176,10 @@ public class TestDriver extends GenericMultiBrowserTest {
 	public void testClickJsDiv() {
 		try {
 			DriverTestPage.redSquare.simulateClick();
-			Assert.assertEquals("coucou", DriverTestPage.textElement.getValue());
+			Assert.assertEquals(DriverTestPage.textElement.getValue(), "coucou");
 		} finally {
 			DriverTestPage.resetButton.click();
-			Assert.assertEquals("", DriverTestPage.textElement.getValue());
+			Assert.assertEquals(DriverTestPage.textElement.getValue(), "");
 		}
 	}
    
@@ -213,7 +213,7 @@ public class TestDriver extends GenericMultiBrowserTest {
 			Assert.assertEquals(DriverTestPage.textElement.getValue(), "coucou");
 		} finally {
 			DriverTestPage.resetButton.click();
-			Assert.assertEquals("", DriverTestPage.textElement.getValue());
+			Assert.assertEquals(DriverTestPage.textElement.getValue(), "");
 		}
 	}
 	
@@ -224,7 +224,7 @@ public class TestDriver extends GenericMultiBrowserTest {
 			Assert.assertEquals(DriverTestPage.textElement.getValue(), "double coucou");
 		} finally {
 			DriverTestPage.resetButton.click();
-			Assert.assertEquals("", DriverTestPage.textElement.getValue());
+			Assert.assertEquals(DriverTestPage.textElement.getValue(), "");
 		}
 	}
 	
@@ -855,7 +855,7 @@ public class TestDriver extends GenericMultiBrowserTest {
 			Assert.assertEquals(DriverTestPage.textElement.getValue(), "greenbox");
 		} finally {
 			DriverTestPage.resetButton.click();
-			Assert.assertEquals("", DriverTestPage.textElement.getValue());
+			Assert.assertEquals(DriverTestPage.textElement.getValue(), "");
 		}
 	}
 	
@@ -867,10 +867,10 @@ public class TestDriver extends GenericMultiBrowserTest {
 		try {
 			DriverTestPage.bigFooterButton.click();
 			DriverTestPage.bottomSquare.click();
-			Assert.assertEquals("coucou bottom", DriverTestPage.textElement.getValue());
+			Assert.assertEquals(DriverTestPage.textElement.getValue(), "coucou bottom");
 		} finally {
 			DriverTestPage.resetButton.click();
-			Assert.assertEquals("", DriverTestPage.textElement.getValue());
+			Assert.assertEquals(DriverTestPage.textElement.getValue(), "");
 		}
 	}
 	

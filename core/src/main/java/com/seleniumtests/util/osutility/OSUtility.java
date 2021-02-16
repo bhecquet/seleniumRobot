@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -342,9 +343,9 @@ public abstract class OSUtility {
     public List<BrowserType> getInstalledBrowsers() {
     	List<BrowserType> browsers = new ArrayList<>();
     	Map<BrowserType, List<BrowserInfo>> installedBrowsers = getInstalledBrowsersWithVersion();
-    	for (BrowserType bType: installedBrowsers.keySet()) {
-    		if (!installedBrowsers.get(bType).isEmpty()) {
-    			browsers.add(bType);
+    	for (Entry<BrowserType, List<BrowserInfo>> bTypeEntry: installedBrowsers.entrySet()) {
+    		if (!bTypeEntry.getValue().isEmpty()) {
+    			browsers.add(bTypeEntry.getKey());
     		}
     	}
     	return browsers;

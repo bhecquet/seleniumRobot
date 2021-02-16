@@ -102,6 +102,23 @@ public class TestArchiving extends ReporterTest {
 		}
 	}
 	
+	public void testArchiving(ITestContext testContext, String archiveOption, String testToExecute) throws Exception {
+		File tmpZip = File.createTempFile("archive", ".zip");
+		tmpZip.delete();
+		
+		try {
+			System.setProperty(SeleniumTestsContext.ARCHIVE_TO_FILE, tmpZip.getAbsolutePath());
+			System.setProperty(SeleniumTestsContext.ARCHIVE, archiveOption);
+			
+			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {testToExecute});
+			
+			Assert.assertTrue(tmpZip.exists());
+		} finally {
+			System.clearProperty(SeleniumTestsContext.ARCHIVE_TO_FILE);
+			System.clearProperty(SeleniumTestsContext.ARCHIVE);
+		}
+	}
+	
 	/**
 	 * Archive must be produced when on success and tests are OK
 	 * @param testContext
@@ -109,20 +126,7 @@ public class TestArchiving extends ReporterTest {
 	 */
 	@Test(groups={"it"})
 	public void testArchivingOnSuccessWithTestsOK(ITestContext testContext) throws Exception {
-		File tmpZip = File.createTempFile("archive", ".zip");
-		tmpZip.delete();
-		
-		try {
-			System.setProperty(SeleniumTestsContext.ARCHIVE_TO_FILE, tmpZip.getAbsolutePath());
-			System.setProperty(SeleniumTestsContext.ARCHIVE, "onSuccess");
-			
-			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions"});
-			
-			Assert.assertTrue(tmpZip.exists());
-		} finally {
-			System.clearProperty(SeleniumTestsContext.ARCHIVE_TO_FILE);
-			System.clearProperty(SeleniumTestsContext.ARCHIVE);
-		}
+		testArchiving(testContext, "onSuccess", "testAndSubActions");
 	}
 	
 	/**
@@ -132,20 +136,7 @@ public class TestArchiving extends ReporterTest {
 	 */
 	@Test(groups={"it"})
 	public void testArchivingOnSkipWithTestsSkipped(ITestContext testContext) throws Exception {
-		File tmpZip = File.createTempFile("archive", ".zip");
-		tmpZip.delete();
-		
-		try {
-			System.setProperty(SeleniumTestsContext.ARCHIVE_TO_FILE, tmpZip.getAbsolutePath());
-			System.setProperty(SeleniumTestsContext.ARCHIVE, "onSkip");
-			
-			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testSkipped"});
-			
-			Assert.assertTrue(tmpZip.exists());
-		} finally {
-			System.clearProperty(SeleniumTestsContext.ARCHIVE_TO_FILE);
-			System.clearProperty(SeleniumTestsContext.ARCHIVE);
-		}
+		testArchiving(testContext, "onSkip", "testSkipped");
 	}
 	
 	/**
@@ -155,20 +146,7 @@ public class TestArchiving extends ReporterTest {
 	 */
 	@Test(groups={"it"})
 	public void testArchivingOnSuccessOrOnErrorWithTestsOK(ITestContext testContext) throws Exception {
-		File tmpZip = File.createTempFile("archive", ".zip");
-		tmpZip.delete();
-		
-		try {
-			System.setProperty(SeleniumTestsContext.ARCHIVE_TO_FILE, tmpZip.getAbsolutePath());
-			System.setProperty(SeleniumTestsContext.ARCHIVE, "onError,onSuccess");
-			
-			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions"});
-			
-			Assert.assertTrue(tmpZip.exists());
-		} finally {
-			System.clearProperty(SeleniumTestsContext.ARCHIVE_TO_FILE);
-			System.clearProperty(SeleniumTestsContext.ARCHIVE);
-		}
+		testArchiving(testContext, "onError,onSuccess", "testAndSubActions");
 	}
 	
 	/**
@@ -178,20 +156,17 @@ public class TestArchiving extends ReporterTest {
 	 */
 	@Test(groups={"it"})
 	public void testArchivingOnSuccessOrOnErrorWithTestsKO(ITestContext testContext) throws Exception {
-		File tmpZip = File.createTempFile("archive", ".zip");
-		tmpZip.delete();
-		
-		try {
-			System.setProperty(SeleniumTestsContext.ARCHIVE_TO_FILE, tmpZip.getAbsolutePath());
-			System.setProperty(SeleniumTestsContext.ARCHIVE, "onError,onSuccess");
-			
-			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testInError"});
-			
-			Assert.assertTrue(tmpZip.exists());
-		} finally {
-			System.clearProperty(SeleniumTestsContext.ARCHIVE_TO_FILE);
-			System.clearProperty(SeleniumTestsContext.ARCHIVE);
-		}
+		testArchiving(testContext, "onError,onSuccess", "testInError");
+	}
+	
+	/**
+	 * Archive should be produced when on success and tests are KO
+	 * @param testContext
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testArchivingOnErrorWithTestsKO(ITestContext testContext) throws Exception {
+		testArchiving(testContext, "onError", "testInError");
 	}
 	
 	/**
@@ -238,29 +213,7 @@ public class TestArchiving extends ReporterTest {
 			System.clearProperty(SeleniumTestsContext.ARCHIVE);
 		}
 	}
-	
-	/**
-	 * Archive should be produced when on success and tests are KO
-	 * @param testContext
-	 * @throws Exception
-	 */
-	@Test(groups={"it"})
-	public void testArchivingOnErrorWithTestsKO(ITestContext testContext) throws Exception {
-		File tmpZip = File.createTempFile("archive", ".zip");
-		tmpZip.delete();
-		
-		try {
-			System.setProperty(SeleniumTestsContext.ARCHIVE_TO_FILE, tmpZip.getAbsolutePath());
-			System.setProperty(SeleniumTestsContext.ARCHIVE, "onError");
-			
-			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testInError"});
-			
-			Assert.assertTrue(tmpZip.exists());
-		} finally {
-			System.clearProperty(SeleniumTestsContext.ARCHIVE_TO_FILE);
-			System.clearProperty(SeleniumTestsContext.ARCHIVE);
-		}
-	}
+
 	
 	/**
 	 * Archive is not produced if file is not specified

@@ -44,10 +44,10 @@ public class TestUiActions extends GenericMultiBrowserTest {
 	public void testNewAction() {
 		try {
 			new Actions(((CustomEventFiringWebDriver)driver).getWebDriver()).moveToElement(driver.findElement(By.id("carre2"))).click().build().perform();
-			Assert.assertEquals("coucou", driver.findElement(By.id("text2")).getAttribute("value"));
+			Assert.assertEquals(driver.findElement(By.id("text2")).getAttribute("value"), "coucou");
 		} finally {
 			new Actions(driver).moveToElement(driver.findElement(By.id("button2"))).click().build().perform();
-			Assert.assertEquals("", driver.findElement(By.id("text2")).getAttribute("value"));
+			Assert.assertEquals(driver.findElement(By.id("text2")).getAttribute("value"), "");
 		}
 	}
 
@@ -59,10 +59,10 @@ public class TestUiActions extends GenericMultiBrowserTest {
 	public void testNewActionWithHtmlElement() throws Exception {
 		try {
 			new Actions(((CustomEventFiringWebDriver)driver).getWebDriver()).moveToElement(DriverTestPage.redSquare).click().build().perform();
-			Assert.assertEquals("coucou", driver.findElement(By.id("text2")).getAttribute("value"));
+			Assert.assertEquals(driver.findElement(By.id("text2")).getAttribute("value"), "coucou");
 		} finally {
 			new Actions(driver).moveToElement(driver.findElement(By.id("button2"))).click().build().perform();
-			Assert.assertEquals("", driver.findElement(By.id("text2")).getAttribute("value"));
+			Assert.assertEquals(driver.findElement(By.id("text2")).getAttribute("value"), "");
 		}
 	}
 
@@ -73,10 +73,10 @@ public class TestUiActions extends GenericMultiBrowserTest {
 	public void testMoveClick() {
 		try {
 			new Actions(driver).moveToElement(driver.findElement(By.id("carre2"))).click().build().perform();
-			Assert.assertEquals("coucou", driver.findElement(By.id("text2")).getAttribute("value"));
+			Assert.assertEquals(driver.findElement(By.id("text2")).getAttribute("value"), "coucou");
 		} finally {
 			new Actions(driver).moveToElement(driver.findElement(By.id("button2"))).click().build().perform();
-			Assert.assertEquals("", driver.findElement(By.id("text2")).getAttribute("value"));
+			Assert.assertEquals(driver.findElement(By.id("text2")).getAttribute("value"), "");
 		}
 	}
 	
@@ -84,7 +84,7 @@ public class TestUiActions extends GenericMultiBrowserTest {
 	public void testSendKeys() {
 		try {
 			new Actions(driver).moveToElement(driver.findElement(By.id("text2"))).click().sendKeys("youpi").build().perform();
-			Assert.assertEquals("youpi", driver.findElement(By.id("text2")).getAttribute("value"));
+			Assert.assertEquals(driver.findElement(By.id("text2")).getAttribute("value"), "youpi");
 		} finally {
 			driver.findElement(By.id("button2")).click();
 		}
@@ -94,7 +94,7 @@ public class TestUiActions extends GenericMultiBrowserTest {
 	public void testSendKeysWithHtmlElement() throws Exception {
 		try {
 			new Actions(driver).moveToElement(DriverTestPage.textElement).click().sendKeys("youpi2").build().perform();
-			Assert.assertEquals("youpi2", DriverTestPage.textElement.getAttribute("value"));
+			Assert.assertEquals(DriverTestPage.textElement.getAttribute("value"), "youpi2");
 		} finally {
 			driver.findElement(By.id("button2")).click();
 		}

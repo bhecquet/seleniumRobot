@@ -226,10 +226,12 @@ public class OSUtilityWindows extends OSUtility {
 				try {
 					browserList.get(BrowserType.FIREFOX).add(new BrowserInfo(BrowserType.FIREFOX, extractFirefoxVersion(version), firefoxPath));
 				} catch (ConfigurationException e) {
-					continue;
+					// ignore
 				}
 			}
-		} catch (IndexOutOfBoundsException e) {}
+		} catch (IndexOutOfBoundsException e) {
+			// ignore
+		}
 		
 		
 		// look for chrome
@@ -239,14 +241,11 @@ public class OSUtilityWindows extends OSUtility {
 			// main chrome version
 			String chromePath = Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Classes\\ChromeHTML\\shell\\open\\command", "");
 			chromePath = chromePath.split(EXE_EXT_QUOTE)[0].replace("\"", "") + ".exe";
-			String version;
-			try {
-				version = getChromeVersionFromRegistry();
-			} catch (Win32Exception e) {
-				version = getChromeVersionFromFolder(chromePath);
-			}
+			String version = getWindowsChromeVersion(chromePath);
 			browserList.get(BrowserType.CHROME).add(new BrowserInfo(BrowserType.CHROME, extractChromeVersion("Google Chrome " + version), chromePath));
-		} catch (Win32Exception | ConfigurationException e) {}
+		} catch (Win32Exception | ConfigurationException e) {
+			logger.warn("Error searching chrome installations: " + e.getMessage());
+		}
 			
 		if (discoverBetaBrowsers) {
 			try {
@@ -254,14 +253,12 @@ public class OSUtilityWindows extends OSUtility {
 				String chromeBetaPath = Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "Software\\Classes\\ChromeBHTML\\shell\\open\\command", "");
 				chromeBetaPath = chromeBetaPath.split(EXE_EXT_QUOTE)[0].replace("\"", "") + ".exe";
 				String versionBeta;
-				try {
-					versionBeta = getChromeBetaVersionFromRegistry();
-				} catch (Win32Exception e) {
-					versionBeta = getChromeVersionFromFolder(chromeBetaPath);
-				}
+				versionBeta = getWindowsBetaChromeVersion(chromeBetaPath);
 				browserList.get(BrowserType.CHROME).add(new BrowserInfo(BrowserType.CHROME, extractChromeVersion("Google Chrome " + versionBeta), chromeBetaPath));
 	
-			} catch (Win32Exception | ConfigurationException e) {}
+			} catch (Win32Exception | ConfigurationException e) {
+				logger.warn("Error searching Beta chrome installations: " + e.getMessage());
+			}
 		}
 		
 		// look for ie
@@ -270,27 +267,58 @@ public class OSUtilityWindows extends OSUtility {
 			String version = getIeVersionFromRegistry();
 			
 			browserList.put(BrowserType.INTERNET_EXPLORER, Arrays.asList(new BrowserInfo(BrowserType.INTERNET_EXPLORER, extractIEVersion(version), null)));
-		} catch (Win32Exception | ConfigurationException e) {}
+		} catch (Win32Exception | ConfigurationException e) {
+			logger.warn("Error searching Internet explorer installations: " + e.getMessage());
+			}
 		
 		// look for edge legacy
 		try {
 			String version = Advapi32Util.registryGetStringValue(WinReg.HKEY_CURRENT_USER, "Software\\Microsoft\\MicrosoftEdge\\Main", "EdgeSwitchingOSBuildNumber");
 			browserList.put(BrowserType.EDGE, Arrays.asList(new BrowserInfo(BrowserType.EDGE, extractEdgeVersion(version), null)));
-		} catch (Win32Exception | ConfigurationException e) {}
+		} catch (Win32Exception | ConfigurationException e) {
+			logger.warn("Error searching Edge legacy installations: " + e.getMessage());
+			}
 		
 		// look for edge chromium
 		try {
 			String version = OSCommand.executeCommandAndWait("powershell.exe \"(Get-AppxPackage Microsoft.MicrosoftEdge).Version\"");
 			if (version != null && !version.isEmpty()) {
-				try {
-					Integer.parseInt(extractEdgeVersion(version));
-					browserList.put(BrowserType.EDGE, Arrays.asList(new BrowserInfo(BrowserType.EDGE, extractEdgeVersion(version), null)));
-				} catch (NumberFormatException e) {}
-				
+				Integer.parseInt(extractEdgeVersion(version));
+				browserList.put(BrowserType.EDGE, Arrays.asList(new BrowserInfo(BrowserType.EDGE, extractEdgeVersion(version), null)));
 			}
-		} catch (Win32Exception | ConfigurationException e) {}
+		} catch (Win32Exception | ConfigurationException | NumberFormatException e) {
+			logger.warn("Error searching Edge chromium installations: " + e.getMessage());
+		}
 		
 		return browserList;
+	}
+
+	/**
+	 * @param chromeBetaPath
+	 * @return
+	 */
+	private String getWindowsBetaChromeVersion(String chromeBetaPath) {
+		String versionBeta;
+		try {
+			versionBeta = getChromeBetaVersionFromRegistry();
+		} catch (Win32Exception e) {
+			versionBeta = getChromeVersionFromFolder(chromeBetaPath);
+		}
+		return versionBeta;
+	}
+
+	/**
+	 * @param chromePath
+	 * @return
+	 */
+	private String getWindowsChromeVersion(String chromePath) {
+		String version;
+		try {
+			version = getChromeVersionFromRegistry();
+		} catch (Win32Exception e) {
+			version = getChromeVersionFromFolder(chromePath);
+		}
+		return version;
 	}
 	
 	public String getSoapUiPath() {
@@ -302,7 +330,9 @@ public class OSUtilityWindows extends OSUtility {
 					return jvm.split("/jre/bin")[0];
 				}
 			}
-		} catch (Exception e) {		}
+		} catch (Exception e) {
+			// ignore
+		}
 		throw new DisabledConnector("SOAP UI is not installed (not found in registry). Install it and run it once (MANDATORY)");
 	
 	}
