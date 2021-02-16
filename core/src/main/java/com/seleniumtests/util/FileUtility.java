@@ -69,6 +69,13 @@ public class FileUtility {
 	        while (jarFiles.hasMoreElements()) {
 	            ZipEntry entry = (ZipEntry) jarFiles.nextElement();
 	            String currentEntry = entry.getName();
+	            
+	            // correct javasecurity:S6096
+                File entryFile = new File(entry.getName());
+                if (entryFile.isAbsolute() || !entryFile.getCanonicalPath().startsWith(new File(".").getCanonicalPath())) {
+                	continue;
+                }
+	            
 	            File destinationFile = new File(storeLocation, currentEntry);
 	            File destinationParent = destinationFile.getParentFile();
 	
@@ -215,6 +222,13 @@ public class FileUtility {
             final Enumeration<? extends ZipEntry> entries = zipFile.entries();
             while (entries.hasMoreElements()) {
                 final ZipEntry entry = entries.nextElement();
+                File entryFile = new File(entry.getName());
+                
+                // correct javasecurity:S6096
+                if (entryFile.isAbsolute() || !entryFile.getCanonicalPath().startsWith(new File(".").getCanonicalPath())) {
+                	continue;
+                }
+                
                 final File entryDestination = new File(outputFolder, entry.getName());
                 if (entry.isDirectory()) {
                     //noinspection ResultOfMethodCallIgnored
