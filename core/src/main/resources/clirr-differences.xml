@@ -1,38 +1,35 @@
 <differences>
 
+
+	
 	<difference>
-		<className>**/uipage/htmlelements/HtmlElement</className>
-		<differenceType>6006</differenceType>
-		<field>OPTIMAL_SCROLLING</field>
-		<justification>code smell correction</justification>
-	</difference>
-	<difference>
-		<className>**/uipage/htmlelements/HtmlElement</className>
-		<differenceType>6006</differenceType>
-		<field>FIRST_VISIBLE</field>
-		<justification>code smell correction</justification>
-	</difference>
-	<difference>
-		<className>**/uipage/htmlelements/select/AngularSelect</className>
-		<differenceType>7004</differenceType>
-		<method>AngularSelect()</method>
-		<justification>internal class renamed</justification>
-	</difference>
-	<difference>
-		<className>**/uipage/htmlelements/select/ISelectList</className>
-		<differenceType>7012</differenceType>
-		<method>void setDriver(org.openqa.selenium.WebDriver)</method>
-		<justification>added driver. No external use for now</justification>
-	</difference>
-	<difference>
-		<className>**/uipage/htmlelements/select/AngularSelect</className>
-		<differenceType>3005</differenceType>
-		<justification>added driver. No external use for now</justification>
-	</difference>
-	<difference>
-		<className>**/connectors/mails/EmailClientImpl</className>
+		<className>**/uipage/htmlelements/GenericPictureElement</className>
 		<differenceType>7009</differenceType>
-		<method>EmailClientImpl()</method>
+		<method>GenericPictureElement()</method>
+		<justification>abstract class</justification>
+	</difference>
+	<difference>
+		<className>**/uipage/htmlelements/GenericPictureElement</className>
+		<differenceType>7009</differenceType>
+		<method>GenericPictureElement(java.lang.String, java.io.File, double, boolean)</method>
+		<justification>abstract class</justification>
+	</difference>
+	<difference>
+		<className>**/uipage/htmlelements/select/AngularSelect</className>
+		<differenceType>7009</differenceType>
+		<method>AngularSelect(org.openqa.selenium.WebElement, com.seleniumtests.uipage.htmlelements.FrameElement)</method>
+		<justification>abstract class</justification>
+	</difference>
+	<difference>
+		<className>**/uipage/htmlelements/select/AngularSelect</className>
+		<differenceType>7009</differenceType>
+		<method>AngularSelect(org.openqa.selenium.WebElement, com.seleniumtests.uipage.htmlelements.FrameElement, boolean)</method>
+		<justification>abstract class</justification>
+	</difference>
+	<difference>
+		<className>**/uipage/htmlelements/select/CommonSelectList</className>
+		<differenceType>7009</differenceType>
+		<method>CommonSelectList(org.openqa.selenium.WebElement, com.seleniumtests.uipage.htmlelements.FrameElement)</method>
 		<justification>abstract class</justification>
 	</difference>
 
