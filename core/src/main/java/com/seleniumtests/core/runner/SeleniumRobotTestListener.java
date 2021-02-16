@@ -606,6 +606,7 @@ public class SeleniumRobotTestListener extends BaseTestNGListener implements ITe
 	 * Execute the actions before test method
 	 */
 	private void executeBeforeTestMethod(IInvokedMethod method, ITestResult testResult, ITestContext context) {
+		
 		TestNGResultUtils.setTestMethodName(testResult, TestNGResultUtils.getTestName(testResult));
 		TestNGResultUtils.setUniqueTestName(testResult, TestNGResultUtils.getTestName(testResult));// initialize it so that it's always set
 		
@@ -630,7 +631,7 @@ public class SeleniumRobotTestListener extends BaseTestNGListener implements ITe
 	 * - record test method context
 	 * @param method
 	 * @param testResult
-	 * @param context
+	 * @param contexte pas
 	 */
 	private void executeAfterTestMethod(IInvokedMethod method, ITestResult testResult, ITestContext context) {
 		logger.info(SeleniumRobotLogger.END_TEST_PATTERN + TestNGResultUtils.getUniqueTestName(testResult));
@@ -644,6 +645,9 @@ public class SeleniumRobotTestListener extends BaseTestNGListener implements ITe
 		
 		// store context in test result
 		TestNGResultUtils.setSeleniumRobotTestContext(testResult, SeleniumTestsContextManager.getThreadContext());
+
+		// store test description
+		TestNGResultUtils.setTestDescription(testResult);
 		
 		// capture snap shot at the end of the test
 		logLastStep(testResult);

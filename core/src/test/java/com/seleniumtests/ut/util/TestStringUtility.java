@@ -21,6 +21,9 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import com.seleniumtests.GenericTest;
+import com.seleniumtests.core.SeleniumTestsContext;
+import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.core.TestVariable;
 import com.seleniumtests.util.StringUtility;
 
 public class TestStringUtility extends GenericTest {
@@ -101,5 +104,74 @@ public class TestStringUtility extends GenericTest {
 	@Test(groups={"ut"})
 	public void testKeepNewLineInHtmlWithNullMessage() {
 		Assert.assertNull(StringUtility.encodeString(null, "html"));
+	}
+	
+	@Test(groups={"ut"})
+	public void testInterpolateString() {
+		SeleniumTestsContextManager.getThreadContext().getConfiguration().put("url", new TestVariable("url", "http://mysite"));
+
+		Assert.assertEquals(StringUtility.interpolateString("connect to ${url}", SeleniumTestsContextManager.getThreadContext()), "connect to http://mysite");
+	}
+	
+	@Test(groups={"ut"})
+	public void testInterpolateNullString() {
+		Assert.assertNull(StringUtility.interpolateString(null, SeleniumTestsContextManager.getThreadContext()));
+	}
+	
+	/**
+	 * If context is null, return the initial string
+	 */
+	@Test(groups={"ut"})
+	public void testInterpolateStringNullContext() {
+		Assert.assertEquals(StringUtility.interpolateString("connect to ${url}", null), "connect to ${url}");
+	}
+	@Test(groups={"ut"})
+	public void testInterpolateStringNullconfiguration() {
+		SeleniumTestsContextManager.getThreadContext().setConfiguration(null);
+		Assert.assertEquals(StringUtility.interpolateString("connect to ${url}", SeleniumTestsContextManager.getThreadContext()), "connect to ${url}");
+	}
+	
+	@Test(groups={"ut"})
+	public void testInterpolateString2() {
+		SeleniumTestsContextManager.getThreadContext().getConfiguration().put("url", new TestVariable("url", "http://mysite"));
+		
+		Assert.assertEquals(StringUtility.interpolateString("connect to ${url} ${url2} correctly", SeleniumTestsContextManager.getThreadContext()), "connect to http://mysite ${url2} correctly");
+	}
+	
+	@Test(groups={"ut"})
+	public void testInterpolateStringMaskPassword1() {
+		SeleniumTestsContextManager.getThreadContext().setMaskPassword(true);
+		SeleniumTestsContextManager.getThreadContext().getConfiguration().put("password", new TestVariable("password", "abc"));
+		
+		Assert.assertEquals(StringUtility.interpolateString("connect with ${password}", SeleniumTestsContextManager.getThreadContext()), "connect with ****");
+	}
+	
+	@Test(groups={"ut"})
+	public void testInterpolateStringMaskPassword2() {
+		SeleniumTestsContextManager.getThreadContext().setMaskPassword(true);
+		SeleniumTestsContextManager.getThreadContext().getConfiguration().put("passwd", new TestVariable("passwd", "abc"));
+		
+		Assert.assertEquals(StringUtility.interpolateString("connect with ${passwd}", SeleniumTestsContextManager.getThreadContext()), "connect with ****");
+	}
+	
+	@Test(groups={"ut"})
+	public void testInterpolateStringMaskPassword3() {
+		SeleniumTestsContextManager.getThreadContext().setMaskPassword(true);
+		SeleniumTestsContextManager.getThreadContext().getConfiguration().put("pwd", new TestVariable("pwd", "abc"));
+		
+		Assert.assertEquals(StringUtility.interpolateString("connect with ${pwd}", SeleniumTestsContextManager.getThreadContext()), "connect with ****");
+	}
+	
+	@Test(groups={"ut"})
+	public void testInterpolateStringDoNotMaskPassword() {
+		SeleniumTestsContextManager.getThreadContext().setMaskPassword(false);
+		SeleniumTestsContextManager.getThreadContext().getConfiguration().put("pwd", new TestVariable("pwd", "abc"));
+		
+		Assert.assertEquals(StringUtility.interpolateString("connect with ${pwd}", SeleniumTestsContextManager.getThreadContext()), "connect with abc");
+	}
+	
+	@Test(groups={"ut"})
+	public void testInterpolateStringKeyNotFound() {
+		Assert.assertEquals(StringUtility.interpolateString("connect to ${url}", SeleniumTestsContextManager.getThreadContext()), "connect to ${url}");
 	}
 }

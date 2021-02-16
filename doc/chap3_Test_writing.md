@@ -736,6 +736,49 @@ Assuming the DEV environment, file will be searched in `<root>/data/<app>/datase
 - 'datasetSemicolon' => CSV file with ";" as separator and no header
 - 'datasetSemicolonWithHeader' => CSV file with ";" as separator and with header
 
+#### Use placeholders in test description ####
+
+With TestNG, it's possible to declare a test description inside the @Test annotation
+
+```java
+	@Test(groups="stub", description="my super test")
+	public void test() {
+		logger.info("hello");
+	}
+```
+
+Seleniumrobot allows to use placeholders in this description to add test data, for example.
+Any variable get from env.ini, XML file, seleniumRobot server will be allowed.
+
+In the example below, assuming `url` is declared in env.ini, we can write
+
+```java
+	@Test(groups="stub", description="my super test on ${url}")
+	public void test() {
+		logger.info("hello");
+	}
+```
+
+You can also use variables created during test. To make it work, you need to place your variable in config using `createOrUpdateParam` or `createOrUpdateLocalParam`
+
+```java
+	@Test(groups="stub", description="my super test on ${client} account ${account}")
+	public void test() {
+		createOrUpdateLocalParam("account", "123456")
+		createOrUpdateParam("client", "Bob")
+		logger.info("hello");
+	}
+```
+
+Finally, when using dataprovider, method parameters can also be used as placeholder in test description. Their name are `arg0`, `arg1`, ..., `argN`
+
+```java
+	@Test(groups="stub", dataProvider = "dataset", description="my super test with ${arg0} and ${arg1}")
+	public void testStandardDataProvider(String col1, String col2) {
+		logger.info(String.format("%s,%s", col1, col2));
+	}
+```
+
 ### 4 Write a cucumber test ###
 Cucumber styled tests rely on a `.feature` file where each test step is defined. Look at [https://cucumber.io/docs/gherkin/reference/](https://cucumber.io/docs/gherkin/reference/) for more information about writing a feature file.
 

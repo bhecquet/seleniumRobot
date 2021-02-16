@@ -116,13 +116,13 @@
 							<div class="col-xl-12">
 								<h4> Test Details - $testName</h4>
 								<table class="table table-bordered table-condensed">
-									#if ($description)
+									#if ($description && !$description.isEmpty())
 										<tr>
 											<th width="200px">Description</th>
 											<td>$description</td>
 										</tr>
 									#end
-									#if ($applicationType)
+									#if ($applicationType && !$applicationType.isEmpty())
 										<tr>
 											<th>Application type</th>
 											<td>$applicationType</td>

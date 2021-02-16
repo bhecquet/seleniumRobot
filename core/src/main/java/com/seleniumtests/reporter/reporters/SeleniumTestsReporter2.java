@@ -55,6 +55,7 @@ import com.seleniumtests.core.utils.TestNGResultUtils;
 import com.seleniumtests.driver.TestType;
 import com.seleniumtests.reporter.logger.TestStep;
 import com.seleniumtests.reporter.logger.TestStep.StepStatus;
+import com.seleniumtests.util.StringUtility;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
 /**
@@ -245,7 +246,7 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 		}
 		
 		context.put("testName", testName);
-		context.put("description", testResult.getMethod().getDescription());
+		context.put("description", StringUtility.encodeString(TestNGResultUtils.getTestDescription(testResult), "html"));
 		context.put("testInfos", TestNGResultUtils.getTestInfoEncoded(testResult, "html"));
 		
 		// Application information

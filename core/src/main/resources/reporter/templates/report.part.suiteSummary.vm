@@ -84,10 +84,10 @@
 				                			#set ($totalPassed = $totalPassed + $passedSteps)
 				                			#set ($totalFailed = $totalFailed + $failedSteps)
 				                			#set ($totalSteps = $totalSteps + $totalTestSteps)
-				                			#if ($testResult.getMethod().getDescription().isEmpty())
+				                			#if ($testResult.getAttribute("description").isEmpty())
 				                				#set ($description = "no description available")
 				                			#else
-				                				#set ($description = $testResult.getMethod().getDescription())
+				                				#set ($description = $testResult.getAttribute("description"))
 				                			#end
 				                			
 				                			#if ("$!testResult.getAttribute('snapshotComparisonResult')" == "")

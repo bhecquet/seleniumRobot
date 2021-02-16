@@ -196,7 +196,7 @@ public class ReporterControler implements IReporter {
 						
 						ITestResult newTestResult;
 						try {
-							newTestResult = TestNGResultUtils.copy(testResult, "snapshots-" +testResult.getName(), testResult.getMethod().getDescription() + " FOR SNAPSHOT COMPARISON");
+							newTestResult = TestNGResultUtils.copy(testResult, "snapshots-" +testResult.getName(), TestNGResultUtils.getTestDescription(testResult) + " FOR SNAPSHOT COMPARISON");
 						} catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e) {
 							throw new ScenarioException(e.getMessage(), e);
 						}
