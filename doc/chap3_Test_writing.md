@@ -33,6 +33,7 @@
     - [Use Generic steps with user defined steps](#use-generic-steps-with-user-defined-steps)
   - [Use WebDriverWait](#use-webdriverwait)
   - [Use Dataprovider](#use-dataprovider)
+  - [Use placeholders in test description](#use-placeholders-in-test-description)
 - [4 Write a cucumber test](#4-write-a-cucumber-test)
   - [Feature file example](#feature-file-example)
   - [TestNG file](#testng-file-1)
