@@ -29,7 +29,7 @@ public class StubSelect extends CommonSelectList implements ISelectList {
 
 	@Override
 	public void finalizeAction() {
-
+		// nothing to do
 	}
 
 	@Override

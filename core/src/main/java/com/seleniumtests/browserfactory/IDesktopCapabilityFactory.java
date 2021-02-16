@@ -48,11 +48,11 @@ public abstract class IDesktopCapabilityFactory extends ICapabilitiesFactory {
 
 	protected BrowserInfo selectedBrowserInfo;
 	
-	public IDesktopCapabilityFactory(DriverConfig webDriverConfig) {
+	protected IDesktopCapabilityFactory(DriverConfig webDriverConfig) {
 		super(webDriverConfig);
 	}
 	
-    private BrowserInfo prepareBinaryAndDriver(final BrowserType browserType, final String binPath, final String driverPath, final String version) throws UnsupportedEncodingException {
+    private BrowserInfo prepareBinaryAndDriver(final BrowserType browserType, final String binPath, final String driverPath, final String version) {
 
     	// automatic list from OS + binary added as launch option (see SeleniumTestsContext.updateInstalledBrowsers())
     	List<BrowserInfo> browserInfos = OSUtility.getInstalledBrowsersWithVersion(webDriverConfig.getBetaBrowser()).get(browserType);
@@ -75,10 +75,8 @@ public abstract class IDesktopCapabilityFactory extends ICapabilitiesFactory {
     	if (newDriverPath != null) {
     		System.setProperty(getDriverExeProperty(), newDriverPath);
     		
-    		if (!OSUtility.isWindows()) {
-                if (!new File(newDriverPath).setExecutable(true)) {
-                	logger.error(String.format("Error setting executable on driver %s", newDriverPath));
-                }
+    		if (!OSUtility.isWindows() && !new File(newDriverPath).setExecutable(true)) {
+                logger.error(String.format("Error setting executable on driver %s", newDriverPath));
             }
     	}
 		
@@ -94,18 +92,15 @@ public abstract class IDesktopCapabilityFactory extends ICapabilitiesFactory {
         options = options.merge(updateDefaultCapabilities());
 
         if (webDriverConfig.getMode() == DriverMode.LOCAL) {
-	        try {
-				prepareBinaryAndDriver(getBrowserType(),
-						getBrowserBinaryPath(), 
-						getDriverPath(),
-						webDriverConfig.getBrowserVersion());
-				
-				updateOptionsWithSelectedBrowserInfo(options);
-			} catch (UnsupportedEncodingException e) {
-			}
+			prepareBinaryAndDriver(getBrowserType(),
+					getBrowserBinaryPath(), 
+					getDriverPath(),
+					webDriverConfig.getBrowserVersion());
+			
+			updateOptionsWithSelectedBrowserInfo(options);
         } else if (webDriverConfig.getMode() == DriverMode.GRID) {
         	// add node tags
-            if (webDriverConfig.getNodeTags().size() > 0) {
+            if (!webDriverConfig.getNodeTags().isEmpty()) {
             	options.setCapability(SeleniumRobotCapabilityType.NODE_TAGS, webDriverConfig.getNodeTags());
             }
             updateGridOptionsWithSelectedBrowserInfo(options);
@@ -137,12 +132,7 @@ public abstract class IDesktopCapabilityFactory extends ICapabilitiesFactory {
 
     	DesiredCapabilities capability = new DesiredCapabilities();
     	
-        if (webDriverConfig.isEnableJavascript()) {
-            capability.setJavascriptEnabled(true);
-        } else {
-            capability.setJavascriptEnabled(false);
-        }
-
+        capability.setJavascriptEnabled(webDriverConfig.isEnableJavascript());
         capability.setCapability(CapabilityType.TAKES_SCREENSHOT, true);
         capability.setCapability(CapabilityType.ACCEPT_SSL_CERTS, true);
         
@@ -154,7 +144,6 @@ public abstract class IDesktopCapabilityFactory extends ICapabilitiesFactory {
         }
 
         if (webDriverConfig.getBrowserVersion() != null) {
-//            capability.setVersion(webDriverConfig.getBrowserVersion());
             capability.setCapability(CapabilityType.BROWSER_VERSION, webDriverConfig.getBrowserVersion());
         }
 

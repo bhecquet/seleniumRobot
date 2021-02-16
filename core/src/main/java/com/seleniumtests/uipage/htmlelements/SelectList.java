@@ -27,7 +27,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.ServiceLoader;
 
-import org.apache.commons.collections.ListUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
@@ -88,7 +87,6 @@ public class SelectList extends HtmlElement {
 	private StringSimilarityService service = new StringSimilarityServiceImpl(strategy);
 	private ISelectList selectImplementation;
 	private List<Class<? extends ISelectList>> implementationList;
-	private static Object lock = new Object();
 	protected boolean multiple;
 
 	/**
@@ -191,6 +189,7 @@ public class SelectList extends HtmlElement {
 				}
 			} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
 					| InvocationTargetException | NoSuchMethodException | SecurityException e) {
+				logger.error(String.format("Cannot use Select implementation %s: %s", selectClass.getName(), e.getMessage()));
 			}
         }
         
@@ -229,10 +228,10 @@ public class SelectList extends HtmlElement {
      */
     @ReplayOnError
     public WebElement getFirstSelectedOption() {
-    	return _getFirstSelectedOption();
+    	return getTheFirstSelectedOption();
     }
-    private WebElement _getFirstSelectedOption() {
-    	List<WebElement> allSelectedOptions = _getAllSelectedOptions();
+    private WebElement getTheFirstSelectedOption() {
+    	List<WebElement> allSelectedOptions = getAllTheSelectedOptions();
     	try {
     		return allSelectedOptions.get(0);
     	} catch (IndexOutOfBoundsException e) {
@@ -245,10 +244,10 @@ public class SelectList extends HtmlElement {
      */
     @ReplayOnError
     public List<WebElement> getAllSelectedOptions() {
-    	return _getAllSelectedOptions();
+    	return getAllTheSelectedOptions();
     }
     
-    private List<WebElement> _getAllSelectedOptions() {
+    private List<WebElement> getAllTheSelectedOptions() {
 
     	try {
 	    	findElement();
@@ -273,7 +272,7 @@ public class SelectList extends HtmlElement {
 
     @ReplayOnError
     public String[] getSelectedTexts() {
-    	List<WebElement> allSelectedOptions = _getAllSelectedOptions();
+    	List<WebElement> allSelectedOptions = getAllTheSelectedOptions();
     	List<String> textList = new ArrayList<>();
     	
         for (WebElement option : allSelectedOptions) {
@@ -286,7 +285,7 @@ public class SelectList extends HtmlElement {
 
     @ReplayOnError
     public String getSelectedValue() {
-    	WebElement firstSelectedOption = _getFirstSelectedOption();
+    	WebElement firstSelectedOption = getTheFirstSelectedOption();
     	if (firstSelectedOption != null) {
     		return selectImplementation.getOptionValue(firstSelectedOption);
     	} else {
@@ -296,7 +295,7 @@ public class SelectList extends HtmlElement {
 
     @ReplayOnError
     public String[] getSelectedValues() {
-    	List<WebElement> allSelectedOptions = _getAllSelectedOptions();
+    	List<WebElement> allSelectedOptions = getAllTheSelectedOptions();
     	List<String> valueList = new ArrayList<>();
     	
         for (WebElement option : allSelectedOptions) {
@@ -328,7 +327,7 @@ public class SelectList extends HtmlElement {
     @ReplayOnError
     public void deselectAll() {
     	
-    	List<WebElement> allSelectedOptions = _getAllSelectedOptions();
+    	List<WebElement> allSelectedOptions = getAllTheSelectedOptions();
     	
     	if (!isMultipleSelect()) {
             throw new UnsupportedOperationException(ERROR_MULTI_SELECT);

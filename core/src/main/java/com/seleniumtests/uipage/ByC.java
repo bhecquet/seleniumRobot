@@ -35,6 +35,9 @@ import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.driver.WebUIDriver;
 
 public class ByC extends By {
+	
+
+	private static final String ERROR_CANNOT_FIND_ELEMENT_WITH_SUCH_CRITERIA = "Cannot find element with such criteria ";
 
 	@Override
 	public List<WebElement> findElements(SearchContext context) {
@@ -580,7 +583,6 @@ public class ByC extends By {
 	 */
 	public static class And extends ByC implements Serializable {
 		
-		private static final String ERROR_CANNOT_FIND_ELEMENT_WITH_SUCH_CRITERIA = "Cannot find element with such criteria ";
 		/**
 		 * 
 		 */
@@ -680,7 +682,7 @@ public class ByC extends By {
 			try {
 				return findElements(context).get(0);
 			} catch (IndexOutOfBoundsException e) {
-				throw new NoSuchElementException("Cannot find element with such criteria " + toString());
+				throw new NoSuchElementException(ERROR_CANNOT_FIND_ELEMENT_WITH_SUCH_CRITERIA + toString());
 			}
 		}
 		
@@ -752,7 +754,7 @@ public class ByC extends By {
 			try {
 				return findElements(context).get(0);
 			} catch (IndexOutOfBoundsException e) {
-				throw new NoSuchElementException("Cannot find element with such criteria " + toString());
+				throw new NoSuchElementException(ERROR_CANNOT_FIND_ELEMENT_WITH_SUCH_CRITERIA + toString());
 			}
 		}
 		

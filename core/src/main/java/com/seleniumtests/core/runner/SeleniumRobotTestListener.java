@@ -46,7 +46,6 @@ import org.testng.ITestNGMethod;
 import org.testng.ITestResult;
 import org.testng.Reporter;
 import org.testng.internal.ConfigurationMethod;
-import org.testng.internal.TestResult;
 import org.testng.internal.annotations.DisabledRetryAnalyzer;
 
 import com.epam.reportportal.testng.BaseTestNGListener;
@@ -133,7 +132,6 @@ public class SeleniumRobotTestListener extends BaseTestNGListener implements ITe
 
 	@Override
 	public void onTestSuccess(ITestResult result) {
-		System.out.println("success");
 		
 		// test is success, so it will not be retried
 		TestNGResultUtils.setNoMoreRetry(result, true);
@@ -157,8 +155,6 @@ public class SeleniumRobotTestListener extends BaseTestNGListener implements ITe
 	 */
 	@Override
 	public void onTestSkipped(ITestResult testResult) {
-		// nothing to do
-		System.out.println("skipped");
 		
 		// be sure that the result contains context. It can happen when the test is never executed
 		// initialize it from the method context as it's the closest for our test
@@ -311,7 +307,7 @@ public class SeleniumRobotTestListener extends BaseTestNGListener implements ITe
 			}
 			
 			if (method.isTestMethod()) {
-		        executeAfterTestMethod(method, testResult, context);
+		        executeAfterTestMethod(method, testResult);
 			}
 		} catch (Exception e) {
 			logger.error(String.format("error while finishing invocation of %s : %s", method.getTestMethod().getQualifiedName(), e.getMessage()));
@@ -598,7 +594,6 @@ public class SeleniumRobotTestListener extends BaseTestNGListener implements ITe
 	 * @param context
 	 */
 	private void configureThreadContextAfterInvoke(IInvokedMethod method, ITestResult testResult, ITestContext context) {
-		ConfigurationMethod configMethod = (ConfigurationMethod)method.getTestMethod();
 		SeleniumTestsContextManager.saveThreadContext(method, testResult, context);
 	}
 	
@@ -633,7 +628,7 @@ public class SeleniumRobotTestListener extends BaseTestNGListener implements ITe
 	 * @param testResult
 	 * @param contexte pas
 	 */
-	private void executeAfterTestMethod(IInvokedMethod method, ITestResult testResult, ITestContext context) {
+	private void executeAfterTestMethod(IInvokedMethod method, ITestResult testResult) {
 		logger.info(SeleniumRobotLogger.END_TEST_PATTERN + TestNGResultUtils.getUniqueTestName(testResult));
 
 		Reporter.setCurrentTestResult(testResult);

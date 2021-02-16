@@ -74,7 +74,7 @@ public class TestNGResultUtils {
 	 * @throws IllegalAccessException 
 	 * @throws IllegalArgumentException 
 	 */
-	public static ITestResult copy(ITestResult toCopy, String name, String description) throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
+	public static ITestResult copy(ITestResult toCopy, String name, String description) throws NoSuchFieldException, IllegalAccessException {
 		
 		
 		Field methodNameField = BaseTestMethod.class.getDeclaredField("m_methodName");

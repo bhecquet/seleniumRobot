@@ -59,7 +59,7 @@ import com.seleniumtests.util.logging.SeleniumRobotLogger;
  */
 public class SeleniumTestsContextManager {
 
-	private static final Logger logger = SeleniumRobotLogger.getLogger(SeleniumTestsContext.class);
+	private static final Logger logger = SeleniumRobotLogger.getLogger(SeleniumTestsContextManager.class);
 	
 	private static String rootPath;
 	private static String dataPath;
@@ -273,7 +273,9 @@ public class SeleniumTestsContextManager {
 						getClassNameFromMethodConfiguration(testResult), 
 						getMethodNameFromMethodConfiguration(testResult), 
 						getThreadContext());
-			} catch (Exception e) {}
+			} catch (Exception e) {
+				// nothing
+			}
 		} else if (configMethod.isAfterMethodConfiguration()) {
 			// issue #254: forget the variables got from server once test method is finished so that, on retry, variable can be get
 			SeleniumTestsContextManager.setMethodContext(context, 
@@ -509,7 +511,7 @@ public class SeleniumTestsContextManager {
                 
                 // get configuration for services.
 	            String runMode = setRunMode(iTestContext);
-	            parameters = getServiceParameters(parameters, runMode, configParser);
+	            getServiceParameters(parameters, runMode, configParser);
                 
                 // 
                 parameters.put(SeleniumTestsContext.DEVICE_LIST, configParser.getDeviceNodesAsJson());
@@ -527,10 +529,10 @@ public class SeleniumTestsContextManager {
     }
 
     public static void initThreadContext() {
-        initThreadContext(globalContext.getTestNGContext(), null, null, null);
+        initThreadContext(globalContext.getTestNGContext(), null);
     }
 
-    public static void initThreadContext(ITestContext testNGCtx, String testName, String className, ITestResult testResult) {
+    public static void initThreadContext(ITestContext testNGCtx, ITestResult testResult) {
 
     	ITestContext newTestNGCtx = getContextFromConfigFile(testNGCtx);
     	SeleniumTestsContext seleniumTestsCtx = new SeleniumTestsContext(newTestNGCtx);
@@ -618,7 +620,7 @@ public class SeleniumTestsContextManager {
      * @param testName
      * @param testResult
      */
-    public static SeleniumTestsContext setThreadContextFromTestResult(ITestContext testNGCtx, String testName, String className, ITestResult testResult) {
+    public static SeleniumTestsContext setThreadContextFromTestResult(ITestContext testNGCtx, ITestResult testResult) {
     	if (testResult == null) {
     		throw new ConfigurationException("Cannot set context from testResult as it is null");
     	}
@@ -705,9 +707,9 @@ public class SeleniumTestsContextManager {
 			}
 			
 			String[] versionParts = version.split("\\.", 3);
-			try {
+			if (versionParts.length > 1) {
 				return String.format("%s.%s", versionParts[0], versionParts[1]);
-			} catch (IndexOutOfBoundsException e) {
+			} else {
 				return versionParts[0];
 			}
 		} catch (IOException | NullPointerException e) {

@@ -32,6 +32,7 @@ import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsEnvironment;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 
@@ -80,7 +81,7 @@ public class VideoRecorder {
 				screenRecorder = new ScreenRecorder(gc, 
 								null,
 								new Format(MediaTypeKey, MediaType.FILE, MimeTypeKey, MIME_AVI),
-								new Format(MediaTypeKey, MediaType.VIDEO, EncodingKey, ENCODING_AVI_TECHSMITH_SCREEN_CAPTURE, CompressorNameKey, ENCODING_AVI_TECHSMITH_SCREEN_CAPTURE, DepthKey, (int)24, FrameRateKey, Rational.valueOf(25), QualityKey, 1.0f, KeyFrameIntervalKey, (int) (15 * 60)),
+								new Format(MediaTypeKey, MediaType.VIDEO, EncodingKey, ENCODING_AVI_TECHSMITH_SCREEN_CAPTURE, CompressorNameKey, ENCODING_AVI_TECHSMITH_SCREEN_CAPTURE, DepthKey, 24, FrameRateKey, Rational.valueOf(25), QualityKey, 1.0f, KeyFrameIntervalKey, 15 * 60),
 								null,
 								null,
 								folderPath);
@@ -127,8 +128,10 @@ public class VideoRecorder {
 				
 				// remove temp files
 				for (File f: createdFiles) {
-					if (!f.delete()) {
-						logger.info("could not delete video temp file");
+					try {
+						Files.delete(Paths.get(f.getAbsolutePath()));
+					} catch (IOException e) {
+						logger.info("could not delete video temp file: " + e.getMessage());
 					}
 				}
 				

@@ -43,6 +43,7 @@ import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.driver.screenshots.ScreenShot;
+import com.seleniumtests.reporter.logger.Snapshot;
 import com.seleniumtests.reporter.logger.TestStep;
 
 public class JiraConnector extends BugTracker {
@@ -292,13 +293,13 @@ public class JiraConnector extends BugTracker {
     	}
 	
 		fullDescription.append("h2. Last logs\n");
-		fullDescription.append(String.format("{code:java}%s{code}", lastTestStep.toString()));
 		
 		if (lastTestStep != null) {
+			fullDescription.append(String.format("{code:java}%s{code}", lastTestStep.toString()));
 			fullDescription.append("\n\nh2. Associated screenshots\n");
 			
     		List<ScreenShot> screenshots = lastTestStep.getSnapshots().stream()
-    				.map(s -> s.getScreenshot())
+    				.map(Snapshot::getScreenshot)
     				.collect(Collectors.toList());
     		for (ScreenShot screenshot: screenshots) {
     			if (screenshot.getFullImagePath() != null && new File(screenshot.getFullImagePath()).exists()) {
@@ -358,7 +359,63 @@ public class JiraConnector extends BugTracker {
         }
         
         // set fields
-        jiraBean.getCustomFields().forEach((fieldName, fieldValue) -> {
+        setCustomFields(jiraBean, fieldInfos, issueBuilder);
+
+        // set components
+        issueBuilder.setComponents(jiraBean.getComponents()
+                .stream()
+                .filter(component -> components.get(component) != null)
+                .map(component -> components.get(component))
+                .collect(Collectors.toList())
+                .toArray(new BasicComponent[] {}));
+
+        // add issue
+        IssueInput newIssue = issueBuilder.build();
+        BasicIssue basicIssue = issueClient.createIssue(newIssue).claim();
+        Issue issue = issueClient.getIssue(basicIssue.getKey()).claim();
+
+        addAttachments(jiraBean, issueClient, issue);
+
+        jiraBean.setId(issue.getKey());
+        jiraBean.setAccessUrl(browseUrl + issue.getKey());
+    }
+
+
+	/**
+	 * Add attachments to the issue
+	 * @param jiraBean
+	 * @param issueClient
+	 * @param issue
+	 */
+	private void addAttachments(JiraBean jiraBean, IssueRestClient issueClient, Issue issue) {
+		if (!jiraBean.getScreenShots().isEmpty()) {
+        	File[] files = jiraBean.getScreenShots()
+                    .stream()
+                    .peek(s -> logger.info("file -> " + s.getFullImagePath()))
+                    .map(s -> new File(s.getFullImagePath()))
+                    .filter(File::exists)
+                    .collect(Collectors.toList())
+                    .toArray(new File[] {});
+        	if (files.length > 0) {
+        		issueClient.addAttachments(issue.getAttachmentsUri(), files).claim();
+        	}
+        }
+
+        if (jiraBean.getDetailedResult() != null && jiraBean.getDetailedResult().exists()) {
+            issueClient.addAttachments(issue.getAttachmentsUri(),  jiraBean.getDetailedResult()).claim();
+        }
+	}
+
+
+	/**
+	 * Add custom fields to the issue
+	 * @param jiraBean
+	 * @param fieldInfos
+	 * @param issueBuilder
+	 */
+	private void setCustomFields(JiraBean jiraBean, Map<String, CimFieldInfo> fieldInfos, IssueInputBuilder issueBuilder) {
+		
+		jiraBean.getCustomFields().forEach((fieldName, fieldValue) -> {
             if (fieldInfos.get(fieldName) != null && fields.get(fieldName) != null) {
             	if ("option".equals(fields.get(fieldName).getSchema().getType())) {
         			CustomFieldOption option = getOptionForField(fieldInfos, fieldName, fieldValue);
@@ -378,40 +435,7 @@ public class JiraConnector extends BugTracker {
                 logger.warn(String.format("Field %s does not exist", fieldName));
             }
         });
-
-        // set components
-        issueBuilder.setComponents(jiraBean.getComponents()
-                .stream()
-                .filter(component -> components.get(component) != null)
-                .map(component -> components.get(component))
-                .collect(Collectors.toList())
-                .toArray(new BasicComponent[] {}));
-
-        // add issue
-        IssueInput newIssue = issueBuilder.build();
-        BasicIssue basicIssue = issueClient.createIssue(newIssue).claim();
-        Issue issue = issueClient.getIssue(basicIssue.getKey()).claim();
-
-        if (!jiraBean.getScreenShots().isEmpty()) {
-        	File[] files = jiraBean.getScreenShots()
-                    .stream()
-                    .peek(s -> logger.info("file -> " + s.getFullImagePath()))
-                    .map(s -> new File(s.getFullImagePath()))
-                    .filter(File::exists)
-                    .collect(Collectors.toList())
-                    .toArray(new File[] {});
-        	if (files.length > 0) {
-        		issueClient.addAttachments(issue.getAttachmentsUri(), files).claim();
-        	}
-        }
-
-        if (jiraBean.getDetailedResult() != null && jiraBean.getDetailedResult().exists()) {
-            issueClient.addAttachments(issue.getAttachmentsUri(),  jiraBean.getDetailedResult()).claim();
-        }
-
-        jiraBean.setId(issue.getKey());
-        jiraBean.setAccessUrl(browseUrl + issue.getKey());
-    }
+	}
 
     /**
      * Search the right field option among all allowed values or return null if value is not valid or field cannot be found

@@ -41,7 +41,6 @@ import org.testng.IReporter;
 import org.testng.ITestContext;
 import org.testng.ITestResult;
 import org.testng.TestRunner;
-import org.testng.internal.ConfigurationMethod;
 import org.testng.internal.TestResult;
 
 import com.seleniumtests.browserfactory.BrowserInfo;
@@ -166,7 +165,6 @@ public class SeleniumTestsContext {
     public static final String CAPTURE_SNAPSHOT = "captureSnapshot";
     public static final String CAPTURE_NETWORK = "captureNetwork";
     public static final String VIDEO_CAPTURE = "captureVideo";
-    public static final String ENABLE_EXCEPTION_LISTENER = "enableExceptionListener";	// TODO: voir son effet, activé par défaut
 
     public static final String DP_TAGS_INCLUDE = "dpTagsInclude";				// 
     public static final String DP_TAGS_EXCLUDE = "dpTagsExclude";				// Utilisé pour la lecture de fichiers CSV/XLS des DataProvider TODO: a étudier comment cela fonctionne
@@ -228,8 +226,8 @@ public class SeleniumTestsContext {
     public static final String TEST_VARIABLES = "testVariables"; 				// configuration (aka variables, get via 'param()' method) used for the current test. It is not updated via XML file
     																		
     // default values
-    public static final List<ReportInfo> DEFAULT_CUSTOM_TEST_REPORTS = Arrays.asList(new ReportInfo("PERF::xml::reporter/templates/report.perf.vm"));
-    public static final List<ReportInfo> DEFAULT_CUSTOM_SUMMARY_REPORTS = Arrays.asList(new ReportInfo("results::json::reporter/templates/report.summary.json.vm"));
+    protected static final List<ReportInfo> DEFAULT_CUSTOM_TEST_REPORTS = Arrays.asList(new ReportInfo("PERF::xml::reporter/templates/report.perf.vm"));
+    protected static final List<ReportInfo> DEFAULT_CUSTOM_SUMMARY_REPORTS = Arrays.asList(new ReportInfo("results::json::reporter/templates/report.summary.json.vm"));
 	public static final int DEFAULT_NEW_COMMAND_TIMEOUT = 120;
 	public static final String DEFAULT_TEST_ENV = "DEV";
 	public static final String DEFAULT_CUCUMBER_TESTS = "";
@@ -436,7 +434,6 @@ public class SeleniumTestsContext {
         setCaptureSnapshot(getBoolValueForTest(CAPTURE_SNAPSHOT, System.getProperty(CAPTURE_SNAPSHOT)));
         setCaptureNetwork(getBoolValueForTest(CAPTURE_NETWORK, System.getProperty(CAPTURE_NETWORK)));
         setVideoCapture(getValueForTest(VIDEO_CAPTURE, System.getProperty(VIDEO_CAPTURE)));
-        setEnableExceptionListener(getBoolValueForTest(ENABLE_EXCEPTION_LISTENER, System.getProperty(ENABLE_EXCEPTION_LISTENER)));
 
         setDpTagsInclude(getValueForTest(DP_TAGS_INCLUDE, System.getProperty(DP_TAGS_INCLUDE)));
         setDpTagsExclude(getValueForTest(DP_TAGS_EXCLUDE, System.getProperty(DP_TAGS_EXCLUDE)));
@@ -543,22 +540,19 @@ public class SeleniumTestsContext {
     private void updatePlatformVersion() {
     	try {
 	    	Platform currentPlatform = Platform.fromString(getPlatform());
-	    	if (currentPlatform.is(Platform.WINDOWS) 
+	    	if (!(currentPlatform.is(Platform.WINDOWS) 
 	    		|| currentPlatform.is(Platform.MAC) 
 	    		|| currentPlatform.is(Platform.UNIX)
-	    		|| currentPlatform.is(Platform.ANY) && getRunMode() == DriverMode.GRID) {
-	    		return;
-	    	
-	    	} else {
+	    		|| currentPlatform.is(Platform.ANY) && getRunMode() == DriverMode.GRID)) {
 	    		throw new WebDriverException("");
-	    	}
+	    	
+	    	} 
 	    } catch (WebDriverException e) {
 	    	if (getPlatform().toLowerCase().startsWith("android") || getPlatform().toLowerCase().startsWith("ios")) {
 	    		String[] pfVersion = getPlatform().split(" ", 2);
 	    		try {
 		    		setPlatform(pfVersion[0]);
 		    		setMobilePlatformVersion(pfVersion[1]);
-		    		return;
 	    		} catch (IndexOutOfBoundsException x) {
 	    			setMobilePlatformVersion(null);
 	    			logger.warn("For mobile platform, platform name should contain version. Ex: 'Android 5.0' or 'iOS 9.1'. Else, first found device is used");
@@ -1147,10 +1141,7 @@ public class SeleniumTestsContext {
     public VideoCaptureMode getVideoCapture() {    	
     	return (VideoCaptureMode) getAttribute(VIDEO_CAPTURE);
     }
- 
-    public boolean getEnableExceptionListener() {
-        return (Boolean) getAttribute(ENABLE_EXCEPTION_LISTENER);
-    }
+
 
     public String getChromeBinPath() {
         return (String) getAttribute(CHROME_BINARY_PATH);
@@ -1864,15 +1855,15 @@ public class SeleniumTestsContext {
     	}
     }
     
-//
-//    public void setReportPortalActive(Boolean active) {
-//    	if (active != null) {
-//    		setAttribute(REPORTPORTAL_ACTIVE, active);
-//    	} else {
-//    		setAttribute(REPORTPORTAL_ACTIVE, DEFAULT_REPORTPORTAL_ACTIVE);
-//    	}
-//    	
-//    }
+
+    public void setReportPortalActive(Boolean active) {
+    	if (active != null) {
+    		setAttribute(REPORTPORTAL_ACTIVE, active);
+    	} else {
+    		setAttribute(REPORTPORTAL_ACTIVE, DEFAULT_REPORTPORTAL_ACTIVE);
+    	}
+    	
+    }
     
     public void setSeleniumRobotServerUrl(String url) {
     	if (url != null) {
@@ -2302,15 +2293,7 @@ public class SeleniumTestsContext {
     		throw new ConfigurationException("Only 'true', 'false', 'onSuccess', 'onError' are supported for video capture");
     	}
     }
-    
-    public void setEnableExceptionListener(Boolean enable) {
-    	if (enable != null) {
-    		setAttribute(ENABLE_EXCEPTION_LISTENER, enable);
-    	} else {
-    		setAttribute(ENABLE_EXCEPTION_LISTENER, DEFAULT_ENABLE_EXCEPTION_LISTENER);
-    	}
-    }
-    
+
     public void setDpTagsInclude(String tags) {
     	setAttribute(DP_TAGS_INCLUDE, tags);
     }
@@ -2488,7 +2471,9 @@ public class SeleniumTestsContext {
     		setAttribute(OUTPUT_DIRECTORY, new File(outputDir).getAbsolutePath().replace(File.separator, "/"));
     		try {
     			new File((String)getAttribute(OUTPUT_DIRECTORY)).mkdirs();
-    		} catch (Exception e) {}
+    		} catch (Exception e) {
+    			logger.error(String.format("Error creating output directory %s", (String)getAttribute(OUTPUT_DIRECTORY)));
+    		}
     	}
     }
     

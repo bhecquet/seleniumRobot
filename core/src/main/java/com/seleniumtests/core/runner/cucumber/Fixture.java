@@ -44,8 +44,7 @@ public class Fixture {
 			ImmutableSet<ClassInfo> infos = ClassPath.from(Fixture.class.getClassLoader()).getTopLevelClassesRecursive(cucumberPkg);
 			
 			for (ClassInfo info: infos) {
-//				System.out.println("--" + info.getName());
-				
+
 				// ReportPortalService try to initialize something which prevent cucumber from analyzing properly
 				if ("com.seleniumtests.connectors.tms.reportportal.ReportPortalService".equals(info.getName())) {
 					continue;
@@ -55,10 +54,7 @@ public class Fixture {
 					if (Element.class.isAssignableFrom(field.getType()) && Modifier.isStatic(field.getModifiers())) {
 						field.setAccessible(true);
 						allFields.put(String.format("%s.%s", info.getSimpleName(), field.getName()), field);
-						allFields.put(field.getName(), field);
-//						System.out.println(field.getName());
-						
-			
+						allFields.put(field.getName(), field);					
 					}
 				}
 			}

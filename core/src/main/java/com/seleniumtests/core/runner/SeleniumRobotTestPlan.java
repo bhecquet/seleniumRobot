@@ -18,7 +18,10 @@
 package com.seleniumtests.core.runner;
 
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Method;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -98,8 +101,10 @@ public class SeleniumRobotTestPlan {
 	        	logger.info("Video file copied to " + videoFile.getAbsolutePath());
 	        	
 			} else {
-				if (!videoFile.delete()) {
-					logger.warn(String.format("Video file %s not deleted", videoFile.getAbsoluteFile()));
+				try {
+					Files.delete(Paths.get(videoFile.getAbsolutePath()));
+				} catch (IOException e) {
+					logger.warn(String.format("Video file %s not deleted: %s", videoFile.getAbsoluteFile(), e.getMessage()));
 				}
 			}
 		}

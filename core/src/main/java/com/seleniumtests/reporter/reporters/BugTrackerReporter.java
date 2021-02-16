@@ -41,7 +41,7 @@ public class BugTrackerReporter extends CommonReporter implements IReporter {
 				}
 				
 				// done in case it was null (issue #81)
-				SeleniumTestsContext testContext = SeleniumTestsContextManager.setThreadContextFromTestResult(context, getTestName(testResult), getClassName(testResult), testResult);
+				SeleniumTestsContext testContext = SeleniumTestsContextManager.setThreadContextFromTestResult(context, testResult);
 
 				BugTracker bugtrackerServer = testContext.getBugTrackerInstance();
 				if (bugtrackerServer == null) {

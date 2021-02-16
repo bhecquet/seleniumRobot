@@ -101,6 +101,7 @@ public class PictureElement extends GenericPictureElement {
 	 * 
 	 * @deprecated use findElement instead
 	 */
+	@Override
 	@Deprecated
 	public void findElement(boolean searchOnly) {
 		findElement();

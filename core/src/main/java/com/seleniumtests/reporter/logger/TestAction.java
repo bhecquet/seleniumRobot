@@ -17,16 +17,13 @@
  */
 package com.seleniumtests.reporter.logger;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.json.JSONObject;
 
-import com.seleniumtests.core.aspects.LogAction;
 import com.seleniumtests.util.StringUtility;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
@@ -36,7 +33,7 @@ import com.seleniumtests.util.logging.SeleniumRobotLogger;
  * @author behe
  *
  */
-public class TestAction implements Serializable {
+public class TestAction {
 	
 
 	protected static final Logger logger = SeleniumRobotLogger.getLogger(TestAction.class);
@@ -141,7 +138,7 @@ public class TestAction implements Serializable {
 	}
 
 	public TestAction encode(String format) {
-		TestAction encodedAction = new TestAction(encodeString(name, format), failed, new ArrayList<String>(pwdToReplace));
+		TestAction encodedAction = new TestAction(encodeString(name, format), failed, new ArrayList<>(pwdToReplace));
 		encodedAction.actionException = actionException;
 		encodedAction.maskPassword = maskPassword;
 		

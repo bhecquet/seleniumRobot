@@ -194,7 +194,7 @@ public class SeleniumRobotElementInfoServerConnector extends SeleniumRobotServer
 						}
 						request = request.field("attributesStability", new JSONObject(attributeStabilityDiff).toString());
 					}
-					JSONObject elementInfoJson = getJSonResponse(request);
+					getJSonResponse(request);
 				} catch (UnirestException e) {
 					logger.warn("cannot update element info: " + e.getMessage());
 				}

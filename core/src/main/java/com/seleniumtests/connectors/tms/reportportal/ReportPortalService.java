@@ -34,12 +34,7 @@ public class ReportPortalService extends TestNGService {
 		rpLaunch = reportPortal.newLaunch(rq);
 		
 		
-		return new Supplier<Launch>() {
-			@Override
-			public Launch get() {
-				return rpLaunch;
-			}
-		};
+		return () -> rpLaunch;
 	}
 
 	private static StartLaunchRQ buildStartLaunch(ListenerParameters parameters) {

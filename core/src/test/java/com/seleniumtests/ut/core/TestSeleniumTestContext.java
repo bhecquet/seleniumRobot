@@ -934,19 +934,7 @@ public class TestSeleniumTestContext extends GenericTest {
 		SeleniumTestsContextManager.getThreadContext().setSeleniumRobotServerRecordResults(null);
 		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getSeleniumRobotServerRecordResults(), SeleniumTestsContext.DEFAULT_SELENIUMROBOTSERVER_RECORD_RESULTS);
 	}
-	
-	@Test(groups="ut context")
-	public void testEnableExceptionListener(final ITestContext testNGCtx, final XmlTest xmlTest) {
-		initThreadContext(testNGCtx);
-		SeleniumTestsContextManager.getThreadContext().setEnableExceptionListener(false);
-		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getEnableExceptionListener(), false);
-	}
-	@Test(groups="ut context")
-	public void testEnableExceptionListenerNull(final ITestContext testNGCtx, final XmlTest xmlTest) {
-		initThreadContext(testNGCtx);
-		SeleniumTestsContextManager.getThreadContext().setEnableExceptionListener(null);
-		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getEnableExceptionListener(), SeleniumTestsContext.DEFAULT_ENABLE_EXCEPTION_LISTENER);
-	}
+
 
 	@Test(groups="ut context")
 	public void testSoftAssertEnabled(final ITestContext testNGCtx, final XmlTest xmlTest) {

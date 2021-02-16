@@ -42,7 +42,7 @@ public class GenericDriverTest {
 	@BeforeMethod(groups={"ut", "it"})  
 	public void initTest(final ITestContext testNGCtx, final ITestResult testResult) {
 		SeleniumTestsContextManager.initGlobalContext(testNGCtx);
-		SeleniumTestsContextManager.initThreadContext(testNGCtx, null, null, testResult);
+		SeleniumTestsContextManager.initThreadContext(testNGCtx, testResult);
 		SeleniumTestsContextManager.getThreadContext().setSoftAssertEnabled(false);
 		SeleniumTestsContextManager.getGlobalContext().setSoftAssertEnabled(false);
 		SeleniumTestsContextManager.getThreadContext().setVideoCapture(VideoCaptureMode.FALSE.toString());
@@ -52,7 +52,7 @@ public class GenericDriverTest {
 	public void initThreadContext(final ITestContext testNGCtx) {
 		SeleniumTestsContextManager.initGlobalContext(testNGCtx);
 		try {
-			SeleniumTestsContextManager.initThreadContext(testNGCtx, null, null, GenericTest.generateResult(testNGCtx, getClass()));
+			SeleniumTestsContextManager.initThreadContext(testNGCtx, GenericTest.generateResult(testNGCtx, getClass()));
 		} catch (NoSuchMethodException | SecurityException | NoSuchFieldException | IllegalArgumentException
 				| IllegalAccessException e) {
 		}

@@ -8,6 +8,10 @@ import org.json.JSONObject;
 
 public class StatisticsStorage {
 	
+	private StatisticsStorage() {
+		// do nothing
+	}
+	
 	public static class DriverUsage {
 		
 		public static final String GRID_HUB = "gridHub";

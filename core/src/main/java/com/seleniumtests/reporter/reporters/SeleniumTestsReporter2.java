@@ -183,7 +183,7 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 	public void generateSingleTestReport(ITestResult testResult, boolean resourcesFromCdn) {
 
 		// issue #81: recreate test context from this context (due to multithreading, this context may be null if parallel testing is done)
-		SeleniumTestsContext testContext = SeleniumTestsContextManager.setThreadContextFromTestResult(testResult.getTestContext(), getTestName(testResult), getClassName(testResult), testResult);
+		SeleniumTestsContext testContext = SeleniumTestsContextManager.setThreadContextFromTestResult(testResult.getTestContext(), testResult);
 		
 		try {
 			copyResources();

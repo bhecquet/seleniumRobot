@@ -48,7 +48,7 @@ public class TestManagerReporter extends CommonReporter implements IReporter {
 		for (Map.Entry<ITestContext, Set<ITestResult>> entry: resultSet.entrySet()) {
 			for (ITestResult testResult: entry.getValue()) {
 				
-				SeleniumTestsContext testContext = SeleniumTestsContextManager.setThreadContextFromTestResult(testResult.getTestContext(), getTestName(testResult), getClassName(testResult), testResult);
+				SeleniumTestsContext testContext = SeleniumTestsContextManager.setThreadContextFromTestResult(testResult.getTestContext(), testResult);
 				TestManager testManager = testContext.getTestManagerInstance();
 
 				if (testManager == null) {

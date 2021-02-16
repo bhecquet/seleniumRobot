@@ -35,7 +35,7 @@ import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
 public class ElementInfo {
 	
-	public static enum Mode {
+	public enum Mode {
 		FALSE,
 		DOM,
 		FULL,
@@ -165,7 +165,7 @@ public class ElementInfo {
 		    	ImageIO.write(eleScreenshot, "png", tmp);*/
 		    	newB64Image = ImageProcessor.toBase64(eleScreenshot);
 	    	
-			} catch (Throwable e) {
+			} catch (Exception e) {
 				logger.error("Error taking element screenshot", e);
 			}
     	}
@@ -256,7 +256,7 @@ public class ElementInfo {
 			if (reference) {
 				outputFile = ELEMENT_INFO_REFERENCE_LOCATION.resolve(Paths.get(id + ".json")).toFile();
 			} else {
-				outputFile = ELEMENT_INFO_LOCATION.resolve(Paths.get(id + ".json")).toFile();
+				outputFile = getElementInfoFile(id);
 			}
 		} else {
 			outputFile = buildElementInfoPath(htmlElement);
@@ -307,14 +307,20 @@ public class ElementInfo {
 	private void delete() {
 		if (new File(path).exists()) {
 
-			if (!new File(path).delete()) {
-				logger.error("Failed to delete elementInfo file for: " + name);
+			try {
+				Files.delete(Paths.get(path));
+			} catch (IOException e) {
+				logger.error(String.format("Failed to delete elementInfo file for %s: %s", name, e.getMessage()));
 			}
 		}
 	}
 	
+	private static File getElementInfoFile(String elementId) {
+		return ELEMENT_INFO_LOCATION.resolve(Paths.get(elementId + ".json")).toFile();
+	}
+	
 	public static File buildElementInfoPath(HtmlElement htmlElement) {
-		return ELEMENT_INFO_LOCATION.resolve(Paths.get(buildId(htmlElement) + ".json")).toFile();
+		return getElementInfoFile(buildId(htmlElement));
 	}
 	
 	/**
@@ -350,6 +356,7 @@ public class ElementInfo {
 				}
 			}
 		} catch (IOException e) {
+			logger.error("Cannot get list of element infos: " + e.getMessage());
 		}
 		
 		return elementInfos;
@@ -371,10 +378,13 @@ public class ElementInfo {
 		        .forEach(t -> {
 					try {
 						Files.delete(t);
-					} catch (IOException e) {}
+					} catch (IOException e) {
+						logger.error("Cannot purge ElementInfo: " + e.getMessage());
+					}
 				});
 			
 		} catch (IOException e) {
+			logger.error("Cannot purge ElementInfo : " + e.getMessage());
 		}
 
 	}

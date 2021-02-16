@@ -57,15 +57,7 @@ public class CachedHtmlElement implements WebElement {
 	}
 	
 	public CachedHtmlElement(WebElement elementToCache) {
-//		try {
-//			rectangle = elementToCache.getRect();
-//			location = new Point(rectangle.x, rectangle.y);
-//			size = new Dimension(rectangle.width, rectangle.height);
-//		} catch (WebDriverException e) {
-//			location = elementToCache.getLocation();
-//			size = elementToCache.getSize();
-//			rectangle = new Rectangle(location, size);
-//		}
+
 		// position and size take some time for methods that are never used 
 		location = new Point(0, 0);
 		size = new Dimension(0, 0);
@@ -85,7 +77,7 @@ public class CachedHtmlElement implements WebElement {
 	}
 	
 	@Override
-	public <X> X getScreenshotAs(OutputType<X> target) throws WebDriverException {
+	public <X> X getScreenshotAs(OutputType<X> target) {
 		throw new ScenarioException("getScreenshotAs cannot be done on a CachedHtmlElement");
 	}
 

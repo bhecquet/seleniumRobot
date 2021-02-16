@@ -24,6 +24,7 @@ import java.awt.im.InputContext;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 
@@ -96,7 +97,6 @@ public class Keyboard {
     		put('$',new KeyStroke(KeyEvent.VK_DOLLAR, false));
     		put('¤',new KeyStroke(KeyEvent.VK_DOLLAR, false, true));
     		put('£',new KeyStroke(KeyEvent.VK_DOLLAR, true));
-    		//put('%',new KeyStroke(KeyEvent.VK_5, true));
     		put('&',new KeyStroke(KeyEvent.VK_1, false));
     		put('é',new KeyStroke(KeyEvent.VK_2, false));
     		put('è',new KeyStroke(KeyEvent.VK_7, false));
@@ -131,7 +131,6 @@ public class Keyboard {
     		put('[',new KeyStroke(KeyEvent.VK_5, false, true));
     		put('\\',new KeyStroke(KeyEvent.VK_8, false, true));
     		put(']',new KeyStroke(KeyEvent.VK_RIGHT_PARENTHESIS, false, true));
-//    		put('^',new KeyStroke(KeyEvent.VK_CIRCUMFLEX, false));
     		put('¨',new KeyStroke(KeyEvent.VK_CIRCUMFLEX, true));
     		put('_',new KeyStroke(KeyEvent.VK_8, false));
     		put('`',new KeyStroke(KeyEvent.VK_7, false, true));
@@ -219,14 +218,14 @@ public class Keyboard {
                 }
 
             }catch(IllegalArgumentException ex){
-                String ch="";
-                for(char key:strokeMap.keySet()){
-                    if(strokeMap.get(key)==this){
-                        ch=""+key;
+                String ch = "";
+                for (Entry<Character, KeyStroke> entry: strokeMap.entrySet()) {
+                    if(entry.getValue() == this) {
+                        ch = "" + entry.getKey();
                         break;
                     }
                 }
-                logger.error("Key Code Not Recognized: '"+ch+"'->"+code);
+                logger.error("Key Code Not Recognized: '" + ch + "'->" + code);
             }
         }
     }
@@ -234,75 +233,4 @@ public class Keyboard {
 	public Robot getRobot() {
 		return robot;
 	}
-
-//    private static AWTKeyStroke getKeyStroke(char c) {
-////        String upper = "`~'\"!@#$%^&*()_+{}|:<>?";
-////        String lower = "`~'\"1234567890-=[]\\;,./";
-//
-//        String upper = "1234567890°+¨£%µ?./§>";
-//        String lower = "&é\"'(-è_çà)=^$ù*,;:!<";
-//        String altgr = "&~#{[|`\\^@]} ¤ù*,;:!<";
-//        
-//        int index = upper.indexOf(c);
-//        if (index != -1) {
-//            int keyCode;
-//            boolean shift = false;
-//            switch (c) {
-//                // these chars need to be handled specially because
-//                // they don't directly translate into the correct keycode
-//                case '~':
-//                    shift = true;
-//                case '`':
-//                    keyCode = KeyEvent.VK_BACK_QUOTE;
-//                    break;
-//                case '\"':
-//                    shift = true;
-//                case '\'':
-//                    keyCode = KeyEvent.VK_QUOTE;
-//                    break;
-//                default:
-//                    keyCode = (int) Character.toUpperCase(lower.charAt(index));
-//                    shift = true;
-//            }
-//            return getAWTKeyStroke(keyCode, shift ? SHIFT_DOWN_MASK : 0);
-//        }
-//        return getAWTKeyStroke((int) Character.toUpperCase(c), 0);
-//    }
-//
-//    public void type(CharSequence chars) {
-//        type(chars, 0);
-//    }
-//
-//    public void type(CharSequence chars, int ms) {
-//        ms = ms > 0 ? ms : 0;
-//        for (int i = 0, len = chars.length(); i < len; i++) {
-//            char c = chars.charAt(i);
-//            AWTKeyStroke keyStroke = getKeyStroke(c);
-//            int keyCode = keyStroke.getKeyCode();
-//            boolean shift = Character.isUpperCase(c) || keyStroke.getModifiers() == (SHIFT_DOWN_MASK + 1);
-//            
-//            if (ms > 0) {
-//                robot.delay(ms);
-//                robot.keyPress(KeyEvent.VK_SHIFT);
-//                robot.keyRelease(KeyEvent.VK_SHIFT);
-//            }
-//            System.out.println(keyCode + "-" + c);
-//            pressKeys(keyCode, shift);
-//            
-//        }
-//    }
-//    
-//    private void pressKeys(int keyCode, boolean shift) {
-//    	if (shift) {
-//            robot.keyPress(KeyEvent.VK_SHIFT);
-//        }
-//
-//        robot.keyPress(keyCode);
-//        robot.keyRelease(keyCode);
-//
-//        if (shift) {
-//            robot.keyRelease(KeyEvent.VK_SHIFT);
-//        }
-//        
-//    }
 }

@@ -27,7 +27,6 @@ import java.time.LocalDateTime;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.openqa.selenium.Rectangle;
-import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.remote.ScreenshotException;
 
 import com.seleniumtests.customexception.ConfigurationException;
@@ -56,7 +55,7 @@ public abstract class GenericPictureElement extends Element {
 	protected ScreenshotUtil screenshotUtil;
 	protected Clock clock = Clock.systemUTC();
 
-	public GenericPictureElement() {
+	protected GenericPictureElement() {
 		// for mocks
 	}
 	
@@ -69,7 +68,7 @@ public abstract class GenericPictureElement extends Element {
 	 * @param detectionThreshold	sensitivity of search between 0 and 1. Be default, 0.1. More sensitivity means search can be less accurate, detect unwanted zones
 	 * @param searchOnDesktop		By default, false: search in driver snapshot. If true, we take a desktop screenshot, allwing searching into other elements that browser
 	 */
-	public GenericPictureElement(String label, File pictureFile, double detectionThreshold, boolean searchOnDesktop) {		
+	protected GenericPictureElement(String label, File pictureFile, double detectionThreshold, boolean searchOnDesktop) {		
 		
 		this.searchOnDesktop = searchOnDesktop;
 		this.label = label;
@@ -205,7 +204,6 @@ public abstract class GenericPictureElement extends Element {
 					return false;
 				}
 				WaitHelper.waitForMilliSeconds(200);
-				continue;
 			}
 		}
 		return false;
