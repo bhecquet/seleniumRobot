@@ -22,11 +22,17 @@ import java.lang.reflect.Method;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.Normalizer;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringEscapeUtils;
 import org.apache.log4j.Logger;
 
+import com.seleniumtests.core.SeleniumTestsContext;
+import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.core.TestVariable;
 import com.seleniumtests.customexception.CustomSeleniumTestsException;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
@@ -133,6 +139,43 @@ public class StringUtility {
 				.replace("\\", "_");
 	}
 	
+	/**
+	 * Do interpolation like groovy language, using context variables
+	 * ex: provided the 'url' variable is present in test configuration with value 'http://my.site', 
+	 *     'connect to ${url}' => 'connect to http://my.site
+	 * 
+	 * @param initialString
+	 * @return
+	 */
+	public static String interpolateString(String initialString, SeleniumTestsContext testContext) {
+		if (initialString == null) {
+			return null;
+		}
+		
+		String interpolatedString  = initialString;
+    	Pattern pattern = Pattern.compile("\\$\\{(.*?)\\}");
+    	Matcher matcher = pattern.matcher(initialString);
+    	
+    	if (testContext == null || testContext.getConfiguration() == null) {
+    		return initialString;
+    	}
+    	Map<String, TestVariable> variables = testContext.getConfiguration();
+    	
+    	while (matcher.find()) {
+    		String key = matcher.group(1);
+    		
+    		if (Boolean.TRUE.equals(SeleniumTestsContextManager.getThreadContext().getMaskedPassword()) && (key.toLowerCase().contains("password") || key.toLowerCase().contains("pwd") || key.toLowerCase().contains("passwd"))) {
+    			interpolatedString = interpolatedString.replace(String.format("${%s}",  key), "****");
+    		} else if (variables.containsKey(key)) {
+    			interpolatedString = interpolatedString.replace(String.format("${%s}",  key), variables.get(key).getValue());
+    		} else {
+    			logger.warn(String.format("Error while interpolating, key '%s' not found in configuration", key));
+    		}
+    		
+    	}
+    	
+    	return interpolatedString;
+	}
 
 	/**
 	 * Encode string according to provided format

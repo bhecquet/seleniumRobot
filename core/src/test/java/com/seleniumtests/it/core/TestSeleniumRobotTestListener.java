@@ -874,4 +874,5 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 		// check "increaseMaxRetry" cannot be called outside test method
 		Assert.assertTrue(logs.contains("SeleniumRobotTestListener: RetryAnalyzer is null, 'increaseMaxRetry' can be called only inside test methods"));
 	}
+
 }

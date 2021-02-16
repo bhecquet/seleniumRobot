@@ -1682,4 +1682,101 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		}
 	}
 	
+	
+	@Test(groups={"it"})
+	public void testNoDescription(ITestContext testContext) throws Exception {
+		
+		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassforTestDescription"}, ParallelMode.METHODS, new String[] {"testNoDescription"});
+		
+		String summaryReport = readSummaryFile();
+		Assert.assertTrue(summaryReport.contains("info=\"ok\" data-toggle=\"tooltip\" title=\"no description available\""));
+		
+		String detailedReportContent = readTestMethodResultFile("testNoDescription");
+		Assert.assertFalse(detailedReportContent.contains("<th width=\"200px\">Description</th>"));
+	}
+	
+	/**
+	 * Check that if a user param is set from command line, description can use it
+	 * @param testContext
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testDescriptionWithUserParam(ITestContext testContext) throws Exception {
+		
+		try {
+			System.setProperty("url", "http://mysite.com");
+			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassforTestDescription"}, ParallelMode.METHODS, new String[] {"testWithDescription"});
+			
+			String summaryReport = readSummaryFile();
+			Assert.assertTrue(summaryReport.contains("info=\"ok\" data-toggle=\"tooltip\" title=\"a test with param http://mysite.com\""));
+			
+			String detailedReportContent = readTestMethodResultFile("testWithDescription");
+			Assert.assertTrue(detailedReportContent.contains("<th width=\"200px\">Description</th><td>a test with param http://mysite.com</td>"));
+		} finally {
+			System.clearProperty("url");
+		}
+		
+	}
+	
+	/**
+	 * Test that a param added inside test can also be used
+	 * @param testContext
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testDescriptionWithParamCreatedInTest(ITestContext testContext) throws Exception {
+	
+		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassforTestDescription"}, ParallelMode.METHODS, new String[] {"testWithParamCreatedInTest"});
+		
+		String summaryReport = readSummaryFile();
+		Assert.assertTrue(summaryReport.contains("info=\"ok\" data-toggle=\"tooltip\" title=\"a test on Bob account account-12345\""));
+		
+		String detailedReportContent = readTestMethodResultFile("testWithParamCreatedInTest");
+		Assert.assertTrue(detailedReportContent.contains("<th width=\"200px\">Description</th><td>a test on Bob account account-12345</td>"));
+		
+	}
+	
+	/**
+	 * Test interpolation of method parameters when they are referenced as 'arg0', 'arg1', ..., 'argN' in description
+	 * @param testContext
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testDescriptionWithDataProvider(ITestContext testContext) throws Exception {
+
+		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassforTestDescription"}, ParallelMode.METHODS, new String[] {"testDataProvider"});
+		
+
+		String summaryReport = readSummaryFile();
+		Assert.assertTrue(summaryReport.contains("info=\"ok\" data-toggle=\"tooltip\" title=\"a test with param data2 and data1 from dataprovider\""));
+		Assert.assertTrue(summaryReport.contains("info=\"ok\" data-toggle=\"tooltip\" title=\"a test with param data3 and data4 from dataprovider\""));
+		
+		String detailedReportContent = readTestMethodResultFile("testDataProvider");
+		Assert.assertTrue(detailedReportContent.contains("<th width=\"200px\">Description</th><td>a test with param data2 and data1 from dataprovider</td>"));		
+		
+		String detailedReportContent2 = readTestMethodResultFile("testDataProvider-1");
+		Assert.assertTrue(detailedReportContent2.contains("<th width=\"200px\">Description</th><td>a test with param data3 and data4 from dataprovider</td>"));		
+	}
+	
+	/**
+	 * Test interpolation of method parameters when they are referenced as 'arg0', 'arg1', ..., 'argN' in description
+	 * @param testContext
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testDescriptionWithLineBreak(ITestContext testContext) throws Exception {
+		
+		try {
+			System.setProperty("url", "http://mysite.com");
+			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassforTestDescription"}, ParallelMode.METHODS, new String[] {"testWithLineBreaksInDescription"});
+			
+			String summaryReport = readSummaryFile();
+			Assert.assertTrue(summaryReport.contains("info=\"ko\" data-toggle=\"tooltip\" title=\"a test with param http://mysite.comand line breaks\""));
+			
+			String detailedReportContent = readTestMethodResultFile("testWithLineBreaksInDescription");
+			Assert.assertTrue(detailedReportContent.contains("<th width=\"200px\">Description</th><td>a test with param http://mysite.com<br/>and line breaks</td>"));
+		} finally {
+			System.clearProperty("url");
+		}	
+	}
 }

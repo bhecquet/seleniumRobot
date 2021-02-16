@@ -65,7 +65,7 @@ public class BugTrackerReporter extends CommonReporter implements IReporter {
 				String description = String.format("Test '%s' failed\n", testName);
 
 				if (testResult.getMethod().getDescription() != null && !testResult.getMethod().getDescription().trim().isEmpty()) {
-					description += "Test goal: " + testResult.getMethod().getDescription();
+					description += "Test goal: " + TestNGResultUtils.getTestDescription(testResult);
 				}
 
 				// search the last step to get screenshots and failure reason

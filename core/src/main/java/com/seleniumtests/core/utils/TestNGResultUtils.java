@@ -19,10 +19,13 @@ package com.seleniumtests.core.utils;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 import org.testng.ITestNGMethod;
@@ -32,6 +35,7 @@ import org.testng.internal.BaseTestMethod;
 import org.testng.internal.TestResult;
 
 import com.seleniumtests.core.SeleniumTestsContext;
+import com.seleniumtests.core.TestVariable;
 import com.seleniumtests.core.runner.CucumberScenarioWrapper;
 import com.seleniumtests.reporter.logger.StringInfo;
 import com.seleniumtests.util.StringUtility;
@@ -55,6 +59,7 @@ public class TestNGResultUtils {
 	private static final String CUSTOM_REPORT = "customReport";			// true if the custom result has already been generated
 	private static final String METHOD_NAME = "methodName";				// name of the test method (or the cucumber scenario)
 	private static final String SNAPSHOT_COMPARISON_RESULT = "snapshotComparisonResult";	// the result of snapshot comparison, when enabled
+	private static final String DESCRIPTION = "description";	// description of the test method, if any
 
 	private TestNGResultUtils() {
 		// nothing to do
@@ -379,5 +384,22 @@ public class TestNGResultUtils {
     	}
     	return null;
     	
+    }
+    
+    public static String getTestDescription(ITestResult testNGResult) {
+    	return (String) testNGResult.getAttribute(DESCRIPTION);
+    }
+    
+    /**
+     * Set description interpolating variables
+     * @param testNGResult
+     */
+    public static void setTestDescription(ITestResult testNGResult) { 
+    	int i = 0;
+    	for (Object parameter: testNGResult.getParameters()) {
+    		String key = String.format("arg%d", i++);
+    		getSeleniumRobotTestContext(testNGResult).getConfiguration().put(key, new TestVariable(key, parameter.toString()));
+    	}
+    	testNGResult.setAttribute(DESCRIPTION, StringUtility.interpolateString(testNGResult.getMethod().getDescription(), getSeleniumRobotTestContext(testNGResult)));
     }
 }

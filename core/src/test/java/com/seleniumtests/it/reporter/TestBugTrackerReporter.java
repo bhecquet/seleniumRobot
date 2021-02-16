@@ -88,7 +88,7 @@ public class TestBugTrackerReporter extends ReporterTest {
 			
 			Assert.assertEquals(issueOptionsArgument.getValue().size(), 3);
 			Assert.assertEquals(issueOptionsArgument.getValue().get("reporter"), "me");
-			Assert.assertEquals(issueOptionsArgument.getValue().get("assignee"), "you2"); // check we get the updated value
+			Assert.assertEquals(issueOptionsArgument.getValue().get("assignee"), "you2"); // check we get the updated value, set directly in test method
 			Assert.assertEquals(issueOptionsArgument.getValue().get("jira.field.application"), "app");
 			
 		} finally {
@@ -384,4 +384,40 @@ public class TestBugTrackerReporter extends ReporterTest {
 			System.clearProperty(SeleniumTestsContext.BUGTRACKER_PASSWORD);
 		}
 	}	
+	
+	/**
+	 * Check that when a test contains description, this is set in issue
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testIssueDescriptionIsInterpolated() throws Exception {
+		try {
+			System.setProperty(SeleniumTestsContext.BUGTRACKER_TYPE, "jira");
+			System.setProperty(SeleniumTestsContext.BUGTRACKER_URL, "http://localhost:1234");
+			System.setProperty(SeleniumTestsContext.BUGTRACKER_PROJECT, "Project");
+			System.setProperty(SeleniumTestsContext.BUGTRACKER_USER, "jira");
+			System.setProperty(SeleniumTestsContext.BUGTRACKER_PASSWORD, "jira");
+
+			System.setProperty("url", "http://mysite.com");
+
+			ArgumentCaptor<List<TestStep>> testStepsArgument = ArgumentCaptor.forClass(List.class);
+			ArgumentCaptor<Map<String, String>> issueOptionsArgument = ArgumentCaptor.forClass(Map.class);
+			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassforTestDescription"}, ParallelMode.METHODS, new String[] {"testWithLineBreaksInDescription"});
+			
+			// check we have only one result recording for each test method
+			verify(jiraConnector).createIssue(eq("core"), eq("DEV"), anyString(), eq("testWithLineBreaksInDescription"), contains("Test 'testWithLineBreaksInDescription' failed\n" + 
+					"Test goal: a test with param http://mysite.com\n" + 
+					"and line breaks"), testStepsArgument.capture(), issueOptionsArgument.capture());
+			Assert.assertEquals(testStepsArgument.getValue().size(), 3);
+
+			
+		} finally {
+			System.clearProperty(SeleniumTestsContext.BUGTRACKER_TYPE);
+			System.clearProperty(SeleniumTestsContext.BUGTRACKER_PROJECT);
+			System.clearProperty(SeleniumTestsContext.BUGTRACKER_URL);
+			System.clearProperty(SeleniumTestsContext.BUGTRACKER_USER);
+			System.clearProperty(SeleniumTestsContext.BUGTRACKER_PASSWORD);
+			System.clearProperty("url");
+		}
+	}
 }
