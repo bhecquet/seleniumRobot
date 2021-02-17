@@ -201,9 +201,9 @@ public class TestJiraConnector extends MockitoTest {
 		user = new User(new URI("http://foo/bar/u"), "user1", "user 1", "1", "user1@company.com", true, null, avatars, "UTC");
 		
 		// create test steps
-		File tmpImg = File.createTempFile("img", ".png");
+		File tmpImg = File.createTempFile("img", "123456.png");
 		tmpImg.deleteOnExit();
-		File tmpHtml = File.createTempFile("html", ".html");
+		File tmpHtml = File.createTempFile("html", "123456.html");
 		tmpHtml.deleteOnExit();
 		
 		screenshot = new ScreenShot();
@@ -712,7 +712,7 @@ public class TestJiraConnector extends MockitoTest {
 		
 		verify(issueRestClient).addComment(any(URI.class), commentArgument.capture());
 		Assert.assertEquals(commentArgument.getValue().getBody(), "update\n" + 
-				"!N-A_0-2_Test_end-N-A_0-1_Test_end-N-A_0-1_step_2-N.png|thumbnail!\n");
+				"!N-A_0-2_Test_end--123456.png|thumbnail!\n");
 		
 		// check attachments have been added (screenshot)
 		verify(issueRestClient).addAttachments(eq(new URI("http://foo/bar/i/1/attachments")), screenshotCaptor.capture());
@@ -765,8 +765,8 @@ public class TestJiraConnector extends MockitoTest {
 				"{code:java}Step Test end{code}\n" + 
 				"\n" + 
 				"h2. Associated screenshots\n" + 
-				"!N-A_0-2_Test_end-N-A_0-1_Test_end-N-A_0-1_step_2-N.png|thumbnail!\n" + 
-				"!N-A_0-2_Test_end-N-A_0-1_Test_end-N-A_0-1_step_2-N.png|thumbnail!\n" + 
+				"!N-A_0-2_Test_end--123456.png|thumbnail!\n" + 
+				"!N-A_0-2_Test_end--123456.png|thumbnail!\n" + 
 				"\n" + 
 				"\n" + 
 				"For more details, see attached .zip file");
@@ -826,8 +826,8 @@ public class TestJiraConnector extends MockitoTest {
 				"{code:java}Step Test end{code}\n" + 
 				"\n" + 
 				"h2. Associated screenshots\n" + 
-				"!N-A_0-2_Test_end-N-A_0-1_Test_end-N-A_0-1_step_2-N.png|thumbnail!\n" + 
-				"!N-A_0-2_Test_end-N-A_0-1_Test_end-N-A_0-1_step_2-N.png|thumbnail!\n"
+				"!N-A_0-2_Test_end--123456.png|thumbnail!\n" + 
+				"!N-A_0-2_Test_end--123456.png|thumbnail!\n"
 				);
 		Assert.assertEquals(jiraBean.getSummary(), "[Selenium][selenium][DEV][ngName] test myTest KO");
 		Assert.assertEquals(jiraBean.getReporter(), "you");
@@ -867,8 +867,8 @@ public class TestJiraConnector extends MockitoTest {
 				"{code:java}Step Test end{code}\n" + 
 				"\n" + 
 				"h2. Associated screenshots\n" + 
-				"!N-A_0-2_Test_end-N-A_0-1_Test_end-N-A_0-1_step_2-N.png|thumbnail!\n" + 
-				"!N-A_0-2_Test_end-N-A_0-1_Test_end-N-A_0-1_step_2-N.png|thumbnail!\n" + 
+				"!N-A_0-2_Test_end--123456.png|thumbnail!\n" + 
+				"!N-A_0-2_Test_end--123456.png|thumbnail!\n" + 
 				"\n" + 
 				"\n" + 
 				"For more details, see attached .zip file");
