@@ -154,5 +154,9 @@ public class SnapshotCheckType {
 	public double getErrorThreshold() {
 		return errorThreshold;
 	}
+
+	public Control getControl() {
+		return control;
+	}
 		
 }

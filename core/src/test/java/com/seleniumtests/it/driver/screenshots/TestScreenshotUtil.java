@@ -21,6 +21,8 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
@@ -33,6 +35,7 @@ import org.testng.ITestResult;
 import org.testng.annotations.Test;
 import org.testng.xml.XmlSuite.ParallelMode;
 
+import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.runner.SeleniumRobotTestListener;
 import com.seleniumtests.core.utils.TestNGResultUtils;
@@ -155,5 +158,82 @@ public class TestScreenshotUtil extends ReporterTest {
 				WebUIDriver.cleanUp();
 			}
 		}
+	}
+	
+	/**
+	 * Test scrollDelay=0
+	 * Check capture delay is not too high
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testNoScrollDelay() throws Exception {
+		
+		try {
+			System.setProperty(SeleniumTestsContext.SNAPSHOT_SCROLL_DELAY, "0");
+			
+			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriverCustomSnapshot"});
+			
+	
+			for (ISuiteResult suiteResult: SeleniumRobotTestListener.getSuiteList().get(0).getResults().values()) {
+				for (ITestResult testResult: suiteResult.getTestContext().getPassedTests().getAllResults()) {
+					List<TestStep> steps = TestNGResultUtils.getSeleniumRobotTestContext(testResult).getTestStepManager().getTestSteps();
+					for (TestStep step: steps) {
+						if ("_captureSnapshot with args: (my snapshot, )".equals(step.getName())) {
+							Assert.assertTrue(step.getSnapshots().get(0).getDurationToExclude() < 3000);
+							return;
+						}	
+					}
+				}
+			}
+			
+			Assert.fail("step has not been found");
+
+		} finally {
+			System.clearProperty(SeleniumTestsContext.SNAPSHOT_SCROLL_DELAY);
+		}
+		
+	}
+	/**
+	 * Test scrollDelay=1000 so that it can be distinguished
+	 * Check that capture for report (when page opens or for 'Test end') is not affected by the scrollDelay setting
+	 * Check that for image comparison, setting is used
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testWithScrollDelay() throws Exception {
+		
+		try {
+			System.setProperty(SeleniumTestsContext.SNAPSHOT_SCROLL_DELAY, "1000");
+			
+			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriverCustomSnapshot"});
+			
+			int checkNumbers = 0;
+			for (ISuiteResult suiteResult: SeleniumRobotTestListener.getSuiteList().get(0).getResults().values()) {
+				for (ITestResult testResult: suiteResult.getTestContext().getPassedTests().getAllResults()) {
+					List<TestStep> steps = TestNGResultUtils.getSeleniumRobotTestContext(testResult).getTestStepManager().getTestSteps();
+					for (TestStep step: steps) {
+						
+						// check that standard screenshots are not affected by scrollDelay setting
+						if (step.getName().startsWith("openPage with args: ")) {
+							Assert.assertTrue(step.getSnapshots().get(0).getDurationToExclude() < 3000);
+							checkNumbers++;
+						}
+						
+						// check that screenshots used for image comparison are affected by scrollDelay setting
+						else if ("_captureSnapshot with args: (my snapshot, )".equals(step.getName())) {
+							Assert.assertTrue(step.getSnapshots().get(0).getDurationToExclude() > 4000);
+							Assert.assertEquals(checkNumbers, 1);
+							return;
+						}	
+					}
+				}
+			}
+			
+			Assert.fail("step has not been found");
+			
+		} finally {
+			System.clearProperty(SeleniumTestsContext.SNAPSHOT_SCROLL_DELAY);
+		}
+		
 	}
 }

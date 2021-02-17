@@ -72,6 +72,7 @@ import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.driver.screenshots.ScreenShot;
 import com.seleniumtests.driver.screenshots.ScreenshotUtil;
 import com.seleniumtests.driver.screenshots.SnapshotCheckType;
+import com.seleniumtests.driver.screenshots.SnapshotCheckType.Control;
 import com.seleniumtests.driver.screenshots.SnapshotTarget;
 import com.seleniumtests.uipage.htmlelements.CheckBoxElement;
 import com.seleniumtests.uipage.htmlelements.Element;
@@ -654,12 +655,24 @@ public class PageObject extends BasePage implements IPage {
      */
     public void capturePageSnapshot(String snapshotName, SnapshotCheckType checkSnapshot) {
     	
-    	ScreenShot screenShot = screenshotUtil.capture(SnapshotTarget.PAGE, ScreenShot.class);
+    	ScreenShot screenShot = screenshotUtil.capture(SnapshotTarget.PAGE, ScreenShot.class, computeScrollDelay(checkSnapshot));
     	
     	// check SnapshotCheckType configuration is compatible with the snapshot
     	checkSnapshot.check(SnapshotTarget.PAGE);
     	
     	storeSnapshot(snapshotName, screenShot, checkSnapshot);
+    }
+    
+    /**
+     * Returns 0 if snapshot is only taken for test report. Else, returns the defined scrollDelay from params
+     * @param checkSnapshot
+     */
+    private int computeScrollDelay(SnapshotCheckType checkSnapshot) {
+    	if (checkSnapshot.getControl() != Control.NONE) {
+    		return robotConfig().getSnapshotScrollDelay().intValue();
+    	} else {
+    		return 0;
+    	}
     }
     
     /**
@@ -688,7 +701,7 @@ public class PageObject extends BasePage implements IPage {
     public void captureElementSnapshot(String snapshotName, WebElement element, SnapshotCheckType checkSnapshot) {
 
     	SnapshotTarget snapshotTarget = new SnapshotTarget(element);
-    	ScreenShot screenShot = screenshotUtil.capture(snapshotTarget, ScreenShot.class);
+    	ScreenShot screenShot = screenshotUtil.capture(snapshotTarget, ScreenShot.class, computeScrollDelay(checkSnapshot));
 
     	// check SnapshotCheckType configuration is compatible with the snapshot
     	checkSnapshot.check(snapshotTarget);
