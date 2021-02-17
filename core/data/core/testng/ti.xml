@@ -11,7 +11,6 @@
     <parameter name="overrideSeleniumNativeAction" value="true" />
     
     <test name="IExplorer" parallel="false">
-    	<parameter name="EXCLUDE_FROM_SQUASH_TA" value="" />
 
 		<groups>
             <run>
@@ -28,7 +27,6 @@
     </test>
     
     <test name="IntegrationTests" parallel="false">
-    	<parameter name="EXCLUDE_FROM_SQUASH_TA" value="" />
  		<parameter name="variable1" value="value1" />
  
         <groups>
@@ -47,7 +45,6 @@
     </test>
     
     <test name="PageObject" parallel="false">
-    	<parameter name="EXCLUDE_FROM_SQUASH_TA" value="" />
  		<parameter name="variable1" value="value3" />
 
         <classes>
@@ -57,7 +54,6 @@
     
     <!-- below are tests with smaller sized groups -->
     <test name="reporter" parallel="false">
-    	<parameter name="EXCLUDE_FROM_SQUASH_TA" value="" />
  		<parameter name="variable1" value="value1" />
 
         <packages>
@@ -65,7 +61,6 @@
         </packages>
     </test>
     <test name="util" parallel="false">
-    	<parameter name="EXCLUDE_FROM_SQUASH_TA" value="" />
  		<parameter name="variable1" value="value1" />
 
         <packages>
@@ -73,7 +68,6 @@
         </packages>
     </test>
     <test name="webelements" parallel="false">
-    	<parameter name="EXCLUDE_FROM_SQUASH_TA" value="" />
  		<parameter name="variable1" value="value1" />
 
         <packages>
@@ -81,7 +75,6 @@
         </packages>
     </test>
     <test name="connector" parallel="false">
-    	<parameter name="EXCLUDE_FROM_SQUASH_TA" value="" />
  		<parameter name="variable1" value="value1" />
 
         <packages>
@@ -89,7 +82,6 @@
         </packages>
     </test>
     <test name="browserfactory" parallel="false">
-    	<parameter name="EXCLUDE_FROM_SQUASH_TA" value="" />
  		<parameter name="variable1" value="value1" />
 
         <packages>
@@ -97,7 +89,6 @@
         </packages>
     </test>
     <test name="browser1" parallel="false">
-    	<parameter name="EXCLUDE_FROM_SQUASH_TA" value="" />
  		<parameter name="variable1" value="value1" />
 
         <classes>
@@ -109,7 +100,6 @@
         </classes>
     </test>
     <test name="browser2" parallel="false">
-    	<parameter name="EXCLUDE_FROM_SQUASH_TA" value="" />
  		<parameter name="variable1" value="value1" />
 
         <classes>
@@ -123,7 +113,6 @@
         </classes>
     </test>
     <test name="browser3" parallel="false">
-    	<parameter name="EXCLUDE_FROM_SQUASH_TA" value="" />
  		<parameter name="variable1" value="value1" />
 
 		<packages>
@@ -132,7 +121,6 @@
 
     </test>
     <test name="browserChrome" parallel="false">
-    	<parameter name="EXCLUDE_FROM_SQUASH_TA" value="" />
  		<parameter name="variable1" value="value1" />
 
 		<classes>
@@ -147,7 +135,6 @@
 
     </test>
     <test name="browserFirefox" parallel="false">
-    	<parameter name="EXCLUDE_FROM_SQUASH_TA" value="" />
  		<parameter name="variable1" value="value1" />
 
 		<classes>
@@ -163,5 +150,12 @@
     </test>
    
 
+	<test name="singleTest" parallel="false">
+ 		<parameter name="variable1" value="value3" />
+
+        <classes>
+            <class name="com.seleniumtests.it.browserfactory.TestSeleniumGridDriverFactory" />
+        </classes>
+    </test>
 
 </suite> 

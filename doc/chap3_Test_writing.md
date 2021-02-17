@@ -222,7 +222,6 @@ to pluginRepository list in settings.xml
 	- `features` contains feature files (mandatory if cucumber mode is used)<br/>
 	- `testng` contains testng files to start tests (mandatory)<br/>
 	- `config` contains centralized env test configuration (optional)<br/>
-	- `squash-ta` contains ta files that should override the default ones (optional). See Squash-TA section for details <br/>
 
 - Test code must be in `src/test/java`
 - **WARN** When using IntelliJ, you must also create a `src/main/java` with subpackage inside and a main class. This does nothing but IntelliJ cannot weave aspects without that: you get `Error:Module '<some_module>' tests: org.aspectj.bridge.AbortException: bad aspect library: 'D:\Dev\seleniumRobot-maaffr\target\classes'`
