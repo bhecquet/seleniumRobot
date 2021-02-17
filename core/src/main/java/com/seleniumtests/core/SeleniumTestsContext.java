@@ -138,6 +138,7 @@ public class SeleniumTestsContext {
 
     public static final String SNAPSHOT_TOP_CROPPING = "snapshotTopCropping";
     public static final String SNAPSHOT_BOTTOM_CROPPING = "snapshotBottomCropping";
+    public static final String SNAPSHOT_SCROLL_DELAY = "snapshotScrollDelay";
     
     public static final String WEB_PROXY_TYPE = "proxyType";					// type de proxy. AUTO, MANUAL, NO
     public static final String WEB_PROXY_TYPE_FROM_USER = "proxyTypeFromUser";	// issue #158: proxy type as requested by user. Store it 
@@ -241,6 +242,7 @@ public class SeleniumTestsContext {
 	public static final String DEFAULT_VIDEO_CAPTURE = "onError";
 	public static final Integer DEFAULT_SNAPSHOT_TOP_CROPPING = null;
 	public static final Integer DEFAULT_SNAPSHOT_BOTTOM_CROPPING = null;
+	public static final int DEFAULT_SNAPSHOT_SCROLL_DELAY = 0;
 	public static final boolean DEFAULT_ENABLE_JAVASCRIPT = true;
 	public static final boolean DEFAULT_SET_ACCEPT_UNTRUSTED_CERTIFICATES = true;
 	public static final boolean DEFAULT_SET_ASSUME_UNTRUSTED_CERTIFICATE_ISSUER = true;
@@ -429,6 +431,7 @@ public class SeleniumTestsContext {
         setWebProxyExclude(getValueForTest(WEB_PROXY_EXCLUDE, System.getProperty(WEB_PROXY_EXCLUDE)));
         setWebProxyPac(getValueForTest(WEB_PROXY_PAC, System.getProperty(WEB_PROXY_PAC)));
         
+        setSnapshotScrollDelay(getIntValueForTest(SNAPSHOT_SCROLL_DELAY, System.getProperty(SNAPSHOT_SCROLL_DELAY)));
         setSnapshotBottomCropping(getIntValueForTest(SNAPSHOT_BOTTOM_CROPPING, System.getProperty(SNAPSHOT_BOTTOM_CROPPING)));
         setSnapshotTopCropping(getIntValueForTest(SNAPSHOT_TOP_CROPPING, System.getProperty(SNAPSHOT_TOP_CROPPING)));
         setCaptureSnapshot(getBoolValueForTest(CAPTURE_SNAPSHOT, System.getProperty(CAPTURE_SNAPSHOT)));
@@ -1105,6 +1108,10 @@ public class SeleniumTestsContext {
         } else {
             return this.getOutputDirectory() + "\\downloads\\";
         }
+    }
+    
+    public Integer getSnapshotScrollDelay() {
+    	return (Integer) getAttribute(SNAPSHOT_SCROLL_DELAY);
     }
     
     public Integer getSnapshotBottomCropping() {
@@ -2252,6 +2259,14 @@ public class SeleniumTestsContext {
     }
     
     
+    
+    public void setSnapshotScrollDelay(Integer scrollDelay) {
+    	if (scrollDelay != null) {
+    		setAttribute(SNAPSHOT_SCROLL_DELAY, scrollDelay);
+    	} else {
+    		setAttribute(SNAPSHOT_SCROLL_DELAY, DEFAULT_SNAPSHOT_SCROLL_DELAY);
+    	}
+    }
     
     public void setSnapshotBottomCropping(Integer crop) {
     	if (crop != null) {

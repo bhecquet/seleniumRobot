@@ -47,6 +47,7 @@ import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.util.FileUtility;
 import com.seleniumtests.util.HashCodeGenerator;
+import com.seleniumtests.util.helper.WaitHelper;
 import com.seleniumtests.util.imaging.ImageProcessor;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
@@ -221,6 +222,10 @@ public class ScreenshotUtil {
     	return capture(target, exportClass, false);
     } 
     
+    public <T extends Object> T capture(SnapshotTarget target, Class<T> exportClass, int scrollDelay) {
+    	return capture(target, exportClass, false, scrollDelay);
+    } 
+    
     /**
      * @deprecated use method with SnapshotTarget signature instead
      * @param <T>
@@ -240,10 +245,22 @@ public class ScreenshotUtil {
      * @param force			force capture even if set to false in SeleniumTestContext. This allows PictureElement and ScreenZone to work
      * @return the screenshot or null if user requested not to take screenshots and force is "false"
      */
-    
     public <T extends Object> T capture(SnapshotTarget target, Class<T> exportClass, boolean force) {
+    	return capture(target, exportClass, force, 0);
+    }
+    
+    /**
+     * Capture a picture
+     * @param target		which picture to take, screen or page.
+     * @param exportClass	The type of export to perform (File, ScreenShot, String, BufferedImage)
+     * @param force			force capture even if set to false in SeleniumTestContext. This allows PictureElement and ScreenZone to work
+     * @param scrollDelay	time in ms between the scrolling (when it's needed) and effective capture. A higher value means we have chance all picture have been loaded (with progressive loading)
+     * 						but capture take more time
+     * @return the screenshot or null if user requested not to take screenshots and force is "false"
+     */
+    public <T extends Object> T capture(SnapshotTarget target, Class<T> exportClass, boolean force, int scrollDelay) {
     	try {
-			return capture(target, exportClass, false, force).get(0);
+			return capture(target, exportClass, false, force, scrollDelay).get(0);
 		} catch (IndexOutOfBoundsException e) {
 			return null;
 		}
@@ -285,49 +302,33 @@ public class ScreenshotUtil {
      * @param exportClass	The type of export to perform (File, ScreenShot, String, BufferedImage)
      * @param allWindows	if true, will take a screenshot for all windows (only available for browser capture)
      * @param force			force capture even if set to false in SeleniumTestContext. This allows PictureElement and ScreenZone to work
-     * @return
+     * @return				The image in the requested format
      */
     
     public <T extends Object> List<T> capture(SnapshotTarget target, Class<T> exportClass, boolean allWindows, boolean force) {
+    	return capture(target, exportClass, allWindows, force, 0);
+    }
+    
+    /**
+     * Capture a picture
+     * @param target		which picture to take, screen or page.
+     * @param exportClass	The type of export to perform (File, ScreenShot, String, BufferedImage)
+     * @param allWindows	if true, will take a screenshot for all windows (only available for browser capture)
+     * @param force			force capture even if set to false in SeleniumTestContext. This allows PictureElement and ScreenZone to work
+     * @param scrollDelay	time in ms between the scrolling (when it's needed) and effective capture. A higher value means we have chance all picture have been loaded (with progressive loading)
+     * 						but capture take more time
+     * @return				The image in the requested format
+     */
+    public <T extends Object> List<T> capture(SnapshotTarget target, Class<T> exportClass, boolean allWindows, boolean force, int scrollDelay) {
     	
     	if (!force && (SeleniumTestsContextManager.getThreadContext() == null 
         		|| getOutputDirectory() == null 
         		|| !SeleniumTestsContextManager.getThreadContext().getCaptureSnapshot())) {
             return new ArrayList<>();
         }
-    	
-    	List<NamedBufferedImage> capturedImages = new ArrayList<>();
+
     	LocalDateTime start = LocalDateTime.now();
-    	
-    	// capture desktop
-    	if (target.isScreenTarget() && SeleniumTestsContextManager.isDesktopWebTest()) {
-    		capturedImages.add(new NamedBufferedImage(captureDesktop(), ""));
-    		
-    	// capture web with scrolling
-    	} else if (target.isPageTarget() && SeleniumTestsContextManager.isWebTest()) {
-    		removeAlert();
-    		capturedImages.addAll(captureWebPages(allWindows));
-    		
-    	// capture web with scrolling on the main window
-    	} else if (target.isElementTarget() && SeleniumTestsContextManager.isWebTest()) {
-    		removeAlert();
-    		capturedImages.addAll(captureWebPages(false));
-    		
-	    } else if ((target.isPageTarget() || target.isElementTarget()) && SeleniumTestsContextManager.isAppTest()){
-    		capturedImages.add(new NamedBufferedImage(capturePage(-1, -1), ""));
-    	} else {
-    		throw new ScenarioException("Capturing page is only possible for web and application tests. Capturing desktop possible for desktop web tests only");
-    	}
-    	
-    	// if we want to capture an element only, crop the previous capture
-    	if (target.isElementTarget() && target.getElement() != null && !capturedImages.isEmpty()) {
-    		Rectangle elementPosition = target.getElement().getRect();
-    		NamedBufferedImage wholeImage = capturedImages.remove(0);
-    		BufferedImage elementImage = ImageProcessor.cropImage(wholeImage.image, elementPosition.x, elementPosition.y, elementPosition.width, elementPosition.height);
-    		NamedBufferedImage namedElementImage = new NamedBufferedImage(elementImage, "");
-    		namedElementImage.addElementMetaDataToImage(target.getElement());
-    		capturedImages.add(0, namedElementImage);
-    	}
+    	List<NamedBufferedImage> capturedImages = captureAllImages(target, allWindows, scrollDelay);
     	
     	// back to page top
     	try {
@@ -340,7 +341,20 @@ public class ScreenshotUtil {
     		// org.openqa.selenium.WebDriverException: Can't execute JavaScript before a page has been loaded!
     	}
     	
-    	List<T> out = new ArrayList<>();
+    	return exportBufferedImages(exportClass, start, capturedImages);
+
+    }
+
+	/**
+	 * Export the captured images
+	 * @param <T>
+	 * @param exportClass
+	 * @param start
+	 * @param capturedImages
+	 * @return
+	 */
+	private <T> List<T> exportBufferedImages(Class<T> exportClass, LocalDateTime start, List<NamedBufferedImage> capturedImages) {
+		List<T> out = new ArrayList<>();
     	for (NamedBufferedImage capturedImage: capturedImages) {
     		if (capturedImage != null) {
 		    	if (exportClass.equals(File.class)) {
@@ -358,9 +372,49 @@ public class ScreenshotUtil {
 		    	}
     		}
     	}
+		return out;
+	}
+
+	/**
+	 * Capture all images and returns them as BufferedImages
+	 * @param target
+	 * @param allWindows
+	 * @return
+	 */
+	private List<NamedBufferedImage> captureAllImages(SnapshotTarget target, boolean allWindows, int scrollDelay) {
+		List<NamedBufferedImage> capturedImages = new ArrayList<>();
     	
-    	return out;
-    }
+    	// capture desktop
+    	if (target.isScreenTarget() && SeleniumTestsContextManager.isDesktopWebTest()) {
+    		capturedImages.add(new NamedBufferedImage(captureDesktop(), ""));
+    		
+    	// capture web with scrolling
+    	} else if (target.isPageTarget() && SeleniumTestsContextManager.isWebTest()) {
+    		removeAlert();
+    		capturedImages.addAll(captureWebPages(allWindows, scrollDelay));
+    		
+    	// capture web with scrolling on the main window
+    	} else if (target.isElementTarget() && SeleniumTestsContextManager.isWebTest()) {
+    		removeAlert();
+    		capturedImages.addAll(captureWebPages(false, scrollDelay));
+    		
+	    } else if ((target.isPageTarget() || target.isElementTarget()) && SeleniumTestsContextManager.isAppTest()){
+    		capturedImages.add(new NamedBufferedImage(capturePage(-1, -1), ""));
+    	} else {
+    		throw new ScenarioException("Capturing page is only possible for web and application tests. Capturing desktop possible for desktop web tests only");
+    	}
+    	
+    	// if we want to capture an element only, crop the previous capture
+    	if (target.isElementTarget() && target.getElement() != null && !capturedImages.isEmpty()) {
+    		Rectangle elementPosition = target.getElement().getRect();
+    		NamedBufferedImage wholeImage = capturedImages.remove(0);
+    		BufferedImage elementImage = ImageProcessor.cropImage(wholeImage.image, elementPosition.x, elementPosition.y, elementPosition.width, elementPosition.height);
+    		NamedBufferedImage namedElementImage = new NamedBufferedImage(elementImage, "");
+    		namedElementImage.addElementMetaDataToImage(target.getElement());
+    		capturedImages.add(0, namedElementImage);
+    	}
+		return capturedImages;
+	}
     
     /**
      * Capture current page (either web or app page)
@@ -447,7 +501,7 @@ public class ScreenshotUtil {
      * @param allWindows		if true, all tabs/windows will be returned
      * @return
      */
-    private List<NamedBufferedImage> captureWebPages(boolean allWindows) {
+    private List<NamedBufferedImage> captureWebPages(boolean allWindows, int scrollDelay) {
     	 // check driver is accessible
         List<NamedBufferedImage> images = new ArrayList<>();
         
@@ -475,7 +529,7 @@ public class ScreenshotUtil {
 	        		}
 	        		driver.switchTo().window(windowHandle);
 	        		windowWithSeleniumfocus = windowHandle;
-	        		images.add(new NamedBufferedImage(captureWebPage(), "").addMetaDataToImage());
+	        		images.add(new NamedBufferedImage(captureWebPage(scrollDelay), "").addMetaDataToImage());
 	        	}
 	        }
 	        
@@ -488,7 +542,7 @@ public class ScreenshotUtil {
         		}
         		
         		// capture current window
-        		images.add(new NamedBufferedImage(captureWebPage(), "Current Window: ").addMetaDataToImage());
+        		images.add(new NamedBufferedImage(captureWebPage(scrollDelay), "Current Window: ").addMetaDataToImage());
         		
         	} catch (Exception e) {
         		try {
@@ -504,9 +558,10 @@ public class ScreenshotUtil {
     
     /**
      * Captures a web page. If the browser natively returns the whole page, nothing more is done. Else (only webview is returned), we scroll down the page to get more of the page  
+     * @param scrollDelay	time in ms to wait between scrolling and snapshot
      * @return
      */
-    private BufferedImage captureWebPage() {
+    private BufferedImage captureWebPage(int scrollDelay) {
 
     	Dimension contentDimension = ((CustomEventFiringWebDriver)driver).getContentDimension();
     	Dimension viewDimensions = ((CustomEventFiringWebDriver)driver).getViewPortDimensionWithoutScrollbar();
@@ -557,6 +612,9 @@ public class ScreenshotUtil {
 			} catch (JavascriptException e) {
 				// ignore javascript errors
 			}
+			
+			// wait some time (if > 0) to let picture loading
+			WaitHelper.waitForMilliSeconds(scrollDelay);
 			
 			BufferedImage image = capturePage(cropTop, cropBottom);
 			if (image == null) {

@@ -2,16 +2,16 @@ package com.seleniumtests.ut.uipage;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.atLeastOnce;
 
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -136,6 +136,8 @@ public class TestPageObject2 extends MockitoTest {
 		when(eventDriver.getBrowserInfo()).thenReturn(new BrowserInfo(BrowserType.FIREFOX, "78.0"));
 		when(screenshotUtil.capture(any(SnapshotTarget.class), ArgumentMatchers.<Class<ScreenShot>>any()))
 				.thenReturn(screenshot);
+		when(screenshotUtil.capture(any(SnapshotTarget.class), ArgumentMatchers.<Class<ScreenShot>>any(), anyInt()))
+				.thenReturn(screenshot);
 		when(screenshot.getHtmlSourcePath()).thenReturn("foo");
 
 		page = new PageForActions();
@@ -169,6 +171,37 @@ public class TestPageObject2 extends MockitoTest {
 		// check capture has been done on the second call (a first capture is done at
 		// PageObject init)
 		Assert.assertFalse(page.getHtmlFilePath().equals(htmlFilePath));
+		
+		// check scroll delay is not applied
+		verify(screenshotUtil).capture(any(SnapshotTarget.class), eq(ScreenShot.class), eq(0));
+	}
+	
+	@Test(groups = { "ut" })
+	public void testCapturPageSnapshotWithCheckAndDelay() throws IOException {
+	
+		SeleniumTestsContextManager.getThreadContext().setSnapshotScrollDelay(100);
+		
+		page.setScreenshotUtil(screenshotUtil);
+		page.capturePageSnapshot("img", SnapshotCheckType.TRUE);
+		
+		// check scroll delay is applied
+		verify(screenshotUtil).capture(any(SnapshotTarget.class), eq(ScreenShot.class), eq(100));
+	}
+	
+	/**
+	 * scrollDelay s set, but snapshot is not performed for control
+	 * @throws IOException
+	 */
+	@Test(groups = { "ut" })
+	public void testCapturePageSnapshotWithoutCheckAndDelay() throws IOException {
+		
+		SeleniumTestsContextManager.getThreadContext().setSnapshotScrollDelay(100);
+		
+		page.setScreenshotUtil(screenshotUtil);
+		page.capturePageSnapshot("img", SnapshotCheckType.FALSE);
+
+		// check scroll delay is 0 
+		verify(screenshotUtil).capture(any(SnapshotTarget.class), eq(ScreenShot.class), eq(0));
 	}
 
 	/**
@@ -200,6 +233,37 @@ public class TestPageObject2 extends MockitoTest {
 		// check capture has been done on the second call (a first capture is done at
 		// PageObject init)
 		Assert.assertFalse(page.getHtmlFilePath().equals(htmlFilePath));
+		
+		// check scroll delay is 0 by default
+		verify(screenshotUtil).capture(any(SnapshotTarget.class), eq(ScreenShot.class), eq(0));
+	}
+	
+	@Test(groups = { "ut" })
+	public void testCaptureElementSnapshotWithCheckAndDelay() throws IOException {
+	
+		SeleniumTestsContextManager.getThreadContext().setSnapshotScrollDelay(100);
+		
+		page.setScreenshotUtil(screenshotUtil);
+		page.captureElementSnapshot("img", new HtmlElement("", By.id("el")), SnapshotCheckType.TRUE);
+		
+		// check scroll delay is applied
+		verify(screenshotUtil).capture(any(SnapshotTarget.class), eq(ScreenShot.class), eq(100));
+	}
+	
+	/**
+	 * scrollDelay s set, but snapshot is not performed for control
+	 * @throws IOException
+	 */
+	@Test(groups = { "ut" })
+	public void testCaptureElementSnapshotWithoutCheckAndDelay() throws IOException {
+		
+		SeleniumTestsContextManager.getThreadContext().setSnapshotScrollDelay(100);
+		
+		page.setScreenshotUtil(screenshotUtil);
+		page.captureElementSnapshot("img", new HtmlElement("", By.id("el")), SnapshotCheckType.FALSE);
+
+		// check scroll delay is 0 by default
+		verify(screenshotUtil).capture(any(SnapshotTarget.class), eq(ScreenShot.class), eq(0));
 	}
 
 	/**

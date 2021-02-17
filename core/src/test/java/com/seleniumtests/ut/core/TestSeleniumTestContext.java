@@ -799,6 +799,19 @@ public class TestSeleniumTestContext extends GenericTest {
 	}
 	
 	@Test(groups="ut context")
+	public void testSnapshotScrollDelay(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setSnapshotScrollDelay(5);
+		Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getSnapshotScrollDelay(), (Integer)5);
+	}
+	@Test(groups="ut context")
+	public void testSnapshotScrollDelayNull(final ITestContext testNGCtx, final XmlTest xmlTest) {
+		initThreadContext(testNGCtx);
+		SeleniumTestsContextManager.getThreadContext().setSnapshotScrollDelay(null);
+		Assert.assertEquals((int)SeleniumTestsContextManager.getThreadContext().getSnapshotScrollDelay(), SeleniumTestsContext.DEFAULT_SNAPSHOT_SCROLL_DELAY);
+	}
+	
+	@Test(groups="ut context")
 	public void testSnapshotTopCropping(final ITestContext testNGCtx, final XmlTest xmlTest) {
 		initThreadContext(testNGCtx);
 		SeleniumTestsContextManager.getThreadContext().setSnapshotTopCropping(5);
