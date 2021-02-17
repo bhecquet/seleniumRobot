@@ -1,11 +1,8 @@
 package com.seleniumtests.reporter.reporters;
 
-import static com.epam.reportportal.testng.TestNGService.ITEM_TREE;
-
 import java.io.File;
 import java.util.Calendar;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import org.testng.ITestContext;
@@ -14,13 +11,6 @@ import org.testng.ITestResult;
 import com.epam.reportportal.listeners.ItemStatus;
 import com.epam.reportportal.listeners.LogLevel;
 import com.epam.reportportal.service.ReportPortal;
-import com.epam.reportportal.service.tree.ItemTreeReporter;
-import com.epam.reportportal.service.tree.TestItemTree;
-import com.epam.reportportal.service.tree.TestItemTree.ItemTreeKey;
-import com.epam.reportportal.service.tree.TestItemTree.TestItemLeaf;
-import com.epam.reportportal.testng.TestNGService;
-import com.epam.reportportal.testng.util.ItemTreeUtils;
-import com.epam.ta.reportportal.ws.model.FinishTestItemRQ;
 import com.epam.ta.reportportal.ws.model.log.SaveLogRQ;
 import com.seleniumtests.connectors.tms.reportportal.ReportPortalService;
 import com.seleniumtests.core.SeleniumTestsContext;

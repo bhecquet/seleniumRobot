@@ -26,8 +26,6 @@ import com.seleniumtests.driver.WebUIDriver;
 import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.PerformsTouchActions;
 import io.appium.java_client.TouchAction;
-import io.appium.java_client.android.AndroidTouchAction;
-import io.appium.java_client.ios.IOSTouchAction;
 
 /**
  * parent class for all elements to share code between HtmlElement and non HtmlElement classes

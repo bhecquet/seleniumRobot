@@ -26,7 +26,6 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 
-import org.apache.commons.io.FileUtils;
 import org.json.JSONObject;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;

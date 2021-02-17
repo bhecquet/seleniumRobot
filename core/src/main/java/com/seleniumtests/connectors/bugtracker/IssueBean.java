@@ -1,11 +1,5 @@
 package com.seleniumtests.connectors.bugtracker;
 
-import com.seleniumtests.driver.screenshots.ScreenShot;
-import com.seleniumtests.reporter.logger.TestStep;
-import org.apache.commons.lang3.StringUtils;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
-
 import java.io.File;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -13,6 +7,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.commons.lang3.StringUtils;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+
+import com.seleniumtests.driver.screenshots.ScreenShot;
+import com.seleniumtests.reporter.logger.TestStep;
 
 /**
  * Stores information about an issue to be created

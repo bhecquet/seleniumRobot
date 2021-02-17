@@ -18,7 +18,6 @@
 package com.seleniumtests.browserfactory;
 
 import java.io.File;
-import java.io.UnsupportedEncodingException;
 import java.net.InetSocketAddress;
 import java.util.List;
 
