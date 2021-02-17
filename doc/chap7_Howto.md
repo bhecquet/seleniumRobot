@@ -599,6 +599,7 @@ To enable this feature you must:
 - set `seleniumRobotServerUrl` to the URL of the seleniumRobot server
 - set `seleniumRobotServerCompareSnapshots` to `true`
 - (optional) set `snapshotComparisonResult` to `displayOnly`, `changeTestResult` or `addTestResult`
+- (optional) set `snapshotScrollDelay` to a value > 0 (time in ms to wait for image loading before taking snapshot)
 
 Then, inside your test scripts, you must add snapshots with
 
@@ -636,4 +637,30 @@ capturePageSnapshot("search", SnapshotCheckType.FULL.exclude(news.findElements()
 ```java
 captureElementSnapshot("result",  result, SnapshotCheckType.FULL.withThreshold(1.5));
 ```
+
+#### Images are not fully loaded on resulting capture ####
+
+On some browser (e.g: chrome), SeleniumRobot needs to scroll the page to rebuild the whole web page picture. 
+Taking a screenshot is done like this:
+- screenshot
+- scroll down
+- screenshot
+- scroll down
+...
+
+When web site uses progressive loading of picture, they may not be loaded when browser takes screenshot.
+To avoid this problem, you can set `snapshotScrollDelay` to, for example, '300' and see if it helps. 
+Then the process of taking screenshot will be
+
+- screenshot
+- scroll down
+- wait 300 ms
+- screenshot
+- scroll down
+- wait 300 ms
+...
+
+This setting wil ldepend on you network capabilities and the size of the loaded pictures. It's a bit empiric.
+
+**This setting only applies to snapshot that will be used for comparison**
 

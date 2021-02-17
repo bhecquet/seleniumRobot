@@ -138,7 +138,7 @@ public class SeleniumTestsContext {
 
     public static final String SNAPSHOT_TOP_CROPPING = "snapshotTopCropping";
     public static final String SNAPSHOT_BOTTOM_CROPPING = "snapshotBottomCropping";
-    public static final String SNAPSHOT_SCROLL_DELAY = "snapshotScrollDelay";
+    public static final String SNAPSHOT_SCROLL_DELAY = "snapshotScrollDelay";	// time in ms between the browser scrolling (when it's needed) and effective capture. A higher value means we have chance all picture have been loaded (with progressive loading) but capture take more time. This is only valid when captures are done for image comparison
     
     public static final String WEB_PROXY_TYPE = "proxyType";					// type de proxy. AUTO, MANUAL, NO
     public static final String WEB_PROXY_TYPE_FROM_USER = "proxyTypeFromUser";	// issue #158: proxy type as requested by user. Store it 
