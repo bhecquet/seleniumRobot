@@ -39,6 +39,7 @@
 - [21 Customize driver behaviour](#21-customize-driver-behaviour)
 - [22 Automate Salesforce lightning UI](#22-automate-salesforce-lightning-ui)
 - [23 Compare snapshots](#23-compare-snapshots)
+  - [Images are not fully loaded on resulting capture](#images-are-not-fully-loaded-on-resulting-capture)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
