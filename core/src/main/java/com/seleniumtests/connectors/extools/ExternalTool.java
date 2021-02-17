@@ -26,7 +26,6 @@ import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 
-import com.seleniumtests.connectors.bugtracker.BugTracker;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.util.FileUtility;

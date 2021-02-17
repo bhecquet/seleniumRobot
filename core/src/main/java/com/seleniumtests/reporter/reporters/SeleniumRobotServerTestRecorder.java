@@ -17,7 +17,6 @@
  */
 package com.seleniumtests.reporter.reporters;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -31,13 +30,11 @@ import org.testng.ITestContext;
 import org.testng.ITestResult;
 
 import com.seleniumtests.connectors.selenium.SeleniumRobotSnapshotServerConnector;
-import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.utils.TestNGContextUtils;
 import com.seleniumtests.core.utils.TestNGResultUtils;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.SeleniumRobotServerException;
-import com.seleniumtests.driver.screenshots.SnapshotCheckType;
 import com.seleniumtests.reporter.logger.Snapshot;
 import com.seleniumtests.reporter.logger.TestStep;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
