@@ -294,6 +294,7 @@ Jira needs more parameters
 | captureSnapshot 			| true 		| Capture page snapshots. Captures are done only when a new page is opened |
 | snapshotTopCropping		| null			| number of pixel that will be cropped from the top when capturing snapshot. This only applies to snapshots done with several captures (like from chrome) when a portion of the GUI is fixed when scrolling. Default value 'null' means 'automatic'. SeleniumRobot will detect fixed headers and footers and crop them. If an integer value is given, we crop the requested pixels. '0' will crop nothing |
 | snapshotBottomCropping	| null			| same as snapshotTopCropping for bottom cropping |
+| snapshotScrollDelay		| 0			| time in ms between the browser scrolling (when it's needed) and effective capture. A higher value means we have chance all picture have been loaded (with progressive loading) but capture take more time. This is only valid when captures are done for image comparison. See [https://github.com/bhecquet/seleniumRobot/blob/master/doc/chap7_Howto.md#23-compare-snapshots](https://github.com/bhecquet/seleniumRobot/blob/master/doc/chap7_Howto.md#23-compare-snapshots) |
 
 #### Deprecated ####
 
