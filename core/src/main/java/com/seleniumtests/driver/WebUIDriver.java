@@ -441,17 +441,6 @@ public class WebUIDriver {
 		}
 	}
 
-    /**
-     * Get EventFiringWebDriver.
-     *
-     * @deprecated use getWebDriver(boolean) instead
-     * @return  webDriver
-     */
-	@Deprecated
-    public static WebDriver getWebDriver() {
-        return getWebDriver(true);
-    }
-
     public IWebDriverFactory getWebDriverBuilder() {
 		return webDriverBuilder;
 	}
@@ -486,7 +475,7 @@ public class WebUIDriver {
     	boolean createDriver = false;
     	
     	// issue #304: should we try to create the driver
-    	if (isCreate && !SeleniumTestsContextManager.isNonGuiTest()) {
+    	if (Boolean.TRUE.equals(isCreate) && !SeleniumTestsContextManager.isNonGuiTest()) {
 	    	if (uxDriverSession.get() == null 
 	        		|| uxDriverSession.get().get(driverName) == null 
 	        		|| uxDriverSession.get().get(driverName).driver == null) {

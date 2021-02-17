@@ -29,11 +29,7 @@ public class NativeSelect extends CommonSelectList implements ISelectList {
 	
 	@Override
 	public boolean isApplicable() {
-		if ("select".equalsIgnoreCase(parentElement.getTagName())) {
-			return true;
-		} else {
-			return false;
-		}
+		return "select".equalsIgnoreCase(parentElement.getTagName());
 	}
 	
 	@Override

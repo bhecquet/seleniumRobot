@@ -29,7 +29,6 @@ import org.aspectj.lang.annotation.Aspect;
  */
 @Aspect
 public class InterceptBy {
-	public static String PAGE = "";
 
 	 @Around("call(* org.openqa.selenium.By..* (..) )")
 	public Object changeArg(ProceedingJoinPoint joinPoint) throws Throwable {

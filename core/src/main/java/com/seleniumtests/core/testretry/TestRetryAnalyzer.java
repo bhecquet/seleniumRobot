@@ -98,8 +98,8 @@ public class TestRetryAnalyzer implements IRetryAnalyzer {
      * @return	true if the test is going to be retried
      */
     public boolean willBeRetried(final ITestResult result) {
-    	Integer currentRetry = (Integer) TestNGResultUtils.getRetry(result);
-    	Boolean noMoreRetry = (Boolean) TestNGResultUtils.getNoMoreRetry(result);
+    	Integer currentRetry = TestNGResultUtils.getRetry(result);
+    	Boolean noMoreRetry = TestNGResultUtils.getNoMoreRetry(result);
     	if (currentRetry == null || (noMoreRetry != null && noMoreRetry)) {
     		return false;
     	}

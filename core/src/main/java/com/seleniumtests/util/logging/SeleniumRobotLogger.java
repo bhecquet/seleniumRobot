@@ -18,13 +18,8 @@
 package com.seleniumtests.util.logging;
 
 import java.io.File;
-import java.io.FilterOutputStream;
-import java.io.FilterWriter;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.io.PrintStream;
-import java.io.Writer;
-import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -45,10 +40,7 @@ import org.apache.log4j.FileAppender;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
-import org.apache.log4j.WriterAppender;
-import org.apache.log4j.helpers.QuietWriter;
 
-import com.seleniumtests.customexception.CustomSeleniumTestsException;
 import com.seleniumtests.util.helper.WaitHelper;
 
 public class SeleniumRobotLogger {
@@ -66,7 +58,7 @@ public class SeleniumRobotLogger {
 	public static final String LOG_FILE_NAME = "seleniumRobot.log";
 	public static final String INTERNAL_DEBUG = "internalDebug";
 	public static final String MAVEN_EXECUTION = "mavenExecution";
-	public static boolean rootIsConfigured = false;
+	private static boolean rootIsConfigured = false;
 	
 	private SeleniumRobotLogger() {
 		// As a utility class, it is not meant to be instantiated.
@@ -180,7 +172,7 @@ public class SeleniumRobotLogger {
 		WaitHelper.waitForSeconds(1);
     	
 		if (new File(defaultOutputDirectory).exists()) {
-	    	for (File directory: new File(defaultOutputDirectory).listFiles(file -> file.isDirectory())) {
+	    	for (File directory: new File(defaultOutputDirectory).listFiles(File::isDirectory)) {
 	    		try {
 					if (Files.readAttributes(directory.toPath(), BasicFileAttributes.class).lastAccessTime().toInstant().atZone(ZoneOffset.UTC).toLocalTime()
 							.isBefore(ZonedDateTime.now().minusMinutes(300).withZoneSameInstant(ZoneOffset.UTC).toLocalTime())) {

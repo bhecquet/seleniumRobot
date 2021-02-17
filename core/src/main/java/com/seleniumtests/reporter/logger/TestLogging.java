@@ -217,7 +217,7 @@ public class TestLogging {
 		Map<ITestResult, SeleniumTestsContext> testResultContext = SeleniumTestsContextManager.getTestResultContext();
 		synchronized (testResultContext) {
 			for (Entry<ITestResult, SeleniumTestsContext> entry: testResultContext.entrySet()) {
-				steps.put(entry.getKey(), new ArrayList<TestStep>(entry.getValue().getTestStepManager().getTestSteps())); // copy to avoid problems with concurrent access
+				steps.put(entry.getKey(), new ArrayList<>(entry.getValue().getTestStepManager().getTestSteps())); // copy to avoid problems with concurrent access
 			}
 		}
     	

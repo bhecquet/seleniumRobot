@@ -43,6 +43,7 @@ public class Oracle extends SqlDatabase {
 	private String password;
 	private String host;
 	private String port;
+	private static final String WINDOWS_ORACLE_PATH = "C:\\oracle";
 	
 	/**
 	 * Constructor
@@ -107,8 +108,8 @@ public class Oracle extends SqlDatabase {
     		return oracleEnv;
     	}
     	
-    	if (OSUtility.getCurrentPlatorm() == Platform.WINDOWS && new File("C:\\oracle").isDirectory()) {
-    		for (File orCli: new File("C:\\oracle").listFiles()) {
+    	if (OSUtility.getCurrentPlatorm() == Platform.WINDOWS && new File(WINDOWS_ORACLE_PATH).isDirectory()) {
+    		for (File orCli: new File(WINDOWS_ORACLE_PATH).listFiles()) {
     			if (new File(orCli.getAbsolutePath() + File.separator + "NETWORK\\ADMIN\\sqlnet.ora").isFile()) {
     				return orCli.getAbsolutePath();
     			}

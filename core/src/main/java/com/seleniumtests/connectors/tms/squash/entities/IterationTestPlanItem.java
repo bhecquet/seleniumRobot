@@ -11,7 +11,7 @@ public class IterationTestPlanItem extends Entity {
 	public static final String TEST_PLAN_ITEM_URL = "iterations/%d/test-plan";
 	public static final String TEST_PLAN_ITEM_EXECUTION_URL = "iteration-test-plan-items/%d/executions";
 	
-	public TestCase testCase;
+	private TestCase testCase;
 
 	public IterationTestPlanItem(String url, int id, TestCase testCase) {
 		super(url, id, null);

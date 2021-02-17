@@ -33,7 +33,7 @@ import com.seleniumtests.util.helper.CSVHelper;
 import com.seleniumtests.util.helper.SpreadSheetHelper;
 import com.seleniumtests.util.internal.entity.TestEntity;
 
-public class testSpreadSheetHelper extends GenericTest {
+public class TestSpreadSheetHelper extends GenericTest {
 	Map<String, Object> classMap = new LinkedHashMap<String, Object>();
 	String test = "violet";
 

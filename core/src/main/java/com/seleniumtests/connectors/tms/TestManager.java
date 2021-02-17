@@ -39,7 +39,7 @@ public abstract class TestManager {
 	public static final String TMS_PROJECT = "tmsProject";
 	public static final String TMS_DOMAIN = "tmsDomain";
 	
-	protected Boolean initialized;
+	protected boolean initialized;
 	
 	protected TestManager() {
 		initialized = false;
@@ -77,7 +77,7 @@ public abstract class TestManager {
 		}
 	}
 
-	public Boolean getInitialized() {
+	public boolean getInitialized() {
 		return initialized;
 	}
 

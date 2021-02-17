@@ -279,8 +279,8 @@ public class TestTasks {
     	List<TestVariable> matchingVariables = context.getConfiguration()
 				.values()
 				.stream()
-				.filter(v -> keyPattern == null ? true: keyPattern.matcher(v.getName()).find())
-				.filter(v -> valuePattern == null ? true : valuePattern.matcher(v.getValue()).find())
+				.filter(v -> keyPattern == null || keyPattern.matcher(v.getName()).find())
+				.filter(v -> valuePattern == null || valuePattern.matcher(v.getValue()).find())
 				.collect(Collectors.toList());
     	Collections.shuffle(matchingVariables);
     	

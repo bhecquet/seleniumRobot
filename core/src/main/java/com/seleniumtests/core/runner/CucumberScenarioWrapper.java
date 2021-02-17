@@ -62,7 +62,7 @@ public class CucumberScenarioWrapper {
     	
     	// in case of examples (Scenario Outline), search if scenario description contains placeholders. 
     	// If true, only resturns description, else, return description and visualName (which contains data) so that all execution can be distinguished in report
-    	if (scenarioOutlineName != null && !Pattern.compile("<.*?>").matcher(scenarioOutlineName).find()) { 
+    	if (scenarioOutlineName != null && !Pattern.compile("<[^>]*+>").matcher(scenarioOutlineName).find()) { 
     		name = cucumberScenario.getGherkinModel().getName() + "-" + cucumberScenario.getVisualName();
     		
     	} else {

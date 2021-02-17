@@ -31,11 +31,7 @@ public class ListSelect extends CommonSelectList implements ISelectList {
 
 	@Override
 	public boolean isApplicable() {
-		if ("ul".equalsIgnoreCase(parentElement.getTagName())) {
-			return true;
-		} else {
-			return false;
-		}
+		return "ul".equalsIgnoreCase(parentElement.getTagName());
 	}
 	
 	@Override

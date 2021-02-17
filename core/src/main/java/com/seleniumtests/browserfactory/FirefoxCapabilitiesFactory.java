@@ -94,11 +94,7 @@ public class FirefoxCapabilitiesFactory extends IDesktopCapabilityFactory {
 	
 	@Override
 	protected void updateOptionsWithSelectedBrowserInfo(MutableCapabilities options) {
-		if (BrowserInfo.useLegacyFirefoxVersion(selectedBrowserInfo.getVersion())) {
-			options.setCapability(FirefoxDriver.MARIONETTE, false);
-		} else {
-			options.setCapability(FirefoxDriver.MARIONETTE, true);
-		}
+		options.setCapability(FirefoxDriver.MARIONETTE, !BrowserInfo.useLegacyFirefoxVersion(selectedBrowserInfo.getVersion()));
 		
 		((FirefoxOptions)options).setBinary(selectedBrowserInfo.getPath());
 		

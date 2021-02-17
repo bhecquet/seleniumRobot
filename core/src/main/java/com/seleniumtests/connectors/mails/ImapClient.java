@@ -157,6 +157,7 @@ public class ImapClient extends EmailClientImpl {
 		
 		// on filtre les message en fonction du mode de recherche
 		if (searchMode == SearchMode.BY_INDEX || firstTime == null) {
+			//preFilteredMessages = Arrays.asList(Arrays.copyOfRange(messages, firstMessageIndex, messages.length)); => to test
 			for (int i = firstMessageIndex, n = messages.length; i < n; i++) {
 				preFilteredMessages.add(messages[i]);
 			}
@@ -208,7 +209,7 @@ public class ImapClient extends EmailClientImpl {
 						
 					} else if (partContentType.contains("text/")
 						&& !partContentType.contains("vcard")) {
-						messageContent = messageContent.concat((String)part.getContent().toString());					
+						messageContent = messageContent.concat(part.getContent().toString());					
 						
 					} else if (partContentType.contains("image")
 							|| partContentType.contains("application/")

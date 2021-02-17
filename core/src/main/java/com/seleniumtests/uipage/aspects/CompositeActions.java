@@ -97,7 +97,7 @@ public class CompositeActions {
 	 * @throws IllegalAccessException
 	 */
 	@Before("execution(public void org.openqa.selenium.remote.RemoteWebDriver.perform (..))")
-	public void updateHandlesNewActions(JoinPoint joinPoint) throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
+	public void updateHandlesNewActions(JoinPoint joinPoint) throws NoSuchFieldException, IllegalAccessException {
 
 		@SuppressWarnings("unchecked")
 		Collection<Sequence> sequences = (Collection<Sequence>)joinPoint.getArgs()[0];
@@ -108,43 +108,54 @@ public class CompositeActions {
 			@SuppressWarnings("unchecked")
 			LinkedList<Interaction> actionsList = (LinkedList<Interaction>)actionsField.get(sequence);
 			
-			Boolean clic = null;
-			boolean clickRequested = false;
+			updateWindowHandles(actionsList);
+		}
+	}
 
-			for (Interaction action: actionsList) {
-				if (action.getClass().getName().contains("PointerInput$PointerPress")) {
-					Field buttonField = action.getClass().getDeclaredField("button");
-					buttonField.setAccessible(true);
-					int button = buttonField.getInt(action);
-					
-					Field directionField = action.getClass().getDeclaredField("direction");
-					directionField.setAccessible(true);
-					String direction = directionField.get(action).toString();
-					
-					// only left button
-					if (button != 0) {
-						clic = null;
-						continue;
-					}
-					
-					// check we have a DOWN -> UP sequence
-					if ("DOWN".equals(direction) && clic == null) {
-						clic = true;
-					} else if (clic && "UP".equals(direction)) {
-						clic = null;
-						clickRequested = true;
-					} else {
-						clic = null;
-					}
-					
+	/**
+	 * Analyse action list and determine if a clic action occured. If it's the case, update window handles
+	 * @param actionsList
+	 * @throws NoSuchFieldException
+	 * @throws IllegalAccessException
+	 */
+	private void updateWindowHandles(LinkedList<Interaction> actionsList)
+			throws NoSuchFieldException, IllegalAccessException {
+		Boolean clic = null;
+		boolean clickRequested = false;
+
+		for (Interaction action: actionsList) {
+			if (action.getClass().getName().contains("PointerInput$PointerPress")) {
+				Field buttonField = action.getClass().getDeclaredField("button");
+				buttonField.setAccessible(true);
+				int button = buttonField.getInt(action);
+				
+				Field directionField = action.getClass().getDeclaredField("direction");
+				directionField.setAccessible(true);
+				String direction = directionField.get(action).toString();
+				
+				// only left button
+				if (button != 0) {
+					clic = null;
+					continue;
+				}
+				
+				// check we have a DOWN -> UP sequence
+				if ("DOWN".equals(direction) && clic == null) {
+					clic = true;
+				} else if (Boolean.TRUE.equals(clic) && "UP".equals(direction)) {
+					clic = null;
+					clickRequested = true;
 				} else {
 					clic = null;
 				}
+				
+			} else {
+				clic = null;
 			}
-			
-			if (clickRequested) {
-				((CustomEventFiringWebDriver)WebUIDriver.getWebDriver(false)).updateWindowsHandles();
-			}
+		}
+		
+		if (clickRequested) {
+			((CustomEventFiringWebDriver)WebUIDriver.getWebDriver(false)).updateWindowsHandles();
 		}
 	}
 	

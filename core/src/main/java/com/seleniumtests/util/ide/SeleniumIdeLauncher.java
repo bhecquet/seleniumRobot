@@ -70,27 +70,14 @@ public class SeleniumIdeLauncher {
 	}
 	
 	public void executeGeneratedClasses(Map<String, String> classCodes) throws ClassNotFoundException {
-//		URLClassLoader sysLoader = (URLClassLoader) ClassLoader.getSystemClassLoader();
-//	    URL urls[] = sysLoader.getURLs();
 		ClassLoader loader = Thread.currentThread().getContextClassLoader();
-//        WeavingURLClassLoader weaver = null;
-//		try {
-//			weaver = new WeavingURLClassLoader(
-//					sysLoader.getURLs(),
-//					new URL[]{new File("./").toURI().toURL()},
-////        		sysLoader.getURLs(),
-//			        loader
-//			);
-//		} catch (MalformedURLException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
+
 		
 		// load web page classes
 		List<String> classes = new ArrayList<>();
 		for (Entry<String, String> entry: classCodes.entrySet()) {
 			if (entry.getKey().endsWith("Page")) {
-				Class aClass = CompilerUtils.CACHED_COMPILER.loadFromJava(loader, entry.getKey(), entry.getValue());
+				CompilerUtils.CACHED_COMPILER.loadFromJava(loader, entry.getKey(), entry.getValue());
 			}
 		}
 		
@@ -114,7 +101,6 @@ public class SeleniumIdeLauncher {
 		suite.setFileName("/home/test/seleniumRobot/data/core/testng/testLoggging.xml");
 		Map<String, String> suiteParameters = new HashMap<>();
 		suiteParameters.put(SeleniumTestsContext.OVERRIDE_SELENIUM_NATIVE_ACTION, "true");
-//		suiteParameters.put(SeleniumTestsContext.MANUAL_TEST_STEPS, "true");
 		suite.setParameters(suiteParameters);
 		suite.setConfigFailurePolicy(FailurePolicy.CONTINUE);
 		List<XmlSuite> suites = new ArrayList<>();

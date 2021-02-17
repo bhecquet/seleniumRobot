@@ -260,7 +260,7 @@ public class TestJiraConnector extends MockitoTest {
 		when(issueRestClient.createIssue(any(IssueInput.class))).thenReturn(promiseBasicIssue);
 		when(promiseBasicIssue.claim()).thenReturn(new BasicIssue(new URI("http://foo/bar/i"), "ISSUE-1", 1L));
 		when(issueRestClient.getIssue(anyString())).thenReturn(promiseIssueEmpty);
-		when(issueRestClient.getIssue(eq("ISSUE-1"))).thenReturn(promiseIssue);
+		when(issueRestClient.getIssue("ISSUE-1")).thenReturn(promiseIssue);
 		when(promiseIssue.claim()).thenReturn(issue1);
 		when(promiseIssueEmpty.claim()).thenThrow(RestClientException.class);
 		

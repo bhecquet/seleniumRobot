@@ -226,7 +226,6 @@ public class SeleniumGridDriverFactory extends AbstractWebDriverFactory implemen
 				} catch (WebDriverException e) {
 					logger.warn(String.format("Error creating driver on hub %s: %s", gridConnector.getHubUrl().toString(), e.getMessage()));
 					currentException = e;
-					continue;
 				}
 			}
 			

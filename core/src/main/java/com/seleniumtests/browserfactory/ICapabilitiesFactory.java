@@ -25,7 +25,7 @@ import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
 public abstract class ICapabilitiesFactory {
 
-	protected static final Logger logger = SeleniumRobotLogger.getLogger(AbstractWebDriverFactory.class);
+	protected static final Logger logger = SeleniumRobotLogger.getLogger(ICapabilitiesFactory.class);
 	protected DriverConfig webDriverConfig;
     
     protected ICapabilitiesFactory(DriverConfig webDriverConfig) {

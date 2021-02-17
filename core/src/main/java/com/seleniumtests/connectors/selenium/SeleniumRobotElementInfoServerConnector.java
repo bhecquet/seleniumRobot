@@ -57,11 +57,11 @@ public class SeleniumRobotElementInfoServerConnector extends SeleniumRobotServer
 		return infoServerConnector;
 	}
 	
-	public SeleniumRobotElementInfoServerConnector(boolean useRequested, String url, String testName) {
-		this(useRequested, url, testName, null);
+	public SeleniumRobotElementInfoServerConnector(boolean useRequested, String url) {
+		this(useRequested, url, null);
 	}
 		
-	public SeleniumRobotElementInfoServerConnector(boolean useRequested, String url, String testName, String authToken) {
+	public SeleniumRobotElementInfoServerConnector(boolean useRequested, String url, String authToken) {
 		super(useRequested, url, authToken);
 		if (!active) {
 			return;
@@ -136,9 +136,7 @@ public class SeleniumRobotElementInfoServerConnector extends SeleniumRobotServer
 			// if no reference exists, create it on server
 			if (referenceElementInfo == null) {
 				// TODO
-			} else if (currentElementInfo.getLastUpdate().equals(referenceElementInfo.getLastUpdate())) {
-				continue;
-			} else {
+			} else if (!currentElementInfo.getLastUpdate().equals(referenceElementInfo.getLastUpdate())) {
 				try {
 					MultipartBody request = buildPatchRequest(url + ELEMENT_INFO_API_URL)
 							.field("application", applicationId)

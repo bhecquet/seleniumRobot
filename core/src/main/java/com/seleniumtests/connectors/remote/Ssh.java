@@ -22,6 +22,10 @@ import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.log4j.Logger;
+
+import com.seleniumtests.util.logging.SeleniumRobotLogger;
+
 import net.schmizz.sshj.SSHClient;
 import net.schmizz.sshj.common.IOUtils;
 import net.schmizz.sshj.connection.channel.direct.Session;
@@ -30,6 +34,10 @@ import net.schmizz.sshj.transport.verification.OpenSSHKnownHosts;
 import net.schmizz.sshj.transport.verification.PromiscuousVerifier;
 
 public class Ssh {
+	
+
+	private static final Logger logger = SeleniumRobotLogger.getLogger(Ssh.class);
+	
 	private enum ConnectMethod {
 		PASSWORD, KEY;
 	}
@@ -80,7 +88,7 @@ public class Ssh {
 		ssh = new SSHClient();
 		ssh.loadKnownHosts();
 	
-		if (!checkIdentity) {
+		if (!Boolean.TRUE.equals(checkIdentity)) {
 			ssh.addHostKeyVerifier(new PromiscuousVerifier());
 		} else if (serverFingerPrint != null) {
 			ssh.addHostKeyVerifier(serverFingerPrint);
@@ -110,7 +118,9 @@ public class Ssh {
 	 */
 	private void createKnownHosts() throws IOException {
 		Paths.get(System.getProperty("user.home"), ".ssh").toFile().mkdirs();
-		Paths.get(System.getProperty("user.home"), ".ssh", "known_hosts").toFile().createNewFile();
+		if (!(Paths.get(System.getProperty("user.home"), ".ssh", "known_hosts").toFile().createNewFile())) {
+			logger.info("known_hosts file has not bee created");
+		}
 	}
 	
 	/**
