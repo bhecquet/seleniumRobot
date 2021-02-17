@@ -108,7 +108,6 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 			recordResults(serverConnector, resultSet);
 		} catch (SeleniumRobotServerException | ConfigurationException e) {
 			logger.error("Error contacting selenium robot server", e);
-			return;
 		}
 	}
 
@@ -151,34 +150,45 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 					continue;
 				}
 				
-				for (TestStep testStep: testSteps) {
-					
-					// record test step
-					Integer testStepId = serverConnector.createTestStep(testStep.getName(), testCaseInSessionId);
-					String stepLogs = testStep.toJson().toString();
-					
-					Integer stepResultId = serverConnector.recordStepResult(!testStep.getFailed(), stepLogs, testStep.getDuration(), sessionId, testCaseInSessionId, testStepId);
-					
-					// sends all snapshots that are flagged as comparable
-					for (Snapshot snapshot: testStep.getSnapshots()) {
-						
-						if (snapshot.getCheckSnapshot().recordSnapshotOnServer()) {
-							if (snapshot.getName() == null || snapshot.getName().isEmpty()) {
-								logger.warn("Snapshot hasn't any name, it won't be sent to server");
-								continue;
-							}
-							
-							Integer snapshotId = serverConnector.createSnapshot(snapshot, sessionId, testCaseInSessionId, stepResultId);
-							for (Rectangle excludeZone: snapshot.getCheckSnapshot().getExcludeElementsRect()) {
-								serverConnector.createExcludeZones(excludeZone, snapshotId);
-							}
-						}
-					}
-				}
+				recordSteps(serverConnector, sessionId, testCaseInSessionId, testSteps);
 				
 				logger.info(String.format("Snapshots has been recorded with TestCaseSessionId: %d", testCaseInSessionId));
 				TestNGResultUtils.setSnapshotTestCaseInSessionId(testResult, testCaseInSessionId);
 				TestNGResultUtils.setSeleniumServerReportCreated(testResult, true);
+			}
+		}
+	}
+
+	/**
+	 * Record test steps to server
+	 * @param serverConnector
+	 * @param sessionId
+	 * @param testCaseInSessionId
+	 * @param testSteps
+	 */
+	private void recordSteps(SeleniumRobotSnapshotServerConnector serverConnector, Integer sessionId, Integer testCaseInSessionId, List<TestStep> testSteps) {
+		for (TestStep testStep: testSteps) {
+			
+			// record test step
+			Integer testStepId = serverConnector.createTestStep(testStep.getName(), testCaseInSessionId);
+			String stepLogs = testStep.toJson().toString();
+			
+			Integer stepResultId = serverConnector.recordStepResult(!testStep.getFailed(), stepLogs, testStep.getDuration(), sessionId, testCaseInSessionId, testStepId);
+			
+			// sends all snapshots that are flagged as comparable
+			for (Snapshot snapshot: testStep.getSnapshots()) {
+				
+				if (snapshot.getCheckSnapshot().recordSnapshotOnServer()) {
+					if (snapshot.getName() == null || snapshot.getName().isEmpty()) {
+						logger.warn("Snapshot hasn't any name, it won't be sent to server");
+						continue;
+					}
+					
+					Integer snapshotId = serverConnector.createSnapshot(snapshot, sessionId, testCaseInSessionId, stepResultId);
+					for (Rectangle excludeZone: snapshot.getCheckSnapshot().getExcludeElementsRect()) {
+						serverConnector.createExcludeZones(excludeZone, snapshotId);
+					}
+				}
 			}
 		}
 	}

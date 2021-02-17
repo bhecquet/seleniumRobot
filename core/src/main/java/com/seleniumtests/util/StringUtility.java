@@ -17,8 +17,8 @@
  */
 package com.seleniumtests.util;
 
-import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Method;
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Map;
@@ -81,8 +81,8 @@ public class StringUtility {
         try {
             messageDigest = MessageDigest.getInstance("MD5");
             messageDigest.reset();
-            messageDigest.update(str.getBytes("UTF-8"));
-        } catch (UnsupportedEncodingException|NoSuchAlgorithmException e) {
+            messageDigest.update(str.getBytes(StandardCharsets.UTF_8));
+        } catch (NoSuchAlgorithmException e) {
         	logger.error(e);
             return str;
         }
@@ -97,9 +97,9 @@ public class StringUtility {
 
         for (int i = 0; i < byteArray.length; i++) {
             if (Integer.toHexString(0xFF & byteArray[i]).length() == 1)
-                builder.append("0").append(Integer.toHexString(0xFF & byteArray[i]));
+                builder.append("0").append(String.format("%02X", byteArray[i]));
             else
-                builder.append(Integer.toHexString(0xFF & byteArray[i]));
+                builder.append(String.format("%02X", byteArray[i]));
         }
 
         return builder.toString();
@@ -115,11 +115,10 @@ public class StringUtility {
 		 * A=65 ; Z=90
 		 * a=97 ; z=122
 		 */
-		if ((ascii >= 65 && ascii <= 90)
-			|| (ascii >= 97 && ascii <= 122)) {
-			return true;
-		}
-		return false;
+		return ((ascii >= 65 && ascii <= 90)
+			|| (ascii >= 97 && ascii <= 122));
+
+
 	}
 	
 	/**

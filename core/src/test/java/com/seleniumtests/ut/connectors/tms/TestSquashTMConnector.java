@@ -177,7 +177,7 @@ public class TestSquashTMConnector extends MockitoTest {
 		
 		// check we call all necessary API methods to record the result
 		verify(api).createCampaign("Selenium " + testContext.getName(), "");
-		verify(api).createIteration(eq(campaign), eq(SeleniumTestsContextManager.getThreadContext().getApplicationVersion()));
+		verify(api).createIteration(campaign, SeleniumTestsContextManager.getThreadContext().getApplicationVersion());
 		verify(api).addTestCaseInIteration(iteration, 1);
 		verify(api).setExecutionResult(iterationTestPlanItem, ExecutionStatus.SUCCESS);
 	}
@@ -231,7 +231,7 @@ public class TestSquashTMConnector extends MockitoTest {
 		
 		// check we call all necessary API methods to record the result
 		verify(api).createCampaign("Selenium " + testContext.getName(), "");
-		verify(api).createIteration(eq(campaign), eq(SeleniumTestsContextManager.getThreadContext().getApplicationVersion()));
+		verify(api).createIteration(campaign, SeleniumTestsContextManager.getThreadContext().getApplicationVersion());
 		verify(api).addTestCaseInIteration(iteration, 1);
 		verify(api).setExecutionResult(iterationTestPlanItem, ExecutionStatus.SUCCESS);
 	}
@@ -282,7 +282,7 @@ public class TestSquashTMConnector extends MockitoTest {
 		
 		// check we call all necessary API methods to record the result
 		verify(api).createCampaign("Selenium " + testContext.getName(), "");
-		verify(api).createIteration(eq(campaign), eq(SeleniumTestsContextManager.getThreadContext().getApplicationVersion()));
+		verify(api).createIteration(campaign, SeleniumTestsContextManager.getThreadContext().getApplicationVersion());
 		verify(api).addTestCaseInIteration(iteration, 1);
 		verify(api).setExecutionResult(iterationTestPlanItem, ExecutionStatus.FAILURE);
 	}
@@ -333,7 +333,7 @@ public class TestSquashTMConnector extends MockitoTest {
 		
 		// check we call all necessary API methods to record the result
 		verify(api).createCampaign("Selenium " + testContext.getName(), "");
-		verify(api).createIteration(eq(campaign), eq(SeleniumTestsContextManager.getThreadContext().getApplicationVersion()));
+		verify(api).createIteration(campaign, SeleniumTestsContextManager.getThreadContext().getApplicationVersion());
 		verify(api).addTestCaseInIteration(iteration, 1);
 		verify(api).setExecutionResult(iterationTestPlanItem, ExecutionStatus.BLOCKED);
 	}
@@ -371,7 +371,7 @@ public class TestSquashTMConnector extends MockitoTest {
 		
 		// check we do not call API as testId is not provided
 		verify(api, never()).createCampaign("Selenium " + testContext.getName(), "");
-		verify(api, never()).createIteration(eq(campaign), eq(SeleniumTestsContextManager.getThreadContext().getApplicationVersion()));
+		verify(api, never()).createIteration(campaign, SeleniumTestsContextManager.getThreadContext().getApplicationVersion());
 		verify(api, never()).addTestCaseInIteration(iteration, 1);
 		verify(api, never()).setExecutionResult(iterationTestPlanItem, ExecutionStatus.SUCCESS);
 	}
@@ -426,7 +426,7 @@ public class TestSquashTMConnector extends MockitoTest {
 		
 		// check we do not call API as testId is not provided
 		verify(api).createCampaign("Selenium " + testContext.getName(), "");
-		verify(api, never()).createIteration(eq(campaign), eq(SeleniumTestsContextManager.getThreadContext().getApplicationVersion()));
+		verify(api, never()).createIteration(campaign, SeleniumTestsContextManager.getThreadContext().getApplicationVersion());
 		verify(api, never()).addTestCaseInIteration(iteration, 1);
 		verify(api, never()).setExecutionResult(iterationTestPlanItem, ExecutionStatus.SUCCESS);
 	}

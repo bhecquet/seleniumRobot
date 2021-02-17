@@ -78,7 +78,7 @@ public class OSCommand {
     }
     
     private static String readOutput(Process proc) throws IOException {
-    	String output = "";
+    	StringBuilder output = new StringBuilder();
     	BufferedReader stdInput = new BufferedReader(new InputStreamReader(proc.getInputStream()));
     	
     	BufferedReader stdError = new BufferedReader(new InputStreamReader(proc.getErrorStream()));
@@ -87,14 +87,14 @@ public class OSCommand {
         
     	// read result output from command
         while ((s = stdInput.readLine()) != null) {
-            output += s + "\n";
+            output.append(s + "\n");
         }
         // read error output from command
         while ((s = stdError.readLine()) != null) {
-            output += s + "\n";
+        	output.append(s + "\n");
         }
         
-        return output;
+        return output.toString();
     }
 
     /**

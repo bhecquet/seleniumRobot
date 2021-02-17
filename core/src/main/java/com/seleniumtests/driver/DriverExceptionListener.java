@@ -127,20 +127,21 @@ public class DriverExceptionListener implements WebDriverEventListener {
     @Override
     public void onException(final Throwable ex, final WebDriver arg1) {
     	
-        if (ex.getMessage() == null) {
-            return;
-        } else if (ex.getMessage().contains("Element must be user-editable in order to clear it")) {
-            return;
-        } else if (ex.getMessage().contains("Element is not clickable at point")) {
-            return;
-        } else if (ex instanceof UnsupportedCommandException) {
-            return;
-        } else if (ex.getMessage().contains(" read-only")) {
-            return;
+        if (ex.getMessage() == null
+        		|| ex.getMessage().contains("Element must be user-editable in order to clear it")
+        		|| ex.getMessage().contains("Element is not clickable at point")
+        		|| ex instanceof UnsupportedCommandException
+        		|| ex.getMessage().contains(" read-only")
+        		|| ex.getMessage().contains("not implemented")
+        		|| ex instanceof org.openqa.selenium.remote.UnreachableBrowserException
+        		|| ex instanceof NoSuchSessionException
+        		|| ex instanceof org.openqa.selenium.UnsupportedCommandException
+        		|| ex instanceof MoveTargetOutOfBoundsException  // exception raised when element is non clickable
+        		|| ex instanceof InvalidElementStateException    // exception raised when element is non clickable
+        		) {
+            // do nothing
             
         // Edge driver does return a WebDriverException when doing getPageSource
-        } else if (ex.getMessage().contains("not implemented")) {
-        	return;
         } else if (ex.getMessage().contains("No response on ECMAScript evaluation command")) { // Opera
 
             // customexception
@@ -162,13 +163,6 @@ public class DriverExceptionListener implements WebDriverEventListener {
                 throw new WebSessionEndedException(ex);
             }
 
-            return;
-        } else if (ex instanceof org.openqa.selenium.remote.UnreachableBrowserException) {
-            return;
-        } else if (ex instanceof NoSuchSessionException) {
-        	throw new WebSessionEndedException(ex);
-        } else if (ex instanceof org.openqa.selenium.UnsupportedCommandException) {
-            return;
         } else if (ex instanceof NoSuchWindowException) {
         	try {
 	        	WebDriver driver = WebUIDriver.getWebDriver(false);
@@ -183,11 +177,10 @@ public class DriverExceptionListener implements WebDriverEventListener {
 	        			logger.info("Current window has been closed, switching to first window to avoid problems in future commands");
 	            	}
 	        	} 
-        	} catch (Exception e) {}
-        	return;
-        // exception raised when element is non clickable
-        } else if (ex instanceof MoveTargetOutOfBoundsException || ex instanceof InvalidElementStateException) {
-        	return;
+        	} catch (Exception e) {
+        		// ignore, do not raise exception during handling it
+        	}
+
         } else {
             String message = ex.getMessage().split("\\n")[0];
             logger.warn("Got exception:" + message);

@@ -104,7 +104,6 @@ public class SauceLabsDriverFactory extends AbstractWebDriverFactory implements 
 	        CloseableHttpResponse response = client.execute(request);
 	        
 	        if (response.getStatusLine().getStatusCode() != 200) {
-	        	client.close();
 	        	throw new ConfigurationException("Application file upload failed: " + response.getStatusLine().getReasonPhrase());
 	        }
         } 

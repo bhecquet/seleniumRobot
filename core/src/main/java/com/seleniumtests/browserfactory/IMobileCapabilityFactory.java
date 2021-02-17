@@ -50,11 +50,7 @@ public abstract class IMobileCapabilityFactory extends ICapabilitiesFactory {
     	capabilities.setCapability(MobileCapabilityType.AUTOMATION_NAME, getAutomationName());
     
     	if (app != null && !"".equals(app.trim())) {
-	    	if (webDriverConfig.isFullReset()) {
-	    		capabilities.setCapability(MobileCapabilityType.FULL_RESET, true);
-	    	} else {
-	    		capabilities.setCapability(MobileCapabilityType.FULL_RESET, false);
-	    	}
+	    	capabilities.setCapability(MobileCapabilityType.FULL_RESET, webDriverConfig.isFullReset());
     	}
     	
     	// Set up version and device name else appium server would pick the only available emulator/device
@@ -83,7 +79,7 @@ public abstract class IMobileCapabilityFactory extends ICapabilitiesFactory {
         }
         
         // add node tags
-        if (webDriverConfig.getNodeTags().size() > 0 && webDriverConfig.getMode() == DriverMode.GRID) {
+        if (!webDriverConfig.getNodeTags().isEmpty() && webDriverConfig.getMode() == DriverMode.GRID) {
         	capabilities.setCapability(SeleniumRobotCapabilityType.NODE_TAGS, webDriverConfig.getNodeTags());
         }
         

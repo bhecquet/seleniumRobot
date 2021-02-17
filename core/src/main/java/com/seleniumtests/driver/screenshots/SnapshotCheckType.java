@@ -9,7 +9,6 @@ import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 
 import com.seleniumtests.customexception.ScenarioException;
-import com.seleniumtests.uipage.BasePage;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
 /**
@@ -21,7 +20,7 @@ import com.seleniumtests.util.logging.SeleniumRobotLogger;
 public class SnapshotCheckType {
 
 	// TODO: check without colors, check only part of the picture (exclusion zones defined directly in test)
-	protected static final Logger logger = SeleniumRobotLogger.getLogger(BasePage.class);
+	protected static final Logger logger = SeleniumRobotLogger.getLogger(SnapshotCheckType.class);
 	
 	private Control control;
 	private List<Rectangle> excludeElementsRect = new ArrayList<>();
@@ -57,11 +56,7 @@ public class SnapshotCheckType {
 	 * @return
 	 */
 	public boolean recordSnapshotOnServer() {
-		if (control == Control.NONE) {
-			return false;
-		} else {
-			return true;
-		}
+		return control != Control.NONE;
 	}
 	
 	private String rectangleToString(Rectangle rect) {

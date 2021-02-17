@@ -124,7 +124,7 @@ public class TestTestTasks extends MockitoTest {
 			TestTasks.createOrUpdateLocalParam("key", "value");
 			
 			// check upsert has been NOT called
-			verify(variableServer, never()).upsertVariable(eq(new TestVariable("key", "value")), eq(true));
+			verify(variableServer, never()).upsertVariable(new TestVariable("key", "value"), true);
 			
 			// check configuration is updated
 			Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getConfiguration().get("key").getValue(), "value");
@@ -157,7 +157,7 @@ public class TestTestTasks extends MockitoTest {
 			TestTasks.createOrUpdateParam("key", "value");
 			
 			// check upsert has been called
-			verify(variableServer).upsertVariable(eq(new TestVariable("key", "value")), eq(true));
+			verify(variableServer).upsertVariable(new TestVariable("key", "value"), true);
 			
 			// check configuration is updated
 			Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getConfiguration().get("key"), varToReturn);
@@ -191,7 +191,7 @@ public class TestTestTasks extends MockitoTest {
 			TestTasks.createOrUpdateParam("key", "value", false, 3, true);
 			
 			// check upsert has been called
-			verify(variableServer).upsertVariable(eq(new TestVariable(null, "key", "value", true, "key", 3, null)), eq(false));
+			verify(variableServer).upsertVariable(new TestVariable(null, "key", "value", true, "key", 3, null), false);
 			
 			// check configuration is updated
 			Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getConfiguration().get("key"), varToReturn);
@@ -226,7 +226,7 @@ public class TestTestTasks extends MockitoTest {
 			TestTasks.createOrUpdateParam("key", "value", false, 3, false);
 			
 			// check upsert has been called
-			verify(variableServer).upsertVariable(eq(new TestVariable(10, "key", "value", false, "key", 3, null)), eq(false));
+			verify(variableServer).upsertVariable(new TestVariable(10, "key", "value", false, "key", 3, null), false);
 			
 			// check configuration is updated
 			Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getConfiguration().get("key"), varToReturn);
@@ -259,7 +259,7 @@ public class TestTestTasks extends MockitoTest {
 			TestTasks.createOrUpdateParam("key", "value", false);
 			
 			// check upsert has been called
-			verify(variableServer).upsertVariable(eq(new TestVariable("key", "value")), eq(false));
+			verify(variableServer).upsertVariable(new TestVariable("key", "value"), false);
 			
 			// check configuration is updated
 			Assert.assertEquals(SeleniumTestsContextManager.getThreadContext().getConfiguration().get("key"), varToReturn);
@@ -318,7 +318,7 @@ public class TestTestTasks extends MockitoTest {
 			TestTasks.createOrUpdateParam("key", "value", false, 1, true);
 			
 			// check upsert has been called
-			verify(variableServer).upsertVariable(eq(new TestVariable(null, "key", "value", true, "key", 1, null)), eq(false));
+			verify(variableServer).upsertVariable(new TestVariable(null, "key", "value", true, "key", 1, null), false);
 			
 		} finally {
 			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE);

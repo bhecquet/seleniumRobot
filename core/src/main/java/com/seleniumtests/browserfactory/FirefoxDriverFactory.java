@@ -41,11 +41,8 @@ public class FirefoxDriverFactory extends AbstractWebDriverFactory implements IW
      */
     @Override
     protected WebDriver createNativeDriver() {
-    	if (driverOptions.is(FirefoxDriver.MARIONETTE)) {
-    		setMarionetteMode(true);
-    	} else {
-    		setMarionetteMode(false);
-    	}
+    	setMarionetteMode(driverOptions.is(FirefoxDriver.MARIONETTE));
+
 		return new FirefoxDriver((FirefoxOptions)driverOptions);
     }
     

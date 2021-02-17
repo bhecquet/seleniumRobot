@@ -239,10 +239,10 @@ public class TestSeleniumRobotVariableServerConnector extends ConnectorsTest {
 		configureMockedVariableServerConnection();
 		SeleniumRobotVariableServerConnector connector= new SeleniumRobotVariableServerConnector(true, SERVER_URL, "Test1", "123");
 		TestVariable existingVariable = new TestVariable(12, "key", "value", false, TestVariable.TEST_VARIABLE_PREFIX + "key");
-		TestVariable variable = connector.upsertVariable(existingVariable, true);
+		connector.upsertVariable(existingVariable, true);
 		
 
-		verify(variablesRequest, never()).header(eq("Authorization"), eq("Token 123"));
+		verify(variablesRequest, never()).header("Authorization", "Token 123");
 	}
 	
 	/**
@@ -294,7 +294,7 @@ public class TestSeleniumRobotVariableServerConnector extends ConnectorsTest {
 	public void testVariableDereservation() throws UnirestException {
 		configureMockedVariableServerConnection();
 		SeleniumRobotVariableServerConnector connector= new SeleniumRobotVariableServerConnector(true, SERVER_URL, "Test1", null);
-		List<TestVariable> variables = new ArrayList(connector.getVariables().values());
+		List<TestVariable> variables = new ArrayList<>(connector.getVariables().values());
 		
 		connector.unreserveVariables(variables);
 		
@@ -421,7 +421,7 @@ public class TestSeleniumRobotVariableServerConnector extends ConnectorsTest {
 		configureMockedVariableServerConnection();
 		SeleniumRobotVariableServerConnector connector= new SeleniumRobotVariableServerConnector(true, SERVER_URL, "Test1", "123");
 		Assert.assertEquals(connector.getApplicationId(), 1);
-		verify(namedApplicationRequest, times(1)).header(eq("Authorization"), eq("Token 123"));
+		verify(namedApplicationRequest, times(1)).header("Authorization", "Token 123");
 	}
 	
 	/**
@@ -433,7 +433,7 @@ public class TestSeleniumRobotVariableServerConnector extends ConnectorsTest {
 		configureMockedVariableServerConnection();
 		SeleniumRobotVariableServerConnector connector= new SeleniumRobotVariableServerConnector(true, SERVER_URL, "Test1", "123");
 		Assert.assertEquals(connector.getEnvironmentId(), 2);
-		verify(namedEnvironmentRequest, times(1)).header(eq("Authorization"), eq("Token 123"));
+		verify(namedEnvironmentRequest, times(1)).header("Authorization", "Token 123");
 	}
 	
 	/**
@@ -445,7 +445,7 @@ public class TestSeleniumRobotVariableServerConnector extends ConnectorsTest {
 		configureMockedVariableServerConnection();
 		SeleniumRobotVariableServerConnector connector= new SeleniumRobotVariableServerConnector(true, SERVER_URL, "Test1", "123");
 		connector.createTestCase("foo");
-		verify(createTestCaseRequest, times(2)).header(eq("Authorization"), eq("Token 123"));
+		verify(createTestCaseRequest, times(2)).header("Authorization", "Token 123");
 	}
 	
 	/**
@@ -457,7 +457,7 @@ public class TestSeleniumRobotVariableServerConnector extends ConnectorsTest {
 		configureMockedVariableServerConnection();
 		SeleniumRobotVariableServerConnector connector= new SeleniumRobotVariableServerConnector(true, SERVER_URL, "Test1", "123");
 		connector.createVersion();
-		verify(createVersionRequest, times(2)).header(eq("Authorization"), eq("Token 123"));
+		verify(createVersionRequest, times(2)).header("Authorization", "Token 123");
 	}
 	
 	/**
@@ -469,7 +469,7 @@ public class TestSeleniumRobotVariableServerConnector extends ConnectorsTest {
 		configureMockedVariableServerConnection();
 		SeleniumRobotVariableServerConnector connector= new SeleniumRobotVariableServerConnector(true, SERVER_URL, "Test1", "123");
 		connector.createEnvironment();
-		verify(createEnvironmentRequest, times(1)).header(eq("Authorization"), eq("Token 123"));
+		verify(createEnvironmentRequest, times(1)).header("Authorization", "Token 123");
 	}
 	
 	/**
@@ -481,6 +481,6 @@ public class TestSeleniumRobotVariableServerConnector extends ConnectorsTest {
 		configureMockedVariableServerConnection();
 		SeleniumRobotVariableServerConnector connector= new SeleniumRobotVariableServerConnector(true, SERVER_URL, "Test1", "123");
 		connector.createApplication();
-		verify(createApplicationRequest, times(1)).header(eq("Authorization"), eq("Token 123"));
+		verify(createApplicationRequest, times(1)).header("Authorization", "Token 123");
 	}
 }

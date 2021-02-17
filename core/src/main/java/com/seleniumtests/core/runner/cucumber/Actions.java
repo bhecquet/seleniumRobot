@@ -1,7 +1,5 @@
 package com.seleniumtests.core.runner.cucumber;
 
-import java.io.IOException;
-
 import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.uipage.PageObject;
 import com.seleniumtests.util.helper.WaitHelper;
@@ -17,13 +15,13 @@ public class Actions extends Fixture {
 
 	@Given("^Open page '(.+)'")
 	@Soit("^Ouvrir la page '(.+)'")
-	public void openPage(String url) throws IOException {
+	public void openPage(String url) {
 		new PageObject(null, getValue(url));
 	}
 	
 	@Given("^Snapshot")
 	@Soit("^Capture d'ecran")
-	public void snapshot(String url) throws IOException {
+	public void snapshot(String url) {
 		if (currentPage.get() == null) {
 			throw new ScenarioException("Aucune page n'a encore été ouverte");
 		} else {

@@ -12,7 +12,7 @@ public class UiLibraryRegistry {
 		// nothing to do
 	}
 	
-	public synchronized static void register(String uiLibrary) {
+	public static synchronized void register(String uiLibrary) {
 		if (!uiLibraries.contains(uiLibrary)) {
 			uiLibraries.add(uiLibrary);
 		}

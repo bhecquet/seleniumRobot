@@ -184,8 +184,8 @@ public class SeleniumRobotTestListener extends BaseTestNGListener implements ITe
 					SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(),
 					testResult);
 			
-			if (SeleniumTestsContextManager.getThreadContext().getKeepAllResults() && testResult.getMethod().getRetryAnalyzer() != null) {
-				TestRetryAnalyzer testRetryAnalyzer = (TestRetryAnalyzer) testResult.getMethod().getRetryAnalyzer();
+			if (SeleniumTestsContextManager.getThreadContext().getKeepAllResults() && testResult.getMethod().getRetryAnalyzer(testResult) != null) {
+				TestRetryAnalyzer testRetryAnalyzer = (TestRetryAnalyzer) testResult.getMethod().getRetryAnalyzer(testResult);
 				
 				// test will be retried, store the result before it is replaced
 				if (testRetryAnalyzer.willBeRetried(testResult)) {
@@ -579,11 +579,7 @@ public class SeleniumRobotTestListener extends BaseTestNGListener implements ITe
 		// issue #137: block driver creation outside of @BeforeMethod / @AfterMethod so that a driver may not remain open without being used
 		// other reason is that context for Class/Test/Group is shared among several test methods
 		// WebDriver.cleanup() is called after @AfterMethod
-		if (configMethod.isBeforeMethodConfiguration() || configMethod.isAfterMethodConfiguration()) { // TODO: to activate but for now, creating driver without having called "updateThreadContext" may raise exception (seen with HTMLUnit and proxy parameter 
-			SeleniumTestsContextManager.getThreadContext().setDriverCreationBlocked(false);
-		} else {
-			SeleniumTestsContextManager.getThreadContext().setDriverCreationBlocked(true);
-		}
+		SeleniumTestsContextManager.getThreadContext().setDriverCreationBlocked(!(configMethod.isBeforeMethodConfiguration() || configMethod.isAfterMethodConfiguration()));
 	}
 	
 
@@ -659,7 +655,7 @@ public class SeleniumRobotTestListener extends BaseTestNGListener implements ITe
 		int maxAllowedRetry = Math.max(SeleniumTestsContextManager.getThreadContext().getTestRetryCount() * 2, SeleniumTestsContext.DEFAULT_TEST_RETRY_COUNT);
     	
     	try {
-    		TestRetryAnalyzer retryAnalyzer = (TestRetryAnalyzer)Reporter.getCurrentTestResult().getMethod().getRetryAnalyzer();
+    		TestRetryAnalyzer retryAnalyzer = (TestRetryAnalyzer)Reporter.getCurrentTestResult().getMethod().getRetryAnalyzer(Reporter.getCurrentTestResult());
     		
     		if (retryAnalyzer == null) {
     			logger.info("RetryAnalyzer is null, 'increaseMaxRetry' can be called only inside test methods");

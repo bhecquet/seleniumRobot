@@ -613,7 +613,7 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 		CustomEventFiringWebDriver.writeToDesktop("text", DriverMode.GRID, gridConnector);
 
 		verify(keyboard, never()).typeKeys("text");
-		verify(gridConnector).writeText(eq("text"));
+		verify(gridConnector).writeText("text");
 	}
 	
 	/**

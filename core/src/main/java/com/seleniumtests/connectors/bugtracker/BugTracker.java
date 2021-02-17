@@ -23,6 +23,7 @@ import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.TestStepManager;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.driver.screenshots.ScreenShot;
+import com.seleniumtests.reporter.logger.Snapshot;
 import com.seleniumtests.reporter.logger.TestStep;
 import com.seleniumtests.util.FileUtility;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
@@ -174,7 +175,7 @@ public abstract class BugTracker {
 		}
 
 		List<ScreenShot> screenShots = lastTestStep.getSnapshots().stream()
-				.map(s -> s.getScreenshot())
+				.map(Snapshot::getScreenshot)
 				.collect(Collectors.toList());
 		StringBuilder fullDescription = new StringBuilder();
 		

@@ -365,8 +365,7 @@ public class HtmlElement extends Element implements WebElement, Locatable {
         if ((driverConfig.getBrowserType() == BrowserType.FIREFOX && FirefoxDriverFactory.isMarionetteMode())
             	|| (driverConfig.getBrowserType() == BrowserType.CHROME 
 	        			&& driverConfig.getMajorBrowserVersion() >= 75)) {
-        		mouseOverScript = "var event = new MouseEvent('mouseover', {view: window, bubbles: true, cancelable: true}) ;"
-                			+ "arguments[0].dispatchEvent(event);";
+        		mouseOverScript = "var event = new MouseEvent('mouseover', {view: window, bubbles: true, cancelable: true}) ; arguments[0].dispatchEvent(event);";
             } else {
             	mouseOverScript = "if(document.createEvent){var evObj = document.createEvent('MouseEvents');evObj.initEvent('mouseover', true, false); arguments[0].dispatchEvent(evObj);} else if(document.createEventObject) { arguments[0].fireEvent('onmouseover');}";
             }
@@ -507,7 +506,6 @@ public class HtmlElement extends Element implements WebElement, Locatable {
      * @param by
      * @return
      */
-	@SuppressWarnings("unchecked")
 	@Override
     public HtmlElement findElement(By by) {
     	return new HtmlElement(label, by, this);
@@ -836,13 +834,13 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 					changeCssAttribute(element, "top", heightPosition + "px"); 
 					changeCssAttribute(element, "position", "inherit");
 				}
-				if (Boolean.TRUE.equals((Boolean)executeScript("return getComputedStyle(arguments[0]).display === 'none'", element))) {
+				if (Boolean.TRUE.equals(executeScript("return getComputedStyle(arguments[0]).display === 'none'", element))) {
 					changeCssAttribute(element, "display", "block");
 				}
-				if (Boolean.TRUE.equals((Boolean)executeScript("return getComputedStyle(arguments[0]).visibility !== 'visible'", element))) {
+				if (Boolean.TRUE.equals(executeScript("return getComputedStyle(arguments[0]).visibility !== 'visible'", element))) {
 					changeCssAttribute(element, "visibility", "visible");
 				}
-				if (Boolean.TRUE.equals((Boolean)executeScript("return getComputedStyle(arguments[0]).opacity === '0'", element))) {
+				if (Boolean.TRUE.equals(executeScript("return getComputedStyle(arguments[0]).opacity === '0'", element))) {
 					changeCssAttribute(element, "opacity", "1");
 				}
 
@@ -1219,11 +1217,9 @@ public class HtmlElement extends Element implements WebElement, Locatable {
     
     public void sendKeys(boolean blurAfter, CharSequence... keysToSend) {
     	// Appium seems to clear field before writing
-    	if (SeleniumTestsContextManager.getThreadContext().getTestType().family() == TestType.APP) {
-    		sendKeys(false, blurAfter, keysToSend);
-    	} else {
-    		sendKeys(true, blurAfter, keysToSend);
-    	}
+    	boolean clearField = SeleniumTestsContextManager.getThreadContext().getTestType().family() != TestType.APP;
+    	sendKeys(clearField, blurAfter, keysToSend);
+
     }
     
     protected void blur() {
