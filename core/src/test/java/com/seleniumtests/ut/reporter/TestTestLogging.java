@@ -114,7 +114,7 @@ public class TestTestLogging extends GenericTest {
 			
 			// relocate
 			TestStepManager.getParentTestStep().getSnapshots().get(0).relocate(SeleniumTestsContextManager.getThreadContext().getOutputDirectory() + "_moved");
-			File movedFile = Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory() + "_moved", ScreenshotUtil.HTML_DIR, "N-A_0-1_step-capture.html").toFile();
+			File movedFile = Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory() + "_moved", ScreenshotUtil.HTML_DIR, "N-A_0-1_step--pture.html").toFile();
 	
 			Assert.assertTrue(movedFile.exists());
 			Assert.assertFalse(initialFile.exists());
@@ -147,7 +147,7 @@ public class TestTestLogging extends GenericTest {
 			
 			// relocate
 			TestStepManager.getParentTestStep().getSnapshots().get(0).relocate(SeleniumTestsContextManager.getThreadContext().getOutputDirectory() + "_moved");
-			File movedFile = Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory() + "_moved", ScreenshotUtil.SCREENSHOT_DIR, "N-A_0-1_step-capture.png").toFile();
+			File movedFile = Paths.get(SeleniumTestsContextManager.getThreadContext().getOutputDirectory() + "_moved", ScreenshotUtil.SCREENSHOT_DIR, "N-A_0-1_step--apture.png").toFile();
 
 			Assert.assertTrue(movedFile.exists());
 			Assert.assertFalse(initialFile.exists());

@@ -101,65 +101,91 @@ public class Snapshot extends TestAction {
     		newBaseName = StringUtility.replaceOddCharsFromFileName(userGivenName);
     	}
     	
-    	
     	if (screenshot.getHtmlSourcePath() != null) {
-    		String oldFullPath = screenshot.getFullHtmlPath();
-    		String oldPath = screenshot.getHtmlSourcePath();
-    		File oldFile = new File(oldPath);
-    		String folderName = "";
-    		if (oldFile.getParent() != null) {
-    			folderName = oldFile.getParent().replace(File.separator, "/") + "/";
-    		}
-    		
-    		String newName = newBaseName + FilenameUtils.getBaseName(oldFile.getName());
-    		newName = newName.substring(0, Math.min(50, newName.length())) + "." +  FilenameUtils.getExtension(oldFile.getName());
-    		
-    		// if file cannot be moved, go back to old name
-    		try {
-    			oldFile = new File(oldFullPath);
-    			if (SeleniumTestsContextManager.getGlobalContext().getOptimizeReports()) {
-    				screenshot.setHtmlSourcePath(folderName + newName + ".zip");
-    				oldFile = FileUtility.createZipArchiveFromFiles(Arrays.asList(oldFile));
-    			} else {
-    				screenshot.setHtmlSourcePath(folderName + newName);
-    			}
-    			
-				FileUtils.copyFile(oldFile, new File(screenshot.getFullHtmlPath()));
-				
-
-	    		try {
-	    			Files.delete(Paths.get(new File(oldFullPath).getCanonicalPath()));
-	    		} catch (IOException e) {
-	    			// do not consider it as an error if old file cannot be deleted
-	    			logger.warn(String.format("Could not delete %s", oldFullPath));
-	    		}	
-    		} catch (IOException e) {
-				screenshot.setHtmlSourcePath(oldPath);
-			}
-    					
-			
+    		renameHtmlSourceFile(newBaseName);
+    						
     	}
     	if (screenshot.getImagePath() != null) {
-    		String oldFullPath = screenshot.getFullImagePath();
-    		String oldPath = screenshot.getImagePath();
-    		File oldFile = new File(oldPath);
-    		String folderName = "";
-    		if (oldFile.getParent() != null) {
-    			folderName = oldFile.getParent().replace(File.separator, "/") + "/";
-    		}
-    		
-    		String newName = newBaseName + FilenameUtils.getBaseName(oldFile.getName());
-    		newName = newName.substring(0, Math.min(50, newName.length())) + "." + FilenameUtils.getExtension(oldFile.getName());
-    		screenshot.setImagePath(folderName + newName);
-    		
-    		// if file cannot be moved, go back to old name
-    		try {
-    			Files.move(Paths.get(oldFullPath), Paths.get(screenshot.getFullImagePath()), StandardCopyOption.REPLACE_EXISTING);
-			} catch (IOException e) {
-				screenshot.setImagePath(oldPath);
-			}
+    		renameImageFile(newBaseName);
     	}
     }
+
+	/**
+	 * Rename the image file with "newBaseName"
+	 * @param newBaseName
+	 */
+	private void renameImageFile(String newBaseName) {
+		
+		// old file name contains a generated UUID
+		String oldFullPath = screenshot.getFullImagePath();
+		String oldPath = screenshot.getImagePath();
+		File oldFile = new File(oldPath);
+		String folderName = "";
+		if (oldFile.getParent() != null) {
+			folderName = oldFile.getParent().replace(File.separator, "/") + "/";
+		}
+		
+
+		String oldFileName = oldFile.getName();
+		// build file name with <base name>-<part of UUID>.html
+		// this way, even when test is repeated multiple times, snapshots will have different names 
+		// (usefull for comments in bugtrackers where reference to new file should be different from previous ones)
+		String newName = String.format("%s-%s", newBaseName.substring(0, Math.min(50, newBaseName.length())), 
+																oldFileName.substring(oldFileName.length() - 10));
+
+		screenshot.setImagePath(folderName + newName);
+		
+		// if file cannot be moved, go back to old name
+		try {
+			Files.move(Paths.get(oldFullPath), Paths.get(screenshot.getFullImagePath()), StandardCopyOption.REPLACE_EXISTING);
+		} catch (IOException e) {
+			screenshot.setImagePath(oldPath);
+		}
+	}
+
+	/**
+	 * @param newBaseName
+	 */
+	private void renameHtmlSourceFile(String newBaseName) {
+		String oldFullPath = screenshot.getFullHtmlPath();
+		String oldPath = screenshot.getHtmlSourcePath();
+		File oldFile = new File(oldPath);
+		String folderName = "";
+		if (oldFile.getParent() != null) {
+			folderName = oldFile.getParent().replace(File.separator, "/") + "/";
+		}
+		
+		String oldFileName = oldFile.getName();
+		// build file name with <base name>-<part of UUID>.html
+		// this way, even when test is repeated multiple times, snapshots will have different names 
+		// (usefull for comments in bugtrackers where reference to new file should be different from previous ones)
+		String newName = String.format("%s-%s", newBaseName.substring(0, Math.min(50, newBaseName.length())), 
+																oldFileName.substring(oldFileName.length() - 10));
+
+		
+		// if file cannot be moved, go back to old name
+		try {
+			oldFile = new File(oldFullPath);
+			if (SeleniumTestsContextManager.getGlobalContext().getOptimizeReports()) {
+				screenshot.setHtmlSourcePath(folderName + newName + ".zip");
+				oldFile = FileUtility.createZipArchiveFromFiles(Arrays.asList(oldFile));
+			} else {
+				screenshot.setHtmlSourcePath(folderName + newName);
+			}
+			
+			FileUtils.copyFile(oldFile, new File(screenshot.getFullHtmlPath()));
+			
+
+			try {
+				Files.delete(Paths.get(new File(oldFullPath).getCanonicalPath()));
+			} catch (IOException e) {
+				// do not consider it as an error if old file cannot be deleted
+				logger.warn(String.format("Could not delete %s", oldFullPath));
+			}	
+		} catch (IOException e) {
+			screenshot.setHtmlSourcePath(oldPath);
+		}
+	}
     
 	public ScreenShot getScreenshot() {
 		return screenshot;
