@@ -139,9 +139,9 @@ public class TestTestStep extends GenericTest {
 		step.addSnapshot(new Snapshot(screenshot, "main", SnapshotCheckType.TRUE), 0, null);
 
 		Assert.assertEquals(step.getSnapshots().get(0).getScreenshot().getImagePath(),
-				"N-A_0-1_step1-" + tmpImgFile.getName());
+				"N-A_0-1_step1--" + tmpImgFile.getName().substring(tmpImgFile.getName().length() - 10));
 		Assert.assertEquals(step.getSnapshots().get(0).getScreenshot().getHtmlSourcePath(),
-				"N-A_0-1_step1-" + tmpHtmlFile.getName());
+				"N-A_0-1_step1--" + tmpHtmlFile.getName().substring(tmpHtmlFile.getName().length() - 10));
 
 		tmpImgFile.deleteOnExit();
 		tmpHtmlFile.deleteOnExit();
@@ -170,9 +170,9 @@ public class TestTestStep extends GenericTest {
 		step.addSnapshot(new Snapshot(screenshot, "main", SnapshotCheckType.FALSE), 0, "my snapshot <name>");
 
 		Assert.assertEquals(step.getSnapshots().get(0).getScreenshot().getImagePath(),
-				"my_snapshot_-name-" + tmpImgFile.getName());
+				"my_snapshot_-name--" + tmpImgFile.getName().substring(tmpImgFile.getName().length() - 10));
 		Assert.assertEquals(step.getSnapshots().get(0).getScreenshot().getHtmlSourcePath(),
-				"my_snapshot_-name-" + tmpHtmlFile.getName());
+				"my_snapshot_-name--" + tmpHtmlFile.getName().substring(tmpHtmlFile.getName().length() - 10));
 
 		tmpImgFile.deleteOnExit();
 		tmpHtmlFile.deleteOnExit();
@@ -199,9 +199,9 @@ public class TestTestStep extends GenericTest {
 		step.addSnapshot(new Snapshot(screenshot, "main", SnapshotCheckType.TRUE), 0, null);
 
 		Assert.assertEquals(step.getSnapshots().get(0).getScreenshot().getImagePath(),
-				"screenshots/N-A_0-1_step1-" + tmpImgFile2.getName());
+				"screenshots/N-A_0-1_step1--" + tmpImgFile2.getName().substring(tmpImgFile2.getName().length() - 10));
 		Assert.assertEquals(step.getSnapshots().get(0).getScreenshot().getHtmlSourcePath(),
-				"htmls/N-A_0-1_step1-" + tmpHtmlFile2.getName());
+				"htmls/N-A_0-1_step1--" + tmpHtmlFile2.getName().substring(tmpHtmlFile2.getName().length() - 10));
 
 		tmpImgFile.deleteOnExit();
 		tmpHtmlFile.deleteOnExit();
@@ -254,13 +254,13 @@ public class TestTestStep extends GenericTest {
 		subStep.addSnapshot(new Snapshot(screenshotSubStep, "main", SnapshotCheckType.TRUE), 0, null);
 
 		Assert.assertEquals(step.getSnapshots().get(0).getScreenshot().getImagePath(),
-				"screenshots/N-A_0-1_step1-" + tmpImgFile2.getName());
+				"screenshots/N-A_0-1_step1--" + tmpImgFile2.getName().substring(tmpImgFile2.getName().length() - 10));
 		Assert.assertEquals(step.getSnapshots().get(0).getScreenshot().getHtmlSourcePath(),
-				"htmls/N-A_0-1_step1-" + tmpHtmlFile2.getName());
+				"htmls/N-A_0-1_step1--" + tmpHtmlFile2.getName().substring(tmpHtmlFile2.getName().length() - 10));
 		Assert.assertEquals(subStep.getSnapshots().get(0).getScreenshot().getImagePath(),
-				"screenshots/N-A_0-11_step1-" + tmpImgFileSubStep2.getName());
+				"screenshots/N-A_0-11_step1--" + tmpImgFileSubStep2.getName().substring(tmpImgFileSubStep2.getName().length() - 10));
 		Assert.assertEquals(subStep.getSnapshots().get(0).getScreenshot().getHtmlSourcePath(),
-				"htmls/N-A_0-11_step1-" + tmpHtmlFileSubStep2.getName());
+				"htmls/N-A_0-11_step1--" + tmpHtmlFileSubStep2.getName().substring(tmpHtmlFileSubStep2.getName().length() - 10));
 
 		tmpImgFile.deleteOnExit();
 		tmpHtmlFile.deleteOnExit();
@@ -307,13 +307,13 @@ public class TestTestStep extends GenericTest {
 		step.addSnapshot(new Snapshot(screenshotSubStep, "main", SnapshotCheckType.TRUE), 0, null);
 
 		Assert.assertEquals(step.getSnapshots().get(0).getScreenshot().getImagePath(),
-				"screenshots/N-A_0-1_step1-" + tmpImgFile2.getName());
+				"screenshots/N-A_0-1_step1--" + tmpImgFile2.getName().substring(tmpImgFile2.getName().length() - 10));
 		Assert.assertEquals(step.getSnapshots().get(0).getScreenshot().getHtmlSourcePath(),
-				"htmls/N-A_0-1_step1-" + tmpHtmlFile2.getName());
+				"htmls/N-A_0-1_step1--" + tmpHtmlFile2.getName().substring(tmpHtmlFile2.getName().length() - 10));
 		Assert.assertEquals(step.getSnapshots().get(1).getScreenshot().getImagePath(),
-				"screenshots/N-A_0-2_step1-" + tmpImgFileSubStep2.getName());
+				"screenshots/N-A_0-2_step1--" + tmpImgFileSubStep2.getName().substring(tmpImgFileSubStep2.getName().length() - 10));
 		Assert.assertEquals(step.getSnapshots().get(1).getScreenshot().getHtmlSourcePath(),
-				"htmls/N-A_0-2_step1-" + tmpHtmlFileSubStep2.getName());
+				"htmls/N-A_0-2_step1--" + tmpHtmlFileSubStep2.getName().substring(tmpHtmlFileSubStep2.getName().length() - 10));
 
 		tmpImgFile.deleteOnExit();
 		tmpHtmlFile.deleteOnExit();
@@ -371,9 +371,9 @@ public class TestTestStep extends GenericTest {
 
 		List<File> attachments = step.getAllAttachments();
 		Assert.assertEquals(attachments.size(), 3);
-		Assert.assertEquals(attachments.get(0).getName(), "N-A_0-1_step1-" + tmpHtmlFile2.getName());
-		Assert.assertEquals(attachments.get(1).getName(), "N-A_0-1_step1-" + tmpImgFile2.getName());
-		Assert.assertEquals(attachments.get(2).getName(), "N-A_0-1_subStep-" + tmpImgFile4.getName());
+		Assert.assertEquals(attachments.get(0).getName(), "N-A_0-1_step1--" + tmpHtmlFile2.getName().substring(tmpHtmlFile2.getName().length() - 10));
+		Assert.assertEquals(attachments.get(1).getName(), "N-A_0-1_step1--" + tmpImgFile2.getName().substring(tmpImgFile2.getName().length() - 10));
+		Assert.assertEquals(attachments.get(2).getName(), "N-A_0-1_subStep--" + tmpImgFile4.getName().substring(tmpImgFile4.getName().length() - 10));
 	}
 
 	@Test(groups = { "ut" }, expectedExceptions = CustomSeleniumTestsException.class)
