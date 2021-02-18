@@ -908,13 +908,12 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	public void testAttachmentRenaming() throws Exception {
 		
 		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions", "testInError", "testWithException"});
-		
-		// check that with error, remaining steps are skipped
+
 		String detailedReportContent1 = readTestMethodResultFile("testAndSubActions");
-		Assert.assertTrue(detailedReportContent1.contains(" | <a href='screenshot/testAndSubActions_0-1_step_1-img_with_very_very_ve.png'"));		
-		Assert.assertTrue(detailedReportContent1.contains(" | <a href='htmls/testAndSubActions_0-1_step_1-html_with_very_very_v.html' target=html>"));	
+		Assert.assertTrue(detailedReportContent1.contains(" | <a href='screenshot/testAndSubActions_0-1_step_1--rtened.png'"));		
+		Assert.assertTrue(detailedReportContent1.contains(" | <a href='htmls/testAndSubActions_0-1_step_1--tened.html' target=html>"));	
 		
-		Assert.assertTrue(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testAndSubActions", "htmls", "testAndSubActions_0-1_step_1-html_with_very_very_v.html").toFile().exists());
+		Assert.assertTrue(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testAndSubActions", "htmls", "testAndSubActions_0-1_step_1--tened.html").toFile().exists());
 	}
 	
 	@Test(groups={"it"})
@@ -926,14 +925,13 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			System.clearProperty("optimizeReports");
 		}
 		
-		// check that with error, remaining steps are skipped
 		String detailedReportContent1 = readTestMethodResultFile("testAndSubActions");
-		Assert.assertTrue(detailedReportContent1.contains(" | <a href='screenshot/testAndSubActions_0-1_step_1-img_with_very_very_ve.png'"));		
-		Assert.assertTrue(detailedReportContent1.contains(" | <a href='htmls/testAndSubActions_0-1_step_1-html_with_very_very_v.html.zip' target=html>"));	
+		Assert.assertTrue(detailedReportContent1.contains(" | <a href='screenshot/testAndSubActions_0-1_step_1--rtened.png'"));		
+		Assert.assertTrue(detailedReportContent1.contains(" | <a href='htmls/testAndSubActions_0-1_step_1--tened.html.zip' target=html>"));	
 		
-		// check file has been moved
-		Assert.assertTrue(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testAndSubActions", "htmls", "testAndSubActions_0-1_step_1-html_with_very_very_v.html.zip").toFile().exists());
-		Assert.assertFalse(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testAndSubActions", "htmls", "testAndSubActions_0-1_step_1-html_with_very_very_v.html").toFile().exists());
+		// check file has been moved / compressed
+		Assert.assertTrue(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testAndSubActions", "htmls", "testAndSubActions_0-1_step_1--tened.html.zip").toFile().exists());
+		Assert.assertFalse(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testAndSubActions", "htmls", "testAndSubActions_0-1_step_1--tened.html").toFile().exists());
 	}
 	
 	/**
@@ -1080,8 +1078,8 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 						+ "<div class=\"message-log\">a message</div>"	// message in sub step
 						+ "<li>sendKeys to password field</li>"			// action in sub step
 					+ "</ul>" 
-					+ "<div class=\"message-snapshot\">Output 'main' browser: null:  | <a href='htmls/testAndSubActions_0-1_step_1-html_with_very_very_v.html' target=html>Application HTML Source</a> | <a href='screenshot/testAndSubActions_0-1_step_1-img_with_very_very_ve.png' class='lightbox'>Application Snapshot</a></div>"
-					+ "<div class=\"message-snapshot\">Output 'null' browser: null:  | <a href='htmls/testAndSubActions_0-2_step_1-html_with_very_very_v.html' target=html>Application HTML Source</a> | <a href='screenshot/testAndSubActions_0-2_step_1-img_with_very_very_ve.png' class='lightbox'>Application Snapshot</a></div>"
+					+ "<div class=\"message-snapshot\">Output 'main' browser: null:  | <a href='htmls/testAndSubActions_0-1_step_1--tened.html' target=html>Application HTML Source</a> | <a href='screenshot/testAndSubActions_0-1_step_1--rtened.png' class='lightbox'>Application Snapshot</a></div>"
+					+ "<div class=\"message-snapshot\">Output 'null' browser: null:  | <a href='htmls/testAndSubActions_0-2_step_1--tened.html' target=html>Application HTML Source</a> | <a href='screenshot/testAndSubActions_0-2_step_1--rtened.png' class='lightbox'>Application Snapshot</a></div>"
 				+ "</ul>"));
 		
 	}
