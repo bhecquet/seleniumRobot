@@ -28,6 +28,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -827,8 +828,10 @@ public class TestSeleniumRobotTestListener extends ReporterTest {
 			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.NONE, new String[] {"testDriverWithFailureAfterSwitchToFrame"});
 			
 			// check image dimensions are high enough to know if all the page has been captured
-			File imageFile = Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriverWithFailureAfterSwitchToFrame", "screenshots", "testDriverWithFailureAfterSwitchToFrame_5-1_Test_e.png").toFile();
-			BufferedImage image = ImageIO.read(imageFile);
+			File[] images = Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "testDriverWithFailureAfterSwitchToFrame", "screenshots").toFile().listFiles();
+			Assert.assertEquals(images.length, 2);
+
+			BufferedImage image = ImageIO.read(images[1]);
 			Assert.assertTrue(image.getHeight() > 2500);
 			Assert.assertTrue(image.getWidth() > 700);
 			

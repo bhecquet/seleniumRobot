@@ -80,8 +80,8 @@ public class StubTestClass extends StubParentClass {
 		step1.addAction(new TestAction("sendKeys to text field", true, new ArrayList<>()));
 		
 		
-		File tmpImg = File.createTempFile("img_with_very_very_very_long_name_to_be_shortened", ".png");
-		File tmpHtml = File.createTempFile("html_with_very_very_very_long_name_to_be_shortened", ".html");
+		File tmpImg = File.createTempFile("img", "_with_very_very_very_long_name_to_be_shortened.png");
+		File tmpHtml = File.createTempFile("html", "_with_very_very_very_long_name_to_be_shortened.html");
 		
 		ScreenShot screenshot = new ScreenShot();
 		screenshot.setImagePath("screenshot/" + tmpImg.getName());
