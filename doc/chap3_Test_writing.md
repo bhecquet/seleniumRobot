@@ -336,6 +336,50 @@ Example of a shopping cart class. All must inherit of PageObject class:
 
 Most of the time, Page classes will inherit from PageObject classes. But, if for some reason, you need to have the same features in several pages (e.g: headers and footer are often common among all the web site), then, you can create a class that handled these common features (which extends PageObject), and then inherit it.
 
+#### PageObject constructors ####
+
+Each Page class will extend PageObject class, and so, calling it's constructors.
+
+##### Check for presence of an element on opening #####
+Most of the time, you will call this constructor who is provided an element to check for presence. If 'myElement' is not present when page opens, then test fails
+
+```java
+	private static HtmlElement myElement = new HtmlElement("element", By.name("anElement"));
+
+	public MyPageObject() throws Exception {
+			super(myElement);
+		}
+```
+
+##### Open URL and check for element present #####
+
+PageObject will connect to provided url (and start browser if necessary), then check 'myElement' is present
+
+```java
+	private static HtmlElement myElement = new HtmlElement("element", By.name("anElement"));
+
+	public MyPageObject(String url) throws Exception {
+			super(myElement, url);
+		}
+```
+
+##### Open page with different loading strategy #####
+
+By default, PageObject waits for page to load completely before doing anything else (document.ready). But sometimes, due to external javascript loading, page may be very long to load (or never load completely) before selenium 'pageLoadTimeout' raises. In this case, you can write (see: [https://www.selenium.dev/documentation/en/webdriver/page_loading_strategy/](https://www.selenium.dev/documentation/en/webdriver/page_loading_strategy/) for details)
+Default driver strategy (that applies to all pages) can be set using `pageLoadStrategy` seleniumRobot option on starting.
+
+```java
+	private static HtmlElement myElement = new HtmlElement("element", By.name("anElement"));
+
+	public MyPageObject(String url) throws Exception {
+			super(myElement, url, PageLoadStrategy.NONE);
+		}
+```
+
+##### Attach to an existing browser #####
+
+See [11 Attach an existing browser inside your scenario](#11-attach-an-existing-browser-inside-your-scenario)
+
 #### Search elements ####
 
 ##### Standard search #####
