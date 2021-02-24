@@ -264,6 +264,8 @@ Either use directly the project file, or change content to adapt it to your data
 	SoapUi soapUi = new SoapUi();
 	String reply = soapUi.executeWithProjectString(<project_content>, "myProject");
 ```
+
+Alternatively, you would use Unirest, which is already provided by SeleniumRobot [http://kong.github.io/unirest-java/](http://kong.github.io/unirest-java/)
 		
 ### 8 Using database ###
 
