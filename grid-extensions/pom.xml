@@ -110,6 +110,7 @@
 						<include>**/browserfactory/mobile/**</include>
 						<include>**/browserfactory/BrowserInfo.java</include>
 						<include>**/browserfactory/SeleniumRobotCapabilityType.java</include>
+						<include>**/util/PackageUtility.java</include>
 						<include>**/util/osutility/**</include>
 						<include>**/util/FileUtility.java</include>
 						<include>**/util/NetworkUtility.java</include>
