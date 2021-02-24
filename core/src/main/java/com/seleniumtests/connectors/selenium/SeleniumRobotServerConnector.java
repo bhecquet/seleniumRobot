@@ -21,6 +21,9 @@ import org.apache.log4j.Logger;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.ConfigurationException;
+import com.seleniumtests.customexception.SeleniumRobotServer401Exception;
+import com.seleniumtests.customexception.SeleniumRobotServer404Exception;
+import com.seleniumtests.customexception.SeleniumRobotServer500Exception;
 import com.seleniumtests.customexception.SeleniumRobotServerException;
 import com.seleniumtests.util.logging.SeleniumRobotLogger;
 
@@ -38,8 +41,8 @@ import kong.unirest.json.JSONObject;
 public abstract class SeleniumRobotServerConnector {
 	
 	protected static final String FIELD_NAME = "name";
-	private static final String REQUEST_FAILED_ERROR = "request to %s failed: %s";
-	private static final String RESPONSE_DETAIL = "detail";
+	public static final String REQUEST_FAILED_ERROR = "request to %s failed: %s";
+	public static final String RESPONSE_DETAIL = "detail";
 	protected static final String AUTHORIZATION_HEADER = "Authorization";
 
 	protected static final Logger logger = SeleniumRobotLogger.getLogger(SeleniumRobotServerConnector.class);
@@ -304,20 +307,7 @@ public abstract class SeleniumRobotServerConnector {
 		}
 		
 		if (response.getStatus() >= 400) {
-			String error = "unknown";
-			try {
-				error = new JSONObject(response.getBody()).getString(RESPONSE_DETAIL);
-			} catch (JSONException e) {
-				throw new SeleniumRobotServerException(String.format(REQUEST_FAILED_ERROR, request.getUrl(), response.getBody()));
-			} catch (Exception e) {
-				throw new UnirestException(String.format(REQUEST_FAILED_ERROR, request.getUrl(), response.getStatusText()));
-			}
-			
-			if (response.getStatus() == 401) {
-				error += "You need to provide the API token through 'seleniumRobotServerToken' parameter";
-			}
-
-			throw new SeleniumRobotServerException(String.format(REQUEST_FAILED_ERROR, request.getUrl(), error));
+			throw getRightSeleniumServerException(response, request.getUrl());
 		}
 		
 		if (response.getStatus() == 204) {
@@ -337,13 +327,7 @@ public abstract class SeleniumRobotServerConnector {
 		}
 		
 		if (response.getStatus() >= 400) {
-			try {
-				String error = new JSONObject(response.getBody()).getString(RESPONSE_DETAIL);
-				throw new SeleniumRobotServerException(String.format(REQUEST_FAILED_ERROR, request.getUrl(), error));
-			} catch (Exception e) {
-				throw new UnirestException(String.format(REQUEST_FAILED_ERROR, request.getUrl(), response.getStatusText()));
-			}
-			
+			throw getRightSeleniumServerException(response, request.getUrl());
 		}
 		
 		if (response.getStatus() == 204) {
@@ -352,6 +336,36 @@ public abstract class SeleniumRobotServerConnector {
 		
 		return new JSONArray(response.getBody());
 	}
+	
+	/**
+	 * Throw the right exception
+	 * @param response
+	 * @param url
+	 * @return
+	 */
+	private SeleniumRobotServerException getRightSeleniumServerException(HttpResponse<String> response, String url) {
+    	int statusCode = response.getStatus();
+    	
+    	String message = "unknown";
+		try {
+			message = new JSONObject(response.getBody()).getString(SeleniumRobotServerConnector.RESPONSE_DETAIL);
+		} catch (JSONException e) {
+			message = String.format(SeleniumRobotServerConnector.REQUEST_FAILED_ERROR, url, response.getBody());
+		} catch (Exception e) {
+			message = String.format(SeleniumRobotServerConnector.REQUEST_FAILED_ERROR, url, response.getStatusText());
+		}
+    	
+    	switch (statusCode) {
+    		case 401:
+    			return new SeleniumRobotServer401Exception(message + "\nYou need to provide the API token through 'seleniumRobotServerToken' parameter");
+	    	case 404:
+	    		return new SeleniumRobotServer404Exception(message);
+	    	case 500:
+	    		return new SeleniumRobotServer500Exception(message);
+	    	default:
+	    		return new SeleniumRobotServerException(message);
+    	}
+    }
 	
 	public boolean getActive() {
 		return active;

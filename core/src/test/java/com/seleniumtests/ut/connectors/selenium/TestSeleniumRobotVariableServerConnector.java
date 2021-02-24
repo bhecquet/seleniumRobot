@@ -44,9 +44,11 @@ import com.seleniumtests.ConnectorsTest;
 import com.seleniumtests.connectors.selenium.SeleniumRobotVariableServerConnector;
 import com.seleniumtests.core.TestVariable;
 import com.seleniumtests.customexception.ConfigurationException;
+import com.seleniumtests.customexception.SeleniumRobotServerException;
 
 import kong.unirest.GetRequest;
 import kong.unirest.Headers;
+import kong.unirest.HttpRequest;
 import kong.unirest.HttpResponse;
 import kong.unirest.Unirest;
 import kong.unirest.UnirestException;
@@ -218,6 +220,35 @@ public class TestSeleniumRobotVariableServerConnector extends ConnectorsTest {
 		Assert.assertEquals(variables.get("key2").getValue(), "value2");
 	}
 	
+	/**
+	 * get variables failes with error on server side
+	 * @throws UnirestException
+	 */
+	@Test(groups= {"ut"}, expectedExceptions = SeleniumRobotServerException.class)
+	public void testFetchVariableFailed() throws UnirestException {
+
+		configureMockedVariableServerConnection();
+		createServerMock(SERVER_URL, "GET", SeleniumRobotVariableServerConnector.VARIABLE_API_URL, 404, "{}");
+
+		SeleniumRobotVariableServerConnector connector= new SeleniumRobotVariableServerConnector(true, SERVER_URL, "Test1", null);
+		Map<String, TestVariable> variables = connector.getVariables();
+		Assert.assertEquals(variables.get("key1").getValue(), "value1");
+		Assert.assertEquals(variables.get("key2").getValue(), "value2");
+	}
+	
+	@Test(groups= {"ut"}, expectedExceptions = SeleniumRobotServerException.class)
+	public void testFetchVariableWithNetworkError() throws UnirestException {
+		
+		configureMockedVariableServerConnection();
+		HttpRequest<HttpRequest> req =  createServerMock(SERVER_URL, "GET", SeleniumRobotVariableServerConnector.VARIABLE_API_URL, 200, "{}");
+		when(req.asString()).thenThrow(UnirestException.class);
+		
+		SeleniumRobotVariableServerConnector connector= new SeleniumRobotVariableServerConnector(true, SERVER_URL, "Test1", null);
+		Map<String, TestVariable> variables = connector.getVariables();
+		Assert.assertEquals(variables.get("key1").getValue(), "value1");
+		Assert.assertEquals(variables.get("key2").getValue(), "value2");
+	}
+	
 
 	@Test(groups= {"ut"})
 	public void testVariableUpdateExistingVariable() throws UnirestException {
@@ -229,6 +260,52 @@ public class TestSeleniumRobotVariableServerConnector extends ConnectorsTest {
 		
 		PowerMockito.verifyStatic(Unirest.class);
 		Unirest.patch(ArgumentMatchers.contains(SeleniumRobotVariableServerConnector.VARIABLE_API_URL));
+		
+		Assert.assertEquals(variable.getValue(), "value");
+	}
+	
+	@Test(groups= {"ut"}, expectedExceptions = SeleniumRobotServerException.class)
+	public void testVariableUpdateExistingVariableWithServerError() throws UnirestException {
+		
+		configureMockedVariableServerConnection();
+		createServerMock(SERVER_URL, "PATCH", String.format(SeleniumRobotVariableServerConnector.EXISTING_VARIABLE_API_URL, 12), 500, "{}");
+		
+		SeleniumRobotVariableServerConnector connector= new SeleniumRobotVariableServerConnector(true, SERVER_URL, "Test1", null);
+		TestVariable existingVariable = new TestVariable(12, "key", "value", false, TestVariable.TEST_VARIABLE_PREFIX + "key");
+		connector.upsertVariable(existingVariable, true);
+	}
+	
+	@Test(groups= {"ut"}, expectedExceptions = SeleniumRobotServerException.class)
+	public void testVariableUpdateExistingVariableWithNetworkError() throws UnirestException {
+		
+		configureMockedVariableServerConnection();
+		HttpRequest<HttpRequest> req =  createServerMock(SERVER_URL, "PATCH", String.format(SeleniumRobotVariableServerConnector.EXISTING_VARIABLE_API_URL, 12), 200, "{}");
+		when(req.asString()).thenThrow(UnirestException.class);
+		
+		SeleniumRobotVariableServerConnector connector= new SeleniumRobotVariableServerConnector(true, SERVER_URL, "Test1", null);
+		TestVariable existingVariable = new TestVariable(12, "key", "value", false, TestVariable.TEST_VARIABLE_PREFIX + "key");
+		connector.upsertVariable(existingVariable, true);
+	}
+	
+	/**
+	 * issue #429: if variable has been deleted, recreate one
+	 * @throws UnirestException
+	 */
+	@Test(groups= {"ut"})
+	public void testVariableUpdateExistingVariableThatDisappeard() throws UnirestException {
+		
+		configureMockedVariableServerConnection();
+		createServerMock(SERVER_URL, "PATCH", String.format(SeleniumRobotVariableServerConnector.EXISTING_VARIABLE_API_URL, 12), 404, "{}");
+		
+		SeleniumRobotVariableServerConnector connector= new SeleniumRobotVariableServerConnector(true, SERVER_URL, "Test1", null);
+		TestVariable existingVariable = new TestVariable(12, "key", "value", false, TestVariable.TEST_VARIABLE_PREFIX + "key");
+		TestVariable variable = connector.upsertVariable(existingVariable, true);
+		
+		// check we tried a PATCH and then create the variable with a POST
+		PowerMockito.verifyStatic(Unirest.class);
+		Unirest.patch(ArgumentMatchers.contains(SeleniumRobotVariableServerConnector.VARIABLE_API_URL));
+		PowerMockito.verifyStatic(Unirest.class);
+		Unirest.post(ArgumentMatchers.contains(SeleniumRobotVariableServerConnector.VARIABLE_API_URL));
 		
 		Assert.assertEquals(variable.getValue(), "value");
 	}

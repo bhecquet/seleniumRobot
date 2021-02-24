@@ -69,7 +69,6 @@ import kong.unirest.HttpRequest;
 import kong.unirest.HttpRequestWithBody;
 import kong.unirest.HttpResponse;
 import kong.unirest.JsonNode;
-import kong.unirest.JsonResponse;
 import kong.unirest.MultipartBody;
 import kong.unirest.PagedList;
 import kong.unirest.RequestBodyEntity;

@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import com.seleniumtests.core.TestVariable;
+import com.seleniumtests.customexception.SeleniumRobotServer404Exception;
 import com.seleniumtests.customexception.SeleniumRobotServerException;
 
 import kong.unirest.GetRequest;
@@ -200,38 +201,59 @@ public class SeleniumRobotVariableServerConnector extends SeleniumRobotServerCon
 		//     this copy would not contain the "test" reference 
 		if (variable.getId() == null || !variable.getInternalName().startsWith(TestVariable.TEST_VARIABLE_PREFIX)) {
 			try {
-				MultipartBody request = buildPostRequest(url + VARIABLE_API_URL)
-						.field(FIELD_NAME, TestVariable.TEST_VARIABLE_PREFIX + variable.getName())
-						.field(FIELD_VALUE, variable.getValue())
-						.field(FIELD_RESERVABLE, String.valueOf(variable.isReservable()))
-						.field(FIELD_ENVIRONMENT, environmentId.toString())
-						.field(FIELD_APPLICATION, applicationId.toString())
-						.field("internal", String.valueOf(true))
-						.field(FIELD_TIME_TO_LIVE, String.valueOf(variable.getTimeToLive()));
-				
-				if (specificToVersion) {
-					request = request.field(FIELD_VERSION, versionId.toString());
-				}
-				
-				JSONObject variableJson = getJSonResponse(request);
-				
-				return TestVariable.fromJsonObject(variableJson);
-				
+				return createVariable(variable, specificToVersion);
 			} catch (UnirestException | JSONException | SeleniumRobotServerException e) {
 				throw new SeleniumRobotServerException("cannot upsert variables", e);
 			} 
 		} else {
 			try {
-				JSONObject variableJson = getJSonResponse(buildPatchRequest(String.format(url + EXISTING_VARIABLE_API_URL, variable.getId()))
-						.field(FIELD_VALUE, variable.getValue())
-						.field(FIELD_RESERVABLE, String.valueOf(variable.isReservable()))
-						.field(FIELD_TIME_TO_LIVE, String.valueOf(variable.getTimeToLive())));
+				return updateVariable(variable);
 				
-				return TestVariable.fromJsonObject(variableJson);
-				
+			// in case variable has been deleted in the interval (between test start and now), recreate it
+			} catch (SeleniumRobotServer404Exception e) {
+				return createVariable(variable, specificToVersion);
 			} catch (UnirestException | JSONException | SeleniumRobotServerException e) {
 				throw new SeleniumRobotServerException("cannot upsert variables", e);
 			} 
 		}
+	}
+
+	/**
+	 * Update variable on the server
+	 * @param variable
+	 * @return
+	 */
+	private TestVariable updateVariable(TestVariable variable) {
+		JSONObject variableJson = getJSonResponse(buildPatchRequest(String.format(url + EXISTING_VARIABLE_API_URL, variable.getId()))
+				.field(FIELD_VALUE, variable.getValue())
+				.field(FIELD_RESERVABLE, String.valueOf(variable.isReservable()))
+				.field(FIELD_TIME_TO_LIVE, String.valueOf(variable.getTimeToLive())));
+		
+		return TestVariable.fromJsonObject(variableJson);
+	}
+
+	/**
+	 * create the variable on the server
+	 * @param variable
+	 * @param specificToVersion
+	 * @return
+	 */
+	private TestVariable createVariable(TestVariable variable, boolean specificToVersion) {
+		MultipartBody request = buildPostRequest(url + VARIABLE_API_URL)
+				.field(FIELD_NAME, TestVariable.TEST_VARIABLE_PREFIX + variable.getName())
+				.field(FIELD_VALUE, variable.getValue())
+				.field(FIELD_RESERVABLE, String.valueOf(variable.isReservable()))
+				.field(FIELD_ENVIRONMENT, environmentId.toString())
+				.field(FIELD_APPLICATION, applicationId.toString())
+				.field("internal", String.valueOf(true))
+				.field(FIELD_TIME_TO_LIVE, String.valueOf(variable.getTimeToLive()));
+		
+		if (specificToVersion) {
+			request = request.field(FIELD_VERSION, versionId.toString());
+		}
+		
+		JSONObject variableJson = getJSonResponse(request);
+		
+		return TestVariable.fromJsonObject(variableJson);
 	}
 }
