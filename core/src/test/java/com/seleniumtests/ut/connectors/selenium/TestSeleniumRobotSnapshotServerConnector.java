@@ -768,6 +768,23 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 		boolean comparisonResult = connector.getTestCaseInSessionComparisonResult(testCaseInSessionId);
 		Assert.assertFalse(comparisonResult);
 	}
+
+	/**
+	 * In case computing errors occur, comparison may return null, handle it as "skipped"
+	 */
+	@Test(groups= {"ut"})
+	public void testGetComparisonResultSkipped() throws UnirestException {
+		Assert.fail("not implemented");
+	}
+	
+	/**
+	 * In case computing errors occur, comparison may return null, handle it as "skipped"
+	 * Check case where "errorComputing" key is not available (before migration)
+	 */
+	@Test(groups= {"ut"})
+	public void testGetComparisonResultSkippedNoErrorComputingInformation() throws UnirestException {
+		Assert.fail("not implemented");
+	}
 	
 	/**
 	 * when comparison is not completed, do not interfere with result => returns true
@@ -801,8 +818,14 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 		Assert.assertTrue(comparisonResult);
 	}
 	
+	
+	@Test(groups= {"ut"})
+	public void testGetComparisonResultTakesTooMuchTime() throws UnirestException {
+		Assert.fail("not implemented");
+	}
+	
 	/**
-	 * when comparison is not available, do not interfere with result => returns true
+	 * If error raised during getting comparison, do not interfere with result
 	 * @throws UnirestException
 	 */
 	@Test(groups= {"ut"})

@@ -24,7 +24,6 @@ import java.util.List;
 import org.apache.commons.io.FileUtils;
 import org.testng.Assert;
 import org.testng.ITestContext;
-import org.testng.TestNG;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.Test;
 import org.testng.xml.XmlSuite.ParallelMode;
@@ -145,6 +144,40 @@ public class TestJUnitReporter extends ReporterTest {
 		}
 	}
 	
+	@Test(groups={"it"})
+	public void testSnapshotComparisonSkipAddTestResult() throws Exception {
+
+		try {
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE, "true");
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT, "true");
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT_BEHAVIOUR, "addTestResult");
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_RECORD_RESULTS, "true");
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL, "http://localhost:4321");
+			
+			SeleniumRobotSnapshotServerConnector server = configureMockedSnapshotServerConnection();
+			createServerMock("GET", SeleniumRobotSnapshotServerConnector.TESTCASEINSESSION_API_URL + "15", 200, "{'testSteps': [], 'computed': true, 'isOkWithSnapshots': null, 'computingError': ['error1']}");		
+			
+			SeleniumTestsContextManager.removeThreadContext();
+			List<String> testList = executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions"});
+			
+			// check there are 2 results. first one is the selenium test (OK) and second one is the snapshot comparison (KO)
+			String result = readJUnitFile(testList.get(0));
+			Assert.assertTrue(result.contains("tests=\"2\""));
+			Assert.assertTrue(result.contains("errors=\"0\""));
+			Assert.assertTrue(result.contains("skipped=\"1\""));
+			
+			Assert.assertTrue(result.matches(".*<testcase name=\"snapshots-testAndSubActions\" time=\"\\d+\\.\\d+\" classname=\"com.seleniumtests.it.stubclasses.StubTestClass\"><skipped/>.*"));
+
+			
+		} finally {
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE);
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL);
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT);
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT_BEHAVIOUR);
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_RECORD_RESULTS);
+		}
+	}
+	
 	/**
 	 * Check that when snapshot server is used with behavior "addTestResult" 2 results should be presented: one with the result of selenium test, a second one with the result of snapshot comparison.
 	 * Both are the same but second test is there for integration with junit parser so that we can differentiate navigation result from GUI result.
@@ -171,6 +204,42 @@ public class TestJUnitReporter extends ReporterTest {
 			Assert.assertTrue(result.contains("tests=\"1\""));
 			Assert.assertTrue(result.contains("errors=\"1\""));
 			Assert.assertTrue(result.contains("<error type=\"com.seleniumtests.customexception.ScenarioException\" message=\"Snapshot comparison failed\">"));
+			
+		} finally {
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE);
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL);
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT);
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT_BEHAVIOUR);
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_RECORD_RESULTS);
+		}
+	}
+	
+	/**
+	 * When snapshot comparison is skipped, this does not change the test result
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testSnapshotComparisonSkipChangeTestResult() throws Exception {
+
+		try {
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE, "true");
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT, "true");
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT_BEHAVIOUR, "changeTestResult");
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_RECORD_RESULTS, "true");
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL, "http://localhost:4321");
+			
+			SeleniumRobotSnapshotServerConnector server = configureMockedSnapshotServerConnection();
+			createServerMock("GET", SeleniumRobotSnapshotServerConnector.TESTCASEINSESSION_API_URL + "15", 200, "{'testSteps': [], 'computed': true, 'isOkWithSnapshots': null, 'computingError': ['error1']}");		
+			
+			SeleniumTestsContextManager.removeThreadContext();
+			List<String> testList = executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions"});
+			
+			// check there is 1 results
+			String outDir = new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath();
+			String result = FileUtils.readFileToString(Paths.get(outDir, "junitreports", String.format("TEST-%s.xml", testList.get(0))).toFile());
+			Assert.assertTrue(result.contains("tests=\"1\""));
+			Assert.assertTrue(result.contains("errors=\"0\"")); // as comparison is skipped, test result is not changed
+			Assert.assertFalse(result.contains("<error type=\"com.seleniumtests.customexception.ScenarioException\" message=\"Snapshot comparison failed\">"));
 			
 		} finally {
 			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE);

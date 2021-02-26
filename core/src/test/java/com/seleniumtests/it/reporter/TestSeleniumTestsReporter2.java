@@ -320,6 +320,153 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_RECORD_RESULTS);
 		}
 	}
+	@Test(groups={"it"})
+	public void testSnapshotComparisonSkipDisplayOnly() throws Exception {
+		TODO
+		try {
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE, "true");
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT, "true");
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT_BEHAVIOUR, "displayOnly");
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_RECORD_RESULTS, "true");
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL, "http://localhost:4321");
+			
+			SeleniumRobotSnapshotServerConnector server = configureMockedSnapshotServerConnection();
+			createServerMock("GET", SeleniumRobotSnapshotServerConnector.TESTCASEINSESSION_API_URL + "15", 200, "{'testSteps': [], 'computed': true, 'isOkWithSnapshots': false}");		
+			
+			SeleniumTestsContextManager.removeThreadContext();
+			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions"});
+			
+			// check result is ok and comparison result is shown through red bullet (comparison KO)
+			String summaryReport = readSummaryFile();
+			Assert.assertTrue(summaryReport.contains("<i class=\"fa fa-circle circleFailed\" data-toggle=\"tooltip\" title=\"snapshot comparison failed\">"));
+			Assert.assertTrue(summaryReport.contains("info=\"ok\" data-toggle=\"tooltip\""));
+			
+			String detailedReportContent = readTestMethodResultFile("testAndSubActions");
+			
+			// tabs are shown
+			Assert.assertTrue(detailedReportContent.contains("<div id=\"tabs\" style=\"display: block;\" >"));
+			
+			// failed step has been added for comparison
+			Assert.assertTrue(detailedReportContent.contains("<div class=\"message-error\">Comparison failed</div>"));
+			Assert.assertTrue(detailedReportContent.matches(".*<div class=\"box collapsed-box failed\">.*?<i class=\"fa fa-plus\"></i></button> Snapshot comparison.*"));
+			
+			// snapshot tab not active
+			Assert.assertTrue(detailedReportContent.contains("<a class=\"nav-link  tab-failed \" id=\"snapshot-tab\" data-toggle=\"tab\" href=\"#snapshots\" role=\"tab\" aria-controls=\"profile\" aria-selected=\"false\">Snapshots</a>"));
+			
+			// iframe present with the right test case id
+			Assert.assertTrue(detailedReportContent.contains("<iframe src=\"http://localhost:4321/snapshot/compare/stepList/15/?header=true\" id=\"snapshot-iframe\" frameborder=\"0\"></iframe>"));
+		} finally {
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE);
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL);
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT);
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT_BEHAVIOUR);
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_RECORD_RESULTS);
+		}
+	}
+	
+	/**
+	 * Check that when snapshot server is used, we see a tab pointing to snapshot comparison results
+	 * Moreover, a red bullet should be visible on summary result when comparison is KO
+	 * Result remains OK as behaviour is "displayOnly"
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testSnapshotComparisonSkipChangeTestResult() throws Exception {
+		TODO
+		try {
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE, "true");
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT, "true");
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT_BEHAVIOUR, "changeTestResult");
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_RECORD_RESULTS, "true");
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL, "http://localhost:4321");
+			
+			SeleniumRobotSnapshotServerConnector server = configureMockedSnapshotServerConnection();
+			createServerMock("GET", SeleniumRobotSnapshotServerConnector.TESTCASEINSESSION_API_URL + "15", 200, "{'testSteps': [], 'computed': true, 'isOkWithSnapshots': false}");		
+			
+			SeleniumTestsContextManager.removeThreadContext();
+			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions"});
+			
+			// check result is KO (due to option 'changeTestResult') and comparison result is shown through red bullet (comparison KO)
+			String summaryReport = readSummaryFile();
+			Assert.assertTrue(summaryReport.contains("<i class=\"fa fa-circle circleFailed\" data-toggle=\"tooltip\" title=\"snapshot comparison failed\">"));
+			Assert.assertTrue(summaryReport.contains("info=\"ko\" data-toggle=\"tooltip\""));
+			
+			String detailedReportContent = readTestMethodResultFile("testAndSubActions");
+			
+			// tabs are shown
+			Assert.assertTrue(detailedReportContent.contains("<div id=\"tabs\" style=\"display: block;\" >"));
+			
+			// failed step has been added for comparison
+			Assert.assertTrue(detailedReportContent.contains("<div class=\"message-error\">Comparison failed</div>"));
+			Assert.assertTrue(detailedReportContent.matches(".*<div class=\"box collapsed-box failed\">.*?<i class=\"fa fa-plus\"></i></button> Snapshot comparison.*"));
+			
+			// snapshot tab not active
+			Assert.assertTrue(detailedReportContent.contains("<a class=\"nav-link  tab-failed \" id=\"snapshot-tab\" data-toggle=\"tab\" href=\"#snapshots\" role=\"tab\" aria-controls=\"profile\" aria-selected=\"false\">Snapshots</a>"));
+			
+			// iframe present with the right test case id
+			Assert.assertTrue(detailedReportContent.contains("<iframe src=\"http://localhost:4321/snapshot/compare/stepList/15/?header=true\" id=\"snapshot-iframe\" frameborder=\"0\"></iframe>"));
+		} finally {
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE);
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL);
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT);
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT_BEHAVIOUR);
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_RECORD_RESULTS);
+		}
+	}
+	
+	/**
+	 * Check that when snapshot server is used, we see a tab pointing to snapshot comparison results
+	 * Moreover, a red bullet should be visible on summary result when comparison is KO
+	 * 2 results should be presented: one with the result of selenium test, a second one with the result of snapshot comparison.
+	 * Both are the same but second test is there for integration with junit parser so that we can differentiate navigation result from GUI result.
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testSnapshotComparisonSkipAddTestResult() throws Exception {
+		TODO
+		try {
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE, "true");
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT, "true");
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT_BEHAVIOUR, "addTestResult");
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_RECORD_RESULTS, "true");
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL, "http://localhost:4321");
+			
+			SeleniumRobotSnapshotServerConnector server = configureMockedSnapshotServerConnection();
+			createServerMock("GET", SeleniumRobotSnapshotServerConnector.TESTCASEINSESSION_API_URL + "15", 200, "{'testSteps': [], 'computed': true, 'isOkWithSnapshots': false}");		
+			
+			SeleniumTestsContextManager.removeThreadContext();
+			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions"});
+			
+			// check there are 2 results. first one is the selenium test (OK) and second one is the snapshot comparison (KO)
+			String summaryReport = readSummaryFile();
+			Assert.assertTrue(summaryReport.contains("<i class=\"fa fa-circle circleFailed\" data-toggle=\"tooltip\" title=\"snapshot comparison failed\"></i><a href='testAndSubActions/TestReport.html' info=\"ok\" "));
+			Assert.assertTrue(summaryReport.contains("<i class=\"fa fa-circle circleFailed\" data-toggle=\"tooltip\" title=\"snapshot comparison failed\"></i><a href='snapshots-testAndSubActions/TestReport.html' info=\"ko\""));
+			
+			String detailedReportContent = readTestMethodResultFile("snapshots-testAndSubActions");
+			
+			// tabs are shown
+			Assert.assertTrue(detailedReportContent.contains("<div id=\"tabs\" style=\"display: block;\" >"));
+			
+			// failed step has been added for comparison
+			Assert.assertTrue(detailedReportContent.contains("<div class=\"message-error\">Comparison failed</div>"));
+			Assert.assertTrue(detailedReportContent.matches(".*<div class=\"box collapsed-box failed\">.*?<i class=\"fa fa-plus\"></i></button> Snapshot comparison.*"));
+			
+			// snapshot tab not active
+			Assert.assertTrue(detailedReportContent.contains("<a class=\"nav-link  tab-failed \" id=\"snapshot-tab\" data-toggle=\"tab\" href=\"#snapshots\" role=\"tab\" aria-controls=\"profile\" aria-selected=\"false\">Snapshots</a>"));
+			
+			// check execution logs contains the exception (but not logs)
+			Assert.assertTrue(detailedReportContent.contains("<div class=\"message-error\"><div>class com.seleniumtests.customexception.ScenarioException: Snapshot comparison failed</div>"));
+			
+			// iframe present with the right test case id
+			Assert.assertTrue(detailedReportContent.contains("<iframe src=\"http://localhost:4321/snapshot/compare/stepList/15/?header=true\" id=\"snapshot-iframe\" frameborder=\"0\"></iframe>"));
+		} finally {
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE);
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL);
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT);
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT_BEHAVIOUR);
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_RECORD_RESULTS);
+		}
+	}
 	
 	/**
 	 * Check summary format in monothread
