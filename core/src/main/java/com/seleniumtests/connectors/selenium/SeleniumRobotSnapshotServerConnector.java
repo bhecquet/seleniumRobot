@@ -27,6 +27,7 @@ import java.util.stream.Collectors;
 
 import org.json.JSONException;
 import org.openqa.selenium.Rectangle;
+import org.testng.ITestResult;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.customexception.ConfigurationException;
@@ -42,6 +43,7 @@ import kong.unirest.json.JSONObject;
 public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerConnector {
 	
 	private static final String FIELD_IS_OK_WITH_SNAPSHOTS = "isOkWithSnapshots";
+	private static final String FIELD_COMPUTING_ERROR = "computingError";
 	private static final String FIELD_STEP = "step";
 	private static final String FIELD_TEST_STEPS = "testSteps";
 	private static final String FIELD_SESSION = "session";
@@ -369,31 +371,59 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 	/**
 	 * Get the comparison result of snapshots. If we cannot get the information, return true
 	 * @param testCaseInSessionId		id of the test case in this test sessions.
-	 * @return							true if snapshot comparison is OK
+	 * @return							integer with test result. Values are the one from ITestResult
 	 */
-	public boolean getTestCaseInSessionComparisonResult(Integer testCaseInSessionId) {
+	public int getTestCaseInSessionComparisonResult(Integer testCaseInSessionId, StringBuilder errorMessage) {
 		
+		logger.info("Getting snapshot comparison result for " + testCaseInSessionId);
 		try {
 			JSONObject response = null;
-			for (int i = 0; i < 3; i++) {
+			for (int i = 0; i < 5; i++) {
 				response = getJSonResponse(buildGetRequest(url + TESTCASEINSESSION_API_URL + testCaseInSessionId));
+				
+				// 'isOkWithSnapshots' can take 3 values
+				// - 'true' if all comparison are OK
+				// - 'false' if at least 1 comparison fails
+				// - 'null' if all comparison failed to be computed (e.g: due to bug on server) or at least one comparison is OK but all others are not computed
 				if (response.optBoolean("computed", false) && response.has(FIELD_IS_OK_WITH_SNAPSHOTS)) {
-					return response.getBoolean(FIELD_IS_OK_WITH_SNAPSHOTS);
+					return displaySnapshotComparisonError(response, errorMessage);
+					
 				} else {
 					WaitHelper.waitForSeconds(1);
 				}
 			}
 			if (response != null) {
-				return response.optBoolean(FIELD_IS_OK_WITH_SNAPSHOTS, true);
+				logger.info("Comparison result took too long to compute");
+				return displaySnapshotComparisonError(response, errorMessage);
 			} else {
-				return true;
+				logger.error("Comparison result is null, setting to 'true'");
+				return ITestResult.SKIP;
 			}
 			
 		} catch (UnirestException e) {
-			logger.error("Cannot get comparison result for this test case. So result is expected to be OK", e);
-			return true;
+			logger.error("Cannot get comparison result for this test case", e);
+			return ITestResult.SKIP;
 		}
 		
+	}
+	
+	private int displaySnapshotComparisonError(JSONObject response, StringBuilder errorMessage) {
+		if (!response.optBoolean(FIELD_IS_OK_WITH_SNAPSHOTS, false) 
+				&& response.optJSONArray(FIELD_COMPUTING_ERROR) != null 
+				&& !response.optJSONArray(FIELD_COMPUTING_ERROR).isEmpty()) {
+			logger.error("Errors while computing snapshot comparisons: \n" + response.optJSONArray(FIELD_COMPUTING_ERROR).join("\n"));
+			errorMessage.append(response.optJSONArray(FIELD_COMPUTING_ERROR).join("\n"));
+		}
+		
+		if (response.has(FIELD_IS_OK_WITH_SNAPSHOTS)) {
+			if (response.isNull(FIELD_IS_OK_WITH_SNAPSHOTS)) {
+				return ITestResult.SKIP;
+			} else {
+				return response.getBoolean(FIELD_IS_OK_WITH_SNAPSHOTS) ? ITestResult.SUCCESS: ITestResult.FAILURE;
+			}
+		} else {
+			return ITestResult.SKIP;
+		}
 	}
 
 }

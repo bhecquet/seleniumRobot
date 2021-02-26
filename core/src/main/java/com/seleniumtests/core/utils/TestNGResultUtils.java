@@ -92,7 +92,7 @@ public class TestNGResultUtils {
 		// reset flags of generated results
 		setHtmlReportCreated(newTestResult, false);
 		setCustomReportCreated(newTestResult, false);
-		setSnapshotComparisonResult(newTestResult, false);
+		setSnapshotComparisonResult(newTestResult, ITestResult.SKIP);
 		
 		// create testResult own context
 		SeleniumTestsContext newTestContext = new SeleniumTestsContext(getSeleniumRobotTestContext(toCopy), false);
@@ -226,11 +226,11 @@ public class TestNGResultUtils {
     }
     
     // the snapshot comparison result
-    public static Boolean getSnapshotComparisonResult(ITestResult testNGResult) {
-    	return (Boolean) testNGResult.getAttribute(SNAPSHOT_COMPARISON_RESULT);
+    public static Integer getSnapshotComparisonResult(ITestResult testNGResult) {
+    	return (Integer) testNGResult.getAttribute(SNAPSHOT_COMPARISON_RESULT);
     }
     
-    public static void setSnapshotComparisonResult(ITestResult testNGResult, Boolean result) {
+    public static void setSnapshotComparisonResult(ITestResult testNGResult, int result) {
     	testNGResult.setAttribute(SNAPSHOT_COMPARISON_RESULT, result);
     }
     

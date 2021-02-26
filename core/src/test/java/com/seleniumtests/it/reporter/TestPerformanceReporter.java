@@ -319,4 +319,36 @@ public class TestPerformanceReporter extends ReporterTest {
 			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_RECORD_RESULTS);
 		}
 	}
+	
+	public void testSnapshotComparisonSkipAddTestResult() throws Exception {
+		TODO
+		try {
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE, "true");
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT, "true");
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT_BEHAVIOUR, "addTestResult");
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_RECORD_RESULTS, "true");
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL, "http://localhost:4321");
+			
+			SeleniumRobotSnapshotServerConnector server = configureMockedSnapshotServerConnection();
+			createServerMock("GET", SeleniumRobotSnapshotServerConnector.TESTCASEINSESSION_API_URL + "15", 200, "{'testSteps': [], 'computed': true, 'isOkWithSnapshots': false}");		
+			
+			SeleniumTestsContextManager.removeThreadContext();
+			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions"});
+			
+			// test both files are available
+			String detailedReportContent1 = readTestMethodPerfFile("snapshots-testAndSubActions");
+			Assert.assertTrue(detailedReportContent1.contains("<testcase classname=\"com.seleniumtests.it.stubclasses.StubTestClass\" name=\"Step 8: Snapshot comparison\" time=\"0.0\">"));
+			
+			// this file is not re-generated with "snapshot comparison" step, but this not a problem. Important fact is that both files are present
+			String detailedReportContent2 = readTestMethodPerfFile("testAndSubActions");
+			Assert.assertTrue(detailedReportContent2.contains("<testcase classname=\"com.seleniumtests.it.stubclasses.StubTestClass\" name=\"Step 6: Test end\""));
+			
+		} finally {
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE);
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL);
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT);
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT_BEHAVIOUR);
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_RECORD_RESULTS);
+		}
+	}
 }

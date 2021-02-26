@@ -318,6 +318,11 @@ public class ReporterTest extends ConnectorsTest {
 		return detailedReportContent.replace("\n", "").replace("\r",  "").replaceAll(">\\s+<", "><");
 	}
 	
+	public static String readJUnitFile(String suiteName) throws IOException {
+		String detailedReportContent = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "junitreports", String.format("TEST-%s.xml", suiteName)).toFile());
+		return detailedReportContent.replace("\n", "").replace("\r",  "").replaceAll(">\\s+<", "><");
+	}
+	
 	public static String readSummaryFile() throws IOException {
 		String detailedReportContent = FileUtils.readFileToString(Paths.get(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory(), "SeleniumTestReport.html").toFile());
 		return detailedReportContent.replace("\n", "").replace("\r",  "").replaceAll(">\\s+<", "><");

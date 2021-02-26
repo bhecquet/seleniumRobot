@@ -109,7 +109,7 @@ public class ReporterControler implements IReporter {
 			
 			// change / add test result according to snapshot comparison results
 			if (suiteFinished) {
-				changeTestResultWithSnapshotComparison(suites);
+				changeTestResultsWithSnapshotComparison(suites);
 			}
 			
 			// test steps to Report Portal
@@ -154,7 +154,7 @@ public class ReporterControler implements IReporter {
 	 * /!\ This method is aimed to be called only once all test suites have been completed 
 	 * @param suites	test suites
 	 */
-	private void changeTestResultWithSnapshotComparison(List<ISuite> suites) {
+	private void changeTestResultsWithSnapshotComparison(List<ISuite> suites) {
 		
 		if (!(SeleniumTestsContextManager.getGlobalContext().getSeleniumRobotServerActive()
 				&& SeleniumTestsContextManager.getGlobalContext().getSeleniumRobotServerCompareSnapshot())) {
@@ -179,38 +179,71 @@ public class ReporterControler implements IReporter {
 					if (testCaseInSessionId == null) {
 						continue;
 					}
-					boolean snapshotComparisonResult = snapshotServer.getTestCaseInSessionComparisonResult(testCaseInSessionId);
+					
+					StringBuilder errorMessage = new StringBuilder();
+					int snapshotComparisonResult = snapshotServer.getTestCaseInSessionComparisonResult(testCaseInSessionId, errorMessage);
 					TestNGResultUtils.setSnapshotComparisonResult(testResult, snapshotComparisonResult);
 					
 					// create a step for snapshot comparison
-					TestStep testStep = new TestStep("Snapshot comparison", testResult, new ArrayList<>(), false);
-					testStep.setFailed(!snapshotComparisonResult);
-					testStep.addMessage(new TestMessage("Comparison " + (snapshotComparisonResult ? "successful": "failed"), snapshotComparisonResult ? MessageType.INFO: MessageType.ERROR));
-					getAllTestSteps(testResult).add(testStep);
+					createTestStepForComparisonResult(testResult, snapshotComparisonResult, errorMessage.toString());
 					
-					// based on snapshot comparison flag, change test result or add an other one
-					if (SeleniumTestsContextManager.getGlobalContext().getSeleniumRobotServerCompareSnapshotBehaviour() == SnapshotComparisonBehaviour.CHANGE_TEST_RESULT && !snapshotComparisonResult) {
-						testResult.setStatus(ITestResult.FAILURE);
-						testResult.setThrowable(new ScenarioException("Snapshot comparison failed"));
-					} else if (SeleniumTestsContextManager.getGlobalContext().getSeleniumRobotServerCompareSnapshotBehaviour() == SnapshotComparisonBehaviour.ADD_TEST_RESULT) {
-						
-						ITestResult newTestResult;
-						try {
-							newTestResult = TestNGResultUtils.copy(testResult, "snapshots-" +testResult.getName(), TestNGResultUtils.getTestDescription(testResult) + " FOR SNAPSHOT COMPARISON");
-						} catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e) {
-							throw new ScenarioException(e.getMessage(), e);
-						}
-						
-						if (snapshotComparisonResult) {
-							newTestResult.setStatus(ITestResult.SUCCESS);
-							suiteResult.getTestContext().getPassedTests().addResult(newTestResult, newTestResult.getMethod());
-						} else {
-							newTestResult.setStatus(ITestResult.FAILURE);
-							newTestResult.setThrowable(new ScenarioException("Snapshot comparison failed"));
-							suiteResult.getTestContext().getFailedTests().addResult(newTestResult, newTestResult.getMethod());
-						}
-					}
+					changeTestResultWithSnapshotComparison(suiteResult, testResult, snapshotComparisonResult);
 				}
+			}
+		}
+	}
+
+	/**
+	 * Create a step with the comparison result
+	 * @param testResult
+	 * @param snapshotComparisonResult
+	 * @return
+	 */
+	private void createTestStepForComparisonResult(ITestResult testResult, int snapshotComparisonResult, String errorMessage) {
+		// create a step for snapshot comparison
+		TestStep testStep = new TestStep("Snapshot comparison", testResult, new ArrayList<>(), false);
+		testStep.setFailed(snapshotComparisonResult != ITestResult.SUCCESS); // step fails if result is KO or SKIPPED (null)
+		
+		if (snapshotComparisonResult == ITestResult.FAILURE) {
+			testStep.addMessage(new TestMessage("Comparison failed: " + errorMessage, MessageType.ERROR));
+		} else if (snapshotComparisonResult == ITestResult.SUCCESS) {
+			testStep.addMessage(new TestMessage("Comparison successful", MessageType.INFO));
+		} else if (snapshotComparisonResult == ITestResult.SKIP) {
+			testStep.addMessage(new TestMessage("Comparison skipped: " + errorMessage, MessageType.ERROR));
+		}
+		
+		getAllTestSteps(testResult).add(testStep);
+	}
+
+	/**
+	 * @param suiteResult
+	 * @param testResult
+	 * @param snapshotComparisonResult
+	 */
+	private void changeTestResultWithSnapshotComparison(ISuiteResult suiteResult, ITestResult testResult, int snapshotComparisonResult) {
+		// based on snapshot comparison flag, change test result only if comparison is KO
+		if (SeleniumTestsContextManager.getGlobalContext().getSeleniumRobotServerCompareSnapshotBehaviour() == SnapshotComparisonBehaviour.CHANGE_TEST_RESULT && snapshotComparisonResult == ITestResult.FAILURE ) {
+			testResult.setStatus(ITestResult.FAILURE);
+			testResult.setThrowable(new ScenarioException("Snapshot comparison failed"));
+			
+		} else if (SeleniumTestsContextManager.getGlobalContext().getSeleniumRobotServerCompareSnapshotBehaviour() == SnapshotComparisonBehaviour.ADD_TEST_RESULT) {
+			
+			ITestResult newTestResult;
+			try {
+				newTestResult = TestNGResultUtils.copy(testResult, "snapshots-" +testResult.getName(), TestNGResultUtils.getTestDescription(testResult) + " FOR SNAPSHOT COMPARISON");
+			} catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e) {
+				throw new ScenarioException(e.getMessage(), e);
+			}
+			
+			// add the test result
+			newTestResult.setStatus(snapshotComparisonResult);
+			if (snapshotComparisonResult == ITestResult.SUCCESS) {
+				suiteResult.getTestContext().getPassedTests().addResult(newTestResult, newTestResult.getMethod());
+			} else if (snapshotComparisonResult == ITestResult.FAILURE) {
+				newTestResult.setThrowable(new ScenarioException("Snapshot comparison failed"));
+				suiteResult.getTestContext().getFailedTests().addResult(newTestResult, newTestResult.getMethod());
+			} else if (snapshotComparisonResult == ITestResult.SKIP) {
+				suiteResult.getTestContext().getSkippedTests().addResult(newTestResult, newTestResult.getMethod());
 			}
 		}
 	}
