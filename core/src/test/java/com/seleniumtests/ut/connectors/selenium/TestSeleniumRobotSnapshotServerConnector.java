@@ -34,6 +34,7 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.Assert;
 import org.testng.ITestContext;
+import org.testng.ITestResult;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -753,8 +754,10 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 		Integer sessionId = connector.createSession("Session1");
 		Integer testCaseId = connector.createTestCase("Test 1");
 		Integer testCaseInSessionId = connector.createTestCaseInSession(sessionId, testCaseId, "Test 1");
-		boolean comparisonResult = connector.getTestCaseInSessionComparisonResult(testCaseInSessionId);
-		Assert.assertTrue(comparisonResult);
+		StringBuilder errorMessage = new StringBuilder();
+		int comparisonResult = connector.getTestCaseInSessionComparisonResult(testCaseInSessionId, errorMessage);
+		Assert.assertEquals(comparisonResult, ITestResult.SUCCESS);
+		Assert.assertTrue(errorMessage.toString().isEmpty()); // no computing error message
 	}
 	
 	@Test(groups= {"ut"})
@@ -765,25 +768,29 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 		Integer sessionId = connector.createSession("Session1");
 		Integer testCaseId = connector.createTestCase("Test 1");
 		Integer testCaseInSessionId = connector.createTestCaseInSession(sessionId, testCaseId, "Test 1");
-		boolean comparisonResult = connector.getTestCaseInSessionComparisonResult(testCaseInSessionId);
-		Assert.assertFalse(comparisonResult);
+		StringBuilder errorMessage = new StringBuilder();
+		int comparisonResult = connector.getTestCaseInSessionComparisonResult(testCaseInSessionId, errorMessage);
+		Assert.assertEquals(comparisonResult, ITestResult.FAILURE);
+		Assert.assertTrue(errorMessage.toString().isEmpty()); // no computing error message
 	}
+	
 
 	/**
-	 * In case computing errors occur, comparison may return null, handle it as "skipped"
+	 * In case computing errors occur, comparison may return isOkWithSnapshots: null, handle it as "skipped"
 	 */
 	@Test(groups= {"ut"})
 	public void testGetComparisonResultSkipped() throws UnirestException {
-		Assert.fail("not implemented");
-	}
-	
-	/**
-	 * In case computing errors occur, comparison may return null, handle it as "skipped"
-	 * Check case where "errorComputing" key is not available (before migration)
-	 */
-	@Test(groups= {"ut"})
-	public void testGetComparisonResultSkippedNoErrorComputingInformation() throws UnirestException {
-		Assert.fail("not implemented");
+		SeleniumRobotSnapshotServerConnector connector = spy(configureMockedSnapshotServerConnection());
+		createServerMock("GET", SeleniumRobotSnapshotServerConnector.TESTCASEINSESSION_API_URL + "15", 200, "{'testSteps': [], 'completed': true, 'isOkWithSnapshots': null, 'computingError': ['img1: computing error', 'img2: computing error']}");		
+		
+		Integer sessionId = connector.createSession("Session1");
+		Integer testCaseId = connector.createTestCase("Test 1");
+		Integer testCaseInSessionId = connector.createTestCaseInSession(sessionId, testCaseId, "Test 1");
+		StringBuilder errorMessage = new StringBuilder();
+		int comparisonResult = connector.getTestCaseInSessionComparisonResult(testCaseInSessionId, errorMessage);
+		Assert.assertEquals(comparisonResult, ITestResult.SKIP);
+		Assert.assertEquals(errorMessage.toString(), "\"img1: computing error\"\n" + 
+				"\"img2: computing error\"");
 	}
 	
 	/**
@@ -798,8 +805,10 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 		Integer sessionId = connector.createSession("Session1");
 		Integer testCaseId = connector.createTestCase("Test 1");
 		Integer testCaseInSessionId = connector.createTestCaseInSession(sessionId, testCaseId, "Test 1");
-		boolean comparisonResult = connector.getTestCaseInSessionComparisonResult(testCaseInSessionId);
-		Assert.assertTrue(comparisonResult);
+		StringBuilder errorMessage = new StringBuilder();
+		int comparisonResult = connector.getTestCaseInSessionComparisonResult(testCaseInSessionId, errorMessage);
+		Assert.assertEquals(comparisonResult, ITestResult.SUCCESS);
+		Assert.assertTrue(errorMessage.toString().isEmpty()); // no computing error message
 	}
 	
 	/**
@@ -814,14 +823,25 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 		Integer sessionId = connector.createSession("Session1");
 		Integer testCaseId = connector.createTestCase("Test 1");
 		Integer testCaseInSessionId = connector.createTestCaseInSession(sessionId, testCaseId, "Test 1");
-		boolean comparisonResult = connector.getTestCaseInSessionComparisonResult(testCaseInSessionId);
-		Assert.assertTrue(comparisonResult);
+		StringBuilder errorMessage = new StringBuilder();
+		int comparisonResult = connector.getTestCaseInSessionComparisonResult(testCaseInSessionId, errorMessage);
+		Assert.assertEquals(comparisonResult, ITestResult.SKIP);
+		Assert.assertTrue(errorMessage.toString().isEmpty()); // no computing error message
 	}
 	
 	
 	@Test(groups= {"ut"})
 	public void testGetComparisonResultTakesTooMuchTime() throws UnirestException {
-		Assert.fail("not implemented");
+		SeleniumRobotSnapshotServerConnector connector = spy(configureMockedSnapshotServerConnection());
+		createServerMock("GET", SeleniumRobotSnapshotServerConnector.TESTCASEINSESSION_API_URL + "15", 200, "{'testSteps': [], 'completed': false}");		
+		
+		Integer sessionId = connector.createSession("Session1");
+		Integer testCaseId = connector.createTestCase("Test 1");
+		Integer testCaseInSessionId = connector.createTestCaseInSession(sessionId, testCaseId, "Test 1");
+		StringBuilder errorMessage = new StringBuilder();
+		int comparisonResult = connector.getTestCaseInSessionComparisonResult(testCaseInSessionId, errorMessage);
+		Assert.assertEquals(comparisonResult, ITestResult.SKIP);
+		Assert.assertTrue(errorMessage.toString().isEmpty()); // no computing error message
 	}
 	
 	/**
@@ -837,8 +857,9 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 		Integer sessionId = connector.createSession("Session1");
 		Integer testCaseId = connector.createTestCase("Test 1");
 		Integer testCaseInSessionId = connector.createTestCaseInSession(sessionId, testCaseId, "Test 1");
-		boolean comparisonResult = connector.getTestCaseInSessionComparisonResult(testCaseInSessionId);
-		Assert.assertTrue(comparisonResult);
+		StringBuilder errorMessage = new StringBuilder();
+		int comparisonResult = connector.getTestCaseInSessionComparisonResult(testCaseInSessionId, errorMessage);
+		Assert.assertEquals(comparisonResult, ITestResult.SKIP); // result is 'skip' if we cannot get comparison result
 	}
 	
 	
