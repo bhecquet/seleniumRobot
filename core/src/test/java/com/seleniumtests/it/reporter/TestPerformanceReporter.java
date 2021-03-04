@@ -320,8 +320,9 @@ public class TestPerformanceReporter extends ReporterTest {
 		}
 	}
 	
+	@Test(groups={"it"})
 	public void testSnapshotComparisonSkipAddTestResult() throws Exception {
-		TODO
+		
 		try {
 			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE, "true");
 			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT, "true");
@@ -330,7 +331,7 @@ public class TestPerformanceReporter extends ReporterTest {
 			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL, "http://localhost:4321");
 			
 			SeleniumRobotSnapshotServerConnector server = configureMockedSnapshotServerConnection();
-			createServerMock("GET", SeleniumRobotSnapshotServerConnector.TESTCASEINSESSION_API_URL + "15", 200, "{'testSteps': [], 'computed': true, 'isOkWithSnapshots': false}");		
+			createServerMock("GET", SeleniumRobotSnapshotServerConnector.TESTCASEINSESSION_API_URL + "15", 200, "{'testSteps': [], 'computed': true, 'isOkWithSnapshots': null, 'computingError': 'error'}");		
 			
 			SeleniumTestsContextManager.removeThreadContext();
 			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions"});
@@ -338,6 +339,8 @@ public class TestPerformanceReporter extends ReporterTest {
 			// test both files are available
 			String detailedReportContent1 = readTestMethodPerfFile("snapshots-testAndSubActions");
 			Assert.assertTrue(detailedReportContent1.contains("<testcase classname=\"com.seleniumtests.it.stubclasses.StubTestClass\" name=\"Step 8: Snapshot comparison\" time=\"0.0\">"));
+			Assert.assertTrue(detailedReportContent1.contains("<system-out><![CDATA[Test skipped]]></system-out>"));
+			Assert.assertTrue(detailedReportContent1.contains("failures=\"-1\"")); // -1 means 'skipped' with our reporter
 			
 			// this file is not re-generated with "snapshot comparison" step, but this not a problem. Important fact is that both files are present
 			String detailedReportContent2 = readTestMethodPerfFile("testAndSubActions");

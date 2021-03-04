@@ -69,6 +69,10 @@ body{
 	background-color: rgba(255,102,102,0.3);
 }
 
+.tab-skipped {
+	background-color: rgba(102,204,255,0.3);
+}
+
 .success{
 	border-top: 3px solid #97D086;
 }

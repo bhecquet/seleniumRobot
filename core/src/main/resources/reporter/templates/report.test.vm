@@ -103,7 +103,7 @@
 					<a class="nav-link active" id="result-tab" data-toggle="tab" href="#results" role="tab" aria-controls="home" aria-selected="true">Results</a>
 			  	</li>
 			  	<li class="nav-item">
-					<a class="nav-link #if ($snapshotComparisonResult) tab-success #else tab-failed #end" id="snapshot-tab" data-toggle="tab" href="#snapshots" role="tab" aria-controls="profile" aria-selected="false">Snapshots</a>
+					<a class="nav-link #if ($snapshotComparisonResult && $snapshotComparisonResult == 1) tab-success #elseif(($snapshotComparisonResult && $snapshotComparisonResult == 3)) tab-skipped #else tab-failed #end" id="snapshot-tab" data-toggle="tab" href="#snapshots" role="tab" aria-controls="profile" aria-selected="false">Snapshots</a>
 				</li>
 			</ul>
 		</div>
