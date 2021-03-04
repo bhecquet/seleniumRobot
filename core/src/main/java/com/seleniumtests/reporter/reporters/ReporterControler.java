@@ -245,6 +245,7 @@ public class ReporterControler implements IReporter {
 			} else if (snapshotComparisonResult == ITestResult.SKIP) {
 				suiteResult.getTestContext().getSkippedTests().addResult(newTestResult, newTestResult.getMethod());
 			}
+			TestNGResultUtils.setSnapshotComparisonResult(newTestResult, snapshotComparisonResult);
 		}
 	}
 	

@@ -313,7 +313,7 @@ public abstract class SeleniumRobotServerConnector {
 		if (response.getStatus() == 204) {
 			return new JSONObject();
 		}
-		
+		new org.json.JSONObject(response.getBody());
 		return new JSONObject(response.getBody());
 	}
 	

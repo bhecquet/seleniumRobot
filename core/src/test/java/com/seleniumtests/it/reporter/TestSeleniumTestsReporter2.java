@@ -202,7 +202,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			Assert.assertTrue(detailedReportContent.contains("<div id=\"tabs\" style=\"display: block;\" >"));
 			
 			// failed step has been added for comparison
-			Assert.assertTrue(detailedReportContent.contains("<div class=\"message-error\">Comparison failed</div>"));
+			Assert.assertTrue(detailedReportContent.contains("<div class=\"message-error\">Comparison failed: </div>"));
 			Assert.assertTrue(detailedReportContent.matches(".*<div class=\"box collapsed-box failed\">.*?<i class=\"fa fa-plus\"></i></button> Snapshot comparison.*"));
 			
 			// snapshot tab not active
@@ -251,7 +251,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			Assert.assertTrue(detailedReportContent.contains("<div id=\"tabs\" style=\"display: block;\" >"));
 			
 			// failed step has been added for comparison
-			Assert.assertTrue(detailedReportContent.contains("<div class=\"message-error\">Comparison failed</div>"));
+			Assert.assertTrue(detailedReportContent.contains("<div class=\"message-error\">Comparison failed: </div>"));
 			Assert.assertTrue(detailedReportContent.matches(".*<div class=\"box collapsed-box failed\">.*?<i class=\"fa fa-plus\"></i></button> Snapshot comparison.*"));
 			
 			// snapshot tab not active
@@ -301,7 +301,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			Assert.assertTrue(detailedReportContent.contains("<div id=\"tabs\" style=\"display: block;\" >"));
 			
 			// failed step has been added for comparison
-			Assert.assertTrue(detailedReportContent.contains("<div class=\"message-error\">Comparison failed</div>"));
+			Assert.assertTrue(detailedReportContent.contains("<div class=\"message-error\">Comparison failed: </div>"));
 			Assert.assertTrue(detailedReportContent.matches(".*<div class=\"box collapsed-box failed\">.*?<i class=\"fa fa-plus\"></i></button> Snapshot comparison.*"));
 			
 			// snapshot tab not active
@@ -322,7 +322,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	}
 	@Test(groups={"it"})
 	public void testSnapshotComparisonSkipDisplayOnly() throws Exception {
-		TODO
+
 		try {
 			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE, "true");
 			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT, "true");
@@ -331,27 +331,28 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL, "http://localhost:4321");
 			
 			SeleniumRobotSnapshotServerConnector server = configureMockedSnapshotServerConnection();
-			createServerMock("GET", SeleniumRobotSnapshotServerConnector.TESTCASEINSESSION_API_URL + "15", 200, "{'testSteps': [], 'computed': true, 'isOkWithSnapshots': false}");		
+			createServerMock("GET", SeleniumRobotSnapshotServerConnector.TESTCASEINSESSION_API_URL + "15", 200, "{'testSteps': [], 'computed': true, 'isOkWithSnapshots': null, 'computingError': ['error computing']}");		
 			
 			SeleniumTestsContextManager.removeThreadContext();
 			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions"});
 			
 			// check result is ok and comparison result is shown through red bullet (comparison KO)
 			String summaryReport = readSummaryFile();
-			Assert.assertTrue(summaryReport.contains("<i class=\"fa fa-circle circleFailed\" data-toggle=\"tooltip\" title=\"snapshot comparison failed\">"));
+			Assert.assertTrue(summaryReport.contains("<i class=\"fa fa-circle circleSkipped\" data-toggle=\"tooltip\" title=\"snapshot comparison skipped\">"));
 			Assert.assertTrue(summaryReport.contains("info=\"ok\" data-toggle=\"tooltip\""));
 			
 			String detailedReportContent = readTestMethodResultFile("testAndSubActions");
 			
 			// tabs are shown
 			Assert.assertTrue(detailedReportContent.contains("<div id=\"tabs\" style=\"display: block;\" >"));
+			Assert.assertTrue(detailedReportContent.contains("<a class=\"nav-link  tab-skipped \" id=\"snapshot-tab\"")); // tab is in blue as comparison skipped
 			
 			// failed step has been added for comparison
-			Assert.assertTrue(detailedReportContent.contains("<div class=\"message-error\">Comparison failed</div>"));
+			Assert.assertTrue(detailedReportContent.contains("<div class=\"message-error\">Comparison skipped: &quot;error computing&quot;</div>"));
 			Assert.assertTrue(detailedReportContent.matches(".*<div class=\"box collapsed-box failed\">.*?<i class=\"fa fa-plus\"></i></button> Snapshot comparison.*"));
 			
 			// snapshot tab not active
-			Assert.assertTrue(detailedReportContent.contains("<a class=\"nav-link  tab-failed \" id=\"snapshot-tab\" data-toggle=\"tab\" href=\"#snapshots\" role=\"tab\" aria-controls=\"profile\" aria-selected=\"false\">Snapshots</a>"));
+			Assert.assertTrue(detailedReportContent.contains("<a class=\"nav-link  tab-skipped \" id=\"snapshot-tab\" data-toggle=\"tab\" href=\"#snapshots\" role=\"tab\" aria-controls=\"profile\" aria-selected=\"false\">Snapshots</a>"));
 			
 			// iframe present with the right test case id
 			Assert.assertTrue(detailedReportContent.contains("<iframe src=\"http://localhost:4321/snapshot/compare/stepList/15/?header=true\" id=\"snapshot-iframe\" frameborder=\"0\"></iframe>"));
@@ -372,7 +373,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	 */
 	@Test(groups={"it"})
 	public void testSnapshotComparisonSkipChangeTestResult() throws Exception {
-		TODO
+	
 		try {
 			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE, "true");
 			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT, "true");
@@ -381,27 +382,28 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL, "http://localhost:4321");
 			
 			SeleniumRobotSnapshotServerConnector server = configureMockedSnapshotServerConnection();
-			createServerMock("GET", SeleniumRobotSnapshotServerConnector.TESTCASEINSESSION_API_URL + "15", 200, "{'testSteps': [], 'computed': true, 'isOkWithSnapshots': false}");		
+			createServerMock("GET", SeleniumRobotSnapshotServerConnector.TESTCASEINSESSION_API_URL + "15", 200, "{'testSteps': [], 'computed': true, 'isOkWithSnapshots': null, 'computingError': ['error computing']}");		
 			
 			SeleniumTestsContextManager.removeThreadContext();
 			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions"});
 			
-			// check result is KO (due to option 'changeTestResult') and comparison result is shown through red bullet (comparison KO)
+			// check result is OK (even with option 'changeTestResult' because comparison is skipped) and comparison result is shown through blue bullet (comparison Skipped)
 			String summaryReport = readSummaryFile();
-			Assert.assertTrue(summaryReport.contains("<i class=\"fa fa-circle circleFailed\" data-toggle=\"tooltip\" title=\"snapshot comparison failed\">"));
-			Assert.assertTrue(summaryReport.contains("info=\"ko\" data-toggle=\"tooltip\""));
+			Assert.assertTrue(summaryReport.contains("<i class=\"fa fa-circle circleSkipped\" data-toggle=\"tooltip\" title=\"snapshot comparison skipped\">"));
+			Assert.assertTrue(summaryReport.contains("info=\"ok\" data-toggle=\"tooltip\""));
 			
 			String detailedReportContent = readTestMethodResultFile("testAndSubActions");
 			
 			// tabs are shown
 			Assert.assertTrue(detailedReportContent.contains("<div id=\"tabs\" style=\"display: block;\" >"));
+			Assert.assertTrue(detailedReportContent.contains("<a class=\"nav-link  tab-skipped \" id=\"snapshot-tab\"")); // tab is in blue as comparison skipped
 			
 			// failed step has been added for comparison
-			Assert.assertTrue(detailedReportContent.contains("<div class=\"message-error\">Comparison failed</div>"));
+			Assert.assertTrue(detailedReportContent.contains("<div class=\"message-error\">Comparison skipped: &quot;error computing&quot;</div>"));
 			Assert.assertTrue(detailedReportContent.matches(".*<div class=\"box collapsed-box failed\">.*?<i class=\"fa fa-plus\"></i></button> Snapshot comparison.*"));
 			
 			// snapshot tab not active
-			Assert.assertTrue(detailedReportContent.contains("<a class=\"nav-link  tab-failed \" id=\"snapshot-tab\" data-toggle=\"tab\" href=\"#snapshots\" role=\"tab\" aria-controls=\"profile\" aria-selected=\"false\">Snapshots</a>"));
+			Assert.assertTrue(detailedReportContent.contains("<a class=\"nav-link  tab-skipped \" id=\"snapshot-tab\" data-toggle=\"tab\" href=\"#snapshots\" role=\"tab\" aria-controls=\"profile\" aria-selected=\"false\">Snapshots</a>"));
 			
 			// iframe present with the right test case id
 			Assert.assertTrue(detailedReportContent.contains("<iframe src=\"http://localhost:4321/snapshot/compare/stepList/15/?header=true\" id=\"snapshot-iframe\" frameborder=\"0\"></iframe>"));
@@ -423,7 +425,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	 */
 	@Test(groups={"it"})
 	public void testSnapshotComparisonSkipAddTestResult() throws Exception {
-		TODO
+		
 		try {
 			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE, "true");
 			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT, "true");
@@ -432,15 +434,15 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL, "http://localhost:4321");
 			
 			SeleniumRobotSnapshotServerConnector server = configureMockedSnapshotServerConnection();
-			createServerMock("GET", SeleniumRobotSnapshotServerConnector.TESTCASEINSESSION_API_URL + "15", 200, "{'testSteps': [], 'computed': true, 'isOkWithSnapshots': false}");		
+			createServerMock("GET", SeleniumRobotSnapshotServerConnector.TESTCASEINSESSION_API_URL + "15", 200, "{'testSteps': [], 'computed': true, 'isOkWithSnapshots': null, 'computingError': ['error computing']}");		
 			
 			SeleniumTestsContextManager.removeThreadContext();
 			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions"});
 			
 			// check there are 2 results. first one is the selenium test (OK) and second one is the snapshot comparison (KO)
 			String summaryReport = readSummaryFile();
-			Assert.assertTrue(summaryReport.contains("<i class=\"fa fa-circle circleFailed\" data-toggle=\"tooltip\" title=\"snapshot comparison failed\"></i><a href='testAndSubActions/TestReport.html' info=\"ok\" "));
-			Assert.assertTrue(summaryReport.contains("<i class=\"fa fa-circle circleFailed\" data-toggle=\"tooltip\" title=\"snapshot comparison failed\"></i><a href='snapshots-testAndSubActions/TestReport.html' info=\"ko\""));
+			Assert.assertTrue(summaryReport.contains("<i class=\"fa fa-circle circleSkipped\" data-toggle=\"tooltip\" title=\"snapshot comparison skipped\"></i><a href='testAndSubActions/TestReport.html' info=\"ok\" "));
+			Assert.assertTrue(summaryReport.contains("<i class=\"fa fa-circle circleSkipped\" data-toggle=\"tooltip\" title=\"snapshot comparison skipped\"></i><a href='snapshots-testAndSubActions/TestReport.html' info=\"skipped\""));
 			
 			String detailedReportContent = readTestMethodResultFile("snapshots-testAndSubActions");
 			
@@ -448,14 +450,12 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			Assert.assertTrue(detailedReportContent.contains("<div id=\"tabs\" style=\"display: block;\" >"));
 			
 			// failed step has been added for comparison
-			Assert.assertTrue(detailedReportContent.contains("<div class=\"message-error\">Comparison failed</div>"));
+			Assert.assertTrue(detailedReportContent.contains("<div class=\"message-error\">Comparison skipped: &quot;error computing&quot;</div>"));
 			Assert.assertTrue(detailedReportContent.matches(".*<div class=\"box collapsed-box failed\">.*?<i class=\"fa fa-plus\"></i></button> Snapshot comparison.*"));
 			
 			// snapshot tab not active
-			Assert.assertTrue(detailedReportContent.contains("<a class=\"nav-link  tab-failed \" id=\"snapshot-tab\" data-toggle=\"tab\" href=\"#snapshots\" role=\"tab\" aria-controls=\"profile\" aria-selected=\"false\">Snapshots</a>"));
+			Assert.assertTrue(detailedReportContent.contains("<a class=\"nav-link  tab-skipped \" id=\"snapshot-tab\" data-toggle=\"tab\" href=\"#snapshots\" role=\"tab\" aria-controls=\"profile\" aria-selected=\"false\">Snapshots</a>"));
 			
-			// check execution logs contains the exception (but not logs)
-			Assert.assertTrue(detailedReportContent.contains("<div class=\"message-error\"><div>class com.seleniumtests.customexception.ScenarioException: Snapshot comparison failed</div>"));
 			
 			// iframe present with the right test case id
 			Assert.assertTrue(detailedReportContent.contains("<iframe src=\"http://localhost:4321/snapshot/compare/stepList/15/?header=true\" id=\"snapshot-iframe\" frameborder=\"0\"></iframe>"));
