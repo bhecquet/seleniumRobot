@@ -402,7 +402,7 @@ public class LogAction {
 				
 				// replaces argument placeholders with values
 				for (Entry<String, String> entry: arguments.entrySet()) {
-					stepName = stepName.replaceAll(String.format("\\$\\{%s\\}",  entry.getKey()), entry.getValue());
+					stepName = stepName.replaceAll(String.format("\\$\\{%s\\}",  entry.getKey()), entry.getValue().replace("$", "\\$"));
 				}
 				break;
 			}
