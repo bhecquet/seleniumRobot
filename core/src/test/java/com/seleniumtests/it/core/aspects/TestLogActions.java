@@ -134,6 +134,26 @@ public class TestLogActions extends GenericTest {
 		Assert.assertEquals(steps.size(), 2);
 		Assert.assertEquals(steps.get(1).getName(), "Connect to calc with login/******");
 	}
+	@Test(groups={"it"})
+	public void testSimpleNonCucumberStepLoggingWithStepDescriptionPassword2() throws IOException {
+		SeleniumTestsContextManager.getThreadContext().setMaskPassword(true);
+		new CalcPage()
+		.connectWithName("login", "$§AbCdE$DeF£GhIjKl*:?");
+		
+		List<TestStep> steps = SeleniumTestsContextManager.getThreadContext().getTestStepManager().getTestSteps();
+		Assert.assertEquals(steps.size(), 2);
+		Assert.assertEquals(steps.get(1).getName(), "Connect to calc with login/******");
+	}
+	@Test(groups={"it"})
+	public void testSimpleNonCucumberStepLoggingWithStepDescriptionPassword3() throws IOException {
+		SeleniumTestsContextManager.getThreadContext().setMaskPassword(true);
+		new CalcPage()
+		.connect("login", "$§AbCdE$DeF£GhIjKl*:?");
+		
+		List<TestStep> steps = SeleniumTestsContextManager.getThreadContext().getTestStepManager().getTestSteps();
+		Assert.assertEquals(steps.size(), 2);
+		Assert.assertEquals(steps.get(1).getName(), "connect with args: (login, ******, )");
+	}
 	
 	/**
 	 * Check that if step definition contains argument name and one of argument is password, it's masked
