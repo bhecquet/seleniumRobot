@@ -18,6 +18,7 @@
 package com.seleniumtests.reporter.logger;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.json.JSONObject;
 
@@ -56,7 +57,7 @@ public class TestMessage extends TestAction {
 	@Override
 	public TestMessage encode(String format) {
 		TestMessage msg = new TestMessage(encodeString(name, format), messageType);
-		msg.pwdToReplace = new ArrayList<>(pwdToReplace);
+		msg.pwdToReplace = encodePasswords(pwdToReplace, format);
 		
 		if (format == null) {
 			msg.encoded = encoded;
