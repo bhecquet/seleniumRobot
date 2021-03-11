@@ -378,7 +378,9 @@ public class TestStep extends TestAction {
 	 */
 	@Override
 	public TestStep encode(String format) {
-		TestStep step = new TestStep(encodeString(name, format), testResult, new ArrayList<>(pwdToReplace), maskPassword);
+
+		List<String> encodedPasswords = encodePasswords(pwdToReplace, format);
+		TestStep step = new TestStep(encodeString(name, format), testResult, encodedPasswords, maskPassword);
 		
 		step.stepActions = new ArrayList<>();
 		for (TestAction testAction: stepActions) {

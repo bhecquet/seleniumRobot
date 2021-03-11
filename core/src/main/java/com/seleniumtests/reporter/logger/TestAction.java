@@ -136,9 +136,16 @@ public class TestAction {
 		
 		return StringUtility.encodeString(message, format);
 	}
+	
+	protected List<String> encodePasswords(List<String> passwords, String format) {
+		return passwords
+				.stream()
+				.map(p -> encodeString(p, format)).collect(Collectors.toList());
+	}
 
 	public TestAction encode(String format) {
-		TestAction encodedAction = new TestAction(encodeString(name, format), failed, new ArrayList<>(pwdToReplace));
+		List<String> encodedPasswords = encodePasswords(pwdToReplace, format);
+		TestAction encodedAction = new TestAction(encodeString(name, format), failed, encodedPasswords);
 		encodedAction.actionException = actionException;
 		encodedAction.maskPassword = maskPassword;
 		

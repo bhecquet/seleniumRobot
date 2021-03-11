@@ -656,7 +656,74 @@ public class TestTestStep extends GenericTest {
 				"  - everything OK on ******\n" + 
 				"  - Step substep with args: (******)");
 	}
+	
+	@Test(groups = { "ut" })
+	public void testPasswordMaskingHtmlEncodedMainStep() {
+		TestStep step = new TestStep("step1 with args: (bar, passwd)", null, Arrays.asList("passwd"), true);
+		TestAction action = new TestAction("action in step1 with args: (foo, passwd)", false, new ArrayList<>());
+		TestMessage message = new TestMessage("everything OK on passwd", MessageType.INFO);
+		TestStep substep = new TestStep("substep with args: (passwd)", null, new ArrayList<>(), true);
+		step.addAction(action);
+		step.addMessage(message);
+		step.addStep(substep);
+		
+		Assert.assertEquals(step.encode("html").getName(), "step1 with args: (bar, ******)");
+		Assert.assertEquals(action.encode("html").getName(), "action in step1 with args: (foo, ******)");
+		Assert.assertEquals(message.encode("html").getName(), "everything OK on ******");
+		Assert.assertEquals(substep.encode("html").getName(), "substep with args: (******)");
+		Assert.assertEquals(step.encode("html").toString(),
+				"Step step1 with args: (bar, ******)\n" + 
+						"  - action in step1 with args: (foo, ******)\n" + 
+						"  - everything OK on ******\n" + 
+				"  - Step substep with args: (******)");
+	}
+	
+	/**
+	 * issue #431: check encoded steps have there password encoded when using special characters
+	 */
+	@Test(groups = { "ut" })
+	public void testPasswordMaskingHtmlEncodedMainStepWithSpecialCharacters() {
+		TestStep step = new TestStep("step1 with args: (bar, passwd§~$µ)", null, Arrays.asList("passwd§~$µ"), true);
+		TestAction action = new TestAction("action in step1 with args: (foo, passwd§~$µ)", false, new ArrayList<>());
+		TestMessage message = new TestMessage("everything OK on passwd§~$µ", MessageType.INFO);
+		TestStep substep = new TestStep("substep with args: (passwd§~$µ)", null, new ArrayList<>(), true);
+		step.addAction(action);
+		step.addMessage(message);
+		step.addStep(substep);
+		
+		Assert.assertEquals(step.encode("html").getName(), "step1 with args: (bar, ******)");
+		Assert.assertEquals(action.encode("html").getName(), "action in step1 with args: (foo, ******)");
+		Assert.assertEquals(message.encode("html").getName(), "everything OK on ******");
+		Assert.assertEquals(substep.encode("html").getName(), "substep with args: (******)");
+		Assert.assertEquals(step.encode("html").toString(),
+				"Step step1 with args: (bar, ******)\n" + 
+						"  - action in step1 with args: (foo, ******)\n" + 
+						"  - everything OK on ******\n" + 
+				"  - Step substep with args: (******)");
+	}
 
+	
+	@Test(groups = { "ut" })
+	public void testPasswordMaskingXmlEncodedMainStepWithSpecialCharacters() {
+		TestStep step = new TestStep("step1 with args: (bar, passwd§~$µ)", null, Arrays.asList("passwd§~$µ"), true);
+		TestAction action = new TestAction("action in step1 with args: (foo, passwd§~$µ)", false, new ArrayList<>());
+		TestMessage message = new TestMessage("everything OK on passwd§~$µ", MessageType.INFO);
+		TestStep substep = new TestStep("substep with args: (passwd§~$µ)", null, new ArrayList<>(), true);
+		step.addAction(action);
+		step.addMessage(message);
+		step.addStep(substep);
+		
+		Assert.assertEquals(step.encode("xml").getName(), "step1 with args: (bar, ******)");
+		Assert.assertEquals(action.encode("xml").getName(), "action in step1 with args: (foo, ******)");
+		Assert.assertEquals(message.encode("xml").getName(), "everything OK on ******");
+		Assert.assertEquals(substep.encode("xml").getName(), "substep with args: (******)");
+		Assert.assertEquals(step.encode("xml").toString(),
+				"Step step1 with args: (bar, ******)\n" + 
+						"  - action in step1 with args: (foo, ******)\n" + 
+						"  - everything OK on ******\n" + 
+				"  - Step substep with args: (******)");
+	}
+	
 	/**
 	 * Check that if a substep adds password values, parent step is not impacted
 	 */
