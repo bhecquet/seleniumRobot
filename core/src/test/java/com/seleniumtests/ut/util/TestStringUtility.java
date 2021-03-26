@@ -21,7 +21,6 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import com.seleniumtests.GenericTest;
-import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.TestVariable;
 import com.seleniumtests.util.StringUtility;
@@ -113,6 +112,30 @@ public class TestStringUtility extends GenericTest {
 		Assert.assertEquals(StringUtility.interpolateString("connect to ${url}", SeleniumTestsContextManager.getThreadContext()), "connect to http://mysite");
 	}
 	
+
+	/**
+	 * Test the case where a variable contains a reference to an other one
+	 */
+	@Test(groups={"ut"})
+	public void testInterpolateStringVariableInVariable() {
+		SeleniumTestsContextManager.getThreadContext().getConfiguration().put("url", new TestVariable("url", "http://mysite${path}"));
+		SeleniumTestsContextManager.getThreadContext().getConfiguration().put("path", new TestVariable("path", "/foo/bar${param}"));
+		SeleniumTestsContextManager.getThreadContext().getConfiguration().put("param", new TestVariable("param", "?key=value"));
+
+		Assert.assertEquals(StringUtility.interpolateString("connect to ${url}", SeleniumTestsContextManager.getThreadContext()), "connect to http://mysite/foo/bar?key=value");
+	}
+	
+	/**
+	 * Check no looping occurs when a variable reference itself
+	 */
+	@Test(groups={"ut"})
+	public void testInterpolateStringWithLoops() {
+		SeleniumTestsContextManager.getThreadContext().getConfiguration().put("url", new TestVariable("url", "http://mysite${path}"));
+		SeleniumTestsContextManager.getThreadContext().getConfiguration().put("path", new TestVariable("path", "/foo/bar${url}"));
+		
+		Assert.assertEquals(StringUtility.interpolateString("connect to ${url}", SeleniumTestsContextManager.getThreadContext()), "connect to http://mysite/foo/bar?key=value");
+	}
+	
 	@Test(groups={"ut"})
 	public void testInterpolateNullString() {
 		Assert.assertNull(StringUtility.interpolateString(null, SeleniumTestsContextManager.getThreadContext()));
@@ -144,6 +167,14 @@ public class TestStringUtility extends GenericTest {
 		SeleniumTestsContextManager.getThreadContext().getConfiguration().put("password", new TestVariable("password", "abc"));
 		
 		Assert.assertEquals(StringUtility.interpolateString("connect with ${password}", SeleniumTestsContextManager.getThreadContext()), "connect with ****");
+	}
+	
+	
+	@Test(groups={"ut"})
+	public void testInterpolateStringDoNotMaskPassword1() {
+		SeleniumTestsContextManager.getThreadContext().getConfiguration().put("password", new TestVariable("password", "abc"));
+		
+		Assert.assertEquals(StringUtility.interpolateString("connect with ${password}", SeleniumTestsContextManager.getThreadContext(), false), "connect with abc");
 	}
 	
 	@Test(groups={"ut"})
