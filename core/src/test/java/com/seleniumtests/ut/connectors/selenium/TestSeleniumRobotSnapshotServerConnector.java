@@ -49,6 +49,7 @@ import com.seleniumtests.driver.screenshots.SnapshotTarget;
 import com.seleniumtests.reporter.logger.Snapshot;
 
 import kong.unirest.HttpRequest;
+import kong.unirest.HttpRequestWithBody;
 import kong.unirest.MultipartBody;
 import kong.unirest.Unirest;
 import kong.unirest.UnirestException;
@@ -431,6 +432,20 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 		Integer testCaseInSessionId = connector.createTestCaseInSession(sessionId, testCaseId, "Test 1");
 		Integer testStepId = connector.createTestStep("Step 1", testCaseInSessionId);
 		Assert.assertEquals((int)testStepId, 14);
+	}
+	
+	@Test(groups= {"ut"})
+	public void testCreateTestStepLongName() throws UnirestException {	
+		SeleniumRobotSnapshotServerConnector connector = spy(configureMockedSnapshotServerConnection());
+		HttpRequestWithBody request = (HttpRequestWithBody) createServerMock("POST", SeleniumRobotSnapshotServerConnector.TESTSTEP_API_URL, 200, "{'id': '9'}", "request");	
+		
+		Integer sessionId = connector.createSession("Session1");
+		Integer testCaseId = connector.createTestCase("Test 1");
+		Integer testCaseInSessionId = connector.createTestCaseInSession(sessionId, testCaseId, "Test 1");
+		Integer testStepId = connector.createTestStep("Step 1" + StringUtils.repeat("-", 95), testCaseInSessionId);
+		
+		verify(request).field("name", ("Step 1" + StringUtils.repeat("-", 94)));
+		Assert.assertEquals((int)testStepId, 9);
 	}
 	
 
