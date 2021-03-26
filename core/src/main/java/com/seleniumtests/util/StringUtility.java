@@ -38,6 +38,7 @@ import com.seleniumtests.util.logging.SeleniumRobotLogger;
 public class StringUtility {
 	
 	private static final Logger logger = SeleniumRobotLogger.getLogger(StringUtility.class);
+	public static Pattern PLACEHOLDER_PATTERN = Pattern.compile("\\$\\{(.*?)\\}");
 
 	private StringUtility() {
 		// As a utility class, it is not meant to be instantiated.
@@ -141,35 +142,63 @@ public class StringUtility {
 	 * Do interpolation like groovy language, using context variables
 	 * ex: provided the 'url' variable is present in test configuration with value 'http://my.site', 
 	 *     'connect to ${url}' => 'connect to http://my.site
+	 * If testContext is set to mask password, then, they will be replaced by '****'
 	 * 
-	 * @param initialString
+	 * @param initialString		the string to interpolate
+	 * @param context			context where we will find values
 	 * @return
 	 */
 	public static String interpolateString(String initialString, SeleniumTestsContext testContext) {
+
+    	if (testContext == null) {
+    		return initialString;
+    	}
+		return interpolateString(initialString, testContext, testContext.getMaskedPassword());
+	}
+	
+	/**
+	 * Do interpolation like groovy language, using context variables
+	 * ex: provided the 'url' variable is present in test configuration with value 'http://my.site', 
+	 *     'connect to ${url}' => 'connect to http://my.site
+	 * 
+	 * @param initialString		the string to interpolate
+	 * @param context			context where we will find values
+	 * @param maskPasswords		if true, password will be replaced by '****'
+	 * @return
+	 */
+	public static String interpolateString(String initialString, SeleniumTestsContext testContext, Boolean maskPassword) {
 		if (initialString == null) {
 			return null;
 		}
 		
 		String interpolatedString  = initialString;
-    	Pattern pattern = Pattern.compile("\\$\\{(.*?)\\}");
-    	Matcher matcher = pattern.matcher(initialString);
     	
     	if (testContext == null || testContext.getConfiguration() == null) {
     		return initialString;
     	}
     	Map<String, TestVariable> variables = testContext.getConfiguration();
     	
-    	while (matcher.find()) {
-    		String key = matcher.group(1);
-    		
-    		if (Boolean.TRUE.equals(SeleniumTestsContextManager.getThreadContext().getMaskedPassword()) && (key.toLowerCase().contains("password") || key.toLowerCase().contains("pwd") || key.toLowerCase().contains("passwd"))) {
-    			interpolatedString = interpolatedString.replace(String.format("${%s}",  key), "****");
-    		} else if (variables.containsKey(key)) {
-    			interpolatedString = interpolatedString.replace(String.format("${%s}",  key), variables.get(key).getValue());
-    		} else {
-    			logger.warn(String.format("Error while interpolating, key '%s' not found in configuration", key));
-    		}
-    		
+    	for (int i = 0; i < 10; i++) {
+	    	Matcher matcher = PLACEHOLDER_PATTERN.matcher(interpolatedString);
+	    	boolean processed = false;
+	    	System.out.println("loop");
+	    	
+	    	while (matcher.find()) {
+	    		processed = true;
+	    		String key = matcher.group(1);
+	    		
+	    		if (Boolean.TRUE.equals(maskPassword) && (key.toLowerCase().contains("password") || key.toLowerCase().contains("pwd") || key.toLowerCase().contains("passwd"))) {
+	    			interpolatedString = interpolatedString.replace(String.format("${%s}",  key), "****");
+	    		} else if (variables.containsKey(key)) {
+	    			interpolatedString = interpolatedString.replace(String.format("${%s}",  key), variables.get(key).getValueNoInterpolation());
+	    		} else {
+	    			logger.warn(String.format("Error while interpolating, key '%s' not found in configuration", key));
+	    		}	
+	    	}
+	    	
+	    	if (!processed) {
+	    		break;
+	    	}
     	}
     	
     	return interpolatedString;

@@ -20,12 +20,19 @@ package com.seleniumtests.core;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+import org.apache.log4j.Logger;
+
+import com.seleniumtests.core.runner.SeleniumRobotTestListener;
+import com.seleniumtests.customexception.ConfigurationException;
+import com.seleniumtests.util.StringUtility;
+import com.seleniumtests.util.logging.SeleniumRobotLogger;
+
 import kong.unirest.json.JSONObject;
 
 
 public class TestVariable {
 
-
+	private static final Logger logger = SeleniumRobotLogger.getLogger(TestVariable.class);
 	public static final String TEST_VARIABLE_PREFIX = "custom.test.variable.";
 	public static final int TIME_TO_LIVE_INFINITE = -1; // value for saying that varible will never be deleted
 	private Integer id; 
@@ -105,9 +112,20 @@ public class TestVariable {
 	public int getTimeToLive() {
 		return timeToLive;
 	}
+	
+	public String getValueNoInterpolation() {
+		return value;
+	}
 
 	public String getValue() {
-		return value;
+		try {
+			return StringUtility.interpolateString(value, SeleniumTestsContextManager.getThreadContext());
+		} catch (ConfigurationException e) {
+			if (StringUtility.PLACEHOLDER_PATTERN.matcher(value).find()) {
+				logger.warn("Cannot interpolate variable value, context is not initalized");
+			}
+			return value;
+		}
 	}
 
 	public String getInternalName() {
