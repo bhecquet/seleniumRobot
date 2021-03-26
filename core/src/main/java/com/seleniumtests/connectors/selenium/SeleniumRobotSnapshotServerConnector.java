@@ -60,6 +60,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 	protected static final int MAX_TESTSESSION_NAME_LENGHT = 100;
 	protected static final int MAX_TESTCASEINSESSION_NAME_LENGHT = 100;
 	protected static final int MAX_SNAPSHOT_NAME_LENGHT = 100;
+	protected static final int MAX_TESTSTEP_NAME_LENGHT = 100;
 	
 	public static SeleniumRobotSnapshotServerConnector getInstance() {
 		if (snapshotConnector == null) {
@@ -187,9 +188,11 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 			return null;
 		}
 		
+		String strippedName = testStep.length() > MAX_TESTSTEP_NAME_LENGHT ? testStep.substring(0, MAX_TESTSTEP_NAME_LENGHT): testStep;
+		
 		try {
 			JSONObject stepJson = getJSonResponse(buildPostRequest(url + TESTSTEP_API_URL)
-					.field(FIELD_NAME, testStep));
+					.field(FIELD_NAME, strippedName));
 			Integer testStepId = stepJson.getInt("id");
 			addCurrentTestStepToTestCase(testStepId, testCaseInSessionId);
 			return testStepId;
