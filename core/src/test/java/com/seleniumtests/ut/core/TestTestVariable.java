@@ -23,6 +23,7 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import com.seleniumtests.GenericTest;
+import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.TestVariable;
 
 import kong.unirest.json.JSONObject;
@@ -102,5 +103,13 @@ public class TestTestVariable extends GenericTest {
 		Assert.assertEquals(var.isReservable(), false);
 		Assert.assertEquals(var.getInternalName(), "custom.test.variable.key");
 		Assert.assertNull(var.getCreationDate());
+	}
+	
+	@Test(groups={"ut"})
+	public void testInterpolateValue() {
+
+		SeleniumTestsContextManager.getThreadContext().getConfiguration().put("path", new TestVariable("path", "/foo/bar"));
+		
+		Assert.assertEquals(new TestVariable("url", "http://mysite${path}").getValue(), "http://mysite/foo/bar");
 	}
 }

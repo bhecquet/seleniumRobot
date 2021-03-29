@@ -141,6 +141,13 @@ public class TestStringUtility extends GenericTest {
 		Assert.assertNull(StringUtility.interpolateString(null, SeleniumTestsContextManager.getThreadContext()));
 	}
 	
+	@Test(groups={"ut"})
+	public void testInterpolateVariableDoesNotExist() {
+		SeleniumTestsContextManager.getThreadContext().getConfiguration().put("url", new TestVariable("url", "http://mysite${path}"));
+		SeleniumTestsContextManager.getThreadContext().getConfiguration().put("path", new TestVariable("path", "/foo/bar${param}"));
+		Assert.assertEquals(StringUtility.interpolateString("connect to ${url}", SeleniumTestsContextManager.getThreadContext()), "connect to http://mysite/foo/bar${param}");
+	}
+	
 	/**
 	 * If context is null, return the initial string
 	 */
