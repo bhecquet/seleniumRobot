@@ -133,7 +133,7 @@ public class TestStringUtility extends GenericTest {
 		SeleniumTestsContextManager.getThreadContext().getConfiguration().put("url", new TestVariable("url", "http://mysite${path}"));
 		SeleniumTestsContextManager.getThreadContext().getConfiguration().put("path", new TestVariable("path", "/foo/bar${url}"));
 		
-		Assert.assertEquals(StringUtility.interpolateString("connect to ${url}", SeleniumTestsContextManager.getThreadContext()), "connect to http://mysite/foo/bar?key=value");
+		Assert.assertEquals(StringUtility.interpolateString("connect to ${url}", SeleniumTestsContextManager.getThreadContext()), "connect to http://mysite/foo/barhttp://mysite/foo/barhttp://mysite/foo/barhttp://mysite/foo/barhttp://mysite/foo/bar${url}");
 	}
 	
 	@Test(groups={"ut"})
