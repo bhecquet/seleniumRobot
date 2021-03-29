@@ -667,3 +667,15 @@ This setting wil ldepend on you network capabilities and the size of the loaded 
 
 **This setting only applies to snapshot that will be used for comparison**
 
+#### Limitations ####
+
+##### Step name #####
+
+Snapshot comparison is done with the reference snapshot having the same (test suite, test case, environment, browser, test step, snapshot name) information.
+If, for some reason, step name changes among executions, comparison will not be done.
+This could happen if the step name is: `myStep with args (a_value, a_changing_token)`
+If `a_changing_token` changes over time, then step will always have a different name.
+
+To avoid this problem:
+- do not provide your token as method parameter (as it is a secret, it should not be displayed), or name the parameter `pwd` or `password` which will mask the token value in step name.
+- Or use the `@StepName` annotation
