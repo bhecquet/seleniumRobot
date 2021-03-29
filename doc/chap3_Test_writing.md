@@ -52,6 +52,7 @@
   - [seleniumRobot server](#seleniumrobot-server)
   - [Using configurations (aka business configuration) in test scripts](#using-configurations-aka-business-configuration-in-test-scripts)
   - [Order of use](#order-of-use)
+  - [Using placeholders in variable value (>= 4.20.0)](#using-placeholders-in-variable-value--4200)
 - [7 Optional features](#7-optional-features)
   - [Soft assertions](#soft-assertions)
   - [Log some information inside a test step](#log-some-information-inside-a-test-step)
