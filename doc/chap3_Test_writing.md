@@ -994,6 +994,17 @@ The business configuration are read in the following order (the last overwrites 
 - parameter defined in env.ini
 - parameter defined in seleniumrobot server (if used)
 
+#### Using placeholders in variable value (>= 4.20.0)
+
+From Selenium Robot 4.20, it's possible for a variable to contain placeholders. It means that a variable value cas use the value of an other one.
+This is valid for any variable, stored in env.ini, variable server, ... as interpolation is done by seleniumRobot
+Placeolders have the format `${KEY}`
+
+```
+url = http//${baseUrl}/foo/bar
+baseUrl = myCompany.com:1234
+```
+
 ### 7 Optional features ###
 Here will be described features that may be used to improve test
 

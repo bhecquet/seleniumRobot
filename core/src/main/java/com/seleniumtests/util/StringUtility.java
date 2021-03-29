@@ -21,6 +21,8 @@ import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -177,11 +179,11 @@ public class StringUtility {
     		return initialString;
     	}
     	Map<String, TestVariable> variables = testContext.getConfiguration();
+    	List<String> unknownKeys = new ArrayList<>();
     	
     	for (int i = 0; i < 10; i++) {
 	    	Matcher matcher = PLACEHOLDER_PATTERN.matcher(interpolatedString);
 	    	boolean processed = false;
-	    	System.out.println("loop");
 	    	
 	    	while (matcher.find()) {
 	    		processed = true;
@@ -191,8 +193,9 @@ public class StringUtility {
 	    			interpolatedString = interpolatedString.replace(String.format("${%s}",  key), "****");
 	    		} else if (variables.containsKey(key)) {
 	    			interpolatedString = interpolatedString.replace(String.format("${%s}",  key), variables.get(key).getValueNoInterpolation());
-	    		} else {
-	    			logger.warn(String.format("Error while interpolating, key '%s' not found in configuration", key));
+	    		} else if (!unknownKeys.contains(key)){
+	    			unknownKeys.add(key);
+	    			logger.warn(String.format("Error while interpolating '%s', key '%s' not found in configuration", interpolatedString, key));
 	    		}	
 	    	}
 	    	
