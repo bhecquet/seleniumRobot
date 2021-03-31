@@ -22,6 +22,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.contains;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -97,6 +98,58 @@ public class TestBugTrackerReporter extends ReporterTest {
 			System.clearProperty(SeleniumTestsContext.BUGTRACKER_URL);
 			System.clearProperty(SeleniumTestsContext.BUGTRACKER_USER);
 			System.clearProperty(SeleniumTestsContext.BUGTRACKER_PASSWORD);
+			System.clearProperty("bugtracker.reporter");
+			System.clearProperty("bugtracker.assignee");
+			System.clearProperty("bugtracker.jira.field.application");
+		}
+	}
+	
+	/**
+	 * check that with data provider, a new issue can be created for each execution of the same method (index is present in test name, which guarantees that a different issue 
+	 * will be created.
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testIssueIsRecordedWithDataProvider() throws Exception {
+		try {
+			System.setProperty(SeleniumTestsContext.BUGTRACKER_TYPE, "jira");
+			System.setProperty(SeleniumTestsContext.BUGTRACKER_URL, "http://localhost:1234");
+			System.setProperty(SeleniumTestsContext.BUGTRACKER_PROJECT, "Project");
+			System.setProperty(SeleniumTestsContext.BUGTRACKER_USER, "jira");
+			System.setProperty(SeleniumTestsContext.BUGTRACKER_PASSWORD, "jira");
+			System.setProperty(SeleniumTestsContext.TEST_RETRY_COUNT, "0");
+			System.setProperty("bugtracker.reporter", "me");
+			System.setProperty("bugtracker.assignee", "you");
+			System.setProperty("bugtracker.jira.field.application", "app");
+			
+			ArgumentCaptor<Map<String, String>> issueOptionsArgument = ArgumentCaptor.forClass(Map.class);
+			ArgumentCaptor<Map<String, String>> issueOptionsArgument2 = ArgumentCaptor.forClass(Map.class);
+			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForTestManager"}, ParallelMode.METHODS, new String[] {"testInErrorDataProvider"});
+			
+			// check we have only one result recording for each test method
+			verify(jiraConnector).createIssue(eq("core"), eq("DEV"), anyString(), eq("testInErrorDataProvider"), contains("Test 'testInErrorDataProvider' failed"), any(), issueOptionsArgument.capture());
+			
+			Assert.assertEquals(issueOptionsArgument.getValue().size(), 3);
+			Assert.assertEquals(issueOptionsArgument.getValue().get("reporter"), "me");
+			Assert.assertEquals(issueOptionsArgument.getValue().get("assignee"), "you2data1"); // check we get the updated value, set directly in test method
+			Assert.assertEquals(issueOptionsArgument.getValue().get("jira.field.application"), "app");
+			
+
+			// check we have only one result recording for each test method
+			verify(jiraConnector).createIssue(eq("core"), eq("DEV"), anyString(), eq("testInErrorDataProvider-1"), contains("Test 'testInErrorDataProvider-1' failed"), any(), issueOptionsArgument2.capture());
+			
+			Assert.assertEquals(issueOptionsArgument2.getValue().size(), 3);
+			Assert.assertEquals(issueOptionsArgument2.getValue().get("reporter"), "me");
+			Assert.assertEquals(issueOptionsArgument2.getValue().get("assignee"), "you2data2"); // check we get the updated value, set directly in test method
+			Assert.assertEquals(issueOptionsArgument2.getValue().get("jira.field.application"), "app");
+			
+		} finally {
+			System.clearProperty(SeleniumTestsContext.BUGTRACKER_TYPE);
+			System.clearProperty(SeleniumTestsContext.BUGTRACKER_PROJECT);
+			System.clearProperty(SeleniumTestsContext.BUGTRACKER_URL);
+			System.clearProperty(SeleniumTestsContext.BUGTRACKER_USER);
+			System.clearProperty(SeleniumTestsContext.BUGTRACKER_PASSWORD);
+			System.clearProperty(SeleniumTestsContext.TEST_RETRY_COUNT);
 			System.clearProperty("bugtracker.reporter");
 			System.clearProperty("bugtracker.assignee");
 			System.clearProperty("bugtracker.jira.field.application");

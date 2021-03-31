@@ -107,7 +107,7 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 		try {
 			recordResults(serverConnector, resultSet);
 		} catch (SeleniumRobotServerException | ConfigurationException e) {
-			logger.error("Error contacting selenium robot server", e);
+			logger.error("Error recording result on selenium robot server", e);
 		}
 	}
 
@@ -182,11 +182,15 @@ public class SeleniumRobotServerTestRecorder extends CommonReporter implements I
 					if (snapshot.getName() == null || snapshot.getName().isEmpty()) {
 						logger.warn("Snapshot hasn't any name, it won't be sent to server");
 						continue;
-					}
+					} 
 					
-					Integer snapshotId = serverConnector.createSnapshot(snapshot, sessionId, testCaseInSessionId, stepResultId);
-					for (Rectangle excludeZone: snapshot.getCheckSnapshot().getExcludeElementsRect()) {
-						serverConnector.createExcludeZones(excludeZone, snapshotId);
+					try {
+						Integer snapshotId = serverConnector.createSnapshot(snapshot, sessionId, testCaseInSessionId, stepResultId);
+						for (Rectangle excludeZone: snapshot.getCheckSnapshot().getExcludeElementsRect()) {
+							serverConnector.createExcludeZones(excludeZone, snapshotId);
+						}
+					} catch (SeleniumRobotServerException e) {
+						logger.error("Could not create snapshot on server", e);
 					}
 				}
 			}

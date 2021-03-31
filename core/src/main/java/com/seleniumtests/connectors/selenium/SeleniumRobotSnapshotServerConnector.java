@@ -217,6 +217,9 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 		if (stepResultId == null) {
 			throw new ConfigurationException("Step result must be previously recorded");
 		}
+		if (snapshot == null || snapshot.getScreenshot() == null || snapshot.getScreenshot().getFullImagePath() == null) {
+			throw new SeleniumRobotServerException("Provided snapshot does not exist");
+		}
 		
 		String snapshotName = snapshot.getName().length() > MAX_SNAPSHOT_NAME_LENGHT ? snapshot.getName().substring(0, MAX_SNAPSHOT_NAME_LENGHT): snapshot.getName(); 
 		

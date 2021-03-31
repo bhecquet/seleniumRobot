@@ -25,6 +25,7 @@ import org.testng.Assert;
 import org.testng.SkipException;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.CustomAttribute;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import com.seleniumtests.util.helper.WaitHelper;
@@ -44,7 +45,7 @@ public class StubTestClassForTestManager extends StubParentClass {
 	
 	@Test(groups="stub", attributes = {@CustomAttribute(name = "testId", values = "13")})
 	public void testInError() {
-		createOrUpdateLocalParam("bugtracker.assignee", "you2"); // change value for bugtracker assignee so that w check it's updated
+		createOrUpdateLocalParam("bugtracker.assignee", "you2"); // change value for bugtracker assignee so that we check it's updated
 		throw new WebDriverException();
 	}
 	
@@ -56,6 +57,18 @@ public class StubTestClassForTestManager extends StubParentClass {
 	@Test(groups="stub", attributes = {@CustomAttribute(name = "testId", values = "15")})
 	public void testSkipped() {
 		throw new SkipException("skip this test");
+	}
+	
+	@DataProvider(name = "data")
+	public Object[][] data() {
+		return new String[][] {new String[] {"data1"}, new String[] {"data2"}};
+	}
+	
+
+	@Test(groups="stub", dataProvider = "data", attributes = {@CustomAttribute(name = "testId", values = "16")})
+	public void testInErrorDataProvider(String name) {
+		createOrUpdateLocalParam("bugtracker.assignee", "you2" + name); // change value for bugtracker assignee so that w check it's updated
+		throw new WebDriverException();
 	}
 
 }
