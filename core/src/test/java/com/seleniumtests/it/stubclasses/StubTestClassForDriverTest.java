@@ -26,6 +26,7 @@ import org.testng.annotations.Test;
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.TestTasks;
 import com.seleniumtests.driver.BrowserType;
+import com.seleniumtests.it.driver.support.pages.DriverModalTestPage;
 import com.seleniumtests.it.driver.support.pages.DriverTestPage;
 import com.seleniumtests.it.driver.support.pages.DriverTestPageNativeActions;
 
@@ -135,6 +136,15 @@ public class StubTestClassForDriverTest extends StubParentClass {
 		._writeSomething()
 		._captureSnapshot("my snapshot")
 		._reset();
+	}
+	
+
+	@Test(groups="stub")
+	public void testDriverModalSnapshot() throws Exception {
+		
+		new DriverModalTestPage(true)
+			._openModal()
+			._captureSnapshot("my snapshot");
 	}
 	
 	@Test(groups="stub")

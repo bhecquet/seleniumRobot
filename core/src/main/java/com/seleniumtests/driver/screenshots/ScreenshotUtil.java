@@ -322,7 +322,7 @@ public class ScreenshotUtil {
     public <T extends Object> List<T> capture(SnapshotTarget target, Class<T> exportClass, boolean allWindows, boolean force, int scrollDelay) {
     	
     	if (!force && (SeleniumTestsContextManager.getThreadContext() == null 
-        		|| getOutputDirectory() == null 
+        		|| outputDirectory == null 
         		|| !SeleniumTestsContextManager.getThreadContext().getCaptureSnapshot())) {
             return new ArrayList<>();
         }
@@ -588,6 +588,9 @@ public class ScreenshotUtil {
     	// when cropping, we do not crop the first header and last footer => loops computing must take it into account (contentDimension.height - topPixelsToCrop - bottomPixelsToCrop)
     	int maxLoops = (((contentDimension.height - topPixelsToCrop - bottomPixelsToCrop) / 
     			(viewDimensions.height - topPixelsToCrop - bottomPixelsToCrop)) + 1) * ((contentDimension.width / viewDimensions.width) + 1) + 3;
+    	
+    	// issue #435: be sure maxLoops is positive (could be negative in presence of fixed modal on long page)
+    	maxLoops = Math.max(1, maxLoops);
     	int loops = 0;
     	int currentImageHeight = 0;
     	
@@ -600,9 +603,9 @@ public class ScreenshotUtil {
     	BufferedImage currentImage = null;
     	while (loops < maxLoops) {
 			// do not crop top for the first vertical capture
-			// do not crop bottom for the last vertical capture
+			// do not crop bottom for the last vertical capture of if maxLoops == 1 (only a single capture)
 			int cropTop = currentImageHeight != 0 ? topPixelsToCrop : 0;
-			int cropBottom = currentImageHeight + (viewDimensions.height - cropTop) < contentDimension.height ? bottomPixelsToCrop : 0;
+			int cropBottom = currentImageHeight + (viewDimensions.height - cropTop) < contentDimension.height && maxLoops != 1 ? bottomPixelsToCrop : 0;
 			
 			// do not scroll to much so that we can crop fixed header without loosing content
 			scrollY = currentImageHeight - cropTop;
@@ -623,7 +626,12 @@ public class ScreenshotUtil {
 			}
 			
 			if (currentImage == null) {
-				currentImage = new BufferedImage(contentDimension.getWidth(), contentDimension.getHeight(), BufferedImage.TYPE_INT_RGB);
+				// issue #435: in case of a single capture, contentDimension may be different from viewDimension (with a displayed modal), create an image with viewDimension
+				if (maxLoops == 1) {
+					currentImage = new BufferedImage(viewDimensions.getWidth(), viewDimensions.getHeight(), BufferedImage.TYPE_INT_RGB);
+				} else {
+					currentImage = new BufferedImage(contentDimension.getWidth(), contentDimension.getHeight(), BufferedImage.TYPE_INT_RGB);
+				}
 				currentImage.createGraphics().drawImage(image, 0, 0, null);
 				currentImageHeight = image.getHeight();
 			} else {
@@ -666,8 +674,9 @@ public class ScreenshotUtil {
      */
     private File exportToFile(BufferedImage image) {
     	filename = HashCodeGenerator.getRandomHashCode("web");
-        String filePath = getOutputDirectory() + "/" + SCREENSHOT_DIR + filename + ".png";
+        String filePath = Paths.get(outputDirectory, SCREENSHOT_DIR + filename + ".png").toString();
         FileUtility.writeImage(filePath, image);
+        logger.debug("Captured image copied to " + filePath);
         return new File(filePath);
     }
     
@@ -699,7 +708,7 @@ public class ScreenshotUtil {
     	screenShot.setDuration(duration);
     	if (screenshotFile.exists()) {
     		Path pathAbsolute = Paths.get(screenshotFile.getAbsolutePath());
-	        Path pathBase = Paths.get(getOutputDirectory());
+	        Path pathBase = Paths.get(outputDirectory);
 
     		screenShot.setImagePath(String.format("../%s/%s", outputSubDirectory, pathBase.relativize(pathAbsolute).toString()));
     	}
