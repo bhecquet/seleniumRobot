@@ -572,6 +572,46 @@ public class TestSeleniumRobotSnapshotServerConnector extends ConnectorsTest {
 	}
 	
 	/**
+	 * 
+	 * @throws UnirestException
+	 */
+	@Test(groups= {"ut"}, expectedExceptions = SeleniumRobotServerException.class)
+	public void testCreateSnapshotNull() throws UnirestException {
+		SeleniumRobotSnapshotServerConnector connector = spy(configureMockedSnapshotServerConnection());
+		
+		Integer sessionId = connector.createSession("Session1");
+		Integer testCaseId = connector.createTestCase("Test 1");
+		Integer testCaseInSessionId = connector.createTestCaseInSession(sessionId, testCaseId, "Test 1");
+		Integer testStepId = connector.createTestStep("Step 1", testCaseInSessionId);
+		Integer stepResultId = connector.recordStepResult(true, "", 1, sessionId, testCaseInSessionId, testStepId);
+		connector.createSnapshot(null, sessionId, testCaseInSessionId, stepResultId);
+	}
+	@Test(groups= {"ut"}, expectedExceptions = SeleniumRobotServerException.class)
+	public void testCreateSnapshotNull2() throws UnirestException {
+		SeleniumRobotSnapshotServerConnector connector = spy(configureMockedSnapshotServerConnection());
+		
+		Integer sessionId = connector.createSession("Session1");
+		Integer testCaseId = connector.createTestCase("Test 1");
+		Integer testCaseInSessionId = connector.createTestCaseInSession(sessionId, testCaseId, "Test 1");
+		Integer testStepId = connector.createTestStep("Step 1", testCaseInSessionId);
+		Integer stepResultId = connector.recordStepResult(true, "", 1, sessionId, testCaseInSessionId, testStepId);
+		when(snapshot.getScreenshot()).thenReturn(null);
+		connector.createSnapshot(snapshot, sessionId, testCaseInSessionId, stepResultId);
+	}
+	@Test(groups= {"ut"}, expectedExceptions = SeleniumRobotServerException.class)
+	public void testCreateSnapshotNull3() throws UnirestException {
+		SeleniumRobotSnapshotServerConnector connector = spy(configureMockedSnapshotServerConnection());
+		
+		Integer sessionId = connector.createSession("Session1");
+		Integer testCaseId = connector.createTestCase("Test 1");
+		Integer testCaseInSessionId = connector.createTestCaseInSession(sessionId, testCaseId, "Test 1");
+		Integer testStepId = connector.createTestStep("Step 1", testCaseInSessionId);
+		Integer stepResultId = connector.recordStepResult(true, "", 1, sessionId, testCaseInSessionId, testStepId);
+		when(screenshot.getFullImagePath()).thenReturn(null);
+		connector.createSnapshot(snapshot, sessionId, testCaseInSessionId, stepResultId);
+	}
+	
+	/**
 	 * snapshot name is limited to 100 chars by server, check we strip it
 	 * @throws UnirestException
 	 */
