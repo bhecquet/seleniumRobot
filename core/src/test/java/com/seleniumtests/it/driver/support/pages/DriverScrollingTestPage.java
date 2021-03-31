@@ -21,6 +21,7 @@ import org.openqa.selenium.By;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.driver.BrowserType;
+import com.seleniumtests.driver.screenshots.SnapshotCheckType;
 import com.seleniumtests.uipage.ByC;
 import com.seleniumtests.uipage.PageObject;
 import com.seleniumtests.uipage.htmlelements.ButtonElement;
@@ -37,6 +38,7 @@ public class DriverScrollingTestPage extends PageObject {
 	public static final ButtonElement buttonScrollTop = new ButtonElement("set top", By.name("buttonScrollTop"));
 	public static final ButtonElement buttonScrollBottom = new ButtonElement("set bottom", By.name("buttonScrollBottom"));
 	public static final ButtonElement dropdownMenu = new ButtonElement("dropdown menu", ByC.text("Dropdown", "button"));
+	public static final ButtonElement openModal = new ButtonElement("open modal", By.id("openModalButton"));
 	public static final LinkElement menuLink2 = new LinkElement("link 2", By.linkText("Link 2"));
 	public static final HtmlElement greenBox = new HtmlElement("button to scroll into view", By.id("greenBox"));
 	public static final HtmlElement blueBox = new HtmlElement("button to scroll into view", By.id("blueBox"));
@@ -65,6 +67,11 @@ public class DriverScrollingTestPage extends PageObject {
     	textElement.sendKeys("a text");
     	return this;
     }
+    
+    public DriverScrollingTestPage _openModal() {
+    	openModal.click();
+    	return this;
+    }
    
     public DriverScrollingTestPage _reset() {
     	resetButton.click();
@@ -73,13 +80,20 @@ public class DriverScrollingTestPage extends PageObject {
     
     public static String getPageUrl(BrowserType browserType) {
     	if (browserType == BrowserType.FIREFOX) {
-			return "file://" + Thread.currentThread().getContextClassLoader().getResource("tu/test.html").getFile();
+			return "file://" + Thread.currentThread().getContextClassLoader().getResource("tu/testScrolling.html").getFile();
 		} else {
-			return "file:///" + Thread.currentThread().getContextClassLoader().getResource("tu/test.html").getFile();
+			return "file:///" + Thread.currentThread().getContextClassLoader().getResource("tu/testScrolling.html").getFile();
 		}
     }
 
 	public String getOpenedPageUrl() {
 		return openedPageUrl;
 	}
+	
+
+    public DriverScrollingTestPage _captureSnapshot(String snapshotName) {
+    	capturePageSnapshot(snapshotName, SnapshotCheckType.FULL);
+    	return this;
+    	
+    }
 }

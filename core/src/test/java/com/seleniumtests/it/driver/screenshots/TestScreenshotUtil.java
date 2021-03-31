@@ -17,11 +17,14 @@
  */
 package com.seleniumtests.it.driver.screenshots;
 
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+
+import javax.imageio.ImageIO;
 
 import org.apache.commons.io.FileUtils;
 import org.openqa.selenium.WebDriver;
@@ -158,6 +161,34 @@ public class TestScreenshotUtil extends ReporterTest {
 		}
 	}
 	
+	/**
+	 * issue #435: Test that when a modal is present on a relatively long web page (twice the height of the modal), screenshot is done
+	 * ('maxLoops' should never be <= 0)
+	 */
+	@Test(groups={"it"})
+	public void testCaptureWhenModalPresent() throws Exception {
+
+		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForDriverTest"}, ParallelMode.METHODS, new String[] {"testDriverModalSnapshot"});
+		
+		
+		for (ISuiteResult suiteResult: SeleniumRobotTestListener.getSuiteList().get(0).getResults().values()) {
+			for (ITestResult testResult: suiteResult.getTestContext().getPassedTests().getAllResults()) {
+				List<TestStep> steps = TestNGResultUtils.getSeleniumRobotTestContext(testResult).getTestStepManager().getTestSteps();
+				for (TestStep step: steps) {
+					if ("_captureSnapshot with args: (my snapshot, )".equals(step.getName())) {
+						Assert.assertEquals(step.getSnapshots().size(), 1);
+						Assert.assertNotNull(step.getSnapshots().get(0).getScreenshot().getFullImagePath());
+						
+						BufferedImage image = ImageIO.read(new File(step.getSnapshots().get(0).getScreenshot().getFullImagePath()));
+						Assert.assertTrue(image.getHeight() < 2000); // check we have a picture which is smaller than the real page height (should be the screen size)
+						return;
+					}	
+				}
+			}
+		}
+		Assert.fail("step has not been found");
+
+	}
 	/**
 	 * Test scrollDelay=0
 	 * Check capture delay is not too high
