@@ -217,6 +217,52 @@ public class TestPageObject2 extends MockitoTest {
 		page.capturePageSnapshot("", SnapshotCheckType.TRUE);
 
 	}
+	
+	@Test(groups = { "ut" })
+	public void testCaptureViewportSnapshotNoArguments() throws IOException {
+		
+		page.setScreenshotUtil(screenshotUtil);
+		String htmlFilePath = page.getHtmlFilePath();
+		page.captureViewportSnapshot();
+		
+		// check capture has been done on the second call (a first capture is done at
+		// PageObject init)
+		Assert.assertFalse(page.getHtmlFilePath().equals(htmlFilePath));
+	}
+	
+	/**
+	 * Capture viewport snapshot and sends it to selenium server
+	 * 
+	 * @throws IOException
+	 */
+	@Test(groups = { "ut" })
+	public void testCaptureViewportSnapshotWithCheck() throws IOException {
+		
+		page.setScreenshotUtil(screenshotUtil);
+		String htmlFilePath = page.getHtmlFilePath();
+		page.captureViewportSnapshot("img", SnapshotCheckType.TRUE);
+		
+		// check capture has been done on the second call (a first capture is done at
+		// PageObject init)
+		Assert.assertFalse(page.getHtmlFilePath().equals(htmlFilePath));
+		
+		// check scroll delay is not applied
+		verify(screenshotUtil).capture(any(SnapshotTarget.class), eq(ScreenShot.class));
+	}
+	
+	/**
+	 * Capture page snapshot and sends it to selenium server. No name is provided
+	 * ScenarioException should be raised
+	 * 
+	 * @throws IOException
+	 */
+	@Test(groups = { "ut" }, expectedExceptions = ScenarioException.class)
+	public void testCaptureViewportSnapshotWithCheckNoName() throws IOException {
+		
+		page.setScreenshotUtil(screenshotUtil);
+		page.captureViewportSnapshot("", SnapshotCheckType.TRUE);
+		
+	}
 
 	/**
 	 * Capture element snapshot and sends it to selenium server

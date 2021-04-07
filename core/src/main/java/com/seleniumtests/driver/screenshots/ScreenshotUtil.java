@@ -393,13 +393,25 @@ public class ScreenshotUtil {
     		removeAlert();
     		capturedImages.addAll(captureWebPages(allWindows, scrollDelay));
     		
+    	// capture web without scrolling on the main window
+    	} else if (target.isViewportTarget() && SeleniumTestsContextManager.isWebTest()) {
+    		removeAlert();
+    		target.setSnapshotRectangle(new Rectangle(((CustomEventFiringWebDriver)driver).getScrollPosition(), ((CustomEventFiringWebDriver)driver).getViewPortDimensionWithoutScrollbar()));
+    		capturedImages.add(new NamedBufferedImage(capturePage(0, 0), "")); // allow removing of scrollbar (a negative value would not remove it)
+    		
     	// capture web with scrolling on the main window
     	} else if (target.isElementTarget() && SeleniumTestsContextManager.isWebTest()) {
     		removeAlert();
+    		try {
+    			target.setSnapshotRectangle(target.getElement().getRect());
+    		} catch (WebDriverException e) {
+				throw new ScenarioException(String.format("Cannot check element %s snapshot as it is not available", target.getElement()));
+			}
     		capturedImages.addAll(captureWebPages(false, scrollDelay));
     		
-	    } else if ((target.isPageTarget() || target.isElementTarget()) && SeleniumTestsContextManager.isAppTest()){
+	    } else if ((target.isPageTarget() || target.isElementTarget() || target.isViewportTarget()) && SeleniumTestsContextManager.isAppTest()){
     		capturedImages.add(new NamedBufferedImage(capturePage(-1, -1), ""));
+    		
     	} else {
     		throw new ScenarioException("Capturing page is only possible for web and application tests. Capturing desktop possible for desktop web tests only");
     	}
@@ -407,6 +419,7 @@ public class ScreenshotUtil {
     	// if we want to capture an element only, crop the previous capture
     	if (target.isElementTarget() && target.getElement() != null && !capturedImages.isEmpty()) {
     		Rectangle elementPosition = target.getElement().getRect();
+    		
     		NamedBufferedImage wholeImage = capturedImages.remove(0);
     		BufferedImage elementImage = ImageProcessor.cropImage(wholeImage.image, elementPosition.x, elementPosition.y, elementPosition.width, elementPosition.height);
     		NamedBufferedImage namedElementImage = new NamedBufferedImage(elementImage, "");
@@ -558,7 +571,7 @@ public class ScreenshotUtil {
     
     /**
      * Captures a web page. If the browser natively returns the whole page, nothing more is done. Else (only webview is returned), we scroll down the page to get more of the page  
-     * @param scrollDelay	time in ms to wait between scrolling and snapshot
+     * @param scrollDelay	time in ms to wait between scrolling and snapshot. 
      * @return
      */
     private BufferedImage captureWebPage(int scrollDelay) {
@@ -589,17 +602,18 @@ public class ScreenshotUtil {
     	int maxLoops = (((contentDimension.height - topPixelsToCrop - bottomPixelsToCrop) / 
     			(viewDimensions.height - topPixelsToCrop - bottomPixelsToCrop)) + 1) * ((contentDimension.width / viewDimensions.width) + 1) + 3;
     	
-    	// issue #435: be sure maxLoops is positive (could be negative in presence of fixed modal on long page)
-    	maxLoops = Math.max(1, maxLoops);
     	int loops = 0;
     	int currentImageHeight = 0;
+  
+    	// issue #435: be sure maxLoops is positive (could be negative in presence of fixed modal on long page)
+    	maxLoops = Math.max(1, maxLoops);
     	
     	try {
     		((CustomEventFiringWebDriver)driver).scrollTop();
     	} catch (JavascriptException e) {
     		maxLoops = 1;
 		}
-    	
+
     	BufferedImage currentImage = null;
     	while (loops < maxLoops) {
 			// do not crop top for the first vertical capture

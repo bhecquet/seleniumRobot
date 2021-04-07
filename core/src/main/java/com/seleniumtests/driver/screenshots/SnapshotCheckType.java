@@ -78,11 +78,11 @@ public class SnapshotCheckType {
 					logger.warn(String.format("Element %s not added to exclusion as it cannot be found", el));
 				}
 			}
-		} else if (target.isElementTarget()) {
+		} else if (target.isElementTarget() || target.isViewportTarget()) {
 			WebElement targetElement = target.getElement();
 			Rectangle targetRectangle;
 			try {
-				targetRectangle = targetElement.getRect();
+				targetRectangle = target.getSnapshotRectangle();
 			} catch (WebDriverException e) {
 				throw new ScenarioException(String.format("Cannot check element %s snapshot as it is not available", targetElement));
 			}

@@ -1,5 +1,6 @@
 package com.seleniumtests.driver.screenshots;
 
+import org.openqa.selenium.Rectangle;
 import org.openqa.selenium.WebElement;
 
 /**
@@ -11,15 +12,18 @@ public class SnapshotTarget {
 	
 	public static final SnapshotTarget SCREEN = new SnapshotTarget(Target.SCREEN);
 	public static final SnapshotTarget PAGE = new SnapshotTarget(Target.PAGE);
+	public static final SnapshotTarget VIEWPORT = new SnapshotTarget(Target.VIEWPORT);
 	
 	public enum Target {
 		SCREEN, 
 		PAGE, 
-		ELEMENT
+		ELEMENT,
+		VIEWPORT
 	}
 	
 	private Target target;
 	private WebElement element;
+	private Rectangle snapshotRectangle = new Rectangle(0, 0, 0, 0);
 
 	public SnapshotTarget(Target target) {
 		this.target = target;
@@ -32,6 +36,10 @@ public class SnapshotTarget {
 	
 	public boolean isScreenTarget() {
 		return target == Target.SCREEN;
+	}
+	
+	public boolean isViewportTarget() {
+		return target == Target.VIEWPORT;
 	}
 	
 	public boolean isPageTarget() {
@@ -48,6 +56,14 @@ public class SnapshotTarget {
 
 	public WebElement getElement() {
 		return element;
+	}
+
+	public Rectangle getSnapshotRectangle() {
+		return snapshotRectangle;
+	}
+
+	public void setSnapshotRectangle(Rectangle snapshotRectangle) {
+		this.snapshotRectangle = snapshotRectangle;
 	}
 }
 	
