@@ -48,7 +48,7 @@ public class SeleniumRobotLogger {
 	private static final String LOG_PATTERN = " %-5p %d [%t] %C{1}: %m%n";
 
 	private static final String FILE_APPENDER_NAME = "FileLogger";
-	private static final Pattern LOG_FILE_PATTERN = Pattern.compile(".*?\\d \\[(.*?)\\](.*)");
+	private static final Pattern LOG_FILE_PATTERN = Pattern.compile(".*?\\d \\[([^\\]]+)\\](.*)");
 	private static Map<String, String> testLogs = Collections.synchronizedMap(new HashMap<>());
 	private static String outputDirectory;
 	private static String defaultOutputDirectory;

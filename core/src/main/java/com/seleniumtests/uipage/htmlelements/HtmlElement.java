@@ -1312,13 +1312,13 @@ public class HtmlElement extends Element implements WebElement, Locatable {
 	public String findLink(String attributeName) {
 		
 		// link <a href="#" id="linkPopup2" onclick="window.open('http://www.infotel.com/', '_blank');">
-		String link = findPattern(Pattern.compile(".*(http://.*?)'\"?.*"), attributeName);
+		String link = findPattern(Pattern.compile(".*(http://.+?)'\"?.*"), attributeName);
 		if (!"".equals(link)) {
 			return link;
 		}
 		
 		// link with simple quotes  <a href="#" id="linkPopup" onclick='window.open("http://www.infotel.com/", "_blank");'>
-		link = findPattern(Pattern.compile(".*(http://.*?)\"'?.*"), attributeName);
+		link = findPattern(Pattern.compile(".*(http://.+?)\"'?.*"), attributeName);
 		if (!"".equals(link)) {
 			return link;
 		}

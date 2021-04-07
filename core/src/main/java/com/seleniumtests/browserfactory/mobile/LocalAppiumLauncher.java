@@ -137,7 +137,7 @@ public class LocalAppiumLauncher implements AppiumLauncher {
 		
 		// get version for node
 		String reply = OSCommand.executeCommandAndWait(nodeCommand + " -v").trim();
-		if (!reply.matches("v\\d+\\.\\d+.*")) {
+		if (!reply.matches("v\\d++\\.\\d++.*")) {
 			throw new ConfigurationException("Node does not seem to be installed, is environment variable APPIUM_HOME set ?");
 		} else {
 			nodeVersion = reply;
