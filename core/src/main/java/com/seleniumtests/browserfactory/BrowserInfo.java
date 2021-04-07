@@ -52,8 +52,8 @@ public class BrowserInfo {
 
 	private static final Logger logger = SeleniumRobotLogger.getLogger(BrowserInfo.class);
 
-	private static final Pattern REG_CHROME_VERSION = Pattern.compile(".*chrome-(\\d+)-(\\d+).*");
-	private static final Pattern REG_ANDROID_VERSION = Pattern.compile(".*android-(\\d+\\.\\d+).*");
+	private static final Pattern REG_CHROME_VERSION = Pattern.compile(".*chrome-(\\d++)-(\\d++).*");
+	private static final Pattern REG_ANDROID_VERSION = Pattern.compile(".*android-(\\d++\\.\\d++).*");
 	public static final String LATEST_VERSION = "999.9";
 	public static final String GRID_BROWSER = "grid-browser";
 	public static final String DEFAULT_BROWSER_PRODFILE = "default";
@@ -297,7 +297,7 @@ public class BrowserInfo {
      * @return
      */
     public static boolean useLegacyFirefoxVersion(String versionString) {
-    	Pattern regMozilla = Pattern.compile(".*?(\\d+)\\..*");
+    	Pattern regMozilla = Pattern.compile(".*?(\\d++)\\..*");
     	Matcher versionMatcher = regMozilla.matcher(versionString);
 		if (versionMatcher.matches()) {
 			String version = versionMatcher.group(1);

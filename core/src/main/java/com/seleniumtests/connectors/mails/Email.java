@@ -54,7 +54,7 @@ public class Email {
 	public List<String> getContentHyperlinks() {
 		List<String> linksList = new ArrayList<>();
 		
-		Pattern p = Pattern.compile("<a.*?href=\"(.*?)\"");
+		Pattern p = Pattern.compile("<a.+?href=\"(.+?)\"");
 		Matcher matcher = p.matcher(getContent().replace("\n", "").replace("\r", ""));
 		while (matcher.find()) {
 			linksList.add(matcher.group(1));

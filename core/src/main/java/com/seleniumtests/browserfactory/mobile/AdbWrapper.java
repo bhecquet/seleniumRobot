@@ -35,14 +35,14 @@ public class AdbWrapper {
 
 	private String adbVersion;
 	private String adbCommand;
-	private static Pattern devicePattern = Pattern.compile("^(.*?)\\s+device$");
-	private static Pattern versionPattern = Pattern.compile(".*\\[ro\\.build\\.version\\.release\\]: \\[(.*?)\\].*");
-	private static Pattern namePattern = Pattern.compile(".*\\[ro\\.product\\.model\\]: \\[(.*?)\\].*");
+	private static Pattern devicePattern = Pattern.compile("^(.+?)\\s+device$");
+	private static Pattern versionPattern = Pattern.compile(".*\\[ro\\.build\\.version\\.release\\]: \\[(.+?)\\].*");
+	private static Pattern namePattern = Pattern.compile(".*\\[ro\\.product\\.model\\]: \\[(.+?)\\].*");
 	
 	private static Logger logger = SeleniumRobotLogger.getLogger(AdbWrapper.class);
 	
-	private static final Pattern REG_BROWSER_VERSION_NAME = Pattern.compile("versionName=(.*?)-.*");
-	private static final Pattern REG_CHROME_VERSION_NAME = Pattern.compile("versionName=(\\d+\\.\\d+).*");
+	private static final Pattern REG_BROWSER_VERSION_NAME = Pattern.compile("versionName=(.+?)-.*");
+	private static final Pattern REG_CHROME_VERSION_NAME = Pattern.compile("versionName=(\\d++\\.\\d++).*");
 	
 	public AdbWrapper() {
 		checkInstallation();

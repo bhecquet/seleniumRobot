@@ -51,7 +51,7 @@ public class SauceLabsDriverFactory extends AbstractWebDriverFactory implements 
 
 	private static final String ANDROID_PLATFORM = "android";
 	private static final String SAUCE_UPLOAD_URL = "https://saucelabs.com/rest/v1/storage/%s/%s?overwrite=true";
-	private static final Pattern REG_USER_PASSWORD = Pattern.compile("http://(.*?):(.*?)@ondemand.saucelabs.com:80/wd/hub");
+	private static final Pattern REG_USER_PASSWORD = Pattern.compile("http://([^:/]++):([^:@]++)@ondemand.saucelabs.com:80/wd/hub");
 
     public SauceLabsDriverFactory(final DriverConfig cfg) {
         super(cfg);

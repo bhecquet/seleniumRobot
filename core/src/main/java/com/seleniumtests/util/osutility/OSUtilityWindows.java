@@ -40,7 +40,7 @@ public class OSUtilityWindows extends OSUtility {
 	
 	private static final String EXE_EXT_QUOTE = ".exe\"";
 	private static final String KEY_VERSION = "version";
-	Pattern versionPattern = Pattern.compile(".*?(\\d+\\.\\d+\\.\\d+).*?");
+	Pattern versionPattern = Pattern.compile(".*?(\\d++\\.\\d++\\.\\d++).*?");
 		
 	@Override
 	public int getIEVersion() {
@@ -71,7 +71,7 @@ public class OSUtilityWindows extends OSUtility {
     	 */
     	String command = System.getenv("windir") + "\\system32\\" + "tasklist.exe /NH /SVC";
     	List<String> strProcessList = Arrays.asList(OSCommand.executeCommandAndWait(command).split("\n"));
-    	Pattern pTasklist = Pattern.compile("(.*?)\\s+(\\d+)\\s+.*");
+    	Pattern pTasklist = Pattern.compile("([^\\s]+)\\s++(\\d++)\\s++.*");
     	
     	List<ProcessInfo> processInfoList = new ArrayList<>();
     	for (String sentence : strProcessList) {
@@ -176,7 +176,7 @@ public class OSUtilityWindows extends OSUtility {
 			throw new ConfigurationException("Chrome version could not be get from folder, chrome path does not exist");
 		}
 		for (File file: new File(chromePath.replace("chrome.exe", "")).listFiles()) {
-			if (file.isDirectory() && file.getName().matches("^\\d+.*")) {
+			if (file.isDirectory() && file.getName().matches("^\\d++.*")) {
 				return file.getName();
 			}
 		}
