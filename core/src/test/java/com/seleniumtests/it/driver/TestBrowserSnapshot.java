@@ -17,12 +17,11 @@
  */
 package com.seleniumtests.it.driver;
 
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
-import static org.mockito.ArgumentMatchers.anyInt;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
@@ -45,6 +44,7 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import com.seleniumtests.driver.WebUIDriver;
@@ -287,6 +287,44 @@ public class TestBrowserSnapshot extends GenericMultiBrowserTest {
 		
 		Assert.assertTrue(image.getHeight() < 105 && image.getHeight() > 95); // should be 100 be may depend on browser / version
 		Assert.assertTrue(image.getWidth() < 75 && image.getWidth() > 70); // should be 72 be may depend on browser / version
+	}
+	
+	/**
+	 * Check that if element does not exist, a Scenario exception is raised
+	 * @throws IOException
+	 */
+	@Test(groups={"it"}, expectedExceptions = ScenarioException.class)
+	public void testCaptureNonExistingElement() throws IOException {
+		driver.manage().window().maximize();
+		WaitHelper.waitForSeconds(1);
+		
+		// get cropped picture
+		String filePath = generateCaptureFilePath();
+		BufferedImage image = new ScreenshotUtil(driver).capture(new SnapshotTarget(DriverTestPage.textElementNotPresent), BufferedImage.class, false, false).get(0);
+		FileUtility.writeImage(filePath, image);
+		
+		Assert.assertTrue(image.getHeight() < 105 && image.getHeight() > 95); // should be 100 be may depend on browser / version
+		Assert.assertTrue(image.getWidth() < 75 && image.getWidth() > 70); // should be 72 be may depend on browser / version
+	}
+	
+	/**
+	 * Capture viewport
+	 * @throws IOException
+	 */
+	@Test(groups={"it"})
+	public void testCaptureViewport() throws IOException {
+		driver.manage().window().maximize();
+		WaitHelper.waitForSeconds(1);
+		
+		// get viewport picture and compare it to full page capture
+		String filePath = generateCaptureFilePath();
+		BufferedImage imageVp = new ScreenshotUtil(driver).capture(SnapshotTarget.VIEWPORT, BufferedImage.class, false, false).get(0);
+		FileUtility.writeImage(filePath, imageVp);
+		BufferedImage imageP = new ScreenshotUtil(driver).capture(SnapshotTarget.PAGE, BufferedImage.class, false, false).get(0);
+
+		// check no vertical scrolling has been performed
+		Assert.assertTrue(imageVp.getHeight() < imageP.getHeight()); 
+		Assert.assertTrue(imageVp.getWidth() <= imageP.getWidth()); 
 	}
 	
 	/**
