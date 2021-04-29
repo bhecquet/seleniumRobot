@@ -35,12 +35,15 @@ import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Listeners;
 
+import com.seleniumtests.connectors.extools.Uft;
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.core.TestStepManager;
 import com.seleniumtests.core.TestTasks;
 import com.seleniumtests.driver.WebUIDriver;
 import com.seleniumtests.driver.screenshots.VideoCaptureMode;
 import com.seleniumtests.reporter.logger.StringInfo;
+import com.seleniumtests.reporter.logger.TestStep;
 import com.seleniumtests.util.logging.ScenarioLogger;
 
 @Listeners({com.seleniumtests.reporter.reporters.ReporterControler.class,
@@ -238,6 +241,21 @@ public class SeleniumRobotTestPlan {
      */
     public String executeCommand(String program, String ... args) {
     	return TestTasks.executeCommand(program, args);
+    }
+    
+    /**
+     * Execute a UFT script locally or remotely via a VBS script called through csscript.exe
+	 * @param vbsPath		path to the vbs file (locally, or on the remote machine)
+	 * @param scriptPath	path to the script, either local or from ALM. If test is from ALM, prefix it with '[QualityCenter]'. e.g: '[QualityCenter]Subject\TOOLS\TestsFoo\foo'
+	 * @param parameters	parameters to pass to the script
+	 */
+    public void executeUftScript(String vbsPath, String scriptPath, Map<String, String> args) {
+    	TestTasks.terminateCurrentStep();
+    	
+		Uft uft = new Uft(vbsPath, scriptPath, args);
+		TestStep uftStep = uft.executeScript();
+		TestStepManager.setCurrentRootTestStep(uftStep);
+		TestStepManager.logTestStep(TestStepManager.getCurrentRootTestStep());
     }
     
     /**
