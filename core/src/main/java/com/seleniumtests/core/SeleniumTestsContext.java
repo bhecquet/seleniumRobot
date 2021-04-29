@@ -105,6 +105,7 @@ public class SeleniumTestsContext {
     public static final String FIREFOX_USER_PROFILE_PATH = "firefoxUserProfilePath";	// firefox user profile
     public static final String OPERA_USER_PROFILE_PATH = "operaUserProfilePath";	// profile utilisateur opéra
     public static final String CHROME_USER_PROFILE_PATH = "chromeUserProfilePath";	// chrome user profile
+    public static final String CHROME_OPTIONS = "chromeOptions";				// options to give to chrome at startup
     public static final String FIREFOX_BINARY_PATH = "firefoxBinaryPath";		// chemin vers le binaire firefox (firefox portable ou pour utiliser une version spécifique
     public static final String CHROME_DRIVER_PATH = "chromeDriverPath";			// chemin vers chromeDriver si on souhaite utiliser une version différente
     public static final String GECKO_DRIVER_PATH = "geckoDriverPath";			// chemin vers chromeDriver si on souhaite utiliser une version différente
@@ -405,6 +406,7 @@ public class SeleniumTestsContext {
         setFirefoxUserProfilePath(getValueForTest(FIREFOX_USER_PROFILE_PATH, System.getProperty(FIREFOX_USER_PROFILE_PATH)));
         setOperaUserProfilePath(getValueForTest(OPERA_USER_PROFILE_PATH, System.getProperty(OPERA_USER_PROFILE_PATH)));
         setChromeUserProfilePath(getValueForTest(CHROME_USER_PROFILE_PATH, System.getProperty(CHROME_USER_PROFILE_PATH)));
+        setChromeOptions(getValueForTest(CHROME_OPTIONS, System.getProperty(CHROME_OPTIONS)));
         setFirefoxBinary(getValueForTest(FIREFOX_BINARY_PATH, System.getProperty(FIREFOX_BINARY_PATH)));
         setChromeBinary(getValueForTest(CHROME_BINARY_PATH, System.getProperty(CHROME_BINARY_PATH)));
         setChromeDriverPath(getValueForTest(CHROME_DRIVER_PATH, System.getProperty(CHROME_DRIVER_PATH)));
@@ -1371,6 +1373,10 @@ public class SeleniumTestsContext {
     public String getChromeUserProfilePath() {
     	return (String) getAttribute(CHROME_USER_PROFILE_PATH);
     }
+    
+    public String getChromeOptions() {
+    	return (String) getAttribute(CHROME_OPTIONS);
+    }
 
     public String getOutputDirectory() {
         return (String) getAttribute(OUTPUT_DIRECTORY);
@@ -2128,6 +2134,10 @@ public class SeleniumTestsContext {
     
     public void setOperaUserProfilePath(String path) {
     	setAttribute(OPERA_USER_PROFILE_PATH, path);
+    }
+   
+    public void setChromeOptions(String options) {
+    	setAttribute(CHROME_OPTIONS, options);
     }
     
     public void setChromeUserProfilePath(String path) {

@@ -681,3 +681,7 @@ If `a_changing_token` changes over time, then step will always have a different 
 To avoid this problem:
 - do not provide your token as method parameter (as it is a secret, it should not be displayed), or name the parameter `pwd` or `password` which will mask the token value in step name.
 - Or use the `@StepName` annotation
+
+### 24 Activate Dark Mode (chrome only) ###
+
+This is done through options given to chrome: `-DchromeOptions="--force-dark-mode --enable-features=WebUIDarkMode"`
