@@ -18,6 +18,7 @@
 package com.seleniumtests.util.osutility;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -48,6 +49,8 @@ public abstract class OSUtility {
 	private String[] webDriverProcessList = {"chromedriver", "geckodriver", "iedriverserver", "microsoftwebdriver"};
 		
 	private static Map<BrowserType, List<BrowserInfo>> installedBrowsersWithVersion;
+	
+	private static Charset consoleCharset = null;
 	
 	/******************************************
 	 *********** OS information ***************
@@ -259,6 +262,12 @@ public abstract class OSUtility {
 	public abstract String getProgramExtension();
 	
 	/**
+	 * Returns the charset for the console
+	 * @return
+	 */
+	public abstract Charset getConsoleCharset();
+	
+	/**
 	 * Returns the process that listens for the given port, or null if none is found
 	 * @param port
 	 */
@@ -315,6 +324,15 @@ public abstract class OSUtility {
     public abstract String getOSBuild();
     
     public abstract String getProgramNameFromPid(Long pid);
+    
+    public static Charset getCharset() {
+    	
+    	if (consoleCharset == null) {
+    		consoleCharset = OSUtilityFactory.getInstance().getConsoleCharset();
+    	}
+    	
+    	return consoleCharset;
+    }
     
     /**
      * Returns the full version of chrome browser

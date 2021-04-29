@@ -19,6 +19,8 @@ package com.seleniumtests.util.osutility;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumMap;
@@ -381,5 +383,15 @@ public class OSUtilityWindows extends OSUtility {
 			}
 		} 
 		return null;
+	}
+
+	@Override
+	public Charset getConsoleCharset() {
+		try {
+			return Charset.forName("cp" + OSCommand.executeCommandAndWait(new String[] {"cmd.exe", "/C", "chcp"}, -1, StandardCharsets.UTF_8).split(": ")[1].trim());
+		} catch (Exception e) {
+			return Charset.defaultCharset();
+		}
+
 	}
 }

@@ -17,9 +17,11 @@
  */
 package com.seleniumtests.util.osutility;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.InputStream;
+import java.nio.charset.Charset;
+import java.time.Clock;
+import java.time.Instant;
 
 import org.apache.log4j.Logger;
 
@@ -64,55 +66,104 @@ public class OSCommand {
      * @return 
      */
     public static String executeCommandAndWait(final String[] cmd) {
+    	return executeCommandAndWait(cmd, -1, null);
+    }
+    
+    /**
+     * Execute a command in command line terminal and wait at most 'timeout' seconds
+     * @param cmd
+     * @param timeout 	number of seconds to wait for end of execution. A negative value means it will wait 30 secs
+     * @return 
+     */
+   	public static String executeCommandAndWait(final String[] cmd, int timeout, Charset charset) {
         
-        Process proc;
         try {
-			proc = Runtime.getRuntime().exec(cmd);
-			return readOutput(proc);
-	        
-        } catch (IOException e1) {
-        	logger.error(e1);
-        }
+        	Process proc = Runtime.getRuntime().exec(cmd);
+			return waitProcessTermination(proc, timeout, charset);
+			
+        } catch (IOException e) {
+        	logger.error(e);
+        } 
         
         return "";
     }
     
-    private static String readOutput(Process proc) throws IOException {
-    	StringBuilder output = new StringBuilder();
-    	BufferedReader stdInput = new BufferedReader(new InputStreamReader(proc.getInputStream()));
-    	
-    	BufferedReader stdError = new BufferedReader(new InputStreamReader(proc.getErrorStream()));
-        
-        String s;
-        
-    	// read result output from command
-        while ((s = stdInput.readLine()) != null) {
-            output.append(s + "\n");
-        }
-        // read error output from command
-        while ((s = stdError.readLine()) != null) {
-        	output.append(s + "\n");
-        }
-        
-        return output.toString();
-    }
-
     /**
      * Execute a command in command line terminal
      * @param cmd
      * @param wait for the end of the command execution
      * @return 
      */
-    public static String executeCommandAndWait(final String cmd) {
-        Process proc;
+   	public static String executeCommandAndWait(final String cmd) {
+   		return executeCommandAndWait(cmd, -1, null);
+   	}
+   	
+    /**
+     * Execute a command in command line terminal and wait at most 'timeout' seconds
+     * @param cmd
+     * @param timeout 	number of seconds to wait for end of execution. A negative value means it will wait 30 secs
+     * @param charset	charset used to read program output. If set to null, default charset will be used
+     * @return 
+     */
+    public static String executeCommandAndWait(final String cmd, int timeout, Charset charset) {
+
         try {
-			proc = Runtime.getRuntime().exec(cmd);
-			return readOutput(proc);
+			Process proc = Runtime.getRuntime().exec(cmd);
+			return waitProcessTermination(proc, timeout, charset);
 			
         } catch (IOException e1) {
         	logger.error(e1);
-        }
+        } 
         
         return "";
     }
+    
+    private static String waitProcessTermination(Process proc, int timeout, Charset charset) {
+
+    	try {
+
+			return readOutput(proc, timeout, charset);
+    	} catch (InterruptedException e) {
+        	logger.error("Interruption: " + e.getMessage());
+		} catch (IOException e1) {
+        	logger.error(e1);
+        } 
+    	return "";
+    }
+    
+    private static String readOutput(Process proc, int timeout, Charset charset) throws IOException, InterruptedException {
+    	
+    	if (charset == null) {
+    		charset = OSUtility.getCharset();
+    	}
+    	
+    	StringBuilder output = new StringBuilder();
+    	StringBuilder error = new StringBuilder();
+    	InputStream is = proc.getInputStream();
+    	InputStream es = proc.getErrorStream();
+        
+    	Clock clock = Clock.systemUTC();
+		Instant end = clock.instant().plusSeconds(timeout > 0 ? timeout: 30);
+    	
+        
+        boolean read = false;
+        while (end.isAfter(clock.instant()) && (proc.isAlive() || !read)) {
+        	read = true;
+        	int isAvailable = is.available();
+        	if (isAvailable > 0) {
+        		byte[] b = new byte[isAvailable];
+        		is.read(b);
+        		output.append(new String(b, charset) + "\n");
+        	}
+        	if (es.available() > 0) {
+        		byte[] b = new byte[isAvailable];
+        		is.read(b);
+        		error.append(new String(b, charset) + "\n");
+        	}
+        	Thread.sleep(1);
+        }
+        
+        return output.toString() + '\n' + error.toString();
+    }
+
 }
