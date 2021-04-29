@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.testng.ITestContext;
 import org.testng.ITestNGMethod;
 import org.testng.ITestResult;
@@ -93,6 +94,11 @@ public class GenericTest {
 		FileUtils.copyInputStreamToFile(Thread.currentThread().getContextClassLoader().getResourceAsStream(resource), tempFile);
 		
 		return tempFile;
+	}
+	
+
+	public static String readResourceToString(String resourceName) throws IOException {
+		return IOUtils.toString(Thread.currentThread().getContextClassLoader().getResourceAsStream(resourceName));
 	}
 	
 
