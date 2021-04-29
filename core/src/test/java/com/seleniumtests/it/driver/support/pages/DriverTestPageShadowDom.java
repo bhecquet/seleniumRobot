@@ -6,6 +6,7 @@ import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.driver.BrowserType;
 import com.seleniumtests.uipage.ByC;
 import com.seleniumtests.uipage.PageObject;
+import com.seleniumtests.uipage.htmlelements.ButtonElement;
 import com.seleniumtests.uipage.htmlelements.HtmlElement;
 import com.seleniumtests.uipage.htmlelements.TextFieldElement;
 
@@ -21,6 +22,7 @@ public class DriverTestPageShadowDom extends PageObject {
 	public static final HtmlElement divMultipleShadowElements = new HtmlElement("", ByC.shadow(By.name("doubleShadow"), By.name("doubleSubShadow")));
 	public static final HtmlElement shadowElementNotFound = new HtmlElement("", ByC.shadow(By.id("shadow5"), By.id("shadowNotPresent"))).findElement(By.id("pass3Shadow"));
 
+	public static final TextFieldElement textInScroll = new HtmlElement("", ByC.shadow(By.id("shadow11"))).findTextFieldElement(By.id("textInScroll"));
 	 
     public DriverTestPageShadowDom(boolean openPageURL) throws Exception {
     	this(openPageURL, getPageUrl(SeleniumTestsContextManager.getThreadContext().getBrowser()));

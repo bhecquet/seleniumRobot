@@ -47,10 +47,26 @@
                     template.innerHTML = "<slot name='stuff'><p>Default</p></slot>";
                     const shadowRoot = this.attachShadow({mode: 'open'}).appendChild(template.content.cloneNode(true));
                 }
-            });			
+            });	
 
+			// Test 10
+			var o=document.getElementById("shadow11").attachShadow({mode: "open"});o.innerHTML='<div class="box2" style="height: 200px;"></div><input type="text" id="textInScroll" value="" />'
+
+			
 		}
 	</script>
+	<style type="text/css">
+	
+	.box {
+	  width: 80%;
+	  border: 2px dashed;
+	  height: 100px;
+	  overflow: auto;
+	  /* scroll-behavior: smooth; <-- for smooth scroll */
+	}
+
+	
+	</style>
 </head>
 <body onload="setup()">
 <h1>Shadow DOM Example</h1>
@@ -141,6 +157,16 @@
 
 	<p>This is a shadowDOM located inside an iFrame:</p>
 	<iframe src="shadowframe.html" width="400px" height="400px"></iframe>
+
+<h2>Test 10</h2>
+	<p>Scrollable element inside shadow DOM</p>
+	<div class="box">
+		<div id="shadow11">
+			
+		</div>
+	</div
+
+
 
 </body>
 </html>

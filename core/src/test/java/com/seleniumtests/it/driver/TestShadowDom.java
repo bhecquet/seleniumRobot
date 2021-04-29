@@ -67,6 +67,7 @@ public class TestShadowDom extends GenericTest {
 		Assert.assertEquals(DriverTestPageShadowDom.divPass1Shadow.getText(), "This is a div with an ID of pass1Shadow");
 	}
 	
+	
 	@Test(groups={"it"})
 	public void testAccessSubShadowElement() {
 		Assert.assertEquals(DriverTestPageShadowDom.divPass1Shadow.getText(), "This is a div with an ID of pass1Shadow");
@@ -96,5 +97,14 @@ public class TestShadowDom extends GenericTest {
 	@Test(groups={"it"}, expectedExceptions = NoSuchElementException.class)
 	public void testAccessShadowElementNotFound() {
 		DriverTestPageShadowDom.shadowElementNotFound.getText();
+	}
+	
+	
+	@Test(groups={"it"})
+	public void testAccessShadowElementInScroll() {
+
+		SeleniumTestsContextManager.getThreadContext().setReplayTimeout(30);
+		DriverTestPageShadowDom.textInScroll.sendKeys("hello!");
+		Assert.assertEquals(DriverTestPageShadowDom.textInScroll.getValue(), "hello!");
 	}
 }
