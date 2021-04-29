@@ -427,6 +427,10 @@
 							<value>${testng.utTestnames}</value>
 						</property>
 					</properties>
+				<!-- JDK11 ??
+				<argLine>- -illegal-access=permit </argLine> 
+				-->
+					
 				<!-- comment for online instrumentation -->
 					<systemPropertyVariables>
                         <jacoco-agent.destfile>${project.build.directory}/coverage-reports/jacoco-ut.exec</jacoco-agent.destfile>
