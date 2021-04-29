@@ -61,6 +61,7 @@ import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.ie.InternetExplorerDriver;
 import org.openqa.selenium.remote.FileDetector;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.UselessFileDetector;
@@ -184,6 +185,154 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
     		"    return rootElement;" + 
     		"}" +
     		"return getScrollParent(arguments[0], false, arguments[1]);";
+    
+
+    /*
+	an other methode for finding scolling parent, that computes full xpath and then search a matching parent
+    this method will work in case of shadowDom / document fragments / slots
+	@param element			the element for which we want to get a scrollable parent
+	@param includeHidden	whether to include hidden scrollable parents in search
+	@param browserName		name of the browser
+
+	TESTED WITH
+	- element does not exist
+	- no scrollable element in parents
+	- scrollable element in parents
+	*/
+    private static final String JS_SCROLL_PARENT2 = "getScrollableParent = function(element, includeHidden, browserName) {"
+    
+    		/**
+    			function for getting the full XPath of an element, or null if element cannot be found
+    			Based on example found here: https://stackoverflow.com/questions/2661818/javascript-get-xpath-of-a-node/43688599#43688599
+    			@param root		root element to search in
+    			@param element	the element for which we want to get xpath
+    			@param xpath	the base xpath (should be empty on first call, used for recursion)
+    			*/
+    		
+    		+ "path = function(root, element, xpath) {"
+    		+ "    _xPathIndex = function (node) {"
+    		// Returns -1 in case of error, 0 if no siblings matching the same expression,"
+    		// <XPath index among the same expression-matching sibling nodes> otherwise."
+    		+ "         function areNodesSimilar(left, right) {"
+    		+ "             if (left === right) {"
+    		+ "                 return true;"
+    		+ "             }"
+    		+ ""
+    		+ "             if (left.nodeType === Node.ELEMENT_NODE && right.nodeType === Node.ELEMENT_NODE) {"
+    		+ "                 return left.localName === right.localName;"
+    		+ "             }"
+    		+ ""
+    		+ "             if (left.nodeType === right.nodeType) {"
+    		+ "                 return true;"
+    		+ "             }"
+    		+ ""
+    		// XPath treats CDATA as text nodes.
+    		+ "             const leftType = left.nodeType === Node.CDATA_SECTION_NODE ? Node.TEXT_NODE : left.nodeType;"
+    		+ "             const rightType = right.nodeType === Node.CDATA_SECTION_NODE ? Node.TEXT_NODE : right.nodeType;"
+    		+ "             return leftType === rightType;"
+    		+ "         }"
+    		+ ""
+    		+ "         const siblings = node.parentNode ? node.parentNode.children : null;"
+    		// Root node - no siblings.
+    		+ "         if (!siblings) {"
+    		+ "             return 0;"
+    		+ "         } "
+    		+ "         let hasSameNamedElements;"
+    		+ "         for (let i = 0; i < siblings.length; ++i) {"
+    		+ "             if (areNodesSimilar(node, siblings[i]) && siblings[i] !== node) {"
+    		+ "                 hasSameNamedElements = true;"
+    		+ "                 break;"
+    		+ "             }"
+    		+ "         }"
+    		+ "         if (!hasSameNamedElements) {"
+    		+ "             return 0;"
+    		+ "         }"
+    		// XPath indices start with 1.
+    		+ "         let ownIndex = 1;  "
+    		+ "         for (let i = 0; i < siblings.length; ++i) {"
+    		+ "             if (areNodesSimilar(node, siblings[i])) {"
+    		+ "                 if (siblings[i] === node) {"
+    		+ "                      return ownIndex;"
+    		+ "                 }"
+    		+ "                 ++ownIndex;"
+    		+ "                   }"
+    		+ "         }"
+    		// An error occurred: |node| not found in parent's children.
+    		+ "         return -1;"
+    		+ "     };"
+    		+ "     "
+    		+ "     var elements = Array.from(root.children);"
+    		+ "     "
+    		// handle shadowRoot
+    		+ "     if (root.shadowRoot != null) {"
+    		+ "         elements = Array.from(root.shadowRoot.children).concat(elements);"
+    		+ "     } "
+    		// handle slots which carry some element inside even if children or shadowRoot is null
+    		+ "     if (root.localName === 'slot' && root.assignedNodes() != null) {"
+    		+ "         elements = Array.from(root.assignedElements()).concat(elements);"
+    		+ "     } "
+    		+ "     "
+    		+ "     for (var i=0; i<elements.length; i++) {"
+    		+ ""
+    		+ "         let p = xpath + '/' + elements[i].localName;"
+    		+ "         const ownIndex = _xPathIndex(elements[i]);"
+    		+ "         if (ownIndex === -1) {"
+    		+ "             return null;"
+    		+ "         }"
+    		+ "         if (ownIndex > 0) {"
+    		+ "             p += '[' + ownIndex + ']';"
+    		+ "         }"
+    		+ "         "
+    		+ "         if (element === elements[i]) {"
+    		+ "             console.log(\"trouve\");"
+    		+ "             return p;"
+    		+ "             break;"
+    		+ "         }"
+    		+ ""
+    		+ "         var ret = path(elements[i], element, p);"
+    		+ "         if (ret != null) {"
+    		+ "             return ret;"
+    		+ "         }"
+    		+ "     }"
+    		+ ""
+    		+ "     return null;"
+    		+ "   "
+    		+ " };"
+    		+ " "
+    		+ " "
+    		+ " let rootElement = browserName === \"safari\" ? document.body: document.documentElement;"
+    		+ " if (element == null) {"
+    		+ "     return rootElement;"
+    		+ " }"
+    		+ " "
+    		// get full xpath of the element
+    		+ " let elementFullXpath = path(document, element, '');"
+    		+ " let style = getComputedStyle(element);"
+    		+ " let excludeStaticParent = style.position === \"absolute\";"
+    		+ " let overflowRegex = includeHidden ? /(auto|scroll|hidden)/ : /(auto|scroll)/;"
+    		+ " if (style.position === \"fixed\") return rootElement;"
+    		+ " "
+    		// parse xpath from end to begin to find a scrollable element
+    		+ " if (elementFullXpath != null) {"
+    		+ "     while ((elementFullXpath.match(new RegExp(\"/\", \"g\")) || []).length > 1) {"
+    		+ "         elementFullXpath = elementFullXpath.substring(0, elementFullXpath.lastIndexOf('/'));"
+    		+ "         let elementToEvaluate = document.evaluate(elementFullXpath, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;"
+    		+ ""
+    		+ "         if (elementToEvaluate === null) {"
+    		+ "             return rootElement;"
+    		+ "         } else {"
+    		+ "             style = getComputedStyle(elementToEvaluate);"
+    		+ "             if (excludeStaticParent && style.position === \"static\") {"
+    		+ "                 continue;"
+    		+ "             } "
+    		+ ""
+    		+ "             if (overflowRegex.test(style.overflow + style.overflowY + style.overflowX)) return elementToEvaluate;"
+    		+ "         }"
+    		+ "     }"
+    		+ " }"
+    		+ " return rootElement;"
+    		+ "};" +
+    		"return getScrollableParent(arguments[0], false, arguments[1]);";
     
     
     private static final String JS_GET_ELEMENT_STYLE = "function getStyle(dom) {" + 
@@ -694,8 +843,17 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
 	public void scrollToElement(WebElement element, int yOffset) {
 		if (isWebTest) {
 			try {
+				long start = new Date().getTime();
 				WebElement parentScrollableElement = (WebElement) ((JavascriptExecutor) driver).executeScript(JS_SCROLL_PARENT, element, (driver instanceof SafariDriver) ? "safari": "other");
 				Long topHeaderSize = (Long) ((JavascriptExecutor) driver).executeScript(JS_GET_TOP_HEADER);
+
+				System.out.println(new Date().getTime() - start);
+				// try a second method (the first one is quicker but does not work when element is inside a document fragment, slot or shadow DOM
+				long start1 = new Date().getTime();
+				if ((parentScrollableElement == null || "html".equalsIgnoreCase(parentScrollableElement.getTagName())) && !(driver instanceof InternetExplorerDriver)) {
+					parentScrollableElement = (WebElement) ((JavascriptExecutor) driver).executeScript(JS_SCROLL_PARENT2, element, (driver instanceof SafariDriver) ? "safari": "other");
+				}
+				System.out.println(new Date().getTime() - start1);
 				
 				if (parentScrollableElement != null) {
 					String parentTagName = parentScrollableElement.getTagName();
