@@ -42,7 +42,6 @@ import org.testng.annotations.Test;
 import com.seleniumtests.MockitoTest;
 import com.seleniumtests.browserfactory.BrowserInfo;
 import com.seleniumtests.browserfactory.ChromeCapabilitiesFactory;
-import com.seleniumtests.browserfactory.FirefoxCapabilitiesFactory;
 import com.seleniumtests.browserfactory.SeleniumRobotCapabilityType;
 import com.seleniumtests.core.SeleniumTestsContext;
 import com.seleniumtests.driver.BrowserType;
@@ -309,9 +308,9 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 	public void testCreateMobileCapabilitiesOverrideUserAgent() {
 		Mockito.when(config.getUserAgentOverride()).thenReturn("CHROME 55");
 		
-		MutableCapabilities capa = new ChromeCapabilitiesFactory(config).createCapabilities();
+		MutableCapabilities capa = new ChromeCapabilitiesFactory(config).createMobileCapabilities(config);
 		
-		Assert.assertEquals(((Map<?,?>)(((ChromeOptions)capa).asMap().get(ChromeOptions.CAPABILITY))).get("args").toString(), "[--user-agent=CHROME 55, --disable-translate, --disable-web-security, --no-sandbox, --disable-site-isolation-trials, --disable-features=IsolateOrigins,site-per-process]");
+		Assert.assertEquals(((Map<?,?>)(capa.asMap().get(ChromeOptions.CAPABILITY))).get("args").toString(), "[--user-agent=CHROME 55, --disable-translate, --disable-web-security, --disable-site-isolation-trials, --disable-features=IsolateOrigins,site-per-process]");
 	}
 	
 
@@ -363,5 +362,24 @@ public class TestChromeCapabilityFactory extends MockitoTest {
 		// check 'chromeProfile' is not set as it's wrong profile path, and no option added
 		Assert.assertNull(capa.getCapability("chromeProfile"));
 		Assert.assertFalse(((Map<String, List<String>>)(((ChromeOptions)capa).asMap().get(ChromeOptions.CAPABILITY))).get("args").toString().contains("--user-data-dir=/home/user/profile"));
+	}
+	
+
+	@Test(groups={"ut"})
+	public void testCreateMobileCapabilitiesWithOptions() {
+		Mockito.when(config.getChromeOptions()).thenReturn("--key1=value1 --key2=value2");
+		
+		MutableCapabilities capa = new ChromeCapabilitiesFactory(config).createMobileCapabilities(config);
+		
+		Assert.assertEquals(((Map<?,?>)(capa.asMap().get(ChromeOptions.CAPABILITY))).get("args").toString(), "[--disable-translate, --disable-web-security, --disable-site-isolation-trials, --disable-features=IsolateOrigins,site-per-process, --key1=value1, --key2=value2]");
+	}
+	@Test(groups={"ut"})
+	public void testCreateChromeCapabilitiesWithOptions() {
+
+		Mockito.when(config.getChromeOptions()).thenReturn("--key1=value1 --key2=value2");
+		
+		MutableCapabilities capa = new ChromeCapabilitiesFactory(config).createCapabilities();
+		
+		Assert.assertEquals(((Map<?,?>)(((ChromeOptions)capa).asMap().get(ChromeOptions.CAPABILITY))).get("args").toString(), "[--disable-translate, --disable-web-security, --no-sandbox, --disable-site-isolation-trials, --disable-features=IsolateOrigins,site-per-process, --key1=value1, --key2=value2]");
 	}
 }

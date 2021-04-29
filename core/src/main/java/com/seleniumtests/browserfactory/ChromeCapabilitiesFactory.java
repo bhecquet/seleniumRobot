@@ -54,6 +54,13 @@ public class ChromeCapabilitiesFactory extends IDesktopCapabilityFactory {
         options.addArguments("--disable-web-security");
         options.addArguments("--disable-site-isolation-trials");
         options.addArguments("--disable-features=IsolateOrigins,site-per-process");
+
+        if (webDriverConfig.getChromeOptions() != null) {
+        	for (String option: webDriverConfig.getChromeOptions().split(" ")) {
+        		options.addArguments(option);
+        	}
+        }
+        
         options.setPageLoadStrategy(webDriverConfig.getPageLoadStrategy());
 
         capabilities.setCapability(ChromeOptions.CAPABILITY, options);
@@ -99,6 +106,12 @@ public class ChromeCapabilitiesFactory extends IDesktopCapabilityFactory {
         options.addArguments("--no-sandbox");
         options.addArguments("--disable-site-isolation-trials");
         options.addArguments("--disable-features=IsolateOrigins,site-per-process");
+        
+        if (webDriverConfig.getChromeOptions() != null) {
+        	for (String option: webDriverConfig.getChromeOptions().split(" ")) {
+        		options.addArguments(option);
+        	}
+        }
         
         if (webDriverConfig.isHeadlessBrowser()) {
         	logger.info("setting chrome in headless mode. Supported for chrome version >= 60");
