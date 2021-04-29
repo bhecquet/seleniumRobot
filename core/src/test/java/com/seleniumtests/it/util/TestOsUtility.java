@@ -94,6 +94,28 @@ public class TestOsUtility extends GenericTest {
 			Assert.assertTrue(osUtil.getProgramNameFromPid(processId).startsWith("java"));
 		}
 	}
+	
+	/**
+	 * Check that command is stopped before end
+	 */
+	@Test(groups={"it"})
+	public void testExecuteCommandAndWait() {
+		if (OSUtility.isWindows()) {
+			String out = OSCommand.executeCommandAndWait("ping localhost -n 10", 5, null);
+			Assert.assertEquals(out.split("\n").length, 7);
+		}
+	}
+	
+	/**
+	 * Check that command is stopped after end
+	 */
+	@Test(groups={"it"})
+	public void testExecuteCommandAndWaitEnd() {
+		if (OSUtility.isWindows()) {
+			String out = OSCommand.executeCommandAndWait("ping localhost -n 4", 10, null);
+			Assert.assertEquals(out.split("\n").length, 11); // we went to the end of the program, so more result lines are added
+		}
+	}
 
 	@Test(groups={"it"})
 	public void testKillProcess() {
@@ -105,6 +127,9 @@ public class TestOsUtility extends GenericTest {
 				pi = osUtil.getRunningProcess("calculator"); // Windows 10
 			}
 			if (pi == null) {
+				pi = osUtil.getRunningProcess("Calculator"); // Windows 10
+			}
+			if (pi == null) {
 				pi = osUtil.getRunningProcess("win32calc"); // Windows 2016
 			}
 			if (pi == null) {
@@ -113,6 +138,7 @@ public class TestOsUtility extends GenericTest {
 			osUtil.killProcess(pi.getPid(), true);
 			Assert.assertNull(osUtil.getRunningProcess("calc"));
 			Assert.assertNull(osUtil.getRunningProcess("calculator"));
+			Assert.assertNull(osUtil.getRunningProcess("Calculator"));
 			Assert.assertNull(osUtil.getRunningProcess("win32calc"));
 		}
 	}
