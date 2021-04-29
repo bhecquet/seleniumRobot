@@ -1,0 +1,198 @@
+<?xml version="1.0"?>
+<!DOCTYPE Report[<!ELEMENT Report (General ,(Doc|BPT)) >
+		<!ATTLIST Report ver CDATA #REQUIRED tmZone CDATA #REQUIRED>
+			<!ELEMENT General ( DocLocation ) >
+				<!ATTLIST General productName CDATA #REQUIRED productVer CDATA #REQUIRED os CDATA #REQUIRED host CDATA #REQUIRED qcserver CDATA #IMPLIED qcproject CDATA #IMPLIED SolManSolutionId CDATA #IMPLIED SolManProjectId CDATA #IMPLIED SolManTestPlanId CDATA #IMPLIED SolManTestPackageId CDATA #IMPLIED SolManUserInfoData CDATA #IMPLIED  >
+					<!ELEMENT BPT (DName,Res,DVer?,TSet?,TInst?,NodeArgs,AdditionalInfo*,Doc*) >
+						<!ATTLIST BPT rID ID #REQUIRED >
+							<!ELEMENT Doc (DName,ConfName?,Res,DVer?,TSet?,TInst?,RunType?,DT?,AdditionalInfo*,Step*,DIter*,Step*,Action*,Doc*,Summary?,TestMaintenanceSummary*,NodeArgs?) >
+								<!ATTLIST Doc rID ID #REQUIRED type (Test|BC|BPTWrapperTest|Flow|Group|Action) "Test" productName CDATA #REQUIRED BCIter CDATA #IMPLIED >
+									<!ELEMENT RunType ( #PCDATA )>
+										<!ATTLIST RunType fmStep (False|True) "False" batch (False|True) "False" upDesc (False|True) "False" upChk (False|True) "False" upAS (False|True) "False">
+											<!ELEMENT DName ( #PCDATA ) >
+												<!ELEMENT ConfName ( #PCDATA ) >
+													<!ELEMENT Res ( #PCDATA ) >
+														<!ELEMENT AdditionalInfo (AdditionalDataName,AdditionalDataValue ) >
+															<!ELEMENT AdditionalDataName ( #PCDATA ) >
+																<!ELEMENT AdditionalDataValue ( #PCDATA ) >
+																	<!ELEMENT DVer ( #PCDATA ) >
+																		<!ELEMENT TSet ( #PCDATA ) >
+																			<!ELEMENT TInst ( #PCDATA ) >
+																				<!ELEMENT DIter (Step*,Action+,Summary?,NodeArgs)>
+																					<!ATTLIST DIter rID ID #REQUIRED iterID CDATA #REQUIRED>
+																						<!ELEMENT DocLocation ( #PCDATA )>
+																							<!ELEMENT Action (AName,AIter*,(Step|HtmlStep|Action)*, Summary,ActionMaintenanceSummary*, NodeArgs ) >
+																								<!ATTLIST Action rID ID #REQUIRED>
+																									<!ELEMENT AIter ((Step|HtmlStep|Action)*,DataMapping?, Summary?,NodeArgs) >
+																										<!ATTLIST AIter rID ID #REQUIRED iterID CDATA #REQUIRED isCountable (False|True) "False">
+																											<!ELEMENT AName ( #PCDATA ) >
+																												<!ELEMENT TestMaintenanceSummary (ActionMaintenanceSummary*) >
+																													<!ATTLIST TestMaintenanceSummary ObjectsAdded CDATA #REQUIRED ObjectsUpdated CDATA #REQUIRED StepsUpdated CDATA #REQUIRED StepsComments CDATA #REQUIRED>
+																														<!ELEMENT ActionMaintenanceSummary (ObjectChange* ) >
+																															<!ATTLIST ActionMaintenanceSummary Action CDATA #REQUIRED Objects CDATA #REQUIRED Updated CDATA #REQUIRED LinesTotal CDATA #REQUIRED Added CDATA #REQUIRED LinesUpdated CDATA #REQUIRED>
+																																<!ELEMENT ObjectChange  (Hierarchy, PropertyChangeList* ) >
+																																	<!ATTLIST ObjectChange Operation CDATA #IMPLIED OriginalRepository CDATA #IMPLIED>
+																																		<!ELEMENT PropertyChangeList (PropertyDef*) >
+																																			<!ELEMENT PropertyDef (OriginalValue, NewValue) >
+																																				<!ATTLIST PropertyDef PropName CDATA #REQUIRED OriginRegularExpression (True|False) "False" NewRegularExpression (True|False) "False" AddedProperty (True|False) "False">
+																																					<!ELEMENT OriginalValue ( #PCDATA )>
+																																						<!ELEMENT NewValue ( #PCDATA )>
+																																							<!ELEMENT Hierarchy  (ObjectName, Hierarchy*) >
+																																								<!ATTLIST Hierarchy MicClass CDATA #REQUIRED>
+																																									<!ELEMENT ObjectName  ( #PCDATA ) >
+																																										<!ELEMENT Step (Obj,Details,Time,TimeTick* ,(Step|HtmlStep|Doc)*, DataMapping?, NodeArgs) >
+																																											<!ATTLIST Step rID ID #REQUIRED retval CDATA #IMPLIED>
+																																												<!ELEMENT HtmlStep (HTML,TimeTick*,(Step|HtmlStep|Doc)*,NodeArgs) >
+																																													<!ATTLIST HtmlStep rID ID #REQUIRED >
+																																														<!ELEMENT Obj ( #PCDATA ) >
+																																															<!ATTLIST Obj plainTxt (False|True) "True">
+																																																<!ELEMENT Details ( #PCDATA ) >
+																																																	<!ATTLIST Details plainTxt (False|True) "True">
+																																																		<!ELEMENT Time ( #PCDATA ) >
+																																																			<!ELEMENT HTML ( #PCDATA ) >
+																																																				<!ELEMENT Disp ( #PCDATA ) >
+																																																					<!ELEMENT TimeTick ( #PCDATA ) >
+																																																						<!ELEMENT DataMapping ( DataMappedItem* )>
+																																																							<!ELEMENT DataMappedItem EMPTY >
+																																																								<!ATTLIST DataMappedItem dsName CDATA #REQUIRED >
+																																																									<!ATTLIST DataMappedItem rowId CDATA #REQUIRED >
+																																																										<!ELEMENT NodeArgs (Disp,TopPane?,BtmPane?,ExtendedInfo? )>
+																																																											<!ATTLIST NodeArgs eType CDATA #REQUIRED icon CDATA #REQUIRED nRep CDATA #REQUIRED UserNote CDATA #IMPLIED filter (False|True) "True">
+																																																												<!ATTLIST NodeArgs status (Passed|Failed|Done|Warning|Information) "Done">
+																																																													<!ATTLIST NodeArgs iconSel CDATA #IMPLIED nType CDATA #IMPLIED MovieMarker CDATA "">
+																																																														<!ATTLIST NodeArgs Source CDATA #IMPLIED SourceLine CDATA #IMPLIED StepFlowItemKey CDATA #IMPLIED >
+																																																															<!ELEMENT TopPane (Path)>
+																																																																<!ELEMENT BtmPane ( (Path|WR)?,ASHilite?)>
+																																																																	<!ATTLIST BtmPane vType CDATA "HTML">
+																																																																		<!ELEMENT Path ( #PCDATA ) >
+																																																																			<!ELEMENT ASHilite ( #PCDATA ) >
+																																																																				<!ELEMENT WR ( #PCDATA ) >
+																																																																					<!ELEMENT ExtendedInfo ( StepData ) >
+																																																																						<!ATTLIST ExtendedInfo StepType CDATA #REQUIRED>
+																																																																							<!ELEMENT DT (NodeArgs) >
+																																																																								<!ATTLIST DT rID ID #REQUIRED>
+																																																																									<!ELEMENT Summary (Param*)>
+																																																																										<!ATTLIST Summary sTime CDATA #IMPLIED eTime CDATA #IMPLIED passed CDATA #IMPLIED failed CDATA #IMPLIED warnings CDATA #IMPLIED retval CDATA #IMPLIED stopped (False|True) "False">
+																																																																											<!ELEMENT Param (ParamName,ParamVal)+ >
+																																																																												<!ATTLIST Param paramInOut (In|Out) "In">
+																																																																													<!ELEMENT ParamName ( #PCDATA ) >
+																																																																														<!ELEMENT ParamVal ( #PCDATA ) >
+																																																																															]
+																																																																															>
+<Report ver="2.0" tmZone="Paris, Madrid">
+	<General productName="Micro Focus Unified Functional Testing" productVer="15.0.1" os="" host="PP20061968" qcserver="http://z6i7222v.itsoc.itmma.fr:8080/qcbin" qcproject="VNR.VALIDATION_2012">
+		<DocLocation><![CDATA[[ALM] Subject\OUTILLAGE\Tests_BHE\test1]]></DocLocation>
+	</General>
+	<Doc rID="T1" productName="Micro Focus Unified Functional Testing">
+		<DName><![CDATA[test1]]></DName>
+		<Res><![CDATA[output]]></Res>
+		<TInst><![CDATA[1]]></TInst>
+		<DT rID="T2">
+			<NodeArgs eType="Table" icon="2" nRep="5" filter="False">
+				<Disp><![CDATA[Run-Time Data Table]]></Disp>
+				<BtmPane vType="Table">
+					<Path><![CDATA[Default.xlsx]]></Path>
+				</BtmPane>
+			</NodeArgs>
+		</DT>
+		<DIter rID="T3" iterID="1">
+			<Action rID="T4">
+				<AName><![CDATA[test1]]></AName>
+				<Step rID="T5">
+					<Obj plainTxt="False"><![CDATA[navigteur]]></Obj>
+					<Details plainTxt="False"><![CDATA[La transaction "navigteur" a démarré.]]></Details>
+					<Time><![CDATA[19/04/2021 - 17:27:58]]></Time>
+					<TimeTick>1618846078</TimeTick>
+					<NodeArgs eType="Transaction" icon="5" nRep="10" nType="Démarrer une transaction" Source="test1" SourceLine="0">
+						<Disp><![CDATA[navigteur]]></Disp>
+					</NodeArgs>
+				</Step>
+				<Step rID="T6">
+					<Obj plainTxt="False"><![CDATA[S'identifier [Jenkins]]]></Obj>
+					<Details plainTxt="False"><![CDATA[<table><tr><td><span style="text-align : left; font-size : 12px; ">Local Browser</span></td></tr></table>]]></Details>
+					<Time><![CDATA[19/04/2021 - 17:27:58]]></Time>
+					<TimeTick>1618846078</TimeTick>
+					<Step rID="T7">
+						<Obj plainTxt="False"><![CDATA[S'identifier [Jenkins]]]></Obj>
+						<Details plainTxt="False"><![CDATA[Page]]></Details>
+						<Time><![CDATA[19/04/2021 - 17:27:58]]></Time>
+						<TimeTick>1618846078</TimeTick>
+						<Step rID="T8">
+							<Obj plainTxt="False"><![CDATA[Utilisateur.Set]]></Obj>
+							<Details plainTxt="False"><![CDATA["toto"]]></Details>
+							<Time><![CDATA[19/04/2021 - 17:27:58]]></Time>
+							<TimeTick>1618846078</TimeTick>
+							<NodeArgs eType="Replay" icon="8" nRep="15" Source="test1" SourceLine="5">
+								<Disp><![CDATA[Utilisateur.Set]]></Disp>
+							</NodeArgs>
+						</Step>
+						<Step rID="T9">
+							<Obj plainTxt="False"><![CDATA[Mot de passe.SetSecure]]></Obj>
+							<Details plainTxt="False"><![CDATA["6075ac75a88a13a533eb7f5db06e"]]></Details>
+							<Time><![CDATA[19/04/2021 - 17:27:58]]></Time>
+							<TimeTick>1618846078</TimeTick>
+							<NodeArgs eType="Replay" icon="8" nRep="18" Source="test1" SourceLine="6">
+								<Disp><![CDATA[Mot de passe.SetSecure]]></Disp>
+							</NodeArgs>
+						</Step>
+						<Step rID="T10">
+							<Obj plainTxt="False"><![CDATA[S'identifier.Click]]></Obj>
+							<Details plainTxt="False"><![CDATA[]]></Details>
+							<Time><![CDATA[19/04/2021 - 17:27:58]]></Time>
+							<TimeTick>1618846078</TimeTick>
+							<NodeArgs eType="Replay" icon="9" nRep="21" Source="test1" SourceLine="7">
+								<Disp><![CDATA[S'identifier.Click]]></Disp>
+							</NodeArgs>
+						</Step>
+						<NodeArgs eType="Context" icon="7" nRep="14" Source="test1" SourceLine="5">
+							<Disp><![CDATA[S'identifier [Jenkins]]]></Disp>
+						</NodeArgs>
+					</Step>
+					<Step rID="T11">
+						<Obj plainTxt="False"><![CDATA[S'identifier [Jenkins].Close]]></Obj>
+						<Details plainTxt="False"><![CDATA[]]></Details>
+						<Time><![CDATA[19/04/2021 - 17:27:59]]></Time>
+						<TimeTick>1618846079</TimeTick>
+						<NodeArgs eType="Replay" icon="6" nRep="23" Source="test1" SourceLine="9">
+							<Disp><![CDATA[S'identifier [Jenkins].Close]]></Disp>
+						</NodeArgs>
+					</Step>
+					<NodeArgs eType="Context" icon="6" nRep="13" Source="test1" SourceLine="5">
+						<Disp><![CDATA[S'identifier [Jenkins]]]></Disp>
+					</NodeArgs>
+				</Step>
+				<Action rID="T12">
+					<AName><![CDATA[IP_Config_Poste_W10 [IP_Config_Poste_W10]]]></AName>
+					<Summary sTime="19/04/2021 - 17:27:59" eTime="19/04/2021 - 17:28:16" passed="0" failed="0" warnings="0"/>
+					<NodeArgs eType="StartAction" icon="10" nRep="24">
+						<Disp><![CDATA[Récapitulatif IP_Config_Poste_W10 [IP_Config_Poste_W10]]]></Disp>
+					</NodeArgs>
+				</Action>
+				<Step rID="T13">
+					<Obj plainTxt="False"><![CDATA[navigteur]]></Obj>
+					<Details plainTxt="False"><![CDATA[La transaction "navigteur" s’est terminée avec l’état "Réussite" (Durée totale : 17,7658 s Temps inutilisé : 0,0888 s).]]></Details>
+					<Time><![CDATA[19/04/2021 - 17:28:16]]></Time>
+					<TimeTick>1618846096</TimeTick>
+					<NodeArgs eType="Transaction" icon="11" nRep="26" nType="Terminer une transaction" Source="test1" SourceLine="14">
+						<Disp><![CDATA[navigteur]]></Disp>
+					</NodeArgs>
+				</Step>
+				<Summary sTime="19/04/2021 - 17:27:58" eTime="19/04/2021 - 17:28:16" passed="0" failed="0" warnings="0"/>
+				<NodeArgs eType="StartAction" icon="4" nRep="9">
+					<Disp><![CDATA[Récapitulatif test1]]></Disp>
+				</NodeArgs>
+			</Action>
+			<NodeArgs eType="StartIteration" icon="3" nRep="7">
+				<Disp><![CDATA[Itération test1 1 (ligne 1)]]></Disp>
+			</NodeArgs>
+		</DIter>
+		<Summary sTime="19/04/2021 - 17:27:53" eTime="19/04/2021 - 17:28:16" passed="0" failed="0" warnings="0">
+			<Param paramInOut="In">
+				<ParamName><![CDATA[User]]></ParamName>
+				<ParamVal><![CDATA[toto]]></ParamVal>
+			</Param>
+		</Summary>
+		<NodeArgs eType="StartTest" icon="1" nRep="4">
+			<Disp><![CDATA[Récapitulatif Test test1]]></Disp>
+		</NodeArgs>
+	</Doc>
