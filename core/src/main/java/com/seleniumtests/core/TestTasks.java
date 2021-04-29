@@ -17,6 +17,7 @@
  */
 package com.seleniumtests.core;
 
+import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -114,18 +115,31 @@ public class TestTasks {
      * @param args
      */
     public static String executeCommand(String program, String ... args) {
+    	return executeCommand(program, -1, null, args);
+    }
+    
+    /**
+     * Execute a command
+     * If test is run locally, you can execute any command, limit is the rights given to the user
+     * If test is run through seleniumRobot grid, only commands allowed by grid will be allowed
+     * @param program	program to execute
+     * @param charset	the charset used to read program output
+     * @param timeout	timeout in seconds. After this duration, program will be terminated
+     * @param args		arguments to give to program
+     */
+    public static String executeCommand(String program, int timeout, Charset charset, String ... args) {
     	if (SeleniumTestsContextManager.getThreadContext().getRunMode() == DriverMode.LOCAL) {
     		String[] cmd = new String[] {program};
-    		ArrayUtils.addAll(cmd, args);
-    		return OSCommand.executeCommandAndWait(cmd);
+    		cmd = ArrayUtils.addAll(cmd, args);
+    		return OSCommand.executeCommandAndWait(cmd, timeout, charset);
     		
     	} else if (SeleniumTestsContextManager.getThreadContext().getRunMode() == DriverMode.GRID) {
     		SeleniumGridConnector gridConnector = SeleniumTestsContextManager.getThreadContext().getSeleniumGridConnector();
     		if (gridConnector != null) {
     			return gridConnector.executeCommand(program, args);
     		} else {
-				throw new ScenarioException(ERROR_NO_GRID_CONNECTOR_ACTIVE);
-			}
+    			throw new ScenarioException(ERROR_NO_GRID_CONNECTOR_ACTIVE);
+    		}
     		
     	} else {
     		throw new ScenarioException("command execution only supported in local and grid mode");
@@ -293,6 +307,20 @@ public class TestTasks {
     	return matchingVariables.get(0).getValue();
     }
    
+    public static void terminateCurrentStep() {
+    	NLWebDriver neoloadDriver = WebUIDriver.getNeoloadDriver();
+    	
+    	// log the previous step if it exists and create the new one
+    	TestStep previousStep = TestStepManager.getCurrentRootTestStep();
+    	if (previousStep != null) {
+    		previousStep.updateDuration();
+    		TestStepManager.logTestStep(previousStep);
+    		
+    		if (neoloadDriver != null) {
+				neoloadDriver.stopTransaction();
+			}
+    	}
+    }
     
     /**
      * Add step to test and add snapshot to it
@@ -309,15 +337,7 @@ public class TestTasks {
     	NLWebDriver neoloadDriver = WebUIDriver.getNeoloadDriver();
     	
     	// log the previous step if it exists and create the new one
-    	TestStep previousStep = TestStepManager.getCurrentRootTestStep();
-    	if (previousStep != null) {
-    		previousStep.updateDuration();
-    		TestStepManager.logTestStep(previousStep);
-    		
-    		if (neoloadDriver != null) {
-				neoloadDriver.stopTransaction();
-			}
-    	}
+    	terminateCurrentStep();
     	
     	// stepName is null when test is terminating. We don't create a new step
     	if (stepName != null) {
