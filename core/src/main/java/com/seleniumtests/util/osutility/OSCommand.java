@@ -147,20 +147,26 @@ public class OSCommand {
     	
         
         boolean read = false;
-        while (end.isAfter(clock.instant()) && (proc.isAlive() || !read)) {
+        boolean terminated = false;
+        while (end.isAfter(clock.instant()) && (!read || !terminated)) {
+        	// be sure we read all logs produced by process, event after termination
+        	if (!proc.isAlive()) {
+        		terminated = true;
+        	}
+        	
         	read = true;
         	int isAvailable = is.available();
         	if (isAvailable > 0) {
         		byte[] b = new byte[isAvailable];
         		is.read(b);
-        		output.append(new String(b, charset) + "\n");
+        		output.append(new String(b, charset));
         	}
         	if (es.available() > 0) {
         		byte[] b = new byte[isAvailable];
         		is.read(b);
-        		error.append(new String(b, charset) + "\n");
+        		error.append(new String(b, charset));
         	}
-        	Thread.sleep(1);
+        	Thread.sleep(100);
         }
         
         return output.toString() + '\n' + error.toString();
