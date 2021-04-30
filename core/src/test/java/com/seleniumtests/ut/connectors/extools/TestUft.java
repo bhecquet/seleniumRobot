@@ -69,7 +69,7 @@ public class TestUft extends GenericTest {
 	// test avec exécution, mais sans contenu retourné
 	// test avec BOM / sans BOM
 	
-	@Test(groups= {"ut"})
+	@Test(groups= {"ut"}, enabled = false)
 	public void testExecute() throws IOException {
 		Map<String, String> args = new HashMap<>();
 		args.put("User", "toto");
