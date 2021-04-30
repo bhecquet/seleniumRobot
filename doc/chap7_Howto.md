@@ -42,6 +42,7 @@
   - [Images are not fully loaded on resulting capture](#images-are-not-fully-loaded-on-resulting-capture)
   - [Limitations](#limitations)
     - [Step name](#step-name)
+- [24 Activate Dark Mode (chrome only)](#24-activate-dark-mode-chrome-only)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
