@@ -20,6 +20,7 @@ package com.seleniumtests;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.nio.charset.StandardCharsets;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -98,7 +99,7 @@ public class GenericTest {
 	
 
 	public static String readResourceToString(String resourceName) throws IOException {
-		return IOUtils.toString(Thread.currentThread().getContextClassLoader().getResourceAsStream(resourceName));
+		return IOUtils.toString(Thread.currentThread().getContextClassLoader().getResourceAsStream(resourceName), StandardCharsets.UTF_8);
 	}
 	
 
