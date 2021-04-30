@@ -21,6 +21,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.never;
@@ -524,7 +525,7 @@ public class TestTestTasks extends MockitoTest {
 	public void testExecuteCommandLocal(final ITestContext testNGCtx) {
 		try {
 			System.setProperty(SeleniumTestsContext.RUN_MODE, "local");
-			PowerMockito.when(OSCommand.executeCommandAndWait(ArgumentMatchers.any(String[].class))).thenReturn("hello guys");
+			PowerMockito.when(OSCommand.executeCommandAndWait(ArgumentMatchers.any(String[].class), eq(-1), isNull())).thenReturn("hello guys");
 			initThreadContext(testNGCtx);
 			String response = TestTasks.executeCommand("echo", "hello");
 			Assert.assertEquals(response, "hello guys");
