@@ -32,5 +32,11 @@
 		<method>CommonSelectList(org.openqa.selenium.WebElement, com.seleniumtests.uipage.htmlelements.FrameElement)</method>
 		<justification>abstract class</justification>
 	</difference>
+	<difference>
+		<className>**/connectors/extools/Uft</className>
+		<differenceType>7004</differenceType>
+		<method>Uft(java.lang.String, java.lang.String, java.util.Map)</method>
+		<justification>not used before</justification>
+	</difference>
 
 </differences>
