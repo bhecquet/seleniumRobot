@@ -686,3 +686,28 @@ To avoid this problem:
 ### 24 Activate Dark Mode (chrome only) ###
 
 This is done through options given to chrome: `-DchromeOptions="--force-dark-mode --enable-features=WebUIDarkMode"`
+
+### 25 Execute UFT test ###
+
+Generally, we should never have to try to mix test tools, but in rare cases, an end-to-end scenario needs using several pieces of software including browser and non-web application clients.
+In this case UFT (Universal Functional Testing) may be used to automate the whole process (we probably should do this) but we d'ont always do what we should. So, in this case, SeleniumRobot can help
+
+For a test stored on ALM
+
+```
+Map<String, String> args = new HashMap<>();
+args.put("User", "toto");
+executeUftScript("http://alm-server.company.com/qcbin", "user", "password", "domain", "project", "[QualityCenter]Subject\\Tools\\Tests\\test1", args, 60);
+```
+You set a timeout to wait for UFT to complete its process. As it may be very slow, add overhead
+
+
+For a test stored locally on computer executing the test
+
+```
+Map<String, String> args = new HashMap<>();
+args.put("User", "toto");
+executeUftScript("D:\\UFT\\Tests\\Tools\\Tests\\test1", args, 60);
+```
+
+If you execute your tests wit seleniumRobot grid, the only thing to worry about is to start the web browser before executing UFT test (it will reserve a node). Else, no node will be available and it will fail.
