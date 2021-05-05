@@ -79,6 +79,15 @@ public class SeleniumGridConnector {
 	}
 	
 	/**
+	 * Upload a file given file path
+	 * @param filePath
+	 */
+	public String uploadFileToNode(String filePath, boolean returnLocalFile) {
+		logger.warn("file upload is only available with seleniumRobot grid");
+		return null;
+	}
+	
+	/**
 	 * Kill process
 	 * @param processName
 	 */
@@ -92,6 +101,16 @@ public class SeleniumGridConnector {
 	 * @param args		arguments of the program
 	 */
 	public String executeCommand(String program, String ... args) {
+		logger.warn("executeCommand is only available with seleniumRobot grid");
+		return "";
+	}
+	/**
+	 * Execute command with timeout
+	 * @param program	name of the program
+	 * @param timeout	if null, default timeout will be applied
+	 * @param args		arguments of the program
+	 */
+	public String executeCommand(String program, Integer timeout, String ... args) {
 		logger.warn("executeCommand is only available with seleniumRobot grid");
 		return "";
 	}
