@@ -138,7 +138,7 @@ public class TestUft extends MockitoTest {
 	public void testPrepareArgumentsForGrid() {
 		SeleniumTestsContextManager.getThreadContext().setSeleniumGridConnector(connector);
 		SeleniumTestsContextManager.getThreadContext().setRunMode("grid");
-		when(connector.uploadFileToNode(anyString(), eq(true))).thenReturn("D:\\file\\uft.vbs");
+		when(connector.uploadFileToNode(anyString(), eq(true))).thenReturn("D:\\file");
 		
 		Uft uft = new Uft("D:\\Subject\\Tools\\Tests\\test1", new HashMap<>());
 		List<String> args = uft.prepareArguments();

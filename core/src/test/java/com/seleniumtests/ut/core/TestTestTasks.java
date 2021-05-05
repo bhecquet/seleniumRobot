@@ -537,8 +537,24 @@ public class TestTestTasks extends MockitoTest {
 	}
 	
 	@Test(groups= {"ut"})
+	public void testExecuteCommandLocalWithTimeout(final ITestContext testNGCtx) {
+		try {
+			System.setProperty(SeleniumTestsContext.RUN_MODE, "local");
+			PowerMockito.when(OSCommand.executeCommandAndWait(ArgumentMatchers.any(String[].class), eq(35), isNull())).thenReturn("hello guys");
+			initThreadContext(testNGCtx);
+			String response = TestTasks.executeCommand("echo", 35, null, "hello");
+			Assert.assertEquals(response, "hello guys");
+			
+			
+		} finally {
+			System.clearProperty(SeleniumTestsContext.RUN_MODE);
+		}
+	}
+	
+	@Test(groups= {"ut"})
 	public void testExecuteCommandGrid(final ITestContext testNGCtx) {
 		SeleniumGridConnector gridConnector = spy(new SeleniumRobotGridConnector("http://localhost:4444/hub/wd"));
+		gridConnector.setNodeUrl("http://localhost:5555/hub/wd");
 		doReturn("hello guys").when(gridConnector).executeCommand("echo", "hello");
 		
 		// grid connector is in use only if session Id exists
@@ -554,6 +570,33 @@ public class TestTestTasks extends MockitoTest {
 			
 			SeleniumTestsContextManager.getThreadContext().getSeleniumGridConnectors();
 			String response = TestTasks.executeCommand("echo", "hello");
+			Assert.assertEquals(response, "hello guys");
+			
+		} finally {
+			System.clearProperty(SeleniumTestsContext.RUN_MODE);
+			System.clearProperty(SeleniumTestsContext.WEB_DRIVER_GRID);
+		}
+	}
+	
+	@Test(groups= {"ut"})
+	public void testExecuteCommandGridWithTimeout(final ITestContext testNGCtx) {
+		SeleniumGridConnector gridConnector = spy(new SeleniumRobotGridConnector("http://localhost:4444/hub/wd"));
+		gridConnector.setNodeUrl("http://localhost:5555/hub/wd");
+		doReturn("hello guys").when(gridConnector).executeCommand("echo", 25, "hello");
+		
+		// grid connector is in use only if session Id exists
+		doReturn(new SessionId("1234")).when(gridConnector).getSessionId();
+		
+		PowerMockito.mockStatic(SeleniumGridConnectorFactory.class);
+		PowerMockito.when(SeleniumGridConnectorFactory.getInstances(Arrays.asList("http://localhost:4444/hub/wd"))).thenReturn(Arrays.asList(gridConnector));
+		
+		try {
+			System.setProperty(SeleniumTestsContext.RUN_MODE, "grid");
+			System.setProperty(SeleniumTestsContext.WEB_DRIVER_GRID, "http://localhost:4444/hub/wd");
+			initThreadContext(testNGCtx);
+			
+			SeleniumTestsContextManager.getThreadContext().getSeleniumGridConnectors();
+			String response = TestTasks.executeCommand("echo", 25, null, "hello");
 			Assert.assertEquals(response, "hello guys");
 			
 		} finally {
