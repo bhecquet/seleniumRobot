@@ -433,7 +433,7 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 			HttpRequestWithBody req = unirest.post(String.format("%s%s", nodeUrl, NODE_TASK_SERVLET))
 				.queryString(ACTION_FIELD, "command")
 				.queryString("name", program)
-				.queryString("session", sessionId.toString());
+				.queryString("session", getSessionId().toString());
 			
 			int i = 0;
 			for (String arg: args) {

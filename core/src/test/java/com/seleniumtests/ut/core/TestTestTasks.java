@@ -555,7 +555,7 @@ public class TestTestTasks extends MockitoTest {
 	public void testExecuteCommandGrid(final ITestContext testNGCtx) {
 		SeleniumGridConnector gridConnector = spy(new SeleniumRobotGridConnector("http://localhost:4444/hub/wd"));
 		gridConnector.setNodeUrl("http://localhost:5555/hub/wd");
-		doReturn("hello guys").when(gridConnector).executeCommand("echo", "hello");
+		doReturn("hello guys").when(gridConnector).executeCommand("echo", -1, "hello");
 		
 		// grid connector is in use only if session Id exists
 		doReturn(new SessionId("1234")).when(gridConnector).getSessionId();
