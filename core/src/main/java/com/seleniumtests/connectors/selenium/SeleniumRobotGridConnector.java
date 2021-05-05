@@ -53,12 +53,14 @@ import kong.unirest.HttpResponse;
 import kong.unirest.JsonNode;
 import kong.unirest.Unirest;
 import kong.unirest.UnirestException;
+import kong.unirest.UnirestInstance;
 import kong.unirest.json.JSONObject;
 
 public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 
 	private static final String ACTION_FIELD = "action";
 	public static final String NODE_TASK_SERVLET = "/extra/NodeTaskServlet";
+	public static final String FILE_SERVLET = "/extra/FileServlet";
 	public static final String STATUS_SERVLET = "/grid/admin/StatusServlet";
 	public static final String GUI_SERVLET = "/grid/admin/GuiServlet/";
 	
@@ -110,6 +112,52 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 	}
 	
 	/**
+	 * Upload file to node
+	 * @param filePath			the file to upload
+	 * @param returnLocalFile	if true, returned path will be the local path on grid node. If false, we get file://upload/file/<uuid>/
+	 * @return
+	 */
+	@Override
+	public String uploadFileToNode(String filePath, boolean returnLocalFile) {
+		
+		if (nodeUrl == null) {
+			throw new ScenarioException("You cannot upload file to browser before driver has been created and corresponding node instanciated");
+		}
+		
+		// zip file
+		File zipFile = null;
+		try {
+			List<File> appFiles = new ArrayList<>();
+			appFiles.add(new File(filePath));
+			zipFile = FileUtility.createZipArchiveFromFiles(appFiles);
+		} catch (IOException e1) {
+			throw new SeleniumGridException("Error in uploading file, when zipping: " + e1.getMessage());
+		}
+
+		logger.info("uploading file to node: " + zipFile.getName());
+		try {
+			HttpRequestWithBody req = Unirest.post(String.format("%s%s", nodeUrl, FILE_SERVLET))
+					.header(HttpHeaders.CONTENT_TYPE, MediaType.OCTET_STREAM.toString())
+					.queryString("output", "file");
+			if (returnLocalFile) {
+				req = req.queryString("localPath", "true");
+			}
+		
+			HttpResponse<String> response = req.field("upload", zipFile)
+					.asString();
+			
+			if (response.getStatus() != 200) {
+				throw new SeleniumGridException(String.format("Error uploading file: %s", response.getBody()));
+			} else {
+				return response.getBody();
+			}
+		} catch (UnirestException e) {
+			throw new SeleniumGridException(String.format("Cannot upload file: %s", e.getMessage()));
+		}
+
+	}
+	
+	/**
 	 * Upload a file given file path
 	 * @param filePath
 	 */
@@ -120,7 +168,7 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 			List<File> appFiles = new ArrayList<>();
 			appFiles.add(new File(filePath));
 			File zipFile = FileUtility.createZipArchiveFromFiles(appFiles);
-			
+
 			HttpHost serverHost = new HttpHost(hubUrl.getHost(), hubUrl.getPort());
 			URIBuilder builder = new URIBuilder();
         	builder.setPath("/grid/admin/FileServlet/");
@@ -362,20 +410,41 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 	 */
 	@Override
 	public String executeCommand(String program, String ... args) {
+		return executeCommand(program, null, args);
+	}
+	
+	/**
+	 * Execute command with timeout
+	 * @param program	name of the program
+	 * @param timeout	if null, default timeout will be applied
+	 * @param args		arguments of the program
+	 */
+	@Override
+	public String executeCommand(String program, Integer timeout, String ... args) {
 		if (nodeUrl == null) {
 			throw new ScenarioException("You cannot execute a remote process before driver has been created and corresponding node instanciated");
 		}
 		
 		logger.info("execute program: " + program);
-		try {
-			HttpRequestWithBody req = Unirest.post(String.format("%s%s", nodeUrl, NODE_TASK_SERVLET))
+		try (UnirestInstance unirest = Unirest.spawnInstance()
+				
+				) {
+			
+			HttpRequestWithBody req = unirest.post(String.format("%s%s", nodeUrl, NODE_TASK_SERVLET))
 				.queryString(ACTION_FIELD, "command")
-				.queryString("name", program);
+				.queryString("name", program)
+				.queryString("session", sessionId.toString());
 			
 			int i = 0;
 			for (String arg: args) {
 				req = req.queryString("arg" + i, arg);
+				i++;
 			}
+			if (timeout != null) {
+				unirest.config().socketTimeout((timeout + 5 ) * 1000);
+				req = req.queryString("timeout", timeout);
+			}
+			
 			HttpResponse<String> response = req.asString();
 			return response.getBody();
 		} catch (UnirestException e) {
@@ -427,7 +496,8 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 		try {
 			HttpResponse<String> response = Unirest.get(String.format("%s%s", nodeUrl, NODE_TASK_SERVLET))
 				.queryString(ACTION_FIELD, "startVideoCapture")
-				.queryString("session", sessionId).asString();
+				.queryString("session", sessionId)
+				.asString();
 			
 			if (response.getStatus() != 200) {
 				logger.error(String.format("start video capture error: %s", response.getBody()));
@@ -452,7 +522,8 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 				
 			HttpResponse<File> videoResponse = Unirest.get(String.format("%s%s", nodeUrl, NODE_TASK_SERVLET))
 				.queryString(ACTION_FIELD, "stopVideoCapture")
-				.queryString("session", sessionId).asFile(outputFile);
+				.queryString("session", sessionId)
+				.asFile(outputFile);
 			
 			if (videoResponse.getStatus() != 200) {
 				logger.error(String.format("stop video capture error: %s", videoResponse.getBody()));
