@@ -5,12 +5,15 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.input.BOMInputStream;
 import org.apache.commons.lang3.StringUtils;
 import org.jdom2.DataConversionException;
@@ -21,7 +24,11 @@ import org.jdom2.input.SAXBuilder;
 import org.testng.Reporter;
 import org.xml.sax.InputSource;
 
+import com.seleniumtests.connectors.selenium.SeleniumGridConnector;
+import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.core.TestTasks;
+import com.seleniumtests.customexception.ScenarioException;
+import com.seleniumtests.driver.DriverMode;
 import com.seleniumtests.reporter.logger.TestAction;
 import com.seleniumtests.reporter.logger.TestMessage;
 import com.seleniumtests.reporter.logger.TestMessage.MessageType;
@@ -31,87 +38,6 @@ import com.seleniumtests.util.logging.ScenarioLogger;
 /**
  * Connector for executing UFT tests either locally or remotely on selenium grid
  * 
- * To allow this feature, you would use such VBS script (uft.vbs) that should be present somewhere on your computer (or on grid node)
- * 
- * 
-Dim fso,fso1
-
-resultFolder = "D:\\uft\\output"
-
-Set fso=createobject("Scripting.FileSystemObject")
-If fso.FolderExists(resultFolder) Then
-	fso.DeleteFolder resultFolder,True
-End If
-
-
-'---------------------------------------------------------------------------------'
-
-Test_path = Wscript.Arguments(0)
-Set qtApp = CreateObject("QuickTest.Application") ' Create the Application object
-qtApp.Launch ' Start QuickTest
-qtApp.Visible = True ' Make the QuickTest application visible
-
-'' Set QuickTest run options
-qtApp.Options.Run.RunMode = "Normal"
-qtApp.Options.Run.ViewResults = False
-
-'connection à QC
-If qtApp.TDConnection.IsConnected Then
-	qtApp.TDConnection.disconnect
-End If
-qtApp.TDConnection.Connect "<server>:8080/qcbin","<domain>","<project>","<user>","<password>",False
-
-qtApp.Open Test_path, False ' Open the test in read-only mode
-
-Set pDefColl = qtApp.Test.ParameterDefinitions
-Set rtParams = pDefColl.GetParameters()
-Dim keyValue
-
-For Each strArg in Wscript.Arguments
-	WScript.Echo strArg
-	keyValue = Split(strArg, "=")
-	
-	cnt = pDefColl.Count
-	Indx = 1
-	While Indx <= cnt
-		Set pDef = pDefColl.Item(Indx)
-		Indx = Indx + 1
-		If StrComp(pDef.Name, keyValue(0)) = 0 Then
-			Set rtParam2 = rtParams.Item(keyValue(0))
-			WScript.Echo keyValue(1)
-			rtParam2.Value = keyValue(1)
-		End If
-		
-	Wend
-	
-Next
-
-Dim qtResultsOpt 'As QuickTest.RunResultsOptions ' Declare a Run Results Options object variable
-
-Set qtResultsOpt = CreateObject("QuickTest.RunResultsOptions") ' Create the Run Results Options object
-qtResultsOpt.ResultsLocation = resultFolder ' Set the results location
-
-' set run settings for the test
-Set qtTest = qtApp.Test
-qtTest.Run qtResultsOpt, true, rtParams 	' Run the test
-
-WScript.Echo resultFolder + "\Report\Results.xml"
-Set file = fso.OpenTextFile(resultFolder + "\Report\Results.xml", 1)
-content = file.ReadAll
-WScript.Echo "_____OUTPUT_____"
-WScript.Echo content
-WScript.Echo "_____ENDOUTPUT_____"
-
-
-qtTest.Close			' Close the test
-qtApp.quit
-Set qtTest = Nothing		' Release the Test object
-Set qtApp = Nothing 		' Release the Application object 
-Set qtResultsOpt = Nothing
-
-wscript.quit 0
-
-
  * 
  * @author S047432
  *
@@ -121,10 +47,15 @@ public class Uft {
 	private static final ScenarioLogger logger = ScenarioLogger.getScenarioLogger(Uft.class); 
 	private static final String START_LOGS = "_____OUTPUT_____";
 	private static final String END_LOGS = "_____ENDOUTPUT_____";
+	private static final String SCRIPT_NAME = "uft.vbs";
 
+	private String almServer;
+	private String almUser;
+	private String almPassword;
+	private String almDomain;
+	private String almProject;
 	private String scriptPath;
 	private String scriptName;
-	private String vbsPath;
 	Map<String, String> parameters;
 	
 	/**
@@ -132,30 +63,82 @@ public class Uft {
 	 * @param scriptPath	path to the script, either local or from ALM. If test is from ALM, prefix it with '[QualityCenter]'. e.g: '[QualityCenter]Subject\TOOLS\TestsFoo\foo'
 	 * @param parameters	parameters to pass to the script
 	 */
-	public Uft(String vbsPath, String scriptPath, Map<String, String> parameters) {
-		this.vbsPath = vbsPath;
+	public Uft(String scriptPath, Map<String, String> parameters) {
 		this.scriptPath = scriptPath;
 		this.scriptName = new File(scriptPath).getName();
 		this.parameters = parameters;
 	}
 	
+	public Uft(String almServer, String almUser, String almPassword, String almDomain, String almProject, String scriptPath, Map<String, String> parameters) {
+		this.scriptPath = scriptPath;
+		this.scriptName = new File(scriptPath).getName();
+		this.parameters = parameters;
+		this.almServer = almServer;
+		this.almUser = almUser;
+		this.almPassword = almPassword;
+		this.almDomain = almDomain;
+		this.almProject = almProject;
+	}
+	
 	/**
-	 * Executes an UFT script
+	 * Executes an UFT script with 2 mins of timeout
 	 * @return	the generated test step
 	 */
 	public TestStep executeScript() {
+		return executeScript(120);
+	}
+	
+	/**
+	 * Executes an UFT script with timeout
+	 * @param timeout 	timeout in seconds for UFT execution
+	 * @return	the generated test step
+	 */
+	public TestStep executeScript(int timeout) {
+		
+		TestStep testStep = new TestStep(String.format("UFT: %s", scriptName), Reporter.getCurrentTestResult(), new ArrayList<>(), false);
+		
+		Date startDate = new Date();
+		String output = TestTasks.executeCommand("cscript.exe", timeout, null, prepareArguments().toArray(new String[] {}));
+		
+		testStep.setDuration(new Date().getTime() - startDate.getTime());
+		return analyseOutput(output, testStep);
+	}
+	
+	public List<String> prepareArguments() {
+		// copy uft.vbs to disk
+		String vbsPath;
+		try {
+			File tempFile = Files.createTempDirectory("uft").resolve(SCRIPT_NAME).toFile();
+			tempFile.deleteOnExit();
+			FileUtils.copyInputStreamToFile(Thread.currentThread().getContextClassLoader().getResourceAsStream("uft/" + SCRIPT_NAME), tempFile);
+			vbsPath = tempFile.getAbsolutePath();
+		} catch (IOException e) {
+			throw new ScenarioException("Error sending UFT script to grid node: " + e.getMessage());
+		}
+		
+		if (SeleniumTestsContextManager.getThreadContext().getRunMode() == DriverMode.GRID) {
+			SeleniumGridConnector gridConnector = SeleniumTestsContextManager.getThreadContext().getSeleniumGridConnector();
+    		if (gridConnector != null) {
+    			vbsPath = Paths.get(gridConnector.uploadFileToNode(vbsPath, true), SCRIPT_NAME).toString();
+    		} else {
+    			throw new ScenarioException("No grid connector present, executing UFT script needs a browser to be initialized");
+    		}
+		} 
+		
 		List<String> args = new ArrayList<>();
 		args.add(vbsPath);
 		args.add(scriptPath);
 		parameters.forEach((key, value) -> args.add(String.format("\"%s=%s\"", key, value)));
 		
-		TestStep testStep = new TestStep(String.format("UFT: %s", scriptName), Reporter.getCurrentTestResult(), new ArrayList<String>(), false);
+		if (almServer != null && almUser != null && almPassword != null && almDomain != null && almProject != null) {
+			args.add("/server:" + almServer);
+			args.add("/user:" + almUser);
+			args.add("/password:" + almPassword);
+			args.add("/domain:" + almDomain);
+			args.add("/project:" + almProject);
+		}
 		
-		Date startDate = new Date();
-		String output = TestTasks.executeCommand("cscript.exe", 60, null, args.toArray(new String[] {}));
-		
-		testStep.setDuration(new Date().getTime() - startDate.getTime());
-		return analyseOutput(output, testStep);
+		return args;
 	}
 	
 	/**
