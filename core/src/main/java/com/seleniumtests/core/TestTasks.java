@@ -136,7 +136,7 @@ public class TestTasks {
     	} else if (SeleniumTestsContextManager.getThreadContext().getRunMode() == DriverMode.GRID) {
     		SeleniumGridConnector gridConnector = SeleniumTestsContextManager.getThreadContext().getSeleniumGridConnector();
     		if (gridConnector != null) {
-    			return gridConnector.executeCommand(program, args);
+    			return gridConnector.executeCommand(program, timeout, args);
     		} else {
     			throw new ScenarioException(ERROR_NO_GRID_CONNECTOR_ACTIVE);
     		}

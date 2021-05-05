@@ -913,9 +913,11 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 		HttpRequestWithBody req = (HttpRequestWithBody)createServerMock("POST", SeleniumRobotGridConnector.NODE_TASK_SERVLET, 200, "foo");	
 		
 		SeleniumGridConnector connector = new SeleniumRobotGridConnector("http://localhost:4444/wd/hub");
+		connector.setSessionId(new SessionId("1234"));
 		connector.setNodeUrl("http://localhost:4321");
-		Assert.assertEquals(connector.executeCommand("myProcess", "arg1"), "foo");
+		Assert.assertEquals(connector.executeCommand("myProcess", "arg1", "arg2"), "foo");
 		verify(req).queryString("arg0", "arg1");
+		verify(req).queryString("arg1", "arg2");
 		verify(req).queryString("name", "myProcess");
 		verify(req).queryString("action", "command");
 	}
