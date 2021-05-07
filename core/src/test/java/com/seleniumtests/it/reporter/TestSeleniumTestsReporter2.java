@@ -1048,6 +1048,14 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 		Assert.assertTrue(detailedReportContent1.contains("</button> failAction"));
 		Assert.assertFalse(detailedReportContent1.contains("</button> add with args: (1, )"));
 		Assert.assertTrue(detailedReportContent1.contains("</button> Test end"));
+
+		// check "openPage" prints the page name
+		String detailedReportContent4 = readTestMethodResultFile("testOk");
+		Assert.assertTrue(detailedReportContent4.contains("</button> openPage with args: (null, )"));
+		Assert.assertTrue(detailedReportContent4.contains("<div class=\"box-body\"><ul><li>Opening page CalcPage</li>"));
+		Assert.assertTrue(detailedReportContent4.contains("</button> failAction"));
+		Assert.assertTrue(detailedReportContent4.contains("</button> add with args: (1, 1)"));
+		Assert.assertTrue(detailedReportContent4.contains("</button> Test end"));
 		
 	}
 	

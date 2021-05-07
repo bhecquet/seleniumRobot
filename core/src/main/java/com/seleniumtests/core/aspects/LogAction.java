@@ -472,6 +472,11 @@ public class LogAction {
 		// step name will contain method arguments only if it's not a configuration method (as they are generic)
 		TestStep currentStep = buildRootStep(joinPoint, stepNamePrefix, !configStep);
 		
+		if ("openPage".equals(joinPoint.getSignature().getName()) && joinPoint.getTarget() instanceof PageObject) {
+			PageObject page = (PageObject)joinPoint.getTarget();
+			currentStep.addAction(new TestAction(String.format("Opening page %s",  page.getClass().getSimpleName()), false, new ArrayList<>()));
+		}
+		
 		BrowserMobProxy mobProxy = WebUIDriver.getBrowserMobProxy();
 		NLWebDriver neoloadDriver = WebUIDriver.getNeoloadDriver();
 		
