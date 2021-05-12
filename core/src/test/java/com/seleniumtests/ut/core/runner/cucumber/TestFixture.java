@@ -12,7 +12,6 @@ import com.seleniumtests.core.TestVariable;
 import com.seleniumtests.core.runner.cucumber.Fixture;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.ScenarioException;
-import com.seleniumtests.it.driver.support.pages.DriverTestPage;
 import com.seleniumtests.uipage.htmlelements.TextFieldElement;
 
 public class TestFixture extends GenericTest {

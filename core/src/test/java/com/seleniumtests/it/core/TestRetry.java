@@ -168,11 +168,12 @@ public class TestRetry extends ReporterTest {
 		String mainReportContent = FileUtils.readFileToString(new File(new File(SeleniumTestsContextManager.getGlobalContext().getOutputDirectory()).getAbsolutePath() + File.separator + "SeleniumTestReport.html"));
 		mainReportContent = mainReportContent.replace("\n", "").replace("\r",  "");
 		Assert.assertTrue(mainReportContent.matches(".*<a href\\='error_scenario/TestReport\\.html'.*?>error_scenario</a>.*"));
+		Assert.assertFalse(mainReportContent.matches(".*<a href\\='error_scenario/TestReport\\.html'.*?>error_scenario-1</a>.*")); // check all executions are put in the same test
 		
 		// check failed test is not retried (AssertionError) based on log. No more direct way found
 		String detailedReportContent = readTestMethodResultFile("error_scenario");
 		Assert.assertTrue(detailedReportContent.contains("Failed in 3 times"));
-		Assert.assertTrue(detailedReportContent.contains("[RETRYING] class com.seleniumtests.core.runner.CucumberTestPlan.feature"));
+		Assert.assertTrue(detailedReportContent.contains("[RETRYING] class com.seleniumtests.core.runner.CucumberTestPlan.runScenario"));
 
 		// check that in case of retry, steps are not logged twice and step name is the cucumber step name (defined by annotation
 		Assert.assertTrue(detailedReportContent.contains("write_error"));

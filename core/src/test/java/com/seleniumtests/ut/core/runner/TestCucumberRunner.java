@@ -17,6 +17,8 @@
  */
 package com.seleniumtests.ut.core.runner;
 
+import java.net.URISyntaxException;
+
 import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.annotations.BeforeMethod;
@@ -24,6 +26,8 @@ import org.testng.annotations.Test;
 
 import com.seleniumtests.GenericTest;
 import com.seleniumtests.core.runner.CustomTestNGCucumberRunner;
+
+import io.cucumber.testng.TestNGCucumberRunner;
 
 public class TestCucumberRunner extends GenericTest {
 	
@@ -33,48 +37,58 @@ public class TestCucumberRunner extends GenericTest {
 	}
 
 	@Test(groups={"ut"})
-	public void testSingle(ITestContext testNGCtx) {
+	public void testSingle(ITestContext testNGCtx) throws URISyntaxException {
 		try {
 			System.setProperty("cucumberTags", "@new");
 			initThreadContext(testNGCtx);
 			CustomTestNGCucumberRunner runner = new CustomTestNGCucumberRunner(this.getClass());
-			Assert.assertEquals(runner.provideScenarios().length, 1);
+			Object[][] scenarios = runner.provideScenarios();
+			Assert.assertEquals(scenarios.length, 1);
+			Assert.assertEquals(scenarios[0][0].toString(), "core_3");
 		} finally {
 			System.clearProperty("cucumberTags");
 		}
 	}
 	
 	@Test(groups={"ut"})
-	public void testAnd(ITestContext testNGCtx) {
+	public void testAnd(ITestContext testNGCtx) throws URISyntaxException {
 		try {
 			System.setProperty("cucumberTags", "@new4 AND @new5");
 			initThreadContext(testNGCtx);
 			CustomTestNGCucumberRunner runner = new CustomTestNGCucumberRunner(this.getClass());
-			Assert.assertEquals(runner.provideScenarios().length, 1);
+			Object[][] scenarios = runner.provideScenarios();
+			Assert.assertEquals(scenarios.length, 1);
+			Assert.assertEquals(scenarios[0][0].toString(), "core_6");
 		} finally {
 			System.clearProperty("cucumberTags");
 		}
 	}
 	
 	@Test(groups={"ut"})
-	public void testOr(ITestContext testNGCtx) {
+	public void testOr(ITestContext testNGCtx) throws URISyntaxException {
 		try {
 			System.setProperty("cucumberTags", "@new,@new2");
 			initThreadContext(testNGCtx);
 			CustomTestNGCucumberRunner runner = new CustomTestNGCucumberRunner(this.getClass());
-			Assert.assertEquals(runner.provideScenarios().length, 2);
+			Object[][] scenarios = runner.provideScenarios();
+			Assert.assertEquals(scenarios.length, 2);
+			Assert.assertEquals(scenarios[0][0].toString(), "core_3");
+			Assert.assertEquals(scenarios[1][0].toString(), "core_4");
 		} finally {
 			System.clearProperty("cucumberTags");
 		}
 	}
 	
 	@Test(groups={"ut"})
-	public void testAndOr(ITestContext testNGCtx) {
+	public void testAndOr(ITestContext testNGCtx) throws URISyntaxException {
 		try {
-			System.setProperty("cucumberTags", "@core AND @new2,@new");
+			System.setProperty("cucumberTags", "@core AND (@new2 or @new)");
 			initThreadContext(testNGCtx);
 			CustomTestNGCucumberRunner runner = new CustomTestNGCucumberRunner(this.getClass());
-			Assert.assertEquals(runner.provideScenarios().length, 2);
+			Object[][] scenarios = runner.provideScenarios();
+			Assert.assertEquals(scenarios.length, 2);
+			Assert.assertEquals(scenarios[0][0].toString(), "core_3");
+			Assert.assertEquals(scenarios[1][0].toString(), "core_4");
 		} finally {
 			System.clearProperty("cucumberTags");
 		}
@@ -85,12 +99,15 @@ public class TestCucumberRunner extends GenericTest {
 	 * @param testNGCtx
 	 */
 	@Test(groups={"ut"})
-	public void testScenarioOutlineMatching(ITestContext testNGCtx) {
+	public void testScenarioOutlineMatching(ITestContext testNGCtx) throws URISyntaxException {
 		try {
 			System.setProperty("cucumberTests", "core_ .*");
 			initThreadContext(testNGCtx);
 			CustomTestNGCucumberRunner runner = new CustomTestNGCucumberRunner(this.getClass());
-			Assert.assertEquals(runner.provideScenarios().length, 2);
+			Object[][] scenarios = runner.provideScenarios();
+			Assert.assertEquals(scenarios.length, 2);
+			Assert.assertEquals(scenarios[0][0].toString(), "core_ tata");
+			Assert.assertEquals(scenarios[1][0].toString(), "core_ titi");
 		} finally {
 			System.clearProperty("cucumberTests");
 		}
@@ -100,12 +117,15 @@ public class TestCucumberRunner extends GenericTest {
 	 * @param testNGCtx
 	 */
 	@Test(groups={"ut"})
-	public void testScenarioExactText(ITestContext testNGCtx) {
+	public void testScenarioExactText(ITestContext testNGCtx) throws URISyntaxException {
 		try {
 			System.setProperty("cucumberTests", "core_3,core_4");
 			initThreadContext(testNGCtx);
 			CustomTestNGCucumberRunner runner = new CustomTestNGCucumberRunner(this.getClass());
-			Assert.assertEquals(runner.provideScenarios().length, 2);
+			Object[][] scenarios = runner.provideScenarios();
+			Assert.assertEquals(scenarios.length, 2);
+			Assert.assertEquals(scenarios[0][0].toString(), "core_3");
+			Assert.assertEquals(scenarios[1][0].toString(), "core_4");
 		} finally {
 			System.clearProperty("cucumberTests");
 		}
@@ -116,12 +136,31 @@ public class TestCucumberRunner extends GenericTest {
 	 * @param testNGCtx
 	 */
 	@Test(groups={"ut"})
-	public void testFeatureMatching(ITestContext testNGCtx) {
+	public void testFeatureNameMatching(ITestContext testNGCtx) throws URISyntaxException {
 		try {
 			System.setProperty("cucumberTests", "Co.*");
 			initThreadContext(testNGCtx);
 			CustomTestNGCucumberRunner runner = new CustomTestNGCucumberRunner(this.getClass());
-			Assert.assertEquals(runner.provideScenarios().length, 12);
+			Object[][] scenarios = runner.provideScenarios();
+			Assert.assertEquals(scenarios.length, 12);
+		} finally {
+			System.clearProperty("cucumberTests");
+		}
+	}
+	/**
+	 * Check that we can get tests from feature file name matching
+	 * @param testNGCtx
+	 */
+	@Test(groups={"ut"})
+	public void testFeatureFileNameMatching(ITestContext testNGCtx) throws URISyntaxException {
+		try {
+			System.setProperty("cucumberTests", "GenericSteps");
+			initThreadContext(testNGCtx);
+			CustomTestNGCucumberRunner runner = new CustomTestNGCucumberRunner(this.getClass());
+			Object[][] scenarios = runner.provideScenarios();
+			Assert.assertEquals(scenarios.length, 2);
+			Assert.assertEquals(scenarios[0][0].toString(), "scenario1");
+			Assert.assertEquals(scenarios[1][0].toString(), "scenario2");
 		} finally {
 			System.clearProperty("cucumberTests");
 		}
