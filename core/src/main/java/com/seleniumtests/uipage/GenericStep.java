@@ -23,7 +23,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
 /**
- * This annotation is used in LogAction.java so that PageObject methods that are identified be this annotation are logged.
+ * This annotation is used in LogAction.java so that PageObject methods that are identified by this annotation are logged.
  * Without this annotation, PageObject methods are not logged as steps, only as actions.
  * @author behe
  *

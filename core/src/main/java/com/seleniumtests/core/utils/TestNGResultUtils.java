@@ -116,7 +116,7 @@ public class TestNGResultUtils {
 			return null;
 		}
 		
-    	if (testNGResult.getParameters().length == 1 
+    	if (testNGResult.getParameters().length > 0 
     			&& testNGResult.getParameters()[0] instanceof CucumberScenarioWrapper 
 //    			&& "com.seleniumtests.core.runner.CucumberTestPlan".equals(testNGResult.getMethod().getTestClass().getName()) // prevents from doing unit tests
     			) {

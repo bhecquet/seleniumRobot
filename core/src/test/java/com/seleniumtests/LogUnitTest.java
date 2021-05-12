@@ -36,7 +36,9 @@ public class LogUnitTest {
 		logger.info("executing " + joinPoint.getSignature()); 
 	}
 	
-	@After("execution(@org.testng.annotations.Test public * com.seleniumtests..* (..)) && !execution(@org.testng.annotations.Test public * com.seleniumtests.it.stubclasses..* (..))")
+	@After("execution(@org.testng.annotations.Test public * com.seleniumtests..* (..)) "
+			+ "&& !execution(@org.testng.annotations.Test public * com.seleniumtests.it.stubclasses..* (..))"
+			+ "&& !execution(@org.testng.annotations.Test public * com.seleniumtests.core.runner..* (..))")
 	public void checkTestEnd(JoinPoint joinPoint)  { 
 		
 		// handle case where thread context is not defined (we get a ConfigurationException)
