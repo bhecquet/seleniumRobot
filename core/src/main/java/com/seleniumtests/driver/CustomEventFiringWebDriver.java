@@ -443,7 +443,7 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
     		"" + 
     		JS_PIXEL_RATIO +
     		"var headers;" + 
-    		"var nodes = document.querySelectorAll(\"div,header\");" + 
+    		"var nodes = document.querySelectorAll(\"div,header,ul\");" + 
     		"if (nodes && nodes.length > 0) {" + 
     		"  var length = nodes.length;" + 
     		"  headers = new Array();" + 
@@ -487,7 +487,7 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
     		JS_PIXEL_RATIO +
     		"" + 
     		"var footers;" + 
-    		"var nodes = document.querySelectorAll(\"div,footer\");" + 
+    		"var nodes = document.querySelectorAll(\"div,footer,ul\");" + 
     		"if (nodes && nodes.length > 0) {" + 
     		"  var length = nodes.length;" + 
     		"  footers = new Array();" + 
