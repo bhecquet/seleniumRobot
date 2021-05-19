@@ -110,33 +110,39 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
 	private final SeleniumGridConnector gridConnector;
 	private final Integer attachExistingDriverPort;
 	private MutableCapabilities internalCapabilities = new MutableCapabilities();
+	
+	private static final String JS_PIXEL_RATIO = "var pixelRatio;" +
+			"try{pixelRatio = devicePixelRatio} catch(err){pixelRatio=1}";
     
-    private static final String JS_GET_VIEWPORT_SIZE = String.format(
-    		"var pixelRatio;" +
-    	    "try{pixelRatio = devicePixelRatio} catch(err){pixelRatio=1}" +
-            "var height = %d;"
-                + "var width = %d;"
-                + "if (window.innerHeight) {"
-                + "    height = Math.min(window.innerHeight, height);"
-                + "}"
-                + "if (document.documentElement && document.documentElement.clientHeight) {"
-                + "    height = Math.min(document.documentElement.clientHeight, height);"
-                + "}"
-                + "var b = document.getElementsByTagName('html')[0]; "
-                + "if (b.clientHeight) {"
-                + "    height = Math.min(b.clientHeight, height);"
-                + "}"
-                + "if (window.innerWidth) {"
-                + "   width = Math.min(window.innerWidth, width);"
-                + "} "
-                + "if (document.documentElement && document.documentElement.clientWidth) {"
-                + "   width = Math.min(document.documentElement.clientWidth, width);"
-                + "} "
-                + "var b = document.getElementsByTagName('html')[0]; "
-                + "if (b.clientWidth) {"
-                + "   width = Math.min(b.clientWidth, width);"
-                + "}"
-                + "return [width * pixelRatio, height * pixelRatio];", MAX_DIMENSION, MAX_DIMENSION);
+    private static final String JS_GET_VIEWPORT_SIZE_WIDTH = String.format(
+    		JS_PIXEL_RATIO
+    				+ "var width = %d;"
+    				+ "if (window.innerWidth) {"
+    				+ "   width = Math.min(window.innerWidth, width);"
+    				+ "} "
+    				+ "if (document.documentElement && document.documentElement.clientWidth) {"
+    				+ "   width = Math.min(document.documentElement.clientWidth, width);"
+    				+ "} "
+    				+ "var b = document.getElementsByTagName('html')[0]; "
+    				+ "if (b.clientWidth) {"
+    				+ "   width = Math.min(b.clientWidth, width);"
+    				+ "}"
+    				+ "return width * pixelRatio;", MAX_DIMENSION);
+    
+    private static final String JS_GET_VIEWPORT_SIZE_HEIGHT = String.format(
+    				JS_PIXEL_RATIO
+    				+ "var height = %d;"
+    				+ "if (window.innerHeight) {"
+    				+ "    height = Math.min(window.innerHeight, height);"
+    				+ "}"
+    				+ "if (document.documentElement && document.documentElement.clientHeight) {"
+    				+ "    height = Math.min(document.documentElement.clientHeight, height);"
+    				+ "}"
+    				+ "var b = document.getElementsByTagName('html')[0]; "
+    				+ "if (b.clientHeight) {"
+    				+ "    height = Math.min(b.clientHeight, height);"
+    				+ "}"
+    				+ "return height * pixelRatio;", MAX_DIMENSION);
 
     private static final String JS_GET_CURRENT_SCROLL_POSITION =
             "var doc = document.documentElement; "
@@ -151,8 +157,7 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
     // smaller (!) than the clientHeight, which is why we take the
     // maximum between them.
     private static final String JS_GET_CONTENT_ENTIRE_SIZE =
-            "var pixelRatio;" +
-    		"try{pixelRatio = devicePixelRatio} catch(err){pixelRatio=1}" +
+    		JS_PIXEL_RATIO +
     		"var scrollWidth = document.documentElement.scrollWidth; " +
             "var bodyScrollWidth = document.body.scrollWidth; " +
             "var totalWidth = Math.max(scrollWidth, bodyScrollWidth); " +
@@ -429,10 +434,14 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
     		"}";
     
     // returns the top pixel from which fixed positioned headers are not present
-    private static final String JS_GET_TOP_HEADER = JS_GET_ELEMENT_STYLE +
+    private static final String JS_GET_TOP_HEADER = 
+    		"function getViewportWidth() {" + JS_GET_VIEWPORT_SIZE_WIDTH + "}" +
+    		"" +
+    		JS_GET_ELEMENT_STYLE +
     		"" + 
     		JS_IS_ELEMENT_VISIBLE + 
     		"" + 
+    		JS_PIXEL_RATIO +
     		"var headers;" + 
     		"var nodes = document.querySelectorAll(\"div,header\");" + 
     		"if (nodes && nodes.length > 0) {" + 
@@ -444,10 +453,11 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
     		"}" + 
     		"" + 
     		"var topPixel = 0;" + 
+    		"var viewportWidth = getViewportWidth();" +
     		"" + 
     		"if (headers && headers.length > 0) {" + 
     		"  headers = headers.filter(function(e) {" + 
-    		"    return getComputedStyle(e)[\"position\"] === \"fixed\" && isVisible(e);" + 
+    		"    return getComputedStyle(e)[\"position\"] === \"fixed\" && isVisible(e) && e.clientWidth > viewportWidth / 2;" + 
     		"  });" + 
     		"  headers = headers.sort(function(a, b) {" + 
     		"    if (a == null || a.offsetTop == null) return 1;" + 
@@ -465,11 +475,16 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
     		"  }" + 
     		"}" + 
     		"" + 
-    		"return topPixel;";
+    		"return Math.round(topPixel * pixelRatio);";
     
-    private static final String JS_GET_BOTTOM_FOOTER = JS_GET_ELEMENT_STYLE +
+    private static final String JS_GET_BOTTOM_FOOTER = 
+    		"function getViewportWidth() {" + JS_GET_VIEWPORT_SIZE_WIDTH + "}" +
+    		"" +
+    		JS_GET_ELEMENT_STYLE +
     		"" + 
-    		JS_IS_ELEMENT_VISIBLE + 
+    		JS_IS_ELEMENT_VISIBLE +
+    		"" + 
+    		JS_PIXEL_RATIO +
     		"" + 
     		"var footers;" + 
     		"var nodes = document.querySelectorAll(\"div,footer\");" + 
@@ -482,10 +497,11 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
     		"}" + 
     		"" + 
     		"var bottomPixel = document.documentElement.clientHeight;" + // count from bottom
+    		"var viewportWidth = getViewportWidth();" +
     		"" + 
     		"if (footers && footers.length > 0) {" + 
     		"  footers = footers.filter(function(e) {" + 
-    		"    return getComputedStyle(e)[\"position\"] === \"fixed\" && isVisible(e);" + 
+    		"    return getComputedStyle(e)[\"position\"] === \"fixed\" && isVisible(e) && e.clientWidth > viewportWidth / 2;" + 
     		"  });" + 
     		"  footers = footers.sort(function(a, b) {" + 
     		"    if (a == null || a.offsetBottom == null) return -1;" + 
@@ -503,7 +519,7 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
     		"  }" + 
     		"}" + 
     		"" + 
-    		"return document.documentElement.clientHeight - bottomPixel;";
+    		"return Math.round(document.documentElement.clientHeight * pixelRatio - bottomPixel * pixelRatio);";
     		
     
     public static final String NON_JS_UPLOAD_FILE_THROUGH_POPUP = 
@@ -714,6 +730,48 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
 		return currentHandles;
 	}
     
+	public int getViewPortWidthWithoutScrollbar() {
+    	if (isWebTest) {
+    		try {
+    			
+	    		Number width = (Number)((JavascriptExecutor)driver).executeScript(JS_GET_VIEWPORT_SIZE_WIDTH);
+	    		
+	    		// issue #238: check we get a non max size
+	    		if (width.intValue() == MAX_DIMENSION) {
+	    			driver.switchTo().defaultContent();
+	    			width = (Number)((JavascriptExecutor)driver).executeScript(JS_GET_VIEWPORT_SIZE_WIDTH);
+	    		}
+	    		return width.intValue();
+	    		
+    		} catch (Exception e) {
+    			return driver.manage().window().getSize().getWidth();
+    		}
+    	} else {
+    		return driver.manage().window().getSize().getWidth();
+    	}
+    }
+	
+	public int getViewPortHeighthWithoutScrollbar() {
+		if (isWebTest) {
+			try {
+				
+				Number height = (Number)((JavascriptExecutor)driver).executeScript(JS_GET_VIEWPORT_SIZE_HEIGHT);
+				
+				// issue #238: check we get a non max size
+				if (height.intValue() == MAX_DIMENSION) {
+					driver.switchTo().defaultContent();
+					height = (Number)((JavascriptExecutor)driver).executeScript(JS_GET_VIEWPORT_SIZE_HEIGHT);
+				}
+				return height.intValue();
+				
+			} catch (Exception e) {
+				return driver.manage().window().getSize().getHeight();
+			}
+		} else {
+			return driver.manage().window().getSize().getHeight();
+		}
+	}
+    
     /**
      * get dimensions of the visible part of the page
      * TODO: handle mobile app case
@@ -721,30 +779,14 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
      */
     @SuppressWarnings("unchecked")
 	public Dimension getViewPortDimensionWithoutScrollbar() {
-    	if (isWebTest) {
-    		try {
-	    		List<Number> dims = (List<Number>)((JavascriptExecutor)driver).executeScript(JS_GET_VIEWPORT_SIZE);
-	    		
-	    		// issue #238: check we get a non max size
-	    		if (dims.get(0).intValue() == MAX_DIMENSION || dims.get(1).intValue() == MAX_DIMENSION) {
-	    			driver.switchTo().defaultContent();
-		    		dims = (List<Number>)((JavascriptExecutor)driver).executeScript(JS_GET_VIEWPORT_SIZE);
-	    		}
-	    		
-	    		Dimension foundDimension = new Dimension(dims.get(0).intValue(), dims.get(1).intValue());
-	    		
-	    		// issue #233: prevent too big size at it may be used to process images and Buffe
-	    		if (foundDimension.width * foundDimension.height * 8L > Integer.MAX_VALUE) {
-	    			return new Dimension(2000, 10000);
-	    		} else {
-	    			return foundDimension;
-	    		}
-    		} catch (Exception e) {
-    			return driver.manage().window().getSize();
-    		}
-    	} else {
-    		return driver.manage().window().getSize();
-    	}
+    	Dimension foundDimension = new Dimension(getViewPortWidthWithoutScrollbar(), getViewPortHeighthWithoutScrollbar());
+		
+		// issue #233: prevent too big size at it may be used to process images and Buffe
+		if (foundDimension.width * foundDimension.height * 8L > Integer.MAX_VALUE) {
+			return new Dimension(2000, 10000);
+		} else {
+			return foundDimension;
+		}
     }
     
     /**

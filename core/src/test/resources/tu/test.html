@@ -41,10 +41,12 @@
 </head>
  
 <body>
-	<div style="background:#FFFF00;height:6px;width:500px;position:fixed;top:0px;left:0px;"></div>
-	<div style="background:#FF0000;height:1px;width:500px;position:fixed;top:6px;left:0px;"></div>
+	<div style="background:#FFFF00;height:6px;width:100%;position:fixed;top:0px;left:0px;"></div>
+	<div style="background:#FF0000;height:1px;width:100%;position:fixed;top:6px;left:0px;"></div>
+	<div id="bighead" style="background:blue;height:40px;width:400px;position:fixed;top:0px;left:0px;display:none;"></div>
 	<h3>Test clicking a moving element</h3>
 	<button id="button">Start Animation</button>
+	<button id="displayBigHeader" name="displayBigHeader" onclick="javascript:displayBigHeader();">header</button>
 	<div style="background:#98bf21;height:20px;width:10px;position:absolute;" onclick="javascript:alert('coucou');" id="carre"></div>
 
 	<h3>Test clicking an element</h3>
@@ -201,8 +203,8 @@
 		</table>
 	</div>
 	
-	<div style="background:#00FF00;height:1px;width:500px;position:fixed;bottom:5px;left:0px;"></div>
-	<div style="background:#FFC800;height:5px;width:500px;position:fixed;bottom:0px;left:0px;"></div>
+	<div style="background:#00FF00;height:1px;width:100%;position:fixed;bottom:5px;left:0px;"></div>
+	<div style="background:#FFC800;height:5px;width:100%;position:fixed;bottom:0px;left:0px;"></div>
 	
 	<h3>Test upload</h3>
 	<input type="text" id="uploadedFile"><input type="file" id="upload"/>
@@ -248,8 +250,11 @@ function addText(id, text) {
 }
 
 function displayBigFooter() {
-	console.log("cououc");
 	$('#bigfoot').css("display", "block");
+}
+
+function displayBigHeader() {
+	$('#bighead').css("display", "block");
 }
 
 function resetState() {
