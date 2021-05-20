@@ -4,12 +4,12 @@ import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.uipage.PageObject;
 import com.seleniumtests.util.helper.WaitHelper;
 
-import cucumber.api.java.en.Given;
-import cucumber.api.java.en.Then;
-import cucumber.api.java.en.When;
-import cucumber.api.java.fr.Alors;
-import cucumber.api.java.fr.Lorsque;
-import cucumber.api.java.fr.Soit;
+import io.cucumber.java.en.Given;
+import io.cucumber.java.en.Then;
+import io.cucumber.java.en.When;
+import io.cucumber.java.fr.Alors;
+import io.cucumber.java.fr.Lorsque;
+import io.cucumber.java.fr.Soit;
 
 public class Actions extends Fixture {
 

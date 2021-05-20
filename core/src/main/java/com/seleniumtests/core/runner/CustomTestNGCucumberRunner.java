@@ -17,12 +17,9 @@
  */
 package com.seleniumtests.core.runner;
 
-import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -86,11 +83,11 @@ public class CustomTestNGCucumberRunner  {
         classLoader = clazz.getClassLoader();
         resourceLoader = new MultiLoader(classLoader);
 
-		initCucumberOptions(clazz);
+		initCucumberOptions();
 
     }
     
-    private void initCucumberOptions(Class<?> clazz) throws URISyntaxException {
+    private void initCucumberOptions() throws URISyntaxException {
     	String cucumberPkg = SeleniumTestsContextManager.getGlobalContext().getCucmberPkg();
     	if (cucumberPkg == null) {
     		throw new CustomSeleniumTestsException("'cucumberPackage' parameter is not set in test NG XML file (inside <suite> tag), "
@@ -135,87 +132,6 @@ public class CustomTestNGCucumberRunner  {
 
     }
     
-    /**
-     * Get list of features given their name or their file name
-     */
-    /*private List<CucumberFeature> getFeaturesFromRequestedTests(Class<?> clazz, ResourceLoader resourceLoader) {
-
-        RuntimeOptions runtimeOptionsB = new RuntimeOptionsFactory(clazz).create();
-        
-        final List<CucumberFeature> allFeatures = runtimeOptionsB.cucumberFeatures(resourceLoader);
-        List<CucumberFeature> selectedFeatures = new ArrayList<>();
-        
-        // filter features requested for execution
-        List<String> testList = SeleniumTestsContextManager.getThreadContext().getCucumberTests();
-        
-        selectFeatures(allFeatures, selectedFeatures, testList);
-        
-        
-        if (selectedFeatures.isEmpty()) {
-        	// select scenarios in features
-        	
-            // get only scenarios whose name is in the list of tests
-        	for (CucumberFeature feature: allFeatures) {
-        		
-        		List<CucumberTagStatement> selectedScenarios = new ArrayList<>();
-        		
-        		selectSenario(feature, testList, selectedScenarios);
-            				
-        		feature.getFeatureElements().removeAll(feature.getFeatureElements());
-        		feature.getFeatureElements().addAll(selectedScenarios);
-        		
-        		if (!selectedScenarios.isEmpty()) {
-        			selectedFeatures.add(feature);
-        		}
-        	}
-        }
-        
-        return selectedFeatures;
-    }*/
-    
-    /**
-     * 
-     * @param allFeatures
-     * @param selectedFeatures
-     * @param testList
-     * @return Cucumber feature list of selected tests
-     */
-    /*private List<CucumberFeature> selectFeatures(final List<CucumberFeature> allFeatures, List<CucumberFeature> selectedFeatures, 
-    									List<String> testList){
-    	for (CucumberFeature feature: allFeatures) {
-        	String featureName = feature.getGherkinFeature().getFeature().getName();
-        	String featureFileName = FilenameUtils.getBaseName(feature.getPath());
-        	
-        	for (String test: testList) {
-    			if (featureName.matches(test) || test.equals(featureFileName)) {
-    				selectedFeatures.add(feature);
-    				break;
-    			}
-    		}  
-        }
-    	return selectedFeatures;
-    }*/
-    
-    /**
-     * 
-     * @param feature
-     * @param testList
-     * @param selectedScenarios
-     * @return Cucumber statement list of selected tests
-     */
-    /*private List<CucumberTagStatement> selectSenario(CucumberFeature feature, List<String> testList, 
-    													List<CucumberTagStatement> selectedScenarios){
-    	for (CucumberTagStatement stmt: feature.getFeatureElements()) {
-			
-			for (String test: testList) {
-    			if (stmt.getGherkinModel().getName().equals(test) || stmt.getGherkinModel().getName().matches(test)) {
-    				selectedScenarios.add(stmt);
-    			}
-			}
-		}
-    	return selectedScenarios;
-    }*/
-    
     public void runScenario(PickleEvent pickle) {
         //Possibly invoked in a multi-threaded context
         Runner runner = runnerSupplier.get();
@@ -227,32 +143,6 @@ public class CustomTestNGCucumberRunner  {
         	throw new CucumberException(testCaseResultListener.getError());
         }
     }
-    
-    /*public void runScenario(CucumberScenarioWrapper cucumberScenarioWrapper)   {
-	
-		resultListener.startFeature();
-		
-		Formatter formatter = runtimeOptions.formatter(classLoader);
-		CucumberScenario cucumberScenario = cucumberScenarioWrapper.getCucumberScenario();
-		
-		try {
-	    	Field field = StepContainer.class.getDeclaredField("cucumberFeature");
-			field.setAccessible(true);
-			CucumberFeature cucumberFeature = (CucumberFeature)field.get(cucumberScenario);
-	    	formatter.uri(cucumberFeature.getPath());
-	        formatter.feature(cucumberFeature.getGherkinFeature());
-	    	
-	    	cucumberScenario.run(runtimeOptions.formatter(classLoader), resultListener, runtime);
-	    	formatter.eof();
-		} catch (NoSuchFieldException | IllegalAccessException e) {
-			throw new CucumberException("Could not run scenario: " + e.getMessage());
-		}
-		
-		if (!resultListener.isPassed()) {
-	        throw new CucumberException(resultListener.getFirstError());
-	    }
-	}*/
-    
 
     public void finish() {
         bus.send(new TestRunFinished(bus.getTime(), bus.getTimeMillis()));
@@ -330,68 +220,6 @@ public class CustomTestNGCucumberRunner  {
         }
         return features;
     }
-
-   
-
-    /*public void finish() {
-        Formatter formatter = runtimeOptions.formatter(classLoader);
-        formatter.done();
-        formatter.close();
-        runtime.printSummary();
-        if (!runtime.getSnippets().isEmpty()) {
-        	throw new CucumberException("Some steps could not be found");
-        }
-    }*/
-
-    /**
-     * @return List of detected cucumber features
-     */
-    /*public List<CucumberFeature> getFeatures() {
-        return cucumberFeatures;
-    }*/
-	
-	/*public Object[][] provideScenarios() {
-		List<CucumberScenarioWrapper> scenarioList = new ArrayList<>();
-        for (CucumberFeature feature : getFeatures()) {
-        	
-        	// get scenario / scenario outline
-        	for (CucumberTagStatement cucumberTagStatement : feature.getFeatureElements()) {
-                
-        		getScenarioWrapper(cucumberTagStatement, scenarioList);
-            }
-       }
-        
-       List<Object[]> newScenarioList = new ArrayList<>();
-       for (CucumberScenarioWrapper scenarioWrapper: scenarioList) {
-    	   newScenarioList.add(new Object[]{scenarioWrapper});
-       }
-        
-       return newScenarioList.toArray(new Object[][]{});
-    }*/
-	
-	/**
-	 * 
-	 * @param cucumberTagStatement
-	 * @param scenarioList
-	 * @return list of cucumber scenario wrapper
-	 */
-	/*private List<CucumberScenarioWrapper> getScenarioWrapper(CucumberTagStatement cucumberTagStatement, 
-															List<CucumberScenarioWrapper> scenarioList){
-		if (cucumberTagStatement instanceof CucumberScenarioOutline) {
-			for (CucumberExamples cucumberExamples : ((CucumberScenarioOutline)cucumberTagStatement).getCucumberExamplesList()) {
-	            for (CucumberScenario exampleScenario : cucumberExamples.createExampleScenarios()) {
-        			CucumberScenarioWrapper scenarioWrapper = new CucumberScenarioWrapper(exampleScenario, cucumberTagStatement.getGherkinModel().getName());
-	            	scenarioList.add(scenarioWrapper);
-	            }
-	        }
-		} else {
-			CucumberScenarioWrapper scenarioWrapper = new CucumberScenarioWrapper((CucumberScenario)cucumberTagStatement);
-			if (!scenarioList.contains(scenarioWrapper)) {
-				scenarioList.add(scenarioWrapper);
-			}
-		}
-		return scenarioList;
-	}*/
 	
 	class TestCaseResultListener {
 	    private static final String UNDEFINED_MESSAGE = "There are undefined steps";
@@ -399,12 +227,7 @@ public class CustomTestNGCucumberRunner  {
 	    private final EventBus bus;
 	    private boolean strict;
 	    private Result result;
-	    private final EventHandler<TestCaseFinished> testCaseFinishedHandler = new EventHandler<TestCaseFinished>() {
-	        @Override
-	        public void receive(TestCaseFinished event) {
-	            receiveResult(event.result);
-	        }
-	    };
+	    private final EventHandler<TestCaseFinished> testCaseFinishedHandler = event -> receiveResult(event.result);
 
 	    TestCaseResultListener(EventBus bus, boolean strict) {
 	        this.strict = strict;
