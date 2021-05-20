@@ -40,7 +40,7 @@ import kong.unirest.UnirestException;
 import kong.unirest.json.JSONException;
 import kong.unirest.json.JSONObject;
 
-public class SeleniumGridConnector {
+public class SeleniumGridConnector implements ISeleniumGridConnector {
 
 	protected URL hubUrl;
 	protected String hubHost;
