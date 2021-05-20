@@ -23,6 +23,7 @@ import java.nio.charset.Charset;
 import java.time.Clock;
 import java.time.Instant;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 
 import com.seleniumtests.customexception.CustomSeleniumTestsException;
@@ -125,6 +126,8 @@ public class OSCommand {
 			return readOutput(proc, timeout, charset);
     	} catch (InterruptedException e) {
         	logger.error("Interruption: " + e.getMessage());
+        	Thread.currentThread().interrupt();
+
 		} catch (IOException e1) {
         	logger.error(e1);
         } 
@@ -158,12 +161,12 @@ public class OSCommand {
         	int isAvailable = is.available();
         	if (isAvailable > 0) {
         		byte[] b = new byte[isAvailable];
-        		is.read(b);
+        		IOUtils.read(is, b);
         		output.append(new String(b, charset));
         	}
         	if (es.available() > 0) {
         		byte[] b = new byte[isAvailable];
-        		is.read(b);
+        		IOUtils.read(es, b);
         		error.append(new String(b, charset));
         	}
         	Thread.sleep(100);
