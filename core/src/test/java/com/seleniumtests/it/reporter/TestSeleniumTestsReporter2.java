@@ -1625,6 +1625,25 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	}
 	
 	/**
+	 * Same as above, but for new cucumber annotations
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testCucumberStart2() throws Exception {
+		
+		executeSubCucumberTests("core_7", 1);
+		
+		String mainReportContent = readSummaryFile();
+		Assert.assertTrue(mainReportContent.matches(".*<a href\\='core_7/TestReport\\.html'.*?>core_7</a>.*"));
+		
+		String detailedReportContent = readTestMethodResultFile("core_7");
+		
+		// Check each step is recorded in file: 2 test steps + test end + logs
+		Assert.assertTrue(detailedReportContent.contains("<div class=\"box collapsed-box success\"><div class=\"box-header with-border\"><button type=\"button\" class=\"btn btn-box-tool\" data-widget=\"collapse\"><i class=\"fa fa-plus\"></i></button> write2 (\\w+) with args: (tutu, )"));
+		Assert.assertTrue(detailedReportContent.contains("<div class=\"message-log\">Test is OK</div>"));
+	}
+	
+	/**
 	 * issue #362: check that with scenario outline, we have the 2 results
 	 * @throws Exception
 	 */
