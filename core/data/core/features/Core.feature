@@ -33,6 +33,10 @@ Feature: Core
 	Scenario: core_3
 		When write tutu
 		
+	# test new annotations
+	Scenario: core_7
+		When write2 tutu
+		
 	@new2
 	Scenario: core_4
 		When write tuta

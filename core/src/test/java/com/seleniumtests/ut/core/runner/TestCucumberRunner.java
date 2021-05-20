@@ -27,8 +27,6 @@ import org.testng.annotations.Test;
 import com.seleniumtests.GenericTest;
 import com.seleniumtests.core.runner.CustomTestNGCucumberRunner;
 
-import io.cucumber.testng.TestNGCucumberRunner;
-
 public class TestCucumberRunner extends GenericTest {
 	
 	@BeforeMethod(groups={"ut"})
@@ -142,7 +140,7 @@ public class TestCucumberRunner extends GenericTest {
 			initThreadContext(testNGCtx);
 			CustomTestNGCucumberRunner runner = new CustomTestNGCucumberRunner(this.getClass());
 			Object[][] scenarios = runner.provideScenarios();
-			Assert.assertEquals(scenarios.length, 12);
+			Assert.assertEquals(scenarios.length, 13);
 		} finally {
 			System.clearProperty("cucumberTests");
 		}
