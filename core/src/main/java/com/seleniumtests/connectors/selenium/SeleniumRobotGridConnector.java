@@ -58,6 +58,11 @@ import kong.unirest.json.JSONObject;
 
 public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 
+	private static final String Y_FIELD = "y";
+	private static final String X_FIELD = "x";
+	private static final String NAME_FIELD = "name";
+	private static final String SESSION_FIELD = "session";
+	private static final String OUTPUT_FIELD = "output";
 	private static final String ACTION_FIELD = "action";
 	public static final String NODE_TASK_SERVLET = "/extra/NodeTaskServlet";
 	public static final String FILE_SERVLET = "/extra/FileServlet";
@@ -90,7 +95,7 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 				HttpHost serverHost = new HttpHost(hubUrl.getHost(), hubUrl.getPort());
 				URIBuilder builder = new URIBuilder();
 	        	builder.setPath("/grid/admin/FileServlet/");
-	        	builder.addParameter("output", "app");
+	        	builder.addParameter(OUTPUT_FIELD, "app");
 	        	HttpPost httpPost = new HttpPost(builder.build());
 		        httpPost.setHeader(HttpHeaders.CONTENT_TYPE, MediaType.OCTET_STREAM.toString());
 		        FileInputStream fileInputStream = new FileInputStream(zipFile);
@@ -138,7 +143,7 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 		try {
 			HttpRequestWithBody req = Unirest.post(String.format("%s%s", nodeUrl, FILE_SERVLET))
 					.header(HttpHeaders.CONTENT_TYPE, MediaType.OCTET_STREAM.toString())
-					.queryString("output", "file");
+					.queryString(OUTPUT_FIELD, "file");
 			if (returnLocalFile) {
 				req = req.queryString("localPath", "true");
 			}
@@ -172,7 +177,7 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 			HttpHost serverHost = new HttpHost(hubUrl.getHost(), hubUrl.getPort());
 			URIBuilder builder = new URIBuilder();
         	builder.setPath("/grid/admin/FileServlet/");
-        	builder.addParameter("output", "app");
+        	builder.addParameter(OUTPUT_FIELD, "app");
         	HttpPost httpPost = new HttpPost(builder.build());
 	        httpPost.setHeader(HttpHeaders.CONTENT_TYPE, MediaType.OCTET_STREAM.toString());
 	        FileInputStream fileInputStream = new FileInputStream(zipFile);
@@ -206,8 +211,8 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 		try {
 			HttpResponse<String> response = Unirest.post(String.format("%s%s", nodeUrl, NODE_TASK_SERVLET))
 				.queryString(ACTION_FIELD, "leftClic")
-				.queryString("x", x)
-				.queryString("y", y)
+				.queryString(X_FIELD, x)
+				.queryString(Y_FIELD, y)
 				.asString();
 			if (response.getStatus() != 200) {
 				logger.error(String.format("Left click error: %s", response.getBody()));
@@ -232,8 +237,8 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 		try {
 			HttpResponse<String> response = Unirest.post(String.format("%s%s", nodeUrl, NODE_TASK_SERVLET))
 			.queryString(ACTION_FIELD, "doubleClick")
-			.queryString("x", x)
-			.queryString("y", y)
+			.queryString(X_FIELD, x)
+			.queryString(Y_FIELD, y)
 			.asString();
 			if (response.getStatus() != 200) {
 				logger.error(String.format("Double click error: %s", response.getBody()));
@@ -258,8 +263,8 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 		try {
 			HttpResponse<String> response = Unirest.post(String.format("%s%s", nodeUrl, NODE_TASK_SERVLET))
 				.queryString(ACTION_FIELD, "rightClic")
-				.queryString("x", x)
-				.queryString("y", y)
+				.queryString(X_FIELD, x)
+				.queryString(Y_FIELD, y)
 				.asString();
 			if (response.getStatus() != 200) {
 				logger.error(String.format("Right click error: %s", response.getBody()));
@@ -312,7 +317,7 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 		try {
 			HttpResponse<String> response = Unirest.post(String.format("%s%s", nodeUrl, NODE_TASK_SERVLET))
 				.queryString(ACTION_FIELD, "uploadFile")
-				.queryString("name", fileName)
+				.queryString(NAME_FIELD, fileName)
 				.field("content", base64Content)
 				.asString();
 			
@@ -432,8 +437,8 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 			
 			HttpRequestWithBody req = unirest.post(String.format("%s%s", nodeUrl, NODE_TASK_SERVLET))
 				.queryString(ACTION_FIELD, "command")
-				.queryString("name", program)
-				.queryString("session", getSessionId().toString());
+				.queryString(NAME_FIELD, program)
+				.queryString(SESSION_FIELD, getSessionId().toString());
 			
 			int i = 0;
 			for (String arg: args) {
@@ -468,7 +473,7 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 		try {
 			HttpResponse<String> response =  Unirest.get(String.format("%s%s", nodeUrl, NODE_TASK_SERVLET))
 				.queryString(ACTION_FIELD, "processList")
-				.queryString("name", processName)
+				.queryString(NAME_FIELD, processName)
 				.asString();
 			
 			if (response.getStatus() != 200) {
@@ -496,7 +501,7 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 		try {
 			HttpResponse<String> response = Unirest.get(String.format("%s%s", nodeUrl, NODE_TASK_SERVLET))
 				.queryString(ACTION_FIELD, "startVideoCapture")
-				.queryString("session", sessionId)
+				.queryString(SESSION_FIELD, sessionId)
 				.asString();
 			
 			if (response.getStatus() != 200) {
@@ -522,7 +527,7 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 				
 			HttpResponse<File> videoResponse = Unirest.get(String.format("%s%s", nodeUrl, NODE_TASK_SERVLET))
 				.queryString(ACTION_FIELD, "stopVideoCapture")
-				.queryString("session", sessionId)
+				.queryString(SESSION_FIELD, sessionId)
 				.asFile(outputFile);
 			
 			if (videoResponse.getStatus() != 200) {
