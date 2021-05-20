@@ -19,13 +19,10 @@ package com.seleniumtests.core.runner;
 
 import java.net.URISyntaxException;
 
-import org.testng.ITestContext;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
-
-import io.cucumber.testng.CucumberFeatureWrapper;
 
 /**
  * This class initializes context, sets up and tears down and clean up drivers An STF test should extend this class.
@@ -68,38 +65,4 @@ public class CucumberTestPlan extends SeleniumRobotTestPlan {
         testNGCucumberRunner.finish();
     }
 	
-
-	//private CustomTestNGCucumberRunner testNGCucumberRunner;
-//
-//	@BeforeClass(alwaysRun=true)
-//	public void configure() {
-//		setCucumberTest(true);
-//	}
-//
-//    @Test(groups = "cucumber", description = "Cucumber scenario", dataProvider = "scenarios")
-//    public void feature(CucumberScenarioWrapper cucumberScenarioWrapper) {
-//    	testNGCucumberRunner.runScenario(cucumberScenarioWrapper);
-//    }
-//
-//    /**
-//     * @return returns two dimensional array of {@link CucumberFeatureWrapper} objects.
-//     */
-//    @DataProvider
-//    public Object[][] scenarios(ITestContext testContext) {
-//        try {
-//	        testNGCucumberRunner = new CustomTestNGCucumberRunner(this.getClass());
-//    	} catch (Exception e) {
-//    		logger.error(Thread.currentThread() + " Error on init: ", e);
-//    		for (StackTraceElement s : e.getStackTrace()) {
-//    			logger.error(Thread.currentThread() + " " + s.toString());
-//    		}
-//    	}
-//        return testNGCucumberRunner.provideScenarios();
-//    }
-//
-//    @AfterTest
-//    public void tearDown() {
-//        testNGCucumberRunner.finish();
-//    }
- 
 }
