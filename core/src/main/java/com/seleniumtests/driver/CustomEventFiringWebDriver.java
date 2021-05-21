@@ -885,17 +885,13 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
 	public void scrollToElement(WebElement element, int yOffset) {
 		if (isWebTest) {
 			try {
-				long start = new Date().getTime();
 				WebElement parentScrollableElement = (WebElement) ((JavascriptExecutor) driver).executeScript(JS_SCROLL_PARENT, element, (driver instanceof SafariDriver) ? "safari": "other");
 				Long topHeaderSize = (Long) ((JavascriptExecutor) driver).executeScript(JS_GET_TOP_HEADER);
 
-				System.out.println(new Date().getTime() - start);
 				// try a second method (the first one is quicker but does not work when element is inside a document fragment, slot or shadow DOM
-				long start1 = new Date().getTime();
 				if ((parentScrollableElement == null || "html".equalsIgnoreCase(parentScrollableElement.getTagName())) && !(driver instanceof InternetExplorerDriver)) {
 					parentScrollableElement = (WebElement) ((JavascriptExecutor) driver).executeScript(JS_SCROLL_PARENT2, element, (driver instanceof SafariDriver) ? "safari": "other");
 				}
-				System.out.println(new Date().getTime() - start1);
 				
 				if (parentScrollableElement != null) {
 					String parentTagName = parentScrollableElement.getTagName();
