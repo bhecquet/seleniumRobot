@@ -17,6 +17,7 @@
  */
 package com.seleniumtests.connectors.selenium;
 
+import java.awt.Point;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -196,6 +197,41 @@ public class SeleniumRobotGridConnector extends SeleniumGridConnector {
 		}
 	}
 	
+
+	/**
+	 * Get position of mouse pointer
+	 * @return
+	 */
+	@Override
+	public Point getMouseCoordinates() {
+		if (nodeUrl == null) {
+			throw new ScenarioException("You cannot get mouse coordinates before driver has been created and corresponding node instanciated");
+		}
+		
+		String responseBody = null;
+		logger.info(String.format("Mouse coordinates"));
+		try {
+			// we get a string with x,y
+			HttpResponse<String> response = Unirest.get(String.format("%s%s", nodeUrl, NODE_TASK_SERVLET))
+					.queryString(ACTION_FIELD, "mouseCoordinates")
+					.asString();
+			if (response.getStatus() != 200) {
+				logger.error(String.format("Mouse coordinates error: %s", response.getBody()));
+				return new Point(0,0);
+			}
+			responseBody = response.getBody();
+			String[] coords = responseBody.split(",");
+			return new Point(Integer.parseInt(coords[0]), Integer.parseInt(coords[1]));
+			
+			
+		} catch (UnirestException e) {
+			logger.warn(String.format("Could not get mouse coordinates: %s", e.getMessage()));
+		} catch (IndexOutOfBoundsException | NumberFormatException e) {
+			logger.error(String.format("mouse coordinates '%s' are invalid", responseBody));
+		}
+		return new Point(0,0);
+	}
+
 	/**
 	 * Left click on desktop at x,y
 	 * @param x		x coordinate

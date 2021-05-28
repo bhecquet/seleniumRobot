@@ -25,6 +25,7 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.awt.Point;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
@@ -166,6 +167,97 @@ public class TestSeleniumRobotGridConnector extends ConnectorsTest {
 		
 		verify(client, never()).execute((HttpHost)any(), any());
 		Assert.assertEquals(capabilities.getCapability(MobileCapabilityType.APP), null);
+	}
+	
+	/**
+	 * Test get mouse coordinates
+	 * @throws UnsupportedOperationException
+	 * @throws IOException
+	 * @throws UnirestException
+	 */
+	@Test(groups={"ut"})
+	public void testGetMouseCoordinates() throws UnsupportedOperationException, IOException {
+		
+		GetRequest req = (GetRequest) createServerMock("GET", SeleniumRobotGridConnector.NODE_TASK_SERVLET, 200, "13,15");	
+		
+		Point coords = connector.getMouseCoordinates();	
+		Assert.assertEquals(coords.x, 13);
+		Assert.assertEquals(coords.y, 15);
+
+		// no error encountered
+		verify(req).queryString("action", "mouseCoordinates");
+		verify(gridLogger, never()).warn(anyString());
+		verify(gridLogger, never()).error(anyString());
+	}
+	
+	/**
+	 * Test mouse coordinates with an invalid response
+	 * @throws UnsupportedOperationException
+	 * @throws IOException
+	 */
+	@Test(groups={"ut"})
+	public void testGetMouseCoordinatesWrontFormat() throws UnsupportedOperationException, IOException {
+		
+		GetRequest req = (GetRequest) createServerMock("GET", SeleniumRobotGridConnector.NODE_TASK_SERVLET, 200, "13");	
+		
+		Point coords = connector.getMouseCoordinates();	
+		Assert.assertEquals(coords.x, 0);
+		Assert.assertEquals(coords.y, 0);
+		
+		// no error encountered
+		verify(req).queryString("action", "mouseCoordinates");
+		verify(gridLogger, never()).warn(anyString());
+		verify(gridLogger).error(anyString());
+	}
+	
+	/**
+	 * Test get mouse coordinates with status code different from 200
+	 * @throws UnsupportedOperationException
+	 * @throws IOException
+	 * @throws UnirestException
+	 */
+	@Test(groups={"ut"})
+	public void testGetMouseCoordinatesError500() throws UnsupportedOperationException, IOException {
+		
+		createServerMock("GET", SeleniumRobotGridConnector.NODE_TASK_SERVLET, 500, "");	
+		
+		Point coords = connector.getMouseCoordinates();	
+		Assert.assertEquals(coords.x, 0);
+		Assert.assertEquals(coords.y, 0);
+		
+		// error clicking
+		verify(gridLogger, never()).warn(anyString());
+		verify(gridLogger).error(anyString());
+	}
+	
+	/**
+	 * Test get mouse coordinates when connection error occurs
+	 * @throws UnsupportedOperationException
+	 * @throws IOException
+	 * @throws UnirestException
+	 */
+	@Test(groups={"ut"})
+	public void testGetMouseCoordinatesNoConnection() throws UnsupportedOperationException, IOException {
+		
+		HttpRequest<HttpRequest> req = createServerMock("GET", SeleniumRobotGridConnector.NODE_TASK_SERVLET, 500, "");
+		when(req.asString()).thenThrow(new UnirestException("connection error"));
+		
+		Point coords = connector.getMouseCoordinates();	
+		Assert.assertEquals(coords.x, 0);
+		Assert.assertEquals(coords.y, 0);
+		
+		// error connecting to node
+		verify(gridLogger).warn(anyString());
+		verify(gridLogger, never()).error(anyString());
+	}
+
+	@Test(groups={"ut"}, expectedExceptions=ScenarioException.class)
+	public void testGetMouseCoordinatesWithoutNodeUrl() throws UnsupportedOperationException, IOException {
+		
+		createServerMock("GET", SeleniumRobotGridConnector.NODE_TASK_SERVLET, 200, "");	
+		
+		connector.setNodeUrl(null);
+		connector.getMouseCoordinates();		
 	}
 	
 	/**

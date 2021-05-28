@@ -17,6 +17,7 @@
  */
 package com.seleniumtests.connectors.selenium;
 
+import java.awt.Point;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -130,6 +131,11 @@ public class SeleniumGridConnector implements ISeleniumGridConnector {
 	 */
 	public void leftClic(int x, int y) {
 		logger.warn("left clic is only available with seleniumRobot grid");
+	}
+	
+	public Point getMouseCoordinates() {
+		logger.warn("getMouseCoordinates is only available with seleniumRobot grid");
+		return new Point(0, 0);
 	}
 	
 	/**

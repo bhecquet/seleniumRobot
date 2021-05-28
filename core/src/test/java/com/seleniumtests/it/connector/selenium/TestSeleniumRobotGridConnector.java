@@ -87,6 +87,14 @@ public class TestSeleniumRobotGridConnector extends MockitoTest {
 //	}
 
 	@Test(groups={"it"})
+	public void testGetMouseCoordinates() throws ClientProtocolException, IOException {
+		connector.getMouseCoordinates();
+		
+		// no error encountered
+		verify(gridLogger, never()).warn(anyString());
+		verify(gridLogger, never()).error(anyString());
+	}
+	@Test(groups={"it"})
 	public void testLeftClick() throws ClientProtocolException, IOException {
 		connector.leftClic(100, 100);
 		

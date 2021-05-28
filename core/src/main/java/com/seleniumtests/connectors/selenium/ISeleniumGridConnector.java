@@ -1,5 +1,6 @@
 package com.seleniumtests.connectors.selenium;
 
+import java.awt.Point;
 import java.io.File;
 import java.util.List;
 
@@ -60,6 +61,12 @@ public interface ISeleniumGridConnector {
 	 * @param y		y coordinate
 	 */
 	public void doubleClick(int x, int y) ;
+	
+	/**
+	 * Get position of mouse pointer
+	 * @return
+	 */
+	public Point getMouseCoordinates();
 	
 	/**
 	 * right clic on desktop at x,y

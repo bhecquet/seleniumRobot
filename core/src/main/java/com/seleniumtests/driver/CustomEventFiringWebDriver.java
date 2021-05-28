@@ -22,6 +22,8 @@ import java.awt.AWTException;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.HeadlessException;
+import java.awt.MouseInfo;
+import java.awt.PointerInfo;
 import java.awt.Rectangle;
 import java.awt.Robot;
 import java.awt.Toolkit;
@@ -1188,6 +1190,27 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
 			gridConnector.leftClic(x, y);
 		} else {
 			throw new ScenarioException("driver supports leftClicOnDesktopAt only in local and grid mode");
+		}
+	}
+	
+	/**
+	 * Get mouse coordinates
+	 * @param x
+	 * @param y
+	 */
+	public static java.awt.Point getMouseCoordinates(DriverMode driverMode, SeleniumGridConnector gridConnector) {
+		
+		if (driverMode == DriverMode.LOCAL) {
+			try {
+				PointerInfo pointerInfo = MouseInfo.getPointerInfo();
+				return pointerInfo.getLocation();
+			} catch (HeadlessException e) {
+				throw new ScenarioException("getMouseCoordinades: problem using Robot: " + e.getMessage());
+			}
+		} else if (driverMode == DriverMode.GRID && gridConnector != null) {
+			return gridConnector.getMouseCoordinates();
+		} else {
+			throw new ScenarioException("driver supports getMouseCoordinades only in local and grid mode");
 		}
 	}
 	

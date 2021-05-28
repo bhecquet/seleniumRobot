@@ -786,6 +786,8 @@ Assuming the DEV environment, file will be searched in `<root>/data/<app>/datase
 - 'datasetSemicolon' => CSV file with ";" as separator and no header
 - 'datasetSemicolonWithHeader' => CSV file with ";" as separator and with header
 
+**WARNING** In case your last cell is empty (a line that ends with ',' or ';'), add a "space" so that cell is taken into account
+
 #### Use placeholders in test description ####
 
 With TestNG, it's possible to declare a test description inside the @Test annotation
