@@ -82,7 +82,7 @@ public class VideoRecorder {
 								null,
 								new Format(MediaTypeKey, MediaType.FILE, MimeTypeKey, MIME_AVI),
 								new Format(MediaTypeKey, MediaType.VIDEO, EncodingKey, ENCODING_AVI_TECHSMITH_SCREEN_CAPTURE, CompressorNameKey, ENCODING_AVI_TECHSMITH_SCREEN_CAPTURE, DepthKey, 24, FrameRateKey, Rational.valueOf(25), QualityKey, 1.0f, KeyFrameIntervalKey, 15 * 60),
-								null,
+								new Format(FrameRateKey, Rational.valueOf(25), EncodingKey, ScreenRecorder.ENCODING_BLACK_CURSOR),
 								null,
 								folderPath);
 			} catch (Exception e) {
