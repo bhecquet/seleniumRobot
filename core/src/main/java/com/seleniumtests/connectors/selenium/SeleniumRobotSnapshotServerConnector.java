@@ -377,6 +377,8 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 	/**
 	 * Get the comparison result of snapshots. If we cannot get the information, return true
 	 * @param testCaseInSessionId		id of the test case in this test sessions.
+	 * @param errorMessage				the messages coming from server if some comparison error occurred (error during computing). 
+	 * 									An empty errorMessage means all snapshots have been processed whatever the comparison result is
 	 * @return							integer with test result. Values are the one from ITestResult
 	 */
 	public int getTestCaseInSessionComparisonResult(Integer testCaseInSessionId, StringBuilder errorMessage) {
@@ -391,6 +393,7 @@ public class SeleniumRobotSnapshotServerConnector extends SeleniumRobotServerCon
 				// - 'true' if all comparison are OK
 				// - 'false' if at least 1 comparison fails
 				// - 'null' if all comparison failed to be computed (e.g: due to bug on server) or at least one comparison is OK but all others are not computed
+				// So if no computing error is returned, having 'null' means that no snapshot has been sent to server (according to 'snapshotServer/models.py' code)
 				if (response.optBoolean("computed", false) && response.has(FIELD_IS_OK_WITH_SNAPSHOTS)) {
 					return displaySnapshotComparisonError(response, errorMessage);
 					

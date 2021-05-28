@@ -171,6 +171,54 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 	}
 	
 	/**
+	 * Test case where no snapshot has been sent to server, 'snapshot comparison' step should be green with message stating that no picture has been processed
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testSnapshotNoComparisonDisplayOnly() throws Exception {
+		try {
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE, "true");
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT, "true");
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT_BEHAVIOUR, "displayOnly");
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_RECORD_RESULTS, "true");
+			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL, "http://localhost:4321");
+			
+			SeleniumRobotSnapshotServerConnector server = configureMockedSnapshotServerConnection();
+			createServerMock("GET", SeleniumRobotSnapshotServerConnector.TESTCASEINSESSION_API_URL + "15", 200, "{'testSteps': [], 'computed': true, 'isOkWithSnapshots': null, 'computingError': []}");		
+			
+			
+			SeleniumTestsContextManager.removeThreadContext();
+			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions"});
+			
+			// check result is ok and comparison result is shown through blue bullet (no comparison to do)
+			String summaryReport = readSummaryFile();
+			Assert.assertTrue(summaryReport.contains("<i class=\"fa fa-circle circleSkipped\" data-toggle=\"tooltip\" title=\"snapshot comparison skipped\">"));
+			Assert.assertTrue(summaryReport.contains("info=\"ok\" data-toggle=\"tooltip\""));
+			
+			String detailedReportContent = readTestMethodResultFile("testAndSubActions");
+			
+			// tabs are shown
+			Assert.assertTrue(detailedReportContent.contains("<div id=\"tabs\" style=\"display: block;\" >"));
+			
+			// successful step has been added for comparison
+			Assert.assertTrue(detailedReportContent.contains("<div class=\"message-log\">No comparison to do (no snapshots)</div>"));
+			Assert.assertTrue(detailedReportContent.matches(".*<div class=\"box collapsed-box success\">.*?<i class=\"fa fa-plus\"></i></button> Snapshot comparison.*"));
+			
+			// snapshot tab active / skipped
+			Assert.assertTrue(detailedReportContent.contains("<a class=\"nav-link  tab-skipped \" id=\"snapshot-tab\" data-toggle=\"tab\" href=\"#snapshots\" role=\"tab\" aria-controls=\"profile\" aria-selected=\"false\">Snapshots</a>"));
+			
+			// iframe present with the right test case id
+			Assert.assertTrue(detailedReportContent.contains("<iframe src=\"http://localhost:4321/snapshot/compare/stepList/15/?header=true\" id=\"snapshot-iframe\" frameborder=\"0\"></iframe>"));
+		} finally {
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_ACTIVE);
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL);
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT);
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_COMPARE_SNAPSHOT_BEHAVIOUR);
+			System.clearProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_RECORD_RESULTS);
+		}
+	}
+	
+	/**
 	 * Check that when snapshot server is used, we see a tab pointing to snapshot comparison results
 	 * Moreover, a red bullet should be visible on summary result when comparison is KO
 	 * Result remains OK as behaviour is "displayOnly"
@@ -186,7 +234,7 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			System.setProperty(SeleniumTestsContext.SELENIUMROBOTSERVER_URL, "http://localhost:4321");
 			
 			SeleniumRobotSnapshotServerConnector server = configureMockedSnapshotServerConnection();
-			createServerMock("GET", SeleniumRobotSnapshotServerConnector.TESTCASEINSESSION_API_URL + "15", 200, "{'testSteps': [], 'computed': true, 'isOkWithSnapshots': false}");		
+			createServerMock("GET", SeleniumRobotSnapshotServerConnector.TESTCASEINSESSION_API_URL + "15", 200, "{'testSteps': [], 'computed': true, 'isOkWithSnapshots': false, 'computingError': []}");		
 			
 			SeleniumTestsContextManager.removeThreadContext();
 			executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClass"}, ParallelMode.METHODS, new String[] {"testAndSubActions"});

@@ -182,6 +182,8 @@ public class ReporterControler implements IReporter {
 					
 					StringBuilder errorMessage = new StringBuilder();
 					int snapshotComparisonResult = snapshotServer.getTestCaseInSessionComparisonResult(testCaseInSessionId, errorMessage);
+					
+					// update snapshot comparison result of the run test.
 					TestNGResultUtils.setSnapshotComparisonResult(testResult, snapshotComparisonResult);
 					
 					// create a step for snapshot comparison
@@ -202,14 +204,17 @@ public class ReporterControler implements IReporter {
 	private void createTestStepForComparisonResult(ITestResult testResult, int snapshotComparisonResult, String errorMessage) {
 		// create a step for snapshot comparison
 		TestStep testStep = new TestStep("Snapshot comparison", testResult, new ArrayList<>(), false);
-		testStep.setFailed(snapshotComparisonResult != ITestResult.SUCCESS); // step fails if result is KO or SKIPPED (null)
-		
+	
 		if (snapshotComparisonResult == ITestResult.FAILURE) {
 			testStep.addMessage(new TestMessage("Comparison failed: " + errorMessage, MessageType.ERROR));
+			testStep.setFailed(true);
 		} else if (snapshotComparisonResult == ITestResult.SUCCESS) {
 			testStep.addMessage(new TestMessage("Comparison successful", MessageType.INFO));
-		} else if (snapshotComparisonResult == ITestResult.SKIP) {
+		} else if (snapshotComparisonResult == ITestResult.SKIP && !errorMessage.isEmpty()) {
 			testStep.addMessage(new TestMessage("Comparison skipped: " + errorMessage, MessageType.ERROR));
+			testStep.setFailed(true);
+		} else if (snapshotComparisonResult == ITestResult.SKIP && errorMessage.isEmpty()) {
+			testStep.addMessage(new TestMessage("No comparison to do (no snapshots)", MessageType.LOG));
 		}
 		
 		getAllTestSteps(testResult).add(testStep);
@@ -245,6 +250,8 @@ public class ReporterControler implements IReporter {
 			} else if (snapshotComparisonResult == ITestResult.SKIP) {
 				suiteResult.getTestContext().getSkippedTests().addResult(newTestResult, newTestResult.getMethod());
 			}
+			
+			// add a snapshot comparison result for the newly created test result (which correspond to snapshot comparison)
 			TestNGResultUtils.setSnapshotComparisonResult(newTestResult, snapshotComparisonResult);
 		}
 	}
