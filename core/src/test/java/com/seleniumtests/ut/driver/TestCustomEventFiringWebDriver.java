@@ -29,6 +29,8 @@ import static org.mockito.Mockito.when;
 import java.awt.AWTError;
 import java.awt.AWTException;
 import java.awt.HeadlessException;
+import java.awt.MouseInfo;
+import java.awt.PointerInfo;
 import java.awt.Rectangle;
 import java.awt.Robot;
 import java.awt.event.InputEvent;
@@ -109,6 +111,9 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 	@Mock
 	private Capabilities capabilities;
 	
+	@Mock
+	private PointerInfo pointerInfo;
+	
 	private EventFiringWebDriver eventDriver;
 	private EventFiringWebDriver attachedEventDriver;
 
@@ -138,6 +143,9 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 		PowerMockito.whenNew(Keyboard.class).withNoArguments().thenReturn(keyboard);
 		PowerMockito.doReturn(new Rectangle(1900, 1000)).when(CustomEventFiringWebDriver.class, "getScreensRectangle");
 		
+		PowerMockito.mockStatic(MouseInfo.class);
+		PowerMockito.when(MouseInfo.getPointerInfo()).thenReturn(pointerInfo);
+		when(pointerInfo.getLocation()).thenReturn(new java.awt.Point(2, 3));
 		
 	}
 	
@@ -433,6 +441,40 @@ public class TestCustomEventFiringWebDriver extends MockitoTest {
 			((CustomEventFiringWebDriver)eventDriver).quit();
 		} catch (WebDriverException e) {}
 		verify(osUtility).killProcess("1000", true);
+	}
+	
+	/**
+	 * Test mouse coordinates in local mode
+	 */
+	@Test(groups = {"ut"})
+	public void testMouseCoordinatesOnDesktop() {
+		CustomEventFiringWebDriver.getMouseCoordinates(DriverMode.LOCAL, gridConnector);
+		
+		verify(pointerInfo).getLocation();
+		verify(gridConnector, never()).getMouseCoordinates();
+	}
+	
+	/**
+	 * Test mouse coordinates in headless mode: an error should be raised because there is no session
+	 * @throws Exception 
+	 */
+	@Test(groups = {"ut"}, expectedExceptions=ScenarioException.class)
+	public void testMouseCoordinatesOnDesktopWithoutDesktop() throws Exception {
+		PowerMockito.when(MouseInfo.getPointerInfo()).thenThrow(HeadlessException.class);
+		
+		CustomEventFiringWebDriver.getMouseCoordinates(DriverMode.LOCAL, gridConnector);
+	}
+
+	/**
+	 * Test mouse coordinates in grid mode
+	 */
+	@Test(groups = {"ut"})
+	public void testMouseCoordinateskOnDesktopWithGrid() {
+		CustomEventFiringWebDriver.getMouseCoordinates(DriverMode.GRID, gridConnector);
+		
+
+		verify(pointerInfo, never()).getLocation();
+		verify(gridConnector).getMouseCoordinates();
 	}
 	
 	/**
