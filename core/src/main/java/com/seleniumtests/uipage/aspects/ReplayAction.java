@@ -159,7 +159,7 @@ public class ReplayAction {
 		    			WaitHelper.waitForMilliSeconds(replay.replayDelayMs());
 					} else {
 						if (e instanceof NoSuchElementException) {
-							throw new NoSuchElementException("Searched element could not be found");
+							throw new NoSuchElementException(String.format("Searched element [%s] from page '%s' could not be found", element, element.getOrigin()));
 						} else if (e instanceof UnreachableBrowserException) {
 							throw new WebDriverException("Browser did not reply, it may have frozen");
 						}

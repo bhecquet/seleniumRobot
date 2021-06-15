@@ -45,6 +45,7 @@ public class DriverTestPage extends PageObject {
 	public static final TextFieldElement textElement = new TextFieldElement("Text", By.id("text2"));
 	public static final TextFieldElement textElementNotPresentFirstVisible = new TextFieldElement("Text", By.id("text_"), HtmlElement.FIRST_VISIBLE);
 	public static final TextFieldElement textElementNotPresent = new TextFieldElement("Text", By.id("text___"));
+	public static final HtmlElement elementNotPresentWithTimeout = new HtmlElement("element", By.id("notPresent"), (Integer)null, 5);
 	public static final RadioButtonElement radioElement = new RadioButtonElement("Radio", By.id("radioClick"));
 	public static final CheckBoxElement checkElement = new CheckBoxElement("Check", By.id("checkboxClick"));
 	public static final ButtonElement startButton = new ButtonElement("Start Animation", By.id("button"));
