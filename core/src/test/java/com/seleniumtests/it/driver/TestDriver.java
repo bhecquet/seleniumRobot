@@ -512,7 +512,10 @@ public class TestDriver extends GenericMultiBrowserTest {
 	public void testElementNotPresent() {	
 		LocalDateTime start = LocalDateTime.now();
 		try {
-			new HtmlElement("element", By.id("notPresent"), (Integer)null, 5).getValue();
+			DriverTestPage.elementNotPresentWithTimeout.getValue();
+		} catch (NoSuchElementException e) {
+			Assert.assertTrue(e.getMessage().contains("Searched element [HtmlElement element, by={By.id: notPresent}] from page 'com.seleniumtests.it.driver.support.pages.DriverTestPage' could not be found"));
+			throw e;
 		} finally {
 			Assert.assertTrue(LocalDateTime.now().minusSeconds(7).isBefore(start));
 			Assert.assertTrue(LocalDateTime.now().minusSeconds(4).isAfter(start));
