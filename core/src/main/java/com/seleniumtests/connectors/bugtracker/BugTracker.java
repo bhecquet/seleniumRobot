@@ -160,13 +160,22 @@ public abstract class BugTracker {
 		for (TestStep testStep: testSteps) {
 			
 			// "Test end" step should never be considered as failed, because it reflects the overall test result
-			if (Boolean.TRUE.equals(testStep.getFailed()) && !testStep.getName().startsWith(TestStepManager.LAST_STEP_NAME)) {
+			if (Boolean.TRUE.equals(testStep.getFailed()) 
+					&& !testStep.getName().startsWith(TestStepManager.LAST_STEP_NAME) 
+					&& !testStep.isDisableBugtracker() // if the step has the flag disabling bugtracker, do not count it as failed step
+					) {
 				failedSteps.add(testStep);
 			}
 			if (testStep.getName().startsWith(TestStepManager.LAST_STEP_NAME)) {
 				lastTestStep = testStep;		
 				break;
 			}
+		}
+		
+		// don't create issue if no failed step is present
+		if (failedSteps.isEmpty()) {
+			logger.info("No failed steps. It may be due to a failed step marked as disabled for bugtracker");
+			return null;
 		}
 
 		// don't create issue if test has not been executed or not completed
@@ -191,6 +200,7 @@ public abstract class BugTracker {
 
 		String assignee = issueOptions.get("assignee");
 		String reporter = issueOptions.get("reporter");
+		
 		
 		return createIssueBean(summary, fullDescription.toString(), 
 				testName, 
@@ -253,7 +263,7 @@ public abstract class BugTracker {
 		// get index of the last step to know where we failed
 		int stepIdx = 0;
 		for (TestStep testStep: testSteps) {
-			if (testStep.getName().startsWith("Test end")) {
+			if (testStep.getName().startsWith(TestStepManager.LAST_STEP_NAME)) {
 				break;
 			}
 			stepIdx += 1;
