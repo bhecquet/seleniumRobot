@@ -24,9 +24,10 @@ import java.lang.annotation.Target;
 
 /**
  * This annotation is used to document PageObject methods
- *
+ * @deprecated, use @Step(name="my name") instead
  */
 
+@Deprecated
 @Retention(java.lang.annotation.RetentionPolicy.RUNTIME)
 @Target(METHOD)
 public @interface StepName {

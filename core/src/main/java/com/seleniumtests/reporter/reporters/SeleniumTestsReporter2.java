@@ -276,6 +276,8 @@ public class SeleniumTestsReporter2 extends CommonReporter implements IReporter 
 			}
 			stepInfo.add(encodedTestStep.getDuration() / (double)1000);
 			stepInfo.add(encodedTestStep);	
+			stepInfo.add(encodedTestStep.getErrorCause());	
+			stepInfo.add(encodedTestStep.getErrorCauseDetails());	
 			steps.add(stepInfo);
 		}
 		context.put("steps", steps);
