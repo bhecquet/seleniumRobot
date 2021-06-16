@@ -17,6 +17,7 @@
     - [test parameters](#test-parameters)
     - [Run test](#run-test)
 - [Bugtrackers](#bugtrackers)
+  - [0 Disable bug creation for a specific step](#0-disable-bug-creation-for-a-specific-step)
   - [1 Jira](#1-jira)
     - [Configuration](#configuration)
     - [Find required fields and allowed values](#find-required-fields-and-allowed-values)
