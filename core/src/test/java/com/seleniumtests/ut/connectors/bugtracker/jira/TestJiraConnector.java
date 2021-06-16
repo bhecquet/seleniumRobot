@@ -962,21 +962,9 @@ public class TestJiraConnector extends MockitoTest {
 		IssueBean issueBean = jiraConnector.createIssueBean("[Selenium][selenium][DEV][ngName] test myTest KO", "testCreateJiraBean", "some description", 
 				Arrays.asList(step1, stepEnd), jiraOptions);
 		
-		JiraBean jiraBean = (JiraBean)issueBean;
-
 		// that when no failed step exist, (this should not happen), this is not a problem for connector
-		Assert.assertEquals(jiraBean.getDescription(), "*Test:* testCreateJiraBean\n" + 
-				"*Description:* some description\n" + 
-				"h2. Last logs\n" + 
-				"{code:java}Step Test end{code}\n" + 
-				"\n" + 
-				"h2. Associated screenshots\n" + 
-				"!N-A_0-2_Test_end--123456.png|thumbnail!\n" + 
-				"!N-A_0-2_Test_end--123456.png|thumbnail!\n" + 
-				"\n" + 
-				"\n" + 
-				"For more details, see attached .zip file");
-		
+		Assert.assertNull(issueBean);
+
 	}
 	
 	@Test(groups={"ut"})

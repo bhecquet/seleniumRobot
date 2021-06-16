@@ -386,6 +386,7 @@ public class TestTestStep extends GenericTest {
 	@Test(groups = { "ut" })
 	public void testTestStepEncodeHtml() {
 		TestStep step = new TestStep("step1 \"'<>&\u0192", null, new ArrayList<>(), true, RootCause.REGRESSION, "\"'<>&\u0192", false);
+		step.setFailed(true); // mandatory so that errorCauseDetails is not null
 		TestStep encodedTestStep = step.encode("html");
 		Assert.assertEquals(encodedTestStep.toString(), "Step step1 &quot;'&lt;&gt;&amp;&fnof;");
 		Assert.assertEquals(encodedTestStep.getErrorCauseDetails(), "&quot;'&lt;&gt;&amp;&fnof;");
@@ -394,6 +395,8 @@ public class TestTestStep extends GenericTest {
 	@Test(groups = { "ut" })
 	public void testTestStepEncodeJson() {
 		TestStep step = new TestStep("step1 \"/\\", null, new ArrayList<>(), true, RootCause.REGRESSION, "\"/\\", false);
+
+		step.setFailed(true); // mandatory so that errorCauseDetails is not null
 		TestStep encodedTestStep = step.encode("json");
 		Assert.assertEquals(encodedTestStep.toString(), "Step step1 \\\"\\/\\\\");
 		Assert.assertEquals(encodedTestStep.getErrorCauseDetails(), "\\\"\\/\\\\");
@@ -402,6 +405,7 @@ public class TestTestStep extends GenericTest {
 	@Test(groups = { "ut" })
 	public void testTestStepEncodeXml() {
 		TestStep step = new TestStep("step1 \"'<>&", null, new ArrayList<>(), true, RootCause.REGRESSION, "\"'<>&", false);
+		step.setFailed(true); // mandatory so that errorCauseDetails is not null
 		TestStep encodedTestStep = step.encode("xml");
 		Assert.assertEquals(encodedTestStep.toString(), "Step step1 &quot;&apos;&lt;&gt;&amp;");
 		Assert.assertEquals(encodedTestStep.getErrorCauseDetails(), "&quot;&apos;&lt;&gt;&amp;");
@@ -963,6 +967,8 @@ public class TestTestStep extends GenericTest {
 	@Test(groups = { "ut" })
 	public void testTestStepWithrootCause() {
 		TestStep step = new TestStep("step1", null, new ArrayList<>(), true, RootCause.REGRESSION, "details", false);
+
+		step.setFailed(true); // mandatory so that errorCauseDetails is not null
 		Assert.assertEquals(step.getErrorCause(), RootCause.REGRESSION);
 		Assert.assertEquals(step.getErrorCauseDetails(), "details");
 	}
@@ -974,6 +980,8 @@ public class TestTestStep extends GenericTest {
 	public void testTestStepWithrootCauseInSubStep() {
 		TestStep step = new TestStep("step1", null, new ArrayList<>(), true);
 		TestStep subStep = new TestStep("step1", null, new ArrayList<>(), true, RootCause.REGRESSION, "details", false);
+
+		subStep.setFailed(true); // mandatory so that errorCauseDetails is not null
 		step.addStep(subStep);
 		Assert.assertEquals(step.getErrorCause(), RootCause.REGRESSION);
 		Assert.assertEquals(step.getErrorCauseDetails(), "details");
