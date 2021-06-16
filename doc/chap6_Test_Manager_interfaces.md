@@ -218,6 +218,19 @@ Bugtrackers will store issues when a selenium test fails.
 If the issue already exists for this failing test, it's not recreated.
 If the issue exists and the test becomes sucessful, then issue is closed
 
+### 0 Disable bug creation for a specific step ###
+
+By default, all failing tests will be logged in bugtracker if this one is configured. For some reason, you may not want a bug to be created if a particular step fails (e.g: a teardown step, a configuration step, ...)
+In this case, you can annotate this step
+
+		@Step(disableBugtracker=true)
+		public SignIn checkout() throws Exception {
+			proceed.click();
+			return new SignIn(); 
+		}
+
+If the test fails at this step no bug will be created, but the test will still fail at this point
+
 ### 1 Jira ###
 
 #### Configuration ####
