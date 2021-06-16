@@ -20,6 +20,8 @@
     - [Additional search capabilities](#additional-search-capabilities)
       - [Shadow DOM](#shadow-dom)
   - [Document your tests](#document-your-tests)
+    - [Step naming](#step-naming)
+    - [Most probable error cause](#most-probable-error-cause)
   - [Add user defined test steps](#add-user-defined-test-steps)
   - [Add snapshots](#add-snapshots)
 - [3 Write a test](#3-write-a-test)
