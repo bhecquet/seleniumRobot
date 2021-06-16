@@ -65,6 +65,7 @@ import com.seleniumtests.connectors.bugtracker.IssueBean;
 import com.seleniumtests.connectors.bugtracker.jira.JiraBean;
 import com.seleniumtests.connectors.bugtracker.jira.JiraConnector;
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.core.Step.RootCause;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.customexception.ScenarioException;
 import com.seleniumtests.driver.screenshots.ScreenShot;
@@ -192,6 +193,8 @@ public class TestJiraConnector extends MockitoTest {
 
 	private TestStep step1;
 	private TestStep step2;
+	private TestStep stepWithErrorCauseAndDetails;
+	private TestStep stepWithErrorCause;
 	private TestStep stepEnd;
 
 	@BeforeMethod(groups={"ut"})
@@ -223,6 +226,23 @@ public class TestJiraConnector extends MockitoTest {
 		step2.addAction(new TestAction("action2", false, new ArrayList<>()));
 		step2.addSnapshot(new Snapshot(screenshot, "main", SnapshotCheckType.FULL), 1, null);
 		step2.setPosition(1);
+		
+
+		stepWithErrorCauseAndDetails = new TestStep("step 3", null, new ArrayList<>(), false, RootCause.REGRESSION, "Check  your script", false);
+		stepWithErrorCauseAndDetails.setFailed(true);
+		stepWithErrorCauseAndDetails.setActionException(new NullPointerException("Error clicking"));
+		stepWithErrorCauseAndDetails.addAction(new TestAction("action1", false, new ArrayList<>()));
+		stepWithErrorCauseAndDetails.addAction(new TestAction("action2", false, new ArrayList<>()));
+		stepWithErrorCauseAndDetails.addSnapshot(new Snapshot(screenshot, "main", SnapshotCheckType.FULL), 1, null);
+		stepWithErrorCauseAndDetails.setPosition(1);
+		
+		stepWithErrorCause = new TestStep("step 4", null, new ArrayList<>(), false, RootCause.REGRESSION, "", false);
+		stepWithErrorCause.setFailed(true);
+		stepWithErrorCause.setActionException(new NullPointerException("Error clicking"));
+		stepWithErrorCause.addAction(new TestAction("action1", false, new ArrayList<>()));
+		stepWithErrorCause.addAction(new TestAction("action2", false, new ArrayList<>()));
+		stepWithErrorCause.addSnapshot(new Snapshot(screenshot, "main", SnapshotCheckType.FULL), 1, null);
+		stepWithErrorCause.setPosition(1);
 		
 		stepEnd = new TestStep("Test end", null, new ArrayList<>(), false);
 		stepEnd.addSnapshot(new Snapshot(screenshot, "end", SnapshotCheckType.FULL), 1, null);
@@ -754,7 +774,7 @@ public class TestJiraConnector extends MockitoTest {
 		// check only step2 is seen as a failed step
 		Assert.assertEquals(jiraBean.getDescription(), "*Test:* testCreateJiraBean\n" + 
 				"*Description:* some description\n" +
-				"*Error step 1 (step 2):* *{color:#de350b}java.lang.NullPointerException: Error clicking{color}*\n" +
+				"*Error step #1 (step 2):* *{color:#de350b}java.lang.NullPointerException: Error clicking{color}*\n" +
 				"h2. Steps in error\n" + 
 				"* *Step 1: step 2*\n" +
 				"{code:java}Step step 2\n" +
@@ -815,7 +835,7 @@ public class TestJiraConnector extends MockitoTest {
 		Assert.assertEquals(jiraBean.getDescription(), "*Test:* testCreateJiraBean\n" + 
 				"*Description:* some description\n" +
 				"*Started by:* http://foo/bar/job/1\n" +
-				"*Error step 1 (step 2):* *{color:#de350b}java.lang.NullPointerException: Error clicking{color}*\n" +
+				"*Error step #1 (step 2):* *{color:#de350b}java.lang.NullPointerException: Error clicking{color}*\n" +
 				"h2. Steps in error\n" + 
 				"* *Step 1: step 2*\n" +
 				"{code:java}Step step 2\n" +
@@ -841,6 +861,90 @@ public class TestJiraConnector extends MockitoTest {
 		Assert.assertEquals(jiraBean.getCustomFields().get("foo"), "bar"); 
 		Assert.assertNull(jiraBean.getDetailedResult()); // detailed result is not provided because 'startedBy' is set
 		Assert.assertNull(jiraBean.getId()); // not inistialized by default
+	}
+	
+	@Test(groups={"ut"})
+	public void testCreateJiraBeanWithErrorCauseAndDetails() throws Exception {
+		
+		jiraOptions.put("priority", "P1");
+		jiraOptions.put("assignee", "me");
+		jiraOptions.put("reporter", "you");
+		jiraOptions.put("jira.issueType", "Bug");
+		jiraOptions.put("jira.components", "comp1,comp2");
+		jiraOptions.put("jira.field.foo", "bar");
+		SeleniumTestsContextManager.getThreadContext().setStartedBy("http://foo/bar/job/1");
+		
+		JiraConnector jiraConnector = new JiraConnector("http://foo/bar", PROJECT_KEY, "user", "password", jiraOptions);
+		
+		IssueBean issueBean = jiraConnector.createIssueBean("[Selenium][selenium][DEV][ngName] test myTest KO", "testCreateJiraBean", "some description", 
+				Arrays.asList(step1, stepWithErrorCauseAndDetails, stepEnd), jiraOptions);
+		
+		Assert.assertTrue(issueBean instanceof JiraBean);
+		JiraBean jiraBean = (JiraBean)issueBean;
+
+		// check only step2 is seen as a failed step
+		// detailed result is not provided because 'startedBy' is set
+		Assert.assertEquals(jiraBean.getDescription(), "*Test:* testCreateJiraBean\n" + 
+				"*Description:* some description\n" +
+				"*Started by:* http://foo/bar/job/1\n" +
+				"*Error step #1 (step 3):* *{color:#de350b}java.lang.NullPointerException: Error clicking{color}*\n" +
+				"h2. Steps in error\n" +
+				"* *Step 1: step 3*\n" +
+				"+Possible cause:+ REGRESSION => Check  your script\n" +
+				"{code:java}Step step 3\n" +
+				"  - action1\n" +
+				"  - action2{code}\n" +
+				"\n" + 
+				"h2. Last logs\n" + 
+				"{code:java}Step Test end{code}\n" + 
+				"\n" + 
+				"h2. Associated screenshots\n" + 
+				"!N-A_0-2_Test_end--123456.png|thumbnail!\n" + 
+				"!N-A_0-2_Test_end--123456.png|thumbnail!\n"
+				);
+		
+	}
+	
+	@Test(groups={"ut"})
+	public void testCreateJiraBeanWithErrorCauseNoDetails() throws Exception {
+		
+		jiraOptions.put("priority", "P1");
+		jiraOptions.put("assignee", "me");
+		jiraOptions.put("reporter", "you");
+		jiraOptions.put("jira.issueType", "Bug");
+		jiraOptions.put("jira.components", "comp1,comp2");
+		jiraOptions.put("jira.field.foo", "bar");
+		SeleniumTestsContextManager.getThreadContext().setStartedBy("http://foo/bar/job/1");
+		
+		JiraConnector jiraConnector = new JiraConnector("http://foo/bar", PROJECT_KEY, "user", "password", jiraOptions);
+		
+		IssueBean issueBean = jiraConnector.createIssueBean("[Selenium][selenium][DEV][ngName] test myTest KO", "testCreateJiraBean", "some description", 
+				Arrays.asList(step1, stepWithErrorCause, stepEnd), jiraOptions);
+		
+		Assert.assertTrue(issueBean instanceof JiraBean);
+		JiraBean jiraBean = (JiraBean)issueBean;
+		
+		// check only step2 is seen as a failed step
+		// detailed result is not provided because 'startedBy' is set
+		Assert.assertEquals(jiraBean.getDescription(), "*Test:* testCreateJiraBean\n" + 
+				"*Description:* some description\n" +
+				"*Started by:* http://foo/bar/job/1\n" +
+				"*Error step #1 (step 4):* *{color:#de350b}java.lang.NullPointerException: Error clicking{color}*\n" +
+				"h2. Steps in error\n" +
+				"* *Step 1: step 4*\n" +
+				"+Possible cause:+ REGRESSION\n" +
+				"{code:java}Step step 4\n" +
+				"  - action1\n" +
+				"  - action2{code}\n" +
+				"\n" + 
+				"h2. Last logs\n" + 
+				"{code:java}Step Test end{code}\n" + 
+				"\n" + 
+				"h2. Associated screenshots\n" + 
+				"!N-A_0-2_Test_end--123456.png|thumbnail!\n" + 
+				"!N-A_0-2_Test_end--123456.png|thumbnail!\n"
+				);
+		
 	}
 	
 	@Test(groups={"ut"})

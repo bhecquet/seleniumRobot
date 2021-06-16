@@ -30,6 +30,7 @@ import com.seleniumtests.connectors.bugtracker.BugTracker;
 import com.seleniumtests.connectors.bugtracker.FakeBugTracker;
 import com.seleniumtests.connectors.bugtracker.IssueBean;
 import com.seleniumtests.connectors.bugtracker.jira.JiraConnector;
+import com.seleniumtests.core.Step.RootCause;
 import com.seleniumtests.customexception.ConfigurationException;
 import com.seleniumtests.driver.screenshots.ScreenShot;
 import com.seleniumtests.driver.screenshots.SnapshotCheckType;
@@ -46,6 +47,7 @@ public class TestBugTracker extends MockitoTest {
 	private ScreenShot screenshot;
 	private TestStep step1;
 	private TestStep step2;
+	private TestStep stepFailedWithDisabledBugtracker;
 	private TestStep stepEnd;
 	
 	Map<String, String> issueOptions = new HashMap<>();
@@ -74,6 +76,14 @@ public class TestBugTracker extends MockitoTest {
 		step2.addAction(new TestAction("action2", false, new ArrayList<>()));
 		step2.addSnapshot(new Snapshot(screenshot, "main", SnapshotCheckType.FULL), 1, null);
 		step2.setPosition(1);
+		
+		stepFailedWithDisabledBugtracker = new TestStep("step 2", null, new ArrayList<>(), false, RootCause.NONE, "", true);
+		stepFailedWithDisabledBugtracker.setFailed(true);
+		stepFailedWithDisabledBugtracker.setActionException(new NullPointerException("Error clicking"));
+		stepFailedWithDisabledBugtracker.addAction(new TestAction("action1", false, new ArrayList<>()));
+		stepFailedWithDisabledBugtracker.addAction(new TestAction("action2", false, new ArrayList<>()));
+		stepFailedWithDisabledBugtracker.addSnapshot(new Snapshot(screenshot, "main", SnapshotCheckType.FULL), 1, null);
+		stepFailedWithDisabledBugtracker.setPosition(1);
 		
 		stepEnd = new TestStep("Test end", null, new ArrayList<>(), false);
 		stepEnd.addSnapshot(new Snapshot(screenshot, "end", SnapshotCheckType.FULL), 1, null);
@@ -104,7 +114,7 @@ public class TestBugTracker extends MockitoTest {
 	}
 	
 	/**
-	 * Create a new issue
+	 * Create a new issue when there is a failed step
 	 * @throws Exception
 	 */
 	@Test(groups={"ut"})
@@ -113,8 +123,8 @@ public class TestBugTracker extends MockitoTest {
 		PowerMockito.whenNew(FakeBugTracker.class).withAnyArguments().thenReturn(fbt);
 		BugTracker bugtracker = BugTracker.getInstance("fake", "http://foo/bar", "selenium", "user", "password", new HashMap<>());
 			
-		bugtracker.createIssue("selenium", "DEV", "ngName", "myTest", "some description", 
-				Arrays.asList(step1, stepEnd),
+		bugtracker.createIssue("selenium", "DEV", "ngName", "testCreateIssue", "some description", 
+				Arrays.asList(step2, stepEnd),
 				issueOptions);
 		
 		// check that we check if the issue already exists
@@ -122,6 +132,27 @@ public class TestBugTracker extends MockitoTest {
 		
 		// check that issue is created
 		verify(fbt).createIssue(any(IssueBean.class));
+	}
+	
+	/**
+	 * Test issue is not created if no failed step is present during execution
+	 * @throws Exception
+	 */
+	@Test(groups={"ut"})
+	public void testDoNotCreateIssue() throws Exception {
+		FakeBugTracker fbt = spy(new FakeBugTracker());
+		PowerMockito.whenNew(FakeBugTracker.class).withAnyArguments().thenReturn(fbt);
+		BugTracker bugtracker = BugTracker.getInstance("fake", "http://foo/bar", "selenium", "user", "password", new HashMap<>());
+		
+		bugtracker.createIssue("selenium", "DEV", "ngName", "testDoNotCreateIssue", "some description", 
+				Arrays.asList(step1, stepEnd),
+				issueOptions);
+		
+		// check that we check if the issue already exists
+		verify(fbt, never()).issueAlreadyExists(any(IssueBean.class));
+		
+		// check that issue is created
+		verify(fbt, never()).createIssue(any(IssueBean.class));
 	}
 	
 	/**
@@ -158,15 +189,15 @@ public class TestBugTracker extends MockitoTest {
 		when(fbt.issueAlreadyExists(any(IssueBean.class))).thenReturn(new IssueBean("ISSUE-1", "[Selenium][app][env][ng] test Test1 KO", "Test KO"));
 		BugTracker bugtracker = BugTracker.getInstance("fake", "http://foo/bar", "selenium", "user", "password", new HashMap<>());
 			
-		bugtracker.createIssue("selenium", "DEV", "ngName", "myTest", "some description", 
-				Arrays.asList(step1, stepEnd), issueOptions);
+		bugtracker.createIssue("selenium", "DEV", "ngName", "testUpdateIssue", "some description", 
+				Arrays.asList(step2, stepEnd), issueOptions);
 		
 		// check that we check if the issue already exists
 		verify(fbt).issueAlreadyExists(any(IssueBean.class));
 		
 		// check that issue is not created
 		verify(fbt, never()).createIssue(any(IssueBean.class));
-		verify(fbt).updateIssue(eq("ISSUE-1"), anyString(), anyList(), eq(stepEnd));
+		verify(fbt).updateIssue(eq("ISSUE-1"), anyString(), anyList(), eq(step2));
 	}
 	
 	/**
@@ -180,15 +211,15 @@ public class TestBugTracker extends MockitoTest {
 		when(fbt.issueAlreadyExists(any(IssueBean.class))).thenReturn(new IssueBean("ISSUE-1", "[Selenium][app][env][ng] test Test1 KO", String.format(BugTracker.STEP_KO_PATTERN, 1)));
 		BugTracker bugtracker = BugTracker.getInstance("fake", "http://foo/bar", "selenium", "user", "password", new HashMap<>());
 	
-		bugtracker.createIssue("selenium", "DEV", "ngName", "myTest", "some description", 
-				Arrays.asList(step1, stepEnd), issueOptions);
+		bugtracker.createIssue("selenium", "DEV", "ngName", "testDoNotUpdateIssue", "some description", 
+				Arrays.asList(step2, stepEnd), issueOptions);
 		
 		// check that we check if the issue already exists
 		verify(fbt).issueAlreadyExists(any(IssueBean.class));
 		
 		// check that issue is not created
 		verify(fbt, never()).createIssue(any(IssueBean.class));
-		verify(fbt, never()).updateIssue(eq("ISSUE-1"), anyString(), anyList(), eq(stepEnd));
+		verify(fbt, never()).updateIssue(eq("ISSUE-1"), anyString(), anyList(), eq(step2));
 	}
 	
 
@@ -232,6 +263,55 @@ public class TestBugTracker extends MockitoTest {
 		Assert.assertEquals(issueBean.getDetailedResult().getName(), "detailedResult.zip");
 		Assert.assertTrue(issueBean.getDetailedResult().length() > 1000);
 		Assert.assertNull(issueBean.getId()); // not initialized by default
+	}
+	
+	/**
+	 * Test that if the failed step disables bugtracker, the issue bean is not created
+	 * @throws Exception
+	 */
+	@Test(groups={"ut"})
+	public void testDoNotCreateIssueBeanWithStepDisabled() throws Exception {
+		FakeBugTracker fbt = spy(new FakeBugTracker());
+		PowerMockito.whenNew(FakeBugTracker.class).withAnyArguments().thenReturn(fbt);
+		BugTracker bugtracker = BugTracker.getInstance("fake", "http://foo/bar", "selenium", "user", "password", new HashMap<>());
+			
+		
+		IssueBean issueBean = bugtracker.createIssueBean("[Selenium][selenium][DEV][ngName] test myTest KO", "testDoNotCreateIssueBeanWithStepDisabled", "some description", 
+				Arrays.asList(step1, stepFailedWithDisabledBugtracker, stepEnd), issueOptions);
+		Assert.assertNull(issueBean);
+	}
+	
+	/**
+	 * Test that if the failed step disables bugtracker, but an other keeps it enabled, the issue bean is created
+	 * @throws Exception
+	 */
+	@Test(groups={"ut"})
+	public void testCreateIssueBeanWithStepDisabled() throws Exception {
+		FakeBugTracker fbt = spy(new FakeBugTracker());
+		PowerMockito.whenNew(FakeBugTracker.class).withAnyArguments().thenReturn(fbt);
+		BugTracker bugtracker = BugTracker.getInstance("fake", "http://foo/bar", "selenium", "user", "password", new HashMap<>());
+		
+		
+		IssueBean issueBean = bugtracker.createIssueBean("[Selenium][selenium][DEV][ngName] test myTest KO", "testCreateIssueBeanWithStepDisabled", "some description", 
+				Arrays.asList(step1, step2, stepFailedWithDisabledBugtracker, stepEnd), issueOptions);
+		Assert.assertNotNull(issueBean);
+		
+		// check description only points step2 as the failed step
+		Assert.assertEquals(issueBean.getDescription(), "Test: testCreateIssueBeanWithStepDisabled\n" + 
+				"Description: some description\n" +
+				"Error step 1 (step 2): java.lang.NullPointerException: Error clicking\n" + 
+				"\n" + 
+				"Steps in error\n" +
+				"Step 1: step 2\n" + 
+				"------------------------------------\n" + 
+				"Step step 2\n" + 
+				"  - action1\n" + 
+				"  - action2\n" + 
+				"\n" + 
+				"Last logs\n" + 
+				"Step Test end\n" + 
+				"\n" + 
+				"For more details, see attached .zip file");
 	}
 	
 	/**
