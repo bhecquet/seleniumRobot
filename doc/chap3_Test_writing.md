@@ -323,7 +323,7 @@ Example of a shopping cart class. All must inherit of PageObject class:
 			return amount;
 		}
 		
-		@StepName("checkout cart")
+		@Step(name="checkout cart")
 		public SignIn checkout() throws Exception {
 			proceed.click();
 			return new SignIn(); 
@@ -462,16 +462,31 @@ If you need to take the n-th shadow-root element, there are 2 cases
 
 #### Document your tests ####
 
-By default, when reporting is built, step names come from method names. For more readability, you can annotate your steps with @StepName annotation
+##### Step naming #####
+
+By default, when reporting is built, step names come from method names. For more readability, you can annotate your steps with `@Step(name="my name")` annotation
 This way, step name will be the name defined in annotation
 	
-	@StepName("checkout cart")
+	@Step(name="checkout cart")
 
 Step name can also use placeholders for method parameters. They will be replaced by real values in report
 
-	@StepName("order ${number} ${product}")
+	@Step(name="order ${number} ${product}")
 	
 where method takes 'number' and 'product' arguments 
+
+##### Most probable error cause #####
+
+Through `@Step` annotation, it's possible to define the most probable cause of error when test fails at this step
+
+
+		@Step(errorCause=RootCause.DEPENDENCIES, errorCauseDetails="Application X is unavailable")
+		public SignIn checkout() throws Exception {
+			proceed.click();
+			return new SignIn(); 
+		}
+
+If the test fails at this step, the possible cause of failure will be displayed in report to help diagnose error.
 
 #### Add user defined test steps ####
 
