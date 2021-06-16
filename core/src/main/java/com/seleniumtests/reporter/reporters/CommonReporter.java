@@ -95,6 +95,7 @@ public abstract class CommonReporter implements IReporter {
 		VelocityEngine ve = new VelocityEngine();
 		ve.setProperty("resource.loader", "class");
 		ve.setProperty("class.resource.loader.class", RESOURCE_LOADER_PATH);
+		ve.setProperty("directive.set.null.allowed", true);
 		ve.init();
 		return ve;
 	}

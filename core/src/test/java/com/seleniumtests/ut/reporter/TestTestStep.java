@@ -30,6 +30,7 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import com.seleniumtests.GenericTest;
+import com.seleniumtests.core.Step.RootCause;
 import com.seleniumtests.customexception.CustomSeleniumTestsException;
 import com.seleniumtests.driver.screenshots.ScreenShot;
 import com.seleniumtests.driver.screenshots.SnapshotCheckType;
@@ -384,23 +385,45 @@ public class TestTestStep extends GenericTest {
 
 	@Test(groups = { "ut" })
 	public void testTestStepEncodeHtml() {
-		TestStep step = new TestStep("step1 \"'<>&\u0192", null, new ArrayList<>(), true);
+		TestStep step = new TestStep("step1 \"'<>&\u0192", null, new ArrayList<>(), true, RootCause.REGRESSION, "\"'<>&\u0192", false);
 		TestStep encodedTestStep = step.encode("html");
 		Assert.assertEquals(encodedTestStep.toString(), "Step step1 &quot;'&lt;&gt;&amp;&fnof;");
+		Assert.assertEquals(encodedTestStep.getErrorCauseDetails(), "&quot;'&lt;&gt;&amp;&fnof;");
 	}
 
 	@Test(groups = { "ut" })
 	public void testTestStepEncodeJson() {
-		TestStep step = new TestStep("step1 \"/\\", null, new ArrayList<>(), true);
+		TestStep step = new TestStep("step1 \"/\\", null, new ArrayList<>(), true, RootCause.REGRESSION, "\"/\\", false);
 		TestStep encodedTestStep = step.encode("json");
 		Assert.assertEquals(encodedTestStep.toString(), "Step step1 \\\"\\/\\\\");
+		Assert.assertEquals(encodedTestStep.getErrorCauseDetails(), "\\\"\\/\\\\");
 	}
 
 	@Test(groups = { "ut" })
 	public void testTestStepEncodeXml() {
-		TestStep step = new TestStep("step1 \"'<>&", null, new ArrayList<>(), true);
+		TestStep step = new TestStep("step1 \"'<>&", null, new ArrayList<>(), true, RootCause.REGRESSION, "\"'<>&", false);
 		TestStep encodedTestStep = step.encode("xml");
 		Assert.assertEquals(encodedTestStep.toString(), "Step step1 &quot;&apos;&lt;&gt;&amp;");
+		Assert.assertEquals(encodedTestStep.getErrorCauseDetails(), "&quot;&apos;&lt;&gt;&amp;");
+	}
+	
+	@Test(groups = { "ut" })
+	public void testDeepCopy() {
+		TestStep step = new TestStep("step1", null, new ArrayList<>(), true, RootCause.REGRESSION, "\"'<>&\u0192", false);
+		TestStep encodedTestStep = step.deepCopy();
+		Assert.assertEquals(step.getName(), encodedTestStep.getName());
+		Assert.assertEquals(step.getStepActions(), encodedTestStep.getStepActions());
+		Assert.assertEquals(step.getFailed(), encodedTestStep.getFailed());
+		Assert.assertEquals(step.getSnapshots(), encodedTestStep.getSnapshots());
+		Assert.assertEquals(step.getFiles(), encodedTestStep.getFiles());
+		Assert.assertEquals(step.getDuration(), encodedTestStep.getDuration());
+		Assert.assertEquals(step.getStartDate(), encodedTestStep.getStartDate());
+		Assert.assertEquals(step.getHarCaptures(), encodedTestStep.getHarCaptures());
+		Assert.assertEquals(step.getActionException(), encodedTestStep.getActionException());
+		Assert.assertEquals(step.getErrorCause(), encodedTestStep.getErrorCause());
+		Assert.assertEquals(step.getErrorCauseDetails(), encodedTestStep.getErrorCauseDetails());
+		Assert.assertEquals(step.isDisableBugtracker(), encodedTestStep.isDisableBugtracker());
+		Assert.assertNull(step.getActionExceptionMessage());
 	}
 
 	/**
@@ -934,5 +957,32 @@ public class TestTestStep extends GenericTest {
 
 		Assert.assertEquals(snapshot.getPosition(), 0);
 		Assert.assertEquals(snapshot.getParent(), step);
+	}
+	
+
+	@Test(groups = { "ut" })
+	public void testTestStepWithrootCause() {
+		TestStep step = new TestStep("step1", null, new ArrayList<>(), true, RootCause.REGRESSION, "details", false);
+		Assert.assertEquals(step.getErrorCause(), RootCause.REGRESSION);
+		Assert.assertEquals(step.getErrorCauseDetails(), "details");
+	}
+	
+	/**
+	 * Check error cause of a sub step is transferred to root step
+	 */
+	@Test(groups = { "ut" })
+	public void testTestStepWithrootCauseInSubStep() {
+		TestStep step = new TestStep("step1", null, new ArrayList<>(), true);
+		TestStep subStep = new TestStep("step1", null, new ArrayList<>(), true, RootCause.REGRESSION, "details", false);
+		step.addStep(subStep);
+		Assert.assertEquals(step.getErrorCause(), RootCause.REGRESSION);
+		Assert.assertEquals(step.getErrorCauseDetails(), "details");
+	}
+	
+	@Test(groups = { "ut" })
+	public void testTestStepWithRootCauseNone() {
+		TestStep step = new TestStep("step1", null, new ArrayList<>(), true, RootCause.NONE, "details", false);
+		Assert.assertNull(step.getErrorCause());
+		Assert.assertNull(step.getErrorCauseDetails());
 	}
 }

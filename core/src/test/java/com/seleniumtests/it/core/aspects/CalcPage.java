@@ -22,6 +22,8 @@ import java.io.IOException;
 import org.openqa.selenium.By;
 import org.testng.Assert;
 
+import com.seleniumtests.core.Step;
+import com.seleniumtests.core.Step.RootCause;
 import com.seleniumtests.core.StepName;
 import com.seleniumtests.customexception.DriverExceptions;
 import com.seleniumtests.uipage.PageObject;
@@ -98,6 +100,53 @@ public class CalcPage extends PageObject {
 			add(result, c);
 		}
 		return this;
+	}
+	
+	@Step(name="add something to total")
+	public CalcPage addWithNameBis(int a) {
+		add(result, a);
+		return this;
+	}
+	
+	@Step(name="add ${a} to total")
+	public CalcPage addWithName2Bis(int a) {
+		add(result, a);
+		return this;
+	}
+	
+	@Step(name="add ${a} and ${b} to total")
+	public CalcPage addWithName3Bis(Integer a, Integer ... b) {
+		add(result, a);
+		for (int c: b) {
+			add(result, c);
+		}
+		return this;
+	}
+	
+	@Step(name="add", errorCause = RootCause.REGRESSION, errorCauseDetails = "Check your scripts")
+	public CalcPage addWithErrorCauseNoError(int a) {
+		add(result, a);
+		return this;
+	}
+	
+	@Step(name="add", errorCause = RootCause.REGRESSION)
+	public CalcPage addWithErrorCauseError(int a) {
+		throw new DriverExceptions("fail");
+	}
+	
+	@Step(name="add", errorCause = RootCause.REGRESSION, errorCauseDetails = "Check your scripts")
+	public CalcPage addWithErrorCauseErrorAndDetails(int a) {
+		throw new DriverExceptions("fail");
+	}
+	
+	@Step(name="add")
+	public CalcPage addNoCauseErrorNoDetails(int a) {
+		throw new DriverExceptions("fail");
+	}
+	
+	@Step(name="add", errorCauseDetails = "Check your scripts")
+	public CalcPage addNoCauseErrorButDetails(int a) {
+		throw new DriverExceptions("fail");
 	}
 	
 	public CalcPage add(int a) {

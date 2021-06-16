@@ -41,6 +41,8 @@ import org.testng.annotations.AfterMethod;
 
 import com.neotys.selenium.proxies.NLWebDriver;
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.core.Step;
+import com.seleniumtests.core.Step.RootCause;
 import com.seleniumtests.core.StepName;
 import com.seleniumtests.core.TestStepManager;
 import com.seleniumtests.core.runner.SeleniumRobotTestPlan;
@@ -396,6 +398,10 @@ public class LogAction {
 		
 		// Get the method called by this joinPoint
 		Method method = ((MethodSignature)joinPoint.getSignature()).getMethod();
+		RootCause errorCause = RootCause.NONE;
+		String errorCauseDetails = null;
+		boolean disableBugtracker = false;
+		
 		
 		for (Annotation annotation: method.getAnnotations()) {
 			if ((annotation.annotationType().getCanonicalName().contains("cucumber.api.java.en") 
@@ -413,9 +419,26 @@ public class LogAction {
 					stepName = stepName.replaceAll(String.format("\\$\\{%s\\}",  entry.getKey()), entry.getValue().replace("$", "\\$"));
 				}
 				break;
+			} else if (annotation instanceof Step) {
+				stepName = ((Step)annotation).name();
+				errorCause = ((Step)annotation).errorCause();
+				errorCauseDetails = ((Step)annotation).errorCauseDetails();
+				disableBugtracker = ((Step)annotation).disableBugTracker();
+				
+				// replaces argument placeholders with values
+				for (Entry<String, String> entry: arguments.entrySet()) {
+					stepName = stepName.replaceAll(String.format("\\$\\{%s\\}",  entry.getKey()), entry.getValue().replace("$", "\\$"));
+				}
+				break;
 			}
 		}
-		return new TestStep(stepNamePrefix + stepName, Reporter.getCurrentTestResult(), pwdToReplace, SeleniumTestsContextManager.getThreadContext().getMaskedPassword());
+		return new TestStep(stepNamePrefix + stepName, 
+				Reporter.getCurrentTestResult(), 
+				pwdToReplace, 
+				SeleniumTestsContextManager.getThreadContext().getMaskedPassword(),
+				errorCause,
+				errorCauseDetails, 
+				disableBugtracker);
 	}
 	
 	/**

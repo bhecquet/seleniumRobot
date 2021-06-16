@@ -29,6 +29,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.testng.ITestResult;
 
+import com.seleniumtests.core.Step.RootCause;
 import com.seleniumtests.reporter.reporters.CommonReporter;
 
 /**
@@ -58,6 +59,9 @@ public class TestStep extends TestAction {
 	private List<GenericFile> files;
 	private List<Snapshot> snapshots;
 	private ITestResult testResult;
+	private RootCause errorCause;
+	private String errorCauseDetails;
+	private boolean disableBugtracker;
 	
 	public enum StepStatus {
 		SUCCESS,
@@ -72,6 +76,9 @@ public class TestStep extends TestAction {
 	 * @param pwdToReplace	list of string to replace when returning actions so that passwords are masked
 	 */
 	public TestStep(String name, ITestResult testResult, List<String> pwdToReplace, boolean maskPassword) {
+		this(name, testResult, pwdToReplace, maskPassword, RootCause.NONE, null, false);
+	}
+	public TestStep(String name, ITestResult testResult, List<String> pwdToReplace, boolean maskPassword, RootCause errorCause, String errorCauseDetails, boolean disableBugtracker) {
 		super(name, false, pwdToReplace);
 		this.maskPassword = maskPassword;
 		stepActions = new ArrayList<>();
@@ -81,6 +88,12 @@ public class TestStep extends TestAction {
 		duration = 0L;
 		startDate = new Date();
 		this.testResult = testResult;
+		
+		if (errorCause != RootCause.NONE) {
+			this.errorCause = errorCause;
+			this.errorCauseDetails = errorCauseDetails;
+		}
+		this.disableBugtracker = disableBugtracker;
 	}
 	
 	public Long getDuration() {
@@ -369,6 +382,43 @@ public class TestStep extends TestAction {
 	}
 	
 
+	public RootCause getErrorCause() {
+		if (getStepStatus() == StepStatus.SUCCESS) {
+			return null;
+		}
+		if (errorCause != null) {
+			return errorCause;
+		} 
+		for (TestAction action: stepActions) {
+			if ((action instanceof TestStep && ((TestStep) action).getErrorCause() != null)) {
+				return ((TestStep) action).getErrorCause();
+			}
+		}
+		
+		return errorCause;
+	}
+	
+	/**
+	 * Returns the error cause detail of the step or any sub step
+	 * @return
+	 */
+	public String getErrorCauseDetails() {
+		if (getStepStatus() == StepStatus.SUCCESS) {
+			return null;
+		}
+		if (errorCause != null) {
+			return errorCauseDetails;
+		} 
+		for (TestAction action: stepActions) {
+			if ((action instanceof TestStep && ((TestStep) action).getErrorCause() != null)) {
+				return ((TestStep) action).getErrorCauseDetails();
+			}
+		}
+		return errorCauseDetails;
+	}
+	public boolean isDisableBugtracker() {
+		return disableBugtracker;
+	}
 	public List<GenericFile> getFiles() {
 		return files;
 	}
@@ -410,6 +460,12 @@ public class TestStep extends TestAction {
 		if (actionException != null) {
 			step.actionExceptionMessage = actionException.getClass().toString() + ": " + encodeString(actionException.getMessage(), format);
 		}
+		
+
+		step.errorCause = errorCause;
+		step.errorCauseDetails = encodeString(errorCauseDetails, format);
+		step.disableBugtracker = disableBugtracker;
+		
 		return step;
 	}
 

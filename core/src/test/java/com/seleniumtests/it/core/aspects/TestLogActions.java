@@ -30,6 +30,7 @@ import org.testng.annotations.Test;
 
 import com.seleniumtests.GenericTest;
 import com.seleniumtests.core.SeleniumTestsContextManager;
+import com.seleniumtests.core.Step.RootCause;
 import com.seleniumtests.core.runner.SeleniumRobotTestPlan;
 import com.seleniumtests.customexception.DriverExceptions;
 import com.seleniumtests.driver.WebUIDriver;
@@ -120,6 +121,45 @@ public class TestLogActions extends GenericTest {
 	}
 	
 	/**
+	 * Only test presence of root steps. there should be:
+	 * - page opening
+	 * - add something to total (this step has the @StepName description
+	 * Checks that root steps are correctly intercepted
+	 * 
+	 * Here, we check the "@Step" annotation
+	 * @throws IOException
+	 */
+	@Test(groups={"it"})
+	public void testSimpleNonCucumberStepLoggingWithStepDescription2() throws IOException {
+		new CalcPage()
+		.addWithNameBis(1);
+		
+		List<TestStep> steps = SeleniumTestsContextManager.getThreadContext().getTestStepManager().getTestSteps();
+		Assert.assertEquals(steps.size(), 2);
+		Assert.assertEquals(steps.get(0).getName(), "openPage with args: (null, )");
+		Assert.assertEquals(steps.get(1).getName(), "add something to total");
+	}
+	
+	/**
+	 * Check that if step definition contains argument name, this one is replaced
+	 * - page opening
+	 * - 'add 1 to total' (this step has the @StepName description
+	 * Checks that root steps are correctly intercepted
+	 * 
+	 * Here, we check the "@Step" annotation
+	 * @throws IOException
+	 */
+	@Test(groups={"it"})
+	public void testSimpleNonCucumberStepLoggingWithStepDescriptionAndArgs2() throws IOException {
+		new CalcPage()
+		.addWithName2Bis(1);
+		
+		List<TestStep> steps = SeleniumTestsContextManager.getThreadContext().getTestStepManager().getTestSteps();
+		Assert.assertEquals(steps.size(), 2);
+		Assert.assertEquals(steps.get(1).getName(), "add 1 to total");
+	}
+	
+	/**
 	 * Check that if step definition contains argument name and one of argument is password, it's masked
 	 * - Connect to calc with login/******
 	 * @throws IOException
@@ -156,8 +196,7 @@ public class TestLogActions extends GenericTest {
 	}
 	
 	/**
-	 * Check that if step definition contains argument name and one of argument is password, it's masked
-	 * - Connect to calc with login/******
+	 * Check that if step definition contains argument name with array, all values are visible
 	 * @throws IOException
 	 */
 	@Test(groups={"it"})
@@ -166,6 +205,23 @@ public class TestLogActions extends GenericTest {
 		new CalcPage()
 		.addWithName3(1, 2, 3);
 
+		List<TestStep> steps = SeleniumTestsContextManager.getThreadContext().getTestStepManager().getTestSteps();
+		Assert.assertEquals(steps.size(), 2);
+		Assert.assertEquals(steps.get(1).getName(), "add 1 and [2,3,] to total");
+	}
+	
+	/**
+	 * Check that if step definition contains argument name with array, all values are visible
+	 * 
+	 * Here, we check the "@Step" annotation
+	 * @throws IOException
+	 */
+	@Test(groups={"it"})
+	public void testSimpleNonCucumberStepLoggingWithStepDescriptionArray2() throws IOException {
+		SeleniumTestsContextManager.getThreadContext().setMaskPassword(true);
+		new CalcPage()
+		.addWithName3Bis(1, 2, 3);
+		
 		List<TestStep> steps = SeleniumTestsContextManager.getThreadContext().getTestStepManager().getTestSteps();
 		Assert.assertEquals(steps.size(), 2);
 		Assert.assertEquals(steps.get(1).getName(), "add 1 and [2,3,] to total");
@@ -330,5 +386,20 @@ public class TestLogActions extends GenericTest {
 	@Test(groups={"it"})
 	public void testNullPasswordReplacement() throws IOException {
 		testPassword(true, null, "null");
+	}
+	
+	/**
+	 * A step is defined with error cause
+	 * @throws IOException
+	 */
+	@Test(groups={"it"})
+	public void testStepWithErrorCause() throws IOException {
+		new CalcPage()
+		.addWithErrorCauseErrorAndDetails(1);
+		
+		List<TestStep> steps = SeleniumTestsContextManager.getThreadContext().getTestStepManager().getTestSteps();
+		Assert.assertEquals(steps.size(), 2);
+		Assert.assertEquals(steps.get(1).getErrorCause(), RootCause.REGRESSION);
+		Assert.assertEquals(steps.get(1).getErrorCauseDetails(), "Check your scripts");
 	}
 }

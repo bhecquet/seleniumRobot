@@ -1999,4 +1999,60 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			System.clearProperty("url");
 		}	
 	}
+	
+	/**
+	 * Check error cause is displayed in report
+	 * @throws Exception
+	 */
+	@Test(groups={"it"})
+	public void testStepAnnotationWithError() throws Exception {
+		
+		SeleniumTestsContextManager.removeThreadContext();
+		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForStepsAnnotation"}, ParallelMode.METHODS, new String[] {"testCauseWithErrorAndDetails"});
+
+		String detailedReportContent = readTestMethodResultFile("testCauseWithErrorAndDetails");
+		
+		// Only failing step contains the information message
+		Assert.assertTrue(detailedReportContent.matches(".*<i class\\=\"fa fa-plus\"></i></button> add - 0\\.0 secs\\s+</div><div class\\=\"box-body\"><div class\\=\"step-info\"><i class\\=\"fa fa-info-circle\"></i><span>Possibly caused by REGRESSION: Check your scripts</span></div>.*"));
+		Assert.assertFalse(detailedReportContent.matches(".*<i class\\=\"fa fa-plus\"></i></button> Test end - 0\\.0 secs\\s+</div><div class\\=\"box-body\"><div class\\=\"step-info\"><i class\\=\"fa fa-info-circle\"></i><span>Possibly caused by REGRESSION: Check your scripts</span></div>.*"));
+	}
+	
+	@Test(groups={"it"})
+	public void testStepAnnotationWithErrorNoDetails() throws Exception {
+		
+		SeleniumTestsContextManager.removeThreadContext();
+		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForStepsAnnotation"}, ParallelMode.METHODS, new String[] {"testCauseWithErrorNoDetails"});
+		
+		String detailedReportContent = readTestMethodResultFile("testCauseWithErrorNoDetails");
+		
+		// Only failing step contains the information message
+		Assert.assertTrue(detailedReportContent.matches(".*<i class\\=\"fa fa-plus\"></i></button> add - 0\\.0 secs\\s+</div><div class\\=\"box-body\"><div class\\=\"step-info\"><i class\\=\"fa fa-info-circle\"></i><span>Possibly caused by REGRESSION: </span></div>.*"));
+		Assert.assertFalse(detailedReportContent.matches(".*<i class\\=\"fa fa-plus\"></i></button> Test end - 0\\.0 secs\\s+</div><div class\\=\"box-body\"><div class\\=\"step-info\"><i class\\=\"fa fa-info-circle\"></i><span>Possibly caused by REGRESSION: </span></div>.*"));
+	}
+	
+	@Test(groups={"it"})
+	public void testStepAnnotationNoErrors() throws Exception {
+		
+		SeleniumTestsContextManager.removeThreadContext();
+		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForStepsAnnotation"}, ParallelMode.METHODS, new String[] {"testCauseNoError"});
+		
+		String detailedReportContent = readTestMethodResultFile("testCauseNoError");
+		
+		// add step is not in error, error cause is not displayed
+		Assert.assertFalse(detailedReportContent.contains("<div class=\"step-info\"><i class=\"fa fa-info-circle\"></i>"));
+		
+	}
+	
+	@Test(groups={"it"})
+	public void testStepAnnotationNoErrorCause() throws Exception {
+		
+		SeleniumTestsContextManager.removeThreadContext();
+		executeSubTest(1, new String[] {"com.seleniumtests.it.stubclasses.StubTestClassForStepsAnnotation"}, ParallelMode.METHODS, new String[] {"testNoCauseAndError"});
+		
+		String detailedReportContent = readTestMethodResultFile("testNoCauseAndError");
+		
+		// add step is not in error, error cause is not displayed
+		Assert.assertFalse(detailedReportContent.contains("<div class=\"step-info\"><i class=\"fa fa-info-circle\"></i>"));
+		
+	}
 }

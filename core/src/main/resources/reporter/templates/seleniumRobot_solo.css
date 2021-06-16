@@ -101,6 +101,19 @@ body{
 	color: #F9727B;
 }
 
+.fa-info-circle {
+	color: #3399ff;
+	padding-right: 4px;
+}
+
+.step-info {
+	background-color: #e6f2ff;
+	border-color: #0073e6;
+	border-style: solid;
+	border-width: 1px;
+	padding: 4px;
+}
+
 .warning .fa-plus, .warning .fa-minus{
 	color: #FFBF80;
 }

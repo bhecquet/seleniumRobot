@@ -149,6 +149,8 @@
 									#set ($stepStatus = $step.get(1))
 									#set ($stepDuration = $step.get(2))
 									#set ($stepObject = $step.get(3))
+									#set ($stepErrorCause = $step.get(4))
+									#set ($stepErrorCauseDetails = $step.get(5))
 									
 									#if ($stepStatus.toString().equals("passed"))
 										<div class="box collapsed-box success">
@@ -163,6 +165,11 @@
 											<button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-plus"></i></button> $stepName - $stepDuration secs
 										</div>
 										<div class="box-body">
+											#if ($stepErrorCause)
+												<div class="step-info">
+													<i class="fa fa-info-circle"></i><span>Possibly caused by $stepErrorCause: $stepErrorCauseDetails</span>
+												</div>
+											#end
 											#stepActions($stepObject true)
 											
 											#if($stepObject.getActionException())
