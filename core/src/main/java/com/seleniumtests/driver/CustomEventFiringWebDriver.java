@@ -19,6 +19,8 @@ package com.seleniumtests.driver;
 
 import java.awt.AWTError;
 import java.awt.AWTException;
+import java.awt.BorderLayout;
+import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.HeadlessException;
@@ -44,6 +46,8 @@ import java.util.TreeSet;
 import java.util.UUID;
 
 import javax.imageio.ImageIO;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Base64OutputStream;
@@ -1400,6 +1404,43 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
 			return captureDesktopToBase64String(driverMode, gridConnector);
 		} else {
 			return super.executeScript(script, args);
+		}
+	}
+	
+	public static void displayStepOnScreen(String textToWrite, DriverMode driverMode, SeleniumGridConnector gridConnector) {
+		if (driverMode == DriverMode.LOCAL) {
+			
+
+			try {
+				GraphicsConfiguration gc = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration();
+				Rectangle screenBounds = gc.getBounds();
+				
+				JFrame window = new JFrame("JFrame with text"); 
+				window.setAlwaysOnTop (true);
+				window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+				window.setUndecorated(true); 
+				try {
+					window.setOpacity(0.4f);
+				} catch (UnsupportedOperationException e) {
+					// nothing to do
+				}
+				window.setBounds(screenBounds.width / 3, 0, screenBounds.width * 2 / 3 - 100, 20);
+				window.setLayout(new BorderLayout());
+				JLabel label = new JLabel("Hello World");
+				label.setFont (label.getFont ().deriveFont (20.0f));
+				window.add(label, BorderLayout.CENTER);
+	
+				window.setVisible(true);
+				
+				label.setText("coucou la planètecoucou la planètecoucou la planètecoucou la planètecoucou la planète");
+	
+			} catch (Exception e) {
+				throw new ScenarioException("writeToDesktop: could not initialize robot to type keys: " + e.getMessage());
+			}
+		} else if (driverMode == DriverMode.GRID && gridConnector != null) {
+			gridConnector.writeText(textToWrite);
+		} else {
+			throw new ScenarioException("driver supports writeToDesktop only in local and grid mode");
 		}
 	}
 	
