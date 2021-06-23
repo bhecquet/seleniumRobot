@@ -1870,11 +1870,11 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			String detailedReportContent = readTestMethodResultFile("testDriverShortKoWithCatchException");
 			
 			// test all error log is displayed in execution logs
-			Assert.assertTrue(detailedReportContent.contains("[main] ScenarioLogger: Searched element could not be found</div>"));
+			Assert.assertTrue(detailedReportContent.contains("[main] ScenarioLogger: Searched element [TextFieldElement Text, by={By.id: text___}] from page 'com.seleniumtests.it.driver.support.pages.DriverTestPage' could not be found</div>"));
 			Assert.assertTrue(detailedReportContent.contains("<div>at com.seleniumtests.it.driver.support.pages.DriverTestPage._writeSomethingOnNonExistentElementWithCatch"));
 			Assert.assertTrue(detailedReportContent.contains("<div>For documentation on this error, please visit: https://www.seleniumhq.org/exceptions/no_such_element.html</div>")); // checks that line not showing thread name are in logs
 			
-			Assert.assertTrue(detailedReportContent.contains("<div class=\"message-warning\">Warning: Searched element could not be found<br/>" + 
+			Assert.assertTrue(detailedReportContent.contains("<div class=\"message-warning\">Warning: Searched element [TextFieldElement Text, by={By.id: text___}] from page 'com.seleniumtests.it.driver.support.pages.DriverTestPage' could not be found<br/>" + 
 					"For documentation on this error, please visit: https://www.seleniumhq.org/exceptions/no_such_element.html<br/>")); // warning displayed in step
 		} finally {
 			System.clearProperty(SeleniumTestsContext.TEST_RETRY_COUNT);
@@ -1895,8 +1895,8 @@ public class TestSeleniumTestsReporter2 extends ReporterTest {
 			
 			// read 'testDriver' report. This contains calls to HtmlElement actions
 			String detailedReportContent1 = readTestMethodResultFile("testDriverIsDisplayedRetry");
-			Assert.assertTrue(detailedReportContent1.contains("<div class=\"message-warning\">Warning: Searched element could not be found")); // warning
-			Assert.assertFalse(detailedReportContent1.contains("<div class=\"message-error\">class org.openqa.selenium.NoSuchElementException: Searched element could not be found<br/>"));
+			Assert.assertTrue(detailedReportContent1.contains("<div class=\"message-warning\">Warning: Searched element [TextFieldElement Text, by={By.id: text___}] from page 'com.seleniumtests.it.driver.support.pages.DriverTestPage' could not be found")); // warning
+			Assert.assertFalse(detailedReportContent1.contains("<div class=\"message-error\">class org.openqa.selenium.NoSuchElementException: Searched element [TextFieldElement Text, by={By.id: text___}] from page 'com.seleniumtests.it.driver.support.pages.DriverTestPage' could not be found<br/>"));
 		} finally {
 			System.clearProperty(SeleniumTestsContext.REPLAY_TIME_OUT);
 		}
