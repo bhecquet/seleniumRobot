@@ -394,8 +394,12 @@ public class TestLogActions extends GenericTest {
 	 */
 	@Test(groups={"it"})
 	public void testStepWithErrorCause() throws IOException {
-		new CalcPage()
-		.addWithErrorCauseErrorAndDetails(1);
+		try {
+			new CalcPage()
+			.addWithErrorCauseErrorAndDetails(1);
+		} catch (DriverExceptions e) {
+			// continue;
+		}
 		
 		List<TestStep> steps = SeleniumTestsContextManager.getThreadContext().getTestStepManager().getTestSteps();
 		Assert.assertEquals(steps.size(), 2);
