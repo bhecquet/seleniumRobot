@@ -44,9 +44,10 @@ public class StubTestClassForTestManager extends StubParentClass {
 	}
 	
 	@Test(groups="stub", attributes = {@CustomAttribute(name = "testId", values = "13")})
-	public void testInError() {
+	public void testInError() throws IOException {
 		createOrUpdateLocalParam("bugtracker.assignee", "you2"); // change value for bugtracker assignee so that we check it's updated
-		throw new WebDriverException();
+		new StubTestPage()
+			.failStep();
 	}
 	
 	@Test(groups="stub", attributes = {@CustomAttribute(name = "testId", values = "14")})
@@ -55,8 +56,9 @@ public class StubTestClassForTestManager extends StubParentClass {
 	}
 	
 	@Test(groups="stub", attributes = {@CustomAttribute(name = "testId", values = "15")})
-	public void testSkipped() {
-		throw new SkipException("skip this test");
+	public void testSkipped() throws IOException {
+		new StubTestPage()
+		.skipStep();
 	}
 	
 	@DataProvider(name = "data")
@@ -66,9 +68,10 @@ public class StubTestClassForTestManager extends StubParentClass {
 	
 
 	@Test(groups="stub", dataProvider = "data", attributes = {@CustomAttribute(name = "testId", values = "16")})
-	public void testInErrorDataProvider(String name) {
+	public void testInErrorDataProvider(String name) throws IOException {
 		createOrUpdateLocalParam("bugtracker.assignee", "you2" + name); // change value for bugtracker assignee so that w check it's updated
-		throw new WebDriverException();
+		new StubTestPage()
+		.failStep();
 	}
 
 }

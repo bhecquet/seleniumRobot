@@ -19,6 +19,7 @@ package com.seleniumtests.it.stubclasses;
 
 import java.io.IOException;
 
+import org.openqa.selenium.WebDriverException;
 import org.testng.SkipException;
 
 import com.seleniumtests.driver.BrowserType;
@@ -52,6 +53,10 @@ public class StubTestPage extends PageObject {
 	
 	public StubTestPage skipStep() {
 		throw new SkipException("skip this");
+	}
+	
+	public StubTestPage failStep() {
+		throw new WebDriverException("fail");
 	}
 
 }

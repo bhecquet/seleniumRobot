@@ -22,7 +22,6 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.contains;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -85,7 +84,7 @@ public class TestBugTrackerReporter extends ReporterTest {
 			
 			// check we have only one result recording for each test method
 			verify(jiraConnector).createIssue(eq("core"), eq("DEV"), anyString(), eq("testInError"), contains("Test 'testInError' failed"), testStepsArgument.capture(), issueOptionsArgument.capture());
-			Assert.assertEquals(testStepsArgument.getValue().size(), 3);
+			Assert.assertEquals(testStepsArgument.getValue().size(), 5);
 			
 			Assert.assertEquals(issueOptionsArgument.getValue().size(), 3);
 			Assert.assertEquals(issueOptionsArgument.getValue().get("reporter"), "me");
