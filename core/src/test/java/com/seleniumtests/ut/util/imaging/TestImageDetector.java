@@ -260,6 +260,17 @@ public class TestImageDetector extends GenericTest {
 		ImageDetector detector = new ImageDetector(createFileFromResource("tu/images/p9.png"), 
 				createFileFromResource("tu/images/vosAlertes.png"));
 		detector.detectExactZoneWithScale();
+		Rectangle detectedRectangle = detector.getDetectedRectangle();
+		Assert.assertEquals(detectedRectangle, new Rectangle(575, 137, 30, 108));
+	}
+	
+	@Test(groups={"ut"})
+	public void searchExactPictureNoScaling() throws IOException {
+		ImageDetector detector = new ImageDetector(createFileFromResource("tu/images/p9.png"), 
+				createFileFromResource("tu/images/vosAlertes.png"));
+		detector.detectExactZoneWithoutScale();
+		Rectangle detectedRectangle = detector.getDetectedRectangle();
+		Assert.assertEquals(detectedRectangle, new Rectangle(575, 137, 30, 108));
 	}
 	
 	
