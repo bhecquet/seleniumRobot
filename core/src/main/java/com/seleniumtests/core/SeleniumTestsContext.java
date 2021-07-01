@@ -121,6 +121,9 @@ public class SeleniumTestsContext {
     public static final String ADVANCED_ELEMENT_SEARCH = "advancedElementSearch";	// 'false' (default), 'full', 'dom'. if 'dom', store and possibly use found element information to adapt to changes in DOM, using only DOM information. If element is not found, it will try to use other element information to find it
     																				// if 'full', search will also be done using element picture, if available
     
+
+    public static final String IMAGE_FIELD_DETECTOR_SERVER_URL = "imageFieldDetectorServerUrl";		// URL of the server that can find fields in an image
+    
     // selenium robot server parameters
     public static final String SELENIUMROBOTSERVER_URL = "seleniumRobotServerUrl";
     public static final String SELENIUMROBOTSERVER_ACTIVE = "seleniumRobotServerActive";
@@ -282,6 +285,7 @@ public class SeleniumTestsContext {
 	public static final String DEFAULT_STARTED_BY = null;
 	public static final boolean DEFAULT_REPORTPORTAL_ACTIVE = false;
 	public static final ElementInfo.Mode DEFAULT_ADVANCED_ELEMENT_SEARCH = ElementInfo.Mode.FALSE;
+	public static final String DEFAULT_IMAGE_FIELD_DETECTOR_SERVER_URL = null;
     
     public static final int DEFAULT_REPLAY_TIME_OUT = 30;
     
@@ -365,6 +369,7 @@ public class SeleniumTestsContext {
     private void buildContextFromConfig() {
     	setConfiguration(new HashMap<>());
     	
+    	setImageFieldDetectorServerUrl(getValueForTest(IMAGE_FIELD_DETECTOR_SERVER_URL, System.getProperty(IMAGE_FIELD_DETECTOR_SERVER_URL)));
         setSeleniumRobotServerUrl(getValueForTest(SELENIUMROBOTSERVER_URL, System.getProperty(SELENIUMROBOTSERVER_URL)));
         setSeleniumRobotServerActive(getBoolValueForTest(SELENIUMROBOTSERVER_ACTIVE, System.getProperty(SELENIUMROBOTSERVER_ACTIVE)));
         setSeleniumRobotServerToken(getValueForTest(SELENIUMROBOTSERVER_TOKEN, System.getProperty(SELENIUMROBOTSERVER_TOKEN)));
@@ -1293,6 +1298,10 @@ public class SeleniumTestsContext {
     	return false;
     }
     
+    public String getImageFieldDetectorServerUrl() {
+    	return (String) getAttribute(IMAGE_FIELD_DETECTOR_SERVER_URL);
+    }
+    
     public String getSeleniumRobotServerUrl() {
     	return (String) getAttribute(SELENIUMROBOTSERVER_URL);
     }
@@ -1876,6 +1885,14 @@ public class SeleniumTestsContext {
     		setAttribute(REPORTPORTAL_ACTIVE, DEFAULT_REPORTPORTAL_ACTIVE);
     	}
     	
+    }
+    
+    public void setImageFieldDetectorServerUrl(String url) {
+    	if (url != null) {
+    		setAttribute(IMAGE_FIELD_DETECTOR_SERVER_URL, url);
+    	} else {
+    		setAttribute(IMAGE_FIELD_DETECTOR_SERVER_URL, DEFAULT_IMAGE_FIELD_DETECTOR_SERVER_URL);
+    	}
     }
     
     public void setSeleniumRobotServerUrl(String url) {
