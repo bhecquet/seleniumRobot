@@ -351,6 +351,11 @@ public class ImageDetector {
 		recordDetectedRectangle(p1, p2, p3, p4);
 	}
 
+	
+	public void detectExactZoneWithoutScale() {
+		detectExactZoneWithScale(false);
+	}
+	
 	/**
 	 * Detect the object inside the scene
 	 * We also search the scale of the scene from 20% to 120% scale by steps
@@ -368,6 +373,9 @@ public class ImageDetector {
 	 * The best match is at 675
 	 */
 	public void detectExactZoneWithScale() {
+		detectExactZoneWithScale(true);
+	}
+	public void detectExactZoneWithScale(boolean scaleImage) {
 		
 		Mat sceneImageMat = Imgcodecs.imread(sceneImage.getAbsolutePath(), Imgcodecs.CV_LOAD_IMAGE_GRAYSCALE);
         Mat objectImageMat = Imgcodecs.imread(objectImage.getAbsolutePath(), Imgcodecs.CV_LOAD_IMAGE_GRAYSCALE);
@@ -375,9 +383,14 @@ public class ImageDetector {
         List<TemplateMatchProperties> matches = Collections.synchronizedList(new ArrayList<>());
         
         Map<Integer, Double> scaleSteps = new LinkedHashMap<>();
-        scaleSteps.put(100, Math.max(0.1, 0.6 - detectionThreshold));
-        scaleSteps.put(50, Math.max(0.1, 0.7 - detectionThreshold));
-        scaleSteps.put(25, Math.max(0.1, 0.8 - detectionThreshold));
+        
+        if (scaleImage) {
+        	scaleSteps.put(100, Math.max(0.1, 0.6 - detectionThreshold));
+        	scaleSteps.put(50, Math.max(0.1, 0.7 - detectionThreshold));
+	        scaleSteps.put(25, Math.max(0.1, 0.8 - detectionThreshold));    
+        } else {
+        	scaleSteps.put(100, Math.max(0.1, 0.8 - detectionThreshold));
+        }
         
         int currentStep = 100;
         
@@ -388,10 +401,14 @@ public class ImageDetector {
         	
         	// first loop
         	Set<Integer> localScales = Collections.synchronizedSet(new HashSet<>());
-        	if (currentStep == 100) {
+        	if (currentStep == 100 && scaleImage) {
         		for (int scale=200; scale < 1200; scale += currentStep) {
         			localScales.add(scale);
                 }
+        		
+        	// no scaling requested, keep only 100%
+        	} else if (currentStep == 100) {
+        		localScales.add(1000);
         	} else {
         		if (matches.isEmpty()) {
         			throw new ImageSearchException("no matches");
@@ -404,44 +421,8 @@ public class ImageDetector {
 	        	}
         	}
         	
-        	ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
-        	for (int scale: localScales) {
-        		if (computedScales.contains(scale)) {
-        			continue;
-        		}
-        		computedScales.add(scale);
-
-    			// resize to scale factor
-        		final int localScale = scale;
-    			Size sz = new Size(sceneImageMat.cols() * scale / 1000.0, sceneImageMat.rows() * localScale / 1000.0);
-    			
-    			// skip if resized image is smaller than object
-    			if (sz.width < objectImageMat.cols() || sz.height < objectImageMat.rows()) {
-    				continue;
-    			}
-
-    			executorService.submit(() -> {
-    				
-    				Mat resizeSceneImageMat = new Mat();
-    				Imgproc.resize( sceneImageMat, resizeSceneImageMat, sz );
-    				
-    		        try {
-    		        	TemplateMatchProperties match = detectExactZone2(resizeSceneImageMat, objectImageMat, localScale, currentThreshold);
-    		        	matches.add(match);
-    		      	} catch (ImageSearchException e) {
-    		      		// no match found
-    				}
-    		        
-    		      });
-    		}
-        
-    		executorService.shutdown();
-    		try {
-    			executorService.awaitTermination(10, TimeUnit.SECONDS);
-    		} catch (Exception e) {
-    			logger.info("Could not compute scale within 10 seconds", e);
-    			Thread.currentThread().interrupt();
-    		}
+        	// extract the matching from images, for each scale
+        	extractMatching(sceneImageMat, objectImageMat, matches, computedScales, currentThreshold, localScales);
     		
     		
         	// shortcut if we find a very good match
@@ -460,6 +441,11 @@ public class ImageDetector {
     			if (t.getMatchValue() < cleanThreshold) {
         			t.setActive(false);
         		}
+    		}
+    		
+    		// if scaling is not requested, stop here
+    		if (!scaleImage) {
+    			break;
     		}
         }
 		
@@ -493,6 +479,57 @@ public class ImageDetector {
 			throw new ImageSearchException("no matching has been found");
 		}
       
+	}
+
+	/**
+	 * Extract matching in parallel
+	 * @param sceneImageMat
+	 * @param objectImageMat
+	 * @param matches
+	 * @param computedScales
+	 * @param currentThreshold
+	 * @param localScales
+	 */
+	private void extractMatching(Mat sceneImageMat, Mat objectImageMat, List<TemplateMatchProperties> matches,
+			Set<Integer> computedScales, final double currentThreshold, Set<Integer> localScales) {
+		ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+		for (int scale: localScales) {
+			if (computedScales.contains(scale)) {
+				continue;
+			}
+			computedScales.add(scale);
+
+			// resize to scale factor
+			final int localScale = scale;
+			Size sz = new Size(sceneImageMat.cols() * scale / 1000.0, sceneImageMat.rows() * localScale / 1000.0);
+			
+			// skip if resized image is smaller than object
+			if (sz.width < objectImageMat.cols() || sz.height < objectImageMat.rows()) {
+				continue;
+			}
+
+			executorService.submit(() -> {
+				
+				Mat resizeSceneImageMat = new Mat();
+				Imgproc.resize( sceneImageMat, resizeSceneImageMat, sz );
+				
+		        try {
+		        	TemplateMatchProperties match = detectExactZone2(resizeSceneImageMat, objectImageMat, localScale, currentThreshold);
+		        	matches.add(match);
+		      	} catch (ImageSearchException e) {
+		      		// no match found
+				}
+		        
+		      });
+		}
+      
+		executorService.shutdown();
+		try {
+			executorService.awaitTermination(10, TimeUnit.SECONDS);
+		} catch (Exception e) {
+			logger.info("Could not compute scale within 10 seconds", e);
+			Thread.currentThread().interrupt();
+		}
 	}
 	
 	private MinMaxLocResult getBestTemplateMatching(int matchMethod, Mat sceneImageMat, Mat objectImageMat) {
