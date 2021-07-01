@@ -33,11 +33,18 @@ public class Field {
 	}
 	
 	public Rectangle getRectangle() {
-		return new Rectangle(label.getLeft(), label.getTop(), label.getHeight(), label.getWidth());
+		return new Rectangle(label.getLeft(), label.getTop(), label.getWidth(), label.getHeight());
 	}
 	
 	public String getClassName() {
 		return className;
+	}
+	
+	/**
+	 * Method for changing position of the element, for example to adapt coordinates to the screen (detection may be done on browser capture, not screen capture)
+	 */
+	public void changePosition(int xOffset, int yOffset) {
+		label.changePosition(xOffset, yOffset);
 	}
 	
 	public Rectangle getInnerFieldRectangle() {

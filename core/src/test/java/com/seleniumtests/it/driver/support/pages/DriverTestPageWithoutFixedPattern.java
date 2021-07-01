@@ -20,16 +20,20 @@ package com.seleniumtests.it.driver.support.pages;
 import java.nio.file.Paths;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.interactions.Actions;
 
 import com.seleniumtests.core.SeleniumTestsContextManager;
 import com.seleniumtests.driver.BrowserType;
+import com.seleniumtests.driver.CustomEventFiringWebDriver;
 import com.seleniumtests.uipage.PageObject;
 import com.seleniumtests.uipage.htmlelements.FrameElement;
+import com.seleniumtests.uipage.htmlelements.HtmlElement;
 import com.seleniumtests.uipage.htmlelements.LinkElement;
 import com.seleniumtests.uipage.htmlelements.PictureElement;
 import com.seleniumtests.uipage.htmlelements.ScreenZone;
 import com.seleniumtests.uipage.htmlelements.Table;
 import com.seleniumtests.uipage.htmlelements.TextFieldElement;
+import com.seleniumtests.uipage.uielements.TextFieldUiElement;
 
 /**
  * Same as DriverTestPage, but colored rows are not displayed in this page
@@ -54,6 +58,8 @@ public class DriverTestPageWithoutFixedPattern extends PageObject {
 	public static final FrameElement iframe = new FrameElement("IFrame", By.id("myIFrame"));
 	public static final TextFieldElement textElementIFrame = new TextFieldElement("Text", By.id("textInIFrameWithValue"), iframe);
 	
+	public static final TextFieldUiElement uiTextElement = new TextFieldUiElement("Mon label.*");
+	
 	private String openedPageUrl;
 	
 	public DriverTestPageWithoutFixedPattern() throws Exception {
@@ -72,6 +78,16 @@ public class DriverTestPageWithoutFixedPattern extends PageObject {
     //for TestInterceptPage (the loader page of By has to be a PageObject)
     public By findById(String id) {
     	return By.id(id); 
+    }
+    
+    public void move() {
+    	CustomEventFiringWebDriver driver = (CustomEventFiringWebDriver)(getDriver());
+    	HtmlElement html = new HtmlElement("", By.tagName("html"));
+    	driver.manage().window().getPosition();
+    	driver.manage().window().getSize();
+    	driver.getViewPortDimensionWithoutScrollbar();
+    	new Actions(driver).moveToElement(html).moveByOffset(10, 100).click().perform();
+    	driver.getCurrentUrl();
     }
     
 
