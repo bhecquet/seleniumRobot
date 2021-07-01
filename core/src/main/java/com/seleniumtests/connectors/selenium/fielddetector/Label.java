@@ -55,4 +55,11 @@ public class Label {
 		
 		return label;
 	}
+	
+	public void changePosition(int xOffset, int yOffset) {
+		left += xOffset;
+		top += yOffset;
+		right = left + width;
+		bottom = top + height;
+	}
 }
