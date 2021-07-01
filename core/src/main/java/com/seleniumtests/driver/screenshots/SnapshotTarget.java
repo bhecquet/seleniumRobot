@@ -11,11 +11,13 @@ import org.openqa.selenium.WebElement;
 public class SnapshotTarget {
 	
 	public static final SnapshotTarget SCREEN = new SnapshotTarget(Target.SCREEN);
+	public static final SnapshotTarget MAIN_SCREEN = new SnapshotTarget(Target.MAIN_SCREEN);
 	public static final SnapshotTarget PAGE = new SnapshotTarget(Target.PAGE);
 	public static final SnapshotTarget VIEWPORT = new SnapshotTarget(Target.VIEWPORT);
 	
 	public enum Target {
 		SCREEN, 
+		MAIN_SCREEN, 
 		PAGE, 
 		ELEMENT,
 		VIEWPORT
@@ -36,6 +38,10 @@ public class SnapshotTarget {
 	
 	public boolean isScreenTarget() {
 		return target == Target.SCREEN;
+	}
+	
+	public boolean isMainScreenTarget() {
+		return target == Target.MAIN_SCREEN;
 	}
 	
 	public boolean isViewportTarget() {

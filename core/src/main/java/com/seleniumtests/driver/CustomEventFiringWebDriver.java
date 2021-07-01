@@ -295,7 +295,7 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
     		+ "         }"
     		+ "         "
     		+ "         if (element === elements[i]) {"
-    		+ "             console.log(\"trouve\");"
+//    		+ "             console.log(\"trouve\");"
     		+ "             return p;"
     		+ "             break;"
     		+ "         }"
@@ -984,6 +984,13 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
 		}
 		return screenRect;
 	}
+	private static Rectangle getMainScreenRectangle() {
+		GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+		
+		GraphicsDevice gd = ge.getDefaultScreenDevice();
+		return gd.getDefaultConfiguration().getBounds();
+
+	}
 	
 	/**
 	 * Take screenshot of the desktop and put it in a file
@@ -994,6 +1001,17 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
 		
 		try {
 			Rectangle screenRect = getScreensRectangle();
+			return new Robot().createScreenCapture(screenRect);
+		} catch (HeadlessException | AWTError | AWTException e) {
+			throw new ScenarioException("Cannot capture image", e);
+		}
+	}
+	
+	private static BufferedImage captureMainDesktopScreenToBuffer() {
+		
+		
+		try {
+			Rectangle screenRect = getMainScreenRectangle();
 			return new Robot().createScreenCapture(screenRect);
 		} catch (HeadlessException | AWTError | AWTException e) {
 			throw new ScenarioException("Cannot capture image", e);
@@ -1173,6 +1191,10 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
 		Rectangle screenRectangle = getScreensRectangle();
 		robot.mouseMove(x + screenRectangle.x, y + screenRectangle.y);
 	}
+	private static void moveMouseMainScreen(Robot robot, int x, int y) {
+		Rectangle screenRectangle = getMainScreenRectangle();
+		robot.mouseMove(x + screenRectangle.x, y + screenRectangle.y);
+	}
 	
 	/**
 	 * Left clic at coordinates on desktop. Coordinates are from screen point of view
@@ -1180,11 +1202,18 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
 	 * @param y
 	 */
 	public static void leftClicOnDesktopAt(int x, int y, DriverMode driverMode, SeleniumGridConnector gridConnector) {
+		leftClicOnDesktopAt(false, x, y, driverMode, gridConnector);
+	}
+	public static void leftClicOnDesktopAt(boolean onlyMainScreen, int x, int y, DriverMode driverMode, SeleniumGridConnector gridConnector) {
 		
 		if (driverMode == DriverMode.LOCAL) {
 			try {
 				Robot robot = new Robot();
-				moveMouse(robot, x, y);
+				if (onlyMainScreen) {
+					moveMouseMainScreen(robot, x, y);
+				} else {
+					moveMouse(robot, x, y);
+				}
 				robot.mousePress(InputEvent.BUTTON1_DOWN_MASK);
 				robot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
 			} catch (AWTException e) {
@@ -1224,11 +1253,18 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
 	 * @param y
 	 */
 	public static void doubleClickOnDesktopAt(int x, int y, DriverMode driverMode, SeleniumGridConnector gridConnector) {
+		doubleClickOnDesktopAt(false, x, y, driverMode, gridConnector);
+	}
+	public static void doubleClickOnDesktopAt(boolean onlyMainScreen, int x, int y, DriverMode driverMode, SeleniumGridConnector gridConnector) {
 		
 		if (driverMode == DriverMode.LOCAL) {
 			try {
 				Robot robot = new Robot();
-				moveMouse(robot, x, y);
+				if (onlyMainScreen) {
+					moveMouseMainScreen(robot, x, y);
+				} else {
+					moveMouse(robot, x, y);
+				}
 				robot.mousePress(InputEvent.BUTTON1_DOWN_MASK);
 				robot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
 				robot.delay(10);
@@ -1250,11 +1286,18 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
 	 * @param y
 	 */
 	public static void rightClicOnDesktopAt(int x, int y, DriverMode driverMode, SeleniumGridConnector gridConnector) {
+		rightClicOnDesktopAt(false, x, y, driverMode, gridConnector);
+	}
+	public static void rightClicOnDesktopAt(boolean onlyMainScreen, int x, int y, DriverMode driverMode, SeleniumGridConnector gridConnector) {
 		
 		if (driverMode == DriverMode.LOCAL) {
 			try {
 				Robot robot = new Robot();
-				moveMouse(robot, x, y);
+				if (onlyMainScreen) {
+					moveMouseMainScreen(robot, x, y);
+				} else {
+					moveMouse(robot, x, y);
+				}
 				robot.mousePress(InputEvent.BUTTON2_DOWN_MASK);
 				robot.mouseRelease(InputEvent.BUTTON2_DOWN_MASK);
 			} catch (AWTException e) {
@@ -1321,8 +1364,25 @@ public class CustomEventFiringWebDriver extends EventFiringWebDriver implements 
 	 * @return
 	 */
 	public static String captureDesktopToBase64String(DriverMode driverMode, SeleniumGridConnector gridConnector) {
+		return captureDesktopToBase64String(false, driverMode, gridConnector);
+	}
+	
+	/**
+	 * Returns a Base64 string of the desktop
+	 * @param onlyMainScreen	if true, only capture the default (or main) screen
+	 * @param driverMode
+	 * @param gridConnector
+	 * @return
+	 */
+	public static String captureDesktopToBase64String(boolean onlyMainScreen, DriverMode driverMode, SeleniumGridConnector gridConnector) {
 		if (driverMode == DriverMode.LOCAL) {
-			BufferedImage bi = captureDesktopToBuffer();
+			BufferedImage bi;
+			if (onlyMainScreen) {
+				bi = captureMainDesktopScreenToBuffer();
+			} else {
+				bi = captureDesktopToBuffer();
+			}
+			
 			ByteArrayOutputStream os = new ByteArrayOutputStream();
 			OutputStream b64 = new Base64OutputStream(os);
 			try {

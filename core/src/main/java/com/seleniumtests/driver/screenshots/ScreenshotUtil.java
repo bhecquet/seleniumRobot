@@ -388,6 +388,10 @@ public class ScreenshotUtil {
     	if (target.isScreenTarget() && SeleniumTestsContextManager.isDesktopWebTest()) {
     		capturedImages.add(new NamedBufferedImage(captureDesktop(), ""));
     		
+    	// capture desktop
+    	} else if (target.isMainScreenTarget() && SeleniumTestsContextManager.isDesktopWebTest()) {
+    		capturedImages.add(new NamedBufferedImage(captureDesktop(true), ""));
+    			
     	// capture web with scrolling
     	} else if (target.isPageTarget() && SeleniumTestsContextManager.isWebTest()) {
     		removeAlert();
@@ -492,13 +496,22 @@ public class ScreenshotUtil {
      * @return
      */
     public BufferedImage captureDesktop() {
+    	return captureDesktop(false);
+    }
+    
+    /**
+     * Capture desktop screenshot. This is not available for mobile tests
+     * @param onlyMainScreen	only capture the default (or 'main') screen
+     * @return
+     */
+    public BufferedImage captureDesktop(boolean onlyMainScreen) {
     	
 		if (SeleniumTestsContextManager.isMobileTest()) {
 			throw new ScenarioException("Desktop capture can only be done on Desktop tests");
 		}
 
 		// use driver because, we need remote desktop capture when using grid mode
-		String screenshotB64 =  CustomEventFiringWebDriver.captureDesktopToBase64String(SeleniumTestsContextManager.getThreadContext().getRunMode(), 
+		String screenshotB64 =  CustomEventFiringWebDriver.captureDesktopToBase64String(onlyMainScreen, SeleniumTestsContextManager.getThreadContext().getRunMode(), 
 																							SeleniumTestsContextManager.getThreadContext().getSeleniumGridConnector());
 		try {
 			return ImageProcessor.loadFromB64String(screenshotB64);
