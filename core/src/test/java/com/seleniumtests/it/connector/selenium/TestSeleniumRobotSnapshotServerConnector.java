@@ -111,10 +111,11 @@ public class TestSeleniumRobotSnapshotServerConnector extends GenericTest {
 		Integer testCaseId = connector.createTestCase("Test 1");
 		Integer testCaseInSessionId = connector.createTestCaseInSession(sessionId, testCaseId, "Test 1");
 		Integer testStepId = connector.createTestStep("Step 1", testCaseInSessionId);
+		connector.createTestStep("Step 2", testCaseInSessionId);
 		Assert.assertNotNull(testStepId);
 		
 		List<String> testSteps = connector.getStepListFromTestCase(testCaseInSessionId);
-		Assert.assertEquals(testSteps.size(), 1);
+		Assert.assertEquals(testSteps.size(), 2);
 		Assert.assertEquals(testSteps.get(0), testStepId.toString());
 	}
 	
